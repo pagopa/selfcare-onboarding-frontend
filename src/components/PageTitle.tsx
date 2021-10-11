@@ -1,5 +1,5 @@
-import React from 'react'
-import { Container, Row } from 'react-bootstrap'
+import React from 'react';
+import { Container, Row } from 'react-bootstrap';
 
 export function PageTitle() {
   return (
@@ -10,5 +10,5 @@ export function PageTitle() {
         </Row>
       </Container>
     </div>
-  )
+  );
 }

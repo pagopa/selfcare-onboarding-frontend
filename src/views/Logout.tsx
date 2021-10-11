@@ -1,7 +1,7 @@
-import { useLogout } from '../hooks/useLogout'
+import { useLogout } from '../hooks/useLogout';
 
 export function Logout() {
-  useLogout()
+  useLogout();
 
-  return null
+  return null;
 }

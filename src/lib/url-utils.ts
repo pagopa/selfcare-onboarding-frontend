@@ -1,5 +1,5 @@
-import qs from 'query-string'
+import qs from 'query-string';
 
 export function parseSearch(search: string) {
-  return qs.parse(search)
+  return qs.parse(search);
 }

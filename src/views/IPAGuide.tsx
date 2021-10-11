@@ -1,6 +1,6 @@
-import React from 'react'
-import { StyledIntro } from '../components/StyledIntro'
-import { WhiteBackground } from '../components/WhiteBackground'
+import React from 'react';
+import { StyledIntro } from '../components/StyledIntro';
+import { WhiteBackground } from '../components/WhiteBackground';
 
 const CONTENTS = [
   {
@@ -19,7 +19,7 @@ const CONTENTS = [
     title: 'Guida step 4',
     text: 'Nunc odio lorem, hendrerit sed justo ac, luctus sollicitudin erat. Donec non neque aliquet, malesuada metus sed, finibus magna. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vestibulum molestie congue ligula in accumsan. Cras ullamcorper finibus felis, pulvinar venenatis metus consequat nec. Ut eget metus congue ipsum pulvinar venenatis. Sed nec nulla dolor. Mauris vitae urna nec urna auctor consectetur non eu nisi. Aliquam vitae metus semper, scelerisque libero ac, malesuada diam. Sed vehicula diam augue, id tincidunt leo pharetra in.',
   },
-]
+];
 
 export function IPAGuide() {
   return (
@@ -38,5 +38,5 @@ export function IPAGuide() {
         </div>
       ))}
     </WhiteBackground>
-  )
+  );
 }

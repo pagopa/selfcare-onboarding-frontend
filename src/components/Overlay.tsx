@@ -1,61 +1,61 @@
-import React, { FunctionComponent, useEffect } from 'react'
+import React, { FunctionComponent, useEffect } from 'react';
 
-type EventOptions = boolean | EventListenerOptions | undefined | any
-type KeyObj = { [key in number]: number }
+type EventOptions = boolean | EventListenerOptions | undefined | any;
+type KeyObj = { [key in number]: number };
 
 export const Overlay: FunctionComponent = ({ children }) => {
   // From https://stackoverflow.com/a/4770179
 
   // left: 37, up: 38, right: 39, down: 40,
   // spacebar: 32, pageup: 33, pagedown: 34, end: 35, home: 36
-  const keys: KeyObj = { 37: 1, 38: 1, 39: 1, 40: 1 }
+  const keys: KeyObj = { 37: 1, 38: 1, 39: 1, 40: 1 };
 
   function preventDefault(e: any) {
-    e.preventDefault()
+    e.preventDefault();
   }
 
   function preventDefaultForScrollKeys(e: any) {
     if (!!keys[e.keyCode]) {
-      preventDefault(e)
-      return false
+      preventDefault(e);
+      return false;
     }
   }
 
   // modern Chrome requires { passive: false } when adding event
-  let supportsPassive = false
+  let supportsPassive = false;
   const passiveCheck = Object.defineProperty({}, 'passive', {
     // eslint-disable-next-line getter-return
     get: function () {
-      supportsPassive = true
+      supportsPassive = true;
     },
-  })
+  });
   try {
-    window.addEventListener('test' as any, null as any, passiveCheck)
+    window.addEventListener('test' as any, null as any, passiveCheck);
   } catch (e) {}
 
-  const wheelOpt: EventOptions = supportsPassive ? { passive: false } : false
-  const wheelEvent = 'onwheel' in document.createElement('div') ? 'wheel' : 'mousewheel'
+  const wheelOpt: EventOptions = supportsPassive ? { passive: false } : false;
+  const wheelEvent = 'onwheel' in document.createElement('div') ? 'wheel' : 'mousewheel';
 
   // call this to Disable
   function disableScroll() {
-    window.addEventListener('DOMMouseScroll', preventDefault, false) // older FF
-    window.addEventListener(wheelEvent, preventDefault, wheelOpt) // modern desktop
-    window.addEventListener('touchmove', preventDefault, wheelOpt) // mobile
-    window.addEventListener('keydown', preventDefaultForScrollKeys, false)
+    window.addEventListener('DOMMouseScroll', preventDefault, false); // older FF
+    window.addEventListener(wheelEvent, preventDefault, wheelOpt); // modern desktop
+    window.addEventListener('touchmove', preventDefault, wheelOpt); // mobile
+    window.addEventListener('keydown', preventDefaultForScrollKeys, false);
   }
 
   // call this to Enable
   function enableScroll() {
-    window.removeEventListener('DOMMouseScroll', preventDefault, false)
-    window.removeEventListener(wheelEvent, preventDefault, wheelOpt)
-    window.removeEventListener('touchmove', preventDefault, wheelOpt)
-    window.removeEventListener('keydown', preventDefaultForScrollKeys, false)
+    window.removeEventListener('DOMMouseScroll', preventDefault, false);
+    window.removeEventListener(wheelEvent, preventDefault, wheelOpt);
+    window.removeEventListener('touchmove', preventDefault, wheelOpt);
+    window.removeEventListener('keydown', preventDefaultForScrollKeys, false);
   }
 
   useEffect(() => {
-    disableScroll()
-    return enableScroll
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+    disableScroll();
+    return enableScroll;
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div
@@ -64,5 +64,5 @@ export const Overlay: FunctionComponent = ({ children }) => {
     >
       <div className="mx-auto my-auto">{children}</div>
     </div>
-  )
-}
+  );
+};

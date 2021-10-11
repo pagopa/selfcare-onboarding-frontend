@@ -1,17 +1,17 @@
-import React from 'react'
-import { Form } from 'react-bootstrap'
-import { StyledInputLabel } from './StyledInputLabel'
+import React from 'react';
+import { Form } from 'react-bootstrap';
+import { StyledInputLabel } from './StyledInputLabel';
 
 type StyledInputCheckboxProps = {
-  id: string
-  label: string
-  groupLabel?: string
-  checked: boolean
-  onChange: any
-  inline?: boolean
-  readOnly?: boolean
-  className?: string
-}
+  id: string;
+  label: string;
+  groupLabel?: string;
+  checked: boolean;
+  onChange: any;
+  inline?: boolean;
+  readOnly?: boolean;
+  className?: string;
+};
 
 export function StyledInputCheckbox({
   groupLabel,
@@ -34,7 +34,7 @@ export function StyledInputCheckbox({
         label={label}
         disabled={readOnly}
       />
-    )
+    );
   }
 
   return (
@@ -49,5 +49,5 @@ export function StyledInputCheckbox({
         disabled={readOnly}
       />
     </div>
-  )
+  );
 }

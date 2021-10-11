@@ -1,14 +1,14 @@
-import React, { useContext } from 'react'
-import { Link } from 'react-router-dom'
-import logo from '../assets/pagopa-logo.svg'
-import { ROUTES } from '../lib/constants'
-import { UserContext } from '../lib/context'
-import { Container, Row, Col, Button } from 'react-bootstrap'
+import React, { useContext } from 'react';
+import { Link } from 'react-router-dom';
+import logo from '../assets/pagopa-logo.svg';
+import { ROUTES } from '../lib/constants';
+import { UserContext } from '../lib/context';
+import { Container, Row, Col, Button } from 'react-bootstrap';
 
 export function MainHeader() {
-  const { user } = useContext(UserContext)
+  const { user } = useContext(UserContext);
 
-  const { PATH: btnPath, LABEL: btnLabel } = user ? ROUTES.LOGOUT : ROUTES.LOGIN
+  const { PATH: btnPath, LABEL: btnLabel } = user ? ROUTES.LOGOUT : ROUTES.LOGIN;
 
   return (
     <div className="bg-white">
@@ -30,5 +30,5 @@ export function MainHeader() {
         </Row>
       </Container>
     </div>
-  )
+  );
 }

@@ -1,11 +1,11 @@
-import React, { useContext } from 'react'
-import { WhiteBackground } from '../components/WhiteBackground'
-import { withLogin } from '../components/withLogin'
-import { PartyContext, UserContext } from '../lib/context'
+import React, { useContext } from 'react';
+import { WhiteBackground } from '../components/WhiteBackground';
+import { withLogin } from '../components/withLogin';
+import { PartyContext, UserContext } from '../lib/context';
 
 function MyExampleLoggedInRouteComponent() {
-  const { user } = useContext(UserContext)
-  const { party } = useContext(PartyContext)
+  const { user } = useContext(UserContext);
+  const { party } = useContext(PartyContext);
 
   return (
     <WhiteBackground>
@@ -19,7 +19,7 @@ function MyExampleLoggedInRouteComponent() {
         <strong>{party?.description}</strong>
       </p>
     </WhiteBackground>
-  )
+  );
 }
 
-export const MyExampleLoggedInRoute = withLogin(MyExampleLoggedInRouteComponent)
+export const MyExampleLoggedInRoute = withLogin(MyExampleLoggedInRouteComponent);

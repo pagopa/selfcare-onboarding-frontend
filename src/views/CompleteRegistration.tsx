@@ -1,61 +1,61 @@
-import React, { useState } from 'react'
-import { WhiteBackground } from '../components/WhiteBackground'
-import { LoadingOverlay } from '../components/LoadingOverlay'
-import { Link, useLocation } from 'react-router-dom'
-import { Form, Button } from 'react-bootstrap'
-import { fetchWithLogs } from '../lib/api-utils'
-import { MessageNoAction } from '../components/MessageNoAction'
-import { RequestOutcome, RequestOutcomeOptions } from '../../types'
-import checkIllustration from '../assets/check-illustration.svg'
-import redXIllustration from '../assets/red-x-illustration.svg'
-import { StyledInputFile } from '../components/StyledInputFile'
-import { getFetchOutcome } from '../lib/error-utils'
-import { InlineSupportLink } from '../components/InlineSupportLink'
-import isEmpty from 'lodash/isEmpty'
-import { StyledIntro } from '../components/StyledIntro'
-import { parseSearch } from '../lib/url-utils'
+import React, { useState } from 'react';
+import { WhiteBackground } from '../components/WhiteBackground';
+import { LoadingOverlay } from '../components/LoadingOverlay';
+import { Link, useLocation } from 'react-router-dom';
+import { Form, Button } from 'react-bootstrap';
+import { fetchWithLogs } from '../lib/api-utils';
+import { MessageNoAction } from '../components/MessageNoAction';
+import { RequestOutcome, RequestOutcomeOptions } from '../../types';
+import checkIllustration from '../assets/check-illustration.svg';
+import redXIllustration from '../assets/red-x-illustration.svg';
+import { StyledInputFile } from '../components/StyledInputFile';
+import { getFetchOutcome } from '../lib/error-utils';
+import { InlineSupportLink } from '../components/InlineSupportLink';
+import isEmpty from 'lodash/isEmpty';
+import { StyledIntro } from '../components/StyledIntro';
+import { parseSearch } from '../lib/url-utils';
 
 export function CompleteRegistration() {
-  const [loading, setLoading] = useState(false)
-  const [outcome, setOutcome] = useState<RequestOutcome>()
-  const [contract, setContract] = useState<Blob>()
-  const location = useLocation()
+  const [loading, setLoading] = useState(false);
+  const [outcome, setOutcome] = useState<RequestOutcome>();
+  const [contract, setContract] = useState<Blob>();
+  const location = useLocation();
 
   const getJwt = () => {
-    const s = parseSearch(location.search)
-    return s.jwt
-  }
+    const s = parseSearch(location.search);
+    return s.jwt;
+  };
 
-  const token = getJwt()
+  const token = getJwt();
 
   const handleSubmit = async (e: React.SyntheticEvent) => {
     // Avoid page reload
-    e.preventDefault()
+    e.preventDefault();
     // Start the loader
-    setLoading(true)
+    setLoading(true);
     // Append the file as form data
-    const formData = new FormData()
-    formData.append('contract', contract!)
+    const formData = new FormData();
+    formData.append('contract', contract!);
     // Send multipart/form-data POST request
     const contractPostResponse = await fetchWithLogs(
       { endpoint: 'ONBOARDING_COMPLETE_REGISTRATION', endpointParams: { token } },
       { method: 'POST', data: formData, headers: { 'Content-Type': 'multipart/form-data' } }
-    )
+    );
     // Stop the loader
-    setLoading(false)
+    setLoading(false);
 
     // Check the outcome
-    const outcome = getFetchOutcome(contractPostResponse)
+    const outcome = getFetchOutcome(contractPostResponse);
 
     // Show it to the end user
-    setOutcome(outcome)
-  }
+    setOutcome(outcome);
+  };
 
   const loadFile = (e: any) => {
     if (!isEmpty(e.target.files) && e.target.files.length > 0) {
-      setContract(e.target.files[0])
+      setContract(e.target.files[0]);
     }
-  }
+  };
 
   const outcomeContent: RequestOutcomeOptions = {
     success: {
@@ -82,7 +82,7 @@ export function CompleteRegistration() {
         </p>,
       ],
     },
-  }
+  };
 
   return !outcome ? (
     <React.Fragment>
@@ -114,5 +114,5 @@ export function CompleteRegistration() {
     </React.Fragment>
   ) : (
     <MessageNoAction {...outcomeContent[outcome]} />
-  )
+  );
 }

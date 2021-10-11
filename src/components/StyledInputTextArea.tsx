@@ -1,20 +1,20 @@
-import { createRef, useEffect } from 'react'
-import { Form } from 'react-bootstrap'
-import { StyledInputLabel } from './StyledInputLabel'
+import { createRef, useEffect } from 'react';
+import { Form } from 'react-bootstrap';
+import { StyledInputLabel } from './StyledInputLabel';
 
 type StyledInputTextAreaProps = {
-  value: string
-  height?: number
-  readOnly?: boolean
-  id?: string
-  label?: string
-  placeholder?: string
-  onChange?: any
-  onBlur?: any
-  className?: string
-  autofocusOnFalseReadOnly?: boolean
-  readOnlyBgWhite?: boolean
-}
+  value: string;
+  height?: number;
+  readOnly?: boolean;
+  id?: string;
+  label?: string;
+  placeholder?: string;
+  onChange?: any;
+  onBlur?: any;
+  className?: string;
+  autofocusOnFalseReadOnly?: boolean;
+  readOnlyBgWhite?: boolean;
+};
 
 export function StyledInputTextArea({
   value,
@@ -29,13 +29,13 @@ export function StyledInputTextArea({
   autofocusOnFalseReadOnly = false,
   readOnlyBgWhite = false,
 }: StyledInputTextAreaProps) {
-  const inputRef = createRef<HTMLTextAreaElement>()
+  const inputRef = createRef<HTMLTextAreaElement>();
 
   useEffect(() => {
     if (!readOnly && inputRef.current && autofocusOnFalseReadOnly) {
-      inputRef.current.focus()
+      inputRef.current.focus();
     }
-  }, [readOnly]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [readOnly]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className={className}>
@@ -56,5 +56,5 @@ export function StyledInputTextArea({
         onBlur={onBlur}
       />
     </div>
-  )
+  );
 }

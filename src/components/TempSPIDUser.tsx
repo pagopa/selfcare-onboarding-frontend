@@ -1,20 +1,20 @@
-import React, { useState } from 'react'
-import isEmpty from 'lodash/isEmpty'
-import { Button, Form } from 'react-bootstrap'
-import { useLogin } from '../hooks/useLogin'
-import { LoadingOverlay } from './LoadingOverlay'
-import { UsersObject } from './OnboardingStep2'
-import { PlatformUserForm } from './PlatformUserForm'
-import { StyledIntro } from './StyledIntro'
+import React, { useState } from 'react';
+import isEmpty from 'lodash/isEmpty';
+import { Button, Form } from 'react-bootstrap';
+import { useLogin } from '../hooks/useLogin';
+import { LoadingOverlay } from './LoadingOverlay';
+import { UsersObject } from './OnboardingStep2';
+import { PlatformUserForm } from './PlatformUserForm';
+import { StyledIntro } from './StyledIntro';
 
 export function TempSPIDUser() {
-  const [data, setData] = useState<UsersObject>({})
-  const { setTestSPIDUser, loadingText } = useLogin()
+  const [data, setData] = useState<UsersObject>({});
+  const { setTestSPIDUser, loadingText } = useLogin();
 
   const handleSubmit = (e: React.SyntheticEvent) => {
-    e.preventDefault()
-    setTestSPIDUser({ ...data['spid'], status: 'active' })
-  }
+    e.preventDefault();
+    setTestSPIDUser({ ...data['spid'], status: 'active' });
+  };
 
   return (
     <React.Fragment>
@@ -63,5 +63,5 @@ export function TempSPIDUser() {
       </div>
       {loadingText && <LoadingOverlay loadingText={loadingText} />}
     </React.Fragment>
-  )
+  );
 }

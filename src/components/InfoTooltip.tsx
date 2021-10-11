@@ -1,10 +1,10 @@
-import React from 'react'
-import { OverlayTrigger, Tooltip } from 'react-bootstrap'
+import React from 'react';
+import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 
 type InfoTooltipProps = {
-  label: string
-  className?: string
-}
+  label: string;
+  className?: string;
+};
 
 export function InfoTooltip({ label, className = '' }: InfoTooltipProps) {
   return (
@@ -18,5 +18,5 @@ export function InfoTooltip({ label, className = '' }: InfoTooltipProps) {
     >
       <i className={`text-primary fs-6 bi bi-info-circle ${className}`} />
     </OverlayTrigger>
-  )
+  );
 }

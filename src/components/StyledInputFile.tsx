@@ -1,12 +1,12 @@
-import React from 'react'
+import React from 'react';
 
 type StyledInputFileProps = {
-  id: string
-  onChange: any
-  value?: any
-  label: string
-  className?: string
-}
+  id: string;
+  onChange: any;
+  value?: any;
+  label: string;
+  className?: string;
+};
 
 export function StyledInputFile({
   id,
@@ -35,5 +35,5 @@ export function StyledInputFile({
         File selezionato: <strong>{value ? value.name : 'nessun file selezionato'}</strong>
       </div>
     </div>
-  )
+  );
 }

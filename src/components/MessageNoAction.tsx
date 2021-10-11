@@ -1,6 +1,6 @@
-import React from 'react'
-import { RequestOutcomeMessage } from '../../types'
-import { WhiteBackground } from './WhiteBackground'
+import React from 'react';
+import { RequestOutcomeMessage } from '../../types';
+import { WhiteBackground } from './WhiteBackground';
 
 export function MessageNoAction({ img, title, description }: RequestOutcomeMessage) {
   return (
@@ -17,5 +17,5 @@ export function MessageNoAction({ img, title, description }: RequestOutcomeMessa
         ))}
       </div>
     </WhiteBackground>
-  )
+  );
 }

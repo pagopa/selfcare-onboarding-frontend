@@ -1,23 +1,23 @@
-import React from 'react'
-import { Form } from 'react-bootstrap'
-import { StyledInputLabel } from './StyledInputLabel'
+import React from 'react';
+import { Form } from 'react-bootstrap';
+import { StyledInputLabel } from './StyledInputLabel';
 
 type Option = {
-  label: string
-  disabled?: boolean
-  onChange?: any
-  value: string
-}
+  label: string;
+  disabled?: boolean;
+  onChange?: any;
+  value: string;
+};
 
 type StyledInputRadioGroupProps = {
-  groupLabel: string
-  options: Option[]
-  id: string
-  currentValue?: string
-  onChange?: any
-  readOnly?: boolean
-  className?: string
-}
+  groupLabel: string;
+  options: Option[];
+  id: string;
+  currentValue?: string;
+  onChange?: any;
+  readOnly?: boolean;
+  className?: string;
+};
 
 export function StyledInputRadioGroup({
   groupLabel,
@@ -46,8 +46,8 @@ export function StyledInputRadioGroup({
             checked={currentValue === option.value}
             onChange={onChange || option.onChange}
           />
-        )
+        );
       })}
     </div>
-  )
+  );
 }

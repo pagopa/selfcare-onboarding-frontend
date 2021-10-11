@@ -1,24 +1,24 @@
-import React from 'react'
-import { StepperStep } from '../../types'
-import checkIcon from '../assets/icons/check.svg'
+import React from 'react';
+import { StepperStep } from '../../types';
+import checkIcon from '../assets/icons/check.svg';
 
 type StepperProps = {
-  steps: StepperStep[]
-  activeIndex: number
-}
+  steps: StepperStep[];
+  activeIndex: number;
+};
 
 export function Stepper({ steps, activeIndex }: StepperProps) {
   const getStatus = (index: number) => {
     if (index > activeIndex) {
-      return 'future'
+      return 'future';
     }
 
     if (index === activeIndex) {
-      return 'current'
+      return 'current';
     }
 
-    return 'past'
-  }
+    return 'past';
+  };
 
   const classes = {
     number: {
@@ -31,12 +31,12 @@ export function Stepper({ steps, activeIndex }: StepperProps) {
       past: 'text-primary',
       future: 'text-light',
     },
-  }
+  };
 
   return (
     <div className="d-flex justify-content-between">
       {steps.map(({ label }, i) => {
-        const status = getStatus(i)
+        const status = getStatus(i);
 
         return (
           <div key={i} className="border-start border-light d-flex align-items-center fw-bold">
@@ -54,8 +54,8 @@ export function Stepper({ steps, activeIndex }: StepperProps) {
             </div>
             <div className={`text-uppercase ${classes.label[status]}`}>{label}</div>
           </div>
-        )
+        );
       })}
     </div>
-  )
+  );
 }

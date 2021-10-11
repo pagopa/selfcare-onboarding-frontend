@@ -1,21 +1,21 @@
-import React, { useState } from 'react'
-import { AsyncTypeahead } from 'react-bootstrap-typeahead'
-import { Endpoint } from '../../types'
-import { fetchWithLogs } from '../lib/api-utils'
-import debounce from 'lodash/debounce'
-import 'react-bootstrap-typeahead/css/Typeahead.css'
-import { getFetchOutcome } from '../lib/error-utils'
-import { AxiosResponse } from 'axios'
+import React, { useState } from 'react';
+import { AsyncTypeahead } from 'react-bootstrap-typeahead';
+import { Endpoint } from '../../types';
+import { fetchWithLogs } from '../lib/api-utils';
+import debounce from 'lodash/debounce';
+import 'react-bootstrap-typeahead/css/Typeahead.css';
+import { getFetchOutcome } from '../lib/error-utils';
+import { AxiosResponse } from 'axios';
 
 type AutocompleteProps = {
-  selected: any
-  setSelected: React.Dispatch<React.SetStateAction<any>>
-  placeholder: string
-  endpoint: Endpoint
-  transformFn: any
-  labelKey: string
-  multiple?: boolean
-}
+  selected: any;
+  setSelected: React.Dispatch<React.SetStateAction<any>>;
+  placeholder: string;
+  endpoint: Endpoint;
+  transformFn: any;
+  labelKey: string;
+  multiple?: boolean;
+};
 
 export function AsyncAutocomplete({
   selected,
@@ -26,26 +26,26 @@ export function AsyncAutocomplete({
   labelKey,
   multiple = false,
 }: AutocompleteProps) {
-  const [isLoading, setIsLoading] = useState(false)
-  const [options, setOptions] = useState<any[]>([])
+  const [isLoading, setIsLoading] = useState(false);
+  const [options, setOptions] = useState<any[]>([]);
 
   const handleSearch = async (query: string) => {
-    setIsLoading(true)
+    setIsLoading(true);
 
     const searchResponse = await fetchWithLogs(endpoint, {
       method: 'GET',
       params: { limit: 100, page: 1, search: query },
-    })
+    });
 
-    const outcome = getFetchOutcome(searchResponse)
+    const outcome = getFetchOutcome(searchResponse);
 
     if (outcome === 'success') {
-      setOptions(transformFn((searchResponse as AxiosResponse).data))
+      setOptions(transformFn((searchResponse as AxiosResponse).data));
     }
-    setIsLoading(false)
-  }
+    setIsLoading(false);
+  };
 
-  const filterBy = () => true
+  const filterBy = () => true;
 
   return (
     <AsyncTypeahead
@@ -69,5 +69,5 @@ export function AsyncAutocomplete({
         </React.Fragment>
       )}
     />
-  )
+  );
 }

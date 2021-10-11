@@ -1,21 +1,21 @@
-import React from 'react'
-import { UserOnCreate, UserPlatformRole, UserRole } from '../../types'
-import { UsersObject } from './OnboardingStep2'
-import { StyledInputText, StyledInputTextType } from './StyledInputText'
+import React from 'react';
+import { UserOnCreate, UserPlatformRole, UserRole } from '../../types';
+import { UsersObject } from './OnboardingStep2';
+import { StyledInputText, StyledInputTextType } from './StyledInputText';
 
 type PlatformUserFormProps = {
-  prefix: keyof UsersObject
-  role: UserRole
-  platformRole: UserPlatformRole
-  people: UsersObject
-  setPeople: React.Dispatch<React.SetStateAction<UsersObject>>
-}
+  prefix: keyof UsersObject;
+  role: UserRole;
+  platformRole: UserPlatformRole;
+  people: UsersObject;
+  setPeople: React.Dispatch<React.SetStateAction<UsersObject>>;
+};
 
 type Field = {
-  id: keyof UserOnCreate
-  label: string
-  type?: 'text' | 'email'
-}
+  id: keyof UserOnCreate;
+  label: string;
+  type?: 'text' | 'email';
+};
 
 export function PlatformUserForm({
   prefix,
@@ -28,15 +28,15 @@ export function PlatformUserForm({
     setPeople({
       ...people,
       [prefix]: { ...people[prefix], [key]: e.target.value, role, platformRole },
-    })
-  }
+    });
+  };
 
   const fields: Field[] = [
     { id: 'name', label: 'Nome' },
     { id: 'surname', label: 'Cognome' },
     { id: 'taxCode', label: 'Codice Fiscale' },
     { id: 'email', label: 'Email', type: 'email' },
-  ]
+  ];
 
   return (
     <React.Fragment>
@@ -52,5 +52,5 @@ export function PlatformUserForm({
         </React.Fragment>
       ))}
     </React.Fragment>
-  )
+  );
 }

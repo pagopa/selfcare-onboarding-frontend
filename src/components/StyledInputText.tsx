@@ -1,23 +1,23 @@
-import React from 'react'
-import { Form } from 'react-bootstrap'
-import { InfoTooltip } from './InfoTooltip'
-import { StyledInputLabel } from './StyledInputLabel'
+import React from 'react';
+import { Form } from 'react-bootstrap';
+import { InfoTooltip } from './InfoTooltip';
+import { StyledInputLabel } from './StyledInputLabel';
 
-export type StyledInputTextType = 'text' | 'email' | 'number'
+export type StyledInputTextType = 'text' | 'email' | 'number';
 
 type StyledInputTextProps = {
-  type?: StyledInputTextType
-  id: string
-  label: string
-  placeholder?: string
-  readOnly?: boolean
-  value?: string | number
-  onChange?: any
-  className?: string
-  tooltipLabel?: string
-  min?: number | string | undefined
-  white?: boolean
-}
+  type?: StyledInputTextType;
+  id: string;
+  label: string;
+  placeholder?: string;
+  readOnly?: boolean;
+  value?: string | number;
+  onChange?: any;
+  className?: string;
+  tooltipLabel?: string;
+  min?: number | string | undefined;
+  white?: boolean;
+};
 
 export function StyledInputText({
   type = 'text',
@@ -50,5 +50,5 @@ export function StyledInputText({
         min={min}
       />
     </div>
-  )
+  );
 }

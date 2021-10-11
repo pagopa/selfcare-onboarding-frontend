@@ -1,31 +1,31 @@
-import React, { useContext } from 'react'
-import { useHistory } from 'react-router-dom'
-import { Party } from '../../types'
-import { WhiteBackground } from '../components/WhiteBackground'
-import { withLogin } from '../components/withLogin'
-import { ROUTES, USER_ROLE_LABEL } from '../lib/constants'
-import { PartyContext } from '../lib/context'
-import { Row, Col, Button } from 'react-bootstrap'
-import { StyledInputRadioGroup } from '../components/StyledInputRadioGroup'
-import { storageWrite } from '../lib/storage-utils'
-import { StyledIntro } from '../components/StyledIntro'
+import React, { useContext } from 'react';
+import { useHistory } from 'react-router-dom';
+import { Party } from '../../types';
+import { WhiteBackground } from '../components/WhiteBackground';
+import { withLogin } from '../components/withLogin';
+import { ROUTES, USER_ROLE_LABEL } from '../lib/constants';
+import { PartyContext } from '../lib/context';
+import { Row, Col, Button } from 'react-bootstrap';
+import { StyledInputRadioGroup } from '../components/StyledInputRadioGroup';
+import { storageWrite } from '../lib/storage-utils';
+import { StyledIntro } from '../components/StyledIntro';
 
 function ChoosePartyComponent() {
-  const { setParty, party, availableParties } = useContext(PartyContext)
-  const history = useHistory()
+  const { setParty, party, availableParties } = useContext(PartyContext);
+  const history = useHistory();
 
   const buildUpdateActiveParty = (newParty: Party) => (_: React.SyntheticEvent) => {
-    setParty(newParty)
-    storageWrite('currentParty', newParty, 'object')
-  }
+    setParty(newParty);
+    storageWrite('currentParty', newParty, 'object');
+  };
 
   const confirmChoice = () => {
-    history.push(ROUTES.LOGGED_IN_ROUTE.PATH)
-  }
+    history.push(ROUTES.LOGGED_IN_ROUTE.PATH);
+  };
 
   const goToOnboarding = () => {
-    history.push(ROUTES.ONBOARDING.PATH)
-  }
+    history.push(ROUTES.ONBOARDING.PATH);
+  };
 
   return availableParties.length > 0 ? (
     <WhiteBackground>
@@ -90,7 +90,7 @@ function ChoosePartyComponent() {
         </Col>
       </Row>
     </WhiteBackground>
-  )
+  );
 }
 
-export const ChooseParty = withLogin(ChoosePartyComponent)
+export const ChooseParty = withLogin(ChoosePartyComponent);

@@ -1,16 +1,16 @@
-import React from 'react'
-import { Button } from 'react-bootstrap'
+import React from 'react';
+import { Button } from 'react-bootstrap';
 
 type ActionStep = {
-  action?: () => void
-  label?: string
-  disabled?: boolean
-}
+  action?: () => void;
+  label?: string;
+  disabled?: boolean;
+};
 
 type ActionStepsProps = {
-  forward?: ActionStep
-  back?: ActionStep
-}
+  forward?: ActionStep;
+  back?: ActionStep;
+};
 
 export function OnboardingStepActions({ forward, back }: ActionStepsProps) {
   return (
@@ -31,5 +31,5 @@ export function OnboardingStepActions({ forward, back }: ActionStepsProps) {
         </Button>
       )}
     </div>
-  )
+  );
 }

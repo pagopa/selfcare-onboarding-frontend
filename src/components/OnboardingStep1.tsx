@@ -1,22 +1,22 @@
-import React, { useContext, useState } from 'react'
-import { IPACatalogParty, StepperStepComponentProps } from '../../types'
-import { WhiteBackground } from '../components/WhiteBackground'
-import { UserContext } from '../lib/context'
-import { Row, Container } from 'react-bootstrap'
-import { OnboardingStepActions } from './OnboardingStepActions'
-import { AsyncAutocomplete } from './AsyncAutocomplete'
-import { StyledIntro } from './StyledIntro'
-import { ROUTES } from '../lib/constants'
-import { Link } from 'react-router-dom'
+import React, { useContext, useState } from 'react';
+import { IPACatalogParty, StepperStepComponentProps } from '../../types';
+import { WhiteBackground } from '../components/WhiteBackground';
+import { UserContext } from '../lib/context';
+import { Row, Container } from 'react-bootstrap';
+import { OnboardingStepActions } from './OnboardingStepActions';
+import { AsyncAutocomplete } from './AsyncAutocomplete';
+import { StyledIntro } from './StyledIntro';
+import { ROUTES } from '../lib/constants';
+import { Link } from 'react-router-dom';
 
 export function OnboardingStep1({ forward }: StepperStepComponentProps) {
-  const { user } = useContext(UserContext)
-  const [selected, setSelected] = useState<IPACatalogParty[]>([])
+  const { user } = useContext(UserContext);
+  const [selected, setSelected] = useState<IPACatalogParty[]>([]);
 
   const onForwardAction = () => {
-    const { digitalAddress, id } = selected[0]
-    forward!({ institutionId: id }, digitalAddress)
-  }
+    const { digitalAddress, id } = selected[0];
+    forward!({ institutionId: id }, digitalAddress);
+  };
 
   return (
     <WhiteBackground>
@@ -54,5 +54,5 @@ export function OnboardingStep1({ forward }: StepperStepComponentProps) {
         />
       </Container>
     </WhiteBackground>
-  )
+  );
 }

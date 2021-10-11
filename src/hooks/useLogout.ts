@@ -1,26 +1,26 @@
-import { useContext, useEffect } from 'react'
-import { useHistory } from 'react-router-dom'
-import { BASE_ROUTE } from '../lib/constants'
-import { PartyContext, UserContext } from '../lib/context'
-import { storageDelete } from '../lib/storage-utils'
+import { useContext, useEffect } from 'react';
+import { useHistory } from 'react-router-dom';
+import { BASE_ROUTE } from '../lib/constants';
+import { PartyContext, UserContext } from '../lib/context';
+import { storageDelete } from '../lib/storage-utils';
 
 export const useLogout = () => {
-  const { setParty, setAvailableParties } = useContext(PartyContext)
-  const { setUser } = useContext(UserContext)
-  const history = useHistory()
+  const { setParty, setAvailableParties } = useContext(PartyContext);
+  const { setUser } = useContext(UserContext);
+  const history = useHistory();
 
   useEffect(() => {
     // clean up user
-    setUser(null)
+    setUser(null);
     // clean up parties
-    setParty(null)
-    setAvailableParties([])
+    setParty(null);
+    setAvailableParties([]);
     // delete everything from the storage
-    storageDelete('user')
-    storageDelete('bearer')
-    storageDelete('currentParty')
+    storageDelete('user');
+    storageDelete('bearer');
+    storageDelete('currentParty');
 
     // go back to homepage (which will redirect to login)
-    history.push(BASE_ROUTE)
-  }, []) //eslint-disable-line react-hooks/exhaustive-deps
-}
+    history.push(BASE_ROUTE);
+  }, []); //eslint-disable-line react-hooks/exhaustive-deps
+};

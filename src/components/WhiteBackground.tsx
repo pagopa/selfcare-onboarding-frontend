@@ -1,14 +1,14 @@
-import React, { CSSProperties, FunctionComponent } from 'react'
-import { Container } from 'react-bootstrap'
+import React, { CSSProperties, FunctionComponent } from 'react';
+import { Container } from 'react-bootstrap';
 
 type WhiteBackgroundProps = {
-  containerClassNames?: string
-  containerStyles?: CSSProperties
-  stickToTop?: boolean
-  noBottomSpacing?: boolean
-}
+  containerClassNames?: string;
+  containerStyles?: CSSProperties;
+  stickToTop?: boolean;
+  noBottomSpacing?: boolean;
+};
 
-const MAX_WIDTH = 1300
+const MAX_WIDTH = 1300;
 
 export const WhiteBackground: FunctionComponent<WhiteBackgroundProps> = ({
   children,
@@ -41,7 +41,7 @@ export const WhiteBackground: FunctionComponent<WhiteBackgroundProps> = ({
           </Container>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -55,5 +55,5 @@ export const WhiteBackground: FunctionComponent<WhiteBackgroundProps> = ({
         </Container>
       </div>
     </div>
-  )
-}
+  );
+};

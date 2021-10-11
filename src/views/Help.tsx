@@ -1,6 +1,6 @@
-import React from 'react'
-import { StyledIntro } from '../components/StyledIntro'
-import { WhiteBackground } from '../components/WhiteBackground'
+import React from 'react';
+import { StyledIntro } from '../components/StyledIntro';
+import { WhiteBackground } from '../components/WhiteBackground';
 
 const CONTENTS = [
   {
@@ -31,7 +31,7 @@ const CONTENTS = [
     title: 'FAQ 7',
     text: 'Nam rhoncus augue at justo rhoncus pellentesque. Fusce bibendum urna sit amet blandit luctus. Nunc porttitor nisi eu neque imperdiet, sed rhoncus mauris ultrices. Aliquam velit sem, mollis at suscipit semper, egestas sed leo. Mauris vel mi et ante volutpat rutrum. Pellentesque mollis a lacus non vestibulum. Mauris nisl tortor, mattis nec eros nec, bibendum maximus tortor. Aenean lobortis commodo elit. Vivamus sed neque luctus, accumsan augue viverra, laoreet leo. Vestibulum at risus leo. Nulla et erat lorem. Vivamus lacinia eros leo, nec aliquam leo dictum at. Proin at nisi ac lacus faucibus pharetra id eu justo. Sed vestibulum nunc sed diam sodales, vitae mattis metus porttitor. Pellentesque blandit eget ex at dapibus. Aenean dapibus mauris sem, malesuada blandit lorem malesuada eu.',
   },
-]
+];
 
 export function Help() {
   return (
@@ -50,5 +50,5 @@ export function Help() {
         </div>
       ))}
     </WhiteBackground>
-  )
+  );
 }

@@ -1,31 +1,31 @@
-import React, { useState } from 'react'
-import { Button, Container } from 'react-bootstrap'
-import { OnboardingStepActions } from './OnboardingStepActions'
-import { WhiteBackground } from './WhiteBackground'
-import cryptoRandomString from 'crypto-random-string'
-import { StepperStepComponentProps, UserOnCreate } from '../../types'
-import { objectIsEmpty } from '../lib/object-utils'
-import { StyledIntro } from './StyledIntro'
-import { PlatformUserForm } from './PlatformUserForm'
+import React, { useState } from 'react';
+import { Button, Container } from 'react-bootstrap';
+import { OnboardingStepActions } from './OnboardingStepActions';
+import { WhiteBackground } from './WhiteBackground';
+import cryptoRandomString from 'crypto-random-string';
+import { StepperStepComponentProps, UserOnCreate } from '../../types';
+import { objectIsEmpty } from '../lib/object-utils';
+import { StyledIntro } from './StyledIntro';
+import { PlatformUserForm } from './PlatformUserForm';
 
 // Could be an ES6 Set but it's too bothersome for now
-export type UsersObject = { [key: string]: UserOnCreate }
+export type UsersObject = { [key: string]: UserOnCreate };
 
 export function OnboardingStep2({ forward, back }: StepperStepComponentProps) {
-  const [delegateFormIds, setDelegateFormIds] = useState<string[]>([])
-  const [people, setPeople] = useState<UsersObject>({})
+  const [delegateFormIds, setDelegateFormIds] = useState<string[]>([]);
+  const [people, setPeople] = useState<UsersObject>({});
 
   const addDelegateForm = () => {
-    setDelegateFormIds([...delegateFormIds, cryptoRandomString({ length: 8 })])
-  }
+    setDelegateFormIds([...delegateFormIds, cryptoRandomString({ length: 8 })]);
+  };
   const buildRemoveDelegateForm = (idToRemove: string) => (_: React.SyntheticEvent) => {
-    const filteredDelegateFormIds = delegateFormIds.filter((id) => id !== idToRemove)
-    setDelegateFormIds(filteredDelegateFormIds)
-  }
+    const filteredDelegateFormIds = delegateFormIds.filter((id) => id !== idToRemove);
+    setDelegateFormIds(filteredDelegateFormIds);
+  };
 
   const onForwardAction = () => {
-    forward!({ users: Object.values(people) })
-  }
+    forward!({ users: Object.values(people) });
+  };
 
   return (
     <React.Fragment>
@@ -61,7 +61,7 @@ export function OnboardingStep2({ forward, back }: StepperStepComponentProps) {
                   rimuovi questo delegato
                 </Button>
               </div>
-            )
+            );
           })}
 
           <div className="mb-5">
@@ -80,5 +80,5 @@ export function OnboardingStep2({ forward, back }: StepperStepComponentProps) {
         </Container>
       </WhiteBackground>
     </React.Fragment>
-  )
+  );
 }
