@@ -1,5 +1,4 @@
-import React from 'react';
-import { Button } from 'react-bootstrap';
+import { Button, Grid } from '@mui/material';
 
 type ActionStep = {
   action?: () => void;
@@ -14,22 +13,26 @@ type ActionStepsProps = {
 
 export function OnboardingStepActions({ forward, back }: ActionStepsProps) {
   return (
-    <div className="d-flex">
+    <Grid container spacing={2} justifyContent="center">
       {back && (
-        <Button
-          className="me-2"
-          variant="outline-primary"
-          onClick={back.action}
-          disabled={back.disabled}
-        >
-          {back.label}
-        </Button>
+        <Grid item>
+          <Button
+            color="primary"
+            variant="outlined"
+            onClick={back.action}
+            disabled={back.disabled}
+          >
+            {back.label}
+          </Button>
+        </Grid>
       )}
-      {forward && (
-        <Button variant="primary" onClick={forward.action} disabled={forward.disabled}>
-          {forward.label}
-        </Button>
+      {forward && (        
+        <Grid item>
+          <Button color="primary" variant="contained" onClick={forward.action} disabled={forward.disabled}>
+            {forward.label}
+          </Button>
+        </Grid>
       )}
-    </div>
+    </Grid>
   );
 }

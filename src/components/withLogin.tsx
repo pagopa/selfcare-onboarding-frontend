@@ -2,6 +2,7 @@ import { useContext, useEffect } from 'react';
 import { useLogin } from '../hooks/useLogin';
 import { UserContext } from '../lib/context';
 
+// eslint-disable-next-line @typescript-eslint/ban-types
 type LoginProps = {};
 
 export function withLogin<T extends LoginProps>(WrappedComponent: React.ComponentType<T>) {
@@ -17,6 +18,7 @@ export function withLogin<T extends LoginProps>(WrappedComponent: React.Componen
       }
 
       if (!user) {
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
         asyncAttemptSilentLogin();
       }
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
@@ -24,6 +26,7 @@ export function withLogin<T extends LoginProps>(WrappedComponent: React.Componen
     return <WrappedComponent {...(props as T)} />;
   };
 
+  // eslint-disable-next-line functional/immutable-data
   ComponentWithLogin.displayName = `withLogin(${displayName})`;
 
   return ComponentWithLogin;

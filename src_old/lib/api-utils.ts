@@ -1,7 +1,7 @@
 import axios, { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import isEmpty from 'lodash/isEmpty';
-import { Endpoint, RequestConfig } from '../../types';
 import { API } from './constants';
+import { Endpoint, RequestConfig } from '../../types';
 import { logAction, logError } from './action-log';
 import { storageRead } from './storage-utils';
 
@@ -16,9 +16,8 @@ function prepareRequest(
     throw new Error(`WARNING! The endpoint ${endpoint} does not exist in constants.ts`);
   }
 
-  // eslint-disable-next-line functional/no-let
   let url = API[endpoint].URL;
-  const baseURL = API.BASE.URL;
+  let baseURL = API.BASE.URL;
 
   // Replace dynamic parts of the URL by substitution
   if (!isEmpty(endpointParams)) {
@@ -52,21 +51,20 @@ function prepareRequest(
 }
 
 async function performRequests(
-  requests: Array<() => Promise<AxiosInstance>>
-): Promise<Array<AxiosResponse> | Array<AxiosError>> {
+  requests: (() => Promise<AxiosInstance>)[]
+): Promise<AxiosResponse[] | AxiosError[]> {
   try {
     const responses = await axios.all(requests.map((r) => r()));
     logAction('Log response', responses);
-    return responses as unknown as Array<AxiosResponse>; // WHYYYYY?
+    return responses as unknown as AxiosResponse[]; // WHYYYYY?
   } catch (error) {
     logError(error);
-    return [error] as Array<AxiosError>; // This is for testing
+    return [error] as AxiosError[]; // This is for testing
   }
 }
 
-export async function fetchAllWithLogs(reqsConfig: Array<RequestConfig>) {
+export async function fetchAllWithLogs(reqsConfig: RequestConfig[]) {
   const requests = await Promise.all(
-    // eslint-disable-next-line @typescript-eslint/await-thenable
     reqsConfig.map(async ({ path, config }) => await prepareRequest(path, config))
   );
   return await performRequests(requests as any);
@@ -77,7 +75,6 @@ export async function fetchWithLogs(
   { method, params, data, headers }: AxiosRequestConfig
 ) {
   // Prepare the request
-  // eslint-disable-next-line @typescript-eslint/await-thenable
   const request = await prepareRequest(
     { endpoint, endpointParams },
     { method, params, data, headers }

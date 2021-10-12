@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import debounce from 'lodash/debounce';
-import { AxiosResponse } from 'axios';
-import { Autocomplete, TextField } from '@mui/material';
+import { AsyncTypeahead } from 'react-bootstrap-typeahead';
 import { Endpoint } from '../../types';
 import { fetchWithLogs } from '../lib/api-utils';
+import debounce from 'lodash/debounce';
+import 'react-bootstrap-typeahead/css/Typeahead.css';
 import { getFetchOutcome } from '../lib/error-utils';
+import { AxiosResponse } from 'axios';
 
 type AutocompleteProps = {
   selected: any;
@@ -12,7 +13,8 @@ type AutocompleteProps = {
   placeholder: string;
   endpoint: Endpoint;
   transformFn: any;
-  labelKey?: string;
+  labelKey: string;
+  multiple?: boolean;
 };
 
 export function AsyncAutocomplete({
@@ -21,11 +23,11 @@ export function AsyncAutocomplete({
   placeholder,
   endpoint,
   transformFn,
-  labelKey
+  labelKey,
+  multiple = false,
 }: AutocompleteProps) {
   const [isLoading, setIsLoading] = useState(false);
-  const [input, setInput] = useState<string>();
-  const [options, setOptions] = useState<Array<any>>([]);
+  const [options, setOptions] = useState<any[]>([]);
 
   const handleSearch = async (query: string) => {
     setIsLoading(true);
@@ -43,29 +45,29 @@ export function AsyncAutocomplete({
     setIsLoading(false);
   };
 
-  const noOptionsText = input!==undefined && input.length >= 3 ? "No risultati" : "Digita almeno 3 caratteri";
-  const getOptionLabel: (option: any) => string = labelKey!==undefined? o => o[labelKey] : (o) => o.label ?? o;
+  const filterBy = () => true;
 
   return (
-    <Autocomplete
-      id="Parties"
-      value={selected}
-      noOptionsText={noOptionsText}
+    <AsyncTypeahead
+      multiple={multiple}
+      filterBy={filterBy}
+      id="async"
+      isLoading={isLoading}
+      labelKey={labelKey}
+      minLength={3}
+      onSearch={debounce(handleSearch, 100)}
       onChange={setSelected}
+      selected={selected}
       options={options}
-      loading={isLoading}
-      onInputChange={(_event, value, reason)=>{
-        setInput(value);
-        if(reason === 'input' && value.length>=3){
-           void debounce(handleSearch, 100)(value);
-        }
-      }}
-      filterOptions={x=>x}
-      renderInput={(params) => (
-        <TextField {...params} variant='outlined' />
-      )}
       placeholder={placeholder}
-      getOptionLabel={getOptionLabel}
+      emptyLabel="Nessun risultato trovato"
+      promptText="Inserisci almeno 3 caratteri..."
+      searchText="Stiamo cercando..."
+      renderMenuItemChildren={(option) => (
+        <React.Fragment>
+          <span>{option[labelKey]}</span>
+        </React.Fragment>
+      )}
     />
   );
 }

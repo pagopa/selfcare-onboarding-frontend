@@ -1,6 +1,5 @@
 import { RoutesObject } from '../../types';
-import { Onboarding } from '../views/Onboarding';
-/* 
+/* import { Onboarding } from '../views/Onboarding'
 import { CompleteRegistration } from '../views/CompleteRegistration'
 import { RejectRegistration } from '../views/RejectRegistration'
 import { TempSPIDUser } from '../components/TempSPIDUser'
@@ -8,24 +7,23 @@ import { IPAGuide } from '../views/IPAGuide' */
 
 const IS_DEVELOP = process.env.NODE_ENV === 'development';
 
+export const USE_MOCK_SPID_USER = IS_DEVELOP;
 export const DISPLAY_LOGS = IS_DEVELOP;
 
 export const BASE_ROUTE = '';
-export const LOGIN_URL : string = process.env.REACT_APP_LOGIN_URL;
-export const LOGOUT_URL : string = process.env.REACT_APP_LOGOUT_URL;
-
+/*
 export const ROUTES: RoutesObject = {
-  ONBOARDING: {
-    PATH: `${BASE_ROUTE}`,
-    LABEL: 'Onboarding',
-    EXACT: true,
-    COMPONENT: Onboarding,
-  },/*
   IPA_GUIDE: { PATH: `${BASE_ROUTE}/guida-ipa`, LABEL: 'Accreditarsi su IPA', COMPONENT: IPAGuide },
   TEMP_SPID_USER: {
     PATH: `${BASE_ROUTE}/temp-spid`,
     LABEL: 'Genera utente SPID di test',
     COMPONENT: TempSPIDUser,
+  },
+  ONBOARDING: {
+    PATH: `${BASE_ROUTE}`,
+    LABEL: 'Onboarding',
+    EXACT: true,
+    COMPONENT: Onboarding,
   },
   REGISTRATION_FINALIZE_COMPLETE: {
     PATH: `${BASE_ROUTE}/conferma-registrazione`,
@@ -36,8 +34,8 @@ export const ROUTES: RoutesObject = {
     PATH: `${BASE_ROUTE}/cancella-registrazione`,
     LABEL: 'Cancella la procedura di onboarding',
     COMPONENT: RejectRegistration,
-  }, */
-};
+  },
+} */
 
 export const API = {
   BASE: {

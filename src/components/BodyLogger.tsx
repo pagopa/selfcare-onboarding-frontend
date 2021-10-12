@@ -1,8 +1,10 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
+import { Box } from '@mui/system';
 import { logAction } from '../lib/action-log';
 import { Header } from './Header';
 import { Footer } from './Footer';
+import { Main } from './Main';
 
 export function BodyLogger() {
   const location = useLocation();
@@ -15,10 +17,16 @@ export function BodyLogger() {
   }, [location]);
 
   return (
-    <React.Fragment>
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        minHeight: '100vh',
+      }}
+    >
       <Header />
-      {/* <Main /> */}
+      <Main />
       <Footer />
-    </React.Fragment>
+    </Box>
   );
 }

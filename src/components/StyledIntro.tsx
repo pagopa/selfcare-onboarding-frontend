@@ -1,5 +1,5 @@
 import React, { FunctionComponent } from 'react';
-import { Row } from 'react-bootstrap';
+import { Container, Typography } from '@mui/material';
 
 type ChildrenProps = {
   title: React.ReactNode;
@@ -12,19 +12,22 @@ type StyledIntroProps = {
   additionalClasses?: string;
 };
 
-export const StyledIntro: FunctionComponent<StyledIntroProps> = ({
-  children,
-  additionalClasses,
-  priority = 1,
-}) => {
+function priorityToTag(priority: 1 | 2 | 3): "h2" | "h3" | "h4" {
   // from https://stackoverflow.com/a/33471928
   // Priority 1 is h2, 2 is h3, 3 is h4
-  const TitleTag = `h${priority + 1}` as keyof JSX.IntrinsicElements;
+  switch(priority) {
+    case 1 : return "h2";
+    case 2 : return "h3";
+    case 3 : return "h4";
+  }
+}
 
-  return (
-    <Row className={`mb-4 ${additionalClasses || ''}`} style={{ maxWidth: 480 }}>
-      <TitleTag>{children.title}</TitleTag>
-      {children.description && <p className="mb-0">{children.description}</p>}
-    </Row>
+export const StyledIntro: FunctionComponent<StyledIntroProps> = ({
+  children,
+  priority = 1,
+}) => (
+    <Container>
+      <Typography variant={priorityToTag(priority)} align="center">{children.title}</Typography>
+      {children.description && <Typography align="center">{children.description}</Typography>}
+    </Container>
   );
-};

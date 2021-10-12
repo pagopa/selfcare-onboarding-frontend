@@ -1,25 +1,31 @@
-import React, {useState} from 'react';
-/* import { withLogin } from '../components/withLogin'; */
-import { useHistory } from 'react-router-dom';
-import { Button } from '@mui/material';
-import { RequestOutcome, RequestOutcomeOptions, StepperStep } from '../../types';
-/* import { fetchWithLogs } from '../lib/api-utils';
-import { getFetchOutcome } from '../lib/error-utils'; */
+import React, { useState } from 'react';
+import { RequestOutcome, RequestOutcomeOptions, StepperStep, User } from '../../types';
+import { Stepper } from '../components/Stepper';
+import { WhiteBackground } from '../components/WhiteBackground';
+import { withLogin } from '../components/withLogin';
 import { OnboardingStep1 } from '../components/OnboardingStep1';
 import { OnboardingStep2 } from '../components/OnboardingStep2';
+import { OnboardingStep3 } from '../components/OnboardingStep3';
 import { LoadingOverlay } from '../components/LoadingOverlay';
+import { fetchWithLogs } from '../lib/api-utils';
 import { MessageNoAction } from '../components/MessageNoAction';
-import checkIllustration from '../assets/check-illustration.svg';
+import emailIllustration from '../assets/email-illustration.svg';
 import redXIllustration from '../assets/red-x-illustration.svg';
+import { getFetchOutcome } from '../lib/error-utils';
+import { useHistory } from 'react-router-dom';
 import { InlineSupportLink } from '../components/InlineSupportLink';
 
+type FormData = {
+  institutionId: string;
+  users: User[];
+};
 
 function OnboardingComponent() {
-  const [loading, _setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
   const [formData, setFormData] = useState<Partial<FormData>>();
-  const [_legalEmail, setLegalEmail] = useState('');
-  const [outcome, _setOutcome] = useState<RequestOutcome>();
+  const [legalEmail, setLegalEmail] = useState('');
+  const [outcome, setOutcome] = useState<RequestOutcome>();
   const history = useHistory();
 
   const reload = () => {
@@ -43,7 +49,7 @@ function OnboardingComponent() {
     setLegalEmail(newLegalEmail);
     forwardWithData(newFormData);
   };
-/*
+
   const submit = async () => {
     setLoading(true);
 
@@ -58,17 +64,13 @@ function OnboardingComponent() {
     const outcome = getFetchOutcome(postLegalsResponse);
 
     setOutcome(outcome);
-  }; */
+  };
 
-  const steps: Array<StepperStep> = [
-    {
-      label: "Accetta privacy",
-      Component: () => OnboardingStep1({ forward }),
-    },
+  const steps: StepperStep[] = [
     {
       label: "Seleziona l'ente",
-      Component: () => OnboardingStep2({ forward: forwardWithDataAndEmail, back }),
-    },/*
+      Component: () => OnboardingStep1({ forward: forwardWithDataAndEmail }),
+    },
     {
       label: 'Inserisci i dati',
       Component: () => OnboardingStep2({ forward: forwardWithData, back }),
@@ -76,21 +78,21 @@ function OnboardingComponent() {
     {
       label: "Verifica l'accordo",
       Component: () => OnboardingStep3({ forward: submit, back }),
-    }, */
+    },
   ];
 
   const Step = steps[activeStep].Component;
 
   const outcomeContent: RequestOutcomeOptions = {
     success: {
-      img: { src: checkIllustration, alt: "Icona dell'email" },
-      title: 'La tua richiesta è stata inviata con successo',
+      img: { src: emailIllustration, alt: "Icona dell'email" },
+      title: 'Ci siamo quasi...',
       description: [
-        <p key="0">
-          Riceverai una PEC all’indirizzo istituzionale dell’Ente.<br />
-          Al suo interno troverai le istruzioni per confermare i dati e ottenere l’autorizzazione.  
+        <p>
+          Per completare la registrazione, segui le istruzioni che trovi nella mail che ti abbiamo
+          inviato a <strong>{legalEmail}</strong>
         </p>,
-        <p key="1">
+        <p>
           Non hai ricevuto nessuna mail? Attendi qualche minuto e controlla anche nello spam. Se non
           arriva, <InlineSupportLink />
         </p>,
@@ -100,11 +102,11 @@ function OnboardingComponent() {
       img: { src: redXIllustration, alt: "Icona dell'email" },
       title: "C'è stato un problema...",
       description: [
-        <p key="0">
+        <p>
           Il salvataggio dei dati inseriti non è andato a buon fine.{' '}
-          <Button onClick={reload}>
+          <button className="reset-btn btn-as-link link-default" onClick={reload}>
             Prova nuovamente a registrarti
-          </Button>
+          </button>
           , e se il problema dovesse persistere, <InlineSupportLink />!
         </p>,
       ],
@@ -113,6 +115,9 @@ function OnboardingComponent() {
 
   return !outcome ? (
     <React.Fragment>
+      <WhiteBackground stickToTop={true}>
+        <Stepper steps={steps} activeIndex={activeStep} />
+      </WhiteBackground>
       <Step />
       {loading && <LoadingOverlay loadingText="Stiamo verificando i tuoi dati" />}
     </React.Fragment>
@@ -121,4 +126,4 @@ function OnboardingComponent() {
   );
 }
 
-export const Onboarding = /* TODO withLogin( */ OnboardingComponent; /* ); */
+export const Onboarding = withLogin(OnboardingComponent);

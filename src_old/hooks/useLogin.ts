@@ -1,22 +1,24 @@
 import { useContext, useState } from 'react';
 import isEmpty from 'lodash/isEmpty';
 import { AxiosResponse } from 'axios';
-import { Party } from '../../types';
-import { fetchAllWithLogs, fetchWithLogs } from '../lib/api-utils';
-import { LOGIN_URL } from '../lib/constants';
+import { useHistory } from 'react-router-dom';
+import { Party, User } from '../../types';
+import { fetchAllWithLogs, fetchWithLogs, sleep } from '../lib/api-utils';
+import { BASE_ROUTE, ROUTES, USE_MOCK_SPID_USER } from '../lib/constants';
 import { PartyContext, UserContext } from '../lib/context';
 import { isFetchError } from '../lib/error-utils';
-import { storageDelete, storageRead } from '../lib/storage-utils';
+import { mockSPIDUser, testBearerToken } from '../lib/mock-static-data';
+import { storageDelete, storageRead, storageWrite } from '../lib/storage-utils';
 
 export const useLogin = () => {
+  const history = useHistory();
   const [loadingText, setLoadingText] = useState<string | undefined>();
-  const { setUser } = useContext(UserContext);
+  const { user, setUser } = useContext(UserContext);
   const { setAvailableParties, setParty } = useContext(PartyContext);
 
   const setPartiesInContext = async (data: any) => {
     // Store them in a variable
-    // eslint-disable-next-line functional/no-let
-    let parties: Array<Party> = data.institutions;
+    let parties: Party[] = data.institutions;
     // Fetch all the partyIds (this can be optimized)
     const partyIdsResponses = await fetchAllWithLogs(
       parties.map(({ institutionId }) => ({
@@ -27,7 +29,7 @@ export const useLogin = () => {
 
     // Associate each partyId to the correspondent party, along with its attributes
     parties = parties.map((party) => {
-      const currentParty = (partyIdsResponses as Array<AxiosResponse>).find(
+      const currentParty = (partyIdsResponses as AxiosResponse[]).find(
         (r: AxiosResponse) => r.data.institutionId === party.institutionId
       );
 
@@ -58,6 +60,50 @@ export const useLogin = () => {
     }
   };
 
+  // This happens as a result of a direct user action
+  // E.g.: the user has pressed the "login" button
+  const login = async () => {
+    // This should not happen, here just for safety
+    if (user) {
+      return;
+    }
+
+    if (USE_MOCK_SPID_USER) {
+      await setTestSPIDUser(mockSPIDUser);
+    } else {
+      history.push(ROUTES.TEMP_SPID_USER.PATH);
+    }
+  };
+
+  const setTestSPIDUser = async (testUserData: User) => {
+    // Display the loader
+    setLoadingText('Stiamo provando ad autenticarti');
+
+    // Mock request/response roundtrip for now, as we don't
+    // have any actual login.
+    await sleep(750);
+
+    // Associate the user taxCode to a platform user
+    // Also this is missing for now.
+    // Ideally, this is done on the backend
+    // const whoAmIResponse = await fetchWithLogs(
+    //   { endpoint: 'USER_GET_SINGLE', endpointParams: { taxCode } },
+    //   { method: 'GET' }
+    // )
+    // setUser(whoAmIResponse.data)
+
+    // Set the user and fill the storage
+    setUser(testUserData);
+    storageWrite('user', testUserData, 'object');
+    storageWrite('bearer', testBearerToken, 'string');
+
+    // Fetch and set the parties available for this user
+    await fetchAndSetAvailableParties(testUserData.taxCode);
+
+    // Go to choice view
+    history.push(ROUTES.CHOOSE_PARTY.PATH);
+  };
+
   // This happens when the user does a hard refresh when logged in
   // Instead of losing the user, we attempt at logging it back in
   // with the credentials stored in the sessionStorage
@@ -75,7 +121,7 @@ export const useLogin = () => {
       storageDelete('currentParty');
       storageDelete('bearer');
       // Go to the login view
-      window.location.assign(LOGIN_URL);
+      history.push(BASE_ROUTE);
       // This return is necessary
       return;
     }
@@ -90,5 +136,5 @@ export const useLogin = () => {
     setParty(sessionStorageParty);
   };
 
-  return { attemptSilentLogin, loadingText };
+  return { login, attemptSilentLogin, loadingText, setTestSPIDUser };
 };

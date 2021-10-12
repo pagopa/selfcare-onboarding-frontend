@@ -1,22 +1,21 @@
-import { Typography } from '@mui/material';
-import { Box } from '@mui/system';
 import React from 'react';
 import { RequestOutcomeMessage } from '../../types';
+import { WhiteBackground } from './WhiteBackground';
 
 export function MessageNoAction({ img, title, description }: RequestOutcomeMessage) {
   return (
-    <Box>
-      <Typography style={{ maxWidth: 440 }}>
+    <WhiteBackground containerClassNames="d-flex flex-direction-column">
+      <div className="text-center mx-auto my-auto" style={{ maxWidth: 440 }}>
         <i>
           <img width={120} src={img.src} alt={img.alt} />
         </i>
         {title && (
-          <p dangerouslySetInnerHTML={{ __html: title }}></p>
+          <p className="fw-bold mt-4 mb-3 h2" dangerouslySetInnerHTML={{ __html: title }}></p>
         )}
         {description.map((paragraph, i) => (
           <React.Fragment key={i}>{paragraph}</React.Fragment>
         ))}
-      </Typography>
-    </Box>
+      </div>
+    </WhiteBackground>
   );
 }
