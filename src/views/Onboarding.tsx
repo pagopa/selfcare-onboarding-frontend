@@ -5,6 +5,7 @@ import { Button } from '@mui/material';
 import { RequestOutcome, RequestOutcomeOptions, StepperStep } from '../../types';
 /* import { fetchWithLogs } from '../lib/api-utils';
 import { getFetchOutcome } from '../lib/error-utils'; */
+import { OnboardingStep0 } from '../components/OnboardingStep0';
 import { OnboardingStep1 } from '../components/OnboardingStep1';
 import { OnboardingStep2 } from '../components/OnboardingStep2';
 import { LoadingOverlay } from '../components/LoadingOverlay';
@@ -63,16 +64,16 @@ function OnboardingComponent() {
   const steps: Array<StepperStep> = [
     {
       label: "Accetta privacy",
-      Component: () => OnboardingStep1({ forward }),
+      Component: () => OnboardingStep0({ forward }),
     },
     {
       label: "Seleziona l'ente",
-      Component: () => OnboardingStep2({ forward: forwardWithDataAndEmail, back }),
-    },/*
+      Component: () => OnboardingStep1({ forward: forwardWithDataAndEmail, back }),
+    },
     {
       label: 'Inserisci i dati',
       Component: () => OnboardingStep2({ forward: forwardWithData, back }),
-    },
+    }, /*
     {
       label: "Verifica l'accordo",
       Component: () => OnboardingStep3({ forward: submit, back }),

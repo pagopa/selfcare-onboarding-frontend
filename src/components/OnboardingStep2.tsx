@@ -1,50 +1,43 @@
 import { useState } from 'react';
-import { Stack, Typography } from '@mui/material';
-import { Box } from '@mui/system';
-import { Link } from 'react-router-dom';
-import { IPACatalogParty, StepperStepComponentProps } from '../../types';
+import { Stack } from '@mui/material';
+import { StepperStepComponentProps, UserOnCreate } from '../../types';
+import { objectIsEmpty } from '../lib/object-utils';
 import { OnboardingStepActions } from './OnboardingStepActions';
-import { AsyncAutocomplete } from './AsyncAutocomplete';
 import { StyledIntro } from './StyledIntro';
+import { PlatformUserForm, validateUser } from './PlatformUserForm';
+
+// Could be an ES6 Set but it's too bothersome for now
+export type UsersObject = { [key: string]: UserOnCreate };
 
 export function OnboardingStep2({ forward, back }: StepperStepComponentProps) {
-  const [selected, setSelected] = useState<IPACatalogParty>();
+  const [people, setPeople] = useState<UsersObject>({});
 
   const onForwardAction = () => {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const { digitalAddress, id } = selected!;
-    forward({ institutionId: id }, digitalAddress);
+    forward({ users: Object.values(people) });
   };
-
+  
   return (
     <Stack spacing={10}>
-        <StyledIntro>
-          {{
-            title: "Seleziona il tuo Ente",
-            description: (
-              <>Seleziona dall’indice IPA l’Ente per cui vuoi richiedere l’adesione ai prodotti PagoPA</>
-            ),
-          }}
-        </StyledIntro>
-        <Box sx={{textAlign: 'center'}}>
-          <AsyncAutocomplete
-            selected={selected}
-            setSelected={setSelected}
-            placeholder="Cerca ente nel catalogo IPA"
-            endpoint={{ endpoint: 'ONBOARDING_GET_SEARCH_PARTIES' }}
-            transformFn={(data: { items: Array<IPACatalogParty> }) => data.items}
-            labelKey="description"
+          <StyledIntro>{{
+            title: 'Indica il Legale Rappresentante',
+            description: <>Inserisci i dati del Legale Rappresentante.<br />
+                           La persona indicata sarà firmataria del contratto per la gestione dei prodotti PagoPA.</>
+            }}</StyledIntro>
+          <PlatformUserForm
+            prefix="admin"
+            role="Manager"
+            platformRole="admin"
+            people={people}
+            setPeople={setPeople}
           />
-        </Box>
-
-        <Box>
-          <Typography>Non trovi il tuo ente nell’indice IPA? <Link to="#">Clicca qui</Link> per maggiori informazioni e istruzioni per essere inclusi nell’indice delle Pubbliche Amministrazioni</Typography>
-        </Box>
-
-        <OnboardingStepActions
-          back={{action: back, label: "Indietro", disabled: false }}
-          forward={{ action: onForwardAction, label: 'Conferma', disabled: selected === undefined }}
-        />
-    </Stack>
+          <OnboardingStepActions
+            back={{ action: back, label: 'Indietro', disabled: false }}
+            forward={{
+              action: onForwardAction,
+              label: 'Conferma',
+              disabled: objectIsEmpty(people) || !validateUser(people.admin),
+            }}
+          />
+      </Stack>
   );
 }
