@@ -68,6 +68,20 @@ export const useLogin = () => {
     const sessionStorageParty = storageRead('currentParty', 'object');
     const sessionStorageBearerToken = storageRead('bearer', 'string');
 
+    // TODO remove this entire if
+    if (isEmpty(sessionStorageUser)) {
+      setUser({
+        name: 'loggedName',
+        surname: 'loggedSurname',
+        email: 'loggedEmail@aa.aa',
+        taxCode: 'AAAAAA00A00A000A',
+        role: 'Delegate',
+        platformRole: 'admin',
+        status: 'active',
+      });
+      return;
+    }
+
     // If there are no credentials, it is impossible to get the user, so
     if (isEmpty(sessionStorageUser) || isEmpty(sessionStorageParty) || !sessionStorageBearerToken) {
       // Remove any partial data that might have remained, just for safety

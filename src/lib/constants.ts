@@ -11,8 +11,9 @@ const IS_DEVELOP = process.env.NODE_ENV === 'development';
 export const DISPLAY_LOGS = IS_DEVELOP;
 
 export const BASE_ROUTE = '';
-export const LOGIN_URL : string = process.env.REACT_APP_LOGIN_URL;
-export const LOGOUT_URL : string = process.env.REACT_APP_LOGOUT_URL;
+export const LOGIN_URL: string = process.env.REACT_APP_LOGIN_URL;
+export const LOGOUT_URL: string = process.env.REACT_APP_LOGOUT_URL;
+export const DASHBOARD_URL: string = process.env.REACT_APP_DASHBOARD_URL;
 
 export const ROUTES: RoutesObject = {
   ONBOARDING: {
@@ -20,7 +21,7 @@ export const ROUTES: RoutesObject = {
     LABEL: 'Onboarding',
     EXACT: true,
     COMPONENT: Onboarding,
-  },/*
+  } /*
   IPA_GUIDE: { PATH: `${BASE_ROUTE}/guida-ipa`, LABEL: 'Accreditarsi su IPA', COMPONENT: IPAGuide },
   TEMP_SPID_USER: {
     PATH: `${BASE_ROUTE}/temp-spid`,
@@ -36,7 +37,7 @@ export const ROUTES: RoutesObject = {
     PATH: `${BASE_ROUTE}/cancella-registrazione`,
     LABEL: 'Cancella la procedura di onboarding',
     COMPONENT: RejectRegistration,
-  }, */
+  }, */,
 };
 
 export const API = {

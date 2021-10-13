@@ -15,29 +15,36 @@ export function OnboardingStep2({ forward, back }: StepperStepComponentProps) {
   const onForwardAction = () => {
     forward({ users: Object.values(people) });
   };
-  
+
   return (
     <Stack spacing={10}>
-          <StyledIntro>{{
-            title: 'Indica il Legale Rappresentante',
-            description: <>Inserisci i dati del Legale Rappresentante.<br />
-                           La persona indicata sarà firmataria del contratto per la gestione dei prodotti PagoPA.</>
-            }}</StyledIntro>
-          <PlatformUserForm
-            prefix="admin"
-            role="Manager"
-            platformRole="admin"
-            people={people}
-            setPeople={setPeople}
-          />
-          <OnboardingStepActions
-            back={{ action: back, label: 'Indietro', disabled: false }}
-            forward={{
-              action: onForwardAction,
-              label: 'Conferma',
-              disabled: objectIsEmpty(people) || !validateUser(people.admin),
-            }}
-          />
-      </Stack>
+      <StyledIntro>
+        {{
+          title: 'Indica il Legale Rappresentante',
+          description: (
+            <>
+              Inserisci i dati del Legale Rappresentante.
+              <br />
+              La persona indicata sarà firmataria del contratto per la gestione dei prodotti PagoPA.
+            </>
+          ),
+        }}
+      </StyledIntro>
+      <PlatformUserForm
+        prefix="admin"
+        role="Manager"
+        platformRole="admin"
+        people={people}
+        setPeople={setPeople}
+      />
+      <OnboardingStepActions
+        back={{ action: back, label: 'Indietro', disabled: false }}
+        forward={{
+          action: onForwardAction,
+          label: 'Conferma',
+          disabled: objectIsEmpty(people) || !validateUser(people.admin),
+        }}
+      />
+    </Stack>
   );
 }
