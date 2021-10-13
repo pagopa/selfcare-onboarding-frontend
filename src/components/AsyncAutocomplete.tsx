@@ -21,7 +21,7 @@ export function AsyncAutocomplete({
   placeholder,
   endpoint,
   transformFn,
-  labelKey
+  labelKey,
 }: AutocompleteProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [input, setInput] = useState<string>();
@@ -43,8 +43,10 @@ export function AsyncAutocomplete({
     setIsLoading(false);
   };
 
-  const noOptionsText = input!==undefined && input.length >= 3 ? "No risultati" : "Digita almeno 3 caratteri";
-  const getOptionLabel: (option: any) => string = labelKey!==undefined? o => o[labelKey] : (o) => o.label ?? o;
+  const noOptionsText =
+    input !== undefined && input.length >= 3 ? 'No risultati' : 'Digita almeno 3 caratteri';
+  const getOptionLabel: (option: any) => string =
+    labelKey !== undefined ? (o) => o[labelKey] : (o) => o.label ?? o;
 
   return (
     <Autocomplete
@@ -54,16 +56,14 @@ export function AsyncAutocomplete({
       onChange={setSelected}
       options={options}
       loading={isLoading}
-      onInputChange={(_event, value, reason)=>{
+      onInputChange={(_event, value, reason) => {
         setInput(value);
-        if(reason === 'input' && value.length>=3){
-           void debounce(handleSearch, 100)(value);
+        if (reason === 'input' && value.length >= 3) {
+          void debounce(handleSearch, 100)(value);
         }
       }}
-      filterOptions={x=>x}
-      renderInput={(params) => (
-        <TextField {...params} variant='outlined' />
-      )}
+      filterOptions={(x) => x}
+      renderInput={(params) => <TextField {...params} variant="outlined" />}
       placeholder={placeholder}
       getOptionLabel={getOptionLabel}
     />

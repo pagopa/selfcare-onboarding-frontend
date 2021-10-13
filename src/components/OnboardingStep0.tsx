@@ -15,23 +15,23 @@ export function OnboardingStep0({ forward }: StepperStepComponentProps) {
 
   return (
     <Stack spacing={10}>
-        <StyledIntro>
-          {{
-            title: `Benvenuto sul Portale Self-care`,
-            description: (
-              <>
-                In pochi passaggi il tuo Ente potrà aderire e gestire tutti i prodotti PagoPA.
-              </>
-            ),
-          }}
-        </StyledIntro>
-        <Box sx={{textAlign: 'center'}}>
-          <Switch checked={checked} onChange={(_,value)=>setChecked(value)} />Ho letto e compreso <Link to="#">l’Informativa Privacy e i Termini e Condizioni d’Uso del servizio</Link>
-        </Box>
+      <StyledIntro>
+        {{
+          title: `Benvenuto sul Portale Self-care`,
+          description: (
+            <>In pochi passaggi il tuo Ente potrà aderire e gestire tutti i prodotti PagoPA.</>
+          ),
+        }}
+      </StyledIntro>
+      <Box sx={{ textAlign: 'center' }}>
+        <Switch checked={checked} onChange={(_, value) => setChecked(value)} />
+        Ho letto e compreso{' '}
+        <Link to="#">l’Informativa Privacy e i Termini e Condizioni d’Uso del servizio</Link>
+      </Box>
 
-        <OnboardingStepActions
-          forward={{ action: onForwardAction, label: 'Conferma', disabled: !checked }}
-        />
+      <OnboardingStepActions
+        forward={{ action: onForwardAction, label: 'Conferma', disabled: !checked }}
+      />
     </Stack>
   );
 }

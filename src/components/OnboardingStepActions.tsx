@@ -16,19 +16,19 @@ export function OnboardingStepActions({ forward, back }: ActionStepsProps) {
     <Grid container spacing={2} justifyContent="center">
       {back && (
         <Grid item>
-          <Button
-            color="primary"
-            variant="outlined"
-            onClick={back.action}
-            disabled={back.disabled}
-          >
+          <Button color="primary" variant="outlined" onClick={back.action} disabled={back.disabled}>
             {back.label}
           </Button>
         </Grid>
       )}
-      {forward && (        
+      {forward && (
         <Grid item>
-          <Button color="primary" variant="contained" onClick={forward.action} disabled={forward.disabled}>
+          <Button
+            color="primary"
+            variant="contained"
+            onClick={forward.action}
+            disabled={forward.disabled}
+          >
             {forward.label}
           </Button>
         </Grid>
