@@ -1,13 +1,14 @@
-import { DISPLAY_LOGS } from './constants'
+import { DISPLAY_LOGS } from './constants';
 
 export function logAction(actionLabel: string, data: any) {
   if (!DISPLAY_LOGS) {
-    return
+    return;
   }
 
-  console.log(actionLabel, data)
+  // eslint-disable-next-line no-console
+  console.log(actionLabel, data);
 }
 
 export function logError(error: any) {
-  console.error(error)
+  console.error(error);
 }

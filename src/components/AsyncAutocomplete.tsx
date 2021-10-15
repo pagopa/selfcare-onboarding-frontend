@@ -1,21 +1,19 @@
-import React, { useState } from 'react'
-import { AsyncTypeahead } from 'react-bootstrap-typeahead'
-import { Endpoint } from '../../types'
-import { fetchWithLogs } from '../lib/api-utils'
-import debounce from 'lodash/debounce'
-import 'react-bootstrap-typeahead/css/Typeahead.css'
-import { getFetchOutcome } from '../lib/error-utils'
-import { AxiosResponse } from 'axios'
+import React, { useState } from 'react';
+import debounce from 'lodash/debounce';
+import { AxiosResponse } from 'axios';
+import { Autocomplete, TextField } from '@mui/material';
+import { Endpoint } from '../../types';
+import { fetchWithLogs } from '../lib/api-utils';
+import { getFetchOutcome } from '../lib/error-utils';
 
 type AutocompleteProps = {
-  selected: any
-  setSelected: React.Dispatch<React.SetStateAction<any>>
-  placeholder: string
-  endpoint: Endpoint
-  transformFn: any
-  labelKey: string
-  multiple?: boolean
-}
+  selected: any;
+  setSelected: React.Dispatch<React.SetStateAction<any>>;
+  placeholder: string;
+  endpoint: Endpoint;
+  transformFn: any;
+  labelKey?: string;
+};
 
 export function AsyncAutocomplete({
   selected,
@@ -24,50 +22,50 @@ export function AsyncAutocomplete({
   endpoint,
   transformFn,
   labelKey,
-  multiple = false,
 }: AutocompleteProps) {
-  const [isLoading, setIsLoading] = useState(false)
-  const [options, setOptions] = useState<any[]>([])
+  const [isLoading, setIsLoading] = useState(false);
+  const [input, setInput] = useState<string>();
+  const [options, setOptions] = useState<Array<any>>([]);
 
   const handleSearch = async (query: string) => {
-    setIsLoading(true)
+    setIsLoading(true);
 
     const searchResponse = await fetchWithLogs(endpoint, {
       method: 'GET',
       params: { limit: 100, page: 1, search: query },
-    })
+    });
 
-    const outcome = getFetchOutcome(searchResponse)
+    const outcome = getFetchOutcome(searchResponse);
 
     if (outcome === 'success') {
-      setOptions(transformFn((searchResponse as AxiosResponse).data))
+      setOptions(transformFn((searchResponse as AxiosResponse).data));
     }
-    setIsLoading(false)
-  }
+    setIsLoading(false);
+  };
 
-  const filterBy = () => true
+  const noOptionsText =
+    input !== undefined && input.length >= 3 ? 'No risultati' : 'Digita almeno 3 caratteri';
+  const getOptionLabel: (option: any) => string =
+    labelKey !== undefined ? (o) => o[labelKey] : (o) => o.label ?? o;
 
   return (
-    <AsyncTypeahead
-      multiple={multiple}
-      filterBy={filterBy}
-      id="async"
-      isLoading={isLoading}
-      labelKey={labelKey}
-      minLength={3}
-      onSearch={debounce(handleSearch, 100)}
+    <Autocomplete
+      id="Parties"
+      value={selected}
+      noOptionsText={noOptionsText}
       onChange={setSelected}
-      selected={selected}
       options={options}
+      loading={isLoading}
+      onInputChange={(_event, value, reason) => {
+        setInput(value);
+        if (reason === 'input' && value.length >= 3) {
+          void debounce(handleSearch, 100)(value);
+        }
+      }}
+      filterOptions={(x) => x}
+      renderInput={(params) => <TextField {...params} variant="outlined" />}
       placeholder={placeholder}
-      emptyLabel="Nessun risultato trovato"
-      promptText="Inserisci almeno 3 caratteri..."
-      searchText="Stiamo cercando..."
-      renderMenuItemChildren={(option) => (
-        <React.Fragment>
-          <span>{option[labelKey]}</span>
-        </React.Fragment>
-      )}
+      getOptionLabel={getOptionLabel}
     />
-  )
+  );
 }

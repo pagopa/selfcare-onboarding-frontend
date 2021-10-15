@@ -1,58 +1,59 @@
-import React, { useContext, useState } from 'react'
-import { IPACatalogParty, StepperStepComponentProps } from '../../types'
-import { WhiteBackground } from '../components/WhiteBackground'
-import { UserContext } from '../lib/context'
-import { Row, Container } from 'react-bootstrap'
-import { OnboardingStepActions } from './OnboardingStepActions'
-import { AsyncAutocomplete } from './AsyncAutocomplete'
-import { StyledIntro } from './StyledIntro'
-import { ROUTES } from '../lib/constants'
-import { Link } from 'react-router-dom'
+import { useState } from 'react';
+import { Stack, Typography } from '@mui/material';
+import { Box } from '@mui/system';
+import { Link } from 'react-router-dom';
+import { IPACatalogParty, StepperStepComponentProps } from '../../types';
+import { OnboardingStepActions } from './OnboardingStepActions';
+import { AsyncAutocomplete } from './AsyncAutocomplete';
+import { StyledIntro } from './StyledIntro';
 
-export function OnboardingStep1({ forward }: StepperStepComponentProps) {
-  const { user } = useContext(UserContext)
-  const [selected, setSelected] = useState<IPACatalogParty[]>([])
+export function OnboardingStep1({ forward, back }: StepperStepComponentProps) {
+  const [selected, setSelected] = useState<IPACatalogParty>();
 
   const onForwardAction = () => {
-    const { digitalAddress, id } = selected[0]
-    forward!({ institutionId: id }, digitalAddress)
-  }
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const { digitalAddress, id } = /* TODO selected! */ { digitalAddress: 'asd', id: 'qwe' };
+    forward({ institutionId: id }, digitalAddress);
+  };
 
   return (
-    <WhiteBackground>
-      <Container className="container-align-left form-max-width">
-        <StyledIntro>
-          {{
-            title: `Ciao, ${user?.name} ${user?.surname}`,
-            description: (
-              <>
-                Per registrarti alla piattaforma di interoperabilità, seleziona il tuo l’ente di
-                riferimento dall’elenco IPA.
-                <br />
-                Se non trovi il tuo ente nell’elenco,{' '}
-                <Link className="link-default" to={ROUTES.IPA_GUIDE.PATH}>
-                  scopri qui
-                </Link>{' '}
-                come aggiungerti.
-              </>
-            ),
-          }}
-        </StyledIntro>
-        <Row className="my-4">
-          <AsyncAutocomplete
-            selected={selected}
-            setSelected={setSelected}
-            placeholder="Cerca ente nel catalogo IPA"
-            endpoint={{ endpoint: 'ONBOARDING_GET_SEARCH_PARTIES' }}
-            transformFn={(data: { items: IPACatalogParty[] }) => data.items}
-            labelKey="description"
-          />
-        </Row>
-
-        <OnboardingStepActions
-          forward={{ action: onForwardAction, label: 'prosegui', disabled: selected.length === 0 }}
+    <Stack spacing={10}>
+      <StyledIntro>
+        {{
+          title: 'Seleziona il tuo Ente',
+          description: (
+            <>
+              Seleziona dall’indice IPA l’Ente per cui vuoi richiedere l’adesione ai prodotti PagoPA
+            </>
+          ),
+        }}
+      </StyledIntro>
+      <Box sx={{ textAlign: 'center' }}>
+        <AsyncAutocomplete
+          selected={selected}
+          setSelected={setSelected}
+          placeholder="Cerca ente nel catalogo IPA"
+          endpoint={{ endpoint: 'ONBOARDING_GET_SEARCH_PARTIES' }}
+          transformFn={(data: { items: Array<IPACatalogParty> }) => data.items}
+          labelKey="description"
         />
-      </Container>
-    </WhiteBackground>
-  )
+      </Box>
+
+      <Box>
+        <Typography>
+          Non trovi il tuo ente nell’indice IPA? <Link to="#">Clicca qui</Link> per maggiori
+          informazioni e istruzioni per essere inclusi nell’indice delle Pubbliche Amministrazioni
+        </Typography>
+      </Box>
+
+      <OnboardingStepActions
+        back={{ action: back, label: 'Indietro', disabled: false }}
+        forward={{
+          action: onForwardAction,
+          label: 'Conferma',
+          disabled: /* TODO selected === undefined */ false,
+        }}
+      />
+    </Stack>
+  );
 }

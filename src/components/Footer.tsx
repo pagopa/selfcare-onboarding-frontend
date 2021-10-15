@@ -1,14 +1,24 @@
-import React from 'react'
-import { Container, Row } from 'react-bootstrap'
+import { Typography } from '@mui/material';
+import { Box } from '@mui/system';
 
 export function Footer() {
   return (
-    <footer className="bg-white py-4">
-      <Container>
-        <Row>
-          <div>... — PagoPA S.p.A. 2021 ©</div>
-        </Row>
-      </Container>
-    </footer>
-  )
+    <Box
+      component="footer"
+      sx={{
+        py: 3,
+        px: 2,
+        mt: 'auto',
+        backgroundColor: '#01254C',
+        color: 'white',
+      }}
+    >
+      <Typography variant="h6" align="center" gutterBottom>
+        Footer
+      </Typography>
+      <Typography variant="subtitle1" align="center" component="p">
+        Something here to give the footer a purpose!
+      </Typography>
+    </Box>
+  );
 }

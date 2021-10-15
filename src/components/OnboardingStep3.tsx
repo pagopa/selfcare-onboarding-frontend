@@ -1,38 +1,122 @@
-import React from 'react'
-import { Row, Container } from 'react-bootstrap'
-import { StepperStepComponentProps } from '../../types'
-import { OnboardingStepActions } from './OnboardingStepActions'
-import { StyledIntro } from './StyledIntro'
-import { StyledInputTextArea } from './StyledInputTextArea'
-import { WhiteBackground } from './WhiteBackground'
+import { ChangeEvent, useContext, useState } from 'react';
+import { Button, Checkbox, FormControlLabel, IconButton, Stack } from '@mui/material';
+import cryptoRandomString from 'crypto-random-string';
+import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
+import { omit } from 'lodash';
+import { Box } from '@mui/system';
+import { objectIsEmpty } from '../lib/object-utils';
+import { StepperStepComponentProps, UserOnCreate } from '../../types';
+import { UserContext } from '../lib/context';
+import { StyledIntro } from './StyledIntro';
+import { OnboardingStepActions } from './OnboardingStepActions';
+import { PlatformUserForm, validateUser } from './PlatformUserForm';
 
-const bozzaAccordo =
-  'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam sit amet leo sed magna pellentesque aliquet sed at libero. Suspendisse potenti. Aenean accumsan pretium ullamcorper. Duis tincidunt est sit amet facilisis consequat. Duis hendrerit quis velit sit amet euismod. Vivamus sit amet diam efficitur, faucibus nisi efficitur, iaculis nisi. Maecenas eu eros sed velit tincidunt gravida id et leo. Nullam elementum augue vitae turpis condimentum, ac dapibus ex pretium. Quisque tincidunt turpis malesuada risus auctor, id porttitor neque sagittis. Nam at nunc id enim feugiat consequat. Proin fringilla, felis sit amet accumsan convallis, sapien elit ultricies tortor, quis vehicula risus tellus in purus. Nulla facilisi. Integer sit amet ante nibh. Donec eu nisl tempor nisi feugiat rutrum. Sed ante ex, tristique in purus in, bibendum finibus mi. Nullam placerat, diam eget scelerisque rhoncus, orci arcu ullamcorper sem, sed imperdiet odio nibh at ipsum. Fusce fringilla ante massa, vitae lobortis sem sagittis nec. Nunc non erat id dui tristique malesuada. Donec odio nisl, ullamcorper id viverra vitae, convallis eu urna. Nam porttitor felis tellus, non feugiat lectus euismod at. Duis mauris neque, molestie vel odio non, aliquet lacinia metus. Etiam nec urna blandit, cursus leo at, gravida orci. Morbi euismod odio orci. Curabitur eros risus, viverra quis accumsan sed, semper in urna. Fusce vitae felis mollis,'
+// Could be an ES6 Set but it's too bothersome for now
+export type UsersObject = { [key: string]: UserOnCreate };
 
 export function OnboardingStep3({ forward, back }: StepperStepComponentProps) {
+  const { user } = useContext(UserContext);
+  const [isAuthUser, setIsAuthUser] = useState(false);
+  const [people, setPeople] = useState<UsersObject>({});
+  const [delegateFormIds, setDelegateFormIds] = useState<Array<string>>([]);
+
+  const addDelegateForm = () => {
+    setDelegateFormIds([...delegateFormIds, cryptoRandomString({ length: 8 })]);
+  };
+  const buildRemoveDelegateForm = (idToRemove: string) => (_: React.SyntheticEvent) => {
+    const filteredDelegateFormIds = delegateFormIds.filter((id) => id !== idToRemove);
+    setDelegateFormIds(filteredDelegateFormIds);
+    setPeople(omit(people, `delegate-${idToRemove}`));
+  };
+
+  const onForwardAction = () => {
+    forward({ users: Object.values(people) });
+  };
+
+  const handleAuthUser = (_: ChangeEvent, value: boolean) => {
+    if (value) {
+      setPeople({
+        ...people,
+        ['delegate-initial']: Object.assign({}, user, { email: undefined }),
+      });
+    }
+    setIsAuthUser(value);
+  };
+
   return (
-    <WhiteBackground>
-      <Container className="container-align-left form-max-width">
-        <StyledIntro>
-          {{
-            title: 'Verifica i dati e i termini dell’accordo di adesione*',
-            description:
-              'Questo è l’accordo che ti verrà inviato via mail da firmare e restituire per l’attivazione dell’account sulla piattaforma interoperabilità.',
-          }}
-        </StyledIntro>
-        <Row className="mt-4 mb-3">
-          <StyledInputTextArea
-            readOnly={true}
-            value={bozzaAccordo}
-            height={200}
-            readOnlyBgWhite={true}
-          />
-        </Row>
-        <OnboardingStepActions
-          back={{ action: back, label: 'indietro', disabled: false }}
-          forward={{ action: forward, label: 'invia', disabled: false }}
+    <Stack spacing={10}>
+      <StyledIntro>
+        {{
+          title: 'Indica il Referente Amministrativo',
+          description: (
+            <>
+              Inserisci i dati del Legale Rappresentante o di un suo delegato.
+              <br />
+              La persona indicata sarà responsabile della gestione dei prodotti PagoPA.
+            </>
+          ),
+        }}
+      </StyledIntro>
+
+      <Box sx={{ textAlign: 'center' }}>
+        <FormControlLabel
+          control={<Checkbox checked={isAuthUser} onChange={handleAuthUser} />}
+          label="Sono io il Referente Amministrativo"
+          sx={{ alignSelf: 'center' }}
         />
-      </Container>
-    </WhiteBackground>
-  )
+
+        <PlatformUserForm
+          prefix={'delegate-initial'}
+          role="Delegate"
+          platformRole="admin"
+          people={people}
+          setPeople={setPeople}
+          readOnly={isAuthUser ? ['name', 'surname', 'taxCode'] : []}
+        />
+      </Box>
+
+      {delegateFormIds.map((id) => (
+        <div style={{ position: 'relative' }} key={id}>
+          <StyledIntro priority={3}>
+            {{
+              title: 'Aggiungi un nuovo Referente Amministrativo',
+            }}
+          </StyledIntro>
+          <PlatformUserForm
+            prefix={`delegate-${id}`}
+            role="Delegate"
+            platformRole="admin"
+            people={people}
+            setPeople={setPeople}
+          />
+          <IconButton
+            color="primary"
+            onClick={buildRemoveDelegateForm(id)}
+            style={{ position: 'absolute', top: '2px', right: '2px', zIndex: 100 }}
+          >
+            <ClearOutlinedIcon />
+          </IconButton>
+        </div>
+      ))}
+
+      <Box sx={{ textAlign: 'center' }}>
+        <Button color="primary" variant="text" onClick={addDelegateForm}>
+          aggiungi nuovo delegato
+        </Button>
+
+        <OnboardingStepActions
+          back={{ action: back, label: 'Indietro', disabled: false }}
+          forward={{
+            action: onForwardAction,
+            label: 'Conferma',
+            disabled:
+              objectIsEmpty(people) ||
+              Object.keys(people)
+                .filter((prefix) => 'admin' !== prefix)
+                .some((prefix) => !validateUser(people[prefix])),
+          }}
+        />
+      </Box>
+    </Stack>
+  );
 }
