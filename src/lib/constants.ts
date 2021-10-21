@@ -16,7 +16,9 @@ export const URL_FE_LOGIN: string = process.env.REACT_APP_URL_FE_LOGIN;
 export const URL_FE_LOGOUT: string = process.env.REACT_APP_URL_FE_LOGOUT;
 export const URL_FE_DASHBOARD: string = process.env.REACT_APP_URL_FE_DASHBOARD;
 
-export const URL_API_ONBOARDING: string = process.env.REACT_APP_URL_API_ONBOARDING;
+export const URL_API_PARTY_PROCESS: string = process.env.URL_API_PARTY_PROCESS;
+export const URL_API_PARTY_REGISTRY_PROXY: string = process.env.URL_API_PARTY_REGISTRY_PROXY;
+export const URL_API_PARTY_MANAGEMENT: string = process.env.URL_API_PARTY_MANAGEMENT;
 
 export const ROUTES: RoutesObject = {
   ONBOARDING: {
@@ -48,19 +50,19 @@ export const API = {
     URL: '',
   },
   ONBOARDING_GET_AVAILABLE_PARTIES: {
-    URL: URL_API_ONBOARDING || '/onboarding/info/{{taxCode}}',
+    URL: URL_API_PARTY_PROCESS || '/onboarding/info/{{taxCode}}',
   },
   ONBOARDING_GET_SEARCH_PARTIES: {
-    URL: 'pdnd-interop-uservice-party-registry-proxy/0.0.1/institutions',
+    URL: URL_API_PARTY_REGISTRY_PROXY || '/institutions',
   },
   ONBOARDING_POST_LEGALS: {
-    URL: URL_API_ONBOARDING || '/onboarding/legals',
+    URL: URL_API_PARTY_PROCESS || '/onboarding/legals',
   },
   ONBOARDING_COMPLETE_REGISTRATION: {
-    URL: URL_API_ONBOARDING || '/onboarding/complete/{{token}}',
+    URL: URL_API_PARTY_PROCESS || '/onboarding/complete/{{token}}',
   },
   PARTY_GET_PARTY_ID: {
-    URL: 'pdnd-interop-uservice-party-management/0.0.1/organizations/{{institutionId}}',
+    URL: URL_API_PARTY_MANAGEMENT || '/organizations/{{institutionId}}',
   },
 };
 

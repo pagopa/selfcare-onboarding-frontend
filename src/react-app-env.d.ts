@@ -6,7 +6,9 @@ declare namespace NodeJS {
     REACT_APP_URL_FE_LOGIN: string;
     REACT_APP_URL_FE_LOGOUT: string;
     REACT_APP_URL_FE_DASHBOARD: string;
-    REACT_APP_URL_API_ONBOARDING: string;
+    URL_API_PARTY_PROCESS: string;
+    URL_API_PARTY_REGISTRY_PROXY: string;
+    URL_API_PARTY_MANAGEMENT: string;
   }
 }
 interface Window {
