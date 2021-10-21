@@ -15,7 +15,7 @@ import checkIllustration from '../assets/check-illustration.svg';
 import redXIllustration from '../assets/red-x-illustration.svg';
 import { InlineSupportLink } from '../components/InlineSupportLink';
 import { sleep } from '../lib/api-utils';
-import { DASHBOARD_URL } from '../lib/constants';
+import { URL_FE_DASHBOARD } from '../lib/constants';
 
 function OnboardingComponent() {
   const [loading, setLoading] = useState(false);
@@ -103,7 +103,7 @@ function OnboardingComponent() {
           <Button
             variant="contained"
             sx={{ width: '200px', alignSelf: 'center' }}
-            onClick={() => window.location.assign(DASHBOARD_URL)}
+            onClick={() => window.location.assign(URL_FE_DASHBOARD)}
           >
             Torna al portale
           </Button>
