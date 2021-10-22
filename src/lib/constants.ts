@@ -51,19 +51,19 @@ export const API = {
     URL: '',
   },
   ONBOARDING_GET_AVAILABLE_PARTIES: {
-    URL: URL_API_PARTY_PROCESS || '/onboarding/info/{{taxCode}}',
+    URL: URL_API_PARTY_PROCESS + '/onboarding/info/{{taxCode}}',
   },
   ONBOARDING_GET_SEARCH_PARTIES: {
-    URL: URL_API_PARTY_REGISTRY_PROXY || '/institutions',
+    URL: URL_API_PARTY_REGISTRY_PROXY + '/institutions',
   },
   ONBOARDING_POST_LEGALS: {
-    URL: URL_API_PARTY_PROCESS || '/onboarding/legals',
+    URL: URL_API_PARTY_PROCESS + '/onboarding/legals',
   },
   ONBOARDING_COMPLETE_REGISTRATION: {
-    URL: URL_API_PARTY_PROCESS || '/onboarding/complete/{{token}}',
+    URL: URL_API_PARTY_PROCESS + '/onboarding/complete/{{token}}',
   },
   PARTY_GET_PARTY_ID: {
-    URL: URL_API_PARTY_MANAGEMENT || '/organizations/{{institutionId}}',
+    URL: URL_API_PARTY_MANAGEMENT + '/organizations/{{institutionId}}',
   },
 };
 
