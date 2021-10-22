@@ -16,9 +16,10 @@ export const URL_FE_LOGIN: string = process.env.REACT_APP_URL_FE_LOGIN;
 export const URL_FE_LOGOUT: string = process.env.REACT_APP_URL_FE_LOGOUT;
 export const URL_FE_DASHBOARD: string = process.env.REACT_APP_URL_FE_DASHBOARD;
 
-export const URL_API_PARTY_PROCESS: string = process.env.URL_API_PARTY_PROCESS;
-export const URL_API_PARTY_REGISTRY_PROXY: string = process.env.URL_API_PARTY_REGISTRY_PROXY;
-export const URL_API_PARTY_MANAGEMENT: string = process.env.URL_API_PARTY_MANAGEMENT;
+export const URL_API_PARTY_PROCESS: string = process.env.REACT_APP_URL_API_PARTY_PROCESS;
+export const URL_API_PARTY_REGISTRY_PROXY: string =
+  process.env.REACT_APP_URL_API_PARTY_REGISTRY_PROXY;
+export const URL_API_PARTY_MANAGEMENT: string = process.env.REACT_APP_URL_API_PARTY_MANAGEMENT;
 
 export const ROUTES: RoutesObject = {
   ONBOARDING: {
