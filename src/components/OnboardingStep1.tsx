@@ -12,7 +12,7 @@ export function OnboardingStep1({ forward, back }: StepperStepComponentProps) {
 
   const onForwardAction = () => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const { digitalAddress, id } = /* TODO selected! */ { digitalAddress: 'asd', id: 'qwe' };
+    const { digitalAddress, id } = selected!;
     forward({ institutionId: id }, digitalAddress);
   };
 
@@ -51,7 +51,7 @@ export function OnboardingStep1({ forward, back }: StepperStepComponentProps) {
         forward={{
           action: onForwardAction,
           label: 'Conferma',
-          disabled: /* TODO selected === undefined */ false,
+          disabled: selected === undefined,
         }}
       />
     </Stack>

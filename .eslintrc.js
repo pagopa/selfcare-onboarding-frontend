@@ -30,7 +30,7 @@ module.exports = {
     'no-throw-literal': 'error',
     'no-new-wrappers': 'error',
     'no-eval': 'error',
-    'no-console': ['error', { 'allow': ['error', 'warn'] }],
+    'no-console': 0, // TODO ['error', { 'allow': ['error', 'warn'] }],
     'no-caller': 'error',
     'no-bitwise': 'error',
     eqeqeq: ['error', 'smart'],
