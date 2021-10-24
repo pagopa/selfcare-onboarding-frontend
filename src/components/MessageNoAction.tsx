@@ -1,11 +1,11 @@
-import { Stack, Typography } from '@mui/material';
+import { Stack, Box } from '@mui/material';
 import React from 'react';
 import { RequestOutcomeMessage } from '../../types';
 
 export function MessageNoAction({ img, title, description }: RequestOutcomeMessage) {
   return (
     <Stack spacing={10}>
-      <Typography style={{ textAlign: 'center' }}>
+      <Box style={{ textAlign: 'center' }}>
         <i>
           <img width={120} src={img.src} alt={img.alt} />
         </i>
@@ -13,7 +13,7 @@ export function MessageNoAction({ img, title, description }: RequestOutcomeMessa
         {description.map((paragraph, i) => (
           <React.Fragment key={i}>{paragraph}</React.Fragment>
         ))}
-      </Typography>
+      </Box>
     </Stack>
   );
 }

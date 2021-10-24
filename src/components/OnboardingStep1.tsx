@@ -1,4 +1,3 @@
-// import {useState} from 'react';
 import {Grid, Stack, Typography} from '@mui/material';
 import {Link} from 'react-router-dom';
 import {Box} from "@mui/system";
@@ -65,7 +64,7 @@ export function OnboardingStep1({forward}: StepperStepComponentProps) {
                 forward={{
                     action: onForwardAction,
                     label: 'Conferma',
-                    disabled: /* TODO selected === undefined */ false,
+                    disabled: selected === undefined,
                 }}
             />
         </Stack>
