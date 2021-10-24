@@ -58,7 +58,7 @@ export function AsyncAutocomplete({
             freeSolo
             value={selected}
             noOptionsText={noOptionsText}
-            onChange={setSelected}
+            onChange={(_event,value)=> setSelected(value)}
             options={options}
             loading={isLoading}
             onInputChange={(_event, value, reason) => {

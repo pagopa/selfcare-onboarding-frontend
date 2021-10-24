@@ -1,4 +1,4 @@
-import {useState} from 'react';
+// import {useState} from 'react';
 import {Grid, Stack, Typography} from '@mui/material';
 import {Link} from 'react-router-dom';
 import {Box} from "@mui/system";
@@ -6,12 +6,14 @@ import {IPACatalogParty, StepperStepComponentProps} from '../../types';
 import {OnboardingStepActions} from './OnboardingStepActions';
 import {AsyncAutocomplete} from './AsyncAutocomplete';
 import {StyledIntro} from './StyledIntro';
+import {useHistoryState} from "./useHistoryState";
 
-export function OnboardingStep1({forward, back}: StepperStepComponentProps) {
-    const [selected, setSelected] = useState<IPACatalogParty>();
+export function OnboardingStep1({forward}: StepperStepComponentProps) {
+    const [selected, setSelected,setSelectedHistory] = useHistoryState<IPACatalogParty>("selected_step1");
 
     const onForwardAction = () => {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        setSelectedHistory(selected);
         const {digitalAddress, id} = /* TODO selected! */ {digitalAddress: 'asd', id: 'qwe'};
         forward({institutionId: id}, digitalAddress);
     };
@@ -59,7 +61,7 @@ export function OnboardingStep1({forward, back}: StepperStepComponentProps) {
               </Box>
 
             <OnboardingStepActions
-                back={{action: back, label: 'Indietro', disabled: false}}
+                // back={{action: back, label: 'Indietro', disabled: true}}
                 forward={{
                     action: onForwardAction,
                     label: 'Conferma',
