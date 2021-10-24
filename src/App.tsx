@@ -5,7 +5,13 @@ import { Party, User } from '../types';
 import { BodyLogger } from './components/BodyLogger';
 import { PartyContext, UserContext } from './lib/context';
 
-const theme = createTheme({});
+const theme = createTheme({
+  typography: {
+    fontFamily: [
+      'Titillium Web',
+          ].join(','),
+  },
+});
 
 export function App() {
   const [user, setUser] = useState<User | null>(null);
