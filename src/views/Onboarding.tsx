@@ -18,7 +18,7 @@ import { URL_FE_DASHBOARD } from '../lib/constants';
 
 function OnboardingComponent() {
   const [loading, setLoading] = useState(false);
-  const [activeStep, setActiveStep] = useState(0);
+  const [activeStep, setActiveStep] = useState(1);
   const [formData, setFormData] = useState<Partial<FormData>>();
   const [_legalEmail, setLegalEmail] = useState('');
   const [outcome, setOutcome] = useState<RequestOutcome>();
