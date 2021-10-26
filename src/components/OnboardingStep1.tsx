@@ -58,7 +58,7 @@ export function OnboardingStep1({ forward }: StepperStepComponentProps) {
             fontSize: '14px',
             lineHeight: '24px',
             textAlign: 'center',
-            color: '#17324D',
+            color: 'text.primary',
           }}
         >
           Non trovi il tuo ente nell’indice IPA? <Link to="#">Clicca qui</Link> per maggiori
