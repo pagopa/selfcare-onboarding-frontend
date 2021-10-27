@@ -9,8 +9,9 @@ import { IPAGuide } from '../views/IPAGuide' */
 const IS_DEVELOP = process.env.NODE_ENV === 'development';
 
 export const DISPLAY_LOGS = IS_DEVELOP;
+export const MOCK_USER = IS_DEVELOP;
 
-export const BASE_ROUTE = '';
+export const BASE_ROUTE = process.env.PUBLIC_URL ? process.env.PUBLIC_URL : '';
 
 export const URL_FE_LOGIN: string = process.env.REACT_APP_URL_FE_LOGIN;
 export const URL_FE_LOGOUT: string = process.env.REACT_APP_URL_FE_LOGOUT;
@@ -47,9 +48,6 @@ export const ROUTES: RoutesObject = {
 };
 
 export const API = {
-  BASE: {
-    URL: '',
-  },
   ONBOARDING_GET_AVAILABLE_PARTIES: {
     URL: URL_API_PARTY_PROCESS + '/onboarding/info/{{taxCode}}',
   },

@@ -1,7 +1,7 @@
 {
   "name": "selfcare-onboarding-frontend",
   "version": "1.0.0",
-  "homepage": ".",
+  "homepage": "onboarding",
   "private": true,
   "dependencies": {
     "@emotion/react": "^11.4.1",
@@ -34,9 +34,11 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "react-scripts test -i",
+    "test:coverage": "react-scripts test -i --coverage",
     "eject": "react-scripts eject",
     "lint-autofix": "eslint . -c .eslintrc.js --ext .ts,.tsx --fix",
+    "lint": "eslint . -c .eslintrc.js --ext .ts,.tsx ",
     "prettify": "prettier --write \"./**/*.{ts,tsx}\""
   },
   "eslintConfig": {
