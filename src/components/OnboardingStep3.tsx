@@ -1,4 +1,4 @@
-import { ChangeEvent, useContext, useState } from 'react';
+import { ChangeEvent, useContext } from 'react';
 import { Button, Checkbox, FormControlLabel, IconButton, Stack } from '@mui/material';
 import cryptoRandomString from 'crypto-random-string';
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
@@ -10,15 +10,18 @@ import { UserContext } from '../lib/context';
 import { StyledIntro } from './StyledIntro';
 import { OnboardingStepActions } from './OnboardingStepActions';
 import { PlatformUserForm, validateUser } from './PlatformUserForm';
+import { useHistoryState } from './useHistoryState';
 
 // Could be an ES6 Set but it's too bothersome for now
 export type UsersObject = { [key: string]: UserOnCreate };
 
 export function OnboardingStep3({ forward, back }: StepperStepComponentProps) {
   const { user } = useContext(UserContext);
-  const [isAuthUser, setIsAuthUser] = useState(false);
-  const [people, setPeople] = useState<UsersObject>({});
-  const [delegateFormIds, setDelegateFormIds] = useState<Array<string>>([]);
+  const [isAuthUser, setIsAuthUser, setIsAuthUserHistory] = useHistoryState('isAuthUser', false);
+  const [people, setPeople, setPeopleHistory] = useHistoryState<UsersObject>('people_step3', {});
+  const [delegateFormIds, setDelegateFormIds, setDelegateFormIdsHistory] = useHistoryState<
+    Array<string>
+  >('delegateFormIds', []);
 
   const addDelegateForm = () => {
     setDelegateFormIds([...delegateFormIds, cryptoRandomString({ length: 8 })]);
@@ -30,7 +33,19 @@ export function OnboardingStep3({ forward, back }: StepperStepComponentProps) {
   };
 
   const onForwardAction = () => {
+    savePageState();
     forward({ users: Object.values(people) });
+  };
+
+  const onBackAction = () => {
+    savePageState();
+    back!();
+  };
+
+  const savePageState = () => {
+    setIsAuthUserHistory(isAuthUser);
+    setPeopleHistory(people);
+    setDelegateFormIdsHistory(delegateFormIds);
   };
 
   const handleAuthUser = (_: ChangeEvent, value: boolean) => {
@@ -100,12 +115,22 @@ export function OnboardingStep3({ forward, back }: StepperStepComponentProps) {
       ))}
 
       <Box sx={{ textAlign: 'center' }}>
-        <Button color="primary" variant="text" onClick={addDelegateForm}>
-          aggiungi nuovo delegato
+        <Button
+          color="primary"
+          variant="text"
+          disabled={
+            objectIsEmpty(people) ||
+            Object.keys(people)
+              .filter((prefix) => 'admin' !== prefix)
+              .some((prefix) => !validateUser(people[prefix]))
+          }
+          onClick={addDelegateForm}
+        >
+          aggiungi nuovo Referente
         </Button>
 
         <OnboardingStepActions
-          back={{ action: back, label: 'Indietro', disabled: false }}
+          back={{ action: onBackAction, label: 'Indietro', disabled: false }}
           forward={{
             action: onForwardAction,
             label: 'Conferma',

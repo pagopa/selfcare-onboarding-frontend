@@ -3,7 +3,7 @@ import isEmpty from 'lodash/isEmpty';
 import { AxiosResponse } from 'axios';
 import { Party } from '../../types';
 import { fetchAllWithLogs, fetchWithLogs } from '../lib/api-utils';
-import { LOGIN_URL } from '../lib/constants';
+import { URL_FE_LOGIN } from '../lib/constants';
 import { PartyContext, UserContext } from '../lib/context';
 import { isFetchError } from '../lib/error-utils';
 import { storageDelete, storageRead } from '../lib/storage-utils';
@@ -89,7 +89,7 @@ export const useLogin = () => {
       storageDelete('currentParty');
       storageDelete('bearer');
       // Go to the login view
-      window.location.assign(LOGIN_URL);
+      window.location.assign(URL_FE_LOGIN);
       // This return is necessary
       return;
     }

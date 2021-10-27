@@ -1,11 +1,10 @@
 import { useState } from 'react';
 import { BrowserRouter } from 'react-router-dom';
-import { createTheme, CssBaseline, ThemeProvider } from '@mui/material';
+import { CssBaseline, ThemeProvider } from '@mui/material';
 import { Party, User } from '../types';
 import { BodyLogger } from './components/BodyLogger';
 import { PartyContext, UserContext } from './lib/context';
-
-const theme = createTheme({});
+import theme from './theme';
 
 export function App() {
   const [user, setUser] = useState<User | null>(null);

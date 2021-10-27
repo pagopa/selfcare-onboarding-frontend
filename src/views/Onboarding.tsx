@@ -3,8 +3,8 @@ import { useHistory } from 'react-router-dom';
 import { Button, Stack, Typography } from '@mui/material';
 import { withLogin } from '../components/withLogin';
 import { RequestOutcome, RequestOutcomeOptions, StepperStep } from '../../types';
-/* import { fetchWithLogs, sleep } from '../lib/api-utils';
-import { getFetchOutcome } from '../lib/error-utils'; */
+import { fetchWithLogs } from '../lib/api-utils';
+import { getFetchOutcome } from '../lib/error-utils';
 import { OnboardingStep0 } from '../components/OnboardingStep0';
 import { OnboardingStep1 } from '../components/OnboardingStep1';
 import { OnboardingStep2 } from '../components/OnboardingStep2';
@@ -14,12 +14,11 @@ import { MessageNoAction } from '../components/MessageNoAction';
 import checkIllustration from '../assets/check-illustration.svg';
 import redXIllustration from '../assets/red-x-illustration.svg';
 import { InlineSupportLink } from '../components/InlineSupportLink';
-import { sleep } from '../lib/api-utils';
-import { DASHBOARD_URL } from '../lib/constants';
+import { URL_FE_DASHBOARD } from '../lib/constants';
 
 function OnboardingComponent() {
   const [loading, setLoading] = useState(false);
-  const [activeStep, setActiveStep] = useState(0);
+  const [activeStep, setActiveStep] = useState(1);
   const [formData, setFormData] = useState<Partial<FormData>>();
   const [_legalEmail, setLegalEmail] = useState('');
   const [outcome, setOutcome] = useState<RequestOutcome>();
@@ -50,20 +49,15 @@ function OnboardingComponent() {
   const submit = async () => {
     setLoading(true);
 
-    // TODO remove me
-    await sleep(750);
-    const outcome = 'success';
-
-    /* TODO
     const postLegalsResponse = await fetchWithLogs(
       { endpoint: 'ONBOARDING_POST_LEGALS' },
       { method: 'POST', data: formData }
-    ); */
+    );
 
     setLoading(false);
 
     // Check the outcome
-    // TODO const outcome = getFetchOutcome(postLegalsResponse);
+    const outcome = getFetchOutcome(postLegalsResponse);
 
     setOutcome(outcome);
   };
@@ -103,7 +97,7 @@ function OnboardingComponent() {
           <Button
             variant="contained"
             sx={{ width: '200px', alignSelf: 'center' }}
-            onClick={() => window.location.assign(DASHBOARD_URL)}
+            onClick={() => window.location.assign(URL_FE_DASHBOARD)}
           >
             Torna al portale
           </Button>

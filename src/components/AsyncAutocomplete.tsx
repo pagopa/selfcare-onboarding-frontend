@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import debounce from 'lodash/debounce';
 import { AxiosResponse } from 'axios';
 import { Autocomplete, TextField } from '@mui/material';
+import { Box } from '@mui/system';
 import { Endpoint } from '../../types';
 import { fetchWithLogs } from '../lib/api-utils';
 import { getFetchOutcome } from '../lib/error-utils';
+import logo from '../assets/comune-milano-logo.svg';
 
 type AutocompleteProps = {
   selected: any;
@@ -51,21 +53,66 @@ export function AsyncAutocomplete({
   return (
     <Autocomplete
       id="Parties"
+      freeSolo
       value={selected}
       noOptionsText={noOptionsText}
-      onChange={setSelected}
+      onChange={(_event, value) => setSelected(value)}
       options={options}
       loading={isLoading}
       onInputChange={(_event, value, reason) => {
         setInput(value);
-        if (reason === 'input' && value.length >= 3) {
-          void debounce(handleSearch, 100)(value);
+
+        if (reason === 'input') {
+          setSelected(null);
+          if (value.length >= 3) {
+            void debounce(handleSearch, 100)(value);
+          }
+        }
+        if (reason === 'clear') {
+          setSelected(null);
         }
       }}
       filterOptions={(x) => x}
-      renderInput={(params) => <TextField {...params} variant="outlined" />}
+      renderInput={(params) => (
+        <TextField
+          {...params}
+          inputProps={{
+            style: {
+              fontFamily: 'Titillium Web',
+              fontStyle: 'normal',
+              fontWeight: 'normal',
+              fontSize: '16px',
+              lineHeight: '24px',
+              color: '#C1C9D2',
+              textAlign: 'center',
+            },
+            ...params.inputProps,
+          }}
+          variant="standard"
+        />
+      )}
       placeholder={placeholder}
       getOptionLabel={getOptionLabel}
+      renderOption={(props, option) => (
+        <li {...props}>
+          <Box sx={{ width: 50 }}>
+            <img src={logo}></img>
+          </Box>
+          <Box
+            sx={{
+              fontFamily: 'Titillium Web',
+              fontStyle: 'normal',
+              fontWeight: 'normal',
+              fontSize: '16px',
+              lineHeight: '24px',
+              color: '#5A768A',
+              textTransform: 'capitalize',
+            }}
+          >
+            {option.description?.toLowerCase()}
+          </Box>
+        </li>
+      )}
     />
   );
 }
