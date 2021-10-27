@@ -1,19 +1,22 @@
-import { AppBar, Button, SvgIcon, Toolbar } from '@mui/material';
-import { Box } from '@mui/system';
-import { ReactComponent as logo } from '../assets/pagopa-logo.svg';
-import { URL_FE_LOGOUT } from '../lib/constants';
+import { AppBar, Container, Grid, Toolbar } from '@mui/material';
+import LogoPagoPa from '../assets/logo_pago_pa_mini.svg';
+// import { URL_FE_LOGOUT } from '../lib/constants';
 
-export function Header() {
-  return (
-    <AppBar position="relative">
-      <Toolbar sx={{ flexWrap: 'wrap' }}>
-        <SvgIcon component={logo} viewBox="0 0 80 24" sx={{ width: '80px' }} />
-        <Box sx={{ flexGrow: 1, textAlign: 'end' }}>
-          <Button href={URL_FE_LOGOUT} variant="contained">
-            Esci
-          </Button>
-        </Box>
-      </Toolbar>
-    </AppBar>
-  );
-}
+const Header = () => (
+  <AppBar>
+    <Toolbar sx={{ bgcolor: 'main.primary' }}>
+      <Container maxWidth="lg">
+        <Grid container direction="row" spacing={4}>
+          <Grid item xs={3} md={3} lg={3}>
+            <img src={LogoPagoPa} alt="fireSpot" />
+          </Grid>
+          <Grid item xs={3} md={3} lg={3}>
+            <img src={LogoPagoPa} alt="fireSpot" />
+          </Grid>
+        </Grid>
+      </Container>
+    </Toolbar>
+  </AppBar>
+);
+
+export default Header;
