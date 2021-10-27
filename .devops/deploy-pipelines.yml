@@ -126,11 +126,13 @@ stages:
               yarn build
             displayName: 'Build files'
             env:
-              SPID_TEST_ENV_ENABLED: '$(spid_test_env_enabled)'
               INLINE_RUNTIME_CHUNK: 'false'
-              REACT_APP_URL_FE_ONBOARDING: '$(react_app_url_fe_onboarding)'
+              REACT_APP_URL_FE_LOGIN: '$(react_app_url_fe_login)/login'
+              REACT_APP_URL_FE_LOGOUT: '$(react_app_url_fe_login)/logout'
               REACT_APP_URL_FE_DASHBOARD: '$(react_app_url_fe_dashboard)'
-              REACT_APP_URL_API_LOGIN: '$(react_app_url_api_login)'
+              REACT_APP_URL_API_PARTY_PROCESS: '$(react_app_url_api_party_process)'
+              REACT_APP_URL_API_PARTY_REGISTRY_PROXY: '$(react_app_url_api_party_registry_proxy)'
+              REACT_APP_URL_API_PARTY_MANAGEMENT: '$(react_app_url_api_party_management)'
           - publish: $(System.DefaultWorkingDirectory)/build
             artifact: Bundle
 
