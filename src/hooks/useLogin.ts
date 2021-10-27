@@ -15,13 +15,11 @@ export const useLogin = () => {
   const attemptSilentLogin = async () => {
     if (MOCK_USER) {
       setUser({
+        uid: '0',
+        taxCode: 'AAAAAA00A00A000A',
         name: 'loggedName',
         surname: 'loggedSurname',
         email: 'loggedEmail@aa.aa',
-        taxCode: 'AAAAAA00A00A000A',
-        role: 'Delegate',
-        platformRole: 'admin',
-        status: 'active',
       });
       return;
     }
