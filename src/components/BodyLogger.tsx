@@ -21,7 +21,7 @@ export function BodyLogger() {
       sx={{
         display: 'flex',
         flexDirection: 'column',
-        minHeight: '100vh',
+        minHeight: '101vh',
       }}
     >
       <Header />
