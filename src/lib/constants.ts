@@ -1,8 +1,9 @@
 import { RoutesObject } from '../../types';
 import { Onboarding } from '../views/Onboarding';
+import { RejectRegistration } from '../views/RejectRegistration';
 /* 
 import { CompleteRegistration } from '../views/CompleteRegistration'
-import { RejectRegistration } from '../views/RejectRegistration'
+
 import { TempSPIDUser } from '../components/TempSPIDUser'
 import { IPAGuide } from '../views/IPAGuide' */
 
@@ -10,7 +11,7 @@ const IS_DEVELOP = process.env.NODE_ENV === 'development';
 
 export const DISPLAY_LOGS = IS_DEVELOP;
 
-export const BASE_ROUTE = '';
+export const BASE_ROUTE = '/Onboarding';
 
 export const URL_FE_LOGIN: string = process.env.REACT_APP_URL_FE_LOGIN;
 export const URL_FE_LOGOUT: string = process.env.REACT_APP_URL_FE_LOGOUT;
@@ -37,13 +38,12 @@ export const ROUTES: RoutesObject = {
   REGISTRATION_FINALIZE_COMPLETE: {
     PATH: `${BASE_ROUTE}/conferma-registrazione`,
     LABEL: 'Completa la procedura di onboarding',
-    COMPONENT: CompleteRegistration,
-  },
+*/,
   REGISTRATION_FINALIZE_REJECT: {
-    PATH: `${BASE_ROUTE}/cancella-registrazione`,
+    PATH: `${BASE_ROUTE}/cancella`,
     LABEL: 'Cancella la procedura di onboarding',
     COMPONENT: RejectRegistration,
-  }, */,
+  },
 };
 
 export const API = {
