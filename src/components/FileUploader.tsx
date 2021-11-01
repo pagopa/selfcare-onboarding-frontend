@@ -1,5 +1,6 @@
-import {Grid, Typography} from "@mui/material";
+import {CircularProgress, Grid, Typography} from "@mui/material";
 import {DropEvent, FileRejection, useDropzone} from "react-dropzone";
+import {Box} from "@mui/system";
 import uploadedImage from "../assets/uploaded_doc.png";
 import uploadImage from "../assets/upload_doc.png";
 import {FileUploadedPreview} from "./FileUploadedPreview";
@@ -8,11 +9,13 @@ type FileUploaderOption = {
     title: string;
     description: string;
     uploadedFiles: Array<File>;
-    deleteUploadedFiles?: (event: any|undefined) => void;
+    deleteUploadedFiles?: (event: any | undefined) => void;
     onDropAccepted?: (t: Array<File>) => void;
     onDropRejected?: (fileRejections: Array<FileRejection>, event?: DropEvent) => void;
     maxFiles?: number;
-    accept?: Array<string>|undefined;
+    accept?: Array<string> | undefined;
+    uploaderImageWidth?: number;
+    loading: boolean;
 
 };
 
@@ -24,7 +27,9 @@ export function FileUploader({
                                  onDropAccepted,
                                  onDropRejected,
                                  maxFiles,
-                                 accept
+                                 accept,
+                                 uploaderImageWidth,
+                                 loading
                              }: FileUploaderOption) {
     const {getRootProps, getInputProps} = useDropzone({
         onDropAccepted,
@@ -35,10 +40,36 @@ export function FileUploader({
 
     return (
         <Grid container direction="row" justifyItems={"center"} alignItems={"center"} sx={{mt: "56px"}}>
-            <div {...getRootProps({className: 'dropzone'})}>
+            <Box {...getRootProps({className: 'dropzone'})} sx={{display: !loading ? undefined : 'none'}}>
                 <input {...getInputProps()} />
-                <img width="180px" src={uploadedFiles && uploadedFiles.length > 0 ? uploadedImage : uploadImage}/>
-            </div>
+                <img width={uploaderImageWidth ? uploaderImageWidth : 180}
+                     src={uploadedFiles && uploadedFiles.length > 0 ? uploadedImage : uploadImage}/>
+            </Box>
+            <Box sx={{position: "relative",display: loading ? undefined : "none"}}>
+                <CircularProgress
+                    variant="determinate"
+                    sx={{
+                        color: "#D1E7FF"
+                    }}
+                    size={180}
+                    thickness={5}
+                    value={100}
+                />
+                <CircularProgress
+                    variant="indeterminate"
+                    disableShrink
+                    sx={{
+                        color: "primary.main",
+                        animationDuration: '1.5s',
+                        position: 'absolute',
+                        left: 0,
+                    }}
+                    size={180}
+                    thickness={7}
+
+                />
+            </Box>
+
 
             {uploadedFiles && uploadedFiles.length > 0 ? (
                 <FileUploadedPreview files={uploadedFiles} deleteUploadedFiles={deleteUploadedFiles}

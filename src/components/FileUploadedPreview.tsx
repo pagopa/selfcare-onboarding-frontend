@@ -10,7 +10,7 @@ type FileUploadedPreviewParams = {
 };
 
 
-export function     FileUploadedPreview({files, sx, deleteUploadedFiles}: FileUploadedPreviewParams): JSX.Element {
+export function  FileUploadedPreview({files, sx, deleteUploadedFiles}: FileUploadedPreviewParams): JSX.Element {
 
     const cleanFileType = (fileType: string): string => {
         // eslint-disable-next-line functional/no-let

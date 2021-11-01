@@ -4,25 +4,33 @@ import {ConfirmRegistrationStep0} from "../components/ConfirmRegistrationStep0";
 import {ConfirmRegistrationStep1} from "../components/ConfirmRegistrationStep1";
 import {AlertDialog} from "../components/AlertDialog";
 import {useHistoryState} from "../components/useHistoryState";
+import {fetchWithLogs} from "../lib/api-utils";
+import {getFetchOutcome} from "../lib/error-utils";
 
 
 function CompleteRegistrationComponent() {
-
-
 
     const [activeStep, setActiveStep] = useState(0);
     const [showDialog, setShowDialog] = useHistoryState<boolean>(
         'show_dialog',
         false
     );
-    const [dialogTitle, setDialogTitle] = useHistoryState<string|null>(
-        'dialog_title_confirm_registration_1',
+    const [dialogTitle, setDialogTitle] = useState<string|null>(
         null
     );
-    const [dialogDescription, setDialogDescription] = useHistoryState<string|null>(
-        'dialog_desription_confirm_registration_1',
+    const [dialogDescription, setDialogDescription] = useState<string|null>(
         null
     );
+
+    const [loading, setLoading] = useState<boolean>(
+        false
+    );
+
+    const [uploadedFiles, setUploadedFiles] = useHistoryState<Array<File>>(
+        'uploaded_files',
+        []
+    );
+
 
 
     const handleCloseDialog = (): void => {
@@ -37,6 +45,27 @@ function CompleteRegistrationComponent() {
     //     setActiveStep(activeStep - 1);
     // };
 
+    const submit = async (file: File) =>{
+
+        setLoading(true);
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const uploadDocument = await fetchWithLogs(
+            { endpoint: 'MOCK_UPLOAD' },
+            { method: 'POST', data: formData }
+        );
+
+        const outcome = getFetchOutcome(uploadDocument);
+
+        setLoading(false);
+
+        console.log(uploadDocument,outcome);
+
+
+
+    };
+
     const steps: Array<StepperStep> = [
         {
             label: "Carica l'Atto di Adessione",
@@ -44,7 +73,8 @@ function CompleteRegistrationComponent() {
         },
         {
             label: "Carica l'Atto di Adessione",
-            Component: () => ConfirmRegistrationStep1({setDialogTitle,setDialogDescription,setShowDialog,handleCloseDialog}),
+            Component: () => ConfirmRegistrationStep1({setDialogTitle,setDialogDescription,setShowDialog,handleCloseDialog},{forward:submit},
+                {loading},{uploadedFiles,setUploadedFiles})
         }
         // {
         //   label: "Seleziona l'ente",

@@ -1,15 +1,20 @@
-import {Grid, Typography} from "@mui/material";
+import {Button, Grid, Typography} from "@mui/material";
 import {Box} from "@mui/system";
-import {AlertDialogActions} from "../../types";
-import {useHistoryState} from "./useHistoryState";
+import {AlertDialogActions, StepperStepComponentProps} from "../../types";
 import {FileUploader} from "./FileUploader";
 
 
-export function ConfirmRegistrationStep1({setDialogTitle, setDialogDescription, setShowDialog}: AlertDialogActions) {
+export function ConfirmRegistrationStep1({
+                                             setDialogTitle,
+                                             setDialogDescription,
+                                             setShowDialog
+                                         }: AlertDialogActions, {forward}: StepperStepComponentProps,{loading} : any,
+                                         {uploadedFiles,setUploadedFiles} : any) {
 
     const onDropAccepted = (acceptedFiles: Array<File>) => {
         setUploadedFiles(acceptedFiles);
     };
+
 
     const onDropRejected = () => {
         setDialogTitle("Controlla il Documento");
@@ -17,20 +22,19 @@ export function ConfirmRegistrationStep1({setDialogTitle, setDialogDescription, 
         setShowDialog(true);
     };
 
-    const [uploadedFiles, setUploadedFiles] = useHistoryState<Array<File>>(
-        'uploaded_files',
-        []
-    );
+    const onSubmit = ():void =>{
+        forward(uploadedFiles[0]);
+    };
 
 
-    const deleteUploadedFiles = () : void => {
-        console.log(event);
+    const deleteUploadedFiles = (): void => {
         setUploadedFiles([]);
     };
 
 
     const subtitle1 = "Per completare la procedura di adesione, inserisci qui l'accordo ricevuto via PEC,";
     const subtitle2 = "firmato digitalmente dal Legale Rappresentante.";
+    const uploaderImageWidth = 180;
 
     return (
 
@@ -71,7 +75,14 @@ export function ConfirmRegistrationStep1({setDialogTitle, setDialogDescription, 
                           onDropAccepted={onDropAccepted}
                           onDropRejected={onDropRejected}
                           accept={['application/pdf']}
+                          uploaderImageWidth={uploaderImageWidth}
+                          loading={loading}
             />
+
+            <Button sx={{mt: 8, width: 180}} color="primary" variant="contained"
+                    disabled={!(uploadedFiles && uploadedFiles.length > 0)} onClick={() => onSubmit()}>
+                Invia
+            </Button>
 
         </Box>
 
