@@ -1,6 +1,6 @@
 import {AppBar, Button, SvgIcon, Toolbar} from '@mui/material';
 import {Box} from "@mui/system";
-import {ReactComponent as logo} from '../assets/logo_pago_pa_mini.svg';
+import {ReactComponent as logo} from '../assets/logo.svg';
 // import { URL_FE_LOGOUT } from '../lib/constants';
 
 const Header = () => (

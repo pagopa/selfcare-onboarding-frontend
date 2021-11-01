@@ -23,7 +23,7 @@ function CompleteRegistrationComponent() {
         },
         {
             label: "Carica l'Atto di Adessione",
-            Component: () => ConfirmRegistrationStep1({forward}),
+            Component: () => ConfirmRegistrationStep1(),
         }
         // {
         //   label: "Seleziona l'ente",

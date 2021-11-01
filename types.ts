@@ -86,3 +86,9 @@ export type Party = {
   partyId?: string;
   attributes: string[];
 };
+
+export type DocUpload = {
+  files: Array<File>;
+};
+
+
