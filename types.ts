@@ -27,7 +27,7 @@ export type RouteConfig = {
 };
 
 export type Image = { src: string; alt: string };
-export type RequestOutcome = 'success' | 'error';
+export type RequestOutcome = 'success' | 'error' ;
 export type RequestOutcomeMessage = { title: string; description: JSX.Element[]; img: Image };
 export type RequestOutcomeOptions = { [key in RequestOutcome]: RequestOutcomeMessage };
 

@@ -1,6 +1,6 @@
 import {RoutesObject} from '../../types';
 import {Onboarding} from '../views/Onboarding';
-import { RejectRegistration } from '../views/RejectRegistration';
+import {RejectRegistration} from '../views/RejectRegistration';
 import CompleteRegistrationComponent from "../views/CompleteRegistrationComponent";
 /*
 import { CompleteRegistration } from '../views/CompleteRegistration'
@@ -31,23 +31,23 @@ export const ROUTES: RoutesObject = {
         COMPONENT: Onboarding,
     },
 
-  // IPA_GUIDE: { PATH: `${BASE_ROUTE}/guida-ipa`, LABEL: 'Accreditarsi su IPA', COMPONENT: IPAGuide },
-  // TEMP_SPID_USER: {
-  //   PATH: `${BASE_ROUTE}/temp-spid`,
-  //   LABEL: 'Genera utente SPID di test',
-  //   COMPONENT: TempSPIDUser,
-  // },
+    // IPA_GUIDE: { PATH: `${BASE_ROUTE}/guida-ipa`, LABEL: 'Accreditarsi su IPA', COMPONENT: IPAGuide },
+    // TEMP_SPID_USER: {
+    //   PATH: `${BASE_ROUTE}/temp-spid`,
+    //   LABEL: 'Genera utente SPID di test',
+    //   COMPONENT: TempSPIDUser,
+    // },
     REGISTRATION_FINALIZE_COMPLETE: {
-        PATH: `${BASE_ROUTE}/confirm`,
+        PATH: `${BASE_ROUTE}/conferma`,
         LABEL: 'Completa la procedura di onboarding',
         COMPONENT: CompleteRegistrationComponent,
     },
 
-  REGISTRATION_FINALIZE_REJECT: {
-    PATH: `${BASE_ROUTE}/cancella`,
-    LABEL: 'Cancella la procedura di onboarding',
-    COMPONENT: RejectRegistration,
-  },
+    REGISTRATION_FINALIZE_REJECT: {
+        PATH: `${BASE_ROUTE}/cancella`,
+        LABEL: 'Cancella la procedura di onboarding',
+        COMPONENT: RejectRegistration,
+    },
 };
 
 export const API = {
@@ -69,7 +69,7 @@ export const API = {
     PARTY_GET_PARTY_ID: {
         URL: URL_API_PARTY_MANAGEMENT + '/organizations/{{institutionId}}',
     },
-    MOCK_UPLOAD:{
+    MOCK_UPLOAD: {
         URL: 'https://petstore.swagger.io/v2/pet/1/uploadImage',
     }
 };

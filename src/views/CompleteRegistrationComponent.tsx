@@ -1,11 +1,16 @@
 import React, {useState} from "react";
-import {StepperStep} from "../../types";
+import {Button, Stack, Typography} from "@mui/material";
+import {RequestOutcome, RequestOutcomeOptions, StepperStep} from "../../types";
 import {ConfirmRegistrationStep0} from "../components/ConfirmRegistrationStep0";
 import {ConfirmRegistrationStep1} from "../components/ConfirmRegistrationStep1";
 import {AlertDialog} from "../components/AlertDialog";
 import {useHistoryState} from "../components/useHistoryState";
 import {fetchWithLogs} from "../lib/api-utils";
 import {getFetchOutcome} from "../lib/error-utils";
+import checkIllustration from "../assets/check-illustration.svg";
+import {URL_FE_DASHBOARD} from "../lib/constants";
+import {InlineSupportLink} from "../components/InlineSupportLink";
+import {MessageNoAction} from "../components/MessageNoAction";
 
 
 function CompleteRegistrationComponent() {
@@ -15,6 +20,7 @@ function CompleteRegistrationComponent() {
     const [dialogTitle, setDialogTitle] = useState<string | null>(null);
     const [dialogDescription, setDialogDescription] = useState<string | null>(null
     );
+    const [outcome, setOutcome] = useState<RequestOutcome>();
 
     const [loading, setLoading] = useState<boolean>(
         false
@@ -25,7 +31,7 @@ function CompleteRegistrationComponent() {
         []
     );
 
-    const setUploadedFilesAndWriteHistory = (files: Array<File>) =>{
+    const setUploadedFilesAndWriteHistory = (files: Array<File>) => {
         setUploadedFilesHistory(files);
         setUploadedFiles(files);
     };
@@ -41,9 +47,6 @@ function CompleteRegistrationComponent() {
         setActiveStep(activeStep + 1);
     };
 
-    // const back = () => {
-    //     setActiveStep(activeStep - 1);
-    // };
 
     const submit = async (file: File) => {
 
@@ -56,12 +59,13 @@ function CompleteRegistrationComponent() {
             {method: 'POST', data: formData}
         );
 
-        const outcome = getFetchOutcome(uploadDocument);
-
         setLoading(false);
 
-        console.log(uploadDocument, outcome);
+        const outcome = getFetchOutcome(uploadDocument);
 
+        if(outcome === 'success'){
+            setOutcome(outcome);
+        }
 
     };
 
@@ -78,21 +82,59 @@ function CompleteRegistrationComponent() {
                     setShowDialog,
                     handleCloseDialog
                 }, {forward: submit},
-                {loading}, {uploadedFiles, setUploadedFiles:setUploadedFilesAndWriteHistory})
+                {loading}, {uploadedFiles, setUploadedFiles: setUploadedFilesAndWriteHistory})
         }
 
     ];
 
     const Step = steps[activeStep].Component;
 
+    const outcomeContent: RequestOutcomeOptions = {
+        success: {
+            img: {src: checkIllustration, alt: "Icona dell'email"},
+            title: 'Richiesta di adesione completata',
+            description: [
+                <Stack key="0" spacing={10}>
+                    <Typography>
+                        {"Comunicheremo all'indirizzo PEC dell'Ente l'avvenuta adesione."}
+
+                        <br/>
+                        {"D'ora in poi i Referenti Amministrativi indicati potranno accedere al portale."}
+                    </Typography>
+                    <Button
+                        variant="contained"
+                        sx={{width: '200px', alignSelf: 'center'}}
+                        onClick={() => window.location.assign(URL_FE_DASHBOARD)}
+                    >
+                        Torna al portale
+                    </Button>
+                    <Typography>
+                        Non hai ricevuto nessuna mail? Attendi qualche minuto e controlla anche nello spam. Se
+                        non arriva, <InlineSupportLink/>
+                    </Typography>
+                </Stack>,
+            ],
+        },
+        error: {
+            img: {src: checkIllustration, alt: "Icona dell'email"},
+            title: 'Richiesta di adesione in errore',
+            description: [
+                <div key="0"></div>,
+            ],
+        },
+    };
+
 
     return (
-        <React.Fragment>
-            <Step/>
-            <AlertDialog open={showDialog} handleClose={handleCloseDialog}
-                         description={dialogDescription}
-                         title={dialogTitle}/>
-        </React.Fragment>);
+        outcome && outcome ==='success' ? (<MessageNoAction {...outcomeContent[outcome]} />) : (
+            <React.Fragment>
+                <Step/>
+                <AlertDialog open={showDialog} handleClose={handleCloseDialog}
+                             description={dialogDescription}
+                             title={dialogTitle}/>
+
+            </React.Fragment>)
+    );
 
 }
 

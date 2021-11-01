@@ -5,9 +5,6 @@ import { MessageNoAction } from '../components/MessageNoAction';
 import checkIllustration from '../assets/check-illustration.svg';
 import redXIllustration from '../assets/red-x-illustration.svg';
 import { RequestOutcome, RequestOutcomeOptions } from '../../types';
-// import { parseSearch } from '../lib/url-utils';
-// import { fetchWithLogs } from '../lib/api-utils';
-// import { getFetchOutcome } from '../lib/error-utils';
 import { LoadingOverlay } from '../components/LoadingOverlay';
 import { InlineSupportLink } from '../components/InlineSupportLink';
 

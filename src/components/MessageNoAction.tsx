@@ -17,7 +17,7 @@ export function MessageNoAction({ img, title, description }: RequestOutcomeMessa
         </Typography>
         {/* 
         <p dangerouslySetInnerHTML={{ __html: title }}></p> */}
-        {description.map((paragraph, i) => (
+        {description && description.map((paragraph, i) => (
           <React.Fragment key={i}>{paragraph}</React.Fragment>
         ))}
       </Box>
