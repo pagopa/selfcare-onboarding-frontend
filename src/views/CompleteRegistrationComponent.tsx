@@ -10,27 +10,25 @@ import {getFetchOutcome} from "../lib/error-utils";
 
 function CompleteRegistrationComponent() {
 
-    const [activeStep, setActiveStep] = useState(0);
-    const [showDialog, setShowDialog] = useHistoryState<boolean>(
-        'show_dialog',
-        false
-    );
-    const [dialogTitle, setDialogTitle] = useState<string|null>(
-        null
-    );
-    const [dialogDescription, setDialogDescription] = useState<string|null>(
-        null
+    const [activeStep, setActiveStep, setActiveStepHistory] = useHistoryState('complete_registration_step', 0);
+    const [showDialog, setShowDialog] = useState<boolean>(false);
+    const [dialogTitle, setDialogTitle] = useState<string | null>(null);
+    const [dialogDescription, setDialogDescription] = useState<string | null>(null
     );
 
     const [loading, setLoading] = useState<boolean>(
         false
     );
 
-    const [uploadedFiles, setUploadedFiles] = useHistoryState<Array<File>>(
+    const [uploadedFiles, setUploadedFiles, setUploadedFilesHistory] = useHistoryState<Array<File>>(
         'uploaded_files',
         []
     );
 
+    const setUploadedFilesAndWriteHistory = (files: Array<File>) =>{
+        setUploadedFilesHistory(files);
+        setUploadedFiles(files);
+    };
 
 
     const handleCloseDialog = (): void => {
@@ -38,6 +36,8 @@ function CompleteRegistrationComponent() {
     };
 
     const forward = () => {
+        setActiveStepHistory(activeStep + 1);
+        setUploadedFilesHistory(uploadedFiles);
         setActiveStep(activeStep + 1);
     };
 
@@ -45,23 +45,22 @@ function CompleteRegistrationComponent() {
     //     setActiveStep(activeStep - 1);
     // };
 
-    const submit = async (file: File) =>{
+    const submit = async (file: File) => {
 
         setLoading(true);
         const formData = new FormData();
         formData.append('file', file);
 
         const uploadDocument = await fetchWithLogs(
-            { endpoint: 'MOCK_UPLOAD' },
-            { method: 'POST', data: formData }
+            {endpoint: 'MOCK_UPLOAD'},
+            {method: 'POST', data: formData}
         );
 
         const outcome = getFetchOutcome(uploadDocument);
 
         setLoading(false);
 
-        console.log(uploadDocument,outcome);
-
+        console.log(uploadDocument, outcome);
 
 
     };
@@ -73,21 +72,15 @@ function CompleteRegistrationComponent() {
         },
         {
             label: "Carica l'Atto di Adessione",
-            Component: () => ConfirmRegistrationStep1({setDialogTitle,setDialogDescription,setShowDialog,handleCloseDialog},{forward:submit},
-                {loading},{uploadedFiles,setUploadedFiles})
+            Component: () => ConfirmRegistrationStep1({
+                    setDialogTitle,
+                    setDialogDescription,
+                    setShowDialog,
+                    handleCloseDialog
+                }, {forward: submit},
+                {loading}, {uploadedFiles, setUploadedFiles:setUploadedFilesAndWriteHistory})
         }
-        // {
-        //   label: "Seleziona l'ente",
-        //   Component: () => OnboardingStep1({ forward: forwardWithDataAndEmail, back }),
-        // },
-        // {
-        //   label: 'Inserisci i dati del rappresentante legale',
-        //   Component: () => OnboardingStep2({ forward: forwardWithData, back }),
-        // },
-        // {
-        //   label: 'Inserisci i dati degli amministratori',
-        //   Component: () => OnboardingStep3({ forward: submit, back }),
-        // },
+
     ];
 
     const Step = steps[activeStep].Component;
