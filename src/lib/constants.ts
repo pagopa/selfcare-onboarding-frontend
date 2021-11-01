@@ -1,9 +1,10 @@
 import {RoutesObject} from '../../types';
 import {Onboarding} from '../views/Onboarding';
+import { RejectRegistration } from '../views/RejectRegistration';
 import CompleteRegistrationComponent from "../views/CompleteRegistrationComponent";
-/* 
+/*
 import { CompleteRegistration } from '../views/CompleteRegistration'
-import { RejectRegistration } from '../views/RejectRegistration'
+
 import { TempSPIDUser } from '../components/TempSPIDUser'
 import { IPAGuide } from '../views/IPAGuide' */
 
@@ -40,13 +41,13 @@ export const ROUTES: RoutesObject = {
         PATH: `${BASE_ROUTE}/confirm`,
         LABEL: 'Completa la procedura di onboarding',
         COMPONENT: CompleteRegistrationComponent,
-    }
-    /*
+    },
+
   REGISTRATION_FINALIZE_REJECT: {
-    PATH: `${BASE_ROUTE}/cancella-registrazione`,
+    PATH: `${BASE_ROUTE}/cancella`,
     LABEL: 'Cancella la procedura di onboarding',
     COMPONENT: RejectRegistration,
-  }, */,
+  },
 };
 
 export const API = {
