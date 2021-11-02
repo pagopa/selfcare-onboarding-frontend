@@ -13,17 +13,18 @@ type ActionStepsProps = {
 
 export function OnboardingStepActions({ forward, back }: ActionStepsProps) {
   return (
-    <Grid container spacing={2} justifyContent="center" my={2}>
+    <Grid container spacing={2} justifyContent="center">
       {back && (
-        <Grid item>
-          <Button color="primary" variant="outlined" onClick={back.action} disabled={back.disabled}>
+        <Grid item xs={2} >
+          <Button sx={{width:'100%'}} color="primary" variant="outlined" onClick={back.action} disabled={back.disabled}>
             {back.label}
           </Button>
         </Grid>
       )}
       {forward && (
-        <Grid item>
+        <Grid item xs={2} >
           <Button
+            sx={{width:'100%'}}
             color="primary"
             variant="contained"
             onClick={forward.action}

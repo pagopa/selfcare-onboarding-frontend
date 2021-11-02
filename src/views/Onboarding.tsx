@@ -101,10 +101,10 @@ function OnboardingComponent() {
           >
             Torna al portale
           </Button>
-          <Typography>
+          {/* <Typography>
             Non hai ricevuto nessuna mail? Attendi qualche minuto e controlla anche nello spam. Se
             non arriva, <InlineSupportLink />
-          </Typography>
+          </Typography> */}
         </Stack>,
       ],
     },

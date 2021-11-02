@@ -6,7 +6,7 @@ import { Box } from '@mui/system';
 import { Endpoint } from '../../types';
 import { fetchWithLogs } from '../lib/api-utils';
 import { getFetchOutcome } from '../lib/error-utils';
-import logo from '../assets/comune-milano-logo.svg';
+// import logo from '../assets/comune-milano-logo.svg';
 
 type AutocompleteProps = {
   selected: any;
@@ -84,7 +84,7 @@ export function AsyncAutocomplete({
               fontSize: '16px',
               lineHeight: '24px',
               color: '#C1C9D2',
-              textAlign: 'center',
+              textAlign: 'start',
             },
             ...params.inputProps,
           }}
@@ -95,9 +95,9 @@ export function AsyncAutocomplete({
       getOptionLabel={getOptionLabel}
       renderOption={(props, option) => (
         <li {...props}>
-          <Box sx={{ width: 50 }}>
+          {/* <Box sx={{ width: 50 }}>
             <img src={logo}></img>
-          </Box>
+          </Box> */}
           <Box
             sx={{
               fontFamily: 'Titillium Web',
