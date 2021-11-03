@@ -18,7 +18,6 @@ function prepareRequest(
 
   // eslint-disable-next-line functional/no-let
   let url = API[endpoint].URL;
-  const baseURL = API.BASE.URL;
 
   // Replace dynamic parts of the URL by substitution
   if (!isEmpty(endpointParams)) {
@@ -31,7 +30,6 @@ function prepareRequest(
   // Log action with updated variables, in case the call is mocked
   logAction('Prepare request', {
     endpoint,
-    baseURL,
     url,
     headers,
     method,
@@ -46,7 +44,6 @@ function prepareRequest(
       method,
       params,
       data,
-      baseURL,
       headers: { ...headers, Authorization: `Bearer ${storageRead('bearer', 'string')}` },
     });
 }
