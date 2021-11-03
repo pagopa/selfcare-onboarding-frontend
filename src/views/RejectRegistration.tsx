@@ -1,48 +1,44 @@
 import React, { useEffect, useState } from 'react';
-// import { useLocation } from 'react-router';
 import { Button, Stack, Typography } from '@mui/material';
 import { MessageNoAction } from '../components/MessageNoAction';
 import checkIllustration from '../assets/check-illustration.svg';
 import redXIllustration from '../assets/red-x-illustration.svg';
 import { RequestOutcome, RequestOutcomeOptions } from '../../types';
-// import { parseSearch } from '../lib/url-utils';
-// import { fetchWithLogs } from '../lib/api-utils';
-// import { getFetchOutcome } from '../lib/error-utils';
+import { fetchWithLogs } from '../lib/api-utils';
+import { getFetchOutcome } from '../lib/error-utils';
 import { LoadingOverlay } from '../components/LoadingOverlay';
-import { InlineSupportLink } from '../components/InlineSupportLink';
 
 export function RejectRegistration() {
-  // const location = useLocation();
   const [outcome, setOutcome] = useState<RequestOutcome>();
+  const [loading, setLoading] = useState(true);
 
-  /*  const getJwt = () => {
-    const s = parseSearch(location.search);
-    return s.jwt;
-  }; */
+  const getJwt = () => new URLSearchParams(window.location.search).get('jwt');
 
-  // const token = 'pippo '; // getJwt();
-
-  const reload = () => {
-    history.go(0);
-  };
+  const token = getJwt();
 
   useEffect(() => {
     async function asyncSendDeleteRequest() {
       // Send DELETE request
-      /*  const contractPostResponse = await fetchWithLogs(
+      const contractPostResponse = await fetchWithLogs(
         { endpoint: 'ONBOARDING_COMPLETE_REGISTRATION', endpointParams: { token } },
         { method: 'DELETE' }
-      ); */
+      );
 
       // Check the outcome
-      //  const outcome = getFetchOutcome(contractPostResponse);
-      const outcome = 'success';
+      const outcome = getFetchOutcome(contractPostResponse);
+
       // Show it to the end user
+      setLoading(false);
       setOutcome(outcome);
     }
 
-    void asyncSendDeleteRequest();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    if (!token) {
+      setLoading(false);
+      setOutcome('error');
+    } else {
+      void asyncSendDeleteRequest();
+    }
+  }, []); // in order to be invoked once
 
   const outcomeContent: RequestOutcomeOptions = {
     success: {
@@ -58,7 +54,7 @@ export function RejectRegistration() {
           <Button
             variant="contained"
             sx={{ width: '200px', alignSelf: 'center' }}
-            onClick={() => window.location.assign(process.env.REACT_APP_URL_FE_LOGIN)}
+            onClick={() => window.location.assign(process.env.REACT_APP_URL_FE_LOGIN)} // TODO redirect to landing
           >
             Torna al portale
           </Button>
@@ -70,23 +66,24 @@ export function RejectRegistration() {
       title: "C'è stato un problema...",
       description: [
         <p key="0">
-          Il salvataggio dei dati inseriti non è andato a buon fine.
-          <br />
-          <Button onClick={reload} variant={'text'}>
-            Prova nuovamente a registrarti
-          </Button>
-          , e se il problema dovesse persistere, <InlineSupportLink />!
+          {!token
+            ? 'Il link usato non è valido!'
+            : 'Il salvataggio dei dati inseriti non è andato a buon fine.'}
         </p>,
       ],
     },
   };
+
+  if (loading) {
+    return <LoadingOverlay loadingText="Stiamo verificando i tuoi dati" />;
+  }
 
   return (
     <React.Fragment>
       {!outcome ? (
         <LoadingOverlay loadingText="Stiamo cancellando la tua iscrizione" />
       ) : (
-        <MessageNoAction {...outcomeContent[outcome!]} />
+        <MessageNoAction {...outcomeContent[outcome]} />
       )}
     </React.Fragment>
   );

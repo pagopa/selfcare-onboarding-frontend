@@ -40,7 +40,7 @@ export const ROUTES: RoutesObject = {
     LABEL: 'Completa la procedura di onboarding',
 */,
   REGISTRATION_FINALIZE_REJECT: {
-    PATH: `${BASE_ROUTE}/cancella`,
+    PATH: `${BASE_ROUTE}/cancel`,
     LABEL: 'Cancella la procedura di onboarding',
     COMPONENT: RejectRegistration,
   },
