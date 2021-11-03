@@ -8,13 +8,14 @@ import { fetchWithLogs } from '../lib/api-utils';
 import { getFetchOutcome } from '../lib/error-utils';
 import { LoadingOverlay } from '../components/LoadingOverlay';
 
+export const getOnboardingMagicLinkJwt = () =>
+  new URLSearchParams(window.location.search).get('jwt');
+
 export function RejectRegistration() {
   const [outcome, setOutcome] = useState<RequestOutcome>();
   const [loading, setLoading] = useState(true);
 
-  const getJwt = () => new URLSearchParams(window.location.search).get('jwt');
-
-  const token = getJwt();
+  const token = getOnboardingMagicLinkJwt();
 
   useEffect(() => {
     async function asyncSendDeleteRequest() {
@@ -62,7 +63,7 @@ export function RejectRegistration() {
       ],
     },
     error: {
-      img: { src: redXIllustration, alt: "Icona dell'email" },
+      img: { src: redXIllustration, alt: 'Error' },
       title: "C'è stato un problema...",
       description: [
         <p key="0">

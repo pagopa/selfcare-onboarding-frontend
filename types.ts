@@ -90,3 +90,14 @@ export type Party = {
   partyId?: string;
   attributes: Array<string>;
 };
+
+export type DocUpload = {
+  files: Array<File>;
+};
+
+export type AlertDialogActions = {
+  setDialogTitle: (t: string) => void;
+  setDialogDescription: (t: string) => void;
+  setShowDialog: (t: boolean) => void;
+  handleCloseDialog?: (t: any) => void;
+};

@@ -1,10 +1,10 @@
-import { Container } from '@mui/material';
+import { Box } from '@mui/material';
 import { Redirect, Route, Switch } from 'react-router-dom';
 import { BASE_ROUTE, ROUTES } from '../lib/constants';
 
 export function Main() {
   return (
-    <Container component="main" sx={{ mt: 8, mb: 2 }}>
+    <Box component="main" sx={{ mt: 8, mb: 2, minHeight: '66vh' }}>
       <Switch>
         {Object.values(ROUTES).map(({ PATH, EXACT, COMPONENT: Component }, i) => (
           <Route path={PATH} exact={EXACT} key={i}>
@@ -21,6 +21,6 @@ export function Main() {
           <Redirect to={ROUTES.ONBOARDING.PATH} />
         </Route>
       </Switch>
-    </Container>
+    </Box>
   );
 }

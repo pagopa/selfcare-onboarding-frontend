@@ -1,9 +1,8 @@
 import { RoutesObject } from '../../types';
 import { Onboarding } from '../views/Onboarding';
 import { RejectRegistration } from '../views/RejectRegistration';
-/* 
-import { CompleteRegistration } from '../views/CompleteRegistration'
-
+import CompleteRegistrationComponent from '../views/CompleteRegistrationComponent';
+/*
 import { TempSPIDUser } from '../components/TempSPIDUser'
 import { IPAGuide } from '../views/IPAGuide' */
 
@@ -35,11 +34,12 @@ export const ROUTES: RoutesObject = {
     PATH: `${BASE_ROUTE}/temp-spid`,
     LABEL: 'Genera utente SPID di test',
     COMPONENT: TempSPIDUser,
-  },
+  }, */,
   REGISTRATION_FINALIZE_COMPLETE: {
-    PATH: `${BASE_ROUTE}/conferma-registrazione`,
+    PATH: `${BASE_ROUTE}/confirm`,
     LABEL: 'Completa la procedura di onboarding',
-*/,
+    COMPONENT: CompleteRegistrationComponent,
+  },
   REGISTRATION_FINALIZE_REJECT: {
     PATH: `${BASE_ROUTE}/cancel`,
     LABEL: 'Cancella la procedura di onboarding',
