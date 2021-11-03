@@ -28,7 +28,7 @@ export type RouteConfig = {
 
 export type Image = { src: string; alt: string };
 export type RequestOutcome = 'success' | 'error';
-export type RequestOutcomeMessage = { title: string; description: JSX.Element[]; img: Image };
+export type RequestOutcomeMessage = { title: string; description: Array<JSX.Element>; img: Image };
 export type RequestOutcomeOptions = { [key in RequestOutcome]: RequestOutcomeMessage };
 
 /*
@@ -72,8 +72,12 @@ export type UserOnCreate = {
   platformRole: UserPlatformRole;
 };
 
-export type User = UserOnCreate & {
-  status: UserStatus;
+export type User = {
+  uid: string;
+  taxCode: string;
+  name: string;
+  surname: string;
+  email: string;
 };
 
 export type Party = {
@@ -84,5 +88,5 @@ export type Party = {
   role: UserRole;
   platformRole: UserPlatformRole;
   partyId?: string;
-  attributes: string[];
+  attributes: Array<string>;
 };

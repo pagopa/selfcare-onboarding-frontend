@@ -16,6 +16,10 @@ export function Main() {
         <Route path={BASE_ROUTE} exact={true}>
           <Redirect to={ROUTES.ONBOARDING.PATH} />
         </Route>
+
+        <Route path="*">
+          <Redirect to={ROUTES.ONBOARDING.PATH} />
+        </Route>
       </Switch>
     </Container>
   );
