@@ -16,6 +16,7 @@ export const BASE_ROUTE = process.env.PUBLIC_URL ? process.env.PUBLIC_URL : '';
 export const URL_FE_LOGIN: string = process.env.REACT_APP_URL_FE_LOGIN + '?onSuccess=onboarding';
 export const URL_FE_LOGOUT: string = process.env.REACT_APP_URL_FE_LOGOUT;
 export const URL_FE_DASHBOARD: string = process.env.REACT_APP_URL_FE_DASHBOARD;
+export const URL_FE_LANDING: string = process.env.REACT_APP_URL_FE_LANDING;
 
 export const URL_API_PARTY_PROCESS: string = process.env.REACT_APP_URL_API_PARTY_PROCESS;
 export const URL_API_PARTY_REGISTRY_PROXY: string =

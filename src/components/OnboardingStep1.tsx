@@ -2,11 +2,16 @@ import { Grid, Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { Box } from '@mui/system';
 import { IPACatalogParty, StepperStepComponentProps } from '../../types';
+import { URL_FE_LANDING } from '../lib/constants';
 import { OnboardingStepActions } from './OnboardingStepActions';
 import { AsyncAutocomplete } from './AsyncAutocomplete';
 import { useHistoryState } from './useHistoryState';
 
-export function OnboardingStep1({ forward }: StepperStepComponentProps) {
+export function OnboardingStep1({ forward}: StepperStepComponentProps) {
+  const goBackToLandingPage = () => {
+    window.location.assign(`${URL_FE_LANDING}`);
+  };
+  
   const [selected, setSelected, setSelectedHistory] = useHistoryState<IPACatalogParty | null>(
     'selected_step1',
     null
@@ -84,7 +89,7 @@ export function OnboardingStep1({ forward }: StepperStepComponentProps) {
 
         <Grid item mt={4}>
           <OnboardingStepActions
-            // back={{action: back, label: 'Indietro', disabled: true}}
+            back={{action: goBackToLandingPage, label: 'Indietro', disabled: false}}
             forward={{
               action: onForwardAction,
               label: 'Conferma',
