@@ -134,4 +134,4 @@ function OnboardingComponent() {
   );
 }
 
-export const Onboarding = withLogin(OnboardingComponent);
+export default withLogin(OnboardingComponent);

@@ -11,7 +11,7 @@ import { LoadingOverlay } from '../components/LoadingOverlay';
 export const getOnboardingMagicLinkJwt = () =>
   new URLSearchParams(window.location.search).get('jwt');
 
-export function RejectRegistration() {
+export default function RejectRegistration() {
   const [outcome, setOutcome] = useState<RequestOutcome>();
   const [loading, setLoading] = useState(true);
 

@@ -1,6 +1,6 @@
 import { RoutesObject } from '../../types';
-import { Onboarding } from '../views/Onboarding';
-import { RejectRegistration } from '../views/RejectRegistration';
+import Onboarding from '../views/Onboarding';
+import RejectRegistration from '../views/RejectRegistration';
 import CompleteRegistrationComponent from '../views/CompleteRegistrationComponent';
 /*
 import { TempSPIDUser } from '../components/TempSPIDUser'
@@ -11,7 +11,7 @@ const IS_DEVELOP = process.env.NODE_ENV === 'development';
 export const DISPLAY_LOGS = IS_DEVELOP;
 export const MOCK_USER = IS_DEVELOP;
 
-export const BASE_ROUTE = process.env.PUBLIC_URL ? process.env.PUBLIC_URL : '';
+export const BASE_ROUTE = process.env.PUBLIC_URL ? process.env.PUBLIC_URL : '/onboarding';
 
 export const URL_FE_LOGIN: string = process.env.REACT_APP_URL_FE_LOGIN + '?onSuccess=onboarding';
 export const URL_FE_LOGOUT: string = process.env.REACT_APP_URL_FE_LOGOUT;
