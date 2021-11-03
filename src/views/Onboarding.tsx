@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import { Button, Stack, Typography } from '@mui/material';
+import { Button, Container, Stack, Typography } from '@mui/material';
 import { withLogin } from '../components/withLogin';
 import { RequestOutcome, RequestOutcomeOptions, StepperStep } from '../../types';
 import { fetchWithLogs } from '../lib/api-utils';
@@ -125,10 +125,10 @@ function OnboardingComponent() {
   };
 
   return !outcome ? (
-    <React.Fragment>
+    <Container>
       <Step />
       {loading && <LoadingOverlay loadingText="Stiamo verificando i tuoi dati" />}
-    </React.Fragment>
+    </Container>
   ) : (
     <MessageNoAction {...outcomeContent[outcome]} />
   );

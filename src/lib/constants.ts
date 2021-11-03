@@ -63,9 +63,6 @@ export const API = {
   PARTY_GET_PARTY_ID: {
     URL: URL_API_PARTY_MANAGEMENT + '/organizations/{{institutionId}}',
   },
-  MOCK_UPLOAD: {
-    URL: 'https://petstore.swagger.io/v2/pet/1/uploadImage',
-  },
 };
 
 export const USER_ROLE_LABEL = {
