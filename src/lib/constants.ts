@@ -48,8 +48,8 @@ export const ROUTES: RoutesObject = {
 };
 
 export const API = {
-  ONBOARDING_GET_AVAILABLE_PARTIES: {
-    URL: URL_API_PARTY_PROCESS + '/onboarding/info/{{taxCode}}',
+  ONBOARDING_GET_INFO: {
+    URL: URL_API_PARTY_PROCESS + '/onboarding/info/',
   },
   ONBOARDING_GET_SEARCH_PARTIES: {
     URL: URL_API_PARTY_REGISTRY_PROXY + '/institutions',

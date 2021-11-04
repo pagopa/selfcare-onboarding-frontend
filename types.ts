@@ -101,3 +101,24 @@ export type AlertDialogActions = {
   setShowDialog: (t: boolean) => void;
   handleCloseDialog?: (t: any) => void;
 };
+
+export interface OnBoardingInfo {
+  person: PersonInfo;
+  institutions: Array<InstitutionInfo>;
+}
+
+export interface PersonInfo {
+  name: string;
+  surname: string;
+  taxCode: string;
+}
+
+export interface InstitutionInfo {
+  institutionId: string;
+  description: string;
+  digitalAddress: string;
+  status: string;
+  role: string;
+  platformRole: string;
+  attributes: Array<string>;
+}

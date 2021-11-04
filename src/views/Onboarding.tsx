@@ -15,12 +15,13 @@ import checkIllustration from '../assets/check-illustration.svg';
 import redXIllustration from '../assets/red-x-illustration.svg';
 import { InlineSupportLink } from '../components/InlineSupportLink';
 import { URL_FE_DASHBOARD } from '../lib/constants';
+import { OnboardingStep1_5 } from '../components/OnboardingStep1_5';
 
 function OnboardingComponent() {
   const [loading, setLoading] = useState(false);
   const [activeStep, setActiveStep] = useState(1);
   const [formData, setFormData] = useState<Partial<FormData>>();
-  const [_legalEmail, setLegalEmail] = useState('');
+  const [institutionId, setInstitutionId] = useState<string>('');
   const [outcome, setOutcome] = useState<RequestOutcome>();
   const history = useHistory();
 
@@ -41,8 +42,11 @@ function OnboardingComponent() {
     forward();
   };
 
-  const forwardWithDataAndEmail = (newFormData: Partial<FormData>, newLegalEmail: string) => {
-    setLegalEmail(newLegalEmail);
+  const forwardWithDataAndInstitutionId = (
+    newFormData: Partial<FormData>,
+    institutionId: string
+  ) => {
+    setInstitutionId(institutionId);
     forwardWithData(newFormData);
   };
 
@@ -69,11 +73,16 @@ function OnboardingComponent() {
     },
     {
       label: "Seleziona l'ente",
-      Component: () => OnboardingStep1({ forward: forwardWithDataAndEmail, back }),
+      Component: () => OnboardingStep1({ forward: forwardWithDataAndInstitutionId, back }),
+    },
+    {
+      label: 'Verifica ente',
+      Component: () => OnboardingStep1_5({ forward, institutionId }),
     },
     {
       label: 'Inserisci i dati del rappresentante legale',
-      Component: () => OnboardingStep2({ forward: forwardWithData, back }),
+      Component: () =>
+        OnboardingStep2({ forward: forwardWithData, back: () => setActiveStep(activeStep - 2) }),
     },
     {
       label: 'Inserisci i dati degli amministratori',
