@@ -1,4 +1,4 @@
-import { ChangeEvent, useContext } from 'react';
+import React, { ChangeEvent, useContext } from 'react';
 import { Checkbox, FormControlLabel, IconButton, Link, Grid, Typography } from '@mui/material';
 import cryptoRandomString from 'crypto-random-string';
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
@@ -13,7 +13,7 @@ import { PlatformUserForm, validateUser } from './PlatformUserForm';
 import { useHistoryState } from './useHistoryState';
 
 // Could be an ES6 Set but it's too bothersome for now
-export type UsersObject = { [key: string]: UserOnCreate };
+export type UsersObject = { [key: string]: UserOnCreate  };
 
 export function OnboardingStep3({ forward, back }: StepperStepComponentProps) {
   const { user } = useContext(UserContext);
@@ -24,12 +24,17 @@ export function OnboardingStep3({ forward, back }: StepperStepComponentProps) {
   >('delegateFormIds', []);
 
   const addDelegateForm = () => {
-    setDelegateFormIds([...delegateFormIds, cryptoRandomString({ length: 8 })]);
+    const newId=`delegate-${cryptoRandomString({ length: 8 })}`;
+    setDelegateFormIds([...delegateFormIds,newId ]);
+    setPeople({
+      ...people,
+      [newId]: {} as UserOnCreate,
+    });
   };
   const buildRemoveDelegateForm = (idToRemove: string) => (_: React.SyntheticEvent) => {
     const filteredDelegateFormIds = delegateFormIds.filter((id) => id !== idToRemove);
     setDelegateFormIds(filteredDelegateFormIds);
-    setPeople(omit(people, `delegate-${idToRemove}`));
+    setPeople(omit(people, idToRemove));
   };
 
   const onForwardAction = () => {
@@ -109,23 +114,23 @@ export function OnboardingStep3({ forward, back }: StepperStepComponentProps) {
             setPeople={setPeople}
             readOnly={isAuthUser ? ['name', 'surname', 'taxCode'] : []}
           />
-       
-
+         </Grid>
+        
             {delegateFormIds.map((id) => (
-              <div style={{ position: 'relative' }} key={id}>
+              <React.Fragment key={id}>
                 {/* <StyledIntro priority={3}>
                   {{
                     title: 'Aggiungi un nuovo Referente Amministrativo',
                   }}
                 </StyledIntro> */}
-                <Grid item xs={12}>
-                  <Typography align="center" variant="h3">
+                 <Grid item xs={10} justifyContent="center" my={3}>
+                  <Typography align="center" variant="h4">
                     Aggiungi un nuovo Referente Amministrativo
                   </Typography>
                 </Grid>
-
+                <Grid item xs={6} sx={{ boxShadow:"0px 12px 40px rgba(0, 0, 0, 0.06)", position:'relative'}}>
                 <PlatformUserForm
-                  prefix={`delegate-${id}`}
+                  prefix={id}
                   role="Delegate"
                   platformRole="admin"
                   people={people}
@@ -138,11 +143,12 @@ export function OnboardingStep3({ forward, back }: StepperStepComponentProps) {
                 >
                   <ClearOutlinedIcon />
                 </IconButton>
-              </div>
+                </Grid>
+              </React.Fragment>
             ))}
-        </Grid>
-      </Grid>
       
+      </Grid>
+
       {/* <Box sx={{ textAlign: 'center' }} > */}
       <Grid container item justifyContent="center" m={4}>
         <Grid item xs={3}>
@@ -152,7 +158,8 @@ export function OnboardingStep3({ forward, back }: StepperStepComponentProps) {
                 objectIsEmpty(people) ||
                 Object.keys(people)
                   .filter((prefix) => 'admin' !== prefix)
-                  .some((prefix) => !validateUser(people[prefix])) ||  Object.keys(people).length === 3
+                  .some((prefix) => !validateUser(people[prefix])) ||  
+                Object.keys(people).length === 3
               }
               underline="none"
               color={

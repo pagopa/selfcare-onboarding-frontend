@@ -85,6 +85,7 @@ export function AsyncAutocomplete({
               lineHeight: '24px',
               color: '#C1C9D2',
               textAlign: 'start',
+              paddingLeft:'16px'
             },
             ...params.inputProps,
           }}
