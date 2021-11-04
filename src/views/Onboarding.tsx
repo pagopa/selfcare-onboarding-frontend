@@ -14,7 +14,7 @@ import { MessageNoAction } from '../components/MessageNoAction';
 import checkIllustration from '../assets/check-illustration.svg';
 import redXIllustration from '../assets/red-x-illustration.svg';
 import { InlineSupportLink } from '../components/InlineSupportLink';
-import { URL_FE_DASHBOARD } from '../lib/constants';
+import { URL_FE_LANDING } from '../lib/constants';
 
 function OnboardingComponent() {
   const [loading, setLoading] = useState(false);
@@ -97,7 +97,7 @@ function OnboardingComponent() {
           <Button
             variant="contained"
             sx={{ width: '200px', alignSelf: 'center' }}
-            onClick={() => window.location.assign(URL_FE_DASHBOARD)}
+            onClick={() => window.location.assign(URL_FE_LANDING)}
           >
             Torna al portale
           </Button>
