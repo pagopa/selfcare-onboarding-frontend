@@ -1,4 +1,5 @@
-import { Grid, Typography } from '@mui/material';
+import React from 'react';
+import { Grid, Typography, Button } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { Box } from '@mui/system';
 import { IPACatalogParty, StepperStepComponentProps } from '../../types';
@@ -6,6 +7,7 @@ import { IPACatalogParty, StepperStepComponentProps } from '../../types';
 import { OnboardingStepActions } from './OnboardingStepActions';
 import { AsyncAutocomplete } from './AsyncAutocomplete';
 import { useHistoryState } from './useHistoryState';
+import SessionModal from './SessionModal';
 
 export function OnboardingStep1({ forward }: StepperStepComponentProps) {
   // const goBackToLandingPage = () => {
@@ -28,6 +30,9 @@ export function OnboardingStep1({ forward }: StepperStepComponentProps) {
   const bodyDescription =
     'Seleziona dall’indice IPA l’Ente per cui vuoi richiedere l’adesione ai prodotti PagoPA';
 
+  const [open, setOpen] = React.useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
   return (
     <Grid
       container
@@ -98,6 +103,13 @@ export function OnboardingStep1({ forward }: StepperStepComponentProps) {
           }}
         />
       </Grid>
+
+      <Button onClick={handleOpen}>Open modal</Button>
+
+
+<SessionModal handleClose={handleClose} open={open} />
+
+     
     </Grid>
   );
 }
