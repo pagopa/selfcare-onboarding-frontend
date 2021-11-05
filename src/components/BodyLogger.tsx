@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Box } from '@mui/system';
 import { logAction } from '../lib/action-log';
-import Header from './Header';
+import Header from './header/Header';
 import Footer from './Footer';
 import { Main } from './Main';
 
@@ -24,7 +24,7 @@ export function BodyLogger() {
         minHeight: '100vh',
       }}
     >
-      <Header />
+      <Header withSecondHeader={true} />
       <Main />
       <Footer />
     </Box>
