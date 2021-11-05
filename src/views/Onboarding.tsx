@@ -12,7 +12,7 @@ import { OnboardingStep3 } from '../components/OnboardingStep3';
 import { LoadingOverlay } from '../components/LoadingOverlay';
 import { MessageNoAction } from '../components/MessageNoAction';
 import checkIllustration from '../assets/check-illustration.svg';
-import redXIllustration from '../assets/red-x-illustration.svg';
+import errorIllustration from '../assets/error-illustration.svg';
 import { InlineSupportLink } from '../components/InlineSupportLink';
 import { URL_FE_DASHBOARD } from '../lib/constants';
 import { OnboardingStep1_5 } from '../components/OnboardingStep1_5';
@@ -118,7 +118,7 @@ function OnboardingComponent() {
       ],
     },
     error: {
-      img: { src: redXIllustration, alt: "Icona dell'email" },
+      img: { src: errorIllustration, alt: "Icona dell'email" },
       title: "C'è stato un problema...",
       description: [
         <p key="0">
