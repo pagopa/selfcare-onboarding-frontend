@@ -42,7 +42,7 @@ export default function SessionModal({ open, handleClose, message, onCloseRedire
           </Grid>
 
           <Grid container item>
-            <Grid item xs={10} my={3}>
+            <Grid item xs={12} my={3}>
               <Typography variant="body2">
                 {message}
               </Typography>
