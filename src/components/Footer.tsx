@@ -1,5 +1,5 @@
 import { Box, Grid, Link, SvgIcon, Typography } from '@mui/material';
-import { ReactComponent as logo } from '../assets/logo.svg';
+import { ReactComponent as logo } from '../assets/logo_pago_pa.svg';
 
 const Footer = () => (
   <Box
@@ -14,7 +14,7 @@ const Footer = () => (
   >
     <Grid container justifyContent={'center'} alignItems={'center'}>
       <Box sx={{ width: '90%', display: 'flex' }}>
-        <SvgIcon component={logo} viewBox="0 0 80 24" sx={{ width: '80px' }} />
+        <SvgIcon component={logo} viewBox="0 0 120 33" sx={{ width: '119px' }} />
         <Box sx={{ textAlign: 'end', flexGrow: 1 }}>
           <Typography
             component="div"
