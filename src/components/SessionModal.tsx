@@ -1,10 +1,6 @@
 import * as React from 'react';
 import { Typography, Box, Button, Grid, IconButton } from '@mui/material';
 import Dialog from '@mui/material/Dialog';
-// import DialogActions from '@mui/material/DialogActions';
-// import DialogContent from '@mui/material/DialogContent';
-// import DialogContentText from '@mui/material/DialogContentText';
-// import DialogTitle from '@mui/material/DialogTitle';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
@@ -12,9 +8,11 @@ import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 type Props = {
   open: boolean;
   handleClose: React.MouseEventHandler<HTMLButtonElement> | undefined;
+  message: string;
+  title: string;
+  onCloseRedirect?:React.MouseEventHandler<HTMLButtonElement> | undefined;
 };
-export default function SessionModal({ open, handleClose }: Props) {
-  const title = 'Vuoi uscire dalla sessione?';
+export default function SessionModal({ open, handleClose, message, onCloseRedirect,title}: Props) {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('xs'));
 
@@ -26,8 +24,8 @@ export default function SessionModal({ open, handleClose }: Props) {
       onClose={handleClose}
       aria-labelledby="responsive-dialog-title"
     >
-      <Grid container direction="column" sx={{ height: '276px', width: '406px' }}>
-        <Box mx={3}>
+      <Grid container direction="column" sx={{ height: '16em', width:'21.9em'}}>
+        <Box mx={3} sx={{ height: '100%'}}>
           <Grid container item mt={4}>
             <Grid item xs={10}>
               <IconButton
@@ -46,8 +44,7 @@ export default function SessionModal({ open, handleClose }: Props) {
           <Grid container item>
             <Grid item xs={10} my={3}>
               <Typography variant="body2">
-                Se confermi dovrai ripetere l&rsquo;autenticazione per entrare e ripetere i passaggi
-                effettuati.
+                {message}
               </Typography>
             </Grid>
           </Grid>
@@ -57,13 +54,13 @@ export default function SessionModal({ open, handleClose }: Props) {
               sx={{ width: '100%' }}
               color="primary"
               variant="contained"
-              onClick={handleClose}
+              onClick={onCloseRedirect}
             >
               Conferma
             </Button>
           </Grid>
 
-          <Grid item xs={12} mb={2}>
+          <Grid item xs={12} mb={3}>
             <Button onClick={handleClose} sx={{ width: '100%' }} color="primary" variant="outlined">
               Annulla
             </Button>

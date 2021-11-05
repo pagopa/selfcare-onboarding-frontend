@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Button, Stack, Typography } from '@mui/material';
 import { withLogin } from '../components/withLogin';
@@ -16,6 +16,15 @@ import redXIllustration from '../assets/red-x-illustration.svg';
 import { InlineSupportLink } from '../components/InlineSupportLink';
 import { URL_FE_LANDING } from '../lib/constants';
 
+const keepOnPage= (e: BeforeUnloadEvent) => {
+  const message = 'Warning!\n\nNavigating away from this page will delete your text if you haven\'t already saved it.';
+  console.log("E",window);
+  e.preventDefault();
+    // eslint-disable-next-line functional/immutable-data
+    e.returnValue = message;
+    return message;
+  };
+
 function OnboardingComponent() {
   const [loading, setLoading] = useState(false);
   const [activeStep, setActiveStep] = useState(1);
@@ -23,6 +32,15 @@ function OnboardingComponent() {
   const [_legalEmail, setLegalEmail] = useState('');
   const [outcome, setOutcome] = useState<RequestOutcome>();
   const history = useHistory();
+ 
+  useEffect(() => {
+   
+    window.addEventListener('beforeunload', keepOnPage);
+    return () => {
+    window.removeEventListener('beforeunload', keepOnPage);
+    };
+  },[]);
+
 
   const reload = () => {
     history.go(0);

@@ -10,29 +10,28 @@ import { useHistoryState } from './useHistoryState';
 import SessionModal from './SessionModal';
 
 export function OnboardingStep1({ forward }: StepperStepComponentProps) {
-  // const goBackToLandingPage = () => {
-  //   window.location.assign(`${URL_FE_LANDING}`);
-  // };
-
+  
   const [selected, setSelected, setSelectedHistory] = useHistoryState<IPACatalogParty | null>(
     'selected_step1',
     null
   );
-
   const onForwardAction = () => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     setSelectedHistory(selected);
     const { digitalAddress, id } = selected!;
     forward({ institutionId: id }, digitalAddress);
   };
-
   const bodyTitle = 'Seleziona il tuo Ente';
   const bodyDescription =
     'Seleziona dall’indice IPA l’Ente per cui vuoi richiedere l’adesione ai prodotti PagoPA';
-
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+  const title = 'Vuoi uscire dalla sessione?';
+  const message ='Se confermi dovrai ripetere lautenticazione per entrare e ripetere i passaggi effettuati.';
+  // const goBackToLandingPage = () => {
+  //   window.location.assign(`${URL_FE_LANDING}`);
+  // };
   return (
     <Grid
       container
@@ -106,10 +105,12 @@ export function OnboardingStep1({ forward }: StepperStepComponentProps) {
 
       <Button onClick={handleOpen}>Open modal</Button>
 
-
-<SessionModal handleClose={handleClose} open={open} />
-
-     
+      <SessionModal 
+      handleClose={handleClose} 
+      // onCloseRedirect={} 
+      open={open} 
+      message={message} 
+      title={title}/>
     </Grid>
   );
 }
