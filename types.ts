@@ -1,6 +1,6 @@
-import { AxiosRequestConfig } from 'axios';
-import { API } from './src/lib/constants';
-import {FunctionComponent, ReactComponentElement, SVGProps} from "react";
+import {AxiosRequestConfig} from 'axios';
+import {API} from './src/lib/constants';
+import {FunctionComponent, SVGProps} from "react";
 
 /*
  * Fetch data and router related types
