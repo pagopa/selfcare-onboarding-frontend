@@ -1,5 +1,5 @@
 import {Box, Grid, Link, SvgIcon, Typography} from '@mui/material';
-import {ReactComponent as logo} from "../assets/logo_pago_pa_mini.svg";
+import {ReactComponent as logo} from "../assets/logo.svg";
 
 const Footer = () => (
     <Box

@@ -1,8 +1,8 @@
 import { RoutesObject } from '../../types';
-import { Onboarding } from '../views/Onboarding';
-/* 
-import { CompleteRegistration } from '../views/CompleteRegistration'
-import { RejectRegistration } from '../views/RejectRegistration'
+import Onboarding from '../views/Onboarding';
+import RejectRegistration from '../views/RejectRegistration';
+import CompleteRegistrationComponent from '../views/CompleteRegistrationComponent';
+/*
 import { TempSPIDUser } from '../components/TempSPIDUser'
 import { IPAGuide } from '../views/IPAGuide' */
 
@@ -11,7 +11,7 @@ const IS_DEVELOP = process.env.NODE_ENV === 'development';
 export const DISPLAY_LOGS = IS_DEVELOP;
 export const MOCK_USER = IS_DEVELOP;
 
-export const BASE_ROUTE = process.env.PUBLIC_URL ? process.env.PUBLIC_URL : '';
+export const BASE_ROUTE = process.env.PUBLIC_URL ? process.env.PUBLIC_URL : '/onboarding';
 
 export const URL_FE_LOGIN: string = process.env.REACT_APP_URL_FE_LOGIN + '?onSuccess=onboarding';
 export const URL_FE_LOGOUT: string = process.env.REACT_APP_URL_FE_LOGOUT;
@@ -35,22 +35,22 @@ export const ROUTES: RoutesObject = {
     PATH: `${BASE_ROUTE}/temp-spid`,
     LABEL: 'Genera utente SPID di test',
     COMPONENT: TempSPIDUser,
-  },
+  }, */,
   REGISTRATION_FINALIZE_COMPLETE: {
-    PATH: `${BASE_ROUTE}/conferma-registrazione`,
+    PATH: `${BASE_ROUTE}/confirm`,
     LABEL: 'Completa la procedura di onboarding',
-    COMPONENT: CompleteRegistration,
+    COMPONENT: CompleteRegistrationComponent,
   },
   REGISTRATION_FINALIZE_REJECT: {
-    PATH: `${BASE_ROUTE}/cancella-registrazione`,
+    PATH: `${BASE_ROUTE}/cancel`,
     LABEL: 'Cancella la procedura di onboarding',
     COMPONENT: RejectRegistration,
-  }, */,
+  },
 };
 
 export const API = {
-  ONBOARDING_GET_AVAILABLE_PARTIES: {
-    URL: URL_API_PARTY_PROCESS + '/onboarding/info/{{taxCode}}',
+  ONBOARDING_GET_INFO: {
+    URL: URL_API_PARTY_PROCESS + '/onboarding/info/',
   },
   ONBOARDING_GET_SEARCH_PARTIES: {
     URL: URL_API_PARTY_REGISTRY_PROXY + '/institutions',

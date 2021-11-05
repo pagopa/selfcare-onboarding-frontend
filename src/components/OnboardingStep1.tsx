@@ -16,10 +16,10 @@ export function OnboardingStep1({ forward }: StepperStepComponentProps) {
     null
   );
   const onForwardAction = () => {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     setSelectedHistory(selected);
-    const { digitalAddress, id } = selected!;
-    forward({ institutionId: id }, digitalAddress);
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const { id } = selected!;
+    forward({ institutionId: id }, id);
   };
   const bodyTitle = 'Seleziona il tuo Ente';
   const bodyDescription =
