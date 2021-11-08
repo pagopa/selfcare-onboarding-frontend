@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { Button, Stack, Typography } from '@mui/material';
 import { MessageNoAction } from '../components/MessageNoAction';
 import checkIllustration from '../assets/check-illustration.svg';
@@ -7,6 +7,7 @@ import { RequestOutcome, RequestOutcomeOptions } from '../../types';
 import { fetchWithLogs } from '../lib/api-utils';
 import { getFetchOutcome } from '../lib/error-utils';
 import { LoadingOverlay } from '../components/LoadingOverlay';
+import { HeaderContext } from '../lib/context';
 
 export const getOnboardingMagicLinkJwt = () =>
   new URLSearchParams(window.location.search).get('jwt');
@@ -16,6 +17,7 @@ export default function RejectRegistration() {
   const [loading, setLoading] = useState(true);
 
   const token = getOnboardingMagicLinkJwt();
+  const { setSubHeaderVisible, setOnLogout } = useContext(HeaderContext);
 
   useEffect(() => {
     async function asyncSendDeleteRequest() {
@@ -41,6 +43,14 @@ export default function RejectRegistration() {
     }
   }, []); // in order to be invoked once
 
+  useEffect(() => {
+    setSubHeaderVisible(true);
+    setOnLogout(null);
+    return () =>{ 
+      setSubHeaderVisible(true);
+      setOnLogout(undefined);
+    };
+  },[]);
   const outcomeContent: RequestOutcomeOptions = {
     success: {
       img: { src: checkIllustration, alt: "Icona dell'email" },

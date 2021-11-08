@@ -1,13 +1,15 @@
 import { Button, Stack } from '@mui/material';
 import { Box } from '@mui/system';
 import { AxiosResponse } from 'axios';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import { InstitutionInfo, OnBoardingInfo, StepperStepComponentProps } from '../../types';
 import { fetchWithLogs } from '../lib/api-utils';
 import { URL_FE_DASHBOARD } from '../lib/constants';
 import { getFetchOutcome } from '../lib/error-utils';
+import { HeaderContext } from '../lib/context';
 import { LoadingOverlay } from './LoadingOverlay';
 import { StyledIntro, StyledIntroChildrenProps } from './StyledIntro';
+import { unregisterUnloadEvent } from './../views/Onboarding';
 
 type Props = StepperStepComponentProps & {
   institutionId: string;
@@ -30,6 +32,7 @@ const genericError: StyledIntroChildrenProps = {
 export function OnboardingStep1_5({ forward, institutionId }: Props) {
   const [loading, setLoading] = useState(true);
   const [outcome, setOutcome] = useState<StyledIntroChildrenProps | null>();
+  const {setOnLogout}= useContext(HeaderContext);
 
   const submit = async () => {
     setLoading(true);
@@ -68,6 +71,9 @@ export function OnboardingStep1_5({ forward, institutionId }: Props) {
     forward();
   };
 
+  if(outcome){
+    unregisterUnloadEvent(setOnLogout);
+  }
   return loading ? (
     <LoadingOverlay loadingText="Stiamo verificando i tuoi dati" />
   ) : outcome ? (

@@ -1,19 +1,19 @@
-import { ChangeEvent, useContext } from 'react';
-import { Button, Checkbox, FormControlLabel, IconButton, Stack } from '@mui/material';
+import React, { ChangeEvent, useContext } from 'react';
+import { Checkbox, FormControlLabel, IconButton, Link, Grid, Typography } from '@mui/material';
 import cryptoRandomString from 'crypto-random-string';
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 import { omit } from 'lodash';
-import { Box } from '@mui/system';
+// import { Box } from '@mui/system';
 import { objectIsEmpty } from '../lib/object-utils';
 import { StepperStepComponentProps, UserOnCreate } from '../../types';
 import { UserContext } from '../lib/context';
-import { StyledIntro } from './StyledIntro';
+// import { StyledIntro } from './StyledIntro';
 import { OnboardingStepActions } from './OnboardingStepActions';
 import { PlatformUserForm, validateUser } from './PlatformUserForm';
 import { useHistoryState } from './useHistoryState';
 
 // Could be an ES6 Set but it's too bothersome for now
-export type UsersObject = { [key: string]: UserOnCreate };
+export type UsersObject = { [key: string]: UserOnCreate  };
 
 export function OnboardingStep3({ forward, back }: StepperStepComponentProps) {
   const { user } = useContext(UserContext);
@@ -24,12 +24,17 @@ export function OnboardingStep3({ forward, back }: StepperStepComponentProps) {
   >('delegateFormIds', []);
 
   const addDelegateForm = () => {
-    setDelegateFormIds([...delegateFormIds, cryptoRandomString({ length: 8 })]);
+    const newId=`delegate-${cryptoRandomString({ length: 8 })}`;
+    setDelegateFormIds([...delegateFormIds,newId ]);
+    setPeople({
+      ...people,
+      [newId]: {} as UserOnCreate,
+    });
   };
   const buildRemoveDelegateForm = (idToRemove: string) => (_: React.SyntheticEvent) => {
     const filteredDelegateFormIds = delegateFormIds.filter((id) => id !== idToRemove);
     setDelegateFormIds(filteredDelegateFormIds);
-    setPeople(omit(people, `delegate-${idToRemove}`));
+    setPeople(omit(people, idToRemove));
   };
 
   const onForwardAction = () => {
@@ -54,81 +59,121 @@ export function OnboardingStep3({ forward, back }: StepperStepComponentProps) {
         ...people,
         ['delegate-initial']: Object.assign({}, user, { email: undefined }),
       });
-    }
+    }else {
+      setPeople({
+        ...people,
+        ['delegate-initial']: Object.assign({}, null, { email: undefined }),
+      });    }
     setIsAuthUser(value);
   };
-
+  const bodyTitle = 'Indica il Referente Amministrativo';
+  const bodyDescription1 = 'Inserisci i dati del Legale Rappresentante o di un suo delegato.';
+  const bodyDescription2 =
+    'La persona indicata sarà responsabile della gestione dei prodotti PagoPA.';
   return (
-    <Stack spacing={10}>
-      <StyledIntro>
-        {{
-          title: 'Indica il Referente Amministrativo',
-          description: (
-            <>
-              Inserisci i dati del Legale Rappresentante o di un suo delegato.
-              <br />
-              La persona indicata sarà responsabile della gestione dei prodotti PagoPA.
-            </>
-          ),
-        }}
-      </StyledIntro>
+    <Grid   container 
+    // mt={16} 
+    direction="column">
 
-      <Box sx={{ textAlign: 'center' }}>
-        <FormControlLabel
-          control={<Checkbox checked={isAuthUser} onChange={handleAuthUser} />}
-          label="Sono io il Referente Amministrativo"
-          sx={{ alignSelf: 'center' }}
-        />
+      <Grid container item justifyContent="center">
+        <Grid item xs={6}>
+          <Typography variant="h3" component="h2" sx={{ color: '#17324D' }} align="center">
+            {bodyTitle}
+          </Typography>
+        </Grid>
+      </Grid>
 
-        <PlatformUserForm
-          prefix={'delegate-initial'}
-          role="Delegate"
-          platformRole="admin"
-          people={people}
-          setPeople={setPeople}
-          readOnly={isAuthUser ? ['name', 'surname', 'taxCode'] : []}
-        />
-      </Box>
+      <Grid container item justifyContent="center" mt={2}>
+        <Grid item xs={6}>
+          <Typography variant="subtitle2" component="h2" align="center">
+            {bodyDescription1}
+          </Typography>
+          <Typography variant="subtitle2" component="h2" align="center">
+            {bodyDescription2}
+          </Typography>
+        </Grid>
+      </Grid>
 
-      {delegateFormIds.map((id) => (
-        <div style={{ position: 'relative' }} key={id}>
-          <StyledIntro priority={3}>
-            {{
-              title: 'Aggiungi un nuovo Referente Amministrativo',
-            }}
-          </StyledIntro>
+      <Grid container item justifyContent="center" mt={2}>
+        <Grid item xs={4}>
+          <FormControlLabel
+            control={<Checkbox checked={isAuthUser} onChange={handleAuthUser} />}
+            label="Sono io il Referente Amministrativo"
+            sx={{ alignSelf: 'center' }}
+          />
+        </Grid>
+      </Grid>
+
+      <Grid container item justifyContent="center" mt={2}>
+        <Grid item xs={6} sx={{ boxShadow:"0px 12px 40px rgba(0, 0, 0, 0.06)"}}>
           <PlatformUserForm
-            prefix={`delegate-${id}`}
+            prefix={'delegate-initial'}
             role="Delegate"
             platformRole="admin"
             people={people}
             setPeople={setPeople}
+            readOnly={isAuthUser ? ['name', 'surname', 'taxCode'] : []}
           />
-          <IconButton
-            color="primary"
-            onClick={buildRemoveDelegateForm(id)}
-            style={{ position: 'absolute', top: '2px', right: '2px', zIndex: 100 }}
-          >
-            <ClearOutlinedIcon />
-          </IconButton>
-        </div>
-      ))}
+         </Grid>
+        
+            {delegateFormIds.map((id) => (
+              <React.Fragment key={id}>
+                {/* <StyledIntro priority={3}>
+                  {{
+                    title: 'Aggiungi un nuovo Referente Amministrativo',
+                  }}
+                </StyledIntro> */}
+                 <Grid item xs={10} justifyContent="center" my={3}>
+                  <Typography align="center" variant="h4">
+                    Aggiungi un nuovo Referente Amministrativo
+                  </Typography>
+                </Grid>
+                <Grid item xs={6} sx={{ boxShadow:"0px 12px 40px rgba(0, 0, 0, 0.06)", position:'relative'}}>
+                <PlatformUserForm
+                  prefix={id}
+                  role="Delegate"
+                  platformRole="admin"
+                  people={people}
+                  setPeople={setPeople}
+                />
+                <IconButton
+                  color="primary"
+                  onClick={buildRemoveDelegateForm(id)}
+                  style={{ position: 'absolute', top: '2px', right: '2px', zIndex: 100 }}
+                >
+                  <ClearOutlinedIcon />
+                </IconButton>
+                </Grid>
+              </React.Fragment>
+            ))}
+      
+      </Grid>
 
-      <Box sx={{ textAlign: 'center' }}>
-        <Button
-          color="primary"
-          variant="text"
-          disabled={
-            objectIsEmpty(people) ||
-            Object.keys(people)
-              .filter((prefix) => 'admin' !== prefix)
-              .some((prefix) => !validateUser(people[prefix]))
-          }
-          onClick={addDelegateForm}
-        >
-          aggiungi nuovo Referente
-        </Button>
-
+      {/* <Box sx={{ textAlign: 'center' }} > */}
+      <Grid container item justifyContent="center" m={4}>
+        <Grid item xs={3}>
+              <Link
+              component="button"
+              disabled={
+                objectIsEmpty(people) ||
+                Object.keys(people)
+                  .filter((prefix) => 'admin' !== prefix)
+                  .some((prefix) => !validateUser(people[prefix])) ||  
+                Object.keys(people).length === 3
+              }
+              underline="none"
+              color={
+                (objectIsEmpty(people) ||
+                Object.keys(people)
+                  .filter((prefix) => 'admin' !== prefix)
+                  .some((prefix) => !validateUser(people[prefix]))) ||  Object.keys(people).length === 3 ? 'text.disabled': 'primary' 
+              }
+              onClick={addDelegateForm}
+              >
+              Aggiungi un nuovo Referente
+              </Link>
+          </Grid>
+        </Grid>
         <OnboardingStepActions
           back={{ action: onBackAction, label: 'Indietro', disabled: false }}
           forward={{
@@ -141,7 +186,7 @@ export function OnboardingStep3({ forward, back }: StepperStepComponentProps) {
                 .some((prefix) => !validateUser(people[prefix])),
           }}
         />
-      </Box>
-    </Stack>
+      {/* </Box> */}
+    </Grid>
   );
 }

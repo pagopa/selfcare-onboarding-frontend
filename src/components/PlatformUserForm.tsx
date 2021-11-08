@@ -72,10 +72,10 @@ export function PlatformUserForm({
   const errors: Array<string> = people[prefix] ? validateNoMandatory(people[prefix]) : [];
 
   return (
-    <Paper elevation={0} sx={{ p: 10 }} variant="outlined">
+    <Paper elevation={0} sx={{ py:4, px:6 }} >
       <Grid container spacing={2}>
         {fields.map(({ id, label, type = 'text', width = 6 }) => (
-          <Grid item key={id} xs={width}>
+          <Grid item key={id} xs={width} mb={5}>
             <TextField
               id={`${prefix}-${id}`}
               variant="standard"
@@ -89,11 +89,13 @@ export function PlatformUserForm({
             />
           </Grid>
         ))}
-        <Grid item xs={12} sx={{ display: 'flex' }}>
-          <InfoOutlinedIcon />
-          <Typography>
+        <Grid item xs={12} sx={{ display: 'flex', marginTop: '-16px !important'}} >
+          <InfoOutlinedIcon sx={{ marginRight:'8px', padding:'3px', color:'#475A6D'}} />
+          <Grid item xs={10} my={'auto'}>
+          <Typography sx={{ fontSize:'14px'}}>
             Inserisci l&apos;indirizzo email istituzionale utilizzato per l&apos;Ente
           </Typography>
+          </Grid>
         </Grid>
       </Grid>
     </Paper>
