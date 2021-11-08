@@ -1,6 +1,6 @@
-import {AxiosRequestConfig} from 'axios';
-import {API} from './src/lib/constants';
-import {FunctionComponent, SVGProps} from "react";
+import { AxiosRequestConfig } from 'axios';
+import { FunctionComponent, SVGProps } from 'react';
+import { API } from './src/lib/constants';
 
 /*
  * Fetch data and router related types
@@ -29,7 +29,12 @@ export type RouteConfig = {
 
 export type Image = { src: string; alt: string };
 export type RequestOutcome = 'success' | 'error';
-export type RequestOutcomeMessage = { title: string; description: Array<JSX.Element>; img?: Image; ImgComponent?: FunctionComponent<SVGProps<SVGSVGElement>> };
+export type RequestOutcomeMessage = {
+  title: string;
+  description: Array<JSX.Element>;
+  img?: Image;
+  ImgComponent?: FunctionComponent<SVGProps<SVGSVGElement>>;
+};
 export type RequestOutcomeOptions = { [key in RequestOutcome]: RequestOutcomeMessage };
 
 /*
