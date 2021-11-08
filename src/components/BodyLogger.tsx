@@ -9,7 +9,7 @@ import { HeaderContext } from './../lib/context';
 
 export function BodyLogger() {
   const location = useLocation();
-  const [subHeaderVisible , setSubHeaderVisible ] = useState<boolean>(true);
+  const [subHeaderVisible , setSubHeaderVisible ] = useState<boolean>(false);
   const [onLogout, setOnLogout] = useState<(() => void) | null | undefined>();
   /*
    * Handle data logging (now console.log, in the future might be Analytics)
