@@ -1,13 +1,10 @@
-import React from 'react';
-import { Grid, Typography, Button } from '@mui/material';
+import { Grid, Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { Box } from '@mui/system';
 import { IPACatalogParty, StepperStepComponentProps } from '../../types';
-// import { URL_FE_LANDING } from '../lib/constants';
 import { OnboardingStepActions } from './OnboardingStepActions';
 import { AsyncAutocomplete } from './AsyncAutocomplete';
 import { useHistoryState } from './useHistoryState';
-import SessionModal from './SessionModal';
 
 export function OnboardingStep1({ forward }: StepperStepComponentProps) {
   
@@ -24,14 +21,6 @@ export function OnboardingStep1({ forward }: StepperStepComponentProps) {
   const bodyTitle = 'Seleziona il tuo Ente';
   const bodyDescription =
     'Seleziona dall’indice IPA l’Ente per cui vuoi richiedere l’adesione ai prodotti PagoPA';
-  const [open, setOpen] = React.useState(false);
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
-  const title = 'Vuoi uscire dalla sessione?';
-  const message ='Se confermi dovrai ripetere lautenticazione per entrare e ripetere i passaggi effettuati.';
-  // const goBackToLandingPage = () => {
-  //   window.location.assign(`${URL_FE_LANDING}`);
-  // };
   return (
     <Grid
       container
@@ -102,15 +91,6 @@ export function OnboardingStep1({ forward }: StepperStepComponentProps) {
           }}
         />
       </Grid>
-
-      <Button onClick={handleOpen}>Open modal</Button>
-
-      <SessionModal 
-      handleClose={handleClose} 
-      // onCloseRedirect={} 
-      open={open} 
-      message={message} 
-      title={title}/>
     </Grid>
   );
 }

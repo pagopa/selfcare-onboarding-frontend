@@ -1,20 +1,19 @@
-import { useContext } from 'react';
 import { AppBar, Button, SvgIcon, Toolbar } from '@mui/material';
 import { Box } from '@mui/system';
 import { Fragment } from 'react';
 import { ReactComponent as logo } from '../../assets/logo.svg';
-// import { URL_FE_LOGOUT } from '../../lib/constants';
-import { HeaderContext } from '../../lib/context';
+import { URL_FE_LOGOUT } from '../../lib/constants';
 import SubHeader from './SubHeader';
 
-// type HeaderProps = {
-//   subHeaderVisible: boolean;
-//   onLogout?: (() => void) | null;
-// };
+type HeaderProps = {
+  withSecondHeader: boolean;
+  onExitAction?: (() => void) | null;
+};
 
-const Header = () => { 
-  const { subHeaderVisible, onLogout } = useContext(HeaderContext);
-  return (
+const Header = ({
+  withSecondHeader,
+  onExitAction = () => window.location.assign(URL_FE_LOGOUT),
+}: HeaderProps) => (
   //   <Box sx={{ height: withSecondHeader === true ? '155px' : '48px' }}>
   <Fragment>
     <AppBar
@@ -23,12 +22,12 @@ const Header = () => {
     >
       <Toolbar sx={{ width: { xs: '100%', lg: '90%', minHeight: '48px !important' } }}>
         <SvgIcon component={logo} viewBox="0 0 80 24" sx={{ width: '80px' }} />
-        {onLogout !== null ? (
+        {onExitAction !== null ? (
           <Box sx={{ flexGrow: 1, textAlign: 'end' }}>
             <Button
               variant="contained"
               sx={{ width: '88px', backgroundColor: '#004C99', height: '32px' }}
-              onClick={onLogout}
+              onClick={onExitAction}
             >
               Esci
             </Button>
@@ -38,9 +37,9 @@ const Header = () => {
         )}
       </Toolbar>
     </AppBar>
-    {subHeaderVisible === true ? <SubHeader /> : ''}
+    {withSecondHeader === true ? <SubHeader /> : ''}
   </Fragment>
   /*  </Box> */
-);};
+);
 
 export default Header;

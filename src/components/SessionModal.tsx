@@ -10,9 +10,9 @@ type Props = {
   handleClose: React.MouseEventHandler<HTMLButtonElement> | undefined;
   message: string;
   title: string;
-  onCloseRedirect?:React.MouseEventHandler<HTMLButtonElement> | undefined;
+  onConfirm?:React.MouseEventHandler<HTMLButtonElement> | undefined;
 };
-export default function SessionModal({ open, handleClose, message, onCloseRedirect,title}: Props) {
+export default function SessionModal({ open, handleClose, message, onConfirm,title}: Props) {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('xs'));
 
@@ -54,7 +54,7 @@ export default function SessionModal({ open, handleClose, message, onCloseRedire
               sx={{ width: '100%' }}
               color="primary"
               variant="contained"
-              onClick={onCloseRedirect}
+              onClick={onConfirm}
             >
               Conferma
             </Button>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Button, Container, Stack, Typography } from '@mui/material';
 import { withLogin } from '../components/withLogin';
@@ -16,15 +16,34 @@ import redXIllustration from '../assets/red-x-illustration.svg';
 import { InlineSupportLink } from '../components/InlineSupportLink';
 import { URL_FE_LANDING } from '../lib/constants';
 import { OnboardingStep1_5 } from '../components/OnboardingStep1_5';
+import { HeaderContext } from '../lib/context';
+import SessionModal from './../components/SessionModal';
+import { URL_FE_LOGOUT } from './../lib/constants';
 
-const keepOnPage= (e: BeforeUnloadEvent) => {
-  const message = 'Warning!\n\nNavigating away from this page will delete your text if you haven\'t already saved it.';
-  console.log("E",window);
+export const unregisterUnloadEvent = (
+  setOnLogout: React.Dispatch<React.SetStateAction<(() => void) | null | undefined>>) => {
+  window.removeEventListener('beforeunload', keepOnPage);
+  setOnLogout(undefined);
+};
+
+const registerUnloadEvent = (
+  setOnLogout: React.Dispatch<React.SetStateAction<(() => void) | null | undefined>>,
+  setOpenLogoutModal:React.Dispatch<React.SetStateAction<boolean>> ) => {
+    
+  window.addEventListener('beforeunload', keepOnPage);
+  // react dispatch consider a function input as a metod to be called with the previuos state to caluclate the next state: those we are defining a function that return the next function
+  setOnLogout(()=> ()=> setOpenLogoutModal(true));
+};
+
+const keepOnPage = (e: BeforeUnloadEvent) => {
+  const message =
+    "Warning!\n\nNavigating away from this page will delete your text if you haven't already saved it.";
+  console.log('E', window);
   e.preventDefault();
-    // eslint-disable-next-line functional/immutable-data
-    e.returnValue = message;
-    return message;
-  };
+  // eslint-disable-next-line functional/immutable-data
+  e.returnValue = message;
+  return message;
+};
 
 function OnboardingComponent() {
   const [loading, setLoading] = useState(false);
@@ -33,15 +52,13 @@ function OnboardingComponent() {
   const [institutionId, setInstitutionId] = useState<string>('');
   const [outcome, setOutcome] = useState<RequestOutcome>();
   const history = useHistory();
- 
+  const [openLogoutModal, setOpenLogoutModal] = useState(false);
+  const {setOnLogout}= useContext(HeaderContext);
+  
   useEffect(() => {
-   
-    window.addEventListener('beforeunload', keepOnPage);
-    return () => {
-    window.removeEventListener('beforeunload', keepOnPage);
-    };
-  },[]);
-
+    registerUnloadEvent(setOnLogout, setOpenLogoutModal);
+    return () => unregisterUnloadEvent(setOnLogout);
+  }, []);
 
   const reload = () => {
     history.go(0);
@@ -151,9 +168,18 @@ function OnboardingComponent() {
     },
   };
 
+  if (outcome) {
+    unregisterUnloadEvent(setOnLogout);
+  }
   return !outcome ? (
     <Container>
       <Step />
+      <SessionModal 
+      handleClose={ () => setOpenLogoutModal(false)} 
+      onConfirm={() => {unregisterUnloadEvent(setOnLogout); window.location.assign(URL_FE_LOGOUT);}} 
+      open={openLogoutModal} 
+      title={'Vuoi uscire dalla sessione?'}
+      message={'Se confermi dovrai ripetere lautenticazione per entrare e ripetere i passaggi effettuati.'} />
       {loading && <LoadingOverlay loadingText="Stiamo verificando i tuoi dati" />}
     </Container>
   ) : (
