@@ -4,7 +4,7 @@ import { ROUTES } from '../lib/constants';
 import { createMemoryHistory } from 'history';
 import { Router } from 'react-router';
 
-jest.mock('../views/OnBoarding', () => () => 'ONBOARDING');
+jest.mock('../views/Onboarding', () => () => 'ONBOARDING');
 jest.mock('../views/RejectRegistration', () => () => 'REJECT ONBOARDING');
 jest.mock('../views/CompleteRegistrationComponent', () => () => 'CONFIRM ONBOARDING');
 
