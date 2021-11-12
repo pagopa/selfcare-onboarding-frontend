@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import App from '../App';
-import { ROUTES } from '../lib/constants';
+import { ROUTES } from '../utils/constants';
 import { createMemoryHistory } from 'history';
 import { Router } from 'react-router';
 
