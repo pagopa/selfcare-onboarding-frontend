@@ -1,4 +1,4 @@
-import { DISPLAY_LOGS } from './constants';
+import { DISPLAY_LOGS } from '../utils/constants';
 
 export function logAction(actionLabel: string, data: any) {
   if (!DISPLAY_LOGS) {

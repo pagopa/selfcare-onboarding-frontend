@@ -2,6 +2,7 @@ import { AppBar, Button, SvgIcon, Toolbar } from '@mui/material';
 import { Box } from '@mui/system';
 import { Fragment } from 'react';
 import { ReactComponent as logo } from '../../assets/logo_pago_pa_mini.svg';
+import { URL_FE_LOGOUT } from '../../utils/constants';
 import SubHeader from './subHeader/SubHeader';
 
 type HeaderProps = {
@@ -10,8 +11,11 @@ type HeaderProps = {
   subHeaderChild?: React.ReactNode;
 };
 
-const Header = ({ withSecondHeader, onExitAction, subHeaderChild }: HeaderProps) => (
-  //   <Box sx={{ height: withSecondHeader === true ? '155px' : '48px' }}>
+const Header = ({
+  withSecondHeader,
+  onExitAction = () => window.location.assign(URL_FE_LOGOUT),
+  subHeaderChild,
+}: HeaderProps) => (
   <Fragment>
     <AppBar
       position="relative"

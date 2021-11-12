@@ -9,13 +9,13 @@ import { fetchWithLogs } from '../lib/api-utils';
 import { getFetchOutcome } from '../lib/error-utils';
 import checkIllustration from '../assets/check-illustration.svg';
 import redXIllustration from '../assets/red-x-illustration.svg';
-import { URL_FE_DASHBOARD } from '../lib/constants';
+import { URL_FE_DASHBOARD } from '../utils/constants';
 import { MessageNoAction } from '../components/MessageNoAction';
 import { HeaderContext } from '../lib/context';
 import { getOnboardingMagicLinkJwt } from './RejectRegistration';
 
 function CompleteRegistrationComponent() {
-  const { setSubHeaderVisible,setOnLogout } = useContext(HeaderContext);
+  const { setSubHeaderVisible, setOnLogout } = useContext(HeaderContext);
   const token = getOnboardingMagicLinkJwt();
 
   const [activeStep, setActiveStep, setActiveStepHistory] = useHistoryState(
@@ -37,11 +37,11 @@ function CompleteRegistrationComponent() {
   useEffect(() => {
     setSubHeaderVisible(true);
     setOnLogout(null);
-    return () =>{ 
+    return () => {
       setSubHeaderVisible(true);
       setOnLogout(undefined);
     };
-  },[]);
+  }, []);
   const setUploadedFilesAndWriteHistory = (files: Array<File>) => {
     setUploadedFilesHistory(files);
     setUploadedFiles(files);

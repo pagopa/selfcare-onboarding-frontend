@@ -4,7 +4,7 @@ import { AxiosResponse } from 'axios';
 import { useEffect, useState, useContext } from 'react';
 import { InstitutionInfo, OnBoardingInfo, StepperStepComponentProps } from '../../types';
 import { fetchWithLogs } from '../lib/api-utils';
-import { URL_FE_DASHBOARD } from '../lib/constants';
+import { URL_FE_DASHBOARD } from '../utils/constants';
 import { getFetchOutcome } from '../lib/error-utils';
 import { HeaderContext } from '../lib/context';
 import { LoadingOverlay } from './LoadingOverlay';
@@ -32,7 +32,7 @@ const genericError: StyledIntroChildrenProps = {
 export function OnboardingStep1_5({ forward, institutionId }: Props) {
   const [loading, setLoading] = useState(true);
   const [outcome, setOutcome] = useState<StyledIntroChildrenProps | null>();
-  const {setOnLogout}= useContext(HeaderContext);
+  const { setOnLogout } = useContext(HeaderContext);
 
   const submit = async () => {
     setLoading(true);
@@ -71,7 +71,7 @@ export function OnboardingStep1_5({ forward, institutionId }: Props) {
     forward();
   };
 
-  if(outcome){
+  if (outcome) {
     unregisterUnloadEvent(setOnLogout);
   }
   return loading ? (
