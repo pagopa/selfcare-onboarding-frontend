@@ -11,8 +11,8 @@ import { OnboardingStep2 } from '../components/OnboardingStep2';
 import { OnboardingStep3 } from '../components/OnboardingStep3';
 import { LoadingOverlay } from '../components/LoadingOverlay';
 import { MessageNoAction } from '../components/MessageNoAction';
-import checkIllustration from '../assets/check-illustration.svg';
-import redXIllustration from '../assets/red-x-illustration.svg';
+import {ReactComponent as CheckIllustration} from '../assets/check-illustration.svg';
+import {ReactComponent as ErrorIllustration} from '../assets/error-illustration.svg';
 import { InlineSupportLink } from '../components/InlineSupportLink';
 import { URL_FE_LANDING } from '../lib/constants';
 import { OnboardingStep1_5 } from '../components/OnboardingStep1_5';
@@ -129,7 +129,7 @@ function OnboardingComponent() {
 
   const outcomeContent: RequestOutcomeOptions = {
     success: {
-      img: { src: checkIllustration, alt: "Icona dell'email" },
+      ImgComponent: CheckIllustration,
       title: 'La tua richiesta è stata inviata con successo',
       description: [
         <Stack key="0" spacing={10}>
@@ -153,7 +153,7 @@ function OnboardingComponent() {
       ],
     },
     error: {
-      img: { src: redXIllustration, alt: "Icona dell'email" },
+      ImgComponent: ErrorIllustration,
       title: "C'è stato un problema...",
       description: [
         <p key="0">
