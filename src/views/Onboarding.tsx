@@ -1,6 +1,6 @@
-import { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { useHistory } from 'react-router-dom';
-import { Button, Container, Stack, Typography } from '@mui/material';
+import { Button, Container, Stack, Typography, Grid } from '@mui/material';
 import { withLogin } from '../components/withLogin';
 import { RequestOutcome, RequestOutcomeOptions, StepperStep } from '../../types';
 import { fetchWithLogs } from '../lib/api-utils';
@@ -13,7 +13,7 @@ import { LoadingOverlay } from '../components/LoadingOverlay';
 import { MessageNoAction } from '../components/MessageNoAction';
 import { ReactComponent as CheckIllustration } from '../assets/check-illustration.svg';
 import { ReactComponent as ErrorIllustration } from '../assets/error-illustration.svg';
-import { InlineSupportLink } from '../components/InlineSupportLink';
+// import { InlineSupportLink } from '../components/InlineSupportLink';
 import { URL_FE_LANDING } from '../utils/constants';
 import { OnboardingStep1_5 } from '../components/OnboardingStep1_5';
 import { HeaderContext } from '../lib/context';
@@ -155,16 +155,30 @@ function OnboardingComponent() {
     },
     error: {
       ImgComponent: ErrorIllustration,
-      title: "C'è stato un problema...",
+      title: '',
       description: [
-        <p key="0">
-          Il salvataggio dei dati inseriti non è andato a buon fine.
-          <br />
-          <Button onClick={reload} variant={'text'}>
-            Prova nuovamente a registrarti
-          </Button>
-          , e se il problema dovesse persistere, <InlineSupportLink />!
-        </p>,
+        <Grid container direction="column" key="0">
+          <Grid container item justifyContent="center" mt={5}>
+            <Grid item xs={5}>
+              <Typography variant="h2">Spiacenti, qualcosa è andato storto.</Typography>
+            </Grid>
+          </Grid>
+          <Grid container item justifyContent="center" mb={7} mt={1}>
+            <Grid item xs={5}>
+              <Typography>
+                A causa di un errore del sistema non è possibile completare la procedura.
+              </Typography>
+              <Typography>Ti chiediamo di riprovare più tardi.</Typography>
+            </Grid>
+          </Grid>
+          <Grid container item justifyContent="center">
+            <Grid item xs={4}>
+              <Button onClick={reload} variant={'contained'}>
+                Torna al portale
+              </Button>
+            </Grid>
+          </Grid>
+        </Grid>,
       ],
     },
   };
@@ -186,6 +200,8 @@ function OnboardingComponent() {
         message={
           'Se confermi dovrai ripetere lautenticazione per entrare e ripetere i passaggi effettuati.'
         }
+        confirmLabel='Conferma'
+        rejectLabel='Annulla'
       />
       {loading && <LoadingOverlay loadingText="Stiamo verificando i tuoi dati" />}
     </Container>

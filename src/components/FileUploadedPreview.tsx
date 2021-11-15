@@ -7,10 +7,11 @@ type FileUploadedPreviewParams = {
     files: Array<File>;
     sx?: any;
     deleteUploadedFiles: ((event: any) => void) | undefined;
+    loading: boolean;
 };
 
 
-export function  FileUploadedPreview({files, sx, deleteUploadedFiles}: FileUploadedPreviewParams): JSX.Element {
+export function  FileUploadedPreview({files, sx, deleteUploadedFiles, loading}: FileUploadedPreviewParams): JSX.Element {
 
     const cleanFileType = (fileType: string): string => {
         // eslint-disable-next-line functional/no-let
@@ -72,10 +73,11 @@ export function  FileUploadedPreview({files, sx, deleteUploadedFiles}: FileUploa
                         sx={{
                             lineHeight: "20px",
                             color: 'info.main',
-                            fontStyle: 'normal'
+                            fontStyle: loading ? 'italic' : 'normal'
                         }}
                         variant={"body2"} align="left">
-                        {'Caricamento Completato'}
+                            {/* TODO: ask if text ok 'caricamento completato' is correct */}
+                        {loading ? 'Invio in corso...' : 'Caricamento completato'}
                     </Typography>
                 </Box>))}
         </>

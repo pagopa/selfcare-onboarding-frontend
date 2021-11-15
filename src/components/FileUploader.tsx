@@ -79,6 +79,7 @@ export function FileUploader({
 
       {uploadedFiles && uploadedFiles.length > 0 ? (
         <FileUploadedPreview
+          loading={loading}
           files={uploadedFiles}
           deleteUploadedFiles={deleteUploadedFiles}
           sx={{ ml: '27px' }}
