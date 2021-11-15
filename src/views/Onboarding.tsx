@@ -11,28 +11,29 @@ import { OnboardingStep2 } from '../components/OnboardingStep2';
 import { OnboardingStep3 } from '../components/OnboardingStep3';
 import { LoadingOverlay } from '../components/LoadingOverlay';
 import { MessageNoAction } from '../components/MessageNoAction';
-import {ReactComponent as CheckIllustration} from '../assets/check-illustration.svg';
-import {ReactComponent as ErrorIllustration} from '../assets/error-illustration.svg';
+import { ReactComponent as CheckIllustration } from '../assets/check-illustration.svg';
+import { ReactComponent as ErrorIllustration } from '../assets/error-illustration.svg';
 import { InlineSupportLink } from '../components/InlineSupportLink';
-import { URL_FE_LANDING } from '../lib/constants';
+import { URL_FE_LANDING } from '../utils/constants';
 import { OnboardingStep1_5 } from '../components/OnboardingStep1_5';
 import { HeaderContext } from '../lib/context';
+import { URL_FE_LOGOUT } from '../utils/constants';
 import SessionModal from './../components/SessionModal';
-import { URL_FE_LOGOUT } from './../lib/constants';
 
 export const unregisterUnloadEvent = (
-  setOnLogout: React.Dispatch<React.SetStateAction<(() => void) | null | undefined>>) => {
+  setOnLogout: React.Dispatch<React.SetStateAction<(() => void) | null | undefined>>
+) => {
   window.removeEventListener('beforeunload', keepOnPage);
   setOnLogout(undefined);
 };
 
 const registerUnloadEvent = (
   setOnLogout: React.Dispatch<React.SetStateAction<(() => void) | null | undefined>>,
-  setOpenLogoutModal:React.Dispatch<React.SetStateAction<boolean>> ) => {
-    
+  setOpenLogoutModal: React.Dispatch<React.SetStateAction<boolean>>
+) => {
   window.addEventListener('beforeunload', keepOnPage);
   // react dispatch consider a function input as a metod to be called with the previuos state to caluclate the next state: those we are defining a function that return the next function
-  setOnLogout(()=> ()=> setOpenLogoutModal(true));
+  setOnLogout(() => () => setOpenLogoutModal(true));
 };
 
 const keepOnPage = (e: BeforeUnloadEvent) => {
@@ -53,8 +54,8 @@ function OnboardingComponent() {
   const [outcome, setOutcome] = useState<RequestOutcome>();
   const history = useHistory();
   const [openLogoutModal, setOpenLogoutModal] = useState(false);
-  const {setOnLogout}= useContext(HeaderContext);
-  
+  const { setOnLogout } = useContext(HeaderContext);
+
   useEffect(() => {
     registerUnloadEvent(setOnLogout, setOpenLogoutModal);
     return () => unregisterUnloadEvent(setOnLogout);
@@ -174,12 +175,18 @@ function OnboardingComponent() {
   return !outcome ? (
     <Container>
       <Step />
-      <SessionModal 
-      handleClose={ () => setOpenLogoutModal(false)} 
-      onConfirm={() => {unregisterUnloadEvent(setOnLogout); window.location.assign(URL_FE_LOGOUT);}} 
-      open={openLogoutModal} 
-      title={'Vuoi uscire dalla sessione?'}
-      message={'Se confermi dovrai ripetere lautenticazione per entrare e ripetere i passaggi effettuati.'} />
+      <SessionModal
+        handleClose={() => setOpenLogoutModal(false)}
+        onConfirm={() => {
+          unregisterUnloadEvent(setOnLogout);
+          window.location.assign(URL_FE_LOGOUT);
+        }}
+        open={openLogoutModal}
+        title={'Vuoi uscire dalla sessione?'}
+        message={
+          'Se confermi dovrai ripetere lautenticazione per entrare e ripetere i passaggi effettuati.'
+        }
+      />
       {loading && <LoadingOverlay loadingText="Stiamo verificando i tuoi dati" />}
     </Container>
   ) : (

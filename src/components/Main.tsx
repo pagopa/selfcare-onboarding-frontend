@@ -1,6 +1,6 @@
 import { Box } from '@mui/material';
 import { Redirect, Route, Switch } from 'react-router-dom';
-import { BASE_ROUTE, ROUTES } from '../lib/constants';
+import { BASE_ROUTE, ROUTES } from '../utils/constants';
 
 export function Main() {
   return (

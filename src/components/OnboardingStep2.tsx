@@ -20,6 +20,7 @@ export function OnboardingStep2({ forward, back }: StepperStepComponentProps) {
 
   const onBackAction = () => {
     savePageState();
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     back!();
   };
 
@@ -31,11 +32,11 @@ export function OnboardingStep2({ forward, back }: StepperStepComponentProps) {
   const bodyDescription2 =
     'La persona indicata sarà firmataria del contratto per la gestione dei prodotti PagoPA.';
   return (
-    <Grid 
-    container 
-    // mt={16} 
-    direction="column">
-
+    <Grid
+      container
+      // mt={16}
+      direction="column"
+    >
       <Grid container item justifyContent="center">
         <Grid item xs={4}>
           <Typography variant="h3" component="h2" sx={{ color: '#17324D' }} align="center">
@@ -55,27 +56,26 @@ export function OnboardingStep2({ forward, back }: StepperStepComponentProps) {
         </Grid>
       </Grid>
 
-      <Grid container item justifyContent="center" mt={7} >
-        <Grid item xs={6} sx={{ boxShadow:"0px 12px 40px rgba(0, 0, 0, 0.06)"}}>
+      <Grid container item justifyContent="center" mt={7}>
+        <Grid item xs={6} sx={{ boxShadow: '0px 12px 40px rgba(0, 0, 0, 0.06)' }}>
           <PlatformUserForm
             prefix="admin"
             role="Manager"
             platformRole="admin"
             people={people}
             setPeople={setPeople}
-            
           />
         </Grid>
       </Grid>
-      
+
       <Grid item my={7}>
         <OnboardingStepActions
-            back={{ action: onBackAction, label: 'Indietro', disabled: false }}
-            forward={{
+          back={{ action: onBackAction, label: 'Indietro', disabled: false }}
+          forward={{
             action: onForwardAction,
             label: 'Conferma',
             disabled: objectIsEmpty(people) || !validateUser(people.admin),
-            }}
+          }}
         />
       </Grid>
     </Grid>

@@ -76,7 +76,7 @@
     "coveragePathIgnorePatterns" : [
       "src/index.tsx",
       "src/reportWebVitals.ts",
-      "src/lib/constants.ts"
+      "src/utils/constants.ts"
     ]
   }
 }

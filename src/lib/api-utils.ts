@@ -1,7 +1,7 @@
 import axios, { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import isEmpty from 'lodash/isEmpty';
 import { Endpoint, RequestConfig } from '../../types';
-import { API } from './constants';
+import { API } from '../utils/constants';
 import { logAction, logError } from './action-log';
 import { storageRead } from './storage-utils';
 
