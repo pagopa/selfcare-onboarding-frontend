@@ -31,7 +31,6 @@ export function ConfirmRegistrationStep1(
     "Per completare la procedura di adesione, inserisci qui l'accordo ricevuto via PEC,";
   const subtitle2 = 'firmato digitalmente dal Legale Rappresentante.';
   const uploaderImageWidth = 180;
-
   return (
     <Box mt={8} sx={{ minHeight: '50vh' }}>
       <Grid container direction="row" justifyContent={'flex-start'} alignItems={'center'}>
@@ -60,7 +59,7 @@ export function ConfirmRegistrationStep1(
             <Grid item xs={11}>
               <FileUploader
                 title={'Trascina qui l’Atto di Adesione firmato'}
-                description={'oppure selezionalo dal desk'}
+                description={'oppure selezionalo dal desk'} // TODO: Inserire link blue
                 uploadedFiles={uploadedFiles}
                 deleteUploadedFiles={deleteUploadedFiles}
                 onDropAccepted={onDropAccepted}

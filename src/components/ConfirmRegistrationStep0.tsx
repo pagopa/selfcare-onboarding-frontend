@@ -18,11 +18,11 @@ export function ConfirmRegistrationStep0({ forward }: StepperStepComponentProps)
       <Grid item xs={5}>
         <Grid container columns={5}>
           <Grid item xs={5}>
-            <Typography color="textPrimary" variant={'h1'} align="left">
+            <Typography color="textPrimary" variant={'h1'} sx={{fontSize: '48px'}} align="left">
               {"Carica l'Atto di Adesione"}
             </Typography>
           </Grid>
-          <Grid item xs={5} mt={3}>
+          <Grid item xs={4} mt={3}>
             <Typography color="textPrimary" variant={'body1'} align="left">
               {
                 "Segui le istruzioni per inviare il documento firmato, servirà a completare l'inserimento del tuo Ente nel portale Self Care."

@@ -13,6 +13,7 @@ import { URL_FE_DASHBOARD } from '../utils/constants';
 import { MessageNoAction } from '../components/MessageNoAction';
 import { HeaderContext } from '../lib/context';
 import { getOnboardingMagicLinkJwt } from './RejectRegistration';
+import SessionModal from './../components/SessionModal';
 
 function CompleteRegistrationComponent() {
   const { setSubHeaderVisible, setOnLogout } = useContext(HeaderContext);
@@ -71,13 +72,16 @@ function CompleteRegistrationComponent() {
     setOutcome(getFetchOutcome(uploadDocument));
   };
 
+  const handleErrorModalClose = () => {
+    setOutcome(null);
+  };
   const steps: Array<StepperStep> = [
     {
-      label: "Carica l'Atto di Adessione",
+      label: "Carica l'Atto di Adesione",
       Component: () => ConfirmRegistrationStep0({ forward }),
     },
     {
-      label: "Carica l'Atto di Adessione",
+      label: "Carica l'Atto di Adesione",
       Component: () =>
         ConfirmRegistrationStep1(
           {
@@ -129,9 +133,24 @@ function CompleteRegistrationComponent() {
     },
   };
 
-  return outcome ? (
+  return outcome === 'success' 
+  ? (
     <MessageNoAction {...outcomeContent[outcome]} />
-  ) : (
+  ) 
+  : outcome === 'error' 
+  ? 
+  <SessionModal
+              handleClose={handleErrorModalClose}
+              onConfirm={handleErrorModalClose}
+              open={true}
+              title={'Errore'}
+              message={
+                "Il caricamento del file non è andato a buon fine. Vuoi riprovare?"
+              }
+              confirmLabel='Torna alla pagina di caricamento'
+              rejectLabel='Esci'
+            />
+  : (
     <React.Fragment>
       <Step />
       <AlertDialog
