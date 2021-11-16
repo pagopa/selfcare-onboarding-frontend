@@ -1,37 +1,73 @@
-import { Button, Stack } from '@mui/material';
-import { Box } from '@mui/system';
+import { Button, Grid, Typography } from '@mui/material';
+// import { Box } from '@mui/system';
 import { AxiosResponse } from 'axios';
 import { useEffect, useState, useContext } from 'react';
-import { InstitutionInfo, OnBoardingInfo, StepperStepComponentProps } from '../../types';
+import {
+  InstitutionInfo,
+  OnBoardingInfo,
+  RequestOutcomeMessage,
+  StepperStepComponentProps,
+} from '../../types';
 import { fetchWithLogs } from '../lib/api-utils';
-import { URL_FE_DASHBOARD } from '../utils/constants';
+import { URL_FE_LANDING } from '../utils/constants';
 import { getFetchOutcome } from '../lib/error-utils';
 import { HeaderContext } from '../lib/context';
+import { ReactComponent as ErrorIllustration } from '../assets/error-illustration.svg';
 import { LoadingOverlay } from './LoadingOverlay';
-import { StyledIntro, StyledIntroChildrenProps } from './StyledIntro';
 import { unregisterUnloadEvent } from './../views/Onboarding';
+import { MessageNoAction } from './MessageNoAction';
 
 type Props = StepperStepComponentProps & {
   institutionId: string;
 };
 
-const alreadyOnboarded: StyledIntroChildrenProps = {
+const alreadyOnboarded: RequestOutcomeMessage = {
   title: "L'Ente che hai scelto ha già aderito",
-  description: (
+  description: [
     <>
       Per accedere, chiedi al Referente incaricato di aggiungerti al portale Self Care del tuo Ente.
     </>
-  ),
+  ],
 };
-
-const genericError: StyledIntroChildrenProps = {
-  title: "C'è stato un problema...",
-  description: <>Qualcosa è andato storto durante la verifica dell&quot;ente, riprova più tardi.</>,
+// const reload = () => {
+//   history.go(0);
+// };
+const genericError: RequestOutcomeMessage = {
+  ImgComponent: ErrorIllustration,
+  title: '',
+  description: [
+    <Grid container direction="column" key="0">
+      <Grid container item justifyContent="center" mt={5}>
+        <Grid item xs={6}>
+          <Typography variant="h2">Spiacenti, qualcosa è andato storto.</Typography>
+        </Grid>
+      </Grid>
+      <Grid container item justifyContent="center" mb={7} mt={1}>
+        <Grid item xs={6}>
+          <Typography>
+            A causa di un errore del sistema non è possibile completare la procedura.
+          </Typography>
+          <Typography>Ti chiediamo di riprovare più tardi.</Typography>
+        </Grid>
+      </Grid>
+      <Grid container item justifyContent="center">
+        <Grid item xs={4}>
+        <Button
+          variant="contained"
+          sx={{ width: '200px', alignSelf: 'center' }}
+          onClick={() => window.location.assign(URL_FE_LANDING)}
+        >
+          Torna al portale
+        </Button>
+        </Grid>
+      </Grid>
+    </Grid>,
+  ],
 };
 
 export function OnboardingStep1_5({ forward, institutionId }: Props) {
   const [loading, setLoading] = useState(true);
-  const [outcome, setOutcome] = useState<StyledIntroChildrenProps | null>();
+  const [outcome, setOutcome] = useState<RequestOutcomeMessage | null>();
   const { setOnLogout } = useContext(HeaderContext);
 
   const submit = async () => {
@@ -77,19 +113,7 @@ export function OnboardingStep1_5({ forward, institutionId }: Props) {
   return loading ? (
     <LoadingOverlay loadingText="Stiamo verificando i tuoi dati" />
   ) : outcome ? (
-    <Stack spacing={10}>
-      <StyledIntro>{outcome}</StyledIntro>
-      <Box sx={{ textAlign: 'center' }}>
-        <Button
-          variant="contained"
-          sx={{ width: '200px', alignSelf: 'center' }}
-          onClick={() => window.location.assign(URL_FE_DASHBOARD)} // TODO to landing
-        >
-          Torna al portale
-        </Button>
-        {/* TODO other actions? */}
-      </Box>
-    </Stack>
+    <MessageNoAction {...outcome} />
   ) : (
     <></>
   );

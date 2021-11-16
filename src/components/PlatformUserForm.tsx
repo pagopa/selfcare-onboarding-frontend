@@ -1,9 +1,9 @@
 import { Grid, Paper, TextField, Typography } from '@mui/material';
 import React from 'react';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import { Tooltip } from '@mui/material';
 import { UserOnCreate, UserPlatformRole, UserRole } from '../../types';
 import { UsersObject } from './OnboardingStep2';
-
 type PlatformUserFormProps = {
   prefix: keyof UsersObject;
   role: UserRole;
@@ -19,11 +19,13 @@ type Field = {
   type?: 'text' | 'email';
   width?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
   regexp?: RegExp;
+  message?: string;
+  icon?: React.ReactNode;
 };
 
 const fields: Array<Field> = [
-  { id: 'name', label: 'Nome' },
-  { id: 'surname', label: 'Cognome' },
+  { id: 'name', label: 'Nome', message: 'Questo campo è obbligatorio' },
+  { id: 'surname', label: 'Cognome', message: 'Questo campo è obbligatorio' },
   {
     id: 'taxCode',
     label: 'Codice Fiscale',
@@ -31,6 +33,7 @@ const fields: Array<Field> = [
     regexp: new RegExp(
       '^[A-Za-z]{6}[0-9lmnpqrstuvLMNPQRSTUV]{2}[abcdehlmprstABCDEHLMPRST]{1}[0-9lmnpqrstuvLMNPQRSTUV]{2}[A-Za-z]{1}[0-9lmnpqrstuvLMNPQRSTUV]{3}[A-Za-z]{1}$'
     ),
+    message: 'Il Codice Fiscale inserito non è valido'
   },
   {
     id: 'email',
@@ -38,10 +41,17 @@ const fields: Array<Field> = [
     type: 'email',
     width: 12,
     regexp: new RegExp('^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$'),
+    message: 'L’indirizzo email non è valido',
+    icon: <Tooltip title="Inserisci l'indirizzo email istituzionale utilizzato per l'Ente" ><InfoOutlinedIcon sx={{marginRight:'8px', padding:'3px', color:'#475A6D'}} /></Tooltip>,
   },
 ];
 
 export function validateUser(user: UserOnCreate): boolean {
+  
+  // if (fields.id === "email") {
+  //   const icon = 
+  // };
+  
   return (
     fields.filter(({ id }) => !user[id]).map(({ id }) => id).length === 0 && // mandatory fields
     validateNoMandatory(user).length === 0
@@ -74,23 +84,34 @@ export function PlatformUserForm({
   return (
     <Paper elevation={0} sx={{ py:4, px:6 }} >
       <Grid container spacing={2}>
-        {fields.map(({ id, label, type = 'text', width = 6 }) => (
+        {fields.map(({ id, label, type = 'text', width = 6, message, icon}) => {
+          const isError= errors.indexOf(id) > -1;
+          return (
           <Grid item key={id} xs={width} mb={5}>
             <TextField
               id={`${prefix}-${id}`}
               variant="standard"
-              label={label}
+              label={
+                <React.Fragment>
+                  {label}
+                  {icon}
+                </React.Fragment>
+              }
               type={type}
               value={people[prefix] && people[prefix][id] ? people[prefix][id] : ''}
               onChange={buildSetPerson(id)}
               sx={{ width: '100%' }}
-              error={errors.indexOf(id) > -1}
+              error={isError}
+              helperText={isError ? message : undefined}
               disabled={readOnly.indexOf(id) > -1}
+              InputProps={{
+                endAdornment:icon,
+              }}
             />
           </Grid>
-        ))}
+        );})}
         <Grid item xs={12} sx={{ display: 'flex', marginTop: '-16px !important'}} >
-          <InfoOutlinedIcon sx={{ marginRight:'8px', padding:'3px', color:'#475A6D'}} />
+          <InfoOutlinedIcon sx={{ marginRight:'8px', padding:'3px',color:'#475A6D'}} />
           <Grid item xs={10} my={'auto'}>
           <Typography sx={{ fontSize:'14px'}}>
             Inserisci l&apos;indirizzo email istituzionale utilizzato per l&apos;Ente
