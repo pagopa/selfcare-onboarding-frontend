@@ -59,9 +59,9 @@ export function OnboardingStep2({ forward, back }: StepperStepComponentProps) {
       <Grid container item justifyContent="center" mt={7}>
         <Grid item xs={6} sx={{ boxShadow: '0px 12px 40px rgba(0, 0, 0, 0.06)' }}>
           <PlatformUserForm
-            prefix="admin"
-            role="Manager"
-            platformRole="admin"
+            prefix="LEGAL"
+            role="MANAGER"
+            platformRole="ADMIN_REF"
             people={people}
             setPeople={setPeople}
           />
@@ -74,7 +74,7 @@ export function OnboardingStep2({ forward, back }: StepperStepComponentProps) {
           forward={{
             action: onForwardAction,
             label: 'Conferma',
-            disabled: objectIsEmpty(people) || !validateUser(people.admin),
+            disabled: objectIsEmpty(people) || !validateUser(people.LEGAL),
           }}
         />
       </Grid>

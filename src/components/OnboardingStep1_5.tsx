@@ -52,7 +52,7 @@ export function OnboardingStep1_5({ forward, institutionId }: Props) {
         .data;
       const institution: InstitutionInfo | null =
         onBoardingInfo.institutions?.length > 0 ? onBoardingInfo.institutions[0] : null;
-      if (institution && institution.status === 'active') {
+      if (institution && institution.state === 'ACTIVE') {
         setOutcome(alreadyOnboarded);
       } else {
         setOutcome(null);
