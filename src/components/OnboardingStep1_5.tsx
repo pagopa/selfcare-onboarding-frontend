@@ -1,4 +1,4 @@
-import { Button, Grid, Typography } from '@mui/material';
+import { Button, Divider, Grid, Typography, Link } from '@mui/material';
 // import { Box } from '@mui/system';
 import { AxiosResponse } from 'axios';
 import { useEffect, useState, useContext } from 'react';
@@ -22,11 +22,51 @@ type Props = StepperStepComponentProps & {
 };
 
 const alreadyOnboarded: RequestOutcomeMessage = {
-  title: "L'Ente che hai scelto ha già aderito",
+  title: '',
   description: [
-    <>
-      Per accedere, chiedi al Referente incaricato di aggiungerti al portale Self Care del tuo Ente.
-    </>
+    <Grid container direction="column" key="0">
+      <Grid container item justifyContent="center" mt={5}>
+        <Grid item xs={6}>
+          <Typography variant="h2">L&apos;Ente che hai scelto ha già aderito</Typography>
+        </Grid>
+      </Grid>
+      <Grid container item justifyContent="center" mb={7} mt={1}>
+        <Grid item xs={7}>
+          <Typography>
+            Per accedere, chiedi al Referente incaricato di aggiungerti al portale Self Care del tuo
+            Ente.
+          </Typography>
+        </Grid>
+      </Grid>
+      <Grid container item justifyContent="center">
+        <Grid item xs={4}>
+          <Button
+            variant="contained"
+            sx={{ width: '200px', alignSelf: 'center' }}
+            onClick={() => window.location.assign(URL_FE_LANDING)}
+          >
+            Torna al portale
+          </Button>
+        </Grid>
+      </Grid>
+      <Grid container item justifyContent="center">
+        <Grid item xs={4} pt={12}>
+          <Divider />
+        </Grid>
+      </Grid>
+      <Grid container item justifyContent="center" mb={7} mt={1}>
+        <Grid item xs={7} mt={2}>
+          <Typography variant="body2">
+            <Typography variant="body2">
+              Gli attuali Referenti non sono più disponibili e hai la necessità di gestire i
+              prodotti?
+            </Typography>
+            {/* TODO: redirect TBD */}
+            <Link>Registra un nuovo referente</Link> 
+          </Typography>
+        </Grid>
+      </Grid>
+    </Grid>,
   ],
 };
 // const reload = () => {
@@ -52,13 +92,13 @@ const genericError: RequestOutcomeMessage = {
       </Grid>
       <Grid container item justifyContent="center">
         <Grid item xs={4}>
-        <Button
-          variant="contained"
-          sx={{ width: '200px', alignSelf: 'center' }}
-          onClick={() => window.location.assign(URL_FE_LANDING)}
-        >
-          Torna al portale
-        </Button>
+          <Button
+            variant="contained"
+            sx={{ width: '200px', alignSelf: 'center' }}
+            onClick={() => window.location.assign(URL_FE_LANDING)}
+          >
+            Torna al portale
+          </Button>
         </Grid>
       </Grid>
     </Grid>,
