@@ -61,7 +61,8 @@ const alreadyOnboarded: RequestOutcomeMessage = {
               Gli attuali Referenti non sono più disponibili e hai la necessità di gestire i
               prodotti?
             </Typography>
-            <Link>Registra un nuovo referente</Link>
+            {/* TODO: redirect TBD */}
+            <Link>Registra un nuovo referente</Link> 
           </Typography>
         </Grid>
       </Grid>
