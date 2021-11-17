@@ -1,7 +1,7 @@
-import { Grid, Paper, TextField, Typography } from '@mui/material';
+import { Grid, Paper, TextField } from '@mui/material';
 import React from 'react';
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import { Tooltip } from '@mui/material';
+// import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+// import { Tooltip } from '@mui/material';
 import { UserOnCreate, UserPlatformRole, UserRole } from '../../types';
 import { UsersObject } from './OnboardingStep2';
 type PlatformUserFormProps = {
@@ -20,7 +20,7 @@ type Field = {
   width?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
   regexp?: RegExp;
   message?: string;
-  icon?: React.ReactNode;
+  helperMessage?: string;
 };
 
 const fields: Array<Field> = [
@@ -42,16 +42,11 @@ const fields: Array<Field> = [
     width: 12,
     regexp: new RegExp('^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$'),
     message: 'L’indirizzo email non è valido',
-    icon: <Tooltip title="Inserisci l'indirizzo email istituzionale utilizzato per l'Ente" ><InfoOutlinedIcon sx={{marginRight:'8px', padding:'3px', color:'#475A6D'}} /></Tooltip>,
+    helperMessage:"Inserisci l'indirizzo email istituzionale utilizzato per l'Ente"
   },
 ];
 
 export function validateUser(user: UserOnCreate): boolean {
-  
-  // if (fields.id === "email") {
-  //   const icon = 
-  // };
-  
   return (
     fields.filter(({ id }) => !user[id]).map(({ id }) => id).length === 0 && // mandatory fields
     validateNoMandatory(user).length === 0
@@ -84,7 +79,7 @@ export function PlatformUserForm({
   return (
     <Paper elevation={0} sx={{ py:4, px:6 }} >
       <Grid container spacing={2}>
-        {fields.map(({ id, label, type = 'text', width = 6, message, icon}) => {
+        {fields.map(({ id, label, type = 'text', width = 6, message, helperMessage}) => {
           const isError= errors.indexOf(id) > -1;
           return (
           <Grid item key={id} xs={width} mb={5}>
@@ -94,7 +89,6 @@ export function PlatformUserForm({
               label={
                 <React.Fragment>
                   {label}
-                  {icon}
                 </React.Fragment>
               }
               type={type}
@@ -102,22 +96,11 @@ export function PlatformUserForm({
               onChange={buildSetPerson(id)}
               sx={{ width: '100%' }}
               error={isError}
-              helperText={isError ? message : undefined}
+              helperText={isError ? message : helperMessage}
               disabled={readOnly.indexOf(id) > -1}
-              InputProps={{
-                endAdornment:icon,
-              }}
             />
           </Grid>
         );})}
-        <Grid item xs={12} sx={{ display: 'flex', marginTop: '-16px !important'}} >
-          <InfoOutlinedIcon sx={{ marginRight:'8px', padding:'3px',color:'#475A6D'}} />
-          <Grid item xs={10} my={'auto'}>
-          <Typography sx={{ fontSize:'14px'}}>
-            Inserisci l&apos;indirizzo email istituzionale utilizzato per l&apos;Ente
-          </Typography>
-          </Grid>
-        </Grid>
       </Grid>
     </Paper>
   );
