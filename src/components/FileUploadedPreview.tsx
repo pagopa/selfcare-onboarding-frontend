@@ -76,8 +76,7 @@ export function  FileUploadedPreview({files, sx, deleteUploadedFiles, loading}: 
                             fontStyle: loading ? 'italic' : 'normal'
                         }}
                         variant={"body2"} align="left">
-                            {/* TODO: ask if text ok 'caricamento completato' is correct */}
-                        {loading ? 'Invio in corso...' : 'Caricamento completato'}
+                        {loading ? 'Invio in corso...' : 'Pronto per l’invio'}
                     </Typography>
                 </Box>))}
         </>
