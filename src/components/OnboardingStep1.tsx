@@ -1,5 +1,4 @@
-import { Grid, Typography } from '@mui/material';
-import { Link } from 'react-router-dom';
+import { Grid, Link, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { IPACatalogParty, StepperStepComponentProps } from '../../types';
 import { OnboardingStepActions } from './OnboardingStepActions';
@@ -73,7 +72,7 @@ export function OnboardingStep1({ forward }: StepperStepComponentProps) {
                 color: 'text.primary',
               }}
             >
-              Non trovi il tuo ente nell’indice IPA? <Link to="#">Clicca qui</Link> per maggiori
+              Non trovi il tuo ente nell’indice IPA? <Link href="https://indicepa.gov.it/ipa-portale/servizi-enti/accreditamento-ente">Clicca qui</Link> per maggiori
               informazioni e istruzioni per essere inclusi nell’indice delle Pubbliche
               Amministrazioni
             </Typography>

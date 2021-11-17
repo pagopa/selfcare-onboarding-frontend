@@ -126,7 +126,7 @@ export function OnboardingStep3({ forward, back }: StepperStepComponentProps) {
                     title: 'Aggiungi un nuovo Referente Amministrativo',
                   }}
                 </StyledIntro> */}
-            <Grid item xs={10} justifyContent="center" my={3}>
+            <Grid item xs={10} justifyContent="center" my={5}>
               <Typography align="center" variant="h4">
                 Aggiungi un nuovo Referente Amministrativo
               </Typography>
@@ -156,8 +156,10 @@ export function OnboardingStep3({ forward, back }: StepperStepComponentProps) {
       </Grid>
 
       {/* <Box sx={{ textAlign: 'center' }} > */}
-      <Grid container item justifyContent="center" m={4}>
-        <Grid item xs={3}>
+
+      <Grid container item  my={4} display='flex' justifyContent="center">
+      <Grid item xs={3} sx={{display: 'flex', justifyContent: 'center'}}>
+        {Object.keys(people).length !== 3 && (
           <Link
             component="button"
             disabled={
@@ -181,7 +183,8 @@ export function OnboardingStep3({ forward, back }: StepperStepComponentProps) {
           >
             Aggiungi un nuovo Referente
           </Link>
-        </Grid>
+        )}
+      </Grid>
       </Grid>
       <OnboardingStepActions
         back={{ action: onBackAction, label: 'Indietro', disabled: false }}

@@ -61,6 +61,10 @@ function OnboardingComponent() {
     return () => unregisterUnloadEvent(setOnLogout);
   }, []);
 
+  useEffect(() => {
+    // eslint-disable-next-line functional/immutable-data
+    Object.assign(history.location,{state: undefined});
+  }, []);
   const reload = () => {
     history.go(0);
   };
