@@ -1,4 +1,4 @@
-import { CircularProgress, Grid, Typography } from '@mui/material';
+import { CircularProgress, Grid, Typography, Link } from '@mui/material';
 import { DropEvent, FileRejection, useDropzone } from 'react-dropzone';
 import { Box } from '@mui/system';
 import uploadedImage from '../assets/uploaded_doc.png';
@@ -8,6 +8,7 @@ import { FileUploadedPreview } from './FileUploadedPreview';
 type FileUploaderOption = {
   title: string;
   description: string;
+  descriptionLink?:string;
   uploadedFiles: Array<File>;
   deleteUploadedFiles?: (event: any | undefined) => void;
   onDropAccepted?: (t: Array<File>) => void;
@@ -21,6 +22,7 @@ type FileUploaderOption = {
 export function FileUploader({
   title,
   description,
+  descriptionLink,
   uploadedFiles,
   deleteUploadedFiles,
   onDropAccepted,
@@ -85,7 +87,7 @@ export function FileUploader({
           sx={{ ml: '27px' }}
         ></FileUploadedPreview>
       ) : (
-        <Grid container direction="column" alignItems={'center'} sx={{ width: 'auto', ml: '27px' }}>
+        <Grid container direction="column" alignItems={'start'} sx={{ width: 'auto', ml: '27px' }}>
           <Typography
             sx={{
               color: '#17324D',
@@ -105,7 +107,7 @@ export function FileUploader({
             variant={'body2'}
             align="left"
           >
-            {description}
+            {description}<Link>{descriptionLink}</Link>
           </Typography>
         </Grid>
       )}

@@ -8,13 +8,14 @@ import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 type Props = {
   open: boolean;
   handleClose?: React.MouseEventHandler<HTMLButtonElement> | undefined;
+  handleExit: React.MouseEventHandler<HTMLButtonElement> | undefined;
   message: string;
   title: string;
   onConfirm?:React.MouseEventHandler<HTMLButtonElement> | undefined;
   confirmLabel: string;
   rejectLabel: string;
 };
-export default function SessionModal({ open, handleClose, message, onConfirm,title, confirmLabel, rejectLabel}: Props) {
+export default function SessionModal({ open, handleClose,handleExit, message, onConfirm,title, confirmLabel, rejectLabel}: Props) {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('xs'));
 
@@ -64,7 +65,7 @@ export default function SessionModal({ open, handleClose, message, onConfirm,tit
           </Grid>
 
           <Grid item xs={12} mb={3}>
-            <Button onClick={handleClose} sx={{ width: '100%' }} color="primary" variant="outlined">
+            <Button onClick={handleExit} sx={{ width: '100%' }} color="primary" variant="outlined">
               {/* Annulla */}
               {rejectLabel}
             </Button>

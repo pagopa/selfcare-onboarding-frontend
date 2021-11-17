@@ -6,7 +6,7 @@ const Footer = () => (
     component="footer"
     sx={{
       pt: '32px',
-      mt: 'auto',
+      // mt: 'auto',
       height: '156px',
       bgcolor: '#01254C',
       alignItems: 'center',

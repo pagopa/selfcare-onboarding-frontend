@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { Button, Stack, Typography } from '@mui/material';
+import { Button, Stack, Typography, Grid } from '@mui/material';
 import { RequestOutcome, RequestOutcomeOptions, StepperStep } from '../../types';
 import { ConfirmRegistrationStep0 } from '../components/ConfirmRegistrationStep0';
 import { ConfirmRegistrationStep1 } from '../components/ConfirmRegistrationStep1';
@@ -9,7 +9,8 @@ import { fetchWithLogs } from '../lib/api-utils';
 import { getFetchOutcome } from '../lib/error-utils';
 import checkIllustration from '../assets/check-illustration.svg';
 import redXIllustration from '../assets/red-x-illustration.svg';
-import { URL_FE_DASHBOARD } from '../utils/constants';
+import { ReactComponent as ErrorIllustration } from '../assets/error-illustration.svg';
+import { URL_FE_LANDING } from '../utils/constants';
 import { MessageNoAction } from '../components/MessageNoAction';
 import { HeaderContext } from '../lib/context';
 import { getOnboardingMagicLinkJwt } from './RejectRegistration';
@@ -75,6 +76,22 @@ function CompleteRegistrationComponent() {
   const handleErrorModalClose = () => {
     setOutcome(null);
   };
+
+  const handleErrorModalExit = () => {
+    setActiveStepHistory(0);
+    setUploadedFilesHistory([]);
+    setActiveStep(0);
+    setUploadedFiles([]);
+    setOutcome(null);
+  };
+
+
+  const handleErrorModalConfirm= () => {
+    console.log('EXIT');
+    setOutcome(null);
+    setUploadedFiles([]);
+  };
+
   const steps: Array<StepperStep> = [
     {
       label: "Carica l'Atto di Adesione",
@@ -113,7 +130,7 @@ function CompleteRegistrationComponent() {
           <Button
             variant="contained"
             sx={{ width: '200px', alignSelf: 'center' }}
-            onClick={() => window.location.assign(URL_FE_DASHBOARD)}
+            onClick={() => window.location.assign(URL_FE_LANDING)}
           >
             Torna al portale
           </Button>
@@ -133,24 +150,55 @@ function CompleteRegistrationComponent() {
     },
   };
 
-  return outcome === 'success' 
-  ? (
+  return outcome === 'success' ? (
     <MessageNoAction {...outcomeContent[outcome]} />
-  ) 
-  : outcome === 'error' 
-  ? 
-  <SessionModal
-              handleClose={handleErrorModalClose}
-              onConfirm={handleErrorModalClose}
-              open={true}
-              title={'Errore'}
-              message={
-                "Il caricamento del file non è andato a buon fine. Vuoi riprovare?"
-              }
-              confirmLabel='Torna alla pagina di caricamento'
-              rejectLabel='Esci'
-            />
-  : (
+  ) : outcome === 'error' ? (
+    !token ? (
+      <Grid container direction="column" key="0" style={{textAlign: 'center'}}>
+        <Grid container item justifyContent="center" mt={5}>
+          <Grid item xs={6}>
+            <ErrorIllustration />
+          </Grid>
+        </Grid>
+        <Grid container item justifyContent="center" mt={5}>
+          <Grid item xs={6}>
+            <Typography variant="h2">Spiacenti, qualcosa è andato storto.</Typography>
+          </Grid>
+        </Grid>
+        <Grid container item justifyContent="center" mb={7} mt={1}>
+          <Grid item xs={6}>
+          {/* TODO: text TBD  */}
+            <Typography>
+              A causa di un errore del sistema non è possibile completare la procedura.
+            </Typography>
+            <Typography>Ti chiediamo di riprovare più tardi.</Typography>
+          </Grid>
+        </Grid>
+        <Grid container item justifyContent="center">
+          <Grid item xs={4}>
+            <Button
+              variant="contained"
+              sx={{ width: '200px', alignSelf: 'center' }}
+              onClick={() => window.location.assign(URL_FE_LANDING)}
+            >
+              Torna al portale
+            </Button>
+          </Grid>
+        </Grid>
+      </Grid>
+    ) : (
+      <SessionModal
+        handleClose={handleErrorModalClose}
+        handleExit={handleErrorModalExit}
+        onConfirm={handleErrorModalConfirm}
+        open={true}
+        title={'Errore'}
+        message={'Il caricamento del file non è andato a buon fine. Vuoi riprovare?'}
+        confirmLabel="Torna alla pagina di caricamento"
+        rejectLabel="Esci"
+      />
+    )
+  ) : (
     <React.Fragment>
       <Step />
       <AlertDialog

@@ -195,6 +195,7 @@ function OnboardingComponent() {
       <Step />
       <SessionModal
         handleClose={() => setOpenLogoutModal(false)}
+        handleExit={() => setOpenLogoutModal(false)}
         onConfirm={() => {
           unregisterUnloadEvent(setOnLogout);
           window.location.assign(URL_FE_LOGOUT);
