@@ -111,8 +111,8 @@ export function OnboardingStep3({ forward, back }: StepperStepComponentProps) {
         <Grid item xs={6} sx={{ boxShadow: '0px 12px 40px rgba(0, 0, 0, 0.06)' }}>
           <PlatformUserForm
             prefix={'delegate-initial'}
-            role="Delegate"
-            platformRole="admin"
+            role="DELEGATE"
+            platformRole="TECH_REF"
             people={people}
             setPeople={setPeople}
             readOnly={isAuthUser ? ['name', 'surname', 'taxCode'] : []}
@@ -138,8 +138,8 @@ export function OnboardingStep3({ forward, back }: StepperStepComponentProps) {
             >
               <PlatformUserForm
                 prefix={id}
-                role="Delegate"
-                platformRole="admin"
+                role="DELEGATE"
+                platformRole="TECH_REF"
                 people={people}
                 setPeople={setPeople}
               />
@@ -165,7 +165,7 @@ export function OnboardingStep3({ forward, back }: StepperStepComponentProps) {
             disabled={
               objectIsEmpty(people) ||
               Object.keys(people)
-                .filter((prefix) => 'admin' !== prefix)
+                .filter((prefix) => 'LEGAL' !== prefix)
                 .some((prefix) => !validateUser(people[prefix])) ||
               Object.keys(people).length === 3
             }
@@ -173,7 +173,7 @@ export function OnboardingStep3({ forward, back }: StepperStepComponentProps) {
             color={
               objectIsEmpty(people) ||
               Object.keys(people)
-                .filter((prefix) => 'admin' !== prefix)
+                .filter((prefix) => 'LEGAL' !== prefix)
                 .some((prefix) => !validateUser(people[prefix])) ||
               Object.keys(people).length === 3
                 ? 'text.disabled'
@@ -194,7 +194,7 @@ export function OnboardingStep3({ forward, back }: StepperStepComponentProps) {
           disabled:
             objectIsEmpty(people) ||
             Object.keys(people)
-              .filter((prefix) => 'admin' !== prefix)
+              .filter((prefix) => 'LEGAL' !== prefix)
               .some((prefix) => !validateUser(people[prefix])),
         }}
       />

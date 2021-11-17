@@ -64,9 +64,9 @@ export type IPACatalogParty = {
 /*
  * Platform user and party
  */
-export type UserStatus = 'active' | 'suspended';
-export type UserRole = 'Manager' | 'Delegate' | 'Operator';
-export type UserPlatformRole = 'admin' | 'security' | 'api';
+export type UserStatus = 'ACTIVE' | 'SUSPENDED';
+export type UserRole = 'MANAGER' | 'DELEGATE' | 'OPERATOR';
+export type UserPlatformRole = 'ADMIN' | 'TECH_REF' | 'ADMIN_REF';
 
 export type UserOnCreate = {
   name: string;
@@ -87,7 +87,7 @@ export type User = {
 };
 
 export type Party = {
-  status: 'Pending' | 'Active';
+  state: 'PENDING' | 'ACTIVE';
   description: string;
   institutionId: string;
   digitalAddress: string;
@@ -123,7 +123,7 @@ export interface InstitutionInfo {
   institutionId: string;
   description: string;
   digitalAddress: string;
-  status: string;
+  state: string;
   role: string;
   platformRole: string;
   attributes: Array<string>;
