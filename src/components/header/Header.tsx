@@ -19,7 +19,7 @@ const Header = ({
   <Fragment>
     <AppBar
       position="relative"
-      sx={{ alignItems: 'center', height: '48px', backgroundColor: '#0059B2' }}
+      sx={{ alignItems: 'center', height: '48px', backgroundColor: 'primary.dark' }}
     >
       <Toolbar sx={{ width: { xs: '100%', lg: '90%', minHeight: '48px !important' } }}>
         <SvgIcon component={logo} viewBox="0 0 80 24" sx={{ width: '80px' }} />

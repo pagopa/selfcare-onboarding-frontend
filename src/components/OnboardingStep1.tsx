@@ -6,7 +6,6 @@ import { AsyncAutocomplete } from './AsyncAutocomplete';
 import { useHistoryState } from './useHistoryState';
 
 export function OnboardingStep1({ forward }: StepperStepComponentProps) {
-  
   const [selected, setSelected, setSelectedHistory] = useHistoryState<IPACatalogParty | null>(
     'selected_step1',
     null
@@ -28,7 +27,7 @@ export function OnboardingStep1({ forward }: StepperStepComponentProps) {
     >
       <Grid container item justifyContent="center">
         <Grid item xs={4}>
-          <Typography variant="h3" component="h2" sx={{ color: '#17324D' }} align="center">
+          <Typography variant="h3" component="h2" align="center">
             {bodyTitle}
           </Typography>
         </Grid>
@@ -71,9 +70,13 @@ export function OnboardingStep1({ forward }: StepperStepComponentProps) {
                 textAlign: 'center',
                 color: 'text.primary',
               }}
+              variant="body2"
             >
-              Non trovi il tuo ente nell’indice IPA? <Link href="https://indicepa.gov.it/ipa-portale/servizi-enti/accreditamento-ente">Clicca qui</Link> per maggiori
-              informazioni e istruzioni per essere inclusi nell’indice delle Pubbliche
+              Non trovi il tuo ente nell’indice IPA?
+              <Link href="https://indicepa.gov.it/ipa-portale/servizi-enti/accreditamento-ente">
+                Clicca qui
+              </Link>
+              per maggiori informazioni e istruzioni per essere inclusi nell’indice delle Pubbliche
               Amministrazioni
             </Typography>
           </Box>

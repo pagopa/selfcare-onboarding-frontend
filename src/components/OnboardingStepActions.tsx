@@ -16,16 +16,20 @@ export function OnboardingStepActions({ forward, back }: ActionStepsProps) {
     <Grid container justifyContent="center">
       {back && (
         <Grid item xs={2} pr={2}>
-          <Button sx={{width:'100%'}} color="primary" variant="outlined" onClick={back.action} disabled={back.disabled}>
+          <Button
+            sx={{ width: '100%' }}
+            variant="outlined"
+            onClick={back.action}
+            disabled={back.disabled}
+          >
             {back.label}
           </Button>
         </Grid>
       )}
       {forward && (
-        <Grid item xs={2} >
+        <Grid item xs={2}>
           <Button
-            sx={{width:'100%'}}
-            color="primary"
+            sx={{ width: '100%' }}
             variant="contained"
             onClick={forward.action}
             disabled={forward.disabled}

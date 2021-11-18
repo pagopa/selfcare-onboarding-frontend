@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { CssBaseline, ThemeProvider } from '@mui/material';
+import theme from '@pagopa/mui-italia/theme';
 import { Party, User } from '../types';
 import { BodyLogger } from './components/BodyLogger';
 import { PartyContext, UserContext } from './lib/context';
-import theme from './theme';
 
 export default function App() {
   const [user, setUser] = useState<User | null>(null);

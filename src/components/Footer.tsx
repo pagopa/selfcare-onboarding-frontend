@@ -37,7 +37,7 @@ const Footer = () => (
     <Grid container alignItems={'center'} justifyContent={'center'}>
       <Box sx={{ width: '90%', display: 'flex' }}>
         <Typography
-          style={{
+          sx={{
             fontWeight: 'normal',
             fontSize: '15px',
             lineHeight: '15px',
@@ -49,14 +49,22 @@ const Footer = () => (
           <Link
             href="https://www.pagopa.gov.it/it/privacy-policy/"
             underline="none"
-            sx={{ marginRight: '10px', color: 'text.disabled' }}
+            sx={{
+              marginRight: '10px',
+              color: '#9BB7CB !important',
+              textDecoration: 'none !important',
+            }}
           >
             {'Privacy Policy '}{' '}
           </Link>
           <Link
             href="https://pagopa.portaleamministrazionetrasparente.it/"
             underline="none"
-            sx={{ margin: '10px', color: 'text.disabled' }}
+            sx={{
+              margin: '10px',
+              color: '#9BB7CB !important',
+              textDecoration: 'none !important',
+            }}
           >
             {'Società Trasparente '}{' '}
           </Link>
