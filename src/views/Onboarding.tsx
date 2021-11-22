@@ -162,7 +162,7 @@ function OnboardingComponent() {
       title: '',
       description: [
         <Grid container direction="column" key="0">
-          <Grid container item justifyContent="center" mt={5}>
+          <Grid container item justifyContent="center">
             <Grid item xs={5}>
               <Typography variant="h2">Spiacenti, qualcosa è andato storto.</Typography>
             </Grid>

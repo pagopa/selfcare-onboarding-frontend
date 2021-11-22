@@ -79,8 +79,7 @@ export default function RejectRegistration() {
       title: '',
       description: [
         <Grid container direction="column" key="0" style={{ textAlign: 'center' }}>
-          <Grid container item justifyContent="center" mt={5}></Grid>
-          <Grid container item justifyContent="center" mt={5}>
+          <Grid container item justifyContent="center">
             <Grid item xs={6}>
               <Typography variant="h2">Spiacenti, qualcosa è andato storto.</Typography>
             </Grid>
