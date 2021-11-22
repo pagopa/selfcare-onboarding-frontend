@@ -80,7 +80,7 @@ export function OnboardingStep3({ forward, back }: StepperStepComponentProps) {
     >
       <Grid container item justifyContent="center">
         <Grid item xs={6}>
-          <Typography variant="h3" component="h2" sx={{ color: '#17324D' }} align="center">
+          <Typography variant="h3" component="h2" align="center">
             {bodyTitle}
           </Typography>
         </Grid>
@@ -157,34 +157,33 @@ export function OnboardingStep3({ forward, back }: StepperStepComponentProps) {
 
       {/* <Box sx={{ textAlign: 'center' }} > */}
 
-      <Grid container item  my={4} display='flex' justifyContent="center">
-      <Grid item xs={3} sx={{display: 'flex', justifyContent: 'center'}}>
-        {Object.keys(people).length !== 3 && (
-          <Link
-            component="button"
-            disabled={
-              objectIsEmpty(people) ||
-              Object.keys(people)
-                .filter((prefix) => 'LEGAL' !== prefix)
-                .some((prefix) => !validateUser(people[prefix])) ||
-              Object.keys(people).length === 3
-            }
-            underline="none"
-            color={
-              objectIsEmpty(people) ||
-              Object.keys(people)
-                .filter((prefix) => 'LEGAL' !== prefix)
-                .some((prefix) => !validateUser(people[prefix])) ||
-              Object.keys(people).length === 3
-                ? 'text.disabled'
-                : 'primary'
-            }
-            onClick={addDelegateForm}
-          >
-            Aggiungi un nuovo Referente
-          </Link>
-        )}
-      </Grid>
+      <Grid container item my={4} display="flex" justifyContent="center">
+        <Grid item xs={3} sx={{ display: 'flex', justifyContent: 'center' }}>
+          {Object.keys(people).length !== 3 && (
+            <Link
+              component="button"
+              disabled={
+                objectIsEmpty(people) ||
+                Object.keys(people)
+                  .filter((prefix) => 'LEGAL' !== prefix)
+                  .some((prefix) => !validateUser(people[prefix])) ||
+                Object.keys(people).length === 3
+              }
+              color={
+                objectIsEmpty(people) ||
+                Object.keys(people)
+                  .filter((prefix) => 'LEGAL' !== prefix)
+                  .some((prefix) => !validateUser(people[prefix])) ||
+                Object.keys(people).length === 3
+                  ? 'text.disabled'
+                  : 'primary'
+              }
+              onClick={addDelegateForm}
+            >
+              Aggiungi un nuovo Referente
+            </Link>
+          )}
+        </Grid>
       </Grid>
       <OnboardingStepActions
         back={{ action: onBackAction, label: 'Indietro', disabled: false }}

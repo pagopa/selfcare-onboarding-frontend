@@ -9,6 +9,7 @@
     "@fontsource/titillium-web": "^4.5.0",
     "@mui/icons-material": "^5.0.3",
     "@mui/material": "^5.0.3",
+    "@pagopa/mui-italia": "pagopa/mui-italia",
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^11.2.7",
     "@testing-library/user-event": "^12.8.3",
@@ -73,7 +74,7 @@
     "prettier": "^2.4.1"
   },
   "jest": {
-    "coveragePathIgnorePatterns" : [
+    "coveragePathIgnorePatterns": [
       "src/index.tsx",
       "src/reportWebVitals.ts",
       "src/utils/constants.ts"

@@ -33,7 +33,6 @@ export const StyledIntro: FunctionComponent<StyledIntroProps> = ({ children, pri
         fontSize: '32px',
         lineHeight: '48px',
         textAlign: 'center',
-        color: '#17324D',
       }}
       variant={priorityToTag(priority)}
       align="center"
@@ -46,7 +45,6 @@ export const StyledIntro: FunctionComponent<StyledIntroProps> = ({ children, pri
           fontSize: '16px',
           lineHeight: '24px',
           textAlign: 'center',
-          color: '#17324D',
         }}
         align="center"
       >

@@ -1,9 +1,7 @@
 import { useState } from 'react';
-import { CssBaseline, ThemeProvider } from '@mui/material';
 import { Party, User } from '../types';
 import { BodyLogger } from './components/BodyLogger';
 import { PartyContext, UserContext } from './lib/context';
-import theme from './theme';
 
 export default function App() {
   const [user, setUser] = useState<User | null>(null);
@@ -13,10 +11,7 @@ export default function App() {
   return (
     <UserContext.Provider value={{ user, setUser }}>
       <PartyContext.Provider value={{ party, availableParties, setParty, setAvailableParties }}>
-        <ThemeProvider theme={theme}>
-          <CssBaseline />
-          <BodyLogger />
-        </ThemeProvider>
+        <BodyLogger />
       </PartyContext.Provider>
     </UserContext.Provider>
   );

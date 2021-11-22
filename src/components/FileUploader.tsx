@@ -90,7 +90,7 @@ export function FileUploader({
         <Grid container direction="column" alignItems={'start'} sx={{ width: 'auto', ml: '27px' }}>
           <Typography
             sx={{
-              color: '#17324D',
+              color: 'text.primary',
               lineHeight: '36,5px',
             }}
             variant={'h4'}
