@@ -168,10 +168,11 @@ function CompleteRegistrationComponent() {
         <Grid container item justifyContent="center" mb={7} mt={1}>
           <Grid item xs={6}>
           {/* TODO: text TBD  */}
-            <Typography>
+            <Typography sx={{lineHeight: '1.5'}}>
               A causa di un errore del sistema non è possibile completare la procedura.
+              <br />
+              Ti chiediamo di riprovare più tardi.
             </Typography>
-            <Typography>Ti chiediamo di riprovare più tardi.</Typography>
           </Grid>
         </Grid>
         <Grid container item justifyContent="center">

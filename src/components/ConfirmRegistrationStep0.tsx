@@ -23,7 +23,7 @@ export function ConfirmRegistrationStep0({ forward }: StepperStepComponentProps)
             </Typography>
           </Grid>
           <Grid item xs={4} mt={3}>
-            <Typography color="textPrimary" variant={'body1'} align="left">
+            <Typography color="textPrimary" variant={'body1'} align="left" sx={{lineHeight: '1.5'}}>
               {
                 "Segui le istruzioni per inviare il documento firmato, servirà a completare l'inserimento del tuo Ente nel portale Self Care."
               }

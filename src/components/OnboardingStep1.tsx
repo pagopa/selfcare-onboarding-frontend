@@ -66,7 +66,7 @@ export function OnboardingStep1({ forward }: StepperStepComponentProps) {
             <Typography
               sx={{
                 fontSize: '14px',
-                lineHeight: '24px',
+                lineHeight: '1.5',
                 textAlign: 'center',
                 color: 'text.primary',
               }}
