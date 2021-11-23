@@ -1,7 +1,6 @@
 import { Grid, Paper, TextField } from '@mui/material';
 import React from 'react';
 import { styled } from '@mui/material/styles';
-// import theme from '@pagopa/mui-italia/theme';
 import { UserOnCreate, UserPlatformRole, UserRole } from '../../types';
 import { UsersObject } from './OnboardingStep2';
 
