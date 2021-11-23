@@ -1,9 +1,16 @@
 import { Grid, Paper, TextField } from '@mui/material';
 import React from 'react';
-// import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-// import { Tooltip } from '@mui/material';
+import { styled } from '@mui/material/styles';
+// import theme from '@pagopa/mui-italia/theme';
 import { UserOnCreate, UserPlatformRole, UserRole } from '../../types';
 import { UsersObject } from './OnboardingStep2';
+
+const CustomTextField = styled(TextField)({
+  '& .MuiFormHelperText-root':{
+    color: '#5C6F82',
+  },
+});
+
 type PlatformUserFormProps = {
   prefix: keyof UsersObject;
   role: UserRole;
@@ -77,13 +84,14 @@ export function PlatformUserForm({
   const errors: Array<string> = people[prefix] ? validateNoMandatory(people[prefix]) : [];
 
   return (
+
     <Paper elevation={0} sx={{ py:4, px:6 }} >
       <Grid container spacing={2}>
         {fields.map(({ id, label, type = 'text', width = 6, message, helperMessage}) => {
           const isError= errors.indexOf(id) > -1;
           return (
           <Grid item key={id} xs={width} mb={5}>
-            <TextField
+            <CustomTextField
               id={`${prefix}-${id}`}
               variant="standard"
               label={
