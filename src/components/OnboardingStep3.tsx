@@ -98,10 +98,14 @@ export function OnboardingStep3({ forward, back }: StepperStepComponentProps) {
       </Grid>
 
       <Grid container item justifyContent="center" mt={2}>
-        <Grid item xs={4}>
+        <Grid item xs={4} display="flex" justifyContent="center">
           <FormControlLabel
             control={<Checkbox checked={isAuthUser} onChange={handleAuthUser} />}
-            label="Sono io il Referente Amministrativo"
+            label={
+              <Typography sx={{ fontSize: '16px', lineHeight: '20px', fontWeight: 600 }}>
+                Sono io il Referente Amministrativo
+              </Typography>
+            }
             sx={{ alignSelf: 'center' }}
           />
         </Grid>
@@ -126,7 +130,7 @@ export function OnboardingStep3({ forward, back }: StepperStepComponentProps) {
                     title: 'Aggiungi un nuovo Referente Amministrativo',
                   }}
                 </StyledIntro> */}
-            <Grid item xs={10} justifyContent="center" my={5}>
+            <Grid item xs={10} justifyContent="center" mt={6} mb={3}>
               <Typography align="center" variant="h4">
                 Aggiungi un nuovo Referente Amministrativo
               </Typography>
@@ -179,6 +183,11 @@ export function OnboardingStep3({ forward, back }: StepperStepComponentProps) {
                   : 'primary'
               }
               onClick={addDelegateForm}
+              sx={{
+                fontSize: 'htmlFontSize',
+                lineHeight: '24px',
+                fontFamily: '"Titillium Web", "sans-serif"',
+              }}
             >
               Aggiungi un nuovo Referente
             </Link>
