@@ -89,8 +89,9 @@ export default function RejectRegistration() {
               {/* TODO: text TBD  */}
               <Typography>
                 A causa di un errore del sistema non è possibile completare la procedura.
+                <br />
+                Ti chiediamo di riprovare più tardi.EE
               </Typography>
-              <Typography>Ti chiediamo di riprovare più tardi.</Typography>
             </Grid>
           </Grid>
           <Grid container item justifyContent="center">

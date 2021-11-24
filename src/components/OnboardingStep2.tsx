@@ -49,8 +49,7 @@ export function OnboardingStep2({ forward, back }: StepperStepComponentProps) {
         <Grid item xs={6}>
           <Typography variant="subtitle2" component="h2" align="center">
             {bodyDescription1}
-          </Typography>
-          <Typography variant="subtitle2" component="h2" align="center">
+            <br />
             {bodyDescription2}
           </Typography>
         </Grid>

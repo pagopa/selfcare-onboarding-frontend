@@ -86,8 +86,8 @@ const genericError: RequestOutcomeMessage = {
         <Grid item xs={6}>
           <Typography>
             A causa di un errore del sistema non è possibile completare la procedura.
-          </Typography>
-          <Typography>Ti chiediamo di riprovare più tardi.</Typography>
+            <br />
+            Ti chiediamo di riprovare più tardi.</Typography>
         </Grid>
       </Grid>
       <Grid container item justifyContent="center">
