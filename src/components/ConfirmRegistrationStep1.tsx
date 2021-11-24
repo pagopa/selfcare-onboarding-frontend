@@ -46,8 +46,7 @@ export function ConfirmRegistrationStep1(
               <Typography
                 color="textPrimary"
                 sx={{
-                  mt: 3,
-                  lineHeight:'1.5'
+                  mt: 3
                 }}
                 variant={'body2'}
                 align="left"

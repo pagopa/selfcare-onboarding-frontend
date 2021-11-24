@@ -47,7 +47,7 @@ export function OnboardingStep2({ forward, back }: StepperStepComponentProps) {
 
       <Grid container item justifyContent="center" mt={2}>
         <Grid item xs={6}>
-          <Typography variant="subtitle2" component="h2" align="center" sx={{lineHeight:'1.5'}}>
+          <Typography variant="subtitle2" component="h2" align="center">
             {bodyDescription1}
             <br />
             {bodyDescription2}

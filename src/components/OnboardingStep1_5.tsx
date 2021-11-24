@@ -56,7 +56,7 @@ const alreadyOnboarded: RequestOutcomeMessage = {
       </Grid>
       <Grid container item justifyContent="center" mb={7} mt={1}>
         <Grid item xs={7} mt={2}>
-          <Typography variant="body2" sx={{lineHeight: '1.5'}}>
+          <Typography variant="body2">
             <Typography variant="body2">
               Gli attuali Referenti non sono più disponibili e hai la necessità di gestire i
               prodotti?
@@ -84,10 +84,10 @@ const genericError: RequestOutcomeMessage = {
       </Grid>
       <Grid container item justifyContent="center" mb={7} mt={1}>
         <Grid item xs={6}>
-          <Typography sx={{lineHeight: '1.5'}}>
+          <Typography>
             A causa di un errore del sistema non è possibile completare la procedura.
-          </Typography >
-          <Typography sx={{lineHeight: '1.5'}}>Ti chiediamo di riprovare più tardi.</Typography>
+            <br />
+            Ti chiediamo di riprovare più tardi.</Typography>
         </Grid>
       </Grid>
       <Grid container item justifyContent="center">

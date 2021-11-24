@@ -138,7 +138,7 @@ function OnboardingComponent() {
       title: 'La tua richiesta è stata inviata con successo',
       description: [
         <Stack key="0" spacing={10}>
-          <Typography sx={{lineHeight:'1.5'}}>
+          <Typography>
             Riceverai una PEC all’indirizzo istituzionale dell’Ente.
             <br />
             Al suo interno troverai le istruzioni per confermare i dati e ottenere l’autorizzazione.
@@ -169,10 +169,10 @@ function OnboardingComponent() {
           </Grid>
           <Grid container item justifyContent="center" mb={7} mt={1}>
             <Grid item xs={5}>
-              <Typography sx={{lineHeight: '1.5'}}>
+              <Typography>
                 A causa di un errore del sistema non è possibile completare la procedura.
-              </Typography>
-              <Typography sx={{lineHeight: '1.5'}}>Ti chiediamo di riprovare più tardi.</Typography>
+                <br />
+                Ti chiediamo di riprovare più tardi.</Typography>
             </Grid>
           </Grid>
           <Grid container item justifyContent="center">
