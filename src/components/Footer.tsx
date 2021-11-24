@@ -47,7 +47,7 @@ const Footer = () => (
           component="div"
         >
           <Link
-            href="https://www.pagopa.gov.it/it/privacy-policy/"
+            href="https://www.pagopa.it/it/privacy-policy/"
             underline="none"
             sx={{
               marginRight: '10px',
@@ -58,7 +58,7 @@ const Footer = () => (
             {'Privacy Policy '}{' '}
           </Link>
           <Link
-            href="https://pagopa.portaleamministrazionetrasparente.it/"
+            href="https://www.pagopa.it/it/termini-e-condizioni-di-utilizzo-del-sito/"
             underline="none"
             sx={{
               margin: '10px',
@@ -66,7 +66,29 @@ const Footer = () => (
               textDecoration: 'none !important',
             }}
           >
-            {'Società Trasparente '}{' '}
+            {'Termini e condizioni d’uso del sito'}{' '}
+          </Link>
+          <Link
+            href="https://www.pagopa.it/static/781646994f1f8ddad2d95af3aaedac3d/Sicurezza-delle-informazioni_PagoPA-S.p.A..pdft"
+            underline="none"
+            sx={{
+              marginRight: '10px',
+              color: '#9BB7CB !important',
+              textDecoration: 'none !important',
+            }}
+          >
+            {'Sicurezza delle informazioni'}{' '}
+          </Link>
+          <Link
+            href="mailto:user@domain.com"
+            underline="none"
+            sx={{
+              margin: '10px',
+              color: '#9BB7CB !important',
+              textDecoration: 'none !important',
+            }}
+          >
+            {'Assistenza'}{' '}
           </Link>
         </Typography>
       </Box>
