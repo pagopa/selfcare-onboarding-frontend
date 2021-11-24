@@ -72,7 +72,7 @@ export function OnboardingStep1({ forward }: StepperStepComponentProps) {
               }}
               variant="body2"
             >
-              {'Non trovi il tuo ente nell’indice IPA?'} {''}
+              {'Non trovi il tuo ente nell’indice IPA?'}
               <Link href="https://indicepa.gov.it/ipa-portale/servizi-enti/accreditamento-ente">
                 Clicca qui
               </Link>
