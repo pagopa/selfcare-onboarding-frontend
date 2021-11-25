@@ -1,12 +1,12 @@
 import { Box, Grid, Link, SvgIcon, Typography } from '@mui/material';
 import { ReactComponent as logo } from '../assets/logo_pago_pa.svg';
-
+import { PAGOPA_HELP_EMAIL } from '../utils/constants';
 const Footer = () => (
   <Box
     component="footer"
     sx={{
       pt: '32px',
-      // mt: 'auto',
+      mt: 'auto',
       height: '156px',
       bgcolor: '#01254C',
       alignItems: 'center',
@@ -55,7 +55,7 @@ const Footer = () => (
               textDecoration: 'none !important',
             }}
           >
-            {'Privacy Policy '}{' '}
+            {'Privacy Policy '}
           </Link>
           <Link
             href="https://www.pagopa.it/it/termini-e-condizioni-di-utilizzo-del-sito/"
@@ -66,7 +66,7 @@ const Footer = () => (
               textDecoration: 'none !important',
             }}
           >
-            {'Termini e condizioni d’uso del sito'}{' '}
+            {'Termini e condizioni d’uso del sito '}
           </Link>
           <Link
             href="https://www.pagopa.it/static/781646994f1f8ddad2d95af3aaedac3d/Sicurezza-delle-informazioni_PagoPA-S.p.A..pdft"
@@ -77,10 +77,10 @@ const Footer = () => (
               textDecoration: 'none !important',
             }}
           >
-            {'Sicurezza delle informazioni'}{' '}
+            {'Sicurezza delle informazioni '}
           </Link>
           <Link
-            href="mailto:user@domain.com"
+            href={`mailto:${PAGOPA_HELP_EMAIL}`}
             underline="none"
             sx={{
               margin: '10px',
@@ -88,7 +88,7 @@ const Footer = () => (
               textDecoration: 'none !important',
             }}
           >
-            {'Assistenza'}{' '}
+            {'Assistenza '}
           </Link>
         </Typography>
       </Box>
