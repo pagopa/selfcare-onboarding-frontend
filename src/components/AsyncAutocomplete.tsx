@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import debounce from 'lodash/debounce';
-import { AxiosResponse } from 'axios';
+import { AxiosError, AxiosResponse } from 'axios';
 import { Autocomplete, TextField } from '@mui/material';
 import { Box } from '@mui/system';
 import { Endpoint } from '../../types';
@@ -41,7 +41,10 @@ export function AsyncAutocomplete({
 
     if (outcome === 'success') {
       setOptions(transformFn((searchResponse as AxiosResponse).data));
+    } else if ((searchResponse as AxiosError).response?.status === 404) {
+      setOptions([]);
     }
+
     setIsLoading(false);
   };
 
@@ -85,7 +88,7 @@ export function AsyncAutocomplete({
               lineHeight: '24px',
               color: '#C1C9D2',
               textAlign: 'start',
-              paddingLeft:'16px'
+              paddingLeft: '16px',
             },
             ...params.inputProps,
           }}
