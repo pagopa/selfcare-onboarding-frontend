@@ -23,6 +23,8 @@ export const URL_API_PARTY_REGISTRY_PROXY: string =
   process.env.REACT_APP_URL_API_PARTY_REGISTRY_PROXY;
 export const URL_API_PARTY_MANAGEMENT: string = process.env.REACT_APP_URL_API_PARTY_MANAGEMENT;
 
+export const PAGOPA_HELP_EMAIL = process.env.REACT_APP_PAGOPA_HELP_EMAIL;
+
 export const ROUTES: RoutesObject = {
   ONBOARDING: {
     PATH: `${BASE_ROUTE}`,
