@@ -29,6 +29,7 @@ variables:
     react_app_url_fe_login: '$(UAT_REACT_APP_URL_FE_LOGIN)/login'
     react_app_url_fe_logout: '$(UAT_REACT_APP_URL_FE_LOGIN)/logout'
     react_app_url_fe_dashboard: '$(UAT_REACT_APP_URL_FE_DASHBOARD)'
+    react_app_url_fe_landing: '$(UAT_REACT_APP_URL_FE_LANDING)'
     react_app_url_api_party_process: '$(UAT_REACT_APP_URL_API_PARTY_PROCESS)'
     react_app_url_api_party_registry_proxy: '$(UAT_REACT_APP_URL_API_PARTY_REGISTRY_PROXY)'
     react_app_url_api_party_management: '$(UAT_REACT_APP_URL_API_PARTY_MANAGEMENT)'
@@ -44,6 +45,7 @@ variables:
     react_app_url_fe_login: '$(PROD_REACT_APP_URL_FE_LOGIN)/login'
     react_app_url_fe_logout: '$(PROD_REACT_APP_URL_FE_LOGIN)/logout'
     react_app_url_fe_dashboard: '$(PROD_REACT_APP_URL_FE_DASHBOARD)'
+    react_app_url_fe_landing: '$(PROD_REACT_APP_URL_FE_LANDING)'
     react_app_url_api_party_process: '$(PROD_REACT_APP_URL_API_PARTY_PROCESS)'
     react_app_url_api_party_registry_proxy: '$(PROD_REACT_APP_URL_API_PARTY_REGISTRY_PROXY)'
     react_app_url_api_party_management: '$(PROD_REACT_APP_URL_API_PARTY_MANAGEMENT)'
@@ -61,9 +63,10 @@ variables:
     react_app_url_fe_login: '$(DEV_REACT_APP_URL_FE_LOGIN)/login'
     react_app_url_fe_logout: '$(DEV_REACT_APP_URL_FE_LOGIN)/logout'
     react_app_url_fe_dashboard: '$(DEV_REACT_APP_URL_FE_DASHBOARD)'
-    react_app_url_api_party_process: '$(DEV_REACT_APP_URL_API_PARTY_PROCESS)'
-    react_app_url_api_party_registry_proxy: '$(DEV_REACT_APP_URL_API_PARTY_REGISTRY_PROXY)'
-    react_app_url_api_party_management: '$(DEV_REACT_APP_URL_API_PARTY_MANAGEMENT)'
+    react_app_url_fe_landing: '$(DEV_REACT_APP_URL_FE_LANDING)'
+    react_app_url_api_party_process: 'https://selc-d-apim.azure-api.net/party-process/v1' # TODO restore me '$(DEV_REACT_APP_URL_API_PARTY_PROCESS)'
+    react_app_url_api_party_registry_proxy: 'https://selc-d-apim.azure-api.net/party-registry-proxy/v1' # TODO restore me '$(DEV_REACT_APP_URL_API_PARTY_REGISTRY_PROXY)'
+    react_app_url_api_party_management: 'https://selc-d-apim.azure-api.net/party-management/v1' # TODO restore me '$(DEV_REACT_APP_URL_API_PARTY_MANAGEMENT)'
 
 # Automatically triggered on PR
 # https://docs.microsoft.com/en-us/azure/devops/pipelines/yaml-schema?view=azure-devops&tabs=schema%2Cparameter-schema#pr-trigger
@@ -139,6 +142,7 @@ stages:
               REACT_APP_URL_FE_LOGIN: '$(react_app_url_fe_login)/login'
               REACT_APP_URL_FE_LOGOUT: '$(react_app_url_fe_login)/logout'
               REACT_APP_URL_FE_DASHBOARD: '$(react_app_url_fe_dashboard)'
+              REACT_APP_URL_FE_LANDING: '$(react_app_url_fe_landing)'
               REACT_APP_URL_API_PARTY_PROCESS: '$(react_app_url_api_party_process)'
               REACT_APP_URL_API_PARTY_REGISTRY_PROXY: '$(react_app_url_api_party_registry_proxy)'
               REACT_APP_URL_API_PARTY_MANAGEMENT: '$(react_app_url_api_party_management)'
