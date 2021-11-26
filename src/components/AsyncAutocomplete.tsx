@@ -34,7 +34,7 @@ export function AsyncAutocomplete({
 
     const searchResponse = await fetchWithLogs(endpoint, {
       method: 'GET',
-      params: { limit: 100, page: 1, search: query },
+      params: { limit: process.env.REACT_APP_MAX_INSTITUTIONS_FETCH, page: 1, search: query },
     });
 
     const outcome = getFetchOutcome(searchResponse);
@@ -99,9 +99,6 @@ export function AsyncAutocomplete({
       getOptionLabel={getOptionLabel}
       renderOption={(props, option) => (
         <li {...props}>
-          {/* <Box sx={{ width: 50 }}>
-            <img src={logo}></img>
-          </Box> */}
           <Box
             sx={{
               fontFamily: 'Titillium Web',
