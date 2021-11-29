@@ -26,11 +26,17 @@ export function BodyLogger() {
         minHeight: '100vh',
       }}
     >
-    <HeaderContext.Provider value={{ subHeaderVisible , setSubHeaderVisible , onLogout, setOnLogout}}>
-        <Header withSecondHeader={subHeaderVisible} onExitAction={onLogout} />
+      <HeaderContext.Provider
+        value={{ subHeaderVisible, setSubHeaderVisible, onLogout, setOnLogout }}
+      >
+        <Box mb={16}>
+          <Header withSecondHeader={subHeaderVisible} onExitAction={onLogout} />
+        </Box>
         <Main />
-        <Footer />
-    </ HeaderContext.Provider>
+        <Box mt={16}>
+          <Footer />
+        </Box>
+      </HeaderContext.Provider>
     </Box>
   );
 }

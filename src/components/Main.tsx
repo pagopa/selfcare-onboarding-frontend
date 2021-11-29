@@ -6,7 +6,6 @@ export function Main() {
   return (
     <Box component="main" 
     m={'auto 0'} 
-    py={16}
     >
       <Switch>
         {Object.values(ROUTES).map(({ PATH, EXACT, COMPONENT: Component }, i) => (

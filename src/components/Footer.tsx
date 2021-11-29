@@ -6,10 +6,11 @@ const Footer = () => (
     component="footer"
     sx={{
       pt: '32px',
-      mt: 'auto',
       height: '156px',
+      mt: 'auto',
       bgcolor: '#01254C',
       alignItems: 'center',
+      boxSizing:'unset'
     }}
   >
     <Grid container justifyContent={'center'} alignItems={'center'}>
