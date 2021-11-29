@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { Box } from '@mui/system';
 import { logAction } from '../lib/action-log';
 import Header from './header/Header';
-import Footer from './Footer';
+import Footer from './footer/Footer';
 import { Main } from './Main';
 import { HeaderContext } from './../lib/context';
 
@@ -29,9 +29,7 @@ export function BodyLogger() {
       <HeaderContext.Provider
         value={{ subHeaderVisible, setSubHeaderVisible, onLogout, setOnLogout }}
       >
-        <Box mb={16}>
-          <Header withSecondHeader={subHeaderVisible} onExitAction={onLogout} />
-        </Box>
+        <Header withSecondHeader={subHeaderVisible} onExitAction={onLogout} />
         <Main />
         <Box mt={16}>
           <Footer />
