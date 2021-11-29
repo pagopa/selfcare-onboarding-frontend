@@ -1,21 +1,23 @@
 import { Box, Grid, Link, SvgIcon, Typography } from '@mui/material';
-import { ReactComponent as logo } from '../assets/logo_pago_pa.svg';
-import { PAGOPA_HELP_EMAIL } from '../utils/constants';
+import { ReactComponent as logo } from '../../assets/logo_pago_pa.svg';
+import { PAGOPA_HELP_EMAIL } from '../../utils/constants';
 const Footer = () => (
   <Box
     component="footer"
     sx={{
       pt: '32px',
-      mt: 'auto',
       height: '156px',
+      mt: 'auto',
       bgcolor: '#01254C',
       alignItems: 'center',
+      boxSizing:'unset',
+      position: 'relative'
     }}
   >
     <Grid container justifyContent={'center'} alignItems={'center'}>
       <Box sx={{ width: '90%', display: 'flex' }}>
-        <SvgIcon component={logo} viewBox="0 0 120 33" sx={{ width: '119px' }} />
-        <Box sx={{ textAlign: 'end', flexGrow: 1 }}>
+        <SvgIcon component={logo} viewBox="0 0 140 33" sx={{ width: '119px' }} />
+        <Box sx={{ textAlign: 'end', flexGrow: 1 }} pl={8}>
           <Typography
             component="div"
             sx={{
@@ -24,17 +26,18 @@ const Footer = () => (
               lineHeight: '22,82px',
               textAlign: 'left',
               color: 'background.default',
-              paddingLeft: '30px',
+              paddingLeft: '0px',
             }}
           >
             PagoPA S.p.A. - società per azioni con socio unico - capitale sociale di euro 1,000,000
-            interamente versato - sede legale in Roma, Piazza Colonna 370, CAP 00187 - n. di
-            iscrizione a Registro Imprese di Roma, CF e P.IVA 15376371009
+            interamente versato - sede legale in Roma, Piazza Colonna 370, CAP 00187 - 
+            <br />
+            n. di iscrizione a Registro Imprese di Roma, CF e P.IVA 15376371009
           </Typography>
         </Box>
       </Box>
     </Grid>
-    <Grid container alignItems={'center'} justifyContent={'center'}>
+    <Grid container alignItems={'center'} justifyContent={'center'} sx={{position:'absolute', bottom:'48px'}}>
       <Box sx={{ width: '90%', display: 'flex' }}>
         <Typography
           sx={{
@@ -42,7 +45,7 @@ const Footer = () => (
             fontSize: '15px',
             lineHeight: '15px',
             textAlign: 'left',
-            padding: '27px 0px',
+            padding: '0px',
           }}
           component="div"
         >
