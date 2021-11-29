@@ -4,9 +4,7 @@ import { BASE_ROUTE, ROUTES } from '../utils/constants';
 
 export function Main() {
   return (
-    <Box component="main" 
-    m={'auto 0'} 
-    >
+    <Box component="main" m={'auto 0'} pt={16}>
       <Switch>
         {Object.values(ROUTES).map(({ PATH, EXACT, COMPONENT: Component }, i) => (
           <Route path={PATH} exact={EXACT} key={i}>
