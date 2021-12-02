@@ -65,8 +65,8 @@ export type IPACatalogParty = {
  * Platform user and party
  */
 export type UserStatus = 'ACTIVE' | 'SUSPENDED';
-export type UserRole = 'MANAGER' | 'DELEGATE' | 'OPERATOR';
-export type UserPlatformRole = 'ADMIN' | 'TECH_REF' | 'ADMIN_REF';
+export type PartyRole = 'MANAGER' | 'DELEGATE' | 'SUB_DELEGATE' | 'OPERATOR';
+export type UserProductRole = 'ADMIN' | 'LIMITED';
 
 export type UserOnCreate = {
   name: string;
@@ -74,8 +74,8 @@ export type UserOnCreate = {
   taxCode: string; // This should not be optional, it is temporarily because of the "from" below
   from?: string; // This is temporary, part of the API shared with self-care
   email: string;
-  role: UserRole;
-  platformRole: UserPlatformRole;
+  role: PartyRole;
+  productRole: UserProductRole;
 };
 
 export type User = {
@@ -86,21 +86,6 @@ export type User = {
   email: string;
 };
 
-export type Party = {
-  state: 'PENDING' | 'ACTIVE';
-  description: string;
-  institutionId: string;
-  digitalAddress: string;
-  role: UserRole;
-  platformRole: UserPlatformRole;
-  partyId?: string;
-  attributes: Array<string>;
-};
-
-export type DocUpload = {
-  files: Array<File>;
-};
-
 export type AlertDialogActions = {
   setDialogTitle: (t: string) => void;
   setDialogDescription: (t: string) => void;
@@ -108,9 +93,9 @@ export type AlertDialogActions = {
   handleCloseDialog?: (t: any) => void;
 };
 
-export interface OnBoardingInfo {
+export interface OnboardingInfo {
   person: PersonInfo;
-  institutions: Array<InstitutionInfo>;
+  institutions: Array<OnboardingData>;
 }
 
 export interface PersonInfo {
@@ -119,12 +104,25 @@ export interface PersonInfo {
   taxCode: string;
 }
 
-export interface InstitutionInfo {
+export interface OnboardingData {
   institutionId: string;
   description: string;
+  taxCode: string;
   digitalAddress: string;
-  state: string;
-  role: string;
-  platformRole: string;
-  attributes: Array<string>;
+  state: UserStatus;
+  role: PartyRole;
+  productInfo: ProductInfo;
+  attributes: Array<Attribute>;
+}
+
+export interface ProductInfo {
+  id: string;
+  role: UserProductRole;
+  createdAt: Date;
+}
+
+export interface Attribute {
+  id: string;
+  name: string;
+  description: string;
 }

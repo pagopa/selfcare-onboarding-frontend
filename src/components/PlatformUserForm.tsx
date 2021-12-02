@@ -1,19 +1,19 @@
 import { Grid, Paper, TextField } from '@mui/material';
 import React from 'react';
 import { styled } from '@mui/material/styles';
-import { UserOnCreate, UserPlatformRole, UserRole } from '../../types';
+import { UserOnCreate, UserProductRole, PartyRole } from '../../types';
 import { UsersObject } from './OnboardingStep2';
 
 const CustomTextField = styled(TextField)({
-  '& .MuiFormHelperText-root':{
+  '& .MuiFormHelperText-root': {
     color: '#5C6F82',
   },
 });
 
 type PlatformUserFormProps = {
   prefix: keyof UsersObject;
-  role: UserRole;
-  platformRole: UserPlatformRole;
+  role: PartyRole;
+  productRole: UserProductRole;
   people: UsersObject;
   setPeople: React.Dispatch<React.SetStateAction<UsersObject>>;
   readOnly?: Array<keyof UserOnCreate>;
@@ -39,7 +39,7 @@ const fields: Array<Field> = [
     regexp: new RegExp(
       '^[A-Za-z]{6}[0-9lmnpqrstuvLMNPQRSTUV]{2}[abcdehlmprstABCDEHLMPRST]{1}[0-9lmnpqrstuvLMNPQRSTUV]{2}[A-Za-z]{1}[0-9lmnpqrstuvLMNPQRSTUV]{3}[A-Za-z]{1}$'
     ),
-    message: 'Il Codice Fiscale inserito non è valido'
+    message: 'Il Codice Fiscale inserito non è valido',
   },
   {
     id: 'email',
@@ -48,7 +48,7 @@ const fields: Array<Field> = [
     width: 12,
     regexp: new RegExp('^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$'),
     message: 'L’indirizzo email non è valido',
-    helperMessage:"Inserisci l'indirizzo email istituzionale utilizzato per l'Ente"
+    helperMessage: "Inserisci l'indirizzo email istituzionale utilizzato per l'Ente",
   },
 ];
 
@@ -68,7 +68,7 @@ function validateNoMandatory(user: UserOnCreate): Array<keyof UserOnCreate> {
 export function PlatformUserForm({
   prefix,
   role,
-  platformRole,
+  productRole,
   people,
   setPeople,
   readOnly = [],
@@ -76,38 +76,34 @@ export function PlatformUserForm({
   const buildSetPerson = (key: string) => (e: any) => {
     setPeople({
       ...people,
-      [prefix]: { ...people[prefix], [key]: e.target.value, role, platformRole },
+      [prefix]: { ...people[prefix], [key]: e.target.value, role, productRole },
     });
   };
 
   const errors: Array<string> = people[prefix] ? validateNoMandatory(people[prefix]) : [];
 
   return (
-
-    <Paper elevation={0} sx={{ py:4, px:6 }} >
+    <Paper elevation={0} sx={{ py: 4, px: 6 }}>
       <Grid container spacing={2}>
-        {fields.map(({ id, label, type = 'text', width = 6, message, helperMessage}) => {
-          const isError= errors.indexOf(id) > -1;
+        {fields.map(({ id, label, type = 'text', width = 6, message, helperMessage }) => {
+          const isError = errors.indexOf(id) > -1;
           return (
-          <Grid item key={id} xs={width} mb={5}>
-            <CustomTextField
-              id={`${prefix}-${id}`}
-              variant="standard"
-              label={
-                <React.Fragment>
-                  {label}
-                </React.Fragment>
-              }
-              type={type}
-              value={people[prefix] && people[prefix][id] ? people[prefix][id] : ''}
-              onChange={buildSetPerson(id)}
-              sx={{ width: '100%' }}
-              error={isError}
-              helperText={isError ? message : helperMessage}
-              disabled={readOnly.indexOf(id) > -1}
-            />
-          </Grid>
-        );})}
+            <Grid item key={id} xs={width} mb={5}>
+              <CustomTextField
+                id={`${prefix}-${id}`}
+                variant="standard"
+                label={<React.Fragment>{label}</React.Fragment>}
+                type={type}
+                value={people[prefix] && people[prefix][id] ? people[prefix][id] : ''}
+                onChange={buildSetPerson(id)}
+                sx={{ width: '100%' }}
+                error={isError}
+                helperText={isError ? message : helperMessage}
+                disabled={readOnly.indexOf(id) > -1}
+              />
+            </Grid>
+          );
+        })}
       </Grid>
     </Paper>
   );

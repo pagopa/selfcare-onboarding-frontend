@@ -3,8 +3,8 @@ import { Button, Divider, Grid, Typography, Link } from '@mui/material';
 import { AxiosResponse } from 'axios';
 import { useEffect, useState, useContext } from 'react';
 import {
-  InstitutionInfo,
-  OnBoardingInfo,
+  OnboardingData,
+  OnboardingInfo,
   RequestOutcomeMessage,
   StepperStepComponentProps,
 } from '../../types';
@@ -62,7 +62,7 @@ const alreadyOnboarded: RequestOutcomeMessage = {
               prodotti?
             </Typography>
             {/* TODO: redirect TBD */}
-            <Link>Registra un nuovo referente</Link> 
+            <Link>Registra un nuovo referente</Link>
           </Typography>
         </Grid>
       </Grid>
@@ -87,7 +87,8 @@ const genericError: RequestOutcomeMessage = {
           <Typography>
             A causa di un errore del sistema non è possibile completare la procedura.
             <br />
-            Ti chiediamo di riprovare più tardi.</Typography>
+            Ti chiediamo di riprovare più tardi.
+          </Typography>
         </Grid>
       </Grid>
       <Grid container item justifyContent="center">
@@ -124,9 +125,9 @@ export function OnboardingStep1_5({ forward, institutionId }: Props) {
     const restOutcome = getFetchOutcome(onboardingStatus);
 
     if (restOutcome === 'success') {
-      const onBoardingInfo: OnBoardingInfo = (onboardingStatus as AxiosResponse<OnBoardingInfo>)
+      const onBoardingInfo: OnboardingInfo = (onboardingStatus as AxiosResponse<OnboardingInfo>)
         .data;
-      const institution: InstitutionInfo | null =
+      const institution: OnboardingData | null =
         onBoardingInfo.institutions?.length > 0 ? onBoardingInfo.institutions[0] : null;
       if (institution && institution.state === 'ACTIVE') {
         setOutcome(alreadyOnboarded);
