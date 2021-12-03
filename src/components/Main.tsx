@@ -1,8 +1,10 @@
 import { Box } from '@mui/material';
 import { Redirect, Route, Switch } from 'react-router-dom';
-import { BASE_ROUTE, ROUTES } from '../utils/constants';
+import { useLocation } from 'react-router';
+import { ROUTES } from '../utils/constants';
 
 export function Main() {
+  const location = useLocation();
   return (
     <Box component="main" m={'auto 0'} pt={16}>
       <Switch>
@@ -13,12 +15,17 @@ export function Main() {
         ))}
 
         {/* If on the ROOT, redirect to platform or login page based on whether the user is logged in */}
-        <Route path={BASE_ROUTE} exact={true}>
-          <Redirect to={ROUTES.ONBOARDING.PATH} />
+        <Route path={ROUTES.ONBOARDING.PATH} exact={false}>
+          <Redirect
+            to={ROUTES.ONBOARDING.PATH.replace(
+              ':productId',
+              location.pathname.replace(/^\/onboarding\/([^/]+)\/.*/, '$1')
+            )}
+          />
         </Route>
 
         <Route path="*">
-          <Redirect to={ROUTES.ONBOARDING.PATH} />
+          <Redirect to={ROUTES.ONBOARDING_ROOT.PATH} />
         </Route>
       </Switch>
     </Box>

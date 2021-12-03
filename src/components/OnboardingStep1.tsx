@@ -1,11 +1,36 @@
 import { Grid, Link, Typography } from '@mui/material';
 import { Box } from '@mui/system';
+import { useEffect, useState } from 'react';
+import { AxiosResponse } from 'axios';
 import { IPACatalogParty, StepperStepComponentProps } from '../../types';
+import { getFetchOutcome } from '../lib/error-utils';
+import { fetchWithLogs } from '../lib/api-utils';
 import { OnboardingStepActions } from './OnboardingStepActions';
 import { AsyncAutocomplete } from './AsyncAutocomplete';
 import { useHistoryState } from './useHistoryState';
+import { LoadingOverlay } from './LoadingOverlay';
+
+const handleSearchInstitutionId = async (
+  institutionId: string
+): Promise<IPACatalogParty | null> => {
+  const searchResponse = await fetchWithLogs(
+    { endpoint: 'ONBOARDING_GET_PARTY', endpointParams: { institutionId } },
+    { method: 'GET' }
+  );
+
+  const outcome = getFetchOutcome(searchResponse);
+
+  if (outcome === 'success') {
+    return (searchResponse as AxiosResponse).data as IPACatalogParty;
+  }
+
+  return null;
+};
 
 export function OnboardingStep1({ forward }: StepperStepComponentProps) {
+  const institutionIdByQuery = new URLSearchParams(window.location.search).get('institutionId');
+
+  const [loading, setLoading] = useState(!!institutionIdByQuery);
   const [selected, setSelected, setSelectedHistory] = useHistoryState<IPACatalogParty | null>(
     'selected_step1',
     null
@@ -19,7 +44,34 @@ export function OnboardingStep1({ forward }: StepperStepComponentProps) {
   const bodyTitle = 'Seleziona il tuo Ente';
   const bodyDescription =
     "Seleziona dall'Indice della Pubblica Amministrazione (IPA) l'Ente per cui vuoi richiedere l'adesione ai prodotti PagoPA";
-  return (
+
+  useEffect(() => {
+    if (institutionIdByQuery) {
+      handleSearchInstitutionId(institutionIdByQuery)
+        .then((ipaParty) => {
+          if (ipaParty) {
+            setSelected(ipaParty);
+          } else {
+            // eslint-disable-next-line functional/immutable-data
+            window.location.search = '';
+          }
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    }
+  }, []);
+
+  // callback of previous useEffect
+  useEffect(() => {
+    if (institutionIdByQuery && selected) {
+      onForwardAction();
+    }
+  }, [selected]);
+
+  return loading ? (
+    <LoadingOverlay loadingText="Stiamo verificando i tuoi dati" />
+  ) : (
     <Grid
       container
       //  mt={16}
