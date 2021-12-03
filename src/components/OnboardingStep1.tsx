@@ -18,7 +18,7 @@ export function OnboardingStep1({ forward }: StepperStepComponentProps) {
   };
   const bodyTitle = 'Seleziona il tuo Ente';
   const bodyDescription =
-    'Seleziona dall’indice IPA l’Ente per cui vuoi richiedere l’adesione ai prodotti PagoPA';
+    "Seleziona dall'Indice della Pubblica Amministrazione (IPA) l'Ente per cui vuoi richiedere l'adesione ai prodotti PagoPA";
   return (
     <Grid
       container
@@ -71,13 +71,11 @@ export function OnboardingStep1({ forward }: StepperStepComponentProps) {
               }}
               variant="body2"
             >
-              {'Non trovi il tuo ente nell’indice IPA?'}
+              {"Non trovi il tuo ente nell'IPA? In "}
               <Link href="https://indicepa.gov.it/ipa-portale/servizi-enti/accreditamento-ente">
-                Clicca qui
+                questa pagina
               </Link>
-              {
-                ' per maggiori informazioni e istruzioni per essere inclusi nell’indice delle Pubbliche Amministrazioni'
-              }
+              {" trovi maggiori informazioni sull'indice e su come accreditarsi."}
             </Typography>
           </Box>
         </Grid>
