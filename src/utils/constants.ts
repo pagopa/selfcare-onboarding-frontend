@@ -21,7 +21,6 @@ export const URL_FE_LANDING: string = process.env.REACT_APP_URL_FE_LANDING;
 export const URL_API_PARTY_PROCESS: string = process.env.REACT_APP_URL_API_PARTY_PROCESS;
 export const URL_API_PARTY_REGISTRY_PROXY: string =
   process.env.REACT_APP_URL_API_PARTY_REGISTRY_PROXY;
-export const URL_API_PARTY_MANAGEMENT: string = process.env.REACT_APP_URL_API_PARTY_MANAGEMENT;
 
 export const PAGOPA_HELP_EMAIL = process.env.REACT_APP_PAGOPA_HELP_EMAIL;
 
@@ -62,9 +61,6 @@ export const API = {
   },
   ONBOARDING_COMPLETE_REGISTRATION: {
     URL: URL_API_PARTY_PROCESS + '/onboarding/complete/{{token}}',
-  },
-  PARTY_GET_PARTY_ID: {
-    URL: URL_API_PARTY_MANAGEMENT + '/organizations/{{institutionId}}',
   },
 };
 

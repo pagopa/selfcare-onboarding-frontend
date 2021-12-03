@@ -11,7 +11,6 @@ declare namespace NodeJS {
 
     REACT_APP_URL_API_PARTY_PROCESS: string;
     REACT_APP_URL_API_PARTY_REGISTRY_PROXY: string;
-    REACT_APP_URL_API_PARTY_MANAGEMENT: string;
 
     REACT_APP_PAGOPA_HELP_EMAIL: string;
 

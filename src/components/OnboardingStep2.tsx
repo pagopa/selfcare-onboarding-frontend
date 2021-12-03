@@ -60,7 +60,7 @@ export function OnboardingStep2({ forward, back }: StepperStepComponentProps) {
           <PlatformUserForm
             prefix="LEGAL"
             role="MANAGER"
-            platformRole="ADMIN_REF"
+            productRole="ADMIN"
             people={people}
             setPeople={setPeople}
           />

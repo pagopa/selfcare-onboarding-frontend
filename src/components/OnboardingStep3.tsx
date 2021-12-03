@@ -115,7 +115,7 @@ export function OnboardingStep3({ forward, back }: StepperStepComponentProps) {
           <PlatformUserForm
             prefix={'delegate-initial'}
             role="DELEGATE"
-            platformRole="TECH_REF"
+            productRole="LIMITED"
             people={people}
             setPeople={setPeople}
             readOnly={isAuthUser ? ['name', 'surname', 'taxCode'] : []}
@@ -142,7 +142,7 @@ export function OnboardingStep3({ forward, back }: StepperStepComponentProps) {
               <PlatformUserForm
                 prefix={id}
                 role="DELEGATE"
-                platformRole="TECH_REF"
+                productRole="LIMITED"
                 people={people}
                 setPeople={setPeople}
               />

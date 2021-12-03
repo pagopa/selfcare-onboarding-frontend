@@ -32,7 +32,6 @@ variables:
     react_app_url_fe_landing: '$(UAT_REACT_APP_URL_FE_LANDING)'
     react_app_url_api_party_process: '$(UAT_REACT_APP_URL_API_PARTY_PROCESS)'
     react_app_url_api_party_registry_proxy: '$(UAT_REACT_APP_URL_API_PARTY_REGISTRY_PROXY)'
-    react_app_url_api_party_management: '$(UAT_REACT_APP_URL_API_PARTY_MANAGEMENT)'
 
   ${{ elseif eq(variables['Build.SourceBranch'], 'refs/heads/main') }}:
     environment: 'PROD'
@@ -48,7 +47,6 @@ variables:
     react_app_url_fe_landing: '$(PROD_REACT_APP_URL_FE_LANDING)'
     react_app_url_api_party_process: '$(PROD_REACT_APP_URL_API_PARTY_PROCESS)'
     react_app_url_api_party_registry_proxy: '$(PROD_REACT_APP_URL_API_PARTY_REGISTRY_PROXY)'
-    react_app_url_api_party_management: '$(PROD_REACT_APP_URL_API_PARTY_MANAGEMENT)'
 
   # every branch different from past will be considered as DEV
   #  ${{ if startsWith(variables['Build.SourceBranch'], 'refs/heads/release-dev') }}:
@@ -66,7 +64,6 @@ variables:
     react_app_url_fe_landing: '$(DEV_REACT_APP_URL_FE_LANDING)'
     react_app_url_api_party_process: 'https://selc-d-apim.azure-api.net/party-process/v1' # TODO restore me '$(DEV_REACT_APP_URL_API_PARTY_PROCESS)'
     react_app_url_api_party_registry_proxy: 'https://selc-d-apim.azure-api.net/party-registry-proxy/v1' # TODO restore me '$(DEV_REACT_APP_URL_API_PARTY_REGISTRY_PROXY)'
-    react_app_url_api_party_management: 'https://selc-d-apim.azure-api.net/party-management/v1' # TODO restore me '$(DEV_REACT_APP_URL_API_PARTY_MANAGEMENT)'
 
 # Automatically triggered on PR
 # https://docs.microsoft.com/en-us/azure/devops/pipelines/yaml-schema?view=azure-devops&tabs=schema%2Cparameter-schema#pr-trigger
@@ -145,7 +142,6 @@ stages:
               REACT_APP_URL_FE_LANDING: '$(react_app_url_fe_landing)'
               REACT_APP_URL_API_PARTY_PROCESS: '$(react_app_url_api_party_process)'
               REACT_APP_URL_API_PARTY_REGISTRY_PROXY: '$(react_app_url_api_party_registry_proxy)'
-              REACT_APP_URL_API_PARTY_MANAGEMENT: '$(react_app_url_api_party_management)'
           - bash: |
               printf "$EXECUTION_ID\n$(git name-rev --name-only FETCH_HEAD) $(git rev-parse HEAD)" > $(System.DefaultWorkingDirectory)/build/build.info
             env:
