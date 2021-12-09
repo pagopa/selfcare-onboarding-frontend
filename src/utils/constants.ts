@@ -2,6 +2,7 @@ import { RoutesObject } from '../../types';
 import Onboarding from '../views/Onboarding';
 import RejectRegistration from '../views/RejectRegistration';
 import CompleteRegistrationComponent from '../views/CompleteRegistrationComponent';
+import NoProductPage from '../views/NoProductPage';
 /*
 import { TempSPIDUser } from '../components/TempSPIDUser'
 import { IPAGuide } from '../views/IPAGuide' */
@@ -25,18 +26,12 @@ export const URL_API_PARTY_REGISTRY_PROXY: string =
 export const PAGOPA_HELP_EMAIL = process.env.REACT_APP_PAGOPA_HELP_EMAIL;
 
 export const ROUTES: RoutesObject = {
-  ONBOARDING: {
-    PATH: `${BASE_ROUTE}`,
+  ONBOARDING_ROOT: {
+    PATH: `${BASE_ROUTE}/`,
     LABEL: 'Onboarding',
     EXACT: true,
-    COMPONENT: Onboarding,
-  } /*
-  IPA_GUIDE: { PATH: `${BASE_ROUTE}/guida-ipa`, LABEL: 'Accreditarsi su IPA', COMPONENT: IPAGuide },
-  TEMP_SPID_USER: {
-    PATH: `${BASE_ROUTE}/temp-spid`,
-    LABEL: 'Genera utente SPID di test',
-    COMPONENT: TempSPIDUser,
-  }, */,
+    COMPONENT: NoProductPage,
+  },
   REGISTRATION_FINALIZE_COMPLETE: {
     PATH: `${BASE_ROUTE}/confirm`,
     LABEL: 'Completa la procedura di onboarding',
@@ -47,6 +42,12 @@ export const ROUTES: RoutesObject = {
     LABEL: 'Cancella la procedura di onboarding',
     COMPONENT: RejectRegistration,
   },
+  ONBOARDING: {
+    PATH: `${BASE_ROUTE}/:productId`,
+    LABEL: 'Onboarding',
+    EXACT: true,
+    COMPONENT: Onboarding,
+  },
 };
 
 export const API = {
@@ -55,6 +56,9 @@ export const API = {
   },
   ONBOARDING_GET_SEARCH_PARTIES: {
     URL: URL_API_PARTY_REGISTRY_PROXY + '/institutions',
+  },
+  ONBOARDING_GET_PARTY: {
+    URL: URL_API_PARTY_REGISTRY_PROXY + '/institutions/{{institutionId}}',
   },
   ONBOARDING_POST_LEGALS: {
     URL: URL_API_PARTY_PROCESS + '/onboarding/legals',
