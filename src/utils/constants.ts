@@ -32,12 +32,6 @@ export const ROUTES: RoutesObject = {
     EXACT: true,
     COMPONENT: NoProductPage,
   },
-  ONBOARDING: {
-    PATH: `${BASE_ROUTE}/:productId`,
-    LABEL: 'Onboarding',
-    EXACT: true,
-    COMPONENT: Onboarding,
-  },
   REGISTRATION_FINALIZE_COMPLETE: {
     PATH: `${BASE_ROUTE}/confirm`,
     LABEL: 'Completa la procedura di onboarding',
@@ -47,6 +41,12 @@ export const ROUTES: RoutesObject = {
     PATH: `${BASE_ROUTE}/cancel`,
     LABEL: 'Cancella la procedura di onboarding',
     COMPONENT: RejectRegistration,
+  },
+  ONBOARDING: {
+    PATH: `${BASE_ROUTE}/:productId`,
+    LABEL: 'Onboarding',
+    EXACT: true,
+    COMPONENT: Onboarding,
   },
 };
 
