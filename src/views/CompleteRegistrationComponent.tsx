@@ -16,22 +16,23 @@ import { HeaderContext } from '../lib/context';
 import { getOnboardingMagicLinkJwt } from './RejectRegistration';
 import SessionModal from './../components/SessionModal';
 
-// const errors = {
-//   ATTO_ADESIONE: {
-//     title: "Controlla il documento",
-//     message: "Il documento caricato non è riconducibile all'Atto di adesione del tuo Ente. Verifica che sia quello corretto e caricalo di nuovo.",
-//   },
-//   LEGALE_RAPPRESENTANTE: {
-//     title: 'Controlla il documento',
-//     message:
-//       'La Firma Digitale non è riconducibile al Legale Rappresentante indicato in fase di adesione. Verifica la corrispondenza e carica di nuovo il documento.',
-//   },
-//   GENERIC: {
-//     title: 'Caricamento non riuscito',
-//     message:
-//       'Il caricamento del documento non è andato a buon fine. Torna indietro e caricalo di nuovo.',
-//   },
-// };
+const errors = {
+  ATTO_ADESIONE: {
+    title: 'Controlla il documento',
+    message:
+      "Il documento caricato non è riconducibile all'Atto di adesione del tuo Ente. Verifica che sia quello corretto e caricalo di nuovo.",
+  },
+  LEGALE_RAPPRESENTANTE: {
+    title: 'Controlla il documento',
+    message:
+      'La Firma Digitale non è riconducibile al Legale Rappresentante indicato in fase di adesione. Verifica la corrispondenza e carica di nuovo il documento.',
+  },
+  GENERIC: {
+    title: 'Caricamento non riuscito',
+    message:
+      'Il caricamento del documento non è andato a buon fine. Torna indietro e caricalo di nuovo.',
+  },
+};
 
 export function CompleteRegistrationComponent() {
   const { setSubHeaderVisible, setOnLogout } = useContext(HeaderContext);
@@ -45,6 +46,7 @@ export function CompleteRegistrationComponent() {
   const [dialogTitle, setDialogTitle] = useState<string | null>(null);
   const [dialogDescription, setDialogDescription] = useState<string | null>(null);
   const [outcome, setOutcome] = useState<RequestOutcome | null>(!token ? 'error' : null);
+  const [errorCode, setErrorCode] = useState<keyof typeof errors>('GENERIC');
 
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -87,7 +89,13 @@ export function CompleteRegistrationComponent() {
     );
 
     setLoading(false);
-    setOutcome(getFetchOutcome(uploadDocument));
+    const outcome = getFetchOutcome(uploadDocument);
+    setOutcome(outcome);
+
+    if (outcome === 'error') {
+      // TODO recognize error motivation
+      setErrorCode('GENERIC');
+    }
   };
 
   const handleErrorModalClose = () => {
@@ -185,7 +193,6 @@ export function CompleteRegistrationComponent() {
         </Grid>
         <Grid container item justifyContent="center" mb={7} mt={1}>
           <Grid item xs={6}>
-            {/* TODO: text TBD  */}
             <Typography>
               A causa di un errore del sistema non è possibile completare la procedura.
               <br />
@@ -211,8 +218,8 @@ export function CompleteRegistrationComponent() {
         handleExit={handleErrorModalExit}
         onConfirm={handleErrorModalConfirm}
         open={true}
-        title={'Errore'}
-        message={'Il caricamento del file non è andato a buon fine. Vuoi riprovare?'}
+        title={errors[errorCode].title}
+        message={errors[errorCode].message}
         confirmLabel="Torna alla pagina di caricamento"
         rejectLabel="Esci"
       />
