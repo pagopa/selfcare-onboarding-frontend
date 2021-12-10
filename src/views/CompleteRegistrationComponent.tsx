@@ -16,7 +16,24 @@ import { HeaderContext } from '../lib/context';
 import { getOnboardingMagicLinkJwt } from './RejectRegistration';
 import SessionModal from './../components/SessionModal';
 
-function CompleteRegistrationComponent() {
+// const errors = {
+//   ATTO_ADESIONE: {
+//     title: "Controlla il documento",
+//     message: "Il documento caricato non è riconducibile all'Atto di adesione del tuo Ente. Verifica che sia quello corretto e caricalo di nuovo.",
+//   },
+//   LEGALE_RAPPRESENTANTE: {
+//     title: 'Controlla il documento',
+//     message:
+//       'La Firma Digitale non è riconducibile al Legale Rappresentante indicato in fase di adesione. Verifica la corrispondenza e carica di nuovo il documento.',
+//   },
+//   GENERIC: {
+//     title: 'Caricamento non riuscito',
+//     message:
+//       'Il caricamento del documento non è andato a buon fine. Torna indietro e caricalo di nuovo.',
+//   },
+// };
+
+export function CompleteRegistrationComponent() {
   const { setSubHeaderVisible, setOnLogout } = useContext(HeaderContext);
   const token = getOnboardingMagicLinkJwt();
 
@@ -85,8 +102,7 @@ function CompleteRegistrationComponent() {
     setOutcome(null);
   };
 
-
-  const handleErrorModalConfirm= () => {
+  const handleErrorModalConfirm = () => {
     console.log('EXIT');
     setOutcome(null);
     setUploadedFiles([]);
@@ -119,20 +135,22 @@ function CompleteRegistrationComponent() {
   const outcomeContent: RequestOutcomeOptions = {
     success: {
       img: { src: checkIllustration, alt: "Icona dell'email" },
-      title: 'Richiesta di adesione completata',
+      title: 'Adesione completata',
       description: [
         <Stack key="0" spacing={10}>
           <Typography>
-            {"Comunicheremo all'indirizzo PEC dell'Ente l'avvenuta adesione."}
+            {"Comunicheremo l'avvenuta adesione all'indirizzo PEC dell'Ente."}
             <br />
-            {"D'ora in poi i Referenti Amministrativi indicati potranno accedere al portale."}
+            {'Da questo momento in poi, i Referenti Amministrativi inseriti in fase di richiesta'}
+            <br />
+            {'potranno accedere al portale.'}
           </Typography>
           <Button
             variant="contained"
             sx={{ width: '200px', alignSelf: 'center' }}
             onClick={() => window.location.assign(URL_FE_LANDING)}
           >
-            Torna al portale
+            Torna alla home
           </Button>
         </Stack>,
       ],
@@ -154,7 +172,7 @@ function CompleteRegistrationComponent() {
     <MessageNoAction {...outcomeContent[outcome]} />
   ) : outcome === 'error' ? (
     !token ? (
-      <Grid container direction="column" key="0" style={{textAlign: 'center'}}>
+      <Grid container direction="column" key="0" style={{ textAlign: 'center' }}>
         <Grid container item justifyContent="center" mb={5}>
           <Grid item xs={6}>
             <ErrorIllustration />
@@ -167,7 +185,7 @@ function CompleteRegistrationComponent() {
         </Grid>
         <Grid container item justifyContent="center" mb={7} mt={1}>
           <Grid item xs={6}>
-          {/* TODO: text TBD  */}
+            {/* TODO: text TBD  */}
             <Typography>
               A causa di un errore del sistema non è possibile completare la procedura.
               <br />
@@ -182,7 +200,7 @@ function CompleteRegistrationComponent() {
               sx={{ width: '200px', alignSelf: 'center' }}
               onClick={() => window.location.assign(URL_FE_LANDING)}
             >
-              Torna al portale
+              Torna alla home
             </Button>
           </Grid>
         </Grid>
@@ -211,5 +229,3 @@ function CompleteRegistrationComponent() {
     </React.Fragment>
   );
 }
-
-export default CompleteRegistrationComponent;

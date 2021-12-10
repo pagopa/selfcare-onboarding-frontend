@@ -28,8 +28,8 @@ export function ConfirmRegistrationStep1(
   };
 
   const subtitle1 =
-    "Per completare la procedura di adesione, inserisci qui l'accordo ricevuto via PEC,";
-  const subtitle2 = 'firmato digitalmente dal Legale Rappresentante.';
+    "Per completare l'adesione, carica l'atto ricevuto via PEC, firmato digitalmente ";
+  const subtitle2 = 'dal Legale Rappresentante.';
   const uploaderImageWidth = 180;
   return (
     <Box sx={{ minHeight: '50vh' }}>
@@ -39,7 +39,7 @@ export function ConfirmRegistrationStep1(
           <Grid container columns={11}>
             <Grid item xs={11}>
               <Typography color="textPrimary" variant={'h2'} align="left">
-                {"Carica l'Atto di Adesione"}
+                {"Carica l'Accordo di Adesione"}
               </Typography>
             </Grid>
             <Grid item xs={11}>
@@ -58,9 +58,9 @@ export function ConfirmRegistrationStep1(
             </Grid>
             <Grid item xs={11} >
               <FileUploader
-                title={'Trascina qui l’Atto di Adesione firmato'}
+                title={'Trascina qui l’Accordo di Adesione firmato'}
                 description={'oppure '}
-                descriptionLink={'selezionalo dal desk'}
+                descriptionLink={'selezionalo dal tuo computer'}
                 uploadedFiles={uploadedFiles}
                 deleteUploadedFiles={deleteUploadedFiles}
                 onDropAccepted={onDropAccepted}

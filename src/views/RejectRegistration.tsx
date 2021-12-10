@@ -69,7 +69,7 @@ export default function RejectRegistration() {
             sx={{ width: '200px', alignSelf: 'center' }}
             onClick={() => window.location.assign(URL_FE_LANDING)}
           >
-            Torna al portale
+            Torna alla home
           </Button>
         </Stack>,
       ],
@@ -101,7 +101,7 @@ export default function RejectRegistration() {
                 sx={{ width: '200px', alignSelf: 'center' }}
                 onClick={() => window.location.assign(URL_FE_LANDING)}
               >
-                Torna al portale
+                Torna alla home
               </Button>
             </Grid>
           </Grid>

@@ -69,9 +69,9 @@ export function OnboardingStep3({ forward, back }: StepperStepComponentProps) {
     setIsAuthUser(value);
   };
   const bodyTitle = 'Indica il Referente Amministrativo';
-  const bodyDescription1 = 'Inserisci i dati del Legale Rappresentante o di un suo delegato.';
+  const bodyDescription1 = 'Inserisci i dati del Referente Amministrativo o di un suo delegato.';
   const bodyDescription2 =
-    'La persona indicata sarà responsabile della gestione dei prodotti PagoPA.';
+    'La persona che indicherai sarà responsabile della gestione del prodotto a cui stai aderendo.';
   return (
     <Grid
       container
@@ -131,7 +131,7 @@ export function OnboardingStep3({ forward, back }: StepperStepComponentProps) {
                 </StyledIntro> */}
             <Grid item xs={10} justifyContent="center" mt={6} mb={3}>
               <Typography align="center" variant="h4">
-                Aggiungi un nuovo Referente Amministrativo
+              Aggiungi un altro Referente Amministrativo
               </Typography>
             </Grid>
             <Grid
@@ -188,7 +188,7 @@ export function OnboardingStep3({ forward, back }: StepperStepComponentProps) {
                 fontFamily: '"Titillium Web", "sans-serif"',
               }}
             >
-              Aggiungi un nuovo Referente
+              Aggiungi un altro referente
             </Link>
           )}
         </Grid>
