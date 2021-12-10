@@ -1,11 +1,8 @@
 import { RoutesObject } from '../../types';
 import Onboarding from '../views/Onboarding';
 import RejectRegistration from '../views/RejectRegistration';
-import { CompleteRegistrationComponent } from '../views/CompleteRegistrationComponent';
+import CompleteRegistrationComponent from '../views/CompleteRegistrationComponent';
 import NoProductPage from '../views/NoProductPage';
-/*
-import { TempSPIDUser } from '../components/TempSPIDUser'
-import { IPAGuide } from '../views/IPAGuide' */
 
 const IS_DEVELOP = process.env.NODE_ENV === 'development';
 

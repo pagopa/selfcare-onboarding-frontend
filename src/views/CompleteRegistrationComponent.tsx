@@ -34,7 +34,7 @@ const errors = {
   },
 };
 
-export function CompleteRegistrationComponent() {
+export default function CompleteRegistrationComponent() {
   const { setSubHeaderVisible, setOnLogout } = useContext(HeaderContext);
   const token = getOnboardingMagicLinkJwt();
 
