@@ -75,7 +75,6 @@ export type UserOnCreate = {
   from?: string; // This is temporary, part of the API shared with self-care
   email: string;
   role: PartyRole;
-  productRole: UserProductRole;
 };
 
 export type User = {

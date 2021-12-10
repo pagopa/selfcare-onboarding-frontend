@@ -14,12 +14,13 @@ export const MOCK_USER = IS_DEVELOP;
 
 export const BASE_ROUTE = process.env.PUBLIC_URL ? process.env.PUBLIC_URL : '/onboarding';
 
-export const URL_FE_LOGIN: string = process.env.REACT_APP_URL_FE_LOGIN + '?onSuccess=onboarding';
+export const URL_FE_LOGIN: string = process.env.REACT_APP_URL_FE_LOGIN;
 export const URL_FE_LOGOUT: string = process.env.REACT_APP_URL_FE_LOGOUT;
 export const URL_FE_DASHBOARD: string = process.env.REACT_APP_URL_FE_DASHBOARD;
 export const URL_FE_LANDING: string = process.env.REACT_APP_URL_FE_LANDING;
 
 export const URL_API_PARTY_PROCESS: string = process.env.REACT_APP_URL_API_PARTY_PROCESS;
+export const URL_API_ONBOARDING: string = process.env.REACT_APP_URL_API_ONBOARDING;
 export const URL_API_PARTY_REGISTRY_PROXY: string =
   process.env.REACT_APP_URL_API_PARTY_REGISTRY_PROXY;
 
@@ -61,7 +62,7 @@ export const API = {
     URL: URL_API_PARTY_REGISTRY_PROXY + '/institutions/{{institutionId}}',
   },
   ONBOARDING_POST_LEGALS: {
-    URL: URL_API_PARTY_PROCESS + '/onboarding/legals',
+    URL: URL_API_ONBOARDING + '/institutions/{{institutionId}}/products/{{productId}}/onboarding',
   },
   ONBOARDING_COMPLETE_REGISTRATION: {
     URL: URL_API_PARTY_PROCESS + '/onboarding/complete/{{token}}',

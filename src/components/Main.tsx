@@ -5,23 +5,19 @@ import { ROUTES } from '../utils/constants';
 
 export function Main() {
   const location = useLocation();
+  const productId = location.pathname.replace(/^\/onboarding\/([^/]+)\/?.*/, '$1');
   return (
-    <Box component="main" m={'auto 0'} pt={16}>
+    <Box component="main" mb="auto" pt={16}>
       <Switch>
         {Object.values(ROUTES).map(({ PATH, EXACT, COMPONENT: Component }, i) => (
           <Route path={PATH} exact={EXACT} key={i}>
-            {Component && <Component />}
+            {Component && <Component productId={productId} />}
           </Route>
         ))}
 
         {/* If on the ROOT, redirect to platform or login page based on whether the user is logged in */}
         <Route path={ROUTES.ONBOARDING.PATH} exact={false}>
-          <Redirect
-            to={ROUTES.ONBOARDING.PATH.replace(
-              ':productId',
-              location.pathname.replace(/^\/onboarding\/([^/]+)\/.*/, '$1')
-            )}
-          />
+          <Redirect to={ROUTES.ONBOARDING.PATH.replace(':productId', productId)} />
         </Route>
 
         <Route path="*">

@@ -44,7 +44,7 @@ function prepareRequest(
       method,
       params,
       data,
-      headers: { ...headers, Authorization: `Bearer ${storageRead('bearer', 'string')}` },
+      headers: { ...headers, Authorization: `Bearer ${storageRead('token', 'string')}` },
     });
 }
 

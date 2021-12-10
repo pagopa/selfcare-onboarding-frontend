@@ -57,13 +57,7 @@ export function OnboardingStep2({ forward, back }: StepperStepComponentProps) {
 
       <Grid container item justifyContent="center" mt={7}>
         <Grid item xs={6} sx={{ boxShadow: '0px 12px 40px rgba(0, 0, 0, 0.06)' }}>
-          <PlatformUserForm
-            prefix="LEGAL"
-            role="MANAGER"
-            productRole="ADMIN"
-            people={people}
-            setPeople={setPeople}
-          />
+          <PlatformUserForm prefix="LEGAL" role="MANAGER" people={people} setPeople={setPeople} />
         </Grid>
       </Grid>
 
