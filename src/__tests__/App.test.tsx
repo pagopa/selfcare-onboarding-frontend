@@ -23,13 +23,13 @@ test('test not served path', () => {
       <App />
     </Router>
   );
-  expect(history.location.pathname).toBe(ROUTES.ONBOARDING.PATH);
+  expect(history.location.pathname).toBe(ROUTES.ONBOARDING_ROOT.PATH);
   checkRedirect(history, false);
 });
 
 test('test OnBoarding', () => {
+  history.push('/onboarding/PRODUCTID');
   jest.spyOn(history, 'push');
-
   render(
     <Router history={history}>
       <App />
