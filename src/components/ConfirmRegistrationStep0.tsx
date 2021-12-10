@@ -19,7 +19,7 @@ export function ConfirmRegistrationStep0({ forward }: StepperStepComponentProps)
         <Grid container columns={5}>
           <Grid item xs={5}>
             <Typography color="textPrimary" variant={'h1'} sx={{fontSize: '48px'}} align="left">
-              {"Carica l'Atto di Adesione"}
+              {"Carica l'Accordo di Adesione"}
             </Typography>
           </Grid>
           <Grid item xs={4} mt={3}>
@@ -32,7 +32,7 @@ export function ConfirmRegistrationStep0({ forward }: StepperStepComponentProps)
 
           <Grid item xs={2} mt={8}>
             <Button fullWidth color="primary" variant="contained" onClick={onForwardAction}>
-              Prosegui
+              Continua
             </Button>
           </Grid>
         </Grid>

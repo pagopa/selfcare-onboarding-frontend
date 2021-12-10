@@ -30,7 +30,7 @@ export function OnboardingStep2({ forward, back }: StepperStepComponentProps) {
   const bodyTitle = 'Indica il Legale Rappresentante';
   const bodyDescription1 = ' Inserisci i dati del Legale Rappresentante.';
   const bodyDescription2 =
-    'La persona indicata sarà firmataria del contratto per la gestione dei prodotti PagoPA.';
+    'La persona che indicherai sarà firmataria del contratto del prodotto a cui stai aderendo.';
   return (
     <Grid
       container

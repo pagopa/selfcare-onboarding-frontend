@@ -33,8 +33,7 @@ const alreadyOnboarded: RequestOutcomeMessage = {
       <Grid container item justifyContent="center" mb={7} mt={1}>
         <Grid item xs={7}>
           <Typography>
-            Per accedere, chiedi al Referente incaricato di aggiungerti al portale Self Care del tuo
-            Ente.
+          Per accedere, chiedi al Referente incaricato di abilitarti nella sezione Referenti del portale.
           </Typography>
         </Grid>
       </Grid>
@@ -45,7 +44,7 @@ const alreadyOnboarded: RequestOutcomeMessage = {
             sx={{ width: '200px', alignSelf: 'center' }}
             onClick={() => window.location.assign(URL_FE_LANDING)}
           >
-            Torna al portale
+            Torna alla home
           </Button>
         </Grid>
       </Grid>
@@ -98,7 +97,7 @@ const genericError: RequestOutcomeMessage = {
             sx={{ width: '200px', alignSelf: 'center' }}
             onClick={() => window.location.assign(URL_FE_LANDING)}
           >
-            Torna al portale
+            Torna alla home
           </Button>
         </Grid>
       </Grid>

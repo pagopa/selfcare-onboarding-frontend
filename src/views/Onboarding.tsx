@@ -141,14 +141,14 @@ function OnboardingComponent() {
           <Typography>
             Riceverai una PEC all’indirizzo istituzionale dell’Ente.
             <br />
-            Al suo interno troverai le istruzioni per confermare i dati e ottenere l’autorizzazione.
+            Al suo interno troverai le istruzioni per completare l&apos;adesione.
           </Typography>
           <Button
             variant="contained"
             sx={{ width: '200px', alignSelf: 'center' }}
             onClick={() => window.location.assign(URL_FE_LANDING)}
           >
-            Torna al portale
+            Torna alla home
           </Button>
           {/* <Typography>
             Non hai ricevuto nessuna mail? Attendi qualche minuto e controlla anche nello spam. Se
@@ -178,7 +178,7 @@ function OnboardingComponent() {
           <Grid container item justifyContent="center">
             <Grid item xs={4}>
               <Button onClick={reload} variant={'contained'}>
-                Torna al portale
+                Torna alla home
               </Button>
             </Grid>
           </Grid>
@@ -201,11 +201,11 @@ function OnboardingComponent() {
           window.location.assign(URL_FE_LOGOUT);
         }}
         open={openLogoutModal}
-        title={'Vuoi uscire dalla sessione?'}
+        title={'Vuoi davvero uscire?'}
         message={
-          'Se confermi dovrai ripetere lautenticazione per entrare e ripetere i passaggi effettuati.'
+          'Se esci, la richiesta di adesione andrà persa.'
         }
-        confirmLabel='Conferma'
+        confirmLabel='Esci'
         rejectLabel='Annulla'
       />
       {loading && <LoadingOverlay loadingText="Stiamo verificando i tuoi dati" />}
