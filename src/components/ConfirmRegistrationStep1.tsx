@@ -19,7 +19,7 @@ export function ConfirmRegistrationStep1(
     setShowDialog(true);
   };
 
-   const onSubmit = (): void => {
+  const onSubmit = (): void => {
     forward(uploadedFiles[0]);
   };
 
@@ -32,7 +32,7 @@ export function ConfirmRegistrationStep1(
   const subtitle2 = 'dal Legale Rappresentante.';
   const uploaderImageWidth = 180;
   return (
-    <Box sx={{ minHeight: '50vh' }}>
+    <Box>
       <Grid container direction="row" justifyContent={'flex-start'} alignItems={'center'}>
         <Grid item xs={1} />
         <Grid item xs={11}>
@@ -46,7 +46,7 @@ export function ConfirmRegistrationStep1(
               <Typography
                 color="textPrimary"
                 sx={{
-                  mt: 3
+                  mt: 3,
                 }}
                 variant={'body2'}
                 align="left"
@@ -56,7 +56,7 @@ export function ConfirmRegistrationStep1(
                 {subtitle2}
               </Typography>
             </Grid>
-            <Grid item xs={11} >
+            <Grid item xs={11}>
               <FileUploader
                 title={'Trascina qui l’Accordo di Adesione firmato'}
                 description={'oppure '}

@@ -86,11 +86,10 @@ export default function RejectRegistration() {
           </Grid>
           <Grid container item justifyContent="center" mb={7} mt={1}>
             <Grid item xs={6}>
-              {/* TODO: text TBD  */}
               <Typography>
                 A causa di un errore del sistema non è possibile completare la procedura.
                 <br />
-                Ti chiediamo di riprovare più tardi.EE
+                Ti chiediamo di riprovare più tardi.
               </Typography>
             </Grid>
           </Grid>
