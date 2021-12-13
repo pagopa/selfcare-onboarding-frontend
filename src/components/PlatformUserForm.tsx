@@ -1,7 +1,7 @@
 import { Grid, Paper, TextField } from '@mui/material';
 import React from 'react';
 import { styled } from '@mui/material/styles';
-import { UserOnCreate, UserProductRole, PartyRole } from '../../types';
+import { UserOnCreate, PartyRole } from '../../types';
 import { UsersObject } from './OnboardingStep2';
 
 const CustomTextField = styled(TextField)({
@@ -13,7 +13,6 @@ const CustomTextField = styled(TextField)({
 type PlatformUserFormProps = {
   prefix: keyof UsersObject;
   role: PartyRole;
-  productRole: UserProductRole;
   people: UsersObject;
   setPeople: React.Dispatch<React.SetStateAction<UsersObject>>;
   readOnly?: Array<keyof UserOnCreate>;
@@ -68,7 +67,6 @@ function validateNoMandatory(user: UserOnCreate): Array<keyof UserOnCreate> {
 export function PlatformUserForm({
   prefix,
   role,
-  productRole,
   people,
   setPeople,
   readOnly = [],
@@ -76,7 +74,7 @@ export function PlatformUserForm({
   const buildSetPerson = (key: string) => (e: any) => {
     setPeople({
       ...people,
-      [prefix]: { ...people[prefix], [key]: e.target.value, role, productRole },
+      [prefix]: { ...people[prefix], [key]: e.target.value, role },
     });
   };
 

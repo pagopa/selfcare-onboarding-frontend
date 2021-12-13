@@ -115,7 +115,6 @@ export function OnboardingStep3({ forward, back }: StepperStepComponentProps) {
           <PlatformUserForm
             prefix={'delegate-initial'}
             role="DELEGATE"
-            productRole="LIMITED"
             people={people}
             setPeople={setPeople}
             readOnly={isAuthUser ? ['name', 'surname', 'taxCode'] : []}
@@ -131,7 +130,7 @@ export function OnboardingStep3({ forward, back }: StepperStepComponentProps) {
                 </StyledIntro> */}
             <Grid item xs={10} justifyContent="center" mt={6} mb={3}>
               <Typography align="center" variant="h4">
-              Aggiungi un altro Referente Amministrativo
+                Aggiungi un altro Referente Amministrativo
               </Typography>
             </Grid>
             <Grid
@@ -139,13 +138,7 @@ export function OnboardingStep3({ forward, back }: StepperStepComponentProps) {
               xs={6}
               sx={{ boxShadow: '0px 12px 40px rgba(0, 0, 0, 0.06)', position: 'relative' }}
             >
-              <PlatformUserForm
-                prefix={id}
-                role="DELEGATE"
-                productRole="LIMITED"
-                people={people}
-                setPeople={setPeople}
-              />
+              <PlatformUserForm prefix={id} role="DELEGATE" people={people} setPeople={setPeople} />
               <IconButton
                 color="primary"
                 onClick={buildRemoveDelegateForm(id)}

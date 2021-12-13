@@ -46,7 +46,7 @@ const keepOnPage = (e: BeforeUnloadEvent) => {
   return message;
 };
 
-function OnboardingComponent() {
+function OnboardingComponent({ productId }: { productId: string }) {
   const [loading, setLoading] = useState(false);
   const [activeStep, setActiveStep] = useState(1);
   const [formData, setFormData] = useState<Partial<FormData>>();
@@ -63,7 +63,7 @@ function OnboardingComponent() {
 
   useEffect(() => {
     // eslint-disable-next-line functional/immutable-data
-    Object.assign(history.location,{state: undefined});
+    Object.assign(history.location, { state: undefined });
   }, []);
   const reload = () => {
     history.go(0);
@@ -94,8 +94,8 @@ function OnboardingComponent() {
     setLoading(true);
 
     const postLegalsResponse = await fetchWithLogs(
-      { endpoint: 'ONBOARDING_POST_LEGALS' },
-      { method: 'POST', data: formData }
+      { endpoint: 'ONBOARDING_POST_LEGALS', endpointParams: { institutionId, productId } },
+      { method: 'POST', data: (formData as any).users }
     );
 
     setLoading(false);
@@ -117,7 +117,7 @@ function OnboardingComponent() {
     },
     {
       label: 'Verifica ente',
-      Component: () => OnboardingStep1_5({ forward, institutionId }),
+      Component: () => OnboardingStep1_5({ forward, institutionId, productId }),
     },
     {
       label: 'Inserisci i dati del rappresentante legale',
@@ -172,7 +172,8 @@ function OnboardingComponent() {
               <Typography>
                 A causa di un errore del sistema non è possibile completare la procedura.
                 <br />
-                Ti chiediamo di riprovare più tardi.</Typography>
+                Ti chiediamo di riprovare più tardi.
+              </Typography>
             </Grid>
           </Grid>
           <Grid container item justifyContent="center">
@@ -202,11 +203,9 @@ function OnboardingComponent() {
         }}
         open={openLogoutModal}
         title={'Vuoi davvero uscire?'}
-        message={
-          'Se esci, la richiesta di adesione andrà persa.'
-        }
-        confirmLabel='Esci'
-        rejectLabel='Annulla'
+        message={'Se esci, la richiesta di adesione andrà persa.'}
+        confirmLabel="Esci"
+        rejectLabel="Annulla"
       />
       {loading && <LoadingOverlay loadingText="Stiamo verificando i tuoi dati" />}
     </Container>

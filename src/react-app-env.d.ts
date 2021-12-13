@@ -9,6 +9,7 @@ declare namespace NodeJS {
     REACT_APP_URL_FE_DASHBOARD: string;
     REACT_APP_URL_FE_LANDING: string;
 
+    REACT_APP_URL_API_ONBOARDING: string;
     REACT_APP_URL_API_PARTY_PROCESS: string;
     REACT_APP_URL_API_PARTY_REGISTRY_PROXY: string;
 
