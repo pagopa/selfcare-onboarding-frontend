@@ -7,18 +7,12 @@ export function ConfirmRegistrationStep0({ forward }: StepperStepComponentProps)
   };
 
   return (
-    <Grid
-      container
-      direction="row"
-      justifyContent={'flex-start'}
-      alignItems={'center'}
-      sx={{ minHeight: '50vh' }}
-    >
+    <Grid container direction="row" justifyContent={'flex-start'} alignItems={'center'}>
       <Grid item xs={1} />
       <Grid item xs={5}>
         <Grid container columns={5}>
           <Grid item xs={5}>
-            <Typography color="textPrimary" variant={'h1'} sx={{fontSize: '48px'}} align="left">
+            <Typography color="textPrimary" variant={'h1'} sx={{ fontSize: '48px' }} align="left">
               {"Carica l'Accordo di Adesione"}
             </Typography>
           </Grid>
