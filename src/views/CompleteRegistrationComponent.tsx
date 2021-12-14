@@ -1,6 +1,7 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { Button, Stack, Typography, Grid } from '@mui/material';
-import { RequestOutcome, RequestOutcomeOptions, StepperStep } from '../../types';
+import { AxiosError } from 'axios';
+import { RequestOutcome, RequestOutcomeOptions, StepperStep, Problem } from '../../types';
 import { ConfirmRegistrationStep0 } from '../components/ConfirmRegistrationStep0';
 import { ConfirmRegistrationStep1 } from '../components/ConfirmRegistrationStep1';
 import { AlertDialog } from '../components/AlertDialog';
@@ -17,12 +18,12 @@ import { getOnboardingMagicLinkJwt } from './RejectRegistration';
 import SessionModal from './../components/SessionModal';
 
 const errors = {
-  ATTO_ADESIONE: {
+  INVALID_DOCUMENT: {
     title: 'Controlla il documento',
     message:
       "Il documento caricato non è riconducibile all'Atto di adesione del tuo Ente. Verifica che sia quello corretto e caricalo di nuovo.",
   },
-  LEGALE_RAPPRESENTANTE: {
+  INVALID_SIGN: {
     title: 'Controlla il documento',
     message:
       'La Firma Digitale non è riconducibile al Legale Rappresentante indicato in fase di adesione. Verifica la corrispondenza e carica di nuovo il documento.',
@@ -32,6 +33,21 @@ const errors = {
     message:
       'Il caricamento del documento non è andato a buon fine. Torna indietro e caricalo di nuovo.',
   },
+};
+
+const error2errorCode: { [key in keyof typeof errors]: Array<string> } = {
+  INVALID_DOCUMENT: ['002-100', '002-101'],
+  INVALID_SIGN: ['002-102', '002-103', '002-104', '002-105', '002-106'],
+  GENERIC: [],
+};
+
+const transcodeErrorCode = (data: Problem): keyof typeof errors => {
+  if (data.errors?.findIndex((e) => error2errorCode.INVALID_DOCUMENT.includes(e.code)) > -1) {
+    return 'INVALID_DOCUMENT';
+  } else if (data.errors?.findIndex((e) => error2errorCode.INVALID_SIGN.includes(e.code)) > -1) {
+    return 'INVALID_SIGN';
+  }
+  return 'GENERIC';
 };
 
 export default function CompleteRegistrationComponent() {
@@ -93,8 +109,16 @@ export default function CompleteRegistrationComponent() {
     setOutcome(outcome);
 
     if (outcome === 'error') {
-      // TODO recognize error motivation
-      setErrorCode('GENERIC');
+      if (
+        (uploadDocument as AxiosError<Problem>).response?.status === 409 &&
+        (uploadDocument as AxiosError<Problem>).response?.data
+      ) {
+        setErrorCode(
+          transcodeErrorCode((uploadDocument as AxiosError<Problem>).response?.data as Problem)
+        );
+      } else {
+        setErrorCode('GENERIC');
+      }
     }
   };
 
@@ -222,6 +246,7 @@ export default function CompleteRegistrationComponent() {
         message={errors[errorCode].message}
         confirmLabel="Torna alla pagina di caricamento"
         rejectLabel="Esci"
+        height="18em"
       />
     )
   ) : (

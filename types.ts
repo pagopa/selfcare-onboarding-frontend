@@ -125,3 +125,16 @@ export interface Attribute {
   name: string;
   description: string;
 }
+
+export interface Problem {
+  type: string;
+  status: number;
+  title: string;
+  detail?: string;
+  errors: Array<ProblemError>;
+}
+
+export interface ProblemError {
+  code: string;
+  detail: string;
+}

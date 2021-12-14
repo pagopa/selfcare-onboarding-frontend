@@ -13,7 +13,6 @@ import { LoadingOverlay } from '../components/LoadingOverlay';
 import { MessageNoAction } from '../components/MessageNoAction';
 import { ReactComponent as CheckIllustration } from '../assets/check-illustration.svg';
 import { ReactComponent as ErrorIllustration } from '../assets/error-illustration.svg';
-// import { InlineSupportLink } from '../components/InlineSupportLink';
 import { URL_FE_LANDING } from '../utils/constants';
 import { OnboardingStep1_5 } from '../components/OnboardingStep1_5';
 import { HeaderContext } from '../lib/context';

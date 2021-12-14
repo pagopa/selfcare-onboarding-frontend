@@ -70,9 +70,7 @@ const alreadyOnboarded: RequestOutcomeMessage = {
     </Grid>,
   ],
 };
-// const reload = () => {
-//   history.go(0);
-// };
+
 const genericError: RequestOutcomeMessage = {
   ImgComponent: ErrorIllustration,
   title: '',
