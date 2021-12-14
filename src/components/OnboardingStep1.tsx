@@ -78,7 +78,7 @@ export function OnboardingStep1({ forward }: StepperStepComponentProps) {
       direction="column"
     >
       <Grid container item justifyContent="center">
-        <Grid item xs={4}>
+        <Grid item xs={12}>
           <Typography variant="h3" component="h2" align="center">
             {bodyTitle}
           </Typography>
@@ -86,7 +86,7 @@ export function OnboardingStep1({ forward }: StepperStepComponentProps) {
       </Grid>
 
       <Grid container item justifyContent="center" mt={2}>
-        <Grid item xs={6}>
+        <Grid item xs={12}>
           <Typography variant="subtitle2" component="h2" align="center">
             {bodyDescription}
           </Typography>
@@ -100,7 +100,10 @@ export function OnboardingStep1({ forward }: StepperStepComponentProps) {
             setSelected={setSelected}
             placeholder="Cerca ente nel catalogo IPA"
             endpoint={{ endpoint: 'ONBOARDING_GET_SEARCH_PARTIES' }}
-            transformFn={(data: { items: Array<IPACatalogParty> }) => data.items}
+            transformFn={(data: { items: Array<IPACatalogParty> }) => {
+              // eslint-disable-next-line functional/immutable-data
+              data.items.forEach(i=>i.description = i.description.toLowerCase());
+              return data.items;}}
             labelKey="description"
           />
         </Grid>

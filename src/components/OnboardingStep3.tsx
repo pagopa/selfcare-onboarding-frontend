@@ -79,7 +79,7 @@ export function OnboardingStep3({ forward, back }: StepperStepComponentProps) {
       direction="column"
     >
       <Grid container item justifyContent="center">
-        <Grid item xs={6}>
+        <Grid item xs={12}>
           <Typography variant="h3" component="h2" align="center">
             {bodyTitle}
           </Typography>
@@ -87,7 +87,7 @@ export function OnboardingStep3({ forward, back }: StepperStepComponentProps) {
       </Grid>
 
       <Grid container item justifyContent="center" mt={2}>
-        <Grid item xs={6}>
+        <Grid item xs={12}>
           <Typography variant="subtitle2" component="h2" align="center">
             {bodyDescription1}
             <br />
