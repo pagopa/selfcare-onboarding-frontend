@@ -59,12 +59,12 @@ export function AsyncAutocomplete({
       freeSolo
       value={selected}
       noOptionsText={noOptionsText}
-      onChange={(_event, value) => setSelected(value)}
+      onChange={
+        (_event, value) =>  setSelected(value)}
       options={options}
       loading={isLoading}
       onInputChange={(_event, value, reason) => {
         setInput(value);
-
         if (reason === 'input') {
           setSelected(null);
           if (value.length >= 3) {
@@ -89,6 +89,7 @@ export function AsyncAutocomplete({
               color: '#C1C9D2',
               textAlign: 'start',
               paddingLeft: '16px',
+              textTransform: 'capitalize',
             },
             ...params.inputProps,
           }}
