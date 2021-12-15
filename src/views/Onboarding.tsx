@@ -38,7 +38,7 @@ const registerUnloadEvent = (
 const keepOnPage = (e: BeforeUnloadEvent) => {
   const message =
     "Warning!\n\nNavigating away from this page will delete your text if you haven't already saved it.";
-  console.log('E', window);
+
   e.preventDefault();
   // eslint-disable-next-line functional/immutable-data
   e.returnValue = message;
@@ -136,7 +136,12 @@ function OnboardingComponent({ productId }: { productId: string }) {
     },
     {
       label: 'Inserisci i dati degli amministratori',
-      Component: () => OnboardingStep3({ forward: submit, back }),
+      Component: () =>
+        OnboardingStep3({
+          legal: (formData as any).users[0],
+          forward: submit,
+          back,
+        }),
     },
   ];
 

@@ -26,7 +26,7 @@ export function AsyncAutocomplete({
   labelKey,
 }: AutocompleteProps) {
   const [isLoading, setIsLoading] = useState(false);
-  const [input, setInput] = useState<string>();
+  const [input, setInput] = useState<string>('');
   const [options, setOptions] = useState<Array<any>>([]);
 
   const handleSearch = async (query: string) => {
@@ -59,10 +59,10 @@ export function AsyncAutocomplete({
       freeSolo
       value={selected}
       noOptionsText={noOptionsText}
-      onChange={
-        (_event, value) =>  setSelected(value)}
+      onChange={(_event, value) => setSelected(value)}
       options={options}
       loading={isLoading}
+      inputValue={input}
       onInputChange={(_event, value, reason) => {
         setInput(value);
         if (reason === 'input') {
