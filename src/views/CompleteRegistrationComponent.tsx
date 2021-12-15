@@ -17,12 +17,12 @@ import { HeaderContext } from '../lib/context';
 import { getOnboardingMagicLinkJwt } from './RejectRegistration';
 import SessionModal from './../components/SessionModal';
 
-type FileErrorAttempt= {
+type FileErrorAttempt = {
   fileName: string;
   fileSize: number;
   fileLastModifyDate: number;
   errorCount: number;
-  };
+};
 
 const errors = {
   INVALID_DOCUMENT: {
@@ -108,7 +108,7 @@ export default function CompleteRegistrationComponent() {
   const submit = async (file: File) => {
     setLoading(true);
     const formData = new FormData();
-    formData.append('file', file);
+    formData.append('contract', file);
 
     const uploadDocument = await fetchWithLogs(
       { endpoint: 'ONBOARDING_COMPLETE_REGISTRATION', endpointParams: { token } },
@@ -120,22 +120,27 @@ export default function CompleteRegistrationComponent() {
     setOutcome(outcome);
 
     if (outcome === 'error') {
-      if(lastFileErrorAttempt && lastFileErrorAttempt.fileName === file.name && lastFileErrorAttempt.fileSize === file.size && lastFileErrorAttempt.fileLastModifyDate === file.lastModified){
-        const errorCount = lastFileErrorAttempt.errorCount +1;
+      if (
+        lastFileErrorAttempt &&
+        lastFileErrorAttempt.fileName === file.name &&
+        lastFileErrorAttempt.fileSize === file.size &&
+        lastFileErrorAttempt.fileLastModifyDate === file.lastModified
+      ) {
+        const errorCount = lastFileErrorAttempt.errorCount + 1;
         setLastFileErrorAttempt({
-          ...lastFileErrorAttempt, 
-          errorCount
+          ...lastFileErrorAttempt,
+          errorCount,
         });
-        if(errorCount > process.env.REACT_APP_UPLOAD_CONTRACT_MAX_LOOP_ERROR){
+        if (errorCount > process.env.REACT_APP_UPLOAD_CONTRACT_MAX_LOOP_ERROR) {
           setShowBlockingError(true);
           return;
         }
-      } else {  
+      } else {
         setLastFileErrorAttempt({
           fileName: file.name,
           fileSize: file.size,
           fileLastModifyDate: file.lastModified,
-          errorCount: 1
+          errorCount: 1,
         });
       }
       if (
@@ -148,7 +153,6 @@ export default function CompleteRegistrationComponent() {
       } else {
         setErrorCode('GENERIC');
       }
-    
     }
   };
 
