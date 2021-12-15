@@ -17,6 +17,13 @@ import { HeaderContext } from '../lib/context';
 import { getOnboardingMagicLinkJwt } from './RejectRegistration';
 import SessionModal from './../components/SessionModal';
 
+type FileErrorAttempt= {
+  fileName: string;
+  fileSize: number;
+  fileLastModifyDate: number;
+  errorCount: number;
+  };
+
 const errors = {
   INVALID_DOCUMENT: {
     title: 'Controlla il documento',
@@ -50,6 +57,7 @@ const transcodeErrorCode = (data: Problem): keyof typeof errors => {
   return 'GENERIC';
 };
 
+// eslint-disable-next-line sonarjs/cognitive-complexity
 export default function CompleteRegistrationComponent() {
   const { setSubHeaderVisible, setOnLogout } = useContext(HeaderContext);
   const token = getOnboardingMagicLinkJwt();
@@ -65,6 +73,9 @@ export default function CompleteRegistrationComponent() {
   const [errorCode, setErrorCode] = useState<keyof typeof errors>('GENERIC');
 
   const [loading, setLoading] = useState<boolean>(false);
+
+  const [lastFileErrorAttempt, setLastFileErrorAttempt] = useState<FileErrorAttempt>();
+  const [showBlockingError, setShowBlockingError] = useState(false);
 
   const [uploadedFiles, setUploadedFiles, setUploadedFilesHistory] = useHistoryState<Array<File>>(
     'uploaded_files',
@@ -109,6 +120,24 @@ export default function CompleteRegistrationComponent() {
     setOutcome(outcome);
 
     if (outcome === 'error') {
+      if(lastFileErrorAttempt && lastFileErrorAttempt.fileName === file.name && lastFileErrorAttempt.fileSize === file.size && lastFileErrorAttempt.fileLastModifyDate === file.lastModified){
+        const errorCount = lastFileErrorAttempt.errorCount +1;
+        setLastFileErrorAttempt({
+          ...lastFileErrorAttempt, 
+          errorCount
+        });
+        if(errorCount > process.env.REACT_APP_UPLOAD_CONTRACT_MAX_LOOP_ERROR){
+          setShowBlockingError(true);
+          return;
+        }
+      } else {  
+        setLastFileErrorAttempt({
+          fileName: file.name,
+          fileSize: file.size,
+          fileLastModifyDate: file.lastModified,
+          errorCount: 1
+        });
+      }
       if (
         (uploadDocument as AxiosError<Problem>).response?.status === 409 &&
         (uploadDocument as AxiosError<Problem>).response?.data
@@ -119,6 +148,7 @@ export default function CompleteRegistrationComponent() {
       } else {
         setErrorCode('GENERIC');
       }
+    
     }
   };
 
@@ -203,7 +233,7 @@ export default function CompleteRegistrationComponent() {
   return outcome === 'success' ? (
     <MessageNoAction {...outcomeContent[outcome]} />
   ) : outcome === 'error' ? (
-    !token ? (
+    !token || showBlockingError ? (
       <Grid container direction="column" key="0" style={{ textAlign: 'center' }}>
         <Grid container item justifyContent="center" mb={5}>
           <Grid item xs={6}>

@@ -16,6 +16,8 @@ declare namespace NodeJS {
     REACT_APP_PAGOPA_HELP_EMAIL: string;
 
     REACT_APP_MAX_INSTITUTIONS_FETCH: number;
+
+    REACT_APP_UPLOAD_CONTRACT_MAX_LOOP_ERROR: number;
   }
 }
 interface Window {
