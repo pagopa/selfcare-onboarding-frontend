@@ -33,6 +33,7 @@ variables:
     react_app_url_api_onboarding: '$(UAT_REACT_APP_URL_API_ONBOARDING)'
     react_app_url_api_party_process: '$(UAT_REACT_APP_URL_API_PARTY_PROCESS)'
     react_app_url_api_party_registry_proxy: '$(UAT_REACT_APP_URL_API_PARTY_REGISTRY_PROXY)'
+    react_app_enable_assistance: 'true'
 
   ${{ elseif eq(variables['Build.SourceBranch'], 'refs/heads/main') }}:
     environment: 'PROD'
@@ -49,6 +50,7 @@ variables:
     react_app_url_api_onboarding: '$(PROD_REACT_APP_URL_API_ONBOARDING)'
     react_app_url_api_party_process: '$(PROD_REACT_APP_URL_API_PARTY_PROCESS)'
     react_app_url_api_party_registry_proxy: '$(PROD_REACT_APP_URL_API_PARTY_REGISTRY_PROXY)'
+    react_app_enable_assistance: 'false'
 
   # every branch different from past will be considered as DEV
   #  ${{ if startsWith(variables['Build.SourceBranch'], 'refs/heads/release-dev') }}:
@@ -67,6 +69,7 @@ variables:
     react_app_url_api_onboarding: '$(DEV_REACT_APP_URL_API_ONBOARDING)'
     react_app_url_api_party_process: 'https://selc-d-apim.azure-api.net/party-process/v1' # TODO restore me '$(DEV_REACT_APP_URL_API_PARTY_PROCESS)'
     react_app_url_api_party_registry_proxy: 'https://selc-d-apim.azure-api.net/party-registry-proxy/v1' # TODO restore me '$(DEV_REACT_APP_URL_API_PARTY_REGISTRY_PROXY)'
+    react_app_enable_assistance: 'true'
 
 # Automatically triggered on PR
 # https://docs.microsoft.com/en-us/azure/devops/pipelines/yaml-schema?view=azure-devops&tabs=schema%2Cparameter-schema#pr-trigger
@@ -146,6 +149,7 @@ stages:
               REACT_APP_URL_API_ONBOARDING: '$(react_app_url_api_onboarding)'
               REACT_APP_URL_API_PARTY_PROCESS: '$(react_app_url_api_party_process)'
               REACT_APP_URL_API_PARTY_REGISTRY_PROXY: '$(react_app_url_api_party_registry_proxy)'
+              REACT_APP_ENABLE_ASSISTANCE: '$(react_app_enable_assistance)'
           - bash: |
               printf "$EXECUTION_ID\n$(git name-rev --name-only FETCH_HEAD) $(git rev-parse HEAD)" > $(System.DefaultWorkingDirectory)/build/build.info
             env:

@@ -1,6 +1,7 @@
 import { Box, Grid, Link, SvgIcon, Typography } from '@mui/material';
 import { ReactComponent as logo } from '../../assets/logo_pago_pa.svg';
-import { PAGOPA_HELP_EMAIL } from '../../utils/constants';
+import { PAGOPA_HELP_EMAIL, ENABLE_ASSISTANCE } from '../../utils/constants';
+
 const Footer = () => (
   <Box
     component="footer"
@@ -10,8 +11,8 @@ const Footer = () => (
       mt: 'auto',
       bgcolor: '#01254C',
       alignItems: 'center',
-      boxSizing:'unset',
-      position: 'relative'
+      boxSizing: 'unset',
+      position: 'relative',
     }}
   >
     <Grid container justifyContent={'center'} alignItems={'center'}>
@@ -30,14 +31,19 @@ const Footer = () => (
             }}
           >
             PagoPA S.p.A. - società per azioni con socio unico - capitale sociale di euro 1,000,000
-            interamente versato - sede legale in Roma, Piazza Colonna 370, CAP 00187 - 
+            interamente versato - sede legale in Roma, Piazza Colonna 370, CAP 00187 -
             <br />
             n. di iscrizione a Registro Imprese di Roma, CF e P.IVA 15376371009
           </Typography>
         </Box>
       </Box>
     </Grid>
-    <Grid container alignItems={'center'} justifyContent={'center'} sx={{position:'absolute', bottom:'48px'}}>
+    <Grid
+      container
+      alignItems={'center'}
+      justifyContent={'center'}
+      sx={{ position: 'absolute', bottom: '48px' }}
+    >
       <Box sx={{ width: '90%', display: 'flex' }}>
         <Typography
           sx={{
@@ -82,17 +88,19 @@ const Footer = () => (
           >
             {'Sicurezza delle informazioni '}
           </Link>
-          <Link
-            href={`mailto:${PAGOPA_HELP_EMAIL}`}
-            underline="none"
-            sx={{
-              margin: '10px',
-              color: '#9BB7CB !important',
-              textDecoration: 'none !important',
-            }}
-          >
-            {'Assistenza '}
-          </Link>
+          {ENABLE_ASSISTANCE && (
+            <Link
+              href={`mailto:${PAGOPA_HELP_EMAIL}`}
+              underline="none"
+              sx={{
+                margin: '10px',
+                color: '#9BB7CB !important',
+                textDecoration: 'none !important',
+              }}
+            >
+              {'Assistenza '}
+            </Link>
+          )}
         </Typography>
       </Box>
     </Grid>
