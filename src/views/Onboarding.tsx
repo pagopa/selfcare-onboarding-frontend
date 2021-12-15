@@ -13,7 +13,7 @@ import { LoadingOverlay } from '../components/LoadingOverlay';
 import { MessageNoAction } from '../components/MessageNoAction';
 import { ReactComponent as CheckIllustration } from '../assets/check-illustration.svg';
 import { ReactComponent as ErrorIllustration } from '../assets/error-illustration.svg';
-import { URL_FE_LANDING } from '../utils/constants';
+import { URL_FE_DASHBOARD, URL_FE_LANDING } from '../utils/constants';
 import { OnboardingStep1_5 } from '../components/OnboardingStep1_5';
 import { HeaderContext } from '../lib/context';
 import { URL_FE_LOGOUT } from '../utils/constants';
@@ -28,11 +28,11 @@ export const unregisterUnloadEvent = (
 
 const registerUnloadEvent = (
   setOnLogout: React.Dispatch<React.SetStateAction<(() => void) | null | undefined>>,
-  setOpenLogoutModal: React.Dispatch<React.SetStateAction<boolean>>
+  setOpenExitModal: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
   window.addEventListener('beforeunload', keepOnPage);
   // react dispatch consider a function input as a metod to be called with the previuos state to caluclate the next state: those we are defining a function that return the next function
-  setOnLogout(() => () => setOpenLogoutModal(true));
+  setOnLogout(() => () => setOpenExitModal(true));
 };
 
 const keepOnPage = (e: BeforeUnloadEvent) => {
@@ -52,11 +52,12 @@ function OnboardingComponent({ productId }: { productId: string }) {
   const [institutionId, setInstitutionId] = useState<string>('');
   const [outcome, setOutcome] = useState<RequestOutcome>();
   const history = useHistory();
-  const [openLogoutModal, setOpenLogoutModal] = useState(false);
+  const [openExitModal, setOpenExitModal] = useState(false);
+  const [openExitUrl, setOpenExitUrl] = useState(URL_FE_LOGOUT);
   const { setOnLogout } = useContext(HeaderContext);
 
   useEffect(() => {
-    registerUnloadEvent(setOnLogout, setOpenLogoutModal);
+    registerUnloadEvent(setOnLogout, setOpenExitModal);
     return () => unregisterUnloadEvent(setOnLogout);
   }, []);
 
@@ -121,7 +122,17 @@ function OnboardingComponent({ productId }: { productId: string }) {
     {
       label: 'Inserisci i dati del rappresentante legale',
       Component: () =>
-        OnboardingStep2({ forward: forwardWithData, back: () => setActiveStep(activeStep - 2) }),
+        OnboardingStep2({
+          forward: forwardWithData,
+          back: () => {
+            if (window.location.search.indexOf(`institutionId=${institutionId}`) > -1) {
+              setOpenExitUrl(`${URL_FE_DASHBOARD}/${institutionId}`);
+              setOpenExitModal(true);
+            } else {
+              setActiveStep(activeStep - 2);
+            }
+          },
+        }),
     },
     {
       label: 'Inserisci i dati degli amministratori',
@@ -190,17 +201,23 @@ function OnboardingComponent({ productId }: { productId: string }) {
   if (outcome) {
     unregisterUnloadEvent(setOnLogout);
   }
+
+  const handleCloseExitModal = () => {
+    setOpenExitModal(false);
+    setOpenExitUrl(URL_FE_LOGOUT);
+  };
+
   return !outcome ? (
     <Container>
       <Step />
       <SessionModal
-        handleClose={() => setOpenLogoutModal(false)}
-        handleExit={() => setOpenLogoutModal(false)}
+        handleClose={handleCloseExitModal}
+        handleExit={handleCloseExitModal}
         onConfirm={() => {
           unregisterUnloadEvent(setOnLogout);
-          window.location.assign(URL_FE_LOGOUT);
+          window.location.assign(openExitUrl);
         }}
-        open={openLogoutModal}
+        open={openExitModal}
         title={'Vuoi davvero uscire?'}
         message={'Se esci, la richiesta di adesione andrà persa.'}
         confirmLabel="Esci"
