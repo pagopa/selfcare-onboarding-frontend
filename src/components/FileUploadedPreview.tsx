@@ -65,7 +65,8 @@ export function  FileUploadedPreview({files, sx, deleteUploadedFiles, loading}: 
                                                mt: 0.5,
                                                ml: 1,
                                                color: "primary.main",
-                                               fontSize: "24px"
+                                               fontSize: "24px",
+                                               cursor:'pointer'
                                            }}></ClearOutlinedIcon>
                     </Grid>
 

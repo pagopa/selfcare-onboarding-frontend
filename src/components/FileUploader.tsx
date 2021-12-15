@@ -39,9 +39,11 @@ export function FileUploader({
     accept: accept ? accept : undefined,
   });
 
+  const dropzoneRootProps = getRootProps({ className: 'dropzone' });
   return (
     <Grid
-      {...getRootProps({ className: 'dropzone' })}
+      {...dropzoneRootProps}
+      onClick= {() =>{}}
       container
       direction="row"
       justifyItems={'center'}
@@ -107,7 +109,7 @@ export function FileUploader({
             variant={'body2'}
             align="left"
           >
-            {description}<Link>{descriptionLink}</Link>
+            {description}<Link sx={{cursor: 'pointer'}} onClick={(dropzoneRootProps as any).onClick}>{descriptionLink}</Link>
           </Typography>
         </Grid>
       )}
