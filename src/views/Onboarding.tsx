@@ -2,7 +2,7 @@ import React, { useEffect, useState, useContext } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Button, Container, Stack, Typography, Grid } from '@mui/material';
 import { withLogin } from '../components/withLogin';
-import { RequestOutcome, RequestOutcomeOptions, StepperStep } from '../../types';
+import { RequestOutcome, RequestOutcomeOptions, StepperStep, UserOnCreate } from '../../types';
 import { fetchWithLogs } from '../lib/api-utils';
 import { getFetchOutcome } from '../lib/error-utils';
 import { OnboardingStep0 } from '../components/OnboardingStep0';
@@ -90,12 +90,12 @@ function OnboardingComponent({ productId }: { productId: string }) {
     forwardWithData(newFormData);
   };
 
-  const submit = async () => {
+  const submit = async (users: Array<UserOnCreate>) => {
     setLoading(true);
 
     const postLegalsResponse = await fetchWithLogs(
       { endpoint: 'ONBOARDING_POST_LEGALS', endpointParams: { institutionId, productId } },
-      { method: 'POST', data: (formData as any).users }
+      { method: 'POST', data: users }
     );
 
     setLoading(false);
@@ -139,7 +139,10 @@ function OnboardingComponent({ productId }: { productId: string }) {
       Component: () =>
         OnboardingStep3({
           legal: (formData as any).users[0],
-          forward: submit,
+          forward: (newFormData: Partial<FormData>) => {
+            setFormData({ ...formData, ...newFormData });
+            void submit((newFormData as any).users);
+          },
           back,
         }),
     },
