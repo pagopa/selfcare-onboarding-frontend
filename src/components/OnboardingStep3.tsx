@@ -15,13 +15,19 @@ import { useHistoryState } from './useHistoryState';
 // Could be an ES6 Set but it's too bothersome for now
 export type UsersObject = { [key: string]: UserOnCreate };
 
-export function OnboardingStep3({ forward, back }: StepperStepComponentProps) {
+type Props = StepperStepComponentProps & {
+  legal: UserOnCreate;
+};
+
+export function OnboardingStep3({ legal, forward, back }: Props) {
   const { user } = useContext(UserContext);
   const [isAuthUser, setIsAuthUser, setIsAuthUserHistory] = useHistoryState('isAuthUser', false);
   const [people, setPeople, setPeopleHistory] = useHistoryState<UsersObject>('people_step3', {});
   const [delegateFormIds, setDelegateFormIds, setDelegateFormIdsHistory] = useHistoryState<
     Array<string>
   >('delegateFormIds', []);
+
+  const allPeople = { ...people, LEGAL: legal };
 
   const addDelegateForm = () => {
     const newId = `delegate-${cryptoRandomString({ length: 8 })}`;
@@ -116,6 +122,7 @@ export function OnboardingStep3({ forward, back }: StepperStepComponentProps) {
             prefix={'delegate-initial'}
             role="DELEGATE"
             people={people}
+            allPeople={allPeople}
             setPeople={setPeople}
             readOnly={isAuthUser ? ['name', 'surname', 'taxCode'] : []}
           />
@@ -138,7 +145,13 @@ export function OnboardingStep3({ forward, back }: StepperStepComponentProps) {
               xs={6}
               sx={{ boxShadow: '0px 12px 40px rgba(0, 0, 0, 0.06)', position: 'relative' }}
             >
-              <PlatformUserForm prefix={id} role="DELEGATE" people={people} setPeople={setPeople} />
+              <PlatformUserForm
+                prefix={id}
+                role="DELEGATE"
+                people={people}
+                allPeople={allPeople}
+                setPeople={setPeople}
+              />
               <IconButton
                 color="primary"
                 onClick={buildRemoveDelegateForm(id)}
@@ -162,14 +175,14 @@ export function OnboardingStep3({ forward, back }: StepperStepComponentProps) {
                 objectIsEmpty(people) ||
                 Object.keys(people)
                   .filter((prefix) => 'LEGAL' !== prefix)
-                  .some((prefix) => !validateUser(people[prefix])) ||
+                  .some((prefix) => !validateUser(prefix, people[prefix], allPeople)) ||
                 Object.keys(people).length === 3
               }
               color={
                 objectIsEmpty(people) ||
                 Object.keys(people)
                   .filter((prefix) => 'LEGAL' !== prefix)
-                  .some((prefix) => !validateUser(people[prefix])) ||
+                  .some((prefix) => !validateUser(prefix, people[prefix], allPeople)) ||
                 Object.keys(people).length === 3
                   ? 'text.disabled'
                   : 'primary'
@@ -195,7 +208,7 @@ export function OnboardingStep3({ forward, back }: StepperStepComponentProps) {
             objectIsEmpty(people) ||
             Object.keys(people)
               .filter((prefix) => 'LEGAL' !== prefix)
-              .some((prefix) => !validateUser(people[prefix])),
+              .some((prefix) => !validateUser(prefix, people[prefix], allPeople)),
         }}
       />
       {/* </Box> */}
