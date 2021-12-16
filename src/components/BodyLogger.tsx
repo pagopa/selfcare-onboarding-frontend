@@ -1,14 +1,16 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Box } from '@mui/system';
 import { logAction } from '../lib/action-log';
-import { Header } from './Header';
-import { Footer } from './Footer';
+import Header from './header/Header';
+import Footer from './footer/Footer';
 import { Main } from './Main';
+import { HeaderContext } from './../lib/context';
 
 export function BodyLogger() {
   const location = useLocation();
-
+  const [subHeaderVisible , setSubHeaderVisible ] = useState<boolean>(false);
+  const [onLogout, setOnLogout] = useState<(() => void) | null | undefined>();
   /*
    * Handle data logging (now console.log, in the future might be Analytics)
    */
@@ -24,9 +26,15 @@ export function BodyLogger() {
         minHeight: '100vh',
       }}
     >
-      <Header />
-      <Main />
-      <Footer />
+      <HeaderContext.Provider
+        value={{ subHeaderVisible, setSubHeaderVisible, onLogout, setOnLogout }}
+      >
+        <Header withSecondHeader={subHeaderVisible} onExitAction={onLogout} />
+        <Main />
+        <Box mt={16}>
+          <Footer />
+        </Box>
+      </HeaderContext.Provider>
     </Box>
   );
 }

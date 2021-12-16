@@ -1,50 +1,82 @@
-import { useState } from 'react';
-import { Stack } from '@mui/material';
+import { Grid, Typography } from '@mui/material';
 import { StepperStepComponentProps, UserOnCreate } from '../../types';
 import { objectIsEmpty } from '../lib/object-utils';
 import { OnboardingStepActions } from './OnboardingStepActions';
-import { StyledIntro } from './StyledIntro';
+// import {StyledIntro} from './StyledIntro';
 import { PlatformUserForm, validateUser } from './PlatformUserForm';
+import { useHistoryState } from './useHistoryState';
 
 // Could be an ES6 Set but it's too bothersome for now
 export type UsersObject = { [key: string]: UserOnCreate };
 
 export function OnboardingStep2({ forward, back }: StepperStepComponentProps) {
-  const [people, setPeople] = useState<UsersObject>({});
+  // const [people, setPeople] = useState<UsersObject>({});
+  const [people, setPeople, setPeopleHistory] = useHistoryState<UsersObject>('people_step2', {});
 
   const onForwardAction = () => {
+    savePageState();
     forward({ users: Object.values(people) });
   };
 
+  const onBackAction = () => {
+    savePageState();
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    back!();
+  };
+
+  const savePageState = () => {
+    setPeopleHistory(people);
+  };
+  const bodyTitle = 'Indica il Legale Rappresentante';
+  const bodyDescription1 = ' Inserisci i dati del Legale Rappresentante.';
+  const bodyDescription2 =
+    'La persona che indicherai sarà firmataria del contratto del prodotto a cui stai aderendo.';
   return (
-    <Stack spacing={10}>
-      <StyledIntro>
-        {{
-          title: 'Indica il Legale Rappresentante',
-          description: (
-            <>
-              Inserisci i dati del Legale Rappresentante.
-              <br />
-              La persona indicata sarà firmataria del contratto per la gestione dei prodotti PagoPA.
-            </>
-          ),
-        }}
-      </StyledIntro>
-      <PlatformUserForm
-        prefix="admin"
-        role="Manager"
-        platformRole="admin"
-        people={people}
-        setPeople={setPeople}
-      />
-      <OnboardingStepActions
-        back={{ action: back, label: 'Indietro', disabled: false }}
-        forward={{
-          action: onForwardAction,
-          label: 'Conferma',
-          disabled: objectIsEmpty(people) || !validateUser(people.admin),
-        }}
-      />
-    </Stack>
+    <Grid
+      container
+      // mt={16}
+      direction="column"
+    >
+      <Grid container item justifyContent="center">
+        <Grid item xs={12}>
+          <Typography variant="h3" component="h2" align="center">
+            {bodyTitle}
+          </Typography>
+        </Grid>
+      </Grid>
+
+      <Grid container item justifyContent="center" mt={2}>
+        <Grid item xs={12}>
+          <Typography variant="subtitle2" component="h2" align="center">
+            {bodyDescription1}
+            <br />
+            {bodyDescription2}
+          </Typography>
+        </Grid>
+      </Grid>
+
+      <Grid container item justifyContent="center" mt={7}>
+        <Grid item xs={6} sx={{ boxShadow: '0px 12px 40px rgba(0, 0, 0, 0.06)' }}>
+          <PlatformUserForm
+            prefix="LEGAL"
+            role="MANAGER"
+            people={people}
+            allPeople={people}
+            setPeople={setPeople}
+          />
+        </Grid>
+      </Grid>
+
+      <Grid item my={7}>
+        <OnboardingStepActions
+          back={{ action: onBackAction, label: 'Indietro', disabled: false }}
+          forward={{
+            action: onForwardAction,
+            label: 'Conferma',
+            disabled: objectIsEmpty(people) || !validateUser('LEGAL', people.LEGAL, people),
+          }}
+        />
+      </Grid>
+    </Grid>
   );
 }

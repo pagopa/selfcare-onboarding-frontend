@@ -1,5 +1,6 @@
 import { AxiosRequestConfig } from 'axios';
-import { API } from './src/lib/constants';
+import { FunctionComponent, SVGProps } from 'react';
+import { API } from './src/utils/constants';
 
 /*
  * Fetch data and router related types
@@ -28,7 +29,12 @@ export type RouteConfig = {
 
 export type Image = { src: string; alt: string };
 export type RequestOutcome = 'success' | 'error';
-export type RequestOutcomeMessage = { title: string; description: JSX.Element[]; img: Image };
+export type RequestOutcomeMessage = {
+  title: string;
+  description: Array<JSX.Element>;
+  img?: Image;
+  ImgComponent?: FunctionComponent<SVGProps<SVGSVGElement>>;
+};
 export type RequestOutcomeOptions = { [key in RequestOutcome]: RequestOutcomeMessage };
 
 /*
@@ -58,9 +64,9 @@ export type IPACatalogParty = {
 /*
  * Platform user and party
  */
-export type UserStatus = 'active' | 'suspended';
-export type UserRole = 'Manager' | 'Delegate' | 'Operator';
-export type UserPlatformRole = 'admin' | 'security' | 'api';
+export type UserStatus = 'ACTIVE' | 'SUSPENDED';
+export type PartyRole = 'MANAGER' | 'DELEGATE' | 'SUB_DELEGATE' | 'OPERATOR';
+export type UserProductRole = 'ADMIN' | 'LIMITED';
 
 export type UserOnCreate = {
   name: string;
@@ -68,21 +74,67 @@ export type UserOnCreate = {
   taxCode: string; // This should not be optional, it is temporarily because of the "from" below
   from?: string; // This is temporary, part of the API shared with self-care
   email: string;
-  role: UserRole;
-  platformRole: UserPlatformRole;
+  role: PartyRole;
 };
 
-export type User = UserOnCreate & {
-  status: UserStatus;
+export type User = {
+  uid: string;
+  taxCode: string;
+  name: string;
+  surname: string;
+  email: string;
 };
 
-export type Party = {
-  status: 'Pending' | 'Active';
-  description: string;
+export type AlertDialogActions = {
+  setDialogTitle: (t: string) => void;
+  setDialogDescription: (t: string) => void;
+  setShowDialog: (t: boolean) => void;
+  handleCloseDialog?: (t: any) => void;
+};
+
+export interface OnboardingInfo {
+  person: PersonInfo;
+  institutions: Array<OnboardingData>;
+}
+
+export interface PersonInfo {
+  name: string;
+  surname: string;
+  taxCode: string;
+}
+
+export interface OnboardingData {
   institutionId: string;
+  description: string;
+  taxCode: string;
   digitalAddress: string;
-  role: UserRole;
-  platformRole: UserPlatformRole;
-  partyId?: string;
-  attributes: string[];
-};
+  state: UserStatus;
+  role: PartyRole;
+  productInfo: ProductInfo;
+  attributes: Array<Attribute>;
+}
+
+export interface ProductInfo {
+  id: string;
+  role: UserProductRole;
+  createdAt: Date;
+}
+
+export interface Attribute {
+  id: string;
+  name: string;
+  description: string;
+}
+
+export interface Problem {
+  type: string;
+  status: number;
+  title: string;
+  detail?: string;
+  errors: Array<ProblemError>;
+}
+
+export interface ProblemError {
+  code: string;
+  detail: string;
+}

@@ -1,13 +1,13 @@
 import React, { FunctionComponent } from 'react';
 import { Container, Typography } from '@mui/material';
 
-type ChildrenProps = {
+export type StyledIntroChildrenProps = {
   title: React.ReactNode;
   description?: React.ReactNode;
 };
 
 type StyledIntroProps = {
-  children: ChildrenProps;
+  children: StyledIntroChildrenProps;
   priority?: 1 | 2 | 3;
   additionalClasses?: string;
 };
@@ -27,9 +27,29 @@ function priorityToTag(priority: 1 | 2 | 3): 'h2' | 'h3' | 'h4' {
 
 export const StyledIntro: FunctionComponent<StyledIntroProps> = ({ children, priority = 1 }) => (
   <Container>
-    <Typography variant={priorityToTag(priority)} align="center">
+    <Typography
+      sx={{
+        fontWeight: 'bold',
+        fontSize: '32px',
+        lineHeight: '48px',
+        textAlign: 'center',
+      }}
+      variant={priorityToTag(priority)}
+      align="center"
+    >
       {children.title}
     </Typography>
-    {children.description && <Typography align="center">{children.description}</Typography>}
+    {children.description && (
+      <Typography
+        sx={{
+          fontSize: '16px',
+          lineHeight: '24px',
+          textAlign: 'center',
+        }}
+        align="center"
+      >
+        {children.description}
+      </Typography>
+    )}
   </Container>
 );

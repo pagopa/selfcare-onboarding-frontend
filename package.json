@@ -1,13 +1,15 @@
 {
   "name": "selfcare-onboarding-frontend",
   "version": "1.0.0",
-  "homepage": ".",
+  "homepage": "onboarding",
   "private": true,
   "dependencies": {
     "@emotion/react": "^11.4.1",
     "@emotion/styled": "^11.3.0",
+    "@fontsource/titillium-web": "^4.5.0",
     "@mui/icons-material": "^5.0.3",
     "@mui/material": "^5.0.3",
+    "@pagopa/mui-italia": "pagopa/mui-italia",
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^11.2.7",
     "@testing-library/user-event": "^12.8.3",
@@ -24,6 +26,7 @@
     "query-string": "^4.3.4",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
+    "react-dropzone": "^11.4.2",
     "react-md-spinner": "^1.0.0",
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.3",
@@ -33,9 +36,11 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "react-scripts test -i",
+    "test:coverage": "react-scripts test -i --coverage",
     "eject": "react-scripts eject",
     "lint-autofix": "eslint . -c .eslintrc.js --ext .ts,.tsx --fix",
+    "lint": "eslint . -c .eslintrc.js --ext .ts,.tsx ",
     "prettify": "prettier --write \"./**/*.{ts,tsx}\""
   },
   "eslintConfig": {
@@ -67,5 +72,12 @@
     "eslint-plugin-react-hooks": "^4.2.0",
     "eslint-plugin-sonarjs": "^0.10.0",
     "prettier": "^2.4.1"
+  },
+  "jest": {
+    "coveragePathIgnorePatterns": [
+      "src/index.tsx",
+      "src/reportWebVitals.ts",
+      "src/utils/constants.ts"
+    ]
   }
 }
