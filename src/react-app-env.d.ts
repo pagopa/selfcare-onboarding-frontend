@@ -18,6 +18,8 @@ declare namespace NodeJS {
     REACT_APP_MAX_INSTITUTIONS_FETCH: number;
 
     REACT_APP_UPLOAD_CONTRACT_MAX_LOOP_ERROR: number;
+
+    REACT_APP_ENABLE_ASSISTANCE: string;
   }
 }
 interface Window {
