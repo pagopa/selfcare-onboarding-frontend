@@ -45,7 +45,7 @@ export function OnboardingStep3({ legal, forward, back }: Props) {
 
   const onForwardAction = () => {
     savePageState();
-    forward({ users: Object.values(people) });
+    forward({ users: [legal].concat(Object.values(people)) });
   };
 
   const onBackAction = () => {

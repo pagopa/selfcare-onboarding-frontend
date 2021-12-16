@@ -1,5 +1,5 @@
 import { Button, Grid, Typography } from '@mui/material';
-import { AxiosResponse } from 'axios';
+import { AxiosError, AxiosResponse } from 'axios';
 import { useEffect, useState, useContext } from 'react';
 import {
   OnboardingData,
@@ -105,6 +105,7 @@ const genericError: RequestOutcomeMessage = {
   ],
 };
 
+// eslint-disable-next-line sonarjs/cognitive-complexity
 export function OnboardingStep1_5({ forward, institutionId, productId }: Props) {
   const [loading, setLoading] = useState(true);
   const [outcome, setOutcome] = useState<RequestOutcomeMessage | null>();
@@ -139,7 +140,15 @@ export function OnboardingStep1_5({ forward, institutionId, productId }: Props) 
         onForwardAction();
       }
     } else {
-      setOutcome(genericError);
+      if (
+        (onboardingStatus as AxiosError<any>).response?.status === 404 ||
+        (onboardingStatus as AxiosError<any>).response?.status === 400
+      ) {
+        setOutcome(null);
+        onForwardAction();
+      } else {
+        setOutcome(genericError);
+      }
     }
   };
 
