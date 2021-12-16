@@ -97,11 +97,9 @@ stages:
   # - is a tag in the form v{version}-RELEASE
   - stage: Release
     condition: or(
-      eq(variables['Build.SourceBranch'], format('refs/heads/{0}', variables.DEFAULT_BRANCH)),
-      and(
-      startsWith(variables['Build.SourceBranch'], 'refs/tags'),
-      endsWith(variables['Build.SourceBranch'], '-RELEASE')
-      )
+      startsWith(variables['Build.SourceBranch'], 'refs/heads/release-uat')
+      , startsWith(variables['Build.SourceBranch'], 'refs/heads/hotfix')
+      , eq(variables['Build.SourceBranch'], 'refs/heads/main')
       )
     pool:
       vmImage: 'ubuntu-latest'
