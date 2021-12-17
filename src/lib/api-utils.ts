@@ -2,6 +2,7 @@ import axios, { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } f
 import isEmpty from 'lodash/isEmpty';
 import { Endpoint, RequestConfig } from '../../types';
 import { API } from '../utils/constants';
+import { mockFetch } from './__mocks__/mockApiRequests';
 import { logAction, logError } from './action-log';
 import { storageRead } from './storage-utils';
 
@@ -73,6 +74,11 @@ export async function fetchWithLogs(
   { endpoint, endpointParams }: Endpoint,
   { method, params, data, headers }: AxiosRequestConfig
 ) {
+  /* istanbul ignore if */
+  if (process.env.REACT_APP_MOCK_API === 'true') {
+    return mockFetch({ endpoint, endpointParams }, { method, params, data, headers });
+  }
+
   // Prepare the request
   // eslint-disable-next-line @typescript-eslint/await-thenable
   const request = await prepareRequest(
