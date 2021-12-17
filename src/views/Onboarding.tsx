@@ -206,9 +206,11 @@ function OnboardingComponent({ productId }: { productId: string }) {
     },
   };
 
-  if (outcome) {
-    unregisterUnloadEvent(setOnLogout);
-  }
+  useEffect(() => {
+    if (outcome) {
+      unregisterUnloadEvent(setOnLogout);
+    }
+  }, [outcome]);
 
   const handleCloseExitModal = () => {
     setOpenExitModal(false);

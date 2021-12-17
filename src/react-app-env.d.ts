@@ -20,6 +20,8 @@ declare namespace NodeJS {
     REACT_APP_UPLOAD_CONTRACT_MAX_LOOP_ERROR: number;
 
     REACT_APP_ENABLE_ASSISTANCE: string;
+
+    REACT_APP_MOCK_API: string;
   }
 }
 interface Window {
