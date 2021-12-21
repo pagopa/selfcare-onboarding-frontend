@@ -105,7 +105,8 @@ export function OnboardingStep1({ forward }: StepperStepComponentProps) {
               data.items.forEach((i) => (i.description = i.description.toLowerCase()));
               return data.items;
             }}
-            labelKey="description"
+            optionKey="id"
+            optionLabel="description"
           />
         </Grid>
       </Grid>
