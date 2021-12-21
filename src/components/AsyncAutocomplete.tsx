@@ -86,13 +86,14 @@ export function AsyncAutocomplete({
               fontWeight: 'normal',
               fontSize: '16px',
               lineHeight: '24px',
-              color: '#C1C9D2',
+              color: '#5C6F82',
               textAlign: 'start',
               paddingLeft: '16px',
               textTransform: 'capitalize',
             },
             ...params.inputProps,
           }}
+          placeholder={placeholder}
           variant="standard"
         />
       )}
