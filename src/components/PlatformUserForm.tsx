@@ -45,7 +45,7 @@ const fields: Array<Field> = [
     regexpMessage: 'Il Codice Fiscale inserito non è valido',
     unique: true,
     caseSensitive: false,
-    uniqueMessage: 'Il Codice Fiscale fornito è stato già fornito',
+    uniqueMessage: 'Il codice fiscale inserito è già presente',
   },
   {
     id: 'email',
@@ -57,7 +57,7 @@ const fields: Array<Field> = [
     helperMessage: "Inserisci l'indirizzo email istituzionale utilizzato per l'Ente",
     unique: true,
     caseSensitive: false,
-    uniqueMessage: 'L’indirizzo email fornito è stato già fornito',
+    uniqueMessage: "L'indirizzo mail inserito è già presente",
   },
 ];
 

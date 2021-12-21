@@ -98,13 +98,15 @@ export function OnboardingStep1({ forward }: StepperStepComponentProps) {
           <AsyncAutocomplete
             selected={selected}
             setSelected={setSelected}
-            placeholder="Cerca ente nel catalogo IPA"
+            placeholder="Cerca"
             endpoint={{ endpoint: 'ONBOARDING_GET_SEARCH_PARTIES' }}
             transformFn={(data: { items: Array<IPACatalogParty> }) => {
               // eslint-disable-next-line functional/immutable-data
-              data.items.forEach(i=>i.description = i.description.toLowerCase());
-              return data.items;}}
-            labelKey="description"
+              data.items.forEach((i) => (i.description = i.description.toLowerCase()));
+              return data.items;
+            }}
+            optionKey="id"
+            optionLabel="description"
           />
         </Grid>
       </Grid>
