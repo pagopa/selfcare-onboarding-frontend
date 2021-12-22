@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import debounce from 'lodash/debounce';
 import { AxiosError, AxiosResponse } from 'axios';
-import { Autocomplete, TextField } from '@mui/material';
+import { Autocomplete, IconButton, InputAdornment, TextField } from '@mui/material';
 import { Box } from '@mui/system';
+import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
+import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 import { Endpoint } from '../../types';
 import { fetchWithLogs } from '../lib/api-utils';
 import { getFetchOutcome } from '../lib/error-utils';
-// import logo from '../assets/comune-milano-logo.svg';
 
 type AutocompleteProps = {
   selected: any;
@@ -14,7 +15,8 @@ type AutocompleteProps = {
   placeholder: string;
   endpoint: Endpoint;
   transformFn: any;
-  labelKey?: string;
+  optionKey?: string;
+  optionLabel?: string;
 };
 
 export function AsyncAutocomplete({
@@ -23,7 +25,8 @@ export function AsyncAutocomplete({
   placeholder,
   endpoint,
   transformFn,
-  labelKey,
+  optionKey,
+  optionLabel,
 }: AutocompleteProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [input, setInput] = useState<string>('');
@@ -50,8 +53,11 @@ export function AsyncAutocomplete({
 
   const noOptionsText =
     input !== undefined && input.length >= 3 ? 'No risultati' : 'Digita almeno 3 caratteri';
+  const getOptionKey: (option: any) => string =
+    optionKey !== undefined ? (o) => o[optionKey] : (o) => o.label ?? o;
+
   const getOptionLabel: (option: any) => string =
-    labelKey !== undefined ? (o) => o[labelKey] : (o) => o.label ?? o;
+    optionLabel !== undefined ? (o) => o[optionLabel] : (o) => o.label ?? o;
 
   return (
     <Autocomplete
@@ -59,12 +65,18 @@ export function AsyncAutocomplete({
       freeSolo
       value={selected}
       noOptionsText={noOptionsText}
-      onChange={(_event, value) => setSelected(value)}
+      onChange={(_event, value) => {
+        setSelected(value);
+        setInput(getOptionLabel(value));
+      }}
       options={options}
       loading={isLoading}
       inputValue={input}
+      disableClearable={true}
       onInputChange={(_event, value, reason) => {
         setInput(value);
+        console.log(reason);
+        console.log(selected);
         if (reason === 'input') {
           setSelected(null);
           if (value.length >= 3) {
@@ -74,30 +86,52 @@ export function AsyncAutocomplete({
         if (reason === 'clear') {
           setSelected(null);
         }
+        if (reason === 'reset' && selected) {
+          setInput(getOptionLabel(selected));
+        }
       }}
       filterOptions={(x) => x}
       renderInput={(params) => (
         <TextField
           {...params}
           inputProps={{
+            ...params.inputProps,
             style: {
               fontFamily: 'Titillium Web',
               fontStyle: 'normal',
               fontWeight: 'normal',
               fontSize: '16px',
               lineHeight: '24px',
-              color: '#C1C9D2',
+              color: '#5C6F82',
               textAlign: 'start',
               paddingLeft: '16px',
               textTransform: 'capitalize',
             },
-            ...params.inputProps,
           }}
+          InputProps={{
+            ...params.InputProps,
+            endAdornment: (
+              <InputAdornment position="end">
+                {!input ? (
+                  <SearchOutlinedIcon />
+                ) : (
+                  <IconButton
+                    // color="primary"
+                    onClick={() => setInput('')}
+                    style={{ marginRight: '-10px' }}
+                  >
+                    <ClearOutlinedIcon />
+                  </IconButton>
+                )}
+              </InputAdornment>
+            ),
+          }}
+          placeholder={placeholder}
           variant="standard"
         />
       )}
       placeholder={placeholder}
-      getOptionLabel={getOptionLabel}
+      getOptionLabel={getOptionKey}
       renderOption={(props, option) => (
         <li {...props}>
           <Box
@@ -111,7 +145,7 @@ export function AsyncAutocomplete({
               textTransform: 'capitalize',
             }}
           >
-            {option.description?.toLowerCase()}
+            {getOptionLabel(option)?.toLowerCase()}
           </Box>
         </li>
       )}
