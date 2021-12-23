@@ -322,6 +322,16 @@ export async function mockFetch(
         );
     }
   }
+  if (endpoint === 'ONBOARDING_COMPLETE_REGISTRATION') {
+    switch (endpointParams.token) {
+      case 'error':
+        return genericError;
+      default:
+        return new Promise((resolve) =>
+          resolve({ data: undefined, status: 200, statusText: '200' } as AxiosResponse)
+        );
+    }
+  }
 
   const msg = `NOT MOCKED REQUEST! {endpoint: ${endpoint}, endpointParams: ${JSON.stringify(
     endpointParams
