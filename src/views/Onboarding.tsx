@@ -65,9 +65,6 @@ function OnboardingComponent({ productId }: { productId: string }) {
     // eslint-disable-next-line functional/immutable-data
     Object.assign(history.location, { state: undefined });
   }, []);
-  const reload = () => {
-    history.go(0);
-  };
 
   const back = () => {
     setActiveStep(activeStep - 1);
@@ -196,7 +193,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
           </Grid>
           <Grid container item justifyContent="center">
             <Grid item xs={4}>
-              <Button onClick={reload} variant={'contained'}>
+              <Button onClick={() => window.location.assign(URL_FE_LANDING)} variant={'contained'}>
                 Torna alla home
               </Button>
             </Grid>

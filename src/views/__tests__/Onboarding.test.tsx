@@ -1,19 +1,13 @@
-import {
-  fireEvent,
-  getByLabelText,
-  getByText,
-  render,
-  screen,
-  waitFor,
-} from '@testing-library/react';
+import { fireEvent, getByLabelText, render, screen, waitFor } from '@testing-library/react';
 import { useState } from 'react';
 import { User } from '../../../types';
-import { fetchWithLogs } from '../../lib/api-utils';
-import { UserContext } from '../../lib/context';
-import { URL_FE_LANDING } from '../../utils/constants';
+import { HeaderContext, UserContext } from '../../lib/context';
+import { URL_FE_LANDING, URL_FE_LOGOUT } from '../../utils/constants';
 import Onboarding from '../Onboarding';
 
 jest.mock('../../lib/api-utils');
+
+jest.setTimeout(7000);
 
 let fetchWithLogsSpy: jest.SpyInstance;
 
@@ -51,11 +45,18 @@ jest.mock('react-router-dom', () => ({
 const renderComponent = () => {
   const Component = () => {
     const [user, setUser] = useState<User | null>(null);
+    const [subHeaderVisible, setSubHeaderVisible] = useState<boolean>(false);
+    const [onLogout, setOnLogout] = useState<(() => void) | null | undefined>();
 
     return (
-      <UserContext.Provider value={{ user, setUser }}>
-        <Onboarding productId="prod-io" />
-      </UserContext.Provider>
+      <HeaderContext.Provider
+        value={{ subHeaderVisible, setSubHeaderVisible, onLogout, setOnLogout }}
+      >
+        <UserContext.Provider value={{ user, setUser }}>
+          <button onClick={onLogout}>LOGOUT</button>
+          <Onboarding productId="prod-io" />
+        </UserContext.Provider>
+      </HeaderContext.Provider>
     );
   };
 
@@ -66,7 +67,7 @@ const step1Title = 'Seleziona il tuo Ente';
 const step2Title = 'Indica il Legale Rappresentante';
 const step3Title = 'Indica il Referente Amministrativo';
 const completeSuccessTitle = 'La tua richiesta è stata inviata con successo';
-const completeErrorTitle = 'Indica il Referente Amministrativo';
+const completeErrorTitle = 'Spiacenti, qualcosa è andato storto.';
 
 test('test already onboarded', async () => {
   renderComponent();
@@ -87,14 +88,55 @@ test('test complete', async () => {
   await executeStep1('agency x');
   await executeStep2();
   await executeStep3(true);
+  await executeGoHome();
 });
 
 test('test complete with error on submit', async () => {
   renderComponent();
-  await executeStep1('agency x');
+  await executeStep1('agency error');
   await executeStep2();
   await executeStep3(false);
+  await executeGoHome();
 });
+
+test('test exiting during flow with unload event', async () => {
+  renderComponent();
+  await executeStep1('agency x');
+  const event = new Event('beforeunload');
+  window.dispatchEvent(event);
+  await waitFor(
+    () =>
+      (event.returnValue as unknown as string) ===
+      "Warning!\n\nNavigating away from this page will delete your text if you haven't already saved it."
+  );
+});
+
+test('test exiting during flow with logout', async () => {
+  renderComponent();
+  await executeStep1('agency x');
+
+  expect(screen.queryByText('Vuoi davvero uscire?')).toBeNull();
+
+  const logoutButton = screen.getByRole('button', { name: 'LOGOUT' });
+  await performLogout(logoutButton);
+
+  await performLogout(logoutButton);
+  fireEvent.click(screen.getByRole('button', { name: 'Annulla' }));
+  await waitFor(() => expect(screen.queryByText('Vuoi davvero uscire?')).toBeNull());
+
+  await performLogout(logoutButton);
+  fireEvent.click(findRemoveAdditionUsersButtons()[0]);
+  await waitFor(() => expect(screen.queryByText('Vuoi davvero uscire?')).toBeNull());
+
+  await performLogout(logoutButton);
+  fireEvent.click(screen.getByRole('button', { name: 'Esci' }));
+  await waitFor(() => expect(mockedLocation.assign).toBeCalledWith(URL_FE_LOGOUT));
+});
+
+const performLogout = async (logoutButton: HTMLElement) => {
+  fireEvent.click(logoutButton);
+  await waitFor(() => expect(screen.queryByText('Vuoi davvero uscire?')).not.toBeNull());
+};
 
 const retrieveNavigationButtons = () => {
   const goBackButton = screen.getByRole('button', {
@@ -116,7 +158,7 @@ const executeGoHome = async () => {
   });
   expect(goHomeButton).toBeEnabled();
   fireEvent.click(goHomeButton);
-  expect(mockedLocation.assign).toBeCalledWith(URL_FE_LANDING);
+  await waitFor(() => expect(mockedLocation.assign).toBeCalledWith(URL_FE_LANDING));
 };
 
 const checkBackForwardNavigation = async (
@@ -386,7 +428,7 @@ const checkAdditionalUsersExistance = (
 const findRemoveAdditionUsersButtons = () =>
   screen
     .getAllByRole('button')
-    .filter((b) => b.children.length === 2 && b.children[0].tagName === 'svg');
+    .filter((b) => b.children.length > 0 && b.children[0].tagName === 'svg');
 
 const fillAdditionalUserAndCheckUniqueValues = async (
   index: number,
