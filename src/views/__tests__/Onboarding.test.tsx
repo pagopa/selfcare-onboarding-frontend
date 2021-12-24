@@ -196,7 +196,7 @@ const executeStep3 = async (expectedSuccessfulSubmit: boolean) => {
     1
   );
 
-  await checkAdditionalUsers(confirmButton, addDelegateButton);
+  await checkAdditionalUsers(confirmButton);
 
   fireEvent.click(confirmButton);
 
@@ -328,20 +328,16 @@ const clickAdminCheckBoxAndTestValues = (
   expect(addDelegateButton).toBeDisabled();
 };
 
-const checkAdditionalUsers = async (confirmButton: HTMLElement, addDelegateButton: HTMLElement) => {
+const checkAdditionalUsers = async (confirmButton: HTMLElement) => {
   for (let i = 0; i < 2; i++) {
     console.log('Adding additional user #', i);
-    await checkRemovingEmptyAdditionalUser(i, confirmButton, addDelegateButton);
+    await checkRemovingEmptyAdditionalUser(i, confirmButton);
 
     await fillAdditionalUserAndCheckUniqueValues(i, confirmButton);
   }
 };
 
-const checkRemovingEmptyAdditionalUser = async (
-  index: number,
-  confirmButton: HTMLElement,
-  addDelegateButton: HTMLElement
-) => {
+const checkRemovingEmptyAdditionalUser = async (index: number, confirmButton: HTMLElement) => {
   const removeUserButtons = await addAdditionEmptyUser(index, confirmButton);
   fireEvent.click(removeUserButtons[index]);
 
