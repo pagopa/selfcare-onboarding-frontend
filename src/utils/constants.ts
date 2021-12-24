@@ -7,7 +7,7 @@ import NoProductPage from '../views/NoProductPage';
 const IS_DEVELOP = process.env.NODE_ENV === 'development';
 
 export const DISPLAY_LOGS = IS_DEVELOP;
-export const MOCK_USER = IS_DEVELOP;
+export const MOCK_USER = process.env.REACT_APP_MOCK_USER;
 
 export const BASE_ROUTE = process.env.PUBLIC_URL ? process.env.PUBLIC_URL : '/onboarding';
 

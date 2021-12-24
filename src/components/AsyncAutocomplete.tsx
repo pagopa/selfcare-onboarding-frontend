@@ -75,8 +75,7 @@ export function AsyncAutocomplete({
       disableClearable={true}
       onInputChange={(_event, value, reason) => {
         setInput(value);
-        console.log(reason);
-        console.log(selected);
+
         if (reason === 'input') {
           setSelected(null);
           if (value.length >= 3) {

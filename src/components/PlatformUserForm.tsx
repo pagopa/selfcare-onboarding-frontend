@@ -53,11 +53,11 @@ const fields: Array<Field> = [
     type: 'email',
     width: 12,
     regexp: new RegExp('^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$'),
-    regexpMessage: 'L’indirizzo email non è valido',
+    regexpMessage: "L'indirizzo email non è valido",
     helperMessage: "Inserisci l'indirizzo email istituzionale utilizzato per l'Ente",
     unique: true,
     caseSensitive: false,
-    uniqueMessage: "L'indirizzo mail inserito è già presente",
+    uniqueMessage: "L'indirizzo email inserito è già presente",
   },
 ];
 

@@ -74,6 +74,15 @@
     "prettier": "^2.4.1"
   },
   "jest": {
+    "restoreMocks": true,
+    "clearMocks": true,
+    "resetMocks": true,
+    "transform": {
+      "node_modules/crypto-random-string/index.js": "babel-jest"
+    },
+    "transformIgnorePatterns": [
+      "node_modules/(?!crypto-random-string/.*)"
+    ],
     "coveragePathIgnorePatterns": [
       "src/index.tsx",
       "src/reportWebVitals.ts",
