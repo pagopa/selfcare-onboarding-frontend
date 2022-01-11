@@ -285,7 +285,7 @@ export async function mockFetch(
     );
   }
 
-  if (endpoint === 'ONBOARDING_GET_INFO') {
+  if (endpoint === 'VERIFY_ONBOARDING') {
     switch (params.institutionId) {
       case 'infoError':
         return genericError;
