@@ -115,8 +115,8 @@ export function OnboardingStep1_5({ forward, institutionId, productId }: Props) 
     setLoading(true);
 
     const onboardingStatus = await fetchWithLogs(
-      { endpoint: 'ONBOARDING_GET_INFO' },
-      { method: 'GET', params: { institutionId } }
+      { endpoint: 'ONBOARDING_GET_INFO' , endpointParams: { institutionId, productId } },
+      { method: 'GET' }
     );
 
     setLoading(false);

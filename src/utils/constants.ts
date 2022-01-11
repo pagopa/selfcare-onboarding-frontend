@@ -52,7 +52,7 @@ export const ROUTES: RoutesObject = {
 
 export const API = {
   ONBOARDING_GET_INFO: {
-    URL: URL_API_PARTY_PROCESS + '/onboarding/info',
+    URL: URL_API_PARTY_PROCESS + '/organization/{{institutionId}}/products/{{productId}}',
   },
   ONBOARDING_GET_SEARCH_PARTIES: {
     URL: URL_API_PARTY_REGISTRY_PROXY + '/institutions',
