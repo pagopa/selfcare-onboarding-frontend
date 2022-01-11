@@ -4,6 +4,7 @@ import 'core-js/es/promise';
 import 'core-js/es/array';
 import 'core-js/stable/string';
 import 'core-js/stable/number';
+import 'core-js/stable/url-search-params';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter } from 'react-router-dom';
