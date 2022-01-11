@@ -286,7 +286,7 @@ export async function mockFetch(
   }
 
   if (endpoint === 'VERIFY_ONBOARDING') {
-    switch (params.institutionId) {
+    switch (endpointParams.institutionId) {
       case 'infoError':
         return genericError;
       case 'onboarded':
