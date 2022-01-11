@@ -18,7 +18,7 @@ const Footer = () => (
     <Grid container justifyContent={'center'} alignItems={'center'}>
       <Box sx={{ width: '90%', display: 'flex' }}>
         <SvgIcon component={logo} viewBox="0 0 140 33" sx={{ width: '119px' }} />
-        <Box sx={{ textAlign: 'end', flexGrow: 1 }} pl={8}>
+        <Box sx={{ textAlign: 'right', flexGrow: 1 }} pl={8}>
           <Typography
             component="div"
             sx={{
