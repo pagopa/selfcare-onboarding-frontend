@@ -43,8 +43,8 @@ const errors = {
 };
 
 const error2errorCode: { [key in keyof typeof errors]: Array<string> } = {
-  INVALID_DOCUMENT: ['002-100', '002-101'],
-  INVALID_SIGN: ['002-102', '002-103', '002-104', '002-105', '002-106'],
+  INVALID_DOCUMENT: ['002-0100', '002-0101'],
+  INVALID_SIGN: ['002-0102', '002-0103', '002-0104', '002-0105', '002-0106', '002-0107'],
   GENERIC: [],
 };
 
