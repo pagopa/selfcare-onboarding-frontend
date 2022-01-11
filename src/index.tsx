@@ -1,5 +1,6 @@
 import 'react-app-polyfill/ie11';
 import 'react-app-polyfill/stable';
+import 'core-js/es/object/values';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter } from 'react-router-dom';
