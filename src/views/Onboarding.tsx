@@ -13,7 +13,7 @@ import { LoadingOverlay } from '../components/LoadingOverlay';
 import { MessageNoAction } from '../components/MessageNoAction';
 import { ReactComponent as CheckIllustration } from '../assets/check-illustration.svg';
 import { ReactComponent as ErrorIllustration } from '../assets/error-illustration.svg';
-import { URL_FE_DASHBOARD, URL_FE_LANDING, URL_FE_LOGOUT } from '../utils/env';
+import { ENV } from '../utils/env';
 import { OnboardingStep1_5 } from '../components/OnboardingStep1_5';
 import { HeaderContext } from '../lib/context';
 import SessionModal from './../components/SessionModal';
@@ -52,7 +52,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
   const [outcome, setOutcome] = useState<RequestOutcome>();
   const history = useHistory();
   const [openExitModal, setOpenExitModal] = useState(false);
-  const [openExitUrl, setOpenExitUrl] = useState(URL_FE_LOGOUT);
+  const [openExitUrl, setOpenExitUrl] = useState(ENV.URL_FE.LOGOUT);
   const { setOnLogout } = useContext(HeaderContext);
 
   useEffect(() => {
@@ -122,7 +122,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
           forward: forwardWithData,
           back: () => {
             if (window.location.search.indexOf(`institutionId=${institutionId}`) > -1) {
-              setOpenExitUrl(`${URL_FE_DASHBOARD}/${institutionId}`);
+              setOpenExitUrl(`${ENV.URL_FE.DASHBOARD}/${institutionId}`);
               setOpenExitModal(true);
             } else {
               setActiveStep(activeStep - 2);
@@ -160,7 +160,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
           <Button
             variant="contained"
             sx={{ width: '200px', alignSelf: 'center' }}
-            onClick={() => window.location.assign(URL_FE_LANDING)}
+            onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
           >
             Torna alla home
           </Button>
@@ -192,7 +192,10 @@ function OnboardingComponent({ productId }: { productId: string }) {
           </Grid>
           <Grid container item justifyContent="center">
             <Grid item xs={4}>
-              <Button onClick={() => window.location.assign(URL_FE_LANDING)} variant={'contained'}>
+              <Button
+                onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+                variant={'contained'}
+              >
                 Torna alla home
               </Button>
             </Grid>
@@ -210,7 +213,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
 
   const handleCloseExitModal = () => {
     setOpenExitModal(false);
-    setOpenExitUrl(URL_FE_LOGOUT);
+    setOpenExitUrl(ENV.URL_FE.LOGOUT);
   };
 
   return !outcome ? (

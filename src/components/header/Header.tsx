@@ -2,7 +2,7 @@ import { AppBar, Button, SvgIcon, Toolbar } from '@mui/material';
 import { Box } from '@mui/system';
 import { Fragment } from 'react';
 import { ReactComponent as logo } from '../../assets/logo_pago_pa_mini.svg';
-import { URL_FE_LOGOUT } from '../../utils/env';
+import { ENV } from '../../utils/env';
 import SubHeader from './subHeader/SubHeader';
 
 type HeaderProps = {
@@ -13,7 +13,7 @@ type HeaderProps = {
 
 const Header = ({
   withSecondHeader,
-  onExitAction = () => window.location.assign(URL_FE_LOGOUT),
+  onExitAction = () => window.location.assign(ENV.URL_FE.LOGOUT),
   subHeaderChild,
 }: HeaderProps) => (
   <Fragment>

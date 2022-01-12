@@ -1,5 +1,5 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { URL_FE_LANDING } from '../../utils/env';
+import { ENV } from '../../utils/env';
 import RejectRegistration from '../RejectRegistration';
 
 jest.mock('../../lib/api-utils');
@@ -43,7 +43,7 @@ test('test no jwt', () => {
     name: 'Torna alla home',
   });
   fireEvent.click(goHomeButton);
-  expect(mockedLocation.assign).toBeCalledWith(URL_FE_LANDING);
+  expect(mockedLocation.assign).toBeCalledWith(ENV.URL_FE.LANDING);
 
   expect(fetchWithLogsSpy).toBeCalledTimes(0);
 });
@@ -59,7 +59,7 @@ test('test', async () => {
       name: 'Torna alla home',
     });
     fireEvent.click(goHomeButton);
-    expect(mockedLocation.assign).toBeCalledWith(URL_FE_LANDING);
+    expect(mockedLocation.assign).toBeCalledWith(ENV.URL_FE.LANDING);
   });
 });
 
@@ -74,6 +74,6 @@ test('test cancel error', async () => {
       name: 'Torna alla home',
     });
     fireEvent.click(goHomeButton);
-    expect(mockedLocation.assign).toBeCalledWith(URL_FE_LANDING);
+    expect(mockedLocation.assign).toBeCalledWith(ENV.URL_FE.LANDING);
   });
 });

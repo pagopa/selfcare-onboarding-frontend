@@ -3,19 +3,14 @@ import Onboarding from '../views/Onboarding';
 import RejectRegistration from '../views/RejectRegistration';
 import CompleteRegistrationComponent from '../views/CompleteRegistrationComponent';
 import NoProductPage from '../views/NoProductPage';
-import {
-  PUBLIC_URL,
-  URL_API_ONBOARDING,
-  URL_API_PARTY_PROCESS,
-  URL_API_PARTY_REGISTRY_PROXY,
-} from './env';
+import { ENV } from './env';
 
 const IS_DEVELOP = process.env.NODE_ENV === 'development';
 
 export const DISPLAY_LOGS = IS_DEVELOP;
 export const MOCK_USER = process.env.REACT_APP_MOCK_USER;
 
-export const BASE_ROUTE = PUBLIC_URL;
+export const BASE_ROUTE = ENV.PUBLIC_URL;
 
 export const ROUTES: RoutesObject = {
   ONBOARDING_ROOT: {
@@ -45,19 +40,21 @@ export const ROUTES: RoutesObject = {
 export const API = {
   VERIFY_ONBOARDING: {
     URL:
-      URL_API_PARTY_PROCESS + '/onboarding/organization/{{institutionId}}/products/{{productId}}',
+      ENV.URL_API.PARTY_PROCESS +
+      '/onboarding/organization/{{institutionId}}/products/{{productId}}',
   },
   ONBOARDING_GET_SEARCH_PARTIES: {
-    URL: URL_API_PARTY_REGISTRY_PROXY + '/institutions',
+    URL: ENV.URL_API.PARTY_REGISTRY_PROXY + '/institutions',
   },
   ONBOARDING_GET_PARTY: {
-    URL: URL_API_PARTY_REGISTRY_PROXY + '/institutions/{{institutionId}}',
+    URL: ENV.URL_API.PARTY_REGISTRY_PROXY + '/institutions/{{institutionId}}',
   },
   ONBOARDING_POST_LEGALS: {
-    URL: URL_API_ONBOARDING + '/institutions/{{institutionId}}/products/{{productId}}/onboarding',
+    URL:
+      ENV.URL_API.ONBOARDING + '/institutions/{{institutionId}}/products/{{productId}}/onboarding',
   },
   ONBOARDING_COMPLETE_REGISTRATION: {
-    URL: URL_API_PARTY_PROCESS + '/onboarding/complete/{{token}}',
+    URL: ENV.URL_API.PARTY_PROCESS + '/onboarding/complete/{{token}}',
   },
 };
 

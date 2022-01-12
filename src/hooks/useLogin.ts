@@ -1,7 +1,7 @@
 import { useContext } from 'react';
 import isEmpty from 'lodash/isEmpty';
 import { MOCK_USER } from '../utils/constants';
-import { URL_FE_LOGIN } from '../utils/env';
+import { ENV } from '../utils/env';
 import { UserContext } from '../lib/context';
 import { storageDelete, storageRead, storageWrite } from '../lib/storage-utils';
 
@@ -36,7 +36,7 @@ export const useLogin = () => {
       // Remove any partial data that might have remained, just for safety
       storageDelete('user');
       // Go to the login view
-      window.location.assign(URL_FE_LOGIN + '?onSuccess=' + location.pathname);
+      window.location.assign(ENV.URL_FE.LOGIN + '?onSuccess=' + location.pathname);
       // This return is necessary
       return;
     }

@@ -2,7 +2,7 @@ import { fireEvent, getByLabelText, render, screen, waitFor } from '@testing-lib
 import { useState } from 'react';
 import { User } from '../../../types';
 import { HeaderContext, UserContext } from '../../lib/context';
-import { URL_FE_LANDING, URL_FE_LOGOUT } from '../../utils/env';
+import { ENV } from '../../utils/env';
 import Onboarding from '../Onboarding';
 
 jest.mock('../../lib/api-utils');
@@ -130,7 +130,7 @@ test('test exiting during flow with logout', async () => {
 
   await performLogout(logoutButton);
   fireEvent.click(screen.getByRole('button', { name: 'Esci' }));
-  await waitFor(() => expect(mockedLocation.assign).toBeCalledWith(URL_FE_LOGOUT));
+  await waitFor(() => expect(mockedLocation.assign).toBeCalledWith(ENV.URL_FE.LOGOUT));
 });
 
 const performLogout = async (logoutButton: HTMLElement) => {
@@ -158,7 +158,7 @@ const executeGoHome = async () => {
   });
   expect(goHomeButton).toBeEnabled();
   fireEvent.click(goHomeButton);
-  await waitFor(() => expect(mockedLocation.assign).toBeCalledWith(URL_FE_LANDING));
+  await waitFor(() => expect(mockedLocation.assign).toBeCalledWith(ENV.URL_FE.LANDING));
 };
 
 const checkBackForwardNavigation = async (
