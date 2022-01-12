@@ -1,6 +1,6 @@
 import { Box, Grid, Link, SvgIcon, Typography } from '@mui/material';
 import { ReactComponent as logo } from '../../assets/logo_pago_pa.svg';
-import { PAGOPA_HELP_EMAIL, ENABLE_ASSISTANCE } from '../../utils/constants';
+import { ENV } from '../../utils/env';
 
 const Footer = () => (
   <Box
@@ -88,9 +88,9 @@ const Footer = () => (
           >
             {'Sicurezza delle informazioni '}
           </Link>
-          {ENABLE_ASSISTANCE && (
+          {ENV.ASSISTANCE.ENABLE && (
             <Link
-              href={`mailto:${PAGOPA_HELP_EMAIL}`}
+              href={`mailto:${ENV.ASSISTANCE.EMAIL}`}
               underline="none"
               sx={{
                 margin: '10px',

@@ -11,7 +11,7 @@ import { getFetchOutcome } from '../lib/error-utils';
 import checkIllustration from '../assets/check-illustration.svg';
 import redXIllustration from '../assets/red-x-illustration.svg';
 import { ReactComponent as ErrorIllustration } from '../assets/error-illustration.svg';
-import { URL_FE_LANDING } from '../utils/constants';
+import { ENV } from '../utils/env';
 import { MessageNoAction } from '../components/MessageNoAction';
 import { HeaderContext } from '../lib/context';
 import { getOnboardingMagicLinkJwt } from './RejectRegistration';
@@ -131,7 +131,7 @@ export default function CompleteRegistrationComponent() {
           ...lastFileErrorAttempt,
           errorCount,
         });
-        if (errorCount > process.env.REACT_APP_UPLOAD_CONTRACT_MAX_LOOP_ERROR) {
+        if (errorCount > ENV.UPLOAD_CONTRACT_MAX_LOOP_ERROR) {
           setShowBlockingError(true);
           return;
         }
@@ -214,7 +214,7 @@ export default function CompleteRegistrationComponent() {
           <Button
             variant="contained"
             sx={{ width: '200px', alignSelf: 'center' }}
-            onClick={() => window.location.assign(URL_FE_LANDING)}
+            onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
           >
             Torna alla home
           </Button>
@@ -263,7 +263,7 @@ export default function CompleteRegistrationComponent() {
             <Button
               variant="contained"
               sx={{ width: '200px', alignSelf: 'center' }}
-              onClick={() => window.location.assign(URL_FE_LANDING)}
+              onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
             >
               Torna alla home
             </Button>
