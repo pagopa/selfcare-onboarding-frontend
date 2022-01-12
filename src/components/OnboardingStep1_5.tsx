@@ -1,9 +1,7 @@
 import { Button, Grid, Typography } from '@mui/material';
-import { AxiosError, AxiosResponse } from 'axios';
+import { AxiosError } from 'axios';
 import { useEffect, useState, useContext } from 'react';
 import {
-  OnboardingData,
-  OnboardingInfo,
   RequestOutcomeMessage,
   StepperStepComponentProps,
 } from '../../types';
@@ -115,8 +113,8 @@ export function OnboardingStep1_5({ forward, institutionId, productId }: Props) 
     setLoading(true);
 
     const onboardingStatus = await fetchWithLogs(
-      { endpoint: 'ONBOARDING_GET_INFO' },
-      { method: 'GET', params: { institutionId } }
+      { endpoint: 'VERIFY_ONBOARDING' , endpointParams: { institutionId, productId } },
+      { method: 'HEAD' }
     );
 
     setLoading(false);
@@ -125,20 +123,7 @@ export function OnboardingStep1_5({ forward, institutionId, productId }: Props) 
     const restOutcome = getFetchOutcome(onboardingStatus);
 
     if (restOutcome === 'success') {
-      const onBoardingInfo: OnboardingInfo = (onboardingStatus as AxiosResponse<OnboardingInfo>)
-        .data;
-      const institution: OnboardingData | undefined =
-        onBoardingInfo.institutions?.length > 0
-          ? onBoardingInfo.institutions.find(
-              (i) => i.state === 'ACTIVE' && i.productInfo.id === productId
-            )
-          : undefined;
-      if (institution) {
-        setOutcome(alreadyOnboarded);
-      } else {
-        setOutcome(null);
-        onForwardAction();
-      }
+      setOutcome(alreadyOnboarded);
     } else {
       if (
         (onboardingStatus as AxiosError<any>).response?.status === 404 ||
