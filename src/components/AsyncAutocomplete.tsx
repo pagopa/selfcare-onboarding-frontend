@@ -96,7 +96,6 @@ export function AsyncAutocomplete({
           inputProps={{
             ...params.inputProps,
             style: {
-              fontFamily: 'Titillium Web',
               fontStyle: 'normal',
               fontWeight: 'normal',
               fontSize: '16px',
@@ -135,7 +134,6 @@ export function AsyncAutocomplete({
         <li {...props}>
           <Box
             sx={{
-              fontFamily: 'Titillium Web',
               fontStyle: 'normal',
               fontWeight: 'normal',
               fontSize: '16px',
