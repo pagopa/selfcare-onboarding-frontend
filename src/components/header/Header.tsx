@@ -19,12 +19,17 @@ const Header = ({
   <Fragment>
     <AppBar
       position="relative"
-      sx={{ alignItems: 'center', height: '48px', backgroundColor: 'primary.dark', boxShadow:'none' }}
+      sx={{
+        alignItems: 'center',
+        height: '48px',
+        backgroundColor: 'primary.dark',
+        boxShadow: 'none',
+      }}
     >
       <Toolbar sx={{ width: { xs: '100%', lg: '90%', minHeight: '48px !important' } }}>
         <SvgIcon component={logo} viewBox="0 0 80 24" sx={{ width: '80px' }} />
         {onExitAction !== null ? (
-          <Box sx={{ flexGrow: 1, textAlign: 'end' }}>
+          <Box sx={{ flexGrow: 1, textAlign: 'right' }}>
             <Button
               variant="contained"
               sx={{ width: '88px', backgroundColor: '#004C99', height: '32px' }}
