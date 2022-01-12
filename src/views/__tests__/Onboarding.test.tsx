@@ -2,7 +2,7 @@ import { fireEvent, getByLabelText, render, screen, waitFor } from '@testing-lib
 import { useState } from 'react';
 import { User } from '../../../types';
 import { HeaderContext, UserContext } from '../../lib/context';
-import { URL_FE_LANDING, URL_FE_LOGOUT } from '../../utils/constants';
+import { URL_FE_LANDING, URL_FE_LOGOUT } from '../../utils/env';
 import Onboarding from '../Onboarding';
 
 jest.mock('../../lib/api-utils');

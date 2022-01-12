@@ -8,7 +8,7 @@ import { fetchWithLogs } from '../lib/api-utils';
 import { getFetchOutcome } from '../lib/error-utils';
 import { LoadingOverlay } from '../components/LoadingOverlay';
 import { HeaderContext } from '../lib/context';
-import { URL_FE_LANDING } from '../utils/constants';
+import { URL_FE_LANDING } from '../utils/env';
 import { ReactComponent as ErrorIllustration } from '../assets/error-illustration.svg';
 
 export const getOnboardingMagicLinkJwt = () =>

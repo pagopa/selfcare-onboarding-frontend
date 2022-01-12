@@ -1,6 +1,6 @@
 import { Box, Grid, Link, SvgIcon, Typography } from '@mui/material';
 import { ReactComponent as logo } from '../../assets/logo_pago_pa.svg';
-import { PAGOPA_HELP_EMAIL, ENABLE_ASSISTANCE } from '../../utils/constants';
+import { PAGOPA_HELP_EMAIL, ENABLE_ASSISTANCE } from '../../utils/env';
 
 const Footer = () => (
   <Box

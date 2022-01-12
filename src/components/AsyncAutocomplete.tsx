@@ -8,6 +8,7 @@ import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 import { Endpoint } from '../../types';
 import { fetchWithLogs } from '../lib/api-utils';
 import { getFetchOutcome } from '../lib/error-utils';
+import { MAX_INSTITUTIONS_FETCH } from '../utils/env';
 
 type AutocompleteProps = {
   selected: any;
@@ -37,7 +38,7 @@ export function AsyncAutocomplete({
 
     const searchResponse = await fetchWithLogs(endpoint, {
       method: 'GET',
-      params: { limit: process.env.REACT_APP_MAX_INSTITUTIONS_FETCH, page: 1, search: query },
+      params: { limit: MAX_INSTITUTIONS_FETCH, page: 1, search: query },
     });
 
     const outcome = getFetchOutcome(searchResponse);

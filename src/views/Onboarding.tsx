@@ -13,10 +13,9 @@ import { LoadingOverlay } from '../components/LoadingOverlay';
 import { MessageNoAction } from '../components/MessageNoAction';
 import { ReactComponent as CheckIllustration } from '../assets/check-illustration.svg';
 import { ReactComponent as ErrorIllustration } from '../assets/error-illustration.svg';
-import { URL_FE_DASHBOARD, URL_FE_LANDING } from '../utils/constants';
+import { URL_FE_DASHBOARD, URL_FE_LANDING, URL_FE_LOGOUT } from '../utils/env';
 import { OnboardingStep1_5 } from '../components/OnboardingStep1_5';
 import { HeaderContext } from '../lib/context';
-import { URL_FE_LOGOUT } from '../utils/constants';
 import SessionModal from './../components/SessionModal';
 
 export const unregisterUnloadEvent = (

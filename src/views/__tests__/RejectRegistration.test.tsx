@@ -1,6 +1,5 @@
-import { fireEvent, getByText, render, screen, waitFor } from '@testing-library/react';
-import { fetchWithLogs } from '../../lib/api-utils';
-import { URL_FE_LANDING } from '../../utils/constants';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { URL_FE_LANDING } from '../../utils/env';
 import RejectRegistration from '../RejectRegistration';
 
 jest.mock('../../lib/api-utils');

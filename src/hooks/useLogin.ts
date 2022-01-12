@@ -1,6 +1,7 @@
 import { useContext } from 'react';
 import isEmpty from 'lodash/isEmpty';
-import { MOCK_USER, URL_FE_LOGIN } from '../utils/constants';
+import { MOCK_USER } from '../utils/constants';
+import { URL_FE_LOGIN } from '../utils/env';
 import { UserContext } from '../lib/context';
 import { storageDelete, storageRead, storageWrite } from '../lib/storage-utils';
 

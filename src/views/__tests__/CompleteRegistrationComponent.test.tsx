@@ -1,5 +1,5 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { URL_FE_LANDING } from '../../utils/constants';
+import { URL_FE_LANDING } from '../../utils/env';
 import CompleteRegistrationComponent from '../CompleteRegistrationComponent';
 
 const oldWindowLocation = global.window.location;

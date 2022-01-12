@@ -3,27 +3,19 @@ import Onboarding from '../views/Onboarding';
 import RejectRegistration from '../views/RejectRegistration';
 import CompleteRegistrationComponent from '../views/CompleteRegistrationComponent';
 import NoProductPage from '../views/NoProductPage';
+import {
+  PUBLIC_URL,
+  URL_API_ONBOARDING,
+  URL_API_PARTY_PROCESS,
+  URL_API_PARTY_REGISTRY_PROXY,
+} from './env';
 
 const IS_DEVELOP = process.env.NODE_ENV === 'development';
 
 export const DISPLAY_LOGS = IS_DEVELOP;
 export const MOCK_USER = process.env.REACT_APP_MOCK_USER;
 
-export const BASE_ROUTE = process.env.PUBLIC_URL ? process.env.PUBLIC_URL : '/onboarding';
-
-export const URL_FE_LOGIN: string = process.env.REACT_APP_URL_FE_LOGIN;
-export const URL_FE_LOGOUT: string = process.env.REACT_APP_URL_FE_LOGOUT;
-export const URL_FE_DASHBOARD: string = process.env.REACT_APP_URL_FE_DASHBOARD;
-export const URL_FE_LANDING: string = process.env.REACT_APP_URL_FE_LANDING;
-
-export const URL_API_PARTY_PROCESS: string = process.env.REACT_APP_URL_API_PARTY_PROCESS;
-export const URL_API_ONBOARDING: string = process.env.REACT_APP_URL_API_ONBOARDING;
-export const URL_API_PARTY_REGISTRY_PROXY: string =
-  process.env.REACT_APP_URL_API_PARTY_REGISTRY_PROXY;
-
-export const PAGOPA_HELP_EMAIL = process.env.REACT_APP_PAGOPA_HELP_EMAIL;
-
-export const ENABLE_ASSISTANCE = process.env.REACT_APP_ENABLE_ASSISTANCE === 'true';
+export const BASE_ROUTE = PUBLIC_URL;
 
 export const ROUTES: RoutesObject = {
   ONBOARDING_ROOT: {
@@ -52,7 +44,8 @@ export const ROUTES: RoutesObject = {
 
 export const API = {
   VERIFY_ONBOARDING: {
-    URL: URL_API_PARTY_PROCESS + '/onboarding/organization/{{institutionId}}/products/{{productId}}',
+    URL:
+      URL_API_PARTY_PROCESS + '/onboarding/organization/{{institutionId}}/products/{{productId}}',
   },
   ONBOARDING_GET_SEARCH_PARTIES: {
     URL: URL_API_PARTY_REGISTRY_PROXY + '/institutions',

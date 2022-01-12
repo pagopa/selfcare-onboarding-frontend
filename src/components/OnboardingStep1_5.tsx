@@ -1,12 +1,9 @@
 import { Button, Grid, Typography } from '@mui/material';
 import { AxiosError } from 'axios';
 import { useEffect, useState, useContext } from 'react';
-import {
-  RequestOutcomeMessage,
-  StepperStepComponentProps,
-} from '../../types';
+import { RequestOutcomeMessage, StepperStepComponentProps } from '../../types';
 import { fetchWithLogs } from '../lib/api-utils';
-import { URL_FE_LANDING } from '../utils/constants';
+import { URL_FE_LANDING } from '../utils/env';
 import { getFetchOutcome } from '../lib/error-utils';
 import { HeaderContext } from '../lib/context';
 import { ReactComponent as ErrorIllustration } from '../assets/error-illustration.svg';
@@ -113,7 +110,7 @@ export function OnboardingStep1_5({ forward, institutionId, productId }: Props) 
     setLoading(true);
 
     const onboardingStatus = await fetchWithLogs(
-      { endpoint: 'VERIFY_ONBOARDING' , endpointParams: { institutionId, productId } },
+      { endpoint: 'VERIFY_ONBOARDING', endpointParams: { institutionId, productId } },
       { method: 'HEAD' }
     );
 
