@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import debounce from 'lodash/debounce';
 import { AxiosError, AxiosResponse } from 'axios';
 import { Autocomplete, IconButton, InputAdornment, TextField } from '@mui/material';
@@ -9,6 +9,7 @@ import { Endpoint } from '../../types';
 import { fetchWithLogs } from '../lib/api-utils';
 import { getFetchOutcome } from '../lib/error-utils';
 import { ENV } from '../utils/env';
+import { UserContext } from '../lib/context';
 
 type AutocompleteProps = {
   selected: any;
@@ -32,14 +33,19 @@ export function AsyncAutocomplete({
   const [isLoading, setIsLoading] = useState(false);
   const [input, setInput] = useState<string>('');
   const [options, setOptions] = useState<Array<any>>([]);
+  const { setRequiredLogin } = useContext(UserContext);
 
   const handleSearch = async (query: string) => {
     setIsLoading(true);
 
-    const searchResponse = await fetchWithLogs(endpoint, {
-      method: 'GET',
-      params: { limit: ENV.MAX_INSTITUTIONS_FETCH, page: 1, search: query },
-    });
+    const searchResponse = await fetchWithLogs(
+      endpoint,
+      {
+        method: 'GET',
+        params: { limit: ENV.MAX_INSTITUTIONS_FETCH, page: 1, search: query },
+      },
+      () => setRequiredLogin(true)
+    );
 
     const outcome = getFetchOutcome(searchResponse);
 

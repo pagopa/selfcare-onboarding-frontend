@@ -13,7 +13,7 @@ import redXIllustration from '../assets/red-x-illustration.svg';
 import { ReactComponent as ErrorIllustration } from '../assets/error-illustration.svg';
 import { ENV } from '../utils/env';
 import { MessageNoAction } from '../components/MessageNoAction';
-import { HeaderContext } from '../lib/context';
+import { HeaderContext, UserContext } from '../lib/context';
 import { getOnboardingMagicLinkJwt } from './RejectRegistration';
 import SessionModal from './../components/SessionModal';
 
@@ -60,6 +60,7 @@ const transcodeErrorCode = (data: Problem): keyof typeof errors => {
 // eslint-disable-next-line sonarjs/cognitive-complexity
 export default function CompleteRegistrationComponent() {
   const { setSubHeaderVisible, setOnLogout } = useContext(HeaderContext);
+  const { setRequiredLogin } = useContext(UserContext);
   const token = getOnboardingMagicLinkJwt();
 
   const [activeStep, setActiveStep, setActiveStepHistory] = useHistoryState(
@@ -112,7 +113,8 @@ export default function CompleteRegistrationComponent() {
 
     const uploadDocument = await fetchWithLogs(
       { endpoint: 'ONBOARDING_COMPLETE_REGISTRATION', endpointParams: { token } },
-      { method: 'POST', data: formData, headers: { 'Content-Type': 'multipart/form-data' } }
+      { method: 'POST', data: formData, headers: { 'Content-Type': 'multipart/form-data' } },
+      () => setRequiredLogin(true)
     );
 
     setLoading(false);
@@ -278,8 +280,8 @@ export default function CompleteRegistrationComponent() {
         open={true}
         title={errors[errorCode].title}
         message={errors[errorCode].message}
-        confirmLabel="Torna alla pagina di caricamento"
-        rejectLabel="Esci"
+        onConfirmLabel="Torna alla pagina di caricamento"
+        onCloseLabel="Esci"
         height="18em"
       />
     )

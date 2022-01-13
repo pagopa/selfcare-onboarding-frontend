@@ -5,7 +5,7 @@ import { RequestOutcomeMessage, StepperStepComponentProps } from '../../types';
 import { fetchWithLogs } from '../lib/api-utils';
 import { ENV } from '../utils/env';
 import { getFetchOutcome } from '../lib/error-utils';
-import { HeaderContext } from '../lib/context';
+import { HeaderContext, UserContext } from '../lib/context';
 import { ReactComponent as ErrorIllustration } from '../assets/error-illustration.svg';
 import { LoadingOverlay } from './LoadingOverlay';
 import { unregisterUnloadEvent } from './../views/Onboarding';
@@ -105,13 +105,15 @@ export function OnboardingStep1_5({ forward, institutionId, productId }: Props) 
   const [loading, setLoading] = useState(true);
   const [outcome, setOutcome] = useState<RequestOutcomeMessage | null>();
   const { setOnLogout } = useContext(HeaderContext);
+  const { setRequiredLogin } = useContext(UserContext);
 
   const submit = async () => {
     setLoading(true);
 
     const onboardingStatus = await fetchWithLogs(
       { endpoint: 'VERIFY_ONBOARDING', endpointParams: { institutionId, productId } },
-      { method: 'HEAD' }
+      { method: 'HEAD' },
+      () => setRequiredLogin(true)
     );
 
     setLoading(false);

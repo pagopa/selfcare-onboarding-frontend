@@ -7,7 +7,7 @@ import { RequestOutcome, RequestOutcomeOptions } from '../../types';
 import { fetchWithLogs } from '../lib/api-utils';
 import { getFetchOutcome } from '../lib/error-utils';
 import { LoadingOverlay } from '../components/LoadingOverlay';
-import { HeaderContext } from '../lib/context';
+import { HeaderContext, UserContext } from '../lib/context';
 import { ENV } from '../utils/env';
 import { ReactComponent as ErrorIllustration } from '../assets/error-illustration.svg';
 
@@ -20,13 +20,15 @@ export default function RejectRegistration() {
 
   const token = getOnboardingMagicLinkJwt();
   const { setSubHeaderVisible, setOnLogout } = useContext(HeaderContext);
+  const { setRequiredLogin } = useContext(UserContext);
 
   useEffect(() => {
     async function asyncSendDeleteRequest() {
       // Send DELETE request
       const contractPostResponse = await fetchWithLogs(
         { endpoint: 'ONBOARDING_COMPLETE_REGISTRATION', endpointParams: { token } },
-        { method: 'DELETE' }
+        { method: 'DELETE' },
+        () => setRequiredLogin(true)
       );
 
       // Check the outcome
