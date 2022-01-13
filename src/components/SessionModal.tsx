@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Typography, Button, Grid, IconButton } from '@mui/material';
+import { Typography, Box, Button, Grid, IconButton } from '@mui/material';
 import Dialog from '@mui/material/Dialog';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
@@ -7,26 +7,28 @@ import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 
 type Props = {
   open: boolean;
-  handleClose?: React.MouseEventHandler<HTMLButtonElement> | undefined;
-  handleExit: React.MouseEventHandler<HTMLButtonElement> | undefined;
-  message: string;
   title: string;
+  message: React.ReactNode;
   onConfirm?: React.MouseEventHandler<HTMLButtonElement> | undefined;
-  confirmLabel: string;
-  rejectLabel: string;
+  onConfirmLabel?: string;
+  handleClose: React.MouseEventHandler<HTMLButtonElement> | undefined;
+  handleExit?: React.MouseEventHandler<HTMLButtonElement> | undefined;
+  onCloseLabel?: string;
   height?: string;
+  minHeight?: string;
   width?: string;
 };
 export default function SessionModal({
   open,
-  handleClose,
-  handleExit,
+  title,
   message,
   onConfirm,
-  title,
-  confirmLabel,
-  rejectLabel,
+  onConfirmLabel = 'Riprova',
+  handleClose,
+  handleExit = handleClose,
+  onCloseLabel = 'Annulla',
   height = '16em',
+  minHeight = '16em',
   width = '21.9em',
 }: Props) {
   const theme = useTheme();
@@ -39,31 +41,29 @@ export default function SessionModal({
       onClose={handleClose}
       aria-labelledby="responsive-dialog-title"
     >
-      <IconButton
-        onClick={handleClose}
-        style={{ position: 'absolute', top: '20px', right: '16px', zIndex: 100 }}
-      >
-        <ClearOutlinedIcon />
-      </IconButton>
-      <Grid container direction="row" sx={{ height, width }} mx={3}>
-        <Grid item mt={4}>
-          <Grid container direction="row">
+      <Grid container direction="column" sx={{ height, minHeight, width }}>
+        <Box mx={3} sx={{ height: '100%' }}>
+          <Grid container item mt={4}>
             <Grid item xs={10}>
+              <IconButton
+                onClick={handleExit}
+                style={{ position: 'absolute', top: '20px', right: '16px', zIndex: 100 }}
+              >
+                <ClearOutlinedIcon />
+              </IconButton>
               <Typography variant="h5" sx={{ fontSize: '18px', fontWeight: '600' }}>
                 {title}
               </Typography>
             </Grid>
+          </Grid>
 
-            <Grid container item>
-              <Grid item xs={12} my={3}>
-                <Typography variant="body2">{message}</Typography>
-              </Grid>
+          <Grid container item>
+            <Grid item xs={12} my={3}>
+              <Typography variant="body2">{message}</Typography>
             </Grid>
           </Grid>
-        </Grid>
 
-        <Grid item xs={12}>
-          <Grid container justifyContent="end" direction="row">
+          {onConfirm && (
             <Grid item xs={12} mb={2}>
               <Button
                 sx={{ width: '100%' }}
@@ -71,22 +71,17 @@ export default function SessionModal({
                 variant="contained"
                 onClick={onConfirm}
               >
-                {confirmLabel}
+                {onConfirmLabel}
               </Button>
             </Grid>
+          )}
 
-            <Grid item xs={12} mb={2}>
-              <Button
-                onClick={handleExit}
-                sx={{ width: '100%' }}
-                color="primary"
-                variant="outlined"
-              >
-                {rejectLabel}
-              </Button>
-            </Grid>
+          <Grid item xs={12} mb={3} mt={onConfirm ? 0 : 7}>
+            <Button onClick={handleClose} sx={{ width: '100%' }} color="primary" variant="outlined">
+              {onCloseLabel}
+            </Button>
           </Grid>
-        </Grid>
+        </Box>
       </Grid>
     </Dialog>
   );

@@ -5,10 +5,10 @@ import CompleteRegistrationComponent from '../views/CompleteRegistrationComponen
 import NoProductPage from '../views/NoProductPage';
 import { ENV } from './env';
 
-const IS_DEVELOP = process.env.NODE_ENV === 'development';
+const IS_DEVELOP = process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test';
 
-export const DISPLAY_LOGS = IS_DEVELOP;
-export const MOCK_USER = process.env.REACT_APP_MOCK_USER;
+export const DISPLAY_LOGS: boolean = IS_DEVELOP;
+export const MOCK_USER: boolean = IS_DEVELOP;
 
 export const BASE_ROUTE = ENV.PUBLIC_URL;
 
