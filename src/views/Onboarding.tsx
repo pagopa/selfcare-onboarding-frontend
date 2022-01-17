@@ -1,8 +1,15 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Button, Container, Stack, Typography, Grid } from '@mui/material';
+import { AxiosError, AxiosResponse } from 'axios';
 import { withLogin } from '../components/withLogin';
-import { RequestOutcome, RequestOutcomeOptions, StepperStep, UserOnCreate } from '../../types';
+import {
+  Product,
+  RequestOutcome,
+  RequestOutcomeOptions,
+  StepperStep,
+  UserOnCreate,
+} from '../../types';
 import { fetchWithLogs } from '../lib/api-utils';
 import { getFetchOutcome } from '../lib/error-utils';
 import { OnboardingStep0 } from '../components/OnboardingStep0';
@@ -17,6 +24,7 @@ import { ENV } from '../utils/env';
 import { OnboardingStep1_5 } from '../components/OnboardingStep1_5';
 import { HeaderContext } from '../lib/context';
 import SessionModal from './../components/SessionModal';
+import NoProductPage from './NoProductPage';
 
 export const unregisterUnloadEvent = (
   setOnLogout: React.Dispatch<React.SetStateAction<(() => void) | null | undefined>>
@@ -45,13 +53,14 @@ const keepOnPage = (e: BeforeUnloadEvent) => {
 };
 
 function OnboardingComponent({ productId }: { productId: string }) {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [activeStep, setActiveStep] = useState(1);
   const [formData, setFormData] = useState<Partial<FormData>>();
   const [institutionId, setInstitutionId] = useState<string>('');
   const [outcome, setOutcome] = useState<RequestOutcome>();
   const history = useHistory();
   const [openExitModal, setOpenExitModal] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>();
   const [openExitUrl, setOpenExitUrl] = useState(ENV.URL_FE.LOGOUT);
   const { setOnLogout } = useContext(HeaderContext);
 
@@ -64,6 +73,28 @@ function OnboardingComponent({ productId }: { productId: string }) {
     // eslint-disable-next-line functional/immutable-data
     Object.assign(history.location, { state: undefined });
   }, []);
+
+  useEffect(() => {
+    void checkProductId().finally(() => {
+      setLoading(false);
+    });
+
+    // eslint-disable-next-line functional/immutable-data
+  }, [productId]);
+
+  const checkProductId = async () => {
+    const onboardingProducts = await fetchWithLogs(
+      { endpoint: 'ONBOARDING_VERIFY_PRODUCT', endpointParams: { productId } },
+      { method: 'HEAD' }
+    );
+    const result = getFetchOutcome(onboardingProducts);
+    if (result === 'success') {
+      const product = (onboardingProducts as AxiosResponse).data;
+      setSelectedProduct(product);
+    } else if ((onboardingProducts as AxiosError).response?.status === 404) {
+      setSelectedProduct(null);
+    }
+  };
 
   const back = () => {
     setActiveStep(activeStep - 1);
@@ -107,6 +138,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
       label: 'Accetta privacy',
       Component: () => OnboardingStep0({ forward }),
     },
+
     {
       label: "Seleziona l'ente",
       Component: () => OnboardingStep1({ forward: forwardWithDataAndInstitutionId, back }),
@@ -216,7 +248,9 @@ function OnboardingComponent({ productId }: { productId: string }) {
     setOpenExitUrl(ENV.URL_FE.LOGOUT);
   };
 
-  return !outcome ? (
+  return selectedProduct === null ? (
+    <NoProductPage />
+  ) : !outcome ? (
     <Container>
       <Step />
       <SessionModal

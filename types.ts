@@ -138,3 +138,31 @@ export interface ProblemError {
   code: string;
   detail: string;
 }
+
+export type Product = {
+  description: string;
+  id: string;
+  logo?: string;
+  title: string;
+  urlBO: string;
+  urlPublic?: string;
+  tag?: string;
+  userRole?: string;
+  authorized?: boolean;
+  active: boolean;
+  status?: string;
+};
+
+/* export const productResource2Product = (resource: ProductsResource): Product => ({
+  activationDateTime: resource.activatedAt,
+  description: resource.description,
+  id: resource.id,
+  logo: resource.logo,
+  title: resource.title,
+  urlBO: resource.urlBO,
+  urlPublic: resource.urlPublic,
+  tag: undefined,
+  userRole: resource.userRole,
+  authorized: resource.authorized,
+  active: resource.active,
+}); */
