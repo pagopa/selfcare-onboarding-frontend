@@ -4,9 +4,16 @@ import { User } from '../../types';
 type UserContextType = {
   user: User | null;
   setUser: React.Dispatch<React.SetStateAction<User | null>>;
+  requiredLogin: boolean;
+  setRequiredLogin: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-export const UserContext = createContext({ user: null, setUser: () => {} } as UserContextType);
+export const UserContext = createContext({
+  user: null,
+  setUser: () => {},
+  requiredLogin: false,
+  setRequiredLogin: () => {},
+} as UserContextType);
 
 type HeaderContextType = {
   subHeaderVisible: boolean;

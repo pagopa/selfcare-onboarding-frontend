@@ -22,7 +22,7 @@ import { ReactComponent as CheckIllustration } from '../assets/check-illustratio
 import { ReactComponent as ErrorIllustration } from '../assets/error-illustration.svg';
 import { ENV } from '../utils/env';
 import { OnboardingStep1_5 } from '../components/OnboardingStep1_5';
-import { HeaderContext } from '../lib/context';
+import { HeaderContext, UserContext } from '../lib/context';
 import SessionModal from './../components/SessionModal';
 import NoProductPage from './NoProductPage';
 
@@ -63,6 +63,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>();
   const [openExitUrl, setOpenExitUrl] = useState(ENV.URL_FE.LOGOUT);
   const { setOnLogout } = useContext(HeaderContext);
+  const { setRequiredLogin } = useContext(UserContext);
 
   useEffect(() => {
     registerUnloadEvent(setOnLogout, setOpenExitModal);
@@ -122,7 +123,8 @@ function OnboardingComponent({ productId }: { productId: string }) {
 
     const postLegalsResponse = await fetchWithLogs(
       { endpoint: 'ONBOARDING_POST_LEGALS', endpointParams: { institutionId, productId } },
-      { method: 'POST', data: users }
+      { method: 'POST', data: users },
+      () => setRequiredLogin(true)
     );
 
     setLoading(false);
@@ -263,8 +265,8 @@ function OnboardingComponent({ productId }: { productId: string }) {
         open={openExitModal}
         title={'Vuoi davvero uscire?'}
         message={'Se esci, la richiesta di adesione andrà persa.'}
-        confirmLabel="Esci"
-        rejectLabel="Annulla"
+        onConfirmLabel="Esci"
+        onCloseLabel="Annulla"
       />
       {loading && <LoadingOverlay loadingText="Stiamo verificando i tuoi dati" />}
     </Container>
