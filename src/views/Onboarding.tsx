@@ -79,14 +79,12 @@ function OnboardingComponent({ productId }: { productId: string }) {
     void checkProductId().finally(() => {
       setLoading(false);
     });
-
-    // eslint-disable-next-line functional/immutable-data
   }, [productId]);
 
   const checkProductId = async () => {
     const onboardingProducts = await fetchWithLogs(
       { endpoint: 'ONBOARDING_VERIFY_PRODUCT', endpointParams: { productId } },
-      { method: 'HEAD' },
+      { method: 'GET' },
       () => setRequiredLogin(true)
     );
     const result = getFetchOutcome(onboardingProducts);
@@ -95,6 +93,9 @@ function OnboardingComponent({ productId }: { productId: string }) {
       const product = (onboardingProducts as AxiosResponse).data;
       setSelectedProduct(product);
     } else if ((onboardingProducts as AxiosError).response?.status === 404) {
+      setSelectedProduct(null);
+    } else {
+      console.error('Unexpected response', response);
       setSelectedProduct(null);
     }
   };
