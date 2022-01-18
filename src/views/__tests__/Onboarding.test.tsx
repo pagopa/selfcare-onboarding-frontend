@@ -42,7 +42,7 @@ jest.mock('react-router-dom', () => ({
   }),
 }));
 
-const renderComponent = () => {
+const renderComponent = (productId: string = 'prod-io') => {
   const Component = () => {
     const [user, setUser] = useState<User | null>(null);
     const [subHeaderVisible, setSubHeaderVisible] = useState<boolean>(false);
@@ -54,7 +54,7 @@ const renderComponent = () => {
       >
         <UserContext.Provider value={{ user, setUser }}>
           <button onClick={onLogout}>LOGOUT</button>
-          <Onboarding productId="prod-io" />
+          <Onboarding productId={productId} />
         </UserContext.Provider>
       </HeaderContext.Provider>
     );
@@ -81,6 +81,12 @@ test('test error retrieving onboarding info', async () => {
   await executeStep1('agency info error');
   await waitFor(() => screen.getByText('Spiacenti, qualcosa è andato storto.'));
   await executeGoHome();
+});
+
+test('test error productID', async () => {
+  renderComponent('error');
+  await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(1));
+  await waitFor(() => screen.getByText('Impossibile individuare il prodotto desiderato'));
 });
 
 test('test complete', async () => {
