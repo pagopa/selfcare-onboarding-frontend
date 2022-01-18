@@ -95,7 +95,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
     } else if ((onboardingProducts as AxiosError).response?.status === 404) {
       setSelectedProduct(null);
     } else {
-      console.error('Unexpected response', response);
+      console.error('Unexpected response', (onboardingProducts as AxiosError).response);
       setSelectedProduct(null);
     }
   };
