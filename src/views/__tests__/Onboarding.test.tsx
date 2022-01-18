@@ -186,12 +186,12 @@ const executeStep1 = async (partyName: string) => {
   console.log('Testing step 1');
 
   screen.getByText(step1Title);
-
+  await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(1));
   const inputPartyName = document.getElementById('Parties');
   fireEvent.change(inputPartyName, { target: { value: 'XXX' } });
 
   const partyNameSelection = await waitFor(() => screen.getByText(partyName));
-  expect(fetchWithLogsSpy).toBeCalledTimes(1);
+  expect(fetchWithLogsSpy).toBeCalledTimes(2);
 
   fireEvent.click(partyNameSelection);
 
@@ -199,7 +199,7 @@ const executeStep1 = async (partyName: string) => {
   expect(confirmButton).toBeEnabled();
 
   fireEvent.click(confirmButton);
-  await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(2));
+  await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(3));
 };
 
 const executeStep2 = async () => {
