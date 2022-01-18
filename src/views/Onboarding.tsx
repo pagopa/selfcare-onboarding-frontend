@@ -86,9 +86,11 @@ function OnboardingComponent({ productId }: { productId: string }) {
   const checkProductId = async () => {
     const onboardingProducts = await fetchWithLogs(
       { endpoint: 'ONBOARDING_VERIFY_PRODUCT', endpointParams: { productId } },
-      { method: 'HEAD' }
+      { method: 'HEAD' },
+      () => setRequiredLogin(true)
     );
     const result = getFetchOutcome(onboardingProducts);
+
     if (result === 'success') {
       const product = (onboardingProducts as AxiosResponse).data;
       setSelectedProduct(product);
