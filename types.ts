@@ -140,10 +140,6 @@ export interface ProblemError {
 }
 
 export type Product = {
-  description: string;
   id: string;
   title: string;
-  urlBO: string;
-  urlPublic?: string;
-  tag?: string;
 };

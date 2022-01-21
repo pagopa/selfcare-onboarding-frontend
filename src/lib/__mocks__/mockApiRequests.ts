@@ -74,12 +74,7 @@ const mockPartyRegistry = {
 
 const mockedProduct = {
   title: 'App IO',
-
-  description: 'App IO description',
   id: 'prod-io',
-  urlPublic: 'https://io.italia.it/ ',
-
-  urlBO: 'https://io.selfcare.pagopa.it/path/acs?token=<IdentityToken>',
 };
 
 const mockedResponseError = {
@@ -139,7 +134,6 @@ export async function mockFetch(
       default:
         return new Promise((resolve) =>
           resolve({ data: mockedProduct, status: 200, statusText: '200' } as AxiosResponse)
-
         );
     }
   }
