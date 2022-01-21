@@ -1,18 +1,22 @@
-import 'react-app-polyfill/ie11';
-import 'core-js/es/object/values';
-import 'core-js/es/promise';
-import 'core-js/es/array';
-import 'core-js/stable/string';
-import 'core-js/stable/number';
-import 'core-js/stable/url-search-params';
+import '@pagopa/selfcare-common-frontend/common-polyfill';
 import React from 'react';
 import ReactDOM from 'react-dom';
+import '@pagopa/selfcare-common-frontend/index.css';
 import { BrowserRouter } from 'react-router-dom';
 import theme from '@pagopa/mui-italia/theme';
+import { CONFIG } from '@pagopa/selfcare-common-frontend/config/env';
 import { CssBaseline, ThemeProvider } from '@mui/material';
-import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import { MOCK_USER } from './utils/constants';
+import { ENV } from './utils/env';
+
+// eslint-disable-next-line functional/immutable-data
+CONFIG.MOCKS.MOCK_USER = MOCK_USER;
+// eslint-disable-next-line functional/immutable-data
+CONFIG.URL_FE.LOGIN = `${ENV.URL_FE.LOGIN}`;
+// eslint-disable-next-line functional/immutable-data
+CONFIG.URL_FE.LOGOUT = ENV.URL_FE.LOGOUT;
 
 ReactDOM.render(
   <React.StrictMode>

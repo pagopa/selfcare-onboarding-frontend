@@ -1,11 +1,11 @@
 import axios, { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import isEmpty from 'lodash/isEmpty';
+import { storageRead } from '@pagopa/selfcare-common-frontend/utils/storage-utils';
 import { Endpoint, RequestConfig } from '../../types';
 import { API } from '../utils/constants';
 import { ENV } from '../utils/env';
 import { mockFetch } from './__mocks__/mockApiRequests';
 import { logAction, logError } from './action-log';
-import { storageRead } from './storage-utils';
 
 // Utility to wait some time
 export const sleep = async (ms: number) => await new Promise((resolve) => setTimeout(resolve, ms));

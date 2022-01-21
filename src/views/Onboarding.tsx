@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Button, Container, Stack, Typography, Grid } from '@mui/material';
+import SessionModal from '@pagopa/selfcare-common-frontend/components/SessionModal';
+import ErrorIcon from '@pagopa/selfcare-common-frontend/components/icons/ErrorIcon';
 import { withLogin } from '../components/withLogin';
 import { RequestOutcome, RequestOutcomeOptions, StepperStep, UserOnCreate } from '../../types';
 import { fetchWithLogs } from '../lib/api-utils';
@@ -12,11 +14,9 @@ import { OnboardingStep3 } from '../components/OnboardingStep3';
 import { LoadingOverlay } from '../components/LoadingOverlay';
 import { MessageNoAction } from '../components/MessageNoAction';
 import { ReactComponent as CheckIllustration } from '../assets/check-illustration.svg';
-import { ReactComponent as ErrorIllustration } from '../assets/error-illustration.svg';
 import { ENV } from '../utils/env';
 import { OnboardingStep1_5 } from '../components/OnboardingStep1_5';
 import { HeaderContext, UserContext } from '../lib/context';
-import SessionModal from './../components/SessionModal';
 
 export const unregisterUnloadEvent = (
   setOnLogout: React.Dispatch<React.SetStateAction<(() => void) | null | undefined>>
@@ -174,7 +174,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
       ],
     },
     error: {
-      ImgComponent: ErrorIllustration,
+      ImgComponent: ErrorIcon,
       title: '',
       description: [
         <Grid container direction="column" key="0">

@@ -1,15 +1,14 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { Button, Stack, Typography, Grid } from '@mui/material';
+import ErrorIcon from '@pagopa/selfcare-common-frontend/components/icons/ErrorIcon';
 import { MessageNoAction } from '../components/MessageNoAction';
 import checkIllustration from '../assets/check-illustration.svg';
-// import redXIllustration from '../assets/red-x-illustration.svg';
 import { RequestOutcome, RequestOutcomeOptions } from '../../types';
 import { fetchWithLogs } from '../lib/api-utils';
 import { getFetchOutcome } from '../lib/error-utils';
 import { LoadingOverlay } from '../components/LoadingOverlay';
 import { HeaderContext, UserContext } from '../lib/context';
 import { ENV } from '../utils/env';
-import { ReactComponent as ErrorIllustration } from '../assets/error-illustration.svg';
 
 export const getOnboardingMagicLinkJwt = () =>
   new URLSearchParams(window.location.search).get('jwt');
@@ -77,7 +76,7 @@ export default function RejectRegistration() {
       ],
     },
     error: {
-      ImgComponent: ErrorIllustration,
+      ImgComponent: ErrorIcon,
       title: '',
       description: [
         <Grid container direction="column" key="0" style={{ textAlign: 'center' }}>
