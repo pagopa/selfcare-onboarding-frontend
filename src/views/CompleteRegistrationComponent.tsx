@@ -1,6 +1,8 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { Button, Stack, Typography, Grid } from '@mui/material';
 import { AxiosError } from 'axios';
+import SessionModal from '@pagopa/selfcare-common-frontend/components/SessionModal';
+import ErrorIcon from '@pagopa/selfcare-common-frontend/components/icons/ErrorIcon';
 import { RequestOutcome, RequestOutcomeOptions, StepperStep, Problem } from '../../types';
 import { ConfirmRegistrationStep0 } from '../components/ConfirmRegistrationStep0';
 import { ConfirmRegistrationStep1 } from '../components/ConfirmRegistrationStep1';
@@ -10,12 +12,10 @@ import { fetchWithLogs } from '../lib/api-utils';
 import { getFetchOutcome } from '../lib/error-utils';
 import checkIllustration from '../assets/check-illustration.svg';
 import redXIllustration from '../assets/red-x-illustration.svg';
-import { ReactComponent as ErrorIllustration } from '../assets/error-illustration.svg';
 import { ENV } from '../utils/env';
 import { MessageNoAction } from '../components/MessageNoAction';
 import { HeaderContext, UserContext } from '../lib/context';
 import { getOnboardingMagicLinkJwt } from './RejectRegistration';
-import SessionModal from './../components/SessionModal';
 
 type FileErrorAttempt = {
   fileName: string;
@@ -243,7 +243,7 @@ export default function CompleteRegistrationComponent() {
       <Grid container direction="column" key="0" style={{ textAlign: 'center' }}>
         <Grid container item justifyContent="center" mb={5}>
           <Grid item xs={6}>
-            <ErrorIllustration />
+            <ErrorIcon />
           </Grid>
         </Grid>
         <Grid container item justifyContent="center">

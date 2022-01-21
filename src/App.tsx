@@ -1,7 +1,7 @@
 import { useState } from 'react';
+import SessionModal from '@pagopa/selfcare-common-frontend/components/SessionModal';
 import { User } from '../types';
 import { BodyLogger } from './components/BodyLogger';
-import SessionModal from './components/SessionModal';
 import { UserContext } from './lib/context';
 
 export default function App() {
