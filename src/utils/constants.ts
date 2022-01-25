@@ -43,6 +43,11 @@ export const API = {
       ENV.URL_API.PARTY_PROCESS +
       '/onboarding/organization/{{institutionId}}/products/{{productId}}',
   },
+
+  ONBOARDING_VERIFY_PRODUCT: {
+    URL: ENV.URL_API.ONBOARDING + '/product/{{productId}}',
+  },
+
   ONBOARDING_GET_SEARCH_PARTIES: {
     URL: ENV.URL_API.PARTY_REGISTRY_PROXY + '/institutions',
   },

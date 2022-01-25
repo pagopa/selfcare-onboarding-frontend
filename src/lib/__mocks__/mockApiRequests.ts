@@ -72,6 +72,11 @@ const mockPartyRegistry = {
   count: 5,
 };
 
+const mockedProduct = {
+  title: 'App IO',
+  id: 'prod-io',
+};
+
 const mockedResponseError = {
   detail: 'Request took too long to complete.',
   status: 503,
@@ -110,19 +115,28 @@ export async function mockFetch(
         return new Promise((resolve) =>
           resolve({
             isAxiosError: true,
-            response: { data:'',status: 404, statusText: 'Not Found' },
+            response: { data: '', status: 404, statusText: 'Not Found' },
           } as AxiosError)
         );
       default:
         return new Promise((resolve) =>
           resolve({
             isAxiosError: true,
-            response: { data:'', status: 400, statusText: 'Bad Request'  },
+            response: { data: '', status: 400, statusText: 'Bad Request' },
           } as AxiosError)
         );
     }
   }
-
+  if (endpoint === 'ONBOARDING_VERIFY_PRODUCT') {
+    switch (endpointParams.productId) {
+      case 'error':
+        return genericError;
+      default:
+        return new Promise((resolve) =>
+          resolve({ data: mockedProduct, status: 200, statusText: '200' } as AxiosResponse)
+        );
+    }
+  }
   if (endpoint === 'ONBOARDING_POST_LEGALS') {
     switch (endpointParams.institutionId) {
       case 'error':

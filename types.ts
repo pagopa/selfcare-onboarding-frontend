@@ -142,3 +142,8 @@ export interface ProblemError {
   code: string;
   detail: string;
 }
+
+export type Product = {
+  id: string;
+  title: string;
+};

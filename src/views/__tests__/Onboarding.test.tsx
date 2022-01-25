@@ -42,7 +42,7 @@ jest.mock('react-router-dom', () => ({
   }),
 }));
 
-const renderComponent = () => {
+const renderComponent = (productId: string = 'prod-io') => {
   const Component = () => {
     const [user, setUser] = useState<User | null>(null);
     const [subHeaderVisible, setSubHeaderVisible] = useState<boolean>(false);
@@ -54,7 +54,7 @@ const renderComponent = () => {
       >
         <UserContext.Provider value={{ user, setUser }}>
           <button onClick={onLogout}>LOGOUT</button>
-          <Onboarding productId="prod-io" />
+          <Onboarding productId={productId} />
         </UserContext.Provider>
       </HeaderContext.Provider>
     );
@@ -81,6 +81,12 @@ test('test error retrieving onboarding info', async () => {
   await executeStep1('agency info error');
   await waitFor(() => screen.getByText('Spiacenti, qualcosa è andato storto.'));
   await executeGoHome();
+});
+
+test('test error productID', async () => {
+  renderComponent('error');
+  await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(1));
+  await waitFor(() => screen.getByText('Impossibile individuare il prodotto desiderato'));
 });
 
 test('test complete', async () => {
@@ -186,12 +192,12 @@ const executeStep1 = async (partyName: string) => {
   console.log('Testing step 1');
 
   screen.getByText(step1Title);
-
+  await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(1));
   const inputPartyName = document.getElementById('Parties');
   fireEvent.change(inputPartyName, { target: { value: 'XXX' } });
 
   const partyNameSelection = await waitFor(() => screen.getByText(partyName));
-  expect(fetchWithLogsSpy).toBeCalledTimes(1);
+  expect(fetchWithLogsSpy).toBeCalledTimes(2);
 
   fireEvent.click(partyNameSelection);
 
@@ -199,7 +205,7 @@ const executeStep1 = async (partyName: string) => {
   expect(confirmButton).toBeEnabled();
 
   fireEvent.click(confirmButton);
-  await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(2));
+  await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(3));
 };
 
 const executeStep2 = async () => {
