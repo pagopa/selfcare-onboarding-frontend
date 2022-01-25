@@ -27,6 +27,11 @@ resources:
       name: pagopa/azure-pipeline-templates
       ref: refs/tags/v18
       endpoint: 'io-azure-devops-github-ro'
+    - repository: selfcareCommons
+      type: github
+      name: pagopa/selfcare-common-frontend
+      ref: refs/main
+      endpoint: 'io-azure-devops-github-ro'
 
 # Execute agents (jobs) on latest Ubuntu version.
 # To change OS for a specific, ovverride "pool" attribute inside the job definition
@@ -39,7 +44,7 @@ stages:
     jobs:
       - job: make_build
         steps:
-          - template: ./azure-templates/setup-yarn-cache.yml
+          - template: .devops/azure-templates/setup-yarn-cache.yml@selfcareCommons
           - template: templates/node-job-setup/template.yaml@pagopaCommons
             parameters:
               nodeVersion: $(NODE_VERSION)
@@ -52,7 +57,7 @@ stages:
     jobs:
       - job: lint
         steps:
-          - template: ./azure-templates/setup-yarn-cache.yml
+          - template: .devops/azure-templates/setup-yarn-cache.yml@selfcareCommons
           - template: templates/node-job-setup/template.yaml@pagopaCommons
             parameters:
               nodeVersion: $(NODE_VERSION)
@@ -83,7 +88,7 @@ stages:
     jobs:
       - job: unit_tests
         steps:
-          - template: ./azure-templates/setup-yarn-cache.yml
+          - template: .devops/azure-templates/setup-yarn-cache.yml@selfcareCommons
           - template: templates/node-job-setup/template.yaml@pagopaCommons
             parameters:
               nodeVersion: $(NODE_VERSION)
