@@ -18,6 +18,9 @@ variables:
 
   basePath: onboarding
 
+  # global variables
+  react_app_pagopa_help_email: '$(REACT_APP_ASSISTANCE_EMAIL)'
+
   ${{ if or(startsWith(variables['Build.SourceBranch'], 'refs/heads/release-uat'), startsWith(variables['Build.SourceBranch'], 'refs/heads/hotfix')) }}:
     environment: 'UAT'
     azure_subscription: $(UAT_AZURE_SUBSCRIPTION)
@@ -148,6 +151,7 @@ stages:
               REACT_APP_URL_API_PARTY_PROCESS: '$(react_app_url_api_party_process)'
               REACT_APP_URL_API_PARTY_REGISTRY_PROXY: '$(react_app_url_api_party_registry_proxy)'
               REACT_APP_ENABLE_ASSISTANCE: '$(react_app_enable_assistance)'
+              REACT_APP_PAGOPA_HELP_EMAIL: '$(react_app_pagopa_help_email)'
           - bash: |
               printf "$EXECUTION_ID\n$(git name-rev --name-only FETCH_HEAD) $(git rev-parse HEAD)" > $(System.DefaultWorkingDirectory)/build/build.info
             env:
