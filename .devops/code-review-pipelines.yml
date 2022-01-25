@@ -22,11 +22,6 @@ trigger:
 
 resources:
   repositories:
-    - repository: pagopaCommons
-      type: github
-      name: pagopa/azure-pipeline-templates
-      ref: refs/tags/v18
-      endpoint: 'io-azure-devops-github-ro'
     - repository: selfcareCommons
       type: github
       name: pagopa/selfcare-common-frontend
