@@ -39,7 +39,7 @@ stages:
       - job: make_build
         steps:
           - template: .devops/azure-templates/setup-yarn-cache.yml@selfcareCommons
-          - template: templates/node-job-setup/template.yaml@pagopaCommons
+          - template: templates/node-job-setup/template.yaml
             parameters:
               nodeVersion: $(NODE_VERSION)
           - script: |
@@ -52,7 +52,7 @@ stages:
       - job: lint
         steps:
           - template: .devops/azure-templates/setup-yarn-cache.yml@selfcareCommons
-          - template: templates/node-job-setup/template.yaml@pagopaCommons
+          - template: templates/node-job-setup/template.yaml
             parameters:
               nodeVersion: $(NODE_VERSION)
           - script: |
@@ -66,7 +66,7 @@ stages:
           )
         steps:
           - template: ./azure-templates/setup-yarn-cache.yml
-          - template: templates/node-job-setup/template.yaml@pagopaCommons
+          - template: templates/node-job-setup/template.yaml
             parameters:
               nodeVersion: $(NODE_VERSION)
 
@@ -83,7 +83,7 @@ stages:
       - job: unit_tests
         steps:
           - template: .devops/azure-templates/setup-yarn-cache.yml@selfcareCommons
-          - template: templates/node-job-setup/template.yaml@pagopaCommons
+          - template: templates/node-job-setup/template.yaml
             parameters:
               nodeVersion: $(NODE_VERSION)
 
