@@ -70,7 +70,7 @@ stages:
           ne(variables['DANGER_GITHUB_API_TOKEN'], 'skip')
           )
         steps:
-          - template: ./azure-templates/setup-yarn-cache.yml@selfcareCommon
+          - template: .devops/azure-templates/setup-yarn-cache.yml@selfcareCommon
           - template: templates/node-job-setup/template.yaml@pagopaCommons
             parameters:
               nodeVersion: $(NODE_VERSION)
