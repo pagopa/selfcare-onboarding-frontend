@@ -30,7 +30,6 @@ resources:
     - repository: selfcareCommons
       type: github
       name: pagopa/selfcare-common-frontend
-      ref: refs/heads/main
       endpoint: 'io-azure-devops-github-ro'
 
 # Execute agents (jobs) on latest Ubuntu version.
