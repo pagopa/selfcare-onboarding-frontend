@@ -1,12 +1,12 @@
 import { Button, Grid, Typography } from '@mui/material';
 import { AxiosError } from 'axios';
 import { useEffect, useState, useContext } from 'react';
+import ErrorIcon from '@pagopa/selfcare-common-frontend/components/icons/ErrorIcon';
 import { RequestOutcomeMessage, StepperStepComponentProps } from '../../types';
 import { fetchWithLogs } from '../lib/api-utils';
 import { ENV } from '../utils/env';
 import { getFetchOutcome } from '../lib/error-utils';
 import { HeaderContext, UserContext } from '../lib/context';
-import { ReactComponent as ErrorIllustration } from '../assets/error-illustration.svg';
 import { LoadingOverlay } from './LoadingOverlay';
 import { unregisterUnloadEvent } from './../views/Onboarding';
 import { MessageNoAction } from './MessageNoAction';
@@ -67,7 +67,7 @@ const alreadyOnboarded: RequestOutcomeMessage = {
 };
 
 const genericError: RequestOutcomeMessage = {
-  ImgComponent: ErrorIllustration,
+  ImgComponent: ErrorIcon,
   title: '',
   description: [
     <Grid container direction="column" key="0">
