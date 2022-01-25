@@ -27,10 +27,6 @@ resources:
       name: pagopa/azure-pipeline-templates
       ref: refs/tags/v18
       endpoint: 'io-azure-devops-github-ro'
-    - repository: selfcareCommon
-      type: github
-      name: pagopa/selfcare-common-frontend
-      endpoint: 'io-azure-devops-github-ro'
 
 # Execute agents (jobs) on latest Ubuntu version.
 # To change OS for a specific, ovverride "pool" attribute inside the job definition
