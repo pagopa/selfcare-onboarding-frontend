@@ -1933,10 +1933,10 @@
     react-dom "^17.0.2"
     react-scripts "4.0.3"
 
-"@pagopa/selfcare-common-frontend@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@pagopa/selfcare-common-frontend/-/selfcare-common-frontend-1.0.0.tgz#4a6a845e2d4fcaedd515568ce1b81aa4987b06d7"
-  integrity sha512-HwV2OxcIule9ZpPJKEMgGpDWpOMiuoNdjmAC24AsZe3R4KG3Xy03z+GEbqURlEuDBWNwvvFYvzcg/ovQHKuZVg==
+"@pagopa/selfcare-common-frontend@^1.1.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@pagopa/selfcare-common-frontend/-/selfcare-common-frontend-1.1.1.tgz#ac7917a4eb3af41b232e70183ce0a85b854ac511"
+  integrity sha512-2opIz+TkdaUZ5mI1ab6Wfz0VYjWCLd3e+XwEcjd91PAmugSznSvD7S3Gmqe4pAmzUNDTDCVH3kylB43gwY4OpQ==
   dependencies:
     "@emotion/react" "^11.4.1"
     "@emotion/styled" "^11.3.0"
