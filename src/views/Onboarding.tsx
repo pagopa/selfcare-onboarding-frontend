@@ -141,21 +141,28 @@ function OnboardingComponent({ productId }: { productId: string }) {
   const steps: Array<StepperStep> = [
     {
       label: 'Accetta privacy',
-      Component: () => OnboardingStep0({ forward }),
+      Component: () => OnboardingStep0({ product: selectedProduct, forward }),
     },
 
     {
       label: "Seleziona l'ente",
-      Component: () => OnboardingStep1({ forward: forwardWithDataAndInstitutionId, back }),
+      Component: () =>
+        OnboardingStep1({
+          product: selectedProduct,
+          forward: forwardWithDataAndInstitutionId,
+          back,
+        }),
     },
     {
       label: 'Verifica ente',
-      Component: () => OnboardingStep1_5({ forward, institutionId, productId }),
+      Component: () =>
+        OnboardingStep1_5({ product: selectedProduct, forward, institutionId, productId }),
     },
     {
       label: 'Inserisci i dati del rappresentante legale',
       Component: () =>
         OnboardingStep2({
+          product: selectedProduct,
           forward: forwardWithData,
           back: () => {
             if (window.location.search.indexOf(`institutionId=${institutionId}`) > -1) {
@@ -171,6 +178,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
       label: 'Inserisci i dati degli amministratori',
       Component: () =>
         OnboardingStep3({
+          product: selectedProduct,
           legal: (formData as any).users[0],
           forward: (newFormData: Partial<FormData>) => {
             setFormData({ ...formData, ...newFormData });

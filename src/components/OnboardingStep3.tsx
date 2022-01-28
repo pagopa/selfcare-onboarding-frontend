@@ -19,7 +19,7 @@ type Props = StepperStepComponentProps & {
   legal: UserOnCreate;
 };
 
-export function OnboardingStep3({ legal, forward, back }: Props) {
+export function OnboardingStep3({ product, legal, forward, back }: Props) {
   const { user } = useContext(UserContext);
   const [isAuthUser, setIsAuthUser, setIsAuthUserHistory] = useHistoryState('isAuthUser', false);
   const [people, setPeople, setPeopleHistory] = useHistoryState<UsersObject>('people_step3', {});
@@ -76,8 +76,7 @@ export function OnboardingStep3({ legal, forward, back }: Props) {
   };
   const bodyTitle = 'Indica il Referente Amministrativo';
   const bodyDescription1 = 'Inserisci i dati del Referente Amministrativo o di un suo delegato.';
-  const bodyDescription2 =
-    'La persona che indicherai sarà responsabile della gestione del prodotto a cui stai aderendo.';
+  const bodyDescription2 = `La persona che indicherai sarà responsabile della gestione di ${product?.title}`;
   return (
     <Grid
       container
