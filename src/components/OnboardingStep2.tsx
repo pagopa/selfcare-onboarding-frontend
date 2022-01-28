@@ -9,7 +9,7 @@ import { useHistoryState } from './useHistoryState';
 // Could be an ES6 Set but it's too bothersome for now
 export type UsersObject = { [key: string]: UserOnCreate };
 
-export function OnboardingStep2({ forward, back }: StepperStepComponentProps) {
+export function OnboardingStep2({ product, forward, back }: StepperStepComponentProps) {
   // const [people, setPeople] = useState<UsersObject>({});
   const [people, setPeople, setPeopleHistory] = useHistoryState<UsersObject>('people_step2', {});
 
@@ -29,8 +29,7 @@ export function OnboardingStep2({ forward, back }: StepperStepComponentProps) {
   };
   const bodyTitle = 'Indica il Legale Rappresentante';
   const bodyDescription1 = ' Inserisci i dati del Legale Rappresentante.';
-  const bodyDescription2 =
-    'La persona che indicherai sarà firmataria del contratto del prodotto a cui stai aderendo.';
+  const bodyDescription2 = `La persona che indicherai sarà firmataria del contratto per ${product?.title}`;
   return (
     <Grid
       container

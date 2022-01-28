@@ -30,7 +30,7 @@ const handleSearchInstitutionId = async (
   return null;
 };
 
-export function OnboardingStep1({ forward }: StepperStepComponentProps) {
+export function OnboardingStep1({ product, forward }: StepperStepComponentProps) {
   const institutionIdByQuery = new URLSearchParams(window.location.search).get('institutionId');
   const { setRequiredLogin } = useContext(UserContext);
 
@@ -46,8 +46,7 @@ export function OnboardingStep1({ forward }: StepperStepComponentProps) {
     forward({ institutionId: id }, id);
   };
   const bodyTitle = 'Seleziona il tuo Ente';
-  const bodyDescription =
-    "Seleziona dall'Indice della Pubblica Amministrazione (IPA) l'Ente per cui vuoi richiedere l'adesione ai prodotti PagoPA";
+  const bodyDescription = `Seleziona dall'Indice della Pubblica Amministrazione (IPA) l'Ente per cui vuoi richiedere l'adesione a ${product?.title}`;
 
   useEffect(() => {
     if (institutionIdByQuery) {

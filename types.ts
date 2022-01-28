@@ -45,6 +45,7 @@ export type RequestOutcomeOptions = { [key in RequestOutcome]: RequestOutcomeMes
  * Onboarding component
  */
 export type StepperStepComponentProps = {
+  product?: Product | null;
   forward?: any;
   back?: VoidFunction;
   updateFormData?: React.Dispatch<React.SetStateAction<any>>;
