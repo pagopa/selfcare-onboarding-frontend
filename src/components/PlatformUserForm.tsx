@@ -8,6 +8,14 @@ const CustomTextField = styled(TextField)({
   '& .MuiFormHelperText-root': {
     color: '#5C6F82',
   },
+  "& .MuiInputBase-root.Mui-disabled:before": {
+    borderBottomStyle: "solid",
+  },
+  input: {
+    '&.Mui-disabled':{
+      '-webkit-text-fill-color':' #A2ADB8'
+    },
+  },
 });
 
 type PlatformUserFormProps = {
