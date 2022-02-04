@@ -10,6 +10,7 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { MOCK_USER } from './utils/constants';
 import { ENV } from './utils/env';
+import './consentAndAnalyticsConfiguration.ts';
 
 // eslint-disable-next-line functional/immutable-data
 CONFIG.MOCKS.MOCK_USER = MOCK_USER;
