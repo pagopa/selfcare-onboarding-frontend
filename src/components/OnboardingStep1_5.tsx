@@ -1,17 +1,12 @@
 import { Button, Grid, Typography } from '@mui/material';
-import { AxiosError, AxiosResponse } from 'axios';
+import { AxiosError } from 'axios';
 import { useEffect, useState, useContext } from 'react';
-import {
-  OnboardingData,
-  OnboardingInfo,
-  RequestOutcomeMessage,
-  StepperStepComponentProps,
-} from '../../types';
+import ErrorIcon from '@pagopa/selfcare-common-frontend/components/icons/ErrorIcon';
+import { RequestOutcomeMessage, StepperStepComponentProps } from '../../types';
 import { fetchWithLogs } from '../lib/api-utils';
-import { URL_FE_LANDING } from '../utils/constants';
+import { ENV } from '../utils/env';
 import { getFetchOutcome } from '../lib/error-utils';
-import { HeaderContext } from '../lib/context';
-import { ReactComponent as ErrorIllustration } from '../assets/error-illustration.svg';
+import { HeaderContext, UserContext } from '../lib/context';
 import { LoadingOverlay } from './LoadingOverlay';
 import { unregisterUnloadEvent } from './../views/Onboarding';
 import { MessageNoAction } from './MessageNoAction';
@@ -43,7 +38,7 @@ const alreadyOnboarded: RequestOutcomeMessage = {
           <Button
             variant="contained"
             sx={{ width: '200px', alignSelf: 'center' }}
-            onClick={() => window.location.assign(URL_FE_LANDING)}
+            onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
           >
             Torna alla home
           </Button>
@@ -72,7 +67,7 @@ const alreadyOnboarded: RequestOutcomeMessage = {
 };
 
 const genericError: RequestOutcomeMessage = {
-  ImgComponent: ErrorIllustration,
+  ImgComponent: ErrorIcon,
   title: '',
   description: [
     <Grid container direction="column" key="0">
@@ -95,7 +90,7 @@ const genericError: RequestOutcomeMessage = {
           <Button
             variant="contained"
             sx={{ width: '200px', alignSelf: 'center' }}
-            onClick={() => window.location.assign(URL_FE_LANDING)}
+            onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
           >
             Torna alla home
           </Button>
@@ -110,13 +105,15 @@ export function OnboardingStep1_5({ forward, institutionId, productId }: Props) 
   const [loading, setLoading] = useState(true);
   const [outcome, setOutcome] = useState<RequestOutcomeMessage | null>();
   const { setOnLogout } = useContext(HeaderContext);
+  const { setRequiredLogin } = useContext(UserContext);
 
   const submit = async () => {
     setLoading(true);
 
     const onboardingStatus = await fetchWithLogs(
-      { endpoint: 'ONBOARDING_GET_INFO' },
-      { method: 'GET', params: { institutionId } }
+      { endpoint: 'VERIFY_ONBOARDING', endpointParams: { institutionId, productId } },
+      { method: 'HEAD' },
+      () => setRequiredLogin(true)
     );
 
     setLoading(false);
@@ -125,20 +122,7 @@ export function OnboardingStep1_5({ forward, institutionId, productId }: Props) 
     const restOutcome = getFetchOutcome(onboardingStatus);
 
     if (restOutcome === 'success') {
-      const onBoardingInfo: OnboardingInfo = (onboardingStatus as AxiosResponse<OnboardingInfo>)
-        .data;
-      const institution: OnboardingData | undefined =
-        onBoardingInfo.institutions?.length > 0
-          ? onBoardingInfo.institutions.find(
-              (i) => i.state === 'ACTIVE' && i.productInfo.id === productId
-            )
-          : undefined;
-      if (institution) {
-        setOutcome(alreadyOnboarded);
-      } else {
-        setOutcome(null);
-        onForwardAction();
-      }
+      setOutcome(alreadyOnboarded);
     } else {
       if (
         (onboardingStatus as AxiosError<any>).response?.status === 404 ||

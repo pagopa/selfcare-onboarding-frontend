@@ -1,21 +1,24 @@
 import { Grid, Link, Typography } from '@mui/material';
 import { Box } from '@mui/system';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { AxiosResponse } from 'axios';
 import { IPACatalogParty, StepperStepComponentProps } from '../../types';
 import { getFetchOutcome } from '../lib/error-utils';
 import { fetchWithLogs } from '../lib/api-utils';
+import { UserContext } from '../lib/context';
 import { OnboardingStepActions } from './OnboardingStepActions';
 import { AsyncAutocomplete } from './AsyncAutocomplete';
 import { useHistoryState } from './useHistoryState';
 import { LoadingOverlay } from './LoadingOverlay';
 
 const handleSearchInstitutionId = async (
-  institutionId: string
+  institutionId: string,
+  onRedirectToLogin: () => void
 ): Promise<IPACatalogParty | null> => {
   const searchResponse = await fetchWithLogs(
     { endpoint: 'ONBOARDING_GET_PARTY', endpointParams: { institutionId } },
-    { method: 'GET' }
+    { method: 'GET' },
+    onRedirectToLogin
   );
 
   const outcome = getFetchOutcome(searchResponse);
@@ -27,8 +30,9 @@ const handleSearchInstitutionId = async (
   return null;
 };
 
-export function OnboardingStep1({ forward }: StepperStepComponentProps) {
+export function OnboardingStep1({ product, forward }: StepperStepComponentProps) {
   const institutionIdByQuery = new URLSearchParams(window.location.search).get('institutionId');
+  const { setRequiredLogin } = useContext(UserContext);
 
   const [loading, setLoading] = useState(!!institutionIdByQuery);
   const [selected, setSelected, setSelectedHistory] = useHistoryState<IPACatalogParty | null>(
@@ -42,12 +46,11 @@ export function OnboardingStep1({ forward }: StepperStepComponentProps) {
     forward({ institutionId: id }, id);
   };
   const bodyTitle = 'Seleziona il tuo Ente';
-  const bodyDescription =
-    "Seleziona dall'Indice della Pubblica Amministrazione (IPA) l'Ente per cui vuoi richiedere l'adesione ai prodotti PagoPA";
+  const bodyDescription = `Seleziona dall'Indice della Pubblica Amministrazione (IPA) l'Ente per cui vuoi richiedere l'adesione a ${product?.title}`;
 
   useEffect(() => {
     if (institutionIdByQuery) {
-      handleSearchInstitutionId(institutionIdByQuery)
+      handleSearchInstitutionId(institutionIdByQuery, () => setRequiredLogin(true))
         .then((ipaParty) => {
           if (ipaParty) {
             setSelected(ipaParty);

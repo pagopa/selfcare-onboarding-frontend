@@ -6,10 +6,10 @@
   "dependencies": {
     "@emotion/react": "^11.4.1",
     "@emotion/styled": "^11.3.0",
-    "@fontsource/titillium-web": "^4.5.0",
     "@mui/icons-material": "^5.0.3",
     "@mui/material": "^5.0.3",
     "@pagopa/mui-italia": "pagopa/mui-italia",
+    "@pagopa/selfcare-common-frontend": "^1.1.1",
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^11.2.7",
     "@testing-library/user-event": "^12.8.3",
@@ -22,9 +22,11 @@
     "axios": "^0.21.1",
     "crypto-random-string": "^4.0.0",
     "debounce": "^1.2.1",
+    "env-var": "^7.1.1",
     "lodash": "^4.17.21",
     "query-string": "^4.3.4",
     "react": "^17.0.2",
+    "react-app-polyfill": "^3.0.0",
     "react-dom": "^17.0.2",
     "react-dropzone": "^11.4.2",
     "react-md-spinner": "^1.0.0",
@@ -56,6 +58,7 @@
       "not op_mini all"
     ],
     "development": [
+      "ie 11",
       "last 1 chrome version",
       "last 1 firefox version",
       "last 1 safari version"
@@ -74,6 +77,15 @@
     "prettier": "^2.4.1"
   },
   "jest": {
+    "restoreMocks": true,
+    "clearMocks": true,
+    "resetMocks": true,
+    "transform": {
+      "node_modules/crypto-random-string/index.js": "babel-jest"
+    },
+    "transformIgnorePatterns": [
+      "node_modules/(?!crypto-random-string/.*)"
+    ],
     "coveragePathIgnorePatterns": [
       "src/index.tsx",
       "src/reportWebVitals.ts",

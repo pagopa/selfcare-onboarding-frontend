@@ -18,6 +18,9 @@ variables:
 
   basePath: onboarding
 
+  # global variables
+  react_app_pagopa_help_email: '$(REACT_APP_ASSISTANCE_EMAIL)'
+
   ${{ if or(startsWith(variables['Build.SourceBranch'], 'refs/heads/release-uat'), startsWith(variables['Build.SourceBranch'], 'refs/heads/hotfix')) }}:
     environment: 'UAT'
     azure_subscription: $(UAT_AZURE_SUBSCRIPTION)
@@ -26,10 +29,10 @@ variables:
     resource_group: '$(UAT_RESOURCE_GROUP)'
     storage_account: '$(UAT_STORAGE_ACCOUNT)'
 
-    react_app_url_fe_login: '$(UAT_REACT_APP_URL_FE_LOGIN)/login'
-    react_app_url_fe_logout: '$(UAT_REACT_APP_URL_FE_LOGIN)/logout'
+    react_app_url_fe_auth: '$(UAT_REACT_APP_URL_FE_LOGIN)'
     react_app_url_fe_dashboard: '$(UAT_REACT_APP_URL_FE_DASHBOARD)'
     react_app_url_fe_landing: '$(UAT_REACT_APP_URL_FE_LANDING)'
+    react_app_url_fe_assistance: '$(UAT_REACT_APP_URL_FE_ASSISTANCE)'
     react_app_url_api_onboarding: '$(UAT_REACT_APP_URL_API_ONBOARDING)'
     react_app_url_api_party_process: '$(UAT_REACT_APP_URL_API_PARTY_PROCESS)'
     react_app_url_api_party_registry_proxy: '$(UAT_REACT_APP_URL_API_PARTY_REGISTRY_PROXY)'
@@ -43,10 +46,10 @@ variables:
     resource_group: '$(PROD_RESOURCE_GROUP)'
     storage_account: '$(PROD_STORAGE_ACCOUNT)'
 
-    react_app_url_fe_login: '$(PROD_REACT_APP_URL_FE_LOGIN)/login'
-    react_app_url_fe_logout: '$(PROD_REACT_APP_URL_FE_LOGIN)/logout'
+    react_app_url_fe_auth: '$(PROD_REACT_APP_URL_FE_LOGIN)'
     react_app_url_fe_dashboard: '$(PROD_REACT_APP_URL_FE_DASHBOARD)'
     react_app_url_fe_landing: '$(PROD_REACT_APP_URL_FE_LANDING)'
+    react_app_url_fe_assistance: '$(PROD_REACT_APP_URL_FE_ASSISTANCE)'
     react_app_url_api_onboarding: '$(PROD_REACT_APP_URL_API_ONBOARDING)'
     react_app_url_api_party_process: '$(PROD_REACT_APP_URL_API_PARTY_PROCESS)'
     react_app_url_api_party_registry_proxy: '$(PROD_REACT_APP_URL_API_PARTY_REGISTRY_PROXY)'
@@ -62,10 +65,10 @@ variables:
     resource_group: '$(DEV_RESOURCE_GROUP)'
     storage_account: '$(DEV_STORAGE_ACCOUNT)'
 
-    react_app_url_fe_login: '$(DEV_REACT_APP_URL_FE_LOGIN)/login'
-    react_app_url_fe_logout: '$(DEV_REACT_APP_URL_FE_LOGIN)/logout'
+    react_app_url_fe_auth: '$(DEV_REACT_APP_URL_FE_LOGIN)'
     react_app_url_fe_dashboard: '$(DEV_REACT_APP_URL_FE_DASHBOARD)'
     react_app_url_fe_landing: '$(DEV_REACT_APP_URL_FE_LANDING)'
+    react_app_url_fe_assistance: '$(DEV_REACT_APP_URL_FE_ASSISTANCE)'
     react_app_url_api_onboarding: '$(DEV_REACT_APP_URL_API_ONBOARDING)'
     react_app_url_api_party_process: '$(DEV_REACT_APP_URL_API_PARTY_PROCESS)'
     react_app_url_api_party_registry_proxy: '$(DEV_REACT_APP_URL_API_PARTY_REGISTRY_PROXY)'
@@ -85,6 +88,11 @@ resources:
       type: github
       name: pagopa/azure-pipeline-templates
       ref: refs/tags/v18
+      endpoint: 'io-azure-devops-github-ro'
+    - repository: selfcareCommon
+      type: github
+      name: pagopa/selfcare-common-frontend
+      ref: refs/heads/main
       endpoint: 'io-azure-devops-github-ro'
 
 pool:
@@ -131,7 +139,7 @@ stages:
     jobs:
       - job: 'make_build'
         steps:
-          - template: ./azure-templates/setup-yarn-cache.yml
+          - template: .devops/azure-templates/setup-yarn-cache.yml@selfcareCommon
           - template: templates/node-job-setup/template.yaml@pagopaCommons
             parameters:
               nodeVersion: $(NODE_VERSION)
@@ -140,14 +148,16 @@ stages:
             displayName: 'Build files'
             env:
               INLINE_RUNTIME_CHUNK: 'false'
-              REACT_APP_URL_FE_LOGIN: '$(react_app_url_fe_login)/login'
-              REACT_APP_URL_FE_LOGOUT: '$(react_app_url_fe_login)/logout'
+              REACT_APP_URL_FE_LOGIN: '$(react_app_url_fe_auth)/login'
+              REACT_APP_URL_FE_LOGOUT: '$(react_app_url_fe_auth)/logout'
               REACT_APP_URL_FE_DASHBOARD: '$(react_app_url_fe_dashboard)'
               REACT_APP_URL_FE_LANDING: '$(react_app_url_fe_landing)'
+              REACT_APP_URL_FE_ASSISTANCE: '$(react_app_url_fe_assistance)'
               REACT_APP_URL_API_ONBOARDING: '$(react_app_url_api_onboarding)'
               REACT_APP_URL_API_PARTY_PROCESS: '$(react_app_url_api_party_process)'
               REACT_APP_URL_API_PARTY_REGISTRY_PROXY: '$(react_app_url_api_party_registry_proxy)'
               REACT_APP_ENABLE_ASSISTANCE: '$(react_app_enable_assistance)'
+              REACT_APP_PAGOPA_HELP_EMAIL: '$(react_app_pagopa_help_email)'
           - bash: |
               printf "$EXECUTION_ID\n$(git name-rev --name-only FETCH_HEAD) $(git rev-parse HEAD)" > $(System.DefaultWorkingDirectory)/build/build.info
             env:

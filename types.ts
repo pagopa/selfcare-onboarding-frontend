@@ -1,3 +1,5 @@
+import { SvgIconTypeMap } from '@mui/material/SvgIcon';
+import { DefaultComponentProps } from '@mui/material/OverridableComponent';
 import { AxiosRequestConfig } from 'axios';
 import { FunctionComponent, SVGProps } from 'react';
 import { API } from './src/utils/constants';
@@ -33,7 +35,9 @@ export type RequestOutcomeMessage = {
   title: string;
   description: Array<JSX.Element>;
   img?: Image;
-  ImgComponent?: FunctionComponent<SVGProps<SVGSVGElement>>;
+  ImgComponent?:
+    | FunctionComponent<SVGProps<SVGSVGElement>>
+    | ((props: DefaultComponentProps<SvgIconTypeMap>) => JSX.Element);
 };
 export type RequestOutcomeOptions = { [key in RequestOutcome]: RequestOutcomeMessage };
 
@@ -41,6 +45,7 @@ export type RequestOutcomeOptions = { [key in RequestOutcome]: RequestOutcomeMes
  * Onboarding component
  */
 export type StepperStepComponentProps = {
+  product?: Product | null;
   forward?: any;
   back?: VoidFunction;
   updateFormData?: React.Dispatch<React.SetStateAction<any>>;
@@ -138,3 +143,8 @@ export interface ProblemError {
   code: string;
   detail: string;
 }
+
+export type Product = {
+  id: string;
+  title: string;
+};

@@ -72,200 +72,15 @@ const mockPartyRegistry = {
   count: 5,
 };
 
+const mockedProduct = {
+  title: 'App IO',
+  id: 'prod-io',
+};
+
 const mockedResponseError = {
   detail: 'Request took too long to complete.',
   status: 503,
   title: 'Service Unavailable',
-};
-
-const mockedOnboardingOnboarded = {
-  person: {
-    name: 'name',
-    surname: 'surname',
-    taxCode: 'AAAAAA00A00A000A',
-  },
-  institutions: [
-    {
-      institutionId: 'onboarded',
-      description: 'AGENCY ONBOARDED',
-      taxCode: 'onboardedFiscalCode',
-      digitalAddress: 'digitalAddress',
-      state: 'ACTIVE',
-      role: 'MANAGER',
-      productInfo: {
-        id: 'prod-io',
-        role: 'ADMIN',
-        createdAt: '2021-12-02T16:57:02.300Z',
-      },
-      attributes: [
-        {
-          id: 'attId',
-          name: 'attName',
-          description: 'attDescription',
-        },
-      ],
-    },
-  ],
-};
-
-const mockedOnBoardingPending = {
-  person: {
-    name: 'name',
-    surname: 'surname',
-    taxCode: 'AAAAAA00A00A000A',
-  },
-  institutions: [
-    {
-      institutionId: 'pending',
-      description: 'AGENCY PENDING',
-      taxCode: 'pendingFiscalCode',
-      digitalAddress: 'digitalAddress',
-      state: 'PENDING',
-      role: 'MANAGER',
-      productInfo: {
-        id: 'pagoPA',
-        role: 'LIMITED',
-        createdAt: '2021-12-02T16:57:02.300Z',
-      },
-      attributes: [
-        {
-          id: 'attId',
-          name: 'attName',
-          description: 'attDescription',
-        },
-      ],
-    },
-  ],
-};
-
-const mockedOnBoardingInfo = {
-  person: {
-    name: 'name',
-    surname: 'surname',
-    taxCode: 'AAAAAA00A00A000A',
-  },
-  institutions: [
-    {
-      role: 'MANAGER',
-      description: 'Comune di Bari',
-      taxCode: 'ComunediBariFiscalCode',
-      state: 'PENDING',
-      institutionId: '1',
-      attributes: [
-        {
-          id: 'attId1',
-          name: 'attName1',
-          description: 'category1',
-        },
-      ],
-      digitalAddress: '',
-      productInfo: {
-        id: 'pagoPA',
-        role: 'ADMIN',
-        createdAt: '2021-12-02T16:57:02.300Z',
-      },
-    },
-    {
-      role: 'MANAGER',
-      description: 'Comune di Milano',
-      taxCode: 'ComunediMilanoFiscalCode',
-      state: 'PENDING',
-      institutionId: '2',
-      attributes: [
-        {
-          id: 'attId2',
-          name: 'attName2',
-          description: 'category2',
-        },
-      ],
-      digitalAddress: '',
-      productInfo: {
-        id: 'pagoPA',
-        role: 'LIMITED',
-        createdAt: '2021-12-02T16:57:02.300Z',
-      },
-    },
-    {
-      role: 'MANAGER',
-      description: 'Comune di Roma',
-      taxCode: 'ComunediRomaFiscalCode',
-      state: 'ACTIVE',
-      institutionId: '3',
-      attributes: [
-        {
-          id: 'attId3',
-          name: 'attName3',
-          description: 'category3',
-        },
-      ],
-      digitalAddress: '',
-      productInfo: {
-        id: 'pagoPA',
-        role: 'ADMIN',
-        createdAt: '2021-12-02T16:57:02.300Z',
-      },
-    },
-    {
-      role: 'MANAGER',
-      description: 'Comune di Napoli',
-      taxCode: 'ComunediNapoliFiscalCode',
-      state: 'ACTIVE',
-      institutionId: '4',
-      attributes: [
-        {
-          id: 'attId4',
-          name: 'attName4',
-          description: 'category4',
-        },
-      ],
-      digitalAddress: '',
-      productInfo: {
-        id: 'pagoPA',
-        role: 'LIMITED',
-        createdAt: '2021-12-02T16:57:02.300Z',
-      },
-    },
-    {
-      role: 'OPERATOR',
-      description: 'Comune di Napoli',
-      taxCode: 'ComunediNapoliFiscalCode',
-      state: 'PENDING',
-      institutionId: '5',
-      attributes: [
-        {
-          id: 'attId5',
-          name: 'attName5',
-          description: 'category5',
-        },
-      ],
-      digitalAddress: '',
-      productInfo: {
-        id: 'PDND',
-        role: 'LIMITED',
-        createdAt: '2021-12-02T16:57:02.300Z',
-      },
-    },
-    {
-      institutionId: 'onboarded',
-      description: 'AGENCY ONBOARDED',
-      taxCode: 'onboardedFiscalCode',
-      digitalAddress: 'digitalAddress',
-      state: 'ACTIVE',
-      role: 'MANAGER',
-      productInfo: {
-        id: 'pagoPA',
-        role: 'ADMIN',
-        createdAt: '2021-12-02T16:57:02.300Z',
-      },
-      attributes: [
-        {
-          id: 'attId',
-          name: 'attName',
-          description: 'category',
-        },
-      ],
-    },
-  ],
 };
 
 const genericError: Promise<AxiosError> = new Promise((resolve) =>
@@ -285,35 +100,55 @@ export async function mockFetch(
     );
   }
 
-  if (endpoint === 'ONBOARDING_GET_INFO') {
-    switch (params.institutionId) {
+  if (endpoint === 'VERIFY_ONBOARDING') {
+    switch (endpointParams.institutionId) {
       case 'infoError':
         return genericError;
       case 'onboarded':
         return new Promise((resolve) =>
           resolve({
-            data: mockedOnboardingOnboarded,
-            status: 200,
-            statusText: '200',
+            status: 204,
+            statusText: 'No Content',
           } as AxiosResponse)
         );
       case 'pending':
         return new Promise((resolve) =>
           resolve({
-            data: mockedOnBoardingPending,
-            status: 200,
-            statusText: '200',
-          } as AxiosResponse)
+            isAxiosError: true,
+            response: { data: '', status: 404, statusText: 'Not Found' },
+          } as AxiosError)
         );
       default:
         return new Promise((resolve) =>
-          resolve({ data: mockedOnBoardingInfo, status: 200, statusText: '200' } as AxiosResponse)
+          resolve({
+            isAxiosError: true,
+            response: { data: '', status: 400, statusText: 'Bad Request' },
+          } as AxiosError)
         );
     }
   }
-
+  if (endpoint === 'ONBOARDING_VERIFY_PRODUCT') {
+    switch (endpointParams.productId) {
+      case 'error':
+        return genericError;
+      default:
+        return new Promise((resolve) =>
+          resolve({ data: mockedProduct, status: 200, statusText: '200' } as AxiosResponse)
+        );
+    }
+  }
   if (endpoint === 'ONBOARDING_POST_LEGALS') {
     switch (endpointParams.institutionId) {
+      case 'error':
+        return genericError;
+      default:
+        return new Promise((resolve) =>
+          resolve({ data: undefined, status: 200, statusText: '200' } as AxiosResponse)
+        );
+    }
+  }
+  if (endpoint === 'ONBOARDING_COMPLETE_REGISTRATION') {
+    switch (endpointParams.token) {
       case 'error':
         return genericError;
       default:

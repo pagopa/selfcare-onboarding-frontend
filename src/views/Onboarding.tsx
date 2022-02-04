@@ -1,8 +1,17 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Button, Container, Stack, Typography, Grid } from '@mui/material';
+import { AxiosError, AxiosResponse } from 'axios';
+import SessionModal from '@pagopa/selfcare-common-frontend/components/SessionModal';
+import ErrorIcon from '@pagopa/selfcare-common-frontend/components/icons/ErrorIcon';
 import { withLogin } from '../components/withLogin';
-import { RequestOutcome, RequestOutcomeOptions, StepperStep, UserOnCreate } from '../../types';
+import {
+  Product,
+  RequestOutcome,
+  RequestOutcomeOptions,
+  StepperStep,
+  UserOnCreate,
+} from '../../types';
 import { fetchWithLogs } from '../lib/api-utils';
 import { getFetchOutcome } from '../lib/error-utils';
 import { OnboardingStep0 } from '../components/OnboardingStep0';
@@ -12,12 +21,10 @@ import { OnboardingStep3 } from '../components/OnboardingStep3';
 import { LoadingOverlay } from '../components/LoadingOverlay';
 import { MessageNoAction } from '../components/MessageNoAction';
 import { ReactComponent as CheckIllustration } from '../assets/check-illustration.svg';
-import { ReactComponent as ErrorIllustration } from '../assets/error-illustration.svg';
-import { URL_FE_DASHBOARD, URL_FE_LANDING } from '../utils/constants';
+import { ENV } from '../utils/env';
 import { OnboardingStep1_5 } from '../components/OnboardingStep1_5';
-import { HeaderContext } from '../lib/context';
-import { URL_FE_LOGOUT } from '../utils/constants';
-import SessionModal from './../components/SessionModal';
+import { HeaderContext, UserContext } from '../lib/context';
+import NoProductPage from './NoProductPage';
 
 export const unregisterUnloadEvent = (
   setOnLogout: React.Dispatch<React.SetStateAction<(() => void) | null | undefined>>
@@ -46,15 +53,17 @@ const keepOnPage = (e: BeforeUnloadEvent) => {
 };
 
 function OnboardingComponent({ productId }: { productId: string }) {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [activeStep, setActiveStep] = useState(1);
   const [formData, setFormData] = useState<Partial<FormData>>();
   const [institutionId, setInstitutionId] = useState<string>('');
   const [outcome, setOutcome] = useState<RequestOutcome>();
   const history = useHistory();
   const [openExitModal, setOpenExitModal] = useState(false);
-  const [openExitUrl, setOpenExitUrl] = useState(URL_FE_LOGOUT);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>();
+  const [openExitUrl, setOpenExitUrl] = useState(ENV.URL_FE.LOGOUT);
   const { setOnLogout } = useContext(HeaderContext);
+  const { setRequiredLogin } = useContext(UserContext);
 
   useEffect(() => {
     registerUnloadEvent(setOnLogout, setOpenExitModal);
@@ -65,8 +74,32 @@ function OnboardingComponent({ productId }: { productId: string }) {
     // eslint-disable-next-line functional/immutable-data
     Object.assign(history.location, { state: undefined });
   }, []);
-  const reload = () => {
-    history.go(0);
+
+  useEffect(() => {
+    void checkProductId().finally(() => {
+      setLoading(false);
+    });
+  }, [productId]);
+
+  const checkProductId = async () => {
+    const onboardingProducts = await fetchWithLogs(
+      { endpoint: 'ONBOARDING_VERIFY_PRODUCT', endpointParams: { productId } },
+      { method: 'GET' },
+      () => setRequiredLogin(true)
+    );
+    const result = getFetchOutcome(onboardingProducts);
+
+    if (result === 'success') {
+      const product = (onboardingProducts as AxiosResponse).data;
+      setSelectedProduct(product);
+    } else if ((onboardingProducts as AxiosError).response?.status === 404) {
+      unregisterUnloadEvent(setOnLogout);
+      setSelectedProduct(null);
+    } else {
+      console.error('Unexpected response', (onboardingProducts as AxiosError).response);
+      unregisterUnloadEvent(setOnLogout);
+      setSelectedProduct(null);
+    }
   };
 
   const back = () => {
@@ -95,7 +128,8 @@ function OnboardingComponent({ productId }: { productId: string }) {
 
     const postLegalsResponse = await fetchWithLogs(
       { endpoint: 'ONBOARDING_POST_LEGALS', endpointParams: { institutionId, productId } },
-      { method: 'POST', data: users }
+      { method: 'POST', data: users },
+      () => setRequiredLogin(true)
     );
 
     setLoading(false);
@@ -109,24 +143,32 @@ function OnboardingComponent({ productId }: { productId: string }) {
   const steps: Array<StepperStep> = [
     {
       label: 'Accetta privacy',
-      Component: () => OnboardingStep0({ forward }),
+      Component: () => OnboardingStep0({ product: selectedProduct, forward }),
     },
+
     {
       label: "Seleziona l'ente",
-      Component: () => OnboardingStep1({ forward: forwardWithDataAndInstitutionId, back }),
+      Component: () =>
+        OnboardingStep1({
+          product: selectedProduct,
+          forward: forwardWithDataAndInstitutionId,
+          back,
+        }),
     },
     {
       label: 'Verifica ente',
-      Component: () => OnboardingStep1_5({ forward, institutionId, productId }),
+      Component: () =>
+        OnboardingStep1_5({ product: selectedProduct, forward, institutionId, productId }),
     },
     {
       label: 'Inserisci i dati del rappresentante legale',
       Component: () =>
         OnboardingStep2({
+          product: selectedProduct,
           forward: forwardWithData,
           back: () => {
             if (window.location.search.indexOf(`institutionId=${institutionId}`) > -1) {
-              setOpenExitUrl(`${URL_FE_DASHBOARD}/${institutionId}`);
+              setOpenExitUrl(`${ENV.URL_FE.DASHBOARD}/${institutionId}`);
               setOpenExitModal(true);
             } else {
               setActiveStep(activeStep - 2);
@@ -138,6 +180,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
       label: 'Inserisci i dati degli amministratori',
       Component: () =>
         OnboardingStep3({
+          product: selectedProduct,
           legal: (formData as any).users[0],
           forward: (newFormData: Partial<FormData>) => {
             setFormData({ ...formData, ...newFormData });
@@ -164,7 +207,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
           <Button
             variant="contained"
             sx={{ width: '200px', alignSelf: 'center' }}
-            onClick={() => window.location.assign(URL_FE_LANDING)}
+            onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
           >
             Torna alla home
           </Button>
@@ -176,7 +219,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
       ],
     },
     error: {
-      ImgComponent: ErrorIllustration,
+      ImgComponent: ErrorIcon,
       title: '',
       description: [
         <Grid container direction="column" key="0">
@@ -196,7 +239,10 @@ function OnboardingComponent({ productId }: { productId: string }) {
           </Grid>
           <Grid container item justifyContent="center">
             <Grid item xs={4}>
-              <Button onClick={reload} variant={'contained'}>
+              <Button
+                onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+                variant={'contained'}
+              >
                 Torna alla home
               </Button>
             </Grid>
@@ -214,10 +260,12 @@ function OnboardingComponent({ productId }: { productId: string }) {
 
   const handleCloseExitModal = () => {
     setOpenExitModal(false);
-    setOpenExitUrl(URL_FE_LOGOUT);
+    setOpenExitUrl(ENV.URL_FE.LOGOUT);
   };
 
-  return !outcome ? (
+  return selectedProduct === null ? (
+    <NoProductPage />
+  ) : !outcome ? (
     <Container>
       <Step />
       <SessionModal
@@ -230,8 +278,8 @@ function OnboardingComponent({ productId }: { productId: string }) {
         open={openExitModal}
         title={'Vuoi davvero uscire?'}
         message={'Se esci, la richiesta di adesione andrà persa.'}
-        confirmLabel="Esci"
-        rejectLabel="Annulla"
+        onConfirmLabel="Esci"
+        onCloseLabel="Annulla"
       />
       {loading && <LoadingOverlay loadingText="Stiamo verificando i tuoi dati" />}
     </Container>

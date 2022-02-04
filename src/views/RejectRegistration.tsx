@@ -1,15 +1,14 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { Button, Stack, Typography, Grid } from '@mui/material';
+import ErrorIcon from '@pagopa/selfcare-common-frontend/components/icons/ErrorIcon';
 import { MessageNoAction } from '../components/MessageNoAction';
 import checkIllustration from '../assets/check-illustration.svg';
-// import redXIllustration from '../assets/red-x-illustration.svg';
 import { RequestOutcome, RequestOutcomeOptions } from '../../types';
 import { fetchWithLogs } from '../lib/api-utils';
 import { getFetchOutcome } from '../lib/error-utils';
 import { LoadingOverlay } from '../components/LoadingOverlay';
-import { HeaderContext } from '../lib/context';
-import { URL_FE_LANDING } from '../utils/constants';
-import { ReactComponent as ErrorIllustration } from '../assets/error-illustration.svg';
+import { HeaderContext, UserContext } from '../lib/context';
+import { ENV } from '../utils/env';
 
 export const getOnboardingMagicLinkJwt = () =>
   new URLSearchParams(window.location.search).get('jwt');
@@ -20,13 +19,15 @@ export default function RejectRegistration() {
 
   const token = getOnboardingMagicLinkJwt();
   const { setSubHeaderVisible, setOnLogout } = useContext(HeaderContext);
+  const { setRequiredLogin } = useContext(UserContext);
 
   useEffect(() => {
     async function asyncSendDeleteRequest() {
       // Send DELETE request
       const contractPostResponse = await fetchWithLogs(
         { endpoint: 'ONBOARDING_COMPLETE_REGISTRATION', endpointParams: { token } },
-        { method: 'DELETE' }
+        { method: 'DELETE' },
+        () => setRequiredLogin(true)
       );
 
       // Check the outcome
@@ -67,7 +68,7 @@ export default function RejectRegistration() {
           <Button
             variant="contained"
             sx={{ width: '200px', alignSelf: 'center' }}
-            onClick={() => window.location.assign(URL_FE_LANDING)}
+            onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
           >
             Torna alla home
           </Button>
@@ -75,7 +76,7 @@ export default function RejectRegistration() {
       ],
     },
     error: {
-      ImgComponent: ErrorIllustration,
+      ImgComponent: ErrorIcon,
       title: '',
       description: [
         <Grid container direction="column" key="0" style={{ textAlign: 'center' }}>
@@ -98,7 +99,7 @@ export default function RejectRegistration() {
               <Button
                 variant="contained"
                 sx={{ width: '200px', alignSelf: 'center' }}
-                onClick={() => window.location.assign(URL_FE_LANDING)}
+                onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
               >
                 Torna alla home
               </Button>

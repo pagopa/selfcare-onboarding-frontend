@@ -1,6 +1,8 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { Button, Stack, Typography, Grid } from '@mui/material';
 import { AxiosError } from 'axios';
+import SessionModal from '@pagopa/selfcare-common-frontend/components/SessionModal';
+import ErrorIcon from '@pagopa/selfcare-common-frontend/components/icons/ErrorIcon';
 import { RequestOutcome, RequestOutcomeOptions, StepperStep, Problem } from '../../types';
 import { ConfirmRegistrationStep0 } from '../components/ConfirmRegistrationStep0';
 import { ConfirmRegistrationStep1 } from '../components/ConfirmRegistrationStep1';
@@ -10,12 +12,10 @@ import { fetchWithLogs } from '../lib/api-utils';
 import { getFetchOutcome } from '../lib/error-utils';
 import checkIllustration from '../assets/check-illustration.svg';
 import redXIllustration from '../assets/red-x-illustration.svg';
-import { ReactComponent as ErrorIllustration } from '../assets/error-illustration.svg';
-import { URL_FE_LANDING } from '../utils/constants';
+import { ENV } from '../utils/env';
 import { MessageNoAction } from '../components/MessageNoAction';
-import { HeaderContext } from '../lib/context';
+import { HeaderContext, UserContext } from '../lib/context';
 import { getOnboardingMagicLinkJwt } from './RejectRegistration';
-import SessionModal from './../components/SessionModal';
 
 type FileErrorAttempt = {
   fileName: string;
@@ -43,8 +43,8 @@ const errors = {
 };
 
 const error2errorCode: { [key in keyof typeof errors]: Array<string> } = {
-  INVALID_DOCUMENT: ['002-100', '002-101'],
-  INVALID_SIGN: ['002-102', '002-103', '002-104', '002-105', '002-106'],
+  INVALID_DOCUMENT: ['002-1000', '002-1001'],
+  INVALID_SIGN: ['002-1002', '002-1003', '002-1004', '002-1005', '002-1006', '002-1007'],
   GENERIC: [],
 };
 
@@ -60,6 +60,7 @@ const transcodeErrorCode = (data: Problem): keyof typeof errors => {
 // eslint-disable-next-line sonarjs/cognitive-complexity
 export default function CompleteRegistrationComponent() {
   const { setSubHeaderVisible, setOnLogout } = useContext(HeaderContext);
+  const { setRequiredLogin } = useContext(UserContext);
   const token = getOnboardingMagicLinkJwt();
 
   const [activeStep, setActiveStep, setActiveStepHistory] = useHistoryState(
@@ -112,7 +113,8 @@ export default function CompleteRegistrationComponent() {
 
     const uploadDocument = await fetchWithLogs(
       { endpoint: 'ONBOARDING_COMPLETE_REGISTRATION', endpointParams: { token } },
-      { method: 'POST', data: formData, headers: { 'Content-Type': 'multipart/form-data' } }
+      { method: 'POST', data: formData, headers: { 'Content-Type': 'multipart/form-data' } },
+      () => setRequiredLogin(true)
     );
 
     setLoading(false);
@@ -131,7 +133,7 @@ export default function CompleteRegistrationComponent() {
           ...lastFileErrorAttempt,
           errorCount,
         });
-        if (errorCount > process.env.REACT_APP_UPLOAD_CONTRACT_MAX_LOOP_ERROR) {
+        if (errorCount > ENV.UPLOAD_CONTRACT_MAX_LOOP_ERROR) {
           setShowBlockingError(true);
           return;
         }
@@ -214,7 +216,7 @@ export default function CompleteRegistrationComponent() {
           <Button
             variant="contained"
             sx={{ width: '200px', alignSelf: 'center' }}
-            onClick={() => window.location.assign(URL_FE_LANDING)}
+            onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
           >
             Torna alla home
           </Button>
@@ -241,7 +243,7 @@ export default function CompleteRegistrationComponent() {
       <Grid container direction="column" key="0" style={{ textAlign: 'center' }}>
         <Grid container item justifyContent="center" mb={5}>
           <Grid item xs={6}>
-            <ErrorIllustration />
+            <ErrorIcon />
           </Grid>
         </Grid>
         <Grid container item justifyContent="center">
@@ -263,7 +265,7 @@ export default function CompleteRegistrationComponent() {
             <Button
               variant="contained"
               sx={{ width: '200px', alignSelf: 'center' }}
-              onClick={() => window.location.assign(URL_FE_LANDING)}
+              onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
             >
               Torna alla home
             </Button>
@@ -278,8 +280,8 @@ export default function CompleteRegistrationComponent() {
         open={true}
         title={errors[errorCode].title}
         message={errors[errorCode].message}
-        confirmLabel="Torna alla pagina di caricamento"
-        rejectLabel="Esci"
+        onConfirmLabel="Torna alla pagina di caricamento"
+        onCloseLabel="Esci"
         height="18em"
       />
     )
