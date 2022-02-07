@@ -1,9 +1,11 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState, useContext, useRef } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Button, Container, Stack, Typography, Grid } from '@mui/material';
 import { AxiosError, AxiosResponse } from 'axios';
 import SessionModal from '@pagopa/selfcare-common-frontend/components/SessionModal';
 import ErrorIcon from '@pagopa/selfcare-common-frontend/components/icons/ErrorIcon';
+import cryptoRandomString from 'crypto-random-string';
+import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
 import { withLogin } from '../components/withLogin';
 import {
   Product,
@@ -52,6 +54,7 @@ const keepOnPage = (e: BeforeUnloadEvent) => {
   return message;
 };
 
+// eslint-disable-next-line sonarjs/cognitive-complexity
 function OnboardingComponent({ productId }: { productId: string }) {
   const [loading, setLoading] = useState(true);
   const [activeStep, setActiveStep] = useState(1);
@@ -64,6 +67,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
   const [openExitUrl, setOpenExitUrl] = useState(ENV.URL_FE.LOGOUT);
   const { setOnLogout } = useContext(HeaderContext);
   const { setRequiredLogin } = useContext(UserContext);
+  const requestIdRef = useRef<string>();
 
   useEffect(() => {
     registerUnloadEvent(setOnLogout, setOpenExitModal);
@@ -76,6 +80,8 @@ function OnboardingComponent({ productId }: { productId: string }) {
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line functional/immutable-data
+    requestIdRef.current = cryptoRandomString({ length: 8 });
     void checkProductId().finally(() => {
       setLoading(false);
     });
@@ -121,6 +127,10 @@ function OnboardingComponent({ productId }: { productId: string }) {
   ) => {
     setInstitutionId(institutionId);
     forwardWithData(newFormData);
+    trackEvent('ONBOARDING_SELEZIONE_ENTE', {
+      party_id: institutionId,
+      request_id: requestIdRef.current,
+    });
   };
 
   const submit = async (users: Array<UserOnCreate>) => {
@@ -138,6 +148,19 @@ function OnboardingComponent({ productId }: { productId: string }) {
     const outcome = getFetchOutcome(postLegalsResponse);
 
     setOutcome(outcome);
+
+    if (outcome === 'success') {
+      trackEvent('ONBOARDING_SEND_SUCCESS', {
+        party_id: institutionId,
+        request_id: requestIdRef.current,
+      });
+    }else if (outcome === 'error') {
+      trackEvent('ONBOARDING_SEND_FAILURE', {
+        party_id: institutionId,
+        request_id: requestIdRef.current,
+      });
+    }
+
   };
 
   const steps: Array<StepperStep> = [
@@ -165,7 +188,13 @@ function OnboardingComponent({ productId }: { productId: string }) {
       Component: () =>
         OnboardingStep2({
           product: selectedProduct,
-          forward: forwardWithData,
+          forward: (newFormData: Partial<FormData>) => {
+            trackEvent('ONBOARDING_LEGALE_RAPPRESENTANTE', {
+              party_id: institutionId,
+              request_id: requestIdRef.current,
+            });
+            forwardWithData(newFormData);
+          },
           back: () => {
             if (window.location.search.indexOf(`institutionId=${institutionId}`) > -1) {
               setOpenExitUrl(`${ENV.URL_FE.DASHBOARD}/${institutionId}`);
@@ -184,7 +213,18 @@ function OnboardingComponent({ productId }: { productId: string }) {
           legal: (formData as any).users[0],
           forward: (newFormData: Partial<FormData>) => {
             setFormData({ ...formData, ...newFormData });
-            void submit((newFormData as any).users);
+            trackEvent('ONBOARDING_REFERENTE_AMMINISTRATIVO', {
+              party_id: institutionId,
+              request_id: requestIdRef.current,
+            });
+            submit((newFormData as any).users).catch(
+              () => {
+                trackEvent('ONBOARDING_REFERENTE_AMMINISTRATIVO', {
+                  party_id: institutionId,
+                  request_id: requestIdRef.current,
+                });
+              }
+            );
           },
           back,
         }),

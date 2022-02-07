@@ -3,6 +3,8 @@ import { Button, Stack, Typography, Grid } from '@mui/material';
 import { AxiosError } from 'axios';
 import SessionModal from '@pagopa/selfcare-common-frontend/components/SessionModal';
 import ErrorIcon from '@pagopa/selfcare-common-frontend/components/icons/ErrorIcon';
+import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
+import cryptoRandomString from 'crypto-random-string';
 import { RequestOutcome, RequestOutcomeOptions, StepperStep, Problem } from '../../types';
 import { ConfirmRegistrationStep0 } from '../components/ConfirmRegistrationStep0';
 import { ConfirmRegistrationStep1 } from '../components/ConfirmRegistrationStep1';
@@ -107,6 +109,9 @@ export default function CompleteRegistrationComponent() {
   };
 
   const submit = async (file: File) => {
+    const requestId = cryptoRandomString({ length: 8 });
+    trackEvent('ONBOARDING_CONTRACT_UPLOAD', { event_name: 'ONBOARDING_CONTRACT_UPLOAD', request_id: requestId });
+    
     setLoading(true);
     const formData = new FormData();
     formData.append('contract', file);
@@ -121,6 +126,13 @@ export default function CompleteRegistrationComponent() {
     const outcome = getFetchOutcome(uploadDocument);
     setOutcome(outcome);
 
+    if(outcome === 'success'){
+      trackEvent('ONBOARDING_SUCCESS', { request_id: requestId });
+    }
+    // else if(outcome === 'error'){
+    //   trackEvent('ONBOARDING_FAILURE', { request_id: requestId });
+    // }
+    
     if (outcome === 'error') {
       if (
         lastFileErrorAttempt &&
