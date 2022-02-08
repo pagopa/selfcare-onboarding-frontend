@@ -110,7 +110,7 @@ export default function CompleteRegistrationComponent() {
 
   const submit = async (file: File) => {
     const requestId = cryptoRandomString({ length: 8 });
-    trackEvent('ONBOARDING_CONTRACT_UPLOAD', { event_name: 'ONBOARDING_CONTRACT_UPLOAD', request_id: requestId });
+    trackEvent('ONBOARDING_CONTRACT_UPLOAD', { request_id: requestId });
     
     setLoading(true);
     const formData = new FormData();
