@@ -41,9 +41,9 @@ export default function RejectRegistration() {
       setLoading(false);
       setOutcome(outcome);
       if (outcome === 'success') {
-        trackEvent('ONBOARDING_CANCEL_SUCCESS', { request_id: requestId });
+        trackEvent('ONBOARDING_CANCEL_SUCCESS', { request_id: requestId, party_id: token});
       } else if (outcome === 'error') {
-        trackEvent('ONBOARDING_CANCEL_FAILURE', { request_id: requestId });
+        trackEvent('ONBOARDING_CANCEL_FAILURE', { request_id: requestId, party_id: token });
       }
     }
 

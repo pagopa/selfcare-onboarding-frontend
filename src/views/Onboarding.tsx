@@ -130,6 +130,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
     trackEvent('ONBOARDING_SELEZIONE_ENTE', {
       party_id: institutionId,
       request_id: requestIdRef.current,
+      product_id: productId,
     });
   };
 
@@ -153,11 +154,13 @@ function OnboardingComponent({ productId }: { productId: string }) {
       trackEvent('ONBOARDING_SEND_SUCCESS', {
         party_id: institutionId,
         request_id: requestIdRef.current,
+        product_id: productId,
       });
     }else if (outcome === 'error') {
       trackEvent('ONBOARDING_SEND_FAILURE', {
         party_id: institutionId,
         request_id: requestIdRef.current,
+        product_id: productId,
       });
     }
 
@@ -216,12 +219,14 @@ function OnboardingComponent({ productId }: { productId: string }) {
             trackEvent('ONBOARDING_REFERENTE_AMMINISTRATIVO', {
               party_id: institutionId,
               request_id: requestIdRef.current,
+              product_id: productId,
             });
             submit((newFormData as any).users).catch(
               () => {
                 trackEvent('ONBOARDING_REFERENTE_AMMINISTRATIVO', {
                   party_id: institutionId,
                   request_id: requestIdRef.current,
+                  product_id: productId,
                 });
               }
             );

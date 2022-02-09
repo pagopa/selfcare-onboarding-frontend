@@ -127,12 +127,9 @@ export default function CompleteRegistrationComponent() {
     setOutcome(outcome);
 
     if(outcome === 'success'){
-      trackEvent('ONBOARDING_SUCCESS', { request_id: requestId });
+      trackEvent('ONBOARDING_SUCCESS', { request_id: requestId, party_id: token });
     }
-    // else if(outcome === 'error'){
-    //   trackEvent('ONBOARDING_FAILURE', { request_id: requestId });
-    // }
-    
+   
     if (outcome === 'error') {
       if (
         lastFileErrorAttempt &&
@@ -161,10 +158,12 @@ export default function CompleteRegistrationComponent() {
         (uploadDocument as AxiosError<Problem>).response?.status === 409 &&
         (uploadDocument as AxiosError<Problem>).response?.data
       ) {
+        trackEvent('ONBOARDING_CONTRACT_FAILURE', { request_id: requestId, party_id: token });
         setErrorCode(
           transcodeErrorCode((uploadDocument as AxiosError<Problem>).response?.data as Problem)
         );
       } else {
+        trackEvent('ONBOARDING_FAILURE', { request_id: requestId, party_id: token });
         setErrorCode('GENERIC');
       }
     }
