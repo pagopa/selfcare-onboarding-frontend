@@ -13,7 +13,7 @@ const CustomTextField = styled(TextField)({
   },
   input: {
     '&.Mui-disabled':{
-      '-webkit-text-fill-color':' #A2ADB8'
+      WebkitTextFillColor:' #A2ADB8'
     },
   },
 });

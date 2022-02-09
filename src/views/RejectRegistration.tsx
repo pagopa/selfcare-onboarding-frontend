@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { Button, Stack, Typography, Grid } from '@mui/material';
 import ErrorIcon from '@pagopa/selfcare-common-frontend/components/icons/ErrorIcon';
+import cryptoRandomString from 'crypto-random-string';
+import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
 import { MessageNoAction } from '../components/MessageNoAction';
 import checkIllustration from '../assets/check-illustration.svg';
 import { RequestOutcome, RequestOutcomeOptions } from '../../types';
@@ -22,6 +24,8 @@ export default function RejectRegistration() {
   const { setRequiredLogin } = useContext(UserContext);
 
   useEffect(() => {
+    const requestId = cryptoRandomString({ length: 8 });
+    trackEvent('ONBOARDING_CANCEL', { request_id: requestId });
     async function asyncSendDeleteRequest() {
       // Send DELETE request
       const contractPostResponse = await fetchWithLogs(
@@ -36,6 +40,11 @@ export default function RejectRegistration() {
       // Show it to the end user
       setLoading(false);
       setOutcome(outcome);
+      if (outcome === 'success') {
+        trackEvent('ONBOARDING_CANCEL_SUCCESS', { request_id: requestId, party_id: token});
+      } else if (outcome === 'error') {
+        trackEvent('ONBOARDING_CANCEL_FAILURE', { request_id: requestId, party_id: token });
+      }
     }
 
     if (!token) {
