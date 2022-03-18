@@ -5,6 +5,7 @@ import { Autocomplete, IconButton, InputAdornment, TextField } from '@mui/materi
 import { Box } from '@mui/system';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
+import { useTranslation } from 'react-i18next';
 import { Endpoint } from '../../types';
 import { fetchWithLogs } from '../lib/api-utils';
 import { getFetchOutcome } from '../lib/error-utils';
@@ -34,6 +35,7 @@ export function AsyncAutocomplete({
   const [input, setInput] = useState<string>('');
   const [options, setOptions] = useState<Array<any>>([]);
   const { setRequiredLogin } = useContext(UserContext);
+  const { t } = useTranslation();
 
   const handleSearch = async (query: string) => {
     setIsLoading(true);
@@ -59,7 +61,9 @@ export function AsyncAutocomplete({
   };
 
   const noOptionsText =
-    input !== undefined && input.length >= 3 ? 'No risultati' : 'Digita almeno 3 caratteri';
+    input !== undefined && input.length >= 3
+      ? t('asyncAutocomplete.noResultsLabel')
+      : t('asyncAutocomplete.lessThen3CharacterLabel');
   const getOptionKey: (option: any) => string =
     optionKey !== undefined ? (o) => o[optionKey] : (o) => o.label ?? o;
 
