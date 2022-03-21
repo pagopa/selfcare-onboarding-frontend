@@ -92,4 +92,80 @@ export default {
       label: 'Sono io il Referente Amministrativo',
     },
   },
+  platformUserForm: {
+    helperText: 'Campo non valido',
+    fields: {
+      name: {
+        label: 'Nome',
+      },
+      surname: { label: 'Cognome' },
+      taxCode: {
+        label: 'Codice Fiscale',
+        errors: {
+          invalid: 'Il Codice Fiscale inserito non è valido',
+          duplicate: 'Il codice fiscale inserito è già presente',
+        },
+      },
+      email: {
+        label: 'Email istituzionale',
+        errors: {
+          invalid: "L'indirizzo email non è valido",
+          duplicate: "L'indirizzo email inserito è già presente",
+        },
+        description: "Inserisci l'indirizzo email istituzionale utilizzato per l'Ente",
+      },
+    },
+  },
+  completeRegistration: {
+    title: 'Spiacenti, qualcosa è andato storto.',
+    description: `A causa di un errore del sistema non è possibile completare la procedura. <1 /> Ti chiediamo di riprovare più tardi.`,
+    backActionLabel: 'Torna alla home',
+    sessionModal: {
+      onConfirmLabel: 'Torna alla pagina di caricamento',
+      onCloseLabel: 'Esci',
+    },
+    steps: {
+      step0: {
+        label: "Carica l'Atto di Adesione",
+      },
+      step1: {
+        label: "Carica l'Atto di Adesione",
+      },
+    },
+    outcomeContent: {
+      success: {
+        alt: "Icona dell'email",
+        title: 'Adesione completata',
+        description: `Comunicheremo l'avvenuta adesione all'indirizzo PEC dell'Ente. <1/> Da questo momento in poi, i Referenti Amministrativi inseriti in fase di richiesta <2/> potranno accedere al portale.`,
+        backActionLabel: 'Torna alla home',
+      },
+      error: {
+        alt: 'Error',
+        title: 'Richiesta di adesione in errore',
+        descriptionWithoutToken: 'Il link usato non è valido!',
+        descriptionWithToken: 'Il salvataggio dei dati inseriti non è andato a buon fine.',
+      },
+    },
+    errors: {
+      INVALID_DOCUMENT: {
+        title: 'Controlla il documento',
+        message:
+          "Il documento caricato non è riconducibile all'Atto di adesione del tuo Ente. Verifica che sia quello corretto e caricalo di nuovo.",
+      },
+      INVALID_SIGN: {
+        title: 'Controlla il documento',
+        message:
+          'La Firma Digitale non è riconducibile al Legale Rappresentante indicato in fase di adesione. Verifica la corrispondenza e carica di nuovo il documento.',
+      },
+      GENERIC: {
+        title: 'Caricamento non riuscito',
+        message:
+          'Il caricamento del documento non è andato a buon fine. Torna indietro e caricalo di nuovo.',
+      },
+    },
+  },
+  noProductPage: {
+    title: 'Spiacenti, qualcosa è andato storto.',
+    description: 'Impossibile individuare il prodotto desiderato',
+  },
 };
