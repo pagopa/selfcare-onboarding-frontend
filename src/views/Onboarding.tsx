@@ -6,6 +6,7 @@ import SessionModal from '@pagopa/selfcare-common-frontend/components/SessionMod
 import ErrorIcon from '@pagopa/selfcare-common-frontend/components/icons/ErrorIcon';
 import cryptoRandomString from 'crypto-random-string';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
+import { useTranslation, Trans } from 'react-i18next';
 import { withLogin } from '../components/withLogin';
 import {
   Product,
@@ -68,6 +69,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
   const { setOnLogout } = useContext(HeaderContext);
   const { setRequiredLogin } = useContext(UserContext);
   const requestIdRef = useRef<string>();
+  const { t } = useTranslation();
 
   useEffect(() => {
     registerUnloadEvent(setOnLogout, setOpenExitModal);
@@ -156,24 +158,23 @@ function OnboardingComponent({ productId }: { productId: string }) {
         request_id: requestIdRef.current,
         product_id: productId,
       });
-    }else if (outcome === 'error') {
+    } else if (outcome === 'error') {
       trackEvent('ONBOARDING_SEND_FAILURE', {
         party_id: institutionId,
         request_id: requestIdRef.current,
         product_id: productId,
       });
     }
-
   };
 
   const steps: Array<StepperStep> = [
     {
-      label: 'Accetta privacy',
+      label: t('onboarding.steps.privacyLabel'),
       Component: () => OnboardingStep0({ product: selectedProduct, forward }),
     },
 
     {
-      label: "Seleziona l'ente",
+      label: t('onboarding.steps.selectPartyLabel'),
       Component: () =>
         OnboardingStep1({
           product: selectedProduct,
@@ -182,12 +183,12 @@ function OnboardingComponent({ productId }: { productId: string }) {
         }),
     },
     {
-      label: 'Verifica ente',
+      label: t('onboarding.steps.verifyPartyLabel'),
       Component: () =>
         OnboardingStep1_5({ product: selectedProduct, forward, institutionId, productId }),
     },
     {
-      label: 'Inserisci i dati del rappresentante legale',
+      label: t('onboarding.steps.insertlegalLabel'),
       Component: () =>
         OnboardingStep2({
           product: selectedProduct,
@@ -209,7 +210,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
         }),
     },
     {
-      label: 'Inserisci i dati degli amministratori',
+      label: t('onboarding.steps.insertAdministratorLabel'),
       Component: () =>
         OnboardingStep3({
           product: selectedProduct,
@@ -221,15 +222,13 @@ function OnboardingComponent({ productId }: { productId: string }) {
               request_id: requestIdRef.current,
               product_id: productId,
             });
-            submit((newFormData as any).users).catch(
-              () => {
-                trackEvent('ONBOARDING_REFERENTE_AMMINISTRATIVO', {
-                  party_id: institutionId,
-                  request_id: requestIdRef.current,
-                  product_id: productId,
-                });
-              }
-            );
+            submit((newFormData as any).users).catch(() => {
+              trackEvent('ONBOARDING_REFERENTE_AMMINISTRATIVO', {
+                party_id: institutionId,
+                request_id: requestIdRef.current,
+                product_id: productId,
+              });
+            });
           },
           back,
         }),
@@ -241,20 +240,22 @@ function OnboardingComponent({ productId }: { productId: string }) {
   const outcomeContent: RequestOutcomeOptions = {
     success: {
       ImgComponent: CheckIllustration,
-      title: 'La tua richiesta è stata inviata con successo',
+      title: t('onboarding.outcomeContent.success.title'),
       description: [
         <Stack key="0" spacing={10}>
           <Typography>
-            Riceverai una PEC all’indirizzo istituzionale dell’Ente.
-            <br />
-            Al suo interno troverai le istruzioni per completare l&apos;adesione.
+            <Trans i18nKey="onboarding.outcomeContent.success.description">
+              Riceverai una PEC all’indirizzo istituzionale dell’Ente.
+              <br />
+              Al suo interno troverai le istruzioni per completare l&apos;adesione.
+            </Trans>
           </Typography>
           <Button
             variant="contained"
             sx={{ width: '200px', alignSelf: 'center' }}
             onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
           >
-            Torna alla home
+            {t('onboarding.outcomeContent.success.backActionLabel')}
           </Button>
           {/* <Typography>
             Non hai ricevuto nessuna mail? Attendi qualche minuto e controlla anche nello spam. Se
@@ -270,15 +271,17 @@ function OnboardingComponent({ productId }: { productId: string }) {
         <Grid container direction="column" key="0">
           <Grid container item justifyContent="center">
             <Grid item xs={5}>
-              <Typography variant="h2">Spiacenti, qualcosa è andato storto.</Typography>
+              <Typography variant="h2">{t('onboarding.outcomeContent.error.title')}</Typography>
             </Grid>
           </Grid>
           <Grid container item justifyContent="center" mb={7} mt={1}>
             <Grid item xs={5}>
               <Typography>
-                A causa di un errore del sistema non è possibile completare la procedura.
-                <br />
-                Ti chiediamo di riprovare più tardi.
+                <Trans i18nKey="onboarding.outcomeContent.error.description">
+                  A causa di un errore del sistema non è possibile completare la procedura.
+                  <br />
+                  Ti chiediamo di riprovare più tardi.
+                </Trans>
               </Typography>
             </Grid>
           </Grid>
@@ -288,7 +291,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
                 onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
                 variant={'contained'}
               >
-                Torna alla home
+                {t('onboarding.outcomeContent.error.backActionLabel')}
               </Button>
             </Grid>
           </Grid>
@@ -321,12 +324,12 @@ function OnboardingComponent({ productId }: { productId: string }) {
           window.location.assign(openExitUrl);
         }}
         open={openExitModal}
-        title={'Vuoi davvero uscire?'}
-        message={'Se esci, la richiesta di adesione andrà persa.'}
-        onConfirmLabel="Esci"
-        onCloseLabel="Annulla"
+        title={t('onboarding.sessionModal.title')}
+        message={t('onboarding.sessionModal.message')}
+        onConfirmLabel={t('onboarding.sessionModal.onConfirmLabel')}
+        onCloseLabel={t('onboarding.sessionModal.onCloseLabel')}
       />
-      {loading && <LoadingOverlay loadingText="Stiamo verificando i tuoi dati" />}
+      {loading && <LoadingOverlay loadingText={t('onboarding.loading.loadingText')} />}
     </Container>
   ) : (
     <MessageNoAction {...outcomeContent[outcome]} />

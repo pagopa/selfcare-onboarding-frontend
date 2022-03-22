@@ -168,4 +168,65 @@ export default {
     title: 'Spiacenti, qualcosa è andato storto.',
     description: 'Impossibile individuare il prodotto desiderato',
   },
+  onboarding: {
+    steps: {
+      privacyLabel: 'Accetta privacy',
+      selectPartyLabel: "Seleziona l'ente",
+      verifyPartyLabel: 'Verifica ente',
+      insertlegalLabel: 'Inserisci i dati del rappresentante legale',
+      insertAdministratorLabel: 'Inserisci i dati degli amministratori',
+    },
+    outcomeContent: {
+      success: {
+        title: 'La tua richiesta è stata inviata con successo',
+        description:
+          "Riceverai una PEC all’indirizzo istituzionale dell’Ente. <1 /> Al suo interno troverai le istruzioni per completare l'adesione.",
+        backActionLabel: 'Torna alla home',
+      },
+      error: {
+        title: 'Spiacenti, qualcosa è andato storto.',
+        description:
+          'A causa di un errore del sistema non è possibile completare la procedura. <1 /> Ti chiediamo di riprovare più tardi.',
+        backActionLabel: 'Torna alla home',
+      },
+    },
+    sessionModal: {
+      title: 'Vuoi davvero uscire?',
+      message: 'Se esci, la richiesta di adesione andrà persa.',
+      onConfirmLabel: 'Esci',
+      onCloseLabel: 'Annulla',
+    },
+    loading: {
+      loadingText: 'Stiamo verificando i tuoi dati',
+    },
+  },
+  rejectRegistration: {
+    outcomeContent: {
+      success: {
+        imgAlt: "Icona dell'email",
+        title: 'La tua richiesta di adesione è stata annullata',
+        description:
+          ' Visita il portale Self Care per conoscere i prodotti e richiedere una nuova <1 /> adesione per il tuo Ente.',
+        backActionLabel: ' Torna alla home',
+      },
+      error: {
+        title: 'Spiacenti, qualcosa è andato storto.',
+        description:
+          'A causa di un errore del sistema non è possibile completare la procedura. <1 /> Ti chiediamo di riprovare più tardi.',
+        backActionLabel: ' Torna alla home',
+      },
+      loading: {
+        loadingText: 'Stiamo verificando i tuoi dati',
+      },
+      notOutcome: {
+        loadingText: 'Stiamo cancellando la tua iscrizione',
+      },
+    },
+  },
+  app: {
+    sessionModal: {
+      title: 'Sessione scaduta',
+      message: 'Stai per essere rediretto alla pagina di login...',
+    },
+  },
 };

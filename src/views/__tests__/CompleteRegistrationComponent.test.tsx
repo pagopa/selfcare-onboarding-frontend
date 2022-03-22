@@ -1,6 +1,7 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { ENV } from '../../utils/env';
 import CompleteRegistrationComponent from '../CompleteRegistrationComponent';
+import './../../locale';
 
 const oldWindowLocation = global.window.location;
 const mockedLocation = {

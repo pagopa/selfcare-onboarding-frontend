@@ -1,6 +1,7 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { ENV } from '../../utils/env';
 import RejectRegistration from '../RejectRegistration';
+import './../../locale';
 
 jest.mock('../../lib/api-utils');
 
