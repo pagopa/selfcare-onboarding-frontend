@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import NoProductPage from '../NoProductPage';
+import './../../locale';
 
 test('test', () => {
   render(<NoProductPage />);

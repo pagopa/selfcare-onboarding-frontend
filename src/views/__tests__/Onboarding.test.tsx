@@ -4,6 +4,7 @@ import { User } from '../../../types';
 import { HeaderContext, UserContext } from '../../lib/context';
 import { ENV } from '../../utils/env';
 import Onboarding from '../Onboarding';
+import './../../locale';
 
 jest.mock('../../lib/api-utils');
 
@@ -52,7 +53,9 @@ const renderComponent = (productId: string = 'prod-io') => {
       <HeaderContext.Provider
         value={{ subHeaderVisible, setSubHeaderVisible, onLogout, setOnLogout }}
       >
-        <UserContext.Provider value={{ user, setUser }}>
+        <UserContext.Provider
+          value={{ user, setUser, requiredLogin: false, setRequiredLogin: () => {} }}
+        >
           <button onClick={onLogout}>LOGOUT</button>
           <Onboarding productId={productId} />
         </UserContext.Provider>
@@ -194,6 +197,8 @@ const executeStep1 = async (partyName: string) => {
   screen.getByText(step1Title);
   await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(1));
   const inputPartyName = document.getElementById('Parties');
+
+  expect(inputPartyName).toBeTruthy();
   fireEvent.change(inputPartyName, { target: { value: 'XXX' } });
 
   const partyNameSelection = await waitFor(() => screen.getByText(partyName));
