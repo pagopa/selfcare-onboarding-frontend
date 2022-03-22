@@ -4,6 +4,7 @@ import cryptoRandomString from 'crypto-random-string';
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 import { omit } from 'lodash';
 // import { Box } from '@mui/system';
+import { useTranslation } from 'react-i18next';
 import { objectIsEmpty } from '../lib/object-utils';
 import { StepperStepComponentProps, UserOnCreate } from '../../types';
 import { UserContext } from '../lib/context';
@@ -26,6 +27,7 @@ export function OnboardingStep3({ product, legal, forward, back }: Props) {
   const [delegateFormIds, setDelegateFormIds, setDelegateFormIdsHistory] = useHistoryState<
     Array<string>
   >('delegateFormIds', []);
+  const { t } = useTranslation();
 
   const allPeople = { ...people, LEGAL: legal };
 
@@ -74,9 +76,9 @@ export function OnboardingStep3({ product, legal, forward, back }: Props) {
     }
     setIsAuthUser(value);
   };
-  const bodyTitle = 'Indica il Referente Amministrativo';
-  const bodyDescription1 = 'Inserisci i dati del Referente Amministrativo o di un suo delegato.';
-  const bodyDescription2 = `La persona che indicherai sarà responsabile della gestione di ${product?.title}`;
+  const bodyTitle = t('onboardingStep3.bodyTitle');
+  const bodyDescription1 = t('onboardingStep3.bodyDescription1');
+  const bodyDescription2 = `${t('onboardingStep3.bodyDescription2')} ${product?.title}`;
   return (
     <Grid
       container
@@ -107,7 +109,7 @@ export function OnboardingStep3({ product, legal, forward, back }: Props) {
             control={<Checkbox checked={isAuthUser} onChange={handleAuthUser} />}
             label={
               <Typography sx={{ fontSize: '16px', lineHeight: '20px', fontWeight: 600 }}>
-                Sono io il Referente Amministrativo
+                {t('onboardingStep3.formControl.label')}
               </Typography>
             }
             sx={{ alignSelf: 'center' }}
@@ -136,7 +138,7 @@ export function OnboardingStep3({ product, legal, forward, back }: Props) {
                 </StyledIntro> */}
             <Grid item xs={10} justifyContent="center" mt={6} mb={3}>
               <Typography align="center" variant="h4">
-                Aggiungi un altro Referente Amministrativo
+                {t('onboardingStep3.addUserLabel')}
               </Typography>
             </Grid>
             <Grid
@@ -193,16 +195,16 @@ export function OnboardingStep3({ product, legal, forward, back }: Props) {
                 fontFamily: '"Titillium Web", "sans-serif"',
               }}
             >
-              Aggiungi un altro referente
+              {t('onboardingStep3.addUserLink')}
             </Link>
           )}
         </Grid>
       </Grid>
       <OnboardingStepActions
-        back={{ action: onBackAction, label: 'Indietro', disabled: false }}
+        back={{ action: onBackAction, label: t('onboardingStep3.backLabel'), disabled: false }}
         forward={{
           action: onForwardAction,
-          label: 'Conferma',
+          label: t('onboardingStep3.confirmLabel'),
           disabled:
             objectIsEmpty(people) ||
             Object.keys(people)

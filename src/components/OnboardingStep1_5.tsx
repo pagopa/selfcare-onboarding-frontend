@@ -2,6 +2,7 @@ import { Button, Grid, Typography } from '@mui/material';
 import { AxiosError } from 'axios';
 import { useEffect, useState, useContext } from 'react';
 import ErrorIcon from '@pagopa/selfcare-common-frontend/components/icons/ErrorIcon';
+import { Trans, useTranslation } from 'react-i18next';
 import { RequestOutcomeMessage, StepperStepComponentProps } from '../../types';
 import { fetchWithLogs } from '../lib/api-utils';
 import { ENV } from '../utils/env';
@@ -22,14 +23,15 @@ const alreadyOnboarded: RequestOutcomeMessage = {
     <Grid container direction="column" key="0">
       <Grid container item justifyContent="center" mt={5}>
         <Grid item xs={6}>
-          <Typography variant="h2">L&apos;Ente che hai scelto ha già aderito</Typography>
+          <Typography variant="h2">
+            <Trans i18nKey="onboardingStep1_5.alreadyOnboarded.title" />
+          </Typography>
         </Grid>
       </Grid>
       <Grid container item justifyContent="center" mb={7} mt={1}>
         <Grid item xs={7}>
           <Typography>
-            Per accedere, chiedi al Referente incaricato di abilitarti nella sezione Referenti del
-            portale.
+            <Trans i18nKey="onboardingStep1_5.alreadyOnboarded.description" />
           </Typography>
         </Grid>
       </Grid>
@@ -40,7 +42,7 @@ const alreadyOnboarded: RequestOutcomeMessage = {
             sx={{ width: '200px', alignSelf: 'center' }}
             onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
           >
-            Torna alla home
+            <Trans i18nKey="onboardingStep1_5.alreadyOnboarded.backAction" />
           </Button>
         </Grid>
       </Grid>
@@ -73,15 +75,19 @@ const genericError: RequestOutcomeMessage = {
     <Grid container direction="column" key="0">
       <Grid container item justifyContent="center">
         <Grid item xs={6}>
-          <Typography variant="h2">Spiacenti, qualcosa è andato storto.</Typography>
+          <Typography variant="h2">
+            <Trans i18nKey="onboardingStep1_5.genericError.title" />
+          </Typography>
         </Grid>
       </Grid>
       <Grid container item justifyContent="center" mb={7} mt={1}>
         <Grid item xs={6}>
           <Typography>
-            A causa di un errore del sistema non è possibile completare la procedura.
-            <br />
-            Ti chiediamo di riprovare più tardi.
+            <Trans i18nKey="onboardingStep1_5.genericError.description">
+              A causa di un errore del sistema non è possibile completare la procedura.
+              <br />
+              Ti chiediamo di riprovare più tardi.
+            </Trans>
           </Typography>
         </Grid>
       </Grid>
@@ -92,7 +98,7 @@ const genericError: RequestOutcomeMessage = {
             sx={{ width: '200px', alignSelf: 'center' }}
             onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
           >
-            Torna alla home
+            <Trans i18nKey="onboardingStep1_5.genericError.backAction" />
           </Button>
         </Grid>
       </Grid>
@@ -106,6 +112,7 @@ export function OnboardingStep1_5({ forward, institutionId, productId }: Props) 
   const [outcome, setOutcome] = useState<RequestOutcomeMessage | null>();
   const { setOnLogout } = useContext(HeaderContext);
   const { setRequiredLogin } = useContext(UserContext);
+  const { t } = useTranslation();
 
   const submit = async () => {
     setLoading(true);
@@ -120,7 +127,6 @@ export function OnboardingStep1_5({ forward, institutionId, productId }: Props) 
 
     // Check the outcome
     const restOutcome = getFetchOutcome(onboardingStatus);
-
     if (restOutcome === 'success') {
       setOutcome(alreadyOnboarded);
     } else {
@@ -148,10 +154,11 @@ export function OnboardingStep1_5({ forward, institutionId, productId }: Props) 
     unregisterUnloadEvent(setOnLogout);
   }
   return loading ? (
-    <LoadingOverlay loadingText="Stiamo verificando i tuoi dati" />
+    <LoadingOverlay loadingText={t('onboardingStep1_5.loadingText')} />
   ) : outcome ? (
     <MessageNoAction {...outcome} />
   ) : (
     <></>
   );
 }
+export default OnboardingStep1_5;

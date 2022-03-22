@@ -3,6 +3,7 @@ import App from '../App';
 import { ROUTES } from '../utils/constants';
 import { createMemoryHistory } from 'history';
 import { Router } from 'react-router';
+import './../locale';
 
 jest.mock('../views/Onboarding', () => () => 'ONBOARDING');
 jest.mock('../views/RejectRegistration', () => () => 'REJECT ONBOARDING');

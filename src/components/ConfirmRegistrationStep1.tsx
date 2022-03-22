@@ -1,5 +1,6 @@
 import { Button, Grid, Typography } from '@mui/material';
 import { Box } from '@mui/system';
+import { useTranslation } from 'react-i18next';
 import { AlertDialogActions, StepperStepComponentProps } from '../../types';
 import { FileUploader } from './FileUploader';
 
@@ -9,13 +10,14 @@ export function ConfirmRegistrationStep1(
   { loading }: any,
   { uploadedFiles, setUploadedFiles }: any
 ) {
+  const { t } = useTranslation();
   const onDropAccepted = (acceptedFiles: Array<File>) => {
     setUploadedFiles(acceptedFiles);
   };
 
   const onDropRejected = () => {
-    setDialogTitle('Controlla il Documento');
-    setDialogDescription("E' possibile caricare un solo file di tipo PDF");
+    setDialogTitle(t('confirmRegistrationStep1.errorAlertTitle'));
+    setDialogDescription(t('confirmRegistrationStep1.errorAlertDescription'));
     setShowDialog(true);
   };
 
@@ -27,9 +29,8 @@ export function ConfirmRegistrationStep1(
     setUploadedFiles([]);
   };
 
-  const subtitle1 =
-    "Per completare l'adesione, carica l'atto ricevuto via PEC, firmato digitalmente ";
-  const subtitle2 = 'dal Legale Rappresentante.';
+  const subtitle1 = t('confirmRegistrationStep1.pageSubtitle1');
+  const subtitle2 = t('confirmRegistrationStep1.pageSubtitle2');
   const uploaderImageWidth = 180;
   return (
     <Box>
@@ -39,7 +40,7 @@ export function ConfirmRegistrationStep1(
           <Grid container columns={11}>
             <Grid item xs={11}>
               <Typography color="textPrimary" variant={'h2'} align="left">
-                {"Carica l'Accordo di Adesione"}
+                {t('confirmRegistrationStep1.pageTitle')}
               </Typography>
             </Grid>
             <Grid item xs={11}>
@@ -58,9 +59,9 @@ export function ConfirmRegistrationStep1(
             </Grid>
             <Grid item xs={11}>
               <FileUploader
-                title={'Trascina qui l’Accordo di Adesione firmato'}
-                description={'oppure '}
-                descriptionLink={'selezionalo dal tuo computer'}
+                title={t('confirmRegistrationStep1.fileUploaderTitle')}
+                description={t('confirmRegistrationStep1.fileUploaderDescription')}
+                descriptionLink={t('confirmRegistrationStep1.fileUploaderDescriptionLink')}
                 uploadedFiles={uploadedFiles}
                 deleteUploadedFiles={deleteUploadedFiles}
                 onDropAccepted={onDropAccepted}
@@ -78,7 +79,7 @@ export function ConfirmRegistrationStep1(
                 disabled={!(uploadedFiles && uploadedFiles.length > 0)}
                 onClick={onSubmit}
               >
-                Invia
+                {t('confirmRegistrationStep1.confirmAction')}
               </Button>
             </Grid>
           </Grid>
