@@ -62,10 +62,8 @@ export default {
     onboarding: {
       bodyTitle: 'Seleziona il tuo Ente',
       bodyDescription:
-        "Seleziona dall'Indice della Pubblica Amministrazione (IPA) l'Ente per cui vuoi richiedere l'adesione a",
-      ipaDescription: "Non trovi il tuo ente nell'IPA? In ",
-      ipaMoreInfoDescription: " trovi maggiori informazioni sull'indice e su come accreditarsi.",
-      ipaLink: 'questa pagina',
+        "Seleziona dall'Indice della Pubblica Amministrazione (IPA) l'ente <1/> per cui vuoi richiedere l'adesione a {{productTitle}}",
+      ipaDescription: `Non trovi il tuo ente nell'IPA? In <1>{{ipaLink}}</1> trovi maggiori <3/> informazioni sull'indice e su come accreditarsi `,
       asyncAutocomplete: {
         placeholder: 'Cerca',
       },

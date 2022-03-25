@@ -1211,6 +1211,39 @@
   dependencies:
     postcss-value-parser "^4.2.0"
 
+"@date-io/core@^2.13.1":
+  version "2.13.1"
+  resolved "https://registry.yarnpkg.com/@date-io/core/-/core-2.13.1.tgz#f041765aff5c55fbc7e37fdd75fc1792733426d6"
+  integrity sha512-pVI9nfkf2qClb2Cxdq0Q4zJhdawMG4ybWZUVGifT78FDwzRMX2SwXBb55s5NRJk0HcIicDuxktmCtemZqMH1Zg==
+
+"@date-io/date-fns@^2.13.1":
+  version "2.13.1"
+  resolved "https://registry.yarnpkg.com/@date-io/date-fns/-/date-fns-2.13.1.tgz#19d8a245dab61c03c95ba492d679d98d2b0b4af5"
+  integrity sha512-8fmfwjiLMpFLD+t4NBwDx0eblWnNcgt4NgfT/uiiQTGI81fnPu9tpBMYdAcuWxaV7LLpXgzLBx1SYWAMDVUDQQ==
+  dependencies:
+    "@date-io/core" "^2.13.1"
+
+"@date-io/dayjs@^2.13.1":
+  version "2.13.1"
+  resolved "https://registry.yarnpkg.com/@date-io/dayjs/-/dayjs-2.13.1.tgz#98461d22ee98179b9f2dca3b36f1b618704ae593"
+  integrity sha512-5bL4WWWmlI4uGZVScANhHJV7Mjp93ec2gNeUHDqqLaMZhp51S0NgD25oqj/k0LqBn1cdU2MvzNpk/ObMmVv5cQ==
+  dependencies:
+    "@date-io/core" "^2.13.1"
+
+"@date-io/luxon@^2.13.1":
+  version "2.13.1"
+  resolved "https://registry.yarnpkg.com/@date-io/luxon/-/luxon-2.13.1.tgz#3701b3cabfffda5102af302979aa6e58acfda91a"
+  integrity sha512-yG+uM7lXfwLyKKEwjvP8oZ7qblpmfl9gxQYae55ifbwiTs0CoCTkYkxEaQHGkYtTqGTzLqcb0O9Pzx6vgWg+yg==
+  dependencies:
+    "@date-io/core" "^2.13.1"
+
+"@date-io/moment@^2.13.1":
+  version "2.13.1"
+  resolved "https://registry.yarnpkg.com/@date-io/moment/-/moment-2.13.1.tgz#122a51e4bdedf71ff3babb264427737dc022c1e6"
+  integrity sha512-XX1X/Tlvl3TdqQy2j0ZUtEJV6Rl8tOyc5WOS3ki52He28Uzme4Ro/JuPWTMBDH63weSWIZDlbR7zBgp3ZA2y1A==
+  dependencies:
+    "@date-io/core" "^2.13.1"
+
 "@emotion/babel-plugin@^11.7.1":
   version "11.7.2"
   resolved "https://registry.yarnpkg.com/@emotion/babel-plugin/-/babel-plugin-11.7.2.tgz#fec75f38a6ab5b304b0601c74e2a5e77c95e5fa0"
@@ -1358,7 +1391,7 @@
     minimatch "^3.0.4"
     strip-json-comments "^3.1.1"
 
-"@fontsource/titillium-web@^4.5.0":
+"@fontsource/titillium-web@^4.5.0", "@fontsource/titillium-web@^4.5.3":
   version "4.5.5"
   resolved "https://registry.yarnpkg.com/@fontsource/titillium-web/-/titillium-web-4.5.5.tgz#cc0ec9d9ae28d291b0043286ce199df0dbb89491"
   integrity sha512-JNk5R7raBSh1qVegTSKolG8Ln9utNsKujHKI9+uWWFCemBKcS5Il0l+EcpcDu+V4F8Ovdco53zNLghug0MFPtA==
@@ -1817,6 +1850,25 @@
   dependencies:
     "@babel/runtime" "^7.17.2"
 
+"@mui/lab@^5.0.0-alpha.74":
+  version "5.0.0-alpha.74"
+  resolved "https://registry.yarnpkg.com/@mui/lab/-/lab-5.0.0-alpha.74.tgz#8744c8a45c3107abbb65d45931725fd878e94b04"
+  integrity sha512-a3spQ3uWzlHVVBLcHqqMXPOwto39EVojaV3+3x102kTwPU6ZT1CsU+nI6+EiGCjZ7hW09gxjhUWxiU3fow9UWA==
+  dependencies:
+    "@babel/runtime" "^7.17.2"
+    "@date-io/date-fns" "^2.13.1"
+    "@date-io/dayjs" "^2.13.1"
+    "@date-io/luxon" "^2.13.1"
+    "@date-io/moment" "^2.13.1"
+    "@mui/base" "5.0.0-alpha.73"
+    "@mui/system" "^5.5.2"
+    "@mui/utils" "^5.4.4"
+    clsx "^1.1.1"
+    prop-types "^15.7.2"
+    react-is "^17.0.2"
+    react-transition-group "^4.4.2"
+    rifm "^0.12.1"
+
 "@mui/material@^5.0.3", "@mui/material@^5.0.4":
   version "5.5.2"
   resolved "https://registry.yarnpkg.com/@mui/material/-/material-5.5.2.tgz#9cea96abda87bed51d435e8676d5bfad99750b8a"
@@ -1919,6 +1971,13 @@
   dependencies:
     mkdirp "^1.0.4"
     rimraf "^3.0.2"
+
+"@pagopa/mui-italia@0.6.5":
+  version "0.6.5"
+  resolved "https://registry.yarnpkg.com/@pagopa/mui-italia/-/mui-italia-0.6.5.tgz#76949e6c343afb70648f90b599b71c1506884786"
+  integrity sha512-kzeIFwNw1zyxVNqDvbA1erq8fLH62ADWrH/pUfFpCABEHi0j2/fizU6351dI/G1xIJhDEqL6JQXs/fzykpINdA==
+  dependencies:
+    "@fontsource/titillium-web" "^4.5.3"
 
 "@pagopa/mui-italia@pagopa/mui-italia":
   version "0.3.1"
@@ -12830,6 +12889,11 @@ rgba-regex@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/rgba-regex/-/rgba-regex-1.0.0.tgz#43374e2e2ca0968b0ef1523460b7d730ff22eeb3"
   integrity sha1-QzdOLiyglosO8VI0YLfXMP8i7rM=
+
+rifm@^0.12.1:
+  version "0.12.1"
+  resolved "https://registry.yarnpkg.com/rifm/-/rifm-0.12.1.tgz#8fa77f45b7f1cda2a0068787ac821f0593967ac4"
+  integrity sha512-OGA1Bitg/dSJtI/c4dh90svzaUPt228kzFsUkJbtA2c964IqEAwWXeL9ZJi86xWv3j5SMqRvGULl7bA6cK0Bvg==
 
 rimraf@2.6.3:
   version "2.6.3"

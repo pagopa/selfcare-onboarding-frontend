@@ -19,12 +19,12 @@ export function OnboardingStep0({ forward }: StepperStepComponentProps) {
       <StyledIntro>
         {{
           title: t('onboardingStep0.title'),
-          description: <>{t('onboardingStep0.description')}</>,
+          description: <>{t('onboardingStep0.description')} test</>,
         }}
       </StyledIntro>
       <Box sx={{ textAlign: 'center' }}>
         <Switch checked={checked} onChange={(_, value) => setChecked(value)} />
-        {t('onboardingStep0.privacyPolicyDescription')}{' '}
+        {t('onboardingStep0.privacyPolicyDescription')}
         <Link to="#">{t('onboardingStep0.privacyPolicyLink')}</Link>
       </Box>
 

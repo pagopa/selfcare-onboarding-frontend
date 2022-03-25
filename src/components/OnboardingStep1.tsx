@@ -1,16 +1,17 @@
-import { Grid, Link, Typography } from '@mui/material';
+import { Grid, Link, Typography, useTheme } from '@mui/material';
 import { Box } from '@mui/system';
 import { useContext, useEffect, useState } from 'react';
 import { AxiosResponse } from 'axios';
-import { useTranslation } from 'react-i18next';
+import { useTranslation, Trans } from 'react-i18next';
 import { IPACatalogParty, StepperStepComponentProps } from '../../types';
 import { getFetchOutcome } from '../lib/error-utils';
 import { fetchWithLogs } from '../lib/api-utils';
 import { UserContext } from '../lib/context';
 import { OnboardingStepActions } from './OnboardingStepActions';
-import { AsyncAutocomplete } from './AsyncAutocomplete';
+// import { AsyncAutocomplete } from './AsyncAutocomplete';
 import { useHistoryState } from './useHistoryState';
 import { LoadingOverlay } from './LoadingOverlay';
+import { AsyncAutocompleteV2 } from './AsyncAutocompleteV2';
 
 const handleSearchInstitutionId = async (
   institutionId: string,
@@ -34,6 +35,7 @@ const handleSearchInstitutionId = async (
 export function OnboardingStep1({ product, forward }: StepperStepComponentProps) {
   const institutionIdByQuery = new URLSearchParams(window.location.search).get('institutionId');
   const { setRequiredLogin } = useContext(UserContext);
+  const theme = useTheme();
 
   const [loading, setLoading] = useState(!!institutionIdByQuery);
   const [selected, setSelected, setSelectedHistory] = useHistoryState<IPACatalogParty | null>(
@@ -48,7 +50,6 @@ export function OnboardingStep1({ product, forward }: StepperStepComponentProps)
   };
   const { t } = useTranslation();
   const bodyTitle = t('onboardingStep1.onboarding.bodyTitle');
-  const bodyDescription = `${t('onboardingStep1.onboarding.bodyDescription')} ${product?.title}`;
 
   useEffect(() => {
     if (institutionIdByQuery) {
@@ -84,7 +85,7 @@ export function OnboardingStep1({ product, forward }: StepperStepComponentProps)
     >
       <Grid container item justifyContent="center">
         <Grid item xs={12}>
-          <Typography variant="h3" component="h2" align="center">
+          <Typography variant="h3" component="h2" align="center" color={theme.palette.text.primary}>
             {bodyTitle}
           </Typography>
         </Grid>
@@ -92,18 +93,42 @@ export function OnboardingStep1({ product, forward }: StepperStepComponentProps)
 
       <Grid container item justifyContent="center" mt={2}>
         <Grid item xs={12}>
-          <Typography variant="subtitle2" component="h2" align="center">
-            {bodyDescription}
+          <Typography
+            variant="subtitle2"
+            component="h2"
+            align="center"
+            color={theme.palette.text.primary}
+          >
+            <Trans i18nKey="onboardingStep1.onboarding.bodyDescription">
+              Seleziona dall&apos;Indice della Pubblica Amministrazione (IPA) l&apos;ente
+              <br />
+              per cui vuoi richiedere l&apos;adesione a {{ productTitle: product?.title }}
+            </Trans>
           </Typography>
         </Grid>
       </Grid>
 
-      <Grid container item justifyContent="center" mt={7}>
-        <Grid item xs={4} sx={{ minHeight: '180px' }}>
-          <AsyncAutocomplete
+      <Grid container item justifyContent="center" mt={7} mb={4}>
+        <Grid item xs={4}>
+          {/* <AsyncAutocomplete
+            theme={theme}
             selected={selected}
             setSelected={setSelected}
-            placeholder={t('onboardingStep1.onboarding.asyncAutocomplete.placeholder')}
+            // placeholder={t('onboardingStep1.onboarding.asyncAutocomplete.placeholder')}
+            endpoint={{ endpoint: 'ONBOARDING_GET_SEARCH_PARTIES' }}
+            transformFn={(data: { items: Array<IPACatalogParty> }) => {
+              // eslint-disable-next-line functional/immutable-data
+              data.items.forEach((i) => (i.description = i.description.toLowerCase()));
+              return data.items;
+            }}
+            optionKey="id"
+            optionLabel="description"
+          /> */}
+          <AsyncAutocompleteV2
+            theme={theme}
+            selected={selected}
+            setSelected={setSelected}
+            // placeholder={t('onboardingStep1.onboarding.asyncAutocomplete.placeholder')}
             endpoint={{ endpoint: 'ONBOARDING_GET_SEARCH_PARTIES' }}
             transformFn={(data: { items: Array<IPACatalogParty> }) => {
               // eslint-disable-next-line functional/immutable-data
@@ -132,12 +157,17 @@ export function OnboardingStep1({ product, forward }: StepperStepComponentProps)
                 color: 'text.primary',
               }}
               variant="body2"
+              color={theme.palette.text.primary}
             >
-              {t('onboardingStep1.onboarding.ipaDescription')}
-              <Link href="https://indicepa.gov.it/ipa-portale/servizi-enti/accreditamento-ente">
-                {t('onboardingStep1.onboarding.ipaLink')}
-              </Link>
-              {t('onboardingStep1.onboarding.ipaMoreInfoDescription')}
+              <Trans i18nKey="onboardingStep1.onboarding.ipaDescription">
+                Non trovi il tuo ente nell&apos;IPA? In
+                <Link href="https://indicepa.gov.it/ipa-portale/servizi-enti/accreditamento-ente">
+                  {{ ipaLink: 'questa pagina' }}
+                </Link>
+                trovi maggiori
+                <br />
+                informazioni sull&apos;indice e su come accreditarsi
+              </Trans>
             </Typography>
           </Box>
         </Grid>
