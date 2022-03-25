@@ -1,9 +1,9 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { Button, Stack, Typography, Grid } from '@mui/material';
 import ErrorIcon from '@pagopa/selfcare-common-frontend/components/icons/ErrorIcon';
-import cryptoRandomString from 'crypto-random-string';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
 import { useTranslation, Trans } from 'react-i18next';
+import { uniqueId } from 'lodash';
 import { MessageNoAction } from '../components/MessageNoAction';
 import checkIllustration from '../assets/check-illustration.svg';
 import { RequestOutcome, RequestOutcomeOptions } from '../../types';
@@ -26,7 +26,7 @@ export default function RejectRegistration() {
 
   const { t } = useTranslation();
   useEffect(() => {
-    const requestId = cryptoRandomString({ length: 8 });
+    const requestId = uniqueId('contract-reject-');
     trackEvent('ONBOARDING_CANCEL', { request_id: requestId });
     async function asyncSendDeleteRequest() {
       // Send DELETE request

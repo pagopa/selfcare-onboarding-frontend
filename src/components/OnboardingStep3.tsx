@@ -1,8 +1,7 @@
 import React, { ChangeEvent, useContext } from 'react';
 import { Checkbox, FormControlLabel, IconButton, Link, Grid, Typography } from '@mui/material';
-import cryptoRandomString from 'crypto-random-string';
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
-import { omit } from 'lodash';
+import { omit, uniqueId } from 'lodash';
 // import { Box } from '@mui/system';
 import { useTranslation } from 'react-i18next';
 import { objectIsEmpty } from '../lib/object-utils';
@@ -32,7 +31,7 @@ export function OnboardingStep3({ product, legal, forward, back }: Props) {
   const allPeople = { ...people, LEGAL: legal };
 
   const addDelegateForm = () => {
-    const newId = `delegate-${cryptoRandomString({ length: 8 })}`;
+    const newId = uniqueId('delegate-');
     setDelegateFormIds([...delegateFormIds, newId]);
     setPeople({
       ...people,

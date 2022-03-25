@@ -4,8 +4,8 @@ import { AxiosError } from 'axios';
 import SessionModal from '@pagopa/selfcare-common-frontend/components/SessionModal';
 import ErrorIcon from '@pagopa/selfcare-common-frontend/components/icons/ErrorIcon';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
-import cryptoRandomString from 'crypto-random-string';
 import { useTranslation, Trans } from 'react-i18next';
+import { uniqueId } from 'lodash';
 import { RequestOutcome, RequestOutcomeOptions, StepperStep, Problem } from '../../types';
 import { ConfirmRegistrationStep0 } from '../components/ConfirmRegistrationStep0';
 import { ConfirmRegistrationStep1 } from '../components/ConfirmRegistrationStep1';
@@ -108,7 +108,7 @@ export default function CompleteRegistrationComponent() {
   };
 
   const submit = async (file: File) => {
-    const requestId = cryptoRandomString({ length: 8 });
+    const requestId = uniqueId('upload-contract-');
     trackEvent('ONBOARDING_CONTRACT_UPLOAD', { request_id: requestId });
 
     setLoading(true);

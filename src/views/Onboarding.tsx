@@ -4,9 +4,9 @@ import { Button, Container, Stack, Typography, Grid } from '@mui/material';
 import { AxiosError, AxiosResponse } from 'axios';
 import SessionModal from '@pagopa/selfcare-common-frontend/components/SessionModal';
 import ErrorIcon from '@pagopa/selfcare-common-frontend/components/icons/ErrorIcon';
-import cryptoRandomString from 'crypto-random-string';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
 import { useTranslation, Trans } from 'react-i18next';
+import { uniqueId } from 'lodash';
 import { withLogin } from '../components/withLogin';
 import {
   Product,
@@ -83,7 +83,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
 
   useEffect(() => {
     // eslint-disable-next-line functional/immutable-data
-    requestIdRef.current = cryptoRandomString({ length: 8 });
+    requestIdRef.current = uniqueId(`onboarding-${institutionId}-${productId}-`);
     void checkProductId().finally(() => {
       setLoading(false);
     });
