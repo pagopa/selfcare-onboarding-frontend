@@ -196,7 +196,7 @@ export function OnboardingStep3({ product, legal, forward, back }: Props) {
                 lineHeight: '24px',
                 fontFamily: '"Titillium Web", "sans-serif"',
                 textDecoration: 'none',
-                color: '#0073E6',
+                cursor: 'default',
               }}
             >
               {t('onboardingStep3.addUserLink')}
