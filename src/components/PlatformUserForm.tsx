@@ -136,7 +136,7 @@ export function PlatformUserForm({
     : [];
 
   return (
-    <Paper elevation={0} sx={{ py: 4, px: 6 }}>
+    <Paper elevation={0} sx={{ py: 4, px: 6, borderRadius: '16px' }}>
       <Grid container spacing={2}>
         {fields.map(
           ({
@@ -153,10 +153,10 @@ export function PlatformUserForm({
               .map((e) => e.replace(prefixErrorCode, ''));
             const isError = error && error.length > 0;
             return (
-              <Grid item key={id} xs={width} mb={5}>
+              <Grid item key={id} xs={width} mb={3}>
                 <CustomTextField
                   id={`${prefix}-${id}`}
-                  variant="standard"
+                  variant="outlined"
                   label={t(`platformUserForm.fields.${id}.label`)}
                   type={type}
                   value={people[prefix] && people[prefix][id] ? people[prefix][id] : ''}

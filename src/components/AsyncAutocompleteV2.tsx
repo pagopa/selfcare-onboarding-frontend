@@ -2,15 +2,55 @@ import React, { useContext, useState } from 'react';
 import debounce from 'lodash/debounce';
 import { AxiosError, AxiosResponse } from 'axios';
 import { IconButton, InputAdornment, TextField, Theme, Grid, Typography } from '@mui/material';
-import { Box } from '@mui/system';
+import { Box, styled } from '@mui/system';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
-// import { useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import { Endpoint } from '../../types';
 import { fetchWithLogs } from '../lib/api-utils';
 import { getFetchOutcome } from '../lib/error-utils';
 import { ENV } from '../utils/env';
 import { UserContext } from '../lib/context';
+import { ReactComponent as PartyIcon } from '../assets/onboarding_party_icon.svg';
+
+const CustomTextField = styled(TextField)({
+  justifyContent: 'center',
+  /* default */
+  '.css-1tu8ncx-MuiInputBase-root-MuiInput-root:before': {
+    borderBottom: 'none',
+  },
+  /* hover (double-ampersand needed for specificity reasons. */
+  '&& .MuiInput-underline:hover:before': {
+    borderBottom: 'none',
+  },
+  /* focused */
+  '.MuiInput-underline:after': {
+    borderBottom: 'none',
+  },
+});
+
+const CustomBox = styled(Box)({
+  /* width */
+  '::-webkit-scrollbar': {
+    width: '6px',
+  },
+  /* Track */
+  '::-webkit-scrollbar-track': {
+    boxShadow: 'inset 0 0 5px #F2F6FA',
+    borderRadius: '20px',
+  },
+  /* Handle */
+  '::-webkit-scrollbar-thumb': {
+    background: '#0073E6',
+    backgroundClip: 'padding-box',
+    borderRadius: '20px',
+  },
+
+  /* Handle on hover */
+  '::-webkit-scrollbar-thumb:hover': {
+    background: '#0073E6',
+  },
+});
 
 type AutocompleteProps = {
   selected: any;
@@ -22,12 +62,13 @@ type AutocompleteProps = {
   theme: Theme;
 };
 
+// eslint-disable-next-line sonarjs/cognitive-complexity
 export function AsyncAutocompleteV2({
   selected,
   setSelected,
   endpoint,
   transformFn,
-  // optionKey,
+  optionKey,
   optionLabel,
   theme,
 }: AutocompleteProps) {
@@ -35,7 +76,7 @@ export function AsyncAutocompleteV2({
   const [input, setInput] = useState<string>('');
   const [options, setOptions] = useState<Array<any>>([]);
   const { setRequiredLogin } = useContext(UserContext);
-  // const { t } = useTranslation();
+  const { t } = useTranslation();
 
   const handleSearch = async (query: string) => {
     setIsLoading(true);
@@ -60,12 +101,8 @@ export function AsyncAutocompleteV2({
     setIsLoading(false);
   };
 
-  // const noOptionsText =
-  //   input !== undefined && input.length >= 3
-  //     ? t('asyncAutocomplete.noResultsLabel')
-  //     : t('asyncAutocomplete.lessThen3CharacterLabel');
-  // const getOptionKey: (option: any) => string =
-  //   optionKey !== undefined ? (o) => o[optionKey] : (o) => o.label ?? o;
+  const getOptionKey: (option: any) => string =
+    optionKey !== undefined ? (o) => o[optionKey] : (o) => o.label ?? o;
 
   const getOptionLabel: (option: any) => string =
     optionLabel !== undefined ? (o) => o[optionLabel] : (o) => o.label ?? o;
@@ -81,13 +118,10 @@ export function AsyncAutocompleteV2({
         void debounce(handleSearch, 100)(value);
       }
     }
-    // if (reason === 'clear') {
-    //   setSelected(null);
-    // }
-    if (
-      // reason === 'reset' &&
-      selected
-    ) {
+    if (value === '') {
+      setSelected(null);
+    }
+    if (selected) {
       setInput(getOptionLabel(selected));
     }
   };
@@ -105,91 +139,6 @@ export function AsyncAutocompleteV2({
           '0px 8px 10px -5px rgba(0, 43, 85, 0.1), 0px 16px 24px 2px rgba(0, 43, 85, 0.05), 0px 6px 30px 5px rgba(0, 43, 85, 0.1);',
       }}
     >
-      {/* <Autocomplete
-        id="Parties"
-        freeSolo
-        value={selected}
-        noOptionsText={noOptionsText}
-        onChange={(_event, value) => {
-          setSelected(value);
-          setInput(getOptionLabel(value));
-        }}
-        options={options}
-        loading={isLoading}
-        inputValue={input}
-        disableClearable={true}
-        onInputChange={(_event, value, reason) => {
-          setInput(value);
-          if (reason === 'input') {
-            setSelected(null);
-            if (value.length >= 3) {
-              void debounce(handleSearch, 100)(value);
-            }
-          }
-          if (reason === 'clear') {
-            setSelected(null);
-          }
-          if (reason === 'reset' && selected) {
-            setInput(getOptionLabel(selected));
-          }
-        }}
-        filterOptions={(x) => x}
-        sx={{
-          '.MuiOutlinedInput-root': { borderRadius: '5px', padding: '0' },
-          width: '90%',
-        }}
-        renderInput={(params) => (
-          <TextField
-            label="Cerca ente"
-            {...params}
-            inputProps={{
-              ...params.inputProps,
-              style: {
-                fontStyle: 'normal',
-                fontWeight: 'normal',
-                fontSize: '16px',
-                lineHeight: '24px',
-                color: '#5C6F82',
-                textAlign: 'start',
-                paddingLeft: '16px',
-                textTransform: 'capitalize',
-              },
-            }}
-            InputProps={{
-              ...params.InputProps,
-              startAdornment: (
-                <InputAdornment position="end">
-                  <SearchOutlinedIcon sx={{ color: theme.palette.text.primary }} />
-                </InputAdornment>
-              ),
-              endAdornment: (
-                <IconButton onClick={() => setInput('')}>
-                  <ClearOutlinedIcon sx={{ color: theme.palette.text.primary }} />
-                </IconButton>
-              ),
-            }}
-            variant="outlined"
-          />
-        )}
-        getOptionLabel={getOptionKey}
-        renderOption={(props, option) => (
-          <li {...props}>
-            <Box
-              sx={{
-                fontStyle: 'normal',
-                fontWeight: 'normal',
-                fontSize: '16px',
-                lineHeight: '24px',
-                color: '#5A768A',
-                textTransform: 'capitalize',
-              }}
-            >
-              {getOptionLabel(option)?.toLowerCase()}
-            </Box>
-          </li>
-        )}
-      /> */}
-
       <Grid container>
         <Grid
           item
@@ -200,46 +149,56 @@ export function AsyncAutocompleteV2({
           pt={4}
           pb={showElement && !selected ? 0 : 4}
         >
-          <TextField
+          {selected && (
+            <Box display="flex" alignItems="center">
+              <PartyIcon width={50} />
+            </Box>
+          )}
+          <CustomTextField
             sx={{ width: '80%' }}
-            value={input}
+            value={selected ? selected.description : input}
             onChange={handleChange}
-            label="Cerca ente"
+            label={!selected ? 'Cerca ente' : ''}
+            variant={!selected ? 'outlined' : 'standard'}
             inputProps={{
               style: {
                 fontStyle: 'normal',
-                fontWeight: 'normal',
+                fontWeight: '700',
                 fontSize: '16px',
                 lineHeight: '24px',
-                color: '#5C6F82',
+                color: '#17324D',
                 textAlign: 'start',
-                paddingLeft: '16px',
+                paddingLeft: '8px',
                 textTransform: 'capitalize',
               },
             }}
             InputProps={{
-              startAdornment: (
+              startAdornment: !selected && (
                 <InputAdornment position="end">
                   <SearchOutlinedIcon sx={{ color: theme.palette.text.primary }} />
                 </InputAdornment>
               ),
               endAdornment: (
-                <IconButton onClick={() => setInput('')}>
+                <IconButton
+                  onClick={() => {
+                    setInput('');
+                    setSelected('');
+                  }}
+                >
                   <ClearOutlinedIcon sx={{ color: theme.palette.text.primary }} />
                 </IconButton>
               ),
             }}
-            variant="outlined"
           />
         </Grid>
         <Grid item xs={12} display="flex" justifyContent="center">
-          {showElement && (
-            <Box {...options} width="80%">
-              {!isLoading ? (
-                options.map((option, index) => (
+          {showElement && options.length > 0 ? (
+            <CustomBox my={2} {...options} width="80%" maxHeight="200px" overflow="auto">
+              {!isLoading &&
+                options.map((option) => (
                   <Box
                     py={1}
-                    key={index}
+                    key={getOptionKey(option)}
                     sx={{
                       fontStyle: 'normal',
                       fontWeight: 'normal',
@@ -249,20 +208,32 @@ export function AsyncAutocompleteV2({
                       textTransform: 'capitalize',
                     }}
                   >
-                    <Typography
-                      onClick={() => {
-                        setSelected(option);
-                        setOptions([]);
-                      }}
-                    >
-                      {getOptionLabel(option)?.toLowerCase()}
-                    </Typography>
+                    <Box display="flex">
+                      <Box pr={1}>
+                        <PartyIcon width={50} />
+                      </Box>
+                      <Box display="flex" alignItems="center">
+                        <Typography
+                          onClick={() => {
+                            setSelected(option);
+                            setOptions([]);
+                          }}
+                          variant="sidenav"
+                          sx={{ fontWeight: '700', cursor: 'pointer' }}
+                        >
+                          {getOptionLabel(option)?.toLowerCase()}
+                        </Typography>
+                      </Box>
+                    </Box>
                   </Box>
-                ))
-              ) : (
-                <Box>Loader</Box>
-              )}
-            </Box>
+                ))}
+            </CustomBox>
+          ) : input.length >= 1 && input.length < 3 ? (
+            <Typography pb={3}> {t('asyncAutocomplete.lessThen3CharacterLabel')}</Typography>
+          ) : (
+            input.length >= 3 &&
+            options.length === 0 &&
+            !selected && <Typography pb={3}> {t('asyncAutocomplete.noResultsLabel')} </Typography>
           )}
         </Grid>
       </Grid>

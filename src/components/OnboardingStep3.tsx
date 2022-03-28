@@ -111,13 +111,16 @@ export function OnboardingStep3({ product, legal, forward, back }: Props) {
                 {t('onboardingStep3.formControl.label')}
               </Typography>
             }
-            sx={{ alignSelf: 'center' }}
+            sx={{
+              alignSelf: 'center',
+              '.MuiSvgIcon-root': { color: '#0073E6' },
+            }}
           />
         </Grid>
       </Grid>
 
       <Grid container item justifyContent="center" mt={2}>
-        <Grid item xs={6} sx={{ boxShadow: '0px 12px 40px rgba(0, 0, 0, 0.06)' }}>
+        <Grid item xs={8} sx={{ boxShadow: '0px 12px 40px rgba(0, 0, 0, 0.06)' }}>
           <PlatformUserForm
             prefix={'delegate-initial'}
             role="DELEGATE"
@@ -142,7 +145,7 @@ export function OnboardingStep3({ product, legal, forward, back }: Props) {
             </Grid>
             <Grid
               item
-              xs={6}
+              xs={8}
               sx={{ boxShadow: '0px 12px 40px rgba(0, 0, 0, 0.06)', position: 'relative' }}
             >
               <PlatformUserForm
@@ -192,6 +195,8 @@ export function OnboardingStep3({ product, legal, forward, back }: Props) {
                 fontSize: 'htmlFontSize',
                 lineHeight: '24px',
                 fontFamily: '"Titillium Web", "sans-serif"',
+                textDecoration: 'none',
+                color: '#0073E6',
               }}
             >
               {t('onboardingStep3.addUserLink')}

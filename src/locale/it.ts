@@ -63,7 +63,7 @@ export default {
       bodyTitle: 'Seleziona il tuo Ente',
       bodyDescription:
         "Seleziona dall'Indice della Pubblica Amministrazione (IPA) l'ente <1/> per cui vuoi richiedere l'adesione a {{productTitle}}",
-      ipaDescription: `Non trovi il tuo ente nell'IPA? In <1>{{ipaLink}}</1> trovi maggiori <3/> informazioni sull'indice e su come accreditarsi `,
+      ipaDescription: `Non trovi il tuo ente nell'IPA? In <1>questa pagina</1> trovi maggiori <3/> informazioni sull'indice e su come accreditarsi `,
       asyncAutocomplete: {
         placeholder: 'Cerca',
       },
@@ -74,7 +74,7 @@ export default {
   },
   onboardingStep2: {
     bodyTitle: 'Indica il Legale Rappresentante',
-    bodyDescription: `Inserisci i dati del Legale Rappresentante. <1 /> La persona che indicherai sarà firmataria del contratto per <2 />`,
+    bodyDescription: `Inserisci i dati del Legale Rappresentante. <1/> La persona che indicherai sarà firmataria del contratto per <3/>`,
     backLabel: 'Indietro',
     confirmLabel: 'Conferma',
   },
@@ -87,7 +87,7 @@ export default {
     backLabel: 'Indietro',
     confirmLabel: 'Conferma',
     formControl: {
-      label: 'Sono io il Referente Amministrativo',
+      label: "Sono io l'Amministratore",
     },
   },
   platformUserForm: {

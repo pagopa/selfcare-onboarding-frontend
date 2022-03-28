@@ -48,6 +48,7 @@ export function OnboardingStep2({ product, forward, back }: StepperStepComponent
             <Trans i18nKey="onboardingStep2.bodyDescription">
               Inserisci i dati del Legale Rappresentante.
               <br />
+              La persona che indicherai sarà firmataria del contratto per
               {`${product?.title}`}
             </Trans>
           </Typography>
@@ -55,7 +56,7 @@ export function OnboardingStep2({ product, forward, back }: StepperStepComponent
       </Grid>
 
       <Grid container item justifyContent="center" mt={7}>
-        <Grid item xs={6} sx={{ boxShadow: '0px 12px 40px rgba(0, 0, 0, 0.06)' }}>
+        <Grid item xs={8} sx={{ boxShadow: '0px 12px 40px rgba(0, 0, 0, 0.06)' }}>
           <PlatformUserForm
             prefix="LEGAL"
             role="MANAGER"

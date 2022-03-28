@@ -109,21 +109,7 @@ export function OnboardingStep1({ product, forward }: StepperStepComponentProps)
       </Grid>
 
       <Grid container item justifyContent="center" mt={7} mb={4}>
-        <Grid item xs={4}>
-          {/* <AsyncAutocomplete
-            theme={theme}
-            selected={selected}
-            setSelected={setSelected}
-            // placeholder={t('onboardingStep1.onboarding.asyncAutocomplete.placeholder')}
-            endpoint={{ endpoint: 'ONBOARDING_GET_SEARCH_PARTIES' }}
-            transformFn={(data: { items: Array<IPACatalogParty> }) => {
-              // eslint-disable-next-line functional/immutable-data
-              data.items.forEach((i) => (i.description = i.description.toLowerCase()));
-              return data.items;
-            }}
-            optionKey="id"
-            optionLabel="description"
-          /> */}
+        <Grid item xs={5}>
           <AsyncAutocompleteV2
             theme={theme}
             selected={selected}
@@ -162,7 +148,7 @@ export function OnboardingStep1({ product, forward }: StepperStepComponentProps)
               <Trans i18nKey="onboardingStep1.onboarding.ipaDescription">
                 Non trovi il tuo ente nell&apos;IPA? In
                 <Link href="https://indicepa.gov.it/ipa-portale/servizi-enti/accreditamento-ente">
-                  {{ ipaLink: 'questa pagina' }}
+                  questa pagina
                 </Link>
                 trovi maggiori
                 <br />
