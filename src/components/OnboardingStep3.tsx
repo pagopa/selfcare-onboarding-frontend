@@ -196,7 +196,14 @@ export function OnboardingStep3({ product, legal, forward, back }: Props) {
                 lineHeight: '24px',
                 fontFamily: '"Titillium Web", "sans-serif"',
                 textDecoration: 'none',
-                cursor: 'default',
+                cursor:
+                  objectIsEmpty(people) ||
+                  Object.keys(people)
+                    .filter((prefix) => 'LEGAL' !== prefix)
+                    .some((prefix) => !validateUser(prefix, people[prefix], allPeople)) ||
+                  Object.keys(people).length === 3
+                    ? 'default'
+                    : 'pointer',
               }}
             >
               {t('onboardingStep3.addUserLink')}

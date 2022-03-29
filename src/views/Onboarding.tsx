@@ -240,28 +240,41 @@ function OnboardingComponent({ productId }: { productId: string }) {
   const outcomeContent: RequestOutcomeOptions = {
     success: {
       ImgComponent: CheckIllustration,
-      title: t('onboarding.outcomeContent.success.title'),
+      title: '',
       description: [
-        <Stack key="0" spacing={10}>
-          <Typography>
-            <Trans i18nKey="onboarding.outcomeContent.success.description">
-              Riceverai una PEC all’indirizzo istituzionale dell’Ente.
+        <>
+          <Typography
+            variant={'h2'}
+            sx={{ color: 'text.primary', lineHeight: '49px', marginBottom: 1 }}
+          >
+            <Trans i18nKey="onboarding.outcomeContent.success.title">
+              La tua richiesta è stata inviata
               <br />
-              Al suo interno troverai le istruzioni per completare l&apos;adesione.
+              con successo
             </Trans>
           </Typography>
-          <Button
-            variant="contained"
-            sx={{ width: '200px', alignSelf: 'center' }}
-            onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
-          >
-            {t('onboarding.outcomeContent.success.backActionLabel')}
-          </Button>
-          {/* <Typography>
+          <Stack key="0" spacing={10}>
+            <Typography>
+              <Trans i18nKey="onboarding.outcomeContent.success.description">
+                Riceverai una PEC all’indirizzo istituzionale dell’Ente.
+                <br />
+                Al suo interno troverai le istruzioni per completare l&apos;adesione.
+              </Trans>
+            </Typography>
+            <Button
+              variant="contained"
+              sx={{ width: '200px', alignSelf: 'center' }}
+              onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+            >
+              {t('onboarding.outcomeContent.success.backActionLabel')}
+            </Button>
+            {/* <Typography>
             Non hai ricevuto nessuna mail? Attendi qualche minuto e controlla anche nello spam. Se
             non arriva, <InlineSupportLink />
           </Typography> */}
-        </Stack>,
+          </Stack>
+          ,
+        </>,
       ],
     },
     error: {
