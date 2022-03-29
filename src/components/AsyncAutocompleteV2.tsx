@@ -166,7 +166,7 @@ export function AsyncAutocompleteV2({
                 fontWeight: '700',
                 fontSize: '16px',
                 lineHeight: '24px',
-                color: '#17324D',
+                color: theme.palette.text.primary,
                 textAlign: 'start',
                 paddingLeft: '8px',
                 textTransform: 'capitalize',

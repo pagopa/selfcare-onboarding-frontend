@@ -11,8 +11,7 @@ export default {
   },
   confirmRegistrationStep0: {
     title: "Carica l'Accordo di Adesione",
-    description:
-      "Segui le istruzioni per inviare il documento firmato, servirà a completare l'inserimento del tuo Ente nel portale Self Care.",
+    description: `<0>Segui le istruzioni</0> per inviare il documento firmato,<2/> servirà a completare l'inserimento del tuo Ente nel <4/> portale Self Care.`,
     confirmAction: 'Continua',
   },
   confirmRegistrationStep1: {
@@ -134,7 +133,7 @@ export default {
       success: {
         alt: "Icona dell'email",
         title: 'Adesione completata',
-        description: `Comunicheremo l'avvenuta adesione all'indirizzo PEC dell'Ente. <1/> Da questo momento in poi, i Referenti Amministrativi inseriti in fase di richiesta <2/> potranno accedere al portale.`,
+        description: `Comunicheremo l'avvenuta adesione all'indirizzo PEC dell'Ente. <1/> Da questo momento in poi, i Referenti Amministrativi inseriti in fase di richiesta <3/> potranno accedere al portale.`,
         backActionLabel: 'Torna alla home',
       },
       error: {
