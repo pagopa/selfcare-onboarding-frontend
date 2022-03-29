@@ -18,9 +18,7 @@ export default {
     errorAlertTitle: 'Controlla il Documento',
     errorAlertDescription: "E' possibile caricare un solo file di tipo PDF",
     pageTitle: "Carica l'Accordo di Adesione",
-    pageSubtitle1:
-      "Per completare l'adesione, carica l'atto ricevuto via PEC, firmato digitalmente ",
-    pageSubtitle2: 'dal Legale Rappresentante.',
+    pageSubtitle: `Per completare l'adesione, carica l'atto ricevuto via <1/> PEC, firmato digitalmente dal Legale Rappresentante.`,
     fileUploaderTitle: 'Trascina qui l’Accordo di Adesione firmato',
     fileUploaderDescription: `oppure `,
     fileUploaderDescriptionLink: 'selezionalo dal tuo computer',
