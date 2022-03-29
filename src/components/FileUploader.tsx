@@ -79,7 +79,6 @@ export function FileUploader({
           loading={loading}
           files={uploadedFiles}
           deleteUploadedFiles={deleteUploadedFiles}
-          theme={theme}
         />
       ) : (
         <Box
