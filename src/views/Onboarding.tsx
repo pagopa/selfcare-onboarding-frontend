@@ -1,12 +1,13 @@
 import React, { useEffect, useState, useContext, useRef } from 'react';
 import { useHistory } from 'react-router-dom';
-import { Button, Container, Stack, Typography, Grid } from '@mui/material';
+import { Button, Container, Stack, Typography, Grid, useTheme } from '@mui/material';
 import { AxiosError, AxiosResponse } from 'axios';
 import SessionModal from '@pagopa/selfcare-common-frontend/components/SessionModal';
-import ErrorIcon from '@pagopa/selfcare-common-frontend/components/icons/ErrorIcon';
+// import ErrorIcon from '@pagopa/selfcare-common-frontend/components/icons/ErrorIcon';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
 import { useTranslation, Trans } from 'react-i18next';
 import { uniqueId } from 'lodash';
+import { ReactComponent as ErrorIcon } from '../assets/payment_completedV2.svg';
 import { withLogin } from '../components/withLogin';
 import {
   Product,
@@ -70,6 +71,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
   const { setRequiredLogin } = useContext(UserContext);
   const requestIdRef = useRef<string>();
   const { t } = useTranslation();
+  const theme = useTheme();
 
   useEffect(() => {
     registerUnloadEvent(setOnLogout, setOpenExitModal);
@@ -284,10 +286,10 @@ function OnboardingComponent({ productId }: { productId: string }) {
         <Grid container direction="column" key="0">
           <Grid container item justifyContent="center">
             <Grid item xs={5}>
-              <Typography variant="h2">{t('onboarding.outcomeContent.error.title')}</Typography>
+              <Typography variant="h4">{t('onboarding.outcomeContent.error.title')}</Typography>
             </Grid>
           </Grid>
-          <Grid container item justifyContent="center" mb={7} mt={1}>
+          <Grid container item justifyContent="center" mb={3} mt={1}>
             <Grid item xs={5}>
               <Typography>
                 <Trans i18nKey="onboarding.outcomeContent.error.description">
@@ -304,7 +306,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
                 onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
                 variant={'contained'}
               >
-                <Typography width="100%">
+                <Typography width="100%" sx={{ color: theme.palette.primary.contrastText }}>
                   {t('onboarding.outcomeContent.error.backActionLabel')}
                 </Typography>
               </Button>

@@ -2,7 +2,7 @@ import { Button, Grid, Typography, useTheme } from '@mui/material';
 import { Box } from '@mui/system';
 import { useTranslation, Trans } from 'react-i18next';
 import { AlertDialogActions, StepperStepComponentProps } from '../../types';
-import { ReactComponent as PaymentCompleted } from '../assets/payment_completed.svg';
+import { ReactComponent as PaymentCompleted } from '../assets/payment_completedV2.svg';
 import { FileUploader } from './FileUploader';
 
 export function ConfirmRegistrationStep1(

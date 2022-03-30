@@ -25,7 +25,7 @@ export default {
     confirmAction: 'Invia',
   },
   fileUploadPreview: {
-    loadingStatus: 'Invio in corso...',
+    loadingStatus: 'Caricamento...',
     labelStatus: 'Pronto per l’invio',
   },
   inlineSupportLink: {

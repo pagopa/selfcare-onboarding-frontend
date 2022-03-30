@@ -1,7 +1,7 @@
 import { Box, Button, Grid, Typography, useTheme } from '@mui/material';
 import { useTranslation, Trans } from 'react-i18next';
 import { StepperStepComponentProps } from '../../types';
-import { ReactComponent as PaymentCompleted } from '../assets/payment_completed.svg';
+import { ReactComponent as PaymentCompleted } from '../assets/payment_completedV2.svg';
 
 export function ConfirmRegistrationStep0({ forward }: StepperStepComponentProps) {
   const onForwardAction = () => {
