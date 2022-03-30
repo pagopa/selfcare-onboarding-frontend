@@ -76,6 +76,7 @@ export function FileUploader({
 
       {uploadedFiles && uploadedFiles.length > 0 ? (
         <FileUploadedPreview
+          theme={theme}
           loading={loading}
           files={uploadedFiles}
           deleteUploadedFiles={deleteUploadedFiles}

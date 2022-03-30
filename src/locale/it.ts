@@ -176,13 +176,13 @@ export default {
         title: 'La tua richiesta è stata inviata <1/> con successo',
         description:
           "Riceverai una PEC all’indirizzo istituzionale dell’Ente. <1 /> Al suo interno troverai le istruzioni per completare l'adesione.",
-        backActionLabel: 'Torna alla home',
+        backActionLabel: 'Chiudi',
       },
       error: {
         title: 'Spiacenti, qualcosa è andato storto.',
         description:
           'A causa di un errore del sistema non è possibile completare la procedura. <1 /> Ti chiediamo di riprovare più tardi.',
-        backActionLabel: 'Torna alla home',
+        backActionLabel: 'Chiudi',
       },
     },
     sessionModal: {

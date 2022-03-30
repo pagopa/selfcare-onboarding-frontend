@@ -244,7 +244,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
       description: [
         <>
           <Typography
-            variant={'h2'}
+            variant={'h4'}
             sx={{ color: 'text.primary', lineHeight: '49px', marginBottom: 1 }}
           >
             <Trans i18nKey="onboarding.outcomeContent.success.title">
@@ -253,8 +253,8 @@ function OnboardingComponent({ productId }: { productId: string }) {
               con successo
             </Trans>
           </Typography>
-          <Stack key="0" spacing={10}>
-            <Typography>
+          <Stack key="0" spacing={4}>
+            <Typography variant="body1">
               <Trans i18nKey="onboarding.outcomeContent.success.description">
                 Riceverai una PEC all’indirizzo istituzionale dell’Ente.
                 <br />
@@ -263,7 +263,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
             </Typography>
             <Button
               variant="contained"
-              sx={{ width: '200px', alignSelf: 'center' }}
+              sx={{ alignSelf: 'center' }}
               onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
             >
               {t('onboarding.outcomeContent.success.backActionLabel')}
@@ -304,7 +304,9 @@ function OnboardingComponent({ productId }: { productId: string }) {
                 onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
                 variant={'contained'}
               >
-                {t('onboarding.outcomeContent.error.backActionLabel')}
+                <Typography width="100%">
+                  {t('onboarding.outcomeContent.error.backActionLabel')}
+                </Typography>
               </Button>
             </Grid>
           </Grid>
