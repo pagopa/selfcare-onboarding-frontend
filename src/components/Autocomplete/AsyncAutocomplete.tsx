@@ -6,11 +6,11 @@ import { Box } from '@mui/system';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 import { useTranslation } from 'react-i18next';
-import { Endpoint } from '../../types';
-import { fetchWithLogs } from '../lib/api-utils';
-import { getFetchOutcome } from '../lib/error-utils';
-import { ENV } from '../utils/env';
-import { UserContext } from '../lib/context';
+import { Endpoint } from '../../../types';
+import { fetchWithLogs } from '../../lib/api-utils';
+import { getFetchOutcome } from '../../lib/error-utils';
+import { ENV } from '../../utils/env';
+import { UserContext } from '../../lib/context';
 
 type AutocompleteProps = {
   selected: any;

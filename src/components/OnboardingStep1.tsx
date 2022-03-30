@@ -8,10 +8,9 @@ import { getFetchOutcome } from '../lib/error-utils';
 import { fetchWithLogs } from '../lib/api-utils';
 import { UserContext } from '../lib/context';
 import { OnboardingStepActions } from './OnboardingStepActions';
-// import { AsyncAutocomplete } from './AsyncAutocomplete';
 import { useHistoryState } from './useHistoryState';
 import { LoadingOverlay } from './LoadingOverlay';
-import { AsyncAutocompleteV2 } from './AsyncAutocompleteV2';
+import { AsyncAutocompleteV2 } from './autocomplete/AsyncAutocompleteV2';
 
 const handleSearchInstitutionId = async (
   institutionId: string,

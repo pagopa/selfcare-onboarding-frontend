@@ -3,7 +3,7 @@ import { Grid, Theme, Tooltip, Typography } from '@mui/material';
 // import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 // import { useTranslation } from 'react-i18next';
-import { ReactComponent as ClipFileUpploaded } from '../assets/clip_file_upploaded.svg';
+import { ReactComponent as ClipFileUploaded } from '../assets/clip_file_uploaded.svg';
 
 type FileUploadedPreviewParams = {
   files: Array<File>;
@@ -55,7 +55,7 @@ FileUploadedPreviewParams): JSX.Element {
               >
                 <Grid item xs={1}>
                   <Box px={2} sx={{ color: theme.palette.primary.main }}>
-                    <ClipFileUpploaded />
+                    <ClipFileUploaded />
                   </Box>
                 </Grid>
                 <Grid item xs={8}>

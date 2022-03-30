@@ -23,13 +23,13 @@ const alreadyOnboarded: RequestOutcomeMessage = {
     <Grid container direction="column" key="0">
       <Grid container item justifyContent="center" mt={5}>
         <Grid item xs={6}>
-          <Typography variant="h2">
+          <Typography variant="h4">
             <Trans i18nKey="onboardingStep1_5.alreadyOnboarded.title" />
           </Typography>
         </Grid>
       </Grid>
-      <Grid container item justifyContent="center" mb={7} mt={1}>
-        <Grid item xs={7}>
+      <Grid container item justifyContent="center" mb={3} mt={1}>
+        <Grid item xs={6}>
           <Typography>
             <Trans i18nKey="onboardingStep1_5.alreadyOnboarded.description" />
           </Typography>
@@ -39,7 +39,7 @@ const alreadyOnboarded: RequestOutcomeMessage = {
         <Grid item xs={4}>
           <Button
             variant="contained"
-            sx={{ width: '200px', alignSelf: 'center' }}
+            sx={{ alignSelf: 'center' }}
             onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
           >
             <Trans i18nKey="onboardingStep1_5.alreadyOnboarded.backAction" />

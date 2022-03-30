@@ -248,7 +248,6 @@ export default function CompleteRegistrationComponent() {
       ],
     },
   };
-
   return outcome === 'success' ? (
     <MessageNoAction {...outcomeContent[outcome]} />
   ) : outcome === 'error' ? (
@@ -293,11 +292,11 @@ export default function CompleteRegistrationComponent() {
         handleExit={handleErrorModalExit}
         onConfirm={handleErrorModalConfirm}
         open={true}
-        title={t(`completeRegistration.errors.${errors[errorCode]}.title`)}
-        message={t(`completeRegistration.errors.${errors[errorCode]}.message`)}
+        title={t(`completeRegistration.errors.${errorCode}.title`)}
+        message={t(`completeRegistration.errors.${errorCode}.message`)}
         onConfirmLabel={t('completeRegistration.sessionModal.onConfirmLabel')}
         onCloseLabel={t('completeRegistration.sessionModal.onCloseLabel')}
-        height="18em"
+        height="20em"
       />
     )
   ) : (

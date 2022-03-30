@@ -4,7 +4,7 @@ import { StyledIntro } from '../components/StyledIntro';
 export default () => {
   const { t } = useTranslation();
   return (
-    <StyledIntro>
+    <StyledIntro priority={2}>
       {{
         title: t('noProductPage.title'),
         description: <>{t('noProductPage.description')}</>,
