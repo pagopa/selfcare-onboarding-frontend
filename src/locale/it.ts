@@ -131,8 +131,8 @@ export default {
       success: {
         alt: "Icona dell'email",
         title: 'Adesione completata',
-        description: `Comunicheremo l'avvenuta adesione all'indirizzo PEC dell'Ente. <1/> Da questo momento in poi, i Referenti Amministrativi inseriti in fase di richiesta <3/> potranno accedere al portale.`,
-        backActionLabel: 'Torna alla home',
+        description: `Comunicheremo l'avvenuta adesione all'indirizzo PEC <1/> dell'Ente. Da questo momento in poi, gli Amministratori <3/> inseriti in fase di richiesta  potranno accedere al portale.`,
+        backActionLabel: 'Chiudi',
       },
       error: {
         alt: 'Error',

@@ -213,21 +213,22 @@ export default function CompleteRegistrationComponent() {
   const outcomeContent: RequestOutcomeOptions = {
     success: {
       img: { src: checkIllustration, alt: t('completeRegistration.outcomeContent.success.alt') },
-      title: t('completeRegistration.outcomeContent.success.title'),
+      title: '',
       description: [
-        <Stack key="0" spacing={10}>
-          <Typography>
+        <Stack key="0" spacing={3}>
+          <Typography variant="h4">
+            {t('completeRegistration.outcomeContent.success.title')}
+          </Typography>
+          <Typography variant="body1">
             <Trans i18nKey="completeRegistration.outcomeContent.success.description">
-              Comunicheremo l&apos;avvenuta adesione all&apos;indirizzo PEC dell&apos;Ente.
-              <br />
-              Da questo momento in poi, i Referenti Amministrativi inseriti in fase di richiesta
-              <br />
-              potranno accedere al portale.
+              Comunicheremo l&apos;avvenuta adesione all&apos;indirizzo PEC <br /> dell&apos;Ente.
+              Da questo momento in poi, i Referenti Amministrativi <br />
+              inseriti in fase di richiesta potranno accedere al portale.
             </Trans>
           </Typography>
           <Button
             variant="contained"
-            sx={{ width: '200px', alignSelf: 'center' }}
+            sx={{ alignSelf: 'center' }}
             onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
           >
             {t('completeRegistration.outcomeContent.success.backActionLabel')}

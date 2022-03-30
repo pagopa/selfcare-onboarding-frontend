@@ -6,12 +6,12 @@ export function MessageNoAction({ img, title, description, ImgComponent }: Reque
   return (
     <Stack spacing={10}>
       <Box style={{ textAlign: 'center' }}>
-        <Box mb={3}>
+        <Box mb={2}>
           <i>
             {ImgComponent ? (
               <ImgComponent />
             ) : img ? (
-              <img width={120} src={img.src} alt={img.alt} />
+              <img width={60} src={img.src} alt={img.alt} />
             ) : null}
           </i>
         </Box>

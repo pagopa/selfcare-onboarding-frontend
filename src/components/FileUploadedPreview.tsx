@@ -73,7 +73,6 @@ FileUploadedPreviewParams): JSX.Element {
                             fontSize: '14px',
                             fontWeight: 700,
                           }}
-                          // variant={'caption'}
                         >
                           {file.name}
                         </Typography>
