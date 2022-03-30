@@ -1,5 +1,13 @@
 import React, { ChangeEvent, useContext } from 'react';
-import { Checkbox, FormControlLabel, IconButton, Link, Grid, Typography } from '@mui/material';
+import {
+  Checkbox,
+  FormControlLabel,
+  IconButton,
+  Link,
+  Grid,
+  Typography,
+  useTheme,
+} from '@mui/material';
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 import { omit, uniqueId } from 'lodash';
 // import { Box } from '@mui/system';
@@ -77,6 +85,8 @@ export function OnboardingStep3({ product, legal, forward, back }: Props) {
   const bodyTitle = t('onboardingStep3.bodyTitle');
   const bodyDescription1 = t('onboardingStep3.bodyDescription1');
   const bodyDescription2 = `${t('onboardingStep3.bodyDescription2')} ${product?.title}`;
+  const theme = useTheme();
+
   return (
     <Grid
       container
@@ -106,14 +116,14 @@ export function OnboardingStep3({ product, legal, forward, back }: Props) {
           <FormControlLabel
             control={<Checkbox checked={isAuthUser} onChange={handleAuthUser} />}
             label={
-              // TODO: intert correct Variant when present in theme.js
+              // TODO: insert correct Variant when present in theme.js
               <Typography sx={{ fontSize: '16px', lineHeight: '20px', fontWeight: 600 }}>
                 {t('onboardingStep3.formControl.label')}
               </Typography>
             }
             sx={{
               alignSelf: 'center',
-              '.MuiSvgIcon-root': { color: '#0073E6' },
+              '.MuiSvgIcon-root': { color: theme.palette.primary.main },
             }}
           />
         </Grid>
