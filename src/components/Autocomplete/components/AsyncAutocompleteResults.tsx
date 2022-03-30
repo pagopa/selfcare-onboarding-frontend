@@ -46,34 +46,21 @@ export default function AsyncAutocompleteResults({
     <CustomBox my={2} {...options} width="80%" maxHeight="200px" overflow="auto">
       {!isLoading &&
         options.map((option) => (
-          <Box
-            py={1}
-            key={getOptionKey(option)}
-            sx={{
-              fontStyle: 'normal',
-              fontWeight: 'normal',
-              fontSize: '16px',
-              lineHeight: '24px',
-              color: '#5A768A',
-              textTransform: 'capitalize',
-            }}
-          >
-            <Box display="flex">
-              <Box pr={1}>
-                <PartyIcon width={50} />
-              </Box>
-              <Box display="flex" alignItems="center">
-                <Typography
-                  onClick={() => {
-                    setSelected(option);
-                    setOptions([]);
-                  }}
-                  variant="sidenav"
-                  sx={{ fontWeight: '700', cursor: 'pointer' }}
-                >
-                  {getOptionLabel(option)?.toLowerCase()}
-                </Typography>
-              </Box>
+          <Box py={1} key={getOptionKey(option)} display="flex">
+            <Box pr={1}>
+              <PartyIcon width={50} />
+            </Box>
+            <Box display="flex" alignItems="center">
+              <Typography
+                onClick={() => {
+                  setSelected(option);
+                  setOptions([]);
+                }}
+                variant="body1" // to be removed when inserted fontWeight:'700' with fontSize:'18px
+                sx={{ fontWeight: '700', cursor: 'pointer', textTransform: 'capitalize' }}
+              >
+                {getOptionLabel(option)?.toLowerCase()}
+              </Typography>
             </Box>
           </Box>
         ))}

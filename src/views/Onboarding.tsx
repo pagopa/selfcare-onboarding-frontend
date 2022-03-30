@@ -7,7 +7,7 @@ import SessionModal from '@pagopa/selfcare-common-frontend/components/SessionMod
 import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
 import { useTranslation, Trans } from 'react-i18next';
 import { uniqueId } from 'lodash';
-import { ReactComponent as ErrorIcon } from '../assets/payment_completedV2.svg';
+import { ReactComponent as ErrorIcon } from '../assets/payment_completed_error.svg';
 import { withLogin } from '../components/withLogin';
 import {
   Product,
@@ -245,10 +245,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
       title: '',
       description: [
         <>
-          <Typography
-            variant={'h4'}
-            sx={{ color: 'text.primary', lineHeight: '49px', marginBottom: 1 }}
-          >
+          <Typography variant={'h4'} sx={{ color: theme.palette.text.primary, marginBottom: 1 }}>
             <Trans i18nKey="onboarding.outcomeContent.success.title">
               La tua richiesta è stata inviata
               <br />
@@ -270,12 +267,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
             >
               {t('onboarding.outcomeContent.success.backActionLabel')}
             </Button>
-            {/* <Typography>
-            Non hai ricevuto nessuna mail? Attendi qualche minuto e controlla anche nello spam. Se
-            non arriva, <InlineSupportLink />
-          </Typography> */}
           </Stack>
-          ,
         </>,
       ],
     },

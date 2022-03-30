@@ -1,7 +1,7 @@
 import { Box, Button, Grid, Typography, useTheme } from '@mui/material';
 import { useTranslation, Trans } from 'react-i18next';
 import { StepperStepComponentProps } from '../../types';
-import { ReactComponent as PaymentCompleted } from '../assets/payment_completedV2.svg';
+import { ReactComponent as PaymentCompleted } from '../assets/payment_completed.svg';
 
 export function ConfirmRegistrationStep0({ forward }: StepperStepComponentProps) {
   const onForwardAction = () => {
@@ -17,7 +17,12 @@ export function ConfirmRegistrationStep0({ forward }: StepperStepComponentProps)
         </Box>
       </Grid>
       <Grid item xs={10} p={1}>
-        <Typography color="textPrimary" display="flex" justifyContent="center" variant="h4">
+        <Typography
+          color={theme.palette.text.primary}
+          display="flex"
+          justifyContent="center"
+          variant="h4"
+        >
           {t('confirmRegistrationStep0.title')}
         </Typography>
       </Grid>
@@ -26,7 +31,7 @@ export function ConfirmRegistrationStep0({ forward }: StepperStepComponentProps)
           <Trans i18nKey="confirmRegistrationStep0.description">
             <strong> Segui le istruzioni</strong> per inviare il documento firmato,
             <br />
-            Perservirà a completare l&apos;inserimento del tuo Ente
+            servirà a completare l&apos;inserimento del tuo Ente
             <br />
             nel portale Self Care.
           </Trans>

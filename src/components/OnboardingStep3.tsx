@@ -7,7 +7,6 @@ import { useTranslation } from 'react-i18next';
 import { objectIsEmpty } from '../lib/object-utils';
 import { StepperStepComponentProps, UserOnCreate } from '../../types';
 import { UserContext } from '../lib/context';
-// import { StyledIntro } from './StyledIntro';
 import { OnboardingStepActions } from './OnboardingStepActions';
 import { PlatformUserForm, validateUser } from './PlatformUserForm';
 import { useHistoryState } from './useHistoryState';
@@ -107,6 +106,7 @@ export function OnboardingStep3({ product, legal, forward, back }: Props) {
           <FormControlLabel
             control={<Checkbox checked={isAuthUser} onChange={handleAuthUser} />}
             label={
+              // TODO: intert correct Variant when present in theme.js
               <Typography sx={{ fontSize: '16px', lineHeight: '20px', fontWeight: 600 }}>
                 {t('onboardingStep3.formControl.label')}
               </Typography>
@@ -133,11 +133,6 @@ export function OnboardingStep3({ product, legal, forward, back }: Props) {
 
         {delegateFormIds.map((id) => (
           <React.Fragment key={id}>
-            {/* <StyledIntro priority={3}>
-                  {{
-                    title: 'Aggiungi un nuovo Referente Amministrativo',
-                  }}
-                </StyledIntro> */}
             <Grid item xs={10} justifyContent="center" mt={6} mb={3}>
               <Typography align="center" variant="h4">
                 {t('onboardingStep3.addUserLabel')}

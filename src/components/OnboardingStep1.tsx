@@ -137,11 +137,9 @@ export function OnboardingStep1({ product, forward }: StepperStepComponentProps)
           >
             <Typography
               sx={{
-                fontSize: '14px',
                 textAlign: 'center',
-                color: 'text.primary',
               }}
-              variant="body2"
+              variant="caption"
               color={theme.palette.text.primary}
             >
               <Trans i18nKey="onboardingStep1.onboarding.ipaDescription">

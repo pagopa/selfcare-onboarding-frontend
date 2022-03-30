@@ -1,4 +1,4 @@
-import { Grid, Typography, Link, Theme, LinearProgress } from '@mui/material';
+import { Grid, Typography, Link, Theme } from '@mui/material';
 import { DropEvent, FileRejection, useDropzone } from 'react-dropzone';
 import { Box } from '@mui/system';
 import { FileUploadedPreview } from './FileUploadedPreview';
@@ -50,29 +50,6 @@ export function FileUploader({
       justifyContent={'center'}
     >
       <input {...getInputProps()} />
-      <Box sx={{ position: 'relative', display: loading ? undefined : 'none' }}>
-        <LinearProgress
-          variant="determinate"
-          sx={{
-            color: '#D1E7FF',
-          }}
-          // size={180}
-          // thickness={5}
-          value={100}
-        />
-        <LinearProgress
-          variant="indeterminate"
-          // disableShrink
-          sx={{
-            color: 'primary.main',
-            animationDuration: '1.5s',
-            position: 'absolute',
-            left: 0,
-          }}
-          // size={180}
-          // thickness={7}
-        />
-      </Box>
 
       {uploadedFiles && uploadedFiles.length > 0 ? (
         <FileUploadedPreview
@@ -99,7 +76,6 @@ export function FileUploader({
               </Typography>
               <Typography
                 sx={{
-                  lineHeight: '20px',
                   fontWeight: 'normal',
                   color: theme.palette.text.primary,
                 }}

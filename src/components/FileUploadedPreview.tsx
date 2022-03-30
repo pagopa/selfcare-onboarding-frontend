@@ -20,14 +20,6 @@ export function FileUploadedPreview({
   theme,
   loading,
 }: FileUploadedPreviewParams): JSX.Element {
-  // const cleanFileType = (fileType: string): string => {
-  //   // eslint-disable-next-line functional/no-let
-  //   let type = fileType;
-  //   if (fileType.includes('application/')) {
-  //     type = type.replace('application/', '');
-  //   }
-  //   return type;
-  // };
   const { t } = useTranslation();
 
   return (
@@ -67,9 +59,6 @@ export function FileUploadedPreview({
           </>
         ) : (
           <Box key={file.name} sx={{ maxWidth: { xs: 300, md: 500, lg: 900 }, ...sx }}>
-            {/* <DescriptionOutlinedIcon
-              sx={{ color: '#ADB7C0', width: 'auto', height: '24px', marginRight: 0.5 }}
-            /> */}
             <Box
               sx={{
                 boxShadow:
@@ -104,7 +93,7 @@ export function FileUploadedPreview({
                               textOverflow: 'ellipsis',
                               width: '100%',
                               fontSize: '14px',
-                              fontWeight: 700,
+                              fontWeight: 700, // if is inserted the variant, the ellipsis doesn't work'
                             }}
                           >
                             {file.name}
@@ -144,17 +133,6 @@ export function FileUploadedPreview({
                 </Grid>
               </Box>
             </Box>
-            {/* <Typography
-            sx={{
-              lineHeight: '20px',
-              color: 'info.main',
-              fontStyle: loading ? 'italic' : 'normal',
-            }}
-            variant={'body2'}
-            align="left"
-          >
-            {loading ? t('fileUploadPreview.loadingStatus') : t('fileUploadPreview.labelStatus')}
-          </Typography> */}
           </Box>
         )
       )}
