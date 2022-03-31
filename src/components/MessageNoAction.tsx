@@ -16,7 +16,7 @@ export function MessageNoAction({ img, title, description, ImgComponent }: Reque
             ) : null}
           </i>
         </Box>
-        <Typography variant={'h2'} sx={{ color: theme.palette.text.primary, marginBottom: 1 }}>
+        <Typography variant={'h4'} sx={{ color: theme.palette.text.primary, marginBottom: 1 }}>
           {title}
         </Typography>
         {/*

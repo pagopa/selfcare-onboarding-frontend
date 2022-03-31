@@ -96,7 +96,7 @@ export default function RejectRegistration() {
         <Grid container direction="column" key="0" style={{ textAlign: 'center' }}>
           <Grid container item justifyContent="center">
             <Grid item xs={6}>
-              <Typography variant="h2">
+              <Typography variant="h4">
                 {t('rejectRegistration.outcomeContent.error.title')}
               </Typography>
             </Grid>
