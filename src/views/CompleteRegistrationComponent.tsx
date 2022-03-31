@@ -279,7 +279,7 @@ export default function CompleteRegistrationComponent() {
           <Grid item xs={4}>
             <Button
               variant="contained"
-              sx={{ width: '200px', alignSelf: 'center' }}
+              sx={{ alignSelf: 'center' }}
               onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
             >
               {t('completeRegistration.backActionLabel')}
