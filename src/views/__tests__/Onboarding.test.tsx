@@ -66,7 +66,7 @@ const renderComponent = (productId: string = 'prod-io') => {
   render(<Component />);
 };
 
-const step1Title = 'Seleziona il tuo Ente';
+const step1Title = 'Seleziona il tuo ente';
 const step2Title = 'Indica il Legale Rappresentante';
 const step3Title = 'Indica il Referente Amministrativo';
 const completeSuccessTitle = 'La tua richiesta è stata inviata con successo';
