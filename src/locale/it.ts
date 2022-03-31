@@ -44,14 +44,14 @@ export default {
       title: "L'Ente che hai scelto ha già aderito",
       description:
         'Per accedere, chiedi al Referente incaricato di abilitarti nella sezione Referenti del portale.',
-      backAction: 'Torna alla home',
+      backAction: 'Chiudi',
     },
     genericError: {
       title: 'Spiacenti, qualcosa è andato storto.',
       description: `A causa di un errore del sistema non è possibile completare la procedura.
       <1/>
       Ti chiediamo di riprovare più tardi.`,
-      backAction: 'Torna alla home',
+      backAction: 'Chiudi',
     },
   },
   onboardingStep1: {
@@ -114,7 +114,7 @@ export default {
   completeRegistration: {
     title: 'Spiacenti, qualcosa è andato storto.',
     description: `A causa di un errore del sistema non è possibile completare la procedura. <1 /> Ti chiediamo di riprovare più tardi.`,
-    backActionLabel: 'Torna alla home',
+    backActionLabel: 'Chiudi',
     sessionModal: {
       onConfirmLabel: 'Torna alla pagina di caricamento',
       onCloseLabel: 'Esci',
@@ -202,13 +202,13 @@ export default {
         title: 'La tua richiesta di adesione è stata annullata',
         description:
           ' Visita il portale Self Care per conoscere i prodotti e richiedere una nuova <1 /> adesione per il tuo Ente.',
-        backActionLabel: ' Torna alla home',
+        backActionLabel: 'Chiudi',
       },
       error: {
         title: 'Spiacenti, qualcosa è andato storto.',
         description:
           'A causa di un errore del sistema non è possibile completare la procedura. <1 /> Ti chiediamo di riprovare più tardi.',
-        backActionLabel: ' Torna alla home',
+        backActionLabel: 'Chiudi',
       },
       loading: {
         loadingText: 'Stiamo verificando i tuoi dati',

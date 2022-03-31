@@ -41,7 +41,7 @@ test('test no jwt', () => {
 
   screen.getByText('Spiacenti, qualcosa è andato storto.');
   const goHomeButton = screen.getByRole('button', {
-    name: 'Torna alla home',
+    name: 'Chiudi',
   });
   fireEvent.click(goHomeButton);
   expect(mockedLocation.assign).toBeCalledWith(ENV.URL_FE.LANDING);
@@ -57,7 +57,7 @@ test('test', async () => {
     expect(fetchWithLogsSpy).toBeCalledTimes(1);
     screen.getByText('La tua richiesta di adesione è stata annullata');
     const goHomeButton = screen.getByRole('button', {
-      name: 'Torna alla home',
+      name: 'Chiudi',
     });
     fireEvent.click(goHomeButton);
     expect(mockedLocation.assign).toBeCalledWith(ENV.URL_FE.LANDING);
@@ -72,7 +72,7 @@ test('test cancel error', async () => {
     expect(fetchWithLogsSpy).toBeCalledTimes(1);
     screen.getByText('Spiacenti, qualcosa è andato storto.');
     const goHomeButton = screen.getByRole('button', {
-      name: 'Torna alla home',
+      name: 'Chiudi',
     });
     fireEvent.click(goHomeButton);
     expect(mockedLocation.assign).toBeCalledWith(ENV.URL_FE.LANDING);
