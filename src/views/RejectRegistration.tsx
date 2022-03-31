@@ -81,7 +81,7 @@ export default function RejectRegistration() {
           </Typography>
           <Button
             variant="contained"
-            sx={{ width: '200px', alignSelf: 'center' }}
+            sx={{ alignSelf: 'center' }}
             onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
           >
             {t('rejectRegistration.outcomeContent.success.backActionLabel')}
@@ -116,7 +116,7 @@ export default function RejectRegistration() {
             <Grid item xs={4}>
               <Button
                 variant="contained"
-                sx={{ width: '200px', alignSelf: 'center' }}
+                sx={{ alignSelf: 'center' }}
                 onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
               >
                 {t('rejectRegistration.outcomeContent.error.backActionLabel')}
