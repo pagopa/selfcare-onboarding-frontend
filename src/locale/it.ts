@@ -57,7 +57,7 @@ export default {
   onboardingStep1: {
     loadingOverlayText: 'Stiamo verificando i tuoi dati',
     onboarding: {
-      bodyTitle: 'Seleziona il tuo Ente',
+      bodyTitle: 'Seleziona il tuo ente',
       bodyDescription:
         "Seleziona dall'Indice della Pubblica Amministrazione (IPA) l'ente <1/> per cui vuoi richiedere l'adesione a {{productTitle}}",
       ipaDescription: `Non trovi il tuo ente nell'IPA? In <1>questa pagina</1> trovi maggiori <3/> informazioni sull'indice e su come accreditarsi `,
@@ -70,17 +70,17 @@ export default {
     },
   },
   onboardingStep2: {
-    bodyTitle: 'Indica il Legale Rappresentante',
-    bodyDescription: `Inserisci i dati del Legale Rappresentante. <1/> La persona che indicherai sarà firmataria del contratto per <3/>`,
+    bodyTitle: 'Indica il Legale <1/> rappresentante',
+    bodyDescription: `Conferma, modifica o inserisci i dati del Legale rappresentante. <1/> La persona indicata sarà firmataria del contratto per <3/>`,
     backLabel: 'Indietro',
     confirmLabel: 'Conferma',
   },
   onboardingStep3: {
-    bodyTitle: 'Indica il Referente Amministrativo',
+    bodyTitle: "Indica l'Amministratore",
     bodyDescription1: 'Inserisci i dati del Referente Amministrativo o di un suo delegato.',
     bodyDescription2: 'La persona che indicherai sarà responsabile della gestione di',
     addUserLabel: 'Aggiungi un altro Referente Amministrativo',
-    addUserLink: 'Aggiungi un altro referente',
+    addUserLink: 'Aggiungi un altro Amministratore',
     backLabel: 'Indietro',
     confirmLabel: 'Conferma',
     formControl: {
