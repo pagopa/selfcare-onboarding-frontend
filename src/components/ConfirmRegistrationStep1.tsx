@@ -2,7 +2,7 @@ import { Button, Grid, Typography, useTheme } from '@mui/material';
 import { Box } from '@mui/system';
 import { useTranslation, Trans } from 'react-i18next';
 import { AlertDialogActions, StepperStepComponentProps } from '../../types';
-import { ReactComponent as PaymentCompleted } from '../assets/payment_completedV2.svg';
+import { ReactComponent as PaymentCompleted } from '../assets/payment_completed.svg';
 import { FileUploader } from './FileUploader';
 
 export function ConfirmRegistrationStep1(
@@ -40,12 +40,12 @@ export function ConfirmRegistrationStep1(
         </Box>
       </Grid>
       <Grid item xs={10} pb={1}>
-        <Typography color="textPrimary" align="center" variant="h4">
+        <Typography color={theme.palette.text.primary} align="center" variant="h4">
           {t('confirmRegistrationStep1.pageTitle')}
         </Typography>
       </Grid>
       <Grid item xs={11} pb={4}>
-        <Typography color="textPrimary" variant={'body2'} align="center">
+        <Typography color={theme.palette.text.primary} variant={'body2'} align="center">
           <Trans i18nKey="confirmRegistrationStep1.pageSubtitle">
             Per completare l&apos;adesione, carica l&apos;atto ricevuto via
             <br />

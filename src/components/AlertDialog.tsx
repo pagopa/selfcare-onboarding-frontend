@@ -42,14 +42,7 @@ export function AlertDialog({
         justifyContent={'space-between'}
         sx={{ pt: 4, pl: 3, pr: 3 }}
       >
-        <Typography
-          sx={{
-            fontSize: '18px',
-            lineHeight: '28px',
-          }}
-          variant={'h6'}
-          align="left"
-        >
+        <Typography variant={'sidenav'} align="left">
           {title ? title : t('alertDialog.title')}
         </Typography>
 

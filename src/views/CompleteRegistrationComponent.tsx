@@ -6,7 +6,7 @@ import SessionModal from '@pagopa/selfcare-common-frontend/components/SessionMod
 import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
 import { useTranslation, Trans } from 'react-i18next';
 import { uniqueId } from 'lodash';
-import { ReactComponent as ErrorIcon } from '../assets/payment_completedV2.svg';
+import { ReactComponent as ErrorIcon } from '../assets/payment_completed_error.svg';
 import { RequestOutcome, RequestOutcomeOptions, StepperStep, Problem } from '../../types';
 import { ConfirmRegistrationStep0 } from '../components/ConfirmRegistrationStep0';
 import { ConfirmRegistrationStep1 } from '../components/ConfirmRegistrationStep1';

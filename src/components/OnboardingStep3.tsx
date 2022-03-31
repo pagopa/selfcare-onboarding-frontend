@@ -1,5 +1,13 @@
 import React, { ChangeEvent, useContext } from 'react';
-import { Checkbox, FormControlLabel, IconButton, Link, Grid, Typography } from '@mui/material';
+import {
+  Checkbox,
+  FormControlLabel,
+  IconButton,
+  Link,
+  Grid,
+  Typography,
+  useTheme,
+} from '@mui/material';
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 import { omit, uniqueId } from 'lodash';
 // import { Box } from '@mui/system';
@@ -7,7 +15,6 @@ import { useTranslation } from 'react-i18next';
 import { objectIsEmpty } from '../lib/object-utils';
 import { StepperStepComponentProps, UserOnCreate } from '../../types';
 import { UserContext } from '../lib/context';
-// import { StyledIntro } from './StyledIntro';
 import { OnboardingStepActions } from './OnboardingStepActions';
 import { PlatformUserForm, validateUser } from './PlatformUserForm';
 import { useHistoryState } from './useHistoryState';
@@ -78,6 +85,8 @@ export function OnboardingStep3({ product, legal, forward, back }: Props) {
   const bodyTitle = t('onboardingStep3.bodyTitle');
   const bodyDescription1 = t('onboardingStep3.bodyDescription1');
   const bodyDescription2 = `${t('onboardingStep3.bodyDescription2')} ${product?.title}`;
+  const theme = useTheme();
+
   return (
     <Grid
       container
@@ -107,13 +116,14 @@ export function OnboardingStep3({ product, legal, forward, back }: Props) {
           <FormControlLabel
             control={<Checkbox checked={isAuthUser} onChange={handleAuthUser} />}
             label={
+              // TODO: insert correct Variant when present in theme.js
               <Typography sx={{ fontSize: '16px', lineHeight: '20px', fontWeight: 600 }}>
                 {t('onboardingStep3.formControl.label')}
               </Typography>
             }
             sx={{
               alignSelf: 'center',
-              '.MuiSvgIcon-root': { color: '#0073E6' },
+              '.MuiSvgIcon-root': { color: theme.palette.primary.main },
             }}
           />
         </Grid>
@@ -133,11 +143,6 @@ export function OnboardingStep3({ product, legal, forward, back }: Props) {
 
         {delegateFormIds.map((id) => (
           <React.Fragment key={id}>
-            {/* <StyledIntro priority={3}>
-                  {{
-                    title: 'Aggiungi un nuovo Referente Amministrativo',
-                  }}
-                </StyledIntro> */}
             <Grid item xs={10} justifyContent="center" mt={6} mb={3}>
               <Typography align="center" variant="h4">
                 {t('onboardingStep3.addUserLabel')}
