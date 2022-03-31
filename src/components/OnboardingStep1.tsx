@@ -90,7 +90,7 @@ export function OnboardingStep1({ product, forward }: StepperStepComponentProps)
         </Grid>
       </Grid>
 
-      <Grid container item justifyContent="center" mt={2}>
+      <Grid container item justifyContent="center" mt={1}>
         <Grid item xs={12}>
           <Typography
             variant="subtitle2"
@@ -107,8 +107,8 @@ export function OnboardingStep1({ product, forward }: StepperStepComponentProps)
         </Grid>
       </Grid>
 
-      <Grid container item justifyContent="center" mt={7} mb={4}>
-        <Grid item xs={5}>
+      <Grid container item justifyContent="center" mt={4} mb={4}>
+        <Grid item xs={8} md={6} lg={5}>
           <AsyncAutocompleteV2
             theme={theme}
             selected={selected}
@@ -144,7 +144,10 @@ export function OnboardingStep1({ product, forward }: StepperStepComponentProps)
             >
               <Trans i18nKey="onboardingStep1.onboarding.ipaDescription">
                 Non trovi il tuo ente nell&apos;IPA? In
-                <Link href="https://indicepa.gov.it/ipa-portale/servizi-enti/accreditamento-ente">
+                <Link
+                  sx={{ textDecoration: 'none', color: theme.palette.primary.main }}
+                  href="https://indicepa.gov.it/ipa-portale/servizi-enti/accreditamento-ente"
+                >
                   questa pagina
                 </Link>
                 trovi maggiori

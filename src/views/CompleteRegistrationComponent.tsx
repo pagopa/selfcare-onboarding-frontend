@@ -261,7 +261,7 @@ export default function CompleteRegistrationComponent() {
         </Grid>
         <Grid container item justifyContent="center">
           <Grid item xs={6}>
-            <Typography variant="h2">{t('completeRegistration.title')}</Typography>
+            <Typography variant="h4">{t('completeRegistration.title')}</Typography>
           </Grid>
         </Grid>
         <Grid container item justifyContent="center" mb={7} mt={1}>
@@ -279,7 +279,7 @@ export default function CompleteRegistrationComponent() {
           <Grid item xs={4}>
             <Button
               variant="contained"
-              sx={{ width: '200px', alignSelf: 'center' }}
+              sx={{ alignSelf: 'center' }}
               onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
             >
               {t('completeRegistration.backActionLabel')}

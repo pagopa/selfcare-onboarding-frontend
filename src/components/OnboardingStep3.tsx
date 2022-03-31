@@ -86,6 +86,12 @@ export function OnboardingStep3({ product, legal, forward, back }: Props) {
   const bodyDescription1 = t('onboardingStep3.bodyDescription1');
   const bodyDescription2 = `${t('onboardingStep3.bodyDescription2')} ${product?.title}`;
   const theme = useTheme();
+  const peopleCondition =
+    objectIsEmpty(people) ||
+    Object.keys(people)
+      .filter((prefix) => 'LEGAL' !== prefix)
+      .some((prefix) => !validateUser(prefix, people[prefix], allPeople)) ||
+    Object.keys(people).length === 3;
 
   return (
     <Grid
@@ -179,36 +185,16 @@ export function OnboardingStep3({ product, legal, forward, back }: Props) {
           {Object.keys(people).length !== 3 && (
             <Link
               component="button"
-              disabled={
-                objectIsEmpty(people) ||
-                Object.keys(people)
-                  .filter((prefix) => 'LEGAL' !== prefix)
-                  .some((prefix) => !validateUser(prefix, people[prefix], allPeople)) ||
-                Object.keys(people).length === 3
-              }
-              color={
-                objectIsEmpty(people) ||
-                Object.keys(people)
-                  .filter((prefix) => 'LEGAL' !== prefix)
-                  .some((prefix) => !validateUser(prefix, people[prefix], allPeople)) ||
-                Object.keys(people).length === 3
-                  ? 'text.disabled'
-                  : 'primary'
-              }
+              disabled={peopleCondition}
               onClick={addDelegateForm}
               sx={{
                 fontSize: 'htmlFontSize',
                 lineHeight: '24px',
                 fontFamily: '"Titillium Web", "sans-serif"',
                 textDecoration: 'none',
-                cursor:
-                  objectIsEmpty(people) ||
-                  Object.keys(people)
-                    .filter((prefix) => 'LEGAL' !== prefix)
-                    .some((prefix) => !validateUser(prefix, people[prefix], allPeople)) ||
-                  Object.keys(people).length === 3
-                    ? 'default'
-                    : 'pointer',
+                cursor: peopleCondition ? 'default' : 'pointer',
+                color: theme.palette.primary.main,
+                opacity: peopleCondition ? 0.5 : 1,
               }}
             >
               {t('onboardingStep3.addUserLink')}

@@ -96,7 +96,7 @@ export default function RejectRegistration() {
         <Grid container direction="column" key="0" style={{ textAlign: 'center' }}>
           <Grid container item justifyContent="center">
             <Grid item xs={6}>
-              <Typography variant="h2">
+              <Typography variant="h4">
                 {t('rejectRegistration.outcomeContent.error.title')}
               </Typography>
             </Grid>
@@ -104,10 +104,11 @@ export default function RejectRegistration() {
           <Grid container item justifyContent="center" mb={7} mt={1}>
             <Grid item xs={6}>
               <Typography>
-                <Trans i18nKey="rejectRegistration.outcomeContent.error.description"></Trans>
-                A causa di un errore del sistema non è possibile completare la procedura.
-                <br />
-                Ti chiediamo di riprovare più tardi.
+                <Trans i18nKey="rejectRegistration.outcomeContent.error.description">
+                  A causa di un errore del sistema non è possibile completare la procedura.
+                  <br />
+                  Ti chiediamo di riprovare più tardi.
+                </Trans>
               </Typography>
             </Grid>
           </Grid>
