@@ -6,10 +6,10 @@ import { IPACatalogParty, StepperStepComponentProps } from '../../../../types';
 import { getFetchOutcome } from '../../../lib/error-utils';
 import { fetchWithLogs } from '../../../lib/api-utils';
 import { UserContext } from '../../../lib/context';
-import { AsyncAutocompleteV2 } from '../../../components/Autocomplete/AsyncAutocompleteV2';
 import { OnboardingStepActions } from '../../../components/OnboardingStepActions';
 import { useHistoryState } from '../../../components/useHistoryState';
 import { LoadingOverlay } from '../../../components/LoadingOverlay';
+import { AsyncAutocompleteV2 } from '../../../components/autocomplete/AsyncAutocompleteV2';
 
 const handleSearchInstitutionId = async (
   // TODO Fetch enti utente loggato

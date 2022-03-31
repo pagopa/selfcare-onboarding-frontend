@@ -77,6 +77,12 @@ const mockedProduct = {
   id: 'prod-io',
 };
 
+const mockedSubProduct = {
+  title: 'Premium',
+  id: 'prod-io-premium',
+  parent: 'prod-io',
+};
+
 const mockedResponseError = {
   detail: 'Request took too long to complete.',
   status: 503,
@@ -131,6 +137,10 @@ export async function mockFetch(
     switch (endpointParams.productId) {
       case 'error':
         return genericError;
+      case 'prod-io-premium':
+        return new Promise((resolve) =>
+          resolve({ data: mockedSubProduct, status: 200, statusText: '200' } as AxiosResponse)
+        );
       default:
         return new Promise((resolve) =>
           resolve({ data: mockedProduct, status: 200, statusText: '200' } as AxiosResponse)

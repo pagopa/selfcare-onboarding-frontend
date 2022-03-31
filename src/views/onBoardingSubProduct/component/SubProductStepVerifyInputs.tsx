@@ -1,0 +1,99 @@
+import { AxiosError, AxiosResponse } from 'axios';
+import { useContext, useEffect, useState } from 'react';
+import { trackAppError } from '@pagopa/selfcare-common-frontend/services/analyticsService';
+import { Product, StepperStepComponentProps } from '../../../../types';
+import { HeaderContext, UserContext } from '../../../lib/context';
+import { unregisterUnloadEvent } from '../../Onboarding';
+import { fetchWithLogs } from '../../../lib/api-utils';
+import { getFetchOutcome } from '../../../lib/error-utils';
+import NoProductPage from '../../NoProductPage';
+
+type Props = StepperStepComponentProps & {
+  requestId: string;
+  productId: string;
+  subProductId: string;
+  setLoading: (loading: boolean) => void;
+};
+
+const checkProduct = async (
+  id: string,
+  setter: (product: Product | null) => void,
+  setRequiredLogin: (required: boolean) => void
+) => {
+  const onboardingProducts = await fetchWithLogs(
+    { endpoint: 'ONBOARDING_VERIFY_PRODUCT', endpointParams: { productId: id } },
+    { method: 'GET' },
+    () => setRequiredLogin(true)
+  );
+  const result = getFetchOutcome(onboardingProducts);
+
+  if (result === 'success') {
+    const product = (onboardingProducts as AxiosResponse).data;
+    setter(product);
+  } else if ((onboardingProducts as AxiosError).response?.status === 404) {
+    setter(null);
+  } else {
+    console.error('Unexpected response', (onboardingProducts as AxiosError).response);
+    setter(null);
+  }
+};
+
+function SubProductStepVerifyInputs({
+  forward,
+  productId,
+  subProductId,
+  requestId,
+  setLoading,
+}: Props) {
+  const [error, setError] = useState<boolean>(false);
+  const { setOnLogout } = useContext(HeaderContext);
+  const { setRequiredLogin } = useContext(UserContext);
+
+  const [selectedSubProduct, setSelectedSubProduct] = useState<Product | null>();
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>();
+
+  const submit = () => {
+    setLoading(true);
+    Promise.all([
+      checkProduct(productId, setSelectedProduct, setRequiredLogin),
+      checkProduct(subProductId, setSelectedSubProduct, setRequiredLogin),
+    ])
+      .catch((reason) => {
+        trackAppError({
+          id: `ONBOARDING_SUBPRODUCT_ERROR_${requestId}`,
+          blocking: false,
+          toNotify: true,
+          techDescription: `Something gone wrong while fetching products ${productId} ${subProductId}`,
+          error: reason,
+        });
+        setError(true);
+      })
+      .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    submit();
+  }, [productId, subProductId]);
+
+  useEffect(() => {
+    if (selectedProduct !== undefined && selectedSubProduct !== undefined) {
+      if (
+        selectedProduct === null ||
+        selectedSubProduct === null ||
+        selectedSubProduct.parent !== productId
+      ) {
+        setError(true);
+      } else {
+        forward(selectedProduct, selectedSubProduct);
+      }
+    }
+  }, [selectedProduct, selectedSubProduct]);
+
+  if (error) {
+    unregisterUnloadEvent(setOnLogout);
+  }
+
+  return error ? <NoProductPage /> : <></>;
+}
+
+export default SubProductStepVerifyInputs;

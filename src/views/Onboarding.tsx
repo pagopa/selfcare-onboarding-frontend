@@ -37,7 +37,7 @@ export const unregisterUnloadEvent = (
   setOnLogout(undefined);
 };
 
-const registerUnloadEvent = (
+export const registerUnloadEvent = (
   setOnLogout: React.Dispatch<React.SetStateAction<(() => void) | null | undefined>>,
   setOpenExitModal: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
