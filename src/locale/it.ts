@@ -130,7 +130,7 @@ export default {
     outcomeContent: {
       success: {
         alt: "Icona dell'email",
-        title: 'Adesione completata',
+        title: 'Adesione completata!',
         description: `Comunicheremo l'avvenuta adesione all'indirizzo PEC <1/> dell'Ente. Da questo momento in poi, gli Amministratori <3/> inseriti in fase di richiesta  potranno accedere al portale.`,
         backActionLabel: 'Chiudi',
       },
