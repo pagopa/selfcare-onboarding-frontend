@@ -39,6 +39,7 @@ export default function AsyncAutocompleteSearch({
 }: Props) {
   return (
     <CustomTextField
+      id="Parties"
       sx={{ width: '80%' }}
       value={selected ? selected.description : input}
       onChange={handleChange}
