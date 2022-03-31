@@ -1,9 +1,10 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { Button, Stack, Typography, Grid } from '@mui/material';
-import ErrorIcon from '@pagopa/selfcare-common-frontend/components/icons/ErrorIcon';
-import cryptoRandomString from 'crypto-random-string';
+// import ErrorIcon from '@pagopa/selfcare-common-frontend/components/icons/ErrorIcon';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
 import { useTranslation, Trans } from 'react-i18next';
+import { uniqueId } from 'lodash';
+import { ReactComponent as ErrorIcon } from '../assets/payment_completed_error.svg';
 import { MessageNoAction } from '../components/MessageNoAction';
 import checkIllustration from '../assets/check-illustration.svg';
 import { RequestOutcome, RequestOutcomeOptions } from '../../types';
@@ -26,7 +27,7 @@ export default function RejectRegistration() {
 
   const { t } = useTranslation();
   useEffect(() => {
-    const requestId = cryptoRandomString({ length: 8 });
+    const requestId = uniqueId('contract-reject-');
     trackEvent('ONBOARDING_CANCEL', { request_id: requestId });
     async function asyncSendDeleteRequest() {
       // Send DELETE request
@@ -80,7 +81,7 @@ export default function RejectRegistration() {
           </Typography>
           <Button
             variant="contained"
-            sx={{ width: '200px', alignSelf: 'center' }}
+            sx={{ alignSelf: 'center' }}
             onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
           >
             {t('rejectRegistration.outcomeContent.success.backActionLabel')}
@@ -95,7 +96,7 @@ export default function RejectRegistration() {
         <Grid container direction="column" key="0" style={{ textAlign: 'center' }}>
           <Grid container item justifyContent="center">
             <Grid item xs={6}>
-              <Typography variant="h2">
+              <Typography variant="h4">
                 {t('rejectRegistration.outcomeContent.error.title')}
               </Typography>
             </Grid>
@@ -103,10 +104,11 @@ export default function RejectRegistration() {
           <Grid container item justifyContent="center" mb={7} mt={1}>
             <Grid item xs={6}>
               <Typography>
-                <Trans i18nKey="rejectRegistration.outcomeContent.error.description"></Trans>
-                A causa di un errore del sistema non è possibile completare la procedura.
-                <br />
-                Ti chiediamo di riprovare più tardi.
+                <Trans i18nKey="rejectRegistration.outcomeContent.error.description">
+                  A causa di un errore del sistema non è possibile completare la procedura.
+                  <br />
+                  Ti chiediamo di riprovare più tardi.
+                </Trans>
               </Typography>
             </Grid>
           </Grid>
@@ -114,7 +116,7 @@ export default function RejectRegistration() {
             <Grid item xs={4}>
               <Button
                 variant="contained"
-                sx={{ width: '200px', alignSelf: 'center' }}
+                sx={{ alignSelf: 'center' }}
                 onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
               >
                 {t('rejectRegistration.outcomeContent.error.backActionLabel')}

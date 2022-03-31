@@ -1,7 +1,8 @@
-import { Button, Grid, Typography } from '@mui/material';
+import { Button, Grid, Typography, useTheme } from '@mui/material';
 import { Box } from '@mui/system';
-import { useTranslation } from 'react-i18next';
+import { useTranslation, Trans } from 'react-i18next';
 import { AlertDialogActions, StepperStepComponentProps } from '../../types';
+import { ReactComponent as PaymentCompleted } from '../assets/payment_completed.svg';
 import { FileUploader } from './FileUploader';
 
 export function ConfirmRegistrationStep1(
@@ -28,63 +29,59 @@ export function ConfirmRegistrationStep1(
   const deleteUploadedFiles = (): void => {
     setUploadedFiles([]);
   };
+  const theme = useTheme();
 
-  const subtitle1 = t('confirmRegistrationStep1.pageSubtitle1');
-  const subtitle2 = t('confirmRegistrationStep1.pageSubtitle2');
   const uploaderImageWidth = 180;
   return (
-    <Box>
-      <Grid container direction="row" justifyContent={'flex-start'} alignItems={'center'}>
-        <Grid item xs={1} />
-        <Grid item xs={11}>
-          <Grid container columns={11}>
-            <Grid item xs={11}>
-              <Typography color="textPrimary" variant={'h2'} align="left">
-                {t('confirmRegistrationStep1.pageTitle')}
-              </Typography>
-            </Grid>
-            <Grid item xs={11}>
-              <Typography
-                color="textPrimary"
-                sx={{
-                  mt: 3,
-                }}
-                variant={'body2'}
-                align="left"
-              >
-                {subtitle1}
-                <br />
-                {subtitle2}
-              </Typography>
-            </Grid>
-            <Grid item xs={11}>
-              <FileUploader
-                title={t('confirmRegistrationStep1.fileUploaderTitle')}
-                description={t('confirmRegistrationStep1.fileUploaderDescription')}
-                descriptionLink={t('confirmRegistrationStep1.fileUploaderDescriptionLink')}
-                uploadedFiles={uploadedFiles}
-                deleteUploadedFiles={deleteUploadedFiles}
-                onDropAccepted={onDropAccepted}
-                onDropRejected={onDropRejected}
-                accept={['application/pdf', 'application/pkcs7-mime', 'application/x-pkcs7-mime']}
-                uploaderImageWidth={uploaderImageWidth}
-                loading={loading}
-              />
-            </Grid>
-            <Grid item xs={2} mt={8}>
-              <Button
-                fullWidth
-                color="primary"
-                variant="contained"
-                disabled={!(uploadedFiles && uploadedFiles.length > 0)}
-                onClick={onSubmit}
-              >
-                {t('confirmRegistrationStep1.confirmAction')}
-              </Button>
-            </Grid>
-          </Grid>
+    <Grid container display="flex" justifyContent="center" alignItems="center">
+      <Grid item xs={12}>
+        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+          <PaymentCompleted width={60} />
+        </Box>
+      </Grid>
+      <Grid item xs={10} pb={1}>
+        <Typography color={theme.palette.text.primary} align="center" variant="h4">
+          {t('confirmRegistrationStep1.pageTitle')}
+        </Typography>
+      </Grid>
+      <Grid item xs={11} pb={4}>
+        <Typography color={theme.palette.text.primary} variant={'body2'} align="center">
+          <Trans i18nKey="confirmRegistrationStep1.pageSubtitle">
+            Per completare l&apos;adesione, carica l&apos;atto ricevuto via
+            <br />
+            PEC, firmato digitalmente dal Legale Rappresentante.
+          </Trans>
+        </Typography>
+      </Grid>
+      <Grid item xs={12} display="flex" justifyContent="center" pb={4}>
+        <FileUploader
+          title={t('confirmRegistrationStep1.fileUploaderTitle')}
+          description={t('confirmRegistrationStep1.fileUploaderDescription')}
+          descriptionLink={t('confirmRegistrationStep1.fileUploaderDescriptionLink')}
+          uploadedFiles={uploadedFiles}
+          deleteUploadedFiles={deleteUploadedFiles}
+          onDropAccepted={onDropAccepted}
+          onDropRejected={onDropRejected}
+          accept={['application/pdf', 'application/pkcs7-mime', 'application/x-pkcs7-mime']}
+          uploaderImageWidth={uploaderImageWidth}
+          loading={loading}
+          theme={theme}
+        />
+      </Grid>
+      <Grid item>
+        <Grid container>
+          <Button
+            sx={{ display: 'flex', justifyContent: 'center', width: '100%' }}
+            fullWidth
+            color="primary"
+            variant="contained"
+            disabled={!(uploadedFiles && uploadedFiles.length > 0)}
+            onClick={onSubmit}
+          >
+            {t('confirmRegistrationStep1.confirmAction')}
+          </Button>
         </Grid>
       </Grid>
-    </Box>
+    </Grid>
   );
 }

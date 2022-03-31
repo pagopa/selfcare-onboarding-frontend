@@ -1,23 +1,8 @@
-import { Grid, Paper, TextField } from '@mui/material';
+import { Grid, Paper, TextField, useTheme } from '@mui/material';
 import React from 'react';
-import { styled } from '@mui/material/styles';
 import { useTranslation, TFunction } from 'react-i18next';
 import { UserOnCreate, PartyRole } from '../../types';
 import { UsersObject } from './OnboardingStep2';
-
-const CustomTextField = styled(TextField)({
-  '& .MuiFormHelperText-root': {
-    color: '#5C6F82',
-  },
-  '& .MuiInputBase-root.Mui-disabled:before': {
-    borderBottomStyle: 'solid',
-  },
-  input: {
-    '&.Mui-disabled': {
-      WebkitTextFillColor: ' #A2ADB8',
-    },
-  },
-});
 
 type PlatformUserFormProps = {
   prefix: keyof UsersObject;
@@ -124,6 +109,7 @@ export function PlatformUserForm({
   readOnly = [],
 }: PlatformUserFormProps) {
   const { t } = useTranslation();
+  const theme = useTheme();
 
   const buildSetPerson = (key: string) => (e: any) => {
     setPeople({
@@ -136,7 +122,7 @@ export function PlatformUserForm({
     : [];
 
   return (
-    <Paper elevation={0} sx={{ py: 4, px: 6 }}>
+    <Paper elevation={0} sx={{ py: 4, px: 6, borderRadius: '16px' }}>
       <Grid container spacing={2}>
         {fields.map(
           ({
@@ -153,15 +139,28 @@ export function PlatformUserForm({
               .map((e) => e.replace(prefixErrorCode, ''));
             const isError = error && error.length > 0;
             return (
-              <Grid item key={id} xs={width} mb={5}>
-                <CustomTextField
+              <Grid item key={id} xs={width} mb={3}>
+                <TextField
                   id={`${prefix}-${id}`}
-                  variant="standard"
+                  variant="outlined"
                   label={t(`platformUserForm.fields.${id}.label`)}
                   type={type}
                   value={people[prefix] && people[prefix][id] ? people[prefix][id] : ''}
                   onChange={buildSetPerson(id)}
-                  sx={{ width: '100%' }}
+                  sx={{
+                    width: '100%',
+                    '& .MuiFormHelperText-root': {
+                      color: theme.palette.text.secondary,
+                    },
+                    '& .MuiInputBase-root.Mui-disabled:before': {
+                      borderBottomStyle: 'solid',
+                    },
+                    input: {
+                      '&.Mui-disabled': {
+                        WebkitTextFillColor: theme.palette.text.disabled,
+                      },
+                    },
+                  }}
                   error={isError}
                   helperText={
                     isError

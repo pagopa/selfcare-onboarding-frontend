@@ -15,7 +15,7 @@ export function OnboardingStepActions({ forward, back }: ActionStepsProps) {
   return (
     <Grid container justifyContent="center" spacing={2}>
       {back && (
-        <Grid item xs={2}>
+        <Grid item>
           <Button
             sx={{ width: '100%' }}
             variant="outlined"
@@ -27,7 +27,7 @@ export function OnboardingStepActions({ forward, back }: ActionStepsProps) {
         </Grid>
       )}
       {forward && (
-        <Grid item xs={2}>
+        <Grid item>
           <Button
             sx={{ width: '100%' }}
             variant="contained"

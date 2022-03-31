@@ -1,13 +1,14 @@
 import { Button, Grid, Typography } from '@mui/material';
 import { AxiosError } from 'axios';
 import { useEffect, useState, useContext } from 'react';
-import ErrorIcon from '@pagopa/selfcare-common-frontend/components/icons/ErrorIcon';
+// import ErrorIcon from '@pagopa/selfcare-common-frontend/components/icons/ErrorIcon';
 import { Trans, useTranslation } from 'react-i18next';
 import { RequestOutcomeMessage, StepperStepComponentProps } from '../../types';
 import { fetchWithLogs } from '../lib/api-utils';
 import { ENV } from '../utils/env';
 import { getFetchOutcome } from '../lib/error-utils';
 import { HeaderContext, UserContext } from '../lib/context';
+import { ReactComponent as ErrorIcon } from '../assets/payment_completed_error.svg';
 import { LoadingOverlay } from './LoadingOverlay';
 import { unregisterUnloadEvent } from './../views/Onboarding';
 import { MessageNoAction } from './MessageNoAction';
@@ -23,13 +24,13 @@ const alreadyOnboarded: RequestOutcomeMessage = {
     <Grid container direction="column" key="0">
       <Grid container item justifyContent="center" mt={5}>
         <Grid item xs={6}>
-          <Typography variant="h2">
+          <Typography variant="h4">
             <Trans i18nKey="onboardingStep1_5.alreadyOnboarded.title" />
           </Typography>
         </Grid>
       </Grid>
-      <Grid container item justifyContent="center" mb={7} mt={1}>
-        <Grid item xs={7}>
+      <Grid container item justifyContent="center" mb={3} mt={1}>
+        <Grid item xs={6}>
           <Typography>
             <Trans i18nKey="onboardingStep1_5.alreadyOnboarded.description" />
           </Typography>
@@ -39,31 +40,13 @@ const alreadyOnboarded: RequestOutcomeMessage = {
         <Grid item xs={4}>
           <Button
             variant="contained"
-            sx={{ width: '200px', alignSelf: 'center' }}
+            sx={{ alignSelf: 'center' }}
             onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
           >
             <Trans i18nKey="onboardingStep1_5.alreadyOnboarded.backAction" />
           </Button>
         </Grid>
       </Grid>
-      {/* removed from MVP
-      <Grid container item justifyContent="center">
-        <Grid item xs={4} pt={12}>
-          <Divider />
-        </Grid>
-      </Grid>
-      <Grid container item justifyContent="center" mb={7} mt={1}>
-        <Grid item xs={7} mt={2}>
-          <Typography variant="body2">
-            <Typography variant="body2">
-              Gli attuali Referenti non sono più disponibili e hai la necessità di gestire i
-              prodotti?
-            </Typography>
-            {/* redirect TBD * /} 
-            <Link>Registra un nuovo referente</Link>
-          </Typography>
-        </Grid>
-      </Grid> */}
     </Grid>,
   ],
 };
@@ -75,12 +58,12 @@ const genericError: RequestOutcomeMessage = {
     <Grid container direction="column" key="0">
       <Grid container item justifyContent="center">
         <Grid item xs={6}>
-          <Typography variant="h2">
+          <Typography variant="h4">
             <Trans i18nKey="onboardingStep1_5.genericError.title" />
           </Typography>
         </Grid>
       </Grid>
-      <Grid container item justifyContent="center" mb={7} mt={1}>
+      <Grid container item justifyContent="center" mb={3} mt={1}>
         <Grid item xs={6}>
           <Typography>
             <Trans i18nKey="onboardingStep1_5.genericError.description">
@@ -95,7 +78,7 @@ const genericError: RequestOutcomeMessage = {
         <Grid item xs={4}>
           <Button
             variant="contained"
-            sx={{ width: '200px', alignSelf: 'center' }}
+            sx={{ alignSelf: 'center' }}
             onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
           >
             <Trans i18nKey="onboardingStep1_5.genericError.backAction" />

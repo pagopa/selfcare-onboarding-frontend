@@ -2,10 +2,11 @@ import React, { useState, useContext, useEffect } from 'react';
 import { Button, Stack, Typography, Grid } from '@mui/material';
 import { AxiosError } from 'axios';
 import SessionModal from '@pagopa/selfcare-common-frontend/components/SessionModal';
-import ErrorIcon from '@pagopa/selfcare-common-frontend/components/icons/ErrorIcon';
+// import ErrorIcon from '@pagopa/selfcare-common-frontend/components/icons/ErrorIcon';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
-import cryptoRandomString from 'crypto-random-string';
 import { useTranslation, Trans } from 'react-i18next';
+import { uniqueId } from 'lodash';
+import { ReactComponent as ErrorIcon } from '../assets/payment_completed_error.svg';
 import { RequestOutcome, RequestOutcomeOptions, StepperStep, Problem } from '../../types';
 import { ConfirmRegistrationStep0 } from '../components/ConfirmRegistrationStep0';
 import { ConfirmRegistrationStep1 } from '../components/ConfirmRegistrationStep1';
@@ -108,7 +109,7 @@ export default function CompleteRegistrationComponent() {
   };
 
   const submit = async (file: File) => {
-    const requestId = cryptoRandomString({ length: 8 });
+    const requestId = uniqueId('upload-contract-');
     trackEvent('ONBOARDING_CONTRACT_UPLOAD', { request_id: requestId });
 
     setLoading(true);
@@ -213,21 +214,22 @@ export default function CompleteRegistrationComponent() {
   const outcomeContent: RequestOutcomeOptions = {
     success: {
       img: { src: checkIllustration, alt: t('completeRegistration.outcomeContent.success.alt') },
-      title: t('completeRegistration.outcomeContent.success.title'),
+      title: '',
       description: [
-        <Stack key="0" spacing={10}>
-          <Typography>
+        <Stack key="0" spacing={3}>
+          <Typography variant="h4">
+            {t('completeRegistration.outcomeContent.success.title')}
+          </Typography>
+          <Typography variant="body1">
             <Trans i18nKey="completeRegistration.outcomeContent.success.description">
-              Comunicheremo l&apos;avvenuta adesione all&apos;indirizzo PEC dell&apos;Ente.
-              <br />
-              Da questo momento in poi, i Referenti Amministrativi inseriti in fase di richiesta
-              <br />
-              potranno accedere al portale.
+              Comunicheremo l&apos;avvenuta adesione all&apos;indirizzo PEC <br /> dell&apos;Ente.
+              Da questo momento in poi, i Referenti Amministrativi <br />
+              inseriti in fase di richiesta potranno accedere al portale.
             </Trans>
           </Typography>
           <Button
             variant="contained"
-            sx={{ width: '200px', alignSelf: 'center' }}
+            sx={{ alignSelf: 'center' }}
             onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
           >
             {t('completeRegistration.outcomeContent.success.backActionLabel')}
@@ -247,7 +249,6 @@ export default function CompleteRegistrationComponent() {
       ],
     },
   };
-
   return outcome === 'success' ? (
     <MessageNoAction {...outcomeContent[outcome]} />
   ) : outcome === 'error' ? (
@@ -260,7 +261,7 @@ export default function CompleteRegistrationComponent() {
         </Grid>
         <Grid container item justifyContent="center">
           <Grid item xs={6}>
-            <Typography variant="h2">{t('completeRegistration.title')}</Typography>
+            <Typography variant="h4">{t('completeRegistration.title')}</Typography>
           </Grid>
         </Grid>
         <Grid container item justifyContent="center" mb={7} mt={1}>
@@ -278,7 +279,7 @@ export default function CompleteRegistrationComponent() {
           <Grid item xs={4}>
             <Button
               variant="contained"
-              sx={{ width: '200px', alignSelf: 'center' }}
+              sx={{ alignSelf: 'center' }}
               onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
             >
               {t('completeRegistration.backActionLabel')}
@@ -292,11 +293,11 @@ export default function CompleteRegistrationComponent() {
         handleExit={handleErrorModalExit}
         onConfirm={handleErrorModalConfirm}
         open={true}
-        title={t(`completeRegistration.errors.${errors[errorCode]}.title`)}
-        message={t(`completeRegistration.errors.${errors[errorCode]}.message`)}
+        title={t(`completeRegistration.errors.${errorCode}.title`)}
+        message={t(`completeRegistration.errors.${errorCode}.message`)}
         onConfirmLabel={t('completeRegistration.sessionModal.onConfirmLabel')}
         onCloseLabel={t('completeRegistration.sessionModal.onCloseLabel')}
-        height="18em"
+        height="20em"
       />
     )
   ) : (

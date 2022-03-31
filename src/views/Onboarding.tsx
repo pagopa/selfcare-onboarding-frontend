@@ -1,12 +1,13 @@
 import React, { useEffect, useState, useContext, useRef } from 'react';
 import { useHistory } from 'react-router-dom';
-import { Button, Container, Stack, Typography, Grid } from '@mui/material';
+import { Button, Container, Stack, Typography, Grid, useTheme } from '@mui/material';
 import { AxiosError, AxiosResponse } from 'axios';
 import SessionModal from '@pagopa/selfcare-common-frontend/components/SessionModal';
-import ErrorIcon from '@pagopa/selfcare-common-frontend/components/icons/ErrorIcon';
-import cryptoRandomString from 'crypto-random-string';
+// import ErrorIcon from '@pagopa/selfcare-common-frontend/components/icons/ErrorIcon';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
 import { useTranslation, Trans } from 'react-i18next';
+import { uniqueId } from 'lodash';
+import { ReactComponent as ErrorIcon } from '../assets/payment_completed_error.svg';
 import { withLogin } from '../components/withLogin';
 import {
   Product,
@@ -70,6 +71,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
   const { setRequiredLogin } = useContext(UserContext);
   const requestIdRef = useRef<string>();
   const { t } = useTranslation();
+  const theme = useTheme();
 
   useEffect(() => {
     registerUnloadEvent(setOnLogout, setOpenExitModal);
@@ -83,7 +85,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
 
   useEffect(() => {
     // eslint-disable-next-line functional/immutable-data
-    requestIdRef.current = cryptoRandomString({ length: 8 });
+    requestIdRef.current = uniqueId(`onboarding-${institutionId}-${productId}-`);
     void checkProductId().finally(() => {
       setLoading(false);
     });
@@ -240,28 +242,33 @@ function OnboardingComponent({ productId }: { productId: string }) {
   const outcomeContent: RequestOutcomeOptions = {
     success: {
       ImgComponent: CheckIllustration,
-      title: t('onboarding.outcomeContent.success.title'),
+      title: '',
       description: [
-        <Stack key="0" spacing={10}>
-          <Typography>
-            <Trans i18nKey="onboarding.outcomeContent.success.description">
-              Riceverai una PEC all’indirizzo istituzionale dell’Ente.
+        <>
+          <Typography variant={'h4'} sx={{ color: theme.palette.text.primary, marginBottom: 1 }}>
+            <Trans i18nKey="onboarding.outcomeContent.success.title">
+              La tua richiesta è stata inviata
               <br />
-              Al suo interno troverai le istruzioni per completare l&apos;adesione.
+              con successo
             </Trans>
           </Typography>
-          <Button
-            variant="contained"
-            sx={{ width: '200px', alignSelf: 'center' }}
-            onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
-          >
-            {t('onboarding.outcomeContent.success.backActionLabel')}
-          </Button>
-          {/* <Typography>
-            Non hai ricevuto nessuna mail? Attendi qualche minuto e controlla anche nello spam. Se
-            non arriva, <InlineSupportLink />
-          </Typography> */}
-        </Stack>,
+          <Stack key="0" spacing={4}>
+            <Typography variant="body1">
+              <Trans i18nKey="onboarding.outcomeContent.success.description">
+                Riceverai una PEC all’indirizzo istituzionale dell’Ente.
+                <br />
+                Al suo interno troverai le istruzioni per completare l&apos;adesione.
+              </Trans>
+            </Typography>
+            <Button
+              variant="contained"
+              sx={{ alignSelf: 'center' }}
+              onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+            >
+              {t('onboarding.outcomeContent.success.backActionLabel')}
+            </Button>
+          </Stack>
+        </>,
       ],
     },
     error: {
@@ -271,10 +278,10 @@ function OnboardingComponent({ productId }: { productId: string }) {
         <Grid container direction="column" key="0">
           <Grid container item justifyContent="center">
             <Grid item xs={5}>
-              <Typography variant="h2">{t('onboarding.outcomeContent.error.title')}</Typography>
+              <Typography variant="h4">{t('onboarding.outcomeContent.error.title')}</Typography>
             </Grid>
           </Grid>
-          <Grid container item justifyContent="center" mb={7} mt={1}>
+          <Grid container item justifyContent="center" mb={3} mt={1}>
             <Grid item xs={5}>
               <Typography>
                 <Trans i18nKey="onboarding.outcomeContent.error.description">
@@ -291,7 +298,9 @@ function OnboardingComponent({ productId }: { productId: string }) {
                 onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
                 variant={'contained'}
               >
-                {t('onboarding.outcomeContent.error.backActionLabel')}
+                <Typography width="100%" sx={{ color: theme.palette.primary.contrastText }}>
+                  {t('onboarding.outcomeContent.error.backActionLabel')}
+                </Typography>
               </Button>
             </Grid>
           </Grid>

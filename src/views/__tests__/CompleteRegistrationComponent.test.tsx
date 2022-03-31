@@ -32,7 +32,7 @@ test('test no jwt', () => {
   render(<CompleteRegistrationComponent />);
 
   const goHomeButton = screen.getByRole('button', {
-    name: 'Torna alla home',
+    name: 'Chiudi',
   });
   fireEvent.click(goHomeButton);
   expect(mockedLocation.assign).toBeCalledWith(ENV.URL_FE.LANDING);

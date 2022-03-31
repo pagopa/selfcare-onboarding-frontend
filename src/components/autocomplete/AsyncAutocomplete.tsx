@@ -1,16 +1,16 @@
 import React, { useContext, useState } from 'react';
 import debounce from 'lodash/debounce';
 import { AxiosError, AxiosResponse } from 'axios';
-import { Autocomplete, IconButton, InputAdornment, TextField } from '@mui/material';
+import { Autocomplete, IconButton, InputAdornment, TextField, useTheme } from '@mui/material';
 import { Box } from '@mui/system';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 import { useTranslation } from 'react-i18next';
-import { Endpoint } from '../../types';
-import { fetchWithLogs } from '../lib/api-utils';
-import { getFetchOutcome } from '../lib/error-utils';
-import { ENV } from '../utils/env';
-import { UserContext } from '../lib/context';
+import { Endpoint } from '../../../types';
+import { fetchWithLogs } from '../../lib/api-utils';
+import { getFetchOutcome } from '../../lib/error-utils';
+import { ENV } from '../../utils/env';
+import { UserContext } from '../../lib/context';
 
 type AutocompleteProps = {
   selected: any;
@@ -36,6 +36,7 @@ export function AsyncAutocomplete({
   const [options, setOptions] = useState<Array<any>>([]);
   const { setRequiredLogin } = useContext(UserContext);
   const { t } = useTranslation();
+  const theme = useTheme();
 
   const handleSearch = async (query: string) => {
     setIsLoading(true);
@@ -111,7 +112,7 @@ export function AsyncAutocomplete({
               fontWeight: 'normal',
               fontSize: '16px',
               lineHeight: '24px',
-              color: '#5C6F82',
+              color: theme.palette.text.secondary,
               textAlign: 'start',
               paddingLeft: '16px',
               textTransform: 'capitalize',
@@ -124,11 +125,7 @@ export function AsyncAutocomplete({
                 {!input ? (
                   <SearchOutlinedIcon />
                 ) : (
-                  <IconButton
-                    // color="primary"
-                    onClick={() => setInput('')}
-                    style={{ marginRight: '-10px' }}
-                  >
+                  <IconButton onClick={() => setInput('')} style={{ marginRight: '-10px' }}>
                     <ClearOutlinedIcon />
                   </IconButton>
                 )}
@@ -149,7 +146,7 @@ export function AsyncAutocomplete({
               fontWeight: 'normal',
               fontSize: '16px',
               lineHeight: '24px',
-              color: '#5A768A',
+              color: theme.palette.text.secondary,
               textTransform: 'capitalize',
             }}
           >
