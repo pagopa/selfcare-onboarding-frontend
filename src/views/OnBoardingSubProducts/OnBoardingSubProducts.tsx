@@ -2,7 +2,7 @@ import { useEffect, useState, useContext, useRef, useMemo } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Container } from '@mui/material';
 import SessionModal from '@pagopa/selfcare-common-frontend/components/SessionModal';
-// import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
+import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
 import { uniqueId } from 'lodash';
 import { useParams } from 'react-router';
 import { withLogin } from '../../components/withLogin';
@@ -11,9 +11,10 @@ import { LoadingOverlay } from '../../components/LoadingOverlay';
 import { ENV } from '../../utils/env';
 import { HeaderContext } from '../../lib/context';
 import { registerUnloadEvent, unregisterUnloadEvent } from '../Onboarding';
-import SubProductStepVerifyInputs from './component/SubProductStepVerifyInputs';
-import SubProductStepSubmit from './component/SubProductStepSubmit';
-import SubProductStepSuccess from './component/SubProductStepSuccess';
+import SubProductStepVerifyInputs from './components/SubProductStepVerifyInputs';
+import SubProductStepSubmit from './components/SubProductStepSubmit';
+import SubProductStepSuccess from './components/SubProductStepSuccess';
+import { SubProductStepSelection } from './components/SubProductStepSelect';
 
 type OnBoardingSubProductUrlParams = {
   productId: string;
@@ -28,7 +29,7 @@ function OnBoardingSubProduct() {
   const [subProduct, setSubProduct] = useState<Product>();
   const [product, setProduct] = useState<Product>();
 
-  const [institutionId, _setInstitutionId] = useState<string>('');
+  const [institutionId, setInstitutionId] = useState<string>('');
   const [manager, _setManager] = useState<UserOnCreate>();
   const [billingData, _setBillingData] = useState<any>(); // TODO Use the correct type
 
@@ -71,10 +72,7 @@ function OnBoardingSubProduct() {
     forward();
   };
 
-  /*
-  const forwardWithInstitutionId = (
-    institutionId: string
-  ) => {
+  const forwardWithInstitutionId = (institutionId: string) => {
     setInstitutionId(institutionId);
     trackEvent('ONBOARDING_SELEZIONE_ENTE', {
       party_id: institutionId,
@@ -84,9 +82,9 @@ function OnBoardingSubProduct() {
     });
     forward();
   };
-*/
 
   const steps: Array<StepperStep> = [
+    // TODO Put Steps Here
     {
       label: 'Verify Inputs',
       Component: () =>
@@ -98,8 +96,14 @@ function OnBoardingSubProduct() {
           forward: forwardWithProducts,
         }),
     },
-
-    // TODO Put here next steps
+    {
+      label: 'Select Institution',
+      Component: () =>
+        SubProductStepSelection({
+          product,
+          forward: forwardWithInstitutionId,
+        }),
+    },
     {
       label: 'Submit',
       Component: () =>

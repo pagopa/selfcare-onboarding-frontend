@@ -8,7 +8,6 @@ import { fetchWithLogs } from '../../../lib/api-utils';
 import { UserContext } from '../../../lib/context';
 import { OnboardingStepActions } from '../../../components/OnboardingStepActions';
 import { useHistoryState } from '../../../components/useHistoryState';
-import { LoadingOverlay } from '../../../components/LoadingOverlay';
 import { AsyncAutocompleteV2 } from '../../../components/autocomplete/AsyncAutocompleteV2';
 
 const handleSearchInstitutionId = async (
@@ -31,12 +30,12 @@ const handleSearchInstitutionId = async (
   return null;
 };
 
-export function OnboardingStep1({ product, forward }: StepperStepComponentProps) {
+export function SubProductStepSelection({ forward, product }: StepperStepComponentProps) {
   const institutionIdByQuery = new URLSearchParams(window.location.search).get('institutionId');
   const { setRequiredLogin } = useContext(UserContext);
   const theme = useTheme();
 
-  const [loading, setLoading] = useState(!!institutionIdByQuery);
+  const [_loading, setLoading] = useState(false);
   const [selected, setSelected, setSelectedHistory] = useHistoryState<IPACatalogParty | null>(
     'selected_step1',
     null
@@ -73,9 +72,7 @@ export function OnboardingStep1({ product, forward }: StepperStepComponentProps)
     }
   }, [selected]);
 
-  return loading ? (
-    <LoadingOverlay loadingText="Stiamo verificando i tuoi dati" />
-  ) : (
+  return (
     <Grid
       container
       //  mt={16}
@@ -99,7 +96,7 @@ export function OnboardingStep1({ product, forward }: StepperStepComponentProps)
           >
             Seleziona dall&apos;Indice della Pubblica Amministrazione (IPA) l&apos;ente
             <br />
-            per cui vuoi richiedere l&apos;adesione a {{ productTitle: product?.title }}
+            per cui vuoi richiedere l&apos;adesione a {`${product?.title}`}
           </Typography>
         </Grid>
       </Grid>
@@ -110,7 +107,6 @@ export function OnboardingStep1({ product, forward }: StepperStepComponentProps)
             theme={theme}
             selected={selected}
             setSelected={setSelected}
-            // placeholder={t('onboardingStep1.onboarding.asyncAutocomplete.placeholder')}
             endpoint={{ endpoint: 'ONBOARDING_GET_SEARCH_PARTIES' }}
             transformFn={(data: { items: Array<IPACatalogParty> }) => {
               // eslint-disable-next-line functional/immutable-data
@@ -139,10 +135,10 @@ export function OnboardingStep1({ product, forward }: StepperStepComponentProps)
               variant="caption"
               color={theme.palette.text.primary}
             >
-              Non trovi il tuo ente nell&apos;IPA? In
+              Non trovi il tuo ente nell&apos;IPA? In{' '}
               <Link href="https://indicepa.gov.it/ipa-portale/servizi-enti/accreditamento-ente">
                 questa pagina
-              </Link>
+              </Link>{' '}
               trovi maggiori
               <br />
               informazioni sull&apos;indice e su come accreditarsi
