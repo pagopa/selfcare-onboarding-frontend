@@ -68,6 +68,9 @@ export const API = {
   ONBOARDING_COMPLETE_REGISTRATION: {
     URL: ENV.URL_API.PARTY_PROCESS + '/onboarding/complete/{{token}}',
   },
+  ONBOARDING_GET_USER_PARTIES: {
+    URL: ENV.URL_API.ONBOARDING + '/institutions',
+  },
 };
 
 export const USER_ROLE_LABEL = {

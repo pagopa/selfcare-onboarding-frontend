@@ -6,15 +6,18 @@ import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsS
 import { uniqueId } from 'lodash';
 import { useParams } from 'react-router';
 import { withLogin } from '../../components/withLogin';
-import { Product, StepperStep, UserOnCreate } from '../../../types';
+import { Party, Product, StepperStep, UserOnCreate } from '../../../types';
 import { LoadingOverlay } from '../../components/LoadingOverlay';
 import { ENV } from '../../utils/env';
 import { HeaderContext } from '../../lib/context';
 import { registerUnloadEvent, unregisterUnloadEvent } from '../Onboarding';
+import { OnboardingStep2 } from '../../components/OnboardingStep2';
+import { OnboardingStep1 } from '../../components/OnboardingStep1';
 import SubProductStepVerifyInputs from './components/SubProductStepVerifyInputs';
 import SubProductStepSubmit from './components/SubProductStepSubmit';
 import SubProductStepSuccess from './components/SubProductStepSuccess';
-import { SubProductStepSelection } from './components/SubProductStepSelect';
+import { SubProductStepSelectUserParty } from './components/SubProductStepSelectUserParty';
+import SubProductStepOnBoardingStatus from './components/SubProductStepOnBoardingStatus';
 
 type OnBoardingSubProductUrlParams = {
   productId: string;
@@ -28,6 +31,7 @@ function OnBoardingSubProduct() {
 
   const [subProduct, setSubProduct] = useState<Product>();
   const [product, setProduct] = useState<Product>();
+  const [parties, setParties] = useState<Array<Party>>([]);
 
   const [institutionId, setInstitutionId] = useState<string>('');
   const [manager, _setManager] = useState<UserOnCreate>();
@@ -62,17 +66,18 @@ function OnBoardingSubProduct() {
   };
   */
 
-  const forward = () => {
-    setActiveStep(activeStep + 1);
+  const forward = (i: number = 1) => {
+    setActiveStep(activeStep + i);
   };
 
-  const forwardWithProducts = (product: Product, subProduct: Product) => {
+  const forwardWithInputs = (product: Product, subProduct: Product, parties: Array<Party>) => {
     setProduct(product);
     setSubProduct(subProduct);
-    forward();
+    setParties(parties);
+    forward(parties.length === 0 ? 2 : 1);
   };
 
-  const forwardWithInstitutionId = (institutionId: string) => {
+  const forwardWithInstitutionId = (institutionId: string, isUserParty: boolean) => {
     setInstitutionId(institutionId);
     trackEvent('ONBOARDING_SELEZIONE_ENTE', {
       party_id: institutionId,
@@ -80,7 +85,7 @@ function OnBoardingSubProduct() {
       product_id: productId,
       subProduct_id: subProductId,
     });
-    forward();
+    forward(isUserParty ? 2 : 1);
   };
 
   const steps: Array<StepperStep> = [
@@ -93,15 +98,62 @@ function OnBoardingSubProduct() {
           productId,
           subProductId,
           setLoading,
-          forward: forwardWithProducts,
+          forward: forwardWithInputs,
         }),
     },
     {
-      label: 'Select Institution',
+      label: 'Select Institution releated',
       Component: () =>
-        SubProductStepSelection({
-          product,
+        SubProductStepSelectUserParty({
+          parties,
+          forward: (institutionId?: string) => {
+            if (institutionId) {
+              forwardWithInstitutionId(institutionId, true);
+            } else {
+              forward();
+            }
+          },
+        }),
+    },
+    {
+      label: 'Select Institution unreleated',
+      Component: () =>
+        OnboardingStep1({
+          product: subProduct,
+          forward,
+        }),
+    },
+    {
+      label: 'Verify OnBoarding Status',
+      Component: () =>
+        SubProductStepOnBoardingStatus({
+          institutionId,
+          productId,
+          subProductId,
           forward: forwardWithInstitutionId,
+        }),
+    },
+    {
+      label: 'Insert Manager',
+      Component: () =>
+        OnboardingStep2({
+          product: subProduct,
+          forward: () => {
+            // TODO
+            trackEvent('ONBOARDING_LEGALE_RAPPRESENTANTE', {
+              party_id: institutionId,
+              request_id: requestIdRef.current,
+            });
+            forward();
+          },
+          back: () => {
+            if (window.location.search.indexOf(`institutionId=${institutionId}`) > -1) {
+              setOpenExitUrl(`${ENV.URL_FE.DASHBOARD}/${institutionId}`);
+              setOpenExitModal(true);
+            } else {
+              setActiveStep(activeStep - 2);
+            }
+          },
         }),
     },
     {

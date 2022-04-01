@@ -149,3 +149,8 @@ export type Product = {
   title: string;
   parent?: string;
 };
+
+export type Party = {
+  id: string;
+  name: string;
+};

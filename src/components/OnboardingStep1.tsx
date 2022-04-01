@@ -61,6 +61,11 @@ export function OnboardingStep1({ product, forward }: StepperStepComponentProps)
             window.location.search = '';
           }
         })
+        .catch((reason) => {
+          // eslint-disable-next-line functional/immutable-data
+          window.location.search = '';
+          console.error(reason);
+        })
         .finally(() => {
           setLoading(false);
         });

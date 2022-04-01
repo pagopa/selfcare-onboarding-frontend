@@ -48,7 +48,12 @@ const alreadyOnboarded: RequestOutcomeMessage = {
 };
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
-export function SubProductStep0({ forward, institutionId, productId, subProductId }: Props) {
+export function SubProductStepOnBoardingStatus({
+  forward,
+  institutionId,
+  productId,
+  subProductId,
+}: Props) {
   const [loading, setLoading] = useState(true);
   const [outcome, setOutcome] = useState<RequestOutcomeMessage | null>();
   const { setOnLogout } = useContext(HeaderContext);
@@ -69,15 +74,13 @@ export function SubProductStep0({ forward, institutionId, productId, subProductI
     // Check the outcome
     const restOutcome = getFetchOutcome(onboardingStatus);
     if (restOutcome === 'success') {
-      // prodotto
-      onForwardAction();
+      setOutcome(alreadyOnboarded);
     } else {
       if (
-        // sotto prodotto
         (onboardingStatus as AxiosError<any>).response?.status === 404 ||
         (onboardingStatus as AxiosError<any>).response?.status === 400
       ) {
-        setOutcome(alreadyOnboarded);
+        onForwardAction();
       }
     }
   };
@@ -101,4 +104,4 @@ export function SubProductStep0({ forward, institutionId, productId, subProductI
     <></>
   );
 }
-export default SubProductStep0;
+export default SubProductStepOnBoardingStatus;

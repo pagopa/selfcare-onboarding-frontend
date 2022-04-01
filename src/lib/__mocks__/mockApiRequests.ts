@@ -1,5 +1,5 @@
 import { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
-import { Endpoint } from '../../../types';
+import { Endpoint, Party } from '../../../types';
 
 const mockPartyRegistry = {
   items: [
@@ -82,6 +82,17 @@ const mockedSubProduct = {
   id: 'prod-io-premium',
   parent: 'prod-io',
 };
+
+const mockedParties: Array<Party> = [
+  {
+    id: '0',
+    name: 'Comune di Milano',
+  },
+  {
+    id: '1',
+    name: 'Comune di Bollate',
+  },
+];
 
 const mockedResponseError = {
   detail: 'Request took too long to complete.',
@@ -166,6 +177,12 @@ export async function mockFetch(
           resolve({ data: undefined, status: 200, statusText: '200' } as AxiosResponse)
         );
     }
+  }
+
+  if (endpoint === 'ONBOARDING_GET_USER_PARTIES') {
+    return new Promise((resolve) =>
+      resolve({ data: mockedParties, status: 200, statusText: '200' } as AxiosResponse)
+    );
   }
 
   const msg = `NOT MOCKED REQUEST! {endpoint: ${endpoint}, endpointParams: ${JSON.stringify(

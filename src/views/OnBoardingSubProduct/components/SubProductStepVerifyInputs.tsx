@@ -1,7 +1,7 @@
 import { AxiosError, AxiosResponse } from 'axios';
 import { useContext, useEffect, useState } from 'react';
 import { trackAppError } from '@pagopa/selfcare-common-frontend/services/analyticsService';
-import { Product, StepperStepComponentProps } from '../../../../types';
+import { Party, Product, StepperStepComponentProps } from '../../../../types';
 import { HeaderContext, UserContext } from '../../../lib/context';
 import { unregisterUnloadEvent } from '../../Onboarding';
 import { fetchWithLogs } from '../../../lib/api-utils';
@@ -38,6 +38,23 @@ const checkProduct = async (
   }
 };
 
+const handleSearchUserParties = async (
+  setParties: (parties: Array<Party>) => void,
+  setRequiredLogin: (required: boolean) => void
+) => {
+  const searchResponse = await fetchWithLogs(
+    { endpoint: 'ONBOARDING_GET_USER_PARTIES' },
+    { method: 'GET' },
+    () => setRequiredLogin(true)
+  );
+  const outcome = getFetchOutcome(searchResponse);
+
+  if (outcome === 'success') {
+    setParties((searchResponse as AxiosResponse).data as Array<Party>);
+  }
+  setParties([]);
+};
+
 function SubProductStepVerifyInputs({
   forward,
   productId,
@@ -52,11 +69,14 @@ function SubProductStepVerifyInputs({
   const [selectedSubProduct, setSelectedSubProduct] = useState<Product | null>();
   const [selectedProduct, setSelectedProduct] = useState<Product | null>();
 
+  const [parties, setParties] = useState<Array<Party>>();
+
   const submit = () => {
     setLoading(true);
     Promise.all([
       checkProduct(productId, setSelectedProduct, setRequiredLogin),
       checkProduct(subProductId, setSelectedSubProduct, setRequiredLogin),
+      handleSearchUserParties(setParties, setRequiredLogin),
     ])
       .catch((reason) => {
         trackAppError({
@@ -76,7 +96,11 @@ function SubProductStepVerifyInputs({
   }, [productId, subProductId]);
 
   useEffect(() => {
-    if (selectedProduct !== undefined && selectedSubProduct !== undefined) {
+    if (
+      selectedProduct !== undefined &&
+      selectedSubProduct !== undefined &&
+      parties !== undefined
+    ) {
       if (
         selectedProduct === null ||
         selectedSubProduct === null ||
@@ -84,10 +108,10 @@ function SubProductStepVerifyInputs({
       ) {
         setError(true);
       } else {
-        forward(selectedProduct, selectedSubProduct);
+        forward(selectedProduct, selectedSubProduct, parties);
       }
     }
-  }, [selectedProduct, selectedSubProduct]);
+  }, [selectedProduct, selectedSubProduct, parties]);
 
   if (error) {
     unregisterUnloadEvent(setOnLogout);
