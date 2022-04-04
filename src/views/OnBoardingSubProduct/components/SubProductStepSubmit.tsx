@@ -5,6 +5,7 @@ import {
 } from '@pagopa/selfcare-common-frontend/services/analyticsService';
 import { Button, Grid, Typography } from '@mui/material';
 import { theme } from '@pagopa/mui-italia';
+import { Trans } from 'react-i18next';
 import { Product, StepperStepComponentProps, UserOnCreate } from '../../../../types';
 import { HeaderContext, UserContext } from '../../../lib/context';
 import { unregisterUnloadEvent } from '../../Onboarding';
@@ -31,15 +32,22 @@ const errorOutCome = {
     <Grid container direction="column" key="0">
       <Grid container item justifyContent="center">
         <Grid item xs={5}>
-          <Typography variant="h4">Richiesta di adesione premium in errore</Typography>
+          <Typography variant="h4">
+            <Trans i18nKey="onBoardingSubProduct.genericError.title">
+              {' '}
+              Richiesta di adesione premium in errore
+            </Trans>
+          </Typography>
         </Grid>
       </Grid>
       <Grid container item justifyContent="center" mb={3} mt={1}>
         <Grid item xs={5}>
           <Typography>
-            A causa di un errore del sistema non è possibile completare la procedura.
-            <br />
-            Ti chiediamo di riprovare più tardi.
+            <Trans i18nKey="onBoardingSubProduct.genericError.message">
+              A causa di un errore del sistema non è possibile completare la procedura.
+              <br />
+              Ti chiediamo di riprovare più tardi.
+            </Trans>
           </Typography>
         </Grid>
       </Grid>
@@ -47,7 +55,7 @@ const errorOutCome = {
         <Grid item xs={4}>
           <Button onClick={() => window.location.assign(ENV.URL_FE.LANDING)} variant={'contained'}>
             <Typography width="100%" sx={{ color: theme.palette.primary.contrastText }}>
-              Torna alla home
+              <Trans i18nKey="onBoardingSubProduct.genericError.homeButton">Torna alla home</Trans>
             </Typography>
           </Button>
         </Grid>

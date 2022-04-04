@@ -195,6 +195,44 @@ export default {
       loadingText: 'Stiamo verificando i tuoi dati',
     },
   },
+  onBoardingSubProduct: {
+    alreadyOnboardedError: {
+      title: 'Sottoscrizione già avvenuta',
+      message: "L'ente che hai selezionato ha già sottoscritto l'offerta Premium.",
+      closeButton: 'Chiudi',
+    },
+    notBasicProductError: {
+      title: "L'ente non ha aderito a {{selectedProduct}}",
+      message:
+        "Per poter sottoscrivere l'offerta Premium, l'ente che hai selezionato deve prima aderire al prodotto {{selectedProduct}}",
+      adhesionButton: 'Aderisci',
+    },
+    selectUserPartyStep: {
+      title: "Seleziona l'ente",
+      subTitle:
+        "Seleziona l'ente per il quale stai richiedendo la sottoscrizione all'offerta Premium",
+      helperLink: 'Non lo trovi? <1>Registra un nuovo ente</1>',
+      confirmButton: 'Conferma',
+    },
+    genericError: {
+      title: 'Richiesta di adesione premium in errore',
+      subTitle:
+        'A causa di un errore del sistema non è possibile completare la procedura.<0 /> Ti chiediamo di riprovare più tardi.',
+      homeButton: 'Torna alla home',
+    },
+    successfulAdhesion: {
+      title: 'La tua richiesta è stata inviata <1 /> con successo',
+      message:
+        "Riceverai una PEC all’indirizzo istituzionale dell’Ente.<1 />Al suo interno troverai le istruzioni per completare l'adesione.",
+      closeButton: 'Chiudi',
+    },
+    exitModal: {
+      title: 'Vuoi davvero uscire?',
+      message: 'Se esci, la richiesta di adesione andrà persa.',
+      backButton: 'Esci',
+      cancelButton: 'Annulla',
+    },
+  },
   rejectRegistration: {
     outcomeContent: {
       success: {

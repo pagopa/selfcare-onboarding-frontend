@@ -1,6 +1,7 @@
-import { Grid, Link, Typography, useTheme } from '@mui/material';
+import { Card, Grid, Link, Typography, useTheme } from '@mui/material';
 import { Box } from '@mui/system';
 import { useEffect } from 'react';
+import { useTranslation, Trans } from 'react-i18next';
 import { Party, StepperStepComponentProps } from '../../../../types';
 import { OnboardingStepActions } from '../../../components/OnboardingStepActions';
 import { useHistoryState } from '../../../components/useHistoryState';
@@ -11,6 +12,9 @@ type Props = {
 
 export function SubProductStepSelectUserParty({ forward, parties }: Props) {
   const institutionIdByQuery = new URLSearchParams(window.location.search).get('institutionId');
+
+  const { t } = useTranslation();
+
   const theme = useTheme();
 
   const [selected, setSelected, setSelectedHistory] = useHistoryState<Party | null>(
@@ -23,7 +27,7 @@ export function SubProductStepSelectUserParty({ forward, parties }: Props) {
     const { id } = selected!;
     forward(id);
   };
-  const bodyTitle = "Seleziona l'ente";
+  const bodyTitle = t('onBoardingSubProduct.selectUserPartyStep.title');
 
   useEffect(() => {
     if (institutionIdByQuery) {
@@ -65,15 +69,34 @@ export function SubProductStepSelectUserParty({ forward, parties }: Props) {
             align="center"
             color={theme.palette.text.primary}
           >
-            Seleziona l&apos;ente per il quale stai richiedendo la sottoscrizione all&apos;offerta
-            Premium
+            {t('onBoardingSubProduct.selectUserPartyStep.subTitle')}
           </Typography>
         </Grid>
       </Grid>
 
-      <Grid container item justifyContent="center" mt={7} mb={4}>
+      <Grid container item display="flex" textAlign="center" justifyContent="center" mt={7} mb={4}>
         <Grid item xs={5}>
-          {/* Todo */}
+          {parties.map((p, index) => (
+            <Box key={p.id}>
+              <Card
+                key={p.id}
+                onClick={() => setSelected(p)}
+                sx={{
+                  cursor: 'pointer',
+                  border: selected === p ? '2px solid #0073E6' : undefined,
+                  width: '480px',
+                  fontWeight: 700,
+                  fontSize: '18px',
+                  height: '113px',
+                  top: '144px',
+                  left: '480px',
+                }}
+              >
+                {p.name}
+              </Card>
+              {index !== parties.length - 1 && <br />}
+            </Box>
+          ))}
         </Grid>
       </Grid>
 
@@ -93,7 +116,12 @@ export function SubProductStepSelectUserParty({ forward, parties }: Props) {
               variant="caption"
               color={theme.palette.text.primary}
             >
-              Non lo trovi? <Link href="TODO redirect to onBoarding1">Registra un nuovo ente</Link>
+              <Trans i18nKey="onBoardingSubProduct.selectUserPartyStep.helperLink">
+                Non lo trovi?
+                <Link sx={{ cursor: 'pointer' }} onClick={() => forward()}>
+                  Registra un nuovo ente
+                </Link>
+              </Trans>
             </Typography>
           </Box>
         </Grid>
@@ -103,7 +131,7 @@ export function SubProductStepSelectUserParty({ forward, parties }: Props) {
         <OnboardingStepActions
           forward={{
             action: onForwardAction,
-            label: 'Conferma',
+            label: t('onBoardingSubProduct.selectUserPartyStep.confirmButton'),
             disabled: selected === undefined || selected === null,
           }}
         />

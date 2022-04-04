@@ -71,6 +71,11 @@ export const API = {
   ONBOARDING_GET_USER_PARTIES: {
     URL: ENV.URL_API.ONBOARDING + '/institutions',
   },
+  ONBOARDING_GET_ONBOARDING_DATA: {
+    URL:
+      ENV.URL_API.PARTY_PROCESS +
+      '/onboarding/organization/{{institutionId}}/products/{{productId}}',
+  },
 };
 
 export const USER_ROLE_LABEL = {

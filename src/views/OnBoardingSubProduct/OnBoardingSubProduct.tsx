@@ -5,6 +5,7 @@ import SessionModal from '@pagopa/selfcare-common-frontend/components/SessionMod
 import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
 import { uniqueId } from 'lodash';
 import { useParams } from 'react-router';
+import { useTranslation } from 'react-i18next';
 import { withLogin } from '../../components/withLogin';
 import { Party, Product, StepperStep, UserOnCreate } from '../../../types';
 import { LoadingOverlay } from '../../components/LoadingOverlay';
@@ -25,6 +26,7 @@ type OnBoardingSubProductUrlParams = {
 };
 
 function OnBoardingSubProduct() {
+  const { t } = useTranslation();
   const { subProductId, productId } = useParams<OnBoardingSubProductUrlParams>();
   const [loading, setLoading] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
@@ -89,7 +91,6 @@ function OnBoardingSubProduct() {
   };
 
   const steps: Array<StepperStep> = [
-    // TODO Put Steps Here
     {
       label: 'Verify Inputs',
       Component: () =>
@@ -120,7 +121,8 @@ function OnBoardingSubProduct() {
       Component: () =>
         OnboardingStep1({
           product: subProduct,
-          forward,
+          forward: (_: any, institutionId: string) =>
+            forwardWithInstitutionId(institutionId, false),
         }),
     },
     {
@@ -130,7 +132,7 @@ function OnBoardingSubProduct() {
           institutionId,
           productId,
           subProductId,
-          forward: forwardWithInstitutionId,
+          forward,
         }),
     },
     {
@@ -156,6 +158,7 @@ function OnBoardingSubProduct() {
           },
         }),
     },
+    // TODO Puts Step Here
     {
       label: 'Submit',
       Component: () =>
@@ -194,12 +197,12 @@ function OnBoardingSubProduct() {
           window.location.assign(openExitUrl);
         }}
         open={openExitModal}
-        title="Vuoi davvero uscire?"
-        message="Se esci, la richiesta di adesione andrà persa."
-        onConfirmLabel="Esci"
-        onCloseLabel="Annulla"
+        title={t('onBoardingSubProduct.exitModal.title')}
+        message={t('onBoardingSubProduct.exitModal.message')}
+        onConfirmLabel={t('onBoardingSubProduct.exitModal.backButton')}
+        onCloseLabel={t('onBoardingSubProduct.exitModal.cancelButton')}
       />
-      {loading && <LoadingOverlay loadingText="Caricamento" />}
+      {loading && <LoadingOverlay loadingText={t('onBoardingSubProduct.loading.loadingText')} />}
     </Container>
   );
 }

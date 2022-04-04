@@ -135,6 +135,14 @@ export async function mockFetch(
             response: { data: '', status: 404, statusText: 'Not Found' },
           } as AxiosError)
         );
+      case '0':
+        return new Promise((resolve) =>
+          resolve({ data: mockedParties, status: 400, statusText: '400' } as AxiosResponse)
+        );
+      case '1':
+        return new Promise((resolve) =>
+          resolve({ data: mockedParties, status: 200, statusText: '200' } as AxiosResponse)
+        );
       default:
         return new Promise((resolve) =>
           resolve({
@@ -144,6 +152,7 @@ export async function mockFetch(
         );
     }
   }
+
   if (endpoint === 'ONBOARDING_VERIFY_PRODUCT') {
     switch (endpointParams.productId) {
       case 'error':
