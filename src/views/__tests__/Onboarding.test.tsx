@@ -93,6 +93,7 @@ test('test error productID', async () => {
 });
 
 test('test complete', async () => {
+  jest.setTimeout(10000);
   renderComponent();
   await executeStep1('agency x');
   await executeStep2();

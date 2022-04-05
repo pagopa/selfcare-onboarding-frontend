@@ -79,6 +79,9 @@
       "src/index.tsx",
       "src/reportWebVitals.ts",
       "src/utils/constants.ts"
-    ]
+    ],
+    "moduleNameMapper": {
+      "^.+\\.(css|less|scss)$": "babel-jest"
+    }
   }
 }
