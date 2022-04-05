@@ -1,5 +1,5 @@
 import { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
-import { Endpoint, Party } from '../../../types';
+import { Endpoint, OnboardingDto, Party } from '../../../types';
 
 const mockPartyRegistry = {
   items: [
@@ -94,11 +94,54 @@ const mockedParties: Array<Party> = [
   },
 ];
 
+const mockedOnboardingData0: OnboardingDto = {
+  billingData: {
+    businessName: 'Comune di Milano',
+    registeredOffice: 'Milano, Piazza Colonna 370, CAP 20021',
+    pec: 'comune.milano@pec.it',
+    fiscalCode: 'AAAAAA11A11A123K',
+    receiverCode: 'M5UXCR1',
+  },
+  manager: {
+    email: 'm@ma.it',
+    taxCode: 'AAAAAA11A11A123K',
+    name: 'Mario',
+    surname: 'Rossi',
+    role: 'MANAGER',
+  },
+  organizationType: 'pa',
+};
+
+const mockedOnboardingData1: OnboardingDto = {
+  billingData: {
+    businessName: 'Comune di Bollate',
+    registeredOffice: 'Bollate, Piazza Colonna 370, CAP 20021',
+    pec: 'comune.bollate@pec.it',
+    fiscalCode: 'BBBBBB11A11A123K',
+    receiverCode: 'M2UHYR1',
+  },
+  manager: {
+    email: 'm@ma.it',
+    taxCode: 'DDDDDD11A11A123K',
+    name: 'Maria',
+    surname: 'Rosa',
+    role: 'MANAGER',
+  },
+  organizationType: 'gsp',
+};
+
 const mockedResponseError = {
   detail: 'Request took too long to complete.',
   status: 503,
   title: 'Service Unavailable',
 };
+
+const notFoundError: Promise<AxiosError> = new Promise((resolve) =>
+  resolve({
+    isAxiosError: true,
+    response: { data: '', status: 404, statusText: 'Not Found' },
+  } as AxiosError)
+);
 
 const genericError: Promise<AxiosError> = new Promise((resolve) =>
   resolve({
@@ -107,6 +150,7 @@ const genericError: Promise<AxiosError> = new Promise((resolve) =>
   } as AxiosError)
 );
 
+// eslint-disable-next-line sonarjs/cognitive-complexity
 export async function mockFetch(
   { endpoint, endpointParams }: Endpoint,
   { params }: AxiosRequestConfig
@@ -129,25 +173,46 @@ export async function mockFetch(
           } as AxiosResponse)
         );
       case 'pending':
-        return new Promise((resolve) =>
-          resolve({
-            isAxiosError: true,
-            response: { data: '', status: 404, statusText: 'Not Found' },
-          } as AxiosError)
-        );
+        return notFoundError;
       case '0':
-        return new Promise((resolve) =>
-          resolve({ data: mockedParties, status: 400, statusText: '400' } as AxiosResponse)
-        );
       case '1':
-        return new Promise((resolve) =>
-          resolve({ data: mockedParties, status: 200, statusText: '200' } as AxiosResponse)
-        );
+        if (endpointParams.productId === 'prod-io') {
+          // eslint-disable-next-line sonarjs/no-identical-functions
+          return new Promise((resolve) =>
+            resolve({
+              status: 204,
+              statusText: 'No Content',
+            } as AxiosResponse)
+          );
+        } else {
+          return notFoundError;
+        }
+
       default:
         return new Promise((resolve) =>
           resolve({
             isAxiosError: true,
             response: { data: '', status: 400, statusText: 'Bad Request' },
+          } as AxiosError)
+        );
+    }
+  }
+
+  if (endpoint === 'ONBOARDING_GET_ONBOARDING_DATA') {
+    switch (endpointParams.institutionId) {
+      case '0':
+        return new Promise((resolve) =>
+          resolve({ data: mockedOnboardingData0, status: 200, statusText: '200' } as AxiosResponse)
+        );
+      case '1':
+        return new Promise((resolve) =>
+          resolve({ data: mockedOnboardingData1, status: 200, statusText: '200' } as AxiosResponse)
+        );
+      default:
+        return new Promise((resolve) =>
+          resolve({
+            isAxiosError: true,
+            response: { status: 404, statusText: 'Not Found' },
           } as AxiosError)
         );
     }

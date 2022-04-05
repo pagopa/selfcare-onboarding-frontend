@@ -73,8 +73,7 @@ export const API = {
   },
   ONBOARDING_GET_ONBOARDING_DATA: {
     URL:
-      ENV.URL_API.PARTY_PROCESS +
-      '/onboarding/organization/{{institutionId}}/products/{{productId}}',
+      ENV.URL_API.ONBOARDING + '/institutions/{{institutionId}}/products/{{productId}}/onboarding',
   },
 };
 

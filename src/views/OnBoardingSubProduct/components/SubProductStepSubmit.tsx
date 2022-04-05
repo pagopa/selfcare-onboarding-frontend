@@ -6,7 +6,13 @@ import {
 import { Button, Grid, Typography } from '@mui/material';
 import { theme } from '@pagopa/mui-italia';
 import { Trans } from 'react-i18next';
-import { Product, StepperStepComponentProps, UserOnCreate } from '../../../../types';
+import {
+  BillingData,
+  OrganizationType,
+  Product,
+  StepperStepComponentProps,
+  UserOnCreate,
+} from '../../../../types';
 import { HeaderContext, UserContext } from '../../../lib/context';
 import { unregisterUnloadEvent } from '../../Onboarding';
 import { fetchWithLogs } from '../../../lib/api-utils';
@@ -21,7 +27,8 @@ type Props = StepperStepComponentProps & {
   subProduct: Product;
   institutionId: string;
   users: Array<UserOnCreate>;
-  billingData: any; // TODO Use the correct type
+  billingData: BillingData;
+  organizationType: OrganizationType;
   setLoading: (loading: boolean) => void;
 };
 
@@ -73,6 +80,7 @@ function SubProductStepSubmit({
   users,
   billingData,
   setLoading,
+  organizationType,
 }: Props) {
   const [error, setError] = useState<boolean>(false);
   const { setOnLogout } = useContext(HeaderContext);
@@ -107,7 +115,7 @@ function SubProductStepSubmit({
         endpoint: 'ONBOARDING_POST_LEGALS',
         endpointParams: { institutionId, productId: subProduct.id },
       },
-      { method: 'POST', data: { users, billingData } },
+      { method: 'POST', data: { users, billingData, organizationType } },
       () => setRequiredLogin(true)
     );
 

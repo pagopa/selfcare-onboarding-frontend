@@ -7,13 +7,21 @@ import { uniqueId } from 'lodash';
 import { useParams } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { withLogin } from '../../components/withLogin';
-import { Party, Product, StepperStep, UserOnCreate } from '../../../types';
+import {
+  BillingData,
+  OrganizationType,
+  Party,
+  Product,
+  StepperStep,
+  UserOnCreate,
+} from '../../../types';
 import { LoadingOverlay } from '../../components/LoadingOverlay';
 import { ENV } from '../../utils/env';
 import { HeaderContext } from '../../lib/context';
 import { registerUnloadEvent, unregisterUnloadEvent } from '../Onboarding';
 import { OnboardingStep2 } from '../../components/OnboardingStep2';
 import { OnboardingStep1 } from '../../components/OnboardingStep1';
+import StepOnboardingData from '../../components/steps/StepOnboardingData';
 import SubProductStepVerifyInputs from './components/SubProductStepVerifyInputs';
 import SubProductStepSubmit from './components/SubProductStepSubmit';
 import SubProductStepSuccess from './components/SubProductStepSuccess';
@@ -36,8 +44,9 @@ function OnBoardingSubProduct() {
   const [parties, setParties] = useState<Array<Party>>([]);
 
   const [institutionId, setInstitutionId] = useState<string>('');
-  const [manager, _setManager] = useState<UserOnCreate>();
-  const [billingData, _setBillingData] = useState<any>(); // TODO Use the correct type
+  const [manager, setManager] = useState<UserOnCreate>();
+  const [billingData, setBillingData] = useState<BillingData>();
+  const [organizationType, setOrganizationType] = useState<OrganizationType>();
 
   const history = useHistory();
 
@@ -90,6 +99,17 @@ function OnBoardingSubProduct() {
     forward(isUserParty ? 2 : 1);
   };
 
+  const forwardWithOnboardingData = (
+    manager?: UserOnCreate,
+    billingData?: BillingData,
+    organizationType?: OrganizationType
+  ) => {
+    setManager(manager);
+    setBillingData(billingData);
+    setOrganizationType(organizationType);
+    forward();
+  };
+
   const steps: Array<StepperStep> = [
     {
       label: 'Verify Inputs',
@@ -136,6 +156,15 @@ function OnBoardingSubProduct() {
         }),
     },
     {
+      label: 'Get Onboarding Data',
+      Component: () =>
+        StepOnboardingData({
+          institutionId,
+          productId,
+          forward: forwardWithOnboardingData,
+        }),
+    },
+    {
       label: 'Insert Manager',
       Component: () =>
         OnboardingStep2({
@@ -168,7 +197,8 @@ function OnBoardingSubProduct() {
           subProduct: subProduct as Product,
           institutionId,
           users: [manager as UserOnCreate],
-          billingData,
+          billingData: billingData as BillingData,
+          organizationType: organizationType as OrganizationType,
           setLoading,
           forward,
         }),

@@ -154,3 +154,19 @@ export type Party = {
   id: string;
   name: string;
 };
+
+export type BillingData = {
+  businessName: string;
+  registeredOffice: string;
+  pec: string;
+  fiscalCode: string;
+  receiverCode: string;
+};
+
+export type OnboardingDto = {
+  manager?: UserOnCreate;
+  billingData?: BillingData;
+  organizationType?: OrganizationType;
+};
+
+export type OrganizationType = 'pa' | 'gsp' | 'scp' | 'pt';

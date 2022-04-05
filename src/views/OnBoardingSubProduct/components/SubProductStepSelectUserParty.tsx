@@ -79,7 +79,6 @@ export function SubProductStepSelectUserParty({ forward, parties }: Props) {
           {parties.map((p, index) => (
             <Box key={p.id}>
               <Card
-                key={p.id}
                 onClick={() => setSelected(p)}
                 sx={{
                   cursor: 'pointer',
