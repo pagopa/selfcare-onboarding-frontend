@@ -43,7 +43,7 @@ jest.mock('react-router-dom', () => ({
   }),
 }));
 
-const renderComponent = (productId: string = 'prod-io') => {
+const renderComponent = (productId: string = 'prod-pagopa') => {
   const Component = () => {
     const [user, setUser] = useState<User | null>(null);
     const [subHeaderVisible, setSubHeaderVisible] = useState<boolean>(false);
