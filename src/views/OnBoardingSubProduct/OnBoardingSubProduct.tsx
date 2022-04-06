@@ -22,6 +22,7 @@ import { registerUnloadEvent, unregisterUnloadEvent } from '../Onboarding';
 import { OnboardingStep2 } from '../../components/OnboardingStep2';
 import { OnboardingStep1 } from '../../components/OnboardingStep1';
 import StepOnboardingData from '../../components/steps/StepOnboardingData';
+import StepBillingData from '../../components/steps/StepBillingData';
 import SubProductStepVerifyInputs from './components/SubProductStepVerifyInputs';
 import SubProductStepSubmit from './components/SubProductStepSubmit';
 import SubProductStepSuccess from './components/SubProductStepSuccess';
@@ -71,11 +72,11 @@ function OnBoardingSubProduct() {
     requestIdRef.current = uniqueId(`onboarding-${institutionId}-${productId}-${subProductId}-`);
   }, [productId, subProductId]);
 
-  /*
+  const chooseFromMyParties = useRef(true);
+
   const back = () => {
     setActiveStep(activeStep - 1);
   };
-  */
 
   const forward = (i: number = 1) => {
     setActiveStep(activeStep + i);
@@ -96,6 +97,8 @@ function OnBoardingSubProduct() {
       product_id: productId,
       subProduct_id: subProductId,
     });
+    // eslint-disable-next-line functional/immutable-data
+    chooseFromMyParties.current = isUserParty;
     forward(isUserParty ? 2 : 1);
   };
 
@@ -165,6 +168,40 @@ function OnBoardingSubProduct() {
         }),
     },
     {
+      label: 'Insert Billing Data',
+      Component: () =>
+        StepBillingData({
+          // product: subProduct,
+          institutionId,
+          initialFormData: billingData ?? {
+            businessName: '',
+            registeredOffice: '',
+            mailPEC: '',
+            taxCode: '',
+            vatNumber: '',
+            recipientCode: '',
+            publicServices: organizationType === 'GSP' ? false : undefined,
+          },
+          organizationType: organizationType as OrganizationType,
+          subtitle: t('onBoardingSubProduct.billingData.subTitle'),
+          forward: () => {
+            trackEvent('ONBOARDING_DATI_FATTURAZIONE', {
+              party_id: institutionId,
+              request_id: requestIdRef.current,
+            });
+            forward();
+          },
+          back: () => {
+            if (window.location.search.indexOf(`institutionId=${institutionId}`) > -1) {
+              setOpenExitUrl(`${ENV.URL_FE.DASHBOARD}/${institutionId}`);
+              setOpenExitModal(true);
+            } else {
+              setActiveStep(chooseFromMyParties.current ? 1 : 2);
+            }
+          },
+        }),
+    },
+    {
       label: 'Insert Manager',
       Component: () =>
         OnboardingStep2({
@@ -177,16 +214,10 @@ function OnBoardingSubProduct() {
             });
             forward();
           },
-          back: () => {
-            if (window.location.search.indexOf(`institutionId=${institutionId}`) > -1) {
-              setOpenExitUrl(`${ENV.URL_FE.DASHBOARD}/${institutionId}`);
-              setOpenExitModal(true);
-            } else {
-              setActiveStep(activeStep - 2);
-            }
-          },
+          back,
         }),
     },
+
     // TODO Puts Step Here
     {
       label: 'Submit',

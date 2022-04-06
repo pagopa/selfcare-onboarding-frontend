@@ -122,7 +122,6 @@ export function OnboardingStep3({ product, legal, forward, back }: Props) {
           <FormControlLabel
             control={<Checkbox checked={isAuthUser} onChange={handleAuthUser} />}
             label={
-              // TODO: insert correct Variant when present in theme.js
               <Typography sx={{ fontSize: '16px', lineHeight: '20px', fontWeight: 600 }}>
                 {t('onboardingStep3.formControl.label')}
               </Typography>

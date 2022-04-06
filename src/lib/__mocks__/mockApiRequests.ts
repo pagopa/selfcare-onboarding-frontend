@@ -98,9 +98,10 @@ const mockedOnboardingData0: OnboardingDto = {
   billingData: {
     businessName: 'Comune di Milano',
     registeredOffice: 'Milano, Piazza Colonna 370, CAP 20021',
-    pec: 'comune.milano@pec.it',
-    fiscalCode: 'AAAAAA11A11A123K',
-    receiverCode: 'M5UXCR1',
+    mailPEC: 'comune.milano@pec.it',
+    taxCode: 'AAAAAA11A11A123K',
+    vatNumber: 'AAAAAA11A11A123K',
+    recipientCode: 'M5UXCR1',
   },
   manager: {
     email: 'm@ma.it',
@@ -109,16 +110,17 @@ const mockedOnboardingData0: OnboardingDto = {
     surname: 'Rossi',
     role: 'MANAGER',
   },
-  organizationType: 'pa',
+  organizationType: 'PA',
 };
 
 const mockedOnboardingData1: OnboardingDto = {
   billingData: {
     businessName: 'Comune di Bollate',
     registeredOffice: 'Bollate, Piazza Colonna 370, CAP 20021',
-    pec: 'comune.bollate@pec.it',
-    fiscalCode: 'BBBBBB11A11A123K',
-    receiverCode: 'M2UHYR1',
+    mailPEC: 'comune.bollate@pec.it',
+    taxCode: 'BBBBBB11A11A123K',
+    vatNumber: 'BBBBBB11A11A123K',
+    recipientCode: 'M2UHYR1',
   },
   manager: {
     email: 'm@ma.it',
@@ -127,7 +129,7 @@ const mockedOnboardingData1: OnboardingDto = {
     surname: 'Rosa',
     role: 'MANAGER',
   },
-  organizationType: 'gsp',
+  organizationType: 'GSP',
 };
 
 const mockedResponseError = {
@@ -150,7 +152,7 @@ const genericError: Promise<AxiosError> = new Promise((resolve) =>
   } as AxiosError)
 );
 
-// eslint-disable-next-line sonarjs/cognitive-complexity
+// eslint-disable-next-line sonarjs/cognitive-complexity, complexity
 export async function mockFetch(
   { endpoint, endpointParams }: Endpoint,
   { params }: AxiosRequestConfig
@@ -189,6 +191,15 @@ export async function mockFetch(
         }
 
       default:
+        if (endpointParams.productId === 'prod-io') {
+          // eslint-disable-next-line sonarjs/no-identical-functions
+          return new Promise((resolve) =>
+            resolve({
+              status: 204,
+              statusText: 'No Content',
+            } as AxiosResponse)
+          );
+        }
         return new Promise((resolve) =>
           resolve({
             isAxiosError: true,

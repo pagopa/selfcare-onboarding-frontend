@@ -226,12 +226,31 @@ export default {
         "Riceverai una PEC all’indirizzo istituzionale dell’Ente.<1 />Al suo interno troverai le istruzioni per completare l'adesione.",
       closeButton: 'Chiudi',
     },
+    billingData: {
+      subTitle:
+        'Conferma, modifica o inserisci i dati richiesti, assicurandoti che siano corretti. Verranno usati anche per richiedere l’adesione ad altri prodotti e in caso di fatturazione',
+    },
     exitModal: {
       title: 'Vuoi davvero uscire?',
       message: 'Se esci, la richiesta di adesione andrà persa.',
       backButton: 'Esci',
       cancelButton: 'Annulla',
     },
+  },
+  stepBillingData: {
+    invalidEmail: 'L’indirizzo email non è valido',
+    businessName: 'Ragione sociale',
+    registeredOffice: 'Sede legale',
+    mailPEC: 'Indirizzo PEC',
+    taxCodeEquals2PIVAdescription: 'Il codice fiscale è uguale alla Partita IVA',
+    taxCode: 'Codice fiscale',
+    vatNumber: 'Partita IVA',
+    recipientCode: 'Codice destinatario',
+    recipientCodeDescription:
+      'È il codice di sette cifre necessario per ricevere le fatture elettroniche',
+    gspDescription: 'Sono gestore di almeno uno dei pubblici servizi Gas, Luce e/o TELCO',
+    backLabel: 'Indietro',
+    confirmLabel: 'Conferma',
   },
   rejectRegistration: {
     outcomeContent: {
