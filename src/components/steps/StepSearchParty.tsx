@@ -3,14 +3,19 @@ import { Box } from '@mui/system';
 import { useContext, useEffect, useState } from 'react';
 import { AxiosResponse } from 'axios';
 import { useTranslation, Trans } from 'react-i18next';
-import { IPACatalogParty, StepperStepComponentProps } from '../../types';
-import { getFetchOutcome } from '../lib/error-utils';
-import { fetchWithLogs } from '../lib/api-utils';
-import { UserContext } from '../lib/context';
-import { OnboardingStepActions } from './OnboardingStepActions';
-import { useHistoryState } from './useHistoryState';
-import { LoadingOverlay } from './LoadingOverlay';
-import { AsyncAutocompleteV2 } from './autocomplete/AsyncAutocompleteV2';
+import { IPACatalogParty, Party, StepperStepComponentProps } from '../../../types';
+import { getFetchOutcome } from '../../lib/error-utils';
+import { fetchWithLogs } from '../../lib/api-utils';
+import { UserContext } from '../../lib/context';
+import { OnboardingStepActions } from '../OnboardingStepActions';
+import { useHistoryState } from '../useHistoryState';
+import { LoadingOverlay } from '../LoadingOverlay';
+import { AsyncAutocompleteV2 } from '../autocomplete/AsyncAutocompleteV2';
+
+type Props = {
+  subTitle: string;
+  parties: Array<Party>;
+};
 
 const handleSearchInstitutionId = async (
   institutionId: string,
@@ -31,7 +36,10 @@ const handleSearchInstitutionId = async (
   return null;
 };
 
-export function OnboardingStep1({ product, forward }: StepperStepComponentProps) {
+export function StepSearchParty(
+  { subTitle, parties }: Props,
+  { forward, back }: StepperStepComponentProps
+) {
   const institutionIdByQuery = new URLSearchParams(window.location.search).get('institutionId');
   const { setRequiredLogin } = useContext(UserContext);
   const theme = useTheme();
@@ -41,12 +49,14 @@ export function OnboardingStep1({ product, forward }: StepperStepComponentProps)
     'selected_step1',
     null
   );
+
   const onForwardAction = () => {
     setSelectedHistory(selected);
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const { id } = selected!;
     forward({ institutionId: id }, id);
   };
+
   const { t } = useTranslation();
   const bodyTitle = t('onboardingStep1.onboarding.bodyTitle');
 
@@ -103,11 +113,7 @@ export function OnboardingStep1({ product, forward }: StepperStepComponentProps)
             align="center"
             color={theme.palette.text.primary}
           >
-            <Trans i18nKey="onboardingStep1.onboarding.bodyDescription">
-              Seleziona dall&apos;Indice della Pubblica Amministrazione (IPA) l&apos;ente
-              <br />
-              per cui vuoi richiedere l&apos;adesione a {{ productTitle: product?.title }}
-            </Trans>
+            {subTitle}
           </Typography>
         </Grid>
       </Grid>
@@ -166,7 +172,15 @@ export function OnboardingStep1({ product, forward }: StepperStepComponentProps)
 
       <Grid item mt={4}>
         <OnboardingStepActions
-          // back={{action: goBackToLandingPage, label: 'Indietro', disabled: false}}
+          {...(parties?.length > 0 ? (
+            <>
+              {{
+                action: back,
+                label: t('onboardingStep1.onboarding.onboardingStepActions.backAction'),
+                disabled: false,
+              }}
+            </>
+          ) : null)}
           forward={{
             action: onForwardAction,
             label: t('onboardingStep1.onboarding.onboardingStepActions.confirmAction'),

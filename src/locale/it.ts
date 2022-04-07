@@ -66,6 +66,7 @@ export default {
       },
       onboardingStepActions: {
         confirmAction: 'Conferma',
+        backAction: 'Indietro',
       },
     },
   },

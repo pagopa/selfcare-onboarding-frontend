@@ -20,7 +20,7 @@ import { ENV } from '../../utils/env';
 import { HeaderContext } from '../../lib/context';
 import { registerUnloadEvent, unregisterUnloadEvent } from '../Onboarding';
 import { OnboardingStep2 } from '../../components/OnboardingStep2';
-import { OnboardingStep1 } from '../../components/OnboardingStep1';
+import { StepSearchParty } from '../../components/steps/StepSearchParty';
 import StepOnboardingData from '../../components/steps/StepOnboardingData';
 import SubProductStepVerifyInputs from './components/SubProductStepVerifyInputs';
 import SubProductStepSubmit from './components/SubProductStepSubmit';
@@ -71,11 +71,9 @@ function OnBoardingSubProduct() {
     requestIdRef.current = uniqueId(`onboarding-${institutionId}-${productId}-${subProductId}-`);
   }, [productId, subProductId]);
 
-  /*
   const back = () => {
     setActiveStep(activeStep - 1);
   };
-  */
 
   const forward = (i: number = 1) => {
     setActiveStep(activeStep + i);
@@ -134,12 +132,13 @@ function OnBoardingSubProduct() {
               forward();
             }
           },
+          back,
         }),
     },
     {
       label: 'Select Institution unreleated',
       Component: () =>
-        OnboardingStep1({
+        StepSearchParty(t('onBoardingSubProduct.selectUserPartyStep.subTitle'), {
           product: subProduct,
           forward: (_: any, institutionId: string) =>
             forwardWithInstitutionId(institutionId, false),
@@ -151,6 +150,7 @@ function OnBoardingSubProduct() {
         SubProductStepOnBoardingStatus({
           institutionId,
           productId,
+          productTitle: (product as Product).title,
           subProductId,
           forward,
         }),
@@ -182,7 +182,7 @@ function OnBoardingSubProduct() {
               setOpenExitUrl(`${ENV.URL_FE.DASHBOARD}/${institutionId}`);
               setOpenExitModal(true);
             } else {
-              setActiveStep(activeStep - 2);
+              setActiveStep(activeStep - 4);
             }
           },
         }),
@@ -201,6 +201,7 @@ function OnBoardingSubProduct() {
           organizationType: organizationType as OrganizationType,
           setLoading,
           forward,
+          back,
         }),
     },
     {

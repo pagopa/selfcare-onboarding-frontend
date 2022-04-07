@@ -13,14 +13,17 @@ import { fetchWithLogs } from '../../../lib/api-utils';
 import { getFetchOutcome } from '../../../lib/error-utils';
 import { ROUTES } from '../../../utils/constants';
 import { ReactComponent as ErrorIcon } from '../../../assets/payment_completed_error.svg';
+import { ReactComponent as SubscribedIcon } from '../../../assets/already-onboarded.svg';
 
 type Props = StepperStepComponentProps & {
   institutionId: string;
   productId: string;
   subProductId: string;
+  productTitle: string;
 };
 
 const alreadyOnboarded: RequestOutcomeMessage = {
+  ImgComponent: SubscribedIcon,
   title: '',
   description: [
     <Grid container direction="column" key="0">
@@ -57,7 +60,8 @@ const alreadyOnboarded: RequestOutcomeMessage = {
   ],
 };
 
-const notBasicProduct: RequestOutcomeMessage = {
+const buildNotBasicProduct = (productTitle: string, productId: string): RequestOutcomeMessage => ({
+  ImgComponent: ErrorIcon,
   title: '',
   description: [
     <Grid container direction="column" key="0">
@@ -65,7 +69,7 @@ const notBasicProduct: RequestOutcomeMessage = {
         <Grid item xs={6}>
           <Typography variant="h4">
             <Trans i18nKey="onBoardingSubProduct.notBasicProductError.title">
-              L&apos;ente non ha aderito a {/* TODO SelectedProduct */}
+              L&apos;ente non ha aderito a {{ selectedProduct: productTitle }}
             </Trans>
           </Typography>
         </Grid>
@@ -75,7 +79,7 @@ const notBasicProduct: RequestOutcomeMessage = {
           <Typography>
             <Trans i18nKey="onBoardingSubProduct.notBasicProductError.message">
               Per poter sottoscrivere l&apos;offerta Premium, l&apos;ente che hai selezionato deve
-              prima aderire al prodotto {/* TODO SelectedProduct */}
+              prima aderire al prodotto {{ selectedProduct: productTitle }}
             </Trans>
           </Typography>
         </Grid>
@@ -85,7 +89,7 @@ const notBasicProduct: RequestOutcomeMessage = {
           <Button
             variant="contained"
             sx={{ alignSelf: 'center' }}
-            onClick={() => resolvePathVariables(ROUTES.ONBOARDING.PATH, {})}
+            onClick={() => resolvePathVariables(ROUTES.ONBOARDING.PATH, { productId })}
           >
             <Trans i18nKey="onBoardingSubProduct.notBasicProductError.adhesionButton">
               Aderisci
@@ -95,7 +99,7 @@ const notBasicProduct: RequestOutcomeMessage = {
       </Grid>
     </Grid>,
   ],
-};
+});
 
 const genericError: RequestOutcomeMessage = {
   ImgComponent: ErrorIcon,
@@ -141,6 +145,7 @@ export function SubProductStepOnBoardingStatus({
   institutionId,
   productId,
   subProductId,
+  productTitle,
 }: Props) {
   const { t } = useTranslation();
 
@@ -161,7 +166,7 @@ export function SubProductStepOnBoardingStatus({
       ((onboardingProductStatus as AxiosError<any>).response?.status === 404 ||
         (onboardingProductStatus as AxiosError<any>).response?.status === 400)
     ) {
-      setOutcome(notBasicProduct);
+      setOutcome(buildNotBasicProduct(productTitle, productId));
       return false;
     } else {
       return true;

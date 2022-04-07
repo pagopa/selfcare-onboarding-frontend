@@ -19,7 +19,7 @@ import {
 import { fetchWithLogs } from '../lib/api-utils';
 import { getFetchOutcome } from '../lib/error-utils';
 import { OnboardingStep0 } from '../components/OnboardingStep0';
-import { OnboardingStep1 } from '../components/OnboardingStep1';
+import { StepSearchParty } from '../components/steps/StepSearchParty';
 import { OnboardingStep2 } from '../components/OnboardingStep2';
 import { OnboardingStep3 } from '../components/OnboardingStep3';
 import { LoadingOverlay } from '../components/LoadingOverlay';
@@ -178,11 +178,21 @@ function OnboardingComponent({ productId }: { productId: string }) {
     {
       label: t('onboarding.steps.selectPartyLabel'),
       Component: () =>
-        OnboardingStep1({
-          product: selectedProduct,
-          forward: forwardWithDataAndInstitutionId,
-          back,
-        }),
+        StepSearchParty(
+          t('onboardingStep1.onboarding.bodyDescription', { productTitle: `${selectedProduct}` }),
+          /*
+          <Trans i18nKey="onboardingStep1.onboarding.bodyDescription">
+            Seleziona dall&apos;Indice della Pubblica Amministrazione (IPA) l&apos;ente
+            <br />
+            per cui vuoi richiedere l&apos; adesione a {{ productTitle: `${selectedProduct}` }}
+          </Trans>,
+          */
+          {
+            product: selectedProduct,
+            forward: forwardWithDataAndInstitutionId,
+            back,
+          }
+        ),
     },
     {
       label: t('onboarding.steps.verifyPartyLabel'),
