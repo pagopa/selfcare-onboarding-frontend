@@ -14,7 +14,7 @@ import {
   UserOnCreate,
 } from '../../../../types';
 import { HeaderContext, UserContext } from '../../../lib/context';
-import { unregisterUnloadEvent } from '../../Onboarding';
+import { unregisterUnloadEvent } from '../../onboarding/Onboarding';
 import { fetchWithLogs } from '../../../lib/api-utils';
 import { getFetchOutcome } from '../../../lib/error-utils';
 import { MessageNoAction } from '../../../components/MessageNoAction';

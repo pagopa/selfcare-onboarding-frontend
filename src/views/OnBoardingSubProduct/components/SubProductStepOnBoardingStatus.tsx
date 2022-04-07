@@ -7,7 +7,7 @@ import { RequestOutcomeMessage, StepperStepComponentProps } from '../../../../ty
 import { MessageNoAction } from '../../../components/MessageNoAction';
 import { HeaderContext, UserContext } from '../../../lib/context';
 import { ENV } from '../../../utils/env';
-import { unregisterUnloadEvent } from '../../Onboarding';
+import { unregisterUnloadEvent } from '../../onboarding/Onboarding';
 import { LoadingOverlay } from '../../../components/LoadingOverlay';
 import { fetchWithLogs } from '../../../lib/api-utils';
 import { getFetchOutcome } from '../../../lib/error-utils';

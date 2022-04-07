@@ -18,7 +18,7 @@ import {
 import { LoadingOverlay } from '../../components/LoadingOverlay';
 import { ENV } from '../../utils/env';
 import { HeaderContext } from '../../lib/context';
-import { registerUnloadEvent, unregisterUnloadEvent } from '../Onboarding';
+import { registerUnloadEvent, unregisterUnloadEvent } from '../onboarding/Onboarding';
 import { OnboardingStep2 } from '../../components/OnboardingStep2';
 import { OnboardingStep1 } from '../../components/OnboardingStep1';
 import StepOnboardingData from '../../components/steps/StepOnboardingData';

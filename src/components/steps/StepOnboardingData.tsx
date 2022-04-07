@@ -6,7 +6,7 @@ import { OnboardingDto, RequestOutcomeMessage, StepperStepComponentProps } from 
 import { MessageNoAction } from '../MessageNoAction';
 import { HeaderContext, UserContext } from '../../lib/context';
 import { ENV } from '../../utils/env';
-import { unregisterUnloadEvent } from '../../views/Onboarding';
+import { unregisterUnloadEvent } from '../../views/onboarding/Onboarding';
 import { LoadingOverlay } from '../LoadingOverlay';
 import { fetchWithLogs } from '../../lib/api-utils';
 import { getFetchOutcome } from '../../lib/error-utils';

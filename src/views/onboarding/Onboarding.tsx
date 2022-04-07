@@ -3,32 +3,34 @@ import { useHistory } from 'react-router-dom';
 import { Button, Container, Stack, Typography, Grid, useTheme } from '@mui/material';
 import { AxiosError, AxiosResponse } from 'axios';
 import SessionModal from '@pagopa/selfcare-common-frontend/components/SessionModal';
-// import ErrorIcon from '@pagopa/selfcare-common-frontend/components/icons/ErrorIcon';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
 import { useTranslation, Trans } from 'react-i18next';
 import { uniqueId } from 'lodash';
-import { ReactComponent as ErrorIcon } from '../assets/payment_completed_error.svg';
-import { withLogin } from '../components/withLogin';
+import { ReactComponent as ErrorIcon } from '../../assets/payment_completed_error.svg';
+import { withLogin } from '../../components/withLogin';
 import {
+  BillingData,
+  OrganizationType,
   Product,
   RequestOutcome,
   RequestOutcomeOptions,
   StepperStep,
   UserOnCreate,
-} from '../../types';
-import { fetchWithLogs } from '../lib/api-utils';
-import { getFetchOutcome } from '../lib/error-utils';
-import { OnboardingStep0 } from '../components/OnboardingStep0';
-import { OnboardingStep1 } from '../components/OnboardingStep1';
-import { OnboardingStep2 } from '../components/OnboardingStep2';
-import { OnboardingStep3 } from '../components/OnboardingStep3';
-import { LoadingOverlay } from '../components/LoadingOverlay';
-import { MessageNoAction } from '../components/MessageNoAction';
-import { ReactComponent as CheckIllustration } from '../assets/check-illustration.svg';
-import { ENV } from '../utils/env';
-import { OnboardingStep1_5 } from '../components/OnboardingStep1_5';
-import { HeaderContext, UserContext } from '../lib/context';
-import NoProductPage from './NoProductPage';
+} from '../../../types';
+import { fetchWithLogs } from '../../lib/api-utils';
+import { getFetchOutcome } from '../../lib/error-utils';
+import { OnboardingStep1 } from '../../components/OnboardingStep1';
+import { OnboardingStep2 } from '../../components/OnboardingStep2';
+import { LoadingOverlay } from '../../components/LoadingOverlay';
+import { MessageNoAction } from '../../components/MessageNoAction';
+import { ReactComponent as CheckIllustration } from '../../assets/check-illustration.svg';
+import { ENV } from '../../utils/env';
+import { OnboardingStep1_5 } from '../../components/OnboardingStep1_5';
+import { HeaderContext, UserContext } from '../../lib/context';
+import NoProductPage from '../NoProductPage';
+import StepOnboardingData from '../../components/steps/StepOnboardingData';
+import StepBillingData from '../../components/steps/StepBillingData';
+import { OnBoardingProductStepDelegates } from './components/OnBoardingProductStepDelegates';
 
 export const unregisterUnloadEvent = (
   setOnLogout: React.Dispatch<React.SetStateAction<(() => void) | null | undefined>>
@@ -59,7 +61,7 @@ const keepOnPage = (e: BeforeUnloadEvent) => {
 // eslint-disable-next-line sonarjs/cognitive-complexity
 function OnboardingComponent({ productId }: { productId: string }) {
   const [loading, setLoading] = useState(true);
-  const [activeStep, setActiveStep] = useState(1);
+  const [activeStep, setActiveStep] = useState(0);
   const [formData, setFormData] = useState<Partial<FormData>>();
   const [institutionId, setInstitutionId] = useState<string>('');
   const [outcome, setOutcome] = useState<RequestOutcome>();
@@ -67,6 +69,8 @@ function OnboardingComponent({ productId }: { productId: string }) {
   const [openExitModal, setOpenExitModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>();
   const [openExitUrl, setOpenExitUrl] = useState(ENV.URL_FE.LOGOUT);
+  const [billingData, setBillingData] = useState<BillingData>();
+  const [organizationType, setOrganizationType] = useState<OrganizationType>();
   const { setOnLogout } = useContext(HeaderContext);
   const { setRequiredLogin } = useContext(UserContext);
   const requestIdRef = useRef<string>();
@@ -169,12 +173,16 @@ function OnboardingComponent({ productId }: { productId: string }) {
     }
   };
 
-  const steps: Array<StepperStep> = [
-    {
-      label: t('onboarding.steps.privacyLabel'),
-      Component: () => OnboardingStep0({ product: selectedProduct, forward }),
-    },
+  const forwardWithOnboardingData = (
+    billingData?: BillingData,
+    organizationType?: OrganizationType
+  ) => {
+    setBillingData(billingData);
+    setOrganizationType(organizationType);
+    forward();
+  };
 
+  const steps: Array<StepperStep> = [
     {
       label: t('onboarding.steps.selectPartyLabel'),
       Component: () =>
@@ -190,6 +198,49 @@ function OnboardingComponent({ productId }: { productId: string }) {
         OnboardingStep1_5({ product: selectedProduct, forward, institutionId, productId }),
     },
     {
+      label: 'Get Onboarding Data',
+      Component: () =>
+        StepOnboardingData({
+          institutionId,
+          productId,
+          forward: forwardWithOnboardingData,
+        }),
+    },
+    // TODO insert StepOrganizationType
+    {
+      label: 'Insert Billing Data',
+      Component: () =>
+        StepBillingData({
+          institutionId,
+          initialFormData: billingData ?? {
+            businessName: '',
+            registeredOffice: '',
+            mailPEC: '',
+            taxCode: '',
+            vatNumber: '',
+            recipientCode: '',
+            publicServices: organizationType === 'GSP' ? false : undefined,
+          },
+          organizationType: organizationType as OrganizationType,
+          subtitle: t('onBoardingSubProduct.billingData.subTitle'),
+          forward: () => {
+            trackEvent('ONBOARDING_DATI_FATTURAZIONE', {
+              party_id: institutionId,
+              request_id: requestIdRef.current,
+            });
+            forward();
+          },
+          back: () => {
+            if (window.location.search.indexOf(`institutionId=${institutionId}`) > -1) {
+              setOpenExitUrl(`${ENV.URL_FE.DASHBOARD}/${institutionId}`);
+              setOpenExitModal(true);
+            } else {
+              setActiveStep(0);
+            }
+          },
+        }),
+    },
+    {
       label: t('onboarding.steps.insertlegalLabel'),
       Component: () =>
         OnboardingStep2({
@@ -201,20 +252,13 @@ function OnboardingComponent({ productId }: { productId: string }) {
             });
             forwardWithData(newFormData);
           },
-          back: () => {
-            if (window.location.search.indexOf(`institutionId=${institutionId}`) > -1) {
-              setOpenExitUrl(`${ENV.URL_FE.DASHBOARD}/${institutionId}`);
-              setOpenExitModal(true);
-            } else {
-              setActiveStep(activeStep - 2);
-            }
-          },
+          back,
         }),
     },
     {
       label: t('onboarding.steps.insertAdministratorLabel'),
       Component: () =>
-        OnboardingStep3({
+        OnBoardingProductStepDelegates({
           product: selectedProduct,
           legal: (formData as any).users[0],
           forward: (newFormData: Partial<FormData>) => {
