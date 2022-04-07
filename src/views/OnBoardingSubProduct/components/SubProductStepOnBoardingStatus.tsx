@@ -3,6 +3,8 @@ import { AxiosError } from 'axios';
 import { useContext, useEffect, useState } from 'react';
 import { resolvePathVariables } from '@pagopa/selfcare-common-frontend/utils/routes-utils';
 import { useTranslation, Trans } from 'react-i18next';
+import { useHistory } from 'react-router-dom';
+import { History } from 'history';
 import { RequestOutcomeMessage, StepperStepComponentProps } from '../../../../types';
 import { MessageNoAction } from '../../../components/MessageNoAction';
 import { HeaderContext, UserContext } from '../../../lib/context';
@@ -60,7 +62,11 @@ const alreadyOnboarded: RequestOutcomeMessage = {
   ],
 };
 
-const buildNotBasicProduct = (productTitle: string, productId: string): RequestOutcomeMessage => ({
+const buildNotBasicProduct = (
+  productTitle: string,
+  productId: string,
+  history: History
+): RequestOutcomeMessage => ({
   ImgComponent: ErrorIcon,
   title: '',
   description: [
@@ -89,7 +95,9 @@ const buildNotBasicProduct = (productTitle: string, productId: string): RequestO
           <Button
             variant="contained"
             sx={{ alignSelf: 'center' }}
-            onClick={() => resolvePathVariables(ROUTES.ONBOARDING.PATH, { productId })}
+            onClick={() =>
+              history.push(resolvePathVariables(ROUTES.ONBOARDING.PATH, { productId }))
+            }
           >
             <Trans i18nKey="onBoardingSubProduct.notBasicProductError.adhesionButton">
               Aderisci
@@ -153,6 +161,7 @@ export function SubProductStepOnBoardingStatus({
   const [outcome, setOutcome] = useState<RequestOutcomeMessage | null>();
   const { setOnLogout } = useContext(HeaderContext);
   const { setRequiredLogin } = useContext(UserContext);
+  const history = useHistory();
 
   const checkProduct = async (): Promise<boolean> => {
     const onboardingProductStatus = await fetchWithLogs(
@@ -166,7 +175,7 @@ export function SubProductStepOnBoardingStatus({
       ((onboardingProductStatus as AxiosError<any>).response?.status === 404 ||
         (onboardingProductStatus as AxiosError<any>).response?.status === 400)
     ) {
-      setOutcome(buildNotBasicProduct(productTitle, productId));
+      setOutcome(buildNotBasicProduct(productTitle, productId, history));
       return false;
     } else {
       return true;

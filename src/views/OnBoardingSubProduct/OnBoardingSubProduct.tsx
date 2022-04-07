@@ -144,6 +144,7 @@ function OnBoardingSubProduct() {
           product: subProduct,
           forward: (_: any, institutionId: string) =>
             forwardWithInstitutionId(institutionId, false),
+          back,
         }),
     },
     {

@@ -37,7 +37,7 @@ const handleSearchInstitutionId = async (
   return null;
 };
 
-export function StepSearchParty({ subTitle, parties, forward, back }: Props) {
+export function StepSearchParty({ parties, subTitle, forward, back }: Props) {
   const institutionIdByQuery = new URLSearchParams(window.location.search).get('institutionId');
   const { setRequiredLogin } = useContext(UserContext);
   const theme = useTheme();
@@ -170,15 +170,12 @@ export function StepSearchParty({ subTitle, parties, forward, back }: Props) {
 
       <Grid item mt={4}>
         <OnboardingStepActions
-          {...(parties && parties.length > 0 ? (
-            <>
-              {{
-                action: back,
-                label: t('onboardingStep1.onboarding.onboardingStepActions.backAction'),
-                disabled: false,
-              }}
-            </>
-          ) : null)}
+          parties={parties}
+          back={{
+            action: back,
+            label: t('onboardingStep1.onboarding.onboardingStepActions.backAction'),
+            disabled: false,
+          }}
           forward={{
             action: onForwardAction,
             label: t('onboardingStep1.onboarding.onboardingStepActions.confirmAction'),
