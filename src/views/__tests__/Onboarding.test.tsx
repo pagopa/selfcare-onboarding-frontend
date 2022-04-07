@@ -221,7 +221,6 @@ const executeStepBillingData = async () => {
   console.log('Testing step Billing Data');
   await waitFor(() => screen.getByText(stepBillingDataTitle));
 
-  screen.debug(document, 100000);
   await checkBackForwardNavigation(step1Title, stepBillingDataTitle);
   await fillTextFieldBillingData(
     'businessName',
