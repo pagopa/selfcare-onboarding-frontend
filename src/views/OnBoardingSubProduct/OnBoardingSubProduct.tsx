@@ -18,11 +18,11 @@ import {
 import { LoadingOverlay } from '../../components/LoadingOverlay';
 import { ENV } from '../../utils/env';
 import { HeaderContext } from '../../lib/context';
-import { registerUnloadEvent, unregisterUnloadEvent } from '../onboarding/Onboarding';
 import { OnboardingStep2 } from '../../components/OnboardingStep2';
 import { OnboardingStep1 } from '../../components/OnboardingStep1';
 import StepOnboardingData from '../../components/steps/StepOnboardingData';
 import StepBillingData from '../../components/steps/StepBillingData';
+import { registerUnloadEvent, unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
 import SubProductStepVerifyInputs from './components/SubProductStepVerifyInputs';
 import SubProductStepSubmit from './components/SubProductStepSubmit';
 import SubProductStepSuccess from './components/SubProductStepSuccess';

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext, useRef } from 'react';
+import { useEffect, useState, useContext, useRef } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Button, Container, Stack, Typography, Grid, useTheme } from '@mui/material';
 import { AxiosError, AxiosResponse } from 'axios';
@@ -30,33 +30,8 @@ import { HeaderContext, UserContext } from '../../lib/context';
 import NoProductPage from '../NoProductPage';
 import StepOnboardingData from '../../components/steps/StepOnboardingData';
 import StepBillingData from '../../components/steps/StepBillingData';
+import { registerUnloadEvent, unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
 import { OnBoardingProductStepDelegates } from './components/OnBoardingProductStepDelegates';
-
-export const unregisterUnloadEvent = (
-  setOnLogout: React.Dispatch<React.SetStateAction<(() => void) | null | undefined>>
-) => {
-  window.removeEventListener('beforeunload', keepOnPage);
-  setOnLogout(undefined);
-};
-
-export const registerUnloadEvent = (
-  setOnLogout: React.Dispatch<React.SetStateAction<(() => void) | null | undefined>>,
-  setOpenExitModal: React.Dispatch<React.SetStateAction<boolean>>
-) => {
-  window.addEventListener('beforeunload', keepOnPage);
-  // react dispatch consider a function input as a metod to be called with the previuos state to caluclate the next state: those we are defining a function that return the next function
-  setOnLogout(() => () => setOpenExitModal(true));
-};
-
-const keepOnPage = (e: BeforeUnloadEvent) => {
-  const message =
-    "Warning!\n\nNavigating away from this page will delete your text if you haven't already saved it.";
-
-  e.preventDefault();
-  // eslint-disable-next-line functional/immutable-data
-  e.returnValue = message;
-  return message;
-};
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
 function OnboardingComponent({ productId }: { productId: string }) {

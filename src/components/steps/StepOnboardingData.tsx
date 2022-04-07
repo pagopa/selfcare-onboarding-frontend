@@ -6,11 +6,11 @@ import { OnboardingDto, RequestOutcomeMessage, StepperStepComponentProps } from 
 import { MessageNoAction } from '../MessageNoAction';
 import { HeaderContext, UserContext } from '../../lib/context';
 import { ENV } from '../../utils/env';
-import { unregisterUnloadEvent } from '../../views/onboarding/Onboarding';
 import { LoadingOverlay } from '../LoadingOverlay';
 import { fetchWithLogs } from '../../lib/api-utils';
 import { getFetchOutcome } from '../../lib/error-utils';
 import { ReactComponent as ErrorIcon } from '../../assets/payment_completed_error.svg';
+import { unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
 
 type Props = StepperStepComponentProps & {
   institutionId: string;
