@@ -159,7 +159,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
 
   const steps: Array<StepperStep> = [
     {
-      label: t('onboarding.steps.selectPartyLabel'),
+      label: "Seleziona l'ente",
       Component: () =>
         OnboardingStep1({
           product: selectedProduct,
@@ -168,7 +168,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
         }),
     },
     {
-      label: t('onboarding.steps.verifyPartyLabel'),
+      label: 'Verifica ente',
       Component: () =>
         OnboardingStep1_5({ product: selectedProduct, forward, institutionId, productId }),
     },
@@ -216,7 +216,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
         }),
     },
     {
-      label: t('onboarding.steps.insertlegalLabel'),
+      label: 'Inserisci i dati del rappresentante legale',
       Component: () =>
         OnboardingStep2({
           product: selectedProduct,
@@ -231,7 +231,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
         }),
     },
     {
-      label: t('onboarding.steps.insertAdministratorLabel'),
+      label: 'Inserisci i dati degli amministratori',
       Component: () =>
         OnBoardingProductStepDelegates({
           product: selectedProduct,
