@@ -138,7 +138,9 @@ function OnBoardingSubProduct() {
     {
       label: 'Select Institution unreleated',
       Component: () =>
-        StepSearchParty(t('onBoardingSubProduct.selectUserPartyStep.subTitle'), {
+        StepSearchParty({
+          parties,
+          subTitle: t('onBoardingSubProduct.selectUserPartyStep.subTitle'),
           product: subProduct,
           forward: (_: any, institutionId: string) =>
             forwardWithInstitutionId(institutionId, false),

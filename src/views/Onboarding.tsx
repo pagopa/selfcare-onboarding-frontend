@@ -178,21 +178,18 @@ function OnboardingComponent({ productId }: { productId: string }) {
     {
       label: t('onboarding.steps.selectPartyLabel'),
       Component: () =>
-        StepSearchParty(
-          t('onboardingStep1.onboarding.bodyDescription', { productTitle: `${selectedProduct}` }),
-          /*
-          <Trans i18nKey="onboardingStep1.onboarding.bodyDescription">
-            Seleziona dall&apos;Indice della Pubblica Amministrazione (IPA) l&apos;ente
-            <br />
-            per cui vuoi richiedere l&apos; adesione a {{ productTitle: `${selectedProduct}` }}
-          </Trans>,
-          */
-          {
-            product: selectedProduct,
-            forward: forwardWithDataAndInstitutionId,
-            back,
-          }
-        ),
+        StepSearchParty({
+          subTitle: (
+            <Trans i18nKey="onboardingStep1.onboarding.bodyDescription">
+              Seleziona dall&apos;Indice della Pubblica Amministrazione (IPA) l&apos;ente
+              <br />
+              per cui vuoi richiedere l&apos; adesione a {{ productTitle: selectedProduct?.title }}
+            </Trans>
+          ),
+          product: selectedProduct,
+          forward: forwardWithDataAndInstitutionId,
+          back,
+        }),
     },
     {
       label: t('onboarding.steps.verifyPartyLabel'),

@@ -3,6 +3,7 @@ import { Box } from '@mui/system';
 import { useContext, useEffect, useState } from 'react';
 import { AxiosResponse } from 'axios';
 import { useTranslation, Trans } from 'react-i18next';
+import { ReactElement } from 'react';
 import { IPACatalogParty, Party, StepperStepComponentProps } from '../../../types';
 import { getFetchOutcome } from '../../lib/error-utils';
 import { fetchWithLogs } from '../../lib/api-utils';
@@ -13,9 +14,9 @@ import { LoadingOverlay } from '../LoadingOverlay';
 import { AsyncAutocompleteV2 } from '../autocomplete/AsyncAutocompleteV2';
 
 type Props = {
-  subTitle: string;
-  parties: Array<Party>;
-};
+  subTitle: string | ReactElement;
+  parties?: Array<Party>;
+} & StepperStepComponentProps;
 
 const handleSearchInstitutionId = async (
   institutionId: string,
@@ -36,10 +37,7 @@ const handleSearchInstitutionId = async (
   return null;
 };
 
-export function StepSearchParty(
-  { subTitle, parties }: Props,
-  { forward, back }: StepperStepComponentProps
-) {
+export function StepSearchParty({ subTitle, parties, forward, back }: Props) {
   const institutionIdByQuery = new URLSearchParams(window.location.search).get('institutionId');
   const { setRequiredLogin } = useContext(UserContext);
   const theme = useTheme();
@@ -172,7 +170,7 @@ export function StepSearchParty(
 
       <Grid item mt={4}>
         <OnboardingStepActions
-          {...(parties?.length > 0 ? (
+          {...(parties && parties.length > 0 ? (
             <>
               {{
                 action: back,
