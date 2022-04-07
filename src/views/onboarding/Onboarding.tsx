@@ -117,12 +117,12 @@ function OnboardingComponent({ productId }: { productId: string }) {
     });
   };
 
-  const forwardWithBillingData = () => {
+  const forwardWithBillingData = (newBillingData: BillingData) => {
     trackEvent('ONBOARDING_DATI_FATTURAZIONE', {
       party_id: institutionId,
       request_id: requestIdRef.current,
     });
-    setBillingData(billingData);
+    setBillingData(newBillingData);
     forward();
   };
 
@@ -131,7 +131,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
 
     const postLegalsResponse = await fetchWithLogs(
       { endpoint: 'ONBOARDING_POST_LEGALS', endpointParams: { institutionId, productId } },
-      { method: 'POST', data: users },
+      { method: 'POST', data: { users, billingData, organizationType } },
       () => setRequiredLogin(true)
     );
 
