@@ -89,6 +89,15 @@ function OnBoardingSubProduct() {
     forward(parties.length === 0 ? 2 : 1);
   };
 
+  const forwardWithBillingData = () => {
+    trackEvent('ONBOARDING_DATI_FATTURAZIONE', {
+      party_id: institutionId,
+      request_id: requestIdRef.current,
+    });
+    setBillingData(billingData);
+    forward();
+  };
+
   const forwardWithInstitutionId = (institutionId: string, isUserParty: boolean) => {
     setInstitutionId(institutionId);
     trackEvent('ONBOARDING_SELEZIONE_ENTE', {
@@ -184,13 +193,7 @@ function OnBoardingSubProduct() {
           },
           organizationType: organizationType as OrganizationType,
           subtitle: t('onBoardingSubProduct.billingData.subTitle'),
-          forward: () => {
-            trackEvent('ONBOARDING_DATI_FATTURAZIONE', {
-              party_id: institutionId,
-              request_id: requestIdRef.current,
-            });
-            forward();
-          },
+          forward: forwardWithBillingData,
           back: () => {
             if (window.location.search.indexOf(`institutionId=${institutionId}`) > -1) {
               setOpenExitUrl(`${ENV.URL_FE.DASHBOARD}/${institutionId}`);
