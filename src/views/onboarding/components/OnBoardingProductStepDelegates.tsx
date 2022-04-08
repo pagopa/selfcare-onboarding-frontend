@@ -12,12 +12,12 @@ import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 import { omit, uniqueId } from 'lodash';
 // import { Box } from '@mui/system';
 import { useTranslation } from 'react-i18next';
-import { objectIsEmpty } from '../lib/object-utils';
-import { StepperStepComponentProps, UserOnCreate } from '../../types';
-import { UserContext } from '../lib/context';
-import { OnboardingStepActions } from './OnboardingStepActions';
-import { PlatformUserForm, validateUser } from './PlatformUserForm';
-import { useHistoryState } from './useHistoryState';
+import { objectIsEmpty } from '../../../lib/object-utils';
+import { StepperStepComponentProps, UserOnCreate } from '../../../../types';
+import { UserContext } from '../../../lib/context';
+import { OnboardingStepActions } from '../../../components/OnboardingStepActions';
+import { PlatformUserForm, validateUser } from '../../../components/PlatformUserForm';
+import { useHistoryState } from '../../../components/useHistoryState';
 
 // Could be an ES6 Set but it's too bothersome for now
 export type UsersObject = { [key: string]: UserOnCreate };
@@ -26,7 +26,7 @@ type Props = StepperStepComponentProps & {
   legal: UserOnCreate;
 };
 
-export function OnboardingStep3({ product, legal, forward, back }: Props) {
+export function OnBoardingProductStepDelegates({ product, legal, forward, back }: Props) {
   const { user } = useContext(UserContext);
   const [isAuthUser, setIsAuthUser, setIsAuthUserHistory] = useHistoryState('isAuthUser', false);
   const [people, setPeople, setPeopleHistory] = useHistoryState<UsersObject>('people_step3', {});

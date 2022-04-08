@@ -9,8 +9,8 @@ import { ENV } from '../utils/env';
 import { getFetchOutcome } from '../lib/error-utils';
 import { HeaderContext, UserContext } from '../lib/context';
 import { ReactComponent as ErrorIcon } from '../assets/payment_completed_error.svg';
+import { unregisterUnloadEvent } from '../utils/unloadEvent-utils';
 import { LoadingOverlay } from './LoadingOverlay';
-import { unregisterUnloadEvent } from './../views/Onboarding';
 import { MessageNoAction } from './MessageNoAction';
 
 type Props = StepperStepComponentProps & {

@@ -3,10 +3,10 @@ import { useContext, useEffect, useState } from 'react';
 import { trackAppError } from '@pagopa/selfcare-common-frontend/services/analyticsService';
 import { Party, Product, StepperStepComponentProps } from '../../../../types';
 import { HeaderContext, UserContext } from '../../../lib/context';
-import { unregisterUnloadEvent } from '../../Onboarding';
 import { fetchWithLogs } from '../../../lib/api-utils';
 import { getFetchOutcome } from '../../../lib/error-utils';
 import NoProductPage from '../../NoProductPage';
+import { unregisterUnloadEvent } from '../../../utils/unloadEvent-utils';
 
 type Props = StepperStepComponentProps & {
   requestId: string;

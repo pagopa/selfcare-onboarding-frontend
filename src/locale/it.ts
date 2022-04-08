@@ -164,13 +164,6 @@ export default {
     description: 'Impossibile individuare il prodotto desiderato',
   },
   onboarding: {
-    steps: {
-      privacyLabel: 'Accetta privacy',
-      selectPartyLabel: "Seleziona l'ente",
-      verifyPartyLabel: 'Verifica ente',
-      insertlegalLabel: 'Inserisci i dati del rappresentante legale',
-      insertAdministratorLabel: 'Inserisci i dati degli amministratori',
-    },
     outcomeContent: {
       success: {
         title: 'La tua richiesta è stata inviata <1/> con successo',

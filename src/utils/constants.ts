@@ -1,5 +1,5 @@
 import { RoutesObject } from '../../types';
-import Onboarding from '../views/Onboarding';
+import Onboarding from '../views/onboarding/Onboarding';
 import RejectRegistration from '../views/RejectRegistration';
 import CompleteRegistrationComponent from '../views/CompleteRegistrationComponent';
 import NoProductPage from '../views/NoProductPage';

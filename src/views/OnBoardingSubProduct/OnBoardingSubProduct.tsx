@@ -18,11 +18,11 @@ import {
 import { LoadingOverlay } from '../../components/LoadingOverlay';
 import { ENV } from '../../utils/env';
 import { HeaderContext } from '../../lib/context';
-import { registerUnloadEvent, unregisterUnloadEvent } from '../Onboarding';
 import { OnboardingStep2 } from '../../components/OnboardingStep2';
 import { OnboardingStep1 } from '../../components/OnboardingStep1';
 import StepOnboardingData from '../../components/steps/StepOnboardingData';
 import StepBillingData from '../../components/steps/StepBillingData';
+import { registerUnloadEvent, unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
 import SubProductStepVerifyInputs from './components/SubProductStepVerifyInputs';
 import SubProductStepSubmit from './components/SubProductStepSubmit';
 import SubProductStepSuccess from './components/SubProductStepSuccess';
@@ -87,6 +87,15 @@ function OnBoardingSubProduct() {
     setSubProduct(subProduct);
     setParties(parties);
     forward(parties.length === 0 ? 2 : 1);
+  };
+
+  const forwardWithBillingData = () => {
+    trackEvent('ONBOARDING_DATI_FATTURAZIONE', {
+      party_id: institutionId,
+      request_id: requestIdRef.current,
+    });
+    setBillingData(billingData);
+    forward();
   };
 
   const forwardWithInstitutionId = (institutionId: string, isUserParty: boolean) => {
@@ -184,13 +193,7 @@ function OnBoardingSubProduct() {
           },
           organizationType: organizationType as OrganizationType,
           subtitle: t('onBoardingSubProduct.billingData.subTitle'),
-          forward: () => {
-            trackEvent('ONBOARDING_DATI_FATTURAZIONE', {
-              party_id: institutionId,
-              request_id: requestIdRef.current,
-            });
-            forward();
-          },
+          forward: forwardWithBillingData,
           back: () => {
             if (window.location.search.indexOf(`institutionId=${institutionId}`) > -1) {
               setOpenExitUrl(`${ENV.URL_FE.DASHBOARD}/${institutionId}`);
