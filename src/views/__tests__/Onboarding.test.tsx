@@ -222,19 +222,18 @@ const executeStepBillingData = async () => {
   await waitFor(() => screen.getByText(stepBillingDataTitle));
 
   await checkBackForwardNavigation(step1Title, stepBillingDataTitle);
-  await fillTextFieldBillingData(
+  await fillUserBillingDataForm(
     'businessName',
     'registeredOffice',
     'mailPEC',
     'taxCode',
     'recipientCode'
   );
-
   const confirmButtonEnabled = screen.getByRole('button', { name: 'Conferma' });
   await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
 
   fireEvent.click(confirmButtonEnabled);
-  await waitFor(() => screen.getByText(step3Title));
+  await waitFor(() => screen.getByText(step2Title));
 };
 
 const executeStep2 = async () => {
@@ -284,7 +283,7 @@ const executeStep3 = async (expectedSuccessfulSubmit: boolean) => {
   );
 };
 
-const fillTextFieldBillingData = async (
+const fillUserBillingDataForm = async (
   businessNameInput: string,
   registeredOfficeInput: string,
   mailPECInput: string,
@@ -297,7 +296,7 @@ const fillTextFieldBillingData = async (
   fireEvent.change(document.getElementById(registeredOfficeInput), {
     target: { value: 'registeredOfficeInput' },
   });
-  fireEvent.change(document.getElementById(mailPECInput), { target: { value: 'mailPECInput' } });
+  fireEvent.change(document.getElementById(mailPECInput), { target: { value: 'a@a.it' } });
   fireEvent.change(document.getElementById(taxCodeInput), { target: { value: 'taxCodeInput' } });
   fireEvent.change(document.getElementById(recipientCode), {
     target: { value: 'recipientCode' },
