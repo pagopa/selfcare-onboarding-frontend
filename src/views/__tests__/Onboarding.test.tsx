@@ -200,10 +200,10 @@ const executeStep1 = async (partyName: string) => {
 
   screen.getByText(step1Title);
   await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(1));
-  const inputPartyName = document.getElementById('Parties');
+  // const inputPartyName = document.getElementById('Parties');
 
-  expect(inputPartyName).toBeTruthy();
-  fireEvent.change(inputPartyName, { target: { value: 'XXX' } });
+  // expect(inputPartyName).toBeTruthy();
+  fireEvent.change(document.getElementById('Parties'), { target: { value: 'XXX' } });
 
   const partyNameSelection = await waitFor(() => screen.getByText(partyName));
   expect(fetchWithLogsSpy).toBeCalledTimes(2);
