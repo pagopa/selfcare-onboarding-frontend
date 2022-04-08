@@ -18,10 +18,11 @@ import {
 import { LoadingOverlay } from '../../components/LoadingOverlay';
 import { ENV } from '../../utils/env';
 import { HeaderContext } from '../../lib/context';
-import { registerUnloadEvent, unregisterUnloadEvent } from '../Onboarding';
 import { StepAddManager } from '../../components/steps/StepAddManager';
 import { StepSearchParty } from '../../components/steps/StepSearchParty';
 import StepOnboardingData from '../../components/steps/StepOnboardingData';
+import StepBillingData from '../../components/steps/StepBillingData';
+import { registerUnloadEvent, unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
 import SubProductStepVerifyInputs from './components/SubProductStepVerifyInputs';
 import SubProductStepSubmit from './components/SubProductStepSubmit';
 import SubProductStepSuccess from './components/SubProductStepSuccess';
@@ -71,6 +72,8 @@ function OnBoardingSubProduct() {
     requestIdRef.current = uniqueId(`onboarding-${institutionId}-${productId}-${subProductId}-`);
   }, [productId, subProductId]);
 
+  const chooseFromMyParties = useRef(true);
+
   const back = () => {
     setActiveStep(activeStep - 1);
   };
@@ -86,6 +89,15 @@ function OnBoardingSubProduct() {
     forward(parties.length === 0 ? 2 : 1);
   };
 
+  const forwardWithBillingData = () => {
+    trackEvent('ONBOARDING_DATI_FATTURAZIONE', {
+      party_id: institutionId,
+      request_id: requestIdRef.current,
+    });
+    setBillingData(billingData);
+    forward();
+  };
+
   const forwardWithInstitutionId = (institutionId: string, isUserParty: boolean) => {
     setInstitutionId(institutionId);
     trackEvent('ONBOARDING_SELEZIONE_ENTE', {
@@ -94,6 +106,8 @@ function OnBoardingSubProduct() {
       product_id: productId,
       subProduct_id: subProductId,
     });
+    // eslint-disable-next-line functional/immutable-data
+    chooseFromMyParties.current = isUserParty;
     forward(isUserParty ? 2 : 1);
   };
 
@@ -176,6 +190,34 @@ function OnBoardingSubProduct() {
         }),
     },
     {
+      label: 'Insert Billing Data',
+      Component: () =>
+        StepBillingData({
+          // product: subProduct,
+          institutionId,
+          initialFormData: billingData ?? {
+            businessName: '',
+            registeredOffice: '',
+            mailPEC: '',
+            taxCode: '',
+            vatNumber: '',
+            recipientCode: '',
+            publicServices: organizationType === 'GSP' ? false : undefined,
+          },
+          organizationType: organizationType as OrganizationType,
+          subtitle: t('onBoardingSubProduct.billingData.subTitle'),
+          forward: forwardWithBillingData,
+          back: () => {
+            if (window.location.search.indexOf(`institutionId=${institutionId}`) > -1) {
+              setOpenExitUrl(`${ENV.URL_FE.DASHBOARD}/${institutionId}`);
+              setOpenExitModal(true);
+            } else {
+              setActiveStep(chooseFromMyParties.current ? 1 : 2);
+            }
+          },
+        }),
+    },
+    {
       label: 'Insert Manager',
       Component: () =>
         StepAddManager({
@@ -198,6 +240,7 @@ function OnBoardingSubProduct() {
           },
         }),
     },
+
     // TODO Puts Step Here
     {
       label: 'Submit',

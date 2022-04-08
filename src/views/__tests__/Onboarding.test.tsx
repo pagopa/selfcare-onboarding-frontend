@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { User } from '../../../types';
 import { HeaderContext, UserContext } from '../../lib/context';
 import { ENV } from '../../utils/env';
-import Onboarding from '../Onboarding';
+import Onboarding from '../onboarding/Onboarding';
 import './../../locale';
 
 jest.mock('../../lib/api-utils');
@@ -43,7 +43,7 @@ jest.mock('react-router-dom', () => ({
   }),
 }));
 
-const renderComponent = (productId: string = 'prod-io') => {
+const renderComponent = (productId: string = 'prod-pagopa') => {
   const Component = () => {
     const [user, setUser] = useState<User | null>(null);
     const [subHeaderVisible, setSubHeaderVisible] = useState<boolean>(false);
@@ -67,6 +67,7 @@ const renderComponent = (productId: string = 'prod-io') => {
 };
 
 const step1Title = 'Seleziona il tuo ente';
+const stepBillingDataTitle = 'Indica i dati del tuo ente';
 const step2Title = 'Indica il Legale rappresentante';
 const step3Title = "Indica l'Amministratore";
 const completeSuccessTitle = 'La tua richiesta è stata inviata con successo';
@@ -96,6 +97,7 @@ test('test complete', async () => {
   jest.setTimeout(10000);
   renderComponent();
   await executeStep1('agency x');
+  await executeStepBillingData();
   await executeStep2();
   await executeStep3(true);
   await executeGoHome();
@@ -104,6 +106,7 @@ test('test complete', async () => {
 test('test complete with error on submit', async () => {
   renderComponent();
   await executeStep1('agency error');
+  await executeStepBillingData();
   await executeStep2();
   await executeStep3(false);
   await executeGoHome();
@@ -163,6 +166,7 @@ const retrieveNavigationButtons = () => {
 };
 
 const executeGoHome = async () => {
+  console.log('Go Home');
   const goHomeButton = screen.getByRole('button', {
     name: 'Chiudi',
   });
@@ -191,16 +195,15 @@ const checkBackForwardNavigation = async (
 
   return retrieveNavigationButtons();
 };
-
 const executeStep1 = async (partyName: string) => {
   console.log('Testing step 1');
 
   screen.getByText(step1Title);
   await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(1));
-  const inputPartyName = document.getElementById('Parties');
+  // const inputPartyName = document.getElementById('Parties');
 
-  expect(inputPartyName).toBeTruthy();
-  fireEvent.change(inputPartyName, { target: { value: 'XXX' } });
+  // expect(inputPartyName).toBeTruthy();
+  fireEvent.change(document.getElementById('Parties'), { target: { value: 'XXX' } });
 
   const partyNameSelection = await waitFor(() => screen.getByText(partyName));
   expect(fetchWithLogsSpy).toBeCalledTimes(2);
@@ -214,11 +217,30 @@ const executeStep1 = async (partyName: string) => {
   await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(3));
 };
 
+const executeStepBillingData = async () => {
+  console.log('Testing step Billing Data');
+  await waitFor(() => screen.getByText(stepBillingDataTitle));
+
+  await checkBackForwardNavigation(step1Title, stepBillingDataTitle);
+  await fillUserBillingDataForm(
+    'businessName',
+    'registeredOffice',
+    'mailPEC',
+    'taxCode',
+    'recipientCode'
+  );
+  const confirmButtonEnabled = screen.getByRole('button', { name: 'Conferma' });
+  await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
+
+  fireEvent.click(confirmButtonEnabled);
+  await waitFor(() => screen.getByText(step2Title));
+};
+
 const executeStep2 = async () => {
   console.log('Testing step 2');
   await waitFor(() => screen.getByText(step2Title));
 
-  const [_, confirmButton] = await checkBackForwardNavigation(step1Title, step2Title);
+  const [_, confirmButton] = await checkBackForwardNavigation(stepBillingDataTitle, step2Title);
 
   await fillUserForm(confirmButton, 'LEGAL', 'BBBBBB00B00B000B', 'b@b.bb');
 
@@ -259,6 +281,26 @@ const executeStep3 = async (expectedSuccessfulSubmit: boolean) => {
   await waitFor(() =>
     screen.getByText(expectedSuccessfulSubmit ? completeSuccessTitle : completeErrorTitle)
   );
+};
+
+const fillUserBillingDataForm = async (
+  businessNameInput: string,
+  registeredOfficeInput: string,
+  mailPECInput: string,
+  taxCodeInput: string,
+  recipientCode: string
+) => {
+  fireEvent.change(document.getElementById(businessNameInput), {
+    target: { value: 'businessNameInput' },
+  });
+  fireEvent.change(document.getElementById(registeredOfficeInput), {
+    target: { value: 'registeredOfficeInput' },
+  });
+  fireEvent.change(document.getElementById(mailPECInput), { target: { value: 'a@a.it' } });
+  fireEvent.change(document.getElementById(taxCodeInput), { target: { value: 'taxCodeInput' } });
+  fireEvent.change(document.getElementById(recipientCode), {
+    target: { value: 'recipientCode' },
+  });
 };
 
 const fillUserForm = async (

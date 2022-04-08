@@ -156,11 +156,20 @@ export type Party = {
 };
 
 export type BillingData = {
+  // Ragione sociale
   businessName: string;
+  // Sede legale
   registeredOffice: string;
-  pec: string;
-  fiscalCode: string;
-  receiverCode: string;
+  // Indirizzo PEC
+  mailPEC: string;
+  // Codice fiscale
+  taxCode: string;
+  // Partita iva
+  vatNumber: string;
+  // Codice destinatario
+  recipientCode: string;
+  // servizi pubblici
+  publicServices?: boolean;
 };
 
 export type OnboardingDto = {
@@ -169,4 +178,4 @@ export type OnboardingDto = {
   organizationType?: OrganizationType;
 };
 
-export type OrganizationType = 'pa' | 'gsp' | 'scp' | 'pt';
+export type OrganizationType = 'PA' | 'GSP' | 'SCP' | 'PT';

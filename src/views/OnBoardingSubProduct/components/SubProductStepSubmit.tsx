@@ -14,12 +14,12 @@ import {
   UserOnCreate,
 } from '../../../../types';
 import { HeaderContext, UserContext } from '../../../lib/context';
-import { unregisterUnloadEvent } from '../../Onboarding';
 import { fetchWithLogs } from '../../../lib/api-utils';
 import { getFetchOutcome } from '../../../lib/error-utils';
 import { MessageNoAction } from '../../../components/MessageNoAction';
 import { ENV } from '../../../utils/env';
 import { ReactComponent as ErrorIcon } from '../../../assets/payment_completed_error.svg';
+import { unregisterUnloadEvent } from '../../../utils/unloadEvent-utils';
 
 type Props = StepperStepComponentProps & {
   requestId: string;
