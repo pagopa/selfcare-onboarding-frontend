@@ -5,7 +5,7 @@ import SessionModal from '@pagopa/selfcare-common-frontend/components/SessionMod
 import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
 import { uniqueId } from 'lodash';
 import { useParams } from 'react-router';
-import { useTranslation } from 'react-i18next';
+import { useTranslation, Trans } from 'react-i18next';
 import { withLogin } from '../../components/withLogin';
 import {
   BillingData,
@@ -19,7 +19,7 @@ import { LoadingOverlay } from '../../components/LoadingOverlay';
 import { ENV } from '../../utils/env';
 import { HeaderContext } from '../../lib/context';
 import { registerUnloadEvent, unregisterUnloadEvent } from '../Onboarding';
-import { OnboardingStep2 } from '../../components/OnboardingStep2';
+import { StepAddManager } from '../../components/steps/StepAddManager';
 import { StepSearchParty } from '../../components/steps/StepSearchParty';
 import StepOnboardingData from '../../components/steps/StepOnboardingData';
 import SubProductStepVerifyInputs from './components/SubProductStepVerifyInputs';
@@ -140,7 +140,12 @@ function OnBoardingSubProduct() {
       Component: () =>
         StepSearchParty({
           parties,
-          subTitle: t('onBoardingSubProduct.selectUserPartyStep.subTitle'),
+          subTitle: (
+            <Trans i18nKey="onBoardingSubProduct.selectUserPartyStep.subTitle">
+              Seleziona l&apos;ente per il quale stai richiedendo la sottoscrizione <br />
+              all&apos;offerta Premium
+            </Trans>
+          ),
           product: subProduct,
           forward: (_: any, institutionId: string) =>
             forwardWithInstitutionId(institutionId, false),
@@ -156,6 +161,9 @@ function OnBoardingSubProduct() {
           productTitle: (product as Product).title,
           subProductId,
           forward,
+          back: () => {
+            setActiveStep(activeStep - 2);
+          },
         }),
     },
     {
@@ -170,7 +178,7 @@ function OnBoardingSubProduct() {
     {
       label: 'Insert Manager',
       Component: () =>
-        OnboardingStep2({
+        StepAddManager({
           product: subProduct,
           forward: () => {
             // TODO

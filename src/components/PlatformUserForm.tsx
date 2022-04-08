@@ -2,7 +2,7 @@ import { Grid, Paper, TextField, useTheme } from '@mui/material';
 import React from 'react';
 import { useTranslation, TFunction } from 'react-i18next';
 import { UserOnCreate, PartyRole } from '../../types';
-import { UsersObject } from './OnboardingStep2';
+import { UsersObject } from './steps/StepAddManager';
 
 type PlatformUserFormProps = {
   prefix: keyof UsersObject;

@@ -48,11 +48,7 @@ export function SubProductStepSelectUserParty({ forward, parties }: Props) {
   }, [selected]);
 
   return (
-    <Grid
-      container
-      //  mt={16}
-      direction="column"
-    >
+    <Grid container direction="column">
       <Grid container item justifyContent="center">
         <Grid item xs={12}>
           <Typography variant="h3" component="h2" align="center" color={theme.palette.text.primary}>
@@ -61,7 +57,7 @@ export function SubProductStepSelectUserParty({ forward, parties }: Props) {
         </Grid>
       </Grid>
 
-      <Grid container item justifyContent="center" mt={2}>
+      <Grid container item justifyContent="center" mt={1}>
         <Grid item xs={12}>
           <Typography
             variant="subtitle2"
@@ -69,12 +65,15 @@ export function SubProductStepSelectUserParty({ forward, parties }: Props) {
             align="center"
             color={theme.palette.text.primary}
           >
-            {t('onBoardingSubProduct.selectUserPartyStep.subTitle')}
+            <Trans i18nKey="onBoardingSubProduct.selectUserPartyStep.subTitle">
+              Seleziona l&apos;ente per il quale stai richiedendo la sottoscrizione <br />
+              all&apos;offerta Premium
+            </Trans>
           </Typography>
         </Grid>
       </Grid>
 
-      <Grid container item display="flex" textAlign="center" justifyContent="center" mt={7} mb={4}>
+      <Grid container item textAlign="center" justifyContent="center" mt={4} mb={3}>
         <Grid item xs={5}>
           {parties.map((p, index) => (
             <Box key={p.id}>
@@ -126,7 +125,7 @@ export function SubProductStepSelectUserParty({ forward, parties }: Props) {
         </Grid>
       </Grid>
 
-      <Grid item mt={4}>
+      <Grid item mt={3}>
         <OnboardingStepActions
           forward={{
             action: onForwardAction,

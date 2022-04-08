@@ -20,7 +20,7 @@ import { fetchWithLogs } from '../lib/api-utils';
 import { getFetchOutcome } from '../lib/error-utils';
 import { OnboardingStep0 } from '../components/OnboardingStep0';
 import { StepSearchParty } from '../components/steps/StepSearchParty';
-import { OnboardingStep2 } from '../components/OnboardingStep2';
+import { StepAddManager } from '../components/steps/StepAddManager';
 import { OnboardingStep3 } from '../components/OnboardingStep3';
 import { LoadingOverlay } from '../components/LoadingOverlay';
 import { MessageNoAction } from '../components/MessageNoAction';
@@ -199,7 +199,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
     {
       label: t('onboarding.steps.insertlegalLabel'),
       Component: () =>
-        OnboardingStep2({
+        StepAddManager({
           product: selectedProduct,
           forward: (newFormData: Partial<FormData>) => {
             trackEvent('ONBOARDING_LEGALE_RAPPRESENTANTE', {

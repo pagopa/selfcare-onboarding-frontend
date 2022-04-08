@@ -199,19 +199,19 @@ export default {
   onBoardingSubProduct: {
     alreadyOnboardedError: {
       title: 'Sottoscrizione già avvenuta',
-      message: "L'ente che hai selezionato ha già sottoscritto l'offerta Premium.",
+      message: "L'ente che hai selezionato ha già sottoscritto l'offerta <1 />Premium.",
       closeButton: 'Chiudi',
     },
     notBasicProductError: {
       title: "L'ente non ha aderito a {{selectedProduct}}",
       message:
-        "Per poter sottoscrivere l'offerta Premium, l'ente che hai selezionato deve prima aderire al prodotto {{selectedProduct}}",
+        "Per poter sottoscrivere l'offerta Premium, l'ente che hai <1 />selezionato deve prima aderire al prodotto {{selectedProduct}}",
       adhesionButton: 'Aderisci',
     },
     selectUserPartyStep: {
       title: "Seleziona l'ente",
       subTitle:
-        "Seleziona l'ente per il quale stai richiedendo la sottoscrizione all'offerta Premium",
+        "Seleziona l'ente per il quale stai richiedendo la sottoscrizione <1 />all'offerta Premium",
       helperLink: 'Non lo trovi? <1>Registra un nuovo ente</1>',
       confirmButton: 'Conferma',
     },
