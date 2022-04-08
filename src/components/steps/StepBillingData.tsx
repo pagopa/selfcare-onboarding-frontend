@@ -84,7 +84,7 @@ export default function StepBillingData({
         registeredOffice: !values.registeredOffice ? requiredError : undefined,
         taxCode: !values.taxCode ? requiredError : undefined,
         vatNumber:
-          !stepHistoryState.isTaxCodeEquals2PIVA && !values.vatNumber ? requiredError : undefined,
+          stepHistoryState.isTaxCodeEquals2PIVA && !values.vatNumber ? requiredError : undefined,
         mailPEC: !values.mailPEC
           ? requiredError
           : !mailPECRegexp.test(values.mailPEC)
@@ -185,6 +185,12 @@ export default function StepBillingData({
               />
             </Grid>
             <Grid item xs={12}>
+              <CustomTextField
+                {...baseTextFieldProps('taxCode', t('stepBillingData.taxCode'), 400, 18)}
+                disabled={ipa}
+              />
+            </Grid>
+            <Grid item xs={12}>
               <Typography>
                 <Checkbox
                   disabled={ipa}
@@ -199,13 +205,7 @@ export default function StepBillingData({
                 {t('stepBillingData.taxCodeEquals2PIVAdescription')}
               </Typography>
             </Grid>
-            <Grid item xs={12}>
-              <CustomTextField
-                {...baseTextFieldProps('taxCode', t('stepBillingData.taxCode'), 400, 18)}
-                disabled={ipa}
-              />
-            </Grid>
-            {!stepHistoryState.isTaxCodeEquals2PIVA && (
+            {stepHistoryState.isTaxCodeEquals2PIVA && (
               // formik.initialValues.taxCode !== formik.initialValues.vatNumber &&
               <Grid item xs={12}>
                 <CustomTextField

@@ -235,7 +235,7 @@ export default {
     businessName: 'Ragione sociale',
     registeredOffice: 'Sede legale',
     mailPEC: 'Indirizzo PEC',
-    taxCodeEquals2PIVAdescription: 'Il codice fiscale è uguale alla Partita IVA',
+    taxCodeEquals2PIVAdescription: 'La Partita IVA non coincide con il Codice fiscale',
     taxCode: 'Codice fiscale',
     vatNumber: 'Partita IVA',
     recipientCode: 'Codice destinatario',

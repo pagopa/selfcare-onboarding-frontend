@@ -227,6 +227,7 @@ const executeStepBillingData = async () => {
     'registeredOffice',
     'mailPEC',
     'taxCode',
+    'vatNumber',
     'recipientCode'
   );
   const confirmButtonEnabled = screen.getByRole('button', { name: 'Conferma' });
@@ -288,6 +289,7 @@ const fillUserBillingDataForm = async (
   registeredOfficeInput: string,
   mailPECInput: string,
   taxCodeInput: string,
+  vatNumber: string,
   recipientCode: string
 ) => {
   fireEvent.change(document.getElementById(businessNameInput), {
@@ -298,6 +300,8 @@ const fillUserBillingDataForm = async (
   });
   fireEvent.change(document.getElementById(mailPECInput), { target: { value: 'a@a.it' } });
   fireEvent.change(document.getElementById(taxCodeInput), { target: { value: 'taxCodeInput' } });
+  fireEvent.change(document.getElementById(taxCodeInput), { target: { value: 'taxCodeInput' } });
+  fireEvent.change(document.getElementById(vatNumber), { target: { value: 'vatNumber' } });
   fireEvent.change(document.getElementById(recipientCode), {
     target: { value: 'recipientCode' },
   });
