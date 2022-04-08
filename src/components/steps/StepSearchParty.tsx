@@ -23,7 +23,10 @@ const handleSearchInstitutionId = async (
   onRedirectToLogin: () => void
 ): Promise<IPACatalogParty | null> => {
   const searchResponse = await fetchWithLogs(
-    { endpoint: 'ONBOARDING_GET_PARTY', endpointParams: { institutionId } },
+    {
+      endpoint: 'ONBOARDING_GET_PARTY',
+      endpointParams: { institutionId },
+    },
     { method: 'GET' },
     onRedirectToLogin
   );
@@ -170,12 +173,15 @@ export function StepSearchParty({ parties, subTitle, forward, back }: Props) {
 
       <Grid item mt={4}>
         <OnboardingStepActions
-          parties={parties}
-          back={{
-            action: back,
-            label: t('onboardingStep1.onboarding.onboardingStepActions.backAction'),
-            disabled: false,
-          }}
+          back={
+            parties && parties.length > 0
+              ? {
+                  action: back,
+                  label: t('onboardingStep1.onboarding.onboardingStepActions.backAction'),
+                  disabled: false,
+                }
+              : undefined
+          }
           forward={{
             action: onForwardAction,
             label: t('onboardingStep1.onboarding.onboardingStepActions.confirmAction'),

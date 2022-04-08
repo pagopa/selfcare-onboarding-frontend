@@ -67,7 +67,13 @@ function StepOnboardingData({ forward, institutionId, productId }: Props) {
     setLoading(true);
 
     const onboardingData = await fetchWithLogs(
-      { endpoint: 'ONBOARDING_GET_ONBOARDING_DATA', endpointParams: { institutionId, productId } },
+      {
+        endpoint: 'ONBOARDING_GET_ONBOARDING_DATA',
+        endpointParams: {
+          institutionId,
+          productId,
+        },
+      },
       { method: 'GET' },
       () => setRequiredLogin(true)
     );

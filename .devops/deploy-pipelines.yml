@@ -171,6 +171,7 @@ stages:
               REACT_APP_URL_API_PARTY_REGISTRY_PROXY: '$(react_app_url_api_party_registry_proxy)'
               REACT_APP_ENABLE_ASSISTANCE: '$(react_app_enable_assistance)'
               REACT_APP_PAGOPA_HELP_EMAIL: '$(react_app_pagopa_help_email)'
+              REACT_APP_URL_INSTITUTION_LOGO_PREFIX: '$(react_app_url_storage)/institutions/'
               REACT_APP_ANALYTICS_ENABLE: '$(react_app_analytics_enabled)'
               REACT_APP_ANALYTICS_MOCK: '$(react_app_analytics_mocked)'
               REACT_APP_MIXPANEL_TOKEN: '$(react_app_mixpanel_token)'

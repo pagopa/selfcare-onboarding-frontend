@@ -2,6 +2,7 @@ import { Card, Grid, Link, Typography, useTheme } from '@mui/material';
 import { Box } from '@mui/system';
 import { useEffect } from 'react';
 import { useTranslation, Trans } from 'react-i18next';
+import { EntityAccountItem } from '@pagopa/mui-italia/dist/components/EntityAccountItem';
 import { Party, StepperStepComponentProps } from '../../../../types';
 import { OnboardingStepActions } from '../../../components/OnboardingStepActions';
 import { useHistoryState } from '../../../components/useHistoryState';
@@ -24,14 +25,14 @@ export function SubProductStepSelectUserParty({ forward, parties }: Props) {
   const onForwardAction = () => {
     setSelectedHistory(selected);
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const { id } = selected!;
-    forward(id);
+    const { institutionId } = selected!;
+    forward(institutionId);
   };
   const bodyTitle = t('onBoardingSubProduct.selectUserPartyStep.title');
 
   useEffect(() => {
     if (institutionIdByQuery) {
-      const selectedParty = parties.find((p) => p.id === institutionIdByQuery);
+      const selectedParty = parties.find((p) => p.institutionId === institutionIdByQuery);
       if (selectedParty) {
         setSelected(selectedParty);
       } else {
@@ -74,9 +75,9 @@ export function SubProductStepSelectUserParty({ forward, parties }: Props) {
       </Grid>
 
       <Grid container item textAlign="center" justifyContent="center" mt={4} mb={3}>
-        <Grid item xs={5}>
+        <Grid item>
           {parties.map((p, index) => (
-            <Box key={p.id}>
+            <Box key={p.institutionId}>
               <Card
                 onClick={() => setSelected(p)}
                 sx={{
@@ -85,12 +86,22 @@ export function SubProductStepSelectUserParty({ forward, parties }: Props) {
                   width: '480px',
                   fontWeight: 700,
                   fontSize: '18px',
+                  boxShadow:
+                    '0px 8px 10px -5px rgba(0, 43, 85, 0.1), 0px 16px 24px 2px rgba(0, 43, 85, 0.05), 0px 6px 30px 5px rgba(0, 43, 85, 0.1)',
+                  borderRadius: '16px',
                   height: '113px',
                   top: '144px',
                   left: '480px',
                 }}
               >
-                {p.name}
+                <Grid mb={3} mt={4} ml={4}>
+                  <EntityAccountItem
+                    entityName={p.description}
+                    entityRole=""
+                    image={p.urlLogo}
+                    noWrap={false}
+                  />
+                </Grid>
               </Card>
               {index !== parties.length - 1 && <br />}
             </Box>

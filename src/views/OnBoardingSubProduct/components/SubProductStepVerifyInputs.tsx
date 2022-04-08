@@ -7,6 +7,7 @@ import { fetchWithLogs } from '../../../lib/api-utils';
 import { getFetchOutcome } from '../../../lib/error-utils';
 import NoProductPage from '../../NoProductPage';
 import { unregisterUnloadEvent } from '../../../utils/unloadEvent-utils';
+import { ENV } from '../../../utils/env';
 
 type Props = StepperStepComponentProps & {
   requestId: string;
@@ -38,6 +39,9 @@ const checkProduct = async (
   }
 };
 
+const buildUrlLog = (institutionId: string) =>
+  `${ENV.URL_INSTITUTION_LOGO.PREFIX}${institutionId}${ENV.URL_INSTITUTION_LOGO.SUFFIX}`;
+
 const handleSearchUserParties = async (
   setParties: (parties: Array<Party>) => void,
   setRequiredLogin: (required: boolean) => void
@@ -50,7 +54,12 @@ const handleSearchUserParties = async (
   const outcome = getFetchOutcome(searchResponse);
 
   if (outcome === 'success') {
-    setParties((searchResponse as AxiosResponse).data as Array<Party>);
+    setParties(
+      ((searchResponse as AxiosResponse).data as Array<Party>).map((p) => ({
+        ...p,
+        urlLogo: buildUrlLog(p.institutionId),
+      }))
+    );
   }
   setParties([]);
 };

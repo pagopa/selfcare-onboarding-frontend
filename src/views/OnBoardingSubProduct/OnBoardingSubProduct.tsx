@@ -223,7 +223,6 @@ function OnBoardingSubProduct() {
         StepAddManager({
           product: subProduct,
           forward: () => {
-            // TODO
             trackEvent('ONBOARDING_LEGALE_RAPPRESENTANTE', {
               party_id: institutionId,
               request_id: requestIdRef.current,
@@ -235,7 +234,7 @@ function OnBoardingSubProduct() {
               setOpenExitUrl(`${ENV.URL_FE.DASHBOARD}/${institutionId}`);
               setOpenExitModal(true);
             } else {
-              setActiveStep(activeStep - 4);
+              setActiveStep(activeStep - 1);
             }
           },
         }),
