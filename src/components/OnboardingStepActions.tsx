@@ -1,4 +1,5 @@
 import { Button, Grid } from '@mui/material';
+import { Party } from '../../types';
 
 type ActionStep = {
   action?: () => void;
@@ -9,12 +10,13 @@ type ActionStep = {
 type ActionStepsProps = {
   forward?: ActionStep;
   back?: ActionStep;
+  parties?: Array<Party>;
 };
 
-export function OnboardingStepActions({ forward, back }: ActionStepsProps) {
+export function OnboardingStepActions({ forward, back, parties }: ActionStepsProps) {
   return (
     <Grid container justifyContent="center" spacing={2}>
-      {back && (
+      {back && parties && parties.length > 0 ? (
         <Grid item>
           <Button
             sx={{ width: '100%' }}
@@ -25,6 +27,20 @@ export function OnboardingStepActions({ forward, back }: ActionStepsProps) {
             {back.label}
           </Button>
         </Grid>
+      ) : (
+        back &&
+        !parties && (
+          <Grid item>
+            <Button
+              sx={{ width: '100%' }}
+              variant="outlined"
+              onClick={back.action}
+              disabled={back.disabled}
+            >
+              {back.label}
+            </Button>
+          </Grid>
+        )
       )}
       {forward && (
         <Grid item>

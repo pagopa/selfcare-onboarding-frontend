@@ -17,12 +17,12 @@ import {
   StepperStep,
   UserOnCreate,
 } from '../../../types';
-import { fetchWithLogs } from '../../lib/api-utils';
-import { getFetchOutcome } from '../../lib/error-utils';
-import { OnboardingStep1 } from '../../components/OnboardingStep1';
-import { OnboardingStep2 } from '../../components/OnboardingStep2';
+import { StepSearchParty } from '../../components/steps/StepSearchParty';
+import { StepAddManager } from '../../components/steps/StepAddManager';
 import { LoadingOverlay } from '../../components/LoadingOverlay';
 import { MessageNoAction } from '../../components/MessageNoAction';
+import { fetchWithLogs } from '../../lib/api-utils';
+import { getFetchOutcome } from '../../lib/error-utils';
 import { ReactComponent as CheckIllustration } from '../../assets/check-illustration.svg';
 import { ENV } from '../../utils/env';
 import { OnboardingStep1_5 } from '../../components/OnboardingStep1_5';
@@ -118,6 +118,15 @@ function OnboardingComponent({ productId }: { productId: string }) {
     });
   };
 
+  const forwardWithBillingData = (newBillingData: BillingData) => {
+    trackEvent('ONBOARDING_DATI_FATTURAZIONE', {
+      party_id: institutionId,
+      request_id: requestIdRef.current,
+    });
+    setBillingData(newBillingData);
+    forward();
+  };
+
   const submit = async (users: Array<UserOnCreate>) => {
     setLoading(true);
 
@@ -167,20 +176,18 @@ function OnboardingComponent({ productId }: { productId: string }) {
     forward();
   };
 
-  const forwardWithBillingData = (newBillingData: BillingData) => {
-    trackEvent('ONBOARDING_DATI_FATTURAZIONE', {
-      party_id: institutionId,
-      request_id: requestIdRef.current,
-    });
-    setBillingData(newBillingData);
-    forward();
-  };
-
   const steps: Array<StepperStep> = [
     {
       label: "Seleziona l'ente",
       Component: () =>
-        OnboardingStep1({
+        StepSearchParty({
+          subTitle: (
+            <Trans i18nKey="onboardingStep1.onboarding.bodyDescription">
+              Seleziona dall&apos;Indice della Pubblica Amministrazione (IPA) l&apos;ente
+              <br />
+              per cui vuoi richiedere l&apos; adesione a {{ productTitle: selectedProduct?.title }}
+            </Trans>
+          ),
           product: selectedProduct,
           forward: forwardWithDataAndInstitutionId,
           back,
@@ -239,7 +246,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
     {
       label: 'Inserisci i dati del rappresentante legale',
       Component: () =>
-        OnboardingStep2({
+        StepAddManager({
           product: selectedProduct,
           forward: (newFormData: Partial<FormData>) => {
             trackEvent('ONBOARDING_LEGALE_RAPPRESENTANTE', {

@@ -3,6 +3,8 @@ import { AxiosError } from 'axios';
 import { useContext, useEffect, useState } from 'react';
 import { resolvePathVariables } from '@pagopa/selfcare-common-frontend/utils/routes-utils';
 import { useTranslation, Trans } from 'react-i18next';
+import { useHistory } from 'react-router-dom';
+import { History } from 'history';
 import { RequestOutcomeMessage, StepperStepComponentProps } from '../../../../types';
 import { MessageNoAction } from '../../../components/MessageNoAction';
 import { HeaderContext, UserContext } from '../../../lib/context';
@@ -12,19 +14,25 @@ import { fetchWithLogs } from '../../../lib/api-utils';
 import { getFetchOutcome } from '../../../lib/error-utils';
 import { ROUTES } from '../../../utils/constants';
 import { ReactComponent as ErrorIcon } from '../../../assets/payment_completed_error.svg';
+import { ReactComponent as SubscribedIcon } from '../../../assets/already-onboarded.svg';
 import { unregisterUnloadEvent } from '../../../utils/unloadEvent-utils';
 
 type Props = StepperStepComponentProps & {
   institutionId: string;
   productId: string;
   subProductId: string;
+  productTitle: string;
 };
 
-const alreadyOnboarded: RequestOutcomeMessage = {
+const alreadyOnboardedSubProduct = (
+  productId: string,
+  history: History
+): RequestOutcomeMessage => ({
+  ImgComponent: SubscribedIcon,
   title: '',
   description: [
     <Grid container direction="column" key="0">
-      <Grid container item justifyContent="center" mt={5}>
+      <Grid container item justifyContent="center" mt={1}>
         <Grid item xs={6}>
           <Typography variant="h4">
             <Trans i18nKey="onBoardingSubProduct.alreadyOnboardedError.title">
@@ -37,7 +45,8 @@ const alreadyOnboarded: RequestOutcomeMessage = {
         <Grid item xs={6}>
           <Typography>
             <Trans i18nKey="onBoardingSubProduct.alreadyOnboardedError.message">
-              L&apos;ente che hai selezionato ha già sottoscritto l&apos;offerta Premium.
+              L&apos;ente che hai selezionato ha già sottoscritto l&apos;offerta <br />
+              Premium.
             </Trans>
           </Typography>
         </Grid>
@@ -47,7 +56,9 @@ const alreadyOnboarded: RequestOutcomeMessage = {
           <Button
             variant="contained"
             sx={{ alignSelf: 'center' }}
-            onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+            onClick={() =>
+              history.push(resolvePathVariables(ROUTES.ONBOARDING.PATH, { productId }))
+            }
           >
             <Trans i18nKey="onBoardingSubProduct.alreadyOnboardedError.closeButton"> Chiudi </Trans>
           </Button>
@@ -55,37 +66,44 @@ const alreadyOnboarded: RequestOutcomeMessage = {
       </Grid>
     </Grid>,
   ],
-};
+});
 
-const notBasicProduct: RequestOutcomeMessage = {
+const buildNotBasicProduct = (
+  productTitle: string,
+  productId: string,
+  history: History
+): RequestOutcomeMessage => ({
+  ImgComponent: ErrorIcon,
   title: '',
   description: [
     <Grid container direction="column" key="0">
-      <Grid container item justifyContent="center" mt={5}>
+      <Grid container item justifyContent="center" mt={2}>
         <Grid item xs={6}>
           <Typography variant="h4">
             <Trans i18nKey="onBoardingSubProduct.notBasicProductError.title">
-              L&apos;ente non ha aderito a {/* TODO SelectedProduct */}
+              L&apos;ente non ha aderito a {{ selectedProduct: productTitle }}
             </Trans>
           </Typography>
         </Grid>
       </Grid>
-      <Grid container item justifyContent="center" mb={3} mt={1}>
+      <Grid container item justifyContent="center" mb={2} mt={1}>
         <Grid item xs={6}>
           <Typography>
             <Trans i18nKey="onBoardingSubProduct.notBasicProductError.message">
-              Per poter sottoscrivere l&apos;offerta Premium, l&apos;ente che hai selezionato deve
-              prima aderire al prodotto {/* TODO SelectedProduct */}
+              Per poter sottoscrivere l&apos;offerta Premium, l&apos;ente che hai <br />
+              selezionato deve prima aderire al prodotto {{ selectedProduct: productTitle }}
             </Trans>
           </Typography>
         </Grid>
       </Grid>
-      <Grid container item justifyContent="center">
+      <Grid container item justifyContent="center" mt={3}>
         <Grid item xs={4}>
           <Button
             variant="contained"
             sx={{ alignSelf: 'center' }}
-            onClick={() => resolvePathVariables(ROUTES.ONBOARDING.PATH, {})}
+            onClick={() =>
+              history.push(resolvePathVariables(ROUTES.ONBOARDING.PATH, { productId }))
+            }
           >
             <Trans i18nKey="onBoardingSubProduct.notBasicProductError.adhesionButton">
               Aderisci
@@ -95,7 +113,7 @@ const notBasicProduct: RequestOutcomeMessage = {
       </Grid>
     </Grid>,
   ],
-};
+});
 
 const genericError: RequestOutcomeMessage = {
   ImgComponent: ErrorIcon,
@@ -141,6 +159,7 @@ export function SubProductStepOnBoardingStatus({
   institutionId,
   productId,
   subProductId,
+  productTitle,
 }: Props) {
   const { t } = useTranslation();
 
@@ -148,6 +167,7 @@ export function SubProductStepOnBoardingStatus({
   const [outcome, setOutcome] = useState<RequestOutcomeMessage | null>();
   const { setOnLogout } = useContext(HeaderContext);
   const { setRequiredLogin } = useContext(UserContext);
+  const history = useHistory();
 
   const checkProduct = async (): Promise<boolean> => {
     const onboardingProductStatus = await fetchWithLogs(
@@ -161,7 +181,7 @@ export function SubProductStepOnBoardingStatus({
       ((onboardingProductStatus as AxiosError<any>).response?.status === 404 ||
         (onboardingProductStatus as AxiosError<any>).response?.status === 400)
     ) {
-      setOutcome(notBasicProduct);
+      setOutcome(buildNotBasicProduct(productTitle, productId, history));
       return false;
     } else {
       return true;
@@ -176,7 +196,7 @@ export function SubProductStepOnBoardingStatus({
     );
     const restOutcomeSubProduct = getFetchOutcome(onboardingSubProductStatus);
     if (restOutcomeSubProduct === 'success') {
-      setOutcome(alreadyOnboarded);
+      setOutcome(alreadyOnboardedSubProduct(productId, history));
       return false;
     } else {
       if (

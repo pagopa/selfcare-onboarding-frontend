@@ -334,7 +334,6 @@ const fillUserBillingDataForm = async (
   });
   fireEvent.change(document.getElementById(mailPECInput), { target: { value: 'a@a.it' } });
   fireEvent.change(document.getElementById(taxCodeInput), { target: { value: 'taxCodeInput' } });
-  fireEvent.change(document.getElementById(taxCodeInput), { target: { value: 'taxCodeInput' } });
   fireEvent.change(document.getElementById(vatNumber), { target: { value: 'vatNumber' } });
   fireEvent.change(document.getElementById(recipientCode), {
     target: { value: 'recipientCode' },

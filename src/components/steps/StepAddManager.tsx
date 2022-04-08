@@ -1,15 +1,15 @@
 import { Grid, Typography } from '@mui/material';
 import { useTranslation, Trans } from 'react-i18next';
-import { StepperStepComponentProps, UserOnCreate } from '../../types';
-import { objectIsEmpty } from '../lib/object-utils';
-import { OnboardingStepActions } from './OnboardingStepActions';
-import { PlatformUserForm, validateUser } from './PlatformUserForm';
-import { useHistoryState } from './useHistoryState';
+import { StepperStepComponentProps, UserOnCreate } from '../../../types';
+import { objectIsEmpty } from '../../lib/object-utils';
+import { OnboardingStepActions } from '../OnboardingStepActions';
+import { PlatformUserForm, validateUser } from '../PlatformUserForm';
+import { useHistoryState } from '../useHistoryState';
 
 // Could be an ES6 Set but it's too bothersome for now
 export type UsersObject = { [key: string]: UserOnCreate };
 
-export function OnboardingStep2({ product, forward, back }: StepperStepComponentProps) {
+export function StepAddManager({ product, forward, back }: StepperStepComponentProps) {
   // const [people, setPeople] = useState<UsersObject>({});
   const [people, setPeople, setPeopleHistory] = useHistoryState<UsersObject>('people_step2', {});
   const { t } = useTranslation();
@@ -38,15 +38,15 @@ export function OnboardingStep2({ product, forward, back }: StepperStepComponent
         <Grid item xs={12}>
           <Typography variant="h3" component="h2" align="center" sx={{ lineHeight: '1.2' }}>
             <Trans i18nKey="onboardingStep2.bodyTitle">
-              Indica il Legale <br /> rappresentante Copy
+              Indica il Legale <br /> rappresentante
             </Trans>
           </Typography>
         </Grid>
       </Grid>
 
-      <Grid container item justifyContent="center" mt={2}>
+      <Grid container item justifyContent="center" mt={1}>
         <Grid item xs={12}>
-          <Typography variant="subtitle2" component="h2" align="center">
+          <Typography sx={{ fontWeight: 400 }} variant="subtitle2" component="h2" align="center">
             <Trans i18nKey="onboardingStep2.bodyDescription">
               Conferma, modifica o inserisci i dati del Legale rappresentante.
               <br />
@@ -57,7 +57,7 @@ export function OnboardingStep2({ product, forward, back }: StepperStepComponent
         </Grid>
       </Grid>
 
-      <Grid container item justifyContent="center" mt={7}>
+      <Grid container item justifyContent="center" mt={4}>
         <Grid item xs={8} sx={{ boxShadow: '0px 12px 40px rgba(0, 0, 0, 0.06)' }}>
           <PlatformUserForm
             prefix="LEGAL"
@@ -69,9 +69,13 @@ export function OnboardingStep2({ product, forward, back }: StepperStepComponent
         </Grid>
       </Grid>
 
-      <Grid item my={7}>
+      <Grid item mb={10} mt={4}>
         <OnboardingStepActions
-          back={{ action: onBackAction, label: t('onboardingStep2.backLabel'), disabled: false }}
+          back={{
+            action: onBackAction,
+            label: t('onboardingStep2.backLabel'),
+            disabled: false,
+          }}
           forward={{
             action: onForwardAction,
             label: t('onboardingStep2.confirmLabel'),

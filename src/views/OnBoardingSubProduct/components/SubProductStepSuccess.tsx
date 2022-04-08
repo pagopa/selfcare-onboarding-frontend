@@ -20,9 +20,11 @@ const successfulOutCome = {
       <Stack key="0" spacing={4}>
         <Typography variant="body1">
           <Trans i18nKey="onBoardingSubProduct.successfulAdhesion.message">
-            Riceverai una PEC all’indirizzo istituzionale dell’Ente.
+            Riceverai una PEC all’indirizzo istituzionale dell&apos;ente.
             <br />
-            Al suo interno troverai le istruzioni per completare l&apos;adesione.
+            Al suo interno troverai le istruzioni per completare la
+            <br />
+            sottoscrizione all&apos;offerta Premium.
           </Trans>
         </Typography>
         <Button
