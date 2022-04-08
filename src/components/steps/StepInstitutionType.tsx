@@ -1,3 +1,4 @@
+import { useTheme } from '@mui/material';
 import { FormControl, FormControlLabel, Grid, Radio, RadioGroup, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import React from 'react';
@@ -20,6 +21,7 @@ export default function StepInstitutionType({ back, forward, organizationType }:
   const [selectedValue, setSelectedValue] = React.useState<OrganizationType>(organizationType);
 
   const { t } = useTranslation();
+  const theme = useTheme();
 
   const handleChange = (value: string) => setSelectedValue(value as OrganizationType);
 
@@ -42,7 +44,7 @@ export default function StepInstitutionType({ back, forward, organizationType }:
         </Typography>
       </Grid>
       <Box
-        width="480px"
+        width="580px"
         height="100%"
         sx={{
           boxShadow:
@@ -52,37 +54,43 @@ export default function StepInstitutionType({ back, forward, organizationType }:
         }}
       >
         <Grid container item>
-          <Grid item xs={12} p={6}>
+          <Grid item xs={12} p={3}>
             <FormControl>
               <RadioGroup name="radio-buttons-group" defaultValue={organizationType}>
                 {organizationTypeValues.map((ot) => (
                   <FormControlLabel
+                    sx={{ p: '8px' }}
                     key={ot.labelKey}
                     onChange={() => handleChange(ot.value)}
                     value={ot.value}
-                    control={<Radio />}
+                    control={<Radio id={ot.labelKey} />}
                     label={t(`stepInstitutionType.organizationTypeValues.${ot.labelKey}`) as string}
                   />
                 ))}
               </RadioGroup>
             </FormControl>
           </Grid>
-          <Grid item xs={12} my={4}>
-            <OnboardingStepActions
-              back={{
-                action: onBackAction,
-                label: t('stepBillingData.backLabel'),
-                disabled: false,
-              }}
-              forward={{
-                action: onForwardAction,
-                label: t('stepBillingData.confirmLabel'),
-                disabled: false,
-              }}
-            />
-          </Grid>
         </Grid>
       </Box>
+      <Grid item xs={12} display="flex" justifyContent="center" p={4}>
+        <Typography color={theme.palette.text.secondary} variant="body1">
+          {t('stepInstitutionType.description')}
+        </Typography>
+      </Grid>
+      <Grid item xs={12}>
+        <OnboardingStepActions
+          back={{
+            action: onBackAction,
+            label: t('stepInstitutionType.backLabel'),
+            disabled: false,
+          }}
+          forward={{
+            action: onForwardAction,
+            label: t('stepInstitutionType.confirmLabel'),
+            disabled: !selectedValue,
+          }}
+        />
+      </Grid>
     </Grid>
   );
 }

@@ -238,6 +238,9 @@ export default {
       scp: 'Società a controllo pubblico',
       pt: 'Partner tecnologico',
     },
+    description: 'Ai sensi dell’art. 2 comma 2 del CAD',
+    backLabel: 'Indietro',
+    confirmLabel: 'Conferma',
   },
   stepBillingData: {
     title: 'Indica i dati del tuo ente',

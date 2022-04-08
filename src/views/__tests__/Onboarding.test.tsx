@@ -1,6 +1,6 @@
 import { fireEvent, getByLabelText, render, screen, waitFor } from '@testing-library/react';
 import { useState } from 'react';
-import { User } from '../../../types';
+import { OrganizationType, User } from '../../../types';
 import { HeaderContext, UserContext } from '../../lib/context';
 import { ENV } from '../../utils/env';
 import Onboarding from '../onboarding/Onboarding';
@@ -67,6 +67,7 @@ const renderComponent = (productId: string = 'prod-pagopa') => {
 };
 
 const step1Title = 'Seleziona il tuo ente';
+const stepInstitutionType = 'Seleziona il tipo di ente che rappresenti';
 const stepBillingDataTitle = 'Indica i dati del tuo ente';
 const step2Title = 'Indica il Legale rappresentante';
 const step3Title = "Indica l'Amministratore";
@@ -97,6 +98,7 @@ test('test complete', async () => {
   jest.setTimeout(10000);
   renderComponent();
   await executeStep1('agency x');
+  await executeStepInstitutionType();
   await executeStepBillingData();
   await executeStep2();
   await executeStep3(true);
@@ -106,6 +108,7 @@ test('test complete', async () => {
 test('test complete with error on submit', async () => {
   renderComponent();
   await executeStep1('agency error');
+  await executeStepInstitutionType();
   await executeStepBillingData();
   await executeStep2();
   await executeStep3(false);
@@ -217,11 +220,30 @@ const executeStep1 = async (partyName: string) => {
   await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(3));
 };
 
+const executeStepInstitutionType = async () => {
+  console.log('Testing step Institution Type');
+  await waitFor(() => screen.getByText(stepInstitutionType));
+
+  await checkBackForwardNavigation(step1Title, stepInstitutionType);
+  await fillInstitutionTypeCheckbox(
+    'pa' as OrganizationType,
+    'gsp' as OrganizationType,
+    'scp' as OrganizationType,
+    'pt' as OrganizationType
+  );
+
+  const confirmButtonEnabled = screen.getByRole('button', { name: 'Conferma' });
+  await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
+
+  fireEvent.click(confirmButtonEnabled);
+  await waitFor(() => screen.getByText(stepBillingDataTitle));
+};
+
 const executeStepBillingData = async () => {
   console.log('Testing step Billing Data');
   await waitFor(() => screen.getByText(stepBillingDataTitle));
 
-  await checkBackForwardNavigation(step1Title, stepBillingDataTitle);
+  await checkBackForwardNavigation(stepInstitutionType, stepBillingDataTitle);
   await fillUserBillingDataForm(
     'businessName',
     'registeredOffice',
@@ -282,6 +304,18 @@ const executeStep3 = async (expectedSuccessfulSubmit: boolean) => {
   await waitFor(() =>
     screen.getByText(expectedSuccessfulSubmit ? completeSuccessTitle : completeErrorTitle)
   );
+};
+
+const fillInstitutionTypeCheckbox = async (
+  pa: OrganizationType,
+  gsp: OrganizationType,
+  scp: OrganizationType,
+  pt: OrganizationType
+) => {
+  fireEvent.click(document.getElementById(pa));
+  fireEvent.click(document.getElementById(gsp));
+  fireEvent.click(document.getElementById(scp));
+  fireEvent.click(document.getElementById(pt));
 };
 
 const fillUserBillingDataForm = async (
