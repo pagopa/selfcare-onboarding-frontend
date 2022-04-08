@@ -224,7 +224,7 @@ export default {
     successfulAdhesion: {
       title: 'La tua richiesta è stata inviata <1 /> con successo',
       message:
-        "Riceverai una PEC all’indirizzo istituzionale dell’Ente.<1 />Al suo interno troverai le istruzioni per completare l'adesione.",
+        "Riceverai una PEC all’indirizzo istituzionale dell’ente.<1 />Al suo interno troverai le istruzioni per completare la <3 /> sottoscrizione all'offerta Premium.",
       closeButton: 'Chiudi',
     },
     exitModal: {
