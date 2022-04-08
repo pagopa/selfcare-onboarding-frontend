@@ -21,13 +21,9 @@ export default function StepInstitutionType({ back, forward, organizationType }:
 
   const { t } = useTranslation();
 
-  const handleChange = (value: string) => {
-    console.log('value', value);
-    return setSelectedValue(value as OrganizationType);
-  };
+  const handleChange = (value: string) => setSelectedValue(value as OrganizationType);
 
   const onForwardAction = () => {
-    console.log('selectedValue', selectedValue);
     forward(selectedValue);
   };
 
