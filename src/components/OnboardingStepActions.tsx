@@ -16,7 +16,7 @@ type ActionStepsProps = {
 export function OnboardingStepActions({ forward, back, parties }: ActionStepsProps) {
   return (
     <Grid container justifyContent="center" spacing={2}>
-      {back && parties && parties.length > 0 && (
+      {back && parties && parties.length > 0 ? (
         <Grid item>
           <Button
             sx={{ width: '100%' }}
@@ -27,6 +27,20 @@ export function OnboardingStepActions({ forward, back, parties }: ActionStepsPro
             {back.label}
           </Button>
         </Grid>
+      ) : (
+        back &&
+        !parties && (
+          <Grid item>
+            <Button
+              sx={{ width: '100%' }}
+              variant="outlined"
+              onClick={back.action}
+              disabled={back.disabled}
+            >
+              {back.label}
+            </Button>
+          </Grid>
+        )
       )}
       {forward && (
         <Grid item>
