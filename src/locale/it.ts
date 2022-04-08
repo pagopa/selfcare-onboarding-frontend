@@ -230,7 +230,17 @@ export default {
       cancelButton: 'Annulla',
     },
   },
+  stepInstitutionType: {
+    title: 'Seleziona il tipo di ente che <1/> rappresenti',
+    organizationTypeValues: {
+      pa: 'Pubblica Amministrazione',
+      gsp: 'Gestore di servizi pubblici',
+      scp: 'Società a controllo pubblico',
+      pt: 'Partner tecnologico',
+    },
+  },
   stepBillingData: {
+    title: 'Indica i dati del tuo ente',
     invalidEmail: 'L’indirizzo email non è valido',
     businessName: 'Ragione sociale',
     registeredOffice: 'Sede legale',

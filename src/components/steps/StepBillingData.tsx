@@ -140,7 +140,7 @@ export default function StepBillingData({
     <Grid container item xs={8}>
       <Grid item xs={12}>
         <Typography variant="h3" component="h2" align="center" sx={{ lineHeight: '1.2' }}>
-          {t('Indica i dati del tuo ente')}
+          {t('stepBillingData.title')}
         </Typography>
       </Grid>
 
