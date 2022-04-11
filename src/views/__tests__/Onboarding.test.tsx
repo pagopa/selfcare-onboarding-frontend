@@ -225,7 +225,7 @@ const executeStepInstitutionType = async () => {
   await waitFor(() => screen.getByText(stepInstitutionType));
 
   await checkBackForwardNavigation(step1Title, stepInstitutionType);
-  await fillInstitutionTypeCheckbox('PA', 'GSP', 'SCP', 'PT');
+  await fillInstitutionTypeCheckbox('pa', 'gsp', 'scp', 'pt');
 
   const confirmButtonEnabled = screen.getByRole('button', { name: 'Conferma' });
   await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
@@ -301,12 +301,7 @@ const executeStep3 = async (expectedSuccessfulSubmit: boolean) => {
   );
 };
 
-const fillInstitutionTypeCheckbox = async (
-  pa: OrganizationType,
-  gsp: OrganizationType,
-  scp: OrganizationType,
-  pt: OrganizationType
-) => {
+const fillInstitutionTypeCheckbox = async (pa: string, gsp: string, scp: string, pt: string) => {
   fireEvent.click(document.getElementById(pa));
   fireEvent.click(document.getElementById(gsp));
   fireEvent.click(document.getElementById(scp));
