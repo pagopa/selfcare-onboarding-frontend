@@ -10,11 +10,11 @@ type Props = StepperStepComponentProps & {
   organizationType: OrganizationType;
 };
 
-const organizationTypeValues = [
-  { labelKey: 'pa', value: 'PA' as OrganizationType },
-  { labelKey: 'gsp', value: 'GSP' as OrganizationType },
-  { labelKey: 'scp', value: 'SCP' as OrganizationType },
-  { labelKey: 'pt', value: 'PT' as OrganizationType },
+const organizationTypeValues: Array<{ labelKey: string; value: OrganizationType }> = [
+  { labelKey: 'pa', value: 'PA' },
+  { labelKey: 'gsp', value: 'GSP' },
+  { labelKey: 'scp', value: 'SCP' },
+  { labelKey: 'pt', value: 'PT' },
 ];
 
 export default function StepInstitutionType({ back, forward, organizationType }: Props) {

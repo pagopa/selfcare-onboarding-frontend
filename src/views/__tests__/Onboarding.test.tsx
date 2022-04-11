@@ -225,12 +225,7 @@ const executeStepInstitutionType = async () => {
   await waitFor(() => screen.getByText(stepInstitutionType));
 
   await checkBackForwardNavigation(step1Title, stepInstitutionType);
-  await fillInstitutionTypeCheckbox(
-    'PA' as OrganizationType,
-    'GSP' as OrganizationType,
-    'SCP' as OrganizationType,
-    'PT' as OrganizationType
-  );
+  await fillInstitutionTypeCheckbox('PA', 'GSP', 'SCP', 'PT');
 
   const confirmButtonEnabled = screen.getByRole('button', { name: 'Conferma' });
   await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
