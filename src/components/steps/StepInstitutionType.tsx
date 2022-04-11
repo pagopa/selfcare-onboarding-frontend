@@ -11,10 +11,10 @@ type Props = StepperStepComponentProps & {
 };
 
 const organizationTypeValues = [
-  { labelKey: 'pa', value: 'PA', label: 'Pubblica Amministrazione' },
-  { labelKey: 'gsp', value: 'GSP', label: 'Gestore di servizi pubblici' },
-  { labelKey: 'scp', value: 'SCP', label: 'Società a controllo pubblico' },
-  { labelKey: 'pt', value: 'PT', label: 'Partner tecnologico' },
+  { labelKey: 'pa', value: 'PA' as OrganizationType },
+  { labelKey: 'gsp', value: 'GSP' as OrganizationType },
+  { labelKey: 'scp', value: 'SCP' as OrganizationType },
+  { labelKey: 'pt', value: 'PT' as OrganizationType },
 ];
 
 export default function StepInstitutionType({ back, forward, organizationType }: Props) {
@@ -23,7 +23,7 @@ export default function StepInstitutionType({ back, forward, organizationType }:
   const { t } = useTranslation();
   const theme = useTheme();
 
-  const handleChange = (value: string) => setSelectedValue(value as OrganizationType);
+  const handleChange = (value: OrganizationType) => setSelectedValue(value);
 
   const onForwardAction = () => {
     forward(selectedValue);

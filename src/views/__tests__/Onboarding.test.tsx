@@ -226,10 +226,10 @@ const executeStepInstitutionType = async () => {
 
   await checkBackForwardNavigation(step1Title, stepInstitutionType);
   await fillInstitutionTypeCheckbox(
-    'pa' as OrganizationType,
-    'gsp' as OrganizationType,
-    'scp' as OrganizationType,
-    'pt' as OrganizationType
+    'PA' as OrganizationType,
+    'GSP' as OrganizationType,
+    'SCP' as OrganizationType,
+    'PT' as OrganizationType
   );
 
   const confirmButtonEnabled = screen.getByRole('button', { name: 'Conferma' });

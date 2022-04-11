@@ -18,7 +18,7 @@ const mailPECRegexp = new RegExp('^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$');
 
 type StepBillingDataHistoryState = {
   institutionId: string;
-  isTaxCodeEquals2PIVA: boolean;
+  isTaxCodeNotEquals2PIVA: boolean;
 };
 
 type Props = StepperStepComponentProps & {
@@ -44,18 +44,18 @@ export default function StepBillingData({
   const [stepHistoryState, setStepHistoryState, setStepHistoryStateHistory] =
     useHistoryState<StepBillingDataHistoryState>('stepBillingData', {
       institutionId,
-      isTaxCodeEquals2PIVA: true,
+      isTaxCodeNotEquals2PIVA: true,
     });
 
   useEffect(() => {
     if (institutionId !== stepHistoryState.institutionId) {
-      setStepHistoryState({ institutionId, isTaxCodeEquals2PIVA: true });
+      setStepHistoryState({ institutionId, isTaxCodeNotEquals2PIVA: true });
     }
   }, []);
 
   useEffect(() => {
     void formik.validateForm();
-  }, [stepHistoryState.isTaxCodeEquals2PIVA]);
+  }, [stepHistoryState.isTaxCodeNotEquals2PIVA]);
 
   const saveHistoryState = () => {
     setStepHistoryStateHistory(stepHistoryState);
@@ -65,7 +65,7 @@ export default function StepBillingData({
     saveHistoryState();
     forward({
       ...formik.values,
-      vatNumber: stepHistoryState.isTaxCodeEquals2PIVA
+      vatNumber: stepHistoryState.isTaxCodeNotEquals2PIVA
         ? formik.values.taxCode
         : formik.values.vatNumber,
     });
@@ -84,7 +84,7 @@ export default function StepBillingData({
         registeredOffice: !values.registeredOffice ? requiredError : undefined,
         taxCode: !values.taxCode ? requiredError : undefined,
         vatNumber:
-          stepHistoryState.isTaxCodeEquals2PIVA && !values.vatNumber ? requiredError : undefined,
+          stepHistoryState.isTaxCodeNotEquals2PIVA && !values.vatNumber ? requiredError : undefined,
         mailPEC: !values.mailPEC
           ? requiredError
           : !mailPECRegexp.test(values.mailPEC)
@@ -200,19 +200,18 @@ export default function StepBillingData({
                 <Typography>
                   <Checkbox
                     disabled={ipa}
-                    checked={stepHistoryState.isTaxCodeEquals2PIVA}
+                    checked={stepHistoryState.isTaxCodeNotEquals2PIVA}
                     onChange={() =>
                       setStepHistoryState({
                         ...stepHistoryState,
-                        isTaxCodeEquals2PIVA: !stepHistoryState.isTaxCodeEquals2PIVA,
+                        isTaxCodeNotEquals2PIVA: !stepHistoryState.isTaxCodeNotEquals2PIVA,
                       })
                     }
                   />
-                  {t('stepBillingData.taxCodeEquals2PIVAdescription')}
+                  {t('stepBillingData.taxCodeNotEquals2PIVAdescription')}
                 </Typography>
               </Grid>
-              {stepHistoryState.isTaxCodeEquals2PIVA && (
-                // formik.initialValues.taxCode !== formik.initialValues.vatNumber &&
+              {stepHistoryState.isTaxCodeNotEquals2PIVA && (
                 <Grid item xs={12}>
                   <CustomTextField
                     {...baseTextFieldProps('vatNumber', t('stepBillingData.vatNumber'), 400, 18)}
