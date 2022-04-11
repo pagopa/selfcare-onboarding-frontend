@@ -24,10 +24,7 @@ type Props = StepperStepComponentProps & {
   productTitle: string;
 };
 
-const alreadyOnboardedSubProduct = (
-  productId: string,
-  history: History
-): RequestOutcomeMessage => ({
+const alreadyOnboardedSubProduct: RequestOutcomeMessage = {
   ImgComponent: SubscribedIcon,
   title: '',
   description: [
@@ -56,9 +53,7 @@ const alreadyOnboardedSubProduct = (
           <Button
             variant="contained"
             sx={{ alignSelf: 'center' }}
-            onClick={() =>
-              history.push(resolvePathVariables(ROUTES.ONBOARDING.PATH, { productId }))
-            }
+            onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
           >
             <Trans i18nKey="onBoardingSubProduct.alreadyOnboardedError.closeButton"> Chiudi </Trans>
           </Button>
@@ -66,7 +61,7 @@ const alreadyOnboardedSubProduct = (
       </Grid>
     </Grid>,
   ],
-});
+};
 
 const buildNotBasicProduct = (
   productTitle: string,
@@ -196,7 +191,7 @@ export function SubProductStepOnBoardingStatus({
     );
     const restOutcomeSubProduct = getFetchOutcome(onboardingSubProductStatus);
     if (restOutcomeSubProduct === 'success') {
-      setOutcome(alreadyOnboardedSubProduct(productId, history));
+      setOutcome(alreadyOnboardedSubProduct);
       return false;
     } else {
       if (

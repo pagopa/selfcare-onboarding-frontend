@@ -98,6 +98,15 @@ function OnBoardingSubProduct() {
     forward();
   };
 
+  const forwardWithManagerData = () => {
+    trackEvent('ONBOARDING_LEGALE_RAPPRESENTANTE', {
+      party_id: institutionId,
+      request_id: requestIdRef.current,
+    });
+    setManager(manager);
+    forward();
+  };
+
   const forwardWithInstitutionId = (institutionId: string, isUserParty: boolean) => {
     setInstitutionId(institutionId);
     trackEvent('ONBOARDING_SELEZIONE_ENTE', {
@@ -222,13 +231,7 @@ function OnBoardingSubProduct() {
       Component: () =>
         StepAddManager({
           product: subProduct,
-          forward: () => {
-            trackEvent('ONBOARDING_LEGALE_RAPPRESENTANTE', {
-              party_id: institutionId,
-              request_id: requestIdRef.current,
-            });
-            forward();
-          },
+          forward: forwardWithManagerData,
           back: () => {
             if (window.location.search.indexOf(`institutionId=${institutionId}`) > -1) {
               setOpenExitUrl(`${ENV.URL_FE.DASHBOARD}/${institutionId}`);
@@ -239,8 +242,6 @@ function OnBoardingSubProduct() {
           },
         }),
     },
-
-    // TODO Puts Step Here
     {
       label: 'Submit',
       Component: () =>

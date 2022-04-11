@@ -8,7 +8,7 @@ import './../../locale';
 
 jest.mock('../../lib/api-utils');
 
-jest.setTimeout(7000);
+jest.setTimeout(1000000);
 
 let fetchWithLogsSpy: jest.SpyInstance;
 
@@ -94,7 +94,7 @@ test('test error productID', async () => {
 });
 
 test('test complete', async () => {
-  jest.setTimeout(10000);
+  jest.setTimeout(1000000);
   renderComponent();
   await executeStep1('agency x');
   await executeStepBillingData();
