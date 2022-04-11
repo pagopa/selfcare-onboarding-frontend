@@ -98,12 +98,12 @@ function OnBoardingSubProduct() {
     forward();
   };
 
-  const forwardWithManagerData = () => {
+  const forwardWithManagerData = (manager: UserOnCreate) => {
+    setManager(manager);
     trackEvent('ONBOARDING_LEGALE_RAPPRESENTANTE', {
       party_id: institutionId,
       request_id: requestIdRef.current,
     });
-    setManager(manager);
     forward();
   };
 
@@ -231,7 +231,11 @@ function OnBoardingSubProduct() {
       Component: () =>
         StepAddManager({
           product: subProduct,
-          forward: forwardWithManagerData,
+          forward: (manager: UserOnCreate) => {
+            if (manager) {
+              forwardWithManagerData(manager);
+            }
+          },
           back: () => {
             if (window.location.search.indexOf(`institutionId=${institutionId}`) > -1) {
               setOpenExitUrl(`${ENV.URL_FE.DASHBOARD}/${institutionId}`);
