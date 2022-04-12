@@ -206,9 +206,13 @@ const executeStep1 = async (partyName: string) => {
 
   const partyNameSelection = await waitFor(() => {
     fireEvent.change(document.getElementById('Parties'), { target: { value: 'XXX' } });
-    return screen.getByText(partyName);
+    const out = screen.getByText(partyName);
+
+    expect(fetchWithLogsSpy).toBeCalledTimes(2);
+    fetchWithLogsSpy = fetchWithLogsSpy.mockClear();
+
+    return out;
   });
-  expect(fetchWithLogsSpy).toBeCalledTimes(2);
 
   fireEvent.click(partyNameSelection);
 
@@ -216,7 +220,7 @@ const executeStep1 = async (partyName: string) => {
   expect(confirmButton).toBeEnabled();
 
   fireEvent.click(confirmButton);
-  await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(3));
+  await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(1));
 };
 
 const executeStepInstitutionType = async () => {
