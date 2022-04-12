@@ -1,4 +1,4 @@
-import { useEffect, useState, useContext, useRef } from 'react';
+import { useEffect, useState, useContext, useRef, useMemo } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Button, Container, Stack, Typography, Grid, useTheme } from '@mui/material';
 import { AxiosError, AxiosResponse } from 'axios';
@@ -31,6 +31,7 @@ import NoProductPage from '../NoProductPage';
 import StepOnboardingData from '../../components/steps/StepOnboardingData';
 import StepBillingData from '../../components/steps/StepBillingData';
 import { registerUnloadEvent, unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
+import StepInstitutionType from '../../components/steps/StepInstitutionType';
 import { OnBoardingProductStepDelegates } from './components/OnBoardingProductStepDelegates';
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
@@ -166,6 +167,15 @@ function OnboardingComponent({ productId }: { productId: string }) {
     forward();
   };
 
+  const forwardWithInstitutionType = (newInstitutionType: OrganizationType) => {
+    trackEvent('ONBOARDING_TIPO_ENTE', {
+      party_id: institutionId,
+      request_id: requestIdRef.current,
+    });
+    setOrganizationType(newInstitutionType);
+    forward();
+  };
+
   const steps: Array<StepperStep> = [
     {
       label: "Seleziona l'ente",
@@ -197,7 +207,22 @@ function OnboardingComponent({ productId }: { productId: string }) {
           forward: forwardWithOnboardingData,
         }),
     },
-    // TODO insert StepOrganizationType
+    {
+      label: 'Seleziona il tipo di ente',
+      Component: () =>
+        StepInstitutionType({
+          organizationType: organizationType as OrganizationType,
+          forward: forwardWithInstitutionType,
+          back: () => {
+            if (window.location.search.indexOf(`institutionId=${institutionId}`) > -1) {
+              setOpenExitUrl(`${ENV.URL_FE.DASHBOARD}/${institutionId}`);
+              setOpenExitModal(true);
+            } else {
+              setActiveStep(0);
+            }
+          },
+        }),
+    },
     {
       label: 'Insert Billing Data',
       Component: () =>
@@ -215,14 +240,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
           organizationType: organizationType as OrganizationType,
           subtitle: t('onBoardingSubProduct.billingData.subTitle'),
           forward: forwardWithBillingData,
-          back: () => {
-            if (window.location.search.indexOf(`institutionId=${institutionId}`) > -1) {
-              setOpenExitUrl(`${ENV.URL_FE.DASHBOARD}/${institutionId}`);
-              setOpenExitModal(true);
-            } else {
-              setActiveStep(0);
-            }
-          },
+          back,
         }),
     },
     {
@@ -266,7 +284,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
     },
   ];
 
-  const Step = steps[activeStep].Component;
+  const Step = useMemo(() => steps[activeStep].Component, [activeStep]);
 
   const outcomeContent: RequestOutcomeOptions = {
     success: {
