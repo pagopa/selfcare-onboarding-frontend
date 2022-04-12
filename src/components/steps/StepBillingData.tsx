@@ -18,7 +18,7 @@ const mailPECRegexp = new RegExp('^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$');
 
 type StepBillingDataHistoryState = {
   institutionId: string;
-  isTaxCodeEquals2PIVA: boolean;
+  isTaxCodeNotEquals2PIVA: boolean;
 };
 
 type Props = StepperStepComponentProps & {
@@ -44,18 +44,18 @@ export default function StepBillingData({
   const [stepHistoryState, setStepHistoryState, setStepHistoryStateHistory] =
     useHistoryState<StepBillingDataHistoryState>('stepBillingData', {
       institutionId,
-      isTaxCodeEquals2PIVA: true,
+      isTaxCodeNotEquals2PIVA: true,
     });
 
   useEffect(() => {
     if (institutionId !== stepHistoryState.institutionId) {
-      setStepHistoryState({ institutionId, isTaxCodeEquals2PIVA: true });
+      setStepHistoryState({ institutionId, isTaxCodeNotEquals2PIVA: true });
     }
   }, []);
 
   useEffect(() => {
     void formik.validateForm();
-  }, [stepHistoryState.isTaxCodeEquals2PIVA]);
+  }, [stepHistoryState.isTaxCodeNotEquals2PIVA]);
 
   const saveHistoryState = () => {
     setStepHistoryStateHistory(stepHistoryState);
@@ -65,7 +65,7 @@ export default function StepBillingData({
     saveHistoryState();
     forward({
       ...formik.values,
-      vatNumber: stepHistoryState.isTaxCodeEquals2PIVA
+      vatNumber: stepHistoryState.isTaxCodeNotEquals2PIVA
         ? formik.values.taxCode
         : formik.values.vatNumber,
     });
@@ -84,7 +84,7 @@ export default function StepBillingData({
         registeredOffice: !values.registeredOffice ? requiredError : undefined,
         taxCode: !values.taxCode ? requiredError : undefined,
         vatNumber:
-          !stepHistoryState.isTaxCodeEquals2PIVA && !values.vatNumber ? requiredError : undefined,
+          stepHistoryState.isTaxCodeNotEquals2PIVA && !values.vatNumber ? requiredError : undefined,
         mailPEC: !values.mailPEC
           ? requiredError
           : !mailPECRegexp.test(values.mailPEC)
@@ -137,128 +137,134 @@ export default function StepBillingData({
   };
 
   return (
-    <Grid container item xs={8}>
-      <Grid item xs={12}>
-        <Typography variant="h3" component="h2" align="center" sx={{ lineHeight: '1.2' }}>
-          {t('Indica i dati del tuo ente')}
-        </Typography>
-      </Grid>
-
-      <Grid container item justifyContent="center" mt={2} mb={4}>
+    <Box display="flex" justifyContent="center">
+      <Grid container item xs={8}>
         <Grid item xs={12}>
-          <Typography variant="subtitle2" component="h2" align="center">
-            {subtitle}
+          <Typography variant="h3" component="h2" align="center" sx={{ lineHeight: '1.2' }}>
+            {t('stepBillingData.title')}
           </Typography>
         </Grid>
-      </Grid>
-      <Box
-        sx={{
-          boxShadow:
-            '0px 8px 10px -5px rgba(0, 43, 85, 0.1), 0px 16px 24px 2px rgba(0, 43, 85, 0.05), 0px 6px 30px 5px rgba(0, 43, 85, 0.1)',
-          borderRadius: '16px',
-          p: 1,
-        }}
-      >
-        <form onSubmit={formik.handleSubmit}>
-          <Grid item container spacing={4} p={4}>
-            <Grid item xs={12}>
-              <CustomTextField
-                {...baseTextFieldProps('businessName', t('stepBillingData.businessName'), 400, 18)}
-                disabled={ipa}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <CustomTextField
-                {...baseTextFieldProps(
-                  'registeredOffice',
-                  t('stepBillingData.registeredOffice'),
-                  400,
-                  18
-                )}
-                disabled={ipa}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <CustomTextField
-                {...baseTextFieldProps('mailPEC', t('stepBillingData.mailPEC'), 400, 18)}
-                disabled={ipa}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <Typography>
-                <Checkbox
-                  disabled={ipa}
-                  checked={stepHistoryState.isTaxCodeEquals2PIVA}
-                  onChange={() =>
-                    setStepHistoryState({
-                      ...stepHistoryState,
-                      isTaxCodeEquals2PIVA: !stepHistoryState.isTaxCodeEquals2PIVA,
-                    })
-                  }
-                />
-                {t('stepBillingData.taxCodeEquals2PIVAdescription')}
-              </Typography>
-            </Grid>
-            <Grid item xs={12}>
-              <CustomTextField
-                {...baseTextFieldProps('taxCode', t('stepBillingData.taxCode'), 400, 18)}
-                disabled={ipa}
-              />
-            </Grid>
-            {!stepHistoryState.isTaxCodeEquals2PIVA && (
-              // formik.initialValues.taxCode !== formik.initialValues.vatNumber &&
+
+        <Grid container item justifyContent="center" mt={2} mb={4}>
+          <Grid item xs={12}>
+            <Typography variant="subtitle2" component="h2" align="center">
+              {subtitle}
+            </Typography>
+          </Grid>
+        </Grid>
+        <Box
+          sx={{
+            boxShadow:
+              '0px 8px 10px -5px rgba(0, 43, 85, 0.1), 0px 16px 24px 2px rgba(0, 43, 85, 0.05), 0px 6px 30px 5px rgba(0, 43, 85, 0.1)',
+            borderRadius: '16px',
+            p: 1,
+          }}
+        >
+          <form onSubmit={formik.handleSubmit}>
+            <Grid item container spacing={4} p={4}>
               <Grid item xs={12}>
                 <CustomTextField
-                  {...baseTextFieldProps('vatNumber', t('stepBillingData.vatNumber'), 400, 18)}
+                  {...baseTextFieldProps(
+                    'businessName',
+                    t('stepBillingData.businessName'),
+                    400,
+                    18
+                  )}
                   disabled={ipa}
                 />
               </Grid>
-            )}
-            <Grid item xs={12}>
-              <CustomTextField
-                {...baseTextFieldProps(
-                  'recipientCode',
-                  t('stepBillingData.recipientCode'),
-                  400,
-                  18
-                )}
-              />
-              <Typography
-                sx={{
-                  fontSize: '12px!important',
-                  fontWeight: 600,
-                  color: theme.palette.text.secondary,
-                }}
-              >
-                {t('stepBillingData.recipientCodeDescription')}
-              </Typography>
-            </Grid>
-            {organizationType === 'GSP' && (
+              <Grid item xs={12}>
+                <CustomTextField
+                  {...baseTextFieldProps(
+                    'registeredOffice',
+                    t('stepBillingData.registeredOffice'),
+                    400,
+                    18
+                  )}
+                  disabled={ipa}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <CustomTextField
+                  {...baseTextFieldProps('mailPEC', t('stepBillingData.mailPEC'), 400, 18)}
+                  disabled={ipa}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <CustomTextField
+                  {...baseTextFieldProps('taxCode', t('stepBillingData.taxCode'), 400, 18)}
+                  disabled={ipa}
+                />
+              </Grid>
               <Grid item xs={12}>
                 <Typography>
                   <Checkbox
-                    value={formik.values.publicServices}
-                    onChange={(_, checked: boolean) =>
-                      formik.setFieldValue('publicServices', checked, true)
+                    disabled={ipa}
+                    checked={stepHistoryState.isTaxCodeNotEquals2PIVA}
+                    onChange={() =>
+                      setStepHistoryState({
+                        ...stepHistoryState,
+                        isTaxCodeNotEquals2PIVA: !stepHistoryState.isTaxCodeNotEquals2PIVA,
+                      })
                     }
                   />
-                  {t('stepBillingData.gspDescription')}
+                  {t('stepBillingData.taxCodeNotEquals2PIVAdescription')}
                 </Typography>
               </Grid>
-            )}
-          </Grid>
-        </form>
-      </Box>
-      <Grid item xs={12} my={4}>
-        <OnboardingStepActions
-          back={{ action: onBackAction, label: t('stepBillingData.backLabel'), disabled: false }}
-          forward={{
-            action: onForwardAction,
-            label: t('stepBillingData.confirmLabel'),
-            disabled: !formik.isValid,
-          }}
-        />
+              {stepHistoryState.isTaxCodeNotEquals2PIVA && (
+                <Grid item xs={12}>
+                  <CustomTextField
+                    {...baseTextFieldProps('vatNumber', t('stepBillingData.vatNumber'), 400, 18)}
+                    disabled={ipa}
+                  />
+                </Grid>
+              )}
+              <Grid item xs={12}>
+                <CustomTextField
+                  {...baseTextFieldProps(
+                    'recipientCode',
+                    t('stepBillingData.recipientCode'),
+                    400,
+                    18
+                  )}
+                />
+                <Typography
+                  sx={{
+                    fontSize: '12px!important',
+                    fontWeight: 600,
+                    color: theme.palette.text.secondary,
+                  }}
+                >
+                  {t('stepBillingData.recipientCodeDescription')}
+                </Typography>
+              </Grid>
+              {organizationType === 'GSP' && (
+                <Grid item xs={12}>
+                  <Typography>
+                    <Checkbox
+                      value={formik.values.publicServices}
+                      onChange={(_, checked: boolean) =>
+                        formik.setFieldValue('publicServices', checked, true)
+                      }
+                    />
+                    {t('stepBillingData.gspDescription')}
+                  </Typography>
+                </Grid>
+              )}
+            </Grid>
+          </form>
+        </Box>
+        <Grid item xs={12} my={4}>
+          <OnboardingStepActions
+            back={{ action: onBackAction, label: t('stepBillingData.backLabel'), disabled: false }}
+            forward={{
+              action: onForwardAction,
+              label: t('stepBillingData.confirmLabel'),
+              disabled: !formik.isValid,
+            }}
+          />
+        </Grid>
       </Grid>
-    </Grid>
+    </Box>
   );
 }
