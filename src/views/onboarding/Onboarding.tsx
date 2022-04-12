@@ -1,4 +1,4 @@
-import { useEffect, useState, useContext, useRef } from 'react';
+import { useEffect, useState, useContext, useRef, useMemo } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Button, Container, Stack, Typography, Grid, useTheme } from '@mui/material';
 import { AxiosError, AxiosResponse } from 'axios';
@@ -284,7 +284,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
     },
   ];
 
-  const Step = steps[activeStep].Component;
+  const Step = useMemo(() => steps[activeStep].Component, [activeStep]);
 
   const outcomeContent: RequestOutcomeOptions = {
     success: {

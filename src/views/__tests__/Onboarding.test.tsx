@@ -94,8 +94,9 @@ test('test error productID', async () => {
   await waitFor(() => screen.getByText('Impossibile individuare il prodotto desiderato'));
 });
 
+jest.setTimeout(10000);
+
 test('test complete', async () => {
-  jest.setTimeout(10000);
   renderComponent();
   await executeStep1('agency x');
   await executeStepInstitutionType();
@@ -203,16 +204,13 @@ const executeStep1 = async (partyName: string) => {
 
   screen.getByText(step1Title);
   await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(1));
+  const inputPartyName = document.getElementById('Parties');
 
-  const partyNameSelection = await waitFor(() => {
-    fireEvent.change(document.getElementById('Parties'), { target: { value: 'XXX' } });
-    const out = screen.getByText(partyName);
+  expect(inputPartyName).toBeTruthy();
+  fireEvent.change(inputPartyName, { target: { value: 'XXX' } });
 
-    expect(fetchWithLogsSpy).toBeCalledTimes(2);
-    fetchWithLogsSpy = fetchWithLogsSpy.mockClear();
-
-    return out;
-  });
+  const partyNameSelection = await waitFor(() => screen.getByText(partyName));
+  expect(fetchWithLogsSpy).toBeCalledTimes(2);
 
   fireEvent.click(partyNameSelection);
 
@@ -220,7 +218,7 @@ const executeStep1 = async (partyName: string) => {
   expect(confirmButton).toBeEnabled();
 
   fireEvent.click(confirmButton);
-  await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(1));
+  await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(3));
 };
 
 const executeStepInstitutionType = async () => {
