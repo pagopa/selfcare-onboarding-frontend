@@ -18,11 +18,12 @@ import {
 import { LoadingOverlay } from '../../components/LoadingOverlay';
 import { ENV } from '../../utils/env';
 import { HeaderContext } from '../../lib/context';
-import { StepAddManager } from '../../components/steps/StepAddManager';
+import { StepAddManager, UsersObject } from '../../components/steps/StepAddManager';
 import { StepSearchParty } from '../../components/steps/StepSearchParty';
 import StepOnboardingData from '../../components/steps/StepOnboardingData';
 import StepBillingData from '../../components/steps/StepBillingData';
 import { registerUnloadEvent, unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
+import { useHistoryState } from '../../components/useHistoryState';
 import SubProductStepVerifyInputs from './components/SubProductStepVerifyInputs';
 import SubProductStepSubmit from './components/SubProductStepSubmit';
 import SubProductStepSuccess from './components/SubProductStepSuccess';
@@ -48,6 +49,7 @@ function OnBoardingSubProduct() {
   const [manager, setManager] = useState<UserOnCreate>();
   const [billingData, setBillingData] = useState<BillingData>();
   const [organizationType, setOrganizationType] = useState<OrganizationType>();
+  const setStepAddManagerHistoryState = useHistoryState<UsersObject>('people_step2', {})[2];
 
   const history = useHistory();
 
@@ -98,8 +100,8 @@ function OnBoardingSubProduct() {
     forward();
   };
 
-  const forwardWithManagerData = (manager: UserOnCreate) => {
-    setManager(manager);
+  const forwardWithManagerData = (formData: any) => {
+    setManager(formData.users[0]);
     trackEvent('ONBOARDING_LEGALE_RAPPRESENTANTE', {
       party_id: institutionId,
       request_id: requestIdRef.current,
@@ -126,6 +128,11 @@ function OnBoardingSubProduct() {
     organizationType?: OrganizationType
   ) => {
     setManager(manager);
+    if (manager) {
+      setStepAddManagerHistoryState({ LEGAL: manager });
+    } else {
+      setStepAddManagerHistoryState({});
+    }
     setBillingData(billingData);
     setOrganizationType(organizationType);
     forward();
@@ -231,11 +238,7 @@ function OnBoardingSubProduct() {
       Component: () =>
         StepAddManager({
           product: subProduct,
-          forward: (manager: UserOnCreate) => {
-            if (manager) {
-              forwardWithManagerData(manager);
-            }
-          },
+          forward: forwardWithManagerData,
           back: () => {
             if (window.location.search.indexOf(`institutionId=${institutionId}`) > -1) {
               setOpenExitUrl(`${ENV.URL_FE.DASHBOARD}/${institutionId}`);
