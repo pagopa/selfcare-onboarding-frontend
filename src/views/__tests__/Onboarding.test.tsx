@@ -94,8 +94,6 @@ test('test error productID', async () => {
   await waitFor(() => screen.getByText('Impossibile individuare il prodotto desiderato'));
 });
 
-jest.setTimeout(20000);
-
 test('test complete', async () => {
   renderComponent();
   await executeStep1('agency x');
