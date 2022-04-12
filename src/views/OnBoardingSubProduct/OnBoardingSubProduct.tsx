@@ -244,7 +244,7 @@ function OnBoardingSubProduct() {
               setOpenExitUrl(`${ENV.URL_FE.DASHBOARD}/${institutionId}`);
               setOpenExitModal(true);
             } else {
-              setActiveStep(activeStep - 1);
+              back();
             }
           },
         }),
