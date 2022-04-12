@@ -85,12 +85,31 @@ const mockedSubProduct = {
 
 const mockedParties: Array<Party> = [
   {
-    id: '0',
-    name: 'Comune di Milano',
+    institutionId: '0',
+    description: 'Comune di Milano',
+    urlLogo: 'logo',
+    address: 'address',
+    digitalAddress: 'a@aa.com',
+    taxCode: 'taxCode',
+    zipCode: 'zipCode',
   },
   {
-    id: '1',
-    name: 'Comune di Bollate',
+    institutionId: '1',
+    description: 'Comune di Bollate',
+    urlLogo: 'logo',
+    address: 'address',
+    digitalAddress: 'a@aa.com',
+    taxCode: 'taxCode',
+    zipCode: 'zipCode',
+  },
+  {
+    institutionId: 'onboarded',
+    description: 'onboarded',
+    urlLogo: 'logo',
+    address: 'address',
+    digitalAddress: 'a@aa.com',
+    taxCode: 'taxCode',
+    zipCode: 'zipCode',
   },
 ];
 

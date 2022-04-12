@@ -8,7 +8,7 @@ import './../../locale';
 
 jest.mock('../../lib/api-utils');
 
-jest.setTimeout(7000);
+jest.setTimeout(20000);
 
 let fetchWithLogsSpy: jest.SpyInstance;
 
@@ -93,8 +93,6 @@ test('test error productID', async () => {
   await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(1));
   await waitFor(() => screen.getByText('Impossibile individuare il prodotto desiderato'));
 });
-
-jest.setTimeout(10000);
 
 test('test complete', async () => {
   renderComponent();

@@ -151,8 +151,13 @@ export type Product = {
 };
 
 export type Party = {
-  id: string;
-  name: string;
+  institutionId: string;
+  description: string;
+  urlLogo?: string;
+  address: string;
+  digitalAddress: string;
+  taxCode: string;
+  zipCode: string;
 };
 
 export type BillingData = {
