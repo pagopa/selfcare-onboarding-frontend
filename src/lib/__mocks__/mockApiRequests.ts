@@ -272,22 +272,24 @@ export async function mockFetch(
         );
     }
   }
+
   if (endpoint === 'ONBOARDING_GET_PARTY') {
-    switch (endpointParams.institutionId) {
-      case 'id':
-        return new Promise((resolve) =>
-          resolve({ data: mockPartyRegistry, status: 200, statusText: '200' } as AxiosResponse)
-        );
-      default:
-        // eslint-disable-next-line sonarjs/no-identical-functions
-        return new Promise((resolve) =>
-          resolve({
-            isAxiosError: true,
-            response: { status: 404, statusText: 'Not Found' },
-          } as AxiosError)
-        );
+    const fetched = mockPartyRegistry.items.find((p) => p.id === endpointParams.institutionId);
+    if (fetched) {
+      return new Promise((resolve) =>
+        resolve({ data: fetched, status: 200, statusText: '200' } as AxiosResponse)
+      );
+    } else {
+      // eslint-disable-next-line sonarjs/no-identical-functions
+      return new Promise((resolve) =>
+        resolve({
+          isAxiosError: true,
+          response: { status: 404, statusText: 'Not Found' },
+        } as AxiosError)
+      );
     }
   }
+
   if (endpoint === 'ONBOARDING_COMPLETE_REGISTRATION') {
     switch (endpointParams.token) {
       case 'error':
