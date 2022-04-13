@@ -49,7 +49,7 @@ function OnBoardingSubProduct() {
   const [manager, setManager] = useState<UserOnCreate>();
   const [billingData, setBillingData] = useState<BillingData>();
   const [organizationType, setOrganizationType] = useState<OrganizationType>();
-  const [pricingPlan, setPricingPlan] = useState<string | null>();
+  const [pricingPlan, setPricingPlan] = useState<string>('');
   const setStepAddManagerHistoryState = useHistoryState<UsersObject>('people_step2', {})[2];
 
   const history = useHistory();
@@ -266,8 +266,8 @@ function OnBoardingSubProduct() {
           institutionId,
           users: [manager as UserOnCreate],
           billingData: billingData as BillingData,
-          organizationType: organizationType as OrganizationType,
-          pricingPlan: pricingPlan as string,
+          institutionType: organizationType as OrganizationType,
+          pricingPlan,
           setLoading,
           forward,
           back,
