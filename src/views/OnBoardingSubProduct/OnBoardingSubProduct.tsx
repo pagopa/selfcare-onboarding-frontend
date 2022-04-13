@@ -46,6 +46,8 @@ function OnBoardingSubProduct() {
   const [parties, setParties] = useState<Array<Party>>([]);
 
   const [institutionId, setInstitutionId] = useState<string>('');
+  const [origin, setOrigin] = useState<string>('');
+
   const [manager, setManager] = useState<UserOnCreate>();
   const [billingData, setBillingData] = useState<BillingData>();
   const [organizationType, setOrganizationType] = useState<OrganizationType>();
@@ -116,8 +118,25 @@ function OnBoardingSubProduct() {
     forward();
   };
 
-  const forwardWithInstitutionId = (institutionId: string, isUserParty: boolean) => {
+  const forwardWithInstitutionId = (
+    address: string,
+    description: string,
+    digitalAddress: string,
+    taxCode: string,
+    origin: string,
+    institutionId: string,
+    isUserParty: boolean
+  ) => {
     setInstitutionId(institutionId);
+    setOrigin(origin);
+    setBillingData({
+      businessName: description,
+      registeredOffice: address,
+      mailPEC: digitalAddress,
+      taxCode,
+      vatNumber: '',
+      recipientCode: '',
+    });
     trackEvent('ONBOARDING_SELEZIONE_ENTE', {
       party_id: institutionId,
       request_id: requestIdRef.current,
@@ -140,7 +159,9 @@ function OnBoardingSubProduct() {
     } else {
       setStepAddManagerHistoryState({});
     }
-    setBillingData(billingData);
+    if (billingData) {
+      setBillingData(billingData);
+    }
     setOrganizationType(organizationType);
     forward();
   };
@@ -162,9 +183,24 @@ function OnBoardingSubProduct() {
       Component: () =>
         SubProductStepSelectUserParty({
           parties,
-          forward: (institutionId?: string) => {
+          forward: (
+            description: string,
+            address: string,
+            digitalAddress: string,
+            taxCode: string,
+            origin: string,
+            institutionId?: string
+          ) => {
             if (institutionId) {
-              forwardWithInstitutionId(institutionId, true);
+              forwardWithInstitutionId(
+                description,
+                address,
+                digitalAddress,
+                taxCode,
+                origin,
+                institutionId,
+                true
+              );
             } else {
               forward();
             }
@@ -184,8 +220,24 @@ function OnBoardingSubProduct() {
             </Trans>
           ),
           product: subProduct,
-          forward: (_: any, institutionId: string) =>
-            forwardWithInstitutionId(institutionId, false),
+          forward: (
+            description: string,
+            address: string,
+            digitalAddress: string,
+            taxCode: string,
+            origin: string,
+            _: any,
+            institutionId: string
+          ) =>
+            forwardWithInstitutionId(
+              description,
+              address,
+              digitalAddress,
+              taxCode,
+              origin,
+              institutionId,
+              false
+            ),
           back,
         }),
     },
@@ -216,7 +268,6 @@ function OnBoardingSubProduct() {
       label: 'Insert Billing Data',
       Component: () =>
         StepBillingData({
-          // product: subProduct,
           institutionId,
           initialFormData: billingData ?? {
             businessName: '',
@@ -271,6 +322,7 @@ function OnBoardingSubProduct() {
           setLoading,
           forward,
           back,
+          origin,
         }),
     },
     {

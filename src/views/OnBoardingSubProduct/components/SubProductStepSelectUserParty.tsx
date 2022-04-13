@@ -26,7 +26,14 @@ export function SubProductStepSelectUserParty({ forward, parties }: Props) {
     setSelectedHistory(selected);
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const { institutionId } = selected!;
-    forward(institutionId);
+    forward(
+      selected?.description,
+      selected?.address,
+      selected?.digitalAddress,
+      selected?.taxCode,
+      selected?.origin,
+      institutionId
+    );
   };
   const bodyTitle = t('onBoardingSubProduct.selectUserPartyStep.title');
 
