@@ -64,6 +64,7 @@ const handleSearchUserParties = async (
   setParties([]);
 };
 
+// eslint-disable-next-line sonarjs/cognitive-complexity
 function SubProductStepVerifyInputs({
   forward,
   productId,
@@ -71,6 +72,8 @@ function SubProductStepVerifyInputs({
   requestId,
   setLoading,
 }: Props) {
+  const pricingPlanByQuery = new URLSearchParams(window.location.search).get('pricingPlan');
+
   const [error, setError] = useState<boolean>(false);
   const { setOnLogout } = useContext(HeaderContext);
   const { setRequiredLogin } = useContext(UserContext);
@@ -117,10 +120,10 @@ function SubProductStepVerifyInputs({
       ) {
         setError(true);
       } else {
-        forward(selectedProduct, selectedSubProduct, parties);
+        forward(selectedProduct, selectedSubProduct, parties, pricingPlanByQuery);
       }
     }
-  }, [selectedProduct, selectedSubProduct, parties]);
+  }, [selectedProduct, selectedSubProduct, parties, pricingPlanByQuery]);
 
   if (error) {
     unregisterUnloadEvent(setOnLogout);
