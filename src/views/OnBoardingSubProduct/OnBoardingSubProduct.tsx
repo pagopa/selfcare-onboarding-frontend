@@ -49,6 +49,7 @@ function OnBoardingSubProduct() {
   const [manager, setManager] = useState<UserOnCreate>();
   const [billingData, setBillingData] = useState<BillingData>();
   const [organizationType, setOrganizationType] = useState<OrganizationType>();
+  const [pricingPlan, setPricingPlan] = useState<string>('');
   const setStepAddManagerHistoryState = useHistoryState<UsersObject>('people_step2', {})[2];
 
   const history = useHistory();
@@ -84,10 +85,16 @@ function OnBoardingSubProduct() {
     setActiveStep(activeStep + i);
   };
 
-  const forwardWithInputs = (product: Product, subProduct: Product, parties: Array<Party>) => {
+  const forwardWithInputs = (
+    product: Product,
+    subProduct: Product,
+    parties: Array<Party>,
+    pricingPlan: string
+  ) => {
     setProduct(product);
     setSubProduct(subProduct);
     setParties(parties);
+    setPricingPlan(pricingPlan);
     forward(parties.length === 0 ? 2 : 1);
   };
 
@@ -259,7 +266,8 @@ function OnBoardingSubProduct() {
           institutionId,
           users: [manager as UserOnCreate],
           billingData: billingData as BillingData,
-          organizationType: organizationType as OrganizationType,
+          institutionType: organizationType as OrganizationType,
+          pricingPlan,
           setLoading,
           forward,
           back,
