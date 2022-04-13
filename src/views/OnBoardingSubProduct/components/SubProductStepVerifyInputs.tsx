@@ -64,7 +64,6 @@ const handleSearchUserParties = async (
   setParties([]);
 };
 
-// eslint-disable-next-line sonarjs/cognitive-complexity
 function SubProductStepVerifyInputs({
   forward,
   productId,
