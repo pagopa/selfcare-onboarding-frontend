@@ -87,9 +87,9 @@ export default function StepBillingData({
         taxCode: !values.taxCode ? requiredError : undefined,
         vatNumber:
           stepHistoryState.isTaxCodeNotEquals2PIVA && !values.vatNumber ? requiredError : undefined,
-        mailPEC: !values.mailPEC
+        digitalAddress: !values.digitalAddress
           ? requiredError
-          : !mailPECRegexp.test(values.mailPEC)
+          : !mailPECRegexp.test(values.digitalAddress)
           ? t('stepBillingData.invalidEmail')
           : undefined,
         recipientCode: !values.recipientCode ? requiredError : undefined,
@@ -188,7 +188,12 @@ export default function StepBillingData({
               </Grid>
               <Grid item xs={12}>
                 <CustomTextField
-                  {...baseTextFieldProps('mailPEC', t('stepBillingData.mailPEC'), 400, 18)}
+                  {...baseTextFieldProps(
+                    'digitalAddress',
+                    t('stepBillingData.digitalAddress'),
+                    400,
+                    18
+                  )}
                   disabled={ipa}
                 />
               </Grid>

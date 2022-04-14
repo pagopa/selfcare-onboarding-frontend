@@ -178,7 +178,7 @@ export type BillingData = {
   // Sede legale
   registeredOffice: string;
   // Indirizzo PEC
-  mailPEC: string;
+  digitalAddress: string;
   // Codice fiscale
   taxCode: string;
   // Partita iva
@@ -189,10 +189,15 @@ export type BillingData = {
   publicServices?: boolean;
 };
 
-export type OnboardingDto = {
-  manager?: UserOnCreate;
-  billingData?: BillingData;
-  organizationType?: InstitutionType;
+export type InstitutionData = {
+  billingData: BillingData;
+  institutionType: InstitutionType;
+  origin: string;
+};
+
+export type InstitutionOnboardingInfoResource = {
+  institution: InstitutionData;
+  manager: UserOnCreate;
 };
 
 export type InstitutionType = 'PA' | 'GSP' | 'SCP' | 'PT';

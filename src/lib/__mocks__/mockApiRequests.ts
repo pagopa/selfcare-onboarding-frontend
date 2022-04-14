@@ -1,5 +1,5 @@
 import { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
-import { Endpoint, OnboardingDto, SelfcareParty } from '../../../types';
+import { Endpoint, InstitutionOnboardingInfoResource, SelfcareParty } from '../../../types';
 
 const mockPartyRegistry = {
   items: [
@@ -121,14 +121,18 @@ const mockedParties: Array<SelfcareParty> = [
   },
 ];
 
-const mockedOnboardingData0: OnboardingDto = {
-  billingData: {
-    businessName: 'Comune di Milano',
-    registeredOffice: 'Milano, Piazza Colonna 370, CAP 20021',
-    mailPEC: 'comune.milano@pec.it',
-    taxCode: 'AAAAAA11A11A123K',
-    vatNumber: 'AAAAAA11A11A123K',
-    recipientCode: 'M5UXCR1',
+const mockedOnboardingData0: InstitutionOnboardingInfoResource = {
+  institution: {
+    billingData: {
+      businessName: 'Comune di Milano',
+      registeredOffice: 'Milano, Piazza Colonna 370, CAP 20021',
+      digitalAddress: 'comune.milano@pec.it',
+      taxCode: 'AAAAAA11A11A123K',
+      vatNumber: 'AAAAAA11A11A123K',
+      recipientCode: 'M5UXCR1',
+    },
+    institutionType: 'PA',
+    origin: 'IPA',
   },
   manager: {
     email: 'm@ma.it',
@@ -137,17 +141,20 @@ const mockedOnboardingData0: OnboardingDto = {
     surname: 'Rossi',
     role: 'MANAGER',
   },
-  organizationType: 'PA',
 };
 
-const mockedOnboardingData1: OnboardingDto = {
-  billingData: {
-    businessName: 'Comune di Bollate',
-    registeredOffice: 'Bollate, Piazza Colonna 370, CAP 20021',
-    mailPEC: 'comune.bollate@pec.it',
-    taxCode: 'BBBBBB11A11A123K',
-    vatNumber: 'BBBBBB11A11A123K',
-    recipientCode: 'M2UHYR1',
+const mockedOnboardingData1: InstitutionOnboardingInfoResource = {
+  institution: {
+    billingData: {
+      businessName: 'Comune di Bollate',
+      registeredOffice: 'Bollate, Piazza Colonna 370, CAP 20021',
+      digitalAddress: 'comune.bollate@pec.it',
+      taxCode: 'BBBBBB11A11A123K',
+      vatNumber: 'BBBBBB11A11A123K',
+      recipientCode: 'M2UHYR1',
+    },
+    institutionType: 'GSP',
+    origin: 'IPA',
   },
   manager: {
     email: 'm@ma.it',
@@ -156,7 +163,6 @@ const mockedOnboardingData1: OnboardingDto = {
     surname: 'Rosa',
     role: 'MANAGER',
   },
-  organizationType: 'GSP',
 };
 
 const mockedResponseError = {

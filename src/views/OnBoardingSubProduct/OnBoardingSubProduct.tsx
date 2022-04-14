@@ -102,12 +102,12 @@ function OnBoardingSubProduct() {
     forward(parties.length === 0 ? 2 : 1);
   };
 
-  const forwardWithBillingData = () => {
+  const forwardWithBillingData = (newBillingData: BillingData) => {
     trackEvent('ONBOARDING_DATI_FATTURAZIONE', {
       party_id: institutionId,
       request_id: requestIdRef.current,
     });
-    setBillingData(billingData);
+    setBillingData(newBillingData);
     forward();
   };
 
@@ -126,7 +126,7 @@ function OnBoardingSubProduct() {
     setBillingData({
       businessName: party.description,
       registeredOffice: party.address,
-      mailPEC: party.digitalAddress,
+      digitalAddress: party.digitalAddress,
       taxCode: party.taxCode,
       vatNumber: '',
       recipientCode: party.origin === 'IPA' ? party.institutionId : '',
@@ -233,7 +233,7 @@ function OnBoardingSubProduct() {
           initialFormData: billingData ?? {
             businessName: '',
             registeredOffice: '',
-            mailPEC: '',
+            digitalAddress: '',
             taxCode: '',
             vatNumber: '',
             recipientCode: '',
