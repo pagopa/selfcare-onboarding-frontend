@@ -11,6 +11,7 @@ import { withLogin } from '../../components/withLogin';
 import {
   BillingData,
   OrganizationType,
+  Party,
   Product,
   RequestOutcome,
   RequestOutcomeOptions,
@@ -39,6 +40,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
   const [activeStep, setActiveStep] = useState(0);
   const [formData, setFormData] = useState<Partial<FormData>>();
   const [institutionId, setInstitutionId] = useState<string>('');
+  const [origin, setOrigin] = useState<string>('');
   const [outcome, setOutcome] = useState<RequestOutcome>();
   const history = useHistory();
   const [openExitModal, setOpenExitModal] = useState(false);
@@ -104,12 +106,18 @@ function OnboardingComponent({ productId }: { productId: string }) {
     forward();
   };
 
-  const forwardWithDataAndInstitutionId = (
-    newFormData: Partial<FormData>,
-    institutionId: string
-  ) => {
-    setInstitutionId(institutionId);
+  const forwardWithDataAndInstitution = (newFormData: Partial<FormData>, party: Party) => {
+    setInstitutionId(party.institutionId);
     forwardWithData(newFormData);
+    setOrigin(party.origin);
+    setBillingData({
+      businessName: party.description,
+      registeredOffice: party.address,
+      mailPEC: party.digitalAddress,
+      taxCode: party.taxCode,
+      vatNumber: '',
+      recipientCode: party.origin === 'IPA' ? party.institutionId : '',
+    });
     trackEvent('ONBOARDING_SELEZIONE_ENTE', {
       party_id: institutionId,
       request_id: requestIdRef.current,
@@ -131,7 +139,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
 
     const postLegalsResponse = await fetchWithLogs(
       { endpoint: 'ONBOARDING_POST_LEGALS', endpointParams: { institutionId, productId } },
-      { method: 'POST', data: { users, billingData, organizationType } },
+      { method: 'POST', data: { users, billingData, organizationType, origin } },
       () => setRequiredLogin(true)
     );
 
@@ -188,7 +196,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
             </Trans>
           ),
           product: selectedProduct,
-          forward: forwardWithDataAndInstitutionId,
+          forward: forwardWithDataAndInstitution,
           back,
         }),
     },

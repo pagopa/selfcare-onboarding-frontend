@@ -30,6 +30,7 @@ type Props = StepperStepComponentProps & {
   institutionType: OrganizationType;
   pricingPlan: string;
   setLoading: (loading: boolean) => void;
+  origin: string;
 };
 
 const errorOutCome = {
@@ -88,6 +89,7 @@ function SubProductStepSubmit({
   setLoading,
   institutionType,
   pricingPlan,
+  origin,
 }: Props) {
   const [error, setError] = useState<boolean>(false);
   const { setOnLogout } = useContext(HeaderContext);
@@ -122,7 +124,7 @@ function SubProductStepSubmit({
         endpoint: 'ONBOARDING_POST_LEGALS',
         endpointParams: { institutionId, productId: subProduct.id },
       },
-      { method: 'POST', data: { users, billingData, institutionType, pricingPlan } },
+      { method: 'POST', data: { users, billingData, institutionType, pricingPlan, origin } },
       () => setRequiredLogin(true)
     );
 
