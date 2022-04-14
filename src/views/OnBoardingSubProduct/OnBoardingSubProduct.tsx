@@ -9,12 +9,12 @@ import { useTranslation, Trans } from 'react-i18next';
 import { withLogin } from '../../components/withLogin';
 import {
   BillingData,
-  OrganizationType,
+  InstitutionType,
   SelfcareParty,
+  Party,
   Product,
   StepperStep,
   UserOnCreate,
-  Party,
 } from '../../../types';
 import { LoadingOverlay } from '../../components/LoadingOverlay';
 import { ENV } from '../../utils/env';
@@ -51,8 +51,9 @@ function OnBoardingSubProduct() {
 
   const [manager, setManager] = useState<UserOnCreate>();
   const [billingData, setBillingData] = useState<BillingData>();
-  const [organizationType, setOrganizationType] = useState<OrganizationType>();
+  const [organizationType, setOrganizationType] = useState<InstitutionType>();
   const [pricingPlan, setPricingPlan] = useState<string>('');
+
   const setStepAddManagerHistoryState = useHistoryState<UsersObject>('people_step2', {})[2];
 
   const history = useHistory();
@@ -144,7 +145,7 @@ function OnBoardingSubProduct() {
   const forwardWithOnboardingData = (
     manager?: UserOnCreate,
     billingData?: BillingData,
-    organizationType?: OrganizationType
+    organizationType?: InstitutionType
   ) => {
     setManager(manager);
     if (manager) {
@@ -238,7 +239,7 @@ function OnBoardingSubProduct() {
             recipientCode: '',
             publicServices: organizationType === 'GSP' ? false : undefined,
           },
-          organizationType: organizationType as OrganizationType,
+          organizationType: organizationType as InstitutionType,
           origin,
           subtitle: t('onBoardingSubProduct.billingData.subTitle'),
           forward: forwardWithBillingData,
@@ -278,12 +279,12 @@ function OnBoardingSubProduct() {
           institutionId,
           users: [manager as UserOnCreate],
           billingData: billingData as BillingData,
-          institutionType: organizationType as OrganizationType,
+          institutionType: organizationType as InstitutionType,
           pricingPlan,
+          origin,
           setLoading,
           forward,
           back,
-          origin,
         }),
     },
     {

@@ -4,7 +4,7 @@ import { useFormik } from 'formik';
 import { useTranslation } from 'react-i18next';
 import Checkbox from '@mui/material/Checkbox';
 import { useEffect } from 'react';
-import { BillingData, OrganizationType, StepperStepComponentProps } from '../../../types';
+import { BillingData, InstitutionType, StepperStepComponentProps } from '../../../types';
 import { OnboardingStepActions } from '../OnboardingStepActions';
 import { useHistoryState } from '../useHistoryState';
 
@@ -23,7 +23,7 @@ type StepBillingDataHistoryState = {
 
 type Props = StepperStepComponentProps & {
   initialFormData: BillingData;
-  organizationType: OrganizationType;
+  organizationType: InstitutionType;
   subtitle: string;
   institutionId: string;
   origin?: string;

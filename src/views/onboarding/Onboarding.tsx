@@ -10,11 +10,11 @@ import { IllusCompleted, IllusError } from '@pagopa/mui-italia';
 import { withLogin } from '../../components/withLogin';
 import {
   BillingData,
-  OrganizationType,
-  Party,
+  InstitutionType,
   Product,
   RequestOutcome,
   RequestOutcomeOptions,
+  Party,
   StepperStep,
   UserOnCreate,
 } from '../../../types';
@@ -40,14 +40,14 @@ function OnboardingComponent({ productId }: { productId: string }) {
   const [activeStep, setActiveStep] = useState(0);
   const [formData, setFormData] = useState<Partial<FormData>>();
   const [institutionId, setInstitutionId] = useState<string>('');
-  const [origin, setOrigin] = useState<string>('');
   const [outcome, setOutcome] = useState<RequestOutcome>();
   const history = useHistory();
   const [openExitModal, setOpenExitModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>();
   const [openExitUrl, setOpenExitUrl] = useState(ENV.URL_FE.LOGOUT);
   const [billingData, setBillingData] = useState<BillingData>();
-  const [organizationType, setOrganizationType] = useState<OrganizationType>();
+  const [institutionType, setInstitutionType] = useState<InstitutionType>();
+  const [origin, setOrigin] = useState<string>('');
   const { setOnLogout } = useContext(HeaderContext);
   const { setRequiredLogin } = useContext(UserContext);
   const requestIdRef = useRef<string>();
@@ -139,7 +139,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
 
     const postLegalsResponse = await fetchWithLogs(
       { endpoint: 'ONBOARDING_POST_LEGALS', endpointParams: { institutionId, productId } },
-      { method: 'POST', data: { users, billingData, organizationType, origin } },
+      { method: 'POST', data: { billingData, institutionType, origin, users } },
       () => setRequiredLogin(true)
     );
 
@@ -167,19 +167,19 @@ function OnboardingComponent({ productId }: { productId: string }) {
 
   const forwardWithOnboardingData = (
     billingData?: BillingData,
-    organizationType?: OrganizationType
+    institutionType?: InstitutionType
   ) => {
     setBillingData(billingData);
-    setOrganizationType(organizationType);
+    setInstitutionType(institutionType);
     forward();
   };
 
-  const forwardWithInstitutionType = (newInstitutionType: OrganizationType) => {
+  const forwardWithInstitutionType = (newInstitutionType: InstitutionType) => {
     trackEvent('ONBOARDING_TIPO_ENTE', {
       party_id: institutionId,
       request_id: requestIdRef.current,
     });
-    setOrganizationType(newInstitutionType);
+    setInstitutionType(newInstitutionType);
     forward();
   };
 
@@ -218,7 +218,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
       label: 'Seleziona il tipo di ente',
       Component: () =>
         StepInstitutionType({
-          organizationType: organizationType as OrganizationType,
+          institutionType: institutionType as InstitutionType,
           forward: forwardWithInstitutionType,
           back: () => {
             if (window.location.search.indexOf(`institutionId=${institutionId}`) > -1) {
@@ -242,9 +242,9 @@ function OnboardingComponent({ productId }: { productId: string }) {
             taxCode: '',
             vatNumber: '',
             recipientCode: '',
-            publicServices: organizationType === 'GSP' ? false : undefined,
+            publicServices: institutionType === 'GSP' ? false : undefined,
           },
-          organizationType: organizationType as OrganizationType,
+          organizationType: institutionType as InstitutionType,
           subtitle: t('onBoardingSubProduct.billingData.subTitle'),
           forward: forwardWithBillingData,
           back,
