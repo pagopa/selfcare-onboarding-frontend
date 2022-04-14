@@ -26,6 +26,7 @@ type Props = StepperStepComponentProps & {
   organizationType: OrganizationType;
   subtitle: string;
   institutionId: string;
+  origin?: string;
 };
 
 export default function StepBillingData({
@@ -35,9 +36,10 @@ export default function StepBillingData({
   subtitle,
   organizationType,
   institutionId,
+  origin,
 }: Props) {
   const requiredError = 'Required';
-  const ipa = organizationType === 'PA';
+  const ipa = origin === 'IPA';
 
   const theme = useTheme();
 
