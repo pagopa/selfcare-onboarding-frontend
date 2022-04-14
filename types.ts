@@ -191,7 +191,7 @@ export type BillingData = {
 
 export type InstitutionData = {
   billingData: BillingData;
-  institutionType: OrganizationType;
+  institutionType: InstitutionType;
   origin: string;
 };
 
