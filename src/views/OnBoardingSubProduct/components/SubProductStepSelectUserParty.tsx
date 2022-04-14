@@ -25,7 +25,7 @@ export function SubProductStepSelectUserParty({ forward, parties }: Props) {
   );
   const onForwardAction = () => {
     setSelectedHistory(selected);
-    forward(selected as SelfcareParty);
+    forward(selected as Party);
   };
   const bodyTitle = t('onBoardingSubProduct.selectUserPartyStep.title');
 
