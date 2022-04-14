@@ -3,7 +3,7 @@ import { Box } from '@mui/system';
 import { useEffect } from 'react';
 import { useTranslation, Trans } from 'react-i18next';
 import { EntityAccountItem } from '@pagopa/mui-italia/dist/components/EntityAccountItem';
-import { SelfcareParty, StepperStepComponentProps } from '../../../../types';
+import { Party, SelfcareParty, StepperStepComponentProps } from '../../../../types';
 import { OnboardingStepActions } from '../../../components/OnboardingStepActions';
 import { useHistoryState } from '../../../components/useHistoryState';
 
