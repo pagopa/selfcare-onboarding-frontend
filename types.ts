@@ -152,7 +152,7 @@ export type Product = {
   parent?: string;
 };
 
-export type Party = {
+export type SelfcareParty = {
   institutionId: string;
   description: string;
   urlLogo?: string;

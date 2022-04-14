@@ -4,7 +4,7 @@ import { useContext, useEffect, useState } from 'react';
 import { AxiosResponse } from 'axios';
 import { useTranslation, Trans } from 'react-i18next';
 import { ReactElement } from 'react';
-import { IPACatalogParty, Party, StepperStepComponentProps } from '../../../types';
+import { IPACatalogParty, SelfcareParty, StepperStepComponentProps } from '../../../types';
 import { getFetchOutcome } from '../../lib/error-utils';
 import { fetchWithLogs } from '../../lib/api-utils';
 import { UserContext } from '../../lib/context';
@@ -15,7 +15,6 @@ import { AsyncAutocompleteV2 } from '../autocomplete/AsyncAutocompleteV2';
 
 type Props = {
   subTitle: string | ReactElement;
-  parties?: Array<Party>;
 } & StepperStepComponentProps;
 
 const handleSearchInstitutionId = async (
@@ -40,8 +39,7 @@ const handleSearchInstitutionId = async (
   return null;
 };
 
-// eslint-disable-next-line sonarjs/cognitive-complexity
-export function StepSearchParty({ parties, subTitle, forward, back }: Props) {
+export function StepSearchParty({ subTitle, forward, back }: Props) {
   const institutionIdByQuery = new URLSearchParams(window.location.search).get('institutionId');
   const { setRequiredLogin } = useContext(UserContext);
   const theme = useTheme();
@@ -57,7 +55,7 @@ export function StepSearchParty({ parties, subTitle, forward, back }: Props) {
     setSelectedHistory(selected);
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const { id } = selected!;
-    forward({ institutionId: id }, id);
+    forward({ institutionId: id }, { ...selected, institutionId: id } as SelfcareParty);
   };
 
   const { t } = useTranslation();
@@ -178,7 +176,7 @@ export function StepSearchParty({ parties, subTitle, forward, back }: Props) {
       <Grid item mt={4}>
         <OnboardingStepActions
           back={
-            parties && parties.length > 0
+            back
               ? {
                   action: back,
                   label: t('onboardingStep1.onboarding.onboardingStepActions.backAction'),

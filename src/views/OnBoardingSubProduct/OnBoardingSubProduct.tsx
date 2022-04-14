@@ -9,8 +9,8 @@ import { useTranslation, Trans } from 'react-i18next';
 import { withLogin } from '../../components/withLogin';
 import {
   BillingData,
-  OrganizationType,
-  Party,
+  InstitutionType,
+  SelfcareParty,
   Product,
   StepperStep,
   UserOnCreate,
@@ -43,14 +43,16 @@ function OnBoardingSubProduct() {
 
   const [subProduct, setSubProduct] = useState<Product>();
   const [product, setProduct] = useState<Product>();
-  const [parties, setParties] = useState<Array<Party>>([]);
+  const [parties, setParties] = useState<Array<SelfcareParty>>([]);
 
   const [institutionId, setInstitutionId] = useState<string>('');
+  const [origin, setOrigin] = useState<string>('');
+
   const [manager, setManager] = useState<UserOnCreate>();
   const [billingData, setBillingData] = useState<BillingData>();
-  const [organizationType, setOrganizationType] = useState<OrganizationType>();
+  const [organizationType, setOrganizationType] = useState<InstitutionType>();
   const [pricingPlan, setPricingPlan] = useState<string>('');
-  const [origin, setOrigin] = useState<string>('');
+
   const setStepAddManagerHistoryState = useHistoryState<UsersObject>('people_step2', {})[2];
 
   const history = useHistory();
@@ -89,7 +91,7 @@ function OnBoardingSubProduct() {
   const forwardWithInputs = (
     product: Product,
     subProduct: Product,
-    parties: Array<Party>,
+    parties: Array<SelfcareParty>,
     pricingPlan: string
   ) => {
     setProduct(product);
@@ -117,13 +119,17 @@ function OnBoardingSubProduct() {
     forward();
   };
 
-  const forwardWithInstitutionId = (
-    institutionId: string,
-    origin: string,
-    isUserParty: boolean
-  ) => {
-    setInstitutionId(institutionId);
-    setOrigin(origin);
+  const forwardWithInstitution = (party: SelfcareParty, isUserParty: boolean) => {
+    setInstitutionId(party.institutionId);
+    setOrigin(party.origin);
+    setBillingData({
+      businessName: party.description,
+      registeredOffice: party.address,
+      mailPEC: party.digitalAddress,
+      taxCode: party.taxCode,
+      vatNumber: '',
+      recipientCode: party.origin === 'IPA' ? party.institutionId : '',
+    });
     trackEvent('ONBOARDING_SELEZIONE_ENTE', {
       party_id: institutionId,
       request_id: requestIdRef.current,
@@ -138,7 +144,7 @@ function OnBoardingSubProduct() {
   const forwardWithOnboardingData = (
     manager?: UserOnCreate,
     billingData?: BillingData,
-    organizationType?: OrganizationType
+    organizationType?: InstitutionType
   ) => {
     setManager(manager);
     if (manager) {
@@ -146,7 +152,9 @@ function OnBoardingSubProduct() {
     } else {
       setStepAddManagerHistoryState({});
     }
-    setBillingData(billingData);
+    if (billingData) {
+      setBillingData(billingData);
+    }
     setOrganizationType(organizationType);
     forward();
   };
@@ -168,9 +176,9 @@ function OnBoardingSubProduct() {
       Component: () =>
         SubProductStepSelectUserParty({
           parties,
-          forward: (institutionId?: string) => {
-            if (institutionId) {
-              forwardWithInstitutionId(institutionId, origin, true);
+          forward: (party?: SelfcareParty) => {
+            if (party) {
+              forwardWithInstitution(party, true);
             } else {
               forward();
             }
@@ -182,7 +190,6 @@ function OnBoardingSubProduct() {
       label: 'Select Institution unreleated',
       Component: () =>
         StepSearchParty({
-          parties,
           subTitle: (
             <Trans i18nKey="onBoardingSubProduct.selectUserPartyStep.subTitle">
               Seleziona l&apos;ente per il quale stai richiedendo la sottoscrizione <br />
@@ -190,8 +197,7 @@ function OnBoardingSubProduct() {
             </Trans>
           ),
           product: subProduct,
-          forward: (_: any, institutionId: string) =>
-            forwardWithInstitutionId(institutionId, origin, false),
+          forward: (_: any, party: SelfcareParty) => forwardWithInstitution(party, false),
           back,
         }),
     },
@@ -222,7 +228,6 @@ function OnBoardingSubProduct() {
       label: 'Insert Billing Data',
       Component: () =>
         StepBillingData({
-          // product: subProduct,
           institutionId,
           initialFormData: billingData ?? {
             businessName: '',
@@ -233,7 +238,7 @@ function OnBoardingSubProduct() {
             recipientCode: '',
             publicServices: organizationType === 'GSP' ? false : undefined,
           },
-          organizationType: organizationType as OrganizationType,
+          organizationType: organizationType as InstitutionType,
           subtitle: t('onBoardingSubProduct.billingData.subTitle'),
           forward: forwardWithBillingData,
           back: () => {
@@ -272,7 +277,7 @@ function OnBoardingSubProduct() {
           institutionId,
           users: [manager as UserOnCreate],
           billingData: billingData as BillingData,
-          institutionType: organizationType as OrganizationType,
+          institutionType: organizationType as InstitutionType,
           pricingPlan,
           origin,
           setLoading,

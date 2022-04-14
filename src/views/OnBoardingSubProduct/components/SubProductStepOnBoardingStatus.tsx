@@ -5,6 +5,7 @@ import { resolvePathVariables } from '@pagopa/selfcare-common-frontend/utils/rou
 import { useTranslation, Trans } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
 import { History } from 'history';
+import { IllusError } from '@pagopa/mui-italia';
 import { RequestOutcomeMessage, StepperStepComponentProps } from '../../../../types';
 import { MessageNoAction } from '../../../components/MessageNoAction';
 import { HeaderContext, UserContext } from '../../../lib/context';
@@ -13,7 +14,6 @@ import { LoadingOverlay } from '../../../components/LoadingOverlay';
 import { fetchWithLogs } from '../../../lib/api-utils';
 import { getFetchOutcome } from '../../../lib/error-utils';
 import { ROUTES } from '../../../utils/constants';
-import { ReactComponent as ErrorIcon } from '../../../assets/payment_completed_error.svg';
 import { ReactComponent as SubscribedIcon } from '../../../assets/already-onboarded.svg';
 import { unregisterUnloadEvent } from '../../../utils/unloadEvent-utils';
 
@@ -68,83 +68,87 @@ const buildNotBasicProduct = (
   productId: string,
   history: History
 ): RequestOutcomeMessage => ({
-  ImgComponent: ErrorIcon,
   title: '',
   description: [
-    <Grid container direction="column" key="0">
-      <Grid container item justifyContent="center" mt={2}>
-        <Grid item xs={6}>
-          <Typography variant="h4">
-            <Trans i18nKey="onBoardingSubProduct.notBasicProductError.title">
-              L&apos;ente non ha aderito a {{ selectedProduct: productTitle }}
-            </Trans>
-          </Typography>
+    <>
+      <IllusError size={60} />
+      <Grid container direction="column" key="0">
+        <Grid container item justifyContent="center" mt={3}>
+          <Grid item xs={6}>
+            <Typography variant="h4">
+              <Trans i18nKey="onBoardingSubProduct.notBasicProductError.title">
+                L&apos;ente non ha aderito a {{ selectedProduct: productTitle }}
+              </Trans>
+            </Typography>
+          </Grid>
+        </Grid>
+        <Grid container item justifyContent="center" mb={2} mt={1}>
+          <Grid item xs={6}>
+            <Typography>
+              <Trans i18nKey="onBoardingSubProduct.notBasicProductError.message">
+                Per poter sottoscrivere l&apos;offerta Premium, l&apos;ente che hai <br />
+                selezionato deve prima aderire al prodotto {{ selectedProduct: productTitle }}
+              </Trans>
+            </Typography>
+          </Grid>
+        </Grid>
+        <Grid container item justifyContent="center" mt={3}>
+          <Grid item xs={4}>
+            <Button
+              variant="contained"
+              sx={{ alignSelf: 'center' }}
+              onClick={() =>
+                history.push(resolvePathVariables(ROUTES.ONBOARDING.PATH, { productId }))
+              }
+            >
+              <Trans i18nKey="onBoardingSubProduct.notBasicProductError.adhesionButton">
+                Aderisci
+              </Trans>
+            </Button>
+          </Grid>
         </Grid>
       </Grid>
-      <Grid container item justifyContent="center" mb={2} mt={1}>
-        <Grid item xs={6}>
-          <Typography>
-            <Trans i18nKey="onBoardingSubProduct.notBasicProductError.message">
-              Per poter sottoscrivere l&apos;offerta Premium, l&apos;ente che hai <br />
-              selezionato deve prima aderire al prodotto {{ selectedProduct: productTitle }}
-            </Trans>
-          </Typography>
-        </Grid>
-      </Grid>
-      <Grid container item justifyContent="center" mt={3}>
-        <Grid item xs={4}>
-          <Button
-            variant="contained"
-            sx={{ alignSelf: 'center' }}
-            onClick={() =>
-              history.push(resolvePathVariables(ROUTES.ONBOARDING.PATH, { productId }))
-            }
-          >
-            <Trans i18nKey="onBoardingSubProduct.notBasicProductError.adhesionButton">
-              Aderisci
-            </Trans>
-          </Button>
-        </Grid>
-      </Grid>
-    </Grid>,
+    </>,
   ],
 });
 
 const genericError: RequestOutcomeMessage = {
-  ImgComponent: ErrorIcon,
   title: '',
   description: [
-    <Grid container direction="column" key="0">
-      <Grid container item justifyContent="center">
-        <Grid item xs={6}>
-          <Typography variant="h4">
-            <Trans i18nKey="onboardingStep1_5.genericError.title" />
-          </Typography>
+    <>
+      <IllusError size={60} />
+      <Grid container direction="column" key="0" mt={3}>
+        <Grid container item justifyContent="center">
+          <Grid item xs={6}>
+            <Typography variant="h4">
+              <Trans i18nKey="onboardingStep1_5.genericError.title" />
+            </Typography>
+          </Grid>
+        </Grid>
+        <Grid container item justifyContent="center" mb={3} mt={1}>
+          <Grid item xs={6}>
+            <Typography>
+              <Trans i18nKey="onboardingStep1_5.genericError.description">
+                A causa di un errore del sistema non è possibile completare la procedura.
+                <br />
+                Ti chiediamo di riprovare più tardi.
+              </Trans>
+            </Typography>
+          </Grid>
+        </Grid>
+        <Grid container item justifyContent="center">
+          <Grid item xs={4}>
+            <Button
+              variant="contained"
+              sx={{ alignSelf: 'center' }}
+              onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+            >
+              <Trans i18nKey="onboardingStep1_5.genericError.backAction" />
+            </Button>
+          </Grid>
         </Grid>
       </Grid>
-      <Grid container item justifyContent="center" mb={3} mt={1}>
-        <Grid item xs={6}>
-          <Typography>
-            <Trans i18nKey="onboardingStep1_5.genericError.description">
-              A causa di un errore del sistema non è possibile completare la procedura.
-              <br />
-              Ti chiediamo di riprovare più tardi.
-            </Trans>
-          </Typography>
-        </Grid>
-      </Grid>
-      <Grid container item justifyContent="center">
-        <Grid item xs={4}>
-          <Button
-            variant="contained"
-            sx={{ alignSelf: 'center' }}
-            onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
-          >
-            <Trans i18nKey="onboardingStep1_5.genericError.backAction" />
-          </Button>
-        </Grid>
-      </Grid>
-    </Grid>,
+    </>,
   ],
 };
 
