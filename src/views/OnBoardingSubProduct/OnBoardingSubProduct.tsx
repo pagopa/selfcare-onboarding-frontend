@@ -121,7 +121,7 @@ function OnBoardingSubProduct() {
 
   const forwardWithInstitution = (party: Party, isUserParty: boolean) => {
     setInstitutionId(institutionId);
-    setOrigin(origin);
+    setOrigin(party.origin);
     setBillingData({
       businessName: party.description,
       registeredOffice: party.address,
