@@ -3,14 +3,14 @@ import { FormControl, FormControlLabel, Grid, Radio, RadioGroup, Typography } fr
 import { Box } from '@mui/system';
 import React from 'react';
 import { useTranslation, Trans } from 'react-i18next';
-import { OrganizationType, StepperStepComponentProps } from '../../../types';
+import { InstitutionType, StepperStepComponentProps } from '../../../types';
 import { OnboardingStepActions } from '../OnboardingStepActions';
 
 type Props = StepperStepComponentProps & {
-  institutionType: OrganizationType;
+  institutionType: InstitutionType;
 };
 
-const organizationTypeValues: Array<{ labelKey: string; value: OrganizationType }> = [
+const organizationTypeValues: Array<{ labelKey: string; value: InstitutionType }> = [
   { labelKey: 'pa', value: 'PA' },
   { labelKey: 'gsp', value: 'GSP' },
   { labelKey: 'scp', value: 'SCP' },
@@ -18,12 +18,12 @@ const organizationTypeValues: Array<{ labelKey: string; value: OrganizationType 
 ];
 
 export default function StepInstitutionType({ back, forward, institutionType }: Props) {
-  const [selectedValue, setSelectedValue] = React.useState<OrganizationType>(institutionType);
+  const [selectedValue, setSelectedValue] = React.useState<InstitutionType>(institutionType);
 
   const { t } = useTranslation();
   const theme = useTheme();
 
-  const handleChange = (value: OrganizationType) => setSelectedValue(value);
+  const handleChange = (value: InstitutionType) => setSelectedValue(value);
 
   const onForwardAction = () => {
     forward(selectedValue);

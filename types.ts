@@ -183,7 +183,7 @@ export type BillingData = {
 export type OnboardingDto = {
   manager?: UserOnCreate;
   billingData?: BillingData;
-  organizationType?: OrganizationType;
+  organizationType?: InstitutionType;
 };
 
-export type OrganizationType = 'PA' | 'GSP' | 'SCP' | 'PT';
+export type InstitutionType = 'PA' | 'GSP' | 'SCP' | 'PT';

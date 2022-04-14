@@ -8,7 +8,7 @@ import { IllusError, theme } from '@pagopa/mui-italia';
 import { Trans } from 'react-i18next';
 import {
   BillingData,
-  OrganizationType,
+  InstitutionType,
   Product,
   StepperStepComponentProps,
   UserOnCreate,
@@ -27,7 +27,7 @@ type Props = StepperStepComponentProps & {
   institutionId: string;
   users: Array<UserOnCreate>;
   billingData: BillingData;
-  institutionType: OrganizationType;
+  institutionType: InstitutionType;
   pricingPlan: string;
   origin: string;
   setLoading: (loading: boolean) => void;
