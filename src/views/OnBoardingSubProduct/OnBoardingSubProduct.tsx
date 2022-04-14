@@ -118,7 +118,7 @@ function OnBoardingSubProduct() {
     forward();
   };
 
-  const forwardWithInstitution = (party: SelfcareParty, isUserParty: boolean) => {
+  const forwardWithInstitution = (party: Party, isUserParty: boolean) => {
     setInstitutionId(party.institutionId);
     setBillingData({
       businessName: party.description,
@@ -174,7 +174,7 @@ function OnBoardingSubProduct() {
       Component: () =>
         SubProductStepSelectUserParty({
           parties,
-          forward: (party?: SelfcareParty) => {
+          forward: (party?: Party) => {
             if (party) {
               forwardWithInstitution(party, true);
             } else {
