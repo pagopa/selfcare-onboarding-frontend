@@ -334,6 +334,7 @@ const fillUserForm = async (
   prefix: string,
   taxCode: string,
   email: string,
+  vatNumber: string,
   existentTaxCode?: string,
   expectedDuplicateTaxCodeMessages?: number,
   existentEmail?: string,
@@ -368,7 +369,9 @@ const fillUserForm = async (
     expectedDuplicateTaxCodeMessages,
     existentEmail,
     email,
-    expectedDuplicateEmailMessages
+    expectedDuplicateEmailMessages,
+    expectedInvalidVatNumber,
+    expectedInvalidVatNumberMessages,
   );
 };
 
@@ -380,7 +383,9 @@ const checkAlreadyExistentValues = async (
   expectedDuplicateTaxCodeMessages: number | undefined,
   existentEmail: string | undefined,
   email: string,
-  expectedDuplicateEmailMessages: number | undefined
+  expectedDuplicateEmailMessages: number | undefined,
+  invalidVatNumber: string | undefined,
+  expectedInvalidVatNumberMessages: number | undefined,
 ) => {
   if (existentTaxCode) {
     await fillTextFieldAndCheckButton(prefix, 'taxCode', existentTaxCode, confirmButton, false);
@@ -395,6 +400,13 @@ const checkAlreadyExistentValues = async (
     expect(duplicateEmailErrors.length).toBe(expectedDuplicateEmailMessages);
   }
   await fillTextFieldAndCheckButton(prefix, 'email', email, confirmButton, true);
+
+  if (invalidVatNumber) {
+    await fillTextFieldAndCheckButton(prefix, 'vatNumber', invalidVatNumber, confirmButton, false);
+    const invalidVatNumberError = screen.getAllByText('Partita IVA non valida');
+    expect(invalidVatNumberError.length).toBe(expectedInvalidVatNumberMessages);
+  }
+  }
 };
 
 const fillTextFieldAndCheckButton = async (
