@@ -18,7 +18,7 @@ export function SubProductStepSelectUserParty({ forward, parties }: Props) {
 
   const theme = useTheme();
 
-  const [_origin, setOrigin] = useState<string>('');
+  const [origin, setOrigin] = useState<string>('');
   const [selected, setSelected, setSelectedHistory] = useHistoryState<Party | null>(
     'SubProductStepSelectUserParty',
     null
@@ -49,7 +49,7 @@ export function SubProductStepSelectUserParty({ forward, parties }: Props) {
     if (institutionIdByQuery && selected && origin) {
       onForwardAction();
     }
-  }, [selected, origin]);
+  }, [selected]);
 
   return (
     <Grid container direction="column">

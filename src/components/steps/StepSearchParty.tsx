@@ -46,7 +46,7 @@ export function StepSearchParty({ parties, subTitle, forward, back }: Props) {
   const { setRequiredLogin } = useContext(UserContext);
   const theme = useTheme();
 
-  const [_origin, setOrigin] = useState<string>('');
+  const [origin, setOrigin] = useState<string>('');
   const [loading, setLoading] = useState(!!institutionIdByQuery);
   const [selected, setSelected, setSelectedHistory] = useHistoryState<IPACatalogParty | null>(
     'selected_step1',
@@ -68,9 +68,9 @@ export function StepSearchParty({ parties, subTitle, forward, back }: Props) {
       handleSearchInstitutionId(institutionIdByQuery, () => setRequiredLogin(true))
         .then((ipaParty) => {
           if (ipaParty) {
-            const originParty = ipaParty.origin;
+            const selectedOriginParty = ipaParty.origin;
             setSelected(ipaParty);
-            setOrigin(originParty);
+            setOrigin(selectedOriginParty);
           } else {
             // eslint-disable-next-line functional/immutable-data
             window.location.search = '';
@@ -92,7 +92,7 @@ export function StepSearchParty({ parties, subTitle, forward, back }: Props) {
     if (institutionIdByQuery && selected && origin) {
       onForwardAction();
     }
-  }, [selected, origin]);
+  }, [selected]);
 
   return loading ? (
     <LoadingOverlay loadingText={t('onboardingStep1.loadingOverlayText')} />
