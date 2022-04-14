@@ -128,7 +128,7 @@ function OnBoardingSubProduct() {
       mailPEC: party.digitalAddress,
       taxCode: party.taxCode,
       vatNumber: '',
-      recipientCode: '',
+      recipientCode: origin === 'IPA' ? party.institutionId : '', // TODO to verify if use origin or institutionType
     });
     trackEvent('ONBOARDING_SELEZIONE_ENTE', {
       party_id: institutionId,
