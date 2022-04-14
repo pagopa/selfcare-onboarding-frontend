@@ -132,6 +132,8 @@ const mockedOnboardingData0: InstitutionOnboardingInfoResource = {
     surname: 'Rossi',
     role: 'MANAGER',
   },
+  organizationType: 'PA',
+  origin: 'IPA',
 };
 
 const mockedOnboardingData1: InstitutionOnboardingInfoResource = {
@@ -150,6 +152,8 @@ const mockedOnboardingData1: InstitutionOnboardingInfoResource = {
     surname: 'Rosa',
     role: 'MANAGER',
   },
+  organizationType: 'GSP',
+  origin: 'IPA',
 };
 
 const mockedResponseError = {

@@ -192,7 +192,8 @@ export type BillingData = {
 export type InstitutionOnboardingInfoResource = {
   manager?: UserOnCreate;
   billingData?: BillingData;
-  // organizationType?: OrganizationType;
+  organizationType?: OrganizationType;
+  origin: string;
 };
 
 export type OrganizationType = 'PA' | 'GSP' | 'SCP' | 'PT';

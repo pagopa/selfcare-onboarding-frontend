@@ -87,7 +87,7 @@ function StepOnboardingData({ forward, institutionId, productId }: Props) {
     const restOutcomeData = getFetchOutcome(onboardingData);
     if (restOutcomeData === 'success') {
       const result = (onboardingData as AxiosResponse).data as InstitutionOnboardingInfoResource;
-      forward(result.manager, result.billingData);
+      forward(result.manager, result.billingData, result.organizationType, result.origin);
     } else if (
       (onboardingData as AxiosError<any>).response?.status === 404 ||
       (onboardingData as AxiosError<any>).response?.status === 400
