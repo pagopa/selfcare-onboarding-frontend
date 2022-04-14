@@ -7,7 +7,7 @@ import { OrganizationType, StepperStepComponentProps } from '../../../types';
 import { OnboardingStepActions } from '../OnboardingStepActions';
 
 type Props = StepperStepComponentProps & {
-  organizationType: OrganizationType;
+  institutionType: OrganizationType;
 };
 
 const organizationTypeValues: Array<{ labelKey: string; value: OrganizationType }> = [
@@ -17,8 +17,8 @@ const organizationTypeValues: Array<{ labelKey: string; value: OrganizationType 
   { labelKey: 'pt', value: 'PT' },
 ];
 
-export default function StepInstitutionType({ back, forward, organizationType }: Props) {
-  const [selectedValue, setSelectedValue] = React.useState<OrganizationType>(organizationType);
+export default function StepInstitutionType({ back, forward, institutionType }: Props) {
+  const [selectedValue, setSelectedValue] = React.useState<OrganizationType>(institutionType);
 
   const { t } = useTranslation();
   const theme = useTheme();
@@ -56,7 +56,7 @@ export default function StepInstitutionType({ back, forward, organizationType }:
         <Grid container item>
           <Grid item xs={12} p={3}>
             <FormControl>
-              <RadioGroup name="radio-buttons-group" defaultValue={organizationType}>
+              <RadioGroup name="radio-buttons-group" defaultValue={institutionType}>
                 {organizationTypeValues.map((ot) => (
                   <FormControlLabel
                     sx={{ p: '8px' }}

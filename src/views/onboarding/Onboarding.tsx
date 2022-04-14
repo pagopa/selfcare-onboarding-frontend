@@ -46,7 +46,8 @@ function OnboardingComponent({ productId }: { productId: string }) {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>();
   const [openExitUrl, setOpenExitUrl] = useState(ENV.URL_FE.LOGOUT);
   const [billingData, setBillingData] = useState<BillingData>();
-  const [organizationType, setOrganizationType] = useState<OrganizationType>();
+  const [institutionType, setInstitutionType] = useState<OrganizationType>();
+  const [origin, setOrigin] = useState<string>('');
   const { setOnLogout } = useContext(HeaderContext);
   const { setRequiredLogin } = useContext(UserContext);
   const requestIdRef = useRef<string>();
@@ -107,9 +108,11 @@ function OnboardingComponent({ productId }: { productId: string }) {
 
   const forwardWithDataAndInstitutionId = (
     newFormData: Partial<FormData>,
-    institutionId: string
+    institutionId: string,
+    origin: string
   ) => {
     setInstitutionId(institutionId);
+    setOrigin(origin);
     forwardWithData(newFormData);
     trackEvent('ONBOARDING_SELEZIONE_ENTE', {
       party_id: institutionId,
@@ -132,7 +135,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
 
     const postLegalsResponse = await fetchWithLogs(
       { endpoint: 'ONBOARDING_POST_LEGALS', endpointParams: { institutionId, productId } },
-      { method: 'POST', data: { billingData, organizationType, origin, users } },
+      { method: 'POST', data: { billingData, institutionType, origin, users } },
       () => setRequiredLogin(true)
     );
 
@@ -163,7 +166,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
     organizationType?: OrganizationType
   ) => {
     setBillingData(billingData);
-    setOrganizationType(organizationType);
+    setInstitutionType(organizationType);
     forward();
   };
 
@@ -172,7 +175,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
       party_id: institutionId,
       request_id: requestIdRef.current,
     });
-    setOrganizationType(newInstitutionType);
+    setInstitutionType(newInstitutionType);
     forward();
   };
 
@@ -211,7 +214,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
       label: 'Seleziona il tipo di ente',
       Component: () =>
         StepInstitutionType({
-          organizationType: organizationType as OrganizationType,
+          institutionType: institutionType as OrganizationType,
           forward: forwardWithInstitutionType,
           back: () => {
             if (window.location.search.indexOf(`institutionId=${institutionId}`) > -1) {
@@ -235,9 +238,9 @@ function OnboardingComponent({ productId }: { productId: string }) {
             taxCode: '',
             vatNumber: '',
             recipientCode: '',
-            publicServices: organizationType === 'GSP' ? false : undefined,
+            publicServices: institutionType === 'GSP' ? false : undefined,
           },
-          organizationType: organizationType as OrganizationType,
+          organizationType: institutionType as OrganizationType,
           subtitle: t('onBoardingSubProduct.billingData.subTitle'),
           forward: forwardWithBillingData,
           back,

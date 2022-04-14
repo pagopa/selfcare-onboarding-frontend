@@ -67,12 +67,10 @@ export function StepSearchParty({ parties, subTitle, forward, back }: Props) {
     if (institutionIdByQuery) {
       handleSearchInstitutionId(institutionIdByQuery, () => setRequiredLogin(true))
         .then((ipaParty) => {
-          const originParty = ipaParty?.origin;
           if (ipaParty) {
+            const originParty = ipaParty.origin;
             setSelected(ipaParty);
-            if (originParty) {
-              setOrigin(originParty);
-            }
+            setOrigin(originParty);
           } else {
             // eslint-disable-next-line functional/immutable-data
             window.location.search = '';
