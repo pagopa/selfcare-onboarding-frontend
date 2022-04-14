@@ -15,7 +15,6 @@ import { AsyncAutocompleteV2 } from '../autocomplete/AsyncAutocompleteV2';
 
 type Props = {
   subTitle: string | ReactElement;
-  parties?: Array<SelfcareParty>;
 } & StepperStepComponentProps;
 
 const handleSearchInstitutionId = async (
