@@ -198,7 +198,7 @@ function OnBoardingSubProduct() {
             </Trans>
           ),
           product: subProduct,
-          forward: (party: Party, _: any) => forwardWithInstitution(party, false),
+          forward: (_: any, party: Party) => forwardWithInstitution(party, false),
           back,
         }),
     },
