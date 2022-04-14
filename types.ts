@@ -169,6 +169,7 @@ export type Party = {
   description: string;
   digitalAddress: string;
   taxCode: string;
+  urlLogo?: string;
   origin: string;
 };
 
