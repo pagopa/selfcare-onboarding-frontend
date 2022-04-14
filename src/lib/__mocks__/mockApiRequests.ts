@@ -92,6 +92,7 @@ const mockedParties: Array<Party> = [
     digitalAddress: 'a@aa.com',
     taxCode: 'taxCode',
     zipCode: 'zipCode',
+    origin: 'IPA',
   },
   {
     institutionId: '1',
@@ -101,6 +102,7 @@ const mockedParties: Array<Party> = [
     digitalAddress: 'a@aa.com',
     taxCode: 'taxCode',
     zipCode: 'zipCode',
+    origin: 'IPA',
   },
   {
     institutionId: 'onboarded',
@@ -110,6 +112,7 @@ const mockedParties: Array<Party> = [
     digitalAddress: 'a@aa.com',
     taxCode: 'taxCode',
     zipCode: 'zipCode',
+    origin: 'IPA',
   },
 ];
 
