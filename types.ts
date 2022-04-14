@@ -189,10 +189,10 @@ export type BillingData = {
   publicServices?: boolean;
 };
 
-export type OnboardingDto = {
+export type InstitutionOnboardingInfoResource = {
   manager?: UserOnCreate;
   billingData?: BillingData;
-  organizationType?: OrganizationType;
+  // organizationType?: OrganizationType;
 };
 
 export type OrganizationType = 'PA' | 'GSP' | 'SCP' | 'PT';

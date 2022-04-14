@@ -3,7 +3,11 @@ import { AxiosError, AxiosResponse } from 'axios';
 import { useContext, useEffect, useState } from 'react';
 import { useTranslation, Trans } from 'react-i18next';
 import { IllusError } from '@pagopa/mui-italia';
-import { OnboardingDto, RequestOutcomeMessage, StepperStepComponentProps } from '../../../types';
+import {
+  InstitutionOnboardingInfoResource,
+  RequestOutcomeMessage,
+  StepperStepComponentProps,
+} from '../../../types';
 import { MessageNoAction } from '../MessageNoAction';
 import { HeaderContext, UserContext } from '../../lib/context';
 import { ENV } from '../../utils/env';
@@ -82,8 +86,8 @@ function StepOnboardingData({ forward, institutionId, productId }: Props) {
 
     const restOutcomeData = getFetchOutcome(onboardingData);
     if (restOutcomeData === 'success') {
-      const result = (onboardingData as AxiosResponse).data as OnboardingDto;
-      forward(result.manager, result.billingData, result.organizationType);
+      const result = (onboardingData as AxiosResponse).data as InstitutionOnboardingInfoResource;
+      forward(result.manager, result.billingData);
     } else if (
       (onboardingData as AxiosError<any>).response?.status === 404 ||
       (onboardingData as AxiosError<any>).response?.status === 400

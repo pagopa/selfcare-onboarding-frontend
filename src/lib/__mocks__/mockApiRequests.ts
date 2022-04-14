@@ -1,5 +1,5 @@
 import { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
-import { Endpoint, OnboardingDto, SelfcareParty } from '../../../types';
+import { Endpoint, InstitutionOnboardingInfoResource, SelfcareParty } from '../../../types';
 
 const mockPartyRegistry = {
   items: [
@@ -116,7 +116,7 @@ const mockedParties: Array<SelfcareParty> = [
   },
 ];
 
-const mockedOnboardingData0: OnboardingDto = {
+const mockedOnboardingData0: InstitutionOnboardingInfoResource = {
   billingData: {
     businessName: 'Comune di Milano',
     registeredOffice: 'Milano, Piazza Colonna 370, CAP 20021',
@@ -132,10 +132,9 @@ const mockedOnboardingData0: OnboardingDto = {
     surname: 'Rossi',
     role: 'MANAGER',
   },
-  organizationType: 'PA',
 };
 
-const mockedOnboardingData1: OnboardingDto = {
+const mockedOnboardingData1: InstitutionOnboardingInfoResource = {
   billingData: {
     businessName: 'Comune di Bollate',
     registeredOffice: 'Bollate, Piazza Colonna 370, CAP 20021',
@@ -151,7 +150,6 @@ const mockedOnboardingData1: OnboardingDto = {
     surname: 'Rosa',
     role: 'MANAGER',
   },
-  organizationType: 'GSP',
 };
 
 const mockedResponseError = {

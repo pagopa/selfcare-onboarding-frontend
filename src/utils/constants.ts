@@ -73,7 +73,8 @@ export const API = {
   },
   ONBOARDING_GET_ONBOARDING_DATA: {
     URL:
-      ENV.URL_API.ONBOARDING + '/institutions/{{institutionId}}/products/{{productId}}/onboarding',
+      ENV.URL_API.ONBOARDING +
+      '/institutions/{{institutionId}}/products/{{productId}}/onboarded-institution-info',
   },
 };
 
