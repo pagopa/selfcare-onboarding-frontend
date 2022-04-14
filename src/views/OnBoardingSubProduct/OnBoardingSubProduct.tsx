@@ -10,10 +10,11 @@ import { withLogin } from '../../components/withLogin';
 import {
   BillingData,
   OrganizationType,
-  Party,
+  SelfcareParty,
   Product,
   StepperStep,
   UserOnCreate,
+  Party,
 } from '../../../types';
 import { LoadingOverlay } from '../../components/LoadingOverlay';
 import { ENV } from '../../utils/env';
@@ -43,7 +44,7 @@ function OnBoardingSubProduct() {
 
   const [subProduct, setSubProduct] = useState<Product>();
   const [product, setProduct] = useState<Product>();
-  const [parties, setParties] = useState<Array<Party>>([]);
+  const [parties, setParties] = useState<Array<SelfcareParty>>([]);
 
   const [institutionId, setInstitutionId] = useState<string>('');
   const [origin, setOrigin] = useState<string>('');
@@ -90,7 +91,7 @@ function OnBoardingSubProduct() {
   const forwardWithInputs = (
     product: Product,
     subProduct: Product,
-    parties: Array<Party>,
+    parties: Array<SelfcareParty>,
     pricingPlan: string
   ) => {
     setProduct(product);
@@ -118,22 +119,14 @@ function OnBoardingSubProduct() {
     forward();
   };
 
-  const forwardWithInstitutionId = (
-    institutionId: string,
-    isUserParty: boolean,
-    address: string,
-    description: string,
-    digitalAddress: string,
-    taxCode: string,
-    origin: string
-  ) => {
+  const forwardWithInstitution = (party: Party, isUserParty: boolean) => {
     setInstitutionId(institutionId);
     setOrigin(origin);
     setBillingData({
-      businessName: description,
-      registeredOffice: address,
-      mailPEC: digitalAddress,
-      taxCode,
+      businessName: party.description,
+      registeredOffice: party.address,
+      mailPEC: party.digitalAddress,
+      taxCode: party.taxCode,
       vatNumber: '',
       recipientCode: '',
     });
@@ -183,24 +176,9 @@ function OnBoardingSubProduct() {
       Component: () =>
         SubProductStepSelectUserParty({
           parties,
-          forward: (
-            description: string,
-            address: string,
-            digitalAddress: string,
-            taxCode: string,
-            origin: string,
-            institutionId?: string
-          ) => {
+          forward: (party: Party, institutionId?: string) => {
             if (institutionId) {
-              forwardWithInstitutionId(
-                institutionId,
-                true,
-                description,
-                address,
-                digitalAddress,
-                taxCode,
-                origin
-              );
+              forwardWithInstitution(party, true);
             } else {
               forward();
             }
@@ -220,24 +198,7 @@ function OnBoardingSubProduct() {
             </Trans>
           ),
           product: subProduct,
-          forward: (
-            description: string,
-            address: string,
-            digitalAddress: string,
-            taxCode: string,
-            origin: string,
-            _: any,
-            institutionId: string
-          ) =>
-            forwardWithInstitutionId(
-              institutionId,
-              false,
-              description,
-              address,
-              digitalAddress,
-              taxCode,
-              origin
-            ),
+          forward: (party: Party, _: any) => forwardWithInstitution(party, false),
           back,
         }),
     },

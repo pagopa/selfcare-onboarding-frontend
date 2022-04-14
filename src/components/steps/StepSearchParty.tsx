@@ -4,7 +4,7 @@ import { useContext, useEffect, useState } from 'react';
 import { AxiosResponse } from 'axios';
 import { useTranslation, Trans } from 'react-i18next';
 import { ReactElement } from 'react';
-import { IPACatalogParty, Party, StepperStepComponentProps } from '../../../types';
+import { IPACatalogParty, SelfcareParty, StepperStepComponentProps } from '../../../types';
 import { getFetchOutcome } from '../../lib/error-utils';
 import { fetchWithLogs } from '../../lib/api-utils';
 import { UserContext } from '../../lib/context';
@@ -15,7 +15,7 @@ import { AsyncAutocompleteV2 } from '../autocomplete/AsyncAutocompleteV2';
 
 type Props = {
   subTitle: string | ReactElement;
-  parties?: Array<Party>;
+  parties?: Array<SelfcareParty>;
 } & StepperStepComponentProps;
 
 const handleSearchInstitutionId = async (
@@ -55,15 +55,7 @@ export function StepSearchParty({ parties, subTitle, forward, back }: Props) {
     setSelectedHistory(selected);
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const { id } = selected!;
-    forward(
-      selected?.description,
-      selected?.address,
-      selected?.digitalAddress,
-      selected?.taxCode,
-      selected?.origin,
-      { institutionId: id },
-      id
-    );
+    forward(selected, { institutionId: id }, id);
   };
 
   const { t } = useTranslation();

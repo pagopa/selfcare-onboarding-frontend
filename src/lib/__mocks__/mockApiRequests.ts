@@ -1,5 +1,5 @@
 import { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
-import { Endpoint, OnboardingDto, Party } from '../../../types';
+import { Endpoint, OnboardingDto, SelfcareParty } from '../../../types';
 
 const mockPartyRegistry = {
   items: [
@@ -83,7 +83,7 @@ const mockedSubProduct = {
   parent: 'prod-io',
 };
 
-const mockedParties: Array<Party> = [
+const mockedParties: Array<SelfcareParty> = [
   {
     institutionId: '0',
     description: 'Comune di Milano',

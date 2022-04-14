@@ -152,7 +152,7 @@ export type Product = {
   parent?: string;
 };
 
-export type Party = {
+export type SelfcareParty = {
   institutionId: string;
   description: string;
   urlLogo?: string;
@@ -160,6 +160,15 @@ export type Party = {
   digitalAddress: string;
   taxCode: string;
   zipCode: string;
+  origin: string;
+};
+
+export type Party = {
+  institutionId: string;
+  address: string;
+  description: string;
+  digitalAddress: string;
+  taxCode: string;
   origin: string;
 };
 

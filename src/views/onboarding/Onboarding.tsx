@@ -11,6 +11,7 @@ import { withLogin } from '../../components/withLogin';
 import {
   BillingData,
   OrganizationType,
+  Party,
   Product,
   RequestOutcome,
   RequestOutcomeOptions,
@@ -106,23 +107,15 @@ function OnboardingComponent({ productId }: { productId: string }) {
     forward();
   };
 
-  const forwardWithDataAndInstitutionId = (
-    institutionId: string,
-    newFormData: Partial<FormData>,
-    address: string,
-    description: string,
-    digitalAddress: string,
-    taxCode: string,
-    origin: string
-  ) => {
+  const forwardWithDataAndInstitution = (party: Party, newFormData: Partial<FormData>) => {
     setInstitutionId(institutionId);
     forwardWithData(newFormData);
     setOrigin(origin);
     setBillingData({
-      businessName: description,
-      registeredOffice: address,
-      mailPEC: digitalAddress,
-      taxCode,
+      businessName: party.description,
+      registeredOffice: party.address,
+      mailPEC: party.digitalAddress,
+      taxCode: party.taxCode,
       vatNumber: '',
       recipientCode: '',
     });
@@ -204,24 +197,8 @@ function OnboardingComponent({ productId }: { productId: string }) {
             </Trans>
           ),
           product: selectedProduct,
-          forward: (
-            institutionId: string,
-            newFormData: Partial<FormData>,
-            description: string,
-            address: string,
-            digitalAddress: string,
-            taxCode: string,
-            origin: string
-          ) => {
-            forwardWithDataAndInstitutionId(
-              institutionId,
-              newFormData,
-              address,
-              description,
-              digitalAddress,
-              taxCode,
-              origin
-            );
+          forward: (newFormData: Partial<FormData>, party: Party) => {
+            forwardWithDataAndInstitution(party, newFormData);
           },
           back,
         }),
