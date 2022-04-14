@@ -40,6 +40,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
   const [activeStep, setActiveStep] = useState(0);
   const [formData, setFormData] = useState<Partial<FormData>>();
   const [institutionId, setInstitutionId] = useState<string>('');
+  const [origin, setOrigin] = useState<string>('');
   const [outcome, setOutcome] = useState<RequestOutcome>();
   const history = useHistory();
   const [openExitModal, setOpenExitModal] = useState(false);
@@ -106,11 +107,25 @@ function OnboardingComponent({ productId }: { productId: string }) {
   };
 
   const forwardWithDataAndInstitutionId = (
+    address: string,
+    description: string,
+    digitalAddress: string,
+    taxCode: string,
+    origin: string,
     newFormData: Partial<FormData>,
     institutionId: string
   ) => {
     setInstitutionId(institutionId);
     forwardWithData(newFormData);
+    setOrigin(origin);
+    setBillingData({
+      businessName: description,
+      registeredOffice: address,
+      mailPEC: digitalAddress,
+      taxCode,
+      vatNumber: '',
+      recipientCode: '',
+    });
     trackEvent('ONBOARDING_SELEZIONE_ENTE', {
       party_id: institutionId,
       request_id: requestIdRef.current,
@@ -132,7 +147,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
 
     const postLegalsResponse = await fetchWithLogs(
       { endpoint: 'ONBOARDING_POST_LEGALS', endpointParams: { institutionId, productId } },
-      { method: 'POST', data: { users, billingData, organizationType } },
+      { method: 'POST', data: { users, billingData, organizationType, origin } },
       () => setRequiredLogin(true)
     );
 
@@ -189,7 +204,25 @@ function OnboardingComponent({ productId }: { productId: string }) {
             </Trans>
           ),
           product: selectedProduct,
-          forward: forwardWithDataAndInstitutionId,
+          forward: (
+            description: string,
+            address: string,
+            digitalAddress: string,
+            taxCode: string,
+            origin: string,
+            newFormData: Partial<FormData>,
+            institutionId: string
+          ) => {
+            forwardWithDataAndInstitutionId(
+              description,
+              address,
+              digitalAddress,
+              taxCode,
+              origin,
+              newFormData,
+              institutionId
+            );
+          },
           back,
         }),
     },
