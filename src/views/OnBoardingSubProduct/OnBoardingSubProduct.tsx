@@ -47,6 +47,7 @@ function OnBoardingSubProduct() {
   const [parties, setParties] = useState<Array<SelfcareParty>>([]);
 
   const [institutionId, setInstitutionId] = useState<string>('');
+  const [origin, setOrigin] = useState<string>('');
 
   const [manager, setManager] = useState<UserOnCreate>();
   const [billingData, setBillingData] = useState<BillingData>();
@@ -121,6 +122,7 @@ function OnBoardingSubProduct() {
 
   const forwardWithInstitution = (party: Party, isUserParty: boolean) => {
     setInstitutionId(party.institutionId);
+    setOrigin(party.origin);
     setBillingData({
       businessName: party.description,
       registeredOffice: party.address,

@@ -160,6 +160,7 @@ export type Party = {
   digitalAddress: string;
   taxCode: string;
   zipCode: string;
+  origin: string;
 };
 
 export type SelfcareParty = {
