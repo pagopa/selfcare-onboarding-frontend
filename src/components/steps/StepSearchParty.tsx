@@ -4,7 +4,7 @@ import { useContext, useEffect, useState } from 'react';
 import { AxiosResponse } from 'axios';
 import { useTranslation, Trans } from 'react-i18next';
 import { ReactElement } from 'react';
-import { IPACatalogParty, SelfcareParty, StepperStepComponentProps } from '../../../types';
+import { IPACatalogParty, Party, StepperStepComponentProps } from '../../../types';
 import { getFetchOutcome } from '../../lib/error-utils';
 import { fetchWithLogs } from '../../lib/api-utils';
 import { UserContext } from '../../lib/context';
@@ -44,7 +44,6 @@ export function StepSearchParty({ subTitle, forward, back }: Props) {
   const { setRequiredLogin } = useContext(UserContext);
   const theme = useTheme();
 
-  const [origin, setOrigin] = useState<string>('');
   const [loading, setLoading] = useState(!!institutionIdByQuery);
   const [selected, setSelected, setSelectedHistory] = useHistoryState<IPACatalogParty | null>(
     'selected_step1',
@@ -55,7 +54,7 @@ export function StepSearchParty({ subTitle, forward, back }: Props) {
     setSelectedHistory(selected);
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const { id } = selected!;
-    forward({ institutionId: id }, { ...selected, institutionId: id } as SelfcareParty);
+    forward({ institutionId: id }, { ...selected, institutionId: id } as Party);
   };
 
   const { t } = useTranslation();
@@ -66,9 +65,7 @@ export function StepSearchParty({ subTitle, forward, back }: Props) {
       handleSearchInstitutionId(institutionIdByQuery, () => setRequiredLogin(true))
         .then((ipaParty) => {
           if (ipaParty) {
-            const selectedOriginParty = ipaParty.origin;
             setSelected(ipaParty);
-            setOrigin(selectedOriginParty);
           } else {
             // eslint-disable-next-line functional/immutable-data
             window.location.search = '';
@@ -87,7 +84,7 @@ export function StepSearchParty({ subTitle, forward, back }: Props) {
 
   // callback of previous useEffect
   useEffect(() => {
-    if (institutionIdByQuery && selected && origin) {
+    if (institutionIdByQuery && selected) {
       onForwardAction();
     }
   }, [selected]);
