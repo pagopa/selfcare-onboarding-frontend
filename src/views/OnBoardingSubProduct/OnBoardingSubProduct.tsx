@@ -239,6 +239,7 @@ function OnBoardingSubProduct() {
             publicServices: organizationType === 'GSP' ? false : undefined,
           },
           organizationType: organizationType as InstitutionType,
+          origin,
           subtitle: t('onBoardingSubProduct.billingData.subTitle'),
           forward: forwardWithBillingData,
           back: () => {
