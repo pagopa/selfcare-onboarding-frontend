@@ -222,8 +222,7 @@ function OnBoardingSubProduct() {
         StepOnboardingData({
           institutionId,
           productId,
-          forward: (institutionType: InstitutionType) =>
-            forwardWithOnboardingData(manager, billingData, institutionType),
+          forward: forwardWithOnboardingData,
         }),
     },
     {
