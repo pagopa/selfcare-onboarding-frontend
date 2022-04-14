@@ -11,10 +11,10 @@ import { withLogin } from '../../components/withLogin';
 import {
   BillingData,
   InstitutionType,
-  SelfcareParty,
   Product,
   RequestOutcome,
   RequestOutcomeOptions,
+  SelfcareParty,
   StepperStep,
   UserOnCreate,
 } from '../../../types';
@@ -106,7 +106,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
     forward();
   };
 
-  const forwardWithDataAndInstitution = (newFormData: Partial<FormData>, party: Party) => {
+  const forwardWithDataAndInstitution = (newFormData: Partial<FormData>, party: SelfcareParty) => {
     setInstitutionId(party.institutionId);
     forwardWithData(newFormData);
     setOrigin(party.origin);
