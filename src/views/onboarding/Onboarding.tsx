@@ -14,7 +14,7 @@ import {
   Product,
   RequestOutcome,
   RequestOutcomeOptions,
-  SelfcareParty,
+  Party,
   StepperStep,
   UserOnCreate,
 } from '../../../types';
