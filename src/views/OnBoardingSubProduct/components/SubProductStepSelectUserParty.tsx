@@ -24,8 +24,6 @@ export function SubProductStepSelectUserParty({ forward, parties }: Props) {
   );
   const onForwardAction = () => {
     setSelectedHistory(selected);
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const { institutionId } = selected!;
     forward(selected as Party);
   };
   const bodyTitle = t('onBoardingSubProduct.selectUserPartyStep.title');

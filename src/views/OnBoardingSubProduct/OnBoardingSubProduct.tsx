@@ -190,7 +190,6 @@ function OnBoardingSubProduct() {
       label: 'Select Institution unreleated',
       Component: () =>
         StepSearchParty({
-          parties,
           subTitle: (
             <Trans i18nKey="onBoardingSubProduct.selectUserPartyStep.subTitle">
               Seleziona l&apos;ente per il quale stai richiedendo la sottoscrizione <br />
