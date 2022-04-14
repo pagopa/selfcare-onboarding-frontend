@@ -1,16 +1,15 @@
 import { Button, Stack, Typography } from '@mui/material';
-import { theme } from '@pagopa/mui-italia';
+import { IllusCompleted, theme } from '@pagopa/mui-italia';
 import { Trans } from 'react-i18next';
 import { MessageNoAction } from '../../../components/MessageNoAction';
 import { ENV } from '../../../utils/env';
-import { ReactComponent as CheckIllustration } from '../../../assets/check-illustration.svg';
 
 const successfulOutCome = {
-  ImgComponent: CheckIllustration,
   title: '',
   description: [
     <>
-      <Typography variant={'h4'} sx={{ color: theme.palette.text.primary, marginBottom: 1 }}>
+      <IllusCompleted size={60} />
+      <Typography mt={3} variant={'h4'} sx={{ color: theme.palette.text.primary, marginBottom: 1 }}>
         <Trans i18nKey="onBoardingSubProduct.successfulAdhesion.title">
           La tua richiesta è stata inviata
           <br />

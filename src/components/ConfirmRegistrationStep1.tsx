@@ -1,8 +1,8 @@
 import { Button, Grid, Typography, useTheme } from '@mui/material';
 import { Box } from '@mui/system';
+import { IllusUploadFile } from '@pagopa/mui-italia';
 import { useTranslation, Trans } from 'react-i18next';
 import { AlertDialogActions, StepperStepComponentProps } from '../../types';
-import { ReactComponent as PaymentCompleted } from '../assets/payment_completed.svg';
 import { FileUploader } from './FileUploader';
 
 export function ConfirmRegistrationStep1(
@@ -36,10 +36,10 @@ export function ConfirmRegistrationStep1(
     <Grid container display="flex" justifyContent="center" alignItems="center">
       <Grid item xs={12}>
         <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-          <PaymentCompleted width={60} />
+          <IllusUploadFile size={60} />
         </Box>
       </Grid>
-      <Grid item xs={10} pb={1}>
+      <Grid item xs={10} pb={1} mt={3}>
         <Typography color={theme.palette.text.primary} align="center" variant="h4">
           {t('confirmRegistrationStep1.pageTitle')}
         </Typography>

@@ -15,7 +15,6 @@ import { AsyncAutocompleteV2 } from '../autocomplete/AsyncAutocompleteV2';
 
 type Props = {
   subTitle: string | ReactElement;
-  parties?: Array<Party>;
 } & StepperStepComponentProps;
 
 const handleSearchInstitutionId = async (
@@ -40,7 +39,7 @@ const handleSearchInstitutionId = async (
   return null;
 };
 
-export function StepSearchParty({ parties, subTitle, forward, back }: Props) {
+export function StepSearchParty({ subTitle, forward, back }: Props) {
   const institutionIdByQuery = new URLSearchParams(window.location.search).get('institutionId');
   const { setRequiredLogin } = useContext(UserContext);
   const theme = useTheme();
@@ -55,15 +54,7 @@ export function StepSearchParty({ parties, subTitle, forward, back }: Props) {
     setSelectedHistory(selected);
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const { id } = selected!;
-    forward(
-      selected?.description,
-      selected?.address,
-      selected?.digitalAddress,
-      selected?.taxCode,
-      selected?.origin,
-      { institutionId: id },
-      id
-    );
+    forward({ institutionId: id }, { ...selected, institutionId: id } as Party);
   };
 
   const { t } = useTranslation();
@@ -182,7 +173,7 @@ export function StepSearchParty({ parties, subTitle, forward, back }: Props) {
       <Grid item mt={4}>
         <OnboardingStepActions
           back={
-            parties && parties.length > 0
+            back
               ? {
                   action: back,
                   label: t('onboardingStep1.onboarding.onboardingStepActions.backAction'),
