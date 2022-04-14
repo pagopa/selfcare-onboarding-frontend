@@ -119,7 +119,7 @@ function OnBoardingSubProduct() {
     forward();
   };
 
-  const forwardWithInstitution = (party: SelfcareParty, isUserParty: boolean) => {
+  const forwardWithInstitution = (party: Party, isUserParty: boolean) => {
     setInstitutionId(party.institutionId);
     setOrigin(party.origin);
     setBillingData({
