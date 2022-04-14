@@ -4,7 +4,7 @@ import {
   trackEvent,
 } from '@pagopa/selfcare-common-frontend/services/analyticsService';
 import { Button, Grid, Typography } from '@mui/material';
-import { theme } from '@pagopa/mui-italia';
+import { IllusError, theme } from '@pagopa/mui-italia';
 import { Trans } from 'react-i18next';
 import {
   BillingData,
@@ -18,7 +18,6 @@ import { fetchWithLogs } from '../../../lib/api-utils';
 import { getFetchOutcome } from '../../../lib/error-utils';
 import { MessageNoAction } from '../../../components/MessageNoAction';
 import { ENV } from '../../../utils/env';
-import { ReactComponent as ErrorIcon } from '../../../assets/payment_completed_error.svg';
 import { unregisterUnloadEvent } from '../../../utils/unloadEvent-utils';
 
 type Props = StepperStepComponentProps & {
@@ -34,41 +33,47 @@ type Props = StepperStepComponentProps & {
 };
 
 const errorOutCome = {
-  ImgComponent: ErrorIcon,
   title: '',
   description: [
-    <Grid container direction="column" key="0">
-      <Grid container item justifyContent="center">
-        <Grid item xs={5}>
-          <Typography variant="h4">
-            <Trans i18nKey="onBoardingSubProduct.genericError.title">
-              {' '}
-              Richiesta di adesione premium in errore
-            </Trans>
-          </Typography>
-        </Grid>
-      </Grid>
-      <Grid container item justifyContent="center" mb={3} mt={1}>
-        <Grid item xs={5}>
-          <Typography>
-            <Trans i18nKey="onBoardingSubProduct.genericError.message">
-              A causa di un errore del sistema non è possibile completare la procedura.
-              <br />
-              Ti chiediamo di riprovare più tardi.
-            </Trans>
-          </Typography>
-        </Grid>
-      </Grid>
-      <Grid container item justifyContent="center">
-        <Grid item xs={4}>
-          <Button onClick={() => window.location.assign(ENV.URL_FE.LANDING)} variant={'contained'}>
-            <Typography width="100%" sx={{ color: theme.palette.primary.contrastText }}>
-              <Trans i18nKey="onBoardingSubProduct.genericError.homeButton">Torna alla home</Trans>
+    <>
+      <IllusError size={60} />
+      <Grid container direction="column" key="0" mt={3}>
+        <Grid container item justifyContent="center">
+          <Grid item xs={5}>
+            <Typography variant="h4">
+              <Trans i18nKey="onBoardingSubProduct.genericError.title">
+                Richiesta di adesione premium in errore
+              </Trans>
             </Typography>
-          </Button>
+          </Grid>
+        </Grid>
+        <Grid container item justifyContent="center" mb={3} mt={1}>
+          <Grid item xs={5}>
+            <Typography>
+              <Trans i18nKey="onBoardingSubProduct.genericError.message">
+                A causa di un errore del sistema non è possibile completare la procedura.
+                <br />
+                Ti chiediamo di riprovare più tardi.
+              </Trans>
+            </Typography>
+          </Grid>
+        </Grid>
+        <Grid container item justifyContent="center">
+          <Grid item xs={4}>
+            <Button
+              onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+              variant={'contained'}
+            >
+              <Typography width="100%" sx={{ color: theme.palette.primary.contrastText }}>
+                <Trans i18nKey="onBoardingSubProduct.genericError.homeButton">
+                  Torna alla home
+                </Trans>
+              </Typography>
+            </Button>
+          </Grid>
         </Grid>
       </Grid>
-    </Grid>,
+    </>,
   ],
 };
 

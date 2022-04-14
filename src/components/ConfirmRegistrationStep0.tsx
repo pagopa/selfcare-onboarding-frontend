@@ -1,7 +1,7 @@
 import { Box, Button, Grid, Typography, useTheme } from '@mui/material';
+import { IllusUploadFile } from '@pagopa/mui-italia';
 import { useTranslation, Trans } from 'react-i18next';
 import { StepperStepComponentProps } from '../../types';
-import { ReactComponent as PaymentCompleted } from '../assets/payment_completed.svg';
 
 export function ConfirmRegistrationStep0({ forward }: StepperStepComponentProps) {
   const onForwardAction = () => {
@@ -13,7 +13,7 @@ export function ConfirmRegistrationStep0({ forward }: StepperStepComponentProps)
     <Grid container display="flex" justifyContent="center" alignItems="center">
       <Grid item xs={12} pb={4}>
         <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-          <PaymentCompleted width={60} />
+          <IllusUploadFile size={60} />
         </Box>
       </Grid>
       <Grid item xs={10} p={1}>
@@ -31,7 +31,7 @@ export function ConfirmRegistrationStep0({ forward }: StepperStepComponentProps)
           <Trans i18nKey="confirmRegistrationStep0.description">
             <strong> Segui le istruzioni</strong> per inviare il documento firmato,
             <br />
-            servirà a completare l&apos;inserimento del tuo Ente
+            servirà a completare l&apos;inserimento del tuo ente
             <br />
             nel portale Self Care.
           </Trans>

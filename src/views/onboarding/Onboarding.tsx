@@ -6,7 +6,7 @@ import SessionModal from '@pagopa/selfcare-common-frontend/components/SessionMod
 import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
 import { useTranslation, Trans } from 'react-i18next';
 import { uniqueId } from 'lodash';
-import { ReactComponent as ErrorIcon } from '../../assets/payment_completed_error.svg';
+import { IllusCompleted, IllusError } from '@pagopa/mui-italia';
 import { withLogin } from '../../components/withLogin';
 import {
   BillingData,
@@ -23,7 +23,6 @@ import { LoadingOverlay } from '../../components/LoadingOverlay';
 import { MessageNoAction } from '../../components/MessageNoAction';
 import { fetchWithLogs } from '../../lib/api-utils';
 import { getFetchOutcome } from '../../lib/error-utils';
-import { ReactComponent as CheckIllustration } from '../../assets/check-illustration.svg';
 import { ENV } from '../../utils/env';
 import { OnboardingStep1_5 } from '../../components/OnboardingStep1_5';
 import { HeaderContext, UserContext } from '../../lib/context';
@@ -288,11 +287,15 @@ function OnboardingComponent({ productId }: { productId: string }) {
 
   const outcomeContent: RequestOutcomeOptions = {
     success: {
-      ImgComponent: CheckIllustration,
       title: '',
       description: [
         <>
-          <Typography variant={'h4'} sx={{ color: theme.palette.text.primary, marginBottom: 1 }}>
+          <IllusCompleted size={60} />
+          <Typography
+            mt={3}
+            variant={'h4'}
+            sx={{ color: theme.palette.text.primary, marginBottom: 1 }}
+          >
             <Trans i18nKey="onboarding.outcomeContent.success.title">
               La tua richiesta è stata inviata
               <br />
@@ -302,9 +305,10 @@ function OnboardingComponent({ productId }: { productId: string }) {
           <Stack key="0" spacing={4}>
             <Typography variant="body1">
               <Trans i18nKey="onboarding.outcomeContent.success.description">
-                Riceverai una PEC all’indirizzo istituzionale dell’Ente.
+                Riceverai una PEC all’indirizzo istituzionale che hai indicato.
                 <br />
-                Al suo interno troverai le istruzioni per completare l&apos;adesione.
+                Al suo interno troverai le istruzioni per completare <br />
+                l&apos;adesione.
               </Trans>
             </Typography>
             <Button
@@ -319,39 +323,41 @@ function OnboardingComponent({ productId }: { productId: string }) {
       ],
     },
     error: {
-      ImgComponent: ErrorIcon,
       title: '',
       description: [
-        <Grid container direction="column" key="0">
-          <Grid container item justifyContent="center">
-            <Grid item xs={5}>
-              <Typography variant="h4">{t('onboarding.outcomeContent.error.title')}</Typography>
+        <>
+          <IllusError size={60} />
+          <Grid container direction="column" key="0" mt={3}>
+            <Grid container item justifyContent="center">
+              <Grid item xs={5}>
+                <Typography variant="h4">{t('onboarding.outcomeContent.error.title')}</Typography>
+              </Grid>
             </Grid>
-          </Grid>
-          <Grid container item justifyContent="center" mb={3} mt={1}>
-            <Grid item xs={5}>
-              <Typography>
-                <Trans i18nKey="onboarding.outcomeContent.error.description">
-                  A causa di un errore del sistema non è possibile completare la procedura.
-                  <br />
-                  Ti chiediamo di riprovare più tardi.
-                </Trans>
-              </Typography>
-            </Grid>
-          </Grid>
-          <Grid container item justifyContent="center">
-            <Grid item xs={4}>
-              <Button
-                onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
-                variant={'contained'}
-              >
-                <Typography width="100%" sx={{ color: theme.palette.primary.contrastText }}>
-                  {t('onboarding.outcomeContent.error.backActionLabel')}
+            <Grid container item justifyContent="center" mb={3} mt={1}>
+              <Grid item xs={5}>
+                <Typography>
+                  <Trans i18nKey="onboarding.outcomeContent.error.description">
+                    A causa di un errore del sistema non è possibile completare la procedura.
+                    <br />
+                    Ti chiediamo di riprovare più tardi.
+                  </Trans>
                 </Typography>
-              </Button>
+              </Grid>
+            </Grid>
+            <Grid container item justifyContent="center">
+              <Grid item xs={4}>
+                <Button
+                  onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+                  variant={'contained'}
+                >
+                  <Typography width="100%" sx={{ color: theme.palette.primary.contrastText }}>
+                    {t('onboarding.outcomeContent.error.backActionLabel')}
+                  </Typography>
+                </Button>
+              </Grid>
             </Grid>
           </Grid>
-        </Grid>,
+        </>,
       ],
     },
   };
