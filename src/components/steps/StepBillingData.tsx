@@ -15,6 +15,10 @@ const CustomTextField = styled(TextField)({
 });
 
 const mailPECRegexp = new RegExp('^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$');
+const fiscalCodeRegexp = new RegExp(
+  '^[A-Za-z]{6}[0-9lmnpqrstuvLMNPQRSTUV]{2}[abcdehlmprstABCDEHLMPRST]{1}[0-9lmnpqrstuvLMNPQRSTUV]{2}[A-Za-z]{1}[0-9lmnpqrstuvLMNPQRSTUV]{3}[A-Za-z]{1}$'
+);
+const onlyNumbersRegexp = new RegExp('^[0-9]{11}$');
 
 type StepBillingDataHistoryState = {
   institutionId: string;
@@ -39,6 +43,7 @@ export default function StepBillingData({
   const requiredError = 'Required';
   const ipa = organizationType === 'PA';
 
+  const { t } = useTranslation();
   const theme = useTheme();
 
   const [stepHistoryState, setStepHistoryState, setStepHistoryStateHistory] =
@@ -77,14 +82,30 @@ export default function StepBillingData({
     back!();
   };
 
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   const validate = (values: Partial<BillingData>) =>
     Object.fromEntries(
       Object.entries({
         businessName: !values.businessName ? requiredError : undefined,
         registeredOffice: !values.registeredOffice ? requiredError : undefined,
-        taxCode: !values.taxCode ? requiredError : undefined,
-        vatNumber:
-          stepHistoryState.isTaxCodeNotEquals2PIVA && !values.vatNumber ? requiredError : undefined,
+        taxCode: !values.taxCode
+          ? requiredError
+          : !stepHistoryState.isTaxCodeNotEquals2PIVA &&
+            values.taxCode &&
+            !onlyNumbersRegexp.test(values.taxCode)
+          ? t('stepBillingData.invalidFiscalCode')
+          : values.taxCode &&
+            stepHistoryState.isTaxCodeNotEquals2PIVA &&
+            !fiscalCodeRegexp.test(values.taxCode)
+          ? t('stepBillingData.invalidFiscalCode')
+          : undefined,
+        vatNumber: !values.vatNumber
+          ? requiredError
+          : stepHistoryState.isTaxCodeNotEquals2PIVA &&
+            values.vatNumber &&
+            !onlyNumbersRegexp.test(values.vatNumber)
+          ? t('stepBillingData.invalidVatNumber')
+          : undefined,
         mailPEC: !values.mailPEC
           ? requiredError
           : !mailPECRegexp.test(values.mailPEC)
@@ -93,7 +114,6 @@ export default function StepBillingData({
         recipientCode: !values.recipientCode ? requiredError : undefined,
       }).filter(([_key, value]) => value)
     );
-  const { t } = useTranslation();
 
   const formik = useFormik<BillingData>({
     initialValues: initialFormData,

@@ -245,6 +245,8 @@ export default {
   },
   stepBillingData: {
     title: 'Indica i dati del tuo ente',
+    invalidFiscalCode: 'Codice fiscale non valido',
+    invalidVatNumber: 'Partita IVA non valida',
     invalidEmail: 'L’indirizzo email non è valido',
     businessName: 'Ragione sociale',
     registeredOffice: 'Sede legale',
@@ -253,8 +255,7 @@ export default {
     taxCode: 'Codice fiscale',
     vatNumber: 'Partita IVA',
     recipientCode: 'Codice destinatario',
-    recipientCodeDescription:
-      'È il codice di sette cifre necessario per ricevere le fatture elettroniche',
+    recipientCodeDescription: 'È il codice necessario per ricevere le fatture elettroniche',
     gspDescription: 'Sono gestore di almeno uno dei pubblici servizi Gas, Luce e/o TELCO',
     backLabel: 'Indietro',
     confirmLabel: 'Conferma',
