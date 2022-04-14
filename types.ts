@@ -200,4 +200,4 @@ export type InstitutionOnboardingInfoResource = {
   manager: UserOnCreate;
 };
 
-export type OrganizationType = 'PA' | 'GSP' | 'SCP' | 'PT';
+export type InstitutionType = 'PA' | 'GSP' | 'SCP' | 'PT';

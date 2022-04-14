@@ -15,6 +15,7 @@ const mockPartyRegistry = {
       managerSurname: 'Rossi',
       description: 'AGENCY X',
       digitalAddress: 'mail@pec.mail.org',
+      origin: 'IPA',
     },
     {
       id: 'error',
@@ -28,6 +29,7 @@ const mockPartyRegistry = {
       managerSurname: 'Rossi_ERROR',
       description: 'AGENCY ERROR',
       digitalAddress: 'mail_ERROR_@pec.mail.org',
+      origin: 'IPA',
     },
     {
       id: 'onboarded',
@@ -41,6 +43,7 @@ const mockPartyRegistry = {
       managerSurname: 'Rossi_ONBOARDED',
       description: 'AGENCY ONBOARDED',
       digitalAddress: 'mail_ONBOARDED_@pec.mail.org',
+      origin: 'IPA',
     },
     {
       id: 'pending',
@@ -54,6 +57,7 @@ const mockPartyRegistry = {
       managerSurname: 'Rossi_PENDING',
       description: 'AGENCY PENDING',
       digitalAddress: 'mail_PENDING_@pec.mail.org',
+      origin: 'IPA',
     },
     {
       id: 'infoError',
@@ -67,6 +71,7 @@ const mockPartyRegistry = {
       managerSurname: 'Rossi_INFOERROR',
       description: 'AGENCY INFO ERROR',
       digitalAddress: 'mail_INFOERROR_@pec.mail.org',
+      origin: 'IPA',
     },
   ],
   count: 5,
