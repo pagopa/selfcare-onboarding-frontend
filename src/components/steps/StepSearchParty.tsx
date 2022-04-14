@@ -40,11 +40,13 @@ const handleSearchInstitutionId = async (
   return null;
 };
 
+// eslint-disable-next-line sonarjs/cognitive-complexity
 export function StepSearchParty({ parties, subTitle, forward, back }: Props) {
   const institutionIdByQuery = new URLSearchParams(window.location.search).get('institutionId');
   const { setRequiredLogin } = useContext(UserContext);
   const theme = useTheme();
 
+  const [_origin, setOrigin] = useState<string>('');
   const [loading, setLoading] = useState(!!institutionIdByQuery);
   const [selected, setSelected, setSelectedHistory] = useHistoryState<IPACatalogParty | null>(
     'selected_step1',
@@ -65,8 +67,12 @@ export function StepSearchParty({ parties, subTitle, forward, back }: Props) {
     if (institutionIdByQuery) {
       handleSearchInstitutionId(institutionIdByQuery, () => setRequiredLogin(true))
         .then((ipaParty) => {
+          const originParty = ipaParty?.origin;
           if (ipaParty) {
             setSelected(ipaParty);
+            if (originParty) {
+              setOrigin(originParty);
+            }
           } else {
             // eslint-disable-next-line functional/immutable-data
             window.location.search = '';
@@ -85,10 +91,10 @@ export function StepSearchParty({ parties, subTitle, forward, back }: Props) {
 
   // callback of previous useEffect
   useEffect(() => {
-    if (institutionIdByQuery && selected) {
+    if (institutionIdByQuery && selected && origin) {
       onForwardAction();
     }
-  }, [selected]);
+  }, [selected, origin]);
 
   return loading ? (
     <LoadingOverlay loadingText={t('onboardingStep1.loadingOverlayText')} />

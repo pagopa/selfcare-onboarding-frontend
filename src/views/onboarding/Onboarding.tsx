@@ -132,7 +132,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
 
     const postLegalsResponse = await fetchWithLogs(
       { endpoint: 'ONBOARDING_POST_LEGALS', endpointParams: { institutionId, productId } },
-      { method: 'POST', data: { users, billingData, organizationType } },
+      { method: 'POST', data: { billingData, organizationType, origin, users } },
       () => setRequiredLogin(true)
     );
 

@@ -57,13 +57,15 @@ export type StepperStep = {
 };
 
 export type IPACatalogParty = {
+  address: string;
+  category: string;
   description: string;
   digitalAddress: string;
   id: string;
-  managerName: string;
-  managerSurname: string;
   o: string;
-  ou: string;
+  origin: string;
+  taxCode: string;
+  zipCode: string;
 };
 
 /*
@@ -158,6 +160,7 @@ export type Party = {
   digitalAddress: string;
   taxCode: string;
   zipCode: string;
+  origin: string;
 };
 
 export type BillingData = {

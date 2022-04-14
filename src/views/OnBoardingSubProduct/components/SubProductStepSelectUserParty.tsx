@@ -1,6 +1,6 @@
 import { Card, Grid, Link, Typography, useTheme } from '@mui/material';
 import { Box } from '@mui/system';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation, Trans } from 'react-i18next';
 import { EntityAccountItem } from '@pagopa/mui-italia/dist/components/EntityAccountItem';
 import { Party, StepperStepComponentProps } from '../../../../types';
@@ -18,6 +18,7 @@ export function SubProductStepSelectUserParty({ forward, parties }: Props) {
 
   const theme = useTheme();
 
+  const [_origin, setOrigin] = useState<string>('');
   const [selected, setSelected, setSelectedHistory] = useHistoryState<Party | null>(
     'SubProductStepSelectUserParty',
     null
@@ -33,8 +34,10 @@ export function SubProductStepSelectUserParty({ forward, parties }: Props) {
   useEffect(() => {
     if (institutionIdByQuery) {
       const selectedParty = parties.find((p) => p.institutionId === institutionIdByQuery);
-      if (selectedParty) {
+      const selectedOrigin = selectedParty?.origin;
+      if (selectedParty && selectedOrigin) {
         setSelected(selectedParty);
+        setOrigin(selectedOrigin);
       } else {
         forward();
       }
@@ -43,10 +46,10 @@ export function SubProductStepSelectUserParty({ forward, parties }: Props) {
 
   // callback of previous useEffect
   useEffect(() => {
-    if (institutionIdByQuery && selected) {
+    if (institutionIdByQuery && selected && origin) {
       onForwardAction();
     }
-  }, [selected]);
+  }, [selected, origin]);
 
   return (
     <Grid container direction="column">

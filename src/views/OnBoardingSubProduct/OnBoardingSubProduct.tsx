@@ -50,6 +50,7 @@ function OnBoardingSubProduct() {
   const [billingData, setBillingData] = useState<BillingData>();
   const [organizationType, setOrganizationType] = useState<OrganizationType>();
   const [pricingPlan, setPricingPlan] = useState<string>('');
+  const [origin, setOrigin] = useState<string>('');
   const setStepAddManagerHistoryState = useHistoryState<UsersObject>('people_step2', {})[2];
 
   const history = useHistory();
@@ -116,8 +117,13 @@ function OnBoardingSubProduct() {
     forward();
   };
 
-  const forwardWithInstitutionId = (institutionId: string, isUserParty: boolean) => {
+  const forwardWithInstitutionId = (
+    institutionId: string,
+    origin: string,
+    isUserParty: boolean
+  ) => {
     setInstitutionId(institutionId);
+    setOrigin(origin);
     trackEvent('ONBOARDING_SELEZIONE_ENTE', {
       party_id: institutionId,
       request_id: requestIdRef.current,
@@ -164,7 +170,7 @@ function OnBoardingSubProduct() {
           parties,
           forward: (institutionId?: string) => {
             if (institutionId) {
-              forwardWithInstitutionId(institutionId, true);
+              forwardWithInstitutionId(institutionId, origin, true);
             } else {
               forward();
             }
@@ -185,7 +191,7 @@ function OnBoardingSubProduct() {
           ),
           product: subProduct,
           forward: (_: any, institutionId: string) =>
-            forwardWithInstitutionId(institutionId, false),
+            forwardWithInstitutionId(institutionId, origin, false),
           back,
         }),
     },
@@ -268,6 +274,7 @@ function OnBoardingSubProduct() {
           billingData: billingData as BillingData,
           institutionType: organizationType as OrganizationType,
           pricingPlan,
+          origin,
           setLoading,
           forward,
           back,
