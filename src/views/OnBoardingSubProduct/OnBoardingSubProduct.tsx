@@ -120,7 +120,7 @@ function OnBoardingSubProduct() {
   };
 
   const forwardWithInstitution = (party: Party, isUserParty: boolean) => {
-    setInstitutionId(institutionId);
+    setInstitutionId(party.institutionId);
     setOrigin(party.origin);
     setBillingData({
       businessName: party.description,
