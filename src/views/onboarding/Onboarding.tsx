@@ -107,13 +107,13 @@ function OnboardingComponent({ productId }: { productId: string }) {
   };
 
   const forwardWithDataAndInstitutionId = (
+    institutionId: string,
+    newFormData: Partial<FormData>,
     address: string,
     description: string,
     digitalAddress: string,
     taxCode: string,
-    origin: string,
-    newFormData: Partial<FormData>,
-    institutionId: string
+    origin: string
   ) => {
     setInstitutionId(institutionId);
     forwardWithData(newFormData);
@@ -205,22 +205,22 @@ function OnboardingComponent({ productId }: { productId: string }) {
           ),
           product: selectedProduct,
           forward: (
+            institutionId: string,
+            newFormData: Partial<FormData>,
             description: string,
             address: string,
             digitalAddress: string,
             taxCode: string,
-            origin: string,
-            newFormData: Partial<FormData>,
-            institutionId: string
+            origin: string
           ) => {
             forwardWithDataAndInstitutionId(
-              description,
+              institutionId,
+              newFormData,
               address,
+              description,
               digitalAddress,
               taxCode,
-              origin,
-              newFormData,
-              institutionId
+              origin
             );
           },
           back,

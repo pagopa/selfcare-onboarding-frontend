@@ -119,13 +119,13 @@ function OnBoardingSubProduct() {
   };
 
   const forwardWithInstitutionId = (
+    institutionId: string,
+    isUserParty: boolean,
     address: string,
     description: string,
     digitalAddress: string,
     taxCode: string,
-    origin: string,
-    institutionId: string,
-    isUserParty: boolean
+    origin: string
   ) => {
     setInstitutionId(institutionId);
     setOrigin(origin);
@@ -193,13 +193,13 @@ function OnBoardingSubProduct() {
           ) => {
             if (institutionId) {
               forwardWithInstitutionId(
+                institutionId,
+                true,
                 description,
                 address,
                 digitalAddress,
                 taxCode,
-                origin,
-                institutionId,
-                true
+                origin
               );
             } else {
               forward();
@@ -230,13 +230,13 @@ function OnBoardingSubProduct() {
             institutionId: string
           ) =>
             forwardWithInstitutionId(
+              institutionId,
+              false,
               description,
               address,
               digitalAddress,
               taxCode,
-              origin,
-              institutionId,
-              false
+              origin
             ),
           back,
         }),
