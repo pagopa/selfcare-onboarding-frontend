@@ -211,7 +211,8 @@ function OnboardingComponent({ productId }: { productId: string }) {
         StepOnboardingData({
           institutionId,
           productId,
-          forward: forwardWithOnboardingData,
+          forward: (institutionType: InstitutionType) =>
+            forwardWithOnboardingData(billingData, institutionType),
         }),
     },
     {
