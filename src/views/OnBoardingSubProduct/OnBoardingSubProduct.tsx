@@ -125,7 +125,7 @@ function OnBoardingSubProduct() {
     setBillingData({
       businessName: party.description,
       registeredOffice: party.address,
-      mailPEC: party.digitalAddress,
+      digitalAddress: party.digitalAddress,
       taxCode: party.taxCode,
       vatNumber: '',
       recipientCode: party.origin === 'IPA' ? party.institutionId : '',
@@ -232,7 +232,7 @@ function OnBoardingSubProduct() {
           initialFormData: billingData ?? {
             businessName: '',
             registeredOffice: '',
-            mailPEC: '',
+            digitalAddress: '',
             taxCode: '',
             vatNumber: '',
             recipientCode: '',
