@@ -116,7 +116,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
       mailPEC: party.digitalAddress,
       taxCode: party.taxCode,
       vatNumber: '',
-      recipientCode: party.origin === 'IPA' ? party.institutionId : '',
+      recipientCode: '',
     });
     trackEvent('ONBOARDING_SELEZIONE_ENTE', {
       party_id: institutionId,
