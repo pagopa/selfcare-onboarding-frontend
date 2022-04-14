@@ -197,9 +197,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
             </Trans>
           ),
           product: selectedProduct,
-          forward: (newFormData: Partial<FormData>, party: Party) => {
-            forwardWithDataAndInstitution(party, newFormData);
-          },
+          forward: forwardWithDataAndInstitution,
           back,
         }),
     },
