@@ -54,7 +54,7 @@ export function StepSearchParty({ subTitle, forward, back }: Props) {
     setSelectedHistory(selected);
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const { id } = selected!;
-    forward({ institutionId: id }, selected as unknown as Party);
+    forward({ institutionId: id }, { ...selected, institutionId: id } as Party);
   };
 
   const { t } = useTranslation();
