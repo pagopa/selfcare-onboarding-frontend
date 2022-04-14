@@ -106,7 +106,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
     forward();
   };
 
-  const forwardWithDataAndInstitution = (newFormData: Partial<FormData>, party: SelfcareParty) => {
+  const forwardWithDataAndInstitution = (newFormData: Partial<FormData>, party: Party) => {
     setInstitutionId(party.institutionId);
     forwardWithData(newFormData);
     setOrigin(party.origin);
