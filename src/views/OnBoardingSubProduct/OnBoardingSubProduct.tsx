@@ -102,12 +102,12 @@ function OnBoardingSubProduct() {
     forward(parties.length === 0 ? 2 : 1);
   };
 
-  const forwardWithBillingData = () => {
+  const forwardWithBillingData = (newBillingData: BillingData) => {
     trackEvent('ONBOARDING_DATI_FATTURAZIONE', {
       party_id: institutionId,
       request_id: requestIdRef.current,
     });
-    setBillingData(billingData);
+    setBillingData(newBillingData);
     forward();
   };
 
