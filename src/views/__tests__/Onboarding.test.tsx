@@ -185,11 +185,12 @@ const checkBackForwardNavigation = async (
   expect(goBackButton).toBeEnabled();
   fireEvent.click(goBackButton);
 
-  await waitFor(() => screen.getByText(previousStepTitle));
+  screen.getByText(previousStepTitle);
 
   const goForwardButton = screen.getByRole('button', {
     name: 'Conferma',
   });
+
   expect(goForwardButton).toBeEnabled();
   fireEvent.click(goForwardButton);
 
@@ -259,7 +260,7 @@ const executeStep2 = async () => {
 
   const [_, confirmButton] = await checkBackForwardNavigation(stepBillingDataTitle, step2Title);
 
-  await fillUserForm(confirmButton, 'LEGAL', 'BBBBBB00B00B000B', 'b@b.bb');
+  await fillUserForm(confirmButton, 'LEGAL', 'BBBBBB00B00B000B', 'b@b.bb', '11122233345');
 
   expect(confirmButton).toBeEnabled();
   fireEvent.click(confirmButton);
@@ -285,6 +286,7 @@ const executeStep3 = async (expectedSuccessfulSubmit: boolean) => {
     'delegate-initial',
     'CCCCCC00C00C000C',
     'a@a.aa',
+    '11122233345',
     'BBBBBB00B00B000B',
     1,
     'b@b.bb',
@@ -322,8 +324,10 @@ const fillUserBillingDataForm = async (
     target: { value: 'registeredOfficeInput' },
   });
   fireEvent.change(document.getElementById(mailPECInput), { target: { value: 'a@a.it' } });
-  fireEvent.change(document.getElementById(taxCodeInput), { target: { value: 'taxCodeInput' } });
-  fireEvent.change(document.getElementById(vatNumber), { target: { value: 'vatNumber' } });
+  fireEvent.change(document.getElementById(taxCodeInput), {
+    target: { value: 'AAAAAA99A11A123K' },
+  });
+  fireEvent.change(document.getElementById(vatNumber), { target: { value: '11122233345' } });
   fireEvent.change(document.getElementById(recipientCode), {
     target: { value: 'recipientCode' },
   });
@@ -369,9 +373,7 @@ const fillUserForm = async (
     expectedDuplicateTaxCodeMessages,
     existentEmail,
     email,
-    expectedDuplicateEmailMessages,
-    expectedInvalidVatNumber,
-    expectedInvalidVatNumberMessages,
+    expectedDuplicateEmailMessages
   );
 };
 
@@ -383,9 +385,7 @@ const checkAlreadyExistentValues = async (
   expectedDuplicateTaxCodeMessages: number | undefined,
   existentEmail: string | undefined,
   email: string,
-  expectedDuplicateEmailMessages: number | undefined,
-  invalidVatNumber: string | undefined,
-  expectedInvalidVatNumberMessages: number | undefined,
+  expectedDuplicateEmailMessages: number | undefined
 ) => {
   if (existentTaxCode) {
     await fillTextFieldAndCheckButton(prefix, 'taxCode', existentTaxCode, confirmButton, false);
@@ -400,13 +400,6 @@ const checkAlreadyExistentValues = async (
     expect(duplicateEmailErrors.length).toBe(expectedDuplicateEmailMessages);
   }
   await fillTextFieldAndCheckButton(prefix, 'email', email, confirmButton, true);
-
-  if (invalidVatNumber) {
-    await fillTextFieldAndCheckButton(prefix, 'vatNumber', invalidVatNumber, confirmButton, false);
-    const invalidVatNumberError = screen.getAllByText('Partita IVA non valida');
-    expect(invalidVatNumberError.length).toBe(expectedInvalidVatNumberMessages);
-  }
-  }
 };
 
 const fillTextFieldAndCheckButton = async (
@@ -416,11 +409,14 @@ const fillTextFieldAndCheckButton = async (
   confirmButton: HTMLElement,
   expectedEnabled: boolean
 ) => {
-  fireEvent.change(document.getElementById(`${prefix}-${field}`), { target: { value } });
+  await waitFor(() =>
+    fireEvent.change(document.getElementById(`${prefix}-${field}`), { target: { value } })
+  );
+
   if (expectedEnabled) {
-    expect(confirmButton).toBeEnabled();
+    await waitFor(() => expect(confirmButton).toBeEnabled());
   } else {
-    expect(confirmButton).toBeDisabled();
+    await waitFor(() => expect(confirmButton).toBeDisabled());
   }
 };
 
@@ -536,7 +532,17 @@ const fillAdditionalUserAndCheckUniqueValues = async (
 
   const taxCode = `ZZZZZZ0${index}A00A000A`;
   const email = `${index}@z.zz`;
-  await fillUserForm(confirmButton, prefix, taxCode, email, 'BBBBBB00B00B000B', 1, 'b@b.bb', 1);
+  await fillUserForm(
+    confirmButton,
+    prefix,
+    taxCode,
+    email,
+    '11122233312',
+    'BBBBBB00B00B000B',
+    1,
+    'b@b.bb',
+    1
+  );
   await checkAlreadyExistentValues(
     prefix,
     confirmButton,
