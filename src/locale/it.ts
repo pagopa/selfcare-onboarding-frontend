@@ -250,7 +250,7 @@ export default {
     invalidEmail: 'L’indirizzo email non è valido',
     businessName: 'Ragione sociale',
     registeredOffice: 'Sede legale',
-    mailPEC: 'Indirizzo PEC',
+    digitalAddress: 'Indirizzo PEC',
     taxCodeNotEquals2PIVAdescription: 'La Partita IVA non coincide con il Codice fiscale',
     taxCode: 'Codice fiscale',
     vatNumber: 'Partita IVA',

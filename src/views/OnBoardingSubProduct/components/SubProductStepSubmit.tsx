@@ -8,7 +8,7 @@ import { IllusError, theme } from '@pagopa/mui-italia';
 import { Trans } from 'react-i18next';
 import {
   BillingData,
-  OrganizationType,
+  InstitutionType,
   Product,
   StepperStepComponentProps,
   UserOnCreate,
@@ -27,8 +27,9 @@ type Props = StepperStepComponentProps & {
   institutionId: string;
   users: Array<UserOnCreate>;
   billingData: BillingData;
-  institutionType: OrganizationType;
+  institutionType: InstitutionType;
   pricingPlan: string;
+  origin: string;
   setLoading: (loading: boolean) => void;
 };
 
@@ -88,6 +89,7 @@ function SubProductStepSubmit({
   setLoading,
   institutionType,
   pricingPlan,
+  origin,
 }: Props) {
   const [error, setError] = useState<boolean>(false);
   const { setOnLogout } = useContext(HeaderContext);
@@ -122,7 +124,7 @@ function SubProductStepSubmit({
         endpoint: 'ONBOARDING_POST_LEGALS',
         endpointParams: { institutionId, productId: subProduct.id },
       },
-      { method: 'POST', data: { users, billingData, institutionType, pricingPlan } },
+      { method: 'POST', data: { users, billingData, institutionType, pricingPlan, origin } },
       () => setRequiredLogin(true)
     );
 

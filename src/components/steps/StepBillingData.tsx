@@ -4,7 +4,7 @@ import { useFormik } from 'formik';
 import { useTranslation } from 'react-i18next';
 import Checkbox from '@mui/material/Checkbox';
 import { useEffect } from 'react';
-import { BillingData, OrganizationType, StepperStepComponentProps } from '../../../types';
+import { BillingData, InstitutionType, StepperStepComponentProps } from '../../../types';
 import { OnboardingStepActions } from '../OnboardingStepActions';
 import { useHistoryState } from '../useHistoryState';
 
@@ -27,9 +27,10 @@ type StepBillingDataHistoryState = {
 
 type Props = StepperStepComponentProps & {
   initialFormData: BillingData;
-  organizationType: OrganizationType;
+  organizationType: InstitutionType;
   subtitle: string;
   institutionId: string;
+  origin?: string;
 };
 
 export default function StepBillingData({
@@ -39,9 +40,10 @@ export default function StepBillingData({
   subtitle,
   organizationType,
   institutionId,
+  origin,
 }: Props) {
   const requiredError = 'Required';
-  const ipa = organizationType === 'PA';
+  const ipa = origin === 'IPA';
 
   const { t } = useTranslation();
   const theme = useTheme();
@@ -106,9 +108,9 @@ export default function StepBillingData({
             !onlyNumbersRegexp.test(values.vatNumber)
           ? t('stepBillingData.invalidVatNumber')
           : undefined,
-        mailPEC: !values.mailPEC
+        mailPEC: !values.digitalAddress
           ? requiredError
-          : !mailPECRegexp.test(values.mailPEC)
+          : !mailPECRegexp.test(values.digitalAddress)
           ? t('stepBillingData.invalidEmail')
           : undefined,
         recipientCode: !values.recipientCode ? requiredError : undefined,
@@ -206,7 +208,12 @@ export default function StepBillingData({
               </Grid>
               <Grid item xs={12}>
                 <CustomTextField
-                  {...baseTextFieldProps('mailPEC', t('stepBillingData.mailPEC'), 400, 18)}
+                  {...baseTextFieldProps(
+                    'digitalAddress',
+                    t('stepBillingData.digitalAddress'),
+                    400,
+                    18
+                  )}
                   disabled={ipa}
                 />
               </Grid>

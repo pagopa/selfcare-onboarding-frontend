@@ -1,5 +1,5 @@
 import { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
-import { Endpoint, OnboardingDto, Party } from '../../../types';
+import { Endpoint, InstitutionOnboardingInfoResource, SelfcareParty } from '../../../types';
 
 const mockPartyRegistry = {
   items: [
@@ -15,6 +15,7 @@ const mockPartyRegistry = {
       managerSurname: 'Rossi',
       description: 'AGENCY X',
       digitalAddress: 'mail@pec.mail.org',
+      origin: 'IPA',
     },
     {
       id: 'error',
@@ -28,6 +29,7 @@ const mockPartyRegistry = {
       managerSurname: 'Rossi_ERROR',
       description: 'AGENCY ERROR',
       digitalAddress: 'mail_ERROR_@pec.mail.org',
+      origin: 'IPA',
     },
     {
       id: 'onboarded',
@@ -41,6 +43,7 @@ const mockPartyRegistry = {
       managerSurname: 'Rossi_ONBOARDED',
       description: 'AGENCY ONBOARDED',
       digitalAddress: 'mail_ONBOARDED_@pec.mail.org',
+      origin: 'IPA',
     },
     {
       id: 'pending',
@@ -54,6 +57,7 @@ const mockPartyRegistry = {
       managerSurname: 'Rossi_PENDING',
       description: 'AGENCY PENDING',
       digitalAddress: 'mail_PENDING_@pec.mail.org',
+      origin: 'IPA',
     },
     {
       id: 'infoError',
@@ -67,6 +71,7 @@ const mockPartyRegistry = {
       managerSurname: 'Rossi_INFOERROR',
       description: 'AGENCY INFO ERROR',
       digitalAddress: 'mail_INFOERROR_@pec.mail.org',
+      origin: 'IPA',
     },
   ],
   count: 5,
@@ -83,7 +88,7 @@ const mockedSubProduct = {
   parent: 'prod-io',
 };
 
-const mockedParties: Array<Party> = [
+const mockedParties: Array<SelfcareParty> = [
   {
     institutionId: '0',
     description: 'Comune di Milano',
@@ -116,14 +121,18 @@ const mockedParties: Array<Party> = [
   },
 ];
 
-const mockedOnboardingData0: OnboardingDto = {
-  billingData: {
-    businessName: 'Comune di Milano',
-    registeredOffice: 'Milano, Piazza Colonna 370, CAP 20021',
-    mailPEC: 'comune.milano@pec.it',
-    taxCode: 'AAAAAA11A11A123K',
-    vatNumber: 'AAAAAA11A11A123K',
-    recipientCode: 'M5UXCR1',
+const mockedOnboardingData0: InstitutionOnboardingInfoResource = {
+  institution: {
+    billingData: {
+      businessName: 'Comune di Milano',
+      registeredOffice: 'Milano, Piazza Colonna 370, CAP 20021',
+      digitalAddress: 'comune.milano@pec.it',
+      taxCode: 'AAAAAA11A11A123K',
+      vatNumber: 'AAAAAA11A11A123K',
+      recipientCode: 'M5UXCR1',
+    },
+    institutionType: 'PA',
+    origin: 'IPA',
   },
   manager: {
     email: 'm@ma.it',
@@ -132,17 +141,20 @@ const mockedOnboardingData0: OnboardingDto = {
     surname: 'Rossi',
     role: 'MANAGER',
   },
-  organizationType: 'PA',
 };
 
-const mockedOnboardingData1: OnboardingDto = {
-  billingData: {
-    businessName: 'Comune di Bollate',
-    registeredOffice: 'Bollate, Piazza Colonna 370, CAP 20021',
-    mailPEC: 'comune.bollate@pec.it',
-    taxCode: 'BBBBBB11A11A123K',
-    vatNumber: 'BBBBBB11A11A123K',
-    recipientCode: 'M2UHYR1',
+const mockedOnboardingData1: InstitutionOnboardingInfoResource = {
+  institution: {
+    billingData: {
+      businessName: 'Comune di Bollate',
+      registeredOffice: 'Bollate, Piazza Colonna 370, CAP 20021',
+      digitalAddress: 'comune.bollate@pec.it',
+      taxCode: 'BBBBBB11A11A123K',
+      vatNumber: 'BBBBBB11A11A123K',
+      recipientCode: 'M2UHYR1',
+    },
+    institutionType: 'GSP',
+    origin: 'IPA',
   },
   manager: {
     email: 'm@ma.it',
@@ -151,7 +163,6 @@ const mockedOnboardingData1: OnboardingDto = {
     surname: 'Rosa',
     role: 'MANAGER',
   },
-  organizationType: 'GSP',
 };
 
 const mockedResponseError = {

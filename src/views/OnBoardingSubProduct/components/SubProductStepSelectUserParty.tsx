@@ -3,12 +3,12 @@ import { Box } from '@mui/system';
 import { useEffect } from 'react';
 import { useTranslation, Trans } from 'react-i18next';
 import { EntityAccountItem } from '@pagopa/mui-italia/dist/components/EntityAccountItem';
-import { Party, StepperStepComponentProps } from '../../../../types';
+import { Party, SelfcareParty, StepperStepComponentProps } from '../../../../types';
 import { OnboardingStepActions } from '../../../components/OnboardingStepActions';
 import { useHistoryState } from '../../../components/useHistoryState';
 
 type Props = {
-  parties: Array<Party>;
+  parties: Array<SelfcareParty>;
 } & StepperStepComponentProps;
 
 export function SubProductStepSelectUserParty({ forward, parties }: Props) {
@@ -18,15 +18,13 @@ export function SubProductStepSelectUserParty({ forward, parties }: Props) {
 
   const theme = useTheme();
 
-  const [selected, setSelected, setSelectedHistory] = useHistoryState<Party | null>(
+  const [selected, setSelected, setSelectedHistory] = useHistoryState<SelfcareParty | null>(
     'SubProductStepSelectUserParty',
     null
   );
   const onForwardAction = () => {
     setSelectedHistory(selected);
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const { institutionId } = selected!;
-    forward(institutionId);
+    forward(selected as Party);
   };
   const bodyTitle = t('onBoardingSubProduct.selectUserPartyStep.title');
 
