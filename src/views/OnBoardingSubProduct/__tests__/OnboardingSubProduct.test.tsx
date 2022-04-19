@@ -1,22 +1,22 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { useState } from 'react';
-import { Product, User } from '../../../types';
-import { HeaderContext, UserContext } from '../../lib/context';
-import { ENV } from '../../utils/env';
-import OnBoardingSubProduct from '../OnBoardingSubProduct/OnBoardingSubProduct';
-import './../../locale';
+import { Product, User } from '../../../../types';
+import { HeaderContext, UserContext } from '../../../lib/context';
+import { ENV } from '../../../utils/env';
+import OnBoardingSubProduct from '../OnBoardingSubProduct';
+import '../../../locale';
 import { Route, Router, Switch } from 'react-router';
 import { createMemoryHistory } from 'history';
-import { ROUTES } from '../../utils/constants';
+import { ROUTES } from '../../../utils/constants';
 
-jest.mock('../../lib/api-utils');
+jest.mock('../../../lib/api-utils');
 
 jest.setTimeout(20000);
 
 let fetchWithLogsSpy: jest.SpyInstance;
 
 beforeEach(() => {
-  fetchWithLogsSpy = jest.spyOn(require('../../lib/api-utils'), 'fetchWithLogs');
+  fetchWithLogsSpy = jest.spyOn(require('../../../lib/api-utils'), 'fetchWithLogs');
 });
 
 const oldWindowLocation = global.window.location;
