@@ -263,7 +263,7 @@ const executeStepBillingData = async () => {
   await fillUserBillingDataForm(
     'businessName',
     'registeredOffice',
-    'mailPEC',
+    'digitalAddress',
     'taxCode',
     'vatNumber',
     'recipientCode'
