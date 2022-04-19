@@ -1,7 +1,7 @@
 import { AxiosError, AxiosResponse } from 'axios';
 import { useContext, useEffect, useState } from 'react';
 import { trackAppError } from '@pagopa/selfcare-common-frontend/services/analyticsService';
-import { Party, Product, StepperStepComponentProps } from '../../../../types';
+import { SelfcareParty, Product, StepperStepComponentProps } from '../../../../types';
 import { HeaderContext, UserContext } from '../../../lib/context';
 import { fetchWithLogs } from '../../../lib/api-utils';
 import { getFetchOutcome } from '../../../lib/error-utils';
@@ -43,7 +43,7 @@ const buildUrlLog = (institutionId: string) =>
   `${ENV.URL_INSTITUTION_LOGO.PREFIX}${institutionId}${ENV.URL_INSTITUTION_LOGO.SUFFIX}`;
 
 const handleSearchUserParties = async (
-  setParties: (parties: Array<Party>) => void,
+  setParties: (parties: Array<SelfcareParty>) => void,
   setRequiredLogin: (required: boolean) => void
 ) => {
   const searchResponse = await fetchWithLogs(
@@ -55,7 +55,7 @@ const handleSearchUserParties = async (
 
   if (outcome === 'success') {
     setParties(
-      ((searchResponse as AxiosResponse).data as Array<Party>).map((p) => ({
+      ((searchResponse as AxiosResponse).data as Array<SelfcareParty>).map((p) => ({
         ...p,
         urlLogo: buildUrlLog(p.institutionId),
       }))
@@ -80,7 +80,7 @@ function SubProductStepVerifyInputs({
   const [selectedSubProduct, setSelectedSubProduct] = useState<Product | null>();
   const [selectedProduct, setSelectedProduct] = useState<Product | null>();
 
-  const [parties, setParties] = useState<Array<Party>>();
+  const [parties, setParties] = useState<Array<SelfcareParty>>();
 
   const submit = () => {
     setLoading(true);

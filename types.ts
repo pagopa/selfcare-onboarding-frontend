@@ -57,13 +57,15 @@ export type StepperStep = {
 };
 
 export type IPACatalogParty = {
+  address: string;
+  category: string;
   description: string;
   digitalAddress: string;
   id: string;
-  managerName: string;
-  managerSurname: string;
   o: string;
-  ou: string;
+  origin: string;
+  taxCode: string;
+  zipCode: string;
 };
 
 /*
@@ -150,7 +152,7 @@ export type Product = {
   parent?: string;
 };
 
-export type Party = {
+export type SelfcareParty = {
   institutionId: string;
   description: string;
   urlLogo?: string;
@@ -158,6 +160,16 @@ export type Party = {
   digitalAddress: string;
   taxCode: string;
   zipCode: string;
+  origin: string;
+};
+
+export type Party = {
+  institutionId: string;
+  address: string;
+  description: string;
+  digitalAddress: string;
+  taxCode: string;
+  origin: string;
 };
 
 export type BillingData = {
@@ -166,7 +178,7 @@ export type BillingData = {
   // Sede legale
   registeredOffice: string;
   // Indirizzo PEC
-  mailPEC: string;
+  digitalAddress: string;
   // Codice fiscale
   taxCode: string;
   // Partita iva
@@ -177,10 +189,15 @@ export type BillingData = {
   publicServices?: boolean;
 };
 
-export type OnboardingDto = {
-  manager?: UserOnCreate;
-  billingData?: BillingData;
-  organizationType?: OrganizationType;
+export type InstitutionData = {
+  billingData: BillingData;
+  institutionType: InstitutionType;
+  origin: string;
 };
 
-export type OrganizationType = 'PA' | 'GSP' | 'SCP' | 'PT';
+export type InstitutionOnboardingInfoResource = {
+  institution: InstitutionData;
+  manager: UserOnCreate;
+};
+
+export type InstitutionType = 'PA' | 'GSP' | 'SCP' | 'PT';

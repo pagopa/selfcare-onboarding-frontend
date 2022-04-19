@@ -1,6 +1,6 @@
 import { fireEvent, getByLabelText, render, screen, waitFor } from '@testing-library/react';
 import { useState } from 'react';
-import { OrganizationType, User } from '../../../../types';
+import { User } from '../../../../types';
 import { HeaderContext, UserContext } from '../../../lib/context';
 import { ENV } from '../../../utils/env';
 import Onboarding from '../Onboarding';
