@@ -1,11 +1,12 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { useState } from 'react';
-import { User } from '../../../types';
+import { Product, User } from '../../../types';
 import { HeaderContext, UserContext } from '../../lib/context';
 import { ENV } from '../../utils/env';
 import OnBoardingSubProduct from '../OnBoardingSubProduct/OnBoardingSubProduct';
 import './../../locale';
-import { ReactRouter, Router } from 'react-router';
+import ReactRouter from 'react-router';
+import Route from 'react-router-dom';
 
 jest.mock('../../lib/api-utils');
 
@@ -23,7 +24,7 @@ jest.spyOn(ReactRouter, 'useParams').mockReturnValue({ subProductId: 'prod-io-pr
 const oldWindowLocation = global.window.location;
 const initialLocation = {
   assign: jest.fn(),
-  pathname: '',
+  pathname: '/:productId/:subProductId',
   origin: 'MOCKED_ORIGIN',
   search: '',
   hash: '',
@@ -47,7 +48,10 @@ jest.mock('react-router-dom', () => ({
   }),
 }));
 
-const renderComponent = (subProductId: string = 'prod-io-premium') => {
+const renderComponent = (
+  productId: string = 'prod-io',
+  subProductId: string = 'prod-io-premium'
+) => {
   const Component = () => {
     const [user, setUser] = useState<User | null>(null);
     const [subHeaderVisible, setSubHeaderVisible] = useState<boolean>(false);
@@ -60,10 +64,8 @@ const renderComponent = (subProductId: string = 'prod-io-premium') => {
         <UserContext.Provider
           value={{ user, setUser, requiredLogin: false, setRequiredLogin: () => {} }}
         >
-          <Router path="http://localhost:3000/onboarding/:productId/:subProductId">
-            <button onClick={onLogout}>LOGOUT</button>
-            <OnBoardingSubProduct />
-          </Router>
+          <button onClick={onLogout}>LOGOUT</button>
+          <OnBoardingSubProduct />
         </UserContext.Provider>
       </HeaderContext.Provider>
     );
@@ -80,34 +82,34 @@ const successOnboardingSubProductTitle = 'La tua richiesta è stata inviata con 
 const errorOnboardingSubProductTitle = 'Spiacenti, qualcosa è andato storto.';
 
 test('test already subscribed to premium', async () => {
-  renderComponent();
+  renderComponent('prod-io', 'prod-io-premium');
   await executeStepSelectInstitutionReleated('agency onboarded');
   await waitFor(() => screen.getByText('Sottoscrizione già avvenuta'));
   await executeGoLanding();
 });
 
 test('test not base product adhesion', async () => {
-  renderComponent();
+  renderComponent('prod-io', 'prod-io-premium');
   await executeStepSelectInstitutionUnreleated('agency onboarded');
   await waitFor(() => screen.getByText("L'ente non ha aderito al prodotto"));
   await executeGoLanding();
 });
 
 test('test error retrieving onboarding info', async () => {
-  renderComponent();
+  renderComponent('prod-io', 'prod-io-premium');
   await executeStepSelectInstitutionUnreleated('agency info error');
   await waitFor(() => screen.getByText('Spiacenti, qualcosa è andato storto.'));
   await executeGoHome();
 });
 
 test('test error subProductID', async () => {
-  renderComponent('error');
+  renderComponent('error', 'error');
   await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(1));
   await waitFor(() => screen.getByText('Impossibile individuare il prodotto desiderato'));
 });
 
 test('test complete', async () => {
-  renderComponent();
+  renderComponent('prod-io', 'prod-io-premium');
   await executeStepSelectInstitutionUnreleated('agency x');
   await executeStepBillingData();
   await executeStepAddManager(true);
@@ -115,7 +117,7 @@ test('test complete', async () => {
 });
 
 test('test complete with error on submit', async () => {
-  renderComponent();
+  renderComponent('prod-io', 'prod-io-premium');
   await executeStepSelectInstitutionUnreleated('agency error');
   await executeStepBillingData();
   await executeStepAddManager(false);
@@ -123,7 +125,7 @@ test('test complete with error on submit', async () => {
 });
 
 test('test exiting during flow with unload event', async () => {
-  renderComponent();
+  renderComponent('prod-io', 'prod-io-premium');
   await executeStepSelectInstitutionUnreleated('agency x');
   const event = new Event('beforeunload');
   window.dispatchEvent(event);
@@ -135,7 +137,7 @@ test('test exiting during flow with unload event', async () => {
 });
 
 test('test exiting during flow with logout', async () => {
-  renderComponent();
+  renderComponent('prod-io', 'prod-io-premium');
   await executeStepSelectInstitutionUnreleated('agency x');
 
   expect(screen.queryByText('Vuoi davvero uscire?')).toBeNull();
