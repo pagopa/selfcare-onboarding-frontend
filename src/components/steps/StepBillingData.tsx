@@ -20,6 +20,10 @@ const fiscalCodeRegexp = new RegExp(
 );
 const onlyNumbersRegexp = new RegExp('^[0-9]{11}$');
 
+const fiscalAndVatCodeRegexp = new RegExp(
+  /(^[A-Za-z]{6}[0-9lmnpqrstuvLMNPQRSTUV]{2}[abcdehlmprstABCDEHLMPRST]{1}[0-9lmnpqrstuvLMNPQRSTUV]{2}[A-Za-z]{1}[0-9lmnpqrstuvLMNPQRSTUV]{3}[A-Za-z]{1}$|^[0-9]{11}$)/
+);
+
 type StepBillingDataHistoryState = {
   institutionId: string;
   isTaxCodeNotEquals2PIVA: boolean;
@@ -93,19 +97,14 @@ export default function StepBillingData({
         taxCode: !values.taxCode
           ? requiredError
           : !stepHistoryState.isTaxCodeNotEquals2PIVA &&
-            values.taxCode &&
-            !onlyNumbersRegexp.test(values.taxCode)
+            !fiscalAndVatCodeRegexp.test(values.taxCode)
           ? t('stepBillingData.invalidFiscalCode')
-          : values.taxCode &&
-            stepHistoryState.isTaxCodeNotEquals2PIVA &&
-            !fiscalCodeRegexp.test(values.taxCode)
+          : stepHistoryState.isTaxCodeNotEquals2PIVA && !fiscalCodeRegexp.test(values.taxCode)
           ? t('stepBillingData.invalidFiscalCode')
           : undefined,
         vatNumber: !values.vatNumber
           ? requiredError
-          : stepHistoryState.isTaxCodeNotEquals2PIVA &&
-            values.vatNumber &&
-            !onlyNumbersRegexp.test(values.vatNumber)
+          : stepHistoryState.isTaxCodeNotEquals2PIVA && !onlyNumbersRegexp.test(values.vatNumber)
           ? t('stepBillingData.invalidVatNumber')
           : undefined,
         mailPEC: !values.digitalAddress
