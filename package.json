@@ -1,6 +1,6 @@
 {
   "name": "selfcare-onboarding-frontend",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "homepage": "onboarding",
   "private": true,
   "dependencies": {
