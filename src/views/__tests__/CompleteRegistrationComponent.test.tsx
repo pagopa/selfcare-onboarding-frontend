@@ -1,6 +1,7 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { ENV } from '../../utils/env';
 import CompleteRegistrationComponent from '../CompleteRegistrationComponent';
+import './../../locale';
 
 const oldWindowLocation = global.window.location;
 const mockedLocation = {
@@ -31,7 +32,7 @@ test('test no jwt', () => {
   render(<CompleteRegistrationComponent />);
 
   const goHomeButton = screen.getByRole('button', {
-    name: 'Torna alla home',
+    name: 'Chiudi',
   });
   fireEvent.click(goHomeButton);
   expect(mockedLocation.assign).toBeCalledWith(ENV.URL_FE.LANDING);

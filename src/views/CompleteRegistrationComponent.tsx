@@ -2,7 +2,11 @@ import React, { useState, useContext, useEffect } from 'react';
 import { Button, Stack, Typography, Grid } from '@mui/material';
 import { AxiosError } from 'axios';
 import SessionModal from '@pagopa/selfcare-common-frontend/components/SessionModal';
-import ErrorIcon from '@pagopa/selfcare-common-frontend/components/icons/ErrorIcon';
+// import ErrorIcon from '@pagopa/selfcare-common-frontend/components/icons/ErrorIcon';
+import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
+import { useTranslation, Trans } from 'react-i18next';
+import { uniqueId } from 'lodash';
+import { ReactComponent as ErrorIcon } from '../assets/payment_completed_error.svg';
 import { RequestOutcome, RequestOutcomeOptions, StepperStep, Problem } from '../../types';
 import { ConfirmRegistrationStep0 } from '../components/ConfirmRegistrationStep0';
 import { ConfirmRegistrationStep1 } from '../components/ConfirmRegistrationStep1';
@@ -26,19 +30,16 @@ type FileErrorAttempt = {
 
 const errors = {
   INVALID_DOCUMENT: {
-    title: 'Controlla il documento',
-    message:
-      "Il documento caricato non è riconducibile all'Atto di adesione del tuo Ente. Verifica che sia quello corretto e caricalo di nuovo.",
+    title: 'title',
+    message: 'message',
   },
   INVALID_SIGN: {
-    title: 'Controlla il documento',
-    message:
-      'La Firma Digitale non è riconducibile al Legale Rappresentante indicato in fase di adesione. Verifica la corrispondenza e carica di nuovo il documento.',
+    title: 'title',
+    message: 'message',
   },
   GENERIC: {
-    title: 'Caricamento non riuscito',
-    message:
-      'Il caricamento del documento non è andato a buon fine. Torna indietro e caricalo di nuovo.',
+    title: 'title',
+    message: 'message',
   },
 };
 
@@ -82,6 +83,7 @@ export default function CompleteRegistrationComponent() {
     'uploaded_files',
     []
   );
+  const { t } = useTranslation();
 
   useEffect(() => {
     setSubHeaderVisible(true);
@@ -107,6 +109,9 @@ export default function CompleteRegistrationComponent() {
   };
 
   const submit = async (file: File) => {
+    const requestId = uniqueId('upload-contract-');
+    trackEvent('ONBOARDING_CONTRACT_UPLOAD', { request_id: requestId });
+
     setLoading(true);
     const formData = new FormData();
     formData.append('contract', file);
@@ -120,6 +125,10 @@ export default function CompleteRegistrationComponent() {
     setLoading(false);
     const outcome = getFetchOutcome(uploadDocument);
     setOutcome(outcome);
+
+    if (outcome === 'success') {
+      trackEvent('ONBOARDING_SUCCESS', { request_id: requestId, party_id: token });
+    }
 
     if (outcome === 'error') {
       if (
@@ -149,10 +158,12 @@ export default function CompleteRegistrationComponent() {
         (uploadDocument as AxiosError<Problem>).response?.status === 409 &&
         (uploadDocument as AxiosError<Problem>).response?.data
       ) {
+        trackEvent('ONBOARDING_CONTRACT_FAILURE', { request_id: requestId, party_id: token });
         setErrorCode(
           transcodeErrorCode((uploadDocument as AxiosError<Problem>).response?.data as Problem)
         );
       } else {
+        trackEvent('ONBOARDING_FAILURE', { request_id: requestId, party_id: token });
         setErrorCode('GENERIC');
       }
     }
@@ -178,11 +189,11 @@ export default function CompleteRegistrationComponent() {
 
   const steps: Array<StepperStep> = [
     {
-      label: "Carica l'Atto di Adesione",
+      label: t('completeRegistration.steps.step0.label'),
       Component: () => ConfirmRegistrationStep0({ forward }),
     },
     {
-      label: "Carica l'Atto di Adesione",
+      label: t('completeRegistration.steps.step1.label'),
       Component: () =>
         ConfirmRegistrationStep1(
           {
@@ -202,40 +213,42 @@ export default function CompleteRegistrationComponent() {
 
   const outcomeContent: RequestOutcomeOptions = {
     success: {
-      img: { src: checkIllustration, alt: "Icona dell'email" },
-      title: 'Adesione completata',
+      img: { src: checkIllustration, alt: t('completeRegistration.outcomeContent.success.alt') },
+      title: '',
       description: [
-        <Stack key="0" spacing={10}>
-          <Typography>
-            {"Comunicheremo l'avvenuta adesione all'indirizzo PEC dell'Ente."}
-            <br />
-            {'Da questo momento in poi, i Referenti Amministrativi inseriti in fase di richiesta'}
-            <br />
-            {'potranno accedere al portale.'}
+        <Stack key="0" spacing={3}>
+          <Typography variant="h4">
+            {t('completeRegistration.outcomeContent.success.title')}
+          </Typography>
+          <Typography variant="body1">
+            <Trans i18nKey="completeRegistration.outcomeContent.success.description">
+              Comunicheremo l&apos;avvenuta adesione all&apos;indirizzo PEC <br /> dell&apos;Ente.
+              Da questo momento in poi, i Referenti Amministrativi <br />
+              inseriti in fase di richiesta potranno accedere al portale.
+            </Trans>
           </Typography>
           <Button
             variant="contained"
-            sx={{ width: '200px', alignSelf: 'center' }}
+            sx={{ alignSelf: 'center' }}
             onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
           >
-            Torna alla home
+            {t('completeRegistration.outcomeContent.success.backActionLabel')}
           </Button>
         </Stack>,
       ],
     },
     error: {
-      img: { src: redXIllustration, alt: 'Error' },
-      title: 'Richiesta di adesione in errore',
+      img: { src: redXIllustration, alt: t('completeRegistration.outcomeContent.error.alt') },
+      title: t('completeRegistration.outcomeContent.error.title'),
       description: [
         <div key="0">
           {!token
-            ? 'Il link usato non è valido!'
-            : 'Il salvataggio dei dati inseriti non è andato a buon fine.'}
+            ? t('completeRegistration.outcomeContent.error.descriptionWithoutToken')
+            : t('completeRegistration.outcomeContent.error.descriptionWithToken')}
         </div>,
       ],
     },
   };
-
   return outcome === 'success' ? (
     <MessageNoAction {...outcomeContent[outcome]} />
   ) : outcome === 'error' ? (
@@ -248,15 +261,17 @@ export default function CompleteRegistrationComponent() {
         </Grid>
         <Grid container item justifyContent="center">
           <Grid item xs={6}>
-            <Typography variant="h2">Spiacenti, qualcosa è andato storto.</Typography>
+            <Typography variant="h4">{t('completeRegistration.title')}</Typography>
           </Grid>
         </Grid>
         <Grid container item justifyContent="center" mb={7} mt={1}>
           <Grid item xs={6}>
             <Typography>
-              A causa di un errore del sistema non è possibile completare la procedura.
-              <br />
-              Ti chiediamo di riprovare più tardi.
+              <Trans i18nKey="completeRegistration.description">
+                A causa di un errore del sistema non è possibile completare la procedura.
+                <br />
+                Ti chiediamo di riprovare più tardi.
+              </Trans>
             </Typography>
           </Grid>
         </Grid>
@@ -264,10 +279,10 @@ export default function CompleteRegistrationComponent() {
           <Grid item xs={4}>
             <Button
               variant="contained"
-              sx={{ width: '200px', alignSelf: 'center' }}
+              sx={{ alignSelf: 'center' }}
               onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
             >
-              Torna alla home
+              {t('completeRegistration.backActionLabel')}
             </Button>
           </Grid>
         </Grid>
@@ -278,11 +293,11 @@ export default function CompleteRegistrationComponent() {
         handleExit={handleErrorModalExit}
         onConfirm={handleErrorModalConfirm}
         open={true}
-        title={errors[errorCode].title}
-        message={errors[errorCode].message}
-        onConfirmLabel="Torna alla pagina di caricamento"
-        onCloseLabel="Esci"
-        height="18em"
+        title={t(`completeRegistration.errors.${errorCode}.title`)}
+        message={t(`completeRegistration.errors.${errorCode}.message`)}
+        onConfirmLabel={t('completeRegistration.sessionModal.onConfirmLabel')}
+        onCloseLabel={t('completeRegistration.sessionModal.onCloseLabel')}
+        height="20em"
       />
     )
   ) : (

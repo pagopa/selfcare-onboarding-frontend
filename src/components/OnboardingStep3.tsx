@@ -1,13 +1,20 @@
 import React, { ChangeEvent, useContext } from 'react';
-import { Checkbox, FormControlLabel, IconButton, Link, Grid, Typography } from '@mui/material';
-import cryptoRandomString from 'crypto-random-string';
+import {
+  Checkbox,
+  FormControlLabel,
+  IconButton,
+  Link,
+  Grid,
+  Typography,
+  useTheme,
+} from '@mui/material';
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
-import { omit } from 'lodash';
+import { omit, uniqueId } from 'lodash';
 // import { Box } from '@mui/system';
+import { useTranslation } from 'react-i18next';
 import { objectIsEmpty } from '../lib/object-utils';
 import { StepperStepComponentProps, UserOnCreate } from '../../types';
 import { UserContext } from '../lib/context';
-// import { StyledIntro } from './StyledIntro';
 import { OnboardingStepActions } from './OnboardingStepActions';
 import { PlatformUserForm, validateUser } from './PlatformUserForm';
 import { useHistoryState } from './useHistoryState';
@@ -26,11 +33,12 @@ export function OnboardingStep3({ product, legal, forward, back }: Props) {
   const [delegateFormIds, setDelegateFormIds, setDelegateFormIdsHistory] = useHistoryState<
     Array<string>
   >('delegateFormIds', []);
+  const { t } = useTranslation();
 
   const allPeople = { ...people, LEGAL: legal };
 
   const addDelegateForm = () => {
-    const newId = `delegate-${cryptoRandomString({ length: 8 })}`;
+    const newId = uniqueId('delegate-');
     setDelegateFormIds([...delegateFormIds, newId]);
     setPeople({
       ...people,
@@ -74,9 +82,17 @@ export function OnboardingStep3({ product, legal, forward, back }: Props) {
     }
     setIsAuthUser(value);
   };
-  const bodyTitle = 'Indica il Referente Amministrativo';
-  const bodyDescription1 = 'Inserisci i dati del Referente Amministrativo o di un suo delegato.';
-  const bodyDescription2 = `La persona che indicherai sarà responsabile della gestione di ${product?.title}`;
+  const bodyTitle = t('onboardingStep3.bodyTitle');
+  const bodyDescription1 = t('onboardingStep3.bodyDescription1');
+  const bodyDescription2 = `${t('onboardingStep3.bodyDescription2')} ${product?.title}`;
+  const theme = useTheme();
+  const peopleCondition =
+    objectIsEmpty(people) ||
+    Object.keys(people)
+      .filter((prefix) => 'LEGAL' !== prefix)
+      .some((prefix) => !validateUser(prefix, people[prefix], allPeople)) ||
+    Object.keys(people).length === 3;
+
   return (
     <Grid
       container
@@ -106,17 +122,21 @@ export function OnboardingStep3({ product, legal, forward, back }: Props) {
           <FormControlLabel
             control={<Checkbox checked={isAuthUser} onChange={handleAuthUser} />}
             label={
+              // TODO: insert correct Variant when present in theme.js
               <Typography sx={{ fontSize: '16px', lineHeight: '20px', fontWeight: 600 }}>
-                Sono io il Referente Amministrativo
+                {t('onboardingStep3.formControl.label')}
               </Typography>
             }
-            sx={{ alignSelf: 'center' }}
+            sx={{
+              alignSelf: 'center',
+              '.MuiSvgIcon-root': { color: theme.palette.primary.main },
+            }}
           />
         </Grid>
       </Grid>
 
       <Grid container item justifyContent="center" mt={2}>
-        <Grid item xs={6} sx={{ boxShadow: '0px 12px 40px rgba(0, 0, 0, 0.06)' }}>
+        <Grid item xs={8} sx={{ boxShadow: '0px 12px 40px rgba(0, 0, 0, 0.06)' }}>
           <PlatformUserForm
             prefix={'delegate-initial'}
             role="DELEGATE"
@@ -129,19 +149,14 @@ export function OnboardingStep3({ product, legal, forward, back }: Props) {
 
         {delegateFormIds.map((id) => (
           <React.Fragment key={id}>
-            {/* <StyledIntro priority={3}>
-                  {{
-                    title: 'Aggiungi un nuovo Referente Amministrativo',
-                  }}
-                </StyledIntro> */}
             <Grid item xs={10} justifyContent="center" mt={6} mb={3}>
               <Typography align="center" variant="h4">
-                Aggiungi un altro Referente Amministrativo
+                {t('onboardingStep3.addUserLabel')}
               </Typography>
             </Grid>
             <Grid
               item
-              xs={6}
+              xs={8}
               sx={{ boxShadow: '0px 12px 40px rgba(0, 0, 0, 0.06)', position: 'relative' }}
             >
               <PlatformUserForm
@@ -170,39 +185,28 @@ export function OnboardingStep3({ product, legal, forward, back }: Props) {
           {Object.keys(people).length !== 3 && (
             <Link
               component="button"
-              disabled={
-                objectIsEmpty(people) ||
-                Object.keys(people)
-                  .filter((prefix) => 'LEGAL' !== prefix)
-                  .some((prefix) => !validateUser(prefix, people[prefix], allPeople)) ||
-                Object.keys(people).length === 3
-              }
-              color={
-                objectIsEmpty(people) ||
-                Object.keys(people)
-                  .filter((prefix) => 'LEGAL' !== prefix)
-                  .some((prefix) => !validateUser(prefix, people[prefix], allPeople)) ||
-                Object.keys(people).length === 3
-                  ? 'text.disabled'
-                  : 'primary'
-              }
+              disabled={peopleCondition}
               onClick={addDelegateForm}
               sx={{
                 fontSize: 'htmlFontSize',
                 lineHeight: '24px',
                 fontFamily: '"Titillium Web", "sans-serif"',
+                textDecoration: 'none',
+                cursor: peopleCondition ? 'default' : 'pointer',
+                color: theme.palette.primary.main,
+                opacity: peopleCondition ? 0.5 : 1,
               }}
             >
-              Aggiungi un altro referente
+              {t('onboardingStep3.addUserLink')}
             </Link>
           )}
         </Grid>
       </Grid>
       <OnboardingStepActions
-        back={{ action: onBackAction, label: 'Indietro', disabled: false }}
+        back={{ action: onBackAction, label: t('onboardingStep3.backLabel'), disabled: false }}
         forward={{
           action: onForwardAction,
-          label: 'Conferma',
+          label: t('onboardingStep3.confirmLabel'),
           disabled:
             objectIsEmpty(people) ||
             Object.keys(people)

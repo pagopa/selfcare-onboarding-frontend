@@ -1,10 +1,6 @@
 import { useContext } from 'react';
 import isEmpty from 'lodash/isEmpty';
-import {
-  storageDelete,
-  storageRead,
-  storageWrite,
-} from '@pagopa/selfcare-common-frontend/utils/storage-utils';
+import { storageTokenOps, storageUserOps } from '@pagopa/selfcare-common-frontend/utils/storage';
 import { MOCK_USER } from '../utils/constants';
 import { ENV } from '../utils/env';
 import { UserContext } from '../lib/context';
@@ -29,16 +25,16 @@ export const useLogin = () => {
         surname: 'loggedSurname',
         email: 'loggedEmail@aa.aa',
       });
-      storageWrite('token', testToken, 'string');
+      storageTokenOps.write(testToken);
       return;
     }
 
-    const sessionStorageUser = storageRead('user', 'object');
+    const sessionStorageUser = storageUserOps.read();
 
     // If there are no credentials, it is impossible to get the user, so
     if (isEmpty(sessionStorageUser)) {
       // Remove any partial data that might have remained, just for safety
-      storageDelete('user');
+      storageUserOps.delete();
       // Go to the login view
       window.location.assign(ENV.URL_FE.LOGIN + '?onSuccess=' + location.pathname);
       // This return is necessary

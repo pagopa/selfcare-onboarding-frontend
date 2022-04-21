@@ -1,6 +1,6 @@
 import axios, { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import isEmpty from 'lodash/isEmpty';
-import { storageRead } from '@pagopa/selfcare-common-frontend/utils/storage-utils';
+import { storageTokenOps } from '@pagopa/selfcare-common-frontend/utils/storage';
 import { Endpoint, RequestConfig } from '../../types';
 import { API } from '../utils/constants';
 import { ENV } from '../utils/env';
@@ -46,7 +46,7 @@ function prepareRequest(
       method,
       params,
       data,
-      headers: { ...headers, Authorization: `Bearer ${storageRead('token', 'string')}` },
+      headers: { ...headers, Authorization: `Bearer ${storageTokenOps.read()}` },
     });
 }
 

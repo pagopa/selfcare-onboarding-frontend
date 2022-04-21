@@ -1,9 +1,13 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState, useContext, useRef } from 'react';
 import { useHistory } from 'react-router-dom';
-import { Button, Container, Stack, Typography, Grid } from '@mui/material';
+import { Button, Container, Stack, Typography, Grid, useTheme } from '@mui/material';
 import { AxiosError, AxiosResponse } from 'axios';
 import SessionModal from '@pagopa/selfcare-common-frontend/components/SessionModal';
-import ErrorIcon from '@pagopa/selfcare-common-frontend/components/icons/ErrorIcon';
+// import ErrorIcon from '@pagopa/selfcare-common-frontend/components/icons/ErrorIcon';
+import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
+import { useTranslation, Trans } from 'react-i18next';
+import { uniqueId } from 'lodash';
+import { ReactComponent as ErrorIcon } from '../assets/payment_completed_error.svg';
 import { withLogin } from '../components/withLogin';
 import {
   Product,
@@ -52,6 +56,7 @@ const keepOnPage = (e: BeforeUnloadEvent) => {
   return message;
 };
 
+// eslint-disable-next-line sonarjs/cognitive-complexity
 function OnboardingComponent({ productId }: { productId: string }) {
   const [loading, setLoading] = useState(true);
   const [activeStep, setActiveStep] = useState(1);
@@ -64,6 +69,9 @@ function OnboardingComponent({ productId }: { productId: string }) {
   const [openExitUrl, setOpenExitUrl] = useState(ENV.URL_FE.LOGOUT);
   const { setOnLogout } = useContext(HeaderContext);
   const { setRequiredLogin } = useContext(UserContext);
+  const requestIdRef = useRef<string>();
+  const { t } = useTranslation();
+  const theme = useTheme();
 
   useEffect(() => {
     registerUnloadEvent(setOnLogout, setOpenExitModal);
@@ -76,6 +84,8 @@ function OnboardingComponent({ productId }: { productId: string }) {
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line functional/immutable-data
+    requestIdRef.current = uniqueId(`onboarding-${institutionId}-${productId}-`);
     void checkProductId().finally(() => {
       setLoading(false);
     });
@@ -121,6 +131,11 @@ function OnboardingComponent({ productId }: { productId: string }) {
   ) => {
     setInstitutionId(institutionId);
     forwardWithData(newFormData);
+    trackEvent('ONBOARDING_SELEZIONE_ENTE', {
+      party_id: institutionId,
+      request_id: requestIdRef.current,
+      product_id: productId,
+    });
   };
 
   const submit = async (users: Array<UserOnCreate>) => {
@@ -138,16 +153,30 @@ function OnboardingComponent({ productId }: { productId: string }) {
     const outcome = getFetchOutcome(postLegalsResponse);
 
     setOutcome(outcome);
+
+    if (outcome === 'success') {
+      trackEvent('ONBOARDING_SEND_SUCCESS', {
+        party_id: institutionId,
+        request_id: requestIdRef.current,
+        product_id: productId,
+      });
+    } else if (outcome === 'error') {
+      trackEvent('ONBOARDING_SEND_FAILURE', {
+        party_id: institutionId,
+        request_id: requestIdRef.current,
+        product_id: productId,
+      });
+    }
   };
 
   const steps: Array<StepperStep> = [
     {
-      label: 'Accetta privacy',
+      label: t('onboarding.steps.privacyLabel'),
       Component: () => OnboardingStep0({ product: selectedProduct, forward }),
     },
 
     {
-      label: "Seleziona l'ente",
+      label: t('onboarding.steps.selectPartyLabel'),
       Component: () =>
         OnboardingStep1({
           product: selectedProduct,
@@ -156,16 +185,22 @@ function OnboardingComponent({ productId }: { productId: string }) {
         }),
     },
     {
-      label: 'Verifica ente',
+      label: t('onboarding.steps.verifyPartyLabel'),
       Component: () =>
         OnboardingStep1_5({ product: selectedProduct, forward, institutionId, productId }),
     },
     {
-      label: 'Inserisci i dati del rappresentante legale',
+      label: t('onboarding.steps.insertlegalLabel'),
       Component: () =>
         OnboardingStep2({
           product: selectedProduct,
-          forward: forwardWithData,
+          forward: (newFormData: Partial<FormData>) => {
+            trackEvent('ONBOARDING_LEGALE_RAPPRESENTANTE', {
+              party_id: institutionId,
+              request_id: requestIdRef.current,
+            });
+            forwardWithData(newFormData);
+          },
           back: () => {
             if (window.location.search.indexOf(`institutionId=${institutionId}`) > -1) {
               setOpenExitUrl(`${ENV.URL_FE.DASHBOARD}/${institutionId}`);
@@ -177,14 +212,25 @@ function OnboardingComponent({ productId }: { productId: string }) {
         }),
     },
     {
-      label: 'Inserisci i dati degli amministratori',
+      label: t('onboarding.steps.insertAdministratorLabel'),
       Component: () =>
         OnboardingStep3({
           product: selectedProduct,
           legal: (formData as any).users[0],
           forward: (newFormData: Partial<FormData>) => {
             setFormData({ ...formData, ...newFormData });
-            void submit((newFormData as any).users);
+            trackEvent('ONBOARDING_REFERENTE_AMMINISTRATIVO', {
+              party_id: institutionId,
+              request_id: requestIdRef.current,
+              product_id: productId,
+            });
+            submit((newFormData as any).users).catch(() => {
+              trackEvent('ONBOARDING_REFERENTE_AMMINISTRATIVO', {
+                party_id: institutionId,
+                request_id: requestIdRef.current,
+                product_id: productId,
+              });
+            });
           },
           back,
         }),
@@ -196,26 +242,33 @@ function OnboardingComponent({ productId }: { productId: string }) {
   const outcomeContent: RequestOutcomeOptions = {
     success: {
       ImgComponent: CheckIllustration,
-      title: 'La tua richiesta è stata inviata con successo',
+      title: '',
       description: [
-        <Stack key="0" spacing={10}>
-          <Typography>
-            Riceverai una PEC all’indirizzo istituzionale dell’Ente.
-            <br />
-            Al suo interno troverai le istruzioni per completare l&apos;adesione.
+        <>
+          <Typography variant={'h4'} sx={{ color: theme.palette.text.primary, marginBottom: 1 }}>
+            <Trans i18nKey="onboarding.outcomeContent.success.title">
+              La tua richiesta è stata inviata
+              <br />
+              con successo
+            </Trans>
           </Typography>
-          <Button
-            variant="contained"
-            sx={{ width: '200px', alignSelf: 'center' }}
-            onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
-          >
-            Torna alla home
-          </Button>
-          {/* <Typography>
-            Non hai ricevuto nessuna mail? Attendi qualche minuto e controlla anche nello spam. Se
-            non arriva, <InlineSupportLink />
-          </Typography> */}
-        </Stack>,
+          <Stack key="0" spacing={4}>
+            <Typography variant="body1">
+              <Trans i18nKey="onboarding.outcomeContent.success.description">
+                Riceverai una PEC all’indirizzo istituzionale dell’Ente.
+                <br />
+                Al suo interno troverai le istruzioni per completare l&apos;adesione.
+              </Trans>
+            </Typography>
+            <Button
+              variant="contained"
+              sx={{ alignSelf: 'center' }}
+              onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+            >
+              {t('onboarding.outcomeContent.success.backActionLabel')}
+            </Button>
+          </Stack>
+        </>,
       ],
     },
     error: {
@@ -225,15 +278,17 @@ function OnboardingComponent({ productId }: { productId: string }) {
         <Grid container direction="column" key="0">
           <Grid container item justifyContent="center">
             <Grid item xs={5}>
-              <Typography variant="h2">Spiacenti, qualcosa è andato storto.</Typography>
+              <Typography variant="h4">{t('onboarding.outcomeContent.error.title')}</Typography>
             </Grid>
           </Grid>
-          <Grid container item justifyContent="center" mb={7} mt={1}>
+          <Grid container item justifyContent="center" mb={3} mt={1}>
             <Grid item xs={5}>
               <Typography>
-                A causa di un errore del sistema non è possibile completare la procedura.
-                <br />
-                Ti chiediamo di riprovare più tardi.
+                <Trans i18nKey="onboarding.outcomeContent.error.description">
+                  A causa di un errore del sistema non è possibile completare la procedura.
+                  <br />
+                  Ti chiediamo di riprovare più tardi.
+                </Trans>
               </Typography>
             </Grid>
           </Grid>
@@ -243,7 +298,9 @@ function OnboardingComponent({ productId }: { productId: string }) {
                 onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
                 variant={'contained'}
               >
-                Torna alla home
+                <Typography width="100%" sx={{ color: theme.palette.primary.contrastText }}>
+                  {t('onboarding.outcomeContent.error.backActionLabel')}
+                </Typography>
               </Button>
             </Grid>
           </Grid>
@@ -276,12 +333,12 @@ function OnboardingComponent({ productId }: { productId: string }) {
           window.location.assign(openExitUrl);
         }}
         open={openExitModal}
-        title={'Vuoi davvero uscire?'}
-        message={'Se esci, la richiesta di adesione andrà persa.'}
-        onConfirmLabel="Esci"
-        onCloseLabel="Annulla"
+        title={t('onboarding.sessionModal.title')}
+        message={t('onboarding.sessionModal.message')}
+        onConfirmLabel={t('onboarding.sessionModal.onConfirmLabel')}
+        onCloseLabel={t('onboarding.sessionModal.onCloseLabel')}
       />
-      {loading && <LoadingOverlay loadingText="Stiamo verificando i tuoi dati" />}
+      {loading && <LoadingOverlay loadingText={t('onboarding.loading.loadingText')} />}
     </Container>
   ) : (
     <MessageNoAction {...outcomeContent[outcome]} />

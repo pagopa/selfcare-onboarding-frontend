@@ -3,6 +3,7 @@ import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import { DialogActions, Grid, Typography } from '@mui/material';
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
+import { useTranslation } from 'react-i18next';
 
 type DialogOption = {
   title: string | null;
@@ -25,6 +26,7 @@ export function AlertDialog({
   handleConfirm,
   handleClose,
 }: DialogOption) {
+  const { t } = useTranslation();
   return (
     <Dialog
       open={open}
@@ -40,15 +42,8 @@ export function AlertDialog({
         justifyContent={'space-between'}
         sx={{ pt: 4, pl: 3, pr: 3 }}
       >
-        <Typography
-          sx={{
-            fontSize: '18px',
-            lineHeight: '28px',
-          }}
-          variant={'h6'}
-          align="left"
-        >
-          {title ? title : 'Titolo'}
+        <Typography variant={'sidenav'} align="left">
+          {title ? title : t('alertDialog.title')}
         </Typography>
 
         <ClearOutlinedIcon onClick={handleClose} sx={{ color: 'info.main' }} />
@@ -56,7 +51,7 @@ export function AlertDialog({
 
       <DialogContent>
         <Typography variant={'body1'} align="left">
-          {description ? description : 'Descrizione'}
+          {description ? description : t('alertDialog.description')}
         </Typography>
       </DialogContent>
       <DialogActions>
@@ -67,11 +62,11 @@ export function AlertDialog({
               variant="contained"
               onClick={handleConfirm ? handleConfirm : handleClose}
             >
-              {confirmLabel ? confirmLabel : 'Torna alla pagina di caricamento'}
+              {confirmLabel ? confirmLabel : t('alertDialog.confirmLabel')}
             </Button>
           )}
           <Button sx={{ mt: 1 }} color="primary" variant="outlined" onClick={handleClose}>
-            {cancelLabel ? cancelLabel : 'Esci'}
+            {cancelLabel ? cancelLabel : t('alertDialog.cancelLabel')}
           </Button>
         </Grid>
       </DialogActions>

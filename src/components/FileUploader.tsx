@@ -1,14 +1,12 @@
-import { CircularProgress, Grid, Typography, Link } from '@mui/material';
+import { Grid, Typography, Link, Theme } from '@mui/material';
 import { DropEvent, FileRejection, useDropzone } from 'react-dropzone';
 import { Box } from '@mui/system';
-import uploadedImage from '../assets/uploaded_doc.png';
-import uploadImage from '../assets/upload_doc.png';
 import { FileUploadedPreview } from './FileUploadedPreview';
 
 type FileUploaderOption = {
   title: string;
   description: string;
-  descriptionLink?:string;
+  descriptionLink?: string;
   uploadedFiles: Array<File>;
   deleteUploadedFiles?: (event: any | undefined) => void;
   onDropAccepted?: (t: Array<File>) => void;
@@ -17,6 +15,7 @@ type FileUploaderOption = {
   accept?: Array<string> | undefined;
   uploaderImageWidth?: number;
   loading: boolean;
+  theme: Theme;
 };
 
 export function FileUploader({
@@ -29,8 +28,8 @@ export function FileUploader({
   onDropRejected,
   maxFiles,
   accept,
-  uploaderImageWidth,
   loading,
+  theme,
 }: FileUploaderOption) {
   const { getRootProps, getInputProps } = useDropzone({
     onDropAccepted,
@@ -43,75 +42,57 @@ export function FileUploader({
   return (
     <Grid
       {...dropzoneRootProps}
-      onClick= {() =>{}}
+      onClick={() => {}}
       container
       direction="row"
       justifyItems={'center'}
       alignItems={'center'}
-      sx={{ mt: '56px' }}
+      justifyContent={'center'}
     >
       <input {...getInputProps()} />
-      <Box sx={{ display: !loading ? undefined : 'none' }}>
-        <img
-          width={uploaderImageWidth ? uploaderImageWidth : 180}
-          src={uploadedFiles && uploadedFiles.length > 0 ? uploadedImage : uploadImage}
-        />
-      </Box>
-      <Box sx={{ position: 'relative', display: loading ? undefined : 'none' }}>
-        <CircularProgress
-          variant="determinate"
-          sx={{
-            color: '#D1E7FF',
-          }}
-          size={180}
-          thickness={5}
-          value={100}
-        />
-        <CircularProgress
-          variant="indeterminate"
-          disableShrink
-          sx={{
-            color: 'primary.main',
-            animationDuration: '1.5s',
-            position: 'absolute',
-            left: 0,
-          }}
-          size={180}
-          thickness={7}
-        />
-      </Box>
 
       {uploadedFiles && uploadedFiles.length > 0 ? (
         <FileUploadedPreview
+          theme={theme}
           loading={loading}
           files={uploadedFiles}
           deleteUploadedFiles={deleteUploadedFiles}
-          sx={{ ml: '27px' }}
-        ></FileUploadedPreview>
+        />
       ) : (
-        <Grid container direction="column" alignItems={'start'} sx={{ width: 'auto', ml: '27px' }}>
-          <Typography
-            sx={{
-              color: 'text.primary',
-              lineHeight: '36,5px',
-            }}
-            variant={'h4'}
-            align="left"
+        <Box
+          sx={{
+            boxShadow:
+              '0px 8px 10px -5px rgba(0, 43, 85, 0.1), 0px 16px 24px 2px rgba(0, 43, 85, 0.05), 0px 6px 30px 5px rgba(0, 43, 85, 0.1)',
+            borderRadius: '16px',
+          }}
+        >
+          <Box
+            m={1}
+            sx={{ borderRadius: '10px', border: `3px dashed ${theme.palette.primary.main}` }}
           >
-            {title}
-          </Typography>
-          <Typography
-            sx={{
-              lineHeight: '20px',
-              fontWeight: 'normal',
-              color: 'secondary.main',
-            }}
-            variant={'body2'}
-            align="left"
-          >
-            {description}<Link sx={{cursor: 'pointer'}} onClick={(dropzoneRootProps as any).onClick}>{descriptionLink}</Link>
-          </Typography>
-        </Grid>
+            <Grid container direction="column" alignItems={'center'} py={3} px={6}>
+              <Typography color={theme.palette.text.primary} variant={'body2'} align="center">
+                {title}
+              </Typography>
+              <Typography
+                sx={{
+                  fontWeight: 'normal',
+                  color: theme.palette.text.primary,
+                }}
+                variant={'body2'}
+                align="center"
+              >
+                {description}
+                <Link
+                  sx={{ cursor: 'pointer', textDecoration: 'none' }}
+                  onClick={(dropzoneRootProps as any).onClick}
+                >
+                  {descriptionLink}
+                </Link>
+              </Typography>
+            </Grid>
+          </Box>
+        </Box>
       )}
     </Grid>
   );

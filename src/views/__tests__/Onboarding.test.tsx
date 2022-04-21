@@ -4,6 +4,7 @@ import { User } from '../../../types';
 import { HeaderContext, UserContext } from '../../lib/context';
 import { ENV } from '../../utils/env';
 import Onboarding from '../Onboarding';
+import './../../locale';
 
 jest.mock('../../lib/api-utils');
 
@@ -52,7 +53,9 @@ const renderComponent = (productId: string = 'prod-io') => {
       <HeaderContext.Provider
         value={{ subHeaderVisible, setSubHeaderVisible, onLogout, setOnLogout }}
       >
-        <UserContext.Provider value={{ user, setUser }}>
+        <UserContext.Provider
+          value={{ user, setUser, requiredLogin: false, setRequiredLogin: () => {} }}
+        >
           <button onClick={onLogout}>LOGOUT</button>
           <Onboarding productId={productId} />
         </UserContext.Provider>
@@ -63,9 +66,9 @@ const renderComponent = (productId: string = 'prod-io') => {
   render(<Component />);
 };
 
-const step1Title = 'Seleziona il tuo Ente';
-const step2Title = 'Indica il Legale Rappresentante';
-const step3Title = 'Indica il Referente Amministrativo';
+const step1Title = 'Seleziona il tuo ente';
+const step2Title = 'Indica il Legale rappresentante';
+const step3Title = "Indica l'Amministratore";
 const completeSuccessTitle = 'La tua richiesta è stata inviata con successo';
 const completeErrorTitle = 'Spiacenti, qualcosa è andato storto.';
 
@@ -160,7 +163,7 @@ const retrieveNavigationButtons = () => {
 
 const executeGoHome = async () => {
   const goHomeButton = screen.getByRole('button', {
-    name: 'Torna alla home',
+    name: 'Chiudi',
   });
   expect(goHomeButton).toBeEnabled();
   fireEvent.click(goHomeButton);
@@ -194,6 +197,8 @@ const executeStep1 = async (partyName: string) => {
   screen.getByText(step1Title);
   await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(1));
   const inputPartyName = document.getElementById('Parties');
+
+  expect(inputPartyName).toBeTruthy();
   fireEvent.change(inputPartyName, { target: { value: 'XXX' } });
 
   const partyNameSelection = await waitFor(() => screen.getByText(partyName));
@@ -228,7 +233,9 @@ const executeStep3 = async (expectedSuccessfulSubmit: boolean) => {
   await waitFor(() => screen.getByText(step3Title));
   const [_, confirmButton] = await checkBackForwardNavigation(step2Title, step3Title);
 
-  const addDelegateButton = screen.getByRole('button', { name: 'Aggiungi un altro referente' });
+  const addDelegateButton = screen.getByRole('button', {
+    name: 'Aggiungi un altro Amministratore',
+  });
   expect(addDelegateButton).toBeDisabled();
 
   await checkLoggedUserAsAdminCheckbox(confirmButton, addDelegateButton);
@@ -397,7 +404,7 @@ const addAdditionEmptyUser = async (
   confirmButton: HTMLElement
 ): Promise<Array<HTMLElement>> => {
   await checkAdditionalUsersExistance(index, false, confirmButton);
-  fireEvent.click(screen.getByRole('button', { name: 'Aggiungi un altro referente' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Aggiungi un altro Amministratore' }));
   await checkAdditionalUsersExistance(index + 1, true, confirmButton);
 
   const removeUserButtons = findRemoveAdditionUsersButtons();
@@ -414,7 +421,7 @@ const checkAdditionalUsersExistance = (
   expect(titles.length).toBe(expectedAdditionalUsersCount);
 
   const isAddUsersVisible = expectedAdditionalUsersCount < 2;
-  const addDelegateButton = screen.queryByText('Aggiungi un altro referente');
+  const addDelegateButton = screen.queryByText('Aggiungi un altro Amministratore');
   if (!isAddUsersVisible) {
     expect(addDelegateButton).toBeNull();
   }

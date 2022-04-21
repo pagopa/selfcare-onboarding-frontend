@@ -1,24 +1,22 @@
-import { Stack, Box, Typography } from '@mui/material';
+import { Stack, Box, Typography, useTheme } from '@mui/material';
 import React from 'react';
 import { RequestOutcomeMessage } from '../../types';
 
 export function MessageNoAction({ img, title, description, ImgComponent }: RequestOutcomeMessage) {
+  const theme = useTheme();
   return (
     <Stack spacing={10}>
       <Box style={{ textAlign: 'center' }}>
-        <Box mb={5}>
+        <Box mb={2}>
           <i>
             {ImgComponent ? (
-              <ImgComponent></ImgComponent>
+              <ImgComponent />
             ) : img ? (
-              <img width={120} src={img.src} alt={img.alt} />
+              <img width={60} src={img.src} alt={img.alt} />
             ) : null}
           </i>
         </Box>
-        <Typography
-          variant={'h2'}
-          sx={{ color: 'text.primary', lineHeight: '49px', marginBottom: 1 }}
-        >
+        <Typography variant={'h4'} sx={{ color: theme.palette.text.primary, marginBottom: 1 }}>
           {title}
         </Typography>
         {/*
