@@ -255,7 +255,7 @@ export default {
     recipientCode: 'Codice destinatario',
     recipientCodeDescription:
       'È il codice di sette cifre necessario per ricevere le fatture elettroniche',
-    gspDescription: 'Sono gestore di almeno uno dei pubblici servizi Gas, Luce e/o TELCO',
+    gspDescription: 'Sono gestore di almeno uno dei pubblici servizi: Gas, Energia, Telco.',
     backLabel: 'Indietro',
     confirmLabel: 'Conferma',
   },
