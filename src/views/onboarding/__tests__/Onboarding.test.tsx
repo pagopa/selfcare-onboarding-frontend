@@ -190,7 +190,7 @@ const checkBackForwardNavigation = async (
   const goForwardButton = screen.getByRole('button', {
     name: 'Conferma',
   });
-  expect(goForwardButton).toBeEnabled();
+  await waitFor(() => expect(goForwardButton).toBeEnabled());
   fireEvent.click(goForwardButton);
 
   await waitFor(() => screen.getByText(actualStepTitle));
@@ -237,7 +237,9 @@ const executeStepBillingData = async () => {
   console.log('Testing step Billing Data');
   await waitFor(() => screen.getByText(stepBillingDataTitle));
 
-  await checkBackForwardNavigation(stepInstitutionType, stepBillingDataTitle);
+  const confirmButtonEnabled = screen.getByRole('button', { name: 'Conferma' });
+  expect(confirmButtonEnabled).toBeDisabled();
+
   await fillUserBillingDataForm(
     'businessName',
     'registeredOffice',
@@ -246,7 +248,7 @@ const executeStepBillingData = async () => {
     'vatNumber',
     'recipientCode'
   );
-  const confirmButtonEnabled = screen.getByRole('button', { name: 'Conferma' });
+
   await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
 
   fireEvent.click(confirmButtonEnabled);
@@ -257,7 +259,8 @@ const executeStep2 = async () => {
   console.log('Testing step 2');
   await waitFor(() => screen.getByText(step2Title));
 
-  const [_, confirmButton] = await checkBackForwardNavigation(stepBillingDataTitle, step2Title);
+  const confirmButton = screen.getByRole('button', { name: 'Conferma' });
+  expect(confirmButton).toBeDisabled();
 
   await fillUserForm(confirmButton, 'LEGAL', 'BBBBBB00B00B000B', 'b@b.bb');
 
@@ -322,8 +325,10 @@ const fillUserBillingDataForm = async (
     target: { value: 'registeredOfficeInput' },
   });
   fireEvent.change(document.getElementById(mailPECInput), { target: { value: 'a@a.it' } });
-  fireEvent.change(document.getElementById(taxCodeInput), { target: { value: 'taxCodeInput' } });
-  fireEvent.change(document.getElementById(vatNumber), { target: { value: 'vatNumber' } });
+  fireEvent.change(document.getElementById(taxCodeInput), {
+    target: { value: 'AAAAAA44D55F456K' },
+  });
+  fireEvent.change(document.getElementById(vatNumber), { target: { value: '11122233345' } });
   fireEvent.change(document.getElementById(recipientCode), {
     target: { value: 'recipientCode' },
   });

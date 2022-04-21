@@ -97,16 +97,22 @@ export default function StepBillingData({
         taxCode: !values.taxCode
           ? requiredError
           : !stepHistoryState.isTaxCodeNotEquals2PIVA &&
+            values.taxCode &&
             !fiscalAndVatCodeRegexp.test(values.taxCode)
           ? t('stepBillingData.invalidFiscalCode')
-          : stepHistoryState.isTaxCodeNotEquals2PIVA && !fiscalCodeRegexp.test(values.taxCode)
+          : stepHistoryState.isTaxCodeNotEquals2PIVA &&
+            values.taxCode &&
+            !fiscalCodeRegexp.test(values.taxCode)
           ? t('stepBillingData.invalidFiscalCode')
           : undefined,
-        vatNumber: !values.vatNumber
-          ? requiredError
-          : stepHistoryState.isTaxCodeNotEquals2PIVA && !onlyNumbersRegexp.test(values.vatNumber)
-          ? t('stepBillingData.invalidVatNumber')
-          : undefined,
+        vatNumber:
+          !values.vatNumber && stepHistoryState.isTaxCodeNotEquals2PIVA
+            ? requiredError
+            : stepHistoryState.isTaxCodeNotEquals2PIVA &&
+              values.vatNumber &&
+              !onlyNumbersRegexp.test(values.vatNumber)
+            ? t('stepBillingData.invalidVatNumber')
+            : undefined,
         mailPEC: !values.digitalAddress
           ? requiredError
           : !mailPECRegexp.test(values.digitalAddress)
