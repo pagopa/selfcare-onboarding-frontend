@@ -1,23 +1,30 @@
 import { createContext } from 'react';
-import { Party, User } from '../../types';
+import { User } from '../../types';
 
 type UserContextType = {
   user: User | null;
   setUser: React.Dispatch<React.SetStateAction<User | null>>;
+  requiredLogin: boolean;
+  setRequiredLogin: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-export const UserContext = createContext({ user: null, setUser: () => {} } as UserContextType);
+export const UserContext = createContext({
+  user: null,
+  setUser: () => {},
+  requiredLogin: false,
+  setRequiredLogin: () => {},
+} as UserContextType);
 
-type PartyContextType = {
-  party: Party | null;
-  availableParties: Array<Party>;
-  setParty: React.Dispatch<React.SetStateAction<Party | null>>;
-  setAvailableParties: React.Dispatch<React.SetStateAction<Array<Party>>>;
+type HeaderContextType = {
+  subHeaderVisible: boolean;
+  setSubHeaderVisible: React.Dispatch<React.SetStateAction<boolean>>;
+  onLogout: (() => void) | null | undefined;
+  setOnLogout: React.Dispatch<React.SetStateAction<(() => void) | null | undefined>>;
 };
 
-export const PartyContext = createContext({
-  party: null,
-  availableParties: [],
-  setParty: () => {},
-  setAvailableParties: () => {},
-} as PartyContextType);
+export const HeaderContext = createContext({
+  subHeaderVisible: true,
+  setSubHeaderVisible: () => {},
+  onLogout: () => {},
+  setOnLogout: () => {},
+} as HeaderContextType);

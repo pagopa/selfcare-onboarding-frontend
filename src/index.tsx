@@ -1,12 +1,35 @@
+import '@pagopa/selfcare-common-frontend/common-polyfill';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
-import { App } from './App';
+// import '@pagopa/selfcare-common-frontend/index.css';
+import { BrowserRouter } from 'react-router-dom';
+import { CONFIG } from '@pagopa/selfcare-common-frontend/config/env';
+import { CssBaseline, ThemeProvider } from '@mui/material';
+import { theme } from '@pagopa/mui-italia';
+import App from './App';
 import reportWebVitals from './reportWebVitals';
+import { MOCK_USER } from './utils/constants';
+import { ENV } from './utils/env';
+import './consentAndAnalyticsConfiguration.ts';
+import './locale';
+
+// eslint-disable-next-line functional/immutable-data
+CONFIG.MOCKS.MOCK_USER = MOCK_USER;
+// eslint-disable-next-line functional/immutable-data
+CONFIG.URL_FE.LOGIN = `${ENV.URL_FE.LOGIN}`;
+// eslint-disable-next-line functional/immutable-data
+CONFIG.URL_FE.LOGOUT = ENV.URL_FE.LOGOUT;
+// eslint-disable-next-line functional/immutable-data
+CONFIG.URL_FE.ASSISTANCE = ENV.URL_FE.ASSISTANCE;
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </ThemeProvider>
   </React.StrictMode>,
   document.getElementById('root')
 );

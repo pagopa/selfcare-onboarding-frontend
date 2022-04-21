@@ -1,27 +1,24 @@
 import { useState } from 'react';
-import { BrowserRouter } from 'react-router-dom';
-import { createTheme, CssBaseline, ThemeProvider } from '@mui/material';
-import { Party, User } from '../types';
+import SessionModal from '@pagopa/selfcare-common-frontend/components/SessionModal';
+import { useTranslation } from 'react-i18next';
+import { User } from '../types';
 import { BodyLogger } from './components/BodyLogger';
-import { PartyContext, UserContext } from './lib/context';
+import { UserContext } from './lib/context';
 
-const theme = createTheme({});
-
-export function App() {
+export default function App() {
   const [user, setUser] = useState<User | null>(null);
-  const [party, setParty] = useState<Party | null>(null);
-  const [availableParties, setAvailableParties] = useState<Array<Party>>([]);
+  const [requiredLogin, setRequiredLogin] = useState(false);
+  const { t } = useTranslation();
 
   return (
-    <UserContext.Provider value={{ user, setUser }}>
-      <PartyContext.Provider value={{ party, availableParties, setParty, setAvailableParties }}>
-        <BrowserRouter>
-          <ThemeProvider theme={theme}>
-            <CssBaseline />
-            <BodyLogger />
-          </ThemeProvider>
-        </BrowserRouter>
-      </PartyContext.Provider>
+    <UserContext.Provider value={{ user, setUser, requiredLogin, setRequiredLogin }}>
+      <BodyLogger />
+      <SessionModal
+        handleClose={() => setRequiredLogin(false)}
+        open={requiredLogin}
+        title={t('app.sessionModal.title')}
+        message={t('app.sessionModal.message')}
+      />
     </UserContext.Provider>
   );
 }

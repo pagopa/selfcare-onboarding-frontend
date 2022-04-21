@@ -3,9 +3,8 @@
 declare namespace NodeJS {
   interface ProcessEnv {
     NODE_ENV: 'development' | 'uat' | 'production';
-    REACT_APP_LOGIN_URL: string;
-    REACT_APP_LOGOUT_URL: string;
-    REACT_APP_DASHBOARD_URL: string;
+
+    REACT_APP_MOCK_API: string;
   }
 }
 interface Window {
