@@ -1,19 +1,19 @@
 import { fireEvent, getByLabelText, render, screen, waitFor } from '@testing-library/react';
 import { useState } from 'react';
-import { InstitutionType, User } from '../../../types';
-import { HeaderContext, UserContext } from '../../lib/context';
-import { ENV } from '../../utils/env';
-import Onboarding from '../onboarding/Onboarding';
-import './../../locale';
+import { User } from '../../../../types';
+import { HeaderContext, UserContext } from '../../../lib/context';
+import { ENV } from '../../../utils/env';
+import Onboarding from '../Onboarding';
+import '../../../locale';
 
-jest.mock('../../lib/api-utils');
+jest.mock('../../../lib/api-utils');
 
 jest.setTimeout(20000);
 
 let fetchWithLogsSpy: jest.SpyInstance;
 
 beforeEach(() => {
-  fetchWithLogsSpy = jest.spyOn(require('../../lib/api-utils'), 'fetchWithLogs');
+  fetchWithLogsSpy = jest.spyOn(require('../../../lib/api-utils'), 'fetchWithLogs');
 });
 
 const oldWindowLocation = global.window.location;
@@ -185,12 +185,11 @@ const checkBackForwardNavigation = async (
   expect(goBackButton).toBeEnabled();
   fireEvent.click(goBackButton);
 
-  screen.getByText(previousStepTitle);
+  await waitFor(() => screen.getByText(previousStepTitle));
 
   const goForwardButton = screen.getByRole('button', {
     name: 'Conferma',
   });
-
   expect(goForwardButton).toBeEnabled();
   fireEvent.click(goForwardButton);
 
@@ -260,7 +259,7 @@ const executeStep2 = async () => {
 
   const [_, confirmButton] = await checkBackForwardNavigation(stepBillingDataTitle, step2Title);
 
-  await fillUserForm(confirmButton, 'LEGAL', 'BBBBBB00B00B000B', 'b@b.bb', '11122233345');
+  await fillUserForm(confirmButton, 'LEGAL', 'BBBBBB00B00B000B', 'b@b.bb');
 
   expect(confirmButton).toBeEnabled();
   fireEvent.click(confirmButton);
@@ -286,7 +285,6 @@ const executeStep3 = async (expectedSuccessfulSubmit: boolean) => {
     'delegate-initial',
     'CCCCCC00C00C000C',
     'a@a.aa',
-    '11122233345',
     'BBBBBB00B00B000B',
     1,
     'b@b.bb',
@@ -324,10 +322,8 @@ const fillUserBillingDataForm = async (
     target: { value: 'registeredOfficeInput' },
   });
   fireEvent.change(document.getElementById(mailPECInput), { target: { value: 'a@a.it' } });
-  fireEvent.change(document.getElementById(taxCodeInput), {
-    target: { value: 'AAAAAA99A11A123K' },
-  });
-  fireEvent.change(document.getElementById(vatNumber), { target: { value: '11122233345' } });
+  fireEvent.change(document.getElementById(taxCodeInput), { target: { value: 'taxCodeInput' } });
+  fireEvent.change(document.getElementById(vatNumber), { target: { value: 'vatNumber' } });
   fireEvent.change(document.getElementById(recipientCode), {
     target: { value: 'recipientCode' },
   });
@@ -338,7 +334,6 @@ const fillUserForm = async (
   prefix: string,
   taxCode: string,
   email: string,
-  vatNumber: string,
   existentTaxCode?: string,
   expectedDuplicateTaxCodeMessages?: number,
   existentEmail?: string,
@@ -409,14 +404,11 @@ const fillTextFieldAndCheckButton = async (
   confirmButton: HTMLElement,
   expectedEnabled: boolean
 ) => {
-  await waitFor(() =>
-    fireEvent.change(document.getElementById(`${prefix}-${field}`), { target: { value } })
-  );
-
+  fireEvent.change(document.getElementById(`${prefix}-${field}`), { target: { value } });
   if (expectedEnabled) {
-    await waitFor(() => expect(confirmButton).toBeEnabled());
+    expect(confirmButton).toBeEnabled();
   } else {
-    await waitFor(() => expect(confirmButton).toBeDisabled());
+    expect(confirmButton).toBeDisabled();
   }
 };
 
@@ -532,17 +524,7 @@ const fillAdditionalUserAndCheckUniqueValues = async (
 
   const taxCode = `ZZZZZZ0${index}A00A000A`;
   const email = `${index}@z.zz`;
-  await fillUserForm(
-    confirmButton,
-    prefix,
-    taxCode,
-    email,
-    '11122233312',
-    'BBBBBB00B00B000B',
-    1,
-    'b@b.bb',
-    1
-  );
+  await fillUserForm(confirmButton, prefix, taxCode, email, 'BBBBBB00B00B000B', 1, 'b@b.bb', 1);
   await checkAlreadyExistentValues(
     prefix,
     confirmButton,
