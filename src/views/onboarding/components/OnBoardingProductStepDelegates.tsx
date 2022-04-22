@@ -149,7 +149,7 @@ export function OnBoardingProductStepDelegates({ product, legal, forward, back }
         {delegateFormIds.map((id) => (
           <React.Fragment key={id}>
             <Grid item xs={10} justifyContent="center" mt={6} mb={3}>
-              <Typography align="center" variant="h4">
+              <Typography align="center" variant="h4" data-testid="extra-delegate">
                 {t('onboardingStep3.addUserLabel')}
               </Typography>
             </Grid>
