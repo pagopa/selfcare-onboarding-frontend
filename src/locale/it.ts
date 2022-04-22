@@ -256,7 +256,6 @@ export default {
     vatNumber: 'Partita IVA',
     recipientCode: 'Codice destinatario',
     recipientCodeDescription: 'È il codice necessario per ricevere le fatture elettroniche',
-
     gspDescription: 'Sono gestore di almeno uno dei pubblici servizi: Gas, Energia, Telco.',
     backLabel: 'Indietro',
     confirmLabel: 'Conferma',
