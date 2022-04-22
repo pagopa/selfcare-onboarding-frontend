@@ -91,13 +91,7 @@ export default function StepBillingData({
         registeredOffice: !values.registeredOffice ? requiredError : undefined,
         taxCode: !values.taxCode
           ? requiredError
-          : !stepHistoryState.isTaxCodeNotEquals2PIVA &&
-            values.taxCode &&
-            !fiscalAndVatCodeRegexp.test(values.taxCode)
-          ? t('stepBillingData.invalidFiscalCode')
-          : stepHistoryState.isTaxCodeNotEquals2PIVA &&
-            values.taxCode &&
-            !fiscalAndVatCodeRegexp.test(values.taxCode)
+          : values.taxCode && !fiscalAndVatCodeRegexp.test(values.taxCode)
           ? t('stepBillingData.invalidFiscalCode')
           : undefined,
         vatNumber:
