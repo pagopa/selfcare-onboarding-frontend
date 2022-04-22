@@ -80,7 +80,7 @@ export default {
     bodyTitle: "Indica l'Amministratore",
     bodyDescription1: 'Inserisci i dati del Referente Amministrativo o di un suo delegato.',
     bodyDescription2: 'La persona che indicherai sarà responsabile della gestione di',
-    addUserLabel: 'Aggiungi un altro Referente Amministrativo',
+    addUserLabel: 'Aggiungi un altro Amministratore',
     addUserLink: 'Aggiungi un altro Amministratore',
     backLabel: 'Indietro',
     confirmLabel: 'Conferma',

@@ -491,11 +491,13 @@ const checkAdditionalUsersExistance = (
   expectedEmptyForm: boolean,
   confirmButton: HTMLElement
 ) => {
-  const titles = screen.queryAllByText('Aggiungi un altro Referente Amministrativo');
+  const titles = screen.queryAllByTestId('extra-delegate');
   expect(titles.length).toBe(expectedAdditionalUsersCount);
 
   const isAddUsersVisible = expectedAdditionalUsersCount < 2;
-  const addDelegateButton = screen.queryByText('Aggiungi un altro Amministratore');
+  const addDelegateButton = screen.queryByRole('button', {
+    name: 'Aggiungi un altro Amministratore',
+  });
   if (!isAddUsersVisible) {
     expect(addDelegateButton).toBeNull();
   }
