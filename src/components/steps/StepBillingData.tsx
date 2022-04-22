@@ -15,6 +15,9 @@ const CustomTextField = styled(TextField)({
 });
 
 const mailPECRegexp = new RegExp('^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$');
+const fiscalAndVatCodeRegexp = new RegExp(
+  /(^[A-Za-z]{6}[0-9lmnpqrstuvLMNPQRSTUV]{2}[abcdehlmprstABCDEHLMPRST]{1}[0-9lmnpqrstuvLMNPQRSTUV]{2}[A-Za-z]{1}[0-9lmnpqrstuvLMNPQRSTUV]{3}[A-Za-z]{1}$|^[0-9]{11}$)/
+);
 
 type StepBillingDataHistoryState = {
   institutionId: string;
@@ -41,6 +44,7 @@ export default function StepBillingData({
   const requiredError = 'Required';
   const ipa = origin === 'IPA';
 
+  const { t } = useTranslation();
   const theme = useTheme();
 
   const [stepHistoryState, setStepHistoryState, setStepHistoryStateHistory] =
@@ -79,15 +83,26 @@ export default function StepBillingData({
     back!();
   };
 
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   const validate = (values: Partial<BillingData>) =>
     Object.fromEntries(
       Object.entries({
         businessName: !values.businessName ? requiredError : undefined,
         registeredOffice: !values.registeredOffice ? requiredError : undefined,
-        taxCode: !values.taxCode ? requiredError : undefined,
+        taxCode: !values.taxCode
+          ? requiredError
+          : values.taxCode && !fiscalAndVatCodeRegexp.test(values.taxCode)
+          ? t('stepBillingData.invalidFiscalCode')
+          : undefined,
         vatNumber:
-          stepHistoryState.isTaxCodeNotEquals2PIVA && !values.vatNumber ? requiredError : undefined,
-        digitalAddress: !values.digitalAddress
+          !values.vatNumber && stepHistoryState.isTaxCodeNotEquals2PIVA
+            ? requiredError
+            : stepHistoryState.isTaxCodeNotEquals2PIVA &&
+              values.vatNumber &&
+              !fiscalAndVatCodeRegexp.test(values.vatNumber)
+            ? t('stepBillingData.invalidVatNumber')
+            : undefined,
+        mailPEC: !values.digitalAddress
           ? requiredError
           : !mailPECRegexp.test(values.digitalAddress)
           ? t('stepBillingData.invalidEmail')
@@ -95,7 +110,6 @@ export default function StepBillingData({
         recipientCode: !values.recipientCode ? requiredError : undefined,
       }).filter(([_key, value]) => value)
     );
-  const { t } = useTranslation();
 
   const formik = useFormik<BillingData>({
     initialValues: initialFormData,
