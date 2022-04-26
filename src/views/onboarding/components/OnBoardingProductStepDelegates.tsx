@@ -107,9 +107,9 @@ export function OnBoardingProductStepDelegates({ product, legal, forward, back }
         </Grid>
       </Grid>
 
-      <Grid container item justifyContent="center" mt={2}>
+      <Grid container item justifyContent="center" mt={1}>
         <Grid item xs={12}>
-          <Typography variant="subtitle2" component="h2" align="center">
+          <Typography variant="body1" align="center">
             {bodyDescription1}
             <br />
             {bodyDescription2}
@@ -117,14 +117,12 @@ export function OnBoardingProductStepDelegates({ product, legal, forward, back }
         </Grid>
       </Grid>
 
-      <Grid container item justifyContent="center" mt={2}>
+      <Grid container item justifyContent="center" mt={4}>
         <Grid item xs={4} display="flex" justifyContent="center">
           <FormControlLabel
             control={<Checkbox checked={isAuthUser} onChange={handleAuthUser} />}
             label={
-              <Typography sx={{ fontSize: '16px', lineHeight: '20px', fontWeight: 600 }}>
-                {t('onboardingStep3.formControl.label')}
-              </Typography>
+              <Typography variant="body1">{t('onboardingStep3.formControl.label')}</Typography>
             }
             sx={{
               alignSelf: 'center',
@@ -134,7 +132,7 @@ export function OnBoardingProductStepDelegates({ product, legal, forward, back }
         </Grid>
       </Grid>
 
-      <Grid container item justifyContent="center" mt={2}>
+      <Grid container item justifyContent="center" mt={4}>
         <Grid item xs={8} sx={{ boxShadow: '0px 12px 40px rgba(0, 0, 0, 0.06)' }}>
           <PlatformUserForm
             prefix={'delegate-initial'}
