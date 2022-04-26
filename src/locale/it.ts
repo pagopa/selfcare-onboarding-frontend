@@ -108,7 +108,7 @@ export default {
           invalid: "L'indirizzo email non è valido",
           duplicate: "L'indirizzo email inserito è già presente",
         },
-        description: "Inserisci l'indirizzo email istituzionale utilizzato per l'Ente",
+        description: 'Inserisci l’indirizzo email istituzionale dell’Amministratore',
       },
     },
   },
