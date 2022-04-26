@@ -60,7 +60,7 @@ export default function StepInstitutionType({ back, forward, institutionType }: 
                     sx={{ p: '8px' }}
                     key={ot.labelKey}
                     onChange={() => handleChange(ot.value)}
-                    value={ot.value === 'PA'}
+                    value={ot.value}
                     control={<Radio id={ot.labelKey} />}
                     label={
                       <>
