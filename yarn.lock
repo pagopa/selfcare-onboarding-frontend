@@ -1683,10 +1683,10 @@
   dependencies:
     "@fontsource/titillium-web" "^4.5.3"
 
-"@pagopa/selfcare-common-frontend@^1.10.4":
-  version "1.10.4"
-  resolved "https://registry.yarnpkg.com/@pagopa/selfcare-common-frontend/-/selfcare-common-frontend-1.10.4.tgz#439fb9187c46a72303433029ae7b1344f846c732"
-  integrity sha512-2B13R0oPiyiohOb5ug2X53lbZIOuQZ4xUNBuPGzMFYunrzL64gHkM7XC0quiNxvZTZcweAlBqnf4tVYlDfwLXw==
+"@pagopa/selfcare-common-frontend@^1.10.5":
+  version "1.10.5"
+  resolved "https://registry.yarnpkg.com/@pagopa/selfcare-common-frontend/-/selfcare-common-frontend-1.10.5.tgz#531a8053fb7b1f90ecc9e11a91d0fa20380dfce7"
+  integrity sha512-8EdSTZsJbSwAQxwZdn+1bX8X2m/cRsoOYrtD59d16qngdJKZPT6ZYPU+d1MzY4chkVrtamdMGLeGDZbXFpLZ6g==
   dependencies:
     "@emotion/react" "^11.4.1"
     "@emotion/styled" "^11.3.0"
