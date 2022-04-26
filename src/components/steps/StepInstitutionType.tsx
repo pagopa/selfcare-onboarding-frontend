@@ -1,4 +1,3 @@
-import { useTheme } from '@mui/material';
 import { FormControl, FormControlLabel, Grid, Radio, RadioGroup, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import React from 'react';
@@ -21,7 +20,6 @@ export default function StepInstitutionType({ back, forward, institutionType }: 
   const [selectedValue, setSelectedValue] = React.useState<InstitutionType>(institutionType);
 
   const { t } = useTranslation();
-  const theme = useTheme();
 
   const handleChange = (value: InstitutionType) => setSelectedValue(value);
 
@@ -62,9 +60,27 @@ export default function StepInstitutionType({ back, forward, institutionType }: 
                     sx={{ p: '8px' }}
                     key={ot.labelKey}
                     onChange={() => handleChange(ot.value)}
-                    value={ot.value}
+                    value={ot.value === 'PA'}
                     control={<Radio id={ot.labelKey} />}
-                    label={t(`stepInstitutionType.organizationTypeValues.${ot.labelKey}`) as string}
+                    label={
+                      <>
+                        <Typography sx={{ fontWeight: 600, fontSize: '18px', color: '#17324D' }}>
+                          {t(`stepInstitutionType.organizationTypeValues.${ot.labelKey}`) as string}
+                        </Typography>
+                        <Typography
+                          variant="subtitle2"
+                          sx={{
+                            fontWeight: 400,
+                            fontSize: '14px',
+                            color: '#5C6F82',
+                          }}
+                        >
+                          {ot.value === 'PT'
+                            ? t('stepInstitutionType.cadArticle6')
+                            : t('stepInstitutionType.cadArticle2')}
+                        </Typography>
+                      </>
+                    }
                   />
                 ))}
               </RadioGroup>
@@ -72,12 +88,7 @@ export default function StepInstitutionType({ back, forward, institutionType }: 
           </Grid>
         </Grid>
       </Box>
-      <Grid item xs={12} display="flex" justifyContent="center" p={4}>
-        <Typography color={theme.palette.text.secondary} variant="body1">
-          {t('stepInstitutionType.description')}
-        </Typography>
-      </Grid>
-      <Grid item xs={12}>
+      <Grid item xs={12} mt={4}>
         <OnboardingStepActions
           back={{
             action: onBackAction,
