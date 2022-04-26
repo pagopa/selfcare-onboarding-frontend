@@ -128,7 +128,7 @@ function OnBoardingSubProduct() {
       registeredOffice: party.address,
       digitalAddress: party.digitalAddress,
       taxCode: party.taxCode,
-      vatNumber: '',
+      vatNumber: party ? party.taxCode : '',
       recipientCode: party.origin === 'IPA' ? party.institutionId : '',
     });
     trackEvent('ONBOARDING_SELEZIONE_ENTE', {

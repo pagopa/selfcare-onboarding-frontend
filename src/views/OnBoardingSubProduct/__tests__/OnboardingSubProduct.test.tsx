@@ -8,6 +8,7 @@ import '../../../locale';
 import { Route, Router, Switch } from 'react-router';
 import { createMemoryHistory } from 'history';
 import { ROUTES } from '../../../utils/constants';
+import { mockedParties } from '../../../lib/__mocks__/mockApiRequests';
 
 jest.mock('../../../lib/api-utils');
 
@@ -175,7 +176,7 @@ const performLogout = async (logoutButton: HTMLElement) => {
   await waitFor(() => expect(screen.queryByText('Vuoi davvero uscire?')).not.toBeNull());
 };
 
-const retrieveNavigationButtons = () => {
+const retrieveNavigationButtons = (expectedEnabled: boolean) => {
   const goBackButton = screen.getByRole('button', {
     name: 'Indietro',
   });
@@ -184,16 +185,20 @@ const retrieveNavigationButtons = () => {
   const confirmButton = screen.getByRole('button', {
     name: 'Conferma',
   });
-  expect(confirmButton).toBeDisabled();
-
+  if (expectedEnabled) {
+    expect(confirmButton).toBeEnabled();
+  } else {
+    expect(confirmButton).toBeDisabled();
+  }
   return [goBackButton, confirmButton];
 };
 
 const checkBackForwardNavigation = async (
   previousStepTitle: string,
-  actualStepTitle: string
+  actualStepTitle: string,
+  expectedEnabled: boolean
 ): Promise<Array<HTMLElement>> => {
-  const [goBackButton] = retrieveNavigationButtons();
+  const [goBackButton] = retrieveNavigationButtons(expectedEnabled);
   expect(goBackButton).toBeEnabled();
   fireEvent.click(goBackButton);
 
@@ -207,7 +212,7 @@ const checkBackForwardNavigation = async (
 
   await waitFor(() => screen.getByText(actualStepTitle));
 
-  return retrieveNavigationButtons();
+  return retrieveNavigationButtons(expectedEnabled);
 };
 
 const executeStepSelectInstitutionUnreleated = async (partyName: string) => {
@@ -258,7 +263,13 @@ const executeStepBillingData = async () => {
   console.log('Testing step Billing Data');
   await waitFor(() => screen.getByText(stepBillingDataTitle));
 
-  await checkBackForwardNavigation(stepSelectInstitutionUnreleatedTitle, stepBillingDataTitle);
+  const isFilled = document.querySelector("input[value='id']");
+
+  await checkBackForwardNavigation(
+    stepSelectInstitutionUnreleatedTitle,
+    stepBillingDataTitle,
+    isFilled ? true : false
+  );
 
   await fillUserBillingDataForm(
     'businessName',
