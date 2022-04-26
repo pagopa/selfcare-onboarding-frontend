@@ -16,6 +16,7 @@ const mockPartyRegistry = {
       description: 'AGENCY X',
       digitalAddress: 'mail@pec.mail.org',
       origin: 'IPA',
+      address: 'sede legale',
     },
     {
       id: 'error',
