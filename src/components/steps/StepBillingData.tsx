@@ -29,7 +29,7 @@ type Props = StepperStepComponentProps & {
   organizationType: InstitutionType;
   subtitle: string;
   institutionId: string;
-  origin?: string;
+  origin: string;
 };
 
 export default function StepBillingData({

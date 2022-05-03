@@ -230,6 +230,9 @@ export default {
       backButton: 'Esci',
       cancelButton: 'Annulla',
     },
+    loading: {
+      loadingText: 'Stiamo verificando i tuoi dati',
+    },
   },
   stepInstitutionType: {
     title: 'Seleziona il tipo di ente che <1/> rappresenti',

@@ -108,7 +108,6 @@ function OnboardingComponent({ productId }: { productId: string }) {
 
   const forwardWithDataAndInstitution = (newFormData: Partial<FormData>, party: Party) => {
     setInstitutionId(party.institutionId);
-    forwardWithData(newFormData);
     setOrigin(party.origin);
     setBillingData({
       businessName: party.description,
@@ -118,6 +117,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
       vatNumber: '',
       recipientCode: party.origin === 'IPA' ? party.institutionId : '',
     });
+    forwardWithData(newFormData);
     trackEvent('ONBOARDING_SELEZIONE_ENTE', {
       party_id: institutionId,
       request_id: requestIdRef.current,
@@ -198,7 +198,6 @@ function OnboardingComponent({ productId }: { productId: string }) {
           ),
           product: selectedProduct,
           forward: forwardWithDataAndInstitution,
-          back,
         }),
     },
     {
@@ -245,6 +244,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
             recipientCode: '',
             publicServices: institutionType === 'GSP' ? false : undefined,
           },
+          origin,
           organizationType: institutionType as InstitutionType,
           subtitle: t('onBoardingSubProduct.billingData.subTitle'),
           forward: forwardWithBillingData,
@@ -292,7 +292,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
     },
   ];
 
-  const Step = useMemo(() => steps[activeStep].Component, [activeStep]);
+  const Step = useMemo(() => steps[activeStep].Component, [activeStep, selectedProduct]);
 
   const outcomeContent: RequestOutcomeOptions = {
     success: {
