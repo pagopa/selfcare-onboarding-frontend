@@ -12,7 +12,7 @@ type Props = {
 } & StepperStepComponentProps;
 
 export function SubProductStepSelectUserParty({ forward, parties }: Props) {
-  const institutionIdByQuery = new URLSearchParams(window.location.search).get('institutionId');
+  const institutionIdByQuery = new URLSearchParams(window.location.search).get('partyExternalId');
 
   const { t } = useTranslation();
 
@@ -30,7 +30,7 @@ export function SubProductStepSelectUserParty({ forward, parties }: Props) {
 
   useEffect(() => {
     if (institutionIdByQuery) {
-      const selectedParty = parties.find((p) => p.institutionId === institutionIdByQuery);
+      const selectedParty = parties.find((p) => p.externalId === institutionIdByQuery);
       if (selectedParty) {
         setSelected(selectedParty);
       } else {
@@ -75,7 +75,7 @@ export function SubProductStepSelectUserParty({ forward, parties }: Props) {
       <Grid container item textAlign="center" justifyContent="center" mt={4} mb={3}>
         <Grid item>
           {parties.map((p, index) => (
-            <Box key={p.institutionId}>
+            <Box key={p.externalId}>
               <Card
                 onClick={() => setSelected(p)}
                 sx={{

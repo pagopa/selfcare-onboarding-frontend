@@ -121,7 +121,7 @@ function OnBoardingSubProduct() {
   };
 
   const forwardWithInstitution = (party: Party, isUserParty: boolean) => {
-    setInstitutionId(party.institutionId);
+    setInstitutionId(party.externalId);
     setOrigin(party.origin);
     setBillingData({
       businessName: party.description,
@@ -129,7 +129,7 @@ function OnBoardingSubProduct() {
       digitalAddress: party.digitalAddress,
       taxCode: party.taxCode,
       vatNumber: party ? party.taxCode : '',
-      recipientCode: party.origin === 'IPA' ? party.institutionId : '',
+      recipientCode: party.origin === 'IPA' ? party.externalId : '',
     });
     trackEvent('ONBOARDING_SELEZIONE_ENTE', {
       party_id: institutionId,

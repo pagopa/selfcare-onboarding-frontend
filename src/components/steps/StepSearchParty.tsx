@@ -40,7 +40,7 @@ const handleSearchInstitutionId = async (
 };
 
 export function StepSearchParty({ subTitle, forward, back }: Props) {
-  const institutionIdByQuery = new URLSearchParams(window.location.search).get('institutionId');
+  const institutionIdByQuery = new URLSearchParams(window.location.search).get('partyExternalId');
   const { setRequiredLogin } = useContext(UserContext);
   const theme = useTheme();
 
@@ -54,7 +54,7 @@ export function StepSearchParty({ subTitle, forward, back }: Props) {
     setSelectedHistory(selected);
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const { id } = selected!;
-    forward({ institutionId: id }, { ...selected, institutionId: id } as Party);
+    forward({ externalId: id }, { ...selected, externalId: id } as Party);
   };
 
   const { t } = useTranslation();

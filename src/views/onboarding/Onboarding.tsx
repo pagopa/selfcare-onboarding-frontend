@@ -107,7 +107,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
   };
 
   const forwardWithDataAndInstitution = (newFormData: Partial<FormData>, party: Party) => {
-    setInstitutionId(party.institutionId);
+    setInstitutionId(party.externalId);
     forwardWithData(newFormData);
     setOrigin(party.origin);
     setBillingData({
@@ -116,7 +116,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
       digitalAddress: party.digitalAddress,
       taxCode: party.taxCode,
       vatNumber: '',
-      recipientCode: party.origin === 'IPA' ? party.institutionId : '',
+      recipientCode: party.origin === 'IPA' ? party.externalId : '',
     });
     trackEvent('ONBOARDING_SELEZIONE_ENTE', {
       party_id: institutionId,
