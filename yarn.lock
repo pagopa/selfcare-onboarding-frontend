@@ -1677,16 +1677,16 @@
   dependencies:
     "@fontsource/titillium-web" "^4.5.3"
 
-"@pagopa/mui-italia@pagopa/mui-italia":
-  version "0.6.8"
-  resolved "https://codeload.github.com/pagopa/mui-italia/tar.gz/1cf8fd130ae514257df1a1055178c8a7c180ba1b"
+"@pagopa/mui-italia@github:pagopa/mui-italia":
+  version "0.6.10"
+  resolved "https://codeload.github.com/pagopa/mui-italia/tar.gz/06d36f2c1c58098bd842571ca4efbeb278c6f9f2"
   dependencies:
     "@fontsource/titillium-web" "^4.5.3"
 
-"@pagopa/selfcare-common-frontend@^1.10.0":
-  version "1.10.0"
-  resolved "https://registry.yarnpkg.com/@pagopa/selfcare-common-frontend/-/selfcare-common-frontend-1.10.0.tgz#a9b73945b1ac71356516dc826378e0c0c79191c0"
-  integrity sha512-zCGRq+pLxAhFqNtDIcR6jBmgZJKfBaTVliEkLqtoyBVM5+RAzpqTnEkwx+BwyTYwRKlwTj33NBvuZJa3E8c8qQ==
+"@pagopa/selfcare-common-frontend@^1.10.5":
+  version "1.10.5"
+  resolved "https://registry.yarnpkg.com/@pagopa/selfcare-common-frontend/-/selfcare-common-frontend-1.10.5.tgz#531a8053fb7b1f90ecc9e11a91d0fa20380dfce7"
+  integrity sha512-8EdSTZsJbSwAQxwZdn+1bX8X2m/cRsoOYrtD59d16qngdJKZPT6ZYPU+d1MzY4chkVrtamdMGLeGDZbXFpLZ6g==
   dependencies:
     "@emotion/react" "^11.4.1"
     "@emotion/styled" "^11.3.0"

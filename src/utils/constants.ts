@@ -48,7 +48,7 @@ export const API = {
   VERIFY_ONBOARDING: {
     URL:
       ENV.URL_API.PARTY_PROCESS +
-      '/onboarding/organization/{{institutionId}}/products/{{productId}}',
+      '/onboarding/institution/{{institutionId}}/products/{{productId}}',
   },
 
   ONBOARDING_VERIFY_PRODUCT: {
