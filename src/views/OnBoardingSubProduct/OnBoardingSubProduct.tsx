@@ -293,7 +293,7 @@ function OnBoardingSubProduct() {
     },
   ];
 
-  const Step = useMemo(() => steps[activeStep].Component, [activeStep]);
+  const Step = useMemo(() => steps[activeStep].Component, [activeStep, parties]);
 
   const handleCloseExitModal = () => {
     setOpenExitModal(false);
