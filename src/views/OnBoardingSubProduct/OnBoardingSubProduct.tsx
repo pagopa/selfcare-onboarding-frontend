@@ -90,16 +90,16 @@ function OnBoardingSubProduct() {
   };
 
   const forwardWithInputs = (
-    product: Product,
-    subProduct: Product,
-    parties: Array<SelfcareParty>,
-    pricingPlan: string
+    newProduct: Product,
+    newSubProduct: Product,
+    newParties: Array<SelfcareParty>,
+    newPricingPlan: string
   ) => {
-    setProduct(product);
-    setSubProduct(subProduct);
-    setParties(parties);
-    setPricingPlan(pricingPlan);
-    setActiveStep(parties.length === 0 ? 2 : 1);
+    setProduct(newProduct);
+    setSubProduct(newSubProduct);
+    setParties(newParties);
+    setPricingPlan(newPricingPlan);
+    setActiveStep(newParties.length === 0 ? 2 : 1);
   };
 
   const forwardWithBillingData = (newBillingData: BillingData) => {
