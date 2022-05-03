@@ -31,6 +31,7 @@ const mockPartyRegistry = {
       description: 'AGENCY ERROR',
       digitalAddress: 'mail_ERROR_@pec.mail.org',
       origin: 'IPA',
+      address: 'sede legale',
     },
     {
       id: 'onboarded',
@@ -45,6 +46,7 @@ const mockPartyRegistry = {
       description: 'AGENCY ONBOARDED',
       digitalAddress: 'mail_ONBOARDED_@pec.mail.org',
       origin: 'IPA',
+      address: 'sede legale',
     },
     {
       id: 'pending',
@@ -59,6 +61,7 @@ const mockPartyRegistry = {
       description: 'AGENCY PENDING',
       digitalAddress: 'mail_PENDING_@pec.mail.org',
       origin: 'IPA',
+      address: 'sede legale',
     },
     {
       id: 'infoError',
@@ -73,6 +76,7 @@ const mockPartyRegistry = {
       description: 'AGENCY INFO ERROR',
       digitalAddress: 'mail_INFOERROR_@pec.mail.org',
       origin: 'IPA',
+      address: 'sede legale',
     },
   ],
   count: 5,

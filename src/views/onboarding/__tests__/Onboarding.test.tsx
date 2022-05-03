@@ -238,7 +238,12 @@ const executeStepBillingData = async () => {
   await waitFor(() => screen.getByText(stepBillingDataTitle));
 
   const confirmButtonEnabled = screen.getByRole('button', { name: 'Conferma' });
-  expect(confirmButtonEnabled).toBeDisabled();
+  await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
+
+  fireEvent.change(document.getElementById('recipientCode'), {
+    target: { value: '' },
+  });
+  await waitFor(() => expect(confirmButtonEnabled).toBeDisabled());
 
   await fillUserBillingDataForm(
     'businessName',

@@ -176,7 +176,7 @@ const performLogout = async (logoutButton: HTMLElement) => {
   await waitFor(() => expect(screen.queryByText('Vuoi davvero uscire?')).not.toBeNull());
 };
 
-const retrieveNavigationButtons = (expectedEnabled: boolean) => {
+const retrieveNavigationButtons = () => {
   const goBackButton = screen.getByRole('button', {
     name: 'Indietro',
   });
@@ -185,20 +185,17 @@ const retrieveNavigationButtons = (expectedEnabled: boolean) => {
   const confirmButton = screen.getByRole('button', {
     name: 'Conferma',
   });
-  if (expectedEnabled) {
-    expect(confirmButton).toBeEnabled();
-  } else {
-    expect(confirmButton).toBeDisabled();
-  }
+
+  expect(confirmButton).toBeEnabled();
+
   return [goBackButton, confirmButton];
 };
 
 const checkBackForwardNavigation = async (
   previousStepTitle: string,
-  actualStepTitle: string,
-  expectedEnabled: boolean
+  actualStepTitle: string
 ): Promise<Array<HTMLElement>> => {
-  const [goBackButton] = retrieveNavigationButtons(expectedEnabled);
+  const [goBackButton] = retrieveNavigationButtons();
   expect(goBackButton).toBeEnabled();
   fireEvent.click(goBackButton);
 
@@ -212,7 +209,7 @@ const checkBackForwardNavigation = async (
 
   await waitFor(() => screen.getByText(actualStepTitle));
 
-  return retrieveNavigationButtons(expectedEnabled);
+  return retrieveNavigationButtons();
 };
 
 const executeStepSelectInstitutionUnreleated = async (partyName: string) => {
@@ -263,13 +260,7 @@ const executeStepBillingData = async () => {
   console.log('Testing step Billing Data');
   await waitFor(() => screen.getByText(stepBillingDataTitle));
 
-  const isFilled = document.querySelector("input[value='id']");
-
-  await checkBackForwardNavigation(
-    stepSelectInstitutionUnreleatedTitle,
-    stepBillingDataTitle,
-    isFilled ? true : false
-  );
+  await checkBackForwardNavigation(stepSelectInstitutionUnreleatedTitle, stepBillingDataTitle);
 
   await fillUserBillingDataForm(
     'businessName',
@@ -280,6 +271,22 @@ const executeStepBillingData = async () => {
     'recipientCode'
   );
   const confirmButtonEnabled = screen.getByRole('button', { name: 'Conferma' });
+  await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
+
+  fireEvent.change(document.getElementById('recipientCode'), {
+    target: { value: '' },
+  });
+  await waitFor(() => expect(confirmButtonEnabled).toBeDisabled());
+
+  await fillUserBillingDataForm(
+    'businessName',
+    'registeredOffice',
+    'digitalAddress',
+    'taxCode',
+    'vatNumber',
+    'recipientCode'
+  );
+
   await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
 
   fireEvent.click(confirmButtonEnabled);
