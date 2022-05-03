@@ -99,7 +99,7 @@ function OnBoardingSubProduct() {
     setSubProduct(subProduct);
     setParties(parties);
     setPricingPlan(pricingPlan);
-    forward(parties.length === 0 ? 2 : 1);
+    setActiveStep(parties.length === 0 ? 2 : 1);
   };
 
   const forwardWithBillingData = (newBillingData: BillingData) => {
@@ -293,7 +293,7 @@ function OnBoardingSubProduct() {
     },
   ];
 
-  const Step = useMemo(() => steps[activeStep].Component, [activeStep, parties]);
+  const Step = useMemo(() => steps[activeStep].Component, [activeStep]);
 
   const handleCloseExitModal = () => {
     setOpenExitModal(false);
