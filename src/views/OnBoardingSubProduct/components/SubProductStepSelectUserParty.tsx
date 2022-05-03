@@ -12,7 +12,7 @@ type Props = {
 } & StepperStepComponentProps;
 
 export function SubProductStepSelectUserParty({ forward, parties }: Props) {
-  const institutionIdByQuery = new URLSearchParams(window.location.search).get('partyExternalId');
+  const partyExternalId = new URLSearchParams(window.location.search).get('partyExternalId');
 
   const { t } = useTranslation();
 
@@ -29,8 +29,8 @@ export function SubProductStepSelectUserParty({ forward, parties }: Props) {
   const bodyTitle = t('onBoardingSubProduct.selectUserPartyStep.title');
 
   useEffect(() => {
-    if (institutionIdByQuery) {
-      const selectedParty = parties.find((p) => p.externalId === institutionIdByQuery);
+    if (partyExternalId) {
+      const selectedParty = parties.find((p) => p.externalId === partyExternalId);
       if (selectedParty) {
         setSelected(selectedParty);
       } else {
@@ -41,7 +41,7 @@ export function SubProductStepSelectUserParty({ forward, parties }: Props) {
 
   // callback of previous useEffect
   useEffect(() => {
-    if (institutionIdByQuery && selected) {
+    if (partyExternalId && selected) {
       onForwardAction();
     }
   }, [selected]);
