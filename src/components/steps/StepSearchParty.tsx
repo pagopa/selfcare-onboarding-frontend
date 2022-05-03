@@ -40,11 +40,11 @@ const handleSearchInstitutionId = async (
 };
 
 export function StepSearchParty({ subTitle, forward, back }: Props) {
-  const institutionIdByQuery = new URLSearchParams(window.location.search).get('partyExternalId');
+  const partyExternalId = new URLSearchParams(window.location.search).get('partyExternalId');
   const { setRequiredLogin } = useContext(UserContext);
   const theme = useTheme();
 
-  const [loading, setLoading] = useState(!!institutionIdByQuery);
+  const [loading, setLoading] = useState(!!partyExternalId);
   const [selected, setSelected, setSelectedHistory] = useHistoryState<IPACatalogParty | null>(
     'selected_step1',
     null
@@ -61,8 +61,8 @@ export function StepSearchParty({ subTitle, forward, back }: Props) {
   const bodyTitle = t('onboardingStep1.onboarding.bodyTitle');
 
   useEffect(() => {
-    if (institutionIdByQuery) {
-      handleSearchInstitutionId(institutionIdByQuery, () => setRequiredLogin(true))
+    if (partyExternalId) {
+      handleSearchInstitutionId(partyExternalId, () => setRequiredLogin(true))
         .then((ipaParty) => {
           if (ipaParty) {
             setSelected(ipaParty);
@@ -84,7 +84,7 @@ export function StepSearchParty({ subTitle, forward, back }: Props) {
 
   // callback of previous useEffect
   useEffect(() => {
-    if (institutionIdByQuery && selected) {
+    if (partyExternalId && selected) {
       onForwardAction();
     }
   }, [selected]);
