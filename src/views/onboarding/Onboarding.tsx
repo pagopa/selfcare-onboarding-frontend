@@ -170,7 +170,9 @@ function OnboardingComponent({ productId }: { productId: string }) {
     billingData?: BillingData,
     institutionType?: InstitutionType
   ) => {
-    setBillingData(billingData);
+    if (billingData) {
+      setBillingData(billingData);
+    }
     setInstitutionType(institutionType);
     forward();
   };
