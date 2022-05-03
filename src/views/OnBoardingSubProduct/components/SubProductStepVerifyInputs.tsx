@@ -115,7 +115,7 @@ function SubProductStepVerifyInputs({
       if (
         selectedProduct === null ||
         selectedSubProduct === null ||
-        selectedSubProduct.parent !== productId
+        selectedSubProduct.parentId !== productId
       ) {
         setError(true);
       } else {

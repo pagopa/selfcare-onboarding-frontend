@@ -86,7 +86,7 @@ const mockedProduct = {
 const mockedSubProduct = {
   title: 'Premium',
   id: 'prod-io-premium',
-  parent: 'prod-io',
+  parentId: 'prod-io',
 };
 
 const mockedParties: Array<SelfcareParty> = [
