@@ -239,7 +239,9 @@ export default {
       scp: 'Società a controllo pubblico',
       pt: 'Partner tecnologico',
     },
-    description: 'Ai sensi dell’art. 2 comma 2 del CAD',
+    cadArticle2: 'art. 2, comma 2, lett. a del CAD',
+    cadArticle6:
+      'par. 6 delle “Linee Guida sul punto di accesso telematico ai servizi della Pubblica Amministrazione” ( art. 64bis del CAD)',
     backLabel: 'Indietro',
     confirmLabel: 'Conferma',
   },
