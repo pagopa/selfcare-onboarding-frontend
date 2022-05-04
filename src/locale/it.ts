@@ -236,7 +236,7 @@ export default {
   },
   stepInstitutionType: {
     title: 'Seleziona il tipo di ente che <1/> rappresenti',
-    organizationTypeValues: {
+    institutionTypeValues: {
       pa: 'Pubblica Amministrazione',
       gsp: 'Gestore di servizi pubblici',
       scp: 'Società a controllo pubblico',

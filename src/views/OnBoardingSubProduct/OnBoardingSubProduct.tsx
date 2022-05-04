@@ -51,7 +51,7 @@ function OnBoardingSubProduct() {
 
   const [manager, setManager] = useState<UserOnCreate>();
   const [billingData, setBillingData] = useState<BillingData>();
-  const [organizationType, setOrganizationType] = useState<InstitutionType>();
+  const [institutionType, setinstitutionType] = useState<InstitutionType>();
   const [pricingPlan, setPricingPlan] = useState<string>('');
 
   const setStepAddManagerHistoryState = useHistoryState<UsersObject>('people_step2', {})[2];
@@ -145,7 +145,7 @@ function OnBoardingSubProduct() {
   const forwardWithOnboardingData = (
     manager?: UserOnCreate,
     billingData?: BillingData,
-    organizationType?: InstitutionType
+    institutionType?: InstitutionType
   ) => {
     setManager(manager);
     if (manager) {
@@ -156,7 +156,7 @@ function OnBoardingSubProduct() {
     if (billingData) {
       setBillingData(billingData);
     }
-    setOrganizationType(organizationType);
+    setinstitutionType(institutionType);
     forward();
   };
 
@@ -237,9 +237,9 @@ function OnBoardingSubProduct() {
             taxCode: '',
             vatNumber: '',
             recipientCode: '',
-            publicServices: organizationType === 'GSP' ? false : undefined,
+            publicServices: institutionType === 'GSP' ? false : undefined,
           },
-          organizationType: organizationType as InstitutionType,
+          institutionType: institutionType as InstitutionType,
           origin,
           subtitle: t('onBoardingSubProduct.billingData.subTitle'),
           forward: forwardWithBillingData,
@@ -279,7 +279,7 @@ function OnBoardingSubProduct() {
           institutionId,
           users: [manager as UserOnCreate],
           billingData: billingData as BillingData,
-          institutionType: organizationType as InstitutionType,
+          institutionType: institutionType as InstitutionType,
           pricingPlan,
           origin,
           setLoading,

@@ -247,7 +247,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
             publicServices: institutionType === 'GSP' ? false : undefined,
           },
           origin,
-          organizationType: institutionType as InstitutionType,
+          institutionType: institutionType as InstitutionType,
           subtitle: t('onBoardingSubProduct.billingData.subTitle'),
           forward: forwardWithBillingData,
           back,

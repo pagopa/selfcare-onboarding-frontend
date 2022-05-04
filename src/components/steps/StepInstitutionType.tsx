@@ -9,7 +9,7 @@ type Props = StepperStepComponentProps & {
   institutionType: InstitutionType;
 };
 
-const organizationTypeValues: Array<{ labelKey: string; value: InstitutionType }> = [
+const institutionTypeValues: Array<{ labelKey: string; value: InstitutionType }> = [
   { labelKey: 'pa', value: 'PA' },
   { labelKey: 'gsp', value: 'GSP' },
   { labelKey: 'scp', value: 'SCP' },
@@ -55,7 +55,7 @@ export default function StepInstitutionType({ back, forward, institutionType }: 
           <Grid item xs={12} p={3}>
             <FormControl>
               <RadioGroup name="radio-buttons-group" defaultValue={institutionType}>
-                {organizationTypeValues.map((ot) => (
+                {institutionTypeValues.map((ot) => (
                   <FormControlLabel
                     sx={{ p: '8px' }}
                     key={ot.labelKey}
@@ -65,7 +65,7 @@ export default function StepInstitutionType({ back, forward, institutionType }: 
                     label={
                       <>
                         <Typography sx={{ fontWeight: 600, fontSize: '18px', color: '#17324D' }}>
-                          {t(`stepInstitutionType.organizationTypeValues.${ot.labelKey}`) as string}
+                          {t(`stepInstitutionType.institutionTypeValues.${ot.labelKey}`) as string}
                         </Typography>
                         <Typography
                           variant="subtitle2"

@@ -26,7 +26,7 @@ type StepBillingDataHistoryState = {
 
 type Props = StepperStepComponentProps & {
   initialFormData: BillingData;
-  organizationType: InstitutionType;
+  institutionType: InstitutionType;
   subtitle: string;
   institutionId: string;
   origin: string;
@@ -37,7 +37,7 @@ export default function StepBillingData({
   back,
   forward,
   subtitle,
-  organizationType,
+  institutionType,
   institutionId,
   origin,
 }: Props) {
@@ -259,7 +259,7 @@ export default function StepBillingData({
                   {t('stepBillingData.recipientCodeDescription')}
                 </Typography>
               </Grid>
-              {organizationType === 'GSP' && (
+              {institutionType === 'GSP' && (
                 <Grid item xs={12}>
                   <Typography>
                     <Checkbox
