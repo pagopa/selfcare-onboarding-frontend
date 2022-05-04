@@ -12,12 +12,12 @@ import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 import { omit, uniqueId } from 'lodash';
 // import { Box } from '@mui/system';
 import { useTranslation } from 'react-i18next';
-import { objectIsEmpty } from '../lib/object-utils';
-import { StepperStepComponentProps, UserOnCreate } from '../../types';
-import { UserContext } from '../lib/context';
-import { OnboardingStepActions } from './OnboardingStepActions';
-import { PlatformUserForm, validateUser } from './PlatformUserForm';
-import { useHistoryState } from './useHistoryState';
+import { objectIsEmpty } from '../../../lib/object-utils';
+import { StepperStepComponentProps, UserOnCreate } from '../../../../types';
+import { UserContext } from '../../../lib/context';
+import { OnboardingStepActions } from '../../../components/OnboardingStepActions';
+import { PlatformUserForm, validateUser } from '../../../components/PlatformUserForm';
+import { useHistoryState } from '../../../components/useHistoryState';
 
 // Could be an ES6 Set but it's too bothersome for now
 export type UsersObject = { [key: string]: UserOnCreate };
@@ -26,7 +26,7 @@ type Props = StepperStepComponentProps & {
   legal: UserOnCreate;
 };
 
-export function OnboardingStep3({ product, legal, forward, back }: Props) {
+export function OnBoardingProductStepDelegates({ product, legal, forward, back }: Props) {
   const { user } = useContext(UserContext);
   const [isAuthUser, setIsAuthUser, setIsAuthUserHistory] = useHistoryState('isAuthUser', false);
   const [people, setPeople, setPeopleHistory] = useHistoryState<UsersObject>('people_step3', {});
@@ -107,9 +107,9 @@ export function OnboardingStep3({ product, legal, forward, back }: Props) {
         </Grid>
       </Grid>
 
-      <Grid container item justifyContent="center" mt={2}>
+      <Grid container item justifyContent="center" mt={1}>
         <Grid item xs={12}>
-          <Typography variant="subtitle2" component="h2" align="center">
+          <Typography variant="body1" align="center">
             {bodyDescription1}
             <br />
             {bodyDescription2}
@@ -117,15 +117,12 @@ export function OnboardingStep3({ product, legal, forward, back }: Props) {
         </Grid>
       </Grid>
 
-      <Grid container item justifyContent="center" mt={2}>
+      <Grid container item justifyContent="center" mt={4}>
         <Grid item xs={4} display="flex" justifyContent="center">
           <FormControlLabel
             control={<Checkbox checked={isAuthUser} onChange={handleAuthUser} />}
             label={
-              // TODO: insert correct Variant when present in theme.js
-              <Typography sx={{ fontSize: '16px', lineHeight: '20px', fontWeight: 600 }}>
-                {t('onboardingStep3.formControl.label')}
-              </Typography>
+              <Typography variant="body1">{t('onboardingStep3.formControl.label')}</Typography>
             }
             sx={{
               alignSelf: 'center',
@@ -135,7 +132,7 @@ export function OnboardingStep3({ product, legal, forward, back }: Props) {
         </Grid>
       </Grid>
 
-      <Grid container item justifyContent="center" mt={2}>
+      <Grid container item justifyContent="center" mt={4}>
         <Grid item xs={8} sx={{ boxShadow: '0px 12px 40px rgba(0, 0, 0, 0.06)' }}>
           <PlatformUserForm
             prefix={'delegate-initial'}
@@ -150,7 +147,7 @@ export function OnboardingStep3({ product, legal, forward, back }: Props) {
         {delegateFormIds.map((id) => (
           <React.Fragment key={id}>
             <Grid item xs={10} justifyContent="center" mt={6} mb={3}>
-              <Typography align="center" variant="h4">
+              <Typography align="center" variant="h4" data-testid="extra-delegate">
                 {t('onboardingStep3.addUserLabel')}
               </Typography>
             </Grid>

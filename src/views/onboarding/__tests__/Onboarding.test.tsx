@@ -1,19 +1,19 @@
 import { fireEvent, getByLabelText, render, screen, waitFor } from '@testing-library/react';
 import { useState } from 'react';
-import { User } from '../../../types';
-import { HeaderContext, UserContext } from '../../lib/context';
-import { ENV } from '../../utils/env';
+import { User } from '../../../../types';
+import { HeaderContext, UserContext } from '../../../lib/context';
+import { ENV } from '../../../utils/env';
 import Onboarding from '../Onboarding';
-import './../../locale';
+import '../../../locale';
 
-jest.mock('../../lib/api-utils');
+jest.mock('../../../lib/api-utils');
 
-jest.setTimeout(7000);
+jest.setTimeout(20000);
 
 let fetchWithLogsSpy: jest.SpyInstance;
 
 beforeEach(() => {
-  fetchWithLogsSpy = jest.spyOn(require('../../lib/api-utils'), 'fetchWithLogs');
+  fetchWithLogsSpy = jest.spyOn(require('../../../lib/api-utils'), 'fetchWithLogs');
 });
 
 const oldWindowLocation = global.window.location;
@@ -43,7 +43,7 @@ jest.mock('react-router-dom', () => ({
   }),
 }));
 
-const renderComponent = (productId: string = 'prod-io') => {
+const renderComponent = (productId: string = 'prod-pagopa') => {
   const Component = () => {
     const [user, setUser] = useState<User | null>(null);
     const [subHeaderVisible, setSubHeaderVisible] = useState<boolean>(false);
@@ -67,6 +67,8 @@ const renderComponent = (productId: string = 'prod-io') => {
 };
 
 const step1Title = 'Seleziona il tuo ente';
+const stepInstitutionType = 'Seleziona il tipo di ente che rappresenti';
+const stepBillingDataTitle = 'Indica i dati del tuo ente';
 const step2Title = 'Indica il Legale rappresentante';
 const step3Title = "Indica l'Amministratore";
 const completeSuccessTitle = 'La tua richiesta è stata inviata con successo';
@@ -95,6 +97,8 @@ test('test error productID', async () => {
 test('test complete', async () => {
   renderComponent();
   await executeStep1('agency x');
+  await executeStepInstitutionType();
+  await executeStepBillingData();
   await executeStep2();
   await executeStep3(true);
   await executeGoHome();
@@ -103,6 +107,8 @@ test('test complete', async () => {
 test('test complete with error on submit', async () => {
   renderComponent();
   await executeStep1('agency error');
+  await executeStepInstitutionType();
+  await executeStepBillingData();
   await executeStep2();
   await executeStep3(false);
   await executeGoHome();
@@ -162,6 +168,7 @@ const retrieveNavigationButtons = () => {
 };
 
 const executeGoHome = async () => {
+  console.log('Go Home');
   const goHomeButton = screen.getByRole('button', {
     name: 'Chiudi',
   });
@@ -183,14 +190,13 @@ const checkBackForwardNavigation = async (
   const goForwardButton = screen.getByRole('button', {
     name: 'Conferma',
   });
-  expect(goForwardButton).toBeEnabled();
+  await waitFor(() => expect(goForwardButton).toBeEnabled());
   fireEvent.click(goForwardButton);
 
   await waitFor(() => screen.getByText(actualStepTitle));
 
   return retrieveNavigationButtons();
 };
-
 const executeStep1 = async (partyName: string) => {
   console.log('Testing step 1');
 
@@ -213,11 +219,53 @@ const executeStep1 = async (partyName: string) => {
   await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(3));
 };
 
+const executeStepInstitutionType = async () => {
+  console.log('Testing step Institution Type');
+  await waitFor(() => screen.getByText(stepInstitutionType));
+
+  await checkBackForwardNavigation(step1Title, stepInstitutionType);
+  await fillInstitutionTypeCheckbox('pa', 'gsp', 'scp', 'pt');
+
+  const confirmButtonEnabled = screen.getByRole('button', { name: 'Conferma' });
+  await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
+
+  fireEvent.click(confirmButtonEnabled);
+  await waitFor(() => screen.getByText(stepBillingDataTitle));
+};
+
+const executeStepBillingData = async () => {
+  console.log('Testing step Billing Data');
+  await waitFor(() => screen.getByText(stepBillingDataTitle));
+
+  const confirmButtonEnabled = screen.getByRole('button', { name: 'Conferma' });
+  await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
+
+  fireEvent.change(document.getElementById('recipientCode'), {
+    target: { value: '' },
+  });
+  await waitFor(() => expect(confirmButtonEnabled).toBeDisabled());
+
+  await fillUserBillingDataForm(
+    'businessName',
+    'registeredOffice',
+    'digitalAddress',
+    'taxCode',
+    'vatNumber',
+    'recipientCode'
+  );
+
+  await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
+
+  fireEvent.click(confirmButtonEnabled);
+  await waitFor(() => screen.getByText(step2Title));
+};
+
 const executeStep2 = async () => {
   console.log('Testing step 2');
   await waitFor(() => screen.getByText(step2Title));
 
-  const [_, confirmButton] = await checkBackForwardNavigation(step1Title, step2Title);
+  const confirmButton = screen.getByRole('button', { name: 'Conferma' });
+  expect(confirmButton).toBeDisabled();
 
   await fillUserForm(confirmButton, 'LEGAL', 'BBBBBB00B00B000B', 'b@b.bb');
 
@@ -258,6 +306,37 @@ const executeStep3 = async (expectedSuccessfulSubmit: boolean) => {
   await waitFor(() =>
     screen.getByText(expectedSuccessfulSubmit ? completeSuccessTitle : completeErrorTitle)
   );
+};
+
+const fillInstitutionTypeCheckbox = async (pa: string, gsp: string, scp: string, pt: string) => {
+  fireEvent.click(document.getElementById(pa));
+  fireEvent.click(document.getElementById(gsp));
+  fireEvent.click(document.getElementById(scp));
+  fireEvent.click(document.getElementById(pt));
+};
+
+const fillUserBillingDataForm = async (
+  businessNameInput: string,
+  registeredOfficeInput: string,
+  mailPECInput: string,
+  taxCodeInput: string,
+  vatNumber: string,
+  recipientCode: string
+) => {
+  fireEvent.change(document.getElementById(businessNameInput), {
+    target: { value: 'businessNameInput' },
+  });
+  fireEvent.change(document.getElementById(registeredOfficeInput), {
+    target: { value: 'registeredOfficeInput' },
+  });
+  fireEvent.change(document.getElementById(mailPECInput), { target: { value: 'a@a.it' } });
+  fireEvent.change(document.getElementById(taxCodeInput), {
+    target: { value: 'AAAAAA44D55F456K' },
+  });
+  fireEvent.change(document.getElementById(vatNumber), { target: { value: '11122233345' } });
+  fireEvent.change(document.getElementById(recipientCode), {
+    target: { value: 'recipientCode' },
+  });
 };
 
 const fillUserForm = async (
@@ -417,11 +496,13 @@ const checkAdditionalUsersExistance = (
   expectedEmptyForm: boolean,
   confirmButton: HTMLElement
 ) => {
-  const titles = screen.queryAllByText('Aggiungi un altro Referente Amministrativo');
+  const titles = screen.queryAllByTestId('extra-delegate');
   expect(titles.length).toBe(expectedAdditionalUsersCount);
 
   const isAddUsersVisible = expectedAdditionalUsersCount < 2;
-  const addDelegateButton = screen.queryByText('Aggiungi un altro Amministratore');
+  const addDelegateButton = screen.queryByRole('button', {
+    name: 'Aggiungi un altro Amministratore',
+  });
   if (!isAddUsersVisible) {
     expect(addDelegateButton).toBeNull();
   }

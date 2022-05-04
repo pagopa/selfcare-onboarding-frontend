@@ -1,65 +1,43 @@
-import React, { useEffect, useState, useContext, useRef } from 'react';
+import { useEffect, useState, useContext, useRef, useMemo } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Button, Container, Stack, Typography, Grid, useTheme } from '@mui/material';
 import { AxiosError, AxiosResponse } from 'axios';
 import SessionModal from '@pagopa/selfcare-common-frontend/components/SessionModal';
-// import ErrorIcon from '@pagopa/selfcare-common-frontend/components/icons/ErrorIcon';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
 import { useTranslation, Trans } from 'react-i18next';
 import { uniqueId } from 'lodash';
-import { ReactComponent as ErrorIcon } from '../assets/payment_completed_error.svg';
-import { withLogin } from '../components/withLogin';
+import { IllusCompleted, IllusError } from '@pagopa/mui-italia';
+import { withLogin } from '../../components/withLogin';
 import {
+  BillingData,
+  InstitutionType,
   Product,
   RequestOutcome,
   RequestOutcomeOptions,
+  Party,
   StepperStep,
   UserOnCreate,
-} from '../../types';
-import { fetchWithLogs } from '../lib/api-utils';
-import { getFetchOutcome } from '../lib/error-utils';
-import { OnboardingStep0 } from '../components/OnboardingStep0';
-import { OnboardingStep1 } from '../components/OnboardingStep1';
-import { OnboardingStep2 } from '../components/OnboardingStep2';
-import { OnboardingStep3 } from '../components/OnboardingStep3';
-import { LoadingOverlay } from '../components/LoadingOverlay';
-import { MessageNoAction } from '../components/MessageNoAction';
-import { ReactComponent as CheckIllustration } from '../assets/check-illustration.svg';
-import { ENV } from '../utils/env';
-import { OnboardingStep1_5 } from '../components/OnboardingStep1_5';
-import { HeaderContext, UserContext } from '../lib/context';
-import NoProductPage from './NoProductPage';
-
-export const unregisterUnloadEvent = (
-  setOnLogout: React.Dispatch<React.SetStateAction<(() => void) | null | undefined>>
-) => {
-  window.removeEventListener('beforeunload', keepOnPage);
-  setOnLogout(undefined);
-};
-
-const registerUnloadEvent = (
-  setOnLogout: React.Dispatch<React.SetStateAction<(() => void) | null | undefined>>,
-  setOpenExitModal: React.Dispatch<React.SetStateAction<boolean>>
-) => {
-  window.addEventListener('beforeunload', keepOnPage);
-  // react dispatch consider a function input as a metod to be called with the previuos state to caluclate the next state: those we are defining a function that return the next function
-  setOnLogout(() => () => setOpenExitModal(true));
-};
-
-const keepOnPage = (e: BeforeUnloadEvent) => {
-  const message =
-    "Warning!\n\nNavigating away from this page will delete your text if you haven't already saved it.";
-
-  e.preventDefault();
-  // eslint-disable-next-line functional/immutable-data
-  e.returnValue = message;
-  return message;
-};
+} from '../../../types';
+import { StepSearchParty } from '../../components/steps/StepSearchParty';
+import { StepAddManager } from '../../components/steps/StepAddManager';
+import { LoadingOverlay } from '../../components/LoadingOverlay';
+import { MessageNoAction } from '../../components/MessageNoAction';
+import { fetchWithLogs } from '../../lib/api-utils';
+import { getFetchOutcome } from '../../lib/error-utils';
+import { ENV } from '../../utils/env';
+import { OnboardingStep1_5 } from '../../components/OnboardingStep1_5';
+import { HeaderContext, UserContext } from '../../lib/context';
+import NoProductPage from '../NoProductPage';
+import StepOnboardingData from '../../components/steps/StepOnboardingData';
+import StepBillingData from '../../components/steps/StepBillingData';
+import { registerUnloadEvent, unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
+import StepInstitutionType from '../../components/steps/StepInstitutionType';
+import { OnBoardingProductStepDelegates } from './components/OnBoardingProductStepDelegates';
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
 function OnboardingComponent({ productId }: { productId: string }) {
   const [loading, setLoading] = useState(true);
-  const [activeStep, setActiveStep] = useState(1);
+  const [activeStep, setActiveStep] = useState(0);
   const [formData, setFormData] = useState<Partial<FormData>>();
   const [institutionId, setInstitutionId] = useState<string>('');
   const [outcome, setOutcome] = useState<RequestOutcome>();
@@ -67,6 +45,9 @@ function OnboardingComponent({ productId }: { productId: string }) {
   const [openExitModal, setOpenExitModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>();
   const [openExitUrl, setOpenExitUrl] = useState(ENV.URL_FE.LOGOUT);
+  const [billingData, setBillingData] = useState<BillingData>();
+  const [institutionType, setInstitutionType] = useState<InstitutionType>();
+  const [origin, setOrigin] = useState<string>('');
   const { setOnLogout } = useContext(HeaderContext);
   const { setRequiredLogin } = useContext(UserContext);
   const requestIdRef = useRef<string>();
@@ -125,11 +106,17 @@ function OnboardingComponent({ productId }: { productId: string }) {
     forward();
   };
 
-  const forwardWithDataAndInstitutionId = (
-    newFormData: Partial<FormData>,
-    institutionId: string
-  ) => {
-    setInstitutionId(institutionId);
+  const forwardWithDataAndInstitution = (newFormData: Partial<FormData>, party: Party) => {
+    setInstitutionId(party.institutionId);
+    setOrigin(party.origin);
+    setBillingData({
+      businessName: party.description,
+      registeredOffice: party.address,
+      digitalAddress: party.digitalAddress,
+      taxCode: party.taxCode,
+      vatNumber: party.taxCode,
+      recipientCode: party.origin === 'IPA' ? party.institutionId : '',
+    });
     forwardWithData(newFormData);
     trackEvent('ONBOARDING_SELEZIONE_ENTE', {
       party_id: institutionId,
@@ -138,12 +125,21 @@ function OnboardingComponent({ productId }: { productId: string }) {
     });
   };
 
+  const forwardWithBillingData = (newBillingData: BillingData) => {
+    trackEvent('ONBOARDING_DATI_FATTURAZIONE', {
+      party_id: institutionId,
+      request_id: requestIdRef.current,
+    });
+    setBillingData(newBillingData);
+    forward();
+  };
+
   const submit = async (users: Array<UserOnCreate>) => {
     setLoading(true);
 
     const postLegalsResponse = await fetchWithLogs(
       { endpoint: 'ONBOARDING_POST_LEGALS', endpointParams: { institutionId, productId } },
-      { method: 'POST', data: users },
+      { method: 'POST', data: { billingData, institutionType, origin, users } },
       () => setRequiredLogin(true)
     );
 
@@ -169,30 +165,98 @@ function OnboardingComponent({ productId }: { productId: string }) {
     }
   };
 
+  const forwardWithOnboardingData = (
+    _manager: BillingData,
+    billingData?: BillingData,
+    institutionType?: InstitutionType
+  ) => {
+    if (billingData) {
+      setBillingData(billingData);
+    }
+    setInstitutionType(institutionType);
+    forward();
+  };
+
+  const forwardWithInstitutionType = (newInstitutionType: InstitutionType) => {
+    trackEvent('ONBOARDING_TIPO_ENTE', {
+      party_id: institutionId,
+      request_id: requestIdRef.current,
+    });
+    setInstitutionType(newInstitutionType);
+    forward();
+  };
+
   const steps: Array<StepperStep> = [
     {
-      label: t('onboarding.steps.privacyLabel'),
-      Component: () => OnboardingStep0({ product: selectedProduct, forward }),
-    },
-
-    {
-      label: t('onboarding.steps.selectPartyLabel'),
+      label: "Seleziona l'ente",
       Component: () =>
-        OnboardingStep1({
+        StepSearchParty({
+          subTitle: (
+            <Trans i18nKey="onboardingStep1.onboarding.bodyDescription">
+              Seleziona dall&apos;Indice della Pubblica Amministrazione (IPA) l&apos;ente
+              <br />
+              per cui vuoi richiedere l&apos; adesione a {{ productTitle: selectedProduct?.title }}
+            </Trans>
+          ),
           product: selectedProduct,
-          forward: forwardWithDataAndInstitutionId,
-          back,
+          forward: forwardWithDataAndInstitution,
         }),
     },
     {
-      label: t('onboarding.steps.verifyPartyLabel'),
+      label: 'Verifica ente',
       Component: () =>
         OnboardingStep1_5({ product: selectedProduct, forward, institutionId, productId }),
     },
     {
-      label: t('onboarding.steps.insertlegalLabel'),
+      label: 'Get Onboarding Data',
       Component: () =>
-        OnboardingStep2({
+        StepOnboardingData({
+          institutionId,
+          productId,
+          forward: forwardWithOnboardingData,
+        }),
+    },
+    {
+      label: 'Seleziona il tipo di ente',
+      Component: () =>
+        StepInstitutionType({
+          institutionType: institutionType as InstitutionType,
+          forward: forwardWithInstitutionType,
+          back: () => {
+            if (window.location.search.indexOf(`institutionId=${institutionId}`) > -1) {
+              setOpenExitUrl(`${ENV.URL_FE.DASHBOARD}/${institutionId}`);
+              setOpenExitModal(true);
+            } else {
+              setActiveStep(0);
+            }
+          },
+        }),
+    },
+    {
+      label: 'Insert Billing Data',
+      Component: () =>
+        StepBillingData({
+          institutionId,
+          initialFormData: billingData ?? {
+            businessName: '',
+            registeredOffice: '',
+            digitalAddress: '',
+            taxCode: '',
+            vatNumber: '',
+            recipientCode: '',
+            publicServices: institutionType === 'GSP' ? false : undefined,
+          },
+          origin,
+          institutionType: institutionType as InstitutionType,
+          subtitle: t('onBoardingSubProduct.billingData.subTitle'),
+          forward: forwardWithBillingData,
+          back,
+        }),
+    },
+    {
+      label: 'Inserisci i dati del rappresentante legale',
+      Component: () =>
+        StepAddManager({
           product: selectedProduct,
           forward: (newFormData: Partial<FormData>) => {
             trackEvent('ONBOARDING_LEGALE_RAPPRESENTANTE', {
@@ -201,20 +265,13 @@ function OnboardingComponent({ productId }: { productId: string }) {
             });
             forwardWithData(newFormData);
           },
-          back: () => {
-            if (window.location.search.indexOf(`institutionId=${institutionId}`) > -1) {
-              setOpenExitUrl(`${ENV.URL_FE.DASHBOARD}/${institutionId}`);
-              setOpenExitModal(true);
-            } else {
-              setActiveStep(activeStep - 2);
-            }
-          },
+          back,
         }),
     },
     {
-      label: t('onboarding.steps.insertAdministratorLabel'),
+      label: 'Inserisci i dati degli amministratori',
       Component: () =>
-        OnboardingStep3({
+        OnBoardingProductStepDelegates({
           product: selectedProduct,
           legal: (formData as any).users[0],
           forward: (newFormData: Partial<FormData>) => {
@@ -237,15 +294,19 @@ function OnboardingComponent({ productId }: { productId: string }) {
     },
   ];
 
-  const Step = steps[activeStep].Component;
+  const Step = useMemo(() => steps[activeStep].Component, [activeStep, selectedProduct]);
 
   const outcomeContent: RequestOutcomeOptions = {
     success: {
-      ImgComponent: CheckIllustration,
       title: '',
       description: [
         <>
-          <Typography variant={'h4'} sx={{ color: theme.palette.text.primary, marginBottom: 1 }}>
+          <IllusCompleted size={60} />
+          <Typography
+            mt={3}
+            variant={'h4'}
+            sx={{ color: theme.palette.text.primary, marginBottom: 1 }}
+          >
             <Trans i18nKey="onboarding.outcomeContent.success.title">
               La tua richiesta è stata inviata
               <br />
@@ -255,9 +316,10 @@ function OnboardingComponent({ productId }: { productId: string }) {
           <Stack key="0" spacing={4}>
             <Typography variant="body1">
               <Trans i18nKey="onboarding.outcomeContent.success.description">
-                Riceverai una PEC all’indirizzo istituzionale dell’Ente.
+                Riceverai una PEC all’indirizzo istituzionale che hai indicato.
                 <br />
-                Al suo interno troverai le istruzioni per completare l&apos;adesione.
+                Al suo interno troverai le istruzioni per completare <br />
+                l&apos;adesione.
               </Trans>
             </Typography>
             <Button
@@ -272,39 +334,41 @@ function OnboardingComponent({ productId }: { productId: string }) {
       ],
     },
     error: {
-      ImgComponent: ErrorIcon,
       title: '',
       description: [
-        <Grid container direction="column" key="0">
-          <Grid container item justifyContent="center">
-            <Grid item xs={5}>
-              <Typography variant="h4">{t('onboarding.outcomeContent.error.title')}</Typography>
+        <>
+          <IllusError size={60} />
+          <Grid container direction="column" key="0" mt={3}>
+            <Grid container item justifyContent="center">
+              <Grid item xs={5}>
+                <Typography variant="h4">{t('onboarding.outcomeContent.error.title')}</Typography>
+              </Grid>
             </Grid>
-          </Grid>
-          <Grid container item justifyContent="center" mb={3} mt={1}>
-            <Grid item xs={5}>
-              <Typography>
-                <Trans i18nKey="onboarding.outcomeContent.error.description">
-                  A causa di un errore del sistema non è possibile completare la procedura.
-                  <br />
-                  Ti chiediamo di riprovare più tardi.
-                </Trans>
-              </Typography>
-            </Grid>
-          </Grid>
-          <Grid container item justifyContent="center">
-            <Grid item xs={4}>
-              <Button
-                onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
-                variant={'contained'}
-              >
-                <Typography width="100%" sx={{ color: theme.palette.primary.contrastText }}>
-                  {t('onboarding.outcomeContent.error.backActionLabel')}
+            <Grid container item justifyContent="center" mb={3} mt={1}>
+              <Grid item xs={5}>
+                <Typography>
+                  <Trans i18nKey="onboarding.outcomeContent.error.description">
+                    A causa di un errore del sistema non è possibile completare la procedura.
+                    <br />
+                    Ti chiediamo di riprovare più tardi.
+                  </Trans>
                 </Typography>
-              </Button>
+              </Grid>
+            </Grid>
+            <Grid container item justifyContent="center">
+              <Grid item xs={4}>
+                <Button
+                  onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+                  variant={'contained'}
+                >
+                  <Typography width="100%" sx={{ color: theme.palette.primary.contrastText }}>
+                    {t('onboarding.outcomeContent.error.backActionLabel')}
+                  </Typography>
+                </Button>
+              </Grid>
             </Grid>
           </Grid>
-        </Grid>,
+        </>,
       ],
     },
   };

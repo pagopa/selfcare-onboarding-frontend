@@ -1,12 +1,10 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { Button, Stack, Typography, Grid } from '@mui/material';
-// import ErrorIcon from '@pagopa/selfcare-common-frontend/components/icons/ErrorIcon';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
 import { useTranslation, Trans } from 'react-i18next';
 import { uniqueId } from 'lodash';
-import { ReactComponent as ErrorIcon } from '../assets/payment_completed_error.svg';
+import { IllusCompleted, IllusError } from '@pagopa/mui-italia';
 import { MessageNoAction } from '../components/MessageNoAction';
-import checkIllustration from '../assets/check-illustration.svg';
 import { RequestOutcome, RequestOutcomeOptions } from '../../types';
 import { fetchWithLogs } from '../lib/api-utils';
 import { getFetchOutcome } from '../lib/error-utils';
@@ -68,11 +66,12 @@ export default function RejectRegistration() {
   }, []);
   const outcomeContent: RequestOutcomeOptions = {
     success: {
-      img: { src: checkIllustration, alt: t('rejectRegistration.outcomeContent.success.imgAlt') },
+      img: { src: '', alt: t('rejectRegistration.outcomeContent.success.imgAlt') },
       title: t('rejectRegistration.outcomeContent.success.title'),
       description: [
         <Stack key="0" spacing={10}>
-          <Typography>
+          <IllusCompleted size={60} />
+          <Typography mt={3}>
             <Trans i18nKey="rejectRegistration.outcomeContent.success.description">
               Visita il portale Self Care per conoscere i prodotti e richiedere una nuova
               <br />
@@ -90,40 +89,42 @@ export default function RejectRegistration() {
       ],
     },
     error: {
-      ImgComponent: ErrorIcon,
       title: '',
       description: [
-        <Grid container direction="column" key="0" style={{ textAlign: 'center' }}>
-          <Grid container item justifyContent="center">
-            <Grid item xs={6}>
-              <Typography variant="h4">
-                {t('rejectRegistration.outcomeContent.error.title')}
-              </Typography>
+        <>
+          <IllusError size={60} />
+          <Grid container direction="column" key="0" style={{ textAlign: 'center' }} mt={3}>
+            <Grid container item justifyContent="center">
+              <Grid item xs={6}>
+                <Typography variant="h4">
+                  {t('rejectRegistration.outcomeContent.error.title')}
+                </Typography>
+              </Grid>
+            </Grid>
+            <Grid container item justifyContent="center" mb={7} mt={1}>
+              <Grid item xs={6}>
+                <Typography>
+                  <Trans i18nKey="rejectRegistration.outcomeContent.error.description">
+                    A causa di un errore del sistema non è possibile completare la procedura.
+                    <br />
+                    Ti chiediamo di riprovare più tardi.
+                  </Trans>
+                </Typography>
+              </Grid>
+            </Grid>
+            <Grid container item justifyContent="center">
+              <Grid item xs={4}>
+                <Button
+                  variant="contained"
+                  sx={{ alignSelf: 'center' }}
+                  onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+                >
+                  {t('rejectRegistration.outcomeContent.error.backActionLabel')}
+                </Button>
+              </Grid>
             </Grid>
           </Grid>
-          <Grid container item justifyContent="center" mb={7} mt={1}>
-            <Grid item xs={6}>
-              <Typography>
-                <Trans i18nKey="rejectRegistration.outcomeContent.error.description">
-                  A causa di un errore del sistema non è possibile completare la procedura.
-                  <br />
-                  Ti chiediamo di riprovare più tardi.
-                </Trans>
-              </Typography>
-            </Grid>
-          </Grid>
-          <Grid container item justifyContent="center">
-            <Grid item xs={4}>
-              <Button
-                variant="contained"
-                sx={{ alignSelf: 'center' }}
-                onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
-              >
-                {t('rejectRegistration.outcomeContent.error.backActionLabel')}
-              </Button>
-            </Grid>
-          </Grid>
-        </Grid>,
+        </>,
       ],
     },
   };

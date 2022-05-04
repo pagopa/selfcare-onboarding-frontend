@@ -41,6 +41,7 @@ variables:
     react_app_url_api_party_registry_proxy: '$(UAT_REACT_APP_URL_API_PARTY_REGISTRY_PROXY)'
 
     react_app_enable_assistance: 'true'
+    react_app_url_storage: '$(UAT_REACT_APP_URL_STORAGE)'
 
     react_app_one_trust_base_url: '$(UAT_REACT_APP_URL_CDN)/ot'
     react_app_analytics_enabled: '$(UAT_ANALYTICS_ENABLED)'
@@ -68,6 +69,7 @@ variables:
     react_app_url_api_party_registry_proxy: '$(PROD_REACT_APP_URL_API_PARTY_REGISTRY_PROXY)'
 
     react_app_enable_assistance: 'false'
+    react_app_url_storage: '$(PROD_REACT_APP_URL_STORAGE)'
 
     react_app_one_trust_base_url: '$(PROD_REACT_APP_URL_CDN)/ot'
     react_app_analytics_enabled: '$(PROD_ANALYTICS_ENABLED)'
@@ -97,6 +99,7 @@ variables:
     react_app_url_api_party_registry_proxy: '$(DEV_REACT_APP_URL_API_PARTY_REGISTRY_PROXY)'
 
     react_app_enable_assistance: 'true'
+    react_app_url_storage: '$(DEV_REACT_APP_URL_STORAGE)'
 
     react_app_one_trust_base_url: '$(DEV_REACT_APP_URL_CDN)/ot/test'
     react_app_analytics_enabled: '$(DEV_ANALYTICS_ENABLED)'
@@ -192,6 +195,7 @@ stages:
 
               REACT_APP_ENABLE_ASSISTANCE: '$(react_app_enable_assistance)'
               REACT_APP_PAGOPA_HELP_EMAIL: '$(react_app_pagopa_help_email)'
+              REACT_APP_URL_INSTITUTION_LOGO_PREFIX: '$(react_app_url_storage)/institutions/'
 
               REACT_APP_ANALYTICS_ENABLE: '$(react_app_analytics_enabled)'
               REACT_APP_ANALYTICS_MOCK: '$(react_app_analytics_mocked)'

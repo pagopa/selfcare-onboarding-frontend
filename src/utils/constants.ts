@@ -1,8 +1,9 @@
 import { RoutesObject } from '../../types';
-import Onboarding from '../views/Onboarding';
+import Onboarding from '../views/onboarding/Onboarding';
 import RejectRegistration from '../views/RejectRegistration';
 import CompleteRegistrationComponent from '../views/CompleteRegistrationComponent';
 import NoProductPage from '../views/NoProductPage';
+import OnBoardingSubProduct from '../views/OnBoardingSubProduct/OnBoardingSubProduct';
 import { ENV } from './env';
 
 const IS_DEVELOP = process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test';
@@ -35,6 +36,12 @@ export const ROUTES: RoutesObject = {
     EXACT: true,
     COMPONENT: Onboarding,
   },
+  ONBOARDING_SUBPRODUCT: {
+    PATH: `${BASE_ROUTE}/:productId/:subProductId`,
+    LABEL: 'Onboarding SubProduct',
+    EXACT: true,
+    COMPONENT: OnBoardingSubProduct,
+  },
 };
 
 export const API = {
@@ -60,6 +67,14 @@ export const API = {
   },
   ONBOARDING_COMPLETE_REGISTRATION: {
     URL: ENV.URL_API.PARTY_PROCESS + '/onboarding/complete/{{token}}',
+  },
+  ONBOARDING_GET_USER_PARTIES: {
+    URL: ENV.URL_API.ONBOARDING + '/institutions',
+  },
+  ONBOARDING_GET_ONBOARDING_DATA: {
+    URL:
+      ENV.URL_API.ONBOARDING +
+      '/institutions/{{institutionId}}/products/{{productId}}/onboarded-institution-info',
   },
 };
 

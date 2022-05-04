@@ -11,7 +11,7 @@ export default {
   },
   confirmRegistrationStep0: {
     title: "Carica l'Accordo di Adesione",
-    description: `<0>Segui le istruzioni</0> per inviare il documento firmato,<2/> servirà a completare l'inserimento del tuo Ente nel <4/> portale Self Care.`,
+    description: `<0>Segui le istruzioni</0> per inviare il documento firmato,<2/> servirà a completare l'inserimento del tuo ente nel <4/> portale Self Care.`,
     confirmAction: 'Continua',
   },
   confirmRegistrationStep1: {
@@ -66,6 +66,7 @@ export default {
       },
       onboardingStepActions: {
         confirmAction: 'Conferma',
+        backAction: 'Indietro',
       },
     },
   },
@@ -79,7 +80,7 @@ export default {
     bodyTitle: "Indica l'Amministratore",
     bodyDescription1: 'Inserisci i dati del Referente Amministrativo o di un suo delegato.',
     bodyDescription2: 'La persona che indicherai sarà responsabile della gestione di',
-    addUserLabel: 'Aggiungi un altro Referente Amministrativo',
+    addUserLabel: 'Aggiungi un altro Amministratore',
     addUserLink: 'Aggiungi un altro Amministratore',
     backLabel: 'Indietro',
     confirmLabel: 'Conferma',
@@ -107,7 +108,7 @@ export default {
           invalid: "L'indirizzo email non è valido",
           duplicate: "L'indirizzo email inserito è già presente",
         },
-        description: "Inserisci l'indirizzo email istituzionale utilizzato per l'Ente",
+        description: 'Inserisci l’indirizzo email istituzionale dell’Amministratore',
       },
     },
   },
@@ -131,7 +132,7 @@ export default {
       success: {
         alt: "Icona dell'email",
         title: 'Adesione completata!',
-        description: `Comunicheremo l'avvenuta adesione all'indirizzo PEC <1/> dell'Ente. Da questo momento in poi, gli Amministratori <3/> inseriti in fase di richiesta  potranno accedere al portale.`,
+        description: `Comunicheremo l'avvenuta adesione all'indirizzo PEC <1/> dell'ente. Da questo momento in poi, gli Amministratori <3/> inseriti in fase di richiesta potranno accedere al portale.`,
         backActionLabel: 'Chiudi',
       },
       error: {
@@ -164,18 +165,11 @@ export default {
     description: 'Impossibile individuare il prodotto desiderato',
   },
   onboarding: {
-    steps: {
-      privacyLabel: 'Accetta privacy',
-      selectPartyLabel: "Seleziona l'ente",
-      verifyPartyLabel: 'Verifica ente',
-      insertlegalLabel: 'Inserisci i dati del rappresentante legale',
-      insertAdministratorLabel: 'Inserisci i dati degli amministratori',
-    },
     outcomeContent: {
       success: {
         title: 'La tua richiesta è stata inviata <1/> con successo',
         description:
-          "Riceverai una PEC all’indirizzo istituzionale dell’Ente. <1 /> Al suo interno troverai le istruzioni per completare l'adesione.",
+          "Riceverai una PEC all’indirizzo istituzionale che hai indicato. <1 /> Al suo interno troverai le istruzioni per completare <3 />l'adesione.",
         backActionLabel: 'Chiudi',
       },
       error: {
@@ -194,6 +188,82 @@ export default {
     loading: {
       loadingText: 'Stiamo verificando i tuoi dati',
     },
+  },
+  onBoardingSubProduct: {
+    alreadyOnboardedError: {
+      title: 'Sottoscrizione già avvenuta',
+      message: "L'ente che hai selezionato ha già sottoscritto l'offerta <1 />Premium.",
+      closeButton: 'Chiudi',
+    },
+    notBasicProductError: {
+      title: "L'ente non ha aderito a {{selectedProduct}}",
+      message:
+        "Per poter sottoscrivere l'offerta Premium, l'ente che hai <1 />selezionato deve prima aderire al prodotto {{selectedProduct}}",
+      adhesionButton: 'Aderisci',
+    },
+    selectUserPartyStep: {
+      title: "Seleziona l'ente",
+      subTitle:
+        "Seleziona l'ente per il quale stai richiedendo la sottoscrizione <1 />all'offerta Premium",
+      helperLink: 'Non lo trovi? <1>Registra un nuovo ente</1>',
+      confirmButton: 'Conferma',
+    },
+    genericError: {
+      title: 'Richiesta di adesione premium in errore',
+      subTitle:
+        'A causa di un errore del sistema non è possibile completare la procedura.<0 /> Ti chiediamo di riprovare più tardi.',
+      homeButton: 'Torna alla home',
+    },
+    successfulAdhesion: {
+      title: 'La tua richiesta è stata inviata <1 /> con successo',
+      message:
+        "Riceverai una PEC all’indirizzo istituzionale dell’ente.<1 />Al suo interno troverai le istruzioni per completare la <3 /> sottoscrizione all'offerta Premium.",
+      closeButton: 'Chiudi',
+    },
+    billingData: {
+      subTitle:
+        'Conferma, modifica o inserisci i dati richiesti, assicurandoti che siano corretti. Verranno usati anche per richiedere l’adesione ad altri prodotti e in caso di fatturazione',
+    },
+    exitModal: {
+      title: 'Vuoi davvero uscire?',
+      message: 'Se esci, la richiesta di adesione andrà persa.',
+      backButton: 'Esci',
+      cancelButton: 'Annulla',
+    },
+    loading: {
+      loadingText: 'Stiamo verificando i tuoi dati',
+    },
+  },
+  stepInstitutionType: {
+    title: 'Seleziona il tipo di ente che <1/> rappresenti',
+    institutionTypeValues: {
+      pa: 'Pubblica Amministrazione',
+      gsp: 'Gestore di servizi pubblici',
+      scp: 'Società a controllo pubblico',
+      pt: 'Partner tecnologico',
+    },
+    cadArticle2: 'art. 2, comma 2, lett. a del CAD',
+    cadArticle6:
+      'par. 6 delle “Linee Guida sul punto di accesso telematico ai servizi della Pubblica Amministrazione” ( art. 64bis del CAD)',
+    backLabel: 'Indietro',
+    confirmLabel: 'Conferma',
+  },
+  stepBillingData: {
+    title: 'Indica i dati del tuo ente',
+    invalidFiscalCode: 'Codice fiscale non valido',
+    invalidVatNumber: 'Partita IVA non valida',
+    invalidEmail: 'L’indirizzo email non è valido',
+    businessName: 'Ragione sociale',
+    registeredOffice: 'Sede legale',
+    digitalAddress: 'Indirizzo PEC',
+    taxCodeNotEquals2PIVAdescription: 'La Partita IVA non coincide con il Codice fiscale',
+    taxCode: 'Codice fiscale',
+    vatNumber: 'Partita IVA',
+    recipientCode: 'Codice destinatario',
+    recipientCodeDescription: 'È il codice necessario per ricevere le fatture elettroniche',
+    gspDescription: 'Sono gestore di almeno uno dei pubblici servizi: Gas, Energia, Telco.',
+    backLabel: 'Indietro',
+    confirmLabel: 'Conferma',
   },
   rejectRegistration: {
     outcomeContent: {
