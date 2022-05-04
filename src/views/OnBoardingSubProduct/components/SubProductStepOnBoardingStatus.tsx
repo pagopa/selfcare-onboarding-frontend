@@ -189,7 +189,7 @@ export function SubProductStepOnBoardingStatus({
 
   const checkSubProduct = async (): Promise<boolean> => {
     const onboardingSubProductStatus = await fetchWithLogs(
-      { endpoint: 'VERIFY_ONBOARDING', endpointParams: { institutionId, subProductId } },
+      { endpoint: 'VERIFY_ONBOARDING', endpointParams: { institutionId, productId: subProductId } },
       { method: 'HEAD' },
       () => setRequiredLogin(true)
     );
