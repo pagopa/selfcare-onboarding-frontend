@@ -60,8 +60,9 @@ const handleSearchUserParties = async (
         urlLogo: buildUrlLog(p.institutionId),
       }))
     );
+  } else {
+    setParties([]);
   }
-  setParties([]);
 };
 
 function SubProductStepVerifyInputs({
