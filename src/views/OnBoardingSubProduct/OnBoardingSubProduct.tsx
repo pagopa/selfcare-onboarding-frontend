@@ -199,7 +199,7 @@ function OnBoardingSubProduct() {
           ),
           product: subProduct,
           forward: (_: any, party: Party) => forwardWithInstitution(party, false),
-          back,
+          back: parties.length > 0 ? back : undefined,
         }),
     },
     {
