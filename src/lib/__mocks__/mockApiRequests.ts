@@ -123,7 +123,8 @@ const mockedParties: Array<SelfcareParty> = [
   {
     externalId: 'onboarded_externalId',
     originId: 'onboarded_originId',
-    partyId: 'onboarded_partyId',
+    id: 'onboarded_partyId',
+
     description: 'onboarded',
     urlLogo: 'logo',
     address: 'address',
