@@ -39,8 +39,8 @@ const checkProduct = async (
   }
 };
 
-const buildUrlLog = (institutionId: string) =>
-  `${ENV.URL_INSTITUTION_LOGO.PREFIX}${institutionId}${ENV.URL_INSTITUTION_LOGO.SUFFIX}`;
+const buildUrlLog = (externalInstitutionId: string) =>
+  `${ENV.URL_INSTITUTION_LOGO.PREFIX}${externalInstitutionId}${ENV.URL_INSTITUTION_LOGO.SUFFIX}`;
 
 const handleSearchUserParties = async (
   setParties: (parties: Array<SelfcareParty>) => void,

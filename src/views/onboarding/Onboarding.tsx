@@ -208,7 +208,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
         OnboardingStep1_5({
           product: selectedProduct,
           forward,
-          institutionId: externalInstitutionId,
+          externalInstitutionId,
           productId,
         }),
     },
@@ -216,7 +216,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
       label: 'Get Onboarding Data',
       Component: () =>
         StepOnboardingData({
-          institutionId: externalInstitutionId,
+          externalInstitutionId,
           productId,
           forward: forwardWithOnboardingData,
         }),
@@ -241,7 +241,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
       label: 'Insert Billing Data',
       Component: () =>
         StepBillingData({
-          institutionId: externalInstitutionId,
+          externalInstitutionId,
           initialFormData: billingData ?? {
             businessName: '',
             registeredOffice: '',

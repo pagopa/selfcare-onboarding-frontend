@@ -17,14 +17,14 @@ type Props = {
   subTitle: string | ReactElement;
 } & StepperStepComponentProps;
 
-const handleSearchInstitutionId = async (
-  institutionId: string,
+const handleSearchExternalId = async (
+  externalId: string,
   onRedirectToLogin: () => void
 ): Promise<IPACatalogParty | null> => {
   const searchResponse = await fetchWithLogs(
     {
       endpoint: 'ONBOARDING_GET_PARTY',
-      endpointParams: { institutionId },
+      endpointParams: { externalId },
     },
     { method: 'GET' },
     onRedirectToLogin
@@ -62,7 +62,7 @@ export function StepSearchParty({ subTitle, forward, back }: Props) {
 
   useEffect(() => {
     if (partyExternalId) {
-      handleSearchInstitutionId(partyExternalId, () => setRequiredLogin(true))
+      handleSearchExternalId(partyExternalId, () => setRequiredLogin(true))
         .then((ipaParty) => {
           if (ipaParty) {
             setSelected(ipaParty);

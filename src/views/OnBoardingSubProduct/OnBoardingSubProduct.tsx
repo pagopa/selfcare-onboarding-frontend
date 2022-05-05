@@ -208,7 +208,7 @@ function OnBoardingSubProduct() {
       label: 'Verify OnBoarding Status',
       Component: () =>
         SubProductStepOnBoardingStatus({
-          institutionId: externalInstitutionId,
+          externalInstitutionId,
           productId,
           productTitle: (product as Product).title,
           subProductId,
@@ -222,7 +222,7 @@ function OnBoardingSubProduct() {
       label: 'Get Onboarding Data',
       Component: () =>
         StepOnboardingData({
-          institutionId: externalInstitutionId,
+          externalInstitutionId,
           productId,
           forward: forwardWithOnboardingData,
         }),
@@ -231,7 +231,7 @@ function OnBoardingSubProduct() {
       label: 'Insert Billing Data',
       Component: () =>
         StepBillingData({
-          institutionId: externalInstitutionId,
+          externalInstitutionId,
           initialFormData: billingData ?? {
             businessName: '',
             registeredOffice: '',
@@ -278,7 +278,7 @@ function OnBoardingSubProduct() {
           requestId: requestIdRef.current,
           product: product as Product,
           subProduct: subProduct as Product,
-          institutionId: externalInstitutionId,
+          externalInstitutionId,
           users: [manager as UserOnCreate],
           billingData: billingData as BillingData,
           institutionType: institutionType as InstitutionType,

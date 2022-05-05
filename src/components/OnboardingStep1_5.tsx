@@ -13,7 +13,7 @@ import { LoadingOverlay } from './LoadingOverlay';
 import { MessageNoAction } from './MessageNoAction';
 
 type Props = StepperStepComponentProps & {
-  institutionId: string;
+  externalInstitutionId: string;
   productId: string;
 };
 
@@ -92,7 +92,7 @@ const genericError: RequestOutcomeMessage = {
 };
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
-export function OnboardingStep1_5({ forward, institutionId, productId }: Props) {
+export function OnboardingStep1_5({ forward, externalInstitutionId, productId }: Props) {
   const [loading, setLoading] = useState(true);
   const [outcome, setOutcome] = useState<RequestOutcomeMessage | null>();
   const { setOnLogout } = useContext(HeaderContext);
@@ -103,7 +103,7 @@ export function OnboardingStep1_5({ forward, institutionId, productId }: Props) 
     setLoading(true);
 
     const onboardingStatus = await fetchWithLogs(
-      { endpoint: 'VERIFY_ONBOARDING', endpointParams: { institutionId, productId } },
+      { endpoint: 'VERIFY_ONBOARDING', endpointParams: { externalInstitutionId, productId } },
       { method: 'HEAD' },
       () => setRequiredLogin(true)
     );

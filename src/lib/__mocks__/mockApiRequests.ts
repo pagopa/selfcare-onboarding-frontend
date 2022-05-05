@@ -208,7 +208,7 @@ export async function mockFetch(
   }
 
   if (endpoint === 'VERIFY_ONBOARDING') {
-    switch (endpointParams.institutionId) {
+    switch (endpointParams.externalId) {
       case 'infoError':
         return genericError;
       case 'onboarded':
@@ -254,7 +254,7 @@ export async function mockFetch(
   }
 
   if (endpoint === 'ONBOARDING_GET_ONBOARDING_DATA') {
-    switch (endpointParams.institutionId) {
+    switch (endpointParams.externalId) {
       case '0':
         return new Promise((resolve) =>
           resolve({ data: mockedOnboardingData0, status: 200, statusText: '200' } as AxiosResponse)
@@ -288,7 +288,7 @@ export async function mockFetch(
     }
   }
   if (endpoint === 'ONBOARDING_POST_LEGALS') {
-    switch (endpointParams.institutionId) {
+    switch (endpointParams.externalId) {
       case 'error':
         return genericError;
       default:
@@ -299,7 +299,7 @@ export async function mockFetch(
   }
 
   if (endpoint === 'ONBOARDING_GET_PARTY') {
-    const fetched = mockPartyRegistry.items.find((p) => p.id === endpointParams.institutionId);
+    const fetched = mockPartyRegistry.items.find((p) => p.id === endpointParams.externalId);
     if (fetched) {
       return new Promise((resolve) =>
         resolve({ data: fetched, status: 200, statusText: '200' } as AxiosResponse)

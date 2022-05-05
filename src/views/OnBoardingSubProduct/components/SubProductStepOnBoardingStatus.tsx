@@ -18,7 +18,7 @@ import { ReactComponent as SubscribedIcon } from '../../../assets/already-onboar
 import { unregisterUnloadEvent } from '../../../utils/unloadEvent-utils';
 
 type Props = StepperStepComponentProps & {
-  institutionId: string;
+  externalInstitutionId: string;
   productId: string;
   subProductId: string;
   productTitle: string;
@@ -155,7 +155,7 @@ const genericError: RequestOutcomeMessage = {
 // eslint-disable-next-line sonarjs/cognitive-complexity
 export function SubProductStepOnBoardingStatus({
   forward,
-  institutionId,
+  externalInstitutionId,
   productId,
   subProductId,
   productTitle,
@@ -170,7 +170,7 @@ export function SubProductStepOnBoardingStatus({
 
   const checkProduct = async (): Promise<boolean> => {
     const onboardingProductStatus = await fetchWithLogs(
-      { endpoint: 'VERIFY_ONBOARDING', endpointParams: { institutionId, productId } },
+      { endpoint: 'VERIFY_ONBOARDING', endpointParams: { externalInstitutionId, productId } },
       { method: 'HEAD' },
       () => setRequiredLogin(true)
     );
@@ -189,7 +189,10 @@ export function SubProductStepOnBoardingStatus({
 
   const checkSubProduct = async (): Promise<boolean> => {
     const onboardingSubProductStatus = await fetchWithLogs(
-      { endpoint: 'VERIFY_ONBOARDING', endpointParams: { institutionId, productId: subProductId } },
+      {
+        endpoint: 'VERIFY_ONBOARDING',
+        endpointParams: { externalInstitutionId, productId: subProductId },
+      },
       { method: 'HEAD' },
       () => setRequiredLogin(true)
     );
