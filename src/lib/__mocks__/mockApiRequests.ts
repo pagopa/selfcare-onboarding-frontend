@@ -293,7 +293,8 @@ export async function mockFetch(
     }
   }
   if (endpoint === 'ONBOARDING_POST_LEGALS') {
-    switch (endpointParams.externalId) {
+    switch (endpointParams.externalInstitutionId) {
+
       case 'error':
         return genericError;
       default:
