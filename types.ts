@@ -64,6 +64,7 @@ export type IPACatalogParty = {
   id: string;
   o: string;
   origin: string;
+  originId: string;
   taxCode: string;
   zipCode: string;
 };
