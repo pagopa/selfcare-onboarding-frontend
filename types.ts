@@ -111,7 +111,10 @@ export interface PersonInfo {
 }
 
 export interface OnboardingData {
+  id: string;
   externalId: string;
+  originId: string;
+  institutionType?: string;
   description: string;
   taxCode: string;
   digitalAddress: string;
