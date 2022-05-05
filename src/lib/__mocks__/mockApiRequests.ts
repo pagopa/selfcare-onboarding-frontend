@@ -98,12 +98,11 @@ const mockedParties: Array<SelfcareParty> = [
     externalId: 'externalId1',
     originId: 'originId1',
     id: 'partyId1',
-
     description: 'Comune di Milano',
     urlLogo: 'logo',
     address: 'address',
     digitalAddress: 'a@aa.com',
-    taxCode: 'taxCode',
+    taxCode: '33344455567',
     zipCode: 'zipCode',
     origin: 'IPA',
   },
@@ -111,12 +110,11 @@ const mockedParties: Array<SelfcareParty> = [
     externalId: 'externalId2',
     originId: 'originId2',
     id: 'partyId2',
-
     description: 'Comune di Bollate',
     urlLogo: 'logo',
     address: 'address',
     digitalAddress: 'a@aa.com',
-    taxCode: 'taxCode',
+    taxCode: '11122233345',
     zipCode: 'zipCode',
     origin: 'IPA',
   },
@@ -124,12 +122,11 @@ const mockedParties: Array<SelfcareParty> = [
     externalId: 'onboarded_externalId',
     originId: 'onboarded_originId',
     id: 'onboarded_partyId',
-
     description: 'onboarded',
     urlLogo: 'logo',
     address: 'address',
     digitalAddress: 'a@aa.com',
-    taxCode: 'taxCode',
+    taxCode: 'BBBBBB22B22B234K',
     zipCode: 'zipCode',
     origin: 'IPA',
   },
@@ -212,7 +209,6 @@ export async function mockFetch(
 
   if (endpoint === 'VERIFY_ONBOARDING') {
     switch (endpointParams.externalInstitutionId) {
-
       case 'infoError':
         return genericError;
       case 'onboarded':
@@ -224,8 +220,8 @@ export async function mockFetch(
         );
       case 'pending':
         return notFoundError;
-      case '0':
-      case '1':
+      case 'externalId1':
+      case 'externalId2':
         if (endpointParams.productId === 'prod-io') {
           // eslint-disable-next-line sonarjs/no-identical-functions
           return new Promise((resolve) =>
@@ -259,12 +255,11 @@ export async function mockFetch(
 
   if (endpoint === 'ONBOARDING_GET_ONBOARDING_DATA') {
     switch (endpointParams.externalInstitutionId) {
-
-      case '0':
+      case 'externalId1':
         return new Promise((resolve) =>
           resolve({ data: mockedOnboardingData0, status: 200, statusText: '200' } as AxiosResponse)
         );
-      case '1':
+      case 'externalId2':
         return new Promise((resolve) =>
           resolve({ data: mockedOnboardingData1, status: 200, statusText: '200' } as AxiosResponse)
         );
@@ -294,7 +289,6 @@ export async function mockFetch(
   }
   if (endpoint === 'ONBOARDING_POST_LEGALS') {
     switch (endpointParams.externalInstitutionId) {
-
       case 'error':
         return genericError;
       default:
@@ -305,7 +299,9 @@ export async function mockFetch(
   }
 
   if (endpoint === 'ONBOARDING_GET_PARTY') {
-    const fetched = mockPartyRegistry.items.find((p) => p.id === endpointParams.externalInstitutionId);
+    const fetched = mockPartyRegistry.items.find(
+      (p) => p.id === endpointParams.externalInstitutionId
+    );
 
     if (fetched) {
       return new Promise((resolve) =>

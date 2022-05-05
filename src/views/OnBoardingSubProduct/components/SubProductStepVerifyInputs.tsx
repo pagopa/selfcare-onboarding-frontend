@@ -57,7 +57,7 @@ const handleSearchUserParties = async (
     setParties(
       ((searchResponse as AxiosResponse).data as Array<SelfcareParty>).map((p) => ({
         ...p,
-        urlLogo: buildUrlLog(p.partyId),
+        urlLogo: buildUrlLog(p.id),
       }))
     );
   } else {
