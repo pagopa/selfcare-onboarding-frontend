@@ -258,7 +258,8 @@ export async function mockFetch(
   }
 
   if (endpoint === 'ONBOARDING_GET_ONBOARDING_DATA') {
-    switch (endpointParams.externalId) {
+    switch (endpointParams.externalInstitutionId) {
+
       case '0':
         return new Promise((resolve) =>
           resolve({ data: mockedOnboardingData0, status: 200, statusText: '200' } as AxiosResponse)
