@@ -61,8 +61,8 @@ export function StepSearchParty({ subTitle, forward, back }: Props) {
   const bodyTitle = t('onboardingStep1.onboarding.bodyTitle');
 
   useEffect(() => {
-    if (partyExternalId) {
-      handleSearchExternalId(partyExternalId, () => setRequiredLogin(true))
+    if (partyExternalIdByQuery) {
+      handleSearchExternalId(partyExternalIdByQuery, () => setRequiredLogin(true))
         .then((ipaParty) => {
           if (ipaParty) {
             setSelected(ipaParty);
