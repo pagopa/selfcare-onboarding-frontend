@@ -156,9 +156,10 @@ export type Product = {
 };
 
 export type SelfcareParty = {
-  partyId: string;
+  id: string;
   originId: string;
   externalId: string;
+  institutionType?: string;
   description: string;
   urlLogo?: string;
   address: string;
