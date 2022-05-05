@@ -40,7 +40,7 @@ const handleSearchExternalId = async (
 };
 
 export function StepSearchParty({ subTitle, forward, back }: Props) {
-  const partyExternalId = new URLSearchParams(window.location.search).get('partyExternalId');
+  const partyExternalIdByQuery = new URLSearchParams(window.location.search).get('partyExternalId');
   const { setRequiredLogin } = useContext(UserContext);
   const theme = useTheme();
 
