@@ -44,7 +44,7 @@ export function StepSearchParty({ subTitle, forward, back }: Props) {
   const { setRequiredLogin } = useContext(UserContext);
   const theme = useTheme();
 
-  const [loading, setLoading] = useState(!!partyExternalId);
+  const [loading, setLoading] = useState(!!partyExternalIdByQuery);
   const [selected, setSelected, setSelectedHistory] = useHistoryState<IPACatalogParty | null>(
     'selected_step1',
     null
