@@ -93,28 +93,28 @@ const stepAddManagerTitle = 'Indica il Legale rappresentante';
 const successOnboardingSubProductTitle = 'La tua richiesta è stata inviata con successo';
 const errorOnboardingSubProductTitle = 'Richiesta di adesione premium in errore';
 
-test.skip('test already subscribed to premium', async () => {
+test('test already subscribed to premium', async () => {
   renderComponent('prod-io', 'prod-io-premium');
   await executeStepSelectInstitutionUnreleated('agency onboarded');
   await waitFor(() => screen.getByText('Sottoscrizione già avvenuta'));
   await executeClickCloseButton();
 });
 
-test.skip('test not base product adhesion', async () => {
+test('test not base product adhesion', async () => {
   renderComponent('prod-io', 'prod-io-premium');
   await executeStepSelectInstitutionUnreleated('agency pending');
   await waitFor(() => screen.getByText('Errore'));
   await executeClickAdhesionButton();
 });
 
-test.skip('test error retrieving onboarding info', async () => {
+test('test error retrieving onboarding info', async () => {
   renderComponent('prod-io', 'prod-io-premium');
   await executeStepSelectInstitutionUnreleated('agency info error');
   await waitFor(() => screen.getByText('Spiacenti, qualcosa è andato storto.'));
   await executeClickCloseButton();
 });
 
-test.skip('test error subProductID', async () => {
+test('test error subProductID', async () => {
   renderComponent('error', 'error');
   await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(3));
   await waitFor(() => screen.getByText('Impossibile individuare il prodotto desiderato'));
@@ -136,7 +136,7 @@ test('test complete with error on submit', async () => {
   await executeClickHomeButton();
 });
 
-test.skip('test exiting during flow with unload event', async () => {
+test('test exiting during flow with unload event', async () => {
   renderComponent('prod-io', 'prod-io-premium');
   await executeStepSelectInstitutionUnreleated('agency x');
   const event = new Event('beforeunload');
@@ -148,7 +148,7 @@ test.skip('test exiting during flow with unload event', async () => {
   );
 });
 
-test.skip('test exiting during flow with logout', async () => {
+test('test exiting during flow with logout', async () => {
   renderComponent('prod-io', 'prod-io-premium');
   await executeStepSelectInstitutionReleated('Comune di Milano');
 
