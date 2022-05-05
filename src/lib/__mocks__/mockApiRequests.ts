@@ -305,7 +305,8 @@ export async function mockFetch(
   }
 
   if (endpoint === 'ONBOARDING_GET_PARTY') {
-    const fetched = mockPartyRegistry.items.find((p) => p.id === endpointParams.externalId);
+    const fetched = mockPartyRegistry.items.find((p) => p.id === endpointParams.externalInstitutionId);
+
     if (fetched) {
       return new Promise((resolve) =>
         resolve({ data: fetched, status: 200, statusText: '200' } as AxiosResponse)
