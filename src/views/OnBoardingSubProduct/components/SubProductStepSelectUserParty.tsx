@@ -12,7 +12,7 @@ type Props = {
 } & StepperStepComponentProps;
 
 export function SubProductStepSelectUserParty({ forward, parties }: Props) {
-  const partyExternalId = new URLSearchParams(window.location.search).get('partyExternalId');
+  const partyExternalIdByQuery = new URLSearchParams(window.location.search).get('partyExternalId');
 
   const { t } = useTranslation();
 
