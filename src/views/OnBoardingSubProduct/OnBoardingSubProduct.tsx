@@ -262,7 +262,7 @@ function OnBoardingSubProduct() {
           product: subProduct,
           forward: forwardWithManagerData,
           back: () => {
-            if (window.location.search.indexOf(`institutionId=${externalInstitutionId}`) > -1) {
+            if (window.location.search.indexOf(`partyExternalId=${externalInstitutionId}`) > -1) {
               setOpenExitUrl(`${ENV.URL_FE.DASHBOARD}/${externalInstitutionId}`);
               setOpenExitModal(true);
             } else {
