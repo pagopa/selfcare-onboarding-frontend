@@ -39,7 +39,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
   const [loading, setLoading] = useState(true);
   const [activeStep, setActiveStep] = useState(0);
   const [formData, setFormData] = useState<Partial<FormData>>();
-  const [institutionId, setInstitutionId] = useState<string>('');
+  const [externalInstitutionId, setExternalInstitutionId] = useState<string>('');
   const [outcome, setOutcome] = useState<RequestOutcome>();
   const history = useHistory();
   const [openExitModal, setOpenExitModal] = useState(false);
@@ -66,7 +66,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
 
   useEffect(() => {
     // eslint-disable-next-line functional/immutable-data
-    requestIdRef.current = uniqueId(`onboarding-${institutionId}-${productId}-`);
+    requestIdRef.current = uniqueId(`onboarding-${externalInstitutionId}-${productId}-`);
     void checkProductId().finally(() => {
       setLoading(false);
     });
@@ -107,7 +107,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
   };
 
   const forwardWithDataAndInstitution = (newFormData: Partial<FormData>, party: Party) => {
-    setInstitutionId(party.institutionId);
+    setExternalInstitutionId(party.externalId);
     setOrigin(party.origin);
     setBillingData({
       businessName: party.description,
@@ -115,11 +115,11 @@ function OnboardingComponent({ productId }: { productId: string }) {
       digitalAddress: party.digitalAddress,
       taxCode: party.taxCode,
       vatNumber: party.taxCode,
-      recipientCode: party.origin === 'IPA' ? party.institutionId : '',
+      recipientCode: party.origin === 'IPA' ? party.originId : '',
     });
     forwardWithData(newFormData);
     trackEvent('ONBOARDING_SELEZIONE_ENTE', {
-      party_id: institutionId,
+      party_id: externalInstitutionId,
       request_id: requestIdRef.current,
       product_id: productId,
     });
@@ -127,7 +127,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
 
   const forwardWithBillingData = (newBillingData: BillingData) => {
     trackEvent('ONBOARDING_DATI_FATTURAZIONE', {
-      party_id: institutionId,
+      party_id: externalInstitutionId,
       request_id: requestIdRef.current,
     });
     setBillingData(newBillingData);
@@ -138,7 +138,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
     setLoading(true);
 
     const postLegalsResponse = await fetchWithLogs(
-      { endpoint: 'ONBOARDING_POST_LEGALS', endpointParams: { institutionId, productId } },
+      { endpoint: 'ONBOARDING_POST_LEGALS', endpointParams: { externalInstitutionId, productId } },
       { method: 'POST', data: { billingData, institutionType, origin, users } },
       () => setRequiredLogin(true)
     );
@@ -152,13 +152,13 @@ function OnboardingComponent({ productId }: { productId: string }) {
 
     if (outcome === 'success') {
       trackEvent('ONBOARDING_SEND_SUCCESS', {
-        party_id: institutionId,
+        party_id: externalInstitutionId,
         request_id: requestIdRef.current,
         product_id: productId,
       });
     } else if (outcome === 'error') {
       trackEvent('ONBOARDING_SEND_FAILURE', {
-        party_id: institutionId,
+        party_id: externalInstitutionId,
         request_id: requestIdRef.current,
         product_id: productId,
       });
@@ -179,7 +179,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
 
   const forwardWithInstitutionType = (newInstitutionType: InstitutionType) => {
     trackEvent('ONBOARDING_TIPO_ENTE', {
-      party_id: institutionId,
+      party_id: externalInstitutionId,
       request_id: requestIdRef.current,
     });
     setInstitutionType(newInstitutionType);
@@ -205,13 +205,18 @@ function OnboardingComponent({ productId }: { productId: string }) {
     {
       label: 'Verifica ente',
       Component: () =>
-        OnboardingStep1_5({ product: selectedProduct, forward, institutionId, productId }),
+        OnboardingStep1_5({
+          product: selectedProduct,
+          forward,
+          institutionId: externalInstitutionId,
+          productId,
+        }),
     },
     {
       label: 'Get Onboarding Data',
       Component: () =>
         StepOnboardingData({
-          institutionId,
+          institutionId: externalInstitutionId,
           productId,
           forward: forwardWithOnboardingData,
         }),
@@ -223,8 +228,8 @@ function OnboardingComponent({ productId }: { productId: string }) {
           institutionType: institutionType as InstitutionType,
           forward: forwardWithInstitutionType,
           back: () => {
-            if (window.location.search.indexOf(`institutionId=${institutionId}`) > -1) {
-              setOpenExitUrl(`${ENV.URL_FE.DASHBOARD}/${institutionId}`);
+            if (window.location.search.indexOf(`partyExternalId=${externalInstitutionId}`) > -1) {
+              setOpenExitUrl(`${ENV.URL_FE.DASHBOARD}/${externalInstitutionId}`);
               setOpenExitModal(true);
             } else {
               setActiveStep(0);
@@ -236,7 +241,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
       label: 'Insert Billing Data',
       Component: () =>
         StepBillingData({
-          institutionId,
+          institutionId: externalInstitutionId,
           initialFormData: billingData ?? {
             businessName: '',
             registeredOffice: '',
@@ -260,7 +265,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
           product: selectedProduct,
           forward: (newFormData: Partial<FormData>) => {
             trackEvent('ONBOARDING_LEGALE_RAPPRESENTANTE', {
-              party_id: institutionId,
+              party_id: externalInstitutionId,
               request_id: requestIdRef.current,
             });
             forwardWithData(newFormData);
@@ -277,13 +282,13 @@ function OnboardingComponent({ productId }: { productId: string }) {
           forward: (newFormData: Partial<FormData>) => {
             setFormData({ ...formData, ...newFormData });
             trackEvent('ONBOARDING_REFERENTE_AMMINISTRATIVO', {
-              party_id: institutionId,
+              party_id: externalInstitutionId,
               request_id: requestIdRef.current,
               product_id: productId,
             });
             submit((newFormData as any).users).catch(() => {
               trackEvent('ONBOARDING_REFERENTE_AMMINISTRATIVO', {
-                party_id: institutionId,
+                party_id: externalInstitutionId,
                 request_id: requestIdRef.current,
                 product_id: productId,
               });

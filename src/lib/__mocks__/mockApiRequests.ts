@@ -95,7 +95,9 @@ const mockedSubProduct = {
 
 const mockedParties: Array<SelfcareParty> = [
   {
-    institutionId: '0',
+    externalId: 'externalId1',
+    originId: 'originId1',
+    partyId: 'partyId1',
     description: 'Comune di Milano',
     urlLogo: 'logo',
     address: 'address',
@@ -105,7 +107,9 @@ const mockedParties: Array<SelfcareParty> = [
     origin: 'IPA',
   },
   {
-    institutionId: '1',
+    externalId: 'externalId2',
+    originId: 'originId2',
+    partyId: 'partyId2',
     description: 'Comune di Bollate',
     urlLogo: 'logo',
     address: 'address',
@@ -115,7 +119,9 @@ const mockedParties: Array<SelfcareParty> = [
     origin: 'IPA',
   },
   {
-    institutionId: 'onboarded',
+    externalId: 'onboarded_externalId',
+    originId: 'onboarded_originId',
+    partyId: 'onboarded_partyId',
     description: 'onboarded',
     urlLogo: 'logo',
     address: 'address',

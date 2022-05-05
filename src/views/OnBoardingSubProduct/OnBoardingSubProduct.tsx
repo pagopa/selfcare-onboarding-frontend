@@ -46,7 +46,7 @@ function OnBoardingSubProduct() {
   const [product, setProduct] = useState<Product>();
   const [parties, setParties] = useState<Array<SelfcareParty>>([]);
 
-  const [institutionId, setInstitutionId] = useState<string>('');
+  const [externalInstitutionId, setExternalInstitutionId] = useState<string>('');
   const [origin, setOrigin] = useState<string>('');
 
   const [manager, setManager] = useState<UserOnCreate>();
@@ -76,7 +76,9 @@ function OnBoardingSubProduct() {
 
   useEffect(() => {
     // eslint-disable-next-line functional/immutable-data
-    requestIdRef.current = uniqueId(`onboarding-${institutionId}-${productId}-${subProductId}-`);
+    requestIdRef.current = uniqueId(
+      `onboarding-${externalInstitutionId}-${productId}-${subProductId}-`
+    );
   }, [productId, subProductId]);
 
   const chooseFromMyParties = useRef(true);
@@ -104,7 +106,7 @@ function OnBoardingSubProduct() {
 
   const forwardWithBillingData = (newBillingData: BillingData) => {
     trackEvent('ONBOARDING_DATI_FATTURAZIONE', {
-      party_id: institutionId,
+      party_id: externalInstitutionId,
       request_id: requestIdRef.current,
     });
     setBillingData(newBillingData);
@@ -114,14 +116,14 @@ function OnBoardingSubProduct() {
   const forwardWithManagerData = (formData: any) => {
     setManager(formData.users[0]);
     trackEvent('ONBOARDING_LEGALE_RAPPRESENTANTE', {
-      party_id: institutionId,
+      party_id: externalInstitutionId,
       request_id: requestIdRef.current,
     });
     forward();
   };
 
   const forwardWithInstitution = (party: Party, isUserParty: boolean) => {
-    setInstitutionId(party.institutionId);
+    setExternalInstitutionId(party.externalId);
     setOrigin(party.origin);
     setBillingData({
       businessName: party.description,
@@ -129,10 +131,10 @@ function OnBoardingSubProduct() {
       digitalAddress: party.digitalAddress,
       taxCode: party.taxCode,
       vatNumber: party.taxCode,
-      recipientCode: party.origin === 'IPA' ? party.institutionId : '',
+      recipientCode: party.origin === 'IPA' ? party.originId : '',
     });
     trackEvent('ONBOARDING_SELEZIONE_ENTE', {
-      party_id: institutionId,
+      party_id: externalInstitutionId,
       request_id: requestIdRef.current,
       product_id: productId,
       subProduct_id: subProductId,
@@ -206,7 +208,7 @@ function OnBoardingSubProduct() {
       label: 'Verify OnBoarding Status',
       Component: () =>
         SubProductStepOnBoardingStatus({
-          institutionId,
+          institutionId: externalInstitutionId,
           productId,
           productTitle: (product as Product).title,
           subProductId,
@@ -220,7 +222,7 @@ function OnBoardingSubProduct() {
       label: 'Get Onboarding Data',
       Component: () =>
         StepOnboardingData({
-          institutionId,
+          institutionId: externalInstitutionId,
           productId,
           forward: forwardWithOnboardingData,
         }),
@@ -229,7 +231,7 @@ function OnBoardingSubProduct() {
       label: 'Insert Billing Data',
       Component: () =>
         StepBillingData({
-          institutionId,
+          institutionId: externalInstitutionId,
           initialFormData: billingData ?? {
             businessName: '',
             registeredOffice: '',
@@ -244,8 +246,8 @@ function OnBoardingSubProduct() {
           subtitle: t('onBoardingSubProduct.billingData.subTitle'),
           forward: forwardWithBillingData,
           back: () => {
-            if (window.location.search.indexOf(`institutionId=${institutionId}`) > -1) {
-              setOpenExitUrl(`${ENV.URL_FE.DASHBOARD}/${institutionId}`);
+            if (window.location.search.indexOf(`partyExternalId=${externalInstitutionId}`) > -1) {
+              setOpenExitUrl(`${ENV.URL_FE.DASHBOARD}/${externalInstitutionId}`);
               setOpenExitModal(true);
             } else {
               setActiveStep(chooseFromMyParties.current ? 1 : 2);
@@ -260,8 +262,8 @@ function OnBoardingSubProduct() {
           product: subProduct,
           forward: forwardWithManagerData,
           back: () => {
-            if (window.location.search.indexOf(`institutionId=${institutionId}`) > -1) {
-              setOpenExitUrl(`${ENV.URL_FE.DASHBOARD}/${institutionId}`);
+            if (window.location.search.indexOf(`institutionId=${externalInstitutionId}`) > -1) {
+              setOpenExitUrl(`${ENV.URL_FE.DASHBOARD}/${externalInstitutionId}`);
               setOpenExitModal(true);
             } else {
               back();
@@ -276,7 +278,7 @@ function OnBoardingSubProduct() {
           requestId: requestIdRef.current,
           product: product as Product,
           subProduct: subProduct as Product,
-          institutionId,
+          institutionId: externalInstitutionId,
           users: [manager as UserOnCreate],
           billingData: billingData as BillingData,
           institutionType: institutionType as InstitutionType,
