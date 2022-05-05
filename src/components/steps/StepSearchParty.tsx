@@ -24,7 +24,7 @@ const handleSearchExternalId = async (
   const searchResponse = await fetchWithLogs(
     {
       endpoint: 'ONBOARDING_GET_PARTY',
-      endpointParams: { externalId },
+      endpointParams: {externalInstitutionId},
     },
     { method: 'GET' },
     onRedirectToLogin
