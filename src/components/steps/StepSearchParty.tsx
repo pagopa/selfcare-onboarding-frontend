@@ -18,7 +18,7 @@ type Props = {
 } & StepperStepComponentProps;
 
 const handleSearchExternalId = async (
-  externalId: string,
+  externalInstitutionId: string,
   onRedirectToLogin: () => void
 ): Promise<IPACatalogParty | null> => {
   const searchResponse = await fetchWithLogs(
