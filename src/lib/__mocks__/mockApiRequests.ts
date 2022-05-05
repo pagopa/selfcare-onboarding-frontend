@@ -110,7 +110,8 @@ const mockedParties: Array<SelfcareParty> = [
   {
     externalId: 'externalId2',
     originId: 'originId2',
-    partyId: 'partyId2',
+    id: 'partyId2',
+
     description: 'Comune di Bollate',
     urlLogo: 'logo',
     address: 'address',
