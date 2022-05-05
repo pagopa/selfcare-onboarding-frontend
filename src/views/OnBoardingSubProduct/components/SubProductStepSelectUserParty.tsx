@@ -41,7 +41,7 @@ export function SubProductStepSelectUserParty({ forward, parties }: Props) {
 
   // callback of previous useEffect
   useEffect(() => {
-    if (partyExternalId && selected) {
+    if (partyExternalIdByQuery && selected) {
       onForwardAction();
     }
   }, [selected]);
