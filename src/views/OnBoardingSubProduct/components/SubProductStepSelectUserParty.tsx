@@ -29,8 +29,8 @@ export function SubProductStepSelectUserParty({ forward, parties }: Props) {
   const bodyTitle = t('onBoardingSubProduct.selectUserPartyStep.title');
 
   useEffect(() => {
-    if (partyExternalId) {
-      const selectedParty = parties.find((p) => p.externalId === partyExternalId);
+    if (partyExternalIdByQuery) {
+      const selectedParty = parties.find((p) => p.externalId === partyExternalIdByQuery);
       if (selectedParty) {
         setSelected(selectedParty);
       } else {
