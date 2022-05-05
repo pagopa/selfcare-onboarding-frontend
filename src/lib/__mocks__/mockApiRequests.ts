@@ -97,7 +97,8 @@ const mockedParties: Array<SelfcareParty> = [
   {
     externalId: 'externalId1',
     originId: 'originId1',
-    partyId: 'partyId1',
+    id: 'partyId1',
+
     description: 'Comune di Milano',
     urlLogo: 'logo',
     address: 'address',
