@@ -333,7 +333,6 @@ const fillUserBillingDataForm = async (
   fireEvent.change(document.getElementById(taxCodeInput), {
     target: { value: 'AAAAAA44D55F456K' },
   });
-  fireEvent.change(document.getElementById(vatNumber), { target: { value: '11122233345' } });
   fireEvent.change(document.getElementById(recipientCode), {
     target: { value: 'recipientCode' },
   });
