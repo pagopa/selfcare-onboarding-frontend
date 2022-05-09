@@ -55,7 +55,7 @@ export default function StepBillingData({
 
   useEffect(() => {
     if (externalInstitutionId !== stepHistoryState.externalInstitutionId) {
-      setStepHistoryState({ externalInstitutionId, isTaxCodeNotEquals2PIVA: true });
+      setStepHistoryState({ externalInstitutionId, isTaxCodeNotEquals2PIVA: false });
     }
   }, []);
 
@@ -213,14 +213,20 @@ export default function StepBillingData({
               </Grid>
               <Grid item xs={12}>
                 <CustomTextField
-                  {...baseTextFieldProps('taxCode', t('stepBillingData.taxCode'), 400, 18)}
+                  {...baseTextFieldProps(
+                    'taxCode',
+                    stepHistoryState.isTaxCodeNotEquals2PIVA
+                      ? t('stepBillingData.taxCode')
+                      : t('stepBillingData.taxCodeAndVatNumber'),
+                    400,
+                    18
+                  )}
                   disabled={ipa}
                 />
               </Grid>
               <Grid item xs={12}>
                 <Typography>
                   <Checkbox
-                    disabled={ipa}
                     checked={stepHistoryState.isTaxCodeNotEquals2PIVA}
                     onChange={() =>
                       setStepHistoryState({
@@ -236,7 +242,6 @@ export default function StepBillingData({
                 <Grid item xs={12}>
                   <CustomTextField
                     {...baseTextFieldProps('vatNumber', t('stepBillingData.vatNumber'), 400, 18)}
-                    disabled={ipa}
                   />
                 </Grid>
               )}

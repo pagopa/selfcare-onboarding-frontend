@@ -114,7 +114,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
       registeredOffice: party.address,
       digitalAddress: party.digitalAddress,
       taxCode: party.taxCode,
-      vatNumber: party.taxCode,
+      vatNumber: '',
       recipientCode: party.origin === 'IPA' ? party.originId : '',
     });
     forwardWithData(newFormData);
