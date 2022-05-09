@@ -258,6 +258,7 @@ export default {
     digitalAddress: 'Indirizzo PEC',
     taxCodeNotEquals2PIVAdescription: 'La Partita IVA non coincide con il Codice fiscale',
     taxCode: 'Codice fiscale',
+    taxCodeAndVatNumber: 'Codice fiscale / Partita IVA',
     vatNumber: 'Partita IVA',
     recipientCode: 'Codice destinatario',
     recipientCodeDescription: 'È il codice necessario per ricevere le fatture elettroniche',
