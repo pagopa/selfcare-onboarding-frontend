@@ -25,13 +25,13 @@ import { MessageNoAction } from '../../components/MessageNoAction';
 import { fetchWithLogs } from '../../lib/api-utils';
 import { getFetchOutcome } from '../../lib/error-utils';
 import { ENV } from '../../utils/env';
-import { OnboardingStep1_5 } from '../../components/OnboardingStep1_5';
 import { HeaderContext, UserContext } from '../../lib/context';
 import NoProductPage from '../NoProductPage';
 import StepOnboardingData from '../../components/steps/StepOnboardingData';
 import StepBillingData from '../../components/steps/StepBillingData';
 import { registerUnloadEvent, unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
 import StepInstitutionType from '../../components/steps/StepInstitutionType';
+import { OnboardingStep1_5 } from './components/OnboardingStep1_5';
 import { OnBoardingProductStepDelegates } from './components/OnBoardingProductStepDelegates';
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
@@ -47,6 +47,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
   const [openExitUrl, setOpenExitUrl] = useState(ENV.URL_FE.LOGOUT);
   const [billingData, setBillingData] = useState<BillingData>();
   const [institutionType, setInstitutionType] = useState<InstitutionType>();
+  const [partyId, setPartyId] = useState<string>();
   const [origin, setOrigin] = useState<string>('');
   const { setOnLogout } = useContext(HeaderContext);
   const { setRequiredLogin } = useContext(UserContext);
@@ -168,12 +169,14 @@ function OnboardingComponent({ productId }: { productId: string }) {
   const forwardWithOnboardingData = (
     _manager: BillingData,
     billingData?: BillingData,
-    institutionType?: InstitutionType
+    institutionType?: InstitutionType,
+    partyId?: string
   ) => {
     if (billingData) {
       setBillingData(billingData);
     }
     setInstitutionType(institutionType);
+    setPartyId(partyId);
     forward();
   };
 
@@ -229,7 +232,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
           forward: forwardWithInstitutionType,
           back: () => {
             if (window.location.search.indexOf(`partyExternalId=${externalInstitutionId}`) > -1) {
-              setOpenExitUrl(`${ENV.URL_FE.DASHBOARD}/${externalInstitutionId}`);
+              setOpenExitUrl(`${ENV.URL_FE.DASHBOARD}/${partyId}`);
               setOpenExitModal(true);
             } else {
               setActiveStep(0);

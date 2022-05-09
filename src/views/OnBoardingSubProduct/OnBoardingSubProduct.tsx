@@ -51,7 +51,8 @@ function OnBoardingSubProduct() {
 
   const [manager, setManager] = useState<UserOnCreate>();
   const [billingData, setBillingData] = useState<BillingData>();
-  const [institutionType, setinstitutionType] = useState<InstitutionType>();
+  const [institutionType, setInstitutionType] = useState<InstitutionType>();
+  const [partyId, setPartyId] = useState<string>();
   const [pricingPlan, setPricingPlan] = useState<string>('');
 
   const setStepAddManagerHistoryState = useHistoryState<UsersObject>('people_step2', {})[2];
@@ -147,7 +148,8 @@ function OnBoardingSubProduct() {
   const forwardWithOnboardingData = (
     manager?: UserOnCreate,
     billingData?: BillingData,
-    institutionType?: InstitutionType
+    institutionType?: InstitutionType,
+    partyId?: string
   ) => {
     setManager(manager);
     if (manager) {
@@ -158,7 +160,8 @@ function OnBoardingSubProduct() {
     if (billingData) {
       setBillingData(billingData);
     }
-    setinstitutionType(institutionType);
+    setInstitutionType(institutionType);
+    setPartyId(partyId);
     forward();
   };
 
@@ -247,7 +250,7 @@ function OnBoardingSubProduct() {
           forward: forwardWithBillingData,
           back: () => {
             if (window.location.search.indexOf(`partyExternalId=${externalInstitutionId}`) > -1) {
-              setOpenExitUrl(`${ENV.URL_FE.DASHBOARD}/${externalInstitutionId}`);
+              setOpenExitUrl(`${ENV.URL_FE.DASHBOARD}/${partyId}`);
               setOpenExitModal(true);
             } else {
               setActiveStep(chooseFromMyParties.current ? 1 : 2);

@@ -139,6 +139,7 @@ const mockedParties: Array<SelfcareParty> = [
 
 const mockedOnboardingData0: InstitutionOnboardingInfoResource = {
   institution: {
+    id: '55897f04-bafd-4bc9-b646-0fd027620c1b',
     billingData: {
       businessName: 'Comune di Milano',
       registeredOffice: 'Milano, Piazza Colonna 370, CAP 20021',
@@ -161,6 +162,7 @@ const mockedOnboardingData0: InstitutionOnboardingInfoResource = {
 
 const mockedOnboardingData1: InstitutionOnboardingInfoResource = {
   institution: {
+    id: '370c63d8-1b76-4376-a725-4caf2a73822a',
     billingData: {
       businessName: 'Comune di Bollate',
       registeredOffice: 'Bollate, Piazza Colonna 370, CAP 20021',

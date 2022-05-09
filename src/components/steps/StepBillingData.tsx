@@ -50,7 +50,7 @@ export default function StepBillingData({
   const [stepHistoryState, setStepHistoryState, setStepHistoryStateHistory] =
     useHistoryState<StepBillingDataHistoryState>('stepBillingData', {
       externalInstitutionId,
-      isTaxCodeNotEquals2PIVA: true,
+      isTaxCodeNotEquals2PIVA: false,
     });
 
   useEffect(() => {

@@ -3,14 +3,14 @@ import { AxiosError } from 'axios';
 import { useEffect, useState, useContext } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { IllusError } from '@pagopa/mui-italia';
-import { RequestOutcomeMessage, StepperStepComponentProps } from '../../types';
-import { fetchWithLogs } from '../lib/api-utils';
-import { ENV } from '../utils/env';
-import { getFetchOutcome } from '../lib/error-utils';
-import { HeaderContext, UserContext } from '../lib/context';
-import { unregisterUnloadEvent } from '../utils/unloadEvent-utils';
-import { LoadingOverlay } from './LoadingOverlay';
-import { MessageNoAction } from './MessageNoAction';
+import { RequestOutcomeMessage, StepperStepComponentProps } from '../../../../types';
+import { fetchWithLogs } from '../../../lib/api-utils';
+import { ENV } from '../../../utils/env';
+import { getFetchOutcome } from '../../../lib/error-utils';
+import { HeaderContext, UserContext } from '../../../lib/context';
+import { unregisterUnloadEvent } from '../../../utils/unloadEvent-utils';
+import { LoadingOverlay } from '../../../components/LoadingOverlay';
+import { MessageNoAction } from '../../../components/MessageNoAction';
 
 type Props = StepperStepComponentProps & {
   externalInstitutionId: string;

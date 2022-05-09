@@ -198,6 +198,7 @@ export type BillingData = {
 };
 
 export type InstitutionData = {
+  id: string;
   billingData: BillingData;
   institutionType: InstitutionType;
   origin: string;
