@@ -20,7 +20,7 @@ const fiscalAndVatCodeRegexp = new RegExp(
 );
 
 type StepBillingDataHistoryState = {
-  institutionId: string;
+  externalInstitutionId: string;
   isTaxCodeNotEquals2PIVA: boolean;
 };
 
@@ -28,7 +28,7 @@ type Props = StepperStepComponentProps & {
   initialFormData: BillingData;
   institutionType: InstitutionType;
   subtitle: string;
-  institutionId: string;
+  externalInstitutionId: string;
   origin: string;
 };
 
@@ -38,7 +38,7 @@ export default function StepBillingData({
   forward,
   subtitle,
   institutionType,
-  institutionId,
+  externalInstitutionId,
   origin,
 }: Props) {
   const requiredError = 'Required';
@@ -49,13 +49,13 @@ export default function StepBillingData({
 
   const [stepHistoryState, setStepHistoryState, setStepHistoryStateHistory] =
     useHistoryState<StepBillingDataHistoryState>('stepBillingData', {
-      institutionId,
+      externalInstitutionId,
       isTaxCodeNotEquals2PIVA: false,
     });
 
   useEffect(() => {
-    if (institutionId !== stepHistoryState.institutionId) {
-      setStepHistoryState({ institutionId, isTaxCodeNotEquals2PIVA: false });
+    if (externalInstitutionId !== stepHistoryState.externalInstitutionId) {
+      setStepHistoryState({ externalInstitutionId, isTaxCodeNotEquals2PIVA: false });
     }
   }, []);
 

@@ -64,6 +64,7 @@ export type IPACatalogParty = {
   id: string;
   o: string;
   origin: string;
+  originId: string;
   taxCode: string;
   zipCode: string;
 };
@@ -111,7 +112,10 @@ export interface PersonInfo {
 }
 
 export interface OnboardingData {
-  institutionId: string;
+  id: string;
+  externalId: string;
+  originId: string;
+  institutionType?: string;
   description: string;
   taxCode: string;
   digitalAddress: string;
@@ -153,7 +157,10 @@ export type Product = {
 };
 
 export type SelfcareParty = {
-  institutionId: string;
+  id: string;
+  originId: string;
+  externalId: string;
+  institutionType?: string;
   description: string;
   urlLogo?: string;
   address: string;
@@ -164,7 +171,8 @@ export type SelfcareParty = {
 };
 
 export type Party = {
-  institutionId: string;
+  originId: string;
+  externalId: string;
   address: string;
   description: string;
   digitalAddress: string;
@@ -190,6 +198,7 @@ export type BillingData = {
 };
 
 export type InstitutionData = {
+  id: string;
   billingData: BillingData;
   institutionType: InstitutionType;
   origin: string;

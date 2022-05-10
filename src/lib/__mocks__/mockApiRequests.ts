@@ -16,6 +16,7 @@ const mockPartyRegistry = {
       description: 'AGENCY X',
       digitalAddress: 'mail@pec.mail.org',
       origin: 'IPA',
+      originId: 'originId1',
       address: 'sede legale',
     },
     {
@@ -31,6 +32,7 @@ const mockPartyRegistry = {
       description: 'AGENCY ERROR',
       digitalAddress: 'mail_ERROR_@pec.mail.org',
       origin: 'IPA',
+      originId: 'originId2',
       address: 'sede legale',
     },
     {
@@ -46,6 +48,7 @@ const mockPartyRegistry = {
       description: 'AGENCY ONBOARDED',
       digitalAddress: 'mail_ONBOARDED_@pec.mail.org',
       origin: 'IPA',
+      originId: 'originId3',
       address: 'sede legale',
     },
     {
@@ -61,6 +64,7 @@ const mockPartyRegistry = {
       description: 'AGENCY PENDING',
       digitalAddress: 'mail_PENDING_@pec.mail.org',
       origin: 'IPA',
+      originId: 'originId4',
       address: 'sede legale',
     },
     {
@@ -76,6 +80,7 @@ const mockPartyRegistry = {
       description: 'AGENCY INFO ERROR',
       digitalAddress: 'mail_INFOERROR_@pec.mail.org',
       origin: 'IPA',
+      originId: 'originId5',
       address: 'sede legale',
     },
   ],
@@ -95,32 +100,38 @@ const mockedSubProduct = {
 
 const mockedParties: Array<SelfcareParty> = [
   {
-    institutionId: '0',
+    externalId: 'externalId1',
+    originId: 'originId1',
+    id: 'partyId1',
     description: 'Comune di Milano',
     urlLogo: 'logo',
     address: 'address',
     digitalAddress: 'a@aa.com',
-    taxCode: 'taxCode',
+    taxCode: '33344455567',
     zipCode: 'zipCode',
     origin: 'IPA',
   },
   {
-    institutionId: '1',
+    externalId: 'externalId2',
+    originId: 'originId2',
+    id: 'partyId2',
     description: 'Comune di Bollate',
     urlLogo: 'logo',
     address: 'address',
     digitalAddress: 'a@aa.com',
-    taxCode: 'taxCode',
+    taxCode: '11122233345',
     zipCode: 'zipCode',
     origin: 'IPA',
   },
   {
-    institutionId: 'onboarded',
+    externalId: 'onboarded_externalId',
+    originId: 'onboarded_originId',
+    id: 'onboarded_partyId',
     description: 'onboarded',
     urlLogo: 'logo',
     address: 'address',
     digitalAddress: 'a@aa.com',
-    taxCode: 'taxCode',
+    taxCode: 'BBBBBB22B22B234K',
     zipCode: 'zipCode',
     origin: 'IPA',
   },
@@ -128,6 +139,7 @@ const mockedParties: Array<SelfcareParty> = [
 
 const mockedOnboardingData0: InstitutionOnboardingInfoResource = {
   institution: {
+    id: '55897f04-bafd-4bc9-b646-0fd027620c1b',
     billingData: {
       businessName: 'Comune di Milano',
       registeredOffice: 'Milano, Piazza Colonna 370, CAP 20021',
@@ -150,6 +162,7 @@ const mockedOnboardingData0: InstitutionOnboardingInfoResource = {
 
 const mockedOnboardingData1: InstitutionOnboardingInfoResource = {
   institution: {
+    id: '370c63d8-1b76-4376-a725-4caf2a73822a',
     billingData: {
       businessName: 'Comune di Bollate',
       registeredOffice: 'Bollate, Piazza Colonna 370, CAP 20021',
@@ -202,7 +215,7 @@ export async function mockFetch(
   }
 
   if (endpoint === 'VERIFY_ONBOARDING') {
-    switch (endpointParams.institutionId) {
+    switch (endpointParams.externalInstitutionId) {
       case 'infoError':
         return genericError;
       case 'onboarded':
@@ -214,8 +227,8 @@ export async function mockFetch(
         );
       case 'pending':
         return notFoundError;
-      case '0':
-      case '1':
+      case 'externalId1':
+      case 'externalId2':
         if (endpointParams.productId === 'prod-io') {
           // eslint-disable-next-line sonarjs/no-identical-functions
           return new Promise((resolve) =>
@@ -248,12 +261,12 @@ export async function mockFetch(
   }
 
   if (endpoint === 'ONBOARDING_GET_ONBOARDING_DATA') {
-    switch (endpointParams.institutionId) {
-      case '0':
+    switch (endpointParams.externalInstitutionId) {
+      case 'externalId1':
         return new Promise((resolve) =>
           resolve({ data: mockedOnboardingData0, status: 200, statusText: '200' } as AxiosResponse)
         );
-      case '1':
+      case 'externalId2':
         return new Promise((resolve) =>
           resolve({ data: mockedOnboardingData1, status: 200, statusText: '200' } as AxiosResponse)
         );
@@ -282,7 +295,7 @@ export async function mockFetch(
     }
   }
   if (endpoint === 'ONBOARDING_POST_LEGALS') {
-    switch (endpointParams.institutionId) {
+    switch (endpointParams.externalInstitutionId) {
       case 'error':
         return genericError;
       default:
@@ -293,7 +306,10 @@ export async function mockFetch(
   }
 
   if (endpoint === 'ONBOARDING_GET_PARTY') {
-    const fetched = mockPartyRegistry.items.find((p) => p.id === endpointParams.institutionId);
+    const fetched = mockPartyRegistry.items.find(
+      (p) => p.id === endpointParams.externalInstitutionId
+    );
+
     if (fetched) {
       return new Promise((resolve) =>
         resolve({ data: fetched, status: 200, statusText: '200' } as AxiosResponse)

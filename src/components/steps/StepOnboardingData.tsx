@@ -17,7 +17,7 @@ import { getFetchOutcome } from '../../lib/error-utils';
 import { unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
 
 type Props = StepperStepComponentProps & {
-  institutionId: string;
+  externalInstitutionId: string;
   productId: string;
 };
 
@@ -61,7 +61,7 @@ const genericError: RequestOutcomeMessage = {
   ],
 };
 
-function StepOnboardingData({ forward, institutionId, productId }: Props) {
+function StepOnboardingData({ forward, externalInstitutionId, productId }: Props) {
   const { t } = useTranslation();
 
   const [loading, setLoading] = useState(true);
@@ -76,7 +76,7 @@ function StepOnboardingData({ forward, institutionId, productId }: Props) {
       {
         endpoint: 'ONBOARDING_GET_ONBOARDING_DATA',
         endpointParams: {
-          institutionId,
+          externalInstitutionId,
           productId,
         },
       },
@@ -87,7 +87,12 @@ function StepOnboardingData({ forward, institutionId, productId }: Props) {
     const restOutcomeData = getFetchOutcome(onboardingData);
     if (restOutcomeData === 'success') {
       const result = (onboardingData as AxiosResponse).data as InstitutionOnboardingInfoResource;
-      forward(result.manager, result.institution.billingData, result.institution.institutionType);
+      forward(
+        result.manager,
+        result.institution.billingData,
+        result.institution.institutionType,
+        result.institution.id
+      );
     } else if (
       (onboardingData as AxiosError<any>).response?.status === 404 ||
       (onboardingData as AxiosError<any>).response?.status === 400

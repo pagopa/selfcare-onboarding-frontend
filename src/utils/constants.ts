@@ -48,7 +48,7 @@ export const API = {
   VERIFY_ONBOARDING: {
     URL:
       ENV.URL_API.PARTY_PROCESS +
-      '/onboarding/institution/{{institutionId}}/products/{{productId}}',
+      '/onboarding/institution/{{externalInstitutionId}}/products/{{productId}}',
   },
 
   ONBOARDING_VERIFY_PRODUCT: {
@@ -59,11 +59,12 @@ export const API = {
     URL: ENV.URL_API.PARTY_REGISTRY_PROXY + '/institutions',
   },
   ONBOARDING_GET_PARTY: {
-    URL: ENV.URL_API.PARTY_REGISTRY_PROXY + '/institutions/{{institutionId}}',
+    URL: ENV.URL_API.PARTY_REGISTRY_PROXY + '/institutions/{{externalInstitutionId}}',
   },
   ONBOARDING_POST_LEGALS: {
     URL:
-      ENV.URL_API.ONBOARDING + '/institutions/{{institutionId}}/products/{{productId}}/onboarding',
+      ENV.URL_API.ONBOARDING +
+      '/institutions/{{externalInstitutionId}}/products/{{productId}}/onboarding',
   },
   ONBOARDING_COMPLETE_REGISTRATION: {
     URL: ENV.URL_API.PARTY_PROCESS + '/onboarding/complete/{{token}}',
@@ -74,7 +75,7 @@ export const API = {
   ONBOARDING_GET_ONBOARDING_DATA: {
     URL:
       ENV.URL_API.ONBOARDING +
-      '/institutions/{{institutionId}}/products/{{productId}}/onboarded-institution-info',
+      '/institutions/{{externalInstitutionId}}/products/{{productId}}/onboarded-institution-info',
   },
 };
 

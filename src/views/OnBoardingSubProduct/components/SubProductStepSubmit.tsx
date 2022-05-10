@@ -24,7 +24,7 @@ type Props = StepperStepComponentProps & {
   requestId: string;
   product: Product;
   subProduct: Product;
-  institutionId: string;
+  externalInstitutionId: string;
   users: Array<UserOnCreate>;
   billingData: BillingData;
   institutionType: InstitutionType;
@@ -83,7 +83,7 @@ function SubProductStepSubmit({
   forward,
   product,
   subProduct,
-  institutionId,
+  externalInstitutionId,
   users,
   billingData,
   setLoading,
@@ -122,7 +122,7 @@ function SubProductStepSubmit({
     const postLegalsResponse = await fetchWithLogs(
       {
         endpoint: 'ONBOARDING_POST_LEGALS',
-        endpointParams: { institutionId, productId: subProduct.id },
+        endpointParams: { externalInstitutionId, productId: subProduct.id },
       },
       { method: 'POST', data: { users, billingData, institutionType, pricingPlan, origin } },
       () => setRequiredLogin(true)
@@ -133,7 +133,7 @@ function SubProductStepSubmit({
 
     if (outcome === 'success') {
       trackEvent('ONBOARDING_SEND_SUCCESS', {
-        party_id: institutionId,
+        party_id: externalInstitutionId,
         request_id: requestId,
         product_id: product.id,
         subproduct_id: subProduct.id,
@@ -142,7 +142,7 @@ function SubProductStepSubmit({
     } else if (outcome === 'error') {
       setError(true);
       trackEvent('ONBOARDING_SEND_FAILURE', {
-        party_id: institutionId,
+        party_id: externalInstitutionId,
         request_id: requestId,
         product_id: product?.id,
         subproduct_id: subProduct?.id,

@@ -39,8 +39,8 @@ const checkProduct = async (
   }
 };
 
-const buildUrlLog = (institutionId: string) =>
-  `${ENV.URL_INSTITUTION_LOGO.PREFIX}${institutionId}${ENV.URL_INSTITUTION_LOGO.SUFFIX}`;
+const buildUrlLog = (partyId: string) =>
+  `${ENV.URL_INSTITUTION_LOGO.PREFIX}${partyId}${ENV.URL_INSTITUTION_LOGO.SUFFIX}`;
 
 const handleSearchUserParties = async (
   setParties: (parties: Array<SelfcareParty>) => void,
@@ -57,7 +57,7 @@ const handleSearchUserParties = async (
     setParties(
       ((searchResponse as AxiosResponse).data as Array<SelfcareParty>).map((p) => ({
         ...p,
-        urlLogo: buildUrlLog(p.institutionId),
+        urlLogo: buildUrlLog(p.id),
       }))
     );
   } else {

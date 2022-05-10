@@ -17,14 +17,14 @@ type Props = {
   subTitle: string | ReactElement;
 } & StepperStepComponentProps;
 
-const handleSearchInstitutionId = async (
-  institutionId: string,
+const handleSearchExternalId = async (
+  externalInstitutionId: string,
   onRedirectToLogin: () => void
 ): Promise<IPACatalogParty | null> => {
   const searchResponse = await fetchWithLogs(
     {
       endpoint: 'ONBOARDING_GET_PARTY',
-      endpointParams: { institutionId },
+      endpointParams: {externalInstitutionId},
     },
     { method: 'GET' },
     onRedirectToLogin
@@ -40,11 +40,11 @@ const handleSearchInstitutionId = async (
 };
 
 export function StepSearchParty({ subTitle, forward, back }: Props) {
-  const institutionIdByQuery = new URLSearchParams(window.location.search).get('institutionId');
+  const partyExternalIdByQuery = new URLSearchParams(window.location.search).get('partyExternalId');
   const { setRequiredLogin } = useContext(UserContext);
   const theme = useTheme();
 
-  const [loading, setLoading] = useState(!!institutionIdByQuery);
+  const [loading, setLoading] = useState(!!partyExternalIdByQuery);
   const [selected, setSelected, setSelectedHistory] = useHistoryState<IPACatalogParty | null>(
     'selected_step1',
     null
@@ -54,15 +54,15 @@ export function StepSearchParty({ subTitle, forward, back }: Props) {
     setSelectedHistory(selected);
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const { id } = selected!;
-    forward({ institutionId: id }, { ...selected, institutionId: id } as Party);
+    forward({ externalId: id }, { ...selected, externalId: id } as Party);
   };
 
   const { t } = useTranslation();
   const bodyTitle = t('onboardingStep1.onboarding.bodyTitle');
 
   useEffect(() => {
-    if (institutionIdByQuery) {
-      handleSearchInstitutionId(institutionIdByQuery, () => setRequiredLogin(true))
+    if (partyExternalIdByQuery) {
+      handleSearchExternalId(partyExternalIdByQuery, () => setRequiredLogin(true))
         .then((ipaParty) => {
           if (ipaParty) {
             setSelected(ipaParty);
@@ -84,7 +84,7 @@ export function StepSearchParty({ subTitle, forward, back }: Props) {
 
   // callback of previous useEffect
   useEffect(() => {
-    if (institutionIdByQuery && selected) {
+    if (partyExternalIdByQuery && selected) {
       onForwardAction();
     }
   }, [selected]);

@@ -7,8 +7,6 @@ import OnBoardingSubProduct from '../OnBoardingSubProduct';
 import '../../../locale';
 import { Route, Router, Switch } from 'react-router';
 import { createMemoryHistory } from 'history';
-import { ROUTES } from '../../../utils/constants';
-import { mockedParties } from '../../../lib/__mocks__/mockApiRequests';
 
 jest.mock('../../../lib/api-utils');
 
@@ -97,7 +95,7 @@ const errorOnboardingSubProductTitle = 'Richiesta di adesione premium in errore'
 
 test('test already subscribed to premium', async () => {
   renderComponent('prod-io', 'prod-io-premium');
-  await executeStepSelectInstitutionReleated('onboarded');
+  await executeStepSelectInstitutionUnreleated('agency onboarded');
   await waitFor(() => screen.getByText('Sottoscrizione già avvenuta'));
   await executeClickCloseButton();
 });
@@ -176,7 +174,7 @@ const performLogout = async (logoutButton: HTMLElement) => {
   await waitFor(() => expect(screen.queryByText('Vuoi davvero uscire?')).not.toBeNull());
 };
 
-const retrieveNavigationButtons = () => {
+const retrieveNavigationButtons = async () => {
   const goBackButton = screen.getByRole('button', {
     name: 'Indietro',
   });
@@ -185,8 +183,7 @@ const retrieveNavigationButtons = () => {
   const confirmButton = screen.getByRole('button', {
     name: 'Conferma',
   });
-
-  expect(confirmButton).toBeEnabled();
+  await waitFor(() => expect(confirmButton).toBeEnabled());
 
   return [goBackButton, confirmButton];
 };
@@ -195,7 +192,7 @@ const checkBackForwardNavigation = async (
   previousStepTitle: string,
   actualStepTitle: string
 ): Promise<Array<HTMLElement>> => {
-  const [goBackButton] = retrieveNavigationButtons();
+  const [goBackButton] = await retrieveNavigationButtons();
   expect(goBackButton).toBeEnabled();
   fireEvent.click(goBackButton);
 
@@ -209,7 +206,7 @@ const checkBackForwardNavigation = async (
 
   await waitFor(() => screen.getByText(actualStepTitle));
 
-  return retrieveNavigationButtons();
+  return await retrieveNavigationButtons();
 };
 
 const executeStepSelectInstitutionUnreleated = async (partyName: string) => {
