@@ -71,7 +71,7 @@ export default function StepBillingData({
     saveHistoryState();
     forward({
       ...formik.values,
-      vatNumber: stepHistoryState.isTaxCodeNotEquals2PIVA
+      vatNumber: !stepHistoryState.isTaxCodeNotEquals2PIVA
         ? formik.values.taxCode
         : formik.values.vatNumber,
     });

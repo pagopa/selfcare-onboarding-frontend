@@ -333,6 +333,13 @@ const fillUserBillingDataForm = async (
   fireEvent.change(document.getElementById(taxCodeInput), {
     target: { value: 'AAAAAA44D55F456K' },
   });
+
+  const isTaxCodeEquals2PIVA = screen.getByRole('checkbox');
+  fireEvent.click(isTaxCodeEquals2PIVA);
+
+  fireEvent.change(document.getElementById(vatNumber), {
+    target: { value: '11223344567' },
+  });
   fireEvent.change(document.getElementById(recipientCode), {
     target: { value: 'recipientCode' },
   });
