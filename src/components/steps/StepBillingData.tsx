@@ -112,7 +112,10 @@ export default function StepBillingData({
     );
 
   const formik = useFormik<BillingData>({
-    initialValues: initialFormData,
+    initialValues: {
+      ...initialFormData,
+      publicServices: institutionType === 'GSP' ? false : undefined,
+    },
     validateOnMount: true,
     validate,
     onSubmit: (values) => {
@@ -268,6 +271,7 @@ export default function StepBillingData({
                 <Grid item xs={12}>
                   <Typography>
                     <Checkbox
+                      checked={formik.values.publicServices ? true : false}
                       value={formik.values.publicServices}
                       onChange={(_, checked: boolean) =>
                         formik.setFieldValue('publicServices', checked, true)

@@ -267,6 +267,8 @@ export async function mockFetch(
           resolve({ data: mockedOnboardingData0, status: 200, statusText: '200' } as AxiosResponse)
         );
       case 'externalId2':
+      case 'id':
+      case 'error':
         return new Promise((resolve) =>
           resolve({ data: mockedOnboardingData1, status: 200, statusText: '200' } as AxiosResponse)
         );

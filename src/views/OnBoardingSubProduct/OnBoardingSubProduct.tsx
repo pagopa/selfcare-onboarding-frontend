@@ -242,7 +242,6 @@ function OnBoardingSubProduct() {
             taxCode: '',
             vatNumber: '',
             recipientCode: '',
-            publicServices: institutionType === 'GSP' ? false : undefined,
           },
           institutionType: institutionType as InstitutionType,
           origin,
