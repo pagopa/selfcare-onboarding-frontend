@@ -23,7 +23,7 @@ const initialLocation = {
   assign: jest.fn(),
   pathname: '/:productId/:subProductId',
   origin: 'MOCKED_ORIGIN',
-  search: '',
+  search: '?pricingPlan=pricingPlan',
   hash: '',
   state: undefined,
 };
@@ -60,9 +60,8 @@ const renderComponent = (
     const [onLogout, setOnLogout] = useState<(() => void) | null | undefined>();
 
     if (!injectedHistory) {
-      history.push(`/${productId}/${subProductId}?pricingPlan=pricingPlan`);
+      history.push(`/${productId}/${subProductId}`);
     }
-
     return (
       <Router history={history}>
         <HeaderContext.Provider
@@ -268,6 +267,7 @@ const executeStepBillingData = async () => {
     'vatNumber',
     'recipientCode'
   );
+
   const confirmButtonEnabled = screen.getByRole('button', { name: 'Conferma' });
   await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
 
@@ -447,6 +447,7 @@ const verifySubmit = async () => {
             {
               name: 'NAME',
               surname: 'SURNAME',
+              role: 'MANAGER',
               taxCode: 'BBBBBB00B00B000B',
               email: 'b@b.bb',
             },

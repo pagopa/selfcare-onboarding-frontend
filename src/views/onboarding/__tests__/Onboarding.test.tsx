@@ -96,7 +96,7 @@ test('test error productID', async () => {
 
 test('test complete', async () => {
   renderComponent();
-  await executeStep1('agency pending');
+  await executeStep1('agency x');
   await executeStepInstitutionType();
   await executeStepBillingData();
   await executeStep2();
@@ -154,7 +154,7 @@ const performLogout = async (logoutButton: HTMLElement) => {
   await waitFor(() => expect(screen.queryByText('Vuoi davvero uscire?')).not.toBeNull());
 };
 
-const retrieveNavigationButtons = () => {
+const retrieveNavigationButtons = async () => {
   const goBackButton = screen.getByRole('button', {
     name: 'Indietro',
   });
@@ -182,7 +182,7 @@ const checkBackForwardNavigation = async (
   previousStepTitle: string,
   actualStepTitle: string
 ): Promise<Array<HTMLElement>> => {
-  const [goBackButton] = retrieveNavigationButtons();
+  const [goBackButton] = await retrieveNavigationButtons();
   expect(goBackButton).toBeEnabled();
   fireEvent.click(goBackButton);
 
@@ -224,11 +224,10 @@ const executeStepInstitutionType = async () => {
   console.log('Testing step Institution Type');
   await waitFor(() => screen.getByText(stepInstitutionType));
 
-  await checkBackForwardNavigation(step1Title, stepInstitutionType);
   await fillInstitutionTypeCheckbox('pa', 'gsp', 'scp', 'pt');
 
   const confirmButtonEnabled = screen.getByRole('button', { name: 'Conferma' });
-  await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
+  expect(confirmButtonEnabled).toBeEnabled();
 
   fireEvent.click(confirmButtonEnabled);
   await waitFor(() => screen.getByText(stepBillingDataTitle));
@@ -607,10 +606,9 @@ const verifySubmit = async () => {
     expect(fetchWithLogsSpy).toBeCalledWith(
       {
         endpoint: 'ONBOARDING_POST_LEGALS',
-        endpointParams: { externalInstitutionId: 'pending', productId: 'prod-pagopa' },
+        endpointParams: { externalInstitutionId: 'id', productId: 'prod-pagopa' },
       },
       {
-        method: 'POST',
         data: {
           billingData: {
             businessName: 'businessNameInput',
@@ -619,41 +617,42 @@ const verifySubmit = async () => {
             taxCode: 'AAAAAA44D55F456K',
             vatNumber: '11223344567',
             recipientCode: 'recipientCode',
-            publicServices: 'undefined',
+            publicServices: false,
           },
           institutionType: 'PT',
           origin: 'IPA',
+          users: [
+            {
+              email: 'b@b.bb',
+              name: 'NAME',
+              role: 'MANAGER',
+              surname: 'SURNAME',
+              taxCode: 'BBBBBB00B00B000B',
+            },
+            {
+              email: 'a@a.aa',
+              name: 'NAME',
+              role: 'DELEGATE',
+              surname: 'SURNAME',
+              taxCode: 'CCCCCC00C00C000C',
+            },
+            {
+              email: '0@z.zz',
+              name: 'NAME',
+              role: 'DELEGATE',
+              surname: 'SURNAME',
+              taxCode: 'ZZZZZZ00A00A000A',
+            },
+            {
+              email: '1@z.zz',
+              name: 'NAME',
+              role: 'DELEGATE',
+              surname: 'SURNAME',
+              taxCode: 'ZZZZZZ01A00A000A',
+            },
+          ],
         },
-        users: [
-          {
-            email: 'b@b.bb',
-            name: 'NAME',
-            role: 'MANAGER',
-            surname: 'SURNAME',
-            taxCode: 'BBBBBB00B00B000B',
-          },
-          {
-            email: 'a@a.aa',
-            name: 'NAME',
-            role: 'DELEGATE',
-            surname: 'SURNAME',
-            taxCode: 'CCCCCC00C00C000C',
-          },
-          {
-            email: '0@z.zz',
-            name: 'NAME',
-            role: 'DELEGATE',
-            surname: 'SURNAME',
-            taxCode: 'ZZZZZZ00A00A000A',
-          },
-          {
-            email: '1@z.zz',
-            name: 'NAME',
-            role: 'DELEGATE',
-            surname: 'SURNAME',
-            taxCode: 'ZZZZZZ01A00A000A',
-          },
-        ],
+        method: 'POST',
       },
       expect.any(Function)
     )

@@ -22,6 +22,7 @@ const fiscalAndVatCodeRegexp = new RegExp(
 type StepBillingDataHistoryState = {
   externalInstitutionId: string;
   isTaxCodeNotEquals2PIVA: boolean;
+  isGSP: boolean;
 };
 
 type Props = StepperStepComponentProps & {
@@ -51,11 +52,12 @@ export default function StepBillingData({
     useHistoryState<StepBillingDataHistoryState>('stepBillingData', {
       externalInstitutionId,
       isTaxCodeNotEquals2PIVA: false,
+      isGSP: false,
     });
 
   useEffect(() => {
     if (externalInstitutionId !== stepHistoryState.externalInstitutionId) {
-      setStepHistoryState({ externalInstitutionId, isTaxCodeNotEquals2PIVA: false });
+      setStepHistoryState({ externalInstitutionId, isTaxCodeNotEquals2PIVA: false, isGSP: false });
     }
   }, []);
 
@@ -114,7 +116,7 @@ export default function StepBillingData({
   const formik = useFormik<BillingData>({
     initialValues: {
       ...initialFormData,
-      publicServices: institutionType === 'GSP' ? false : undefined,
+      publicServices: false,
     },
     validateOnMount: true,
     validate,
@@ -271,8 +273,14 @@ export default function StepBillingData({
                 <Grid item xs={12}>
                   <Typography>
                     <Checkbox
-                      checked={formik.values.publicServices ? true : false}
+                      checked={stepHistoryState.isGSP}
                       value={formik.values.publicServices}
+                      onClick={() =>
+                        setStepHistoryState({
+                          ...stepHistoryState,
+                          isGSP: !stepHistoryState.isGSP,
+                        })
+                      }
                       onChange={(_, checked: boolean) =>
                         formik.setFieldValue('publicServices', checked, true)
                       }
