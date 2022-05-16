@@ -23,7 +23,7 @@ const initialLocation = {
   assign: jest.fn(),
   pathname: '/:productId/:subProductId',
   origin: 'MOCKED_ORIGIN',
-  search: '',
+  search: '?pricingPlan=pricingPlan',
   hash: '',
   state: undefined,
 };
@@ -62,7 +62,6 @@ const renderComponent = (
     if (!injectedHistory) {
       history.push(`/${productId}/${subProductId}`);
     }
-
     return (
       <Router history={history}>
         <HeaderContext.Provider
@@ -126,6 +125,7 @@ test('test complete', async () => {
   await executeStepBillingData();
   await executeStepAddManager(true);
   await executeClickCloseButton();
+  await verifySubmit();
 });
 
 test('test complete with error on submit', async () => {
@@ -267,6 +267,7 @@ const executeStepBillingData = async () => {
     'vatNumber',
     'recipientCode'
   );
+
   const confirmButtonEnabled = screen.getByRole('button', { name: 'Conferma' });
   await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
 
@@ -285,6 +286,15 @@ const executeStepBillingData = async () => {
   );
 
   await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
+
+  await checkCorrectBodyBillingData(
+    'businessNameInput',
+    'registeredOfficeInput',
+    'a@a.com',
+    'AAAAAA44D55F456K',
+    'AAAAAA44D55F456K',
+    'AM23EIX'
+  );
 
   fireEvent.click(confirmButtonEnabled);
   await waitFor(() => screen.getByText(stepAddManagerTitle));
@@ -365,68 +375,47 @@ const fillUserForm = async (
   confirmButton: HTMLElement,
   prefix: string,
   taxCode: string,
-  email: string,
-  existentTaxCode?: string,
-  expectedDuplicateTaxCodeMessages?: number,
-  existentEmail?: string,
-  expectedDuplicateEmailMessages?: number
+  email: string
 ) => {
-  await fillTextFieldAndCheckButton(prefix, 'name', 'NAME', confirmButton, false);
-  await fillTextFieldAndCheckButton(prefix, 'surname', 'SURNAME', confirmButton, false);
-  await fillTextFieldAndCheckButton(prefix, 'taxCode', taxCode, confirmButton, false);
-  await fillTextFieldAndCheckButton(prefix, 'email', email, confirmButton, true);
-
-  await fillTextFieldAndCheckButton(prefix, 'taxCode', '', confirmButton, false);
-  await fillTextFieldAndCheckButton(prefix, 'taxCode', 'INVALIDTAXCODE', confirmButton, false);
-  screen.getByText('Il Codice Fiscale inserito non è valido');
-  await fillTextFieldAndCheckButton(prefix, 'taxCode', taxCode, confirmButton, true);
-
-  await fillTextFieldAndCheckButton(prefix, 'email', '', confirmButton, false);
-  await fillTextFieldAndCheckButton(prefix, 'email', 'INVALIDEMAIL', confirmButton, false);
-  screen.getByText("L'indirizzo email non è valido");
-  await fillTextFieldAndCheckButton(prefix, 'email', email, confirmButton, true);
-
-  await fillTextFieldAndCheckButton(prefix, 'name', '', confirmButton, false);
-  await fillTextFieldAndCheckButton(prefix, 'name', 'NAME', confirmButton, true);
-
-  await fillTextFieldAndCheckButton(prefix, 'surname', '', confirmButton, false);
-  await fillTextFieldAndCheckButton(prefix, 'surname', 'SURNAME', confirmButton, true);
-
-  await checkAlreadyExistentValues(
-    prefix,
-    confirmButton,
-    existentTaxCode,
-    taxCode,
-    expectedDuplicateTaxCodeMessages,
-    existentEmail,
-    email,
-    expectedDuplicateEmailMessages
+  await waitFor(() =>
+    expect((document.getElementById('LEGAL-email') as HTMLInputElement).value).toBe('m@ma.it')
   );
+  expect((document.getElementById('LEGAL-taxCode') as HTMLInputElement).value).toBe(
+    'DDDDDD11A11A123K'
+  );
+  expect((document.getElementById('LEGAL-name') as HTMLInputElement).value).toBe('Maria');
+  expect((document.getElementById('LEGAL-surname') as HTMLInputElement).value).toBe('Rosa');
+
+  expect(confirmButton).toBeEnabled();
+
+  await fillTextFieldAndCheckButton(prefix, 'name', 'NAME', confirmButton, true);
+  await fillTextFieldAndCheckButton(prefix, 'surname', 'SURNAME', confirmButton, true);
+  await fillTextFieldAndCheckButton(prefix, 'taxCode', taxCode, confirmButton, true);
+  await fillTextFieldAndCheckButton(prefix, 'email', email, confirmButton, true);
 };
 
-const checkAlreadyExistentValues = async (
-  prefix: string,
-  confirmButton: HTMLElement,
-  existentTaxCode: string | undefined,
-  taxCode: string,
-  expectedDuplicateTaxCodeMessages: number | undefined,
-  existentEmail: string | undefined,
-  email: string,
-  expectedDuplicateEmailMessages: number | undefined
+const checkCorrectBodyBillingData = (
+  expectedBusinessName: string = '',
+  expectedRegisteredOfficeInput: string = '',
+  expectedMailPEC: string = '',
+  expectedTaxCode: string = '',
+  expectedVatNumber: string = '',
+  expectedRecipientCode: string = ''
 ) => {
-  if (existentTaxCode) {
-    await fillTextFieldAndCheckButton(prefix, 'taxCode', existentTaxCode, confirmButton, false);
-    const duplicateTaxCodeErrors = screen.getAllByText('Il codice fiscale inserito è già presente');
-    expect(duplicateTaxCodeErrors.length).toBe(expectedDuplicateTaxCodeMessages);
-  }
-  await fillTextFieldAndCheckButton(prefix, 'taxCode', taxCode, confirmButton, true);
+  expect((document.getElementById('businessName') as HTMLInputElement).value).toBe(
+    expectedBusinessName
+  );
+  expect((document.getElementById('registeredOffice') as HTMLInputElement).value).toBe(
+    expectedRegisteredOfficeInput
+  );
+  expect((document.getElementById('digitalAddress') as HTMLInputElement).value).toBe(
+    expectedMailPEC
+  );
+  expect((document.getElementById('taxCode') as HTMLInputElement).value).toBe(expectedTaxCode);
 
-  if (existentEmail) {
-    await fillTextFieldAndCheckButton(prefix, 'email', existentEmail, confirmButton, false);
-    const duplicateEmailErrors = screen.getAllByText("L'indirizzo email inserito è già presente");
-    expect(duplicateEmailErrors.length).toBe(expectedDuplicateEmailMessages);
-  }
-  await fillTextFieldAndCheckButton(prefix, 'email', email, confirmButton, true);
+  expect((document.getElementById('recipientCode') as HTMLInputElement).value).toBe(
+    expectedRecipientCode
+  );
 };
 
 const fillTextFieldAndCheckButton = async (
@@ -442,4 +431,42 @@ const fillTextFieldAndCheckButton = async (
   } else {
     expect(confirmButton).toBeDisabled();
   }
+};
+
+const verifySubmit = async () => {
+  await waitFor(() =>
+    expect(fetchWithLogsSpy).toBeCalledWith(
+      {
+        endpoint: 'ONBOARDING_POST_LEGALS',
+        endpointParams: { externalInstitutionId: 'id', productId: 'prod-io-premium' },
+      },
+      {
+        method: 'POST',
+        data: {
+          users: [
+            {
+              name: 'NAME',
+              surname: 'SURNAME',
+              role: 'MANAGER',
+              taxCode: 'BBBBBB00B00B000B',
+              email: 'b@b.bb',
+            },
+          ],
+          billingData: {
+            businessName: 'businessNameInput',
+            registeredOffice: 'registeredOfficeInput',
+            digitalAddress: 'a@a.com',
+            taxCode: 'AAAAAA44D55F456K',
+            vatNumber: 'AAAAAA44D55F456K',
+            recipientCode: 'AM23EIX',
+            publicServices: false,
+          },
+          institutionType: 'GSP',
+          pricingPlan: 'pricingPlan',
+          origin: 'IPA',
+        },
+      },
+      expect.any(Function)
+    )
+  );
 };

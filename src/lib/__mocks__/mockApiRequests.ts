@@ -145,7 +145,7 @@ const mockedOnboardingData0: InstitutionOnboardingInfoResource = {
       registeredOffice: 'Milano, Piazza Colonna 370, CAP 20021',
       digitalAddress: 'comune.milano@pec.it',
       taxCode: 'AAAAAA11A11A123K',
-      vatNumber: 'AAAAAA11A11A123K',
+      vatNumber: '',
       recipientCode: 'M5UXCR1',
     },
     institutionType: 'PA',
@@ -168,7 +168,7 @@ const mockedOnboardingData1: InstitutionOnboardingInfoResource = {
       registeredOffice: 'Bollate, Piazza Colonna 370, CAP 20021',
       digitalAddress: 'comune.bollate@pec.it',
       taxCode: 'BBBBBB11A11A123K',
-      vatNumber: 'BBBBBB11A11A123K',
+      vatNumber: '',
       recipientCode: 'M2UHYR1',
     },
     institutionType: 'GSP',
@@ -267,6 +267,8 @@ export async function mockFetch(
           resolve({ data: mockedOnboardingData0, status: 200, statusText: '200' } as AxiosResponse)
         );
       case 'externalId2':
+      case 'id':
+      case 'error':
         return new Promise((resolve) =>
           resolve({ data: mockedOnboardingData1, status: 200, statusText: '200' } as AxiosResponse)
         );

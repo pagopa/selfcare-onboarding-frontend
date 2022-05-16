@@ -137,7 +137,6 @@ function OnboardingComponent({ productId }: { productId: string }) {
 
   const submit = async (users: Array<UserOnCreate>) => {
     setLoading(true);
-
     const postLegalsResponse = await fetchWithLogs(
       { endpoint: 'ONBOARDING_POST_LEGALS', endpointParams: { externalInstitutionId, productId } },
       { method: 'POST', data: { billingData, institutionType, origin, users } },
@@ -252,7 +251,6 @@ function OnboardingComponent({ productId }: { productId: string }) {
             taxCode: '',
             vatNumber: '',
             recipientCode: '',
-            publicServices: institutionType === 'GSP' ? false : undefined,
           },
           origin,
           institutionType: institutionType as InstitutionType,

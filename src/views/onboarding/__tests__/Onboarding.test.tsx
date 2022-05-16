@@ -101,6 +101,7 @@ test('test complete', async () => {
   await executeStepBillingData();
   await executeStep2();
   await executeStep3(true);
+  await verifySubmit();
   await executeGoHome();
 });
 
@@ -153,7 +154,7 @@ const performLogout = async (logoutButton: HTMLElement) => {
   await waitFor(() => expect(screen.queryByText('Vuoi davvero uscire?')).not.toBeNull());
 };
 
-const retrieveNavigationButtons = () => {
+const retrieveNavigationButtons = async () => {
   const goBackButton = screen.getByRole('button', {
     name: 'Indietro',
   });
@@ -181,7 +182,7 @@ const checkBackForwardNavigation = async (
   previousStepTitle: string,
   actualStepTitle: string
 ): Promise<Array<HTMLElement>> => {
-  const [goBackButton] = retrieveNavigationButtons();
+  const [goBackButton] = await retrieveNavigationButtons();
   expect(goBackButton).toBeEnabled();
   fireEvent.click(goBackButton);
 
@@ -223,11 +224,10 @@ const executeStepInstitutionType = async () => {
   console.log('Testing step Institution Type');
   await waitFor(() => screen.getByText(stepInstitutionType));
 
-  await checkBackForwardNavigation(step1Title, stepInstitutionType);
   await fillInstitutionTypeCheckbox('pa', 'gsp', 'scp', 'pt');
 
   const confirmButtonEnabled = screen.getByRole('button', { name: 'Conferma' });
-  await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
+  expect(confirmButtonEnabled).toBeEnabled();
 
   fireEvent.click(confirmButtonEnabled);
   await waitFor(() => screen.getByText(stepBillingDataTitle));
@@ -255,6 +255,15 @@ const executeStepBillingData = async () => {
   );
 
   await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
+
+  await checkCorrectBodyBillingData(
+    'businessNameInput',
+    'registeredOfficeInput',
+    'a@a.it',
+    'AAAAAA44D55F456K',
+    '11223344567',
+    'recipientCode'
+  );
 
   fireEvent.click(confirmButtonEnabled);
   await waitFor(() => screen.getByText(step2Title));
@@ -332,6 +341,14 @@ const fillUserBillingDataForm = async (
   fireEvent.change(document.getElementById(mailPECInput), { target: { value: 'a@a.it' } });
   fireEvent.change(document.getElementById(taxCodeInput), {
     target: { value: 'AAAAAA44D55F456K' },
+  });
+
+  const isTaxCodeNotEquals2PIVA = screen.getByRole('checkbox');
+  fireEvent.click(isTaxCodeNotEquals2PIVA);
+  expect(isTaxCodeNotEquals2PIVA).toBeTruthy();
+
+  fireEvent.change(document.getElementById(vatNumber), {
+    target: { value: '11223344567' },
   });
   fireEvent.change(document.getElementById(recipientCode), {
     target: { value: 'recipientCode' },
@@ -437,6 +454,30 @@ const checkLoggedUserAsAdminCheckbox = async (
   expect(addDelegateButton).toBeEnabled();
 
   await clickAdminCheckBoxAndTestValues(confirmButton, addDelegateButton, '', '', '');
+};
+
+const checkCorrectBodyBillingData = (
+  expectedBusinessName: string = '',
+  expectedRegisteredOfficeInput: string = '',
+  expectedMailPEC: string = '',
+  expectedTaxCode: string = '',
+  expectedVatNumber: string = '',
+  expectedRecipientCode: string = ''
+) => {
+  expect((document.getElementById('businessName') as HTMLInputElement).value).toBe(
+    expectedBusinessName
+  );
+  expect((document.getElementById('registeredOffice') as HTMLInputElement).value).toBe(
+    expectedRegisteredOfficeInput
+  );
+  expect((document.getElementById('digitalAddress') as HTMLInputElement).value).toBe(
+    expectedMailPEC
+  );
+  expect((document.getElementById('taxCode') as HTMLInputElement).value).toBe(expectedTaxCode);
+  expect((document.getElementById('vatNumber') as HTMLInputElement).value).toBe(expectedVatNumber);
+  expect((document.getElementById('recipientCode') as HTMLInputElement).value).toBe(
+    expectedRecipientCode
+  );
 };
 
 const clickAdminCheckBoxAndTestValues = (
@@ -558,4 +599,62 @@ const fillAdditionalUserAndCheckUniqueValues = async (
       2
     );
   }
+};
+
+const verifySubmit = async () => {
+  await waitFor(() =>
+    expect(fetchWithLogsSpy).toBeCalledWith(
+      {
+        endpoint: 'ONBOARDING_POST_LEGALS',
+        endpointParams: { externalInstitutionId: 'id', productId: 'prod-pagopa' },
+      },
+      {
+        data: {
+          billingData: {
+            businessName: 'businessNameInput',
+            registeredOffice: 'registeredOfficeInput',
+            digitalAddress: 'a@a.it',
+            taxCode: 'AAAAAA44D55F456K',
+            vatNumber: '11223344567',
+            recipientCode: 'recipientCode',
+            publicServices: undefined,
+          },
+          institutionType: 'PT',
+          origin: 'IPA',
+          users: [
+            {
+              email: 'b@b.bb',
+              name: 'NAME',
+              role: 'MANAGER',
+              surname: 'SURNAME',
+              taxCode: 'BBBBBB00B00B000B',
+            },
+            {
+              email: 'a@a.aa',
+              name: 'NAME',
+              role: 'DELEGATE',
+              surname: 'SURNAME',
+              taxCode: 'CCCCCC00C00C000C',
+            },
+            {
+              email: '0@z.zz',
+              name: 'NAME',
+              role: 'DELEGATE',
+              surname: 'SURNAME',
+              taxCode: 'ZZZZZZ00A00A000A',
+            },
+            {
+              email: '1@z.zz',
+              name: 'NAME',
+              role: 'DELEGATE',
+              surname: 'SURNAME',
+              taxCode: 'ZZZZZZ01A00A000A',
+            },
+          ],
+        },
+        method: 'POST',
+      },
+      expect.any(Function)
+    )
+  );
 };
