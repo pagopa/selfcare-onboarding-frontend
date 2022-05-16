@@ -617,7 +617,7 @@ const verifySubmit = async () => {
             taxCode: 'AAAAAA44D55F456K',
             vatNumber: '11223344567',
             recipientCode: 'recipientCode',
-            publicServices: false,
+            publicServices: undefined,
           },
           institutionType: 'PT',
           origin: 'IPA',
