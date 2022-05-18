@@ -462,7 +462,7 @@ const verifySubmit = async () => {
             businessName: 'businessNameInput',
             registeredOffice: 'registeredOfficeInput',
             digitalAddress: 'a@a.com',
-            zipCode: '20212',
+            zipCode: 20212,
             taxCode: 'AAAAAA44D55F456K',
             vatNumber: 'AAAAAA44D55F456K',
             recipientCode: 'AM23EIX',
