@@ -174,6 +174,7 @@ export type Party = {
   originId: string;
   externalId: string;
   address: string;
+  zipCode: string;
   description: string;
   digitalAddress: string;
   taxCode: string;
@@ -185,6 +186,8 @@ export type BillingData = {
   businessName: string;
   // Sede legale
   registeredOffice: string;
+  // Codice di avviamento postale
+  zipCode: string;
   // Indirizzo PEC
   digitalAddress: string;
   // Codice fiscale

@@ -265,6 +265,7 @@ const executeStepBillingData = async () => {
     'digitalAddress',
     'taxCode',
     'vatNumber',
+    'zipCode',
     'recipientCode'
   );
 
@@ -282,6 +283,7 @@ const executeStepBillingData = async () => {
     'digitalAddress',
     'taxCode',
     'vatNumber',
+    'zipCode',
     'recipientCode'
   );
 
@@ -354,6 +356,7 @@ const fillUserBillingDataForm = async (
   mailPECInput: string,
   taxCodeInput: string,
   vatNumber: string,
+  zipCodeInput: string,
   recipientCode: string
 ) => {
   fireEvent.change(document.getElementById(businessNameInput), {
@@ -365,6 +368,9 @@ const fillUserBillingDataForm = async (
   fireEvent.change(document.getElementById(mailPECInput), { target: { value: 'a@a.com' } });
   fireEvent.change(document.getElementById(taxCodeInput), {
     target: { value: 'AAAAAA44D55F456K' },
+  });
+  fireEvent.change(document.getElementById(zipCodeInput), {
+    target: { value: '20212' },
   });
   fireEvent.change(document.getElementById(recipientCode), {
     target: { value: 'AM23EIX' },
@@ -456,6 +462,7 @@ const verifySubmit = async () => {
             businessName: 'businessNameInput',
             registeredOffice: 'registeredOfficeInput',
             digitalAddress: 'a@a.com',
+            zipCode: '20212',
             taxCode: 'AAAAAA44D55F456K',
             vatNumber: 'AAAAAA44D55F456K',
             recipientCode: 'AM23EIX',

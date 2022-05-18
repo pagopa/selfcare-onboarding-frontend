@@ -14,10 +14,22 @@ const CustomTextField = styled(TextField)({
   },
 });
 
+const CustomNumberField = styled(TextField)({
+  'input::-webkit-inner-spin-button': {
+    '-webkit-appearance': 'none',
+    margin: 0,
+  },
+  '.MuiInputLabel-asterisk': {
+    display: 'none',
+  },
+});
+
 const mailPECRegexp = new RegExp('^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$');
 const fiscalAndVatCodeRegexp = new RegExp(
   /(^[A-Za-z]{6}[0-9lmnpqrstuvLMNPQRSTUV]{2}[abcdehlmprstABCDEHLMPRST]{1}[0-9lmnpqrstuvLMNPQRSTUV]{2}[A-Za-z]{1}[0-9lmnpqrstuvLMNPQRSTUV]{3}[A-Za-z]{1}$|^[0-9]{11}$)/
 );
+
+const zipCodeRegexp = new RegExp('^\\d{5}$');
 
 type StepBillingDataHistoryState = {
   externalInstitutionId: string;
@@ -89,6 +101,11 @@ export default function StepBillingData({
       Object.entries({
         businessName: !values.businessName ? requiredError : undefined,
         registeredOffice: !values.registeredOffice ? requiredError : undefined,
+        zipCode: !values.zipCode
+          ? requiredError
+          : !zipCodeRegexp.test(values.zipCode)
+          ? t('stepBillingData.invalidZipCode')
+          : undefined,
         taxCode: !values.taxCode
           ? requiredError
           : values.taxCode && !fiscalAndVatCodeRegexp.test(values.taxCode)
@@ -160,6 +177,38 @@ export default function StepBillingData({
     };
   };
 
+  const baseNumericFieldProps = (
+    field: keyof BillingData,
+    label: string,
+    fontWeight: number = 400,
+    fontSize: number = 16
+  ) => {
+    const isError = !!formik.errors[field] && formik.errors[field] !== requiredError;
+    return {
+      id: field,
+      type: 'number',
+      value: formik.values[field],
+      label,
+      error: isError,
+      helperText: isError ? formik.errors[field] : undefined,
+      required: true,
+      variant: 'outlined' as const,
+      onChange: formik.handleChange,
+      sx: { width: '100%' },
+      InputProps: {
+        style: {
+          fontSize,
+          fontWeight,
+          lineHeight: '24px',
+          color: '#5C6F82',
+          textAlign: 'start' as const,
+          paddingLeft: '16px',
+          borderRadius: '4px',
+        },
+      },
+    };
+  };
+
   return (
     <Box display="flex" justifyContent="center">
       <Grid container item xs={8}>
@@ -185,7 +234,7 @@ export default function StepBillingData({
           }}
         >
           <form onSubmit={formik.handleSubmit}>
-            <Grid item container spacing={4} p={4}>
+            <Grid item container spacing={3} p={3}>
               <Grid item xs={12}>
                 <CustomTextField
                   {...baseTextFieldProps(
@@ -197,7 +246,7 @@ export default function StepBillingData({
                   disabled={ipa}
                 />
               </Grid>
-              <Grid item xs={12}>
+              <Grid item xs={8}>
                 <CustomTextField
                   {...baseTextFieldProps(
                     'registeredOffice',
@@ -205,6 +254,13 @@ export default function StepBillingData({
                     400,
                     18
                   )}
+                  disabled={ipa}
+                />
+              </Grid>
+              <Grid item xs={4} paddingLeft={1}>
+                <CustomNumberField
+                  inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
+                  {...baseNumericFieldProps('zipCode', t('stepBillingData.zipCode'), 400, 18)}
                   disabled={ipa}
                 />
               </Grid>
