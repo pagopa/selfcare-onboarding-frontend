@@ -44,19 +44,20 @@ export function ConfirmRegistrationStep1(
           {t('confirmRegistrationStep1.pageTitle')}
         </Typography>
       </Grid>
-      <Grid item xs={11} pb={4}>
-        <Typography color={theme.palette.text.primary} variant={'body2'} align="center">
+      <Grid item xs={11} pb={3}>
+        <Typography color={theme.palette.text.primary} variant={'body1'} align="center">
           <Trans i18nKey="confirmRegistrationStep1.pageSubtitle">
-            Per completare l&apos;adesione, carica l&apos;atto ricevuto via
+            Carica l’Accordo di Adesione ricevuto all’indirizzo PEC
             <br />
-            PEC, firmato digitalmente dal Legale Rappresentante.
+            primario dell’ente, firmato digitalmente dal Legale
+            <br />
+            Rappresentante.
           </Trans>
         </Typography>
       </Grid>
       <Grid item xs={12} display="flex" justifyContent="center" pb={4}>
         <FileUploader
           title={t('confirmRegistrationStep1.fileUploaderTitle')}
-          description={t('confirmRegistrationStep1.fileUploaderDescription')}
           descriptionLink={t('confirmRegistrationStep1.fileUploaderDescriptionLink')}
           uploadedFiles={uploadedFiles}
           deleteUploadedFiles={deleteUploadedFiles}

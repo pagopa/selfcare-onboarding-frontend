@@ -352,7 +352,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
             </Grid>
             <Grid container item justifyContent="center" mb={3} mt={1}>
               <Grid item xs={5}>
-                <Typography>
+                <Typography variant="body1">
                   <Trans i18nKey="onboarding.outcomeContent.error.description">
                     A causa di un errore del sistema non è possibile completare la procedura.
                     <br />

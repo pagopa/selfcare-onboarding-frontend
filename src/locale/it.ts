@@ -11,18 +11,17 @@ export default {
   },
   confirmRegistrationStep0: {
     title: "Carica l'Accordo di Adesione",
-    description: `<0>Segui le istruzioni</0> per inviare il documento firmato,<2/> servirà a completare l'inserimento del tuo ente nel <4/> portale Self Care.`,
+    description: `<0>Segui le istruzioni</0> per inviare il documento firmato,<2/> servirà a completare l'adesione al prodotto scelto.`,
     confirmAction: 'Continua',
   },
   confirmRegistrationStep1: {
     errorAlertTitle: 'Controlla il Documento',
     errorAlertDescription: "E' possibile caricare un solo file di tipo PDF",
     pageTitle: "Carica l'Accordo di Adesione",
-    pageSubtitle: `Per completare l'adesione, carica l'atto ricevuto via <1/> PEC, firmato digitalmente dal Legale Rappresentante.`,
-    fileUploaderTitle: 'Trascina qui l’Accordo di Adesione firmato',
-    fileUploaderDescription: `oppure `,
+    pageSubtitle: `Carica l’Accordo di Adesione ricevuto all’indirizzo PEC <1 />primario dell’ente, firmato digitalmente dal Legale <3 />Rappresentante.`,
+    fileUploaderTitle: 'Trascina qui l’Accordo di Adesione firmato oppure',
     fileUploaderDescriptionLink: 'selezionalo dal tuo computer',
-    confirmAction: 'Invia',
+    confirmAction: 'Continua',
   },
   fileUploadPreview: {
     loadingStatus: 'Caricamento...',
@@ -113,9 +112,9 @@ export default {
     },
   },
   completeRegistration: {
-    title: 'Spiacenti, qualcosa è andato storto.',
-    description: `A causa di un errore del sistema non è possibile completare la procedura. <1 /> Ti chiediamo di riprovare più tardi.`,
-    backActionLabel: 'Chiudi',
+    title: 'Qualcosa è andato storto.',
+    description: `Non siamo riusciti a indirizzarti alla pagina di caricamento<1 />per completare la procedura.`,
+    contactAssistanceButton: 'Contatta l’assistenza',
     sessionModal: {
       onConfirmLabel: 'Torna alla pagina di caricamento',
       onCloseLabel: 'Esci',
@@ -130,10 +129,9 @@ export default {
     },
     outcomeContent: {
       success: {
-        alt: "Icona dell'email",
         title: 'Adesione completata!',
-        description: `Comunicheremo l'avvenuta adesione all'indirizzo PEC <1/> dell'ente. Da questo momento in poi, gli Amministratori <3/> inseriti in fase di richiesta potranno accedere al portale.`,
-        backActionLabel: 'Chiudi',
+        description: `Comunicheremo l'avvenuta adesione all'indirizzo PEC <1/> primario dell'ente. Da questo momento, gli Amministratori <3/> inseriti in fase di richiesta possono accedere all'Area <5 />Riservata.`,
+        backActionLabel: 'Torna alla home',
       },
       error: {
         alt: 'Error',
@@ -146,7 +144,7 @@ export default {
       INVALID_DOCUMENT: {
         title: 'Controlla il documento',
         message:
-          "Il documento caricato non è riconducibile all'Atto di adesione del tuo Ente. Verifica che sia quello corretto e caricalo di nuovo.",
+          "Il documento caricato non corrisponde all'Atto di Adesione. Verifica che sia corretto e caricalo di nuovo.",
       },
       INVALID_SIGN: {
         title: 'Controlla il documento',
@@ -155,8 +153,7 @@ export default {
       },
       GENERIC: {
         title: 'Caricamento non riuscito',
-        message:
-          'Il caricamento del documento non è andato a buon fine. Torna indietro e caricalo di nuovo.',
+        message: 'Il caricamento del documento non è andato a buon fine.',
       },
     },
   },
@@ -269,17 +266,16 @@ export default {
   rejectRegistration: {
     outcomeContent: {
       success: {
-        imgAlt: "Icona dell'email",
-        title: 'La tua richiesta di adesione è stata annullata',
+        title: 'La tua richiesta di adesione è <1 />stata annullata',
         description:
-          ' Visita il portale Self Care per conoscere i prodotti e richiedere una nuova <1 /> adesione per il tuo Ente.',
-        backActionLabel: 'Chiudi',
+          'Nella home dell’Area Riservata puoi vedere i prodotti<1 />disponibili e richiedere l’adesione per il tuo ente.',
+        backActionLabel: 'Torna alla home',
       },
       error: {
-        title: 'Spiacenti, qualcosa è andato storto.',
+        title: 'Qualcosa è andato storto.',
         description:
           'A causa di un errore del sistema non è possibile completare la procedura. <1 /> Ti chiediamo di riprovare più tardi.',
-        backActionLabel: 'Chiudi',
+        backActionLabel: 'Torna alla home',
       },
       loading: {
         loadingText: 'Stiamo verificando i tuoi dati',

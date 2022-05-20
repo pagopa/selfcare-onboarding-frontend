@@ -31,9 +31,7 @@ export function ConfirmRegistrationStep0({ forward }: StepperStepComponentProps)
           <Trans i18nKey="confirmRegistrationStep0.description">
             <strong> Segui le istruzioni</strong> per inviare il documento firmato,
             <br />
-            servirà a completare l&apos;inserimento del tuo ente
-            <br />
-            nel portale Self Care.
+            servirà a completare l&apos;adesione al prodotto scelto.
           </Trans>
         </Typography>
       </Grid>
