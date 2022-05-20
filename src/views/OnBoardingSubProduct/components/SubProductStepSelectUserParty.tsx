@@ -2,7 +2,7 @@ import { Card, Grid, Link, Typography, useTheme } from '@mui/material';
 import { Box } from '@mui/system';
 import { useEffect } from 'react';
 import { useTranslation, Trans } from 'react-i18next';
-import { EntityAccountItem } from '@pagopa/mui-italia/dist/components/EntityAccountItem';
+import { PartyAccountItem } from '@pagopa/mui-italia/dist/components/PartyAccountItem';
 import { Party, SelfcareParty, StepperStepComponentProps } from '../../../../types';
 import { OnboardingStepActions } from '../../../components/OnboardingStepActions';
 import { useHistoryState } from '../../../components/useHistoryState';
@@ -92,10 +92,10 @@ export function SubProductStepSelectUserParty({ forward, parties }: Props) {
                   left: '480px',
                 }}
               >
-                <Grid mb={3} mt={4} ml={4}>
-                  <EntityAccountItem
-                    entityName={p.description}
-                    entityRole=""
+                <Grid mb={3} mt={4} px={4}>
+                  <PartyAccountItem
+                    partyName={p.description}
+                    partyRole=""
                     image={p.urlLogo}
                     noWrap={false}
                   />

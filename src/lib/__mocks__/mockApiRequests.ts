@@ -103,7 +103,8 @@ const mockedParties: Array<SelfcareParty> = [
     externalId: 'externalId1',
     originId: 'originId1',
     id: 'partyId1',
-    description: 'Comune di Milano',
+    description:
+      'Commissario straordinario per la realizzazione di approdi temporanei e di interventi complementari per la salvaguardia di Venezia e della sua laguna e ulteriori interventi per la salvaguardia della laguna di Venezia',
     urlLogo: 'logo',
     address: 'address',
     digitalAddress: 'a@aa.com',
