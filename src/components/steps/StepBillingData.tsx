@@ -186,7 +186,7 @@ export default function StepBillingData({
     const isError = !!formik.errors[field] && formik.errors[field] !== requiredError;
     return {
       id: field,
-      type: 'number',
+      type: 'tel',
       value: formik.values[field],
       label,
       error: isError,

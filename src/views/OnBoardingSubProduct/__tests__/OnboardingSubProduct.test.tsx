@@ -370,7 +370,7 @@ const fillUserBillingDataForm = async (
     target: { value: 'AAAAAA44D55F456K' },
   });
   fireEvent.change(document.getElementById(zipCodeInput), {
-    target: { value: '20212' },
+    target: { value: '09010' },
   });
   fireEvent.change(document.getElementById(recipientCode), {
     target: { value: 'AM23EIX' },
@@ -462,7 +462,7 @@ const verifySubmit = async () => {
             businessName: 'businessNameInput',
             registeredOffice: 'registeredOfficeInput',
             digitalAddress: 'a@a.com',
-            zipCode: 20212,
+            zipCode: '09010',
             taxCode: 'AAAAAA44D55F456K',
             vatNumber: 'AAAAAA44D55F456K',
             recipientCode: 'AM23EIX',

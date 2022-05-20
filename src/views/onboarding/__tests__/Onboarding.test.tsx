@@ -261,7 +261,7 @@ const executeStepBillingData = async () => {
     'businessNameInput',
     'registeredOfficeInput',
     'a@a.it',
-    '20121',
+    '09010',
     'AAAAAA44D55F456K',
     '11223344567',
     'recipientCode'
@@ -342,7 +342,7 @@ const fillUserBillingDataForm = async (
     target: { value: 'registeredOfficeInput' },
   });
   fireEvent.change(document.getElementById(mailPECInput), { target: { value: 'a@a.it' } });
-  fireEvent.change(document.getElementById(zipCode), { target: { value: '20121' } });
+  fireEvent.change(document.getElementById(zipCode), { target: { value: '09010' } });
   fireEvent.change(document.getElementById(taxCodeInput), {
     target: { value: 'AAAAAA44D55F456K' },
   });
@@ -620,7 +620,7 @@ const verifySubmit = async () => {
             businessName: 'businessNameInput',
             registeredOffice: 'registeredOfficeInput',
             digitalAddress: 'a@a.it',
-            zipCode: 20121,
+            zipCode: '09010',
             taxCode: 'AAAAAA44D55F456K',
             vatNumber: '11223344567',
             recipientCode: 'recipientCode',
