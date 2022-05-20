@@ -441,7 +441,7 @@ const fillTextFieldAndCheckButton = async (
 
 const verifySubmit = async () => {
   await waitFor(() =>
-    expect(fetchWithLogsSpy).toBeCalledWith(
+    expect(fetchWithLogsSpy).lastCalledWith(
       {
         endpoint: 'ONBOARDING_POST_LEGALS',
         endpointParams: { externalInstitutionId: 'id', productId: 'prod-io-premium' },
@@ -464,7 +464,7 @@ const verifySubmit = async () => {
             digitalAddress: 'a@a.com',
             zipCode: 20212,
             taxCode: 'AAAAAA44D55F456K',
-            vatNumber: 'AAAAAA44D55F456K',
+            vatNumber: '12345678901',
             recipientCode: 'AM23EIX',
             publicServices: false,
           },
