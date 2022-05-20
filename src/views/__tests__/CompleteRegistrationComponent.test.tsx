@@ -32,10 +32,10 @@ test('test no jwt', () => {
   render(<CompleteRegistrationComponent />);
 
   const goHomeButton = screen.getByRole('button', {
-    name: 'Chiudi',
+    name: 'Contatta l’assistenza',
   });
   fireEvent.click(goHomeButton);
-  expect(mockedLocation.assign).toBeCalledWith(ENV.URL_FE.LANDING);
+  expect(mockedLocation.assign).toBeCalledWith(ENV.URL_FE.ASSISTANCE);
 });
 
 test('test', async () => {
@@ -48,7 +48,7 @@ test('test', async () => {
   fireEvent.click(goOnButton);
 
   const sendButton = screen.getByRole('button', {
-    name: 'Invia',
+    name: 'Continua',
   });
   expect(sendButton).toBeDisabled();
 
