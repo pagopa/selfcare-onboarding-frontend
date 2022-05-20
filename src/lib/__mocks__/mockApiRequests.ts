@@ -124,6 +124,19 @@ const mockedParties: Array<SelfcareParty> = [
     origin: 'IPA',
   },
   {
+    externalId: 'externalId3',
+    originId: 'originId3',
+    id: 'partyId3',
+    description:
+      'Commissario straordinario per la realizzazione di approdi temporanei e di interventi complementari per la salvaguardia di Venezia e della sua laguna e ulteriori interventi per la salvaguardia della laguna di Venezia',
+    urlLogo: 'logo',
+    address: 'address',
+    digitalAddress: 'a@aa.com',
+    taxCode: '33322268945',
+    zipCode: 'zipCode',
+    origin: 'IPA',
+  },
+  {
     externalId: 'onboarded_externalId',
     originId: 'onboarded_originId',
     id: 'onboarded_partyId',

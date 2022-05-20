@@ -1322,10 +1322,10 @@
     minimatch "^3.0.4"
     strip-json-comments "^3.1.1"
 
-"@fontsource/titillium-web@^4.5.3":
-  version "4.5.5"
-  resolved "https://registry.yarnpkg.com/@fontsource/titillium-web/-/titillium-web-4.5.5.tgz#cc0ec9d9ae28d291b0043286ce199df0dbb89491"
-  integrity sha512-JNk5R7raBSh1qVegTSKolG8Ln9utNsKujHKI9+uWWFCemBKcS5Il0l+EcpcDu+V4F8Ovdco53zNLghug0MFPtA==
+"@fontsource/titillium-web@^4.5.8":
+  version "4.5.8"
+  resolved "https://registry.yarnpkg.com/@fontsource/titillium-web/-/titillium-web-4.5.8.tgz#1bebb1daf86b02c7c8d816071a850121904f7b56"
+  integrity sha512-9sOpgikaqh9qvYRYLnk7C0PSIU4GNt17Qtw3txUwLioRcLWiL0OeNDE1vndC1NzeWII6AicTRMOoMTbthRuFIw==
 
 "@humanwhocodes/config-array@^0.9.2":
   version "0.9.5"
@@ -1670,18 +1670,20 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
-"@pagopa/mui-italia@0.6.9":
-  version "0.6.9"
-  resolved "https://registry.yarnpkg.com/@pagopa/mui-italia/-/mui-italia-0.6.9.tgz#75f545982ba3b692a1108c6f9cfea770ff56b636"
-  integrity sha512-SeVSiVvmSN/JvtG/a9oNmdezt2NnDjMJ3npuSwWl1quqrvqNkDU3JT2GXaUSXnykUBz8R2OKs/fswNQ1EeR5ZA==
+"@pagopa/mui-italia@0.6.20":
+  version "0.6.20"
+  resolved "https://registry.yarnpkg.com/@pagopa/mui-italia/-/mui-italia-0.6.20.tgz#ff2879ece72763883d9db54d1ddce856d2febe48"
+  integrity sha512-qjrwBJUilFDPedHy4AT/2TqjhQaEBthH8tdsR9eMLbrG+ygIecTmk0kzXYjTnb/9Lf7pHpGinZmBh9NivGdS+Q==
   dependencies:
-    "@fontsource/titillium-web" "^4.5.3"
+    "@fontsource/titillium-web" "^4.5.8"
+    clsx "^1.1.1"
 
-"@pagopa/mui-italia@github:pagopa/mui-italia":
-  version "0.6.10"
-  resolved "https://codeload.github.com/pagopa/mui-italia/tar.gz/06d36f2c1c58098bd842571ca4efbeb278c6f9f2"
+"@pagopa/mui-italia@pagopa/mui-italia":
+  version "0.6.19"
+  resolved "https://codeload.github.com/pagopa/mui-italia/tar.gz/fd857ee718e7903320595bac0cffe5eb47d077ca"
   dependencies:
-    "@fontsource/titillium-web" "^4.5.3"
+    "@fontsource/titillium-web" "^4.5.8"
+    clsx "^1.1.1"
 
 "@pagopa/selfcare-common-frontend@^1.10.11":
   version "1.10.11"
