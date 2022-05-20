@@ -348,7 +348,6 @@ const fillUserBillingDataForm = async (
   });
 
   const isTaxCodeNotEquals2PIVA = screen.getByRole('checkbox');
-  fireEvent.click(isTaxCodeNotEquals2PIVA);
   expect(isTaxCodeNotEquals2PIVA).toBeTruthy();
 
   fireEvent.change(document.getElementById(vatNumber), {
@@ -609,7 +608,7 @@ const fillAdditionalUserAndCheckUniqueValues = async (
 
 const verifySubmit = async () => {
   await waitFor(() =>
-    expect(fetchWithLogsSpy).toBeCalledWith(
+    expect(fetchWithLogsSpy).lastCalledWith(
       {
         endpoint: 'ONBOARDING_POST_LEGALS',
         endpointParams: { externalInstitutionId: 'id', productId: 'prod-pagopa' },
