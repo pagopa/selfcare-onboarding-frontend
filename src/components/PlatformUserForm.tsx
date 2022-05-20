@@ -10,7 +10,8 @@ type PlatformUserFormProps = {
   people: UsersObject;
   allPeople: UsersObject;
   setPeople: React.Dispatch<React.SetStateAction<UsersObject>>;
-  readOnly?: Array<keyof UserOnCreate>;
+  readOnly?: boolean;
+  readOnlyFields?: Array<keyof UserOnCreate>;
 };
 
 type Field = {
@@ -106,7 +107,8 @@ export function PlatformUserForm({
   people,
   allPeople,
   setPeople,
-  readOnly = [],
+  readOnly,
+  readOnlyFields = [],
 }: PlatformUserFormProps) {
   const { t } = useTranslation();
   const theme = useTheme();
@@ -173,7 +175,7 @@ export function PlatformUserForm({
                       ? t(`platformUserForm.fields.${id}.description`)
                       : ''
                   }
-                  disabled={readOnly.indexOf(id) > -1}
+                  disabled={readOnly || readOnlyFields.indexOf(id) > -1}
                 />
               </Grid>
             );

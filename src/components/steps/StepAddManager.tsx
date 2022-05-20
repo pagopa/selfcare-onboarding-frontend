@@ -9,7 +9,11 @@ import { useHistoryState } from '../useHistoryState';
 // Could be an ES6 Set but it's too bothersome for now
 export type UsersObject = { [key: string]: UserOnCreate };
 
-export function StepAddManager({ product, forward, back }: StepperStepComponentProps) {
+type Props = StepperStepComponentProps & {
+  readOnly?: boolean;
+};
+
+export function StepAddManager({ readOnly, product, forward, back }: Props) {
   // const [people, setPeople] = useState<UsersObject>({});
   const [people, setPeople, setPeopleHistory] = useHistoryState<UsersObject>('people_step2', {});
   const { t } = useTranslation();
@@ -65,6 +69,7 @@ export function StepAddManager({ product, forward, back }: StepperStepComponentP
             people={people}
             allPeople={people}
             setPeople={setPeople}
+            readOnly={readOnly}
           />
         </Grid>
       </Grid>
