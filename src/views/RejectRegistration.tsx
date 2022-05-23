@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { Button, Stack, Typography, Grid } from '@mui/material';
+import { Button, Typography, Grid } from '@mui/material';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
 import { useTranslation, Trans } from 'react-i18next';
 import { uniqueId } from 'lodash';
@@ -66,26 +66,35 @@ export default function RejectRegistration() {
   }, []);
   const outcomeContent: RequestOutcomeOptions = {
     success: {
-      img: { src: '', alt: t('rejectRegistration.outcomeContent.success.imgAlt') },
-      title: t('rejectRegistration.outcomeContent.success.title'),
+      title: '',
       description: [
-        <Stack key="0" spacing={10}>
+        <>
           <IllusCompleted size={60} />
-          <Typography mt={3}>
-            <Trans i18nKey="rejectRegistration.outcomeContent.success.description">
-              Visita il portale Self Care per conoscere i prodotti e richiedere una nuova
+          <Typography variant="h4" mt={3}>
+            <Trans i18nKey="rejectRegistration.outcomeContent.success.title">
+              La tua richiesta di adesione è
               <br />
-              adesione per il tuo Ente.
+              stata annullata
             </Trans>
           </Typography>
-          <Button
-            variant="contained"
-            sx={{ alignSelf: 'center' }}
-            onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
-          >
-            {t('rejectRegistration.outcomeContent.success.backActionLabel')}
-          </Button>
-        </Stack>,
+          <Typography variant="body1" mb={4} mt={1}>
+            <Trans i18nKey="rejectRegistration.outcomeContent.success.description">
+              Nella home dell’Area Riservata puoi vedere i prodotti
+              <br />
+              disponibili e richiedere l’adesione per il tuo ente.
+            </Trans>
+          </Typography>
+          <Typography mt={3}>
+            <Button
+              variant="contained"
+              sx={{ alignSelf: 'center' }}
+              onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+            >
+              {t('rejectRegistration.outcomeContent.success.backActionLabel')}
+            </Button>
+          </Typography>
+          ,
+        </>,
       ],
     },
     error: {
@@ -101,9 +110,9 @@ export default function RejectRegistration() {
                 </Typography>
               </Grid>
             </Grid>
-            <Grid container item justifyContent="center" mb={7} mt={1}>
+            <Grid container item justifyContent="center" mb={4} mt={1}>
               <Grid item xs={6}>
-                <Typography>
+                <Typography variant="body1">
                   <Trans i18nKey="rejectRegistration.outcomeContent.error.description">
                     A causa di un errore del sistema non è possibile completare la procedura.
                     <br />

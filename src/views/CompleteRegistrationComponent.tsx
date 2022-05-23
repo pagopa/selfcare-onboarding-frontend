@@ -6,6 +6,7 @@ import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsS
 import { useTranslation, Trans } from 'react-i18next';
 import { uniqueId } from 'lodash';
 import { IllusCompleted, IllusError } from '@pagopa/mui-italia';
+import { buildAssistanceURI } from '@pagopa/selfcare-common-frontend/services/assistanceService';
 import { RequestOutcome, RequestOutcomeOptions, StepperStep, Problem } from '../../types';
 import { ConfirmRegistrationStep0 } from '../components/ConfirmRegistrationStep0';
 import { ConfirmRegistrationStep1 } from '../components/ConfirmRegistrationStep1';
@@ -221,9 +222,13 @@ export default function CompleteRegistrationComponent() {
           <Stack key="0" spacing={3}>
             <Typography variant="body1">
               <Trans i18nKey="completeRegistration.outcomeContent.success.description">
-                Comunicheremo l&apos;avvenuta adesione all&apos;indirizzo PEC <br /> dell&apos;ente.
-                Da questo momento in poi, gli Amministratori <br />
-                inseriti in fase di richiesta potranno accedere al portale.
+                Comunicheremo l&apos;avvenuta adesione all&apos;indirizzo PEC
+                <br />
+                primario dell&apos;ente. Da questo momento, gli Amministratori
+                <br />
+                inseriti in fase di richiesta possono accedere all&apos;Area
+                <br />
+                Riservata.`,
               </Trans>
             </Typography>
             <Button
@@ -254,7 +259,7 @@ export default function CompleteRegistrationComponent() {
   ) : outcome === 'error' ? (
     !token || showBlockingError ? (
       <Grid container direction="column" key="0" style={{ textAlign: 'center' }}>
-        <Grid container item justifyContent="center" mb={5}>
+        <Grid container item justifyContent="center" mb={2}>
           <IllusError size={60} />
         </Grid>
         <Grid container item justifyContent="center" mt={3}>
@@ -262,13 +267,13 @@ export default function CompleteRegistrationComponent() {
             <Typography variant="h4">{t('completeRegistration.title')}</Typography>
           </Grid>
         </Grid>
-        <Grid container item justifyContent="center" mb={4} mt={2}>
+        <Grid container item justifyContent="center" mb={4} mt={1}>
           <Grid item xs={6}>
-            <Typography>
+            <Typography variant="body1">
               <Trans i18nKey="completeRegistration.description">
-                A causa di un errore del sistema non è possibile completare la procedura.
+                Non siamo riusciti a indirizzarti alla pagina di caricamento
                 <br />
-                Ti chiediamo di riprovare più tardi.
+                per completare la procedura.
               </Trans>
             </Typography>
           </Grid>
@@ -278,9 +283,9 @@ export default function CompleteRegistrationComponent() {
             <Button
               variant="contained"
               sx={{ alignSelf: 'center' }}
-              onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+              onClick={() => window.location.assign(buildAssistanceURI(ENV.ASSISTANCE.EMAIL))}
             >
-              {t('completeRegistration.backActionLabel')}
+              {t('completeRegistration.contactAssistanceButton')}
             </Button>
           </Grid>
         </Grid>
