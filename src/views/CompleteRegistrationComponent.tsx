@@ -27,10 +27,6 @@ type FileErrorAttempt = {
   errorCount: number;
 };
 
-type Props = {
-  assistanceEmail?: string;
-};
-
 const errors = {
   INVALID_DOCUMENT: {
     title: 'title',
@@ -62,7 +58,7 @@ const transcodeErrorCode = (data: Problem): keyof typeof errors => {
 };
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
-export default function CompleteRegistrationComponent({ assistanceEmail }: Props) {
+export default function CompleteRegistrationComponent() {
   const { setSubHeaderVisible, setOnLogout } = useContext(HeaderContext);
   const { setRequiredLogin } = useContext(UserContext);
   const token = getOnboardingMagicLinkJwt();
@@ -287,7 +283,7 @@ export default function CompleteRegistrationComponent({ assistanceEmail }: Props
             <Button
               variant="contained"
               sx={{ alignSelf: 'center' }}
-              onClick={() => window.location.assign(buildAssistanceURI(assistanceEmail))}
+              onClick={() => window.location.assign(buildAssistanceURI(ENV.ASSISTANCE.EMAIL))}
             >
               {t('completeRegistration.contactAssistanceButton')}
             </Button>

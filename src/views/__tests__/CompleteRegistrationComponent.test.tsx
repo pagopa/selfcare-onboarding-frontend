@@ -33,14 +33,14 @@ jest.mock('@pagopa/selfcare-common-frontend/services/assistanceService', () => (
 test('test no jwt', () => {
   mockedLocation.search = undefined;
 
-  render(<CompleteRegistrationComponent assistanceEmail="assistance.selfcare@email.com" />);
+  render(<CompleteRegistrationComponent />);
 
   const assistanceButton = screen.getByRole('button', {
     name: 'Contatta l’assistenza',
   });
 
   fireEvent.click(assistanceButton);
-  expect(buildAssistanceURI).toBeCalledWith('assistance.selfcare@email.com');
+  expect(buildAssistanceURI).toBeCalledWith('assistenza@selfcare.it');
 });
 
 test('test', async () => {
