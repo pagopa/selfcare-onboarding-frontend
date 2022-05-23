@@ -394,10 +394,15 @@ const fillUserForm = async (
 
   expect(confirmButton).toBeEnabled();
 
-  await fillTextFieldAndCheckButton(prefix, 'name', 'NAME', confirmButton, true);
+  /*await fillTextFieldAndCheckButton(prefix, 'name', 'NAME', confirmButton, true);
   await fillTextFieldAndCheckButton(prefix, 'surname', 'SURNAME', confirmButton, true);
   await fillTextFieldAndCheckButton(prefix, 'taxCode', taxCode, confirmButton, true);
-  await fillTextFieldAndCheckButton(prefix, 'email', email, confirmButton, true);
+  await fillTextFieldAndCheckButton(prefix, 'email', email, confirmButton, true);*/
+
+  expect(document.getElementById('LEGAL-name')).toBeDisabled();
+  expect(document.getElementById('LEGAL-surname')).toBeDisabled();
+  expect(document.getElementById('LEGAL-taxCode')).toBeDisabled();
+  expect(document.getElementById('LEGAL-email')).toBeDisabled();
 };
 
 const checkCorrectBodyBillingData = (
@@ -450,13 +455,13 @@ const verifySubmit = async () => {
         method: 'POST',
         data: {
           users: [
-            {
+            /*{
               name: 'NAME',
               surname: 'SURNAME',
               role: 'MANAGER',
               taxCode: 'BBBBBB00B00B000B',
               email: 'b@b.bb',
-            },
+            }, not more to be sent */
           ],
           billingData: {
             businessName: 'businessNameInput',

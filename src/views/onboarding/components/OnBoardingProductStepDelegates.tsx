@@ -140,7 +140,7 @@ export function OnBoardingProductStepDelegates({ product, legal, forward, back }
             people={people}
             allPeople={allPeople}
             setPeople={setPeople}
-            readOnly={isAuthUser ? ['name', 'surname', 'taxCode'] : []}
+            readOnlyFields={isAuthUser ? ['name', 'surname', 'taxCode'] : []}
           />
         </Grid>
 

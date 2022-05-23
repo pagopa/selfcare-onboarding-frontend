@@ -49,7 +49,7 @@ function OnBoardingSubProduct() {
   const [externalInstitutionId, setExternalInstitutionId] = useState<string>('');
   const [origin, setOrigin] = useState<string>('');
 
-  const [manager, setManager] = useState<UserOnCreate>();
+  const [_manager, setManager] = useState<UserOnCreate>();
   const [billingData, setBillingData] = useState<BillingData>();
   const [institutionType, setInstitutionType] = useState<InstitutionType>();
   const [partyId, setPartyId] = useState<string>();
@@ -263,6 +263,7 @@ function OnBoardingSubProduct() {
       label: 'Insert Manager',
       Component: () =>
         StepAddManager({
+          readOnly: true,
           product: subProduct,
           forward: forwardWithManagerData,
           back: () => {
@@ -283,7 +284,7 @@ function OnBoardingSubProduct() {
           product: product as Product,
           subProduct: subProduct as Product,
           externalInstitutionId,
-          users: [manager as UserOnCreate],
+          users: [], // manager as UserOnCreate not more to be send
           billingData: billingData as BillingData,
           institutionType: institutionType as InstitutionType,
           pricingPlan,
