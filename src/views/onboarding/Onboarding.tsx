@@ -113,6 +113,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
     setBillingData({
       businessName: party.description,
       registeredOffice: party.address,
+      zipCode: party.zipCode,
       digitalAddress: party.digitalAddress,
       taxCode: party.taxCode,
       vatNumber: '',
@@ -247,6 +248,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
           initialFormData: billingData ?? {
             businessName: '',
             registeredOffice: '',
+            zipCode: '',
             digitalAddress: '',
             taxCode: '',
             vatNumber: '',

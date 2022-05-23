@@ -155,7 +155,8 @@ const mockedOnboardingData0: InstitutionOnboardingInfoResource = {
     id: '55897f04-bafd-4bc9-b646-0fd027620c1b',
     billingData: {
       businessName: 'Comune di Milano',
-      registeredOffice: 'Milano, Piazza Colonna 370, CAP 20021',
+      registeredOffice: 'Milano, Piazza Colonna 370',
+      zipCode: '20021',
       digitalAddress: 'comune.milano@pec.it',
       taxCode: 'AAAAAA11A11A123K',
       vatNumber: 'AAAAAA11A11A123K',
@@ -178,7 +179,8 @@ const mockedOnboardingData1: InstitutionOnboardingInfoResource = {
     id: '370c63d8-1b76-4376-a725-4caf2a73822a',
     billingData: {
       businessName: 'Comune di Bollate',
-      registeredOffice: 'Bollate, Piazza Colonna 370, CAP 20021',
+      registeredOffice: 'Bollate, Piazza Colonna 370',
+      zipCode: '20021',
       digitalAddress: 'comune.bollate@pec.it',
       taxCode: 'BBBBBB11A11A123K',
       vatNumber: '12345678901',

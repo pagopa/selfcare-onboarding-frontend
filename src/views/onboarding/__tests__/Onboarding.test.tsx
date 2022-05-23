@@ -249,6 +249,7 @@ const executeStepBillingData = async () => {
     'businessName',
     'registeredOffice',
     'digitalAddress',
+    'zipCode',
     'taxCode',
     'vatNumber',
     'recipientCode'
@@ -260,6 +261,7 @@ const executeStepBillingData = async () => {
     'businessNameInput',
     'registeredOfficeInput',
     'a@a.it',
+    '09010',
     'AAAAAA44D55F456K',
     '11223344567',
     'recipientCode'
@@ -328,6 +330,7 @@ const fillUserBillingDataForm = async (
   businessNameInput: string,
   registeredOfficeInput: string,
   mailPECInput: string,
+  zipCode: string,
   taxCodeInput: string,
   vatNumber: string,
   recipientCode: string
@@ -339,6 +342,7 @@ const fillUserBillingDataForm = async (
     target: { value: 'registeredOfficeInput' },
   });
   fireEvent.change(document.getElementById(mailPECInput), { target: { value: 'a@a.it' } });
+  fireEvent.change(document.getElementById(zipCode), { target: { value: '09010' } });
   fireEvent.change(document.getElementById(taxCodeInput), {
     target: { value: 'AAAAAA44D55F456K' },
   });
@@ -459,6 +463,7 @@ const checkCorrectBodyBillingData = (
   expectedBusinessName: string = '',
   expectedRegisteredOfficeInput: string = '',
   expectedMailPEC: string = '',
+  expectedZipCode: string = '',
   expectedTaxCode: string = '',
   expectedVatNumber: string = '',
   expectedRecipientCode: string = ''
@@ -472,6 +477,7 @@ const checkCorrectBodyBillingData = (
   expect((document.getElementById('digitalAddress') as HTMLInputElement).value).toBe(
     expectedMailPEC
   );
+  expect((document.getElementById('zipCode') as HTMLInputElement).value).toBe(expectedZipCode);
   expect((document.getElementById('taxCode') as HTMLInputElement).value).toBe(expectedTaxCode);
   expect((document.getElementById('vatNumber') as HTMLInputElement).value).toBe(expectedVatNumber);
   expect((document.getElementById('recipientCode') as HTMLInputElement).value).toBe(
@@ -613,6 +619,7 @@ const verifySubmit = async () => {
             businessName: 'businessNameInput',
             registeredOffice: 'registeredOfficeInput',
             digitalAddress: 'a@a.it',
+            zipCode: '09010',
             taxCode: 'AAAAAA44D55F456K',
             vatNumber: '11223344567',
             recipientCode: 'recipientCode',

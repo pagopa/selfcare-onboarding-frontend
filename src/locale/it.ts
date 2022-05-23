@@ -248,10 +248,12 @@ export default {
   stepBillingData: {
     title: 'Indica i dati del tuo ente',
     invalidFiscalCode: 'Codice fiscale non valido',
+    invalidZipCode: 'CAP non valido',
     invalidVatNumber: 'Partita IVA non valida',
     invalidEmail: 'L’indirizzo email non è valido',
     businessName: 'Ragione sociale',
     registeredOffice: 'Sede legale',
+    zipCode: 'CAP',
     digitalAddress: 'Indirizzo PEC',
     taxCodeNotEquals2PIVAdescription: 'La Partita IVA non coincide con il Codice fiscale',
     taxCode: 'Codice fiscale',
