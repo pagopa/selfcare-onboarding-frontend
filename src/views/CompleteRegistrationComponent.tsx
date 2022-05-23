@@ -6,6 +6,7 @@ import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsS
 import { useTranslation, Trans } from 'react-i18next';
 import { uniqueId } from 'lodash';
 import { IllusCompleted, IllusError } from '@pagopa/mui-italia';
+import { buildAssistanceURI } from '@pagopa/selfcare-common-frontend/services/assistanceService';
 import { RequestOutcome, RequestOutcomeOptions, StepperStep, Problem } from '../../types';
 import { ConfirmRegistrationStep0 } from '../components/ConfirmRegistrationStep0';
 import { ConfirmRegistrationStep1 } from '../components/ConfirmRegistrationStep1';
@@ -24,6 +25,10 @@ type FileErrorAttempt = {
   fileSize: number;
   fileLastModifyDate: number;
   errorCount: number;
+};
+
+type Props = {
+  assistanceEmail?: string;
 };
 
 const errors = {
@@ -57,7 +62,7 @@ const transcodeErrorCode = (data: Problem): keyof typeof errors => {
 };
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
-export default function CompleteRegistrationComponent() {
+export default function CompleteRegistrationComponent({ assistanceEmail }: Props) {
   const { setSubHeaderVisible, setOnLogout } = useContext(HeaderContext);
   const { setRequiredLogin } = useContext(UserContext);
   const token = getOnboardingMagicLinkJwt();
@@ -282,7 +287,7 @@ export default function CompleteRegistrationComponent() {
             <Button
               variant="contained"
               sx={{ alignSelf: 'center' }}
-              onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+              onClick={() => window.location.assign(buildAssistanceURI(assistanceEmail))}
             >
               {t('completeRegistration.contactAssistanceButton')}
             </Button>

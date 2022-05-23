@@ -1,7 +1,7 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { ENV } from '../../utils/env';
+import { fireEvent, render, screen } from '@testing-library/react';
 import CompleteRegistrationComponent from '../CompleteRegistrationComponent';
 import './../../locale';
+import { buildAssistanceURI } from '@pagopa/selfcare-common-frontend/services/assistanceService';
 
 const oldWindowLocation = global.window.location;
 const mockedLocation = {
@@ -26,16 +26,21 @@ jest.mock('react-router-dom', () => ({
   }),
 }));
 
+jest.mock('@pagopa/selfcare-common-frontend/services/assistanceService', () => ({
+  buildAssistanceURI: jest.fn(),
+}));
+
 test('test no jwt', () => {
   mockedLocation.search = undefined;
 
-  render(<CompleteRegistrationComponent />);
+  render(<CompleteRegistrationComponent assistanceEmail="assistance.selfcare@email.com" />);
 
-  const goHomeButton = screen.getByRole('button', {
+  const assistanceButton = screen.getByRole('button', {
     name: 'Contatta l’assistenza',
   });
-  fireEvent.click(goHomeButton);
-  expect(mockedLocation.assign).toBeCalledWith(ENV.URL_FE.LANDING);
+
+  fireEvent.click(assistanceButton);
+  expect(buildAssistanceURI).toBeCalledWith('assistance.selfcare@email.com');
 });
 
 test('test', async () => {
