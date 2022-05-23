@@ -282,7 +282,7 @@ export default function CompleteRegistrationComponent() {
             <Button
               variant="contained"
               sx={{ alignSelf: 'center' }}
-              onClick={() => window.location.assign(ENV.URL_FE.ASSISTANCE)}
+              onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
             >
               {t('completeRegistration.contactAssistanceButton')}
             </Button>

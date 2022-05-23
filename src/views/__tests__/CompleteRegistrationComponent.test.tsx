@@ -35,7 +35,7 @@ test('test no jwt', () => {
     name: 'Contatta l’assistenza',
   });
   fireEvent.click(goHomeButton);
-  expect(mockedLocation.assign).toBeCalledWith(ENV.URL_FE.ASSISTANCE);
+  expect(mockedLocation.assign).toBeCalledWith(ENV.URL_FE.LANDING);
 });
 
 test('test', async () => {
