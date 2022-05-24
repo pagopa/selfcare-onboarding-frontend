@@ -77,6 +77,7 @@ export function SubProductStepSelectUserParty({ forward, parties }: Props) {
           {parties.map((p, index) => (
             <Box key={p.externalId}>
               <Card
+                aria-label={selected ? p.description : undefined}
                 onClick={() => setSelected(p)}
                 sx={{
                   cursor: 'pointer',
@@ -92,7 +93,7 @@ export function SubProductStepSelectUserParty({ forward, parties }: Props) {
                   left: '480px',
                 }}
               >
-                <Grid mb={3} mt={4} px={4}>
+                <Grid mb={3} mt={4} px={4} aria-label={p.description}>
                   <PartyAccountItem
                     partyName={p.description}
                     partyRole=""
@@ -117,6 +118,7 @@ export function SubProductStepSelectUserParty({ forward, parties }: Props) {
             }}
           >
             <Typography
+              aria-label="Non lo trovi? Registra un nuovo ente"
               sx={{
                 textAlign: 'center',
               }}

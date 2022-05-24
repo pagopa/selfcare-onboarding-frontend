@@ -69,6 +69,7 @@ export default function AsyncAutocompleteSearch({
               setInput('');
               setSelected('');
             }}
+            aria-label="clearIcon"
           >
             <ClearOutlinedIcon sx={{ color: theme.palette.text.primary }} />
           </IconButton>
