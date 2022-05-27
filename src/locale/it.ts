@@ -16,7 +16,7 @@ export default {
   },
   confirmRegistrationStep1: {
     errorAlertTitle: 'Controlla il Documento',
-    errorAlertDescription: "E' possibile caricare un solo file di tipo PDF",
+    errorAlertDescription: "Il formato del file dev'essere di tipo PDF",
     pageTitle: "Carica l'Accordo di Adesione",
     pageSubtitle: `Carica l’Accordo di Adesione ricevuto all’indirizzo PEC <1 />primario dell’ente, firmato digitalmente dal Legale <3 />Rappresentante.`,
     fileUploaderTitle: 'Trascina qui l’Accordo di Adesione firmato oppure',

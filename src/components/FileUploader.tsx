@@ -7,12 +7,13 @@ import { FileUploadedPreview } from './FileUploadedPreview';
 type FileUploaderOption = {
   title: string;
   descriptionLink?: string;
-  uploadedFiles: Array<File>;
-  deleteUploadedFiles?: (event: any | undefined) => void;
-  onDropAccepted?: (t: Array<File>) => void;
+  uploadedFile: File;
+  deleteUploadedFile?: (event: any | undefined) => void;
+  onDropAccepted?: (t: File) => void;
   onDropRejected?: (fileRejections: Array<FileRejection>, event?: DropEvent) => void;
-  maxFiles?: number;
-  accept?: Array<string> | undefined;
+  maxFiles: number;
+  multiple: boolean;
+  accept?: string | undefined;
   uploaderImageWidth?: number;
   loading: boolean;
   theme: Theme;
@@ -21,19 +22,17 @@ type FileUploaderOption = {
 export function FileUploader({
   title,
   descriptionLink,
-  uploadedFiles,
-  deleteUploadedFiles,
-  onDropAccepted,
+  uploadedFile,
+  deleteUploadedFile,
   onDropRejected,
-  maxFiles,
   accept,
   loading,
   theme,
 }: FileUploaderOption) {
   const { getRootProps, getInputProps } = useDropzone({
-    onDropAccepted,
     onDropRejected,
-    maxFiles: maxFiles ? maxFiles : 1,
+    maxFiles: 1,
+    multiple: false,
     accept: accept ? accept : undefined,
   });
 
@@ -50,12 +49,12 @@ export function FileUploader({
     >
       <input {...getInputProps()} />
 
-      {uploadedFiles && uploadedFiles.length > 0 ? (
+      {uploadedFile ? (
         <FileUploadedPreview
           theme={theme}
           loading={loading}
-          files={uploadedFiles}
-          deleteUploadedFiles={deleteUploadedFiles}
+          file={uploadedFile}
+          deleteUploadedFile={deleteUploadedFile}
         />
       ) : (
         <Box

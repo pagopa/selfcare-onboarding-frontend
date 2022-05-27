@@ -9,11 +9,11 @@ export function ConfirmRegistrationStep1(
   { setDialogTitle, setDialogDescription, setShowDialog }: AlertDialogActions,
   { forward }: StepperStepComponentProps,
   { loading }: any,
-  { uploadedFiles, setUploadedFiles }: any
+  { uploadedFile, setUploadedFile }: any
 ) {
   const { t } = useTranslation();
-  const onDropAccepted = (acceptedFiles: Array<File>) => {
-    setUploadedFiles(acceptedFiles);
+  const onDropAccepted = (acceptedFile: File) => {
+    setUploadedFile(acceptedFile);
   };
 
   const onDropRejected = () => {
@@ -23,11 +23,11 @@ export function ConfirmRegistrationStep1(
   };
 
   const onSubmit = (): void => {
-    forward(uploadedFiles[0]);
+    forward(uploadedFile);
   };
 
-  const deleteUploadedFiles = (): void => {
-    setUploadedFiles([]);
+  const deleteUploadedFile = (): void => {
+    setUploadedFile();
   };
   const theme = useTheme();
 
@@ -59,11 +59,13 @@ export function ConfirmRegistrationStep1(
         <FileUploader
           title={t('confirmRegistrationStep1.fileUploaderTitle')}
           descriptionLink={t('confirmRegistrationStep1.fileUploaderDescriptionLink')}
-          uploadedFiles={uploadedFiles}
-          deleteUploadedFiles={deleteUploadedFiles}
+          uploadedFile={uploadedFile}
+          deleteUploadedFile={deleteUploadedFile}
           onDropAccepted={onDropAccepted}
           onDropRejected={onDropRejected}
-          accept={['application/pdf', 'application/pkcs7-mime', 'application/x-pkcs7-mime']}
+          maxFiles={1}
+          multiple={false}
+          accept={'application/pdf'}
           uploaderImageWidth={uploaderImageWidth}
           loading={loading}
           theme={theme}
@@ -76,7 +78,7 @@ export function ConfirmRegistrationStep1(
             fullWidth
             color="primary"
             variant="contained"
-            disabled={!(uploadedFiles && uploadedFiles.length > 0)}
+            disabled={!uploadedFile}
             onClick={onSubmit}
           >
             {t('confirmRegistrationStep1.confirmAction')}
