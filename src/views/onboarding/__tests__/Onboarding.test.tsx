@@ -69,7 +69,7 @@ const renderComponent = (productId: string = 'prod-pagopa') => {
 const step1Title = 'Seleziona il tuo ente';
 const stepInstitutionType = 'Seleziona il tipo di ente che rappresenti';
 const stepBillingDataTitle = 'Indica i dati del tuo ente';
-const step2Title = 'Indica il Legale rappresentante';
+const step2Title = 'Indica il Legale Rappresentante';
 const step3Title = "Indica l'Amministratore";
 const completeSuccessTitle = 'La tua richiesta è stata inviata con successo';
 const completeErrorTitle = 'Spiacenti, qualcosa è andato storto.';
@@ -161,7 +161,7 @@ const retrieveNavigationButtons = async () => {
   expect(goBackButton).toBeEnabled();
 
   const confirmButton = screen.getByRole('button', {
-    name: 'Conferma',
+    name: 'Continua',
   });
   expect(confirmButton).toBeDisabled();
 
@@ -189,7 +189,7 @@ const checkBackForwardNavigation = async (
   await waitFor(() => screen.getByText(previousStepTitle));
 
   const goForwardButton = screen.getByRole('button', {
-    name: 'Conferma',
+    name: 'Continua',
   });
   await waitFor(() => expect(goForwardButton).toBeEnabled());
   fireEvent.click(goForwardButton);
@@ -213,7 +213,7 @@ const executeStep1 = async (partyName: string) => {
 
   fireEvent.click(partyNameSelection);
 
-  const confirmButton = screen.getByRole('button', { name: 'Conferma' });
+  const confirmButton = screen.getByRole('button', { name: 'Continua' });
   expect(confirmButton).toBeEnabled();
 
   fireEvent.click(confirmButton);
@@ -226,7 +226,7 @@ const executeStepInstitutionType = async () => {
 
   await fillInstitutionTypeCheckbox('pa', 'gsp', 'scp', 'pt');
 
-  const confirmButtonEnabled = screen.getByRole('button', { name: 'Conferma' });
+  const confirmButtonEnabled = screen.getByRole('button', { name: 'Continua' });
   expect(confirmButtonEnabled).toBeEnabled();
 
   fireEvent.click(confirmButtonEnabled);
@@ -237,7 +237,7 @@ const executeStepBillingData = async () => {
   console.log('Testing step Billing Data');
   await waitFor(() => screen.getByText(stepBillingDataTitle));
 
-  const confirmButtonEnabled = screen.getByRole('button', { name: 'Conferma' });
+  const confirmButtonEnabled = screen.getByRole('button', { name: 'Continua' });
   await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
 
   fireEvent.change(document.getElementById('recipientCode'), {
@@ -275,7 +275,7 @@ const executeStep2 = async () => {
   console.log('Testing step 2');
   await waitFor(() => screen.getByText(step2Title));
 
-  const confirmButton = screen.getByRole('button', { name: 'Conferma' });
+  const confirmButton = screen.getByRole('button', { name: 'Continua' });
   expect(confirmButton).toBeDisabled();
 
   await fillUserForm(confirmButton, 'LEGAL', 'BBBBBB00B00B000B', 'b@b.bb');
