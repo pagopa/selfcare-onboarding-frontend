@@ -88,7 +88,7 @@ const renderComponent = (
 const stepSelectInstitutionUnreleatedTitle = 'Seleziona il tuo ente';
 const stepSelectInstitutionReleatedTitle = "Seleziona l'ente";
 const stepBillingDataTitle = 'Indica i dati del tuo ente';
-const stepAddManagerTitle = 'Indica il Legale rappresentante';
+const stepAddManagerTitle = 'Indica il Legale Rappresentante';
 const successOnboardingSubProductTitle = 'La tua richiesta è stata inviata con successo';
 const errorOnboardingSubProductTitle = 'Richiesta di adesione premium in errore';
 
@@ -181,7 +181,7 @@ const retrieveNavigationButtons = async () => {
   expect(goBackButton).toBeEnabled();
 
   const confirmButton = screen.getByRole('button', {
-    name: 'Conferma',
+    name: 'Continua',
   });
   await waitFor(() => expect(confirmButton).toBeEnabled());
 
@@ -199,7 +199,7 @@ const checkBackForwardNavigation = async (
   await waitFor(() => screen.getByText(previousStepTitle));
 
   const goForwardButton = screen.getByRole('button', {
-    name: 'Conferma',
+    name: 'Continua',
   });
   expect(goForwardButton).toBeEnabled();
   fireEvent.click(goForwardButton);
@@ -227,7 +227,7 @@ const executeStepSelectInstitutionUnreleated = async (partyName: string) => {
 
   fireEvent.click(partyNameSelection);
 
-  const confirmButton = screen.getByRole('button', { name: 'Conferma' });
+  const confirmButton = screen.getByRole('button', { name: 'Continua' });
 
   fireEvent.click(confirmButton);
   await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(5));
@@ -247,7 +247,7 @@ const executeStepSelectInstitutionReleated = async (partyName: string) => {
 
   fireEvent.click(partyNameSelection);
 
-  const confirmButton = screen.getByRole('button', { name: 'Conferma' });
+  const confirmButton = screen.getByRole('button', { name: 'Continua' });
   expect(confirmButton).toBeEnabled();
 
   fireEvent.click(confirmButton);
@@ -269,7 +269,7 @@ const executeStepBillingData = async () => {
     'recipientCode'
   );
 
-  const confirmButtonEnabled = screen.getByRole('button', { name: 'Conferma' });
+  const confirmButtonEnabled = screen.getByRole('button', { name: 'Continua' });
   await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
 
   fireEvent.change(document.getElementById('recipientCode'), {
@@ -306,7 +306,7 @@ const executeStepAddManager = async (expectedSuccessfulSubmit: boolean) => {
   console.log('Testing step add manager');
   await waitFor(() => screen.getByText(stepAddManagerTitle));
 
-  const confirmButton = screen.getByRole('button', { name: 'Conferma' });
+  const confirmButton = screen.getByRole('button', { name: 'Continua' });
 
   await fillUserForm(confirmButton, 'LEGAL', 'BBBBBB00B00B000B', 'b@b.bb');
 

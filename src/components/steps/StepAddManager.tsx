@@ -42,7 +42,7 @@ export function StepAddManager({ readOnly, product, forward, back }: Props) {
         <Grid item xs={12}>
           <Typography variant="h3" component="h2" align="center" sx={{ lineHeight: '1.2' }}>
             <Trans i18nKey="onboardingStep2.bodyTitle">
-              Indica il Legale <br /> rappresentante
+              Indica il Legale <br /> Rappresentante
             </Trans>
           </Typography>
         </Grid>
@@ -52,10 +52,11 @@ export function StepAddManager({ readOnly, product, forward, back }: Props) {
         <Grid item xs={12}>
           <Typography sx={{ fontWeight: 400 }} variant="subtitle2" component="h2" align="center">
             <Trans i18nKey="onboardingStep2.bodyDescription">
-              Conferma, modifica o inserisci i dati del Legale rappresentante.
+              Inserisci i dati del Legale Rappresentante.
               <br />
-              La persona indicata sarà firmataria del contratto per
-              {`${product?.title}`}
+              La persona che indicherai sarà firmataria del contratto per
+              <br />
+              {`${product?.title}`}.
             </Trans>
           </Typography>
         </Grid>

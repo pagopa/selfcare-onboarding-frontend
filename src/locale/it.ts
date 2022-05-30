@@ -35,7 +35,7 @@ export default {
     description: 'In pochi passaggi il tuo Ente potrà aderire e gestire tutti i prodotti PagoPA.',
     privacyPolicyDescription: 'Ho letto e compreso',
     privacyPolicyLink: 'l’Informativa Privacy e i Termini e Condizioni d’Uso del servizio',
-    actionLabel: 'Conferma',
+    actionLabel: 'Continua',
   },
   onboardingStep1_5: {
     loadingText: 'Stiamo verificando i tuoi dati',
@@ -64,25 +64,26 @@ export default {
         placeholder: 'Cerca',
       },
       onboardingStepActions: {
-        confirmAction: 'Conferma',
+        confirmAction: 'Continua',
         backAction: 'Indietro',
       },
     },
   },
   onboardingStep2: {
-    bodyTitle: 'Indica il Legale <1/> rappresentante',
-    bodyDescription: `Conferma, modifica o inserisci i dati del Legale rappresentante. <1/> La persona indicata sarà firmataria del contratto per <3/>`,
+    bodyTitle: 'Indica il Legale <1/> Rappresentante',
+    bodyDescription: `Inserisci i dati del Legale Rappresentante. <1/> La persona che indicherai sarà firmataria del contratto per <3/><4/>`,
     backLabel: 'Indietro',
-    confirmLabel: 'Conferma',
+    confirmLabel: 'Continua',
   },
   onboardingStep3: {
     bodyTitle: "Indica l'Amministratore",
     bodyDescription1: 'Inserisci i dati del Referente Amministrativo o di un suo delegato.',
-    bodyDescription2: 'La persona che indicherai sarà responsabile della gestione di',
+    bodyDescription2:
+      'La persona che indicherai sarà responsabile della gestione di {{productTitle}}',
     addUserLabel: 'Aggiungi un altro Amministratore',
     addUserLink: 'Aggiungi un altro Amministratore',
     backLabel: 'Indietro',
-    confirmLabel: 'Conferma',
+    confirmLabel: 'Continua',
     formControl: {
       label: "Sono io l'Amministratore",
     },
@@ -107,7 +108,7 @@ export default {
           invalid: "L'indirizzo email non è valido",
           duplicate: "L'indirizzo email inserito è già presente",
         },
-        description: 'Inserisci l’indirizzo email istituzionale dell’Amministratore',
+        description: 'Inserisci l’indirizzo email istituzionale utilizzato per l’ente',
       },
     },
   },
@@ -203,7 +204,7 @@ export default {
       subTitle:
         "Seleziona l'ente per il quale stai richiedendo la sottoscrizione <1 />all'offerta Premium",
       helperLink: 'Non lo trovi? <1>Registra un nuovo ente</1>',
-      confirmButton: 'Conferma',
+      confirmButton: 'Continua',
     },
     genericError: {
       title: 'Richiesta di adesione premium in errore',
@@ -243,7 +244,7 @@ export default {
     cadArticle6:
       'par. 6 delle “Linee Guida sul punto di accesso telematico ai servizi della Pubblica Amministrazione” ( art. 64bis del CAD)',
     backLabel: 'Indietro',
-    confirmLabel: 'Conferma',
+    confirmLabel: 'Continua',
   },
   stepBillingData: {
     title: 'Indica i dati del tuo ente',
@@ -263,7 +264,7 @@ export default {
     recipientCodeDescription: 'È il codice necessario per ricevere le fatture elettroniche',
     gspDescription: 'Sono gestore di almeno uno dei pubblici servizi: Gas, Energia, Telco.',
     backLabel: 'Indietro',
-    confirmLabel: 'Conferma',
+    confirmLabel: 'Continua',
   },
   rejectRegistration: {
     outcomeContent: {
