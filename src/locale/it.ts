@@ -2,7 +2,7 @@ export default {
   alertDialog: {
     title: 'Titolo',
     description: 'Descrizione',
-    confirmLabel: 'Torna alla pagina di caricamento',
+    confirmLabel: 'Carica di nuovo',
     cancelLabel: 'Esci',
   },
   asyncAutocomplete: {
@@ -15,8 +15,9 @@ export default {
     confirmAction: 'Continua',
   },
   confirmRegistrationStep1: {
-    errorAlertTitle: 'Controlla il Documento',
-    errorAlertDescription: "Il formato del file dev'essere di tipo PDF",
+    errorAlertTitle: 'Caricamento non riuscito',
+    errorAlertDescription:
+      'Il caricamento del documento non è andato a buon fine. Torna indietro <1 />e caricalo di nuovo.',
     pageTitle: "Carica l'Accordo di Adesione",
     pageSubtitle: `Carica l’Accordo di Adesione ricevuto all’indirizzo PEC <1 />primario dell’ente, firmato digitalmente dal Legale <3 />Rappresentante.`,
     fileUploaderTitle: 'Trascina qui l’Accordo di Adesione firmato oppure',

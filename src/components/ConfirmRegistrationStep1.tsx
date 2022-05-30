@@ -18,7 +18,13 @@ export function ConfirmRegistrationStep1(
 
   const onDropRejected = () => {
     setDialogTitle(t('confirmRegistrationStep1.errorAlertTitle'));
-    setDialogDescription(t('confirmRegistrationStep1.errorAlertDescription'));
+    setDialogDescription(
+      <Trans i18nKey="confirmRegistrationStep1.errorAlertDescription">
+        {'Il caricamento del documento non è andato a buon fine. Torna indietro'}
+        <br />
+        {'e caricalo di nuovo.'}
+      </Trans>
+    );
     setShowDialog(true);
   };
 

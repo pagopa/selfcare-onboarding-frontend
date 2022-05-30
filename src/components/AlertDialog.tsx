@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 
 type DialogOption = {
   title: string | null;
-  description: string | null;
+  description: React.ReactElement | null;
   open: boolean;
   showConfirm?: boolean;
   confirmLabel?: string;

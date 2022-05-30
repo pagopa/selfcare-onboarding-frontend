@@ -95,7 +95,7 @@ export type User = {
 
 export type AlertDialogActions = {
   setDialogTitle: (t: string) => void;
-  setDialogDescription: (t: string) => void;
+  setDialogDescription: (t: React.ReactElement) => void;
   setShowDialog: (t: boolean) => void;
   handleCloseDialog?: (t: any) => void;
 };

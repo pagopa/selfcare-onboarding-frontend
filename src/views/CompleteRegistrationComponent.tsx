@@ -69,7 +69,7 @@ export default function CompleteRegistrationComponent() {
   );
   const [showDialog, setShowDialog] = useState<boolean>(false);
   const [dialogTitle, setDialogTitle] = useState<string | null>(null);
-  const [dialogDescription, setDialogDescription] = useState<string | null>(null);
+  const [dialogDescription, setDialogDescription] = useState<React.ReactElement | null>(null);
   const [outcome, setOutcome] = useState<RequestOutcome | null>(!token ? 'error' : null);
   const [errorCode, setErrorCode] = useState<keyof typeof errors>('GENERIC');
 
