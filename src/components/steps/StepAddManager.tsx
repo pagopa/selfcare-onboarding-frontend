@@ -50,7 +50,7 @@ export function StepAddManager({ readOnly, product, forward, back }: Props) {
 
       <Grid container item justifyContent="center" mt={1}>
         <Grid item xs={12}>
-          <Typography sx={{ fontWeight: 400 }} variant="subtitle2" component="h2" align="center">
+          <Typography sx={{ fontWeight: 400 }} variant="body1" component="h2" align="center">
             <Trans i18nKey="onboardingStep2.bodyDescription">
               Inserisci i dati del Legale Rappresentante.
               <br />
