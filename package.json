@@ -5,12 +5,13 @@
   "private": true,
   "dependencies": {
     "@mui/lab": "^5.0.0-alpha.74",
-    "@pagopa/mui-italia": "0.6.5",
-    "@pagopa/selfcare-common-frontend": "^1.10.1",
+    "@pagopa/mui-italia": "0.6.20",
+    "@pagopa/selfcare-common-frontend": "^1.10.11",
     "@types/react": "^17.0.18",
     "@types/react-dom": "^17.0.9",
     "axios": "^0.21.1",
     "debounce": "^1.2.1",
+    "formik": "^2.2.9",
     "query-string": "^4.3.4",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
@@ -79,6 +80,9 @@
       "src/index.tsx",
       "src/reportWebVitals.ts",
       "src/utils/constants.ts"
-    ]
+    ],
+    "moduleNameMapper": {
+      "^.+\\.(css|less|scss)$": "babel-jest"
+    }
   }
 }

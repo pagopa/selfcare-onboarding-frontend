@@ -56,7 +56,7 @@ export default function AsyncAutocompleteResults({
                   setSelected(option);
                   setOptions([]);
                 }}
-                variant="body1" // to be removed when inserted fontWeight:'700' with fontSize:'18px
+                variant="body1"
                 sx={{ fontWeight: '700', cursor: 'pointer', textTransform: 'capitalize' }}
               >
                 {getOptionLabel(option)?.toLowerCase()}

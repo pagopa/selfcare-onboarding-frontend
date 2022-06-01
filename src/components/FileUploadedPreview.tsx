@@ -72,8 +72,8 @@ export function FileUploadedPreview({
                   container
                   justifyContent="space-evenly"
                   alignItems="center"
-                  width="390px"
-                  height="90px"
+                  width="400px"
+                  height="66px"
                 >
                   <Grid item xs={1}>
                     <Box px={2} sx={{ color: theme.palette.primary.main }}>
