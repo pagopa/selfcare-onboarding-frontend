@@ -49,6 +49,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
   const [institutionType, setInstitutionType] = useState<InstitutionType>();
   const [partyId, setPartyId] = useState<string>();
   const [origin, setOrigin] = useState<string>('');
+  const [pricingPlan, setPricingPlan] = useState<string>('');
   const { setOnLogout } = useContext(HeaderContext);
   const { setRequiredLogin } = useContext(UserContext);
   const requestIdRef = useRef<string>();
@@ -71,6 +72,10 @@ function OnboardingComponent({ productId }: { productId: string }) {
     void checkProductId().finally(() => {
       setLoading(false);
     });
+    const pricingPlanByQuery = new URLSearchParams(window.location.search).get('pricingPlan');
+    if (pricingPlanByQuery) {
+      setPricingPlan(pricingPlanByQuery);
+    }
   }, [productId]);
 
   const checkProductId = async () => {
@@ -140,7 +145,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
     setLoading(true);
     const postLegalsResponse = await fetchWithLogs(
       { endpoint: 'ONBOARDING_POST_LEGALS', endpointParams: { externalInstitutionId, productId } },
-      { method: 'POST', data: { billingData, institutionType, origin, users } },
+      { method: 'POST', data: { billingData, institutionType, origin, users, pricingPlan } },
       () => setRequiredLogin(true)
     );
 
