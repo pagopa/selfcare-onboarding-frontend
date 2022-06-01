@@ -28,7 +28,7 @@ type Props = StepperStepComponentProps & {
   users: Array<UserOnCreate>;
   billingData: BillingData;
   institutionType: InstitutionType;
-  pricingPlan: string;
+  pricingPlan?: string;
   origin: string;
   setLoading: (loading: boolean) => void;
 };

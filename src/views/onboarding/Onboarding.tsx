@@ -49,7 +49,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
   const [institutionType, setInstitutionType] = useState<InstitutionType>();
   const [partyId, setPartyId] = useState<string>();
   const [origin, setOrigin] = useState<string>('');
-  const [pricingPlan, setPricingPlan] = useState<string>('');
+  const [pricingPlan, setPricingPlan] = useState<string>();
   const { setOnLogout } = useContext(HeaderContext);
   const { setRequiredLogin } = useContext(UserContext);
   const requestIdRef = useRef<string>();
