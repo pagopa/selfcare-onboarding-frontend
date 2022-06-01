@@ -21,7 +21,7 @@ const initialLocation = {
   assign: jest.fn(),
   pathname: '',
   origin: 'MOCKED_ORIGIN',
-  search: '',
+  search: '?pricingPlan=pricingPlan',
   hash: '',
   state: undefined,
 };
@@ -627,6 +627,7 @@ const verifySubmit = async () => {
           },
           institutionType: 'PT',
           origin: 'IPA',
+          pricingPlan: 'pricingPlan',
           users: [
             {
               email: 'b@b.bb',
