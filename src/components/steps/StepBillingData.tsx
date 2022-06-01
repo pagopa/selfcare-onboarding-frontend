@@ -225,7 +225,7 @@ export default function StepBillingData({
 
         <Grid container item justifyContent="center" mt={2} mb={4}>
           <Grid item xs={12}>
-            <Typography variant="subtitle2" component="h2" align="center">
+            <Typography variant="body1" align="center">
               {subtitle}
             </Typography>
           </Grid>
