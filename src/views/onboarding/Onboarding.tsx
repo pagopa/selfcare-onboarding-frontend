@@ -72,10 +72,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
     void checkProductId().finally(() => {
       setLoading(false);
     });
-    const pricingPlanByQuery = new URLSearchParams(window.location.search).get('pricingPlan');
-    if (pricingPlanByQuery) {
-      setPricingPlan(pricingPlanByQuery);
-    }
+    setPricingPlan(new URLSearchParams(window.location.search).get('pricingPlan') ?? undefined);
   }, [productId]);
 
   const checkProductId = async () => {
