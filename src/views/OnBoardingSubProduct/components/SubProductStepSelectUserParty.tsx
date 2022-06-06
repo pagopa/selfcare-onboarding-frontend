@@ -58,12 +58,7 @@ export function SubProductStepSelectUserParty({ forward, parties }: Props) {
 
       <Grid container item justifyContent="center" mt={1}>
         <Grid item xs={12}>
-          <Typography
-            variant="subtitle2"
-            component="h2"
-            align="center"
-            color={theme.palette.text.primary}
-          >
+          <Typography variant="body1" align="center" color={theme.palette.text.primary}>
             <Trans i18nKey="onBoardingSubProduct.selectUserPartyStep.subTitle">
               Seleziona l&apos;ente per il quale stai richiedendo la sottoscrizione <br />
               all&apos;offerta Premium
