@@ -6,9 +6,11 @@ import {
 import { Button, Grid, Typography } from '@mui/material';
 import { IllusError, theme } from '@pagopa/mui-italia';
 import { Trans } from 'react-i18next';
+import { AxiosError } from 'axios';
 import {
   BillingData,
   InstitutionType,
+  Problem,
   Product,
   StepperStepComponentProps,
   UserOnCreate,
@@ -31,6 +33,7 @@ type Props = StepperStepComponentProps & {
   pricingPlan: string;
   origin: string;
   setLoading: (loading: boolean) => void;
+  setHasReceivedError: (hasReceivedError: boolean) => void;
 };
 
 const errorOutCome = {
@@ -87,6 +90,7 @@ function SubProductStepSubmit({
   users,
   billingData,
   setLoading,
+  setHasReceivedError,
   institutionType,
   pricingPlan,
   origin,
@@ -139,7 +143,10 @@ function SubProductStepSubmit({
         subproduct_id: subProduct.id,
       });
       forward();
-    } else if (outcome === 'error') {
+    } else if (
+      outcome === 'error' &&
+      (postLegalsResponse as AxiosError<Problem>).response?.status !== 409
+    ) {
       setError(true);
       trackEvent('ONBOARDING_SEND_FAILURE', {
         party_id: externalInstitutionId,
@@ -147,6 +154,8 @@ function SubProductStepSubmit({
         product_id: product?.id,
         subproduct_id: subProduct?.id,
       });
+    } else {
+      setHasReceivedError(true);
     }
   };
 

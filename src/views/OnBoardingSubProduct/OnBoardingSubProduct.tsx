@@ -62,6 +62,7 @@ function OnBoardingSubProduct() {
   const [openExitModal, setOpenExitModal] = useState(false);
   const [openExitUrl, setOpenExitUrl] = useState(ENV.URL_FE.LOGOUT);
   const { setOnLogout } = useContext(HeaderContext);
+  const [hasReceivedError, setHasReceivedError] = useState(false);
 
   const requestIdRef = useRef<string>('');
 
@@ -290,6 +291,7 @@ function OnBoardingSubProduct() {
           pricingPlan,
           origin,
           setLoading,
+          setHasReceivedError,
           forward,
           back,
         }),
@@ -307,9 +309,28 @@ function OnBoardingSubProduct() {
     setOpenExitUrl(ENV.URL_FE.LOGOUT);
   };
 
+  const handleRetryErrorModal = () => {
+    setHasReceivedError(false);
+    back();
+  };
+
+  const handleCloseErrorModal = () => {
+    setHasReceivedError(false);
+    window.location.assign(ENV.URL_FE.LOGOUT);
+  };
+
   return (
     <Container>
       <Step />
+      <SessionModal
+        open={hasReceivedError}
+        title={t('onboarding.outcomeContent.error409.title')}
+        message={t('onboarding.outcomeContent.error409.description')}
+        onConfirmLabel={t('onboarding.outcomeContent.error409.retry')}
+        onConfirm={handleRetryErrorModal}
+        onCloseLabel={t('onboarding.outcomeContent.error409.back')}
+        handleClose={handleCloseErrorModal}
+      />
       <SessionModal
         handleClose={handleCloseExitModal}
         handleExit={handleCloseExitModal}

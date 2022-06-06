@@ -17,6 +17,7 @@ import {
   Party,
   StepperStep,
   UserOnCreate,
+  Problem,
 } from '../../../types';
 import { StepSearchParty } from '../../components/steps/StepSearchParty';
 import { StepAddManager } from '../../components/steps/StepAddManager';
@@ -49,6 +50,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
   const [institutionType, setInstitutionType] = useState<InstitutionType>();
   const [partyId, setPartyId] = useState<string>();
   const [origin, setOrigin] = useState<string>('');
+  const [hasReceivedError, setHasReceivedError] = useState(false);
   const { setOnLogout } = useContext(HeaderContext);
   const { setRequiredLogin } = useContext(UserContext);
   const requestIdRef = useRef<string>();
@@ -157,12 +159,17 @@ function OnboardingComponent({ productId }: { productId: string }) {
         request_id: requestIdRef.current,
         product_id: productId,
       });
-    } else if (outcome === 'error') {
+    } else if (
+      outcome === 'error' &&
+      (postLegalsResponse as AxiosError<Problem>).response?.status !== 409
+    ) {
       trackEvent('ONBOARDING_SEND_FAILURE', {
         party_id: externalInstitutionId,
         request_id: requestIdRef.current,
         product_id: productId,
       });
+    } else {
+      setHasReceivedError(true);
     }
   };
 
@@ -392,11 +399,32 @@ function OnboardingComponent({ productId }: { productId: string }) {
     setOpenExitUrl(ENV.URL_FE.LOGOUT);
   };
 
+  const handleRetryErrorModal = () => {
+    setHasReceivedError(false);
+    back();
+  };
+
+  const handleCloseErrorModal = () => {
+    setHasReceivedError(false);
+    window.location.assign(ENV.URL_FE.LOGOUT);
+  };
+
   return selectedProduct === null ? (
     <NoProductPage />
   ) : !outcome ? (
     <Container>
       <Step />
+      {hasReceivedError && (
+        <SessionModal
+          open={hasReceivedError}
+          title={t('onboarding.outcomeContent.error409.title')}
+          message={t('onboarding.outcomeContent.error409.description')}
+          onConfirmLabel={t('onboarding.outcomeContent.error409.retry')}
+          onConfirm={handleRetryErrorModal}
+          onCloseLabel={t('onboarding.outcomeContent.error409.back')}
+          handleClose={handleCloseErrorModal}
+        />
+      )}
       <SessionModal
         handleClose={handleCloseExitModal}
         handleExit={handleCloseExitModal}

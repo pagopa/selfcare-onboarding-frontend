@@ -218,6 +218,13 @@ const genericError: Promise<AxiosError> = new Promise((resolve) =>
   } as AxiosError)
 );
 
+const error409: Promise<AxiosError> = new Promise((resolve) =>
+  resolve({
+    isAxiosError: true,
+    response: { data: '', status: 409, statusText: '409' },
+  } as AxiosError)
+);
+
 // eslint-disable-next-line sonarjs/cognitive-complexity, complexity
 export async function mockFetch(
   { endpoint, endpointParams }: Endpoint,
@@ -315,6 +322,8 @@ export async function mockFetch(
     switch (endpointParams.externalInstitutionId) {
       case 'error':
         return genericError;
+      case 'externalId1':
+        return error409;
       default:
         return new Promise((resolve) =>
           resolve({ data: undefined, status: 200, statusText: '200' } as AxiosResponse)
