@@ -53,7 +53,7 @@ function OnBoardingSubProduct() {
   const [billingData, setBillingData] = useState<BillingData>();
   const [institutionType, setInstitutionType] = useState<InstitutionType>();
   const [partyId, setPartyId] = useState<string>();
-  const [pricingPlan, setPricingPlan] = useState<string>('');
+  const [pricingPlan, setPricingPlan] = useState<string>();
 
   const setStepAddManagerHistoryState = useHistoryState<UsersObject>('people_step2', {})[2];
 
