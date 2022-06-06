@@ -24,7 +24,7 @@ const handleSearchExternalId = async (
   const searchResponse = await fetchWithLogs(
     {
       endpoint: 'ONBOARDING_GET_PARTY',
-      endpointParams: {externalInstitutionId},
+      endpointParams: { externalInstitutionId },
     },
     { method: 'GET' },
     onRedirectToLogin
@@ -107,12 +107,7 @@ export function StepSearchParty({ subTitle, forward, back }: Props) {
 
       <Grid container item justifyContent="center" mt={1}>
         <Grid item xs={12}>
-          <Typography
-            variant="subtitle2"
-            component="h2"
-            align="center"
-            color={theme.palette.text.primary}
-          >
+          <Typography variant="body1" align="center" color={theme.palette.text.primary}>
             {subTitle}
           </Typography>
         </Grid>
