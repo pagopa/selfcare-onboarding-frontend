@@ -95,11 +95,13 @@ export default {
         label: 'Nome',
       },
       surname: { label: 'Cognome' },
+      errorUserData: 'Non corrisponde al Codice Fiscale inserito',
       taxCode: {
         label: 'Codice Fiscale',
         errors: {
           invalid: 'Il Codice Fiscale inserito non è valido',
           duplicate: 'Il codice fiscale inserito è già presente',
+          mismatch: 'Il Codice Fiscale non corrisponde ai dati inseriti',
         },
       },
       email: {
