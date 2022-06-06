@@ -2,7 +2,6 @@ import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import { DialogActions, Grid, Typography } from '@mui/material';
-import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 import { useTranslation } from 'react-i18next';
 
 type DialogOption = {
@@ -20,7 +19,6 @@ export function AlertDialog({
   title,
   description,
   open,
-  showConfirm,
   confirmLabel,
   cancelLabel,
   handleConfirm,
@@ -45,8 +43,6 @@ export function AlertDialog({
         <Typography variant={'sidenav'} align="left">
           {title ? title : t('alertDialog.title')}
         </Typography>
-
-        <ClearOutlinedIcon onClick={handleClose} sx={{ color: 'info.main' }} />
       </Grid>
 
       <DialogContent>
@@ -55,8 +51,8 @@ export function AlertDialog({
         </Typography>
       </DialogContent>
       <DialogActions>
-        <Grid container direction={'column'} m={2}>
-          {showConfirm && (
+        <Grid container direction={'row-reverse'} mt={1} mb={3} ml={2}>
+          <Grid xs={4} ml={1}>
             <Button
               color="primary"
               variant="contained"
@@ -64,10 +60,12 @@ export function AlertDialog({
             >
               {confirmLabel ? confirmLabel : t('alertDialog.confirmLabel')}
             </Button>
-          )}
-          <Button sx={{ mt: 1 }} color="primary" variant="outlined" onClick={handleClose}>
-            {cancelLabel ? cancelLabel : t('alertDialog.cancelLabel')}
-          </Button>
+          </Grid>
+          <Grid xs={2}>
+            <Button color="primary" variant="outlined" onClick={handleClose}>
+              {cancelLabel ? cancelLabel : t('alertDialog.cancelLabel')}
+            </Button>
+          </Grid>
         </Grid>
       </DialogActions>
     </Dialog>
