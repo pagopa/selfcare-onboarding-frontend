@@ -33,7 +33,7 @@ type Props = StepperStepComponentProps & {
   pricingPlan?: string;
   origin: string;
   setLoading: (loading: boolean) => void;
-  setHasReceivedError: (hasReceivedError: boolean) => void;
+  setClientBadInputError: (clientBadInputError: boolean) => void;
 };
 
 const errorOutCome = {
@@ -90,7 +90,7 @@ function SubProductStepSubmit({
   users,
   billingData,
   setLoading,
-  setHasReceivedError,
+  setClientBadInputError,
   institutionType,
   pricingPlan,
   origin,
@@ -155,7 +155,7 @@ function SubProductStepSubmit({
         subproduct_id: subProduct?.id,
       });
     } else {
-      setHasReceivedError(true);
+      setClientBadInputError(true);
     }
   };
 

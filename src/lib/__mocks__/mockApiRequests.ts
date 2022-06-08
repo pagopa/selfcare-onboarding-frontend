@@ -1,5 +1,10 @@
 import { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
-import { Endpoint, InstitutionOnboardingInfoResource, SelfcareParty } from '../../../types';
+import {
+  Endpoint,
+  InstitutionOnboardingInfoResource,
+  SelfcareParty,
+  UserOnCreate,
+} from '../../../types';
 
 const mockPartyRegistry = {
   items: [
@@ -233,7 +238,7 @@ const error409: Promise<AxiosError> = new Promise((resolve) =>
 // eslint-disable-next-line sonarjs/cognitive-complexity, complexity
 export async function mockFetch(
   { endpoint, endpointParams }: Endpoint,
-  { params }: AxiosRequestConfig
+  { params, data }: AxiosRequestConfig
 ): Promise<AxiosResponse | AxiosError> {
   if (endpoint === 'ONBOARDING_GET_SEARCH_PARTIES') {
     return new Promise((resolve) =>
@@ -323,16 +328,26 @@ export async function mockFetch(
         );
     }
   }
+
   if (endpoint === 'ONBOARDING_POST_LEGALS') {
     switch (endpointParams.externalInstitutionId) {
       case 'error':
         return genericError;
-      case 'externalId1':
-        return error409;
       default:
-        return new Promise((resolve) =>
-          resolve({ data: undefined, status: 200, statusText: '200' } as AxiosResponse)
-        );
+        const certifiedUser: UserOnCreate | undefined = (
+          (data as any).users as Array<UserOnCreate>
+        ).find((u) => u.taxCode === 'XXXXXX00A00X000X');
+        if (
+          certifiedUser &&
+          certifiedUser.name === 'CERTIFIED_NAME' &&
+          certifiedUser.surname === 'CERTIFIED_SURNAME'
+        ) {
+          return error409;
+        } else {
+          return new Promise((resolve) =>
+            resolve({ data: '', status: 200, statusText: '200' } as AxiosResponse)
+          );
+        }
     }
   }
 

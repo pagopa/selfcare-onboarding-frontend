@@ -50,7 +50,8 @@ function OnboardingComponent({ productId }: { productId: string }) {
   const [institutionType, setInstitutionType] = useState<InstitutionType>();
   const [partyId, setPartyId] = useState<string>();
   const [origin, setOrigin] = useState<string>('');
-  const [hasReceivedError, setHasReceivedError] = useState(false);
+  const [clientBadInputError, setClientBadInputError] = useState<boolean>(false);
+  const [resolvedConflictError, setResolvedConflictError] = useState<boolean>(true);
   const [pricingPlan, setPricingPlan] = useState<string>();
   const { setOnLogout } = useContext(HeaderContext);
   const { setRequiredLogin } = useContext(UserContext);
@@ -171,7 +172,8 @@ function OnboardingComponent({ productId }: { productId: string }) {
         product_id: productId,
       });
     } else {
-      setHasReceivedError(true);
+      setClientBadInputError(true);
+      setResolvedConflictError(false);
     }
   };
 
@@ -394,6 +396,11 @@ function OnboardingComponent({ productId }: { productId: string }) {
     if (outcome) {
       unregisterUnloadEvent(setOnLogout);
     }
+    if (clientBadInputError) {
+      setResolvedConflictError(false);
+    } else {
+      setResolvedConflictError(true);
+    }
   }, [outcome]);
 
   const handleCloseExitModal = () => {
@@ -402,31 +409,31 @@ function OnboardingComponent({ productId }: { productId: string }) {
   };
 
   const handleRetryErrorModal = () => {
-    setHasReceivedError(false);
-    back();
+    setClientBadInputError(false);
+    setResolvedConflictError(false);
   };
 
   const handleCloseErrorModal = () => {
-    setHasReceivedError(false);
+    setClientBadInputError(false);
     window.location.assign(ENV.URL_FE.LOGOUT);
   };
 
   return selectedProduct === null ? (
     <NoProductPage />
-  ) : !outcome ? (
+  ) : outcome && resolvedConflictError ? (
+    <MessageNoAction {...outcomeContent[outcome]} />
+  ) : (
     <Container>
       <Step />
-      {hasReceivedError && (
-        <SessionModal
-          open={hasReceivedError}
-          title={t('onboarding.outcomeContent.error409.title')}
-          message={t('onboarding.outcomeContent.error409.description')}
-          onConfirmLabel={t('onboarding.outcomeContent.error409.retry')}
-          onConfirm={handleRetryErrorModal}
-          onCloseLabel={t('onboarding.outcomeContent.error409.back')}
-          handleClose={handleCloseErrorModal}
-        />
-      )}
+      <SessionModal
+        open={clientBadInputError}
+        title={t('onboarding.outcomeContent.error409.title')}
+        message={t('onboarding.outcomeContent.error409.description')}
+        onConfirmLabel={t('onboarding.outcomeContent.error409.retry')}
+        onConfirm={handleRetryErrorModal}
+        onCloseLabel={t('onboarding.outcomeContent.error409.back')}
+        handleClose={handleCloseErrorModal}
+      />
       <SessionModal
         handleClose={handleCloseExitModal}
         handleExit={handleCloseExitModal}
@@ -442,8 +449,6 @@ function OnboardingComponent({ productId }: { productId: string }) {
       />
       {loading && <LoadingOverlay loadingText={t('onboarding.loading.loadingText')} />}
     </Container>
-  ) : (
-    <MessageNoAction {...outcomeContent[outcome]} />
   );
 }
 
