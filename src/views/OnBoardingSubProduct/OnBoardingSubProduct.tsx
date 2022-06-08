@@ -25,6 +25,7 @@ import StepOnboardingData from '../../components/steps/StepOnboardingData';
 import StepBillingData from '../../components/steps/StepBillingData';
 import { registerUnloadEvent, unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
 import { useHistoryState } from '../../components/useHistoryState';
+import { SubmitErrorType } from '../onboarding/Onboarding';
 import SubProductStepVerifyInputs from './components/SubProductStepVerifyInputs';
 import SubProductStepSubmit from './components/SubProductStepSubmit';
 import SubProductStepSuccess from './components/SubProductStepSuccess';
@@ -62,7 +63,7 @@ function OnBoardingSubProduct() {
   const [openExitModal, setOpenExitModal] = useState(false);
   const [openExitUrl, setOpenExitUrl] = useState(ENV.URL_FE.LOGOUT);
   const { setOnLogout } = useContext(HeaderContext);
-  const [clientBadInputError, setClientBadInputError] = useState(false);
+  const [submitErrorType, setSubmitErrorType] = useState<SubmitErrorType>();
 
   const requestIdRef = useRef<string>('');
 
@@ -291,7 +292,7 @@ function OnBoardingSubProduct() {
           pricingPlan,
           origin,
           setLoading,
-          setClientBadInputError,
+          setSubmitErrorType,
           forward,
           back,
         }),
@@ -309,13 +310,12 @@ function OnBoardingSubProduct() {
     setOpenExitUrl(ENV.URL_FE.LOGOUT);
   };
 
-  const handleRetryErrorModal = () => {
-    setClientBadInputError(false);
+  const handleRetryBadInputErrorModal = () => {
+    setSubmitErrorType(undefined);
     back();
   };
 
-  const handleCloseErrorModal = () => {
-    setClientBadInputError(false);
+  const handleCloseBadInputErrorModal = () => {
     window.location.assign(ENV.URL_FE.LOGOUT);
   };
 
@@ -323,13 +323,13 @@ function OnBoardingSubProduct() {
     <Container>
       <Step />
       <SessionModal
-        open={clientBadInputError}
+        open={submitErrorType === 'badInput'}
         title={t('onboarding.outcomeContent.error409.title')}
         message={t('onboarding.outcomeContent.error409.description')}
         onConfirmLabel={t('onboarding.outcomeContent.error409.retry')}
-        onConfirm={handleRetryErrorModal}
+        onConfirm={handleRetryBadInputErrorModal}
         onCloseLabel={t('onboarding.outcomeContent.error409.back')}
-        handleClose={handleCloseErrorModal}
+        handleClose={handleCloseBadInputErrorModal}
       />
       <SessionModal
         handleClose={handleCloseExitModal}

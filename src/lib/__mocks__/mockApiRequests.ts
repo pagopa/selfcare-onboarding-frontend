@@ -339,8 +339,7 @@ export async function mockFetch(
         ).find((u) => u.taxCode === 'XXXXXX00A00X000X');
         if (
           certifiedUser &&
-          certifiedUser.name === 'CERTIFIED_NAME' &&
-          certifiedUser.surname === 'CERTIFIED_SURNAME'
+          (certifiedUser.name === 'CERTIFIED_NAME' || certifiedUser.surname === 'CERTIFIED_SURNAME')
         ) {
           return error409;
         } else {

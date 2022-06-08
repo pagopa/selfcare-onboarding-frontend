@@ -35,6 +35,8 @@ import StepInstitutionType from '../../components/steps/StepInstitutionType';
 import { OnboardingStep1_5 } from './components/OnboardingStep1_5';
 import { OnBoardingProductStepDelegates } from './components/OnBoardingProductStepDelegates';
 
+export type SubmitErrorType = 'badInput';
+
 // eslint-disable-next-line sonarjs/cognitive-complexity
 function OnboardingComponent({ productId }: { productId: string }) {
   const [loading, setLoading] = useState(true);
@@ -50,8 +52,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
   const [institutionType, setInstitutionType] = useState<InstitutionType>();
   const [partyId, setPartyId] = useState<string>();
   const [origin, setOrigin] = useState<string>('');
-  const [clientBadInputError, setClientBadInputError] = useState<boolean>(false);
-  const [resolvedConflictError, setResolvedConflictError] = useState<boolean>(true);
+  const [submitErrorType, setSubmitErrorType] = useState<SubmitErrorType>();
   const [pricingPlan, setPricingPlan] = useState<string>();
   const { setOnLogout } = useContext(HeaderContext);
   const { setRequiredLogin } = useContext(UserContext);
@@ -162,18 +163,19 @@ function OnboardingComponent({ productId }: { productId: string }) {
         request_id: requestIdRef.current,
         product_id: productId,
       });
+      setSubmitErrorType(undefined);
     } else if (
       outcome === 'error' &&
-      (postLegalsResponse as AxiosError<Problem>).response?.status !== 409
+      (postLegalsResponse as AxiosError<Problem>).response?.status === 409
     ) {
+      setSubmitErrorType('badInput');
+    } else {
       trackEvent('ONBOARDING_SEND_FAILURE', {
         party_id: externalInstitutionId,
         request_id: requestIdRef.current,
         product_id: productId,
       });
-    } else {
-      setClientBadInputError(true);
-      setResolvedConflictError(false);
+      setSubmitErrorType(undefined);
     }
   };
 
@@ -396,11 +398,6 @@ function OnboardingComponent({ productId }: { productId: string }) {
     if (outcome) {
       unregisterUnloadEvent(setOnLogout);
     }
-    if (clientBadInputError) {
-      setResolvedConflictError(false);
-    } else {
-      setResolvedConflictError(true);
-    }
   }, [outcome]);
 
   const handleCloseExitModal = () => {
@@ -408,31 +405,30 @@ function OnboardingComponent({ productId }: { productId: string }) {
     setOpenExitUrl(ENV.URL_FE.LOGOUT);
   };
 
-  const handleRetryErrorModal = () => {
-    setClientBadInputError(false);
-    setResolvedConflictError(false);
+  const handleRetryBadInputErrorModal = () => {
+    setSubmitErrorType(undefined);
+    setOutcome(undefined);
   };
 
-  const handleCloseErrorModal = () => {
-    setClientBadInputError(false);
-    window.location.assign(ENV.URL_FE.LOGOUT);
+  const handleCloseBadInputErrorModal = () => {
+    window.location.assign(ENV.URL_FE.LANDING);
   };
 
   return selectedProduct === null ? (
     <NoProductPage />
-  ) : outcome && resolvedConflictError ? (
+  ) : outcome && (outcome === 'success' || !submitErrorType) ? (
     <MessageNoAction {...outcomeContent[outcome]} />
   ) : (
     <Container>
       <Step />
       <SessionModal
-        open={clientBadInputError}
+        open={submitErrorType === 'badInput'}
         title={t('onboarding.outcomeContent.error409.title')}
         message={t('onboarding.outcomeContent.error409.description')}
         onConfirmLabel={t('onboarding.outcomeContent.error409.retry')}
-        onConfirm={handleRetryErrorModal}
+        onConfirm={handleRetryBadInputErrorModal}
         onCloseLabel={t('onboarding.outcomeContent.error409.back')}
-        handleClose={handleCloseErrorModal}
+        handleClose={handleCloseBadInputErrorModal}
       />
       <SessionModal
         handleClose={handleCloseExitModal}

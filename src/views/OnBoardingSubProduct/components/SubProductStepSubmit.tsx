@@ -21,6 +21,7 @@ import { getFetchOutcome } from '../../../lib/error-utils';
 import { MessageNoAction } from '../../../components/MessageNoAction';
 import { ENV } from '../../../utils/env';
 import { unregisterUnloadEvent } from '../../../utils/unloadEvent-utils';
+import { SubmitErrorType } from '../../onboarding/Onboarding';
 
 type Props = StepperStepComponentProps & {
   requestId: string;
@@ -33,7 +34,7 @@ type Props = StepperStepComponentProps & {
   pricingPlan?: string;
   origin: string;
   setLoading: (loading: boolean) => void;
-  setClientBadInputError: (clientBadInputError: boolean) => void;
+  setSubmitErrorType: (submitErrorType: SubmitErrorType | undefined) => void;
 };
 
 const errorOutCome = {
@@ -90,7 +91,7 @@ function SubProductStepSubmit({
   users,
   billingData,
   setLoading,
-  setClientBadInputError,
+  setSubmitErrorType,
   institutionType,
   pricingPlan,
   origin,
@@ -142,11 +143,14 @@ function SubProductStepSubmit({
         product_id: product.id,
         subproduct_id: subProduct.id,
       });
+      setSubmitErrorType(undefined);
       forward();
     } else if (
       outcome === 'error' &&
-      (postLegalsResponse as AxiosError<Problem>).response?.status !== 409
+      (postLegalsResponse as AxiosError<Problem>).response?.status === 409
     ) {
+      setSubmitErrorType('badInput');
+    } else {
       setError(true);
       trackEvent('ONBOARDING_SEND_FAILURE', {
         party_id: externalInstitutionId,
@@ -154,8 +158,7 @@ function SubProductStepSubmit({
         product_id: product?.id,
         subproduct_id: subProduct?.id,
       });
-    } else {
-      setClientBadInputError(true);
+      setSubmitErrorType(undefined);
     }
   };
 
