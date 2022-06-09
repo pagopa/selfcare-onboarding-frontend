@@ -93,15 +93,17 @@ export default {
     fields: {
       name: {
         label: 'Nome',
+        mismatchWithTaxCode: 'Nome non corretto o diverso dal Codice Fiscale ',
       },
-      surname: { label: 'Cognome' },
-      errorUserData: 'Non corrisponde al Codice Fiscale inserito',
+      surname: {
+        label: 'Cognome',
+        mismatchWithTaxCode: 'Cognome non corretto o diverso dal Codice Fiscale ',
+      },
       taxCode: {
         label: 'Codice Fiscale',
         errors: {
           invalid: 'Il Codice Fiscale inserito non è valido',
           duplicate: 'Il codice fiscale inserito è già presente',
-          mismatch: 'Il Codice Fiscale non corrisponde ai dati inseriti',
         },
       },
       email: {

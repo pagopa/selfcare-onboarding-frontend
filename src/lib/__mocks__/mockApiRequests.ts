@@ -311,6 +311,22 @@ export async function mockFetch(
         );
     }
   }
+
+  if (endpoint === 'ONBOARDING_USER_VALIDATION') {
+    switch (endpointParams.taxCode) {
+      case 'XXXXXX00A00X000X':
+        return error409;
+      case 'prod-io-premium':
+        return new Promise((resolve) =>
+          resolve({ data: mockedSubProduct, status: 200, statusText: '200' } as AxiosResponse)
+        );
+      default:
+        return new Promise((resolve) =>
+          resolve({ data: mockedProduct, status: 200, statusText: '200' } as AxiosResponse)
+        );
+    }
+  }
+
   if (endpoint === 'ONBOARDING_POST_LEGALS') {
     switch (endpointParams.externalInstitutionId) {
       case 'error':

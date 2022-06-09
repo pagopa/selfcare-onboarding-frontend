@@ -12,6 +12,7 @@ import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 import { omit, uniqueId } from 'lodash';
 // import { Box } from '@mui/system';
 import { useTranslation, Trans } from 'react-i18next';
+import useLoading from '@pagopa/selfcare-common-frontend/hooks/useLoading';
 import { objectIsEmpty } from '../../../lib/object-utils';
 import { StepperStepComponentProps, UserOnCreate } from '../../../../types';
 import { UserContext } from '../../../lib/context';
@@ -27,6 +28,36 @@ type Props = StepperStepComponentProps & {
 };
 
 export function OnBoardingProductStepDelegates({ product, legal, forward, back }: Props) {
+  const validateUserData = async (taxCode: string, name: string, surname: string) => {
+    await fetchWithLogs(
+      {
+        endpoint: 'ONBOARDING_USER_VALIDATION',
+        endpointParams: { taxCode: people[prefix].taxCode },
+      },
+      {
+        method: 'POST',
+        data: {
+          taxCode: people[prefix].taxCode,
+          name: people[prefix].name,
+          surname: people[prefix].surname,
+        },
+      },
+      () => setRequiredLogin(true)
+    );
+
+    const restOutcomeProduct = getFetchOutcome(onboardingProductStatus);
+    if (
+      restOutcomeProduct === 'error' &&
+      ((onboardingProductStatus as AxiosError<any>).response?.status === 404 ||
+        (onboardingProductStatus as AxiosError<any>).response?.status === 400)
+    ) {
+      setOutcome(buildNotBasicProduct(productTitle, productId, history));
+      return false;
+    } else {
+      return true;
+    }
+  };
+
   const { user } = useContext(UserContext);
   const [isAuthUser, setIsAuthUser, setIsAuthUserHistory] = useHistoryState('isAuthUser', false);
   const [people, setPeople, setPeopleHistory] = useHistoryState<UsersObject>('people_step3', {});
@@ -51,7 +82,50 @@ export function OnBoardingProductStepDelegates({ product, legal, forward, back }
     setPeople(omit(people, idToRemove));
   };
 
+  const fetchValidateUser = (taxCode: string, name: string, surname: string) => {
+    validateUserData(taxCode, partyId)
+      .then((userRegistry) => {
+        void formik.setValues(
+          {
+            ...formik.values,
+            name:
+              userRegistry?.name ??
+              (formik.values.certifiedName ? initialFormData.name : formik.values.name),
+            surname:
+              userRegistry?.surname ??
+              (formik.values.certifiedSurname ? initialFormData.surname : formik.values.surname),
+            email:
+              userRegistry?.email ??
+              (formik.values.certifiedMail ? initialFormData.email : formik.values.email),
+            confirmEmail: '',
+            certifiedName:
+              userRegistry?.certifiedName ??
+              (formik.values.certifiedName
+                ? initialFormData.certifiedName
+                : formik.values.certifiedName),
+            certifiedSurname:
+              userRegistry?.certifiedSurname ??
+              (formik.values.certifiedSurname
+                ? initialFormData.certifiedSurname
+                : formik.values.certifiedSurname),
+          },
+          true
+        );
+      })
+      .catch((errors) =>
+        addError({
+          id: 'FETCH_TAX_CODE',
+          blocking: false,
+          error: errors,
+          techDescription: `An error occurred while fetching Tax Code of Product ${taxCode}`,
+          toNotify: true,
+        })
+      )
+      .finally(() => setLoadingFetchTaxCode(false));
+  };
+
   const onForwardAction = () => {
+    validateUserData();
     savePageState();
     forward({ users: [legal].concat(Object.values(people)) });
   };

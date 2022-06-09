@@ -27,8 +27,8 @@ type Field = {
 };
 
 const fields: Array<Field> = [
-  { id: 'name', unique: false },
-  { id: 'surname', unique: false },
+  { id: 'name', unique: false, uniqueMessageKey: 'mismatchWithTaxCode' },
+  { id: 'surname', unique: false, uniqueMessageKey: 'mismatchWithTaxCode' },
   {
     id: 'taxCode',
     width: 12,
