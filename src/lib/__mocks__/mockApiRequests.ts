@@ -1,5 +1,10 @@
 import { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
-import { Endpoint, InstitutionOnboardingInfoResource, SelfcareParty } from '../../../types';
+import {
+  Endpoint,
+  InstitutionOnboardingInfoResource,
+  SelfcareParty,
+  UserOnCreate,
+} from '../../../types';
 
 const mockPartyRegistry = {
   items: [
@@ -9,6 +14,7 @@ const mockPartyRegistry = {
       ou: 'ou',
       aoo: 'aoo',
       taxCode: '00000000000',
+      zipCode: '44332',
       administrationCode: '00000000000',
       category: 'c7',
       managerName: 'Mario',
@@ -25,6 +31,7 @@ const mockPartyRegistry = {
       ou: 'errorUu',
       aoo: 'errorAoo',
       taxCode: '11111111111',
+      zipCode: '01345',
       administrationCode: '11111111111',
       category: 'c7',
       managerName: 'Mario:ERROR',
@@ -41,6 +48,7 @@ const mockPartyRegistry = {
       ou: 'onboardedUu',
       aoo: 'onboardedAoo',
       taxCode: '22222222222',
+      zipCode: '12345',
       administrationCode: '22222222222',
       category: 'c7',
       managerName: 'Mario_ONBOARDED',
@@ -57,6 +65,7 @@ const mockPartyRegistry = {
       ou: 'pendingUu',
       aoo: 'pendingAoo',
       taxCode: '33333333333',
+      zipCode: '54321',
       administrationCode: '33333333333',
       category: 'c7',
       managerName: 'Mario_PENDING',
@@ -73,6 +82,7 @@ const mockPartyRegistry = {
       ou: 'infoErrorUu',
       aoo: 'infoErrorAoo',
       taxCode: '99999999999',
+      zipCode: '12122',
       administrationCode: '99999999999',
       category: 'c7',
       managerName: 'Mario_INFOERROR',
@@ -218,10 +228,17 @@ const genericError: Promise<AxiosError> = new Promise((resolve) =>
   } as AxiosError)
 );
 
+const error409: Promise<AxiosError> = new Promise((resolve) =>
+  resolve({
+    isAxiosError: true,
+    response: { data: '', status: 409, statusText: '409' },
+  } as AxiosError)
+);
+
 // eslint-disable-next-line sonarjs/cognitive-complexity, complexity
 export async function mockFetch(
   { endpoint, endpointParams }: Endpoint,
-  { params }: AxiosRequestConfig
+  { params, data }: AxiosRequestConfig
 ): Promise<AxiosResponse | AxiosError> {
   if (endpoint === 'ONBOARDING_GET_SEARCH_PARTIES') {
     return new Promise((resolve) =>
@@ -332,9 +349,19 @@ export async function mockFetch(
       case 'error':
         return genericError;
       default:
-        return new Promise((resolve) =>
-          resolve({ data: undefined, status: 200, statusText: '200' } as AxiosResponse)
-        );
+        const certifiedUser: UserOnCreate | undefined = (
+          (data as any).users as Array<UserOnCreate>
+        ).find((u) => u.taxCode === 'XXXXXX00A00X000X');
+        if (
+          certifiedUser &&
+          (certifiedUser.name !== 'CERTIFIED_NAME' || certifiedUser.surname !== 'CERTIFIED_SURNAME')
+        ) {
+          return error409;
+        } else {
+          return new Promise((resolve) =>
+            resolve({ data: '', status: 200, statusText: '200' } as AxiosResponse)
+          );
+        }
     }
   }
 
