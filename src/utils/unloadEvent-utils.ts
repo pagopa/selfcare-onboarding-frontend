@@ -14,7 +14,8 @@ export const registerUnloadEvent = (
   // react dispatch consider a function input as a metod to be called with the previuos state to caluclate the next state: those we are defining a function that return the next function
   setOnExit(() => (exitAction: (() => void) | undefined) => {
     setOpenExitModal(true);
-    setOnExitAction(exitAction);
+    // react dispatch consider a function input as a metod to be called with the previuos state to caluclate the next state: those we are defining a function that return the next function
+    setOnExitAction(() => exitAction);
   });
 };
 
