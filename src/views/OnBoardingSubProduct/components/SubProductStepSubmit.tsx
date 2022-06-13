@@ -97,7 +97,7 @@ function SubProductStepSubmit({
   origin,
 }: Props) {
   const [error, setError] = useState<boolean>(false);
-  const { setOnLogout } = useContext(HeaderContext);
+  const { setOnExit } = useContext(HeaderContext);
   const { setRequiredLogin } = useContext(UserContext);
 
   useEffect(() => {
@@ -117,7 +117,7 @@ function SubProductStepSubmit({
           */
         })
         .finally(() => {
-          unregisterUnloadEvent(setOnLogout);
+          unregisterUnloadEvent(setOnExit);
           setLoading(false);
         });
     }

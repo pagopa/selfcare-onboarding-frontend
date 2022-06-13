@@ -16,15 +16,19 @@ export const UserContext = createContext({
 } as UserContextType);
 
 type HeaderContextType = {
+  enableLogin: boolean;
+  setEnableLogin: (enableLogin: boolean) => void;
   subHeaderVisible: boolean;
   setSubHeaderVisible: React.Dispatch<React.SetStateAction<boolean>>;
-  onLogout: (() => void) | null | undefined;
-  setOnLogout: React.Dispatch<React.SetStateAction<(() => void) | null | undefined>>;
+  onExit: ((exitAction: () => void) => void) | undefined;
+  setOnExit: React.Dispatch<React.SetStateAction<((exitAction: () => void) => void) | undefined>>;
 };
 
 export const HeaderContext = createContext({
+  enableLogin: true,
+  setEnableLogin: () => {},
   subHeaderVisible: true,
   setSubHeaderVisible: () => {},
-  onLogout: () => {},
-  setOnLogout: () => {},
+  onExit: undefined,
+  setOnExit: () => {},
 } as HeaderContextType);

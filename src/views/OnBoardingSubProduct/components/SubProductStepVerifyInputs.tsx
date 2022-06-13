@@ -75,7 +75,7 @@ function SubProductStepVerifyInputs({
   const pricingPlanByQuery = new URLSearchParams(window.location.search).get('pricingPlan');
 
   const [error, setError] = useState<boolean>(false);
-  const { setOnLogout } = useContext(HeaderContext);
+  const { setOnExit } = useContext(HeaderContext);
   const { setRequiredLogin } = useContext(UserContext);
 
   const [selectedSubProduct, setSelectedSubProduct] = useState<Product | null>();
@@ -126,7 +126,7 @@ function SubProductStepVerifyInputs({
   }, [selectedProduct, selectedSubProduct, parties, pricingPlanByQuery]);
 
   if (error) {
-    unregisterUnloadEvent(setOnLogout);
+    unregisterUnloadEvent(setOnExit);
   }
 
   return error ? <NoProductPage /> : <></>;
