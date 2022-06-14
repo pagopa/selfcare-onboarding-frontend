@@ -2,7 +2,7 @@ import { Grid, Paper, TextField, useTheme } from '@mui/material';
 import React from 'react';
 import { useTranslation, TFunction } from 'react-i18next';
 import { UserOnCreate, PartyRole } from '../../types';
-import { UsersObject } from './OnboardingStep2';
+import { UsersObject } from './steps/StepAddManager';
 
 type PlatformUserFormProps = {
   prefix: keyof UsersObject;
@@ -10,7 +10,8 @@ type PlatformUserFormProps = {
   people: UsersObject;
   allPeople: UsersObject;
   setPeople: React.Dispatch<React.SetStateAction<UsersObject>>;
-  readOnly?: Array<keyof UserOnCreate>;
+  readOnly?: boolean;
+  readOnlyFields?: Array<keyof UserOnCreate>;
 };
 
 type Field = {
@@ -106,7 +107,8 @@ export function PlatformUserForm({
   people,
   allPeople,
   setPeople,
-  readOnly = [],
+  readOnly,
+  readOnlyFields = [],
 }: PlatformUserFormProps) {
   const { t } = useTranslation();
   const theme = useTheme();
@@ -122,7 +124,7 @@ export function PlatformUserForm({
     : [];
 
   return (
-    <Paper elevation={0} sx={{ py: 4, px: 6, borderRadius: '16px' }}>
+    <Paper elevation={0} sx={{ p: 4, borderRadius: '16px' }}>
       <Grid container spacing={2}>
         {fields.map(
           ({
@@ -173,7 +175,7 @@ export function PlatformUserForm({
                       ? t(`platformUserForm.fields.${id}.description`)
                       : ''
                   }
-                  disabled={readOnly.indexOf(id) > -1}
+                  disabled={readOnly || readOnlyFields.indexOf(id) > -1}
                 />
               </Grid>
             );

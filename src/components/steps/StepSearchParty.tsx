@@ -3,21 +3,29 @@ import { Box } from '@mui/system';
 import { useContext, useEffect, useState } from 'react';
 import { AxiosResponse } from 'axios';
 import { useTranslation, Trans } from 'react-i18next';
-import { IPACatalogParty, StepperStepComponentProps } from '../../types';
-import { getFetchOutcome } from '../lib/error-utils';
-import { fetchWithLogs } from '../lib/api-utils';
-import { UserContext } from '../lib/context';
-import { OnboardingStepActions } from './OnboardingStepActions';
-import { useHistoryState } from './useHistoryState';
-import { LoadingOverlay } from './LoadingOverlay';
-import { AsyncAutocompleteV2 } from './autocomplete/AsyncAutocompleteV2';
+import { ReactElement } from 'react';
+import { IPACatalogParty, Party, StepperStepComponentProps } from '../../../types';
+import { getFetchOutcome } from '../../lib/error-utils';
+import { fetchWithLogs } from '../../lib/api-utils';
+import { UserContext } from '../../lib/context';
+import { OnboardingStepActions } from '../OnboardingStepActions';
+import { useHistoryState } from '../useHistoryState';
+import { LoadingOverlay } from '../LoadingOverlay';
+import { AsyncAutocompleteV2 } from '../autocomplete/AsyncAutocompleteV2';
 
-const handleSearchInstitutionId = async (
-  institutionId: string,
+type Props = {
+  subTitle: string | ReactElement;
+} & StepperStepComponentProps;
+
+const handleSearchExternalId = async (
+  externalInstitutionId: string,
   onRedirectToLogin: () => void
 ): Promise<IPACatalogParty | null> => {
   const searchResponse = await fetchWithLogs(
-    { endpoint: 'ONBOARDING_GET_PARTY', endpointParams: { institutionId } },
+    {
+      endpoint: 'ONBOARDING_GET_PARTY',
+      endpointParams: { externalInstitutionId },
+    },
     { method: 'GET' },
     onRedirectToLogin
   );
@@ -31,28 +39,30 @@ const handleSearchInstitutionId = async (
   return null;
 };
 
-export function OnboardingStep1({ product, forward }: StepperStepComponentProps) {
-  const institutionIdByQuery = new URLSearchParams(window.location.search).get('institutionId');
+export function StepSearchParty({ subTitle, forward, back }: Props) {
+  const partyExternalIdByQuery = new URLSearchParams(window.location.search).get('partyExternalId');
   const { setRequiredLogin } = useContext(UserContext);
   const theme = useTheme();
 
-  const [loading, setLoading] = useState(!!institutionIdByQuery);
+  const [loading, setLoading] = useState(!!partyExternalIdByQuery);
   const [selected, setSelected, setSelectedHistory] = useHistoryState<IPACatalogParty | null>(
     'selected_step1',
     null
   );
+
   const onForwardAction = () => {
     setSelectedHistory(selected);
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const { id } = selected!;
-    forward({ institutionId: id }, id);
+    forward({ externalId: id }, { ...selected, externalId: id } as Party);
   };
+
   const { t } = useTranslation();
   const bodyTitle = t('onboardingStep1.onboarding.bodyTitle');
 
   useEffect(() => {
-    if (institutionIdByQuery) {
-      handleSearchInstitutionId(institutionIdByQuery, () => setRequiredLogin(true))
+    if (partyExternalIdByQuery) {
+      handleSearchExternalId(partyExternalIdByQuery, () => setRequiredLogin(true))
         .then((ipaParty) => {
           if (ipaParty) {
             setSelected(ipaParty);
@@ -60,6 +70,11 @@ export function OnboardingStep1({ product, forward }: StepperStepComponentProps)
             // eslint-disable-next-line functional/immutable-data
             window.location.search = '';
           }
+        })
+        .catch((reason) => {
+          // eslint-disable-next-line functional/immutable-data
+          window.location.search = '';
+          console.error(reason);
         })
         .finally(() => {
           setLoading(false);
@@ -69,7 +84,7 @@ export function OnboardingStep1({ product, forward }: StepperStepComponentProps)
 
   // callback of previous useEffect
   useEffect(() => {
-    if (institutionIdByQuery && selected) {
+    if (partyExternalIdByQuery && selected) {
       onForwardAction();
     }
   }, [selected]);
@@ -92,17 +107,8 @@ export function OnboardingStep1({ product, forward }: StepperStepComponentProps)
 
       <Grid container item justifyContent="center" mt={1}>
         <Grid item xs={12}>
-          <Typography
-            variant="subtitle2"
-            component="h2"
-            align="center"
-            color={theme.palette.text.primary}
-          >
-            <Trans i18nKey="onboardingStep1.onboarding.bodyDescription">
-              Seleziona dall&apos;Indice della Pubblica Amministrazione (IPA) l&apos;ente
-              <br />
-              per cui vuoi richiedere l&apos;adesione a {{ productTitle: product?.title }}
-            </Trans>
+          <Typography variant="body1" align="center" color={theme.palette.text.primary}>
+            {subTitle}
           </Typography>
         </Grid>
       </Grid>
@@ -161,7 +167,15 @@ export function OnboardingStep1({ product, forward }: StepperStepComponentProps)
 
       <Grid item mt={4}>
         <OnboardingStepActions
-          // back={{action: goBackToLandingPage, label: 'Indietro', disabled: false}}
+          back={
+            back
+              ? {
+                  action: back,
+                  label: t('onboardingStep1.onboarding.onboardingStepActions.backAction'),
+                  disabled: false,
+                }
+              : undefined
+          }
           forward={{
             action: onForwardAction,
             label: t('onboardingStep1.onboarding.onboardingStepActions.confirmAction'),

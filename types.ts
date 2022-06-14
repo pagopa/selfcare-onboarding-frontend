@@ -57,13 +57,16 @@ export type StepperStep = {
 };
 
 export type IPACatalogParty = {
+  address: string;
+  category: string;
   description: string;
   digitalAddress: string;
   id: string;
-  managerName: string;
-  managerSurname: string;
   o: string;
-  ou: string;
+  origin: string;
+  originId: string;
+  taxCode: string;
+  zipCode: string;
 };
 
 /*
@@ -109,7 +112,10 @@ export interface PersonInfo {
 }
 
 export interface OnboardingData {
-  institutionId: string;
+  id: string;
+  externalId: string;
+  originId: string;
+  institutionType?: string;
   description: string;
   taxCode: string;
   digitalAddress: string;
@@ -147,4 +153,63 @@ export interface ProblemError {
 export type Product = {
   id: string;
   title: string;
+  parentId?: string;
 };
+
+export type SelfcareParty = {
+  id: string;
+  originId: string;
+  externalId: string;
+  institutionType?: string;
+  description: string;
+  urlLogo?: string;
+  address: string;
+  digitalAddress: string;
+  taxCode: string;
+  zipCode: string;
+  origin: string;
+};
+
+export type Party = {
+  originId: string;
+  externalId: string;
+  address: string;
+  zipCode: string;
+  description: string;
+  digitalAddress: string;
+  taxCode: string;
+  origin: string;
+};
+
+export type BillingData = {
+  // Ragione sociale
+  businessName: string;
+  // Sede legale
+  registeredOffice: string;
+  // Codice di avviamento postale
+  zipCode: string;
+  // Indirizzo PEC
+  digitalAddress: string;
+  // Codice fiscale
+  taxCode: string;
+  // Partita iva
+  vatNumber: string;
+  // Codice destinatario
+  recipientCode: string;
+  // servizi pubblici
+  publicServices?: boolean;
+};
+
+export type InstitutionData = {
+  id: string;
+  billingData: BillingData;
+  institutionType: InstitutionType;
+  origin: string;
+};
+
+export type InstitutionOnboardingInfoResource = {
+  institution: InstitutionData;
+  manager: UserOnCreate;
+};
+
+export type InstitutionType = 'PA' | 'GSP' | 'SCP' | 'PT';

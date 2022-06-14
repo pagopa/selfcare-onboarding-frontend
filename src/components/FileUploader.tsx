@@ -1,11 +1,11 @@
 import { Grid, Typography, Link, Theme } from '@mui/material';
 import { DropEvent, FileRejection, useDropzone } from 'react-dropzone';
 import { Box } from '@mui/system';
+import { ReactComponent as CloudUpload } from '../assets/cloud-upload.svg';
 import { FileUploadedPreview } from './FileUploadedPreview';
 
 type FileUploaderOption = {
   title: string;
-  description: string;
   descriptionLink?: string;
   uploadedFiles: Array<File>;
   deleteUploadedFiles?: (event: any | undefined) => void;
@@ -20,7 +20,6 @@ type FileUploaderOption = {
 
 export function FileUploader({
   title,
-  description,
   descriptionLink,
   uploadedFiles,
   deleteUploadedFiles,
@@ -68,10 +67,19 @@ export function FileUploader({
         >
           <Box
             m={1}
-            sx={{ borderRadius: '10px', border: `3px dashed ${theme.palette.primary.main}` }}
+            sx={{
+              borderRadius: '10px',
+              border: `2px dashed ${theme.palette.primary.main}`,
+            }}
           >
             <Grid container direction="column" alignItems={'center'} py={3} px={6}>
-              <Typography color={theme.palette.text.primary} variant={'body2'} align="center">
+              <CloudUpload />
+              <Typography
+                color={theme.palette.text.primary}
+                variant={'body2'}
+                align="center"
+                mt={1}
+              >
                 {title}
               </Typography>
               <Typography
@@ -82,7 +90,6 @@ export function FileUploader({
                 variant={'body2'}
                 align="center"
               >
-                {description}
                 <Link
                   sx={{ cursor: 'pointer', textDecoration: 'none' }}
                   onClick={(dropzoneRootProps as any).onClick}
