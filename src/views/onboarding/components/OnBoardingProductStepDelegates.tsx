@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useContext } from 'react';
+import React, { ChangeEvent, useContext, useState } from 'react';
 import {
   Checkbox,
   FormControlLabel,
@@ -12,61 +12,74 @@ import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 import { omit, uniqueId } from 'lodash';
 // import { Box } from '@mui/system';
 import { useTranslation, Trans } from 'react-i18next';
-import useLoading from '@pagopa/selfcare-common-frontend/hooks/useLoading';
+import { AxiosError, AxiosResponse } from 'axios';
+import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
 import { objectIsEmpty } from '../../../lib/object-utils';
 import { StepperStepComponentProps, UserOnCreate } from '../../../../types';
 import { UserContext } from '../../../lib/context';
 import { OnboardingStepActions } from '../../../components/OnboardingStepActions';
 import { PlatformUserForm, validateUser } from '../../../components/PlatformUserForm';
 import { useHistoryState } from '../../../components/useHistoryState';
+import { ValidateErrorType } from '../Onboarding';
+import { fetchWithLogs } from '../../../lib/api-utils';
+import { getFetchOutcome } from '../../../lib/error-utils';
 
 // Could be an ES6 Set but it's too bothersome for now
 export type UsersObject = { [key: string]: UserOnCreate };
+export type UsersError = { [key: string]: { [userField: string]: Array<string> } };
 
 type Props = StepperStepComponentProps & {
   legal: UserOnCreate;
 };
 
 export function OnBoardingProductStepDelegates({ product, legal, forward, back }: Props) {
-  const validateUserData = async (taxCode: string, name: string, surname: string) => {
-    await fetchWithLogs(
-      {
-        endpoint: 'ONBOARDING_USER_VALIDATION',
-        endpointParams: { taxCode: people[prefix].taxCode },
-      },
-      {
-        method: 'POST',
-        data: {
-          taxCode: people[prefix].taxCode,
-          name: people[prefix].name,
-          surname: people[prefix].surname,
-        },
-      },
-      () => setRequiredLogin(true)
-    );
-
-    const restOutcomeProduct = getFetchOutcome(onboardingProductStatus);
-    if (
-      restOutcomeProduct === 'error' &&
-      ((onboardingProductStatus as AxiosError<any>).response?.status === 404 ||
-        (onboardingProductStatus as AxiosError<any>).response?.status === 400)
-    ) {
-      setOutcome(buildNotBasicProduct(productTitle, productId, history));
-      return false;
-    } else {
-      return true;
-    }
-  };
-
-  const { user } = useContext(UserContext);
+  const { user, setRequiredLogin } = useContext(UserContext);
+  const [errorField, setErrorField] = useState<UsersError>();
   const [isAuthUser, setIsAuthUser, setIsAuthUserHistory] = useHistoryState('isAuthUser', false);
   const [people, setPeople, setPeopleHistory] = useHistoryState<UsersObject>('people_step3', {});
   const [delegateFormIds, setDelegateFormIds, setDelegateFormIdsHistory] = useHistoryState<
     Array<string>
   >('delegateFormIds', []);
+  const [_validateError, setValidateError] = useState<ValidateErrorType>();
   const { t } = useTranslation();
 
   const allPeople = { ...people, LEGAL: legal };
+
+  const validateUserData = async (taxCode: string, name: string, surname: string) => {
+    const resultValidation = await fetchWithLogs(
+      {
+        endpoint: 'ONBOARDING_USER_VALIDATION',
+        endpointParams: { taxCode },
+      },
+      {
+        method: 'POST',
+        data: {
+          taxCode,
+          name,
+          surname,
+        },
+      },
+      () => setRequiredLogin(true)
+    );
+
+    const result = getFetchOutcome(resultValidation);
+
+    if (result === 'success') {
+      setValidateError(undefined);
+      onForwardAction();
+    } else if (result === 'error' && (resultValidation as AxiosError).response?.status === 409) {
+      setValidateError('conflictError');
+      const error = (resultValidation as AxiosResponse).data;
+      setErrorField(error);
+      trackEvent('STEP_DELEGATE_CONFLICT_ERROR', {
+        product_id: product?.id,
+        error_field: errorField,
+      });
+    } else {
+      onForwardAction();
+      setValidateError(undefined);
+    }
+  };
 
   const addDelegateForm = () => {
     const newId = uniqueId('delegate-');
@@ -82,50 +95,7 @@ export function OnBoardingProductStepDelegates({ product, legal, forward, back }
     setPeople(omit(people, idToRemove));
   };
 
-  const fetchValidateUser = (taxCode: string, name: string, surname: string) => {
-    validateUserData(taxCode, partyId)
-      .then((userRegistry) => {
-        void formik.setValues(
-          {
-            ...formik.values,
-            name:
-              userRegistry?.name ??
-              (formik.values.certifiedName ? initialFormData.name : formik.values.name),
-            surname:
-              userRegistry?.surname ??
-              (formik.values.certifiedSurname ? initialFormData.surname : formik.values.surname),
-            email:
-              userRegistry?.email ??
-              (formik.values.certifiedMail ? initialFormData.email : formik.values.email),
-            confirmEmail: '',
-            certifiedName:
-              userRegistry?.certifiedName ??
-              (formik.values.certifiedName
-                ? initialFormData.certifiedName
-                : formik.values.certifiedName),
-            certifiedSurname:
-              userRegistry?.certifiedSurname ??
-              (formik.values.certifiedSurname
-                ? initialFormData.certifiedSurname
-                : formik.values.certifiedSurname),
-          },
-          true
-        );
-      })
-      .catch((errors) =>
-        addError({
-          id: 'FETCH_TAX_CODE',
-          blocking: false,
-          error: errors,
-          techDescription: `An error occurred while fetching Tax Code of Product ${taxCode}`,
-          toNotify: true,
-        })
-      )
-      .finally(() => setLoadingFetchTaxCode(false));
-  };
-
   const onForwardAction = () => {
-    validateUserData();
     savePageState();
     forward({ users: [legal].concat(Object.values(people)) });
   };
@@ -217,6 +187,7 @@ export function OnBoardingProductStepDelegates({ product, legal, forward, back }
             prefix={'delegate-initial'}
             role="DELEGATE"
             people={people}
+            peopleErrors={errorField}
             allPeople={allPeople}
             setPeople={setPeople}
             readOnlyFields={isAuthUser ? ['name', 'surname', 'taxCode'] : []}
@@ -239,6 +210,7 @@ export function OnBoardingProductStepDelegates({ product, legal, forward, back }
                 prefix={id}
                 role="DELEGATE"
                 people={people}
+                peopleErrors={errorField}
                 allPeople={allPeople}
                 setPeople={setPeople}
               />
@@ -278,10 +250,16 @@ export function OnBoardingProductStepDelegates({ product, legal, forward, back }
           )}
         </Grid>
       </Grid>
+      {console.log(errorField)}
       <OnboardingStepActions
         back={{ action: onBackAction, label: t('onboardingStep3.backLabel'), disabled: false }}
         forward={{
-          action: onForwardAction,
+          action: () =>
+            validateUserData(
+              people.userField?.taxCode,
+              people.userField?.name,
+              people.userField?.surname
+            ),
           label: t('onboardingStep3.confirmLabel'),
           disabled:
             objectIsEmpty(people) ||

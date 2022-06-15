@@ -331,16 +331,20 @@ export async function mockFetch(
 
   if (endpoint === 'ONBOARDING_USER_VALIDATION') {
     switch (endpointParams.taxCode) {
-      case 'XXXXXX00A00X000X':
-        return error409;
-      case 'prod-io-premium':
-        return new Promise((resolve) =>
-          resolve({ data: mockedSubProduct, status: 200, statusText: '200' } as AxiosResponse)
-        );
+      case 'AAAAAA11A11A123K':
+        return genericError;
       default:
-        return new Promise((resolve) =>
-          resolve({ data: mockedProduct, status: 200, statusText: '200' } as AxiosResponse)
-        );
+        if (
+          ((data as any).taxCode === 'XXXXXX00A00X000X' &&
+            (data as any).name !== 'CERTIFIED_NAME') ||
+          (data as any).surname !== 'CERTIFIED_SURNAME'
+        ) {
+          return error409;
+        } else {
+          return new Promise((resolve) =>
+            resolve({ data: '', status: 200, statusText: '200' } as AxiosResponse)
+          );
+        }
     }
   }
 

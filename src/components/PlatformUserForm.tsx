@@ -1,13 +1,30 @@
-import { Grid, Paper, TextField, useTheme } from '@mui/material';
+import { Grid, Paper, TextField, styled } from '@mui/material';
+import { theme } from '@pagopa/mui-italia';
 import React from 'react';
 import { useTranslation, TFunction } from 'react-i18next';
 import { UserOnCreate, PartyRole } from '../../types';
-import { UsersObject } from './steps/StepAddManager';
+import { UsersError, UsersObject } from './steps/StepAddManager';
+
+const CustomTextField = styled(TextField)({
+  width: '100%',
+  '& .MuiFormHelperText-root': {
+    color: theme.palette.text.secondary,
+  },
+  '& .MuiInputBase-root.Mui-disabled:before': {
+    borderBottomStyle: 'solid',
+  },
+  input: {
+    '&.Mui-disabled': {
+      WebkitTextFillColor: theme.palette.text.disabled,
+    },
+  },
+});
 
 type PlatformUserFormProps = {
   prefix: keyof UsersObject;
   role: PartyRole;
   people: UsersObject;
+  peopleErrors?: UsersError;
   allPeople: UsersObject;
   setPeople: React.Dispatch<React.SetStateAction<UsersObject>>;
   readOnly?: boolean;
@@ -27,8 +44,8 @@ type Field = {
 };
 
 const fields: Array<Field> = [
-  { id: 'name', unique: false, uniqueMessageKey: 'mismatchWithTaxCode' },
-  { id: 'surname', unique: false, uniqueMessageKey: 'mismatchWithTaxCode' },
+  { id: 'name', unique: false, uniqueMessageKey: 'conflict' },
+  { id: 'surname', unique: false, uniqueMessageKey: 'conflict' },
   {
     id: 'taxCode',
     width: 12,
@@ -105,13 +122,13 @@ export function PlatformUserForm({
   prefix,
   role,
   people,
+  peopleErrors,
   allPeople,
   setPeople,
   readOnly,
   readOnlyFields = [],
 }: PlatformUserFormProps) {
   const { t } = useTranslation();
-  const theme = useTheme();
 
   const buildSetPerson = (key: string) => (e: any) => {
     setPeople({
@@ -122,6 +139,9 @@ export function PlatformUserForm({
   const errors: Array<ValidationErrorCode> = people[prefix]
     ? validateNoMandatory(prefix, people[prefix], allPeople)
     : [];
+
+  const externalErrors: { [fieldName: string]: Array<string> } | undefined =
+    peopleErrors && peopleErrors[prefix];
 
   return (
     <Paper elevation={0} sx={{ p: 4, borderRadius: '16px' }}>
@@ -134,41 +154,32 @@ export function PlatformUserForm({
             regexpMessageKey,
             uniqueMessageKey,
             hasDescription,
+            // eslint-disable-next-line sonarjs/cognitive-complexity
           }) => {
             const prefixErrorCode = `${id}-`;
-            const error = errors
-              .filter((e) => e.startsWith(prefixErrorCode))
-              .map((e) => e.replace(prefixErrorCode, ''));
+            const error =
+              (externalErrors && externalErrors[id]) ??
+              errors
+                .filter((e) => e.startsWith(prefixErrorCode))
+                .map((e) => e.replace(prefixErrorCode, ''));
             const isError = error && error.length > 0;
             return (
               <Grid item key={id} xs={width} mb={3}>
-                <TextField
+                <CustomTextField
                   id={`${prefix}-${id}`}
                   variant="outlined"
                   label={t(`platformUserForm.fields.${id}.label`)}
                   type={type}
                   value={people[prefix] && people[prefix][id] ? people[prefix][id] : ''}
                   onChange={buildSetPerson(id)}
-                  sx={{
-                    width: '100%',
-                    '& .MuiFormHelperText-root': {
-                      color: theme.palette.text.secondary,
-                    },
-                    '& .MuiInputBase-root.Mui-disabled:before': {
-                      borderBottomStyle: 'solid',
-                    },
-                    input: {
-                      '&.Mui-disabled': {
-                        WebkitTextFillColor: theme.palette.text.disabled,
-                      },
-                    },
-                  }}
                   error={isError}
                   helperText={
                     isError
                       ? error.indexOf('regexp') > -1
                         ? transcodeFormErrorKey(id, regexpMessageKey, t)
                         : error.indexOf('unique') > -1
+                        ? transcodeFormErrorKey(id, uniqueMessageKey, t)
+                        : error.indexOf('conflict') > -1
                         ? transcodeFormErrorKey(id, uniqueMessageKey, t)
                         : t('platformUserForm.helperText')
                       : hasDescription
