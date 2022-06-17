@@ -78,9 +78,8 @@ export default function CompleteRegistrationComponent() {
   const [lastFileErrorAttempt, setLastFileErrorAttempt] = useState<FileErrorAttempt>();
   const [showBlockingError, setShowBlockingError] = useState(false);
 
-  const [uploadedFiles, setUploadedFiles, setUploadedFilesHistory] = useHistoryState<Array<File>>(
-    'uploaded_files',
-    []
+  const [uploadFile, setUploadFile, setUploadFileHistory] = useHistoryState<File | undefined>(
+    'uploaded_file'
   );
   const { t } = useTranslation();
 
@@ -92,9 +91,9 @@ export default function CompleteRegistrationComponent() {
       setOnLogout(undefined);
     };
   }, []);
-  const setUploadedFilesAndWriteHistory = (files: Array<File>) => {
-    setUploadedFilesHistory(files);
-    setUploadedFiles(files);
+  const setUploadFileAndWriteHistory = (file: File) => {
+    setUploadFileHistory(file);
+    setUploadFile(file);
   };
 
   const handleCloseDialog = (): void => {
@@ -103,7 +102,7 @@ export default function CompleteRegistrationComponent() {
 
   const forward = () => {
     setActiveStepHistory(activeStep + 1);
-    setUploadedFilesHistory(uploadedFiles);
+    setUploadFileHistory(uploadFile);
     setActiveStep(activeStep + 1);
   };
 
@@ -174,16 +173,16 @@ export default function CompleteRegistrationComponent() {
 
   const handleErrorModalExit = () => {
     setActiveStepHistory(0);
-    setUploadedFilesHistory([]);
+    setUploadFileHistory(undefined);
     setActiveStep(0);
-    setUploadedFiles([]);
+    setUploadFile(undefined);
     setOutcome(null);
   };
 
   const handleErrorModalConfirm = () => {
     console.log('EXIT');
     setOutcome(null);
-    setUploadedFiles([]);
+    setUploadFile(undefined);
   };
 
   const steps: Array<StepperStep> = [
@@ -203,7 +202,7 @@ export default function CompleteRegistrationComponent() {
           },
           { forward: submit },
           { loading },
-          { uploadedFiles, setUploadedFiles: setUploadedFilesAndWriteHistory }
+          { uploadFile, setUploadFile: setUploadFileAndWriteHistory }
         ),
     },
   ];

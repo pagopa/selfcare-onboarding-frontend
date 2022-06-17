@@ -9,11 +9,11 @@ export function ConfirmRegistrationStep1(
   { setDialogTitle, setDialogDescription, setShowDialog }: AlertDialogActions,
   { forward }: StepperStepComponentProps,
   { loading }: any,
-  { uploadedFile, setUploadedFile }: any
+  { uploadFile, setUploadFile }: File
 ) {
   const { t } = useTranslation();
   const onDropAccepted = (acceptedFile: File) => {
-    setUploadedFile(acceptedFile);
+    setUploadFile(acceptedFile);
   };
 
   const onDropRejected = () => {
@@ -29,11 +29,11 @@ export function ConfirmRegistrationStep1(
   };
 
   const onSubmit = (): void => {
-    forward(uploadedFile);
+    forward(uploadFile);
   };
 
   const deleteUploadedFile = (): void => {
-    setUploadedFile();
+    setUploadFile();
   };
   const theme = useTheme();
 
@@ -65,7 +65,7 @@ export function ConfirmRegistrationStep1(
         <FileUploader
           title={t('confirmRegistrationStep1.fileUploaderTitle')}
           descriptionLink={t('confirmRegistrationStep1.fileUploaderDescriptionLink')}
-          uploadedFile={uploadedFile}
+          uploadedFile={uploadFile}
           deleteUploadedFile={deleteUploadedFile}
           onDropAccepted={onDropAccepted}
           onDropRejected={onDropRejected}
@@ -84,7 +84,7 @@ export function ConfirmRegistrationStep1(
             fullWidth
             color="primary"
             variant="contained"
-            disabled={!uploadedFile}
+            disabled={!uploadFile}
             onClick={onSubmit}
           >
             {t('confirmRegistrationStep1.confirmAction')}

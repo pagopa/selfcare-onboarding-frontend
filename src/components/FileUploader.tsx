@@ -8,7 +8,7 @@ type FileUploaderOption = {
   title: string;
   descriptionLink?: string;
   uploadedFile: File;
-  deleteUploadedFile?: (event: any | undefined) => void;
+  deleteUploadedFile?: (event: File | undefined) => void;
   onDropAccepted?: (t: File) => void;
   onDropRejected?: (fileRejections: Array<FileRejection>, event?: DropEvent) => void;
   maxFiles: number;
