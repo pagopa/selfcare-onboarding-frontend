@@ -37,6 +37,7 @@ type Field = {
   width?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
   regexp?: RegExp;
   regexpMessageKey?: string;
+  conflictMessageKey?: string;
   hasDescription?: boolean;
   unique: boolean;
   caseSensitive?: boolean;
@@ -44,8 +45,8 @@ type Field = {
 };
 
 const fields: Array<Field> = [
-  { id: 'name', unique: false, uniqueMessageKey: 'conflict' },
-  { id: 'surname', unique: false, uniqueMessageKey: 'conflict' },
+  { id: 'name', unique: false, conflictMessageKey: 'conflict' },
+  { id: 'surname', unique: false, conflictMessageKey: 'conflict' },
   {
     id: 'taxCode',
     width: 12,
@@ -69,7 +70,10 @@ const fields: Array<Field> = [
   },
 ];
 
-type ValidationErrorCode = `${keyof UserOnCreate}-regexp` | `${keyof UserOnCreate}-unique`;
+type ValidationErrorCode =
+  | `${keyof UserOnCreate}-regexp`
+  | `${keyof UserOnCreate}-unique`
+  | `${keyof UserOnCreate}-conflict`;
 
 function stringEquals(str1?: string, str2?: string, caseSensitive?: boolean) {
   return (
@@ -136,11 +140,12 @@ export function PlatformUserForm({
       [prefix]: { ...people[prefix], [key]: e.target.value, role },
     });
   };
+
   const errors: Array<ValidationErrorCode> = people[prefix]
     ? validateNoMandatory(prefix, people[prefix], allPeople)
     : [];
 
-  const externalErrors: { [fieldName: string]: Array<string> } | undefined =
+  const externalErrors: { [errorsUserData: string]: Array<string> } | undefined =
     peopleErrors && peopleErrors[prefix];
 
   return (
@@ -153,6 +158,7 @@ export function PlatformUserForm({
             width = 6,
             regexpMessageKey,
             uniqueMessageKey,
+            conflictMessageKey,
             hasDescription,
             // eslint-disable-next-line sonarjs/cognitive-complexity
           }) => {
@@ -180,7 +186,7 @@ export function PlatformUserForm({
                         : error.indexOf('unique') > -1
                         ? transcodeFormErrorKey(id, uniqueMessageKey, t)
                         : error.indexOf('conflict') > -1
-                        ? transcodeFormErrorKey(id, uniqueMessageKey, t)
+                        ? transcodeFormErrorKey(id, conflictMessageKey, t)
                         : t('platformUserForm.helperText')
                       : hasDescription
                       ? t(`platformUserForm.fields.${id}.description`)

@@ -12,15 +12,15 @@ import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 import { omit, uniqueId } from 'lodash';
 // import { Box } from '@mui/system';
 import { useTranslation, Trans } from 'react-i18next';
-import { AxiosError, AxiosResponse } from 'axios';
+import { AxiosError } from 'axios';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
+import SessionModal from '@pagopa/selfcare-common-frontend/components/SessionModal';
 import { objectIsEmpty } from '../../../lib/object-utils';
 import { StepperStepComponentProps, UserOnCreate } from '../../../../types';
 import { UserContext } from '../../../lib/context';
 import { OnboardingStepActions } from '../../../components/OnboardingStepActions';
 import { PlatformUserForm, validateUser } from '../../../components/PlatformUserForm';
 import { useHistoryState } from '../../../components/useHistoryState';
-import { ValidateErrorType } from '../Onboarding';
 import { fetchWithLogs } from '../../../lib/api-utils';
 import { getFetchOutcome } from '../../../lib/error-utils';
 
@@ -34,50 +34,64 @@ type Props = StepperStepComponentProps & {
 
 export function OnBoardingProductStepDelegates({ product, legal, forward, back }: Props) {
   const { user, setRequiredLogin } = useContext(UserContext);
-  const [errorField, setErrorField] = useState<UsersError>();
+  const [_loading, setLoading] = useState(true);
+  const [peopleErrors, setPeopleErrors] = useState<UsersError>({});
+  const [genericError, setGenericError] = useState<boolean>(false);
   const [isAuthUser, setIsAuthUser, setIsAuthUserHistory] = useHistoryState('isAuthUser', false);
   const [people, setPeople, setPeopleHistory] = useHistoryState<UsersObject>('people_step3', {});
   const [delegateFormIds, setDelegateFormIds, setDelegateFormIdsHistory] = useHistoryState<
     Array<string>
   >('delegateFormIds', []);
-  const [_validateError, setValidateError] = useState<ValidateErrorType>();
   const { t } = useTranslation();
 
   const allPeople = { ...people, LEGAL: legal };
 
-  const validateUserData = async (taxCode: string, name: string, surname: string) => {
+  const validateUserData = async (user: UserOnCreate, prefix: string) => {
+    setLoading(true);
     const resultValidation = await fetchWithLogs(
       {
         endpoint: 'ONBOARDING_USER_VALIDATION',
-        endpointParams: { taxCode },
       },
       {
         method: 'POST',
         data: {
-          taxCode,
-          name,
-          surname,
+          name: user?.name,
+          surname: user?.surname,
+          taxCode: user.taxCode,
         },
       },
       () => setRequiredLogin(true)
     );
 
     const result = getFetchOutcome(resultValidation);
+    const nextUsersError = Object.fromEntries(
+      Object.entries(peopleErrors).filter(([userId]) => userId !== prefix)
+    );
+    const errorBody = (resultValidation as AxiosError).response?.data;
 
     if (result === 'success') {
-      setValidateError(undefined);
+      setPeopleErrors(nextUsersError);
       onForwardAction();
-    } else if (result === 'error' && (resultValidation as AxiosError).response?.status === 409) {
-      setValidateError('conflictError');
-      const error = (resultValidation as AxiosResponse).data;
-      setErrorField(error);
-      trackEvent('STEP_DELEGATE_CONFLICT_ERROR', {
+    } else if (
+      result === 'error' &&
+      (resultValidation as AxiosError).response?.status === 409 &&
+      errorBody
+    ) {
+      setPeopleErrors({
+        ...nextUsersError,
+        [prefix]: Object.fromEntries(errorBody?.map((e: any) => [e.name, 'conflict']) ?? []),
+      });
+      trackEvent('STEP_ADD_DELEGATE_CONFLICT_ERROR', {
         product_id: product?.id,
-        error_field: errorField,
+        errorBody,
       });
     } else {
-      onForwardAction();
-      setValidateError(undefined);
+      setGenericError(true);
+      trackEvent('STEP_ADD_DELEGATE_GENERIC_ERROR', {
+        product_id: product?.id,
+        error: resultValidation,
+      });
+      setPeopleErrors(nextUsersError);
     }
   };
 
@@ -142,6 +156,10 @@ export function OnBoardingProductStepDelegates({ product, legal, forward, back }
       .some((prefix) => !validateUser(prefix, people[prefix], allPeople)) ||
     Object.keys(people).length === 3;
 
+  const handleCloseGenericErrorModal = () => {
+    setGenericError(false);
+  };
+
   return (
     <Grid
       container
@@ -187,7 +205,7 @@ export function OnBoardingProductStepDelegates({ product, legal, forward, back }
             prefix={'delegate-initial'}
             role="DELEGATE"
             people={people}
-            peopleErrors={errorField}
+            peopleErrors={peopleErrors}
             allPeople={allPeople}
             setPeople={setPeople}
             readOnlyFields={isAuthUser ? ['name', 'surname', 'taxCode'] : []}
@@ -210,7 +228,7 @@ export function OnBoardingProductStepDelegates({ product, legal, forward, back }
                 prefix={id}
                 role="DELEGATE"
                 people={people}
-                peopleErrors={errorField}
+                peopleErrors={peopleErrors}
                 allPeople={allPeople}
                 setPeople={setPeople}
               />
@@ -250,16 +268,18 @@ export function OnBoardingProductStepDelegates({ product, legal, forward, back }
           )}
         </Grid>
       </Grid>
-      {console.log(errorField)}
+
       <OnboardingStepActions
         back={{ action: onBackAction, label: t('onboardingStep3.backLabel'), disabled: false }}
         forward={{
-          action: () =>
-            validateUserData(
-              people.userField?.taxCode,
-              people.userField?.name,
-              people.userField?.surname
-            ),
+          action: () => {
+            Object.keys(people).forEach((prefix) =>
+              validateUserData(
+                people[prefix === 'delegate-1' ? 'delegate-initial' : prefix],
+                prefix
+              )
+            );
+          },
           label: t('onboardingStep3.confirmLabel'),
           disabled:
             objectIsEmpty(people) ||
@@ -268,7 +288,18 @@ export function OnBoardingProductStepDelegates({ product, legal, forward, back }
               .some((prefix) => !validateUser(prefix, people[prefix], allPeople)),
         }}
       />
-      {/* </Box> */}
+      <SessionModal
+        open={genericError}
+        title={t('onboarding.outcomeContent.error.title')}
+        message={
+          <Trans i18nKey="onboarding.outcomeContent.error.description">
+            {'A causa di un errore del sistema non è possibile completare la procedura.'} <br />
+            {'Ti chiediamo di riprovare più tardi.'}
+          </Trans>
+        }
+        onCloseLabel={t('onboarding.outcomeContent.error.backActionLabel')}
+        handleClose={handleCloseGenericErrorModal}
+      ></SessionModal>
     </Grid>
   );
 }

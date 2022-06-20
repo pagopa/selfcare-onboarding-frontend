@@ -1,69 +1,76 @@
 import { Grid, Typography } from '@mui/material';
+import SessionModal from '@pagopa/selfcare-common-frontend/components/SessionModal';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
-import { AxiosError, AxiosResponse } from 'axios';
+import { AxiosError } from 'axios';
 import { useContext, useState } from 'react';
 import { useTranslation, Trans } from 'react-i18next';
-import { StepperStepComponentProps, UserOnCreate } from '../../../types';
+import { Problem, StepperStepComponentProps, UserOnCreate } from '../../../types';
 import { fetchWithLogs } from '../../lib/api-utils';
 import { UserContext } from '../../lib/context';
 import { getFetchOutcome } from '../../lib/error-utils';
 import { objectIsEmpty } from '../../lib/object-utils';
-import { ValidateErrorType } from '../../views/onboarding/Onboarding';
 import { OnboardingStepActions } from '../OnboardingStepActions';
 import { PlatformUserForm, validateUser } from '../PlatformUserForm';
 import { useHistoryState } from '../useHistoryState';
 
 // Could be an ES6 Set but it's too bothersome for now
 export type UsersObject = { [key: string]: UserOnCreate };
-export type UsersError = { [key: string]: { [userField: string]: Array<string> } };
+export type UsersError = { [key: string]: { [userField: string]: any } };
 
 type Props = StepperStepComponentProps & {
   readOnly?: boolean;
 };
 
 export function StepAddManager({ readOnly, product, forward, back }: Props) {
-  // const [people, setPeople] = useState<UsersObject>({});
   const { setRequiredLogin } = useContext(UserContext);
   const [_loading, setLoading] = useState(true);
   const [people, setPeople, setPeopleHistory] = useHistoryState<UsersObject>('people_step2', {});
-  const [errorField, setErrorField] = useState<UsersError>();
-  const [_validateError, setValidateError] = useState<ValidateErrorType>();
+  const [peopleErrors, setPeopleErrors] = useState<UsersError>();
+  const [genericError, setGenericError] = useState<boolean>(false);
   const { t } = useTranslation();
 
-  const validateUserData = async (taxCode: string, name?: string, surname?: string) => {
+  const validateUserData = async (user: UserOnCreate) => {
     setLoading(true);
     const resultValidation = await fetchWithLogs(
       {
         endpoint: 'ONBOARDING_USER_VALIDATION',
-        endpointParams: { taxCode },
       },
       {
         method: 'POST',
         data: {
-          name,
-          surname,
+          name: user.name,
+          surname: user.surname,
+          taxCode: user.taxCode,
         },
       },
       () => setRequiredLogin(true)
     );
 
     const result = getFetchOutcome(resultValidation);
+    const errorBody = (resultValidation as AxiosError).response?.data;
 
     if (result === 'success') {
-      setValidateError(undefined);
       onForwardAction();
-    } else if (result === 'error' && (resultValidation as AxiosError).response?.status === 409) {
-      setValidateError('conflictError');
-      const error = (resultValidation as AxiosResponse).data;
-      setErrorField(error);
+    } else if (
+      result === 'error' &&
+      (resultValidation as AxiosError<Problem>).response?.status === 409 &&
+      errorBody
+    ) {
+      setPeopleErrors({
+        LEGAL: Object.fromEntries(errorBody?.map((e: any) => [e.name, 'conflict']) ?? []),
+      });
       trackEvent('STEP_ADD_MANAGER_CONFLICT_ERROR', {
         product_id: product?.id,
-        error_field: errorField,
+        error_field: peopleErrors,
       });
     } else {
-      onForwardAction();
-      setValidateError(undefined);
+      setGenericError(true);
+      trackEvent('STEP_ADD_MANAGER_GENERIC_ERROR', {
+        product_id: product?.id,
+        error: resultValidation,
+      });
     }
+    setLoading(false);
   };
 
   const onForwardAction = () => {
@@ -80,6 +87,11 @@ export function StepAddManager({ readOnly, product, forward, back }: Props) {
   const savePageState = () => {
     setPeopleHistory(people);
   };
+
+  const handleCloseGenericErrorModal = () => {
+    setGenericError(false);
+  };
+
   return (
     <Grid
       container
@@ -109,14 +121,14 @@ export function StepAddManager({ readOnly, product, forward, back }: Props) {
           </Typography>
         </Grid>
       </Grid>
-      {console.log(people.LEGAL.taxCode)}
+
       <Grid container item justifyContent="center" mt={4}>
         <Grid item xs={8} sx={{ boxShadow: '0px 12px 40px rgba(0, 0, 0, 0.06)' }}>
           <PlatformUserForm
             prefix="LEGAL"
             role="MANAGER"
             people={people}
-            peopleErrors={errorField}
+            peopleErrors={peopleErrors}
             allPeople={people}
             setPeople={setPeople}
             readOnly={readOnly}
@@ -132,13 +144,24 @@ export function StepAddManager({ readOnly, product, forward, back }: Props) {
             disabled: false,
           }}
           forward={{
-            action: () =>
-              validateUserData(people.LEGAL?.taxCode, people.LEGAL?.name, people.LEGAL?.surname),
+            action: () => validateUserData(people.LEGAL),
             label: t('onboardingStep2.confirmLabel'),
             disabled: objectIsEmpty(people) || !validateUser('LEGAL', people.LEGAL, people),
           }}
         />
       </Grid>
+      <SessionModal
+        open={genericError}
+        title={t('onboarding.outcomeContent.error.title')}
+        message={
+          <Trans i18nKey="onboarding.outcomeContent.error.description">
+            {'A causa di un errore del sistema non è possibile completare la procedura.'} <br />
+            {'Ti chiediamo di riprovare più tardi.'}
+          </Trans>
+        }
+        onCloseLabel={t('onboarding.outcomeContent.error.backActionLabel')}
+        handleClose={handleCloseGenericErrorModal}
+      ></SessionModal>
     </Grid>
   );
 }

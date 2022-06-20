@@ -214,6 +214,17 @@ const mockedResponseError = {
   title: 'Service Unavailable',
 };
 
+const mockedUserDataValidationResponseError = [
+  {
+    name: 'name',
+    reason: 'conflict',
+  },
+  {
+    name: 'surname',
+    reason: 'conflict',
+  },
+];
+
 const notFoundError: Promise<AxiosError> = new Promise((resolve) =>
   resolve({
     isAxiosError: true,
@@ -231,7 +242,7 @@ const genericError: Promise<AxiosError> = new Promise((resolve) =>
 const error409: Promise<AxiosError> = new Promise((resolve) =>
   resolve({
     isAxiosError: true,
-    response: { data: '', status: 409, statusText: '409' },
+    response: { data: mockedUserDataValidationResponseError, status: 409, statusText: '409' },
   } as AxiosError)
 );
 
@@ -330,14 +341,12 @@ export async function mockFetch(
   }
 
   if (endpoint === 'ONBOARDING_USER_VALIDATION') {
-    switch (endpointParams.taxCode) {
-      case 'AAAAAA11A11A123K':
-        return genericError;
+    switch (endpoint === 'ONBOARDING_USER_VALIDATION') {
       default:
         if (
-          ((data as any).taxCode === 'XXXXXX00A00X000X' &&
-            (data as any).name !== 'CERTIFIED_NAME') ||
-          (data as any).surname !== 'CERTIFIED_SURNAME'
+          ((data as any)?.taxCode === 'XXXXXX00A00X000X' &&
+            (data as any)?.name !== 'CERTIFIED_NAME') ||
+          (data as any)?.surname !== 'CERTIFIED_SURNAME'
         ) {
           return error409;
         } else {
