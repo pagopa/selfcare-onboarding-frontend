@@ -24,7 +24,10 @@ type Field = {
   unique: boolean;
   caseSensitive?: boolean;
   uniqueMessageKey?: string;
+  textTransformation?: TextTransformation;
 };
+
+type TextTransformation = 'uppercase' | 'lowercase';
 
 const fields: Array<Field> = [
   { id: 'name', unique: false },
@@ -39,6 +42,7 @@ const fields: Array<Field> = [
     unique: true,
     caseSensitive: false,
     uniqueMessageKey: 'duplicate',
+    textTransformation: 'uppercase',
   },
   {
     id: 'email',
@@ -49,6 +53,7 @@ const fields: Array<Field> = [
     unique: true,
     caseSensitive: false,
     uniqueMessageKey: 'duplicate',
+    textTransformation: 'lowercase',
   },
 ];
 
@@ -113,10 +118,19 @@ export function PlatformUserForm({
   const { t } = useTranslation();
   const theme = useTheme();
 
-  const buildSetPerson = (key: string) => (e: any) => {
+  const buildSetPerson = (key: string, textTransformation?: TextTransformation) => (e: any) => {
     setPeople({
       ...people,
-      [prefix]: { ...people[prefix], [key]: e.target.value, role },
+      [prefix]: {
+        ...people[prefix],
+        [key]:
+          textTransformation === 'uppercase'
+            ? (e.target.value as string).toLocaleUpperCase()
+            : textTransformation === 'lowercase'
+            ? (e.target.value as string).toLocaleLowerCase()
+            : e.target.value,
+        role,
+      },
     });
   };
   const errors: Array<ValidationErrorCode> = people[prefix]
@@ -134,6 +148,7 @@ export function PlatformUserForm({
             regexpMessageKey,
             uniqueMessageKey,
             hasDescription,
+            textTransformation,
           }) => {
             const prefixErrorCode = `${id}-`;
             const error = errors
@@ -148,7 +163,7 @@ export function PlatformUserForm({
                   label={t(`platformUserForm.fields.${id}.label`)}
                   type={type}
                   value={people[prefix] && people[prefix][id] ? people[prefix][id] : ''}
-                  onChange={buildSetPerson(id)}
+                  onChange={buildSetPerson(id, textTransformation)}
                   sx={{
                     width: '100%',
                     '& .MuiFormHelperText-root': {
