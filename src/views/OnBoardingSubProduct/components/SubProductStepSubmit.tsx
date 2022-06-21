@@ -129,7 +129,20 @@ function SubProductStepSubmit({
         endpoint: 'ONBOARDING_POST_LEGALS',
         endpointParams: { externalInstitutionId, productId: subProduct.id },
       },
-      { method: 'POST', data: { users, billingData, institutionType, pricingPlan, origin } },
+      {
+        method: 'POST',
+        data: {
+          users: users.map((u) => ({
+            ...u,
+            taxCode: u.taxCode.toUpperCase(),
+            email: u.email.toLowerCase(),
+          })),
+          billingData,
+          institutionType,
+          pricingPlan,
+          origin,
+        },
+      },
       () => setRequiredLogin(true)
     );
 
