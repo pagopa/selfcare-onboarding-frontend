@@ -278,7 +278,7 @@ const executeStep2 = async () => {
   const confirmButton = screen.getByRole('button', { name: 'Continua' });
   expect(confirmButton).toBeDisabled();
 
-  await fillUserForm(confirmButton, 'LEGAL', 'BBBBBB00B00B000B', 'b@b.bb');
+  await fillUserForm(confirmButton, 'LEGAL', 'bbBBBB00B00B000B', 'b@b.BB');
 
   expect(confirmButton).toBeEnabled();
   fireEvent.click(confirmButton);
@@ -302,8 +302,8 @@ const executeStep3 = async (expectedSuccessfulSubmit: boolean) => {
   await fillUserForm(
     confirmButton,
     'delegate-initial',
-    'CCCCCC00C00C000C',
-    'a@a.aa',
+    'CCCCcc00C00C000C',
+    'a@a.AA',
     'BBBBBB00B00B000B',
     1,
     'b@b.bb',

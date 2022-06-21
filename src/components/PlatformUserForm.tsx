@@ -24,10 +24,10 @@ type Field = {
   unique: boolean;
   caseSensitive?: boolean;
   uniqueMessageKey?: string;
-  textTransformation?: TextTransformation;
+  textTransform?: TextTransform;
 };
 
-type TextTransformation = 'uppercase' | 'lowercase';
+type TextTransform = 'uppercase' | 'lowercase';
 
 const fields: Array<Field> = [
   { id: 'name', unique: false },
@@ -42,7 +42,7 @@ const fields: Array<Field> = [
     unique: true,
     caseSensitive: false,
     uniqueMessageKey: 'duplicate',
-    textTransformation: 'uppercase',
+    textTransform: 'uppercase',
   },
   {
     id: 'email',
@@ -53,7 +53,7 @@ const fields: Array<Field> = [
     unique: true,
     caseSensitive: false,
     uniqueMessageKey: 'duplicate',
-    textTransformation: 'lowercase',
+    textTransform: 'lowercase',
   },
 ];
 
@@ -118,17 +118,12 @@ export function PlatformUserForm({
   const { t } = useTranslation();
   const theme = useTheme();
 
-  const buildSetPerson = (key: string, textTransformation?: TextTransformation) => (e: any) => {
+  const buildSetPerson = (key: string) => (e: any) => {
     setPeople({
       ...people,
       [prefix]: {
         ...people[prefix],
-        [key]:
-          textTransformation === 'uppercase'
-            ? (e.target.value as string).toLocaleUpperCase()
-            : textTransformation === 'lowercase'
-            ? (e.target.value as string).toLocaleLowerCase()
-            : e.target.value,
+        [key]: e.target.value,
         role,
       },
     });
@@ -148,7 +143,7 @@ export function PlatformUserForm({
             regexpMessageKey,
             uniqueMessageKey,
             hasDescription,
-            textTransformation,
+            textTransform,
           }) => {
             const prefixErrorCode = `${id}-`;
             const error = errors
@@ -163,7 +158,7 @@ export function PlatformUserForm({
                   label={t(`platformUserForm.fields.${id}.label`)}
                   type={type}
                   value={people[prefix] && people[prefix][id] ? people[prefix][id] : ''}
-                  onChange={buildSetPerson(id, textTransformation)}
+                  onChange={buildSetPerson(id)}
                   sx={{
                     width: '100%',
                     '& .MuiFormHelperText-root': {
@@ -176,6 +171,11 @@ export function PlatformUserForm({
                       '&.Mui-disabled': {
                         WebkitTextFillColor: theme.palette.text.disabled,
                       },
+                    },
+                  }}
+                  inputProps={{
+                    style: {
+                      textTransform,
                     },
                   }}
                   error={isError}

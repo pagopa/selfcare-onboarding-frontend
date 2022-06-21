@@ -146,7 +146,20 @@ function OnboardingComponent({ productId }: { productId: string }) {
     setLoading(true);
     const postLegalsResponse = await fetchWithLogs(
       { endpoint: 'ONBOARDING_POST_LEGALS', endpointParams: { externalInstitutionId, productId } },
-      { method: 'POST', data: { billingData, institutionType, origin, users, pricingPlan } },
+      {
+        method: 'POST',
+        data: {
+          billingData,
+          institutionType,
+          origin,
+          users: users.map((u) => ({
+            ...u,
+            taxCode: u.taxCode.toUpperCase(),
+            email: u.email.toLowerCase(),
+          })),
+          pricingPlan,
+        },
+      },
       () => setRequiredLogin(true)
     );
 
