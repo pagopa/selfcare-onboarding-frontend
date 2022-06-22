@@ -24,7 +24,10 @@ type Field = {
   unique: boolean;
   caseSensitive?: boolean;
   uniqueMessageKey?: string;
+  textTransform?: TextTransform;
 };
+
+type TextTransform = 'uppercase' | 'lowercase';
 
 const fields: Array<Field> = [
   { id: 'name', unique: false },
@@ -39,6 +42,7 @@ const fields: Array<Field> = [
     unique: true,
     caseSensitive: false,
     uniqueMessageKey: 'duplicate',
+    textTransform: 'uppercase',
   },
   {
     id: 'email',
@@ -49,6 +53,7 @@ const fields: Array<Field> = [
     unique: true,
     caseSensitive: false,
     uniqueMessageKey: 'duplicate',
+    textTransform: 'lowercase',
   },
 ];
 
@@ -116,7 +121,11 @@ export function PlatformUserForm({
   const buildSetPerson = (key: string) => (e: any) => {
     setPeople({
       ...people,
-      [prefix]: { ...people[prefix], [key]: e.target.value, role },
+      [prefix]: {
+        ...people[prefix],
+        [key]: e.target.value,
+        role,
+      },
     });
   };
   const errors: Array<ValidationErrorCode> = people[prefix]
@@ -134,6 +143,7 @@ export function PlatformUserForm({
             regexpMessageKey,
             uniqueMessageKey,
             hasDescription,
+            textTransform,
           }) => {
             const prefixErrorCode = `${id}-`;
             const error = errors
@@ -161,6 +171,11 @@ export function PlatformUserForm({
                       '&.Mui-disabled': {
                         WebkitTextFillColor: theme.palette.text.disabled,
                       },
+                    },
+                  }}
+                  inputProps={{
+                    style: {
+                      textTransform,
                     },
                   }}
                   error={isError}
