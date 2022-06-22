@@ -10,9 +10,7 @@ import {
 } from '@mui/material';
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 import { omit, uniqueId } from 'lodash';
-// import { Box } from '@mui/system';
 import { useTranslation, Trans } from 'react-i18next';
-import { AxiosError } from 'axios';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
 import SessionModal from '@pagopa/selfcare-common-frontend/components/SessionModal';
 import { objectIsEmpty } from '../../../lib/object-utils';
@@ -21,8 +19,7 @@ import { UserContext } from '../../../lib/context';
 import { OnboardingStepActions } from '../../../components/OnboardingStepActions';
 import { PlatformUserForm, validateUser } from '../../../components/PlatformUserForm';
 import { useHistoryState } from '../../../components/useHistoryState';
-import { fetchWithLogs } from '../../../lib/api-utils';
-import { getFetchOutcome } from '../../../lib/error-utils';
+import { userValidate } from '../../../utils/api/userValidate';
 
 // Could be an ES6 Set but it's too bothersome for now
 export type UsersObject = { [key: string]: UserOnCreate };
@@ -46,53 +43,62 @@ export function OnBoardingProductStepDelegates({ product, legal, forward, back }
 
   const allPeople = { ...people, LEGAL: legal };
 
-  const validateUserData = async (user: UserOnCreate, prefix: string) => {
-    setLoading(true);
-    const resultValidation = await fetchWithLogs(
-      {
-        endpoint: 'ONBOARDING_USER_VALIDATION',
-      },
-      {
-        method: 'POST',
-        data: {
-          name: user?.name,
-          surname: user?.surname,
-          taxCode: user.taxCode,
-        },
-      },
-      () => setRequiredLogin(true)
-    );
-
-    const result = getFetchOutcome(resultValidation);
-    const nextUsersError = Object.fromEntries(
-      Object.entries(peopleErrors).filter(([userId]) => userId !== prefix)
-    );
-    const errorBody = (resultValidation as AxiosError).response?.data;
-
-    if (result === 'success') {
-      setPeopleErrors(nextUsersError);
-      onForwardAction();
-    } else if (
-      result === 'error' &&
-      (resultValidation as AxiosError).response?.status === 409 &&
-      errorBody
-    ) {
-      setPeopleErrors({
-        ...nextUsersError,
-        [prefix]: Object.fromEntries(errorBody?.map((e: any) => [e.name, 'conflict']) ?? []),
-      });
-      trackEvent('STEP_ADD_DELEGATE_CONFLICT_ERROR', {
-        product_id: product?.id,
-        errorBody,
-      });
-    } else {
-      setGenericError(true);
-      trackEvent('STEP_ADD_DELEGATE_GENERIC_ERROR', {
-        product_id: product?.id,
-        error: resultValidation,
-      });
-      setPeopleErrors(nextUsersError);
+  const validateUsers = (index: number, peopleErrors: UsersError) => {
+    const userIds = Object.keys(people);
+    if (index === userIds.length) {
+      if (Object.keys(peopleErrors).length === 0) {
+        onForwardAction();
+      }
+      setPeopleErrors(peopleErrors);
+      setLoading(false);
     }
+    const userId = userIds[index];
+    validateUserData(people[userId], userId, index, peopleErrors);
+  };
+
+  const onUserValidateSuccess = (_userId: string, index: number, peopleErrors: UsersError) => {
+    validateUsers(index + 1, peopleErrors);
+  };
+
+  const onUserValidateError = (
+    userId: string,
+    errors: { [fieldName: string]: Array<string> },
+    index: number,
+    peopleErrors: UsersError
+  ) => {
+    const nextPeopleErrors = {
+      ...peopleErrors,
+      [userId]: errors,
+    };
+    validateUsers(index + 1, nextPeopleErrors);
+  };
+
+  const onUserValidateGenericError = (_userId: string, index: number, peopleErrors: UsersError) => {
+    setGenericError(true);
+    validateUsers(index + 1, peopleErrors);
+  };
+
+  const validateUserData = (
+    user: UserOnCreate,
+    prefix: string,
+    index: number,
+    peopleErrors: UsersError
+  ) => {
+    userValidate(
+      user,
+      prefix,
+      (userId) => onUserValidateSuccess(userId, index, peopleErrors),
+      (userId, errors) => onUserValidateError(userId, errors, index, peopleErrors),
+      (userId) => onUserValidateGenericError(userId, index, peopleErrors),
+      () => setRequiredLogin(true),
+      () => {},
+      'STEP_ADD_DELEGATE'
+    ).catch((reason) => {
+      trackEvent('STEP_ADD_DELEGATE', {
+        message: `Something gone wrong while validating user having id: ${prefix}`,
+        reason,
+      });
+    });
   };
 
   const addDelegateForm = () => {
@@ -273,12 +279,8 @@ export function OnBoardingProductStepDelegates({ product, legal, forward, back }
         back={{ action: onBackAction, label: t('onboardingStep3.backLabel'), disabled: false }}
         forward={{
           action: () => {
-            Object.keys(people).forEach((prefix) =>
-              validateUserData(
-                people[prefix === 'delegate-1' ? 'delegate-initial' : prefix],
-                prefix
-              )
-            );
+            setLoading(true);
+            validateUsers(0, {});
           },
           label: t('onboardingStep3.confirmLabel'),
           disabled:

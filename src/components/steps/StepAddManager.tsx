@@ -1,21 +1,19 @@
 import { Grid, Typography } from '@mui/material';
 import SessionModal from '@pagopa/selfcare-common-frontend/components/SessionModal';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
-import { AxiosError } from 'axios';
 import { useContext, useState } from 'react';
 import { useTranslation, Trans } from 'react-i18next';
-import { Problem, StepperStepComponentProps, UserOnCreate } from '../../../types';
-import { fetchWithLogs } from '../../lib/api-utils';
+import { StepperStepComponentProps, UserOnCreate } from '../../../types';
 import { UserContext } from '../../lib/context';
-import { getFetchOutcome } from '../../lib/error-utils';
 import { objectIsEmpty } from '../../lib/object-utils';
+import { userValidate } from '../../utils/api/userValidate';
 import { OnboardingStepActions } from '../OnboardingStepActions';
 import { PlatformUserForm, validateUser } from '../PlatformUserForm';
 import { useHistoryState } from '../useHistoryState';
 
 // Could be an ES6 Set but it's too bothersome for now
 export type UsersObject = { [key: string]: UserOnCreate };
-export type UsersError = { [key: string]: { [userField: string]: any } };
+export type UsersError = { [key: string]: { [userField: string]: Array<string> } };
 
 type Props = StepperStepComponentProps & {
   readOnly?: boolean;
@@ -29,48 +27,37 @@ export function StepAddManager({ readOnly, product, forward, back }: Props) {
   const [genericError, setGenericError] = useState<boolean>(false);
   const { t } = useTranslation();
 
-  const validateUserData = async (user: UserOnCreate) => {
-    setLoading(true);
-    const resultValidation = await fetchWithLogs(
-      {
-        endpoint: 'ONBOARDING_USER_VALIDATION',
-      },
-      {
-        method: 'POST',
-        data: {
-          name: user.name,
-          surname: user.surname,
-          taxCode: user.taxCode,
-        },
-      },
-      () => setRequiredLogin(true)
-    );
+  const onUserValidateSuccess = () => {
+    setGenericError(false);
+    onForwardAction();
+  };
 
-    const result = getFetchOutcome(resultValidation);
-    const errorBody = (resultValidation as AxiosError).response?.data;
+  const onUserValidateError = (userId: string, errors: { [fieldName: string]: Array<string> }) => {
+    setPeopleErrors({
+      [userId]: errors,
+    });
+  };
 
-    if (result === 'success') {
-      onForwardAction();
-    } else if (
-      result === 'error' &&
-      (resultValidation as AxiosError<Problem>).response?.status === 409 &&
-      errorBody
-    ) {
-      setPeopleErrors({
-        LEGAL: Object.fromEntries(errorBody?.map((e: any) => [e.name, 'conflict']) ?? []),
+  const onUserValidateGenericError = () => {
+    setGenericError(true);
+  };
+
+  const validateUserData = (user: UserOnCreate, prefix: string) => {
+    userValidate(
+      user,
+      prefix,
+      onUserValidateSuccess,
+      onUserValidateError,
+      onUserValidateGenericError,
+      () => setRequiredLogin(true),
+      setLoading,
+      'STEP_ADD_MANAGER'
+    ).catch((reason) => {
+      trackEvent('STEP_ADD_MANAGER', {
+        message: `Something gone wrong while validating user having id: ${prefix}`,
+        reason,
       });
-      trackEvent('STEP_ADD_MANAGER_CONFLICT_ERROR', {
-        product_id: product?.id,
-        error_field: peopleErrors,
-      });
-    } else {
-      setGenericError(true);
-      trackEvent('STEP_ADD_MANAGER_GENERIC_ERROR', {
-        product_id: product?.id,
-        error: resultValidation,
-      });
-    }
-    setLoading(false);
+    });
   };
 
   const onForwardAction = () => {
@@ -144,7 +131,9 @@ export function StepAddManager({ readOnly, product, forward, back }: Props) {
             disabled: false,
           }}
           forward={{
-            action: () => validateUserData(people.LEGAL),
+            action: () => {
+              validateUserData(people.LEGAL, 'LEGAL');
+            },
             label: t('onboardingStep2.confirmLabel'),
             disabled: objectIsEmpty(people) || !validateUser('LEGAL', people.LEGAL, people),
           }}

@@ -148,6 +148,31 @@ export function PlatformUserForm({
   const externalErrors: { [errorsUserData: string]: Array<string> } | undefined =
     peopleErrors && peopleErrors[prefix];
 
+  const checkErrors = (id: string, prefixErrorCode: string): Array<string> =>
+    (externalErrors && externalErrors[id]) ??
+    errors.filter((e) => e.startsWith(prefixErrorCode)).map((e) => e.replace(prefixErrorCode, ''));
+
+  const transcodeHelperText = (
+    isError: boolean,
+    error: Array<string>,
+    field: string,
+    regexpMessageKey?: string,
+    uniqueMessageKey?: string,
+    conflictMessageKey?: string,
+    hasDescription?: boolean
+  ): string =>
+    isError
+      ? error.indexOf('regexp') > -1
+        ? transcodeFormErrorKey(field, regexpMessageKey, t)
+        : error.indexOf('unique') > -1
+        ? transcodeFormErrorKey(field, uniqueMessageKey, t)
+        : error.indexOf('conflict') > -1
+        ? transcodeFormErrorKey(field, conflictMessageKey, t)
+        : t('platformUserForm.helperText')
+      : hasDescription
+      ? t(`platformUserForm.fields.${field}.description`)
+      : '';
+
   return (
     <Paper elevation={0} sx={{ p: 4, borderRadius: '16px' }}>
       <Grid container spacing={2}>
@@ -160,14 +185,9 @@ export function PlatformUserForm({
             uniqueMessageKey,
             conflictMessageKey,
             hasDescription,
-            // eslint-disable-next-line sonarjs/cognitive-complexity
           }) => {
             const prefixErrorCode = `${id}-`;
-            const error =
-              (externalErrors && externalErrors[id]) ??
-              errors
-                .filter((e) => e.startsWith(prefixErrorCode))
-                .map((e) => e.replace(prefixErrorCode, ''));
+            const error = checkErrors(id, prefixErrorCode);
             const isError = error && error.length > 0;
             return (
               <Grid item key={id} xs={width} mb={3}>
@@ -179,19 +199,15 @@ export function PlatformUserForm({
                   value={people[prefix] && people[prefix][id] ? people[prefix][id] : ''}
                   onChange={buildSetPerson(id)}
                   error={isError}
-                  helperText={
-                    isError
-                      ? error.indexOf('regexp') > -1
-                        ? transcodeFormErrorKey(id, regexpMessageKey, t)
-                        : error.indexOf('unique') > -1
-                        ? transcodeFormErrorKey(id, uniqueMessageKey, t)
-                        : error.indexOf('conflict') > -1
-                        ? transcodeFormErrorKey(id, conflictMessageKey, t)
-                        : t('platformUserForm.helperText')
-                      : hasDescription
-                      ? t(`platformUserForm.fields.${id}.description`)
-                      : ''
-                  }
+                  helperText={transcodeHelperText(
+                    isError,
+                    error,
+                    id,
+                    regexpMessageKey,
+                    uniqueMessageKey,
+                    conflictMessageKey,
+                    hasDescription
+                  )}
                   disabled={readOnly || readOnlyFields.indexOf(id) > -1}
                 />
               </Grid>

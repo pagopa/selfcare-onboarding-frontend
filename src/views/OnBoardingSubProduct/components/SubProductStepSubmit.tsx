@@ -141,19 +141,12 @@ function SubProductStepSubmit({
         subproduct_id: subProduct.id,
       });
       forward();
-    } else if (
-      outcome === 'error' ||
-      (postLegalsResponse as AxiosError<Problem>).response?.status === 409
-    ) {
-      setError(true);
-      trackEvent('ONBOARDING_SEND_CONFLICT_ERROR_FAILURE', {
-        party_id: externalInstitutionId,
-        request_id: requestId,
-        product_id: product?.id,
-        subproduct_id: subProduct?.id,
-      });
     } else {
-      trackEvent('ONBOARDING_SEND_FAILURE', {
+      const event =
+        (postLegalsResponse as AxiosError<Problem>).response?.status === 409
+          ? 'ONBOARDING_SEND_CONFLICT_ERROR_FAILURE'
+          : 'ONBOARDING_SEND_FAILURE';
+      trackEvent(event, {
         party_id: externalInstitutionId,
         request_id: requestId,
         product_id: product?.id,

@@ -162,11 +162,12 @@ function OnboardingComponent({ productId }: { productId: string }) {
         request_id: requestIdRef.current,
         product_id: productId,
       });
-    } else if (
-      outcome === 'error' ||
-      (postLegalsResponse as AxiosError<Problem>).response?.status === 409
-    ) {
-      trackEvent('ONBOARDING_SEND_FAILURE', {
+    } else {
+      const event =
+        (postLegalsResponse as AxiosError<Problem>).response?.status === 409
+          ? 'ONBOARDING_SEND_CONFLICT_ERROR_FAILURE'
+          : 'ONBOARDING_SEND_FAILURE';
+      trackEvent(event, {
         party_id: externalInstitutionId,
         request_id: requestIdRef.current,
         product_id: productId,
