@@ -308,7 +308,13 @@ const executeStepAddManager = async (expectedSuccessfulSubmit: boolean) => {
 
   const confirmButton = screen.getByRole('button', { name: 'Continua' });
 
-  await fillUserForm(confirmButton, 'LEGAL', 'bbBBBB00B00B000B', 'b@b.BB');
+  await fillUserForm(confirmButton, 'LEGAL', 'XXXXXX00A00X000X', 'b@b.BB', true);
+  expect(confirmButton).toBeEnabled();
+  fireEvent.click(confirmButton);
+  await waitFor(() => screen.getByText('Nome non corretto o diverso dal Codice Fiscale'));
+  screen.getByText('Cognome non corretto o diverso dal Codice Fiscale');
+
+  await fillUserForm(confirmButton, 'LEGAL', 'bbBBBB00B00B000B', 'b@b.BB', true);
 
   expect(confirmButton).toBeEnabled();
   fireEvent.click(confirmButton);
@@ -381,18 +387,13 @@ const fillUserForm = async (
   confirmButton: HTMLElement,
   prefix: string,
   taxCode: string,
-  email: string
+  email: string,
+  expectedEnabled?: boolean
 ) => {
-  await waitFor(() =>
-    expect((document.getElementById('LEGAL-email') as HTMLInputElement).value).toBe('m@ma.it')
-  );
-  expect((document.getElementById('LEGAL-taxCode') as HTMLInputElement).value).toBe(
-    'ZZZZZZ00A00Z000Z'
-  );
-  expect((document.getElementById('LEGAL-name') as HTMLInputElement).value).toBe('CERTIFIED_NAME');
-  expect((document.getElementById('LEGAL-surname') as HTMLInputElement).value).toBe(
-    'CERTIFIED_SURNAME'
-  );
+  await fillTextFieldAndCheckButton(prefix, 'name', 'NAME', confirmButton, expectedEnabled);
+  await fillTextFieldAndCheckButton(prefix, 'surname', 'SURNAME', confirmButton, expectedEnabled);
+  await fillTextFieldAndCheckButton(prefix, 'taxCode', taxCode, confirmButton, expectedEnabled);
+  await fillTextFieldAndCheckButton(prefix, 'email', email, confirmButton, expectedEnabled);
 
   expect(confirmButton).toBeEnabled();
 
@@ -436,7 +437,7 @@ const fillTextFieldAndCheckButton = async (
   field: string,
   value: string,
   confirmButton: HTMLElement,
-  expectedEnabled: boolean
+  expectedEnabled?: boolean
 ) => {
   fireEvent.change(document.getElementById(`${prefix}-${field}`), { target: { value } });
   if (expectedEnabled) {
