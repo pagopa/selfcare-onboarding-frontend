@@ -42,7 +42,10 @@ type Field = {
   unique: boolean;
   caseSensitive?: boolean;
   uniqueMessageKey?: string;
+  textTransform?: TextTransform;
 };
+
+type TextTransform = 'uppercase' | 'lowercase';
 
 const fields: Array<Field> = [
   { id: 'name', unique: false, conflictMessageKey: 'conflict' },
@@ -57,6 +60,7 @@ const fields: Array<Field> = [
     unique: true,
     caseSensitive: false,
     uniqueMessageKey: 'duplicate',
+    textTransform: 'uppercase',
   },
   {
     id: 'email',
@@ -67,6 +71,7 @@ const fields: Array<Field> = [
     unique: true,
     caseSensitive: false,
     uniqueMessageKey: 'duplicate',
+    textTransform: 'lowercase',
   },
 ];
 
@@ -137,7 +142,11 @@ export function PlatformUserForm({
   const buildSetPerson = (key: string) => (e: any) => {
     setPeople({
       ...people,
-      [prefix]: { ...people[prefix], [key]: e.target.value, role },
+      [prefix]: {
+        ...people[prefix],
+        [key]: e.target.value,
+        role,
+      },
     });
   };
 
@@ -185,6 +194,7 @@ export function PlatformUserForm({
             uniqueMessageKey,
             conflictMessageKey,
             hasDescription,
+            textTransform,
           }) => {
             const prefixErrorCode = `${id}-`;
             const error = checkErrors(id, prefixErrorCode);
@@ -198,6 +208,25 @@ export function PlatformUserForm({
                   type={type}
                   value={people[prefix] && people[prefix][id] ? people[prefix][id] : ''}
                   onChange={buildSetPerson(id)}
+                  sx={{
+                    width: '100%',
+                    '& .MuiFormHelperText-root': {
+                      color: theme.palette.text.secondary,
+                    },
+                    '& .MuiInputBase-root.Mui-disabled:before': {
+                      borderBottomStyle: 'solid',
+                    },
+                    input: {
+                      '&.Mui-disabled': {
+                        WebkitTextFillColor: theme.palette.text.disabled,
+                      },
+                    },
+                  }}
+                  inputProps={{
+                    style: {
+                      textTransform,
+                    },
+                  }}
                   error={isError}
                   helperText={transcodeHelperText(
                     isError,
