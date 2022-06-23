@@ -94,13 +94,13 @@ export default {
       name: {
         label: 'Nome',
         errors: {
-          conflict: 'Nome non corretto o diverso dal Codice Fiscale ',
+          conflict: 'Nome non corretto o diverso dal Codice Fiscale',
         },
       },
       surname: {
         label: 'Cognome',
         errors: {
-          conflict: 'Cognome non corretto o diverso dal Codice Fiscale ',
+          conflict: 'Cognome non corretto o diverso dal Codice Fiscale',
         },
       },
       taxCode: {
