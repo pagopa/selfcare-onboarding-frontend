@@ -387,10 +387,12 @@ const fillUserForm = async (
     expect((document.getElementById('LEGAL-email') as HTMLInputElement).value).toBe('m@ma.it')
   );
   expect((document.getElementById('LEGAL-taxCode') as HTMLInputElement).value).toBe(
-    'DDDDDD11A11A123K'
+    'ZZZZZZ00A00Z000Z'
   );
-  expect((document.getElementById('LEGAL-name') as HTMLInputElement).value).toBe('Maria');
-  expect((document.getElementById('LEGAL-surname') as HTMLInputElement).value).toBe('Rosa');
+  expect((document.getElementById('LEGAL-name') as HTMLInputElement).value).toBe('CERTIFIED_NAME');
+  expect((document.getElementById('LEGAL-surname') as HTMLInputElement).value).toBe(
+    'CERTIFIED_SURNAME'
+  );
 
   expect(confirmButton).toBeEnabled();
 

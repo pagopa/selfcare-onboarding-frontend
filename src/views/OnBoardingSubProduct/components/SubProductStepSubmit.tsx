@@ -152,6 +152,9 @@ function SubProductStepSubmit({
         product_id: product?.id,
         subproduct_id: subProduct?.id,
       });
+      if (event === 'ONBOARDING_SEND_FAILURE') {
+        setError(true);
+      }
     }
   };
 

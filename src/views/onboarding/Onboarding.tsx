@@ -403,7 +403,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
 
   return selectedProduct === null ? (
     <NoProductPage />
-  ) : outcome && outcome === 'success' ? (
+  ) : outcome ? (
     <MessageNoAction {...outcomeContent[outcome]} />
   ) : (
     <Container>

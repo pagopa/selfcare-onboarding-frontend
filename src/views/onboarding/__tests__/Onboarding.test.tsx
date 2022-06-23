@@ -8,7 +8,7 @@ import '../../../locale';
 
 jest.mock('../../../lib/api-utils');
 
-jest.setTimeout(20000);
+jest.setTimeout(30000);
 
 let fetchWithLogsSpy: jest.SpyInstance;
 

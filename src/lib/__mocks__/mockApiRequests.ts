@@ -143,7 +143,7 @@ const mockedParties: Array<SelfcareParty> = [
     address: 'address',
     digitalAddress: 'a@aa.com',
     taxCode: '33322268945',
-    zipCode: 'zipCode',
+    zipCode: '02102',
     origin: 'IPA',
   },
   {
@@ -155,7 +155,7 @@ const mockedParties: Array<SelfcareParty> = [
     address: 'address',
     digitalAddress: 'a@aa.com',
     taxCode: 'BBBBBB22B22B234K',
-    zipCode: 'zipCode',
+    zipCode: '12125',
     origin: 'IPA',
   },
 ];
