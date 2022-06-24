@@ -93,8 +93,16 @@ export default {
     fields: {
       name: {
         label: 'Nome',
+        errors: {
+          conflict: 'Nome non corretto o diverso dal Codice Fiscale',
+        },
       },
-      surname: { label: 'Cognome' },
+      surname: {
+        label: 'Cognome',
+        errors: {
+          conflict: 'Cognome non corretto o diverso dal Codice Fiscale',
+        },
+      },
       taxCode: {
         label: 'Codice Fiscale',
         errors: {
@@ -175,13 +183,6 @@ export default {
         description:
           'A causa di un errore del sistema non è possibile completare la procedura. <1 /> Ti chiediamo di riprovare più tardi.',
         backActionLabel: 'Chiudi',
-      },
-      error409: {
-        title: 'Errore',
-        description:
-          'Uno o più campi potrebbero contenere un errore. Verifica i dati inseriti e riprova.',
-        back: 'Esci',
-        retry: 'Riprova',
       },
     },
     sessionModal: {

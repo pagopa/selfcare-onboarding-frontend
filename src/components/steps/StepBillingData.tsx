@@ -16,7 +16,7 @@ const CustomTextField = styled(TextField)({
 
 const CustomNumberField = styled(TextField)({
   'input::-webkit-inner-spin-button': {
-    '-webkit-appearance': 'none',
+    WebkitAppearance: 'none',
     margin: 0,
   },
   '.MuiInputLabel-asterisk': {
