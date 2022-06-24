@@ -429,7 +429,7 @@ const checkCorrectBodyBillingData = (
 };
 
 const checkCertifiedUserValidation = async (prefix: string, confirmButton: HTMLElement) => {
-  await fillUserForm(confirmButton, prefix, 'ZZZZZZ00A00Z000Z', 'b@c.BB', false);
+  await fillUserForm(confirmButton, prefix, 'ZZZZZZ00A00Z000Z', 'b@c.BB', true);
   fireEvent.click(confirmButton);
   await waitFor(() => screen.getByText('Nome non corretto o diverso dal Codice Fiscale'));
   screen.getByText('Cognome non corretto o diverso dal Codice Fiscale');
