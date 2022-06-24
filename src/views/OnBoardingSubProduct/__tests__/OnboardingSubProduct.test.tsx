@@ -308,11 +308,7 @@ const executeStepAddManager = async (expectedSuccessfulSubmit: boolean) => {
 
   const confirmButton = screen.getByRole('button', { name: 'Continua' });
 
-  await fillUserForm(confirmButton, 'LEGAL', 'XXXXXX00A00X000X', 'b@b.BB', true);
-  expect(confirmButton).toBeEnabled();
-  fireEvent.click(confirmButton);
-  await waitFor(() => screen.getByText('Nome non corretto o diverso dal Codice Fiscale'));
-  screen.getByText('Cognome non corretto o diverso dal Codice Fiscale');
+  await checkCertifiedUserValidation('LEGAL', confirmButton);
 
   await fillUserForm(confirmButton, 'LEGAL', 'bbBBBB00B00B000B', 'b@b.BB', true);
 
@@ -430,6 +426,13 @@ const checkCorrectBodyBillingData = (
   expect((document.getElementById('recipientCode') as HTMLInputElement).value).toBe(
     expectedRecipientCode
   );
+};
+
+const checkCertifiedUserValidation = async (prefix: string, confirmButton: HTMLElement) => {
+  await fillUserForm(confirmButton, prefix, 'ZZZZZZ00A00Z000Z', 'b@c.BB', false);
+  fireEvent.click(confirmButton);
+  await waitFor(() => screen.getByText('Nome non corretto o diverso dal Codice Fiscale'));
+  screen.getByText('Cognome non corretto o diverso dal Codice Fiscale');
 };
 
 const fillTextFieldAndCheckButton = async (

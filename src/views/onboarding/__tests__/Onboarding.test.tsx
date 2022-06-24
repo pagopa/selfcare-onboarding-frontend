@@ -278,11 +278,7 @@ const executeStep2 = async () => {
   const confirmButton = screen.getByRole('button', { name: 'Continua' });
   expect(confirmButton).toBeDisabled();
 
-  await fillUserForm(confirmButton, 'LEGAL', 'XXXXXX00A00X000X', 'b@b.BB', false);
-  expect(confirmButton).toBeEnabled();
-  fireEvent.click(confirmButton);
-  await waitFor(() => screen.getByText('Nome non corretto o diverso dal Codice Fiscale'));
-  screen.getByText('Cognome non corretto o diverso dal Codice Fiscale');
+  await checkCertifiedUserValidation('LEGAL', confirmButton);
 
   await fillUserForm(confirmButton, 'LEGAL', 'bbBBBB00B00B000B', 'b@b.BB', true);
 
@@ -304,12 +300,14 @@ const executeStep3 = async (expectedSuccessfulSubmit: boolean) => {
 
   await checkLoggedUserAsAdminCheckbox(confirmButton, addDelegateButton);
 
+  await checkCertifiedUserValidation('delegate-initial', confirmButton);
+
   await fillUserForm(
     confirmButton,
     'delegate-initial',
     'CCCCcc00C00C000C',
     'a@a.AA',
-    false,
+    true,
     'BBBBBB00B00B000B',
     1,
     'b@b.bb',
@@ -323,6 +321,13 @@ const executeStep3 = async (expectedSuccessfulSubmit: boolean) => {
   await waitFor(() =>
     screen.getByText(expectedSuccessfulSubmit ? completeSuccessTitle : completeErrorTitle)
   );
+};
+
+const checkCertifiedUserValidation = async (prefix: string, confirmButton: HTMLElement) => {
+  await fillUserForm(confirmButton, prefix, 'ZZZZZZ00A00Z000Z', 'b@c.BB', false);
+  fireEvent.click(confirmButton);
+  await waitFor(() => screen.getByText('Nome non corretto o diverso dal Codice Fiscale'));
+  screen.getByText('Cognome non corretto o diverso dal Codice Fiscale');
 };
 
 const fillInstitutionTypeCheckbox = async (pa: string, gsp: string, scp: string, pt: string) => {
@@ -586,6 +591,8 @@ const fillAdditionalUserAndCheckUniqueValues = async (
     'Nome'
   ).id.replace(/-name$/, '');
 
+  await checkCertifiedUserValidation(prefix, confirmButton);
+
   const taxCode = `ZZZZZZ0${index}A00A000A`;
   const email = `${index}@z.zz`;
   await fillUserForm(
@@ -593,7 +600,7 @@ const fillAdditionalUserAndCheckUniqueValues = async (
     prefix,
     taxCode,
     email,
-    false,
+    true,
     'BBBBBB00B00B000B',
     1,
     'b@b.bb',
