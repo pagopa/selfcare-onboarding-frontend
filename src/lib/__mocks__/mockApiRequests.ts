@@ -201,9 +201,9 @@ const mockedOnboardingData1: InstitutionOnboardingInfoResource = {
   },
   manager: {
     email: 'm@ma.it',
-    taxCode: 'ZZZZZZ00A00Z000Z',
-    name: 'CERTIFIED_NAME',
-    surname: 'CERTIFIED_SURNAME',
+    taxCode: 'DDDDDD11A11A123K',
+    name: 'Maria',
+    surname: 'Rosa',
     role: 'MANAGER',
   },
 };
