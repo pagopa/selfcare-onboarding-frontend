@@ -25,7 +25,6 @@ import StepOnboardingData from '../../components/steps/StepOnboardingData';
 import StepBillingData from '../../components/steps/StepBillingData';
 import { registerUnloadEvent, unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
 import { useHistoryState } from '../../components/useHistoryState';
-import { SubmitErrorType } from '../onboarding/Onboarding';
 import SubProductStepVerifyInputs from './components/SubProductStepVerifyInputs';
 import SubProductStepSubmit from './components/SubProductStepSubmit';
 import SubProductStepSuccess from './components/SubProductStepSuccess';
@@ -62,7 +61,6 @@ function OnBoardingSubProduct() {
 
   const [openExitModal, setOpenExitModal] = useState(false);
   const { setOnExit } = useContext(HeaderContext);
-  const [submitErrorType, setSubmitErrorType] = useState<SubmitErrorType>();
   const [onExitAction, setOnExitAction] = useState<(() => void) | undefined>();
   const requestIdRef = useRef<string>('');
 
@@ -293,7 +291,6 @@ function OnBoardingSubProduct() {
           pricingPlan,
           origin,
           setLoading,
-          setSubmitErrorType,
           forward,
           back,
         }),
@@ -308,30 +305,12 @@ function OnBoardingSubProduct() {
 
   const handleCloseExitModal = () => {
     setOpenExitModal(false);
-    setOnExitAction(undefined);
-  };
-
-  const handleRetryBadInputErrorModal = () => {
-    setSubmitErrorType(undefined);
-    back();
-  };
-
-  const handleCloseBadInputErrorModal = () => {
-    window.location.assign(ENV.URL_FE.LOGOUT);
+    setOpenExitUrl(ENV.URL_FE.LOGOUT);
   };
 
   return (
     <Container>
       <Step />
-      <SessionModal
-        open={submitErrorType === 'badInput'}
-        title={t('onboarding.outcomeContent.error409.title')}
-        message={t('onboarding.outcomeContent.error409.description')}
-        onConfirmLabel={t('onboarding.outcomeContent.error409.retry')}
-        onConfirm={handleRetryBadInputErrorModal}
-        onCloseLabel={t('onboarding.outcomeContent.error409.back')}
-        handleClose={handleCloseBadInputErrorModal}
-      />
       <SessionModal
         handleClose={handleCloseExitModal}
         handleExit={handleCloseExitModal}
