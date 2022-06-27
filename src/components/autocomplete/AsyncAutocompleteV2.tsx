@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
 import debounce from 'lodash/debounce';
 import { AxiosError, AxiosResponse } from 'axios';
-import { Theme, Grid, Typography } from '@mui/material';
+import { Theme, Grid, Typography, Paper } from '@mui/material';
 import { Box } from '@mui/system';
 import { useTranslation } from 'react-i18next';
 import { Endpoint } from '../../../types';
@@ -86,63 +86,65 @@ export function AsyncAutocompleteV2({
     }
   };
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        minHeight: '104px',
-        maxHeight: '100%',
-        minWidth: '480px',
-        borderRadius: '16px',
-        boxShadow:
-          '0px 8px 10px -5px rgba(0, 43, 85, 0.1), 0px 16px 24px 2px rgba(0, 43, 85, 0.05), 0px 6px 30px 5px rgba(0, 43, 85, 0.1);',
-      }}
-    >
-      <Grid container>
-        <Grid
-          item
-          xs={12}
-          display="flex"
-          justifyContent="center"
-          width="100%"
-          pt={4}
-          pb={showElement && !selected ? 0 : 4}
-        >
-          {selected && (
-            <Box display="flex" alignItems="center">
-              <PartyIcon width={50} />
-            </Box>
-          )}
+    <Paper elevation={0} sx={{ borderRadius: '16px' }}>
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          minHeight: '104px',
+          maxHeight: '100%',
+          minWidth: '480px',
+          borderRadius: '16px',
+          boxShadow:
+            '0px 8px 10px -5px rgba(0, 43, 85, 0.1), 0px 16px 24px 2px rgba(0, 43, 85, 0.05), 0px 6px 30px 5px rgba(0, 43, 85, 0.1);',
+        }}
+      >
+        <Grid container>
+          <Grid
+            item
+            xs={12}
+            display="flex"
+            justifyContent="center"
+            width="100%"
+            pt={4}
+            pb={showElement && !selected ? 0 : 4}
+          >
+            {selected && (
+              <Box display="flex" alignItems="center">
+                <PartyIcon width={50} />
+              </Box>
+            )}
 
-          <AsyncAutocompleteSearch
-            theme={theme}
-            selected={selected}
-            setSelected={setSelected}
-            setInput={setInput}
-            input={input}
-            handleChange={handleChange}
-          />
-        </Grid>
-        <Grid item xs={12} display="flex" justifyContent="center">
-          {showElement && options.length > 0 ? (
-            <AsyncAutocompleteResults
+            <AsyncAutocompleteSearch
+              theme={theme}
+              selected={selected}
               setSelected={setSelected}
-              options={options}
-              setOptions={setOptions}
-              isLoading={isLoading}
-              getOptionLabel={getOptionLabel}
-              getOptionKey={getOptionKey}
+              setInput={setInput}
+              input={input}
+              handleChange={handleChange}
             />
-          ) : input.length >= 1 && input.length < 3 ? (
-            <Typography pb={3}> {t('asyncAutocomplete.lessThen3CharacterLabel')}</Typography>
-          ) : (
-            input.length >= 3 &&
-            options.length === 0 &&
-            !selected && <Typography pb={3}> {t('asyncAutocomplete.noResultsLabel')} </Typography>
-          )}
+          </Grid>
+          <Grid item xs={12} display="flex" justifyContent="center">
+            {showElement && options.length > 0 ? (
+              <AsyncAutocompleteResults
+                setSelected={setSelected}
+                options={options}
+                setOptions={setOptions}
+                isLoading={isLoading}
+                getOptionLabel={getOptionLabel}
+                getOptionKey={getOptionKey}
+              />
+            ) : input.length >= 1 && input.length < 3 ? (
+              <Typography pb={3}> {t('asyncAutocomplete.lessThen3CharacterLabel')}</Typography>
+            ) : (
+              input.length >= 3 &&
+              options.length === 0 &&
+              !selected && <Typography pb={3}> {t('asyncAutocomplete.noResultsLabel')} </Typography>
+            )}
+          </Grid>
         </Grid>
-      </Grid>
-    </Box>
+      </Box>
+    </Paper>
   );
 }

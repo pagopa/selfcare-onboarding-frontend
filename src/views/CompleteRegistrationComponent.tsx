@@ -302,6 +302,7 @@ export default function CompleteRegistrationComponent() {
         onConfirmLabel={t('completeRegistration.sessionModal.onConfirmLabel')}
         onCloseLabel={t('completeRegistration.sessionModal.onCloseLabel')}
         height="20em"
+        showCloseIcon={true}
       />
     )
   ) : (

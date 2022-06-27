@@ -1,4 +1,12 @@
-import { FormControl, FormControlLabel, Grid, Radio, RadioGroup, Typography } from '@mui/material';
+import {
+  FormControl,
+  FormControlLabel,
+  Grid,
+  Radio,
+  RadioGroup,
+  Typography,
+  Paper,
+} from '@mui/material';
 import { Box } from '@mui/system';
 import React from 'react';
 import { useTranslation, Trans } from 'react-i18next';
@@ -41,53 +49,59 @@ export default function StepInstitutionType({ back, forward, institutionType }: 
           </Trans>
         </Typography>
       </Grid>
-      <Box
-        width="580px"
-        height="100%"
-        sx={{
-          boxShadow:
-            '0px 8px 10px -5px rgba(0, 43, 85, 0.1), 0px 16px 24px 2px rgba(0, 43, 85, 0.05), 0px 6px 30px 5px rgba(0, 43, 85, 0.1)',
-          borderRadius: '16px',
-          p: 1,
-        }}
-      >
-        <Grid container item>
-          <Grid item xs={12} p={3}>
-            <FormControl>
-              <RadioGroup name="radio-buttons-group" defaultValue={institutionType}>
-                {institutionTypeValues.map((ot) => (
-                  <FormControlLabel
-                    sx={{ p: '8px' }}
-                    key={ot.labelKey}
-                    onChange={() => handleChange(ot.value)}
-                    value={ot.value}
-                    control={<Radio id={ot.labelKey} />}
-                    label={
-                      <>
-                        <Typography sx={{ fontWeight: 600, fontSize: '18px', color: '#17324D' }}>
-                          {t(`stepInstitutionType.institutionTypeValues.${ot.labelKey}`) as string}
-                        </Typography>
-                        <Typography
-                          variant="subtitle2"
-                          sx={{
-                            fontWeight: 400,
-                            fontSize: '14px',
-                            color: '#5C6F82',
-                          }}
-                        >
-                          {ot.value === 'PT'
-                            ? t('stepInstitutionType.cadArticle6')
-                            : t('stepInstitutionType.cadArticle2')}
-                        </Typography>
-                      </>
-                    }
-                  />
-                ))}
-              </RadioGroup>
-            </FormControl>
+      <Paper elevation={0} sx={{ borderRadius: '16px' }}>
+        <Box
+          width="580px"
+          height="100%"
+          sx={{
+            boxShadow:
+              '0px 8px 10px -5px rgba(0, 43, 85, 0.1), 0px 16px 24px 2px rgba(0, 43, 85, 0.05), 0px 6px 30px 5px rgba(0, 43, 85, 0.1)',
+            borderRadius: '16px',
+            p: 1,
+          }}
+        >
+          <Grid container item>
+            <Grid item xs={12} p={3}>
+              <FormControl>
+                <RadioGroup name="radio-buttons-group" defaultValue={institutionType}>
+                  {institutionTypeValues.map((ot) => (
+                    <FormControlLabel
+                      sx={{ p: '8px' }}
+                      key={ot.labelKey}
+                      onChange={() => handleChange(ot.value)}
+                      value={ot.value}
+                      control={<Radio id={ot.labelKey} />}
+                      label={
+                        <>
+                          <Typography sx={{ fontWeight: 600, fontSize: '18px', color: '#17324D' }}>
+                            {
+                              t(
+                                `stepInstitutionType.institutionTypeValues.${ot.labelKey}`
+                              ) as string
+                            }
+                          </Typography>
+                          <Typography
+                            variant="subtitle2"
+                            sx={{
+                              fontWeight: 400,
+                              fontSize: '14px',
+                              color: '#5C6F82',
+                            }}
+                          >
+                            {ot.value === 'PT'
+                              ? t('stepInstitutionType.cadArticle6')
+                              : t('stepInstitutionType.cadArticle2')}
+                          </Typography>
+                        </>
+                      }
+                    />
+                  ))}
+                </RadioGroup>
+              </FormControl>
+            </Grid>
           </Grid>
-        </Grid>
-      </Box>
+        </Box>
+      </Paper>
       <Grid item xs={12} mt={4}>
         <OnboardingStepActions
           back={{
