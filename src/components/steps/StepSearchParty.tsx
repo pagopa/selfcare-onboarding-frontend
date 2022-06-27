@@ -121,11 +121,13 @@ export function StepSearchParty({ subTitle, forward, back }: Props) {
             setSelected={setSelected}
             // placeholder={t('onboardingStep1.onboarding.asyncAutocomplete.placeholder')}
             endpoint={{ endpoint: 'ONBOARDING_GET_SEARCH_PARTIES' }}
-            transformFn={(data: { items: Array<IPACatalogParty> }) => {
+            transformFn={(data: { items: Array<IPACatalogParty> }) =>
+              /* removed transformation into lower case in order to send data to BE as obtained from registry
               // eslint-disable-next-line functional/immutable-data
               data.items.forEach((i) => (i.description = i.description.toLowerCase()));
-              return data.items;
-            }}
+              */
+              data.items
+            }
             optionKey="id"
             optionLabel="description"
           />

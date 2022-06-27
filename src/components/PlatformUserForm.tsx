@@ -1,13 +1,30 @@
-import { Grid, Paper, TextField, useTheme } from '@mui/material';
+import { Grid, Paper, TextField, styled } from '@mui/material';
+import { theme } from '@pagopa/mui-italia';
 import React from 'react';
 import { useTranslation, TFunction } from 'react-i18next';
 import { UserOnCreate, PartyRole } from '../../types';
-import { UsersObject } from './steps/StepAddManager';
+import { UsersError, UsersObject } from './steps/StepAddManager';
+
+const CustomTextField = styled(TextField)({
+  width: '100%',
+  '& .MuiFormHelperText-root': {
+    color: theme.palette.text.secondary,
+  },
+  '& .MuiInputBase-root.Mui-disabled:before': {
+    borderBottomStyle: 'solid',
+  },
+  input: {
+    '&.Mui-disabled': {
+      WebkitTextFillColor: theme.palette.text.disabled,
+    },
+  },
+});
 
 type PlatformUserFormProps = {
   prefix: keyof UsersObject;
   role: PartyRole;
   people: UsersObject;
+  peopleErrors?: UsersError;
   allPeople: UsersObject;
   setPeople: React.Dispatch<React.SetStateAction<UsersObject>>;
   readOnly?: boolean;
@@ -20,15 +37,19 @@ type Field = {
   width?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
   regexp?: RegExp;
   regexpMessageKey?: string;
+  conflictMessageKey?: string;
   hasDescription?: boolean;
   unique: boolean;
   caseSensitive?: boolean;
   uniqueMessageKey?: string;
+  textTransform?: TextTransform;
 };
 
+type TextTransform = 'uppercase' | 'lowercase';
+
 const fields: Array<Field> = [
-  { id: 'name', unique: false },
-  { id: 'surname', unique: false },
+  { id: 'name', unique: false, conflictMessageKey: 'conflict' },
+  { id: 'surname', unique: false, conflictMessageKey: 'conflict' },
   {
     id: 'taxCode',
     width: 12,
@@ -39,6 +60,7 @@ const fields: Array<Field> = [
     unique: true,
     caseSensitive: false,
     uniqueMessageKey: 'duplicate',
+    textTransform: 'uppercase',
   },
   {
     id: 'email',
@@ -49,10 +71,14 @@ const fields: Array<Field> = [
     unique: true,
     caseSensitive: false,
     uniqueMessageKey: 'duplicate',
+    textTransform: 'lowercase',
   },
 ];
 
-type ValidationErrorCode = `${keyof UserOnCreate}-regexp` | `${keyof UserOnCreate}-unique`;
+type ValidationErrorCode =
+  | `${keyof UserOnCreate}-regexp`
+  | `${keyof UserOnCreate}-unique`
+  | `${keyof UserOnCreate}-conflict`;
 
 function stringEquals(str1?: string, str2?: string, caseSensitive?: boolean) {
   return (
@@ -105,23 +131,56 @@ export function PlatformUserForm({
   prefix,
   role,
   people,
+  peopleErrors,
   allPeople,
   setPeople,
   readOnly,
   readOnlyFields = [],
 }: PlatformUserFormProps) {
   const { t } = useTranslation();
-  const theme = useTheme();
 
   const buildSetPerson = (key: string) => (e: any) => {
     setPeople({
       ...people,
-      [prefix]: { ...people[prefix], [key]: e.target.value, role },
+      [prefix]: {
+        ...people[prefix],
+        [key]: e.target.value,
+        role,
+      },
     });
   };
+
   const errors: Array<ValidationErrorCode> = people[prefix]
     ? validateNoMandatory(prefix, people[prefix], allPeople)
     : [];
+
+  const externalErrors: { [errorsUserData: string]: Array<string> } | undefined =
+    peopleErrors && peopleErrors[prefix];
+
+  const checkErrors = (id: string, prefixErrorCode: string): Array<string> =>
+    (externalErrors && externalErrors[id]) ??
+    errors.filter((e) => e.startsWith(prefixErrorCode)).map((e) => e.replace(prefixErrorCode, ''));
+
+  const transcodeHelperText = (
+    isError: boolean,
+    error: Array<string>,
+    field: string,
+    regexpMessageKey?: string,
+    uniqueMessageKey?: string,
+    conflictMessageKey?: string,
+    hasDescription?: boolean
+  ): string =>
+    isError
+      ? error.indexOf('regexp') > -1
+        ? transcodeFormErrorKey(field, regexpMessageKey, t)
+        : error.indexOf('unique') > -1
+        ? transcodeFormErrorKey(field, uniqueMessageKey, t)
+        : error.indexOf('conflict') > -1
+        ? transcodeFormErrorKey(field, conflictMessageKey, t)
+        : t('platformUserForm.helperText')
+      : hasDescription
+      ? t(`platformUserForm.fields.${field}.description`)
+      : '';
 
   return (
     <Paper elevation={0} sx={{ p: 4, borderRadius: '16px' }}>
@@ -133,16 +192,16 @@ export function PlatformUserForm({
             width = 6,
             regexpMessageKey,
             uniqueMessageKey,
+            conflictMessageKey,
             hasDescription,
+            textTransform,
           }) => {
             const prefixErrorCode = `${id}-`;
-            const error = errors
-              .filter((e) => e.startsWith(prefixErrorCode))
-              .map((e) => e.replace(prefixErrorCode, ''));
+            const error = checkErrors(id, prefixErrorCode);
             const isError = error && error.length > 0;
             return (
               <Grid item key={id} xs={width} mb={3}>
-                <TextField
+                <CustomTextField
                   id={`${prefix}-${id}`}
                   variant="outlined"
                   label={t(`platformUserForm.fields.${id}.label`)}
@@ -163,18 +222,21 @@ export function PlatformUserForm({
                       },
                     },
                   }}
+                  inputProps={{
+                    style: {
+                      textTransform,
+                    },
+                  }}
                   error={isError}
-                  helperText={
-                    isError
-                      ? error.indexOf('regexp') > -1
-                        ? transcodeFormErrorKey(id, regexpMessageKey, t)
-                        : error.indexOf('unique') > -1
-                        ? transcodeFormErrorKey(id, uniqueMessageKey, t)
-                        : t('platformUserForm.helperText')
-                      : hasDescription
-                      ? t(`platformUserForm.fields.${id}.description`)
-                      : ''
-                  }
+                  helperText={transcodeHelperText(
+                    isError,
+                    error,
+                    id,
+                    regexpMessageKey,
+                    uniqueMessageKey,
+                    conflictMessageKey,
+                    hasDescription
+                  )}
                   disabled={readOnly || readOnlyFields.indexOf(id) > -1}
                 />
               </Grid>

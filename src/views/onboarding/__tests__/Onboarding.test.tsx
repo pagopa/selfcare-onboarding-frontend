@@ -8,7 +8,7 @@ import '../../../locale';
 
 jest.mock('../../../lib/api-utils');
 
-jest.setTimeout(20000);
+jest.setTimeout(30000);
 
 let fetchWithLogsSpy: jest.SpyInstance;
 
@@ -288,9 +288,10 @@ const executeStep2 = async () => {
   const confirmButton = screen.getByRole('button', { name: 'Continua' });
   expect(confirmButton).toBeDisabled();
 
-  await fillUserForm(confirmButton, 'LEGAL', 'BBBBBB00B00B000B', 'b@b.bb');
+  await checkCertifiedUserValidation('LEGAL', confirmButton);
 
-  expect(confirmButton).toBeEnabled();
+  await fillUserForm(confirmButton, 'LEGAL', 'bbBBBB00B00B000B', 'b@b.BB', true);
+
   fireEvent.click(confirmButton);
 
   await waitFor(() => screen.getByText(step3Title));
@@ -309,11 +310,14 @@ const executeStep3 = async (expectedSuccessfulSubmit: boolean) => {
 
   await checkLoggedUserAsAdminCheckbox(confirmButton, addDelegateButton);
 
+  await checkCertifiedUserValidation('delegate-initial', confirmButton);
+
   await fillUserForm(
     confirmButton,
     'delegate-initial',
-    'CCCCCC00C00C000C',
-    'a@a.aa',
+    'CCCCcc00C00C000C',
+    'a@a.AA',
+    true,
     'BBBBBB00B00B000B',
     1,
     'b@b.bb',
@@ -327,6 +331,13 @@ const executeStep3 = async (expectedSuccessfulSubmit: boolean) => {
   await waitFor(() =>
     screen.getByText(expectedSuccessfulSubmit ? completeSuccessTitle : completeErrorTitle)
   );
+};
+
+const checkCertifiedUserValidation = async (prefix: string, confirmButton: HTMLElement) => {
+  await fillUserForm(confirmButton, prefix, 'ZZZZZZ00A00Z000Z', 'b@c.BB', false);
+  fireEvent.click(confirmButton);
+  await waitFor(() => screen.getByText('Nome non corretto o diverso dal Codice Fiscale'));
+  screen.getByText('Cognome non corretto o diverso dal Codice Fiscale');
 };
 
 const fillInstitutionTypeCheckbox = async (pa: string, gsp: string, scp: string, pt: string) => {
@@ -373,14 +384,15 @@ const fillUserForm = async (
   prefix: string,
   taxCode: string,
   email: string,
+  expectedEnabled?: boolean,
   existentTaxCode?: string,
   expectedDuplicateTaxCodeMessages?: number,
   existentEmail?: string,
   expectedDuplicateEmailMessages?: number
 ) => {
-  await fillTextFieldAndCheckButton(prefix, 'name', 'NAME', confirmButton, false);
-  await fillTextFieldAndCheckButton(prefix, 'surname', 'SURNAME', confirmButton, false);
-  await fillTextFieldAndCheckButton(prefix, 'taxCode', taxCode, confirmButton, false);
+  await fillTextFieldAndCheckButton(prefix, 'name', 'NAME', confirmButton, expectedEnabled);
+  await fillTextFieldAndCheckButton(prefix, 'surname', 'SURNAME', confirmButton, expectedEnabled);
+  await fillTextFieldAndCheckButton(prefix, 'taxCode', taxCode, confirmButton, expectedEnabled);
   await fillTextFieldAndCheckButton(prefix, 'email', email, confirmButton, true);
 
   await fillTextFieldAndCheckButton(prefix, 'taxCode', '', confirmButton, false);
@@ -441,7 +453,7 @@ const fillTextFieldAndCheckButton = async (
   field: string,
   value: string,
   confirmButton: HTMLElement,
-  expectedEnabled: boolean
+  expectedEnabled?: boolean
 ) => {
   fireEvent.change(document.getElementById(`${prefix}-${field}`), { target: { value } });
   if (expectedEnabled) {
@@ -589,9 +601,21 @@ const fillAdditionalUserAndCheckUniqueValues = async (
     'Nome'
   ).id.replace(/-name$/, '');
 
+  await checkCertifiedUserValidation(prefix, confirmButton);
+
   const taxCode = `ZZZZZZ0${index}A00A000A`;
   const email = `${index}@z.zz`;
-  await fillUserForm(confirmButton, prefix, taxCode, email, 'BBBBBB00B00B000B', 1, 'b@b.bb', 1);
+  await fillUserForm(
+    confirmButton,
+    prefix,
+    taxCode,
+    email,
+    true,
+    'BBBBBB00B00B000B',
+    1,
+    'b@b.bb',
+    1
+  );
   await checkAlreadyExistentValues(
     prefix,
     confirmButton,

@@ -318,7 +318,7 @@ const executeStepAddManager = async (expectedSuccessfulSubmit: boolean) => {
 
   const confirmButton = screen.getByRole('button', { name: 'Continua' });
 
-  await fillUserForm(confirmButton, 'LEGAL', 'BBBBBB00B00B000B', 'b@b.bb');
+  await fillUserForm(confirmButton, 'LEGAL', 'bbBBBB00B00B000B', 'b@b.BB');
 
   expect(confirmButton).toBeEnabled();
   fireEvent.click(confirmButton);

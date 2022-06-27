@@ -77,6 +77,9 @@ export const API = {
       ENV.URL_API.ONBOARDING +
       '/institutions/{{externalInstitutionId}}/products/{{productId}}/onboarded-institution-info',
   },
+  ONBOARDING_USER_VALIDATION: {
+    URL: ENV.URL_API.ONBOARDING + '/users/validate',
+  },
 };
 
 export const USER_ROLE_LABEL = {

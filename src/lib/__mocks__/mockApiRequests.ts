@@ -143,7 +143,7 @@ const mockedParties: Array<SelfcareParty> = [
     address: 'address',
     digitalAddress: 'a@aa.com',
     taxCode: '33322268945',
-    zipCode: 'zipCode',
+    zipCode: '02102',
     origin: 'IPA',
   },
   {
@@ -155,7 +155,7 @@ const mockedParties: Array<SelfcareParty> = [
     address: 'address',
     digitalAddress: 'a@aa.com',
     taxCode: 'BBBBBB22B22B234K',
-    zipCode: 'zipCode',
+    zipCode: '12125',
     origin: 'IPA',
   },
 ];
@@ -234,6 +234,34 @@ const error409: Promise<AxiosError> = new Promise((resolve) =>
     response: { data: '', status: 409, statusText: '409' },
   } as AxiosError)
 );
+
+const buildOnboardingUserValidation409 = (
+  isNameConflict: boolean,
+  isSurnameConflict: boolean
+): Promise<AxiosError> =>
+  new Promise((resolve) =>
+    resolve({
+      isAxiosError: true,
+      response: {
+        data: {
+          detail: 'there are values that do not match with the certified data',
+          instance: '/users/validate',
+          invalidParams: [
+            isNameConflict
+              ? { name: 'name', reason: 'the value does not match with the certified data' }
+              : undefined,
+            isSurnameConflict
+              ? { name: 'surname', reason: 'the value does not match with the certified data' }
+              : undefined,
+          ].filter((x) => x),
+          status: 409,
+          title: 'Conflict',
+        },
+        status: 409,
+        statusText: '409',
+      },
+    } as AxiosError)
+  );
 
 // eslint-disable-next-line sonarjs/cognitive-complexity, complexity
 export async function mockFetch(
@@ -329,6 +357,23 @@ export async function mockFetch(
     }
   }
 
+  if (endpoint === 'ONBOARDING_USER_VALIDATION') {
+    if (
+      ['XXXXXX00A00X000X', 'ZZZZZZ00A00Z000Z'].indexOf((data as any)?.taxCode) > -1 &&
+      ((data as any)?.name !== 'CERTIFIED_NAME' || (data as any)?.surname !== 'CERTIFIED_SURNAME')
+    ) {
+      return buildOnboardingUserValidation409(
+        (data as any)?.name !== 'CERTIFIED_NAME',
+        (data as any)?.surname !== 'CERTIFIED_SURNAME'
+      );
+    } else if ((data as any)?.taxCode === 'ZZZZZZ01A00A000A') {
+      return genericError;
+    } else {
+      return new Promise((resolve) =>
+        resolve({ data: '', status: 200, statusText: '200' } as AxiosResponse)
+      );
+    }
+  }
   if (endpoint === 'ONBOARDING_POST_LEGALS') {
     switch (endpointParams.externalInstitutionId) {
       case 'error':

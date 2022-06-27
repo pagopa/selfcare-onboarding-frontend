@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useContext } from 'react';
+import React, { ChangeEvent, useContext, useState } from 'react';
 import {
   Checkbox,
   FormControlLabel,
@@ -10,24 +10,30 @@ import {
 } from '@mui/material';
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 import { omit, uniqueId } from 'lodash';
-// import { Box } from '@mui/system';
 import { useTranslation, Trans } from 'react-i18next';
+import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
+import SessionModal from '@pagopa/selfcare-common-frontend/components/SessionModal';
 import { objectIsEmpty } from '../../../lib/object-utils';
 import { StepperStepComponentProps, UserOnCreate } from '../../../../types';
 import { UserContext } from '../../../lib/context';
 import { OnboardingStepActions } from '../../../components/OnboardingStepActions';
 import { PlatformUserForm, validateUser } from '../../../components/PlatformUserForm';
 import { useHistoryState } from '../../../components/useHistoryState';
+import { userValidate } from '../../../utils/api/userValidate';
 
 // Could be an ES6 Set but it's too bothersome for now
 export type UsersObject = { [key: string]: UserOnCreate };
+export type UsersError = { [key: string]: { [userField: string]: Array<string> } };
 
 type Props = StepperStepComponentProps & {
   legal: UserOnCreate;
 };
 
 export function OnBoardingProductStepDelegates({ product, legal, forward, back }: Props) {
-  const { user } = useContext(UserContext);
+  const { user, setRequiredLogin } = useContext(UserContext);
+  const [_loading, setLoading] = useState(true);
+  const [peopleErrors, setPeopleErrors] = useState<UsersError>({});
+  const [genericError, setGenericError] = useState<boolean>(false);
   const [isAuthUser, setIsAuthUser, setIsAuthUserHistory] = useHistoryState('isAuthUser', false);
   const [people, setPeople, setPeopleHistory] = useHistoryState<UsersObject>('people_step3', {});
   const [delegateFormIds, setDelegateFormIds, setDelegateFormIdsHistory] = useHistoryState<
@@ -36,6 +42,64 @@ export function OnBoardingProductStepDelegates({ product, legal, forward, back }
   const { t } = useTranslation();
 
   const allPeople = { ...people, LEGAL: legal };
+
+  const validateUsers = (index: number, peopleErrors: UsersError) => {
+    const userIds = Object.keys(people);
+    if (index === userIds.length) {
+      if (Object.keys(peopleErrors).length === 0) {
+        onForwardAction();
+      }
+      setPeopleErrors(peopleErrors);
+      setLoading(false);
+    }
+    const userId = userIds[index];
+    validateUserData(people[userId], userId, index, peopleErrors);
+  };
+
+  const onUserValidateSuccess = (_userId: string, index: number, peopleErrors: UsersError) => {
+    validateUsers(index + 1, peopleErrors);
+  };
+
+  const onUserValidateError = (
+    userId: string,
+    errors: { [fieldName: string]: Array<string> },
+    index: number,
+    peopleErrors: UsersError
+  ) => {
+    const nextPeopleErrors = {
+      ...peopleErrors,
+      [userId]: errors,
+    };
+    validateUsers(index + 1, nextPeopleErrors);
+  };
+
+  const onUserValidateGenericError = (_userId: string, index: number, peopleErrors: UsersError) => {
+    setGenericError(true);
+    validateUsers(index + 1, peopleErrors);
+  };
+
+  const validateUserData = (
+    user: UserOnCreate,
+    prefix: string,
+    index: number,
+    peopleErrors: UsersError
+  ) => {
+    userValidate(
+      user,
+      prefix,
+      (userId) => onUserValidateSuccess(userId, index, peopleErrors),
+      (userId, errors) => onUserValidateError(userId, errors, index, peopleErrors),
+      (userId) => onUserValidateGenericError(userId, index, peopleErrors),
+      () => setRequiredLogin(true),
+      () => {},
+      'STEP_ADD_DELEGATE'
+    ).catch((reason) => {
+      trackEvent('STEP_ADD_DELEGATE', {
+        message: `Something gone wrong while validating user having id: ${prefix}`,
+        reason,
+      });
+    });
+  };
 
   const addDelegateForm = () => {
     const newId = uniqueId('delegate-');
@@ -98,6 +162,10 @@ export function OnBoardingProductStepDelegates({ product, legal, forward, back }
       .some((prefix) => !validateUser(prefix, people[prefix], allPeople)) ||
     Object.keys(people).length === 3;
 
+  const handleCloseGenericErrorModal = () => {
+    setGenericError(false);
+  };
+
   return (
     <Grid
       container
@@ -143,6 +211,7 @@ export function OnBoardingProductStepDelegates({ product, legal, forward, back }
             prefix={'delegate-initial'}
             role="DELEGATE"
             people={people}
+            peopleErrors={peopleErrors}
             allPeople={allPeople}
             setPeople={setPeople}
             readOnlyFields={isAuthUser ? ['name', 'surname', 'taxCode'] : []}
@@ -165,6 +234,7 @@ export function OnBoardingProductStepDelegates({ product, legal, forward, back }
                 prefix={id}
                 role="DELEGATE"
                 people={people}
+                peopleErrors={peopleErrors}
                 allPeople={allPeople}
                 setPeople={setPeople}
               />
@@ -204,10 +274,14 @@ export function OnBoardingProductStepDelegates({ product, legal, forward, back }
           )}
         </Grid>
       </Grid>
+
       <OnboardingStepActions
         back={{ action: onBackAction, label: t('onboardingStep3.backLabel'), disabled: false }}
         forward={{
-          action: onForwardAction,
+          action: () => {
+            setLoading(true);
+            validateUsers(0, {});
+          },
           label: t('onboardingStep3.confirmLabel'),
           disabled:
             objectIsEmpty(people) ||
@@ -216,7 +290,18 @@ export function OnBoardingProductStepDelegates({ product, legal, forward, back }
               .some((prefix) => !validateUser(prefix, people[prefix], allPeople)),
         }}
       />
-      {/* </Box> */}
+      <SessionModal
+        open={genericError}
+        title={t('onboarding.outcomeContent.error.title')}
+        message={
+          <Trans i18nKey="onboarding.outcomeContent.error.description">
+            {'A causa di un errore del sistema non è possibile completare la procedura.'} <br />
+            {'Ti chiediamo di riprovare più tardi.'}
+          </Trans>
+        }
+        onCloseLabel={t('onboarding.outcomeContent.error.backActionLabel')}
+        handleClose={handleCloseGenericErrorModal}
+      ></SessionModal>
     </Grid>
   );
 }
