@@ -47,26 +47,16 @@ const renderComponent = (productId: string = 'prod-pagopa') => {
   const Component = () => {
     const [user, setUser] = useState<User | null>(null);
     const [subHeaderVisible, setSubHeaderVisible] = useState<boolean>(false);
-    const [onExit, setOnExit] = useState<(exitAction: () => void) => void | undefined>();
-    const [enableLogin, setEnableLogin] = useState<boolean>(true);
+    const [onLogout, setOnLogout] = useState<(() => void) | null | undefined>();
 
     return (
       <HeaderContext.Provider
-        value={{
-          subHeaderVisible,
-          setSubHeaderVisible,
-          onExit,
-          setOnExit,
-          enableLogin,
-          setEnableLogin,
-        }}
+        value={{ subHeaderVisible, setSubHeaderVisible, onLogout, setOnLogout }}
       >
         <UserContext.Provider
           value={{ user, setUser, requiredLogin: false, setRequiredLogin: () => {} }}
         >
-          <button onClick={() => onExit?.(() => window.location.assign(ENV.URL_FE.LOGOUT))}>
-            LOGOUT
-          </button>
+          <button onClick={onLogout}>LOGOUT</button>
           <Onboarding productId={productId} />
         </UserContext.Provider>
       </HeaderContext.Provider>
