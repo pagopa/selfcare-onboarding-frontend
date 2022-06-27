@@ -296,6 +296,7 @@ export default function CompleteRegistrationComponent() {
         handleExit={handleErrorModalExit}
         onConfirm={handleErrorModalConfirm}
         open={true}
+        showCloseIcon={true}
         title={t(`completeRegistration.errors.${errorCode}.title`)}
         message={t(`completeRegistration.errors.${errorCode}.message`)}
         onConfirmLabel={t('completeRegistration.sessionModal.onConfirmLabel')}
