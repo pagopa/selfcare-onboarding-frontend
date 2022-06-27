@@ -1,4 +1,4 @@
-import { Card, Grid, Link, Typography, useTheme, Paper } from '@mui/material';
+import { Grid, Link, Typography, useTheme, Paper } from '@mui/material';
 import { Box } from '@mui/system';
 import { useEffect } from 'react';
 import { useTranslation, Trans } from 'react-i18next';
@@ -71,32 +71,29 @@ export function SubProductStepSelectUserParty({ forward, parties }: Props) {
         <Grid item>
           {parties.map((p, index) => (
             <Box key={p.externalId}>
-              <Paper elevation={0} sx={{ borderRadius: '16px' }}>
-                <Card
-                  aria-label={selected ? p.description : undefined}
-                  onClick={() => setSelected(p)}
-                  sx={{
-                    cursor: 'pointer',
-                    border: selected === p ? '2px solid #0073E6' : undefined,
-                    width: '480px',
-                    fontWeight: 700,
-                    fontSize: '18px',
-                    boxShadow:
-                      '0px 8px 10px -5px rgba(0, 43, 85, 0.1), 0px 16px 24px 2px rgba(0, 43, 85, 0.05), 0px 6px 30px 5px rgba(0, 43, 85, 0.1)',
-                    height: '113px',
-                    top: '144px',
-                    left: '480px',
-                  }}
-                >
-                  <Grid mb={3} mt={4} px={4} aria-label={p.description}>
-                    <PartyAccountItem
-                      partyName={p.description}
-                      partyRole=""
-                      image={p.urlLogo}
-                      noWrap={false}
-                    />
-                  </Grid>
-                </Card>
+              <Paper
+                elevation={8}
+                aria-label={selected ? p.description : undefined}
+                onClick={() => setSelected(p)}
+                sx={{
+                  cursor: 'pointer',
+                  border: selected === p ? '2px solid #0073E6' : undefined,
+                  width: '480px',
+                  fontWeight: 700,
+                  fontSize: '18px',
+                  height: '113px',
+                  borderRadius: theme.spacing(2),
+                  display: 'flex',
+                }}
+              >
+                <Grid mb={3} mt={4} px={4} aria-label={p.description}>
+                  <PartyAccountItem
+                    partyName={p.description}
+                    partyRole=""
+                    image={p.urlLogo}
+                    noWrap={false}
+                  />
+                </Grid>
               </Paper>
               {index !== parties.length - 1 && <br />}
             </Box>
