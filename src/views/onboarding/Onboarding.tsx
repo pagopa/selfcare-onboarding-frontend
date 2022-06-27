@@ -47,21 +47,21 @@ function OnboardingComponent({ productId }: { productId: string }) {
   const history = useHistory();
   const [openExitModal, setOpenExitModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>();
-  const [openExitUrl, setOpenExitUrl] = useState(ENV.URL_FE.LOGOUT);
   const [billingData, setBillingData] = useState<BillingData>();
   const [institutionType, setInstitutionType] = useState<InstitutionType>();
   const [partyId, setPartyId] = useState<string>();
   const [origin, setOrigin] = useState<string>('');
   const [pricingPlan, setPricingPlan] = useState<string>();
-  const { setOnLogout } = useContext(HeaderContext);
+  const { setOnExit } = useContext(HeaderContext);
   const { setRequiredLogin } = useContext(UserContext);
   const requestIdRef = useRef<string>();
   const { t } = useTranslation();
   const theme = useTheme();
+  const [onExitAction, setOnExitAction] = useState<(() => void) | undefined>();
 
   useEffect(() => {
-    registerUnloadEvent(setOnLogout, setOpenExitModal);
-    return () => unregisterUnloadEvent(setOnLogout);
+    registerUnloadEvent(setOnExit, setOpenExitModal, setOnExitAction);
+    return () => unregisterUnloadEvent(setOnExit);
   }, []);
 
   useEffect(() => {
@@ -90,11 +90,11 @@ function OnboardingComponent({ productId }: { productId: string }) {
       const product = (onboardingProducts as AxiosResponse).data;
       setSelectedProduct(product);
     } else if ((onboardingProducts as AxiosError).response?.status === 404) {
-      unregisterUnloadEvent(setOnLogout);
+      unregisterUnloadEvent(setOnExit);
       setSelectedProduct(null);
     } else {
       console.error('Unexpected response', (onboardingProducts as AxiosError).response);
-      unregisterUnloadEvent(setOnLogout);
+      unregisterUnloadEvent(setOnExit);
       setSelectedProduct(null);
     }
   };
@@ -254,7 +254,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
           forward: forwardWithInstitutionType,
           back: () => {
             if (window.location.search.indexOf(`partyExternalId=${externalInstitutionId}`) > -1) {
-              setOpenExitUrl(`${ENV.URL_FE.DASHBOARD}/${partyId}`);
+              setOnExitAction(() => window.location.assign(`${ENV.URL_FE.DASHBOARD}/${partyId}`));
               setOpenExitModal(true);
             } else {
               setActiveStep(0);
@@ -405,13 +405,13 @@ function OnboardingComponent({ productId }: { productId: string }) {
 
   useEffect(() => {
     if (outcome) {
-      unregisterUnloadEvent(setOnLogout);
+      unregisterUnloadEvent(setOnExit);
     }
   }, [outcome]);
 
   const handleCloseExitModal = () => {
     setOpenExitModal(false);
-    setOpenExitUrl(ENV.URL_FE.LOGOUT);
+    setOnExitAction(undefined);
   };
 
   return selectedProduct === null ? (
@@ -425,8 +425,10 @@ function OnboardingComponent({ productId }: { productId: string }) {
         handleClose={handleCloseExitModal}
         handleExit={handleCloseExitModal}
         onConfirm={() => {
-          unregisterUnloadEvent(setOnLogout);
-          window.location.assign(openExitUrl);
+          unregisterUnloadEvent(setOnExit);
+          if (onExitAction) {
+            onExitAction();
+          }
         }}
         open={openExitModal}
         title={t('onboarding.sessionModal.title')}

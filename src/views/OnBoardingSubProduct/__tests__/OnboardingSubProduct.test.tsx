@@ -57,7 +57,8 @@ const renderComponent = (
     const history = injectedHistory ? injectedHistory : createMemoryHistory();
     const [user, setUser] = useState<User | null>(null);
     const [subHeaderVisible, setSubHeaderVisible] = useState<boolean>(false);
-    const [onLogout, setOnLogout] = useState<(() => void) | null | undefined>();
+    const [onExit, setOnExit] = useState<(exitAction: () => void) => void | undefined>();
+    const [enableLogin, setEnableLogin] = useState<boolean>(true);
 
     if (!injectedHistory) {
       history.push(`/${productId}/${subProductId}`);
@@ -65,12 +66,21 @@ const renderComponent = (
     return (
       <Router history={history}>
         <HeaderContext.Provider
-          value={{ subHeaderVisible, setSubHeaderVisible, onLogout, setOnLogout }}
+          value={{
+            subHeaderVisible,
+            setSubHeaderVisible,
+            onExit,
+            setOnExit,
+            enableLogin,
+            setEnableLogin,
+          }}
         >
           <UserContext.Provider
             value={{ user, setUser, requiredLogin: false, setRequiredLogin: () => {} }}
           >
-            <button onClick={onLogout}>LOGOUT</button>
+            <button onClick={() => onExit?.(() => window.location.assign(ENV.URL_FE.LOGOUT))}>
+              LOGOUT
+            </button>
             <Switch>
               <Route path="/:productId/:subProductId">
                 <OnBoardingSubProduct />

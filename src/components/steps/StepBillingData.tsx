@@ -1,5 +1,5 @@
 import { Box, styled } from '@mui/system';
-import { Grid, TextField, Typography, useTheme } from '@mui/material';
+import { Grid, TextField, Typography, useTheme, Paper } from '@mui/material';
 import { useFormik } from 'formik';
 import { useTranslation } from 'react-i18next';
 import Checkbox from '@mui/material/Checkbox';
@@ -230,14 +230,7 @@ export default function StepBillingData({
             </Typography>
           </Grid>
         </Grid>
-        <Box
-          sx={{
-            boxShadow:
-              '0px 8px 10px -5px rgba(0, 43, 85, 0.1), 0px 16px 24px 2px rgba(0, 43, 85, 0.05), 0px 6px 30px 5px rgba(0, 43, 85, 0.1)',
-            borderRadius: '16px',
-            p: 1,
-          }}
-        >
+        <Paper elevation={8} sx={{ borderRadius: theme.spacing(2), p: 1 }}>
           <form onSubmit={formik.handleSubmit}>
             <Grid item container spacing={3} p={3}>
               <Grid item xs={12}>
@@ -349,7 +342,7 @@ export default function StepBillingData({
               )}
             </Grid>
           </form>
-        </Box>
+        </Paper>
         <Grid item xs={12} my={4}>
           <OnboardingStepActions
             back={{ action: onBackAction, label: t('stepBillingData.backLabel'), disabled: false }}

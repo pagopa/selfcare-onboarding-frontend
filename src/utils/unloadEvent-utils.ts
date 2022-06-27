@@ -1,17 +1,22 @@
 export const unregisterUnloadEvent = (
-  setOnLogout: React.Dispatch<React.SetStateAction<(() => void) | null | undefined>>
+  setOnExit: React.Dispatch<React.SetStateAction<((exitAction: () => void) => void) | undefined>>
 ) => {
   window.removeEventListener('beforeunload', keepOnPage);
-  setOnLogout(undefined);
+  setOnExit(undefined);
 };
 
 export const registerUnloadEvent = (
-  setOnLogout: React.Dispatch<React.SetStateAction<(() => void) | null | undefined>>,
-  setOpenExitModal: React.Dispatch<React.SetStateAction<boolean>>
+  setOnExit: React.Dispatch<React.SetStateAction<((exitAction: () => void) => void) | undefined>>,
+  setOpenExitModal: React.Dispatch<React.SetStateAction<boolean>>,
+  setOnExitAction: React.Dispatch<React.SetStateAction<(() => void) | undefined>>
 ) => {
   window.addEventListener('beforeunload', keepOnPage);
   // react dispatch consider a function input as a metod to be called with the previuos state to caluclate the next state: those we are defining a function that return the next function
-  setOnLogout(() => () => setOpenExitModal(true));
+  setOnExit(() => (exitAction: (() => void) | undefined) => {
+    setOpenExitModal(true);
+    // react dispatch consider a function input as a metod to be called with the previuos state to caluclate the next state: those we are defining a function that return the next function
+    setOnExitAction(() => exitAction);
+  });
 };
 
 const keepOnPage = (e: BeforeUnloadEvent) => {

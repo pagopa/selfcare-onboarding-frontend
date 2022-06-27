@@ -60,14 +60,13 @@ function OnBoardingSubProduct() {
   const history = useHistory();
 
   const [openExitModal, setOpenExitModal] = useState(false);
-  const [openExitUrl, setOpenExitUrl] = useState(ENV.URL_FE.LOGOUT);
-  const { setOnLogout } = useContext(HeaderContext);
-
+  const { setOnExit } = useContext(HeaderContext);
+  const [onExitAction, setOnExitAction] = useState<(() => void) | undefined>();
   const requestIdRef = useRef<string>('');
 
   useEffect(() => {
-    registerUnloadEvent(setOnLogout, setOpenExitModal);
-    return () => unregisterUnloadEvent(setOnLogout);
+    registerUnloadEvent(setOnExit, setOpenExitModal, setOnExitAction);
+    return () => unregisterUnloadEvent(setOnExit);
   }, []);
 
   useEffect(() => {
@@ -251,7 +250,7 @@ function OnBoardingSubProduct() {
           forward: forwardWithBillingData,
           back: () => {
             if (window.location.search.indexOf(`partyExternalId=${externalInstitutionId}`) > -1) {
-              setOpenExitUrl(`${ENV.URL_FE.DASHBOARD}/${partyId}`);
+              setOnExitAction(() => window.location.assign(`${ENV.URL_FE.DASHBOARD}/${partyId}`));
               setOpenExitModal(true);
             } else {
               setActiveStep(chooseFromMyParties.current ? 1 : 2);
@@ -268,7 +267,9 @@ function OnBoardingSubProduct() {
           forward: forwardWithManagerData,
           back: () => {
             if (window.location.search.indexOf(`partyExternalId=${externalInstitutionId}`) > -1) {
-              setOpenExitUrl(`${ENV.URL_FE.DASHBOARD}/${externalInstitutionId}`);
+              setOnExitAction(() =>
+                window.location.assign(`${ENV.URL_FE.DASHBOARD}/${externalInstitutionId}`)
+              );
               setOpenExitModal(true);
             } else {
               back();
@@ -304,7 +305,7 @@ function OnBoardingSubProduct() {
 
   const handleCloseExitModal = () => {
     setOpenExitModal(false);
-    setOpenExitUrl(ENV.URL_FE.LOGOUT);
+    setOnExitAction(undefined);
   };
 
   return (
@@ -314,8 +315,10 @@ function OnBoardingSubProduct() {
         handleClose={handleCloseExitModal}
         handleExit={handleCloseExitModal}
         onConfirm={() => {
-          unregisterUnloadEvent(setOnLogout);
-          window.location.assign(openExitUrl);
+          unregisterUnloadEvent(setOnExit);
+          if (onExitAction) {
+            onExitAction();
+          }
         }}
         open={openExitModal}
         title={t('onBoardingSubProduct.exitModal.title')}
