@@ -305,7 +305,7 @@ function OnBoardingSubProduct() {
 
   const handleCloseExitModal = () => {
     setOpenExitModal(false);
-    setOpenExitUrl(ENV.URL_FE.LOGOUT);
+    setOnExitAction(undefined);
   };
 
   return (

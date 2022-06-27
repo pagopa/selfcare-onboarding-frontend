@@ -411,7 +411,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
 
   const handleCloseExitModal = () => {
     setOpenExitModal(false);
-    setOpenExitUrl(ENV.URL_FE.LANDING);
+    setOnExitAction(undefined);
   };
 
   return selectedProduct === null ? (

@@ -47,16 +47,26 @@ const renderComponent = (productId: string = 'prod-pagopa') => {
   const Component = () => {
     const [user, setUser] = useState<User | null>(null);
     const [subHeaderVisible, setSubHeaderVisible] = useState<boolean>(false);
-    const [onLogout, setOnLogout] = useState<(() => void) | null | undefined>();
+    const [onExit, setOnExit] = useState<(exitAction: () => void) => void | undefined>();
+    const [enableLogin, setEnableLogin] = useState<boolean>(true);
 
     return (
       <HeaderContext.Provider
-        value={{ subHeaderVisible, setSubHeaderVisible, onLogout, setOnLogout }}
+        value={{
+          subHeaderVisible,
+          setSubHeaderVisible,
+          onExit,
+          setOnExit,
+          enableLogin,
+          setEnableLogin,
+        }}
       >
         <UserContext.Provider
           value={{ user, setUser, requiredLogin: false, setRequiredLogin: () => {} }}
         >
-          <button onClick={onLogout}>LOGOUT</button>
+          <button onClick={() => onExit?.(() => window.location.assign(ENV.URL_FE.LOGOUT))}>
+            LOGOUT
+          </button>
           <Onboarding productId={productId} />
         </UserContext.Provider>
       </HeaderContext.Provider>
@@ -140,9 +150,11 @@ test('test exiting during flow with logout', async () => {
   fireEvent.click(screen.getByRole('button', { name: 'Annulla' }));
   await waitFor(() => expect(screen.queryByText('Vuoi davvero uscire?')).toBeNull());
 
+  /* closeIcon not shown
   await performLogout(logoutButton);
-  fireEvent.click(findRemoveAdditionUsersButtons()[0]);
+  fireEvent.click(findRemoveAdditionUsersButtons()[0]); // to search closeIcon, same logic as searching remove additional delegate
   await waitFor(() => expect(screen.queryByText('Vuoi davvero uscire?')).toBeNull());
+  */
 
   await performLogout(logoutButton);
   fireEvent.click(screen.getByRole('button', { name: 'Esci' }));
