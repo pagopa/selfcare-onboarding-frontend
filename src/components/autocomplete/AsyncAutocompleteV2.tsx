@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
 import debounce from 'lodash/debounce';
 import { AxiosError, AxiosResponse } from 'axios';
-import { Theme, Grid, Typography } from '@mui/material';
+import { Theme, Grid, Typography, Paper } from '@mui/material';
 import { Box } from '@mui/system';
 import { useTranslation } from 'react-i18next';
 import { Endpoint } from '../../../types';
@@ -86,7 +86,8 @@ export function AsyncAutocompleteV2({
     }
   };
   return (
-    <Box
+    <Paper
+      elevation={8}
       sx={{
         display: 'flex',
         alignItems: 'center',
@@ -94,9 +95,7 @@ export function AsyncAutocompleteV2({
         minHeight: '104px',
         maxHeight: '100%',
         minWidth: '480px',
-        borderRadius: '16px',
-        boxShadow:
-          '0px 8px 10px -5px rgba(0, 43, 85, 0.1), 0px 16px 24px 2px rgba(0, 43, 85, 0.05), 0px 6px 30px 5px rgba(0, 43, 85, 0.1);',
+        borderRadius: theme.spacing(2),
       }}
     >
       <Grid container>
@@ -143,6 +142,6 @@ export function AsyncAutocompleteV2({
           )}
         </Grid>
       </Grid>
-    </Box>
+    </Paper>
   );
 }

@@ -35,7 +35,7 @@ import StepInstitutionType from '../../components/steps/StepInstitutionType';
 import { OnboardingStep1_5 } from './components/OnboardingStep1_5';
 import { OnBoardingProductStepDelegates } from './components/OnBoardingProductStepDelegates';
 
-export type SubmitErrorType = 'badInput';
+export type ValidateErrorType = 'conflictError';
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
 function OnboardingComponent({ productId }: { productId: string }) {
@@ -47,22 +47,21 @@ function OnboardingComponent({ productId }: { productId: string }) {
   const history = useHistory();
   const [openExitModal, setOpenExitModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>();
-  const [openExitUrl, setOpenExitUrl] = useState(ENV.URL_FE.LOGOUT);
   const [billingData, setBillingData] = useState<BillingData>();
   const [institutionType, setInstitutionType] = useState<InstitutionType>();
   const [partyId, setPartyId] = useState<string>();
   const [origin, setOrigin] = useState<string>('');
-  const [submitErrorType, setSubmitErrorType] = useState<SubmitErrorType>();
   const [pricingPlan, setPricingPlan] = useState<string>();
-  const { setOnLogout } = useContext(HeaderContext);
+  const { setOnExit } = useContext(HeaderContext);
   const { setRequiredLogin } = useContext(UserContext);
   const requestIdRef = useRef<string>();
   const { t } = useTranslation();
   const theme = useTheme();
+  const [onExitAction, setOnExitAction] = useState<(() => void) | undefined>();
 
   useEffect(() => {
-    registerUnloadEvent(setOnLogout, setOpenExitModal);
-    return () => unregisterUnloadEvent(setOnLogout);
+    registerUnloadEvent(setOnExit, setOpenExitModal, setOnExitAction);
+    return () => unregisterUnloadEvent(setOnExit);
   }, []);
 
   useEffect(() => {
@@ -91,11 +90,11 @@ function OnboardingComponent({ productId }: { productId: string }) {
       const product = (onboardingProducts as AxiosResponse).data;
       setSelectedProduct(product);
     } else if ((onboardingProducts as AxiosError).response?.status === 404) {
-      unregisterUnloadEvent(setOnLogout);
+      unregisterUnloadEvent(setOnExit);
       setSelectedProduct(null);
     } else {
       console.error('Unexpected response', (onboardingProducts as AxiosError).response);
-      unregisterUnloadEvent(setOnLogout);
+      unregisterUnloadEvent(setOnExit);
       setSelectedProduct(null);
     }
   };
@@ -176,19 +175,16 @@ function OnboardingComponent({ productId }: { productId: string }) {
         request_id: requestIdRef.current,
         product_id: productId,
       });
-      setSubmitErrorType(undefined);
-    } else if (
-      outcome === 'error' &&
-      (postLegalsResponse as AxiosError<Problem>).response?.status === 409
-    ) {
-      setSubmitErrorType('badInput');
     } else {
-      trackEvent('ONBOARDING_SEND_FAILURE', {
+      const event =
+        (postLegalsResponse as AxiosError<Problem>).response?.status === 409
+          ? 'ONBOARDING_SEND_CONFLICT_ERROR_FAILURE'
+          : 'ONBOARDING_SEND_FAILURE';
+      trackEvent(event, {
         party_id: externalInstitutionId,
         request_id: requestIdRef.current,
         product_id: productId,
       });
-      setSubmitErrorType(undefined);
     }
   };
 
@@ -258,7 +254,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
           forward: forwardWithInstitutionType,
           back: () => {
             if (window.location.search.indexOf(`partyExternalId=${externalInstitutionId}`) > -1) {
-              setOpenExitUrl(`${ENV.URL_FE.DASHBOARD}/${partyId}`);
+              setOnExitAction(() => window.location.assign(`${ENV.URL_FE.DASHBOARD}/${partyId}`));
               setOpenExitModal(true);
             } else {
               setActiveStep(0);
@@ -409,46 +405,30 @@ function OnboardingComponent({ productId }: { productId: string }) {
 
   useEffect(() => {
     if (outcome) {
-      unregisterUnloadEvent(setOnLogout);
+      unregisterUnloadEvent(setOnExit);
     }
   }, [outcome]);
 
   const handleCloseExitModal = () => {
     setOpenExitModal(false);
-    setOpenExitUrl(ENV.URL_FE.LOGOUT);
-  };
-
-  const handleRetryBadInputErrorModal = () => {
-    setSubmitErrorType(undefined);
-    setOutcome(undefined);
-  };
-
-  const handleCloseBadInputErrorModal = () => {
-    window.location.assign(ENV.URL_FE.LANDING);
+    setOnExitAction(undefined);
   };
 
   return selectedProduct === null ? (
     <NoProductPage />
-  ) : outcome && (outcome === 'success' || !submitErrorType) ? (
+  ) : outcome ? (
     <MessageNoAction {...outcomeContent[outcome]} />
   ) : (
     <Container>
       <Step />
       <SessionModal
-        open={submitErrorType === 'badInput'}
-        title={t('onboarding.outcomeContent.error409.title')}
-        message={t('onboarding.outcomeContent.error409.description')}
-        onConfirmLabel={t('onboarding.outcomeContent.error409.retry')}
-        onConfirm={handleRetryBadInputErrorModal}
-        onCloseLabel={t('onboarding.outcomeContent.error409.back')}
-        handleClose={handleCloseBadInputErrorModal}
-      />
-      <SessionModal
         handleClose={handleCloseExitModal}
         handleExit={handleCloseExitModal}
         onConfirm={() => {
-          unregisterUnloadEvent(setOnLogout);
-          window.location.assign(openExitUrl);
+          unregisterUnloadEvent(setOnExit);
+          if (onExitAction) {
+            onExitAction();
+          }
         }}
         open={openExitModal}
         title={t('onboarding.sessionModal.title')}

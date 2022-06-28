@@ -59,7 +59,7 @@ const transcodeErrorCode = (data: Problem): keyof typeof errors => {
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
 export default function CompleteRegistrationComponent() {
-  const { setSubHeaderVisible, setOnLogout } = useContext(HeaderContext);
+  const { setSubHeaderVisible, setOnExit, setEnableLogin } = useContext(HeaderContext);
   const { setRequiredLogin } = useContext(UserContext);
   const token = getOnboardingMagicLinkJwt();
 
@@ -86,10 +86,11 @@ export default function CompleteRegistrationComponent() {
 
   useEffect(() => {
     setSubHeaderVisible(true);
-    setOnLogout(null);
+    setEnableLogin(false);
     return () => {
       setSubHeaderVisible(true);
-      setOnLogout(undefined);
+      setOnExit(undefined);
+      setEnableLogin(true);
     };
   }, []);
   const setUploadedFilesAndWriteHistory = (files: Array<File>) => {
@@ -301,6 +302,7 @@ export default function CompleteRegistrationComponent() {
         onConfirmLabel={t('completeRegistration.sessionModal.onConfirmLabel')}
         onCloseLabel={t('completeRegistration.sessionModal.onCloseLabel')}
         height="20em"
+        showCloseIcon={true}
       />
     )
   ) : (
