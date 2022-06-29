@@ -236,6 +236,7 @@ export function OnBoardingProductStepDelegates({ product, legal, forward, back }
                 role="DELEGATE"
                 people={people}
                 peopleErrors={peopleErrors}
+                isAuthUser={false}
                 allPeople={allPeople}
                 setPeople={setPeople}
               />

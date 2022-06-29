@@ -116,6 +116,7 @@ export function StepAddManager({ readOnly, product, forward, back }: Props) {
             role="MANAGER"
             people={people}
             peopleErrors={peopleErrors}
+            isAuthUser={false}
             allPeople={people}
             setPeople={setPeople}
             readOnly={readOnly}
