@@ -285,6 +285,13 @@ export async function mockFetch(
             statusText: 'No Content',
           } as AxiosResponse)
         );
+      case 'id':
+        return new Promise((resolve) =>
+          resolve({
+            isAxiosError: true,
+            response: { status: 404, statusText: '' },
+          } as AxiosError)
+        );
       case 'pending':
         return notFoundError;
       case 'externalId1':
