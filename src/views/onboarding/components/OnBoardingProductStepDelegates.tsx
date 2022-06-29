@@ -212,6 +212,7 @@ export function OnBoardingProductStepDelegates({ product, legal, forward, back }
             role="DELEGATE"
             people={people}
             peopleErrors={peopleErrors}
+            isAuthUser={isAuthUser}
             allPeople={allPeople}
             setPeople={setPeople}
             readOnlyFields={isAuthUser ? ['name', 'surname', 'taxCode'] : []}

@@ -25,6 +25,7 @@ type PlatformUserFormProps = {
   role: PartyRole;
   people: UsersObject;
   peopleErrors?: UsersError;
+  isAuthUser?: boolean;
   allPeople: UsersObject;
   setPeople: React.Dispatch<React.SetStateAction<UsersObject>>;
   readOnly?: boolean;
@@ -132,6 +133,7 @@ export function PlatformUserForm({
   role,
   people,
   peopleErrors,
+  isAuthUser,
   allPeople,
   setPeople,
   readOnly,
@@ -175,7 +177,7 @@ export function PlatformUserForm({
         ? transcodeFormErrorKey(field, regexpMessageKey, t)
         : error.indexOf('unique') > -1
         ? transcodeFormErrorKey(field, uniqueMessageKey, t)
-        : error.indexOf('conflict') > -1
+        : error.indexOf('conflict') > -1 && !isAuthUser
         ? transcodeFormErrorKey(field, conflictMessageKey, t)
         : t('platformUserForm.helperText')
       : hasDescription
