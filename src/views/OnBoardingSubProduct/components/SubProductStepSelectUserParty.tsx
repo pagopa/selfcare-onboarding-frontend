@@ -69,35 +69,36 @@ export function SubProductStepSelectUserParty({ forward, parties }: Props) {
 
       <Grid container item textAlign="center" justifyContent="center" mt={4} mb={3}>
         <Grid item>
-          {parties.map((p, index) => (
-            <Box key={p.externalId}>
-              <Paper
-                elevation={8}
-                aria-label={selected ? p.description : undefined}
-                onClick={() => setSelected(p)}
-                sx={{
-                  cursor: 'pointer',
-                  border: selected === p ? '2px solid #0073E6' : undefined,
-                  width: '480px',
-                  fontWeight: 700,
-                  fontSize: '18px',
-                  height: '113px',
-                  borderRadius: theme.spacing(2),
-                  display: 'flex',
-                }}
-              >
-                <Grid mb={3} mt={4} px={4} aria-label={p.description}>
+          <Paper elevation={8} sx={{ borderRadius: theme.spacing(2) }}>
+            {parties.map((p) => (
+              <Box key={p.externalId} pl={3} pr={3}>
+                <Grid
+                  aria-label={p.description}
+                  p={3}
+                  sx={{
+                    cursor: 'pointer',
+                    variant: 'outlined',
+                    border: selected === p ? '2px solid #0073E6' : undefined,
+                    width: '480px',
+                    fontWeight: 700,
+                    fontSize: '18px',
+                    height: '70px',
+                    display: 'flex',
+                  }}
+                  onClick={() => setSelected(p)}
+                >
                   <PartyAccountItem
+                    containerSx={{ height: '50%' }}
+                    aria-label={selected ? p.description : undefined}
                     partyName={p.description}
                     partyRole=""
                     image={p.urlLogo}
                     noWrap={false}
                   />
                 </Grid>
-              </Paper>
-              {index !== parties.length - 1 && <br />}
-            </Box>
-          ))}
+              </Box>
+            ))}
+          </Paper>
         </Grid>
       </Grid>
 
