@@ -171,13 +171,16 @@ export function PlatformUserForm({
     uniqueMessageKey?: string,
     conflictMessageKey?: string,
     hasDescription?: boolean
+    // eslint-disable-next-line sonarjs/cognitive-complexity
   ): string =>
     isError
       ? error.indexOf('regexp') > -1
         ? transcodeFormErrorKey(field, regexpMessageKey, t)
         : error.indexOf('unique') > -1
         ? transcodeFormErrorKey(field, uniqueMessageKey, t)
-        : error.indexOf('conflict') > -1 && !isAuthUser
+        : isAuthUser
+        ? ''
+        : error.indexOf('conflict') > -1
         ? transcodeFormErrorKey(field, conflictMessageKey, t)
         : t('platformUserForm.helperText')
       : hasDescription
