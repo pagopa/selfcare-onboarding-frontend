@@ -80,11 +80,7 @@ export function StepAddManager({ readOnly, product, forward, back }: Props) {
   };
 
   return (
-    <Grid
-      container
-      // mt={16}
-      direction="column"
-    >
+    <Grid container direction="column">
       <Grid container item justifyContent="center">
         <Grid item xs={12}>
           <Typography variant="h3" component="h2" align="center" sx={{ lineHeight: '1.2' }}>

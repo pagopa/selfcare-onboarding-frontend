@@ -183,8 +183,8 @@ export function PlatformUserForm({
       : '';
 
   return (
-    <Paper elevation={0} sx={{ p: 4, borderRadius: '16px' }}>
-      <Grid container spacing={2}>
+    <Paper elevation={0} sx={{ p: 5, borderRadius: '16px' }}>
+      <Grid container spacing={2} mb="-16px">
         {fields.map(
           ({
             id,
@@ -200,7 +200,7 @@ export function PlatformUserForm({
             const error = checkErrors(id, prefixErrorCode);
             const isError = error && error.length > 0;
             return (
-              <Grid item key={id} xs={width} mb={3}>
+              <Grid item key={id} xs={width} mb={2}>
                 <CustomTextField
                   id={`${prefix}-${id}`}
                   variant="outlined"
