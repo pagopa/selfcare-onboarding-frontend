@@ -68,27 +68,28 @@ export function SubProductStepSelectUserParty({ forward, parties }: Props) {
       </Grid>
 
       <Grid container item textAlign="center" justifyContent="center" mt={4} mb={3}>
-        <Grid item>
-          <Paper elevation={8} sx={{ borderRadius: theme.spacing(2) }}>
+        <Paper elevation={8} sx={{ borderRadius: theme.spacing(2) }}>
+          <Grid pl={3} pr={3} mb={3} mt={3}>
             {parties.map((p) => (
-              <Box key={p.externalId} pl={3} pr={3}>
+              <Box key={p.externalId}>
                 <Grid
                   aria-label={p.description}
-                  p={3}
+                  p={2}
                   sx={{
                     cursor: 'pointer',
-                    variant: 'outlined',
-                    border: selected === p ? '2px solid #0073E6' : undefined,
+                    backgroundColor: selected === p ? '#0073E614' : undefined,
+                    borderLeft: selected === p ? 'solid' : undefined,
+                    borderLeftColor: selected === p ? '#0073E6' : undefined,
+                    borderLeftWidth: selected === p ? '3px' : undefined,
                     width: '480px',
                     fontWeight: 700,
                     fontSize: '18px',
-                    height: '70px',
+                    height: '80px',
                     display: 'flex',
                   }}
                   onClick={() => setSelected(p)}
                 >
                   <PartyAccountItem
-                    containerSx={{ height: '50%' }}
                     aria-label={selected ? p.description : undefined}
                     partyName={p.description}
                     partyRole=""
@@ -98,8 +99,8 @@ export function SubProductStepSelectUserParty({ forward, parties }: Props) {
                 </Grid>
               </Box>
             ))}
-          </Paper>
-        </Grid>
+          </Grid>
+        </Paper>
       </Grid>
 
       <Grid container item justifyContent="center">
