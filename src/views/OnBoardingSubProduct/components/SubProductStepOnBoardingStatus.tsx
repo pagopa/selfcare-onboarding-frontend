@@ -100,7 +100,10 @@ const buildNotBasicProduct = (
               sx={{ alignSelf: 'center' }}
               onClick={() =>
                 history.push(
-                  resolvePathVariables(ROUTES.ONBOARDING.PATH, { productId, externalInstitutionId })
+                  resolvePathVariables(ROUTES.ONBOARDING_STEP_INSTITUTION_TYPE.PATH, {
+                    productId,
+                    externalInstitutionId,
+                  })
                 )
               }
             >

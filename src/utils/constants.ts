@@ -4,6 +4,7 @@ import RejectRegistration from '../views/RejectRegistration';
 import CompleteRegistrationComponent from '../views/CompleteRegistrationComponent';
 import NoProductPage from '../views/NoProductPage';
 import OnBoardingSubProduct from '../views/OnBoardingSubProduct/OnBoardingSubProduct';
+import StepInstitutionType from '../components/steps/StepInstitutionType';
 import { ENV } from './env';
 
 const IS_DEVELOP = process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test';
@@ -33,8 +34,12 @@ export const ROUTES: RoutesObject = {
   ONBOARDING: {
     PATH: `${BASE_ROUTE}/:productId`,
     LABEL: 'Onboarding',
-    EXACT: true,
     COMPONENT: Onboarding,
+  },
+  ONBOARDING_STEP_INSTITUTION_TYPE: {
+    PATH: `${BASE_ROUTE}/:productId/`,
+    LABEL: 'Onboarding Step Institution Type',
+    COMPONENT: StepInstitutionType,
   },
   ONBOARDING_SUBPRODUCT: {
     PATH: `${BASE_ROUTE}/:productId/:subProductId`,
