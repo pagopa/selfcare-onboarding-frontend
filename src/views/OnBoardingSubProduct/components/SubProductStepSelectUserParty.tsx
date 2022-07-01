@@ -95,6 +95,7 @@ export function SubProductStepSelectUserParty({ forward, parties }: Props) {
                     partyRole=""
                     image={p.urlLogo}
                     noWrap={false}
+                    maxCharactersNumberMultiLine={25}
                   />
                 </Grid>
               </Box>
