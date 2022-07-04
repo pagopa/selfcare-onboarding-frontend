@@ -145,8 +145,10 @@ export function PlatformUserForm({
   useEffect(() => {
     if (isAuthUser) {
       setShowErrorHelperText(false);
+    } else {
+      setShowErrorHelperText(true);
     }
-  }, [isAuthUser]);
+  }, [isAuthUser, peopleErrors]);
 
   const buildSetPerson = (key: string) => (e: any) => {
     setPeople({
@@ -236,9 +238,9 @@ export function PlatformUserForm({
                       textTransform,
                     },
                   }}
-                  error={isError || showErrorHelperText}
+                  error={!isAuthUser && isError}
                   helperText={
-                    !isAuthUser || showErrorHelperText
+                    !isAuthUser && showErrorHelperText
                       ? transcodeHelperText(
                           isError,
                           error,
