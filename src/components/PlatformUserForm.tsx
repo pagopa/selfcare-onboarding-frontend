@@ -1,6 +1,6 @@
 import { Grid, Paper, TextField, styled } from '@mui/material';
 import { theme } from '@pagopa/mui-italia';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation, TFunction } from 'react-i18next';
 import { UserOnCreate, PartyRole } from '../../types';
 import { UsersError, UsersObject } from './steps/StepAddManager';
@@ -25,7 +25,7 @@ type PlatformUserFormProps = {
   role: PartyRole;
   people: UsersObject;
   peopleErrors?: UsersError;
-  isAuthUser?: boolean;
+  isAuthUser: boolean;
   allPeople: UsersObject;
   setPeople: React.Dispatch<React.SetStateAction<UsersObject>>;
   readOnly?: boolean;
@@ -140,6 +140,13 @@ export function PlatformUserForm({
   readOnlyFields = [],
 }: PlatformUserFormProps) {
   const { t } = useTranslation();
+  const [showErrorHelperText, setShowErrorHelperText] = useState<boolean>();
+
+  useEffect(() => {
+    if (isAuthUser) {
+      setShowErrorHelperText(false);
+    }
+  }, [isAuthUser]);
 
   const buildSetPerson = (key: string) => (e: any) => {
     setPeople({
@@ -171,15 +178,12 @@ export function PlatformUserForm({
     uniqueMessageKey?: string,
     conflictMessageKey?: string,
     hasDescription?: boolean
-    // eslint-disable-next-line sonarjs/cognitive-complexity
   ): string =>
     isError
       ? error.indexOf('regexp') > -1
         ? transcodeFormErrorKey(field, regexpMessageKey, t)
         : error.indexOf('unique') > -1
         ? transcodeFormErrorKey(field, uniqueMessageKey, t)
-        : isAuthUser
-        ? ''
         : error.indexOf('conflict') > -1
         ? transcodeFormErrorKey(field, conflictMessageKey, t)
         : t('platformUserForm.helperText')
@@ -232,16 +236,20 @@ export function PlatformUserForm({
                       textTransform,
                     },
                   }}
-                  error={isError}
-                  helperText={transcodeHelperText(
-                    isError,
-                    error,
-                    id,
-                    regexpMessageKey,
-                    uniqueMessageKey,
-                    conflictMessageKey,
-                    hasDescription
-                  )}
+                  error={isError || showErrorHelperText}
+                  helperText={
+                    !isAuthUser || showErrorHelperText
+                      ? transcodeHelperText(
+                          isError,
+                          error,
+                          id,
+                          regexpMessageKey,
+                          uniqueMessageKey,
+                          conflictMessageKey,
+                          hasDescription
+                        )
+                      : ''
+                  }
                   disabled={readOnly || readOnlyFields.indexOf(id) > -1}
                 />
               </Grid>
