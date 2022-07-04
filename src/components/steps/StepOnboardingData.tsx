@@ -66,7 +66,7 @@ function StepOnboardingData({ forward, externalInstitutionId, productId }: Props
 
   const [loading, setLoading] = useState(true);
   const [outcome, setOutcome] = useState<RequestOutcomeMessage | null>();
-  const { setOnLogout } = useContext(HeaderContext);
+  const { setOnExit } = useContext(HeaderContext);
   const { setRequiredLogin } = useContext(UserContext);
 
   const submit = async () => {
@@ -109,7 +109,7 @@ function StepOnboardingData({ forward, externalInstitutionId, productId }: Props
   }, []);
 
   if (outcome) {
-    unregisterUnloadEvent(setOnLogout);
+    unregisterUnloadEvent(setOnExit);
   }
   return loading ? (
     <LoadingOverlay loadingText={t('onboarding.loading.loadingText')} />

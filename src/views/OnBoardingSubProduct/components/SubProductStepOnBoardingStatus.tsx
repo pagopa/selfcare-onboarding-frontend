@@ -164,7 +164,7 @@ export function SubProductStepOnBoardingStatus({
 
   const [loading, setLoading] = useState(true);
   const [outcome, setOutcome] = useState<RequestOutcomeMessage | null>();
-  const { setOnLogout } = useContext(HeaderContext);
+  const { setOnExit } = useContext(HeaderContext);
   const { setRequiredLogin } = useContext(UserContext);
   const history = useHistory();
 
@@ -231,7 +231,7 @@ export function SubProductStepOnBoardingStatus({
   }, []);
 
   if (outcome) {
-    unregisterUnloadEvent(setOnLogout);
+    unregisterUnloadEvent(setOnExit);
   }
   return loading ? (
     <LoadingOverlay loadingText={t('onboarding.loading.loadingText')} />

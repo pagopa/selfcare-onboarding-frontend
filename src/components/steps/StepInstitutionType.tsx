@@ -1,5 +1,13 @@
-import { FormControl, FormControlLabel, Grid, Radio, RadioGroup, Typography } from '@mui/material';
-import { Box } from '@mui/system';
+import {
+  FormControl,
+  FormControlLabel,
+  Grid,
+  Radio,
+  RadioGroup,
+  Typography,
+  Paper,
+  useTheme,
+} from '@mui/material';
 import React from 'react';
 import { useTranslation, Trans } from 'react-i18next';
 import { InstitutionType, StepperStepComponentProps } from '../../../types';
@@ -21,6 +29,8 @@ export default function StepInstitutionType({ back, forward, institutionType }: 
 
   const { t } = useTranslation();
 
+  const theme = useTheme();
+
   const handleChange = (value: InstitutionType) => setSelectedValue(value);
 
   const onForwardAction = () => {
@@ -41,15 +51,9 @@ export default function StepInstitutionType({ back, forward, institutionType }: 
           </Trans>
         </Typography>
       </Grid>
-      <Box
-        width="580px"
-        height="100%"
-        sx={{
-          boxShadow:
-            '0px 8px 10px -5px rgba(0, 43, 85, 0.1), 0px 16px 24px 2px rgba(0, 43, 85, 0.05), 0px 6px 30px 5px rgba(0, 43, 85, 0.1)',
-          borderRadius: '16px',
-          p: 1,
-        }}
+      <Paper
+        elevation={8}
+        sx={{ borderRadius: theme.spacing(2), p: 1, width: '580px', height: '100%' }}
       >
         <Grid container item>
           <Grid item xs={12} p={3}>
@@ -87,7 +91,7 @@ export default function StepInstitutionType({ back, forward, institutionType }: 
             </FormControl>
           </Grid>
         </Grid>
-      </Box>
+      </Paper>
       <Grid item xs={12} mt={4}>
         <OnboardingStepActions
           back={{

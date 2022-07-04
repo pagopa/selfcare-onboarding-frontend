@@ -20,7 +20,7 @@ export default function RejectRegistration() {
   const [loading, setLoading] = useState(true);
 
   const token = getOnboardingMagicLinkJwt();
-  const { setSubHeaderVisible, setOnLogout } = useContext(HeaderContext);
+  const { setSubHeaderVisible, setOnExit, setEnableLogin } = useContext(HeaderContext);
   const { setRequiredLogin } = useContext(UserContext);
 
   const { t } = useTranslation();
@@ -58,10 +58,11 @@ export default function RejectRegistration() {
 
   useEffect(() => {
     setSubHeaderVisible(true);
-    setOnLogout(null);
+    setEnableLogin(false);
     return () => {
       setSubHeaderVisible(true);
-      setOnLogout(undefined);
+      setOnExit(undefined);
+      setEnableLogin(true);
     };
   }, []);
   const outcomeContent: RequestOutcomeOptions = {
