@@ -148,7 +148,7 @@ export function PlatformUserForm({
     } else {
       setShowErrorHelperText(true);
     }
-  }, [isAuthUser, peopleErrors]);
+  }, [isAuthUser]);
 
   const buildSetPerson = (key: string) => (e: any) => {
     setPeople({
@@ -186,7 +186,7 @@ export function PlatformUserForm({
         ? transcodeFormErrorKey(field, regexpMessageKey, t)
         : error.indexOf('unique') > -1
         ? transcodeFormErrorKey(field, uniqueMessageKey, t)
-        : error.indexOf('conflict') > -1
+        : error.indexOf('conflict') > -1 && showErrorHelperText
         ? transcodeFormErrorKey(field, conflictMessageKey, t)
         : t('platformUserForm.helperText')
       : hasDescription
@@ -238,20 +238,16 @@ export function PlatformUserForm({
                       textTransform,
                     },
                   }}
-                  error={!isAuthUser && isError}
-                  helperText={
-                    !isAuthUser && showErrorHelperText
-                      ? transcodeHelperText(
-                          isError,
-                          error,
-                          id,
-                          regexpMessageKey,
-                          uniqueMessageKey,
-                          conflictMessageKey,
-                          hasDescription
-                        )
-                      : ''
-                  }
+                  error={isError && (showErrorHelperText || isAuthUser)}
+                  helperText={transcodeHelperText(
+                    isError,
+                    error,
+                    id,
+                    regexpMessageKey,
+                    uniqueMessageKey,
+                    conflictMessageKey,
+                    hasDescription
+                  )}
                   disabled={readOnly || readOnlyFields.indexOf(id) > -1}
                 />
               </Grid>
