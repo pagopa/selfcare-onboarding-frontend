@@ -2,7 +2,8 @@ import { Grid, Link, Typography, useTheme, Paper } from '@mui/material';
 import { Box } from '@mui/system';
 import { useEffect } from 'react';
 import { useTranslation, Trans } from 'react-i18next';
-import { PartyAccountItem } from '@pagopa/mui-italia/dist/components/PartyAccountItem';
+import { PartyAccountItemButton } from '@pagopa/mui-italia/dist/components/PartyAccountItemButton';
+import { roleLabels } from '@pagopa/selfcare-common-frontend/utils/constants';
 import { Party, SelfcareParty, StepperStepComponentProps } from '../../../../types';
 import { OnboardingStepActions } from '../../../components/OnboardingStepActions';
 import { useHistoryState } from '../../../components/useHistoryState';
@@ -74,28 +75,22 @@ export function SubProductStepSelectUserParty({ forward, parties }: Props) {
               <Box key={p.externalId}>
                 <Grid
                   aria-label={p.description}
-                  p={2}
                   sx={{
-                    cursor: 'pointer',
-                    backgroundColor: selected === p ? '#0073E614' : undefined,
-                    borderLeft: selected === p ? 'solid' : undefined,
-                    borderLeftColor: selected === p ? '#0073E6' : undefined,
-                    borderLeftWidth: selected === p ? '3px' : undefined,
                     width: '480px',
                     fontWeight: 700,
                     fontSize: '18px',
                     height: '80px',
                     display: 'flex',
+                    textAlign: 'initial',
                   }}
-                  onClick={() => setSelected(p)}
                 >
-                  <PartyAccountItem
-                    aria-label={selected ? p.description : undefined}
+                  <PartyAccountItemButton
+                    aria-label={p.description}
                     partyName={p.description}
-                    partyRole=""
+                    partyRole={p.userRole ? t(roleLabels[p?.userRole].longLabelKey) : ''}
                     image={p.urlLogo}
-                    noWrap={false}
-                    maxCharactersNumberMultiLine={25}
+                    action={() => setSelected(p)}
+                    selectedItem={selected ? true : false}
                   />
                 </Grid>
               </Box>
