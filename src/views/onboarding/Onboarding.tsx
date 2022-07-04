@@ -78,6 +78,12 @@ function OnboardingComponent({ productId }: { productId: string }) {
     setPricingPlan(new URLSearchParams(window.location.search).get('pricingPlan') ?? undefined);
   }, [productId]);
 
+  useEffect(() => {
+    if (externalInstitutionId) {
+      forward();
+    }
+  }, []);
+
   const checkProductId = async () => {
     const onboardingProducts = await fetchWithLogs(
       { endpoint: 'ONBOARDING_VERIFY_PRODUCT', endpointParams: { productId } },
