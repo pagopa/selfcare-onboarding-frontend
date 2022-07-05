@@ -1,6 +1,6 @@
 import { Grid, Paper, TextField, styled } from '@mui/material';
 import { theme } from '@pagopa/mui-italia';
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useTranslation, TFunction } from 'react-i18next';
 import { UserOnCreate, PartyRole } from '../../types';
 import { UsersError, UsersObject } from './steps/StepAddManager';
@@ -140,15 +140,6 @@ export function PlatformUserForm({
   readOnlyFields = [],
 }: PlatformUserFormProps) {
   const { t } = useTranslation();
-  const [showErrorHelperText, setShowErrorHelperText] = useState<boolean>();
-
-  useEffect(() => {
-    if (isAuthUser) {
-      setShowErrorHelperText(false);
-    } else {
-      setShowErrorHelperText(true);
-    }
-  }, [isAuthUser]);
 
   const buildSetPerson = (key: string) => (e: any) => {
     setPeople({
@@ -172,26 +163,25 @@ export function PlatformUserForm({
     (externalErrors && externalErrors[id]) ??
     errors.filter((e) => e.startsWith(prefixErrorCode)).map((e) => e.replace(prefixErrorCode, ''));
 
-  const transcodeHelperText = (
-    isError: boolean,
+  const transcodeErrorHelperText = (
     error: Array<string>,
     field: string,
     regexpMessageKey?: string,
     uniqueMessageKey?: string,
-    conflictMessageKey?: string,
-    hasDescription?: boolean
+    conflictMessageKey?: string
   ): string =>
-    isError
-      ? error.indexOf('regexp') > -1
-        ? transcodeFormErrorKey(field, regexpMessageKey, t)
-        : error.indexOf('unique') > -1
-        ? transcodeFormErrorKey(field, uniqueMessageKey, t)
-        : error.indexOf('conflict') > -1 && showErrorHelperText
-        ? transcodeFormErrorKey(field, conflictMessageKey, t)
-        : t('platformUserForm.helperText')
-      : hasDescription
-      ? t(`platformUserForm.fields.${field}.description`)
-      : '';
+    error.indexOf('regexp') > -1
+      ? transcodeFormErrorKey(field, regexpMessageKey, t)
+      : error.indexOf('unique') > -1
+      ? transcodeFormErrorKey(field, uniqueMessageKey, t)
+      : error.indexOf('conflict') > -1 && !isAuthUser
+      ? transcodeFormErrorKey(field, conflictMessageKey, t)
+      : isAuthUser
+      ? ''
+      : t('platformUserForm.helperText');
+
+  const transcodeDescriptionHelperText = (field: string): string =>
+    t(`platformUserForm.fields.${field}.description`);
 
   return (
     <Paper elevation={0} sx={{ p: 4, borderRadius: '16px' }}>
@@ -210,6 +200,7 @@ export function PlatformUserForm({
             const prefixErrorCode = `${id}-`;
             const error = checkErrors(id, prefixErrorCode);
             const isError = error && error.length > 0;
+            const conflictErrorInAuthUser = error.indexOf('conflict') > -1 && isAuthUser;
             return (
               <Grid item key={id} xs={width} mb={3}>
                 <CustomTextField
@@ -238,16 +229,20 @@ export function PlatformUserForm({
                       textTransform,
                     },
                   }}
-                  error={isError && (showErrorHelperText || isAuthUser)}
-                  helperText={transcodeHelperText(
-                    isError,
-                    error,
-                    id,
-                    regexpMessageKey,
-                    uniqueMessageKey,
-                    conflictMessageKey,
-                    hasDescription
-                  )}
+                  error={isError && !conflictErrorInAuthUser}
+                  helperText={
+                    isError
+                      ? transcodeErrorHelperText(
+                          error,
+                          id,
+                          regexpMessageKey,
+                          uniqueMessageKey,
+                          conflictMessageKey
+                        )
+                      : hasDescription
+                      ? transcodeDescriptionHelperText(id)
+                      : ''
+                  }
                   disabled={readOnly || readOnlyFields.indexOf(id) > -1}
                 />
               </Grid>
