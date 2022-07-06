@@ -90,7 +90,8 @@ export function SubProductStepSelectUserParty({ forward, parties }: Props) {
                     partyRole={p.userRole ? t(roleLabels[p?.userRole].longLabelKey) : ''}
                     image={p.urlLogo}
                     action={() => setSelected(p)}
-                    selectedItem={selected ? true : false}
+                    selectedItem={selected?.id === p.id}
+                    maxCharactersNumberMultiLine={20}
                   />
                 </Grid>
               </Box>
