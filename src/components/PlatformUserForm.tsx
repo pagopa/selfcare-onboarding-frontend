@@ -1,6 +1,6 @@
 import { Grid, Paper, TextField, styled } from '@mui/material';
 import { theme } from '@pagopa/mui-italia';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation, TFunction } from 'react-i18next';
 import { UserOnCreate, PartyRole } from '../../types';
 import { UsersError, UsersObject } from './steps/StepAddManager';
@@ -140,6 +140,14 @@ export function PlatformUserForm({
   readOnlyFields = [],
 }: PlatformUserFormProps) {
   const { t } = useTranslation();
+  const [previousConflictErrorInAuthUser, setPreviousConflictErrorInAuthUser] =
+    useState<boolean>(false);
+
+  useEffect(() => {
+    if (isAuthUser) {
+      setPreviousConflictErrorInAuthUser(true);
+    }
+  }, [isAuthUser]);
 
   const buildSetPerson = (key: string) => (e: any) => {
     setPeople({
@@ -176,7 +184,7 @@ export function PlatformUserForm({
       ? transcodeFormErrorKey(field, uniqueMessageKey, t)
       : error.indexOf('conflict') > -1 && !isAuthUser
       ? transcodeFormErrorKey(field, conflictMessageKey, t)
-      : isAuthUser
+      : isAuthUser || previousConflictErrorInAuthUser
       ? ''
       : t('platformUserForm.helperText');
 
@@ -200,7 +208,6 @@ export function PlatformUserForm({
             const prefixErrorCode = `${id}-`;
             const error = checkErrors(id, prefixErrorCode);
             const isError = error && error.length > 0;
-            const conflictErrorInAuthUser = error.indexOf('conflict') > -1 && isAuthUser;
             return (
               <Grid item key={id} xs={width} mb={3}>
                 <CustomTextField
@@ -229,9 +236,17 @@ export function PlatformUserForm({
                       textTransform,
                     },
                   }}
-                  error={isError && !conflictErrorInAuthUser}
+                  error={isError && !previousConflictErrorInAuthUser}
                   helperText={
-                    isError
+                    !isAuthUser && previousConflictErrorInAuthUser
+                      ? transcodeErrorHelperText(
+                          error,
+                          id,
+                          regexpMessageKey,
+                          uniqueMessageKey,
+                          undefined
+                        )
+                      : isError
                       ? transcodeErrorHelperText(
                           error,
                           id,
