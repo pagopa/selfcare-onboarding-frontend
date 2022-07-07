@@ -43,7 +43,7 @@ export function OnBoardingProductStepDelegates({ product, legal, forward, back }
 
   useEffect(() => {
     if (isAuthUser) {
-      setPeopleErrors({});
+      setPeopleErrors({ ...peopleErrors, ['delegate-initial']: Object.assign({}) });
     }
   }, [isAuthUser]);
 
