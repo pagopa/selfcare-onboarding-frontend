@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useContext, useState } from 'react';
+import React, { ChangeEvent, useContext, useEffect, useState } from 'react';
 import {
   Checkbox,
   FormControlLabel,
@@ -40,6 +40,12 @@ export function OnBoardingProductStepDelegates({ product, legal, forward, back }
     Array<string>
   >('delegateFormIds', []);
   const { t } = useTranslation();
+
+  useEffect(() => {
+    if (isAuthUser) {
+      setPeopleErrors({});
+    }
+  }, [isAuthUser]);
 
   const allPeople = { ...people, LEGAL: legal };
 
