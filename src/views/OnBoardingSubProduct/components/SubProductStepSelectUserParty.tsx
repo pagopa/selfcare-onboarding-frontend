@@ -2,7 +2,8 @@ import { Grid, Link, Typography, useTheme, Paper } from '@mui/material';
 import { Box } from '@mui/system';
 import { useEffect } from 'react';
 import { useTranslation, Trans } from 'react-i18next';
-import { PartyAccountItem } from '@pagopa/mui-italia/dist/components/PartyAccountItem';
+import { PartyAccountItemButton } from '@pagopa/mui-italia/dist/components/PartyAccountItemButton';
+import { roleLabels } from '@pagopa/selfcare-common-frontend/utils/constants';
 import { Party, SelfcareParty, StepperStepComponentProps } from '../../../../types';
 import { OnboardingStepActions } from '../../../components/OnboardingStepActions';
 import { useHistoryState } from '../../../components/useHistoryState';
@@ -68,37 +69,35 @@ export function SubProductStepSelectUserParty({ forward, parties }: Props) {
       </Grid>
 
       <Grid container item textAlign="center" justifyContent="center" mt={4} mb={3}>
-        <Grid item>
-          {parties.map((p, index) => (
-            <Box key={p.externalId}>
-              <Paper
-                elevation={8}
-                aria-label={selected ? p.description : undefined}
-                onClick={() => setSelected(p)}
-                sx={{
-                  cursor: 'pointer',
-                  border: selected === p ? '2px solid #0073E6' : undefined,
-                  width: '480px',
-                  fontWeight: 700,
-                  fontSize: '18px',
-                  height: '113px',
-                  borderRadius: theme.spacing(2),
-                  display: 'flex',
-                }}
-              >
-                <Grid mb={3} mt={4} px={4} aria-label={p.description}>
-                  <PartyAccountItem
+        <Paper elevation={8} sx={{ borderRadius: theme.spacing(2) }}>
+          <Grid pl={3} pr={3} mb={3} mt={3}>
+            {parties.map((p) => (
+              <Box key={p.externalId}>
+                <Grid
+                  aria-label={p.description}
+                  sx={{
+                    width: '480px',
+                    fontWeight: 700,
+                    fontSize: '18px',
+                    height: '80px',
+                    display: 'flex',
+                    textAlign: 'initial',
+                  }}
+                >
+                  <PartyAccountItemButton
+                    aria-label={p.description}
                     partyName={p.description}
-                    partyRole=""
+                    partyRole={p.userRole ? t(roleLabels[p?.userRole].longLabelKey) : ''}
                     image={p.urlLogo}
-                    noWrap={false}
+                    action={() => setSelected(p)}
+                    selectedItem={selected?.id === p.id}
+                    maxCharactersNumberMultiLine={20}
                   />
                 </Grid>
-              </Paper>
-              {index !== parties.length - 1 && <br />}
-            </Box>
-          ))}
-        </Grid>
+              </Box>
+            ))}
+          </Grid>
+        </Paper>
       </Grid>
 
       <Grid container item justifyContent="center">
