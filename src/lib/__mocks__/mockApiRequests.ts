@@ -120,6 +120,7 @@ const mockedParties: Array<SelfcareParty> = [
     taxCode: '33344455567',
     zipCode: 'zipCode',
     origin: 'IPA',
+    userRole: 'ADMIN',
   },
   {
     externalId: 'externalId2',
@@ -132,6 +133,7 @@ const mockedParties: Array<SelfcareParty> = [
     taxCode: '11122233345',
     zipCode: 'zipCode',
     origin: 'IPA',
+    userRole: 'ADMIN',
   },
   {
     externalId: 'externalId3',
@@ -145,6 +147,7 @@ const mockedParties: Array<SelfcareParty> = [
     taxCode: '33322268945',
     zipCode: '02102',
     origin: 'IPA',
+    userRole: 'LIMITED',
   },
   {
     externalId: 'onboarded_externalId',
@@ -157,6 +160,7 @@ const mockedParties: Array<SelfcareParty> = [
     taxCode: 'BBBBBB22B22B234K',
     zipCode: '12125',
     origin: 'IPA',
+    userRole: 'LIMITED',
   },
 ];
 

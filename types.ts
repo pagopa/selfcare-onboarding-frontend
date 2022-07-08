@@ -2,6 +2,7 @@ import { SvgIconTypeMap } from '@mui/material/SvgIcon';
 import { DefaultComponentProps } from '@mui/material/OverridableComponent';
 import { AxiosRequestConfig } from 'axios';
 import { FunctionComponent, SVGProps } from 'react';
+import { UserRole } from '@pagopa/selfcare-common-frontend/utils/constants';
 import { API } from './src/utils/constants';
 
 /*
@@ -168,6 +169,7 @@ export type SelfcareParty = {
   taxCode: string;
   zipCode: string;
   origin: string;
+  userRole: UserRole;
 };
 
 export type Party = {
