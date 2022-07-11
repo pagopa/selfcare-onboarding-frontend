@@ -197,10 +197,6 @@ function OnBoardingSubProduct() {
       Component: () =>
         StepSearchParty({
           subTitle: (
-            // <Trans i18nKey="onBoardingSubProduct.selectUserPartyStep.subTitle">
-            //   Seleziona l&apos;ente per il quale stai richiedendo la sottoscrizione <br />
-            //   all&apos;offerta Premium
-            // </Trans>
             <Trans i18nKey="onBoardingSubProduct.selectUserPartyStep.IPAsubTitle">
               Seleziona dall&apos;Indice della Pubblica Amministrazione (IPA) l&apos;ente
               <br /> per cui vuoi richiedere l&apos;adesione a{' '}
