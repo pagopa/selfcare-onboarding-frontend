@@ -72,6 +72,7 @@ export default {
   onboardingStep2: {
     bodyTitle: 'Indica il Legale <1/> Rappresentante',
     bodyDescription: `Inserisci i dati del Legale Rappresentante. <1/> La persona che indicherai sarà firmataria del contratto per <3/><4/>`,
+    premiumBodyDescription: `Inserisci i dati del Legale Rappresentante. <1/> La persona che indicherai sarà firmataria del contratto per <3/><4/> Premium`,
     backLabel: 'Indietro',
     confirmLabel: 'Continua',
   },
@@ -208,9 +209,11 @@ export default {
       adhesionButton: 'Aderisci',
     },
     selectUserPartyStep: {
-      title: "Seleziona l'ente",
+      title: 'Seleziona il tuo ente',
       subTitle:
         "Seleziona l'ente per il quale stai richiedendo la sottoscrizione <1 />all'offerta Premium",
+      IPAsubTitle:
+        "Seleziona dall'Indice della Pubblica Amministrazione (IPA) l'ente <1/> per cui vuoi richiedere l'adesione a {{baseProduct}} Premium",
       helperLink: 'Non lo trovi? <1>Registra un nuovo ente</1>',
       confirmButton: 'Continua',
     },
