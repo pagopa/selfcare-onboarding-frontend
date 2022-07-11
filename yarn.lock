@@ -1854,20 +1854,20 @@
     fp-ts "^2.12.1"
     io-ts "^2.2.16"
 
-"@pagopa/mui-italia@^0.6.32":
-  version "0.6.32"
-  resolved "https://registry.yarnpkg.com/@pagopa/mui-italia/-/mui-italia-0.6.32.tgz#45353149af76bb102e4b90cb812da12c1ce1bd26"
-  integrity sha512-UuRxh/Br2nHz3iEi8sk6fy0EoU26oQQ2L2sQC//Tr9pF0uvsQYZpgOVN/DxCc92LqYjXw1prbsJzqFoaoHPZ4A==
+"@pagopa/mui-italia@^0.6.33":
+  version "0.6.33"
+  resolved "https://registry.yarnpkg.com/@pagopa/mui-italia/-/mui-italia-0.6.33.tgz#b6e12f16be0e7673f7d69873d37e0155ba46a66b"
+  integrity sha512-gzSoN0SqI66iW38zTyc15Jygbsfj/nLWUNCeSFfxJobDwLMddKJy/ALyqOiETbfHIlerMYzBVdPcUBI4kwB8IA==
   dependencies:
     "@fontsource/titillium-web" "^4.5.8"
     clsx "^1.1.1"
     fp-ts "^2.12.1"
     io-ts "^2.2.16"
 
-"@pagopa/selfcare-common-frontend@^1.11.12":
-  version "1.11.12"
-  resolved "https://registry.yarnpkg.com/@pagopa/selfcare-common-frontend/-/selfcare-common-frontend-1.11.12.tgz#a1435cbc5bd2ad310d5145bd38b2bbe446c77bb1"
-  integrity sha512-C97btgukmU2IIjtOfQy9t8mK7X6nVLX7J3QuKsM7HLKK0OmrVbtwRinzAb8Cgpp9X2aB1Dz3o5r84rM8Cgf26w==
+"@pagopa/selfcare-common-frontend@^1.11.13":
+  version "1.11.13"
+  resolved "https://registry.yarnpkg.com/@pagopa/selfcare-common-frontend/-/selfcare-common-frontend-1.11.13.tgz#c4c75ebb431fd0655646479964535dc268303e8b"
+  integrity sha512-AW0rp0rNKEe7HtwzEPu8ZfDELdKJgN0q+rioWO1KkIFbdORX2Ac463eoG7Q3PqgcWHrO+fweTOHCExWbCcOmFA==
   dependencies:
     "@emotion/react" "^11.4.1"
     "@emotion/styled" "^11.3.0"
