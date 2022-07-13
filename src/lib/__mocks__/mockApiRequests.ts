@@ -110,6 +110,23 @@ const mockPartyRegistry = {
       originId: 'originId6',
       address: 'sede legale',
     },
+    {
+      id: 'notAllowedInSubmit',
+      o: 'notAllowedO',
+      ou: 'notAllowedUDu',
+      aoo: 'notAllowedAooe',
+      taxCode: '44444444444',
+      zipCode: '07089',
+      administrationCode: '44444444444',
+      category: 'c7',
+      managerName: 'Maria_NOTALLOWED',
+      managerSurname: 'Rossa_NOTALLOWED',
+      description: 'Not Allowed Error on Submit',
+      digitalAddress: 'mail_NOTALLOWEDINSUBMIT_@pec.mail.org',
+      origin: 'IPA',
+      originId: 'originId7',
+      address: 'sede legale',
+    },
   ],
   count: 5,
 };
@@ -241,6 +258,7 @@ const notFoundError: Promise<AxiosError> = new Promise((resolve) =>
     response: { data: '', status: 404, statusText: 'Not Found' },
   } as AxiosError)
 );
+
 const notAllowedError: Promise<AxiosError> = new Promise((resolve) =>
   resolve({
     isAxiosError: true,
@@ -406,6 +424,8 @@ export async function mockFetch(
     switch (endpointParams.externalInstitutionId) {
       case 'error':
         return genericError;
+      case 'notAllowedInSubmit':
+        return notAllowedError;
       default:
         const certifiedUser: UserOnCreate | undefined = (
           (data as any).users as Array<UserOnCreate>

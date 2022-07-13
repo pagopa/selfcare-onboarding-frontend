@@ -18,6 +18,7 @@ import {
   StepperStep,
   UserOnCreate,
   Problem,
+  RequestOutcomeMessage,
 } from '../../../types';
 import { StepSearchParty } from '../../components/steps/StepSearchParty';
 import { StepAddManager } from '../../components/steps/StepAddManager';
@@ -43,7 +44,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
   const [activeStep, setActiveStep] = useState(0);
   const [formData, setFormData] = useState<Partial<FormData>>();
   const [externalInstitutionId, setExternalInstitutionId] = useState<string>('');
-  const [outcome, setOutcome] = useState<RequestOutcome>();
+  const [outcome, setOutcome] = useState<RequestOutcome | RequestOutcomeMessage>();
   const history = useHistory();
   const [openExitModal, setOpenExitModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>();
@@ -173,6 +174,13 @@ function OnboardingComponent({ productId }: { productId: string }) {
 
     if (outcome === 'success') {
       trackEvent('ONBOARDING_SEND_SUCCESS', {
+        party_id: externalInstitutionId,
+        request_id: requestIdRef.current,
+        product_id: productId,
+      });
+    } else if ((postLegalsResponse as AxiosError<Problem>).response?.status === 403) {
+      setOutcome(notAllowedError);
+      trackEvent('ONBOARDING_NOT_ALLOWED_ERROR', {
         party_id: externalInstitutionId,
         request_id: requestIdRef.current,
         product_id: productId,
@@ -407,6 +415,48 @@ function OnboardingComponent({ productId }: { productId: string }) {
     },
   };
 
+  const notAllowedError: RequestOutcomeMessage = {
+    title: '',
+    description: [
+      <>
+        <IllusError size={60} />
+        <Grid container direction="column" key="0" mt={3}>
+          <Grid container item justifyContent="center">
+            <Grid item xs={6}>
+              <Typography variant="h4">
+                <Trans i18nKey="onboardingStep1_5.userNotAllowedError.title" />
+              </Typography>
+            </Grid>
+          </Grid>
+          <Grid container item justifyContent="center" mb={2} mt={1}>
+            <Grid item xs={6}>
+              <Typography>
+                <Trans i18nKey="onboardingStep1_5.userNotAllowedError.description">
+                  Al momento, l’ente
+                  <strong>{{ partyName: selectedParty?.description.toLowerCase() }}</strong>
+                  non ha il permesso di aderire a
+                  <strong>{{ productName: selectedProduct?.title }}</strong>
+                </Trans>
+              </Typography>
+            </Grid>
+          </Grid>
+          <Grid container item justifyContent="center" mt={2}>
+            <Grid item xs={4}>
+              <Button
+                variant="contained"
+                sx={{ alignSelf: 'center' }}
+                onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+              >
+                <Trans i18nKey="onboardingStep1_5.genericError.backAction" />
+              </Button>
+            </Grid>
+          </Grid>
+        </Grid>
+        ,
+      </>,
+    ],
+  };
+
   useEffect(() => {
     if (outcome) {
       unregisterUnloadEvent(setOnExit);
@@ -421,7 +471,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
   return selectedProduct === null ? (
     <NoProductPage />
   ) : outcome ? (
-    <MessageNoAction {...outcomeContent[outcome]} />
+    <MessageNoAction {...(outcomeContent[outcome as RequestOutcome] || notAllowedError)} />
   ) : (
     <Container>
       <Step />
