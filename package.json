@@ -5,8 +5,8 @@
   "private": true,
   "dependencies": {
     "@mui/lab": "^5.0.0-alpha.74",
-    "@pagopa/mui-italia": "0.6.20",
-    "@pagopa/selfcare-common-frontend": "^1.11.8",
+    "@pagopa/mui-italia": "^0.6.33",
+    "@pagopa/selfcare-common-frontend": "^1.11.13",
     "@types/react": "^17.0.18",
     "@types/react-dom": "^17.0.9",
     "axios": "^0.21.1",

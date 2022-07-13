@@ -197,9 +197,13 @@ function OnBoardingSubProduct() {
       Component: () =>
         StepSearchParty({
           subTitle: (
-            <Trans i18nKey="onBoardingSubProduct.selectUserPartyStep.subTitle">
-              Seleziona l&apos;ente per il quale stai richiedendo la sottoscrizione <br />
-              all&apos;offerta Premium
+            <Trans i18nKey="onBoardingSubProduct.selectUserPartyStep.IPAsubTitle">
+              Seleziona dall&apos;Indice della Pubblica Amministrazione (IPA) l&apos;ente
+              <br /> per cui vuoi richiedere l&apos;adesione a{' '}
+              {{
+                baseProduct: product?.title,
+              }}{' '}
+              Premium.
             </Trans>
           ),
           product: subProduct,
@@ -263,7 +267,7 @@ function OnBoardingSubProduct() {
       Component: () =>
         StepAddManager({
           readOnly: true,
-          product: subProduct,
+          product,
           forward: forwardWithManagerData,
           back: () => {
             if (window.location.search.indexOf(`partyExternalId=${externalInstitutionId}`) > -1) {
@@ -275,6 +279,7 @@ function OnBoardingSubProduct() {
               back();
             }
           },
+          subProduct,
         }),
     },
     {

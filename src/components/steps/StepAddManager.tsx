@@ -3,7 +3,7 @@ import SessionModal from '@pagopa/selfcare-common-frontend/components/SessionMod
 import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
 import { useContext, useState } from 'react';
 import { useTranslation, Trans } from 'react-i18next';
-import { StepperStepComponentProps, UserOnCreate } from '../../../types';
+import { Product, StepperStepComponentProps, UserOnCreate } from '../../../types';
 import { UserContext } from '../../lib/context';
 import { objectIsEmpty } from '../../lib/object-utils';
 import { userValidate } from '../../utils/api/userValidate';
@@ -17,9 +17,10 @@ export type UsersError = { [key: string]: { [userField: string]: Array<string> }
 
 type Props = StepperStepComponentProps & {
   readOnly?: boolean;
+  subProduct?: Product;
 };
 
-export function StepAddManager({ readOnly, product, forward, back }: Props) {
+export function StepAddManager({ readOnly, product, forward, back, subProduct }: Props) {
   const { setRequiredLogin } = useContext(UserContext);
   const [_loading, setLoading] = useState(true);
   const [people, setPeople, setPeopleHistory] = useHistoryState<UsersObject>('people_step2', {});
@@ -80,11 +81,7 @@ export function StepAddManager({ readOnly, product, forward, back }: Props) {
   };
 
   return (
-    <Grid
-      container
-      // mt={16}
-      direction="column"
-    >
+    <Grid container direction="column">
       <Grid container item justifyContent="center">
         <Grid item xs={12}>
           <Typography variant="h3" component="h2" align="center" sx={{ lineHeight: '1.2' }}>
@@ -98,7 +95,13 @@ export function StepAddManager({ readOnly, product, forward, back }: Props) {
       <Grid container item justifyContent="center" mt={1}>
         <Grid item xs={12}>
           <Typography sx={{ fontWeight: 400 }} variant="body1" component="h2" align="center">
-            <Trans i18nKey="onboardingStep2.bodyDescription">
+            <Trans
+              i18nKey={
+                subProduct
+                  ? 'onboardingStep2.premiumBodyDescription'
+                  : 'onboardingStep2.bodyDescription'
+              }
+            >
               Inserisci i dati del Legale Rappresentante.
               <br />
               La persona che indicherai sarà firmataria del contratto per

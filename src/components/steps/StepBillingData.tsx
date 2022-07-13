@@ -232,7 +232,7 @@ export default function StepBillingData({
         </Grid>
         <Paper elevation={8} sx={{ borderRadius: theme.spacing(2), p: 1 }}>
           <form onSubmit={formik.handleSubmit}>
-            <Grid item container spacing={3} p={3}>
+            <Grid item container spacing={3} px={3} pt={3} pb={2}>
               <Grid item xs={12}>
                 <CustomTextField
                   {...baseTextFieldProps(
