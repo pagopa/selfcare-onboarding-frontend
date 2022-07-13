@@ -58,6 +58,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
   const { t } = useTranslation();
   const theme = useTheme();
   const [onExitAction, setOnExitAction] = useState<(() => void) | undefined>();
+  const [selectedParty, setSelectedParty] = useState<Party>();
 
   useEffect(() => {
     registerUnloadEvent(setOnExit, setOpenExitModal, setOnExitAction);
@@ -130,6 +131,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
       request_id: requestIdRef.current,
       product_id: productId,
     });
+    setSelectedParty(party);
   };
 
   const forwardWithBillingData = (newBillingData: BillingData) => {
@@ -235,6 +237,8 @@ function OnboardingComponent({ productId }: { productId: string }) {
           forward,
           externalInstitutionId,
           productId,
+          selectedProduct,
+          selectedParty,
         }),
     },
     {
