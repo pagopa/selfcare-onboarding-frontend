@@ -52,6 +52,12 @@ export default {
       Ti chiediamo di riprovare più tardi.`,
       backAction: 'Chiudi',
     },
+    userNotAllowedError: {
+      title: 'Non puoi aderire a questo prodotto',
+      description:
+        'Al momento, l’ente <1>{{partyName}}</1> non ha il permesso di aderire a <3>{{productName}}</3>',
+      backAction: 'Chiudi',
+    },
   },
   onboardingStep1: {
     loadingOverlayText: 'Stiamo verificando i tuoi dati',

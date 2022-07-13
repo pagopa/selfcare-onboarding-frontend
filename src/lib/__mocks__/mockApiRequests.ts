@@ -93,6 +93,23 @@ const mockPartyRegistry = {
       originId: 'originId5',
       address: 'sede legale',
     },
+    {
+      id: 'notAllowed',
+      o: 'notAllowedO',
+      ou: 'notAllowedUu',
+      aoo: 'notAllowedAoo',
+      taxCode: '44444444444',
+      zipCode: '070889',
+      administrationCode: '44444444444',
+      category: 'c7',
+      managerName: 'Mario_NOTALLOWED',
+      managerSurname: 'Rossi_NOTALLOWED',
+      description: 'Not Allowed',
+      digitalAddress: 'mail_NOTALLOWED_@pec.mail.org',
+      origin: 'IPA',
+      originId: 'originId6',
+      address: 'sede legale',
+    },
   ],
   count: 5,
 };
@@ -224,6 +241,12 @@ const notFoundError: Promise<AxiosError> = new Promise((resolve) =>
     response: { data: '', status: 404, statusText: 'Not Found' },
   } as AxiosError)
 );
+const notAllowedError: Promise<AxiosError> = new Promise((resolve) =>
+  resolve({
+    isAxiosError: true,
+    response: { data: '', status: 403, statusText: 'Not Found' },
+  } as AxiosError)
+);
 
 const genericError: Promise<AxiosError> = new Promise((resolve) =>
   resolve({
@@ -304,7 +327,8 @@ export async function mockFetch(
         } else {
           return notFoundError;
         }
-
+      case 'notAllowed':
+        return notAllowedError;
       default:
         if (endpointParams.productId === 'prod-io') {
           // eslint-disable-next-line sonarjs/no-identical-functions
