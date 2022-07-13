@@ -224,6 +224,12 @@ const notFoundError: Promise<AxiosError> = new Promise((resolve) =>
     response: { data: '', status: 404, statusText: 'Not Found' },
   } as AxiosError)
 );
+// const notAllowedError: Promise<AxiosError> = new Promise((resolve) =>
+//   resolve({
+//     isAxiosError: true,
+//     response: { data: '', status: 403, statusText: 'Not Found' },
+//   } as AxiosError)
+// );
 
 const genericError: Promise<AxiosError> = new Promise((resolve) =>
   resolve({
@@ -291,6 +297,7 @@ export async function mockFetch(
         );
       case 'pending':
         return notFoundError;
+      // return notAllowedError;
       case 'externalId1':
       case 'externalId2':
         if (endpointParams.productId === 'prod-io') {

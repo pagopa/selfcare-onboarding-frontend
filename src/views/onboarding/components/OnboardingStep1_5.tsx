@@ -3,7 +3,12 @@ import { AxiosError } from 'axios';
 import { useEffect, useState, useContext } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { IllusError } from '@pagopa/mui-italia';
-import { RequestOutcomeMessage, StepperStepComponentProps } from '../../../../types';
+import {
+  Party,
+  Product,
+  RequestOutcomeMessage,
+  StepperStepComponentProps,
+} from '../../../../types';
 import { fetchWithLogs } from '../../../lib/api-utils';
 import { ENV } from '../../../utils/env';
 import { getFetchOutcome } from '../../../lib/error-utils';
@@ -15,6 +20,8 @@ import { MessageNoAction } from '../../../components/MessageNoAction';
 type Props = StepperStepComponentProps & {
   externalInstitutionId: string;
   productId: string;
+  selectedProduct?: Product | null;
+  selectedParty?: Party;
 };
 
 const alreadyOnboarded: RequestOutcomeMessage = {
@@ -92,12 +99,60 @@ const genericError: RequestOutcomeMessage = {
 };
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
-export function OnboardingStep1_5({ forward, externalInstitutionId, productId }: Props) {
+export function OnboardingStep1_5({
+  forward,
+  externalInstitutionId,
+  productId,
+  selectedProduct,
+  selectedParty,
+}: Props) {
   const [loading, setLoading] = useState(true);
   const [outcome, setOutcome] = useState<RequestOutcomeMessage | null>();
   const { setOnExit } = useContext(HeaderContext);
   const { setRequiredLogin } = useContext(UserContext);
   const { t } = useTranslation();
+
+  const notAllowedError: RequestOutcomeMessage = {
+    title: '',
+    description: [
+      <>
+        <IllusError size={60} />
+        <Grid container direction="column" key="0" mt={3}>
+          <Grid container item justifyContent="center">
+            <Grid item xs={6}>
+              <Typography variant="h4">
+                <Trans i18nKey="onboardingStep1_5.userNotAllowedError.title" />
+              </Typography>
+            </Grid>
+          </Grid>
+          <Grid container item justifyContent="center" mb={2} mt={1}>
+            <Grid item xs={6}>
+              <Typography>
+                <Trans i18nKey="onboardingStep1_5.userNotAllowedError.description">
+                  Al momento, l’ente
+                  <strong>{{ partyName: selectedParty?.description.toLowerCase() }}</strong>
+                  non ha il permesso di aderire a
+                  <strong>{{ productName: selectedProduct?.title }}</strong>
+                </Trans>
+              </Typography>
+            </Grid>
+          </Grid>
+          <Grid container item justifyContent="center" mt={2}>
+            <Grid item xs={4}>
+              <Button
+                variant="contained"
+                sx={{ alignSelf: 'center' }}
+                onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+              >
+                <Trans i18nKey="onboardingStep1_5.genericError.backAction" />
+              </Button>
+            </Grid>
+          </Grid>
+        </Grid>
+        ,
+      </>,
+    ],
+  };
 
   const submit = async () => {
     setLoading(true);
@@ -121,6 +176,8 @@ export function OnboardingStep1_5({ forward, externalInstitutionId, productId }:
       ) {
         setOutcome(null);
         onForwardAction();
+      } else if ((onboardingStatus as AxiosError<any>).response?.status === 403) {
+        setOutcome(notAllowedError);
       } else {
         setOutcome(genericError);
       }
