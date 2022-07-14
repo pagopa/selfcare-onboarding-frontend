@@ -156,6 +156,12 @@ export default {
         descriptionWithToken: 'Il salvataggio dei dati inseriti non è andato a buon fine.',
       },
     },
+    userNotAllowedError: {
+      title: 'Non puoi aderire a questo prodotto',
+      description:
+        'Al momento, l’ente <1>{{partyName}}</1> non ha il permesso di aderire a <3>{{productName}}</3>',
+      backAction: 'Chiudi',
+    },
     errors: {
       INVALID_DOCUMENT: {
         title: 'Controlla il documento',
