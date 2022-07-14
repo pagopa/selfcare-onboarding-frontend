@@ -305,6 +305,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
         request_id: requestIdRef.current,
         product_id: productId,
       });
+      setOutcome(outcomeContent[outcome]);
       if ((postLegalsResponse as AxiosError<Problem>).response?.status === 403) {
         trackEvent('ONBOARDING_NOT_ALLOWED_ERROR', {
           party_id: externalInstitutionId,
