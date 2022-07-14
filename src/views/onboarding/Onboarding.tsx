@@ -12,7 +12,6 @@ import {
   BillingData,
   InstitutionType,
   Product,
-  RequestOutcome,
   RequestOutcomeOptions,
   Party,
   StepperStep,
@@ -44,7 +43,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
   const [activeStep, setActiveStep] = useState(0);
   const [formData, setFormData] = useState<Partial<FormData>>();
   const [externalInstitutionId, setExternalInstitutionId] = useState<string>('');
-  const [outcome, setOutcome] = useState<RequestOutcome | RequestOutcomeMessage>();
+  const [outcome, setOutcome] = useState<RequestOutcomeMessage>();
   const history = useHistory();
   const [openExitModal, setOpenExitModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>();
@@ -144,6 +143,125 @@ function OnboardingComponent({ productId }: { productId: string }) {
     forward();
   };
 
+  const outcomeContent: RequestOutcomeOptions = {
+    success: {
+      title: '',
+      description: [
+        <>
+          <IllusCompleted size={60} />
+          <Typography
+            mt={3}
+            variant={'h4'}
+            sx={{ color: theme.palette.text.primary, marginBottom: 1 }}
+          >
+            <Trans i18nKey="onboarding.outcomeContent.success.title">
+              La tua richiesta è stata inviata
+              <br />
+              con successo
+            </Trans>
+          </Typography>
+          <Stack key="0" spacing={4}>
+            <Typography variant="body1">
+              <Trans i18nKey="onboarding.outcomeContent.success.description">
+                Riceverai una PEC all’indirizzo istituzionale che hai indicato.
+                <br />
+                Al suo interno troverai le istruzioni per completare <br />
+                l&apos;adesione.
+              </Trans>
+            </Typography>
+            <Button
+              variant="contained"
+              sx={{ alignSelf: 'center' }}
+              onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+            >
+              {t('onboarding.outcomeContent.success.backActionLabel')}
+            </Button>
+          </Stack>
+        </>,
+      ],
+    },
+    error: {
+      title: '',
+      description: [
+        <>
+          <IllusError size={60} />
+          <Grid container direction="column" key="0" mt={3}>
+            <Grid container item justifyContent="center">
+              <Grid item xs={5}>
+                <Typography variant="h4">{t('onboarding.outcomeContent.error.title')}</Typography>
+              </Grid>
+            </Grid>
+            <Grid container item justifyContent="center" mb={3} mt={1}>
+              <Grid item xs={5}>
+                <Typography variant="body1">
+                  <Trans i18nKey="onboarding.outcomeContent.error.description">
+                    A causa di un errore del sistema non è possibile completare la procedura.
+                    <br />
+                    Ti chiediamo di riprovare più tardi.
+                  </Trans>
+                </Typography>
+              </Grid>
+            </Grid>
+            <Grid container item justifyContent="center">
+              <Grid item xs={4}>
+                <Button
+                  onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+                  variant={'contained'}
+                >
+                  <Typography width="100%" sx={{ color: theme.palette.primary.contrastText }}>
+                    {t('onboarding.outcomeContent.error.backActionLabel')}
+                  </Typography>
+                </Button>
+              </Grid>
+            </Grid>
+          </Grid>
+        </>,
+      ],
+    },
+  };
+
+  const notAllowedError: RequestOutcomeMessage = {
+    title: '',
+    description: [
+      <>
+        <IllusError size={60} />
+        <Grid container direction="column" key="0" mt={3}>
+          <Grid container item justifyContent="center">
+            <Grid item xs={6}>
+              <Typography variant="h4">
+                <Trans i18nKey="onboardingStep1_5.userNotAllowedError.title" />
+              </Typography>
+            </Grid>
+          </Grid>
+          <Grid container item justifyContent="center" mb={2} mt={1}>
+            <Grid item xs={6}>
+              <Typography>
+                <Trans i18nKey="onboardingStep1_5.userNotAllowedError.description">
+                  Al momento, l’ente
+                  <strong>{{ partyName: selectedParty?.description.toLowerCase() }}</strong>
+                  non ha il permesso di aderire a
+                  <strong>{{ productName: selectedProduct?.title }}</strong>
+                </Trans>
+              </Typography>
+            </Grid>
+          </Grid>
+          <Grid container item justifyContent="center" mt={2}>
+            <Grid item xs={4}>
+              <Button
+                variant="contained"
+                sx={{ alignSelf: 'center' }}
+                onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+              >
+                <Trans i18nKey="onboardingStep1_5.genericError.backAction" />
+              </Button>
+            </Grid>
+          </Grid>
+        </Grid>
+        ,
+      </>,
+    ],
+  };
+
   const submit = async (users: Array<UserOnCreate>) => {
     setLoading(true);
     const postLegalsResponse = await fetchWithLogs(
@@ -170,21 +288,13 @@ function OnboardingComponent({ productId }: { productId: string }) {
     // Check the outcome
     const outcome = getFetchOutcome(postLegalsResponse);
 
-    setOutcome(outcome);
-
     if (outcome === 'success') {
       trackEvent('ONBOARDING_SEND_SUCCESS', {
         party_id: externalInstitutionId,
         request_id: requestIdRef.current,
         product_id: productId,
       });
-    } else if ((postLegalsResponse as AxiosError<Problem>).response?.status === 403) {
-      setOutcome(notAllowedError);
-      trackEvent('ONBOARDING_NOT_ALLOWED_ERROR', {
-        party_id: externalInstitutionId,
-        request_id: requestIdRef.current,
-        product_id: productId,
-      });
+      setOutcome(outcomeContent[outcome]);
     } else {
       const event =
         (postLegalsResponse as AxiosError<Problem>).response?.status === 409
@@ -195,6 +305,14 @@ function OnboardingComponent({ productId }: { productId: string }) {
         request_id: requestIdRef.current,
         product_id: productId,
       });
+      if ((postLegalsResponse as AxiosError<Problem>).response?.status === 403) {
+        trackEvent('ONBOARDING_NOT_ALLOWED_ERROR', {
+          party_id: externalInstitutionId,
+          request_id: requestIdRef.current,
+          product_id: productId,
+        });
+        setOutcome(notAllowedError);
+      }
     }
   };
 
@@ -338,125 +456,6 @@ function OnboardingComponent({ productId }: { productId: string }) {
 
   const Step = useMemo(() => steps[activeStep].Component, [activeStep, selectedProduct]);
 
-  const outcomeContent: RequestOutcomeOptions = {
-    success: {
-      title: '',
-      description: [
-        <>
-          <IllusCompleted size={60} />
-          <Typography
-            mt={3}
-            variant={'h4'}
-            sx={{ color: theme.palette.text.primary, marginBottom: 1 }}
-          >
-            <Trans i18nKey="onboarding.outcomeContent.success.title">
-              La tua richiesta è stata inviata
-              <br />
-              con successo
-            </Trans>
-          </Typography>
-          <Stack key="0" spacing={4}>
-            <Typography variant="body1">
-              <Trans i18nKey="onboarding.outcomeContent.success.description">
-                Riceverai una PEC all’indirizzo istituzionale che hai indicato.
-                <br />
-                Al suo interno troverai le istruzioni per completare <br />
-                l&apos;adesione.
-              </Trans>
-            </Typography>
-            <Button
-              variant="contained"
-              sx={{ alignSelf: 'center' }}
-              onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
-            >
-              {t('onboarding.outcomeContent.success.backActionLabel')}
-            </Button>
-          </Stack>
-        </>,
-      ],
-    },
-    error: {
-      title: '',
-      description: [
-        <>
-          <IllusError size={60} />
-          <Grid container direction="column" key="0" mt={3}>
-            <Grid container item justifyContent="center">
-              <Grid item xs={5}>
-                <Typography variant="h4">{t('onboarding.outcomeContent.error.title')}</Typography>
-              </Grid>
-            </Grid>
-            <Grid container item justifyContent="center" mb={3} mt={1}>
-              <Grid item xs={5}>
-                <Typography variant="body1">
-                  <Trans i18nKey="onboarding.outcomeContent.error.description">
-                    A causa di un errore del sistema non è possibile completare la procedura.
-                    <br />
-                    Ti chiediamo di riprovare più tardi.
-                  </Trans>
-                </Typography>
-              </Grid>
-            </Grid>
-            <Grid container item justifyContent="center">
-              <Grid item xs={4}>
-                <Button
-                  onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
-                  variant={'contained'}
-                >
-                  <Typography width="100%" sx={{ color: theme.palette.primary.contrastText }}>
-                    {t('onboarding.outcomeContent.error.backActionLabel')}
-                  </Typography>
-                </Button>
-              </Grid>
-            </Grid>
-          </Grid>
-        </>,
-      ],
-    },
-  };
-
-  const notAllowedError: RequestOutcomeMessage = {
-    title: '',
-    description: [
-      <>
-        <IllusError size={60} />
-        <Grid container direction="column" key="0" mt={3}>
-          <Grid container item justifyContent="center">
-            <Grid item xs={6}>
-              <Typography variant="h4">
-                <Trans i18nKey="onboardingStep1_5.userNotAllowedError.title" />
-              </Typography>
-            </Grid>
-          </Grid>
-          <Grid container item justifyContent="center" mb={2} mt={1}>
-            <Grid item xs={6}>
-              <Typography>
-                <Trans i18nKey="onboardingStep1_5.userNotAllowedError.description">
-                  Al momento, l’ente
-                  <strong>{{ partyName: selectedParty?.description.toLowerCase() }}</strong>
-                  non ha il permesso di aderire a
-                  <strong>{{ productName: selectedProduct?.title }}</strong>
-                </Trans>
-              </Typography>
-            </Grid>
-          </Grid>
-          <Grid container item justifyContent="center" mt={2}>
-            <Grid item xs={4}>
-              <Button
-                variant="contained"
-                sx={{ alignSelf: 'center' }}
-                onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
-              >
-                <Trans i18nKey="onboardingStep1_5.genericError.backAction" />
-              </Button>
-            </Grid>
-          </Grid>
-        </Grid>
-        ,
-      </>,
-    ],
-  };
-
   useEffect(() => {
     if (outcome) {
       unregisterUnloadEvent(setOnExit);
@@ -471,7 +470,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
   return selectedProduct === null ? (
     <NoProductPage />
   ) : outcome ? (
-    <MessageNoAction {...(outcomeContent[outcome as RequestOutcome] || notAllowedError)} />
+    <MessageNoAction {...outcome} />
   ) : (
     <Container>
       <Step />
