@@ -46,9 +46,7 @@ export const ROUTES: RoutesObject = {
 
 export const API = {
   VERIFY_ONBOARDING: {
-    URL:
-      ENV.URL_API.PARTY_PROCESS +
-      '/onboarding/institution/{{externalInstitutionId}}/products/{{productId}}',
+    URL: ENV.URL_API.ONBOARDING + '/institutions/{{externalInstitutionId}}/products/{{productId}}',
   },
 
   ONBOARDING_VERIFY_PRODUCT: {
