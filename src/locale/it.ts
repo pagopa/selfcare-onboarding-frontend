@@ -156,12 +156,6 @@ export default {
         descriptionWithToken: 'Il salvataggio dei dati inseriti non è andato a buon fine.',
       },
     },
-    userNotAllowedError: {
-      title: 'Non puoi aderire a questo prodotto',
-      description:
-        'Al momento, l’ente <1>{{partyName}}</1> non ha il permesso di aderire a <3>{{productName}}</3>',
-      backAction: 'Chiudi',
-    },
     errors: {
       INVALID_DOCUMENT: {
         title: 'Controlla il documento',
@@ -197,6 +191,12 @@ export default {
           'A causa di un errore del sistema non è possibile completare la procedura. <1 /> Ti chiediamo di riprovare più tardi.',
         backActionLabel: 'Chiudi',
       },
+    },
+    userNotAllowedError: {
+      title: 'Non puoi aderire a questo prodotto',
+      description:
+        'Al momento, l’ente <1>{{partyName}}</1> non ha il permesso di aderire a <3>{{productName}}</3>',
+      backAction: 'Chiudi',
     },
     sessionModal: {
       title: 'Vuoi davvero uscire?',
