@@ -130,7 +130,7 @@ export function OnboardingStep1_5({
               <Typography>
                 <Trans i18nKey="onboardingStep1_5.userNotAllowedError.description">
                   Al momento, l’ente
-                  {{ partyName: selectedParty?.description.toLowerCase() }}
+                  {{ partyName: selectedParty?.description }}
                   non ha il permesso di aderire a{{ productName: selectedProduct?.title }}
                 </Trans>
               </Typography>
