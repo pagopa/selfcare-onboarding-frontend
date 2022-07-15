@@ -229,18 +229,17 @@ function OnboardingComponent({ productId }: { productId: string }) {
           <Grid container item justifyContent="center">
             <Grid item xs={6}>
               <Typography variant="h4">
-                <Trans i18nKey="onboardingStep1_5.userNotAllowedError.title" />
+                <Trans i18nKey="onboarding.userNotAllowedError.title" />
               </Typography>
             </Grid>
           </Grid>
           <Grid container item justifyContent="center" mb={2} mt={1}>
             <Grid item xs={6}>
               <Typography>
-                <Trans i18nKey="onboardingStep1_5.userNotAllowedError.description">
+                <Trans i18nKey="onboarding.userNotAllowedError.description">
                   Al momento, l’ente
-                  <strong>{{ partyName: selectedParty?.description.toLowerCase() }}</strong>
-                  non ha il permesso di aderire a
-                  <strong>{{ productName: selectedProduct?.title }}</strong>
+                  {{ partyName: selectedParty?.description }}
+                  non ha il permesso di aderire a{{ productName: selectedProduct?.title }}
                 </Trans>
               </Typography>
             </Grid>
@@ -252,12 +251,11 @@ function OnboardingComponent({ productId }: { productId: string }) {
                 sx={{ alignSelf: 'center' }}
                 onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
               >
-                <Trans i18nKey="onboardingStep1_5.genericError.backAction" />
+                <Trans i18nKey="onboarding.userNotAllowedError.backAction" />
               </Button>
             </Grid>
           </Grid>
         </Grid>
-        ,
       </>,
     ],
   };

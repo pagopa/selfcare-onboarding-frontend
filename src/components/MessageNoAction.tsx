@@ -5,7 +5,7 @@ import { RequestOutcomeMessage } from '../../types';
 export function MessageNoAction({ img, title, description, ImgComponent }: RequestOutcomeMessage) {
   const theme = useTheme();
   return (
-    <Stack spacing={10}>
+    <Stack spacing={10} mt={8}>
       <Box style={{ textAlign: 'center' }}>
         <Box mb={2}>
           <i>
