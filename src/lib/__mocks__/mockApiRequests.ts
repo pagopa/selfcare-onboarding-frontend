@@ -93,6 +93,40 @@ const mockPartyRegistry = {
       originId: 'originId5',
       address: 'sede legale',
     },
+    {
+      id: 'notAllowed',
+      o: 'notAllowedO',
+      ou: 'notAllowedUu',
+      aoo: 'notAllowedAoo',
+      taxCode: '44444444444',
+      zipCode: '070889',
+      administrationCode: '44444444444',
+      category: 'c7',
+      managerName: 'Mario_NOTALLOWED',
+      managerSurname: 'Rossi_NOTALLOWED',
+      description: 'Not Allowed',
+      digitalAddress: 'mail_NOTALLOWED_@pec.mail.org',
+      origin: 'IPA',
+      originId: 'originId6',
+      address: 'sede legale',
+    },
+    {
+      id: 'notAllowedInSubmit',
+      o: 'notAllowedO',
+      ou: 'notAllowedUDu',
+      aoo: 'notAllowedAooe',
+      taxCode: '44444444444',
+      zipCode: '07089',
+      administrationCode: '44444444444',
+      category: 'c7',
+      managerName: 'Maria_NOTALLOWED',
+      managerSurname: 'Rossa_NOTALLOWED',
+      description: 'Not Allowed Error on Submit',
+      digitalAddress: 'mail_NOTALLOWEDINSUBMIT_@pec.mail.org',
+      origin: 'IPA',
+      originId: 'originId7',
+      address: 'sede legale',
+    },
   ],
   count: 5,
 };
@@ -225,6 +259,13 @@ const notFoundError: Promise<AxiosError> = new Promise((resolve) =>
   } as AxiosError)
 );
 
+const notAllowedError: Promise<AxiosError> = new Promise((resolve) =>
+  resolve({
+    isAxiosError: true,
+    response: { data: '', status: 403, statusText: 'Not Found' },
+  } as AxiosError)
+);
+
 const genericError: Promise<AxiosError> = new Promise((resolve) =>
   resolve({
     isAxiosError: true,
@@ -304,7 +345,8 @@ export async function mockFetch(
         } else {
           return notFoundError;
         }
-
+      case 'notAllowed':
+        return notAllowedError;
       default:
         if (endpointParams.productId === 'prod-io') {
           // eslint-disable-next-line sonarjs/no-identical-functions
@@ -382,6 +424,8 @@ export async function mockFetch(
     switch (endpointParams.externalInstitutionId) {
       case 'error':
         return genericError;
+      case 'notAllowedInSubmit':
+        return notAllowedError;
       default:
         const certifiedUser: UserOnCreate | undefined = (
           (data as any).users as Array<UserOnCreate>
