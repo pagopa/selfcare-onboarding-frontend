@@ -148,7 +148,6 @@ export function OnboardingStep1_5({
             </Grid>
           </Grid>
         </Grid>
-        ,
       </>,
     ],
   };
