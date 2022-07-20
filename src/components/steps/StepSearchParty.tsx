@@ -181,7 +181,7 @@ export function StepSearchParty({ subTitle, forward, back }: Props) {
           forward={{
             action: onForwardAction,
             label: t('onboardingStep1.onboarding.onboardingStepActions.confirmAction'),
-            disabled: selected === undefined || selected === null,
+            disabled: !selected,
           }}
         />
       </Grid>
