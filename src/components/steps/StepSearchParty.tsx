@@ -43,7 +43,6 @@ export function StepSearchParty({ subTitle, forward, back }: Props) {
   const partyExternalIdByQuery = new URLSearchParams(window.location.search).get('partyExternalId');
   const { setRequiredLogin } = useContext(UserContext);
   const theme = useTheme();
-  const [input, setInput] = useState<string>('');
 
   const [loading, setLoading] = useState(!!partyExternalIdByQuery);
   const [selected, setSelected, setSelectedHistory] = useHistoryState<IPACatalogParty | null>(
@@ -118,8 +117,6 @@ export function StepSearchParty({ subTitle, forward, back }: Props) {
         <Grid item xs={8} md={6} lg={5}>
           <AsyncAutocompleteV2
             theme={theme}
-            input={input}
-            setInput={setInput}
             selected={selected}
             setSelected={setSelected}
             // placeholder={t('onboardingStep1.onboarding.asyncAutocomplete.placeholder')}
@@ -184,7 +181,7 @@ export function StepSearchParty({ subTitle, forward, back }: Props) {
           forward={{
             action: onForwardAction,
             label: t('onboardingStep1.onboarding.onboardingStepActions.confirmAction'),
-            disabled: selected === undefined || selected === null || input === '',
+            disabled: !selected,
           }}
         />
       </Grid>

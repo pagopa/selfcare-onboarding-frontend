@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction, useContext, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import debounce from 'lodash/debounce';
 import { AxiosError, AxiosResponse } from 'axios';
 import { Theme, Grid, Typography, Paper } from '@mui/material';
@@ -21,8 +21,6 @@ type AutocompleteProps = {
   optionKey?: string;
   optionLabel?: string;
   theme: Theme;
-  setInput: Dispatch<SetStateAction<string>>;
-  input: string;
 };
 
 export function AsyncAutocompleteV2({
@@ -33,10 +31,9 @@ export function AsyncAutocompleteV2({
   optionKey,
   optionLabel,
   theme,
-  input,
-  setInput,
 }: AutocompleteProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const [input, setInput] = useState<string>('');
   const [options, setOptions] = useState<Array<any>>([]);
   const { setRequiredLogin } = useContext(UserContext);
   const { t } = useTranslation();
