@@ -18,6 +18,9 @@ const CustomTextField = styled(TextField)({
   '.MuiInput-underline:after': {
     borderBottom: 'none',
   },
+  '.MuiInput-underline:before': {
+    borderBottom: 'none',
+  },
 });
 
 type Props = {
@@ -46,6 +49,7 @@ export default function AsyncAutocompleteSearch({
       label={!selected ? 'Cerca ente' : ''}
       variant={!selected ? 'outlined' : 'standard'}
       inputProps={{
+        disableUnderline: true,
         style: {
           fontStyle: 'normal',
           fontWeight: '700',
