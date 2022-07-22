@@ -2,7 +2,7 @@ export default {
   alertDialog: {
     title: 'Titolo',
     description: 'Descrizione',
-    confirmLabel: 'Torna alla pagina di caricamento',
+    confirmLabel: 'Carica di nuovo',
     cancelLabel: 'Esci',
   },
   asyncAutocomplete: {
@@ -132,7 +132,7 @@ export default {
     description: `Non siamo riusciti a indirizzarti alla pagina di caricamento<1 />per completare la procedura.`,
     contactAssistanceButton: 'Contatta l’assistenza',
     sessionModal: {
-      onConfirmLabel: 'Torna alla pagina di caricamento',
+      onConfirmLabel: 'Carica di nuovo',
       onCloseLabel: 'Esci',
     },
     steps: {
@@ -169,7 +169,8 @@ export default {
       },
       GENERIC: {
         title: 'Caricamento non riuscito',
-        message: 'Il caricamento del documento non è andato a buon fine.',
+        message:
+          'Il caricamento del documento non è andato a buon fine. Torna indietro e caricalo di nuovo',
       },
     },
   },
