@@ -11,7 +11,7 @@ const CustomTextField = styled(TextField)({
     borderBottom: 'none',
   },
   /* hover (double-ampersand needed for specificity reasons. */
-  '&& .MuiInput-underline:before': {
+  '&& .MuiInput-underline:hover:before': {
     borderBottom: 'none',
   },
   /* focused */
