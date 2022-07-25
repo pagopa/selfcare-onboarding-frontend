@@ -212,7 +212,6 @@ const checkBackForwardNavigation = async (
 };
 const executeStep1 = async (partyName: string) => {
   console.log('Testing step 1');
-
   screen.getByText(step1Title);
   await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(1));
   const inputPartyName = document.getElementById('Parties');
