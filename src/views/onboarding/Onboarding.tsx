@@ -381,7 +381,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
           forward: forwardWithInstitutionType,
           back: () => {
             if (window.location.search.indexOf(`partyExternalId=${externalInstitutionId}`) > -1) {
-              setOnExitAction(() => history.goBack());
+              setOnExitAction(() => () => history.goBack());
               setOpenExitModal(true);
             } else {
               setActiveStep(0);
