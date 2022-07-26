@@ -301,7 +301,6 @@ export default function CompleteRegistrationComponent() {
         message={t(`completeRegistration.errors.${errorCode}.message`)}
         onConfirmLabel={t('completeRegistration.sessionModal.onConfirmLabel')}
         onCloseLabel={t('completeRegistration.sessionModal.onCloseLabel')}
-        height="20em"
         showCloseIcon={true}
       />
     )
