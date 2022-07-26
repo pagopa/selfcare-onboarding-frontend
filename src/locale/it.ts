@@ -170,7 +170,7 @@ export default {
       GENERIC: {
         title: 'Caricamento non riuscito',
         message:
-          'Il caricamento del documento non è andato a buon fine. Torna indietro e caricalo di nuovo',
+          'Il caricamento del documento non è andato a buon fine. Torna indietro e caricalo di nuovo.',
       },
     },
   },
