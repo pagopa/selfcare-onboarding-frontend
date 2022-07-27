@@ -1,7 +1,7 @@
 import { SvgIconTypeMap } from '@mui/material/SvgIcon';
 import { DefaultComponentProps } from '@mui/material/OverridableComponent';
 import { AxiosRequestConfig } from 'axios';
-import { FunctionComponent, SVGProps } from 'react';
+import React, { FunctionComponent, SVGProps } from 'react';
 import { UserRole } from '@pagopa/selfcare-common-frontend/utils/constants';
 import { API } from './src/utils/constants';
 
@@ -96,7 +96,7 @@ export type User = {
 
 export type AlertDialogActions = {
   setDialogTitle: (t: string) => void;
-  setDialogDescription: (t: string) => void;
+  setDialogDescription: (t: React.ReactNode) => void;
   setShowDialog: (t: boolean) => void;
   handleCloseDialog?: (t: any) => void;
 };

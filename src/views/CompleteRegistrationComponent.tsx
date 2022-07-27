@@ -68,8 +68,8 @@ export default function CompleteRegistrationComponent() {
     0
   );
   const [showDialog, setShowDialog] = useState<boolean>(false);
-  const [dialogTitle, setDialogTitle] = useState<string | null>(null);
-  const [dialogDescription, setDialogDescription] = useState<string | null>(null);
+  const [dialogTitle, _setDialogTitle] = useState<string | null>(null);
+  const [dialogDescription, _setDialogDescription] = useState<string | null>(null);
   const [outcome, setOutcome] = useState<RequestOutcome | null>(!token ? 'error' : null);
   const [errorCode, setErrorCode] = useState<keyof typeof errors>('GENERIC');
 
@@ -196,12 +196,6 @@ export default function CompleteRegistrationComponent() {
       label: t('completeRegistration.steps.step1.label'),
       Component: () =>
         ConfirmRegistrationStep1(
-          {
-            setDialogTitle,
-            setDialogDescription,
-            setShowDialog,
-            handleCloseDialog,
-          },
           { forward: submit },
           { loading },
           { uploadedFiles, setUploadedFiles: setUploadedFilesAndWriteHistory }
@@ -301,7 +295,6 @@ export default function CompleteRegistrationComponent() {
         message={t(`completeRegistration.errors.${errorCode}.message`)}
         onConfirmLabel={t('completeRegistration.sessionModal.onConfirmLabel')}
         onCloseLabel={t('completeRegistration.sessionModal.onCloseLabel')}
-        showCloseIcon={true}
       />
     )
   ) : (

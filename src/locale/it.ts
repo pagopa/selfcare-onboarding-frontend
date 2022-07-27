@@ -16,7 +16,10 @@ export default {
   },
   confirmRegistrationStep1: {
     errorAlertTitle: 'Controlla il Documento',
-    errorAlertDescription: "E' possibile caricare un solo file di tipo PDF",
+    errorAlertDescription:
+      'Il caricamento del documento non è andato a buon fine. Carica un solo file per volta, in formato <1>pdf</1> o <5>p7m.<5/>',
+    errorAlertRetryLabel: 'Carica di nuovo',
+    errorAlertCloseLabel: 'Esci',
     pageTitle: "Carica l'Accordo di Adesione",
     pageSubtitle: `Carica l’Accordo di Adesione ricevuto all’indirizzo PEC <1 />primario dell’ente, firmato digitalmente dal Legale <3 />Rappresentante.`,
     fileUploaderTitle: 'Trascina qui l’Accordo di Adesione firmato oppure',
@@ -167,10 +170,14 @@ export default {
         message:
           'La Firma Digitale non è riconducibile al Legale Rappresentante indicato in fase di adesione. Verifica la corrispondenza e carica di nuovo il documento.',
       },
+      INVALID_UPLOAD: {
+        title: 'Controlla il documento',
+        message:
+          'Il caricamento del documento non è andato a buon fine. Carica un solo file per volta, in formato <1>pdf</1> o <3>p7m.</3>',
+      },
       GENERIC: {
         title: 'Caricamento non riuscito',
-        message:
-          'Il caricamento del documento non è andato a buon fine. Torna indietro e caricalo di nuovo.',
+        message: 'Il caricamento del documento non è andato a buon fine.',
       },
     },
   },
