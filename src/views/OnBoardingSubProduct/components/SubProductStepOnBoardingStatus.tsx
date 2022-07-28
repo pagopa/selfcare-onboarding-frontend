@@ -66,6 +66,7 @@ const alreadyOnboardedSubProduct: RequestOutcomeMessage = {
 const buildNotBasicProduct = (
   productTitle: string,
   productId: string,
+  externalInstitutionId: string,
   history: History
 ): RequestOutcomeMessage => ({
   title: '',
@@ -97,9 +98,13 @@ const buildNotBasicProduct = (
             <Button
               variant="contained"
               sx={{ alignSelf: 'center' }}
-              onClick={() =>
-                history.push(resolvePathVariables(ROUTES.ONBOARDING.PATH, { productId }))
-              }
+              onClick={() => {
+                history.push(
+                  resolvePathVariables(ROUTES.ONBOARDING.PATH, { productId }).concat(
+                    `?partyExternalId=${externalInstitutionId}`
+                  )
+                );
+              }}
             >
               <Trans i18nKey="onBoardingSubProduct.notBasicProductError.adhesionButton">
                 Aderisci
@@ -180,7 +185,7 @@ export function SubProductStepOnBoardingStatus({
       ((onboardingProductStatus as AxiosError<any>).response?.status === 404 ||
         (onboardingProductStatus as AxiosError<any>).response?.status === 400)
     ) {
-      setOutcome(buildNotBasicProduct(productTitle, productId, history));
+      setOutcome(buildNotBasicProduct(productTitle, productId, externalInstitutionId, history));
       return false;
     } else {
       return true;
