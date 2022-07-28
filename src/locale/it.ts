@@ -170,14 +170,10 @@ export default {
         message:
           'La Firma Digitale non è riconducibile al Legale Rappresentante indicato in fase di adesione. Verifica la corrispondenza e carica di nuovo il documento.',
       },
-      INVALID_UPLOAD: {
-        title: 'Controlla il documento',
-        message:
-          'Il caricamento del documento non è andato a buon fine. Carica un solo file per volta, in formato <1>pdf</1> o <3>p7m.</3>',
-      },
       GENERIC: {
         title: 'Caricamento non riuscito',
-        message: 'Il caricamento del documento non è andato a buon fine.',
+        message:
+          'Il caricamento del documento non è andato a buon fine. Torna indietro e caricalo di nuovo.',
       },
     },
   },
