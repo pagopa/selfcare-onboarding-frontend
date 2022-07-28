@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { Button, Stack, Typography, Grid } from '@mui/material';
 import { AxiosError } from 'axios';
 import SessionModal from '@pagopa/selfcare-common-frontend/components/SessionModal';
@@ -10,7 +10,6 @@ import { buildAssistanceURI } from '@pagopa/selfcare-common-frontend/services/as
 import { RequestOutcome, RequestOutcomeOptions, StepperStep, Problem } from '../../types';
 import { ConfirmRegistrationStep0 } from '../components/ConfirmRegistrationStep0';
 import { ConfirmRegistrationStep1 } from '../components/ConfirmRegistrationStep1';
-import { AlertDialog } from '../components/AlertDialog';
 import { useHistoryState } from '../components/useHistoryState';
 import { fetchWithLogs } from '../lib/api-utils';
 import { getFetchOutcome } from '../lib/error-utils';
@@ -67,9 +66,7 @@ export default function CompleteRegistrationComponent() {
     'complete_registration_step',
     0
   );
-  const [showDialog, setShowDialog] = useState<boolean>(false);
-  const [dialogTitle, setDialogTitle] = useState<string | null>(null);
-  const [dialogDescription, setDialogDescription] = useState<string | null>(null);
+
   const [outcome, setOutcome] = useState<RequestOutcome | null>(!token ? 'error' : null);
   const [errorCode, setErrorCode] = useState<keyof typeof errors>('GENERIC');
 
@@ -96,10 +93,6 @@ export default function CompleteRegistrationComponent() {
   const setUploadedFilesAndWriteHistory = (files: Array<File>) => {
     setUploadedFilesHistory(files);
     setUploadedFiles(files);
-  };
-
-  const handleCloseDialog = (): void => {
-    setShowDialog(false);
   };
 
   const forward = () => {
@@ -196,12 +189,6 @@ export default function CompleteRegistrationComponent() {
       label: t('completeRegistration.steps.step1.label'),
       Component: () =>
         ConfirmRegistrationStep1(
-          {
-            setDialogTitle,
-            setDialogDescription,
-            setShowDialog,
-            handleCloseDialog,
-          },
           { forward: submit },
           { loading },
           { uploadedFiles, setUploadedFiles: setUploadedFilesAndWriteHistory }
@@ -301,18 +288,9 @@ export default function CompleteRegistrationComponent() {
         message={t(`completeRegistration.errors.${errorCode}.message`)}
         onConfirmLabel={t('completeRegistration.sessionModal.onConfirmLabel')}
         onCloseLabel={t('completeRegistration.sessionModal.onCloseLabel')}
-        showCloseIcon={true}
       />
     )
   ) : (
-    <React.Fragment>
-      <Step />
-      <AlertDialog
-        open={showDialog}
-        handleClose={handleCloseDialog}
-        description={dialogDescription}
-        title={dialogTitle}
-      />
-    </React.Fragment>
+    <Step />
   );
 }
