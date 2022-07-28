@@ -357,9 +357,7 @@ const executeClickAdhesionButton = async () => {
   });
   expect(adhesionButton).toBeEnabled();
   fireEvent.click(adhesionButton);
-  await waitFor(() =>
-    expect(mockedHistoryPush).toBeCalledWith('/onboarding/prod-io?partyExternalId=pending')
-  );
+  await waitFor(() => expect(mockedHistoryPush).toBeCalledWith('/onboarding/prod-io'));
 };
 
 const fillUserBillingDataForm = async (
