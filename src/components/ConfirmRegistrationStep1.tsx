@@ -53,7 +53,7 @@ export function ConfirmRegistrationStep1(
           <Trans i18nKey="confirmRegistrationStep1.pageSubtitle">
             Carica l’Accordo di Adesione ricevuto all’indirizzo PEC
             <br />
-            primario dell’ente, firmato digitalmente dal Legale
+            primario dell’ente, firmato digitalmente in p7m dal Legale
             <br />
             Rappresentante.
           </Trans>
