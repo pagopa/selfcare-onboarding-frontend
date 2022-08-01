@@ -21,7 +21,7 @@ export default {
     errorAlertRetryLabel: 'Carica di nuovo',
     errorAlertCloseLabel: 'Esci',
     pageTitle: "Carica l'Accordo di Adesione",
-    pageSubtitle: `Carica l’Accordo di Adesione ricevuto all’indirizzo PEC <1 />primario dell’ente, firmato digitalmente dal Legale <3 />Rappresentante.`,
+    pageSubtitle: `Carica l’Accordo di Adesione ricevuto all’indirizzo PEC <1 />primario dell’ente, firmato digitalmente in p7m dal Legale <3 />Rappresentante.`,
     fileUploaderTitle: 'Trascina qui l’Accordo di Adesione firmato oppure',
     fileUploaderDescriptionLink: 'selezionalo dal tuo computer',
     confirmAction: 'Continua',
