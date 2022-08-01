@@ -49,7 +49,6 @@ function OnboardingComponent({ productId }: { productId: string }) {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>();
   const [billingData, setBillingData] = useState<BillingData>();
   const [institutionType, setInstitutionType] = useState<InstitutionType>();
-  const [partyId, setPartyId] = useState<string>();
   const [origin, setOrigin] = useState<string>('');
   const [pricingPlan, setPricingPlan] = useState<string>();
   const { setOnExit } = useContext(HeaderContext);
@@ -319,14 +318,12 @@ function OnboardingComponent({ productId }: { productId: string }) {
   const forwardWithOnboardingData = (
     _manager: BillingData,
     billingData?: BillingData,
-    institutionType?: InstitutionType,
-    partyId?: string
+    institutionType?: InstitutionType
   ) => {
     if (billingData) {
       setBillingData(billingData);
     }
     setInstitutionType(institutionType);
-    setPartyId(partyId);
     forward();
   };
 
@@ -384,7 +381,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
           forward: forwardWithInstitutionType,
           back: () => {
             if (window.location.search.indexOf(`partyExternalId=${externalInstitutionId}`) > -1) {
-              setOnExitAction(() => window.location.assign(`${ENV.URL_FE.DASHBOARD}/${partyId}`));
+              setOnExitAction(() => () => history.goBack());
               setOpenExitModal(true);
             } else {
               setActiveStep(0);

@@ -1,25 +1,29 @@
 import { Button, Grid, Typography, useTheme } from '@mui/material';
 import { Box } from '@mui/system';
 import { IllusUploadFile } from '@pagopa/mui-italia';
+import SessionModal from '@pagopa/selfcare-common-frontend/components/SessionModal';
+import { useState } from 'react';
 import { useTranslation, Trans } from 'react-i18next';
-import { AlertDialogActions, StepperStepComponentProps } from '../../types';
+import { StepperStepComponentProps } from '../../types';
 import { FileUploader } from './FileUploader';
 
 export function ConfirmRegistrationStep1(
-  { setDialogTitle, setDialogDescription, setShowDialog }: AlertDialogActions,
   { forward }: StepperStepComponentProps,
   { loading }: any,
   { uploadedFiles, setUploadedFiles }: any
 ) {
   const { t } = useTranslation();
+  const [rejectedError, setRejectedError] = useState<boolean>(false);
   const onDropAccepted = (acceptedFiles: Array<File>) => {
     setUploadedFiles(acceptedFiles);
   };
 
+  const handleClose = () => {
+    setRejectedError(false);
+  };
+
   const onDropRejected = () => {
-    setDialogTitle(t('confirmRegistrationStep1.errorAlertTitle'));
-    setDialogDescription(t('confirmRegistrationStep1.errorAlertDescription'));
-    setShowDialog(true);
+    setRejectedError(true);
   };
 
   const onSubmit = (): void => {
@@ -69,6 +73,22 @@ export function ConfirmRegistrationStep1(
           theme={theme}
         />
       </Grid>
+      <SessionModal
+        open={rejectedError}
+        title={t('confirmRegistrationStep1.errorAlertTitle')}
+        message={
+          <Trans i18nKey="confirmRegistrationStep1.errorAlertDescription">
+            {
+              'Il caricamento del documento non è andato a buon fine. Carica un solo file per volta, in formato '
+            }
+            <strong>{'pdf'}</strong> {' o '} <strong>{'p7m.'}</strong>
+          </Trans>
+        }
+        onConfirmLabel={t('confirmRegistrationStep1.errorAlertRetryLabel')}
+        onCloseLabel={t('confirmRegistrationStep1.errorAlertCloseLabel')}
+        onConfirm={handleClose}
+        handleClose={handleClose}
+      />
       <Grid item>
         <Grid container>
           <Button

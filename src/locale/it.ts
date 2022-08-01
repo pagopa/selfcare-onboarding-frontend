@@ -2,7 +2,7 @@ export default {
   alertDialog: {
     title: 'Titolo',
     description: 'Descrizione',
-    confirmLabel: 'Torna alla pagina di caricamento',
+    confirmLabel: 'Carica di nuovo',
     cancelLabel: 'Esci',
   },
   asyncAutocomplete: {
@@ -16,7 +16,10 @@ export default {
   },
   confirmRegistrationStep1: {
     errorAlertTitle: 'Controlla il Documento',
-    errorAlertDescription: "E' possibile caricare un solo file di tipo PDF",
+    errorAlertDescription:
+      'Il caricamento del documento non è andato a buon fine. Carica un solo file per volta, in formato <1>pdf</1> o <5>p7m.<5/>',
+    errorAlertRetryLabel: 'Carica di nuovo',
+    errorAlertCloseLabel: 'Esci',
     pageTitle: "Carica l'Accordo di Adesione",
     pageSubtitle: `Carica l’Accordo di Adesione ricevuto all’indirizzo PEC <1 />primario dell’ente, firmato digitalmente dal Legale <3 />Rappresentante.`,
     fileUploaderTitle: 'Trascina qui l’Accordo di Adesione firmato oppure',
@@ -132,7 +135,7 @@ export default {
     description: `Non siamo riusciti a indirizzarti alla pagina di caricamento<1 />per completare la procedura.`,
     contactAssistanceButton: 'Contatta l’assistenza',
     sessionModal: {
-      onConfirmLabel: 'Torna alla pagina di caricamento',
+      onConfirmLabel: 'Carica di nuovo',
       onCloseLabel: 'Esci',
     },
     steps: {
@@ -169,7 +172,8 @@ export default {
       },
       GENERIC: {
         title: 'Caricamento non riuscito',
-        message: 'Il caricamento del documento non è andato a buon fine.',
+        message:
+          'Il caricamento del documento non è andato a buon fine. Torna indietro e caricalo di nuovo.',
       },
     },
   },
