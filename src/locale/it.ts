@@ -17,7 +17,7 @@ export default {
   confirmRegistrationStep1: {
     errorAlertTitle: 'Controlla il Documento',
     errorAlertDescription:
-      'Il caricamento del documento non è andato a buon fine. Carica un solo file per volta, in formato <1>pdf</1> o <5>p7m.<5/>',
+      'Il caricamento del documento non è andato a buon fine. <1 />Carica un solo file in formato <3>p7m.<3/>',
     errorAlertRetryLabel: 'Carica di nuovo',
     errorAlertCloseLabel: 'Esci',
     pageTitle: "Carica l'Accordo di Adesione",
