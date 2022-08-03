@@ -15,9 +15,9 @@ export default {
     confirmAction: 'Continua',
   },
   confirmRegistrationStep1: {
-    errorAlertTitle: 'Controlla il Documento',
+    errorAlertTitle: 'Caricamento non riuscito',
     errorAlertDescription:
-      'Il caricamento del documento non è andato a buon fine. <1 />Carica un solo file in formato <3>p7m.<3/>',
+      'Il caricamento del documento non è andato a buon fine. <1 />Carica un solo file in formato <3>p7m</3>.',
     errorAlertRetryLabel: 'Carica di nuovo',
     errorAlertCloseLabel: 'Esci',
     pageTitle: "Carica l'Accordo di Adesione",

@@ -81,7 +81,8 @@ export function ConfirmRegistrationStep1(
             {'Il caricamento del documento non è andato a buon fine.'}
             <br />
             {'Carica un solo file in formato '}
-            <strong>{'p7m.'}</strong>
+            <strong>{'p7m'}</strong>
+            {'.'}
           </Trans>
         }
         onConfirmLabel={t('confirmRegistrationStep1.errorAlertRetryLabel')}
