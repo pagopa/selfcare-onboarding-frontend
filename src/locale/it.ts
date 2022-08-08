@@ -15,13 +15,13 @@ export default {
     confirmAction: 'Continua',
   },
   confirmRegistrationStep1: {
-    errorAlertTitle: 'Controlla il Documento',
+    errorAlertTitle: 'Caricamento non riuscito',
     errorAlertDescription:
-      'Il caricamento del documento non è andato a buon fine. Carica un solo file per volta, in formato <1>pdf</1> o <5>p7m.<5/>',
+      'Il caricamento del documento non è andato a buon fine. <1 />Carica un solo file in formato <3>p7m</3>.',
     errorAlertRetryLabel: 'Carica di nuovo',
     errorAlertCloseLabel: 'Esci',
     pageTitle: "Carica l'Accordo di Adesione",
-    pageSubtitle: `Carica l’Accordo di Adesione ricevuto all’indirizzo PEC <1 />primario dell’ente, firmato digitalmente dal Legale <3 />Rappresentante.`,
+    pageSubtitle: `Carica l’Accordo di Adesione ricevuto all’indirizzo PEC <1 />primario dell’ente, firmato digitalmente in p7m dal Legale <3 />Rappresentante.`,
     fileUploaderTitle: 'Trascina qui l’Accordo di Adesione firmato oppure',
     fileUploaderDescriptionLink: 'selezionalo dal tuo computer',
     confirmAction: 'Continua',
