@@ -175,6 +175,11 @@ export default {
         message:
           'Il caricamento del documento non è andato a buon fine. Torna indietro e caricalo di nuovo.',
       },
+      INVALID_SIGN_FORMAT: {
+        title: 'Caricamento non riuscito',
+        message:
+          'Il caricamento del documento non è andato a buon fine. <1 />Carica un solo file in formato <3>p7m</3>.',
+      },
     },
   },
   noProductPage: {
