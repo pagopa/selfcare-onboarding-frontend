@@ -411,10 +411,10 @@ const fillUserForm = async (
   await fillTextFieldAndCheckButton(prefix, 'taxCode', taxCode, confirmButton, true);
   await fillTextFieldAndCheckButton(prefix, 'email', email, confirmButton, true);*/
 
-  expect(document.getElementById('LEGAL-name')).toBeDisabled();
-  expect(document.getElementById('LEGAL-surname')).toBeDisabled();
-  expect(document.getElementById('LEGAL-taxCode')).toBeDisabled();
-  expect(document.getElementById('LEGAL-email')).toBeDisabled();
+  expect(document.getElementById('LEGAL-name')).toBeEnabled();
+  expect(document.getElementById('LEGAL-surname')).toBeEnabled();
+  expect(document.getElementById('LEGAL-taxCode')).toBeEnabled();
+  expect(document.getElementById('LEGAL-email')).toBeEnabled();
 };
 
 const checkCorrectBodyBillingData = (
@@ -467,13 +467,13 @@ const verifySubmit = async () => {
         method: 'POST',
         data: {
           users: [
-            /*{
-              name: 'NAME',
-              surname: 'SURNAME',
+            {
+              name: 'Maria',
+              surname: 'Rosa',
               role: 'MANAGER',
-              taxCode: 'BBBBBB00B00B000B',
-              email: 'b@b.bb',
-            }, not more to be sent */
+              taxCode: 'DDDDDD11A11A123K',
+              email: 'm@ma.it',
+            },
           ],
           billingData: {
             businessName: 'businessNameInput',
