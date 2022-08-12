@@ -93,7 +93,6 @@ const genericError: RequestOutcomeMessage = {
           </Grid>
         </Grid>
       </Grid>
-      ,
     </>,
   ],
 };
