@@ -39,11 +39,16 @@ const errors = {
     title: 'title',
     message: 'message',
   },
+  INVALID_SIGN_FORMAT: {
+    title: 'title',
+    message: 'message',
+  },
 };
 
 const error2errorCode: { [key in keyof typeof errors]: Array<string> } = {
   INVALID_DOCUMENT: ['002-1000', '002-1001'],
-  INVALID_SIGN: ['002-1002', '002-1003', '002-1004', '002-1005', '002-1006', '002-1007'],
+  INVALID_SIGN: ['002-1002', '002-1004', '002-1005', '002-1006', '002-1007'],
+  INVALID_SIGN_FORMAT: ['002-1003', '002-1008'],
   GENERIC: [],
 };
 
@@ -52,6 +57,10 @@ const transcodeErrorCode = (data: Problem): keyof typeof errors => {
     return 'INVALID_DOCUMENT';
   } else if (data.errors?.findIndex((e) => error2errorCode.INVALID_SIGN.includes(e.code)) > -1) {
     return 'INVALID_SIGN';
+  } else if (
+    data.errors?.findIndex((e) => error2errorCode.INVALID_SIGN_FORMAT.includes(e.code)) > -1
+  ) {
+    return 'INVALID_SIGN_FORMAT';
   }
   return 'GENERIC';
 };
@@ -285,7 +294,19 @@ export default function CompleteRegistrationComponent() {
         onConfirm={handleErrorModalConfirm}
         open={true}
         title={t(`completeRegistration.errors.${errorCode}.title`)}
-        message={t(`completeRegistration.errors.${errorCode}.message`)}
+        message={
+          errorCode === 'INVALID_SIGN_FORMAT' ? (
+            <Trans i18nKey={`completeRegistration.errors.INVALID_SIGN_FORMAT.message`}>
+              {'Il caricamento del documento non è andato a buon fine.'}
+              <br />
+              {'Carica un solo file in formato '}
+              <strong>{'p7m'}</strong>
+              {'.'}
+            </Trans>
+          ) : (
+            t(`completeRegistration.errors.${errorCode}.message`)
+          )
+        }
         onConfirmLabel={t('completeRegistration.sessionModal.onConfirmLabel')}
         onCloseLabel={t('completeRegistration.sessionModal.onCloseLabel')}
       />
