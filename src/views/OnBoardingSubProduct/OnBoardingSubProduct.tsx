@@ -50,6 +50,7 @@ function OnBoardingSubProduct() {
   const [origin, setOrigin] = useState<string>('');
 
   const [_manager, setManager] = useState<UserOnCreate>();
+  const [users, setUsers] = useState<Array<UserOnCreate>>([]);
   const [billingData, setBillingData] = useState<BillingData>();
   const [institutionType, setInstitutionType] = useState<InstitutionType>();
   const [partyId, setPartyId] = useState<string>();
@@ -115,6 +116,7 @@ function OnBoardingSubProduct() {
 
   const forwardWithManagerData = (formData: any) => {
     setManager(formData.users[0]);
+    setUsers(formData.users);
     trackEvent('ONBOARDING_LEGALE_RAPPRESENTANTE', {
       party_id: externalInstitutionId,
       request_id: requestIdRef.current,
@@ -266,7 +268,7 @@ function OnBoardingSubProduct() {
       label: 'Insert Manager',
       Component: () =>
         StepAddManager({
-          readOnly: true,
+          readOnly: false,
           product,
           forward: forwardWithManagerData,
           back: () => {
@@ -290,7 +292,7 @@ function OnBoardingSubProduct() {
           product: product as Product,
           subProduct: subProduct as Product,
           externalInstitutionId,
-          users: [], // manager as UserOnCreate not more to be send
+          users,
           billingData: billingData as BillingData,
           institutionType: institutionType as InstitutionType,
           pricingPlan,
