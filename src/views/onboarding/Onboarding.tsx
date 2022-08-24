@@ -78,6 +78,18 @@ function OnboardingComponent({ productId }: { productId: string }) {
     setPricingPlan(new URLSearchParams(window.location.search).get('pricingPlan') ?? undefined);
   }, [productId]);
 
+  useEffect(() => {
+    const customPopstate = () => {
+      setOnExitAction(() => () => history.goBack());
+      setOpenExitModal(true);
+    };
+    if (window.location.search.indexOf(`partyExternalId=${externalInstitutionId}`) > -1) {
+      window.history.pushState(null, '', location.href);
+      window.addEventListener('popstate', customPopstate);
+    }
+    return () => window.removeEventListener('popstate', customPopstate);
+  }, []);
+
   const checkProductId = async () => {
     const onboardingProducts = await fetchWithLogs(
       { endpoint: 'ONBOARDING_VERIFY_PRODUCT', endpointParams: { productId } },
