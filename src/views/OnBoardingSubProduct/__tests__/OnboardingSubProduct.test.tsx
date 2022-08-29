@@ -100,7 +100,7 @@ const stepSelectInstitutionReleatedTitle = 'Seleziona il tuo ente';
 const stepBillingDataTitle = 'Indica i dati del tuo ente';
 const stepAddManagerTitle = 'Indica il Legale Rappresentante';
 const successOnboardingSubProductTitle = 'La tua richiesta è stata inviata con successo';
-const errorOnboardingSubProductTitle = 'Richiesta di adesione premium in errore';
+const errorOnboardingSubProductTitle = 'Qualcosa è andato storto';
 
 test('test already subscribed to premium', async () => {
   renderComponent('prod-io', 'prod-io-premium');
