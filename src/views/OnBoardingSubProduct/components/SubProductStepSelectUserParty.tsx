@@ -47,6 +47,12 @@ export function SubProductStepSelectUserParty({ forward, parties }: Props) {
     }
   }, [selected]);
 
+  useEffect(() => {
+    if (parties.length === 1) {
+      setSelected(parties[0]);
+    }
+  }, []);
+
   return (
     <Grid container direction="column">
       <Grid container item justifyContent="center">
@@ -133,7 +139,7 @@ export function SubProductStepSelectUserParty({ forward, parties }: Props) {
           forward={{
             action: onForwardAction,
             label: t('onBoardingSubProduct.selectUserPartyStep.confirmButton'),
-            disabled: selected === undefined || selected === null,
+            disabled: parties.length > 1 && (selected === undefined || selected === null),
           }}
         />
       </Grid>
