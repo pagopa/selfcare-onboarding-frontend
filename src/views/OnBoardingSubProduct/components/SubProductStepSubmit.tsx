@@ -45,18 +45,17 @@ const errorOutCome = {
           <Grid item xs={5}>
             <Typography variant="h4">
               <Trans i18nKey="onBoardingSubProduct.genericError.title">
-                Richiesta di adesione premium in errore
+                Qualcosa è andato storto
               </Trans>
             </Typography>
           </Grid>
         </Grid>
         <Grid container item justifyContent="center" mb={3} mt={1}>
-          <Grid item xs={5}>
+          <Grid item xs={6}>
             <Typography>
               <Trans i18nKey="onBoardingSubProduct.genericError.message">
-                A causa di un errore del sistema non è possibile completare la procedura.
-                <br />
-                Ti chiediamo di riprovare più tardi.
+                A causa di un errore del sistema non è possibile completare <br />
+                la procedura. Ti chiediamo di riprovare più tardi.
               </Trans>
             </Typography>
           </Grid>

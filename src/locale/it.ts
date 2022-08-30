@@ -239,9 +239,9 @@ export default {
       confirmButton: 'Continua',
     },
     genericError: {
-      title: 'Richiesta di adesione premium in errore',
+      title: 'Qualcosa è andato storto',
       subTitle:
-        'A causa di un errore del sistema non è possibile completare la procedura.<0 /> Ti chiediamo di riprovare più tardi.',
+        'A causa di un errore del sistema non è possibile completare<0 /> la procedura. Ti chiediamo di riprovare più tardi.',
       homeButton: 'Torna alla home',
     },
     successfulAdhesion: {
