@@ -102,23 +102,29 @@ const stepAddManagerTitle = 'Indica il Legale Rappresentante';
 const successOnboardingSubProductTitle = 'La tua richiesta è stata inviata con successo';
 const errorOnboardingSubProductTitle = 'Qualcosa è andato storto';
 
+const agencyOnboarded = 'AGENCY ONBOARDED';
+const agencyInfoError = 'AGENCY INFO ERROR';
+const agencyX = 'AGENCY X';
+const agencyError = 'AGENCY ERROR';
+const agencyPending = 'AGENCY PENDING';
+
 test('test already subscribed to premium', async () => {
   renderComponent('prod-io', 'prod-io-premium');
-  await executeStepSelectInstitutionUnreleated('agency onboarded');
+  await executeStepSelectInstitutionUnreleated(agencyOnboarded);
   await waitFor(() => screen.getByText('Sottoscrizione già avvenuta'));
   await executeClickCloseButton();
 });
 
 test('test not base product adhesion', async () => {
   renderComponent('prod-io', 'prod-io-premium');
-  await executeStepSelectInstitutionUnreleated('agency pending');
+  await executeStepSelectInstitutionUnreleated(agencyPending);
   await waitFor(() => screen.getByText('Errore'));
   await executeClickAdhesionButton();
 });
 
 test('test error retrieving onboarding info', async () => {
   renderComponent('prod-io', 'prod-io-premium');
-  await executeStepSelectInstitutionUnreleated('agency info error');
+  await executeStepSelectInstitutionUnreleated(agencyInfoError);
   await waitFor(() => screen.getByText('Spiacenti, qualcosa è andato storto.'));
   await executeClickCloseButton();
 });
@@ -131,7 +137,7 @@ test('test error subProductID', async () => {
 
 test('test complete', async () => {
   renderComponent('prod-io', 'prod-io-premium');
-  await executeStepSelectInstitutionUnreleated('agency x');
+  await executeStepSelectInstitutionUnreleated(agencyX);
   await executeStepBillingData();
   await executeStepAddManager(true);
   await executeClickCloseButton();
@@ -140,7 +146,7 @@ test('test complete', async () => {
 
 test('test complete with error on submit', async () => {
   renderComponent('prod-io', 'prod-io-premium');
-  await executeStepSelectInstitutionUnreleated('agency error');
+  await executeStepSelectInstitutionUnreleated(agencyError);
   await executeStepBillingData();
   await executeStepAddManager(false);
   await executeClickHomeButton();
@@ -148,7 +154,7 @@ test('test complete with error on submit', async () => {
 
 test('test exiting during flow with unload event', async () => {
   renderComponent('prod-io', 'prod-io-premium');
-  await executeStepSelectInstitutionUnreleated('agency x');
+  await executeStepSelectInstitutionUnreleated(agencyX);
   const event = new Event('beforeunload');
   window.dispatchEvent(event);
   await waitFor(
