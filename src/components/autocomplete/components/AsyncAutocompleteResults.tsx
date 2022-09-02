@@ -44,9 +44,14 @@ export default function AsyncAutocompleteResults({
     <CustomBox my={2} {...options} width="80%" maxHeight="200px" overflow="auto">
       {!isLoading &&
         options.map((option) => (
-          <Box py={1} key={getOptionKey(option)} display="flex">
+          <Box
+            py={1}
+            key={getOptionKey(option)}
+            display="flex"
+            sx={{ textTransform: 'capitalize' }}
+          >
             <PartyAccountItemButton
-              partyName={getOptionLabel(option)}
+              partyName={getOptionLabel(option)?.toLowerCase()}
               image={' '}
               action={() => {
                 setSelected(option);
