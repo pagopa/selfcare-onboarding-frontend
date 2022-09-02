@@ -51,7 +51,7 @@ export default function AsyncAutocompleteResults({
             sx={{ textTransform: 'capitalize' }}
           >
             <PartyAccountItemButton
-              partyName={getOptionLabel(option)?.toLowerCase()}
+              partyName={getOptionLabel(option)}
               image={' '}
               action={() => {
                 setSelected(option);
