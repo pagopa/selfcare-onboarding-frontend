@@ -106,9 +106,11 @@ function OnBoardingSubProduct() {
   };
 
   const forwardWithBillingData = (newBillingData: BillingData) => {
-    trackEvent('ONBOARDING_DATI_FATTURAZIONE', {
-      party_id: externalInstitutionId,
+    trackEvent('ONBOARDING_PREMIUM_BILLING_DATA', {
       request_id: requestIdRef.current,
+      party_id: externalInstitutionId,
+      product_id: productId,
+      subproduct_id: subProductId,
     });
     setBillingData(newBillingData);
     forward();
@@ -117,9 +119,11 @@ function OnBoardingSubProduct() {
   const forwardWithManagerData = (formData: any) => {
     setManager(formData.users[0]);
     setUsers(formData.users);
-    trackEvent('ONBOARDING_LEGALE_RAPPRESENTANTE', {
-      party_id: externalInstitutionId,
+    trackEvent('ONBOARDING_PREMIUM_ADD_MANAGER', {
       request_id: requestIdRef.current,
+      party_id: externalInstitutionId,
+      product_id: productId,
+      subproduct_id: subProductId,
     });
     forward();
   };
@@ -136,11 +140,14 @@ function OnBoardingSubProduct() {
       vatNumber: '',
       recipientCode: party.origin === 'IPA' ? party.originId : '',
     });
-    trackEvent('ONBOARDING_SELEZIONE_ENTE', {
+    const event = isUserParty
+      ? 'ONBOARDING_PREMIUM_ASSOCIATED_PARTY_SELECTION'
+      : 'ONBOARDING_PREMIUM_PARTY_SELECTION';
+    trackEvent(event, {
       party_id: externalInstitutionId,
       request_id: requestIdRef.current,
       product_id: productId,
-      subProduct_id: subProductId,
+      subproduct_id: subProductId,
     });
     // eslint-disable-next-line functional/immutable-data
     chooseFromMyParties.current = isUserParty;
