@@ -11,7 +11,6 @@ import {
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 import { omit, uniqueId } from 'lodash';
 import { useTranslation, Trans } from 'react-i18next';
-import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
 import SessionModal from '@pagopa/selfcare-common-frontend/components/SessionModal';
 import { objectIsEmpty } from '../../../lib/object-utils';
 import { StepperStepComponentProps, UserOnCreate } from '../../../../types';
@@ -102,13 +101,8 @@ export function OnBoardingProductStepDelegates({ product, legal, forward, back }
       (userId) => onUserValidateGenericError(userId, index, peopleErrors),
       () => setRequiredLogin(true),
       () => {},
-      'STEP_ADD_DELEGATE'
-    ).catch((reason) => {
-      trackEvent('STEP_ADD_DELEGATE', {
-        message: `Something gone wrong while validating user having id: ${prefix}`,
-        reason,
-      });
-    });
+      'ONBOARDING_ADD_DELEGATE'
+    ).catch((reason) => reason);
   };
 
   const addDelegateForm = () => {
