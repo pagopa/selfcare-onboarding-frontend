@@ -46,7 +46,7 @@ export default function AsyncAutocompleteResults({
         options.map((option) => (
           <Box py={1} key={getOptionKey(option)} display="flex">
             <PartyAccountItemButton
-              partyName={getOptionLabel(option)?.toLowerCase()}
+              partyName={getOptionLabel(option)}
               image={' '}
               action={() => {
                 setSelected(option);
