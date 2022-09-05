@@ -1,6 +1,5 @@
-import { Typography } from '@mui/material';
 import { Box, styled } from '@mui/system';
-import { ReactComponent as PartyIcon } from '../../../assets/onboarding_party_icon.svg';
+import { PartyAccountItemButton } from '@pagopa/mui-italia/dist/components/PartyAccountItemButton';
 
 const CustomBox = styled(Box)({
   /* width */
@@ -18,7 +17,6 @@ const CustomBox = styled(Box)({
     backgroundClip: 'padding-box',
     borderRadius: '20px',
   },
-
   /* Handle on hover */
   '::-webkit-scrollbar-thumb:hover': {
     background: '#0073E6',
@@ -47,21 +45,15 @@ export default function AsyncAutocompleteResults({
       {!isLoading &&
         options.map((option) => (
           <Box py={1} key={getOptionKey(option)} display="flex">
-            <Box pr={1}>
-              <PartyIcon width={50} />
-            </Box>
-            <Box display="flex" alignItems="center">
-              <Typography
-                onClick={() => {
-                  setSelected(option);
-                  setOptions([]);
-                }}
-                variant="body1"
-                sx={{ fontWeight: '700', cursor: 'pointer', textTransform: 'capitalize' }}
-              >
-                {getOptionLabel(option)?.toLowerCase()}
-              </Typography>
-            </Box>
+            <PartyAccountItemButton
+              partyName={getOptionLabel(option)}
+              image={' '}
+              action={() => {
+                setSelected(option);
+                setOptions([]);
+              }}
+              maxCharactersNumberMultiLine={20}
+            />
           </Box>
         ))}
     </CustomBox>

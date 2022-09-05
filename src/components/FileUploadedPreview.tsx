@@ -83,7 +83,7 @@ export function FileUploadedPreview({
                   <Grid item xs={8}>
                     <Box display="flex" flexDirection="column">
                       <Box>
-                        <Tooltip title={file.name}>
+                        <Tooltip title={file.name} placement="top" arrow={true}>
                           <Typography
                             sx={{
                               color: theme.palette.primary.main,

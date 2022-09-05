@@ -100,25 +100,31 @@ const stepSelectInstitutionReleatedTitle = 'Seleziona il tuo ente';
 const stepBillingDataTitle = 'Indica i dati del tuo ente';
 const stepAddManagerTitle = 'Indica il Legale Rappresentante';
 const successOnboardingSubProductTitle = 'La tua richiesta è stata inviata con successo';
-const errorOnboardingSubProductTitle = 'Richiesta di adesione premium in errore';
+const errorOnboardingSubProductTitle = 'Qualcosa è andato storto';
+
+const agencyOnboarded = 'AGENCY ONBOARDED';
+const agencyInfoError = 'AGENCY INFO ERROR';
+const agencyX = 'AGENCY X';
+const agencyError = 'AGENCY ERROR';
+const agencyPending = 'AGENCY PENDING';
 
 test('test already subscribed to premium', async () => {
   renderComponent('prod-io', 'prod-io-premium');
-  await executeStepSelectInstitutionUnreleated('agency onboarded');
+  await executeStepSelectInstitutionUnreleated(agencyOnboarded);
   await waitFor(() => screen.getByText('Sottoscrizione già avvenuta'));
   await executeClickCloseButton();
 });
 
 test('test not base product adhesion', async () => {
   renderComponent('prod-io', 'prod-io-premium');
-  await executeStepSelectInstitutionUnreleated('agency pending');
+  await executeStepSelectInstitutionUnreleated(agencyPending);
   await waitFor(() => screen.getByText('Errore'));
   await executeClickAdhesionButton();
 });
 
 test('test error retrieving onboarding info', async () => {
   renderComponent('prod-io', 'prod-io-premium');
-  await executeStepSelectInstitutionUnreleated('agency info error');
+  await executeStepSelectInstitutionUnreleated(agencyInfoError);
   await waitFor(() => screen.getByText('Spiacenti, qualcosa è andato storto.'));
   await executeClickCloseButton();
 });
@@ -131,7 +137,7 @@ test('test error subProductID', async () => {
 
 test('test complete', async () => {
   renderComponent('prod-io', 'prod-io-premium');
-  await executeStepSelectInstitutionUnreleated('agency x');
+  await executeStepSelectInstitutionUnreleated(agencyX);
   await executeStepBillingData();
   await executeStepAddManager(true);
   await executeClickCloseButton();
@@ -140,7 +146,7 @@ test('test complete', async () => {
 
 test('test complete with error on submit', async () => {
   renderComponent('prod-io', 'prod-io-premium');
-  await executeStepSelectInstitutionUnreleated('agency error');
+  await executeStepSelectInstitutionUnreleated(agencyError);
   await executeStepBillingData();
   await executeStepAddManager(false);
   await executeClickHomeButton();
@@ -148,7 +154,7 @@ test('test complete with error on submit', async () => {
 
 test('test exiting during flow with unload event', async () => {
   renderComponent('prod-io', 'prod-io-premium');
-  await executeStepSelectInstitutionUnreleated('agency x');
+  await executeStepSelectInstitutionUnreleated(agencyX);
   const event = new Event('beforeunload');
   window.dispatchEvent(event);
   await waitFor(
@@ -411,10 +417,10 @@ const fillUserForm = async (
   await fillTextFieldAndCheckButton(prefix, 'taxCode', taxCode, confirmButton, true);
   await fillTextFieldAndCheckButton(prefix, 'email', email, confirmButton, true);*/
 
-  expect(document.getElementById('LEGAL-name')).toBeDisabled();
-  expect(document.getElementById('LEGAL-surname')).toBeDisabled();
-  expect(document.getElementById('LEGAL-taxCode')).toBeDisabled();
-  expect(document.getElementById('LEGAL-email')).toBeDisabled();
+  expect(document.getElementById('LEGAL-name')).toBeEnabled();
+  expect(document.getElementById('LEGAL-surname')).toBeEnabled();
+  expect(document.getElementById('LEGAL-taxCode')).toBeEnabled();
+  expect(document.getElementById('LEGAL-email')).toBeEnabled();
 };
 
 const checkCorrectBodyBillingData = (
@@ -467,13 +473,13 @@ const verifySubmit = async () => {
         method: 'POST',
         data: {
           users: [
-            /*{
-              name: 'NAME',
-              surname: 'SURNAME',
+            {
+              name: 'Maria',
+              surname: 'Rosa',
               role: 'MANAGER',
-              taxCode: 'BBBBBB00B00B000B',
-              email: 'b@b.bb',
-            }, not more to be sent */
+              taxCode: 'DDDDDD11A11A123K',
+              email: 'm@ma.it',
+            },
           ],
           billingData: {
             businessName: 'businessNameInput',
