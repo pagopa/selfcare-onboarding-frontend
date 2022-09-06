@@ -146,18 +146,18 @@ function SubProductStepSubmit({
     const outcome = getFetchOutcome(postLegalsResponse);
 
     if (outcome === 'success') {
-      trackEvent('ONBOARDING_SEND_SUCCESS', {
-        party_id: externalInstitutionId,
+      trackEvent('ONBOARDING_PREMIUM_SEND_SUCCESS', {
         request_id: requestId,
-        product_id: product.id,
-        subproduct_id: subProduct.id,
+        party_id: externalInstitutionId,
+        product_id: product?.id,
+        subproduct_id: subProduct?.id,
       });
       forward();
     } else {
       const event =
         (postLegalsResponse as AxiosError<Problem>).response?.status === 409
-          ? 'ONBOARDING_SEND_CONFLICT_ERROR_FAILURE'
-          : 'ONBOARDING_SEND_FAILURE';
+          ? 'ONBOARDING_PREMIUM_SEND_CONFLICT_ERROR_FAILURE'
+          : 'ONBOARDING_PREMIUM_SEND_FAILURE';
       trackEvent(event, {
         party_id: externalInstitutionId,
         request_id: requestId,

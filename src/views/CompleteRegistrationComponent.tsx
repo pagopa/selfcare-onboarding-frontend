@@ -112,7 +112,7 @@ export default function CompleteRegistrationComponent() {
 
   const submit = async (file: File) => {
     const requestId = uniqueId('upload-contract-');
-    trackEvent('ONBOARDING_CONTRACT_UPLOAD', { request_id: requestId });
+    trackEvent('ONBOARDING_CONTRACT_UPLOAD', { request_id: requestId, party_id: token });
 
     setLoading(true);
     const formData = new FormData();
