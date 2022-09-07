@@ -1,6 +1,5 @@
 import { Grid, Typography } from '@mui/material';
 import SessionModal from '@pagopa/selfcare-common-frontend/components/SessionModal';
-import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
 import { useContext, useState } from 'react';
 import { useTranslation, Trans } from 'react-i18next';
 import { Product, StepperStepComponentProps, UserOnCreate } from '../../../types';
@@ -43,7 +42,7 @@ export function StepAddManager({ readOnly, product, forward, back, subProduct }:
     setGenericError(true);
   };
 
-  const validateUserData = (user: UserOnCreate, prefix: string) => {
+  const validateUserData = (user: UserOnCreate, prefix: string, subProduct?: string) => {
     userValidate(
       user,
       prefix,
@@ -52,13 +51,8 @@ export function StepAddManager({ readOnly, product, forward, back, subProduct }:
       onUserValidateGenericError,
       () => setRequiredLogin(true),
       setLoading,
-      'STEP_ADD_MANAGER'
-    ).catch((reason) => {
-      trackEvent('STEP_ADD_MANAGER', {
-        message: `Something gone wrong while validating user having id: ${prefix}`,
-        reason,
-      });
-    });
+      subProduct ? 'ONBOARDING_PREMIUM_ADD_MANAGER' : 'ONBOARDING_ADD_MANAGER'
+    ).catch((reason) => reason);
   };
 
   const onForwardAction = () => {

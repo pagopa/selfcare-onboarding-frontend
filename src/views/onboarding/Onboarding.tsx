@@ -125,7 +125,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
       recipientCode: party.origin === 'IPA' ? party.originId : '',
     });
     forwardWithData(newFormData);
-    trackEvent('ONBOARDING_SELEZIONE_ENTE', {
+    trackEvent('ONBOARDING_PARTY_SELECTION', {
       party_id: externalInstitutionId,
       request_id: requestIdRef.current,
       product_id: productId,
@@ -134,9 +134,10 @@ function OnboardingComponent({ productId }: { productId: string }) {
   };
 
   const forwardWithBillingData = (newBillingData: BillingData) => {
-    trackEvent('ONBOARDING_DATI_FATTURAZIONE', {
-      party_id: externalInstitutionId,
+    trackEvent('ONBOARDING_BILLING_DATA', {
       request_id: requestIdRef.current,
+      party_id: externalInstitutionId,
+      product_id: productId,
     });
     setBillingData(newBillingData);
     forward();
@@ -287,8 +288,8 @@ function OnboardingComponent({ productId }: { productId: string }) {
 
     if (outcome === 'success') {
       trackEvent('ONBOARDING_SEND_SUCCESS', {
-        party_id: externalInstitutionId,
         request_id: requestIdRef.current,
+        party_id: externalInstitutionId,
         product_id: productId,
       });
       setOutcome(outcomeContent[outcome]);
@@ -298,14 +299,14 @@ function OnboardingComponent({ productId }: { productId: string }) {
           ? 'ONBOARDING_SEND_CONFLICT_ERROR_FAILURE'
           : 'ONBOARDING_SEND_FAILURE';
       trackEvent(event, {
-        party_id: externalInstitutionId,
         request_id: requestIdRef.current,
+        party_id: externalInstitutionId,
         product_id: productId,
       });
       if ((postLegalsResponse as AxiosError<Problem>).response?.status === 403) {
         trackEvent('ONBOARDING_NOT_ALLOWED_ERROR', {
-          party_id: externalInstitutionId,
           request_id: requestIdRef.current,
+          party_id: externalInstitutionId,
           product_id: productId,
         });
         setOutcome(notAllowedError);
@@ -328,9 +329,10 @@ function OnboardingComponent({ productId }: { productId: string }) {
   };
 
   const forwardWithInstitutionType = (newInstitutionType: InstitutionType) => {
-    trackEvent('ONBOARDING_TIPO_ENTE', {
-      party_id: externalInstitutionId,
+    trackEvent('ONBOARDING_PARTY_TYPE_SELECTION', {
       request_id: requestIdRef.current,
+      party_id: externalInstitutionId,
+      product_id: productId,
     });
     setInstitutionType(newInstitutionType);
     forward();
@@ -416,9 +418,10 @@ function OnboardingComponent({ productId }: { productId: string }) {
         StepAddManager({
           product: selectedProduct,
           forward: (newFormData: Partial<FormData>) => {
-            trackEvent('ONBOARDING_LEGALE_RAPPRESENTANTE', {
-              party_id: externalInstitutionId,
+            trackEvent('ONBOARDING_ADD_MANAGER', {
               request_id: requestIdRef.current,
+              party_id: externalInstitutionId,
+              product_id: productId,
             });
             forwardWithData(newFormData);
           },
@@ -433,15 +436,15 @@ function OnboardingComponent({ productId }: { productId: string }) {
           legal: (formData as any).users[0],
           forward: (newFormData: Partial<FormData>) => {
             setFormData({ ...formData, ...newFormData });
-            trackEvent('ONBOARDING_REFERENTE_AMMINISTRATIVO', {
-              party_id: externalInstitutionId,
+            trackEvent('ONBOARDING_ADD_DELEGATE', {
               request_id: requestIdRef.current,
+              party_id: externalInstitutionId,
               product_id: productId,
             });
             submit((newFormData as any).users).catch(() => {
-              trackEvent('ONBOARDING_REFERENTE_AMMINISTRATIVO', {
-                party_id: externalInstitutionId,
+              trackEvent('ONBOARDING_ADD_DELEGATE', {
                 request_id: requestIdRef.current,
+                party_id: externalInstitutionId,
                 product_id: productId,
               });
             });

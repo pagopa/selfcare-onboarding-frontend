@@ -1,11 +1,13 @@
 import { Button, Grid, Typography } from '@mui/material';
 import { AxiosError } from 'axios';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { resolvePathVariables } from '@pagopa/selfcare-common-frontend/utils/routes-utils';
 import { useTranslation, Trans } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
 import { History } from 'history';
 import { IllusError } from '@pagopa/mui-italia';
+import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
+import { uniqueId } from 'lodash';
 import { RequestOutcomeMessage, StepperStepComponentProps } from '../../../../types';
 import { MessageNoAction } from '../../../components/MessageNoAction';
 import { HeaderContext, UserContext } from '../../../lib/context';
@@ -171,7 +173,15 @@ export function SubProductStepOnBoardingStatus({
   const [outcome, setOutcome] = useState<RequestOutcomeMessage | null>();
   const { setOnExit } = useContext(HeaderContext);
   const { setRequiredLogin } = useContext(UserContext);
+  const requestIdRef = useRef<string>();
   const history = useHistory();
+
+  useEffect(() => {
+    // eslint-disable-next-line functional/immutable-data
+    requestIdRef.current = uniqueId(
+      `onboarding-subproduct-verify-onboarding${externalInstitutionId}-${productId}-`
+    );
+  }, [productId]);
 
   const checkProduct = async (): Promise<boolean> => {
     const onboardingProductStatus = await fetchWithLogs(
@@ -185,6 +195,12 @@ export function SubProductStepOnBoardingStatus({
       ((onboardingProductStatus as AxiosError<any>).response?.status === 404 ||
         (onboardingProductStatus as AxiosError<any>).response?.status === 400)
     ) {
+      trackEvent('ONBOARDING_PREMIUM_WITHOUT_BASE_PRODUCT', {
+        request_id: requestIdRef.current,
+        party_id: externalInstitutionId,
+        product_id: productId,
+        subproduct_id: subProductId,
+      });
       setOutcome(buildNotBasicProduct(productTitle, productId, externalInstitutionId, history));
       return false;
     } else {
@@ -203,6 +219,12 @@ export function SubProductStepOnBoardingStatus({
     );
     const restOutcomeSubProduct = getFetchOutcome(onboardingSubProductStatus);
     if (restOutcomeSubProduct === 'success') {
+      trackEvent('ONBOARDING_PREMIUM_ALREADY_SUBSCRIBED', {
+        request_id: requestIdRef.current,
+        party_id: externalInstitutionId,
+        product_id: productId,
+        subproduct_id: subProductId,
+      });
       setOutcome(alreadyOnboardedSubProduct);
       return false;
     } else {

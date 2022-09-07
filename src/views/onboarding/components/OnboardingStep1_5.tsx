@@ -1,8 +1,10 @@
 import { Button, Grid, Typography } from '@mui/material';
 import { AxiosError } from 'axios';
-import { useEffect, useState, useContext } from 'react';
+import { useEffect, useState, useContext, useRef } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { IllusError } from '@pagopa/mui-italia';
+import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
+import { uniqueId } from 'lodash';
 import {
   Party,
   Product,
@@ -109,6 +111,7 @@ export function OnboardingStep1_5({
   const [outcome, setOutcome] = useState<RequestOutcomeMessage | null>();
   const { setOnExit } = useContext(HeaderContext);
   const { setRequiredLogin } = useContext(UserContext);
+  const requestIdRef = useRef<string>();
   const { t } = useTranslation();
 
   const notAllowedError: RequestOutcomeMessage = {
@@ -151,6 +154,13 @@ export function OnboardingStep1_5({
     ],
   };
 
+  useEffect(() => {
+    // eslint-disable-next-line functional/immutable-data
+    requestIdRef.current = uniqueId(
+      `onboarding-verify-onboarding${externalInstitutionId}-${productId}-`
+    );
+  }, [productId]);
+
   const submit = async () => {
     setLoading(true);
 
@@ -165,6 +175,11 @@ export function OnboardingStep1_5({
     // Check the outcome
     const restOutcome = getFetchOutcome(onboardingStatus);
     if (restOutcome === 'success') {
+      trackEvent('ONBOARDING_PRODUCT_ALREADY_SUBSCRIBED', {
+        request_id: requestIdRef.current,
+        party_id: selectedParty?.externalId,
+        product_id: selectedProduct?.id,
+      });
       setOutcome(alreadyOnboarded);
     } else {
       if (
@@ -174,6 +189,11 @@ export function OnboardingStep1_5({
         setOutcome(null);
         onForwardAction();
       } else if ((onboardingStatus as AxiosError<any>).response?.status === 403) {
+        trackEvent('ONBOARDING_NOT_ALLOWED_ERROR', {
+          request_id: requestIdRef.current,
+          party_id: externalInstitutionId,
+          product_id: productId,
+        });
         setOutcome(notAllowedError);
       } else {
         setOutcome(genericError);
