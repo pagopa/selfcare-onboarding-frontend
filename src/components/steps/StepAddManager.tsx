@@ -1,7 +1,9 @@
 import { Grid, Typography } from '@mui/material';
 import SessionModal from '@pagopa/selfcare-common-frontend/components/SessionModal';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useTranslation, Trans } from 'react-i18next';
+import { verifyNameMatchWithTaxCode } from '@pagopa/selfcare-common-frontend/utils/verifyNameMatchWithTaxCode';
+import { verifySurnameMatchWithTaxCode } from '@pagopa/selfcare-common-frontend/utils/verifySurnameMatchWithTaxCode';
 import { Product, StepperStepComponentProps, UserOnCreate } from '../../../types';
 import { UserContext } from '../../lib/context';
 import { objectIsEmpty } from '../../lib/object-utils';
@@ -54,6 +56,11 @@ export function StepAddManager({ readOnly, product, forward, back, subProduct }:
       subProduct ? 'ONBOARDING_PREMIUM_ADD_MANAGER' : 'ONBOARDING_ADD_MANAGER'
     ).catch((reason) => reason);
   };
+
+  useEffect(() => {
+    verifyNameMatchWithTaxCode(people.LEGAL?.name, people.LEGAL?.taxCode);
+    verifySurnameMatchWithTaxCode(people.LEGAL?.surname, people.LEGAL?.taxCode);
+  }, [people?.LEGAL]);
 
   const onForwardAction = () => {
     savePageState();

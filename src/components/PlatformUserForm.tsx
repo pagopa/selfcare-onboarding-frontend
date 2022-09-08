@@ -78,7 +78,8 @@ const fields: Array<Field> = [
 type ValidationErrorCode =
   | `${keyof UserOnCreate}-regexp`
   | `${keyof UserOnCreate}-unique`
-  | `${keyof UserOnCreate}-conflict`;
+  | `${keyof UserOnCreate}-conflict`
+  | `${keyof UserOnCreate}-mismatch`;
 
 function stringEquals(str1?: string, str2?: string, caseSensitive?: boolean) {
   return (
@@ -175,7 +176,7 @@ export function PlatformUserForm({
         ? transcodeFormErrorKey(field, regexpMessageKey, t)
         : error.indexOf('unique') > -1
         ? transcodeFormErrorKey(field, uniqueMessageKey, t)
-        : error.indexOf('conflict') > -1
+        : error.indexOf('conflict' || 'mismatch') > -1
         ? transcodeFormErrorKey(field, conflictMessageKey, t)
         : t('platformUserForm.helperText')
       : hasDescription
