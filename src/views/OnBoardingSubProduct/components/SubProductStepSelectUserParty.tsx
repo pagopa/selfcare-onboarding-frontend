@@ -88,6 +88,7 @@ export function SubProductStepSelectUserParty({ forward, parties }: Props) {
                     height: '80px',
                     display: 'flex',
                     textAlign: 'initial',
+                    pointerEvents: parties.length !== 1 ? 'auto' : 'none',
                   }}
                 >
                   <PartyAccountItemButton
@@ -96,7 +97,7 @@ export function SubProductStepSelectUserParty({ forward, parties }: Props) {
                     partyRole={p.userRole ? t(roleLabels[p?.userRole].longLabelKey) : ''}
                     image={p.urlLogo}
                     action={() => setSelected(p)}
-                    selectedItem={selected?.id === p.id}
+                    selectedItem={parties.length !== 1 ? selected?.id === p.id : false}
                     maxCharactersNumberMultiLine={20}
                   />
                 </Grid>
