@@ -2,6 +2,8 @@ import { Grid, Paper, TextField, styled } from '@mui/material';
 import { theme } from '@pagopa/mui-italia';
 import React from 'react';
 import { useTranslation, TFunction } from 'react-i18next';
+import { verifyNameMatchWithTaxCode } from '@pagopa/selfcare-common-frontend/utils/verifyNameMatchWithTaxCode';
+import { verifySurnameMatchWithTaxCode } from '@pagopa/selfcare-common-frontend/utils/verifySurnameMatchWithTaxCode';
 import { UserOnCreate, PartyRole } from '../../types';
 import { UsersError, UsersObject } from './steps/StepAddManager';
 
@@ -78,8 +80,7 @@ const fields: Array<Field> = [
 type ValidationErrorCode =
   | `${keyof UserOnCreate}-regexp`
   | `${keyof UserOnCreate}-unique`
-  | `${keyof UserOnCreate}-conflict`
-  | `${keyof UserOnCreate}-mismatch`;
+  | `${keyof UserOnCreate}-conflict`;
 
 function stringEquals(str1?: string, str2?: string, caseSensitive?: boolean) {
   return (
@@ -99,6 +100,7 @@ export function validateUser(
   );
 }
 
+// eslint-disable-next-line sonarjs/cognitive-complexity
 function validateNoMandatory(
   userTempId: keyof UsersObject,
   user: UserOnCreate,
@@ -116,6 +118,11 @@ function validateNoMandatory(
         ? `${id}-regexp`
         : unique && usersArray.findIndex((u) => stringEquals(u[id], user[id], caseSensitive)) > -1
         ? `${id}-unique`
+        : user[id] === user.surname &&
+          verifySurnameMatchWithTaxCode(user[id] as string, user.taxCode)
+        ? `${id}-conflict`
+        : user[id] === user.name && verifyNameMatchWithTaxCode(user[id] as string, user.taxCode)
+        ? `${id}-conflict`
         : undefined
     )
     .filter((x) => x)
@@ -176,7 +183,7 @@ export function PlatformUserForm({
         ? transcodeFormErrorKey(field, regexpMessageKey, t)
         : error.indexOf('unique') > -1
         ? transcodeFormErrorKey(field, uniqueMessageKey, t)
-        : error.indexOf('conflict' || 'mismatch') > -1
+        : error.indexOf('conflict') > -1
         ? transcodeFormErrorKey(field, conflictMessageKey, t)
         : t('platformUserForm.helperText')
       : hasDescription
