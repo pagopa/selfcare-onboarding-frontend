@@ -297,7 +297,7 @@ const executeStep2 = async () => {
 
   await checkCertifiedUserValidation('LEGAL', confirmButton);
 
-  await fillUserForm(confirmButton, 'LEGAL', 'bbBBBB00B00B000B', 'b@b.BB', true);
+  await fillUserForm(confirmButton, 'LEGAL', 'SRNNMA00B00B000B', 'b@b.BB', true);
 
   fireEvent.click(confirmButton);
 
@@ -322,10 +322,10 @@ const executeStep3 = async (expectedSuccessfulSubmit: boolean) => {
   await fillUserForm(
     confirmButton,
     'delegate-initial',
-    'CCCCcc00C00C000C',
+    'SRNNMA00C00C000C',
     'a@a.AA',
     true,
-    'BBBBBB00B00B000B',
+    'SRNNMA00B00B000B',
     1,
     'b@b.bb',
     1
@@ -341,7 +341,7 @@ const executeStep3 = async (expectedSuccessfulSubmit: boolean) => {
 };
 
 const checkCertifiedUserValidation = async (prefix: string, confirmButton: HTMLElement) => {
-  await fillUserForm(confirmButton, prefix, 'ZZZZZZ00A00Z000Z', 'b@c.BB', false);
+  await fillUserForm(confirmButton, prefix, 'SRNNMA00A00Z000Z', 'b@c.BB', false);
   fireEvent.click(confirmButton);
   await waitFor(() => screen.getByText('Nome non corretto o diverso dal Codice Fiscale'));
   screen.getByText('Cognome non corretto o diverso dal Codice Fiscale');
@@ -479,7 +479,7 @@ const checkLoggedUserAsAdminCheckbox = async (
     addDelegateButton,
     'loggedName',
     'loggedSurname',
-    'AAAAAA00A00A000A'
+    'LGGLGD00A00A000A'
   );
 
   await fillTextFieldAndCheckButton('delegate-initial', 'email', 'a@a.aa', confirmButton, true);
@@ -610,7 +610,7 @@ const fillAdditionalUserAndCheckUniqueValues = async (
 
   await checkCertifiedUserValidation(prefix, confirmButton);
 
-  const taxCode = `ZZZZZZ0${index}A00A000A`;
+  const taxCode = `SRNNMA0${index}A00A000A`;
   const email = `${index}@z.zz`;
   await fillUserForm(
     confirmButton,
@@ -618,7 +618,7 @@ const fillAdditionalUserAndCheckUniqueValues = async (
     taxCode,
     email,
     true,
-    'BBBBBB00B00B000B',
+    'SRNNMA00B00B000B',
     1,
     'b@b.bb',
     1
@@ -626,7 +626,7 @@ const fillAdditionalUserAndCheckUniqueValues = async (
   await checkAlreadyExistentValues(
     prefix,
     confirmButton,
-    'CCCCCC00C00C000C',
+    'SRNNMA00C00C000C',
     taxCode,
     2,
     'a@a.aa',
@@ -637,7 +637,7 @@ const fillAdditionalUserAndCheckUniqueValues = async (
     await checkAlreadyExistentValues(
       prefix,
       confirmButton,
-      `ZZZZZZ0${j}A00A000A`,
+      `SRNNMA0${j}A00A000A`,
       taxCode,
       2,
       `${j}@z.zz`,
@@ -675,28 +675,28 @@ const verifySubmit = async () => {
               name: 'NAME',
               role: 'MANAGER',
               surname: 'SURNAME',
-              taxCode: 'BBBBBB00B00B000B',
+              taxCode: 'SRNNMA00B00B000B',
             },
             {
               email: 'a@a.aa',
               name: 'NAME',
               role: 'DELEGATE',
               surname: 'SURNAME',
-              taxCode: 'CCCCCC00C00C000C',
+              taxCode: 'SRNNMA00C00C000C',
             },
             {
               email: '0@z.zz',
               name: 'NAME',
               role: 'DELEGATE',
               surname: 'SURNAME',
-              taxCode: 'ZZZZZZ00A00A000A',
+              taxCode: 'SRNNMA00A00A000A',
             },
             {
               email: '1@z.zz',
               name: 'NAME',
               role: 'DELEGATE',
               surname: 'SURNAME',
-              taxCode: 'ZZZZZZ01A00A000A',
+              taxCode: 'SRNNMA01A00A000A',
             },
           ],
         },

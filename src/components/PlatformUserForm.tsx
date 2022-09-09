@@ -111,17 +111,15 @@ function validateNoMandatory(
         .filter((u) => u[0] !== userTempId)
         .map((u) => u[1])
     : [];
-
   return fields
     .map(({ id, regexp, unique, caseSensitive }) =>
       regexp && user[id] && !regexp.test(user[id] as string)
         ? `${id}-regexp`
         : unique && usersArray.findIndex((u) => stringEquals(u[id], user[id], caseSensitive)) > -1
         ? `${id}-unique`
-        : user[id] === user.surname &&
-          verifySurnameMatchWithTaxCode(user[id] as string, user.taxCode)
+        : verifySurnameMatchWithTaxCode(user[id] as string, user.taxCode)
         ? `${id}-conflict`
-        : user[id] === user.name && verifyNameMatchWithTaxCode(user[id] as string, user.taxCode)
+        : verifyNameMatchWithTaxCode(user[id] as string, user.taxCode)
         ? `${id}-conflict`
         : undefined
     )
