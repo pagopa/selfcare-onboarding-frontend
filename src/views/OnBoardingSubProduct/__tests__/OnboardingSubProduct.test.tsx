@@ -405,7 +405,7 @@ const fillUserForm = async (
     expect((document.getElementById('LEGAL-email') as HTMLInputElement).value).toBe('m@ma.it')
   );
   expect((document.getElementById('LEGAL-taxCode') as HTMLInputElement).value).toBe(
-    'DDDDDD11A11A123K'
+    'RSOMRA11A11A123K'
   );
   expect((document.getElementById('LEGAL-name') as HTMLInputElement).value).toBe('Maria');
   expect((document.getElementById('LEGAL-surname') as HTMLInputElement).value).toBe('Rosa');
@@ -477,7 +477,7 @@ const verifySubmit = async () => {
               name: 'Maria',
               surname: 'Rosa',
               role: 'MANAGER',
-              taxCode: 'DDDDDD11A11A123K',
+              taxCode: 'RSOMRA11A11A123K',
               email: 'm@ma.it',
             },
           ],

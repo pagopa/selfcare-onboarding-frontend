@@ -2,6 +2,8 @@ import { Grid, Paper, TextField, styled } from '@mui/material';
 import { theme } from '@pagopa/mui-italia';
 import React from 'react';
 import { useTranslation, TFunction } from 'react-i18next';
+import { verifyNameMatchWithTaxCode } from '@pagopa/selfcare-common-frontend/utils/verifyNameMatchWithTaxCode';
+import { verifySurnameMatchWithTaxCode } from '@pagopa/selfcare-common-frontend/utils/verifySurnameMatchWithTaxCode';
 import { UserOnCreate, PartyRole } from '../../types';
 import { UsersError, UsersObject } from './steps/StepAddManager';
 
@@ -98,6 +100,7 @@ export function validateUser(
   );
 }
 
+// eslint-disable-next-line sonarjs/cognitive-complexity
 function validateNoMandatory(
   userTempId: keyof UsersObject,
   user: UserOnCreate,
@@ -108,13 +111,16 @@ function validateNoMandatory(
         .filter((u) => u[0] !== userTempId)
         .map((u) => u[1])
     : [];
-
   return fields
     .map(({ id, regexp, unique, caseSensitive }) =>
       regexp && user[id] && !regexp.test(user[id] as string)
         ? `${id}-regexp`
         : unique && usersArray.findIndex((u) => stringEquals(u[id], user[id], caseSensitive)) > -1
         ? `${id}-unique`
+        : id === 'name' && verifyNameMatchWithTaxCode(user.name, user.taxCode)
+        ? `${id}-conflict`
+        : id === 'surname' && verifySurnameMatchWithTaxCode(user.surname, user.taxCode)
+        ? `${id}-conflict`
         : undefined
     )
     .filter((x) => x)
