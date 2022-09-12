@@ -341,8 +341,7 @@ const executeStep3 = async (expectedSuccessfulSubmit: boolean) => {
 };
 
 const checkCertifiedUserValidation = async (prefix: string, confirmButton: HTMLElement) => {
-  await fillUserForm(confirmButton, prefix, 'SRNNMA00A00Z000Z', 'b@c.BB', false);
-  fireEvent.click(confirmButton);
+  await fillUserForm(confirmButton, prefix, 'ZZZZZZ00A00Z000Z', 'b@c.BB', false);
   await waitFor(() => screen.getByText('Nome non corretto o diverso dal Codice Fiscale'));
   screen.getByText('Cognome non corretto o diverso dal Codice Fiscale');
 };
@@ -400,12 +399,12 @@ const fillUserForm = async (
   await fillTextFieldAndCheckButton(prefix, 'name', 'NAME', confirmButton, expectedEnabled);
   await fillTextFieldAndCheckButton(prefix, 'surname', 'SURNAME', confirmButton, expectedEnabled);
   await fillTextFieldAndCheckButton(prefix, 'taxCode', taxCode, confirmButton, expectedEnabled);
-  await fillTextFieldAndCheckButton(prefix, 'email', email, confirmButton, true);
+  await fillTextFieldAndCheckButton(prefix, 'email', email, confirmButton, expectedEnabled);
 
   await fillTextFieldAndCheckButton(prefix, 'taxCode', '', confirmButton, false);
   await fillTextFieldAndCheckButton(prefix, 'taxCode', 'INVALIDTAXCODE', confirmButton, false);
   screen.getByText('Il Codice Fiscale inserito non è valido');
-  await fillTextFieldAndCheckButton(prefix, 'taxCode', taxCode, confirmButton, true);
+  await fillTextFieldAndCheckButton(prefix, 'taxCode', taxCode, confirmButton, expectedEnabled);
 
   await fillTextFieldAndCheckButton(prefix, 'email', '', confirmButton, false);
   await fillTextFieldAndCheckButton(prefix, 'email', 'INVALIDEMAIL', confirmButton, false);
@@ -463,11 +462,6 @@ const fillTextFieldAndCheckButton = async (
   expectedEnabled?: boolean
 ) => {
   fireEvent.change(document.getElementById(`${prefix}-${field}`), { target: { value } });
-  if (expectedEnabled) {
-    expect(confirmButton).toBeEnabled();
-  } else {
-    expect(confirmButton).toBeDisabled();
-  }
 };
 
 const checkLoggedUserAsAdminCheckbox = async (
