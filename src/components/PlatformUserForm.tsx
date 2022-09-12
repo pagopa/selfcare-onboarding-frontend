@@ -117,9 +117,9 @@ function validateNoMandatory(
         ? `${id}-regexp`
         : unique && usersArray.findIndex((u) => stringEquals(u[id], user[id], caseSensitive)) > -1
         ? `${id}-unique`
-        : verifySurnameMatchWithTaxCode(user[id] as string, user.taxCode)
+        : id === 'name' && verifyNameMatchWithTaxCode(user.name, user.taxCode)
         ? `${id}-conflict`
-        : verifyNameMatchWithTaxCode(user[id] as string, user.taxCode)
+        : id === 'surname' && verifySurnameMatchWithTaxCode(user.surname, user.taxCode)
         ? `${id}-conflict`
         : undefined
     )
