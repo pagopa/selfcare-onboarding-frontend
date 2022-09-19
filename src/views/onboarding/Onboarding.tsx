@@ -340,6 +340,22 @@ function OnboardingComponent({ productId }: { productId: string }) {
 
   const steps: Array<StepperStep> = [
     {
+      label: 'Seleziona il tipo di ente',
+      Component: () =>
+        StepInstitutionType({
+          institutionType: institutionType as InstitutionType,
+          forward: forwardWithInstitutionType,
+          back: () => {
+            if (window.location.search.indexOf(`partyExternalId=${externalInstitutionId}`) > -1) {
+              setOnExitAction(() => () => history.goBack());
+              setOpenExitModal(true);
+            } else {
+              setActiveStep(0);
+            }
+          },
+        }),
+    },
+    {
       label: "Seleziona l'ente",
       Component: () =>
         StepSearchParty({
@@ -373,22 +389,6 @@ function OnboardingComponent({ productId }: { productId: string }) {
           externalInstitutionId,
           productId,
           forward: forwardWithOnboardingData,
-        }),
-    },
-    {
-      label: 'Seleziona il tipo di ente',
-      Component: () =>
-        StepInstitutionType({
-          institutionType: institutionType as InstitutionType,
-          forward: forwardWithInstitutionType,
-          back: () => {
-            if (window.location.search.indexOf(`partyExternalId=${externalInstitutionId}`) > -1) {
-              setOnExitAction(() => () => history.goBack());
-              setOpenExitModal(true);
-            } else {
-              setActiveStep(0);
-            }
-          },
         }),
     },
     {
