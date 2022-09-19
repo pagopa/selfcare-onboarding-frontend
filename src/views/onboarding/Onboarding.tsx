@@ -368,6 +368,9 @@ function OnboardingComponent({ productId }: { productId: string }) {
           ),
           product: selectedProduct,
           forward: forwardWithDataAndInstitution,
+          back: () => {
+            setActiveStep(0);
+          },
         }),
     },
     {

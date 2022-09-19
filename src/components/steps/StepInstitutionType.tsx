@@ -37,11 +37,6 @@ export default function StepInstitutionType({ back, forward, institutionType }: 
     forward(selectedValue);
   };
 
-  const onBackAction = () => {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    back!();
-  };
-
   return (
     <Grid container display="flex" justifyContent="center" alignItems="center">
       <Grid item xs={12} display="flex" justifyContent="center">
@@ -94,11 +89,15 @@ export default function StepInstitutionType({ back, forward, institutionType }: 
       </Paper>
       <Grid item xs={12} mt={4}>
         <OnboardingStepActions
-          back={{
-            action: onBackAction,
-            label: t('stepInstitutionType.backLabel'),
-            disabled: false,
-          }}
+          back={
+            back
+              ? {
+                  action: back,
+                  label: t('onboardingStep1.onboarding.onboardingStepActions.backAction'),
+                  disabled: false,
+                }
+              : undefined
+          }
           forward={{
             action: onForwardAction,
             label: t('stepInstitutionType.confirmLabel'),
