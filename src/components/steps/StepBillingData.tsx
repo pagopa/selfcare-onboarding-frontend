@@ -289,6 +289,7 @@ export default function StepBillingData({
               <Grid item xs={12}>
                 <Typography>
                   <Checkbox
+                    id="billingdata"
                     checked={stepHistoryState.isTaxCodeNotEquals2PIVA}
                     onChange={() =>
                       setStepHistoryState({

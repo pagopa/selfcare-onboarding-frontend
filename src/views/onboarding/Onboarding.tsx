@@ -337,6 +337,8 @@ function OnboardingComponent({ productId }: { productId: string }) {
     setInstitutionType(newInstitutionType);
     forward();
   };
+  const fromDashboard =
+    window.location.search.indexOf(`partyExternalId=${externalInstitutionId}`) > -1;
 
   const steps: Array<StepperStep> = [
     {
@@ -344,14 +346,11 @@ function OnboardingComponent({ productId }: { productId: string }) {
       Component: () =>
         StepInstitutionType({
           institutionType: institutionType as InstitutionType,
+          fromDashboard,
           forward: forwardWithInstitutionType,
           back: () => {
-            if (window.location.search.indexOf(`partyExternalId=${externalInstitutionId}`) > -1) {
-              setOnExitAction(() => () => history.goBack());
-              setOpenExitModal(true);
-            } else {
-              setActiveStep(0);
-            }
+            setOnExitAction(() => () => history.goBack());
+            setOpenExitModal(true);
           },
         }),
     },
@@ -412,7 +411,9 @@ function OnboardingComponent({ productId }: { productId: string }) {
           institutionType: institutionType as InstitutionType,
           subtitle: t('onBoardingSubProduct.billingData.subTitle'),
           forward: forwardWithBillingData,
-          back,
+          back: () => {
+            setActiveStep(1);
+          },
         }),
     },
     {

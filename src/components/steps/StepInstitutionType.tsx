@@ -15,6 +15,7 @@ import { OnboardingStepActions } from '../OnboardingStepActions';
 
 type Props = StepperStepComponentProps & {
   institutionType: InstitutionType;
+  fromDashboard: boolean;
 };
 
 const institutionTypeValues: Array<{ labelKey: string; value: InstitutionType }> = [
@@ -24,7 +25,12 @@ const institutionTypeValues: Array<{ labelKey: string; value: InstitutionType }>
   { labelKey: 'pt', value: 'PT' },
 ];
 
-export default function StepInstitutionType({ back, forward, institutionType }: Props) {
+export default function StepInstitutionType({
+  back,
+  forward,
+  institutionType,
+  fromDashboard,
+}: Props) {
   const [selectedValue, setSelectedValue] = React.useState<InstitutionType>(institutionType);
 
   const { t } = useTranslation();
@@ -90,7 +96,7 @@ export default function StepInstitutionType({ back, forward, institutionType }: 
       <Grid item xs={12} mt={4}>
         <OnboardingStepActions
           back={
-            back
+            fromDashboard
               ? {
                   action: back,
                   label: t('onboardingStep1.onboarding.onboardingStepActions.backAction'),
