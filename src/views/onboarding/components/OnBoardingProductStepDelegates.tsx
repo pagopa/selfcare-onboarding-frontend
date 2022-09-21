@@ -26,9 +26,16 @@ export type UsersError = { [key: string]: { [userField: string]: Array<string> }
 
 type Props = StepperStepComponentProps & {
   legal: UserOnCreate;
+  externalInstitutionId: string;
 };
 
-export function OnBoardingProductStepDelegates({ product, legal, forward, back }: Props) {
+export function OnBoardingProductStepDelegates({
+  externalInstitutionId,
+  product,
+  legal,
+  forward,
+  back,
+}: Props) {
   const { user, setRequiredLogin } = useContext(UserContext);
   const [_loading, setLoading] = useState(true);
   const [peopleErrors, setPeopleErrors] = useState<UsersError>({});
@@ -62,7 +69,7 @@ export function OnBoardingProductStepDelegates({ product, legal, forward, back }
       setLoading(false);
     }
     const userId = userIds[index];
-    validateUserData(people[userId], userId, index, peopleErrors);
+    validateUserData(people[userId], externalInstitutionId, userId, index, peopleErrors);
   };
 
   const onUserValidateSuccess = (_userId: string, index: number, peopleErrors: UsersError) => {
@@ -89,11 +96,13 @@ export function OnBoardingProductStepDelegates({ product, legal, forward, back }
 
   const validateUserData = (
     user: UserOnCreate,
+    externalInstitutionId: string,
     prefix: string,
     index: number,
     peopleErrors: UsersError
   ) => {
     userValidate(
+      externalInstitutionId,
       user,
       prefix,
       (userId) => onUserValidateSuccess(userId, index, peopleErrors),
