@@ -412,7 +412,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
           subtitle: t('onBoardingSubProduct.billingData.subTitle'),
           forward: forwardWithBillingData,
           back: () => {
-            setActiveStep(1);
+            setActiveStep(fromDashboard ? 0 : 1);
           },
         }),
     },
