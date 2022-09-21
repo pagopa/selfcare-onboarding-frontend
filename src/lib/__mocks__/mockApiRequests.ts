@@ -413,7 +413,7 @@ export async function mockFetch(
         (data as any)?.name !== 'CERTIFIED_NAME',
         (data as any)?.surname !== 'CERTIFIED_SURNAME'
       );
-    } else if ((data as any)?.taxCode === 'CRTCTF92B12C124K') {
+    } else if ((data as any)?.taxCode === 'CRTCTF93B12C124K') {
       return genericError;
     } else {
       return new Promise((resolve) =>

@@ -51,7 +51,7 @@ export async function userValidate(
     );
   } else {
     trackEvent(`${eventName}_GENERIC_ERROR`, {
-      party_role: userId,
+      party_id: partyId,
     });
     onGenericError(userId);
   }
