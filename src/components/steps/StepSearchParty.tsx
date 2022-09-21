@@ -60,7 +60,10 @@ export function StepSearchParty({ subTitle, forward, back, institutionType }: Pr
 
   const { t } = useTranslation();
   const bodyTitle = t('onboardingStep1.onboarding.bodyTitle');
-
+  const onBackAction = () => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    back!();
+  };
   useEffect(() => {
     if (partyExternalIdByQuery) {
       handleSearchExternalId(partyExternalIdByQuery, () => setRequiredLogin(true))
@@ -170,15 +173,11 @@ export function StepSearchParty({ subTitle, forward, back, institutionType }: Pr
 
       <Grid item mt={4}>
         <OnboardingStepActions
-          back={
-            back
-              ? {
-                  action: back,
-                  label: t('onboardingStep1.onboarding.onboardingStepActions.backAction'),
-                  disabled: false,
-                }
-              : undefined
-          }
+          back={{
+            action: onBackAction,
+            label: t('stepInstitutionType.backLabel'),
+            disabled: false,
+          }}
           forward={{
             action: onForwardAction,
             label: t('onboardingStep1.onboarding.onboardingStepActions.confirmAction'),

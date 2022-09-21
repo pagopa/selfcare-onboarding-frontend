@@ -15,6 +15,7 @@ import { OnboardingStepActions } from '../OnboardingStepActions';
 
 type Props = StepperStepComponentProps & {
   institutionType: InstitutionType;
+  fromDashboard: boolean;
 };
 
 const institutionTypeValues: Array<{ labelKey: string; value: InstitutionType }> = [
@@ -24,7 +25,12 @@ const institutionTypeValues: Array<{ labelKey: string; value: InstitutionType }>
   { labelKey: 'pt', value: 'PT' },
 ];
 
-export default function StepInstitutionType({ back, forward, institutionType }: Props) {
+export default function StepInstitutionType({
+  back,
+  forward,
+  institutionType,
+  fromDashboard,
+}: Props) {
   const [selectedValue, setSelectedValue] = React.useState<InstitutionType>(institutionType);
 
   const { t } = useTranslation();
@@ -35,11 +41,6 @@ export default function StepInstitutionType({ back, forward, institutionType }: 
 
   const onForwardAction = () => {
     forward(selectedValue);
-  };
-
-  const onBackAction = () => {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    back!();
   };
 
   return (
@@ -94,11 +95,15 @@ export default function StepInstitutionType({ back, forward, institutionType }: 
       </Paper>
       <Grid item xs={12} mt={4}>
         <OnboardingStepActions
-          back={{
-            action: onBackAction,
-            label: t('stepInstitutionType.backLabel'),
-            disabled: false,
-          }}
+          back={
+            fromDashboard
+              ? {
+                  action: back,
+                  label: t('onboardingStep1.onboarding.onboardingStepActions.backAction'),
+                  disabled: false,
+                }
+              : undefined
+          }
           forward={{
             action: onForwardAction,
             label: t('stepInstitutionType.confirmLabel'),
