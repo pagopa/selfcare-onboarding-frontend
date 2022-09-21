@@ -4,7 +4,7 @@ import { useContext, useEffect, useState } from 'react';
 import { AxiosResponse } from 'axios';
 import { useTranslation, Trans } from 'react-i18next';
 import { ReactElement } from 'react';
-import { IPACatalogParty, Party, StepperStepComponentProps } from '../../../types';
+import { InstitutionType, IPACatalogParty, Party, StepperStepComponentProps } from '../../../types';
 import { getFetchOutcome } from '../../lib/error-utils';
 import { fetchWithLogs } from '../../lib/api-utils';
 import { UserContext } from '../../lib/context';
@@ -15,6 +15,7 @@ import { AsyncAutocompleteV2 } from '../autocomplete/AsyncAutocompleteV2';
 
 type Props = {
   subTitle: string | ReactElement;
+  institutionType?: InstitutionType;
 } & StepperStepComponentProps;
 
 const handleSearchExternalId = async (
@@ -39,7 +40,7 @@ const handleSearchExternalId = async (
   return null;
 };
 
-export function StepSearchParty({ subTitle, forward, back }: Props) {
+export function StepSearchParty({ subTitle, forward, back, institutionType }: Props) {
   const partyExternalIdByQuery = new URLSearchParams(window.location.search).get('partyExternalId');
   const { setRequiredLogin } = useContext(UserContext);
   const theme = useTheme();
@@ -54,12 +55,15 @@ export function StepSearchParty({ subTitle, forward, back }: Props) {
     setSelectedHistory(selected);
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const { id } = selected!;
-    forward({ externalId: id }, { ...selected, externalId: id } as Party);
+    forward({ externalId: id }, { ...selected, externalId: id } as Party, institutionType);
   };
 
   const { t } = useTranslation();
   const bodyTitle = t('onboardingStep1.onboarding.bodyTitle');
-
+  const onBackAction = () => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    back!();
+  };
   useEffect(() => {
     if (partyExternalIdByQuery) {
       handleSearchExternalId(partyExternalIdByQuery, () => setRequiredLogin(true))
@@ -169,15 +173,11 @@ export function StepSearchParty({ subTitle, forward, back }: Props) {
 
       <Grid item mt={4}>
         <OnboardingStepActions
-          back={
-            back
-              ? {
-                  action: back,
-                  label: t('onboardingStep1.onboarding.onboardingStepActions.backAction'),
-                  disabled: false,
-                }
-              : undefined
-          }
+          back={{
+            action: onBackAction,
+            label: t('stepInstitutionType.backLabel'),
+            disabled: false,
+          }}
           forward={{
             action: onForwardAction,
             label: t('onboardingStep1.onboarding.onboardingStepActions.confirmAction'),

@@ -5,6 +5,7 @@ import { useTranslation, Trans } from 'react-i18next';
 import { IllusError } from '@pagopa/mui-italia';
 import {
   InstitutionOnboardingInfoResource,
+  InstitutionType,
   RequestOutcomeMessage,
   StepperStepComponentProps,
 } from '../../../types';
@@ -19,6 +20,7 @@ import { unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
 type Props = StepperStepComponentProps & {
   externalInstitutionId: string;
   productId: string;
+  institutionType?: InstitutionType;
 };
 
 const genericError: RequestOutcomeMessage = {
@@ -61,7 +63,7 @@ const genericError: RequestOutcomeMessage = {
   ],
 };
 
-function StepOnboardingData({ forward, externalInstitutionId, productId }: Props) {
+function StepOnboardingData({ forward, externalInstitutionId, productId, institutionType }: Props) {
   const { t } = useTranslation();
 
   const [loading, setLoading] = useState(true);
@@ -97,7 +99,7 @@ function StepOnboardingData({ forward, externalInstitutionId, productId }: Props
       (onboardingData as AxiosError<any>).response?.status === 404 ||
       (onboardingData as AxiosError<any>).response?.status === 400
     ) {
-      forward();
+      forward(undefined, undefined, institutionType, undefined);
     } else {
       setOutcome(genericError);
     }
