@@ -59,6 +59,9 @@ function OnboardingComponent({ productId }: { productId: string }) {
   const [onExitAction, setOnExitAction] = useState<(() => void) | undefined>();
   const [selectedParty, setSelectedParty] = useState<Party>();
 
+  const fromDashboard =
+    window.location.search.indexOf(`partyExternalId=${externalInstitutionId}`) > -1;
+
   useEffect(() => {
     registerUnloadEvent(setOnExit, setOpenExitModal, setOnExitAction);
     return () => unregisterUnloadEvent(setOnExit);
@@ -339,8 +342,6 @@ function OnboardingComponent({ productId }: { productId: string }) {
     setInstitutionType(newInstitutionType);
     forward();
   };
-  const fromDashboard =
-    window.location.search.indexOf(`partyExternalId=${externalInstitutionId}`) > -1;
 
   const steps: Array<StepperStep> = [
     {
