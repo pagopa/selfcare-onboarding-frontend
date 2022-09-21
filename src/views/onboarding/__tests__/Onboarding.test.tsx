@@ -91,7 +91,6 @@ const agencyError = 'AGENCY ERROR';
 
 test('test already onboarded', async () => {
   renderComponent();
-  await executeStepInstitutionType();
   await executeStep1(agencyOnboarded);
   await waitFor(() => screen.getByText("L'Ente che hai scelto ha già aderito"));
   await executeGoHome();
@@ -99,7 +98,6 @@ test('test already onboarded', async () => {
 
 test('test error retrieving onboarding info', async () => {
   renderComponent();
-  await executeStepInstitutionType();
   await executeStep1(agencyInfoError);
   await waitFor(() => screen.getByText('Spiacenti, qualcosa è andato storto.'));
   await executeGoHome();
@@ -113,8 +111,8 @@ test('test error productID', async () => {
 
 test('test complete', async () => {
   renderComponent();
-  await executeStepInstitutionType();
   await executeStep1(agencyX);
+  await executeStepInstitutionType();
   await executeStepBillingData();
   await executeStep2();
   await executeStep3(true);
@@ -124,8 +122,8 @@ test('test complete', async () => {
 
 test('test complete with error on submit', async () => {
   renderComponent();
-  await executeStepInstitutionType();
   await executeStep1(agencyError);
+  await executeStepInstitutionType();
   await executeStepBillingData();
   await executeStep2();
   await executeStep3(false);
@@ -134,7 +132,6 @@ test('test complete with error on submit', async () => {
 
 test('test exiting during flow with unload event', async () => {
   renderComponent();
-  await executeStepInstitutionType();
   await executeStep1(agencyX);
   const event = new Event('beforeunload');
   window.dispatchEvent(event);
@@ -147,8 +144,6 @@ test('test exiting during flow with unload event', async () => {
 
 test('test exiting during flow with logout', async () => {
   renderComponent();
-  await executeStepInstitutionType();
-
   await executeStep1(agencyX);
 
   expect(screen.queryByText('Vuoi davvero uscire?')).toBeNull();
@@ -252,7 +247,7 @@ const executeStepInstitutionType = async () => {
   expect(confirmButtonEnabled).toBeEnabled();
 
   fireEvent.click(confirmButtonEnabled);
-  await waitFor(() => screen.getByText(step1Title));
+  await waitFor(() => screen.getByText(stepBillingDataTitle));
 };
 
 const executeStepBillingData = async () => {
@@ -379,7 +374,7 @@ const fillUserBillingDataForm = async (
     target: { value: 'AAAAAA44D55F456K' },
   });
 
-  const isTaxCodeNotEquals2PIVA = document.getElementById('billingdata');
+  const isTaxCodeNotEquals2PIVA = screen.getByRole('checkbox');
   expect(isTaxCodeNotEquals2PIVA).toBeTruthy();
 
   fireEvent.change(document.getElementById(vatNumber), {
@@ -663,9 +658,9 @@ const verifySubmit = async () => {
             taxCode: 'AAAAAA44D55F456K',
             vatNumber: '11223344567',
             recipientCode: 'recipientCode',
-            publicServices: false,
+            publicServices: undefined,
           },
-          institutionType: 'GSP',
+          institutionType: 'PT',
           origin: 'IPA',
           pricingPlan: 'pricingPlan',
           users: [
