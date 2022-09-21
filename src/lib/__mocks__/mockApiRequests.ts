@@ -405,14 +405,15 @@ export async function mockFetch(
 
   if (endpoint === 'ONBOARDING_USER_VALIDATION') {
     if (
-      ['XXXXXX00A00X000X', 'ZZZZZZ00A00Z000Z'].indexOf((data as any)?.taxCode) > -1 &&
+      ['CRTCTF90B12C123K', 'CRTCTF91B12C123K', 'CRTCTF92B12C123K'].indexOf((data as any)?.taxCode) >
+        -1 &&
       ((data as any)?.name !== 'CERTIFIED_NAME' || (data as any)?.surname !== 'CERTIFIED_SURNAME')
     ) {
       return buildOnboardingUserValidation409(
         (data as any)?.name !== 'CERTIFIED_NAME',
         (data as any)?.surname !== 'CERTIFIED_SURNAME'
       );
-    } else if ((data as any)?.taxCode === 'ZZZZZZ01A00A000A') {
+    } else if ((data as any)?.taxCode === 'CRTCTF92B12C124K') {
       return genericError;
     } else {
       return new Promise((resolve) =>

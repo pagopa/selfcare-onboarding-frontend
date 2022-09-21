@@ -420,6 +420,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
       label: 'Inserisci i dati del rappresentante legale',
       Component: () =>
         StepAddManager({
+          externalInstitutionId,
           product: selectedProduct,
           forward: (newFormData: Partial<FormData>) => {
             trackEvent('ONBOARDING_ADD_MANAGER', {
@@ -436,6 +437,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
       label: 'Inserisci i dati degli amministratori',
       Component: () =>
         OnBoardingProductStepDelegates({
+          externalInstitutionId,
           product: selectedProduct,
           legal: (formData as any).users[0],
           forward: (newFormData: Partial<FormData>) => {
