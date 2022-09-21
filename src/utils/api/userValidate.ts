@@ -5,6 +5,7 @@ import { fetchWithLogs } from '../../lib/api-utils';
 import { getFetchOutcome } from '../../lib/error-utils';
 
 export async function userValidate(
+  partyId: string,
   user: UserOnCreate,
   userId: string,
   onSuccess: (userId: string) => void,
@@ -42,7 +43,7 @@ export async function userValidate(
     errorBody
   ) {
     trackEvent(`${eventName}_CONFLICT_ERROR`, {
-      party_role: userId,
+      party_id: partyId,
     });
     onValidationError(
       userId,
@@ -50,7 +51,7 @@ export async function userValidate(
     );
   } else {
     trackEvent(`${eventName}_GENERIC_ERROR`, {
-      party_role: userId,
+      party_id: partyId,
     });
     onGenericError(userId);
   }
