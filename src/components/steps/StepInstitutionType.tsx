@@ -45,7 +45,7 @@ export default function StepInstitutionType({
     forward(selectedValue);
   };
 
-  const intisutionTypeValueFiltered = (id: string | undefined) => {
+  const institutionTypeValueFiltered = (id: string | undefined) => {
     switch (id) {
       case 'prod-interop':
       case 'prod-pagopa':
@@ -97,7 +97,7 @@ export default function StepInstitutionType({
           <Grid item xs={12} p={3}>
             <FormControl>
               <RadioGroup name="radio-buttons-group" defaultValue={institutionType}>
-                {intisutionTypeValueFiltered(selectedProduct?.id).map((ot) => (
+                {institutionTypeValueFiltered(selectedProduct?.id).map((ot) => (
                   <FormControlLabel
                     sx={{ p: '8px' }}
                     key={ot.labelKey}
@@ -117,7 +117,7 @@ export default function StepInstitutionType({
                             color: '#5C6F82',
                           }}
                         >
-                          {intisutionTypeLabelFiltered(selectedProduct?.id, ot.value)}
+                          {institutionTypeLabelFiltered(selectedProduct?.id, ot.value)}
                         </Typography>
                       </>
                     }
