@@ -67,7 +67,7 @@ export default function StepInstitutionType({
     }
   };
 
-  const intisutionTypeLabelFiltered = (selectedProductId: string | undefined, itValue: string) => {
+  const institutionTypeLabelFiltered = (selectedProductId: string | undefined, itValue: string) => {
     if (selectedProductId === 'prod-io' && itValue === 'PT') {
       return t('stepInstitutionType.cadArticle6AppIo');
     } else if (
