@@ -118,9 +118,6 @@ export default function StepInstitutionType({
                           }}
                         >
                           {intisutionTypeLabelFiltered(selectedProduct?.id, ot.value)}
-                          {/* {ot.value === 'PT'
-                            ? t('stepInstitutionType.cadArticle6')
-                            : t('stepInstitutionType.cadArticle2')} */}
                         </Typography>
                       </>
                     }
