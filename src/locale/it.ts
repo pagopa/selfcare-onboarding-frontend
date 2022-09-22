@@ -78,6 +78,11 @@ export default {
       },
     },
   },
+  stepSearchPartyFromTaxCode: {
+    bodyTitle: 'Ricerca il tuo ente',
+    bodyDescription:
+      "Inserisci il Codice Fiscale/Partita IVA del tuo ente per cui vuoi richiedere l'adesione a {{selectedProduct}}",
+  },
   onboardingStep2: {
     bodyTitle: 'Indica il Legale <1/> Rappresentante',
     bodyDescription: `Inserisci i dati del Legale Rappresentante. <1/> La persona che indicherai sarà firmataria del contratto per <3/><4/>`,

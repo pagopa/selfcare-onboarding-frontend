@@ -1,8 +1,7 @@
-import { Grid, Link, Typography, useTheme } from '@mui/material';
-import { Box } from '@mui/system';
+import { Grid, Typography, useTheme } from '@mui/material';
 import { useContext, useEffect, useState } from 'react';
 import { AxiosResponse } from 'axios';
-import { useTranslation, Trans } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import { ReactElement } from 'react';
 import { IPACatalogParty, Party, StepperStepComponentProps } from '../../../types';
 import { getFetchOutcome } from '../../lib/error-utils';
@@ -21,7 +20,7 @@ const handleSearchExternalId = async (
   externalInstitutionId: string,
   onRedirectToLogin: () => void
 ): Promise<IPACatalogParty | null> => {
-  const searchResponse = await fetchWithLogs(
+  const searchResponse: any = await fetchWithLogs(
     {
       endpoint: 'ONBOARDING_GET_PARTY',
       endpointParams: { externalInstitutionId },
@@ -39,7 +38,7 @@ const handleSearchExternalId = async (
   return null;
 };
 
-export function StepSearchParty({ subTitle, forward, back }: Props) {
+export function StepSearchPartyFromTaxCode({ subTitle, forward, back }: Props) {
   const partyExternalIdByQuery = new URLSearchParams(window.location.search).get('partyExternalId');
   const { setRequiredLogin } = useContext(UserContext);
   const theme = useTheme();
@@ -58,7 +57,7 @@ export function StepSearchParty({ subTitle, forward, back }: Props) {
   };
 
   const { t } = useTranslation();
-  const bodyTitle = t('onboardingStep1.onboarding.bodyTitle');
+  const bodyTitle = t('stepSearchPartyFromTaxCode.bodyTitle');
 
   useEffect(() => {
     if (partyExternalIdByQuery) {
@@ -117,6 +116,7 @@ export function StepSearchParty({ subTitle, forward, back }: Props) {
         <Grid item xs={8} md={6} lg={5}>
           <AsyncAutocompleteV2
             theme={theme}
+            searchByTaxCode={true}
             selected={selected}
             setSelected={setSelected}
             // placeholder={t('onboardingStep1.onboarding.asyncAutocomplete.placeholder')}
@@ -131,39 +131,6 @@ export function StepSearchParty({ subTitle, forward, back }: Props) {
             optionKey="id"
             optionLabel="description"
           />
-        </Grid>
-      </Grid>
-
-      <Grid container item justifyContent="center">
-        <Grid item xs={6}>
-          <Box
-            sx={{
-              fontSize: '14px',
-              lineHeight: '24px',
-              textAlign: 'center',
-            }}
-          >
-            <Typography
-              sx={{
-                textAlign: 'center',
-              }}
-              variant="caption"
-              color={theme.palette.text.primary}
-            >
-              <Trans i18nKey="onboardingStep1.onboarding.ipaDescription">
-                Non trovi il tuo ente nell&apos;IPA? In
-                <Link
-                  sx={{ textDecoration: 'none', color: theme.palette.primary.main }}
-                  href="https://indicepa.gov.it/ipa-portale/servizi-enti/accreditamento-ente"
-                >
-                  questa pagina
-                </Link>
-                trovi maggiori
-                <br />
-                informazioni sull&apos;indice e su come accreditarsi
-              </Trans>
-            </Typography>
-          </Box>
         </Grid>
       </Grid>
 

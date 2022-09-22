@@ -3,6 +3,7 @@ import { styled } from '@mui/system';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 import { Dispatch, SetStateAction } from 'react';
+import { IPACatalogParty } from '../../../../types';
 
 const CustomTextField = styled(TextField)({
   justifyContent: 'center',
@@ -25,8 +26,9 @@ const CustomTextField = styled(TextField)({
 
 type Props = {
   theme: Theme;
-  selected: any;
-  setSelected: React.Dispatch<React.SetStateAction<any>>;
+  searchByTaxCode: boolean;
+  selected: IPACatalogParty | null;
+  setSelected: React.Dispatch<React.SetStateAction<IPACatalogParty | null>>;
   setInput: Dispatch<SetStateAction<string>>;
   input: string;
   handleChange: (event: any) => void;
@@ -34,6 +36,7 @@ type Props = {
 
 export default function AsyncAutocompleteSearch({
   theme,
+  searchByTaxCode,
   selected,
   setSelected,
   setInput,
@@ -46,7 +49,13 @@ export default function AsyncAutocompleteSearch({
       sx={{ width: '80%' }}
       value={selected ? selected.description : input}
       onChange={handleChange}
-      label={!selected ? 'Cerca ente' : ''}
+      label={
+        !selected && !searchByTaxCode
+          ? 'Cerca ente'
+          : !selected && searchByTaxCode
+          ? 'Codice Fiscale/P.IVA'
+          : ''
+      }
       variant={!selected ? 'outlined' : 'standard'}
       inputProps={{
         style: {
@@ -70,7 +79,7 @@ export default function AsyncAutocompleteSearch({
           <IconButton
             onClick={() => {
               setInput('');
-              setSelected('');
+              setSelected(null);
             }}
             aria-label="clearIcon"
           >

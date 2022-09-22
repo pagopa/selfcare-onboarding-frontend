@@ -14,6 +14,7 @@ import AsyncAutocompleteResults from './components/AsyncAutocompleteResults';
 import AsyncAutocompleteSearch from './components/AsyncAutocompleteSearch';
 
 type AutocompleteProps = {
+  searchByTaxCode: boolean;
   selected: any;
   setSelected: React.Dispatch<React.SetStateAction<any>>;
   endpoint: Endpoint;
@@ -24,6 +25,7 @@ type AutocompleteProps = {
 };
 
 export function AsyncAutocompleteV2({
+  searchByTaxCode,
   selected,
   setSelected,
   endpoint,
@@ -116,6 +118,7 @@ export function AsyncAutocompleteV2({
 
           <AsyncAutocompleteSearch
             theme={theme}
+            searchByTaxCode={searchByTaxCode}
             selected={selected}
             setSelected={setSelected}
             setInput={setInput}
@@ -123,24 +126,26 @@ export function AsyncAutocompleteV2({
             handleChange={handleChange}
           />
         </Grid>
-        <Grid item xs={12} display="flex" justifyContent="center">
-          {showElement && options.length > 0 ? (
-            <AsyncAutocompleteResults
-              setSelected={setSelected}
-              options={options}
-              setOptions={setOptions}
-              isLoading={isLoading}
-              getOptionLabel={getOptionLabel}
-              getOptionKey={getOptionKey}
-            />
-          ) : input.length >= 1 && input.length < 3 ? (
-            <Typography pb={3}> {t('asyncAutocomplete.lessThen3CharacterLabel')}</Typography>
-          ) : (
-            input.length >= 3 &&
-            options.length === 0 &&
-            !selected && <Typography pb={3}> {t('asyncAutocomplete.noResultsLabel')} </Typography>
-          )}
-        </Grid>
+        {!searchByTaxCode && (
+          <Grid item xs={12} display="flex" justifyContent="center">
+            {showElement && options.length > 0 ? (
+              <AsyncAutocompleteResults
+                setSelected={setSelected}
+                options={options}
+                setOptions={setOptions}
+                isLoading={isLoading}
+                getOptionLabel={getOptionLabel}
+                getOptionKey={getOptionKey}
+              />
+            ) : input.length >= 1 && input.length < 3 ? (
+              <Typography pb={3}> {t('asyncAutocomplete.lessThen3CharacterLabel')}</Typography>
+            ) : (
+              input.length >= 3 &&
+              options.length === 0 &&
+              !selected && <Typography pb={3}> {t('asyncAutocomplete.noResultsLabel')} </Typography>
+            )}
+          </Grid>
+        )}
       </Grid>
     </Paper>
   );
