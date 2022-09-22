@@ -136,6 +136,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
     });
     setSelectedParty(party);
     setInstitutionType(institutionType);
+    setActiveStep(activeStep + 2);
   };
 
   const forwardWithBillingData = (newBillingData: BillingData) => {
@@ -341,7 +342,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
       product_id: productId,
     });
     setInstitutionType(newInstitutionType);
-    forward();
+    setActiveStep(newInstitutionType !== 'PA' ? 2 : 1);
   };
 
   const steps: Array<StepperStep> = [
@@ -359,7 +360,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
         }),
     },
     {
-      label: "Seleziona l'ente",
+      label: 'Search party from businessName',
       Component: () =>
         StepSearchPartyFromBusinessName({
           subTitle: (
@@ -383,13 +384,16 @@ function OnboardingComponent({ productId }: { productId: string }) {
         StepSearchPartyFromTaxCode({
           subTitle: (
             <Trans i18nKey="stepSearchPartyFromTaxCode.bodyDescription">
-              Inserisci il Codice Fiscale/Partita IVA del tuo ente per cui vuoi richiedere
-              l&apos;adesione a {{ selectedProduct: selectedProduct?.title }}
+              Inserisci il Codice Fiscale/Partita IVA del tuo ente per cui vuoi <br />
+              richiedere l&apos;adesione a {{ selectedProduct: selectedProduct?.title }}
               `${selectedProduct?.title}.`
             </Trans>
           ),
           product: selectedProduct,
           forward: forwardWithDataAndInstitution,
+          back: () => {
+            setActiveStep(0);
+          },
         }),
     },
     {

@@ -81,13 +81,6 @@ export function StepSearchPartyFromTaxCode({ subTitle, forward, back }: Props) {
     }
   }, []);
 
-  // callback of previous useEffect
-  useEffect(() => {
-    if (partyExternalIdByQuery && selected) {
-      onForwardAction();
-    }
-  }, [selected]);
-
   return loading ? (
     <LoadingOverlay loadingText={t('onboardingStep1.loadingOverlayText')} />
   ) : (
@@ -119,7 +112,6 @@ export function StepSearchPartyFromTaxCode({ subTitle, forward, back }: Props) {
             searchByTaxCode={true}
             selected={selected}
             setSelected={setSelected}
-            // placeholder={t('onboardingStep1.onboarding.asyncAutocomplete.placeholder')}
             endpoint={{ endpoint: 'ONBOARDING_GET_SEARCH_PARTIES' }}
             transformFn={(data: { items: Array<IPACatalogParty> }) =>
               /* removed transformation into lower case in order to send data to BE as obtained from registry
@@ -128,23 +120,19 @@ export function StepSearchPartyFromTaxCode({ subTitle, forward, back }: Props) {
               */
               data.items
             }
-            optionKey="id"
-            optionLabel="description"
+            optionKey="taxCode"
+            optionLabel="taxCode"
           />
         </Grid>
       </Grid>
 
       <Grid item mt={4}>
         <OnboardingStepActions
-          back={
-            back
-              ? {
-                  action: back,
-                  label: t('onboardingStep1.onboarding.onboardingStepActions.backAction'),
-                  disabled: false,
-                }
-              : undefined
-          }
+          back={{
+            action: back,
+            label: t('onboardingStep1.onboarding.onboardingStepActions.backAction'),
+            disabled: false,
+          }}
           forward={{
             action: onForwardAction,
             label: t('onboardingStep1.onboarding.onboardingStepActions.confirmAction'),

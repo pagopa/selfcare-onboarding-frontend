@@ -3,6 +3,7 @@ import { styled } from '@mui/system';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 import { Dispatch, SetStateAction } from 'react';
+import { useTranslation } from 'react-i18next';
 import { IPACatalogParty } from '../../../../types';
 
 const CustomTextField = styled(TextField)({
@@ -43,6 +44,7 @@ export default function AsyncAutocompleteSearch({
   input,
   handleChange,
 }: Props) {
+  const { t } = useTranslation();
   return (
     <CustomTextField
       id="Parties"
@@ -51,9 +53,9 @@ export default function AsyncAutocompleteSearch({
       onChange={handleChange}
       label={
         !selected && !searchByTaxCode
-          ? 'Cerca ente'
+          ? t('onboardingStep1.onboarding.searchParty')
           : !selected && searchByTaxCode
-          ? 'Codice Fiscale/P.IVA'
+          ? t('stepSearchPartyFromTaxCode.placeholder')
           : ''
       }
       variant={!selected ? 'outlined' : 'standard'}

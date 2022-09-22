@@ -4,7 +4,7 @@ import { AxiosError, AxiosResponse } from 'axios';
 import { Theme, Grid, Typography, Paper } from '@mui/material';
 import { Box } from '@mui/system';
 import { useTranslation } from 'react-i18next';
-import { Endpoint } from '../../../types';
+import { Endpoint, IPACatalogParty } from '../../../types';
 import { fetchWithLogs } from '../../lib/api-utils';
 import { getFetchOutcome } from '../../lib/error-utils';
 import { ENV } from '../../utils/env';
@@ -16,7 +16,7 @@ import AsyncAutocompleteSearch from './components/AsyncAutocompleteSearch';
 type AutocompleteProps = {
   searchByTaxCode: boolean;
   selected: any;
-  setSelected: React.Dispatch<React.SetStateAction<any>>;
+  setSelected: React.Dispatch<React.SetStateAction<IPACatalogParty | null>>;
   endpoint: Endpoint;
   transformFn: any;
   optionKey?: string;
@@ -56,6 +56,14 @@ export function AsyncAutocompleteV2({
 
     if (outcome === 'success') {
       setOptions(transformFn((searchResponse as AxiosResponse).data));
+      if (searchByTaxCode) {
+        const matchedParty = (searchResponse as AxiosResponse).data.items.find(
+          (p: any) => p.taxCode === query
+        );
+        if (matchedParty) {
+          setSelected(matchedParty);
+        }
+      }
     } else if ((searchResponse as AxiosError).response?.status === 404) {
       setOptions([]);
     }
@@ -71,13 +79,15 @@ export function AsyncAutocompleteV2({
 
   const showElement = input !== undefined && input.length >= 3;
 
-  const handleChange = (event: any) => {
-    const value = event.target.value as string;
+  const handleChange = (event?: any) => {
+    const value = event?.target.value as string;
     setInput(value);
     if (value !== '') {
       setSelected(null);
-      if (value.length >= 3) {
+      if (!searchByTaxCode && value.length >= 3) {
         void debounce(handleSearch, 100)(value);
+      } else if (searchByTaxCode && (value.length === 11 || value.length === 16)) {
+        void handleSearch(value);
       }
     }
     if (value === '') {
@@ -108,7 +118,7 @@ export function AsyncAutocompleteV2({
           justifyContent="center"
           width="100%"
           pt={4}
-          pb={showElement && !selected ? 0 : 4}
+          pb={showElement && !selected && !searchByTaxCode ? 0 : 4}
         >
           {selected && (
             <Box display="flex" alignItems="center">
@@ -126,7 +136,9 @@ export function AsyncAutocompleteV2({
             handleChange={handleChange}
           />
         </Grid>
-        {!searchByTaxCode && (
+        {searchByTaxCode ? (
+          <> </>
+        ) : (
           <Grid item xs={12} display="flex" justifyContent="center">
             {showElement && options.length > 0 ? (
               <AsyncAutocompleteResults
