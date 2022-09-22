@@ -47,7 +47,8 @@ export default function StepInstitutionType({
 
   const intisutionTypeValueFiltered = (id: string | undefined) => {
     switch (id) {
-      case 'prod-interop' && 'prod-pagopa':
+      case 'prod-interop':
+      case 'prod-pagopa':
         return institutionTypeValues.filter(
           (it) => it.labelKey === 'pa' || it.labelKey === 'gsp' || it.labelKey === 'scp'
         );
@@ -65,6 +66,20 @@ export default function StepInstitutionType({
         );
     }
   };
+
+  const intisutionTypeLabelFiltered = (selectedProductId: string | undefined, itValue: string) => {
+    if (selectedProductId === 'prod-io' && itValue === 'PT') {
+      return t('stepInstitutionType.cadArticle6AppIo');
+    } else if (
+      (selectedProductId === 'prod-pn' || selectedProductId === 'prod-idpay') &&
+      itValue === 'PA'
+    ) {
+      return t('stepInstitutionType.cadArticle165');
+    } else {
+      return t('stepInstitutionType.cadArticle2');
+    }
+  };
+
   return (
     <Grid container display="flex" justifyContent="center" alignItems="center">
       <Grid item xs={12} display="flex" justifyContent="center">
@@ -102,9 +117,10 @@ export default function StepInstitutionType({
                             color: '#5C6F82',
                           }}
                         >
-                          {ot.value === 'PT'
+                          {intisutionTypeLabelFiltered(selectedProduct?.id, ot.value)}
+                          {/* {ot.value === 'PT'
                             ? t('stepInstitutionType.cadArticle6')
-                            : t('stepInstitutionType.cadArticle2')}
+                            : t('stepInstitutionType.cadArticle2')} */}
                         </Typography>
                       </>
                     }
