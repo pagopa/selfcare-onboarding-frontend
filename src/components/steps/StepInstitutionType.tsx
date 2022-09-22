@@ -10,12 +10,13 @@ import {
 } from '@mui/material';
 import React from 'react';
 import { useTranslation, Trans } from 'react-i18next';
-import { InstitutionType, StepperStepComponentProps } from '../../../types';
+import { InstitutionType, Product, StepperStepComponentProps } from '../../../types';
 import { OnboardingStepActions } from '../OnboardingStepActions';
 
 type Props = StepperStepComponentProps & {
   institutionType: InstitutionType;
   fromDashboard: boolean;
+  selectedProduct?: Product | null;
 };
 
 const institutionTypeValues: Array<{ labelKey: string; value: InstitutionType }> = [
@@ -30,6 +31,7 @@ export default function StepInstitutionType({
   forward,
   institutionType,
   fromDashboard,
+  selectedProduct,
 }: Props) {
   const [selectedValue, setSelectedValue] = React.useState<InstitutionType>(institutionType);
 
@@ -41,6 +43,41 @@ export default function StepInstitutionType({
 
   const onForwardAction = () => {
     forward(selectedValue);
+  };
+
+  const institutionTypeValueFiltered = (id: string | undefined) => {
+    switch (id) {
+      case 'prod-interop':
+      case 'prod-pagopa':
+        return institutionTypeValues.filter(
+          (it) => it.labelKey === 'pa' || it.labelKey === 'gsp' || it.labelKey === 'scp'
+        );
+      case 'prod-pn':
+        return institutionTypeValues.filter((it) => it.labelKey === 'pa');
+      case 'prod-idpay':
+        return institutionTypeValues.filter((it) => it.labelKey === 'pa');
+      default:
+        return institutionTypeValues.filter(
+          (it) =>
+            it.labelKey === 'pa' ||
+            it.labelKey === 'gsp' ||
+            it.labelKey === 'scp' ||
+            it.labelKey === 'pt'
+        );
+    }
+  };
+
+  const institutionTypeLabelFiltered = (selectedProductId: string | undefined, itValue: string) => {
+    if (selectedProductId === 'prod-io' && itValue === 'PT') {
+      return t('stepInstitutionType.cadArticle6AppIo');
+    } else if (
+      (selectedProductId === 'prod-pn' || selectedProductId === 'prod-idpay') &&
+      itValue === 'PA'
+    ) {
+      return t('stepInstitutionType.cadArticle165');
+    } else {
+      return t('stepInstitutionType.cadArticle2');
+    }
   };
 
   return (
@@ -60,7 +97,7 @@ export default function StepInstitutionType({
           <Grid item xs={12} p={3}>
             <FormControl>
               <RadioGroup name="radio-buttons-group" defaultValue={institutionType}>
-                {institutionTypeValues.map((ot) => (
+                {institutionTypeValueFiltered(selectedProduct?.id).map((ot) => (
                   <FormControlLabel
                     sx={{ p: '8px' }}
                     key={ot.labelKey}
@@ -80,9 +117,7 @@ export default function StepInstitutionType({
                             color: '#5C6F82',
                           }}
                         >
-                          {ot.value === 'PT'
-                            ? t('stepInstitutionType.cadArticle6')
-                            : t('stepInstitutionType.cadArticle2')}
+                          {institutionTypeLabelFiltered(selectedProduct?.id, ot.value)}
                         </Typography>
                       </>
                     }
