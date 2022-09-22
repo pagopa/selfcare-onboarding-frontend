@@ -60,6 +60,9 @@ function OnboardingComponent({ productId }: { productId: string }) {
   const [onExitAction, setOnExitAction] = useState<(() => void) | undefined>();
   const [selectedParty, setSelectedParty] = useState<Party>();
 
+  const fromDashboard =
+    window.location.search.indexOf(`partyExternalId=${externalInstitutionId}`) > -1;
+
   useEffect(() => {
     registerUnloadEvent(setOnExit, setOpenExitModal, setOnExitAction);
     return () => unregisterUnloadEvent(setOnExit);
@@ -132,6 +135,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
       product_id: productId,
     });
     setSelectedParty(party);
+    setInstitutionType(institutionType);
   };
 
   const forwardWithBillingData = (newBillingData: BillingData) => {
@@ -320,7 +324,8 @@ function OnboardingComponent({ productId }: { productId: string }) {
   const forwardWithOnboardingData = (
     _manager: BillingData,
     billingData?: BillingData,
-    institutionType?: InstitutionType
+    institutionType?: InstitutionType,
+    _id?: string
   ) => {
     if (billingData) {
       setBillingData(billingData);
@@ -341,7 +346,20 @@ function OnboardingComponent({ productId }: { productId: string }) {
 
   const steps: Array<StepperStep> = [
     {
-      label: 'Search party from businessName',
+      label: 'Seleziona il tipo di ente',
+      Component: () =>
+        StepInstitutionType({
+          institutionType: institutionType as InstitutionType,
+          fromDashboard,
+          forward: forwardWithInstitutionType,
+          back: () => {
+            setOnExitAction(() => () => history.goBack());
+            setOpenExitModal(true);
+          },
+        }),
+    },
+    {
+      label: "Seleziona l'ente",
       Component: () =>
         StepSearchPartyFromBusinessName({
           subTitle: (
@@ -351,8 +369,12 @@ function OnboardingComponent({ productId }: { productId: string }) {
               per cui vuoi richiedere l&apos; adesione a {{ productTitle: selectedProduct?.title }}
             </Trans>
           ),
+          institutionType,
           product: selectedProduct,
           forward: forwardWithDataAndInstitution,
+          back: () => {
+            setActiveStep(0);
+          },
         }),
     },
     {
@@ -388,23 +410,8 @@ function OnboardingComponent({ productId }: { productId: string }) {
         StepOnboardingData({
           externalInstitutionId,
           productId,
+          institutionType,
           forward: forwardWithOnboardingData,
-        }),
-    },
-    {
-      label: 'Seleziona il tipo di ente',
-      Component: () =>
-        StepInstitutionType({
-          institutionType: institutionType as InstitutionType,
-          forward: forwardWithInstitutionType,
-          back: () => {
-            if (window.location.search.indexOf(`partyExternalId=${externalInstitutionId}`) > -1) {
-              setOnExitAction(() => () => history.goBack());
-              setOpenExitModal(true);
-            } else {
-              setActiveStep(0);
-            }
-          },
         }),
     },
     {
@@ -425,7 +432,9 @@ function OnboardingComponent({ productId }: { productId: string }) {
           institutionType: institutionType as InstitutionType,
           subtitle: t('onBoardingSubProduct.billingData.subTitle'),
           forward: forwardWithBillingData,
-          back,
+          back: () => {
+            setActiveStep(fromDashboard ? 0 : 1);
+          },
         }),
     },
     {
