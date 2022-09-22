@@ -330,6 +330,7 @@ export default function StepBillingData({
                 <Grid item xs={12}>
                   <Typography>
                     <Checkbox
+                      id="billingdata"
                       checked={formik.values.publicServices}
                       value={formik.values.publicServices}
                       onChange={(_, checked: boolean) =>
