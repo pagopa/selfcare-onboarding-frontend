@@ -279,7 +279,7 @@ export default {
       'Ai sensi di IO - Paragrafo 6.1.3 delle “Linee Guida sul punto di accesso telematico ai servizi della Pubblica Amministrazione” emanate da AgID ai sensi dell’art- 64-bis del CAD',
     cadArticle6:
       'par. 6 delle “Linee Guida sul punto di accesso telematico ai servizi della Pubblica Amministrazione” ( art. 64bis del CAD)',
-    cadPsp: 'tbd',
+    cadPsp: '',
     backLabel: 'Indietro',
     confirmLabel: 'Continua',
   },
