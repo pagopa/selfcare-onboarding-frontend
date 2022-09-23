@@ -94,7 +94,6 @@ export default function RejectRegistration() {
               {t('rejectRegistration.outcomeContent.success.backActionLabel')}
             </Button>
           </Typography>
-          ,
         </>,
       ],
     },
