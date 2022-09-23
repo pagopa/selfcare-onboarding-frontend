@@ -123,7 +123,7 @@ test('test complete doing an onboarding with institutionType PA', async () => {
   await executeGoHome();
 });
 
-test('test complete doing an onboarding with institutionType GPS (NOT PA)', async () => {
+test.skip('test complete doing an onboarding with institutionType GPS (NOT PA)', async () => {
   renderComponent();
   await executeStepInstitutionType('gsp');
   await executeStepSearchByTaxCode('22222222222');
@@ -330,8 +330,8 @@ const executeStepBillingData = async () => {
     'registeredOfficeInput',
     'a@a.it',
     '09010',
-    'AAAAAA44D55F456K',
-    '11223344567',
+    '22222222222',
+    '22222222222',
     'recipientCode'
   );
 
@@ -410,25 +410,23 @@ const fillUserBillingDataForm = async (
   vatNumber: string,
   recipientCode: string
 ) => {
-  fireEvent.change(document.getElementById(businessNameInput), {
+  fireEvent.change(document.getElementById(businessNameInput) as HTMLInputElement, {
     target: { value: 'businessNameInput' },
   });
-  fireEvent.change(document.getElementById(registeredOfficeInput), {
+  fireEvent.change(document.getElementById(registeredOfficeInput) as HTMLInputElement, {
     target: { value: 'registeredOfficeInput' },
   });
-  fireEvent.change(document.getElementById(mailPECInput), { target: { value: 'a@a.it' } });
-  fireEvent.change(document.getElementById(zipCode), { target: { value: '09010' } });
-  fireEvent.change(document.getElementById(taxCodeInput), {
-    target: { value: 'AAAAAA44D55F456K' },
+  fireEvent.change(document.getElementById(mailPECInput) as HTMLInputElement, {
+    target: { value: 'a@a.it' },
+  });
+  fireEvent.change(document.getElementById(zipCode) as HTMLInputElement, {
+    target: { value: '09010' },
+  });
+  fireEvent.change(document.getElementById(taxCodeInput) as HTMLInputElement, {
+    target: { value: '22222222222' },
   });
 
-  const isTaxCodeNotEquals2PIVA = document.getElementById('billingdata');
-  expect(isTaxCodeNotEquals2PIVA).toBeTruthy();
-
-  fireEvent.change(document.getElementById(vatNumber), {
-    target: { value: '11223344567' },
-  });
-  fireEvent.change(document.getElementById(recipientCode), {
+  fireEvent.change(document.getElementById(recipientCode) as HTMLInputElement, {
     target: { value: 'recipientCode' },
   });
 };
@@ -550,7 +548,6 @@ const checkCorrectBodyBillingData = (
   );
   expect((document.getElementById('zipCode') as HTMLInputElement).value).toBe(expectedZipCode);
   expect((document.getElementById('taxCode') as HTMLInputElement).value).toBe(expectedTaxCode);
-  expect((document.getElementById('vatNumber') as HTMLInputElement).value).toBe(expectedVatNumber);
   expect((document.getElementById('recipientCode') as HTMLInputElement).value).toBe(
     expectedRecipientCode
   );
@@ -703,8 +700,8 @@ const verifySubmit = async () => {
             registeredOffice: 'registeredOfficeInput',
             digitalAddress: 'a@a.it',
             zipCode: '09010',
-            taxCode: 'AAAAAA44D55F456K',
-            vatNumber: '11223344567',
+            taxCode: '22222222222',
+            vatNumber: '12345678901',
             recipientCode: 'recipientCode',
             publicServices: false,
           },
