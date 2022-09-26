@@ -123,6 +123,7 @@ test('test complete doing an onboarding with institutionType PA', async () => {
   await executeGoHome();
 });
 
+// TODO Resolve this first before going to ENV development
 test.skip('test complete doing an onboarding with institutionType GPS (NOT PA)', async () => {
   renderComponent();
   await executeStepInstitutionType('gsp');
@@ -282,7 +283,7 @@ const executeStepSearchByTaxCode = async (taxCode: string) => {
   expect(confirmButton).toBeEnabled();
 
   fireEvent.click(confirmButton);
-  await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(3));
+  await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(2));
 };
 
 const executeStepInstitutionType = async (selectedType: string) => {
