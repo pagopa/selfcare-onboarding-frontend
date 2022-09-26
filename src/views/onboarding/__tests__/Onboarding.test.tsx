@@ -282,7 +282,7 @@ const executeStepSearchByTaxCode = async (taxCode: string) => {
   expect(confirmButton).toBeEnabled();
 
   fireEvent.click(confirmButton);
-  await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(3));
+  await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(2));
 };
 
 const executeStepInstitutionType = async (selectedType: string) => {
