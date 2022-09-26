@@ -353,6 +353,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
         StepInstitutionType({
           institutionType: institutionType as InstitutionType,
           fromDashboard,
+          selectedProduct,
           forward: forwardWithInstitutionType,
           back: () => {
             setOnExitAction(() => () => history.goBack());
