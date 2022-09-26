@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import debounce from 'lodash/debounce';
 import { AxiosError, AxiosResponse } from 'axios';
 import { Theme, Grid, Typography, Paper } from '@mui/material';
@@ -15,6 +15,8 @@ import AsyncAutocompleteSearch from './components/AsyncAutocompleteSearch';
 
 type AutocompleteProps = {
   searchByTaxCode: boolean;
+  confirmAction?: boolean;
+  setConfirmAction: any;
   selected: any;
   setSelected: React.Dispatch<React.SetStateAction<IPACatalogParty | null>>;
   endpoint: Endpoint;
@@ -27,6 +29,8 @@ type AutocompleteProps = {
 export function AsyncAutocompleteV2({
   searchByTaxCode,
   selected,
+  setConfirmAction,
+  confirmAction,
   setSelected,
   endpoint,
   transformFn,
@@ -40,6 +44,10 @@ export function AsyncAutocompleteV2({
   const { setRequiredLogin } = useContext(UserContext);
   const { t } = useTranslation();
 
+  /* TODO SELC-1533 This API will return to its original state as soon as we have
+   the new API from the BE that calls the data of "infocamere". 
+   this logic will then be moved to the new 
+   API as it becomes available */
   const handleSearch = async (query: string) => {
     setIsLoading(true);
 
@@ -62,6 +70,8 @@ export function AsyncAutocompleteV2({
         );
         if (matchedParty) {
           setSelected(matchedParty);
+        } else {
+          // TODO SELC-1560 Put here the management of errors
         }
       }
     } else if ((searchResponse as AxiosError).response?.status === 404) {
@@ -86,8 +96,6 @@ export function AsyncAutocompleteV2({
       setSelected(null);
       if (!searchByTaxCode && value.length >= 3) {
         void debounce(handleSearch, 100)(value);
-      } else if (searchByTaxCode && (value.length === 11 || value.length === 16)) {
-        void handleSearch(value);
       }
     }
     if (value === '') {
@@ -97,6 +105,15 @@ export function AsyncAutocompleteV2({
       setInput(getOptionLabel(selected));
     }
   };
+
+  console.log(input);
+  useEffect(() => {
+    if (confirmAction && input) {
+      void handleSearch(input);
+      setConfirmAction(false);
+    }
+  }, [confirmAction, input]);
+
   return (
     <Paper
       elevation={8}

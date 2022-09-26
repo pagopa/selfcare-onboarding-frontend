@@ -129,6 +129,7 @@ export function StepSearchPartyFromBusinessName({
             searchByTaxCode={false}
             selected={selected}
             setSelected={setSelected}
+            setConfirmAction={undefined}
             // placeholder={t('onboardingStep1.onboarding.asyncAutocomplete.placeholder')}
             endpoint={{ endpoint: 'ONBOARDING_GET_SEARCH_PARTIES' }}
             transformFn={(data: { items: Array<IPACatalogParty> }) =>

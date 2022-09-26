@@ -48,6 +48,7 @@ export function StepSearchPartyFromTaxCode({ subTitle, forward, back }: Props) {
     'selected_step1',
     null
   );
+  const [confirmAction, setConfirmAction] = useState<boolean>(false);
 
   const onForwardAction = () => {
     setSelectedHistory(selected);
@@ -110,6 +111,8 @@ export function StepSearchPartyFromTaxCode({ subTitle, forward, back }: Props) {
           <AsyncAutocompleteV2
             theme={theme}
             searchByTaxCode={true}
+            confirmAction={confirmAction}
+            setConfirmAction={setConfirmAction}
             selected={selected}
             setSelected={setSelected}
             endpoint={{ endpoint: 'ONBOARDING_GET_SEARCH_PARTIES' }}
@@ -129,14 +132,18 @@ export function StepSearchPartyFromTaxCode({ subTitle, forward, back }: Props) {
       <Grid item mt={4}>
         <OnboardingStepActions
           back={{
-            action: back,
+            action: () => {
+              setSelected(null);
+              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+              back!();
+            },
             label: t('onboardingStep1.onboarding.onboardingStepActions.backAction'),
             disabled: false,
           }}
           forward={{
-            action: onForwardAction,
+            action: () => (!selected ? setConfirmAction(true) : onForwardAction()),
             label: t('onboardingStep1.onboarding.onboardingStepActions.confirmAction'),
-            disabled: !selected,
+            disabled: false, // TODO: SELC-1560 Check for lenght (11 or 16) else disable
           }}
         />
       </Grid>

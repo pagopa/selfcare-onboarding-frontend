@@ -72,7 +72,7 @@ export default function AsyncAutocompleteSearch({
         },
       }}
       InputProps={{
-        startAdornment: !selected && (
+        startAdornment: !selected && !searchByTaxCode && (
           <InputAdornment position="end">
             <SearchOutlinedIcon sx={{ color: theme.palette.text.primary }} />
           </InputAdornment>
