@@ -20,7 +20,7 @@ import { LoadingOverlay } from '../../components/LoadingOverlay';
 import { ENV } from '../../utils/env';
 import { HeaderContext } from '../../lib/context';
 import { StepAddManager, UsersObject } from '../../components/steps/StepAddManager';
-import { StepSearchParty } from '../../components/steps/StepSearchParty';
+import { StepSearchPartyFromBusinessName } from '../../components/steps/StepSearchPartyFromBusinessName';
 import StepOnboardingData from '../../components/steps/StepOnboardingData';
 import StepBillingData from '../../components/steps/StepBillingData';
 import { registerUnloadEvent, unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
@@ -204,7 +204,7 @@ function OnBoardingSubProduct() {
     {
       label: 'Select Institution unreleated',
       Component: () =>
-        StepSearchParty({
+        StepSearchPartyFromBusinessName({
           subTitle: (
             <Trans i18nKey="onBoardingSubProduct.selectUserPartyStep.IPAsubTitle">
               Seleziona dall&apos;Indice della Pubblica Amministrazione (IPA) l&apos;ente

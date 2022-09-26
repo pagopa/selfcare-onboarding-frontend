@@ -430,7 +430,7 @@ export async function mockFetch(
       default:
         const certifiedUser: UserOnCreate | undefined = (
           (data as any).users as Array<UserOnCreate>
-        ).find((u) => u.taxCode === 'XXXXXX00A00X000X');
+        ).find((u) => u.taxCode === 'CRTCTF90B12C123K');
         if (
           certifiedUser &&
           (certifiedUser.name !== 'CERTIFIED_NAME' || certifiedUser.surname !== 'CERTIFIED_SURNAME')

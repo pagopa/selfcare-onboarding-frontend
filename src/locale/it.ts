@@ -65,6 +65,7 @@ export default {
   onboardingStep1: {
     loadingOverlayText: 'Stiamo verificando i tuoi dati',
     onboarding: {
+      searchParty: 'Cerca ente',
       bodyTitle: 'Seleziona il tuo ente',
       bodyDescription:
         "Seleziona dall'Indice della Pubblica Amministrazione (IPA) l'ente <1/> per cui vuoi richiedere l'adesione a {{productTitle}}",
@@ -77,6 +78,12 @@ export default {
         backAction: 'Indietro',
       },
     },
+  },
+  stepSearchPartyFromTaxCode: {
+    bodyTitle: 'Ricerca il tuo ente',
+    bodyDescription:
+      "Inserisci il Codice Fiscale/Partita IVA del tuo ente per cui vuoi <1/>richiedere l'adesione a {{selectedProduct}}",
+    placeholder: 'Codice Fiscale/P.IVA',
   },
   onboardingStep2: {
     bodyTitle: 'Indica il Legale <1/> Rappresentante',

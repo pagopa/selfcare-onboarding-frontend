@@ -40,7 +40,12 @@ const handleSearchExternalId = async (
   return null;
 };
 
-export function StepSearchParty({ subTitle, forward, back, institutionType }: Props) {
+export function StepSearchPartyFromBusinessName({
+  subTitle,
+  forward,
+  back,
+  institutionType,
+}: Props) {
   const partyExternalIdByQuery = new URLSearchParams(window.location.search).get('partyExternalId');
   const { setRequiredLogin } = useContext(UserContext);
   const theme = useTheme();
@@ -121,8 +126,10 @@ export function StepSearchParty({ subTitle, forward, back, institutionType }: Pr
         <Grid item xs={8} md={6} lg={5}>
           <AsyncAutocompleteV2
             theme={theme}
+            searchByTaxCode={false}
             selected={selected}
             setSelected={setSelected}
+            setConfirmAction={undefined}
             // placeholder={t('onboardingStep1.onboarding.asyncAutocomplete.placeholder')}
             endpoint={{ endpoint: 'ONBOARDING_GET_SEARCH_PARTIES' }}
             transformFn={(data: { items: Array<IPACatalogParty> }) =>

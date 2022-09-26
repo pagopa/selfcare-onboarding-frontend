@@ -19,7 +19,7 @@ import {
   Problem,
   RequestOutcomeMessage,
 } from '../../../types';
-import { StepSearchParty } from '../../components/steps/StepSearchParty';
+import { StepSearchPartyFromBusinessName } from '../../components/steps/StepSearchPartyFromBusinessName';
 import { StepAddManager } from '../../components/steps/StepAddManager';
 import { LoadingOverlay } from '../../components/LoadingOverlay';
 import { MessageNoAction } from '../../components/MessageNoAction';
@@ -32,6 +32,7 @@ import StepOnboardingData from '../../components/steps/StepOnboardingData';
 import StepBillingData from '../../components/steps/StepBillingData';
 import { registerUnloadEvent, unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
 import StepInstitutionType from '../../components/steps/StepInstitutionType';
+import { StepSearchPartyFromTaxCode } from '../../components/steps/StepSearchPartyFromTaxCode';
 import { OnboardingStep1_5 } from './components/OnboardingStep1_5';
 import { OnBoardingProductStepDelegates } from './components/OnBoardingProductStepDelegates';
 
@@ -135,6 +136,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
     });
     setSelectedParty(party);
     setInstitutionType(institutionType);
+    setActiveStep(activeStep + 2);
   };
 
   const forwardWithBillingData = (newBillingData: BillingData) => {
@@ -340,7 +342,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
       product_id: productId,
     });
     setInstitutionType(newInstitutionType);
-    forward();
+    setActiveStep(newInstitutionType !== 'PA' ? 2 : 1);
   };
 
   const steps: Array<StepperStep> = [
@@ -359,9 +361,9 @@ function OnboardingComponent({ productId }: { productId: string }) {
         }),
     },
     {
-      label: "Seleziona l'ente",
+      label: 'Search party from businessName',
       Component: () =>
-        StepSearchParty({
+        StepSearchPartyFromBusinessName({
           subTitle: (
             <Trans i18nKey="onboardingStep1.onboarding.bodyDescription">
               Seleziona dall&apos;Indice della Pubblica Amministrazione (IPA) l&apos;ente
@@ -370,6 +372,24 @@ function OnboardingComponent({ productId }: { productId: string }) {
             </Trans>
           ),
           institutionType,
+          product: selectedProduct,
+          forward: forwardWithDataAndInstitution,
+          back: () => {
+            setActiveStep(0);
+          },
+        }),
+    },
+    {
+      label: 'Search party from taxCode',
+      Component: () =>
+        StepSearchPartyFromTaxCode({
+          subTitle: (
+            <Trans i18nKey="stepSearchPartyFromTaxCode.bodyDescription">
+              Inserisci il Codice Fiscale/Partita IVA del tuo ente per cui vuoi <br />
+              richiedere l&apos;adesione a {{ selectedProduct: selectedProduct?.title }}
+              `${selectedProduct?.title}.`
+            </Trans>
+          ),
           product: selectedProduct,
           forward: forwardWithDataAndInstitution,
           back: () => {
@@ -418,7 +438,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
           subtitle: t('onBoardingSubProduct.billingData.subTitle'),
           forward: forwardWithBillingData,
           back: () => {
-            setActiveStep(fromDashboard ? 0 : 1);
+            setActiveStep(institutionType === 'PA' ? 1 : 2);
           },
         }),
     },
@@ -436,7 +456,9 @@ function OnboardingComponent({ productId }: { productId: string }) {
             });
             forwardWithData(newFormData);
           },
-          back,
+          back: () => {
+            setActiveStep(fromDashboard ? 0 : 1);
+          },
         }),
     },
     {

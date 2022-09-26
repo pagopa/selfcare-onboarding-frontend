@@ -1,10 +1,10 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import debounce from 'lodash/debounce';
 import { AxiosError, AxiosResponse } from 'axios';
 import { Theme, Grid, Typography, Paper } from '@mui/material';
 import { Box } from '@mui/system';
 import { useTranslation } from 'react-i18next';
-import { Endpoint } from '../../../types';
+import { Endpoint, IPACatalogParty } from '../../../types';
 import { fetchWithLogs } from '../../lib/api-utils';
 import { getFetchOutcome } from '../../lib/error-utils';
 import { ENV } from '../../utils/env';
@@ -14,8 +14,11 @@ import AsyncAutocompleteResults from './components/AsyncAutocompleteResults';
 import AsyncAutocompleteSearch from './components/AsyncAutocompleteSearch';
 
 type AutocompleteProps = {
+  searchByTaxCode: boolean;
+  confirmAction?: boolean;
+  setConfirmAction: any;
   selected: any;
-  setSelected: React.Dispatch<React.SetStateAction<any>>;
+  setSelected: React.Dispatch<React.SetStateAction<IPACatalogParty | null>>;
   endpoint: Endpoint;
   transformFn: any;
   optionKey?: string;
@@ -24,7 +27,10 @@ type AutocompleteProps = {
 };
 
 export function AsyncAutocompleteV2({
+  searchByTaxCode,
   selected,
+  setConfirmAction,
+  confirmAction,
   setSelected,
   endpoint,
   transformFn,
@@ -38,6 +44,10 @@ export function AsyncAutocompleteV2({
   const { setRequiredLogin } = useContext(UserContext);
   const { t } = useTranslation();
 
+  /* TODO SELC-1533 This API will return to its original state as soon as we have
+   the new API from the BE that calls the data of "infocamere". 
+   this logic will then be moved to the new 
+   API as it becomes available */
   const handleSearch = async (query: string) => {
     setIsLoading(true);
 
@@ -54,6 +64,16 @@ export function AsyncAutocompleteV2({
 
     if (outcome === 'success') {
       setOptions(transformFn((searchResponse as AxiosResponse).data));
+      if (searchByTaxCode) {
+        const matchedParty = (searchResponse as AxiosResponse).data.items.find(
+          (p: any) => p.taxCode === query
+        );
+        if (matchedParty) {
+          setSelected(matchedParty);
+        } else {
+          // TODO SELC-1560 Put here the management of errors
+        }
+      }
     } else if ((searchResponse as AxiosError).response?.status === 404) {
       setOptions([]);
     }
@@ -69,12 +89,12 @@ export function AsyncAutocompleteV2({
 
   const showElement = input !== undefined && input.length >= 3;
 
-  const handleChange = (event: any) => {
-    const value = event.target.value as string;
+  const handleChange = (event?: any) => {
+    const value = event?.target.value as string;
     setInput(value);
     if (value !== '') {
       setSelected(null);
-      if (value.length >= 3) {
+      if (!searchByTaxCode && value.length >= 3) {
         void debounce(handleSearch, 100)(value);
       }
     }
@@ -85,6 +105,14 @@ export function AsyncAutocompleteV2({
       setInput(getOptionLabel(selected));
     }
   };
+
+  useEffect(() => {
+    if (confirmAction && input) {
+      void handleSearch(input);
+      setConfirmAction(false);
+    }
+  }, [confirmAction, input]);
+
   return (
     <Paper
       elevation={8}
@@ -106,7 +134,7 @@ export function AsyncAutocompleteV2({
           justifyContent="center"
           width="100%"
           pt={4}
-          pb={showElement && !selected ? 0 : 4}
+          pb={showElement && !selected && !searchByTaxCode ? 0 : 4}
         >
           {selected && (
             <Box display="flex" alignItems="center">
@@ -116,6 +144,7 @@ export function AsyncAutocompleteV2({
 
           <AsyncAutocompleteSearch
             theme={theme}
+            searchByTaxCode={searchByTaxCode}
             selected={selected}
             setSelected={setSelected}
             setInput={setInput}
@@ -123,24 +152,28 @@ export function AsyncAutocompleteV2({
             handleChange={handleChange}
           />
         </Grid>
-        <Grid item xs={12} display="flex" justifyContent="center">
-          {showElement && options.length > 0 ? (
-            <AsyncAutocompleteResults
-              setSelected={setSelected}
-              options={options}
-              setOptions={setOptions}
-              isLoading={isLoading}
-              getOptionLabel={getOptionLabel}
-              getOptionKey={getOptionKey}
-            />
-          ) : input.length >= 1 && input.length < 3 ? (
-            <Typography pb={3}> {t('asyncAutocomplete.lessThen3CharacterLabel')}</Typography>
-          ) : (
-            input.length >= 3 &&
-            options.length === 0 &&
-            !selected && <Typography pb={3}> {t('asyncAutocomplete.noResultsLabel')} </Typography>
-          )}
-        </Grid>
+        {searchByTaxCode ? (
+          <> </>
+        ) : (
+          <Grid item xs={12} display="flex" justifyContent="center">
+            {showElement && options.length > 0 ? (
+              <AsyncAutocompleteResults
+                setSelected={setSelected}
+                options={options}
+                setOptions={setOptions}
+                isLoading={isLoading}
+                getOptionLabel={getOptionLabel}
+                getOptionKey={getOptionKey}
+              />
+            ) : input.length >= 1 && input.length < 3 ? (
+              <Typography pb={3}> {t('asyncAutocomplete.lessThen3CharacterLabel')}</Typography>
+            ) : (
+              input.length >= 3 &&
+              options.length === 0 &&
+              !selected && <Typography pb={3}> {t('asyncAutocomplete.noResultsLabel')} </Typography>
+            )}
+          </Grid>
+        )}
       </Grid>
     </Paper>
   );

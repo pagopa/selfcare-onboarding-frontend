@@ -3,6 +3,8 @@ import { styled } from '@mui/system';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 import { Dispatch, SetStateAction } from 'react';
+import { useTranslation } from 'react-i18next';
+import { IPACatalogParty } from '../../../../types';
 
 const CustomTextField = styled(TextField)({
   justifyContent: 'center',
@@ -25,8 +27,9 @@ const CustomTextField = styled(TextField)({
 
 type Props = {
   theme: Theme;
-  selected: any;
-  setSelected: React.Dispatch<React.SetStateAction<any>>;
+  searchByTaxCode: boolean;
+  selected: IPACatalogParty | null;
+  setSelected: React.Dispatch<React.SetStateAction<IPACatalogParty | null>>;
   setInput: Dispatch<SetStateAction<string>>;
   input: string;
   handleChange: (event: any) => void;
@@ -34,19 +37,27 @@ type Props = {
 
 export default function AsyncAutocompleteSearch({
   theme,
+  searchByTaxCode,
   selected,
   setSelected,
   setInput,
   input,
   handleChange,
 }: Props) {
+  const { t } = useTranslation();
   return (
     <CustomTextField
       id="Parties"
       sx={{ width: '80%' }}
       value={selected ? selected.description : input}
       onChange={handleChange}
-      label={!selected ? 'Cerca ente' : ''}
+      label={
+        !selected && !searchByTaxCode
+          ? t('onboardingStep1.onboarding.searchParty')
+          : !selected && searchByTaxCode
+          ? t('stepSearchPartyFromTaxCode.placeholder')
+          : ''
+      }
       variant={!selected ? 'outlined' : 'standard'}
       inputProps={{
         style: {
@@ -61,7 +72,7 @@ export default function AsyncAutocompleteSearch({
         },
       }}
       InputProps={{
-        startAdornment: !selected && (
+        startAdornment: !selected && !searchByTaxCode && (
           <InputAdornment position="end">
             <SearchOutlinedIcon sx={{ color: theme.palette.text.primary }} />
           </InputAdornment>
@@ -70,11 +81,11 @@ export default function AsyncAutocompleteSearch({
           <IconButton
             onClick={() => {
               setInput('');
-              setSelected('');
+              setSelected(null);
             }}
             aria-label="clearIcon"
           >
-            <ClearOutlinedIcon sx={{ color: theme.palette.text.primary }} />
+            {!searchByTaxCode && <ClearOutlinedIcon sx={{ color: theme.palette.text.primary }} />}
           </IconButton>
         ),
       }}
