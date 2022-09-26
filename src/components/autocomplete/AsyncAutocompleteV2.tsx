@@ -106,7 +106,6 @@ export function AsyncAutocompleteV2({
     }
   };
 
-  console.log(input);
   useEffect(() => {
     if (confirmAction && input) {
       void handleSearch(input);

@@ -85,7 +85,7 @@ export default function AsyncAutocompleteSearch({
             }}
             aria-label="clearIcon"
           >
-            <ClearOutlinedIcon sx={{ color: theme.palette.text.primary }} />
+            {!searchByTaxCode && <ClearOutlinedIcon sx={{ color: theme.palette.text.primary }} />}
           </IconButton>
         ),
       }}
