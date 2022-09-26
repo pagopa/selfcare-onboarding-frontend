@@ -25,7 +25,7 @@ const handleSearchExternalId = async (
       endpoint: 'ONBOARDING_GET_PARTY',
       endpointParams: { externalInstitutionId },
     },
-    { method: 'GET' },
+    { method: 'GET', params: { origin: 'INFOCAMERE' } },
     onRedirectToLogin
   );
 

@@ -343,6 +343,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
     });
     setInstitutionType(newInstitutionType);
     setActiveStep(newInstitutionType !== 'PA' ? 2 : 1);
+    setOrigin(newInstitutionType !== 'PA' ? 'INFOCAMERE' : 'IPA');
   };
 
   const steps: Array<StepperStep> = [
