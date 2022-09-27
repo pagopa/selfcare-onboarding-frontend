@@ -493,7 +493,7 @@ const verifySubmit = async () => {
           },
           institutionType: 'GSP',
           pricingPlan: 'pricingPlan',
-          origin: 'IPA',
+          origin: 'INFOCAMERE',
         },
       },
       expect.any(Function)
