@@ -50,6 +50,7 @@ export function StepSearchPartyFromTaxCode({ subTitle, forward, back }: Props) {
   );
   const [confirmAction, setConfirmAction] = useState<boolean>(false);
   const [input, setInput] = useState<string>('');
+  const [error, setError] = useState<boolean>(false);
 
   const onForwardAction = () => {
     setSelectedHistory(selected);
@@ -66,7 +67,8 @@ export function StepSearchPartyFromTaxCode({ subTitle, forward, back }: Props) {
   };
 
   const { t } = useTranslation();
-  const bodyTitle = t('stepSearchPartyFromTaxCode.bodyTitle');
+  const titleOfSearch = t('stepSearchPartyFromTaxCode.titleOfSearch');
+  const titleOfSelection = t('stepSearchPartyFromTaxCode.titleOfSelection');
 
   useEffect(() => {
     if (partyExternalIdByQuery) {
@@ -97,7 +99,7 @@ export function StepSearchPartyFromTaxCode({ subTitle, forward, back }: Props) {
       <Grid container item justifyContent="center">
         <Grid item xs={12}>
           <Typography variant="h3" component="h2" align="center" color={theme.palette.text.primary}>
-            {bodyTitle}
+            {!selected ? titleOfSearch : titleOfSelection}
           </Typography>
         </Grid>
       </Grid>
@@ -121,6 +123,8 @@ export function StepSearchPartyFromTaxCode({ subTitle, forward, back }: Props) {
             setSelected={setSelected}
             setInput={setInput}
             input={input}
+            error={error}
+            setError={setError}
             endpoint={{ endpoint: 'ONBOARDING_GET_SEARCH_PARTIES' }}
             transformFn={(data: { items: Array<IPACatalogParty> }) =>
               /* removed transformation into lower case in order to send data to BE as obtained from registry
@@ -145,7 +149,7 @@ export function StepSearchPartyFromTaxCode({ subTitle, forward, back }: Props) {
           forward={{
             action: () => (!selected ? setConfirmAction(true) : onForwardAction()),
             label: t('onboardingStep1.onboarding.onboardingStepActions.confirmAction'),
-            disabled: !(input.length === 11 || input.length === 16),
+            disabled: error || !(input.length === 11 || input.length === 16),
           }}
         />
       </Grid>

@@ -1,9 +1,11 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import debounce from 'lodash/debounce';
 import { AxiosError, AxiosResponse } from 'axios';
 import { Theme, Grid, Typography, Paper } from '@mui/material';
 import { Box } from '@mui/system';
 import { useTranslation } from 'react-i18next';
+import SessionModal from '@pagopa/selfcare-common-frontend/components/SessionModal';
+import { PartyAccountItemButton } from '@pagopa/mui-italia/dist/components/PartyAccountItemButton';
 import { Endpoint, IPACatalogParty } from '../../../types';
 import { fetchWithLogs } from '../../lib/api-utils';
 import { getFetchOutcome } from '../../lib/error-utils';
@@ -20,6 +22,8 @@ type AutocompleteProps = {
   selected: any;
   setSelected: React.Dispatch<React.SetStateAction<IPACatalogParty | null>>;
   setInput: React.Dispatch<React.SetStateAction<string>>;
+  error: boolean;
+  setError: React.Dispatch<React.SetStateAction<boolean>>;
   input: string;
   endpoint: Endpoint;
   transformFn: any;
@@ -28,6 +32,7 @@ type AutocompleteProps = {
   theme: Theme;
 };
 
+// eslint-disable-next-line sonarjs/cognitive-complexity
 export function AsyncAutocompleteV2({
   searchByTaxCode,
   selected,
@@ -36,15 +41,20 @@ export function AsyncAutocompleteV2({
   setSelected,
   setInput,
   input,
+  error,
+  setError,
   endpoint,
   transformFn,
   optionKey,
   optionLabel,
   theme,
 }: AutocompleteProps) {
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [openErrorModal, setOpenErrorModal] = useState<boolean>(false);
   const [options, setOptions] = useState<Array<any>>([]);
+  const [moreMatches, setMoreMatches] = useState<Array<IPACatalogParty>>([]);
   const { setRequiredLogin } = useContext(UserContext);
+  const currentInput = useRef<string>('');
   const { t } = useTranslation();
 
   const handleSearch = async (query: string) => {
@@ -64,19 +74,23 @@ export function AsyncAutocompleteV2({
     if (outcome === 'success') {
       setOptions(transformFn((searchResponse as AxiosResponse).data));
       if (searchByTaxCode) {
-        const matchedParty = (searchResponse as AxiosResponse).data.items.find(
+        const matchedParty = (searchResponse as AxiosResponse).data.items.filter(
           (p: any) => p.taxCode === query
         );
-        if (matchedParty) {
-          setSelected(matchedParty);
+        if (matchedParty.length === 1) {
+          setSelected(matchedParty[0]);
+        } else if (matchedParty.length > 1) {
+          setMoreMatches(matchedParty);
         } else {
-          // TODO SELC-1560 Put here the management of errors
+          setOpenErrorModal(true);
+          // eslint-disable-next-line functional/immutable-data
+          currentInput.current = query;
+          setError(true);
         }
       }
     } else if ((searchResponse as AxiosError).response?.status === 404) {
       setOptions([]);
     }
-
     setIsLoading(false);
   };
 
@@ -105,12 +119,22 @@ export function AsyncAutocompleteV2({
     }
   };
 
+  const handleCloseErrorModal = () => {
+    setOpenErrorModal(false);
+  };
+
   useEffect(() => {
     if (confirmAction && input) {
       void handleSearch(input);
       setConfirmAction(false);
     }
   }, [confirmAction, input]);
+
+  useEffect(() => {
+    if (input) {
+      setError(currentInput.current === input);
+    }
+  }, [currentInput.current, input]);
 
   return (
     <Paper
@@ -131,28 +155,51 @@ export function AsyncAutocompleteV2({
           xs={12}
           display="flex"
           justifyContent="center"
-          width="100%"
+          sx={{ flexDirection: 'column', alignItems: 'center' }}
           pt={4}
           pb={showElement && !selected && !searchByTaxCode ? 0 : 4}
         >
-          {selected && (
+          {!searchByTaxCode && selected && (
             <Box display="flex" alignItems="center">
               <PartyIcon width={50} />
             </Box>
           )}
-
-          <AsyncAutocompleteSearch
-            theme={theme}
-            searchByTaxCode={searchByTaxCode}
-            selected={selected}
-            setSelected={setSelected}
-            setInput={setInput}
-            input={input}
-            handleChange={handleChange}
+          <SessionModal
+            handleClose={handleCloseErrorModal}
+            open={openErrorModal}
+            title={t('stepSearchPartyFromTaxCode.notMatchTaxCodeModal.title')}
+            message={t('stepSearchPartyFromTaxCode.notMatchTaxCodeModal.message')}
+            onCloseLabel={t('stepSearchPartyFromTaxCode.notMatchTaxCodeModal.retry')}
           />
+          {!confirmAction && moreMatches.length === 0 ? (
+            <AsyncAutocompleteSearch
+              theme={theme}
+              searchByTaxCode={searchByTaxCode}
+              selected={selected}
+              setSelected={setSelected}
+              setInput={setInput}
+              error={error}
+              input={input}
+              handleChange={handleChange}
+            />
+          ) : (
+            moreMatches.map((m) => (
+              <Box key={m.id} sx={{ width: '100%', paddingLeft: 4 }}>
+                <Grid aria-label={m.description}>
+                  <PartyAccountItemButton
+                    aria-label={m.description}
+                    partyName={m.description}
+                    action={() => setSelected(m)}
+                    selectedItem={selected?.id === m.id}
+                    maxCharactersNumberMultiLine={20}
+                  />
+                </Grid>
+              </Box>
+            ))
+          )}
         </Grid>
         {searchByTaxCode ? (
-          <> </>
+          <></>
         ) : (
           <Grid item xs={12} display="flex" justifyContent="center">
             {showElement && options.length > 0 ? (
