@@ -19,7 +19,7 @@ import {
   Problem,
   RequestOutcomeMessage,
 } from '../../../types';
-import { StepSearchPartyFromBusinessName } from '../../components/steps/StepSearchPartyFromBusinessName';
+import { StepSearchPartyFromBusinessNameFromBusinessName } from '../../components/steps/StepSearchPartyFromBusinessNameFromBusinessName';
 import { StepAddManager } from '../../components/steps/StepAddManager';
 import { LoadingOverlay } from '../../components/LoadingOverlay';
 import { MessageNoAction } from '../../components/MessageNoAction';
@@ -32,6 +32,7 @@ import StepOnboardingData from '../../components/steps/StepOnboardingData';
 import StepBillingData from '../../components/steps/StepBillingData';
 import { registerUnloadEvent, unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
 import StepInstitutionType from '../../components/steps/StepInstitutionType';
+import { StepSearchPartyFromTaxCode } from '../../components/steps/StepSearchPartyFromTaxCode';
 import { StepSearchPartyFromTaxCode } from '../../components/steps/StepSearchPartyFromTaxCode';
 import { OnboardingStep1_5 } from './components/OnboardingStep1_5';
 import { OnBoardingProductStepDelegates } from './components/OnBoardingProductStepDelegates';
@@ -343,6 +344,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
     });
     setInstitutionType(newInstitutionType);
     setActiveStep(newInstitutionType !== 'PA' ? 2 : 1);
+    setOrigin(newInstitutionType !== 'PA' ? 'INFOCAMERE' : 'IPA');
   };
 
   const steps: Array<StepperStep> = [
@@ -352,6 +354,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
         StepInstitutionType({
           institutionType: institutionType as InstitutionType,
           fromDashboard,
+          selectedProduct,
           forward: forwardWithInstitutionType,
           back: () => {
             setOnExitAction(() => () => history.goBack());

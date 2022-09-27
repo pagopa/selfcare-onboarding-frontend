@@ -112,7 +112,7 @@ test('test error productID', async () => {
   await waitFor(() => screen.getByText('Impossibile individuare il prodotto desiderato'));
 });
 
-test('test complete doing an onboarding with institutionType PA', async () => {
+test('test complete doing an onboarding with institutionType PA doing an onboarding with institutionType PA', async () => {
   renderComponent();
   await executeStepInstitutionType('pa');
   await executeStepSearchByBusinessName(agencyX);
@@ -123,6 +123,7 @@ test('test complete doing an onboarding with institutionType PA', async () => {
   await executeGoHome();
 });
 
+// TODO Resolve this first before going to ENV development
 test.skip('test complete doing an onboarding with institutionType GPS (NOT PA)', async () => {
   renderComponent();
   await executeStepInstitutionType('gsp');
@@ -156,6 +157,18 @@ test('test correct redirect to taxCode research when selected type is NOT EQUAL 
   await executeStepSearchByTaxCode('11111111111');
 });
 
+test('test correct redirect to businessName research when selected type is EQUAL to PA', async () => {
+  renderComponent();
+  await executeStepInstitutionType('pa');
+  await executeStepSearchByBusinessName(agencyError);
+});
+
+test('test correct redirect to taxCode research when selected type is NOT EQUAL to PA', async () => {
+  renderComponent();
+  await executeStepInstitutionType('pt');
+  await executeStepSearchByTaxCode('11111111111');
+});
+
 test('test exiting during flow with unload event', async () => {
   renderComponent();
   await executeStepInstitutionType('pa');
@@ -171,7 +184,7 @@ test('test exiting during flow with unload event', async () => {
 
 test('test exiting during flow with logout', async () => {
   renderComponent();
-  await executeStepInstitutionType('pa');
+  await executeStepInstitutionType('pa''pa');
 
   await executeStepSearchByBusinessName(agencyX);
 
@@ -285,13 +298,31 @@ const executeStepSearchByTaxCode = async (taxCode: string) => {
   await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(2));
 };
 
-const executeStepInstitutionType = async (selectedType: string) => {
+const executeStepSearchByTaxCode = async (taxCode: string) => {
+  console.log('Testing step search by taxCode');
+
+  screen.getByText(stepSearchByTaxcode);
+  screen.getAllByText('Codice Fiscale/P.IVA')[0];
+  await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(1));
+  const inputPartyName = document.getElementById('Parties');
+
+  expect(inputPartyName).toBeTruthy();
+  await waitFor(() => fireEvent.change(inputPartyName, { target: { value: taxCode } }));
+
+  const confirmButton = screen.getByRole('button', { name: 'Continua' });
+  expect(confirmButton).toBeEnabled();
+
+  fireEvent.click(confirmButton);
+  await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(2));
+};
+
+const executeStepInstitutionType = async (selectedType: stringselectedType: string) => {
   console.log('Testing step Institution Type');
   await waitFor(() => screen.getByText(stepInstitutionType));
   await fillInstitutionTypeCheckbox(selectedType);
 
   const confirmButtonEnabled = screen.getByRole('button', { name: 'Continua' });
-  await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
+  await waitFor(() => await waitFor(() => expect(confirmButtonEnabled).toBeEnabled()));
 
   fireEvent.click(confirmButtonEnabled);
   await waitFor(() =>
@@ -410,10 +441,10 @@ const fillUserBillingDataForm = async (
   vatNumber: string,
   recipientCode: string
 ) => {
-  fireEvent.change(document.getElementById(businessNameInput) as HTMLInputElement, {
+  fireEvent.change(document.getElementById(businessNameInput) as HTMLInputElement as HTMLInputElement, {
     target: { value: 'businessNameInput' },
   });
-  fireEvent.change(document.getElementById(registeredOfficeInput) as HTMLInputElement, {
+  fireEvent.change(document.getElementById(registeredOfficeInput) as HTMLInputElement as HTMLInputElement, {
     target: { value: 'registeredOfficeInput' },
   });
   fireEvent.change(document.getElementById(mailPECInput) as HTMLInputElement, {

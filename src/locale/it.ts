@@ -278,10 +278,15 @@ export default {
       gsp: 'Gestore di servizi pubblici',
       scp: 'Società a controllo pubblico',
       pt: 'Partner tecnologico',
+      psp: 'Prestatori Servizi di Pagamento',
     },
     cadArticle2: 'art. 2, comma 2, lett. a del CAD',
+    cadArticle165: 'articolo 1, comma 2, del decreto legislativo 30 marzo 2001, n. 165',
+    cadArticle6AppIo:
+      'Ai sensi di IO - Paragrafo 6.1.3 delle “Linee Guida sul punto di accesso telematico ai servizi della Pubblica Amministrazione” emanate da AgID ai sensi dell’art- 64-bis del CAD',
     cadArticle6:
       'par. 6 delle “Linee Guida sul punto di accesso telematico ai servizi della Pubblica Amministrazione” ( art. 64bis del CAD)',
+    cadPsp: '',
     backLabel: 'Indietro',
     confirmLabel: 'Continua',
   },
