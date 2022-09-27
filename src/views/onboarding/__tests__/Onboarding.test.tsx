@@ -112,7 +112,7 @@ test('test error productID', async () => {
   await waitFor(() => screen.getByText('Impossibile individuare il prodotto desiderato'));
 });
 
-test('test complete doing an onboarding with institutionType PA', async () => {
+test('test complete doing an onboarding with institutionType PA doing an onboarding with institutionType PA', async () => {
   renderComponent();
   await executeStepInstitutionType('pa');
   await executeStepSearchByBusinessName(agencyX);
@@ -143,6 +143,18 @@ test('test complete with error on submit', async () => {
   await executeStep2();
   await executeStep3(false);
   await executeGoHome();
+});
+
+test('test correct redirect to businessName research when selected type is EQUAL to PA', async () => {
+  renderComponent();
+  await executeStepInstitutionType('pa');
+  await executeStepSearchByBusinessName(agencyError);
+});
+
+test('test correct redirect to taxCode research when selected type is NOT EQUAL to PA', async () => {
+  renderComponent();
+  await executeStepInstitutionType('pt');
+  await executeStepSearchByTaxCode('11111111111');
 });
 
 test('test correct redirect to businessName research when selected type is EQUAL to PA', async () => {
@@ -411,12 +423,18 @@ const fillUserBillingDataForm = async (
   vatNumber: string,
   recipientCode: string
 ) => {
-  fireEvent.change(document.getElementById(businessNameInput) as HTMLInputElement, {
-    target: { value: 'businessNameInput' },
-  });
-  fireEvent.change(document.getElementById(registeredOfficeInput) as HTMLInputElement, {
-    target: { value: 'registeredOfficeInput' },
-  });
+  fireEvent.change(
+    document.getElementById(businessNameInput) as HTMLInputElement as HTMLInputElement,
+    {
+      target: { value: 'businessNameInput' },
+    }
+  );
+  fireEvent.change(
+    document.getElementById(registeredOfficeInput) as HTMLInputElement as HTMLInputElement,
+    {
+      target: { value: 'registeredOfficeInput' },
+    }
+  );
   fireEvent.change(document.getElementById(mailPECInput) as HTMLInputElement, {
     target: { value: 'a@a.it' },
   });

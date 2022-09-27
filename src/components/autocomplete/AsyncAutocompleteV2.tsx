@@ -19,6 +19,8 @@ type AutocompleteProps = {
   setConfirmAction: any;
   selected: any;
   setSelected: React.Dispatch<React.SetStateAction<IPACatalogParty | null>>;
+  setInput: React.Dispatch<React.SetStateAction<string>>;
+  input: string;
   endpoint: Endpoint;
   transformFn: any;
   optionKey?: string;
@@ -32,6 +34,8 @@ export function AsyncAutocompleteV2({
   setConfirmAction,
   confirmAction,
   setSelected,
+  setInput,
+  input,
   endpoint,
   transformFn,
   optionKey,
@@ -39,15 +43,10 @@ export function AsyncAutocompleteV2({
   theme,
 }: AutocompleteProps) {
   const [isLoading, setIsLoading] = useState(false);
-  const [input, setInput] = useState<string>('');
   const [options, setOptions] = useState<Array<any>>([]);
   const { setRequiredLogin } = useContext(UserContext);
   const { t } = useTranslation();
 
-  /* TODO SELC-1533 This API will return to its original state as soon as we have
-   the new API from the BE that calls the data of "infocamere". 
-   this logic will then be moved to the new 
-   API as it becomes available */
   const handleSearch = async (query: string) => {
     setIsLoading(true);
 
