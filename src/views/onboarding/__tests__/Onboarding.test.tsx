@@ -184,7 +184,7 @@ test('test exiting during flow with unload event', async () => {
 
 test('test exiting during flow with logout', async () => {
   renderComponent();
-  await executeStepInstitutionType('pa''pa');
+  await executeStepInstitutionType('pa');
 
   await executeStepSearchByBusinessName(agencyX);
 
@@ -298,31 +298,13 @@ const executeStepSearchByTaxCode = async (taxCode: string) => {
   await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(2));
 };
 
-const executeStepSearchByTaxCode = async (taxCode: string) => {
-  console.log('Testing step search by taxCode');
-
-  screen.getByText(stepSearchByTaxcode);
-  screen.getAllByText('Codice Fiscale/P.IVA')[0];
-  await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(1));
-  const inputPartyName = document.getElementById('Parties');
-
-  expect(inputPartyName).toBeTruthy();
-  await waitFor(() => fireEvent.change(inputPartyName, { target: { value: taxCode } }));
-
-  const confirmButton = screen.getByRole('button', { name: 'Continua' });
-  expect(confirmButton).toBeEnabled();
-
-  fireEvent.click(confirmButton);
-  await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(2));
-};
-
-const executeStepInstitutionType = async (selectedType: stringselectedType: string) => {
+const executeStepInstitutionType = async (selectedType: string) => {
   console.log('Testing step Institution Type');
   await waitFor(() => screen.getByText(stepInstitutionType));
   await fillInstitutionTypeCheckbox(selectedType);
 
   const confirmButtonEnabled = screen.getByRole('button', { name: 'Continua' });
-  await waitFor(() => await waitFor(() => expect(confirmButtonEnabled).toBeEnabled()));
+  await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
 
   fireEvent.click(confirmButtonEnabled);
   await waitFor(() =>
@@ -441,12 +423,18 @@ const fillUserBillingDataForm = async (
   vatNumber: string,
   recipientCode: string
 ) => {
-  fireEvent.change(document.getElementById(businessNameInput) as HTMLInputElement as HTMLInputElement, {
-    target: { value: 'businessNameInput' },
-  });
-  fireEvent.change(document.getElementById(registeredOfficeInput) as HTMLInputElement as HTMLInputElement, {
-    target: { value: 'registeredOfficeInput' },
-  });
+  fireEvent.change(
+    document.getElementById(businessNameInput) as HTMLInputElement as HTMLInputElement,
+    {
+      target: { value: 'businessNameInput' },
+    }
+  );
+  fireEvent.change(
+    document.getElementById(registeredOfficeInput) as HTMLInputElement as HTMLInputElement,
+    {
+      target: { value: 'registeredOfficeInput' },
+    }
+  );
   fireEvent.change(document.getElementById(mailPECInput) as HTMLInputElement, {
     target: { value: 'a@a.it' },
   });
