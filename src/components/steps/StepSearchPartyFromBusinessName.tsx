@@ -56,6 +56,7 @@ export function StepSearchPartyFromBusinessName({
     null
   );
   const [input, setInput] = useState<string>('');
+  const [error, setError] = useState<boolean>(false);
 
   const onForwardAction = () => {
     setSelectedHistory(selected);
@@ -133,6 +134,8 @@ export function StepSearchPartyFromBusinessName({
             setInput={setInput}
             input={input}
             setConfirmAction={undefined}
+            error={error}
+            setError={setError}
             // placeholder={t('onboardingStep1.onboarding.asyncAutocomplete.placeholder')}
             endpoint={{ endpoint: 'ONBOARDING_GET_SEARCH_PARTIES' }}
             transformFn={(data: { items: Array<IPACatalogParty> }) =>

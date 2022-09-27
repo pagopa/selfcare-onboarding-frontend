@@ -80,10 +80,20 @@ export default {
     },
   },
   stepSearchPartyFromTaxCode: {
-    bodyTitle: 'Ricerca il tuo ente',
-    bodyDescription:
+    titleOfSearch: 'Ricerca il tuo ente',
+    titleOfSelection: 'Conferma il tuo ente',
+    SubtitleOfSearch:
       "Inserisci il Codice Fiscale/Partita IVA del tuo ente per cui vuoi <1/>richiedere l'adesione a {{selectedProduct}}",
+    SubtitleOfSelection:
+      "Conferma l’identità dell’ente per cui vuoi richiedere l'adesione a {{selectedProduct}}.",
     placeholder: 'Codice Fiscale/P.IVA',
+    notMatchTaxCodeModal: {
+      title: 'Nessun riscontro',
+      message:
+        'Non è stato trovato nessun ente con il Codice Fiscale o la Partita IVA che hai inserito. Verifica che sia corretto e inseriscilo di nuovo.',
+      retry: 'Riprova',
+    },
+    notMatchHelperText: 'Nessun riscontro',
   },
   onboardingStep2: {
     bodyTitle: 'Indica il Legale <1/> Rappresentante',

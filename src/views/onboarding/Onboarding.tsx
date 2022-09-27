@@ -18,6 +18,7 @@ import {
   UserOnCreate,
   Problem,
   RequestOutcomeMessage,
+  IPACatalogParty,
 } from '../../../types';
 import { StepAddManager } from '../../components/steps/StepAddManager';
 import { LoadingOverlay } from '../../components/LoadingOverlay';
@@ -33,9 +34,9 @@ import { registerUnloadEvent, unregisterUnloadEvent } from '../../utils/unloadEv
 import StepInstitutionType from '../../components/steps/StepInstitutionType';
 import { StepSearchPartyFromTaxCode } from '../../components/steps/StepSearchPartyFromTaxCode';
 import { StepSearchPartyFromBusinessName } from '../../components/steps/StepSearchPartyFromBusinessName';
+import { useHistoryState } from '../../components/useHistoryState';
 import { OnboardingStep1_5 } from './components/OnboardingStep1_5';
 import { OnBoardingProductStepDelegates } from './components/OnBoardingProductStepDelegates';
-
 export type ValidateErrorType = 'conflictError';
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
@@ -59,6 +60,10 @@ function OnboardingComponent({ productId }: { productId: string }) {
   const theme = useTheme();
   const [onExitAction, setOnExitAction] = useState<(() => void) | undefined>();
   const [selectedParty, setSelectedParty] = useState<Party>();
+  const [selected, _setSelected, _setSelectedHistory] = useHistoryState<IPACatalogParty | null>(
+    'selected_step1',
+    null
+  );
 
   const fromDashboard =
     window.location.search.indexOf(`partyExternalId=${externalInstitutionId}`) > -1;
@@ -384,11 +389,16 @@ function OnboardingComponent({ productId }: { productId: string }) {
       label: 'Search party from taxCode',
       Component: () =>
         StepSearchPartyFromTaxCode({
-          subTitle: (
-            <Trans i18nKey="stepSearchPartyFromTaxCode.bodyDescription">
+          subTitle: !selected ? (
+            <Trans i18nKey="stepSearchPartyFromTaxCode.SubtitleOfSearch">
               Inserisci il Codice Fiscale/Partita IVA del tuo ente per cui vuoi <br />
               richiedere l&apos;adesione a {{ selectedProduct: selectedProduct?.title }}
               `${selectedProduct?.title}.`
+            </Trans>
+          ) : (
+            <Trans i18nKey="stepSearchPartyFromTaxCode.SubtitleOfSelection">
+              Conferma l’identità dell’ente per cui vuoi richiedere l&apos;adesione a <br />
+              {{ selectedProduct: selectedProduct?.title }}.
             </Trans>
           ),
           product: selectedProduct,

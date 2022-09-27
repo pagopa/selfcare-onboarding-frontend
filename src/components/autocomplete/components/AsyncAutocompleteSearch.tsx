@@ -32,9 +32,11 @@ type Props = {
   setSelected: React.Dispatch<React.SetStateAction<IPACatalogParty | null>>;
   setInput: Dispatch<SetStateAction<string>>;
   input: string;
+  error: boolean;
   handleChange: (event: any) => void;
 };
 
+// eslint-disable-next-line sonarjs/cognitive-complexity
 export default function AsyncAutocompleteSearch({
   theme,
   searchByTaxCode,
@@ -42,6 +44,7 @@ export default function AsyncAutocompleteSearch({
   setSelected,
   setInput,
   input,
+  error,
   handleChange,
 }: Props) {
   const { t } = useTranslation();
@@ -58,6 +61,10 @@ export default function AsyncAutocompleteSearch({
           ? t('stepSearchPartyFromTaxCode.placeholder')
           : ''
       }
+      helperText={
+        searchByTaxCode && error ? t('stepSearchPartyFromTaxCode.notMatchHelperText') : ''
+      }
+      error={error}
       variant={!selected ? 'outlined' : 'standard'}
       inputProps={{
         style: {
