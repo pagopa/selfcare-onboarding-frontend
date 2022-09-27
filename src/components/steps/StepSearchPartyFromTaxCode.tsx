@@ -49,12 +49,20 @@ export function StepSearchPartyFromTaxCode({ subTitle, forward, back }: Props) {
     null
   );
   const [confirmAction, setConfirmAction] = useState<boolean>(false);
+  const [input, setInput] = useState<string>('');
 
   const onForwardAction = () => {
     setSelectedHistory(selected);
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const { id } = selected!;
     forward({ externalId: id }, { ...selected, externalId: id } as Party);
+  };
+
+  const onBackAction = () => {
+    setSelected(null);
+    setSelectedHistory(null);
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    back!();
   };
 
   const { t } = useTranslation();
@@ -85,11 +93,7 @@ export function StepSearchPartyFromTaxCode({ subTitle, forward, back }: Props) {
   return loading ? (
     <LoadingOverlay loadingText={t('onboardingStep1.loadingOverlayText')} />
   ) : (
-    <Grid
-      container
-      //  mt={16}
-      direction="column"
-    >
+    <Grid container direction="column">
       <Grid container item justifyContent="center">
         <Grid item xs={12}>
           <Typography variant="h3" component="h2" align="center" color={theme.palette.text.primary}>
@@ -115,6 +119,8 @@ export function StepSearchPartyFromTaxCode({ subTitle, forward, back }: Props) {
             setConfirmAction={setConfirmAction}
             selected={selected}
             setSelected={setSelected}
+            setInput={setInput}
+            input={input}
             endpoint={{ endpoint: 'ONBOARDING_GET_SEARCH_PARTIES' }}
             transformFn={(data: { items: Array<IPACatalogParty> }) =>
               /* removed transformation into lower case in order to send data to BE as obtained from registry
@@ -132,18 +138,14 @@ export function StepSearchPartyFromTaxCode({ subTitle, forward, back }: Props) {
       <Grid item mt={4}>
         <OnboardingStepActions
           back={{
-            action: () => {
-              setSelected(null);
-              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-              back!();
-            },
+            action: onBackAction,
             label: t('onboardingStep1.onboarding.onboardingStepActions.backAction'),
             disabled: false,
           }}
           forward={{
             action: () => (!selected ? setConfirmAction(true) : onForwardAction()),
             label: t('onboardingStep1.onboarding.onboardingStepActions.confirmAction'),
-            disabled: false, // TODO: SELC-1560 Check for lenght (11 or 16) else disable
+            disabled: !(input.length === 11 || input.length === 16),
           }}
         />
       </Grid>

@@ -19,6 +19,8 @@ type AutocompleteProps = {
   setConfirmAction: any;
   selected: any;
   setSelected: React.Dispatch<React.SetStateAction<IPACatalogParty | null>>;
+  setInput: React.Dispatch<React.SetStateAction<string>>;
+  input: string;
   endpoint: Endpoint;
   transformFn: any;
   optionKey?: string;
@@ -32,6 +34,8 @@ export function AsyncAutocompleteV2({
   setConfirmAction,
   confirmAction,
   setSelected,
+  setInput,
+  input,
   endpoint,
   transformFn,
   optionKey,
@@ -39,7 +43,6 @@ export function AsyncAutocompleteV2({
   theme,
 }: AutocompleteProps) {
   const [isLoading, setIsLoading] = useState(false);
-  const [input, setInput] = useState<string>('');
   const [options, setOptions] = useState<Array<any>>([]);
   const { setRequiredLogin } = useContext(UserContext);
   const { t } = useTranslation();

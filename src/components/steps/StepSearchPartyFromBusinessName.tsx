@@ -55,6 +55,7 @@ export function StepSearchPartyFromBusinessName({
     'selected_step1',
     null
   );
+  const [input, setInput] = useState<string>('');
 
   const onForwardAction = () => {
     setSelectedHistory(selected);
@@ -129,6 +130,8 @@ export function StepSearchPartyFromBusinessName({
             searchByTaxCode={false}
             selected={selected}
             setSelected={setSelected}
+            setInput={setInput}
+            input={input}
             setConfirmAction={undefined}
             // placeholder={t('onboardingStep1.onboarding.asyncAutocomplete.placeholder')}
             endpoint={{ endpoint: 'ONBOARDING_GET_SEARCH_PARTIES' }}
