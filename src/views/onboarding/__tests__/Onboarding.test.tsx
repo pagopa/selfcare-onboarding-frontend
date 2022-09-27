@@ -725,7 +725,7 @@ const verifySubmit = async () => {
             publicServices: false,
           },
           institutionType: 'GSP',
-          origin: 'IPA',
+          origin: 'INFOCAMERE',
           pricingPlan: 'pricingPlan',
           users: [
             {
