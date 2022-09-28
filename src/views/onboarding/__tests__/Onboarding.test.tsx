@@ -339,7 +339,6 @@ const executeStepBillingData = async () => {
     'recipientCode'
   );
 
-  screen.debug(document, 100000000000000000000000000000);
   await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
 
   await checkCorrectBodyBillingData(

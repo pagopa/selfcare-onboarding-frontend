@@ -238,7 +238,7 @@ const executeStepSelectInstitutionUnreleated = async (partyName: string) => {
   expect(inputPartyName).toBeTruthy();
   fireEvent.change(inputPartyName, { target: { value: 'XXX' } });
 
-  const partyNameSelection = await waitFor(() => screen.getByText(partyName));
+  const partyNameSelection = await waitFor(() => screen.getAllByText(partyName)[0]);
   expect(fetchWithLogsSpy).toBeCalledTimes(4);
 
   fireEvent.click(partyNameSelection);
@@ -493,7 +493,7 @@ const verifySubmit = async () => {
           },
           institutionType: 'GSP',
           pricingPlan: 'pricingPlan',
-          origin: 'INFOCAMERE',
+          origin: 'IPA',
         },
       },
       expect.any(Function)
