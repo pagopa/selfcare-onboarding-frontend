@@ -67,7 +67,7 @@ export function ConfirmRegistrationStep1(
           deleteUploadedFiles={deleteUploadedFiles}
           onDropAccepted={onDropAccepted}
           onDropRejected={onDropRejected}
-          accept={['application/pdf', 'application/pkcs7-mime', 'application/x-pkcs7-mime']}
+          accept={['.pdf', '.p7z', '.p7m', '.p7c']}
           uploaderImageWidth={uploaderImageWidth}
           loading={loading}
           theme={theme}
