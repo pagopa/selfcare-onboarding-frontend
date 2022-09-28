@@ -144,7 +144,7 @@ function OnBoardingSubProduct() {
       ? 'ONBOARDING_PREMIUM_ASSOCIATED_PARTY_SELECTION'
       : 'ONBOARDING_PREMIUM_PARTY_SELECTION';
     trackEvent(event, {
-      party_id: externalInstitutionId,
+      party_id: party.externalId,
       request_id: requestIdRef.current,
       product_id: productId,
       subproduct_id: subProductId,
