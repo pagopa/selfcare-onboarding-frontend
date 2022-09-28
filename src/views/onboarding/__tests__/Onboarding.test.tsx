@@ -77,7 +77,8 @@ const renderComponent = (productId: string = 'prod-pagopa') => {
 };
 
 const stepSearchByBusinessName = 'Seleziona il tuo ente';
-const stepSearchByTaxcode = 'Ricerca il tuo ente';
+const stepSearchByTaxcodeWithNoSelection = 'Ricerca il tuo ente';
+const stepSearchByTaxcodeWithSelection = 'Ricerca il tuo ente';
 const stepInstitutionType = 'Seleziona il tipo di ente che rappresenti';
 const stepBillingDataTitle = 'Indica i dati del tuo ente';
 const step2Title = 'Indica il Legale Rappresentante';
@@ -123,11 +124,10 @@ test('test complete doing an onboarding with institutionType PA doing an onboard
   await executeGoHome();
 });
 
-// TODO Resolve this first before going to ENV development
-test.skip('test complete doing an onboarding with institutionType GPS (NOT PA)', async () => {
+test('test complete doing an onboarding with institutionType GPS (NOT PA)', async () => {
   renderComponent();
   await executeStepInstitutionType('gsp');
-  await executeStepSearchByTaxCode('22222222222');
+  await executeStepSearchByTaxCode('00000000000');
   await executeStepBillingData();
   await executeStep2();
   await executeStep3(true);
@@ -268,7 +268,7 @@ const executeStepSearchByBusinessName = async (partyName: string) => {
   expect(inputPartyName).toBeTruthy();
   fireEvent.change(inputPartyName, { target: { value: 'XXX' } });
 
-  const partyNameSelection = await waitFor(() => screen.getByText(partyName));
+  const partyNameSelection = await waitFor(() => screen.getAllByText(partyName)[0]);
   expect(fetchWithLogsSpy).toBeCalledTimes(2);
 
   fireEvent.click(partyNameSelection);
@@ -283,19 +283,22 @@ const executeStepSearchByBusinessName = async (partyName: string) => {
 const executeStepSearchByTaxCode = async (taxCode: string) => {
   console.log('Testing step search by taxCode');
 
-  screen.getByText(stepSearchByTaxcode);
+  screen.getByText(stepSearchByTaxcodeWithNoSelection);
   screen.getAllByText('Codice Fiscale/P.IVA')[0];
   await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(1));
   const inputPartyName = document.getElementById('Parties');
-
   expect(inputPartyName).toBeTruthy();
-  await waitFor(() => fireEvent.change(inputPartyName, { target: { value: taxCode } }));
 
   const confirmButton = screen.getByRole('button', { name: 'Continua' });
+
+  await waitFor(() => fireEvent.change(inputPartyName, { target: { value: taxCode } }));
   expect(confirmButton).toBeEnabled();
+  fireEvent.click(confirmButton);
+
+  await waitFor(() => screen.getByText(stepSearchByTaxcodeWithSelection));
 
   fireEvent.click(confirmButton);
-  await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(2));
+  await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(3));
 };
 
 const executeStepInstitutionType = async (selectedType: string) => {
@@ -310,7 +313,7 @@ const executeStepInstitutionType = async (selectedType: string) => {
   await waitFor(() =>
     selectedType === 'pa'
       ? screen.getByText(stepSearchByBusinessName)
-      : screen.getByText(stepSearchByTaxcode)
+      : screen.getByText(stepSearchByTaxcodeWithNoSelection)
   );
 };
 
@@ -344,7 +347,7 @@ const executeStepBillingData = async () => {
     'a@a.it',
     '09010',
     '22222222222',
-    '22222222222',
+    '12345678901',
     'recipientCode'
   );
 
@@ -423,18 +426,12 @@ const fillUserBillingDataForm = async (
   vatNumber: string,
   recipientCode: string
 ) => {
-  fireEvent.change(
-    document.getElementById(businessNameInput) as HTMLInputElement as HTMLInputElement,
-    {
-      target: { value: 'businessNameInput' },
-    }
-  );
-  fireEvent.change(
-    document.getElementById(registeredOfficeInput) as HTMLInputElement as HTMLInputElement,
-    {
-      target: { value: 'registeredOfficeInput' },
-    }
-  );
+  fireEvent.change(document.getElementById(businessNameInput) as HTMLInputElement, {
+    target: { value: 'businessNameInput' },
+  });
+  fireEvent.change(document.getElementById(registeredOfficeInput) as HTMLInputElement, {
+    target: { value: 'registeredOfficeInput' },
+  });
   fireEvent.change(document.getElementById(mailPECInput) as HTMLInputElement, {
     target: { value: 'a@a.it' },
   });
@@ -725,7 +722,7 @@ const verifySubmit = async () => {
             publicServices: false,
           },
           institutionType: 'GSP',
-          origin: 'INFOCAMERE',
+          origin: 'IPA',
           pricingPlan: 'pricingPlan',
           users: [
             {

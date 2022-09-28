@@ -184,7 +184,7 @@ export function AsyncAutocompleteV2({
             />
           ) : (
             moreMatches.map((m) => (
-              <Box key={m.id} sx={{ width: '100%', paddingLeft: 4 }}>
+              <Box key={m.id} sx={{ width: '100%', paddingLeft: 4, paddingRight: 4 }}>
                 <Grid aria-label={m.description}>
                   <PartyAccountItemButton
                     aria-label={m.description}
