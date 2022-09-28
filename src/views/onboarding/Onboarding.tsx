@@ -129,7 +129,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
     });
     forwardWithData(newFormData);
     trackEvent('ONBOARDING_PARTY_SELECTION', {
-      party_id: externalInstitutionId,
+      party_id: party.externalId,
       request_id: requestIdRef.current,
       product_id: productId,
     });
@@ -336,7 +336,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
   const forwardWithInstitutionType = (newInstitutionType: InstitutionType) => {
     trackEvent('ONBOARDING_PARTY_TYPE_SELECTION', {
       request_id: requestIdRef.current,
-      party_id: externalInstitutionId,
+      party_id: selectedParty?.externalId,
       product_id: productId,
     });
     setInstitutionType(newInstitutionType);
