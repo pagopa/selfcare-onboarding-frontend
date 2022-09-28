@@ -287,6 +287,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
 
     setLoading(false);
 
+    // Check the outcome
     const outcome = getFetchOutcome(postLegalsResponse);
 
     if (outcome === 'success') {
