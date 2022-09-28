@@ -54,7 +54,7 @@ export function StepAddManager({
     user: UserOnCreate,
     prefix: string,
     externalInstitutionId: string,
-    subProduct?: string
+    subProduct?: Product | undefined
   ) => {
     userValidate(
       externalInstitutionId,
@@ -143,7 +143,7 @@ export function StepAddManager({
           }}
           forward={{
             action: () => {
-              validateUserData(people.LEGAL, 'LEGAL', externalInstitutionId);
+              validateUserData(people.LEGAL, 'LEGAL', externalInstitutionId, subProduct);
             },
             label: t('onboardingStep2.confirmLabel'),
             disabled: objectIsEmpty(people) || !validateUser('LEGAL', people.LEGAL, people),
