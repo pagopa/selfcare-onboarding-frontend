@@ -336,7 +336,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
   const forwardWithInstitutionType = (newInstitutionType: InstitutionType) => {
     trackEvent('ONBOARDING_PARTY_TYPE_SELECTION', {
       request_id: requestIdRef.current,
-      party_id: selectedParty?.externalId,
+      party_id: externalInstitutionId ?? selectedParty?.externalId,
       product_id: productId,
     });
     setInstitutionType(newInstitutionType);
