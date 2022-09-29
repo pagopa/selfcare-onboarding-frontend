@@ -18,6 +18,7 @@ import { ENV } from '../utils/env';
 import { MessageNoAction } from '../components/MessageNoAction';
 import { HeaderContext, UserContext } from '../lib/context';
 import { getOnboardingMagicLinkJwt } from './RejectRegistration';
+import JwtIvalidPage from './JwtIvalidPage';
 
 type FileErrorAttempt = {
   fileName: string;
@@ -251,67 +252,76 @@ export default function CompleteRegistrationComponent() {
       ],
     },
   };
-  return outcome === 'success' ? (
-    <MessageNoAction {...outcomeContent[outcome]} />
-  ) : outcome === 'error' ? (
-    !token || showBlockingError ? (
-      <Grid container direction="column" key="0" style={{ textAlign: 'center' }}>
-        <Grid container item justifyContent="center" mb={2}>
-          <IllusError size={60} />
-        </Grid>
-        <Grid container item justifyContent="center" mt={3}>
-          <Grid item xs={6}>
-            <Typography variant="h4">{t('completeRegistration.title')}</Typography>
+
+  const [errorTrue, setErrorTrue] = useState<boolean>(false);
+  return (
+    <>
+      <Button onClick={() => setErrorTrue(!errorTrue)}>click</Button>
+      {errorTrue ? (
+        <JwtIvalidPage />
+      ) : outcome === 'success' ? (
+        <MessageNoAction {...outcomeContent[outcome]} />
+      ) : outcome === 'error' ? (
+        !token || showBlockingError ? (
+          <Grid container direction="column" key="0" style={{ textAlign: 'center' }}>
+            <Grid container item justifyContent="center" mb={2}>
+              <IllusError size={60} />
+            </Grid>
+            <Grid container item justifyContent="center" mt={3}>
+              <Grid item xs={6}>
+                <Typography variant="h4">{t('completeRegistration.title')}</Typography>
+              </Grid>
+            </Grid>
+            <Grid container item justifyContent="center" mb={4} mt={1}>
+              <Grid item xs={6}>
+                <Typography variant="body1">
+                  <Trans i18nKey="completeRegistration.description">
+                    Non siamo riusciti a indirizzarti alla pagina di caricamento
+                    <br />
+                    per completare la procedura.
+                  </Trans>
+                </Typography>
+              </Grid>
+            </Grid>
+            <Grid container item justifyContent="center">
+              <Grid item xs={4}>
+                <Button
+                  variant="contained"
+                  sx={{ alignSelf: 'center' }}
+                  onClick={() => window.location.assign(buildAssistanceURI(ENV.ASSISTANCE.EMAIL))}
+                >
+                  {t('completeRegistration.contactAssistanceButton')}
+                </Button>
+              </Grid>
+            </Grid>
           </Grid>
-        </Grid>
-        <Grid container item justifyContent="center" mb={4} mt={1}>
-          <Grid item xs={6}>
-            <Typography variant="body1">
-              <Trans i18nKey="completeRegistration.description">
-                Non siamo riusciti a indirizzarti alla pagina di caricamento
-                <br />
-                per completare la procedura.
-              </Trans>
-            </Typography>
-          </Grid>
-        </Grid>
-        <Grid container item justifyContent="center">
-          <Grid item xs={4}>
-            <Button
-              variant="contained"
-              sx={{ alignSelf: 'center' }}
-              onClick={() => window.location.assign(buildAssistanceURI(ENV.ASSISTANCE.EMAIL))}
-            >
-              {t('completeRegistration.contactAssistanceButton')}
-            </Button>
-          </Grid>
-        </Grid>
-      </Grid>
-    ) : (
-      <SessionModal
-        handleClose={handleErrorModalClose}
-        handleExit={handleErrorModalExit}
-        onConfirm={handleErrorModalConfirm}
-        open={true}
-        title={t(`completeRegistration.errors.${errorCode}.title`)}
-        message={
-          errorCode === 'INVALID_SIGN_FORMAT' ? (
-            <Trans i18nKey={`completeRegistration.errors.INVALID_SIGN_FORMAT.message`}>
-              {'Il caricamento del documento non è andato a buon fine.'}
-              <br />
-              {'Carica un solo file in formato '}
-              <strong>{'p7m'}</strong>
-              {'.'}
-            </Trans>
-          ) : (
-            t(`completeRegistration.errors.${errorCode}.message`)
-          )
-        }
-        onConfirmLabel={t('completeRegistration.sessionModal.onConfirmLabel')}
-        onCloseLabel={t('completeRegistration.sessionModal.onCloseLabel')}
-      />
-    )
-  ) : (
-    <Step />
+        ) : (
+          <SessionModal
+            handleClose={handleErrorModalClose}
+            handleExit={handleErrorModalExit}
+            onConfirm={handleErrorModalConfirm}
+            open={true}
+            title={t(`completeRegistration.errors.${errorCode}.title`)}
+            message={
+              errorCode === 'INVALID_SIGN_FORMAT' ? (
+                <Trans i18nKey={`completeRegistration.errors.INVALID_SIGN_FORMAT.message`}>
+                  {'Il caricamento del documento non è andato a buon fine.'}
+                  <br />
+                  {'Carica un solo file in formato '}
+                  <strong>{'p7m'}</strong>
+                  {'.'}
+                </Trans>
+              ) : (
+                t(`completeRegistration.errors.${errorCode}.message`)
+              )
+            }
+            onConfirmLabel={t('completeRegistration.sessionModal.onConfirmLabel')}
+            onCloseLabel={t('completeRegistration.sessionModal.onCloseLabel')}
+          />
+        )
+      ) : (
+        <Step />
+      )}
+    </>
   );
 }
