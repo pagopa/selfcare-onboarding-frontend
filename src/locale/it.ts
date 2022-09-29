@@ -272,7 +272,9 @@ export default {
       scp: 'Società a controllo pubblico',
       pt: 'Partner tecnologico',
     },
-    cadArticle2: 'art. 2, comma 2, lett. a del CAD',
+    cadArticle2A: 'art. 2, comma 2, lettera A del CAD',
+    cadArticle2B: 'art. 2, comma 2, lettera B del CAD',
+    cadArticle2C: 'art. 2, comma 2, lettera C del CAD',
     cadArticle165: 'articolo 1, comma 2, del decreto legislativo 30 marzo 2001, n. 165',
     cadArticle6AppIo:
       'Ai sensi di IO - Paragrafo 6.1.3 delle “Linee Guida sul punto di accesso telematico ai servizi della Pubblica Amministrazione” emanate da AgID ai sensi dell’art- 64-bis del CAD',
