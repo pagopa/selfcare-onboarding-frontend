@@ -71,12 +71,26 @@ export default function StepInstitutionType({
     if (selectedProductId === 'prod-io' && itValue === 'PT') {
       return t('stepInstitutionType.cadArticle6AppIo');
     } else if (
+      (selectedProductId === 'prod-io' ||
+        selectedProductId === 'prod-interop' ||
+        selectedProductId === 'prod-pagopa') &&
+      itValue === 'GSP'
+    ) {
+      return t('stepInstitutionType.cadArticle2B');
+    } else if (
+      (selectedProductId === 'prod-io' ||
+        selectedProductId === 'prod-interop' ||
+        selectedProductId === 'prod-pagopa') &&
+      itValue === 'SCP'
+    ) {
+      return t('stepInstitutionType.cadArticle2C');
+    } else if (
       (selectedProductId === 'prod-pn' || selectedProductId === 'prod-idpay') &&
       itValue === 'PA'
     ) {
       return t('stepInstitutionType.cadArticle165');
     } else {
-      return t('stepInstitutionType.cadArticle2');
+      return t('stepInstitutionType.cadArticle2A');
     }
   };
 
