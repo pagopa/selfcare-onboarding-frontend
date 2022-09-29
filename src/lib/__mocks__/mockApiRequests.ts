@@ -149,9 +149,77 @@ const mockPartyRegistry = {
   count: 5,
 };
 
+const mockedProducts = {
+  products: [
+    {
+      title: 'App IO',
+      id: 'prod-io',
+      roles: [
+        {
+          relationshipId: 'rel2',
+          role: 'incaricato-ente-creditore',
+          selcRole: 'ADMIN',
+          status: 'ACTIVE',
+        },
+      ],
+    },
+    {
+      title: 'Piattaforma Notifiche',
+      id: 'prod-pn',
+      roles: [
+        {
+          relationshipId: 'rel2',
+          role: 'referente-tecnico',
+          selcRole: 'LIMITED',
+          status: 'ACTIVE',
+        },
+      ],
+    },
+    {
+      title: 'Pagamenti pagoPA',
+      id: 'prod-pagopa',
+      roles: [
+        {
+          relationshipId: 'rel2',
+          role: 'referente-tecnico',
+          selcRole: 'LIMITED',
+          status: 'ACTIVE',
+        },
+      ],
+    },
+    {
+      title: 'Interoperabilità',
+      id: 'prod-interop',
+      roles: [
+        {
+          relationshipId: 'rel2',
+          role: 'referente-tecnico',
+          selcRole: 'LIMITED',
+          status: 'ACTIVE',
+        },
+      ],
+    },
+    {
+      title: 'IDPay',
+      id: 'prod-idpay',
+      roles: [
+        {
+          relationshipId: 'rel2',
+          role: 'referente-tecnico',
+          selcRole: 'LIMITED',
+          status: 'ACTIVE',
+        },
+      ],
+    },
+  ],
+};
+
+// eslint-disable-next-line functional/immutable-data
+const urlProductId = window.location.pathname.split('/').pop();
+
 const mockedProduct = {
-  title: 'App IO',
-  id: 'prod-io',
+  title: mockedProducts.products.find((p) => p.id === urlProductId)?.title,
+  id: urlProductId,
 };
 
 const mockedSubProduct = {
@@ -416,7 +484,11 @@ export async function mockFetch(
         );
       default:
         return new Promise((resolve) =>
-          resolve({ data: mockedProduct, status: 200, statusText: '200' } as AxiosResponse)
+          resolve({
+            data: mockedProduct,
+            status: 200,
+            statusText: '200',
+          } as AxiosResponse)
         );
     }
   }
