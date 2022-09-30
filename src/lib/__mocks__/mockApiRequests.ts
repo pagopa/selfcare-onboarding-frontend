@@ -145,6 +145,7 @@ const mockPartyRegistry = {
       originId: 'originId7',
       address: 'sede legale',
     },
+    // taxCode: '55555555555' is related to institutionType GSP
     {
       id: 'idInfocamere',
       o: 'o',
@@ -152,7 +153,7 @@ const mockPartyRegistry = {
       aoo: 'aoo',
       taxCode: '55555555555',
       zipCode: '44332',
-      administrationCode: '00000000000',
+      administrationCode: '55555555555',
       category: 'c7',
       managerName: 'Mario',
       managerSurname: 'Rossi',
@@ -176,6 +177,24 @@ const mockPartyRegistry = {
       description: 'AGENCY ORIGIN IPA',
       digitalAddress: 'mail@pec.mail.org',
       origin: 'IPA',
+      originId: 'originId1',
+      address: 'sede legale',
+    },
+    // use case with billingData enabled (origin !== IPA || INFOCAMERE)
+    {
+      id: 'idIpa',
+      o: 'o',
+      ou: 'ou',
+      aoo: 'aoo',
+      taxCode: '77777777777',
+      zipCode: '44332',
+      administrationCode: '77777777777',
+      category: 'c7',
+      managerName: 'Mario',
+      managerSurname: 'Rossi',
+      description: 'AGENCY EDITABLE',
+      digitalAddress: 'mail@pec.mail.org',
+      origin: 'TEST',
       originId: 'originId1',
       address: 'sede legale',
     },
@@ -355,9 +374,34 @@ const mockedOnboardingData1: InstitutionOnboardingInfoResource = {
       vatNumber: '12345678901',
       recipientCode: 'M2UHYR1',
     },
-    institutionType: 'PA',
+    institutionType: 'GSP',
     origin: 'INFOCAMERE',
   },
+  manager: {
+    email: 'm@ma.it',
+    taxCode: 'RSOMRA11A11A123K',
+    name: 'Maria',
+    surname: 'Rosa',
+    role: 'MANAGER',
+  },
+};
+
+const mockedOnboardingData2: InstitutionOnboardingInfoResource = {
+  institution: {
+    id: '370c63d8-1b76-4376-a725-4caf2a73822a',
+    billingData: {
+      businessName: 'Comune di Roma',
+      registeredOffice: 'Roma, Piazza Colonna 370',
+      zipCode: '20021',
+      digitalAddress: 'comune.bollate@pec.it',
+      taxCode: 'EEEEEE11A11A123L',
+      vatNumber: '12345678942',
+      recipientCode: 'M2UHYR1',
+    },
+    institutionType: 'GSP',
+    origin: 'INFOCAMERE',
+  },
+
   manager: {
     email: 'm@ma.it',
     taxCode: 'RSOMRA11A11A123K',
@@ -498,6 +542,10 @@ export async function mockFetch(
       case 'error':
         return new Promise((resolve) =>
           resolve({ data: mockedOnboardingData1, status: 200, statusText: '200' } as AxiosResponse)
+        );
+      case 'idInfocamere':
+        return new Promise((resolve) =>
+          resolve({ data: mockedOnboardingData2, status: 200, statusText: '200' } as AxiosResponse)
         );
       default:
         return new Promise((resolve) =>
