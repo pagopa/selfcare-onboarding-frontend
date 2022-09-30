@@ -62,7 +62,7 @@ export function StepSearchPartyFromBusinessName({
     setSelectedHistory(selected);
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const { id } = selected!;
-    forward({ externalId: id }, { ...selected, externalId: id } as Party, institutionType);
+    forward({ externalId: id }, { ...selected, externalId: id } as Party, institutionType, origin);
   };
 
   const { t } = useTranslation();

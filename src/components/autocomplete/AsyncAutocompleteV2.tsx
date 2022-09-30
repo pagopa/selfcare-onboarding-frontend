@@ -1,9 +1,9 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import debounce from 'lodash/debounce';
 import { AxiosError, AxiosResponse } from 'axios';
-import { Theme, Grid, Typography, Paper } from '@mui/material';
+import { Theme, Grid, Typography, Paper, Stack } from '@mui/material';
 import { Box } from '@mui/system';
-import { useTranslation } from 'react-i18next';
+import { useTranslation, Trans } from 'react-i18next';
 import SessionModal from '@pagopa/selfcare-common-frontend/components/SessionModal';
 import { PartyAccountItemButton } from '@pagopa/mui-italia/dist/components/PartyAccountItemButton';
 import { Endpoint, IPACatalogParty } from '../../../types';
@@ -141,6 +141,7 @@ export function AsyncAutocompleteV2({
       elevation={8}
       sx={{
         display: 'flex',
+        flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
         minHeight: '104px',
@@ -155,7 +156,7 @@ export function AsyncAutocompleteV2({
           xs={12}
           display="flex"
           justifyContent="center"
-          sx={{ flexDirection: 'column', alignItems: 'center' }}
+          sx={{ flexDirection: 'row', alignItems: 'center' }}
           pt={4}
           pb={showElement && !selected && !searchByTaxCode ? 0 : 4}
         >
@@ -168,7 +169,13 @@ export function AsyncAutocompleteV2({
             handleClose={handleCloseErrorModal}
             open={openErrorModal}
             title={t('stepSearchPartyFromTaxCode.notMatchTaxCodeModal.title')}
-            message={t('stepSearchPartyFromTaxCode.notMatchTaxCodeModal.message')}
+            message={
+              <Trans i18nKey="stepSearchPartyFromTaxCode.notMatchTaxCodeModal.message">
+                Non è stato trovato nessun ente con il Codice Fiscale/Partita IVA
+                <strong> {{ taxCode: input }}</strong>. Verifica che sia corretto e inseriscilo di
+                nuovo.
+              </Trans>
+            }
             onCloseLabel={t('stepSearchPartyFromTaxCode.notMatchTaxCodeModal.retry')}
           />
           {!confirmAction && moreMatches.length === 0 ? (
@@ -183,19 +190,21 @@ export function AsyncAutocompleteV2({
               handleChange={handleChange}
             />
           ) : (
-            moreMatches.map((m) => (
-              <Box key={m.id} sx={{ width: '100%', paddingLeft: 4, paddingRight: 4 }}>
-                <Grid aria-label={m.description}>
-                  <PartyAccountItemButton
-                    aria-label={m.description}
-                    partyName={m.description}
-                    action={() => setSelected(m)}
-                    selectedItem={selected?.id === m.id}
-                    maxCharactersNumberMultiLine={20}
-                  />
-                </Grid>
-              </Box>
-            ))
+            <Stack spacing={2} sx={{ display: 'flex', px: 4, width: '100%' }}>
+              {moreMatches.map((m) => (
+                <Box key={m.id}>
+                  <Grid aria-label={m.description}>
+                    <PartyAccountItemButton
+                      aria-label={m.description}
+                      partyName={m.description}
+                      action={() => setSelected(m)}
+                      selectedItem={selected?.id === m.id}
+                      maxCharactersNumberMultiLine={20}
+                    />
+                  </Grid>
+                </Box>
+              ))}
+            </Stack>
           )}
         </Grid>
         {searchByTaxCode ? (

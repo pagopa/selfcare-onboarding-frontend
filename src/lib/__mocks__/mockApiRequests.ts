@@ -21,7 +21,7 @@ const mockPartyRegistry = {
       managerSurname: 'Rossi',
       description: 'AGENCY X',
       digitalAddress: 'mail@pec.mail.org',
-      origin: 'IPA',
+      origin: 'INFOCAMERE',
       originId: 'originId1',
       address: 'sede legale',
     },
@@ -145,13 +145,116 @@ const mockPartyRegistry = {
       originId: 'originId7',
       address: 'sede legale',
     },
+    {
+      id: 'idInfocamere',
+      o: 'o',
+      ou: 'ou',
+      aoo: 'aoo',
+      taxCode: '55555555555',
+      zipCode: '44332',
+      administrationCode: '00000000000',
+      category: 'c7',
+      managerName: 'Mario',
+      managerSurname: 'Rossi',
+      description: 'AGENCY ORIGIN INFOCAMERE',
+      digitalAddress: 'mail@pec.mail.org',
+      origin: 'INFOCAMERE',
+      originId: 'originId1',
+      address: 'sede legale',
+    },
+    {
+      id: 'idIpa',
+      o: 'o',
+      ou: 'ou',
+      aoo: 'aoo',
+      taxCode: '88888888888',
+      zipCode: '44332',
+      administrationCode: '00000000000',
+      category: 'c7',
+      managerName: 'Mario',
+      managerSurname: 'Rossi',
+      description: 'AGENCY ORIGIN IPA',
+      digitalAddress: 'mail@pec.mail.org',
+      origin: 'IPA',
+      originId: 'originId1',
+      address: 'sede legale',
+    },
   ],
   count: 5,
 };
 
+const mockedProducts = {
+  products: [
+    {
+      title: 'App IO',
+      id: 'prod-io',
+      roles: [
+        {
+          relationshipId: 'rel2',
+          role: 'incaricato-ente-creditore',
+          selcRole: 'ADMIN',
+          status: 'ACTIVE',
+        },
+      ],
+    },
+    {
+      title: 'Piattaforma Notifiche',
+      id: 'prod-pn',
+      roles: [
+        {
+          relationshipId: 'rel2',
+          role: 'referente-tecnico',
+          selcRole: 'LIMITED',
+          status: 'ACTIVE',
+        },
+      ],
+    },
+    {
+      title: 'Pagamenti pagoPA',
+      id: 'prod-pagopa',
+      roles: [
+        {
+          relationshipId: 'rel2',
+          role: 'referente-tecnico',
+          selcRole: 'LIMITED',
+          status: 'ACTIVE',
+        },
+      ],
+    },
+    {
+      title: 'Interoperabilità',
+      id: 'prod-interop',
+      roles: [
+        {
+          relationshipId: 'rel2',
+          role: 'referente-tecnico',
+          selcRole: 'LIMITED',
+          status: 'ACTIVE',
+        },
+      ],
+    },
+    {
+      title: 'IDPay',
+      id: 'prod-idpay',
+      roles: [
+        {
+          relationshipId: 'rel2',
+          role: 'referente-tecnico',
+          selcRole: 'LIMITED',
+          status: 'ACTIVE',
+        },
+      ],
+    },
+  ],
+};
+
+// eslint-disable-next-line functional/immutable-data
+const urlProductId = window.location.pathname.split('/').pop();
+const selectedProduct = mockedProducts.products.find((p) => p.id === urlProductId);
+
 const mockedProduct = {
-  title: 'App IO',
-  id: 'prod-io',
+  title: selectedProduct?.title,
+  id: urlProductId,
 };
 
 const mockedSubProduct = {
@@ -252,8 +355,8 @@ const mockedOnboardingData1: InstitutionOnboardingInfoResource = {
       vatNumber: '12345678901',
       recipientCode: 'M2UHYR1',
     },
-    institutionType: 'GSP',
-    origin: 'IPA',
+    institutionType: 'PA',
+    origin: 'INFOCAMERE',
   },
   manager: {
     email: 'm@ma.it',
@@ -416,7 +519,11 @@ export async function mockFetch(
         );
       default:
         return new Promise((resolve) =>
-          resolve({ data: mockedProduct, status: 200, statusText: '200' } as AxiosResponse)
+          resolve({
+            data: mockedProduct,
+            status: 200,
+            statusText: '200',
+          } as AxiosResponse)
         );
     }
   }

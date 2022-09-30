@@ -67,6 +67,7 @@ export default function AsyncAutocompleteSearch({
       error={error}
       variant={!selected ? 'outlined' : 'standard'}
       inputProps={{
+        maxLength: searchByTaxCode ? '16ch' : undefined,
         style: {
           fontStyle: 'normal',
           fontWeight: '700',

@@ -3,7 +3,7 @@ import { useContext, useEffect, useState } from 'react';
 import { AxiosResponse } from 'axios';
 import { useTranslation } from 'react-i18next';
 import { ReactElement } from 'react';
-import { IPACatalogParty, Party, StepperStepComponentProps } from '../../../types';
+import { InstitutionType, IPACatalogParty, Party, StepperStepComponentProps } from '../../../types';
 import { getFetchOutcome } from '../../lib/error-utils';
 import { fetchWithLogs } from '../../lib/api-utils';
 import { UserContext } from '../../lib/context';
@@ -14,6 +14,7 @@ import { AsyncAutocompleteV2 } from '../autocomplete/AsyncAutocompleteV2';
 
 type Props = {
   subTitle: string | ReactElement;
+  institutionType?: InstitutionType;
 } & StepperStepComponentProps;
 
 const handleSearchExternalId = async (
@@ -38,7 +39,7 @@ const handleSearchExternalId = async (
   return null;
 };
 
-export function StepSearchPartyFromTaxCode({ subTitle, forward, back }: Props) {
+export function StepSearchPartyFromTaxCode({ subTitle, institutionType, forward, back }: Props) {
   const partyExternalIdByQuery = new URLSearchParams(window.location.search).get('partyExternalId');
   const { setRequiredLogin } = useContext(UserContext);
   const theme = useTheme();
@@ -56,7 +57,7 @@ export function StepSearchPartyFromTaxCode({ subTitle, forward, back }: Props) {
     setSelectedHistory(selected);
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const { id } = selected!;
-    forward({ externalId: id }, { ...selected, externalId: id } as Party);
+    forward({ externalId: id }, { ...selected, externalId: id } as Party, institutionType);
   };
 
   const onBackAction = () => {
@@ -149,7 +150,7 @@ export function StepSearchPartyFromTaxCode({ subTitle, forward, back }: Props) {
           forward={{
             action: () => (!selected ? setConfirmAction(true) : onForwardAction()),
             label: t('onboardingStep1.onboarding.onboardingStepActions.confirmAction'),
-            disabled: error || !(input.length === 11 || input.length === 16),
+            disabled: error || !(input.length >= 11 && input.length <= 16),
           }}
         />
       </Grid>

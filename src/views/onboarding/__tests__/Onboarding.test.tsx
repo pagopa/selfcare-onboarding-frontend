@@ -113,25 +113,25 @@ test('test error productID', async () => {
   await waitFor(() => screen.getByText('Impossibile individuare il prodotto desiderato'));
 });
 
-test('test complete doing an onboarding with institutionType PA doing an onboarding with institutionType PA', async () => {
+test('test complete doing an onboarding with institutionType PA (from IPA)', async () => {
   renderComponent();
   await executeStepInstitutionType('pa');
   await executeStepSearchByBusinessName(agencyX);
   await executeStepBillingData();
   await executeStep2();
   await executeStep3(true);
-  await verifySubmit();
+  await expectedSubmitFromIpaCompleteTest();
   await executeGoHome();
 });
 
-test('test complete doing an onboarding with institutionType GPS (NOT PA)', async () => {
+test('test complete doing an onboarding with institutionType GPS (from Infocamere)', async () => {
   renderComponent();
   await executeStepInstitutionType('gsp');
-  await executeStepSearchByTaxCode('00000000000');
+  await executeStepSearchByTaxCode('55555555555');
   await executeStepBillingData();
   await executeStep2();
   await executeStep3(true);
-  await verifySubmit();
+  await expectedSubmitFromInfocamereCompleteTest();
   await executeGoHome();
 });
 
@@ -321,13 +321,13 @@ const executeStepBillingData = async () => {
   console.log('Testing step Billing Data');
   await waitFor(() => screen.getByText(stepBillingDataTitle));
 
-  const confirmButtonEnabled = screen.getByRole('button', { name: 'Continua' });
-  await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
+  const confirmButton = screen.getByRole('button', { name: 'Continua' });
 
-  fireEvent.change(document.getElementById('recipientCode'), {
-    target: { value: '' },
-  });
-  await waitFor(() => expect(confirmButtonEnabled).toBeDisabled());
+  await waitFor(() =>
+    fireEvent.change(document.getElementById('recipientCode'), {
+      target: { value: 'recipientCode' },
+    })
+  );
 
   await fillUserBillingDataForm(
     'businessName',
@@ -339,7 +339,7 @@ const executeStepBillingData = async () => {
     'recipientCode'
   );
 
-  await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
+  await waitFor(() => expect(confirmButton).toBeEnabled());
 
   await checkCorrectBodyBillingData(
     'businessNameInput',
@@ -351,7 +351,7 @@ const executeStepBillingData = async () => {
     'recipientCode'
   );
 
-  fireEvent.click(confirmButtonEnabled);
+  fireEvent.click(confirmButton);
   await waitFor(() => screen.getByText(step2Title));
 };
 
@@ -702,7 +702,7 @@ const fillAdditionalUserAndCheckUniqueValues = async (
   }
 };
 
-const verifySubmit = async () => {
+const expectedSubmitFromIpaCompleteTest = async () => {
   await waitFor(() =>
     expect(fetchWithLogsSpy).lastCalledWith(
       {
@@ -719,10 +719,70 @@ const verifySubmit = async () => {
             taxCode: '22222222222',
             vatNumber: '12345678901',
             recipientCode: 'recipientCode',
+            publicServices: undefined,
+          },
+          institutionType: 'PA',
+          origin: 'INFOCAMERE',
+          pricingPlan: 'pricingPlan',
+          users: [
+            {
+              email: 'b@b.bb',
+              name: 'NAME',
+              role: 'MANAGER',
+              surname: 'SURNAME',
+              taxCode: 'SRNNMA00B00B000B',
+            },
+            {
+              email: 'a@a.aa',
+              name: 'NAME',
+              role: 'DELEGATE',
+              surname: 'SURNAME',
+              taxCode: 'SRNNMA00C00C000C',
+            },
+            {
+              email: '0@z.zz',
+              name: 'NAME',
+              role: 'DELEGATE',
+              surname: 'SURNAME',
+              taxCode: 'SRNNMA00A00A000A',
+            },
+            {
+              email: '1@z.zz',
+              name: 'NAME',
+              role: 'DELEGATE',
+              surname: 'SURNAME',
+              taxCode: 'SRNNMA01A00A000A',
+            },
+          ],
+        },
+        method: 'POST',
+      },
+      expect.any(Function)
+    )
+  );
+};
+
+const expectedSubmitFromInfocamereCompleteTest = async () => {
+  await waitFor(() =>
+    expect(fetchWithLogsSpy).lastCalledWith(
+      {
+        endpoint: 'ONBOARDING_POST_LEGALS',
+        endpointParams: { externalInstitutionId: 'idInfocamere', productId: 'prod-pagopa' },
+      },
+      {
+        data: {
+          billingData: {
+            businessName: 'businessNameInput',
+            registeredOffice: 'registeredOfficeInput',
+            digitalAddress: 'a@a.it',
+            zipCode: '09010',
+            taxCode: '22222222222',
+            vatNumber: '22222222222',
+            recipientCode: 'recipientCode',
             publicServices: false,
           },
           institutionType: 'GSP',
-          origin: 'IPA',
+          origin: 'INFOCAMERE',
           pricingPlan: 'pricingPlan',
           users: [
             {
