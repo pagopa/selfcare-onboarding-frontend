@@ -250,9 +250,10 @@ const mockedProducts = {
 
 // eslint-disable-next-line functional/immutable-data
 const urlProductId = window.location.pathname.split('/').pop();
+const selectedProduct = mockedProducts.products.find((p) => p.id === urlProductId);
 
 const mockedProduct = {
-  title: mockedProducts.products.find((p) => p.id === urlProductId)?.title,
+  title: selectedProduct?.title,
   id: urlProductId,
 };
 
