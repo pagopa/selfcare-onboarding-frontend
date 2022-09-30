@@ -334,9 +334,12 @@ function OnboardingComponent({ productId }: { productId: string }) {
   };
 
   const forwardWithInstitutionType = (newInstitutionType: InstitutionType) => {
+    const partyExternalIdByQuery = new URLSearchParams(window.location.search).get(
+      'partyExternalId'
+    );
     trackEvent('ONBOARDING_PARTY_TYPE_SELECTION', {
       request_id: requestIdRef.current,
-      party_id: externalInstitutionId ?? selectedParty?.externalId,
+      party_id: partyExternalIdByQuery ?? '',
       product_id: productId,
     });
     setInstitutionType(newInstitutionType);
