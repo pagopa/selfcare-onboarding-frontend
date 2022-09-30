@@ -401,6 +401,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
               {{ selectedProduct: selectedProduct?.title }}.
             </Trans>
           ),
+          institutionType,
           product: selectedProduct,
           forward: forwardWithDataAndInstitution,
           back: () => {
@@ -449,7 +450,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
           subtitle: t('onBoardingSubProduct.billingData.subTitle'),
           forward: forwardWithBillingData,
           back: () => {
-            setActiveStep(institutionType === 'PA' ? 1 : 2);
+            setActiveStep(origin === 'IPA' ? 1 : 2);
           },
         }),
     },
@@ -468,7 +469,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
             forwardWithData(newFormData);
           },
           back: () => {
-            setActiveStep(fromDashboard ? 0 : 1);
+            setActiveStep(fromDashboard ? 0 : activeStep - 1);
           },
         }),
     },

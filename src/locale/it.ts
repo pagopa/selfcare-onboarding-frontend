@@ -90,7 +90,7 @@ export default {
     notMatchTaxCodeModal: {
       title: 'Nessun riscontro',
       message:
-        'Non è stato trovato nessun ente con il Codice Fiscale o la Partita IVA che hai inserito. Verifica che sia corretto e inseriscilo di nuovo.',
+        'Non è stato trovato nessun ente con il Codice Fiscale/Partita IVA <1>{{taxCode}}</1>. Verifica che sia corretto e inseriscilo di nuovo.',
       retry: 'Riprova',
     },
     notMatchHelperText: 'Nessun riscontro',
