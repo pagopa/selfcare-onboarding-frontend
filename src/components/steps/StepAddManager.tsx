@@ -15,11 +15,19 @@ export type UsersObject = { [key: string]: UserOnCreate };
 export type UsersError = { [key: string]: { [userField: string]: Array<string> } };
 
 type Props = StepperStepComponentProps & {
+  externalInstitutionId: string;
   readOnly?: boolean;
   subProduct?: Product;
 };
 
-export function StepAddManager({ readOnly, product, forward, back, subProduct }: Props) {
+export function StepAddManager({
+  readOnly,
+  externalInstitutionId,
+  product,
+  forward,
+  back,
+  subProduct,
+}: Props) {
   const { setRequiredLogin } = useContext(UserContext);
   const [_loading, setLoading] = useState(true);
   const [people, setPeople, setPeopleHistory] = useHistoryState<UsersObject>('people_step2', {});
@@ -42,8 +50,14 @@ export function StepAddManager({ readOnly, product, forward, back, subProduct }:
     setGenericError(true);
   };
 
-  const validateUserData = (user: UserOnCreate, prefix: string, subProduct?: string) => {
+  const validateUserData = (
+    user: UserOnCreate,
+    prefix: string,
+    externalInstitutionId: string,
+    subProduct?: Product | undefined
+  ) => {
     userValidate(
+      externalInstitutionId,
       user,
       prefix,
       onUserValidateSuccess,
@@ -129,7 +143,7 @@ export function StepAddManager({ readOnly, product, forward, back, subProduct }:
           }}
           forward={{
             action: () => {
-              validateUserData(people.LEGAL, 'LEGAL');
+              validateUserData(people.LEGAL, 'LEGAL', externalInstitutionId, subProduct);
             },
             label: t('onboardingStep2.confirmLabel'),
             disabled: objectIsEmpty(people) || !validateUser('LEGAL', people.LEGAL, people),

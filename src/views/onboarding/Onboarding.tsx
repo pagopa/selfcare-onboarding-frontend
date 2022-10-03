@@ -59,6 +59,9 @@ function OnboardingComponent({ productId }: { productId: string }) {
   const [onExitAction, setOnExitAction] = useState<(() => void) | undefined>();
   const [selectedParty, setSelectedParty] = useState<Party>();
 
+  const fromDashboard =
+    window.location.search.indexOf(`partyExternalId=${externalInstitutionId}`) > -1;
+
   useEffect(() => {
     registerUnloadEvent(setOnExit, setOpenExitModal, setOnExitAction);
     return () => unregisterUnloadEvent(setOnExit);
@@ -126,11 +129,12 @@ function OnboardingComponent({ productId }: { productId: string }) {
     });
     forwardWithData(newFormData);
     trackEvent('ONBOARDING_PARTY_SELECTION', {
-      party_id: externalInstitutionId,
+      party_id: party.externalId,
       request_id: requestIdRef.current,
       product_id: productId,
     });
     setSelectedParty(party);
+    setInstitutionType(institutionType);
   };
 
   const forwardWithBillingData = (newBillingData: BillingData) => {
@@ -319,7 +323,8 @@ function OnboardingComponent({ productId }: { productId: string }) {
   const forwardWithOnboardingData = (
     _manager: BillingData,
     billingData?: BillingData,
-    institutionType?: InstitutionType
+    institutionType?: InstitutionType,
+    _id?: string
   ) => {
     if (billingData) {
       setBillingData(billingData);
@@ -329,9 +334,12 @@ function OnboardingComponent({ productId }: { productId: string }) {
   };
 
   const forwardWithInstitutionType = (newInstitutionType: InstitutionType) => {
+    const partyExternalIdByQuery = new URLSearchParams(window.location.search).get(
+      'partyExternalId'
+    );
     trackEvent('ONBOARDING_PARTY_TYPE_SELECTION', {
       request_id: requestIdRef.current,
-      party_id: externalInstitutionId,
+      party_id: partyExternalIdByQuery ?? '',
       product_id: productId,
     });
     setInstitutionType(newInstitutionType);
@@ -339,6 +347,20 @@ function OnboardingComponent({ productId }: { productId: string }) {
   };
 
   const steps: Array<StepperStep> = [
+    {
+      label: 'Seleziona il tipo di ente',
+      Component: () =>
+        StepInstitutionType({
+          institutionType: institutionType as InstitutionType,
+          fromDashboard,
+          selectedProduct,
+          forward: forwardWithInstitutionType,
+          back: () => {
+            setOnExitAction(() => () => history.goBack());
+            setOpenExitModal(true);
+          },
+        }),
+    },
     {
       label: "Seleziona l'ente",
       Component: () =>
@@ -350,8 +372,12 @@ function OnboardingComponent({ productId }: { productId: string }) {
               per cui vuoi richiedere l&apos; adesione a {{ productTitle: selectedProduct?.title }}
             </Trans>
           ),
+          institutionType,
           product: selectedProduct,
           forward: forwardWithDataAndInstitution,
+          back: () => {
+            setActiveStep(0);
+          },
         }),
     },
     {
@@ -372,23 +398,8 @@ function OnboardingComponent({ productId }: { productId: string }) {
         StepOnboardingData({
           externalInstitutionId,
           productId,
+          institutionType,
           forward: forwardWithOnboardingData,
-        }),
-    },
-    {
-      label: 'Seleziona il tipo di ente',
-      Component: () =>
-        StepInstitutionType({
-          institutionType: institutionType as InstitutionType,
-          forward: forwardWithInstitutionType,
-          back: () => {
-            if (window.location.search.indexOf(`partyExternalId=${externalInstitutionId}`) > -1) {
-              setOnExitAction(() => () => history.goBack());
-              setOpenExitModal(true);
-            } else {
-              setActiveStep(0);
-            }
-          },
         }),
     },
     {
@@ -409,13 +420,16 @@ function OnboardingComponent({ productId }: { productId: string }) {
           institutionType: institutionType as InstitutionType,
           subtitle: t('onBoardingSubProduct.billingData.subTitle'),
           forward: forwardWithBillingData,
-          back,
+          back: () => {
+            setActiveStep(fromDashboard ? 0 : 1);
+          },
         }),
     },
     {
       label: 'Inserisci i dati del rappresentante legale',
       Component: () =>
         StepAddManager({
+          externalInstitutionId,
           product: selectedProduct,
           forward: (newFormData: Partial<FormData>) => {
             trackEvent('ONBOARDING_ADD_MANAGER', {
@@ -432,6 +446,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
       label: 'Inserisci i dati degli amministratori',
       Component: () =>
         OnBoardingProductStepDelegates({
+          externalInstitutionId,
           product: selectedProduct,
           legal: (formData as any).users[0],
           forward: (newFormData: Partial<FormData>) => {

@@ -10,11 +10,13 @@ import {
 } from '@mui/material';
 import React from 'react';
 import { useTranslation, Trans } from 'react-i18next';
-import { InstitutionType, StepperStepComponentProps } from '../../../types';
+import { InstitutionType, Product, StepperStepComponentProps } from '../../../types';
 import { OnboardingStepActions } from '../OnboardingStepActions';
 
 type Props = StepperStepComponentProps & {
   institutionType: InstitutionType;
+  fromDashboard: boolean;
+  selectedProduct?: Product | null;
 };
 
 const institutionTypeValues: Array<{ labelKey: string; value: InstitutionType }> = [
@@ -24,7 +26,13 @@ const institutionTypeValues: Array<{ labelKey: string; value: InstitutionType }>
   { labelKey: 'pt', value: 'PT' },
 ];
 
-export default function StepInstitutionType({ back, forward, institutionType }: Props) {
+export default function StepInstitutionType({
+  back,
+  forward,
+  institutionType,
+  fromDashboard,
+  selectedProduct,
+}: Props) {
   const [selectedValue, setSelectedValue] = React.useState<InstitutionType>(institutionType);
 
   const { t } = useTranslation();
@@ -37,9 +45,53 @@ export default function StepInstitutionType({ back, forward, institutionType }: 
     forward(selectedValue);
   };
 
-  const onBackAction = () => {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    back!();
+  const institutionTypeValueFiltered = (id: string | undefined) => {
+    switch (id) {
+      case 'prod-interop':
+      case 'prod-pagopa':
+        return institutionTypeValues.filter(
+          (it) => it.labelKey === 'pa' || it.labelKey === 'gsp' || it.labelKey === 'scp'
+        );
+      case 'prod-pn':
+        return institutionTypeValues.filter((it) => it.labelKey === 'pa');
+      case 'prod-idpay':
+        return institutionTypeValues.filter((it) => it.labelKey === 'pa');
+      default:
+        return institutionTypeValues.filter(
+          (it) =>
+            it.labelKey === 'pa' ||
+            it.labelKey === 'gsp' ||
+            it.labelKey === 'scp' ||
+            it.labelKey === 'pt'
+        );
+    }
+  };
+
+  const institutionTypeLabelFiltered = (selectedProductId: string | undefined, itValue: string) => {
+    if (selectedProductId === 'prod-io' && itValue === 'PT') {
+      return t('stepInstitutionType.cadArticle6AppIo');
+    } else if (
+      (selectedProductId === 'prod-io' ||
+        selectedProductId === 'prod-interop' ||
+        selectedProductId === 'prod-pagopa') &&
+      itValue === 'GSP'
+    ) {
+      return t('stepInstitutionType.cadArticle2B');
+    } else if (
+      (selectedProductId === 'prod-io' ||
+        selectedProductId === 'prod-interop' ||
+        selectedProductId === 'prod-pagopa') &&
+      itValue === 'SCP'
+    ) {
+      return t('stepInstitutionType.cadArticle2C');
+    } else if (
+      (selectedProductId === 'prod-pn' || selectedProductId === 'prod-idpay') &&
+      itValue === 'PA'
+    ) {
+      return t('stepInstitutionType.cadArticle165');
+    } else {
+      return t('stepInstitutionType.cadArticle2A');
+    }
   };
 
   return (
@@ -59,7 +111,7 @@ export default function StepInstitutionType({ back, forward, institutionType }: 
           <Grid item xs={12} p={3}>
             <FormControl>
               <RadioGroup name="radio-buttons-group" defaultValue={institutionType}>
-                {institutionTypeValues.map((ot) => (
+                {institutionTypeValueFiltered(selectedProduct?.id).map((ot) => (
                   <FormControlLabel
                     sx={{ p: '8px' }}
                     key={ot.labelKey}
@@ -79,9 +131,7 @@ export default function StepInstitutionType({ back, forward, institutionType }: 
                             color: '#5C6F82',
                           }}
                         >
-                          {ot.value === 'PT'
-                            ? t('stepInstitutionType.cadArticle6')
-                            : t('stepInstitutionType.cadArticle2')}
+                          {institutionTypeLabelFiltered(selectedProduct?.id, ot.value)}
                         </Typography>
                       </>
                     }
@@ -94,11 +144,15 @@ export default function StepInstitutionType({ back, forward, institutionType }: 
       </Paper>
       <Grid item xs={12} mt={4}>
         <OnboardingStepActions
-          back={{
-            action: onBackAction,
-            label: t('stepInstitutionType.backLabel'),
-            disabled: false,
-          }}
+          back={
+            fromDashboard
+              ? {
+                  action: back,
+                  label: t('onboardingStep1.onboarding.onboardingStepActions.backAction'),
+                  disabled: false,
+                }
+              : undefined
+          }
           forward={{
             action: onForwardAction,
             label: t('stepInstitutionType.confirmLabel'),

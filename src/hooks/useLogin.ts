@@ -20,7 +20,7 @@ export const useLogin = () => {
     if (MOCK_USER) {
       setUser({
         uid: '0',
-        taxCode: 'AAAAAA00A00A000A',
+        taxCode: 'LGGLGD00A00A000A',
         name: 'loggedName',
         surname: 'loggedSurname',
         email: 'loggedEmail@aa.aa',

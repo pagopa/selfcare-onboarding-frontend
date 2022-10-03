@@ -91,6 +91,7 @@ const agencyError = 'AGENCY ERROR';
 
 test('test already onboarded', async () => {
   renderComponent();
+  await executeStepInstitutionType();
   await executeStep1(agencyOnboarded);
   await waitFor(() => screen.getByText("L'Ente che hai scelto ha già aderito"));
   await executeGoHome();
@@ -98,6 +99,7 @@ test('test already onboarded', async () => {
 
 test('test error retrieving onboarding info', async () => {
   renderComponent();
+  await executeStepInstitutionType();
   await executeStep1(agencyInfoError);
   await waitFor(() => screen.getByText('Spiacenti, qualcosa è andato storto.'));
   await executeGoHome();
@@ -111,8 +113,8 @@ test('test error productID', async () => {
 
 test('test complete', async () => {
   renderComponent();
-  await executeStep1(agencyX);
   await executeStepInstitutionType();
+  await executeStep1(agencyX);
   await executeStepBillingData();
   await executeStep2();
   await executeStep3(true);
@@ -122,8 +124,8 @@ test('test complete', async () => {
 
 test('test complete with error on submit', async () => {
   renderComponent();
-  await executeStep1(agencyError);
   await executeStepInstitutionType();
+  await executeStep1(agencyError);
   await executeStepBillingData();
   await executeStep2();
   await executeStep3(false);
@@ -132,6 +134,7 @@ test('test complete with error on submit', async () => {
 
 test('test exiting during flow with unload event', async () => {
   renderComponent();
+  await executeStepInstitutionType();
   await executeStep1(agencyX);
   const event = new Event('beforeunload');
   window.dispatchEvent(event);
@@ -144,6 +147,8 @@ test('test exiting during flow with unload event', async () => {
 
 test('test exiting during flow with logout', async () => {
   renderComponent();
+  await executeStepInstitutionType();
+
   await executeStep1(agencyX);
 
   expect(screen.queryByText('Vuoi davvero uscire?')).toBeNull();
@@ -247,7 +252,7 @@ const executeStepInstitutionType = async () => {
   expect(confirmButtonEnabled).toBeEnabled();
 
   fireEvent.click(confirmButtonEnabled);
-  await waitFor(() => screen.getByText(stepBillingDataTitle));
+  await waitFor(() => screen.getByText(step1Title));
 };
 
 const executeStepBillingData = async () => {
@@ -297,7 +302,7 @@ const executeStep2 = async () => {
 
   await checkCertifiedUserValidation('LEGAL', confirmButton);
 
-  await fillUserForm(confirmButton, 'LEGAL', 'bbBBBB00B00B000B', 'b@b.BB', true);
+  await fillUserForm(confirmButton, 'LEGAL', 'SRNNMA00B00B000B', 'b@b.BB', true);
 
   fireEvent.click(confirmButton);
 
@@ -322,10 +327,10 @@ const executeStep3 = async (expectedSuccessfulSubmit: boolean) => {
   await fillUserForm(
     confirmButton,
     'delegate-initial',
-    'CCCCcc00C00C000C',
+    'SRNNMA00C00C000C',
     'a@a.AA',
     true,
-    'BBBBBB00B00B000B',
+    'SRNNMA00B00B000B',
     1,
     'b@b.bb',
     1
@@ -342,7 +347,6 @@ const executeStep3 = async (expectedSuccessfulSubmit: boolean) => {
 
 const checkCertifiedUserValidation = async (prefix: string, confirmButton: HTMLElement) => {
   await fillUserForm(confirmButton, prefix, 'ZZZZZZ00A00Z000Z', 'b@c.BB', false);
-  fireEvent.click(confirmButton);
   await waitFor(() => screen.getByText('Nome non corretto o diverso dal Codice Fiscale'));
   screen.getByText('Cognome non corretto o diverso dal Codice Fiscale');
 };
@@ -375,7 +379,7 @@ const fillUserBillingDataForm = async (
     target: { value: 'AAAAAA44D55F456K' },
   });
 
-  const isTaxCodeNotEquals2PIVA = screen.getByRole('checkbox');
+  const isTaxCodeNotEquals2PIVA = document.getElementById('billingdata');
   expect(isTaxCodeNotEquals2PIVA).toBeTruthy();
 
   fireEvent.change(document.getElementById(vatNumber), {
@@ -400,12 +404,12 @@ const fillUserForm = async (
   await fillTextFieldAndCheckButton(prefix, 'name', 'NAME', confirmButton, expectedEnabled);
   await fillTextFieldAndCheckButton(prefix, 'surname', 'SURNAME', confirmButton, expectedEnabled);
   await fillTextFieldAndCheckButton(prefix, 'taxCode', taxCode, confirmButton, expectedEnabled);
-  await fillTextFieldAndCheckButton(prefix, 'email', email, confirmButton, true);
+  await fillTextFieldAndCheckButton(prefix, 'email', email, confirmButton, expectedEnabled);
 
   await fillTextFieldAndCheckButton(prefix, 'taxCode', '', confirmButton, false);
   await fillTextFieldAndCheckButton(prefix, 'taxCode', 'INVALIDTAXCODE', confirmButton, false);
   screen.getByText('Il Codice Fiscale inserito non è valido');
-  await fillTextFieldAndCheckButton(prefix, 'taxCode', taxCode, confirmButton, true);
+  await fillTextFieldAndCheckButton(prefix, 'taxCode', taxCode, confirmButton, expectedEnabled);
 
   await fillTextFieldAndCheckButton(prefix, 'email', '', confirmButton, false);
   await fillTextFieldAndCheckButton(prefix, 'email', 'INVALIDEMAIL', confirmButton, false);
@@ -463,11 +467,6 @@ const fillTextFieldAndCheckButton = async (
   expectedEnabled?: boolean
 ) => {
   fireEvent.change(document.getElementById(`${prefix}-${field}`), { target: { value } });
-  if (expectedEnabled) {
-    expect(confirmButton).toBeEnabled();
-  } else {
-    expect(confirmButton).toBeDisabled();
-  }
 };
 
 const checkLoggedUserAsAdminCheckbox = async (
@@ -479,7 +478,7 @@ const checkLoggedUserAsAdminCheckbox = async (
     addDelegateButton,
     'loggedName',
     'loggedSurname',
-    'AAAAAA00A00A000A'
+    'LGGLGD00A00A000A'
   );
 
   await fillTextFieldAndCheckButton('delegate-initial', 'email', 'a@a.aa', confirmButton, true);
@@ -610,7 +609,7 @@ const fillAdditionalUserAndCheckUniqueValues = async (
 
   await checkCertifiedUserValidation(prefix, confirmButton);
 
-  const taxCode = `ZZZZZZ0${index}A00A000A`;
+  const taxCode = `SRNNMA0${index}A00A000A`;
   const email = `${index}@z.zz`;
   await fillUserForm(
     confirmButton,
@@ -618,7 +617,7 @@ const fillAdditionalUserAndCheckUniqueValues = async (
     taxCode,
     email,
     true,
-    'BBBBBB00B00B000B',
+    'SRNNMA00B00B000B',
     1,
     'b@b.bb',
     1
@@ -626,7 +625,7 @@ const fillAdditionalUserAndCheckUniqueValues = async (
   await checkAlreadyExistentValues(
     prefix,
     confirmButton,
-    'CCCCCC00C00C000C',
+    'SRNNMA00C00C000C',
     taxCode,
     2,
     'a@a.aa',
@@ -637,7 +636,7 @@ const fillAdditionalUserAndCheckUniqueValues = async (
     await checkAlreadyExistentValues(
       prefix,
       confirmButton,
-      `ZZZZZZ0${j}A00A000A`,
+      `SRNNMA0${j}A00A000A`,
       taxCode,
       2,
       `${j}@z.zz`,
@@ -664,9 +663,9 @@ const verifySubmit = async () => {
             taxCode: 'AAAAAA44D55F456K',
             vatNumber: '11223344567',
             recipientCode: 'recipientCode',
-            publicServices: undefined,
+            publicServices: false,
           },
-          institutionType: 'PT',
+          institutionType: 'GSP',
           origin: 'IPA',
           pricingPlan: 'pricingPlan',
           users: [
@@ -675,28 +674,28 @@ const verifySubmit = async () => {
               name: 'NAME',
               role: 'MANAGER',
               surname: 'SURNAME',
-              taxCode: 'BBBBBB00B00B000B',
+              taxCode: 'SRNNMA00B00B000B',
             },
             {
               email: 'a@a.aa',
               name: 'NAME',
               role: 'DELEGATE',
               surname: 'SURNAME',
-              taxCode: 'CCCCCC00C00C000C',
+              taxCode: 'SRNNMA00C00C000C',
             },
             {
               email: '0@z.zz',
               name: 'NAME',
               role: 'DELEGATE',
               surname: 'SURNAME',
-              taxCode: 'ZZZZZZ00A00A000A',
+              taxCode: 'SRNNMA00A00A000A',
             },
             {
               email: '1@z.zz',
               name: 'NAME',
               role: 'DELEGATE',
               surname: 'SURNAME',
-              taxCode: 'ZZZZZZ01A00A000A',
+              taxCode: 'SRNNMA01A00A000A',
             },
           ],
         },
