@@ -68,6 +68,8 @@ export function StepSearchPartyFromBusinessName({
   const { t } = useTranslation();
   const bodyTitle = t('onboardingStep1.onboarding.bodyTitle');
   const onBackAction = () => {
+    setSelected(null);
+    setSelectedHistory(null);
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     back!();
   };

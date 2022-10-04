@@ -493,7 +493,7 @@ const verifySubmit = async () => {
           },
           institutionType: 'PA',
           pricingPlan: 'pricingPlan',
-          origin: 'INFOCAMERE',
+          origin: 'IPA',
         },
       },
       expect.any(Function)

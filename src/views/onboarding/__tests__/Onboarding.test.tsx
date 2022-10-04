@@ -127,7 +127,7 @@ test('test complete doing an onboarding with institutionType PA (from IPA)', asy
 test('test complete doing an onboarding with institutionType GPS (from Infocamere)', async () => {
   renderComponent();
   await executeStepInstitutionType('gsp');
-  await executeStepSearchByTaxCode('55555555555');
+  await executeStepSearchByTaxCode('12121212121');
   await executeStepBillingData();
   await executeStep2();
   await executeStep3(true);
@@ -154,19 +154,7 @@ test('test correct redirect to businessName research when selected type is EQUAL
 test('test correct redirect to taxCode research when selected type is NOT EQUAL to PA', async () => {
   renderComponent();
   await executeStepInstitutionType('pt');
-  await executeStepSearchByTaxCode('11111111111');
-});
-
-test('test correct redirect to businessName research when selected type is EQUAL to PA', async () => {
-  renderComponent();
-  await executeStepInstitutionType('pa');
-  await executeStepSearchByBusinessName(agencyError);
-});
-
-test('test correct redirect to taxCode research when selected type is NOT EQUAL to PA', async () => {
-  renderComponent();
-  await executeStepInstitutionType('pt');
-  await executeStepSearchByTaxCode('11111111111');
+  await executeStepSearchByTaxCode('21212121211');
 });
 
 test('test exiting during flow with unload event', async () => {
@@ -722,7 +710,7 @@ const expectedSubmitFromIpaCompleteTest = async () => {
             publicServices: undefined,
           },
           institutionType: 'PA',
-          origin: 'INFOCAMERE',
+          origin: 'IPA',
           pricingPlan: 'pricingPlan',
           users: [
             {
@@ -767,7 +755,7 @@ const expectedSubmitFromInfocamereCompleteTest = async () => {
     expect(fetchWithLogsSpy).lastCalledWith(
       {
         endpoint: 'ONBOARDING_POST_LEGALS',
-        endpointParams: { externalInstitutionId: 'idInfocamere', productId: 'prod-pagopa' },
+        endpointParams: { externalInstitutionId: 'idInfocamere0', productId: 'prod-pagopa' },
       },
       {
         data: {

@@ -39,6 +39,7 @@ const handleSearchExternalId = async (
   return null;
 };
 
+// eslint-disable-next-line sonarjs/cognitive-complexity
 export function StepSearchPartyFromTaxCode({ subTitle, institutionType, forward, back }: Props) {
   const partyExternalIdByQuery = new URLSearchParams(window.location.search).get('partyExternalId');
   const { setRequiredLogin } = useContext(UserContext);
@@ -57,7 +58,7 @@ export function StepSearchPartyFromTaxCode({ subTitle, institutionType, forward,
     setSelectedHistory(selected);
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const { id } = selected!;
-    forward({ externalId: id }, { ...selected, externalId: id } as Party, institutionType);
+    forward({ externalId: id }, { ...selected, externalId: id } as Party, institutionType, origin);
   };
 
   const onBackAction = () => {
@@ -126,7 +127,7 @@ export function StepSearchPartyFromTaxCode({ subTitle, institutionType, forward,
             input={input}
             error={error}
             setError={setError}
-            endpoint={{ endpoint: 'ONBOARDING_GET_SEARCH_PARTIES' }}
+            endpoint={{ endpoint: 'ONBOARDING_GET_PARTY' }}
             transformFn={(data: { items: Array<IPACatalogParty> }) =>
               /* removed transformation into lower case in order to send data to BE as obtained from registry
               // eslint-disable-next-line functional/immutable-data
@@ -150,7 +151,7 @@ export function StepSearchPartyFromTaxCode({ subTitle, institutionType, forward,
           forward={{
             action: () => (!selected ? setConfirmAction(true) : onForwardAction()),
             label: t('onboardingStep1.onboarding.onboardingStepActions.confirmAction'),
-            disabled: error || !(input.length >= 11 && input.length <= 16),
+            disabled: !selected && (error || !(input.length >= 11 && input.length <= 16)),
           }}
         />
       </Grid>

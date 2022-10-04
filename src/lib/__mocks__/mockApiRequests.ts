@@ -21,7 +21,7 @@ const mockPartyRegistry = {
       managerSurname: 'Rossi',
       description: 'AGENCY X',
       digitalAddress: 'mail@pec.mail.org',
-      origin: 'INFOCAMERE',
+      origin: 'IPA',
       originId: 'originId1',
       address: 'sede legale',
     },
@@ -46,24 +46,6 @@ const mockPartyRegistry = {
       id: 'onboarded',
       o: 'onboardedO',
       ou: 'onboardedUu',
-      aoo: 'onboardedAoo',
-      taxCode: '22222222222',
-      zipCode: '12345',
-      administrationCode: '22222222222',
-      category: 'c7',
-      managerName: 'Mario_ONBOARDED',
-      managerSurname: 'Rossi_ONBOARDED',
-      description: 'AGENCY ONBOARDED',
-      digitalAddress: 'mail_ONBOARDED_@pec.mail.org',
-      origin: 'IPA',
-      originId: 'originId3',
-      address: 'sede legale',
-    },
-    // Use case added for test multiple party having the same taxCode
-    {
-      id: 'onboarded2',
-      o: 'onboardedO0',
-      ou: 'onboardedUuu',
       aoo: 'onboardedAoo',
       taxCode: '22222222222',
       zipCode: '12345',
@@ -145,24 +127,6 @@ const mockPartyRegistry = {
       originId: 'originId7',
       address: 'sede legale',
     },
-    // taxCode: '55555555555' is related to institutionType GSP
-    {
-      id: 'idInfocamere',
-      o: 'o',
-      ou: 'ou',
-      aoo: 'aoo',
-      taxCode: '55555555555',
-      zipCode: '44332',
-      administrationCode: '55555555555',
-      category: 'c7',
-      managerName: 'Mario',
-      managerSurname: 'Rossi',
-      description: 'AGENCY ORIGIN INFOCAMERE',
-      digitalAddress: 'mail@pec.mail.org',
-      origin: 'INFOCAMERE',
-      originId: 'originId1',
-      address: 'sede legale',
-    },
     {
       id: 'idIpa',
       o: 'o',
@@ -180,26 +144,104 @@ const mockPartyRegistry = {
       originId: 'originId1',
       address: 'sede legale',
     },
-    // use case with billingData enabled (origin !== IPA || INFOCAMERE)
+  ],
+  count: 8,
+};
+
+const mockInfocamereRegistry = {
+  items: [
+    /* TODO: Probably, for technical limits of Infocamere API/probably unattainable case, we couldn't manage
+  multiples match cases. If this is confirmed, this code will be deleted else we will restore it.
+
+    // Use case for test multiple party having the same taxCode
     {
-      id: 'idIpa',
+      id: 'sametaxcode1',
+      o: 'onboardedO',
+      ou: 'onboardedUu',
+      aoo: 'onboardedAoo',
+      taxCode: '55555555555',
+      zipCode: '12345',
+      administrationCode: '55555555555',
+      category: 'c7',
+      managerName: 'Mario_ONBOARDED',
+      managerSurname: 'Rossi_ONBOARDED',
+      description: 'AGENCY WITH SAME TAXCODE1',
+      digitalAddress: 'mail_ONBOARDED_@pec.mail.org',
+      origin: 'INFOCAMERE',
+      originId: 'originId32',
+      address: 'sede legale',
+    },
+    {
+      id: 'sametaxcode2',
+      o: 'sametaxcodeO2',
+      ou: 'sametaxcode2oo',
+      aoo: 'sametaxcodeeed',
+      taxCode: '55555555555',
+      zipCode: '12345',
+      administrationCode: '55555555555',
+      category: 'c7',
+      managerName: 'Mario_SAMETAXCODE2',
+      managerSurname: 'Rossi_SAMETAXCODE2',
+      description: 'AGENCY WITH SAME TAXCODE2',
+      digitalAddress: 'mail_SAMETAXCODE2_@pec.mail.org',
+      origin: 'INFOCAMERE',
+      originId: 'originId33',
+      address: 'sede legale',
+    },
+    */
+    {
+      id: 'idInfocamere0',
       o: 'o',
       ou: 'ou',
       aoo: 'aoo',
-      taxCode: '77777777777',
+      taxCode: '12121212121',
       zipCode: '44332',
-      administrationCode: '77777777777',
+      administrationCode: '12345678901',
       category: 'c7',
-      managerName: 'Mario',
-      managerSurname: 'Rossi',
-      description: 'AGENCY EDITABLE',
+      managerName: 'Fabio',
+      managerSurname: 'Verde',
+      description: 'AGENCY ORIGIN INFOCAMERE0',
       digitalAddress: 'mail@pec.mail.org',
-      origin: 'TEST',
+      origin: 'INFOCAMERE',
+      originId: 'originId1',
+      address: 'sede legale',
+    },
+    {
+      id: 'idInfocamere1',
+      o: 'o',
+      ou: 'ou',
+      aoo: 'aoo',
+      taxCode: '21212121211',
+      zipCode: '44332',
+      administrationCode: '10987654321',
+      category: 'c7',
+      managerName: 'Nicola',
+      managerSurname: 'Bianchi',
+      description: 'AGENCY ORIGIN INFOCAMERE1',
+      digitalAddress: 'mail@pec.mail.org',
+      origin: 'INFOCAMERE',
+      originId: 'originId1',
+      address: 'sede legale',
+    },
+    {
+      id: 'idInfocamere2',
+      o: 'o',
+      ou: 'ou',
+      aoo: 'aoo',
+      taxCode: '66666666666',
+      zipCode: '44332',
+      administrationCode: '66666666666',
+      category: 'c7',
+      managerName: 'Gianni',
+      managerSurname: 'Verdi',
+      description: 'AGENCY ORIGIN INFOCAMERE2',
+      digitalAddress: 'mail@pec.mail.org',
+      origin: 'INFOCAMERE',
       originId: 'originId1',
       address: 'sede legale',
     },
   ],
-  count: 5,
+  count: 3,
 };
 
 const mockedProducts = {
@@ -374,8 +416,8 @@ const mockedOnboardingData1: InstitutionOnboardingInfoResource = {
       vatNumber: '12345678901',
       recipientCode: 'M2UHYR1',
     },
-    institutionType: 'GSP',
-    origin: 'INFOCAMERE',
+    institutionType: 'PA',
+    origin: 'IPA',
   },
   manager: {
     email: 'm@ma.it',
@@ -399,7 +441,7 @@ const mockedOnboardingData2: InstitutionOnboardingInfoResource = {
       recipientCode: 'M2UHYR1',
     },
     institutionType: 'GSP',
-    origin: 'INFOCAMERE',
+    origin: 'IPA',
   },
 
   manager: {
@@ -409,6 +451,25 @@ const mockedOnboardingData2: InstitutionOnboardingInfoResource = {
     surname: 'Rosa',
     role: 'MANAGER',
   },
+};
+
+const findPartyFromInfocamere = (receivedExternalInstitutionId: string) => {
+  const partyExternalIdByQuery = new URLSearchParams(window.location.search).get('partyExternalId');
+
+  const searchFromInfocamereWithTaxcode = mockInfocamereRegistry.items.find(
+    (p) => p.taxCode === receivedExternalInstitutionId
+  );
+  const searchFromInfocamereWithExternalId = mockInfocamereRegistry.items.find(
+    (p) => p.id === receivedExternalInstitutionId
+  );
+
+  if (partyExternalIdByQuery && searchFromInfocamereWithExternalId) {
+    return searchFromInfocamereWithExternalId;
+  } else if (searchFromInfocamereWithTaxcode) {
+    return searchFromInfocamereWithTaxcode;
+  } else {
+    return true;
+  }
 };
 
 const mockedResponseError = {
@@ -618,13 +679,22 @@ export async function mockFetch(
   }
 
   if (endpoint === 'ONBOARDING_GET_PARTY') {
-    const fetched = mockPartyRegistry.items.find(
+    const fromInfocamere = (params as any)?.origin === 'INFOCAMERE';
+    const fromPartyRegistry = (params as any)?.origin === 'IPA';
+
+    const searchFromPartyRegistry = mockPartyRegistry.items.find(
       (p) => p.id === endpointParams.externalInstitutionId
     );
 
-    if (fetched) {
+    if (fromInfocamere || fromPartyRegistry) {
       return new Promise((resolve) =>
-        resolve({ data: fetched, status: 200, statusText: '200' } as AxiosResponse)
+        resolve({
+          data: fromInfocamere
+            ? findPartyFromInfocamere(endpointParams.externalInstitutionId)
+            : searchFromPartyRegistry,
+          status: 200,
+          statusText: '200',
+        } as AxiosResponse)
       );
     } else {
       // eslint-disable-next-line sonarjs/no-identical-functions

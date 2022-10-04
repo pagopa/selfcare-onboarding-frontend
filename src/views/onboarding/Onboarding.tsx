@@ -330,13 +330,11 @@ function OnboardingComponent({ productId }: { productId: string }) {
   const forwardWithOnboardingData = (
     _manager: BillingData,
     billingData?: BillingData,
-    institutionType?: InstitutionType,
     _id?: string
   ) => {
     if (billingData) {
       setBillingData(billingData);
     }
-    setInstitutionType(institutionType);
     forward();
   };
 

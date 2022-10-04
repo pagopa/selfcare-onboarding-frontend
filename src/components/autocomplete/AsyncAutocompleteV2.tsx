@@ -1,11 +1,10 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import debounce from 'lodash/debounce';
 import { AxiosError, AxiosResponse } from 'axios';
-import { Theme, Grid, Typography, Paper, Stack } from '@mui/material';
+import { Theme, Grid, Typography, Paper } from '@mui/material';
 import { Box } from '@mui/system';
 import { useTranslation, Trans } from 'react-i18next';
 import SessionModal from '@pagopa/selfcare-common-frontend/components/SessionModal';
-import { PartyAccountItemButton } from '@pagopa/mui-italia/dist/components/PartyAccountItemButton';
 import { Endpoint, IPACatalogParty } from '../../../types';
 import { fetchWithLogs } from '../../lib/api-utils';
 import { getFetchOutcome } from '../../lib/error-utils';
@@ -52,12 +51,14 @@ export function AsyncAutocompleteV2({
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [openErrorModal, setOpenErrorModal] = useState<boolean>(false);
   const [options, setOptions] = useState<Array<any>>([]);
-  const [moreMatches, setMoreMatches] = useState<Array<IPACatalogParty>>([]);
+  /* TODO: Probably, for technical limits of Infocamere API/probably unattainable case, we couldn't manage
+  multiples match cases. If this is confirmed, this code will be deleted else we will restore it. */
+  // const [moreMatches, setMoreMatches] = useState<Array<IPACatalogParty>>([]);
   const { setRequiredLogin } = useContext(UserContext);
   const currentInput = useRef<string>('');
   const { t } = useTranslation();
 
-  const handleSearch = async (query: string) => {
+  const handleSearchByBusinessName = async (query: string) => {
     setIsLoading(true);
 
     const searchResponse = await fetchWithLogs(
@@ -73,23 +74,40 @@ export function AsyncAutocompleteV2({
 
     if (outcome === 'success') {
       setOptions(transformFn((searchResponse as AxiosResponse).data));
-      if (searchByTaxCode) {
-        const matchedParty = (searchResponse as AxiosResponse).data.items.filter(
-          (p: any) => p.taxCode === query
-        );
-        if (matchedParty.length === 1) {
-          setSelected(matchedParty[0]);
-        } else if (matchedParty.length > 1) {
-          setMoreMatches(matchedParty);
-        } else {
-          setOpenErrorModal(true);
-          // eslint-disable-next-line functional/immutable-data
-          currentInput.current = query;
-          setError(true);
-        }
-      }
     } else if ((searchResponse as AxiosError).response?.status === 404) {
       setOptions([]);
+    }
+    setIsLoading(false);
+  };
+
+  const handleSearchByTaxCode = async (query: string) => {
+    setIsLoading(true);
+    const searchResponse: any = await fetchWithLogs(
+      {
+        endpoint: 'ONBOARDING_GET_PARTY',
+        endpointParams: { externalInstitutionId: query },
+      },
+      { method: 'GET', params: { origin: 'INFOCAMERE' } },
+      () => setRequiredLogin(true)
+    );
+
+    const outcome = getFetchOutcome(searchResponse);
+    const foundParty = (searchResponse as AxiosResponse).data;
+    if (outcome === 'success' && foundParty?.taxCode === query) {
+      console.log('output', (searchResponse as AxiosResponse).data);
+      setSelected(foundParty);
+    } else {
+      /* 
+      TODO: Probably, for technical limits of Infocamere API/probably unattainable case, we couldn't manage
+      multiples match cases. If this is confirmed, this code will be deleted else we will restore it.
+
+      else if (matchedParty.length > 1) {
+        setMoreMatches(matchedParty); 
+      */
+      setOpenErrorModal(true);
+      // eslint-disable-next-line functional/immutable-data
+      currentInput.current = query;
+      setError(true);
     }
     setIsLoading(false);
   };
@@ -108,7 +126,7 @@ export function AsyncAutocompleteV2({
     if (value !== '') {
       setSelected(null);
       if (!searchByTaxCode && value.length >= 3) {
-        void debounce(handleSearch, 100)(value);
+        void debounce(handleSearchByBusinessName, 100)(value);
       }
     }
     if (value === '') {
@@ -125,10 +143,10 @@ export function AsyncAutocompleteV2({
 
   useEffect(() => {
     if (confirmAction && input) {
-      void handleSearch(input);
+      void handleSearchByTaxCode(input);
       setConfirmAction(false);
     }
-  }, [confirmAction, input]);
+  }, [confirmAction]);
 
   useEffect(() => {
     if (input) {
@@ -178,7 +196,8 @@ export function AsyncAutocompleteV2({
             }
             onCloseLabel={t('stepSearchPartyFromTaxCode.notMatchTaxCodeModal.retry')}
           />
-          {!confirmAction && moreMatches.length === 0 ? (
+          {/* {!confirmAction && moreMatches.length === 0 && ( */}
+          {!confirmAction && (
             <AsyncAutocompleteSearch
               theme={theme}
               searchByTaxCode={searchByTaxCode}
@@ -189,7 +208,10 @@ export function AsyncAutocompleteV2({
               input={input}
               handleChange={handleChange}
             />
-          ) : (
+          )}
+          {/* TODO: Probably, for technical limits of Infocamere/probably unattainable case, we couldn't manage
+  multiples match cases. If this is confirmed, this code will be deleted else we will restore it. */
+          /* : (
             <Stack spacing={2} sx={{ display: 'flex', px: 4, width: '100%' }}>
               {moreMatches.map((m) => (
                 <Box key={m.id}>
@@ -206,6 +228,7 @@ export function AsyncAutocompleteV2({
               ))}
             </Stack>
           )}
+          */}
         </Grid>
         {searchByTaxCode ? (
           <></>
