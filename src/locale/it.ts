@@ -182,9 +182,8 @@ export default {
       },
     },
     jwtNotValid: {
-      title: 'Richiesta di adesione non più valida',
-      subtitle:
-        'Richiesta di adesione non più valida in quanto è stata <1 /> annullata o già completata o scaduta.',
+      title: 'Richiesta di adesione non più <1 /> valida',
+      subtitle: 'Questa richiesta è stata accolta, annullata o è scaduta.',
     },
   },
   noProductPage: {
