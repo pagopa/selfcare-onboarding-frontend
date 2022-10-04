@@ -94,7 +94,6 @@ export function AsyncAutocompleteV2({
     const outcome = getFetchOutcome(searchResponse);
     const foundParty = (searchResponse as AxiosResponse).data;
     if (outcome === 'success' && foundParty?.taxCode === query) {
-      console.log('output', (searchResponse as AxiosResponse).data);
       setSelected(foundParty);
     } else {
       /* 
