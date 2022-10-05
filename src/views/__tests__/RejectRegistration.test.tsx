@@ -38,7 +38,11 @@ test('test no jwt', () => {
   mockedLocation.search = undefined;
 
   render(<RejectRegistration />);
-
+  screen.getByText('Se la elimini, tutti i dati inseriti verranno persi.');
+  const confirmButton = screen.getByRole('button', {
+    name: 'Elimina la richiesta',
+  });
+  fireEvent.click(confirmButton);
   screen.getByText('Qualcosa è andato storto.');
   const goHomeButton = screen.getByRole('button', {
     name: 'Torna alla home',
@@ -53,28 +57,34 @@ test('test', async () => {
   mockedLocation.search = 'jwt=asd';
   render(<RejectRegistration />);
 
-  await waitFor(() => {
-    expect(fetchWithLogsSpy).toBeCalledTimes(1);
-    screen.getByText('La tua richiesta di adesione è stata annullata');
-    const goHomeButton = screen.getByRole('button', {
-      name: 'Torna alla home',
-    });
-    fireEvent.click(goHomeButton);
-    expect(mockedLocation.assign).toBeCalledWith(ENV.URL_FE.LANDING);
+  screen.getByText('Se la elimini, tutti i dati inseriti verranno persi.');
+  const confirmButton = screen.getByRole('button', {
+    name: 'Elimina la richiesta',
   });
+  fireEvent.click(confirmButton);
+  await waitFor(() => {
+    screen.getByText('La tua richiesta di adesione è stata annullata');
+  });
+  expect(fetchWithLogsSpy).toBeCalledTimes(1);
 });
 
 test('test cancel error', async () => {
   mockedLocation.search = 'jwt=error';
   render(<RejectRegistration />);
 
-  await waitFor(() => {
-    expect(fetchWithLogsSpy).toBeCalledTimes(1);
-    screen.getByText('Qualcosa è andato storto.');
-    const goHomeButton = screen.getByRole('button', {
-      name: 'Torna alla home',
-    });
-    fireEvent.click(goHomeButton);
-    expect(mockedLocation.assign).toBeCalledWith(ENV.URL_FE.LANDING);
+  screen.getByText('Se la elimini, tutti i dati inseriti verranno persi.');
+  const confirmButton = screen.getByRole('button', {
+    name: 'Elimina la richiesta',
   });
+  fireEvent.click(confirmButton);
+  await waitFor(() => {
+    screen.getByText('Qualcosa è andato storto.');
+  });
+  const goHomeButton = screen.getByRole('button', {
+    name: 'Torna alla home',
+  });
+  fireEvent.click(goHomeButton);
+  expect(mockedLocation.assign).toBeCalledWith(ENV.URL_FE.LANDING);
+
+  expect(fetchWithLogsSpy).toBeCalledTimes(1);
 });
