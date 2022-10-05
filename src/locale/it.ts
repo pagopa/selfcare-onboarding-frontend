@@ -324,6 +324,12 @@ export default {
         loadingText: 'Stiamo cancellando la tua iscrizione',
       },
     },
+    confirmCancellatione: {
+      title: 'Vuoi eliminare la richiesta di <1 /> adesione?',
+      subtitle: 'Se la elimini, tutti i dati inseriti verranno persi. ',
+      confirmActionLabel: 'Elimina la richiesta',
+      backActionLabel: 'Torna alla home',
+    },
   },
   app: {
     sessionModal: {

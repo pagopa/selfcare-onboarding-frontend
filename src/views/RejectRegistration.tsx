@@ -11,20 +11,23 @@ import { getFetchOutcome } from '../lib/error-utils';
 import { LoadingOverlay } from '../components/LoadingOverlay';
 import { HeaderContext, UserContext } from '../lib/context';
 import { ENV } from '../utils/env';
+import { ReactComponent as PaymentCompleted } from './../assets/payment_completed.svg';
 
 export const getOnboardingMagicLinkJwt = () =>
   new URLSearchParams(window.location.search).get('jwt');
 
 export default function RejectRegistration() {
   const [outcome, setOutcome] = useState<RequestOutcome>();
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [isConfirmPageVisible, setIsConfirmPageVisible] = useState(true);
 
   const token = getOnboardingMagicLinkJwt();
   const { setSubHeaderVisible, setOnExit, setEnableLogin } = useContext(HeaderContext);
   const { setRequiredLogin } = useContext(UserContext);
 
   const { t } = useTranslation();
-  useEffect(() => {
+
+  const deleteRequest = () => {
     const requestId = uniqueId('contract-reject-');
     trackEvent('ONBOARDING_CANCEL', { request_id: requestId });
     async function asyncSendDeleteRequest() {
@@ -54,7 +57,39 @@ export default function RejectRegistration() {
     } else {
       void asyncSendDeleteRequest();
     }
-  }, []); // in order to be invoked once
+  };
+
+  /* useEffect(() => {
+    const requestId = uniqueId('contract-reject-');
+    trackEvent('ONBOARDING_CANCEL', { request_id: requestId });
+    async function asyncSendDeleteRequest() {
+      // Send DELETE request
+      const contractPostResponse = await fetchWithLogs(
+        { endpoint: 'ONBOARDING_COMPLETE_REGISTRATION', endpointParams: { token } },
+        { method: 'DELETE' },
+        () => setRequiredLogin(true)
+      );
+
+      // Check the outcome
+      const outcome = getFetchOutcome(contractPostResponse);
+
+      // Show it to the end user
+      setLoading(false);
+      setOutcome(outcome);
+      if (outcome === 'success') {
+        trackEvent('ONBOARDING_CANCEL_SUCCESS', { request_id: requestId, party_id: token });
+      } else if (outcome === 'error') {
+        trackEvent('ONBOARDING_CANCEL_FAILURE', { request_id: requestId, party_id: token });
+      }
+    }
+
+    if (!token) {
+      setLoading(false);
+      setOutcome('error');
+    } else {
+      void asyncSendDeleteRequest();
+    }
+  }, []); // in order to be invoked once */
 
   useEffect(() => {
     setSubHeaderVisible(true);
@@ -65,6 +100,47 @@ export default function RejectRegistration() {
       setEnableLogin(true);
     };
   }, []);
+  const confirmCancellationContent = {
+    title: '',
+    description: [
+      <>
+        <div>
+          <PaymentCompleted />
+          <Typography variant="h4" mt={3}>
+            <Trans i18nKey="rejectRegistration.confirmCancellatione.title">
+              Vuoi eliminare la richiesta di
+              <br />
+              adesione?
+            </Trans>
+          </Typography>
+          <Typography variant="body1" mb={4} mt={1}>
+            <Trans i18nKey="rejectRegistration.confirmCancellatione.description">
+              Se la elimini, tutti i dati inseriti verranno persi.
+            </Trans>
+          </Typography>
+          <Typography mt={3}>
+            <Button
+              variant="outlined"
+              sx={{ alignSelf: 'center', mr: 2 }}
+              onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+            >
+              {t('rejectRegistration.outcomeContent.success.backActionLabel')}
+            </Button>
+            <Button
+              variant="contained"
+              sx={{ alignSelf: 'center' }}
+              onClick={() => {
+                setIsConfirmPageVisible(false);
+                deleteRequest();
+              }}
+            >
+              {t('rejectRegistration.confirmCancellatione.confirmActionLabel')}
+            </Button>
+          </Typography>
+        </div>
+      </>,
+    ],
+  };
   const outcomeContent: RequestOutcomeOptions = {
     success: {
       title: '',
@@ -139,12 +215,16 @@ export default function RejectRegistration() {
   };
 
   if (loading) {
-    return <LoadingOverlay loadingText={t('rejectRegistration.loading.loadingText')} />;
+    return (
+      <LoadingOverlay loadingText={t('rejectRegistration.outcomeContent.notOutcome.loadingText')} />
+    );
   }
 
   return (
     <React.Fragment>
-      {!outcome ? (
+      {isConfirmPageVisible ? (
+        <MessageNoAction {...confirmCancellationContent} />
+      ) : !outcome ? (
         <LoadingOverlay loadingText={t('rejectRegistration.notOutcome.loadingText')} />
       ) : (
         <MessageNoAction {...outcomeContent[outcome]} />
