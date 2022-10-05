@@ -19,7 +19,8 @@ export const getOnboardingMagicLinkJwt = () =>
 export default function RejectRegistration() {
   const [outcome, setOutcome] = useState<RequestOutcome>();
   const [loading, setLoading] = useState(false);
-  const [isConfirmPageVisible, setIsConfirmPageVisible] = useState(true);
+  const [isConfirmPageVisible, setIsConfirmPageVisible] = useState<boolean>(true);
+  const [isValidToken, setIsValidToken] = useState<boolean>();
 
   const token = getOnboardingMagicLinkJwt();
   const { setSubHeaderVisible, setOnExit, setEnableLogin } = useContext(HeaderContext);
@@ -59,37 +60,35 @@ export default function RejectRegistration() {
     }
   };
 
-  /* useEffect(() => {
-    const requestId = uniqueId('contract-reject-');
-    trackEvent('ONBOARDING_CANCEL', { request_id: requestId });
-    async function asyncSendDeleteRequest() {
-      // Send DELETE request
-      const contractPostResponse = await fetchWithLogs(
-        { endpoint: 'ONBOARDING_COMPLETE_REGISTRATION', endpointParams: { token } },
-        { method: 'DELETE' },
-        () => setRequiredLogin(true)
-      );
-
-      // Check the outcome
-      const outcome = getFetchOutcome(contractPostResponse);
-
-      // Show it to the end user
-      setLoading(false);
-      setOutcome(outcome);
-      if (outcome === 'success') {
-        trackEvent('ONBOARDING_CANCEL_SUCCESS', { request_id: requestId, party_id: token });
-      } else if (outcome === 'error') {
-        trackEvent('ONBOARDING_CANCEL_FAILURE', { request_id: requestId, party_id: token });
-      }
-    }
-
-    if (!token) {
-      setLoading(false);
-      setOutcome('error');
-    } else {
-      void asyncSendDeleteRequest();
-    }
-  }, []); // in order to be invoked once */
+  // TODO: update when BE fetch token verify will be ready
+  useEffect(() => {
+    setIsValidToken(true);
+    //   const requestId = uniqueId('contract-reject-');
+    //   trackEvent('ONBOARDING_CANCEL', { request_id: requestId });
+    //   async function asyncSendDeleteRequest() {
+    //     // Send DELETE request
+    //     const contractPostResponse = await fetchWithLogs(
+    //       { endpoint: 'ONBOARDING_COMPLETE_REGISTRATION', endpointParams: { token } },
+    //       { method: 'DELETE' },
+    //       () => setRequiredLogin(true)
+    //     );
+    //     // Check the outcome
+    //     const outcome = getFetchOutcome(contractPostResponse);
+    //     // Show it to the end user
+    //     setLoading(false);
+    //     setOutcome(outcome);
+    //     if (outcome === 'success') {
+    //       trackEvent('ONBOARDING_CANCEL_SUCCESS', { request_id: requestId, party_id: token });
+    //       setIsValidToken(false);
+    //     } else if (outcome === 'error') {
+    //       trackEvent('ONBOARDING_CANCEL_FAILURE', { request_id: requestId, party_id: token });
+    //       setIsValidToken(false);
+    //       setLoading(false);
+    //       setOutcome('error');
+    //     }
+    //   }
+    // }
+  }, []);
 
   useEffect(() => {
     setSubHeaderVisible(true);
@@ -100,6 +99,7 @@ export default function RejectRegistration() {
       setEnableLogin(true);
     };
   }, []);
+
   const confirmCancellationContent = {
     title: '',
     description: [
@@ -141,6 +141,7 @@ export default function RejectRegistration() {
       </>,
     ],
   };
+
   const outcomeContent: RequestOutcomeOptions = {
     success: {
       title: '',
@@ -214,6 +215,46 @@ export default function RejectRegistration() {
     },
   };
 
+  const jwtNotValid = {
+    title: '',
+    description: [
+      <>
+        <Grid container direction="column" key="0" style={{ textAlign: 'center' }}>
+          <Grid container item justifyContent="center" mb={2}>
+            <IllusError size={60} />
+          </Grid>
+          <Grid container item justifyContent="center" mt={3}>
+            <Grid item xs={4}>
+              <Typography variant="h4">
+                <Trans i18nKey="rejectRegistration.outcomeContent.jwtNotValid.title">
+                  Richiesta di adesione non più <br /> valida
+                </Trans>
+              </Typography>
+            </Grid>
+          </Grid>
+          <Grid container item justifyContent="center" mb={4} mt={1}>
+            <Grid item xs={6}>
+              <Typography variant="body1">
+                {t('rejectRegistration.outcomeContent.jwtNotValid.subtitle')}
+              </Typography>
+            </Grid>
+          </Grid>
+          <Grid container item justifyContent="center">
+            <Grid item xs={4}>
+              <Button
+                variant="contained"
+                sx={{ alignSelf: 'center' }}
+                onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+              >
+                {t('rejectRegistration.outcomeContent.jwtNotValid.backActionLabel')}
+              </Button>
+            </Grid>
+          </Grid>
+        </Grid>
+      </>,
+    ],
+  };
+
   if (loading) {
     return (
       <LoadingOverlay loadingText={t('rejectRegistration.outcomeContent.notOutcome.loadingText')} />
@@ -222,12 +263,16 @@ export default function RejectRegistration() {
 
   return (
     <React.Fragment>
-      {isConfirmPageVisible ? (
-        <MessageNoAction {...confirmCancellationContent} />
-      ) : !outcome ? (
-        <LoadingOverlay loadingText={t('rejectRegistration.notOutcome.loadingText')} />
+      {isValidToken ? (
+        isConfirmPageVisible ? (
+          <MessageNoAction {...confirmCancellationContent} />
+        ) : !outcome ? (
+          <LoadingOverlay loadingText={t('rejectRegistration.notOutcome.loadingText')} />
+        ) : (
+          <MessageNoAction {...outcomeContent[outcome]} />
+        )
       ) : (
-        <MessageNoAction {...outcomeContent[outcome]} />
+        <MessageNoAction {...jwtNotValid} />
       )}
     </React.Fragment>
   );

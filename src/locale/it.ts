@@ -323,6 +323,11 @@ export default {
       notOutcome: {
         loadingText: 'Stiamo cancellando la tua iscrizione',
       },
+      jwtNotValid: {
+        title: 'Richiesta di adesione non più <1 /> valida',
+        subtitle: 'Questa richiesta è stata accolta, annullata o è scaduta.',
+        backActionLabel: 'Torna alla home',
+      },
     },
     confirmCancellatione: {
       title: 'Vuoi eliminare la richiesta di <1 /> adesione?',
