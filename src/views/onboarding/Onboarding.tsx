@@ -85,7 +85,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
   useEffect(() => {
     const productAvoidStep =
       selectedProduct?.id === 'prod-pn' || selectedProduct?.id === 'prod-idpay';
-    if (prductAvoidStep) {
+    if (productAvoidStep) {
       forwardWithInstitutionType('PA');
     }
   }, [selectedProduct]);
