@@ -278,7 +278,7 @@ export default function CompleteRegistrationComponent() {
       setErrorPage(false);
     } else {
       setErrorPage(true);
-      getMixPanelEvent((fetchJwt as AxiosError<Problem>).response?.status);
+      trackEvent(getMixPanelEvent((fetchJwt as AxiosError<Problem>).response?.status) as string);
     }
   };
 
