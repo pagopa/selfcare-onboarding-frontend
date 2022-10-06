@@ -18,7 +18,7 @@ import { ENV } from '../utils/env';
 import { MessageNoAction } from '../components/MessageNoAction';
 import { HeaderContext, UserContext } from '../lib/context';
 import { getOnboardingMagicLinkJwt } from './RejectRegistration';
-import JwtIvalidPage from './JwtIvalidPage';
+import JwtInvalidPage from './JwtInvalidPage';
 
 type FileErrorAttempt = {
   fileName: string;
@@ -79,6 +79,7 @@ export default function CompleteRegistrationComponent() {
 
   const [outcome, setOutcome] = useState<RequestOutcome | null>(!token ? 'error' : null);
   const [errorCode, setErrorCode] = useState<keyof typeof errors>('GENERIC');
+  const [errorPage, setErrorPage] = useState<boolean>(false);
 
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -253,35 +254,36 @@ export default function CompleteRegistrationComponent() {
     },
   };
 
-  // TODO: SELC-1574 - remove when fetch is ready
-  const errorTrue = false;
-  // const [errorTrue, setErrorTrue] = useState<boolean>(false);
+  const jwtNotValid = async () => {
+    // TODO: SELC-1574 - invoke fetch BE for JWT invalid
+    const fetchJwt = await fetchWithLogs(
+      { endpoint: 'ONBOARDING_COMPLETE_REGISTRATION', endpointParams: { token } },
+      { method: 'GET' },
+      () => setRequiredLogin(true)
+    );
+    const outcome = getFetchOutcome(fetchJwt);
 
-  // TODO: SELC-1574 - invoke fetch BE for JWT invalid
-  // const jwtNotValid = async () => {
-  //   const fetchJwt = await fetchWithLogs(
-  //     { endpoint: 'ONBOARDING_COMPLETE_REGISTRATION', endpointParams: { token } },
-  //     { method: 'GET' },
-  //     () => setRequiredLogin(true)
-  //   );
-  //   if (
-  //     (fetchJwt as AxiosError<Problem>).response?.status === 409 ||
-  //     (fetchJwt as AxiosError<Problem>).response?.status === 400
-  //   ) {
-  //     setErrorTrue(true);
-  //   } else {
-  //     setErrorTrue(false);
-  //   }
-  // };
+    if (outcome === 'success') {
+      setErrorPage(false);
+    } else {
+      setErrorPage(true);
+      if ((fetchJwt as AxiosError<Problem>).response?.status === 409) {
+        trackEvent('ONBOARDING_TOKEN_VALIDATION_ALREADY_VALIDATED', { token });
+      } else if ((fetchJwt as AxiosError<Problem>).response?.status === 400) {
+        trackEvent('ONBOARDING_TOKEN_VALIDATION_REQUEST_CANCELED', { token });
+      }
+    }
+  };
 
-  // useEffect(() => {
-  //  await jwtNotValid();
-  // }, []);
+  useEffect(() => {
+    setLoading(true);
+    jwtNotValid().finally(() => setLoading(false));
+  }, []);
 
   return (
     <>
-      {errorTrue ? (
-        <JwtIvalidPage />
+      {errorPage ? (
+        <JwtInvalidPage />
       ) : outcome === 'success' ? (
         <MessageNoAction {...outcomeContent[outcome]} />
       ) : outcome === 'error' ? (
