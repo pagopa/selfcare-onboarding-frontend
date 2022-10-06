@@ -81,6 +81,15 @@ function OnboardingComponent({ productId }: { productId: string }) {
     setPricingPlan(new URLSearchParams(window.location.search).get('pricingPlan') ?? undefined);
   }, [productId]);
 
+  // avoid step 1 if selectedProduct is 'prod-pn' or 'prod-idpay'
+  useEffect(() => {
+    const prductAvoidStep =
+      selectedProduct?.id === 'prod-pn' || selectedProduct?.id === 'prod-idpay';
+    if (prductAvoidStep) {
+      forwardWithInstitutionType('PA');
+    }
+  }, [selectedProduct]);
+
   const checkProductId = async () => {
     const onboardingProducts = await fetchWithLogs(
       { endpoint: 'ONBOARDING_VERIFY_PRODUCT', endpointParams: { productId } },
