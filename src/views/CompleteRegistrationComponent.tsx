@@ -268,9 +268,13 @@ export default function CompleteRegistrationComponent() {
     } else {
       setErrorPage(true);
       if ((fetchJwt as AxiosError<Problem>).response?.status === 409) {
-        trackEvent('ONBOARDING_TOKEN_VALIDATION_ALREADY_VALIDATED', { token });
+        trackEvent('ONBOARDING_TOKEN_VALIDATION_JWT_CONFIRMED', {});
       } else if ((fetchJwt as AxiosError<Problem>).response?.status === 400) {
-        trackEvent('ONBOARDING_TOKEN_VALIDATION_REQUEST_CANCELED', { token });
+        trackEvent('ONBOARDING_TOKEN_VALIDATION_JWT_CANCELED', {});
+      } else if ((fetchJwt as AxiosError<Problem>).response?.status === 404) {
+        trackEvent('ONBOARDING_TOKEN_VALIDATION_JWT_NOT_FOUND', {});
+      } else {
+        trackEvent('ONBOARDING_TOKEN_VALIDATION_ERROR', {});
       }
     }
   };
