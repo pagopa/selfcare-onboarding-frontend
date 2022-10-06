@@ -254,6 +254,17 @@ export default function CompleteRegistrationComponent() {
     },
   };
 
+  const getMixPanelEvent = (errorStatus: number | undefined) => {
+    const errors = [
+      {
+        409: 'ONBOARDING_TOKEN_VALIDATION_JWT_CONFIRMED',
+        400: 'ONBOARDING_TOKEN_VALIDATION_JWT_CANCELED',
+        404: 'ONBOARDING_TOKEN_VALIDATION_JWT_NOT_FOUND',
+      },
+    ];
+    return (errorStatus && errors[errorStatus]) ?? 'ONBOARDING_TOKEN_VALIDATION_ERROR';
+  };
+
   const jwtNotValid = async () => {
     // TODO: SELC-1574 - invoke fetch BE for JWT invalid
     const fetchJwt = await fetchWithLogs(
@@ -267,15 +278,7 @@ export default function CompleteRegistrationComponent() {
       setErrorPage(false);
     } else {
       setErrorPage(true);
-      if ((fetchJwt as AxiosError<Problem>).response?.status === 409) {
-        trackEvent('ONBOARDING_TOKEN_VALIDATION_JWT_CONFIRMED', {});
-      } else if ((fetchJwt as AxiosError<Problem>).response?.status === 400) {
-        trackEvent('ONBOARDING_TOKEN_VALIDATION_JWT_CANCELED', {});
-      } else if ((fetchJwt as AxiosError<Problem>).response?.status === 404) {
-        trackEvent('ONBOARDING_TOKEN_VALIDATION_JWT_NOT_FOUND', {});
-      } else {
-        trackEvent('ONBOARDING_TOKEN_VALIDATION_ERROR', {});
-      }
+      getMixPanelEvent((fetchJwt as AxiosError<Problem>).response?.status);
     }
   };
 
