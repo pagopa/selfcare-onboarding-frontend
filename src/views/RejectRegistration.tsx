@@ -214,7 +214,7 @@ export default function RejectRegistration() {
       ],
     },
   };
-
+  console.log('outcomeContent', outcomeContent);
   const jwtNotValid = {
     title: '',
     description: [
@@ -266,10 +266,12 @@ export default function RejectRegistration() {
       {isValidToken ? (
         isConfirmPageVisible ? (
           <MessageNoAction {...confirmCancellationContent} />
-        ) : !outcome ? (
-          <LoadingOverlay loadingText={t('rejectRegistration.notOutcome.loadingText')} />
+        ) : outcome ? (
+          <LoadingOverlay
+            loadingText={t('rejectRegistration.outcomeContent.notOutcome.loadingText')}
+          />
         ) : (
-          <MessageNoAction {...outcomeContent[outcome]} />
+          <MessageNoAction {...confirmCancellationContent} />
         )
       ) : (
         <MessageNoAction {...jwtNotValid} />
