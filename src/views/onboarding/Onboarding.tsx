@@ -83,7 +83,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
 
   // avoid step 1 if selectedProduct is 'prod-pn' or 'prod-idpay'
   useEffect(() => {
-    const prductAvoidStep =
+    const productAvoidStep =
       selectedProduct?.id === 'prod-pn' || selectedProduct?.id === 'prod-idpay';
     if (prductAvoidStep) {
       forwardWithInstitutionType('PA');
