@@ -16,6 +16,7 @@ import { AsyncAutocompleteV2 } from '../autocomplete/AsyncAutocompleteV2';
 type Props = {
   subTitle: string | ReactElement;
   institutionType?: InstitutionType;
+  productAvoidStep?: boolean;
 } & StepperStepComponentProps;
 
 const handleSearchExternalId = async (
@@ -40,7 +41,13 @@ const handleSearchExternalId = async (
   return null;
 };
 
-export function StepSearchParty({ subTitle, forward, back, institutionType }: Props) {
+export function StepSearchParty({
+  subTitle,
+  forward,
+  back,
+  institutionType,
+  productAvoidStep,
+}: Props) {
   const partyExternalIdByQuery = new URLSearchParams(window.location.search).get('partyExternalId');
   const { setRequiredLogin } = useContext(UserContext);
   const theme = useTheme();
@@ -173,11 +180,15 @@ export function StepSearchParty({ subTitle, forward, back, institutionType }: Pr
 
       <Grid item mt={4}>
         <OnboardingStepActions
-          back={{
-            action: onBackAction,
-            label: t('stepInstitutionType.backLabel'),
-            disabled: false,
-          }}
+          back={
+            !productAvoidStep
+              ? {
+                  action: onBackAction,
+                  label: t('stepInstitutionType.backLabel'),
+                  disabled: false,
+                }
+              : undefined
+          }
           forward={{
             action: onForwardAction,
             label: t('onboardingStep1.onboarding.onboardingStepActions.confirmAction'),
