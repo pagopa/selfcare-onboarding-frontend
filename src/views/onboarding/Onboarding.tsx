@@ -436,7 +436,6 @@ function OnboardingComponent({ productId }: { productId: string }) {
               setActiveStep(0);
             } else if (fromDashboard && productAvoidStep) {
               setOnExitAction(() => () => history.goBack());
-
               setOpenExitModal(true);
             } else {
               setActiveStep(1);
