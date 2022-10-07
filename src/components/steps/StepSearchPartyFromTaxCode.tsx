@@ -62,8 +62,6 @@ export function StepSearchPartyFromTaxCode({ subTitle, institutionType, forward,
   };
 
   const onBackAction = () => {
-    setSelected(null);
-    setSelectedHistory(null);
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     back!();
   };
