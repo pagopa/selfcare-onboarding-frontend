@@ -30,7 +30,6 @@ export default function RejectRegistration() {
 
   const deleteRequest = () => {
     const requestId = uniqueId('contract-reject-');
-    trackEvent('ONBOARDING_CANCEL', { request_id: requestId });
     async function asyncSendDeleteRequest() {
       // Send DELETE request
       const contractPostResponse = await fetchWithLogs(
@@ -64,7 +63,6 @@ export default function RejectRegistration() {
   useEffect(() => {
     setIsValidToken(true);
     //   const requestId = uniqueId('contract-reject-');
-    //   trackEvent('ONBOARDING_CANCEL', { request_id: requestId });
     //   async function asyncSendDeleteRequest() {
     //     // Send DELETE request
     //     const contractPostResponse = await fetchWithLogs(
