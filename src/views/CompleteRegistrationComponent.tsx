@@ -255,14 +255,12 @@ export default function CompleteRegistrationComponent() {
   };
 
   const getMixPanelEvent = (errorStatus: number | undefined) => {
-    const errors = [
-      {
-        409: 'ONBOARDING_TOKEN_VALIDATION_JWT_CONFIRMED',
-        400: 'ONBOARDING_TOKEN_VALIDATION_JWT_CANCELED',
-        404: 'ONBOARDING_TOKEN_VALIDATION_JWT_NOT_FOUND',
-      },
-    ];
-    return (errorStatus && errors[errorStatus]) ?? 'ONBOARDING_TOKEN_VALIDATION_ERROR';
+    const errors = {
+      409: 'ONBOARDING_TOKEN_VALIDATION_JWT_CONFIRMED',
+      400: 'ONBOARDING_TOKEN_VALIDATION_JWT_CANCELED',
+      404: 'ONBOARDING_TOKEN_VALIDATION_JWT_NOT_FOUND',
+    };
+    return errors[errorStatus as keyof typeof errors] ?? 'ONBOARDING_TOKEN_VALIDATION_ERROR';
   };
 
   const jwtNotValid = async () => {
@@ -278,7 +276,7 @@ export default function CompleteRegistrationComponent() {
       setErrorPage(false);
     } else {
       setErrorPage(true);
-      trackEvent(getMixPanelEvent((fetchJwt as AxiosError<Problem>).response?.status) as string);
+      trackEvent(getMixPanelEvent((fetchJwt as AxiosError<Problem>).response?.status));
     }
   };
 
