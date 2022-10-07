@@ -3,7 +3,7 @@ import { IllusError } from '@pagopa/mui-italia';
 import { useTranslation, Trans } from 'react-i18next';
 import { ENV } from '../utils/env';
 
-export default function JwtIvalidPage() {
+export default function JwtInvalidPage() {
   const { t } = useTranslation();
   return (
     <Grid container direction="column" key="0" style={{ textAlign: 'center' }}>
@@ -32,7 +32,7 @@ export default function JwtIvalidPage() {
             // TODO: to confirm
             onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
           >
-            {'Torna alla home'}
+            {t('completeRegistration.jwtNotValid.backHome')}
           </Button>
         </Grid>
       </Grid>
