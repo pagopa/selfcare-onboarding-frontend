@@ -354,6 +354,9 @@ function OnboardingComponent({ productId }: { productId: string }) {
     });
     setInstitutionType(newInstitutionType);
     forward();
+    if (newInstitutionType === 'PSP') {
+      setActiveStep(3);
+    }
   };
 
   const steps: Array<StepperStep> = [
@@ -418,15 +421,18 @@ function OnboardingComponent({ productId }: { productId: string }) {
       Component: () =>
         StepBillingData({
           externalInstitutionId,
-          initialFormData: billingData ?? {
-            businessName: '',
-            registeredOffice: '',
-            zipCode: '',
-            digitalAddress: '',
-            taxCode: '',
-            vatNumber: '',
-            recipientCode: '',
-          },
+          initialFormData:
+            !billingData || institutionType === 'PSP'
+              ? {
+                  businessName: '',
+                  registeredOffice: '',
+                  zipCode: '',
+                  digitalAddress: '',
+                  taxCode: '',
+                  vatNumber: '',
+                  recipientCode: '',
+                }
+              : billingData,
           origin,
           institutionType: institutionType as InstitutionType,
           subtitle: t('onBoardingSubProduct.billingData.subTitle'),
@@ -437,6 +443,8 @@ function OnboardingComponent({ productId }: { productId: string }) {
             } else if (fromDashboard && productAvoidStep) {
               setOnExitAction(() => () => history.goBack());
               setOpenExitModal(true);
+            } else if (institutionType === 'PSP') {
+              setActiveStep(0);
             } else {
               setActiveStep(1);
             }
