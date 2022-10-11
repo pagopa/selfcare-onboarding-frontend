@@ -304,6 +304,10 @@ export default {
     gspDescription: 'Sono gestore di almeno uno dei pubblici servizi: Gas, Energia, Telco.',
     backLabel: 'Indietro',
     confirmLabel: 'Continua',
+    commericialRegisterNumber: 'n. Iscrizione al Registro delle Imprese',
+    registrationInRegister: 'Iscrizione all’Albo',
+    registerNumber: 'Al numero',
+    abiCode: 'Codice ABI',
   },
   rejectRegistration: {
     outcomeContent: {

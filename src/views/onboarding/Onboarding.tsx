@@ -136,6 +136,10 @@ function OnboardingComponent({ productId }: { productId: string }) {
       taxCode: party.taxCode,
       vatNumber: '',
       recipientCode: party.origin === 'IPA' ? party.originId : '',
+      commericialRegisterNumber: '',
+      registrationInRegister: '',
+      registerNumber: undefined,
+      abiCode: '',
     });
     forwardWithData(newFormData);
     trackEvent('ONBOARDING_PARTY_SELECTION', {
@@ -431,6 +435,10 @@ function OnboardingComponent({ productId }: { productId: string }) {
                   taxCode: '',
                   vatNumber: '',
                   recipientCode: '',
+                  commericialRegisterNumber: '',
+                  registrationInRegister: '',
+                  registerNumber: undefined,
+                  abiCode: '',
                 }
               : billingData,
           origin,

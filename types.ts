@@ -200,6 +200,14 @@ export type BillingData = {
   recipientCode: string;
   // servizi pubblici
   publicServices?: boolean;
+  // n. iscrizione al Registro delle Imprese
+  commericialRegisterNumber?: string;
+  // iscrizione all'Albo
+  registrationInRegister?: string;
+  // numero iscrizione albo
+  registerNumber?: number;
+  // codice ABI
+  abiCode?: string;
 };
 
 export type InstitutionData = {

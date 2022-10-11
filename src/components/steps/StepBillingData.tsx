@@ -342,6 +342,45 @@ export default function StepBillingData({
                   </Typography>
                 </Grid>
               )}
+              {institutionType === 'PSP' && (
+                <>
+                  <Grid item xs={12}>
+                    <CustomTextField
+                      {...baseTextFieldProps(
+                        'commericialRegisterNumber',
+                        t('stepBillingData.commericialRegisterNumber'),
+                        400,
+                        18
+                      )}
+                    />
+                  </Grid>
+                  <Grid item xs={6}>
+                    <CustomTextField
+                      {...baseTextFieldProps(
+                        'registrationInRegister',
+                        t('stepBillingData.registrationInRegister'),
+                        400,
+                        18
+                      )}
+                    />
+                  </Grid>
+                  <Grid item xs={6}>
+                    <CustomTextField
+                      {...baseTextFieldProps(
+                        'registerNumber',
+                        t('stepBillingData.registerNumber'),
+                        400,
+                        18
+                      )}
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <CustomTextField
+                      {...baseTextFieldProps('abiCode', t('stepBillingData.abiCode'), 400, 18)}
+                    />
+                  </Grid>
+                </>
+              )}
             </Grid>
           </form>
         </Paper>
