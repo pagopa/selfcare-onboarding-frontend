@@ -184,6 +184,7 @@ export default {
     jwtNotValid: {
       title: 'Richiesta di adesione non più <1 /> valida',
       subtitle: 'Questa richiesta è stata accolta, annullata o è scaduta.',
+      backHome: 'Torna alla home',
     },
   },
   noProductPage: {
