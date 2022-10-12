@@ -84,6 +84,7 @@ export default function CompleteRegistrationComponent() {
 
   const [lastFileErrorAttempt, setLastFileErrorAttempt] = useState<FileErrorAttempt>();
   const [showBlockingError, setShowBlockingError] = useState(false);
+  const [errorTrue, setErrorTrue] = useState<boolean>(false);
 
   const [uploadedFiles, setUploadedFiles, setUploadedFilesHistory] = useHistoryState<Array<File>>(
     'uploaded_files',
@@ -100,6 +101,33 @@ export default function CompleteRegistrationComponent() {
       setEnableLogin(true);
     };
   }, []);
+
+  useEffect(() => {
+    const jwtNotValid = async () => {
+      const fetchJwt = await fetchWithLogs(
+        { endpoint: 'ONBOARDING_TOKEN_VALIDATION', endpointParams: { token } },
+        { method: 'POST', data: '', headers: { 'Content-Type': 'token' } },
+        () => setRequiredLogin(true)
+      );
+      if (
+        (fetchJwt as AxiosError<Problem>).response?.status === 409 ||
+        (fetchJwt as AxiosError<Problem>).response?.status === 400 ||
+        (fetchJwt as AxiosError<Problem>).response?.status === 404
+      ) {
+        setErrorTrue(true);
+      } else {
+        setErrorTrue(false);
+      }
+    };
+
+    if (!token) {
+      setLoading(false);
+      setOutcome('error');
+    } else {
+      void jwtNotValid();
+    }
+  }, []);
+
   const setUploadedFilesAndWriteHistory = (files: Array<File>) => {
     setUploadedFilesHistory(files);
     setUploadedFiles(files);
@@ -252,31 +280,6 @@ export default function CompleteRegistrationComponent() {
       ],
     },
   };
-
-  // TODO: SELC-1574 - remove when fetch is ready
-  const errorTrue = false;
-  // const [errorTrue, setErrorTrue] = useState<boolean>(false);
-
-  // TODO: SELC-1574 - invoke fetch BE for JWT invalid
-  // const jwtNotValid = async () => {
-  //   const fetchJwt = await fetchWithLogs(
-  //     { endpoint: 'ONBOARDING_COMPLETE_REGISTRATION', endpointParams: { token } },
-  //     { method: 'GET' },
-  //     () => setRequiredLogin(true)
-  //   );
-  //   if (
-  //     (fetchJwt as AxiosError<Problem>).response?.status === 409 ||
-  //     (fetchJwt as AxiosError<Problem>).response?.status === 400
-  //   ) {
-  //     setErrorTrue(true);
-  //   } else {
-  //     setErrorTrue(false);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //  await jwtNotValid();
-  // }, []);
 
   return (
     <>

@@ -29,7 +29,6 @@ export default function JwtIvalidPage() {
           <Button
             variant="contained"
             sx={{ alignSelf: 'center' }}
-            // TODO: to confirm
             onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
           >
             {'Torna alla home'}
