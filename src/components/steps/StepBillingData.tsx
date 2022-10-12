@@ -290,6 +290,9 @@ export default function StepBillingData({
                 <Typography>
                   <Checkbox
                     checked={stepHistoryState.isTaxCodeNotEquals2PIVA}
+                    inputProps={{
+                      'aria-label': t('stepBillingData.taxCodeNotEquals2PIVAdescription'),
+                    }}
                     onChange={() =>
                       setStepHistoryState({
                         ...stepHistoryState,
