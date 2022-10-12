@@ -181,6 +181,11 @@ export default {
           'Il caricamento del documento non è andato a buon fine. <1 />Carica un solo file in formato <3>p7m</3>.',
       },
     },
+    jwtNotValid: {
+      title: 'Richiesta di adesione non più <1 /> valida',
+      subtitle: 'Questa richiesta è stata accolta, annullata o è scaduta.',
+      backHome: 'Torna alla home',
+    },
   },
   noProductPage: {
     title: 'Spiacenti, qualcosa è andato storto.',
