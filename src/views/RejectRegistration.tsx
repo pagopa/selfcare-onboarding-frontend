@@ -1,18 +1,18 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { Button, Typography, Grid } from '@mui/material';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
-import { useTranslation, Trans } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import { uniqueId } from 'lodash';
-import { IllusCompleted, IllusError } from '@pagopa/mui-italia';
-import { AxiosError } from 'axios';
 import { MessageNoAction } from '../components/MessageNoAction';
-import { Problem, RequestOutcome, RequestOutcomeOptions } from '../../types';
+import { RequestOutcome, RequestOutcomeOptions } from '../../types';
 import { fetchWithLogs } from '../lib/api-utils';
 import { getFetchOutcome } from '../lib/error-utils';
 import { LoadingOverlay } from '../components/LoadingOverlay';
 import { HeaderContext, UserContext } from '../lib/context';
-import { ENV } from '../utils/env';
-import { ReactComponent as PaymentCompleted } from './../assets/payment_completed.svg';
+import { jwtNotValid } from '../services/tokenServices';
+import JwtInvalidPage from './JwtInvalidPage';
+import ConfrimCancellationPage from './ConfrimCancellationPage';
+import RejectContentSuccessPage from './RejectContentSuccessPage';
+import RejectContentErrorPage from './RejectContentErrorPage';
 
 export const getOnboardingMagicLinkJwt = () =>
   new URLSearchParams(window.location.search).get('jwt');
@@ -21,7 +21,7 @@ export default function RejectRegistration() {
   const [outcome, setOutcome] = useState<RequestOutcome>();
   const [loading, setLoading] = useState(false);
   const [isConfirmPageVisible, setIsConfirmPageVisible] = useState<boolean>(true);
-  const [isValidToken, setIsValidToken] = useState<boolean>();
+  const [tokenValid, setTokenValid] = useState<boolean>(false);
 
   const token = getOnboardingMagicLinkJwt();
   const { setSubHeaderVisible, setOnExit, setEnableLogin } = useContext(HeaderContext);
@@ -61,47 +61,11 @@ export default function RejectRegistration() {
   };
 
   useEffect(() => {
-    const getMixPanelEvent = (errorStatus: number | undefined) => {
-      const errors = {
-        409: 'ONBOARDING_TOKEN_VALIDATION_JWT_CONFIRMED',
-        400: 'ONBOARDING_TOKEN_VALIDATION_JWT_CANCELED',
-        404: 'ONBOARDING_TOKEN_VALIDATION_JWT_NOT_FOUND',
-      };
-      return errors[errorStatus as keyof typeof errors] ?? 'ONBOARDING_TOKEN_VALIDATION_ERROR';
-    };
-
-    const jwtNotValid = async () => {
-      const fetchJwt = await fetchWithLogs(
-        { endpoint: 'ONBOARDING_TOKEN_VALIDATION', endpointParams: { token } },
-        { method: 'POST', headers: { 'Content-Type': 'application/json' } },
-        () => setRequiredLogin(true)
-      );
-
-      if (
-        (fetchJwt as AxiosError<Problem>).response?.status === 409 ||
-        (fetchJwt as AxiosError<Problem>).response?.status === 400 ||
-        (fetchJwt as AxiosError<Problem>).response?.status === 404
-      ) {
-        setIsValidToken(false);
-      } else {
-        setIsValidToken(true);
-      }
-
-      const outcome = getFetchOutcome(fetchJwt);
-
-      if (outcome === 'success') {
-        setIsValidToken(true);
-      } else {
-        setIsValidToken(false);
-        trackEvent(getMixPanelEvent((fetchJwt as AxiosError<Problem>).response?.status));
-      }
-    };
-
     if (!token) {
       setOutcome('error');
     } else {
       setLoading(true);
-      jwtNotValid().finally(() => setLoading(false));
+      jwtNotValid({ token, setRequiredLogin, setTokenValid }).finally(() => setLoading(false));
     }
   }, []);
 
@@ -119,40 +83,10 @@ export default function RejectRegistration() {
     title: '',
     description: [
       <>
-        <div>
-          <PaymentCompleted />
-          <Typography variant="h4" mt={3}>
-            <Trans i18nKey="rejectRegistration.confirmCancellatione.title">
-              Vuoi eliminare la richiesta di
-              <br />
-              adesione?
-            </Trans>
-          </Typography>
-          <Typography variant="body1" mb={4} mt={1}>
-            <Trans i18nKey="rejectRegistration.confirmCancellatione.description">
-              Se la elimini, tutti i dati inseriti verranno persi.
-            </Trans>
-          </Typography>
-          <Typography mt={3}>
-            <Button
-              variant="outlined"
-              sx={{ alignSelf: 'center', mr: 2 }}
-              onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
-            >
-              {t('rejectRegistration.outcomeContent.success.backActionLabel')}
-            </Button>
-            <Button
-              variant="contained"
-              sx={{ alignSelf: 'center' }}
-              onClick={() => {
-                setIsConfirmPageVisible(false);
-                deleteRequest();
-              }}
-            >
-              {t('rejectRegistration.confirmCancellatione.confirmActionLabel')}
-            </Button>
-          </Typography>
-        </div>
+        <ConfrimCancellationPage
+          setIsConfirmPageVisible={setIsConfirmPageVisible}
+          deleteRequest={deleteRequest}
+        />
       </>,
     ],
   };
@@ -162,30 +96,7 @@ export default function RejectRegistration() {
       title: '',
       description: [
         <>
-          <IllusCompleted size={60} />
-          <Typography variant="h4" mt={3}>
-            <Trans i18nKey="rejectRegistration.outcomeContent.success.title">
-              La tua richiesta di adesione è
-              <br />
-              stata annullata
-            </Trans>
-          </Typography>
-          <Typography variant="body1" mb={4} mt={1}>
-            <Trans i18nKey="rejectRegistration.outcomeContent.success.description">
-              Nella home dell’Area Riservata puoi vedere i prodotti
-              <br />
-              disponibili e richiedere l’adesione per il tuo ente.
-            </Trans>
-          </Typography>
-          <Typography mt={3}>
-            <Button
-              variant="contained"
-              sx={{ alignSelf: 'center' }}
-              onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
-            >
-              {t('rejectRegistration.outcomeContent.success.backActionLabel')}
-            </Button>
-          </Typography>
+          <RejectContentSuccessPage />
         </>,
       ],
     },
@@ -193,79 +104,17 @@ export default function RejectRegistration() {
       title: '',
       description: [
         <>
-          <IllusError size={60} />
-          <Grid container direction="column" key="0" style={{ textAlign: 'center' }} mt={3}>
-            <Grid container item justifyContent="center">
-              <Grid item xs={6}>
-                <Typography variant="h4">
-                  {t('rejectRegistration.outcomeContent.error.title')}
-                </Typography>
-              </Grid>
-            </Grid>
-            <Grid container item justifyContent="center" mb={4} mt={1}>
-              <Grid item xs={6}>
-                <Typography variant="body1">
-                  <Trans i18nKey="rejectRegistration.outcomeContent.error.description">
-                    A causa di un errore del sistema non è possibile completare la procedura.
-                    <br />
-                    Ti chiediamo di riprovare più tardi.
-                  </Trans>
-                </Typography>
-              </Grid>
-            </Grid>
-            <Grid container item justifyContent="center">
-              <Grid item xs={4}>
-                <Button
-                  variant="contained"
-                  sx={{ alignSelf: 'center' }}
-                  onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
-                >
-                  {t('rejectRegistration.outcomeContent.error.backActionLabel')}
-                </Button>
-              </Grid>
-            </Grid>
-          </Grid>
+          <RejectContentErrorPage />
         </>,
       ],
     },
   };
 
-  const jwtNotValid = {
+  const jwtNotValidPage = {
     title: '',
     description: [
       <>
-        <Grid container direction="column" key="0" style={{ textAlign: 'center' }}>
-          <Grid container item justifyContent="center" mb={2}>
-            <IllusError size={60} />
-          </Grid>
-          <Grid container item justifyContent="center" mt={3}>
-            <Grid item xs={4}>
-              <Typography variant="h4">
-                <Trans i18nKey="rejectRegistration.outcomeContent.jwtNotValid.title">
-                  Richiesta di adesione non più <br /> valida
-                </Trans>
-              </Typography>
-            </Grid>
-          </Grid>
-          <Grid container item justifyContent="center" mb={4} mt={1}>
-            <Grid item xs={6}>
-              <Typography variant="body1">
-                {t('rejectRegistration.outcomeContent.jwtNotValid.subtitle')}
-              </Typography>
-            </Grid>
-          </Grid>
-          <Grid container item justifyContent="center">
-            <Grid item xs={4}>
-              <Button
-                variant="contained"
-                sx={{ alignSelf: 'center' }}
-                onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
-              >
-                {t('rejectRegistration.outcomeContent.jwtNotValid.backActionLabel')}
-              </Button>
-            </Grid>
-          </Grid>
-        </Grid>
+        <JwtInvalidPage />
       </>,
     ],
   };
@@ -278,7 +127,7 @@ export default function RejectRegistration() {
 
   return (
     <React.Fragment>
-      {isValidToken ? (
+      {tokenValid ? (
         isConfirmPageVisible ? (
           <MessageNoAction {...confirmCancellationContent} />
         ) : !outcome ? (
@@ -289,7 +138,7 @@ export default function RejectRegistration() {
           <MessageNoAction {...outcomeContent[outcome]} />
         )
       ) : (
-        <MessageNoAction {...jwtNotValid} />
+        <MessageNoAction {...jwtNotValidPage} />
       )}
     </React.Fragment>
   );
