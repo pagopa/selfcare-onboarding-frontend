@@ -59,6 +59,9 @@ function OnboardingComponent({ productId }: { productId: string }) {
   const [onExitAction, setOnExitAction] = useState<(() => void) | undefined>();
   const [selectedParty, setSelectedParty] = useState<Party>();
 
+  const productAvoidStep =
+    selectedProduct?.id === 'prod-pn' || selectedProduct?.id === 'prod-idpay';
+
   const fromDashboard =
     window.location.search.indexOf(`partyExternalId=${externalInstitutionId}`) > -1;
 
@@ -80,6 +83,13 @@ function OnboardingComponent({ productId }: { productId: string }) {
     });
     setPricingPlan(new URLSearchParams(window.location.search).get('pricingPlan') ?? undefined);
   }, [productId]);
+
+  // avoid step 1 if selectedProduct is 'prod-pn' or 'prod-idpay'
+  useEffect(() => {
+    if (productAvoidStep) {
+      forwardWithInstitutionType('PA');
+    }
+  }, [selectedProduct]);
 
   const checkProductId = async () => {
     const onboardingProducts = await fetchWithLogs(
@@ -373,6 +383,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
             </Trans>
           ),
           institutionType,
+          productAvoidStep,
           product: selectedProduct,
           forward: forwardWithDataAndInstitution,
           back: () => {
@@ -421,7 +432,14 @@ function OnboardingComponent({ productId }: { productId: string }) {
           subtitle: t('onBoardingSubProduct.billingData.subTitle'),
           forward: forwardWithBillingData,
           back: () => {
-            setActiveStep(fromDashboard ? 0 : 1);
+            if (fromDashboard && !productAvoidStep) {
+              setActiveStep(0);
+            } else if (fromDashboard && productAvoidStep) {
+              setOnExitAction(() => () => history.goBack());
+              setOpenExitModal(true);
+            } else {
+              setActiveStep(1);
+            }
           },
         }),
     },
