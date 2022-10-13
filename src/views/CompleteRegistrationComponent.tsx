@@ -116,7 +116,7 @@ export default function CompleteRegistrationComponent() {
     const jwtNotValid = async () => {
       const fetchJwt = await fetchWithLogs(
         { endpoint: 'ONBOARDING_TOKEN_VALIDATION', endpointParams: { token } },
-        { method: 'POST', data: '', headers: { 'Content-Type': 'token' } },
+        { method: 'POST', data: '', headers: { 'Content-Type': 'application/json' } },
         () => setRequiredLogin(true)
       );
 
