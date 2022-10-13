@@ -141,14 +141,11 @@ export default function CompleteRegistrationComponent() {
     };
 
     if (!token) {
-      setLoading(false);
       setOutcome('error');
     } else {
-      void jwtNotValid();
+      setLoading(true);
+      jwtNotValid().finally(() => setLoading(false));
     }
-
-    setLoading(true);
-    jwtNotValid().finally(() => setLoading(false));
   }, []);
 
   const setUploadedFilesAndWriteHistory = (files: Array<File>) => {

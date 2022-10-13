@@ -4,8 +4,9 @@ import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsS
 import { useTranslation, Trans } from 'react-i18next';
 import { uniqueId } from 'lodash';
 import { IllusCompleted, IllusError } from '@pagopa/mui-italia';
+import { AxiosError } from 'axios';
 import { MessageNoAction } from '../components/MessageNoAction';
-import { RequestOutcome, RequestOutcomeOptions } from '../../types';
+import { Problem, RequestOutcome, RequestOutcomeOptions } from '../../types';
 import { fetchWithLogs } from '../lib/api-utils';
 import { getFetchOutcome } from '../lib/error-utils';
 import { LoadingOverlay } from '../components/LoadingOverlay';
@@ -59,33 +60,49 @@ export default function RejectRegistration() {
     }
   };
 
-  // TODO: update when BE fetch token verify will be ready
   useEffect(() => {
-    setIsValidToken(true);
-    //   const requestId = uniqueId('contract-reject-');
-    //   async function asyncSendDeleteRequest() {
-    //     // Send DELETE request
-    //     const contractPostResponse = await fetchWithLogs(
-    //       { endpoint: 'ONBOARDING_COMPLETE_REGISTRATION', endpointParams: { token } },
-    //       { method: 'DELETE' },
-    //       () => setRequiredLogin(true)
-    //     );
-    //     // Check the outcome
-    //     const outcome = getFetchOutcome(contractPostResponse);
-    //     // Show it to the end user
-    //     setLoading(false);
-    //     setOutcome(outcome);
-    //     if (outcome === 'success') {
-    //       trackEvent('ONBOARDING_CANCEL_SUCCESS', { request_id: requestId, party_id: token });
-    //       setIsValidToken(false);
-    //     } else if (outcome === 'error') {
-    //       trackEvent('ONBOARDING_CANCEL_FAILURE', { request_id: requestId, party_id: token });
-    //       setIsValidToken(false);
-    //       setLoading(false);
-    //       setOutcome('error');
-    //     }
-    //   }
-    // }
+    const getMixPanelEvent = (errorStatus: number | undefined) => {
+      const errors = {
+        409: 'ONBOARDING_TOKEN_VALIDATION_JWT_CONFIRMED',
+        400: 'ONBOARDING_TOKEN_VALIDATION_JWT_CANCELED',
+        404: 'ONBOARDING_TOKEN_VALIDATION_JWT_NOT_FOUND',
+      };
+      return errors[errorStatus as keyof typeof errors] ?? 'ONBOARDING_TOKEN_VALIDATION_ERROR';
+    };
+
+    const jwtNotValid = async () => {
+      const fetchJwt = await fetchWithLogs(
+        { endpoint: 'ONBOARDING_TOKEN_VALIDATION', endpointParams: { token } },
+        { method: 'POST', headers: { 'Content-Type': 'application/json' } },
+        () => setRequiredLogin(true)
+      );
+
+      if (
+        (fetchJwt as AxiosError<Problem>).response?.status === 409 ||
+        (fetchJwt as AxiosError<Problem>).response?.status === 400 ||
+        (fetchJwt as AxiosError<Problem>).response?.status === 404
+      ) {
+        setIsValidToken(false);
+      } else {
+        setIsValidToken(true);
+      }
+
+      const outcome = getFetchOutcome(fetchJwt);
+
+      if (outcome === 'success') {
+        setIsValidToken(true);
+      } else {
+        setIsValidToken(false);
+        trackEvent(getMixPanelEvent((fetchJwt as AxiosError<Problem>).response?.status));
+      }
+    };
+
+    if (!token) {
+      setOutcome('error');
+    } else {
+      setLoading(true);
+      jwtNotValid().finally(() => setLoading(false));
+    }
   }, []);
 
   useEffect(() => {
