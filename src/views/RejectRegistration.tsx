@@ -1,32 +1,36 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { Button, Typography, Grid } from '@mui/material';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
-import { useTranslation, Trans } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import { uniqueId } from 'lodash';
-import { IllusCompleted, IllusError } from '@pagopa/mui-italia';
 import { MessageNoAction } from '../components/MessageNoAction';
 import { RequestOutcome, RequestOutcomeOptions } from '../../types';
 import { fetchWithLogs } from '../lib/api-utils';
 import { getFetchOutcome } from '../lib/error-utils';
 import { LoadingOverlay } from '../components/LoadingOverlay';
 import { HeaderContext, UserContext } from '../lib/context';
-import { ENV } from '../utils/env';
+import { jwtNotValid } from '../services/tokenServices';
+import JwtInvalidPage from './JwtInvalidPage';
+import ConfrimCancellationPage from './ConfrimCancellationPage';
+import RejectContentSuccessPage from './RejectContentSuccessPage';
+import RejectContentErrorPage from './RejectContentErrorPage';
 
 export const getOnboardingMagicLinkJwt = () =>
   new URLSearchParams(window.location.search).get('jwt');
 
 export default function RejectRegistration() {
   const [outcome, setOutcome] = useState<RequestOutcome>();
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [isConfirmPageVisible, setIsConfirmPageVisible] = useState<boolean>(true);
+  const [tokenValid, setTokenValid] = useState<boolean>();
 
   const token = getOnboardingMagicLinkJwt();
   const { setSubHeaderVisible, setOnExit, setEnableLogin } = useContext(HeaderContext);
   const { setRequiredLogin } = useContext(UserContext);
 
   const { t } = useTranslation();
-  useEffect(() => {
+
+  const deleteRequest = () => {
     const requestId = uniqueId('contract-reject-');
-    trackEvent('ONBOARDING_CANCEL', { request_id: requestId });
     async function asyncSendDeleteRequest() {
       // Send DELETE request
       const contractPostResponse = await fetchWithLogs(
@@ -54,7 +58,16 @@ export default function RejectRegistration() {
     } else {
       void asyncSendDeleteRequest();
     }
-  }, []); // in order to be invoked once
+  };
+
+  useEffect(() => {
+    if (!token) {
+      setOutcome('error');
+    } else {
+      setLoading(true);
+      jwtNotValid({ token, setRequiredLogin, setTokenValid }).finally(() => setLoading(false));
+    }
+  }, []);
 
   useEffect(() => {
     setSubHeaderVisible(true);
@@ -65,35 +78,25 @@ export default function RejectRegistration() {
       setEnableLogin(true);
     };
   }, []);
+
+  const confirmCancellationContent = {
+    title: '',
+    description: [
+      <>
+        <ConfrimCancellationPage
+          setIsConfirmPageVisible={setIsConfirmPageVisible}
+          deleteRequest={deleteRequest}
+        />
+      </>,
+    ],
+  };
+
   const outcomeContent: RequestOutcomeOptions = {
     success: {
       title: '',
       description: [
         <>
-          <IllusCompleted size={60} />
-          <Typography variant="h4" mt={3}>
-            <Trans i18nKey="rejectRegistration.outcomeContent.success.title">
-              La tua richiesta di adesione è
-              <br />
-              stata annullata
-            </Trans>
-          </Typography>
-          <Typography variant="body1" mb={4} mt={1}>
-            <Trans i18nKey="rejectRegistration.outcomeContent.success.description">
-              Nella home dell’Area Riservata puoi vedere i prodotti
-              <br />
-              disponibili e richiedere l’adesione per il tuo ente.
-            </Trans>
-          </Typography>
-          <Typography mt={3}>
-            <Button
-              variant="contained"
-              sx={{ alignSelf: 'center' }}
-              onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
-            >
-              {t('rejectRegistration.outcomeContent.success.backActionLabel')}
-            </Button>
-          </Typography>
+          <RejectContentSuccessPage />
         </>,
       ],
     },
@@ -101,53 +104,41 @@ export default function RejectRegistration() {
       title: '',
       description: [
         <>
-          <IllusError size={60} />
-          <Grid container direction="column" key="0" style={{ textAlign: 'center' }} mt={3}>
-            <Grid container item justifyContent="center">
-              <Grid item xs={6}>
-                <Typography variant="h4">
-                  {t('rejectRegistration.outcomeContent.error.title')}
-                </Typography>
-              </Grid>
-            </Grid>
-            <Grid container item justifyContent="center" mb={4} mt={1}>
-              <Grid item xs={6}>
-                <Typography variant="body1">
-                  <Trans i18nKey="rejectRegistration.outcomeContent.error.description">
-                    A causa di un errore del sistema non è possibile completare la procedura.
-                    <br />
-                    Ti chiediamo di riprovare più tardi.
-                  </Trans>
-                </Typography>
-              </Grid>
-            </Grid>
-            <Grid container item justifyContent="center">
-              <Grid item xs={4}>
-                <Button
-                  variant="contained"
-                  sx={{ alignSelf: 'center' }}
-                  onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
-                >
-                  {t('rejectRegistration.outcomeContent.error.backActionLabel')}
-                </Button>
-              </Grid>
-            </Grid>
-          </Grid>
+          <RejectContentErrorPage />
         </>,
       ],
     },
   };
 
+  const jwtNotValidPage = {
+    title: '',
+    description: [
+      <>
+        <JwtInvalidPage />
+      </>,
+    ],
+  };
+
   if (loading) {
-    return <LoadingOverlay loadingText={t('rejectRegistration.loading.loadingText')} />;
+    return (
+      <LoadingOverlay loadingText={t('rejectRegistration.outcomeContent.notOutcome.loadingText')} />
+    );
   }
 
   return (
     <React.Fragment>
-      {!outcome ? (
-        <LoadingOverlay loadingText={t('rejectRegistration.notOutcome.loadingText')} />
+      {tokenValid ? (
+        isConfirmPageVisible ? (
+          <MessageNoAction {...confirmCancellationContent} />
+        ) : !outcome ? (
+          <LoadingOverlay
+            loadingText={t('rejectRegistration.outcomeContent.notOutcome.loadingText')}
+          />
+        ) : (
+          <MessageNoAction {...outcomeContent[outcome]} />
+        )
       ) : (
-        <MessageNoAction {...outcomeContent[outcome]} />
+        <MessageNoAction {...jwtNotValidPage} />
       )}
     </React.Fragment>
   );

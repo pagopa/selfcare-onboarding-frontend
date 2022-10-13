@@ -17,6 +17,7 @@ import redXIllustration from '../assets/red-x-illustration.svg';
 import { ENV } from '../utils/env';
 import { MessageNoAction } from '../components/MessageNoAction';
 import { HeaderContext, UserContext } from '../lib/context';
+import { jwtNotValid } from '../services/tokenServices';
 import { getOnboardingMagicLinkJwt } from './RejectRegistration';
 import JwtInvalidPage from './JwtInvalidPage';
 
@@ -80,7 +81,7 @@ export default function CompleteRegistrationComponent() {
   const [outcome, setOutcome] = useState<RequestOutcome | null>(!token ? 'error' : null);
   const [errorCode, setErrorCode] = useState<keyof typeof errors>('GENERIC');
 
-  const [errorPage, setErrorPage] = useState<boolean>(false);
+  const [tokenValid, setTokenValid] = useState<boolean>();
 
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -104,51 +105,12 @@ export default function CompleteRegistrationComponent() {
   }, []);
 
   useEffect(() => {
-    const getMixPanelEvent = (errorStatus: number | undefined) => {
-      const errors = {
-        409: 'ONBOARDING_TOKEN_VALIDATION_JWT_CONFIRMED',
-        400: 'ONBOARDING_TOKEN_VALIDATION_JWT_CANCELED',
-        404: 'ONBOARDING_TOKEN_VALIDATION_JWT_NOT_FOUND',
-      };
-      return errors[errorStatus as keyof typeof errors] ?? 'ONBOARDING_TOKEN_VALIDATION_ERROR';
-    };
-
-    const jwtNotValid = async () => {
-      const fetchJwt = await fetchWithLogs(
-        { endpoint: 'ONBOARDING_TOKEN_VALIDATION', endpointParams: { token } },
-        { method: 'POST', headers: { 'Content-Type': 'application/json' } },
-        () => setRequiredLogin(true)
-      );
-
-      if (
-        (fetchJwt as AxiosError<Problem>).response?.status === 409 ||
-        (fetchJwt as AxiosError<Problem>).response?.status === 400 ||
-        (fetchJwt as AxiosError<Problem>).response?.status === 404
-      ) {
-        setErrorPage(true);
-      } else {
-        setErrorPage(false);
-      }
-
-      const outcome = getFetchOutcome(fetchJwt);
-
-      if (outcome === 'success') {
-        setErrorPage(false);
-      } else {
-        setErrorPage(true);
-        trackEvent(getMixPanelEvent((fetchJwt as AxiosError<Problem>).response?.status));
-      }
-    };
-
     if (!token) {
-      setLoading(false);
       setOutcome('error');
     } else {
-      void jwtNotValid();
+      setLoading(true);
+      jwtNotValid({ token, setRequiredLogin, setTokenValid }).finally(() => setLoading(false));
     }
-
-    setLoading(true);
-    jwtNotValid().finally(() => setLoading(false));
   }, []);
 
   const setUploadedFilesAndWriteHistory = (files: Array<File>) => {
@@ -306,7 +268,7 @@ export default function CompleteRegistrationComponent() {
 
   return (
     <>
-      {errorPage ? (
+      {!tokenValid ? (
         <JwtInvalidPage />
       ) : outcome === 'success' ? (
         <MessageNoAction {...outcomeContent[outcome]} />
