@@ -79,7 +79,7 @@ export const API = {
     URL: ENV.URL_API.ONBOARDING + '/users/validate',
   },
   ONBOARDING_TOKEN_VALIDATION: {
-    URL: ENV.URL_API.PARTY_PROCESS + '/tokens/{{token}}/verify:',
+    URL: ENV.URL_API.PARTY_PROCESS + '/tokens/{{token}}/verify',
   },
 };
 
