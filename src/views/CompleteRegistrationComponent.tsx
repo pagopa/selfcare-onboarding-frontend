@@ -81,7 +81,7 @@ export default function CompleteRegistrationComponent() {
   const [outcome, setOutcome] = useState<RequestOutcome | null>(!token ? 'error' : null);
   const [errorCode, setErrorCode] = useState<keyof typeof errors>('GENERIC');
 
-  const [tokenValid, setTokenValid] = useState<boolean>(false);
+  const [tokenValid, setTokenValid] = useState<boolean>();
 
   const [loading, setLoading] = useState<boolean>(false);
 

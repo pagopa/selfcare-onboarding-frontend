@@ -21,7 +21,7 @@ export default function RejectRegistration() {
   const [outcome, setOutcome] = useState<RequestOutcome>();
   const [loading, setLoading] = useState(false);
   const [isConfirmPageVisible, setIsConfirmPageVisible] = useState<boolean>(true);
-  const [tokenValid, setTokenValid] = useState<boolean>(false);
+  const [tokenValid, setTokenValid] = useState<boolean>();
 
   const token = getOnboardingMagicLinkJwt();
   const { setSubHeaderVisible, setOnExit, setEnableLogin } = useContext(HeaderContext);

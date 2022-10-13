@@ -7,7 +7,7 @@ import { getFetchOutcome } from '../lib/error-utils';
 type Props = {
   token: string;
   setRequiredLogin: (value: React.SetStateAction<boolean>) => void;
-  setTokenValid: (value: React.SetStateAction<boolean>) => void;
+  setTokenValid: React.Dispatch<React.SetStateAction<boolean | undefined>>;
 };
 
 const getMixPanelEvent = (errorStatus: number | undefined) => {
