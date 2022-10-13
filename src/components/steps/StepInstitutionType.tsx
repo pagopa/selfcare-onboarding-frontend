@@ -8,10 +8,16 @@ import {
   Paper,
   useTheme,
 } from '@mui/material';
-import React from 'react';
+import React, { useRef } from 'react';
 import { useTranslation, Trans } from 'react-i18next';
-import { InstitutionType, Product, StepperStepComponentProps } from '../../../types';
+import {
+  InstitutionType,
+  IPACatalogParty,
+  Product,
+  StepperStepComponentProps,
+} from '../../../types';
 import { OnboardingStepActions } from '../OnboardingStepActions';
+import { useHistoryState } from '../useHistoryState';
 
 type Props = StepperStepComponentProps & {
   institutionType: InstitutionType;
@@ -24,6 +30,7 @@ const institutionTypeValues: Array<{ labelKey: string; value: InstitutionType }>
   { labelKey: 'gsp', value: 'GSP' },
   { labelKey: 'scp', value: 'SCP' },
   { labelKey: 'pt', value: 'PT' },
+  { labelKey: 'psp', value: 'PSP' },
 ];
 
 export default function StepInstitutionType({
@@ -34,12 +41,20 @@ export default function StepInstitutionType({
   selectedProduct,
 }: Props) {
   const [selectedValue, setSelectedValue] = React.useState<InstitutionType>(institutionType);
+  const setSelectedHistory = useHistoryState<IPACatalogParty | null>('selected_step1', null)[2];
+
+  const selectedValueRef = useRef<InstitutionType>(selectedValue);
 
   const { t } = useTranslation();
 
   const theme = useTheme();
 
-  const handleChange = (value: InstitutionType) => setSelectedValue(value);
+  const handleChange = (value: InstitutionType) => {
+    if (value !== selectedValueRef.current) {
+      setSelectedHistory(null);
+    }
+    setSelectedValue(value);
+  };
 
   const onForwardAction = () => {
     forward(selectedValue);
@@ -48,9 +63,16 @@ export default function StepInstitutionType({
   const institutionTypeValueFiltered = (id: string | undefined) => {
     switch (id) {
       case 'prod-interop':
-      case 'prod-pagopa':
         return institutionTypeValues.filter(
           (it) => it.labelKey === 'pa' || it.labelKey === 'gsp' || it.labelKey === 'scp'
+        );
+      case 'prod-pagopa':
+        return institutionTypeValues.filter(
+          (it) =>
+            it.labelKey === 'pa' ||
+            it.labelKey === 'gsp' ||
+            it.labelKey === 'scp' ||
+            it.labelKey === 'psp'
         );
       case 'prod-pn':
         return institutionTypeValues.filter((it) => it.labelKey === 'pa');
@@ -89,6 +111,8 @@ export default function StepInstitutionType({
       itValue === 'PA'
     ) {
       return t('stepInstitutionType.cadArticle165');
+    } else if (selectedProductId === 'prod-pagopa' && itValue === 'PSP') {
+      return t('stepInstitutionType.cadPsp');
     } else {
       return t('stepInstitutionType.cadArticle2A');
     }

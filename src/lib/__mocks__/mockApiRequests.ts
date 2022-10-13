@@ -279,6 +279,12 @@ const error409: Promise<AxiosError> = new Promise((resolve) =>
     response: { data: '', status: 409, statusText: '409' },
   } as AxiosError)
 );
+const error400: Promise<AxiosError> = new Promise((resolve) =>
+  resolve({
+    isAxiosError: true,
+    response: { data: '', status: 400, statusText: '400' },
+  } as AxiosError)
+);
 
 const buildOnboardingUserValidation409 = (
   isNameConflict: boolean,
@@ -479,6 +485,20 @@ export async function mockFetch(
     return new Promise((resolve) =>
       resolve({ data: mockedParties, status: 200, statusText: '200' } as AxiosResponse)
     );
+  }
+
+  if (endpoint === 'ONBOARDING_TOKEN_VALIDATION') {
+    if (window.location.search === '?jwt=tokenNotFound') {
+      return notFoundError;
+    } else if (window.location.search === '?jwt=tokenAlreadyConsumed') {
+      return error409;
+    } else if (window.location.search === '?jwt=tokenNotValid') {
+      return error400;
+    } else {
+      return new Promise((resolve) =>
+        resolve({ data: '', status: 200, statusText: '200' } as AxiosResponse)
+      );
+    }
   }
 
   const msg = `NOT MOCKED REQUEST! {endpoint: ${endpoint}, endpointParams: ${JSON.stringify(

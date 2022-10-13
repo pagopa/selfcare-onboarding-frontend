@@ -18,6 +18,7 @@ import { ENV } from '../utils/env';
 import { MessageNoAction } from '../components/MessageNoAction';
 import { HeaderContext, UserContext } from '../lib/context';
 import { getOnboardingMagicLinkJwt } from './RejectRegistration';
+import JwtInvalidPage from './JwtInvalidPage';
 
 type FileErrorAttempt = {
   fileName: string;
@@ -79,6 +80,8 @@ export default function CompleteRegistrationComponent() {
   const [outcome, setOutcome] = useState<RequestOutcome | null>(!token ? 'error' : null);
   const [errorCode, setErrorCode] = useState<keyof typeof errors>('GENERIC');
 
+  const [errorPage, setErrorPage] = useState<boolean>(false);
+
   const [loading, setLoading] = useState<boolean>(false);
 
   const [lastFileErrorAttempt, setLastFileErrorAttempt] = useState<FileErrorAttempt>();
@@ -99,6 +102,55 @@ export default function CompleteRegistrationComponent() {
       setEnableLogin(true);
     };
   }, []);
+
+  useEffect(() => {
+    const getMixPanelEvent = (errorStatus: number | undefined) => {
+      const errors = {
+        409: 'ONBOARDING_TOKEN_VALIDATION_JWT_CONFIRMED',
+        400: 'ONBOARDING_TOKEN_VALIDATION_JWT_CANCELED',
+        404: 'ONBOARDING_TOKEN_VALIDATION_JWT_NOT_FOUND',
+      };
+      return errors[errorStatus as keyof typeof errors] ?? 'ONBOARDING_TOKEN_VALIDATION_ERROR';
+    };
+
+    const jwtNotValid = async () => {
+      const fetchJwt = await fetchWithLogs(
+        { endpoint: 'ONBOARDING_TOKEN_VALIDATION', endpointParams: { token } },
+        { method: 'POST', headers: { 'Content-Type': 'application/json' } },
+        () => setRequiredLogin(true)
+      );
+
+      if (
+        (fetchJwt as AxiosError<Problem>).response?.status === 409 ||
+        (fetchJwt as AxiosError<Problem>).response?.status === 400 ||
+        (fetchJwt as AxiosError<Problem>).response?.status === 404
+      ) {
+        setErrorPage(true);
+      } else {
+        setErrorPage(false);
+      }
+
+      const outcome = getFetchOutcome(fetchJwt);
+
+      if (outcome === 'success') {
+        setErrorPage(false);
+      } else {
+        setErrorPage(true);
+        trackEvent(getMixPanelEvent((fetchJwt as AxiosError<Problem>).response?.status));
+      }
+    };
+
+    if (!token) {
+      setLoading(false);
+      setOutcome('error');
+    } else {
+      void jwtNotValid();
+    }
+
+    setLoading(true);
+    jwtNotValid().finally(() => setLoading(false));
+  }, []);
+
   const setUploadedFilesAndWriteHistory = (files: Array<File>) => {
     setUploadedFilesHistory(files);
     setUploadedFiles(files);
@@ -251,67 +303,74 @@ export default function CompleteRegistrationComponent() {
       ],
     },
   };
-  return outcome === 'success' ? (
-    <MessageNoAction {...outcomeContent[outcome]} />
-  ) : outcome === 'error' ? (
-    !token || showBlockingError ? (
-      <Grid container direction="column" key="0" style={{ textAlign: 'center' }}>
-        <Grid container item justifyContent="center" mb={2}>
-          <IllusError size={60} />
-        </Grid>
-        <Grid container item justifyContent="center" mt={3}>
-          <Grid item xs={6}>
-            <Typography variant="h4">{t('completeRegistration.title')}</Typography>
+
+  return (
+    <>
+      {errorPage ? (
+        <JwtInvalidPage />
+      ) : outcome === 'success' ? (
+        <MessageNoAction {...outcomeContent[outcome]} />
+      ) : outcome === 'error' ? (
+        !token || showBlockingError ? (
+          <Grid container direction="column" key="0" style={{ textAlign: 'center' }}>
+            <Grid container item justifyContent="center" mb={2}>
+              <IllusError size={60} />
+            </Grid>
+            <Grid container item justifyContent="center" mt={3}>
+              <Grid item xs={6}>
+                <Typography variant="h4">{t('completeRegistration.title')}</Typography>
+              </Grid>
+            </Grid>
+            <Grid container item justifyContent="center" mb={4} mt={1}>
+              <Grid item xs={6}>
+                <Typography variant="body1">
+                  <Trans i18nKey="completeRegistration.description">
+                    Non siamo riusciti a indirizzarti alla pagina di caricamento
+                    <br />
+                    per completare la procedura.
+                  </Trans>
+                </Typography>
+              </Grid>
+            </Grid>
+            <Grid container item justifyContent="center">
+              <Grid item xs={4}>
+                <Button
+                  variant="contained"
+                  sx={{ alignSelf: 'center' }}
+                  onClick={() => window.location.assign(buildAssistanceURI(ENV.ASSISTANCE.EMAIL))}
+                >
+                  {t('completeRegistration.contactAssistanceButton')}
+                </Button>
+              </Grid>
+            </Grid>
           </Grid>
-        </Grid>
-        <Grid container item justifyContent="center" mb={4} mt={1}>
-          <Grid item xs={6}>
-            <Typography variant="body1">
-              <Trans i18nKey="completeRegistration.description">
-                Non siamo riusciti a indirizzarti alla pagina di caricamento
-                <br />
-                per completare la procedura.
-              </Trans>
-            </Typography>
-          </Grid>
-        </Grid>
-        <Grid container item justifyContent="center">
-          <Grid item xs={4}>
-            <Button
-              variant="contained"
-              sx={{ alignSelf: 'center' }}
-              onClick={() => window.location.assign(buildAssistanceURI(ENV.ASSISTANCE.EMAIL))}
-            >
-              {t('completeRegistration.contactAssistanceButton')}
-            </Button>
-          </Grid>
-        </Grid>
-      </Grid>
-    ) : (
-      <SessionModal
-        handleClose={handleErrorModalClose}
-        handleExit={handleErrorModalExit}
-        onConfirm={handleErrorModalConfirm}
-        open={true}
-        title={t(`completeRegistration.errors.${errorCode}.title`)}
-        message={
-          errorCode === 'INVALID_SIGN_FORMAT' ? (
-            <Trans i18nKey={`completeRegistration.errors.INVALID_SIGN_FORMAT.message`}>
-              {'Il caricamento del documento non è andato a buon fine.'}
-              <br />
-              {'Carica un solo file in formato '}
-              <strong>{'p7m'}</strong>
-              {'.'}
-            </Trans>
-          ) : (
-            t(`completeRegistration.errors.${errorCode}.message`)
-          )
-        }
-        onConfirmLabel={t('completeRegistration.sessionModal.onConfirmLabel')}
-        onCloseLabel={t('completeRegistration.sessionModal.onCloseLabel')}
-      />
-    )
-  ) : (
-    <Step />
+        ) : (
+          <SessionModal
+            handleClose={handleErrorModalClose}
+            handleExit={handleErrorModalExit}
+            onConfirm={handleErrorModalConfirm}
+            open={true}
+            title={t(`completeRegistration.errors.${errorCode}.title`)}
+            message={
+              errorCode === 'INVALID_SIGN_FORMAT' ? (
+                <Trans i18nKey={`completeRegistration.errors.INVALID_SIGN_FORMAT.message`}>
+                  {'Il caricamento del documento non è andato a buon fine.'}
+                  <br />
+                  {'Carica un solo file in formato '}
+                  <strong>{'p7m'}</strong>
+                  {'.'}
+                </Trans>
+              ) : (
+                t(`completeRegistration.errors.${errorCode}.message`)
+              )
+            }
+            onConfirmLabel={t('completeRegistration.sessionModal.onConfirmLabel')}
+            onCloseLabel={t('completeRegistration.sessionModal.onCloseLabel')}
+          />
+        )
+      ) : (
+        <Step />
+      )}
+    </>
   );
 }
