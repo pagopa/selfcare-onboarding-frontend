@@ -9,11 +9,7 @@ export default function RejectContentSuccessPage() {
     <>
       <IllusCompleted size={60} />
       <Typography variant="h4" mt={3}>
-        <Trans i18nKey="rejectRegistration.outcomeContent.success.title">
-          La tua richiesta di adesione è
-          <br />
-          stata annullata
-        </Trans>
+        {t('rejectRegistration.outcomeContent.success.title')}
       </Typography>
       <Typography variant="body1" mb={4} mt={1}>
         <Trans i18nKey="rejectRegistration.outcomeContent.success.description">

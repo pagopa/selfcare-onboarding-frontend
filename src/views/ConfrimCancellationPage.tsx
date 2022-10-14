@@ -7,7 +7,7 @@ type Props = {
   setIsConfirmPageVisible: (value: React.SetStateAction<boolean>) => void;
   deleteRequest: () => void;
 };
-export default function ConfrimCancellationPage({ setIsConfirmPageVisible, deleteRequest }: Props) {
+export default function ConfirmCancellationPage({ setIsConfirmPageVisible, deleteRequest }: Props) {
   const { t } = useTranslation();
 
   return (
