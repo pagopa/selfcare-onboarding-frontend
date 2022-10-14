@@ -36,12 +36,12 @@ test('test no jwt', () => {
 
   render(<CompleteRegistrationComponent />);
 
-  const homeButton = screen.getByRole('button', {
-    name: 'Torna alla home',
+  const assistanceButton = screen.getByRole('button', {
+    name: 'Contatta l’assistenza',
   });
 
-  fireEvent.click(homeButton);
-  expect(mockedLocation.assign).toBeCalledWith(ENV.URL_FE.LANDING);
+  fireEvent.click(assistanceButton);
+  expect(buildAssistanceURI).toBeCalledWith('assistenza@selfcare.it');
 });
 
 test('test', async () => {
