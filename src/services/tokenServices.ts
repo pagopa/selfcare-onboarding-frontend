@@ -12,8 +12,8 @@ type Props = {
 const getMixPanelEvent = (errorStatus: number | undefined) => {
   const errors = {
     409: 'ONBOARDING_TOKEN_VALIDATION_JWT_CONFIRMED',
-    400: 'ONBOARDING_TOKEN_VALIDATION_JWT_CANCELED',
-    404: 'ONBOARDING_TOKEN_VALIDATION_JWT_NOT_FOUND',
+    400: 'ONBOARDING_TOKEN_VALIDATION_JWT_INVALID',
+    404: 'ONBOARDING_TOKEN_VALIDATION_JWT_INVALID',
   };
   return errors[errorStatus as keyof typeof errors] ?? 'ONBOARDING_TOKEN_VALIDATION_ERROR';
 };
