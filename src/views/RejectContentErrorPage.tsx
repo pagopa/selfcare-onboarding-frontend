@@ -7,10 +7,10 @@ export default function RejectContentErrorPage() {
   const { t } = useTranslation();
   return (
     <>
-      <IllusError size={60} />
       <Grid container direction="column" key="0" style={{ textAlign: 'center' }} mt={3}>
         <Grid container item justifyContent="center">
           <Grid item xs={6}>
+            <IllusError size={60} />
             <Typography variant="h4">
               {t('rejectRegistration.outcomeContent.error.title')}
             </Typography>

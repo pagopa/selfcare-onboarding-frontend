@@ -34,11 +34,11 @@ jest.mock('react-router-dom', () => ({
   }),
 }));
 
-test('test no jwt', () => {
+test('test no jwt', async () => {
   mockedLocation.search = undefined;
 
   render(<RejectRegistration />);
-  screen.getByText('Questa richiesta è stata accolta, annullata o è scaduta.');
+  await waitFor(() => screen.getByText('Qualcosa è andato storto.'));
   const backButton = screen.getByRole('button', {
     name: 'Torna alla home',
   });
@@ -57,7 +57,7 @@ test('test', async () => {
   });
   fireEvent.click(confirmButton);
   await waitFor(() => {
-    screen.getByText('La tua richiesta di adesione è stata annullata');
+    screen.getByText('Richiesta di adesione eliminata');
   });
   expect(fetchWithLogsSpy).toBeCalledTimes(2);
 });
