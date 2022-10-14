@@ -20,6 +20,7 @@ import { HeaderContext, UserContext } from '../lib/context';
 import { jwtNotValid } from '../services/tokenServices';
 import { getOnboardingMagicLinkJwt } from './RejectRegistration';
 import JwtInvalidPage from './JwtInvalidPage';
+import RejectContentErrorPage from './RejectContentErrorPage';
 
 type FileErrorAttempt = {
   fileName: string;
@@ -82,6 +83,7 @@ export default function CompleteRegistrationComponent() {
   const [errorCode, setErrorCode] = useState<keyof typeof errors>('GENERIC');
 
   const [tokenValid, setTokenValid] = useState<boolean>();
+  const [showErrorPage, setShowErrorPage] = useState<boolean>();
 
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -109,7 +111,9 @@ export default function CompleteRegistrationComponent() {
       setOutcome('error');
     } else {
       setLoading(true);
-      jwtNotValid({ token, setRequiredLogin, setTokenValid }).finally(() => setLoading(false));
+      jwtNotValid({ token, setRequiredLogin, setTokenValid, setShowErrorPage }).finally(() =>
+        setLoading(false)
+      );
     }
   }, []);
 
@@ -270,6 +274,8 @@ export default function CompleteRegistrationComponent() {
     <>
       {!tokenValid ? (
         <JwtInvalidPage />
+      ) : !tokenValid && showErrorPage ? (
+        <RejectContentErrorPage />
       ) : outcome === 'success' ? (
         <MessageNoAction {...outcomeContent[outcome]} />
       ) : outcome === 'error' ? (

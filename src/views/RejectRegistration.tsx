@@ -22,6 +22,10 @@ export default function RejectRegistration() {
   const [loading, setLoading] = useState(false);
   const [isConfirmPageVisible, setIsConfirmPageVisible] = useState<boolean>(true);
   const [tokenValid, setTokenValid] = useState<boolean>();
+  const [showErrorPage, setShowErrorPage] = useState<boolean>();
+
+  console.log('showErrorPage', showErrorPage);
+  console.log('tokenValid', tokenValid);
 
   const token = getOnboardingMagicLinkJwt();
   const { setSubHeaderVisible, setOnExit, setEnableLogin } = useContext(HeaderContext);
@@ -65,7 +69,9 @@ export default function RejectRegistration() {
       setOutcome('error');
     } else {
       setLoading(true);
-      jwtNotValid({ token, setRequiredLogin, setTokenValid }).finally(() => setLoading(false));
+      jwtNotValid({ token, setRequiredLogin, setTokenValid, setShowErrorPage }).finally(() =>
+        setLoading(false)
+      );
     }
   }, []);
 
@@ -137,6 +143,8 @@ export default function RejectRegistration() {
         ) : (
           <MessageNoAction {...outcomeContent[outcome]} />
         )
+      ) : showErrorPage ? (
+        <RejectContentErrorPage />
       ) : (
         <MessageNoAction {...jwtNotValidPage} />
       )}

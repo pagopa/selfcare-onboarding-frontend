@@ -313,7 +313,7 @@ export default {
   rejectRegistration: {
     outcomeContent: {
       success: {
-        title: 'La tua richiesta di adesione è <1 />stata annullata',
+        title: 'Richiesta di adesione eliminata',
         description:
           'Nella home dell’Area Riservata puoi vedere i prodotti<1 />disponibili e richiedere l’adesione per il tuo ente.',
         backActionLabel: 'Torna alla home',
