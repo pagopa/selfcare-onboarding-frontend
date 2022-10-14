@@ -1,4 +1,5 @@
 import { Button, Typography } from '@mui/material';
+import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
 import { Trans, useTranslation } from 'react-i18next';
 import { ENV } from '../utils/env';
 import { ReactComponent as PaymentCompleted } from './../assets/payment_completed.svg';
@@ -29,7 +30,10 @@ export default function ConfirmCancellationPage({ setIsConfirmPageVisible, delet
         <Button
           variant="outlined"
           sx={{ alignSelf: 'center', mr: 2 }}
-          onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+          onClick={() => {
+            trackEvent('ONBOARDING_CANCEL_DECLINED_BY_USER');
+            window.location.assign(ENV.URL_FE.LANDING);
+          }}
         >
           {t('rejectRegistration.outcomeContent.success.backActionLabel')}
         </Button>
