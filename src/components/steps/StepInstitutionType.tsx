@@ -8,7 +8,7 @@ import {
   Paper,
   useTheme,
 } from '@mui/material';
-import React, { useEffect, useRef } from 'react';
+import React, { useRef } from 'react';
 import { useTranslation, Trans } from 'react-i18next';
 import {
   InstitutionType,
@@ -60,21 +60,6 @@ export default function StepInstitutionType({
     forward(selectedValue);
   };
 
-  const getMixPanelEvent = (errorStatus: number | undefined) => {
-    const errors = {
-      409: 'ONBOARDING_TOKEN_VALIDATION_JWT_CONFIRMED',
-      400: 'ONBOARDING_TOKEN_VALIDATION_JWT_INVALID',
-      404: 'ONBOARDING_TOKEN_VALIDATION_JWT_INVALID',
-    };
-    return errors[errorStatus as keyof typeof errors] ?? 'ONBOARDING_TOKEN_VALIDATION_ERROR';
-  };
-
-  useEffect(() => {
-    const risult400 = getMixPanelEvent(400);
-    console.log('result 400 ', risult400);
-    const risult404 = getMixPanelEvent(404);
-    console.log('result 404 ', risult404);
-  }, []);
   const institutionTypeValueFiltered = (id: string | undefined) => {
     switch (id) {
       case 'prod-interop':
