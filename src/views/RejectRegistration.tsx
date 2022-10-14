@@ -10,7 +10,7 @@ import { LoadingOverlay } from '../components/LoadingOverlay';
 import { HeaderContext, UserContext } from '../lib/context';
 import { jwtNotValid } from '../services/tokenServices';
 import JwtInvalidPage from './JwtInvalidPage';
-import ConfrimCancellationPage from './ConfrimCancellationPage';
+import ConfirmCancellationPage from './ConfirmCancellationPage';
 import RejectContentSuccessPage from './RejectContentSuccessPage';
 import RejectContentErrorPage from './RejectContentErrorPage';
 
@@ -82,7 +82,7 @@ export default function RejectRegistration() {
     title: '',
     description: [
       <>
-        <ConfrimCancellationPage
+        <ConfirmCancellationPage
           setIsConfirmPageVisible={setIsConfirmPageVisible}
           deleteRequest={deleteRequest}
         />
