@@ -7,7 +7,7 @@ import { useTranslation, Trans } from 'react-i18next';
 import { uniqueId } from 'lodash';
 import { IllusCompleted, IllusError } from '@pagopa/mui-italia';
 import { buildAssistanceURI } from '@pagopa/selfcare-common-frontend/services/assistanceService';
-import { RequestOutcome, RequestOutcomeOptions, StepperStep, Problem } from '../../types';
+import { StepperStep, Problem, RequestOutcomeOptionsJwt, RequestOutcomeJwt } from '../../types';
 import { ConfirmRegistrationStep0 } from '../components/ConfirmRegistrationStep0';
 import { ConfirmRegistrationStep1 } from '../components/ConfirmRegistrationStep1';
 import { useHistoryState } from '../components/useHistoryState';
@@ -20,7 +20,7 @@ import { HeaderContext, UserContext } from '../lib/context';
 import { jwtNotValid } from '../services/tokenServices';
 import { getOnboardingMagicLinkJwt } from './RejectRegistration';
 import JwtInvalidPage from './JwtInvalidPage';
-import RejectContentErrorPage from './RejectContentErrorPage';
+import RejectContentSuccessPage from './RejectContentSuccessPage';
 
 type FileErrorAttempt = {
   fileName: string;
@@ -79,11 +79,8 @@ export default function CompleteRegistrationComponent() {
     0
   );
 
-  const [outcome, setOutcome] = useState<RequestOutcome | null>(!token ? 'error' : null);
+  const [outcome, setOutcome] = useState<RequestOutcomeJwt | null>(!token ? 'error' : null);
   const [errorCode, setErrorCode] = useState<keyof typeof errors>('GENERIC');
-
-  const [tokenValid, setTokenValid] = useState<boolean>();
-  const [showErrorPage, setShowErrorPage] = useState<boolean>();
 
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -111,9 +108,7 @@ export default function CompleteRegistrationComponent() {
       setOutcome('error');
     } else {
       setLoading(true);
-      jwtNotValid({ token, setRequiredLogin, setTokenValid, setShowErrorPage }).finally(() =>
-        setLoading(false)
-      );
+      jwtNotValid({ token, setRequiredLogin, setOutcome }).finally(() => setLoading(false));
     }
   }, []);
 
@@ -225,7 +220,7 @@ export default function CompleteRegistrationComponent() {
 
   const Step = steps[activeStep].Component;
 
-  const outcomeContent: RequestOutcomeOptions = {
+  const outcomeContent: RequestOutcomeOptionsJwt = {
     success: {
       title: '',
       description: [
@@ -257,6 +252,14 @@ export default function CompleteRegistrationComponent() {
         </>,
       ],
     },
+    jwtsuccess: {
+      title: '',
+      description: [
+        <>
+          <RejectContentSuccessPage />
+        </>,
+      ],
+    },
     error: {
       img: { src: redXIllustration, alt: t('completeRegistration.outcomeContent.error.alt') },
       title: t('completeRegistration.outcomeContent.error.title'),
@@ -268,14 +271,20 @@ export default function CompleteRegistrationComponent() {
         </div>,
       ],
     },
+    jwterror: {
+      title: '',
+      description: [
+        <>
+          <JwtInvalidPage />
+        </>,
+      ],
+    },
   };
 
   return (
     <>
-      {!tokenValid ? (
-        <JwtInvalidPage />
-      ) : !tokenValid && showErrorPage ? (
-        <RejectContentErrorPage />
+      {outcome === 'jwterror' ? (
+        <MessageNoAction {...outcomeContent[outcome]} />
       ) : outcome === 'success' ? (
         <MessageNoAction {...outcomeContent[outcome]} />
       ) : outcome === 'error' ? (
@@ -337,7 +346,7 @@ export default function CompleteRegistrationComponent() {
           />
         )
       ) : (
-        <Step />
+        outcome === 'jwtsuccess' && <Step />
       )}
     </>
   );

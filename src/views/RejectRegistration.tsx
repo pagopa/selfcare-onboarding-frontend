@@ -3,7 +3,7 @@ import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsS
 import { useTranslation } from 'react-i18next';
 import { uniqueId } from 'lodash';
 import { MessageNoAction } from '../components/MessageNoAction';
-import { RequestOutcome, RequestOutcomeOptions } from '../../types';
+import { RequestOutcomeJwt, RequestOutcomeOptionsJwt } from '../../types';
 import { fetchWithLogs } from '../lib/api-utils';
 import { getFetchOutcome } from '../lib/error-utils';
 import { LoadingOverlay } from '../components/LoadingOverlay';
@@ -18,16 +18,11 @@ export const getOnboardingMagicLinkJwt = () =>
   new URLSearchParams(window.location.search).get('jwt');
 
 export default function RejectRegistration() {
-  const [outcome, setOutcome] = useState<RequestOutcome>();
+  const token = getOnboardingMagicLinkJwt();
+  const [outcome, setOutcome] = useState<RequestOutcomeJwt | null>(!token ? 'error' : null);
   const [loading, setLoading] = useState(false);
   const [isConfirmPageVisible, setIsConfirmPageVisible] = useState<boolean>(true);
-  const [tokenValid, setTokenValid] = useState<boolean>();
-  const [showErrorPage, setShowErrorPage] = useState<boolean>();
 
-  console.log('showErrorPage', showErrorPage);
-  console.log('tokenValid', tokenValid);
-
-  const token = getOnboardingMagicLinkJwt();
   const { setSubHeaderVisible, setOnExit, setEnableLogin } = useContext(HeaderContext);
   const { setRequiredLogin } = useContext(UserContext);
 
@@ -69,9 +64,7 @@ export default function RejectRegistration() {
       setOutcome('error');
     } else {
       setLoading(true);
-      jwtNotValid({ token, setRequiredLogin, setTokenValid, setShowErrorPage }).finally(() =>
-        setLoading(false)
-      );
+      jwtNotValid({ token, setRequiredLogin, setOutcome }).finally(() => setLoading(false));
     }
   }, []);
 
@@ -97,8 +90,16 @@ export default function RejectRegistration() {
     ],
   };
 
-  const outcomeContent: RequestOutcomeOptions = {
+  const outcomeContent: RequestOutcomeOptionsJwt = {
     success: {
+      title: '',
+      description: [
+        <>
+          <RejectContentSuccessPage />
+        </>,
+      ],
+    },
+    jwtsuccess: {
       title: '',
       description: [
         <>
@@ -114,15 +115,14 @@ export default function RejectRegistration() {
         </>,
       ],
     },
-  };
-
-  const jwtNotValidPage = {
-    title: '',
-    description: [
-      <>
-        <JwtInvalidPage />
-      </>,
-    ],
+    jwterror: {
+      title: '',
+      description: [
+        <>
+          <JwtInvalidPage />
+        </>,
+      ],
+    },
   };
 
   if (loading) {
@@ -133,20 +133,20 @@ export default function RejectRegistration() {
 
   return (
     <React.Fragment>
-      {tokenValid ? (
+      {outcome === 'jwtsuccess' ? (
         isConfirmPageVisible ? (
           <MessageNoAction {...confirmCancellationContent} />
-        ) : !outcome ? (
-          <LoadingOverlay
-            loadingText={t('rejectRegistration.outcomeContent.notOutcome.loadingText')}
-          />
         ) : (
           <MessageNoAction {...outcomeContent[outcome]} />
         )
-      ) : showErrorPage ? (
-        <RejectContentErrorPage />
+      ) : outcome === 'jwterror' ? (
+        <MessageNoAction {...outcomeContent[outcome]} />
+      ) : !outcome ? (
+        <LoadingOverlay
+          loadingText={t('rejectRegistration.outcomeContent.notOutcome.loadingText')}
+        />
       ) : (
-        <MessageNoAction {...jwtNotValidPage} />
+        <MessageNoAction {...outcomeContent[outcome]} />
       )}
     </React.Fragment>
   );
