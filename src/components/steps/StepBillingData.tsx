@@ -318,7 +318,6 @@ export default function StepBillingData({
                     400,
                     18
                   )}
-                  disabled={institutionType === 'PA'}
                 />
                 <Typography
                   sx={{
