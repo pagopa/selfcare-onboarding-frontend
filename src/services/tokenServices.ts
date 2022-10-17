@@ -31,7 +31,9 @@ export const jwtNotValid = async ({ token, setRequiredLogin, setOutcome }: Props
     (fetchJwt as AxiosError<Problem>).response?.status === 404
   ) {
     setOutcome('jwterror');
-    trackEvent(getMixPanelEvent((fetchJwt as AxiosError<Problem>).response?.status));
+    trackEvent(getMixPanelEvent((fetchJwt as AxiosError<Problem>).response?.status), {
+      party_id: token,
+    });
   } else if ((fetchJwt as AxiosResponse).status !== 200) {
     setOutcome('error');
   } else {
