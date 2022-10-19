@@ -36,7 +36,7 @@ export const useLogin = () => {
       // Remove any partial data that might have remained, just for safety
       storageUserOps.delete();
       // Go to the login view
-      window.location.assign(ENV.URL_FE.LOGIN + '?onSuccess=' + location.pathname);
+      window.location.assign(ENV.URL_FE.LOGIN + '?onSuccess=' + location.pathname + location.search);
       // This return is necessary
       return;
     }
