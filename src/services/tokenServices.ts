@@ -12,8 +12,8 @@ type Props = {
 const getMixPanelEvent = (errorStatus: number | undefined) => {
   const errors = {
     409: 'ONBOARDING_TOKEN_VALIDATION_JWT_CONFIRMED',
-    400: 'ONBOARDING_TOKEN_VALIDATION_JWT_CANCELED',
-    404: 'ONBOARDING_TOKEN_VALIDATION_JWT_NOT_FOUND',
+    400: 'ONBOARDING_TOKEN_VALIDATION_JWT_INVALID',
+    404: 'ONBOARDING_TOKEN_VALIDATION_JWT_INVALID',
   };
   return errors[errorStatus as keyof typeof errors] ?? 'ONBOARDING_TOKEN_VALIDATION_ERROR';
 };
@@ -31,7 +31,9 @@ export const jwtNotValid = async ({ token, setRequiredLogin, setOutcome }: Props
     (fetchJwt as AxiosError<Problem>).response?.status === 404
   ) {
     setOutcome('jwterror');
-    trackEvent(getMixPanelEvent((fetchJwt as AxiosError<Problem>).response?.status));
+    trackEvent(getMixPanelEvent((fetchJwt as AxiosError<Problem>).response?.status), {
+      party_id: token,
+    });
   } else if ((fetchJwt as AxiosResponse).status !== 200) {
     setOutcome('error');
   } else {
