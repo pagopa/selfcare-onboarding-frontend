@@ -35,8 +35,9 @@ export const useLogin = () => {
     if (isEmpty(sessionStorageUser)) {
       // Remove any partial data that might have remained, just for safety
       storageUserOps.delete();
+      const onSuccessEncoded= encodeURIComponent(location.pathname + location.search)
       // Go to the login view
-      window.location.assign(ENV.URL_FE.LOGIN + '?onSuccess=' + location.pathname + location.search);
+      window.location.assign(ENV.URL_FE.LOGIN + '?onSuccess=' + onSuccessEncoded);
       // This return is necessary
       return;
     }
