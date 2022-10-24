@@ -379,8 +379,8 @@ const fillUserBillingDataForm = async (
     target: { value: 'AAAAAA44D55F456K' },
   });
 
-  const isTaxCodeNotEquals2PIVA = document.getElementById('billingdata');
-  expect(isTaxCodeNotEquals2PIVA).toBeTruthy();
+  const isTaxCodeEquals2PIVA = document.getElementById('billingdata');
+  expect(isTaxCodeEquals2PIVA).toBeTruthy();
 
   fireEvent.change(document.getElementById(vatNumber), {
     target: { value: '11223344567' },
