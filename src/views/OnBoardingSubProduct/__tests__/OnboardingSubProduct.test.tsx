@@ -487,7 +487,7 @@ const verifySubmit = async () => {
             digitalAddress: 'a@a.com',
             zipCode: '09010',
             taxCode: 'AAAAAA44D55F456K',
-            vatNumber: '12345678901',
+            vatNumber: 'AAAAAA44D55F456K',
             recipientCode: 'AM23EIX',
             publicServices: false,
           },

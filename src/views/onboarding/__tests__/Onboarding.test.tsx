@@ -285,7 +285,7 @@ const executeStepBillingData = async () => {
     'a@a.it',
     '09010',
     'AAAAAA44D55F456K',
-    '11223344567',
+    'AAAAAA44D55F456K',
     'recipientCode'
   );
 
@@ -661,7 +661,7 @@ const verifySubmit = async () => {
             digitalAddress: 'a@a.it',
             zipCode: '09010',
             taxCode: 'AAAAAA44D55F456K',
-            vatNumber: '11223344567',
+            vatNumber: 'AAAAAA44D55F456K',
             recipientCode: 'recipientCode',
             publicServices: false,
           },
