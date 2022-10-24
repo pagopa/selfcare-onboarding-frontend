@@ -194,11 +194,9 @@ export default {
   onboarding: {
     outcomeContent: {
       success: {
-        title: 'La richiesta di adesione è stata <1/>inviata con successo',
-        baseDescription:
+        title: 'La tua richiesta è stata inviata <1/> con successo',
+        description:
           "Riceverai una PEC all’indirizzo istituzionale che hai indicato. <1 /> Al suo interno troverai le istruzioni per completare <3 />l'adesione.",
-        pspDescription:
-          "Procederemo al controllo dei dati inseriti e invieremo una <1 />mail di cortesia e una PEC con l'esito di tale verifica.",
         backActionLabel: 'Chiudi',
       },
       error: {
@@ -252,7 +250,7 @@ export default {
       homeButton: 'Torna alla home',
     },
     successfulAdhesion: {
-      title: 'La richiesta di adesione è stata <1/>inviata con successo',
+      title: 'La tua richiesta è stata inviata <1 /> con successo',
       message:
         "Riceverai una PEC all’indirizzo istituzionale dell’ente.<1 />Al suo interno troverai le istruzioni per completare la <3 /> sottoscrizione all'offerta Premium.",
       closeButton: 'Chiudi',

@@ -169,27 +169,19 @@ function OnboardingComponent({ productId }: { productId: string }) {
             sx={{ color: theme.palette.text.primary, marginBottom: 1 }}
           >
             <Trans i18nKey="onboarding.outcomeContent.success.title">
-              La richiesta di adesione è stata
+              La tua richiesta è stata inviata
               <br />
-              inviata con successo
+              con successo
             </Trans>
           </Typography>
           <Stack key="0" spacing={4}>
             <Typography variant="body1">
-              {institutionType !== 'PSP' ? (
-                <Trans i18nKey="onboarding.outcomeContent.success.baseDescription">
-                  Riceverai una PEC all’indirizzo istituzionale che hai indicato.
-                  <br />
-                  Al suo interno troverai le istruzioni per completare <br />
-                  l&apos;adesione.
-                </Trans>
-              ) : (
-                <Trans i18nKey="onboarding.outcomeContent.success.pspDescription">
-                  Procederemo al controllo dei dati inseriti e invieremo una
-                  <br />
-                  mail di cortesia e una PEC con l&apos;esito di tale verifica.
-                </Trans>
-              )}
+              <Trans i18nKey="onboarding.outcomeContent.success.description">
+                Riceverai una PEC all’indirizzo istituzionale che hai indicato.
+                <br />
+                Al suo interno troverai le istruzioni per completare <br />
+                l&apos;adesione.
+              </Trans>
             </Typography>
             <Button
               variant="contained"

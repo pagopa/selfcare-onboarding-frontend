@@ -11,9 +11,9 @@ const successfulOutCome = {
       <IllusCompleted size={60} />
       <Typography mt={3} variant={'h4'} sx={{ color: theme.palette.text.primary, marginBottom: 1 }}>
         <Trans i18nKey="onBoardingSubProduct.successfulAdhesion.title">
-          La richiesta di adesione è stata
+          La tua richiesta è stata inviata
           <br />
-          inviata con successo
+          con successo
         </Trans>
       </Typography>
       <Stack key="0" spacing={4}>
