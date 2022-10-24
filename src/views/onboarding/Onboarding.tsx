@@ -169,26 +169,34 @@ function OnboardingComponent({ productId }: { productId: string }) {
             sx={{ color: theme.palette.text.primary, marginBottom: 1 }}
           >
             <Trans i18nKey="onboarding.outcomeContent.success.title">
-              La tua richiesta è stata inviata
+              La richiesta di adesione è stata
               <br />
-              con successo
+              inviata con successo
             </Trans>
           </Typography>
           <Stack key="0" spacing={4}>
             <Typography variant="body1">
-              <Trans i18nKey="onboarding.outcomeContent.success.description">
-                Riceverai una PEC all’indirizzo istituzionale che hai indicato.
-                <br />
-                Al suo interno troverai le istruzioni per completare <br />
-                l&apos;adesione.
-              </Trans>
+              {institutionType !== 'PSP' ? (
+                <Trans i18nKey="onboarding.outcomeContent.success.baseDescription">
+                  Riceverai una PEC all’indirizzo istituzionale che hai indicato.
+                  <br />
+                  Al suo interno troverai le istruzioni per completare <br />
+                  l&apos;adesione.
+                </Trans>
+              ) : (
+                <Trans i18nKey="onboarding.outcomeContent.success.pspDescription">
+                  Procederemo al controllo dei dati inseriti e invieremo una
+                  <br />
+                  mail di cortesia e una PEC con l&apos;esito di tale verifica.
+                </Trans>
+              )}
             </Typography>
             <Button
               variant="contained"
               sx={{ alignSelf: 'center' }}
               onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
             >
-              {t('onboarding.outcomeContent.success.backActionLabel')}
+              {t('onboarding.outcomeContent.success.backHome')}
             </Button>
           </Stack>
         </>,
