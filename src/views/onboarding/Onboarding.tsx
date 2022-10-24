@@ -196,7 +196,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
               sx={{ alignSelf: 'center' }}
               onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
             >
-              {t('onboarding.outcomeContent.success.backActionLabel')}
+              {t('onboarding.outcomeContent.success.backHome')}
             </Button>
           </Stack>
         </>,
