@@ -94,7 +94,7 @@ test('test already onboarded', async () => {
   await executeStepInstitutionType();
   await executeStep1(agencyOnboarded);
   await waitFor(() => screen.getByText("L'Ente che hai scelto ha già aderito"));
-  await executeGoHome();
+  await executeGoHome(false);
 });
 
 test('test error retrieving onboarding info', async () => {
@@ -102,7 +102,7 @@ test('test error retrieving onboarding info', async () => {
   await executeStepInstitutionType();
   await executeStep1(agencyInfoError);
   await waitFor(() => screen.getByText('Spiacenti, qualcosa è andato storto.'));
-  await executeGoHome();
+  await executeGoHome(false);
 });
 
 test('test error productID', async () => {
@@ -119,7 +119,7 @@ test('test complete', async () => {
   await executeStep2();
   await executeStep3(true);
   await verifySubmit();
-  await executeGoHome();
+  await executeGoHome(true);
 });
 
 test('test complete with error on submit', async () => {
@@ -129,7 +129,7 @@ test('test complete with error on submit', async () => {
   await executeStepBillingData();
   await executeStep2();
   await executeStep3(false);
-  await executeGoHome();
+  await executeGoHome(false);
 });
 
 test('test exiting during flow with unload event', async () => {
@@ -190,11 +190,15 @@ const retrieveNavigationButtons = async () => {
   return [goBackButton, confirmButton];
 };
 
-const executeGoHome = async () => {
+const executeGoHome = async (expectedSuccessfulSubmit) => {
   console.log('Go Home');
-  const goHomeButton = screen.getByRole('button', {
-    name: 'Chiudi',
-  });
+  const goHomeButton = !expectedSuccessfulSubmit
+    ? screen.getByRole('button', {
+        name: 'Chiudi',
+      })
+    : screen.getByRole('button', {
+        name: 'Torna alla home',
+      });
   expect(goHomeButton).toBeEnabled();
   fireEvent.click(goHomeButton);
   await waitFor(() => expect(mockedLocation.assign).toBeCalledWith(ENV.URL_FE.LANDING));
