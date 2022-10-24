@@ -226,7 +226,6 @@ export default function StepBillingData({
             {t('stepBillingData.title')}
           </Typography>
         </Grid>
-
         <Grid container item justifyContent="center" mt={2} mb={4}>
           <Grid item xs={12}>
             <Typography variant="body1" align="center">
