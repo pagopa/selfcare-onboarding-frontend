@@ -119,7 +119,9 @@ export default function StepBillingData({
         vatNumber:
           !values.vatNumber && !stepHistoryState.isTaxCodeEquals2PIVA
             ? requiredError
-            : values.vatNumber && !fiscalAndVatCodeRegexp.test(values.vatNumber)
+            : values.vatNumber &&
+              !fiscalAndVatCodeRegexp.test(values.vatNumber) &&
+              !stepHistoryState.isTaxCodeEquals2PIVA
             ? t('stepBillingData.invalidVatNumber')
             : values.taxCode &&
               stepHistoryState.isTaxCodeEquals2PIVA &&
