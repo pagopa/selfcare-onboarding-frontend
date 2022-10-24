@@ -119,7 +119,9 @@ export default function StepBillingData({
         vatNumber:
           !values.vatNumber && !stepHistoryState.isTaxCodeEquals2PIVA
             ? requiredError
-            : values.vatNumber && !fiscalAndVatCodeRegexp.test(values.vatNumber)
+            : values.vatNumber &&
+              !fiscalAndVatCodeRegexp.test(values.vatNumber) &&
+              !stepHistoryState.isTaxCodeEquals2PIVA
             ? t('stepBillingData.invalidVatNumber')
             : values.taxCode &&
               stepHistoryState.isTaxCodeEquals2PIVA &&
@@ -224,7 +226,6 @@ export default function StepBillingData({
             {t('stepBillingData.title')}
           </Typography>
         </Grid>
-
         <Grid container item justifyContent="center" mt={2} mb={4}>
           <Grid item xs={12}>
             <Typography variant="body1" align="center">
