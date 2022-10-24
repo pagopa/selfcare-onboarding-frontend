@@ -136,10 +136,14 @@ function OnboardingComponent({ productId }: { productId: string }) {
       taxCode: party.taxCode,
       vatNumber: '',
       recipientCode: party.origin === 'IPA' ? party.originId : '',
-      commericialRegisterNumber: '',
+      commercialRegisterNumber: '',
       registrationInRegister: '',
       registerNumber: undefined,
       abiCode: '',
+      dpoAddress: '',
+      dpoPecAddress: '',
+      dopEmailAddress: '',
+      vatnumberGroup: false,
     });
     forwardWithData(newFormData);
     trackEvent('ONBOARDING_PARTY_SELECTION', {
@@ -435,10 +439,14 @@ function OnboardingComponent({ productId }: { productId: string }) {
                   taxCode: '',
                   vatNumber: '',
                   recipientCode: '',
-                  commericialRegisterNumber: '',
+                  commercialRegisterNumber: '',
                   registrationInRegister: '',
                   registerNumber: undefined,
                   abiCode: '',
+                  dpoAddress: '',
+                  dpoPecAddress: '',
+                  dopEmailAddress: '',
+                  vatnumberGroup: false,
                 }
               : billingData,
           origin,

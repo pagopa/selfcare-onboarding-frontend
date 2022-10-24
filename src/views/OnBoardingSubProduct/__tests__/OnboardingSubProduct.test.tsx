@@ -491,7 +491,7 @@ const verifySubmit = async () => {
             recipientCode: 'AM23EIX',
             publicServices: false,
             abiCode: '',
-            commericialRegisterNumber: '',
+            commercialRegisterNumber: '',
             registerNumber: 0,
             registrationInRegister: '',
           },

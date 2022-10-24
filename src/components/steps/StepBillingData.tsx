@@ -1,9 +1,10 @@
+/* eslint-disable complexity */
 import { Box, styled } from '@mui/system';
 import { Grid, TextField, Typography, useTheme, Paper } from '@mui/material';
 import { useFormik } from 'formik';
 import { useTranslation } from 'react-i18next';
 import Checkbox from '@mui/material/Checkbox';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { BillingData, InstitutionType, StepperStepComponentProps } from '../../../types';
 import { OnboardingStepActions } from '../OnboardingStepActions';
 import { useHistoryState } from '../useHistoryState';
@@ -29,7 +30,9 @@ const fiscalAndVatCodeRegexp = new RegExp(
   /(^[A-Za-z]{6}[0-9lmnpqrstuvLMNPQRSTUV]{2}[abcdehlmprstABCDEHLMPRST]{1}[0-9lmnpqrstuvLMNPQRSTUV]{2}[A-Za-z]{1}[0-9lmnpqrstuvLMNPQRSTUV]{3}[A-Za-z]{1}$|^[0-9]{11}$)/
 );
 
-const zipCodeRegexp = new RegExp('^\\d{5}$');
+const fiveCharactersAllowed = new RegExp('^\\d{5}$');
+const commercialRegisterNumberRegexp = new RegExp('^\\d{11}$');
+const numericField = new RegExp('^[0-9]');
 
 type StepBillingDataHistoryState = {
   externalInstitutionId: string;
@@ -56,6 +59,7 @@ export default function StepBillingData({
   const requiredError = 'Required';
   const ipa = origin === 'IPA';
   const disabledField = ipa || institutionType !== 'PSP';
+  const isPSP = institutionType === 'PSP';
 
   const { t } = useTranslation();
   const theme = useTheme();
@@ -66,6 +70,7 @@ export default function StepBillingData({
       isTaxCodeNotEquals2PIVA:
         !!initialFormData.vatNumber && initialFormData.taxCode !== initialFormData.vatNumber,
     });
+  const [isVatNumberGroup, setIsVatNumberGroup] = useState<boolean>();
 
   useEffect(() => {
     if (externalInstitutionId !== stepHistoryState.externalInstitutionId) {
@@ -109,7 +114,7 @@ export default function StepBillingData({
         registeredOffice: !values.registeredOffice ? requiredError : undefined,
         zipCode: !values.zipCode
           ? requiredError
-          : !zipCodeRegexp.test(values.zipCode)
+          : !fiveCharactersAllowed.test(values.zipCode)
           ? t('stepBillingData.invalidZipCode')
           : undefined,
         taxCode: !values.taxCode
@@ -125,9 +130,37 @@ export default function StepBillingData({
               !fiscalAndVatCodeRegexp.test(values.vatNumber)
             ? t('stepBillingData.invalidVatNumber')
             : undefined,
+        vatnumberGroup: requiredError,
         mailPEC: !values.digitalAddress
           ? requiredError
           : !mailPECRegexp.test(values.digitalAddress)
+          ? t('stepBillingData.invalidEmail')
+          : undefined,
+        commercialRegisterNumber: !values.commercialRegisterNumber
+          ? requiredError
+          : !commercialRegisterNumberRegexp.test(values.commercialRegisterNumber)
+          ? t('stepBillingData.invalidCommercialRegisterNumber')
+          : undefined,
+        registrationInRegister: requiredError,
+        dpoAddress: requiredError,
+        registerNumber: !values.registerNumber
+          ? requiredError
+          : !numericField.test(values.registerNumber)
+          ? t('stepBillingData.invalidregisterNumber')
+          : undefined,
+        abiCode: !values.abiCode
+          ? requiredError
+          : !fiveCharactersAllowed.test(values.abiCode)
+          ? t('stepBillingData.invalidabiCode')
+          : undefined,
+        dopEmailAddress: !values.dopEmailAddress
+          ? requiredError
+          : !mailPECRegexp.test(values.dopEmailAddress)
+          ? t('stepBillingData.invalidEmail')
+          : undefined,
+        dpoPecAddress: !values.dpoPecAddress
+          ? requiredError
+          : !mailPECRegexp.test(values.dpoPecAddress)
           ? t('stepBillingData.invalidEmail')
           : undefined,
         recipientCode: !values.recipientCode ? requiredError : undefined,
@@ -231,8 +264,9 @@ export default function StepBillingData({
             </Typography>
           </Grid>
         </Grid>
-        <Paper elevation={8} sx={{ borderRadius: theme.spacing(2), p: 1 }}>
-          <form onSubmit={formik.handleSubmit}>
+
+        <form onSubmit={formik.handleSubmit}>
+          <Paper elevation={8} sx={{ borderRadius: theme.spacing(2), p: 1 }}>
             <Grid item container spacing={3} px={3} pt={3} pb={2}>
               <Grid item xs={12}>
                 <CustomTextField
@@ -276,14 +310,7 @@ export default function StepBillingData({
               </Grid>
               <Grid item xs={12}>
                 <CustomTextField
-                  {...baseTextFieldProps(
-                    'taxCode',
-                    stepHistoryState.isTaxCodeNotEquals2PIVA
-                      ? t('stepBillingData.taxCode')
-                      : t('stepBillingData.taxCodeAndVatNumber'),
-                    400,
-                    18
-                  )}
+                  {...baseTextFieldProps('taxCode', t('stepBillingData.taxCode'), 400, 18)}
                   disabled={disabledField}
                 />
               </Grid>
@@ -301,12 +328,78 @@ export default function StepBillingData({
                   {t('stepBillingData.taxCodeNotEquals2PIVAdescription')}
                 </Typography>
               </Grid>
-              {stepHistoryState.isTaxCodeNotEquals2PIVA && (
-                <Grid item xs={12}>
+              <Grid item xs={12}>
+                <Typography>
                   <CustomTextField
                     {...baseTextFieldProps('vatNumber', t('stepBillingData.vatNumber'), 400, 18)}
                   />
+                  {isPSP && (
+                    <>
+                      <Checkbox
+                        sx={{ mt: 1 }}
+                        checked={isVatNumberGroup}
+                        onChange={() => setIsVatNumberGroup(true)}
+                      />
+                      {t('stepBillingData.vatnumberGroup')}
+                    </>
+                  )}
+                </Typography>
+              </Grid>
+              {institutionType === 'GSP' && (
+                <Grid item xs={12}>
+                  <Typography>
+                    <Checkbox
+                      id="billingdata"
+                      checked={formik.values.publicServices}
+                      value={formik.values.publicServices}
+                      onChange={(_, checked: boolean) =>
+                        formik.setFieldValue('publicServices', checked, true)
+                      }
+                    />
+                    {t('stepBillingData.gspDescription')}
+                  </Typography>
                 </Grid>
+              )}
+              {isPSP && (
+                <>
+                  <Grid item xs={12}>
+                    <CustomTextField
+                      inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
+                      {...baseTextFieldProps(
+                        'commercialRegisterNumber',
+                        t('stepBillingData.commercialRegisterNumber'),
+                        400,
+                        18
+                      )}
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <CustomTextField
+                      {...baseTextFieldProps(
+                        'registrationInRegister',
+                        t('stepBillingData.registrationInRegister'),
+                        400,
+                        18
+                      )}
+                    />
+                  </Grid>
+                  <Grid item xs={6}>
+                    <CustomTextField
+                      inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
+                      {...baseTextFieldProps(
+                        'registerNumber',
+                        t('stepBillingData.registerNumber'),
+                        400,
+                        18
+                      )}
+                    />
+                  </Grid>
+                  <Grid item xs={6}>
+                    <CustomTextField
+                      {...baseTextFieldProps('abiCode', t('stepBillingData.abiCode'), 400, 18)}
+                    />
+                  </Grid>
+                </>
               )}
               <Grid item xs={12}>
                 <CustomTextField
@@ -327,48 +420,27 @@ export default function StepBillingData({
                   {t('stepBillingData.recipientCodeDescription')}
                 </Typography>
               </Grid>
-              {institutionType === 'GSP' && (
+            </Grid>
+          </Paper>
+          {isPSP && (
+            <>
+              <Grid container item justifyContent="center" mt={6} mb={4}>
                 <Grid item xs={12}>
-                  <Typography>
-                    <Checkbox
-                      id="billingdata"
-                      checked={formik.values.publicServices}
-                      value={formik.values.publicServices}
-                      onChange={(_, checked: boolean) =>
-                        formik.setFieldValue('publicServices', checked, true)
-                      }
-                    />
-                    {t('stepBillingData.gspDescription')}
+                  <Typography
+                    align="center"
+                    sx={{ fontWeight: 'fontWeightMedium', fontSize: '24px' }}
+                  >
+                    {t('stepBillingData.dpoTitle')}
                   </Typography>
                 </Grid>
-              )}
-              {institutionType === 'PSP' && (
-                <>
+              </Grid>
+              <Paper elevation={8} sx={{ borderRadius: theme.spacing(2), p: 1 }}>
+                <Grid item container spacing={3} p={3}>
                   <Grid item xs={12}>
                     <CustomTextField
                       {...baseTextFieldProps(
-                        'commericialRegisterNumber',
-                        t('stepBillingData.commericialRegisterNumber'),
-                        400,
-                        18
-                      )}
-                    />
-                  </Grid>
-                  <Grid item xs={6}>
-                    <CustomTextField
-                      {...baseTextFieldProps(
-                        'registrationInRegister',
-                        t('stepBillingData.registrationInRegister'),
-                        400,
-                        18
-                      )}
-                    />
-                  </Grid>
-                  <Grid item xs={6}>
-                    <CustomTextField
-                      {...baseTextFieldProps(
-                        'registerNumber',
-                        t('stepBillingData.registerNumber'),
+                        'dpoAddress',
+                        t('stepBillingData.dpoAddress'),
                         400,
                         18
                       )}
@@ -376,14 +448,30 @@ export default function StepBillingData({
                   </Grid>
                   <Grid item xs={12}>
                     <CustomTextField
-                      {...baseTextFieldProps('abiCode', t('stepBillingData.abiCode'), 400, 18)}
+                      {...baseTextFieldProps(
+                        'dpoPecAddress',
+                        t('stepBillingData.dpoPecAddress'),
+                        400,
+                        18
+                      )}
                     />
                   </Grid>
-                </>
-              )}
-            </Grid>
-          </form>
-        </Paper>
+                  <Grid item xs={12}>
+                    <CustomTextField
+                      {...baseTextFieldProps(
+                        'dopEmailAddress',
+                        t('stepBillingData.dopEmailAddress'),
+                        400,
+                        18
+                      )}
+                    />
+                  </Grid>
+                </Grid>
+              </Paper>
+            </>
+          )}
+        </form>
+
         <Grid item xs={12} my={4}>
           <OnboardingStepActions
             back={{ action: onBackAction, label: t('stepBillingData.backLabel'), disabled: false }}

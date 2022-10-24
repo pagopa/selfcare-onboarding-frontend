@@ -665,7 +665,7 @@ const verifySubmit = async () => {
             recipientCode: 'recipientCode',
             publicServices: false,
             abiCode: '',
-            commericialRegisterNumber: '',
+            commercialRegisterNumber: '',
             registerNumber: 0,
             registrationInRegister: '',
           },

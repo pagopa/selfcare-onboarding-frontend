@@ -11,10 +11,10 @@ import {
   BillingData,
   InstitutionType,
   SelfcareParty,
-  Party,
   Product,
   StepperStep,
   UserOnCreate,
+  Party,
 } from '../../../types';
 import { LoadingOverlay } from '../../components/LoadingOverlay';
 import { ENV } from '../../utils/env';
@@ -139,6 +139,11 @@ function OnBoardingSubProduct() {
       taxCode: party.taxCode,
       vatNumber: '',
       recipientCode: party.origin === 'IPA' ? party.originId : '',
+      abiCode: '',
+      dpoAddress: '',
+      dpoPecAddress: '',
+      dopEmailAddress: '',
+      vatnumberGroup: false,
     });
     const event = isUserParty
       ? 'ONBOARDING_PREMIUM_ASSOCIATED_PARTY_SELECTION'
@@ -248,15 +253,23 @@ function OnBoardingSubProduct() {
       Component: () =>
         StepBillingData({
           externalInstitutionId,
-          initialFormData: billingData ?? {
-            businessName: '',
-            registeredOffice: '',
-            zipCode: '',
-            digitalAddress: '',
-            taxCode: '',
-            vatNumber: '',
-            recipientCode: '',
-          },
+          initialFormData:
+            !billingData || institutionType === 'PSP'
+              ? {
+                  businessName: '',
+                  registeredOffice: '',
+                  zipCode: '',
+                  digitalAddress: '',
+                  taxCode: '',
+                  vatNumber: '',
+                  recipientCode: '',
+                  abiCode: '',
+                  dpoAddress: '',
+                  dpoPecAddress: '',
+                  dopEmailAddress: '',
+                  vatnumberGroup: false,
+                }
+              : billingData,
           institutionType: institutionType as InstitutionType,
           origin,
           subtitle: t('onBoardingSubProduct.billingData.subTitle'),

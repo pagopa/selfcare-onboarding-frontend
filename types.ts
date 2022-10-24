@@ -201,13 +201,21 @@ export type BillingData = {
   // servizi pubblici
   publicServices?: boolean;
   // n. iscrizione al Registro delle Imprese
-  commericialRegisterNumber?: string;
+  commercialRegisterNumber?: string;
   // iscrizione all'Albo
   registrationInRegister?: string;
   // numero iscrizione albo
-  registerNumber?: number;
+  registerNumber?: string;
   // codice ABI
   abiCode?: string;
+  // La partita IVA è di gruppo
+  vatnumberGroup?: boolean;
+  // Indirizzo DPO
+  dpoAddress?: string;
+  // Indirizzo PEC DPO
+  dpoPecAddress?: string;
+  // Indirizzo Email DPO
+  dopEmailAddress?: string;
 };
 
 export type InstitutionData = {
