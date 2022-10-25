@@ -128,7 +128,7 @@ const mockPartyRegistry = {
       address: 'sede legale',
     },
   ],
-  count: 5,
+  count: 8,
 };
 
 const mockedProduct = {

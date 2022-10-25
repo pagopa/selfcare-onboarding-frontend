@@ -285,7 +285,7 @@ const executeStepBillingData = async () => {
     'a@a.it',
     '09010',
     'AAAAAA44D55F456K',
-    '11223344567',
+    'AAAAAA44D55F456K',
     'recipientCode'
   );
 
@@ -379,8 +379,8 @@ const fillUserBillingDataForm = async (
     target: { value: 'AAAAAA44D55F456K' },
   });
 
-  const isTaxCodeNotEquals2PIVA = document.getElementById('billingdata');
-  expect(isTaxCodeNotEquals2PIVA).toBeTruthy();
+  const isTaxCodeEquals2PIVA = document.getElementById('billingdata');
+  expect(isTaxCodeEquals2PIVA).toBeTruthy();
 
   fireEvent.change(document.getElementById(vatNumber), {
     target: { value: '11223344567' },
@@ -661,7 +661,7 @@ const verifySubmit = async () => {
             digitalAddress: 'a@a.it',
             zipCode: '09010',
             taxCode: 'AAAAAA44D55F456K',
-            vatNumber: '11223344567',
+            vatNumber: 'AAAAAA44D55F456K',
             recipientCode: 'recipientCode',
             publicServices: false,
             abiCode: '',
