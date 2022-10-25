@@ -322,12 +322,13 @@ export default function StepBillingData({
                     inputProps={{
                       'aria-label': t('stepBillingData.taxCodeEquals2PIVAdescription'),
                     }}
-                    onChange={() =>
+                    onChange={() => {
+                      void formik.setFieldValue('vatNumber', '');
                       setStepHistoryState({
                         ...stepHistoryState,
                         isTaxCodeEquals2PIVA: !stepHistoryState.isTaxCodeEquals2PIVA,
-                      })
-                    }
+                      });
+                    }}
                   />
                   {t('stepBillingData.taxCodeEquals2PIVAdescription')}
                 </Typography>

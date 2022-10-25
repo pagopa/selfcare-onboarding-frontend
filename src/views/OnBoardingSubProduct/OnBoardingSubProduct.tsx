@@ -253,23 +253,20 @@ function OnBoardingSubProduct() {
       Component: () =>
         StepBillingData({
           externalInstitutionId,
-          initialFormData:
-            !billingData || institutionType === 'PSP'
-              ? {
-                  businessName: '',
-                  registeredOffice: '',
-                  zipCode: '',
-                  digitalAddress: '',
-                  taxCode: '',
-                  vatNumber: '',
-                  recipientCode: '',
-                  abiCode: '',
-                  dpoAddress: '',
-                  dpoPecAddress: '',
-                  dopEmailAddress: '',
-                  vatnumberGroup: false,
-                }
-              : billingData,
+          initialFormData: billingData ?? {
+            businessName: '',
+            registeredOffice: '',
+            zipCode: '',
+            digitalAddress: '',
+            taxCode: '',
+            vatNumber: '',
+            recipientCode: '',
+            abiCode: '',
+            dpoAddress: '',
+            dpoPecAddress: '',
+            dopEmailAddress: '',
+            vatnumberGroup: false,
+          },
           institutionType: institutionType as InstitutionType,
           origin,
           subtitle: t('onBoardingSubProduct.billingData.subTitle'),
