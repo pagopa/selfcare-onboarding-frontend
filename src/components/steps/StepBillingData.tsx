@@ -68,7 +68,7 @@ export default function StepBillingData({
     useHistoryState<StepBillingDataHistoryState>('stepBillingData', {
       externalInstitutionId,
       isTaxCodeEquals2PIVA:
-        !!initialFormData.vatNumber && initialFormData.taxCode !== initialFormData.vatNumber,
+        !!initialFormData.vatNumber && initialFormData.taxCode === initialFormData.vatNumber,
     });
   const [isVatNumberGroup, setIsVatNumberGroup] = useState<boolean>();
 
@@ -77,7 +77,7 @@ export default function StepBillingData({
       setStepHistoryState({
         externalInstitutionId,
         isTaxCodeEquals2PIVA:
-          !!initialFormData.vatNumber && initialFormData.taxCode !== initialFormData.vatNumber,
+          !!initialFormData.vatNumber && initialFormData.taxCode === initialFormData.vatNumber,
       });
     }
   }, []);
@@ -184,6 +184,8 @@ export default function StepBillingData({
       forward(values);
     },
   });
+  const isTaxCodeValueEquals2PIVAValue =
+    !!formik.values.taxCode && formik.values.taxCode === formik.values.vatNumber;
 
   const baseTextFieldProps = (
     field: keyof BillingData,
@@ -248,7 +250,6 @@ export default function StepBillingData({
       },
     };
   };
-
   return (
     <Box display="flex" justifyContent="center">
       <Grid container item xs={8}>
@@ -318,7 +319,9 @@ export default function StepBillingData({
               <Grid item xs={12}>
                 <Typography>
                   <Checkbox
-                    checked={stepHistoryState.isTaxCodeEquals2PIVA}
+                    checked={
+                      stepHistoryState.isTaxCodeEquals2PIVA || isTaxCodeValueEquals2PIVAValue
+                    }
                     inputProps={{
                       'aria-label': t('stepBillingData.taxCodeEquals2PIVAdescription'),
                     }}
@@ -326,7 +329,9 @@ export default function StepBillingData({
                       void formik.setFieldValue('vatNumber', '');
                       setStepHistoryState({
                         ...stepHistoryState,
-                        isTaxCodeEquals2PIVA: !stepHistoryState.isTaxCodeEquals2PIVA,
+                        isTaxCodeEquals2PIVA: isTaxCodeValueEquals2PIVAValue
+                          ? false
+                          : !stepHistoryState.isTaxCodeEquals2PIVA,
                       });
                     }}
                   />
@@ -342,7 +347,9 @@ export default function StepBillingData({
                         ? formik.values.taxCode
                         : formik.values.vatNumber
                     }
-                    disabled={stepHistoryState.isTaxCodeEquals2PIVA}
+                    disabled={
+                      stepHistoryState.isTaxCodeEquals2PIVA || isTaxCodeValueEquals2PIVAValue
+                    }
                   />
                   {isPSP && (
                     <>
