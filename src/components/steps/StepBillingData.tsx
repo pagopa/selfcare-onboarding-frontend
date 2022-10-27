@@ -63,7 +63,7 @@ export default function StepBillingData({
     useHistoryState<StepBillingDataHistoryState>('stepBillingData', {
       externalInstitutionId,
       isTaxCodeEquals2PIVA:
-        !!initialFormData.vatNumber && initialFormData.taxCode !== initialFormData.vatNumber,
+        !!initialFormData.vatNumber && initialFormData.taxCode === initialFormData.vatNumber,
     });
 
   useEffect(() => {
@@ -71,7 +71,7 @@ export default function StepBillingData({
       setStepHistoryState({
         externalInstitutionId,
         isTaxCodeEquals2PIVA:
-          !!initialFormData.vatNumber && initialFormData.taxCode !== initialFormData.vatNumber,
+          !!initialFormData.vatNumber && initialFormData.taxCode === initialFormData.vatNumber,
       });
     }
   }, []);
@@ -153,6 +153,25 @@ export default function StepBillingData({
       forward(values);
     },
   });
+
+  useEffect(() => {
+    if (
+      !stepHistoryState.isTaxCodeEquals2PIVA &&
+      formik.values.taxCode === formik.values.vatNumber &&
+      formik.values.taxCode.length > 0
+    ) {
+      setStepHistoryState({
+        ...stepHistoryState,
+        isTaxCodeEquals2PIVA: true,
+      });
+    } else if (stepHistoryState.isTaxCodeEquals2PIVA && formik.values.taxCode.length === 0) {
+      void formik.setFieldValue('vatNumber', '');
+      setStepHistoryState({
+        ...stepHistoryState,
+        isTaxCodeEquals2PIVA: false,
+      });
+    }
+  }, [formik.values.taxCode, formik.values.vatNumber]);
 
   const baseTextFieldProps = (
     field: keyof BillingData,
@@ -289,12 +308,13 @@ export default function StepBillingData({
                     inputProps={{
                       'aria-label': t('stepBillingData.taxCodeEquals2PIVAdescription'),
                     }}
-                    onChange={() =>
+                    onChange={() => {
+                      void formik.setFieldValue('vatNumber', '');
                       setStepHistoryState({
                         ...stepHistoryState,
                         isTaxCodeEquals2PIVA: !stepHistoryState.isTaxCodeEquals2PIVA,
-                      })
-                    }
+                      });
+                    }}
                   />
                   {t('stepBillingData.taxCodeEquals2PIVAdescription')}
                 </Typography>
