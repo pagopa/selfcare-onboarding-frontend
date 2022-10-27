@@ -387,7 +387,7 @@ const fillUserBillingDataForm = async (
   expect(isTaxCodeEquals2PIVA).toBeTruthy();
 
   fireEvent.change(document.getElementById(vatNumber), {
-    target: { value: '11223344567' },
+    target: { value: 'AAAAAA44D55F456K' },
   });
   fireEvent.change(document.getElementById(recipientCode), {
     target: { value: 'recipientCode' },
