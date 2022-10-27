@@ -4,7 +4,7 @@ import { Grid, TextField, Typography, useTheme, Paper } from '@mui/material';
 import { useFormik } from 'formik';
 import { useTranslation } from 'react-i18next';
 import Checkbox from '@mui/material/Checkbox';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { BillingData, InstitutionType, StepperStepComponentProps } from '../../../types';
 import { OnboardingStepActions } from '../OnboardingStepActions';
 import { useHistoryState } from '../useHistoryState';
@@ -70,7 +70,6 @@ export default function StepBillingData({
       isTaxCodeEquals2PIVA:
         !!initialFormData.vatNumber && initialFormData.taxCode === initialFormData.vatNumber,
     });
-  const [isVatNumberGroup, setIsVatNumberGroup] = useState<boolean>();
 
   useEffect(() => {
     if (externalInstitutionId !== stepHistoryState.externalInstitutionId) {
@@ -358,8 +357,11 @@ export default function StepBillingData({
                         inputProps={{
                           'aria-label': t('stepBillingData.vatNumberGroup'),
                         }}
-                        checked={isVatNumberGroup}
-                        onChange={() => setIsVatNumberGroup(!isVatNumberGroup)}
+                        checked={formik.values.vatNumberGroup}
+                        onChange={(_, checked: boolean) =>
+                          formik.setFieldValue('vatNumberGroup', checked, true)
+                        }
+                        value={formik.values.vatNumberGroup}
                       />
                       {t('stepBillingData.vatNumberGroup')}
                     </>
