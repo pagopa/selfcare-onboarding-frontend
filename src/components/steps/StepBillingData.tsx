@@ -63,7 +63,7 @@ export default function StepBillingData({
     useHistoryState<StepBillingDataHistoryState>('stepBillingData', {
       externalInstitutionId,
       isTaxCodeEquals2PIVA:
-        !!initialFormData.vatNumber && initialFormData.taxCode !== initialFormData.vatNumber,
+        !!initialFormData.vatNumber && initialFormData.taxCode === initialFormData.vatNumber,
     });
 
   useEffect(() => {
@@ -71,7 +71,7 @@ export default function StepBillingData({
       setStepHistoryState({
         externalInstitutionId,
         isTaxCodeEquals2PIVA:
-          !!initialFormData.vatNumber && initialFormData.taxCode !== initialFormData.vatNumber,
+          !!initialFormData.vatNumber && initialFormData.taxCode === initialFormData.vatNumber,
       });
     }
   }, []);
@@ -289,12 +289,13 @@ export default function StepBillingData({
                     inputProps={{
                       'aria-label': t('stepBillingData.taxCodeEquals2PIVAdescription'),
                     }}
-                    onChange={() =>
+                    onChange={() => {
+                      void formik.setFieldValue('vatNumber', '');
                       setStepHistoryState({
                         ...stepHistoryState,
                         isTaxCodeEquals2PIVA: !stepHistoryState.isTaxCodeEquals2PIVA,
-                      })
-                    }
+                      });
+                    }}
                   />
                   {t('stepBillingData.taxCodeEquals2PIVAdescription')}
                 </Typography>
