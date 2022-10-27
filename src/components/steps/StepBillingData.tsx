@@ -183,8 +183,25 @@ export default function StepBillingData({
       forward(values);
     },
   });
-  const isTaxCodeValueEquals2PIVAValue =
-    !!formik.values.taxCode && formik.values.taxCode === formik.values.vatNumber;
+
+  useEffect(() => {
+    if (
+      !stepHistoryState.isTaxCodeEquals2PIVA &&
+      formik.values.taxCode === formik.values.vatNumber &&
+      formik.values.taxCode.length > 0
+    ) {
+      setStepHistoryState({
+        ...stepHistoryState,
+        isTaxCodeEquals2PIVA: true,
+      });
+    } else if (stepHistoryState.isTaxCodeEquals2PIVA && formik.values.taxCode.length === 0) {
+      void formik.setFieldValue('vatNumber', '');
+      setStepHistoryState({
+        ...stepHistoryState,
+        isTaxCodeEquals2PIVA: false,
+      });
+    }
+  }, [formik.values.taxCode, formik.values.vatNumber]);
 
   const baseTextFieldProps = (
     field: keyof BillingData,
@@ -318,9 +335,7 @@ export default function StepBillingData({
               <Grid item xs={12}>
                 <Typography>
                   <Checkbox
-                    checked={
-                      stepHistoryState.isTaxCodeEquals2PIVA || isTaxCodeValueEquals2PIVAValue
-                    }
+                    checked={stepHistoryState.isTaxCodeEquals2PIVA}
                     inputProps={{
                       'aria-label': t('stepBillingData.taxCodeEquals2PIVAdescription'),
                     }}
@@ -328,9 +343,7 @@ export default function StepBillingData({
                       void formik.setFieldValue('vatNumber', '');
                       setStepHistoryState({
                         ...stepHistoryState,
-                        isTaxCodeEquals2PIVA: isTaxCodeValueEquals2PIVAValue
-                          ? false
-                          : !stepHistoryState.isTaxCodeEquals2PIVA,
+                        isTaxCodeEquals2PIVA: !stepHistoryState.isTaxCodeEquals2PIVA,
                       });
                     }}
                   />
@@ -346,9 +359,7 @@ export default function StepBillingData({
                         ? formik.values.taxCode
                         : formik.values.vatNumber
                     }
-                    disabled={
-                      stepHistoryState.isTaxCodeEquals2PIVA || isTaxCodeValueEquals2PIVAValue
-                    }
+                    disabled={stepHistoryState.isTaxCodeEquals2PIVA}
                   />
                   {isPSP && (
                     <>
