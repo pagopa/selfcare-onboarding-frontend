@@ -154,6 +154,25 @@ export default function StepBillingData({
     },
   });
 
+  useEffect(() => {
+    if (
+      !stepHistoryState.isTaxCodeEquals2PIVA &&
+      formik.values.taxCode === formik.values.vatNumber &&
+      formik.values.taxCode.length > 0
+    ) {
+      setStepHistoryState({
+        ...stepHistoryState,
+        isTaxCodeEquals2PIVA: true,
+      });
+    } else if (stepHistoryState.isTaxCodeEquals2PIVA && formik.values.taxCode.length === 0) {
+      void formik.setFieldValue('vatNumber', '');
+      setStepHistoryState({
+        ...stepHistoryState,
+        isTaxCodeEquals2PIVA: false,
+      });
+    }
+  }, [formik.values.taxCode, formik.values.vatNumber]);
+
   const baseTextFieldProps = (
     field: keyof BillingData,
     label: string,
