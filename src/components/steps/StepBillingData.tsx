@@ -356,12 +356,12 @@ export default function StepBillingData({
                       <Checkbox
                         sx={{ mt: 1 }}
                         inputProps={{
-                          'aria-label': t('stepBillingData.vatnumberGroup'),
+                          'aria-label': t('stepBillingData.vatNumberGroup'),
                         }}
                         checked={isVatNumberGroup}
                         onChange={() => setIsVatNumberGroup(!isVatNumberGroup)}
                       />
-                      {t('stepBillingData.vatnumberGroup')}
+                      {t('stepBillingData.vatNumberGroup')}
                     </>
                   )}
                 </Typography>

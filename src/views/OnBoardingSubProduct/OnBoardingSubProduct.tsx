@@ -143,7 +143,7 @@ function OnBoardingSubProduct() {
       dpoAddress: '',
       dpoPecAddress: '',
       dopEmailAddress: '',
-      vatnumberGroup: false,
+      vatNumberGroup: false,
     });
     const event = isUserParty
       ? 'ONBOARDING_PREMIUM_ASSOCIATED_PARTY_SELECTION'
@@ -265,7 +265,7 @@ function OnBoardingSubProduct() {
             dpoAddress: '',
             dpoPecAddress: '',
             dopEmailAddress: '',
-            vatnumberGroup: false,
+            vatNumberGroup: false,
           },
           institutionType: institutionType as InstitutionType,
           origin,

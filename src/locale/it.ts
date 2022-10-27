@@ -296,7 +296,7 @@ export default {
     zipCode: 'CAP',
     digitalAddress: 'Indirizzo PEC',
     taxCodeEquals2PIVAdescription: 'La Partita IVA coincide con il Codice Fiscale',
-    vatnumberGroup: 'La Partita IVA è di gruppo',
+    vatNumberGroup: 'La Partita IVA è di gruppo',
     taxCode: 'Codice Fiscale',
     vatNumber: 'Partita IVA',
     recipientCode: 'Codice destinatario',

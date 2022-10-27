@@ -143,7 +143,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
       dpoAddress: '',
       dpoPecAddress: '',
       dopEmailAddress: '',
-      vatnumberGroup: false,
+      vatNumberGroup: false,
     });
     forwardWithData(newFormData);
     trackEvent('ONBOARDING_PARTY_SELECTION', {
@@ -444,7 +444,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
             dpoAddress: '',
             dpoPecAddress: '',
             dopEmailAddress: '',
-            vatnumberGroup: false,
+            vatNumberGroup: false,
           },
           origin,
           institutionType: institutionType as InstitutionType,

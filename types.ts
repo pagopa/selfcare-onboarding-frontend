@@ -209,7 +209,7 @@ export type BillingData = {
   // codice ABI
   abiCode?: string;
   // La partita IVA è di gruppo
-  vatnumberGroup?: boolean;
+  vatNumberGroup?: boolean;
   // Indirizzo DPO
   dpoAddress?: string;
   // Indirizzo PEC DPO
