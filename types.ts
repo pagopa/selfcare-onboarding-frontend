@@ -201,9 +201,9 @@ export type BillingData = {
   // servizi pubblici
   publicServices?: boolean;
   // n. iscrizione al Registro delle Imprese
-  businessRegisterNumber?: string;
+  commercialRegisterNumber?: string;
   // iscrizione all'Albo
-  registerType?: string;
+  registrationInRegister?: string;
   // numero iscrizione albo
   registerNumber?: string;
   // codice ABI
@@ -217,7 +217,6 @@ export type BillingData = {
   // Indirizzo Email DPO
   dopEmailAddress?: string;
 };
-
 
 export type InstitutionData = {
   id: string;

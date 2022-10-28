@@ -31,7 +31,7 @@ const fiscalAndVatCodeRegexp = new RegExp(
 );
 
 const fiveCharactersAllowed = new RegExp('^\\d{5}$');
-const businessRegisterNumberRegexp = new RegExp('^\\d{11}$');
+const commercialRegisterNumberRegexp = new RegExp('^\\d{11}$');
 const numericField = new RegExp('^[0-9]');
 
 type StepBillingDataHistoryState = {
@@ -136,12 +136,12 @@ export default function StepBillingData({
           : !mailPECRegexp.test(values.digitalAddress)
           ? t('stepBillingData.invalidEmail')
           : undefined,
-        businessRegisterNumber: !values.businessRegisterNumber
+        commercialRegisterNumber: !values.commercialRegisterNumber
           ? requiredError
-          : !businessRegisterNumberRegexp.test(values.businessRegisterNumber)
-          ? t('stepBillingData.invalidbusinessRegisterNumber')
+          : !commercialRegisterNumberRegexp.test(values.commercialRegisterNumber)
+          ? t('stepBillingData.invalidCommercialRegisterNumber')
           : undefined,
-        registerType: !values.registerType ? requiredError : undefined,
+        registrationInRegister: !values.registrationInRegister ? requiredError : undefined,
         dpoAddress: !values.dpoAddress ? requiredError : undefined,
         registerNumber: !values.registerNumber
           ? requiredError
@@ -361,11 +361,10 @@ export default function StepBillingData({
                     }
                     disabled={stepHistoryState.isTaxCodeEquals2PIVA}
                   />
-                </Typography>
-                {isPSP && (
-                  <Grid item xs={12} display={'flex'} alignContent="center" pt={1}>
-                    <Typography>
+                  {isPSP && (
+                    <>
                       <Checkbox
+                        sx={{ mt: 1 }}
                         inputProps={{
                           'aria-label': t('stepBillingData.vatNumberGroup'),
                         }}
@@ -376,11 +375,10 @@ export default function StepBillingData({
                         value={formik.values.vatNumberGroup}
                       />
                       {t('stepBillingData.vatNumberGroup')}
-                    </Typography>
-                  </Grid>
-                )}
+                    </>
+                  )}
+                </Typography>
               </Grid>
-
               {institutionType === 'GSP' && (
                 <Grid item xs={12}>
                   <Typography>
@@ -402,8 +400,8 @@ export default function StepBillingData({
                     <CustomTextField
                       inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
                       {...baseTextFieldProps(
-                        'businessRegisterNumber',
-                        t('stepBillingData.businessRegisterNumber'),
+                        'commercialRegisterNumber',
+                        t('stepBillingData.commercialRegisterNumber'),
                         400,
                         18
                       )}
@@ -412,8 +410,8 @@ export default function StepBillingData({
                   <Grid item xs={12}>
                     <CustomTextField
                       {...baseTextFieldProps(
-                        'registerType',
-                        t('stepBillingData.registerType'),
+                        'registrationInRegister',
+                        t('stepBillingData.registrationInRegister'),
                         400,
                         18
                       )}
