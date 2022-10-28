@@ -362,7 +362,7 @@ export default function StepBillingData({
                     disabled={stepHistoryState.isTaxCodeEquals2PIVA}
                   />
                   {isPSP && (
-                    <Box display="flex" alignItems="center">
+                    <Box display="flex" alignItems="center" mt="2px">
                       <Checkbox
                         inputProps={{
                           'aria-label': t('stepBillingData.vatNumberGroup'),
