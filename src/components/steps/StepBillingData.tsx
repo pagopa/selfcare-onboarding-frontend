@@ -333,7 +333,7 @@ export default function StepBillingData({
                 />
               </Grid>
               <Grid item xs={12}>
-                <Typography>
+                <Box display="flex" alignItems="center">
                   <Checkbox
                     checked={stepHistoryState.isTaxCodeEquals2PIVA}
                     inputProps={{
@@ -347,8 +347,8 @@ export default function StepBillingData({
                       });
                     }}
                   />
-                  {t('stepBillingData.taxCodeEquals2PIVAdescription')}
-                </Typography>
+                  <Typography>{t('stepBillingData.taxCodeEquals2PIVAdescription')}</Typography>
+                </Box>
               </Grid>
               <Grid item xs={12}>
                 <Typography>
@@ -362,9 +362,8 @@ export default function StepBillingData({
                     disabled={stepHistoryState.isTaxCodeEquals2PIVA}
                   />
                   {isPSP && (
-                    <>
+                    <Box display="flex" alignItems="center">
                       <Checkbox
-                        sx={{ mt: 1 }}
                         inputProps={{
                           'aria-label': t('stepBillingData.vatNumberGroup'),
                         }}
@@ -374,8 +373,8 @@ export default function StepBillingData({
                         }
                         value={formik.values.vatNumberGroup}
                       />
-                      {t('stepBillingData.vatNumberGroup')}
-                    </>
+                      <Typography>{t('stepBillingData.vatNumberGroup')}</Typography>
+                    </Box>
                   )}
                 </Typography>
               </Grid>
