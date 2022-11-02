@@ -183,6 +183,50 @@ export type Party = {
   origin: string;
 };
 
+export type BillingDataDto = {
+  // Ragione sociale
+  businessName: string;
+  // Indirizzo PEC
+  digitalAddress: string;
+  // servizi pubblici
+  publicServices?: boolean;
+  // Codice destinatario
+  recipientCode: string;
+  // Sede legale
+  registeredOffice: string;
+  // Codice fiscale
+  taxCode: string;
+  // Partita iva
+  vatNumber: string;
+  // Codice di avviamento postale
+  zipCode: string;
+};
+
+export type PspDataDto = {
+  // codice ABI
+  abiCode: string;
+  // n. iscrizione al Registro delle Imprese
+  commercialRegisterNumber: string;
+  // dati del Responsabile protezione dati (DPO)
+  dpoData: DpoData;
+  // numero iscrizione albo
+  registerNumber: string;
+  // iscrizione all'Albo
+  registrationInRegister: string;
+  // La partita IVA è di gruppo
+  vatNumberGroup: boolean;
+};
+
+export type DpoData = {
+  // Indirizzo DPO
+  address: string;
+  // Indirizzo PEC DPO
+  pec: string;
+  // Indirizzo Email DPO
+  email: string;
+};
+
+
 export type BillingData = {
   // Ragione sociale
   businessName: string;
@@ -217,6 +261,8 @@ export type BillingData = {
   // Indirizzo Email DPO
   dopEmailAddress?: string;
 };
+
+
 
 export type InstitutionData = {
   id: string;

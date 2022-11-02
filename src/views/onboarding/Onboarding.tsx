@@ -18,6 +18,8 @@ import {
   UserOnCreate,
   Problem,
   RequestOutcomeMessage,
+  BillingDataDto,
+  PspDataDto,
 } from '../../../types';
 import { StepSearchParty } from '../../components/steps/StepSearchParty';
 import { StepAddManager } from '../../components/steps/StepAddManager';
@@ -282,6 +284,30 @@ function OnboardingComponent({ productId }: { productId: string }) {
     ],
   };
 
+  const billingData2billingDataRequest = (billingData: BillingData): BillingDataDto => ({
+    businessName: billingData.businessName,
+    digitalAddress: billingData.businessName,
+    publicServices: billingData.publicServices,
+    recipientCode: billingData.recipientCode,
+    registeredOffice: billingData.registeredOffice,
+    taxCode: billingData.taxCode,
+    vatNumber: billingData.vatNumber,
+    zipCode: billingData.zipCode,
+  });
+
+  const pspData2pspDataRequest = (billingData: BillingData): PspDataDto => ({
+    abiCode: billingData.abiCode ?? '',
+    commercialRegisterNumber: billingData.commercialRegisterNumber ?? '',
+    dpoData: {
+      address: billingData.dpoAddress ?? '',
+      pec: billingData.dpoPecAddress ?? '',
+      email: billingData.dopEmailAddress ?? '',
+    },
+    registerNumber: billingData.registerNumber ?? '',
+    registrationInRegister: billingData.registrationInRegister ?? '',
+    vatNumberGroup: billingData.vatNumberGroup ?? false,
+  });
+
   const submit = async (users: Array<UserOnCreate>) => {
     setLoading(true);
     const postLegalsResponse = await fetchWithLogs(
@@ -289,7 +315,8 @@ function OnboardingComponent({ productId }: { productId: string }) {
       {
         method: 'POST',
         data: {
-          billingData,
+          billingData: billingData2billingDataRequest,
+          pspData: pspData2pspDataRequest,
           institutionType,
           origin,
           users: users.map((u) => ({
