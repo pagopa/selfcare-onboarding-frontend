@@ -196,7 +196,7 @@ export default {
       success: {
         title: 'La richiesta di adesione è stata <1/>inviata con successo',
         baseDescription:
-          "Riceverai una PEC all’indirizzo istituzionale che hai indicato. <1 /> Al suo interno troverai le istruzioni per completare <3 />l'adesione.",
+          "Invieremo un'email all'indirizzo PEC primario dell'ente. <1 /> Al suo interno, ci sono le istruzioni per completare <3 />l'adesione.",
         pspDescription:
           "Procederemo al controllo dei dati inseriti e invieremo una <1 />mail di cortesia e una PEC con l'esito di tale verifica.",
         backHome: 'Torna alla home',
