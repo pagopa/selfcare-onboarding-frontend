@@ -32,6 +32,7 @@ export type RouteConfig = {
 
 export type Image = { src: string; alt: string };
 export type RequestOutcome = 'success' | 'error';
+export type RequestOutcomeJwt = 'success' | 'error' | 'jwterror' | 'jwtsuccess';
 export type RequestOutcomeMessage = {
   title: string;
   description: Array<JSX.Element>;
@@ -41,6 +42,7 @@ export type RequestOutcomeMessage = {
     | ((props: DefaultComponentProps<SvgIconTypeMap>) => JSX.Element);
 };
 export type RequestOutcomeOptions = { [key in RequestOutcome]: RequestOutcomeMessage };
+export type RequestOutcomeOptionsJwt = { [key in RequestOutcomeJwt]: RequestOutcomeMessage };
 
 /*
  * Onboarding component
@@ -226,7 +228,6 @@ export type DpoData = {
   email: string;
 };
 
-
 export type BillingData = {
   // Ragione sociale
   businessName: string;
@@ -261,8 +262,6 @@ export type BillingData = {
   // Indirizzo Email DPO
   dopEmailAddress?: string;
 };
-
-
 
 export type InstitutionData = {
   id: string;

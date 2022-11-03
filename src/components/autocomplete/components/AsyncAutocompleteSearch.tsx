@@ -3,6 +3,8 @@ import { styled } from '@mui/system';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 import { Dispatch, SetStateAction } from 'react';
+import { IPACatalogParty } from '../../../../types';
+import { useHistoryState } from '../../useHistoryState';
 
 const CustomTextField = styled(TextField)({
   justifyContent: 'center',
@@ -40,6 +42,8 @@ export default function AsyncAutocompleteSearch({
   input,
   handleChange,
 }: Props) {
+  const setSelectedHistory = useHistoryState<IPACatalogParty | null>('selected_step1', null)[2];
+
   return (
     <CustomTextField
       id="Parties"
@@ -71,6 +75,7 @@ export default function AsyncAutocompleteSearch({
             onClick={() => {
               setInput('');
               setSelected('');
+              setSelectedHistory(null);
             }}
             aria-label="clearIcon"
           >

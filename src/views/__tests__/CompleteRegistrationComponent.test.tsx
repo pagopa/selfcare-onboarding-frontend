@@ -1,7 +1,8 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import CompleteRegistrationComponent from '../CompleteRegistrationComponent';
 import './../../locale';
 import { buildAssistanceURI } from '@pagopa/selfcare-common-frontend/services/assistanceService';
+import { ENV } from '../../utils/env';
 
 const oldWindowLocation = global.window.location;
 const mockedLocation = {
@@ -45,17 +46,19 @@ test('test no jwt', () => {
 
 test('test', async () => {
   mockedLocation.search = 'jwt=asd';
-  render(<CompleteRegistrationComponent />);
 
-  const goOnButton = screen.getByRole('button', {
-    name: 'Continua',
-  });
+  render(<CompleteRegistrationComponent />);
+  await waitFor(() => screen.getByText('Segui le istruzioni'));
+  const goOnButton = await waitFor(() =>
+    screen.getByRole('button', {
+      name: 'Continua',
+    })
+  );
   fireEvent.click(goOnButton);
+  screen.getByText('selezionalo dal tuo computer');
 
   const sendButton = screen.getByRole('button', {
     name: 'Continua',
   });
   expect(sendButton).toBeDisabled();
-
-  screen.getByText('selezionalo dal tuo computer');
 });

@@ -124,7 +124,9 @@ export default function StepBillingData({
         vatNumber:
           !values.vatNumber && !stepHistoryState.isTaxCodeEquals2PIVA
             ? requiredError
-            : values.vatNumber && !fiscalAndVatCodeRegexp.test(values.vatNumber)
+            : values.vatNumber &&
+              !fiscalAndVatCodeRegexp.test(values.vatNumber) &&
+              !stepHistoryState.isTaxCodeEquals2PIVA
             ? t('stepBillingData.invalidVatNumber')
             : values.taxCode &&
               stepHistoryState.isTaxCodeEquals2PIVA &&
@@ -136,33 +138,41 @@ export default function StepBillingData({
           : !mailPECRegexp.test(values.digitalAddress)
           ? t('stepBillingData.invalidEmail')
           : undefined,
-        commercialRegisterNumber: !values.commercialRegisterNumber
-          ? requiredError
-          : !commercialRegisterNumberRegexp.test(values.commercialRegisterNumber)
-          ? t('stepBillingData.invalidCommercialRegisterNumber')
-          : undefined,
-        registrationInRegister: !values.registrationInRegister ? requiredError : undefined,
-        dpoAddress: !values.dpoAddress ? requiredError : undefined,
-        registerNumber: !values.registerNumber
-          ? requiredError
-          : !numericField.test(values.registerNumber)
-          ? t('stepBillingData.invalidregisterNumber')
-          : undefined,
-        abiCode: !values.abiCode
-          ? requiredError
-          : !fiveCharactersAllowed.test(values.abiCode)
-          ? t('stepBillingData.invalidabiCode')
-          : undefined,
-        dopEmailAddress: !values.dopEmailAddress
-          ? requiredError
-          : !mailPECRegexp.test(values.dopEmailAddress)
-          ? t('stepBillingData.invalidEmail')
-          : undefined,
-        dpoPecAddress: !values.dpoPecAddress
-          ? requiredError
-          : !mailPECRegexp.test(values.dpoPecAddress)
-          ? t('stepBillingData.invalidEmail')
-          : undefined,
+
+        commercialRegisterNumber:
+          isPSP && !values.commercialRegisterNumber
+            ? requiredError
+            : values.commercialRegisterNumber &&
+              !commercialRegisterNumberRegexp.test(values.commercialRegisterNumber) &&
+              isPSP
+            ? t('stepBillingData.invalidCommercialRegisterNumber')
+            : undefined,
+        registrationInRegister: isPSP && !values.registrationInRegister ? requiredError : undefined,
+        dpoAddress: isPSP && !values.dpoAddress ? requiredError : undefined,
+        registerNumber:
+          isPSP && !values.registerNumber
+            ? requiredError
+            : isPSP && values.registerNumber && !numericField.test(values.registerNumber)
+            ? t('stepBillingData.invalidregisterNumber')
+            : undefined,
+        abiCode:
+          isPSP && !values.abiCode
+            ? requiredError
+            : isPSP && values.abiCode && !fiveCharactersAllowed.test(values.abiCode)
+            ? t('stepBillingData.invalidabiCode')
+            : undefined,
+        dopEmailAddress:
+          isPSP && !values.dopEmailAddress
+            ? requiredError
+            : isPSP && values.dopEmailAddress && !mailPECRegexp.test(values.dopEmailAddress)
+            ? t('stepBillingData.invalidEmail')
+            : undefined,
+        dpoPecAddress:
+          isPSP && !values.dpoPecAddress
+            ? requiredError
+            : isPSP && values.dpoPecAddress && !mailPECRegexp.test(values.dpoPecAddress)
+            ? t('stepBillingData.invalidEmail')
+            : undefined,
         recipientCode: !values.recipientCode ? requiredError : undefined,
       }).filter(([_key, value]) => value)
     );

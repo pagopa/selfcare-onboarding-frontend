@@ -8,10 +8,16 @@ import {
   Paper,
   useTheme,
 } from '@mui/material';
-import React from 'react';
+import React, { useRef } from 'react';
 import { useTranslation, Trans } from 'react-i18next';
-import { InstitutionType, Product, StepperStepComponentProps } from '../../../types';
+import {
+  InstitutionType,
+  IPACatalogParty,
+  Product,
+  StepperStepComponentProps,
+} from '../../../types';
 import { OnboardingStepActions } from '../OnboardingStepActions';
+import { useHistoryState } from '../useHistoryState';
 
 type Props = StepperStepComponentProps & {
   institutionType: InstitutionType;
@@ -35,12 +41,20 @@ export default function StepInstitutionType({
   selectedProduct,
 }: Props) {
   const [selectedValue, setSelectedValue] = React.useState<InstitutionType>(institutionType);
+  const setSelectedHistory = useHistoryState<IPACatalogParty | null>('selected_step1', null)[2];
+
+  const selectedValueRef = useRef<InstitutionType>(selectedValue);
 
   const { t } = useTranslation();
 
   const theme = useTheme();
 
-  const handleChange = (value: InstitutionType) => setSelectedValue(value);
+  const handleChange = (value: InstitutionType) => {
+    if (value !== selectedValueRef.current) {
+      setSelectedHistory(null);
+    }
+    setSelectedValue(value);
+  };
 
   const onForwardAction = () => {
     forward(selectedValue);

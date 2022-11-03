@@ -7,7 +7,7 @@ import { useTranslation, Trans } from 'react-i18next';
 import { uniqueId } from 'lodash';
 import { IllusCompleted, IllusError } from '@pagopa/mui-italia';
 import { buildAssistanceURI } from '@pagopa/selfcare-common-frontend/services/assistanceService';
-import { RequestOutcome, RequestOutcomeOptions, StepperStep, Problem } from '../../types';
+import { StepperStep, Problem, RequestOutcomeOptionsJwt, RequestOutcomeJwt } from '../../types';
 import { ConfirmRegistrationStep0 } from '../components/ConfirmRegistrationStep0';
 import { ConfirmRegistrationStep1 } from '../components/ConfirmRegistrationStep1';
 import { useHistoryState } from '../components/useHistoryState';
@@ -17,7 +17,10 @@ import redXIllustration from '../assets/red-x-illustration.svg';
 import { ENV } from '../utils/env';
 import { MessageNoAction } from '../components/MessageNoAction';
 import { HeaderContext, UserContext } from '../lib/context';
+import { jwtNotValid } from '../services/tokenServices';
 import { getOnboardingMagicLinkJwt } from './RejectRegistration';
+import JwtInvalidPage from './JwtInvalidPage';
+import RejectContentSuccessPage from './RejectContentSuccessPage';
 
 type FileErrorAttempt = {
   fileName: string;
@@ -76,7 +79,7 @@ export default function CompleteRegistrationComponent() {
     0
   );
 
-  const [outcome, setOutcome] = useState<RequestOutcome | null>(!token ? 'error' : null);
+  const [outcome, setOutcome] = useState<RequestOutcomeJwt | null>(!token ? 'error' : null);
   const [errorCode, setErrorCode] = useState<keyof typeof errors>('GENERIC');
 
   const [loading, setLoading] = useState<boolean>(false);
@@ -99,6 +102,16 @@ export default function CompleteRegistrationComponent() {
       setEnableLogin(true);
     };
   }, []);
+
+  useEffect(() => {
+    if (!token) {
+      setOutcome('error');
+    } else {
+      setLoading(true);
+      jwtNotValid({ token, setRequiredLogin, setOutcome }).finally(() => setLoading(false));
+    }
+  }, []);
+
   const setUploadedFilesAndWriteHistory = (files: Array<File>) => {
     setUploadedFilesHistory(files);
     setUploadedFiles(files);
@@ -207,7 +220,7 @@ export default function CompleteRegistrationComponent() {
 
   const Step = steps[activeStep].Component;
 
-  const outcomeContent: RequestOutcomeOptions = {
+  const outcomeContent: RequestOutcomeOptionsJwt = {
     success: {
       title: '',
       description: [
@@ -239,6 +252,14 @@ export default function CompleteRegistrationComponent() {
         </>,
       ],
     },
+    jwtsuccess: {
+      title: '',
+      description: [
+        <>
+          <RejectContentSuccessPage />
+        </>,
+      ],
+    },
     error: {
       img: { src: redXIllustration, alt: t('completeRegistration.outcomeContent.error.alt') },
       title: t('completeRegistration.outcomeContent.error.title'),
@@ -250,68 +271,83 @@ export default function CompleteRegistrationComponent() {
         </div>,
       ],
     },
+    jwterror: {
+      title: '',
+      description: [
+        <>
+          <JwtInvalidPage />
+        </>,
+      ],
+    },
   };
-  return outcome === 'success' ? (
-    <MessageNoAction {...outcomeContent[outcome]} />
-  ) : outcome === 'error' ? (
-    !token || showBlockingError ? (
-      <Grid container direction="column" key="0" style={{ textAlign: 'center' }}>
-        <Grid container item justifyContent="center" mb={2}>
-          <IllusError size={60} />
-        </Grid>
-        <Grid container item justifyContent="center" mt={3}>
-          <Grid item xs={6}>
-            <Typography variant="h4">{t('completeRegistration.title')}</Typography>
+
+  return (
+    <>
+      {outcome === 'jwterror' ? (
+        <MessageNoAction {...outcomeContent[outcome]} />
+      ) : outcome === 'success' ? (
+        <MessageNoAction {...outcomeContent[outcome]} />
+      ) : outcome === 'error' ? (
+        !token || showBlockingError ? (
+          <Grid container direction="column" key="0" style={{ textAlign: 'center' }}>
+            <Grid container item justifyContent="center" mb={2}>
+              <IllusError size={60} />
+            </Grid>
+            <Grid container item justifyContent="center" mt={3}>
+              <Grid item xs={6}>
+                <Typography variant="h4">{t('completeRegistration.title')}</Typography>
+              </Grid>
+            </Grid>
+            <Grid container item justifyContent="center" mb={4} mt={1}>
+              <Grid item xs={6}>
+                <Typography variant="body1">
+                  <Trans i18nKey="completeRegistration.description">
+                    Non siamo riusciti a indirizzarti alla pagina di caricamento
+                    <br />
+                    per completare la procedura.
+                  </Trans>
+                </Typography>
+              </Grid>
+            </Grid>
+            <Grid container item justifyContent="center">
+              <Grid item xs={4}>
+                <Button
+                  variant="contained"
+                  sx={{ alignSelf: 'center' }}
+                  onClick={() => window.location.assign(buildAssistanceURI(ENV.ASSISTANCE.EMAIL))}
+                >
+                  {t('completeRegistration.contactAssistanceButton')}
+                </Button>
+              </Grid>
+            </Grid>
           </Grid>
-        </Grid>
-        <Grid container item justifyContent="center" mb={4} mt={1}>
-          <Grid item xs={6}>
-            <Typography variant="body1">
-              <Trans i18nKey="completeRegistration.description">
-                Non siamo riusciti a indirizzarti alla pagina di caricamento
-                <br />
-                per completare la procedura.
-              </Trans>
-            </Typography>
-          </Grid>
-        </Grid>
-        <Grid container item justifyContent="center">
-          <Grid item xs={4}>
-            <Button
-              variant="contained"
-              sx={{ alignSelf: 'center' }}
-              onClick={() => window.location.assign(buildAssistanceURI(ENV.ASSISTANCE.EMAIL))}
-            >
-              {t('completeRegistration.contactAssistanceButton')}
-            </Button>
-          </Grid>
-        </Grid>
-      </Grid>
-    ) : (
-      <SessionModal
-        handleClose={handleErrorModalClose}
-        handleExit={handleErrorModalExit}
-        onConfirm={handleErrorModalConfirm}
-        open={true}
-        title={t(`completeRegistration.errors.${errorCode}.title`)}
-        message={
-          errorCode === 'INVALID_SIGN_FORMAT' ? (
-            <Trans i18nKey={`completeRegistration.errors.INVALID_SIGN_FORMAT.message`}>
-              {'Il caricamento del documento non è andato a buon fine.'}
-              <br />
-              {'Carica un solo file in formato '}
-              <strong>{'p7m'}</strong>
-              {'.'}
-            </Trans>
-          ) : (
-            t(`completeRegistration.errors.${errorCode}.message`)
-          )
-        }
-        onConfirmLabel={t('completeRegistration.sessionModal.onConfirmLabel')}
-        onCloseLabel={t('completeRegistration.sessionModal.onCloseLabel')}
-      />
-    )
-  ) : (
-    <Step />
+        ) : (
+          <SessionModal
+            handleClose={handleErrorModalClose}
+            handleExit={handleErrorModalExit}
+            onConfirm={handleErrorModalConfirm}
+            open={true}
+            title={t(`completeRegistration.errors.${errorCode}.title`)}
+            message={
+              errorCode === 'INVALID_SIGN_FORMAT' ? (
+                <Trans i18nKey={`completeRegistration.errors.INVALID_SIGN_FORMAT.message`}>
+                  {'Il caricamento del documento non è andato a buon fine.'}
+                  <br />
+                  {'Carica un solo file in formato '}
+                  <strong>{'p7m'}</strong>
+                  {'.'}
+                </Trans>
+              ) : (
+                t(`completeRegistration.errors.${errorCode}.message`)
+              )
+            }
+            onConfirmLabel={t('completeRegistration.sessionModal.onConfirmLabel')}
+            onCloseLabel={t('completeRegistration.sessionModal.onCloseLabel')}
+          />
+        )
+      ) : (
+        outcome === 'jwtsuccess' && <Step />
+      )}
+    </>
   );
 }

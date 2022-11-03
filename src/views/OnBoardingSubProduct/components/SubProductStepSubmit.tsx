@@ -21,6 +21,10 @@ import { getFetchOutcome } from '../../../lib/error-utils';
 import { MessageNoAction } from '../../../components/MessageNoAction';
 import { ENV } from '../../../utils/env';
 import { unregisterUnloadEvent } from '../../../utils/unloadEvent-utils';
+import {
+  billingData2billingDataRequest,
+  pspData2pspDataRequest,
+} from '../../onboarding/Onboarding';
 
 type Props = StepperStepComponentProps & {
   requestId: string;
@@ -133,7 +137,8 @@ function SubProductStepSubmit({
             taxCode: u.taxCode.toUpperCase(),
             email: u.email.toLowerCase(),
           })),
-          billingData,
+          billingData: billingData2billingDataRequest(billingData as BillingData),
+          pspData: pspData2pspDataRequest(billingData as BillingData),
           institutionType,
           pricingPlan,
           origin,

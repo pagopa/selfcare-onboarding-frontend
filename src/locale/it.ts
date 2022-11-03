@@ -181,6 +181,11 @@ export default {
           'Il caricamento del documento non è andato a buon fine. <1 />Carica un solo file in formato <3>p7m</3>.',
       },
     },
+    jwtNotValid: {
+      title: 'Richiesta di adesione non più <1 /> valida',
+      subtitle: 'Questa richiesta è stata accolta, annullata o è scaduta.',
+      backHome: 'Torna alla home',
+    },
   },
   noProductPage: {
     title: 'Spiacenti, qualcosa è andato storto.',
@@ -189,10 +194,12 @@ export default {
   onboarding: {
     outcomeContent: {
       success: {
-        title: 'La tua richiesta è stata inviata <1/> con successo',
-        description:
+        title: 'La richiesta di adesione è stata <1/>inviata con successo',
+        baseDescription:
           "Riceverai una PEC all’indirizzo istituzionale che hai indicato. <1 /> Al suo interno troverai le istruzioni per completare <3 />l'adesione.",
-        backActionLabel: 'Chiudi',
+        pspDescription:
+          "Procederemo al controllo dei dati inseriti e invieremo una <1 />mail di cortesia e una PEC con l'esito di tale verifica.",
+        backHome: 'Torna alla home',
       },
       error: {
         title: 'Spiacenti, qualcosa è andato storto.',
@@ -245,7 +252,7 @@ export default {
       homeButton: 'Torna alla home',
     },
     successfulAdhesion: {
-      title: 'La tua richiesta è stata inviata <1 /> con successo',
+      title: 'La richiesta di adesione è stata <1/>inviata con successo',
       message:
         "Riceverai una PEC all’indirizzo istituzionale dell’ente.<1 />Al suo interno troverai le istruzioni per completare la <3 /> sottoscrizione all'offerta Premium.",
       closeButton: 'Chiudi',
@@ -319,7 +326,7 @@ export default {
   rejectRegistration: {
     outcomeContent: {
       success: {
-        title: 'La tua richiesta di adesione è <1 />stata annullata',
+        title: 'Richiesta di adesione eliminata',
         description:
           'Nella home dell’Area Riservata puoi vedere i prodotti<1 />disponibili e richiedere l’adesione per il tuo ente.',
         backActionLabel: 'Torna alla home',
@@ -336,6 +343,17 @@ export default {
       notOutcome: {
         loadingText: 'Stiamo cancellando la tua iscrizione',
       },
+      jwtNotValid: {
+        title: 'Richiesta di adesione non più <1 /> valida',
+        subtitle: 'Questa richiesta è stata accolta, annullata o è scaduta.',
+        backActionLabel: 'Torna alla home',
+      },
+    },
+    confirmCancellatione: {
+      title: 'Vuoi eliminare la richiesta di <1 /> adesione?',
+      subtitle: 'Se la elimini, tutti i dati inseriti verranno persi. ',
+      confirmActionLabel: 'Elimina la richiesta',
+      backActionLabel: 'Torna alla home',
     },
   },
   app: {

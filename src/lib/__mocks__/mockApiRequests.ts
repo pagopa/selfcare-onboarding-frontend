@@ -127,6 +127,24 @@ const mockPartyRegistry = {
       originId: 'originId7',
       address: 'sede legale',
     },
+    // use case added for easily test new feature about taxCode equal to vatCode
+    {
+      id: 'idNotIpa',
+      o: 'od',
+      ou: 'oud',
+      aoo: 'aood',
+      taxCode: '98765432123',
+      zipCode: '44382',
+      administrationCode: '98765432123',
+      category: 'c432',
+      managerName: 'Ugo',
+      managerSurname: 'Diaz',
+      description: 'AGENCY NOT IPA',
+      digitalAddress: 'mail@pec.mail.org',
+      origin: 'IPAIPA', // origin not IPA for fields editability
+      originId: 'originId1',
+      address: 'sede legale',
+    },
   ],
   count: 8,
 };
@@ -209,14 +227,6 @@ const mockedOnboardingData0: InstitutionOnboardingInfoResource = {
       taxCode: 'AAAAAA11A11A123K',
       vatNumber: 'AAAAAA11A11A123K',
       recipientCode: 'M5UXCR1',
-      commercialRegisterNumber: '',
-      registrationInRegister: '',
-      registerNumber: '',
-      abiCode: '',
-      dpoAddress: '',
-      dpoPecAddress: '',
-      dopEmailAddress: '',
-      vatNumberGroup: false,
     },
     institutionType: 'PA',
     origin: 'IPA',
@@ -241,14 +251,6 @@ const mockedOnboardingData1: InstitutionOnboardingInfoResource = {
       taxCode: 'BBBBBB11A11A123K',
       vatNumber: '12345678901',
       recipientCode: 'M2UHYR1',
-      commercialRegisterNumber: '',
-      registrationInRegister: '',
-      registerNumber: '',
-      abiCode: '',
-      dpoAddress: '',
-      dpoPecAddress: '',
-      dopEmailAddress: '',
-      vatNumberGroup: false,
     },
     institutionType: 'GSP',
     origin: 'IPA',
@@ -293,6 +295,12 @@ const error409: Promise<AxiosError> = new Promise((resolve) =>
   resolve({
     isAxiosError: true,
     response: { data: '', status: 409, statusText: '409' },
+  } as AxiosError)
+);
+const error400: Promise<AxiosError> = new Promise((resolve) =>
+  resolve({
+    isAxiosError: true,
+    response: { data: '', status: 400, statusText: '400' },
   } as AxiosError)
 );
 
@@ -495,6 +503,20 @@ export async function mockFetch(
     return new Promise((resolve) =>
       resolve({ data: mockedParties, status: 200, statusText: '200' } as AxiosResponse)
     );
+  }
+
+  if (endpoint === 'ONBOARDING_TOKEN_VALIDATION') {
+    if (window.location.search === '?jwt=tokenNotFound') {
+      return notFoundError;
+    } else if (window.location.search === '?jwt=tokenAlreadyConsumed') {
+      return error409;
+    } else if (window.location.search === '?jwt=tokenNotValid') {
+      return error400;
+    } else {
+      return new Promise((resolve) =>
+        resolve({ data: '', status: 200, statusText: '200' } as AxiosResponse)
+      );
+    }
   }
 
   const msg = `NOT MOCKED REQUEST! {endpoint: ${endpoint}, endpointParams: ${JSON.stringify(

@@ -39,6 +39,30 @@ import { OnBoardingProductStepDelegates } from './components/OnBoardingProductSt
 
 export type ValidateErrorType = 'conflictError';
 
+export const billingData2billingDataRequest = (billingData: BillingData): BillingDataDto => ({
+  businessName: billingData.businessName,
+  digitalAddress: billingData.digitalAddress,
+  publicServices: billingData.publicServices,
+  recipientCode: billingData.recipientCode,
+  registeredOffice: billingData.registeredOffice,
+  taxCode: billingData.taxCode,
+  vatNumber: billingData.vatNumber,
+  zipCode: billingData.zipCode,
+});
+
+export const pspData2pspDataRequest = (billingData: BillingData): PspDataDto => ({
+  abiCode: billingData.abiCode ?? '',
+  commercialRegisterNumber: billingData.commercialRegisterNumber ?? '',
+  dpoData: {
+    address: billingData.dpoAddress ?? '',
+    pec: billingData.dpoPecAddress ?? '',
+    email: billingData.dopEmailAddress ?? '',
+  },
+  registerNumber: billingData.registerNumber ?? '',
+  registrationInRegister: billingData.registrationInRegister ?? '',
+  vatNumberGroup: billingData.vatNumberGroup ?? false,
+});
+
 // eslint-disable-next-line sonarjs/cognitive-complexity
 function OnboardingComponent({ productId }: { productId: string }) {
   const [loading, setLoading] = useState(true);
@@ -132,20 +156,12 @@ function OnboardingComponent({ productId }: { productId: string }) {
     setOrigin(party.origin);
     setBillingData({
       businessName: party.description,
-      registeredOffice: party.address,
-      zipCode: party.zipCode,
       digitalAddress: party.digitalAddress,
+      recipientCode: party.origin === 'IPA' ? party.originId : '',
+      registeredOffice: party.address,
       taxCode: party.taxCode,
       vatNumber: '',
-      recipientCode: party.origin === 'IPA' ? party.originId : '',
-      commercialRegisterNumber: '',
-      registrationInRegister: '',
-      registerNumber: undefined,
-      abiCode: '',
-      dpoAddress: '',
-      dpoPecAddress: '',
-      dopEmailAddress: '',
-      vatNumberGroup: false,
+      zipCode: party.zipCode,
     });
     forwardWithData(newFormData);
     trackEvent('ONBOARDING_PARTY_SELECTION', {
@@ -179,26 +195,34 @@ function OnboardingComponent({ productId }: { productId: string }) {
             sx={{ color: theme.palette.text.primary, marginBottom: 1 }}
           >
             <Trans i18nKey="onboarding.outcomeContent.success.title">
-              La tua richiesta è stata inviata
+              La richiesta di adesione è stata
               <br />
-              con successo
+              inviata con successo
             </Trans>
           </Typography>
           <Stack key="0" spacing={4}>
             <Typography variant="body1">
-              <Trans i18nKey="onboarding.outcomeContent.success.description">
-                Riceverai una PEC all’indirizzo istituzionale che hai indicato.
-                <br />
-                Al suo interno troverai le istruzioni per completare <br />
-                l&apos;adesione.
-              </Trans>
+              {institutionType !== 'PSP' ? (
+                <Trans i18nKey="onboarding.outcomeContent.success.baseDescription">
+                  Riceverai una PEC all’indirizzo istituzionale che hai indicato.
+                  <br />
+                  Al suo interno troverai le istruzioni per completare <br />
+                  l&apos;adesione.
+                </Trans>
+              ) : (
+                <Trans i18nKey="onboarding.outcomeContent.success.pspDescription">
+                  Procederemo al controllo dei dati inseriti e invieremo una
+                  <br />
+                  mail di cortesia e una PEC con l&apos;esito di tale verifica.
+                </Trans>
+              )}
             </Typography>
             <Button
               variant="contained"
               sx={{ alignSelf: 'center' }}
               onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
             >
-              {t('onboarding.outcomeContent.success.backActionLabel')}
+              {t('onboarding.outcomeContent.success.backHome')}
             </Button>
           </Stack>
         </>,
@@ -284,30 +308,6 @@ function OnboardingComponent({ productId }: { productId: string }) {
     ],
   };
 
-  const billingData2billingDataRequest = (billingData: BillingData): BillingDataDto => ({
-    businessName: billingData.businessName,
-    digitalAddress: billingData.businessName,
-    publicServices: billingData.publicServices,
-    recipientCode: billingData.recipientCode,
-    registeredOffice: billingData.registeredOffice,
-    taxCode: billingData.taxCode,
-    vatNumber: billingData.vatNumber,
-    zipCode: billingData.zipCode,
-  });
-
-  const pspData2pspDataRequest = (billingData: BillingData): PspDataDto => ({
-    abiCode: billingData.abiCode ?? '',
-    commercialRegisterNumber: billingData.commercialRegisterNumber ?? '',
-    dpoData: {
-      address: billingData.dpoAddress ?? '',
-      pec: billingData.dpoPecAddress ?? '',
-      email: billingData.dopEmailAddress ?? '',
-    },
-    registerNumber: billingData.registerNumber ?? '',
-    registrationInRegister: billingData.registrationInRegister ?? '',
-    vatNumberGroup: billingData.vatNumberGroup ?? false,
-  });
-
   const submit = async (users: Array<UserOnCreate>) => {
     setLoading(true);
     const postLegalsResponse = await fetchWithLogs(
@@ -315,8 +315,8 @@ function OnboardingComponent({ productId }: { productId: string }) {
       {
         method: 'POST',
         data: {
-          billingData: billingData2billingDataRequest,
-          pspData: pspData2pspDataRequest,
+          billingData: billingData2billingDataRequest(billingData as BillingData),
+          pspData: pspData2pspDataRequest(billingData as BillingData),
           institutionType,
           origin,
           users: users.map((u) => ({
@@ -464,14 +464,6 @@ function OnboardingComponent({ productId }: { productId: string }) {
             taxCode: '',
             vatNumber: '',
             recipientCode: '',
-            commercialRegisterNumber: '',
-            registrationInRegister: '',
-            registerNumber: undefined,
-            abiCode: '',
-            dpoAddress: '',
-            dpoPecAddress: '',
-            dopEmailAddress: '',
-            vatNumberGroup: false,
           },
           origin,
           institutionType: institutionType as InstitutionType,
