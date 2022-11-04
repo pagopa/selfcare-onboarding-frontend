@@ -43,7 +43,7 @@ jest.mock('react-router-dom', () => ({
   }),
 }));
 
-const renderComponent = (productId: string = 'prod-pagopa') => {
+const renderComponent = (productId: string = 'prod-pn') => {
   const Component = () => {
     const [user, setUser] = useState<User | null>(null);
     const [subHeaderVisible, setSubHeaderVisible] = useState<boolean>(false);
@@ -650,28 +650,42 @@ const fillAdditionalUserAndCheckUniqueValues = async (
   }
 };
 
+const billingData2billingDataRequest = () => ({
+  businessName: 'businessNameInput',
+  registeredOffice: 'registeredOfficeInput',
+  digitalAddress: 'a@a.it',
+  zipCode: '09010',
+  taxCode: 'AAAAAA44D55F456K',
+  vatNumber: 'AAAAAA44D55F456K',
+  recipientCode: 'recipientCode',
+  publicServices: false,
+});
+
+const pspData2pspDataRequest = () => ({
+  abiCode: '',
+  commercialRegisterNumber: '',
+  dpoData: {
+    address: '',
+    pec: '',
+    email: '',
+  },
+  registerNumber: '',
+  registrationInRegister: '',
+  vatNumberGroup: false,
+});
 const verifySubmit = async () => {
   await waitFor(() =>
     expect(fetchWithLogsSpy).lastCalledWith(
       {
         endpoint: 'ONBOARDING_POST_LEGALS',
-        endpointParams: { externalInstitutionId: 'id', productId: 'prod-pagopa' },
+        endpointParams: { externalInstitutionId: 'id', productId: 'prod-pn' },
       },
       {
         data: {
-          billingData: {
-            businessName: 'businessNameInput',
-            registeredOffice: 'registeredOfficeInput',
-            digitalAddress: 'a@a.it',
-            zipCode: '09010',
-            taxCode: 'AAAAAA44D55F456K',
-            vatNumber: 'AAAAAA44D55F456K',
-            recipientCode: 'recipientCode',
-            publicServices: false,
-          },
+          billingData: billingData2billingDataRequest(),
+          pspData: pspData2pspDataRequest(),
           institutionType: 'GSP',
           origin: 'IPA',
-          pricingPlan: 'pricingPlan',
           users: [
             {
               email: 'b@b.bb',
@@ -702,6 +716,7 @@ const verifySubmit = async () => {
               taxCode: 'SRNNMA01A00A000A',
             },
           ],
+          pricingPlan: 'pricingPlan',
         },
         method: 'POST',
       },

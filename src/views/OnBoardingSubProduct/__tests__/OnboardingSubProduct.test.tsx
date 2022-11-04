@@ -462,6 +462,29 @@ const fillTextFieldAndCheckButton = async (
   }
 };
 
+const billingData2billingDataRequest = () => ({
+  businessName: 'businessNameInput',
+  registeredOffice: 'registeredOfficeInput',
+  digitalAddress: 'a@a.com',
+  zipCode: '09010',
+  taxCode: 'AAAAAA44D55F456K',
+  vatNumber: '12345678901',
+  recipientCode: 'AM23EIX',
+  publicServices: false,
+});
+
+const pspData2pspDataRequest = () => ({
+  abiCode: '',
+  commercialRegisterNumber: '',
+  dpoData: {
+    address: '',
+    pec: '',
+    email: '',
+  },
+  registerNumber: '',
+  registrationInRegister: '',
+  vatNumberGroup: false,
+});
 const verifySubmit = async () => {
   await waitFor(() =>
     expect(fetchWithLogsSpy).lastCalledWith(
@@ -481,16 +504,8 @@ const verifySubmit = async () => {
               email: 'm@ma.it',
             },
           ],
-          billingData: {
-            businessName: 'businessNameInput',
-            registeredOffice: 'registeredOfficeInput',
-            digitalAddress: 'a@a.com',
-            zipCode: '09010',
-            taxCode: 'AAAAAA44D55F456K',
-            vatNumber: '12345678901',
-            recipientCode: 'AM23EIX',
-            publicServices: false,
-          },
+          billingData: billingData2billingDataRequest(),
+          pspData: pspData2pspDataRequest(),
           institutionType: 'GSP',
           pricingPlan: 'pricingPlan',
           origin: 'IPA',

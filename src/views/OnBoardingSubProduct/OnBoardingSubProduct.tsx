@@ -11,10 +11,10 @@ import {
   BillingData,
   InstitutionType,
   SelfcareParty,
-  Party,
   Product,
   StepperStep,
   UserOnCreate,
+  Party,
 } from '../../../types';
 import { LoadingOverlay } from '../../components/LoadingOverlay';
 import { ENV } from '../../utils/env';
