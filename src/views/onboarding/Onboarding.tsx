@@ -18,6 +18,8 @@ import {
   UserOnCreate,
   Problem,
   RequestOutcomeMessage,
+  BillingDataDto,
+  PspDataDto,
 } from '../../../types';
 import { StepSearchParty } from '../../components/steps/StepSearchParty';
 import { StepAddManager } from '../../components/steps/StepAddManager';
@@ -36,6 +38,30 @@ import { OnboardingStep1_5 } from './components/OnboardingStep1_5';
 import { OnBoardingProductStepDelegates } from './components/OnBoardingProductStepDelegates';
 
 export type ValidateErrorType = 'conflictError';
+
+export const billingData2billingDataRequest = (billingData: BillingData): BillingDataDto => ({
+  businessName: billingData.businessName,
+  digitalAddress: billingData.digitalAddress,
+  publicServices: billingData.publicServices,
+  recipientCode: billingData.recipientCode,
+  registeredOffice: billingData.registeredOffice,
+  taxCode: billingData.taxCode,
+  vatNumber: billingData.vatNumber,
+  zipCode: billingData.zipCode,
+});
+
+export const pspData2pspDataRequest = (billingData: BillingData): PspDataDto => ({
+  abiCode: billingData.abiCode ?? '',
+  commercialRegisterNumber: billingData.commercialRegisterNumber ?? '',
+  dpoData: {
+    address: billingData.dpoAddress ?? '',
+    pec: billingData.dpoPecAddress ?? '',
+    email: billingData.dopEmailAddress ?? '',
+  },
+  registerNumber: billingData.registerNumber ?? '',
+  registrationInRegister: billingData.registrationInRegister ?? '',
+  vatNumberGroup: billingData.vatNumberGroup ?? false,
+});
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
 function OnboardingComponent({ productId }: { productId: string }) {
@@ -130,12 +156,12 @@ function OnboardingComponent({ productId }: { productId: string }) {
     setOrigin(party.origin);
     setBillingData({
       businessName: party.description,
-      registeredOffice: party.address,
-      zipCode: party.zipCode,
       digitalAddress: party.digitalAddress,
+      recipientCode: party.origin === 'IPA' ? party.originId : '',
+      registeredOffice: party.address,
       taxCode: party.taxCode,
       vatNumber: '',
-      recipientCode: party.origin === 'IPA' ? party.originId : '',
+      zipCode: party.zipCode,
     });
     forwardWithData(newFormData);
     trackEvent('ONBOARDING_PARTY_SELECTION', {
@@ -289,7 +315,8 @@ function OnboardingComponent({ productId }: { productId: string }) {
       {
         method: 'POST',
         data: {
-          billingData,
+          billingData: billingData2billingDataRequest(billingData as BillingData),
+          pspData: pspData2pspDataRequest(billingData as BillingData),
           institutionType,
           origin,
           users: users.map((u) => ({
@@ -362,6 +389,9 @@ function OnboardingComponent({ productId }: { productId: string }) {
     });
     setInstitutionType(newInstitutionType);
     forward();
+    if (newInstitutionType === 'PSP') {
+      setActiveStep(3);
+    }
   };
 
   const steps: Array<StepperStep> = [
@@ -445,6 +475,8 @@ function OnboardingComponent({ productId }: { productId: string }) {
             } else if (fromDashboard && productAvoidStep) {
               setOnExitAction(() => () => history.goBack());
               setOpenExitModal(true);
+            } else if (institutionType === 'PSP') {
+              setActiveStep(0);
             } else {
               setActiveStep(1);
             }
