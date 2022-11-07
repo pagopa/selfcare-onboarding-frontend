@@ -1,13 +1,30 @@
+/* eslint-disable sonarjs/cognitive-complexity */
 /* eslint-disable complexity */
+import { AxiosError } from 'axios';
+
 import { Box, styled } from '@mui/system';
-import { Grid, TextField, Typography, useTheme, Paper } from '@mui/material';
+import { Grid, TextField, Typography, useTheme, Paper, Button } from '@mui/material';
 import { useFormik } from 'formik';
-import { useTranslation } from 'react-i18next';
+import { useTranslation, Trans } from 'react-i18next';
 import Checkbox from '@mui/material/Checkbox';
-import { useEffect } from 'react';
-import { BillingData, InstitutionType, StepperStepComponentProps } from '../../../types';
+import { useContext, useEffect, useState } from 'react';
+import { IllusError } from '@pagopa/mui-italia';
+import {
+  BillingData,
+  InstitutionType,
+  Party,
+  Product,
+  RequestOutcomeMessage,
+  StepperStepComponentProps,
+} from '../../../types';
 import { OnboardingStepActions } from '../OnboardingStepActions';
 import { useHistoryState } from '../useHistoryState';
+import { UserContext } from '../../lib/context';
+import { fetchWithLogs } from '../../lib/api-utils';
+import { getFetchOutcome } from '../../lib/error-utils';
+import { genericError } from '../../views/onboarding/components/OnboardingStep1_5';
+import { ENV } from '../../utils/env';
+import { MessageNoAction } from '../MessageNoAction';
 
 const CustomTextField = styled(TextField)({
   '.MuiInputLabel-asterisk': {
@@ -45,6 +62,10 @@ type Props = StepperStepComponentProps & {
   subtitle: string;
   externalInstitutionId: string;
   origin: string;
+  setExternalInstitutionId: React.Dispatch<React.SetStateAction<string>>;
+  productId?: string;
+  selectedParty?: Party;
+  selectedProduct?: Product | null;
 };
 
 export default function StepBillingData({
@@ -55,11 +76,17 @@ export default function StepBillingData({
   institutionType,
   externalInstitutionId,
   origin,
+  setExternalInstitutionId,
+  productId,
+  selectedParty,
+  selectedProduct,
 }: Props) {
   const requiredError = 'Required';
   const ipa = origin === 'IPA';
   const disabledField = ipa || institutionType !== 'PSP';
   const isPSP = institutionType === 'PSP';
+  const { setRequiredLogin } = useContext(UserContext);
+  const [outcome, setOutcome] = useState<RequestOutcomeMessage | null>();
 
   const { t } = useTranslation();
   const theme = useTheme();
@@ -70,6 +97,104 @@ export default function StepBillingData({
       isTaxCodeEquals2PIVA:
         !!initialFormData.vatNumber && initialFormData.taxCode === initialFormData.vatNumber,
     });
+
+  const verifyOnboarding = async () => {
+    const notAllowedError: RequestOutcomeMessage = {
+      title: '',
+      description: [
+        <>
+          <IllusError size={60} />
+          <Grid container direction="column" key="0" mt={3}>
+            <Grid container item justifyContent="center">
+              <Grid item xs={6}>
+                <Typography variant="h4">
+                  <Trans i18nKey="onboardingStep1_5.userNotAllowedError.title" />
+                </Typography>
+              </Grid>
+            </Grid>
+            <Grid container item justifyContent="center" mb={2} mt={1}>
+              <Grid item xs={6}>
+                <Typography>
+                  <Trans i18nKey="onboardingStep1_5.userNotAllowedError.description">
+                    Al momento, l’ente
+                    {{ partyName: selectedParty?.description }}
+                    non ha il permesso di aderire a{{ productName: selectedProduct?.title }}
+                  </Trans>
+                </Typography>
+              </Grid>
+            </Grid>
+            <Grid container item justifyContent="center" mt={2}>
+              <Grid item xs={4}>
+                <Button
+                  variant="contained"
+                  sx={{ alignSelf: 'center' }}
+                  onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+                >
+                  <Trans i18nKey="onboardingStep1_5.genericError.backAction" />
+                </Button>
+              </Grid>
+            </Grid>
+          </Grid>
+        </>,
+      ],
+    };
+    const alreadyOnboarded: RequestOutcomeMessage = {
+      title: '',
+      description: [
+        <Grid container direction="column" key="0">
+          <Grid container item justifyContent="center" mt={5}>
+            <Grid item xs={6}>
+              <Typography variant="h4">
+                <Trans i18nKey="onboardingStep1_5.alreadyOnboarded.title" />
+              </Typography>
+            </Grid>
+          </Grid>
+          <Grid container item justifyContent="center" mb={3} mt={1}>
+            <Grid item xs={6}>
+              <Typography>
+                <Trans i18nKey="onboardingStep1_5.alreadyOnboarded.description" />
+              </Typography>
+            </Grid>
+          </Grid>
+          <Grid container item justifyContent="center">
+            <Grid item xs={4}>
+              <Button
+                variant="contained"
+                sx={{ alignSelf: 'center' }}
+                onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+              >
+                <Trans i18nKey="onboardingStep1_5.alreadyOnboarded.backAction" />
+              </Button>
+            </Grid>
+          </Grid>
+        </Grid>,
+      ],
+    };
+
+    const onboardingStatus = await fetchWithLogs(
+      { endpoint: 'VERIFY_ONBOARDING', endpointParams: { externalInstitutionId, productId } },
+      { method: 'HEAD' },
+      () => setRequiredLogin(true)
+    );
+
+    // Check the outcome
+    const restOutcome = getFetchOutcome(onboardingStatus);
+    if (restOutcome === 'success') {
+      setOutcome(alreadyOnboarded);
+    } else {
+      if (
+        (onboardingStatus as AxiosError<any>).response?.status === 404 ||
+        (onboardingStatus as AxiosError<any>).response?.status === 400
+      ) {
+        setOutcome(null);
+        onForwardAction();
+      } else if ((onboardingStatus as AxiosError<any>).response?.status === 403) {
+        setOutcome(notAllowedError);
+      } else {
+        setOutcome(genericError);
+      }
+    }
+  };
 
   useEffect(() => {
     if (externalInstitutionId !== stepHistoryState.externalInstitutionId) {
@@ -88,7 +213,14 @@ export default function StepBillingData({
   const saveHistoryState = () => {
     setStepHistoryStateHistory(stepHistoryState);
   };
-
+  const validateForward = () => {
+    if (isPSP) {
+      setExternalInstitutionId(formik.values.taxCode);
+      void verifyOnboarding();
+    } else {
+      onForwardAction();
+    }
+  };
   const onForwardAction = () => {
     saveHistoryState();
     forward({
@@ -276,7 +408,9 @@ export default function StepBillingData({
       },
     };
   };
-  return (
+  return outcome ? (
+    <MessageNoAction {...outcome} />
+  ) : (
     <Box display="flex" justifyContent="center">
       <Grid container item xs={8}>
         <Grid item xs={12}>
@@ -452,6 +586,7 @@ export default function StepBillingData({
                     400,
                     18
                   )}
+                  // value={''}
                 />
                 <Typography
                   sx={{
@@ -519,7 +654,7 @@ export default function StepBillingData({
           <OnboardingStepActions
             back={{ action: onBackAction, label: t('stepBillingData.backLabel'), disabled: false }}
             forward={{
-              action: onForwardAction,
+              action: validateForward,
               label: t('stepBillingData.confirmLabel'),
               disabled: !formik.isValid,
             }}
