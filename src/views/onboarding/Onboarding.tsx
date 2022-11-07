@@ -455,6 +455,10 @@ function OnboardingComponent({ productId }: { productId: string }) {
       label: 'Insert Billing Data',
       Component: () =>
         StepBillingData({
+          productId,
+          selectedParty,
+          selectedProduct,
+          setExternalInstitutionId,
           externalInstitutionId,
           initialFormData: billingData ?? {
             businessName: '',
