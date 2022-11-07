@@ -1,13 +1,25 @@
+/* eslint-disable sonarjs/cognitive-complexity */
 /* eslint-disable complexity */
+
 import { Box, styled } from '@mui/system';
 import { Grid, TextField, Typography, useTheme, Paper } from '@mui/material';
 import { useFormik } from 'formik';
 import { useTranslation } from 'react-i18next';
 import Checkbox from '@mui/material/Checkbox';
-import { useEffect } from 'react';
-import { BillingData, InstitutionType, StepperStepComponentProps } from '../../../types';
+import { useContext, useEffect, useState } from 'react';
+import {
+  BillingData,
+  InstitutionType,
+  Party,
+  Product,
+  RequestOutcomeMessage,
+  StepperStepComponentProps,
+} from '../../../types';
 import { OnboardingStepActions } from '../OnboardingStepActions';
 import { useHistoryState } from '../useHistoryState';
+import { UserContext } from '../../lib/context';
+import { MessageNoAction } from '../MessageNoAction';
+import { verifyOnboarding } from '../verifyOnboarding';
 
 const CustomTextField = styled(TextField)({
   '.MuiInputLabel-asterisk': {
@@ -45,6 +57,10 @@ type Props = StepperStepComponentProps & {
   subtitle: string;
   externalInstitutionId: string;
   origin: string;
+  setExternalInstitutionId: React.Dispatch<React.SetStateAction<string>>;
+  productId?: string;
+  selectedParty?: Party;
+  selectedProduct?: Product | null;
 };
 
 export default function StepBillingData({
@@ -55,11 +71,17 @@ export default function StepBillingData({
   institutionType,
   externalInstitutionId,
   origin,
+  setExternalInstitutionId,
+  productId,
+  selectedParty,
+  selectedProduct,
 }: Props) {
   const requiredError = 'Required';
   const ipa = origin === 'IPA';
   const disabledField = ipa || institutionType !== 'PSP';
   const isPSP = institutionType === 'PSP';
+  const { setRequiredLogin } = useContext(UserContext);
+  const [outcome, setOutcome] = useState<RequestOutcomeMessage | null>();
 
   const { t } = useTranslation();
   const theme = useTheme();
@@ -88,7 +110,22 @@ export default function StepBillingData({
   const saveHistoryState = () => {
     setStepHistoryStateHistory(stepHistoryState);
   };
-
+  const validateForward = () => {
+    if (isPSP) {
+      setExternalInstitutionId(formik.values.taxCode);
+      void verifyOnboarding({
+        selectedParty,
+        selectedProduct,
+        externalInstitutionId,
+        productId,
+        setOutcome,
+        onForwardAction,
+        setRequiredLogin,
+      });
+    } else {
+      onForwardAction();
+    }
+  };
   const onForwardAction = () => {
     saveHistoryState();
     forward({
@@ -276,7 +313,9 @@ export default function StepBillingData({
       },
     };
   };
-  return (
+  return outcome ? (
+    <MessageNoAction {...outcome} />
+  ) : (
     <Box display="flex" justifyContent="center">
       <Grid container item xs={8}>
         <Grid item xs={12}>
@@ -452,6 +491,7 @@ export default function StepBillingData({
                     400,
                     18
                   )}
+                  // value={''}
                 />
                 <Typography
                   sx={{
@@ -519,7 +559,7 @@ export default function StepBillingData({
           <OnboardingStepActions
             back={{ action: onBackAction, label: t('stepBillingData.backLabel'), disabled: false }}
             forward={{
-              action: onForwardAction,
+              action: validateForward,
               label: t('stepBillingData.confirmLabel'),
               disabled: !formik.isValid,
             }}

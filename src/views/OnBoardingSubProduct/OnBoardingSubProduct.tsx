@@ -247,6 +247,9 @@ function OnBoardingSubProduct() {
       label: 'Insert Billing Data',
       Component: () =>
         StepBillingData({
+          productId,
+          selectedProduct: subProduct,
+          setExternalInstitutionId,
           externalInstitutionId,
           initialFormData: billingData ?? {
             businessName: '',
