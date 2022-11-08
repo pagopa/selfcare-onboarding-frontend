@@ -73,8 +73,8 @@ export default function StepBillingData({
 }: Props) {
   const requiredError = 'Required';
   const ipa = origin === 'IPA';
-  const isDisabled = ipa && institutionType !== 'PSP';
   const isPSP = institutionType === 'PSP';
+  const isDisabled = ipa && !isPSP;
 
   const { t } = useTranslation();
   const theme = useTheme();
