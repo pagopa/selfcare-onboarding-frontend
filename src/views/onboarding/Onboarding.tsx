@@ -34,7 +34,7 @@ import StepOnboardingData from '../../components/steps/StepOnboardingData';
 import StepBillingData from '../../components/steps/StepBillingData';
 import { registerUnloadEvent, unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
 import StepInstitutionType from '../../components/steps/StepInstitutionType';
-import { OnboardingStep1_5 } from './components/OnboardingStep1_5';
+import { genericError, OnboardingStep1_5 } from './components/OnboardingStep1_5';
 import { OnBoardingProductStepDelegates } from './components/OnBoardingProductStepDelegates';
 
 export type ValidateErrorType = 'conflictError';
@@ -63,13 +63,46 @@ export const pspData2pspDataRequest = (billingData: BillingData): PspDataDto => 
   vatNumberGroup: billingData.vatNumberGroup ?? false,
 });
 
+const alreadyOnboarded: RequestOutcomeMessage = {
+  title: '',
+  description: [
+    <Grid container direction="column" key="0">
+      <Grid container item justifyContent="center" mt={5}>
+        <Grid item xs={6}>
+          <Typography variant="h4">
+            <Trans i18nKey="onboardingStep1_5.alreadyOnboarded.title" />
+          </Typography>
+        </Grid>
+      </Grid>
+      <Grid container item justifyContent="center" mb={3} mt={1}>
+        <Grid item xs={6}>
+          <Typography>
+            <Trans i18nKey="onboardingStep1_5.alreadyOnboarded.description" />
+          </Typography>
+        </Grid>
+      </Grid>
+      <Grid container item justifyContent="center">
+        <Grid item xs={4}>
+          <Button
+            variant="contained"
+            sx={{ alignSelf: 'center' }}
+            onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+          >
+            <Trans i18nKey="onboardingStep1_5.alreadyOnboarded.backAction" />
+          </Button>
+        </Grid>
+      </Grid>
+    </Grid>,
+  ],
+};
+
 // eslint-disable-next-line sonarjs/cognitive-complexity
 function OnboardingComponent({ productId }: { productId: string }) {
   const [loading, setLoading] = useState(true);
   const [activeStep, setActiveStep] = useState(0);
   const [formData, setFormData] = useState<Partial<FormData>>();
   const [externalInstitutionId, setExternalInstitutionId] = useState<string>('');
-  const [outcome, setOutcome] = useState<RequestOutcomeMessage>();
+  const [outcome, setOutcome] = useState<RequestOutcomeMessage | null>();
   const history = useHistory();
   const [openExitModal, setOpenExitModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>();
@@ -179,7 +212,43 @@ function OnboardingComponent({ productId }: { productId: string }) {
       party_id: externalInstitutionId,
       product_id: productId,
     });
+
     setBillingData(newBillingData);
+    if (institutionType === 'PSP') {
+      // TODO: fix when party registry proxy will return externalInstitutionId
+      setExternalInstitutionId(newBillingData.taxCode);
+
+      const partyVerifyOnboarded = async () => {
+        const onboardingStatus = await fetchWithLogs(
+          {
+            endpoint: 'VERIFY_ONBOARDING',
+            endpointParams: { externalInstitutionId: newBillingData.taxCode, productId },
+          },
+          { method: 'HEAD' },
+          () => setRequiredLogin(true)
+        );
+        const restOutcome = getFetchOutcome(onboardingStatus);
+        // party is already onboarded
+        if (restOutcome === 'success') {
+          setOutcome(alreadyOnboarded);
+        } else {
+          // party is NOT already onboarded
+          if (
+            (onboardingStatus as AxiosError<any>).response?.status === 404 ||
+            (onboardingStatus as AxiosError<any>).response?.status === 400
+          ) {
+            setOutcome(null);
+            forward();
+          } else if ((onboardingStatus as AxiosError<any>).response?.status === 403) {
+            setOutcome(notAllowedError);
+          } else {
+            setOutcome(genericError);
+          }
+        }
+      };
+
+      void partyVerifyOnboarded();
+    }
     forward();
   };
 
@@ -455,10 +524,10 @@ function OnboardingComponent({ productId }: { productId: string }) {
       label: 'Insert Billing Data',
       Component: () =>
         StepBillingData({
+          outcome,
           productId,
           selectedParty,
           selectedProduct,
-          setExternalInstitutionId,
           externalInstitutionId,
           initialFormData: billingData ?? {
             businessName: '',
