@@ -112,6 +112,7 @@ export default function StepBillingData({
   };
   const validateForward = () => {
     if (isPSP) {
+      // TODO: fix when party registry proxy will return externalInstitutionId
       setExternalInstitutionId(formik.values.taxCode);
       void verifyOnboarding({
         selectedParty,
