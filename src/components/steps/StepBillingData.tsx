@@ -73,7 +73,7 @@ export default function StepBillingData({
 }: Props) {
   const requiredError = 'Required';
   const ipa = origin === 'IPA';
-  const disabledField = ipa || institutionType !== 'PSP';
+  const isDisabled = ipa && institutionType !== 'PSP';
   const isPSP = institutionType === 'PSP';
 
   const { t } = useTranslation();
@@ -321,7 +321,7 @@ export default function StepBillingData({
                     400,
                     18
                   )}
-                  disabled={disabledField}
+                  disabled={isDisabled}
                 />
               </Grid>
               <Grid item xs={8}>
@@ -332,14 +332,14 @@ export default function StepBillingData({
                     400,
                     18
                   )}
-                  disabled={disabledField}
+                  disabled={isDisabled}
                 />
               </Grid>
               <Grid item xs={4} paddingLeft={1}>
                 <CustomNumberField
                   inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
                   {...baseNumericFieldProps('zipCode', t('stepBillingData.zipCode'), 400, 18)}
-                  disabled={disabledField}
+                  disabled={isDisabled}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -350,13 +350,13 @@ export default function StepBillingData({
                     400,
                     18
                   )}
-                  disabled={disabledField}
+                  disabled={isDisabled}
                 />
               </Grid>
               <Grid item xs={12}>
                 <CustomTextField
                   {...baseTextFieldProps('taxCode', t('stepBillingData.taxCode'), 400, 18)}
-                  disabled={disabledField}
+                  disabled={isDisabled}
                 />
               </Grid>
               <Grid item xs={12}>
