@@ -249,7 +249,6 @@ function OnBoardingSubProduct() {
         StepBillingData({
           productId,
           selectedProduct: subProduct,
-          setExternalInstitutionId,
           externalInstitutionId,
           initialFormData: billingData ?? {
             businessName: '',
