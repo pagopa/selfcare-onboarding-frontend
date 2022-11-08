@@ -529,15 +529,18 @@ function OnboardingComponent({ productId }: { productId: string }) {
           selectedParty,
           selectedProduct,
           externalInstitutionId,
-          initialFormData: billingData ?? {
-            businessName: '',
-            registeredOffice: '',
-            zipCode: '',
-            digitalAddress: '',
-            taxCode: '',
-            vatNumber: '',
-            recipientCode: '',
-          },
+          initialFormData:
+            billingData && institutionType !== 'PSP'
+              ? billingData
+              : {
+                  businessName: '',
+                  registeredOffice: '',
+                  zipCode: '',
+                  digitalAddress: '',
+                  taxCode: '',
+                  vatNumber: '',
+                  recipientCode: '',
+                },
           origin,
           institutionType: institutionType as InstitutionType,
           subtitle: t('onBoardingSubProduct.billingData.subTitle'),
