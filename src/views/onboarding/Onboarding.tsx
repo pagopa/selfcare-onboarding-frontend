@@ -459,7 +459,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
     setInstitutionType(newInstitutionType);
     forward();
     if (newInstitutionType === 'PSP') {
-      setActiveStep(3);
+      setActiveStep(4);
     }
   };
 
