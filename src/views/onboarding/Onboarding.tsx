@@ -190,7 +190,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
     setBillingData({
       businessName: party.description,
       digitalAddress: party.digitalAddress,
-      recipientCode: party.origin === 'IPA' ? party.originId : '',
+      recipientCode: '',
       registeredOffice: party.address,
       taxCode: party.taxCode,
       vatNumber: '',
