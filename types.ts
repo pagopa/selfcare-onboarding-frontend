@@ -208,13 +208,13 @@ export type PspDataDto = {
   // codice ABI
   abiCode: string;
   // n. iscrizione al Registro delle Imprese
-  commercialRegisterNumber: string;
+  businessRegisterNumber: string;
   // dati del Responsabile protezione dati (DPO)
   dpoData: DpoData;
   // numero iscrizione albo
-  registerNumber: string;
+  legalRegisterNumber: string;
   // iscrizione all'Albo
-  registrationInRegister: string;
+  legalRegisterName: string;
   // La partita IVA è di gruppo
   vatNumberGroup: boolean;
 };
