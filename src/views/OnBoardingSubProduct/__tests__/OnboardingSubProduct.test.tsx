@@ -473,18 +473,6 @@ const billingData2billingDataRequest = () => ({
   publicServices: false,
 });
 
-const pspData2pspDataRequest = () => ({
-  abiCode: '',
-  commercialRegisterNumber: '',
-  dpoData: {
-    address: '',
-    pec: '',
-    email: '',
-  },
-  registerNumber: '',
-  registrationInRegister: '',
-  vatNumberGroup: false,
-});
 const verifySubmit = async () => {
   await waitFor(() =>
     expect(fetchWithLogsSpy).lastCalledWith(
@@ -505,7 +493,7 @@ const verifySubmit = async () => {
             },
           ],
           billingData: billingData2billingDataRequest(),
-          pspData: pspData2pspDataRequest(),
+          pspData: undefined,
           institutionType: 'GSP',
           pricingPlan: 'pricingPlan',
           origin: 'IPA',

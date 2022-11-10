@@ -385,7 +385,10 @@ function OnboardingComponent({ productId }: { productId: string }) {
         method: 'POST',
         data: {
           billingData: billingData2billingDataRequest(billingData as BillingData),
-          pspData: pspData2pspDataRequest(billingData as BillingData),
+          pspData:
+            institutionType === 'PSP'
+              ? pspData2pspDataRequest(billingData as BillingData)
+              : undefined,
           institutionType,
           origin,
           users: users.map((u) => ({

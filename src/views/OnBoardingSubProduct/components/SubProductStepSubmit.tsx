@@ -138,7 +138,10 @@ function SubProductStepSubmit({
             email: u.email.toLowerCase(),
           })),
           billingData: billingData2billingDataRequest(billingData as BillingData),
-          pspData: pspData2pspDataRequest(billingData as BillingData),
+          pspData:
+            institutionType === 'PSP'
+              ? pspData2pspDataRequest(billingData as BillingData)
+              : undefined,
           institutionType,
           pricingPlan,
           origin,
