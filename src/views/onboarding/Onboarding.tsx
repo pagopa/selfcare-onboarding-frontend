@@ -52,14 +52,14 @@ export const billingData2billingDataRequest = (billingData: BillingData): Billin
 
 export const pspData2pspDataRequest = (billingData: BillingData): PspDataDto => ({
   abiCode: billingData.abiCode ?? '',
-  commercialRegisterNumber: billingData.commercialRegisterNumber ?? '',
+  businessRegisterNumber: billingData.commercialRegisterNumber ?? '',
   dpoData: {
     address: billingData.dpoAddress ?? '',
     pec: billingData.dpoPecAddress ?? '',
     email: billingData.dopEmailAddress ?? '',
   },
-  registerNumber: billingData.registerNumber ?? '',
-  registrationInRegister: billingData.registrationInRegister ?? '',
+  legalRegisterName: billingData.registerNumber ?? '',
+  legalRegisterNumber: billingData.registrationInRegister ?? '',
   vatNumberGroup: billingData.vatNumberGroup ?? false,
 });
 
