@@ -58,8 +58,8 @@ export const pspData2pspDataRequest = (billingData: BillingData): PspDataDto => 
     pec: billingData.dpoPecAddress ?? '',
     email: billingData.dopEmailAddress ?? '',
   },
-  legalRegisterName: billingData.registerNumber ?? '',
-  legalRegisterNumber: billingData.registrationInRegister ?? '',
+  legalRegisterNumber: billingData.registerNumber ?? '',
+  legalRegisterName: billingData.registrationInRegister ?? '',
   vatNumberGroup: billingData.vatNumberGroup ?? false,
 });
 
