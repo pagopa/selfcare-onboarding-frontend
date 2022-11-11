@@ -462,6 +462,19 @@ function OnboardingComponent({ productId }: { productId: string }) {
     setInstitutionType(newInstitutionType);
     forward();
     if (newInstitutionType === 'PSP') {
+      if (newInstitutionType !== institutionType) {
+        setBillingData({
+          businessName: '',
+          registeredOffice: '',
+          zipCode: '',
+          digitalAddress: '',
+          taxCode: '',
+          vatNumber: '',
+          recipientCode: '',
+        });
+      } else {
+        setBillingData(billingData);
+      }
       setActiveStep(4);
     }
   };
@@ -532,18 +545,15 @@ function OnboardingComponent({ productId }: { productId: string }) {
           selectedParty,
           selectedProduct,
           externalInstitutionId,
-          initialFormData:
-            billingData && institutionType !== 'PSP'
-              ? billingData
-              : {
-                  businessName: '',
-                  registeredOffice: '',
-                  zipCode: '',
-                  digitalAddress: '',
-                  taxCode: '',
-                  vatNumber: '',
-                  recipientCode: '',
-                },
+          initialFormData: billingData ?? {
+            businessName: '',
+            registeredOffice: '',
+            zipCode: '',
+            digitalAddress: '',
+            taxCode: '',
+            vatNumber: '',
+            recipientCode: '',
+          },
           origin,
           institutionType: institutionType as InstitutionType,
           subtitle: t('onBoardingSubProduct.billingData.subTitle'),

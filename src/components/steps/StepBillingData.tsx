@@ -79,7 +79,7 @@ export default function StepBillingData({
   const { t } = useTranslation();
   const theme = useTheme();
 
-  const [stepHistoryState, setStepHistoryState, setStepHistoryStateHistory] =
+  const [stepHistoryState, setStepHistoryState, _setStepHistoryStateHistory] =
     useHistoryState<StepBillingDataHistoryState>('stepBillingData', {
       externalInstitutionId,
       isTaxCodeEquals2PIVA:
@@ -101,7 +101,7 @@ export default function StepBillingData({
   }, [stepHistoryState.isTaxCodeEquals2PIVA]);
 
   const saveHistoryState = () => {
-    setStepHistoryStateHistory(stepHistoryState);
+    setStepHistoryState(stepHistoryState);
   };
 
   const onForwardAction = () => {
@@ -469,7 +469,6 @@ export default function StepBillingData({
                     400,
                     18
                   )}
-                  // value={''}
                 />
                 <Typography
                   sx={{
