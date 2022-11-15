@@ -108,7 +108,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>();
   const [billingData, setBillingData] = useState<BillingData>();
   const [institutionType, setInstitutionType] = useState<InstitutionType>();
-  const [origin, setOrigin] = useState<string>('');
+  const [origin, setOrigin] = useState<string>();
   const [pricingPlan, setPricingPlan] = useState<string>();
   const { setOnExit } = useContext(HeaderContext);
   const { setRequiredLogin } = useContext(UserContext);
@@ -476,6 +476,9 @@ function OnboardingComponent({ productId }: { productId: string }) {
         setBillingData(billingData);
       }
       setActiveStep(4);
+    }
+    if (institutionType === 'PSP') {
+      setOrigin(undefined);
     }
   };
 
