@@ -54,7 +54,7 @@ type Props = StepperStepComponentProps & {
   institutionType: InstitutionType;
   subtitle: string;
   externalInstitutionId: string;
-  origin: string;
+  origin?: string;
   productId?: string;
   selectedParty?: Party;
   selectedProduct?: Product | null;
