@@ -143,6 +143,12 @@ function OnboardingComponent({ productId }: { productId: string }) {
     setPricingPlan(new URLSearchParams(window.location.search).get('pricingPlan') ?? undefined);
   }, [productId]);
 
+  useEffect(() => {
+    if (institutionType && institutionType === 'PSP') {
+      setOrigin(undefined);
+    }
+  }, [institutionType]);
+
   // avoid step 1 if selectedProduct is 'prod-pn' or 'prod-idpay'
   useEffect(() => {
     if (productAvoidStep) {
@@ -476,9 +482,6 @@ function OnboardingComponent({ productId }: { productId: string }) {
         setBillingData(billingData);
       }
       setActiveStep(4);
-    }
-    if (institutionType === 'PSP') {
-      setOrigin(undefined);
     }
   };
 
