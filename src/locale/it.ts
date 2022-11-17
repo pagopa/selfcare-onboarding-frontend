@@ -271,7 +271,7 @@ export default {
       loadingText: 'Stiamo verificando i tuoi dati',
     },
     notFoundResults: 'No risultati',
-    serachLabel:'Cerca ente'
+    searchLabel:'Cerca ente'
   },
   stepInstitutionType: {
     title: 'Seleziona il tipo di ente che <1/> rappresenti',
