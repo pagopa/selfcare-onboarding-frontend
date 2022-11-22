@@ -276,16 +276,17 @@ function OnboardingComponent({ productId }: { productId: string }) {
             <Typography variant="body1">
               {institutionType !== 'PSP' ? (
                 <Trans i18nKey="onboarding.outcomeContent.success.baseDescription">
-                  Invieremo un&apos;email all&apos;indirizzo PEC primario dell&apos;ente.
+                  Invieremo un&apos;email all&apos;indirizzo PEC indicato.
                   <br />
                   Al suo interno, ci sono le istruzioni per completare <br />
                   l&apos;adesione.
                 </Trans>
               ) : (
                 <Trans i18nKey="onboarding.outcomeContent.success.pspDescription">
-                  Procederemo al controllo dei dati inseriti e invieremo una
+                  Invieremo un&apos;email all&apos;indirizzo PEC primario dell&apos;ente.
                   <br />
-                  mail di cortesia e una PEC con l&apos;esito di tale verifica.
+                  Al suo interno, ci sono le istruzioni per completare <br />
+                  l&apos;adesione.
                 </Trans>
               )}
             </Typography>
