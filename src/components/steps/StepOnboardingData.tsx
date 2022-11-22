@@ -1,8 +1,6 @@
-import { Button, Grid, Typography } from '@mui/material';
 import { AxiosError, AxiosResponse } from 'axios';
 import { useContext, useEffect, useState } from 'react';
 import { useTranslation, Trans } from 'react-i18next';
-import { IllusError } from '@pagopa/mui-italia';
 import {
   InstitutionOnboardingInfoResource,
   InstitutionType,
@@ -11,11 +9,11 @@ import {
 } from '../../../types';
 import { MessageNoAction } from '../MessageNoAction';
 import { HeaderContext, UserContext } from '../../lib/context';
-import { ENV } from '../../utils/env';
 import { LoadingOverlay } from '../LoadingOverlay';
 import { fetchWithLogs } from '../../lib/api-utils';
 import { getFetchOutcome } from '../../lib/error-utils';
 import { unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
+import ErrorPage from '../errorPage/ErrorPage';
 
 type Props = StepperStepComponentProps & {
   externalInstitutionId: string;
@@ -27,38 +25,18 @@ const genericError: RequestOutcomeMessage = {
   title: '',
   description: [
     <>
-      <IllusError size={60} />
-      <Grid container direction="column" key="0" mt={3}>
-        <Grid container item justifyContent="center">
-          <Grid item xs={6}>
-            <Typography variant="h4">
-              <Trans i18nKey="onboardingStep1_5.genericError.title" />
-            </Typography>
-          </Grid>
-        </Grid>
-        <Grid container item justifyContent="center" mb={3} mt={1}>
-          <Grid item xs={6}>
-            <Typography>
-              <Trans i18nKey="onboardingStep1_5.genericError.description">
-                A causa di un errore del sistema non è possibile completare la procedura.
-                <br />
-                Ti chiediamo di riprovare più tardi.
-              </Trans>
-            </Typography>
-          </Grid>
-        </Grid>
-        <Grid container item justifyContent="center">
-          <Grid item xs={4}>
-            <Button
-              variant="contained"
-              sx={{ alignSelf: 'center' }}
-              onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
-            >
-              <Trans i18nKey="onboardingStep1_5.genericError.backAction" />
-            </Button>
-          </Grid>
-        </Grid>
-      </Grid>
+      <ErrorPage
+        titleContent={<Trans i18nKey="onboardingStep1_5.genericError.title" />}
+        descriptionContent={
+          <Trans i18nKey="onboardingStep1_5.genericError.description">
+            A causa di un errore del sistema non è possibile completare la procedura.
+            <br />
+            Ti chiediamo di riprovare più tardi.
+          </Trans>
+        }
+        backButtonContent={<Trans i18nKey="onboardingStep1_5.genericError.backAction" />}
+      />
+      ,
     </>,
   ],
 };

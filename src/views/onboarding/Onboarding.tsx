@@ -34,6 +34,7 @@ import StepOnboardingData from '../../components/steps/StepOnboardingData';
 import StepBillingData from '../../components/steps/StepBillingData';
 import { registerUnloadEvent, unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
 import StepInstitutionType from '../../components/steps/StepInstitutionType';
+import ErrorPage from '../../components/errorPage/ErrorPage';
 import { genericError, OnboardingStep1_5 } from './components/OnboardingStep1_5';
 import { OnBoardingProductStepDelegates } from './components/OnBoardingProductStepDelegates';
 
@@ -66,31 +67,33 @@ export const pspData2pspDataRequest = (billingData: BillingData): PspDataDto => 
 const alreadyOnboarded: RequestOutcomeMessage = {
   title: '',
   description: [
-    <Grid container direction="column" key="0">
-      <Grid container item justifyContent="center" mt={5}>
-        <Grid item xs={6}>
-          <Typography variant="h4">
-            <Trans i18nKey="onboardingStep1_5.alreadyOnboarded.title" />
-          </Typography>
-        </Grid>
+    <Grid
+      container
+      item
+      direction="column"
+      justifyContent="center"
+      alignItems="center"
+      key="0"
+      mt={5}
+    >
+      <Grid item xs={6}>
+        <Typography variant="h4">
+          <Trans i18nKey="onboardingStep1_5.alreadyOnboarded.title" />
+        </Typography>
       </Grid>
-      <Grid container item justifyContent="center" mb={3} mt={1}>
-        <Grid item xs={6}>
-          <Typography>
-            <Trans i18nKey="onboardingStep1_5.alreadyOnboarded.description" />
-          </Typography>
-        </Grid>
+      <Grid item mb={3} mt={1} xs={6}>
+        <Typography>
+          <Trans i18nKey="onboardingStep1_5.alreadyOnboarded.description" />
+        </Typography>
       </Grid>
-      <Grid container item justifyContent="center">
-        <Grid item xs={4}>
-          <Button
-            variant="contained"
-            sx={{ alignSelf: 'center' }}
-            onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
-          >
-            <Trans i18nKey="onboardingStep1_5.alreadyOnboarded.backAction" />
-          </Button>
-        </Grid>
+      <Grid item xs={4}>
+        <Button
+          variant="contained"
+          sx={{ alignSelf: 'center' }}
+          onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+        >
+          <Trans i18nKey="onboardingStep1_5.alreadyOnboarded.backAction" />
+        </Button>
       </Grid>
     </Grid>,
   ],
@@ -108,7 +111,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>();
   const [billingData, setBillingData] = useState<BillingData>();
   const [institutionType, setInstitutionType] = useState<InstitutionType>();
-  const [origin, setOrigin] = useState<string>();
+  const [origin, setOrigin] = useState<string>('');
   const [pricingPlan, setPricingPlan] = useState<string>();
   const { setOnExit } = useContext(HeaderContext);
   const { setRequiredLogin } = useContext(UserContext);
@@ -142,12 +145,6 @@ function OnboardingComponent({ productId }: { productId: string }) {
     });
     setPricingPlan(new URLSearchParams(window.location.search).get('pricingPlan') ?? undefined);
   }, [productId]);
-
-  useEffect(() => {
-    if (institutionType && institutionType === 'PSP') {
-      setOrigin(undefined);
-    }
-  }, [institutionType]);
 
   // avoid step 1 if selectedProduct is 'prod-pn' or 'prod-idpay'
   useEffect(() => {
@@ -307,37 +304,17 @@ function OnboardingComponent({ productId }: { productId: string }) {
       title: '',
       description: [
         <>
-          <IllusError size={60} />
-          <Grid container direction="column" key="0" mt={3}>
-            <Grid container item justifyContent="center">
-              <Grid item xs={5}>
-                <Typography variant="h4">{t('onboarding.outcomeContent.error.title')}</Typography>
-              </Grid>
-            </Grid>
-            <Grid container item justifyContent="center" mb={3} mt={1}>
-              <Grid item xs={5}>
-                <Typography variant="body1">
-                  <Trans i18nKey="onboarding.outcomeContent.error.description">
-                    A causa di un errore del sistema non è possibile completare la procedura.
-                    <br />
-                    Ti chiediamo di riprovare più tardi.
-                  </Trans>
-                </Typography>
-              </Grid>
-            </Grid>
-            <Grid container item justifyContent="center">
-              <Grid item xs={4}>
-                <Button
-                  onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
-                  variant={'contained'}
-                >
-                  <Typography width="100%" sx={{ color: theme.palette.primary.contrastText }}>
-                    {t('onboarding.outcomeContent.error.backActionLabel')}
-                  </Typography>
-                </Button>
-              </Grid>
-            </Grid>
-          </Grid>
+          <ErrorPage
+            titleContent={t('onboarding.outcomeContent.error.title')}
+            descriptionContent={
+              <Trans i18nKey="onboarding.outcomeContent.error.description">
+                A causa di un errore del sistema non è possibile completare la procedura.
+                <br />
+                Ti chiediamo di riprovare più tardi.
+              </Trans>
+            }
+            backButtonContent={t('onboarding.outcomeContent.error.backActionLabel')}
+          />
         </>,
       ],
     },
@@ -639,6 +616,17 @@ function OnboardingComponent({ productId }: { productId: string }) {
     <NoProductPage />
   ) : outcome ? (
     <MessageNoAction {...outcome} />
+  ) : pricingPlan && pricingPlan !== 'FA' ? (
+    <ErrorPage
+      titleContent={t('invalidPricingPlan.title')}
+      descriptionContent={
+        <Trans i18nKey="invalidPricingPlan.description">
+          Non riusciamo a trovare la pagina che stai cercando. <br />
+          Assicurati che l’indirizzo sia corretto o torna alla home.
+        </Trans>
+      }
+      backButtonContent={t('invalidPricingPlan.backButton')}
+    />
   ) : (
     <Container>
       <Step />

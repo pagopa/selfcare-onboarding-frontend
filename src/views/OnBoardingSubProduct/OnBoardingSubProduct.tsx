@@ -25,6 +25,7 @@ import StepOnboardingData from '../../components/steps/StepOnboardingData';
 import StepBillingData from '../../components/steps/StepBillingData';
 import { registerUnloadEvent, unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
 import { useHistoryState } from '../../components/useHistoryState';
+import ErrorPage from '../../components/errorPage/ErrorPage';
 import SubProductStepVerifyInputs from './components/SubProductStepVerifyInputs';
 import SubProductStepSubmit from './components/SubProductStepSubmit';
 import SubProductStepSuccess from './components/SubProductStepSuccess';
@@ -36,6 +37,7 @@ type OnBoardingSubProductUrlParams = {
   subProductId: string;
 };
 
+// eslint-disable-next-line sonarjs/cognitive-complexity
 function OnBoardingSubProduct() {
   const { t } = useTranslation();
   const { subProductId, productId } = useParams<OnBoardingSubProductUrlParams>();
@@ -325,7 +327,18 @@ function OnBoardingSubProduct() {
     setOnExitAction(undefined);
   };
 
-  return (
+  return pricingPlan && pricingPlan !== 'C1' ? (
+    <ErrorPage
+      titleContent={t('invalidPricingPlan.title')}
+      descriptionContent={
+        <Trans i18nKey="invalidPricingPlan.description">
+          Non riusciamo a trovare la pagina che stai cercando. <br />
+          Assicurati che l’indirizzo sia corretto o torna alla home.
+        </Trans>
+      }
+      backButtonContent={t('invalidPricingPlan.backButton')}
+    />
+  ) : (
     <Container>
       <Step />
       <SessionModal

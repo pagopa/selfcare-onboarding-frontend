@@ -1,12 +1,11 @@
 import { useState, useContext, useEffect } from 'react';
-import { Button, Stack, Typography, Grid } from '@mui/material';
+import { Button, Stack, Typography } from '@mui/material';
 import { AxiosError } from 'axios';
 import SessionModal from '@pagopa/selfcare-common-frontend/components/SessionModal';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
 import { useTranslation, Trans } from 'react-i18next';
 import { uniqueId } from 'lodash';
-import { IllusCompleted, IllusError } from '@pagopa/mui-italia';
-import { buildAssistanceURI } from '@pagopa/selfcare-common-frontend/services/assistanceService';
+import { IllusCompleted } from '@pagopa/mui-italia';
 import { StepperStep, Problem, RequestOutcomeOptionsJwt, RequestOutcomeJwt } from '../../types';
 import { ConfirmRegistrationStep0 } from '../components/ConfirmRegistrationStep0';
 import { ConfirmRegistrationStep1 } from '../components/ConfirmRegistrationStep1';
@@ -18,6 +17,7 @@ import { ENV } from '../utils/env';
 import { MessageNoAction } from '../components/MessageNoAction';
 import { HeaderContext, UserContext } from '../lib/context';
 import { jwtNotValid } from '../services/tokenServices';
+import ErrorPage from '../components/errorPage/ErrorPage';
 import { getOnboardingMagicLinkJwt } from './RejectRegistration';
 import JwtInvalidPage from './JwtInvalidPage';
 import RejectContentSuccessPage from './RejectContentSuccessPage';
@@ -289,38 +289,17 @@ export default function CompleteRegistrationComponent() {
         <MessageNoAction {...outcomeContent[outcome]} />
       ) : outcome === 'error' ? (
         !token || showBlockingError ? (
-          <Grid container direction="column" key="0" style={{ textAlign: 'center' }}>
-            <Grid container item justifyContent="center" mb={2}>
-              <IllusError size={60} />
-            </Grid>
-            <Grid container item justifyContent="center" mt={3}>
-              <Grid item xs={6}>
-                <Typography variant="h4">{t('completeRegistration.title')}</Typography>
-              </Grid>
-            </Grid>
-            <Grid container item justifyContent="center" mb={4} mt={1}>
-              <Grid item xs={6}>
-                <Typography variant="body1">
-                  <Trans i18nKey="completeRegistration.description">
-                    Non siamo riusciti a indirizzarti alla pagina di caricamento
-                    <br />
-                    per completare la procedura.
-                  </Trans>
-                </Typography>
-              </Grid>
-            </Grid>
-            <Grid container item justifyContent="center">
-              <Grid item xs={4}>
-                <Button
-                  variant="contained"
-                  sx={{ alignSelf: 'center' }}
-                  onClick={() => window.location.assign(buildAssistanceURI(ENV.ASSISTANCE.EMAIL))}
-                >
-                  {t('completeRegistration.contactAssistanceButton')}
-                </Button>
-              </Grid>
-            </Grid>
-          </Grid>
+          <ErrorPage
+            titleContent={t('completeRegistration.title')}
+            descriptionContent={
+              <Trans i18nKey="completeRegistration.description">
+                Non siamo riusciti a indirizzarti alla pagina di caricamento
+                <br />
+                per completare la procedura.
+              </Trans>
+            }
+            backButtonContent={t('completeRegistration.contactAssistanceButton')}
+          />
         ) : (
           <SessionModal
             handleClose={handleErrorModalClose}

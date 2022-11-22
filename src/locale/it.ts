@@ -270,8 +270,12 @@ export default {
     loading: {
       loadingText: 'Stiamo verificando i tuoi dati',
     },
-    notFoundResults: 'No risultati',
-    searchLabel:'Cerca ente'
+  },
+  invalidPricingPlan: {
+    title: 'Qualcosa è andato storto',
+    description:
+      'Non riusciamo a trovare la pagina che stai cercando. <1 />Assicurati che l’indirizzo sia corretto o torna alla home.',
+    backButton: 'Torna alla home',
   },
   stepInstitutionType: {
     title: 'Seleziona il tipo di ente che <1/> rappresenti',
