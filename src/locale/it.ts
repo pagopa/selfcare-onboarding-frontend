@@ -194,7 +194,7 @@ export default {
   onboarding: {
     outcomeContent: {
       success: {
-        title: 'La richiesta di adesione è stata <1/>inviata con successo',
+        title: 'Richiesta di adesione inviata',
         baseDescription:
           "Invieremo un'email all'indirizzo PEC primario indicato. <1 /> Al suo interno, ci sono le istruzioni per completare <3 />l'adesione.",
         pspDescription:

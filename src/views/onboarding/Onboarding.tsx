@@ -266,11 +266,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
             variant={'h4'}
             sx={{ color: theme.palette.text.primary, marginBottom: 1 }}
           >
-            <Trans i18nKey="onboarding.outcomeContent.success.title">
-              La richiesta di adesione è stata
-              <br />
-              inviata con successo
-            </Trans>
+            {t('onboarding.outcomeContent.success.title')}
           </Typography>
           <Stack key="0" spacing={4}>
             <Typography variant="body1">
