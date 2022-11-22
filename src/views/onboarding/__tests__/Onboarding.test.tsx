@@ -21,7 +21,7 @@ const initialLocation = {
   assign: jest.fn(),
   pathname: '',
   origin: 'MOCKED_ORIGIN',
-  search: '?pricingPlan=pricingPlan',
+  search: '?pricingPlan=FA',
   hash: '',
   state: undefined,
 };
@@ -704,7 +704,7 @@ const verifySubmit = async () => {
               taxCode: 'SRNNMA01A00A000A',
             },
           ],
-          pricingPlan: 'pricingPlan',
+          pricingPlan: 'FA',
         },
         method: 'POST',
       },
