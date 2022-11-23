@@ -123,7 +123,7 @@ export function SubProductStepSelectUserParty({ forward, parties }: Props) {
               input={input}
               onChange={(e) => onFilterChange(e.target.value)}
               iconColor={'#17324D'}
-              label={t('onBoardingSubProduct.searchLabel')}
+              label={t('onBoardingSubProduct.selectUserPartyStep.searchLabel')}
             />
           )}
           {filteredParties.length >= 1 ? (
