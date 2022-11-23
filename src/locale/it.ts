@@ -194,11 +194,11 @@ export default {
   onboarding: {
     outcomeContent: {
       success: {
-        title: 'La richiesta di adesione è stata <1/>inviata con successo',
+        title: 'Richiesta di adesione inviata',
         baseDescription:
-          "Invieremo un'email all'indirizzo PEC primario dell'ente. <1 /> Al suo interno, ci sono le istruzioni per completare <3 />l'adesione.",
+          "Invieremo un'email all'indirizzo PEC primario indicato. <1 /> Al suo interno, ci sono le istruzioni per completare <3 />l'adesione.",
         pspDescription:
-          "Procederemo al controllo dei dati inseriti e invieremo una <1 />mail di cortesia e una PEC con l'esito di tale verifica.",
+          "Invieremo un'email all'indirizzo PEC primario dell'ente. <1 /> Al suo interno, ci sono le istruzioni per completare <3 />l'adesione.",
         backHome: 'Torna alla home',
       },
       error: {
@@ -270,8 +270,12 @@ export default {
     loading: {
       loadingText: 'Stiamo verificando i tuoi dati',
     },
-    notFoundResults: 'No risultati',
-    searchLabel:'Cerca ente'
+  },
+  invalidPricingPlan: {
+    title: 'Qualcosa è andato storto',
+    description:
+      'Non riusciamo a trovare la pagina che stai cercando. <1 />Assicurati che l’indirizzo sia corretto o torna alla home.',
+    backButton: 'Torna alla home',
   },
   stepInstitutionType: {
     title: 'Seleziona il tipo di ente che <1/> rappresenti',

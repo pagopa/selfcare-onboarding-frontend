@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
-import { useTranslation } from 'react-i18next';
+import { useTranslation, Trans } from 'react-i18next';
 import { uniqueId } from 'lodash';
 import { MessageNoAction } from '../components/MessageNoAction';
 import { RequestOutcomeJwt, RequestOutcomeOptionsJwt } from '../../types';
@@ -9,10 +9,10 @@ import { getFetchOutcome } from '../lib/error-utils';
 import { LoadingOverlay } from '../components/LoadingOverlay';
 import { HeaderContext, UserContext } from '../lib/context';
 import { jwtNotValid } from '../services/tokenServices';
+import ErrorPage from '../components/errorPage/ErrorPage';
 import JwtInvalidPage from './JwtInvalidPage';
 import ConfirmCancellationPage from './ConfirmCancellationPage';
 import RejectContentSuccessPage from './RejectContentSuccessPage';
-import RejectContentErrorPage from './RejectContentErrorPage';
 
 export const getOnboardingMagicLinkJwt = () =>
   new URLSearchParams(window.location.search).get('jwt');
@@ -111,7 +111,17 @@ export default function RejectRegistration() {
       title: '',
       description: [
         <>
-          <RejectContentErrorPage />
+          <ErrorPage
+            titleContent={t('rejectRegistration.outcomeContent.error.title')}
+            descriptionContent={
+              <Trans i18nKey="rejectRegistration.outcomeContent.error.description">
+                A causa di un errore del sistema non è possibile completare la procedura.
+                <br />
+                Ti chiediamo di riprovare più tardi.
+              </Trans>
+            }
+            backButtonContent={t('rejectRegistration.outcomeContent.error.backActionLabel')}
+          />
         </>,
       ],
     },

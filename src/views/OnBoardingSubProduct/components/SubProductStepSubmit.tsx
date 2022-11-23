@@ -1,10 +1,5 @@
 import { useContext, useEffect, useState } from 'react';
-import {
-  // trackAppError,
-  trackEvent,
-} from '@pagopa/selfcare-common-frontend/services/analyticsService';
-import { Button, Grid, Typography } from '@mui/material';
-import { IllusError, theme } from '@pagopa/mui-italia';
+import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
 import { Trans } from 'react-i18next';
 import { AxiosError } from 'axios';
 import {
@@ -19,12 +14,12 @@ import { HeaderContext, UserContext } from '../../../lib/context';
 import { fetchWithLogs } from '../../../lib/api-utils';
 import { getFetchOutcome } from '../../../lib/error-utils';
 import { MessageNoAction } from '../../../components/MessageNoAction';
-import { ENV } from '../../../utils/env';
 import { unregisterUnloadEvent } from '../../../utils/unloadEvent-utils';
 import {
   billingData2billingDataRequest,
   pspData2pspDataRequest,
 } from '../../onboarding/Onboarding';
+import ErrorPage from '../../../components/errorPage/ErrorPage';
 
 type Props = StepperStepComponentProps & {
   requestId: string;
@@ -43,42 +38,20 @@ const errorOutCome = {
   title: '',
   description: [
     <>
-      <IllusError size={60} />
-      <Grid container direction="column" key="0" mt={3}>
-        <Grid container item justifyContent="center">
-          <Grid item xs={5}>
-            <Typography variant="h4">
-              <Trans i18nKey="onBoardingSubProduct.genericError.title">
-                Qualcosa è andato storto
-              </Trans>
-            </Typography>
-          </Grid>
-        </Grid>
-        <Grid container item justifyContent="center" mb={3} mt={1}>
-          <Grid item xs={6}>
-            <Typography>
-              <Trans i18nKey="onBoardingSubProduct.genericError.message">
-                A causa di un errore del sistema non è possibile completare <br />
-                la procedura. Ti chiediamo di riprovare più tardi.
-              </Trans>
-            </Typography>
-          </Grid>
-        </Grid>
-        <Grid container item justifyContent="center">
-          <Grid item xs={4}>
-            <Button
-              onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
-              variant={'contained'}
-            >
-              <Typography width="100%" sx={{ color: theme.palette.primary.contrastText }}>
-                <Trans i18nKey="onBoardingSubProduct.genericError.homeButton">
-                  Torna alla home
-                </Trans>
-              </Typography>
-            </Button>
-          </Grid>
-        </Grid>
-      </Grid>
+      <ErrorPage
+        titleContent={
+          <Trans i18nKey="onBoardingSubProduct.genericError.title">Qualcosa è andato storto</Trans>
+        }
+        descriptionContent={
+          <Trans i18nKey="onBoardingSubProduct.genericError.message">
+            A causa di un errore del sistema non è possibile completare <br />
+            la procedura. Ti chiediamo di riprovare più tardi.
+          </Trans>
+        }
+        backButtonContent={
+          <Trans i18nKey="onBoardingSubProduct.genericError.homeButton">Torna alla home</Trans>
+        }
+      />
     </>,
   ],
 };

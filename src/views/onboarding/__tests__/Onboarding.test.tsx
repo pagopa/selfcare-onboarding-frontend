@@ -21,7 +21,7 @@ const initialLocation = {
   assign: jest.fn(),
   pathname: '',
   origin: 'MOCKED_ORIGIN',
-  search: '?pricingPlan=pricingPlan',
+  search: '?pricingPlan=FA',
   hash: '',
   state: undefined,
 };
@@ -81,7 +81,7 @@ const stepInstitutionType = 'Seleziona il tipo di ente che rappresenti';
 const stepBillingDataTitle = 'Indica i dati del tuo ente';
 const step2Title = 'Indica il Legale Rappresentante';
 const step3Title = "Indica l'Amministratore";
-const completeSuccessTitle = 'La richiesta di adesione è stata inviata con successo';
+const completeSuccessTitle = 'Richiesta di adesione inviata';
 const completeErrorTitle = 'Spiacenti, qualcosa è andato storto.';
 
 const agencyOnboarded = 'AGENCY ONBOARDED';
@@ -704,7 +704,7 @@ const verifySubmit = async () => {
               taxCode: 'SRNNMA01A00A000A',
             },
           ],
-          pricingPlan: 'pricingPlan',
+          pricingPlan: 'FA',
         },
         method: 'POST',
       },
