@@ -56,7 +56,7 @@ export function BodyLogger() {
           }
         />
         <Main />
-        <Box mt={16}>
+        <Box>
           <Footer loggedUser={!!user} onExit={onExit} />
         </Box>
       </HeaderContext.Provider>

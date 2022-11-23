@@ -23,7 +23,7 @@ const initialLocation = {
   assign: jest.fn(),
   pathname: '/:productId/:subProductId',
   origin: 'MOCKED_ORIGIN',
-  search: '?pricingPlan=pricingPlan',
+  search: '?pricingPlan=C1',
   hash: '',
   state: undefined,
 };
@@ -495,7 +495,7 @@ const verifySubmit = async () => {
           billingData: billingData2billingDataRequest(),
           pspData: undefined,
           institutionType: 'GSP',
-          pricingPlan: 'pricingPlan',
+          pricingPlan: 'C1',
           origin: 'IPA',
         },
       },
