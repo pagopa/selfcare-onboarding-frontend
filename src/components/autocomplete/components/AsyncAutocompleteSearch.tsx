@@ -10,7 +10,7 @@ const CustomTextField = styled(TextField)({
   justifyContent: 'center',
   /* default */
   '.css-1tu8ncx-MuiInputBase-root-MuiInput-root:before': {
-    borderBottom: 'red',
+    borderBottom: 'none',
   },
   /* hover (double-ampersand needed for specificity reasons. */
   '&& .MuiInput-underline:hover:before': {

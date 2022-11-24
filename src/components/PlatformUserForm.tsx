@@ -1,5 +1,4 @@
 import { Grid, Paper, TextField } from '@mui/material';
-// import { theme } from '@pagopa/mui-italia';
 import React from 'react';
 import { useTranslation, TFunction } from 'react-i18next';
 import { verifyNameMatchWithTaxCode } from '@pagopa/selfcare-common-frontend/utils/verifyNameMatchWithTaxCode';
