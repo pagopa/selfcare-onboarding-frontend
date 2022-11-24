@@ -1,26 +1,11 @@
-import { Grid, Paper, TextField, styled } from '@mui/material';
-import { theme } from '@pagopa/mui-italia';
+import { Grid, Paper, TextField } from '@mui/material';
+// import { theme } from '@pagopa/mui-italia';
 import React from 'react';
 import { useTranslation, TFunction } from 'react-i18next';
 import { verifyNameMatchWithTaxCode } from '@pagopa/selfcare-common-frontend/utils/verifyNameMatchWithTaxCode';
 import { verifySurnameMatchWithTaxCode } from '@pagopa/selfcare-common-frontend/utils/verifySurnameMatchWithTaxCode';
 import { UserOnCreate, PartyRole } from '../../types';
 import { UsersError, UsersObject } from './steps/StepAddManager';
-
-const CustomTextField = styled(TextField)({
-  width: '100%',
-  '& .MuiFormHelperText-root': {
-    color: theme.palette.text.secondary,
-  },
-  '& .MuiInputBase-root.Mui-disabled:before': {
-    borderBottomStyle: 'solid',
-  },
-  input: {
-    '&.Mui-disabled': {
-      WebkitTextFillColor: theme.palette.text.disabled,
-    },
-  },
-});
 
 type PlatformUserFormProps = {
   prefix: keyof UsersObject;
@@ -207,7 +192,7 @@ export function PlatformUserForm({
             const isError = error && error.length > 0;
             return (
               <Grid item key={id} xs={width} mb={2}>
-                <CustomTextField
+                <TextField
                   id={`${prefix}-${id}`}
                   variant="outlined"
                   label={t(`platformUserForm.fields.${id}.label`)}
@@ -216,17 +201,6 @@ export function PlatformUserForm({
                   onChange={buildSetPerson(id)}
                   sx={{
                     width: '100%',
-                    '& .MuiFormHelperText-root': {
-                      color: theme.palette.text.secondary,
-                    },
-                    '& .MuiInputBase-root.Mui-disabled:before': {
-                      borderBottomStyle: 'solid',
-                    },
-                    input: {
-                      '&.Mui-disabled': {
-                        WebkitTextFillColor: theme.palette.text.disabled,
-                      },
-                    },
                   }}
                   inputProps={{
                     style: {
