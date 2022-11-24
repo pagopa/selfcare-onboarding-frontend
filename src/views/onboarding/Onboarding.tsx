@@ -111,7 +111,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>();
   const [billingData, setBillingData] = useState<BillingData>();
   const [institutionType, setInstitutionType] = useState<InstitutionType>();
-  const [origin, setOrigin] = useState<string>('');
+  const [origin, setOrigin] = useState<string>();
   const [pricingPlan, setPricingPlan] = useState<string>();
   const { setOnExit } = useContext(HeaderContext);
   const { setRequiredLogin } = useContext(UserContext);
@@ -145,6 +145,12 @@ function OnboardingComponent({ productId }: { productId: string }) {
     });
     setPricingPlan(new URLSearchParams(window.location.search).get('pricingPlan') ?? undefined);
   }, [productId]);
+
+  useEffect(() => {
+    if (institutionType && institutionType === 'PSP') {
+      setOrigin(undefined);
+    }
+  }, [institutionType]);
 
   // avoid step 1 if selectedProduct is 'prod-pn' or 'prod-idpay'
   useEffect(() => {
