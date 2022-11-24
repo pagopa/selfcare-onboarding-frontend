@@ -300,7 +300,7 @@ export default {
     confirmLabel: 'Continua',
   },
   stepBillingData: {
-    title: 'Indica i dati del tuo ente',
+    title: 'Indica i dati',
     invalidFiscalCode: 'Codice fiscale non valido',
     invalidZipCode: 'CAP non valido',
     invalidVatNumber: 'Partita IVA non valida',
