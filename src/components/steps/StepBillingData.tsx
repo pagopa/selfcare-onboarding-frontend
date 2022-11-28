@@ -70,6 +70,7 @@ export default function StepBillingData({
   externalInstitutionId,
   origin,
   outcome,
+  productId,
 }: Props) {
   const requiredError = 'Required';
   const ipa = origin === 'IPA';
@@ -298,7 +299,9 @@ export default function StepBillingData({
       <Grid container item xs={8}>
         <Grid item xs={12}>
           <Typography variant="h3" component="h2" align="center" sx={{ lineHeight: '1.2' }}>
-            {t('stepBillingData.title')}
+            {institutionType === 'PSP' && productId === 'prod-pagopa'
+              ? t('stepBillingData.pspAndProdPagoPATitle')
+              : t('stepBillingData.title')}
           </Typography>
         </Grid>
 
