@@ -78,7 +78,7 @@ const renderComponent = (productId: string = 'prod-pn') => {
 
 const step1Title = 'Seleziona il tuo ente';
 const stepInstitutionType = 'Seleziona il tipo di ente che rappresenti';
-const stepBillingDataTitle = 'Indica i dati';
+const stepBillingDataTitle = 'Indica i dati del tuo ente';
 const step2Title = 'Indica il Legale Rappresentante';
 const step3Title = "Indica l'Amministratore";
 const completeSuccessTitle = 'Richiesta di adesione inviata';

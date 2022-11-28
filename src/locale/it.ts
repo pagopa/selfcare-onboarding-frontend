@@ -300,7 +300,8 @@ export default {
     confirmLabel: 'Continua',
   },
   stepBillingData: {
-    title: 'Indica i dati',
+    title: 'Indica i dati del tuo ente',
+    pspAndProdPagoPATitle: 'Indica i dati',
     invalidFiscalCode: 'Codice fiscale non valido',
     invalidZipCode: 'CAP non valido',
     invalidVatNumber: 'Partita IVA non valida',
