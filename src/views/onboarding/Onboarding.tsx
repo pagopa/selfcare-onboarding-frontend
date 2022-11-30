@@ -218,10 +218,8 @@ function OnboardingComponent({ productId }: { productId: string }) {
       unregisterUnloadEvent(setOnExit);
       setSelectedProduct(null);
     }
-    const activeProduct = (onboardingProducts as AxiosResponse).data.status === 'ACTIVE';
-    const testingProduct = (onboardingProducts as AxiosResponse).data.status === 'TESTING';
 
-    if (!activeProduct && !testingProduct) {
+    if ((onboardingProducts as AxiosResponse).data.status === 'PHASE_OUT') {
       setOutcome(prodPhaseOutErrorPage);
     }
   };
