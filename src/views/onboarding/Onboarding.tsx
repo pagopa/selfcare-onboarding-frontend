@@ -219,7 +219,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
       setSelectedProduct(null);
     }
 
-    if ((onboardingProducts as AxiosResponse).data.status === 'PHASE_OUT') {
+    if ((onboardingProducts as AxiosResponse).data?.status === 'PHASE_OUT') {
       setOutcome(prodPhaseOutErrorPage);
     }
   };
