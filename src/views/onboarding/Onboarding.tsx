@@ -64,7 +64,7 @@ export const pspData2pspDataRequest = (billingData: BillingData): PspDataDto => 
   vatNumberGroup: billingData.vatNumberGroup ?? false,
 });
 
-export const onboardingNotallowed: RequestOutcomeMessage = {
+export const prodPhaseOutErrorPage: RequestOutcomeMessage = {
   title: '',
   description: [
     <>
@@ -73,17 +73,17 @@ export const onboardingNotallowed: RequestOutcomeMessage = {
         <Grid container item justifyContent="center">
           <Grid item xs={6}>
             <Typography variant="h4">
-              <Trans i18nKey="onboardingStep1_5.genericError.title" />
+              <Trans i18nKey="onboarding.phaseOutError.title" />
             </Typography>
           </Grid>
         </Grid>
         <Grid container item justifyContent="center" mb={2} mt={1}>
           <Grid item xs={6}>
             <Typography>
-              <Trans i18nKey="onboardingStep1_5.genericError.description">
-                A causa di un errore del sistema non è possibile completare la procedura.
+              <Trans i18nKey="onboarding.phaseOutError.description">
+                Non puoi aderire al prodotto scelto poiché a breve non sarà
                 <br />
-                Ti chiediamo di riprovare più tardi.
+                più disponibile.
               </Trans>
             </Typography>
           </Grid>
@@ -95,7 +95,7 @@ export const onboardingNotallowed: RequestOutcomeMessage = {
               sx={{ alignSelf: 'center' }}
               onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
             >
-              <Trans i18nKey="onboardingStep1_5.genericError.backAction" />
+              <Trans i18nKey="onboarding.phaseOutError.backAction" />
             </Button>
           </Grid>
         </Grid>
@@ -222,7 +222,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
     const testingProduct = (onboardingProducts as AxiosResponse).data.status === 'TESTING';
 
     if (!activeProduct && !testingProduct) {
-      setOutcome(onboardingNotallowed);
+      setOutcome(prodPhaseOutErrorPage);
     }
   };
 

@@ -223,6 +223,11 @@ export default {
     loading: {
       loadingText: 'Stiamo verificando i tuoi dati',
     },
+    phaseOutError: {
+      title: 'Qualcosa è andato storto',
+      description: 'Non puoi aderire al prodotto scelto poiché a breve non sarà <1 /> più disponibile.',
+      backAction:'Torna alla home'
+    }
   },
   onBoardingSubProduct: {
     alreadyOnboardedError: {
