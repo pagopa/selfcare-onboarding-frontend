@@ -21,7 +21,7 @@ const initialLocation = {
   assign: jest.fn(),
   pathname: '',
   origin: 'MOCKED_ORIGIN',
-  search: '?pricingPlan=pricingPlan',
+  search: '?pricingPlan=FA',
   hash: '',
   state: undefined,
 };
@@ -43,7 +43,7 @@ jest.mock('react-router-dom', () => ({
   }),
 }));
 
-const renderComponent = (productId: string = 'prod-pagopa') => {
+const renderComponent = (productId: string = 'prod-pn') => {
   const Component = () => {
     const [user, setUser] = useState<User | null>(null);
     const [subHeaderVisible, setSubHeaderVisible] = useState<boolean>(false);
@@ -81,7 +81,7 @@ const stepInstitutionType = 'Seleziona il tipo di ente che rappresenti';
 const stepBillingDataTitle = 'Indica i dati del tuo ente';
 const step2Title = 'Indica il Legale Rappresentante';
 const step3Title = "Indica l'Amministratore";
-const completeSuccessTitle = 'La tua richiesta è stata inviata con successo';
+const completeSuccessTitle = 'Richiesta di adesione inviata';
 const completeErrorTitle = 'Spiacenti, qualcosa è andato storto.';
 
 const agencyOnboarded = 'AGENCY ONBOARDED';
@@ -94,7 +94,7 @@ test('test already onboarded', async () => {
   await executeStepInstitutionType();
   await executeStep1(agencyOnboarded);
   await waitFor(() => screen.getByText("L'Ente che hai scelto ha già aderito"));
-  await executeGoHome();
+  await executeGoHome(false);
 });
 
 test('test error retrieving onboarding info', async () => {
@@ -102,7 +102,7 @@ test('test error retrieving onboarding info', async () => {
   await executeStepInstitutionType();
   await executeStep1(agencyInfoError);
   await waitFor(() => screen.getByText('Spiacenti, qualcosa è andato storto.'));
-  await executeGoHome();
+  await executeGoHome(false);
 });
 
 test('test error productID', async () => {
@@ -119,7 +119,7 @@ test('test complete', async () => {
   await executeStep2();
   await executeStep3(true);
   await verifySubmit();
-  await executeGoHome();
+  await executeGoHome(true);
 });
 
 test('test complete with error on submit', async () => {
@@ -129,7 +129,7 @@ test('test complete with error on submit', async () => {
   await executeStepBillingData();
   await executeStep2();
   await executeStep3(false);
-  await executeGoHome();
+  await executeGoHome(false);
 });
 
 test('test exiting during flow with unload event', async () => {
@@ -190,11 +190,15 @@ const retrieveNavigationButtons = async () => {
   return [goBackButton, confirmButton];
 };
 
-const executeGoHome = async () => {
+const executeGoHome = async (expectedSuccessfulSubmit) => {
   console.log('Go Home');
-  const goHomeButton = screen.getByRole('button', {
-    name: 'Chiudi',
-  });
+  const goHomeButton = !expectedSuccessfulSubmit
+    ? screen.getByRole('button', {
+        name: 'Chiudi',
+      })
+    : screen.getByRole('button', {
+        name: 'Torna alla home',
+      });
   expect(goHomeButton).toBeEnabled();
   fireEvent.click(goHomeButton);
   await waitFor(() => expect(mockedLocation.assign).toBeCalledWith(ENV.URL_FE.LANDING));
@@ -285,7 +289,7 @@ const executeStepBillingData = async () => {
     'a@a.it',
     '09010',
     'AAAAAA44D55F456K',
-    '11223344567',
+    'AAAAAA44D55F456K',
     'recipientCode'
   );
 
@@ -379,11 +383,11 @@ const fillUserBillingDataForm = async (
     target: { value: 'AAAAAA44D55F456K' },
   });
 
-  const isTaxCodeNotEquals2PIVA = document.getElementById('billingdata');
-  expect(isTaxCodeNotEquals2PIVA).toBeTruthy();
+  const isTaxCodeEquals2PIVA = document.getElementById('billingdata');
+  expect(isTaxCodeEquals2PIVA).toBeTruthy();
 
   fireEvent.change(document.getElementById(vatNumber), {
-    target: { value: '11223344567' },
+    target: { value: 'AAAAAA44D55F456K' },
   });
   fireEvent.change(document.getElementById(recipientCode), {
     target: { value: 'recipientCode' },
@@ -646,28 +650,30 @@ const fillAdditionalUserAndCheckUniqueValues = async (
   }
 };
 
+const billingData2billingDataRequest = () => ({
+  businessName: 'businessNameInput',
+  registeredOffice: 'registeredOfficeInput',
+  digitalAddress: 'a@a.it',
+  zipCode: '09010',
+  taxCode: 'AAAAAA44D55F456K',
+  vatNumber: 'AAAAAA44D55F456K',
+  recipientCode: 'recipientCode',
+  publicServices: false,
+});
+
 const verifySubmit = async () => {
   await waitFor(() =>
     expect(fetchWithLogsSpy).lastCalledWith(
       {
         endpoint: 'ONBOARDING_POST_LEGALS',
-        endpointParams: { externalInstitutionId: 'id', productId: 'prod-pagopa' },
+        endpointParams: { externalInstitutionId: 'id', productId: 'prod-pn' },
       },
       {
         data: {
-          billingData: {
-            businessName: 'businessNameInput',
-            registeredOffice: 'registeredOfficeInput',
-            digitalAddress: 'a@a.it',
-            zipCode: '09010',
-            taxCode: 'AAAAAA44D55F456K',
-            vatNumber: '11223344567',
-            recipientCode: 'recipientCode',
-            publicServices: false,
-          },
+          billingData: billingData2billingDataRequest(),
+          pspData: undefined,
           institutionType: 'GSP',
           origin: 'IPA',
-          pricingPlan: 'pricingPlan',
           users: [
             {
               email: 'b@b.bb',
@@ -698,6 +704,7 @@ const verifySubmit = async () => {
               taxCode: 'SRNNMA01A00A000A',
             },
           ],
+          pricingPlan: 'FA',
         },
         method: 'POST',
       },

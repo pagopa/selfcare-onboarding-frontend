@@ -194,10 +194,12 @@ export default {
   onboarding: {
     outcomeContent: {
       success: {
-        title: 'La tua richiesta è stata inviata <1/> con successo',
-        description:
-          "Riceverai una PEC all’indirizzo istituzionale che hai indicato. <1 /> Al suo interno troverai le istruzioni per completare <3 />l'adesione.",
-        backActionLabel: 'Chiudi',
+        title: 'Richiesta di adesione inviata',
+        pspDescription:
+          "Invieremo un'email all'indirizzo PEC indicato. <1 /> Al suo interno, ci sono le istruzioni per completare <3 />l'adesione.",
+        baseDescription:
+          "Invieremo un'email all'indirizzo PEC primario dell'ente. <1 /> Al suo interno, ci sono le istruzioni per completare <3 />l'adesione.",
+        backHome: 'Torna alla home',
       },
       error: {
         title: 'Spiacenti, qualcosa è andato storto.',
@@ -221,6 +223,11 @@ export default {
     loading: {
       loadingText: 'Stiamo verificando i tuoi dati',
     },
+    phaseOutError: {
+      title: 'Qualcosa è andato storto',
+      description: 'Non puoi aderire al prodotto scelto poiché a breve non sarà <1 /> più disponibile.',
+      backAction:'Torna alla home'
+    }
   },
   onBoardingSubProduct: {
     alreadyOnboardedError: {
@@ -238,6 +245,7 @@ export default {
       title: 'Seleziona il tuo ente',
       subTitle:
         "Seleziona l'ente per il quale stai richiedendo la sottoscrizione <1 />all'offerta Premium",
+      searchLabel: 'Cerca ente',
       IPAsubTitle:
         "Seleziona dall'Indice della Pubblica Amministrazione (IPA) l'ente <1/> per cui vuoi richiedere l'adesione a {{baseProduct}} Premium",
       helperLink: 'Non lo trovi? <1>Registra un nuovo ente</1>',
@@ -250,7 +258,7 @@ export default {
       homeButton: 'Torna alla home',
     },
     successfulAdhesion: {
-      title: 'La tua richiesta è stata inviata <1 /> con successo',
+      title: 'La richiesta di adesione è stata <1/>inviata con successo',
       message:
         "Riceverai una PEC all’indirizzo istituzionale dell’ente.<1 />Al suo interno troverai le istruzioni per completare la <3 /> sottoscrizione all'offerta Premium.",
       closeButton: 'Chiudi',
@@ -268,6 +276,12 @@ export default {
     loading: {
       loadingText: 'Stiamo verificando i tuoi dati',
     },
+  },
+  invalidPricingPlan: {
+    title: 'Qualcosa è andato storto',
+    description:
+      'Non riusciamo a trovare la pagina che stai cercando. <1 />Assicurati che l’indirizzo sia corretto o torna alla home.',
+    backButton: 'Torna alla home',
   },
   stepInstitutionType: {
     title: 'Seleziona il tipo di ente che <1/> rappresenti',
@@ -292,6 +306,7 @@ export default {
   },
   stepBillingData: {
     title: 'Indica i dati del tuo ente',
+    pspAndProdPagoPATitle: 'Indica i dati',
     invalidFiscalCode: 'Codice fiscale non valido',
     invalidZipCode: 'CAP non valido',
     invalidVatNumber: 'Partita IVA non valida',
@@ -300,15 +315,26 @@ export default {
     registeredOffice: 'Sede legale',
     zipCode: 'CAP',
     digitalAddress: 'Indirizzo PEC',
-    taxCodeNotEquals2PIVAdescription: 'La Partita IVA non coincide con il Codice fiscale',
-    taxCode: 'Codice fiscale',
-    taxCodeAndVatNumber: 'Codice fiscale / Partita IVA',
+    taxCodeEquals2PIVAdescription: 'La Partita IVA coincide con il Codice Fiscale',
+    vatNumberGroup: 'La Partita IVA è di gruppo',
+    taxCode: 'Codice Fiscale',
     vatNumber: 'Partita IVA',
     recipientCode: 'Codice destinatario',
     recipientCodeDescription: 'È il codice necessario per ricevere le fatture elettroniche',
     gspDescription: 'Sono gestore di almeno uno dei pubblici servizi: Gas, Energia, Telco.',
     backLabel: 'Indietro',
     confirmLabel: 'Continua',
+    commercialRegisterNumber: 'n. Iscrizione al Registro delle Imprese',
+    invalidCommercialRegisterNumber: 'n. Iscrizione al Registro delle Imprese non valido',
+    registrationInRegister: 'Iscrizione all’Albo',
+    registerNumber: 'Numero dell’Albo',
+    invalidregisterNumber: 'Numero dell’Albo non valido',
+    abiCode: 'Codice ABI',
+    invalidabiCode: 'Codice ABI non valido',
+    dpoTitle: 'Contatti del responsabile della protezione dei dati',
+    dpoAddress: 'Indirizzo',
+    dpoPecAddress: 'Indirizzo PEC',
+    dopEmailAddress: 'Indirizzo email',
   },
   rejectRegistration: {
     outcomeContent: {

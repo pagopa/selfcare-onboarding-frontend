@@ -59,7 +59,7 @@ const alreadyOnboarded: RequestOutcomeMessage = {
   ],
 };
 
-const genericError: RequestOutcomeMessage = {
+export const genericError: RequestOutcomeMessage = {
   title: '',
   description: [
     <>

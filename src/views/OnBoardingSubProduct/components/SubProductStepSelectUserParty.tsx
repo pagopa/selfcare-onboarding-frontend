@@ -1,17 +1,35 @@
 import { Grid, Link, Typography, useTheme, Paper } from '@mui/material';
 import { Box } from '@mui/system';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { styled } from '@mui/material/styles';
 import { useTranslation, Trans } from 'react-i18next';
 import { PartyAccountItemButton } from '@pagopa/mui-italia/dist/components/PartyAccountItemButton';
 import { roleLabels } from '@pagopa/selfcare-common-frontend/utils/constants';
 import { Party, SelfcareParty, StepperStepComponentProps } from '../../../../types';
 import { OnboardingStepActions } from '../../../components/OnboardingStepActions';
 import { useHistoryState } from '../../../components/useHistoryState';
+import PartySelectionSearchInput from './PartySelectionSearchInput';
 
 type Props = {
   parties: Array<SelfcareParty>;
 } & StepperStepComponentProps;
 
+const CustomBox = styled(Box)({
+  '&::-webkit-scrollbar': {
+    width: 4,
+  },
+  '&::-webkit-scrollbar-track': {
+    boxShadow: `inset 10px 10px  #E6E9F2`,
+  },
+  '&::-webkit-scrollbar-thumb': {
+    backgroundColor: '#0073E6',
+    borderRadius: '16px',
+  },
+  overflowY: 'auto',
+  overflowX: 'hidden',
+});
+const verifyPartyFilter = (party: Party, filter: string) =>
+  party.description.toUpperCase().indexOf(filter.toUpperCase()) >= 0;
 export function SubProductStepSelectUserParty({ forward, parties }: Props) {
   const partyExternalIdByQuery = new URLSearchParams(window.location.search).get('partyExternalId');
 
@@ -53,8 +71,31 @@ export function SubProductStepSelectUserParty({ forward, parties }: Props) {
     }
   }, []);
 
+  const [input, setInput] = useState('');
+  const [filteredParties, setFilteredParties] = useState<Array<SelfcareParty>>(parties);
+  const [selectedParty, setSelectedParty] = useState<Party | null>(
+    parties.length === 1 ? parties[0] : null
+  );
+  const onPartySelectionChange = (selectedParty: Party | null) => {
+    setSelectedParty(selectedParty);
+  };
+
+  const onFilterChange = (value: string) => {
+    setInput(value);
+    if (!value) {
+      setFilteredParties(parties);
+    } else {
+      setFilteredParties(parties?.filter((e) => verifyPartyFilter(e, value)));
+    }
+    if (value && selectedParty && !verifyPartyFilter(selectedParty, value)) {
+      onPartySelectionChange(null);
+    }
+  };
+
+  const moreThan3Parties = parties.length > 3;
+
   return (
-    <Grid container direction="column">
+    <Grid container direction="column" sx={{ minWidth: '480px' }}>
       <Grid container item justifyContent="center">
         <Grid item xs={12}>
           <Typography variant="h3" component="h2" align="center" color={theme.palette.text.primary}>
@@ -74,12 +115,27 @@ export function SubProductStepSelectUserParty({ forward, parties }: Props) {
         </Grid>
       </Grid>
 
-      <Grid container item textAlign="center" justifyContent="center" mt={4} mb={3}>
-        <Paper elevation={8} sx={{ borderRadius: theme.spacing(2) }}>
-          <Grid pl={3} pr={3} mb={3} mt={3}>
-            {parties.map((p) => (
-              <Box key={p.externalId}>
+      <Grid container item textAlign="center" justifyContent="center" mt={4} mb={2}>
+        <Paper elevation={8} sx={{ borderRadius: theme.spacing(2), p: 2, minWidth: '480px' }}>
+          {moreThan3Parties && (
+            <PartySelectionSearchInput
+              clearField={() => onFilterChange('')}
+              input={input}
+              onChange={(e) => onFilterChange(e.target.value)}
+              iconColor={'#17324D'}
+              label={t('onBoardingSubProduct.selectUserPartyStep.searchLabel')}
+            />
+          )}
+          {filteredParties.length >= 1 ? (
+            <CustomBox
+              maxHeight={'250px'}
+              sx={{
+                pointerEvents: parties.length !== 1 ? 'auto' : 'none',
+              }}
+            >
+              {filteredParties.map((p) => (
                 <Grid
+                  key={p.externalId}
                   aria-label={p.description}
                   sx={{
                     width: '480px',
@@ -101,9 +157,11 @@ export function SubProductStepSelectUserParty({ forward, parties }: Props) {
                     maxCharactersNumberMultiLine={20}
                   />
                 </Grid>
-              </Box>
-            ))}
-          </Grid>
+              ))}
+            </CustomBox>
+          ) : (
+            t('onBoardingSubProduct.notFoundResults')
+          )}
         </Paper>
       </Grid>
 

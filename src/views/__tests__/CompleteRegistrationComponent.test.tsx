@@ -2,7 +2,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import CompleteRegistrationComponent from '../CompleteRegistrationComponent';
 import './../../locale';
 import { buildAssistanceURI } from '@pagopa/selfcare-common-frontend/services/assistanceService';
-import { ENV } from '../../utils/env';
+import React from 'react';
 
 const oldWindowLocation = global.window.location;
 const mockedLocation = {
@@ -32,8 +32,6 @@ jest.mock('@pagopa/selfcare-common-frontend/services/assistanceService', () => (
 }));
 
 test('test no jwt', () => {
-  mockedLocation.search = undefined;
-
   render(<CompleteRegistrationComponent />);
 
   const assistanceButton = screen.getByRole('button', {
@@ -41,7 +39,7 @@ test('test no jwt', () => {
   });
 
   fireEvent.click(assistanceButton);
-  expect(buildAssistanceURI).toBeCalledWith('assistenza@selfcare.it');
+  waitFor(() => expect(buildAssistanceURI).toBeCalledWith('assistenza@selfcare.it'));
 });
 
 test('test', async () => {

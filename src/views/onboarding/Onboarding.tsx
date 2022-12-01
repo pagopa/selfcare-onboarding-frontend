@@ -18,6 +18,8 @@ import {
   UserOnCreate,
   Problem,
   RequestOutcomeMessage,
+  BillingDataDto,
+  PspDataDto,
 } from '../../../types';
 import { StepSearchParty } from '../../components/steps/StepSearchParty';
 import { StepAddManager } from '../../components/steps/StepAddManager';
@@ -32,10 +34,110 @@ import StepOnboardingData from '../../components/steps/StepOnboardingData';
 import StepBillingData from '../../components/steps/StepBillingData';
 import { registerUnloadEvent, unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
 import StepInstitutionType from '../../components/steps/StepInstitutionType';
-import { OnboardingStep1_5 } from './components/OnboardingStep1_5';
+import ErrorPage from '../../components/errorPage/ErrorPage';
+import { genericError, OnboardingStep1_5 } from './components/OnboardingStep1_5';
 import { OnBoardingProductStepDelegates } from './components/OnBoardingProductStepDelegates';
 
 export type ValidateErrorType = 'conflictError';
+
+export const billingData2billingDataRequest = (billingData: BillingData): BillingDataDto => ({
+  businessName: billingData.businessName,
+  digitalAddress: billingData.digitalAddress,
+  publicServices: billingData.publicServices,
+  recipientCode: billingData.recipientCode,
+  registeredOffice: billingData.registeredOffice,
+  taxCode: billingData.taxCode,
+  vatNumber: billingData.vatNumber,
+  zipCode: billingData.zipCode,
+});
+
+export const pspData2pspDataRequest = (billingData: BillingData): PspDataDto => ({
+  abiCode: billingData.abiCode ?? '',
+  businessRegisterNumber: billingData.commercialRegisterNumber ?? '',
+  dpoData: {
+    address: billingData.dpoAddress ?? '',
+    pec: billingData.dpoPecAddress ?? '',
+    email: billingData.dopEmailAddress ?? '',
+  },
+  legalRegisterNumber: billingData.registerNumber ?? '',
+  legalRegisterName: billingData.registrationInRegister ?? '',
+  vatNumberGroup: billingData.vatNumberGroup ?? false,
+});
+
+export const prodPhaseOutErrorPage: RequestOutcomeMessage = {
+  title: '',
+  description: [
+    <>
+      <IllusError size={60} />
+      <Grid container direction="column" key="0" mt={3}>
+        <Grid container item justifyContent="center">
+          <Grid item xs={6}>
+            <Typography variant="h4">
+              <Trans i18nKey="onboarding.phaseOutError.title" />
+            </Typography>
+          </Grid>
+        </Grid>
+        <Grid container item justifyContent="center" mb={2} mt={1}>
+          <Grid item xs={6}>
+            <Typography>
+              <Trans i18nKey="onboarding.phaseOutError.description">
+                Non puoi aderire al prodotto scelto poiché a breve non sarà
+                <br />
+                più disponibile.
+              </Trans>
+            </Typography>
+          </Grid>
+        </Grid>
+        <Grid container item justifyContent="center" mt={2}>
+          <Grid item xs={4}>
+            <Button
+              variant="contained"
+              sx={{ alignSelf: 'center' }}
+              onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+            >
+              <Trans i18nKey="onboarding.phaseOutError.backAction" />
+            </Button>
+          </Grid>
+        </Grid>
+      </Grid>
+    </>,
+  ],
+};
+
+const alreadyOnboarded: RequestOutcomeMessage = {
+  title: '',
+  description: [
+    <Grid
+      container
+      item
+      direction="column"
+      justifyContent="center"
+      alignItems="center"
+      key="0"
+      mt={5}
+    >
+      <Grid item xs={6}>
+        <Typography variant="h4">
+          <Trans i18nKey="onboardingStep1_5.alreadyOnboarded.title" />
+        </Typography>
+      </Grid>
+      <Grid item mb={3} mt={1} xs={6}>
+        <Typography>
+          <Trans i18nKey="onboardingStep1_5.alreadyOnboarded.description" />
+        </Typography>
+      </Grid>
+      <Grid item xs={4}>
+        <Button
+          variant="contained"
+          sx={{ alignSelf: 'center' }}
+          onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+        >
+          <Trans i18nKey="onboardingStep1_5.alreadyOnboarded.backAction" />
+        </Button>
+      </Grid>
+    </Grid>,
+  ],
+};
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
 function OnboardingComponent({ productId }: { productId: string }) {
@@ -43,13 +145,13 @@ function OnboardingComponent({ productId }: { productId: string }) {
   const [activeStep, setActiveStep] = useState(0);
   const [formData, setFormData] = useState<Partial<FormData>>();
   const [externalInstitutionId, setExternalInstitutionId] = useState<string>('');
-  const [outcome, setOutcome] = useState<RequestOutcomeMessage>();
+  const [outcome, setOutcome] = useState<RequestOutcomeMessage | null>();
   const history = useHistory();
   const [openExitModal, setOpenExitModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>();
   const [billingData, setBillingData] = useState<BillingData>();
   const [institutionType, setInstitutionType] = useState<InstitutionType>();
-  const [origin, setOrigin] = useState<string>('');
+  const [origin, setOrigin] = useState<string>();
   const [pricingPlan, setPricingPlan] = useState<string>();
   const { setOnExit } = useContext(HeaderContext);
   const { setRequiredLogin } = useContext(UserContext);
@@ -84,6 +186,12 @@ function OnboardingComponent({ productId }: { productId: string }) {
     setPricingPlan(new URLSearchParams(window.location.search).get('pricingPlan') ?? undefined);
   }, [productId]);
 
+  useEffect(() => {
+    if (institutionType && institutionType === 'PSP') {
+      setOrigin(undefined);
+    }
+  }, [institutionType]);
+
   // avoid step 1 if selectedProduct is 'prod-pn' or 'prod-idpay'
   useEffect(() => {
     if (productAvoidStep) {
@@ -110,6 +218,10 @@ function OnboardingComponent({ productId }: { productId: string }) {
       unregisterUnloadEvent(setOnExit);
       setSelectedProduct(null);
     }
+
+    if ((onboardingProducts as AxiosResponse).data?.status === 'PHASE_OUT') {
+      setOutcome(prodPhaseOutErrorPage);
+    }
   };
 
   const back = () => {
@@ -130,12 +242,12 @@ function OnboardingComponent({ productId }: { productId: string }) {
     setOrigin(party.origin);
     setBillingData({
       businessName: party.description,
-      registeredOffice: party.address,
-      zipCode: party.zipCode,
       digitalAddress: party.digitalAddress,
+      recipientCode: '',
+      registeredOffice: party.address,
       taxCode: party.taxCode,
       vatNumber: '',
-      recipientCode: party.origin === 'IPA' ? party.originId : '',
+      zipCode: party.zipCode,
     });
     forwardWithData(newFormData);
     trackEvent('ONBOARDING_PARTY_SELECTION', {
@@ -153,7 +265,43 @@ function OnboardingComponent({ productId }: { productId: string }) {
       party_id: externalInstitutionId,
       product_id: productId,
     });
+
     setBillingData(newBillingData);
+    if (institutionType === 'PSP') {
+      // TODO: fix when party registry proxy will return externalInstitutionId
+      setExternalInstitutionId(newBillingData.taxCode);
+
+      const partyVerifyOnboarded = async () => {
+        const onboardingStatus = await fetchWithLogs(
+          {
+            endpoint: 'VERIFY_ONBOARDING',
+            endpointParams: { externalInstitutionId: newBillingData.taxCode, productId },
+          },
+          { method: 'HEAD' },
+          () => setRequiredLogin(true)
+        );
+        const restOutcome = getFetchOutcome(onboardingStatus);
+        // party is already onboarded
+        if (restOutcome === 'success') {
+          setOutcome(alreadyOnboarded);
+        } else {
+          // party is NOT already onboarded
+          if (
+            (onboardingStatus as AxiosError<any>).response?.status === 404 ||
+            (onboardingStatus as AxiosError<any>).response?.status === 400
+          ) {
+            setOutcome(null);
+            forward();
+          } else if ((onboardingStatus as AxiosError<any>).response?.status === 403) {
+            setOutcome(notAllowedError);
+          } else {
+            setOutcome(genericError);
+          }
+        }
+      };
+
+      void partyVerifyOnboarded();
+    }
     forward();
   };
 
@@ -168,27 +316,32 @@ function OnboardingComponent({ productId }: { productId: string }) {
             variant={'h4'}
             sx={{ color: theme.palette.text.primary, marginBottom: 1 }}
           >
-            <Trans i18nKey="onboarding.outcomeContent.success.title">
-              La tua richiesta è stata inviata
-              <br />
-              con successo
-            </Trans>
+            {t('onboarding.outcomeContent.success.title')}
           </Typography>
           <Stack key="0" spacing={4}>
             <Typography variant="body1">
-              <Trans i18nKey="onboarding.outcomeContent.success.description">
-                Riceverai una PEC all’indirizzo istituzionale che hai indicato.
-                <br />
-                Al suo interno troverai le istruzioni per completare <br />
-                l&apos;adesione.
-              </Trans>
+              {institutionType !== 'PSP' ? (
+                <Trans i18nKey="onboarding.outcomeContent.success.baseDescription">
+                  Invieremo un&apos;email all&apos;indirizzo PEC primario dell&apos;ente.
+                  <br />
+                  Al suo interno, ci sono le istruzioni per completare <br />
+                  l&apos;adesione.
+                </Trans>
+              ) : (
+                <Trans i18nKey="onboarding.outcomeContent.success.pspDescription">
+                  Invieremo un&apos;email all&apos;indirizzo PEC indicato.
+                  <br />
+                  Al suo interno, ci sono le istruzioni per completare <br />
+                  l&apos;adesione.
+                </Trans>
+              )}
             </Typography>
             <Button
               variant="contained"
               sx={{ alignSelf: 'center' }}
               onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
             >
-              {t('onboarding.outcomeContent.success.backActionLabel')}
+              {t('onboarding.outcomeContent.success.backHome')}
             </Button>
           </Stack>
         </>,
@@ -198,37 +351,17 @@ function OnboardingComponent({ productId }: { productId: string }) {
       title: '',
       description: [
         <>
-          <IllusError size={60} />
-          <Grid container direction="column" key="0" mt={3}>
-            <Grid container item justifyContent="center">
-              <Grid item xs={5}>
-                <Typography variant="h4">{t('onboarding.outcomeContent.error.title')}</Typography>
-              </Grid>
-            </Grid>
-            <Grid container item justifyContent="center" mb={3} mt={1}>
-              <Grid item xs={5}>
-                <Typography variant="body1">
-                  <Trans i18nKey="onboarding.outcomeContent.error.description">
-                    A causa di un errore del sistema non è possibile completare la procedura.
-                    <br />
-                    Ti chiediamo di riprovare più tardi.
-                  </Trans>
-                </Typography>
-              </Grid>
-            </Grid>
-            <Grid container item justifyContent="center">
-              <Grid item xs={4}>
-                <Button
-                  onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
-                  variant={'contained'}
-                >
-                  <Typography width="100%" sx={{ color: theme.palette.primary.contrastText }}>
-                    {t('onboarding.outcomeContent.error.backActionLabel')}
-                  </Typography>
-                </Button>
-              </Grid>
-            </Grid>
-          </Grid>
+          <ErrorPage
+            titleContent={t('onboarding.outcomeContent.error.title')}
+            descriptionContent={
+              <Trans i18nKey="onboarding.outcomeContent.error.description">
+                A causa di un errore del sistema non è possibile completare la procedura.
+                <br />
+                Ti chiediamo di riprovare più tardi.
+              </Trans>
+            }
+            backButtonContent={t('onboarding.outcomeContent.error.backActionLabel')}
+          />
         </>,
       ],
     },
@@ -281,7 +414,11 @@ function OnboardingComponent({ productId }: { productId: string }) {
       {
         method: 'POST',
         data: {
-          billingData,
+          billingData: billingData2billingDataRequest(billingData as BillingData),
+          pspData:
+            institutionType === 'PSP'
+              ? pspData2pspDataRequest(billingData as BillingData)
+              : undefined,
           institutionType,
           origin,
           users: users.map((u) => ({
@@ -354,6 +491,22 @@ function OnboardingComponent({ productId }: { productId: string }) {
     });
     setInstitutionType(newInstitutionType);
     forward();
+    if (newInstitutionType === 'PSP') {
+      if (newInstitutionType !== institutionType) {
+        setBillingData({
+          businessName: '',
+          registeredOffice: '',
+          zipCode: '',
+          digitalAddress: '',
+          taxCode: '',
+          vatNumber: '',
+          recipientCode: '',
+        });
+      } else {
+        setBillingData(billingData);
+      }
+      setActiveStep(4);
+    }
   };
 
   const steps: Array<StepperStep> = [
@@ -417,6 +570,10 @@ function OnboardingComponent({ productId }: { productId: string }) {
       label: 'Insert Billing Data',
       Component: () =>
         StepBillingData({
+          outcome,
+          productId,
+          selectedParty,
+          selectedProduct,
           externalInstitutionId,
           initialFormData: billingData ?? {
             businessName: '',
@@ -437,6 +594,8 @@ function OnboardingComponent({ productId }: { productId: string }) {
             } else if (fromDashboard && productAvoidStep) {
               setOnExitAction(() => () => history.goBack());
               setOpenExitModal(true);
+            } else if (institutionType === 'PSP') {
+              setActiveStep(0);
             } else {
               setActiveStep(1);
             }
@@ -504,6 +663,17 @@ function OnboardingComponent({ productId }: { productId: string }) {
     <NoProductPage />
   ) : outcome ? (
     <MessageNoAction {...outcome} />
+  ) : pricingPlan && pricingPlan !== 'FA' ? (
+    <ErrorPage
+      titleContent={t('invalidPricingPlan.title')}
+      descriptionContent={
+        <Trans i18nKey="invalidPricingPlan.description">
+          Non riusciamo a trovare la pagina che stai cercando. <br />
+          Assicurati che l’indirizzo sia corretto o torna alla home.
+        </Trans>
+      }
+      backButtonContent={t('invalidPricingPlan.backButton')}
+    />
   ) : (
     <Container>
       <Step />

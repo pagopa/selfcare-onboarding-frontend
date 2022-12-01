@@ -127,8 +127,26 @@ const mockPartyRegistry = {
       originId: 'originId7',
       address: 'sede legale',
     },
+    // use case added for easily test new feature about taxCode equal to vatCode
+    {
+      id: 'idNotIpa',
+      o: 'od',
+      ou: 'oud',
+      aoo: 'aood',
+      taxCode: '98765432123',
+      zipCode: '44382',
+      administrationCode: '98765432123',
+      category: 'c432',
+      managerName: 'Ugo',
+      managerSurname: 'Diaz',
+      description: 'AGENCY NOT IPA',
+      digitalAddress: 'mail@pec.mail.org',
+      origin: 'IPAIPA', // origin not IPA for fields editability
+      originId: 'originId1',
+      address: 'sede legale',
+    },
   ],
-  count: 5,
+  count: 8,
 };
 
 const mockedProduct = {

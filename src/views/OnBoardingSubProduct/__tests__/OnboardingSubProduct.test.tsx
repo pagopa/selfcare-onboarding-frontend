@@ -23,7 +23,7 @@ const initialLocation = {
   assign: jest.fn(),
   pathname: '/:productId/:subProductId',
   origin: 'MOCKED_ORIGIN',
-  search: '?pricingPlan=pricingPlan',
+  search: '?pricingPlan=C1',
   hash: '',
   state: undefined,
 };
@@ -99,7 +99,7 @@ const stepSelectInstitutionUnreleatedTitle = 'Seleziona il tuo ente';
 const stepSelectInstitutionReleatedTitle = 'Seleziona il tuo ente';
 const stepBillingDataTitle = 'Indica i dati del tuo ente';
 const stepAddManagerTitle = 'Indica il Legale Rappresentante';
-const successOnboardingSubProductTitle = 'La tua richiesta è stata inviata con successo';
+const successOnboardingSubProductTitle = 'La richiesta di adesione è stata inviata con successo';
 const errorOnboardingSubProductTitle = 'Qualcosa è andato storto';
 
 const agencyOnboarded = 'AGENCY ONBOARDED';
@@ -462,6 +462,17 @@ const fillTextFieldAndCheckButton = async (
   }
 };
 
+const billingData2billingDataRequest = () => ({
+  businessName: 'businessNameInput',
+  registeredOffice: 'registeredOfficeInput',
+  digitalAddress: 'a@a.com',
+  zipCode: '09010',
+  taxCode: 'AAAAAA44D55F456K',
+  vatNumber: '12345678901',
+  recipientCode: 'AM23EIX',
+  publicServices: false,
+});
+
 const verifySubmit = async () => {
   await waitFor(() =>
     expect(fetchWithLogsSpy).lastCalledWith(
@@ -481,18 +492,10 @@ const verifySubmit = async () => {
               email: 'm@ma.it',
             },
           ],
-          billingData: {
-            businessName: 'businessNameInput',
-            registeredOffice: 'registeredOfficeInput',
-            digitalAddress: 'a@a.com',
-            zipCode: '09010',
-            taxCode: 'AAAAAA44D55F456K',
-            vatNumber: '12345678901',
-            recipientCode: 'AM23EIX',
-            publicServices: false,
-          },
+          billingData: billingData2billingDataRequest(),
+          pspData: undefined,
           institutionType: 'GSP',
-          pricingPlan: 'pricingPlan',
+          pricingPlan: 'C1',
           origin: 'IPA',
         },
       },
