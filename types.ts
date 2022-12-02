@@ -227,10 +227,6 @@ export type DpoData = {
   // Indirizzo Email DPO
   email: string;
 };
-export type Test = {
-  nome: string;
-
-};
 
 export type BillingData = {
   // Ragione sociale
@@ -265,7 +261,6 @@ export type BillingData = {
   dpoPecAddress?: string;
   // Indirizzo Email DPO
   dopEmailAddress?: string;
-  billingDataTest: Test;
 };
 
 export type InstitutionData = {

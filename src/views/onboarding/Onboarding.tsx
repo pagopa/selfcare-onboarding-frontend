@@ -248,9 +248,6 @@ function OnboardingComponent({ productId }: { productId: string }) {
       taxCode: party.taxCode,
       vatNumber: '',
       zipCode: party.zipCode,
-      billingDataTest: {
-        nome: '',
-      },
     });
     forwardWithData(newFormData);
     trackEvent('ONBOARDING_PARTY_SELECTION', {
@@ -504,9 +501,6 @@ function OnboardingComponent({ productId }: { productId: string }) {
           taxCode: '',
           vatNumber: '',
           recipientCode: '',
-          billingDataTest: {
-            nome: '',
-          },
         });
       } else {
         setBillingData(billingData);
@@ -589,9 +583,6 @@ function OnboardingComponent({ productId }: { productId: string }) {
             taxCode: '',
             vatNumber: '',
             recipientCode: '',
-            billingDataTest: {
-              nome: '',
-            },
           },
           origin,
           institutionType: institutionType as InstitutionType,
