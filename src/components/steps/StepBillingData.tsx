@@ -202,6 +202,7 @@ export default function StepBillingData({
           : institutionType === 'GSP'
           ? false
           : undefined,
+      billingDataTest: { nome: 'pippo' },
     },
     validateOnMount: true,
     validate,
