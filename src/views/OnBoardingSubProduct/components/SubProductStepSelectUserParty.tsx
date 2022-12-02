@@ -160,7 +160,7 @@ export function SubProductStepSelectUserParty({ forward, parties }: Props) {
               ))}
             </CustomBox>
           ) : (
-            t('onBoardingSubProduct.notFoundResults')
+            t('onBoardingSubProduct.selectUserPartyStep.notFoundResults')
           )}
         </Paper>
       </Grid>
