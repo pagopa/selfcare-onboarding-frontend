@@ -8,7 +8,7 @@ import { useParams } from 'react-router';
 import { useTranslation, Trans } from 'react-i18next';
 import { withLogin } from '../../components/withLogin';
 import {
-  BillingData,
+  OnboardingFormData,
   InstitutionType,
   SelfcareParty,
   Product,
@@ -22,7 +22,7 @@ import { HeaderContext } from '../../lib/context';
 import { StepAddManager, UsersObject } from '../../components/steps/StepAddManager';
 import { StepSearchParty } from '../../components/steps/StepSearchParty';
 import StepOnboardingData from '../../components/steps/StepOnboardingData';
-import StepBillingData from '../../components/steps/StepBillingData';
+import StepOnboardingFormData from '../../components/steps/StepOnboardingFormData';
 import { registerUnloadEvent, unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
 import { useHistoryState } from '../../components/useHistoryState';
 import ErrorPage from '../../components/errorPage/ErrorPage';
@@ -53,7 +53,7 @@ function OnBoardingSubProduct() {
 
   const [_manager, setManager] = useState<UserOnCreate>();
   const [users, setUsers] = useState<Array<UserOnCreate>>([]);
-  const [billingData, setBillingData] = useState<BillingData>();
+  const [billingData, setBillingData] = useState<OnboardingFormData>();
   const [institutionType, setInstitutionType] = useState<InstitutionType>();
   const [partyId, setPartyId] = useState<string>();
   const [pricingPlan, setPricingPlan] = useState<string>();
@@ -107,7 +107,7 @@ function OnBoardingSubProduct() {
     setActiveStep(newParties.length === 0 ? 2 : 1);
   };
 
-  const forwardWithBillingData = (newBillingData: BillingData) => {
+  const forwardWithBillingData = (newBillingData: OnboardingFormData) => {
     trackEvent('ONBOARDING_PREMIUM_BILLING_DATA', {
       request_id: requestIdRef.current,
       party_id: externalInstitutionId,
@@ -158,7 +158,7 @@ function OnBoardingSubProduct() {
 
   const forwardWithOnboardingData = (
     manager?: UserOnCreate,
-    billingData?: BillingData,
+    billingData?: OnboardingFormData,
     institutionType?: InstitutionType,
     partyId?: string
   ) => {
@@ -248,7 +248,7 @@ function OnBoardingSubProduct() {
     {
       label: 'Insert Billing Data',
       Component: () =>
-        StepBillingData({
+        StepOnboardingFormData({
           productId,
           selectedProduct: subProduct,
           externalInstitutionId,
@@ -305,7 +305,7 @@ function OnBoardingSubProduct() {
           subProduct: subProduct as Product,
           externalInstitutionId,
           users,
-          billingData: billingData as BillingData,
+          billingData: billingData as OnboardingFormData,
           institutionType: institutionType as InstitutionType,
           pricingPlan,
           origin,

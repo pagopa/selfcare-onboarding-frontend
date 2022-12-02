@@ -228,7 +228,9 @@ export type DpoData = {
   email: string;
 };
 
-export type BillingData = {
+
+
+export type OnboardingFormData = {
   // Ragione sociale
   businessName: string;
   // Sede legale
@@ -265,7 +267,7 @@ export type BillingData = {
 
 export type InstitutionData = {
   id: string;
-  billingData: BillingData;
+  billingData: OnboardingFormData;
   institutionType: InstitutionType;
   origin: string;
 };

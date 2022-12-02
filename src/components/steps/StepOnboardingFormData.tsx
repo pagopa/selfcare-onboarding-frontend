@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 import Checkbox from '@mui/material/Checkbox';
 import { useEffect } from 'react';
 import {
-  BillingData,
+  OnboardingFormData,
   InstitutionType,
   Party,
   Product,
@@ -50,7 +50,7 @@ type StepBillingDataHistoryState = {
 };
 
 type Props = StepperStepComponentProps & {
-  initialFormData: BillingData;
+  initialFormData: OnboardingFormData;
   institutionType: InstitutionType;
   subtitle: string;
   externalInstitutionId: string;
@@ -61,7 +61,7 @@ type Props = StepperStepComponentProps & {
   outcome?: RequestOutcomeMessage | null;
 };
 
-export default function StepBillingData({
+export default function StepOnboardingFormData({
   initialFormData,
   back,
   forward,
@@ -122,7 +122,7 @@ export default function StepBillingData({
   };
 
   // eslint-disable-next-line sonarjs/cognitive-complexity
-  const validate = (values: Partial<BillingData>) =>
+  const validate = (values: Partial<OnboardingFormData>) =>
     Object.fromEntries(
       Object.entries({
         businessName: !values.businessName ? requiredError : undefined,
@@ -193,7 +193,7 @@ export default function StepBillingData({
       }).filter(([_key, value]) => value)
     );
 
-  const formik = useFormik<BillingData>({
+  const formik = useFormik<OnboardingFormData>({
     initialValues: {
       ...initialFormData,
       publicServices:
@@ -230,7 +230,7 @@ export default function StepBillingData({
   }, [formik.values.taxCode, formik.values.vatNumber]);
 
   const baseTextFieldProps = (
-    field: keyof BillingData,
+    field: keyof OnboardingFormData,
     label: string,
     fontWeight: number = 400,
     fontSize: number = 16
@@ -262,7 +262,7 @@ export default function StepBillingData({
   };
 
   const baseNumericFieldProps = (
-    field: keyof BillingData,
+    field: keyof OnboardingFormData,
     label: string,
     fontWeight: number = 400,
     fontSize: number = 16
