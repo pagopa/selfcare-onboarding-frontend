@@ -9,7 +9,6 @@ import { uniqueId } from 'lodash';
 import { IllusCompleted, IllusError } from '@pagopa/mui-italia';
 import { withLogin } from '../../components/withLogin';
 import {
-  OnboardingFormData,
   InstitutionType,
   Product,
   RequestOutcomeOptions,
@@ -18,8 +17,6 @@ import {
   UserOnCreate,
   Problem,
   RequestOutcomeMessage,
-  BillingDataDto,
-  PspDataDto,
 } from '../../../types';
 import { StepSearchParty } from '../../components/steps/StepSearchParty';
 import { StepAddManager } from '../../components/steps/StepAddManager';
@@ -29,7 +26,10 @@ import { fetchWithLogs } from '../../lib/api-utils';
 import { getFetchOutcome } from '../../lib/error-utils';
 import { ENV } from '../../utils/env';
 import { HeaderContext, UserContext } from '../../lib/context';
+import { billingData2billingDataRequest } from '../../model/BillingData';
+import { pspData2pspDataRequest } from '../../model/PspData';
 import NoProductPage from '../NoProductPage';
+import { OnboardingFormData } from '../../model/OnboardingFormData';
 import StepOnboardingData from '../../components/steps/StepOnboardingData';
 import StepOnboardingFormData from '../../components/steps/StepOnboardingFormData';
 import { registerUnloadEvent, unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
@@ -39,32 +39,6 @@ import { genericError, OnboardingStep1_5 } from './components/OnboardingStep1_5'
 import { OnBoardingProductStepDelegates } from './components/OnBoardingProductStepDelegates';
 
 export type ValidateErrorType = 'conflictError';
-
-export const billingData2billingDataRequest = (
-  billingData: OnboardingFormData
-): BillingDataDto => ({
-  businessName: billingData.businessName,
-  digitalAddress: billingData.digitalAddress,
-  publicServices: billingData.publicServices,
-  recipientCode: billingData.recipientCode,
-  registeredOffice: billingData.registeredOffice,
-  taxCode: billingData.taxCode,
-  vatNumber: billingData.vatNumber,
-  zipCode: billingData.zipCode,
-});
-
-export const pspData2pspDataRequest = (billingData: OnboardingFormData): PspDataDto => ({
-  abiCode: billingData.abiCode ?? '',
-  businessRegisterNumber: billingData.commercialRegisterNumber ?? '',
-  dpoData: {
-    address: billingData.dpoAddress ?? '',
-    pec: billingData.dpoPecAddress ?? '',
-    email: billingData.dopEmailAddress ?? '',
-  },
-  legalRegisterNumber: billingData.registerNumber ?? '',
-  legalRegisterName: billingData.registrationInRegister ?? '',
-  vatNumberGroup: billingData.vatNumberGroup ?? false,
-});
 
 export const prodPhaseOutErrorPage: RequestOutcomeMessage = {
   title: '',

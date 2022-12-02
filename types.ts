@@ -4,6 +4,7 @@ import { AxiosRequestConfig } from 'axios';
 import { FunctionComponent, SVGProps } from 'react';
 import { UserRole } from '@pagopa/selfcare-common-frontend/utils/constants';
 import { API } from './src/utils/constants';
+import { OnboardingFormData } from './src/model/OnboardingFormData';
 
 /*
  * Fetch data and router related types
@@ -183,86 +184,6 @@ export type Party = {
   digitalAddress: string;
   taxCode: string;
   origin: string;
-};
-
-export type BillingDataDto = {
-  // Ragione sociale
-  businessName: string;
-  // Indirizzo PEC
-  digitalAddress: string;
-  // servizi pubblici
-  publicServices?: boolean;
-  // Codice destinatario
-  recipientCode: string;
-  // Sede legale
-  registeredOffice: string;
-  // Codice fiscale
-  taxCode: string;
-  // Partita iva
-  vatNumber: string;
-  // Codice di avviamento postale
-  zipCode: string;
-};
-
-export type PspDataDto = {
-  // codice ABI
-  abiCode: string;
-  // n. iscrizione al Registro delle Imprese
-  businessRegisterNumber: string;
-  // dati del Responsabile protezione dati (DPO)
-  dpoData: DpoData;
-  // numero iscrizione albo
-  legalRegisterNumber: string;
-  // iscrizione all'Albo
-  legalRegisterName: string;
-  // La partita IVA è di gruppo
-  vatNumberGroup: boolean;
-};
-
-export type DpoData = {
-  // Indirizzo DPO
-  address: string;
-  // Indirizzo PEC DPO
-  pec: string;
-  // Indirizzo Email DPO
-  email: string;
-};
-
-
-
-export type OnboardingFormData = {
-  // Ragione sociale
-  businessName: string;
-  // Sede legale
-  registeredOffice: string;
-  // Codice di avviamento postale
-  zipCode: string;
-  // Indirizzo PEC
-  digitalAddress: string;
-  // Codice fiscale
-  taxCode: string;
-  // Partita iva
-  vatNumber: string;
-  // Codice destinatario
-  recipientCode: string;
-  // servizi pubblici
-  publicServices?: boolean;
-  // n. iscrizione al Registro delle Imprese
-  commercialRegisterNumber?: string;
-  // iscrizione all'Albo
-  registrationInRegister?: string;
-  // numero iscrizione albo
-  registerNumber?: string;
-  // codice ABI
-  abiCode?: string;
-  // La partita IVA è di gruppo
-  vatNumberGroup?: boolean;
-  // Indirizzo DPO
-  dpoAddress?: string;
-  // Indirizzo PEC DPO
-  dpoPecAddress?: string;
-  // Indirizzo Email DPO
-  dopEmailAddress?: string;
 };
 
 export type InstitutionData = {

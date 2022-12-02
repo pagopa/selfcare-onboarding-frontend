@@ -8,7 +8,6 @@ import { useParams } from 'react-router';
 import { useTranslation, Trans } from 'react-i18next';
 import { withLogin } from '../../components/withLogin';
 import {
-  OnboardingFormData,
   InstitutionType,
   SelfcareParty,
   Product,
@@ -16,6 +15,7 @@ import {
   UserOnCreate,
   Party,
 } from '../../../types';
+import { OnboardingFormData } from '../../model/OnboardingFormData';
 import { LoadingOverlay } from '../../components/LoadingOverlay';
 import { ENV } from '../../utils/env';
 import { HeaderContext } from '../../lib/context';

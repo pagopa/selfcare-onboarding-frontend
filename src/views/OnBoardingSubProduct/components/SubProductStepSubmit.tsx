@@ -3,7 +3,6 @@ import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsS
 import { Trans } from 'react-i18next';
 import { AxiosError } from 'axios';
 import {
-  OnboardingFormData,
   InstitutionType,
   Problem,
   Product,
@@ -15,11 +14,11 @@ import { fetchWithLogs } from '../../../lib/api-utils';
 import { getFetchOutcome } from '../../../lib/error-utils';
 import { MessageNoAction } from '../../../components/MessageNoAction';
 import { unregisterUnloadEvent } from '../../../utils/unloadEvent-utils';
-import {
-  billingData2billingDataRequest,
-  pspData2pspDataRequest,
-} from '../../onboarding/Onboarding';
+import {} from '../../onboarding/Onboarding';
 import ErrorPage from '../../../components/errorPage/ErrorPage';
+import { billingData2billingDataRequest } from '../../../model/BillingData';
+import { pspData2pspDataRequest } from '../../../model/PspData';
+import { OnboardingFormData } from '../../../model/OnboardingFormData';
 
 type Props = StepperStepComponentProps & {
   requestId: string;

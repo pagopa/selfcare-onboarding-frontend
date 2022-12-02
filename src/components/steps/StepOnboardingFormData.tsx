@@ -8,7 +8,6 @@ import { useTranslation } from 'react-i18next';
 import Checkbox from '@mui/material/Checkbox';
 import { useEffect } from 'react';
 import {
-  OnboardingFormData,
   InstitutionType,
   Party,
   Product,
@@ -18,6 +17,7 @@ import {
 import { OnboardingStepActions } from '../OnboardingStepActions';
 import { useHistoryState } from '../useHistoryState';
 import { MessageNoAction } from '../MessageNoAction';
+import { OnboardingFormData } from '../../model/OnboardingFormData';
 
 const CustomTextField = styled(TextField)({
   '.MuiInputLabel-asterisk': {
