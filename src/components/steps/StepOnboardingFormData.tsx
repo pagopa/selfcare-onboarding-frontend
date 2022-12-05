@@ -1,8 +1,8 @@
 /* eslint-disable sonarjs/cognitive-complexity */
 /* eslint-disable complexity */
 
-import { Box, styled } from '@mui/system';
-import { Grid, TextField, Typography, useTheme, Paper } from '@mui/material';
+import { Box } from '@mui/system';
+import { Grid, Typography } from '@mui/material';
 import { useFormik } from 'formik';
 import { useTranslation } from 'react-i18next';
 import { useEffect } from 'react';
@@ -18,12 +18,7 @@ import { useHistoryState } from '../useHistoryState';
 import { MessageNoAction } from '../MessageNoAction';
 import { OnboardingFormData } from '../../model/OnboardingFormData';
 import PersonalAndBillingDataSection from '../onboardingFormData/PersonalAndBillingDataSection';
-
-const CustomTextField = styled(TextField)({
-  '.MuiInputLabel-asterisk': {
-    display: 'none',
-  },
-});
+import DpoSection from '../onboardingFormData/DpoSection';
 
 const mailPECRegexp = new RegExp('^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$');
 const fiscalAndVatCodeRegexp = new RegExp(
@@ -67,7 +62,6 @@ export default function StepOnboardingFormData({
   const isPSP = institutionType === 'PSP';
 
   const { t } = useTranslation();
-  const theme = useTheme();
 
   const [stepHistoryState, setStepHistoryState, _setStepHistoryStateHistory] =
     useHistoryState<StepBillingDataHistoryState>('stepBillingData', {
@@ -271,65 +265,15 @@ export default function StepOnboardingFormData({
           </Grid>
         </Grid>
 
-        <form onSubmit={formik.handleSubmit}>
-          <PersonalAndBillingDataSection
-            origin={origin}
-            institutionType={institutionType}
-            baseTextFieldProps={baseTextFieldProps}
-            stepHistoryState={stepHistoryState}
-            setStepHistoryState={setStepHistoryState}
-            formik={formik}
-          />
-          {isPSP && (
-            <>
-              {/* DATI DEL DPO */}
-              <Grid container item justifyContent="center" mt={6} mb={4}>
-                <Grid item xs={12}>
-                  <Typography
-                    align="center"
-                    sx={{ fontWeight: 'fontWeightMedium', fontSize: '24px' }}
-                  >
-                    {t('stepBillingData.dpoTitle')}
-                  </Typography>
-                </Grid>
-              </Grid>
-              <Paper elevation={8} sx={{ borderRadius: theme.spacing(2), p: 1 }}>
-                <Grid item container spacing={3} p={3}>
-                  <Grid item xs={12}>
-                    <CustomTextField
-                      {...baseTextFieldProps(
-                        'dpoAddress',
-                        t('stepBillingData.dpoAddress'),
-                        400,
-                        18
-                      )}
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <CustomTextField
-                      {...baseTextFieldProps(
-                        'dpoPecAddress',
-                        t('stepBillingData.dpoPecAddress'),
-                        400,
-                        18
-                      )}
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <CustomTextField
-                      {...baseTextFieldProps(
-                        'dopEmailAddress',
-                        t('stepBillingData.dopEmailAddress'),
-                        400,
-                        18
-                      )}
-                    />
-                  </Grid>
-                </Grid>
-              </Paper>
-            </>
-          )}
-        </form>
+        <PersonalAndBillingDataSection
+          origin={origin}
+          institutionType={institutionType}
+          baseTextFieldProps={baseTextFieldProps}
+          stepHistoryState={stepHistoryState}
+          setStepHistoryState={setStepHistoryState}
+          formik={formik}
+        />
+        {isPSP && <DpoSection baseTextFieldProps={baseTextFieldProps} />}
 
         <Grid item xs={12} my={4}>
           <OnboardingStepActions
