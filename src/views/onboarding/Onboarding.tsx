@@ -9,7 +9,6 @@ import { uniqueId } from 'lodash';
 import { IllusCompleted, IllusError } from '@pagopa/mui-italia';
 import { withLogin } from '../../components/withLogin';
 import {
-  BillingData,
   InstitutionType,
   Product,
   RequestOutcomeOptions,
@@ -18,8 +17,6 @@ import {
   UserOnCreate,
   Problem,
   RequestOutcomeMessage,
-  BillingDataDto,
-  PspDataDto,
 } from '../../../types';
 import { StepSearchParty } from '../../components/steps/StepSearchParty';
 import { StepAddManager } from '../../components/steps/StepAddManager';
@@ -29,9 +26,12 @@ import { fetchWithLogs } from '../../lib/api-utils';
 import { getFetchOutcome } from '../../lib/error-utils';
 import { ENV } from '../../utils/env';
 import { HeaderContext, UserContext } from '../../lib/context';
+import { billingData2billingDataRequest } from '../../model/BillingData';
+import { pspData2pspDataRequest } from '../../model/PspData';
 import NoProductPage from '../NoProductPage';
+import { OnboardingFormData } from '../../model/OnboardingFormData';
 import StepOnboardingData from '../../components/steps/StepOnboardingData';
-import StepBillingData from '../../components/steps/StepBillingData';
+import StepOnboardingFormData from '../../components/steps/StepOnboardingFormData';
 import { registerUnloadEvent, unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
 import StepInstitutionType from '../../components/steps/StepInstitutionType';
 import ErrorPage from '../../components/errorPage/ErrorPage';
@@ -39,30 +39,6 @@ import { genericError, OnboardingStep1_5 } from './components/OnboardingStep1_5'
 import { OnBoardingProductStepDelegates } from './components/OnBoardingProductStepDelegates';
 
 export type ValidateErrorType = 'conflictError';
-
-export const billingData2billingDataRequest = (billingData: BillingData): BillingDataDto => ({
-  businessName: billingData.businessName,
-  digitalAddress: billingData.digitalAddress,
-  publicServices: billingData.publicServices,
-  recipientCode: billingData.recipientCode,
-  registeredOffice: billingData.registeredOffice,
-  taxCode: billingData.taxCode,
-  vatNumber: billingData.vatNumber,
-  zipCode: billingData.zipCode,
-});
-
-export const pspData2pspDataRequest = (billingData: BillingData): PspDataDto => ({
-  abiCode: billingData.abiCode ?? '',
-  businessRegisterNumber: billingData.commercialRegisterNumber ?? '',
-  dpoData: {
-    address: billingData.dpoAddress ?? '',
-    pec: billingData.dpoPecAddress ?? '',
-    email: billingData.dopEmailAddress ?? '',
-  },
-  legalRegisterNumber: billingData.registerNumber ?? '',
-  legalRegisterName: billingData.registrationInRegister ?? '',
-  vatNumberGroup: billingData.vatNumberGroup ?? false,
-});
 
 export const prodPhaseOutErrorPage: RequestOutcomeMessage = {
   title: '',
@@ -149,7 +125,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
   const history = useHistory();
   const [openExitModal, setOpenExitModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>();
-  const [billingData, setBillingData] = useState<BillingData>();
+  const [billingData, setBillingData] = useState<OnboardingFormData>();
   const [institutionType, setInstitutionType] = useState<InstitutionType>();
   const [origin, setOrigin] = useState<string>();
   const [pricingPlan, setPricingPlan] = useState<string>();
@@ -259,7 +235,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
     setInstitutionType(institutionType);
   };
 
-  const forwardWithBillingData = (newBillingData: BillingData) => {
+  const forwardWithBillingData = (newBillingData: OnboardingFormData) => {
     trackEvent('ONBOARDING_BILLING_DATA', {
       request_id: requestIdRef.current,
       party_id: externalInstitutionId,
@@ -414,10 +390,10 @@ function OnboardingComponent({ productId }: { productId: string }) {
       {
         method: 'POST',
         data: {
-          billingData: billingData2billingDataRequest(billingData as BillingData),
+          billingData: billingData2billingDataRequest(billingData as OnboardingFormData),
           pspData:
             institutionType === 'PSP'
-              ? pspData2pspDataRequest(billingData as BillingData)
+              ? pspData2pspDataRequest(billingData as OnboardingFormData)
               : undefined,
           institutionType,
           origin,
@@ -468,8 +444,8 @@ function OnboardingComponent({ productId }: { productId: string }) {
   };
 
   const forwardWithOnboardingData = (
-    _manager: BillingData,
-    billingData?: BillingData,
+    _manager: OnboardingFormData,
+    billingData?: OnboardingFormData,
     institutionType?: InstitutionType,
     _id?: string
   ) => {
@@ -569,7 +545,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
     {
       label: 'Insert Billing Data',
       Component: () =>
-        StepBillingData({
+        StepOnboardingFormData({
           outcome,
           productId,
           selectedParty,
