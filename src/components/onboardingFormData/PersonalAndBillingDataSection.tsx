@@ -80,11 +80,16 @@ export default function PersonalAndBillingDataSection({
   return (
     <>
       {/* DATI DI FATTURAZIONE E ANAGRAFICI */}
-      <Paper elevation={8} sx={{ borderRadius: theme.spacing(2), p: 1 }}>
-        <Grid item container spacing={3} px={3} pt={3} pb={2}>
+      <Paper elevation={8} sx={{ borderRadius: theme.spacing(2), p: 4 }}>
+        <Grid item container spacing={3}>
           <Grid item xs={12}>
             <CustomTextField
-              {...baseTextFieldProps('businessName', t('stepBillingData.businessName'), 400, 18)}
+              {...baseTextFieldProps(
+                'businessName',
+                t('onboardingFormData.billingDataSection.businessName'),
+                400,
+                18
+              )}
               disabled={isDisabled}
             />
           </Grid>
@@ -92,7 +97,7 @@ export default function PersonalAndBillingDataSection({
             <CustomTextField
               {...baseTextFieldProps(
                 'registeredOffice',
-                t('stepBillingData.registeredOffice'),
+                t('onboardingFormData.billingDataSection.registeredOffice'),
                 400,
                 18
               )}
@@ -102,15 +107,9 @@ export default function PersonalAndBillingDataSection({
           <Grid item xs={4} paddingLeft={1}>
             <CustomNumberField
               inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
-              {...baseNumericFieldProps('zipCode', t('stepBillingData.zipCode'), 400, 18)}
-              disabled={isDisabled}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <CustomTextField
-              {...baseTextFieldProps(
-                'digitalAddress',
-                t('stepBillingData.digitalAddress'),
+              {...baseNumericFieldProps(
+                'zipCode',
+                t('onboardingFormData.billingDataSection.zipCode'),
                 400,
                 18
               )}
@@ -119,7 +118,23 @@ export default function PersonalAndBillingDataSection({
           </Grid>
           <Grid item xs={12}>
             <CustomTextField
-              {...baseTextFieldProps('taxCode', t('stepBillingData.taxCode'), 400, 18)}
+              {...baseTextFieldProps(
+                'digitalAddress',
+                t('onboardingFormData.billingDataSection.digitalAddress'),
+                400,
+                18
+              )}
+              disabled={isDisabled}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <CustomTextField
+              {...baseTextFieldProps(
+                'taxCode',
+                t('onboardingFormData.billingDataSection.taxCode'),
+                400,
+                18
+              )}
               disabled={isDisabled}
             />
           </Grid>
@@ -128,7 +143,9 @@ export default function PersonalAndBillingDataSection({
               <Checkbox
                 checked={stepHistoryState.isTaxCodeEquals2PIVA}
                 inputProps={{
-                  'aria-label': t('stepBillingData.taxCodeEquals2PIVAdescription'),
+                  'aria-label': t(
+                    'onboardingFormData.billingDataSection.taxCodeEquals2PIVAdescription'
+                  ),
                 }}
                 onChange={() => {
                   void formik.setFieldValue('vatNumber', '');
@@ -138,13 +155,20 @@ export default function PersonalAndBillingDataSection({
                   });
                 }}
               />
-              <Typography>{t('stepBillingData.taxCodeEquals2PIVAdescription')}</Typography>
+              <Typography>
+                {t('onboardingFormData.billingDataSection.taxCodeEquals2PIVAdescription')}
+              </Typography>
             </Box>
           </Grid>
           <Grid item xs={12}>
             <Typography>
               <CustomTextField
-                {...baseTextFieldProps('vatNumber', t('stepBillingData.vatNumber'), 400, 18)}
+                {...baseTextFieldProps(
+                  'vatNumber',
+                  t('onboardingFormData.billingDataSection.vatNumber'),
+                  400,
+                  18
+                )}
                 value={
                   stepHistoryState.isTaxCodeEquals2PIVA
                     ? formik.values.taxCode
@@ -156,7 +180,7 @@ export default function PersonalAndBillingDataSection({
                 <Box display="flex" alignItems="center" mt="2px">
                   <Checkbox
                     inputProps={{
-                      'aria-label': t('stepBillingData.vatNumberGroup'),
+                      'aria-label': t('onboardingFormData.billingDataSection.vatNumberGroup'),
                     }}
                     checked={formik.values.vatNumberGroup}
                     onChange={(_, checked: boolean) =>
@@ -164,7 +188,9 @@ export default function PersonalAndBillingDataSection({
                     }
                     value={formik.values.vatNumberGroup}
                   />
-                  <Typography>{t('stepBillingData.vatNumberGroup')}</Typography>
+                  <Typography>
+                    {t('onboardingFormData.billingDataSection.vatNumberGroup')}
+                  </Typography>
                 </Box>
               )}
             </Typography>
@@ -180,7 +206,7 @@ export default function PersonalAndBillingDataSection({
                     formik.setFieldValue('publicServices', checked, true)
                   }
                 />
-                {t('stepBillingData.gspDescription')}
+                {t('onboardingFormData.billingDataSection.gspDescription')}
               </Typography>
             </Grid>
           )}
@@ -191,7 +217,9 @@ export default function PersonalAndBillingDataSection({
                   inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
                   {...baseTextFieldProps(
                     'commercialRegisterNumber',
-                    t('stepBillingData.commercialRegisterNumber'),
+                    t(
+                      'onboardingFormData.billingDataSection.pspDataSection.commercialRegisterNumber'
+                    ),
                     400,
                     18
                   )}
@@ -201,7 +229,9 @@ export default function PersonalAndBillingDataSection({
                 <CustomTextField
                   {...baseTextFieldProps(
                     'registrationInRegister',
-                    t('stepBillingData.registrationInRegister'),
+                    t(
+                      'onboardingFormData.billingDataSection.pspDataSection.registrationInRegister'
+                    ),
                     400,
                     18
                   )}
@@ -212,7 +242,7 @@ export default function PersonalAndBillingDataSection({
                   inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
                   {...baseTextFieldProps(
                     'registerNumber',
-                    t('stepBillingData.registerNumber'),
+                    t('onboardingFormData.billingDataSection.pspDataSection.registerNumber'),
                     400,
                     18
                   )}
@@ -220,14 +250,24 @@ export default function PersonalAndBillingDataSection({
               </Grid>
               <Grid item xs={6}>
                 <CustomTextField
-                  {...baseTextFieldProps('abiCode', t('stepBillingData.abiCode'), 400, 18)}
+                  {...baseTextFieldProps(
+                    'abiCode',
+                    t('onboardingFormData.billingDataSection.pspDataSection.abiCode'),
+                    400,
+                    18
+                  )}
                 />
               </Grid>
             </>
           )}
           <Grid item xs={12}>
             <CustomTextField
-              {...baseTextFieldProps('recipientCode', t('stepBillingData.recipientCode'), 400, 18)}
+              {...baseTextFieldProps(
+                'recipientCode',
+                t('onboardingFormData.billingDataSection.recipientCode'),
+                400,
+                18
+              )}
             />
             <Typography
               sx={{
@@ -236,7 +276,7 @@ export default function PersonalAndBillingDataSection({
                 color: theme.palette.text.secondary,
               }}
             >
-              {t('stepBillingData.recipientCodeDescription')}
+              {t('onboardingFormData.billingDataSection.recipientCodeDescription')}
             </Typography>
           </Grid>
         </Grid>

@@ -2,10 +2,11 @@
 /* eslint-disable complexity */
 
 import { Box } from '@mui/system';
-import { Grid, Typography } from '@mui/material';
+import { Grid, Typography, TextField } from '@mui/material';
 import { useFormik } from 'formik';
 import { useTranslation } from 'react-i18next';
 import { useEffect } from 'react';
+import { styled } from '@mui/system';
 import {
   InstitutionType,
   Party,
@@ -19,6 +20,7 @@ import { MessageNoAction } from '../MessageNoAction';
 import { OnboardingFormData } from '../../model/OnboardingFormData';
 import PersonalAndBillingDataSection from '../onboardingFormData/PersonalAndBillingDataSection';
 import DpoSection from '../onboardingFormData/DpoSection';
+import TaxonomySection from '../onboardingFormData/taxonomy/TaxonomySection';
 
 const mailPECRegexp = new RegExp('^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$');
 const fiscalAndVatCodeRegexp = new RegExp(
@@ -33,6 +35,12 @@ export type StepBillingDataHistoryState = {
   externalInstitutionId: string;
   isTaxCodeEquals2PIVA: boolean;
 };
+
+export const CustomTextField = styled(TextField)({
+  '.MuiInputLabel-asterisk': {
+    display: 'none',
+  },
+});
 
 type Props = StepperStepComponentProps & {
   initialFormData: OnboardingFormData;
@@ -64,7 +72,7 @@ export default function StepOnboardingFormData({
   const { t } = useTranslation();
 
   const [stepHistoryState, setStepHistoryState, _setStepHistoryStateHistory] =
-    useHistoryState<StepBillingDataHistoryState>('stepBillingData', {
+    useHistoryState<StepBillingDataHistoryState>('onboardingFormData', {
       externalInstitutionId,
       isTaxCodeEquals2PIVA:
         !!initialFormData.vatNumber && initialFormData.taxCode === initialFormData.vatNumber,
@@ -113,12 +121,12 @@ export default function StepOnboardingFormData({
         zipCode: !values.zipCode
           ? requiredError
           : !fiveCharactersAllowed.test(values.zipCode)
-          ? t('stepBillingData.invalidZipCode')
+          ? t('onboardingFormData.billingDataSection.invalidZipCode')
           : undefined,
         taxCode: !values.taxCode
           ? requiredError
           : values.taxCode && !fiscalAndVatCodeRegexp.test(values.taxCode)
-          ? t('stepBillingData.invalidFiscalCode')
+          ? t('onboardingFormData.billingDataSection.invalidFiscalCode')
           : undefined,
         vatNumber:
           !values.vatNumber && !stepHistoryState.isTaxCodeEquals2PIVA
@@ -126,16 +134,16 @@ export default function StepOnboardingFormData({
             : values.vatNumber &&
               !fiscalAndVatCodeRegexp.test(values.vatNumber) &&
               !stepHistoryState.isTaxCodeEquals2PIVA
-            ? t('stepBillingData.invalidVatNumber')
+            ? t('onboardingFormData.billingDataSection.invalidVatNumber')
             : values.taxCode &&
               stepHistoryState.isTaxCodeEquals2PIVA &&
               !fiscalAndVatCodeRegexp.test(values.taxCode)
-            ? t('stepBillingData.invalidVatNumber')
+            ? t('onboardingFormData.billingDataSection.invalidVatNumber')
             : undefined,
         digitalAddress: !values.digitalAddress
           ? requiredError
           : !mailPECRegexp.test(values.digitalAddress)
-          ? t('stepBillingData.invalidEmail')
+          ? t('onboardingFormData.billingDataSection.invalidEmail')
           : undefined,
 
         commercialRegisterNumber:
@@ -144,7 +152,9 @@ export default function StepOnboardingFormData({
             : values.commercialRegisterNumber &&
               !commercialRegisterNumberRegexp.test(values.commercialRegisterNumber) &&
               isPSP
-            ? t('stepBillingData.invalidCommercialRegisterNumber')
+            ? t(
+                'onboardingFormData.billingDataSection.pspDataSection.invalidCommercialRegisterNumber'
+              )
             : undefined,
         registrationInRegister: isPSP && !values.registrationInRegister ? requiredError : undefined,
         dpoAddress: isPSP && !values.dpoAddress ? requiredError : undefined,
@@ -152,25 +162,25 @@ export default function StepOnboardingFormData({
           isPSP && !values.registerNumber
             ? requiredError
             : isPSP && values.registerNumber && !numericField.test(values.registerNumber)
-            ? t('stepBillingData.invalidregisterNumber')
+            ? t('onboardingFormData.billingDataSection.pspDataSection.invalidregisterNumber')
             : undefined,
         abiCode:
           isPSP && !values.abiCode
             ? requiredError
             : isPSP && values.abiCode && !fiveCharactersAllowed.test(values.abiCode)
-            ? t('stepBillingData.invalidabiCode')
+            ? t('onboardingFormData.billingDataSection.pspDataSection.invalidabiCode')
             : undefined,
         dopEmailAddress:
           isPSP && !values.dopEmailAddress
             ? requiredError
             : isPSP && values.dopEmailAddress && !mailPECRegexp.test(values.dopEmailAddress)
-            ? t('stepBillingData.invalidEmail')
+            ? t('onboardingFormData.billingDataSection.invalidEmail')
             : undefined,
         dpoPecAddress:
           isPSP && !values.dpoPecAddress
             ? requiredError
             : isPSP && values.dpoPecAddress && !mailPECRegexp.test(values.dpoPecAddress)
-            ? t('stepBillingData.invalidEmail')
+            ? t('onboardingFormData.billingDataSection.invalidEmail')
             : undefined,
         recipientCode: !values.recipientCode ? requiredError : undefined,
       }).filter(([_key, value]) => value)
@@ -252,8 +262,8 @@ export default function StepOnboardingFormData({
         <Grid item xs={12}>
           <Typography variant="h3" component="h2" align="center" sx={{ lineHeight: '1.2' }}>
             {institutionType === 'PSP' && productId === 'prod-pagopa'
-              ? t('stepBillingData.pspAndProdPagoPATitle')
-              : t('stepBillingData.title')}
+              ? t('onboardingFormData.pspAndProdPagoPATitle')
+              : t('onboardingFormData.title')}
           </Typography>
         </Grid>
 
@@ -273,14 +283,23 @@ export default function StepOnboardingFormData({
           setStepHistoryState={setStepHistoryState}
           formik={formik}
         />
+        {/* DATI RELATIVI ALLA TASSONOMIA */}
+        <Grid item xs={12}>
+          <TaxonomySection />
+        </Grid>
+
         {isPSP && <DpoSection baseTextFieldProps={baseTextFieldProps} />}
 
         <Grid item xs={12} my={4}>
           <OnboardingStepActions
-            back={{ action: onBackAction, label: t('stepBillingData.backLabel'), disabled: false }}
+            back={{
+              action: onBackAction,
+              label: t('onboardingFormData.backLabel'),
+              disabled: false,
+            }}
             forward={{
               action: onForwardAction,
-              label: t('stepBillingData.confirmLabel'),
+              label: t('onboardingFormData.confirmLabel'),
               disabled: !formik.isValid,
             }}
           />
