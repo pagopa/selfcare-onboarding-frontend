@@ -2,11 +2,21 @@ import { useState, useContext } from 'react';
 import { AxiosError, AxiosResponse } from 'axios';
 import debounce from 'lodash/debounce';
 import { useTranslation } from 'react-i18next';
-import { RadioGroup, Radio, FormControlLabel, Paper, Grid, Typography, Box } from '@mui/material';
+import {
+  RadioGroup,
+  Radio,
+  FormControlLabel,
+  Paper,
+  Grid,
+  Typography,
+  Box,
+  Tooltip,
+} from '@mui/material';
+import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
+import { ButtonNaked } from '@pagopa/mui-italia';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { fetchWithLogs } from '../../../lib/api-utils';
 import { ENV } from '../../../utils/env';
-import { useHistoryState } from '../../useHistoryState';
-import { IPACatalogParty } from '../../../../types';
 import { UserContext } from '../../../lib/context';
 import { getFetchOutcome } from '../../../lib/error-utils';
 import ResultsTaxonomyLocalValues from './ResultsTaxonomyLocalValues';
@@ -22,10 +32,7 @@ export default function TaxonomySection() {
   const { setRequiredLogin } = useContext(UserContext);
   const [input, setInput] = useState<string>('');
   const [options, setOptions] = useState<Array<any>>([]);
-  const [selected, setSelected, _setSelectedHistory] = useHistoryState<IPACatalogParty | null>(
-    'selected_step1',
-    null
-  );
+  const [selected, setSelected] = useState();
   const [isNationalAreaVisible, setIsNationalAreaVisible] = useState<boolean>();
   const [isLocalAreaVisible, setIsLocalAreaVisible] = useState<boolean>();
 
@@ -53,25 +60,39 @@ export default function TaxonomySection() {
     const value = event.target.value as string;
     setInput(value);
     if (value !== '') {
-      setSelected(null);
+      setSelected(undefined);
       if (value.length >= 3) {
         void debounce(handleSearch, 100)(value);
       }
     }
     if (value === '') {
-      setSelected(null);
+      setSelected(undefined);
     }
     if (selected) {
       setInput(getOptionLabel(selected));
     }
   };
+
+  const handleOpenClick = () => {
+    console.log('test');
+  };
   return (
     <Paper elevation={0} sx={{ p: 5, borderRadius: '16px', my: 4 }}>
       <Grid container item pb={2}>
-        <Grid item xs={12}>
-          <Typography variant="caption" sx={{ fontWeight: 'fontWeightBold' }}>
-            {t('onboardingFormData.taxonomySection.title')}
-          </Typography>
+        <Grid item xs={12} display="flex">
+          <Box>
+            <Typography variant="caption" sx={{ fontWeight: 'fontWeightBold' }}>
+              {t('onboardingFormData.taxonomySection.title')}
+            </Typography>
+          </Box>
+          <Box ml={2} display="flex" alignItems="center" sx={{ cursor: 'pointer' }}>
+            <Tooltip
+              title={t('onboardingFormData.taxonomySection.infoLabel') as string}
+              placement="top"
+            >
+              <InfoOutlinedIcon color="primary" fontSize={'small'} />
+            </Tooltip>
+          </Box>
         </Grid>
       </Grid>
       <RadioGroup
@@ -105,11 +126,26 @@ export default function TaxonomySection() {
       </RadioGroup>
       {/* National Area Visible */}
       {isNationalAreaVisible && <> National area</>}
+      {/* Local Area Visible */}
       {isLocalAreaVisible && (
-        <Box sx={{ pt: 1 }}>
-          <SearchTaxonomyLocalValues handleChange={handleChange} />
-          <ResultsTaxonomyLocalValues isLoading={isLoading} input={input} options={options} />
-        </Box>
+        <>
+          <Box sx={{ pt: 2 }}>
+            <SearchTaxonomyLocalValues handleChange={handleChange} />
+            <ResultsTaxonomyLocalValues isLoading={isLoading} input={input} options={options} />
+          </Box>
+          <Box mt={2}>
+            <ButtonNaked
+              component="button"
+              onClick={handleOpenClick}
+              startIcon={<AddOutlinedIcon />}
+              sx={{ color: 'primary.main' }}
+              weight="default"
+              // disabled={!selected}
+            >
+              {t('onboardingFormData.taxonomySection.localSection.addButtonLabel')}
+            </ButtonNaked>
+          </Box>
+        </>
       )}
     </Paper>
   );

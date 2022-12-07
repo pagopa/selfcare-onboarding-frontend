@@ -61,7 +61,7 @@ export default function SearchTaxonomyLocalValues({ handleChange }: Props) {
             },
           }}
           InputProps={{
-            endAdornment: (
+            endAdornment: selected && (
               <IconButton
                 onClick={() => {
                   setInput('');

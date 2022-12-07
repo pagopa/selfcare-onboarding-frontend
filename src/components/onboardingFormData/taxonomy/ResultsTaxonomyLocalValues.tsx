@@ -4,8 +4,8 @@ type Props = {
   options: Array<any>;
 };
 export default function ResultsTaxonomyLocalValues({ isLoading, input, options }: Props) {
-  console.log(isLoading); // TODO: remove
-  console.log(input); // TODO: remove
-  console.log(options); // TODO: remove
+  console.log('isLoading', isLoading); // TODO: remove
+  console.log('input', input); // TODO: remove
+  console.log('options', options); // TODO: remove
   return <div></div>;
 }
