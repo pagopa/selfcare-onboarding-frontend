@@ -341,7 +341,7 @@ export default {
       title: 'AREA GEOGRAFICA DI COMPETENZA',
       nationalLabel: 'Nazionale',
       localLabel: 'Locale',
-      infoLabel:'Seleziona in quale territorio opera il tuo ente. Se locale, puoi scegliere una o più aree di competenza.',
+      infoLabel:'Seleziona in quale territorio opera il tuo ente. Se locale, puoi scegliere una o più aree di competenza. Se l’ente ha già aderito ad altri prodotti PagoPA, troverai l’area già compliata.',
       localSection: { addButtonLabel:'Aggiungi area', inputLabel:'Comune, Provincia o Regione' }
     },
     dpoDataSection: {

@@ -51,6 +51,7 @@ export default function TaxonomySection() {
             <Tooltip
               title={t('onboardingFormData.taxonomySection.infoLabel') as string}
               placement="top"
+              arrow={true}
             >
               <InfoOutlinedIcon color="primary" fontSize={'small'} />
             </Tooltip>
