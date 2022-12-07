@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import debounce from 'lodash/debounce';
 import {
   RadioGroup,
   Radio,
@@ -16,6 +17,14 @@ import {
 import { AddOutlined, RemoveCircleOutlineOutlined, ClearOutlined } from '@mui/icons-material';
 import { ButtonNaked } from '@pagopa/mui-italia';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import { AxiosError, AxiosResponse } from 'axios';
+import { useHistoryState } from '../../useHistoryState';
+import { Geotaxonomy } from '../../../model/Geotaxonomy';
+import { fetchWithLogs } from '../../../lib/api-utils';
+import { getFetchOutcome } from '../../../lib/error-utils';
+import { UserContext } from '../../../lib/context';
+import { ENV } from '../../../utils/env';
+
 // import ResultsTaxonomyLocalValues from './ResultsTaxonomyLocalValues';
 // import SearchTaxonomyLocalValues from './SearchTaxonomyLocalValues';
 
@@ -25,7 +34,18 @@ export default function TaxonomySection() {
   const [isNationalAreaVisible, setIsNationalAreaVisible] = useState<boolean>();
   const [isLocalAreaVisible, setIsLocalAreaVisible] = useState<boolean>();
   const [inputList, setInputList] = useState([{ taxonomyRegion: '' }]);
-  const [selectedRegion, _setSelectedRegion] = useState();
+  const [selectedRegion, setSelectedRegion, setSelectedRegionHistory] =
+    useHistoryState<Geotaxonomy | null>('selected_step1', null);
+  const [inputValue, setInputValue] = useState<string>('');
+  const [_isLoading, setIsLoading] = useState(false);
+  const { setRequiredLogin } = useContext(UserContext);
+  const [options, setOptions] = useState<Array<any>>([]);
+
+  console.log('options', options);
+  const optionLabel = 'description';
+
+  const getOptionLabel: (option: any) => string =
+    optionLabel !== undefined ? (o) => o[optionLabel] : (o) => o.label ?? o;
 
   const handleRemoveClick = (index: number) => {
     const list = [...inputList];
@@ -36,6 +56,52 @@ export default function TaxonomySection() {
 
   const handleAddClick = () => {
     setInputList([...inputList, { taxonomyRegion: '' }]);
+  };
+
+  const handleChange = (event: any) => {
+    const value = event.target.value as string;
+    console.log('value', value);
+    setInputValue(value);
+    if (value !== '') {
+      setSelectedRegion(null);
+      if (value.length >= 3) {
+        console.log('>=3');
+        void debounce(handleSearch, 100)(value);
+      }
+    }
+    if (value === '') {
+      setSelectedRegion(null);
+    }
+    if (selectedRegion) {
+      setInputValue(getOptionLabel(selectedRegion));
+    }
+  };
+
+  const transformFn = (data: { items: Array<Geotaxonomy> }) => data.items;
+
+  const handleSearch = async (query: string) => {
+    setIsLoading(true);
+
+    const searchGeotaxonomy = await fetchWithLogs(
+      {
+        endpoint: 'ONBOARDING_GET_GEOTAXONOMY',
+      },
+      {
+        method: 'GET',
+        params: { limit: ENV.MAX_INSTITUTIONS_FETCH, page: 1, search: query },
+      },
+      () => setRequiredLogin(true)
+    );
+    const outcome = getFetchOutcome(searchGeotaxonomy);
+
+    console.log('data', (searchGeotaxonomy as AxiosResponse).data);
+    if (outcome === 'success') {
+      setOptions(transformFn((searchGeotaxonomy as AxiosResponse).data));
+    } else if ((searchGeotaxonomy as AxiosError).response?.status === 404) {
+      setOptions([]);
+    }
+
+    setIsLoading(false);
   };
 
   return (
@@ -109,7 +175,7 @@ export default function TaxonomySection() {
             </ButtonNaked>
           </Box> */}
 
-          {inputList.map((value, i) => (
+          {inputList.map((_val, i) => (
             <div key={i}>
               <Box display={'flex'} width="100%" mt={2}>
                 {i !== 0 && (
@@ -130,10 +196,13 @@ export default function TaxonomySection() {
                       width: '100%',
                     }}
                     id="Parties"
-                    value={value.taxonomyRegion}
-                    // onChange={(e) => handleInputChange(e, i)}
-                    label={t('onboardingFormData.taxonomySection.localSection.inputLabel')}
-                    variant={'outlined'}
+                    value={selectedRegion ? selectedRegion.desc : inputValue}
+                    onChange={handleChange}
+                    label={
+                      !selectedRegion
+                        ? t('onboardingFormData.taxonomySection.localSection.inputLabel')
+                        : ''
+                    }
                     inputProps={{
                       style: {
                         fontStyle: 'normal',
@@ -147,12 +216,12 @@ export default function TaxonomySection() {
                       },
                     }}
                     InputProps={{
-                      endAdornment: selectedRegion && (
+                      endAdornment: (
                         <IconButton
                           onClick={() => {
-                            // setInputValue('');
-                            //  setSelected('');
-                            //  setSelectedHistory(null);
+                            setInputValue('');
+                            setSelectedRegion(null);
+                            setSelectedRegionHistory(null);
                           }}
                           aria-label="clearIcon"
                         >
@@ -179,6 +248,8 @@ export default function TaxonomySection() {
               )}
             </div>
           ))}
+
+          <Typography>{options}</Typography>
         </>
       )}
     </Paper>

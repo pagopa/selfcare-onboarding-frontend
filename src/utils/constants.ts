@@ -81,6 +81,11 @@ export const API = {
   ONBOARDING_TOKEN_VALIDATION: {
     URL: ENV.URL_API.PARTY_PROCESS + '/tokens/{{token}}/verify',
   },
+
+  ONBOARDING_GET_GEOTAXONOMY: {
+    URL: ENV.URL_API.GEOTAXONOMY,
+  },
+  
 };
 
 export const USER_ROLE_LABEL = {
