@@ -342,7 +342,7 @@ export default {
       nationalLabel: 'Nazionale',
       localLabel: 'Locale',
       infoLabel:'Seleziona in quale territorio opera il tuo ente. Se locale, puoi scegliere una o più aree di competenza.',
-      localSection: { addButtonLabel:'Aggiungi area' }
+      localSection: { addButtonLabel:'Aggiungi area', inputLabel:'Comune, Provincia o Regione' }
     },
     dpoDataSection: {
       dpoTitle: 'CONTATTI DEL RESPONSABILE DELLA PROTEZIONE DEI DATI',

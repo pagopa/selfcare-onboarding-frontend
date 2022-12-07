@@ -1,6 +1,4 @@
-import { useState, useContext } from 'react';
-import { AxiosError, AxiosResponse } from 'axios';
-import debounce from 'lodash/debounce';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   RadioGroup,
@@ -11,71 +9,35 @@ import {
   Typography,
   Box,
   Tooltip,
+  TextField,
+  IconButton,
+  useTheme,
 } from '@mui/material';
-import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
+import { AddOutlined, RemoveCircleOutlineOutlined, ClearOutlined } from '@mui/icons-material';
 import { ButtonNaked } from '@pagopa/mui-italia';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import { fetchWithLogs } from '../../../lib/api-utils';
-import { ENV } from '../../../utils/env';
-import { UserContext } from '../../../lib/context';
-import { getFetchOutcome } from '../../../lib/error-utils';
-import ResultsTaxonomyLocalValues from './ResultsTaxonomyLocalValues';
-import SearchTaxonomyLocalValues from './SearchTaxonomyLocalValues';
+// import ResultsTaxonomyLocalValues from './ResultsTaxonomyLocalValues';
+// import SearchTaxonomyLocalValues from './SearchTaxonomyLocalValues';
 
 export default function TaxonomySection() {
-  const optionLabel = 'description';
   const { t } = useTranslation();
-
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const getOptionLabel: (option: any) => string =
-    optionLabel !== undefined ? (o) => o[optionLabel] : (o) => o.label ?? o;
-  const { setRequiredLogin } = useContext(UserContext);
-  const [input, setInput] = useState<string>('');
-  const [options, setOptions] = useState<Array<any>>([]);
-  const [selected, setSelected] = useState();
+  const theme = useTheme();
   const [isNationalAreaVisible, setIsNationalAreaVisible] = useState<boolean>();
   const [isLocalAreaVisible, setIsLocalAreaVisible] = useState<boolean>();
+  const [inputList, setInputList] = useState([{ taxonomyRegion: '' }]);
+  const [selectedRegion, _setSelectedRegion] = useState();
 
-  const handleSearch = async (query: string) => {
-    setIsLoading(true);
-    const searchResponse = await fetchWithLogs(
-      { endpoint: 'ONBOARDING_GET_SEARCH_PARTIES' },
-      {
-        method: 'GET',
-        params: { limit: ENV.MAX_INSTITUTIONS_FETCH, page: 1, search: query },
-      },
-      () => setRequiredLogin(true)
-    );
-
-    const outcome = getFetchOutcome(searchResponse);
-    if (outcome === 'success') {
-      setOptions((searchResponse as AxiosResponse).data);
-    } else if ((searchResponse as AxiosError).response?.status === 404) {
-      setOptions([]);
-    }
-
-    setIsLoading(false);
-  };
-  const handleChange = (event: any) => {
-    const value = event.target.value as string;
-    setInput(value);
-    if (value !== '') {
-      setSelected(undefined);
-      if (value.length >= 3) {
-        void debounce(handleSearch, 100)(value);
-      }
-    }
-    if (value === '') {
-      setSelected(undefined);
-    }
-    if (selected) {
-      setInput(getOptionLabel(selected));
-    }
+  const handleRemoveClick = (index: number) => {
+    const list = [...inputList];
+    // eslint-disable-next-line functional/immutable-data
+    list.splice(index, 1);
+    setInputList(list);
   };
 
-  const handleOpenClick = () => {
-    console.log('test');
+  const handleAddClick = () => {
+    setInputList([...inputList, { taxonomyRegion: '' }]);
   };
+
   return (
     <Paper elevation={0} sx={{ p: 5, borderRadius: '16px', my: 4 }}>
       <Grid container item pb={2}>
@@ -129,11 +91,11 @@ export default function TaxonomySection() {
       {/* Local Area Visible */}
       {isLocalAreaVisible && (
         <>
-          <Box sx={{ pt: 2 }}>
-            <SearchTaxonomyLocalValues handleChange={handleChange} />
-            <ResultsTaxonomyLocalValues isLoading={isLoading} input={input} options={options} />
-          </Box>
-          <Box mt={2}>
+          {/* <Box sx={{ pt: 2 }} key={i}>
+              <SearchTaxonomyLocalValues />
+              <ResultsTaxonomyLocalValues />
+            </Box> */}
+          {/* <Box mt={2}>
             <ButtonNaked
               component="button"
               onClick={handleOpenClick}
@@ -144,7 +106,78 @@ export default function TaxonomySection() {
             >
               {t('onboardingFormData.taxonomySection.localSection.addButtonLabel')}
             </ButtonNaked>
-          </Box>
+          </Box> */}
+
+          {inputList.map((value, i) => (
+            <div key={i}>
+              <Box display={'flex'} width="100%" mt={2}>
+                {i !== 0 && (
+                  <Box display="flex" alignItems={'center'}>
+                    <ButtonNaked
+                      component="button"
+                      onClick={() => handleRemoveClick(i)}
+                      startIcon={<RemoveCircleOutlineOutlined />}
+                      sx={{ color: 'error.dark', size: 'medium' }}
+                      weight="default"
+                      size="large"
+                    />
+                  </Box>
+                )}
+                <Box width="100%">
+                  <TextField
+                    sx={{
+                      width: '100%',
+                    }}
+                    id="Parties"
+                    value={value.taxonomyRegion}
+                    // onChange={(e) => handleInputChange(e, i)}
+                    label={t('onboardingFormData.taxonomySection.localSection.inputLabel')}
+                    variant={'outlined'}
+                    inputProps={{
+                      style: {
+                        fontStyle: 'normal',
+                        fontWeight: '700',
+                        fontSize: '16px',
+                        lineHeight: '24px',
+                        color: theme.palette.text.primary,
+                        textAlign: 'start',
+                        paddingLeft: '8px',
+                        textTransform: 'capitalize',
+                      },
+                    }}
+                    InputProps={{
+                      endAdornment: selectedRegion && (
+                        <IconButton
+                          onClick={() => {
+                            // setInputValue('');
+                            //  setSelected('');
+                            //  setSelectedHistory(null);
+                          }}
+                          aria-label="clearIcon"
+                        >
+                          <ClearOutlined color="primary" />
+                        </IconButton>
+                      ),
+                    }}
+                    name="taxonomyRegion"
+                  />
+                </Box>
+              </Box>
+              {inputList.length - 1 === i && (
+                <Box mt={2}>
+                  <ButtonNaked
+                    component="button"
+                    onClick={handleAddClick}
+                    startIcon={<AddOutlined />}
+                    sx={{ color: 'primary.main' }}
+                    weight="default"
+                  >
+                    {t('onboardingFormData.taxonomySection.localSection.addButtonLabel')}
+                  </ButtonNaked>
+                </Box>
+              )}
+            </div>
+          ))}
         </>
       )}
     </Paper>
