@@ -39,7 +39,7 @@ export default function TaxonomySection() {
   const [inputValue, setInputValue] = useState<string>('');
   const [_isLoading, setIsLoading] = useState(false);
   const { setRequiredLogin } = useContext(UserContext);
-  const [options, setOptions] = useState<Array<any>>([]);
+  const [options, setOptions] = useState<Array<Geotaxonomy>>([]);
 
   console.log('options', options);
   const optionLabel = 'description';
@@ -65,7 +65,6 @@ export default function TaxonomySection() {
     if (value !== '') {
       setSelectedRegion(null);
       if (value.length >= 3) {
-        console.log('>=3');
         void debounce(handleSearch, 100)(value);
       }
     }
@@ -77,7 +76,7 @@ export default function TaxonomySection() {
     }
   };
 
-  const transformFn = (data: { items: Array<Geotaxonomy> }) => data.items;
+  // const transformFn = (data: { items: Array<Geotaxonomy> }) => data.items;
 
   const handleSearch = async (query: string) => {
     setIsLoading(true);
@@ -88,17 +87,19 @@ export default function TaxonomySection() {
       },
       {
         method: 'GET',
-        params: { limit: ENV.MAX_INSTITUTIONS_FETCH, page: 1, search: query },
+        params: { limit: ENV.MAX_INSTITUTIONS_FETCH, page: 1, startsWith: query },
       },
       () => setRequiredLogin(true)
     );
     const outcome = getFetchOutcome(searchGeotaxonomy);
+    console.log('outcome', outcome);
 
-    console.log('data', (searchGeotaxonomy as AxiosResponse).data);
+    console.log('data', searchGeotaxonomy);
     if (outcome === 'success') {
-      setOptions(transformFn((searchGeotaxonomy as AxiosResponse).data));
+      setOptions((searchGeotaxonomy as AxiosResponse).data);
     } else if ((searchGeotaxonomy as AxiosError).response?.status === 404) {
       setOptions([]);
+      console.log('error');
     }
 
     setIsLoading(false);
@@ -249,7 +250,11 @@ export default function TaxonomySection() {
             </div>
           ))}
 
-          <Typography>{options}</Typography>
+          <Typography>
+            {options.map((value) => (
+              <h1 key={value.code}>{value.desc}</h1>
+            ))}
+          </Typography>
         </>
       )}
     </Paper>

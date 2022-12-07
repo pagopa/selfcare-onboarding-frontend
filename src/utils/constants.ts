@@ -83,7 +83,7 @@ export const API = {
   },
 
   ONBOARDING_GET_GEOTAXONOMY: {
-    URL: ENV.URL_API.GEOTAXONOMY,
+    URL:ENV.URL_API.GEOTAXONOMY,
   },
   
 };
