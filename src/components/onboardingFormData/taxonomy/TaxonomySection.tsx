@@ -24,6 +24,7 @@ import { fetchWithLogs } from '../../../lib/api-utils';
 import { getFetchOutcome } from '../../../lib/error-utils';
 import { UserContext } from '../../../lib/context';
 import { ENV } from '../../../utils/env';
+import ResultsTaxonomyLocalValues from './ResultsTaxonomyLocalValues';
 
 // import ResultsTaxonomyLocalValues from './ResultsTaxonomyLocalValues';
 // import SearchTaxonomyLocalValues from './SearchTaxonomyLocalValues';
@@ -35,7 +36,7 @@ export default function TaxonomySection() {
   const [isLocalAreaVisible, setIsLocalAreaVisible] = useState<boolean>();
   const [inputList, setInputList] = useState([{ taxonomyRegion: '' }]);
   const [selectedRegion, setSelectedRegion, setSelectedRegionHistory] =
-    useHistoryState<Geotaxonomy | null>('selected_step1', null);
+    useHistoryState<Geotaxonomy | null>('selected_region', null);
   const [inputValue, setInputValue] = useState<string>('');
   const [_isLoading, setIsLoading] = useState(false);
   const { setRequiredLogin } = useContext(UserContext);
@@ -106,8 +107,8 @@ export default function TaxonomySection() {
   };
 
   return (
-    <Paper elevation={0} sx={{ p: 5, borderRadius: '16px', my: 4 }}>
-      <Grid container item pb={2}>
+    <Paper elevation={0} sx={{ p: 4, borderRadius: '16px', my: 4 }}>
+      <Grid container item pb={3}>
         <Grid item xs={12} display="flex">
           <Box>
             <Typography variant="caption" sx={{ fontWeight: 'fontWeightBold' }}>
@@ -134,18 +135,18 @@ export default function TaxonomySection() {
           <FormControlLabel
             checked={isNationalAreaVisible}
             value="national"
-            control={<Radio />}
+            control={<Radio disableRipple={true} />}
             label={t('onboardingFormData.taxonomySection.nationalLabel')}
             onChange={() => {
               setIsNationalAreaVisible(true);
               setIsLocalAreaVisible(false);
             }}
-            sx={{ mr: 4, ml: 1 }}
+            sx={{ mr: 3, ml: 1 }}
           />
           <FormControlLabel
             checked={isLocalAreaVisible}
             value="local"
-            control={<Radio />}
+            control={<Radio disableRipple={true} />}
             label={t('onboardingFormData.taxonomySection.localLabel')}
             onChange={() => {
               setIsNationalAreaVisible(false);
@@ -250,11 +251,7 @@ export default function TaxonomySection() {
             </div>
           ))}
 
-          <Typography>
-            {options.map((value) => (
-              <h1 key={value.code}>{value.desc}</h1>
-            ))}
-          </Typography>
+          <ResultsTaxonomyLocalValues options={options} />
         </>
       )}
     </Paper>
