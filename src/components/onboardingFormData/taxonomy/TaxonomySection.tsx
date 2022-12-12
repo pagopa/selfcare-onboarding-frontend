@@ -11,77 +11,72 @@ import {
   Box,
   Tooltip,
   TextField,
-  IconButton,
-  useTheme,
+  // IconButton,
+  // useTheme,
 } from '@mui/material';
-import { AddOutlined, RemoveCircleOutlineOutlined, ClearOutlined } from '@mui/icons-material';
+import { AddOutlined, RemoveCircleOutlineOutlined } from '@mui/icons-material';
 import { ButtonNaked } from '@pagopa/mui-italia';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { AxiosError, AxiosResponse } from 'axios';
-import { useHistoryState } from '../../useHistoryState';
+import { Autocomplete } from '@mui/lab';
+// import { useHistoryState } from '../../useHistoryState';
 import { Geotaxonomy } from '../../../model/Geotaxonomy';
 import { fetchWithLogs } from '../../../lib/api-utils';
 import { getFetchOutcome } from '../../../lib/error-utils';
 import { UserContext } from '../../../lib/context';
 import { ENV } from '../../../utils/env';
-import ResultsTaxonomyLocalValues from './ResultsTaxonomyLocalValues';
 
 // import ResultsTaxonomyLocalValues from './ResultsTaxonomyLocalValues';
 // import SearchTaxonomyLocalValues from './SearchTaxonomyLocalValues';
 
 export default function TaxonomySection() {
   const { t } = useTranslation();
-  const theme = useTheme();
+  // const theme = useTheme();
   const [isNationalAreaVisible, setIsNationalAreaVisible] = useState<boolean>();
   const [isLocalAreaVisible, setIsLocalAreaVisible] = useState<boolean>();
   const [inputList, setInputList] = useState([{ taxonomyRegion: '' }]);
-  const [selectedRegion, setSelectedRegion, setSelectedRegionHistory] =
-    useHistoryState<Geotaxonomy | null>('selected_region', null);
-  const [inputValue, setInputValue] = useState<string>('');
+  const [inputValue, setInputValue] = useState<Array<Geotaxonomy>>([]);
   const [_isLoading, setIsLoading] = useState(false);
   const { setRequiredLogin } = useContext(UserContext);
-  const [options, setOptions] = useState<Array<Geotaxonomy>>([]);
+  const [options, setOptions] = useState<Array<Array<Geotaxonomy>>>([]);
 
-  console.log('options', options);
-  const optionLabel = 'description';
-
-  const getOptionLabel: (option: any) => string =
-    optionLabel !== undefined ? (o) => o[optionLabel] : (o) => o.label ?? o;
+  // TODO: impostare il setOptions di i sia all'add che al remove
 
   const handleRemoveClick = (index: number) => {
     const list = [...inputList];
     // eslint-disable-next-line functional/immutable-data
     list.splice(index, 1);
     setInputList(list);
+
+    const valueList = [...inputValue];
+    // eslint-disable-next-line functional/immutable-data
+    valueList.splice(index, 1);
+    setInputValue(valueList);
   };
 
   const handleAddClick = () => {
     setInputList([...inputList, { taxonomyRegion: '' }]);
+    setInputValue((curInputValue) => [...curInputValue, ...[]]);
   };
 
-  const handleChange = (event: any) => {
-    const value = event.target.value as string;
-    console.log('value', value);
-    setInputValue(value);
-    if (value !== '') {
-      setSelectedRegion(null);
-      if (value.length >= 3) {
-        void debounce(handleSearch, 100)(value);
-      }
-    }
-    if (value === '') {
-      setSelectedRegion(null);
-    }
-    if (selectedRegion) {
-      setInputValue(getOptionLabel(selectedRegion));
-    }
+  const handleChange = (_event: any, value: any, index: number) => {
+    const newValues = inputValue;
+    // eslint-disable-next-line functional/immutable-data
+    newValues[index] = value;
+    console.log('newValues', newValues);
+
+    setInputValue(newValues);
   };
 
-  // const transformFn = (data: { items: Array<Geotaxonomy> }) => data.items;
-
+  const handleSearchInput = (event: any) => {
+    const value = event.target.value;
+    if (value.length >= 3) {
+      void debounce(handleSearch, 100)(value);
+    }
+  };
   const handleSearch = async (query: string) => {
     setIsLoading(true);
-
+    // TODO: far partire dopo 500ms e crealTimeout per non far partire chiamate ogni volta che digito
     const searchGeotaxonomy = await fetchWithLogs(
       {
         endpoint: 'ONBOARDING_GET_GEOTAXONOMY',
@@ -97,7 +92,12 @@ export default function TaxonomySection() {
 
     console.log('data', searchGeotaxonomy);
     if (outcome === 'success') {
-      setOptions((searchGeotaxonomy as AxiosResponse).data);
+      // eslint-disable-next-line functional/no-let
+      let data = (searchGeotaxonomy as AxiosResponse).data;
+
+      data = data.map((value: Geotaxonomy) => ({ ...value, label: value.desc }));
+
+      setOptions(data);
     } else if ((searchGeotaxonomy as AxiosError).response?.status === 404) {
       setOptions([]);
       console.log('error');
@@ -160,23 +160,6 @@ export default function TaxonomySection() {
       {/* Local Area Visible */}
       {isLocalAreaVisible && (
         <>
-          {/* <Box sx={{ pt: 2 }} key={i}>
-              <SearchTaxonomyLocalValues />
-              <ResultsTaxonomyLocalValues />
-            </Box> */}
-          {/* <Box mt={2}>
-            <ButtonNaked
-              component="button"
-              onClick={handleOpenClick}
-              startIcon={<AddOutlinedIcon />}
-              sx={{ color: 'primary.main' }}
-              weight="default"
-              // disabled={!selected}
-            >
-              {t('onboardingFormData.taxonomySection.localSection.addButtonLabel')}
-            </ButtonNaked>
-          </Box> */}
-
           {inputList.map((_val, i) => (
             <div key={i}>
               <Box display={'flex'} width="100%" mt={2}>
@@ -193,13 +176,15 @@ export default function TaxonomySection() {
                   </Box>
                 )}
                 <Box width="100%">
-                  <TextField
+                  {/* <TextField
                     sx={{
                       width: '100%',
                     }}
                     id="Parties"
-                    value={selectedRegion ? selectedRegion.desc : inputValue}
-                    onChange={handleChange}
+                    value={inputValue[i]}
+                    // onChange={(event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+                    //   handleChange(event, i)
+                    // }
                     label={
                       !selectedRegion
                         ? t('onboardingFormData.taxonomySection.localSection.inputLabel')
@@ -221,7 +206,7 @@ export default function TaxonomySection() {
                       endAdornment: (
                         <IconButton
                           onClick={() => {
-                            setInputValue('');
+                            setInputValue(['']);
                             setSelectedRegion(null);
                             setSelectedRegionHistory(null);
                           }}
@@ -231,7 +216,29 @@ export default function TaxonomySection() {
                         </IconButton>
                       ),
                     }}
-                    name="taxonomyRegion"
+                    name={`name ${i}`}
+                  /> */}
+
+                  <Autocomplete
+                    disablePortal
+                    id="combo-box-demo"
+                    options={options[i]}
+                    sx={{ width: 300 }}
+                    onChange={(event: any, value: any) => handleChange(event, value, i)}
+                    value={inputValue[i]}
+                    renderOption={(props, option) => <span {...props}>{option.desc}</span>}
+                    renderInput={(params) => (
+                      <TextField
+                        onChange={handleSearchInput}
+                        {...params}
+                        variant="outlined"
+                        label={
+                          !inputValue?.[i]?.desc
+                            ? t('onboardingFormData.taxonomySection.localSection.inputLabel')
+                            : ''
+                        }
+                      />
+                    )}
                   />
                 </Box>
               </Box>
@@ -250,8 +257,6 @@ export default function TaxonomySection() {
               )}
             </div>
           ))}
-
-          <ResultsTaxonomyLocalValues options={options} />
         </>
       )}
     </Paper>
