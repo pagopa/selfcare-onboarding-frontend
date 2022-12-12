@@ -1,6 +1,8 @@
 import { AxiosError, AxiosResponse } from 'axios';
 import { useContext, useEffect, useState } from 'react';
 import { useTranslation, Trans } from 'react-i18next';
+import { EndingPage } from '@pagopa/selfcare-common-frontend';
+import { IllusError } from '@pagopa/mui-italia';
 import {
   InstitutionOnboardingInfoResource,
   InstitutionType,
@@ -13,7 +15,7 @@ import { LoadingOverlay } from '../LoadingOverlay';
 import { fetchWithLogs } from '../../lib/api-utils';
 import { getFetchOutcome } from '../../lib/error-utils';
 import { unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
-import ErrorPage from '../errorPage/ErrorPage';
+import { ENV } from '../../utils/env';
 
 type Props = StepperStepComponentProps & {
   externalInstitutionId: string;
@@ -25,16 +27,21 @@ const genericError: RequestOutcomeMessage = {
   title: '',
   description: [
     <>
-      <ErrorPage
-        titleContent={<Trans i18nKey="onboardingStep1_5.genericError.title" />}
-        descriptionContent={
+      <EndingPage
+        minHeight="52vh"
+        icon={<IllusError size={60} />}
+        variantTitle={'h4'}
+        variantDescription={'body1'}
+        title={<Trans i18nKey="onboardingStep1_5.genericError.title" />}
+        description={
           <Trans i18nKey="onboardingStep1_5.genericError.description">
             A causa di un errore del sistema non è possibile completare la procedura.
             <br />
             Ti chiediamo di riprovare più tardi.
           </Trans>
         }
-        backButtonContent={<Trans i18nKey="onboardingStep1_5.genericError.backAction" />}
+        buttonLabel={<Trans i18nKey="onboardingStep1_5.genericError.backAction" />}
+        onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
       />
       ,
     </>,

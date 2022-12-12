@@ -1,4 +1,4 @@
-import { Button, Grid, Typography } from '@mui/material';
+import { Grid } from '@mui/material';
 import { AxiosError } from 'axios';
 import { useContext, useEffect, useRef, useState } from 'react';
 import { resolvePathVariables } from '@pagopa/selfcare-common-frontend/utils/routes-utils';
@@ -8,6 +8,7 @@ import { History } from 'history';
 import { IllusError } from '@pagopa/mui-italia';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
 import { uniqueId } from 'lodash';
+import { EndingPage } from '@pagopa/selfcare-common-frontend';
 import { RequestOutcomeMessage, StepperStepComponentProps } from '../../../../types';
 import { MessageNoAction } from '../../../components/MessageNoAction';
 import { HeaderContext, UserContext } from '../../../lib/context';
@@ -27,39 +28,31 @@ type Props = StepperStepComponentProps & {
 };
 
 const alreadyOnboardedSubProduct: RequestOutcomeMessage = {
-  ImgComponent: SubscribedIcon,
   title: '',
   description: [
     <Grid container direction="column" key="0">
       <Grid container item justifyContent="center" mt={1}>
-        <Grid item xs={6}>
-          <Typography variant="h4">
+        <EndingPage
+          minHeight="52vh"
+          icon={<SubscribedIcon />}
+          variantTitle={'h4'}
+          variantDescription={'body1'}
+          title={
             <Trans i18nKey="onBoardingSubProduct.alreadyOnboardedError.title">
               Sottoscrizione già avvenuta
             </Trans>
-          </Typography>
-        </Grid>
-      </Grid>
-      <Grid container item justifyContent="center" mb={3} mt={1}>
-        <Grid item xs={6}>
-          <Typography>
+          }
+          description={
             <Trans i18nKey="onBoardingSubProduct.alreadyOnboardedError.message">
               L&apos;ente che hai selezionato ha già sottoscritto l&apos;offerta <br />
               Premium.
             </Trans>
-          </Typography>
-        </Grid>
-      </Grid>
-      <Grid container item justifyContent="center">
-        <Grid item xs={4}>
-          <Button
-            variant="contained"
-            sx={{ alignSelf: 'center' }}
-            onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
-          >
-            <Trans i18nKey="onBoardingSubProduct.alreadyOnboardedError.closeButton"> Chiudi </Trans>
-          </Button>
-        </Grid>
+          }
+          buttonLabel={
+            <Trans i18nKey="onBoardingSubProduct.alreadyOnboardedError.closeButton">Chiudi</Trans>
+          }
+          onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+        />
       </Grid>
     </Grid>,
   ],
@@ -74,47 +67,33 @@ const buildNotBasicProduct = (
   title: '',
   description: [
     <>
-      <IllusError size={60} />
-      <Grid container direction="column" key="0">
-        <Grid container item justifyContent="center" mt={3}>
-          <Grid item xs={6}>
-            <Typography variant="h4">
-              <Trans i18nKey="onBoardingSubProduct.notBasicProductError.title">
-                L&apos;ente non ha aderito a {{ selectedProduct: productTitle }}
-              </Trans>
-            </Typography>
-          </Grid>
-        </Grid>
-        <Grid container item justifyContent="center" mb={2} mt={1}>
-          <Grid item xs={6}>
-            <Typography>
-              <Trans i18nKey="onBoardingSubProduct.notBasicProductError.message">
-                Per poter sottoscrivere l&apos;offerta Premium, l&apos;ente che hai <br />
-                selezionato deve prima aderire al prodotto {{ selectedProduct: productTitle }}
-              </Trans>
-            </Typography>
-          </Grid>
-        </Grid>
-        <Grid container item justifyContent="center" mt={3}>
-          <Grid item xs={4}>
-            <Button
-              variant="contained"
-              sx={{ alignSelf: 'center' }}
-              onClick={() => {
-                history.push(
-                  resolvePathVariables(ROUTES.ONBOARDING.PATH, { productId }).concat(
-                    `?partyExternalId=${externalInstitutionId}`
-                  )
-                );
-              }}
-            >
-              <Trans i18nKey="onBoardingSubProduct.notBasicProductError.adhesionButton">
-                Aderisci
-              </Trans>
-            </Button>
-          </Grid>
-        </Grid>
-      </Grid>
+      <EndingPage
+        minHeight="52vh"
+        icon={<IllusError size={60} />}
+        title={
+          <Trans i18nKey="onBoardingSubProduct.notBasicProductError.title">
+            L&apos;ente non ha aderito a {{ selectedProduct: productTitle }}
+          </Trans>
+        }
+        description={
+          <Trans i18nKey="onBoardingSubProduct.notBasicProductError.message">
+            Per poter sottoscrivere l&apos;offerta Premium, l&apos;ente che hai <br />
+            selezionato deve prima aderire al prodotto {{ selectedProduct: productTitle }}
+          </Trans>
+        }
+        variantTitle={'h4'}
+        variantDescription={'body1'}
+        buttonLabel={
+          <Trans i18nKey="onBoardingSubProduct.notBasicProductError.adhesionButton">Aderisci</Trans>
+        }
+        onButtonClick={() => {
+          history.push(
+            resolvePathVariables(ROUTES.ONBOARDING.PATH, { productId }).concat(
+              `?partyExternalId=${externalInstitutionId}`
+            )
+          );
+        }}
+      />
     </>,
   ],
 });
@@ -123,38 +102,22 @@ const genericError: RequestOutcomeMessage = {
   title: '',
   description: [
     <>
-      <IllusError size={60} />
-      <Grid container direction="column" key="0" mt={3}>
-        <Grid container item justifyContent="center">
-          <Grid item xs={6}>
-            <Typography variant="h4">
-              <Trans i18nKey="onboardingStep1_5.genericError.title" />
-            </Typography>
-          </Grid>
-        </Grid>
-        <Grid container item justifyContent="center" mb={3} mt={1}>
-          <Grid item xs={6}>
-            <Typography>
-              <Trans i18nKey="onboardingStep1_5.genericError.description">
-                A causa di un errore del sistema non è possibile completare la procedura.
-                <br />
-                Ti chiediamo di riprovare più tardi.
-              </Trans>
-            </Typography>
-          </Grid>
-        </Grid>
-        <Grid container item justifyContent="center">
-          <Grid item xs={4}>
-            <Button
-              variant="contained"
-              sx={{ alignSelf: 'center' }}
-              onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
-            >
-              <Trans i18nKey="onboardingStep1_5.genericError.backAction" />
-            </Button>
-          </Grid>
-        </Grid>
-      </Grid>
+      <EndingPage
+        minHeight="52vh"
+        icon={<IllusError size={60} />}
+        title={<Trans i18nKey="onboardingStep1_5.genericError.title" />}
+        description={
+          <Trans i18nKey="onboardingStep1_5.genericError.description">
+            A causa di un errore del sistema non è possibile completare la procedura.
+            <br />
+            Ti chiediamo di riprovare più tardi.
+          </Trans>
+        }
+        variantTitle={'h4'}
+        variantDescription={'body1'}
+        buttonLabel={<Trans i18nKey="onboardingStep1_5.genericError.backAction" />}
+        onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+      />
     </>,
   ],
 };
@@ -168,7 +131,6 @@ export function SubProductStepOnBoardingStatus({
   productTitle,
 }: Props) {
   const { t } = useTranslation();
-
   const [loading, setLoading] = useState(true);
   const [outcome, setOutcome] = useState<RequestOutcomeMessage | null>();
   const { setOnExit } = useContext(HeaderContext);
