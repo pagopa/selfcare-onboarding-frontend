@@ -1,5 +1,5 @@
-import { Button, Stack, Typography } from '@mui/material';
-import { IllusCompleted, theme } from '@pagopa/mui-italia';
+import { IllusCompleted } from '@pagopa/mui-italia';
+import { EndingPage } from '@pagopa/selfcare-common-frontend';
 import { Trans } from 'react-i18next';
 import { MessageNoAction } from '../../../components/MessageNoAction';
 import { ENV } from '../../../utils/env';
@@ -8,16 +8,18 @@ const successfulOutCome = {
   title: '',
   description: [
     <>
-      <IllusCompleted size={60} />
-      <Typography mt={3} variant={'h4'} sx={{ color: theme.palette.text.primary, marginBottom: 1 }}>
-        <Trans i18nKey="onBoardingSubProduct.successfulAdhesion.title">
-          La richiesta di adesione è stata
-          <br />
-          inviata con successo
-        </Trans>
-      </Typography>
-      <Stack key="0" spacing={4}>
-        <Typography variant="body1">
+      <EndingPage
+        icon={<IllusCompleted size={60} />}
+        variantTitle="h4"
+        variantDescription="body1"
+        title={
+          <Trans i18nKey="onBoardingSubProduct.successfulAdhesion.title">
+            La richiesta di adesione è stata
+            <br />
+            inviata con successo
+          </Trans>
+        }
+        description={
           <Trans i18nKey="onBoardingSubProduct.successfulAdhesion.message">
             Riceverai una PEC all’indirizzo istituzionale dell&apos;ente.
             <br />
@@ -25,15 +27,12 @@ const successfulOutCome = {
             <br />
             sottoscrizione all&apos;offerta Premium.
           </Trans>
-        </Typography>
-        <Button
-          variant="contained"
-          sx={{ alignSelf: 'center' }}
-          onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
-        >
+        }
+        buttonLabel={
           <Trans i18nKey="onBoardingSubProduct.successfulAdhesion.closeButton"> Chiudi </Trans>
-        </Button>
-      </Stack>
+        }
+        onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+      />
     </>,
   ],
 };
