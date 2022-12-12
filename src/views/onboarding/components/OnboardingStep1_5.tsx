@@ -1,10 +1,10 @@
-import { Button, Grid, Typography } from '@mui/material';
 import { AxiosError } from 'axios';
 import { useEffect, useState, useContext, useRef } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { IllusError } from '@pagopa/mui-italia';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
 import { uniqueId } from 'lodash';
+import { EndingPage } from '@pagopa/selfcare-common-frontend';
 import {
   Party,
   Product,
@@ -29,33 +29,17 @@ type Props = StepperStepComponentProps & {
 const alreadyOnboarded: RequestOutcomeMessage = {
   title: '',
   description: [
-    <Grid container direction="column" key="0">
-      <Grid container item justifyContent="center" mt={5}>
-        <Grid item xs={6}>
-          <Typography variant="h4">
-            <Trans i18nKey="onboardingStep1_5.alreadyOnboarded.title" />
-          </Typography>
-        </Grid>
-      </Grid>
-      <Grid container item justifyContent="center" mb={3} mt={1}>
-        <Grid item xs={6}>
-          <Typography>
-            <Trans i18nKey="onboardingStep1_5.alreadyOnboarded.description" />
-          </Typography>
-        </Grid>
-      </Grid>
-      <Grid container item justifyContent="center">
-        <Grid item xs={4}>
-          <Button
-            variant="contained"
-            sx={{ alignSelf: 'center' }}
-            onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
-          >
-            <Trans i18nKey="onboardingStep1_5.alreadyOnboarded.backAction" />
-          </Button>
-        </Grid>
-      </Grid>
-    </Grid>,
+    <>
+      <EndingPage
+        minHeight="52vh"
+        variantTitle={'h4'}
+        variantDescription={'body1'}
+        title={<Trans i18nKey="onboardingStep1_5.alreadyOnboarded.title" />}
+        description={<Trans i18nKey="onboardingStep1_5.alreadyOnboarded.description" />}
+        buttonLabel={<Trans i18nKey="onboardingStep1_5.alreadyOnboarded.backAction" />}
+        onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+      />
+    </>,
   ],
 };
 
@@ -63,43 +47,26 @@ export const genericError: RequestOutcomeMessage = {
   title: '',
   description: [
     <>
-      <IllusError size={60} />
-      <Grid container direction="column" key="0" mt={3}>
-        <Grid container item justifyContent="center">
-          <Grid item xs={6}>
-            <Typography variant="h4">
-              <Trans i18nKey="onboardingStep1_5.genericError.title" />
-            </Typography>
-          </Grid>
-        </Grid>
-        <Grid container item justifyContent="center" mb={2} mt={1}>
-          <Grid item xs={6}>
-            <Typography>
-              <Trans i18nKey="onboardingStep1_5.genericError.description">
-                A causa di un errore del sistema non è possibile completare la procedura.
-                <br />
-                Ti chiediamo di riprovare più tardi.
-              </Trans>
-            </Typography>
-          </Grid>
-        </Grid>
-        <Grid container item justifyContent="center" mt={2}>
-          <Grid item xs={4}>
-            <Button
-              variant="contained"
-              sx={{ alignSelf: 'center' }}
-              onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
-            >
-              <Trans i18nKey="onboardingStep1_5.genericError.backAction" />
-            </Button>
-          </Grid>
-        </Grid>
-      </Grid>
+      <EndingPage
+        minHeight="52vh"
+        icon={<IllusError size={60} />}
+        title={<Trans i18nKey="onboardingStep1_5.genericError.title" />}
+        description={
+          <Trans i18nKey="onboardingStep1_5.genericError.description">
+            A causa di un errore del sistema non è possibile completare la procedura.
+            <br />
+            Ti chiediamo di riprovare più tardi.
+          </Trans>
+        }
+        variantTitle={'h4'}
+        variantDescription={'body1'}
+        buttonLabel={<Trans i18nKey="onboardingStep1_5.genericError.backAction" />}
+        onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+      />
     </>,
   ],
 };
 
-// eslint-disable-next-line sonarjs/cognitive-complexity
 export function OnboardingStep1_5({
   forward,
   externalInstitutionId,
@@ -118,38 +85,22 @@ export function OnboardingStep1_5({
     title: '',
     description: [
       <>
-        <IllusError size={60} />
-        <Grid container direction="column" key="0" mt={3}>
-          <Grid container item justifyContent="center">
-            <Grid item xs={6}>
-              <Typography variant="h4">
-                <Trans i18nKey="onboardingStep1_5.userNotAllowedError.title" />
-              </Typography>
-            </Grid>
-          </Grid>
-          <Grid container item justifyContent="center" mb={2} mt={1}>
-            <Grid item xs={6}>
-              <Typography>
-                <Trans i18nKey="onboardingStep1_5.userNotAllowedError.description">
-                  Al momento, l’ente
-                  {{ partyName: selectedParty?.description }}
-                  non ha il permesso di aderire a{{ productName: selectedProduct?.title }}
-                </Trans>
-              </Typography>
-            </Grid>
-          </Grid>
-          <Grid container item justifyContent="center" mt={2}>
-            <Grid item xs={4}>
-              <Button
-                variant="contained"
-                sx={{ alignSelf: 'center' }}
-                onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
-              >
-                <Trans i18nKey="onboardingStep1_5.genericError.backAction" />
-              </Button>
-            </Grid>
-          </Grid>
-        </Grid>
+        <EndingPage
+          minHeight="52vh"
+          icon={<IllusError size={60} />}
+          title={<Trans i18nKey="onboardingStep1_5.userNotAllowedError.title" />}
+          description={
+            <Trans i18nKey="onboardingStep1_5.userNotAllowedError.description">
+              Al momento, l’ente
+              {{ partyName: selectedParty?.description }}
+              non ha il permesso di aderire a{{ productName: selectedProduct?.title }}
+            </Trans>
+          }
+          variantTitle={'h4'}
+          variantDescription={'body1'}
+          buttonLabel={<Trans i18nKey="onboardingStep1_5.genericError.backAction" />}
+          onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+        />
       </>,
     ],
   };

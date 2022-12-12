@@ -1,12 +1,13 @@
 import { useEffect, useState, useContext, useRef, useMemo } from 'react';
 import { useHistory } from 'react-router-dom';
-import { Button, Container, Stack, Typography, Grid, useTheme } from '@mui/material';
+import { Button, Container, Typography, Grid } from '@mui/material';
 import { AxiosError, AxiosResponse } from 'axios';
 import SessionModal from '@pagopa/selfcare-common-frontend/components/SessionModal';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
 import { useTranslation, Trans } from 'react-i18next';
 import { uniqueId } from 'lodash';
 import { IllusCompleted, IllusError } from '@pagopa/mui-italia';
+import { EndingPage } from '@pagopa/selfcare-common-frontend';
 import { withLogin } from '../../components/withLogin';
 import {
   BillingData,
@@ -34,7 +35,6 @@ import StepOnboardingData from '../../components/steps/StepOnboardingData';
 import StepBillingData from '../../components/steps/StepBillingData';
 import { registerUnloadEvent, unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
 import StepInstitutionType from '../../components/steps/StepInstitutionType';
-import ErrorPage from '../../components/errorPage/ErrorPage';
 import { genericError, OnboardingStep1_5 } from './components/OnboardingStep1_5';
 import { OnBoardingProductStepDelegates } from './components/OnBoardingProductStepDelegates';
 
@@ -107,34 +107,16 @@ export const prodPhaseOutErrorPage: RequestOutcomeMessage = {
 const alreadyOnboarded: RequestOutcomeMessage = {
   title: '',
   description: [
-    <Grid
-      container
-      item
-      direction="column"
-      justifyContent="center"
-      alignItems="center"
-      key="0"
-      mt={5}
-    >
-      <Grid item xs={6}>
-        <Typography variant="h4">
-          <Trans i18nKey="onboardingStep1_5.alreadyOnboarded.title" />
-        </Typography>
-      </Grid>
-      <Grid item mb={3} mt={1} xs={6}>
-        <Typography>
-          <Trans i18nKey="onboardingStep1_5.alreadyOnboarded.description" />
-        </Typography>
-      </Grid>
-      <Grid item xs={4}>
-        <Button
-          variant="contained"
-          sx={{ alignSelf: 'center' }}
-          onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
-        >
-          <Trans i18nKey="onboardingStep1_5.alreadyOnboarded.backAction" />
-        </Button>
-      </Grid>
+    <Grid key="0">
+      <EndingPage
+        minHeight="52vh"
+        variantTitle={'h4'}
+        variantDescription={'body1'}
+        title={<Trans i18nKey="onboardingStep1_5.alreadyOnboarded.title" />}
+        description={<Trans i18nKey="onboardingStep1_5.alreadyOnboarded.description" />}
+        buttonLabel={<Trans i18nKey="onboardingStep1_5.alreadyOnboarded.backAction" />}
+        onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+      />
     </Grid>,
   ],
 };
@@ -157,7 +139,6 @@ function OnboardingComponent({ productId }: { productId: string }) {
   const { setRequiredLogin } = useContext(UserContext);
   const requestIdRef = useRef<string>();
   const { t } = useTranslation();
-  const theme = useTheme();
   const [onExitAction, setOnExitAction] = useState<(() => void) | undefined>();
   const [selectedParty, setSelectedParty] = useState<Party>();
 
@@ -310,17 +291,11 @@ function OnboardingComponent({ productId }: { productId: string }) {
       title: '',
       description: [
         <>
-          <IllusCompleted size={60} />
-          <Typography
-            mt={3}
-            variant={'h4'}
-            sx={{ color: theme.palette.text.primary, marginBottom: 1 }}
-          >
-            {t('onboarding.outcomeContent.success.title')}
-          </Typography>
-          <Stack key="0" spacing={4}>
-            <Typography variant="body1">
-              {institutionType !== 'PSP' ? (
+          <EndingPage
+            icon={<IllusCompleted size={60} />}
+            title={t('onboarding.outcomeContent.success.title')}
+            description={
+              institutionType !== 'PSP' ? (
                 <Trans i18nKey="onboarding.outcomeContent.success.baseDescription">
                   Invieremo un&apos;email all&apos;indirizzo PEC primario dell&apos;ente.
                   <br />
@@ -334,16 +309,13 @@ function OnboardingComponent({ productId }: { productId: string }) {
                   Al suo interno, ci sono le istruzioni per completare <br />
                   l&apos;adesione.
                 </Trans>
-              )}
-            </Typography>
-            <Button
-              variant="contained"
-              sx={{ alignSelf: 'center' }}
-              onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
-            >
-              {t('onboarding.outcomeContent.success.backHome')}
-            </Button>
-          </Stack>
+              )
+            }
+            variantTitle={'h4'}
+            variantDescription={'body1'}
+            buttonLabel={t('onboarding.outcomeContent.success.backHome')}
+            onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+          />
         </>,
       ],
     },
@@ -351,16 +323,21 @@ function OnboardingComponent({ productId }: { productId: string }) {
       title: '',
       description: [
         <>
-          <ErrorPage
-            titleContent={t('onboarding.outcomeContent.error.title')}
-            descriptionContent={
+          <EndingPage
+            minHeight="52vh"
+            icon={<IllusError size={60} />}
+            variantTitle={'h4'}
+            variantDescription={'body1'}
+            title={t('onboarding.outcomeContent.error.title')}
+            description={
               <Trans i18nKey="onboarding.outcomeContent.error.description">
                 A causa di un errore del sistema non è possibile completare la procedura.
                 <br />
                 Ti chiediamo di riprovare più tardi.
               </Trans>
             }
-            backButtonContent={t('onboarding.outcomeContent.error.backActionLabel')}
+            buttonLabel={t('onboarding.outcomeContent.error.backActionLabel')}
+            onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
           />
         </>,
       ],
@@ -664,15 +641,20 @@ function OnboardingComponent({ productId }: { productId: string }) {
   ) : outcome ? (
     <MessageNoAction {...outcome} />
   ) : pricingPlan && pricingPlan !== 'FA' ? (
-    <ErrorPage
-      titleContent={t('invalidPricingPlan.title')}
-      descriptionContent={
+    <EndingPage
+      minHeight="52vh"
+      icon={<IllusError size={60} />}
+      variantTitle={'h4'}
+      variantDescription={'body1'}
+      title={t('invalidPricingPlan.title')}
+      description={
         <Trans i18nKey="invalidPricingPlan.description">
           Non riusciamo a trovare la pagina che stai cercando. <br />
           Assicurati che l’indirizzo sia corretto o torna alla home.
         </Trans>
       }
-      backButtonContent={t('invalidPricingPlan.backButton')}
+      buttonLabel={t('invalidPricingPlan.backButton')}
+      onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
     />
   ) : (
     <Container>
