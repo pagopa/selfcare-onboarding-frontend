@@ -131,7 +131,6 @@ export function SubProductStepOnBoardingStatus({
   productTitle,
 }: Props) {
   const { t } = useTranslation();
-
   const [loading, setLoading] = useState(true);
   const [outcome, setOutcome] = useState<RequestOutcomeMessage | null>();
   const { setOnExit } = useContext(HeaderContext);
