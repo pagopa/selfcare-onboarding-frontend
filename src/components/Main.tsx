@@ -7,7 +7,7 @@ export function Main() {
   const location = useLocation();
   const productId = location.pathname.replace(/^\/onboarding\/([^/]+)\/?.*/, '$1');
   return (
-    <Box component="main" my="auto" marginY={'87px'}>
+    <Box component="main" my="auto" marginY={11}>
       <Switch>
         {Object.values(ROUTES).map(({ PATH, EXACT, COMPONENT: Component }, i) => (
           <Route path={PATH} exact={EXACT} key={i}>
