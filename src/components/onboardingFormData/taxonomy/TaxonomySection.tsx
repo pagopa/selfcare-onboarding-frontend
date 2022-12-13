@@ -34,11 +34,11 @@ export default function TaxonomySection() {
   // const theme = useTheme();
   const [isNationalAreaVisible, setIsNationalAreaVisible] = useState<boolean>();
   const [isLocalAreaVisible, setIsLocalAreaVisible] = useState<boolean>();
-  const [inputList, setInputList] = useState([{ taxonomyRegion: '' }]);
+  const [inputList, setInputList] = useState([{ taxonomyRegion: '', id: '' }]);
   const [inputValue, setInputValue] = useState<Array<Geotaxonomy>>([]);
   const [_isLoading, setIsLoading] = useState(false);
   const { setRequiredLogin } = useContext(UserContext);
-  const [options, setOptions] = useState<Array<Array<Geotaxonomy>>>([]);
+  const [options, setOptions] = useState<Array<Geotaxonomy>>([...inputValue]);
 
   // TODO: impostare il setOptions di i sia all'add che al remove
 
@@ -55,7 +55,7 @@ export default function TaxonomySection() {
   };
 
   const handleAddClick = () => {
-    setInputList([...inputList, { taxonomyRegion: '' }]);
+    setInputList([...inputList, { taxonomyRegion: '', id: '' }]);
     setInputValue((curInputValue) => [...curInputValue, ...[]]);
   };
 
@@ -76,7 +76,7 @@ export default function TaxonomySection() {
   };
   const handleSearch = async (query: string) => {
     setIsLoading(true);
-    // TODO: far partire dopo 500ms e crealTimeout per non far partire chiamate ogni volta che digito
+    // TODO: far partire dopo 500ms e clearTimeout per non far partire chiamate ogni volta che digito
     const searchGeotaxonomy = await fetchWithLogs(
       {
         endpoint: 'ONBOARDING_GET_GEOTAXONOMY',
@@ -160,23 +160,27 @@ export default function TaxonomySection() {
       {/* Local Area Visible */}
       {isLocalAreaVisible && (
         <>
-          {inputList.map((_val, i) => (
-            <div key={i}>
-              <Box display={'flex'} width="100%" mt={2}>
-                {i !== 0 && (
-                  <Box display="flex" alignItems={'center'}>
-                    <ButtonNaked
-                      component="button"
-                      onClick={() => handleRemoveClick(i)}
-                      startIcon={<RemoveCircleOutlineOutlined />}
-                      sx={{ color: 'error.dark', size: 'medium' }}
-                      weight="default"
-                      size="large"
-                    />
-                  </Box>
-                )}
-                <Box width="100%">
-                  {/* <TextField
+          {inputList.map((val, i) => {
+            const selectedValue = inputValue[i];
+
+            console.log('selectedValue', selectedValue);
+            return (
+              <div key={val.id}>
+                <Box display={'flex'} width="100%" mt={2}>
+                  {i !== 0 && (
+                    <Box display="flex" alignItems={'center'}>
+                      <ButtonNaked
+                        component="button"
+                        onClick={() => handleRemoveClick(i)}
+                        startIcon={<RemoveCircleOutlineOutlined />}
+                        sx={{ color: 'error.dark', size: 'medium' }}
+                        weight="default"
+                        size="large"
+                      />
+                    </Box>
+                  )}
+                  <Box width="100%">
+                    {/* <TextField
                     sx={{
                       width: '100%',
                     }}
@@ -219,44 +223,46 @@ export default function TaxonomySection() {
                     name={`name ${i}`}
                   /> */}
 
-                  <Autocomplete
-                    disablePortal
-                    id="combo-box-demo"
-                    options={options[i]}
-                    sx={{ width: 300 }}
-                    onChange={(event: any, value: any) => handleChange(event, value, i)}
-                    value={inputValue[i]}
-                    renderOption={(props, option) => <span {...props}>{option.desc}</span>}
-                    renderInput={(params) => (
-                      <TextField
-                        onChange={handleSearchInput}
-                        {...params}
-                        variant="outlined"
-                        label={
-                          !inputValue?.[i]?.desc
-                            ? t('onboardingFormData.taxonomySection.localSection.inputLabel')
-                            : ''
-                        }
-                      />
-                    )}
-                  />
+                    <Autocomplete
+                      freeSolo
+                      disablePortal
+                      id="combo-box-demo"
+                      options={options}
+                      sx={{ width: '100%' }}
+                      onChange={(event: any, value: any) => handleChange(event, value, i)}
+                      value={selectedValue}
+                      renderOption={(props, option) => <span {...props}>{option.desc}</span>}
+                      renderInput={(params) => (
+                        <TextField
+                          onChange={handleSearchInput}
+                          {...params}
+                          variant="outlined"
+                          label={
+                            !inputValue?.[i]?.desc
+                              ? t('onboardingFormData.taxonomySection.localSection.inputLabel')
+                              : ''
+                          }
+                        />
+                      )}
+                    />
+                  </Box>
                 </Box>
-              </Box>
-              {inputList.length - 1 === i && (
-                <Box mt={2}>
-                  <ButtonNaked
-                    component="button"
-                    onClick={handleAddClick}
-                    startIcon={<AddOutlined />}
-                    sx={{ color: 'primary.main' }}
-                    weight="default"
-                  >
-                    {t('onboardingFormData.taxonomySection.localSection.addButtonLabel')}
-                  </ButtonNaked>
-                </Box>
-              )}
-            </div>
-          ))}
+                {inputList.length - 1 === i && (
+                  <Box mt={2}>
+                    <ButtonNaked
+                      component="button"
+                      onClick={handleAddClick}
+                      startIcon={<AddOutlined />}
+                      sx={{ color: 'primary.main' }}
+                      weight="default"
+                    >
+                      {t('onboardingFormData.taxonomySection.localSection.addButtonLabel')}
+                    </ButtonNaked>
+                  </Box>
+                )}
+              </div>
+            );
+          })}
         </>
       )}
     </Paper>
