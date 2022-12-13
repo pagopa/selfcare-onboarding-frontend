@@ -27,6 +27,7 @@ export function BodyLogger() {
         display: 'flex',
         flexDirection: 'column',
         minHeight: '100vh',
+        justifyContent: 'space-between',
       }}
     >
       <HeaderContext.Provider

@@ -1,14 +1,14 @@
+import { EndingPage } from '@pagopa/selfcare-common-frontend';
 import { useTranslation } from 'react-i18next';
-import { StyledIntro } from '../components/StyledIntro';
 
 export default () => {
   const { t } = useTranslation();
   return (
-    <StyledIntro>
-      {{
-        title: t('noProductPage.title'),
-        description: <>{t('noProductPage.description')}</>,
-      }}
-    </StyledIntro>
+    <EndingPage
+      title={t('noProductPage.title')}
+      description={t('noProductPage.description')}
+      variantTitle={'h4'}
+      variantDescription={'body1'}
+    ></EndingPage>
   );
 };
