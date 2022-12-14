@@ -14,8 +14,6 @@ export type OnboardingFormData = {
     vatNumber: string;
     // Codice destinatario
     recipientCode: string;
-    // servizi pubblici
-    publicServices?: boolean;
     // n. iscrizione al Registro delle Imprese
     commercialRegisterNumber?: string;
     // iscrizione all'Albo

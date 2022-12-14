@@ -169,21 +169,6 @@ export default function PersonalAndBillingDataSection({
               )}
             </Typography>
           </Grid>
-          {institutionType === 'GSP' && (
-            <Grid item xs={12}>
-              <Typography>
-                <Checkbox
-                  id="billingdata"
-                  checked={formik.values.publicServices}
-                  value={formik.values.publicServices}
-                  onChange={(_, checked: boolean) =>
-                    formik.setFieldValue('publicServices', checked, true)
-                  }
-                />
-                {t('stepBillingData.gspDescription')}
-              </Typography>
-            </Grid>
-          )}
           {isPSP && (
             <>
               <Grid item xs={12}>
