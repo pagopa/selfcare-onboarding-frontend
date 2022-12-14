@@ -44,38 +44,20 @@ export const prodPhaseOutErrorPage: RequestOutcomeMessage = {
   title: '',
   description: [
     <>
-      <IllusError size={60} />
-      <Grid container direction="column" key="0" mt={3}>
-        <Grid container item justifyContent="center">
-          <Grid item xs={6}>
-            <Typography variant="h4">
-              <Trans i18nKey="onboarding.phaseOutError.title" />
-            </Typography>
-          </Grid>
-        </Grid>
-        <Grid container item justifyContent="center" mb={2} mt={1}>
-          <Grid item xs={6}>
-            <Typography>
-              <Trans i18nKey="onboarding.phaseOutError.description">
-                Non puoi aderire al prodotto scelto poiché a breve non sarà
-                <br />
-                più disponibile.
-              </Trans>
-            </Typography>
-          </Grid>
-        </Grid>
-        <Grid container item justifyContent="center" mt={2}>
-          <Grid item xs={4}>
-            <Button
-              variant="contained"
-              sx={{ alignSelf: 'center' }}
-              onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
-            >
-              <Trans i18nKey="onboarding.phaseOutError.backAction" />
-            </Button>
-          </Grid>
-        </Grid>
-      </Grid>
+      <EndingPage
+        icon={<IllusError size={60} />}
+        title={<Trans i18nKey="onboarding.phaseOutError.title" />}
+        description={
+          <Trans i18nKey="onboarding.phaseOutError.description">
+            Non puoi aderire al prodotto scelto poiché a breve non sarà
+            <br />
+            più disponibile.
+          </Trans>
+        }
+        variantTitle={'h4'}
+        buttonLabel={<Trans i18nKey="onboarding.phaseOutError.backAction" />}
+        onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+      />
     </>,
   ],
 };
