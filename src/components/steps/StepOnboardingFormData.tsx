@@ -179,12 +179,6 @@ export default function StepOnboardingFormData({
   const formik = useFormik<OnboardingFormData>({
     initialValues: {
       ...initialFormData,
-      publicServices:
-        initialFormData.publicServices !== undefined
-          ? initialFormData.publicServices
-          : institutionType === 'GSP'
-          ? false
-          : undefined,
     },
     validateOnMount: true,
     validate,

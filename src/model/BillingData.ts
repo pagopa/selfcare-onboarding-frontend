@@ -5,8 +5,6 @@ export type BillingDataDto = {
     businessName: string;
     // Indirizzo PEC
     digitalAddress: string;
-    // servizi pubblici
-    publicServices?: boolean;
     // Codice destinatario
     recipientCode: string;
     // Sede legale
@@ -25,7 +23,6 @@ export const billingData2billingDataRequest = (
   ): BillingDataDto => ({
     businessName: billingData.businessName,
     digitalAddress: billingData.digitalAddress,
-    publicServices: billingData.publicServices,
     recipientCode: billingData.recipientCode,
     registeredOffice: billingData.registeredOffice,
     taxCode: billingData.taxCode,

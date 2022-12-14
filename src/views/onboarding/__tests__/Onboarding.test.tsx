@@ -383,7 +383,7 @@ const fillUserBillingDataForm = async (
     target: { value: 'AAAAAA44D55F456K' },
   });
 
-  const isTaxCodeEquals2PIVA = document.getElementById('billingdata');
+  const isTaxCodeEquals2PIVA = document.getElementById('onboardingFormData');
   expect(isTaxCodeEquals2PIVA).toBeTruthy();
 
   fireEvent.change(document.getElementById(vatNumber), {
@@ -658,7 +658,6 @@ const billingData2billingDataRequest = () => ({
   taxCode: 'AAAAAA44D55F456K',
   vatNumber: 'AAAAAA44D55F456K',
   recipientCode: 'recipientCode',
-  publicServices: false,
 });
 
 const verifySubmit = async () => {

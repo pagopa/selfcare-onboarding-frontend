@@ -470,7 +470,6 @@ const billingData2billingDataRequest = () => ({
   taxCode: 'AAAAAA44D55F456K',
   vatNumber: '12345678901',
   recipientCode: 'AM23EIX',
-  publicServices: false,
 });
 
 const verifySubmit = async () => {
