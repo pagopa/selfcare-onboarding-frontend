@@ -671,7 +671,6 @@ const verifySubmit = async () => {
       {
         data: {
           billingData: billingData2billingDataRequest(),
-          geographicTaxonomies: [],
           pspData: undefined,
           institutionType: 'GSP',
           origin: 'IPA',
@@ -706,6 +705,7 @@ const verifySubmit = async () => {
             },
           ],
           pricingPlan: 'FA',
+          geographicTaxonomies: [],
         },
         method: 'POST',
       },

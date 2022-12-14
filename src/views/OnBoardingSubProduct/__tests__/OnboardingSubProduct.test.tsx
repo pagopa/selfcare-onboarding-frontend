@@ -497,6 +497,7 @@ const verifySubmit = async () => {
           institutionType: 'GSP',
           pricingPlan: 'C1',
           origin: 'IPA',
+          geographicTaxonomies: [],
         },
       },
       expect.any(Function)
