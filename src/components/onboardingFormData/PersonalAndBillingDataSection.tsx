@@ -126,6 +126,7 @@ export default function PersonalAndBillingDataSection({
           <Grid item xs={12}>
             <Box display="flex" alignItems="center">
               <Checkbox
+                id="onboardingFormData"
                 checked={stepHistoryState.isTaxCodeEquals2PIVA}
                 inputProps={{
                   'aria-label': t('stepBillingData.taxCodeEquals2PIVAdescription'),
