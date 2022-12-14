@@ -373,7 +373,6 @@ function OnboardingComponent({ productId }: { productId: string }) {
               ? pspData2pspDataRequest(billingData as OnboardingFormData)
               : undefined,
           institutionType,
-          geographicTaxonomies: [],
           origin,
           users: users.map((u) => ({
             ...u,
@@ -381,6 +380,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
             email: u.email.toLowerCase(),
           })),
           pricingPlan,
+          geographicTaxonomies: [],
         },
       },
       () => setRequiredLogin(true)
