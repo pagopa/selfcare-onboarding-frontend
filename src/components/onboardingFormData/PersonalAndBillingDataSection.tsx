@@ -40,9 +40,10 @@ export default function PersonalAndBillingDataSection({
   setStepHistoryState,
   formik,
 }: Props) {
-  const ipa = origin === 'IPA';
+  const isFromIPA = origin === 'IPA';
   const isPSP = institutionType === 'PSP';
-  const isDisabled = ipa && !isPSP;
+  const isPA = institutionType === 'PA';
+  const isDisabled = isFromIPA && isPA && !isPSP;
   const { t } = useTranslation();
   const requiredError = 'Required';
 
