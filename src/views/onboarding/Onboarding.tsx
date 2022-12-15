@@ -253,15 +253,15 @@ function OnboardingComponent({ productId }: { productId: string }) {
             icon={<IllusCompleted size={60} />}
             title={t('onboarding.outcomeContent.success.title')}
             description={
-              institutionType !== 'PSP' ? (
-                <Trans i18nKey="onboarding.outcomeContent.success.baseDescription">
+              institutionType === 'PA' ? (
+                <Trans i18nKey="onboarding.outcomeContent.success.paDescription">
                   Invieremo un&apos;email all&apos;indirizzo PEC primario dell&apos;ente.
                   <br />
                   Al suo interno, ci sono le istruzioni per completare <br />
                   l&apos;adesione.
                 </Trans>
               ) : (
-                <Trans i18nKey="onboarding.outcomeContent.success.pspDescription">
+                <Trans i18nKey="onboarding.outcomeContent.success.notPaDescription">
                   Invieremo un&apos;email all&apos;indirizzo PEC indicato.
                   <br />
                   Al suo interno, ci sono le istruzioni per completare <br />

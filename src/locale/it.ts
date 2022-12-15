@@ -195,9 +195,9 @@ export default {
     outcomeContent: {
       success: {
         title: 'Richiesta di adesione inviata',
-        pspDescription:
+        notPaDescription:
           "Invieremo un'email all'indirizzo PEC indicato. <1 /> Al suo interno, ci sono le istruzioni per completare <3 />l'adesione.",
-        baseDescription:
+        paDescription:
           "Invieremo un'email all'indirizzo PEC primario dell'ente. <1 /> Al suo interno, ci sono le istruzioni per completare <3 />l'adesione.",
         backHome: 'Torna alla home',
       },
