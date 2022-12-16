@@ -37,6 +37,7 @@ import StepInstitutionType from '../../components/steps/StepInstitutionType';
 import ErrorPage from '../../components/errorPage/ErrorPage';
 import { genericError, OnboardingStep1_5 } from './components/OnboardingStep1_5';
 import { OnBoardingProductStepDelegates } from './components/OnBoardingProductStepDelegates';
+import { OnboardedInstitutionInfo } from '../../model/OnboardedInstitutionInfo';
 
 export type ValidateErrorType = 'conflictError';
 
@@ -136,7 +137,8 @@ function OnboardingComponent({ productId }: { productId: string }) {
   const theme = useTheme();
   const [onExitAction, setOnExitAction] = useState<(() => void) | undefined>();
   const [selectedParty, setSelectedParty] = useState<Party>();
-
+  const [geographicTaxonomies, setGeographicTaxonomies] =
+    useState<Array<OnboardedInstitutionInfo>>();
   const productAvoidStep =
     selectedProduct?.id === 'prod-pn' || selectedProduct?.id === 'prod-idpay';
 
@@ -396,6 +398,9 @@ function OnboardingComponent({ productId }: { productId: string }) {
               ? pspData2pspDataRequest(billingData as OnboardingFormData)
               : undefined,
           institutionType,
+          geographicTaxonomy: [
+            geographicTaxonomies?.map((gt) => onboardedInstitutionInfo2geographicTaxonomy),
+          ],
           origin,
           users: users.map((u) => ({
             ...u,

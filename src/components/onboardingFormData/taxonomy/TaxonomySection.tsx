@@ -1,6 +1,7 @@
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import debounce from 'lodash/debounce';
+import { Autocomplete } from '@mui/material';
 import {
   RadioGroup,
   Radio,
@@ -18,9 +19,8 @@ import { AddOutlined, RemoveCircleOutlineOutlined } from '@mui/icons-material';
 import { ButtonNaked } from '@pagopa/mui-italia';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { AxiosError, AxiosResponse } from 'axios';
-import { Autocomplete } from '@mui/lab';
 // import { useHistoryState } from '../../useHistoryState';
-import { Geotaxonomy } from '../../../model/Geotaxonomy';
+import { OnboardedInstitutionInfo } from '../../../model/OnboardedInstitutionInfo';
 import { fetchWithLogs } from '../../../lib/api-utils';
 import { getFetchOutcome } from '../../../lib/error-utils';
 import { UserContext } from '../../../lib/context';
@@ -34,49 +34,84 @@ export default function TaxonomySection() {
   // const theme = useTheme();
   const [isNationalAreaVisible, setIsNationalAreaVisible] = useState<boolean>();
   const [isLocalAreaVisible, setIsLocalAreaVisible] = useState<boolean>();
-  const [inputList, setInputList] = useState([{ taxonomyRegion: '', id: '' }]);
-  const [inputValue, setInputValue] = useState<Array<Geotaxonomy>>([]);
+  // const [previousSelectedValue, setPreviousSelectedValue] =
+  //   useState<Array<OnboardedInstitutionInfo>>([]);
+  const [autocompleteFields, setAutocompleteFields] = useState<Array<OnboardedInstitutionInfo>>([]);
   const [_isLoading, setIsLoading] = useState(false);
   const { setRequiredLogin } = useContext(UserContext);
-  const [options, setOptions] = useState<Array<Geotaxonomy>>([...inputValue]);
+  const [optionsSelected, setOptionsSelected] = useState<Array<OnboardedInstitutionInfo>>([]);
+  const [options, setOptions] = useState<Array<OnboardedInstitutionInfo>>([...optionsSelected]);
+
+  const mockedPreviusValue: Array<OnboardedInstitutionInfo> = [
+    {
+      code: '058091',
+      desc: 'Firenze - Comune',
+      region: '12',
+      province: '058',
+      provinceAbbreviation: 'RM',
+      country: '100',
+      countryAbbreviation: 'IT',
+      startDate: new Date('1871-01-15'),
+      endDate: undefined,
+      enable: true,
+    },
+    {
+      code: '015146',
+      desc: 'Napoli - Comune',
+      region: '03',
+      province: '015',
+      provinceAbbreviation: 'MI',
+      country: '100',
+      countryAbbreviation: 'IT',
+      startDate: new Date('1861-03-18'),
+      endDate: undefined,
+      enable: true,
+    },
+  ];
+
+  useEffect(() => {
+    // TODO: add service -> /{externalInstitutionId}/products/{productId}/onboarded-institution-info --- move mock
+    setAutocompleteFields(mockedPreviusValue);
+  }, []);
 
   // TODO: impostare il setOptions di i sia all'add che al remove
 
   const handleRemoveClick = (index: number) => {
-    const list = [...inputList];
+    const list = [...autocompleteFields];
     // eslint-disable-next-line functional/immutable-data
     list.splice(index, 1);
-    setInputList(list);
+    setAutocompleteFields(list);
 
-    const valueList = [...inputValue];
+    const optionValues = [...options];
     // eslint-disable-next-line functional/immutable-data
-    valueList.splice(index, 1);
-    setInputValue(valueList);
+    options.splice(index, 1);
+    setOptionsSelected(optionValues);
   };
 
   const handleAddClick = () => {
-    setInputList([...inputList, { taxonomyRegion: '', id: '' }]);
-    setInputValue((curInputValue) => [...curInputValue, ...[]]);
+    setAutocompleteFields([...autocompleteFields, [{ taxonomyRegion: '', id: '' }]]);
+    setOptionsSelected((curInputValue) => [...curInputValue, ...[]]);
   };
 
   const handleChange = (_event: any, value: any, index: number) => {
-    const newValues = inputValue;
+    const newValues = optionsSelected;
     // eslint-disable-next-line functional/immutable-data
     newValues[index] = value;
     console.log('newValues', newValues);
 
-    setInputValue(newValues);
+    setOptionsSelected(newValues);
   };
 
   const handleSearchInput = (event: any) => {
     const value = event.target.value;
+    console.log('value', value);
+
     if (value.length >= 3) {
       void debounce(handleSearch, 100)(value);
     }
   };
   const handleSearch = async (query: string) => {
     setIsLoading(true);
-    // TODO: far partire dopo 500ms e clearTimeout per non far partire chiamate ogni volta che digito
     const searchGeotaxonomy = await fetchWithLogs(
       {
         endpoint: 'ONBOARDING_GET_GEOTAXONOMY',
@@ -95,7 +130,7 @@ export default function TaxonomySection() {
       // eslint-disable-next-line functional/no-let
       let data = (searchGeotaxonomy as AxiosResponse).data;
 
-      data = data.map((value: Geotaxonomy) => ({ ...value, label: value.desc }));
+      data = data.map((value: OnboardedInstitutionInfo) => ({ ...value, label: value.desc }));
 
       setOptions(data);
     } else if ((searchGeotaxonomy as AxiosError).response?.status === 404) {
@@ -160,12 +195,13 @@ export default function TaxonomySection() {
       {/* Local Area Visible */}
       {isLocalAreaVisible && (
         <>
-          {inputList.map((val, i) => {
-            const selectedValue = inputValue[i];
+          {autocompleteFields.map((val, i) => {
+            console.log('autocompleteField', val);
+            const selectedValue = optionsSelected[i];
 
             console.log('selectedValue', selectedValue);
             return (
-              <div key={val.id}>
+              <div key={val.code}>
                 <Box display={'flex'} width="100%" mt={2}>
                   {i !== 0 && (
                     <Box display="flex" alignItems={'center'}>
@@ -185,7 +221,7 @@ export default function TaxonomySection() {
                       width: '100%',
                     }}
                     id="Parties"
-                    value={inputValue[i]}
+                    value={optionsSelected[i]}
                     // onChange={(event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
                     //   handleChange(event, i)
                     // }
@@ -210,7 +246,7 @@ export default function TaxonomySection() {
                       endAdornment: (
                         <IconButton
                           onClick={() => {
-                            setInputValue(['']);
+                            setOptionsSelected(['']);
                             setSelectedRegion(null);
                             setSelectedRegionHistory(null);
                           }}
@@ -231,14 +267,16 @@ export default function TaxonomySection() {
                       sx={{ width: '100%' }}
                       onChange={(event: any, value: any) => handleChange(event, value, i)}
                       value={selectedValue}
-                      renderOption={(props, option) => <span {...props}>{option.desc}</span>}
+                      renderOption={(props, option) => (
+                        <span {...props}>{option.desc ? option.desc : 'test'}</span>
+                      )}
                       renderInput={(params) => (
                         <TextField
                           onChange={handleSearchInput}
                           {...params}
                           variant="outlined"
                           label={
-                            !inputValue?.[i]?.desc
+                            !optionsSelected?.[i]?.desc
                               ? t('onboardingFormData.taxonomySection.localSection.inputLabel')
                               : ''
                           }
@@ -247,7 +285,7 @@ export default function TaxonomySection() {
                     />
                   </Box>
                 </Box>
-                {inputList.length - 1 === i && (
+                {autocompleteFields.length - 1 === i && (
                   <Box mt={2}>
                     <ButtonNaked
                       component="button"

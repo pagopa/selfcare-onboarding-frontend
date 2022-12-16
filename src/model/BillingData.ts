@@ -15,7 +15,7 @@ export type BillingDataDto = {
     taxCode: string;
     // Partita iva
     vatNumber: string;
-    // Codice di avviamento postale
+    // CAP
     zipCode: string;
 };
   

@@ -1,6 +1,6 @@
 import { Typography } from '@mui/material';
 import { Box } from '@mui/system';
-import { Geotaxonomy } from '../../../model/Geotaxonomy';
+import { OnboardedInstitutionInfo } from '../../../model/OnboardedInstitutionInfo';
 
 // const CustomBox = styled(Box)({
 //   /* width */
@@ -25,7 +25,7 @@ import { Geotaxonomy } from '../../../model/Geotaxonomy';
 // });
 
 type Props = {
-  options: Array<Geotaxonomy>;
+  options: Array<OnboardedInstitutionInfo>;
 };
 
 export default function ResultsTaxonomyLocalValues({ options }: Props) {
