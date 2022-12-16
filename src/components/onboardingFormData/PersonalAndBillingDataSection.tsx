@@ -30,6 +30,7 @@ type Props = StepperStepComponentProps & {
   stepHistoryState: StepBillingDataHistoryState;
   setStepHistoryState: React.Dispatch<React.SetStateAction<StepBillingDataHistoryState>>;
   formik: any;
+  subProductId?: string;
 };
 
 export default function PersonalAndBillingDataSection({
@@ -39,12 +40,15 @@ export default function PersonalAndBillingDataSection({
   stepHistoryState,
   setStepHistoryState,
   formik,
+  subProductId,
 }: Props) {
+  const { t } = useTranslation();
+
   const isFromIPA = origin === 'IPA';
   const isPSP = institutionType === 'PSP';
   const isPA = institutionType === 'PA';
-  const isDisabled = isFromIPA && isPA && !isPSP;
-  const { t } = useTranslation();
+  const premiumFlow = !!subProductId;
+  const isDisabled = premiumFlow || (isFromIPA && isPA && !isPSP);
   const requiredError = 'Required';
 
   const baseNumericFieldProps = (
@@ -129,6 +133,7 @@ export default function PersonalAndBillingDataSection({
               <Checkbox
                 id="onboardingFormData"
                 checked={stepHistoryState.isTaxCodeEquals2PIVA}
+                disabled={premiumFlow}
                 inputProps={{
                   'aria-label': t('stepBillingData.taxCodeEquals2PIVAdescription'),
                 }}
@@ -152,7 +157,7 @@ export default function PersonalAndBillingDataSection({
                     ? formik.values.taxCode
                     : formik.values.vatNumber
                 }
-                disabled={stepHistoryState.isTaxCodeEquals2PIVA}
+                disabled={stepHistoryState.isTaxCodeEquals2PIVA || premiumFlow}
               />
               {isPSP && (
                 <Box display="flex" alignItems="center" mt="2px">
