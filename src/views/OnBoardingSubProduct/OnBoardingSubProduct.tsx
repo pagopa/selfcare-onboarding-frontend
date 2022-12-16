@@ -251,6 +251,7 @@ function OnBoardingSubProduct() {
       Component: () =>
         StepOnboardingFormData({
           productId,
+          subProductId: subProduct?.id,
           selectedProduct: subProduct,
           externalInstitutionId,
           initialFormData: billingData ?? {

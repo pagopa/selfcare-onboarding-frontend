@@ -41,6 +41,7 @@ type Props = StepperStepComponentProps & {
   externalInstitutionId: string;
   origin?: string;
   productId?: string;
+  subProductId?: string;
   selectedParty?: Party;
   selectedProduct?: Product | null;
   outcome?: RequestOutcomeMessage | null;
@@ -56,6 +57,7 @@ export default function StepOnboardingFormData({
   origin,
   outcome,
   productId,
+  subProductId,
 }: Props) {
   const requiredError = 'Required';
 
@@ -266,6 +268,7 @@ export default function StepOnboardingFormData({
           stepHistoryState={stepHistoryState}
           setStepHistoryState={setStepHistoryState}
           formik={formik}
+          subProductId={subProductId}
         />
         {isPSP && <DpoSection baseTextFieldProps={baseTextFieldProps} />}
 
