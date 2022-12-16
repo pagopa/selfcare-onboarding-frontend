@@ -40,9 +40,10 @@ export default function PersonalAndBillingDataSection({
   setStepHistoryState,
   formik,
 }: Props) {
-  const ipa = origin === 'IPA';
+  const isFromIPA = origin === 'IPA';
   const isPSP = institutionType === 'PSP';
-  const isDisabled = ipa && !isPSP;
+  const isPA = institutionType === 'PA';
+  const isDisabled = isFromIPA && isPA && !isPSP;
   const { t } = useTranslation();
   const requiredError = 'Required';
 
@@ -126,6 +127,7 @@ export default function PersonalAndBillingDataSection({
           <Grid item xs={12}>
             <Box display="flex" alignItems="center">
               <Checkbox
+                id="onboardingFormData"
                 checked={stepHistoryState.isTaxCodeEquals2PIVA}
                 inputProps={{
                   'aria-label': t('stepBillingData.taxCodeEquals2PIVAdescription'),
@@ -169,21 +171,6 @@ export default function PersonalAndBillingDataSection({
               )}
             </Typography>
           </Grid>
-          {institutionType === 'GSP' && (
-            <Grid item xs={12}>
-              <Typography>
-                <Checkbox
-                  id="billingdata"
-                  checked={formik.values.publicServices}
-                  value={formik.values.publicServices}
-                  onChange={(_, checked: boolean) =>
-                    formik.setFieldValue('publicServices', checked, true)
-                  }
-                />
-                {t('stepBillingData.gspDescription')}
-              </Typography>
-            </Grid>
-          )}
           {isPSP && (
             <>
               <Grid item xs={12}>

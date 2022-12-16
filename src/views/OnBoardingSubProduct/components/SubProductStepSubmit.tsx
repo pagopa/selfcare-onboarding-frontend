@@ -123,6 +123,7 @@ function SubProductStepSubmit({
           institutionType,
           pricingPlan,
           origin,
+          geographicTaxonomies: [],
         },
       },
       () => setRequiredLogin(true)
