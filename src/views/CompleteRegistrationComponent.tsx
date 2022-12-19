@@ -80,6 +80,7 @@ export default function CompleteRegistrationComponent() {
 
   const [outcome, setOutcome] = useState<RequestOutcomeJwt | null>(!token ? 'error' : null);
   const [errorCode, setErrorCode] = useState<keyof typeof errors>('GENERIC');
+  const [open, setOpen] = useState<boolean>(false);
 
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -184,7 +185,7 @@ export default function CompleteRegistrationComponent() {
   };
 
   const handleErrorModalClose = () => {
-    setOutcome(null);
+    setOpen(false);
   };
 
   const handleErrorModalExit = () => {
@@ -192,12 +193,12 @@ export default function CompleteRegistrationComponent() {
     setUploadedFilesHistory([]);
     setActiveStep(0);
     setUploadedFiles([]);
-    setOutcome(null);
+    setOpen(false);
   };
 
   const handleErrorModalConfirm = () => {
     console.log('EXIT');
-    setOutcome(null);
+    setOpen(false);
     setUploadedFiles([]);
   };
 
@@ -320,7 +321,7 @@ export default function CompleteRegistrationComponent() {
             handleClose={handleErrorModalClose}
             handleExit={handleErrorModalExit}
             onConfirm={handleErrorModalConfirm}
-            open={true}
+            open={open}
             title={t(`completeRegistration.errors.${errorCode}.title`)}
             message={
               errorCode === 'INVALID_SIGN_FORMAT' ? (
