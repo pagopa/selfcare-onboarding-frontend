@@ -2,8 +2,9 @@ import { useContext, useEffect, useState } from 'react';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
 import { Trans } from 'react-i18next';
 import { AxiosError } from 'axios';
+import { EndingPage } from '@pagopa/selfcare-common-frontend';
+import { IllusError } from '@pagopa/mui-italia';
 import {
-  BillingData,
   InstitutionType,
   Problem,
   Product,
@@ -15,11 +16,10 @@ import { fetchWithLogs } from '../../../lib/api-utils';
 import { getFetchOutcome } from '../../../lib/error-utils';
 import { MessageNoAction } from '../../../components/MessageNoAction';
 import { unregisterUnloadEvent } from '../../../utils/unloadEvent-utils';
-import {
-  billingData2billingDataRequest,
-  pspData2pspDataRequest,
-} from '../../onboarding/Onboarding';
-import ErrorPage from '../../../components/errorPage/ErrorPage';
+import { billingData2billingDataRequest } from '../../../model/BillingData';
+import { pspData2pspDataRequest } from '../../../model/PspData';
+import { OnboardingFormData } from '../../../model/OnboardingFormData';
+import { ENV } from '../../../utils/env';
 
 type Props = StepperStepComponentProps & {
   requestId: string;
@@ -27,7 +27,7 @@ type Props = StepperStepComponentProps & {
   subProduct: Product;
   externalInstitutionId: string;
   users: Array<UserOnCreate>;
-  billingData: BillingData;
+  billingData: OnboardingFormData;
   institutionType: InstitutionType;
   pricingPlan?: string;
   origin: string;
@@ -38,19 +38,24 @@ const errorOutCome = {
   title: '',
   description: [
     <>
-      <ErrorPage
-        titleContent={
+      <EndingPage
+        minHeight="52vh"
+        icon={<IllusError size={60} />}
+        variantTitle={'h4'}
+        variantDescription={'body1'}
+        title={
           <Trans i18nKey="onBoardingSubProduct.genericError.title">Qualcosa è andato storto</Trans>
         }
-        descriptionContent={
+        description={
           <Trans i18nKey="onBoardingSubProduct.genericError.message">
             A causa di un errore del sistema non è possibile completare <br />
             la procedura. Ti chiediamo di riprovare più tardi.
           </Trans>
         }
-        backButtonContent={
+        buttonLabel={
           <Trans i18nKey="onBoardingSubProduct.genericError.homeButton">Torna alla home</Trans>
         }
+        onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
       />
     </>,
   ],
@@ -110,14 +115,15 @@ function SubProductStepSubmit({
             taxCode: u.taxCode.toUpperCase(),
             email: u.email.toLowerCase(),
           })),
-          billingData: billingData2billingDataRequest(billingData as BillingData),
+          billingData: billingData2billingDataRequest(billingData as OnboardingFormData),
           pspData:
             institutionType === 'PSP'
-              ? pspData2pspDataRequest(billingData as BillingData)
+              ? pspData2pspDataRequest(billingData as OnboardingFormData)
               : undefined,
           institutionType,
           pricingPlan,
           origin,
+          geographicTaxonomies: [],
         },
       },
       () => setRequiredLogin(true)

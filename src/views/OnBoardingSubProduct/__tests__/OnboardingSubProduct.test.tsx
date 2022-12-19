@@ -470,7 +470,6 @@ const billingData2billingDataRequest = () => ({
   taxCode: 'AAAAAA44D55F456K',
   vatNumber: '12345678901',
   recipientCode: 'AM23EIX',
-  publicServices: false,
 });
 
 const verifySubmit = async () => {
@@ -497,6 +496,7 @@ const verifySubmit = async () => {
           institutionType: 'GSP',
           pricingPlan: 'C1',
           origin: 'IPA',
+          geographicTaxonomies: [],
         },
       },
       expect.any(Function)

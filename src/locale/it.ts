@@ -195,9 +195,9 @@ export default {
     outcomeContent: {
       success: {
         title: 'Richiesta di adesione inviata',
-        pspDescription:
+        notPaDescription:
           "Invieremo un'email all'indirizzo PEC indicato. <1 /> Al suo interno, ci sono le istruzioni per completare <3 />l'adesione.",
-        baseDescription:
+        paDescription:
           "Invieremo un'email all'indirizzo PEC primario dell'ente. <1 /> Al suo interno, ci sono le istruzioni per completare <3 />l'adesione.",
         backHome: 'Torna alla home',
       },
@@ -225,9 +225,10 @@ export default {
     },
     phaseOutError: {
       title: 'Qualcosa è andato storto',
-      description: 'Non puoi aderire al prodotto scelto poiché a breve non sarà <1 /> più disponibile.',
-      backAction:'Torna alla home'
-    }
+      description:
+        'Non puoi aderire al prodotto scelto poiché a breve non sarà <1 /> più disponibile.',
+      backAction: 'Torna alla home',
+    },
   },
   onBoardingSubProduct: {
     alreadyOnboardedError: {
@@ -246,6 +247,7 @@ export default {
       subTitle:
         "Seleziona l'ente per il quale stai richiedendo la sottoscrizione <1 />all'offerta Premium",
       searchLabel: 'Cerca ente',
+      notFoundResults: 'No risultati',
       IPAsubTitle:
         "Seleziona dall'Indice della Pubblica Amministrazione (IPA) l'ente <1/> per cui vuoi richiedere l'adesione a {{baseProduct}} Premium",
       helperLink: 'Non lo trovi? <1>Registra un nuovo ente</1>',

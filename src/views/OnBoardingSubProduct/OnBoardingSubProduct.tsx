@@ -6,9 +6,10 @@ import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsS
 import { uniqueId } from 'lodash';
 import { useParams } from 'react-router';
 import { useTranslation, Trans } from 'react-i18next';
+import { EndingPage } from '@pagopa/selfcare-common-frontend';
+import { IllusError } from '@pagopa/mui-italia';
 import { withLogin } from '../../components/withLogin';
 import {
-  BillingData,
   InstitutionType,
   SelfcareParty,
   Product,
@@ -16,16 +17,16 @@ import {
   UserOnCreate,
   Party,
 } from '../../../types';
+import { OnboardingFormData } from '../../model/OnboardingFormData';
 import { LoadingOverlay } from '../../components/LoadingOverlay';
 import { ENV } from '../../utils/env';
 import { HeaderContext } from '../../lib/context';
 import { StepAddManager, UsersObject } from '../../components/steps/StepAddManager';
 import { StepSearchParty } from '../../components/steps/StepSearchParty';
 import StepOnboardingData from '../../components/steps/StepOnboardingData';
-import StepBillingData from '../../components/steps/StepBillingData';
+import StepOnboardingFormData from '../../components/steps/StepOnboardingFormData';
 import { registerUnloadEvent, unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
 import { useHistoryState } from '../../components/useHistoryState';
-import ErrorPage from '../../components/errorPage/ErrorPage';
 import SubProductStepVerifyInputs from './components/SubProductStepVerifyInputs';
 import SubProductStepSubmit from './components/SubProductStepSubmit';
 import SubProductStepSuccess from './components/SubProductStepSuccess';
@@ -53,7 +54,7 @@ function OnBoardingSubProduct() {
 
   const [_manager, setManager] = useState<UserOnCreate>();
   const [users, setUsers] = useState<Array<UserOnCreate>>([]);
-  const [billingData, setBillingData] = useState<BillingData>();
+  const [billingData, setBillingData] = useState<OnboardingFormData>();
   const [institutionType, setInstitutionType] = useState<InstitutionType>();
   const [partyId, setPartyId] = useState<string>();
   const [pricingPlan, setPricingPlan] = useState<string>();
@@ -107,7 +108,7 @@ function OnBoardingSubProduct() {
     setActiveStep(newParties.length === 0 ? 2 : 1);
   };
 
-  const forwardWithBillingData = (newBillingData: BillingData) => {
+  const forwardWithBillingData = (newBillingData: OnboardingFormData) => {
     trackEvent('ONBOARDING_PREMIUM_BILLING_DATA', {
       request_id: requestIdRef.current,
       party_id: externalInstitutionId,
@@ -158,7 +159,7 @@ function OnBoardingSubProduct() {
 
   const forwardWithOnboardingData = (
     manager?: UserOnCreate,
-    billingData?: BillingData,
+    billingData?: OnboardingFormData,
     institutionType?: InstitutionType,
     partyId?: string
   ) => {
@@ -248,8 +249,9 @@ function OnBoardingSubProduct() {
     {
       label: 'Insert Billing Data',
       Component: () =>
-        StepBillingData({
+        StepOnboardingFormData({
           productId,
+          subProductId: subProduct?.id,
           selectedProduct: subProduct,
           externalInstitutionId,
           initialFormData: billingData ?? {
@@ -305,7 +307,7 @@ function OnBoardingSubProduct() {
           subProduct: subProduct as Product,
           externalInstitutionId,
           users,
-          billingData: billingData as BillingData,
+          billingData: billingData as OnboardingFormData,
           institutionType: institutionType as InstitutionType,
           pricingPlan,
           origin,
@@ -328,15 +330,20 @@ function OnBoardingSubProduct() {
   };
 
   return pricingPlan && pricingPlan !== 'C1' ? (
-    <ErrorPage
-      titleContent={t('invalidPricingPlan.title')}
-      descriptionContent={
+    <EndingPage
+      minHeight="52vh"
+      icon={<IllusError size={60} />}
+      variantTitle={'h4'}
+      variantDescription={'body1'}
+      title={t('invalidPricingPlan.title')}
+      description={
         <Trans i18nKey="invalidPricingPlan.description">
           Non riusciamo a trovare la pagina che stai cercando. <br />
           Assicurati che l’indirizzo sia corretto o torna alla home.
         </Trans>
       }
-      backButtonContent={t('invalidPricingPlan.backButton')}
+      buttonLabel={t('invalidPricingPlan.backButton')}
+      onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
     />
   ) : (
     <Container>
