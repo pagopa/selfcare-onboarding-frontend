@@ -29,6 +29,7 @@ import { HeaderContext, UserContext } from '../../lib/context';
 import { billingData2billingDataRequest } from '../../model/BillingData';
 import { pspData2pspDataRequest } from '../../model/PspData';
 import NoProductPage from '../NoProductPage';
+import { onboardedInstitutionInfo2geographicTaxonomy } from '../../model/GeographicTaxonomies';
 import { OnboardingFormData } from '../../model/OnboardingFormData';
 import StepOnboardingData from '../../components/steps/StepOnboardingData';
 import StepOnboardingFormData from '../../components/steps/StepOnboardingFormData';
@@ -37,7 +38,6 @@ import StepInstitutionType from '../../components/steps/StepInstitutionType';
 import ErrorPage from '../../components/errorPage/ErrorPage';
 import { genericError, OnboardingStep1_5 } from './components/OnboardingStep1_5';
 import { OnBoardingProductStepDelegates } from './components/OnBoardingProductStepDelegates';
-import { OnboardedInstitutionInfo } from '../../model/OnboardedInstitutionInfo';
 
 export type ValidateErrorType = 'conflictError';
 
@@ -126,7 +126,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
   const history = useHistory();
   const [openExitModal, setOpenExitModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>();
-  const [billingData, setBillingData] = useState<OnboardingFormData>();
+  const [onboardingFormData, setBillingData] = useState<OnboardingFormData>();
   const [institutionType, setInstitutionType] = useState<InstitutionType>();
   const [origin, setOrigin] = useState<string>();
   const [pricingPlan, setPricingPlan] = useState<string>();
@@ -137,8 +137,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
   const theme = useTheme();
   const [onExitAction, setOnExitAction] = useState<(() => void) | undefined>();
   const [selectedParty, setSelectedParty] = useState<Party>();
-  const [geographicTaxonomies, setGeographicTaxonomies] =
-    useState<Array<OnboardedInstitutionInfo>>();
+
   const productAvoidStep =
     selectedProduct?.id === 'prod-pn' || selectedProduct?.id === 'prod-idpay';
 
@@ -226,6 +225,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
       taxCode: party.taxCode,
       vatNumber: '',
       zipCode: party.zipCode,
+      geographicTaxonomies: [],
     });
     forwardWithData(newFormData);
     trackEvent('ONBOARDING_PARTY_SELECTION', {
@@ -392,14 +392,16 @@ function OnboardingComponent({ productId }: { productId: string }) {
       {
         method: 'POST',
         data: {
-          billingData: billingData2billingDataRequest(billingData as OnboardingFormData),
+          billingData: billingData2billingDataRequest(onboardingFormData as OnboardingFormData),
           pspData:
             institutionType === 'PSP'
-              ? pspData2pspDataRequest(billingData as OnboardingFormData)
+              ? pspData2pspDataRequest(onboardingFormData as OnboardingFormData)
               : undefined,
           institutionType,
           geographicTaxonomy: [
-            geographicTaxonomies?.map((gt) => onboardedInstitutionInfo2geographicTaxonomy),
+            onboardingFormData?.geographicTaxonomies?.map((gt) =>
+              onboardedInstitutionInfo2geographicTaxonomy(gt)
+            ),
           ],
           origin,
           users: users.map((u) => ({
@@ -482,9 +484,10 @@ function OnboardingComponent({ productId }: { productId: string }) {
           taxCode: '',
           vatNumber: '',
           recipientCode: '',
+          geographicTaxonomies: [],
         });
       } else {
-        setBillingData(billingData);
+        setBillingData(onboardingFormData);
       }
       setActiveStep(4);
     }
@@ -556,7 +559,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
           selectedParty,
           selectedProduct,
           externalInstitutionId,
-          initialFormData: billingData ?? {
+          initialFormData: onboardingFormData ?? {
             businessName: '',
             registeredOffice: '',
             zipCode: '',
@@ -564,6 +567,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
             taxCode: '',
             vatNumber: '',
             recipientCode: '',
+            geographicTaxonomies: [],
           },
           origin,
           institutionType: institutionType as InstitutionType,

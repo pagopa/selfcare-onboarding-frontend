@@ -291,8 +291,7 @@ export default function StepOnboardingFormData({
         {isPSP && <DpoSection baseTextFieldProps={baseTextFieldProps} />}
 
         <Grid item xs={12} my={4}>
-          <OnboardingStepAct
-            ions
+          <OnboardingStepActions
             back={{
               action: onBackAction,
               label: t('onboardingFormData.backLabel'),

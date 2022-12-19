@@ -1,3 +1,4 @@
+import { OnboardingInstitutionInfo } from "./OnboardingInstitutionInfo";
 
 export type OnboardingFormData = {
     // Ragione sociale
@@ -32,5 +33,7 @@ export type OnboardingFormData = {
     dpoPecAddress?: string;
     // Indirizzo Email DPO
     dopEmailAddress?: string;
+    // tassonomia geografica
+    geographicTaxonomies: Array<OnboardingInstitutionInfo>;
   };
   

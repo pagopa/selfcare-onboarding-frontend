@@ -12,84 +12,94 @@ import {
   Box,
   Tooltip,
   TextField,
-  // IconButton,
-  // useTheme,
 } from '@mui/material';
 import { AddOutlined, RemoveCircleOutlineOutlined } from '@mui/icons-material';
 import { ButtonNaked } from '@pagopa/mui-italia';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { AxiosError, AxiosResponse } from 'axios';
-// import { useHistoryState } from '../../useHistoryState';
-import { OnboardedInstitutionInfo } from '../../../model/OnboardedInstitutionInfo';
 import { fetchWithLogs } from '../../../lib/api-utils';
 import { getFetchOutcome } from '../../../lib/error-utils';
 import { UserContext } from '../../../lib/context';
 import { ENV } from '../../../utils/env';
-
-// import ResultsTaxonomyLocalValues from './ResultsTaxonomyLocalValues';
-// import SearchTaxonomyLocalValues from './SearchTaxonomyLocalValues';
+import { OnboardingInstitutionInfo } from '../../../model/OnboardingInstitutionInfo';
+import { GeographicTaxonomy } from '../../../model/GeographicTaxonomies';
 
 export default function TaxonomySection() {
   const { t } = useTranslation();
-  // const theme = useTheme();
-  const [isNationalAreaVisible, setIsNationalAreaVisible] = useState<boolean>();
-  const [isLocalAreaVisible, setIsLocalAreaVisible] = useState<boolean>();
-  // const [previousSelectedValue, setPreviousSelectedValue] =
-  //   useState<Array<OnboardedInstitutionInfo>>([]);
-  const [autocompleteFields, setAutocompleteFields] = useState<Array<OnboardedInstitutionInfo>>([]);
+  const [isNationalAreaVisible, setIsNationalAreaVisible] = useState<boolean>(false);
+  const [isLocalAreaVisible, setIsLocalAreaVisible] = useState<boolean>(false);
   const [_isLoading, setIsLoading] = useState(false);
   const { setRequiredLogin } = useContext(UserContext);
-  const [optionsSelected, setOptionsSelected] = useState<Array<OnboardedInstitutionInfo>>([]);
-  const [options, setOptions] = useState<Array<OnboardedInstitutionInfo>>([...optionsSelected]);
+  const [optionsSelected, setOptionsSelected] = useState<Array<GeographicTaxonomy>>([
+    { code: '', desc: '' },
+  ]);
+  const [options, setOptions] = useState<Array<OnboardingInstitutionInfo>>([]);
+  const [isAddNewAutocompleteEnabled, setIsAddNewAutocompleteEnabled] = useState<boolean>(false);
 
-  const mockedPreviusValue: Array<OnboardedInstitutionInfo> = [
-    {
-      code: '058091',
-      desc: 'Firenze - Comune',
-      region: '12',
-      province: '058',
-      provinceAbbreviation: 'RM',
-      country: '100',
-      countryAbbreviation: 'IT',
-      startDate: new Date('1871-01-15'),
-      endDate: undefined,
-      enable: true,
-    },
-    {
-      code: '015146',
-      desc: 'Napoli - Comune',
-      region: '03',
-      province: '015',
-      provinceAbbreviation: 'MI',
-      country: '100',
-      countryAbbreviation: 'IT',
-      startDate: new Date('1861-03-18'),
-      endDate: undefined,
-      enable: true,
-    },
-  ];
+  // const mockedPreviusValue: Array<GeographicTaxonomy> = [
+  //   {
+  //     code: '058091',
+  //     desc: 'Firenze - Comune',
+  //   },
+  //   {
+  //     code: '014468',
+  //     desc: 'Napoli - Comune',
+  //   },
+  // ];
+  // const mockedPreviusValue: Array<GeographicTaxonomy> = [{ code: '100', desc: 'ITALIA' }];
+  const mockedPreviusValue: Array<GeographicTaxonomy> = [];
 
   useEffect(() => {
     // TODO: add service -> /{externalInstitutionId}/products/{productId}/onboarded-institution-info --- move mock
-    setAutocompleteFields(mockedPreviusValue);
+    // if (mockedPreviusValue && mockedPreviusValue.length > 0) {
+    //   setOptionsSelected(mockedPreviusValue);
+    //   setIsAddNewAutocompleteEnabled(true);
+    // } else {
+    //   // setOptionsSelected([{ code: '', desc: '' }]);
+    // }
+
+    // TODO: verify il national is desc:'ITALIA' and code:'100'
+    if (
+      mockedPreviusValue &&
+      mockedPreviusValue.length > 0 &&
+      mockedPreviusValue[0].code === '100'
+    ) {
+      setIsNationalAreaVisible(true);
+      setOptionsSelected([{ code: '', desc: '' }]);
+    } else if (mockedPreviusValue && mockedPreviusValue.length > 0) {
+      setIsLocalAreaVisible(true);
+      setOptionsSelected(mockedPreviusValue);
+      setIsAddNewAutocompleteEnabled(true);
+    } else {
+      setIsLocalAreaVisible(false);
+      setIsNationalAreaVisible(false);
+    }
   }, []);
 
-  // TODO: impostare il setOptions di i sia all'add che al remove
+  const isNationalFunction = ({ code, desc }: GeographicTaxonomy) =>
+    code === '100' && desc === 'ITALIA' ? true : false;
+  // TODO: impostare il setOptions di [i] sia all'add che al remove
 
   const handleRemoveClick = (index: number) => {
-    const list = [...autocompleteFields];
+    const list = [...optionsSelected];
     // eslint-disable-next-line functional/immutable-data
     list.splice(index, 1);
-    setAutocompleteFields(list);
+    setOptionsSelected(list);
 
-    const optionValues = [...options];
-    // eslint-disable-next-line functional/immutable-data
-    options.splice(index, 1);
-    setOptionsSelected(optionValues);
+    // const optionValues = [...options];
+    // // eslint-disable-next-line functional/immutable-data
+    // options.splice(index, 1);
+    // setOptionsSelected(optionValues);
   };
 
   const handleAddClick = () => {
-    setAutocompleteFields([...autocompleteFields, [{ taxonomyRegion: '', id: '' }]]);
+    setOptionsSelected([
+      ...optionsSelected,
+      {
+        code: '',
+        desc: '',
+      },
+    ]);
     setOptionsSelected((curInputValue) => [...curInputValue, ...[]]);
   };
 
@@ -98,7 +108,6 @@ export default function TaxonomySection() {
     // eslint-disable-next-line functional/immutable-data
     newValues[index] = value;
     console.log('newValues', newValues);
-
     setOptionsSelected(newValues);
   };
 
@@ -130,7 +139,7 @@ export default function TaxonomySection() {
       // eslint-disable-next-line functional/no-let
       let data = (searchGeotaxonomy as AxiosResponse).data;
 
-      data = data.map((value: OnboardedInstitutionInfo) => ({ ...value, label: value.desc }));
+      data = data.map((value: OnboardingInstitutionInfo) => ({ ...value, label: value.desc }));
 
       setOptions(data);
     } else if ((searchGeotaxonomy as AxiosError).response?.status === 404) {
@@ -173,6 +182,7 @@ export default function TaxonomySection() {
             control={<Radio disableRipple={true} />}
             label={t('onboardingFormData.taxonomySection.nationalLabel')}
             onChange={() => {
+              console.log('onChange national');
               setIsNationalAreaVisible(true);
               setIsLocalAreaVisible(false);
             }}
@@ -184,6 +194,7 @@ export default function TaxonomySection() {
             control={<Radio disableRipple={true} />}
             label={t('onboardingFormData.taxonomySection.localLabel')}
             onChange={() => {
+              console.log('onChange local');
               setIsNationalAreaVisible(false);
               setIsLocalAreaVisible(true);
             }}
@@ -191,32 +202,34 @@ export default function TaxonomySection() {
         </Box>
       </RadioGroup>
       {/* National Area Visible */}
-      {isNationalAreaVisible && <> National area</>}
+      {isNationalAreaVisible && (
+        <TextField sx={{ width: '100%' }} disabled={true} value={t('italia')}></TextField>
+      )}
       {/* Local Area Visible */}
       {isLocalAreaVisible && (
         <>
-          {autocompleteFields.map((val, i) => {
-            console.log('autocompleteField', val);
-            const selectedValue = optionsSelected[i];
+          {optionsSelected
+            .filter((val) => !isNationalFunction(val))
+            .map((val, i) => {
+              const selectedValue = optionsSelected[i];
 
-            console.log('selectedValue', selectedValue);
-            return (
-              <div key={val.code}>
-                <Box display={'flex'} width="100%" mt={2}>
-                  {i !== 0 && (
-                    <Box display="flex" alignItems={'center'}>
-                      <ButtonNaked
-                        component="button"
-                        onClick={() => handleRemoveClick(i)}
-                        startIcon={<RemoveCircleOutlineOutlined />}
-                        sx={{ color: 'error.dark', size: 'medium' }}
-                        weight="default"
-                        size="large"
-                      />
-                    </Box>
-                  )}
-                  <Box width="100%">
-                    {/* <TextField
+              return (
+                <div key={val.code}>
+                  <Box display={'flex'} width="100%" mt={2}>
+                    {i !== 0 && (
+                      <Box display="flex" alignItems={'center'}>
+                        <ButtonNaked
+                          component="button"
+                          onClick={() => handleRemoveClick(i)}
+                          startIcon={<RemoveCircleOutlineOutlined />}
+                          sx={{ color: 'error.dark', size: 'medium' }}
+                          weight="default"
+                          size="large"
+                        />
+                      </Box>
+                    )}
+                    <Box width="100%">
+                      {/* <TextField
                     sx={{
                       width: '100%',
                     }}
@@ -259,48 +272,48 @@ export default function TaxonomySection() {
                     name={`name ${i}`}
                   /> */}
 
-                    <Autocomplete
-                      freeSolo
-                      disablePortal
-                      id="combo-box-demo"
-                      options={options}
-                      sx={{ width: '100%' }}
-                      onChange={(event: any, value: any) => handleChange(event, value, i)}
-                      value={selectedValue}
-                      renderOption={(props, option) => (
-                        <span {...props}>{option.desc ? option.desc : 'test'}</span>
-                      )}
-                      renderInput={(params) => (
-                        <TextField
-                          onChange={handleSearchInput}
-                          {...params}
-                          variant="outlined"
-                          label={
-                            !optionsSelected?.[i]?.desc
-                              ? t('onboardingFormData.taxonomySection.localSection.inputLabel')
-                              : ''
-                          }
-                        />
-                      )}
-                    />
+                      <Autocomplete
+                        freeSolo
+                        disablePortal
+                        options={options}
+                        sx={{ width: '100%' }}
+                        onChange={(event: any, value: any) => handleChange(event, value, i)}
+                        value={selectedValue?.desc}
+                        renderOption={(props, option) => (
+                          <span {...props}>{option.desc ? option.desc : 'test'}</span>
+                        )}
+                        renderInput={(params) => (
+                          <TextField
+                            onChange={handleSearchInput}
+                            {...params}
+                            variant="outlined"
+                            label={
+                              !optionsSelected?.[i]?.desc
+                                ? t('onboardingFormData.taxonomySection.localSection.inputLabel')
+                                : ''
+                            }
+                          />
+                        )}
+                      />
+                    </Box>
                   </Box>
-                </Box>
-                {autocompleteFields.length - 1 === i && (
-                  <Box mt={2}>
-                    <ButtonNaked
-                      component="button"
-                      onClick={handleAddClick}
-                      startIcon={<AddOutlined />}
-                      sx={{ color: 'primary.main' }}
-                      weight="default"
-                    >
-                      {t('onboardingFormData.taxonomySection.localSection.addButtonLabel')}
-                    </ButtonNaked>
-                  </Box>
-                )}
-              </div>
-            );
-          })}
+                  {optionsSelected.length - 1 === i && (
+                    <Box mt={2}>
+                      <ButtonNaked
+                        disabled={!isAddNewAutocompleteEnabled}
+                        component="button"
+                        onClick={handleAddClick}
+                        startIcon={<AddOutlined />}
+                        sx={{ color: 'primary.main' }}
+                        weight="default"
+                      >
+                        {t('onboardingFormData.taxonomySection.localSection.addButtonLabel')}
+                      </ButtonNaked>
+                    </Box>
+                  )}
+                </div>
+              );
+            })}
         </>
       )}
     </Paper>
