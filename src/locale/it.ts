@@ -328,28 +328,35 @@ export default {
       recipientCodeDescription: 'È il codice necessario per ricevere le fatture elettroniche',
       gspDescription: 'Sono gestore di almeno uno dei pubblici servizi: Gas, Energia, Telco.',
       pspDataSection: {
-          commercialRegisterNumber: 'n. Iscrizione al Registro delle Imprese',
-          invalidCommercialRegisterNumber: 'n. Iscrizione al Registro delle Imprese non valido',
-          registrationInRegister: 'Iscrizione all’Albo',
-          registerNumber: 'Numero dell’Albo',
-          invalidregisterNumber: 'Numero dell’Albo non valido',
-          abiCode: 'Codice ABI',
-          invalidabiCode: 'Codice ABI non valido',
+        commercialRegisterNumber: 'n. Iscrizione al Registro delle Imprese',
+        invalidCommercialRegisterNumber: 'n. Iscrizione al Registro delle Imprese non valido',
+        registrationInRegister: 'Iscrizione all’Albo',
+        registerNumber: 'Numero dell’Albo',
+        invalidregisterNumber: 'Numero dell’Albo non valido',
+        abiCode: 'Codice ABI',
+        invalidabiCode: 'Codice ABI non valido',
       },
     },
     taxonomySection: {
       title: 'INDICA L’AREA GEOGRAFICA',
       nationalLabel: 'Nazionale',
       localLabel: 'Locale',
-      infoLabel:'Seleziona il territorio in cui opera il tuo ente. Se locale, puoi scegliere una o più aree di competenza. Se l’ente ha già aderito ad altri prodotti PagoPA, troverai l’area già impostata.',
-      localSection: { addButtonLabel:'Aggiungi area', inputLabel:'Comune, Provincia o Regione' }
+      infoLabel:
+        'Seleziona il territorio in cui opera il tuo ente. Se locale, puoi scegliere una o più aree di competenza. Se l’ente ha già aderito ad altri prodotti PagoPA, troverai l’area già impostata.',
+      localSection: {
+        addButtonLabel: 'Aggiungi area',
+        inputLabel: 'Comune, Provincia o Regione',
+      },
+      nationalSection: {
+        italy: 'Italia',
+      },
     },
     dpoDataSection: {
       dpoTitle: 'CONTATTI DEL RESPONSABILE DELLA PROTEZIONE DEI DATI',
       dpoAddress: 'Indirizzo',
       dpoPecAddress: 'Indirizzo PEC',
       dopEmailAddress: 'Indirizzo email',
-    }
+    },
   },
   rejectRegistration: {
     outcomeContent: {
