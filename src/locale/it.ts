@@ -347,9 +347,6 @@ export default {
         addButtonLabel: 'Aggiungi area',
         inputLabel: 'Comune, Provincia o Regione',
       },
-      nationalSection: {
-        italy: 'Italia',
-      },
     },
     dpoDataSection: {
       dpoTitle: 'CONTATTI DEL RESPONSABILE DELLA PROTEZIONE DEI DATI',

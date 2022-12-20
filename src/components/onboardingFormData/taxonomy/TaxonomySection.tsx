@@ -67,9 +67,6 @@ export default function TaxonomySection() {
     }
   }, []);
 
-  const isNationalFunction = ({ code, desc }: GeographicTaxonomy) =>
-    code === '100' && desc === 'ITALIA' ? true : false;
-
   const handleRemoveClick = (index: number) => {
     const list = [...optionsSelected];
     // eslint-disable-next-line functional/immutable-data
@@ -91,14 +88,11 @@ export default function TaxonomySection() {
     const newValues = optionsSelected;
     // eslint-disable-next-line functional/immutable-data
     newValues[index] = value;
-    console.log('newValues', newValues);
     setOptionsSelected(newValues);
   };
 
   const handleSearchInput = (event: any) => {
     const value = event.target.value;
-    console.log('value', value);
-
     if (value.length >= 3) {
       void debounce(handleSearch, 100)(value);
     }
@@ -116,9 +110,7 @@ export default function TaxonomySection() {
       () => setRequiredLogin(true)
     );
     const outcome = getFetchOutcome(searchGeotaxonomy);
-    console.log('outcome', outcome);
 
-    console.log('data', searchGeotaxonomy);
     if (outcome === 'success') {
       // eslint-disable-next-line functional/no-let
       let data = (searchGeotaxonomy as AxiosResponse).data;
@@ -128,7 +120,6 @@ export default function TaxonomySection() {
       setOptions(data);
     } else if ((searchGeotaxonomy as AxiosError).response?.status === 404) {
       setOptions([]);
-      console.log('error');
     }
     setIsLoading(false);
   };
@@ -153,7 +144,7 @@ export default function TaxonomySection() {
           </Box>
         </Grid>
       </Grid>
-      <RadioGroup>
+      <RadioGroup name="geographicTaxonomy">
         <Box display="flex">
           <FormControlLabel
             checked={isNationalAreaVisible}
@@ -161,7 +152,6 @@ export default function TaxonomySection() {
             control={<Radio disableRipple={true} />}
             label={t('onboardingFormData.taxonomySection.nationalLabel')}
             onChange={() => {
-              console.log('onChange national');
               setIsNationalAreaVisible(true);
               setIsLocalAreaVisible(false);
             }}
@@ -173,83 +163,71 @@ export default function TaxonomySection() {
             control={<Radio disableRipple={true} />}
             label={t('onboardingFormData.taxonomySection.localLabel')}
             onChange={() => {
-              console.log('onChange local');
               setIsNationalAreaVisible(false);
               setIsLocalAreaVisible(true);
             }}
           />
         </Box>
       </RadioGroup>
-      {/* National Area Visible */}
-      {isNationalAreaVisible && (
-        <TextField
-          sx={{ width: '100%', marginTop: 2 }}
-          disabled
-          value={t('onboardingFormData.taxonomySection.nationalSection.italy')}
-        ></TextField>
-      )}
-      {/* Local Area Visible */}
       {isLocalAreaVisible && (
         <>
-          {optionsSelected
-            .filter((val) => !isNationalFunction(val))
-            .map((val, i) => (
-              <div key={i}>
-                <Box display={'flex'} width="100%" mt={2}>
-                  {i !== 0 && (
-                    <Box display="flex" alignItems={'center'}>
-                      <ButtonNaked
-                        component="button"
-                        onClick={() => handleRemoveClick(i)}
-                        startIcon={<RemoveCircleOutlineOutlined />}
-                        sx={{ color: 'error.dark', size: 'medium' }}
-                        weight="default"
-                        size="large"
-                      />
-                    </Box>
-                  )}
-                  <Box width="100%">
-                    <Autocomplete
-                      freeSolo
-                      disablePortal
-                      options={options}
-                      sx={{ width: '100%' }}
-                      onChange={(event: any, value: any) => handleChange(event, value, i)}
-                      value={val.desc}
-                      renderOption={(props, option) => (
-                        <span {...props}>{option.desc ? option.desc : 'test'}</span>
-                      )}
-                      renderInput={(params) => (
-                        <TextField
-                          onChange={handleSearchInput}
-                          {...params}
-                          variant="outlined"
-                          label={
-                            !optionsSelected?.[i]?.desc
-                              ? t('onboardingFormData.taxonomySection.localSection.inputLabel')
-                              : ''
-                          }
-                        />
-                      )}
+          {optionsSelected.map((val, i) => (
+            <div key={i}>
+              <Box display={'flex'} width="100%" mt={2}>
+                {i !== 0 && (
+                  <Box display="flex" alignItems={'center'}>
+                    <ButtonNaked
+                      component="button"
+                      onClick={() => handleRemoveClick(i)}
+                      startIcon={<RemoveCircleOutlineOutlined />}
+                      sx={{ color: 'error.dark', size: 'medium' }}
+                      weight="default"
+                      size="large"
                     />
                   </Box>
-                </Box>
-                {optionsSelected.length - 1 === i && (
-                  <Box mt={2}>
-                    <ButtonNaked
-                      disabled={!isAddNewAutocompleteEnabled}
-                      component="button"
-                      onClick={handleAddClick}
-                      startIcon={<AddOutlined />}
-                      sx={{ color: 'primary.main' }}
-                      weight="default"
-                    >
-                      {t('onboardingFormData.taxonomySection.localSection.addButtonLabel')}
-                    </ButtonNaked>
-                  </Box>
                 )}
-              </div>
-            ))}
+                <Box width="100%">
+                  <Autocomplete
+                    freeSolo
+                    disablePortal
+                    options={options}
+                    sx={{ width: '100%' }}
+                    onChange={(event: any, value: any) => handleChange(event, value, i)}
+                    value={val?.desc}
+                    renderOption={(props, option) => (
+                      <span {...props}>{option.desc ? option.desc : 'test'}</span>
+                    )}
+                    renderInput={(params) => (
+                      <TextField
+                        onChange={handleSearchInput}
+                        {...params}
+                        variant="outlined"
+                        label={
+                          !optionsSelected?.[i]?.desc
+                            ? t('onboardingFormData.taxonomySection.localSection.inputLabel')
+                            : ''
+                        }
+                      />
+                    )}
+                  />
+                </Box>
+              </Box>
+              {optionsSelected.length - 1 === i && (
+                <Box mt={2}>
+                  <ButtonNaked
+                    disabled={!isAddNewAutocompleteEnabled}
+                    component="button"
+                    onClick={handleAddClick}
+                    startIcon={<AddOutlined />}
+                    sx={{ color: 'primary.main' }}
+                    weight="default"
+                  >
+                    {t('onboardingFormData.taxonomySection.localSection.addButtonLabel')}
+                  </ButtonNaked>
+                </Box>
+              )}
+            </div>
+          ))}
         </>
       )}
     </Paper>
