@@ -27,14 +27,9 @@ import { GeographicTaxonomy } from '../../../model/GeographicTaxonomies';
 type Props = {
   retrievedTaxonomies: Array<GeographicTaxonomy>;
   setGeographicTaxonomies: React.Dispatch<React.SetStateAction<Array<GeographicTaxonomy>>>;
-  formik: any;
 };
 
-export default function TaxonomySection({
-  retrievedTaxonomies,
-  setGeographicTaxonomies,
-  formik,
-}: Props) {
+export default function TaxonomySection({ retrievedTaxonomies, setGeographicTaxonomies }: Props) {
   const { t } = useTranslation();
   const [isNationalAreaVisible, setIsNationalAreaVisible] = useState<boolean>(false);
   const [isLocalAreaVisible, setIsLocalAreaVisible] = useState<boolean>(false);
@@ -89,7 +84,7 @@ export default function TaxonomySection({
 
     // eslint-disable-next-line functional/immutable-data
     newValues[index] = value;
-    setOptionsSelected(newValues);
+    setOptionsSelected(newValues.slice());
     if (newValues[index]?.desc) {
       setIsAddNewAutocompleteEnabled(true);
     } else if (emptyField) {
@@ -159,7 +154,7 @@ export default function TaxonomySection({
         <Box display="flex">
           <FormControlLabel
             checked={isNationalAreaVisible}
-            value={formik.values.national}
+            value={'nationl'}
             control={<Radio disableRipple={true} />}
             label={t('onboardingFormData.taxonomySection.nationalLabel')}
             onChange={() => {
@@ -171,7 +166,7 @@ export default function TaxonomySection({
           />
           <FormControlLabel
             checked={isLocalAreaVisible}
-            value={formik.values.local}
+            value={'local'}
             control={<Radio disableRipple={true} />}
             label={t('onboardingFormData.taxonomySection.localLabel')}
             onChange={() => {

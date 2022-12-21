@@ -21,7 +21,7 @@ import { OnboardingFormData } from '../../model/OnboardingFormData';
 import PersonalAndBillingDataSection from '../onboardingFormData/PersonalAndBillingDataSection';
 import DpoSection from '../onboardingFormData/DpoSection';
 import TaxonomySection from '../onboardingFormData/taxonomy/TaxonomySection';
-// import { GeographicTaxonomy } from '../../model/GeographicTaxonomies';
+import { GeographicTaxonomy } from '../../model/GeographicTaxonomies';
 
 const mailPECRegexp = new RegExp('^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$');
 const fiscalAndVatCodeRegexp = new RegExp(
@@ -71,13 +71,13 @@ export default function StepOnboardingFormData({
   const isPSP = institutionType === 'PSP';
 
   // CASE 1: New API retrieve some geographicsArea for the party
-  const mockRetrievedGeographicTaxonomies = [
-    { code: '2322435', desc: 'Comune di Cagliari' },
-    { code: '2322435', desc: 'Comune di Alghero' },
-  ];
+  // const mockRetrievedGeographicTaxonomies = [
+  //   { code: '2322435', desc: 'Comune di Cagliari' },
+  //   { code: '2322435', desc: 'Comune di Alghero' },
+  // ];
 
   // CASE 2: New API NOT found some geographicsArea for the party
-  // const mockRetrievedGeographicTaxonomies: Array<GeographicTaxonomy> = [];
+  const mockRetrievedGeographicTaxonomies: Array<GeographicTaxonomy> = [];
 
   // CASE 3: New API found National area selected
   // const mockRetrievedGeographicTaxonomies = [{ code: '100', desc: 'ITALIA' }];
@@ -195,12 +195,10 @@ export default function StepOnboardingFormData({
             ? t('onboardingFormData.billingDataSection.invalidEmail')
             : undefined,
         recipientCode: !values.recipientCode ? requiredError : undefined,
-        national:
-          !values.geographicTaxonomies || values.geographicTaxonomies.length === 0
-            ? requiredError
-            : undefined,
-        local:
-          !values.geographicTaxonomies || values.geographicTaxonomies.length === 0
+        geographicTaxonomies:
+          !values.geographicTaxonomies ||
+          values.geographicTaxonomies.length === 0 ||
+          values.geographicTaxonomies.find(({ code }) => code === '')
             ? requiredError
             : undefined,
       }).filter(([_key, value]) => value)
@@ -310,7 +308,6 @@ export default function StepOnboardingFormData({
             setGeographicTaxonomies={(geographicTaxonomies) =>
               formik.setFieldValue('geographicTaxonomies', geographicTaxonomies)
             }
-            formik={formik}
           />
         </Grid>
 
