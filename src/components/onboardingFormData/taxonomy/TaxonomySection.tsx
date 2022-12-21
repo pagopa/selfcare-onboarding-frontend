@@ -35,18 +35,8 @@ export default function TaxonomySection() {
   ]);
   const [options, setOptions] = useState<Array<OnboardingInstitutionInfo>>([]);
   const [isAddNewAutocompleteEnabled, setIsAddNewAutocompleteEnabled] = useState<boolean>(false);
+  const [input, setInput] = useState<string>('');
 
-  // const mockedPreviusValue: Array<GeographicTaxonomy> = [
-  //   {
-  //     code: '058091',
-  //     desc: 'Firenze - Comune',
-  //   },
-  //   {
-  //     code: '014468',
-  //     desc: 'Napoli - Comune',
-  //   },
-  // ];
-  // const mockedPreviusValue: Array<GeographicTaxonomy> = [{ code: '100', desc: 'ITALIA' }];
   const mockedPreviusValue: Array<GeographicTaxonomy> = [];
 
   useEffect(() => {
@@ -67,6 +57,14 @@ export default function TaxonomySection() {
     }
   }, []);
 
+  useEffect(() => {
+    if (optionsSelected) {
+      setIsAddNewAutocompleteEnabled(false);
+      const selectableOccurrences = options.filter((o) => !optionsSelected.includes(o));
+      setOptions(selectableOccurrences);
+    }
+  }, [optionsSelected]);
+
   const handleRemoveClick = (index: number) => {
     const list = [...optionsSelected];
     // eslint-disable-next-line functional/immutable-data
@@ -86,13 +84,19 @@ export default function TaxonomySection() {
 
   const handleChange = (_event: any, value: any, index: number) => {
     const newValues = optionsSelected;
+    const emptyField = !optionsSelected.find((o) => o?.desc === '');
+
     // eslint-disable-next-line functional/immutable-data
     newValues[index] = value;
     setOptionsSelected(newValues);
+    if (newValues[index]?.desc || emptyField) {
+      setIsAddNewAutocompleteEnabled(true);
+    }
   };
 
   const handleSearchInput = (event: any) => {
     const value = event.target.value;
+    setInput(value);
     if (value.length >= 3) {
       void debounce(handleSearch, 100)(value);
     }
@@ -124,12 +128,14 @@ export default function TaxonomySection() {
     setIsLoading(false);
   };
 
+  const notValidEntry = input.length >= 3 && options.length === 0;
+
   return (
-    <Paper elevation={0} sx={{ p: 4, borderRadius: '16px', my: 4 }}>
+    <Paper elevation={0} sx={{ p: 4, borderRadius: 2, my: 4 }}>
       <Grid container item pb={3}>
         <Grid item xs={12} display="flex">
           <Box>
-            <Typography variant="caption" sx={{ fontWeight: 'fontWeightBold' }}>
+            <Typography component="div" variant="caption" sx={{ fontWeight: 'fontWeightBold' }}>
               {t('onboardingFormData.taxonomySection.title')}
             </Typography>
           </Box>
@@ -207,9 +213,15 @@ export default function TaxonomySection() {
                             ? t('onboardingFormData.taxonomySection.localSection.inputLabel')
                             : ''
                         }
+                        error={notValidEntry}
                       />
                     )}
                   />
+                  {notValidEntry && (
+                    <Typography sx={{ fontSize: 'fontSize', color: 'error.dark' }} pt={1} ml={2}>
+                      {t('onboardingFormData.taxonomySection.error.notMatchedArea')}
+                    </Typography>
+                  )}
                 </Box>
               </Box>
               {optionsSelected.length - 1 === i && (

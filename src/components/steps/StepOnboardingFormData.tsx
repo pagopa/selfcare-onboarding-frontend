@@ -183,6 +183,7 @@ export default function StepOnboardingFormData({
             ? t('onboardingFormData.billingDataSection.invalidEmail')
             : undefined,
         recipientCode: !values.recipientCode ? requiredError : undefined,
+        geographicTaxonomies: !values.geographicTaxonomies ? requiredError : undefined,
       }).filter(([_key, value]) => value)
     );
 

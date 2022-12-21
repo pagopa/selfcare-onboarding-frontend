@@ -347,6 +347,9 @@ export default {
         addButtonLabel: 'Aggiungi area',
         inputLabel: 'Comune, Provincia o Regione',
       },
+      error: {
+        notMatchedArea: 'Scegli una località presente nell’elenco',
+      },
     },
     dpoDataSection: {
       dpoTitle: 'CONTATTI DEL RESPONSABILE DELLA PROTEZIONE DEI DATI',
