@@ -149,27 +149,28 @@ const mockPartyRegistry = {
   count: 8,
 };
 
-const mockedGeoTaxonomy =
-  [{
-    code: "058091",
-    desc: "Roma - Comune",
-    region: "12",
-    province: "058",
-    provinceAbbreviation: "RM",
-    country: "100",
-    countryAbbreviation: "IT",
-    startDate: "1871-01-15",
+const mockedGeoTaxonomy = [
+  {
+    code: '058091',
+    desc: 'Roma - Comune',
+    region: '12',
+    province: '058',
+    provinceAbbreviation: 'RM',
+    country: '100',
+    countryAbbreviation: 'IT',
+    startDate: '1871-01-15',
     endDate: null,
-    enable: true
-  }, {
-    code: "015146",
-    desc: "Milano - Comune",
-    region: "03",
-    province: "015",
-    provinceAbbreviation: "MI",
-    country: "100",
-    countryAbbreviation: "IT",
-    startDate: "1861-03-18",
+    enable: true,
+  },
+  {
+    code: '015146',
+    desc: 'Milano - Comune',
+    region: '03',
+    province: '015',
+    provinceAbbreviation: 'MI',
+    country: '100',
+    countryAbbreviation: 'IT',
+    startDate: '1861-03-18',
     endDate: null,
     enable: true
   }, {
@@ -275,20 +276,12 @@ const mockedOnboardingData0: InstitutionOnboardingInfoResource = {
       taxCode: 'AAAAAA11A11A123K',
       vatNumber: 'AAAAAA11A11A123K',
       recipientCode: 'M5UXCR1',
-      geographicTaxonomies:[
+      geographicTaxonomies: [
         {
           code: '058091',
           desc: 'Firenze - Comune',
-          region: '12',
-          province: '058',
-          provinceAbbreviation: 'RM',
-          country: '100',
-          countryAbbreviation: 'IT',
-          startDate: new Date('1871-01-15'),
-          endDate: undefined,
-          enable: true,
-        }
-      ]
+        },
+      ],
     },
     institutionType: 'PA',
     origin: 'IPA',
@@ -313,20 +306,12 @@ const mockedOnboardingData1: InstitutionOnboardingInfoResource = {
       taxCode: 'BBBBBB11A11A123K',
       vatNumber: '12345678901',
       recipientCode: 'M2UHYR1',
-      geographicTaxonomies:[
+      geographicTaxonomies: [
         {
           code: '058091',
           desc: 'Firenze - Comune',
-          region: '12',
-          province: '058',
-          provinceAbbreviation: 'RM',
-          country: '100',
-          countryAbbreviation: 'IT',
-          startDate: new Date('1871-01-15'),
-          endDate: undefined,
-          enable: true,
-        }
-      ]
+        },
+      ],
     },
     institutionType: 'GSP',
     origin: 'IPA',
