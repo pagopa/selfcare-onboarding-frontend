@@ -172,7 +172,30 @@ const mockedGeoTaxonomy =
     startDate: "1861-03-18",
     endDate: null,
     enable: true
-  }];
+  }, {
+    code: "015456",
+    desc: "Napoli - Comune",
+    region: "08",
+    province: "018",
+    provinceAbbreviation: "NA",
+    country: "100",
+    countryAbbreviation: "IT",
+    startDate: "1861-03-18",
+    endDate: null,
+    enable: true
+    },
+    {
+      code: "015456",
+      desc: "Milazzo - Comune",
+      region: "08",
+      province: "016",
+      provinceAbbreviation: "GE",
+      country: "100",
+      countryAbbreviation: "IT",
+      startDate: "1861-03-18",
+      endDate: null,
+      enable: true
+    }];
 
 const mockedProduct = {
   title: 'App IO',

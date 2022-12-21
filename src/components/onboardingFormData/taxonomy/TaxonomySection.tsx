@@ -37,8 +37,20 @@ export default function TaxonomySection() {
   const [isAddNewAutocompleteEnabled, setIsAddNewAutocompleteEnabled] = useState<boolean>(false);
   const [input, setInput] = useState<string>('');
 
-  const mockedPreviusValue: Array<GeographicTaxonomy> = [];
+  const emptyField = !optionsSelected.find((o) => o?.desc === '');
 
+  console.log('optionsSelected', optionsSelected);
+  // const mockedPreviusValue: Array<GeographicTaxonomy> = [];
+  const mockedPreviusValue: Array<GeographicTaxonomy> = [
+    {
+      code: '152',
+      desc: 'Roma - Comune',
+    },
+    {
+      code: '856',
+      desc: 'Milano - Comune',
+    },
+  ];
   useEffect(() => {
     if (
       mockedPreviusValue &&
@@ -57,14 +69,6 @@ export default function TaxonomySection() {
     }
   }, []);
 
-  useEffect(() => {
-    if (optionsSelected) {
-      setIsAddNewAutocompleteEnabled(false);
-      const selectableOccurrences = options.filter((o) => !optionsSelected.includes(o));
-      setOptions(selectableOccurrences);
-    }
-  }, [optionsSelected]);
-
   const handleRemoveClick = (index: number) => {
     const list = [...optionsSelected];
     // eslint-disable-next-line functional/immutable-data
@@ -73,6 +77,9 @@ export default function TaxonomySection() {
   };
 
   const handleAddClick = () => {
+    if (emptyField) {
+      setIsAddNewAutocompleteEnabled(false);
+    }
     setOptionsSelected([
       ...optionsSelected,
       {
@@ -84,13 +91,14 @@ export default function TaxonomySection() {
 
   const handleChange = (_event: any, value: any, index: number) => {
     const newValues = optionsSelected;
-    const emptyField = !optionsSelected.find((o) => o?.desc === '');
 
     // eslint-disable-next-line functional/immutable-data
     newValues[index] = value;
     setOptionsSelected(newValues);
-    if (newValues[index]?.desc || emptyField) {
+    if (newValues[index]?.desc) {
       setIsAddNewAutocompleteEnabled(true);
+    } else if (emptyField) {
+      setIsAddNewAutocompleteEnabled(false);
     }
   };
 
@@ -99,6 +107,8 @@ export default function TaxonomySection() {
     setInput(value);
     if (value.length >= 3) {
       void debounce(handleSearch, 100)(value);
+    } else {
+      setOptions([]);
     }
   };
   const handleSearch = async (query: string) => {
@@ -121,14 +131,14 @@ export default function TaxonomySection() {
 
       data = data.map((value: OnboardingInstitutionInfo) => ({ ...value, label: value.desc }));
 
-      setOptions(data);
+      setOptions(data.filter((o: any) => !optionsSelected.includes(o)));
     } else if ((searchGeotaxonomy as AxiosError).response?.status === 404) {
       setOptions([]);
     }
     setIsLoading(false);
   };
 
-  const notValidEntry = input.length >= 3 && options.length === 0;
+  const notValidEntry = input.length >= 3 && options.length === 0 && !optionsSelected;
 
   return (
     <Paper elevation={0} sx={{ p: 4, borderRadius: 2, my: 4 }}>
@@ -195,13 +205,15 @@ export default function TaxonomySection() {
                 <Box width="100%">
                   <Autocomplete
                     freeSolo
+                    onOpen={() => setOptions([])}
                     disablePortal
-                    options={options}
+                    options={input.length >= 3 ? options : []}
                     sx={{ width: '100%' }}
                     onChange={(event: any, value: any) => handleChange(event, value, i)}
                     value={val?.desc}
                     renderOption={(props, option) => (
-                      <span {...props}>{option.desc ? option.desc : 'test'}</span>
+                      // TODO: customize layout
+                      <span {...props}>{option.desc ? option.desc : ''}</span>
                     )}
                     renderInput={(params) => (
                       <TextField
