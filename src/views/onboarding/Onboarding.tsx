@@ -225,9 +225,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
       taxCode: party.taxCode,
       vatNumber: '',
       zipCode: party.zipCode,
-      geographicTaxonomies: onboardingFormData?.geographicTaxonomies ?? [
-        { code: '100', desc: 'Italia' },
-      ],
+      geographicTaxonomies: onboardingFormData ? onboardingFormData.geographicTaxonomies : [],
     });
     forwardWithData(newFormData);
     trackEvent('ONBOARDING_PARTY_SELECTION', {
@@ -240,6 +238,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
   };
 
   const forwardWithBillingData = (newOnboardingFormData: OnboardingFormData) => {
+    console.log('newOnboardingFormData', newOnboardingFormData);
     trackEvent('ONBOARDING_BILLING_DATA', {
       request_id: requestIdRef.current,
       party_id: externalInstitutionId,
@@ -401,11 +400,9 @@ function OnboardingComponent({ productId }: { productId: string }) {
               ? pspData2pspDataRequest(onboardingFormData as OnboardingFormData)
               : undefined,
           institutionType,
-          geographicTaxonomy: [
-            onboardingFormData?.geographicTaxonomies?.map((gt) =>
-              onboardedInstitutionInfo2geographicTaxonomy(gt)
-            ),
-          ],
+          geographicTaxonomies: onboardingFormData?.geographicTaxonomies?.map((gt) =>
+            onboardedInstitutionInfo2geographicTaxonomy(gt)
+          ),
           origin,
           users: users.map((u) => ({
             ...u,

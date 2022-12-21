@@ -26,9 +26,15 @@ import { GeographicTaxonomy } from '../../../model/GeographicTaxonomies';
 
 type Props = {
   retrievedTaxonomies: Array<GeographicTaxonomy>;
+  setGeographicTaxonomies: React.Dispatch<React.SetStateAction<Array<GeographicTaxonomy>>>;
+  formik: any;
 };
 
-export default function TaxonomySection({ retrievedTaxonomies }: Props) {
+export default function TaxonomySection({
+  retrievedTaxonomies,
+  setGeographicTaxonomies,
+  formik,
+}: Props) {
   const { t } = useTranslation();
   const [isNationalAreaVisible, setIsNationalAreaVisible] = useState<boolean>(false);
   const [isLocalAreaVisible, setIsLocalAreaVisible] = useState<boolean>(false);
@@ -43,19 +49,23 @@ export default function TaxonomySection({ retrievedTaxonomies }: Props) {
 
   const emptyField = !optionsSelected.find((o) => o?.desc === '');
 
+  console.log('optionsSelected', optionsSelected);
   useEffect(() => {
-    if (retrievedTaxonomies && retrievedTaxonomies.length === 0) {
+    console.log('retrieve', retrievedTaxonomies);
+    if (retrievedTaxonomies && retrievedTaxonomies[0]?.code === '100') {
       setIsNationalAreaVisible(true);
-      setOptionsSelected([{ code: '', desc: '' }]);
+      setGeographicTaxonomies([{ code: '100', desc: 'ITALIA' }]);
     } else if (retrievedTaxonomies && retrievedTaxonomies.length > 0) {
       setIsLocalAreaVisible(true);
       setOptionsSelected(retrievedTaxonomies);
       setIsAddNewAutocompleteEnabled(true);
-    } else {
-      setIsLocalAreaVisible(false);
-      setIsNationalAreaVisible(false);
+      setGeographicTaxonomies(optionsSelected);
     }
   }, []);
+
+  useEffect(() => {
+    setGeographicTaxonomies(optionsSelected);
+  }, [optionsSelected]);
 
   const handleRemoveClick = (index: number) => {
     const list = [...optionsSelected];
@@ -127,7 +137,7 @@ export default function TaxonomySection({ retrievedTaxonomies }: Props) {
     setIsLoading(false);
   };
 
-  const notValidEntry = input.length >= 3 && options.length === 0 && !optionsSelected;
+  // const notValidEntry = input.length >= 3 && options.length === 0 && !optionsSelected;
 
   return (
     <Paper elevation={0} sx={{ p: 4, borderRadius: 2, my: 4 }}>
@@ -153,23 +163,25 @@ export default function TaxonomySection({ retrievedTaxonomies }: Props) {
         <Box display="flex">
           <FormControlLabel
             checked={isNationalAreaVisible}
-            value="national"
+            value={formik.values.national}
             control={<Radio disableRipple={true} />}
             label={t('onboardingFormData.taxonomySection.nationalLabel')}
             onChange={() => {
               setIsNationalAreaVisible(true);
               setIsLocalAreaVisible(false);
+              setGeographicTaxonomies([{ code: '100', desc: 'ITALIA' }]);
             }}
             sx={{ mr: 3, ml: 1 }}
           />
           <FormControlLabel
             checked={isLocalAreaVisible}
-            value="local"
+            value={formik.values.local}
             control={<Radio disableRipple={true} />}
             label={t('onboardingFormData.taxonomySection.localLabel')}
             onChange={() => {
               setIsNationalAreaVisible(false);
               setIsLocalAreaVisible(true);
+              setGeographicTaxonomies(optionsSelected);
             }}
           />
         </Box>
@@ -210,19 +222,19 @@ export default function TaxonomySection({ retrievedTaxonomies }: Props) {
                         {...params}
                         variant="outlined"
                         label={
-                          !optionsSelected?.[i]?.desc
+                          !val?.desc
                             ? t('onboardingFormData.taxonomySection.localSection.inputLabel')
                             : ''
                         }
-                        error={notValidEntry}
+                        // error={notValidEntry}
                       />
                     )}
                   />
-                  {notValidEntry && (
+                  {/* {notValidEntry && (
                     <Typography sx={{ fontSize: 'fontSize', color: 'error.dark' }} pt={1} ml={2}>
                       {t('onboardingFormData.taxonomySection.error.notMatchedArea')}
                     </Typography>
-                  )}
+                  )} */}
                 </Box>
               </Box>
               {optionsSelected.length - 1 === i && (
