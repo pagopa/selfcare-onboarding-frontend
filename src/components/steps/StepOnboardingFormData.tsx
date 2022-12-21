@@ -20,7 +20,7 @@ import { MessageNoAction } from '../MessageNoAction';
 import { OnboardingFormData } from '../../model/OnboardingFormData';
 import PersonalAndBillingDataSection from '../onboardingFormData/PersonalAndBillingDataSection';
 import DpoSection from '../onboardingFormData/DpoSection';
-import TaxonomySection from '../onboardingFormData/taxonomy/TaxonomySection';
+import GeoTaxonomySection from '../onboardingFormData/taxonomy/GeoTaxonomySection';
 import { GeographicTaxonomy } from '../../model/GeographicTaxonomies';
 
 const mailPECRegexp = new RegExp('^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$');
@@ -67,6 +67,9 @@ export default function StepOnboardingFormData({
   productId,
 }: Props) {
   const requiredError = 'Required';
+
+  // TODO: to remove when will be real data retrieved
+  const geotaxonomyVisible = true;
 
   const isPSP = institutionType === 'PSP';
 
@@ -196,9 +199,10 @@ export default function StepOnboardingFormData({
             : undefined,
         recipientCode: !values.recipientCode ? requiredError : undefined,
         geographicTaxonomies:
-          !values.geographicTaxonomies ||
-          values.geographicTaxonomies.length === 0 ||
-          values.geographicTaxonomies.find(({ code }) => code === '')
+          geotaxonomyVisible &&
+          (!values.geographicTaxonomies ||
+            values.geographicTaxonomies.length === 0 ||
+            values.geographicTaxonomies.find(({ code }) => code === ''))
             ? requiredError
             : undefined,
       }).filter(([_key, value]) => value)
@@ -302,15 +306,16 @@ export default function StepOnboardingFormData({
           formik={formik}
         />
         {/* DATI RELATIVI ALLA TASSONOMIA */}
-        <Grid item xs={12}>
-          <TaxonomySection
-            retrievedTaxonomies={mockRetrievedGeographicTaxonomies}
-            setGeographicTaxonomies={(geographicTaxonomies) =>
-              formik.setFieldValue('geographicTaxonomies', geographicTaxonomies)
-            }
-          />
-        </Grid>
-
+        {geotaxonomyVisible && (
+          <Grid item xs={12}>
+            <GeoTaxonomySection
+              retrievedTaxonomies={mockRetrievedGeographicTaxonomies}
+              setGeographicTaxonomies={(geographicTaxonomies) =>
+                formik.setFieldValue('geographicTaxonomies', geographicTaxonomies)
+              }
+            />
+          </Grid>
+        )}
         {isPSP && <DpoSection baseTextFieldProps={baseTextFieldProps} />}
 
         <Grid item xs={12} my={4}>

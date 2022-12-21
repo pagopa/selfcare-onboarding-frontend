@@ -29,7 +29,10 @@ type Props = {
   setGeographicTaxonomies: React.Dispatch<React.SetStateAction<Array<GeographicTaxonomy>>>;
 };
 
-export default function TaxonomySection({ retrievedTaxonomies, setGeographicTaxonomies }: Props) {
+export default function GeoTaxonomySection({
+  retrievedTaxonomies,
+  setGeographicTaxonomies,
+}: Props) {
   const { t } = useTranslation();
   const [isNationalAreaVisible, setIsNationalAreaVisible] = useState<boolean>(false);
   const [isLocalAreaVisible, setIsLocalAreaVisible] = useState<boolean>(false);
