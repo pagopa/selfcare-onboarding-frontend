@@ -30,6 +30,7 @@ type Props = StepperStepComponentProps & {
   stepHistoryState: StepBillingDataHistoryState;
   setStepHistoryState: React.Dispatch<React.SetStateAction<StepBillingDataHistoryState>>;
   formik: any;
+  subProductId?: string;
 };
 
 export default function PersonalAndBillingDataSection({
@@ -39,11 +40,15 @@ export default function PersonalAndBillingDataSection({
   stepHistoryState,
   setStepHistoryState,
   formik,
+  subProductId,
 }: Props) {
-  const ipa = origin === 'IPA';
-  const isPSP = institutionType === 'PSP';
-  const isDisabled = ipa && !isPSP;
   const { t } = useTranslation();
+
+  const isFromIPA = origin === 'IPA';
+  const isPSP = institutionType === 'PSP';
+  const isPA = institutionType === 'PA';
+  const premiumFlow = !!subProductId;
+  const isDisabled = premiumFlow || (isFromIPA && isPA && !isPSP);
   const requiredError = 'Required';
 
   const baseNumericFieldProps = (
@@ -141,7 +146,9 @@ export default function PersonalAndBillingDataSection({
           <Grid item xs={12}>
             <Box display="flex" alignItems="center">
               <Checkbox
+                id="onboardingFormData"
                 checked={stepHistoryState.isTaxCodeEquals2PIVA}
+                disabled={premiumFlow}
                 inputProps={{
                   'aria-label': t(
                     'onboardingFormData.billingDataSection.taxCodeEquals2PIVAdescription'
@@ -174,7 +181,7 @@ export default function PersonalAndBillingDataSection({
                     ? formik.values.taxCode
                     : formik.values.vatNumber
                 }
-                disabled={stepHistoryState.isTaxCodeEquals2PIVA}
+                disabled={stepHistoryState.isTaxCodeEquals2PIVA || premiumFlow}
               />
               {isPSP && (
                 <Box display="flex" alignItems="center" mt="2px">
@@ -195,21 +202,6 @@ export default function PersonalAndBillingDataSection({
               )}
             </Typography>
           </Grid>
-          {institutionType === 'GSP' && (
-            <Grid item xs={12}>
-              <Typography>
-                <Checkbox
-                  id="billingdata"
-                  checked={formik.values.publicServices}
-                  value={formik.values.publicServices}
-                  onChange={(_, checked: boolean) =>
-                    formik.setFieldValue('publicServices', checked, true)
-                  }
-                />
-                {t('onboardingFormData.billingDataSection.gspDescription')}
-              </Typography>
-            </Grid>
-          )}
           {isPSP && (
             <>
               <Grid item xs={12}>

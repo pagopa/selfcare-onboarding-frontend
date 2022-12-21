@@ -1,11 +1,12 @@
 import { useState, useContext, useEffect } from 'react';
-import { Button, Stack, Typography } from '@mui/material';
 import { AxiosError } from 'axios';
 import SessionModal from '@pagopa/selfcare-common-frontend/components/SessionModal';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
 import { useTranslation, Trans } from 'react-i18next';
 import { uniqueId } from 'lodash';
 import { IllusCompleted } from '@pagopa/mui-italia';
+import { IllusError } from '@pagopa/mui-italia';
+import { EndingPage } from '@pagopa/selfcare-common-frontend';
 import { StepperStep, Problem, RequestOutcomeOptionsJwt, RequestOutcomeJwt } from '../../types';
 import { ConfirmRegistrationStep0 } from '../components/ConfirmRegistrationStep0';
 import { ConfirmRegistrationStep1 } from '../components/ConfirmRegistrationStep1';
@@ -17,10 +18,8 @@ import { ENV } from '../utils/env';
 import { MessageNoAction } from '../components/MessageNoAction';
 import { HeaderContext, UserContext } from '../lib/context';
 import { jwtNotValid } from '../services/tokenServices';
-import ErrorPage from '../components/errorPage/ErrorPage';
 import { getOnboardingMagicLinkJwt } from './RejectRegistration';
 import JwtInvalidPage from './JwtInvalidPage';
-import RejectContentSuccessPage from './RejectContentSuccessPage';
 
 type FileErrorAttempt = {
   fileName: string;
@@ -81,6 +80,7 @@ export default function CompleteRegistrationComponent() {
 
   const [outcome, setOutcome] = useState<RequestOutcomeJwt | null>(!token ? 'error' : null);
   const [errorCode, setErrorCode] = useState<keyof typeof errors>('GENERIC');
+  const [open, setOpen] = useState<boolean>(false);
 
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -185,7 +185,7 @@ export default function CompleteRegistrationComponent() {
   };
 
   const handleErrorModalClose = () => {
-    setOutcome(null);
+    setOpen(false);
   };
 
   const handleErrorModalExit = () => {
@@ -193,12 +193,12 @@ export default function CompleteRegistrationComponent() {
     setUploadedFilesHistory([]);
     setActiveStep(0);
     setUploadedFiles([]);
-    setOutcome(null);
+    setOpen(false);
   };
 
   const handleErrorModalConfirm = () => {
     console.log('EXIT');
-    setOutcome(null);
+    setOpen(false);
     setUploadedFiles([]);
   };
 
@@ -225,12 +225,11 @@ export default function CompleteRegistrationComponent() {
       title: '',
       description: [
         <>
-          <IllusCompleted size={60} />
-          <Typography mt={3} mb={1} variant="h4">
-            {t('completeRegistration.outcomeContent.success.title')}
-          </Typography>
-          <Stack key="0" spacing={3}>
-            <Typography variant="body1">
+          <EndingPage
+            minHeight="52vh"
+            icon={<IllusCompleted size={60} />}
+            title={t('completeRegistration.outcomeContent.success.title')}
+            description={
               <Trans i18nKey="completeRegistration.outcomeContent.success.description">
                 Comunicheremo l&apos;avvenuta adesione all&apos;indirizzo PEC
                 <br />
@@ -240,15 +239,12 @@ export default function CompleteRegistrationComponent() {
                 <br />
                 Riservata.`,
               </Trans>
-            </Typography>
-            <Button
-              variant="contained"
-              sx={{ alignSelf: 'center' }}
-              onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
-            >
-              {t('completeRegistration.outcomeContent.success.backActionLabel')}
-            </Button>
-          </Stack>
+            }
+            variantTitle="h4"
+            variantDescription="body1"
+            buttonLabel={t('completeRegistration.outcomeContent.success.backActionLabel')}
+            onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+          ></EndingPage>
         </>,
       ],
     },
@@ -256,7 +252,22 @@ export default function CompleteRegistrationComponent() {
       title: '',
       description: [
         <>
-          <RejectContentSuccessPage />
+          <EndingPage
+            minHeight="52vh"
+            icon={<IllusCompleted size={60} />}
+            variantTitle="h4"
+            variantDescription="body1"
+            title={t('rejectRegistration.outcomeContent.success.title')}
+            description={
+              <Trans i18nKey="rejectRegistration.outcomeContent.success.description">
+                Nella home dell’Area Riservata puoi vedere i prodotti
+                <br />
+                disponibili e richiedere l’adesione per il tuo ente.
+              </Trans>
+            }
+            buttonLabel={t('rejectRegistration.outcomeContent.success.backActionLabel')}
+            onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+          />
         </>,
       ],
     },
@@ -289,23 +300,28 @@ export default function CompleteRegistrationComponent() {
         <MessageNoAction {...outcomeContent[outcome]} />
       ) : outcome === 'error' ? (
         !token || showBlockingError ? (
-          <ErrorPage
-            titleContent={t('completeRegistration.title')}
-            descriptionContent={
+          <EndingPage
+            minHeight="52vh"
+            icon={<IllusError size={60} />}
+            variantTitle={'h4'}
+            variantDescription={'body1'}
+            title={t('completeRegistration.title')}
+            description={
               <Trans i18nKey="completeRegistration.description">
                 Non siamo riusciti a indirizzarti alla pagina di caricamento
                 <br />
                 per completare la procedura.
               </Trans>
             }
-            backButtonContent={t('completeRegistration.contactAssistanceButton')}
+            buttonLabel={t('completeRegistration.contactAssistanceButton')}
+            onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
           />
         ) : (
           <SessionModal
             handleClose={handleErrorModalClose}
             handleExit={handleErrorModalExit}
             onConfirm={handleErrorModalConfirm}
-            open={true}
+            open={open}
             title={t(`completeRegistration.errors.${errorCode}.title`)}
             message={
               errorCode === 'INVALID_SIGN_FORMAT' ? (
