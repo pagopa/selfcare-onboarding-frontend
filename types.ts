@@ -5,6 +5,7 @@ import { FunctionComponent, SVGProps } from 'react';
 import { UserRole } from '@pagopa/selfcare-common-frontend/utils/constants';
 import { API } from './src/utils/constants';
 import { OnboardingFormData } from './src/model/OnboardingFormData';
+import { GeographicTaxonomy } from './src/model/GeographicTaxonomies';
 
 /*
  * Fetch data and router related types
@@ -173,6 +174,7 @@ export type SelfcareParty = {
   zipCode: string;
   origin: string;
   userRole: UserRole;
+  geographicTaxonomies: Array<GeographicTaxonomy>;
 };
 
 export type Party = {
@@ -184,6 +186,7 @@ export type Party = {
   digitalAddress: string;
   taxCode: string;
   origin: string;
+  geographicTaxonomies: Array<GeographicTaxonomy>;
 };
 
 export type InstitutionData = {

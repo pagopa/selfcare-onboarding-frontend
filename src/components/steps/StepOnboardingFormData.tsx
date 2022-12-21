@@ -69,6 +69,15 @@ export default function StepOnboardingFormData({
 
   const isPSP = institutionType === 'PSP';
 
+  // CASE 1: New API retrieve some geographicsArea for the party
+  const mockRetrievedGeographicTaxonomies = [
+    { code: '2322435', desc: 'Comune di Cagliari' },
+    { code: '2322435', desc: 'Comune di Alghero' },
+  ];
+
+  // CASE 2: New API NOT found some geographicsArea for the party
+  // const mockRetrievedGeographicTaxonomies = [];
+
   const { t } = useTranslation();
 
   const [stepHistoryState, setStepHistoryState, _setStepHistoryStateHistory] =
@@ -104,6 +113,7 @@ export default function StepOnboardingFormData({
         ? formik.values.taxCode
         : formik.values.vatNumber,
     });
+    console.log('typed values:', formik.values);
   };
 
   const onBackAction = () => {
@@ -286,7 +296,7 @@ export default function StepOnboardingFormData({
         />
         {/* DATI RELATIVI ALLA TASSONOMIA */}
         <Grid item xs={12}>
-          <TaxonomySection />
+          <TaxonomySection retrievedTaxonomies={mockRetrievedGeographicTaxonomies} />
         </Grid>
 
         {isPSP && <DpoSection baseTextFieldProps={baseTextFieldProps} />}

@@ -126,7 +126,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
   const history = useHistory();
   const [openExitModal, setOpenExitModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>();
-  const [onboardingFormData, setBillingData] = useState<OnboardingFormData>();
+  const [onboardingFormData, setOnboardingFormData] = useState<OnboardingFormData>();
   const [institutionType, setInstitutionType] = useState<InstitutionType>();
   const [origin, setOrigin] = useState<string>();
   const [pricingPlan, setPricingPlan] = useState<string>();
@@ -217,7 +217,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
   const forwardWithDataAndInstitution = (newFormData: Partial<FormData>, party: Party) => {
     setExternalInstitutionId(party.externalId);
     setOrigin(party.origin);
-    setBillingData({
+    setOnboardingFormData({
       businessName: party.description,
       digitalAddress: party.digitalAddress,
       recipientCode: '',
@@ -225,7 +225,9 @@ function OnboardingComponent({ productId }: { productId: string }) {
       taxCode: party.taxCode,
       vatNumber: '',
       zipCode: party.zipCode,
-      geographicTaxonomies: [],
+      geographicTaxonomies: onboardingFormData?.geographicTaxonomies ?? [
+        { code: '100', desc: 'Italia' },
+      ],
     });
     forwardWithData(newFormData);
     trackEvent('ONBOARDING_PARTY_SELECTION', {
@@ -237,23 +239,24 @@ function OnboardingComponent({ productId }: { productId: string }) {
     setInstitutionType(institutionType);
   };
 
-  const forwardWithBillingData = (newBillingData: OnboardingFormData) => {
+  const forwardWithBillingData = (newOnboardingFormData: OnboardingFormData) => {
     trackEvent('ONBOARDING_BILLING_DATA', {
       request_id: requestIdRef.current,
       party_id: externalInstitutionId,
       product_id: productId,
+      geographic_taxonomies: newOnboardingFormData.geographicTaxonomies,
     });
 
-    setBillingData(newBillingData);
+    setOnboardingFormData(newOnboardingFormData);
     if (institutionType === 'PSP') {
       // TODO: fix when party registry proxy will return externalInstitutionId
-      setExternalInstitutionId(newBillingData.taxCode);
+      setExternalInstitutionId(newOnboardingFormData.taxCode);
 
       const partyVerifyOnboarded = async () => {
         const onboardingStatus = await fetchWithLogs(
           {
             endpoint: 'VERIFY_ONBOARDING',
-            endpointParams: { externalInstitutionId: newBillingData.taxCode, productId },
+            endpointParams: { externalInstitutionId: newOnboardingFormData.taxCode, productId },
           },
           { method: 'HEAD' },
           () => setRequiredLogin(true)
@@ -452,12 +455,12 @@ function OnboardingComponent({ productId }: { productId: string }) {
 
   const forwardWithOnboardingData = (
     _manager: OnboardingFormData,
-    billingData?: OnboardingFormData,
+    onboardingFormData?: OnboardingFormData,
     institutionType?: InstitutionType,
     _id?: string
   ) => {
-    if (billingData) {
-      setBillingData(billingData);
+    if (onboardingFormData) {
+      setOnboardingFormData(onboardingFormData);
     }
     setInstitutionType(institutionType);
     forward();
@@ -476,7 +479,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
     forward();
     if (newInstitutionType === 'PSP') {
       if (newInstitutionType !== institutionType) {
-        setBillingData({
+        setOnboardingFormData({
           businessName: '',
           registeredOffice: '',
           zipCode: '',
@@ -487,7 +490,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
           geographicTaxonomies: [],
         });
       } else {
-        setBillingData(onboardingFormData);
+        setOnboardingFormData(onboardingFormData);
       }
       setActiveStep(4);
     }

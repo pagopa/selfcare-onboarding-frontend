@@ -24,7 +24,11 @@ import { ENV } from '../../../utils/env';
 import { OnboardingInstitutionInfo } from '../../../model/OnboardingInstitutionInfo';
 import { GeographicTaxonomy } from '../../../model/GeographicTaxonomies';
 
-export default function TaxonomySection() {
+type Props = {
+  retrievedTaxonomies: Array<GeographicTaxonomy>;
+};
+
+export default function TaxonomySection({ retrievedTaxonomies }: Props) {
   const { t } = useTranslation();
   const [isNationalAreaVisible, setIsNationalAreaVisible] = useState<boolean>(false);
   const [isLocalAreaVisible, setIsLocalAreaVisible] = useState<boolean>(false);
@@ -37,19 +41,13 @@ export default function TaxonomySection() {
   const [isAddNewAutocompleteEnabled, setIsAddNewAutocompleteEnabled] = useState<boolean>(false);
   const [input, setInput] = useState<string>('');
 
-  const mockedPreviusValue: Array<GeographicTaxonomy> = [];
-
   useEffect(() => {
-    if (
-      mockedPreviusValue &&
-      mockedPreviusValue.length > 0 &&
-      mockedPreviusValue[0].code === '100'
-    ) {
+    if (retrievedTaxonomies && retrievedTaxonomies.length === 0) {
       setIsNationalAreaVisible(true);
       setOptionsSelected([{ code: '', desc: '' }]);
-    } else if (mockedPreviusValue && mockedPreviusValue.length > 0) {
+    } else if (retrievedTaxonomies && retrievedTaxonomies.length > 0) {
       setIsLocalAreaVisible(true);
-      setOptionsSelected(mockedPreviusValue);
+      setOptionsSelected(retrievedTaxonomies);
       setIsAddNewAutocompleteEnabled(true);
     } else {
       setIsLocalAreaVisible(false);
@@ -59,7 +57,7 @@ export default function TaxonomySection() {
 
   useEffect(() => {
     if (optionsSelected) {
-      setIsAddNewAutocompleteEnabled(false);
+      setIsAddNewAutocompleteEnabled(optionsSelected.length === retrievedTaxonomies.length);
       const selectableOccurrences = options.filter((o) => !optionsSelected.includes(o));
       setOptions(selectableOccurrences);
     }
@@ -70,6 +68,7 @@ export default function TaxonomySection() {
     // eslint-disable-next-line functional/immutable-data
     list.splice(index, 1);
     setOptionsSelected(list);
+    setIsAddNewAutocompleteEnabled(true);
   };
 
   const handleAddClick = () => {
