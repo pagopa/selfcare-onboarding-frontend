@@ -156,6 +156,7 @@ export default function GeoTaxonomySection({
       <RadioGroup name="geographicTaxonomy">
         <Box display="flex">
           <FormControlLabel
+            id={'geographicTaxonomies'}
             checked={isNationalAreaVisible}
             value={'nationl'}
             control={<Radio disableRipple={true} />}

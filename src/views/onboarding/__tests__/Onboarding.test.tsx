@@ -5,6 +5,7 @@ import { HeaderContext, UserContext } from '../../../lib/context';
 import { ENV } from '../../../utils/env';
 import Onboarding from '../Onboarding';
 import '../../../locale';
+import { GeographicTaxonomy } from '../../../model/GeographicTaxonomies';
 
 jest.mock('../../../lib/api-utils');
 
@@ -278,7 +279,8 @@ const executeStepBillingData = async () => {
     'zipCode',
     'taxCode',
     'vatNumber',
-    'recipientCode'
+    'recipientCode',
+    'geographicTaxonomies'
   );
 
   await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
@@ -369,7 +371,8 @@ const fillUserBillingDataForm = async (
   zipCode: string,
   taxCodeInput: string,
   vatNumber: string,
-  recipientCode: string
+  recipientCode: string,
+  geographicTaxonomies: GeographicTaxonomy
 ) => {
   fireEvent.change(document.getElementById(businessNameInput), {
     target: { value: 'businessNameInput' },
@@ -392,6 +395,7 @@ const fillUserBillingDataForm = async (
   fireEvent.change(document.getElementById(recipientCode), {
     target: { value: 'recipientCode' },
   });
+  fireEvent.click(document.getElementById(geographicTaxonomies));
 };
 
 const fillUserForm = async (
@@ -704,7 +708,7 @@ const verifySubmit = async () => {
             },
           ],
           pricingPlan: 'FA',
-          geographicTaxonomies: [],
+          geographicTaxonomies: [{ code: '100', desc: 'ITALIA' }],
         },
         method: 'POST',
       },
