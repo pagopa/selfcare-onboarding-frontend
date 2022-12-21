@@ -40,18 +40,14 @@ export default function TaxonomySection({
   const [isLocalAreaVisible, setIsLocalAreaVisible] = useState<boolean>(false);
   const [_isLoading, setIsLoading] = useState(false);
   const { setRequiredLogin } = useContext(UserContext);
-  const [optionsSelected, setOptionsSelected] = useState<Array<GeographicTaxonomy>>([
-    { code: '', desc: '' },
-  ]);
+  const [optionsSelected, setOptionsSelected] = useState<Array<GeographicTaxonomy>>([]);
   const [options, setOptions] = useState<Array<OnboardingInstitutionInfo>>([]);
   const [isAddNewAutocompleteEnabled, setIsAddNewAutocompleteEnabled] = useState<boolean>(false);
   const [input, setInput] = useState<string>('');
 
   const emptyField = !optionsSelected.find((o) => o?.desc === '');
 
-  console.log('optionsSelected', optionsSelected);
   useEffect(() => {
-    console.log('retrieve', retrievedTaxonomies);
     if (retrievedTaxonomies && retrievedTaxonomies[0]?.code === '100') {
       setIsNationalAreaVisible(true);
       setGeographicTaxonomies([{ code: '100', desc: 'ITALIA' }]);
@@ -182,6 +178,7 @@ export default function TaxonomySection({
               setIsNationalAreaVisible(false);
               setIsLocalAreaVisible(true);
               setGeographicTaxonomies(optionsSelected);
+              setOptionsSelected([{ code: '', desc: '' }]);
             }}
           />
         </Box>

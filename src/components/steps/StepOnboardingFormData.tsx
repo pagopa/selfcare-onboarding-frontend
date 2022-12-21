@@ -5,7 +5,7 @@ import { Box } from '@mui/system';
 import { Grid, Typography, TextField } from '@mui/material';
 import { useFormik } from 'formik';
 import { useTranslation } from 'react-i18next';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { styled } from '@mui/system';
 import {
   InstitutionType,
@@ -21,7 +21,7 @@ import { OnboardingFormData } from '../../model/OnboardingFormData';
 import PersonalAndBillingDataSection from '../onboardingFormData/PersonalAndBillingDataSection';
 import DpoSection from '../onboardingFormData/DpoSection';
 import TaxonomySection from '../onboardingFormData/taxonomy/TaxonomySection';
-import { GeographicTaxonomy } from '../../model/GeographicTaxonomies';
+// import { GeographicTaxonomy } from '../../model/GeographicTaxonomies';
 
 const mailPECRegexp = new RegExp('^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$');
 const fiscalAndVatCodeRegexp = new RegExp(
@@ -35,7 +35,6 @@ const numericField = new RegExp('^[0-9]');
 export type StepBillingDataHistoryState = {
   externalInstitutionId: string;
   isTaxCodeEquals2PIVA: boolean;
-  geographicTaxonomies: Array<GeographicTaxonomy>;
 };
 
 export const CustomTextField = styled(TextField)({
@@ -68,19 +67,17 @@ export default function StepOnboardingFormData({
   productId,
 }: Props) {
   const requiredError = 'Required';
-  const [geographicTaxonomies, setGeographicTaxonomies] = useState<Array<GeographicTaxonomy>>([]);
 
-  console.log('geographicTaxonomies in step', geographicTaxonomies);
   const isPSP = institutionType === 'PSP';
 
   // CASE 1: New API retrieve some geographicsArea for the party
-  // const mockRetrievedGeographicTaxonomies = [
-  //   { code: '2322435', desc: 'Comune di Cagliari' },
-  //   { code: '2322435', desc: 'Comune di Alghero' },
-  // ];
+  const mockRetrievedGeographicTaxonomies = [
+    { code: '2322435', desc: 'Comune di Cagliari' },
+    { code: '2322435', desc: 'Comune di Alghero' },
+  ];
 
   // CASE 2: New API NOT found some geographicsArea for the party
-  const mockRetrievedGeographicTaxonomies: Array<GeographicTaxonomy> = [];
+  // const mockRetrievedGeographicTaxonomies: Array<GeographicTaxonomy> = [];
 
   // CASE 3: New API found National area selected
   // const mockRetrievedGeographicTaxonomies = [{ code: '100', desc: 'ITALIA' }];
@@ -92,7 +89,6 @@ export default function StepOnboardingFormData({
       externalInstitutionId,
       isTaxCodeEquals2PIVA:
         !!initialFormData.vatNumber && initialFormData.taxCode === initialFormData.vatNumber,
-      geographicTaxonomies,
     });
 
   useEffect(() => {
@@ -101,7 +97,6 @@ export default function StepOnboardingFormData({
         externalInstitutionId,
         isTaxCodeEquals2PIVA:
           !!initialFormData.vatNumber && initialFormData.taxCode === initialFormData.vatNumber,
-        geographicTaxonomies,
       });
     }
   }, []);
@@ -121,9 +116,7 @@ export default function StepOnboardingFormData({
       vatNumber: stepHistoryState.isTaxCodeEquals2PIVA
         ? formik.values.taxCode
         : formik.values.vatNumber,
-      geographicTaxonomies,
     });
-    console.log('typed values:', formik.values);
   };
 
   const onBackAction = () => {
@@ -131,7 +124,6 @@ export default function StepOnboardingFormData({
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     back!();
   };
-
   // eslint-disable-next-line sonarjs/cognitive-complexity
   const validate = (values: Partial<OnboardingFormData>) =>
     Object.fromEntries(
@@ -203,8 +195,14 @@ export default function StepOnboardingFormData({
             ? t('onboardingFormData.billingDataSection.invalidEmail')
             : undefined,
         recipientCode: !values.recipientCode ? requiredError : undefined,
-        national: !values.geographicTaxonomies ? requiredError : undefined,
-        local: !values.geographicTaxonomies ? requiredError : undefined,
+        national:
+          !values.geographicTaxonomies || values.geographicTaxonomies.length === 0
+            ? requiredError
+            : undefined,
+        local:
+          !values.geographicTaxonomies || values.geographicTaxonomies.length === 0
+            ? requiredError
+            : undefined,
       }).filter(([_key, value]) => value)
     );
 
@@ -309,7 +307,9 @@ export default function StepOnboardingFormData({
         <Grid item xs={12}>
           <TaxonomySection
             retrievedTaxonomies={mockRetrievedGeographicTaxonomies}
-            setGeographicTaxonomies={setGeographicTaxonomies}
+            setGeographicTaxonomies={(geographicTaxonomies) =>
+              formik.setFieldValue('geographicTaxonomies', geographicTaxonomies)
+            }
             formik={formik}
           />
         </Grid>
