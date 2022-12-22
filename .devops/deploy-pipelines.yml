@@ -40,6 +40,8 @@ variables:
     react_app_url_api_party_process: '$(UAT_REACT_APP_URL_API_PARTY_PROCESS)'
     react_app_url_api_party_registry_proxy: '$(UAT_REACT_APP_URL_API_PARTY_REGISTRY_PROXY)'
 
+    react_app_url_api_geotaxonomy: '$(UAT_REACT_APP_URL_GEOTAXONOMY)'
+
     react_app_enable_assistance: 'true'
     react_app_url_storage: '$(UAT_REACT_APP_URL_STORAGE)'
 
@@ -67,6 +69,8 @@ variables:
     react_app_url_api_onboarding: '$(PROD_REACT_APP_URL_API_ONBOARDING)'
     react_app_url_api_party_process: '$(PROD_REACT_APP_URL_API_PARTY_PROCESS)'
     react_app_url_api_party_registry_proxy: '$(PROD_REACT_APP_URL_API_PARTY_REGISTRY_PROXY)'
+
+    react_app_url_api_geotaxonomy: '$(PROD_REACT_APP_URL_GEOTAXONOMY)'
 
     react_app_enable_assistance: 'true'
     react_app_url_storage: '$(PROD_REACT_APP_URL_STORAGE)'
@@ -97,6 +101,8 @@ variables:
     react_app_url_api_onboarding: '$(DEV_REACT_APP_URL_API_ONBOARDING)'
     react_app_url_api_party_process: '$(DEV_REACT_APP_URL_API_PARTY_PROCESS)'
     react_app_url_api_party_registry_proxy: '$(DEV_REACT_APP_URL_API_PARTY_REGISTRY_PROXY)'
+
+    react_app_url_api_geotaxonomy: '$(DEV_REACT_APP_URL_GEOTAXONOMY)'
 
     react_app_enable_assistance: 'true'
     react_app_url_storage: '$(DEV_REACT_APP_URL_STORAGE)'
@@ -192,6 +198,7 @@ stages:
               REACT_APP_URL_API_ONBOARDING: '$(react_app_url_api_onboarding)'
               REACT_APP_URL_API_PARTY_PROCESS: '$(react_app_url_api_party_process)'
               REACT_APP_URL_API_PARTY_REGISTRY_PROXY: '$(react_app_url_api_party_registry_proxy)'
+              REACT_APP_URL_GEOTAXONOMY: '$(react_app_url_api_geotaxonomy)'
 
               REACT_APP_ENABLE_ASSISTANCE: '$(react_app_enable_assistance)'
               REACT_APP_PAGOPA_HELP_EMAIL: '$(react_app_pagopa_help_email)'
