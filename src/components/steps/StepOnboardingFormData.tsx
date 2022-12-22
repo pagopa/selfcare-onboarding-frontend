@@ -71,8 +71,8 @@ export default function StepOnboardingFormData({
 }: Props) {
   const requiredError = 'Required';
 
-  // TODO: to remove when will be real data retrieved
-  const geotaxonomyVisible = false;
+  // TODO: remove when will be real data retrieved - it show/hide geotaxonomy section
+  const geotaxonomyVisible = true;
 
   const isPSP = institutionType === 'PSP';
 
