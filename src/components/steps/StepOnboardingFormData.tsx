@@ -5,7 +5,7 @@ import { Box } from '@mui/system';
 import { Grid, Typography, TextField } from '@mui/material';
 import { useFormik } from 'formik';
 import { useTranslation } from 'react-i18next';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { styled } from '@mui/system';
 import {
   InstitutionType,
@@ -21,7 +21,8 @@ import { OnboardingFormData } from '../../model/OnboardingFormData';
 import PersonalAndBillingDataSection from '../onboardingFormData/PersonalAndBillingDataSection';
 import DpoSection from '../onboardingFormData/DpoSection';
 import GeoTaxonomySection from '../onboardingFormData/taxonomy/GeoTaxonomySection';
-import { GeographicTaxonomy } from '../../model/GeographicTaxonomies';
+import GeoTaxSessionModal from '../onboardingFormData/taxonomy/GeoTaxSessionModal';
+// import { GeographicTaxonomy } from '../../model/GeographicTaxonomies';
 
 const mailPECRegexp = new RegExp('^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$');
 const fiscalAndVatCodeRegexp = new RegExp(
@@ -71,21 +72,24 @@ export default function StepOnboardingFormData({
   const requiredError = 'Required';
 
   // TODO: to remove when will be real data retrieved
-  const geotaxonomyVisible = true;
+  const geotaxonomyVisible = false;
 
   const isPSP = institutionType === 'PSP';
 
   // CASE 1: New API retrieve some geographicsArea for the party
-  // const mockRetrievedGeographicTaxonomies = [
-  //   { code: '2322435', desc: 'Comune di Cagliari' },
-  //   { code: '2322435', desc: 'Comune di Alghero' },
-  // ];
+  const mockRetrievedGeographicTaxonomies = [
+    { code: '145236', desc: 'Cagliari - Comune' },
+    { code: '015146', desc: 'Milano - Comune' },
+  ];
 
   // CASE 2: New API NOT found some geographicsArea for the party
-  const mockRetrievedGeographicTaxonomies: Array<GeographicTaxonomy> = [];
+  // const mockRetrievedGeographicTaxonomies: Array<GeographicTaxonomy> = [];
 
   // CASE 3: New API found National area selected
   // const mockRetrievedGeographicTaxonomies = [{ code: '100', desc: 'ITALIA' }];
+
+  const [openModifyModal, setOpenModifyModal] = useState<boolean>(false);
+  const [openAddModal, setOpenAddModal] = useState<boolean>(false);
 
   const { t } = useTranslation();
 
@@ -122,6 +126,50 @@ export default function StepOnboardingFormData({
         ? formik.values.taxCode
         : formik.values.vatNumber,
     });
+  };
+
+  const onBeforeForwardAction = () => {
+    if (geotaxonomyVisible && mockRetrievedGeographicTaxonomies.length > 0) {
+      const deltaLength =
+        mockRetrievedGeographicTaxonomies.length - formik.values.geographicTaxonomies.length;
+      // eslint-disable-next-line functional/no-let
+      let array1 = mockRetrievedGeographicTaxonomies;
+      // eslint-disable-next-line functional/no-let
+      let array2 = formik.values.geographicTaxonomies;
+      if (deltaLength < 0) {
+        array2 = mockRetrievedGeographicTaxonomies;
+        array1 = formik.values.geographicTaxonomies;
+      }
+      const arrayDifferences = array1.filter(
+        (element) => !array2.some((elementSelected) => element.code === elementSelected.code)
+      );
+      if (deltaLength === 0) {
+        if (arrayDifferences.length > 0) {
+          // modify element
+          setOpenModifyModal(true);
+        } else {
+          onForwardAction();
+        }
+      } else if (arrayDifferences.length === Math.abs(deltaLength)) {
+        if (deltaLength > 0) {
+          // remove element
+          setOpenModifyModal(true);
+        } else {
+          // add element
+          setOpenAddModal(true);
+        }
+      }
+    } else {
+      onForwardAction();
+    }
+  };
+
+  const handleClose = () => {
+    if (openModifyModal) {
+      setOpenModifyModal(false);
+    } else {
+      setOpenAddModal(false);
+    }
   };
 
   const onBackAction = () => {
@@ -204,7 +252,9 @@ export default function StepOnboardingFormData({
           geotaxonomyVisible &&
           (!values.geographicTaxonomies ||
             values.geographicTaxonomies.length === 0 ||
-            values.geographicTaxonomies.find(({ code }) => code === ''))
+            values.geographicTaxonomies.some(
+              (geoValue) => geoValue?.code === '' || geoValue === null
+            ))
             ? requiredError
             : undefined,
       }).filter(([_key, value]) => value)
@@ -303,7 +353,7 @@ export default function StepOnboardingFormData({
           subProductId={subProductId}
         />
         {/* DATI RELATIVI ALLA TASSONOMIA */}
-        {geotaxonomyVisible && (
+        {geotaxonomyVisible ? (
           <Grid item xs={12}>
             <GeoTaxonomySection
               retrievedTaxonomies={mockRetrievedGeographicTaxonomies}
@@ -312,10 +362,12 @@ export default function StepOnboardingFormData({
               }
             />
           </Grid>
+        ) : (
+          <div style={{ margin: '16px' }}></div>
         )}
         {isPSP && <DpoSection baseTextFieldProps={baseTextFieldProps} />}
 
-        <Grid item xs={12} my={4}>
+        <Grid item xs={12} my={2}>
           <OnboardingStepActions
             back={{
               action: onBackAction,
@@ -323,13 +375,20 @@ export default function StepOnboardingFormData({
               disabled: false,
             }}
             forward={{
-              action: onForwardAction,
+              action: onBeforeForwardAction,
               label: t('onboardingFormData.confirmLabel'),
               disabled: !formik.isValid,
             }}
           />
         </Grid>
       </Grid>
+
+      <GeoTaxSessionModal
+        openModifyModal={openModifyModal}
+        openAddModal={openAddModal}
+        onForwardAction={onForwardAction}
+        handleClose={handleClose}
+      />
     </Box>
   );
 }

@@ -350,6 +350,21 @@ export default {
       error: {
         notMatchedArea: 'Scegli una località presente nell’elenco',
       },
+      modal: {
+        addModal: {
+          title: 'Stai aggiungendo altre aree per il tuo ente',
+          description: `Le aree geografiche verrano aggiunte a tutti i prodotti PagoPA a cui l’ente ha già aderito. Vuoi continuare?`,
+          confirmButton: 'Continua',
+          backButton:'Indietro'
+          
+        },
+        modifyModal: {
+          title: 'Stai modificando l’area geografica del tuo ente',
+          description: 'La modifica verrà applicata a tutti i prodotti PagoPA a cui l’ente ha già aderito. Vuoi continuare?',
+          confirmButton: 'Continua',
+          backButton:'Indietro'
+        }
+      }
     },
     dpoDataSection: {
       dpoTitle: 'CONTATTI DEL RESPONSABILE DELLA PROTEZIONE DEI DATI',
