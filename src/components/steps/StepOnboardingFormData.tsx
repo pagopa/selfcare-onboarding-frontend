@@ -73,7 +73,7 @@ export default function StepOnboardingFormData({
 
   // TODO: remove when will be real data retrieved - it show/hide geotaxonomy section
   const geotaxonomyVisible = true;
-
+  const premiumFlow = !!subProductId;
   const isPSP = institutionType === 'PSP';
 
   // CASE 1: New API retrieve some geographicsArea for the party
@@ -130,33 +130,46 @@ export default function StepOnboardingFormData({
 
   const onBeforeForwardAction = () => {
     if (geotaxonomyVisible && mockRetrievedGeographicTaxonomies.length > 0) {
-      const deltaLength =
-        mockRetrievedGeographicTaxonomies.length - formik.values.geographicTaxonomies.length;
-      // eslint-disable-next-line functional/no-let
-      let array1 = mockRetrievedGeographicTaxonomies;
-      // eslint-disable-next-line functional/no-let
-      let array2 = formik.values.geographicTaxonomies;
-      if (deltaLength < 0) {
-        array2 = mockRetrievedGeographicTaxonomies;
-        array1 = formik.values.geographicTaxonomies;
-      }
-      const arrayDifferences = array1.filter(
-        (element) => !array2.some((elementSelected) => element.code === elementSelected.code)
-      );
-      if (deltaLength === 0) {
-        if (arrayDifferences.length > 0) {
-          // modify element
-          setOpenModifyModal(true);
+      const changedNational2Local =
+        mockRetrievedGeographicTaxonomies.some((rv) => rv.code === '100') &&
+        !formik.values.geographicTaxonomies.some((gv) => gv.code === '100');
+      const changedToLocal2National =
+        !mockRetrievedGeographicTaxonomies.some((rv) => rv.code === '100') &&
+        formik.values.geographicTaxonomies.some((gv) => gv.code === '100');
+
+      if (changedNational2Local || changedToLocal2National) {
+        setOpenModifyModal(true);
+      } else {
+        const deltaLength =
+          mockRetrievedGeographicTaxonomies.length - formik.values.geographicTaxonomies.length;
+        // eslint-disable-next-line functional/no-let
+        let array1 = mockRetrievedGeographicTaxonomies;
+        // eslint-disable-next-line functional/no-let
+        let array2 = formik.values.geographicTaxonomies;
+        if (deltaLength < 0) {
+          array2 = mockRetrievedGeographicTaxonomies;
+          array1 = formik.values.geographicTaxonomies;
+        }
+        const arrayDifferences = array1.filter(
+          (element) => !array2.some((elementSelected) => element.code === elementSelected.code)
+        );
+        if (deltaLength === 0) {
+          if (arrayDifferences.length > 0) {
+            // modify element
+            setOpenModifyModal(true);
+          } else {
+            onForwardAction();
+          }
+        } else if (arrayDifferences.length === Math.abs(deltaLength)) {
+          if (deltaLength > 0) {
+            // remove element
+            setOpenModifyModal(true);
+          } else {
+            // add element
+            setOpenAddModal(true);
+          }
         } else {
           onForwardAction();
-        }
-      } else if (arrayDifferences.length === Math.abs(deltaLength)) {
-        if (deltaLength > 0) {
-          // remove element
-          setOpenModifyModal(true);
-        } else {
-          // add element
-          setOpenAddModal(true);
         }
       }
     } else {
@@ -350,7 +363,7 @@ export default function StepOnboardingFormData({
           stepHistoryState={stepHistoryState}
           setStepHistoryState={setStepHistoryState}
           formik={formik}
-          subProductId={subProductId}
+          premiumFlow={premiumFlow}
         />
         {/* DATI RELATIVI ALLA TASSONOMIA */}
         {geotaxonomyVisible ? (
@@ -360,6 +373,7 @@ export default function StepOnboardingFormData({
               setGeographicTaxonomies={(geographicTaxonomies) =>
                 formik.setFieldValue('geographicTaxonomies', geographicTaxonomies)
               }
+              premiumFlow={premiumFlow}
             />
           </Grid>
         ) : (

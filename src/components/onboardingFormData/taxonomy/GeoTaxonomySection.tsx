@@ -27,11 +27,13 @@ import { GeographicTaxonomy } from '../../../model/GeographicTaxonomies';
 type Props = {
   retrievedTaxonomies: Array<GeographicTaxonomy>;
   setGeographicTaxonomies: React.Dispatch<React.SetStateAction<Array<GeographicTaxonomy>>>;
+  premiumFlow: boolean;
 };
 
 export default function GeoTaxonomySection({
   retrievedTaxonomies,
   setGeographicTaxonomies,
+  premiumFlow,
 }: Props) {
   const { t } = useTranslation();
   const [isNationalAreaVisible, setIsNationalAreaVisible] = useState<boolean>(false);
@@ -65,7 +67,8 @@ export default function GeoTaxonomySection({
   useEffect(() => {
     if (retrievedTaxonomies && retrievedTaxonomies[0]?.code === '100') {
       setIsNationalAreaVisible(true);
-      setGeographicTaxonomies([{ code: '100', desc: 'ITALIA' }]);
+      setOptionsSelected([{ code: '100', desc: 'ITALIA' }]);
+      setGeographicTaxonomies(optionsSelected);
     } else if (retrievedTaxonomies && retrievedTaxonomies.length > 0) {
       setIsLocalAreaVisible(true);
       setOptionsSelected(retrievedTaxonomies);
@@ -185,7 +188,7 @@ export default function GeoTaxonomySection({
       <RadioGroup name="geographicTaxonomy">
         <Box display="flex">
           <FormControlLabel
-            id={'geographicTaxonomies'}
+            disabled={premiumFlow}
             checked={isNationalAreaVisible}
             value={'nationl'}
             control={<Radio disableRipple={true} />}
@@ -198,6 +201,8 @@ export default function GeoTaxonomySection({
             sx={{ mr: 3, ml: 1 }}
           />
           <FormControlLabel
+            id={'geographicTaxonomies'}
+            disabled={premiumFlow}
             checked={isLocalAreaVisible}
             value={'local'}
             control={<Radio disableRipple={true} />}
@@ -206,7 +211,11 @@ export default function GeoTaxonomySection({
               setIsNationalAreaVisible(false);
               setIsLocalAreaVisible(true);
               setGeographicTaxonomies(optionsSelected);
-              setOptionsSelected([{ code: '', desc: '' }]);
+              if (retrievedTaxonomies && retrievedTaxonomies[0].code !== '100') {
+                setOptionsSelected(retrievedTaxonomies);
+              } else {
+                setOptionsSelected([{ code: '', desc: '' }]);
+              }
             }}
           />
         </Box>
@@ -219,6 +228,7 @@ export default function GeoTaxonomySection({
                 {i !== 0 && (
                   <Box display="flex" alignItems={'center'}>
                     <ButtonNaked
+                      disabled={premiumFlow}
                       component="button"
                       onClick={() => handleRemoveClick(i)}
                       startIcon={<RemoveCircleOutlineOutlined />}
@@ -230,6 +240,7 @@ export default function GeoTaxonomySection({
                 )}
                 <Box width="100%">
                   <Autocomplete
+                    disabled={premiumFlow}
                     freeSolo
                     onOpen={() => setOptions([])}
                     disablePortal
@@ -263,7 +274,7 @@ export default function GeoTaxonomySection({
               {optionsSelected.length - 1 === i && (
                 <Box mt={2}>
                   <ButtonNaked
-                    disabled={!isAddNewAutocompleteEnabled}
+                    disabled={!isAddNewAutocompleteEnabled || premiumFlow}
                     component="button"
                     onClick={handleAddClick}
                     startIcon={<AddOutlined />}

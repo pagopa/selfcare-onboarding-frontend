@@ -294,7 +294,6 @@ const executeStepBillingData = async () => {
     'AAAAAA44D55F456K',
     'recipientCode'
   );
-
   fireEvent.click(confirmButtonEnabled);
   await waitFor(() => screen.getByText(step2Title));
 };
@@ -708,7 +707,10 @@ const verifySubmit = async () => {
             },
           ],
           pricingPlan: 'FA',
-          geographicTaxonomies: [{ code: '100', desc: 'ITALIA' }],
+          geographicTaxonomies: [
+            { code: '145236', desc: 'Cagliari - Comune' },
+            { code: '015146', desc: 'Milano - Comune' },
+          ],
         },
         method: 'POST',
       },
