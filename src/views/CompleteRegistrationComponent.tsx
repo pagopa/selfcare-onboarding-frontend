@@ -173,11 +173,13 @@ export default function CompleteRegistrationComponent() {
         (uploadDocument as AxiosError<Problem>).response?.status === 409 &&
         (uploadDocument as AxiosError<Problem>).response?.data
       ) {
+        setOpen(true);
         trackEvent('ONBOARDING_CONTRACT_FAILURE', { request_id: requestId, party_id: token });
         setErrorCode(
           transcodeErrorCode((uploadDocument as AxiosError<Problem>).response?.data as Problem)
         );
       } else {
+        setOpen(true);
         trackEvent('ONBOARDING_FAILURE', { request_id: requestId, party_id: token });
         setErrorCode('GENERIC');
       }
@@ -317,28 +319,31 @@ export default function CompleteRegistrationComponent() {
             onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
           />
         ) : (
-          <SessionModal
-            handleClose={handleErrorModalClose}
-            handleExit={handleErrorModalExit}
-            onConfirm={handleErrorModalConfirm}
-            open={open}
-            title={t(`completeRegistration.errors.${errorCode}.title`)}
-            message={
-              errorCode === 'INVALID_SIGN_FORMAT' ? (
-                <Trans i18nKey={`completeRegistration.errors.INVALID_SIGN_FORMAT.message`}>
-                  {'Il caricamento del documento non è andato a buon fine.'}
-                  <br />
-                  {'Carica un solo file in formato '}
-                  <strong>{'p7m'}</strong>
-                  {'.'}
-                </Trans>
-              ) : (
-                t(`completeRegistration.errors.${errorCode}.message`)
-              )
-            }
-            onConfirmLabel={t('completeRegistration.sessionModal.onConfirmLabel')}
-            onCloseLabel={t('completeRegistration.sessionModal.onCloseLabel')}
-          />
+          <>
+            <SessionModal
+              handleClose={handleErrorModalClose}
+              handleExit={handleErrorModalExit}
+              onConfirm={handleErrorModalConfirm}
+              open={open}
+              title={t(`completeRegistration.errors.${errorCode}.title`)}
+              message={
+                errorCode === 'INVALID_SIGN_FORMAT' ? (
+                  <Trans i18nKey={`completeRegistration.errors.INVALID_SIGN_FORMAT.message`}>
+                    {'Il caricamento del documento non è andato a buon fine.'}
+                    <br />
+                    {'Carica un solo file in formato '}
+                    <strong>{'p7m'}</strong>
+                    {'.'}
+                  </Trans>
+                ) : (
+                  t(`completeRegistration.errors.${errorCode}.message`)
+                )
+              }
+              onConfirmLabel={t('completeRegistration.sessionModal.onConfirmLabel')}
+              onCloseLabel={t('completeRegistration.sessionModal.onCloseLabel')}
+            />
+            <Step />
+          </>
         )
       ) : (
         outcome === 'jwtsuccess' && <Step />
