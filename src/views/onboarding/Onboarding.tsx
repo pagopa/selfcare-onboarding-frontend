@@ -201,7 +201,6 @@ function OnboardingComponent({ productId }: { productId: string }) {
   };
 
   const forwardWithBillingData = (newOnboardingFormData: OnboardingFormData) => {
-    console.log('newOnboardingFormData', newOnboardingFormData);
     trackEvent('ONBOARDING_BILLING_DATA', {
       request_id: requestIdRef.current,
       party_id: externalInstitutionId,
