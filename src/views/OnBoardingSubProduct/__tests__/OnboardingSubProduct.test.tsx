@@ -7,6 +7,7 @@ import OnBoardingSubProduct from '../OnBoardingSubProduct';
 import '../../../locale';
 import { Route, Router, Switch } from 'react-router';
 import { createMemoryHistory } from 'history';
+import { GeographicTaxonomy } from '../../../model/GeographicTaxonomies';
 
 jest.mock('../../../lib/api-utils');
 
@@ -282,7 +283,8 @@ const executeStepBillingData = async () => {
     'taxCode',
     'vatNumber',
     'zipCode',
-    'recipientCode'
+    'recipientCode',
+    'geographicTaxonomies'
   );
 
   const confirmButtonEnabled = screen.getByRole('button', { name: 'Continua' });
@@ -300,7 +302,8 @@ const executeStepBillingData = async () => {
     'taxCode',
     'vatNumber',
     'zipCode',
-    'recipientCode'
+    'recipientCode',
+    'geographicTaxonomies'
   );
 
   await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
@@ -375,7 +378,8 @@ const fillUserBillingDataForm = async (
   taxCodeInput: string,
   vatNumber: string,
   zipCodeInput: string,
-  recipientCode: string
+  recipientCode: string,
+  geographicTaxonomies: GeographicTaxonomy
 ) => {
   fireEvent.change(document.getElementById(businessNameInput), {
     target: { value: 'businessNameInput' },
@@ -393,6 +397,7 @@ const fillUserBillingDataForm = async (
   fireEvent.change(document.getElementById(recipientCode), {
     target: { value: 'AM23EIX' },
   });
+  fireEvent.click(document.getElementById(geographicTaxonomies));
 };
 
 const fillUserForm = async (
@@ -496,7 +501,7 @@ const verifySubmit = async () => {
           institutionType: 'GSP',
           pricingPlan: 'C1',
           origin: 'IPA',
-          geographicTaxonomies: [],
+          geographicTaxonomies: [{ code: '100', desc: 'ITALIA' }],
         },
       },
       expect.any(Function)

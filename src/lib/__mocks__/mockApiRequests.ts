@@ -149,6 +149,55 @@ const mockPartyRegistry = {
   count: 8,
 };
 
+const mockedGeoTaxonomy = [
+  {
+    code: '058091',
+    desc: 'Roma - Comune',
+    region: '12',
+    province: '058',
+    provinceAbbreviation: 'RM',
+    country: '100',
+    countryAbbreviation: 'IT',
+    startDate: '1871-01-15',
+    endDate: null,
+    enable: true,
+  },
+  {
+    code: '015146',
+    desc: 'Milano - Comune',
+    region: '03',
+    province: '015',
+    provinceAbbreviation: 'MI',
+    country: '100',
+    countryAbbreviation: 'IT',
+    startDate: '1861-03-18',
+    endDate: null,
+    enable: true
+  }, {
+    code: "015456",
+    desc: "Napoli - Comune",
+    region: "08",
+    province: "018",
+    provinceAbbreviation: "NA",
+    country: "100",
+    countryAbbreviation: "IT",
+    startDate: "1861-03-18",
+    endDate: null,
+    enable: true
+    },
+    {
+      code: "015456",
+      desc: "Milazzo - Comune",
+      region: "08",
+      province: "016",
+      provinceAbbreviation: "GE",
+      country: "100",
+      countryAbbreviation: "IT",
+      startDate: "1861-03-18",
+      endDate: null,
+      enable: true
+    }];
+
 const mockedProduct = {
   title: 'App IO',
   id: 'prod-io',
@@ -227,6 +276,12 @@ const mockedOnboardingData0: InstitutionOnboardingInfoResource = {
       taxCode: 'AAAAAA11A11A123K',
       vatNumber: 'AAAAAA11A11A123K',
       recipientCode: 'M5UXCR1',
+      geographicTaxonomies: [
+        {
+          code: '058091',
+          desc: 'Firenze - Comune',
+        },
+      ],
     },
     institutionType: 'PA',
     origin: 'IPA',
@@ -251,6 +306,12 @@ const mockedOnboardingData1: InstitutionOnboardingInfoResource = {
       taxCode: 'BBBBBB11A11A123K',
       vatNumber: '12345678901',
       recipientCode: 'M2UHYR1',
+      geographicTaxonomies: [
+        {
+          code: '058091',
+          desc: 'Firenze - Comune',
+        },
+      ],
     },
     institutionType: 'GSP',
     origin: 'IPA',
@@ -340,6 +401,12 @@ export async function mockFetch(
   if (endpoint === 'ONBOARDING_GET_SEARCH_PARTIES') {
     return new Promise((resolve) =>
       resolve({ data: mockPartyRegistry, status: 200, statusText: '200' } as AxiosResponse)
+    );
+  }
+
+  if (endpoint === 'ONBOARDING_GET_GEOTAXONOMY') {
+    return new Promise((resolve) =>
+      resolve({ data: mockedGeoTaxonomy, status: 200, statusText: '200' } as AxiosResponse)
     );
   }
 
