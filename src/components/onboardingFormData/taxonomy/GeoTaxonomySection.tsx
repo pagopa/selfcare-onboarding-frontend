@@ -129,6 +129,7 @@ export default function GeoTaxonomySection({
       setOptions([]);
     }
   };
+
   const handleSearch = async (query: string, index: number) => {
     setIsLoading(true);
     const searchGeotaxonomy = await fetchWithLogs(
@@ -211,7 +212,11 @@ export default function GeoTaxonomySection({
               setIsNationalAreaVisible(false);
               setIsLocalAreaVisible(true);
               setGeographicTaxonomies(optionsSelected);
-              if (retrievedTaxonomies && retrievedTaxonomies[0].code !== '100') {
+              if (
+                retrievedTaxonomies &&
+                retrievedTaxonomies[0]?.code !== '100' &&
+                retrievedTaxonomies.length !== 0
+              ) {
                 setOptionsSelected(retrievedTaxonomies);
               } else {
                 setOptionsSelected([{ code: '', desc: '' }]);
