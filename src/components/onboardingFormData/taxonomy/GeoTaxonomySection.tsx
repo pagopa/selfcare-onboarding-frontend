@@ -27,11 +27,13 @@ import { GeographicTaxonomy } from '../../../model/GeographicTaxonomies';
 type Props = {
   retrievedTaxonomies: Array<GeographicTaxonomy>;
   setGeographicTaxonomies: React.Dispatch<React.SetStateAction<Array<GeographicTaxonomy>>>;
+  premiumFlow: boolean;
 };
 
 export default function GeoTaxonomySection({
   retrievedTaxonomies,
   setGeographicTaxonomies,
+  premiumFlow,
 }: Props) {
   const { t } = useTranslation();
   const [isNationalAreaVisible, setIsNationalAreaVisible] = useState<boolean>(false);
@@ -43,12 +45,30 @@ export default function GeoTaxonomySection({
   const [isAddNewAutocompleteEnabled, setIsAddNewAutocompleteEnabled] = useState<boolean>(false);
   const [input, setInput] = useState<string>('');
 
+  const [error, setError] = useState<any>({});
+
   const emptyField = !optionsSelected.find((o) => o?.desc === '');
+
+  const deleteError = (index: number) => {
+    const newError = { ...error };
+    // eslint-disable-next-line functional/immutable-data
+    delete newError[index];
+    setError(newError);
+  };
+
+  const findError = (index: number, data: any) => {
+    if (data?.length === 0) {
+      setError((currError: any) => ({ ...currError, [index]: true }));
+    } else {
+      deleteError(index);
+    }
+  };
 
   useEffect(() => {
     if (retrievedTaxonomies && retrievedTaxonomies[0]?.code === '100') {
       setIsNationalAreaVisible(true);
-      setGeographicTaxonomies([{ code: '100', desc: 'ITALIA' }]);
+      setOptionsSelected([{ code: '100', desc: 'ITALIA' }]);
+      setGeographicTaxonomies(optionsSelected);
     } else if (retrievedTaxonomies && retrievedTaxonomies.length > 0) {
       setIsLocalAreaVisible(true);
       setOptionsSelected(retrievedTaxonomies);
@@ -67,6 +87,7 @@ export default function GeoTaxonomySection({
     list.splice(index, 1);
     setOptionsSelected(list);
     setIsAddNewAutocompleteEnabled(true);
+    deleteError(index);
   };
 
   const handleAddClick = () => {
@@ -93,18 +114,22 @@ export default function GeoTaxonomySection({
     } else if (emptyField) {
       setIsAddNewAutocompleteEnabled(false);
     }
+
+    if (!value) {
+      deleteError(index);
+    }
   };
 
-  const handleSearchInput = (event: any) => {
+  const handleSearchInput = (event: any, index: number) => {
     const value = event.target.value;
     setInput(value);
     if (value.length >= 3) {
-      void debounce(handleSearch, 100)(value);
+      void debounce(handleSearch, 100)(value, index);
     } else {
       setOptions([]);
     }
   };
-  const handleSearch = async (query: string) => {
+  const handleSearch = async (query: string, index: number) => {
     setIsLoading(true);
     const searchGeotaxonomy = await fetchWithLogs(
       {
@@ -124,17 +149,24 @@ export default function GeoTaxonomySection({
 
       data = data.map((value: OnboardingInstitutionInfo) => ({ ...value, label: value.desc }));
 
-      setOptions(data.filter((o: any) => !optionsSelected.includes(o)));
+      if (optionsSelected?.find((os) => os?.desc)) {
+        const dataFiltered = data.filter(
+          (data: any) => !optionsSelected.find((os) => os?.code === data?.code)
+        );
+        findError(index, dataFiltered);
+        setOptions(dataFiltered);
+      } else {
+        setOptions(data);
+        findError(index, data);
+      }
     } else if ((searchGeotaxonomy as AxiosError).response?.status === 404) {
       setOptions([]);
     }
     setIsLoading(false);
   };
 
-  // const notValidEntry = input.length >= 3 && options.length === 0 && !optionsSelected;
-
   return (
-    <Paper elevation={0} sx={{ p: 4, borderRadius: 2, my: 4 }}>
+    <Paper elevation={8} sx={{ p: 4, borderRadius: 2, my: 4 }}>
       <Grid container item pb={3}>
         <Grid item xs={12} display="flex">
           <Box>
@@ -156,7 +188,7 @@ export default function GeoTaxonomySection({
       <RadioGroup name="geographicTaxonomy">
         <Box display="flex">
           <FormControlLabel
-            id={'geographicTaxonomies'}
+            disabled={premiumFlow}
             checked={isNationalAreaVisible}
             value={'nationl'}
             control={<Radio disableRipple={true} />}
@@ -169,6 +201,8 @@ export default function GeoTaxonomySection({
             sx={{ mr: 3, ml: 1 }}
           />
           <FormControlLabel
+            id={'geographicTaxonomies'}
+            disabled={premiumFlow}
             checked={isLocalAreaVisible}
             value={'local'}
             control={<Radio disableRipple={true} />}
@@ -177,7 +211,11 @@ export default function GeoTaxonomySection({
               setIsNationalAreaVisible(false);
               setIsLocalAreaVisible(true);
               setGeographicTaxonomies(optionsSelected);
-              setOptionsSelected([{ code: '', desc: '' }]);
+              if (retrievedTaxonomies && retrievedTaxonomies[0].code !== '100') {
+                setOptionsSelected(retrievedTaxonomies);
+              } else {
+                setOptionsSelected([{ code: '', desc: '' }]);
+              }
             }}
           />
         </Box>
@@ -190,6 +228,7 @@ export default function GeoTaxonomySection({
                 {i !== 0 && (
                   <Box display="flex" alignItems={'center'}>
                     <ButtonNaked
+                      disabled={premiumFlow}
                       component="button"
                       onClick={() => handleRemoveClick(i)}
                       startIcon={<RemoveCircleOutlineOutlined />}
@@ -201,6 +240,7 @@ export default function GeoTaxonomySection({
                 )}
                 <Box width="100%">
                   <Autocomplete
+                    disabled={premiumFlow}
                     freeSolo
                     onOpen={() => setOptions([])}
                     disablePortal
@@ -214,7 +254,7 @@ export default function GeoTaxonomySection({
                     )}
                     renderInput={(params) => (
                       <TextField
-                        onChange={handleSearchInput}
+                        onChange={(e) => handleSearchInput(e, i)}
                         {...params}
                         variant="outlined"
                         label={
@@ -222,21 +262,19 @@ export default function GeoTaxonomySection({
                             ? t('onboardingFormData.taxonomySection.localSection.inputLabel')
                             : ''
                         }
-                        // error={notValidEntry}
+                        error={error?.[i]}
+                        helperText={
+                          error?.[i] && t('onboardingFormData.taxonomySection.error.notMatchedArea')
+                        }
                       />
                     )}
                   />
-                  {/* {notValidEntry && (
-                    <Typography sx={{ fontSize: 'fontSize', color: 'error.dark' }} pt={1} ml={2}>
-                      {t('onboardingFormData.taxonomySection.error.notMatchedArea')}
-                    </Typography>
-                  )} */}
                 </Box>
               </Box>
               {optionsSelected.length - 1 === i && (
                 <Box mt={2}>
                   <ButtonNaked
-                    disabled={!isAddNewAutocompleteEnabled}
+                    disabled={!isAddNewAutocompleteEnabled || premiumFlow}
                     component="button"
                     onClick={handleAddClick}
                     startIcon={<AddOutlined />}
