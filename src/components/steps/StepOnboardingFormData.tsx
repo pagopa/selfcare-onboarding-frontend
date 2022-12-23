@@ -78,8 +78,8 @@ export default function StepOnboardingFormData({
 
   // CASE 1: New API retrieve some geographicsArea for the party
   const mockRetrievedGeographicTaxonomies = [
-    { code: '145236', desc: 'Cagliari - Comune' },
-    { code: '015146', desc: 'Milano - Comune' },
+    { code: '058091', desc: 'Roma - Comune' },
+    // { code: '015146', desc: 'Milano - Comune' },
   ];
 
   // CASE 2: New API NOT found some geographicsArea for the party

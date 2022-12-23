@@ -707,10 +707,7 @@ const verifySubmit = async () => {
             },
           ],
           pricingPlan: 'FA',
-          geographicTaxonomies: [
-            { code: '145236', desc: 'Cagliari - Comune' },
-            { code: '015146', desc: 'Milano - Comune' },
-          ],
+          geographicTaxonomies: [{ code: '058091', desc: 'Roma - Comune' }],
         },
         method: 'POST',
       },
