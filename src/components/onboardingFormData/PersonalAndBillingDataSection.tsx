@@ -30,7 +30,7 @@ type Props = StepperStepComponentProps & {
   stepHistoryState: StepBillingDataHistoryState;
   setStepHistoryState: React.Dispatch<React.SetStateAction<StepBillingDataHistoryState>>;
   formik: any;
-  subProductId?: string;
+  premiumFlow: boolean;
 };
 
 export default function PersonalAndBillingDataSection({
@@ -40,14 +40,13 @@ export default function PersonalAndBillingDataSection({
   stepHistoryState,
   setStepHistoryState,
   formik,
-  subProductId,
+  premiumFlow,
 }: Props) {
   const { t } = useTranslation();
 
   const isFromIPA = origin === 'IPA';
   const isPSP = institutionType === 'PSP';
   const isPA = institutionType === 'PA';
-  const premiumFlow = !!subProductId;
   const isDisabled = premiumFlow || (isFromIPA && isPA && !isPSP);
   const requiredError = 'Required';
 
