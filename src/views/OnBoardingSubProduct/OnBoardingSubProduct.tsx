@@ -142,7 +142,7 @@ function OnBoardingSubProduct() {
       taxCode: party.taxCode,
       vatNumber: '',
       recipientCode: party.origin === 'IPA' ? party.originId : '',
-      geographicTaxonomies: [], // TODO
+      geographicTaxonomies: [],
     });
     const event = isUserParty
       ? 'ONBOARDING_PREMIUM_ASSOCIATED_PARTY_SELECTION'
