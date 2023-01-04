@@ -73,6 +73,7 @@ export default function StepOnboardingFormData({
 
   // TODO: remove when will be real data retrieved - it show/hide geotaxonomy section
   const geotaxonomyVisible = true;
+
   const premiumFlow = !!subProductId;
   const isPSP = institutionType === 'PSP';
 
@@ -90,6 +91,8 @@ export default function StepOnboardingFormData({
 
   const [openModifyModal, setOpenModifyModal] = useState<boolean>(false);
   const [openAddModal, setOpenAddModal] = useState<boolean>(false);
+
+  // const [previousGeotaxononomies, setPreviousGeotaxononomies] = useState(); // TODO: modify when it's ready the updated api version that returns Geographic Taxonomy Resource as model
 
   const { t } = useTranslation();
 
