@@ -23,17 +23,20 @@ import { UserContext } from '../../../lib/context';
 import { ENV } from '../../../utils/env';
 import { OnboardingInstitutionInfo } from '../../../model/OnboardingInstitutionInfo';
 import { GeographicTaxonomy } from '../../../model/GeographicTaxonomies';
+import { useHistoryState } from '../../useHistoryState';
 
 type Props = {
   retrievedTaxonomies: Array<GeographicTaxonomy>;
   setGeographicTaxonomies: React.Dispatch<React.SetStateAction<Array<GeographicTaxonomy>>>;
   premiumFlow: boolean;
+  formik: any;
 };
 
 export default function GeoTaxonomySection({
   retrievedTaxonomies,
   setGeographicTaxonomies,
   premiumFlow,
+  formik,
 }: Props) {
   const { t } = useTranslation();
   const [isNationalAreaVisible, setIsNationalAreaVisible] = useState<boolean>(false);
@@ -49,6 +52,10 @@ export default function GeoTaxonomySection({
 
   const emptyField = !optionsSelected.find((o) => o?.desc === '');
 
+  const [geotaxonomiesHistory, setGeotaxonomiesHistory, setGeotaxonomiesHistoryState] =
+    useHistoryState<Array<GeographicTaxonomy>>('geotaxonomies', []);
+
+  console.log('geotaxonomiesHistory', geotaxonomiesHistory);
   const deleteError = (index: number) => {
     const newError = { ...error };
     // eslint-disable-next-line functional/immutable-data
@@ -70,10 +77,14 @@ export default function GeoTaxonomySection({
       setOptionsSelected([{ code: '100', desc: 'ITALIA' }]);
       setGeographicTaxonomies(optionsSelected);
     } else if (retrievedTaxonomies && retrievedTaxonomies.length > 0) {
-      setIsLocalAreaVisible(true);
-      setOptionsSelected(retrievedTaxonomies);
-      setIsAddNewAutocompleteEnabled(true);
-      setGeographicTaxonomies(optionsSelected);
+      if (geotaxonomiesHistory && geotaxonomiesHistory.length > 0) {
+        setOptionsSelected(geotaxonomiesHistory);
+      } else {
+        setIsLocalAreaVisible(true);
+        setOptionsSelected(retrievedTaxonomies);
+        setIsAddNewAutocompleteEnabled(true);
+        setGeographicTaxonomies(optionsSelected);
+      }
     }
   }, []);
 
@@ -117,6 +128,10 @@ export default function GeoTaxonomySection({
 
     if (!value) {
       deleteError(index);
+    }
+    if (formik.values.geographicTaxonomies.length > 0) {
+      setGeotaxonomiesHistory(formik.values.geographicTaxonomies);
+      setGeotaxonomiesHistoryState(formik.values.geographicTaxonomies);
     }
   };
 
@@ -252,9 +267,8 @@ export default function GeoTaxonomySection({
                     options={input.length >= 3 ? options : []}
                     sx={{ width: '100%' }}
                     onChange={(event: any, value: any) => handleChange(event, value, i)}
-                    value={val?.desc}
+                    value={geotaxonomiesHistory[i]?.desc ?? val?.desc}
                     renderOption={(props, option) => (
-                      // TODO: customize layout
                       <span {...props}>{option.desc ? option.desc : ''}</span>
                     )}
                     renderInput={(params) => (
@@ -275,6 +289,7 @@ export default function GeoTaxonomySection({
                     )}
                   />
                 </Box>
+                {geotaxonomiesHistory.map((p) => p.desc)}
               </Box>
               {optionsSelected.length - 1 === i && (
                 <Box mt={2}>

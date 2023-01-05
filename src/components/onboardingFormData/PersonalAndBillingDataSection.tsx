@@ -161,13 +161,13 @@ export default function PersonalAndBillingDataSection({
                   });
                 }}
               />
-              <Typography>
+              <Typography component={'span'}>
                 {t('onboardingFormData.billingDataSection.taxCodeEquals2PIVAdescription')}
               </Typography>
             </Box>
           </Grid>
           <Grid item xs={12}>
-            <Typography>
+            <Typography component={'span'}>
               <CustomTextField
                 {...baseTextFieldProps(
                   'vatNumber',
@@ -194,7 +194,7 @@ export default function PersonalAndBillingDataSection({
                     }
                     value={formik.values.vatNumberGroup}
                   />
-                  <Typography>
+                  <Typography component={'span'}>
                     {t('onboardingFormData.billingDataSection.vatNumberGroup')}
                   </Typography>
                 </Box>
@@ -261,6 +261,7 @@ export default function PersonalAndBillingDataSection({
               )}
             />
             <Typography
+              component={'span'}
               sx={{
                 fontSize: '12px!important',
                 fontWeight: 600,

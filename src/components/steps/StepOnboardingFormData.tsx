@@ -93,7 +93,7 @@ export default function StepOnboardingFormData({
 
   const { t } = useTranslation();
 
-  const [stepHistoryState, setStepHistoryState, _setStepHistoryStateHistory] =
+  const [stepHistoryState, setStepHistoryState, setStepHistoryStateHistory] =
     useHistoryState<StepBillingDataHistoryState>('onboardingFormData', {
       externalInstitutionId,
       isTaxCodeEquals2PIVA:
@@ -116,6 +116,7 @@ export default function StepOnboardingFormData({
 
   const saveHistoryState = () => {
     setStepHistoryState(stepHistoryState);
+    setStepHistoryStateHistory(stepHistoryState);
   };
 
   const onForwardAction = () => {
@@ -374,6 +375,7 @@ export default function StepOnboardingFormData({
                 formik.setFieldValue('geographicTaxonomies', geographicTaxonomies)
               }
               premiumFlow={premiumFlow}
+              formik={formik}
             />
           </Grid>
         ) : (
