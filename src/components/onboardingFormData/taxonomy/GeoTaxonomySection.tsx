@@ -75,7 +75,7 @@ export default function GeoTaxonomySection({
       setIsAddNewAutocompleteEnabled(true);
       setGeographicTaxonomies(optionsSelected);
     }
-  }, []);
+  }, [retrievedTaxonomies]);
 
   useEffect(() => {
     setGeographicTaxonomies(optionsSelected);
@@ -191,8 +191,8 @@ export default function GeoTaxonomySection({
           <FormControlLabel
             disabled={premiumFlow}
             checked={isNationalAreaVisible}
-            value={'nationl'}
-            control={<Radio disableRipple={true} />}
+            value={'national'}
+            control={<Radio disableRipple={true} id={'national_geographicTaxonomies'} />}
             label={t('onboardingFormData.taxonomySection.nationalLabel')}
             onChange={() => {
               setIsNationalAreaVisible(true);
@@ -254,7 +254,6 @@ export default function GeoTaxonomySection({
                     onChange={(event: any, value: any) => handleChange(event, value, i)}
                     value={val?.desc}
                     renderOption={(props, option) => (
-                      // TODO: customize layout
                       <span {...props}>{option.desc ? option.desc : ''}</span>
                     )}
                     renderInput={(params) => (
