@@ -593,12 +593,6 @@ export async function mockFetch(
     }
   }
 
-  if (endpoint === 'ONBOARDING_GET_PREVIOUS_GEOTAXONOMIES') {
-    return new Promise((resolve) =>
-      resolve({ data: mockedParties, status: 200, statusText: '200' } as AxiosResponse)
-    );
-  }
-
 
   const msg = `NOT MOCKED REQUEST! {endpoint: ${endpoint}, endpointParams: ${JSON.stringify(
     endpointParams
