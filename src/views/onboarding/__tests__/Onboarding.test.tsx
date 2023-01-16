@@ -8,7 +8,6 @@ import '../../../locale';
 import { GeographicTaxonomy } from '../../../model/GeographicTaxonomies';
 
 jest.mock('../../../lib/api-utils');
-
 jest.setTimeout(30000);
 
 let fetchWithLogsSpy: jest.SpyInstance;
@@ -279,8 +278,7 @@ const executeStepBillingData = async () => {
     'zipCode',
     'taxCode',
     'vatNumber',
-    'recipientCode',
-    'geographicTaxonomies'
+    'recipientCode'
   );
 
   await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
@@ -370,8 +368,7 @@ const fillUserBillingDataForm = async (
   zipCode: string,
   taxCodeInput: string,
   vatNumber: string,
-  recipientCode: string,
-  geographicTaxonomies: GeographicTaxonomy
+  recipientCode: string
 ) => {
   fireEvent.change(document.getElementById(businessNameInput), {
     target: { value: 'businessNameInput' },
@@ -394,7 +391,8 @@ const fillUserBillingDataForm = async (
   fireEvent.change(document.getElementById(recipientCode), {
     target: { value: 'recipientCode' },
   });
-  fireEvent.click(document.getElementById(geographicTaxonomies));
+
+  await waitFor(() => fireEvent.click(document.getElementById('national_geographicTaxonomies')));
 };
 
 const fillUserForm = async (
@@ -707,7 +705,7 @@ const verifySubmit = async () => {
             },
           ],
           pricingPlan: 'FA',
-          geographicTaxonomies: [{ code: '058091', desc: 'Roma - Comune' }],
+          geographicTaxonomies: [{ code: '100', desc: 'ITALIA' }],
         },
         method: 'POST',
       },

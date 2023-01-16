@@ -302,8 +302,7 @@ const executeStepBillingData = async () => {
     'taxCode',
     'vatNumber',
     'zipCode',
-    'recipientCode',
-    'geographicTaxonomies'
+    'recipientCode'
   );
 
   await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
@@ -378,8 +377,7 @@ const fillUserBillingDataForm = async (
   taxCodeInput: string,
   vatNumber: string,
   zipCodeInput: string,
-  recipientCode: string,
-  geographicTaxonomies: GeographicTaxonomy
+  recipientCode: string
 ) => {
   fireEvent.change(document.getElementById(businessNameInput), {
     target: { value: 'businessNameInput' },
@@ -397,7 +395,7 @@ const fillUserBillingDataForm = async (
   fireEvent.change(document.getElementById(recipientCode), {
     target: { value: 'AM23EIX' },
   });
-  fireEvent.click(document.getElementById(geographicTaxonomies));
+  fireEvent.click(document.getElementById('national_geographicTaxonomies'));
 };
 
 const fillUserForm = async (
@@ -501,7 +499,7 @@ const verifySubmit = async () => {
           institutionType: 'GSP',
           pricingPlan: 'C1',
           origin: 'IPA',
-          geographicTaxonomies: [{ code: '058091', desc: 'Roma - Comune' }],
+          geographicTaxonomies: [{ code: '100', desc: 'ITALIA' }],
         },
       },
       expect.any(Function)
