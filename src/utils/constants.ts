@@ -85,7 +85,7 @@ export const API = {
     URL:ENV.URL_API.GEOTAXONOMY,
   },
   ONBOARDING_GET_PREVIOUS_GEOTAXONOMIES: {
-    URL: ENV.URL_API.PARTY_REGISTRY_PROXY + '/institutions/{{externalInstitutionId}}/data',
+    URL: ENV.URL_API.ONBOARDING + '/institutions/{{externalInstitutionId}}/geographicTaxonomy',
   },
   
 };

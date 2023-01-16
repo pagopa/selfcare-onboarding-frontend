@@ -5,7 +5,8 @@ import { Box } from '@mui/system';
 import { Grid, Typography, TextField } from '@mui/material';
 import { useFormik } from 'formik';
 import { useTranslation } from 'react-i18next';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
+import { AxiosResponse } from 'axios';
 import { styled } from '@mui/system';
 import {
   InstitutionType,
@@ -22,7 +23,10 @@ import PersonalAndBillingDataSection from '../onboardingFormData/PersonalAndBill
 import DpoSection from '../onboardingFormData/DpoSection';
 import GeoTaxonomySection from '../onboardingFormData/taxonomy/GeoTaxonomySection';
 import GeoTaxSessionModal from '../onboardingFormData/taxonomy/GeoTaxSessionModal';
-// import { GeographicTaxonomy } from '../../model/GeographicTaxonomies';
+import { GeographicTaxonomy } from '../../model/GeographicTaxonomies';
+import { fetchWithLogs } from '../../lib/api-utils';
+import { UserContext } from '../../lib/context';
+import { getFetchOutcome } from '../../lib/error-utils';
 
 const mailPECRegexp = new RegExp('^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$');
 const fiscalAndVatCodeRegexp = new RegExp(
@@ -77,31 +81,43 @@ export default function StepOnboardingFormData({
   const premiumFlow = !!subProductId;
   const isPSP = institutionType === 'PSP';
 
-  // CASE 1: New API retrieve some geographicsArea for the party
-  const mockRetrievedGeographicTaxonomies = [
-    { code: '058091', desc: 'Roma - Comune' },
-    // { code: '015146', desc: 'Milano - Comune' },
-  ];
-
-  // CASE 2: New API NOT found some geographicsArea for the party
-  // const mockRetrievedGeographicTaxonomies: Array<GeographicTaxonomy> = [];
-
-  // CASE 3: New API found National area selected
-  // const mockRetrievedGeographicTaxonomies = [{ code: '100', desc: 'ITALIA' }];
-
   const [openModifyModal, setOpenModifyModal] = useState<boolean>(false);
   const [openAddModal, setOpenAddModal] = useState<boolean>(false);
+  const { setRequiredLogin } = useContext(UserContext);
 
-  // const [previousGeotaxononomies, setPreviousGeotaxononomies] = useState(); // TODO: modify when it's ready the updated api version that returns Geographic Taxonomy Resource as model
+  const [previousGeotaxononomies, setPreviousGeotaxononomies] = useState<Array<GeographicTaxonomy>>(
+    []
+  );
 
   const { t } = useTranslation();
-
   const [stepHistoryState, setStepHistoryState, _setStepHistoryStateHistory] =
     useHistoryState<StepBillingDataHistoryState>('onboardingFormData', {
       externalInstitutionId,
       isTaxCodeEquals2PIVA:
         !!initialFormData.vatNumber && initialFormData.taxCode === initialFormData.vatNumber,
     });
+
+  const getPreviousGeotaxononomies = async () => {
+    const onboardingData = await fetchWithLogs(
+      {
+        endpoint: 'ONBOARDING_GET_PREVIOUS_GEOTAXONOMIES',
+        endpointParams: {
+          externalInstitutionId,
+        },
+      },
+      { method: 'GET' },
+      () => setRequiredLogin(true)
+    );
+
+    const restOutcomeData = getFetchOutcome(onboardingData);
+    if (restOutcomeData === 'success') {
+      const result = (onboardingData as AxiosResponse).data;
+      console.log('result', result);
+      if (result) {
+        setPreviousGeotaxononomies(result);
+      }
+    }
+  };
 
   useEffect(() => {
     if (externalInstitutionId !== stepHistoryState.externalInstitutionId) {
@@ -111,6 +127,10 @@ export default function StepOnboardingFormData({
           !!initialFormData.vatNumber && initialFormData.taxCode === initialFormData.vatNumber,
       });
     }
+  }, []);
+
+  useEffect(() => {
+    void getPreviousGeotaxononomies();
   }, []);
 
   useEffect(() => {
@@ -132,25 +152,25 @@ export default function StepOnboardingFormData({
   };
 
   const onBeforeForwardAction = () => {
-    if (geotaxonomyVisible && mockRetrievedGeographicTaxonomies.length > 0) {
+    if (geotaxonomyVisible && previousGeotaxononomies && previousGeotaxononomies.length > 0) {
       const changedNational2Local =
-        mockRetrievedGeographicTaxonomies.some((rv) => rv.code === '100') &&
+        previousGeotaxononomies.some((rv) => rv.code === '100') &&
         !formik.values.geographicTaxonomies.some((gv) => gv.code === '100');
       const changedToLocal2National =
-        !mockRetrievedGeographicTaxonomies.some((rv) => rv.code === '100') &&
+        !previousGeotaxononomies.some((rv) => rv.code === '100') &&
         formik.values.geographicTaxonomies.some((gv) => gv.code === '100');
 
       if (changedNational2Local || changedToLocal2National) {
         setOpenModifyModal(true);
       } else {
         const deltaLength =
-          mockRetrievedGeographicTaxonomies.length - formik.values.geographicTaxonomies.length;
+          previousGeotaxononomies.length - formik.values.geographicTaxonomies.length;
         // eslint-disable-next-line functional/no-let
-        let array1 = mockRetrievedGeographicTaxonomies;
+        let array1 = previousGeotaxononomies;
         // eslint-disable-next-line functional/no-let
         let array2 = formik.values.geographicTaxonomies;
         if (deltaLength < 0) {
-          array2 = mockRetrievedGeographicTaxonomies;
+          array2 = previousGeotaxononomies;
           array1 = formik.values.geographicTaxonomies;
         }
         const arrayDifferences = array1.filter(
@@ -372,7 +392,7 @@ export default function StepOnboardingFormData({
         {geotaxonomyVisible ? (
           <Grid item xs={12}>
             <GeoTaxonomySection
-              retrievedTaxonomies={mockRetrievedGeographicTaxonomies}
+              retrievedTaxonomies={previousGeotaxononomies}
               setGeographicTaxonomies={(geographicTaxonomies) =>
                 formik.setFieldValue('geographicTaxonomies', geographicTaxonomies)
               }
