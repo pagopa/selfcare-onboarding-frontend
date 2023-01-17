@@ -62,12 +62,8 @@ export default function GeoTaxonomySection({
     setError(newError);
   };
 
-  const findError = (index: number, data: any) => {
-    if (data?.length === 0) {
-      setError((currError: any) => ({ ...currError, [index]: true }));
-    } else {
-      deleteError(index);
-    }
+  const findError = (index: number) => {
+    setError((currError: any) => ({ ...currError, [index]: true }));
   };
 
   useEffect(() => {
@@ -171,11 +167,18 @@ export default function GeoTaxonomySection({
         const dataFiltered = data.filter(
           (data: any) => !optionsSelected.find((os) => os?.code === data?.code)
         );
-        findError(index, dataFiltered);
         setOptions(dataFiltered);
+      }
+      const matchesWithTyped = data.filter((o: GeographicTaxonomy) =>
+        o.desc.toLocaleLowerCase().includes(query.toLocaleLowerCase())
+      );
+      setOptions(matchesWithTyped);
+
+      if (matchesWithTyped.length > 0) {
+        deleteError(index);
       } else {
-        setOptions(data);
-        findError(index, data);
+        findError(index);
+        setIsAddNewAutocompleteEnabled(false);
       }
     } else if ((searchGeotaxonomy as AxiosError).response?.status === 404) {
       setOptions([]);
