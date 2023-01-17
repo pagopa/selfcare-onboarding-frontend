@@ -23,17 +23,20 @@ import { UserContext } from '../../../lib/context';
 import { ENV } from '../../../utils/env';
 import { OnboardingInstitutionInfo } from '../../../model/OnboardingInstitutionInfo';
 import { GeographicTaxonomy } from '../../../model/GeographicTaxonomies';
+import { useHistoryState } from '../../useHistoryState';
 
 type Props = {
   retrievedTaxonomies: Array<GeographicTaxonomy>;
   setGeographicTaxonomies: React.Dispatch<React.SetStateAction<Array<GeographicTaxonomy>>>;
   premiumFlow: boolean;
+  formik: any;
 };
 
 export default function GeoTaxonomySection({
   retrievedTaxonomies,
   setGeographicTaxonomies,
   premiumFlow,
+  formik,
 }: Props) {
   const { t } = useTranslation();
   const [isNationalAreaVisible, setIsNationalAreaVisible] = useState<boolean>(false);
@@ -49,6 +52,9 @@ export default function GeoTaxonomySection({
 
   const emptyField = !optionsSelected.find((o) => o?.desc === '');
 
+  const [geotaxonomiesHistory, setGeotaxonomiesHistory, setGeotaxonomiesHistoryState] =
+    useHistoryState<Array<GeographicTaxonomy>>('geotaxonomies', []);
+
   const deleteError = (index: number) => {
     const newError = { ...error };
     // eslint-disable-next-line functional/immutable-data
@@ -56,12 +62,8 @@ export default function GeoTaxonomySection({
     setError(newError);
   };
 
-  const findError = (index: number, data: any) => {
-    if (data?.length === 0) {
-      setError((currError: any) => ({ ...currError, [index]: true }));
-    } else {
-      deleteError(index);
-    }
+  const findError = (index: number) => {
+    setError((currError: any) => ({ ...currError, [index]: true }));
   };
 
   useEffect(() => {
@@ -74,6 +76,13 @@ export default function GeoTaxonomySection({
       setOptionsSelected(retrievedTaxonomies);
       setIsAddNewAutocompleteEnabled(true);
       setGeographicTaxonomies(optionsSelected);
+    }
+  }, [retrievedTaxonomies]);
+
+  useEffect(() => {
+    if (geotaxonomiesHistory && geotaxonomiesHistory.length > 0) {
+      setOptionsSelected(geotaxonomiesHistory);
+      setIsLocalAreaVisible(true);
     }
   }, [retrievedTaxonomies]);
 
@@ -118,6 +127,10 @@ export default function GeoTaxonomySection({
     if (!value) {
       deleteError(index);
     }
+    if (formik.values.geographicTaxonomies.length > 0) {
+      setGeotaxonomiesHistory(formik.values.geographicTaxonomies);
+      setGeotaxonomiesHistoryState(formik.values.geographicTaxonomies);
+    }
   };
 
   const handleSearchInput = (event: any, index: number) => {
@@ -154,11 +167,18 @@ export default function GeoTaxonomySection({
         const dataFiltered = data.filter(
           (data: any) => !optionsSelected.find((os) => os?.code === data?.code)
         );
-        findError(index, dataFiltered);
         setOptions(dataFiltered);
+      }
+      const matchesWithTyped = data.filter((o: GeographicTaxonomy) =>
+        o.desc.toLocaleLowerCase().includes(query.toLocaleLowerCase())
+      );
+      setOptions(matchesWithTyped);
+
+      if (matchesWithTyped.length > 0) {
+        deleteError(index);
       } else {
-        setOptions(data);
-        findError(index, data);
+        findError(index);
+        setIsAddNewAutocompleteEnabled(false);
       }
     } else if ((searchGeotaxonomy as AxiosError).response?.status === 404) {
       setOptions([]);
@@ -218,6 +238,8 @@ export default function GeoTaxonomySection({
                 retrievedTaxonomies.length !== 0
               ) {
                 setOptionsSelected(retrievedTaxonomies);
+              } else if (geotaxonomiesHistory && geotaxonomiesHistory.length > 0) {
+                setOptionsSelected(geotaxonomiesHistory);
               } else {
                 setOptionsSelected([{ code: '', desc: '' }]);
               }
@@ -252,7 +274,7 @@ export default function GeoTaxonomySection({
                     options={input.length >= 3 ? options : []}
                     sx={{ width: '100%' }}
                     onChange={(event: any, value: any) => handleChange(event, value, i)}
-                    value={val?.desc}
+                    value={geotaxonomiesHistory[i]?.desc ?? val?.desc}
                     renderOption={(props, option) => (
                       <span {...props}>{option.desc ? option.desc : ''}</span>
                     )}
