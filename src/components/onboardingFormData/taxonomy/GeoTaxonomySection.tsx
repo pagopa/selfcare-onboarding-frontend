@@ -238,6 +238,8 @@ export default function GeoTaxonomySection({
                 retrievedTaxonomies.length !== 0
               ) {
                 setOptionsSelected(retrievedTaxonomies);
+              } else if (geotaxonomiesHistory && geotaxonomiesHistory.length > 0) {
+                setOptionsSelected(geotaxonomiesHistory);
               } else {
                 setOptionsSelected([{ code: '', desc: '' }]);
               }
