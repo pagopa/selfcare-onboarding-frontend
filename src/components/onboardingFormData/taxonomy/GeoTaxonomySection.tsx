@@ -55,7 +55,6 @@ export default function GeoTaxonomySection({
   const [geotaxonomiesHistory, setGeotaxonomiesHistory, setGeotaxonomiesHistoryState] =
     useHistoryState<Array<GeographicTaxonomy>>('geotaxonomies', []);
 
-  console.log('geotaxonomiesHistory', geotaxonomiesHistory);
   const deleteError = (index: number) => {
     const newError = { ...error };
     // eslint-disable-next-line functional/immutable-data
@@ -77,16 +76,19 @@ export default function GeoTaxonomySection({
       setOptionsSelected([{ code: '100', desc: 'ITALIA' }]);
       setGeographicTaxonomies(optionsSelected);
     } else if (retrievedTaxonomies && retrievedTaxonomies.length > 0) {
-      if (geotaxonomiesHistory && geotaxonomiesHistory.length > 0) {
-        setOptionsSelected(geotaxonomiesHistory);
-      } else {
-        setIsLocalAreaVisible(true);
-        setOptionsSelected(retrievedTaxonomies);
-        setIsAddNewAutocompleteEnabled(true);
-        setGeographicTaxonomies(optionsSelected);
-      }
+      setIsLocalAreaVisible(true);
+      setOptionsSelected(retrievedTaxonomies);
+      setIsAddNewAutocompleteEnabled(true);
+      setGeographicTaxonomies(optionsSelected);
     }
-  }, []);
+  }, [retrievedTaxonomies]);
+
+  useEffect(() => {
+    if (geotaxonomiesHistory && geotaxonomiesHistory.length > 0) {
+      setOptionsSelected(geotaxonomiesHistory);
+      setIsLocalAreaVisible(true);
+    }
+  }, [retrievedTaxonomies]);
 
   useEffect(() => {
     setGeographicTaxonomies(optionsSelected);
@@ -206,8 +208,8 @@ export default function GeoTaxonomySection({
           <FormControlLabel
             disabled={premiumFlow}
             checked={isNationalAreaVisible}
-            value={'nationl'}
-            control={<Radio disableRipple={true} />}
+            value={'national'}
+            control={<Radio disableRipple={true} id={'national_geographicTaxonomies'} />}
             label={t('onboardingFormData.taxonomySection.nationalLabel')}
             onChange={() => {
               setIsNationalAreaVisible(true);
@@ -289,7 +291,6 @@ export default function GeoTaxonomySection({
                     )}
                   />
                 </Box>
-                {geotaxonomiesHistory.map((p) => p.desc)}
               </Box>
               {optionsSelected.length - 1 === i && (
                 <Box mt={2}>
