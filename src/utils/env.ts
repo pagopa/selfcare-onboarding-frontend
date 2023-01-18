@@ -49,4 +49,8 @@ export const ENV = {
       .default('https://api-eu.mixpanel.com')
       .asString(),
   },
+
+  GEOTAXONOMY: {
+    SHOW_GEOTAXONOMY: env.get('REACT_APP_ENABLE_GEOTAXONOMY').default('false').asBool(),
+  },
 };
