@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import debounce from 'lodash/debounce';
 import { Autocomplete } from '@mui/material';
@@ -39,22 +39,24 @@ export default function GeoTaxonomySection({
   formik,
 }: Props) {
   const { t } = useTranslation();
+  const nationalArea = [{ code: '100', desc: 'ITALIA' }];
+
   const [isNationalAreaVisible, setIsNationalAreaVisible] = useState<boolean>(false);
   const [isLocalAreaVisible, setIsLocalAreaVisible] = useState<boolean>(false);
-  const [_isLoading, setIsLoading] = useState(false);
-  const { setRequiredLogin } = useContext(UserContext);
   const [optionsSelected, setOptionsSelected] = useState<Array<GeographicTaxonomy>>([]);
   const [options, setOptions] = useState<Array<OnboardingInstitutionInfo>>([]);
   const [isAddNewAutocompleteEnabled, setIsAddNewAutocompleteEnabled] = useState<boolean>(false);
   const [input, setInput] = useState<string>('');
-
   const [error, setError] = useState<any>({});
 
-  const emptyField = !optionsSelected.find((o) => o?.desc === '');
+  const localState = useRef<Array<GeographicTaxonomy>>();
 
   const [geotaxonomiesHistory, setGeotaxonomiesHistory, setGeotaxonomiesHistoryState] =
     useHistoryState<Array<GeographicTaxonomy>>('geotaxonomies', []);
 
+  const { setRequiredLogin } = useContext(UserContext);
+
+  const emptyField = !optionsSelected.find((o) => o?.desc === '');
   const deleteError = (index: number) => {
     const newError = { ...error };
     // eslint-disable-next-line functional/immutable-data
@@ -69,7 +71,7 @@ export default function GeoTaxonomySection({
   useEffect(() => {
     if (retrievedTaxonomies && retrievedTaxonomies[0]?.code === '100') {
       setIsNationalAreaVisible(true);
-      setOptionsSelected([{ code: '100', desc: 'ITALIA' }]);
+      setOptionsSelected(nationalArea);
       setGeographicTaxonomies(optionsSelected);
     } else if (retrievedTaxonomies && retrievedTaxonomies.length > 0) {
       setIsLocalAreaVisible(true);
@@ -78,6 +80,11 @@ export default function GeoTaxonomySection({
       setGeographicTaxonomies(optionsSelected);
     }
   }, [retrievedTaxonomies]);
+
+  // useEffect(() => {
+  //   // eslint-disable-next-line functional/immutable-data
+  //   localState.current = geotaxonomiesHistory;
+  // }, [isLocalAreaVisible, isLocalAreaVisible, geotaxonomiesHistory]);
 
   useEffect(() => {
     if (geotaxonomiesHistory && geotaxonomiesHistory.length > 0) {
@@ -88,7 +95,17 @@ export default function GeoTaxonomySection({
 
   useEffect(() => {
     setGeographicTaxonomies(optionsSelected);
+    setGeotaxonomiesHistory(optionsSelected);
+    setGeotaxonomiesHistoryState(optionsSelected);
+    setIsAddNewAutocompleteEnabled(true);
   }, [optionsSelected]);
+
+  useEffect(() => {
+    if (geotaxonomiesHistory[0]?.code === '100') {
+      setIsLocalAreaVisible(false);
+      setIsNationalAreaVisible(true);
+    }
+  }, []);
 
   const handleRemoveClick = (index: number) => {
     const list = [...optionsSelected];
@@ -97,6 +114,7 @@ export default function GeoTaxonomySection({
     setOptionsSelected(list);
     setIsAddNewAutocompleteEnabled(true);
     deleteError(index);
+    setGeotaxonomiesHistory(list);
   };
 
   const handleAddClick = () => {
@@ -110,6 +128,39 @@ export default function GeoTaxonomySection({
         desc: '',
       },
     ]);
+  };
+
+  const checkLocalArea = () => {
+    if (
+      retrievedTaxonomies &&
+      retrievedTaxonomies[0]?.code !== '100' &&
+      retrievedTaxonomies.length !== 0
+    ) {
+      if (
+        geotaxonomiesHistory &&
+        geotaxonomiesHistory.length > 0 &&
+        localState.current &&
+        localState.current?.length > 0
+      ) {
+        setOptionsSelected(localState.current);
+      } else {
+        setOptionsSelected(retrievedTaxonomies);
+      }
+    } else if (geotaxonomiesHistory && geotaxonomiesHistory.length > 0) {
+      if (
+        geotaxonomiesHistory[0]?.code === '100' &&
+        localState.current &&
+        localState.current?.length > 0
+      ) {
+        setOptionsSelected(localState.current);
+      } else if (geotaxonomiesHistory[0]?.code === '100' && !localState.current) {
+        setOptionsSelected([{ code: '', desc: '' }]);
+      } else {
+        setOptionsSelected(geotaxonomiesHistory);
+      }
+    } else {
+      setOptionsSelected([{ code: '', desc: '' }]);
+    }
   };
 
   const handleChange = (_event: any, value: any, index: number) => {
@@ -130,6 +181,8 @@ export default function GeoTaxonomySection({
     if (formik.values.geographicTaxonomies.length > 0) {
       setGeotaxonomiesHistory(formik.values.geographicTaxonomies);
       setGeotaxonomiesHistoryState(formik.values.geographicTaxonomies);
+      // eslint-disable-next-line functional/immutable-data
+      localState.current = formik.values.geographicTaxonomies;
     }
   };
 
@@ -144,7 +197,6 @@ export default function GeoTaxonomySection({
   };
 
   const handleSearch = async (query: string, index: number) => {
-    setIsLoading(true);
     const searchGeotaxonomy = await fetchWithLogs(
       {
         endpoint: 'ONBOARDING_GET_GEOTAXONOMY',
@@ -183,7 +235,6 @@ export default function GeoTaxonomySection({
     } else if ((searchGeotaxonomy as AxiosError).response?.status === 404) {
       setOptions([]);
     }
-    setIsLoading(false);
   };
 
   return (
@@ -217,7 +268,8 @@ export default function GeoTaxonomySection({
             onChange={() => {
               setIsNationalAreaVisible(true);
               setIsLocalAreaVisible(false);
-              setGeographicTaxonomies([{ code: '100', desc: 'ITALIA' }]);
+              setGeographicTaxonomies(nationalArea);
+              setOptionsSelected(nationalArea);
             }}
             sx={{ mr: 3, ml: 1 }}
           />
@@ -232,17 +284,7 @@ export default function GeoTaxonomySection({
               setIsNationalAreaVisible(false);
               setIsLocalAreaVisible(true);
               setGeographicTaxonomies(optionsSelected);
-              if (
-                retrievedTaxonomies &&
-                retrievedTaxonomies[0]?.code !== '100' &&
-                retrievedTaxonomies.length !== 0
-              ) {
-                setOptionsSelected(retrievedTaxonomies);
-              } else if (geotaxonomiesHistory && geotaxonomiesHistory.length > 0) {
-                setOptionsSelected(geotaxonomiesHistory);
-              } else {
-                setOptionsSelected([{ code: '', desc: '' }]);
-              }
+              checkLocalArea();
             }}
           />
         </Box>
