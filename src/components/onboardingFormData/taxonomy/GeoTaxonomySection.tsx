@@ -50,11 +50,11 @@ export default function GeoTaxonomySection({
   const [error, setError] = useState<any>({});
 
   const localState = useRef<Array<GeographicTaxonomy>>();
-
   const [geotaxonomiesHistory, setGeotaxonomiesHistory, setGeotaxonomiesHistoryState] =
     useHistoryState<Array<GeographicTaxonomy>>('geotaxonomies', []);
 
   const { setRequiredLogin } = useContext(UserContext);
+  console.log('xx history ', geotaxonomiesHistory);
 
   const emptyField = !optionsSelected.find((o) => o?.desc === '');
   const deleteError = (index: number) => {
@@ -131,6 +131,7 @@ export default function GeoTaxonomySection({
   };
 
   const checkLocalArea = () => {
+    console.log('xx geotaxonomiesHistory', geotaxonomiesHistory);
     if (
       retrievedTaxonomies &&
       retrievedTaxonomies[0]?.code !== '100' &&
@@ -270,8 +271,6 @@ export default function GeoTaxonomySection({
               setIsLocalAreaVisible(false);
               setGeographicTaxonomies(nationalArea);
               setOptionsSelected(nationalArea);
-              // eslint-disable-next-line functional/immutable-data
-              localState.current = formik.values.geographicTaxonomies;
             }}
             sx={{ mr: 3, ml: 1 }}
           />
