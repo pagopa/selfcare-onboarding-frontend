@@ -114,6 +114,8 @@ export default function GeoTaxonomySection({
     setIsAddNewAutocompleteEnabled(true);
     deleteError(index);
     setGeotaxonomiesHistory(list);
+    // eslint-disable-next-line functional/immutable-data
+    localState.current = list;
   };
 
   const handleAddClick = () => {
