@@ -90,7 +90,8 @@ export default function StepOnboardingFormData({
   );
 
   const { t } = useTranslation();
-  const [stepHistoryState, setStepHistoryState, _setStepHistoryStateHistory] =
+
+  const [stepHistoryState, setStepHistoryState, setStepHistoryStateHistory] =
     useHistoryState<StepBillingDataHistoryState>('onboardingFormData', {
       externalInstitutionId,
       isTaxCodeEquals2PIVA:
@@ -112,7 +113,6 @@ export default function StepOnboardingFormData({
     const restOutcomeData = getFetchOutcome(onboardingData);
     if (restOutcomeData === 'success') {
       const result = (onboardingData as AxiosResponse).data;
-      console.log('result', result);
       if (result) {
         setPreviousGeotaxononomies(result);
       }
@@ -139,6 +139,7 @@ export default function StepOnboardingFormData({
 
   const saveHistoryState = () => {
     setStepHistoryState(stepHistoryState);
+    setStepHistoryStateHistory(stepHistoryState);
   };
 
   const onForwardAction = () => {
@@ -150,6 +151,9 @@ export default function StepOnboardingFormData({
         : formik.values.vatNumber,
     });
   };
+
+  const [_geotaxonomiesHistory, setGeotaxonomiesHistory, setGeotaxonomiesHistoryState] =
+    useHistoryState<Array<GeographicTaxonomy>>('geotaxonomies', []);
 
   const onBeforeForwardAction = () => {
     if (geotaxonomyVisible && previousGeotaxononomies && previousGeotaxononomies.length > 0) {
@@ -212,6 +216,8 @@ export default function StepOnboardingFormData({
     saveHistoryState();
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     back!();
+    setGeotaxonomiesHistory([]);
+    setGeotaxonomiesHistoryState([]);
   };
   // eslint-disable-next-line sonarjs/cognitive-complexity
   const validate = (values: Partial<OnboardingFormData>) =>
@@ -397,6 +403,7 @@ export default function StepOnboardingFormData({
                 formik.setFieldValue('geographicTaxonomies', geographicTaxonomies)
               }
               premiumFlow={premiumFlow}
+              formik={formik}
             />
           </Grid>
         ) : (
