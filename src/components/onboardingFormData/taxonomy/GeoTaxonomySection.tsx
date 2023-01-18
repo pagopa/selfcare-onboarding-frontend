@@ -54,7 +54,6 @@ export default function GeoTaxonomySection({
     useHistoryState<Array<GeographicTaxonomy>>('geotaxonomies', []);
 
   const { setRequiredLogin } = useContext(UserContext);
-  console.log('xx history ', geotaxonomiesHistory);
 
   const emptyField = !optionsSelected.find((o) => o?.desc === '');
   const deleteError = (index: number) => {
@@ -131,7 +130,6 @@ export default function GeoTaxonomySection({
   };
 
   const checkLocalArea = () => {
-    console.log('xx geotaxonomiesHistory', geotaxonomiesHistory);
     if (
       retrievedTaxonomies &&
       retrievedTaxonomies[0]?.code !== '100' &&
