@@ -152,6 +152,9 @@ export default function StepOnboardingFormData({
     });
   };
 
+  const [_geotaxonomiesHistory, setGeotaxonomiesHistory, setGeotaxonomiesHistoryState] =
+    useHistoryState<Array<GeographicTaxonomy>>('geotaxonomies', []);
+
   const onBeforeForwardAction = () => {
     if (geotaxonomyVisible && previousGeotaxononomies && previousGeotaxononomies.length > 0) {
       const changedNational2Local =
@@ -213,6 +216,8 @@ export default function StepOnboardingFormData({
     saveHistoryState();
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     back!();
+    setGeotaxonomiesHistory([]);
+    setGeotaxonomiesHistoryState([]);
   };
   // eslint-disable-next-line sonarjs/cognitive-complexity
   const validate = (values: Partial<OnboardingFormData>) =>
