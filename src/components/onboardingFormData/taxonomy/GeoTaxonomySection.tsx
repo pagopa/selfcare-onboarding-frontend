@@ -270,6 +270,8 @@ export default function GeoTaxonomySection({
               setIsLocalAreaVisible(false);
               setGeographicTaxonomies(nationalArea);
               setOptionsSelected(nationalArea);
+              // eslint-disable-next-line functional/immutable-data
+              localState.current = formik.values.geographicTaxonomies;
             }}
             sx={{ mr: 3, ml: 1 }}
           />
