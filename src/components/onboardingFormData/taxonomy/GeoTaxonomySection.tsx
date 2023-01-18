@@ -78,18 +78,18 @@ export default function GeoTaxonomySection({
       setOptionsSelected(retrievedTaxonomies);
       setIsAddNewAutocompleteEnabled(true);
       setGeographicTaxonomies(optionsSelected);
+    } else if (geotaxonomiesHistory[0]?.code === '100') {
+      setIsLocalAreaVisible(false);
     }
   }, [retrievedTaxonomies]);
-
-  // useEffect(() => {
-  //   // eslint-disable-next-line functional/immutable-data
-  //   localState.current = geotaxonomiesHistory;
-  // }, [isLocalAreaVisible, isLocalAreaVisible, geotaxonomiesHistory]);
 
   useEffect(() => {
     if (geotaxonomiesHistory && geotaxonomiesHistory.length > 0) {
       setOptionsSelected(geotaxonomiesHistory);
       setIsLocalAreaVisible(true);
+      if (geotaxonomiesHistory[0]?.code === '100') {
+        setIsLocalAreaVisible(false);
+      }
     }
   }, [retrievedTaxonomies]);
 
