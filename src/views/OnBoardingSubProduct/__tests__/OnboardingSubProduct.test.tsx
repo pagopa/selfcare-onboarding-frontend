@@ -499,8 +499,8 @@ const verifySubmit = async () => {
           institutionType: 'GSP',
           pricingPlan: 'C1',
           origin: 'IPA',
-          // geographicTaxonomies: [{ code: '100', desc: 'ITALIA' }],
-          geographicTaxonomies: [{ code: '058091', desc: 'Firenze - Comune' }],
+          // TODO: remove comment if REACT_APP_ENABLE_GEOTAXONOMY is true -- geographicTaxonomies: [{ code: '100', desc: 'ITALIA' }],
+          geographicTaxonomies: [],
         },
       },
       expect.any(Function)
