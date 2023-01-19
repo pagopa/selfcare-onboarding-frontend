@@ -124,9 +124,11 @@ function SubProductStepSubmit({
           institutionType,
           pricingPlan,
           origin,
-          geographicTaxonomies: billingData?.geographicTaxonomies?.map((gt) =>
-            onboardedInstitutionInfo2geographicTaxonomy(gt)
-          ),
+          geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY
+            ? billingData.geographicTaxonomies?.map((gt) =>
+                onboardedInstitutionInfo2geographicTaxonomy(gt)
+              )
+            : [],
         },
       },
       () => setRequiredLogin(true)

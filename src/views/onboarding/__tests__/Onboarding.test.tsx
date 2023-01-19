@@ -392,7 +392,7 @@ const fillUserBillingDataForm = async (
     target: { value: 'recipientCode' },
   });
 
-  // await waitFor(() => fireEvent.click(document.getElementById('national_geographicTaxonomies')));
+  // TODO: remove comment if REACT_APP_ENABLE_GEOTAXONOMY is true -- await waitFor(() => fireEvent.click(document.getElementById('national_geographicTaxonomies')));
 };
 
 const fillUserForm = async (
@@ -705,8 +705,9 @@ const verifySubmit = async () => {
             },
           ],
           pricingPlan: 'FA',
-          // geographicTaxonomies: [{ code: '100', desc: 'ITALIA' }],
-          geographicTaxonomies: [{ code: '058091', desc: 'Firenze - Comune' }],
+          geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY
+            ? [{ code: '100', desc: 'ITALIA' }]
+            : [],
         },
         method: 'POST',
       },
