@@ -27,6 +27,7 @@ import { GeographicTaxonomy } from '../../model/GeographicTaxonomies';
 import { fetchWithLogs } from '../../lib/api-utils';
 import { UserContext } from '../../lib/context';
 import { getFetchOutcome } from '../../lib/error-utils';
+import { ENV } from '../../utils/env';
 
 const mailPECRegexp = new RegExp('^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$');
 const fiscalAndVatCodeRegexp = new RegExp(
@@ -75,8 +76,8 @@ export default function StepOnboardingFormData({
 }: Props) {
   const requiredError = 'Required';
 
-  // TODO: remove when will be real data retrieved - it show/hide geotaxonomy section
-  const geotaxonomyVisible = true;
+  // // TODO: remove when will be real data retrieved - it show/hide geotaxonomy section
+  // const ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY = false;
 
   const premiumFlow = !!subProductId;
   const isPSP = institutionType === 'PSP';
@@ -156,7 +157,11 @@ export default function StepOnboardingFormData({
     useHistoryState<Array<GeographicTaxonomy>>('geotaxonomies', []);
 
   const onBeforeForwardAction = () => {
-    if (geotaxonomyVisible && previousGeotaxononomies && previousGeotaxononomies.length > 0) {
+    if (
+      ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY &&
+      previousGeotaxononomies &&
+      previousGeotaxononomies.length > 0
+    ) {
       const changedNational2Local =
         previousGeotaxononomies.some((rv) => rv.code === '100') &&
         !formik.values.geographicTaxonomies.some((gv) => gv.code === '100');
@@ -291,7 +296,7 @@ export default function StepOnboardingFormData({
             : undefined,
         recipientCode: !values.recipientCode ? requiredError : undefined,
         geographicTaxonomies:
-          geotaxonomyVisible &&
+          ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY &&
           (!values.geographicTaxonomies ||
             values.geographicTaxonomies.length === 0 ||
             values.geographicTaxonomies.some(
@@ -395,7 +400,7 @@ export default function StepOnboardingFormData({
           premiumFlow={premiumFlow}
         />
         {/* DATI RELATIVI ALLA TASSONOMIA */}
-        {geotaxonomyVisible ? (
+        {ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY ? (
           <Grid item xs={12}>
             <GeoTaxonomySection
               retrievedTaxonomies={previousGeotaxononomies}

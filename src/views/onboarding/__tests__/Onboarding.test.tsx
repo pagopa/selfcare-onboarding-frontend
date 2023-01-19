@@ -392,7 +392,7 @@ const fillUserBillingDataForm = async (
     target: { value: 'recipientCode' },
   });
 
-  await waitFor(() => fireEvent.click(document.getElementById('national_geographicTaxonomies')));
+  // await waitFor(() => fireEvent.click(document.getElementById('national_geographicTaxonomies')));
 };
 
 const fillUserForm = async (
@@ -705,7 +705,8 @@ const verifySubmit = async () => {
             },
           ],
           pricingPlan: 'FA',
-          geographicTaxonomies: [{ code: '100', desc: 'ITALIA' }],
+          // geographicTaxonomies: [{ code: '100', desc: 'ITALIA' }],
+          geographicTaxonomies: [{ code: '058091', desc: 'Firenze - Comune' }],
         },
         method: 'POST',
       },

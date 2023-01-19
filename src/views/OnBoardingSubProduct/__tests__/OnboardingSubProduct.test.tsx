@@ -395,7 +395,7 @@ const fillUserBillingDataForm = async (
   fireEvent.change(document.getElementById(recipientCode), {
     target: { value: 'AM23EIX' },
   });
-  fireEvent.click(document.getElementById('national_geographicTaxonomies'));
+  // fireEvent.click(document.getElementById('national_geographicTaxonomies'));
 };
 
 const fillUserForm = async (
@@ -499,7 +499,8 @@ const verifySubmit = async () => {
           institutionType: 'GSP',
           pricingPlan: 'C1',
           origin: 'IPA',
-          geographicTaxonomies: [{ code: '100', desc: 'ITALIA' }],
+          // geographicTaxonomies: [{ code: '100', desc: 'ITALIA' }],
+          geographicTaxonomies: [{ code: '058091', desc: 'Firenze - Comune' }],
         },
       },
       expect.any(Function)
