@@ -46,8 +46,10 @@ export default function PersonalAndBillingDataSection({
 
   const isFromIPA = origin === 'IPA';
   const isPSP = institutionType === 'PSP';
+  // const isInformationCompany =
+  //   institutionType === 'GSP' || institutionType === 'PT' || institutionType === 'SCP';
   const isPA = institutionType === 'PA';
-  const isDisabled = premiumFlow || (isFromIPA && isPA && !isPSP);
+  const isDisabled = premiumFlow || (isFromIPA && !isPA && !isPSP);
   const requiredError = 'Required';
 
   const baseNumericFieldProps = (
