@@ -28,14 +28,12 @@ import { useHistoryState } from '../../useHistoryState';
 type Props = {
   retrievedTaxonomies: Array<GeographicTaxonomy>;
   setGeographicTaxonomies: React.Dispatch<React.SetStateAction<Array<GeographicTaxonomy>>>;
-  premiumFlow: boolean;
   formik: any;
 };
 
 export default function GeoTaxonomySection({
   retrievedTaxonomies,
   setGeographicTaxonomies,
-  premiumFlow,
   formik,
 }: Props) {
   const { t } = useTranslation();
@@ -261,7 +259,6 @@ export default function GeoTaxonomySection({
       <RadioGroup name="geographicTaxonomy">
         <Box display="flex">
           <FormControlLabel
-            disabled={premiumFlow}
             checked={isNationalAreaVisible}
             value={'national'}
             control={<Radio disableRipple={true} id={'national_geographicTaxonomies'} />}
@@ -276,7 +273,6 @@ export default function GeoTaxonomySection({
           />
           <FormControlLabel
             id={'geographicTaxonomies'}
-            disabled={premiumFlow}
             checked={isLocalAreaVisible}
             value={'local'}
             control={<Radio disableRipple={true} />}
@@ -298,7 +294,6 @@ export default function GeoTaxonomySection({
                 {i !== 0 && (
                   <Box display="flex" alignItems={'center'}>
                     <ButtonNaked
-                      disabled={premiumFlow}
                       component="button"
                       onClick={() => handleRemoveClick(i)}
                       startIcon={<RemoveCircleOutlineOutlined />}
@@ -310,7 +305,6 @@ export default function GeoTaxonomySection({
                 )}
                 <Box width="100%">
                   <Autocomplete
-                    disabled={premiumFlow}
                     freeSolo
                     onOpen={() => setOptions([])}
                     disablePortal
@@ -343,7 +337,7 @@ export default function GeoTaxonomySection({
               {optionsSelected.length - 1 === i && (
                 <Box mt={2}>
                   <ButtonNaked
-                    disabled={!isAddNewAutocompleteEnabled || premiumFlow}
+                    disabled={!isAddNewAutocompleteEnabled}
                     component="button"
                     onClick={handleAddClick}
                     startIcon={<AddOutlined />}
