@@ -395,7 +395,7 @@ const fillUserBillingDataForm = async (
   fireEvent.change(document.getElementById(recipientCode), {
     target: { value: 'AM23EIX' },
   });
-  // fireEvent.click(document.getElementById('national_geographicTaxonomies'));
+  // TODO: remove comment if REACT_APP_ENABLE_GEOTAXONOMY is true -- fireEvent.click(document.getElementById('national_geographicTaxonomies'));
 };
 
 const fillUserForm = async (
@@ -499,8 +499,9 @@ const verifySubmit = async () => {
           institutionType: 'GSP',
           pricingPlan: 'C1',
           origin: 'IPA',
-          // TODO: remove comment if REACT_APP_ENABLE_GEOTAXONOMY is true -- geographicTaxonomies: [{ code: '100', desc: 'ITALIA' }],
-          geographicTaxonomies: [],
+          geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY
+            ? [{ code: '100', desc: 'ITALIA' }]
+            : [],
         },
       },
       expect.any(Function)
