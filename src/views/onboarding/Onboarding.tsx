@@ -30,7 +30,10 @@ import { HeaderContext, UserContext } from '../../lib/context';
 import { billingData2billingDataRequest } from '../../model/BillingData';
 import { pspData2pspDataRequest } from '../../model/PspData';
 import NoProductPage from '../NoProductPage';
-import { onboardedInstitutionInfo2geographicTaxonomy } from '../../model/GeographicTaxonomies';
+import {
+  GeographicTaxonomy,
+  onboardedInstitutionInfo2geographicTaxonomy,
+} from '../../model/GeographicTaxonomies';
 import { OnboardingFormData } from '../../model/OnboardingFormData';
 import StepOnboardingData from '../../components/steps/StepOnboardingData';
 import StepOnboardingFormData from '../../components/steps/StepOnboardingFormData';
@@ -188,7 +191,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
       taxCode: party.taxCode,
       vatNumber: '',
       zipCode: party.zipCode,
-      geographicTaxonomies: onboardingFormData ? onboardingFormData.geographicTaxonomies : [],
+      geographicTaxonomies: onboardingFormData?.geographicTaxonomies as Array<GeographicTaxonomy>,
     });
     forwardWithData(newFormData);
     trackEvent('ONBOARDING_PARTY_SELECTION', {
@@ -358,9 +361,11 @@ function OnboardingComponent({ productId }: { productId: string }) {
               ? pspData2pspDataRequest(onboardingFormData as OnboardingFormData)
               : undefined,
           institutionType,
-          geographicTaxonomies: onboardingFormData?.geographicTaxonomies?.map((gt) =>
-            onboardedInstitutionInfo2geographicTaxonomy(gt)
-          ),
+          geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY
+            ? onboardingFormData?.geographicTaxonomies?.map((gt) =>
+                onboardedInstitutionInfo2geographicTaxonomy(gt)
+              )
+            : [],
           origin,
           users: users.map((u) => ({
             ...u,
