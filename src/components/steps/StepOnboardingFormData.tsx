@@ -76,9 +76,6 @@ export default function StepOnboardingFormData({
 }: Props) {
   const requiredError = 'Required';
 
-  // // TODO: remove when will be real data retrieved - it show/hide geotaxonomy section
-  // const ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY = false;
-
   const premiumFlow = !!subProductId;
   const isPSP = institutionType === 'PSP';
 
@@ -407,7 +404,6 @@ export default function StepOnboardingFormData({
               setGeographicTaxonomies={(geographicTaxonomies) =>
                 formik.setFieldValue('geographicTaxonomies', geographicTaxonomies)
               }
-              premiumFlow={premiumFlow}
               formik={formik}
             />
           </Grid>
