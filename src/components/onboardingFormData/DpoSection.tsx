@@ -1,15 +1,8 @@
-import { styled } from '@mui/system';
-import { Grid, TextField, Typography, useTheme, Paper } from '@mui/material';
+import { Grid, Typography, useTheme, Paper } from '@mui/material';
 import { useTranslation } from 'react-i18next';
-import { StepperStepComponentProps } from '../../../types';
+import { CustomTextField } from '../steps/StepOnboardingFormData';
 
-const CustomTextField = styled(TextField)({
-  '.MuiInputLabel-asterisk': {
-    display: 'none',
-  },
-});
-
-type Props = StepperStepComponentProps & {
+type Props = {
   baseTextFieldProps: any;
 };
 export default function DpoSection({ baseTextFieldProps }: Props) {
@@ -19,30 +12,40 @@ export default function DpoSection({ baseTextFieldProps }: Props) {
   return (
     <>
       {/* DATI DEL DPO */}
-      <Grid container item justifyContent="center" mt={6} mb={4}>
-        <Grid item xs={12}>
-          <Typography align="center" sx={{ fontWeight: 'fontWeightMedium', fontSize: '24px' }}>
-            {t('stepBillingData.dpoTitle')}
-          </Typography>
+      <Paper elevation={8} sx={{ borderRadius: theme.spacing(2), width: '100%', p: 4 }}>
+        <Grid container item pb={3}>
+          <Grid item xs={12}>
+            <Typography variant="caption" sx={{ fontWeight: 'fontWeightBold' }}>
+              {t('onboardingFormData.dpoDataSection.dpoTitle')}
+            </Typography>
+          </Grid>
         </Grid>
-      </Grid>
-      <Paper elevation={8} sx={{ borderRadius: theme.spacing(2), p: 1 }}>
-        <Grid item container spacing={3} p={3}>
+        <Grid item container spacing={3}>
           <Grid item xs={12}>
             <CustomTextField
-              {...baseTextFieldProps('dpoAddress', t('stepBillingData.dpoAddress'), 400, 18)}
+              {...baseTextFieldProps(
+                'dpoAddress',
+                t('onboardingFormData.dpoDataSection.dpoAddress'),
+                400,
+                18
+              )}
             />
           </Grid>
           <Grid item xs={12}>
             <CustomTextField
-              {...baseTextFieldProps('dpoPecAddress', t('stepBillingData.dpoPecAddress'), 400, 18)}
+              {...baseTextFieldProps(
+                'dpoPecAddress',
+                t('onboardingFormData.dpoDataSection.dpoPecAddress'),
+                400,
+                18
+              )}
             />
           </Grid>
           <Grid item xs={12}>
             <CustomTextField
               {...baseTextFieldProps(
                 'dopEmailAddress',
-                t('stepBillingData.dopEmailAddress'),
+                t('onboardingFormData.dpoDataSection.dopEmailAddress'),
                 400,
                 18
               )}

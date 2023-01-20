@@ -142,6 +142,7 @@ function OnBoardingSubProduct() {
       taxCode: party.taxCode,
       vatNumber: '',
       recipientCode: party.origin === 'IPA' ? party.originId : '',
+      geographicTaxonomies: [],
     });
     const event = isUserParty
       ? 'ONBOARDING_PREMIUM_ASSOCIATED_PARTY_SELECTION'
@@ -262,6 +263,7 @@ function OnBoardingSubProduct() {
             taxCode: '',
             vatNumber: '',
             recipientCode: '',
+            geographicTaxonomies: [],
           },
           institutionType: institutionType as InstitutionType,
           origin,

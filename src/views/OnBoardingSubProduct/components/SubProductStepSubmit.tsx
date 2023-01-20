@@ -20,6 +20,7 @@ import { billingData2billingDataRequest } from '../../../model/BillingData';
 import { pspData2pspDataRequest } from '../../../model/PspData';
 import { OnboardingFormData } from '../../../model/OnboardingFormData';
 import { ENV } from '../../../utils/env';
+import { onboardedInstitutionInfo2geographicTaxonomy } from '../../../model/GeographicTaxonomies';
 
 type Props = StepperStepComponentProps & {
   requestId: string;
@@ -123,7 +124,11 @@ function SubProductStepSubmit({
           institutionType,
           pricingPlan,
           origin,
-          geographicTaxonomies: [],
+          geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY
+            ? billingData.geographicTaxonomies?.map((gt) =>
+                onboardedInstitutionInfo2geographicTaxonomy(gt)
+              )
+            : [],
         },
       },
       () => setRequiredLogin(true)

@@ -30,6 +30,10 @@ import { HeaderContext, UserContext } from '../../lib/context';
 import { billingData2billingDataRequest } from '../../model/BillingData';
 import { pspData2pspDataRequest } from '../../model/PspData';
 import NoProductPage from '../NoProductPage';
+import {
+  GeographicTaxonomy,
+  onboardedInstitutionInfo2geographicTaxonomy,
+} from '../../model/GeographicTaxonomies';
 import { OnboardingFormData } from '../../model/OnboardingFormData';
 import StepOnboardingData from '../../components/steps/StepOnboardingData';
 import StepOnboardingFormData from '../../components/steps/StepOnboardingFormData';
@@ -89,7 +93,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
   const history = useHistory();
   const [openExitModal, setOpenExitModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>();
-  const [billingData, setBillingData] = useState<OnboardingFormData>();
+  const [onboardingFormData, setOnboardingFormData] = useState<OnboardingFormData>();
   const [institutionType, setInstitutionType] = useState<InstitutionType>();
   const [origin, setOrigin] = useState<string>();
   const [pricingPlan, setPricingPlan] = useState<string>();
@@ -179,7 +183,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
   const forwardWithDataAndInstitution = (newFormData: Partial<FormData>, party: Party) => {
     setExternalInstitutionId(party.externalId);
     setOrigin(party.origin);
-    setBillingData({
+    setOnboardingFormData({
       businessName: party.description,
       digitalAddress: party.digitalAddress,
       recipientCode: '',
@@ -187,6 +191,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
       taxCode: party.taxCode,
       vatNumber: '',
       zipCode: party.zipCode,
+      geographicTaxonomies: onboardingFormData?.geographicTaxonomies as Array<GeographicTaxonomy>,
     });
     forwardWithData(newFormData);
     trackEvent('ONBOARDING_PARTY_SELECTION', {
@@ -198,23 +203,24 @@ function OnboardingComponent({ productId }: { productId: string }) {
     setInstitutionType(institutionType);
   };
 
-  const forwardWithBillingData = (newBillingData: OnboardingFormData) => {
+  const forwardWithBillingData = (newOnboardingFormData: OnboardingFormData) => {
     trackEvent('ONBOARDING_BILLING_DATA', {
       request_id: requestIdRef.current,
       party_id: externalInstitutionId,
       product_id: productId,
+      geographic_taxonomies: newOnboardingFormData.geographicTaxonomies,
     });
 
-    setBillingData(newBillingData);
+    setOnboardingFormData(newOnboardingFormData);
     if (institutionType === 'PSP') {
       // TODO: fix when party registry proxy will return externalInstitutionId
-      setExternalInstitutionId(newBillingData.taxCode);
+      setExternalInstitutionId(newOnboardingFormData.taxCode);
 
       const partyVerifyOnboarded = async () => {
         const onboardingStatus = await fetchWithLogs(
           {
             endpoint: 'VERIFY_ONBOARDING',
-            endpointParams: { externalInstitutionId: newBillingData.taxCode, productId },
+            endpointParams: { externalInstitutionId: newOnboardingFormData.taxCode, productId },
           },
           { method: 'HEAD' },
           () => setRequiredLogin(true)
@@ -349,12 +355,17 @@ function OnboardingComponent({ productId }: { productId: string }) {
       {
         method: 'POST',
         data: {
-          billingData: billingData2billingDataRequest(billingData as OnboardingFormData),
+          billingData: billingData2billingDataRequest(onboardingFormData as OnboardingFormData),
           pspData:
             institutionType === 'PSP'
-              ? pspData2pspDataRequest(billingData as OnboardingFormData)
+              ? pspData2pspDataRequest(onboardingFormData as OnboardingFormData)
               : undefined,
           institutionType,
+          geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY
+            ? onboardingFormData?.geographicTaxonomies?.map((gt) =>
+                onboardedInstitutionInfo2geographicTaxonomy(gt)
+              )
+            : [],
           origin,
           users: users.map((u) => ({
             ...u,
@@ -362,7 +373,6 @@ function OnboardingComponent({ productId }: { productId: string }) {
             email: u.email.toLowerCase(),
           })),
           pricingPlan,
-          geographicTaxonomies: [],
         },
       },
       () => setRequiredLogin(true)
@@ -405,12 +415,12 @@ function OnboardingComponent({ productId }: { productId: string }) {
 
   const forwardWithOnboardingData = (
     _manager: OnboardingFormData,
-    billingData?: OnboardingFormData,
+    onboardingFormData?: OnboardingFormData,
     institutionType?: InstitutionType,
     _id?: string
   ) => {
-    if (billingData) {
-      setBillingData(billingData);
+    if (onboardingFormData) {
+      setOnboardingFormData(onboardingFormData);
     }
     setInstitutionType(institutionType);
     forward();
@@ -429,7 +439,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
     forward();
     if (newInstitutionType === 'PSP') {
       if (newInstitutionType !== institutionType) {
-        setBillingData({
+        setOnboardingFormData({
           businessName: '',
           registeredOffice: '',
           zipCode: '',
@@ -437,9 +447,10 @@ function OnboardingComponent({ productId }: { productId: string }) {
           taxCode: '',
           vatNumber: '',
           recipientCode: '',
+          geographicTaxonomies: [],
         });
       } else {
-        setBillingData(billingData);
+        setOnboardingFormData(onboardingFormData);
       }
       setActiveStep(4);
     }
@@ -511,7 +522,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
           selectedParty,
           selectedProduct,
           externalInstitutionId,
-          initialFormData: billingData ?? {
+          initialFormData: onboardingFormData ?? {
             businessName: '',
             registeredOffice: '',
             zipCode: '',
@@ -519,6 +530,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
             taxCode: '',
             vatNumber: '',
             recipientCode: '',
+            geographicTaxonomies: [],
           },
           origin,
           institutionType: institutionType as InstitutionType,

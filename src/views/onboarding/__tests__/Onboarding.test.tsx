@@ -5,9 +5,9 @@ import { HeaderContext, UserContext } from '../../../lib/context';
 import { ENV } from '../../../utils/env';
 import Onboarding from '../Onboarding';
 import '../../../locale';
+import { GeographicTaxonomy } from '../../../model/GeographicTaxonomies';
 
 jest.mock('../../../lib/api-utils');
-
 jest.setTimeout(30000);
 
 let fetchWithLogsSpy: jest.SpyInstance;
@@ -292,7 +292,6 @@ const executeStepBillingData = async () => {
     'AAAAAA44D55F456K',
     'recipientCode'
   );
-
   fireEvent.click(confirmButtonEnabled);
   await waitFor(() => screen.getByText(step2Title));
 };
@@ -392,6 +391,8 @@ const fillUserBillingDataForm = async (
   fireEvent.change(document.getElementById(recipientCode), {
     target: { value: 'recipientCode' },
   });
+
+  // TODO: remove comment if REACT_APP_ENABLE_GEOTAXONOMY is true -- await waitFor(() => fireEvent.click(document.getElementById('national_geographicTaxonomies')));
 };
 
 const fillUserForm = async (
@@ -704,7 +705,9 @@ const verifySubmit = async () => {
             },
           ],
           pricingPlan: 'FA',
-          geographicTaxonomies: [],
+          geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY
+            ? [{ code: '100', desc: 'ITALIA' }]
+            : [],
         },
         method: 'POST',
       },

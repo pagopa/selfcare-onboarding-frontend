@@ -7,6 +7,7 @@ import OnBoardingSubProduct from '../OnBoardingSubProduct';
 import '../../../locale';
 import { Route, Router, Switch } from 'react-router';
 import { createMemoryHistory } from 'history';
+import { GeographicTaxonomy } from '../../../model/GeographicTaxonomies';
 
 jest.mock('../../../lib/api-utils');
 
@@ -282,7 +283,8 @@ const executeStepBillingData = async () => {
     'taxCode',
     'vatNumber',
     'zipCode',
-    'recipientCode'
+    'recipientCode',
+    'geographicTaxonomies'
   );
 
   const confirmButtonEnabled = screen.getByRole('button', { name: 'Continua' });
@@ -393,6 +395,7 @@ const fillUserBillingDataForm = async (
   fireEvent.change(document.getElementById(recipientCode), {
     target: { value: 'AM23EIX' },
   });
+  // TODO: remove comment if REACT_APP_ENABLE_GEOTAXONOMY is true -- fireEvent.click(document.getElementById('national_geographicTaxonomies'));
 };
 
 const fillUserForm = async (
@@ -496,7 +499,9 @@ const verifySubmit = async () => {
           institutionType: 'GSP',
           pricingPlan: 'C1',
           origin: 'IPA',
-          geographicTaxonomies: [],
+          geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY
+            ? [{ code: '100', desc: 'ITALIA' }]
+            : [],
         },
       },
       expect.any(Function)
