@@ -218,13 +218,11 @@ export default function GeoTaxonomySection({
 
       data = data.map((value: OnboardingInstitutionInfo) => ({ ...value, label: value.desc }));
 
-      if (optionsSelected?.find((os) => os?.desc)) {
-        const dataFiltered = data.filter(
-          (data: any) => !optionsSelected.find((os) => os?.code === data?.code)
-        );
-        setOptions(dataFiltered);
-      }
-      const matchesWithTyped = data.filter((o: GeographicTaxonomy) =>
+      const dataFiltered = data.filter(
+        (data: any) => !optionsSelected.find((os) => os?.code === data?.code)
+      );
+
+      const matchesWithTyped = dataFiltered.filter((o: GeographicTaxonomy) =>
         o.desc.toLocaleLowerCase().includes(query.toLocaleLowerCase())
       );
       setOptions(matchesWithTyped);
