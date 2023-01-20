@@ -96,7 +96,11 @@ export default function GeoTaxonomySection({
     setGeographicTaxonomies(optionsSelected);
     setGeotaxonomiesHistory(optionsSelected);
     setGeotaxonomiesHistoryState(optionsSelected);
-    setIsAddNewAutocompleteEnabled(true);
+    if (optionsSelected[0]?.desc !== '' && optionsSelected.length > 0 && emptyField) {
+      setIsAddNewAutocompleteEnabled(true);
+    } else {
+      setIsAddNewAutocompleteEnabled(false);
+    }
   }, [optionsSelected]);
 
   useEffect(() => {
