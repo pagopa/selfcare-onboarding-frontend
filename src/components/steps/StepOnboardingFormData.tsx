@@ -160,11 +160,11 @@ export default function StepOnboardingFormData({
       previousGeotaxononomies.length > 0
     ) {
       const changedNational2Local =
-        previousGeotaxononomies.some((rv) => rv.code === '100') &&
-        !formik.values.geographicTaxonomies.some((gv) => gv.code === '100');
+        previousGeotaxononomies.some((rv) => rv?.code === '100') &&
+        !formik.values.geographicTaxonomies.some((gv) => gv?.code === '100');
       const changedToLocal2National =
-        !previousGeotaxononomies.some((rv) => rv.code === '100') &&
-        formik.values.geographicTaxonomies.some((gv) => gv.code === '100');
+        !previousGeotaxononomies.some((rv) => rv?.code === '100') &&
+        formik.values.geographicTaxonomies.some((gv) => gv?.code === '100');
 
       if (changedNational2Local || changedToLocal2National) {
         setOpenModifyModal(true);
@@ -180,7 +180,7 @@ export default function StepOnboardingFormData({
           array1 = formik.values.geographicTaxonomies;
         }
         const arrayDifferences = array1.filter(
-          (element) => !array2.some((elementSelected) => element.code === elementSelected.code)
+          (element) => !array2.some((elementSelected) => element?.code === elementSelected?.code)
         );
         if (deltaLength === 0) {
           if (arrayDifferences.length > 0) {
