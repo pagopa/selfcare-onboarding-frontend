@@ -98,7 +98,7 @@ export function AsyncAutocompleteV2({
         borderRadius: theme.spacing(2),
       }}
     >
-      <Grid container>
+      <Grid container mx={selected ? 4 : undefined}>
         <Grid
           item
           xs={12}
