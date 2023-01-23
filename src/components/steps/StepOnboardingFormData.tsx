@@ -179,8 +179,8 @@ export default function StepOnboardingFormData({
           array2 = previousGeotaxononomies;
           array1 = formik.values.geographicTaxonomies;
         }
-        const arrayDifferences = array1.filter(
-          (element) => !array2.some((elementSelected) => element?.code === elementSelected?.code)
+        const arrayDifferences = array1.filter((elementarray1) =>
+          array2.some((elementArray2) => elementarray1?.code !== elementArray2?.code)
         );
         if (deltaLength === 0) {
           if (arrayDifferences.length > 0) {
@@ -197,6 +197,9 @@ export default function StepOnboardingFormData({
             // add element
             setOpenAddModal(true);
           }
+        } else if (deltaLength > 0) {
+          // modify element
+          setOpenModifyModal(true);
         } else {
           onForwardAction();
         }
