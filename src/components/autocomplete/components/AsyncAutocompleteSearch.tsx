@@ -44,11 +44,14 @@ export default function AsyncAutocompleteSearch({
 }: Props) {
   const setSelectedHistory = useHistoryState<IPACatalogParty | null>('selected_step1', null)[2];
 
+  const capitalizeFirstLetter = (string: string) =>
+    string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+
   return (
     <CustomTextField
       id="Parties"
       sx={{ width: '80%' }}
-      value={selected ? selected.description : input}
+      value={selected ? selected.description : capitalizeFirstLetter(input)}
       onChange={handleChange}
       label={!selected ? 'Cerca ente' : ''}
       variant={!selected ? 'outlined' : 'standard'}
@@ -61,7 +64,6 @@ export default function AsyncAutocompleteSearch({
           color: theme.palette.text.primary,
           textAlign: 'start',
           paddingLeft: '8px',
-          textTransform: 'capitalize',
         },
       }}
       InputProps={{

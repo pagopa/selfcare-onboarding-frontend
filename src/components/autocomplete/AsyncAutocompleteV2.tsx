@@ -123,7 +123,13 @@ export function AsyncAutocompleteV2({
             handleChange={handleChange}
           />
         </Grid>
-        <Grid item xs={12} display="flex" justifyContent="center">
+        <Grid
+          item
+          xs={12}
+          display="flex"
+          justifyContent="center"
+          sx={{ height: showElement && options.length > 0 ? '232px' : undefined }}
+        >
           {showElement && options.length > 0 ? (
             <AsyncAutocompleteResults
               setSelected={setSelected}

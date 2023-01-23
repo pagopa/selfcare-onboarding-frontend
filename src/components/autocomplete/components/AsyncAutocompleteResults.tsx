@@ -40,6 +40,8 @@ export default function AsyncAutocompleteResults({
   getOptionLabel,
   getOptionKey,
 }: Props) {
+  const capitalizeFirstLetter = (string: string) =>
+    string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
   return (
     <CustomBox my={2} {...options} width="80%" maxHeight="200px" overflow="auto">
       {!isLoading &&
@@ -56,7 +58,7 @@ export default function AsyncAutocompleteResults({
             }}
           >
             <PartyAccountItemButton
-              partyName={getOptionLabel(option)}
+              partyName={capitalizeFirstLetter(getOptionLabel(option))}
               image={' '}
               action={() => {
                 setSelected(option);
