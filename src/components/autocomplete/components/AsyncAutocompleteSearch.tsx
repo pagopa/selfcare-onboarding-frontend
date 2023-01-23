@@ -47,7 +47,7 @@ export default function AsyncAutocompleteSearch({
   return (
     <CustomTextField
       id="Parties"
-      sx={{ width: '80%' }}
+      sx={{ width: '100%', mx: 4 }}
       value={selected ? selected.description : input}
       onChange={handleChange}
       label={!selected ? 'Cerca ente' : ''}

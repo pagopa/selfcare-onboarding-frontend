@@ -140,11 +140,21 @@ export function AsyncAutocompleteV2({
               getOptionKey={getOptionKey}
             />
           ) : input.length >= 1 && input.length < 3 ? (
-            <Typography pb={3}> {t('asyncAutocomplete.lessThen3CharacterLabel')}</Typography>
+            <Box display="flex" sx={{ jusifyContent: 'start' }} width="100%" mx={4}>
+              <Typography pb={3} sx={{ fontSize: '18px', fontWeight: 'fontWeightBold' }}>
+                {t('asyncAutocomplete.lessThen3CharacterLabel')}
+              </Typography>
+            </Box>
           ) : (
             input.length >= 3 &&
             options.length === 0 &&
-            !selected && <Typography py={3}> {t('asyncAutocomplete.noResultsLabel')} </Typography>
+            !selected && (
+              <Box display="flex" sx={{ jusifyContent: 'start' }} width="100%" mx={4}>
+                <Typography py={3} sx={{ fontSize: '18px', fontWeight: 'fontWeightBold' }}>
+                  {t('asyncAutocomplete.noResultsLabel')}
+                </Typography>
+              </Box>
+            )
           )}
         </Grid>
       </Grid>
