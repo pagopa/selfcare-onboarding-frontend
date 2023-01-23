@@ -3,6 +3,7 @@ import React from 'react';
 import { useTranslation, TFunction } from 'react-i18next';
 import { verifyNameMatchWithTaxCode } from '@pagopa/selfcare-common-frontend/utils/verifyNameMatchWithTaxCode';
 import { verifySurnameMatchWithTaxCode } from '@pagopa/selfcare-common-frontend/utils/verifySurnameMatchWithTaxCode';
+import { verifyChecksumMatchWithTaxCode } from '@pagopa/selfcare-common-frontend/utils/verifyChecksumMatchWithTaxCode';
 import { UserOnCreate, PartyRole } from '../../types';
 import { UsersError, UsersObject } from './steps/StepAddManager';
 
@@ -97,7 +98,9 @@ function validateNoMandatory(
     : [];
   return fields
     .map(({ id, regexp, unique, caseSensitive }) =>
-      regexp && user[id] && !regexp.test(user[id] as string)
+      regexp &&
+      user[id] &&
+      (!regexp.test(user[id] as string) || verifyChecksumMatchWithTaxCode(user.taxCode))
         ? `${id}-regexp`
         : unique && usersArray.findIndex((u) => stringEquals(u[id], user[id], caseSensitive)) > -1
         ? `${id}-unique`
