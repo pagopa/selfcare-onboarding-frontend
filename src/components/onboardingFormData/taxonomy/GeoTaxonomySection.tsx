@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import debounce from 'lodash/debounce';
 import { Autocomplete } from '@mui/material';
@@ -23,32 +23,37 @@ import { UserContext } from '../../../lib/context';
 import { ENV } from '../../../utils/env';
 import { OnboardingInstitutionInfo } from '../../../model/OnboardingInstitutionInfo';
 import { GeographicTaxonomy } from '../../../model/GeographicTaxonomies';
+import { useHistoryState } from '../../useHistoryState';
 
 type Props = {
   retrievedTaxonomies: Array<GeographicTaxonomy>;
   setGeographicTaxonomies: React.Dispatch<React.SetStateAction<Array<GeographicTaxonomy>>>;
-  premiumFlow: boolean;
+  formik: any;
 };
 
 export default function GeoTaxonomySection({
   retrievedTaxonomies,
   setGeographicTaxonomies,
-  premiumFlow,
+  formik,
 }: Props) {
   const { t } = useTranslation();
+  const nationalArea = [{ code: '100', desc: 'ITALIA' }];
+
   const [isNationalAreaVisible, setIsNationalAreaVisible] = useState<boolean>(false);
   const [isLocalAreaVisible, setIsLocalAreaVisible] = useState<boolean>(false);
-  const [_isLoading, setIsLoading] = useState(false);
-  const { setRequiredLogin } = useContext(UserContext);
   const [optionsSelected, setOptionsSelected] = useState<Array<GeographicTaxonomy>>([]);
   const [options, setOptions] = useState<Array<OnboardingInstitutionInfo>>([]);
   const [isAddNewAutocompleteEnabled, setIsAddNewAutocompleteEnabled] = useState<boolean>(false);
   const [input, setInput] = useState<string>('');
-
   const [error, setError] = useState<any>({});
 
-  const emptyField = !optionsSelected.find((o) => o?.desc === '');
+  const localState = useRef<Array<GeographicTaxonomy>>();
+  const [geotaxonomiesHistory, setGeotaxonomiesHistory, setGeotaxonomiesHistoryState] =
+    useHistoryState<Array<GeographicTaxonomy>>('geotaxonomies', []);
 
+  const { setRequiredLogin } = useContext(UserContext);
+
+  const emptyField = !optionsSelected.find((o) => o?.desc === '');
   const deleteError = (index: number) => {
     const newError = { ...error };
     // eslint-disable-next-line functional/immutable-data
@@ -56,30 +61,52 @@ export default function GeoTaxonomySection({
     setError(newError);
   };
 
-  const findError = (index: number, data: any) => {
-    if (data?.length === 0) {
-      setError((currError: any) => ({ ...currError, [index]: true }));
-    } else {
-      deleteError(index);
-    }
+  const findError = (index: number) => {
+    setError((currError: any) => ({ ...currError, [index]: true }));
   };
 
   useEffect(() => {
     if (retrievedTaxonomies && retrievedTaxonomies[0]?.code === '100') {
       setIsNationalAreaVisible(true);
-      setOptionsSelected([{ code: '100', desc: 'ITALIA' }]);
+      setOptionsSelected(nationalArea);
       setGeographicTaxonomies(optionsSelected);
     } else if (retrievedTaxonomies && retrievedTaxonomies.length > 0) {
       setIsLocalAreaVisible(true);
       setOptionsSelected(retrievedTaxonomies);
       setIsAddNewAutocompleteEnabled(true);
       setGeographicTaxonomies(optionsSelected);
+    } else if (geotaxonomiesHistory[0]?.code === '100') {
+      setIsLocalAreaVisible(false);
     }
-  }, []);
+  }, [retrievedTaxonomies]);
+
+  useEffect(() => {
+    if (geotaxonomiesHistory && geotaxonomiesHistory.length > 0) {
+      setOptionsSelected(geotaxonomiesHistory);
+      setIsLocalAreaVisible(true);
+      if (geotaxonomiesHistory[0]?.code === '100') {
+        setIsLocalAreaVisible(false);
+      }
+    }
+  }, [retrievedTaxonomies]);
 
   useEffect(() => {
     setGeographicTaxonomies(optionsSelected);
+    setGeotaxonomiesHistory(optionsSelected);
+    setGeotaxonomiesHistoryState(optionsSelected);
+    if (optionsSelected[0]?.desc !== '' && optionsSelected.length > 0 && emptyField) {
+      setIsAddNewAutocompleteEnabled(true);
+    } else {
+      setIsAddNewAutocompleteEnabled(false);
+    }
   }, [optionsSelected]);
+
+  useEffect(() => {
+    if (geotaxonomiesHistory[0]?.code === '100') {
+      setIsLocalAreaVisible(false);
+      setIsNationalAreaVisible(true);
+    }
+  }, []);
 
   const handleRemoveClick = (index: number) => {
     const list = [...optionsSelected];
@@ -88,6 +115,9 @@ export default function GeoTaxonomySection({
     setOptionsSelected(list);
     setIsAddNewAutocompleteEnabled(true);
     deleteError(index);
+    setGeotaxonomiesHistory(list);
+    // eslint-disable-next-line functional/immutable-data
+    localState.current = list;
   };
 
   const handleAddClick = () => {
@@ -101,6 +131,39 @@ export default function GeoTaxonomySection({
         desc: '',
       },
     ]);
+  };
+
+  const checkLocalArea = () => {
+    if (
+      retrievedTaxonomies &&
+      retrievedTaxonomies[0]?.code !== '100' &&
+      retrievedTaxonomies.length !== 0
+    ) {
+      if (
+        geotaxonomiesHistory &&
+        geotaxonomiesHistory.length > 0 &&
+        localState.current &&
+        localState.current?.length > 0
+      ) {
+        setOptionsSelected(localState.current);
+      } else {
+        setOptionsSelected(retrievedTaxonomies);
+      }
+    } else if (geotaxonomiesHistory && geotaxonomiesHistory.length > 0) {
+      if (
+        geotaxonomiesHistory[0]?.code === '100' &&
+        localState.current &&
+        localState.current?.length > 0
+      ) {
+        setOptionsSelected(localState.current);
+      } else if (geotaxonomiesHistory[0]?.code === '100' && !localState.current) {
+        setOptionsSelected([{ code: '', desc: '' }]);
+      } else {
+        setOptionsSelected(geotaxonomiesHistory);
+      }
+    } else {
+      setOptionsSelected([{ code: '', desc: '' }]);
+    }
   };
 
   const handleChange = (_event: any, value: any, index: number) => {
@@ -118,6 +181,12 @@ export default function GeoTaxonomySection({
     if (!value) {
       deleteError(index);
     }
+    if (formik.values.geographicTaxonomies.length > 0) {
+      setGeotaxonomiesHistory(formik.values.geographicTaxonomies);
+      setGeotaxonomiesHistoryState(formik.values.geographicTaxonomies);
+      // eslint-disable-next-line functional/immutable-data
+      localState.current = formik.values.geographicTaxonomies;
+    }
   };
 
   const handleSearchInput = (event: any, index: number) => {
@@ -131,7 +200,6 @@ export default function GeoTaxonomySection({
   };
 
   const handleSearch = async (query: string, index: number) => {
-    setIsLoading(true);
     const searchGeotaxonomy = await fetchWithLogs(
       {
         endpoint: 'ONBOARDING_GET_GEOTAXONOMY',
@@ -150,20 +218,24 @@ export default function GeoTaxonomySection({
 
       data = data.map((value: OnboardingInstitutionInfo) => ({ ...value, label: value.desc }));
 
-      if (optionsSelected?.find((os) => os?.desc)) {
-        const dataFiltered = data.filter(
-          (data: any) => !optionsSelected.find((os) => os?.code === data?.code)
-        );
-        findError(index, dataFiltered);
-        setOptions(dataFiltered);
+      const dataFiltered = data.filter(
+        (data: any) => !optionsSelected.find((os) => os?.code === data?.code)
+      );
+
+      const matchesWithTyped = dataFiltered.filter((o: GeographicTaxonomy) =>
+        o.desc.toLocaleLowerCase().includes(query.toLocaleLowerCase())
+      );
+      setOptions(matchesWithTyped);
+
+      if (matchesWithTyped.length > 0) {
+        deleteError(index);
       } else {
-        setOptions(data);
-        findError(index, data);
+        findError(index);
+        setIsAddNewAutocompleteEnabled(false);
       }
     } else if ((searchGeotaxonomy as AxiosError).response?.status === 404) {
       setOptions([]);
     }
-    setIsLoading(false);
   };
 
   return (
@@ -189,21 +261,20 @@ export default function GeoTaxonomySection({
       <RadioGroup name="geographicTaxonomy">
         <Box display="flex">
           <FormControlLabel
-            disabled={premiumFlow}
             checked={isNationalAreaVisible}
-            value={'nationl'}
-            control={<Radio disableRipple={true} />}
+            value={'national'}
+            control={<Radio disableRipple={true} id={'national_geographicTaxonomies'} />}
             label={t('onboardingFormData.taxonomySection.nationalLabel')}
             onChange={() => {
               setIsNationalAreaVisible(true);
               setIsLocalAreaVisible(false);
-              setGeographicTaxonomies([{ code: '100', desc: 'ITALIA' }]);
+              setGeographicTaxonomies(nationalArea);
+              setOptionsSelected(nationalArea);
             }}
             sx={{ mr: 3, ml: 1 }}
           />
           <FormControlLabel
             id={'geographicTaxonomies'}
-            disabled={premiumFlow}
             checked={isLocalAreaVisible}
             value={'local'}
             control={<Radio disableRipple={true} />}
@@ -212,15 +283,7 @@ export default function GeoTaxonomySection({
               setIsNationalAreaVisible(false);
               setIsLocalAreaVisible(true);
               setGeographicTaxonomies(optionsSelected);
-              if (
-                retrievedTaxonomies &&
-                retrievedTaxonomies[0]?.code !== '100' &&
-                retrievedTaxonomies.length !== 0
-              ) {
-                setOptionsSelected(retrievedTaxonomies);
-              } else {
-                setOptionsSelected([{ code: '', desc: '' }]);
-              }
+              checkLocalArea();
             }}
           />
         </Box>
@@ -233,7 +296,6 @@ export default function GeoTaxonomySection({
                 {i !== 0 && (
                   <Box display="flex" alignItems={'center'}>
                     <ButtonNaked
-                      disabled={premiumFlow}
                       component="button"
                       onClick={() => handleRemoveClick(i)}
                       startIcon={<RemoveCircleOutlineOutlined />}
@@ -245,16 +307,14 @@ export default function GeoTaxonomySection({
                 )}
                 <Box width="100%">
                   <Autocomplete
-                    disabled={premiumFlow}
                     freeSolo
                     onOpen={() => setOptions([])}
                     disablePortal
                     options={input.length >= 3 ? options : []}
                     sx={{ width: '100%' }}
                     onChange={(event: any, value: any) => handleChange(event, value, i)}
-                    value={val?.desc}
+                    value={geotaxonomiesHistory[i]?.desc ?? val?.desc}
                     renderOption={(props, option) => (
-                      // TODO: customize layout
                       <span {...props}>{option.desc ? option.desc : ''}</span>
                     )}
                     renderInput={(params) => (
@@ -279,7 +339,7 @@ export default function GeoTaxonomySection({
               {optionsSelected.length - 1 === i && (
                 <Box mt={2}>
                   <ButtonNaked
-                    disabled={!isAddNewAutocompleteEnabled || premiumFlow}
+                    disabled={!isAddNewAutocompleteEnabled}
                     component="button"
                     onClick={handleAddClick}
                     startIcon={<AddOutlined />}

@@ -5,7 +5,8 @@ import { Box } from '@mui/system';
 import { Grid, Typography, TextField } from '@mui/material';
 import { useFormik } from 'formik';
 import { useTranslation } from 'react-i18next';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
+import { AxiosResponse } from 'axios';
 import { styled } from '@mui/system';
 import {
   InstitutionType,
@@ -22,7 +23,11 @@ import PersonalAndBillingDataSection from '../onboardingFormData/PersonalAndBill
 import DpoSection from '../onboardingFormData/DpoSection';
 import GeoTaxonomySection from '../onboardingFormData/taxonomy/GeoTaxonomySection';
 import GeoTaxSessionModal from '../onboardingFormData/taxonomy/GeoTaxSessionModal';
-// import { GeographicTaxonomy } from '../../model/GeographicTaxonomies';
+import { GeographicTaxonomy } from '../../model/GeographicTaxonomies';
+import { fetchWithLogs } from '../../lib/api-utils';
+import { UserContext } from '../../lib/context';
+import { getFetchOutcome } from '../../lib/error-utils';
+import { ENV } from '../../utils/env';
 
 const mailPECRegexp = new RegExp('^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$');
 const fiscalAndVatCodeRegexp = new RegExp(
@@ -71,34 +76,46 @@ export default function StepOnboardingFormData({
 }: Props) {
   const requiredError = 'Required';
 
-  // TODO: remove when will be real data retrieved - it show/hide geotaxonomy section
-  const geotaxonomyVisible = true;
   const premiumFlow = !!subProductId;
   const isPSP = institutionType === 'PSP';
 
-  // CASE 1: New API retrieve some geographicsArea for the party
-  const mockRetrievedGeographicTaxonomies = [
-    { code: '058091', desc: 'Roma - Comune' },
-    // { code: '015146', desc: 'Milano - Comune' },
-  ];
-
-  // CASE 2: New API NOT found some geographicsArea for the party
-  // const mockRetrievedGeographicTaxonomies: Array<GeographicTaxonomy> = [];
-
-  // CASE 3: New API found National area selected
-  // const mockRetrievedGeographicTaxonomies = [{ code: '100', desc: 'ITALIA' }];
-
   const [openModifyModal, setOpenModifyModal] = useState<boolean>(false);
   const [openAddModal, setOpenAddModal] = useState<boolean>(false);
+  const { setRequiredLogin } = useContext(UserContext);
+
+  const [previousGeotaxononomies, setPreviousGeotaxononomies] = useState<Array<GeographicTaxonomy>>(
+    []
+  );
 
   const { t } = useTranslation();
 
-  const [stepHistoryState, setStepHistoryState, _setStepHistoryStateHistory] =
+  const [stepHistoryState, setStepHistoryState, setStepHistoryStateHistory] =
     useHistoryState<StepBillingDataHistoryState>('onboardingFormData', {
       externalInstitutionId,
       isTaxCodeEquals2PIVA:
         !!initialFormData.vatNumber && initialFormData.taxCode === initialFormData.vatNumber,
     });
+
+  const getPreviousGeotaxononomies = async () => {
+    const onboardingData = await fetchWithLogs(
+      {
+        endpoint: 'ONBOARDING_GET_PREVIOUS_GEOTAXONOMIES',
+        endpointParams: {
+          externalInstitutionId,
+        },
+      },
+      { method: 'GET' },
+      () => setRequiredLogin(true)
+    );
+
+    const restOutcomeData = getFetchOutcome(onboardingData);
+    if (restOutcomeData === 'success') {
+      const result = (onboardingData as AxiosResponse).data;
+      if (result) {
+        setPreviousGeotaxononomies(result);
+      }
+    }
+  };
 
   useEffect(() => {
     if (externalInstitutionId !== stepHistoryState.externalInstitutionId) {
@@ -111,11 +128,16 @@ export default function StepOnboardingFormData({
   }, []);
 
   useEffect(() => {
+    void getPreviousGeotaxononomies();
+  }, []);
+
+  useEffect(() => {
     void formik.validateForm();
   }, [stepHistoryState.isTaxCodeEquals2PIVA]);
 
   const saveHistoryState = () => {
     setStepHistoryState(stepHistoryState);
+    setStepHistoryStateHistory(stepHistoryState);
   };
 
   const onForwardAction = () => {
@@ -128,30 +150,37 @@ export default function StepOnboardingFormData({
     });
   };
 
+  const [_geotaxonomiesHistory, setGeotaxonomiesHistory, setGeotaxonomiesHistoryState] =
+    useHistoryState<Array<GeographicTaxonomy>>('geotaxonomies', []);
+
   const onBeforeForwardAction = () => {
-    if (geotaxonomyVisible && mockRetrievedGeographicTaxonomies.length > 0) {
+    if (
+      ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY &&
+      previousGeotaxononomies &&
+      previousGeotaxononomies.length > 0
+    ) {
       const changedNational2Local =
-        mockRetrievedGeographicTaxonomies.some((rv) => rv.code === '100') &&
-        !formik.values.geographicTaxonomies.some((gv) => gv.code === '100');
+        previousGeotaxononomies.some((rv) => rv?.code === '100') &&
+        !formik.values.geographicTaxonomies.some((gv) => gv?.code === '100');
       const changedToLocal2National =
-        !mockRetrievedGeographicTaxonomies.some((rv) => rv.code === '100') &&
-        formik.values.geographicTaxonomies.some((gv) => gv.code === '100');
+        !previousGeotaxononomies.some((rv) => rv?.code === '100') &&
+        formik.values.geographicTaxonomies.some((gv) => gv?.code === '100');
 
       if (changedNational2Local || changedToLocal2National) {
         setOpenModifyModal(true);
       } else {
         const deltaLength =
-          mockRetrievedGeographicTaxonomies.length - formik.values.geographicTaxonomies.length;
+          previousGeotaxononomies.length - formik.values.geographicTaxonomies.length;
         // eslint-disable-next-line functional/no-let
-        let array1 = mockRetrievedGeographicTaxonomies;
+        let array1 = previousGeotaxononomies;
         // eslint-disable-next-line functional/no-let
         let array2 = formik.values.geographicTaxonomies;
         if (deltaLength < 0) {
-          array2 = mockRetrievedGeographicTaxonomies;
+          array2 = previousGeotaxononomies;
           array1 = formik.values.geographicTaxonomies;
         }
-        const arrayDifferences = array1.filter(
-          (element) => !array2.some((elementSelected) => element.code === elementSelected.code)
+        const arrayDifferences = array1.filter((elementarray1) =>
+          array2.some((elementArray2) => elementarray1?.code !== elementArray2?.code)
         );
         if (deltaLength === 0) {
           if (arrayDifferences.length > 0) {
@@ -168,6 +197,9 @@ export default function StepOnboardingFormData({
             // add element
             setOpenAddModal(true);
           }
+        } else if (deltaLength > 0) {
+          // modify element
+          setOpenModifyModal(true);
         } else {
           onForwardAction();
         }
@@ -189,6 +221,8 @@ export default function StepOnboardingFormData({
     saveHistoryState();
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     back!();
+    setGeotaxonomiesHistory([]);
+    setGeotaxonomiesHistoryState([]);
   };
   // eslint-disable-next-line sonarjs/cognitive-complexity
   const validate = (values: Partial<OnboardingFormData>) =>
@@ -262,7 +296,7 @@ export default function StepOnboardingFormData({
             : undefined,
         recipientCode: !values.recipientCode ? requiredError : undefined,
         geographicTaxonomies:
-          geotaxonomyVisible &&
+          ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY &&
           (!values.geographicTaxonomies ||
             values.geographicTaxonomies.length === 0 ||
             values.geographicTaxonomies.some(
@@ -364,16 +398,17 @@ export default function StepOnboardingFormData({
           setStepHistoryState={setStepHistoryState}
           formik={formik}
           premiumFlow={premiumFlow}
+          // productId={productId}
         />
         {/* DATI RELATIVI ALLA TASSONOMIA */}
-        {geotaxonomyVisible ? (
+        {ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY ? (
           <Grid item xs={12}>
             <GeoTaxonomySection
-              retrievedTaxonomies={mockRetrievedGeographicTaxonomies}
+              retrievedTaxonomies={previousGeotaxononomies}
               setGeographicTaxonomies={(geographicTaxonomies) =>
                 formik.setFieldValue('geographicTaxonomies', geographicTaxonomies)
               }
-              premiumFlow={premiumFlow}
+              formik={formik}
             />
           </Grid>
         ) : (

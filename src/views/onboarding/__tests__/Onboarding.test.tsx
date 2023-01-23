@@ -8,7 +8,6 @@ import '../../../locale';
 import { GeographicTaxonomy } from '../../../model/GeographicTaxonomies';
 
 jest.mock('../../../lib/api-utils');
-
 jest.setTimeout(30000);
 
 let fetchWithLogsSpy: jest.SpyInstance;
@@ -92,7 +91,7 @@ const agencyError = 'AGENCY ERROR';
 
 test('test already onboarded', async () => {
   renderComponent();
-  await executeStepInstitutionType();
+  await executeStepInstitutionTypePA();
   await executeStep1(agencyOnboarded);
   await waitFor(() => screen.getByText("L'Ente che hai scelto ha già aderito"));
   await executeGoHome(false);
@@ -100,7 +99,7 @@ test('test already onboarded', async () => {
 
 test('test error retrieving onboarding info', async () => {
   renderComponent();
-  await executeStepInstitutionType();
+  await executeStepInstitutionTypePA();
   await executeStep1(agencyInfoError);
   await waitFor(() => screen.getByText('Spiacenti, qualcosa è andato storto.'));
   await executeGoHome(false);
@@ -114,7 +113,7 @@ test('test error productID', async () => {
 
 test('test complete', async () => {
   renderComponent();
-  await executeStepInstitutionType();
+  await executeStepInstitutionTypePA();
   await executeStep1(agencyX);
   await executeStepBillingData();
   await executeStep2();
@@ -125,7 +124,7 @@ test('test complete', async () => {
 
 test('test complete with error on submit', async () => {
   renderComponent();
-  await executeStepInstitutionType();
+  await executeStepInstitutionTypePA();
   await executeStep1(agencyError);
   await executeStepBillingData();
   await executeStep2();
@@ -135,7 +134,7 @@ test('test complete with error on submit', async () => {
 
 test('test exiting during flow with unload event', async () => {
   renderComponent();
-  await executeStepInstitutionType();
+  await executeStepInstitutionTypePA();
   await executeStep1(agencyX);
   const event = new Event('beforeunload');
   window.dispatchEvent(event);
@@ -148,7 +147,7 @@ test('test exiting during flow with unload event', async () => {
 
 test('test exiting during flow with logout', async () => {
   renderComponent();
-  await executeStepInstitutionType();
+  await executeStepInstitutionTypePA();
 
   await executeStep1(agencyX);
 
@@ -247,11 +246,11 @@ const executeStep1 = async (partyName: string) => {
   await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(3));
 };
 
-const executeStepInstitutionType = async () => {
-  console.log('Testing step Institution Type');
+const executeStepInstitutionTypePA = async () => {
+  console.log('Testing step Institution Type PA');
   await waitFor(() => screen.getByText(stepInstitutionType));
 
-  await fillInstitutionTypeCheckbox('pa', 'gsp', 'scp', 'pt');
+  await fillInstitutionTypeCheckbox('pa');
 
   const confirmButtonEnabled = screen.getByRole('button', { name: 'Continua' });
   expect(confirmButtonEnabled).toBeEnabled();
@@ -279,8 +278,7 @@ const executeStepBillingData = async () => {
     'zipCode',
     'taxCode',
     'vatNumber',
-    'recipientCode',
-    'geographicTaxonomies'
+    'recipientCode'
   );
 
   await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
@@ -359,10 +357,7 @@ const checkCertifiedUserValidation = async (prefix: string, confirmButton: HTMLE
 };
 
 const fillInstitutionTypeCheckbox = async (pa: string, gsp: string, scp: string, pt: string) => {
-  fireEvent.click(document.getElementById(pa));
-  fireEvent.click(document.getElementById(gsp));
-  fireEvent.click(document.getElementById(scp));
-  fireEvent.click(document.getElementById(pt));
+  fireEvent.click(document.getElementById('pa'));
 };
 
 const fillUserBillingDataForm = async (
@@ -372,8 +367,7 @@ const fillUserBillingDataForm = async (
   zipCode: string,
   taxCodeInput: string,
   vatNumber: string,
-  recipientCode: string,
-  geographicTaxonomies: GeographicTaxonomy
+  recipientCode: string
 ) => {
   fireEvent.change(document.getElementById(businessNameInput), {
     target: { value: 'businessNameInput' },
@@ -396,7 +390,8 @@ const fillUserBillingDataForm = async (
   fireEvent.change(document.getElementById(recipientCode), {
     target: { value: 'recipientCode' },
   });
-  fireEvent.click(document.getElementById(geographicTaxonomies));
+
+  // TODO: remove comment if REACT_APP_ENABLE_GEOTAXONOMY is true -- await waitFor(() => fireEvent.click(document.getElementById('national_geographicTaxonomies')));
 };
 
 const fillUserForm = async (
@@ -697,7 +692,9 @@ const verifySubmit = async () => {
             },
           ],
           pricingPlan: 'FA',
-          geographicTaxonomies: [{ code: '058091', desc: 'Roma - Comune' }],
+          geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY
+            ? [{ code: '100', desc: 'ITALIA' }]
+            : [],
         },
         method: 'POST',
       },

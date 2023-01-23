@@ -151,8 +151,8 @@ const mockPartyRegistry = {
 
 const mockedGeoTaxonomy = [
   {
-    code: '058091',
-    desc: 'Roma - Comune',
+    code: '100',
+    desc: 'ITALIA',
     region: '12',
     province: '058',
     provinceAbbreviation: 'RM',
@@ -162,42 +162,41 @@ const mockedGeoTaxonomy = [
     endDate: null,
     enable: true,
   },
-  {
-    code: '015146',
-    desc: 'Milano - Comune',
-    region: '03',
-    province: '015',
-    provinceAbbreviation: 'MI',
-    country: '100',
-    countryAbbreviation: 'IT',
-    startDate: '1861-03-18',
-    endDate: null,
-    enable: true,
-  },
-  {
-    code: '015456',
-    desc: 'Napoli - Comune',
-    region: '08',
-    province: '018',
-    provinceAbbreviation: 'NA',
-    country: '100',
-    countryAbbreviation: 'IT',
-    startDate: '1861-03-18',
-    endDate: null,
-    enable: true,
-  },
-  {
-    code: '015456',
-    desc: 'Milazzo - Comune',
-    region: '08',
-    province: '016',
-    provinceAbbreviation: 'GE',
-    country: '100',
-    countryAbbreviation: 'IT',
-    startDate: '1861-03-18',
-    endDate: null,
-    enable: true,
-  },
+  // {
+  //   code: '015146',
+  //   desc: 'Milano - Comune',
+  //   region: '03',
+  //   province: '015',
+  //   provinceAbbreviation: 'MI',
+  //   country: '100',
+  //   countryAbbreviation: 'IT',
+  //   startDate: '1861-03-18',
+  //   endDate: null,
+  //   enable: true
+  // }, {
+  //   code: "015456",
+  //   desc: "Napoli - Comune",
+  //   region: "08",
+  //   province: "018",
+  //   provinceAbbreviation: "NA",
+  //   country: "100",
+  //   countryAbbreviation: "IT",
+  //   startDate: "1861-03-18",
+  //   endDate: null,
+  //   enable: true
+  //   },
+  //   {
+  //     code: "015456",
+  //     desc: "Milazzo - Comune",
+  //     region: "08",
+  //     province: "016",
+  //     provinceAbbreviation: "GE",
+  //     country: "100",
+  //     countryAbbreviation: "IT",
+  //     startDate: "1861-03-18",
+  //     endDate: null,
+  //     enable: true
+  // }
 ];
 
 const mockedProduct = {
@@ -407,6 +406,12 @@ export async function mockFetch(
   }
 
   if (endpoint === 'ONBOARDING_GET_GEOTAXONOMY') {
+    return new Promise((resolve) =>
+      resolve({ data: mockedGeoTaxonomy, status: 200, statusText: '200' } as AxiosResponse)
+    );
+  }
+
+  if (endpoint === 'ONBOARDING_GET_PREVIOUS_GEOTAXONOMIES') {
     return new Promise((resolve) =>
       resolve({ data: mockedGeoTaxonomy, status: 200, statusText: '200' } as AxiosResponse)
     );

@@ -31,6 +31,7 @@ type Props = StepperStepComponentProps & {
   setStepHistoryState: React.Dispatch<React.SetStateAction<StepBillingDataHistoryState>>;
   formik: any;
   premiumFlow: boolean;
+  // productId: string;
 };
 
 export default function PersonalAndBillingDataSection({
@@ -46,8 +47,11 @@ export default function PersonalAndBillingDataSection({
 
   const isFromIPA = origin === 'IPA';
   const isPSP = institutionType === 'PSP';
+  // const isInformationCompany =
+  //   (institutionType === 'GSP' || institutionType === 'PT' || institutionType === 'SCP') &&
+  // productId === 'prod-io';
   const isPA = institutionType === 'PA';
-  const isDisabled = premiumFlow || (isFromIPA && isPA && !isPSP);
+  const isDisabled = premiumFlow || (isFromIPA && !isPA && !isPSP);
   const requiredError = 'Required';
 
   const baseNumericFieldProps = (
@@ -161,13 +165,13 @@ export default function PersonalAndBillingDataSection({
                   });
                 }}
               />
-              <Typography>
+              <Typography component={'span'}>
                 {t('onboardingFormData.billingDataSection.taxCodeEquals2PIVAdescription')}
               </Typography>
             </Box>
           </Grid>
           <Grid item xs={12}>
-            <Typography>
+            <Typography component={'span'}>
               <CustomTextField
                 {...baseTextFieldProps(
                   'vatNumber',
@@ -194,7 +198,7 @@ export default function PersonalAndBillingDataSection({
                     }
                     value={formik.values.vatNumberGroup}
                   />
-                  <Typography>
+                  <Typography component={'span'}>
                     {t('onboardingFormData.billingDataSection.vatNumberGroup')}
                   </Typography>
                 </Box>
@@ -261,6 +265,7 @@ export default function PersonalAndBillingDataSection({
               )}
             />
             <Typography
+              component={'span'}
               sx={{
                 fontSize: '12px!important',
                 fontWeight: 600,
