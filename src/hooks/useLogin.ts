@@ -20,7 +20,7 @@ export const useLogin = () => {
     if (MOCK_USER) {
       setUser({
         uid: '0',
-        taxCode: 'LGGLGD00A00A000A',
+        taxCode: 'LGGLGD80A01B354S',
         name: 'loggedName',
         surname: 'loggedSurname',
         email: 'loggedEmail@aa.aa',
@@ -35,7 +35,7 @@ export const useLogin = () => {
     if (isEmpty(sessionStorageUser)) {
       // Remove any partial data that might have remained, just for safety
       storageUserOps.delete();
-      const onSuccessEncoded= encodeURIComponent(location.pathname + location.search);
+      const onSuccessEncoded = encodeURIComponent(location.pathname + location.search);
       // Go to the login view
       window.location.assign(ENV.URL_FE.LOGIN + '?onSuccess=' + onSuccessEncoded);
       // This return is necessary
