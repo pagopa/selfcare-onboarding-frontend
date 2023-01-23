@@ -144,7 +144,7 @@ export function AsyncAutocompleteV2({
           ) : (
             input.length >= 3 &&
             options.length === 0 &&
-            !selected && <Typography pb={3}> {t('asyncAutocomplete.noResultsLabel')} </Typography>
+            !selected && <Typography py={3}> {t('asyncAutocomplete.noResultsLabel')} </Typography>
           )}
         </Grid>
       </Grid>
