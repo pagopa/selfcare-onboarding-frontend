@@ -200,6 +200,8 @@ export default function StepOnboardingFormData({
         } else if (deltaLength > 0) {
           // modify element
           setOpenModifyModal(true);
+        } else if (deltaLength < 0) {
+          setOpenModifyModal(true);
         } else {
           onForwardAction();
         }
