@@ -437,7 +437,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
     });
     setInstitutionType(newInstitutionType);
     forward();
-    if (newInstitutionType === 'PSP' || newInstitutionType !== 'PA') {
+    if (newInstitutionType === 'PSP') {
       if (newInstitutionType !== institutionType) {
         setOnboardingFormData({
           businessName: '',
@@ -542,7 +542,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
             } else if (fromDashboard && productAvoidStep) {
               setOnExitAction(() => () => history.goBack());
               setOpenExitModal(true);
-            } else if (institutionType === 'PSP' || institutionType !== 'PA') {
+            } else if (institutionType === 'PSP') {
               setActiveStep(0);
             } else {
               setActiveStep(1);

@@ -82,12 +82,11 @@ export const API = {
     URL: ENV.URL_API.PARTY_PROCESS + '/tokens/{{token}}/verify',
   },
   ONBOARDING_GET_GEOTAXONOMY: {
-    URL:ENV.URL_API.GEOTAXONOMY,
+    URL: ENV.URL_API.GEOTAXONOMY,
   },
   ONBOARDING_GET_PREVIOUS_GEOTAXONOMIES: {
     URL: ENV.URL_API.ONBOARDING + '/institutions/{{externalInstitutionId}}/geographicTaxonomy',
   },
-  
 };
 
 export const USER_ROLE_LABEL = {

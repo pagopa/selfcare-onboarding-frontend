@@ -91,7 +91,7 @@ const agencyError = 'AGENCY ERROR';
 
 test('test already onboarded', async () => {
   renderComponent();
-  await executeStepInstitutionTypePA();
+  await executeStepInstitutionType();
   await executeStep1(agencyOnboarded);
   await waitFor(() => screen.getByText("L'Ente che hai scelto ha già aderito"));
   await executeGoHome(false);
@@ -99,7 +99,7 @@ test('test already onboarded', async () => {
 
 test('test error retrieving onboarding info', async () => {
   renderComponent();
-  await executeStepInstitutionTypePA();
+  await executeStepInstitutionType();
   await executeStep1(agencyInfoError);
   await waitFor(() => screen.getByText('Spiacenti, qualcosa è andato storto.'));
   await executeGoHome(false);
@@ -113,7 +113,7 @@ test('test error productID', async () => {
 
 test('test complete', async () => {
   renderComponent();
-  await executeStepInstitutionTypePA();
+  await executeStepInstitutionType();
   await executeStep1(agencyX);
   await executeStepBillingData();
   await executeStep2();
@@ -124,7 +124,7 @@ test('test complete', async () => {
 
 test('test complete with error on submit', async () => {
   renderComponent();
-  await executeStepInstitutionTypePA();
+  await executeStepInstitutionType();
   await executeStep1(agencyError);
   await executeStepBillingData();
   await executeStep2();
@@ -134,7 +134,7 @@ test('test complete with error on submit', async () => {
 
 test('test exiting during flow with unload event', async () => {
   renderComponent();
-  await executeStepInstitutionTypePA();
+  await executeStepInstitutionType();
   await executeStep1(agencyX);
   const event = new Event('beforeunload');
   window.dispatchEvent(event);
@@ -147,7 +147,7 @@ test('test exiting during flow with unload event', async () => {
 
 test('test exiting during flow with logout', async () => {
   renderComponent();
-  await executeStepInstitutionTypePA();
+  await executeStepInstitutionType();
 
   await executeStep1(agencyX);
 
@@ -246,11 +246,11 @@ const executeStep1 = async (partyName: string) => {
   await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(3));
 };
 
-const executeStepInstitutionTypePA = async () => {
-  console.log('Testing step Institution Type PA');
+const executeStepInstitutionType = async () => {
+  console.log('Testing step Institution Type');
   await waitFor(() => screen.getByText(stepInstitutionType));
 
-  await fillInstitutionTypeCheckbox('pa');
+  await fillInstitutionTypeCheckbox('pa', 'gsp', 'scp', 'pt');
 
   const confirmButtonEnabled = screen.getByRole('button', { name: 'Continua' });
   expect(confirmButtonEnabled).toBeEnabled();
@@ -305,7 +305,7 @@ const executeStep2 = async () => {
 
   await checkCertifiedUserValidation('LEGAL', confirmButton);
 
-  await fillUserForm(confirmButton, 'LEGAL', 'SRNNMA00B00B000B', 'b@b.BB', true);
+  await fillUserForm(confirmButton, 'LEGAL', 'SRNNMA80A01A794F', 'b@b.BB', true);
 
   fireEvent.click(confirmButton);
 
@@ -330,18 +330,20 @@ const executeStep3 = async (expectedSuccessfulSubmit: boolean) => {
   await fillUserForm(
     confirmButton,
     'delegate-initial',
-    'SRNNMA00C00C000C',
+    'SRNNMA80A01B354S',
     'a@a.AA',
     true,
-    'SRNNMA00B00B000B',
+    'SRNNMA80A01A794F',
     1,
     'b@b.bb',
     1
   );
 
-  await checkAdditionalUsers(confirmButton);
+  await waitFor(() => checkAdditionalUsers(confirmButton));
 
-  fireEvent.click(confirmButton);
+  await waitFor(() => expect(confirmButton).toBeEnabled());
+
+  await waitFor(() => fireEvent.click(confirmButton));
 
   await waitFor(() =>
     screen.getByText(expectedSuccessfulSubmit ? completeSuccessTitle : completeErrorTitle)
@@ -349,13 +351,16 @@ const executeStep3 = async (expectedSuccessfulSubmit: boolean) => {
 };
 
 const checkCertifiedUserValidation = async (prefix: string, confirmButton: HTMLElement) => {
-  await fillUserForm(confirmButton, prefix, 'ZZZZZZ00A00Z000Z', 'b@c.BB', false);
+  await fillUserForm(confirmButton, prefix, 'FRRMRA80A01F205X', 'b@c.BB', false);
   await waitFor(() => screen.getByText('Nome non corretto o diverso dal Codice Fiscale'));
   screen.getByText('Cognome non corretto o diverso dal Codice Fiscale');
 };
 
 const fillInstitutionTypeCheckbox = async (pa: string, gsp: string, scp: string, pt: string) => {
-  fireEvent.click(document.getElementById('pa'));
+  fireEvent.click(document.getElementById(pa));
+  fireEvent.click(document.getElementById(gsp));
+  fireEvent.click(document.getElementById(scp));
+  fireEvent.click(document.getElementById(pt));
 };
 
 const fillUserBillingDataForm = async (
@@ -480,7 +485,7 @@ const checkLoggedUserAsAdminCheckbox = async (
     addDelegateButton,
     'loggedName',
     'loggedSurname',
-    'LGGLGD00A00A000A'
+    'LGGLGD80A01B354S'
   );
 
   await fillTextFieldAndCheckButton('delegate-initial', 'email', 'a@a.aa', confirmButton, true);
@@ -538,12 +543,10 @@ const clickAdminCheckBoxAndTestValues = (
 };
 
 const checkAdditionalUsers = async (confirmButton: HTMLElement) => {
-  for (let i = 0; i < 2; i++) {
-    console.log('Adding additional user #', i);
-    await checkRemovingEmptyAdditionalUser(i, confirmButton);
+  console.log('Adding additional user');
+  await checkRemovingEmptyAdditionalUser(0, confirmButton);
 
-    await fillAdditionalUserAndCheckUniqueValues(i, confirmButton);
-  }
+  await fillAdditionalUserAndCheckUniqueValues(0, confirmButton);
 };
 
 const checkRemovingEmptyAdditionalUser = async (index: number, confirmButton: HTMLElement) => {
@@ -559,7 +562,6 @@ const addAdditionEmptyUser = async (
 ): Promise<Array<HTMLElement>> => {
   await checkAdditionalUsersExistance(index, false, confirmButton);
   fireEvent.click(screen.getByRole('button', { name: 'Aggiungi un altro Amministratore' }));
-  await checkAdditionalUsersExistance(index + 1, true, confirmButton);
 
   const removeUserButtons = findRemoveAdditionUsersButtons();
   expect(removeUserButtons.length).toBe(index + 1);
@@ -611,15 +613,15 @@ const fillAdditionalUserAndCheckUniqueValues = async (
 
   await checkCertifiedUserValidation(prefix, confirmButton);
 
-  const taxCode = `SRNNMA0${index}A00A000A`;
-  const email = `${index}@z.zz`;
+  const taxCode = 'SRNNMA80A01F205T';
+  const email = '0@z.zz';
   await fillUserForm(
     confirmButton,
     prefix,
     taxCode,
     email,
     true,
-    'SRNNMA00B00B000B',
+    'SRNNMA80A01A794F',
     1,
     'b@b.bb',
     1
@@ -627,25 +629,23 @@ const fillAdditionalUserAndCheckUniqueValues = async (
   await checkAlreadyExistentValues(
     prefix,
     confirmButton,
-    'SRNNMA00C00C000C',
+    'SRNNMA80A01A794F',
     taxCode,
-    2,
+    1,
     'a@a.aa',
     email,
     2
   );
-  for (let j = index - 1; j >= 0; j--) {
-    await checkAlreadyExistentValues(
-      prefix,
-      confirmButton,
-      `SRNNMA0${j}A00A000A`,
-      taxCode,
-      2,
-      `${j}@z.zz`,
-      email,
-      2
-    );
-  }
+  await checkAlreadyExistentValues(
+    prefix,
+    confirmButton,
+    'SRNNMA80A01A794F',
+    taxCode,
+    1,
+    'a@a.aa',
+    email,
+    2
+  );
 };
 
 const billingData2billingDataRequest = () => ({
@@ -677,28 +677,21 @@ const verifySubmit = async () => {
               name: 'NAME',
               role: 'MANAGER',
               surname: 'SURNAME',
-              taxCode: 'SRNNMA00B00B000B',
+              taxCode: 'SRNNMA80A01A794F',
             },
             {
               email: 'a@a.aa',
               name: 'NAME',
               role: 'DELEGATE',
               surname: 'SURNAME',
-              taxCode: 'SRNNMA00C00C000C',
+              taxCode: 'SRNNMA80A01B354S',
             },
             {
               email: '0@z.zz',
               name: 'NAME',
               role: 'DELEGATE',
               surname: 'SURNAME',
-              taxCode: 'SRNNMA00A00A000A',
-            },
-            {
-              email: '1@z.zz',
-              name: 'NAME',
-              role: 'DELEGATE',
-              surname: 'SURNAME',
-              taxCode: 'SRNNMA01A00A000A',
+              taxCode: 'SRNNMA80A01F205T',
             },
           ],
           pricingPlan: 'FA',

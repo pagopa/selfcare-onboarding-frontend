@@ -98,7 +98,7 @@ export function AsyncAutocompleteV2({
         borderRadius: theme.spacing(2),
       }}
     >
-      <Grid container>
+      <Grid container mx={selected ? 4 : undefined}>
         <Grid
           item
           xs={12}
@@ -123,7 +123,13 @@ export function AsyncAutocompleteV2({
             handleChange={handleChange}
           />
         </Grid>
-        <Grid item xs={12} display="flex" justifyContent="center">
+        <Grid
+          item
+          xs={12}
+          display="flex"
+          justifyContent="center"
+          sx={{ height: showElement && options.length > 0 ? '232px' : undefined }}
+        >
           {showElement && options.length > 0 ? (
             <AsyncAutocompleteResults
               setSelected={setSelected}
@@ -134,11 +140,21 @@ export function AsyncAutocompleteV2({
               getOptionKey={getOptionKey}
             />
           ) : input.length >= 1 && input.length < 3 ? (
-            <Typography pb={3}> {t('asyncAutocomplete.lessThen3CharacterLabel')}</Typography>
+            <Box display="flex" sx={{ jusifyContent: 'start' }} width="100%" mx={4}>
+              <Typography pb={3} sx={{ fontSize: '18px', fontWeight: 'fontWeightBold' }}>
+                {t('asyncAutocomplete.lessThen3CharacterLabel')}
+              </Typography>
+            </Box>
           ) : (
             input.length >= 3 &&
             options.length === 0 &&
-            !selected && <Typography pb={3}> {t('asyncAutocomplete.noResultsLabel')} </Typography>
+            !selected && (
+              <Box display="flex" sx={{ jusifyContent: 'start' }} width="100%" mx={4}>
+                <Typography py={3} sx={{ fontSize: '18px', fontWeight: 'fontWeightBold' }}>
+                  {t('asyncAutocomplete.noResultsLabel')}
+                </Typography>
+              </Box>
+            )
           )}
         </Grid>
       </Grid>

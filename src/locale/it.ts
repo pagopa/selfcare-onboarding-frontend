@@ -6,7 +6,7 @@ export default {
     cancelLabel: 'Esci',
   },
   asyncAutocomplete: {
-    noResultsLabel: 'No risultati',
+    noResultsLabel: 'Nessun risultato',
     lessThen3CharacterLabel: 'Digita almeno 3 caratteri',
   },
   confirmRegistrationStep0: {
