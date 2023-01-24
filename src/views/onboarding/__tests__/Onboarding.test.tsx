@@ -250,7 +250,7 @@ const executeStepInstitutionType = async () => {
   console.log('Testing step Institution Type');
   await waitFor(() => screen.getByText(stepInstitutionType));
 
-  await fillInstitutionTypeCheckbox('pa', 'gsp', 'scp', 'pt');
+  await fillInstitutionTypeCheckbox('pa');
 
   const confirmButtonEnabled = screen.getByRole('button', { name: 'Continua' });
   expect(confirmButtonEnabled).toBeEnabled();
@@ -358,9 +358,6 @@ const checkCertifiedUserValidation = async (prefix: string, confirmButton: HTMLE
 
 const fillInstitutionTypeCheckbox = async (pa: string, gsp: string, scp: string, pt: string) => {
   fireEvent.click(document.getElementById(pa));
-  fireEvent.click(document.getElementById(gsp));
-  fireEvent.click(document.getElementById(scp));
-  fireEvent.click(document.getElementById(pt));
 };
 
 const fillUserBillingDataForm = async (
@@ -669,7 +666,7 @@ const verifySubmit = async () => {
         data: {
           billingData: billingData2billingDataRequest(),
           pspData: undefined,
-          institutionType: 'GSP',
+          institutionType: 'PA',
           origin: 'IPA',
           users: [
             {
