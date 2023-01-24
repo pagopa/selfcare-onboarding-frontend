@@ -111,7 +111,7 @@ variables:
 
     react_app_one_trust_base_url: '$(DEV_REACT_APP_URL_CDN)/ot/test'
     react_app_analytics_enabled: '$(DEV_ANALYTICS_ENABLED)'
-    react_app_enable_geotaxonomy: 'false'
+    react_app_enable_geotaxonomy: 'true'
     react_app_analytics_mocked: '$(DEV_ANALYTICS_MOCKED)'
     react_app_mixpanel_token: '$(DEV_MIXPANEL_TOKEN)'
     react_app_onetrust_domain_id: '$(DEV_ONETRUST_DOMAIN_ID)'
