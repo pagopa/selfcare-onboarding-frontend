@@ -496,7 +496,7 @@ const verifySubmit = async () => {
           ],
           billingData: billingData2billingDataRequest(),
           pspData: undefined,
-          institutionType: 'GSP',
+          institutionType: 'PA',
           pricingPlan: 'C1',
           origin: 'IPA',
           geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY
