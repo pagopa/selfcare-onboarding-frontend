@@ -35,4 +35,10 @@ export type OnboardingFormData = {
   dopEmailAddress?: string;
   // tassonomia geografica
   geographicTaxonomies: Array<GeographicTaxonomy>;
+  // n. Iscrizione al Registro Imprese (facoltativo) per institutionType !== PA e PSP
+  commercialRegisterNumberInformationCompanies?: string;
+  // REA (facoltativo) PER institutionType !== PA e PSP
+  reaInformationCompanies?: string;
+  // capitale sociale (facoltativo) PER institutionType !== PA e PSP
+  shareCapitalsInformationCompanies?: string;
 };

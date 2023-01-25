@@ -336,6 +336,11 @@ export default {
         abiCode: 'Codice ABI',
         invalidabiCode: 'Codice ABI non valido',
       },
+      informationCompanies: {
+        commercialRegisterNumber: 'n. Iscrizione al Registro Imprese (facoltativo)',
+        rea: 'REA (facoltativo)',
+        shareCapital:'Capitale sociale (facoltativo)',
+      }
     },
     taxonomySection: {
       title: 'INDICA L’AREA GEOGRAFICA',

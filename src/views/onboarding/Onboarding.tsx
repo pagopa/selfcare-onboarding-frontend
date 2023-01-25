@@ -37,6 +37,7 @@ import {
 import { OnboardingFormData } from '../../model/OnboardingFormData';
 import StepOnboardingData from '../../components/steps/StepOnboardingData';
 import StepOnboardingFormData from '../../components/steps/StepOnboardingFormData';
+import { informationCompaniesDto2pspDataRequest } from '../../model/InformationCompaniesData';
 import { registerUnloadEvent, unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
 import StepInstitutionType from '../../components/steps/StepInstitutionType';
 import { genericError, OnboardingStep1_5 } from './components/OnboardingStep1_5';
@@ -359,6 +360,10 @@ function OnboardingComponent({ productId }: { productId: string }) {
           pspData:
             institutionType === 'PSP'
               ? pspData2pspDataRequest(onboardingFormData as OnboardingFormData)
+              : undefined,
+          informationCompaniesData:
+            institutionType !== 'PSP' && institutionType !== 'PA'
+              ? informationCompaniesDto2pspDataRequest(onboardingFormData as OnboardingFormData)
               : undefined,
           institutionType,
           geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY

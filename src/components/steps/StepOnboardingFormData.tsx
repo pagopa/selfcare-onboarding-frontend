@@ -400,7 +400,7 @@ export default function StepOnboardingFormData({
           setStepHistoryState={setStepHistoryState}
           formik={formik}
           premiumFlow={premiumFlow}
-          // productId={productId}
+          productId={productId}
         />
         {/* DATI RELATIVI ALLA TASSONOMIA */}
         {ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY ? (
