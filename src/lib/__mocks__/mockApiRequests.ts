@@ -314,7 +314,7 @@ const mockedOnboardingData1: InstitutionOnboardingInfoResource = {
         },
       ],
     },
-    institutionType: 'GSP',
+    institutionType: 'PA',
     origin: 'IPA',
   },
   manager: {
