@@ -116,7 +116,10 @@ export function SubProductStepSelectUserParty({ forward, parties }: Props) {
       </Grid>
 
       <Grid container item textAlign="center" justifyContent="center" mt={4} mb={2}>
-        <Paper elevation={8} sx={{ borderRadius: theme.spacing(2), p: 2, minWidth: '480px' }}>
+        <Paper
+          elevation={8}
+          sx={{ borderRadius: theme.spacing(2), py: 2, px: 4, minWidth: '480px' }}
+        >
           {moreThan3Parties && (
             <PartySelectionSearchInput
               clearField={() => onFilterChange('')}
@@ -160,7 +163,17 @@ export function SubProductStepSelectUserParty({ forward, parties }: Props) {
               ))}
             </CustomBox>
           ) : (
-            t('onBoardingSubProduct.selectUserPartyStep.notFoundResults')
+            <Typography
+              py={2}
+              sx={{
+                fontSize: '18px',
+                fontWeight: 'fontWeightBold',
+                display: 'flex',
+                justifyContent: 'flex-start',
+              }}
+            >
+              {t('onBoardingSubProduct.selectUserPartyStep.notFoundResults')}
+            </Typography>
           )}
         </Paper>
       </Grid>
