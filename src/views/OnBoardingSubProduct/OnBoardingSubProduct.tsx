@@ -331,7 +331,15 @@ function OnBoardingSubProduct() {
     setOnExitAction(undefined);
   };
 
-  return pricingPlan && pricingPlan !== 'C1' ? (
+  return pricingPlan &&
+    pricingPlan !== 'C0' &&
+    pricingPlan !== 'C1' &&
+    pricingPlan !== 'C2' &&
+    pricingPlan !== 'C3' &&
+    pricingPlan !== 'C4' &&
+    pricingPlan !== 'C5' &&
+    pricingPlan !== 'C6' &&
+    pricingPlan !== 'C7' ? (
     <EndingPage
       minHeight="52vh"
       icon={<IllusError size={60} />}
