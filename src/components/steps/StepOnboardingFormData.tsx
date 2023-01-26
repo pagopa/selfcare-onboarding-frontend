@@ -35,6 +35,8 @@ const fiscalAndVatCodeRegexp = new RegExp(
 );
 
 const fiveCharactersAllowed = new RegExp('^\\d{5}$');
+const sixCharactersAllowed = new RegExp('^[^0-9]*[0-9]{6}[^\\d]*$');
+
 const commercialRegisterNumberRegexp = new RegExp('^\\d{11}$');
 const numericField = new RegExp('^[0-9]');
 
@@ -305,6 +307,11 @@ export default function StepOnboardingFormData({
               (geoValue) => geoValue?.code === '' || geoValue === null
             ))
             ? requiredError
+            : undefined,
+        reaInformationCompanies:
+          values.reaInformationCompanies &&
+          !sixCharactersAllowed.test(values.reaInformationCompanies as string)
+            ? t('onboardingFormData.billingDataSection.invalidZipCode')
             : undefined,
       }).filter(([_key, value]) => value)
     );
