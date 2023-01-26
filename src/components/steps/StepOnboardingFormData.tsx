@@ -76,9 +76,6 @@ export default function StepOnboardingFormData({
 }: Props) {
   const requiredError = 'Required';
 
-  // // TODO: remove when will be real data retrieved - it show/hide geotaxonomy section
-  // const ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY = false;
-
   const premiumFlow = !!subProductId;
   const isPSP = institutionType === 'PSP';
 
@@ -163,11 +160,11 @@ export default function StepOnboardingFormData({
       previousGeotaxononomies.length > 0
     ) {
       const changedNational2Local =
-        previousGeotaxononomies.some((rv) => rv.code === '100') &&
-        !formik.values.geographicTaxonomies.some((gv) => gv.code === '100');
+        previousGeotaxononomies.some((rv) => rv?.code === '100') &&
+        !formik.values.geographicTaxonomies.some((gv) => gv?.code === '100');
       const changedToLocal2National =
-        !previousGeotaxononomies.some((rv) => rv.code === '100') &&
-        formik.values.geographicTaxonomies.some((gv) => gv.code === '100');
+        !previousGeotaxononomies.some((rv) => rv?.code === '100') &&
+        formik.values.geographicTaxonomies.some((gv) => gv?.code === '100');
 
       if (changedNational2Local || changedToLocal2National) {
         setOpenModifyModal(true);
@@ -182,8 +179,8 @@ export default function StepOnboardingFormData({
           array2 = previousGeotaxononomies;
           array1 = formik.values.geographicTaxonomies;
         }
-        const arrayDifferences = array1.filter(
-          (element) => !array2.some((elementSelected) => element.code === elementSelected.code)
+        const arrayDifferences = array1.filter((elementarray1) =>
+          array2.some((elementArray2) => elementarray1?.code !== elementArray2?.code)
         );
         if (deltaLength === 0) {
           if (arrayDifferences.length > 0) {
@@ -200,6 +197,11 @@ export default function StepOnboardingFormData({
             // add element
             setOpenAddModal(true);
           }
+        } else if (deltaLength > 0) {
+          // modify element
+          setOpenModifyModal(true);
+        } else if (deltaLength < 0) {
+          setOpenModifyModal(true);
         } else {
           onForwardAction();
         }
@@ -398,6 +400,7 @@ export default function StepOnboardingFormData({
           setStepHistoryState={setStepHistoryState}
           formik={formik}
           premiumFlow={premiumFlow}
+          // productId={productId}
         />
         {/* DATI RELATIVI ALLA TASSONOMIA */}
         {ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY ? (
@@ -407,7 +410,6 @@ export default function StepOnboardingFormData({
               setGeographicTaxonomies={(geographicTaxonomies) =>
                 formik.setFieldValue('geographicTaxonomies', geographicTaxonomies)
               }
-              premiumFlow={premiumFlow}
               formik={formik}
             />
           </Grid>

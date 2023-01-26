@@ -6,7 +6,7 @@ export default {
     cancelLabel: 'Esci',
   },
   asyncAutocomplete: {
-    noResultsLabel: 'No risultati',
+    noResultsLabel: 'Nessun risultato',
     lessThen3CharacterLabel: 'Digita almeno 3 caratteri',
   },
   confirmRegistrationStep0: {
@@ -247,7 +247,7 @@ export default {
       subTitle:
         "Seleziona l'ente per il quale stai richiedendo la sottoscrizione <1 />all'offerta Premium",
       searchLabel: 'Cerca ente',
-      notFoundResults: 'No risultati',
+      notFoundResults: 'Nessun risultato',
       IPAsubTitle:
         "Seleziona dall'Indice della Pubblica Amministrazione (IPA) l'ente <1/> per cui vuoi richiedere l'adesione a {{baseProduct}} Premium",
       helperLink: 'Non lo trovi? <1>Registra un nuovo ente</1>',
