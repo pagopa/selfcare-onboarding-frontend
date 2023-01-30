@@ -35,10 +35,11 @@ const fiscalAndVatCodeRegexp = new RegExp(
 );
 
 const fiveCharactersAllowed = new RegExp('^\\d{5}$');
-const sixCharactersAllowed = new RegExp('^[^0-9]*[0-9]{6}[^\\d]*$');
+const sixCharactersAllowed = new RegExp('^[A-Za-z][A-Za-z0-9]');
 
 const commercialRegisterNumberRegexp = new RegExp('^\\d{11}$');
-const numericField = new RegExp('^[0-9]');
+const numericField = new RegExp('^[0-9]*$');
+const currencyField = new RegExp('^(\u20AC)(0|[1-9][0-9]*(?:(,[0-9]*)*|[0-9]*))((\\.|,)[0-9]+)*$');
 
 export type StepBillingDataHistoryState = {
   externalInstitutionId: string;
@@ -311,8 +312,12 @@ export default function StepOnboardingFormData({
         reaInformationCompanies:
           values.reaInformationCompanies &&
           !sixCharactersAllowed.test(values.reaInformationCompanies as string)
-            ? t('onboardingFormData.billingDataSection.invalidZipCode')
+            ? t('onboardingFormData.billingDataSection.invalidReaField')
             : undefined,
+        shareCapitalInformationCompanies:
+          values.shareCapitalInformationCompanies &&
+          !currencyField.test(values.shareCapitalInformationCompanies) &&
+          t('onboardingFormData.billingDataSection.invalidShareCapitalField'),
       }).filter(([_key, value]) => value)
     );
 

@@ -12,5 +12,5 @@ export type InformationCompaniesDto = {
 export const informationCompaniesDto2pspDataRequest = (billingData: OnboardingFormData): InformationCompaniesDto => ({
     commercialRegisterNumber: billingData.commercialRegisterNumberInformationCompanies,
     rea: billingData.reaInformationCompanies,
-    shareCapital: billingData.shareCapitalsInformationCompanies
+    shareCapital: billingData.shareCapitalInformationCompanies
 });

@@ -40,5 +40,5 @@ export type OnboardingFormData = {
   // REA (facoltativo) PER institutionType !== PA e PSP
   reaInformationCompanies?: string;
   // capitale sociale (facoltativo) PER institutionType !== PA e PSP
-  shareCapitalsInformationCompanies?: string;
+  shareCapitalInformationCompanies?: string;
 };

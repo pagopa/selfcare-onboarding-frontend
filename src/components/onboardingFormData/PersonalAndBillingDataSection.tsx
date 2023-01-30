@@ -245,8 +245,9 @@ export default function PersonalAndBillingDataSection({
                 {/* capitale sociale facoltativo per institution Type !== 'PA' e 'PSP */}
                 <CustomTextField
                   inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
+                  defaultValue={'\u20AC'}
                   {...baseTextFieldProps(
-                    'shareCapitalsInformationCompanies',
+                    'shareCapitalInformationCompanies',
                     t('onboardingFormData.billingDataSection.informationCompanies.shareCapital'),
                     400,
                     18
