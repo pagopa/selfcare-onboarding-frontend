@@ -39,7 +39,7 @@ const reaValidation = new RegExp('^[A-Za-z]{2}');
 
 const commercialRegisterNumberRegexp = new RegExp('^\\d{11}$');
 const numericField = new RegExp('^[0-9]*$');
-const currencyField = new RegExp('^(\u20AC)(0|[1-9][0-9]*(?:(,[0-9]*)*|[0-9]*))((\\.|,)[0-9]+)*$');
+const currencyField = new RegExp('^(0|[1-9][0-9]*(?:(,[0-9]*)*|[0-9]*))((\\.|,)[0-9]+)*$');
 
 export type StepBillingDataHistoryState = {
   externalInstitutionId: string;
@@ -362,6 +362,7 @@ export default function StepOnboardingFormData({
       id: field,
       type: 'text',
       value: formik.values[field],
+      defaultValue: formik.values[field],
       label,
       error: isError,
       helperText: isError ? formik.errors[field] : undefined,

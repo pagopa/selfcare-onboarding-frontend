@@ -6,6 +6,7 @@ import { theme } from '@pagopa/mui-italia';
 import { InstitutionType, StepperStepComponentProps } from '../../../types';
 import { OnboardingFormData } from '../../model/OnboardingFormData';
 import { StepBillingDataHistoryState } from '../steps/StepOnboardingFormData';
+import NumberDecimalFormat from './NumberDecimalFormat';
 
 const CustomTextField = styled(TextField)({
   '.MuiInputLabel-asterisk': {
@@ -244,14 +245,17 @@ export default function PersonalAndBillingDataSection({
               <Grid item xs={12}>
                 {/* capitale sociale facoltativo per institution Type !== 'PA' e 'PSP */}
                 <CustomTextField
-                  inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
-                  defaultValue={'\u20AC'}
+                  name={'shareCapitalInformationCompanies'}
                   {...baseTextFieldProps(
                     'shareCapitalInformationCompanies',
                     t('onboardingFormData.billingDataSection.informationCompanies.shareCapital'),
                     400,
                     18
                   )}
+                  InputLabelProps={{ shrink: true }}
+                  InputProps={{
+                    inputComponent: NumberDecimalFormat,
+                  }}
                 />
               </Grid>
             </>
