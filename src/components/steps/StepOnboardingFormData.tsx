@@ -35,7 +35,7 @@ const fiscalAndVatCodeRegexp = new RegExp(
 );
 
 const fiveCharactersAllowed = new RegExp('^\\d{5}$');
-const sixCharactersAllowed = new RegExp('^[A-Za-z][A-Za-z0-9]');
+const reaValidation = new RegExp('^[A-Za-z]{2}');
 
 const commercialRegisterNumberRegexp = new RegExp('^\\d{11}$');
 const numericField = new RegExp('^[0-9]*$');
@@ -311,7 +311,7 @@ export default function StepOnboardingFormData({
             : undefined,
         reaInformationCompanies:
           values.reaInformationCompanies &&
-          !sixCharactersAllowed.test(values.reaInformationCompanies as string)
+          !reaValidation.test(values.reaInformationCompanies as string)
             ? t('onboardingFormData.billingDataSection.invalidReaField')
             : undefined,
         shareCapitalInformationCompanies:
