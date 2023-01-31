@@ -1,8 +1,8 @@
 import { OnboardingFormData } from './OnboardingFormData';
 
 export type InformationCompaniesDto = {
-  // n. Iscrizione al Registro Imprese (facoltativo)
-  commercialRegisterNumber?: string;
+  // n. Iscrizione al Registro Imprese
+  businessRegisterPlace?: string;
   // codice REA
   rea?: string;
   // capitale sociale
@@ -10,7 +10,7 @@ export type InformationCompaniesDto = {
 };
 
 export const informationCompaniesDto2pspDataRequest = (billingData: OnboardingFormData): InformationCompaniesDto => ({
-    commercialRegisterNumber: billingData.commercialRegisterNumberInformationCompanies,
-    rea: billingData.reaInformationCompanies,
-    shareCapital: billingData.shareCapitalInformationCompanies
+  businessRegisterPlace: billingData.businessRegisterPlace,
+    rea: billingData.rea,
+    shareCapital: billingData.shareCapital
 });

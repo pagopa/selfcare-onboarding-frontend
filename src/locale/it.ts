@@ -340,7 +340,7 @@ export default {
       },
       informationCompanies: {
         commercialRegisterNumber: 'n. Iscrizione al Registro Imprese (facoltativo)',
-        rea: 'REA (facoltativo)',
+        rea: 'REA',
         shareCapital:'Capitale sociale (facoltativo)',
       }
     },

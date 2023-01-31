@@ -309,14 +309,14 @@ export default function StepOnboardingFormData({
             ))
             ? requiredError
             : undefined,
-        reaInformationCompanies:
-          values.reaInformationCompanies &&
-          !reaValidation.test(values.reaInformationCompanies as string)
-            ? t('onboardingFormData.billingDataSection.invalidReaField')
-            : undefined,
-        shareCapitalInformationCompanies:
-          values.shareCapitalInformationCompanies &&
-          !currencyField.test(values.shareCapitalInformationCompanies) &&
+        rea: !values.rea
+          ? requiredError
+          : !reaValidation.test(values.rea as string)
+          ? t('onboardingFormData.billingDataSection.invalidReaField')
+          : undefined,
+        shareCapital:
+          values.shareCapital &&
+          !currencyField.test(values.shareCapital) &&
           t('onboardingFormData.billingDataSection.invalidShareCapitalField'),
       }).filter(([_key, value]) => value)
     );
@@ -361,7 +361,7 @@ export default function StepOnboardingFormData({
     return {
       id: field,
       type: 'text',
-      value: formik.values[field],
+      value: formik.values[field] || '',
       label,
       error: isError,
       helperText: isError ? formik.errors[field] : undefined,

@@ -89,16 +89,16 @@ export default function PersonalAndBillingDataSection({
   };
   const [shrinkValue, setShrinkValue] = useState<boolean>(false);
   useEffect(() => {
-    const shareCapitalIsNan = isNaN(formik.values.shareCapitalInformationCompanies);
+    const shareCapitalIsNan = isNaN(formik.values.shareCapital);
     if (shareCapitalIsNan) {
-      formik.setFieldValue('shareCapitalInformationCompanies', undefined);
+      formik.setFieldValue('shareCapital', undefined);
     }
-    if (formik.values.shareCapitalInformationCompanies) {
+    if (formik.values.shareCapital) {
       setShrinkValue(true);
     } else {
       setShrinkValue(false);
     }
-  }, [formik.values.shareCapitalInformationCompanies]);
+  }, [formik.values.shareCapital]);
 
   return (
     <>
@@ -235,7 +235,7 @@ export default function PersonalAndBillingDataSection({
                 {/* n. Iscrizione al Registro delle Imprese facoltativo per institution Type !== 'PA' e 'PSP */}
                 <CustomTextField
                   {...baseTextFieldProps(
-                    'commercialRegisterNumberInformationCompanies',
+                    'businessRegisterPlace',
                     t(
                       'onboardingFormData.billingDataSection.informationCompanies.commercialRegisterNumber'
                     ),
@@ -247,10 +247,9 @@ export default function PersonalAndBillingDataSection({
               <Grid item xs={4}>
                 {/* REA facoltativo per institution Type !== 'PA' e 'PSP */}
                 <CustomTextField
-                  inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
                   placeholder={'RM-123456'}
                   {...baseTextFieldProps(
-                    'reaInformationCompanies',
+                    'rea',
                     t('onboardingFormData.billingDataSection.informationCompanies.rea'),
                     400,
                     18
@@ -260,9 +259,9 @@ export default function PersonalAndBillingDataSection({
               <Grid item xs={12}>
                 {/* capitale sociale facoltativo per institution Type !== 'PA' e 'PSP */}
                 <CustomTextField
-                  name={'shareCapitalInformationCompanies'}
+                  name={'shareCapital'}
                   {...baseTextFieldProps(
-                    'shareCapitalInformationCompanies',
+                    'shareCapital',
                     t('onboardingFormData.billingDataSection.informationCompanies.shareCapital'),
                     400,
                     18

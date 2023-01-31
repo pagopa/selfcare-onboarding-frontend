@@ -1,12 +1,13 @@
+import React from 'react';
 import NumberFormat from 'react-number-format';
 
-export default function NumberDecimalFormat(props: any) {
-  const { inputRef, onChange, ...other } = props;
+const NumberDecimalFormat = React.forwardRef(function NumberDecimalFormat(props: any, ref) {
+  const { onChange, ...other } = props;
   return (
-    <div>
+    <div style={{ fontWeight: 'normal' }}>
       <NumberFormat
         {...other}
-        getInputRef={inputRef}
+        getInputRef={ref}
         onValueChange={(values) => {
           onChange({
             target: {
@@ -24,4 +25,6 @@ export default function NumberDecimalFormat(props: any) {
       />
     </div>
   );
-}
+});
+
+export default NumberDecimalFormat;

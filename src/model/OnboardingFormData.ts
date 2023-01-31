@@ -36,9 +36,9 @@ export type OnboardingFormData = {
   // tassonomia geografica
   geographicTaxonomies: Array<GeographicTaxonomy>;
   // n. Iscrizione al Registro Imprese (facoltativo) per institutionType !== PA e PSP
-  commercialRegisterNumberInformationCompanies?: string;
+  businessRegisterPlace?: string;
   // REA (facoltativo) PER institutionType !== PA e PSP
-  reaInformationCompanies?: string;
+  rea?: string;
   // capitale sociale (facoltativo) PER institutionType !== PA e PSP
-  shareCapitalInformationCompanies?: string;
+  shareCapital?: string;
 };
