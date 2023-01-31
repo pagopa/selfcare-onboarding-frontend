@@ -362,7 +362,6 @@ export default function StepOnboardingFormData({
       id: field,
       type: 'text',
       value: formik.values[field],
-      defaultValue: formik.values[field],
       label,
       error: isError,
       helperText: isError ? formik.errors[field] : undefined,

@@ -1,11 +1,11 @@
 import { OnboardingFormData } from './OnboardingFormData';
 
 export type InformationCompaniesDto = {
-  // n. iscrizione al Registro delle Imprese
+  // n. Iscrizione al Registro Imprese (facoltativo)
   commercialRegisterNumber?: string;
-  // dati del Responsabile protezione dati (DPO)
+  // codice REA
   rea?: string;
-  // numero iscrizione albo
+  // capitale sociale
   shareCapital?: string;
 };
 

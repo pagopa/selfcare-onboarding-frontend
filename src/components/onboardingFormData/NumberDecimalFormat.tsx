@@ -19,9 +19,8 @@ export default function NumberDecimalFormat(props: any) {
         thousandSeparator="."
         prefix="€ "
         decimalScale={2}
-        fixedDecimalScale={true}
+        fixedDecimalScale={false}
         isNumericString
-        isAllowed={(values) => values.value.length <= 16}
       />
     </div>
   );

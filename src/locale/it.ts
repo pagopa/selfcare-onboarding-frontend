@@ -316,7 +316,7 @@ export default {
       invalidZipCode: 'CAP non valido',
       invalidVatNumber: 'Partita IVA non valida',
       invalidEmail: 'L’indirizzo email non è valido',
-      invalidReaField: 'Il codice REA non è valido',
+      invalidReaField: 'Campo REA non valido',
       invalidShareCapitalField: 'Il campo capitale sociale non è valido',
       businessName: 'Ragione sociale',
       registeredOffice: 'Sede legale',

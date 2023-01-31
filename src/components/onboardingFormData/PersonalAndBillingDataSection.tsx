@@ -1,4 +1,5 @@
 import { Box, styled } from '@mui/system';
+import { useEffect, useState } from 'react';
 import { Grid, TextField, Typography, Paper } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import Checkbox from '@mui/material/Checkbox';
@@ -86,6 +87,19 @@ export default function PersonalAndBillingDataSection({
       },
     };
   };
+  const [shrinkValue, setShrinkValue] = useState<boolean>(false);
+  useEffect(() => {
+    const shareCapitalIsNan = isNaN(formik.values.shareCapitalInformationCompanies);
+    if (shareCapitalIsNan) {
+      formik.setFieldValue('shareCapitalInformationCompanies', undefined);
+    }
+    if (formik.values.shareCapitalInformationCompanies) {
+      setShrinkValue(true);
+    } else {
+      setShrinkValue(false);
+    }
+  }, [formik.values.shareCapitalInformationCompanies]);
+
   return (
     <>
       {/* DATI DI FATTURAZIONE E ANAGRAFICI */}
@@ -214,12 +228,12 @@ export default function PersonalAndBillingDataSection({
               )}
             </Typography>
           </Grid>
+          {/* institutionType !== 'PA' && institutionType !== 'PSP' && productId === 'prod-io'; */}
           {isInformationCompany && (
             <>
               <Grid item xs={8}>
                 {/* n. Iscrizione al Registro delle Imprese facoltativo per institution Type !== 'PA' e 'PSP */}
                 <CustomTextField
-                  inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
                   {...baseTextFieldProps(
                     'commercialRegisterNumberInformationCompanies',
                     t(
@@ -234,6 +248,7 @@ export default function PersonalAndBillingDataSection({
                 {/* REA facoltativo per institution Type !== 'PA' e 'PSP */}
                 <CustomTextField
                   inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
+                  placeholder={'RM-123456'}
                   {...baseTextFieldProps(
                     'reaInformationCompanies',
                     t('onboardingFormData.billingDataSection.informationCompanies.rea'),
@@ -252,7 +267,7 @@ export default function PersonalAndBillingDataSection({
                     400,
                     18
                   )}
-                  InputLabelProps={{ shrink: true }}
+                  InputLabelProps={{ shrink: shrinkValue }}
                   InputProps={{
                     inputComponent: NumberDecimalFormat,
                   }}
