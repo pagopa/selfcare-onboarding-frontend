@@ -338,6 +338,7 @@ export default function PersonalAndBillingDataSection({
                 18
               )}
             />
+            {/* descrizione destinatario */}
             <Typography
               component={'span'}
               sx={{
@@ -347,6 +348,28 @@ export default function PersonalAndBillingDataSection({
               }}
             >
               {t('onboardingFormData.billingDataSection.recipientCodeDescription')}
+            </Typography>
+          </Grid>
+          {/* indirizzo mail di supporto */}
+          <Grid item xs={12}>
+            <CustomTextField
+              {...baseTextFieldProps(
+                'supportEmail',
+                t('onboardingFormData.billingDataSection.assistanceContact.supportEmail'),
+                400,
+                18
+              )}
+            />
+            {/* descrizione indirizzo mail di supporto */}
+            <Typography
+              component={'span'}
+              sx={{
+                fontSize: '12px!important',
+                fontWeight: 600,
+                color: theme.palette.text.secondary,
+              }}
+            >
+              {t('onboardingFormData.billingDataSection.assistanceContact.supportEmailDescriprion')}
             </Typography>
           </Grid>
         </Grid>

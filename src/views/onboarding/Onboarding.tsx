@@ -34,6 +34,7 @@ import {
   GeographicTaxonomy,
   onboardedInstitutionInfo2geographicTaxonomy,
 } from '../../model/GeographicTaxonomies';
+import { assistanceConcatsDto2pspDataRequest } from '../../model/AssistanceContactsData';
 import { OnboardingFormData } from '../../model/OnboardingFormData';
 import StepOnboardingData from '../../components/steps/StepOnboardingData';
 import StepOnboardingFormData from '../../components/steps/StepOnboardingFormData';
@@ -378,6 +379,9 @@ function OnboardingComponent({ productId }: { productId: string }) {
             email: u.email.toLowerCase(),
           })),
           pricingPlan,
+          assistanceConctactsData: assistanceConcatsDto2pspDataRequest(
+            onboardingFormData as OnboardingFormData
+          ),
         },
       },
       () => setRequiredLogin(true)
