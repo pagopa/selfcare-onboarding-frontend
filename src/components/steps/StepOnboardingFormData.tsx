@@ -81,6 +81,8 @@ export default function StepOnboardingFormData({
 
   const premiumFlow = !!subProductId;
   const isPSP = institutionType === 'PSP';
+  const isInformationCompany =
+    institutionType !== 'PA' && institutionType !== 'PSP' && productId === 'prod-io';
 
   const [openModifyModal, setOpenModifyModal] = useState<boolean>(false);
   const [openAddModal, setOpenAddModal] = useState<boolean>(false);
@@ -309,11 +311,12 @@ export default function StepOnboardingFormData({
             ))
             ? requiredError
             : undefined,
-        rea: !values.rea
-          ? requiredError
-          : !reaValidation.test(values.rea as string)
-          ? t('onboardingFormData.billingDataSection.invalidReaField')
-          : undefined,
+        rea:
+          isInformationCompany && !values.rea
+            ? requiredError
+            : !reaValidation.test(values.rea as string)
+            ? t('onboardingFormData.billingDataSection.invalidReaField')
+            : undefined,
         shareCapital:
           values.shareCapital &&
           !currencyField.test(values.shareCapital) &&
