@@ -12,7 +12,9 @@ import {
   Box,
   Tooltip,
   TextField,
+  IconButton,
 } from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
 import { AddOutlined, RemoveCircleOutlineOutlined } from '@mui/icons-material';
 import { ButtonNaked } from '@pagopa/mui-italia';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
@@ -311,7 +313,7 @@ export default function GeoTaxonomySection({
                     onOpen={() => setOptions([])}
                     disablePortal
                     options={input.length >= 3 ? options : []}
-                    sx={{ width: '100%' }}
+                    sx={{ width: '100%', pr: '0px !important', color: 'red !important' }}
                     onChange={(event: any, value: any) => handleChange(event, value, i)}
                     value={geotaxonomiesHistory[i]?.desc ?? val?.desc}
                     renderOption={(props, option) => (
@@ -331,6 +333,13 @@ export default function GeoTaxonomySection({
                         helperText={
                           error?.[i] && t('onboardingFormData.taxonomySection.error.notMatchedArea')
                         }
+                        InputProps={{
+                          endAdornment: (
+                            <IconButton aria-label="elimina">
+                              <CloseIcon />
+                            </IconButton>
+                          ),
+                        }}
                       />
                     )}
                   />
