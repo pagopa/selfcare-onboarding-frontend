@@ -319,7 +319,7 @@ export default function GeoTaxonomySection({
                     onOpen={() => setOptions([])}
                     disablePortal
                     options={input.length >= 3 ? options : []}
-                    sx={{ width: '100%', pr: '0px !important', color: 'red !important' }}
+                    sx={{ width: '100%', pr: '0px !important' }}
                     onChange={(event: any, value: any) => handleChange(event, value, i)}
                     value={geotaxonomiesHistory[i]?.desc ?? val?.desc}
                     renderOption={(props, option) => (
