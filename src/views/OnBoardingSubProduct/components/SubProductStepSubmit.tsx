@@ -21,6 +21,7 @@ import { pspData2pspDataRequest } from '../../../model/PspData';
 import { OnboardingFormData } from '../../../model/OnboardingFormData';
 import { ENV } from '../../../utils/env';
 import { onboardedInstitutionInfo2geographicTaxonomy } from '../../../model/GeographicTaxonomies';
+import { assistanceConcatsDto2pspDataRequest } from '../../../model/AssistanceContactsData';
 
 type Props = StepperStepComponentProps & {
   requestId: string;
@@ -129,6 +130,9 @@ function SubProductStepSubmit({
                 onboardedInstitutionInfo2geographicTaxonomy(gt)
               )
             : [],
+          assistanceContacts: assistanceConcatsDto2pspDataRequest(
+            billingData as OnboardingFormData
+          ),
         },
       },
       () => setRequiredLogin(true)
