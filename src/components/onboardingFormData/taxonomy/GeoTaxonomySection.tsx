@@ -96,7 +96,12 @@ export default function GeoTaxonomySection({
     setGeographicTaxonomies(optionsSelected);
     setGeotaxonomiesHistory(optionsSelected);
     setGeotaxonomiesHistoryState(optionsSelected);
-    if (optionsSelected[0]?.desc !== '' && optionsSelected.length > 0 && emptyField) {
+    if (
+      optionsSelected &&
+      optionsSelected.find((o) => o?.desc !== '') &&
+      optionsSelected.length > 0 &&
+      emptyField
+    ) {
       setIsAddNewAutocompleteEnabled(true);
     } else {
       setIsAddNewAutocompleteEnabled(false);
@@ -182,6 +187,7 @@ export default function GeoTaxonomySection({
 
     if (!value) {
       deleteError(index);
+      setIsAddNewAutocompleteEnabled(false);
     }
     if (formik.values.geographicTaxonomies.length > 0) {
       setGeotaxonomiesHistory(formik.values.geographicTaxonomies);
