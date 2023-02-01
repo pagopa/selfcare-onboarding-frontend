@@ -100,7 +100,8 @@ function validateNoMandatory(
     .map(({ id, regexp, unique, caseSensitive }) =>
       regexp &&
       user[id] &&
-      (!regexp.test(user[id] as string) || verifyChecksumMatchWithTaxCode(user.taxCode))
+      !regexp.test(user[id] as string) &&
+      verifyChecksumMatchWithTaxCode(user.taxCode)
         ? `${id}-regexp`
         : unique && usersArray.findIndex((u) => stringEquals(u[id], user[id], caseSensitive)) > -1
         ? `${id}-unique`
