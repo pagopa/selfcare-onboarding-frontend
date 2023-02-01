@@ -271,7 +271,7 @@ export default function GeoTaxonomySection({
           <FormControlLabel
             checked={isNationalAreaVisible}
             value={'national'}
-            control={<Radio disableRipple={true} id={'national_geographicTaxonomies'} />}
+            control={<Radio id={'national_geographicTaxonomies'} />}
             label={t('onboardingFormData.taxonomySection.nationalLabel')}
             onChange={() => {
               setIsNationalAreaVisible(true);
@@ -285,7 +285,7 @@ export default function GeoTaxonomySection({
             id={'geographicTaxonomies'}
             checked={isLocalAreaVisible}
             value={'local'}
-            control={<Radio disableRipple={true} />}
+            control={<Radio />}
             label={t('onboardingFormData.taxonomySection.localLabel')}
             onChange={() => {
               setIsNationalAreaVisible(false);
