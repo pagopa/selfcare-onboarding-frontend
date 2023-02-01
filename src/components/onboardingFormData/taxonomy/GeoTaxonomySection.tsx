@@ -12,7 +12,9 @@ import {
   Box,
   Tooltip,
   TextField,
+  IconButton,
 } from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
 import { AddOutlined, RemoveCircleOutlineOutlined } from '@mui/icons-material';
 import { ButtonNaked } from '@pagopa/mui-italia';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
@@ -94,7 +96,12 @@ export default function GeoTaxonomySection({
     setGeographicTaxonomies(optionsSelected);
     setGeotaxonomiesHistory(optionsSelected);
     setGeotaxonomiesHistoryState(optionsSelected);
-    if (optionsSelected[0]?.desc !== '' && optionsSelected.length > 0 && emptyField) {
+    if (
+      optionsSelected &&
+      optionsSelected.find((o) => o?.desc !== '') &&
+      optionsSelected.length > 0 &&
+      emptyField
+    ) {
       setIsAddNewAutocompleteEnabled(true);
     } else {
       setIsAddNewAutocompleteEnabled(false);
@@ -180,6 +187,7 @@ export default function GeoTaxonomySection({
 
     if (!value) {
       deleteError(index);
+      setIsAddNewAutocompleteEnabled(false);
     }
     if (formik.values.geographicTaxonomies.length > 0) {
       setGeotaxonomiesHistory(formik.values.geographicTaxonomies);
@@ -263,7 +271,7 @@ export default function GeoTaxonomySection({
           <FormControlLabel
             checked={isNationalAreaVisible}
             value={'national'}
-            control={<Radio disableRipple={true} id={'national_geographicTaxonomies'} />}
+            control={<Radio id={'national_geographicTaxonomies'} />}
             label={t('onboardingFormData.taxonomySection.nationalLabel')}
             onChange={() => {
               setIsNationalAreaVisible(true);
@@ -277,7 +285,7 @@ export default function GeoTaxonomySection({
             id={'geographicTaxonomies'}
             checked={isLocalAreaVisible}
             value={'local'}
-            control={<Radio disableRipple={true} />}
+            control={<Radio />}
             label={t('onboardingFormData.taxonomySection.localLabel')}
             onChange={() => {
               setIsNationalAreaVisible(false);
@@ -311,7 +319,7 @@ export default function GeoTaxonomySection({
                     onOpen={() => setOptions([])}
                     disablePortal
                     options={input.length >= 3 ? options : []}
-                    sx={{ width: '100%' }}
+                    sx={{ width: '100%', pr: '0px !important' }}
                     onChange={(event: any, value: any) => handleChange(event, value, i)}
                     value={geotaxonomiesHistory[i]?.desc ?? val?.desc}
                     renderOption={(props, option) => (
@@ -331,6 +339,13 @@ export default function GeoTaxonomySection({
                         helperText={
                           error?.[i] && t('onboardingFormData.taxonomySection.error.notMatchedArea')
                         }
+                        InputProps={{
+                          endAdornment: (
+                            <IconButton aria-label="elimina">
+                              <CloseIcon />
+                            </IconButton>
+                          ),
+                        }}
                       />
                     )}
                   />
