@@ -340,7 +340,7 @@ export default {
         invalidabiCode: 'Codice ABI non valido',
       },
       informationCompanies: {
-        commercialRegisterNumber: 'n. Iscrizione al Registro Imprese (facoltativo)',
+        commercialRegisterNumber: 'Luogo di iscrizione al Registro delle Imprese (facoltativo)',
         rea: 'REA',
         shareCapital:'Capitale sociale (facoltativo)',
       },
