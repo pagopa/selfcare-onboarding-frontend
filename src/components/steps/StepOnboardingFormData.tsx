@@ -324,7 +324,7 @@ export default function StepOnboardingFormData({
         supportEmail:
           !values.supportEmail && !premiumFlow
             ? requiredError
-            : !mailPECRegexp.test(values.supportEmail as string) && !premiumFlow
+            : !mailPECRegexp.test(values.supportEmail as string) && values.supportEmail
             ? t('onboardingFormData.billingDataSection.invalidMailSupport')
             : undefined,
       }).filter(([_key, value]) => value)
