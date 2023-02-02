@@ -29,7 +29,7 @@ export const ENV = {
     ONBOARDING: env.get('REACT_APP_URL_API_ONBOARDING').required().asString(),
     PARTY_REGISTRY_PROXY: env.get('REACT_APP_URL_API_PARTY_REGISTRY_PROXY').required().asString(),
     // GEOTAXONOMY: env.get('REACT_APP_URL_GEOTAXONOMY').required().asString(),
-    GEOTAXONOMY:'https://api.dev.selfcare.pagopa.it/external/geotaxonomy'
+    GEOTAXONOMY:'https://api.dev.selfcare.pagopa.it/external/geo-tax/geotaxonomy'
   },
 
   MAX_INSTITUTIONS_FETCH: env.get('REACT_APP_MAX_INSTITUTIONS_FETCH').required().asIntPositive(),
