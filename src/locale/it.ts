@@ -317,6 +317,7 @@ export default {
       invalidVatNumber: 'Partita IVA non valida',
       invalidEmail: 'L’indirizzo email non è valido',
       invalidReaField: 'Campo REA non valido',
+      invalidMailSupport:'L’indirizzo email non è valido',
       invalidShareCapitalField: 'Il campo capitale sociale non è valido',
       businessName: 'Ragione sociale',
       registeredOffice: 'Sede legale',
@@ -342,6 +343,10 @@ export default {
         commercialRegisterNumber: 'n. Iscrizione al Registro Imprese (facoltativo)',
         rea: 'REA',
         shareCapital:'Capitale sociale (facoltativo)',
+      },
+      assistanceContact: {
+        supportEmail: 'Indirizzo email visibile ai cittadini',
+        supportEmailDescriprion:'È il contatto che i cittadini visualizzano per richiedere assistenza all’ente'
       }
     },
     taxonomySection: {

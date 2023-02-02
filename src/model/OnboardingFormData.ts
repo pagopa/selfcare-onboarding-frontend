@@ -41,4 +41,6 @@ export type OnboardingFormData = {
   rea?: string;
   // capitale sociale (facoltativo) PER institutionType !== PA e PSP
   shareCapital?: string;
+  // indirizzo mail supporto
+  supportEmail?: string;
 };

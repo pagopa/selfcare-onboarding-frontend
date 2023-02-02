@@ -1,6 +1,6 @@
 import { OnboardingFormData } from './OnboardingFormData';
 
-export type InformationCompaniesDto = {
+export type CompanyInformationsDto = {
   // n. Iscrizione al Registro Imprese
   businessRegisterPlace?: string;
   // codice REA
@@ -9,7 +9,7 @@ export type InformationCompaniesDto = {
   shareCapital?: string;
 };
 
-export const informationCompaniesDto2pspDataRequest = (billingData: OnboardingFormData): InformationCompaniesDto => ({
+export const companyInformationsDto2pspDataRequest = (billingData: OnboardingFormData): CompanyInformationsDto => ({
   businessRegisterPlace: billingData.businessRegisterPlace,
     rea: billingData.rea,
     shareCapital: billingData.shareCapital

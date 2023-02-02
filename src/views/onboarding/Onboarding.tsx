@@ -34,10 +34,11 @@ import {
   GeographicTaxonomy,
   onboardedInstitutionInfo2geographicTaxonomy,
 } from '../../model/GeographicTaxonomies';
+import { companyInformationsDto2pspDataRequest } from '../../model/InformationCompaniesData';
+import { assistanceConcatsDto2pspDataRequest } from '../../model/AssistanceContactsData';
 import { OnboardingFormData } from '../../model/OnboardingFormData';
 import StepOnboardingData from '../../components/steps/StepOnboardingData';
 import StepOnboardingFormData from '../../components/steps/StepOnboardingFormData';
-import { informationCompaniesDto2pspDataRequest } from '../../model/InformationCompaniesData';
 import { registerUnloadEvent, unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
 import StepInstitutionType from '../../components/steps/StepInstitutionType';
 import { genericError, OnboardingStep1_5 } from './components/OnboardingStep1_5';
@@ -361,9 +362,9 @@ function OnboardingComponent({ productId }: { productId: string }) {
             institutionType === 'PSP'
               ? pspData2pspDataRequest(onboardingFormData as OnboardingFormData)
               : undefined,
-          informationCompaniesData:
+          companyInformations:
             institutionType !== 'PSP' && institutionType !== 'PA'
-              ? informationCompaniesDto2pspDataRequest(onboardingFormData as OnboardingFormData)
+              ? companyInformationsDto2pspDataRequest(onboardingFormData as OnboardingFormData)
               : undefined,
           institutionType,
           geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY
@@ -378,6 +379,9 @@ function OnboardingComponent({ productId }: { productId: string }) {
             email: u.email.toLowerCase(),
           })),
           pricingPlan,
+          assistanceContacts: assistanceConcatsDto2pspDataRequest(
+            onboardingFormData as OnboardingFormData
+          ),
         },
       },
       () => setRequiredLogin(true)

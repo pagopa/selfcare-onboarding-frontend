@@ -321,6 +321,11 @@ export default function StepOnboardingFormData({
           values.shareCapital &&
           !currencyField.test(values.shareCapital) &&
           t('onboardingFormData.billingDataSection.invalidShareCapitalField'),
+        supportEmail: !values.supportEmail
+          ? requiredError
+          : !mailPECRegexp.test(values.supportEmail)
+          ? t('onboardingFormData.billingDataSection.invalidMailSupport')
+          : undefined,
       }).filter(([_key, value]) => value)
     );
 
