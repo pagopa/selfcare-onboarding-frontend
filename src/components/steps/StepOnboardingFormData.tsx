@@ -35,8 +35,11 @@ const fiscalAndVatCodeRegexp = new RegExp(
 );
 
 const fiveCharactersAllowed = new RegExp('^\\d{5}$');
+const reaValidation = new RegExp('^[A-Za-z]{2}');
+
 const commercialRegisterNumberRegexp = new RegExp('^\\d{11}$');
-const numericField = new RegExp('^[0-9]');
+const numericField = new RegExp('^[0-9]*$');
+const currencyField = new RegExp('^(0|[1-9][0-9]*(?:(,[0-9]*)*|[0-9]*))((\\.|,)[0-9]+)*$');
 
 export type StepBillingDataHistoryState = {
   externalInstitutionId: string;
@@ -78,6 +81,8 @@ export default function StepOnboardingFormData({
 
   const premiumFlow = !!subProductId;
   const isPSP = institutionType === 'PSP';
+  const isInformationCompany =
+    institutionType !== 'PA' && institutionType !== 'PSP' && productId === 'prod-io';
 
   const [openModifyModal, setOpenModifyModal] = useState<boolean>(false);
   const [openAddModal, setOpenAddModal] = useState<boolean>(false);
@@ -306,6 +311,21 @@ export default function StepOnboardingFormData({
             ))
             ? requiredError
             : undefined,
+        rea:
+          isInformationCompany && !values.rea
+            ? requiredError
+            : !reaValidation.test(values.rea as string)
+            ? t('onboardingFormData.billingDataSection.invalidReaField')
+            : undefined,
+        shareCapital:
+          values.shareCapital &&
+          !currencyField.test(values.shareCapital) &&
+          t('onboardingFormData.billingDataSection.invalidShareCapitalField'),
+        supportEmail: !values.supportEmail
+          ? requiredError
+          : !mailPECRegexp.test(values.supportEmail)
+          ? t('onboardingFormData.billingDataSection.invalidMailSupport')
+          : undefined,
       }).filter(([_key, value]) => value)
     );
 
@@ -349,7 +369,7 @@ export default function StepOnboardingFormData({
     return {
       id: field,
       type: 'text',
-      value: formik.values[field],
+      value: formik.values[field] || '',
       label,
       error: isError,
       helperText: isError ? formik.errors[field] : undefined,
@@ -400,7 +420,7 @@ export default function StepOnboardingFormData({
           setStepHistoryState={setStepHistoryState}
           formik={formik}
           premiumFlow={premiumFlow}
-          // productId={productId}
+          productId={productId}
         />
         {/* DATI RELATIVI ALLA TASSONOMIA */}
         {ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY ? (

@@ -316,6 +316,9 @@ export default {
       invalidZipCode: 'CAP non valido',
       invalidVatNumber: 'Partita IVA non valida',
       invalidEmail: 'L’indirizzo email non è valido',
+      invalidReaField: 'Campo REA non valido',
+      invalidMailSupport:'L’indirizzo email non è valido',
+      invalidShareCapitalField: 'Il campo capitale sociale non è valido',
       businessName: 'Ragione sociale',
       registeredOffice: 'Sede legale',
       zipCode: 'CAP',
@@ -336,6 +339,15 @@ export default {
         abiCode: 'Codice ABI',
         invalidabiCode: 'Codice ABI non valido',
       },
+      informationCompanies: {
+        commercialRegisterNumber: 'Luogo di iscrizione al Registro delle Imprese (facoltativo)',
+        rea: 'REA',
+        shareCapital:'Capitale sociale (facoltativo)',
+      },
+      assistanceContact: {
+        supportEmail: 'Indirizzo email visibile ai cittadini',
+        supportEmailDescriprion:'È il contatto che i cittadini visualizzano per richiedere assistenza all’ente'
+      }
     },
     taxonomySection: {
       title: 'INDICA L’AREA GEOGRAFICA',

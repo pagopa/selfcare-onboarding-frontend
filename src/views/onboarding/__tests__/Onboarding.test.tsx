@@ -262,6 +262,16 @@ const executeStepInstitutionType = async () => {
 const executeStepBillingData = async () => {
   console.log('Testing step Billing Data');
   await waitFor(() => screen.getByText(stepBillingDataTitle));
+  await fillUserBillingDataForm(
+    'businessName',
+    'registeredOffice',
+    'digitalAddress',
+    'zipCode',
+    'taxCode',
+    'vatNumber',
+    'recipientCode',
+    'supportEmail'
+  );
 
   const confirmButtonEnabled = screen.getByRole('button', { name: 'Continua' });
   await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
@@ -278,7 +288,8 @@ const executeStepBillingData = async () => {
     'zipCode',
     'taxCode',
     'vatNumber',
-    'recipientCode'
+    'recipientCode',
+    'supportEmail'
   );
 
   await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
@@ -367,7 +378,8 @@ const fillUserBillingDataForm = async (
   zipCode: string,
   taxCodeInput: string,
   vatNumber: string,
-  recipientCode: string
+  recipientCode: string,
+  supportEmail: string
 ) => {
   fireEvent.change(document.getElementById(businessNameInput), {
     target: { value: 'businessNameInput' },
@@ -390,7 +402,7 @@ const fillUserBillingDataForm = async (
   fireEvent.change(document.getElementById(recipientCode), {
     target: { value: 'recipientCode' },
   });
-
+  fireEvent.change(document.getElementById(supportEmail), { target: { value: 'a@a.it' } });
   // TODO: remove comment if REACT_APP_ENABLE_GEOTAXONOMY is true -- await waitFor(() => fireEvent.click(document.getElementById('national_geographicTaxonomies')));
 };
 
@@ -695,6 +707,7 @@ const verifySubmit = async () => {
           geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY
             ? [{ code: '100', desc: 'ITALIA' }]
             : [],
+          assistanceContacts: { supportEmail: 'a@a.it' },
         },
         method: 'POST',
       },
