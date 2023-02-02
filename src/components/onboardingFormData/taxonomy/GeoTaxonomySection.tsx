@@ -342,7 +342,9 @@ export default function GeoTaxonomySection({
                         InputProps={{
                           endAdornment: (
                             <IconButton aria-label="elimina">
-                              <CloseIcon />
+                              <CloseIcon
+                                onClick={() => setOptionsSelected([{ code: '', desc: '' }])}
+                              />
                             </IconButton>
                           ),
                         }}

@@ -231,8 +231,8 @@ export default function PersonalAndBillingDataSection({
           {/* institutionType !== 'PA' && institutionType !== 'PSP' && productId === 'prod-io'; */}
           {isInformationCompany && (
             <>
-              <Grid item xs={8}>
-                {/* n. Iscrizione al Registro delle Imprese facoltativo per institution Type !== 'PA' e 'PSP */}
+              <Grid item xs={12}>
+                {/* Luogo di iscrizione al Registro delle Imprese facoltativo per institution Type !== 'PA' e 'PSP */}
                 <CustomTextField
                   {...baseTextFieldProps(
                     'businessRegisterPlace',
@@ -244,7 +244,7 @@ export default function PersonalAndBillingDataSection({
                   )}
                 />
               </Grid>
-              <Grid item xs={4}>
+              <Grid item xs={6}>
                 {/* REA facoltativo per institution Type !== 'PA' e 'PSP */}
                 <CustomTextField
                   placeholder={'RM-123456'}
@@ -256,7 +256,7 @@ export default function PersonalAndBillingDataSection({
                   )}
                 />
               </Grid>
-              <Grid item xs={12}>
+              <Grid item xs={6}>
                 {/* capitale sociale facoltativo per institution Type !== 'PA' e 'PSP */}
                 <CustomTextField
                   name={'shareCapital'}

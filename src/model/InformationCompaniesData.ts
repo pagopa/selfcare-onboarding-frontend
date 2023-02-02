@@ -1,7 +1,7 @@
 import { OnboardingFormData } from './OnboardingFormData';
 
 export type CompanyInformationsDto = {
-  // n. Iscrizione al Registro Imprese
+  // Luogo di iscrizione al Registro delle Imprese
   businessRegisterPlace?: string;
   // codice REA
   rea?: string;
