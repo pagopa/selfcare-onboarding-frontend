@@ -226,6 +226,28 @@ export default function PersonalAndBillingDataSection({
                   </Typography>
                 </Box>
               )}
+              {/* Codice destinatario */}
+              <Grid item xs={12} mt={3}>
+                <CustomTextField
+                  {...baseTextFieldProps(
+                    'recipientCode',
+                    t('onboardingFormData.billingDataSection.recipientCode'),
+                    400,
+                    18
+                  )}
+                />
+                {/* descrizione destinatario */}
+                <Typography
+                  component={'span'}
+                  sx={{
+                    fontSize: '12px!important',
+                    fontWeight: 600,
+                    color: theme.palette.text.secondary,
+                  }}
+                >
+                  {t('onboardingFormData.billingDataSection.recipientCodeDescription')}
+                </Typography>
+              </Grid>
             </Typography>
           </Grid>
           {/* institutionType !== 'PA' && institutionType !== 'PSP' && productId === 'prod-io'; */}
@@ -266,6 +288,12 @@ export default function PersonalAndBillingDataSection({
                     400,
                     18
                   )}
+                  onClick={() => setShrinkValue(true)}
+                  onBlur={() => {
+                    if (!formik.values.shareCapital) {
+                      setShrinkValue(false);
+                    }
+                  }}
                   InputLabelProps={{ shrink: shrinkValue }}
                   InputProps={{
                     inputComponent: NumberDecimalFormat,
@@ -328,28 +356,6 @@ export default function PersonalAndBillingDataSection({
               </Grid>
             </>
           )}
-          <Grid item xs={12}>
-            {/* Codice destinatario */}
-            <CustomTextField
-              {...baseTextFieldProps(
-                'recipientCode',
-                t('onboardingFormData.billingDataSection.recipientCode'),
-                400,
-                18
-              )}
-            />
-            {/* descrizione destinatario */}
-            <Typography
-              component={'span'}
-              sx={{
-                fontSize: '12px!important',
-                fontWeight: 600,
-                color: theme.palette.text.secondary,
-              }}
-            >
-              {t('onboardingFormData.billingDataSection.recipientCodeDescription')}
-            </Typography>
-          </Grid>
           {/* indirizzo mail di supporto */}
           <Grid item xs={12}>
             <CustomTextField
