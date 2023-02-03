@@ -183,6 +183,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
   };
 
   const forwardWithDataAndInstitution = (newFormData: Partial<FormData>, party: Party) => {
+    console.log('test');
     setExternalInstitutionId(party.externalId);
     setOrigin(party.origin);
     setOnboardingFormData({

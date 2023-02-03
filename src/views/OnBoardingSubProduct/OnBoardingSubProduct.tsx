@@ -163,6 +163,8 @@ function OnBoardingSubProduct() {
     billingData?: OnboardingFormData,
     institutionType?: InstitutionType,
     partyId?: string
+    assistanceData?: Obj
+    companyInformations?: Obj
   ) => {
     setManager(manager);
     if (manager) {
@@ -172,6 +174,12 @@ function OnBoardingSubProduct() {
     }
     if (billingData) {
       setBillingData(billingData);
+    }
+    if (assistanceData) {
+      setAssistanceData(assistanceData)
+    }
+    if (companyInformations) {
+      setCompanyInformations(companyInformations)
     }
     setInstitutionType(institutionType);
     setPartyId(partyId);
@@ -255,7 +263,7 @@ function OnBoardingSubProduct() {
           subProductId: subProduct?.id,
           selectedProduct: subProduct,
           externalInstitutionId,
-          initialFormData: billingData ?? {
+          initialFormData: {...billingData ?? {
             businessName: '',
             registeredOffice: '',
             zipCode: '',
@@ -264,7 +272,7 @@ function OnBoardingSubProduct() {
             vatNumber: '',
             recipientCode: '',
             geographicTaxonomies: [],
-          },
+          } ,...assistanceData,...companyInformations} ,
           institutionType: institutionType as InstitutionType,
           origin,
           subtitle: t('onBoardingSubProduct.billingData.subTitle'),

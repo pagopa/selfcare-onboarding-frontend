@@ -78,7 +78,9 @@ function StepOnboardingData({ forward, externalInstitutionId, productId, institu
         result.manager,
         result.institution.billingData,
         result.institution.institutionType,
-        result.institution.id
+        result.institution.id,
+        result.institution.assistanceData,
+        result.institution.companyInformations
       );
     } else if (
       (onboardingData as AxiosError<any>).response?.status === 404 ||

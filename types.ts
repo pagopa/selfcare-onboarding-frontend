@@ -184,6 +184,8 @@ export type Party = {
   digitalAddress: string;
   taxCode: string;
   origin: string;
+  // indirizzo mail supporto
+  supportEmail?: string;
 };
 
 export type InstitutionData = {
