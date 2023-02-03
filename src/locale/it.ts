@@ -99,7 +99,7 @@ export default {
     },
   },
   platformUserForm: {
-    helperText: 'Campo non valido',
+    helperText: 'Il Campo non è valido',
     fields: {
       name: {
         label: 'Nome',
@@ -312,11 +312,11 @@ export default {
     backLabel: 'Indietro',
     confirmLabel: 'Continua',
     billingDataSection: {
-      invalidFiscalCode: 'Codice fiscale non valido',
-      invalidZipCode: 'CAP non valido',
-      invalidVatNumber: 'Partita IVA non valida',
+      invalidFiscalCode: 'Il Codice Fiscale non è valido',
+      invalidZipCode: 'Il CAP non è valido',
+      invalidVatNumber: 'La Partita IVA non è valida',
       invalidEmail: 'L’indirizzo email non è valido',
-      invalidReaField: 'Campo REA non valido',
+      invalidReaField: 'Il Campo REA non è valido',
       invalidMailSupport:'L’indirizzo email non è valido',
       invalidShareCapitalField: 'Il campo capitale sociale non è valido',
       businessName: 'Ragione sociale',
@@ -332,12 +332,12 @@ export default {
       gspDescription: 'Sono gestore di almeno uno dei pubblici servizi: Gas, Energia, Telco.',
       pspDataSection: {
         commercialRegisterNumber: 'n. Iscrizione al Registro delle Imprese',
-        invalidCommercialRegisterNumber: 'n. Iscrizione al Registro delle Imprese non valido',
+        invalidCommercialRegisterNumber: 'Il n. Iscrizione al Registro delle Imprese non è valido',
         registrationInRegister: 'Iscrizione all’Albo',
         registerNumber: 'Numero dell’Albo',
-        invalidregisterNumber: 'Numero dell’Albo non valido',
+        invalidregisterNumber: 'Il Numero dell’Albo non è valido',
         abiCode: 'Codice ABI',
-        invalidabiCode: 'Codice ABI non valido',
+        invalidabiCode: 'Il Codice ABI non è valido',
       },
       informationCompanies: {
         commercialRegisterNumber: 'Luogo di iscrizione al Registro delle Imprese (facoltativo)',
