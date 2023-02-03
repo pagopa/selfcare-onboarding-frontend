@@ -266,6 +266,12 @@ export default function PersonalAndBillingDataSection({
                     400,
                     18
                   )}
+                  onClick={() => setShrinkValue(true)}
+                  onBlur={() => {
+                    if (!formik.values.shareCapital) {
+                      setShrinkValue(false);
+                    }
+                  }}
                   InputLabelProps={{ shrink: shrinkValue }}
                   InputProps={{
                     inputComponent: NumberDecimalFormat,
