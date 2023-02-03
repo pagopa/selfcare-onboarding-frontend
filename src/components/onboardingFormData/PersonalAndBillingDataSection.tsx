@@ -1,4 +1,5 @@
 import { Box, styled } from '@mui/system';
+import { useEffect, useState } from 'react';
 import { Grid, TextField, Typography, Paper } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import Checkbox from '@mui/material/Checkbox';
@@ -6,6 +7,7 @@ import { theme } from '@pagopa/mui-italia';
 import { InstitutionType, StepperStepComponentProps } from '../../../types';
 import { OnboardingFormData } from '../../model/OnboardingFormData';
 import { StepBillingDataHistoryState } from '../steps/StepOnboardingFormData';
+import NumberDecimalFormat from './NumberDecimalFormat';
 
 const CustomTextField = styled(TextField)({
   '.MuiInputLabel-asterisk': {
@@ -31,7 +33,7 @@ type Props = StepperStepComponentProps & {
   setStepHistoryState: React.Dispatch<React.SetStateAction<StepBillingDataHistoryState>>;
   formik: any;
   premiumFlow: boolean;
-  // productId: string;
+  productId?: string;
 };
 
 export default function PersonalAndBillingDataSection({
@@ -42,14 +44,14 @@ export default function PersonalAndBillingDataSection({
   setStepHistoryState,
   formik,
   premiumFlow,
+  productId,
 }: Props) {
   const { t } = useTranslation();
 
   const isFromIPA = origin === 'IPA';
   const isPSP = institutionType === 'PSP';
-  // const isInformationCompany =
-  //   (institutionType === 'GSP' || institutionType === 'PT' || institutionType === 'SCP') &&
-  // productId === 'prod-io';
+  const isInformationCompany =
+    institutionType !== 'PA' && institutionType !== 'PSP' && productId === 'prod-io';
   const isPA = institutionType === 'PA';
   const isDisabled = premiumFlow || (isFromIPA && !isPA && !isPSP) || isPA;
   const requiredError = 'Required';
@@ -85,11 +87,25 @@ export default function PersonalAndBillingDataSection({
       },
     };
   };
+  const [shrinkValue, setShrinkValue] = useState<boolean>(false);
+  useEffect(() => {
+    const shareCapitalIsNan = isNaN(formik.values.shareCapital);
+    if (shareCapitalIsNan) {
+      formik.setFieldValue('shareCapital', undefined);
+    }
+    if (formik.values.shareCapital) {
+      setShrinkValue(true);
+    } else {
+      setShrinkValue(false);
+    }
+  }, [formik.values.shareCapital]);
+
   return (
     <>
       {/* DATI DI FATTURAZIONE E ANAGRAFICI */}
       <Paper elevation={8} sx={{ borderRadius: theme.spacing(2), p: 4 }}>
         <Grid item container spacing={3}>
+          {/* Ragione sociale */}
           <Grid item xs={12}>
             <CustomTextField
               {...baseTextFieldProps(
@@ -101,6 +117,7 @@ export default function PersonalAndBillingDataSection({
               disabled={isDisabled}
             />
           </Grid>
+          {/* Sede legale */}
           <Grid item xs={8}>
             <CustomTextField
               {...baseTextFieldProps(
@@ -112,6 +129,7 @@ export default function PersonalAndBillingDataSection({
               disabled={isDisabled}
             />
           </Grid>
+          {/* CAP */}
           <Grid item xs={4} paddingLeft={1}>
             <CustomNumberField
               inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
@@ -124,6 +142,7 @@ export default function PersonalAndBillingDataSection({
               disabled={isDisabled}
             />
           </Grid>
+          {/* Indirizzo PEC */}
           <Grid item xs={12}>
             <CustomTextField
               {...baseTextFieldProps(
@@ -135,6 +154,7 @@ export default function PersonalAndBillingDataSection({
               disabled={isDisabled}
             />
           </Grid>
+          {/* Codice fiscale */}
           <Grid item xs={12}>
             <CustomTextField
               {...baseTextFieldProps(
@@ -146,6 +166,7 @@ export default function PersonalAndBillingDataSection({
               disabled={isDisabled}
             />
           </Grid>
+          {/* Checkbox codice fiscale = P.IVA */}
           <Grid item xs={12}>
             <Box display="flex" alignItems="center">
               <Checkbox
@@ -170,6 +191,7 @@ export default function PersonalAndBillingDataSection({
               </Typography>
             </Box>
           </Grid>
+          {/* Partita IVA */}
           <Grid item xs={12}>
             <Typography component={'span'}>
               <CustomTextField
@@ -188,6 +210,7 @@ export default function PersonalAndBillingDataSection({
               />
               {isPSP && (
                 <Box display="flex" alignItems="center" mt="2px">
+                  {/* Checkbox la aprtita IVA è di gruppo */}
                   <Checkbox
                     inputProps={{
                       'aria-label': t('onboardingFormData.billingDataSection.vatNumberGroup'),
@@ -203,11 +226,86 @@ export default function PersonalAndBillingDataSection({
                   </Typography>
                 </Box>
               )}
+              {/* Codice destinatario */}
+              <Grid item xs={12} mt={3}>
+                <CustomTextField
+                  {...baseTextFieldProps(
+                    'recipientCode',
+                    t('onboardingFormData.billingDataSection.recipientCode'),
+                    400,
+                    18
+                  )}
+                />
+                {/* descrizione destinatario */}
+                <Typography
+                  component={'span'}
+                  sx={{
+                    fontSize: '12px!important',
+                    fontWeight: 600,
+                    color: theme.palette.text.secondary,
+                  }}
+                >
+                  {t('onboardingFormData.billingDataSection.recipientCodeDescription')}
+                </Typography>
+              </Grid>
             </Typography>
           </Grid>
+          {/* institutionType !== 'PA' && institutionType !== 'PSP' && productId === 'prod-io'; */}
+          {isInformationCompany && (
+            <>
+              <Grid item xs={12}>
+                {/* Luogo di iscrizione al Registro delle Imprese facoltativo per institution Type !== 'PA' e 'PSP */}
+                <CustomTextField
+                  {...baseTextFieldProps(
+                    'businessRegisterPlace',
+                    t(
+                      'onboardingFormData.billingDataSection.informationCompanies.commercialRegisterNumber'
+                    ),
+                    400,
+                    18
+                  )}
+                />
+              </Grid>
+              <Grid item xs={6}>
+                {/* REA facoltativo per institution Type !== 'PA' e 'PSP */}
+                <CustomTextField
+                  placeholder={'RM-123456'}
+                  {...baseTextFieldProps(
+                    'rea',
+                    t('onboardingFormData.billingDataSection.informationCompanies.rea'),
+                    400,
+                    18
+                  )}
+                />
+              </Grid>
+              <Grid item xs={6}>
+                {/* capitale sociale facoltativo per institution Type !== 'PA' e 'PSP */}
+                <CustomTextField
+                  name={'shareCapital'}
+                  {...baseTextFieldProps(
+                    'shareCapital',
+                    t('onboardingFormData.billingDataSection.informationCompanies.shareCapital'),
+                    400,
+                    18
+                  )}
+                  onClick={() => setShrinkValue(true)}
+                  onBlur={() => {
+                    if (!formik.values.shareCapital) {
+                      setShrinkValue(false);
+                    }
+                  }}
+                  InputLabelProps={{ shrink: shrinkValue }}
+                  InputProps={{
+                    inputComponent: NumberDecimalFormat,
+                  }}
+                />
+              </Grid>
+            </>
+          )}
           {isPSP && (
             <>
               <Grid item xs={12}>
+                {/* n. Iscrizione al Registro delle Imprese */}
                 <CustomTextField
                   inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
                   {...baseTextFieldProps(
@@ -221,6 +319,7 @@ export default function PersonalAndBillingDataSection({
                 />
               </Grid>
               <Grid item xs={12}>
+                {/* Iscrizione all’Albo */}
                 <CustomTextField
                   {...baseTextFieldProps(
                     'registrationInRegister',
@@ -233,6 +332,7 @@ export default function PersonalAndBillingDataSection({
                 />
               </Grid>
               <Grid item xs={6}>
+                {/* Numero dell’Albo */}
                 <CustomTextField
                   inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
                   {...baseTextFieldProps(
@@ -244,6 +344,7 @@ export default function PersonalAndBillingDataSection({
                 />
               </Grid>
               <Grid item xs={6}>
+                {/* ABI code */}
                 <CustomTextField
                   {...baseTextFieldProps(
                     'abiCode',
@@ -255,15 +356,17 @@ export default function PersonalAndBillingDataSection({
               </Grid>
             </>
           )}
+          {/* indirizzo mail di supporto */}
           <Grid item xs={12}>
             <CustomTextField
               {...baseTextFieldProps(
-                'recipientCode',
-                t('onboardingFormData.billingDataSection.recipientCode'),
+                'supportEmail',
+                t('onboardingFormData.billingDataSection.assistanceContact.supportEmail'),
                 400,
                 18
               )}
             />
+            {/* descrizione indirizzo mail di supporto */}
             <Typography
               component={'span'}
               sx={{
@@ -272,7 +375,7 @@ export default function PersonalAndBillingDataSection({
                 color: theme.palette.text.secondary,
               }}
             >
-              {t('onboardingFormData.billingDataSection.recipientCodeDescription')}
+              {t('onboardingFormData.billingDataSection.assistanceContact.supportEmailDescriprion')}
             </Typography>
           </Grid>
         </Grid>

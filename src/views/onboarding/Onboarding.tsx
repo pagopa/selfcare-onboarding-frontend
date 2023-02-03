@@ -34,6 +34,8 @@ import {
   GeographicTaxonomy,
   onboardedInstitutionInfo2geographicTaxonomy,
 } from '../../model/GeographicTaxonomies';
+import { companyInformationsDto2pspDataRequest } from '../../model/InformationCompaniesData';
+import { assistanceConcatsDto2pspDataRequest } from '../../model/AssistanceContactsData';
 import { OnboardingFormData } from '../../model/OnboardingFormData';
 import StepOnboardingData from '../../components/steps/StepOnboardingData';
 import StepOnboardingFormData from '../../components/steps/StepOnboardingFormData';
@@ -360,6 +362,10 @@ function OnboardingComponent({ productId }: { productId: string }) {
             institutionType === 'PSP'
               ? pspData2pspDataRequest(onboardingFormData as OnboardingFormData)
               : undefined,
+          companyInformations:
+            institutionType !== 'PSP' && institutionType !== 'PA'
+              ? companyInformationsDto2pspDataRequest(onboardingFormData as OnboardingFormData)
+              : undefined,
           institutionType,
           geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY
             ? onboardingFormData?.geographicTaxonomies?.map((gt) =>
@@ -373,6 +379,9 @@ function OnboardingComponent({ productId }: { productId: string }) {
             email: u.email.toLowerCase(),
           })),
           pricingPlan,
+          assistanceContacts: assistanceConcatsDto2pspDataRequest(
+            onboardingFormData as OnboardingFormData
+          ),
         },
       },
       () => setRequiredLogin(true)

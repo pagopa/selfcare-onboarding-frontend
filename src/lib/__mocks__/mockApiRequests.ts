@@ -283,13 +283,14 @@ const mockedOnboardingData0: InstitutionOnboardingInfoResource = {
           desc: 'Firenze - Comune',
         },
       ],
+      supportEmail:'comune.bollate@pec.it'
     },
     institutionType: 'PA',
     origin: 'IPA',
   },
   manager: {
     email: 'm@ma.it',
-    taxCode: 'AAAAAA11A11A123K',
+    taxCode: 'RSSMRA80A01H501U',
     name: 'Mario',
     surname: 'Rossi',
     role: 'MANAGER',
@@ -313,6 +314,7 @@ const mockedOnboardingData1: InstitutionOnboardingInfoResource = {
           desc: 'Firenze - Comune',
         },
       ],
+      supportEmail:'comune.bollate@pec.it'
     },
     institutionType: 'PA',
     origin: 'IPA',
