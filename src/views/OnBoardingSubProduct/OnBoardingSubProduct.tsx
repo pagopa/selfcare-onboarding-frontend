@@ -25,6 +25,8 @@ import { StepAddManager, UsersObject } from '../../components/steps/StepAddManag
 import { StepSearchParty } from '../../components/steps/StepSearchParty';
 import StepOnboardingData from '../../components/steps/StepOnboardingData';
 import StepOnboardingFormData from '../../components/steps/StepOnboardingFormData';
+import { AssistanceContacts } from '../../model/AssistanceContacts';
+import { CompanyInformations } from '../../model/CompanyInformations';
 import { registerUnloadEvent, unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
 import { useHistoryState } from '../../components/useHistoryState';
 import SubProductStepVerifyInputs from './components/SubProductStepVerifyInputs';
@@ -67,6 +69,8 @@ function OnBoardingSubProduct() {
   const { setOnExit } = useContext(HeaderContext);
   const [onExitAction, setOnExitAction] = useState<(() => void) | undefined>();
   const requestIdRef = useRef<string>('');
+  const [assistanceContacts, setAssistanceContacts] = useState<AssistanceContacts>();
+  const [companyInformations, setCompanyInformations] = useState<CompanyInformations>();
 
   useEffect(() => {
     registerUnloadEvent(setOnExit, setOpenExitModal, setOnExitAction);
@@ -162,9 +166,9 @@ function OnBoardingSubProduct() {
     manager?: UserOnCreate,
     billingData?: OnboardingFormData,
     institutionType?: InstitutionType,
-    partyId?: string
-    assistanceData?: Obj
-    companyInformations?: Obj
+    partyId?: string,
+    assistanceContacts?: AssistanceContacts,
+    companyInformations?: CompanyInformations
   ) => {
     setManager(manager);
     if (manager) {
@@ -175,11 +179,11 @@ function OnBoardingSubProduct() {
     if (billingData) {
       setBillingData(billingData);
     }
-    if (assistanceData) {
-      setAssistanceData(assistanceData)
+    if (assistanceContacts) {
+      setAssistanceContacts(assistanceContacts);
     }
     if (companyInformations) {
-      setCompanyInformations(companyInformations)
+      setCompanyInformations(companyInformations);
     }
     setInstitutionType(institutionType);
     setPartyId(partyId);
@@ -263,16 +267,20 @@ function OnBoardingSubProduct() {
           subProductId: subProduct?.id,
           selectedProduct: subProduct,
           externalInstitutionId,
-          initialFormData: {...billingData ?? {
-            businessName: '',
-            registeredOffice: '',
-            zipCode: '',
-            digitalAddress: '',
-            taxCode: '',
-            vatNumber: '',
-            recipientCode: '',
-            geographicTaxonomies: [],
-          } ,...assistanceData,...companyInformations} ,
+          initialFormData: {
+            ...(billingData ?? {
+              businessName: '',
+              registeredOffice: '',
+              zipCode: '',
+              digitalAddress: '',
+              taxCode: '',
+              vatNumber: '',
+              recipientCode: '',
+              geographicTaxonomies: [],
+            }),
+            ...assistanceContacts,
+            ...companyInformations,
+          },
           institutionType: institutionType as InstitutionType,
           origin,
           subtitle: t('onBoardingSubProduct.billingData.subTitle'),

@@ -79,7 +79,7 @@ function StepOnboardingData({ forward, externalInstitutionId, productId, institu
         result.institution.billingData,
         result.institution.institutionType,
         result.institution.id,
-        result.institution.assistanceData,
+        result.institution.assistanceContacts,
         result.institution.companyInformations
       );
     } else if (

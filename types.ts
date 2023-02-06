@@ -5,6 +5,8 @@ import { FunctionComponent, SVGProps } from 'react';
 import { UserRole } from '@pagopa/selfcare-common-frontend/utils/constants';
 import { API } from './src/utils/constants';
 import { OnboardingFormData } from './src/model/OnboardingFormData';
+import { AssistanceContacts } from './src/model/AssistanceContacts';
+import { CompanyInformations } from './src/model/CompanyInformations';
 
 /*
  * Fetch data and router related types
@@ -193,6 +195,8 @@ export type InstitutionData = {
   billingData: OnboardingFormData;
   institutionType: InstitutionType;
   origin: string;
+  companyInformations?: CompanyInformations;
+  assistanceContacts?: AssistanceContacts;
 };
 
 export type InstitutionOnboardingInfoResource = {

@@ -34,8 +34,8 @@ import {
   GeographicTaxonomy,
   onboardedInstitutionInfo2geographicTaxonomy,
 } from '../../model/GeographicTaxonomies';
-import { companyInformationsDto2pspDataRequest } from '../../model/InformationCompaniesData';
-import { assistanceConcatsDto2pspDataRequest } from '../../model/AssistanceContactsData';
+import { companyInformationsDto2pspDataRequest } from '../../model/CompanyInformations';
+import { assistanceConcatsDto2pspDataRequest } from '../../model/AssistanceContacts';
 import { OnboardingFormData } from '../../model/OnboardingFormData';
 import StepOnboardingData from '../../components/steps/StepOnboardingData';
 import StepOnboardingFormData from '../../components/steps/StepOnboardingFormData';
