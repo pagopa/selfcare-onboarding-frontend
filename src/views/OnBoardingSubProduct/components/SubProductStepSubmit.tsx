@@ -1,27 +1,20 @@
 import { useContext, useEffect, useState } from 'react';
-import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
 import { Trans } from 'react-i18next';
-import { AxiosError } from 'axios';
+
 import { EndingPage } from '@pagopa/selfcare-common-frontend';
 import { IllusError } from '@pagopa/mui-italia';
 import {
   InstitutionType,
-  Problem,
   Product,
   StepperStepComponentProps,
   UserOnCreate,
 } from '../../../../types';
 import { HeaderContext, UserContext } from '../../../lib/context';
-import { fetchWithLogs } from '../../../lib/api-utils';
-import { getFetchOutcome } from '../../../lib/error-utils';
 import { MessageNoAction } from '../../../components/MessageNoAction';
 import { unregisterUnloadEvent } from '../../../utils/unloadEvent-utils';
-import { billingData2billingDataRequest } from '../../../model/BillingData';
-import { pspData2pspDataRequest } from '../../../model/PspData';
 import { OnboardingFormData } from '../../../model/OnboardingFormData';
 import { ENV } from '../../../utils/env';
-import { onboardedInstitutionInfo2geographicTaxonomy } from '../../../model/GeographicTaxonomies';
-import { assistanceConcatsDto2pspDataRequest } from '../../../model/AssistanceContacts';
+import { subProductSubmitFetch } from './SubProductSubmitFetch';
 
 type Props = StepperStepComponentProps & {
   requestId: string;
@@ -83,8 +76,21 @@ function SubProductStepSubmit({
   useEffect(() => {
     if (!error) {
       setLoading(true);
-      submit()
-        .catch((_reason) => {
+      subProductSubmitFetch({
+        externalInstitutionId,
+        subProduct,
+        users,
+        billingData,
+        institutionType,
+        pricingPlan,
+        setRequiredLogin,
+        requestId,
+        product,
+        setError,
+        forward,
+        origin,
+      })
+        .catch((_reason: any) => {
           setError(true);
           /*
           trackAppError({
@@ -102,68 +108,6 @@ function SubProductStepSubmit({
         });
     }
   }, []);
-
-  const submit = async () => {
-    const postLegalsResponse = await fetchWithLogs(
-      {
-        endpoint: 'ONBOARDING_POST_LEGALS',
-        endpointParams: { externalInstitutionId, productId: subProduct.id },
-      },
-      {
-        method: 'POST',
-        data: {
-          users: users.map((u) => ({
-            ...u,
-            taxCode: u.taxCode.toUpperCase(),
-            email: u.email.toLowerCase(),
-          })),
-          billingData: billingData2billingDataRequest(billingData as OnboardingFormData),
-          pspData:
-            institutionType === 'PSP'
-              ? pspData2pspDataRequest(billingData as OnboardingFormData)
-              : undefined,
-          institutionType,
-          pricingPlan,
-          origin,
-          geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY
-            ? billingData.geographicTaxonomies?.map((gt) =>
-                onboardedInstitutionInfo2geographicTaxonomy(gt)
-              )
-            : [],
-          assistanceContacts: assistanceConcatsDto2pspDataRequest(
-            billingData as OnboardingFormData
-          ),
-        },
-      },
-      () => setRequiredLogin(true)
-    );
-
-    // Check the outcome
-    const outcome = getFetchOutcome(postLegalsResponse);
-
-    if (outcome === 'success') {
-      trackEvent('ONBOARDING_PREMIUM_SEND_SUCCESS', {
-        request_id: requestId,
-        party_id: externalInstitutionId,
-        product_id: product?.id,
-        subproduct_id: subProduct?.id,
-      });
-      forward();
-    } else {
-      const event =
-        (postLegalsResponse as AxiosError<Problem>).response?.status === 409
-          ? 'ONBOARDING_PREMIUM_SEND_CONFLICT_ERROR_FAILURE'
-          : 'ONBOARDING_PREMIUM_SEND_FAILURE';
-      trackEvent(event, {
-        party_id: externalInstitutionId,
-        request_id: requestId,
-        product_id: product?.id,
-        subproduct_id: subProduct?.id,
-      });
-      setError(true);
-    }
-  };
-
   return error ? <MessageNoAction {...errorOutCome} /> : <></>;
 }
 export default SubProductStepSubmit;
