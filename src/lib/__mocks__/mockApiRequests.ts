@@ -318,6 +318,14 @@ const mockedOnboardingData1: InstitutionOnboardingInfoResource = {
     },
     institutionType: 'PA',
     origin: 'IPA',
+    assistanceContacts: {
+      supportEmail:'a@a.it'
+    },
+    companyInformations: {
+      businessRegisterPlace: 'register Place test',
+      rea: 'RM-123456',
+      shareCapital:'123456'
+    },
   },
   manager: {
     email: 'm@ma.it',
