@@ -69,7 +69,9 @@ export function OnBoardingProductStepDelegates({
       setLoading(false);
     }
     const userId = userIds[index];
-    validateUserData(people[userId], externalInstitutionId, userId, index, peopleErrors);
+    if (!isAuthUser) {
+      validateUserData(people[userId], externalInstitutionId, userId, index, peopleErrors);
+    }
   };
 
   const onUserValidateSuccess = (_userId: string, index: number, peopleErrors: UsersError) => {
