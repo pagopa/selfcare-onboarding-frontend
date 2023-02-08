@@ -69,7 +69,11 @@ export function OnBoardingProductStepDelegates({
       setLoading(false);
     }
     const userId = userIds[index];
-    validateUserData(people[userId], externalInstitutionId, userId, index, peopleErrors);
+    if (!isAuthUser) {
+      validateUserData(people[userId], externalInstitutionId, userId, index, peopleErrors);
+    } else {
+      onForwardAction();
+    }
   };
 
   const onUserValidateSuccess = (_userId: string, index: number, peopleErrors: UsersError) => {
@@ -172,7 +176,7 @@ export function OnBoardingProductStepDelegates({
     objectIsEmpty(people) ||
     Object.keys(people)
       .filter((prefix) => 'LEGAL' !== prefix)
-      .some((prefix) => !validateUser(prefix, people[prefix], allPeople)) ||
+      .some((prefix) => !validateUser(prefix, people[prefix], allPeople, isAuthUser)) ||
     Object.keys(people).length === 3;
 
   const handleCloseGenericErrorModal = () => {
@@ -228,6 +232,7 @@ export function OnBoardingProductStepDelegates({
             allPeople={allPeople}
             setPeople={setPeople}
             readOnlyFields={isAuthUser ? ['name', 'surname', 'taxCode'] : []}
+            isAuthUser={isAuthUser}
           />
         </Grid>
 
@@ -300,7 +305,7 @@ export function OnBoardingProductStepDelegates({
             objectIsEmpty(people) ||
             Object.keys(people)
               .filter((prefix) => 'LEGAL' !== prefix)
-              .some((prefix) => !validateUser(prefix, people[prefix], allPeople)),
+              .some((prefix) => !validateUser(prefix, people[prefix], allPeople, isAuthUser)),
         }}
       />
       <SessionModal
