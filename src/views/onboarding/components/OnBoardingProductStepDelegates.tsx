@@ -232,6 +232,7 @@ export function OnBoardingProductStepDelegates({
             allPeople={allPeople}
             setPeople={setPeople}
             readOnlyFields={isAuthUser ? ['name', 'surname', 'taxCode'] : []}
+            isAuthUser={isAuthUser}
           />
         </Grid>
 
