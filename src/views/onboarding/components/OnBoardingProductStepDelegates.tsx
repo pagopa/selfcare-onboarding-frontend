@@ -176,7 +176,7 @@ export function OnBoardingProductStepDelegates({
     objectIsEmpty(people) ||
     Object.keys(people)
       .filter((prefix) => 'LEGAL' !== prefix)
-      .some((prefix) => !validateUser(prefix, people[prefix], allPeople)) ||
+      .some((prefix) => !validateUser(prefix, people[prefix], allPeople, isAuthUser)) ||
     Object.keys(people).length === 3;
 
   const handleCloseGenericErrorModal = () => {
@@ -305,7 +305,7 @@ export function OnBoardingProductStepDelegates({
             objectIsEmpty(people) ||
             Object.keys(people)
               .filter((prefix) => 'LEGAL' !== prefix)
-              .some((prefix) => !validateUser(prefix, people[prefix], allPeople)),
+              .some((prefix) => !validateUser(prefix, people[prefix], allPeople, isAuthUser)),
         }}
       />
       <SessionModal

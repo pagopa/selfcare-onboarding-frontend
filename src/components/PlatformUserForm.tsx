@@ -78,11 +78,12 @@ function stringEquals(str1?: string, str2?: string, caseSensitive?: boolean) {
 export function validateUser(
   userTempId: keyof UsersObject,
   user: UserOnCreate,
-  users: UsersObject
+  users: UsersObject,
+  isAuthUser?: boolean
 ): boolean {
   return (
     fields.filter(({ id }) => !user[id]).map(({ id }) => id).length === 0 && // mandatory fields
-    validateNoMandatory(userTempId, user, users).length === 0
+    validateNoMandatory(userTempId, user, users, isAuthUser).length === 0
   );
 }
 
