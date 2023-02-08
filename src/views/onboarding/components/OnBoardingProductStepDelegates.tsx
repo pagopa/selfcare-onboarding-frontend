@@ -71,6 +71,8 @@ export function OnBoardingProductStepDelegates({
     const userId = userIds[index];
     if (!isAuthUser) {
       validateUserData(people[userId], externalInstitutionId, userId, index, peopleErrors);
+    } else {
+      onForwardAction();
     }
   };
 
