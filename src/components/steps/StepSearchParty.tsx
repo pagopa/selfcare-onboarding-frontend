@@ -4,7 +4,13 @@ import { useContext, useEffect, useState } from 'react';
 import { AxiosResponse } from 'axios';
 import { useTranslation, Trans } from 'react-i18next';
 import { ReactElement } from 'react';
-import { InstitutionType, IPACatalogParty, Party, StepperStepComponentProps } from '../../../types';
+import {
+  InstitutionType,
+  IPACatalogParty,
+  Party,
+  Product,
+  StepperStepComponentProps,
+} from '../../../types';
 import { getFetchOutcome } from '../../lib/error-utils';
 import { fetchWithLogs } from '../../lib/api-utils';
 import { UserContext } from '../../lib/context';
@@ -17,6 +23,7 @@ type Props = {
   subTitle: string | ReactElement;
   institutionType?: InstitutionType;
   productAvoidStep?: boolean;
+  product?: Product | null;
 } & StepperStepComponentProps;
 
 const handleSearchExternalId = async (
@@ -47,11 +54,11 @@ export function StepSearchParty({
   back,
   institutionType,
   productAvoidStep,
+  product,
 }: Props) {
   const partyExternalIdByQuery = new URLSearchParams(window.location.search).get('partyExternalId');
   const { setRequiredLogin } = useContext(UserContext);
   const theme = useTheme();
-
   const [loading, setLoading] = useState(!!partyExternalIdByQuery);
   const [selected, setSelected, setSelectedHistory] = useHistoryState<IPACatalogParty | null>(
     'selected_step1',
@@ -141,6 +148,7 @@ export function StepSearchParty({
             }
             optionKey="id"
             optionLabel="description"
+            product={product}
           />
         </Grid>
       </Grid>
