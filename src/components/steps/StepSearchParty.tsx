@@ -11,7 +11,7 @@ import { UserContext } from '../../lib/context';
 import { OnboardingStepActions } from '../OnboardingStepActions';
 import { useHistoryState } from '../useHistoryState';
 import { LoadingOverlay } from '../LoadingOverlay';
-import { AsyncAutocompleteV2 } from '../autocomplete/AsyncAutocompleteV2';
+import { AsyncAutocomplete } from '../autocomplete/AsyncAutocomplete';
 
 type Props = {
   subTitle: string | ReactElement;
@@ -122,7 +122,7 @@ export function StepSearchParty({
 
       <Grid container item justifyContent="center" mt={4} mb={4}>
         <Grid item xs={8} md={6} lg={5}>
-          <AsyncAutocompleteV2
+          <AsyncAutocomplete
             theme={theme}
             selected={selected}
             setSelected={setSelected}

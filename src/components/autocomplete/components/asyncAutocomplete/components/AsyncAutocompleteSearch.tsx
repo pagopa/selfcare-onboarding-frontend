@@ -3,8 +3,8 @@ import { styled } from '@mui/system';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 import { Dispatch, SetStateAction } from 'react';
-import { IPACatalogParty } from '../../../../types';
-import { useHistoryState } from '../../useHistoryState';
+import { IPACatalogParty } from '../../../../../../types';
+import { useHistoryState } from '../../../../useHistoryState';
 
 const CustomTextField = styled(TextField)({
   justifyContent: 'center',
