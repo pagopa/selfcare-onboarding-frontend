@@ -28,6 +28,7 @@ export function AsyncAutocomplete({
   const [options, setOptions] = useState<Array<any>>([]);
   const [isBusinessNameSelected, setIsBusinessNameSelected] = useState<boolean>();
   const [isTaxCodeSelected, setIsTaxCodeSelected] = useState<boolean>();
+  const [isSearchFieldSelected, setIsSearchFieldSelected] = useState<boolean>(false);
 
   return (
     <Paper
@@ -50,6 +51,9 @@ export function AsyncAutocomplete({
               setIsTaxCodeSelected={setIsTaxCodeSelected}
               setOptions={setOptions}
               setInput={setInput}
+              setIsSearchFieldSelected={setIsSearchFieldSelected}
+              isSearchFieldSelected={isSearchFieldSelected}
+              isSelected={selected}
             />
           </Grid>
         )}
@@ -69,6 +73,8 @@ export function AsyncAutocomplete({
           selected={selected}
           theme={theme}
           options={options}
+          isSearchFieldSelected={isSearchFieldSelected}
+          setIsSearchFieldSelected={setIsSearchFieldSelected}
         />
       </Grid>
     </Paper>

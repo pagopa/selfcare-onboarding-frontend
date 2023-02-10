@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { FormControl, InputLabel, MenuItem } from '@mui/material';
@@ -8,6 +8,9 @@ type Props = {
   setIsTaxCodeSelected: React.Dispatch<React.SetStateAction<boolean | undefined>>;
   setOptions: React.Dispatch<React.SetStateAction<Array<any>>>;
   setInput: React.Dispatch<React.SetStateAction<string>>;
+  setIsSearchFieldSelected: React.Dispatch<React.SetStateAction<boolean>>;
+  isSearchFieldSelected: boolean;
+  isSelected: boolean;
 };
 
 export default function PartyAdvancedSelect({
@@ -15,6 +18,8 @@ export default function PartyAdvancedSelect({
   setIsTaxCodeSelected,
   setOptions,
   setInput,
+  setIsSearchFieldSelected,
+  isSearchFieldSelected,
 }: Props) {
   const { t } = useTranslation();
 
@@ -22,6 +27,7 @@ export default function PartyAdvancedSelect({
 
   const handleTypeSearchChange = (event: SelectChangeEvent) => {
     setTypeOfSearch(event.target.value as string);
+    setIsSearchFieldSelected(true);
   };
   const onSelectValue = (isTaxCodeSelected: boolean, IsBusinessNameSelected: boolean) => {
     setIsBusinessNameSelected(IsBusinessNameSelected);
@@ -29,23 +35,29 @@ export default function PartyAdvancedSelect({
     setOptions([]);
     setInput('');
   };
+
+  useEffect(() => {
+    if (isSearchFieldSelected) {
+      setIsSearchFieldSelected(true);
+    }
+  }, [isSearchFieldSelected]);
   return (
     <FormControl fullWidth size="small">
-      <InputLabel id="advancedSearch">{t('Cerca per')}</InputLabel>
+      <InputLabel id="advancedSearch">{t('partyAdvancedSelect.advancedSearchLabel')}</InputLabel>
       <Select
         labelId="advancedSearch"
         id="demo-simple-select"
         value={typeOfSearch}
-        label={t('Cerca per')}
+        label={t('partyAdvancedSelect.advancedSearchLabel')}
         onChange={handleTypeSearchChange}
       >
         <MenuItem value={'businessName'} onClick={() => onSelectValue(false, true)}>
-          {t('Ragione Sociale')}
+          {t('partyAdvancedSelect.businessName')}
         </MenuItem>
         <MenuItem value={'taxCode'} onClick={() => onSelectValue(true, false)}>
-          {t('Codice Fiscale dell’ente')}
+          {t('partyAdvancedSelect.taxCode')}
         </MenuItem>
-        <MenuItem value={'ipaCode'}>{t('Codice IPA')}</MenuItem>
+        <MenuItem value={'ipaCode'}> {t('partyAdvancedSelect.ipaCode')}</MenuItem>
       </Select>
     </FormControl>
   );

@@ -29,6 +29,8 @@ type Props = {
   selected: any;
   theme: Theme;
   options: Array<any>;
+  isSearchFieldSelected: boolean;
+  setIsSearchFieldSelected: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 export default function AsyncAutocompleteContainer({
@@ -47,6 +49,8 @@ export default function AsyncAutocompleteContainer({
   selected,
   theme,
   options,
+  isSearchFieldSelected,
+  setIsSearchFieldSelected,
 }: Props) {
   const { setRequiredLogin } = useContext(UserContext);
   const { t } = useTranslation();
@@ -93,9 +97,9 @@ export default function AsyncAutocompleteContainer({
         setIsBusinessNameSelected(false);
         void debounce(handleSearch, 100)(value);
       } else if (isTaxCodeSelected) {
-        console.log('xx CF selezionato');
+        console.log('xx CF selezionato'); // TODO add fetch
         setIsTaxCodeSelected(false);
-      }
+      } // TODO add fetch for ipa code search
     }
     if (value === '') {
       setSelected(null);
@@ -112,7 +116,7 @@ export default function AsyncAutocompleteContainer({
         display="flex"
         justifyContent="center"
         width="100%"
-        pt={4}
+        pt={selected ? 4 : 2}
         pb={showElement && !selected ? 0 : 4}
       >
         {selected && (
@@ -128,6 +132,8 @@ export default function AsyncAutocompleteContainer({
           setInput={setInput}
           input={input}
           handleChange={handleChange}
+          isSearchFieldSelected={isSearchFieldSelected}
+          setIsSearchFieldSelected={setIsSearchFieldSelected}
         />
       </Grid>
       <Grid
@@ -164,7 +170,6 @@ export default function AsyncAutocompleteContainer({
           )
         )}
       </Grid>
-      ;
     </>
   );
 }

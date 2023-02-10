@@ -8,6 +8,13 @@ export default {
   asyncAutocomplete: {
     noResultsLabel: 'Nessun risultato',
     lessThen3CharacterLabel: 'Digita almeno 3 caratteri',
+    serachLabel:'Cerca'
+  },
+  partyAdvancedSelect: {
+    advancedSearchLabel: 'Cerca per',
+    businessName: 'Ragione Sociale',
+    taxCode: 'Codice Fiscale dell’ente',
+    ipaCode: 'Codice IPA'
   },
   confirmRegistrationStep0: {
     title: "Carica l'Accordo di Adesione",

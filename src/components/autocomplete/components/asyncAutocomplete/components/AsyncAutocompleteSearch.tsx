@@ -1,6 +1,6 @@
-import { IconButton, InputAdornment, TextField, Theme } from '@mui/material';
+import { IconButton, TextField, Theme } from '@mui/material';
 import { styled } from '@mui/system';
-import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
+import { useTranslation } from 'react-i18next';
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 import { Dispatch, SetStateAction } from 'react';
 import { IPACatalogParty } from '../../../../../../types';
@@ -32,6 +32,8 @@ type Props = {
   setInput: Dispatch<SetStateAction<string>>;
   input: string;
   handleChange: (event: any) => void;
+  isSearchFieldSelected: boolean;
+  setIsSearchFieldSelected: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 export default function AsyncAutocompleteSearch({
@@ -41,16 +43,19 @@ export default function AsyncAutocompleteSearch({
   setInput,
   input,
   handleChange,
+  isSearchFieldSelected,
+  setIsSearchFieldSelected,
 }: Props) {
   const setSelectedHistory = useHistoryState<IPACatalogParty | null>('selected_step1', null)[2];
-
+  const { t } = useTranslation();
   return (
     <CustomTextField
+      disabled={!isSearchFieldSelected}
       id="Parties"
       sx={{ width: '100%', mx: selected ? 1 : 4 }}
       value={selected ? selected.description : input}
       onChange={handleChange}
-      label={!selected ? 'Cerca ente' : ''}
+      label={!selected ? t('asyncAutocomplete.serachLabel') : ''}
       variant={!selected ? 'outlined' : 'standard'}
       inputProps={{
         style: {
@@ -64,21 +69,24 @@ export default function AsyncAutocompleteSearch({
         },
       }}
       InputProps={{
-        startAdornment: !selected && (
-          <InputAdornment position="end">
-            <SearchOutlinedIcon sx={{ color: theme.palette.text.primary }} />
-          </InputAdornment>
-        ),
         endAdornment: (
           <IconButton
+            disabled={!isSearchFieldSelected}
             onClick={() => {
               setInput('');
               setSelected('');
               setSelectedHistory(null);
+              setIsSearchFieldSelected(false);
             }}
             aria-label="clearIcon"
           >
-            <ClearOutlinedIcon sx={{ color: theme.palette.text.primary }} />
+            <ClearOutlinedIcon
+              sx={{
+                color: !isSearchFieldSelected
+                  ? theme.palette.text.disabled
+                  : theme.palette.text.primary,
+              }}
+            />
           </IconButton>
         ),
       }}
