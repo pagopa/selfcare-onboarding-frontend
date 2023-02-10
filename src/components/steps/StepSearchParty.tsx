@@ -103,11 +103,7 @@ export function StepSearchParty({
   return loading ? (
     <LoadingOverlay loadingText={t('onboardingStep1.loadingOverlayText')} />
   ) : (
-    <Grid
-      container
-      //  mt={16}
-      direction="column"
-    >
+    <Grid container direction="column">
       <Grid container item justifyContent="center">
         <Grid item xs={12}>
           <Typography variant="h3" component="h2" align="center" color={theme.palette.text.primary}>

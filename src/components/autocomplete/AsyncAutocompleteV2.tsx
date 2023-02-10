@@ -12,6 +12,7 @@ import { UserContext } from '../../lib/context';
 import { ReactComponent as PartyIcon } from '../../assets/onboarding_party_icon.svg';
 import AsyncAutocompleteResults from './components/AsyncAutocompleteResults';
 import AsyncAutocompleteSearch from './components/AsyncAutocompleteSearch';
+import PartyAdvancedSelect from './PartyAdvancedSelect';
 
 type AutocompleteProps = {
   selected: any;
@@ -23,6 +24,7 @@ type AutocompleteProps = {
   theme: Theme;
 };
 
+// eslint-disable-next-line sonarjs/cognitive-complexity
 export function AsyncAutocompleteV2({
   selected,
   setSelected,
@@ -37,6 +39,9 @@ export function AsyncAutocompleteV2({
   const [options, setOptions] = useState<Array<any>>([]);
   const { setRequiredLogin } = useContext(UserContext);
   const { t } = useTranslation();
+
+  const [isBusinessNameSelected, setIsBusinessNameSelected] = useState<boolean>();
+  const [isTaxCodeSelected, setIsTaxCodeSelected] = useState<boolean>();
 
   const handleSearch = async (query: string) => {
     setIsLoading(true);
@@ -74,8 +79,13 @@ export function AsyncAutocompleteV2({
     setInput(value);
     if (value !== '') {
       setSelected(null);
-      if (value.length >= 3) {
+      if (value.length >= 3 && isBusinessNameSelected) {
+        console.log('xx Ragione sociale selezionata');
+        setIsBusinessNameSelected(false);
         void debounce(handleSearch, 100)(value);
+      } else if (isTaxCodeSelected) {
+        console.log('xx CF selezionato');
+        setIsTaxCodeSelected(false);
       }
     }
     if (value === '') {
@@ -99,6 +109,16 @@ export function AsyncAutocompleteV2({
       }}
     >
       <Grid container mx={selected ? 4 : undefined}>
+        {!selected && (
+          <Grid item xs={12} px={4} pt={4}>
+            <PartyAdvancedSelect
+              setIsBusinessNameSelected={setIsBusinessNameSelected}
+              setIsTaxCodeSelected={setIsTaxCodeSelected}
+              setOptions={setOptions}
+              setInput={setInput}
+            />
+          </Grid>
+        )}
         <Grid
           item
           xs={12}
