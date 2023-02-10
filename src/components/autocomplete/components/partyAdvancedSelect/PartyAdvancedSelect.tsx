@@ -9,8 +9,8 @@ type Props = {
   setOptions: React.Dispatch<React.SetStateAction<Array<any>>>;
   setInput: React.Dispatch<React.SetStateAction<string>>;
   setIsSearchFieldSelected: React.Dispatch<React.SetStateAction<boolean>>;
-  isSearchFieldSelected: boolean;
-  isSelected: boolean;
+  isSearchFieldSelected?: boolean;
+  selected: boolean;
 };
 
 export default function PartyAdvancedSelect({
@@ -20,6 +20,7 @@ export default function PartyAdvancedSelect({
   setInput,
   setIsSearchFieldSelected,
   isSearchFieldSelected,
+  selected,
 }: Props) {
   const { t } = useTranslation();
 
@@ -37,8 +38,10 @@ export default function PartyAdvancedSelect({
   };
 
   useEffect(() => {
-    if (isSearchFieldSelected) {
+    if (isSearchFieldSelected || selected) {
       setIsSearchFieldSelected(true);
+    } else {
+      setIsSearchFieldSelected(false);
     }
   }, [isSearchFieldSelected]);
   return (

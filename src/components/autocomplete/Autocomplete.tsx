@@ -12,10 +12,16 @@ type AutocompleteProps = {
   optionKey?: string;
   optionLabel?: string;
   theme: Theme;
+  input: string;
+  setInput: React.Dispatch<React.SetStateAction<string>>;
+  isTaxCodeSelected?: boolean;
+  setIsTaxCodeSelected: React.Dispatch<React.SetStateAction<boolean | undefined>>;
+  setIsSearchFieldSelected: React.Dispatch<React.SetStateAction<boolean>>;
+  isSearchFieldSelected: boolean;
 };
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
-export function AsyncAutocomplete({
+export function Autocomplete({
   selected,
   setSelected,
   endpoint,
@@ -23,12 +29,15 @@ export function AsyncAutocomplete({
   optionKey,
   optionLabel,
   theme,
+  input,
+  setInput,
+  setIsTaxCodeSelected,
+  isTaxCodeSelected,
+  setIsSearchFieldSelected,
+  isSearchFieldSelected,
 }: AutocompleteProps) {
-  const [input, setInput] = useState<string>('');
   const [options, setOptions] = useState<Array<any>>([]);
   const [isBusinessNameSelected, setIsBusinessNameSelected] = useState<boolean>();
-  const [isTaxCodeSelected, setIsTaxCodeSelected] = useState<boolean>();
-  const [isSearchFieldSelected, setIsSearchFieldSelected] = useState<boolean>(false);
 
   return (
     <Paper
@@ -53,7 +62,7 @@ export function AsyncAutocomplete({
               setInput={setInput}
               setIsSearchFieldSelected={setIsSearchFieldSelected}
               isSearchFieldSelected={isSearchFieldSelected}
-              isSelected={selected}
+              selected={selected}
             />
           </Grid>
         )}

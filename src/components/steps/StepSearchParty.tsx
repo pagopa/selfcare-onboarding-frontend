@@ -11,7 +11,7 @@ import { UserContext } from '../../lib/context';
 import { OnboardingStepActions } from '../OnboardingStepActions';
 import { useHistoryState } from '../useHistoryState';
 import { LoadingOverlay } from '../LoadingOverlay';
-import { AsyncAutocomplete } from '../autocomplete/AsyncAutocomplete';
+import { Autocomplete } from '../autocomplete/Autocomplete';
 
 type Props = {
   subTitle: string | ReactElement;
@@ -40,7 +40,8 @@ const handleSearchExternalId = async (
 
   return null;
 };
-
+// TODO remove cognitive-complexity
+// eslint-disable-next-line sonarjs/cognitive-complexity
 export function StepSearchParty({
   subTitle,
   forward,
@@ -52,16 +53,53 @@ export function StepSearchParty({
   const { setRequiredLogin } = useContext(UserContext);
   const theme = useTheme();
 
+  const [isTaxCodeSelected, setIsTaxCodeSelected] = useState<boolean>();
+  const [input, setInput] = useState<string>('');
+  const [isSearchFieldSelected, setIsSearchFieldSelected] = useState<boolean>(false);
+
   const [loading, setLoading] = useState(!!partyExternalIdByQuery);
   const [selected, setSelected, setSelectedHistory] = useHistoryState<IPACatalogParty | null>(
     'selected_step1',
     null
   );
 
+  const handleSearchByTaxCode = async (query: string) => {
+    console.log('input', query); // TODO remove
+    // setIsLoading(true);
+    // const searchResponse: any = await fetchWithLogs(
+    //   {
+    //     endpoint: 'ONBOARDING_GET_PARTY',
+    //     endpointParams: { externalInstitutionId: query },
+    //   },
+    //   { method: 'GET', params: { origin: 'INFOCAMERE' } },
+    //   () => setRequiredLogin(true)
+    // );
+
+    // const outcome = getFetchOutcome(searchResponse);
+    // const foundParty = (searchResponse as AxiosResponse).data;
+    // if (outcome === 'success' && foundParty?.taxCode === query) {
+    //   setSelected(foundParty);
+    // } else {
+    //   /*
+    //   TODO: Probably, for technical limits of Infocamere API/probably unattainable case, we couldn't manage
+    //   multiples match cases. If this is confirmed, this code will be deleted else we will restore it.
+    //   else if (matchedParty.length > 1) {
+    //     setMoreMatches(matchedParty);
+    //   */
+    //   setOpenErrorModal(true);
+    //   // eslint-disable-next-line functional/immutable-data
+    //   currentInput.current = query;
+    //   setError(true);
+    // }
+  };
+
   const onForwardAction = () => {
     setSelectedHistory(selected);
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const { id } = selected!;
+    if (isTaxCodeSelected) {
+      void handleSearchByTaxCode(input);
+    }
     forward({ externalId: id }, { ...selected, externalId: id } as Party, institutionType);
   };
 
@@ -71,6 +109,7 @@ export function StepSearchParty({
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     back!();
   };
+
   useEffect(() => {
     if (partyExternalIdByQuery) {
       handleSearchExternalId(partyExternalIdByQuery, () => setRequiredLogin(true))
@@ -100,6 +139,14 @@ export function StepSearchParty({
     }
   }, [selected]);
 
+  useEffect(() => {
+    if (isSearchFieldSelected || selected) {
+      setIsSearchFieldSelected(true);
+    } else {
+      setIsSearchFieldSelected(false);
+    }
+  }, [isSearchFieldSelected]);
+
   return loading ? (
     <LoadingOverlay loadingText={t('onboardingStep1.loadingOverlayText')} />
   ) : (
@@ -122,21 +169,26 @@ export function StepSearchParty({
 
       <Grid container item justifyContent="center" mt={4} mb={4}>
         <Grid item xs={8} md={6} lg={5}>
-          <AsyncAutocomplete
+          <Autocomplete
             theme={theme}
             selected={selected}
             setSelected={setSelected}
-            // placeholder={t('onboardingStep1.onboarding.asyncAutocomplete.placeholder')}
             endpoint={{ endpoint: 'ONBOARDING_GET_SEARCH_PARTIES' }}
             transformFn={(data: { items: Array<IPACatalogParty> }) =>
               /* removed transformation into lower case in order to send data to BE as obtained from registry
-              // eslint-disable-next-line functional/immutable-data
-              data.items.forEach((i) => (i.description = i.description.toLowerCase()));
-              */
+                  // eslint-disable-next-line functional/immutable-data
+                  data.items.forEach((i) => (i.description = i.description.toLowerCase()));
+                  */
               data.items
             }
             optionKey="id"
             optionLabel="description"
+            input={input}
+            setInput={setInput}
+            setIsTaxCodeSelected={setIsTaxCodeSelected}
+            isTaxCodeSelected={isTaxCodeSelected}
+            setIsSearchFieldSelected={setIsSearchFieldSelected}
+            isSearchFieldSelected={isSearchFieldSelected}
           />
         </Grid>
       </Grid>
