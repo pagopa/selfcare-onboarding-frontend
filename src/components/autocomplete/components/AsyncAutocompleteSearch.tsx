@@ -1,4 +1,4 @@
-import { IconButton, InputAdornment, TextField, Theme } from '@mui/material';
+import { IconButton, InputAdornment, TextField, Theme, Tooltip } from '@mui/material';
 import { styled } from '@mui/system';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
@@ -43,45 +43,58 @@ export default function AsyncAutocompleteSearch({
   handleChange,
 }: Props) {
   const setSelectedHistory = useHistoryState<IPACatalogParty | null>('selected_step1', null)[2];
-
+  const truncatedText = {
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    display: '-webkit-box',
+    WebkitBoxOrient: 'vertical' as const,
+    width: '100%',
+    whiteSpace: 'normal' as const,
+  };
   return (
-    <CustomTextField
-      id="Parties"
-      sx={{ width: '100%', mx: selected ? 1 : 4 }}
-      value={selected ? selected.description : input}
-      onChange={handleChange}
-      label={!selected ? 'Cerca ente' : ''}
-      variant={!selected ? 'outlined' : 'standard'}
-      inputProps={{
-        style: {
-          fontStyle: 'normal',
-          fontWeight: '700',
-          fontSize: '16px',
-          lineHeight: '24px',
-          color: theme.palette.text.primary,
-          textAlign: 'start',
-          paddingLeft: '8px',
-        },
-      }}
-      InputProps={{
-        startAdornment: !selected && (
-          <InputAdornment position="end">
-            <SearchOutlinedIcon sx={{ color: theme.palette.text.primary }} />
-          </InputAdornment>
-        ),
-        endAdornment: (
-          <IconButton
-            onClick={() => {
-              setInput('');
-              setSelected('');
-              setSelectedHistory(null);
-            }}
-            aria-label="clearIcon"
-          >
-            <ClearOutlinedIcon sx={{ color: theme.palette.text.primary }} />
-          </IconButton>
-        ),
-      }}
-    />
+    <Tooltip arrow title={selected?.description?.length > 20 ? selected?.description : ''}>
+      <CustomTextField
+        id="Parties"
+        sx={{ width: '100%', mx: selected ? 1 : 4 }}
+        value={selected ? selected.description : input}
+        onChange={handleChange}
+        label={!selected ? 'Cerca ente' : ''}
+        variant={!selected ? 'outlined' : 'standard'}
+        inputProps={{
+          style: {
+            fontStyle: 'normal',
+            fontWeight: '700',
+            fontSize: '16px',
+            lineHeight: '24px',
+            color: theme.palette.text.primary,
+            textAlign: 'start',
+            paddingLeft: '8px',
+            ...(selected && {
+              ...truncatedText,
+              WebkitLineClamp: 1,
+            }),
+          },
+        }}
+        InputProps={{
+          startAdornment: !selected && (
+            <InputAdornment position="end">
+              <SearchOutlinedIcon sx={{ color: theme.palette.text.primary }} />
+            </InputAdornment>
+          ),
+          endAdornment: (
+            <IconButton
+              onClick={() => {
+                setInput('');
+                setSelected('');
+                setSelectedHistory(null);
+              }}
+              aria-label="clearIcon"
+            >
+              <ClearOutlinedIcon sx={{ color: theme.palette.text.primary }} />
+            </IconButton>
+          ),
+        }}
+      />
+    </Tooltip>
   );
 }
