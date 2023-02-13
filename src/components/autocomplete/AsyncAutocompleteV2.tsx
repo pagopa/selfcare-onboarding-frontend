@@ -39,7 +39,6 @@ export function AsyncAutocompleteV2({
   const [options, setOptions] = useState<Array<any>>([]);
   const { setRequiredLogin } = useContext(UserContext);
   const { t } = useTranslation();
-  const categories = ['L6', 'L4', 'L45'];
   const prodPn = product?.id === 'prod-pn';
 
   const handleSearch = async (query: string) => {
@@ -52,7 +51,7 @@ export function AsyncAutocompleteV2({
           limit: ENV.MAX_INSTITUTIONS_FETCH,
           page: 1,
           search: query,
-          ...(prodPn && { categories }),
+          ...(prodPn && { categories: ['L6', 'L4', 'L45'] }),
         },
       },
       () => setRequiredLogin(true)
