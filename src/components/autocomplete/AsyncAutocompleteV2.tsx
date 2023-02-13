@@ -52,7 +52,7 @@ export function AsyncAutocompleteV2({
           limit: ENV.MAX_INSTITUTIONS_FETCH,
           page: 1,
           search: query,
-          ...(prodPn && { categories: [categories] }),
+          ...(prodPn && { categories }),
         },
       },
       () => setRequiredLogin(true)
