@@ -4,7 +4,7 @@ import { AxiosError, AxiosResponse } from 'axios';
 import { Theme, Grid, Typography, Paper } from '@mui/material';
 import { Box } from '@mui/system';
 import { useTranslation } from 'react-i18next';
-import { Endpoint } from '../../../types';
+import { Endpoint, Product } from '../../../types';
 import { fetchWithLogs } from '../../lib/api-utils';
 import { getFetchOutcome } from '../../lib/error-utils';
 import { ENV } from '../../utils/env';
@@ -21,6 +21,7 @@ type AutocompleteProps = {
   optionKey?: string;
   optionLabel?: string;
   theme: Theme;
+  product?: Product | null;
 };
 
 export function AsyncAutocompleteV2({
@@ -31,21 +32,28 @@ export function AsyncAutocompleteV2({
   optionKey,
   optionLabel,
   theme,
+  product,
 }: AutocompleteProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [input, setInput] = useState<string>('');
   const [options, setOptions] = useState<Array<any>>([]);
   const { setRequiredLogin } = useContext(UserContext);
   const { t } = useTranslation();
+  const categories = ['L6', 'L4', 'L45'];
+  const prodPn = product?.id === 'prod-pn';
 
   const handleSearch = async (query: string) => {
     setIsLoading(true);
-
     const searchResponse = await fetchWithLogs(
       endpoint,
       {
         method: 'GET',
-        params: { limit: ENV.MAX_INSTITUTIONS_FETCH, page: 1, search: query },
+        params: {
+          limit: ENV.MAX_INSTITUTIONS_FETCH,
+          page: 1,
+          search: query,
+          ...(prodPn && { categories }),
+        },
       },
       () => setRequiredLogin(true)
     );
