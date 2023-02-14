@@ -238,14 +238,6 @@ const executeStep1 = async (partyName: string) => {
 
   expect(fetchWithLogsSpy).toBeCalledTimes(2);
 
-  // Getting the page href
-  const pageHref = 'institutions?limit=50&page=1&search=XXX&categories=[L6,L4,L45]';
-
-  // Construct a new object and pass the page href to URLSearchParams
-  const searchParams = new URLSearchParams(pageHref.substring(pageHref.indexOf('?')));
-
-  expect(searchParams.has('categories'));
-
   fireEvent.click(partyNameSelection);
 
   const confirmButton = screen.getByRole('button', { name: 'Continua' });
