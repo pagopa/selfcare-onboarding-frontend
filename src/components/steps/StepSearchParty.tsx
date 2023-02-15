@@ -53,9 +53,7 @@ export function StepSearchParty({
   const { setRequiredLogin } = useContext(UserContext);
   const theme = useTheme();
 
-  const [isTaxCodeSelected, setIsTaxCodeSelected] = useState<boolean>();
-  const [input, setInput] = useState<string>('');
-  const [isSearchFieldSelected, setIsSearchFieldSelected] = useState<boolean>(false);
+  const [isSearchFieldSelected, setIsSearchFieldSelected] = useState<boolean>(true);
 
   const [loading, setLoading] = useState(!!partyExternalIdByQuery);
   const [selected, setSelected, setSelectedHistory] = useHistoryState<IPACatalogParty | null>(
@@ -63,43 +61,10 @@ export function StepSearchParty({
     null
   );
 
-  const handleSearchByTaxCode = async (query: string) => {
-    console.log('input', query); // TODO remove
-    // setIsLoading(true);
-    // const searchResponse: any = await fetchWithLogs(
-    //   {
-    //     endpoint: 'ONBOARDING_GET_PARTY',
-    //     endpointParams: { externalInstitutionId: query },
-    //   },
-    //   { method: 'GET', params: { origin: 'INFOCAMERE' } },
-    //   () => setRequiredLogin(true)
-    // );
-
-    // const outcome = getFetchOutcome(searchResponse);
-    // const foundParty = (searchResponse as AxiosResponse).data;
-    // if (outcome === 'success' && foundParty?.taxCode === query) {
-    //   setSelected(foundParty);
-    // } else {
-    //   /*
-    //   TODO: Probably, for technical limits of Infocamere API/probably unattainable case, we couldn't manage
-    //   multiples match cases. If this is confirmed, this code will be deleted else we will restore it.
-    //   else if (matchedParty.length > 1) {
-    //     setMoreMatches(matchedParty);
-    //   */
-    //   setOpenErrorModal(true);
-    //   // eslint-disable-next-line functional/immutable-data
-    //   currentInput.current = query;
-    //   setError(true);
-    // }
-  };
-
   const onForwardAction = () => {
     setSelectedHistory(selected);
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const { id } = selected!;
-    if (isTaxCodeSelected) {
-      void handleSearchByTaxCode(input);
-    }
     forward({ externalId: id }, { ...selected, externalId: id } as Party, institutionType);
   };
 
@@ -183,12 +148,8 @@ export function StepSearchParty({
             }
             optionKey="id"
             optionLabel="description"
-            input={input}
-            setInput={setInput}
-            setIsTaxCodeSelected={setIsTaxCodeSelected}
-            isTaxCodeSelected={isTaxCodeSelected}
-            setIsSearchFieldSelected={setIsSearchFieldSelected}
             isSearchFieldSelected={isSearchFieldSelected}
+            setIsSearchFieldSelected={setIsSearchFieldSelected}
           />
         </Grid>
       </Grid>

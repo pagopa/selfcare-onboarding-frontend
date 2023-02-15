@@ -33,7 +33,6 @@ type Props = {
   input: string;
   handleChange: (event: any) => void;
   isSearchFieldSelected: boolean;
-  setIsSearchFieldSelected: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 export default function AsyncAutocompleteSearch({
@@ -44,7 +43,6 @@ export default function AsyncAutocompleteSearch({
   input,
   handleChange,
   isSearchFieldSelected,
-  setIsSearchFieldSelected,
 }: Props) {
   const setSelectedHistory = useHistoryState<IPACatalogParty | null>('selected_step1', null)[2];
   const { t } = useTranslation();
@@ -76,7 +74,6 @@ export default function AsyncAutocompleteSearch({
               setInput('');
               setSelected('');
               setSelectedHistory(null);
-              setIsSearchFieldSelected(false);
             }}
             aria-label="clearIcon"
           >

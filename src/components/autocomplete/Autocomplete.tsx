@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Theme, Grid, Paper } from '@mui/material';
 import { Endpoint } from '../../../types';
-import PartyAdvancedSelect from './components/partyAdvancedSelect/PartyAdvancedSelect';
+import PartyAdvancedSelect from './components/partyAdvancedSearchType/PartyAdvancedSelect';
 import AsyncAutocompleteContainer from './components/asyncAutocomplete/AsyncAutocompleteContainer';
 
 type AutocompleteProps = {
@@ -12,12 +12,8 @@ type AutocompleteProps = {
   optionKey?: string;
   optionLabel?: string;
   theme: Theme;
-  input: string;
-  setInput: React.Dispatch<React.SetStateAction<string>>;
-  isTaxCodeSelected?: boolean;
-  setIsTaxCodeSelected: React.Dispatch<React.SetStateAction<boolean | undefined>>;
-  setIsSearchFieldSelected: React.Dispatch<React.SetStateAction<boolean>>;
   isSearchFieldSelected: boolean;
+  setIsSearchFieldSelected: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
@@ -29,15 +25,14 @@ export function Autocomplete({
   optionKey,
   optionLabel,
   theme,
-  input,
-  setInput,
-  setIsTaxCodeSelected,
-  isTaxCodeSelected,
-  setIsSearchFieldSelected,
   isSearchFieldSelected,
+  setIsSearchFieldSelected,
 }: AutocompleteProps) {
   const [options, setOptions] = useState<Array<any>>([]);
-  const [isBusinessNameSelected, setIsBusinessNameSelected] = useState<boolean>();
+  const [isBusinessNameSelected, setIsBusinessNameSelected] = useState<boolean>(true);
+
+  const [isTaxCodeSelected, setIsTaxCodeSelected] = useState<boolean>();
+  const [input, setInput] = useState<string>('');
 
   return (
     <Paper
@@ -61,7 +56,6 @@ export function Autocomplete({
               setOptions={setOptions}
               setInput={setInput}
               setIsSearchFieldSelected={setIsSearchFieldSelected}
-              isSearchFieldSelected={isSearchFieldSelected}
               selected={selected}
             />
           </Grid>
@@ -83,7 +77,6 @@ export function Autocomplete({
           theme={theme}
           options={options}
           isSearchFieldSelected={isSearchFieldSelected}
-          setIsSearchFieldSelected={setIsSearchFieldSelected}
         />
       </Grid>
     </Paper>

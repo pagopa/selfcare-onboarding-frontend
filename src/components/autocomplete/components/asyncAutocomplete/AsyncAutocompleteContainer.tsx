@@ -23,14 +23,13 @@ type Props = {
   setInput: React.Dispatch<React.SetStateAction<string>>;
   setSelected: React.Dispatch<React.SetStateAction<any>>;
   isBusinessNameSelected?: boolean;
-  setIsBusinessNameSelected: React.Dispatch<React.SetStateAction<boolean | undefined>>;
+  setIsBusinessNameSelected: React.Dispatch<React.SetStateAction<boolean>>;
   isTaxCodeSelected?: boolean;
   setIsTaxCodeSelected: React.Dispatch<React.SetStateAction<boolean | undefined>>;
   selected: any;
   theme: Theme;
   options: Array<any>;
   isSearchFieldSelected: boolean;
-  setIsSearchFieldSelected: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 export default function AsyncAutocompleteContainer({
@@ -43,14 +42,11 @@ export default function AsyncAutocompleteContainer({
   setInput,
   setSelected,
   isBusinessNameSelected,
-  setIsBusinessNameSelected,
   isTaxCodeSelected,
-  setIsTaxCodeSelected,
   selected,
   theme,
   options,
   isSearchFieldSelected,
-  setIsSearchFieldSelected,
 }: Props) {
   const { setRequiredLogin } = useContext(UserContext);
   const { t } = useTranslation();
@@ -86,20 +82,17 @@ export default function AsyncAutocompleteContainer({
 
     setIsLoading(false);
   };
-
   const handleChange = (event: any) => {
     const value = event.target.value as string;
     setInput(value);
     if (value !== '') {
       setSelected(null);
       if (value.length >= 3 && isBusinessNameSelected) {
-        console.log('xx Ragione sociale selezionata');
-        setIsBusinessNameSelected(false);
         void debounce(handleSearch, 100)(value);
-      } else if (isTaxCodeSelected) {
-        console.log('xx CF selezionato'); // TODO add fetch
-        setIsTaxCodeSelected(false);
-      } // TODO add fetch for ipa code search
+      } else if (isTaxCodeSelected && value.length === 11) {
+        void handleSearch(value);
+        // TODO add fetch for ipa code search
+      }
     }
     if (value === '') {
       setSelected(null);
@@ -133,7 +126,6 @@ export default function AsyncAutocompleteContainer({
           input={input}
           handleChange={handleChange}
           isSearchFieldSelected={isSearchFieldSelected}
-          setIsSearchFieldSelected={setIsSearchFieldSelected}
         />
       </Grid>
       <Grid
