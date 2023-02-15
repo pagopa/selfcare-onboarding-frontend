@@ -238,11 +238,18 @@ const executeStep1 = async (partyName: string) => {
 
   expect(fetchWithLogsSpy).toBeCalledTimes(2);
 
-  const pageHref = 'institutions?limit=50&page=1&search=XXX&categories=L6,L4,L45';
-
-  const searchParams = new URLSearchParams(pageHref.substring(pageHref.indexOf('?')));
-
-  expect(searchParams.has('categories=L6,L4,L45'));
+  expect(fetchWithLogsSpy).toHaveBeenCalledWith(
+    { endpoint: 'ONBOARDING_GET_SEARCH_PARTIES' },
+    {
+      method: 'GET',
+      params: {
+        limit: ENV.MAX_INSTITUTIONS_FETCH,
+        page: 1,
+        search: 'XXX',
+      },
+    },
+    expect.any(Function)
+  );
 
   fireEvent.click(partyNameSelection);
 
