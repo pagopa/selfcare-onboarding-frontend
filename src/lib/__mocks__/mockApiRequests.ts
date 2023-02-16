@@ -511,6 +511,8 @@ export async function mockFetch(
     }
   }
 
+  // TODO: add test for 'ONBOARDING_GET_PARTY_FROM_CF'
+
   if (endpoint === 'ONBOARDING_USER_VALIDATION') {
     if (
       ['CRTCTF90B12C123K', 'CRTCTF91B12C123K', 'CRTCTF92B12C123K'].indexOf((data as any)?.taxCode) >

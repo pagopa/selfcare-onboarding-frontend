@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Theme, Grid, Paper } from '@mui/material';
 import { Endpoint } from '../../../types';
+import { InstitutionResource } from '../../model/InstitutionResource';
 import AsyncAutocompleteContainer from './components/asyncAutocomplete/AsyncAutocompleteContainer';
 import PartyAdvancedRadioButton from './components/partyAdvancedSearchType/PartyAdvancedRadioButton';
 
@@ -28,13 +29,16 @@ export function Autocomplete({
   isSearchFieldSelected,
   setIsSearchFieldSelected,
 }: AutocompleteProps) {
-  const [options, setOptions] = useState<Array<any>>([]);
+  const [options, setOptions] = useState<Array<InstitutionResource>>([]);
+  const [cfResult, setCfResult] = useState<InstitutionResource>();
   const [isBusinessNameSelected, setIsBusinessNameSelected] = useState<boolean>(true);
 
   const [isTaxCodeSelected, setIsTaxCodeSelected] = useState<boolean>();
   const [input, setInput] = useState<string>('');
 
   console.log(setIsSearchFieldSelected);
+
+  console.log('xx Options: ', options);
 
   return (
     <Paper
@@ -53,6 +57,10 @@ export function Autocomplete({
         {!selected && (
           <Grid item xs={12} px={4} pt={4}>
             <PartyAdvancedRadioButton
+              setIsTaxCodeSelected={setIsTaxCodeSelected}
+              setIsBusinessNameSelected={setIsBusinessNameSelected}
+              setOptions={setOptions}
+              setInput={setInput}
             />
           </Grid>
         )}
@@ -73,6 +81,8 @@ export function Autocomplete({
           theme={theme}
           options={options}
           isSearchFieldSelected={isSearchFieldSelected}
+          setCfResult={setCfResult}
+          cfResult={cfResult}
         />
       </Grid>
     </Paper>

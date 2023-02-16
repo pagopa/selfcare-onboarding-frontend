@@ -32,7 +32,7 @@ type Props = {
   getOptionKey: (option: any) => string;
 };
 
-export default function AsyncAutocompleteResults({
+export default function AsyncAutocompleteResultsBusinessName({
   setSelected,
   options,
   setOptions,

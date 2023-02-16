@@ -6,12 +6,14 @@ import debounce from 'lodash/debounce';
 import { useTranslation } from 'react-i18next';
 import { UserContext } from '../../../../lib/context';
 import { fetchWithLogs } from '../../../../lib/api-utils';
+import { InstitutionResource } from '../../../../model/InstitutionResource';
 import { getFetchOutcome } from '../../../../lib/error-utils';
 import { Endpoint } from '../../../../../types';
 import { ENV } from '../../../../utils/env';
 import { ReactComponent as PartyIcon } from '../../../../assets/onboarding_party_icon.svg';
-import AsyncAutocompleteResults from './components/AsyncAutocompleteResults';
+import AsyncAutocompleteResultsBusinessName from './components/AsyncAutocompleteResultsBusinessName';
 import AsyncAutocompleteSearch from './components/AsyncAutocompleteSearch';
+import AsyncAutocompleteResultsTaxCode from './components/AsyncAutocompleteResultsTaxCode';
 
 type Props = {
   optionKey?: string;
@@ -30,8 +32,12 @@ type Props = {
   theme: Theme;
   options: Array<any>;
   isSearchFieldSelected: boolean;
+  setCfResult: React.Dispatch<React.SetStateAction<InstitutionResource | undefined>>;
+  cfResult?: InstitutionResource;
 };
 
+// TODO: handle cognitive-complexity
+// eslint-disable-next-line sonarjs/cognitive-complexity
 export default function AsyncAutocompleteContainer({
   optionKey,
   optionLabel,
@@ -47,10 +53,12 @@ export default function AsyncAutocompleteContainer({
   theme,
   options,
   isSearchFieldSelected,
+  setCfResult,
+  cfResult
 }: Props) {
   const { setRequiredLogin } = useContext(UserContext);
   const { t } = useTranslation();
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false); 
 
   const getOptionKey: (option: any) => string =
     optionKey !== undefined ? (o) => o[optionKey] : (o) => o.label ?? o;
@@ -60,7 +68,7 @@ export default function AsyncAutocompleteContainer({
 
   const showElement = input !== undefined && input.length >= 3;
 
-  const handleSearch = async (query: string) => {
+  const handleSearchByBusinessName = async (query: string) => {
     setIsLoading(true);
 
     const searchResponse = await fetchWithLogs(
@@ -82,16 +90,41 @@ export default function AsyncAutocompleteContainer({
 
     setIsLoading(false);
   };
+
+  
+  const handleSearchByTaxCode = async (query: string) => {
+    setIsLoading(true);
+
+    const searchResponse = await fetchWithLogs(
+      {endpoint: 'ONBOARDING_GET_PARTY_FROM_CF',
+       endpointParams: { id: query}},
+      {
+        method: 'GET',
+      },
+      () => setRequiredLogin(true)
+    );
+
+    const outcome = getFetchOutcome(searchResponse);
+
+    if (outcome === 'success') {
+      setCfResult((searchResponse as AxiosResponse).data);
+    } else if ((searchResponse as AxiosError).response?.status === 404) {
+      setCfResult(undefined);
+    }
+
+    setIsLoading(false);
+  };
+  
+
   const handleChange = (event: any) => {
     const value = event.target.value as string;
     setInput(value);
     if (value !== '') {
       setSelected(null);
       if (value.length >= 3 && isBusinessNameSelected) {
-        void debounce(handleSearch, 100)(value);
+        void debounce(handleSearchByBusinessName, 100)(value);
       } else if (isTaxCodeSelected && value.length === 11) {
-        void handleSearch(value);
-        // TODO add fetch for ipa code search
+        void handleSearchByTaxCode(value);
       }
     }
     if (value === '') {
@@ -135,8 +168,9 @@ export default function AsyncAutocompleteContainer({
         justifyContent="center"
         sx={{ height: showElement && options.length > 0 ? '232px' : undefined }}
       >
+        {isBusinessNameSelected?<>
         {showElement && options.length > 0 ? (
-          <AsyncAutocompleteResults
+          <AsyncAutocompleteResultsBusinessName
             setSelected={setSelected}
             options={options}
             setOptions={setOptions}
@@ -161,6 +195,16 @@ export default function AsyncAutocompleteContainer({
             </Box>
           )
         )}
+        </>:<>{showElement && 
+          <AsyncAutocompleteResultsTaxCode 
+            setSelected={setSelected}
+            cfResult={cfResult}
+            setCfResult={setCfResult}
+            isLoading={isLoading}
+            getOptionLabel={getOptionLabel}
+            getOptionKey={getOptionKey}
+          /> 
+            }</>}
       </Grid>
     </>
   );
