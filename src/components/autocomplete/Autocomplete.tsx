@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Theme, Grid, Paper } from '@mui/material';
 import { Endpoint } from '../../../types';
-import PartyAdvancedSelect from './components/partyAdvancedSearchType/PartyAdvancedSelect';
 import AsyncAutocompleteContainer from './components/asyncAutocomplete/AsyncAutocompleteContainer';
+import PartyAdvancedRadioButton from './components/partyAdvancedSearchType/PartyAdvancedRadioButton';
 
 type AutocompleteProps = {
   selected: any;
@@ -34,6 +34,8 @@ export function Autocomplete({
   const [isTaxCodeSelected, setIsTaxCodeSelected] = useState<boolean>();
   const [input, setInput] = useState<string>('');
 
+  console.log(setIsSearchFieldSelected);
+
   return (
     <Paper
       elevation={8}
@@ -50,13 +52,7 @@ export function Autocomplete({
       <Grid container mx={selected ? 4 : undefined}>
         {!selected && (
           <Grid item xs={12} px={4} pt={4}>
-            <PartyAdvancedSelect
-              setIsBusinessNameSelected={setIsBusinessNameSelected}
-              setIsTaxCodeSelected={setIsTaxCodeSelected}
-              setOptions={setOptions}
-              setInput={setInput}
-              setIsSearchFieldSelected={setIsSearchFieldSelected}
-              selected={selected}
+            <PartyAdvancedRadioButton
             />
           </Grid>
         )}
