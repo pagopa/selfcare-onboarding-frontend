@@ -55,6 +55,7 @@ export function StepSearchParty({
   back,
   institutionType,
   productAvoidStep,
+  product,
 }: Props) {
   const partyExternalIdByQuery = new URLSearchParams(window.location.search).get('partyExternalId');
   const { setRequiredLogin } = useContext(UserContext);
@@ -156,6 +157,7 @@ export function StepSearchParty({
             optionKey="id"
             optionLabel="description"
             isSearchFieldSelected={isSearchFieldSelected}
+            product={product}
           />
         </Grid>
       </Grid>
