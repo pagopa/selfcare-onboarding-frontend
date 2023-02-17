@@ -76,7 +76,7 @@ const renderComponent = (productId: string = 'prod-pn') => {
   render(<Component />);
 };
 
-const step1Title = 'Seleziona il tuo ente';
+const step1Title = 'Cerca il tuo ente';
 const stepInstitutionType = 'Seleziona il tipo di ente che rappresenti';
 const stepBillingDataTitle = 'Indica i dati del tuo ente';
 const step2Title = 'Indica il Legale Rappresentante';
