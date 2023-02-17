@@ -8,7 +8,7 @@ import { UserContext } from '../../../../lib/context';
 import { fetchWithLogs } from '../../../../lib/api-utils';
 import { InstitutionResource } from '../../../../model/InstitutionResource';
 import { getFetchOutcome } from '../../../../lib/error-utils';
-import { Endpoint } from '../../../../../types';
+import { Endpoint, Product } from '../../../../../types';
 import { ENV } from '../../../../utils/env';
 import { ReactComponent as PartyIcon } from '../../../../assets/onboarding_party_icon.svg';
 import AsyncAutocompleteResultsBusinessName from './components/AsyncAutocompleteResultsBusinessName';
@@ -34,6 +34,7 @@ type Props = {
   isSearchFieldSelected: boolean;
   setCfResult: React.Dispatch<React.SetStateAction<InstitutionResource | undefined>>;
   cfResult?: InstitutionResource;
+  product?: Product | null;
 };
 
 // TODO: handle cognitive-complexity
@@ -55,6 +56,7 @@ export default function AsyncAutocompleteContainer({
   isSearchFieldSelected,
   setCfResult,
   cfResult,
+  product,
 }: Props) {
   const { setRequiredLogin } = useContext(UserContext);
   const { t } = useTranslation();
@@ -67,7 +69,7 @@ export default function AsyncAutocompleteContainer({
     optionLabel !== undefined ? (o) => o[optionLabel] : (o) => o.label ?? o;
 
   const showBusinessNameElement = input !== undefined && input.length >= 3;
-
+  const prodPn = product?.id === 'prod-pn';
   const handleSearchByBusinessName = async (query: string) => {
     setIsLoading(true);
 
@@ -75,7 +77,12 @@ export default function AsyncAutocompleteContainer({
       endpoint,
       {
         method: 'GET',
-        params: { limit: ENV.MAX_INSTITUTIONS_FETCH, page: 1, search: query },
+        params: {
+          limit: ENV.MAX_INSTITUTIONS_FETCH,
+          page: 1,
+          search: query,
+          ...(prodPn && { categories: 'L6,L4,L45' }),
+        },
       },
       () => setRequiredLogin(true)
     );

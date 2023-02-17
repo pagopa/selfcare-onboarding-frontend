@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Theme, Grid, Paper } from '@mui/material';
-import { Endpoint } from '../../../types';
+import { Endpoint, Product } from '../../../types';
 import { InstitutionResource } from '../../model/InstitutionResource';
 import AsyncAutocompleteContainer from './components/asyncAutocomplete/AsyncAutocompleteContainer';
 import PartyAdvancedRadioButton from './components/partyAdvancedSearchType/PartyAdvancedRadioButton';
@@ -14,6 +14,7 @@ type AutocompleteProps = {
   optionLabel?: string;
   theme: Theme;
   isSearchFieldSelected: boolean;
+  product?: Product | null;
 };
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
@@ -26,6 +27,7 @@ export function Autocomplete({
   optionLabel,
   theme,
   isSearchFieldSelected,
+  product,
 }: AutocompleteProps) {
   const [options, setOptions] = useState<Array<InstitutionResource>>([]);
   const [cfResult, setCfResult] = useState<InstitutionResource>();
@@ -77,6 +79,7 @@ export function Autocomplete({
           isSearchFieldSelected={isSearchFieldSelected}
           setCfResult={setCfResult}
           cfResult={cfResult}
+          product={product}
         />
       </Grid>
     </Paper>
