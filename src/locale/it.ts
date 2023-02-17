@@ -9,7 +9,10 @@ export default {
     noResultsLabel: 'Nessun risultato',
     lessThen3CharacterLabel: 'Digita almeno 3 caratteri',
     lessThen11CharacterLabel: 'Digita almeno 11 caratteri',
-    serachLabel:'Cerca'
+    serachLabel: 'Cerca',
+    ariaLabel:`Seleziona la tipologia di ricerca dell'ente`,
+    businessName: 'Ragione Sociale',
+    taxcode:'Codice Fiscale'
   },
   partyAdvancedSelect: {
     advancedSearchLabel: 'Cerca per',
