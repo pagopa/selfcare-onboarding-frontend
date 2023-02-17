@@ -338,17 +338,16 @@ const mockedOnboardingData1: InstitutionOnboardingInfoResource = {
   },
 };
 
-const mockedProducts = [{
-  title: 'Prod Io',
-  id: 'prod-io',
-},
+
+const mockedSubProduct = {
+  title: 'Premium',
+  id: 'prod-io-premium',
+  parentId: 'prod-io',
+};
+const mockedProducts = [
 {
   title: 'Interoperabilità',
   id: 'prod-interop',
-  },
-  {
-  title: 'Prod io premium',
-  id: 'prod-io-premium',
   },
   {
     title: 'Piattaforma Notifiche',
@@ -537,6 +536,10 @@ export async function mockFetch(
         //   return new Promise((resolve) =>
         //     resolve({ data: mockedProductPn, status: 200, statusText: '200' } as AxiosResponse)
         // );
+        case 'prod-io-premium':
+          return new Promise((resolve) =>
+            resolve({ data: mockedSubProduct, status: 200, statusText: '200' } as AxiosResponse)
+          );
       default:
         return new Promise((resolve) =>
           resolve({ data: mockedSelectedProduct, status: 200, statusText: '200' } as AxiosResponse)
