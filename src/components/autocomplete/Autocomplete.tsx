@@ -14,7 +14,6 @@ type AutocompleteProps = {
   optionLabel?: string;
   theme: Theme;
   isSearchFieldSelected: boolean;
-  setIsSearchFieldSelected: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
@@ -27,7 +26,6 @@ export function Autocomplete({
   optionLabel,
   theme,
   isSearchFieldSelected,
-  setIsSearchFieldSelected,
 }: AutocompleteProps) {
   const [options, setOptions] = useState<Array<InstitutionResource>>([]);
   const [cfResult, setCfResult] = useState<InstitutionResource>();
@@ -35,10 +33,6 @@ export function Autocomplete({
 
   const [isTaxCodeSelected, setIsTaxCodeSelected] = useState<boolean>();
   const [input, setInput] = useState<string>('');
-
-  console.log(setIsSearchFieldSelected);
-
-  console.log('xx Options: ', options);
 
   return (
     <Paper

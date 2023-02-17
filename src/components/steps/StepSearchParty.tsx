@@ -156,7 +156,6 @@ export function StepSearchParty({
             optionKey="id"
             optionLabel="description"
             isSearchFieldSelected={isSearchFieldSelected}
-            setIsSearchFieldSelected={setIsSearchFieldSelected}
           />
         </Grid>
       </Grid>
