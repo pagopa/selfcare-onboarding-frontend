@@ -56,6 +56,7 @@ export default function AsyncAutocompleteSearch({
       label={!selected ? t('asyncAutocomplete.serachLabel') : ''}
       variant={!selected ? 'outlined' : 'standard'}
       inputProps={{
+        // maxLength: isTaxCodeSelected ? '11' : undefined,
         style: {
           fontStyle: 'normal',
           fontWeight: '700',

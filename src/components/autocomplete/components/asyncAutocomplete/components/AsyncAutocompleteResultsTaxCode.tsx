@@ -3,70 +3,67 @@ import { PartyAccountItemButton } from '@pagopa/mui-italia/dist/components/Party
 import { InstitutionResource } from '../../../../../model/InstitutionResource';
 
 const CustomBox = styled(Box)({
-    /* width */
-    '::-webkit-scrollbar': {
-      width: '6px',
-    },
-    /* Track */
-    '::-webkit-scrollbar-track': {
-      boxShadow: 'inset 0 0 5px #F2F6FA',
-      borderRadius: '20px',
-    },
-    /* Handle */
-    '::-webkit-scrollbar-thumb': {
-      background: '#0073E6',
-      backgroundClip: 'padding-box',
-      borderRadius: '20px',
-    },
-    /* Handle on hover */
-    '::-webkit-scrollbar-thumb:hover': {
-      background: '#0073E6',
-    },
-  });
+  /* width */
+  '::-webkit-scrollbar': {
+    width: '6px',
+  },
+  /* Track */
+  '::-webkit-scrollbar-track': {
+    boxShadow: 'inset 0 0 5px #F2F6FA',
+    borderRadius: '20px',
+  },
+  /* Handle */
+  '::-webkit-scrollbar-thumb': {
+    background: '#0073E6',
+    backgroundClip: 'padding-box',
+    borderRadius: '20px',
+  },
+  /* Handle on hover */
+  '::-webkit-scrollbar-thumb:hover': {
+    background: '#0073E6',
+  },
+});
 
 type Props = {
-    setSelected: React.Dispatch<React.SetStateAction<any>>;
-    isLoading: boolean;
-    getOptionLabel: (option: any) => string;
-    getOptionKey: (option: any) => string;
-    cfResult?: InstitutionResource; 
-    setCfResult: React.Dispatch<React.SetStateAction<InstitutionResource | undefined>>;
-  };
+  setSelected: React.Dispatch<React.SetStateAction<any>>;
+  isLoading: boolean;
+  getOptionLabel: (option: any) => string;
+  getOptionKey: (option: any) => string;
+  cfResult?: InstitutionResource;
+  setCfResult: React.Dispatch<React.SetStateAction<InstitutionResource | undefined>>;
+};
 
 export default function AsyncAutocompleteResultsTaxCode({
-    setSelected,
-    isLoading,
-    getOptionLabel,
-    getOptionKey,
-    cfResult,
-    setCfResult
-}:Props
-) {
+  setSelected,
+  isLoading,
+  cfResult,
+  setCfResult,
+}: Props) {
   return (
     <CustomBox my={2} {...cfResult} width="80%" maxHeight="200px" overflow="auto">
-      {!isLoading &&
-      <Box
-        py={1}
-        key={getOptionKey(cfResult)}
-        display="flex"
-        onKeyDownCapture={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            setSelected(cfResult);
-            setCfResult(undefined);
-          }
-        }}
-      >
-        <PartyAccountItemButton
-          partyName={getOptionLabel(cfResult)}
-          image={' '}
-          action={() => {
-            setSelected(cfResult);
-            setCfResult(undefined);
+      {!isLoading && (
+        <Box
+          py={1}
+          key={cfResult?.id}
+          display="flex"
+          onKeyDownCapture={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              setSelected(cfResult);
+              setCfResult(undefined);
+            }
           }}
-          maxCharactersNumberMultiLine={20}
-        />
-      </Box>
-    }
+        >
+          <PartyAccountItemButton
+            partyName={cfResult?.description ?? ''}
+            image={' '}
+            action={() => {
+              setSelected(cfResult);
+              setCfResult(undefined);
+            }}
+            maxCharactersNumberMultiLine={20}
+          />
+        </Box>
+      )}
     </CustomBox>
   );
 }

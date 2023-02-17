@@ -8,6 +8,7 @@ export default {
   asyncAutocomplete: {
     noResultsLabel: 'Nessun risultato',
     lessThen3CharacterLabel: 'Digita almeno 3 caratteri',
+    lessThen11CharacterLabel: 'Digita almeno 11 caratteri',
     serachLabel:'Cerca'
   },
   partyAdvancedSelect: {

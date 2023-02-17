@@ -37,7 +37,7 @@ type Props = {
 };
 
 // TODO: handle cognitive-complexity
-// eslint-disable-next-line sonarjs/cognitive-complexity
+// eslint-disable-next-line sonarjs/cognitive-complexity, complexity
 export default function AsyncAutocompleteContainer({
   optionKey,
   optionLabel,
@@ -54,11 +54,11 @@ export default function AsyncAutocompleteContainer({
   options,
   isSearchFieldSelected,
   setCfResult,
-  cfResult
+  cfResult,
 }: Props) {
   const { setRequiredLogin } = useContext(UserContext);
   const { t } = useTranslation();
-  const [isLoading, setIsLoading] = useState(false); 
+  const [isLoading, setIsLoading] = useState(false);
 
   const getOptionKey: (option: any) => string =
     optionKey !== undefined ? (o) => o[optionKey] : (o) => o.label ?? o;
@@ -66,7 +66,7 @@ export default function AsyncAutocompleteContainer({
   const getOptionLabel: (option: any) => string =
     optionLabel !== undefined ? (o) => o[optionLabel] : (o) => o.label ?? o;
 
-  const showElement = input !== undefined && input.length >= 3;
+  const showBusinessNameElement = input !== undefined && input.length >= 3;
 
   const handleSearchByBusinessName = async (query: string) => {
     setIsLoading(true);
@@ -91,13 +91,11 @@ export default function AsyncAutocompleteContainer({
     setIsLoading(false);
   };
 
-  
   const handleSearchByTaxCode = async (query: string) => {
     setIsLoading(true);
 
     const searchResponse = await fetchWithLogs(
-      {endpoint: 'ONBOARDING_GET_PARTY_FROM_CF',
-       endpointParams: { id: query}},
+      { endpoint: 'ONBOARDING_GET_PARTY_FROM_CF', endpointParams: { id: query } },
       {
         method: 'GET',
       },
@@ -114,14 +112,13 @@ export default function AsyncAutocompleteContainer({
 
     setIsLoading(false);
   };
-  
 
   const handleChange = (event: any) => {
     const value = event.target.value as string;
     setInput(value);
     if (value !== '') {
       setSelected(null);
-      if (value.length >= 3 && isBusinessNameSelected) {
+      if (value.length >= 3 && isBusinessNameSelected && !isTaxCodeSelected) {
         void debounce(handleSearchByBusinessName, 100)(value);
       } else if (isTaxCodeSelected && value.length === 11) {
         void handleSearchByTaxCode(value);
@@ -143,7 +140,7 @@ export default function AsyncAutocompleteContainer({
         justifyContent="center"
         width="100%"
         pt={selected ? 4 : 2}
-        pb={showElement && !selected ? 0 : 4}
+        pb={input.length === 0 || selected ? 4 : 0}
       >
         {selected && (
           <Box display="flex" alignItems="center">
@@ -166,45 +163,61 @@ export default function AsyncAutocompleteContainer({
         xs={12}
         display="flex"
         justifyContent="center"
-        sx={{ height: showElement && options.length > 0 ? '232px' : undefined }}
+        sx={{ height: showBusinessNameElement && options.length > 0 ? '232px' : undefined }}
       >
-        {isBusinessNameSelected?<>
-        {showElement && options.length > 0 ? (
-          <AsyncAutocompleteResultsBusinessName
-            setSelected={setSelected}
-            options={options}
-            setOptions={setOptions}
-            isLoading={isLoading}
-            getOptionLabel={getOptionLabel}
-            getOptionKey={getOptionKey}
-          />
-        ) : input.length >= 1 && input.length < 3 ? (
-          <Box display="flex" sx={{ jusifyContent: 'start' }} width="100%" mx={4}>
-            <Typography pb={3} sx={{ fontSize: '18px', fontWeight: 'fontWeightBold' }}>
-              {t('asyncAutocomplete.lessThen3CharacterLabel')}
-            </Typography>
-          </Box>
+        {isBusinessNameSelected ? (
+          <>
+            {options && showBusinessNameElement && options.length > 0 ? (
+              <AsyncAutocompleteResultsBusinessName
+                setSelected={setSelected}
+                options={options}
+                setOptions={setOptions}
+                isLoading={isLoading}
+                getOptionLabel={getOptionLabel}
+                getOptionKey={getOptionKey}
+              />
+            ) : input.length >= 1 && input.length < 3 ? (
+              <Box display="flex" sx={{ jusifyContent: 'start' }} width="100%" mx={4}>
+                <Typography py={3} sx={{ fontSize: '18px', fontWeight: 'fontWeightBold' }}>
+                  {t('asyncAutocomplete.lessThen3CharacterLabel')}
+                </Typography>
+              </Box>
+            ) : (
+              input.length >= 3 &&
+              options.length === 0 &&
+              !selected && (
+                <Box display="flex" sx={{ jusifyContent: 'start' }} width="100%" mx={4}>
+                  <Typography py={3} sx={{ fontSize: '18px', fontWeight: 'fontWeightBold' }}>
+                    {t('asyncAutocomplete.noResultsLabel')}
+                  </Typography>
+                </Box>
+              )
+            )}
+          </>
         ) : (
-          input.length >= 3 &&
-          options.length === 0 &&
-          !selected && (
-            <Box display="flex" sx={{ jusifyContent: 'start' }} width="100%" mx={4}>
-              <Typography py={3} sx={{ fontSize: '18px', fontWeight: 'fontWeightBold' }}>
-                {t('asyncAutocomplete.noResultsLabel')}
-              </Typography>
-            </Box>
-          )
+          <>
+            {isTaxCodeSelected && input !== undefined && input.length === 11 && cfResult ? (
+              <AsyncAutocompleteResultsTaxCode
+                setSelected={setSelected}
+                cfResult={cfResult}
+                setCfResult={setCfResult}
+                isLoading={isLoading}
+                getOptionLabel={getOptionLabel}
+                getOptionKey={getOptionKey}
+              />
+            ) : (
+              input.length >= 1 &&
+              options.length === 0 &&
+              !selected && (
+                <Box display="flex" sx={{ jusifyContent: 'start' }} width="100%" mx={4}>
+                  <Typography py={3} sx={{ fontSize: '18px', fontWeight: 'fontWeightBold' }}>
+                    {t('asyncAutocomplete.noResultsLabel')}
+                  </Typography>
+                </Box>
+              )
+            )}
+          </>
         )}
-        </>:<>{showElement && 
-          <AsyncAutocompleteResultsTaxCode 
-            setSelected={setSelected}
-            cfResult={cfResult}
-            setCfResult={setCfResult}
-            isLoading={isLoading}
-            getOptionLabel={getOptionLabel}
-            getOptionKey={getOptionKey}
-          /> 
-            }</>}
       </Grid>
     </>
   );
