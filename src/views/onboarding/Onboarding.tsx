@@ -486,9 +486,10 @@ function OnboardingComponent({ productId }: { productId: string }) {
         StepSearchParty({
           subTitle: (
             <Trans i18nKey="onboardingStep1.onboarding.bodyDescription">
-              Seleziona dall&apos;Indice della Pubblica Amministrazione (IPA) l&apos;ente
+              Inserisci uno dei dati richiesti e cerca dall&apos;Indice della Pubblica
               <br />
-              per cui vuoi richiedere l&apos; adesione a {{ productTitle: selectedProduct?.title }}
+              Amministrazione (IPA) l&apos;ente per cui vuoi richiedere l&apos;adesione a <br />
+              {{ productTitle: selectedProduct?.title }}
             </Trans>
           ),
           institutionType,

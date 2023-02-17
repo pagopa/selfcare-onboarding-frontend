@@ -199,17 +199,19 @@ const mockedGeoTaxonomy = [
   // }
 ];
 
-const mockedProduct = {
-  title: 'App IO',
-  id: 'prod-io',
+const mockedParty = {
+  externalId: 'externalId1',
+  originId: 'originId1',
+  id: 'partyId1',
+  description: 'Comune di Milano',
+  urlLogo: 'logo',
+  address: 'address',
+  digitalAddress: 'a@aa.com',
+  taxCode: '33344455567',
+  zipCode: '12345',
+  origin: 'IPA',
+  userRole: 'ADMIN',
 };
-
-const mockedSubProduct = {
-  title: 'Premium',
-  id: 'prod-io-premium',
-  parentId: 'prod-io',
-};
-
 const mockedParties: Array<SelfcareParty> = [
   {
     externalId: 'externalId1',
@@ -336,6 +338,30 @@ const mockedOnboardingData1: InstitutionOnboardingInfoResource = {
   },
 };
 
+
+const mockedSubProduct = {
+  title: 'Premium',
+  id: 'prod-io-premium',
+  parentId: 'prod-io',
+};
+const mockedProducts = [
+{
+  title: 'Interoperabilità',
+  id: 'prod-interop',
+  },
+  {
+    title: 'Piattaforma Notifiche',
+    id: 'prod-pn',
+  },];
+
+// eslint-disable-next-line functional/immutable-data
+const urlProdId =window.location.pathname.split('/').pop();
+const SelectedProduct = mockedProducts.find((p) => p.id === urlProdId);
+
+const mockedSelectedProduct = {
+  title: SelectedProduct?.title,
+  id: SelectedProduct?.id,
+};
 const mockedResponseError = {
   detail: 'Request took too long to complete.',
   status: 503,
@@ -427,6 +453,12 @@ export async function mockFetch(
     );
   }
 
+  if (endpoint === 'ONBOARDING_GET_PARTY_FROM_CF') {
+    return new Promise((resolve) =>
+      resolve({ data: mockedParty, status: 200, statusText: '200' } as AxiosResponse)
+    );
+  }
+
   if (endpoint === 'VERIFY_ONBOARDING') {
     switch (endpointParams.externalInstitutionId) {
       case 'infoError':
@@ -500,13 +532,17 @@ export async function mockFetch(
     switch (endpointParams.productId) {
       case 'error':
         return genericError;
-      case 'prod-io-premium':
-        return new Promise((resolve) =>
-          resolve({ data: mockedSubProduct, status: 200, statusText: '200' } as AxiosResponse)
-        );
+        // case 'prod-pn':
+        //   return new Promise((resolve) =>
+        //     resolve({ data: mockedProductPn, status: 200, statusText: '200' } as AxiosResponse)
+        // );
+        case 'prod-io-premium':
+          return new Promise((resolve) =>
+            resolve({ data: mockedSubProduct, status: 200, statusText: '200' } as AxiosResponse)
+          );
       default:
         return new Promise((resolve) =>
-          resolve({ data: mockedProduct, status: 200, statusText: '200' } as AxiosResponse)
+          resolve({ data: mockedSelectedProduct, status: 200, statusText: '200' } as AxiosResponse)
         );
     }
   }
@@ -604,6 +640,7 @@ export async function mockFetch(
       );
     }
   }
+
 
   const msg = `NOT MOCKED REQUEST! {endpoint: ${endpoint}, endpointParams: ${JSON.stringify(
     endpointParams

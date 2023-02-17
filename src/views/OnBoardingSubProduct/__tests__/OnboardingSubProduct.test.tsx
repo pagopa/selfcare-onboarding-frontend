@@ -96,7 +96,7 @@ const renderComponent = (
   render(<Component />);
 };
 
-const stepSelectInstitutionUnreleatedTitle = 'Seleziona il tuo ente';
+const stepSelectInstitutionUnreleatedTitle = 'Cerca il tuo ente';
 const stepSelectInstitutionReleatedTitle = 'Seleziona il tuo ente';
 const stepBillingDataTitle = 'Indica i dati del tuo ente';
 const stepAddManagerTitle = 'Indica il Legale Rappresentante';
