@@ -4,19 +4,26 @@ import { useContext, useEffect, useState } from 'react';
 import { AxiosResponse } from 'axios';
 import { useTranslation, Trans } from 'react-i18next';
 import { ReactElement } from 'react';
-import { InstitutionType, IPACatalogParty, Party, StepperStepComponentProps } from '../../../types';
+import {
+  InstitutionType,
+  IPACatalogParty,
+  Party,
+  Product,
+  StepperStepComponentProps,
+} from '../../../types';
+import { Autocomplete } from '../autocomplete/Autocomplete';
 import { getFetchOutcome } from '../../lib/error-utils';
 import { fetchWithLogs } from '../../lib/api-utils';
 import { UserContext } from '../../lib/context';
 import { OnboardingStepActions } from '../OnboardingStepActions';
 import { useHistoryState } from '../useHistoryState';
 import { LoadingOverlay } from '../LoadingOverlay';
-import { Autocomplete } from '../autocomplete/Autocomplete';
 
 type Props = {
   subTitle: string | ReactElement;
   institutionType?: InstitutionType;
   productAvoidStep?: boolean;
+  product?: Product | null;
 } & StepperStepComponentProps;
 
 const handleSearchExternalId = async (

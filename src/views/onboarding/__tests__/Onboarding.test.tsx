@@ -235,7 +235,21 @@ const executeStep1 = async (partyName: string) => {
   fireEvent.change(inputPartyName, { target: { value: 'XXX' } });
 
   const partyNameSelection = await waitFor(() => screen.getByText(partyName));
+
   expect(fetchWithLogsSpy).toBeCalledTimes(2);
+
+  expect(fetchWithLogsSpy).toHaveBeenCalledWith(
+    { endpoint: 'ONBOARDING_GET_SEARCH_PARTIES' },
+    {
+      method: 'GET',
+      params: {
+        limit: ENV.MAX_INSTITUTIONS_FETCH,
+        page: 1,
+        search: 'XXX',
+      },
+    },
+    expect.any(Function)
+  );
 
   fireEvent.click(partyNameSelection);
 
