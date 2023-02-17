@@ -1,10 +1,10 @@
-import { IconButton, InputAdornment, TextField, Theme, Tooltip } from '@mui/material';
+import { IconButton, TextField, Theme, Tooltip } from '@mui/material';
 import { styled } from '@mui/system';
-import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
+import { useTranslation } from 'react-i18next';
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 import { Dispatch, SetStateAction } from 'react';
-import { IPACatalogParty } from '../../../../types';
-import { useHistoryState } from '../../useHistoryState';
+import { IPACatalogParty } from '../../../../../../types';
+import { useHistoryState } from '../../../../useHistoryState';
 
 const CustomTextField = styled(TextField)({
   justifyContent: 'center',
@@ -32,6 +32,7 @@ type Props = {
   setInput: Dispatch<SetStateAction<string>>;
   input: string;
   handleChange: (event: any) => void;
+  isSearchFieldSelected: boolean;
 };
 
 export default function AsyncAutocompleteSearch({
@@ -41,8 +42,11 @@ export default function AsyncAutocompleteSearch({
   setInput,
   input,
   handleChange,
+  isSearchFieldSelected,
 }: Props) {
   const setSelectedHistory = useHistoryState<IPACatalogParty | null>('selected_step1', null)[2];
+  const { t } = useTranslation();
+
   const truncatedText = {
     overflow: 'hidden',
     textOverflow: 'ellipsis',
@@ -54,13 +58,15 @@ export default function AsyncAutocompleteSearch({
   return (
     <Tooltip arrow title={selected?.description?.length > 20 ? selected?.description : ''}>
       <CustomTextField
+        disabled={!isSearchFieldSelected}
         id="Parties"
         sx={{ width: '100%', mx: selected ? 1 : 4 }}
         value={selected ? selected.description : input}
         onChange={handleChange}
-        label={!selected ? 'Cerca ente' : ''}
+        label={!selected ? t('asyncAutocomplete.serachLabel') : ''}
         variant={!selected ? 'outlined' : 'standard'}
         inputProps={{
+          // maxLength: isTaxCodeSelected ? '11' : undefined,
           style: {
             fontStyle: 'normal',
             fontWeight: '700',
@@ -76,13 +82,9 @@ export default function AsyncAutocompleteSearch({
           },
         }}
         InputProps={{
-          startAdornment: !selected && (
-            <InputAdornment position="end">
-              <SearchOutlinedIcon sx={{ color: theme.palette.text.primary }} />
-            </InputAdornment>
-          ),
           endAdornment: (
             <IconButton
+              disabled={!isSearchFieldSelected}
               onClick={() => {
                 setInput('');
                 setSelected('');
@@ -90,7 +92,13 @@ export default function AsyncAutocompleteSearch({
               }}
               aria-label="clearIcon"
             >
-              <ClearOutlinedIcon sx={{ color: theme.palette.text.primary }} />
+              <ClearOutlinedIcon
+                sx={{
+                  color: !isSearchFieldSelected
+                    ? theme.palette.text.disabled
+                    : theme.palette.text.primary,
+                }}
+              />
             </IconButton>
           ),
         }}
