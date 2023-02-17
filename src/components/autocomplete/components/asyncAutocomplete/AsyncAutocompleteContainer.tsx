@@ -105,6 +105,7 @@ export default function AsyncAutocompleteContainer({
       { endpoint: 'ONBOARDING_GET_PARTY_FROM_CF', endpointParams: { id: query } },
       {
         method: 'GET',
+        params: { ...(prodPn && { categories: 'L6,L4,L45' }) },
       },
       () => setRequiredLogin(true)
     );
