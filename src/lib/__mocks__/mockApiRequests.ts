@@ -208,7 +208,7 @@ const mockedParty = {
   address: 'address',
   digitalAddress: 'a@aa.com',
   taxCode: '33344455567',
-  zipCode: 'zipCode',
+  zipCode: '12345',
   origin: 'IPA',
   userRole: 'ADMIN',
 };
