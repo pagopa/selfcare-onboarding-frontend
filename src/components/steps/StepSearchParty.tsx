@@ -11,13 +11,13 @@ import {
   Product,
   StepperStepComponentProps,
 } from '../../../types';
+import { Autocomplete } from '../autocomplete/Autocomplete';
 import { getFetchOutcome } from '../../lib/error-utils';
 import { fetchWithLogs } from '../../lib/api-utils';
 import { UserContext } from '../../lib/context';
 import { OnboardingStepActions } from '../OnboardingStepActions';
 import { useHistoryState } from '../useHistoryState';
 import { LoadingOverlay } from '../LoadingOverlay';
-import { AsyncAutocompleteV2 } from '../autocomplete/AsyncAutocompleteV2';
 
 type Props = {
   subTitle: string | ReactElement;
@@ -47,7 +47,8 @@ const handleSearchExternalId = async (
 
   return null;
 };
-
+// TODO remove cognitive-complexity
+// eslint-disable-next-line sonarjs/cognitive-complexity
 export function StepSearchParty({
   subTitle,
   forward,
@@ -59,6 +60,9 @@ export function StepSearchParty({
   const partyExternalIdByQuery = new URLSearchParams(window.location.search).get('partyExternalId');
   const { setRequiredLogin } = useContext(UserContext);
   const theme = useTheme();
+
+  const [isSearchFieldSelected, setIsSearchFieldSelected] = useState<boolean>(true);
+
   const [loading, setLoading] = useState(!!partyExternalIdByQuery);
   const [selected, setSelected, setSelectedHistory] = useHistoryState<IPACatalogParty | null>(
     'selected_step1',
@@ -78,6 +82,7 @@ export function StepSearchParty({
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     back!();
   };
+
   useEffect(() => {
     if (partyExternalIdByQuery) {
       handleSearchExternalId(partyExternalIdByQuery, () => setRequiredLogin(true))
@@ -107,14 +112,18 @@ export function StepSearchParty({
     }
   }, [selected]);
 
+  useEffect(() => {
+    if (isSearchFieldSelected || selected) {
+      setIsSearchFieldSelected(true);
+    } else {
+      setIsSearchFieldSelected(false);
+    }
+  }, [isSearchFieldSelected]);
+
   return loading ? (
     <LoadingOverlay loadingText={t('onboardingStep1.loadingOverlayText')} />
   ) : (
-    <Grid
-      container
-      //  mt={16}
-      direction="column"
-    >
+    <Grid container direction="column">
       <Grid container item justifyContent="center">
         <Grid item xs={12}>
           <Typography variant="h3" component="h2" align="center" color={theme.palette.text.primary}>
@@ -133,21 +142,21 @@ export function StepSearchParty({
 
       <Grid container item justifyContent="center" mt={4} mb={4}>
         <Grid item xs={8} md={6} lg={5}>
-          <AsyncAutocompleteV2
+          <Autocomplete
             theme={theme}
             selected={selected}
             setSelected={setSelected}
-            // placeholder={t('onboardingStep1.onboarding.asyncAutocomplete.placeholder')}
             endpoint={{ endpoint: 'ONBOARDING_GET_SEARCH_PARTIES' }}
             transformFn={(data: { items: Array<IPACatalogParty> }) =>
               /* removed transformation into lower case in order to send data to BE as obtained from registry
-              // eslint-disable-next-line functional/immutable-data
-              data.items.forEach((i) => (i.description = i.description.toLowerCase()));
-              */
+                  // eslint-disable-next-line functional/immutable-data
+                  data.items.forEach((i) => (i.description = i.description.toLowerCase()));
+                  */
               data.items
             }
             optionKey="id"
             optionLabel="description"
+            isSearchFieldSelected={isSearchFieldSelected}
             product={product}
           />
         </Grid>

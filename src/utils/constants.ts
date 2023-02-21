@@ -59,6 +59,9 @@ export const API = {
   ONBOARDING_GET_PARTY: {
     URL: ENV.URL_API.PARTY_REGISTRY_PROXY + '/institutions/{{externalInstitutionId}}',
   },
+  ONBOARDING_GET_PARTY_FROM_CF: {
+    URL: ENV.URL_API.PARTY_REGISTRY_PROXY + '/institutions/{{id}}',
+  },
   ONBOARDING_POST_LEGALS: {
     URL:
       ENV.URL_API.ONBOARDING +

@@ -8,6 +8,17 @@ export default {
   asyncAutocomplete: {
     noResultsLabel: 'Nessun risultato',
     lessThen3CharacterLabel: 'Digita almeno 3 caratteri',
+    lessThen11CharacterLabel: 'Digita almeno 11 caratteri',
+    serachLabel: 'Cerca ente',
+    ariaLabel:`Seleziona la tipologia di ricerca dell'ente`,
+    businessName: 'Ragione Sociale',
+    taxcode:'Codice Fiscale ente'
+  },
+  partyAdvancedSelect: {
+    advancedSearchLabel: 'Cerca per',
+    businessName: 'Ragione Sociale',
+    taxCode: 'Codice Fiscale dell’ente',
+    ipaCode: 'Codice IPA'
   },
   confirmRegistrationStep0: {
     title: "Carica l'Accordo di Adesione",
@@ -65,9 +76,9 @@ export default {
   onboardingStep1: {
     loadingOverlayText: 'Stiamo verificando i tuoi dati',
     onboarding: {
-      bodyTitle: 'Seleziona il tuo ente',
+      bodyTitle: 'Cerca il tuo ente',
       bodyDescription:
-        "Seleziona dall'Indice della Pubblica Amministrazione (IPA) l'ente <1/> per cui vuoi richiedere l'adesione a {{productTitle}}",
+        "Inserisci uno dei dati richiesti e cerca dall’Indice della Pubblica <1/> Amministrazione (IPA) l’ente per cui vuoi richiedere l’adesione a <3/>{{productTitle}}",
       ipaDescription: `Non trovi il tuo ente nell'IPA? In <1>questa pagina</1> trovi maggiori <3/> informazioni sull'indice e su come accreditarsi `,
       asyncAutocomplete: {
         placeholder: 'Cerca',

@@ -76,7 +76,7 @@ const renderComponent = (productId: string = 'prod-pn') => {
   render(<Component />);
 };
 
-const step1Title = 'Seleziona il tuo ente';
+const step1Title = 'Cerca il tuo ente';
 const stepInstitutionType = 'Seleziona il tipo di ente che rappresenti';
 const stepBillingDataTitle = 'Indica i dati del tuo ente';
 const step2Title = 'Indica il Legale Rappresentante';
@@ -88,6 +88,7 @@ const agencyOnboarded = 'AGENCY ONBOARDED';
 const agencyInfoError = 'AGENCY INFO ERROR';
 const agencyX = 'AGENCY X';
 const agencyError = 'AGENCY ERROR';
+const comune = 'Comune di Milano';
 
 test('test already onboarded', async () => {
   renderComponent();
@@ -171,6 +172,18 @@ test('test exiting during flow with logout', async () => {
   await waitFor(() => expect(mockedLocation.assign).toBeCalledWith(ENV.URL_FE.LOGOUT));
 });
 
+test('test advanvced search business name', async () => {
+  renderComponent('prod-pn');
+  await executeStepInstitutionType();
+  await executeAdvancedSearchForBusinessName(agencyX);
+});
+
+test('test advanvced search taxcode', async () => {
+  renderComponent('prod-pn');
+  await executeStepInstitutionType();
+  await executeAdvancedSearchForTaxCode(comune);
+});
+
 const performLogout = async (logoutButton: HTMLElement) => {
   fireEvent.click(logoutButton);
   await waitFor(() => expect(screen.queryByText('Vuoi davvero uscire?')).not.toBeNull());
@@ -250,6 +263,56 @@ const executeStep1 = async (partyName: string) => {
     },
     expect.any(Function)
   );
+
+  fireEvent.click(partyNameSelection);
+
+  const confirmButton = screen.getByRole('button', { name: 'Continua' });
+  expect(confirmButton).toBeEnabled();
+
+  fireEvent.click(confirmButton);
+  await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(3));
+};
+
+const executeAdvancedSearchForBusinessName = async (partyName: string) => {
+  console.log('Testing step 1');
+
+  screen.getByText(step1Title);
+  await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(1));
+  const inputPartyName = document.getElementById('Parties');
+
+  fireEvent.click(document.getElementById('businessName'));
+
+  expect(inputPartyName).toBeTruthy();
+  fireEvent.change(inputPartyName, { target: { value: 'XXX' } });
+
+  const partyNameSelection = await waitFor(() => screen.getByText(partyName));
+
+  expect(fetchWithLogsSpy).toBeCalledTimes(2);
+
+  fireEvent.click(partyNameSelection);
+
+  const confirmButton = screen.getByRole('button', { name: 'Continua' });
+  expect(confirmButton).toBeEnabled();
+
+  fireEvent.click(confirmButton);
+  await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(3));
+};
+
+const executeAdvancedSearchForTaxCode = async (partyName: string) => {
+  console.log('Testing step 1');
+
+  screen.getByText(step1Title);
+  await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(1));
+  const inputPartyName = document.getElementById('Parties');
+
+  fireEvent.click(document.getElementById('taxcode'));
+
+  expect(inputPartyName).toBeTruthy();
+  fireEvent.change(inputPartyName, { target: { value: '33344455567' } });
+
+  const partyNameSelection = await waitFor(() => screen.getByText(partyName));
+
+  expect(fetchWithLogsSpy).toBeCalledTimes(2);
 
   fireEvent.click(partyNameSelection);
 
