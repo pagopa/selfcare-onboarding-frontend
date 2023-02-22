@@ -463,6 +463,11 @@ function OnboardingComponent({ productId }: { productId: string }) {
       }
       setActiveStep(4);
     }
+    if (newInstitutionType && newInstitutionType === 'PA') {
+      setOrigin('IPA');
+    } else {
+      setOrigin(undefined);
+    }
   };
 
   const steps: Array<StepperStep> = [
