@@ -184,6 +184,13 @@ test('test advanvced search taxcode', async () => {
   await executeAdvancedSearchForTaxCode(comune);
 });
 
+test('test billingData without Support Mail', async () => {
+  renderComponent('prod-io-sign');
+  await executeStepInstitutionType();
+  await executeStep1(agencyError);
+  await executeStepBillingDataWithoutSupportMail();
+});
+
 const performLogout = async (logoutButton: HTMLElement) => {
   fireEvent.click(logoutButton);
   await waitFor(() => expect(screen.queryByText('Vuoi davvero uscire?')).not.toBeNull());
@@ -384,6 +391,63 @@ const executeStepBillingData = async () => {
   await waitFor(() => screen.getByText(step2Title));
 };
 
+const executeStepBillingDataWithoutSupportMail = async () => {
+  console.log('execute Step Billing Data Without SupportMail');
+  await waitFor(() => screen.getByText(stepBillingDataTitle));
+  await fillUserBillingDataForm(
+    'businessName',
+    'registeredOffice',
+    'digitalAddress',
+    'zipCode',
+    'taxCode',
+    'vatNumber',
+    'recipientCode',
+    'supportEmail'
+  );
+
+  const confirmButtonEnabled = screen.getByRole('button', { name: 'Continua' });
+  await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
+
+  fireEvent.change(document.getElementById('supportEmail'), {
+    target: { value: 'h' },
+  });
+
+  await waitFor(() => screen.getByText('L’indirizzo email non è valido'));
+
+  await waitFor(() => expect(confirmButtonEnabled).toBeDisabled());
+
+  await waitFor(() =>
+    fireEvent.change(document.getElementById('supportEmail'), {
+      target: { value: '' },
+    })
+  );
+
+  await waitFor(() => expect(confirmButtonEnabled).toBeDisabled());
+  await fillUserBillingDataForm(
+    'businessName',
+    'registeredOffice',
+    'digitalAddress',
+    'zipCode',
+    'taxCode',
+    'vatNumber',
+    'recipientCode',
+    'supportEmail'
+  );
+
+  await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
+
+  await checkCorrectBodyBillingData(
+    'businessNameInput',
+    'registeredOfficeInput',
+    'a@a.it',
+    '09010',
+    'AAAAAA44D55F456K',
+    'AAAAAA44D55F456K',
+    'recipientCode'
+  );
+  fireEvent.click(confirmButtonEnabled);
+  await waitFor(() => screen.getByText(step2Title));
+};
 const executeStep2 = async () => {
   console.log('Testing step 2');
   await waitFor(() => screen.getByText(step2Title));
