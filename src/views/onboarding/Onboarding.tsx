@@ -107,7 +107,9 @@ function OnboardingComponent({ productId }: { productId: string }) {
   const [selectedParty, setSelectedParty] = useState<Party>();
 
   const productAvoidStep =
-    selectedProduct?.id === 'prod-pn' || selectedProduct?.id === 'prod-idpay';
+    selectedProduct?.id === 'prod-pn' ||
+    selectedProduct?.id === 'prod-idpay' ||
+    selectedProduct?.id === 'prod-interop';
 
   const fromDashboard =
     window.location.search.indexOf(`partyExternalId=${externalInstitutionId}`) > -1;
