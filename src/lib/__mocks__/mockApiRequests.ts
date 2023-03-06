@@ -285,7 +285,7 @@ const mockedOnboardingData0: InstitutionOnboardingInfoResource = {
           desc: 'Firenze - Comune',
         },
       ],
-      supportEmail:'comune.bollate@pec.it'
+      supportEmail: 'comune.bollate@pec.it',
     },
     institutionType: 'PA',
     origin: 'IPA',
@@ -316,17 +316,17 @@ const mockedOnboardingData1: InstitutionOnboardingInfoResource = {
           desc: 'Firenze - Comune',
         },
       ],
-      supportEmail:'comune.bollate@pec.it'
+      supportEmail: 'comune.bollate@pec.it',
     },
     institutionType: 'PA',
     origin: 'IPA',
     assistanceContacts: {
-      supportEmail:'a@a.it'
+      supportEmail: 'a@a.it',
     },
     companyInformations: {
       businessRegisterPlace: 'register Place test',
       rea: 'RM-123456',
-      shareCapital:'123456'
+      shareCapital: '123456',
     },
   },
   manager: {
@@ -338,24 +338,28 @@ const mockedOnboardingData1: InstitutionOnboardingInfoResource = {
   },
 };
 
-
 const mockedSubProduct = {
   title: 'Premium',
   id: 'prod-io-premium',
   parentId: 'prod-io',
 };
+const mockedProdIoSign = {
+  title: 'Firma con Io',
+  id: 'prod-io-sign',
+};
 const mockedProducts = [
-{
-  title: 'Interoperabilità',
-  id: 'prod-interop',
+  {
+    title: 'Interoperabilità',
+    id: 'prod-interop',
   },
   {
     title: 'Piattaforma Notifiche',
     id: 'prod-pn',
-  },];
+  },
+];
 
 // eslint-disable-next-line functional/immutable-data
-const urlProdId =window.location.pathname.split('/').pop();
+const urlProdId = window.location.pathname.split('/').pop();
 const SelectedProduct = mockedProducts.find((p) => p.id === urlProdId);
 
 const mockedSelectedProduct = {
@@ -532,22 +536,24 @@ export async function mockFetch(
     switch (endpointParams.productId) {
       case 'error':
         return genericError;
-        // case 'prod-pn':
-        //   return new Promise((resolve) =>
-        //     resolve({ data: mockedProductPn, status: 200, statusText: '200' } as AxiosResponse)
-        // );
-        case 'prod-io-premium':
-          return new Promise((resolve) =>
-            resolve({ data: mockedSubProduct, status: 200, statusText: '200' } as AxiosResponse)
-          );
+      // case 'prod-pn':
+      //   return new Promise((resolve) =>
+      //     resolve({ data: mockedProductPn, status: 200, statusText: '200' } as AxiosResponse)
+      // );
+      case 'prod-io-premium':
+        return new Promise((resolve) =>
+          resolve({ data: mockedSubProduct, status: 200, statusText: '200' } as AxiosResponse)
+        );
+      case 'prod-io-sign':
+        return new Promise((resolve) =>
+          resolve({ data: mockedProdIoSign, status: 200, statusText: '200' } as AxiosResponse)
+        );
       default:
         return new Promise((resolve) =>
           resolve({ data: mockedSelectedProduct, status: 200, statusText: '200' } as AxiosResponse)
         );
     }
   }
-
-  // TODO: add test for 'ONBOARDING_GET_PARTY_FROM_CF'
 
   if (endpoint === 'ONBOARDING_USER_VALIDATION') {
     if (
@@ -640,7 +646,6 @@ export async function mockFetch(
       );
     }
   }
-
 
   const msg = `NOT MOCKED REQUEST! {endpoint: ${endpoint}, endpointParams: ${JSON.stringify(
     endpointParams
