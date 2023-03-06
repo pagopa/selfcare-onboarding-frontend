@@ -254,7 +254,6 @@ const executeStep1 = async (partyName: string) => {
   console.log('Testing step 1');
 
   screen.getByText(step1Title);
-  screen.debug(document, 100000000);
   await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(1));
   const inputPartyName = document.getElementById('Parties');
 
