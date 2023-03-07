@@ -91,8 +91,8 @@ export default {
   },
   onboardingStep2: {
     bodyTitle: 'Indica il Legale <1/> Rappresentante',
-    bodyDescription: `Inserisci i dati del Legale Rappresentante. <1/> La persona che indicherai sarà firmataria del contratto per <3/><4/>`,
-    premiumBodyDescription: `Inserisci i dati del Legale Rappresentante. <1/> La persona che indicherai sarà firmataria del contratto per <3/><4/> Premium`,
+    bodyDescription: `Inserisci i dati del Legale Rappresentante o del procuratore del tuo ente. <1/> La persona che indicherai sarà firmataria del contratto per <3/>.`,
+    premiumBodyDescription: `Inserisci i dati del Legale Rappresentante o del procuratore del tuo ente. <1/> La persona che indicherai sarà firmataria del contratto per <3/> Premium.`,
     backLabel: 'Indietro',
     confirmLabel: 'Continua',
   },
