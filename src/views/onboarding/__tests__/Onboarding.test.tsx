@@ -161,12 +161,6 @@ test('test exiting during flow with logout', async () => {
   fireEvent.click(screen.getByRole('button', { name: 'Annulla' }));
   await waitFor(() => expect(screen.queryByText('Vuoi davvero uscire?')).toBeNull());
 
-  /* closeIcon not shown
-  await performLogout(logoutButton);
-  fireEvent.click(findRemoveAdditionUsersButtons()[0]); // to search closeIcon, same logic as searching remove additional delegate
-  await waitFor(() => expect(screen.queryByText('Vuoi davvero uscire?')).toBeNull());
-  */
-
   await performLogout(logoutButton);
   fireEvent.click(screen.getByRole('button', { name: 'Esci' }));
   await waitFor(() => expect(mockedLocation.assign).toBeCalledWith(ENV.URL_FE.LOGOUT));
@@ -195,6 +189,12 @@ test('test advanvced search business name', async () => {
   renderComponent('prod-interop');
   await executeStepInstitutionType();
   await executeAdvancedSearchForBusinessName(agencyX);
+});
+
+test('test label recipientCode only for institutionType !== PA', async () => {
+  renderComponent('prod-interop');
+  await executeStepInstitutionTypeScp();
+  await executeStepBillingDataLabels();
 });
 
 const performLogout = async (logoutButton: HTMLElement) => {
@@ -286,6 +286,21 @@ const executeStep1 = async (partyName: string) => {
   await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(3));
 };
 
+const executeStep1Base = async (partyName: string) => {
+  console.log('Testing step 1 Base');
+  const confirmButton = screen.getByRole('button', { name: 'Continua' });
+  screen.getByText(step1Title);
+
+  expect(document.getElementById('Parties')).toBeTruthy();
+  fireEvent.change(document.getElementById('Parties'), { target: { value: 'XXX' } });
+
+  await waitFor(() => fireEvent.click(screen.getByText(partyName)));
+
+  expect(screen.getByRole('button', { name: 'Continua' })).toBeEnabled();
+  await waitFor(() => fireEvent.click(confirmButton));
+  expect(screen.getByText('Indica i dati del tuo ente'));
+};
+
 const executeAdvancedSearchForBusinessName = async (partyName: string) => {
   console.log('Testing step 1');
 
@@ -349,6 +364,19 @@ const executeStepInstitutionType = async () => {
   await waitFor(() => screen.getByText(step1Title));
 };
 
+const executeStepInstitutionTypeScp = async () => {
+  console.log('Testing step Institution Type');
+  await waitFor(() => screen.getByText(stepInstitutionType));
+
+  await fillInstitutionTypeCheckbox('scp');
+
+  const confirmButtonEnabled = screen.getByRole('button', { name: 'Continua' });
+  expect(confirmButtonEnabled).toBeEnabled();
+
+  fireEvent.click(confirmButtonEnabled);
+  await waitFor(() => screen.getByText('Indica i dati del tuo ente'));
+};
+
 const executeStepBillingData = async () => {
   console.log('Testing step Billing Data');
   await waitFor(() => screen.getByText(stepBillingDataTitle));
@@ -395,6 +423,22 @@ const executeStepBillingData = async () => {
   );
   fireEvent.click(confirmButtonEnabled);
   await waitFor(() => screen.getByText(step2Title));
+};
+
+const executeStepBillingDataLabels = async () => {
+  console.log('test label recipientCode only for institutionType !== PA');
+
+  const backButton = screen.getByRole('button', { name: 'Indietro' });
+
+  await waitFor(() => screen.getByText('Indica i dati del tuo ente'));
+  expect(screen.getByText('Codice destinatario'));
+
+  expect(backButton).toBeEnabled();
+  await waitFor(() => fireEvent.click(backButton));
+  await waitFor(() => screen.getByText('Seleziona il tipo di ente che rappresenti'));
+  await executeStepInstitutionType();
+  await executeStep1Base(agencyX);
+  expect(screen.getByText('Codice univoco'));
 };
 
 const executeStepBillingDataWithoutSupportMail = async () => {
