@@ -10,15 +10,15 @@ export default {
     lessThen3CharacterLabel: 'Digita almeno 3 caratteri',
     lessThen11CharacterLabel: 'Digita almeno 11 caratteri',
     serachLabel: 'Cerca ente',
-    ariaLabel:`Seleziona la tipologia di ricerca dell'ente`,
+    ariaLabel: `Seleziona la tipologia di ricerca dell'ente`,
     businessName: 'Ragione Sociale',
-    taxcode:'Codice Fiscale ente'
+    taxcode: 'Codice Fiscale ente',
   },
   partyAdvancedSelect: {
     advancedSearchLabel: 'Cerca per',
     businessName: 'Ragione Sociale',
     taxCode: 'Codice Fiscale dell’ente',
-    ipaCode: 'Codice IPA'
+    ipaCode: 'Codice IPA',
   },
   confirmRegistrationStep0: {
     title: "Carica l'Accordo di Adesione",
@@ -78,7 +78,7 @@ export default {
     onboarding: {
       bodyTitle: 'Cerca il tuo ente',
       bodyDescription:
-        "Inserisci uno dei dati richiesti e cerca dall’Indice della Pubblica <1/> Amministrazione (IPA) l’ente per cui vuoi richiedere l’adesione a <3/>{{productTitle}}",
+        'Inserisci uno dei dati richiesti e cerca dall’Indice della Pubblica <1/> Amministrazione (IPA) l’ente per cui vuoi richiedere l’adesione a <3/>{{productTitle}}',
       ipaDescription: `Non trovi il tuo ente nell'IPA? In <1>questa pagina</1> trovi maggiori <3/> informazioni sull'indice e su come accreditarsi `,
       asyncAutocomplete: {
         placeholder: 'Cerca',
@@ -328,7 +328,7 @@ export default {
       invalidVatNumber: 'La Partita IVA non è valida',
       invalidEmail: 'L’indirizzo email non è valido',
       invalidReaField: 'Il Campo REA non è valido',
-      invalidMailSupport:'L’indirizzo email non è valido',
+      invalidMailSupport: 'L’indirizzo email non è valido',
       invalidShareCapitalField: 'Il campo capitale sociale non è valido',
       businessName: 'Ragione sociale',
       registeredOffice: 'Sede legale',
@@ -339,6 +339,7 @@ export default {
       taxCode: 'Codice Fiscale',
       vatNumber: 'Partita IVA',
       recipientCode: 'Codice destinatario',
+      recipientCodeForPa: 'Codice univoco',
       recipientCodeDescription: 'È il codice necessario per ricevere le fatture elettroniche',
       gspDescription: 'Sono gestore di almeno uno dei pubblici servizi: Gas, Energia, Telco.',
       pspDataSection: {
@@ -353,12 +354,13 @@ export default {
       informationCompanies: {
         commercialRegisterNumber: 'Luogo di iscrizione al Registro delle Imprese (facoltativo)',
         rea: 'REA',
-        shareCapital:'Capitale sociale (facoltativo)',
+        shareCapital: 'Capitale sociale (facoltativo)',
       },
       assistanceContact: {
         supportEmail: 'Indirizzo email visibile ai cittadini',
-        supportEmailDescriprion:'È il contatto che i cittadini visualizzano per richiedere assistenza all’ente'
-      }
+        supportEmailDescriprion:
+          'È il contatto che i cittadini visualizzano per richiedere assistenza all’ente',
+      },
     },
     taxonomySection: {
       title: 'INDICA L’AREA GEOGRAFICA',
@@ -378,16 +380,16 @@ export default {
           title: 'Stai aggiungendo altre aree per il tuo ente',
           description: `Le aree geografiche verrano aggiunte a tutti i prodotti PagoPA a cui l’ente ha già aderito. Vuoi continuare?`,
           confirmButton: 'Continua',
-          backButton:'Indietro'
-          
+          backButton: 'Indietro',
         },
         modifyModal: {
           title: 'Stai modificando l’area geografica del tuo ente',
-          description: 'La modifica verrà applicata a tutti i prodotti PagoPA a cui l’ente ha già aderito. Vuoi continuare?',
+          description:
+            'La modifica verrà applicata a tutti i prodotti PagoPA a cui l’ente ha già aderito. Vuoi continuare?',
           confirmButton: 'Continua',
-          backButton:'Indietro'
-        }
-      }
+          backButton: 'Indietro',
+        },
+      },
     },
     dpoDataSection: {
       dpoTitle: 'CONTATTI DEL RESPONSABILE DELLA PROTEZIONE DEI DATI',
