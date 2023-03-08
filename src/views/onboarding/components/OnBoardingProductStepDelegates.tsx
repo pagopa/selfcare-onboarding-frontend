@@ -164,13 +164,7 @@ export function OnBoardingProductStepDelegates({
     setIsAuthUser(value);
   };
   const bodyTitle = t('onboardingStep3.bodyTitle');
-  const bodyDescription1 = t('onboardingStep3.bodyDescription1');
-  const bodyDescription2 = (
-    <Trans i18nKey="onboardingStep3.bodyDescription2">
-      {'La persona che indicherai sarà responsabile della gestione di'} <br />
-      {{ productTitle: product?.title }}
-    </Trans>
-  );
+
   const theme = useTheme();
   const peopleCondition =
     objectIsEmpty(people) ||
@@ -198,11 +192,13 @@ export function OnBoardingProductStepDelegates({
       </Grid>
 
       <Grid container item justifyContent="center" mt={1}>
-        <Grid item xs={12}>
+        <Grid item xs={8}>
           <Typography variant="body1" align="center">
-            {bodyDescription1}
-            <br />
-            {bodyDescription2}
+            <Trans i18nKey="onboardingStep3.bodyDescription1">
+              Puoi aggiungere da uno a tre Amministratori o suoi delegati. <br /> Saranno i
+              responsabili della gestione di {{ productTitle: product?.title }} e presenti nel
+              contratto di adesione come delegati dal Legale Rappresentante.
+            </Trans>
           </Typography>
         </Grid>
       </Grid>
