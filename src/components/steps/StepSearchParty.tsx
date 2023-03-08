@@ -1,4 +1,4 @@
-import { Grid, Link, Typography, useTheme } from '@mui/material';
+import { Grid, Link, Typography, useTheme, Alert } from '@mui/material';
 import { Box } from '@mui/system';
 import { useContext, useEffect, useState } from 'react';
 import { AxiosResponse } from 'axios';
@@ -141,6 +141,32 @@ export function StepSearchParty({
       </Grid>
 
       <Grid container item justifyContent="center" mt={4} mb={4}>
+        {product?.id === 'prod-pn' && (
+          <Grid container item justifyContent="center">
+            <Grid item xs={10}>
+              <Box display="flex" justifyContent="center" mb={5}>
+                <Alert severity="warning" sx={{ width: '100%' }}>
+                  <Typography sx={{ fontSize: '16px', a: { color: theme.palette.text.primary } }}>
+                    Al momento possono aderire a Piattaforma Notifiche le
+                    <strong> Pubbliche Amministrazioni Locali </strong> presenti in IPA come{' '}
+                    <a href="https://www.indicepa.gov.it/ipa-portale/consultazione/indirizzo-sede/ricerca-ente?categoria=L45">
+                      Città Metropolitane
+                    </a>
+                    ,{' '}
+                    <a href="https://www.indicepa.gov.it/ipa-portale/consultazione/indirizzo-sede/ricerca-ente?categoria=L6">
+                      Comuni e loro Consorzi e Associazioni
+                    </a>{' '}
+                    e{' '}
+                    <a href="https://www.indicepa.gov.it/ipa-portale/consultazione/indirizzo-sede/ricerca-ente?categoria=L4">
+                      Regioni, Province Autonome e loro Consorzi e Associazioni
+                    </a>
+                  </Typography>
+                </Alert>
+              </Box>
+            </Grid>
+          </Grid>
+        )}
+
         <Grid item xs={8} md={6} lg={5}>
           <Autocomplete
             theme={theme}
