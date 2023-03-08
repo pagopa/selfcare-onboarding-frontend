@@ -63,9 +63,7 @@ export default function StepInstitutionType({
   const institutionTypeValueFiltered = (id: string | undefined) => {
     switch (id) {
       case 'prod-interop':
-        return institutionTypeValues.filter(
-          (it) => it.labelKey === 'pa' || it.labelKey === 'gsp' || it.labelKey === 'scp'
-        );
+        return institutionTypeValues.filter((it) => it.labelKey === 'pa' || it.labelKey === 'gsp');
       case 'prod-pagopa':
         return institutionTypeValues.filter(
           (it) =>

@@ -192,9 +192,20 @@ test('test advanvced search business name', async () => {
 });
 
 test('test label recipientCode only for institutionType !== PA', async () => {
-  renderComponent('prod-interop');
+  renderComponent('prod-pagopa');
   await executeStepInstitutionTypeScp();
   await executeStepBillingDataLabels();
+});
+
+test('test party search if gps for prod-interop', async () => {
+  renderComponent('prod-interop');
+  await executeStepInstitutionTypeGspForInterop();
+  await executeStep1(agencyX);
+  await executeStepBillingData();
+  await executeStep2();
+  await executeStep3(true);
+  await verifySubmit('prod-interop');
+  await executeGoHome(true);
 });
 
 const performLogout = async (logoutButton: HTMLElement) => {
@@ -375,6 +386,18 @@ const executeStepInstitutionTypeScp = async () => {
 
   fireEvent.click(confirmButtonEnabled);
   await waitFor(() => screen.getByText('Indica i dati del tuo ente'));
+};
+const executeStepInstitutionTypeGspForInterop = async () => {
+  console.log('Testing step Institution Type');
+  await waitFor(() => screen.getByText(stepInstitutionType));
+
+  await fillInstitutionTypeCheckbox('gsp');
+
+  const confirmButtonEnabled = screen.getByRole('button', { name: 'Continua' });
+  expect(confirmButtonEnabled).toBeEnabled();
+
+  fireEvent.click(confirmButtonEnabled);
+  await waitFor(() => screen.getByText(step1Title));
 };
 
 const executeStepBillingData = async () => {
@@ -858,12 +881,12 @@ const billingData2billingDataRequest = () => ({
   recipientCode: 'recipientCode',
 });
 
-const verifySubmit = async () => {
+const verifySubmit = async (productId = 'prod-pn') => {
   await waitFor(() =>
     expect(fetchWithLogsSpy).lastCalledWith(
       {
         endpoint: 'ONBOARDING_POST_LEGALS',
-        endpointParams: { externalInstitutionId: 'id', productId: 'prod-pn' },
+        endpointParams: { externalInstitutionId: 'id', productId: productId },
       },
       {
         data: {
