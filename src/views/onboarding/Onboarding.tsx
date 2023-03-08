@@ -446,7 +446,10 @@ function OnboardingComponent({ productId }: { productId: string }) {
     });
     setInstitutionType(newInstitutionType);
     forward();
-    if (newInstitutionType === 'PSP' || newInstitutionType !== 'PA') {
+    if (
+      (newInstitutionType === 'PSP' || newInstitutionType !== 'PA') &&
+      productId !== 'prod-interop'
+    ) {
       if (newInstitutionType !== institutionType) {
         setOnboardingFormData({
           businessName: '',
