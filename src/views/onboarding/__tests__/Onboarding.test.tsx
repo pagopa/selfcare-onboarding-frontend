@@ -208,6 +208,15 @@ test('test party search if gps for prod-interop', async () => {
   await executeGoHome(true);
 });
 
+test('test description in step3', async () => {
+  renderComponent('prod-interop');
+  await executeStepInstitutionTypeGspForInterop();
+  await executeStep1(agencyX);
+  await executeStepBillingData();
+  await executeStep2();
+  await verifyDescriptionInStep3();
+});
+
 const performLogout = async (logoutButton: HTMLElement) => {
   fireEvent.click(logoutButton);
   await waitFor(() => expect(screen.queryByText('Vuoi davvero uscire?')).not.toBeNull());
@@ -572,6 +581,14 @@ const executeStep3 = async (expectedSuccessfulSubmit: boolean) => {
 
   await waitFor(() =>
     screen.getByText(expectedSuccessfulSubmit ? completeSuccessTitle : completeErrorTitle)
+  );
+};
+
+const verifyDescriptionInStep3 = async () => {
+  console.log('Testing step 3');
+  await waitFor(() => screen.getByText(step3Title));
+  expect(
+    waitFor(() => screen.getByText('Puoi aggiungere da uno a tre Amministratori o suoi delegati.'))
   );
 };
 
