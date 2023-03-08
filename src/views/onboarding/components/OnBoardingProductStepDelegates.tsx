@@ -7,7 +7,9 @@ import {
   Grid,
   Typography,
   useTheme,
+  Box,
 } from '@mui/material';
+import Add from '@mui/icons-material/Add';
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 import { omit, uniqueId } from 'lodash';
 import { useTranslation, Trans } from 'react-i18next';
@@ -267,23 +269,24 @@ export function OnBoardingProductStepDelegates({
       {/* <Box sx={{ textAlign: 'center' }} > */}
 
       <Grid container item my={4} display="flex" justifyContent="center">
-        <Grid item xs={3} sx={{ display: 'flex', justifyContent: 'center' }}>
+        <Grid item xs={6} sx={{ display: 'flex', justifyContent: 'center' }}>
           {Object.keys(people).length !== 3 && (
             <Link
               component="button"
               disabled={peopleCondition}
               onClick={addDelegateForm}
               sx={{
-                fontSize: 'htmlFontSize',
-                lineHeight: '24px',
-                fontFamily: '"Titillium Web", "sans-serif"',
                 textDecoration: 'none',
                 cursor: peopleCondition ? 'default' : 'pointer',
-                color: theme.palette.primary.main,
                 opacity: peopleCondition ? 0.5 : 1,
               }}
             >
-              {t('onboardingStep3.addUserLink')}
+              <Box display={'flex'} alignItems={'center'}>
+                <Add fontSize="small" color="primary" sx={{ mr: 1 }} />
+                <Typography color="primary" sx={{ fontWeight: 'fontWeightBold', fontSize: '18px' }}>
+                  {t('onboardingStep3.addUserLink')}
+                </Typography>
+              </Box>
             </Link>
           )}
         </Grid>
