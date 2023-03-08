@@ -110,10 +110,9 @@ export function StepAddManager({
                   : 'onboardingStep2.bodyDescription'
               }
             >
-              Inserisci i dati del Legale Rappresentante.
+              Inserisci i dati del Legale Rappresentante o del procuratore del tuo ente.
               <br />
               La persona che indicherai sarà firmataria del contratto per
-              <br />
               {`${product?.title}`}.
             </Trans>
           </Typography>

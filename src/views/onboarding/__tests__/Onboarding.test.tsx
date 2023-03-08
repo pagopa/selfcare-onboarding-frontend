@@ -161,12 +161,6 @@ test('test exiting during flow with logout', async () => {
   fireEvent.click(screen.getByRole('button', { name: 'Annulla' }));
   await waitFor(() => expect(screen.queryByText('Vuoi davvero uscire?')).toBeNull());
 
-  /* closeIcon not shown
-  await performLogout(logoutButton);
-  fireEvent.click(findRemoveAdditionUsersButtons()[0]); // to search closeIcon, same logic as searching remove additional delegate
-  await waitFor(() => expect(screen.queryByText('Vuoi davvero uscire?')).toBeNull());
-  */
-
   await performLogout(logoutButton);
   fireEvent.click(screen.getByRole('button', { name: 'Esci' }));
   await waitFor(() => expect(mockedLocation.assign).toBeCalledWith(ENV.URL_FE.LOGOUT));
@@ -182,6 +176,45 @@ test('test advanvced search taxcode', async () => {
   renderComponent('prod-pn');
   await executeStepInstitutionType();
   await executeAdvancedSearchForTaxCode(comune);
+});
+
+test('test billingData without Support Mail', async () => {
+  renderComponent('prod-io-sign');
+  await executeStepInstitutionType();
+  await executeStep1(agencyError);
+  await executeStepBillingDataWithoutSupportMail();
+});
+
+test('test advanvced search business name', async () => {
+  renderComponent('prod-interop');
+  await executeStepInstitutionType();
+  await executeAdvancedSearchForBusinessName(agencyX);
+});
+
+test('test label recipientCode only for institutionType !== PA', async () => {
+  renderComponent('prod-pagopa');
+  await executeStepInstitutionTypeScp();
+  await executeStepBillingDataLabels();
+});
+
+test('test party search if gps for prod-interop', async () => {
+  renderComponent('prod-interop');
+  await executeStepInstitutionTypeGspForInterop();
+  await executeStep1(agencyX);
+  await executeStepBillingData();
+  await executeStep2();
+  await executeStep3(true);
+  await verifySubmit('prod-interop');
+  await executeGoHome(true);
+});
+
+test('test description in step3', async () => {
+  renderComponent('prod-interop');
+  await executeStepInstitutionTypeGspForInterop();
+  await executeStep1(agencyX);
+  await executeStepBillingData();
+  await executeStep2();
+  await verifyDescriptionInStep3();
 });
 
 const performLogout = async (logoutButton: HTMLElement) => {
@@ -273,6 +306,21 @@ const executeStep1 = async (partyName: string) => {
   await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(3));
 };
 
+const executeStep1Base = async (partyName: string) => {
+  console.log('Testing step 1 Base');
+  const confirmButton = screen.getByRole('button', { name: 'Continua' });
+  screen.getByText(step1Title);
+
+  expect(document.getElementById('Parties')).toBeTruthy();
+  fireEvent.change(document.getElementById('Parties'), { target: { value: 'XXX' } });
+
+  await waitFor(() => fireEvent.click(screen.getByText(partyName)));
+
+  expect(screen.getByRole('button', { name: 'Continua' })).toBeEnabled();
+  await waitFor(() => fireEvent.click(confirmButton));
+  expect(screen.getByText('Indica i dati del tuo ente'));
+};
+
 const executeAdvancedSearchForBusinessName = async (partyName: string) => {
   console.log('Testing step 1');
 
@@ -336,6 +384,31 @@ const executeStepInstitutionType = async () => {
   await waitFor(() => screen.getByText(step1Title));
 };
 
+const executeStepInstitutionTypeScp = async () => {
+  console.log('Testing step Institution Type');
+  await waitFor(() => screen.getByText(stepInstitutionType));
+
+  await fillInstitutionTypeCheckbox('scp');
+
+  const confirmButtonEnabled = screen.getByRole('button', { name: 'Continua' });
+  expect(confirmButtonEnabled).toBeEnabled();
+
+  fireEvent.click(confirmButtonEnabled);
+  await waitFor(() => screen.getByText('Indica i dati del tuo ente'));
+};
+const executeStepInstitutionTypeGspForInterop = async () => {
+  console.log('Testing step Institution Type');
+  await waitFor(() => screen.getByText(stepInstitutionType));
+
+  await fillInstitutionTypeCheckbox('gsp');
+
+  const confirmButtonEnabled = screen.getByRole('button', { name: 'Continua' });
+  expect(confirmButtonEnabled).toBeEnabled();
+
+  fireEvent.click(confirmButtonEnabled);
+  await waitFor(() => screen.getByText(step1Title));
+};
+
 const executeStepBillingData = async () => {
   console.log('Testing step Billing Data');
   await waitFor(() => screen.getByText(stepBillingDataTitle));
@@ -384,6 +457,79 @@ const executeStepBillingData = async () => {
   await waitFor(() => screen.getByText(step2Title));
 };
 
+const executeStepBillingDataLabels = async () => {
+  console.log('test label recipientCode only for institutionType !== PA');
+
+  const backButton = screen.getByRole('button', { name: 'Indietro' });
+
+  await waitFor(() => screen.getByText('Indica i dati del tuo ente'));
+  expect(screen.getByText('Codice destinatario'));
+
+  expect(backButton).toBeEnabled();
+  await waitFor(() => fireEvent.click(backButton));
+  await waitFor(() => screen.getByText('Seleziona il tipo di ente che rappresenti'));
+  await executeStepInstitutionType();
+  await executeStep1Base(agencyX);
+  expect(screen.getByText('Codice univoco'));
+};
+
+const executeStepBillingDataWithoutSupportMail = async () => {
+  console.log('execute Step Billing Data Without SupportMail');
+  await waitFor(() => screen.getByText(stepBillingDataTitle));
+  await fillUserBillingDataForm(
+    'businessName',
+    'registeredOffice',
+    'digitalAddress',
+    'zipCode',
+    'taxCode',
+    'vatNumber',
+    'recipientCode',
+    'supportEmail'
+  );
+
+  const confirmButtonEnabled = screen.getByRole('button', { name: 'Continua' });
+  await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
+
+  fireEvent.change(document.getElementById('supportEmail'), {
+    target: { value: 'h' },
+  });
+
+  await waitFor(() => screen.getByText('L’indirizzo email non è valido'));
+
+  await waitFor(() => expect(confirmButtonEnabled).toBeDisabled());
+
+  await waitFor(() =>
+    fireEvent.change(document.getElementById('supportEmail'), {
+      target: { value: '' },
+    })
+  );
+
+  await waitFor(() => expect(confirmButtonEnabled).toBeDisabled());
+  await fillUserBillingDataForm(
+    'businessName',
+    'registeredOffice',
+    'digitalAddress',
+    'zipCode',
+    'taxCode',
+    'vatNumber',
+    'recipientCode',
+    'supportEmail'
+  );
+
+  await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
+
+  await checkCorrectBodyBillingData(
+    'businessNameInput',
+    'registeredOfficeInput',
+    'a@a.it',
+    '09010',
+    'AAAAAA44D55F456K',
+    'AAAAAA44D55F456K',
+    'recipientCode'
+  );
+  fireEvent.click(confirmButtonEnabled);
+  await waitFor(() => screen.getByText(step2Title));
+};
 const executeStep2 = async () => {
   console.log('Testing step 2');
   await waitFor(() => screen.getByText(step2Title));
@@ -435,6 +581,14 @@ const executeStep3 = async (expectedSuccessfulSubmit: boolean) => {
 
   await waitFor(() =>
     screen.getByText(expectedSuccessfulSubmit ? completeSuccessTitle : completeErrorTitle)
+  );
+};
+
+const verifyDescriptionInStep3 = async () => {
+  console.log('Testing step 3');
+  await waitFor(() => screen.getByText(step3Title));
+  expect(
+    waitFor(() => screen.getByText('Puoi aggiungere da uno a tre Amministratori o suoi delegati.'))
   );
 };
 
@@ -744,12 +898,12 @@ const billingData2billingDataRequest = () => ({
   recipientCode: 'recipientCode',
 });
 
-const verifySubmit = async () => {
+const verifySubmit = async (productId = 'prod-pn') => {
   await waitFor(() =>
     expect(fetchWithLogsSpy).lastCalledWith(
       {
         endpoint: 'ONBOARDING_POST_LEGALS',
-        endpointParams: { externalInstitutionId: 'id', productId: 'prod-pn' },
+        endpointParams: { externalInstitutionId: 'id', productId: productId },
       },
       {
         data: {

@@ -83,6 +83,7 @@ export default function StepOnboardingFormData({
   const isPSP = institutionType === 'PSP';
   const isInformationCompany =
     institutionType !== 'PA' && institutionType !== 'PSP' && productId === 'prod-io';
+  const isProdIoSign = productId === 'prod-io-sign';
 
   const [openModifyModal, setOpenModifyModal] = useState<boolean>(false);
   const [openAddModal, setOpenAddModal] = useState<boolean>(false);
@@ -321,17 +322,10 @@ export default function StepOnboardingFormData({
           values.shareCapital &&
           !currencyField.test(values.shareCapital) &&
           t('onboardingFormData.billingDataSection.invalidShareCapitalField'),
-        // TODO - set control after release in prod
-        // supportEmail:
-        //   !values.supportEmail && !premiumFlow
-        //     ? requiredError
-        //     : !mailPECRegexp.test(values.supportEmail as string) && values.supportEmail
-        //     ? t('onboardingFormData.billingDataSection.invalidMailSupport')
-        //       : undefined,
         supportEmail:
-          values.supportEmail &&
-          !mailPECRegexp.test(values.supportEmail as string) &&
-          values.supportEmail
+          !values.supportEmail && !premiumFlow && isProdIoSign
+            ? requiredError
+            : !mailPECRegexp.test(values.supportEmail as string) && values.supportEmail
             ? t('onboardingFormData.billingDataSection.invalidMailSupport')
             : undefined,
       }).filter(([_key, value]) => value)
