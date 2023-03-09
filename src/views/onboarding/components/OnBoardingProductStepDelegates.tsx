@@ -8,6 +8,7 @@ import {
   Typography,
   useTheme,
   Box,
+  Paper,
 } from '@mui/material';
 import Add from '@mui/icons-material/Add';
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
@@ -234,33 +235,51 @@ export function OnBoardingProductStepDelegates({
           />
         </Grid>
 
-        {delegateFormIds.map((id) => (
+        {delegateFormIds.map((id, index) => (
           <React.Fragment key={id}>
-            <Grid item xs={10} justifyContent="center" mt={6} mb={3}>
-              <Typography align="center" variant="h4" data-testid="extra-delegate">
-                {t('onboardingStep3.addUserLabel')}
-              </Typography>
-            </Grid>
-            <Grid
-              item
-              xs={8}
-              sx={{ boxShadow: '0px 12px 40px rgba(0, 0, 0, 0.06)', position: 'relative' }}
-            >
-              <PlatformUserForm
-                prefix={id}
-                role="DELEGATE"
-                people={people}
-                peopleErrors={peopleErrors}
-                allPeople={allPeople}
-                setPeople={setPeople}
-              />
-              <IconButton
-                color="primary"
-                onClick={buildRemoveDelegateForm(id)}
-                style={{ position: 'absolute', top: '2px', right: '2px', zIndex: 100 }}
-              >
-                <ClearOutlinedIcon />
-              </IconButton>
+            <Grid item xs={8}>
+              <Paper elevation={8} sx={{ borderRadius: 3, mt: 4 }} role="userForm">
+                <Grid container>
+                  <Grid
+                    item
+                    xs={6}
+                    display="flex"
+                    justifyContent="flex-start"
+                    alignItems="center"
+                    p="32px 0 0 32px "
+                  >
+                    <Typography
+                      component="div"
+                      variant="caption"
+                      sx={{ fontWeight: 'fontWeightBold' }}
+                      data-testid="extra-delegate"
+                    >
+                      {t('onboardingStep3.addUserLabel')}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={6} p="24px 32px 0 0px ">
+                    <Box display={'flex'} justifyContent={'flex-end'}>
+                      <IconButton
+                        id={`id_${index}`}
+                        data-testid="removeButton"
+                        color="primary"
+                        onClick={buildRemoveDelegateForm(id)}
+                        sx={{ p: '8px', display: 'flex', justifyContent: 'flex-end' }}
+                      >
+                        <ClearOutlinedIcon />
+                      </IconButton>
+                    </Box>
+                  </Grid>
+                </Grid>
+                <PlatformUserForm
+                  prefix={id}
+                  role="DELEGATE"
+                  people={people}
+                  peopleErrors={peopleErrors}
+                  allPeople={allPeople}
+                  setPeople={setPeople}
+                />
+              </Paper>
             </Grid>
           </React.Fragment>
         ))}
