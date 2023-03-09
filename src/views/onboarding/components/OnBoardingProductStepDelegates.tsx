@@ -235,10 +235,10 @@ export function OnBoardingProductStepDelegates({
           />
         </Grid>
 
-        {delegateFormIds.map((id) => (
+        {delegateFormIds.map((id, index) => (
           <React.Fragment key={id}>
             <Grid item xs={8}>
-              <Paper elevation={8} sx={{ borderRadius: 3, mt: 4 }}>
+              <Paper elevation={8} sx={{ borderRadius: 3, mt: 4 }} role="userForm">
                 <Grid container>
                   <Grid
                     item
@@ -260,6 +260,8 @@ export function OnBoardingProductStepDelegates({
                   <Grid item xs={6} p="24px 32px 0 0px ">
                     <Box display={'flex'} justifyContent={'flex-end'}>
                       <IconButton
+                        id={`id_${index}`}
+                        data-testid="removeButton"
                         color="primary"
                         onClick={buildRemoveDelegateForm(id)}
                         sx={{ p: '8px', display: 'flex', justifyContent: 'flex-end' }}

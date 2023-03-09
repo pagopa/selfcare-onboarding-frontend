@@ -135,7 +135,9 @@ export function StepSearchParty({
       <Grid container item justifyContent="center" mt={1}>
         <Grid item xs={12}>
           <Typography variant="body1" align="center" color={theme.palette.text.primary}>
-            {subTitle}
+            {selected
+              ? `Prosegui con l’adesione a ${product?.title} per l’ente selezionato`
+              : subTitle}
           </Typography>
         </Grid>
       </Grid>
