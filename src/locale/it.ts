@@ -99,7 +99,7 @@ export default {
   onboardingStep3: {
     bodyTitle: "Indica l'Amministratore",
     bodyDescription1: `Puoi aggiungere da uno a tre Amministratori o suoi delegati. <1/> Saranno i responsabili della gestione di {{productTitle}} e presenti nel contratto di adesione come delegati dal Legale Rappresentante.`,
-    addUserLabel: 'Aggiungi un altro Amministratore',
+    addUserLabel: 'AGGIUNGI UN ALTRO AMMINISTRATORE',
     addUserLink: 'Aggiungi un altro Amministratore',
     backLabel: 'Indietro',
     confirmLabel: 'Continua',

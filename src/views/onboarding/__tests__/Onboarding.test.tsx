@@ -808,13 +808,13 @@ const addAdditionEmptyUser = async (
   return removeUserButtons;
 };
 
-const checkAdditionalUsersExistance = (
+const checkAdditionalUsersExistance = async (
   expectedAdditionalUsersCount: number,
   expectedEmptyForm: boolean,
   confirmButton: HTMLElement
 ) => {
   const titles = screen.queryAllByTestId('extra-delegate');
-  expect(titles.length).toBe(expectedAdditionalUsersCount);
+  await waitFor(() => expect(titles.length).toBe(expectedAdditionalUsersCount));
 
   const isAddUsersVisible = expectedAdditionalUsersCount < 2;
   const addDelegateButton = screen.queryByRole('button', {
@@ -841,13 +841,26 @@ const findRemoveAdditionUsersButtons = () =>
     .getAllByRole('button')
     .filter((b) => b.children.length > 0 && b.children[0].tagName === 'svg');
 
+const searchUserFormFromRemoveBtn = (removeButton: HTMLElement) => {
+  if (!removeButton) {
+    return null;
+  } else {
+    const parent = removeButton.parentElement as HTMLElement;
+    if (parent.getAttribute('role') === 'userForm') {
+      return parent;
+    } else {
+      return searchUserFormFromRemoveBtn(parent);
+    }
+  }
+};
 const fillAdditionalUserAndCheckUniqueValues = async (
   index: number,
   confirmButton: HTMLElement
 ) => {
   const removeUserButtons = await addAdditionEmptyUser(index, confirmButton);
+
   const prefix = getByLabelText(
-    removeUserButtons[index].parentElement.children[0] as HTMLElement,
+    searchUserFormFromRemoveBtn(removeUserButtons[index]),
     'Nome'
   ).id.replace(/-name$/, '');
 
