@@ -1,5 +1,6 @@
 import { fireEvent, getByLabelText, render, screen, waitFor } from '@testing-library/react';
 import { useState } from 'react';
+import '@testing-library/jest-dom';
 import { User } from '../../../../types';
 import { HeaderContext, UserContext } from '../../../lib/context';
 import { ENV } from '../../../utils/env';
@@ -217,6 +218,10 @@ test('test description in step3', async () => {
   await verifyDescriptionInStep3();
 });
 
+test('test institution type if prod-io-sign', async () => {
+  renderComponent('prod-io-sign');
+  await executeStepInstitutionTypeGspForProdIoSign();
+});
 const performLogout = async (logoutButton: HTMLElement) => {
   fireEvent.click(logoutButton);
   await waitFor(() => expect(screen.queryByText('Vuoi davvero uscire?')).not.toBeNull());
@@ -407,6 +412,14 @@ const executeStepInstitutionTypeGspForInterop = async () => {
 
   fireEvent.click(confirmButtonEnabled);
   await waitFor(() => screen.getByText(step1Title));
+};
+
+const executeStepInstitutionTypeGspForProdIoSign = async () => {
+  console.log('Testing step Institution Type for Prod io sign');
+  await waitFor(() => screen.getByText(stepInstitutionType));
+
+  const ptLabel = await waitFor(() => screen.queryByText('Partner Tecnologico'));
+  expect(ptLabel).not.toBeInTheDocument();
 };
 
 const executeStepBillingData = async () => {

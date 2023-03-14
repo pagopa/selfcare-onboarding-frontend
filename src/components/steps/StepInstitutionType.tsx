@@ -76,6 +76,10 @@ export default function StepInstitutionType({
         return institutionTypeValues.filter((it) => it.labelKey === 'pa');
       case 'prod-idpay':
         return institutionTypeValues.filter((it) => it.labelKey === 'pa');
+      case 'prod-io-sign':
+        return institutionTypeValues.filter(
+          (it) => it.labelKey === 'pa' || it.labelKey === 'gsp' || it.labelKey === 'scp'
+        );
       default:
         return institutionTypeValues.filter(
           (it) =>
