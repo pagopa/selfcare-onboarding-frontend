@@ -33,7 +33,7 @@ type Props = StepperStepComponentProps & {
   setStepHistoryState: React.Dispatch<React.SetStateAction<StepBillingDataHistoryState>>;
   formik: any;
   premiumFlow: boolean;
-  isInformationCompany: any;
+  isInformationCompany: boolean;
 };
 
 export default function PersonalAndBillingDataSection({

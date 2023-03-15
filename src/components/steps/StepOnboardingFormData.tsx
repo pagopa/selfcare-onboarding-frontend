@@ -84,7 +84,7 @@ export default function StepOnboardingFormData({
   const isInformationCompany =
     institutionType !== 'PA' &&
     institutionType !== 'PSP' &&
-    (productId === 'prod-io' || 'prod-io-sign');
+    (productId === 'prod-io' || productId === 'prod-io-sign');
   const isProdIoSign = productId === 'prod-io-sign';
 
   const [openModifyModal, setOpenModifyModal] = useState<boolean>(false);
