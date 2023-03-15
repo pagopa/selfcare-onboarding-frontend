@@ -221,6 +221,7 @@ test('test description in step3', async () => {
 test('test institution type if prod-io-sign', async () => {
   renderComponent('prod-io-sign');
   await executeStepInstitutionTypeGspForProdIoSign();
+  await executeStepBillingDataReaField();
 });
 const performLogout = async (logoutButton: HTMLElement) => {
   fireEvent.click(logoutButton);
@@ -420,6 +421,13 @@ const executeStepInstitutionTypeGspForProdIoSign = async () => {
 
   const ptLabel = await waitFor(() => screen.queryByText('Partner Tecnologico'));
   expect(ptLabel).not.toBeInTheDocument();
+
+  await fillInstitutionTypeCheckbox('gsp');
+  const confirmButtonEnabled = screen.getByRole('button', { name: 'Continua' });
+  expect(confirmButtonEnabled).toBeEnabled();
+
+  fireEvent.click(confirmButtonEnabled);
+  await waitFor(() => screen.getByText('Indica i dati del tuo ente'));
 };
 
 const executeStepBillingData = async () => {
@@ -484,6 +492,30 @@ const executeStepBillingDataLabels = async () => {
   await executeStepInstitutionType();
   await executeStep1Base(agencyX);
   expect(screen.getByText('Codice univoco'));
+};
+
+const executeStepBillingDataReaField = async () => {
+  console.log('Testing step Billing Data');
+  await waitFor(() => screen.getByText(stepBillingDataTitle));
+
+  await waitFor(() => screen.getByText('REA'));
+
+  await fillUserBillingDataForm(
+    'businessName',
+    'registeredOffice',
+    'digitalAddress',
+    'zipCode',
+    'taxCode',
+    'vatNumber',
+    'recipientCode',
+    'supportEmail',
+    'rea'
+  );
+
+  const confirmButtonEnabled = screen.getByRole('button', { name: 'Continua' });
+  await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
+  fireEvent.click(confirmButtonEnabled);
+  await waitFor(() => screen.getByText(step2Title));
 };
 
 const executeStepBillingDataWithoutSupportMail = async () => {
@@ -623,7 +655,8 @@ const fillUserBillingDataForm = async (
   taxCodeInput: string,
   vatNumber: string,
   recipientCode: string,
-  supportEmail: string
+  supportEmail: string,
+  rea?: string
 ) => {
   fireEvent.change(document.getElementById(businessNameInput), {
     target: { value: 'businessNameInput' },
@@ -648,6 +681,11 @@ const fillUserBillingDataForm = async (
   });
   fireEvent.change(document.getElementById(supportEmail), { target: { value: 'a@a.it' } });
   // TODO: remove comment if REACT_APP_ENABLE_GEOTAXONOMY is true -- await waitFor(() => fireEvent.click(document.getElementById('national_geographicTaxonomies')));
+  if (rea) {
+    await waitFor(() =>
+      fireEvent.change(document.getElementById(rea), { target: { value: 'RM-123456' } })
+    );
+  }
 };
 
 const fillUserForm = async (
