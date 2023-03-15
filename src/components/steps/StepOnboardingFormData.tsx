@@ -82,7 +82,9 @@ export default function StepOnboardingFormData({
   const premiumFlow = !!subProductId;
   const isPSP = institutionType === 'PSP';
   const isInformationCompany =
-    institutionType !== 'PA' && institutionType !== 'PSP' && productId === 'prod-io';
+    institutionType !== 'PA' &&
+    institutionType !== 'PSP' &&
+    (productId === 'prod-io' || productId === 'prod-io-sign');
   const isProdIoSign = productId === 'prod-io-sign';
 
   const [openModifyModal, setOpenModifyModal] = useState<boolean>(false);
@@ -422,7 +424,7 @@ export default function StepOnboardingFormData({
           setStepHistoryState={setStepHistoryState}
           formik={formik}
           premiumFlow={premiumFlow}
-          productId={productId}
+          isInformationCompany={isInformationCompany}
         />
         {/* DATI RELATIVI ALLA TASSONOMIA */}
         {ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY ? (
