@@ -96,7 +96,7 @@ const renderComponent = (
   render(<Component />);
 };
 
-const stepSelectInstitutionUnreleatedTitle = 'Cerca il tuo ente';
+const stepSelectInstitutionUnreleatedTitle = 'Seleziona il tuo ente';
 const stepSelectInstitutionReleatedTitle = 'Seleziona il tuo ente';
 const stepBillingDataTitle = 'Indica i dati del tuo ente';
 const stepAddManagerTitle = 'Indica il Legale Rappresentante';
@@ -213,8 +213,7 @@ const checkBackForwardNavigation = async (
   expect(goBackButton).toBeEnabled();
   fireEvent.click(goBackButton);
 
-  await waitFor(() => screen.getByText(previousStepTitle));
-
+  await waitFor(() => screen.getByText('Conferma l’ente selezionato'));
   const goForwardButton = screen.getByRole('button', {
     name: 'Continua',
   });
@@ -232,7 +231,7 @@ const executeStepSelectInstitutionUnreleated = async (partyName: string) => {
   const newInstitutionAdhesion = await waitFor(() => screen.getByText('Registra un nuovo ente'));
   fireEvent.click(newInstitutionAdhesion);
 
-  await waitFor(() => screen.getByText(stepSelectInstitutionUnreleatedTitle));
+  await waitFor(() => screen.getByText('Cerca il tuo ente'));
   await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(3));
   const inputPartyName = document.getElementById('Parties');
 
