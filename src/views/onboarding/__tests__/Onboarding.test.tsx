@@ -1,5 +1,6 @@
 import { fireEvent, getByLabelText, render, screen, waitFor } from '@testing-library/react';
 import { useState } from 'react';
+import '@testing-library/jest-dom';
 import { User } from '../../../../types';
 import { HeaderContext, UserContext } from '../../../lib/context';
 import { ENV } from '../../../utils/env';
@@ -217,6 +218,11 @@ test('test description in step3', async () => {
   await verifyDescriptionInStep3();
 });
 
+test('test institution type if prod-io-sign', async () => {
+  renderComponent('prod-io-sign');
+  await executeStepInstitutionTypeGspForProdIoSign();
+  await executeStepBillingDataReaField();
+});
 const performLogout = async (logoutButton: HTMLElement) => {
   fireEvent.click(logoutButton);
   await waitFor(() => expect(screen.queryByText('Vuoi davvero uscire?')).not.toBeNull());
@@ -409,6 +415,21 @@ const executeStepInstitutionTypeGspForInterop = async () => {
   await waitFor(() => screen.getByText(step1Title));
 };
 
+const executeStepInstitutionTypeGspForProdIoSign = async () => {
+  console.log('Testing step Institution Type for Prod io sign');
+  await waitFor(() => screen.getByText(stepInstitutionType));
+
+  const ptLabel = await waitFor(() => screen.queryByText('Partner Tecnologico'));
+  expect(ptLabel).not.toBeInTheDocument();
+
+  await fillInstitutionTypeCheckbox('gsp');
+  const confirmButtonEnabled = screen.getByRole('button', { name: 'Continua' });
+  expect(confirmButtonEnabled).toBeEnabled();
+
+  fireEvent.click(confirmButtonEnabled);
+  await waitFor(() => screen.getByText('Indica i dati del tuo ente'));
+};
+
 const executeStepBillingData = async () => {
   console.log('Testing step Billing Data');
   await waitFor(() => screen.getByText(stepBillingDataTitle));
@@ -471,6 +492,30 @@ const executeStepBillingDataLabels = async () => {
   await executeStepInstitutionType();
   await executeStep1Base(agencyX);
   expect(screen.getByText('Codice univoco'));
+};
+
+const executeStepBillingDataReaField = async () => {
+  console.log('Testing step Billing Data');
+  await waitFor(() => screen.getByText(stepBillingDataTitle));
+
+  await waitFor(() => screen.getByText('REA'));
+
+  await fillUserBillingDataForm(
+    'businessName',
+    'registeredOffice',
+    'digitalAddress',
+    'zipCode',
+    'taxCode',
+    'vatNumber',
+    'recipientCode',
+    'supportEmail',
+    'rea'
+  );
+
+  const confirmButtonEnabled = screen.getByRole('button', { name: 'Continua' });
+  await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
+  fireEvent.click(confirmButtonEnabled);
+  await waitFor(() => screen.getByText(step2Title));
 };
 
 const executeStepBillingDataWithoutSupportMail = async () => {
@@ -610,7 +655,8 @@ const fillUserBillingDataForm = async (
   taxCodeInput: string,
   vatNumber: string,
   recipientCode: string,
-  supportEmail: string
+  supportEmail: string,
+  rea?: string
 ) => {
   fireEvent.change(document.getElementById(businessNameInput), {
     target: { value: 'businessNameInput' },
@@ -635,6 +681,11 @@ const fillUserBillingDataForm = async (
   });
   fireEvent.change(document.getElementById(supportEmail), { target: { value: 'a@a.it' } });
   // TODO: remove comment if REACT_APP_ENABLE_GEOTAXONOMY is true -- await waitFor(() => fireEvent.click(document.getElementById('national_geographicTaxonomies')));
+  if (rea) {
+    await waitFor(() =>
+      fireEvent.change(document.getElementById(rea), { target: { value: 'RM-123456' } })
+    );
+  }
 };
 
 const fillUserForm = async (
@@ -808,13 +859,13 @@ const addAdditionEmptyUser = async (
   return removeUserButtons;
 };
 
-const checkAdditionalUsersExistance = (
+const checkAdditionalUsersExistance = async (
   expectedAdditionalUsersCount: number,
   expectedEmptyForm: boolean,
   confirmButton: HTMLElement
 ) => {
   const titles = screen.queryAllByTestId('extra-delegate');
-  expect(titles.length).toBe(expectedAdditionalUsersCount);
+  await waitFor(() => expect(titles.length).toBe(expectedAdditionalUsersCount));
 
   const isAddUsersVisible = expectedAdditionalUsersCount < 2;
   const addDelegateButton = screen.queryByRole('button', {
@@ -841,13 +892,26 @@ const findRemoveAdditionUsersButtons = () =>
     .getAllByRole('button')
     .filter((b) => b.children.length > 0 && b.children[0].tagName === 'svg');
 
+const searchUserFormFromRemoveBtn = (removeButton: HTMLElement) => {
+  if (!removeButton) {
+    return null;
+  } else {
+    const parent = removeButton.parentElement as HTMLElement;
+    if (parent.getAttribute('role') === 'userForm') {
+      return parent;
+    } else {
+      return searchUserFormFromRemoveBtn(parent);
+    }
+  }
+};
 const fillAdditionalUserAndCheckUniqueValues = async (
   index: number,
   confirmButton: HTMLElement
 ) => {
   const removeUserButtons = await addAdditionEmptyUser(index, confirmButton);
+
   const prefix = getByLabelText(
-    removeUserButtons[index].parentElement.children[0] as HTMLElement,
+    searchUserFormFromRemoveBtn(removeUserButtons[index]),
     'Nome'
   ).id.replace(/-name$/, '');
 
