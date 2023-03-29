@@ -77,6 +77,7 @@ export default {
     loadingOverlayText: 'Stiamo verificando i tuoi dati',
     onboarding: {
       bodyTitle: 'Cerca il tuo ente',
+      codyTitleSelected: 'Conferma l’ente selezionato',
       bodyDescription:
         'Inserisci uno dei dati richiesti e cerca dall’Indice della Pubblica <1/> Amministrazione (IPA) l’ente per cui vuoi richiedere l’adesione a <3/>{{productTitle}}',
       ipaDescription: `Non trovi il tuo ente nell'IPA? In <1>questa pagina</1> trovi maggiori <3/> informazioni sull'indice e su come accreditarsi `,
