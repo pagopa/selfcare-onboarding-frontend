@@ -77,7 +77,6 @@ export function StepSearchParty({
   };
 
   const { t } = useTranslation();
-  const bodyTitle = t('onboardingStep1.onboarding.bodyTitle');
   const onBackAction = () => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     back!();
@@ -127,7 +126,9 @@ export function StepSearchParty({
       <Grid container item justifyContent="center">
         <Grid item xs={12}>
           <Typography variant="h3" component="h2" align="center" color={theme.palette.text.primary}>
-            {bodyTitle}
+            {selected
+              ? t('onboardingStep1.onboarding.codyTitleSelected')
+              : t('onboardingStep1.onboarding.bodyTitle')}
           </Typography>
         </Grid>
       </Grid>
