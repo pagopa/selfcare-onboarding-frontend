@@ -170,7 +170,7 @@ export default function CompleteRegistrationComponent() {
         });
       }
       if (
-        (uploadDocument as AxiosError<Problem>).response?.status === 409 &&
+        (uploadDocument as AxiosError<Problem>).response?.status === 400 &&
         (uploadDocument as AxiosError<Problem>).response?.data
       ) {
         setOpen(true);
