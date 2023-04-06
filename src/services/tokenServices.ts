@@ -2,7 +2,6 @@ import { AxiosError, AxiosResponse } from 'axios';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
 import { fetchWithLogs } from '../lib/api-utils';
 import { Problem, RequestOutcomeJwt } from '../../types';
-import { ENV } from '../utils/env';
 
 type Props = {
   token: string;
@@ -19,15 +18,11 @@ const getMixPanelEvent = (errorStatus: number | undefined) => {
   return errors[errorStatus as keyof typeof errors] ?? 'ONBOARDING_TOKEN_VALIDATION_ERROR';
 };
 
-export const jwtNotValid = async ({ token, setOutcome }: Props) => {
+export const jwtNotValid = async ({ token, setRequiredLogin, setOutcome }: Props) => {
   const fetchJwt = await fetchWithLogs(
     { endpoint: 'ONBOARDING_TOKEN_VALIDATION', endpointParams: { token } },
     { method: 'POST', headers: { 'Content-Type': 'application/json' } },
-
-    () => {
-      const onSuccessEncoded = encodeURIComponent(location.pathname + location.search);
-      window.location.assign(`${ENV.URL_FE.LOGIN}?onSuccess=${onSuccessEncoded}`);
-    }
+    () => setRequiredLogin(true)
   );
 
   if (

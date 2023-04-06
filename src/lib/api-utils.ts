@@ -66,7 +66,10 @@ async function performRequests(
       (error as AxiosError).response?.status === notValidTokenHttpStatus
     ) {
       onRedirectToLogin();
-      window.setTimeout(() => window.location.assign(ENV.URL_FE.LOGOUT), 2000);
+      window.setTimeout(() => {
+        const onSuccessEncoded = encodeURIComponent(location.pathname + location.search);
+        window.location.assign(`${ENV.URL_FE.LOGIN}?onSuccess=${onSuccessEncoded}`);
+      }, 2000);
     }
     return [error] as Array<AxiosError>;
   }
