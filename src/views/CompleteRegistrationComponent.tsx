@@ -134,7 +134,10 @@ export default function CompleteRegistrationComponent() {
     const uploadDocument = await fetchWithLogs(
       { endpoint: 'ONBOARDING_COMPLETE_REGISTRATION', endpointParams: { token } },
       { method: 'POST', data: formData, headers: { 'Content-Type': 'multipart/form-data' } },
-      () => setRequiredLogin(true)
+      () => {
+        const onSuccessEncoded = encodeURIComponent(location.pathname + location.search);
+        window.location.assign(`${ENV.URL_FE.LOGIN}?onSuccess=${onSuccessEncoded}`);
+      }
     );
 
     setLoading(false);
