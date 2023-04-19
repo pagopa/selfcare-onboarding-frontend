@@ -34,6 +34,7 @@ import SubProductStepSubmit from './components/SubProductStepSubmit';
 import SubProductStepSuccess from './components/SubProductStepSuccess';
 import { SubProductStepSelectUserParty } from './components/SubProductStepSelectUserParty';
 import SubProductStepOnBoardingStatus from './components/SubProductStepOnBoardingStatus';
+import SubProductStepSelectPricingPlan from './components/SubProductStepSelectPricingPlan';
 
 type OnBoardingSubProductUrlParams = {
   productId: string;
@@ -191,6 +192,7 @@ function OnBoardingSubProduct() {
   };
 
   const steps: Array<StepperStep> = [
+    { label: 'Select Pricing Plan', Component: () => SubProductStepSelectPricingPlan() },
     {
       label: 'Verify Inputs',
       Component: () =>
@@ -372,7 +374,7 @@ function OnBoardingSubProduct() {
       onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
     />
   ) : (
-    <Container>
+    <Container sx={{ px: '0px !important', maxWidth: '100% !important' }}>
       <Step />
       <SessionModal
         handleClose={handleCloseExitModal}

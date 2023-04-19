@@ -252,6 +252,14 @@ export default {
         "Per poter sottoscrivere l'offerta Premium, l'ente che hai <1 />selezionato deve prima aderire al prodotto {{selectedProduct}}",
       adhesionButton: 'Aderisci',
     },
+    subProductStepSelectPricingPlan: {
+      discountLabelData: '25% di sconto Fino al 30 giugno 2023 ',
+      title: 'Passa a IO Premium e migliora le <1/> performance dei messaggi',
+      firstCheckLabel: 'Riduci i tempi di incasso',
+      secondCheckLabel: 'Migliori le performance di riscossione',
+      thirdCheckLabel: 'Riduci i crediti insoluti',
+      infoSectionLabel: `Se il tuo ente ha già aderito ad app IO, scegli qual è il piano che più soddisfa le sue esigenze. <1/> Il piano a carnet è attivabile una sola volta. Una volta terminato il numero di messaggi del piano a  <3/> carnet, si attiverà automaticamente il piano a consumo. `,
+    },
     selectUserPartyStep: {
       title: 'Seleziona il tuo ente',
       subTitle:
