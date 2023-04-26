@@ -41,7 +41,7 @@ export default function CarnetPlanCard({ discount }: Prop) {
   const carnetBoxWidth = '530';
 
   const carnetBoxHeight = '87px';
-  const canetBoxStyle = {
+  const carnetBoxStyle = {
     border: '1px solid #E3E7EB',
     borderRadius: '8px',
     mb: 1,
@@ -147,7 +147,7 @@ export default function CarnetPlanCard({ discount }: Prop) {
           <CardContent sx={{ height: '100%' }}>
             <RadioGroup name="radio-buttons-group">
               {/* C1 */}
-              <Box width={carnetBoxWidth} height={carnetBoxHeight} sx={canetBoxStyle}>
+              <Box width={carnetBoxWidth} height={carnetBoxHeight} sx={carnetBoxStyle}>
                 <Box>
                   <FormControlLabel
                     onClick={() => setPricingPlanSelected(true)}
@@ -226,7 +226,7 @@ export default function CarnetPlanCard({ discount }: Prop) {
                 </Box>
               </Box>
               {/* C2 */}
-              <Box width={carnetBoxWidth} height={carnetBoxHeight} sx={canetBoxStyle}>
+              <Box width={carnetBoxWidth} height={carnetBoxHeight} sx={carnetBoxStyle}>
                 <Box>
                   <FormControlLabel
                     onClick={() => setPricingPlanSelected(true)}
@@ -310,7 +310,7 @@ export default function CarnetPlanCard({ discount }: Prop) {
                 </Box>
               </Box>
               {/* C3 */}
-              <Box width={carnetBoxWidth} height={carnetBoxHeight} sx={canetBoxStyle}>
+              <Box width={carnetBoxWidth} height={carnetBoxHeight} sx={carnetBoxStyle}>
                 <Box>
                   <FormControlLabel
                     onClick={() => setPricingPlanSelected(true)}
@@ -394,7 +394,7 @@ export default function CarnetPlanCard({ discount }: Prop) {
                 </Box>
               </Box>
               {/* C4 */}
-              <Box width={carnetBoxWidth} height={carnetBoxHeight} sx={canetBoxStyle}>
+              <Box width={carnetBoxWidth} height={carnetBoxHeight} sx={carnetBoxStyle}>
                 <Box>
                   <FormControlLabel
                     onClick={() => setPricingPlanSelected(true)}
@@ -478,7 +478,7 @@ export default function CarnetPlanCard({ discount }: Prop) {
                 </Box>
               </Box>
               {/* C5 */}
-              <Box width={carnetBoxWidth} height={carnetBoxHeight} sx={canetBoxStyle}>
+              <Box width={carnetBoxWidth} height={carnetBoxHeight} sx={carnetBoxStyle}>
                 <Box>
                   <FormControlLabel
                     onClick={() => setPricingPlanSelected(true)}
@@ -562,7 +562,7 @@ export default function CarnetPlanCard({ discount }: Prop) {
                 </Box>
               </Box>
               {/* C6 */}
-              <Box width={carnetBoxWidth} height={carnetBoxHeight} sx={canetBoxStyle}>
+              <Box width={carnetBoxWidth} height={carnetBoxHeight} sx={carnetBoxStyle}>
                 <Box>
                   <FormControlLabel
                     onClick={() => setPricingPlanSelected(true)}
@@ -645,7 +645,7 @@ export default function CarnetPlanCard({ discount }: Prop) {
                 </Box>
               </Box>
               {/* C7 */}
-              <Box width={carnetBoxWidth} height={carnetBoxHeight} sx={canetBoxStyle}>
+              <Box width={carnetBoxWidth} height={carnetBoxHeight} sx={carnetBoxStyle}>
                 <Box>
                   <FormControlLabel
                     onClick={() => setPricingPlanSelected(true)}

@@ -1,6 +1,7 @@
 import { Typography, useTheme, Grid } from '@mui/material';
 import { Box } from '@mui/system';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import Button from '@mui/material/Button';
 import { useTranslation, Trans } from 'react-i18next';
 import CarnetPlanCard from './components/CarnetPlanCard';
 import ConsumptionPlanCard from './components/ConsumptionPlanCard';
@@ -10,6 +11,7 @@ export default function SubProductStepSelectPricingPlan() {
   const { t } = useTranslation();
   const theme = useTheme();
 
+  const onReject = () => {};
   return (
     <Box width={'100%'} height={'720px'} sx={{ backgroundColor: 'primary.main' }} mt={'-88px'}>
       <Grid
@@ -25,7 +27,10 @@ export default function SubProductStepSelectPricingPlan() {
             <Box
               width={'326px'}
               height={'41px'}
-              sx={{ backgroundColor: 'warning.main', borderRadius: theme.spacing(0.5) }}
+              sx={{
+                backgroundColor: 'warning.main',
+                borderRadius: theme.spacing(0.5),
+              }}
               display="flex"
               alignItems="center"
               justifyContent="center"
@@ -94,9 +99,18 @@ export default function SubProductStepSelectPricingPlan() {
               <CarnetPlanCard discount={discount} />
             </Box>
             <Box>
-              <ConsumptionPlanCard />
+              <ConsumptionPlanCard discount={discount} />
             </Box>
           </Box>
+        </Grid>
+        <Grid item>
+          <Button
+            onClick={() => onReject()}
+            sx={{ mt: 5, ':hover': { backgroundColor: 'transparent' } }}
+            disableRipple
+          >
+            {t('onBoardingSubProduct.subProductStepSelectPricingPlan.btnRejectLabel')}
+          </Button>
         </Grid>
       </Grid>
     </Box>
