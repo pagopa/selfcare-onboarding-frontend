@@ -156,8 +156,8 @@ export default function SubProductStepSelectPricingPlan() {
         onCloseLabel={t(
           'onBoardingSubProduct.subProductStepSelectPricingPlan.pricingPlanExitModal.confirmBtnLabel'
         )}
-        onConfirm={handleClose}
-        handleClose={onExitPremiumFlow}
+        onConfirm={onExitPremiumFlow}
+        handleClose={handleClose}
       />
     </Box>
   );
