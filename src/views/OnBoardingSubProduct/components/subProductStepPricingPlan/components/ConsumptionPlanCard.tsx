@@ -410,6 +410,7 @@ export default function ConsumptionPlanCard({ discount }: Prop) {
               handleExpandClick();
               setOpenRangeCard(!openRangeCard);
             }}
+            sx={{ ':hover': { backgroundColor: 'transparent' } }}
           >
             {openRangeCard ? (
               <Typography

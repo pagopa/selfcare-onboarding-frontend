@@ -260,6 +260,12 @@ export default {
       thirdCheckLabel: 'Riduci i crediti insoluti',
       infoSectionLabel: `Se il tuo ente ha già aderito ad app IO, scegli qual è il piano che più soddisfa le sue esigenze. <1/> Il piano a carnet è attivabile una sola volta. Una volta terminato il numero di messaggi del piano a  <3/> carnet, si attiverà automaticamente il piano a consumo. `,
       btnRejectLabel: 'Non mi interessa',
+      pricingPlanExitModal: {
+        title: 'Vuoi rinunciare alle offerte Premium?',
+        subtitle: 'Se esci, proseguirai con l’accesso all’Area Riservata.',
+        closeBtnLabel: 'Esci',
+        confirmBtnLabel: 'Torna alle offerte Premium',
+      },
       carnetPlan: {
         caption: 'PIANO A CARNET - UNA TANTUM',
         discountBoxLabel: '25% di sconto',

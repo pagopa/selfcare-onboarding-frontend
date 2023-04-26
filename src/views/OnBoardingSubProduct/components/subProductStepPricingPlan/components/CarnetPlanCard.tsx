@@ -764,6 +764,7 @@ export default function CarnetPlanCard({ discount }: Prop) {
               handleExpandClick();
               setOpenCarnetCard(!openCarnetCard);
             }}
+            sx={{ ':hover': { backgroundColor: 'transparent' } }}
           >
             {openCarnetCard ? (
               <Typography

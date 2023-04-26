@@ -1,8 +1,14 @@
+import { useContext, useState } from 'react';
 import { Typography, useTheme, Grid } from '@mui/material';
 import { Box } from '@mui/system';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import Button from '@mui/material/Button';
+import SessionModal from '@pagopa/selfcare-common-frontend/components/SessionModal';
 import { useTranslation, Trans } from 'react-i18next';
+import Button from '@mui/material/Button';
+import { ENV } from '../../../../utils/env';
+import { fetchWithLogs } from '../../../../lib/api-utils';
+import { getFetchOutcome } from '../../../../lib/error-utils';
+import { UserContext } from '../../../../lib/context';
 import CarnetPlanCard from './components/CarnetPlanCard';
 import ConsumptionPlanCard from './components/ConsumptionPlanCard';
 
@@ -10,8 +16,32 @@ export default function SubProductStepSelectPricingPlan() {
   const discount = true;
   const { t } = useTranslation();
   const theme = useTheme();
+  const { setRequiredLogin } = useContext(UserContext);
 
-  const onReject = () => {};
+  const [openExitModal, setOpenExitModal] = useState<boolean>(false);
+  const onReject = () => {
+    setOpenExitModal(true);
+  };
+  const handleClose = () => {
+    setOpenExitModal(false);
+  };
+
+  const onExitPremiumFlow = async () => {
+    const searchResponse = await fetchWithLogs(
+      { endpoint: 'ONBOARDING_GET_USER_PARTIES' },
+      { method: 'GET' },
+      () => setRequiredLogin(true)
+    );
+    const outcome = getFetchOutcome(searchResponse);
+
+    if (outcome === 'success') {
+      window.location.assign(ENV.URL_FE.DASHBOARD);
+    } else {
+      window.location.assign('https://www.pagopa.it/it/prodotti-e-servizi/app-io');
+    }
+    setOpenExitModal(false);
+  };
+
   return (
     <Box width={'100%'} height={'720px'} sx={{ backgroundColor: 'primary.main' }} mt={'-88px'}>
       <Grid
@@ -113,6 +143,22 @@ export default function SubProductStepSelectPricingPlan() {
           </Button>
         </Grid>
       </Grid>
+
+      <SessionModal
+        open={openExitModal}
+        title={t('onBoardingSubProduct.subProductStepSelectPricingPlan.pricingPlanExitModal.title')}
+        message={t(
+          'onBoardingSubProduct.subProductStepSelectPricingPlan.pricingPlanExitModal.subtitle'
+        )}
+        onConfirmLabel={t(
+          'onBoardingSubProduct.subProductStepSelectPricingPlan.pricingPlanExitModal.closeBtnLabel'
+        )}
+        onCloseLabel={t(
+          'onBoardingSubProduct.subProductStepSelectPricingPlan.pricingPlanExitModal.confirmBtnLabel'
+        )}
+        onConfirm={handleClose}
+        handleClose={onExitPremiumFlow}
+      />
     </Box>
   );
 }
