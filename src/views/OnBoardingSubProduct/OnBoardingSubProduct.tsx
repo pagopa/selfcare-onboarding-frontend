@@ -34,7 +34,7 @@ import SubProductStepSubmit from './components/SubProductStepSubmit';
 import SubProductStepSuccess from './components/SubProductStepSuccess';
 import { SubProductStepSelectUserParty } from './components/SubProductStepSelectUserParty';
 import SubProductStepOnBoardingStatus from './components/SubProductStepOnBoardingStatus';
-import SubProductStepSelectPricingPlan from './components/SubProductStepSelectPricingPlan';
+import SubProductStepSelectPricingPlan from './components/subProductStepPricingPlan/SubProductStepSelectPricingPlan';
 
 type OnBoardingSubProductUrlParams = {
   productId: string;

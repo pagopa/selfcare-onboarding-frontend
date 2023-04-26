@@ -2,6 +2,8 @@ import { Typography, useTheme, Grid } from '@mui/material';
 import { Box } from '@mui/system';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { useTranslation, Trans } from 'react-i18next';
+import CarnetPlanCard from './components/CarnetPlanCard';
+import ConsumptionPlanCard from './components/ConsumptionPlanCard';
 
 export default function SubProductStepSelectPricingPlan() {
   const discount = true;
@@ -19,7 +21,7 @@ export default function SubProductStepSelectPricingPlan() {
       >
         {/* discount banner */}
         <Grid item xs={12} mt={8}>
-          {discount && (
+          {discount ? (
             <Box
               width={'326px'}
               height={'41px'}
@@ -32,6 +34,8 @@ export default function SubProductStepSelectPricingPlan() {
                 {t('onBoardingSubProduct.subProductStepSelectPricingPlan.discountLabelData')}{' '}
               </Typography>
             </Box>
+          ) : (
+            <Box height={'41px'}></Box>
           )}
         </Grid>
 
@@ -83,6 +87,16 @@ export default function SubProductStepSelectPricingPlan() {
               </Trans>
             </Typography>
           </Grid>
+        </Grid>
+        <Grid container item justifyContent={'center'}>
+          <Box display={'flex'}>
+            <Box>
+              <CarnetPlanCard discount={discount} />
+            </Box>
+            <Box>
+              <ConsumptionPlanCard />
+            </Box>
+          </Box>
         </Grid>
       </Grid>
     </Box>
