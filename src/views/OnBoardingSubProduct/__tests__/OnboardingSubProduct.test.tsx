@@ -109,8 +109,12 @@ const agencyX = 'AGENCY X';
 const agencyError = 'AGENCY ERROR';
 const agencyPending = 'AGENCY PENDING';
 
-test('test already subscribed to premium', async () => {
+test('test render Component', async () => {
   renderComponent('prod-io', 'prod-io-premium');
+});
+test('test select pricing plan', async () => {
+  renderComponent('prod-io', 'prod-io-premium');
+  await executeStepSelectPricingPlan();
   await executeStepSelectInstitutionUnreleated(agencyOnboarded);
   await waitFor(() => screen.getByText('Sottoscrizione già avvenuta'));
   await executeClickCloseButton();
@@ -118,6 +122,7 @@ test('test already subscribed to premium', async () => {
 
 test('test not base product adhesion', async () => {
   renderComponent('prod-io', 'prod-io-premium');
+  await executeStepSelectPricingPlan();
   await executeStepSelectInstitutionUnreleated(agencyPending);
   await waitFor(() => screen.getByText('Errore'));
   await executeClickAdhesionButton();
@@ -125,6 +130,7 @@ test('test not base product adhesion', async () => {
 
 test('test error retrieving onboarding info', async () => {
   renderComponent('prod-io', 'prod-io-premium');
+  await executeStepSelectPricingPlan();
   await executeStepSelectInstitutionUnreleated(agencyInfoError);
   await waitFor(() => screen.getByText('Spiacenti, qualcosa è andato storto.'));
   await executeClickCloseButton();
@@ -138,6 +144,7 @@ test('test error subProductID', async () => {
 
 test('test complete', async () => {
   renderComponent('prod-io', 'prod-io-premium');
+  await executeStepSelectPricingPlan();
   await executeStepSelectInstitutionUnreleated(agencyX);
   await executeStepBillingData();
   await executeStepAddManager(true);
@@ -147,6 +154,7 @@ test('test complete', async () => {
 
 test('test complete with error on submit', async () => {
   renderComponent('prod-io', 'prod-io-premium');
+  await executeStepSelectPricingPlan();
   await executeStepSelectInstitutionUnreleated(agencyError);
   await executeStepBillingData();
   await executeStepAddManager(false);
@@ -155,6 +163,7 @@ test('test complete with error on submit', async () => {
 
 test('test exiting during flow with unload event', async () => {
   renderComponent('prod-io', 'prod-io-premium');
+  await executeStepSelectPricingPlan();
   await executeStepSelectInstitutionUnreleated(agencyX);
   const event = new Event('beforeunload');
   window.dispatchEvent(event);
@@ -167,6 +176,7 @@ test('test exiting during flow with unload event', async () => {
 
 test('test exiting during flow with logout', async () => {
   renderComponent('prod-io', 'prod-io-premium');
+  await executeStepSelectPricingPlan();
   await executeStepSelectInstitutionReleated('Comune di Milano');
 
   expect(screen.queryByText('Vuoi davvero uscire?')).toBeNull();
@@ -223,6 +233,22 @@ const checkBackForwardNavigation = async (
   await waitFor(() => screen.getByText(actualStepTitle));
 
   return await retrieveNavigationButtons();
+};
+
+const executeStepSelectPricingPlan = async () => {
+  console.log('Testing step select pricingPlan');
+
+  await waitFor(() =>
+    screen.getByText(/Passa a IO Premium e migliora le performance dei messaggi/)
+  );
+
+  const showMoreBtn = document.getElementById('showMoreConsumptionPlan');
+  fireEvent.click(showMoreBtn);
+
+  const forwardBtn = document.getElementById('forwardConsumptionPlan');
+
+  expect(forwardBtn).toBeEnabled();
+  fireEvent.click(forwardBtn);
 };
 
 const executeStepSelectInstitutionUnreleated = async (partyName: string) => {
@@ -499,7 +525,7 @@ const verifySubmit = async () => {
           billingData: billingData2billingDataRequest(),
           pspData: undefined,
           institutionType: 'PA',
-          pricingPlan: 'C1',
+          pricingPlan: 'C0',
           origin: 'IPA',
           geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY
             ? [{ code: '100', desc: 'ITALIA' }]
