@@ -383,7 +383,7 @@ export default function ConsumptionPlanCard({ discount, forward, showHeader }: P
                 </Box>
               </Box>
 
-              <Box>
+              <Box display={'flex'} justifyContent={'center'}>
                 <Typography
                   variant="caption"
                   sx={{ color: 'text.secondary', textAlign: 'center', display: 'flex', mt: 3 }}
