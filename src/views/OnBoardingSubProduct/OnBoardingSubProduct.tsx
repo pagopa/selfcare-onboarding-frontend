@@ -34,6 +34,7 @@ import SubProductStepSubmit from './components/SubProductStepSubmit';
 import SubProductStepSuccess from './components/SubProductStepSuccess';
 import { SubProductStepSelectUserParty } from './components/SubProductStepSelectUserParty';
 import SubProductStepOnBoardingStatus from './components/SubProductStepOnBoardingStatus';
+import SubProductStepSelectPricingPlan from './components/subProductStepPricingPlan/SubProductStepSelectPricingPlan';
 
 type OnBoardingSubProductUrlParams = {
   productId: string;
@@ -189,6 +190,11 @@ function OnBoardingSubProduct() {
     setPartyId(partyId);
     forward();
   };
+  const forwardWitSelectedPricingPlan = (pp: string) => {
+    setPricingPlan(pp);
+    forward();
+    window.scrollTo(0, 0);
+  };
 
   const steps: Array<StepperStep> = [
     {
@@ -203,6 +209,10 @@ function OnBoardingSubProduct() {
         }),
     },
     {
+      label: 'Select Pricing Plan',
+      Component: () => SubProductStepSelectPricingPlan({ forward: forwardWitSelectedPricingPlan }),
+    },
+    {
       label: 'Select Institution releated',
       Component: () =>
         SubProductStepSelectUserParty({
@@ -214,7 +224,9 @@ function OnBoardingSubProduct() {
               forward();
             }
           },
-          back,
+          back: () => {
+            setActiveStep(0);
+          },
         }),
     },
     {
@@ -290,7 +302,8 @@ function OnBoardingSubProduct() {
               setOnExitAction(() => window.location.assign(`${ENV.URL_FE.DASHBOARD}/${partyId}`));
               setOpenExitModal(true);
             } else {
-              setActiveStep(chooseFromMyParties.current ? 1 : 2);
+              setActiveStep(chooseFromMyParties.current ? 2 : 3);
+              window.scrollTo(0, 0);
             }
           },
         }),
@@ -372,7 +385,7 @@ function OnBoardingSubProduct() {
       onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
     />
   ) : (
-    <Container>
+    <Container sx={{ px: '0px !important', maxWidth: '100% !important' }}>
       <Step />
       <SessionModal
         handleClose={handleCloseExitModal}
