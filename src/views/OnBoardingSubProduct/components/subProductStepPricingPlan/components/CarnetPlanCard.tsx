@@ -767,7 +767,7 @@ export default function CarnetPlanCard({ discount, forward, showHeader }: Prop) 
                 {/* forward action with pricing plan */}
                 <Box mt={3} display="flex" justifyContent={'center'}>
                   <Button
-                    disabled={!isPricingPlanSelected}
+                    disabled={!isPricingPlanSelected || pricingPlanSelected === ''}
                     variant="contained"
                     onClick={onForwardAction}
                   >
@@ -793,6 +793,7 @@ export default function CarnetPlanCard({ discount, forward, showHeader }: Prop) 
               onClick={() => {
                 handleExpandClick();
                 setOpenCarnetCard(!openCarnetCard);
+                setPpFunction('');
               }}
               sx={{ ':hover': { backgroundColor: 'transparent' } }}
             >

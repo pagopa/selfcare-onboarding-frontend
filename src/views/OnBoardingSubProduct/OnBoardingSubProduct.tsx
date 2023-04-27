@@ -225,7 +225,7 @@ function OnBoardingSubProduct() {
             }
           },
           back: () => {
-            setActiveStep(0);
+            setActiveStep(1);
           },
         }),
     },
