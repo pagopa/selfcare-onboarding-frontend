@@ -428,7 +428,7 @@ export default function StepOnboardingFormData({
         />
         {/* DATI RELATIVI ALLA TASSONOMIA */}
         {ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY ? (
-          <Grid item xs={12}>
+          <Grid item xs={12} display="flex" justifyContent={'center'}>
             <GeoTaxonomySection
               retrievedTaxonomies={previousGeotaxononomies}
               setGeographicTaxonomies={(geographicTaxonomies) =>
