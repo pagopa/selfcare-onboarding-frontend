@@ -784,6 +784,7 @@ export default function CarnetPlanCard({ discount, forward }: Prop) {
           }}
         >
           <Button
+            id="showMoreCarnetPlan"
             size="small"
             onClick={() => {
               handleExpandClick();

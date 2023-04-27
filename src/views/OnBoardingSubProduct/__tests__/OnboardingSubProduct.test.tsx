@@ -109,85 +109,92 @@ const agencyX = 'AGENCY X';
 const agencyError = 'AGENCY ERROR';
 const agencyPending = 'AGENCY PENDING';
 
-test('test already subscribed to premium', async () => {
+test('test render Component', async () => {
   renderComponent('prod-io', 'prod-io-premium');
 });
-// test('test already subscribed to premium', async () => {
-//   renderComponent('prod-io', 'prod-io-premium');
-//   await executeStepSelectInstitutionUnreleated(agencyOnboarded);
-//   await waitFor(() => screen.getByText('Sottoscrizione già avvenuta'));
-//   await executeClickCloseButton();
-// });
+test('test select pricing plan', async () => {
+  renderComponent('prod-io', 'prod-io-premium');
+  await executeStepSelectPricingPlan();
+  await executeStepSelectInstitutionUnreleated(agencyOnboarded);
+  await waitFor(() => screen.getByText('Sottoscrizione già avvenuta'));
+  await executeClickCloseButton();
+});
 
-// test('test not base product adhesion', async () => {
-//   renderComponent('prod-io', 'prod-io-premium');
-//   await executeStepSelectInstitutionUnreleated(agencyPending);
-//   await waitFor(() => screen.getByText('Errore'));
-//   await executeClickAdhesionButton();
-// });
+test('test not base product adhesion', async () => {
+  renderComponent('prod-io', 'prod-io-premium');
+  await executeStepSelectPricingPlan();
+  await executeStepSelectInstitutionUnreleated(agencyPending);
+  await waitFor(() => screen.getByText('Errore'));
+  await executeClickAdhesionButton();
+});
 
-// test('test error retrieving onboarding info', async () => {
-//   renderComponent('prod-io', 'prod-io-premium');
-//   await executeStepSelectInstitutionUnreleated(agencyInfoError);
-//   await waitFor(() => screen.getByText('Spiacenti, qualcosa è andato storto.'));
-//   await executeClickCloseButton();
-// });
+test('test error retrieving onboarding info', async () => {
+  renderComponent('prod-io', 'prod-io-premium');
+  await executeStepSelectPricingPlan();
+  await executeStepSelectInstitutionUnreleated(agencyInfoError);
+  await waitFor(() => screen.getByText('Spiacenti, qualcosa è andato storto.'));
+  await executeClickCloseButton();
+});
 
-// test('test error subProductID', async () => {
-//   renderComponent('error', 'error');
-//   await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(3));
-//   await waitFor(() => screen.getByText('Impossibile individuare il prodotto desiderato'));
-// });
+test('test error subProductID', async () => {
+  renderComponent('error', 'error');
+  await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(3));
+  await waitFor(() => screen.getByText('Impossibile individuare il prodotto desiderato'));
+});
 
-// test('test complete', async () => {
-//   renderComponent('prod-io', 'prod-io-premium');
-//   await executeStepSelectInstitutionUnreleated(agencyX);
-//   await executeStepBillingData();
-//   await executeStepAddManager(true);
-//   await executeClickCloseButton();
-//   await verifySubmit();
-// });
+test('test complete', async () => {
+  renderComponent('prod-io', 'prod-io-premium');
+  await executeStepSelectPricingPlan();
+  await executeStepSelectInstitutionUnreleated(agencyX);
+  await executeStepBillingData();
+  await executeStepAddManager(true);
+  await executeClickCloseButton();
+  await verifySubmit();
+});
 
-// test('test complete with error on submit', async () => {
-//   renderComponent('prod-io', 'prod-io-premium');
-//   await executeStepSelectInstitutionUnreleated(agencyError);
-//   await executeStepBillingData();
-//   await executeStepAddManager(false);
-//   await executeClickHomeButton();
-// });
+test('test complete with error on submit', async () => {
+  renderComponent('prod-io', 'prod-io-premium');
+  await executeStepSelectPricingPlan();
+  await executeStepSelectInstitutionUnreleated(agencyError);
+  await executeStepBillingData();
+  await executeStepAddManager(false);
+  await executeClickHomeButton();
+});
 
-// test('test exiting during flow with unload event', async () => {
-//   renderComponent('prod-io', 'prod-io-premium');
-//   await executeStepSelectInstitutionUnreleated(agencyX);
-//   const event = new Event('beforeunload');
-//   window.dispatchEvent(event);
-//   await waitFor(
-//     () =>
-//       (event.returnValue as unknown as string) ===
-//       "Warning!\n\nNavigating away from this page will delete your text if you haven't already saved it."
-//   );
-// });
+test('test exiting during flow with unload event', async () => {
+  renderComponent('prod-io', 'prod-io-premium');
+  await executeStepSelectPricingPlan();
+  await executeStepSelectInstitutionUnreleated(agencyX);
+  const event = new Event('beforeunload');
+  window.dispatchEvent(event);
+  await waitFor(
+    () =>
+      (event.returnValue as unknown as string) ===
+      "Warning!\n\nNavigating away from this page will delete your text if you haven't already saved it."
+  );
+});
 
-// test('test exiting during flow with logout', async () => {
-//   renderComponent('prod-io', 'prod-io-premium');
-//   await executeStepSelectInstitutionReleated('Comune di Milano');
+test('test exiting during flow with logout', async () => {
+  renderComponent('prod-io', 'prod-io-premium');
+  await executeStepSelectPricingPlan();
+  await executeStepSelectInstitutionReleated('Comune di Milano');
 
-//   expect(screen.queryByText('Vuoi davvero uscire?')).toBeNull();
+  expect(screen.queryByText('Vuoi davvero uscire?')).toBeNull();
 
-//   const logoutButton = screen.getByText('LOGOUT');
-//   await performLogout(logoutButton);
+  const logoutButton = screen.getByText('LOGOUT');
+  await performLogout(logoutButton);
 
-//   await performLogout(logoutButton);
-//   fireEvent.click(screen.getByRole('button', { name: 'Annulla' }));
-//   await waitFor(() => expect(screen.queryByText('Vuoi davvero uscire?')).toBeNull());
+  await performLogout(logoutButton);
+  fireEvent.click(screen.getByRole('button', { name: 'Annulla' }));
+  await waitFor(() => expect(screen.queryByText('Vuoi davvero uscire?')).toBeNull());
 
-//   await performLogout(logoutButton);
-//   await waitFor(() => expect(screen.getByText('Vuoi davvero uscire?')).not.toBeNull());
+  await performLogout(logoutButton);
+  await waitFor(() => expect(screen.getByText('Vuoi davvero uscire?')).not.toBeNull());
 
-//   await performLogout(logoutButton);
-//   fireEvent.click(screen.getByRole('button', { name: 'Esci' }));
-//   await waitFor(() => expect(mockedLocation.assign).toBeCalledWith(ENV.URL_FE.LOGOUT));
-// });
+  await performLogout(logoutButton);
+  fireEvent.click(screen.getByRole('button', { name: 'Esci' }));
+  await waitFor(() => expect(mockedLocation.assign).toBeCalledWith(ENV.URL_FE.LOGOUT));
+});
 
 const performLogout = async (logoutButton: HTMLElement) => {
   fireEvent.click(logoutButton);
@@ -226,6 +233,22 @@ const checkBackForwardNavigation = async (
   await waitFor(() => screen.getByText(actualStepTitle));
 
   return await retrieveNavigationButtons();
+};
+
+const executeStepSelectPricingPlan = async () => {
+  console.log('Testing step select pricingPlan');
+
+  await waitFor(() =>
+    screen.getByText(/Passa a IO Premium e migliora le performance dei messaggi/)
+  );
+
+  const showMoreBtn = document.getElementById('showMoreConsumptionPlan');
+  fireEvent.click(showMoreBtn);
+
+  const forwardBtn = document.getElementById('forwardConsumptionPlan');
+
+  expect(forwardBtn).toBeEnabled();
+  fireEvent.click(forwardBtn);
 };
 
 const executeStepSelectInstitutionUnreleated = async (partyName: string) => {
@@ -502,7 +525,7 @@ const verifySubmit = async () => {
           billingData: billingData2billingDataRequest(),
           pspData: undefined,
           institutionType: 'PA',
-          pricingPlan: 'C1',
+          pricingPlan: 'C0',
           origin: 'IPA',
           geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY
             ? [{ code: '100', desc: 'ITALIA' }]

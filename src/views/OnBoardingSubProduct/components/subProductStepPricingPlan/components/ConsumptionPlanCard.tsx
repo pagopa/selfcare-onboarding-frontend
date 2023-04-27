@@ -391,7 +391,7 @@ export default function ConsumptionPlanCard({ discount, forward }: Prop) {
 
             {/* forward action with pricing plan */}
             <Box mt={3} display="flex" justifyContent={'center'}>
-              <Button variant="contained" onClick={onForwardAction}>
+              <Button variant="contained" onClick={onForwardAction} id={'forwardConsumptionPlan'}>
                 {t(
                   'onBoardingSubProduct.subProductStepSelectPricingPlan.consumptionPlan.btnActionLabel'
                 )}
@@ -409,6 +409,7 @@ export default function ConsumptionPlanCard({ discount, forward }: Prop) {
           }}
         >
           <Button
+            id="showMoreConsumptionPlan"
             size="small"
             onClick={() => {
               handleExpandClick();
