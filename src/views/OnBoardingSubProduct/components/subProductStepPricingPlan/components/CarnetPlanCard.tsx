@@ -9,21 +9,23 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import { Box, useTheme, Radio, RadioGroup, FormControlLabel } from '@mui/material';
 import { useTranslation, Trans } from 'react-i18next';
+import { StepperStepComponentProps } from '../../../../../../types';
 
-type Prop = {
+type Prop = StepperStepComponentProps & {
   discount: boolean;
 };
 
 // TODO: reduce complexity
 // eslint-disable-next-line sonarjs/cognitive-complexity
-export default function CarnetPlanCard({ discount }: Prop) {
+export default function CarnetPlanCard({ discount, forward }: Prop) {
   const [expanded, setExpanded] = React.useState(false);
   const { t } = useTranslation();
   const handleExpandClick = () => {
     setExpanded(!expanded);
   };
   const theme = useTheme();
-  const [pricingPlanSelected, setPricingPlanSelected] = React.useState<boolean>(false);
+  const [isPricingPlanSelected, setIsPricingPlanSelected] = React.useState<boolean>(false);
+  const [pricingPlanSelected, setPricingPlanSelected] = React.useState<string>('');
   const [openCarnetCard, setOpenCarnetCard] = React.useState<boolean>();
   const fontBigBlue = { color: '#0073E6', fontSize: '50px', fontWeight: '700' };
   const fontMediumBlueRegular = { color: '#0073E6', fontSize: '32px', marginRight: '8px' };
@@ -50,14 +52,12 @@ export default function CarnetPlanCard({ discount }: Prop) {
     padding: 2,
   };
 
-  // TODO: gestire così o con literals
-  // const [pl, setPL] = useState<string>();
-  // const testFunction = (pp: string) => {
-  //   setPL(pp);
-  // };
-
-  // testFunction('C1');
-  // setUrl(pl)
+  const setPpFunction = (pp: string) => {
+    setPricingPlanSelected(pp);
+  };
+  const onForwardAction = () => {
+    forward(pricingPlanSelected);
+  };
 
   return (
     <Box mr={3} sx={{ borderRadius: '16px' }}>
@@ -150,7 +150,10 @@ export default function CarnetPlanCard({ discount }: Prop) {
               <Box width={carnetBoxWidth} height={carnetBoxHeight} sx={carnetBoxStyle}>
                 <Box>
                   <FormControlLabel
-                    onClick={() => setPricingPlanSelected(true)}
+                    onClick={() => {
+                      setIsPricingPlanSelected(true);
+                      setPpFunction('C1');
+                    }}
                     value="C1"
                     control={<Radio />}
                     label={
@@ -229,7 +232,10 @@ export default function CarnetPlanCard({ discount }: Prop) {
               <Box width={carnetBoxWidth} height={carnetBoxHeight} sx={carnetBoxStyle}>
                 <Box>
                   <FormControlLabel
-                    onClick={() => setPricingPlanSelected(true)}
+                    onClick={() => {
+                      setIsPricingPlanSelected(true);
+                      setPpFunction('C2');
+                    }}
                     value="C2"
                     control={<Radio />}
                     label={
@@ -313,7 +319,10 @@ export default function CarnetPlanCard({ discount }: Prop) {
               <Box width={carnetBoxWidth} height={carnetBoxHeight} sx={carnetBoxStyle}>
                 <Box>
                   <FormControlLabel
-                    onClick={() => setPricingPlanSelected(true)}
+                    onClick={() => {
+                      setIsPricingPlanSelected(true);
+                      setPpFunction('C3');
+                    }}
                     value="C3"
                     control={<Radio />}
                     label={
@@ -397,7 +406,10 @@ export default function CarnetPlanCard({ discount }: Prop) {
               <Box width={carnetBoxWidth} height={carnetBoxHeight} sx={carnetBoxStyle}>
                 <Box>
                   <FormControlLabel
-                    onClick={() => setPricingPlanSelected(true)}
+                    onClick={() => {
+                      setIsPricingPlanSelected(true);
+                      setPpFunction('C4');
+                    }}
                     value="C4"
                     control={<Radio />}
                     label={
@@ -481,7 +493,10 @@ export default function CarnetPlanCard({ discount }: Prop) {
               <Box width={carnetBoxWidth} height={carnetBoxHeight} sx={carnetBoxStyle}>
                 <Box>
                   <FormControlLabel
-                    onClick={() => setPricingPlanSelected(true)}
+                    onClick={() => {
+                      setIsPricingPlanSelected(true);
+                      setPpFunction('C5');
+                    }}
                     value="C5"
                     control={<Radio />}
                     label={
@@ -565,7 +580,10 @@ export default function CarnetPlanCard({ discount }: Prop) {
               <Box width={carnetBoxWidth} height={carnetBoxHeight} sx={carnetBoxStyle}>
                 <Box>
                   <FormControlLabel
-                    onClick={() => setPricingPlanSelected(true)}
+                    onClick={() => {
+                      setIsPricingPlanSelected(true);
+                      setPpFunction('C6');
+                    }}
                     value="C6"
                     control={<Radio />}
                     label={
@@ -648,7 +666,10 @@ export default function CarnetPlanCard({ discount }: Prop) {
               <Box width={carnetBoxWidth} height={carnetBoxHeight} sx={carnetBoxStyle}>
                 <Box>
                   <FormControlLabel
-                    onClick={() => setPricingPlanSelected(true)}
+                    onClick={() => {
+                      setIsPricingPlanSelected(true);
+                      setPpFunction('C7');
+                    }}
                     value="C7"
                     control={<Radio />}
                     label={
@@ -740,7 +761,11 @@ export default function CarnetPlanCard({ discount }: Prop) {
 
               {/* forward action with pricing plan */}
               <Box mt={3} display="flex" justifyContent={'center'}>
-                <Button disabled={!pricingPlanSelected} variant="contained">
+                <Button
+                  disabled={!isPricingPlanSelected}
+                  variant="contained"
+                  onClick={onForwardAction}
+                >
                   {t(
                     'onBoardingSubProduct.subProductStepSelectPricingPlan.carnetPlan.btnActionLabel'
                   )}

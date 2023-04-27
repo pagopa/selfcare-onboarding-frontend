@@ -190,9 +190,13 @@ function OnBoardingSubProduct() {
     setPartyId(partyId);
     forward();
   };
+  const forwardWitSelectedPricingPlan = (pp: string) => {
+    setPricingPlan(pp);
+    forward();
+    window.scrollTo(0, 0);
+  };
 
   const steps: Array<StepperStep> = [
-    { label: 'Select Pricing Plan', Component: () => SubProductStepSelectPricingPlan() },
     {
       label: 'Verify Inputs',
       Component: () =>
@@ -203,6 +207,10 @@ function OnBoardingSubProduct() {
           setLoading,
           forward: forwardWithInputs,
         }),
+    },
+    {
+      label: 'Select Pricing Plan',
+      Component: () => SubProductStepSelectPricingPlan({ forward: forwardWitSelectedPricingPlan }),
     },
     {
       label: 'Select Institution releated',
@@ -216,7 +224,9 @@ function OnBoardingSubProduct() {
               forward();
             }
           },
-          back,
+          back: () => {
+            setActiveStep(0);
+          },
         }),
     },
     {
@@ -292,7 +302,8 @@ function OnBoardingSubProduct() {
               setOnExitAction(() => window.location.assign(`${ENV.URL_FE.DASHBOARD}/${partyId}`));
               setOpenExitModal(true);
             } else {
-              setActiveStep(chooseFromMyParties.current ? 1 : 2);
+              setActiveStep(chooseFromMyParties.current ? 2 : 3);
+              window.scrollTo(0, 0);
             }
           },
         }),

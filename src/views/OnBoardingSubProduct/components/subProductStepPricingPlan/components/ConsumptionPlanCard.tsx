@@ -9,13 +9,14 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import { Box, useTheme } from '@mui/material';
 import { useTranslation, Trans } from 'react-i18next';
+import { StepperStepComponentProps } from '../../../../../../types';
 
-type Prop = {
+type Prop = StepperStepComponentProps & {
   discount: boolean;
 };
 // TODO: reduce complexity
 // eslint-disable-next-line sonarjs/cognitive-complexity
-export default function ConsumptionPlanCard({ discount }: Prop) {
+export default function ConsumptionPlanCard({ discount, forward }: Prop) {
   const [expanded, setExpanded] = React.useState(false);
   const { t } = useTranslation();
   const handleExpandClick = () => {
@@ -37,6 +38,9 @@ export default function ConsumptionPlanCard({ discount }: Prop) {
   };
   const cardWidth = '530px';
 
+  const onForwardAction = () => {
+    forward('C0');
+  };
   return (
     <Box mr={3} sx={{ borderRadius: '16px' }}>
       {/* First Card */}
@@ -387,7 +391,7 @@ export default function ConsumptionPlanCard({ discount }: Prop) {
 
             {/* forward action with pricing plan */}
             <Box mt={3} display="flex" justifyContent={'center'}>
-              <Button variant="contained">
+              <Button variant="contained" onClick={onForwardAction}>
                 {t(
                   'onBoardingSubProduct.subProductStepSelectPricingPlan.consumptionPlan.btnActionLabel'
                 )}

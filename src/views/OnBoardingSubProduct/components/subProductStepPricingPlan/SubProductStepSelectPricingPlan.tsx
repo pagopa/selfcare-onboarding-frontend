@@ -9,10 +9,12 @@ import { ENV } from '../../../../utils/env';
 import { fetchWithLogs } from '../../../../lib/api-utils';
 import { getFetchOutcome } from '../../../../lib/error-utils';
 import { UserContext } from '../../../../lib/context';
+import { StepperStepComponentProps } from '../../../../../types';
 import CarnetPlanCard from './components/CarnetPlanCard';
 import ConsumptionPlanCard from './components/ConsumptionPlanCard';
 
-export default function SubProductStepSelectPricingPlan() {
+type Props = StepperStepComponentProps;
+export default function SubProductStepSelectPricingPlan({ forward }: Props) {
   const discount = true;
   const { t } = useTranslation();
   const theme = useTheme();
@@ -126,10 +128,10 @@ export default function SubProductStepSelectPricingPlan() {
         <Grid container item justifyContent={'center'}>
           <Box display={'flex'}>
             <Box>
-              <CarnetPlanCard discount={discount} />
+              <CarnetPlanCard discount={discount} forward={forward} />
             </Box>
             <Box>
-              <ConsumptionPlanCard discount={discount} />
+              <ConsumptionPlanCard discount={discount} forward={forward} />
             </Box>
           </Box>
         </Grid>
