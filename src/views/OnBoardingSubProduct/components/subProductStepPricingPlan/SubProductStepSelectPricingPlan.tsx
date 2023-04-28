@@ -92,7 +92,7 @@ export default function SubProductStepSelectPricingPlan({ forward }: Props) {
             </Typography>
           </Grid>
           {/* check section */}
-          <Grid item xs={4} mt={3} maxWidth={'100%'} direction="column">
+          <Grid container item xs={4} mt={3} maxWidth={'100%'} direction="column">
             <Box display={'flex'} justifyContent="center">
               <CheckCircleIcon style={{ color: 'white' }} fontSize="small" />
               <Typography pl={1} fontSize="fontSize" color={'white'}>

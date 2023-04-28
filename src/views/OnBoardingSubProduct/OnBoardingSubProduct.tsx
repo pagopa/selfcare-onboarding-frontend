@@ -103,13 +103,11 @@ function OnBoardingSubProduct() {
   const forwardWithInputs = (
     newProduct: Product,
     newSubProduct: Product,
-    newParties: Array<SelfcareParty>,
-    newPricingPlan: string
+    newParties: Array<SelfcareParty>
   ) => {
     setProduct(newProduct);
     setSubProduct(newSubProduct);
     setParties(newParties);
-    setPricingPlan(newPricingPlan);
     setActiveStep(1);
   };
 
