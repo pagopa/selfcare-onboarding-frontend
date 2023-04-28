@@ -110,7 +110,7 @@ function OnBoardingSubProduct() {
     setSubProduct(newSubProduct);
     setParties(newParties);
     setPricingPlan(newPricingPlan);
-    setActiveStep(newParties.length === 0 ? 2 : 1);
+    setActiveStep(1);
   };
 
   const forwardWithBillingData = (newBillingData: OnboardingFormData) => {
@@ -192,7 +192,7 @@ function OnBoardingSubProduct() {
   };
   const forwardWitSelectedPricingPlan = (pp: string) => {
     setPricingPlan(pp);
-    forward();
+    setActiveStep(parties.length === 0 ? 3 : 2);
     window.scrollTo(0, 0);
   };
 
@@ -225,7 +225,7 @@ function OnBoardingSubProduct() {
             }
           },
           back: () => {
-            setActiveStep(0);
+            setActiveStep(1);
           },
         }),
     },
