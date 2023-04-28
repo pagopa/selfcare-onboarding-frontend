@@ -237,7 +237,7 @@ export function OnBoardingProductStepDelegates({
 
         {delegateFormIds.map((id, index) => (
           <React.Fragment key={id}>
-            <Grid item xs={8}>
+            <Grid item xs={8} width="704px" display={'flex'} justifyContent="center">
               <Paper elevation={8} sx={{ borderRadius: 3, mt: 4 }} role="userForm">
                 <Grid container>
                   <Grid
