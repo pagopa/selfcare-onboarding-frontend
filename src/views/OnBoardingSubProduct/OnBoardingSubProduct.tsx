@@ -235,7 +235,7 @@ function OnBoardingSubProduct() {
     {
       label: 'Select Institution unreleated',
       Component: () => SubProductStepUserUnrelated({ product, productId }),
-      // TODO temporary commented in order to develop SELF-2237
+      // TODO temporary commented in order to develop SELC-2237
       // StepSearchParty({
       //   subTitle: (
       //     <Trans i18nKey="onBoardingSubProduct.selectUserPartyStep.IPAsubTitle">

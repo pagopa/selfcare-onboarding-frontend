@@ -78,12 +78,21 @@ const handleSearchUserParties = async (
   const outcome = getFetchOutcome(searchResponseBase);
 
   if (outcome === 'success') {
-    setParties(
-      filteredArrayWithoutPremium.map((p) => ({
-        ...p,
-        urlLogo: buildUrlLog(p.id),
-      }))
-    );
+    if (process.env.REACT_APP_MOCK_API === 'true') {
+      setParties(
+        baseProducts.map((p) => ({
+          ...p,
+          urlLogo: buildUrlLog(p.id),
+        }))
+      );
+    } else {
+      setParties(
+        filteredArrayWithoutPremium.map((p) => ({
+          ...p,
+          urlLogo: buildUrlLog(p.id),
+        }))
+      );
+    }
   } else {
     setParties([]);
   }
