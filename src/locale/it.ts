@@ -368,6 +368,13 @@ export default {
         btnActionLabel: 'Attiva il piano',
       },
     },
+    subProductStepUserUnrelated: {
+      title: 'Non puoi aderire a {{selectedProduct}} Premium',
+      description:
+        'Il tuo ente non ha aderito ad {{selectedProduct}}, o non hai un ruolo per gestire il prodotto. <1/> Chiedi ad un Amministratore di aggiungerti nella sezione Utenti, oppure richiedi l’adesione ad {{selectedProduct}} per il tuo ente.',
+      backHomeLabelBtn: 'Torna alla home',
+      goToBtnLabel: 'Vai all’adesione',
+    },
     selectUserPartyStep: {
       title: 'Seleziona il tuo ente',
       subTitle:

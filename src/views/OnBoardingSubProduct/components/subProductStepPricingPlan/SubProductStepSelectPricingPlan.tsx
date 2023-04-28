@@ -5,16 +5,20 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import SessionModal from '@pagopa/selfcare-common-frontend/components/SessionModal';
 import { useTranslation, Trans } from 'react-i18next';
 import Button from '@mui/material/Button';
+import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
+import { AxiosResponse } from 'axios';
 import { ENV } from '../../../../utils/env';
 import { fetchWithLogs } from '../../../../lib/api-utils';
 import { getFetchOutcome } from '../../../../lib/error-utils';
 import { UserContext } from '../../../../lib/context';
-import { StepperStepComponentProps } from '../../../../../types';
+import { Product, SelfcareParty, StepperStepComponentProps } from '../../../../../types';
 import CarnetPlanCard from './components/CarnetPlanCard';
 import ConsumptionPlanCard from './components/ConsumptionPlanCard';
 
-type Props = StepperStepComponentProps;
-export default function SubProductStepSelectPricingPlan({ forward }: Props) {
+type Props = StepperStepComponentProps & {
+  product?: Product;
+};
+export default function SubProductStepSelectPricingPlan({ forward, product }: Props) {
   const discount = true;
   const { t } = useTranslation();
   const theme = useTheme();
@@ -35,11 +39,14 @@ export default function SubProductStepSelectPricingPlan({ forward }: Props) {
       () => setRequiredLogin(true)
     );
     const outcome = getFetchOutcome(searchResponse);
+    const response = (searchResponse as AxiosResponse).data as Array<SelfcareParty>;
 
-    if (outcome === 'success') {
+    if (outcome === 'success' && response.length > 0) {
       window.location.assign(ENV.URL_FE.DASHBOARD);
-    } else {
+    } else if (outcome === 'success' && response.length === 0) {
       window.location.assign('https://www.pagopa.it/it/prodotti-e-servizi/app-io');
+    } else {
+      trackEvent('ONBOARDING_REDIRECT_TO_ONBOARDING_FAILURE', { product_id: product?.id });
     }
     setOpenExitModal(false);
   };
@@ -92,7 +99,7 @@ export default function SubProductStepSelectPricingPlan({ forward }: Props) {
             </Typography>
           </Grid>
           {/* check section */}
-          <Grid item xs={4} mt={3} maxWidth={'100%'} direction="column">
+          <Grid container item xs={4} mt={3} maxWidth={'100%'} direction="column">
             <Box display={'flex'} justifyContent="center">
               <CheckCircleIcon style={{ color: 'white' }} fontSize="small" />
               <Typography pl={1} fontSize="fontSize" color={'white'}>

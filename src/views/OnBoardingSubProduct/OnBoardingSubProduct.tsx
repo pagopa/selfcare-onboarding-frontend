@@ -22,7 +22,7 @@ import { LoadingOverlay } from '../../components/LoadingOverlay';
 import { ENV } from '../../utils/env';
 import { HeaderContext } from '../../lib/context';
 import { StepAddManager, UsersObject } from '../../components/steps/StepAddManager';
-import { StepSearchParty } from '../../components/steps/StepSearchParty';
+// import { StepSearchParty } from '../../components/steps/StepSearchParty';
 import StepOnboardingData from '../../components/steps/StepOnboardingData';
 import StepOnboardingFormData from '../../components/steps/StepOnboardingFormData';
 import { AssistanceContacts } from '../../model/AssistanceContacts';
@@ -35,6 +35,7 @@ import SubProductStepSuccess from './components/SubProductStepSuccess';
 import { SubProductStepSelectUserParty } from './components/SubProductStepSelectUserParty';
 import SubProductStepOnBoardingStatus from './components/SubProductStepOnBoardingStatus';
 import SubProductStepSelectPricingPlan from './components/subProductStepPricingPlan/SubProductStepSelectPricingPlan';
+import SubProductStepUserUnrelated from './components/SubProductStepUserUnrelated';
 
 type OnBoardingSubProductUrlParams = {
   productId: string;
@@ -103,13 +104,11 @@ function OnBoardingSubProduct() {
   const forwardWithInputs = (
     newProduct: Product,
     newSubProduct: Product,
-    newParties: Array<SelfcareParty>,
-    newPricingPlan: string
+    newParties: Array<SelfcareParty>
   ) => {
     setProduct(newProduct);
     setSubProduct(newSubProduct);
     setParties(newParties);
-    setPricingPlan(newPricingPlan);
     setActiveStep(1);
   };
 
@@ -210,7 +209,11 @@ function OnBoardingSubProduct() {
     },
     {
       label: 'Select Pricing Plan',
-      Component: () => SubProductStepSelectPricingPlan({ forward: forwardWitSelectedPricingPlan }),
+      Component: () =>
+        SubProductStepSelectPricingPlan({
+          forward: forwardWitSelectedPricingPlan,
+          product,
+        }),
     },
     {
       label: 'Select Institution releated',
@@ -231,24 +234,26 @@ function OnBoardingSubProduct() {
     },
     {
       label: 'Select Institution unreleated',
-      Component: () =>
-        StepSearchParty({
-          subTitle: (
-            <Trans i18nKey="onBoardingSubProduct.selectUserPartyStep.IPAsubTitle">
-              Seleziona dall&apos;Indice della Pubblica Amministrazione (IPA) l&apos;ente
-              <br /> per cui vuoi richiedere l&apos;adesione a{' '}
-              {{
-                baseProduct: product?.title,
-              }}{' '}
-              Premium.
-            </Trans>
-          ),
-          product: subProduct,
-          forward: (_: any, party: Party) => forwardWithInstitution(party, false),
-          back: parties.length > 0 ? back : undefined,
-        }),
+      Component: () => SubProductStepUserUnrelated({ product, productId }),
+      // TODO temporary commented in order to develop SELC-2237
+      // StepSearchParty({
+      //   subTitle: (
+      //     <Trans i18nKey="onBoardingSubProduct.selectUserPartyStep.IPAsubTitle">
+      //       Seleziona dall&apos;Indice della Pubblica Amministrazione (IPA) l&apos;ente
+      //       <br /> per cui vuoi richiedere l&apos;adesione a{' '}
+      //       {{
+      //         baseProduct: product?.title,
+      //       }}{' '}
+      //       Premium.
+      //     </Trans>
+      //   ),
+      //   product: subProduct,
+      //   forward: (_: any, party: Party) => forwardWithInstitution(party, false),
+      //   back: parties.length > 0 ? back : undefined,
+      // }),
     },
     {
+      // TODO: remove if not used
       label: 'Verify OnBoarding Status',
       Component: () =>
         SubProductStepOnBoardingStatus({
