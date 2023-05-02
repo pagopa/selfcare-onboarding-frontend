@@ -383,7 +383,7 @@ export default {
       notFoundResults: 'Nessun risultato',
       IPAsubTitle:
         "Seleziona dall'Indice della Pubblica Amministrazione (IPA) l'ente <1/> per cui vuoi richiedere l'adesione a {{baseProduct}} Premium",
-      helperLink: 'Non lo trovi? <1>Registra un nuovo ente</1>',
+      helperLink: 'Non trovi il tuo ente? <1>Scopri perché</1>',
       confirmButton: 'Continua',
     },
     genericError: {
