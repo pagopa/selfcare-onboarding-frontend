@@ -53,6 +53,7 @@ export const API = {
     URL: ENV.URL_API.ONBOARDING + '/product/{{productId}}',
   },
 
+  // institutions present on Ipa
   ONBOARDING_GET_SEARCH_PARTIES: {
     URL: ENV.URL_API.PARTY_REGISTRY_PROXY + '/institutions',
   },
@@ -70,6 +71,8 @@ export const API = {
   ONBOARDING_COMPLETE_REGISTRATION: {
     URL: ENV.URL_API.PARTY_PROCESS + '/onboarding/complete/{{token}}',
   },
+
+  // institutions present on self care db
   ONBOARDING_GET_USER_PARTIES: {
     URL: ENV.URL_API.ONBOARDING + '/institutions',
   },

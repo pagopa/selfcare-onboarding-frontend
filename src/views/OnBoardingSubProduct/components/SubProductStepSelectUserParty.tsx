@@ -30,7 +30,7 @@ const CustomBox = styled(Box)({
 });
 const verifyPartyFilter = (party: Party, filter: string) =>
   party.description.toUpperCase().indexOf(filter.toUpperCase()) >= 0;
-export function SubProductStepSelectUserParty({ forward, parties }: Props) {
+export function SubProductStepSelectUserParty({ forward, parties, back }: Props) {
   const partyExternalIdByQuery = new URLSearchParams(window.location.search).get('partyExternalId');
 
   const { t } = useTranslation();
@@ -46,6 +46,11 @@ export function SubProductStepSelectUserParty({ forward, parties }: Props) {
     forward(selected as Party);
   };
   const bodyTitle = t('onBoardingSubProduct.selectUserPartyStep.title');
+
+  const backAction = () => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    back!();
+  };
 
   useEffect(() => {
     if (partyExternalIdByQuery) {
@@ -212,6 +217,11 @@ export function SubProductStepSelectUserParty({ forward, parties }: Props) {
             action: onForwardAction,
             label: t('onBoardingSubProduct.selectUserPartyStep.confirmButton'),
             disabled: parties.length > 1 && (selected === undefined || selected === null),
+          }}
+          back={{
+            action: backAction,
+            label: t('stepInstitutionType.backLabel'),
+            disabled: false,
           }}
         />
       </Grid>

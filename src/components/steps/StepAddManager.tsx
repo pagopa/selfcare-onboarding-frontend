@@ -119,8 +119,8 @@ export function StepAddManager({
         </Grid>
       </Grid>
 
-      <Grid container item justifyContent="center" mt={4}>
-        <Grid item xs={8} sx={{ boxShadow: '0px 12px 40px rgba(0, 0, 0, 0.06)' }}>
+      <Grid container item display="flex" justifyContent="center" mt={4}>
+        <Grid item xs={8} display="flex" justifyContent="center">
           <PlatformUserForm
             prefix="LEGAL"
             role="MANAGER"

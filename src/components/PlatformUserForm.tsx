@@ -194,7 +194,7 @@ export function PlatformUserForm({
       : '';
 
   return (
-    <Paper elevation={0} sx={{ p: 4, borderRadius: '16px' }}>
+    <Paper sx={{ borderRadius: '16px', p: 4, width: '704px' }}>
       <Grid container spacing={2} mb="-16px">
         {fields.map(
           ({

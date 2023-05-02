@@ -46,20 +46,53 @@ const handleSearchUserParties = async (
   setParties: (parties: Array<SelfcareParty>) => void,
   setRequiredLogin: (required: boolean) => void
 ) => {
-  const searchResponse = await fetchWithLogs(
+  const searchResponseBase = await fetchWithLogs(
     { endpoint: 'ONBOARDING_GET_USER_PARTIES' },
-    { method: 'GET' },
+    {
+      method: 'GET',
+      params: {
+        productFilter: 'prod-io', // filter for multiple products -->  productFilter: 'prod-io,prod-pn,prod-pagopa',
+      },
+    },
     () => setRequiredLogin(true)
   );
-  const outcome = getFetchOutcome(searchResponse);
+
+  const searchResponsePremium = await fetchWithLogs(
+    { endpoint: 'ONBOARDING_GET_USER_PARTIES' },
+    {
+      method: 'GET',
+      params: {
+        productFilter: 'prod-io-premium',
+      },
+    },
+    () => setRequiredLogin(true)
+  );
+  const baseProducts = (searchResponseBase as AxiosResponse).data as Array<SelfcareParty>;
+  const premiumProducts = (searchResponsePremium as AxiosResponse).data;
+
+  const filteredArrayWithoutPremium = baseProducts.filter(
+    (beseProduct) =>
+      !premiumProducts.find((premiumProduct: any) => beseProduct.id === premiumProduct.id)
+  );
+
+  const outcome = getFetchOutcome(searchResponseBase);
 
   if (outcome === 'success') {
-    setParties(
-      ((searchResponse as AxiosResponse).data as Array<SelfcareParty>).map((p) => ({
-        ...p,
-        urlLogo: buildUrlLog(p.id),
-      }))
-    );
+    if (process.env.REACT_APP_MOCK_API === 'true') {
+      setParties(
+        baseProducts.map((p) => ({
+          ...p,
+          urlLogo: buildUrlLog(p.id),
+        }))
+      );
+    } else {
+      setParties(
+        filteredArrayWithoutPremium.map((p) => ({
+          ...p,
+          urlLogo: buildUrlLog(p.id),
+        }))
+      );
+    }
   } else {
     setParties([]);
   }
@@ -72,8 +105,6 @@ function SubProductStepVerifyInputs({
   requestId,
   setLoading,
 }: Props) {
-  const pricingPlanByQuery = new URLSearchParams(window.location.search).get('pricingPlan');
-
   const [error, setError] = useState<boolean>(false);
   const { setOnExit } = useContext(HeaderContext);
   const { setRequiredLogin } = useContext(UserContext);
@@ -120,10 +151,10 @@ function SubProductStepVerifyInputs({
       ) {
         setError(true);
       } else {
-        forward(selectedProduct, selectedSubProduct, parties, pricingPlanByQuery);
+        forward(selectedProduct, selectedSubProduct, parties);
       }
     }
-  }, [selectedProduct, selectedSubProduct, parties, pricingPlanByQuery]);
+  }, [selectedProduct, selectedSubProduct, parties]);
 
   if (error) {
     unregisterUnloadEvent(setOnExit);

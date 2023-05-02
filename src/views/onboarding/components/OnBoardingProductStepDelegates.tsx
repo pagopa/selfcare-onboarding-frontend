@@ -222,7 +222,7 @@ export function OnBoardingProductStepDelegates({
       </Grid>
 
       <Grid container item justifyContent="center" mt={4}>
-        <Grid item xs={8} sx={{ boxShadow: '0px 12px 40px rgba(0, 0, 0, 0.06)' }}>
+        <Grid item xs={8} display="flex" justifyContent={'center'}>
           <PlatformUserForm
             prefix={'delegate-initial'}
             role="DELEGATE"
@@ -237,7 +237,7 @@ export function OnBoardingProductStepDelegates({
 
         {delegateFormIds.map((id, index) => (
           <React.Fragment key={id}>
-            <Grid item xs={8}>
+            <Grid item xs={8} width="704px" display={'flex'} justifyContent="center">
               <Paper elevation={8} sx={{ borderRadius: 3, mt: 4 }} role="userForm">
                 <Grid container>
                   <Grid
