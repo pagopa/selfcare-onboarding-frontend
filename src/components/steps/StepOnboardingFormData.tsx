@@ -438,7 +438,7 @@ export default function StepOnboardingFormData({
             />
           </Grid>
         ) : (
-          <div style={{ margin: '16px' }}></div>
+          <></>
         )}
         {isPSP && <DpoSection baseTextFieldProps={baseTextFieldProps} />}
 

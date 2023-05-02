@@ -193,7 +193,7 @@ export function SubProductStepSelectUserParty({ forward, parties, back }: Props)
             }}
           >
             <Typography
-              aria-label="Non lo trovi? Registra un nuovo ente"
+              aria-label="Non trovi il tuo ente? Scopri perché"
               sx={{
                 textAlign: 'center',
               }}
