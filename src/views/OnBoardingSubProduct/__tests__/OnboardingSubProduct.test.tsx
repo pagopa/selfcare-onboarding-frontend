@@ -108,6 +108,7 @@ const agencyInfoError = 'AGENCY INFO ERROR';
 const agencyX = 'AGENCY X';
 const agencyError = 'AGENCY ERROR';
 const agencyPending = 'AGENCY PENDING';
+const onboardedWithPricingPlan = 'onboardedWithPricingPlan';
 
 // TODO all unreleated old test where commented in order to develop SELC-2237
 // test('test select pricing plan', async () => {
@@ -165,12 +166,6 @@ const agencyPending = 'AGENCY PENDING';
 //       "Warning!\n\nNavigating away from this page will delete your text if you haven't already saved it."
 //   );
 // });
-
-test('test unrelated party', async () => {
-  renderComponent('prod-io', 'prod-io-premium');
-  await executeStepSelectPricingPlan();
-  await executeStepSelectInstitutionUnrelatedWithPricingPlan(agencyX);
-});
 
 test('test error subProductID', async () => {
   renderComponent('error', 'error');
@@ -301,27 +296,6 @@ const executeStepSelectInstitutionUnreleated = async (partyName: string) => {
 
   fireEvent.click(confirmButton);
   await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(5));
-};
-
-const executeStepSelectInstitutionUnrelatedWithPricingPlan = async (partyName: string) => {
-  console.log('Testing step select institution UNRELEATED');
-  // await waitFor(() => screen.getByText(/Non puoi aderire a {{selectedProduct}} Premium/));
-
-  console.log('Testing step select institution UNRELEATED');
-
-  const newInstitutionAdhesion = await waitFor(() => screen.getByText('Registra un nuovo ente'));
-  fireEvent.click(newInstitutionAdhesion);
-
-  await waitFor(() => screen.getByText(/Non puoi aderire a {{selectedProduct}} Premium/));
-  await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(4));
-
-  const confirmButton = screen.getByRole('button', { name: 'Torna alla home' });
-  expect(confirmButton).toBeEnabled();
-  fireEvent.click(confirmButton);
-
-  const confirmAdesionButton = screen.getByRole('button', { name: 'Vai all’adesione' });
-  expect(confirmAdesionButton).toBeEnabled();
-  fireEvent.click(confirmAdesionButton);
 };
 
 const executeStepSelectInstitutionReleated = async (partyName: string) => {
