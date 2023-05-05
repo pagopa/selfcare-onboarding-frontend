@@ -266,6 +266,11 @@ export default {
         closeBtnLabel: 'Esci',
         confirmBtnLabel: 'Torna alle offerte Premium',
       },
+      headerPlanCard: {
+        from: 'Da',
+        to: 'a',
+        mess: '/ mess',
+      },
       carnetPlan: {
         caption: 'PIANO A CARNET - UNA TANTUM',
         discountBoxLabel: '25% di sconto',

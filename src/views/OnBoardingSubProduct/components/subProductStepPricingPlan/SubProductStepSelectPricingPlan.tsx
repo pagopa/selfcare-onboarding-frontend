@@ -12,8 +12,9 @@ import { fetchWithLogs } from '../../../../lib/api-utils';
 import { getFetchOutcome } from '../../../../lib/error-utils';
 import { UserContext } from '../../../../lib/context';
 import { Product, SelfcareParty, StepperStepComponentProps } from '../../../../../types';
-import CarnetPlanCard from './components/CarnetPlanCard';
-import ConsumptionPlanCard from './components/ConsumptionPlanCard';
+import FooterCarnet from './components/carnetPlanComponent/FooterCarnet';
+import FooterConsumptionCard from './components/consumptionPlanComponent/FooterConsumptionCard';
+import HeaderPlanCard from './components/HeaderPlanCard';
 
 type Props = StepperStepComponentProps & {
   product?: Product;
@@ -133,30 +134,59 @@ export default function SubProductStepSelectPricingPlan({ forward, product }: Pr
             </Grid>
           </Grid>
           <Grid container item justifyContent={'center'}>
-            <Box display={'flex'}>
-              <Box>
-                <CarnetPlanCard discount={discount} forward={forward} showHeader={true} />
-              </Box>
-              <Box>
-                <ConsumptionPlanCard discount={discount} forward={forward} showHeader={true} />
-              </Box>
+            <Box mr={3} sx={{ borderRadius: '16px' }}>
+              {/* <HeaderCarnetCard discount={discount} /> */}
+              <HeaderPlanCard
+                discount={discount}
+                caption={t(
+                  'onBoardingSubProduct.subProductStepSelectPricingPlan.carnetPlan.caption'
+                )}
+                discountBoxLabel={t(
+                  'onBoardingSubProduct.subProductStepSelectPricingPlan.carnetPlan.discountBoxLabel'
+                )}
+                title={t('onBoardingSubProduct.subProductStepSelectPricingPlan.carnetPlan.title')}
+                firstNumberBeforeComma={'0,'}
+                firstNumberAfterComma={'15€'}
+                secondNumberBeforeComma={'0,'}
+                secondNumberAfterComma={'165€'}
+              />
+            </Box>
+            <Box mr={3} sx={{ borderRadius: '16px' }}>
+              <HeaderPlanCard
+                discount={discount}
+                caption={t(
+                  'onBoardingSubProduct.subProductStepSelectPricingPlan.consumptionPlan.caption'
+                )}
+                discountBoxLabel={t(
+                  'onBoardingSubProduct.subProductStepSelectPricingPlan.consumptionPlan.discountBoxLabel'
+                )}
+                title={
+                  <Trans
+                    i18nKey={
+                      'onBoardingSubProduct.subProductStepSelectPricingPlan.consumptionPlan.title'
+                    }
+                  >
+                    Scegli di pagare solo i messaggi <br /> effettivi che invii
+                  </Trans>
+                }
+                firstNumberBeforeComma={'0,'}
+                firstNumberAfterComma={'15€'}
+                secondNumberBeforeComma={'0,'}
+                secondNumberAfterComma={'187€'}
+              />
             </Box>
           </Grid>
         </Grid>
       </Box>
       <Box>
-        {/*  */}
         <Grid container item justifyContent={'center'}>
-          <Box display={'flex'}>
-            <Box>
-              <CarnetPlanCard discount={discount} forward={forward} showHeader={false} />
-            </Box>
-            <Box>
-              <ConsumptionPlanCard discount={discount} forward={forward} showHeader={false} />
-            </Box>
+          <Box mr={3} sx={{ borderRadius: '16px' }}>
+            <FooterCarnet forward={forward} discount={discount} />
+          </Box>
+          <Box mr={3} sx={{ borderRadius: '16px' }}>
+            <FooterConsumptionCard forward={forward} discount={discount} />
           </Box>
         </Grid>
-
         {/* forward action */}
         <Grid item display={'flex'} justifyContent="center">
           <Button
@@ -184,7 +214,6 @@ export default function SubProductStepSelectPricingPlan({ forward, product }: Pr
           onConfirm={onExitPremiumFlow}
           handleClose={handleClose}
         />
-        {/*  */}
       </Box>
     </>
   );
