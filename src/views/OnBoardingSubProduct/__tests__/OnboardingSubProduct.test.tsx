@@ -108,12 +108,13 @@ const agencyInfoError = 'AGENCY INFO ERROR';
 const agencyX = 'AGENCY X';
 const agencyError = 'AGENCY ERROR';
 const agencyPending = 'AGENCY PENDING';
+const onboardedWithPricingPlan = 'onboardedWithPricingPlan';
 
 // TODO all unreleated old test where commented in order to develop SELC-2237
 // test('test select pricing plan', async () => {
 //   renderComponent('prod-io', 'prod-io-premium');
 //   await executeStepSelectPricingPlan();
-//   await executeStepSelectInstitutionReleated('onboarded');
+//   await executeStepSelectInstitutionUnreleated('onboarded');
 //   await waitFor(() => screen.getByText('Sottoscrizione già avvenuta'));
 //   await executeClickCloseButton();
 // });
@@ -141,7 +142,7 @@ const agencyPending = 'AGENCY PENDING';
 //   await executeStepBillingData();
 //   await executeStepAddManager(true);
 //   await executeClickCloseButton();
-//   await verifySubmit();
+//   await verifySubmitPostLegals();
 // });
 
 // test.skip('test complete with error on submit', async () => {
@@ -153,7 +154,7 @@ const agencyPending = 'AGENCY PENDING';
 //   await executeClickHomeButton();
 // });
 
-// test.skip('test exiting during flow with unload event', async () => {
+// test('test exiting during flow with unload event', async () => {
 //   renderComponent('prod-io', 'prod-io-premium');
 //   await executeStepSelectPricingPlan();
 //   await executeStepSelectInstitutionUnreleated(agencyX);
@@ -192,6 +193,30 @@ test('test exiting during flow with logout', async () => {
   await performLogout(logoutButton);
   fireEvent.click(screen.getByRole('button', { name: 'Esci' }));
   await waitFor(() => expect(mockedLocation.assign).toBeCalledWith(ENV.URL_FE.LOGOUT));
+});
+
+test('test exiting during flow with unload event', async () => {
+  renderComponent('prod-io', 'prod-io-premium');
+  await executeStepSelectPricingPlan();
+  await executeStepSelectInstitutionReleated('Comune di Milano');
+
+  const event = new Event('beforeunload');
+  window.dispatchEvent(event);
+  await waitFor(
+    () =>
+      (event.returnValue as unknown as string) ===
+      "Warning!\n\nNavigating away from this page will delete your text if you haven't already saved it."
+  );
+});
+
+test('test complete', async () => {
+  renderComponent('prod-io', 'prod-io-premium');
+  await executeStepSelectPricingPlan();
+  await executeStepSelectInstitutionReleated('Comune di Milano');
+  await executeStepBillingDataUnrelated();
+  await executeStepAddManager(true);
+  await executeClickCloseButton();
+  await verifySubmitPostLegals();
 });
 
 const performLogout = async (logoutButton: HTMLElement) => {
@@ -293,6 +318,24 @@ const executeStepSelectInstitutionReleated = async (partyName: string) => {
   fireEvent.click(confirmButton);
 };
 
+const executeStepBillingDataUnrelated = async () => {
+  console.log('Testing step Billing Data');
+  await waitFor(() => screen.getByText(stepBillingDataTitle));
+
+  const confirmButtonEnabled = screen.getByRole('button', { name: 'Continua' });
+  await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
+
+  fireEvent.change(document.getElementById('recipientCode'), {
+    target: { value: '' },
+  });
+  await waitFor(() => expect(confirmButtonEnabled).toBeDisabled());
+  fireEvent.change(document.getElementById('recipientCode'), {
+    target: { value: 'M5UXCR1' },
+  });
+  await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
+  fireEvent.click(confirmButtonEnabled);
+  await waitFor(() => screen.getByText(stepAddManagerTitle));
+};
 const executeStepBillingData = async () => {
   console.log('Testing step Billing Data');
   await waitFor(() => screen.getByText(stepBillingDataTitle));
@@ -434,10 +477,10 @@ const fillUserForm = async (
     expect((document.getElementById('LEGAL-email') as HTMLInputElement).value).toBe('m@ma.it')
   );
   expect((document.getElementById('LEGAL-taxCode') as HTMLInputElement).value).toBe(
-    'RSOMRA80A01A794I'
+    'RSSMRA80A01H501U'
   );
-  expect((document.getElementById('LEGAL-name') as HTMLInputElement).value).toBe('Maria');
-  expect((document.getElementById('LEGAL-surname') as HTMLInputElement).value).toBe('Rosa');
+  expect((document.getElementById('LEGAL-name') as HTMLInputElement).value).toBe('Mario');
+  expect((document.getElementById('LEGAL-surname') as HTMLInputElement).value).toBe('Rossi');
 
   expect(confirmButton).toBeEnabled();
 
@@ -492,31 +535,31 @@ const fillTextFieldAndCheckButton = async (
 };
 
 const billingData2billingDataRequest = () => ({
-  businessName: 'businessNameInput',
-  registeredOffice: 'registeredOfficeInput',
-  digitalAddress: 'a@a.com',
-  zipCode: '09010',
-  taxCode: 'AAAAAA44D55F456K',
-  vatNumber: '12345678901',
-  recipientCode: 'AM23EIX',
+  businessName: 'Comune di Milano',
+  registeredOffice: 'Milano, Piazza Colonna 370',
+  digitalAddress: 'comune.milano@pec.it',
+  zipCode: '20021',
+  taxCode: 'AAAAAA11A11A123K',
+  vatNumber: 'AAAAAA11A11A123K',
+  recipientCode: 'M5UXCR1',
 });
 
-const verifySubmit = async () => {
+const verifySubmitPostLegals = async () => {
   await waitFor(() =>
     expect(fetchWithLogsSpy).lastCalledWith(
       {
         endpoint: 'ONBOARDING_POST_LEGALS',
-        endpointParams: { externalInstitutionId: 'id', productId: 'prod-io-premium' },
+        endpointParams: { externalInstitutionId: 'externalId1', productId: 'prod-io-premium' },
       },
       {
         method: 'POST',
         data: {
           users: [
             {
-              name: 'Maria',
-              surname: 'Rosa',
+              name: 'Mario',
+              surname: 'Rossi',
               role: 'MANAGER',
-              taxCode: 'RSOMRA80A01A794I',
+              taxCode: 'RSSMRA80A01H501U',
               email: 'm@ma.it',
             },
           ],
@@ -528,7 +571,7 @@ const verifySubmit = async () => {
           geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY
             ? [{ code: '100', desc: 'ITALIA' }]
             : [],
-          assistanceContacts: { supportEmail: 'a@a.it' },
+          assistanceContacts: { supportEmail: 'comune.bollate@pec.it' },
         },
       },
       expect.any(Function)
