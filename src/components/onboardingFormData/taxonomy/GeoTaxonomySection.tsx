@@ -212,7 +212,7 @@ export default function GeoTaxonomySection({
       },
       {
         method: 'GET',
-        params: { limit: ENV.MAX_INSTITUTIONS_FETCH, page: 1, startsWith: query },
+        params: { limit: ENV.MAX_INSTITUTIONS_FETCH, offset: 1, q: query },
       },
       () => setRequiredLogin(true)
     );
