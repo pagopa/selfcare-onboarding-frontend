@@ -129,6 +129,14 @@ export default function StepInstitutionType({
           </Trans>
         </Typography>
       </Grid>
+      <Grid item xs={12} display="flex" justifyContent="center">
+        <Typography variant="body1" align="center" pb={4}>
+          <Trans i18nKey="stepInstitutionType.subtitle">
+            Seleziona il tipo di ente che rappresenti per iniziare l’adesione a <br />
+            {{ productName: selectedProduct?.title }}
+          </Trans>
+        </Typography>
+      </Grid>
       <Paper
         elevation={8}
         sx={{ borderRadius: theme.spacing(2), p: 1, width: '580px', height: '100%' }}
