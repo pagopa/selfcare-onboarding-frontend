@@ -466,8 +466,7 @@ export default {
       vatNumberGroup: 'La Partita IVA è di gruppo',
       taxCode: 'Codice Fiscale',
       vatNumber: 'Partita IVA',
-      recipientCode: 'Codice destinatario',
-      recipientCodeForPa: 'Codice univoco',
+      sdiCode: 'Codice SDI',
       recipientCodeDescription: 'È il codice necessario per ricevere le fatture elettroniche',
       gspDescription: 'Sono gestore di almeno uno dei pubblici servizi: Gas, Energia, Telco.',
       pspDataSection: {
