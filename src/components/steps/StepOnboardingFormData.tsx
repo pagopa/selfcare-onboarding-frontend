@@ -399,7 +399,7 @@ export default function StepOnboardingFormData({
     <MessageNoAction {...outcome} />
   ) : (
     <Box display="flex" justifyContent="center">
-      <Grid container item xs={8}>
+      <Grid container item xs={8} display="flex" justifyContent="center">
         <Grid item xs={12}>
           <Typography variant="h3" component="h2" align="center" sx={{ lineHeight: '1.2' }}>
             {institutionType === 'PSP' && productId === 'prod-pagopa'
@@ -409,7 +409,7 @@ export default function StepOnboardingFormData({
         </Grid>
 
         <Grid container item justifyContent="center" mt={2} mb={4}>
-          <Grid item xs={12}>
+          <Grid item xs={6}>
             <Typography variant="body1" align="center">
               {subtitle}
             </Typography>
@@ -428,7 +428,7 @@ export default function StepOnboardingFormData({
         />
         {/* DATI RELATIVI ALLA TASSONOMIA */}
         {ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY ? (
-          <Grid item xs={12}>
+          <Grid item xs={12} display="flex" justifyContent={'center'}>
             <GeoTaxonomySection
               retrievedTaxonomies={previousGeotaxononomies}
               setGeographicTaxonomies={(geographicTaxonomies) =>
@@ -438,7 +438,7 @@ export default function StepOnboardingFormData({
             />
           </Grid>
         ) : (
-          <div style={{ margin: '16px' }}></div>
+          <></>
         )}
         {isPSP && <DpoSection baseTextFieldProps={baseTextFieldProps} />}
 

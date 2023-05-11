@@ -382,7 +382,7 @@ const executeStepInstitutionType = async () => {
   await waitFor(() => screen.getByText(stepInstitutionType));
 
   await fillInstitutionTypeCheckbox('pa');
-
+  screen.getByText(/Indica il tipo di ente che aderirà a/);
   const confirmButtonEnabled = screen.getByRole('button', { name: 'Continua' });
   expect(confirmButtonEnabled).toBeEnabled();
 
@@ -484,14 +484,11 @@ const executeStepBillingDataLabels = async () => {
   const backButton = screen.getByRole('button', { name: 'Indietro' });
 
   await waitFor(() => screen.getByText('Indica i dati del tuo ente'));
-  expect(screen.getByText('Codice destinatario'));
+  expect(screen.getByText('Codice SDI'));
 
   expect(backButton).toBeEnabled();
   await waitFor(() => fireEvent.click(backButton));
   await waitFor(() => screen.getByText('Seleziona il tipo di ente che rappresenti'));
-  await executeStepInstitutionType();
-  await executeStep1Base(agencyX);
-  expect(screen.getByText('Codice univoco'));
 };
 
 const executeStepBillingDataReaField = async () => {

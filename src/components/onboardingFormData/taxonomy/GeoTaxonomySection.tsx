@@ -245,7 +245,7 @@ export default function GeoTaxonomySection({
   };
 
   return (
-    <Paper elevation={8} sx={{ p: 4, borderRadius: 2, my: 4 }}>
+    <Paper elevation={8} sx={{ p: 4, borderRadius: 4, my: 4, width: '704px' }}>
       <Grid container item pb={3}>
         <Grid item xs={12} display="flex">
           <Box>
