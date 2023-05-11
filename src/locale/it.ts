@@ -425,8 +425,7 @@ export default {
   },
   stepInstitutionType: {
     title: 'Seleziona il tipo di ente che <1/> rappresenti',
-    subtitle:
-      ' Seleziona il tipo di ente che rappresenti per iniziare l’adesione a <1/> {{productName}}',
+    subtitle: 'Indica il tipo di ente che aderirà a {{productName}}',
     institutionTypeValues: {
       pa: 'Pubblica Amministrazione',
       gsp: 'Gestore di servizi pubblici',
