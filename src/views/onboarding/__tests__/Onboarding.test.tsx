@@ -382,7 +382,7 @@ const executeStepInstitutionType = async () => {
   await waitFor(() => screen.getByText(stepInstitutionType));
 
   await fillInstitutionTypeCheckbox('pa');
-
+  screen.getByText(/Indica il tipo di ente che aderirà a/);
   const confirmButtonEnabled = screen.getByRole('button', { name: 'Continua' });
   expect(confirmButtonEnabled).toBeEnabled();
 
