@@ -37,7 +37,10 @@ export default function RejectRegistration() {
       const contractPostResponse = await fetchWithLogs(
         { endpoint: 'ONBOARDING_COMPLETE_REGISTRATION', endpointParams: { token } },
         { method: 'DELETE' },
-        () => setRequiredLogin(true)
+        () => {
+          const onSuccessEncoded = encodeURIComponent(location.pathname + location.search);
+          window.location.assign(`${ENV.URL_FE.LOGIN}?onSuccess=${onSuccessEncoded}`);
+        }
       );
 
       // Check the outcome
