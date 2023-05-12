@@ -11,6 +11,7 @@ import { StepperStep, Problem, RequestOutcomeOptionsJwt, RequestOutcomeJwt } fro
 import { ConfirmRegistrationStep0 } from '../components/ConfirmRegistrationStep0';
 import { ConfirmRegistrationStep1 } from '../components/ConfirmRegistrationStep1';
 import { useHistoryState } from '../components/useHistoryState';
+import { redirectToLogin } from '../utils/unloadEvent-utils';
 import { fetchWithLogs } from '../lib/api-utils';
 import { getFetchOutcome } from '../lib/error-utils';
 import redXIllustration from '../assets/red-x-illustration.svg';
@@ -134,7 +135,7 @@ export default function CompleteRegistrationComponent() {
     const uploadDocument = await fetchWithLogs(
       { endpoint: 'ONBOARDING_COMPLETE_REGISTRATION', endpointParams: { token } },
       { method: 'POST', data: formData, headers: { 'Content-Type': 'multipart/form-data' } },
-      () => setRequiredLogin(true)
+      redirectToLogin
     );
 
     setLoading(false);
@@ -170,7 +171,7 @@ export default function CompleteRegistrationComponent() {
         });
       }
       if (
-        (uploadDocument as AxiosError<Problem>).response?.status === 409 &&
+        (uploadDocument as AxiosError<Problem>).response?.status === 400 &&
         (uploadDocument as AxiosError<Problem>).response?.data
       ) {
         setOpen(true);

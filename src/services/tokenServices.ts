@@ -2,6 +2,7 @@ import { AxiosError, AxiosResponse } from 'axios';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
 import { fetchWithLogs } from '../lib/api-utils';
 import { Problem, RequestOutcomeJwt } from '../../types';
+import { redirectToLogin } from '../utils/unloadEvent-utils';
 
 type Props = {
   token: string;
@@ -18,11 +19,11 @@ const getMixPanelEvent = (errorStatus: number | undefined) => {
   return errors[errorStatus as keyof typeof errors] ?? 'ONBOARDING_TOKEN_VALIDATION_ERROR';
 };
 
-export const jwtNotValid = async ({ token, setRequiredLogin, setOutcome }: Props) => {
+export const jwtNotValid = async ({ token, setOutcome }: Props) => {
   const fetchJwt = await fetchWithLogs(
     { endpoint: 'ONBOARDING_TOKEN_VALIDATION', endpointParams: { token } },
     { method: 'POST', headers: { 'Content-Type': 'application/json' } },
-    () => setRequiredLogin(true)
+    redirectToLogin
   );
 
   if (
