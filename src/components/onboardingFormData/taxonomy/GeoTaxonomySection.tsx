@@ -20,10 +20,9 @@ import { AxiosError, AxiosResponse } from 'axios';
 import { fetchWithLogs } from '../../../lib/api-utils';
 import { getFetchOutcome } from '../../../lib/error-utils';
 import { UserContext } from '../../../lib/context';
-import { ENV } from '../../../utils/env';
-import { OnboardingInstitutionInfo } from '../../../model/OnboardingInstitutionInfo';
 import { GeographicTaxonomy } from '../../../model/GeographicTaxonomies';
 import { useHistoryState } from '../../useHistoryState';
+import { OnboardingInstitutionInfo } from '../../../model/OnboardingInstitutionInfo';
 
 type Props = {
   retrievedTaxonomies: Array<GeographicTaxonomy>;
@@ -212,7 +211,7 @@ export default function GeoTaxonomySection({
       },
       {
         method: 'GET',
-        params: { limit: ENV.MAX_INSTITUTIONS_FETCH, offset: 1, q: query },
+        params: { description: query },
       },
       () => setRequiredLogin(true)
     );
@@ -222,7 +221,16 @@ export default function GeoTaxonomySection({
       // eslint-disable-next-line functional/no-let
       let data = (searchGeotaxonomy as AxiosResponse).data;
 
-      data = data.map((value: OnboardingInstitutionInfo) => ({ ...value, label: value.desc }));
+      // dataRetrieve = dataRetrieve.map((value: onboardingInfo2onboardingInstitutionInfo) => ({
+      //   ...value,
+      //   desc: value.description,
+      //   code: value.geotax_id,
+      // }));
+
+      data = data.map((value: OnboardingInstitutionInfo) => ({
+        ...value,
+        label: value.desc,
+      }));
 
       const dataFiltered = data.filter(
         (data: any) => !optionsSelected.find((os) => os?.code === data?.code)
