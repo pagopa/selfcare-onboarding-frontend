@@ -2,7 +2,7 @@ import { AxiosError, AxiosResponse } from 'axios';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
 import { fetchWithLogs } from '../lib/api-utils';
 import { Problem, RequestOutcomeJwt } from '../../types';
-import { ENV } from '../utils/env';
+import { redirectToLogin } from '../utils/unloadEvent-utils';
 
 type Props = {
   token: string;
@@ -23,10 +23,7 @@ export const jwtNotValid = async ({ token, setOutcome }: Props) => {
   const fetchJwt = await fetchWithLogs(
     { endpoint: 'ONBOARDING_TOKEN_VALIDATION', endpointParams: { token } },
     { method: 'POST', headers: { 'Content-Type': 'application/json' } },
-    () => {
-      const onSuccessEncoded = encodeURIComponent(location.pathname + location.search);
-      window.location.assign(`${ENV.URL_FE.LOGIN}?onSuccess=${onSuccessEncoded}`);
-    }
+    redirectToLogin
   );
 
   if (

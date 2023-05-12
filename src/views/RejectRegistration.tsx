@@ -11,6 +11,7 @@ import { getFetchOutcome } from '../lib/error-utils';
 import { LoadingOverlay } from '../components/LoadingOverlay';
 import { HeaderContext, UserContext } from '../lib/context';
 import { jwtNotValid } from '../services/tokenServices';
+import { redirectToLogin } from '../utils/unloadEvent-utils';
 import { ENV } from '../utils/env';
 import JwtInvalidPage from './JwtInvalidPage';
 import ConfirmCancellationPage from './ConfirmCancellationPage';
@@ -37,10 +38,7 @@ export default function RejectRegistration() {
       const contractPostResponse = await fetchWithLogs(
         { endpoint: 'ONBOARDING_COMPLETE_REGISTRATION', endpointParams: { token } },
         { method: 'DELETE' },
-        () => {
-          const onSuccessEncoded = encodeURIComponent(location.pathname + location.search);
-          window.location.assign(`${ENV.URL_FE.LOGIN}?onSuccess=${onSuccessEncoded}`);
-        }
+        redirectToLogin
       );
 
       // Check the outcome
