@@ -20,8 +20,6 @@ import { AxiosError, AxiosResponse } from 'axios';
 import { fetchWithLogs } from '../../../lib/api-utils';
 import { getFetchOutcome } from '../../../lib/error-utils';
 import { UserContext } from '../../../lib/context';
-import { ENV } from '../../../utils/env';
-import { OnboardingInstitutionInfo } from '../../../model/OnboardingInstitutionInfo';
 import { GeographicTaxonomy } from '../../../model/GeographicTaxonomies';
 import { useHistoryState } from '../../useHistoryState';
 
@@ -42,7 +40,7 @@ export default function GeoTaxonomySection({
   const [isNationalAreaVisible, setIsNationalAreaVisible] = useState<boolean>(false);
   const [isLocalAreaVisible, setIsLocalAreaVisible] = useState<boolean>(false);
   const [optionsSelected, setOptionsSelected] = useState<Array<GeographicTaxonomy>>([]);
-  const [options, setOptions] = useState<Array<OnboardingInstitutionInfo>>([]);
+  const [options, setOptions] = useState<Array<GeographicTaxonomy>>([]);
   const [isAddNewAutocompleteEnabled, setIsAddNewAutocompleteEnabled] = useState<boolean>(false);
   const [input, setInput] = useState<string>('');
   const [error, setError] = useState<any>({});
@@ -212,7 +210,7 @@ export default function GeoTaxonomySection({
       },
       {
         method: 'GET',
-        params: { limit: ENV.MAX_INSTITUTIONS_FETCH, page: 1, startsWith: query },
+        params: { description: query },
       },
       () => setRequiredLogin(true)
     );
@@ -222,7 +220,10 @@ export default function GeoTaxonomySection({
       // eslint-disable-next-line functional/no-let
       let data = (searchGeotaxonomy as AxiosResponse).data;
 
-      data = data.map((value: OnboardingInstitutionInfo) => ({ ...value, label: value.desc }));
+      data = data.map((value: GeographicTaxonomy) => ({
+        ...value,
+        label: value.desc,
+      }));
 
       const dataFiltered = data.filter(
         (data: any) => !optionsSelected.find((os) => os?.code === data?.code)

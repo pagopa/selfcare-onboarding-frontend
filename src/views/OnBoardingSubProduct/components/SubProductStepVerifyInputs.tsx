@@ -51,7 +51,7 @@ const handleSearchUserParties = async (
     {
       method: 'GET',
       params: {
-        productFilter: 'prod-io', // filter for multiple products -->  productFilter: 'prod-io,prod-pn,prod-pagopa',
+        productFilter: 'prod-io',
       },
     },
     () => setRequiredLogin(true)
