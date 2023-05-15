@@ -1,12 +1,12 @@
+// from BFF
 export type OnboardingInstitutionInfo = {
-  code: string;
-  desc: string;
-  region?: string;
-  province?: string;
-  provinceAbbreviation?: string;
-  country?: string;
-  countryAbbreviation?: string;
-  startDate?: Date;
-  endDate?: Date;
-  enable: boolean;
+  description: string;
+  istat_code: string;
+  province_id: string;
+  province_abbreviation: string;
+  region_id: string;
+  geotax_id: string;
+  enabled: boolean;
+  country: string;
+  country_abbreviation: string;
 };
