@@ -22,7 +22,6 @@ import { getFetchOutcome } from '../../../lib/error-utils';
 import { UserContext } from '../../../lib/context';
 import { GeographicTaxonomy } from '../../../model/GeographicTaxonomies';
 import { useHistoryState } from '../../useHistoryState';
-import { OnboardingInstitutionInfo } from '../../../model/OnboardingInstitutionInfo';
 
 type Props = {
   retrievedTaxonomies: Array<GeographicTaxonomy>;
@@ -219,15 +218,9 @@ export default function GeoTaxonomySection({
 
     if (outcome === 'success') {
       // eslint-disable-next-line functional/no-let
-      let dataRetrieve = (searchGeotaxonomy as AxiosResponse).data;
+      let data = (searchGeotaxonomy as AxiosResponse).data;
 
-      dataRetrieve = dataRetrieve.map((value: OnboardingInstitutionInfo) => ({
-        ...value,
-        desc: value.description,
-        code: value.geotax_id,
-      }));
-
-      const data = dataRetrieve.map((value: GeographicTaxonomy) => ({
+      data = data.map((value: GeographicTaxonomy) => ({
         ...value,
         label: value.desc,
       }));
