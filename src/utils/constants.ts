@@ -88,7 +88,7 @@ export const API = {
     URL: ENV.URL_API.PARTY_PROCESS + '/tokens/{{token}}/verify',
   },
   ONBOARDING_GET_GEOTAXONOMY: {
-    URL: ENV.URL_API.ONBOARDING + '/geotaxonomies',
+    URL: ENV.URL_API.PARTY_REGISTRY_PROXY + '/geotaxonomies',
   },
   ONBOARDING_GET_PREVIOUS_GEOTAXONOMIES: {
     URL: ENV.URL_API.ONBOARDING + '/institutions/{{externalInstitutionId}}/geographicTaxonomy',

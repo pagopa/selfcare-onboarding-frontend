@@ -41,7 +41,7 @@ export default function GeoTaxonomySection({
   const [isNationalAreaVisible, setIsNationalAreaVisible] = useState<boolean>(false);
   const [isLocalAreaVisible, setIsLocalAreaVisible] = useState<boolean>(false);
   const [optionsSelected, setOptionsSelected] = useState<Array<GeographicTaxonomy>>([]);
-  const [options, setOptions] = useState<Array<OnboardingInstitutionInfo>>([]);
+  const [options, setOptions] = useState<Array<GeographicTaxonomy>>([]);
   const [isAddNewAutocompleteEnabled, setIsAddNewAutocompleteEnabled] = useState<boolean>(false);
   const [input, setInput] = useState<string>('');
   const [error, setError] = useState<any>({});
@@ -219,15 +219,15 @@ export default function GeoTaxonomySection({
 
     if (outcome === 'success') {
       // eslint-disable-next-line functional/no-let
-      let data = (searchGeotaxonomy as AxiosResponse).data;
+      let dataRetrieve = (searchGeotaxonomy as AxiosResponse).data;
 
-      // dataRetrieve = dataRetrieve.map((value: onboardingInfo2onboardingInstitutionInfo) => ({
-      //   ...value,
-      //   desc: value.description,
-      //   code: value.geotax_id,
-      // }));
+      dataRetrieve = dataRetrieve.map((value: OnboardingInstitutionInfo) => ({
+        ...value,
+        desc: value.description,
+        code: value.geotax_id,
+      }));
 
-      data = data.map((value: OnboardingInstitutionInfo) => ({
+      const data = dataRetrieve.map((value: GeographicTaxonomy) => ({
         ...value,
         label: value.desc,
       }));
