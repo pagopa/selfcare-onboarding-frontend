@@ -229,9 +229,7 @@ export default function PersonalAndBillingDataSection({
                 <CustomTextField
                   {...baseTextFieldProps(
                     'recipientCode',
-                    institutionType === 'PA'
-                      ? t('onboardingFormData.billingDataSection.recipientCodeForPa')
-                      : t('onboardingFormData.billingDataSection.recipientCode'),
+                    t('onboardingFormData.billingDataSection.sdiCode'),
                     400,
                     18
                   )}

@@ -266,6 +266,11 @@ export default {
         closeBtnLabel: 'Esci',
         confirmBtnLabel: 'Torna alle offerte Premium',
       },
+      headerPlanCard: {
+        from: 'Da',
+        to: 'a',
+        mess: '/ mess',
+      },
       carnetPlan: {
         caption: 'PIANO A CARNET - UNA TANTUM',
         discountBoxLabel: '25% di sconto',
@@ -420,6 +425,7 @@ export default {
   },
   stepInstitutionType: {
     title: 'Seleziona il tipo di ente che <1/> rappresenti',
+    subtitle: 'Indica il tipo di ente che aderirà a {{productName}}',
     institutionTypeValues: {
       pa: 'Pubblica Amministrazione',
       gsp: 'Gestore di servizi pubblici',
@@ -460,8 +466,7 @@ export default {
       vatNumberGroup: 'La Partita IVA è di gruppo',
       taxCode: 'Codice Fiscale',
       vatNumber: 'Partita IVA',
-      recipientCode: 'Codice destinatario',
-      recipientCodeForPa: 'Codice univoco',
+      sdiCode: 'Codice SDI',
       recipientCodeDescription: 'È il codice necessario per ricevere le fatture elettroniche',
       gspDescription: 'Sono gestore di almeno uno dei pubblici servizi: Gas, Energia, Telco.',
       pspDataSection: {

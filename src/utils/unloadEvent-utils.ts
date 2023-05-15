@@ -1,3 +1,5 @@
+import { ENV } from './env';
+
 export const unregisterUnloadEvent = (
   setOnExit: React.Dispatch<React.SetStateAction<((exitAction: () => void) => void) | undefined>>
 ) => {
@@ -27,4 +29,9 @@ const keepOnPage = (e: BeforeUnloadEvent) => {
   // eslint-disable-next-line functional/immutable-data
   e.returnValue = message;
   return message;
+};
+
+export const redirectToLogin = () => {
+  const onSuccessEncoded = encodeURIComponent(location.pathname + location.search);
+  window.location.assign(`${ENV.URL_FE.LOGIN}?onSuccess=${onSuccessEncoded}`);
 };
