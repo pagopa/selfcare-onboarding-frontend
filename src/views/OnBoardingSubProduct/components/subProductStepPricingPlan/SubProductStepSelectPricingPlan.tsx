@@ -20,7 +20,7 @@ type Props = StepperStepComponentProps & {
   product?: Product;
 };
 export default function SubProductStepSelectPricingPlan({ forward, product }: Props) {
-  const discount = true;
+  const discount = false;
   const { t } = useTranslation();
   const theme = useTheme();
   const { setRequiredLogin } = useContext(UserContext);
