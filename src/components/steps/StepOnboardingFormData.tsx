@@ -188,7 +188,7 @@ export default function StepOnboardingFormData({
           array1 = formik.values.geographicTaxonomies;
         }
         const arrayDifferences = array1.filter((elementarray1) =>
-          array2.some((elementArray2) => elementarray1?.code !== elementArray2?.code)
+          array2.some((elementArray2) => elementarray1?.code === elementArray2?.code) ? false : true
         );
         if (deltaLength === 0) {
           if (arrayDifferences.length > 0) {
