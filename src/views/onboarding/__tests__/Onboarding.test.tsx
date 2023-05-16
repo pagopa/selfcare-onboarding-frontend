@@ -997,7 +997,7 @@ const verifySubmit = async (productId = 'prod-pn') => {
           ],
           pricingPlan: 'FA',
           geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY
-            ? [{ code: '100', desc: 'ITALIA' }]
+            ? [{ code: '1000', desc: 'ITALIA' }]
             : [],
           assistanceContacts: { supportEmail: 'a@a.it' },
         },

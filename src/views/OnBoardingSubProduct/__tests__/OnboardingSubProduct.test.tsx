@@ -569,7 +569,7 @@ const verifySubmitPostLegals = async () => {
           pricingPlan: 'C0',
           origin: 'IPA',
           geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY
-            ? [{ code: '100', desc: 'ITALIA' }]
+            ? [{ code: '1000', desc: 'ITALIA' }]
             : [],
           assistanceContacts: { supportEmail: 'comune.bollate@pec.it' },
         },

@@ -168,11 +168,11 @@ export default function StepOnboardingFormData({
       previousGeotaxononomies.length > 0
     ) {
       const changedNational2Local =
-        previousGeotaxononomies.some((rv) => rv?.code === '100') &&
-        !formik.values.geographicTaxonomies.some((gv) => gv?.code === '100');
+        previousGeotaxononomies.some((rv) => rv?.code === '1000') &&
+        !formik.values.geographicTaxonomies.some((gv) => gv?.code === '1000');
       const changedToLocal2National =
-        !previousGeotaxononomies.some((rv) => rv?.code === '100') &&
-        formik.values.geographicTaxonomies.some((gv) => gv?.code === '100');
+        !previousGeotaxononomies.some((rv) => rv?.code === '1000') &&
+        formik.values.geographicTaxonomies.some((gv) => gv?.code === '1000');
 
       if (changedNational2Local || changedToLocal2National) {
         setOpenModifyModal(true);

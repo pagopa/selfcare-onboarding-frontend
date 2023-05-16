@@ -151,7 +151,7 @@ const mockPartyRegistry = {
 
 const mockedGeoTaxonomy = [
   {
-    code: '100',
+    code: '1000',
     desc: 'ITALIA',
     region: '12',
     province: '058',

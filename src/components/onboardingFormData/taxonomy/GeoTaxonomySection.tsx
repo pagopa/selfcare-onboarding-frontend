@@ -35,7 +35,7 @@ export default function GeoTaxonomySection({
   formik,
 }: Props) {
   const { t } = useTranslation();
-  const nationalArea = [{ code: '100', desc: 'ITALIA' }];
+  const nationalArea = [{ code: '1000', desc: 'ITALIA' }];
 
   const [isNationalAreaVisible, setIsNationalAreaVisible] = useState<boolean>(false);
   const [isLocalAreaVisible, setIsLocalAreaVisible] = useState<boolean>(false);
@@ -64,7 +64,7 @@ export default function GeoTaxonomySection({
   };
 
   useEffect(() => {
-    if (retrievedTaxonomies && retrievedTaxonomies[0]?.code === '100') {
+    if (retrievedTaxonomies && retrievedTaxonomies[0]?.code === '1000') {
       setIsNationalAreaVisible(true);
       setOptionsSelected(nationalArea);
       setGeographicTaxonomies(optionsSelected);
@@ -73,7 +73,7 @@ export default function GeoTaxonomySection({
       setOptionsSelected(retrievedTaxonomies);
       setIsAddNewAutocompleteEnabled(true);
       setGeographicTaxonomies(optionsSelected);
-    } else if (geotaxonomiesHistory[0]?.code === '100') {
+    } else if (geotaxonomiesHistory[0]?.code === '1000') {
       setIsLocalAreaVisible(false);
     }
   }, [retrievedTaxonomies]);
@@ -82,7 +82,7 @@ export default function GeoTaxonomySection({
     if (geotaxonomiesHistory && geotaxonomiesHistory.length > 0) {
       setOptionsSelected(geotaxonomiesHistory);
       setIsLocalAreaVisible(true);
-      if (geotaxonomiesHistory[0]?.code === '100') {
+      if (geotaxonomiesHistory[0]?.code === '1000') {
         setIsLocalAreaVisible(false);
       }
     }
@@ -105,7 +105,7 @@ export default function GeoTaxonomySection({
   }, [optionsSelected]);
 
   useEffect(() => {
-    if (geotaxonomiesHistory[0]?.code === '100') {
+    if (geotaxonomiesHistory[0]?.code === '1000') {
       setIsLocalAreaVisible(false);
       setIsNationalAreaVisible(true);
     }
@@ -154,12 +154,12 @@ export default function GeoTaxonomySection({
       }
     } else if (geotaxonomiesHistory && geotaxonomiesHistory.length > 0) {
       if (
-        geotaxonomiesHistory[0]?.code === '100' &&
+        geotaxonomiesHistory[0]?.code === '1000' &&
         localState.current &&
         localState.current?.length > 0
       ) {
         setOptionsSelected(localState.current);
-      } else if (geotaxonomiesHistory[0]?.code === '100' && !localState.current) {
+      } else if (geotaxonomiesHistory[0]?.code === '1000' && !localState.current) {
         setOptionsSelected([{ code: '', desc: '' }]);
       } else {
         setOptionsSelected(geotaxonomiesHistory);
