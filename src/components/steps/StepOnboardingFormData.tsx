@@ -23,7 +23,7 @@ import PersonalAndBillingDataSection from '../onboardingFormData/PersonalAndBill
 import DpoSection from '../onboardingFormData/DpoSection';
 import GeoTaxonomySection from '../onboardingFormData/taxonomy/GeoTaxonomySection';
 import GeoTaxSessionModal from '../onboardingFormData/taxonomy/GeoTaxSessionModal';
-import { GeographicTaxonomy } from '../../model/GeographicTaxonomies';
+import { GeographicTaxonomy, nationalValue } from '../../model/GeographicTaxonomies';
 import { fetchWithLogs } from '../../lib/api-utils';
 import { UserContext } from '../../lib/context';
 import { getFetchOutcome } from '../../lib/error-utils';
@@ -168,11 +168,11 @@ export default function StepOnboardingFormData({
       previousGeotaxononomies.length > 0
     ) {
       const changedNational2Local =
-        previousGeotaxononomies.some((rv) => rv?.code === '1000') &&
-        !formik.values.geographicTaxonomies.some((gv) => gv?.code === '1000');
+        previousGeotaxononomies.some((rv) => rv?.code === nationalValue) &&
+        !formik.values.geographicTaxonomies.some((gv) => gv?.code === nationalValue);
       const changedToLocal2National =
-        !previousGeotaxononomies.some((rv) => rv?.code === '1000') &&
-        formik.values.geographicTaxonomies.some((gv) => gv?.code === '1000');
+        !previousGeotaxononomies.some((rv) => rv?.code === nationalValue) &&
+        formik.values.geographicTaxonomies.some((gv) => gv?.code === nationalValue);
 
       if (changedNational2Local || changedToLocal2National) {
         setOpenModifyModal(true);

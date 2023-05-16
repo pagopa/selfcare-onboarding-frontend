@@ -6,7 +6,7 @@ import { HeaderContext, UserContext } from '../../../lib/context';
 import { ENV } from '../../../utils/env';
 import Onboarding from '../Onboarding';
 import '../../../locale';
-import { GeographicTaxonomy } from '../../../model/GeographicTaxonomies';
+import { GeographicTaxonomy, nationalValue } from '../../../model/GeographicTaxonomies';
 
 jest.mock('../../../lib/api-utils');
 jest.setTimeout(30000);
@@ -997,7 +997,7 @@ const verifySubmit = async (productId = 'prod-pn') => {
           ],
           pricingPlan: 'FA',
           geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY
-            ? [{ code: '1000', desc: 'ITALIA' }]
+            ? [{ code: nationalValue, desc: 'ITALIA' }]
             : [],
           assistanceContacts: { supportEmail: 'a@a.it' },
         },

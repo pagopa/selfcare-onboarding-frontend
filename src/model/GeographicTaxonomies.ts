@@ -9,3 +9,5 @@ export const onboardedInstitutionInfo2geographicTaxonomy = (
   code: onboardingInstitutionInfo.code,
   desc: onboardingInstitutionInfo.desc,
 });
+
+export const nationalValue = '1000';

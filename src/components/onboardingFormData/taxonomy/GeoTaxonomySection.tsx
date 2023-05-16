@@ -20,7 +20,7 @@ import { AxiosError, AxiosResponse } from 'axios';
 import { fetchWithLogs } from '../../../lib/api-utils';
 import { getFetchOutcome } from '../../../lib/error-utils';
 import { UserContext } from '../../../lib/context';
-import { GeographicTaxonomy } from '../../../model/GeographicTaxonomies';
+import { GeographicTaxonomy, nationalValue } from '../../../model/GeographicTaxonomies';
 import { useHistoryState } from '../../useHistoryState';
 
 type Props = {
@@ -35,7 +35,7 @@ export default function GeoTaxonomySection({
   formik,
 }: Props) {
   const { t } = useTranslation();
-  const nationalArea = [{ code: '1000', desc: 'ITALIA' }];
+  const nationalArea = [{ code: nationalValue, desc: 'ITALIA' }];
 
   const [isNationalAreaVisible, setIsNationalAreaVisible] = useState<boolean>(false);
   const [isLocalAreaVisible, setIsLocalAreaVisible] = useState<boolean>(false);
@@ -63,10 +63,10 @@ export default function GeoTaxonomySection({
     setError((currError: any) => ({ ...currError, [index]: true }));
   };
 
-  const geotaxItaHistory = geotaxonomiesHistory[0]?.code === '1000';
+  const isGeotaxHistoryNational = geotaxonomiesHistory[0]?.code === nationalValue;
 
   useEffect(() => {
-    if (retrievedTaxonomies && retrievedTaxonomies[0]?.code === '1000') {
+    if (retrievedTaxonomies && retrievedTaxonomies[0]?.code === nationalValue) {
       setIsNationalAreaVisible(true);
       setOptionsSelected(nationalArea);
       setGeographicTaxonomies(optionsSelected);
@@ -75,7 +75,7 @@ export default function GeoTaxonomySection({
       setOptionsSelected(retrievedTaxonomies);
       setIsAddNewAutocompleteEnabled(true);
       setGeographicTaxonomies(optionsSelected);
-    } else if (geotaxItaHistory) {
+    } else if (isGeotaxHistoryNational) {
       setIsLocalAreaVisible(false);
     }
   }, [retrievedTaxonomies]);
@@ -84,7 +84,7 @@ export default function GeoTaxonomySection({
     if (geotaxonomiesHistory && geotaxonomiesHistory.length > 0) {
       setOptionsSelected(geotaxonomiesHistory);
       setIsLocalAreaVisible(true);
-      if (geotaxItaHistory) {
+      if (isGeotaxHistoryNational) {
         setIsLocalAreaVisible(false);
       }
     }
@@ -107,7 +107,7 @@ export default function GeoTaxonomySection({
   }, [optionsSelected]);
 
   useEffect(() => {
-    if (geotaxItaHistory) {
+    if (isGeotaxHistoryNational) {
       setIsLocalAreaVisible(false);
       setIsNationalAreaVisible(true);
     }
@@ -155,9 +155,9 @@ export default function GeoTaxonomySection({
         setOptionsSelected(retrievedTaxonomies);
       }
     } else if (geotaxonomiesHistory && geotaxonomiesHistory.length > 0) {
-      if (geotaxItaHistory && localState.current && localState.current?.length > 0) {
+      if (isGeotaxHistoryNational && localState.current && localState.current?.length > 0) {
         setOptionsSelected(localState.current);
-      } else if (geotaxItaHistory && !localState.current) {
+      } else if (isGeotaxHistoryNational && !localState.current) {
         setOptionsSelected([{ code: '', desc: '' }]);
       } else {
         setOptionsSelected(geotaxonomiesHistory);
