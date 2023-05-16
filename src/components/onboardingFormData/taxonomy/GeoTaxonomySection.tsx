@@ -63,6 +63,8 @@ export default function GeoTaxonomySection({
     setError((currError: any) => ({ ...currError, [index]: true }));
   };
 
+  const geotaxItaHistory = geotaxonomiesHistory[0]?.code === '1000';
+
   useEffect(() => {
     if (retrievedTaxonomies && retrievedTaxonomies[0]?.code === '1000') {
       setIsNationalAreaVisible(true);
@@ -73,7 +75,7 @@ export default function GeoTaxonomySection({
       setOptionsSelected(retrievedTaxonomies);
       setIsAddNewAutocompleteEnabled(true);
       setGeographicTaxonomies(optionsSelected);
-    } else if (geotaxonomiesHistory[0]?.code === '1000') {
+    } else if (geotaxItaHistory) {
       setIsLocalAreaVisible(false);
     }
   }, [retrievedTaxonomies]);
@@ -82,7 +84,7 @@ export default function GeoTaxonomySection({
     if (geotaxonomiesHistory && geotaxonomiesHistory.length > 0) {
       setOptionsSelected(geotaxonomiesHistory);
       setIsLocalAreaVisible(true);
-      if (geotaxonomiesHistory[0]?.code === '1000') {
+      if (geotaxItaHistory) {
         setIsLocalAreaVisible(false);
       }
     }
@@ -105,7 +107,7 @@ export default function GeoTaxonomySection({
   }, [optionsSelected]);
 
   useEffect(() => {
-    if (geotaxonomiesHistory[0]?.code === '1000') {
+    if (geotaxItaHistory) {
       setIsLocalAreaVisible(false);
       setIsNationalAreaVisible(true);
     }
@@ -153,13 +155,9 @@ export default function GeoTaxonomySection({
         setOptionsSelected(retrievedTaxonomies);
       }
     } else if (geotaxonomiesHistory && geotaxonomiesHistory.length > 0) {
-      if (
-        geotaxonomiesHistory[0]?.code === '1000' &&
-        localState.current &&
-        localState.current?.length > 0
-      ) {
+      if (geotaxItaHistory && localState.current && localState.current?.length > 0) {
         setOptionsSelected(localState.current);
-      } else if (geotaxonomiesHistory[0]?.code === '1000' && !localState.current) {
+      } else if (geotaxItaHistory && !localState.current) {
         setOptionsSelected([{ code: '', desc: '' }]);
       } else {
         setOptionsSelected(geotaxonomiesHistory);
