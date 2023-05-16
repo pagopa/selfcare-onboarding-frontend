@@ -5,6 +5,7 @@ import {
   SelfcareParty,
   UserOnCreate,
 } from '../../../types';
+import { nationalValue } from '../../model/GeographicTaxonomies';
 
 const mockPartyRegistry = {
   items: [
@@ -151,7 +152,7 @@ const mockPartyRegistry = {
 
 const mockedGeoTaxonomy = [
   {
-    code: '100',
+    code: nationalValue,
     desc: 'ITALIA',
     region: '12',
     province: '058',

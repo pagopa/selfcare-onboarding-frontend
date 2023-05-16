@@ -7,7 +7,7 @@ import OnBoardingSubProduct from '../OnBoardingSubProduct';
 import '../../../locale';
 import { Route, Router, Switch } from 'react-router';
 import { createMemoryHistory } from 'history';
-import { GeographicTaxonomy } from '../../../model/GeographicTaxonomies';
+import { GeographicTaxonomy, nationalValue } from '../../../model/GeographicTaxonomies';
 
 jest.mock('../../../lib/api-utils');
 
@@ -569,7 +569,7 @@ const verifySubmitPostLegals = async () => {
           pricingPlan: 'C0',
           origin: 'IPA',
           geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY
-            ? [{ code: '100', desc: 'ITALIA' }]
+            ? [{ code: nationalValue, desc: 'ITALIA' }]
             : [],
           assistanceContacts: { supportEmail: 'comune.bollate@pec.it' },
         },

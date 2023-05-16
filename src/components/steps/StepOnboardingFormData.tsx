@@ -23,7 +23,7 @@ import PersonalAndBillingDataSection from '../onboardingFormData/PersonalAndBill
 import DpoSection from '../onboardingFormData/DpoSection';
 import GeoTaxonomySection from '../onboardingFormData/taxonomy/GeoTaxonomySection';
 import GeoTaxSessionModal from '../onboardingFormData/taxonomy/GeoTaxSessionModal';
-import { GeographicTaxonomy } from '../../model/GeographicTaxonomies';
+import { GeographicTaxonomy, nationalValue } from '../../model/GeographicTaxonomies';
 import { fetchWithLogs } from '../../lib/api-utils';
 import { UserContext } from '../../lib/context';
 import { getFetchOutcome } from '../../lib/error-utils';
@@ -168,11 +168,11 @@ export default function StepOnboardingFormData({
       previousGeotaxononomies.length > 0
     ) {
       const changedNational2Local =
-        previousGeotaxononomies.some((rv) => rv?.code === '100') &&
-        !formik.values.geographicTaxonomies.some((gv) => gv?.code === '100');
+        previousGeotaxononomies.some((rv) => rv?.code === nationalValue) &&
+        !formik.values.geographicTaxonomies.some((gv) => gv?.code === nationalValue);
       const changedToLocal2National =
-        !previousGeotaxononomies.some((rv) => rv?.code === '100') &&
-        formik.values.geographicTaxonomies.some((gv) => gv?.code === '100');
+        !previousGeotaxononomies.some((rv) => rv?.code === nationalValue) &&
+        formik.values.geographicTaxonomies.some((gv) => gv?.code === nationalValue);
 
       if (changedNational2Local || changedToLocal2National) {
         setOpenModifyModal(true);
@@ -188,7 +188,7 @@ export default function StepOnboardingFormData({
           array1 = formik.values.geographicTaxonomies;
         }
         const arrayDifferences = array1.filter((elementarray1) =>
-          array2.some((elementArray2) => elementarray1?.code !== elementArray2?.code)
+          array2.some((elementArray2) => elementarray1?.code === elementArray2?.code) ? false : true
         );
         if (deltaLength === 0) {
           if (arrayDifferences.length > 0) {
