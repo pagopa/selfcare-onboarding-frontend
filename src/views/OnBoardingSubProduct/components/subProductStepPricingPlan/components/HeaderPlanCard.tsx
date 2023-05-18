@@ -12,6 +12,7 @@ type Props = {
   firstNumberAfterComma: string;
   secondNumberBeforeComma: string;
   secondNumberAfterComma: string;
+  carnetPlan: boolean;
 };
 export default function HeaderPlanCard({
   discount,
@@ -22,6 +23,7 @@ export default function HeaderPlanCard({
   firstNumberAfterComma,
   secondNumberBeforeComma,
   secondNumberAfterComma,
+  carnetPlan,
 }: Props) {
   const theme = useTheme();
   const fontBigBlue = { color: '#0073E6', fontSize: '50px', fontWeight: '700' };
@@ -77,7 +79,17 @@ export default function HeaderPlanCard({
             alignItems="center"
             fontFamily="Titillium Web !important"
           >
-            <Trans i18nKey="onBoardingSubProduct.subProductStepSelectPricingPlan.carnetPlan.infoLabel">
+            <Trans
+              i18nKey={
+                carnetPlan
+                  ? `onBoardingSubProduct.subProductStepSelectPricingPlan.carnetPlan.${
+                      discount ? 'infoLabelDiscounted' : 'infoLabel'
+                    }`
+                  : `onBoardingSubProduct.subProductStepSelectPricingPlan.consumptionPlan.${
+                      discount ? 'infoLabelDiscounted' : 'infoLabel'
+                    }`
+              }
+            >
               <span style={{ color: '#5C6F82', fontSize: '16px', marginRight: '8px' }}>
                 {t('onBoardingSubProduct.subProductStepSelectPricingPlan.headerPlanCard.from')}
               </span>
