@@ -20,7 +20,7 @@ type Props = StepperStepComponentProps & {
   product?: Product;
 };
 export default function SubProductStepSelectPricingPlan({ forward, product }: Props) {
-  const discount = false;
+  const discount = true;
   const { t } = useTranslation();
   const theme = useTheme();
   const { setRequiredLogin } = useContext(UserContext);
@@ -146,9 +146,10 @@ export default function SubProductStepSelectPricingPlan({ forward, product }: Pr
                 )}
                 title={t('onBoardingSubProduct.subProductStepSelectPricingPlan.carnetPlan.title')}
                 firstNumberBeforeComma={'0,'}
-                firstNumberAfterComma={'15€'}
+                firstNumberAfterComma={discount ? '20' : '15€'}
                 secondNumberBeforeComma={'0,'}
-                secondNumberAfterComma={'165€'}
+                secondNumberAfterComma={discount ? '22' : '165€'}
+                carnetPlan={true}
               />
             </Box>
             <Box mr={3} sx={{ borderRadius: '16px' }}>
@@ -170,9 +171,10 @@ export default function SubProductStepSelectPricingPlan({ forward, product }: Pr
                   </Trans>
                 }
                 firstNumberBeforeComma={'0,'}
-                firstNumberAfterComma={'15€'}
+                firstNumberAfterComma={discount ? '20' : '15€'}
                 secondNumberBeforeComma={'0,'}
-                secondNumberAfterComma={'187€'}
+                secondNumberAfterComma={discount ? '25' : '187€'}
+                carnetPlan={false}
               />
             </Box>
           </Grid>

@@ -12,6 +12,7 @@ type Props = {
   firstNumberAfterComma: string;
   secondNumberBeforeComma: string;
   secondNumberAfterComma: string;
+  carnetPlan: boolean;
 };
 export default function HeaderPlanCard({
   discount,
@@ -22,6 +23,7 @@ export default function HeaderPlanCard({
   firstNumberAfterComma,
   secondNumberBeforeComma,
   secondNumberAfterComma,
+  carnetPlan,
 }: Props) {
   const theme = useTheme();
   const fontBigBlue = { color: '#0073E6', fontSize: '50px', fontWeight: '700' };
@@ -77,27 +79,63 @@ export default function HeaderPlanCard({
             alignItems="center"
             fontFamily="Titillium Web !important"
           >
-            <Trans i18nKey="onBoardingSubProduct.subProductStepSelectPricingPlan.carnetPlan.infoLabel">
-              <span style={{ color: '#5C6F82', fontSize: '16px', marginRight: '8px' }}>
-                {t('onBoardingSubProduct.subProductStepSelectPricingPlan.headerPlanCard.from')}
-              </span>
+            {!discount ? (
+              <Trans
+                i18nKey={
+                  carnetPlan
+                    ? 'onBoardingSubProduct.subProductStepSelectPricingPlan.carnetPlan.infoLabel'
+                    : 'onBoardingSubProduct.subProductStepSelectPricingPlan.consumptionPlan.infoLabel'
+                }
+              >
+                <span style={{ color: '#5C6F82', fontSize: '16px', marginRight: '8px' }}>
+                  {t('onBoardingSubProduct.subProductStepSelectPricingPlan.headerPlanCard.from')}
+                </span>
 
-              <span style={fontBigBlue}>{firstNumberBeforeComma}</span>
+                <span style={fontBigBlue}>{firstNumberBeforeComma}</span>
 
-              <span style={fontMediumBlueRegular}>{firstNumberAfterComma}</span>
+                <span style={fontMediumBlueRegular}>{firstNumberAfterComma}</span>
 
-              <span style={{ color: '#5C6F82', fontSize: '16px', marginRight: '8px' }}>
-                {t('onBoardingSubProduct.subProductStepSelectPricingPlan.headerPlanCard.to')}
-              </span>
+                <span style={{ color: '#5C6F82', fontSize: '16px', marginRight: '8px' }}>
+                  {t('onBoardingSubProduct.subProductStepSelectPricingPlan.headerPlanCard.to')}
+                </span>
 
-              <span style={fontBigBlue}>{secondNumberBeforeComma}</span>
+                <span style={fontBigBlue}>{secondNumberBeforeComma}</span>
 
-              <span style={fontMediumBlueRegular}>{secondNumberAfterComma}</span>
+                <span style={fontMediumBlueRegular}>{secondNumberAfterComma}</span>
 
-              <span style={{ color: '#5C6F82', fontSize: '16px', marginRight: '8px' }}>
-                {t('onBoardingSubProduct.subProductStepSelectPricingPlan.headerPlanCard.mess')}
-              </span>
-            </Trans>
+                <span style={{ color: '#5C6F82', fontSize: '16px', marginRight: '8px' }}>
+                  {t('onBoardingSubProduct.subProductStepSelectPricingPlan.headerPlanCard.mess')}
+                </span>
+              </Trans>
+            ) : (
+              <Trans
+                i18nKey={
+                  carnetPlan
+                    ? 'onBoardingSubProduct.subProductStepSelectPricingPlan.carnetPlan.infoLabelDiscounted'
+                    : 'onBoardingSubProduct.subProductStepSelectPricingPlan.consumptionPlan.infoLabelDiscounted'
+                }
+              >
+                <span style={{ color: '#5C6F82', fontSize: '16px', marginRight: '8px' }}>
+                  {t('onBoardingSubProduct.subProductStepSelectPricingPlan.headerPlanCard.from')}
+                </span>
+
+                <span style={fontBigBlue}>{firstNumberBeforeComma}</span>
+
+                <span style={fontMediumBlueRegular}>{firstNumberAfterComma}</span>
+
+                <span style={{ color: '#5C6F82', fontSize: '16px', marginRight: '8px' }}>
+                  {t('onBoardingSubProduct.subProductStepSelectPricingPlan.headerPlanCard.to')}
+                </span>
+
+                <span style={fontBigBlue}>{secondNumberBeforeComma}</span>
+
+                <span style={fontMediumBlueRegular}>{secondNumberAfterComma}</span>
+
+                <span style={{ color: '#5C6F82', fontSize: '16px', marginRight: '8px' }}>
+                  {t('onBoardingSubProduct.subProductStepSelectPricingPlan.headerPlanCard.mess')}
+                </span>
+              </Trans>
+            )}
           </Typography>
         </Box>
       </CardContent>
