@@ -146,9 +146,10 @@ export default function SubProductStepSelectPricingPlan({ forward, product }: Pr
                 )}
                 title={t('onBoardingSubProduct.subProductStepSelectPricingPlan.carnetPlan.title')}
                 firstNumberBeforeComma={'0,'}
-                firstNumberAfterComma={'15€'}
+                firstNumberAfterComma={discount ? '15€' : '20€'}
                 secondNumberBeforeComma={'0,'}
-                secondNumberAfterComma={'165€'}
+                secondNumberAfterComma={discount ? '165€' : '22€'}
+                carnetPlan={true}
               />
             </Box>
             <Box mr={3} sx={{ borderRadius: '16px' }}>
@@ -170,9 +171,10 @@ export default function SubProductStepSelectPricingPlan({ forward, product }: Pr
                   </Trans>
                 }
                 firstNumberBeforeComma={'0,'}
-                firstNumberAfterComma={'15€'}
+                firstNumberAfterComma={discount ? '15€' : '20€'}
                 secondNumberBeforeComma={'0,'}
-                secondNumberAfterComma={'187€'}
+                secondNumberAfterComma={discount ? '187€' : '25€'}
+                carnetPlan={false}
               />
             </Box>
           </Grid>

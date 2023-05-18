@@ -275,7 +275,8 @@ export default {
         caption: 'PIANO A CARNET - UNA TANTUM',
         discountBoxLabel: '25% di sconto',
         title: 'Scegli tra i 7 carnet differenti pensati per ogni tua esigenza',
-        infoLabel: `<0>Da</0><1>0,</1><2>15€</2><3>a</3><4>0,</4><5>165€</5><6>/mess</6>`,
+        infoLabelDiscounted: `<0>Da</0><1>0,</1><2>15€</2><3>a</3><4>0,</4><5>165€</5><6>/mess</6>`,
+        infoLabel: `<0>Da</0><1>0,</1><2>20€</2><3>a</3><4>0,</4><5>22</5><6>/mess</6>`,
         showMore: 'Scopri di più',
         showLess: 'Mostra meno',
         description:
@@ -340,7 +341,8 @@ export default {
         caption: 'PIANO A CONSUMO',
         discountBoxLabel: '25% di sconto',
         title: 'Scegli di pagare solo i messaggi <1/> effettivi che invii',
-        infoLabel: `<0>Da</0><1>0,</1><2>15€</2><3>a</3><4>0,</4><5>187€</5><6>/mess</6>`,
+        infoLabelDiscounted: `<0>Da</0><1>0,</1><2>15€</2><3>a</3><4>0,</4><5>187€</5><6>/mess</6>`,
+        infoLabel: `<0>Da</0><1>0,</1><2>20€</2><3>a</3><4>0,</4><5>25</5><6>/mess</6>`,
         showMore: 'Scopri di più',
         showLess: 'Mostra meno',
         description:
