@@ -10,4 +10,4 @@ export const onboardedInstitutionInfo2geographicTaxonomy = (
   desc: onboardingInstitutionInfo.desc,
 });
 
-export const nationalValue = '1000';
+export const nationalValue = 'ITA';
