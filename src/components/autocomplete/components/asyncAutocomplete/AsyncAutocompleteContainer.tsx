@@ -35,6 +35,8 @@ type Props = {
   setCfResult: React.Dispatch<React.SetStateAction<InstitutionResource | undefined>>;
   cfResult?: InstitutionResource;
   product?: Product | null;
+  isAooCodeSelected: boolean;
+  isUoCodeSelected: boolean;
 };
 
 // TODO: handle cognitive-complexity
@@ -57,6 +59,8 @@ export default function AsyncAutocompleteContainer({
   setCfResult,
   cfResult,
   product,
+  isAooCodeSelected,
+  isUoCodeSelected,
 }: Props) {
   const { setRequiredLogin } = useContext(UserContext);
   const { t } = useTranslation();
@@ -121,6 +125,18 @@ export default function AsyncAutocompleteContainer({
     setIsLoading(false);
   };
 
+  const handleSearchByCode = async (
+    query: string,
+    isAooCodeSelected: boolean,
+    isUoCodeSelected: boolean
+  ) => {
+    if (isAooCodeSelected && query.length === 7) {
+      console.log('xx query', query, isAooCodeSelected);
+    } else if (isUoCodeSelected && query.length === 6) {
+      console.log('xx query', query, isUoCodeSelected);
+    }
+  };
+
   const handleChange = (event: any) => {
     const value = event.target.value as string;
     setInput(value);
@@ -130,6 +146,8 @@ export default function AsyncAutocompleteContainer({
         void debounce(handleSearchByBusinessName, 100)(value);
       } else if (isTaxCodeSelected && value.length === 11) {
         void handleSearchByTaxCode(value);
+      } else {
+        void handleSearchByCode(value, isAooCodeSelected, isUoCodeSelected);
       }
     }
     if (value === '') {

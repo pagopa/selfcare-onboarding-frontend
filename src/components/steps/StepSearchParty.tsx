@@ -205,6 +205,7 @@ export function StepSearchParty({
             optionKey="id"
             optionLabel="description"
             isSearchFieldSelected={isSearchFieldSelected}
+            setIsSearchFieldSelected={setIsSearchFieldSelected}
             product={product}
           />
         </Grid>

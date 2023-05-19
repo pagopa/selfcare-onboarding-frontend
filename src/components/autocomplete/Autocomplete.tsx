@@ -3,7 +3,7 @@ import { Theme, Grid, Paper } from '@mui/material';
 import { Endpoint, Product } from '../../../types';
 import { InstitutionResource } from '../../model/InstitutionResource';
 import AsyncAutocompleteContainer from './components/asyncAutocomplete/AsyncAutocompleteContainer';
-import PartyAdvancedRadioButton from './components/partyAdvancedSearchType/PartyAdvancedRadioButton';
+import PartyAdvancedSelect from './components/partyAdvancedSearchType/PartyAdvancedSelect';
 
 type AutocompleteProps = {
   selected: any;
@@ -14,6 +14,7 @@ type AutocompleteProps = {
   optionLabel?: string;
   theme: Theme;
   isSearchFieldSelected: boolean;
+  setIsSearchFieldSelected: React.Dispatch<React.SetStateAction<boolean>>;
   product?: Product | null;
 };
 
@@ -28,10 +29,13 @@ export function Autocomplete({
   theme,
   isSearchFieldSelected,
   product,
+  setIsSearchFieldSelected,
 }: AutocompleteProps) {
   const [options, setOptions] = useState<Array<InstitutionResource>>([]);
   const [cfResult, setCfResult] = useState<InstitutionResource>();
   const [isBusinessNameSelected, setIsBusinessNameSelected] = useState<boolean>(true);
+  const [isAooCodeSelected, setIsAooCodeSelected] = useState<boolean>(false);
+  const [isUoCodeSelected, setIsUoCodeSelected] = useState<boolean>(false);
 
   const [isTaxCodeSelected, setIsTaxCodeSelected] = useState<boolean>();
   const [input, setInput] = useState<string>('');
@@ -52,11 +56,22 @@ export function Autocomplete({
       <Grid container mx={selected ? 4 : undefined}>
         {!selected && (
           <Grid item xs={12} px={4} pt={4}>
-            <PartyAdvancedRadioButton
+            {/* <PartyAdvancedRadioButton
               setIsTaxCodeSelected={setIsTaxCodeSelected}
               setIsBusinessNameSelected={setIsBusinessNameSelected}
               setOptions={setOptions}
               setInput={setInput}
+            /> */}
+
+            <PartyAdvancedSelect
+              setIsTaxCodeSelected={setIsTaxCodeSelected}
+              setIsBusinessNameSelected={setIsBusinessNameSelected}
+              setIsAooCodeSelected={setIsAooCodeSelected}
+              setIsUoCodeSelected={setIsUoCodeSelected}
+              setOptions={setOptions}
+              setInput={setInput}
+              setIsSearchFieldSelected={setIsSearchFieldSelected}
+              selected={selected}
             />
           </Grid>
         )}
@@ -80,6 +95,8 @@ export function Autocomplete({
           setCfResult={setCfResult}
           cfResult={cfResult}
           product={product}
+          isAooCodeSelected={isAooCodeSelected}
+          isUoCodeSelected={isUoCodeSelected}
         />
       </Grid>
     </Paper>

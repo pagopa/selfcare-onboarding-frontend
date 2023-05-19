@@ -18,7 +18,8 @@ export default {
     advancedSearchLabel: 'Cerca per',
     businessName: 'Ragione Sociale',
     taxCode: 'Codice Fiscale dell’ente',
-    ipaCode: 'Codice IPA',
+    aooCode: 'Codice univoco AOO',
+    uoCode: 'Codice univoco UO',
   },
   confirmRegistrationStep0: {
     title: "Carica l'Accordo di Adesione",

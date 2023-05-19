@@ -9,6 +9,8 @@ type Props = {
   setOptions: React.Dispatch<React.SetStateAction<Array<any>>>;
   setInput: React.Dispatch<React.SetStateAction<string>>;
   setIsSearchFieldSelected: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsAooCodeSelected: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsUoCodeSelected: React.Dispatch<React.SetStateAction<boolean>>;
   selected: boolean;
 };
 
@@ -18,6 +20,8 @@ export default function PartyAdvancedSelect({
   setOptions,
   setInput,
   setIsSearchFieldSelected,
+  setIsAooCodeSelected,
+  setIsUoCodeSelected,
 }: Props) {
   const { t } = useTranslation();
 
@@ -27,9 +31,16 @@ export default function PartyAdvancedSelect({
     setTypeOfSearch(event.target.value as string);
     setIsSearchFieldSelected(true);
   };
-  const onSelectValue = (isBusinessNameSelected: boolean, isTaxCodeSelected: boolean) => {
+  const onSelectValue = (
+    isBusinessNameSelected: boolean,
+    isTaxCodeSelected: boolean,
+    isAooCodeSelected: boolean,
+    isUoCodeSelected: boolean
+  ) => {
     setIsBusinessNameSelected(isBusinessNameSelected);
     setIsTaxCodeSelected(isTaxCodeSelected);
+    setIsAooCodeSelected(isAooCodeSelected);
+    setIsUoCodeSelected(isUoCodeSelected);
     setOptions([]);
     setInput('');
   };
@@ -44,13 +55,18 @@ export default function PartyAdvancedSelect({
         label={t('partyAdvancedSelect.advancedSearchLabel')}
         onChange={handleTypeSearchChange}
       >
-        <MenuItem value={'businessName'} onClick={() => onSelectValue(true, false)}>
+        <MenuItem value={'businessName'} onClick={() => onSelectValue(true, false, false, false)}>
           {t('partyAdvancedSelect.businessName')}
         </MenuItem>
-        <MenuItem value={'taxCode'} onClick={() => onSelectValue(false, true)}>
+        <MenuItem value={'taxCode'} onClick={() => onSelectValue(false, true, false, false)}>
           {t('partyAdvancedSelect.taxCode')}
         </MenuItem>
-        <MenuItem value={'ipaCode'}> {t('partyAdvancedSelect.ipaCode')}</MenuItem>
+        <MenuItem value={'aooCode'} onClick={() => onSelectValue(false, false, true, false)}>
+          {t('partyAdvancedSelect.aooCode')}
+        </MenuItem>
+        <MenuItem value={'uoCode'} onClick={() => onSelectValue(false, false, false, true)}>
+          {t('partyAdvancedSelect.uoCode')}
+        </MenuItem>
       </Select>
     </FormControl>
   );
