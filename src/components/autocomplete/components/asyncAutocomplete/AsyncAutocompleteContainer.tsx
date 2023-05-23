@@ -1,19 +1,23 @@
-import { Theme, Grid, Typography } from '@mui/material';
-import { Box } from '@mui/system';
-import { useContext, useState } from 'react';
 import { AxiosError, AxiosResponse } from 'axios';
 import debounce from 'lodash/debounce';
+import { useContext, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { UserContext } from '../../../../lib/context';
-import { fetchWithLogs } from '../../../../lib/api-utils';
-import { InstitutionResource } from '../../../../model/InstitutionResource';
-import { getFetchOutcome } from '../../../../lib/error-utils';
+
+import { Grid, Theme, Typography } from '@mui/material';
+import { Box } from '@mui/system';
+
 import { Endpoint, Product } from '../../../../../types';
-import { ENV } from '../../../../utils/env';
 import { ReactComponent as PartyIcon } from '../../../../assets/onboarding_party_icon.svg';
+import { fetchWithLogs } from '../../../../lib/api-utils';
+import { UserContext } from '../../../../lib/context';
+import { getFetchOutcome } from '../../../../lib/error-utils';
+import { AooData } from '../../../../model/AooData';
+import { InstitutionResource } from '../../../../model/InstitutionResource';
+import { UoData } from '../../../../model/UoModel';
+import { ENV } from '../../../../utils/env';
 import AsyncAutocompleteResultsBusinessName from './components/AsyncAutocompleteResultsBusinessName';
+import AsyncAutocompleteResultsCode from './components/AsyncAutocompleteResultsCode';
 import AsyncAutocompleteSearch from './components/AsyncAutocompleteSearch';
-import AsyncAutocompleteResultsTaxCode from './components/AsyncAutocompleteResultsTaxCode';
 
 type Props = {
   optionKey?: string;
@@ -37,6 +41,10 @@ type Props = {
   product?: Product | null;
   isAooCodeSelected: boolean;
   isUoCodeSelected: boolean;
+  setAooResult: React.Dispatch<React.SetStateAction<AooData | undefined>>;
+  setUoResult: React.Dispatch<React.SetStateAction<UoData | undefined>>;
+  aooResult?: AooData;
+  uoResult?: UoData;
 };
 
 // TODO: handle cognitive-complexity
@@ -61,6 +69,10 @@ export default function AsyncAutocompleteContainer({
   product,
   isAooCodeSelected,
   isUoCodeSelected,
+  setAooResult,
+  setUoResult,
+  aooResult,
+  uoResult,
 }: Props) {
   const { setRequiredLogin } = useContext(UserContext);
   const { t } = useTranslation();
@@ -130,11 +142,36 @@ export default function AsyncAutocompleteContainer({
     isAooCodeSelected: boolean,
     isUoCodeSelected: boolean
   ) => {
+    setIsLoading(true);
+
     if (isAooCodeSelected && query.length === 7) {
-      console.log('xx query', query, isAooCodeSelected);
+      const searchResponse = await fetchWithLogs(
+        { endpoint: 'ONBOARDING_GET_AOO_CODE_INFO', endpointParams: { codiceUniAoo: query } },
+        {
+          method: 'GET',
+        },
+        () => setRequiredLogin(true)
+      );
+
+      const outcome = getFetchOutcome(searchResponse);
+      if (outcome === 'success') {
+        setAooResult((searchResponse as AxiosResponse).data);
+      }
     } else if (isUoCodeSelected && query.length === 6) {
-      console.log('xx query', query, isUoCodeSelected);
+      const searchResponse = await fetchWithLogs(
+        { endpoint: 'ONBOARDING_GET_UO_CODE_INFO', endpointParams: { codiceUniUo: query } },
+        {
+          method: 'GET',
+        },
+        () => setRequiredLogin(true)
+      );
+
+      const outcome = getFetchOutcome(searchResponse);
+      if (outcome === 'success') {
+        setUoResult((searchResponse as AxiosResponse).data);
+      }
     }
+    setIsLoading(false);
   };
 
   const handleChange = (event: any) => {
@@ -222,14 +259,19 @@ export default function AsyncAutocompleteContainer({
           </>
         ) : (
           <>
-            {isTaxCodeSelected && input !== undefined && input.length === 11 && cfResult ? (
-              <AsyncAutocompleteResultsTaxCode
+            {input !== undefined && input.length > 6 ? (
+              <AsyncAutocompleteResultsCode
                 setSelected={setSelected}
                 cfResult={cfResult}
                 setCfResult={setCfResult}
                 isLoading={isLoading}
                 getOptionLabel={getOptionLabel}
                 getOptionKey={getOptionKey}
+                aooResult={aooResult}
+                uoResult={uoResult}
+                isTaxCodeSelected={isTaxCodeSelected}
+                isAooCodeSelected={isAooCodeSelected}
+                isUoCodeSelected={isUoCodeSelected}
               />
             ) : (
               input.length >= 1 &&

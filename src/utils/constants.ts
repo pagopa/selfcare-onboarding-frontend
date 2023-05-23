@@ -1,9 +1,9 @@
 import { RoutesObject } from '../../types';
-import Onboarding from '../views/onboarding/Onboarding';
-import RejectRegistration from '../views/RejectRegistration';
 import CompleteRegistrationComponent from '../views/CompleteRegistrationComponent';
 import NoProductPage from '../views/NoProductPage';
+import Onboarding from '../views/onboarding/Onboarding';
 import OnBoardingSubProduct from '../views/OnBoardingSubProduct/OnBoardingSubProduct';
+import RejectRegistration from '../views/RejectRegistration';
 import { ENV } from './env';
 
 const IS_DEVELOP = process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test';
@@ -92,6 +92,12 @@ export const API = {
   },
   ONBOARDING_GET_PREVIOUS_GEOTAXONOMIES: {
     URL: ENV.URL_API.ONBOARDING + '/institutions/{{externalInstitutionId}}/geographicTaxonomy',
+  },
+  ONBOARDING_GET_UO_CODE_INFO: {
+    URL: ENV.URL_API.PARTY_REGISTRY_PROXY + '/uo/{{codiceUniUo}}',
+  },
+  ONBOARDING_GET_AOO_CODE_INFO: {
+    URL: ENV.URL_API.PARTY_REGISTRY_PROXY + '/aoo/{{codiceUniAoo}}',
   },
 };
 

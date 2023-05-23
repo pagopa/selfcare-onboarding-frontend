@@ -1,6 +1,9 @@
 import { Box, styled } from '@mui/system';
 import { PartyAccountItemButton } from '@pagopa/mui-italia/dist/components/PartyAccountItemButton';
+
+import { AooData } from '../../../../../model/AooData';
 import { InstitutionResource } from '../../../../../model/InstitutionResource';
+import { UoData } from '../../../../../model/UoModel';
 
 const CustomBox = styled(Box)({
   /* width */
@@ -31,14 +34,29 @@ type Props = {
   getOptionKey: (option: any) => string;
   cfResult?: InstitutionResource;
   setCfResult: React.Dispatch<React.SetStateAction<InstitutionResource | undefined>>;
+  uoResult?: UoData;
+  aooResult?: AooData;
+  isTaxCodeSelected?: boolean;
+  isAooCodeSelected?: boolean;
+  isUoCodeSelected?: boolean;
 };
 
-export default function AsyncAutocompleteResultsTaxCode({
+export default function AsyncAutocompleteResultsCode({
   setSelected,
   isLoading,
   cfResult,
   setCfResult,
+  uoResult,
+  aooResult,
+  isTaxCodeSelected,
+  isAooCodeSelected,
+  isUoCodeSelected,
 }: Props) {
+  const visibleCode = isTaxCodeSelected
+    ? cfResult
+    : isAooCodeSelected
+    ? aooResult
+    : isUoCodeSelected ?? uoResult;
   return (
     <CustomBox my={2} {...cfResult} width="80%" maxHeight="200px" overflow="auto">
       {!isLoading && (
@@ -48,16 +66,24 @@ export default function AsyncAutocompleteResultsTaxCode({
           display="flex"
           onKeyDownCapture={(e) => {
             if (e.key === 'Enter' || e.key === ' ') {
-              setSelected(cfResult);
+              setSelected(visibleCode);
               setCfResult(undefined);
             }
           }}
         >
           <PartyAccountItemButton
-            partyName={cfResult?.description ?? ''}
+            partyName={
+              isTaxCodeSelected && cfResult?.description
+                ? cfResult?.description
+                : isAooCodeSelected && aooResult?.denominazioneAoo
+                ? aooResult?.denominazioneAoo
+                : isUoCodeSelected && uoResult?.descrizioneUo
+                ? uoResult?.descrizioneUo
+                : ''
+            }
             image={' '}
             action={() => {
-              setSelected(cfResult);
+              setSelected(visibleCode);
               setCfResult(undefined);
             }}
             maxCharactersNumberMultiLine={20}

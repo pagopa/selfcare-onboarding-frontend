@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
-import { Theme, Grid, Paper } from '@mui/material';
+
+import { Grid, Paper, Theme } from '@mui/material';
+
 import { Endpoint, Product } from '../../../types';
+import { AooData } from '../../model/AooData';
 import { InstitutionResource } from '../../model/InstitutionResource';
+import { UoData } from '../../model/UoModel';
 import AsyncAutocompleteContainer from './components/asyncAutocomplete/AsyncAutocompleteContainer';
 import PartyAdvancedSelect from './components/partyAdvancedSearchType/PartyAdvancedSelect';
 
@@ -33,6 +37,12 @@ export function Autocomplete({
 }: AutocompleteProps) {
   const [options, setOptions] = useState<Array<InstitutionResource>>([]);
   const [cfResult, setCfResult] = useState<InstitutionResource>();
+  const [aooResult, setAooResult] = useState<AooData>();
+  const [uoResult, setUoResult] = useState<UoData>();
+
+  console.log('aooResult', aooResult);
+  console.log('aooResult', uoResult);
+
   const [isBusinessNameSelected, setIsBusinessNameSelected] = useState<boolean>(true);
   const [isAooCodeSelected, setIsAooCodeSelected] = useState<boolean>(false);
   const [isUoCodeSelected, setIsUoCodeSelected] = useState<boolean>(false);
@@ -56,13 +66,6 @@ export function Autocomplete({
       <Grid container mx={selected ? 4 : undefined}>
         {!selected && (
           <Grid item xs={12} px={4} pt={4}>
-            {/* <PartyAdvancedRadioButton
-              setIsTaxCodeSelected={setIsTaxCodeSelected}
-              setIsBusinessNameSelected={setIsBusinessNameSelected}
-              setOptions={setOptions}
-              setInput={setInput}
-            /> */}
-
             <PartyAdvancedSelect
               setIsTaxCodeSelected={setIsTaxCodeSelected}
               setIsBusinessNameSelected={setIsBusinessNameSelected}
@@ -97,6 +100,10 @@ export function Autocomplete({
           product={product}
           isAooCodeSelected={isAooCodeSelected}
           isUoCodeSelected={isUoCodeSelected}
+          setAooResult={setAooResult}
+          setUoResult={setUoResult}
+          aooResult={aooResult}
+          uoResult={uoResult}
         />
       </Grid>
     </Paper>
