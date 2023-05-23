@@ -423,7 +423,6 @@ function OnboardingComponent({ productId }: { productId: string }) {
   };
 
   const forwardWithOnboardingData = (
-    _manager: OnboardingFormData,
     onboardingFormData?: OnboardingFormData,
     institutionType?: InstitutionType,
     _id?: string
