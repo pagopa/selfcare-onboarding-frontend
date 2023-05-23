@@ -316,11 +316,19 @@ export default function GeoTaxonomySection({
                     onOpen={() => setOptions([])}
                     disablePortal
                     options={input.length >= 3 ? options : []}
-                    sx={{ width: '100%', pr: '0px !important' }}
+                    sx={{
+                      width: '100%',
+                      pr: '0px !important',
+                      '& .MuiAutocomplete-inputRoot .MuiAutocomplete-input': {
+                        textTransform: 'capitalize',
+                      },
+                    }}
                     onChange={(event: any, value: any) => handleChange(event, value, i)}
-                    value={geotaxonomiesHistory[i]?.desc ?? val?.desc}
+                    value={geotaxonomiesHistory[i]?.desc.toLowerCase() ?? val?.desc.toLowerCase()}
                     renderOption={(props, option) => (
-                      <span {...props}>{option.desc ? option.desc : ''}</span>
+                      <span style={{ textTransform: 'capitalize' }} {...props}>
+                        {option.desc ? option.desc.toLocaleLowerCase() : ''}
+                      </span>
                     )}
                     renderInput={(params) => (
                       <TextField
