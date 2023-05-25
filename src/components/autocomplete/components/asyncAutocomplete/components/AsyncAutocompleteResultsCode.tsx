@@ -41,6 +41,7 @@ type Props = {
   isUoCodeSelected?: boolean;
 };
 
+// eslint-disable-next-line sonarjs/cognitive-complexity
 export default function AsyncAutocompleteResultsCode({
   setSelected,
   isLoading,
@@ -56,11 +57,14 @@ export default function AsyncAutocompleteResultsCode({
     ? cfResult
     : isAooCodeSelected
     ? aooResult
-    : isUoCodeSelected ?? uoResult;
+    : isUoCodeSelected
+    ? uoResult
+    : '';
   return (
-    <CustomBox my={2} {...cfResult} width="80%" maxHeight="200px" overflow="auto">
+    <CustomBox my={2} {...cfResult} width="90%" maxHeight="200px" overflow="auto">
       {!isLoading && (
         <Box
+          sx={{ textTransform: 'capitalize' }}
           py={1}
           key={cfResult?.id}
           display="flex"
@@ -74,11 +78,18 @@ export default function AsyncAutocompleteResultsCode({
           <PartyAccountItemButton
             partyName={
               isTaxCodeSelected && cfResult?.description
-                ? cfResult?.description
+                ? cfResult?.description.toLocaleLowerCase()
                 : isAooCodeSelected && aooResult?.denominazioneAoo
-                ? aooResult?.denominazioneAoo
+                ? aooResult?.denominazioneAoo.toLocaleLowerCase()
                 : isUoCodeSelected && uoResult?.descrizioneUo
-                ? uoResult?.descrizioneUo
+                ? uoResult?.descrizioneUo.toLocaleLowerCase()
+                : ''
+            }
+            partyRole={
+              !isTaxCodeSelected && aooResult
+                ? aooResult.denominazioneEnte
+                : uoResult
+                ? uoResult?.denominazioneEnte
                 : ''
             }
             image={' '}

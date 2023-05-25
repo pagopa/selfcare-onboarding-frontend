@@ -18,6 +18,8 @@ import { UserContext } from '../../lib/context';
 import { OnboardingStepActions } from '../OnboardingStepActions';
 import { useHistoryState } from '../useHistoryState';
 import { LoadingOverlay } from '../LoadingOverlay';
+import { AooData } from '../../model/AooData';
+import { UoData } from '../../model/UoModel';
 
 type Props = {
   subTitle: string | ReactElement;
@@ -61,6 +63,9 @@ export function StepSearchParty({
   const { setRequiredLogin } = useContext(UserContext);
   const theme = useTheme();
 
+  const [aooResult, setAooResult] = useState<AooData>();
+  const [uoResult, setUoResult] = useState<UoData>();
+
   const [isSearchFieldSelected, setIsSearchFieldSelected] = useState<boolean>(true);
 
   const [loading, setLoading] = useState(!!partyExternalIdByQuery);
@@ -73,7 +78,13 @@ export function StepSearchParty({
     setSelectedHistory(selected);
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const { id } = selected!;
-    forward({ externalId: id }, { ...selected, externalId: id } as Party, institutionType);
+    forward(
+      { externalId: id },
+      { ...selected, externalId: id } as Party,
+      aooResult,
+      uoResult,
+      institutionType
+    );
   };
 
   const { t } = useTranslation();
@@ -207,6 +218,10 @@ export function StepSearchParty({
             isSearchFieldSelected={isSearchFieldSelected}
             setIsSearchFieldSelected={setIsSearchFieldSelected}
             product={product}
+            aooResult={aooResult}
+            uoResult={uoResult}
+            setAooResult={setAooResult}
+            setUoResult={setUoResult}
           />
         </Grid>
       </Grid>

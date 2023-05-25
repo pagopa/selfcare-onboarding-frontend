@@ -20,6 +20,10 @@ type AutocompleteProps = {
   isSearchFieldSelected: boolean;
   setIsSearchFieldSelected: React.Dispatch<React.SetStateAction<boolean>>;
   product?: Product | null;
+  aooResult?: AooData;
+  uoResult?: UoData;
+  setAooResult: React.Dispatch<React.SetStateAction<AooData | undefined>>;
+  setUoResult: React.Dispatch<React.SetStateAction<UoData | undefined>>;
 };
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
@@ -33,15 +37,14 @@ export function Autocomplete({
   theme,
   isSearchFieldSelected,
   product,
+  aooResult,
+  uoResult,
+  setAooResult,
+  setUoResult,
   setIsSearchFieldSelected,
 }: AutocompleteProps) {
   const [options, setOptions] = useState<Array<InstitutionResource>>([]);
   const [cfResult, setCfResult] = useState<InstitutionResource>();
-  const [aooResult, setAooResult] = useState<AooData>();
-  const [uoResult, setUoResult] = useState<UoData>();
-
-  console.log('aooResult', aooResult);
-  console.log('aooResult', uoResult);
 
   const [isBusinessNameSelected, setIsBusinessNameSelected] = useState<boolean>(true);
   const [isAooCodeSelected, setIsAooCodeSelected] = useState<boolean>(false);
@@ -75,6 +78,9 @@ export function Autocomplete({
               setInput={setInput}
               setIsSearchFieldSelected={setIsSearchFieldSelected}
               selected={selected}
+              setAooResult={setAooResult}
+              setUoResult={setUoResult}
+              setCfResult={setCfResult}
             />
           </Grid>
         )}
@@ -88,7 +94,6 @@ export function Autocomplete({
           setInput={setInput}
           setSelected={setSelected}
           isBusinessNameSelected={isBusinessNameSelected}
-          setIsBusinessNameSelected={setIsBusinessNameSelected}
           isTaxCodeSelected={isTaxCodeSelected}
           setIsTaxCodeSelected={setIsTaxCodeSelected}
           selected={selected}

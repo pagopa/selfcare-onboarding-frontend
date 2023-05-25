@@ -9,6 +9,8 @@ import { uniqueId } from 'lodash';
 import { IllusCompleted, IllusError } from '@pagopa/mui-italia';
 import { EndingPage } from '@pagopa/selfcare-common-frontend';
 import { withLogin } from '../../components/withLogin';
+import { AooData } from '../../model/AooData';
+import { UoData } from '../../model/UoModel';
 import {
   InstitutionType,
   Product,
@@ -182,7 +184,14 @@ function OnboardingComponent({ productId }: { productId: string }) {
     forward();
   };
 
-  const forwardWithDataAndInstitution = (newFormData: Partial<FormData>, party: Party) => {
+  const forwardWithDataAndInstitution = (
+    newFormData: Partial<FormData>,
+    party: Party,
+    aooResult: AooData,
+    uoResult: UoData,
+    institutionType: InstitutionType
+  ) => {
+    console.log('xx aooSelected', aooResult, 'xx uoSelected', uoResult);
     setExternalInstitutionId(party.externalId);
     setOrigin(party.origin);
     setOnboardingFormData({
@@ -382,6 +391,8 @@ function OnboardingComponent({ productId }: { productId: string }) {
           assistanceContacts: assistanceConcatsDto2pspDataRequest(
             onboardingFormData as OnboardingFormData
           ),
+          aooData: {},
+          uooData: {},
         },
       },
       () => setRequiredLogin(true)

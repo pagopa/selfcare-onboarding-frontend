@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SelectChangeEvent } from '@mui/material/Select';
 import { FormControl, InputLabel, Select, MenuItem } from '@mui/material';
+import { InstitutionResource } from '../../../../model/InstitutionResource';
+import { AooData } from '../../../../model/AooData';
+import { UoData } from '../../../../model/UoModel';
 
 type Props = {
   setIsBusinessNameSelected: React.Dispatch<React.SetStateAction<boolean>>;
@@ -12,6 +15,9 @@ type Props = {
   setIsAooCodeSelected: React.Dispatch<React.SetStateAction<boolean>>;
   setIsUoCodeSelected: React.Dispatch<React.SetStateAction<boolean>>;
   selected: boolean;
+  setCfResult: React.Dispatch<React.SetStateAction<InstitutionResource | undefined>>;
+  setAooResult: React.Dispatch<React.SetStateAction<AooData | undefined>>;
+  setUoResult: React.Dispatch<React.SetStateAction<UoData | undefined>>;
 };
 
 export default function PartyAdvancedSelect({
@@ -22,6 +28,9 @@ export default function PartyAdvancedSelect({
   setIsSearchFieldSelected,
   setIsAooCodeSelected,
   setIsUoCodeSelected,
+  setCfResult,
+  setAooResult,
+  setUoResult,
 }: Props) {
   const { t } = useTranslation();
 
@@ -43,6 +52,9 @@ export default function PartyAdvancedSelect({
     setIsUoCodeSelected(isUoCodeSelected);
     setOptions([]);
     setInput('');
+    setCfResult(undefined);
+    setAooResult(undefined);
+    setUoResult(undefined);
   };
 
   return (

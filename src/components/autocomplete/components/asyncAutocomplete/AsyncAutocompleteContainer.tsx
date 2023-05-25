@@ -29,7 +29,6 @@ type Props = {
   setInput: React.Dispatch<React.SetStateAction<string>>;
   setSelected: React.Dispatch<React.SetStateAction<any>>;
   isBusinessNameSelected?: boolean;
-  setIsBusinessNameSelected: React.Dispatch<React.SetStateAction<boolean>>;
   isTaxCodeSelected?: boolean;
   setIsTaxCodeSelected: React.Dispatch<React.SetStateAction<boolean | undefined>>;
   selected: any;
@@ -136,41 +135,46 @@ export default function AsyncAutocompleteContainer({
 
     setIsLoading(false);
   };
-
-  const handleSearchByCode = async (
-    query: string,
-    isAooCodeSelected: boolean,
-    isUoCodeSelected: boolean
-  ) => {
+  const handleSearchByAooCode = async (query: string) => {
     setIsLoading(true);
 
-    if (isAooCodeSelected && query.length === 7) {
-      const searchResponse = await fetchWithLogs(
-        { endpoint: 'ONBOARDING_GET_AOO_CODE_INFO', endpointParams: { codiceUniAoo: query } },
-        {
-          method: 'GET',
-        },
-        () => setRequiredLogin(true)
-      );
+    const searchResponse = await fetchWithLogs(
+      { endpoint: 'ONBOARDING_GET_AOO_CODE_INFO', endpointParams: { codiceUniAoo: query } },
+      {
+        method: 'GET',
+      },
+      () => setRequiredLogin(true)
+    );
 
-      const outcome = getFetchOutcome(searchResponse);
-      if (outcome === 'success') {
-        setAooResult((searchResponse as AxiosResponse).data);
-      }
-    } else if (isUoCodeSelected && query.length === 6) {
-      const searchResponse = await fetchWithLogs(
-        { endpoint: 'ONBOARDING_GET_UO_CODE_INFO', endpointParams: { codiceUniUo: query } },
-        {
-          method: 'GET',
-        },
-        () => setRequiredLogin(true)
-      );
+    const outcome = getFetchOutcome(searchResponse);
 
-      const outcome = getFetchOutcome(searchResponse);
-      if (outcome === 'success') {
-        setUoResult((searchResponse as AxiosResponse).data);
-      }
+    if (outcome === 'success') {
+      setAooResult((searchResponse as AxiosResponse).data);
+    } else if ((searchResponse as AxiosError).response?.status === 404) {
+      setAooResult(undefined);
     }
+
+    setIsLoading(false);
+  };
+  const handleSearchByUoCode = async (query: string) => {
+    setIsLoading(true);
+
+    const searchResponse = await fetchWithLogs(
+      { endpoint: 'ONBOARDING_GET_UO_CODE_INFO', endpointParams: { codiceUniUo: query } },
+      {
+        method: 'GET',
+      },
+      () => setRequiredLogin(true)
+    );
+
+    const outcome = getFetchOutcome(searchResponse);
+
+    if (outcome === 'success') {
+      setUoResult((searchResponse as AxiosResponse).data);
+    } else if ((searchResponse as AxiosError).response?.status === 404) {
+      setUoResult(undefined);
+    }
+
     setIsLoading(false);
   };
 
@@ -183,8 +187,10 @@ export default function AsyncAutocompleteContainer({
         void debounce(handleSearchByBusinessName, 100)(value);
       } else if (isTaxCodeSelected && value.length === 11) {
         void handleSearchByTaxCode(value);
-      } else {
-        void handleSearchByCode(value, isAooCodeSelected, isUoCodeSelected);
+      } else if (isAooCodeSelected && !isUoCodeSelected && value.length === 7) {
+        void handleSearchByAooCode(value);
+      } else if (isUoCodeSelected && !isAooCodeSelected && value.length === 6) {
+        void handleSearchByUoCode(value);
       }
     }
     if (value === '') {
@@ -203,7 +209,7 @@ export default function AsyncAutocompleteContainer({
         justifyContent="center"
         width="100%"
         pt={selected ? 4 : 2}
-        pb={input.length === 0 || selected ? 4 : 0}
+        pb={input?.length === 0 || selected ? 4 : 0}
       >
         {selected && (
           <Box display="flex" alignItems="center">
@@ -219,6 +225,13 @@ export default function AsyncAutocompleteContainer({
           input={input}
           handleChange={handleChange}
           isSearchFieldSelected={isSearchFieldSelected}
+          isAooCodeSelected={isAooCodeSelected}
+          isUoCodeSelected={isUoCodeSelected}
+          isTaxCodeSelected={isTaxCodeSelected}
+          isBusinessNameSelected={isBusinessNameSelected}
+          setCfResult={setCfResult}
+          setAooResult={setAooResult}
+          setUoResult={setUoResult}
         />
       </Grid>
       <Grid
@@ -226,7 +239,7 @@ export default function AsyncAutocompleteContainer({
         xs={12}
         display="flex"
         justifyContent="center"
-        sx={{ height: showBusinessNameElement && options.length > 0 ? '232px' : undefined }}
+        sx={{ height: showBusinessNameElement && options?.length > 0 ? '232px' : undefined }}
       >
         {isBusinessNameSelected ? (
           <>
@@ -259,7 +272,12 @@ export default function AsyncAutocompleteContainer({
           </>
         ) : (
           <>
-            {input !== undefined && input.length > 6 ? (
+            {(isTaxCodeSelected || isAooCodeSelected || isUoCodeSelected) &&
+            !isBusinessNameSelected &&
+            input !== undefined &&
+            input?.length >= 6 &&
+            !selected &&
+            (cfResult || uoResult || aooResult) ? (
               <AsyncAutocompleteResultsCode
                 setSelected={setSelected}
                 cfResult={cfResult}
@@ -276,6 +294,7 @@ export default function AsyncAutocompleteContainer({
             ) : (
               input.length >= 1 &&
               options.length === 0 &&
+              (!cfResult || !aooResult || !uoResult) &&
               !selected && (
                 <Box display="flex" sx={{ jusifyContent: 'start' }} width="100%" mx={4}>
                   <Typography py={3} sx={{ fontSize: '18px', fontWeight: 'fontWeightBold' }}>
