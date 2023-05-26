@@ -393,7 +393,7 @@ const executeStepAddManager = async (expectedSuccessfulSubmit: boolean) => {
 
   const confirmButton = screen.getByRole('button', { name: 'Continua' });
 
-  await fillUserForm(confirmButton, 'LEGAL', 'bbBBBB00B00B000B', 'b@b.BB');
+  await fillUserForm();
 
   expect(confirmButton).toBeEnabled();
   fireEvent.click(confirmButton);
@@ -467,32 +467,14 @@ const fillUserBillingDataForm = async (
   // TODO: remove comment if REACT_APP_ENABLE_GEOTAXONOMY is true -- fireEvent.click(document.getElementById('national_geographicTaxonomies'));
 };
 
-const fillUserForm = async (
-  confirmButton: HTMLElement,
-  prefix: string,
-  taxCode: string,
-  email: string
-) => {
-  await waitFor(() =>
-    expect((document.getElementById('LEGAL-email') as HTMLInputElement).value).toBe('m@ma.it')
-  );
-  expect((document.getElementById('LEGAL-taxCode') as HTMLInputElement).value).toBe(
-    'RSSMRA80A01H501U'
-  );
-  expect((document.getElementById('LEGAL-name') as HTMLInputElement).value).toBe('Mario');
-  expect((document.getElementById('LEGAL-surname') as HTMLInputElement).value).toBe('Rossi');
-
-  expect(confirmButton).toBeEnabled();
-
-  /*await fillTextFieldAndCheckButton(prefix, 'name', 'NAME', confirmButton, true);
-  await fillTextFieldAndCheckButton(prefix, 'surname', 'SURNAME', confirmButton, true);
-  await fillTextFieldAndCheckButton(prefix, 'taxCode', taxCode, confirmButton, true);
-  await fillTextFieldAndCheckButton(prefix, 'email', email, confirmButton, true);*/
-
-  expect(document.getElementById('LEGAL-name')).toBeEnabled();
-  expect(document.getElementById('LEGAL-surname')).toBeEnabled();
-  expect(document.getElementById('LEGAL-taxCode')).toBeEnabled();
-  expect(document.getElementById('LEGAL-email')).toBeEnabled();
+const fillTextFieldAndCheck = async (prefix: string, field: string, value: string) => {
+  fireEvent.change(document.getElementById(`${prefix}-${field}`), { target: { value } });
+};
+const fillUserForm = async () => {
+  await fillTextFieldAndCheck('LEGAL', 'email', 'm@ma.it');
+  await fillTextFieldAndCheck('LEGAL', 'taxCode', 'RSSMRA80A01H501U');
+  await fillTextFieldAndCheck('LEGAL', 'name', 'Mario');
+  await fillTextFieldAndCheck('LEGAL', 'surname', 'Rossi');
 };
 
 const checkCorrectBodyBillingData = (
