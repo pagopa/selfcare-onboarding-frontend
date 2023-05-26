@@ -133,7 +133,19 @@ export default function AsyncAutocompleteSearch({
               {(isAooCodeSelected ||
                 isUoCodeSelected ||
                 selected.denominazioneAoo ||
-                selected.descrizioneUo) && <Typography>{selected.denominazioneEnte}</Typography>}
+                selected.descrizioneUo) && (
+                <Typography
+                  variant="body1"
+                  sx={{
+                    ...(selected && {
+                      ...truncatedText,
+                      WebkitLineClamp: 2,
+                    }),
+                  }}
+                >
+                  {selected.denominazioneEnte}
+                </Typography>
+              )}
             </Box>
           ),
           endAdornment: (

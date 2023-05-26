@@ -81,6 +81,10 @@ export function Autocomplete({
               setAooResult={setAooResult}
               setUoResult={setUoResult}
               setCfResult={setCfResult}
+              isBusinessNameSelected={isBusinessNameSelected}
+              isTaxCodeSelected={isTaxCodeSelected}
+              isAooCodeSelected={isAooCodeSelected}
+              isUoCodeSelected={isUoCodeSelected}
             />
           </Grid>
         )}

@@ -200,6 +200,8 @@ function OnboardingComponent({ productId }: { productId: string }) {
     setOrigin(party.origin);
     setOnboardingFormData({
       businessName: party.description,
+      aooCode: aooResult?.denominazioneAoo,
+      uoCode: uoResult?.descrizioneUo,
       digitalAddress: party.digitalAddress,
       recipientCode: '',
       registeredOffice: party.address,

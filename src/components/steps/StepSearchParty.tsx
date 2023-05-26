@@ -79,7 +79,13 @@ export function StepSearchParty({
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const { id } = selected!;
     forward(
-      { externalId: id },
+      {
+        externalId: aooResult
+          ? aooResult.codiceFiscaleEnte
+          : uoResult
+          ? uoResult.codiceFiscaleEnte
+          : id,
+      },
       { ...selected, externalId: id } as Party,
       aooResult,
       uoResult,

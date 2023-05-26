@@ -83,7 +83,6 @@ export default function StepOnboardingFormData({
   aooSelected,
   uoSelected,
 }: Props) {
-  console.log(aooSelected, uoSelected);
   const requiredError = 'Required';
 
   const premiumFlow = !!subProductId;
@@ -415,7 +414,7 @@ export default function StepOnboardingFormData({
           </Typography>
         </Grid>
         <Grid container item justifyContent="center" mt={2} mb={4}>
-          <Grid item xs={6}>
+          <Grid item xs={premiumFlow ? 7 : 10}>
             <Typography variant="body1" align="center">
               {subtitle}
             </Typography>
@@ -430,6 +429,8 @@ export default function StepOnboardingFormData({
           formik={formik}
           premiumFlow={premiumFlow}
           isInformationCompany={isInformationCompany}
+          aooSelected={aooSelected}
+          uoSelected={uoSelected}
         />
         {/* DATI RELATIVI ALLA TASSONOMIA */}
         {ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY ? (

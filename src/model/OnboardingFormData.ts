@@ -43,4 +43,8 @@ export type OnboardingFormData = {
   shareCapital?: string;
   // indirizzo mail supporto
   supportEmail?: string;
+  // denominazione aoo
+  aooCode?: string;
+  // denominazione uo
+  uoCode?: string;
 };

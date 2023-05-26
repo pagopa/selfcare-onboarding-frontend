@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SelectChangeEvent } from '@mui/material/Select';
 import { FormControl, InputLabel, Select, MenuItem } from '@mui/material';
@@ -18,6 +18,10 @@ type Props = {
   setCfResult: React.Dispatch<React.SetStateAction<InstitutionResource | undefined>>;
   setAooResult: React.Dispatch<React.SetStateAction<AooData | undefined>>;
   setUoResult: React.Dispatch<React.SetStateAction<UoData | undefined>>;
+  isBusinessNameSelected?: boolean;
+  isTaxCodeSelected?: boolean;
+  isAooCodeSelected?: boolean;
+  isUoCodeSelected?: boolean;
 };
 
 export default function PartyAdvancedSelect({
@@ -31,6 +35,10 @@ export default function PartyAdvancedSelect({
   setCfResult,
   setAooResult,
   setUoResult,
+  isBusinessNameSelected,
+  isTaxCodeSelected,
+  isAooCodeSelected,
+  isUoCodeSelected,
 }: Props) {
   const { t } = useTranslation();
 
@@ -56,6 +64,18 @@ export default function PartyAdvancedSelect({
     setAooResult(undefined);
     setUoResult(undefined);
   };
+
+  useEffect(() => {
+    if (isBusinessNameSelected) {
+      setTypeOfSearch('businessName');
+    } else if (isTaxCodeSelected) {
+      setTypeOfSearch('taxCode');
+    } else if (isAooCodeSelected) {
+      setTypeOfSearch('aooCode');
+    } else if (isUoCodeSelected) {
+      setTypeOfSearch('uoCode');
+    }
+  }, []);
 
   return (
     <FormControl fullWidth size="small">
