@@ -44,7 +44,11 @@ export type OnboardingFormData = {
   // indirizzo mail supporto
   supportEmail?: string;
   // denominazione aoo
-  aooCode?: string;
+  aooName?: string;
   // denominazione uo
-  uoCode?: string;
+  uoName?: string;
+  // codice univoco aoo
+  aooUniqueCode?: string;
+  // codice univoco uo
+  uoUniqueCode?: string;
 };

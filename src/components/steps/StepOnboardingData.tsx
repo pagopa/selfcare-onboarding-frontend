@@ -85,7 +85,7 @@ function StepOnboardingData({ forward, externalInstitutionId, productId, institu
       (onboardingData as AxiosError<any>).response?.status === 404 ||
       (onboardingData as AxiosError<any>).response?.status === 400
     ) {
-      forward(undefined, undefined, institutionType, undefined);
+      forward(undefined, institutionType, undefined);
     } else {
       setOutcome(genericError);
     }

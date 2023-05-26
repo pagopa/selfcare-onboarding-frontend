@@ -119,31 +119,60 @@ export default function PersonalAndBillingDataSection({
               </Typography>
             </Box>
           )}
-
-          {/* Ragione sociale */}
           {aooSelected ? (
-            <Grid item xs={8}>
-              <CustomTextField
-                {...baseTextFieldProps(
-                  'aooCode',
-                  t('onboardingFormData.billingDataSection.aooLabel'),
-                  400,
-                  18
-                )}
-                disabled={isDisabled}
-              />
-            </Grid>
+            // ao Description
+            <>
+              <Grid item xs={8}>
+                <CustomTextField
+                  {...baseTextFieldProps(
+                    'aooName',
+                    t('onboardingFormData.billingDataSection.aooName'),
+                    400,
+                    18
+                  )}
+                  disabled={isDisabled}
+                />
+              </Grid>
+              <Grid item xs={4}>
+                <CustomTextField
+                  {...baseTextFieldProps(
+                    'aooUniqueCode',
+                    t('onboardingFormData.billingDataSection.aooUniqueCode'),
+                    400,
+                    18
+                  )}
+                  disabled={isDisabled}
+                />
+              </Grid>
+            </>
           ) : uoSelected ? (
-            <CustomTextField
-              {...baseTextFieldProps(
-                'uoCode',
-                t('onboardingFormData.billingDataSection.uoLabel'),
-                400,
-                18
-              )}
-              disabled={isDisabled}
-            />
+            // uo Description
+            <>
+              <Grid item xs={8}>
+                <CustomTextField
+                  {...baseTextFieldProps(
+                    'uoName',
+                    t('onboardingFormData.billingDataSection.uoName'),
+                    400,
+                    18
+                  )}
+                  disabled={isDisabled}
+                />
+              </Grid>
+              <Grid item xs={4}>
+                <CustomTextField
+                  {...baseTextFieldProps(
+                    'uoUniqueCode',
+                    t('onboardingFormData.billingDataSection.uoUniqueCode'),
+                    400,
+                    18
+                  )}
+                  disabled={isDisabled}
+                />
+              </Grid>
+            </>
           ) : (
+            // Ragione sociale
             <Grid item xs={12}>
               <CustomTextField
                 {...baseTextFieldProps(

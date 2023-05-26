@@ -200,8 +200,10 @@ function OnboardingComponent({ productId }: { productId: string }) {
     setOrigin(party.origin);
     setOnboardingFormData({
       businessName: party.description,
-      aooCode: aooResult?.denominazioneAoo,
-      uoCode: uoResult?.descrizioneUo,
+      aooName: aooResult?.denominazioneAoo,
+      uoName: uoResult?.descrizioneUo,
+      aooUniqueCode: aooResult?.codiceUniAoo,
+      uoUniqueCode: uoResult?.codiceUniUo,
       digitalAddress: party.digitalAddress,
       recipientCode: '',
       registeredOffice: party.address,
@@ -397,8 +399,6 @@ function OnboardingComponent({ productId }: { productId: string }) {
           assistanceContacts: assistanceConcatsDto2pspDataRequest(
             onboardingFormData as OnboardingFormData
           ),
-          aooData: {},
-          uooData: {},
         },
       },
       () => setRequiredLogin(true)

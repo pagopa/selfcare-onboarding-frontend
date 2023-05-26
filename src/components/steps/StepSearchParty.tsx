@@ -1,7 +1,7 @@
 import { Grid, Link, Typography, useTheme, Alert } from '@mui/material';
 import { Box } from '@mui/system';
 import { useContext, useEffect, useState } from 'react';
-import { AxiosResponse } from 'axios';
+import { AxiosError, AxiosResponse } from 'axios';
 import { useTranslation, Trans } from 'react-i18next';
 import { ReactElement } from 'react';
 import {
@@ -73,6 +73,33 @@ export function StepSearchParty({
     'selected_step1',
     null
   );
+  const [dataFromAooUo, setDataFromAooUo] = useState<IPACatalogParty | null>();
+
+  const handleSearchTaxCodeFromAooUo = async (query: string) => {
+    const searchResponse = await fetchWithLogs(
+      { endpoint: 'ONBOARDING_GET_PARTY_FROM_CF', endpointParams: { id: query } },
+      {
+        method: 'GET',
+      },
+      () => setRequiredLogin(true)
+    );
+
+    const outcome = getFetchOutcome(searchResponse);
+
+    if (outcome === 'success') {
+      setDataFromAooUo((searchResponse as AxiosResponse).data);
+    } else if ((searchResponse as AxiosError).response?.status === 404) {
+      setDataFromAooUo(undefined);
+    }
+  };
+
+  useEffect(() => {
+    if (aooResult) {
+      void handleSearchTaxCodeFromAooUo(aooResult?.codiceFiscaleEnte);
+    } else if (uoResult) {
+      void handleSearchTaxCodeFromAooUo(uoResult?.codiceFiscaleEnte);
+    }
+  }, [aooResult, uoResult]);
 
   const onForwardAction = () => {
     setSelectedHistory(selected);
@@ -80,13 +107,11 @@ export function StepSearchParty({
     const { id } = selected!;
     forward(
       {
-        externalId: aooResult
-          ? aooResult.codiceFiscaleEnte
-          : uoResult
-          ? uoResult.codiceFiscaleEnte
-          : id,
+        externalId: dataFromAooUo ? dataFromAooUo.id : id,
       },
-      { ...selected, externalId: id } as Party,
+      aooResult || uoResult
+        ? ({ ...dataFromAooUo } as Party)
+        : ({ ...selected, externalId: id } as Party),
       aooResult,
       uoResult,
       institutionType
