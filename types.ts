@@ -201,7 +201,6 @@ export type InstitutionData = {
 
 export type InstitutionOnboardingInfoResource = {
   institution: InstitutionData;
-  manager: UserOnCreate;
 };
 
 export type InstitutionType = 'PA' | 'GSP' | 'SCP' | 'PT' | 'PSP';

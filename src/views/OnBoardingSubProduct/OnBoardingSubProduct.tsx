@@ -163,19 +163,14 @@ function OnBoardingSubProduct() {
   };
 
   const forwardWithOnboardingData = (
-    manager?: UserOnCreate,
     billingData?: OnboardingFormData,
     institutionType?: InstitutionType,
     partyId?: string,
     assistanceContacts?: AssistanceContacts,
     companyInformations?: CompanyInformations
   ) => {
-    setManager(manager);
-    if (manager) {
-      setStepAddManagerHistoryState({ LEGAL: manager });
-    } else {
-      setStepAddManagerHistoryState({});
-    }
+    setStepAddManagerHistoryState({});
+
     if (billingData) {
       setBillingData(billingData);
     }
