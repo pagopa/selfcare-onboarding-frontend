@@ -87,7 +87,7 @@ export default function AsyncAutocompleteSearch({
   useEffect(() => {
     if (selected && selected?.denominazioneAoo) {
       setInput(selected?.denominazioneAoo);
-    } else if (selected.descrizioneUo) {
+    } else if (selected && selected?.descrizioneUo) {
       setInput(selected?.descrizioneUo);
     } else {
       setInput(input);

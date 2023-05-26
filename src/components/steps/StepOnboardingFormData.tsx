@@ -28,6 +28,8 @@ import { fetchWithLogs } from '../../lib/api-utils';
 import { UserContext } from '../../lib/context';
 import { getFetchOutcome } from '../../lib/error-utils';
 import { ENV } from '../../utils/env';
+import { AooData } from '../../model/AooData';
+import { UoData } from '../../model/UoModel';
 
 const mailPECRegexp = new RegExp('^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$');
 const fiscalAndVatCodeRegexp = new RegExp(
@@ -63,6 +65,8 @@ type Props = StepperStepComponentProps & {
   selectedParty?: Party;
   selectedProduct?: Product | null;
   outcome?: RequestOutcomeMessage | null;
+  aooSelected?: AooData;
+  uoSelected?: UoData;
 };
 
 export default function StepOnboardingFormData({
@@ -76,7 +80,10 @@ export default function StepOnboardingFormData({
   outcome,
   productId,
   subProductId,
+  aooSelected,
+  uoSelected,
 }: Props) {
+  console.log(aooSelected, uoSelected);
   const requiredError = 'Required';
 
   const premiumFlow = !!subProductId;
@@ -407,7 +414,6 @@ export default function StepOnboardingFormData({
               : t('onboardingFormData.title')}
           </Typography>
         </Grid>
-
         <Grid container item justifyContent="center" mt={2} mb={4}>
           <Grid item xs={6}>
             <Typography variant="body1" align="center">
@@ -415,7 +421,6 @@ export default function StepOnboardingFormData({
             </Typography>
           </Grid>
         </Grid>
-
         <PersonalAndBillingDataSection
           origin={origin}
           institutionType={institutionType}
@@ -441,7 +446,6 @@ export default function StepOnboardingFormData({
           <></>
         )}
         {isPSP && <DpoSection baseTextFieldProps={baseTextFieldProps} />}
-
         <Grid item xs={12} my={2}>
           <OnboardingStepActions
             back={{

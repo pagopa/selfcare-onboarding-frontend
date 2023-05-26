@@ -108,6 +108,9 @@ function OnboardingComponent({ productId }: { productId: string }) {
   const [onExitAction, setOnExitAction] = useState<(() => void) | undefined>();
   const [selectedParty, setSelectedParty] = useState<Party>();
 
+  const [aooSelected, setAooSelected] = useState<AooData>();
+  const [uoSelected, setUoSelected] = useState<UoData>();
+
   const productAvoidStep =
     selectedProduct?.id === 'prod-pn' || selectedProduct?.id === 'prod-idpay';
 
@@ -191,7 +194,8 @@ function OnboardingComponent({ productId }: { productId: string }) {
     uoResult: UoData,
     institutionType: InstitutionType
   ) => {
-    console.log('xx aooSelected', aooResult, 'xx uoSelected', uoResult);
+    setAooSelected(aooResult);
+    setUoSelected(uoResult);
     setExternalInstitutionId(party.externalId);
     setOrigin(party.origin);
     setOnboardingFormData({
@@ -561,6 +565,8 @@ function OnboardingComponent({ productId }: { productId: string }) {
             recipientCode: '',
             geographicTaxonomies: [],
           },
+          aooSelected,
+          uoSelected,
           origin,
           institutionType: institutionType as InstitutionType,
           subtitle: t('onBoardingSubProduct.billingData.subTitle'),
