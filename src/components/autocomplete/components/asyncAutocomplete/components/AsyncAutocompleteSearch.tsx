@@ -106,7 +106,15 @@ export default function AsyncAutocompleteSearch({
         }}
         onChange={handleChange}
         value={!selected ? valueSelected : ''}
-        label={!selected ? t('asyncAutocomplete.serachLabel') : ''}
+        label={
+          !selected
+            ? isAooCodeSelected
+              ? t('asyncAutocomplete.aooLabel')
+              : isUoCodeSelected
+              ? t('asyncAutocomplete.uoLabel')
+              : t('asyncAutocomplete.serachLabel')
+            : ''
+        }
         variant={!selected ? 'outlined' : 'standard'}
         inputProps={{
           // maxLength: isTaxCodeSelected ? '11' : undefined,
