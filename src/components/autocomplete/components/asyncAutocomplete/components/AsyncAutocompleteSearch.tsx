@@ -156,7 +156,7 @@ export default function AsyncAutocompleteSearch({
               )}
             </Box>
           ),
-          endAdornment: (
+          endAdornment: selected && (
             <IconButton
               disabled={!isSearchFieldSelected}
               onClick={() => {
