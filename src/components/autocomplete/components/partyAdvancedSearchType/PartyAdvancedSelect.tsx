@@ -82,21 +82,41 @@ export default function PartyAdvancedSelect({
       <InputLabel id="advancedSearch">{t('partyAdvancedSelect.advancedSearchLabel')}</InputLabel>
       <Select
         labelId="advancedSearch"
-        id="demo-simple-select"
+        id="party-type-select"
         value={typeOfSearch}
         label={t('partyAdvancedSelect.advancedSearchLabel')}
         onChange={handleTypeSearchChange}
       >
-        <MenuItem value={'businessName'} onClick={() => onSelectValue(true, false, false, false)}>
+        <MenuItem
+          id="businessName"
+          data-testid="businessName"
+          value={'businessName'}
+          onClick={() => onSelectValue(true, false, false, false)}
+        >
           {t('partyAdvancedSelect.businessName')}
         </MenuItem>
-        <MenuItem value={'taxCode'} onClick={() => onSelectValue(false, true, false, false)}>
+        <MenuItem
+          id="taxCode"
+          data-testid="taxCode"
+          value={'taxCode'}
+          onClick={() => onSelectValue(false, true, false, false)}
+        >
           {t('partyAdvancedSelect.taxCode')}
         </MenuItem>
-        <MenuItem value={'aooCode'} onClick={() => onSelectValue(false, false, true, false)}>
+        <MenuItem
+          id="aooCode"
+          data-testid="aooCode"
+          value={'aooCode'}
+          onClick={() => onSelectValue(false, false, true, false)}
+        >
           {t('partyAdvancedSelect.aooCode')}
         </MenuItem>
-        <MenuItem value={'uoCode'} onClick={() => onSelectValue(false, false, false, true)}>
+        <MenuItem
+          id="uoCode"
+          data-testid="uoCode"
+          value={'uoCode'}
+          onClick={() => onSelectValue(false, false, false, true)}
+        >
           {t('partyAdvancedSelect.uoCode')}
         </MenuItem>
       </Select>

@@ -335,7 +335,13 @@ const executeAdvancedSearchForBusinessName = async (partyName: string) => {
   await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(1));
   const inputPartyName = document.getElementById('Parties');
 
-  await selectEvent.select(document.getElementById('businessName'), ['Ragione Sociale']);
+  const selectWrapper = document.getElementById('party-type-select');
+  const input = selectWrapper?.firstChild;
+  fireEvent.keyDown(input, { keyCode: 40 });
+
+  const option = await document.getElementById('businessName');
+  fireEvent.click(option);
+
   expect(inputPartyName).toBeTruthy();
   fireEvent.change(inputPartyName, { target: { value: 'XXX' } });
 
@@ -358,17 +364,20 @@ const executeAdvancedSearchForTaxCode = async (partyName: string) => {
   screen.getByText(step1Title);
   await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(1));
   const inputPartyName = document.getElementById('Parties');
+  const selectWrapper = document.getElementById('party-type-select');
 
-  fireEvent.click(document.getElementById('taxcode'));
+  const input = selectWrapper?.firstChild;
+  fireEvent.keyDown(input, { keyCode: 40 });
+
+  const option = await document.getElementById('taxCode');
+  fireEvent.click(option);
 
   expect(inputPartyName).toBeTruthy();
-  fireEvent.change(inputPartyName, { target: { value: '33344455567' } });
-
-  const partyNameSelection = await waitFor(() => screen.getByText(partyName));
+  await waitFor(() => fireEvent.change(inputPartyName, { target: { value: '33344455567' } }));
 
   expect(fetchWithLogsSpy).toBeCalledTimes(2);
 
-  fireEvent.click(partyNameSelection);
+  fireEvent.click(screen.getByText('comune di milano'));
 
   const confirmButton = screen.getByRole('button', { name: 'Continua' });
   expect(confirmButton).toBeEnabled();
