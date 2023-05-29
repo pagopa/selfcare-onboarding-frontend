@@ -110,7 +110,7 @@ export default function PersonalAndBillingDataSection({
       <Paper elevation={8} sx={{ borderRadius: theme.spacing(2), p: 4, width: '704px' }}>
         <Grid item container spacing={3}>
           {isAooUo && (
-            <Box px={4} pt={2}>
+            <Box px={4} pt={2} width="100%">
               <Typography sx={{ fontSize: 'fontSize' }}>
                 {t('onboardingFormData.billingDataSection.centralPartyLabel')}
               </Typography>
