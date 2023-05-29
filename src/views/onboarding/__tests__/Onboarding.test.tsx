@@ -1,4 +1,5 @@
 import { fireEvent, getByLabelText, render, screen, waitFor } from '@testing-library/react';
+import selectEvent from 'react-select-event';
 import { useState } from 'react';
 import '@testing-library/jest-dom';
 import { User } from '../../../../types';
@@ -334,8 +335,7 @@ const executeAdvancedSearchForBusinessName = async (partyName: string) => {
   await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(1));
   const inputPartyName = document.getElementById('Parties');
 
-  fireEvent.click(document.getElementById('businessName'));
-
+  await selectEvent.select(document.getElementById('businessName'), ['Ragione Sociale']);
   expect(inputPartyName).toBeTruthy();
   fireEvent.change(inputPartyName, { target: { value: 'XXX' } });
 

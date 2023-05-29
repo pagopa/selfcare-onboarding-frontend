@@ -10,6 +10,8 @@ export default {
     lessThen3CharacterLabel: 'Digita almeno 3 caratteri',
     lessThen11CharacterLabel: 'Digita almeno 11 caratteri',
     serachLabel: 'Cerca ente',
+    aooLabel: 'Inserisci il codice univoco AOO',
+    uoLabel: 'Inserisci il codice univoco UO',
     ariaLabel: `Seleziona la tipologia di ricerca dell'ente`,
     businessName: 'Ragione Sociale',
     taxcode: 'Codice Fiscale ente',
