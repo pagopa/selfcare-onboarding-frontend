@@ -232,7 +232,7 @@ export default function PersonalAndBillingDataSection({
                 400,
                 18
               )}
-              disabled={isDisabled}
+              disabled={isDisabled && !isAooUo}
             />
           </Grid>
           {/* Checkbox codice fiscale = P.IVA */}

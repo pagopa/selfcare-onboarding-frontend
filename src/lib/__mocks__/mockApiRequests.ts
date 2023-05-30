@@ -212,6 +212,16 @@ const mockedAooCode: AooData = {
   id: 'AR488GS',
   mail1: 'test.it',
   origin: 'IPA',
+  CAP: '53100',
+  codiceCatastaleComune: 'I726',
+  codiceComuneISTAT: '052032',
+  cognomeResponsabile: 'Bielli',
+  nomeResponsabile: 'Silvia',
+  dataIstituzione: '2023-01-27',
+  indirizzo: 'Via Nenni 6',
+  mailResponsabile: 'test@gmail.com',
+  telefonoResponsabile: '3357080675',
+  tipoMail1: 'Pec',
 };
 
 const mockedUoCode: UoData = {
@@ -225,6 +235,14 @@ const mockedUoCode: UoData = {
   id: 'YMELIE',
   mail1: 'test@fnofi.it',
   origin: 'IPA',
+  CAP: '84014',
+  codiceCatastaleComune: 'F912',
+  codiceComuneISTAT: '065078',
+  cognomeResponsabile: 'Ventura',
+  dataAggiornamento: '2020-09-22',
+  dataIstituzione: '2017-09-29',
+  indirizzo: 'Via San Pietro, 10',
+  tipoMail1: 'Pec',
 };
 
 const mockedParty = {
@@ -600,7 +618,7 @@ export async function mockFetch(
     }
   }
   if (endpoint === 'ONBOARDING_POST_LEGALS') {
-    switch (endpointParams.externalInstitutionId) {
+    switch (mockedOnboardingData1.institution.billingData.taxCode) {
       case 'error':
         return genericError;
       case 'notAllowedInSubmit':

@@ -64,9 +64,7 @@ export const API = {
     URL: ENV.URL_API.PARTY_REGISTRY_PROXY + '/institutions/{{id}}',
   },
   ONBOARDING_POST_LEGALS: {
-    URL:
-      ENV.URL_API.ONBOARDING +
-      '/institutions/{{externalInstitutionId}}/products/{{productId}}/onboarding',
+    URL: ENV.URL_API.ONBOARDING + '/institutions/onboarding',
   },
   ONBOARDING_COMPLETE_REGISTRATION: {
     URL: ENV.URL_API.PARTY_PROCESS + '/onboarding/complete/{{token}}',
