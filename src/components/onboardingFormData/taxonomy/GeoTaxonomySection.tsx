@@ -324,10 +324,10 @@ export default function GeoTaxonomySection({
                       },
                     }}
                     onChange={(event: any, value: any) => handleChange(event, value, i)}
-                    value={geotaxonomiesHistory[i]?.desc.toLowerCase() ?? val?.desc.toLowerCase()}
+                    value={geotaxonomiesHistory[i]?.desc?.toLowerCase() ?? val?.desc?.toLowerCase()}
                     renderOption={(props, option) => (
                       <span style={{ textTransform: 'capitalize' }} {...props}>
-                        {option.desc ? option.desc.toLocaleLowerCase() : ''}
+                        {option.desc ? option.desc?.toLocaleLowerCase() : ''}
                       </span>
                     )}
                     renderInput={(params) => (
