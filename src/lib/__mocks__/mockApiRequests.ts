@@ -6,6 +6,8 @@ import {
   UserOnCreate,
 } from '../../../types';
 import { nationalValue } from '../../model/GeographicTaxonomies';
+import { UoData } from '../../model/UoModel';
+import { AooData } from './../../model/AooData';
 
 const mockPartyRegistry = {
   items: [
@@ -200,6 +202,31 @@ const mockedGeoTaxonomy = [
   // }
 ];
 
+const mockedAooCode: AooData = {
+  codAoo: 'ND',
+  codiceFiscaleEnte: '92078570527',
+  codiceIpa: '03YBQ4C7',
+  codiceUniAoo: 'AR488GS',
+  denominazioneAoo: 'Denominazione Aoo Test',
+  denominazioneEnte: 'Comune Test',
+  id: 'AR488GS',
+  mail1: 'test.it',
+  origin: 'IPA',
+};
+
+const mockedUoCode: UoData = {
+  codiceFiscaleEnte: '92078570527',
+  codiceIpa: '03YBQ4C7',
+  codiceUniAoo: 'AR488GS',
+  codiceUniUo: 'YMELIE',
+  codiceUniUoPadre: '',
+  denominazioneEnte: 'denominazione uo test',
+  descrizioneUo: 'Ufficio per la transizione al Digitale',
+  id: 'YMELIE',
+  mail1: 'test@fnofi.it',
+  origin: 'IPA',
+};
+
 const mockedParty = {
   externalId: 'externalId1',
   originId: 'originId1',
@@ -213,6 +240,7 @@ const mockedParty = {
   origin: 'IPA',
   userRole: 'ADMIN',
 };
+
 const mockedParties: Array<SelfcareParty> = [
   {
     externalId: 'externalId1',
@@ -450,6 +478,17 @@ export async function mockFetch(
     );
   }
 
+  if (endpoint === 'ONBOARDING_GET_AOO_CODE_INFO') {
+    return new Promise((resolve) =>
+      resolve({ data: mockedAooCode, status: 200, statusText: '200' } as AxiosResponse)
+    );
+  }
+
+  if (endpoint === 'ONBOARDING_GET_UO_CODE_INFO') {
+    return new Promise((resolve) =>
+      resolve({ data: mockedUoCode, status: 200, statusText: '200' } as AxiosResponse)
+    );
+  }
   if (endpoint === 'VERIFY_ONBOARDING') {
     switch (endpointParams.externalInstitutionId) {
       case 'infoError':

@@ -193,6 +193,18 @@ test('test advanvced search business name', async () => {
   await executeAdvancedSearchForBusinessName(agencyX);
 });
 
+test('test advanvced search aoo name', async () => {
+  renderComponent('prod-interop');
+  await executeStepInstitutionType();
+  await executeAdvancedSearchForAoo(agencyX);
+});
+
+test('test advanvced search uo name', async () => {
+  renderComponent('prod-interop');
+  await executeStepInstitutionType();
+  await executeAdvancedSearchForAoo(agencyX);
+});
+
 test('test label recipientCode only for institutionType !== PA', async () => {
   renderComponent('prod-pagopa');
   await executeStepInstitutionTypeScp();
@@ -384,6 +396,66 @@ const executeAdvancedSearchForTaxCode = async (partyName: string) => {
 
   fireEvent.click(confirmButton);
   await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(3));
+};
+
+const executeAdvancedSearchForAoo = async (partyName: string) => {
+  console.log('Testing step 1');
+
+  screen.getByText(step1Title);
+  await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(1));
+  const inputPartyName = document.getElementById('Parties');
+
+  const selectWrapper = document.getElementById('party-type-select');
+  const input = selectWrapper?.firstChild;
+  fireEvent.keyDown(input, { keyCode: 40 });
+
+  const option = await document.getElementById('aooCode');
+  fireEvent.click(option);
+
+  expect(inputPartyName).toBeTruthy();
+  fireEvent.change(inputPartyName, { target: { value: 'AR488GS' } });
+
+  const partyNameSelection = await waitFor(() => screen.getByText('denominazione aoo test'));
+
+  expect(fetchWithLogsSpy).toBeCalledTimes(3);
+
+  fireEvent.click(partyNameSelection);
+
+  const confirmButton = screen.getByRole('button', { name: 'Continua' });
+  expect(confirmButton).toBeEnabled();
+
+  fireEvent.click(confirmButton);
+  await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(4));
+};
+
+const executeAdvancedSearchForUo = async (partyName: string) => {
+  console.log('Testing step 1');
+
+  screen.getByText(step1Title);
+  await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(1));
+  const inputPartyName = document.getElementById('Parties');
+
+  const selectWrapper = document.getElementById('party-type-select');
+  const input = selectWrapper?.firstChild;
+  fireEvent.keyDown(input, { keyCode: 40 });
+
+  const option = await document.getElementById('uoCode');
+  fireEvent.click(option);
+
+  expect(inputPartyName).toBeTruthy();
+  fireEvent.change(inputPartyName, { target: { value: 'YMELIE' } });
+
+  const partyNameSelection = await waitFor(() => screen.getByText('denominazione uo test'));
+
+  expect(fetchWithLogsSpy).toBeCalledTimes(3);
+
+  fireEvent.click(partyNameSelection);
+
+  const confirmButton = screen.getByRole('button', { name: 'Continua' });
+  expect(confirmButton).toBeEnabled();
+
+  fireEvent.click(confirmButton);
+  await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(4));
 };
 
 const executeStepInstitutionType = async () => {
