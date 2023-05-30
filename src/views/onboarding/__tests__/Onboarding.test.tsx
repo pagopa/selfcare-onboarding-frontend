@@ -1,5 +1,5 @@
+import React from 'react';
 import { fireEvent, getByLabelText, render, screen, waitFor } from '@testing-library/react';
-import selectEvent from 'react-select-event';
 import { useState } from 'react';
 import '@testing-library/jest-dom';
 import { User } from '../../../../types';
@@ -7,7 +7,7 @@ import { HeaderContext, UserContext } from '../../../lib/context';
 import { ENV } from '../../../utils/env';
 import Onboarding from '../Onboarding';
 import '../../../locale';
-import { GeographicTaxonomy, nationalValue } from '../../../model/GeographicTaxonomies';
+import { nationalValue } from '../../../model/GeographicTaxonomies';
 
 jest.mock('../../../lib/api-utils');
 jest.setTimeout(30000);
@@ -294,7 +294,7 @@ const executeStep1 = async (partyName: string) => {
 
   screen.getByText(step1Title);
   await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(1));
-  const inputPartyName = document.getElementById('Parties');
+  const inputPartyName = document.getElementById('Parties') as HTMLElement;
 
   expect(inputPartyName).toBeTruthy();
   fireEvent.change(inputPartyName, { target: { value: 'XXX' } });
@@ -331,7 +331,7 @@ const executeStep1Base = async (partyName: string) => {
   screen.getByText(step1Title);
 
   expect(document.getElementById('Parties')).toBeTruthy();
-  fireEvent.change(document.getElementById('Parties'), { target: { value: 'XXX' } });
+  fireEvent.change(document.getElementById('Parties') as HTMLElement, { target: { value: 'XXX' } });
 
   await waitFor(() => fireEvent.click(screen.getByText(partyName)));
 
@@ -345,13 +345,13 @@ const executeAdvancedSearchForBusinessName = async (partyName: string) => {
 
   screen.getByText(step1Title);
   await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(1));
-  const inputPartyName = document.getElementById('Parties');
+  const inputPartyName = document.getElementById('Parties') as HTMLElement;
 
   const selectWrapper = document.getElementById('party-type-select');
-  const input = selectWrapper?.firstChild;
+  const input = selectWrapper?.firstChild as HTMLElement;
   fireEvent.keyDown(input, { keyCode: 40 });
 
-  const option = await document.getElementById('businessName');
+  const option = (await document.getElementById('businessName')) as HTMLElement;
   fireEvent.click(option);
 
   expect(inputPartyName).toBeTruthy();
@@ -375,13 +375,13 @@ const executeAdvancedSearchForTaxCode = async (partyName: string) => {
 
   screen.getByText(step1Title);
   await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(1));
-  const inputPartyName = document.getElementById('Parties');
+  const inputPartyName = document.getElementById('Parties') as HTMLElement;
   const selectWrapper = document.getElementById('party-type-select');
 
-  const input = selectWrapper?.firstChild;
+  const input = selectWrapper?.firstChild as HTMLElement;
   fireEvent.keyDown(input, { keyCode: 40 });
 
-  const option = await document.getElementById('taxCode');
+  const option = (await document.getElementById('taxCode')) as HTMLElement;
   fireEvent.click(option);
 
   expect(inputPartyName).toBeTruthy();
@@ -403,13 +403,13 @@ const executeAdvancedSearchForAoo = async (partyName: string) => {
 
   screen.getByText(step1Title);
   await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(1));
-  const inputPartyName = document.getElementById('Parties');
+  const inputPartyName = document.getElementById('Parties') as HTMLElement;
 
   const selectWrapper = document.getElementById('party-type-select');
-  const input = selectWrapper?.firstChild;
+  const input = selectWrapper?.firstChild as HTMLElement;
   fireEvent.keyDown(input, { keyCode: 40 });
 
-  const option = await document.getElementById('aooCode');
+  const option = (await document.getElementById('aooCode')) as HTMLElement;
   fireEvent.click(option);
 
   expect(inputPartyName).toBeTruthy();
@@ -433,13 +433,13 @@ const executeAdvancedSearchForUo = async (partyName: string) => {
 
   screen.getByText(step1Title);
   await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(1));
-  const inputPartyName = document.getElementById('Parties');
+  const inputPartyName = document.getElementById('Parties') as HTMLElement;
 
   const selectWrapper = document.getElementById('party-type-select');
-  const input = selectWrapper?.firstChild;
+  const input = selectWrapper?.firstChild as HTMLElement;
   fireEvent.keyDown(input, { keyCode: 40 });
 
-  const option = await document.getElementById('uoCode');
+  const option = (await document.getElementById('uoCode')) as HTMLElement;
   fireEvent.click(option);
 
   expect(inputPartyName).toBeTruthy();
@@ -528,7 +528,7 @@ const executeStepBillingData = async () => {
   const confirmButtonEnabled = screen.getByRole('button', { name: 'Continua' });
   await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
 
-  fireEvent.change(document.getElementById('recipientCode'), {
+  fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
     target: { value: '' },
   });
   await waitFor(() => expect(confirmButtonEnabled).toBeDisabled());
@@ -613,7 +613,7 @@ const executeStepBillingDataWithoutSupportMail = async () => {
   const confirmButtonEnabled = screen.getByRole('button', { name: 'Continua' });
   await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
 
-  fireEvent.change(document.getElementById('supportEmail'), {
+  fireEvent.change(document.getElementById('supportEmail') as HTMLElement, {
     target: { value: 'h' },
   });
 
@@ -622,7 +622,7 @@ const executeStepBillingDataWithoutSupportMail = async () => {
   await waitFor(() => expect(confirmButtonEnabled).toBeDisabled());
 
   await waitFor(() =>
-    fireEvent.change(document.getElementById('supportEmail'), {
+    fireEvent.change(document.getElementById('supportEmail') as HTMLElement, {
       target: { value: '' },
     })
   );
@@ -721,8 +721,8 @@ const checkCertifiedUserValidation = async (prefix: string, confirmButton: HTMLE
   screen.getByText('Cognome non corretto o diverso dal Codice Fiscale');
 };
 
-const fillInstitutionTypeCheckbox = async (pa: string, gsp: string, scp: string, pt: string) => {
-  fireEvent.click(document.getElementById(pa));
+const fillInstitutionTypeCheckbox = async (element: string) => {
+  fireEvent.click(document.getElementById(element) as HTMLElement);
 };
 
 const fillUserBillingDataForm = async (
@@ -736,32 +736,38 @@ const fillUserBillingDataForm = async (
   supportEmail: string,
   rea?: string
 ) => {
-  fireEvent.change(document.getElementById(businessNameInput), {
+  fireEvent.change(document.getElementById(businessNameInput) as HTMLElement, {
     target: { value: 'businessNameInput' },
   });
-  fireEvent.change(document.getElementById(registeredOfficeInput), {
+  fireEvent.change(document.getElementById(registeredOfficeInput) as HTMLElement, {
     target: { value: 'registeredOfficeInput' },
   });
-  fireEvent.change(document.getElementById(mailPECInput), { target: { value: 'a@a.it' } });
-  fireEvent.change(document.getElementById(zipCode), { target: { value: '09010' } });
-  fireEvent.change(document.getElementById(taxCodeInput), {
+  fireEvent.change(document.getElementById(mailPECInput) as HTMLElement, {
+    target: { value: 'a@a.it' },
+  });
+  fireEvent.change(document.getElementById(zipCode) as HTMLElement, { target: { value: '09010' } });
+  fireEvent.change(document.getElementById(taxCodeInput) as HTMLElement, {
     target: { value: 'AAAAAA44D55F456K' },
   });
 
   const isTaxCodeEquals2PIVA = document.getElementById('onboardingFormData');
   expect(isTaxCodeEquals2PIVA).toBeTruthy();
 
-  fireEvent.change(document.getElementById(vatNumber), {
+  fireEvent.change(document.getElementById(vatNumber) as HTMLElement, {
     target: { value: 'AAAAAA44D55F456K' },
   });
-  fireEvent.change(document.getElementById(recipientCode), {
+  fireEvent.change(document.getElementById(recipientCode) as HTMLElement, {
     target: { value: 'recipientCode' },
   });
-  fireEvent.change(document.getElementById(supportEmail), { target: { value: 'a@a.it' } });
+  fireEvent.change(document.getElementById(supportEmail) as HTMLElement, {
+    target: { value: 'a@a.it' },
+  });
   // TODO: remove comment if REACT_APP_ENABLE_GEOTAXONOMY is true -- await waitFor(() => fireEvent.click(document.getElementById('national_geographicTaxonomies')));
   if (rea) {
     await waitFor(() =>
-      fireEvent.change(document.getElementById(rea), { target: { value: 'RM-123456' } })
+      fireEvent.change(document.getElementById(rea) as HTMLElement, {
+        target: { value: 'RM-123456' },
+      })
     );
   }
 };
@@ -842,7 +848,9 @@ const fillTextFieldAndCheckButton = async (
   confirmButton: HTMLElement,
   expectedEnabled?: boolean
 ) => {
-  fireEvent.change(document.getElementById(`${prefix}-${field}`), { target: { value } });
+  fireEvent.change(document.getElementById(`${prefix}-${field}`) as HTMLElement, {
+    target: { value },
+  });
 };
 
 const checkLoggedUserAsAdminCheckbox = async (
@@ -896,7 +904,7 @@ const clickAdminCheckBoxAndTestValues = (
   expectedSurname: string = '',
   expectedTaxCode: string = ''
 ) => {
-  fireEvent.click(document.querySelector("input[type='checkbox']"));
+  fireEvent.click(document.querySelector("input[type='checkbox']") as HTMLElement);
   expect((document.getElementById('delegate-initial-name') as HTMLInputElement).value).toBe(
     expectedName
   );
