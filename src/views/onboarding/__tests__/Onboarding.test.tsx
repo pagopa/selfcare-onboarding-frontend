@@ -114,26 +114,22 @@ test('test error productID', async () => {
   await waitFor(() => screen.getByText('Impossibile individuare il prodotto desiderato'));
 });
 
-// test('test complete', async () => {
-//   renderComponent();
-//   await executeStepInstitutionType();
-//   await executeStep1(agencyX);
-//   await executeStepBillingData();
-//   await executeStep2();
-//   await executeStep3(true);
-//   await verifySubmit();
-//   await executeGoHome(true);
-// });
+test('test complete', async () => {
+  renderComponent();
+  await executeStepInstitutionType();
+  await executeStep1(agencyX);
+  await executeStepBillingData();
+  await executeStep2();
+  await executeStep3(true);
+  await verifySubmit();
+  await executeGoHome(true);
+});
 
-// test('test complete with error on submit', async () => {
-//   renderComponent();
-//   await executeStepInstitutionType();
-//   await executeStep1(agencyError);
-//   await executeStepBillingData();
-//   await executeStep2();
-//   await executeStep3(false);
-//   await executeGoHome(false);
-// });
+test('test complete with error on submit', async () => {
+  renderComponent('prod-io');
+  await executeStepInstitutionType();
+  await executeStep1(agencyError);
+});
 
 test('test exiting during flow with unload event', async () => {
   renderComponent();

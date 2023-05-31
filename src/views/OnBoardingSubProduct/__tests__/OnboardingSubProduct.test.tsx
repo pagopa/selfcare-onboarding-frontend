@@ -210,15 +210,15 @@ test('test exiting during flow with unload event', async () => {
   );
 });
 
-// test('test complete', async () => {
-//   renderComponent('prod-io', 'prod-io-premium');
-//   await executeStepSelectPricingPlan();
-//   await executeStepSelectInstitutionReleated('Comune di Milano');
-//   await executeStepBillingDataUnrelated();
-//   await executeStepAddManager(true);
-//   await executeClickCloseButton();
-//   await verifySubmitPostLegals();
-// });
+test('test complete', async () => {
+  renderComponent('prod-io', 'prod-io-premium');
+  await executeStepSelectPricingPlan();
+  await executeStepSelectInstitutionReleated('Comune di Milano');
+  await executeStepBillingDataUnrelated();
+  await executeStepAddManager(true);
+  await executeClickCloseButton();
+  await verifySubmitPostLegals();
+});
 
 const performLogout = async (logoutButton: HTMLElement) => {
   fireEvent.click(logoutButton);
@@ -564,7 +564,7 @@ const verifySubmitPostLegals = async () => {
           assistanceContacts: { supportEmail: 'comune.bollate@pec.it' },
           productId: 'prod-io-premium',
           subunitCode: undefined,
-          subunitType: 'EC',
+          subunitType: undefined,
           taxCode: 'AAAAAA11A11A123K',
           companyInformations: undefined,
         },
