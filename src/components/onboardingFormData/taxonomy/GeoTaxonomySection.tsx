@@ -10,12 +10,10 @@ import {
   Grid,
   Typography,
   Box,
-  Tooltip,
   TextField,
 } from '@mui/material';
 import { AddOutlined, RemoveCircleOutlineOutlined } from '@mui/icons-material';
 import { ButtonNaked } from '@pagopa/mui-italia';
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { AxiosError, AxiosResponse } from 'axios';
 import { fetchWithLogs } from '../../../lib/api-utils';
 import { getFetchOutcome } from '../../../lib/error-utils';
@@ -247,19 +245,15 @@ export default function GeoTaxonomySection({
     <Paper elevation={8} sx={{ p: 4, borderRadius: 4, my: 4, width: '704px' }}>
       <Grid container item pb={3}>
         <Grid item xs={12} display="flex">
-          <Box>
-            <Typography component="div" variant="caption" sx={{ fontWeight: 'fontWeightBold' }}>
-              {t('onboardingFormData.taxonomySection.title')}
+          <Typography component="div" variant="caption" sx={{ fontWeight: 'fontWeightBold' }}>
+            {t('onboardingFormData.taxonomySection.title')}
+          </Typography>
+        </Grid>
+        <Grid item xs={12} display="flex" mt={1}>
+          <Box display="flex" alignItems="center">
+            <Typography variant="caption">
+              {t('onboardingFormData.taxonomySection.infoLabel')}
             </Typography>
-          </Box>
-          <Box ml={2} display="flex" alignItems="center" sx={{ cursor: 'pointer' }}>
-            <Tooltip
-              title={t('onboardingFormData.taxonomySection.infoLabel') as string}
-              placement="top"
-              arrow={true}
-            >
-              <InfoOutlinedIcon color="primary" fontSize={'small'} />
-            </Tooltip>
           </Box>
         </Grid>
       </Grid>
