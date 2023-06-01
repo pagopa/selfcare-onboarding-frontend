@@ -199,7 +199,11 @@ function OnboardingComponent({ productId }: { productId: string }) {
     setExternalInstitutionId(party.externalId);
     setOrigin(party.origin);
     setOnboardingFormData({
-      businessName: party.description,
+      businessName: aooResult
+        ? aooResult?.denominazioneAoo
+        : uoResult
+        ? uoResult.descrizioneUo
+        : party.description,
       aooName: aooResult?.denominazioneAoo,
       uoName: uoResult?.descrizioneUo,
       aooUniqueCode: aooResult?.codiceUniAoo,
