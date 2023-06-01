@@ -76,7 +76,7 @@ function StepOnboardingData({ forward, externalInstitutionId, productId, institu
       const result = (onboardingData as AxiosResponse).data as InstitutionOnboardingInfoResource;
       forward(
         result.institution.billingData,
-        result.institution.institutionType,
+        result.institution.institutionType ? result.institution.institutionType : institutionType,
         result.institution.id,
         result.institution.assistanceContacts,
         result.institution.companyInformations
