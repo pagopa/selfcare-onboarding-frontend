@@ -101,7 +101,7 @@ export default function PersonalAndBillingDataSection({
   return (
     <>
       {/* DATI DI FATTURAZIONE E ANAGRAFICI */}
-      <Paper elevation={8} sx={{ borderRadius: theme.spacing(2), p: 4 }}>
+      <Paper elevation={8} sx={{ borderRadius: theme.spacing(2), p: 4, width: '704px' }}>
         <Grid item container spacing={3}>
           {/* Ragione sociale */}
           <Grid item xs={12}>
@@ -229,9 +229,7 @@ export default function PersonalAndBillingDataSection({
                 <CustomTextField
                   {...baseTextFieldProps(
                     'recipientCode',
-                    institutionType === 'PA'
-                      ? t('onboardingFormData.billingDataSection.recipientCodeForPa')
-                      : t('onboardingFormData.billingDataSection.recipientCode'),
+                    t('onboardingFormData.billingDataSection.sdiCode'),
                     400,
                     18
                   )}

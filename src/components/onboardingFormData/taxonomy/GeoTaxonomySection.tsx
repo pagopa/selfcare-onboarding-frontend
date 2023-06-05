@@ -10,19 +10,15 @@ import {
   Grid,
   Typography,
   Box,
-  Tooltip,
   TextField,
 } from '@mui/material';
 import { AddOutlined, RemoveCircleOutlineOutlined } from '@mui/icons-material';
 import { ButtonNaked } from '@pagopa/mui-italia';
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { AxiosError, AxiosResponse } from 'axios';
 import { fetchWithLogs } from '../../../lib/api-utils';
 import { getFetchOutcome } from '../../../lib/error-utils';
 import { UserContext } from '../../../lib/context';
-import { ENV } from '../../../utils/env';
-import { OnboardingInstitutionInfo } from '../../../model/OnboardingInstitutionInfo';
-import { GeographicTaxonomy } from '../../../model/GeographicTaxonomies';
+import { GeographicTaxonomy, nationalValue } from '../../../model/GeographicTaxonomies';
 import { useHistoryState } from '../../useHistoryState';
 
 type Props = {
@@ -37,12 +33,12 @@ export default function GeoTaxonomySection({
   formik,
 }: Props) {
   const { t } = useTranslation();
-  const nationalArea = [{ code: '100', desc: 'ITALIA' }];
+  const nationalArea = [{ code: nationalValue, desc: 'ITALIA' }];
 
   const [isNationalAreaVisible, setIsNationalAreaVisible] = useState<boolean>(false);
   const [isLocalAreaVisible, setIsLocalAreaVisible] = useState<boolean>(false);
   const [optionsSelected, setOptionsSelected] = useState<Array<GeographicTaxonomy>>([]);
-  const [options, setOptions] = useState<Array<OnboardingInstitutionInfo>>([]);
+  const [options, setOptions] = useState<Array<GeographicTaxonomy>>([]);
   const [isAddNewAutocompleteEnabled, setIsAddNewAutocompleteEnabled] = useState<boolean>(false);
   const [input, setInput] = useState<string>('');
   const [error, setError] = useState<any>({});
@@ -65,8 +61,10 @@ export default function GeoTaxonomySection({
     setError((currError: any) => ({ ...currError, [index]: true }));
   };
 
+  const isGeotaxHistoryNational = geotaxonomiesHistory[0]?.code === nationalValue;
+
   useEffect(() => {
-    if (retrievedTaxonomies && retrievedTaxonomies[0]?.code === '100') {
+    if (retrievedTaxonomies && retrievedTaxonomies[0]?.code === nationalValue) {
       setIsNationalAreaVisible(true);
       setOptionsSelected(nationalArea);
       setGeographicTaxonomies(optionsSelected);
@@ -75,7 +73,7 @@ export default function GeoTaxonomySection({
       setOptionsSelected(retrievedTaxonomies);
       setIsAddNewAutocompleteEnabled(true);
       setGeographicTaxonomies(optionsSelected);
-    } else if (geotaxonomiesHistory[0]?.code === '100') {
+    } else if (isGeotaxHistoryNational) {
       setIsLocalAreaVisible(false);
     }
   }, [retrievedTaxonomies]);
@@ -84,7 +82,7 @@ export default function GeoTaxonomySection({
     if (geotaxonomiesHistory && geotaxonomiesHistory.length > 0) {
       setOptionsSelected(geotaxonomiesHistory);
       setIsLocalAreaVisible(true);
-      if (geotaxonomiesHistory[0]?.code === '100') {
+      if (isGeotaxHistoryNational) {
         setIsLocalAreaVisible(false);
       }
     }
@@ -107,7 +105,7 @@ export default function GeoTaxonomySection({
   }, [optionsSelected]);
 
   useEffect(() => {
-    if (geotaxonomiesHistory[0]?.code === '100') {
+    if (isGeotaxHistoryNational) {
       setIsLocalAreaVisible(false);
       setIsNationalAreaVisible(true);
     }
@@ -155,13 +153,9 @@ export default function GeoTaxonomySection({
         setOptionsSelected(retrievedTaxonomies);
       }
     } else if (geotaxonomiesHistory && geotaxonomiesHistory.length > 0) {
-      if (
-        geotaxonomiesHistory[0]?.code === '100' &&
-        localState.current &&
-        localState.current?.length > 0
-      ) {
+      if (isGeotaxHistoryNational && localState.current && localState.current?.length > 0) {
         setOptionsSelected(localState.current);
-      } else if (geotaxonomiesHistory[0]?.code === '100' && !localState.current) {
+      } else if (isGeotaxHistoryNational && !localState.current) {
         setOptionsSelected([{ code: '', desc: '' }]);
       } else {
         setOptionsSelected(geotaxonomiesHistory);
@@ -212,7 +206,7 @@ export default function GeoTaxonomySection({
       },
       {
         method: 'GET',
-        params: { limit: ENV.MAX_INSTITUTIONS_FETCH, page: 1, startsWith: query },
+        params: { description: query },
       },
       () => setRequiredLogin(true)
     );
@@ -222,7 +216,10 @@ export default function GeoTaxonomySection({
       // eslint-disable-next-line functional/no-let
       let data = (searchGeotaxonomy as AxiosResponse).data;
 
-      data = data.map((value: OnboardingInstitutionInfo) => ({ ...value, label: value.desc }));
+      data = data.map((value: GeographicTaxonomy) => ({
+        ...value,
+        label: value.desc,
+      }));
 
       const dataFiltered = data.filter(
         (data: any) => !optionsSelected.find((os) => os?.code === data?.code)
@@ -245,22 +242,18 @@ export default function GeoTaxonomySection({
   };
 
   return (
-    <Paper elevation={8} sx={{ p: 4, borderRadius: 2, my: 4 }}>
+    <Paper elevation={8} sx={{ p: 4, borderRadius: 4, my: 4, width: '704px' }}>
       <Grid container item pb={3}>
         <Grid item xs={12} display="flex">
-          <Box>
-            <Typography component="div" variant="caption" sx={{ fontWeight: 'fontWeightBold' }}>
-              {t('onboardingFormData.taxonomySection.title')}
+          <Typography component="div" variant="caption" sx={{ fontWeight: 'fontWeightBold' }}>
+            {t('onboardingFormData.taxonomySection.title')}
+          </Typography>
+        </Grid>
+        <Grid item xs={12} display="flex" mt={1}>
+          <Box display="flex" alignItems="center">
+            <Typography variant="caption">
+              {t('onboardingFormData.taxonomySection.infoLabel')}
             </Typography>
-          </Box>
-          <Box ml={2} display="flex" alignItems="center" sx={{ cursor: 'pointer' }}>
-            <Tooltip
-              title={t('onboardingFormData.taxonomySection.infoLabel') as string}
-              placement="top"
-              arrow={true}
-            >
-              <InfoOutlinedIcon color="primary" fontSize={'small'} />
-            </Tooltip>
           </Box>
         </Grid>
       </Grid>
@@ -317,11 +310,19 @@ export default function GeoTaxonomySection({
                     onOpen={() => setOptions([])}
                     disablePortal
                     options={input.length >= 3 ? options : []}
-                    sx={{ width: '100%', pr: '0px !important' }}
+                    sx={{
+                      width: '100%',
+                      pr: '0px !important',
+                      '& .MuiAutocomplete-inputRoot .MuiAutocomplete-input': {
+                        textTransform: 'capitalize',
+                      },
+                    }}
                     onChange={(event: any, value: any) => handleChange(event, value, i)}
-                    value={geotaxonomiesHistory[i]?.desc ?? val?.desc}
+                    value={geotaxonomiesHistory[i]?.desc?.toLowerCase() ?? val?.desc?.toLowerCase()}
                     renderOption={(props, option) => (
-                      <span {...props}>{option.desc ? option.desc : ''}</span>
+                      <span style={{ textTransform: 'capitalize' }} {...props}>
+                        {option.desc ? option.desc?.toLocaleLowerCase() : ''}
+                      </span>
                     )}
                     renderInput={(params) => (
                       <TextField

@@ -22,7 +22,7 @@ import { LoadingOverlay } from '../../components/LoadingOverlay';
 import { ENV } from '../../utils/env';
 import { HeaderContext } from '../../lib/context';
 import { StepAddManager, UsersObject } from '../../components/steps/StepAddManager';
-import { StepSearchParty } from '../../components/steps/StepSearchParty';
+// import { StepSearchParty } from '../../components/steps/StepSearchParty';
 import StepOnboardingData from '../../components/steps/StepOnboardingData';
 import StepOnboardingFormData from '../../components/steps/StepOnboardingFormData';
 import { AssistanceContacts } from '../../model/AssistanceContacts';
@@ -34,6 +34,8 @@ import SubProductStepSubmit from './components/SubProductStepSubmit';
 import SubProductStepSuccess from './components/SubProductStepSuccess';
 import { SubProductStepSelectUserParty } from './components/SubProductStepSelectUserParty';
 import SubProductStepOnBoardingStatus from './components/SubProductStepOnBoardingStatus';
+import SubProductStepSelectPricingPlan from './components/subProductStepPricingPlan/SubProductStepSelectPricingPlan';
+import SubProductStepUserUnrelated from './components/SubProductStepUserUnrelated';
 
 type OnBoardingSubProductUrlParams = {
   productId: string;
@@ -102,14 +104,12 @@ function OnBoardingSubProduct() {
   const forwardWithInputs = (
     newProduct: Product,
     newSubProduct: Product,
-    newParties: Array<SelfcareParty>,
-    newPricingPlan: string
+    newParties: Array<SelfcareParty>
   ) => {
     setProduct(newProduct);
     setSubProduct(newSubProduct);
     setParties(newParties);
-    setPricingPlan(newPricingPlan);
-    setActiveStep(newParties.length === 0 ? 2 : 1);
+    setActiveStep(1);
   };
 
   const forwardWithBillingData = (newBillingData: OnboardingFormData) => {
@@ -163,19 +163,14 @@ function OnBoardingSubProduct() {
   };
 
   const forwardWithOnboardingData = (
-    manager?: UserOnCreate,
     billingData?: OnboardingFormData,
     institutionType?: InstitutionType,
     partyId?: string,
     assistanceContacts?: AssistanceContacts,
     companyInformations?: CompanyInformations
   ) => {
-    setManager(manager);
-    if (manager) {
-      setStepAddManagerHistoryState({ LEGAL: manager });
-    } else {
-      setStepAddManagerHistoryState({});
-    }
+    setStepAddManagerHistoryState({});
+
     if (billingData) {
       setBillingData(billingData);
     }
@@ -188,6 +183,11 @@ function OnBoardingSubProduct() {
     setInstitutionType(institutionType);
     setPartyId(partyId);
     forward();
+  };
+  const forwardWitSelectedPricingPlan = (pp: string) => {
+    setPricingPlan(pp);
+    setActiveStep(parties.length === 0 ? 3 : 2);
+    window.scrollTo(0, 0);
   };
 
   const steps: Array<StepperStep> = [
@@ -203,6 +203,14 @@ function OnBoardingSubProduct() {
         }),
     },
     {
+      label: 'Select Pricing Plan',
+      Component: () =>
+        SubProductStepSelectPricingPlan({
+          forward: forwardWitSelectedPricingPlan,
+          product,
+        }),
+    },
+    {
       label: 'Select Institution releated',
       Component: () =>
         SubProductStepSelectUserParty({
@@ -214,29 +222,33 @@ function OnBoardingSubProduct() {
               forward();
             }
           },
-          back,
+          back: () => {
+            setActiveStep(1);
+          },
         }),
     },
     {
       label: 'Select Institution unreleated',
-      Component: () =>
-        StepSearchParty({
-          subTitle: (
-            <Trans i18nKey="onBoardingSubProduct.selectUserPartyStep.IPAsubTitle">
-              Seleziona dall&apos;Indice della Pubblica Amministrazione (IPA) l&apos;ente
-              <br /> per cui vuoi richiedere l&apos;adesione a{' '}
-              {{
-                baseProduct: product?.title,
-              }}{' '}
-              Premium.
-            </Trans>
-          ),
-          product: subProduct,
-          forward: (_: any, party: Party) => forwardWithInstitution(party, false),
-          back: parties.length > 0 ? back : undefined,
-        }),
+      Component: () => SubProductStepUserUnrelated({ product, productId }),
+      // TODO temporary commented in order to develop SELC-2237
+      // StepSearchParty({
+      //   subTitle: (
+      //     <Trans i18nKey="onBoardingSubProduct.selectUserPartyStep.IPAsubTitle">
+      //       Seleziona dall&apos;Indice della Pubblica Amministrazione (IPA) l&apos;ente
+      //       <br /> per cui vuoi richiedere l&apos;adesione a{' '}
+      //       {{
+      //         baseProduct: product?.title,
+      //       }}{' '}
+      //       Premium.
+      //     </Trans>
+      //   ),
+      //   product: subProduct,
+      //   forward: (_: any, party: Party) => forwardWithInstitution(party, false),
+      //   back: parties.length > 0 ? back : undefined,
+      // }),
     },
     {
+      // TODO: remove if not used
       label: 'Verify OnBoarding Status',
       Component: () =>
         SubProductStepOnBoardingStatus({
@@ -290,7 +302,8 @@ function OnBoardingSubProduct() {
               setOnExitAction(() => window.location.assign(`${ENV.URL_FE.DASHBOARD}/${partyId}`));
               setOpenExitModal(true);
             } else {
-              setActiveStep(chooseFromMyParties.current ? 1 : 2);
+              setActiveStep(chooseFromMyParties.current ? 2 : 3);
+              window.scrollTo(0, 0);
             }
           },
         }),
@@ -372,7 +385,7 @@ function OnBoardingSubProduct() {
       onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
     />
   ) : (
-    <Container>
+    <Container sx={{ px: '0px !important', maxWidth: '100% !important' }}>
       <Step />
       <SessionModal
         handleClose={handleCloseExitModal}

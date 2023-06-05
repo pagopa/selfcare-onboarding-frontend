@@ -11,6 +11,7 @@ import { getFetchOutcome } from '../lib/error-utils';
 import { LoadingOverlay } from '../components/LoadingOverlay';
 import { HeaderContext, UserContext } from '../lib/context';
 import { jwtNotValid } from '../services/tokenServices';
+import { redirectToLogin } from '../utils/unloadEvent-utils';
 import { ENV } from '../utils/env';
 import JwtInvalidPage from './JwtInvalidPage';
 import ConfirmCancellationPage from './ConfirmCancellationPage';
@@ -37,7 +38,7 @@ export default function RejectRegistration() {
       const contractPostResponse = await fetchWithLogs(
         { endpoint: 'ONBOARDING_COMPLETE_REGISTRATION', endpointParams: { token } },
         { method: 'DELETE' },
-        () => setRequiredLogin(true)
+        redirectToLogin
       );
 
       // Check the outcome

@@ -5,6 +5,7 @@ import {
   SelfcareParty,
   UserOnCreate,
 } from '../../../types';
+import { nationalValue } from '../../model/GeographicTaxonomies';
 
 const mockPartyRegistry = {
   items: [
@@ -151,7 +152,7 @@ const mockPartyRegistry = {
 
 const mockedGeoTaxonomy = [
   {
-    code: '100',
+    code: nationalValue,
     desc: 'ITALIA',
     region: '12',
     province: '058',
@@ -290,13 +291,6 @@ const mockedOnboardingData0: InstitutionOnboardingInfoResource = {
     institutionType: 'PA',
     origin: 'IPA',
   },
-  manager: {
-    email: 'm@ma.it',
-    taxCode: 'RSSMRA80A01H501U',
-    name: 'Mario',
-    surname: 'Rossi',
-    role: 'MANAGER',
-  },
 };
 
 const mockedOnboardingData1: InstitutionOnboardingInfoResource = {
@@ -328,13 +322,6 @@ const mockedOnboardingData1: InstitutionOnboardingInfoResource = {
       rea: 'RM-123456',
       shareCapital: '123456',
     },
-  },
-  manager: {
-    email: 'm@ma.it',
-    taxCode: 'RSOMRA80A01A794I',
-    name: 'Maria',
-    surname: 'Rosa',
-    role: 'MANAGER',
   },
 };
 

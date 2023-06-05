@@ -12,7 +12,7 @@ export default function DpoSection({ baseTextFieldProps }: Props) {
   return (
     <>
       {/* DATI DEL DPO */}
-      <Paper elevation={8} sx={{ borderRadius: theme.spacing(2), width: '100%', p: 4 }}>
+      <Paper elevation={8} sx={{ borderRadius: theme.spacing(2), p: 4, width: '704px', my: 2 }}>
         <Grid container item pb={3}>
           <Grid item xs={12}>
             <Typography variant="caption" sx={{ fontWeight: 'fontWeightBold' }}>
