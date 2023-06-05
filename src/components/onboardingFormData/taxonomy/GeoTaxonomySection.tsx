@@ -57,6 +57,7 @@ export default function GeoTaxonomySection({
     setError(newError);
   };
 
+  console.log('option selected', optionsSelected);
   const findError = (index: number) => {
     setError((currError: any) => ({ ...currError, [index]: true }));
   };
@@ -139,7 +140,7 @@ export default function GeoTaxonomySection({
   const checkLocalArea = () => {
     if (
       retrievedTaxonomies &&
-      retrievedTaxonomies[0]?.code !== '100' &&
+      retrievedTaxonomies[0]?.code !== nationalValue &&
       retrievedTaxonomies.length !== 0
     ) {
       if (
