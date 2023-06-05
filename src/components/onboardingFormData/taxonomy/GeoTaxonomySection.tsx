@@ -57,7 +57,6 @@ export default function GeoTaxonomySection({
     setError(newError);
   };
 
-  console.log('option selected', optionsSelected);
   const findError = (index: number) => {
     setError((currError: any) => ({ ...currError, [index]: true }));
   };
