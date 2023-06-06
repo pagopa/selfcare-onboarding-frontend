@@ -46,12 +46,17 @@ const errors = {
     title: 'title',
     message: 'message',
   },
+  ALREADY_ONBOARDED: {
+    title: 'title',
+    message: 'message',
+  },
 };
 
 const error2errorCode: { [key in keyof typeof errors]: Array<string> } = {
   INVALID_DOCUMENT: ['002-1000', '002-1001', '002-1002'],
   INVALID_SIGN: ['002-1004', '002-1005', '002-1006', '002-1007'],
   INVALID_SIGN_FORMAT: ['002-1003', '002-1008'],
+  ALREADY_ONBOARDED: ['002-1009'],
   GENERIC: [],
 };
 
@@ -64,6 +69,10 @@ const transcodeErrorCode = (data: Problem): keyof typeof errors => {
     data.errors?.findIndex((e) => error2errorCode.INVALID_SIGN_FORMAT.includes(e.code)) > -1
   ) {
     return 'INVALID_SIGN_FORMAT';
+  } else if (
+    data.errors?.findIndex((e) => error2errorCode.ALREADY_ONBOARDED.includes(e.code)) > -1
+  ) {
+    return 'ALREADY_ONBOARDED';
   }
   return 'GENERIC';
 };
