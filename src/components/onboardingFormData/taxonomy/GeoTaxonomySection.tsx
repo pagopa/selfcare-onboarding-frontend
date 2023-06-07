@@ -139,7 +139,7 @@ export default function GeoTaxonomySection({
   const checkLocalArea = () => {
     if (
       retrievedTaxonomies &&
-      retrievedTaxonomies[0]?.code !== '100' &&
+      retrievedTaxonomies[0]?.code !== nationalValue &&
       retrievedTaxonomies.length !== 0
     ) {
       if (
