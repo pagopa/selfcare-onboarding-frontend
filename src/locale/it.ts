@@ -183,6 +183,11 @@ export default {
         message:
           'La Firma Digitale non è riconducibile al Legale Rappresentante indicato in fase di adesione. Verifica la corrispondenza e carica di nuovo il documento.',
       },
+      ALREADY_ONBOARDED: {
+        title: `L'Ente che hai scelto ha già aderito`,
+        message:
+          'Per accedere, chiedi al Referente incaricato di abilitarti nella sezione Referenti del portale.',
+      },
       GENERIC: {
         title: 'Caricamento non riuscito',
         message:
