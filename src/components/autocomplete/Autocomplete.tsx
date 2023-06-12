@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { Dispatch, SetStateAction, useState } from 'react';
 
 import { Grid, Paper, Theme } from '@mui/material';
 
@@ -22,8 +22,11 @@ type AutocompleteProps = {
   product?: Product | null;
   aooResult?: AooData;
   uoResult?: UoData;
-  setAooResult: React.Dispatch<React.SetStateAction<AooData | undefined>>;
-  setUoResult: React.Dispatch<React.SetStateAction<UoData | undefined>>;
+  setAooResult: Dispatch<SetStateAction<AooData | undefined>>;
+  setUoResult: Dispatch<SetStateAction<UoData | undefined>>;
+  setUoResultHistory: (t: UoData | undefined) => void;
+  setAooResultHistory: (t: AooData | undefined) => void;
+  externalInstitutionId: string;
 };
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
@@ -42,6 +45,9 @@ export function Autocomplete({
   setAooResult,
   setUoResult,
   setIsSearchFieldSelected,
+  setUoResultHistory,
+  setAooResultHistory,
+  externalInstitutionId,
 }: AutocompleteProps) {
   const [options, setOptions] = useState<Array<InstitutionResource>>([]);
   const [cfResult, setCfResult] = useState<InstitutionResource>();
@@ -85,6 +91,8 @@ export function Autocomplete({
               isTaxCodeSelected={isTaxCodeSelected}
               isAooCodeSelected={isAooCodeSelected}
               isUoCodeSelected={isUoCodeSelected}
+              setUoResultHistory={setUoResultHistory}
+              setAooResultHistory={setAooResultHistory}
             />
           </Grid>
         )}
@@ -113,6 +121,9 @@ export function Autocomplete({
           setUoResult={setUoResult}
           aooResult={aooResult}
           uoResult={uoResult}
+          setUoResultHistory={setUoResultHistory}
+          setAooResultHistory={setAooResultHistory}
+          externalInstitutionId={externalInstitutionId}
         />
       </Grid>
     </Paper>

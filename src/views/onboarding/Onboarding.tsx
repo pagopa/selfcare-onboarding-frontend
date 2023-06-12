@@ -544,6 +544,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
       label: "Seleziona l'ente",
       Component: () =>
         StepSearchParty({
+          externalInstitutionId,
           subTitle: (
             <Trans i18nKey="onboardingStep1.onboarding.bodyDescription">
               Inserisci uno dei dati richiesti e cerca dall&apos;Indice della Pubblica
