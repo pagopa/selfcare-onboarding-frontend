@@ -1,13 +1,14 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { useState } from 'react';
-import { Product, User } from '../../../../types';
+import { User } from '../../../../types';
 import { HeaderContext, UserContext } from '../../../lib/context';
 import { ENV } from '../../../utils/env';
 import OnBoardingSubProduct from '../OnBoardingSubProduct';
 import '../../../locale';
 import { Route, Router, Switch } from 'react-router';
 import { createMemoryHistory } from 'history';
-import { GeographicTaxonomy, nationalValue } from '../../../model/GeographicTaxonomies';
+import { nationalValue } from '../../../model/GeographicTaxonomies';
+import React from 'react';
 
 jest.mock('../../../lib/api-utils');
 
@@ -265,10 +266,10 @@ const executeStepSelectPricingPlan = async () => {
     screen.getByText(/Passa a IO Premium e migliora le performance dei messaggi/)
   );
 
-  const showMoreBtn = document.getElementById('showMoreConsumptionPlan');
+  const showMoreBtn = document.getElementById('showMoreConsumptionPlan') as HTMLElement;
   fireEvent.click(showMoreBtn);
 
-  const forwardBtn = document.getElementById('forwardConsumptionPlan');
+  const forwardBtn = document.getElementById('forwardConsumptionPlan') as HTMLElement;
 
   expect(forwardBtn).toBeEnabled();
   fireEvent.click(forwardBtn);
@@ -282,7 +283,7 @@ const executeStepSelectInstitutionUnreleated = async (partyName: string) => {
 
   await waitFor(() => screen.getByText('Cerca il tuo ente'));
   await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(3));
-  const inputPartyName = document.getElementById('Parties');
+  const inputPartyName = document.getElementById('Parties') as HTMLElement;
 
   expect(inputPartyName).toBeTruthy();
   fireEvent.change(inputPartyName, { target: { value: 'XXX' } });
@@ -325,11 +326,11 @@ const executeStepBillingDataUnrelated = async () => {
   const confirmButtonEnabled = screen.getByRole('button', { name: 'Continua' });
   await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
 
-  fireEvent.change(document.getElementById('recipientCode'), {
+  fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
     target: { value: '' },
   });
   await waitFor(() => expect(confirmButtonEnabled).toBeDisabled());
-  fireEvent.change(document.getElementById('recipientCode'), {
+  fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
     target: { value: 'M5UXCR1' },
   });
   await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
@@ -356,7 +357,7 @@ const executeStepBillingData = async () => {
   const confirmButtonEnabled = screen.getByRole('button', { name: 'Continua' });
   await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
 
-  fireEvent.change(document.getElementById('recipientCode'), {
+  fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
     target: { value: '' },
   });
   await waitFor(() => expect(confirmButtonEnabled).toBeDisabled());
@@ -447,28 +448,34 @@ const fillUserBillingDataForm = async (
   recipientCode: string,
   supportEmail: string
 ) => {
-  fireEvent.change(document.getElementById(businessNameInput), {
+  fireEvent.change(document.getElementById(businessNameInput) as HTMLElement, {
     target: { value: 'businessNameInput' },
   });
-  fireEvent.change(document.getElementById(registeredOfficeInput), {
+  fireEvent.change(document.getElementById(registeredOfficeInput) as HTMLElement, {
     target: { value: 'registeredOfficeInput' },
   });
-  fireEvent.change(document.getElementById(mailPECInput), { target: { value: 'a@a.com' } });
-  fireEvent.change(document.getElementById(taxCodeInput), {
+  fireEvent.change(document.getElementById(mailPECInput) as HTMLElement, {
+    target: { value: 'a@a.com' },
+  });
+  fireEvent.change(document.getElementById(taxCodeInput) as HTMLElement, {
     target: { value: 'AAAAAA44D55F456K' },
   });
-  fireEvent.change(document.getElementById(zipCodeInput), {
+  fireEvent.change(document.getElementById(zipCodeInput) as HTMLElement, {
     target: { value: '09010' },
   });
-  fireEvent.change(document.getElementById(recipientCode), {
+  fireEvent.change(document.getElementById(recipientCode) as HTMLElement, {
     target: { value: 'AM23EIX' },
   });
-  fireEvent.change(document.getElementById(supportEmail), { target: { value: 'a@a.it' } });
+  fireEvent.change(document.getElementById(supportEmail) as HTMLElement, {
+    target: { value: 'a@a.it' },
+  });
   // TODO: remove comment if REACT_APP_ENABLE_GEOTAXONOMY is true -- fireEvent.click(document.getElementById('national_geographicTaxonomies'));
 };
 
 const fillTextFieldAndCheck = async (prefix: string, field: string, value: string) => {
-  fireEvent.change(document.getElementById(`${prefix}-${field}`), { target: { value } });
+  fireEvent.change(document.getElementById(`${prefix}-${field}`) as HTMLElement, {
+    target: { value },
+  });
 };
 const fillUserForm = async () => {
   await fillTextFieldAndCheck('LEGAL', 'email', 'm@ma.it');
@@ -508,7 +515,9 @@ const fillTextFieldAndCheckButton = async (
   confirmButton: HTMLElement,
   expectedEnabled: boolean
 ) => {
-  fireEvent.change(document.getElementById(`${prefix}-${field}`), { target: { value } });
+  fireEvent.change(document.getElementById(`${prefix}-${field}`) as HTMLElement, {
+    target: { value },
+  });
   if (expectedEnabled) {
     expect(confirmButton).toBeEnabled();
   } else {
@@ -531,7 +540,6 @@ const verifySubmitPostLegals = async () => {
     expect(fetchWithLogsSpy).lastCalledWith(
       {
         endpoint: 'ONBOARDING_POST_LEGALS',
-        endpointParams: { externalInstitutionId: 'externalId1', productId: 'prod-io-premium' },
       },
       {
         method: 'POST',
@@ -554,6 +562,11 @@ const verifySubmitPostLegals = async () => {
             ? [{ code: nationalValue, desc: 'ITALIA' }]
             : [],
           assistanceContacts: { supportEmail: 'comune.bollate@pec.it' },
+          productId: 'prod-io-premium',
+          subunitCode: undefined,
+          subunitType: undefined,
+          taxCode: 'AAAAAA11A11A123K',
+          companyInformations: undefined,
         },
       },
       expect.any(Function)

@@ -7,6 +7,8 @@ import { theme } from '@pagopa/mui-italia';
 import { InstitutionType, StepperStepComponentProps } from '../../../types';
 import { OnboardingFormData } from '../../model/OnboardingFormData';
 import { StepBillingDataHistoryState } from '../steps/StepOnboardingFormData';
+import { AooData } from '../../model/AooData';
+import { UoData } from '../../model/UoModel';
 import NumberDecimalFormat from './NumberDecimalFormat';
 
 const CustomTextField = styled(TextField)({
@@ -34,6 +36,8 @@ type Props = StepperStepComponentProps & {
   formik: any;
   premiumFlow: boolean;
   isInformationCompany: boolean;
+  aooSelected?: AooData;
+  uoSelected?: UoData;
 };
 
 export default function PersonalAndBillingDataSection({
@@ -45,6 +49,8 @@ export default function PersonalAndBillingDataSection({
   formik,
   premiumFlow,
   isInformationCompany,
+  aooSelected,
+  uoSelected,
 }: Props) {
   const { t } = useTranslation();
 
@@ -53,7 +59,7 @@ export default function PersonalAndBillingDataSection({
   const isPA = institutionType === 'PA';
   const isDisabled = premiumFlow || (isFromIPA && !isPA && !isPSP) || isPA;
   const requiredError = 'Required';
-
+  const isAooUo = aooSelected || uoSelected;
   const baseNumericFieldProps = (
     field: keyof OnboardingFormData,
     label: string,
@@ -103,18 +109,83 @@ export default function PersonalAndBillingDataSection({
       {/* DATI DI FATTURAZIONE E ANAGRAFICI */}
       <Paper elevation={8} sx={{ borderRadius: theme.spacing(2), p: 4, width: '704px' }}>
         <Grid item container spacing={3}>
-          {/* Ragione sociale */}
-          <Grid item xs={12}>
-            <CustomTextField
-              {...baseTextFieldProps(
-                'businessName',
-                t('onboardingFormData.billingDataSection.businessName'),
-                400,
-                18
-              )}
-              disabled={isDisabled}
-            />
-          </Grid>
+          {isAooUo && (
+            <Box px={4} pt={2} width="100%">
+              <Typography sx={{ fontSize: 'fontSize' }}>
+                {t('onboardingFormData.billingDataSection.centralPartyLabel')}
+              </Typography>
+              <Typography sx={{ fontWeight: 'fontWeightMedium', fontSize: 'fontSize' }}>
+                {aooSelected ? aooSelected?.denominazioneEnte : uoSelected?.denominazioneEnte}
+              </Typography>
+            </Box>
+          )}
+          {aooSelected ? (
+            // ao Description
+            <>
+              <Grid item xs={8}>
+                <CustomTextField
+                  {...baseTextFieldProps(
+                    'aooName',
+                    t('onboardingFormData.billingDataSection.aooName'),
+                    400,
+                    18
+                  )}
+                  disabled={isDisabled}
+                />
+              </Grid>
+              <Grid item xs={4}>
+                <CustomTextField
+                  {...baseTextFieldProps(
+                    'aooUniqueCode',
+                    t('onboardingFormData.billingDataSection.aooUniqueCode'),
+                    400,
+                    18
+                  )}
+                  disabled={isDisabled}
+                />
+              </Grid>
+            </>
+          ) : uoSelected ? (
+            // uo Description
+            <>
+              <Grid item xs={8}>
+                <CustomTextField
+                  {...baseTextFieldProps(
+                    'uoName',
+                    t('onboardingFormData.billingDataSection.uoName'),
+                    400,
+                    18
+                  )}
+                  disabled={isDisabled}
+                />
+              </Grid>
+              <Grid item xs={4}>
+                <CustomTextField
+                  {...baseTextFieldProps(
+                    'uoUniqueCode',
+                    t('onboardingFormData.billingDataSection.uoUniqueCode'),
+                    400,
+                    18
+                  )}
+                  disabled={isDisabled}
+                />
+              </Grid>
+            </>
+          ) : (
+            // Ragione sociale
+            <Grid item xs={12}>
+              <CustomTextField
+                {...baseTextFieldProps(
+                  'businessName',
+                  t('onboardingFormData.billingDataSection.businessName'),
+                  400,
+                  18
+                )}
+                disabled={isDisabled}
+              />
+            </Grid>
+          )}
+
           {/* Sede legale */}
           <Grid item xs={8}>
             <CustomTextField
@@ -161,7 +232,7 @@ export default function PersonalAndBillingDataSection({
                 400,
                 18
               )}
-              disabled={isDisabled}
+              disabled={isDisabled && !isAooUo}
             />
           </Grid>
           {/* Checkbox codice fiscale = P.IVA */}
