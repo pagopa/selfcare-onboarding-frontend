@@ -26,6 +26,7 @@ type Props = {
   institutionType?: InstitutionType;
   productAvoidStep?: boolean;
   product?: Product | null;
+  externalInstitutionId: string;
 } & StepperStepComponentProps;
 
 const handleSearchExternalId = async (
@@ -58,13 +59,20 @@ export function StepSearchParty({
   institutionType,
   productAvoidStep,
   product,
+  externalInstitutionId,
 }: Props) {
   const partyExternalIdByQuery = new URLSearchParams(window.location.search).get('partyExternalId');
   const { setRequiredLogin } = useContext(UserContext);
   const theme = useTheme();
 
-  const [aooResult, setAooResult] = useState<AooData>();
-  const [uoResult, setUoResult] = useState<UoData>();
+  const [aooResult, setAooResult, setAooResultHistory] = useHistoryState<AooData | undefined>(
+    'aooSelected_step1',
+    undefined
+  );
+  const [uoResult, setUoResult, setUoResultHistory] = useHistoryState<UoData | undefined>(
+    'uoSelected_step1',
+    undefined
+  );
 
   const [isSearchFieldSelected, setIsSearchFieldSelected] = useState<boolean>(true);
 
@@ -102,6 +110,8 @@ export function StepSearchParty({
   }, [aooResult, uoResult]);
 
   const onForwardAction = () => {
+    setAooResultHistory(aooResult);
+    setUoResultHistory(uoResult);
     setSelectedHistory(selected);
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const { id } = selected!;
@@ -253,6 +263,9 @@ export function StepSearchParty({
             uoResult={uoResult}
             setAooResult={setAooResult}
             setUoResult={setUoResult}
+            setUoResultHistory={setUoResultHistory}
+            setAooResultHistory={setAooResultHistory}
+            externalInstitutionId={externalInstitutionId}
           />
         </Grid>
       </Grid>

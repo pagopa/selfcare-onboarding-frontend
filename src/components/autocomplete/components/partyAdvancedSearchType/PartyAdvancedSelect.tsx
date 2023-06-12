@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SelectChangeEvent } from '@mui/material/Select';
 import { FormControl, InputLabel, Select, MenuItem } from '@mui/material';
@@ -16,8 +16,10 @@ type Props = {
   setIsUoCodeSelected: React.Dispatch<React.SetStateAction<boolean>>;
   selected: boolean;
   setCfResult: React.Dispatch<React.SetStateAction<InstitutionResource | undefined>>;
-  setAooResult: React.Dispatch<React.SetStateAction<AooData | undefined>>;
-  setUoResult: React.Dispatch<React.SetStateAction<UoData | undefined>>;
+  setAooResult: Dispatch<SetStateAction<AooData | undefined>>;
+  setUoResult: Dispatch<SetStateAction<UoData | undefined>>;
+  setUoResultHistory: (t: UoData | undefined) => void;
+  setAooResultHistory: (t: AooData | undefined) => void;
   isBusinessNameSelected?: boolean;
   isTaxCodeSelected?: boolean;
   isAooCodeSelected?: boolean;
@@ -39,6 +41,8 @@ export default function PartyAdvancedSelect({
   isTaxCodeSelected,
   isAooCodeSelected,
   isUoCodeSelected,
+  setUoResultHistory,
+  setAooResultHistory,
 }: Props) {
   const { t } = useTranslation();
 
@@ -63,6 +67,8 @@ export default function PartyAdvancedSelect({
     setCfResult(undefined);
     setAooResult(undefined);
     setUoResult(undefined);
+    setUoResultHistory(undefined);
+    setAooResultHistory(undefined);
   };
 
   useEffect(() => {

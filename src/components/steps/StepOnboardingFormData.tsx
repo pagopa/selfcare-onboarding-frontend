@@ -360,7 +360,7 @@ export default function StepOnboardingFormData({
         ...stepHistoryState,
         isTaxCodeEquals2PIVA: true,
       });
-    } else if (stepHistoryState.isTaxCodeEquals2PIVA && formik.values.taxCode.length === 0) {
+    } else if (stepHistoryState.isTaxCodeEquals2PIVA && formik.values?.taxCode?.length === 0) {
       void formik.setFieldValue('vatNumber', '');
       setStepHistoryState({
         ...stepHistoryState,

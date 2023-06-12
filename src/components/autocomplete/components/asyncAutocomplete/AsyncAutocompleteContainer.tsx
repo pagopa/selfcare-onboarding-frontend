@@ -1,6 +1,6 @@
 import { AxiosError, AxiosResponse } from 'axios';
 import debounce from 'lodash/debounce';
-import { useContext, useState } from 'react';
+import { Dispatch, SetStateAction, useContext, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { Grid, Theme, Typography } from '@mui/material';
@@ -40,10 +40,13 @@ type Props = {
   product?: Product | null;
   isAooCodeSelected: boolean;
   isUoCodeSelected: boolean;
-  setAooResult: React.Dispatch<React.SetStateAction<AooData | undefined>>;
-  setUoResult: React.Dispatch<React.SetStateAction<UoData | undefined>>;
+  setAooResult: Dispatch<SetStateAction<AooData | undefined>>;
+  setUoResult: Dispatch<SetStateAction<UoData | undefined>>;
+  setUoResultHistory: (t: UoData | undefined) => void;
+  setAooResultHistory: (t: AooData | undefined) => void;
   aooResult?: AooData;
   uoResult?: UoData;
+  externalInstitutionId: string;
 };
 
 // TODO: handle cognitive-complexity
@@ -72,6 +75,9 @@ export default function AsyncAutocompleteContainer({
   setUoResult,
   aooResult,
   uoResult,
+  setUoResultHistory,
+  setAooResultHistory,
+  externalInstitutionId,
 }: Props) {
   const { setRequiredLogin } = useContext(UserContext);
   const { t } = useTranslation();
@@ -150,6 +156,7 @@ export default function AsyncAutocompleteContainer({
 
     if (outcome === 'success') {
       setAooResult((searchResponse as AxiosResponse).data);
+      setAooResultHistory((searchResponse as AxiosResponse).data);
     } else if ((searchResponse as AxiosError).response?.status === 404) {
       setAooResult(undefined);
     }
@@ -171,6 +178,7 @@ export default function AsyncAutocompleteContainer({
 
     if (outcome === 'success') {
       setUoResult((searchResponse as AxiosResponse).data);
+      setUoResultHistory((searchResponse as AxiosResponse).data);
     } else if ((searchResponse as AxiosError).response?.status === 404) {
       setUoResult(undefined);
     }
@@ -232,6 +240,7 @@ export default function AsyncAutocompleteContainer({
           setCfResult={setCfResult}
           setAooResult={setAooResult}
           setUoResult={setUoResult}
+          externalInstitutionId={externalInstitutionId}
         />
       </Grid>
       <Grid

@@ -8,6 +8,7 @@ import { useHistoryState } from '../../../../useHistoryState';
 import { InstitutionResource } from '../../../../../model/InstitutionResource';
 import { AooData } from '../../../../../model/AooData';
 import { UoData } from '../../../../../model/UoModel';
+import { StepBillingDataHistoryState } from '../../../../steps/StepOnboardingFormData';
 
 const CustomTextField = styled(TextField)({
   justifyContent: 'center',
@@ -43,6 +44,7 @@ type Props = {
   setCfResult: React.Dispatch<React.SetStateAction<InstitutionResource | undefined>>;
   setAooResult: React.Dispatch<React.SetStateAction<AooData | undefined>>;
   setUoResult: React.Dispatch<React.SetStateAction<UoData | undefined>>;
+  externalInstitutionId: string;
 };
 
 // eslint-disable-next-line sonarjs/cognitive-complexity, complexity
@@ -61,10 +63,16 @@ export default function AsyncAutocompleteSearch({
   setCfResult,
   setAooResult,
   setUoResult,
+  externalInstitutionId,
 }: Props) {
   const setSelectedHistory = useHistoryState<IPACatalogParty | null>('selected_step1', null)[2];
   const { t } = useTranslation();
 
+  const [stepHistoryState, setStepHistoryState, setStepHistoryStateHistory] =
+    useHistoryState<StepBillingDataHistoryState>('onboardingFormData', {
+      externalInstitutionId,
+      isTaxCodeEquals2PIVA: false,
+    });
   const truncatedText = {
     overflow: 'hidden',
     textOverflow: 'ellipsis',
@@ -166,6 +174,14 @@ export default function AsyncAutocompleteSearch({
                 setCfResult(undefined);
                 setAooResult(undefined);
                 setUoResult(undefined);
+                setStepHistoryState({
+                  ...stepHistoryState,
+                  isTaxCodeEquals2PIVA: false,
+                });
+                setStepHistoryStateHistory({
+                  ...stepHistoryState,
+                  isTaxCodeEquals2PIVA: false,
+                });
               }}
               aria-label="clearIcon"
             >
