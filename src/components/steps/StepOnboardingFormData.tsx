@@ -6,10 +6,11 @@ import { Grid, Typography, TextField } from '@mui/material';
 import { useFormik } from 'formik';
 import { useTranslation } from 'react-i18next';
 import { useContext, useEffect, useState } from 'react';
-import { AxiosResponse } from 'axios';
+import { AxiosError, AxiosResponse } from 'axios';
 import { styled } from '@mui/system';
 import {
   InstitutionType,
+  IPACatalogParty,
   Party,
   Product,
   RequestOutcomeMessage,
@@ -130,6 +131,37 @@ export default function StepOnboardingFormData({
       }
     }
   };
+
+  const aooUoValue = window.location.hash.substr(1);
+  const [aooUoValueFromDashboard, setAooUoValueFromDashboard] = useState<IPACatalogParty | null>();
+
+  console.log('xx institutionValue', aooUoValueFromDashboard);
+  useEffect(() => {
+    const handleSearchTaxCodeFromAooUo = async () => {
+      const searchResponse = await fetchWithLogs(
+        {
+          endpoint: 'ONBOARDING_GET_PARTY_FROM_CF',
+          endpointParams: { id: `${externalInstitutionId}#${aooUoValue}` },
+        },
+        {
+          method: 'GET',
+        },
+        () => setRequiredLogin(true)
+      );
+
+      const outcome = getFetchOutcome(searchResponse);
+
+      if (outcome === 'success') {
+        setAooUoValueFromDashboard((searchResponse as AxiosResponse).data);
+      } else if ((searchResponse as AxiosError).response?.status === 404) {
+        setAooUoValueFromDashboard(undefined);
+      }
+    };
+
+    if (aooUoValue) {
+      void handleSearchTaxCodeFromAooUo();
+    }
+  }, [aooUoValue]);
 
   useEffect(() => {
     if (externalInstitutionId !== stepHistoryState.externalInstitutionId) {
@@ -369,6 +401,8 @@ export default function StepOnboardingFormData({
     }
   }, [formik.values.taxCode, formik.values.vatNumber]);
 
+  console.log('xx formik.values', formik.values);
+
   const baseTextFieldProps = (
     field: keyof OnboardingFormData,
     label: string,
@@ -431,6 +465,7 @@ export default function StepOnboardingFormData({
           isInformationCompany={isInformationCompany}
           aooSelected={aooSelected}
           uoSelected={uoSelected}
+          aooUoValueFromDashboard={aooUoValueFromDashboard}
         />
         {/* DATI RELATIVI ALLA TASSONOMIA */}
         {ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY ? (

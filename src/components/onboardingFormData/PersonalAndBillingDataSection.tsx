@@ -4,7 +4,7 @@ import { Grid, TextField, Typography, Paper } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import Checkbox from '@mui/material/Checkbox';
 import { theme } from '@pagopa/mui-italia';
-import { InstitutionType, StepperStepComponentProps } from '../../../types';
+import { InstitutionType, IPACatalogParty, StepperStepComponentProps } from '../../../types';
 import { OnboardingFormData } from '../../model/OnboardingFormData';
 import { StepBillingDataHistoryState } from '../steps/StepOnboardingFormData';
 import { AooData } from '../../model/AooData';
@@ -38,6 +38,7 @@ type Props = StepperStepComponentProps & {
   isInformationCompany: boolean;
   aooSelected?: AooData;
   uoSelected?: UoData;
+  aooUoValueFromDashboard?: IPACatalogParty | null;
 };
 
 export default function PersonalAndBillingDataSection({
@@ -51,6 +52,7 @@ export default function PersonalAndBillingDataSection({
   isInformationCompany,
   aooSelected,
   uoSelected,
+  aooUoValueFromDashboard,
 }: Props) {
   const { t } = useTranslation();
 
@@ -59,7 +61,7 @@ export default function PersonalAndBillingDataSection({
   const isPA = institutionType === 'PA';
   const isDisabled = premiumFlow || (isFromIPA && !isPA && !isPSP) || isPA;
   const requiredError = 'Required';
-  const isAooUo = aooSelected || uoSelected;
+  const isAooUo = aooSelected || uoSelected || aooUoValueFromDashboard;
   const baseNumericFieldProps = (
     field: keyof OnboardingFormData,
     label: string,
