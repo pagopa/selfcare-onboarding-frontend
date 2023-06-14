@@ -82,6 +82,8 @@ export function StepSearchParty({
     null
   );
   const [dataFromAooUo, setDataFromAooUo] = useState<IPACatalogParty | null>();
+  // const aooUoValue = window.location.hash.substr(1); // TODO: implement to retrienve aoo/yuo info
+  // const externkalIdFromDashboardWithAooUo = `${externalInstitutionId}#${aooUoValue}`;
 
   const handleSearchTaxCodeFromAooUo = async (query: string) => {
     const searchResponse = await fetchWithLogs(
