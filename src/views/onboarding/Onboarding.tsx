@@ -214,12 +214,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
           : uoResult && uoResult.tipoMail1 === 'Pec'
           ? uoResult.mail1
           : party.digitalAddress,
-      recipientCode:
-        aooResult && aooResult.codiceUniAoo
-          ? aooResult.codiceUniAoo
-          : uoResult && uoResult.codiceUniUo
-          ? uoResult.codiceUniUo
-          : '',
+      recipientCode: '',
       registeredOffice: aooResult
         ? aooResult.indirizzo
         : uoResult
