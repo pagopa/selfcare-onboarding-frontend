@@ -93,6 +93,7 @@ export function Autocomplete({
               isUoCodeSelected={isUoCodeSelected}
               setUoResultHistory={setUoResultHistory}
               setAooResultHistory={setAooResultHistory}
+              product={product}
             />
           </Grid>
         )}
