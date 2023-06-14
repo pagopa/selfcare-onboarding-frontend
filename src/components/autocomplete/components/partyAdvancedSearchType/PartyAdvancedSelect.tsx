@@ -112,25 +112,26 @@ export default function PartyAdvancedSelect({
         >
           {t('partyAdvancedSelect.taxCode')}
         </MenuItem>
+
         {product && product.id !== 'prod-interop' && (
-          <>
-            <MenuItem
-              id="aooCode"
-              data-testid="aooCode"
-              value={'aooCode'}
-              onClick={() => onSelectValue(false, false, true, false)}
-            >
-              {t('partyAdvancedSelect.aooCode')}
-            </MenuItem>
-            <MenuItem
-              id="uoCode"
-              data-testid="uoCode"
-              value={'uoCode'}
-              onClick={() => onSelectValue(false, false, false, true)}
-            >
-              {t('partyAdvancedSelect.uoCode')}
-            </MenuItem>
-          </>
+          <MenuItem
+            id="aooCode"
+            data-testid="aooCode"
+            value={'aooCode'}
+            onClick={() => onSelectValue(false, false, true, false)}
+          >
+            {t('partyAdvancedSelect.aooCode')}
+          </MenuItem>
+        )}
+        {product && product.id !== 'prod-interop' && (
+          <MenuItem
+            id="uoCode"
+            data-testid="uoCode"
+            value={'uoCode'}
+            onClick={() => onSelectValue(false, false, false, true)}
+          >
+            {t('partyAdvancedSelect.uoCode')}
+          </MenuItem>
         )}
       </Select>
     </FormControl>
