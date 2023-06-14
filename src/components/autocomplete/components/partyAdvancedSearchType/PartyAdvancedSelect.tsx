@@ -86,6 +86,12 @@ export default function PartyAdvancedSelect({
     }
   }, []);
 
+  const filteredByProducts =
+    product &&
+    product.id !== 'prod-interop' &&
+    product.id !== 'prod-idpay' &&
+    product.id !== 'prod-io' &&
+    product.id !== 'prod-io-premium';
   return (
     <FormControl fullWidth size="small">
       <InputLabel id="advancedSearch">{t('partyAdvancedSelect.advancedSearchLabel')}</InputLabel>
@@ -113,7 +119,7 @@ export default function PartyAdvancedSelect({
           {t('partyAdvancedSelect.taxCode')}
         </MenuItem>
 
-        {product && product.id !== 'prod-interop' && (
+        {filteredByProducts && (
           <MenuItem
             id="aooCode"
             data-testid="aooCode"
@@ -123,7 +129,7 @@ export default function PartyAdvancedSelect({
             {t('partyAdvancedSelect.aooCode')}
           </MenuItem>
         )}
-        {product && product.id !== 'prod-interop' && (
+        {filteredByProducts && (
           <MenuItem
             id="uoCode"
             data-testid="uoCode"
