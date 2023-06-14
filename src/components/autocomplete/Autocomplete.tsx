@@ -1,9 +1,13 @@
-import React, { useState } from 'react';
-import { Theme, Grid, Paper } from '@mui/material';
+import React, { Dispatch, SetStateAction, useState } from 'react';
+
+import { Grid, Paper, Theme } from '@mui/material';
+
 import { Endpoint, Product } from '../../../types';
+import { AooData } from '../../model/AooData';
 import { InstitutionResource } from '../../model/InstitutionResource';
+import { UoData } from '../../model/UoModel';
 import AsyncAutocompleteContainer from './components/asyncAutocomplete/AsyncAutocompleteContainer';
-import PartyAdvancedRadioButton from './components/partyAdvancedSearchType/PartyAdvancedRadioButton';
+import PartyAdvancedSelect from './components/partyAdvancedSearchType/PartyAdvancedSelect';
 
 type AutocompleteProps = {
   selected: any;
@@ -14,7 +18,15 @@ type AutocompleteProps = {
   optionLabel?: string;
   theme: Theme;
   isSearchFieldSelected: boolean;
+  setIsSearchFieldSelected: React.Dispatch<React.SetStateAction<boolean>>;
   product?: Product | null;
+  aooResult?: AooData;
+  uoResult?: UoData;
+  setAooResult: Dispatch<SetStateAction<AooData | undefined>>;
+  setUoResult: Dispatch<SetStateAction<UoData | undefined>>;
+  setUoResultHistory: (t: UoData | undefined) => void;
+  setAooResultHistory: (t: AooData | undefined) => void;
+  externalInstitutionId: string;
 };
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
@@ -28,10 +40,21 @@ export function Autocomplete({
   theme,
   isSearchFieldSelected,
   product,
+  aooResult,
+  uoResult,
+  setAooResult,
+  setUoResult,
+  setIsSearchFieldSelected,
+  setUoResultHistory,
+  setAooResultHistory,
+  externalInstitutionId,
 }: AutocompleteProps) {
   const [options, setOptions] = useState<Array<InstitutionResource>>([]);
   const [cfResult, setCfResult] = useState<InstitutionResource>();
+
   const [isBusinessNameSelected, setIsBusinessNameSelected] = useState<boolean>(true);
+  const [isAooCodeSelected, setIsAooCodeSelected] = useState<boolean>(false);
+  const [isUoCodeSelected, setIsUoCodeSelected] = useState<boolean>(false);
 
   const [isTaxCodeSelected, setIsTaxCodeSelected] = useState<boolean>();
   const [input, setInput] = useState<string>('');
@@ -52,11 +75,24 @@ export function Autocomplete({
       <Grid container mx={selected ? 4 : undefined}>
         {!selected && (
           <Grid item xs={12} px={4} pt={4}>
-            <PartyAdvancedRadioButton
+            <PartyAdvancedSelect
               setIsTaxCodeSelected={setIsTaxCodeSelected}
               setIsBusinessNameSelected={setIsBusinessNameSelected}
+              setIsAooCodeSelected={setIsAooCodeSelected}
+              setIsUoCodeSelected={setIsUoCodeSelected}
               setOptions={setOptions}
               setInput={setInput}
+              setIsSearchFieldSelected={setIsSearchFieldSelected}
+              selected={selected}
+              setAooResult={setAooResult}
+              setUoResult={setUoResult}
+              setCfResult={setCfResult}
+              isBusinessNameSelected={isBusinessNameSelected}
+              isTaxCodeSelected={isTaxCodeSelected}
+              isAooCodeSelected={isAooCodeSelected}
+              isUoCodeSelected={isUoCodeSelected}
+              setUoResultHistory={setUoResultHistory}
+              setAooResultHistory={setAooResultHistory}
             />
           </Grid>
         )}
@@ -70,7 +106,6 @@ export function Autocomplete({
           setInput={setInput}
           setSelected={setSelected}
           isBusinessNameSelected={isBusinessNameSelected}
-          setIsBusinessNameSelected={setIsBusinessNameSelected}
           isTaxCodeSelected={isTaxCodeSelected}
           setIsTaxCodeSelected={setIsTaxCodeSelected}
           selected={selected}
@@ -80,6 +115,15 @@ export function Autocomplete({
           setCfResult={setCfResult}
           cfResult={cfResult}
           product={product}
+          isAooCodeSelected={isAooCodeSelected}
+          isUoCodeSelected={isUoCodeSelected}
+          setAooResult={setAooResult}
+          setUoResult={setUoResult}
+          aooResult={aooResult}
+          uoResult={uoResult}
+          setUoResultHistory={setUoResultHistory}
+          setAooResultHistory={setAooResultHistory}
+          externalInstitutionId={externalInstitutionId}
         />
       </Grid>
     </Paper>

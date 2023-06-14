@@ -1,7 +1,7 @@
 import { Grid, Link, Typography, useTheme, Alert } from '@mui/material';
 import { Box } from '@mui/system';
 import { useContext, useEffect, useState } from 'react';
-import { AxiosResponse } from 'axios';
+import { AxiosError, AxiosResponse } from 'axios';
 import { useTranslation, Trans } from 'react-i18next';
 import { ReactElement } from 'react';
 import {
@@ -18,12 +18,15 @@ import { UserContext } from '../../lib/context';
 import { OnboardingStepActions } from '../OnboardingStepActions';
 import { useHistoryState } from '../useHistoryState';
 import { LoadingOverlay } from '../LoadingOverlay';
+import { AooData } from '../../model/AooData';
+import { UoData } from '../../model/UoModel';
 
 type Props = {
   subTitle: string | ReactElement;
   institutionType?: InstitutionType;
   productAvoidStep?: boolean;
   product?: Product | null;
+  externalInstitutionId: string;
 } & StepperStepComponentProps;
 
 const handleSearchExternalId = async (
@@ -56,10 +59,20 @@ export function StepSearchParty({
   institutionType,
   productAvoidStep,
   product,
+  externalInstitutionId,
 }: Props) {
   const partyExternalIdByQuery = new URLSearchParams(window.location.search).get('partyExternalId');
   const { setRequiredLogin } = useContext(UserContext);
   const theme = useTheme();
+
+  const [aooResult, setAooResult, setAooResultHistory] = useHistoryState<AooData | undefined>(
+    'aooSelected_step1',
+    undefined
+  );
+  const [uoResult, setUoResult, setUoResultHistory] = useHistoryState<UoData | undefined>(
+    'uoSelected_step1',
+    undefined
+  );
 
   const [isSearchFieldSelected, setIsSearchFieldSelected] = useState<boolean>(true);
 
@@ -68,12 +81,51 @@ export function StepSearchParty({
     'selected_step1',
     null
   );
+  const [dataFromAooUo, setDataFromAooUo] = useState<IPACatalogParty | null>();
+
+  const handleSearchTaxCodeFromAooUo = async (query: string) => {
+    const searchResponse = await fetchWithLogs(
+      { endpoint: 'ONBOARDING_GET_PARTY_FROM_CF', endpointParams: { id: query } },
+      {
+        method: 'GET',
+      },
+      () => setRequiredLogin(true)
+    );
+
+    const outcome = getFetchOutcome(searchResponse);
+
+    if (outcome === 'success') {
+      setDataFromAooUo((searchResponse as AxiosResponse).data);
+    } else if ((searchResponse as AxiosError).response?.status === 404) {
+      setDataFromAooUo(undefined);
+    }
+  };
+
+  useEffect(() => {
+    if (aooResult) {
+      void handleSearchTaxCodeFromAooUo(aooResult?.codiceFiscaleEnte);
+    } else if (uoResult) {
+      void handleSearchTaxCodeFromAooUo(uoResult?.codiceFiscaleEnte);
+    }
+  }, [aooResult, uoResult]);
 
   const onForwardAction = () => {
+    setAooResultHistory(aooResult);
+    setUoResultHistory(uoResult);
     setSelectedHistory(selected);
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const { id } = selected!;
-    forward({ externalId: id }, { ...selected, externalId: id } as Party, institutionType);
+    forward(
+      {
+        externalId: dataFromAooUo ? dataFromAooUo.id : id,
+      },
+      aooResult || uoResult
+        ? ({ ...dataFromAooUo } as Party)
+        : ({ ...selected, externalId: id } as Party),
+      aooResult,
+      uoResult,
+      institutionType
+    );
   };
 
   const { t } = useTranslation();
@@ -205,7 +257,15 @@ export function StepSearchParty({
             optionKey="id"
             optionLabel="description"
             isSearchFieldSelected={isSearchFieldSelected}
+            setIsSearchFieldSelected={setIsSearchFieldSelected}
             product={product}
+            aooResult={aooResult}
+            uoResult={uoResult}
+            setAooResult={setAooResult}
+            setUoResult={setUoResult}
+            setUoResultHistory={setUoResultHistory}
+            setAooResultHistory={setAooResultHistory}
+            externalInstitutionId={externalInstitutionId}
           />
         </Grid>
       </Grid>

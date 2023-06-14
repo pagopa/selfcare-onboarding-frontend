@@ -1,6 +1,9 @@
 import { Box, styled } from '@mui/system';
 import { PartyAccountItemButton } from '@pagopa/mui-italia/dist/components/PartyAccountItemButton';
+
+import { AooData } from '../../../../../model/AooData';
 import { InstitutionResource } from '../../../../../model/InstitutionResource';
+import { UoData } from '../../../../../model/UoModel';
 
 const CustomBox = styled(Box)({
   /* width */
@@ -31,33 +34,67 @@ type Props = {
   getOptionKey: (option: any) => string;
   cfResult?: InstitutionResource;
   setCfResult: React.Dispatch<React.SetStateAction<InstitutionResource | undefined>>;
+  uoResult?: UoData;
+  aooResult?: AooData;
+  isTaxCodeSelected?: boolean;
+  isAooCodeSelected?: boolean;
+  isUoCodeSelected?: boolean;
 };
 
-export default function AsyncAutocompleteResultsTaxCode({
+// eslint-disable-next-line sonarjs/cognitive-complexity
+export default function AsyncAutocompleteResultsCode({
   setSelected,
   isLoading,
   cfResult,
   setCfResult,
+  uoResult,
+  aooResult,
+  isTaxCodeSelected,
+  isAooCodeSelected,
+  isUoCodeSelected,
 }: Props) {
+  const visibleCode = isTaxCodeSelected
+    ? cfResult
+    : isAooCodeSelected
+    ? aooResult
+    : isUoCodeSelected
+    ? uoResult
+    : '';
   return (
-    <CustomBox my={2} {...cfResult} width="80%" maxHeight="200px" overflow="auto">
+    <CustomBox my={2} {...cfResult} width="90%" maxHeight="200px" overflow="auto">
       {!isLoading && (
         <Box
+          sx={{ textTransform: 'capitalize' }}
           py={1}
           key={cfResult?.id}
           display="flex"
           onKeyDownCapture={(e) => {
             if (e.key === 'Enter' || e.key === ' ') {
-              setSelected(cfResult);
+              setSelected(visibleCode);
               setCfResult(undefined);
             }
           }}
         >
           <PartyAccountItemButton
-            partyName={cfResult?.description ?? ''}
+            partyName={
+              isTaxCodeSelected && cfResult?.description
+                ? cfResult?.description.toLocaleLowerCase()
+                : isAooCodeSelected && aooResult?.denominazioneAoo
+                ? aooResult?.denominazioneAoo.toLocaleLowerCase()
+                : isUoCodeSelected && uoResult?.descrizioneUo
+                ? uoResult?.descrizioneUo.toLocaleLowerCase()
+                : ''
+            }
+            partyRole={
+              !isTaxCodeSelected && aooResult
+                ? aooResult.denominazioneEnte
+                : uoResult
+                ? uoResult?.denominazioneEnte
+                : ''
+            }
             image={' '}
             action={() => {
-              setSelected(cfResult);
+              setSelected(visibleCode);
               setCfResult(undefined);
             }}
             maxCharactersNumberMultiLine={20}

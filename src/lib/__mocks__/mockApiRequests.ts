@@ -6,6 +6,8 @@ import {
   UserOnCreate,
 } from '../../../types';
 import { nationalValue } from '../../model/GeographicTaxonomies';
+import { UoData } from '../../model/UoModel';
+import { AooData } from './../../model/AooData';
 
 const mockPartyRegistry = {
   items: [
@@ -200,6 +202,49 @@ const mockedGeoTaxonomy = [
   // }
 ];
 
+const mockedAooCode: AooData = {
+  codAoo: 'ND',
+  codiceFiscaleEnte: '92078570527',
+  codiceIpa: '03YBQ4C7',
+  codiceUniAoo: 'AR488GS',
+  denominazioneAoo: 'Denominazione Aoo Test',
+  denominazioneEnte: 'Comune Test',
+  id: 'AR488GS',
+  mail1: 'test.it',
+  origin: 'IPA',
+  CAP: '53100',
+  codiceCatastaleComune: 'I726',
+  codiceComuneISTAT: '052032',
+  cognomeResponsabile: 'Bielli',
+  nomeResponsabile: 'Silvia',
+  dataIstituzione: '2023-01-27',
+  indirizzo: 'Via Nenni 6',
+  mailResponsabile: 'test@gmail.com',
+  telefonoResponsabile: '3357080675',
+  tipoMail1: 'Pec',
+};
+
+const mockedUoCode: UoData = {
+  codiceFiscaleEnte: '92078570527',
+  codiceIpa: '03YBQ4C7',
+  codiceUniAoo: 'AR488GS',
+  codiceUniUo: 'YMELIE',
+  codiceUniUoPadre: '',
+  denominazioneEnte: 'denominazione uo test',
+  descrizioneUo: 'Ufficio per la transizione al Digitale',
+  id: 'YMELIE',
+  mail1: 'test@fnofi.it',
+  origin: 'IPA',
+  CAP: '84014',
+  codiceCatastaleComune: 'F912',
+  codiceComuneISTAT: '065078',
+  cognomeResponsabile: 'Ventura',
+  dataAggiornamento: '2020-09-22',
+  dataIstituzione: '2017-09-29',
+  indirizzo: 'Via San Pietro, 10',
+  tipoMail1: 'Pec',
+};
+
 const mockedParty = {
   externalId: 'externalId1',
   originId: 'originId1',
@@ -213,6 +258,7 @@ const mockedParty = {
   origin: 'IPA',
   userRole: 'ADMIN',
 };
+
 const mockedParties: Array<SelfcareParty> = [
   {
     externalId: 'externalId1',
@@ -450,6 +496,17 @@ export async function mockFetch(
     );
   }
 
+  if (endpoint === 'ONBOARDING_GET_AOO_CODE_INFO') {
+    return new Promise((resolve) =>
+      resolve({ data: mockedAooCode, status: 200, statusText: '200' } as AxiosResponse)
+    );
+  }
+
+  if (endpoint === 'ONBOARDING_GET_UO_CODE_INFO') {
+    return new Promise((resolve) =>
+      resolve({ data: mockedUoCode, status: 200, statusText: '200' } as AxiosResponse)
+    );
+  }
   if (endpoint === 'VERIFY_ONBOARDING') {
     switch (endpointParams.externalInstitutionId) {
       case 'infoError':
@@ -561,7 +618,7 @@ export async function mockFetch(
     }
   }
   if (endpoint === 'ONBOARDING_POST_LEGALS') {
-    switch (endpointParams.externalInstitutionId) {
+    switch (mockedOnboardingData1.institution.billingData.taxCode) {
       case 'error':
         return genericError;
       case 'notAllowedInSubmit':

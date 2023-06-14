@@ -9,6 +9,8 @@ import { uniqueId } from 'lodash';
 import { IllusCompleted, IllusError } from '@pagopa/mui-italia';
 import { EndingPage } from '@pagopa/selfcare-common-frontend';
 import { withLogin } from '../../components/withLogin';
+import { AooData } from '../../model/AooData';
+import { UoData } from '../../model/UoModel';
 import {
   InstitutionType,
   Product,
@@ -106,6 +108,9 @@ function OnboardingComponent({ productId }: { productId: string }) {
   const [onExitAction, setOnExitAction] = useState<(() => void) | undefined>();
   const [selectedParty, setSelectedParty] = useState<Party>();
 
+  const [aooSelected, setAooSelected] = useState<AooData>();
+  const [uoSelected, setUoSelected] = useState<UoData>();
+
   const productAvoidStep =
     selectedProduct?.id === 'prod-pn' || selectedProduct?.id === 'prod-idpay';
 
@@ -182,17 +187,51 @@ function OnboardingComponent({ productId }: { productId: string }) {
     forward();
   };
 
-  const forwardWithDataAndInstitution = (newFormData: Partial<FormData>, party: Party) => {
+  const forwardWithDataAndInstitution = (
+    newFormData: Partial<FormData>,
+    party: Party,
+    aooResult: AooData,
+    uoResult: UoData,
+    institutionType: InstitutionType
+  ) => {
+    setAooSelected(aooResult);
+    setUoSelected(uoResult);
     setExternalInstitutionId(party.externalId);
     setOrigin(party.origin);
     setOnboardingFormData({
-      businessName: party.description,
-      digitalAddress: party.digitalAddress,
-      recipientCode: '',
-      registeredOffice: party.address,
-      taxCode: party.taxCode,
+      businessName: aooResult
+        ? aooResult?.denominazioneAoo
+        : uoResult
+        ? uoResult.descrizioneUo
+        : party.description,
+      aooName: aooResult?.denominazioneAoo,
+      uoName: uoResult?.descrizioneUo,
+      aooUniqueCode: aooResult?.codiceUniAoo,
+      uoUniqueCode: uoResult?.codiceUniUo,
+      digitalAddress:
+        aooResult && aooResult.tipoMail1 === 'Pec'
+          ? aooResult.mail1
+          : uoResult && uoResult.tipoMail1 === 'Pec'
+          ? uoResult.mail1
+          : party.digitalAddress,
+      recipientCode:
+        aooResult && aooResult.codiceUniAoo
+          ? aooResult.codiceUniAoo
+          : uoResult && uoResult.codiceUniUo
+          ? uoResult.codiceUniUo
+          : '',
+      registeredOffice: aooResult
+        ? aooResult.indirizzo
+        : uoResult
+        ? uoResult.indirizzo
+        : party.address,
+      taxCode: aooResult
+        ? aooResult.codiceFiscaleEnte
+        : uoResult
+        ? uoResult.codiceFiscaleEnte
+        : party.taxCode,
       vatNumber: '',
-      zipCode: party.zipCode,
+      zipCode: aooResult ? aooResult.CAP : uoResult ? uoResult.CAP : party.zipCode,
       geographicTaxonomies: onboardingFormData?.geographicTaxonomies as Array<GeographicTaxonomy>,
     });
     forwardWithData(newFormData);
@@ -353,7 +392,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
   const submit = async (users: Array<UserOnCreate>) => {
     setLoading(true);
     const postLegalsResponse = await fetchWithLogs(
-      { endpoint: 'ONBOARDING_POST_LEGALS', endpointParams: { externalInstitutionId, productId } },
+      { endpoint: 'ONBOARDING_POST_LEGALS' },
       {
         method: 'POST',
         data: {
@@ -367,7 +406,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
               ? companyInformationsDto2pspDataRequest(onboardingFormData as OnboardingFormData)
               : undefined,
           institutionType,
-          geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY
+          geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY //
             ? onboardingFormData?.geographicTaxonomies?.map((gt) =>
                 onboardedInstitutionInfo2geographicTaxonomy(gt)
               )
@@ -382,6 +421,20 @@ function OnboardingComponent({ productId }: { productId: string }) {
           assistanceContacts: assistanceConcatsDto2pspDataRequest(
             onboardingFormData as OnboardingFormData
           ),
+          productId,
+          subunitCode: aooSelected
+            ? aooSelected.codiceUniAoo
+            : uoSelected
+            ? uoSelected.codiceUniUo
+            : undefined,
+          subunitType: aooSelected
+            ? 'AOO'
+            : uoSelected
+            ? 'UO'
+            : !aooSelected && !uoSelected && institutionType === 'PA'
+            ? 'EC'
+            : undefined,
+          taxCode: onboardingFormData?.taxCode,
         },
       },
       () => setRequiredLogin(true)
@@ -491,6 +544,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
       label: "Seleziona l'ente",
       Component: () =>
         StepSearchParty({
+          externalInstitutionId,
           subTitle: (
             <Trans i18nKey="onboardingStep1.onboarding.bodyDescription">
               Inserisci uno dei dati richiesti e cerca dall&apos;Indice della Pubblica
@@ -549,6 +603,8 @@ function OnboardingComponent({ productId }: { productId: string }) {
             recipientCode: '',
             geographicTaxonomies: [],
           },
+          aooSelected,
+          uoSelected,
           origin,
           institutionType: institutionType as InstitutionType,
           subtitle: t('onBoardingSubProduct.billingData.subTitle'),
