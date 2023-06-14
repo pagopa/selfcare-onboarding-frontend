@@ -86,6 +86,12 @@ export default function PartyAdvancedSelect({
     }
   }, []);
 
+  const filteredByProducts =
+    product &&
+    product.id !== 'prod-interop' &&
+    product.id !== 'prod-idpay' &&
+    product.id !== 'prod-io' &&
+    product.id !== 'prod-io-premium';
   return (
     <FormControl fullWidth size="small">
       <InputLabel id="advancedSearch">{t('partyAdvancedSelect.advancedSearchLabel')}</InputLabel>
@@ -112,25 +118,26 @@ export default function PartyAdvancedSelect({
         >
           {t('partyAdvancedSelect.taxCode')}
         </MenuItem>
-        {product && product.id !== 'prod-interop' && (
-          <>
-            <MenuItem
-              id="aooCode"
-              data-testid="aooCode"
-              value={'aooCode'}
-              onClick={() => onSelectValue(false, false, true, false)}
-            >
-              {t('partyAdvancedSelect.aooCode')}
-            </MenuItem>
-            <MenuItem
-              id="uoCode"
-              data-testid="uoCode"
-              value={'uoCode'}
-              onClick={() => onSelectValue(false, false, false, true)}
-            >
-              {t('partyAdvancedSelect.uoCode')}
-            </MenuItem>
-          </>
+
+        {filteredByProducts && (
+          <MenuItem
+            id="aooCode"
+            data-testid="aooCode"
+            value={'aooCode'}
+            onClick={() => onSelectValue(false, false, true, false)}
+          >
+            {t('partyAdvancedSelect.aooCode')}
+          </MenuItem>
+        )}
+        {filteredByProducts && (
+          <MenuItem
+            id="uoCode"
+            data-testid="uoCode"
+            value={'uoCode'}
+            onClick={() => onSelectValue(false, false, false, true)}
+          >
+            {t('partyAdvancedSelect.uoCode')}
+          </MenuItem>
         )}
       </Select>
     </FormControl>
