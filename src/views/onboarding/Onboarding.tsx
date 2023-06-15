@@ -156,7 +156,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
       () => setRequiredLogin(true)
     );
     const result = getFetchOutcome(onboardingProducts);
-
+    console.log('xx onboardingProducts', onboardingProducts);
     if (result === 'success') {
       const product = (onboardingProducts as AxiosResponse).data;
       setSelectedProduct(product);

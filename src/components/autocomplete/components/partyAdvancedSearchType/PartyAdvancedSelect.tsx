@@ -87,7 +87,6 @@ export default function PartyAdvancedSelect({
   }, []);
 
   const filteredByProducts = product && product.id === 'prod-pn';
-
   return (
     <FormControl fullWidth size="small">
       <InputLabel id="advancedSearch">{t('partyAdvancedSelect.advancedSearchLabel')}</InputLabel>
