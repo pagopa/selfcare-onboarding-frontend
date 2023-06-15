@@ -415,7 +415,6 @@ const executeAdvancedSearchForAoo = async () => {
   fireEvent.keyDown(input, { keyCode: 40 });
 
   const option = (await document.getElementById('aooCode')) as HTMLElement;
-  screen.debug(document, 100000000);
   fireEvent.click(option);
   expect(inputPartyName).toBeTruthy();
   fireEvent.change(inputPartyName, { target: { value: 'AR488GS' } });
