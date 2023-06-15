@@ -567,7 +567,6 @@ export async function mockFetch(
   }
 
   if (endpoint === 'ONBOARDING_VERIFY_PRODUCT') {
-    console.log('xx endpointParams.productId', endpointParams.productId);
     switch (endpointParams.productId) {
       case 'error':
         return genericError;

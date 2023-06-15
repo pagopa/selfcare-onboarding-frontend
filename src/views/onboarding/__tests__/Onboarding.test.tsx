@@ -463,11 +463,9 @@ const executeAdvancedSearchForUo = async () => {
 };
 
 const executeStepInstitutionType = async (productSelected) => {
-  console.log('Testing step Institution Type', productSelected);
   await waitFor(() => screen.getByText(stepInstitutionType));
 
   if (productSelected !== 'prod-pn' && productSelected !== prodIdpay) {
-    console.log('sono qui');
     await fillInstitutionTypeCheckbox('pa');
     screen.getByText(/Indica il tipo di ente che aderirà a/);
     const confirmButtonEnabled = screen.getByRole('button', { name: 'Continua' });
@@ -475,11 +473,6 @@ const executeStepInstitutionType = async (productSelected) => {
 
     fireEvent.click(confirmButtonEnabled);
   }
-  await waitFor(() => screen.getByText(step1Title));
-};
-
-const executeStepInstitutionTypeForPnIdPay = async () => {
-  console.log('Testing step Institution Type and productpn or idpay');
   await waitFor(() => screen.getByText(step1Title));
 };
 
