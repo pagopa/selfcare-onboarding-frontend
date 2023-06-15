@@ -44,7 +44,6 @@ export default function SubProductStepUserUnrelated({ product, productId }: Prop
     history.push(resolvePathVariables(ROUTES.ONBOARDING.PATH, { productId }));
   };
 
-  console.log('prodTitle', product?.title, 'productId', productId);
   return (
     <Box sx={{ minHeight: '52vh', position: 'static' }} display="flex" flexGrow={1}>
       <Grid container direction="column" key="0" style={{ textAlign: 'center' }} margin={'auto'}>
