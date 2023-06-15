@@ -86,12 +86,8 @@ export default function PartyAdvancedSelect({
     }
   }, []);
 
-  const filteredByProducts =
-    product &&
-    product.id !== 'prod-interop' &&
-    product.id !== 'prod-idpay' &&
-    product.id !== 'prod-io' &&
-    product.id !== 'prod-io-premium';
+  const filteredByProducts = product && product.id === 'prod-pn';
+
   return (
     <FormControl fullWidth size="small">
       <InputLabel id="advancedSearch">{t('partyAdvancedSelect.advancedSearchLabel')}</InputLabel>
