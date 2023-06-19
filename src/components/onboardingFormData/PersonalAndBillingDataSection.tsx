@@ -40,6 +40,7 @@ type Props = StepperStepComponentProps & {
   uoSelected?: UoData;
 };
 
+// eslint-disable-next-line sonarjs/cognitive-complexity
 export default function PersonalAndBillingDataSection({
   institutionType,
   baseTextFieldProps,
@@ -195,7 +196,7 @@ export default function PersonalAndBillingDataSection({
                 400,
                 18
               )}
-              disabled={isDisabled}
+              disabled={!isAooUo && isDisabled}
             />
           </Grid>
           {/* CAP */}
@@ -208,7 +209,7 @@ export default function PersonalAndBillingDataSection({
                 400,
                 18
               )}
-              disabled={isDisabled}
+              disabled={!isAooUo && isDisabled}
             />
           </Grid>
           {/* Indirizzo PEC */}
