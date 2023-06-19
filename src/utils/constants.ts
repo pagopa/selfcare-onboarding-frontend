@@ -67,7 +67,7 @@ export const API = {
     URL: ENV.URL_API.ONBOARDING + '/institutions/onboarding',
   },
   ONBOARDING_COMPLETE_REGISTRATION: {
-    URL: ENV.URL_API.ONBOARDING + '/onboarding/complete/{{token}}',
+    URL: ENV.URL_API.ONBOARDING + '/tokens/{{token}}/complete',
   },
 
   // institutions present on self care db
