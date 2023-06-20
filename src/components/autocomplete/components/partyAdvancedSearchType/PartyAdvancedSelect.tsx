@@ -5,6 +5,7 @@ import { FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import { InstitutionResource } from '../../../../model/InstitutionResource';
 import { AooData } from '../../../../model/AooData';
 import { UoData } from '../../../../model/UoModel';
+import { Product } from '../../../../../types';
 
 type Props = {
   setIsBusinessNameSelected: React.Dispatch<React.SetStateAction<boolean>>;
@@ -24,6 +25,7 @@ type Props = {
   isTaxCodeSelected?: boolean;
   isAooCodeSelected?: boolean;
   isUoCodeSelected?: boolean;
+  product?: Product | null;
 };
 
 export default function PartyAdvancedSelect({
@@ -43,6 +45,7 @@ export default function PartyAdvancedSelect({
   isUoCodeSelected,
   setUoResultHistory,
   setAooResultHistory,
+  product,
 }: Props) {
   const { t } = useTranslation();
 
@@ -83,6 +86,7 @@ export default function PartyAdvancedSelect({
     }
   }, []);
 
+  const filteredByProducts = product && product.id === 'prod-pn';
   return (
     <FormControl fullWidth size="small">
       <InputLabel id="advancedSearch">{t('partyAdvancedSelect.advancedSearchLabel')}</InputLabel>
@@ -109,22 +113,27 @@ export default function PartyAdvancedSelect({
         >
           {t('partyAdvancedSelect.taxCode')}
         </MenuItem>
-        <MenuItem
-          id="aooCode"
-          data-testid="aooCode"
-          value={'aooCode'}
-          onClick={() => onSelectValue(false, false, true, false)}
-        >
-          {t('partyAdvancedSelect.aooCode')}
-        </MenuItem>
-        <MenuItem
-          id="uoCode"
-          data-testid="uoCode"
-          value={'uoCode'}
-          onClick={() => onSelectValue(false, false, false, true)}
-        >
-          {t('partyAdvancedSelect.uoCode')}
-        </MenuItem>
+
+        {filteredByProducts && (
+          <MenuItem
+            id="aooCode"
+            data-testid="aooCode"
+            value={'aooCode'}
+            onClick={() => onSelectValue(false, false, true, false)}
+          >
+            {t('partyAdvancedSelect.aooCode')}
+          </MenuItem>
+        )}
+        {filteredByProducts && (
+          <MenuItem
+            id="uoCode"
+            data-testid="uoCode"
+            value={'uoCode'}
+            onClick={() => onSelectValue(false, false, false, true)}
+          >
+            {t('partyAdvancedSelect.uoCode')}
+          </MenuItem>
+        )}
       </Select>
     </FormControl>
   );

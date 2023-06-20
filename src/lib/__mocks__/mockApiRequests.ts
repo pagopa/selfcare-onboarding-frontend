@@ -370,7 +370,14 @@ const mockedOnboardingData1: InstitutionOnboardingInfoResource = {
     },
   },
 };
-
+const mockedProductPn = {
+  title: 'Piattaforma Notifiche',
+  id: 'prod-pn',
+};
+const mockedProductPagopa = {
+  title: 'Piattaforma Notifiche',
+  id: 'prod-pagopa',
+};
 const mockedSubProduct = {
   title: 'Premium',
   id: 'prod-io-premium',
@@ -380,25 +387,8 @@ const mockedProdIoSign = {
   title: 'Firma con Io',
   id: 'prod-io-sign',
 };
-const mockedProducts = [
-  {
-    title: 'Interoperabilità',
-    id: 'prod-interop',
-  },
-  {
-    title: 'Piattaforma Notifiche',
-    id: 'prod-pn',
-  },
-];
+const defaultProduct = mockedProductPagopa;
 
-// eslint-disable-next-line functional/immutable-data
-const urlProdId = window.location.pathname.split('/').pop();
-const SelectedProduct = mockedProducts.find((p) => p.id === urlProdId);
-
-const mockedSelectedProduct = {
-  title: SelectedProduct?.title,
-  id: SelectedProduct?.id,
-};
 const mockedResponseError = {
   detail: 'Request took too long to complete.',
   status: 503,
@@ -580,10 +570,10 @@ export async function mockFetch(
     switch (endpointParams.productId) {
       case 'error':
         return genericError;
-      // case 'prod-pn':
-      //   return new Promise((resolve) =>
-      //     resolve({ data: mockedProductPn, status: 200, statusText: '200' } as AxiosResponse)
-      // );
+      case 'prod-pn':
+        return new Promise((resolve) =>
+          resolve({ data: mockedProductPn, status: 200, statusText: '200' } as AxiosResponse)
+        );
       case 'prod-io-premium':
         return new Promise((resolve) =>
           resolve({ data: mockedSubProduct, status: 200, statusText: '200' } as AxiosResponse)
@@ -592,9 +582,10 @@ export async function mockFetch(
         return new Promise((resolve) =>
           resolve({ data: mockedProdIoSign, status: 200, statusText: '200' } as AxiosResponse)
         );
+      // eslint-disable-next-line sonarjs/no-duplicated-branches
       default:
         return new Promise((resolve) =>
-          resolve({ data: mockedSelectedProduct, status: 200, statusText: '200' } as AxiosResponse)
+          resolve({ data: defaultProduct, status: 200, statusText: '200' } as AxiosResponse)
         );
     }
   }
