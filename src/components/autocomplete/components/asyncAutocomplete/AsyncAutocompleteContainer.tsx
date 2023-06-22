@@ -148,6 +148,7 @@ export default function AsyncAutocompleteContainer({
       { endpoint: 'ONBOARDING_GET_AOO_CODE_INFO', endpointParams: { codiceUniAoo: query } },
       {
         method: 'GET',
+        params: { ...(prodPn && { categories: 'L6,L4,L45', origin: 'IPA' }) },
       },
       () => setRequiredLogin(true)
     );
@@ -170,6 +171,7 @@ export default function AsyncAutocompleteContainer({
       { endpoint: 'ONBOARDING_GET_UO_CODE_INFO', endpointParams: { codiceUniUo: query } },
       {
         method: 'GET',
+        params: { ...(prodPn && { categories: 'L6,L4,L45', origin: 'IPA' }) },
       },
       () => setRequiredLogin(true)
     );
