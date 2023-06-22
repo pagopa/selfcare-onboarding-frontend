@@ -65,6 +65,7 @@ export function StepSearchParty({
   const { setRequiredLogin } = useContext(UserContext);
   const theme = useTheme();
 
+  const productAllowed = product?.id === 'prod-pn';
   const [aooResult, setAooResult, setAooResultHistory] = useHistoryState<AooData | undefined>(
     'aooSelected_step1',
     undefined
@@ -100,6 +101,59 @@ export function StepSearchParty({
       setDataFromAooUo(undefined);
     }
   };
+
+  const subunitTypeByQuery = new URLSearchParams(window.location.search).get('subunitType') ?? '';
+  const subunitCodeByQuery = new URLSearchParams(window.location.search).get('subunitCode') ?? '';
+  const prodPn = product?.id === 'prod-pn';
+
+  const handleSearchByAooCode = async (query: string) => {
+    const searchResponse = await fetchWithLogs(
+      { endpoint: 'ONBOARDING_GET_AOO_CODE_INFO', endpointParams: { codiceUniAoo: query } },
+      {
+        method: 'GET',
+        params: { ...(prodPn && { categories: 'L6,L4,L45', origin: 'IPA' }) },
+      },
+      () => setRequiredLogin(true)
+    );
+
+    const outcome = getFetchOutcome(searchResponse);
+
+    if (outcome === 'success') {
+      setAooResult((searchResponse as AxiosResponse).data);
+      setAooResultHistory((searchResponse as AxiosResponse).data);
+    } else if ((searchResponse as AxiosError).response?.status === 404) {
+      setAooResult(undefined);
+    }
+  };
+  const handleSearchByUoCode = async (query: string) => {
+    const searchResponse = await fetchWithLogs(
+      { endpoint: 'ONBOARDING_GET_UO_CODE_INFO', endpointParams: { codiceUniUo: query } },
+      {
+        method: 'GET',
+        params: { ...(prodPn && { categories: 'L6,L4,L45', origin: 'IPA' }) },
+      },
+      () => setRequiredLogin(true)
+    );
+
+    const outcome = getFetchOutcome(searchResponse);
+
+    if (outcome === 'success') {
+      setUoResult((searchResponse as AxiosResponse).data);
+      setUoResultHistory((searchResponse as AxiosResponse).data);
+    } else if ((searchResponse as AxiosError).response?.status === 404) {
+      setUoResult(undefined);
+    }
+  };
+
+  useEffect(() => {
+    if (productAllowed) {
+      if (subunitTypeByQuery === 'UO') {
+        void handleSearchByUoCode(subunitCodeByQuery);
+      } else if (subunitTypeByQuery === 'AOO') {
+        void handleSearchByAooCode(subunitCodeByQuery);
+      }
+    }
+  }, [subunitTypeByQuery]);
 
   useEffect(() => {
     if (aooResult) {
