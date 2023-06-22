@@ -135,7 +135,6 @@ export default function StepOnboardingFormData({
   const aooUoValue = window.location.hash.substr(1);
   const [aooUoValueFromDashboard, setAooUoValueFromDashboard] = useState<IPACatalogParty | null>();
 
-  console.log('xx institutionValue', aooUoValueFromDashboard);
   useEffect(() => {
     const handleSearchTaxCodeFromAooUo = async () => {
       const searchResponse = await fetchWithLogs(
@@ -400,8 +399,6 @@ export default function StepOnboardingFormData({
       });
     }
   }, [formik.values.taxCode, formik.values.vatNumber]);
-
-  console.log('xx formik.values', formik.values);
 
   const baseTextFieldProps = (
     field: keyof OnboardingFormData,
