@@ -27,6 +27,8 @@ type Props = {
   productAvoidStep?: boolean;
   product?: Product | null;
   externalInstitutionId: string;
+  subunitTypeByQuery: string;
+  subunitCodeByQuery: string;
 } & StepperStepComponentProps;
 
 const handleSearchExternalId = async (
@@ -60,8 +62,11 @@ export function StepSearchParty({
   productAvoidStep,
   product,
   externalInstitutionId,
+  subunitTypeByQuery,
+  subunitCodeByQuery,
 }: Props) {
   const partyExternalIdByQuery = new URLSearchParams(window.location.search).get('partyExternalId');
+
   const { setRequiredLogin } = useContext(UserContext);
   const theme = useTheme();
 
@@ -101,11 +106,7 @@ export function StepSearchParty({
       setDataFromAooUo(undefined);
     }
   };
-
-  const subunitTypeByQuery = new URLSearchParams(window.location.search).get('subunitType') ?? '';
-  const subunitCodeByQuery = new URLSearchParams(window.location.search).get('subunitCode') ?? '';
   const prodPn = product?.id === 'prod-pn';
-
   const handleSearchByAooCode = async (query: string) => {
     const searchResponse = await fetchWithLogs(
       { endpoint: 'ONBOARDING_GET_AOO_CODE_INFO', endpointParams: { codiceUniAoo: query } },
@@ -153,7 +154,7 @@ export function StepSearchParty({
         void handleSearchByAooCode(subunitCodeByQuery);
       }
     }
-  }, [subunitTypeByQuery]);
+  }, [productAllowed]);
 
   useEffect(() => {
     if (aooResult) {
@@ -212,10 +213,14 @@ export function StepSearchParty({
 
   // callback of previous useEffect
   useEffect(() => {
-    if (partyExternalIdByQuery && selected) {
+    if (
+      selected &&
+      ((partyExternalIdByQuery && subunitCodeByQuery === '' && subunitTypeByQuery === '') ||
+        ((aooResult || uoResult) && productAllowed))
+    ) {
       onForwardAction();
     }
-  }, [selected]);
+  }, [selected, aooResult, uoResult]);
 
   useEffect(() => {
     if (isSearchFieldSelected || selected) {
