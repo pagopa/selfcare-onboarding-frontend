@@ -80,7 +80,6 @@ export function StepSearchParty({
     undefined
   );
 
-  useEffect(() => {}, [aooResult]);
   const [isSearchFieldSelected, setIsSearchFieldSelected] = useState<boolean>(true);
 
   const [loading, setLoading] = useState(!!partyExternalIdByQuery);
