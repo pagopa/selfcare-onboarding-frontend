@@ -628,7 +628,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
           back: () => {
             if (fromDashboard && !productAvoidStep) {
               setActiveStep(0);
-            } else if (fromDashboard && productAvoidStep) {
+            } else if ((fromDashboard || subunitTypeByQuery) && productAvoidStep) {
               setOnExitAction(() => () => history.goBack());
               setOpenExitModal(true);
             } else if (institutionType === 'PSP' || institutionType !== 'PA') {

@@ -215,7 +215,8 @@ export function StepSearchParty({
   useEffect(() => {
     if (
       selected &&
-      ((partyExternalIdByQuery && subunitCodeByQuery === '' && subunitTypeByQuery === '') ||
+      partyExternalIdByQuery &&
+      ((subunitCodeByQuery === '' && subunitTypeByQuery === '') ||
         ((aooResult || uoResult) && productAllowed))
     ) {
       onForwardAction();
