@@ -117,6 +117,21 @@ function OnboardingComponent({ productId }: { productId: string }) {
   const fromDashboard =
     window.location.search.indexOf(`partyExternalId=${externalInstitutionId}`) > -1;
 
+  const subunitTypeByQuery =
+    new URLSearchParams(window.location.hash.substr(1)).get('subunitType') ?? '';
+  const subunitCodeByQuery =
+    new URLSearchParams(window.location.hash.substr(1)).get('subunitCode') ?? '';
+
+  useEffect(() => {
+    if (
+      selectedProduct &&
+      selectedProduct?.id !== 'prod-pn' &&
+      (subunitTypeByQuery || subunitCodeByQuery)
+    ) {
+      window.location.assign(ENV.URL_FE.DASHBOARD);
+    }
+  }, [selectedProduct, aooSelected, uoSelected]);
+
   useEffect(() => {
     registerUnloadEvent(setOnExit, setOpenExitModal, setOnExitAction);
     return () => unregisterUnloadEvent(setOnExit);
@@ -559,6 +574,8 @@ function OnboardingComponent({ productId }: { productId: string }) {
           back: () => {
             setActiveStep(0);
           },
+          subunitTypeByQuery,
+          subunitCodeByQuery,
         }),
     },
     {
@@ -611,7 +628,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
           back: () => {
             if (fromDashboard && !productAvoidStep) {
               setActiveStep(0);
-            } else if (fromDashboard && productAvoidStep) {
+            } else if ((fromDashboard || subunitTypeByQuery) && productAvoidStep) {
               setOnExitAction(() => () => history.goBack());
               setOpenExitModal(true);
             } else if (institutionType === 'PSP' || institutionType !== 'PA') {

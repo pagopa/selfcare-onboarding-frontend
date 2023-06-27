@@ -417,7 +417,7 @@ const executeAdvancedSearchForAoo = async () => {
   const option = (await document.getElementById('aooCode')) as HTMLElement;
   fireEvent.click(option);
   expect(inputPartyName).toBeTruthy();
-  fireEvent.change(inputPartyName, { target: { value: 'AR488GS' } });
+  fireEvent.change(inputPartyName, { target: { value: 'A356E00' } });
 
   const partyNameSelection = await waitFor(() => screen.getByText('denominazione aoo test'));
 
@@ -425,11 +425,11 @@ const executeAdvancedSearchForAoo = async () => {
 
   fireEvent.click(partyNameSelection);
 
-  const confirmButton = screen.getByRole('button', { name: 'Continua' });
+  const confirmButton = await waitFor(() => screen.getByRole('button', { name: 'Continua' }));
   expect(confirmButton).toBeEnabled();
 
   fireEvent.click(confirmButton);
-  await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(4));
+  await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(6));
 };
 
 const executeAdvancedSearchForUo = async () => {
@@ -447,7 +447,7 @@ const executeAdvancedSearchForUo = async () => {
   fireEvent.click(option);
 
   expect(inputPartyName).toBeTruthy();
-  fireEvent.change(inputPartyName, { target: { value: 'YMELIE' } });
+  fireEvent.change(inputPartyName, { target: { value: 'UF9YK6' } });
 
   const partyNameSelection = await waitFor(() => screen.getByText('denominazione uo test'));
 
@@ -455,11 +455,11 @@ const executeAdvancedSearchForUo = async () => {
 
   fireEvent.click(partyNameSelection);
 
-  const confirmButton = screen.getByRole('button', { name: 'Continua' });
+  const confirmButton = await waitFor(() => screen.getByRole('button', { name: 'Continua' }));
   expect(confirmButton).toBeEnabled();
 
   fireEvent.click(confirmButton);
-  await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(4));
+  await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(6));
 };
 
 const executeStepInstitutionType = async (productSelected) => {
