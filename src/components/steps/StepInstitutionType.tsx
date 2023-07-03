@@ -70,7 +70,8 @@ export default function StepInstitutionType({
             it.labelKey === 'pa' ||
             it.labelKey === 'gsp' ||
             it.labelKey === 'scp' ||
-            it.labelKey === 'psp'
+            it.labelKey === 'psp' ||
+            it.labelKey === 'pt'
         );
       case 'prod-pn':
         return institutionTypeValues.filter((it) => it.labelKey === 'pa');
