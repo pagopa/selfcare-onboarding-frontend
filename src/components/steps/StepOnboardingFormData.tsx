@@ -85,11 +85,13 @@ export default function StepOnboardingFormData({
 }: Props) {
   const requiredError = 'Required';
 
+  const institutionAvoidGeotax = 'PT';
   const premiumFlow = !!subProductId;
   const isPSP = institutionType === 'PSP';
   const isInformationCompany =
     institutionType !== 'PA' &&
     institutionType !== 'PSP' &&
+    institutionType !== 'PT' &&
     (productId === 'prod-io' || productId === 'prod-io-sign');
   const isProdIoSign = productId === 'prod-io-sign';
 
@@ -313,6 +315,7 @@ export default function StepOnboardingFormData({
         recipientCode: !values.recipientCode ? requiredError : undefined,
         geographicTaxonomies:
           ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY &&
+          institutionType !== institutionAvoidGeotax &&
           (!values.geographicTaxonomies ||
             values.geographicTaxonomies.length === 0 ||
             values.geographicTaxonomies.some(
@@ -433,7 +436,7 @@ export default function StepOnboardingFormData({
           uoSelected={uoSelected}
         />
         {/* DATI RELATIVI ALLA TASSONOMIA */}
-        {ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY ? (
+        {ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY && institutionType !== institutionAvoidGeotax ? (
           <Grid item xs={12} display="flex" justifyContent={'center'}>
             <GeoTaxonomySection
               retrievedTaxonomies={previousGeotaxononomies}
