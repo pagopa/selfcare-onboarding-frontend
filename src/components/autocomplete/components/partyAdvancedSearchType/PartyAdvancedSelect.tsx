@@ -45,7 +45,6 @@ export default function PartyAdvancedSelect({
   isUoCodeSelected,
   setUoResultHistory,
   setAooResultHistory,
-  product,
 }: Props) {
   const { t } = useTranslation();
 
@@ -86,7 +85,9 @@ export default function PartyAdvancedSelect({
     }
   }, []);
 
-  const filteredByProducts = product && product.id === 'prod-pn';
+  // TODO: boolean will be activated when the aoo/uo are ready
+  // const filteredByProducts = product && product.id === 'prod-pn';
+  const filteredByProducts = false;
   return (
     <FormControl fullWidth size="small">
       <InputLabel id="advancedSearch">{t('partyAdvancedSelect.advancedSearchLabel')}</InputLabel>
