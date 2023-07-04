@@ -198,17 +198,18 @@ test('test advanvced search business name', async () => {
   await executeAdvancedSearchForBusinessName(agencyX);
 });
 
-test('test advanvced search aoo name with product pn', async () => {
-  renderComponent(prodPn);
-  await executeStepInstitutionType(prodPn);
-  await executeAdvancedSearchForAoo();
-});
+//TODO: boolean will be activated when the aoo/uo are ready
+// test('test advanvced search aoo name with product pn', async () => {
+//   renderComponent(prodPn);
+//   await executeStepInstitutionType(prodPn);
+//   await executeAdvancedSearchForAoo();
+// });
 
-test('test advanvced search uo name with product pn', async () => {
-  renderComponent('prod-pn');
-  await executeStepInstitutionType('prod-pn');
-  await executeAdvancedSearchForUo();
-});
+// test('test advanvced search uo name with product pn', async () => {
+//   renderComponent('prod-pn');
+//   await executeStepInstitutionType('prod-pn');
+//   await executeAdvancedSearchForUo();
+// });
 
 test('test label recipientCode only for institutionType !== PA', async () => {
   renderComponent(prodIoSign);
