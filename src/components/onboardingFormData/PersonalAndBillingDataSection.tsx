@@ -38,6 +38,7 @@ type Props = StepperStepComponentProps & {
   isInformationCompany: boolean;
   aooSelected?: AooData;
   uoSelected?: UoData;
+  institutionAvoidGeotax: string;
 };
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
@@ -52,6 +53,7 @@ export default function PersonalAndBillingDataSection({
   isInformationCompany,
   aooSelected,
   uoSelected,
+  institutionAvoidGeotax,
 }: Props) {
   const { t } = useTranslation();
 
@@ -427,27 +429,31 @@ export default function PersonalAndBillingDataSection({
             </>
           )}
           {/* indirizzo mail di supporto */}
-          <Grid item xs={12}>
-            <CustomTextField
-              {...baseTextFieldProps(
-                'supportEmail',
-                t('onboardingFormData.billingDataSection.assistanceContact.supportEmail'),
-                400,
-                18
-              )}
-            />
-            {/* descrizione indirizzo mail di supporto */}
-            <Typography
-              component={'span'}
-              sx={{
-                fontSize: '12px!important',
-                fontWeight: 600,
-                color: theme.palette.text.secondary,
-              }}
-            >
-              {t('onboardingFormData.billingDataSection.assistanceContact.supportEmailDescriprion')}
-            </Typography>
-          </Grid>
+          {institutionType !== institutionAvoidGeotax && (
+            <Grid item xs={12}>
+              <CustomTextField
+                {...baseTextFieldProps(
+                  'supportEmail',
+                  t('onboardingFormData.billingDataSection.assistanceContact.supportEmail'),
+                  400,
+                  18
+                )}
+              />
+              {/* descrizione indirizzo mail di supporto */}
+              <Typography
+                component={'span'}
+                sx={{
+                  fontSize: '12px!important',
+                  fontWeight: 600,
+                  color: theme.palette.text.secondary,
+                }}
+              >
+                {t(
+                  'onboardingFormData.billingDataSection.assistanceContact.supportEmailDescriprion'
+                )}
+              </Typography>
+            </Grid>
+          )}
         </Grid>
       </Paper>
     </>

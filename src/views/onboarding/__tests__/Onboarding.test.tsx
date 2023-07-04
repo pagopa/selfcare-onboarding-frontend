@@ -216,6 +216,18 @@ test('test label recipientCode only for institutionType !== PA', async () => {
   await executeStepBillingDataLabels();
 });
 
+test('test prod-io only for institutionType === PT', async () => {
+  renderComponent(prodIo);
+  await executeStepInstitutionTypePt();
+  await executeStepBillingDataLabelsForPt();
+});
+
+test('test prod-pagopa only for institutionType === PT', async () => {
+  renderComponent(prodPagopa);
+  await executeStepInstitutionTypePt();
+  await executeStepBillingDataLabelsForPt();
+});
+
 test('test party search if gps for prod-interop', async () => {
   renderComponent(prodInterop);
   await executeStepInstitutionTypeGspForInterop();
@@ -488,6 +500,20 @@ const executeStepInstitutionTypeScp = async () => {
   fireEvent.click(confirmButtonEnabled);
   await waitFor(() => screen.getByText('Indica i dati del tuo ente'));
 };
+
+const executeStepInstitutionTypePt = async () => {
+  console.log('Testing step Institution Type');
+  await waitFor(() => screen.getByText(stepInstitutionType));
+
+  await fillInstitutionTypeCheckbox('pt');
+
+  const confirmButtonEnabled = screen.getByRole('button', { name: 'Continua' });
+  expect(confirmButtonEnabled).toBeEnabled();
+
+  fireEvent.click(confirmButtonEnabled);
+  await waitFor(() => screen.getByText('Indica i dati del tuo ente'));
+};
+
 const executeStepInstitutionTypeGspForInterop = async () => {
   console.log('Testing step Institution Type');
   await waitFor(() => screen.getByText(stepInstitutionType));
@@ -571,6 +597,25 @@ const executeStepBillingDataLabels = async () => {
 
   await waitFor(() => screen.getByText('Indica i dati del tuo ente'));
   expect(screen.getByText('Codice SDI'));
+
+  expect(backButton).toBeEnabled();
+  await waitFor(() => fireEvent.click(backButton));
+  await waitFor(() => screen.getByText('Seleziona il tipo di ente che rappresenti'));
+};
+
+const executeStepBillingDataLabelsForPt = async () => {
+  console.log('test label recipientCode only for institutionType !== PA');
+
+  const backButton = screen.getByRole('button', { name: 'Indietro' });
+
+  await waitFor(() => screen.getByText('Indica i dati del tuo ente'));
+  expect(screen.getByText('Codice SDI'));
+
+  const geotaxArea = screen.queryByText('INDICA L’AREA GEOGRAFICA');
+  expect(geotaxArea).not.toBeInTheDocument;
+
+  const assistanceEmail = screen.queryByText('Indirizzo email visibile ai cittadini');
+  expect(assistanceEmail).not.toBeInTheDocument;
 
   expect(backButton).toBeEnabled();
   await waitFor(() => fireEvent.click(backButton));

@@ -86,6 +86,7 @@ export default function StepOnboardingFormData({
   const requiredError = 'Required';
 
   const institutionAvoidGeotax = 'PT';
+
   const premiumFlow = !!subProductId;
   const isPSP = institutionType === 'PSP';
   const isInformationCompany =
@@ -334,7 +335,10 @@ export default function StepOnboardingFormData({
           !currencyField.test(values.shareCapital) &&
           t('onboardingFormData.billingDataSection.invalidShareCapitalField'),
         supportEmail:
-          !values.supportEmail && !premiumFlow && isProdIoSign
+          institutionType !== institutionAvoidGeotax &&
+          !values.supportEmail &&
+          !premiumFlow &&
+          isProdIoSign
             ? requiredError
             : !mailPECRegexp.test(values.supportEmail as string) && values.supportEmail
             ? t('onboardingFormData.billingDataSection.invalidMailSupport')
@@ -434,6 +438,7 @@ export default function StepOnboardingFormData({
           isInformationCompany={isInformationCompany}
           aooSelected={aooSelected}
           uoSelected={uoSelected}
+          institutionAvoidGeotax={institutionAvoidGeotax}
         />
         {/* DATI RELATIVI ALLA TASSONOMIA */}
         {ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY && institutionType !== institutionAvoidGeotax ? (
