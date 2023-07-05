@@ -56,6 +56,12 @@ export default {
   },
   onboardingStep1_5: {
     loadingText: 'Stiamo verificando i tuoi dati',
+    ptAlreadyOnboarded: {
+      title: 'L’ente indicato è già registrato',
+      description:
+        'Per operare su un prodotto, chiedi a un Amministratore di <1/> aggiungerti nella sezione Utenti.',
+      backAction: 'Chiudi',
+    },
     alreadyOnboarded: {
       title: "L'Ente che hai scelto ha già aderito",
       description:
@@ -217,6 +223,7 @@ export default {
           "Invieremo un'email all'indirizzo PEC indicato. <1 /> Al suo interno, ci sono le istruzioni per completare <3 />l'adesione.",
         paDescription:
           "Invieremo un'email all'indirizzo PEC primario dell'ente. <1 /> Al suo interno, ci sono le istruzioni per completare <3 />l'adesione.",
+        ptDescription: '', // TODO SELC-2565 -  add whrn text will be ready
         backHome: 'Torna alla home',
       },
       error: {

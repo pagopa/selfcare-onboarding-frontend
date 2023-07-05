@@ -70,23 +70,6 @@ export const prodPhaseOutErrorPage: RequestOutcomeMessage = {
   ],
 };
 
-const alreadyOnboarded: RequestOutcomeMessage = {
-  title: '',
-  description: [
-    <Grid key="0">
-      <EndingPage
-        minHeight="52vh"
-        variantTitle={'h4'}
-        variantDescription={'body1'}
-        title={<Trans i18nKey="onboardingStep1_5.alreadyOnboarded.title" />}
-        description={<Trans i18nKey="onboardingStep1_5.alreadyOnboarded.description" />}
-        buttonLabel={<Trans i18nKey="onboardingStep1_5.alreadyOnboarded.backAction" />}
-        onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
-      />
-    </Grid>,
-  ],
-};
-
 // eslint-disable-next-line sonarjs/cognitive-complexity
 function OnboardingComponent({ productId }: { productId: string }) {
   const [loading, setLoading] = useState(true);
@@ -121,6 +104,44 @@ function OnboardingComponent({ productId }: { productId: string }) {
     new URLSearchParams(window.location.hash.substr(1)).get('subunitType') ?? '';
   const subunitCodeByQuery =
     new URLSearchParams(window.location.hash.substr(1)).get('subunitCode') ?? '';
+
+  const alreadyOnboarded: RequestOutcomeMessage = {
+    title: '',
+    description:
+      institutionType === 'PT'
+        ? [
+            <Grid key="0">
+              <EndingPage
+                minHeight="52vh"
+                variantTitle={'h4'}
+                variantDescription={'body1'}
+                icon={<IllusError size={60} />}
+                title={<Trans i18nKey="onboardingStep1_5.ptAlreadyOnboarded.title" />}
+                description={
+                  <Trans i18nKey="onboardingStep1_5.ptAlreadyOnboarded.description">
+                    Per operare su un prodotto, chiedi a un Amministratore di <br /> aggiungerti
+                    nella sezione Utenti.
+                  </Trans>
+                }
+                buttonLabel={<Trans i18nKey="onboardingStep1_5.ptAlreadyOnboarded.backAction" />}
+                onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+              />
+            </Grid>,
+          ]
+        : [
+            <Grid key="0">
+              <EndingPage
+                minHeight="52vh"
+                variantTitle={'h4'}
+                variantDescription={'body1'}
+                title={<Trans i18nKey="onboardingStep1_5.alreadyOnboarded.title" />}
+                description={<Trans i18nKey="onboardingStep1_5.alreadyOnboarded.description" />}
+                buttonLabel={<Trans i18nKey="onboardingStep1_5.alreadyOnboarded.backAction" />}
+                onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+              />
+            </Grid>,
+          ],
+  };
 
   useEffect(() => {
     if (
@@ -305,6 +326,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
     forward();
   };
 
+  // TODO SELC-2565 - update with correct text when will be ready
   const outcomeContent: RequestOutcomeOptions = {
     success: {
       title: '',

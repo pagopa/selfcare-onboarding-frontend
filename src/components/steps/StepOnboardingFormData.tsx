@@ -174,7 +174,8 @@ export default function StepOnboardingFormData({
     if (
       ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY &&
       previousGeotaxononomies &&
-      previousGeotaxononomies.length > 0
+      previousGeotaxononomies.length > 0 &&
+      institutionType !== institutionAvoidGeotax
     ) {
       const changedNational2Local =
         previousGeotaxononomies.some((rv) => rv?.code === nationalValue) &&
