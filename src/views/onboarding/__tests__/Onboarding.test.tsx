@@ -48,7 +48,7 @@ jest.mock('react-router-dom', () => ({
 const prodPn = 'prod-pn';
 const prodIdpay = 'prod-idpay';
 const prodIo = 'prod-io';
-const prodPagopa = 'prodPagoPa';
+const prodPagopa = 'prod-pagopa';
 const prodIoSign = 'prod-io-sign';
 const prodInterop = 'prod-interop';
 const prodDefault = prodPn;
@@ -211,22 +211,26 @@ test('test advanvced search business name', async () => {
 //   await executeAdvancedSearchForUo();
 // });
 
-test('test label recipientCode only for institutionType !== PA', async () => {
+test('test label recipientCode only for institutionType is not PA', async () => {
   renderComponent(prodIoSign);
   await executeStepInstitutionTypeScp();
   await executeStepBillingDataLabels();
 });
 
-test('test prod-io only for institutionType === PT', async () => {
+test('test prod-io only for institutionType is PT and PT already onboarded', async () => {
   renderComponent(prodIo);
   await executeStepInstitutionTypePt();
-  await executeStepBillingDataLabelsForPt();
+  await executeStepBillingDataLabelsForPtAlreadyOnboarded();
 });
 
-test('test prod-pagopa only for institutionType === PT', async () => {
+test('test prod-pagopa only for institutionType is PT', async () => {
   renderComponent(prodPagopa);
   await executeStepInstitutionTypePt();
   await executeStepBillingDataLabelsForPt();
+  await executeStep2();
+  await executeStep3(true);
+  await verifySubmitPt('prod-pagopa');
+  // TODO SELC-2565 add verify thankyouPage text
 });
 
 test('test party search if gps for prod-interop', async () => {
@@ -618,9 +622,52 @@ const executeStepBillingDataLabelsForPt = async () => {
   const assistanceEmail = screen.queryByText('Indirizzo email visibile ai cittadini');
   expect(assistanceEmail).not.toBeInTheDocument;
 
-  expect(backButton).toBeEnabled();
-  await waitFor(() => fireEvent.click(backButton));
-  await waitFor(() => screen.getByText('Seleziona il tipo di ente che rappresenti'));
+  await waitFor(() =>
+    fillUserBillingDataForm(
+      'businessName',
+      'registeredOffice',
+      'digitalAddress',
+      'zipCode',
+      'taxCode',
+      'vatNumber',
+      'recipientCode'
+    )
+  );
+
+  const confirmButtonEnabled = screen.getByRole('button', { name: 'Continua' });
+  await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
+  fireEvent.click(confirmButtonEnabled);
+  await waitFor(() => screen.getByText(step2Title));
+};
+
+const executeStepBillingDataLabelsForPtAlreadyOnboarded = async () => {
+  console.log('test label recipientCode only for institutionType !== PA');
+
+  await waitFor(() => screen.getByText('Indica i dati del tuo ente'));
+  expect(screen.getByText('Codice SDI'));
+
+  const geotaxArea = screen.queryByText('INDICA L’AREA GEOGRAFICA');
+  expect(geotaxArea).not.toBeInTheDocument;
+
+  const assistanceEmail = screen.queryByText('Indirizzo email visibile ai cittadini');
+  expect(assistanceEmail).not.toBeInTheDocument;
+
+  await waitFor(() =>
+    fillUserBillingDataForm(
+      'businessName',
+      'registeredOffice',
+      'digitalAddress',
+      'zipCode',
+      'taxCode',
+      'vatNumber',
+      'recipientCode'
+    )
+  );
+
+  const confirmButtonEnabled = screen.getByRole('button', { name: 'Continua' });
+  await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
+  fireEvent.click(confirmButtonEnabled);
+  await waitFor(() => screen.getByText('L’ente indicato è già registrato'));
 };
 
 const executeStepBillingDataReaField = async () => {
@@ -784,7 +831,7 @@ const fillUserBillingDataForm = async (
   taxCodeInput: string,
   vatNumber: string,
   recipientCode: string,
-  supportEmail: string,
+  supportEmail?: string,
   rea?: string
 ) => {
   fireEvent.change(document.getElementById(businessNameInput) as HTMLElement, {
@@ -810,9 +857,11 @@ const fillUserBillingDataForm = async (
   fireEvent.change(document.getElementById(recipientCode) as HTMLElement, {
     target: { value: 'recipientCode' },
   });
-  fireEvent.change(document.getElementById(supportEmail) as HTMLElement, {
-    target: { value: 'a@a.it' },
-  });
+  if (supportEmail) {
+    fireEvent.change(document.getElementById(supportEmail) as HTMLElement, {
+      target: { value: 'a@a.it' },
+    });
+  }
   // TODO: remove comment if REACT_APP_ENABLE_GEOTAXONOMY is true -- await waitFor(() => fireEvent.click(document.getElementById('national_geographicTaxonomies')));
   if (rea) {
     await waitFor(() =>
@@ -1144,6 +1193,63 @@ const verifySubmit = async (productId = prodIoSign) => {
           subunitType: 'EC',
           taxCode: 'AAAAAA44D55F456K',
           companyInformations: undefined,
+        },
+        method: 'POST',
+      },
+      expect.any(Function)
+    )
+  );
+};
+
+const verifySubmitPt = async (productId = prodIoSign) => {
+  await waitFor(() =>
+    expect(fetchWithLogsSpy).lastCalledWith(
+      {
+        endpoint: 'ONBOARDING_POST_LEGALS',
+      },
+      {
+        data: {
+          billingData: billingData2billingDataRequest(),
+          pspData: undefined,
+          institutionType: 'PT',
+          origin: undefined,
+          users: [
+            {
+              email: 'b@b.bb',
+              name: 'NAME',
+              role: 'MANAGER',
+              surname: 'SURNAME',
+              taxCode: 'SRNNMA80A01A794F',
+            },
+            {
+              email: 'a@a.aa',
+              name: 'NAME',
+              role: 'DELEGATE',
+              surname: 'SURNAME',
+              taxCode: 'SRNNMA80A01B354S',
+            },
+            {
+              email: '0@z.zz',
+              name: 'NAME',
+              role: 'DELEGATE',
+              surname: 'SURNAME',
+              taxCode: 'SRNNMA80A01F205T',
+            },
+          ],
+          pricingPlan: 'FA',
+          geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY
+            ? [{ code: nationalValue, desc: 'ITALIA' }]
+            : [],
+          assistanceContacts: { supportEmail: undefined },
+          productId,
+          subunitCode: undefined,
+          subunitType: undefined,
+          taxCode: 'AAAAAA44D55F456K',
+          companyInformations: {
+            businessRegisterPlace: undefined,
+            rea: undefined,
+            shareCapital: undefined,
+          },
         },
         method: 'POST',
       },
