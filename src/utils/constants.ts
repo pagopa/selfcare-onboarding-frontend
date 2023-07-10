@@ -1,9 +1,9 @@
 import { RoutesObject } from '../../types';
-import Onboarding from '../views/onboarding/Onboarding';
-import RejectRegistration from '../views/RejectRegistration';
 import CompleteRegistrationComponent from '../views/CompleteRegistrationComponent';
 import NoProductPage from '../views/NoProductPage';
+import Onboarding from '../views/onboarding/Onboarding';
 import OnBoardingSubProduct from '../views/OnBoardingSubProduct/OnBoardingSubProduct';
+import RejectRegistration from '../views/RejectRegistration';
 import { ENV } from './env';
 
 const IS_DEVELOP = process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test';
@@ -64,12 +64,10 @@ export const API = {
     URL: ENV.URL_API.PARTY_REGISTRY_PROXY + '/institutions/{{id}}',
   },
   ONBOARDING_POST_LEGALS: {
-    URL:
-      ENV.URL_API.ONBOARDING +
-      '/institutions/{{externalInstitutionId}}/products/{{productId}}/onboarding',
+    URL: ENV.URL_API.ONBOARDING + '/institutions/onboarding',
   },
   ONBOARDING_COMPLETE_REGISTRATION: {
-    URL: ENV.URL_API.PARTY_PROCESS + '/onboarding/complete/{{token}}',
+    URL: ENV.URL_API.ONBOARDING + '/tokens/{{token}}/complete',
   },
 
   // institutions present on self care db
@@ -85,13 +83,19 @@ export const API = {
     URL: ENV.URL_API.ONBOARDING + '/users/validate',
   },
   ONBOARDING_TOKEN_VALIDATION: {
-    URL: ENV.URL_API.PARTY_PROCESS + '/tokens/{{token}}/verify',
+    URL: ENV.URL_API.ONBOARDING + '/tokens/{{token}}/verify',
   },
   ONBOARDING_GET_GEOTAXONOMY: {
     URL: ENV.URL_API.PARTY_REGISTRY_PROXY + '/geotaxonomies',
   },
   ONBOARDING_GET_PREVIOUS_GEOTAXONOMIES: {
     URL: ENV.URL_API.ONBOARDING + '/institutions/{{externalInstitutionId}}/geographicTaxonomy',
+  },
+  ONBOARDING_GET_UO_CODE_INFO: {
+    URL: ENV.URL_API.PARTY_REGISTRY_PROXY + '/uo/{{codiceUniUo}}',
+  },
+  ONBOARDING_GET_AOO_CODE_INFO: {
+    URL: ENV.URL_API.PARTY_REGISTRY_PROXY + '/aoo/{{codiceUniAoo}}',
   },
 };
 

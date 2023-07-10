@@ -6,6 +6,8 @@ import {
   UserOnCreate,
 } from '../../../types';
 import { nationalValue } from '../../model/GeographicTaxonomies';
+import { UoData } from '../../model/UoModel';
+import { AooData } from './../../model/AooData';
 
 const mockPartyRegistry = {
   items: [
@@ -200,6 +202,48 @@ const mockedGeoTaxonomy = [
   // }
 ];
 
+const mockedAooCode: AooData = {
+  codAoo: 'ND',
+  codiceFiscaleEnte: '92078570527',
+  codiceIpa: '03YBQ4C7',
+  codiceUniAoo: 'A356E00',
+  denominazioneAoo: 'Denominazione Aoo Test',
+  denominazioneEnte: 'Comune Test',
+  id: 'A356E00',
+  mail1: 'test.it',
+  origin: 'IPA',
+  CAP: '53100',
+  codiceCatastaleComune: 'I726',
+  codiceComuneISTAT: '052032',
+  cognomeResponsabile: 'Bielli',
+  nomeResponsabile: 'Silvia',
+  dataIstituzione: '2023-01-27',
+  indirizzo: 'Via Nenni 6',
+  mailResponsabile: 'test@gmail.com',
+  telefonoResponsabile: '3357080675',
+  tipoMail1: 'Pec',
+};
+
+const mockedUoCode: UoData = {
+  codiceFiscaleEnte: '92078570527',
+  codiceIpa: '03YBQ4C7',
+  codiceUniUo: 'UF9YK6',
+  codiceUniUoPadre: '',
+  denominazioneEnte: 'denominazione uo test',
+  descrizioneUo: 'Ufficio per la transizione al Digitale',
+  id: 'UF9YK6',
+  mail1: 'test@fnofi.it',
+  origin: 'IPA',
+  CAP: '84014',
+  codiceCatastaleComune: 'F912',
+  codiceComuneISTAT: '065078',
+  cognomeResponsabile: 'Ventura',
+  dataAggiornamento: '2020-09-22',
+  dataIstituzione: '2017-09-29',
+  indirizzo: 'Via San Pietro, 10',
+  tipoMail1: 'Pec',
+};
+
 const mockedParty = {
   externalId: 'externalId1',
   originId: 'originId1',
@@ -213,6 +257,7 @@ const mockedParty = {
   origin: 'IPA',
   userRole: 'ADMIN',
 };
+
 const mockedParties: Array<SelfcareParty> = [
   {
     externalId: 'externalId1',
@@ -324,7 +369,14 @@ const mockedOnboardingData1: InstitutionOnboardingInfoResource = {
     },
   },
 };
-
+const mockedProductPn = {
+  title: 'Piattaforma Notifiche',
+  id: 'prod-pn',
+};
+const mockedProductPagopa = {
+  title: 'Piattaforma Notifiche',
+  id: 'prod-pagopa',
+};
 const mockedSubProduct = {
   title: 'Premium',
   id: 'prod-io-premium',
@@ -334,25 +386,8 @@ const mockedProdIoSign = {
   title: 'Firma con Io',
   id: 'prod-io-sign',
 };
-const mockedProducts = [
-  {
-    title: 'Interoperabilità',
-    id: 'prod-interop',
-  },
-  {
-    title: 'Piattaforma Notifiche',
-    id: 'prod-pn',
-  },
-];
+const defaultProduct = mockedProductPagopa;
 
-// eslint-disable-next-line functional/immutable-data
-const urlProdId = window.location.pathname.split('/').pop();
-const SelectedProduct = mockedProducts.find((p) => p.id === urlProdId);
-
-const mockedSelectedProduct = {
-  title: SelectedProduct?.title,
-  id: SelectedProduct?.id,
-};
 const mockedResponseError = {
   detail: 'Request took too long to complete.',
   status: 503,
@@ -450,6 +485,17 @@ export async function mockFetch(
     );
   }
 
+  if (endpoint === 'ONBOARDING_GET_AOO_CODE_INFO') {
+    return new Promise((resolve) =>
+      resolve({ data: mockedAooCode, status: 200, statusText: '200' } as AxiosResponse)
+    );
+  }
+
+  if (endpoint === 'ONBOARDING_GET_UO_CODE_INFO') {
+    return new Promise((resolve) =>
+      resolve({ data: mockedUoCode, status: 200, statusText: '200' } as AxiosResponse)
+    );
+  }
   if (endpoint === 'VERIFY_ONBOARDING') {
     switch (endpointParams.externalInstitutionId) {
       case 'infoError':
@@ -523,10 +569,10 @@ export async function mockFetch(
     switch (endpointParams.productId) {
       case 'error':
         return genericError;
-      // case 'prod-pn':
-      //   return new Promise((resolve) =>
-      //     resolve({ data: mockedProductPn, status: 200, statusText: '200' } as AxiosResponse)
-      // );
+      case 'prod-pn':
+        return new Promise((resolve) =>
+          resolve({ data: mockedProductPn, status: 200, statusText: '200' } as AxiosResponse)
+        );
       case 'prod-io-premium':
         return new Promise((resolve) =>
           resolve({ data: mockedSubProduct, status: 200, statusText: '200' } as AxiosResponse)
@@ -535,9 +581,10 @@ export async function mockFetch(
         return new Promise((resolve) =>
           resolve({ data: mockedProdIoSign, status: 200, statusText: '200' } as AxiosResponse)
         );
+      // eslint-disable-next-line sonarjs/no-duplicated-branches
       default:
         return new Promise((resolve) =>
-          resolve({ data: mockedSelectedProduct, status: 200, statusText: '200' } as AxiosResponse)
+          resolve({ data: defaultProduct, status: 200, statusText: '200' } as AxiosResponse)
         );
     }
   }
@@ -561,7 +608,7 @@ export async function mockFetch(
     }
   }
   if (endpoint === 'ONBOARDING_POST_LEGALS') {
-    switch (endpointParams.externalInstitutionId) {
+    switch (mockedOnboardingData1.institution.billingData.taxCode) {
       case 'error':
         return genericError;
       case 'notAllowedInSubmit':
