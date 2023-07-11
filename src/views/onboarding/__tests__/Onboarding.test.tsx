@@ -93,6 +93,7 @@ const stepBillingDataTitle = 'Indica i dati del tuo ente';
 const step2Title = 'Indica il Legale Rappresentante';
 const step3Title = "Indica l'Amministratore";
 const completeSuccessTitle = 'Richiesta di adesione inviata';
+const completeSuccessTitleForPt = 'Richiesta di registrazione inviata';
 const completeErrorTitle = 'Spiacenti, qualcosa è andato storto.';
 
 const agencyOnboarded = 'AGENCY ONBOARDED';
@@ -228,9 +229,8 @@ test('test prod-pagopa only for institutionType is PT', async () => {
   await executeStepInstitutionTypePt();
   await executeStepBillingDataLabelsForPt();
   await executeStep2();
-  await executeStep3(true);
+  await executeStep3(true, true);
   await verifySubmitPt('prod-pagopa');
-  // TODO SELC-2565 add verify thankyouPage text
 });
 
 test('test party search if gps for prod-interop', async () => {
@@ -667,7 +667,7 @@ const executeStepBillingDataLabelsForPtAlreadyOnboarded = async () => {
   const confirmButtonEnabled = screen.getByRole('button', { name: 'Continua' });
   await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
   fireEvent.click(confirmButtonEnabled);
-  await waitFor(() => screen.getByText('L’ente indicato è già registrato'));
+  await waitFor(() => screen.getByText('Il Partner è già registrato'));
 };
 
 const executeStepBillingDataReaField = async () => {
@@ -767,7 +767,7 @@ const executeStep2 = async () => {
   await waitFor(() => screen.getByText(step3Title));
 };
 
-const executeStep3 = async (expectedSuccessfulSubmit: boolean) => {
+const executeStep3 = async (expectedSuccessfulSubmit: boolean, isPt = false) => {
   console.log('Testing step 3');
 
   await waitFor(() => screen.getByText(step3Title));
@@ -801,7 +801,13 @@ const executeStep3 = async (expectedSuccessfulSubmit: boolean) => {
   await waitFor(() => fireEvent.click(confirmButton));
 
   await waitFor(() =>
-    screen.getByText(expectedSuccessfulSubmit ? completeSuccessTitle : completeErrorTitle)
+    screen.getByText(
+      expectedSuccessfulSubmit && !isPt
+        ? completeSuccessTitle
+        : expectedSuccessfulSubmit && isPt
+        ? completeSuccessTitleForPt
+        : completeErrorTitle
+    )
   );
 };
 

@@ -57,7 +57,7 @@ export default {
   onboardingStep1_5: {
     loadingText: 'Stiamo verificando i tuoi dati',
     ptAlreadyOnboarded: {
-      title: 'L’ente indicato è già registrato',
+      title: 'Il Partner è già registrato',
       description:
         'Per operare su un prodotto, chiedi a un Amministratore di <1/> aggiungerti nella sezione Utenti.',
       backAction: 'Chiudi',
@@ -217,13 +217,17 @@ export default {
   },
   onboarding: {
     outcomeContent: {
+      ptSuccess: {
+        title: 'Richiesta di registrazione inviata',
+        description:
+          'Invieremo un’email con l’esito della richiesta all’indirizzo  <1 /> PEC indicato.',
+      },
       success: {
         title: 'Richiesta di adesione inviata',
         notPaDescription:
           "Invieremo un'email all'indirizzo PEC indicato. <1 /> Al suo interno, ci sono le istruzioni per completare <3 />l'adesione.",
         paDescription:
           "Invieremo un'email all'indirizzo PEC primario dell'ente. <1 /> Al suo interno, ci sono le istruzioni per completare <3 />l'adesione.",
-        ptDescription: '', // TODO SELC-2565 -  add whrn text will be ready
         backHome: 'Torna alla home',
       },
       error: {

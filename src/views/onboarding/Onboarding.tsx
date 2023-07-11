@@ -326,37 +326,52 @@ function OnboardingComponent({ productId }: { productId: string }) {
     forward();
   };
 
-  // TODO SELC-2565 - update with correct text when will be ready
   const outcomeContent: RequestOutcomeOptions = {
     success: {
       title: '',
       description: [
         <>
-          <EndingPage
-            icon={<IllusCompleted size={60} />}
-            title={t('onboarding.outcomeContent.success.title')}
-            description={
-              institutionType === 'PA' ? (
-                <Trans i18nKey="onboarding.outcomeContent.success.paDescription">
-                  Invieremo un&apos;email all&apos;indirizzo PEC primario dell&apos;ente.
-                  <br />
-                  Al suo interno, ci sono le istruzioni per completare <br />
-                  l&apos;adesione.
+          {institutionType !== 'PT' ? (
+            <EndingPage
+              icon={<IllusCompleted size={60} />}
+              title={t('onboarding.outcomeContent.success.title')}
+              description={
+                institutionType === 'PA' ? (
+                  <Trans i18nKey="onboarding.outcomeContent.success.paDescription">
+                    Invieremo un&apos;email all&apos;indirizzo PEC primario dell&apos;ente.
+                    <br />
+                    Al suo interno, ci sono le istruzioni per completare <br />
+                    l&apos;adesione.
+                  </Trans>
+                ) : (
+                  <Trans i18nKey="onboarding.outcomeContent.success.notPaDescription">
+                    Invieremo un&apos;email all&apos;indirizzo PEC indicato.
+                    <br />
+                    Al suo interno, ci sono le istruzioni per completare <br />
+                    l&apos;adesione.
+                  </Trans>
+                )
+              }
+              variantTitle={'h4'}
+              variantDescription={'body1'}
+              buttonLabel={t('onboarding.outcomeContent.success.backHome')}
+              onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+            />
+          ) : (
+            <EndingPage
+              icon={<IllusCompleted size={60} />}
+              title={t('onboarding.outcomeContent.ptSuccess.title')}
+              description={
+                <Trans i18nKey="onboarding.outcomeContent.success.description">
+                  Invieremo un’email con l’esito della richiesta all’indirizzo <br /> PEC indicato.
                 </Trans>
-              ) : (
-                <Trans i18nKey="onboarding.outcomeContent.success.notPaDescription">
-                  Invieremo un&apos;email all&apos;indirizzo PEC indicato.
-                  <br />
-                  Al suo interno, ci sono le istruzioni per completare <br />
-                  l&apos;adesione.
-                </Trans>
-              )
-            }
-            variantTitle={'h4'}
-            variantDescription={'body1'}
-            buttonLabel={t('onboarding.outcomeContent.success.backHome')}
-            onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
-          />
+              }
+              variantTitle={'h4'}
+              variantDescription={'body1'}
+              buttonLabel={t('onboarding.outcomeContent.success.backHome')}
+              onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+            />
+          )}
         </>,
       ],
     },
