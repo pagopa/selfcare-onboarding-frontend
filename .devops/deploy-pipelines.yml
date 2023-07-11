@@ -53,6 +53,8 @@ variables:
 
     react_app_enable_aoo_uo: '$(UAT_AOO_UO_ENABLED)'
 
+    react_app_enable_pt: 'UAT_PT_ENABLED'
+
   ${{ elseif eq(variables['Build.SourceBranch'], 'refs/heads/main') }}:
     environment: 'PROD'
     azure_subscription: $(PROD_AZURE_SUBSCRIPTION)
@@ -84,6 +86,8 @@ variables:
     react_app_onetrust_domain_id: '$(PROD_ONETRUST_DOMAIN_ID)'
 
     react_app_enable_aoo_uo: '$(PROD_AOO_UO_ENABLED)'
+
+    react_app_enable_pt: 'PROD_PT_ENABLED'
 
   # every branch different from past will be considered as DEV
   #  ${{ if startsWith(variables['Build.SourceBranch'], 'refs/heads/release-dev') }}:
@@ -118,6 +122,8 @@ variables:
     react_app_onetrust_domain_id: '$(DEV_ONETRUST_DOMAIN_ID)'
 
     react_app_enable_aoo_uo: '$(DEV_AOO_UO_ENABLED)'
+
+    react_app_enable_pt: 'DEV_PT_ENABLED'
 
 # Automatically triggered on PR
 # https://docs.microsoft.com/en-us/azure/devops/pipelines/yaml-schema?view=azure-devops&tabs=schema%2Cparameter-schema#pr-trigger
@@ -217,6 +223,8 @@ stages:
               REACT_APP_ONETRUST_DOMAIN_ID: '$(react_app_onetrust_domain_id)'
 
               REACT_APP_ENABLE_AOO_UO: '$(react_app_enable_aoo_uo)'
+
+              REACT_APP_ENABLE_PT: '$(react_app_enable_pt)'
           - bash: |
               printf "$EXECUTION_ID\n$(git name-rev --name-only FETCH_HEAD) $(git rev-parse HEAD)" > $(System.DefaultWorkingDirectory)/build/build.info
             env:
