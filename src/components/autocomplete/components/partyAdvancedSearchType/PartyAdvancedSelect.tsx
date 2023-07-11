@@ -6,6 +6,7 @@ import { InstitutionResource } from '../../../../model/InstitutionResource';
 import { AooData } from '../../../../model/AooData';
 import { UoData } from '../../../../model/UoModel';
 import { Product } from '../../../../../types';
+import { ENV } from '../../../../utils/env';
 
 type Props = {
   setIsBusinessNameSelected: React.Dispatch<React.SetStateAction<boolean>>;
@@ -45,6 +46,7 @@ export default function PartyAdvancedSelect({
   isUoCodeSelected,
   setUoResultHistory,
   setAooResultHistory,
+  product,
 }: Props) {
   const { t } = useTranslation();
 
@@ -85,9 +87,8 @@ export default function PartyAdvancedSelect({
     }
   }, []);
 
-  // TODO: boolean will be activated when the aoo/uo are ready
-  // const filteredByProducts = product && product.id === 'prod-pn';
-  const filteredByProducts = false;
+  const filteredByProducts = product && product.id === 'prod-pn';
+
   return (
     <FormControl fullWidth size="small">
       <InputLabel id="advancedSearch">{t('partyAdvancedSelect.advancedSearchLabel')}</InputLabel>
@@ -115,7 +116,7 @@ export default function PartyAdvancedSelect({
           {t('partyAdvancedSelect.taxCode')}
         </MenuItem>
 
-        {filteredByProducts && (
+        {ENV.AOO_UO.SHOW_AOO_UO && filteredByProducts && (
           <MenuItem
             id="aooCode"
             data-testid="aooCode"
@@ -125,7 +126,7 @@ export default function PartyAdvancedSelect({
             {t('partyAdvancedSelect.aooCode')}
           </MenuItem>
         )}
-        {filteredByProducts && (
+        {ENV.AOO_UO.SHOW_AOO_UO && filteredByProducts && (
           <MenuItem
             id="uoCode"
             data-testid="uoCode"

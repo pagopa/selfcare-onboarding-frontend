@@ -70,23 +70,6 @@ export const prodPhaseOutErrorPage: RequestOutcomeMessage = {
   ],
 };
 
-const alreadyOnboarded: RequestOutcomeMessage = {
-  title: '',
-  description: [
-    <Grid key="0">
-      <EndingPage
-        minHeight="52vh"
-        variantTitle={'h4'}
-        variantDescription={'body1'}
-        title={<Trans i18nKey="onboardingStep1_5.alreadyOnboarded.title" />}
-        description={<Trans i18nKey="onboardingStep1_5.alreadyOnboarded.description" />}
-        buttonLabel={<Trans i18nKey="onboardingStep1_5.alreadyOnboarded.backAction" />}
-        onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
-      />
-    </Grid>,
-  ],
-};
-
 // eslint-disable-next-line sonarjs/cognitive-complexity
 function OnboardingComponent({ productId }: { productId: string }) {
   const [loading, setLoading] = useState(true);
@@ -121,6 +104,44 @@ function OnboardingComponent({ productId }: { productId: string }) {
     new URLSearchParams(window.location.hash.substr(1)).get('subunitType') ?? '';
   const subunitCodeByQuery =
     new URLSearchParams(window.location.hash.substr(1)).get('subunitCode') ?? '';
+
+  const alreadyOnboarded: RequestOutcomeMessage = {
+    title: '',
+    description:
+      institutionType === 'PT'
+        ? [
+            <Grid key="0">
+              <EndingPage
+                minHeight="52vh"
+                variantTitle={'h4'}
+                variantDescription={'body1'}
+                icon={<IllusError size={60} />}
+                title={<Trans i18nKey="onboardingStep1_5.ptAlreadyOnboarded.title" />}
+                description={
+                  <Trans i18nKey="onboardingStep1_5.ptAlreadyOnboarded.description">
+                    Per operare su un prodotto, chiedi a un Amministratore di <br /> aggiungerti
+                    nella sezione Utenti.
+                  </Trans>
+                }
+                buttonLabel={<Trans i18nKey="onboardingStep1_5.ptAlreadyOnboarded.backAction" />}
+                onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+              />
+            </Grid>,
+          ]
+        : [
+            <Grid key="0">
+              <EndingPage
+                minHeight="52vh"
+                variantTitle={'h4'}
+                variantDescription={'body1'}
+                title={<Trans i18nKey="onboardingStep1_5.alreadyOnboarded.title" />}
+                description={<Trans i18nKey="onboardingStep1_5.alreadyOnboarded.description" />}
+                buttonLabel={<Trans i18nKey="onboardingStep1_5.alreadyOnboarded.backAction" />}
+                onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+              />
+            </Grid>,
+          ],
+  };
 
   useEffect(() => {
     if (
@@ -310,31 +331,47 @@ function OnboardingComponent({ productId }: { productId: string }) {
       title: '',
       description: [
         <>
-          <EndingPage
-            icon={<IllusCompleted size={60} />}
-            title={t('onboarding.outcomeContent.success.title')}
-            description={
-              institutionType === 'PA' ? (
-                <Trans i18nKey="onboarding.outcomeContent.success.paDescription">
-                  Invieremo un&apos;email all&apos;indirizzo PEC primario dell&apos;ente.
-                  <br />
-                  Al suo interno, ci sono le istruzioni per completare <br />
-                  l&apos;adesione.
+          {institutionType !== 'PT' ? (
+            <EndingPage
+              icon={<IllusCompleted size={60} />}
+              title={t('onboarding.outcomeContent.success.title')}
+              description={
+                institutionType === 'PA' ? (
+                  <Trans i18nKey="onboarding.outcomeContent.success.paDescription">
+                    Invieremo un&apos;email all&apos;indirizzo PEC primario dell&apos;ente.
+                    <br />
+                    Al suo interno, ci sono le istruzioni per completare <br />
+                    l&apos;adesione.
+                  </Trans>
+                ) : (
+                  <Trans i18nKey="onboarding.outcomeContent.success.notPaDescription">
+                    Invieremo un&apos;email all&apos;indirizzo PEC indicato.
+                    <br />
+                    Al suo interno, ci sono le istruzioni per completare <br />
+                    l&apos;adesione.
+                  </Trans>
+                )
+              }
+              variantTitle={'h4'}
+              variantDescription={'body1'}
+              buttonLabel={t('onboarding.outcomeContent.success.backHome')}
+              onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+            />
+          ) : (
+            <EndingPage
+              icon={<IllusCompleted size={60} />}
+              title={t('onboarding.outcomeContent.ptSuccess.title')}
+              description={
+                <Trans i18nKey="onboarding.outcomeContent.success.description">
+                  Invieremo un’email con l’esito della richiesta all’indirizzo <br /> PEC indicato.
                 </Trans>
-              ) : (
-                <Trans i18nKey="onboarding.outcomeContent.success.notPaDescription">
-                  Invieremo un&apos;email all&apos;indirizzo PEC indicato.
-                  <br />
-                  Al suo interno, ci sono le istruzioni per completare <br />
-                  l&apos;adesione.
-                </Trans>
-              )
-            }
-            variantTitle={'h4'}
-            variantDescription={'body1'}
-            buttonLabel={t('onboarding.outcomeContent.success.backHome')}
-            onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
-          />
+              }
+              variantTitle={'h4'}
+              variantDescription={'body1'}
+              buttonLabel={t('onboarding.outcomeContent.success.backHome')}
+              onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+            />
+          )}
         </>,
       ],
     },

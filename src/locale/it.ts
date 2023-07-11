@@ -56,6 +56,12 @@ export default {
   },
   onboardingStep1_5: {
     loadingText: 'Stiamo verificando i tuoi dati',
+    ptAlreadyOnboarded: {
+      title: 'Il Partner è già registrato',
+      description:
+        'Per operare su un prodotto, chiedi a un Amministratore di <1/> aggiungerti nella sezione Utenti.',
+      backAction: 'Chiudi',
+    },
     alreadyOnboarded: {
       title: "L'Ente che hai scelto ha già aderito",
       description:
@@ -211,6 +217,11 @@ export default {
   },
   onboarding: {
     outcomeContent: {
+      ptSuccess: {
+        title: 'Richiesta di registrazione inviata',
+        description:
+          'Invieremo un’email con l’esito della richiesta all’indirizzo  <1 /> PEC indicato.',
+      },
       success: {
         title: 'Richiesta di adesione inviata',
         notPaDescription:

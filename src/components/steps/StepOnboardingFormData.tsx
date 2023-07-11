@@ -85,11 +85,14 @@ export default function StepOnboardingFormData({
 }: Props) {
   const requiredError = 'Required';
 
+  const institutionAvoidGeotax = 'PT';
+
   const premiumFlow = !!subProductId;
   const isPSP = institutionType === 'PSP';
   const isInformationCompany =
     institutionType !== 'PA' &&
     institutionType !== 'PSP' &&
+    institutionType !== 'PT' &&
     (productId === 'prod-io' || productId === 'prod-io-sign');
   const isProdIoSign = productId === 'prod-io-sign';
 
@@ -171,7 +174,8 @@ export default function StepOnboardingFormData({
     if (
       ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY &&
       previousGeotaxononomies &&
-      previousGeotaxononomies.length > 0
+      previousGeotaxononomies.length > 0 &&
+      institutionType !== institutionAvoidGeotax
     ) {
       const changedNational2Local =
         previousGeotaxononomies.some((rv) => rv?.code === nationalValue) &&
@@ -313,6 +317,7 @@ export default function StepOnboardingFormData({
         recipientCode: !values.recipientCode ? requiredError : undefined,
         geographicTaxonomies:
           ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY &&
+          institutionType !== institutionAvoidGeotax &&
           (!values.geographicTaxonomies ||
             values.geographicTaxonomies.length === 0 ||
             values.geographicTaxonomies.some(
@@ -331,7 +336,10 @@ export default function StepOnboardingFormData({
           !currencyField.test(values.shareCapital) &&
           t('onboardingFormData.billingDataSection.invalidShareCapitalField'),
         supportEmail:
-          !values.supportEmail && !premiumFlow && isProdIoSign
+          institutionType !== institutionAvoidGeotax &&
+          !values.supportEmail &&
+          !premiumFlow &&
+          isProdIoSign
             ? requiredError
             : !mailPECRegexp.test(values.supportEmail as string) && values.supportEmail
             ? t('onboardingFormData.billingDataSection.invalidMailSupport')
@@ -431,9 +439,10 @@ export default function StepOnboardingFormData({
           isInformationCompany={isInformationCompany}
           aooSelected={aooSelected}
           uoSelected={uoSelected}
+          institutionAvoidGeotax={institutionAvoidGeotax}
         />
         {/* DATI RELATIVI ALLA TASSONOMIA */}
-        {ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY ? (
+        {ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY && institutionType !== institutionAvoidGeotax ? (
           <Grid item xs={12} display="flex" justifyContent={'center'}>
             <GeoTaxonomySection
               retrievedTaxonomies={previousGeotaxononomies}
