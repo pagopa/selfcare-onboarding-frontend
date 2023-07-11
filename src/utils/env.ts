@@ -51,4 +51,8 @@ export const ENV = {
   GEOTAXONOMY: {
     SHOW_GEOTAXONOMY: env.get('REACT_APP_ENABLE_GEOTAXONOMY').default('false').asBool(),
   },
+
+  AOO_UO: {
+    SHOW_AOO_UO: env.get('REACT_APP_ENABLE_AOO_UO').default('false').asBool(),
+  },
 };
