@@ -219,20 +219,22 @@ test('test label recipientCode only for institutionType is not PA', async () => 
   await executeStepBillingDataLabels();
 });
 
-test('test prod-io only for institutionType is PT and PT already onboarded', async () => {
-  renderComponent(prodIo);
-  await executeStepInstitutionTypePt();
-  await executeStepBillingDataLabelsForPtAlreadyOnboarded();
-});
+ENV.PT.SHOW_PT &&
+  test('test prod-io only for institutionType is PT and PT already onboarded', async () => {
+    renderComponent(prodIo);
+    await executeStepInstitutionTypePt();
+    await executeStepBillingDataLabelsForPtAlreadyOnboarded();
+  });
 
-test('test prod-pagopa only for institutionType is PT', async () => {
-  renderComponent(prodPagopa);
-  await executeStepInstitutionTypePt();
-  await executeStepBillingDataLabelsForPt();
-  await executeStep2();
-  await executeStep3(true, true);
-  await verifySubmitPt('prod-pagopa');
-});
+ENV.PT.SHOW_PT &&
+  test('test prod-pagopa only for institutionType is PT', async () => {
+    renderComponent(prodPagopa);
+    await executeStepInstitutionTypePt();
+    await executeStepBillingDataLabelsForPt();
+    await executeStep2();
+    await executeStep3(true, true);
+    await verifySubmitPt('prod-pagopa');
+  });
 
 test('test party search if gps for prod-interop', async () => {
   renderComponent(prodInterop);
