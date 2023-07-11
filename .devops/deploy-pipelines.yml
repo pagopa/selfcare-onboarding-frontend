@@ -53,7 +53,7 @@ variables:
 
     react_app_enable_aoo_uo: '$(UAT_AOO_UO_ENABLED)'
 
-    react_app_enable_pt: 'UAT_PT_ENABLED'
+    react_app_enable_pt: '$(UAT_PT_ENABLED)'
 
   ${{ elseif eq(variables['Build.SourceBranch'], 'refs/heads/main') }}:
     environment: 'PROD'
@@ -87,7 +87,7 @@ variables:
 
     react_app_enable_aoo_uo: '$(PROD_AOO_UO_ENABLED)'
 
-    react_app_enable_pt: 'PROD_PT_ENABLED'
+    react_app_enable_pt: '$(PROD_PT_ENABLED)'
 
   # every branch different from past will be considered as DEV
   #  ${{ if startsWith(variables['Build.SourceBranch'], 'refs/heads/release-dev') }}:
@@ -123,7 +123,7 @@ variables:
 
     react_app_enable_aoo_uo: '$(DEV_AOO_UO_ENABLED)'
 
-    react_app_enable_pt: 'DEV_PT_ENABLED'
+    react_app_enable_pt: '$(DEV_PT_ENABLED)'
 
 # Automatically triggered on PR
 # https://docs.microsoft.com/en-us/azure/devops/pipelines/yaml-schema?view=azure-devops&tabs=schema%2Cparameter-schema#pr-trigger
