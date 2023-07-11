@@ -468,7 +468,7 @@ export default {
   },
   onboardingFormData: {
     title: 'Indica i dati del tuo ente',
-    pspAndProdPagoPATitle: 'Indica i dati',
+    pspAndProdPagoPATitle: 'Inserisci i dati',
     backLabel: 'Indietro',
     confirmLabel: 'Continua',
     billingDataPt: {
