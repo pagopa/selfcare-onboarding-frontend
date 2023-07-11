@@ -517,7 +517,7 @@ const executeStepInstitutionTypePt = async () => {
   expect(confirmButtonEnabled).toBeEnabled();
 
   fireEvent.click(confirmButtonEnabled);
-  await waitFor(() => screen.getByText('Indica i dati del tuo ente'));
+  await waitFor(() => screen.getByText('Inserisci i dati'));
 };
 
 const executeStepInstitutionTypeGspForInterop = async () => {
@@ -614,7 +614,7 @@ const executeStepBillingDataLabelsForPt = async () => {
 
   const backButton = screen.getByRole('button', { name: 'Indietro' });
 
-  await waitFor(() => screen.getByText('Indica i dati del tuo ente'));
+  await waitFor(() => screen.getByText('Inserisci i dati'));
   expect(screen.getByText('Codice SDI'));
 
   const geotaxArea = screen.queryByText('INDICA L’AREA GEOGRAFICA');
@@ -644,7 +644,7 @@ const executeStepBillingDataLabelsForPt = async () => {
 const executeStepBillingDataLabelsForPtAlreadyOnboarded = async () => {
   console.log('test label recipientCode only for institutionType !== PA');
 
-  await waitFor(() => screen.getByText('Indica i dati del tuo ente'));
+  await waitFor(() => screen.getByText('Inserisci i dati'));
   expect(screen.getByText('Codice SDI'));
 
   const geotaxArea = screen.queryByText('INDICA L’AREA GEOGRAFICA');

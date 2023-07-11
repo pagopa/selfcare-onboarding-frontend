@@ -471,6 +471,10 @@ export default {
     pspAndProdPagoPATitle: 'Indica i dati',
     backLabel: 'Indietro',
     confirmLabel: 'Continua',
+    billingDataPt: {
+      title: 'Inserisci i dati',
+      subTitle: 'Inserisci le informazioni richieste, assicurandoti che siano corrette.',
+    },
     billingDataSection: {
       invalidFiscalCode: 'Il Codice Fiscale non è valido',
       invalidZipCode: 'Il CAP non è valido',
