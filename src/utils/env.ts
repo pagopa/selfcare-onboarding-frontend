@@ -55,4 +55,8 @@ export const ENV = {
   AOO_UO: {
     SHOW_AOO_UO: env.get('REACT_APP_ENABLE_AOO_UO').default('false').asBool(),
   },
+
+  PT: {
+    SHOW_PT: env.get('REACT_APP_ENABLE_PT').default('false').asBool(),
+  },
 };

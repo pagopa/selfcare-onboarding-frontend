@@ -16,6 +16,7 @@ import {
   Product,
   StepperStepComponentProps,
 } from '../../../types';
+import { ENV } from '../../utils/env';
 import { OnboardingStepActions } from '../OnboardingStepActions';
 import { useHistoryState } from '../useHistoryState';
 
@@ -71,23 +72,23 @@ export default function StepInstitutionType({
             it.labelKey === 'gsp' ||
             it.labelKey === 'scp' ||
             it.labelKey === 'psp' ||
-            it.labelKey === 'pt'
+            (ENV.PT.SHOW_PT ?? it.labelKey === 'pt')
         );
       case 'prod-pn':
         return institutionTypeValues.filter((it) => it.labelKey === 'pa');
       case 'prod-idpay':
         return institutionTypeValues.filter((it) => it.labelKey === 'pa');
-      case 'prod-io-sign':
-        return institutionTypeValues.filter(
-          (it) => it.labelKey === 'pa' || it.labelKey === 'gsp' || it.labelKey === 'scp'
-        );
-      default:
+      case 'prod-io':
         return institutionTypeValues.filter(
           (it) =>
             it.labelKey === 'pa' ||
             it.labelKey === 'gsp' ||
             it.labelKey === 'scp' ||
-            it.labelKey === 'pt'
+            (ENV.PT.SHOW_PT ?? it.labelKey === 'pt')
+        );
+      default:
+        return institutionTypeValues.filter(
+          (it) => it.labelKey === 'pa' || it.labelKey === 'gsp' || it.labelKey === 'scp'
         );
     }
   };
