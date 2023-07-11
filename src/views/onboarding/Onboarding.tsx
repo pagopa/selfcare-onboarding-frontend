@@ -660,7 +660,10 @@ function OnboardingComponent({ productId }: { productId: string }) {
           uoSelected,
           origin,
           institutionType: institutionType as InstitutionType,
-          subtitle: t('onBoardingSubProduct.billingData.subTitle'),
+          subtitle:
+            institutionType !== 'PT'
+              ? t('onBoardingSubProduct.billingData.subTitle')
+              : t('onboardingFormData.billingDataPt.subTitle'),
           forward: forwardWithBillingData,
           back: () => {
             if (fromDashboard && !productAvoidStep) {

@@ -418,6 +418,8 @@ export default function StepOnboardingFormData({
           <Typography variant="h3" component="h2" align="center" sx={{ lineHeight: '1.2' }}>
             {institutionType === 'PSP' && productId === 'prod-pagopa'
               ? t('onboardingFormData.pspAndProdPagoPATitle')
+              : institutionType === 'PT'
+              ? t('onboardingFormData.billingDataPt.title')
               : t('onboardingFormData.title')}
           </Typography>
         </Grid>
