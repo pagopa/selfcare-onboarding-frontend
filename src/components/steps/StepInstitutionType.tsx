@@ -72,7 +72,7 @@ export default function StepInstitutionType({
             it.labelKey === 'gsp' ||
             it.labelKey === 'scp' ||
             it.labelKey === 'psp' ||
-            (ENV.PT.SHOW_PT ?? it.labelKey === 'pt')
+            (ENV.PT.SHOW_PT ? it.labelKey === 'pt' : '')
         );
       case 'prod-pn':
         return institutionTypeValues.filter((it) => it.labelKey === 'pa');
@@ -84,7 +84,7 @@ export default function StepInstitutionType({
             it.labelKey === 'pa' ||
             it.labelKey === 'gsp' ||
             it.labelKey === 'scp' ||
-            (ENV.PT.SHOW_PT ?? it.labelKey === 'pt')
+            (ENV.PT.SHOW_PT ? it.labelKey === 'pt' : '')
         );
       default:
         return institutionTypeValues.filter(
