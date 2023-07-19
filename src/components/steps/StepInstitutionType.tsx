@@ -86,14 +86,6 @@ export default function StepInstitutionType({
             it.labelKey === 'scp' ||
             (ENV.PT.SHOW_PT ? it.labelKey === 'pt' : '')
         );
-      case 'prod-io-sign':
-        return institutionTypeValues.filter(
-          (it) =>
-            it.labelKey === 'pa' ||
-            it.labelKey === 'gsp' ||
-            it.labelKey === 'scp' ||
-            it.labelKey === 'pt'
-        );
       default:
         return institutionTypeValues.filter(
           (it) => it.labelKey === 'pa' || it.labelKey === 'gsp' || it.labelKey === 'scp'
