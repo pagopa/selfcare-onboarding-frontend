@@ -239,9 +239,12 @@ export default {
     },
     userNotAllowedError: {
       title: 'Non puoi aderire a questo prodotto',
+      titleNoParty: 'Qualcosa è andato storto',
       description:
         'Al momento, l’ente <1>{{partyName}}</1> non ha il permesso di aderire a <3>{{productName}}</3>',
+      descriptionNoParty: `Al momento l'ente indicato non può aderire a <1>{{productName}}</1>. <2/> Per maggiori dettagli contatta <4>l'assistenza</4>`,
       backAction: 'Chiudi',
+      backActionNoParty: 'Torna alla home',
     },
     sessionModal: {
       title: 'Vuoi davvero uscire?',

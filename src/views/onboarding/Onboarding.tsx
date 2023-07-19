@@ -1,6 +1,6 @@
 import { useEffect, useState, useContext, useRef, useMemo } from 'react';
 import { useHistory } from 'react-router-dom';
-import { Button, Container, Typography, Grid } from '@mui/material';
+import { Button, Container, Typography, Grid, Link } from '@mui/material';
 import { AxiosError, AxiosResponse } from 'axios';
 import SessionModal from '@pagopa/selfcare-common-frontend/components/SessionModal';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
@@ -405,37 +405,76 @@ function OnboardingComponent({ productId }: { productId: string }) {
     description: [
       <>
         <IllusError size={60} />
-        <Grid container direction="column" key="0" mt={3}>
-          <Grid container item justifyContent="center">
-            <Grid item xs={6}>
-              <Typography variant="h4">
-                <Trans i18nKey="onboarding.userNotAllowedError.title" />
-              </Typography>
+        {selectedParty ? (
+          <Grid container direction="column" key="0" mt={3}>
+            <Grid container item justifyContent="center">
+              <Grid item xs={6}>
+                <Typography variant="h4">
+                  <Trans i18nKey="onboarding.userNotAllowedError.title" />
+                </Typography>
+              </Grid>
+            </Grid>
+            <Grid container item justifyContent="center" mb={2} mt={1}>
+              <Grid item xs={6}>
+                <Typography>
+                  <Trans i18nKey="onboarding.userNotAllowedError.description">
+                    Al momento, l’ente
+                    {{ partyName: selectedParty?.description }}
+                    non ha il permesso di aderire a{{ productName: selectedProduct?.title }}
+                  </Trans>
+                </Typography>
+              </Grid>
+            </Grid>
+            <Grid container item justifyContent="center" mt={2}>
+              <Grid item xs={4}>
+                <Button
+                  variant="contained"
+                  sx={{ alignSelf: 'center' }}
+                  onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+                >
+                  <Trans i18nKey="onboarding.userNotAllowedError.backAction" />
+                </Button>
+              </Grid>
             </Grid>
           </Grid>
-          <Grid container item justifyContent="center" mb={2} mt={1}>
-            <Grid item xs={6}>
-              <Typography>
-                <Trans i18nKey="onboarding.userNotAllowedError.description">
-                  Al momento, l’ente
-                  {{ partyName: selectedParty?.description }}
-                  non ha il permesso di aderire a{{ productName: selectedProduct?.title }}
-                </Trans>
-              </Typography>
+        ) : (
+          <Grid container direction="column" key="0" mt={3}>
+            <Grid container item justifyContent="center">
+              <Grid item xs={6}>
+                <Typography variant="h4">
+                  <Trans i18nKey="onboarding.userNotAllowedError.titleNoParty" />
+                </Typography>
+              </Grid>
+            </Grid>
+            <Grid container item justifyContent="center" mb={2} mt={1}>
+              <Grid item xs={6}>
+                <Typography>
+                  <Trans i18nKey="onboardingStep1_5.userNotAllowedError.descriptionNoParty">
+                    Al momento l&apos;ente indicato non può aderire a{' '}
+                    {{ productName: selectedProduct?.title }}. <br /> Per maggiori dettagli contatta
+                    <Link
+                      sx={{ cursro: 'pointer', textDecoration: 'none' }}
+                      href={ENV.ASSISTANCE.ENABLE ? ENV.URL_FE.ASSISTANCE : ''}
+                    >
+                      &nbsp;l&apos;assistenza
+                    </Link>
+                  </Trans>
+                </Typography>
+              </Grid>
+            </Grid>
+            <Grid container item justifyContent="center" mt={2}>
+              <Grid item xs={4}>
+                <Button
+                  variant="contained"
+                  sx={{ alignSelf: 'center' }}
+                  onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+                >
+                  <Trans i18nKey="onboarding.userNotAllowedError.backActionNoParty" />
+                </Button>
+              </Grid>
             </Grid>
           </Grid>
-          <Grid container item justifyContent="center" mt={2}>
-            <Grid item xs={4}>
-              <Button
-                variant="contained"
-                sx={{ alignSelf: 'center' }}
-                onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
-              >
-                <Trans i18nKey="onboarding.userNotAllowedError.backAction" />
-              </Button>
-            </Grid>
-          </Grid>
-        </Grid>
+        )}
       </>,
     ],
   };
