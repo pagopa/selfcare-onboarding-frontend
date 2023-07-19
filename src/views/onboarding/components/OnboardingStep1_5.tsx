@@ -1,5 +1,7 @@
+/* eslint-disable sonarjs/cognitive-complexity */
 import { AxiosError } from 'axios';
 import { useEffect, useState, useContext, useRef } from 'react';
+import { Link } from '@mui/material';
 import { Trans, useTranslation } from 'react-i18next';
 import { IllusError } from '@pagopa/mui-italia';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
@@ -81,6 +83,34 @@ export function OnboardingStep1_5({
   const requestIdRef = useRef<string>();
   const { t } = useTranslation();
 
+  const notAllowedErrorNoParty: RequestOutcomeMessage = {
+    title: '',
+    description: [
+      <>
+        <EndingPage
+          minHeight="52vh"
+          icon={<IllusError size={60} />}
+          title={<Trans i18nKey="onboardingStep1_5.userNotAllowedError.titleNoParty" />}
+          description={
+            <Trans i18nKey="onboardingStep1_5.userNotAllowedError.descriptionNoParty">
+              Al momento l&apos;ente indicato non può aderire a{' '}
+              {{ productName: selectedProduct?.title }}. <br /> Per maggiori dettagli contatta
+              <Link
+                sx={{ cursro: 'pointer', textDecoration: 'none' }}
+                href={ENV.ASSISTANCE.ENABLE ? ENV.URL_FE.ASSISTANCE : ''}
+              >
+                &nbsp;l&apos;assistenza
+              </Link>
+            </Trans>
+          }
+          variantTitle={'h4'}
+          variantDescription={'body1'}
+          buttonLabel={<Trans i18nKey="onboardingStep1_5.genericError.backActionNoParty" />}
+          onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+        />
+      </>,
+    ],
+  };
   const notAllowedError: RequestOutcomeMessage = {
     title: '',
     description: [
@@ -90,18 +120,11 @@ export function OnboardingStep1_5({
           icon={<IllusError size={60} />}
           title={<Trans i18nKey="onboardingStep1_5.userNotAllowedError.title" />}
           description={
-            // selectedParty ? (
             <Trans i18nKey="onboardingStep1_5.userNotAllowedError.description">
               Al momento, l’ente
               {{ partyName: selectedParty?.description }}
               non ha il permesso di aderire a{{ productName: selectedProduct?.title }}
             </Trans>
-            // ) : (
-            //   <Trans i18nKey="onboardingStep1_5.userNotAllowedError.descriptionNoParty">
-            //     Al momento l’ente non ha il permesso di aderire a
-            //     {{ productName: selectedProduct?.title }}
-            //   </Trans>
-            // )
           }
           variantTitle={'h4'}
           variantDescription={'body1'}
@@ -152,7 +175,7 @@ export function OnboardingStep1_5({
           party_id: externalInstitutionId,
           product_id: productId,
         });
-        setOutcome(notAllowedError);
+        setOutcome(selectedParty ? notAllowedError : notAllowedErrorNoParty);
       } else {
         setOutcome(genericError);
       }

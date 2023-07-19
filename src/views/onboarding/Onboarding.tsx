@@ -405,24 +405,50 @@ function OnboardingComponent({ productId }: { productId: string }) {
     description: [
       <>
         <IllusError size={60} />
-        <Grid container direction="column" key="0" mt={3}>
-          <Grid container item justifyContent="center">
-            <Grid item xs={6}>
-              <Typography variant="h4">
-                <Trans i18nKey="onboarding.userNotAllowedError.title" />
-              </Typography>
+        {selectedParty ? (
+          <Grid container direction="column" key="0" mt={3}>
+            <Grid container item justifyContent="center">
+              <Grid item xs={6}>
+                <Typography variant="h4">
+                  <Trans i18nKey="onboarding.userNotAllowedError.title" />
+                </Typography>
+              </Grid>
             </Grid>
-          </Grid>
-          <Grid container item justifyContent="center" mb={2} mt={1}>
-            <Grid item xs={6}>
-              <Typography>
-                {selectedParty ? (
+            <Grid container item justifyContent="center" mb={2} mt={1}>
+              <Grid item xs={6}>
+                <Typography>
                   <Trans i18nKey="onboarding.userNotAllowedError.description">
                     Al momento, l’ente
                     {{ partyName: selectedParty?.description }}
                     non ha il permesso di aderire a{{ productName: selectedProduct?.title }}
                   </Trans>
-                ) : (
+                </Typography>
+              </Grid>
+            </Grid>
+            <Grid container item justifyContent="center" mt={2}>
+              <Grid item xs={4}>
+                <Button
+                  variant="contained"
+                  sx={{ alignSelf: 'center' }}
+                  onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+                >
+                  <Trans i18nKey="onboarding.userNotAllowedError.backAction" />
+                </Button>
+              </Grid>
+            </Grid>
+          </Grid>
+        ) : (
+          <Grid container direction="column" key="0" mt={3}>
+            <Grid container item justifyContent="center">
+              <Grid item xs={6}>
+                <Typography variant="h4">
+                  <Trans i18nKey="onboarding.userNotAllowedError.titleNoParty" />
+                </Typography>
+              </Grid>
+            </Grid>
+            <Grid container item justifyContent="center" mb={2} mt={1}>
+              <Grid item xs={6}>
+                <Typography>
                   <Trans i18nKey="onboardingStep1_5.userNotAllowedError.descriptionNoParty">
                     Al momento l&apos;ente indicato non può aderire a{' '}
                     {{ productName: selectedProduct?.title }}. <br /> Per maggiori dettagli contatta
@@ -433,22 +459,22 @@ function OnboardingComponent({ productId }: { productId: string }) {
                       &nbsp;l&apos;assistenza
                     </Link>
                   </Trans>
-                )}
-              </Typography>
+                </Typography>
+              </Grid>
+            </Grid>
+            <Grid container item justifyContent="center" mt={2}>
+              <Grid item xs={4}>
+                <Button
+                  variant="contained"
+                  sx={{ alignSelf: 'center' }}
+                  onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+                >
+                  <Trans i18nKey="onboarding.userNotAllowedError.backActionNoParty" />
+                </Button>
+              </Grid>
             </Grid>
           </Grid>
-          <Grid container item justifyContent="center" mt={2}>
-            <Grid item xs={4}>
-              <Button
-                variant="contained"
-                sx={{ alignSelf: 'center' }}
-                onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
-              >
-                <Trans i18nKey="onboarding.userNotAllowedError.backAction" />
-              </Button>
-            </Grid>
-          </Grid>
-        </Grid>
+        )}
       </>,
     ],
   };
