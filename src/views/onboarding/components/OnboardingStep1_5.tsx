@@ -90,11 +90,18 @@ export function OnboardingStep1_5({
           icon={<IllusError size={60} />}
           title={<Trans i18nKey="onboardingStep1_5.userNotAllowedError.title" />}
           description={
+            // selectedParty ? (
             <Trans i18nKey="onboardingStep1_5.userNotAllowedError.description">
               Al momento, l’ente
               {{ partyName: selectedParty?.description }}
               non ha il permesso di aderire a{{ productName: selectedProduct?.title }}
             </Trans>
+            // ) : (
+            //   <Trans i18nKey="onboardingStep1_5.userNotAllowedError.descriptionNoParty">
+            //     Al momento l’ente non ha il permesso di aderire a
+            //     {{ productName: selectedProduct?.title }}
+            //   </Trans>
+            // )
           }
           variantTitle={'h4'}
           variantDescription={'body1'}

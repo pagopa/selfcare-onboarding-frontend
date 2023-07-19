@@ -1,6 +1,6 @@
 import { useEffect, useState, useContext, useRef, useMemo } from 'react';
 import { useHistory } from 'react-router-dom';
-import { Button, Container, Typography, Grid } from '@mui/material';
+import { Button, Container, Typography, Grid, Link } from '@mui/material';
 import { AxiosError, AxiosResponse } from 'axios';
 import SessionModal from '@pagopa/selfcare-common-frontend/components/SessionModal';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
@@ -416,11 +416,24 @@ function OnboardingComponent({ productId }: { productId: string }) {
           <Grid container item justifyContent="center" mb={2} mt={1}>
             <Grid item xs={6}>
               <Typography>
-                <Trans i18nKey="onboarding.userNotAllowedError.description">
-                  Al momento, l’ente
-                  {{ partyName: selectedParty?.description }}
-                  non ha il permesso di aderire a{{ productName: selectedProduct?.title }}
-                </Trans>
+                {selectedParty ? (
+                  <Trans i18nKey="onboarding.userNotAllowedError.description">
+                    Al momento, l’ente
+                    {{ partyName: selectedParty?.description }}
+                    non ha il permesso di aderire a{{ productName: selectedProduct?.title }}
+                  </Trans>
+                ) : (
+                  <Trans i18nKey="onboardingStep1_5.userNotAllowedError.descriptionNoParty">
+                    Al momento l&apos;ente indicato non può aderire a{' '}
+                    {{ productName: selectedProduct?.title }}. <br /> Per maggiori dettagli contatta
+                    <Link
+                      sx={{ cursro: 'pointer', textDecoration: 'none' }}
+                      href={ENV.ASSISTANCE.ENABLE ? ENV.URL_FE.ASSISTANCE : ''}
+                    >
+                      &nbsp;l&apos;assistenza
+                    </Link>
+                  </Trans>
+                )}
               </Typography>
             </Grid>
           </Grid>
