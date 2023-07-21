@@ -136,6 +136,7 @@ export default function StepInstitutionType({
 
   return errorPageViosible && isAlertVisible ? (
     <>
+      {/* TODO: SELC-2732 edit texts when will be ready */}
       <EndingPage
         minHeight="52vh"
         icon={<IllusError size={60} />}
