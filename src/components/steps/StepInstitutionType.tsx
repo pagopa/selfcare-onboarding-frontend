@@ -8,7 +8,9 @@ import {
   Paper,
   useTheme,
 } from '@mui/material';
-import React, { useRef } from 'react';
+import { IllusError } from '@pagopa/mui-italia';
+import { EndingPage } from '@pagopa/selfcare-common-frontend';
+import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation, Trans } from 'react-i18next';
 import {
   InstitutionType,
@@ -34,6 +36,7 @@ const institutionTypeValues: Array<{ labelKey: string; value: InstitutionType }>
   { labelKey: 'psp', value: 'PSP' },
 ];
 
+// eslint-disable-next-line sonarjs/cognitive-complexity
 export default function StepInstitutionType({
   back,
   forward,
@@ -122,7 +125,35 @@ export default function StepInstitutionType({
     }
   };
 
-  return (
+  const [errorPageViosible, setErrorPageVisible] = useState<boolean>(false);
+  useEffect(() => {
+    if (selectedProduct?.id === 'prod-io' || selectedProduct?.id === 'prod-io-premium') {
+      setErrorPageVisible(true);
+    }
+  }, []);
+
+  const isAlertVisible = ENV.BANNER.ENABLE;
+
+  return errorPageViosible && isAlertVisible ? (
+    <>
+      <EndingPage
+        minHeight="52vh"
+        icon={<IllusError size={60} />}
+        variantTitle={'h4'}
+        variantDescription={'body1'}
+        title={<Trans i18nKey="onboardingStep1_5.genericError.title" />}
+        description={
+          <Trans i18nKey="onboardingStep1_5.genericError.description">
+            A causa di un errore del sistema non è possibile completare la procedura.
+            <br />
+            Ti chiediamo di riprovare più tardi.
+          </Trans>
+        }
+        buttonLabel={<Trans i18nKey="onboardingStep1_5.genericError.backAction" />}
+        onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+      />
+    </>
+  ) : (
     <Grid container display="flex" justifyContent="center" alignItems="center">
       <Grid item xs={12} display="flex" justifyContent="center">
         <Typography variant="h3" align="center" pb={4}>
