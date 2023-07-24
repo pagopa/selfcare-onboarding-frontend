@@ -55,7 +55,7 @@ variables:
 
     react_app_enable_pt: '$(UAT_PT_ENABLED)'
 
-    react_app_banner_enabled: '$(UAT_BANNER_ENABLED)'
+    react_app_banner_enabled: '$(UAT_REACT_APP_BANNER_ENABLED)'
 
   ${{ elseif eq(variables['Build.SourceBranch'], 'refs/heads/main') }}:
     environment: 'PROD'
@@ -91,7 +91,7 @@ variables:
 
     react_app_enable_pt: '$(PROD_PT_ENABLED)'
 
-    react_app_banner_enabled: '$(PROD_BANNER_ENABLED)'
+    react_app_banner_enabled: '$(PROD_REACT_APP_BANNER_ENABLED)'
 
   # every branch different from past will be considered as DEV
   #  ${{ if startsWith(variables['Build.SourceBranch'], 'refs/heads/release-dev') }}:
@@ -127,7 +127,7 @@ variables:
 
     react_app_enable_aoo_uo: '$(DEV_AOO_UO_ENABLED)'
 
-    react_app_banner_enabled: '$(DEV_BANNER_ENABLED)'
+    react_app_banner_enabled: '$(DEV_REACT_APP_BANNER_ENABLED)'
 
     react_app_enable_pt: '$(DEV_PT_ENABLED)'
 
