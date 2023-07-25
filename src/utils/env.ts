@@ -59,4 +59,8 @@ export const ENV = {
   PT: {
     SHOW_PT: env.get('REACT_APP_ENABLE_PT').default('false').asBool(),
   },
+
+  BANNER: {
+    ENABLE: env.get('REACT_APP_BANNER_ENABLE').default('false').asBool(),
+  },
 };
