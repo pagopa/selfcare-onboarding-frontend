@@ -125,32 +125,30 @@ export default function StepInstitutionType({
     }
   };
 
-  const [errorPageViosible, setErrorPageVisible] = useState<boolean>(false);
+  const [errorPageVisible, setErrorPageVisible] = useState<boolean>(false);
   useEffect(() => {
-    if (selectedProduct?.id === 'prod-io' || selectedProduct?.id === 'prod-io-premium') {
+    if (
+      selectedProduct &&
+      (selectedProduct.id === 'prod-io' || selectedProduct.id === 'prod-io-premium')
+    ) {
       setErrorPageVisible(true);
     }
-  }, []);
+  }, [selectedProduct]);
 
   const isAlertVisible = ENV.BANNER.ENABLE;
 
-  return errorPageViosible && isAlertVisible ? (
+  return errorPageVisible && isAlertVisible ? (
     <>
-      {/* TODO: SELC-2732 edit texts when will be ready */}
       <EndingPage
         minHeight="52vh"
         icon={<IllusError size={60} />}
         variantTitle={'h4'}
         variantDescription={'body1'}
-        title={<Trans i18nKey="onboardingStep1_5.genericError.title" />}
+        title={'Aggiornamento in corso'}
         description={
-          <Trans i18nKey="onboardingStep1_5.genericError.description">
-            A causa di un errore del sistema non è possibile completare la procedura.
-            <br />
-            Ti chiediamo di riprovare più tardi.
-          </Trans>
+          'Per un aggiornamento dell’Area Riservata, oggi non sarà possibile aderire all’app IO. Le adesioni riprenderanno domani, ci scusiamo per il disagio.'
         }
-        buttonLabel={<Trans i18nKey="onboardingStep1_5.genericError.backAction" />}
+        buttonLabel={'Torna alla home'}
         onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
       />
     </>
