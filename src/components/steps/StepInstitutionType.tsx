@@ -127,10 +127,7 @@ export default function StepInstitutionType({
 
   const [errorPageVisible, setErrorPageVisible] = useState<boolean>(false);
   useEffect(() => {
-    if (
-      selectedProduct &&
-      (selectedProduct.id === 'prod-io' || selectedProduct.id === 'prod-io-premium')
-    ) {
+    if (selectedProduct && selectedProduct.id === 'prod-io') {
       setErrorPageVisible(true);
     }
   }, [selectedProduct]);
