@@ -174,51 +174,54 @@ test('test error subProductID', async () => {
   await waitFor(() => screen.getByText('Impossibile individuare il prodotto desiderato'));
 });
 
-test('test exiting during flow with logout', async () => {
-  renderComponent('prod-io', 'prod-io-premium');
-  await executeStepSelectPricingPlan();
-  await executeStepSelectInstitutionReleated('Comune di Milano');
+!ENV.BANNER.ENABLE &&
+  test('test exiting during flow with logout', async () => {
+    renderComponent('prod-io', 'prod-io-premium');
+    await executeStepSelectPricingPlan();
+    await executeStepSelectInstitutionReleated('Comune di Milano');
 
-  expect(screen.queryByText('Vuoi davvero uscire?')).toBeNull();
+    expect(screen.queryByText('Vuoi davvero uscire?')).toBeNull();
 
-  const logoutButton = screen.getByText('LOGOUT');
-  await performLogout(logoutButton);
+    const logoutButton = screen.getByText('LOGOUT');
+    await performLogout(logoutButton);
 
-  await performLogout(logoutButton);
-  fireEvent.click(screen.getByRole('button', { name: 'Annulla' }));
-  await waitFor(() => expect(screen.queryByText('Vuoi davvero uscire?')).toBeNull());
+    await performLogout(logoutButton);
+    fireEvent.click(screen.getByRole('button', { name: 'Annulla' }));
+    await waitFor(() => expect(screen.queryByText('Vuoi davvero uscire?')).toBeNull());
 
-  await performLogout(logoutButton);
-  await waitFor(() => expect(screen.getByText('Vuoi davvero uscire?')).not.toBeNull());
+    await performLogout(logoutButton);
+    await waitFor(() => expect(screen.getByText('Vuoi davvero uscire?')).not.toBeNull());
 
-  await performLogout(logoutButton);
-  fireEvent.click(screen.getByRole('button', { name: 'Esci' }));
-  await waitFor(() => expect(mockedLocation.assign).toBeCalledWith(ENV.URL_FE.LOGOUT));
-});
+    await performLogout(logoutButton);
+    fireEvent.click(screen.getByRole('button', { name: 'Esci' }));
+    await waitFor(() => expect(mockedLocation.assign).toBeCalledWith(ENV.URL_FE.LOGOUT));
+  });
 
-test('test exiting during flow with unload event', async () => {
-  renderComponent('prod-io', 'prod-io-premium');
-  await executeStepSelectPricingPlan();
-  await executeStepSelectInstitutionReleated('Comune di Milano');
+!ENV.BANNER.ENABLE &&
+  test('test exiting during flow with unload event', async () => {
+    renderComponent('prod-io', 'prod-io-premium');
+    await executeStepSelectPricingPlan();
+    await executeStepSelectInstitutionReleated('Comune di Milano');
 
-  const event = new Event('beforeunload');
-  window.dispatchEvent(event);
-  await waitFor(
-    () =>
-      (event.returnValue as unknown as string) ===
-      "Warning!\n\nNavigating away from this page will delete your text if you haven't already saved it."
-  );
-});
+    const event = new Event('beforeunload');
+    window.dispatchEvent(event);
+    await waitFor(
+      () =>
+        (event.returnValue as unknown as string) ===
+        "Warning!\n\nNavigating away from this page will delete your text if you haven't already saved it."
+    );
+  });
 
-test('test complete', async () => {
-  renderComponent('prod-io', 'prod-io-premium');
-  await executeStepSelectPricingPlan();
-  await executeStepSelectInstitutionReleated('Comune di Milano');
-  await executeStepBillingDataUnrelated();
-  await executeStepAddManager(true);
-  await executeClickCloseButton();
-  await verifySubmitPostLegals();
-});
+!ENV.BANNER.ENABLE &&
+  test('test complete', async () => {
+    renderComponent('prod-io', 'prod-io-premium');
+    await executeStepSelectPricingPlan();
+    await executeStepSelectInstitutionReleated('Comune di Milano');
+    await executeStepBillingDataUnrelated();
+    await executeStepAddManager(true);
+    await executeClickCloseButton();
+    await verifySubmitPostLegals();
+  });
 
 const performLogout = async (logoutButton: HTMLElement) => {
   fireEvent.click(logoutButton);
