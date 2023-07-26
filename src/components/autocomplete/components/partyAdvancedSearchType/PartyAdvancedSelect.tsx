@@ -87,7 +87,7 @@ export default function PartyAdvancedSelect({
     }
   }, []);
 
-  const filteredByProducts = product && product.id === 'prod-pn';
+  const filteredByProducts = product && product.id === 'prod-interop';
 
   return (
     <FormControl fullWidth size="small">
