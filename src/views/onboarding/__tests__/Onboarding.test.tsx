@@ -199,19 +199,19 @@ test('test advanvced search business name', async () => {
   await executeAdvancedSearchForBusinessName(agencyX);
 });
 
-// ENV.AOO_UO.SHOW_AOO_UO &&
-//   test('test advanvced search aoo name with product pn', async () => {
-//     renderComponent(prodPn);
-//     await executeStepInstitutionType(prodPn);
-//     await executeAdvancedSearchForAoo();
-//   });
+ENV.AOO_UO.SHOW_AOO_UO &&
+  test.skip('test advanvced search aoo name with product pn', async () => {
+    renderComponent(prodPn);
+    await executeStepInstitutionType(prodPn);
+    await executeAdvancedSearchForAoo();
+  });
 
-// ENV.AOO_UO.SHOW_AOO_UO &&
-//   test('test advanvced search uo name with product pn', async () => {
-//     renderComponent('prod-pn');
-//     await executeStepInstitutionType('prod-pn');
-//     await executeAdvancedSearchForUo();
-//   });
+ENV.AOO_UO.SHOW_AOO_UO &&
+  test.skip('test advanvced search uo name with product pn', async () => {
+    renderComponent('prod-pn');
+    await executeStepInstitutionType('prod-pn');
+    await executeAdvancedSearchForUo();
+  });
 
 test('test label recipientCode only for institutionType is not PA', async () => {
   renderComponent(prodIoSign);
