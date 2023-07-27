@@ -51,6 +51,12 @@ variables:
     react_app_mixpanel_token: '$(UAT_MIXPANEL_TOKEN)'
     react_app_onetrust_domain_id: '$(UAT_ONETRUST_DOMAIN_ID)'
 
+    react_app_enable_aoo_uo: '$(UAT_AOO_UO_ENABLED)'
+
+    react_app_enable_pt: '$(UAT_PT_ENABLED)'
+
+    react_app_banner_enabled: '$(UAT_REACT_APP_BANNER_ENABLED)'
+
   ${{ elseif eq(variables['Build.SourceBranch'], 'refs/heads/main') }}:
     environment: 'PROD'
     azure_subscription: $(PROD_AZURE_SUBSCRIPTION)
@@ -80,6 +86,12 @@ variables:
     react_app_analytics_mocked: '$(PROD_ANALYTICS_MOCKED)'
     react_app_mixpanel_token: '$(PROD_MIXPANEL_TOKEN)'
     react_app_onetrust_domain_id: '$(PROD_ONETRUST_DOMAIN_ID)'
+
+    react_app_enable_aoo_uo: '$(PROD_AOO_UO_ENABLED)'
+
+    react_app_enable_pt: '$(PROD_PT_ENABLED)'
+
+    react_app_banner_enabled: '$(PROD_REACT_APP_BANNER_ENABLED)'
 
   # every branch different from past will be considered as DEV
   #  ${{ if startsWith(variables['Build.SourceBranch'], 'refs/heads/release-dev') }}:
@@ -112,6 +124,12 @@ variables:
     react_app_analytics_mocked: '$(DEV_ANALYTICS_MOCKED)'
     react_app_mixpanel_token: '$(DEV_MIXPANEL_TOKEN)'
     react_app_onetrust_domain_id: '$(DEV_ONETRUST_DOMAIN_ID)'
+
+    react_app_enable_aoo_uo: '$(DEV_AOO_UO_ENABLED)'
+
+    react_app_banner_enabled: '$(DEV_REACT_APP_BANNER_ENABLED)'
+
+    react_app_enable_pt: '$(DEV_PT_ENABLED)'
 
 # Automatically triggered on PR
 # https://docs.microsoft.com/en-us/azure/devops/pipelines/yaml-schema?view=azure-devops&tabs=schema%2Cparameter-schema#pr-trigger
@@ -209,6 +227,12 @@ stages:
               REACT_APP_MIXPANEL_TOKEN: '$(react_app_mixpanel_token)'
               REACT_APP_ONE_TRUST_BASE_URL: '$(react_app_one_trust_base_url)'
               REACT_APP_ONETRUST_DOMAIN_ID: '$(react_app_onetrust_domain_id)'
+
+              REACT_APP_ENABLE_AOO_UO: '$(react_app_enable_aoo_uo)'
+
+              REACT_APP_ENABLE_PT: '$(react_app_enable_pt)'
+
+              REACT_APP_BANNER_ENABLE: '$(react_app_banner_enabled)'
           - bash: |
               printf "$EXECUTION_ID\n$(git name-rev --name-only FETCH_HEAD) $(git rev-parse HEAD)" > $(System.DefaultWorkingDirectory)/build/build.info
             env:

@@ -51,4 +51,16 @@ export const ENV = {
   GEOTAXONOMY: {
     SHOW_GEOTAXONOMY: env.get('REACT_APP_ENABLE_GEOTAXONOMY').default('false').asBool(),
   },
+
+  AOO_UO: {
+    SHOW_AOO_UO: env.get('REACT_APP_ENABLE_AOO_UO').default('false').asBool(),
+  },
+
+  PT: {
+    SHOW_PT: env.get('REACT_APP_ENABLE_PT').default('false').asBool(),
+  },
+
+  BANNER: {
+    ENABLE: env.get('REACT_APP_BANNER_ENABLE').default('false').asBool(),
+  },
 };

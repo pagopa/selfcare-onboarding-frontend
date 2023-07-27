@@ -56,6 +56,12 @@ export default {
   },
   onboardingStep1_5: {
     loadingText: 'Stiamo verificando i tuoi dati',
+    ptAlreadyOnboarded: {
+      title: 'Il Partner è già registrato',
+      description:
+        'Per operare su un prodotto, chiedi a un Amministratore di <1/> aggiungerti nella sezione Utenti.',
+      backAction: 'Chiudi',
+    },
     alreadyOnboarded: {
       title: "L'Ente che hai scelto ha già aderito",
       description:
@@ -211,6 +217,11 @@ export default {
   },
   onboarding: {
     outcomeContent: {
+      ptSuccess: {
+        title: 'Richiesta di registrazione inviata',
+        description:
+          'Invieremo un’email con l’esito della richiesta all’indirizzo  <1 /> PEC indicato.',
+      },
       success: {
         title: 'Richiesta di adesione inviata',
         notPaDescription:
@@ -228,9 +239,12 @@ export default {
     },
     userNotAllowedError: {
       title: 'Non puoi aderire a questo prodotto',
+      titleNoParty: 'Qualcosa è andato storto',
       description:
         'Al momento, l’ente <1>{{partyName}}</1> non ha il permesso di aderire a <3>{{productName}}</3>',
+      descriptionNoParty: `Al momento l'ente indicato non può aderire a <1>{{productName}}</1>. <2/> Per maggiori dettagli contatta <4>l'assistenza</4>`,
       backAction: 'Chiudi',
+      backActionNoParty: 'Torna alla home',
     },
     sessionModal: {
       title: 'Vuoi davvero uscire?',
@@ -457,9 +471,13 @@ export default {
   },
   onboardingFormData: {
     title: 'Indica i dati del tuo ente',
-    pspAndProdPagoPATitle: 'Indica i dati',
+    pspAndProdPagoPATitle: 'Inserisci i dati',
     backLabel: 'Indietro',
     confirmLabel: 'Continua',
+    billingDataPt: {
+      title: 'Inserisci i dati',
+      subTitle: 'Inserisci le informazioni richieste, assicurandoti che siano corrette.',
+    },
     billingDataSection: {
       invalidFiscalCode: 'Il Codice Fiscale non è valido',
       invalidZipCode: 'Il CAP non è valido',

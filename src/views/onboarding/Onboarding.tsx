@@ -1,6 +1,6 @@
 import { useEffect, useState, useContext, useRef, useMemo } from 'react';
 import { useHistory } from 'react-router-dom';
-import { Button, Container, Typography, Grid } from '@mui/material';
+import { Button, Container, Typography, Grid, Link } from '@mui/material';
 import { AxiosError, AxiosResponse } from 'axios';
 import SessionModal from '@pagopa/selfcare-common-frontend/components/SessionModal';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
@@ -70,23 +70,6 @@ export const prodPhaseOutErrorPage: RequestOutcomeMessage = {
   ],
 };
 
-const alreadyOnboarded: RequestOutcomeMessage = {
-  title: '',
-  description: [
-    <Grid key="0">
-      <EndingPage
-        minHeight="52vh"
-        variantTitle={'h4'}
-        variantDescription={'body1'}
-        title={<Trans i18nKey="onboardingStep1_5.alreadyOnboarded.title" />}
-        description={<Trans i18nKey="onboardingStep1_5.alreadyOnboarded.description" />}
-        buttonLabel={<Trans i18nKey="onboardingStep1_5.alreadyOnboarded.backAction" />}
-        onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
-      />
-    </Grid>,
-  ],
-};
-
 // eslint-disable-next-line sonarjs/cognitive-complexity
 function OnboardingComponent({ productId }: { productId: string }) {
   const [loading, setLoading] = useState(true);
@@ -121,6 +104,44 @@ function OnboardingComponent({ productId }: { productId: string }) {
     new URLSearchParams(window.location.hash.substr(1)).get('subunitType') ?? '';
   const subunitCodeByQuery =
     new URLSearchParams(window.location.hash.substr(1)).get('subunitCode') ?? '';
+
+  const alreadyOnboarded: RequestOutcomeMessage = {
+    title: '',
+    description:
+      institutionType === 'PT'
+        ? [
+            <Grid key="0">
+              <EndingPage
+                minHeight="52vh"
+                variantTitle={'h4'}
+                variantDescription={'body1'}
+                icon={<IllusError size={60} />}
+                title={<Trans i18nKey="onboardingStep1_5.ptAlreadyOnboarded.title" />}
+                description={
+                  <Trans i18nKey="onboardingStep1_5.ptAlreadyOnboarded.description">
+                    Per operare su un prodotto, chiedi a un Amministratore di <br /> aggiungerti
+                    nella sezione Utenti.
+                  </Trans>
+                }
+                buttonLabel={<Trans i18nKey="onboardingStep1_5.ptAlreadyOnboarded.backAction" />}
+                onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+              />
+            </Grid>,
+          ]
+        : [
+            <Grid key="0">
+              <EndingPage
+                minHeight="52vh"
+                variantTitle={'h4'}
+                variantDescription={'body1'}
+                title={<Trans i18nKey="onboardingStep1_5.alreadyOnboarded.title" />}
+                description={<Trans i18nKey="onboardingStep1_5.alreadyOnboarded.description" />}
+                buttonLabel={<Trans i18nKey="onboardingStep1_5.alreadyOnboarded.backAction" />}
+                onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+              />
+            </Grid>,
+          ],
+  };
 
   useEffect(() => {
     if (
@@ -310,31 +331,47 @@ function OnboardingComponent({ productId }: { productId: string }) {
       title: '',
       description: [
         <>
-          <EndingPage
-            icon={<IllusCompleted size={60} />}
-            title={t('onboarding.outcomeContent.success.title')}
-            description={
-              institutionType === 'PA' ? (
-                <Trans i18nKey="onboarding.outcomeContent.success.paDescription">
-                  Invieremo un&apos;email all&apos;indirizzo PEC primario dell&apos;ente.
-                  <br />
-                  Al suo interno, ci sono le istruzioni per completare <br />
-                  l&apos;adesione.
+          {institutionType !== 'PT' ? (
+            <EndingPage
+              icon={<IllusCompleted size={60} />}
+              title={t('onboarding.outcomeContent.success.title')}
+              description={
+                institutionType === 'PA' ? (
+                  <Trans i18nKey="onboarding.outcomeContent.success.paDescription">
+                    Invieremo un&apos;email all&apos;indirizzo PEC primario dell&apos;ente.
+                    <br />
+                    Al suo interno, ci sono le istruzioni per completare <br />
+                    l&apos;adesione.
+                  </Trans>
+                ) : (
+                  <Trans i18nKey="onboarding.outcomeContent.success.notPaDescription">
+                    Invieremo un&apos;email all&apos;indirizzo PEC indicato.
+                    <br />
+                    Al suo interno, ci sono le istruzioni per completare <br />
+                    l&apos;adesione.
+                  </Trans>
+                )
+              }
+              variantTitle={'h4'}
+              variantDescription={'body1'}
+              buttonLabel={t('onboarding.outcomeContent.success.backHome')}
+              onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+            />
+          ) : (
+            <EndingPage
+              icon={<IllusCompleted size={60} />}
+              title={t('onboarding.outcomeContent.ptSuccess.title')}
+              description={
+                <Trans i18nKey="onboarding.outcomeContent.success.description">
+                  Invieremo un’email con l’esito della richiesta all’indirizzo <br /> PEC indicato.
                 </Trans>
-              ) : (
-                <Trans i18nKey="onboarding.outcomeContent.success.notPaDescription">
-                  Invieremo un&apos;email all&apos;indirizzo PEC indicato.
-                  <br />
-                  Al suo interno, ci sono le istruzioni per completare <br />
-                  l&apos;adesione.
-                </Trans>
-              )
-            }
-            variantTitle={'h4'}
-            variantDescription={'body1'}
-            buttonLabel={t('onboarding.outcomeContent.success.backHome')}
-            onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
-          />
+              }
+              variantTitle={'h4'}
+              variantDescription={'body1'}
+              buttonLabel={t('onboarding.outcomeContent.success.backHome')}
+              onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+            />
+          )}
         </>,
       ],
     },
@@ -368,37 +405,76 @@ function OnboardingComponent({ productId }: { productId: string }) {
     description: [
       <>
         <IllusError size={60} />
-        <Grid container direction="column" key="0" mt={3}>
-          <Grid container item justifyContent="center">
-            <Grid item xs={6}>
-              <Typography variant="h4">
-                <Trans i18nKey="onboarding.userNotAllowedError.title" />
-              </Typography>
+        {selectedParty ? (
+          <Grid container direction="column" key="0" mt={3}>
+            <Grid container item justifyContent="center">
+              <Grid item xs={6}>
+                <Typography variant="h4">
+                  <Trans i18nKey="onboarding.userNotAllowedError.title" />
+                </Typography>
+              </Grid>
+            </Grid>
+            <Grid container item justifyContent="center" mb={2} mt={1}>
+              <Grid item xs={6}>
+                <Typography>
+                  <Trans i18nKey="onboarding.userNotAllowedError.description">
+                    Al momento, l’ente
+                    {{ partyName: selectedParty?.description }}
+                    non ha il permesso di aderire a{{ productName: selectedProduct?.title }}
+                  </Trans>
+                </Typography>
+              </Grid>
+            </Grid>
+            <Grid container item justifyContent="center" mt={2}>
+              <Grid item xs={4}>
+                <Button
+                  variant="contained"
+                  sx={{ alignSelf: 'center' }}
+                  onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+                >
+                  <Trans i18nKey="onboarding.userNotAllowedError.backAction" />
+                </Button>
+              </Grid>
             </Grid>
           </Grid>
-          <Grid container item justifyContent="center" mb={2} mt={1}>
-            <Grid item xs={6}>
-              <Typography>
-                <Trans i18nKey="onboarding.userNotAllowedError.description">
-                  Al momento, l’ente
-                  {{ partyName: selectedParty?.description }}
-                  non ha il permesso di aderire a{{ productName: selectedProduct?.title }}
-                </Trans>
-              </Typography>
+        ) : (
+          <Grid container direction="column" key="0" mt={3}>
+            <Grid container item justifyContent="center">
+              <Grid item xs={6}>
+                <Typography variant="h4">
+                  <Trans i18nKey="onboarding.userNotAllowedError.titleNoParty" />
+                </Typography>
+              </Grid>
+            </Grid>
+            <Grid container item justifyContent="center" mb={2} mt={1}>
+              <Grid item xs={6}>
+                <Typography>
+                  <Trans i18nKey="onboardingStep1_5.userNotAllowedError.descriptionNoParty">
+                    Al momento l&apos;ente indicato non può aderire a{' '}
+                    {{ productName: selectedProduct?.title }}. <br /> Per maggiori dettagli contatta
+                    <Link
+                      sx={{ cursro: 'pointer', textDecoration: 'none' }}
+                      href={ENV.ASSISTANCE.ENABLE ? ENV.URL_FE.ASSISTANCE : ''}
+                    >
+                      &nbsp;l&apos;assistenza
+                    </Link>
+                  </Trans>
+                </Typography>
+              </Grid>
+            </Grid>
+            <Grid container item justifyContent="center" mt={2}>
+              <Grid item xs={4}>
+                <Button
+                  variant="contained"
+                  sx={{ alignSelf: 'center' }}
+                  onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+                >
+                  <Trans i18nKey="onboarding.userNotAllowedError.backActionNoParty" />
+                </Button>
+              </Grid>
             </Grid>
           </Grid>
-          <Grid container item justifyContent="center" mt={2}>
-            <Grid item xs={4}>
-              <Button
-                variant="contained"
-                sx={{ alignSelf: 'center' }}
-                onClick={() => window.location.assign(ENV.URL_FE.LANDING)}
-              >
-                <Trans i18nKey="onboarding.userNotAllowedError.backAction" />
-              </Button>
-            </Grid>
-          </Grid>
-        </Grid>
+        )}
       </>,
     ],
   };
@@ -623,7 +699,10 @@ function OnboardingComponent({ productId }: { productId: string }) {
           uoSelected,
           origin,
           institutionType: institutionType as InstitutionType,
-          subtitle: t('onBoardingSubProduct.billingData.subTitle'),
+          subtitle:
+            institutionType !== 'PT'
+              ? t('onBoardingSubProduct.billingData.subTitle')
+              : t('onboardingFormData.billingDataPt.subTitle'),
           forward: forwardWithBillingData,
           back: () => {
             if (fromDashboard && !productAvoidStep) {

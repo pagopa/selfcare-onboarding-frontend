@@ -8,7 +8,9 @@ import {
   Paper,
   useTheme,
 } from '@mui/material';
-import React, { useRef } from 'react';
+import { IllusError } from '@pagopa/mui-italia';
+import { EndingPage } from '@pagopa/selfcare-common-frontend';
+import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation, Trans } from 'react-i18next';
 import {
   InstitutionType,
@@ -16,6 +18,7 @@ import {
   Product,
   StepperStepComponentProps,
 } from '../../../types';
+import { ENV } from '../../utils/env';
 import { OnboardingStepActions } from '../OnboardingStepActions';
 import { useHistoryState } from '../useHistoryState';
 
@@ -33,6 +36,7 @@ const institutionTypeValues: Array<{ labelKey: string; value: InstitutionType }>
   { labelKey: 'psp', value: 'PSP' },
 ];
 
+// eslint-disable-next-line sonarjs/cognitive-complexity
 export default function StepInstitutionType({
   back,
   forward,
@@ -70,23 +74,24 @@ export default function StepInstitutionType({
             it.labelKey === 'pa' ||
             it.labelKey === 'gsp' ||
             it.labelKey === 'scp' ||
-            it.labelKey === 'psp'
+            it.labelKey === 'psp' ||
+            (ENV.PT.SHOW_PT ? it.labelKey === 'pt' : '')
         );
       case 'prod-pn':
         return institutionTypeValues.filter((it) => it.labelKey === 'pa');
       case 'prod-idpay':
         return institutionTypeValues.filter((it) => it.labelKey === 'pa');
-      case 'prod-io-sign':
-        return institutionTypeValues.filter(
-          (it) => it.labelKey === 'pa' || it.labelKey === 'gsp' || it.labelKey === 'scp'
-        );
-      default:
+      case 'prod-io':
         return institutionTypeValues.filter(
           (it) =>
             it.labelKey === 'pa' ||
             it.labelKey === 'gsp' ||
             it.labelKey === 'scp' ||
-            it.labelKey === 'pt'
+            (ENV.PT.SHOW_PT ? it.labelKey === 'pt' : '')
+        );
+      default:
+        return institutionTypeValues.filter(
+          (it) => it.labelKey === 'pa' || it.labelKey === 'gsp' || it.labelKey === 'scp'
         );
     }
   };
@@ -120,7 +125,31 @@ export default function StepInstitutionType({
     }
   };
 
-  return (
+  const [errorPageVisible, setErrorPageVisible] = useState<boolean>(false);
+  useEffect(() => {
+    if (selectedProduct && selectedProduct.id === 'prod-io') {
+      setErrorPageVisible(true);
+    }
+  }, [selectedProduct]);
+
+  const isAlertVisible = ENV.BANNER.ENABLE;
+
+  return errorPageVisible && isAlertVisible ? (
+    <>
+      <EndingPage
+        minHeight="52vh"
+        icon={<IllusError size={60} />}
+        variantTitle={'h4'}
+        variantDescription={'body1'}
+        title={'Aggiornamento in corso'}
+        description={
+          'Per un aggiornamento dell’Area Riservata, oggi non sarà possibile aderire all’app IO. Le adesioni riprenderanno domani, ci scusiamo per il disagio.'
+        }
+        buttonLabel={'Torna alla home'}
+        onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+      />
+    </>
+  ) : (
     <Grid container display="flex" justifyContent="center" alignItems="center">
       <Grid item xs={12} display="flex" justifyContent="center">
         <Typography variant="h3" align="center" pb={4}>
