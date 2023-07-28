@@ -90,7 +90,7 @@ export function OnboardingStep1_5({
         <EndingPage
           minHeight="52vh"
           icon={<IllusError size={60} />}
-          title={<Trans i18nKey="onboardingStep1_5.userNotAllowedError.titleNoParty" />}
+          title={<Trans i18nKey="onboarding.userNotAllowedError.titleNoParty" />}
           description={
             <Trans i18nKey="onboardingStep1_5.userNotAllowedError.descriptionNoParty">
               Al momento l&apos;ente indicato non può aderire a{' '}
@@ -105,30 +105,7 @@ export function OnboardingStep1_5({
           }
           variantTitle={'h4'}
           variantDescription={'body1'}
-          buttonLabel={<Trans i18nKey="onboardingStep1_5.genericError.backActionNoParty" />}
-          onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
-        />
-      </>,
-    ],
-  };
-  const notAllowedError: RequestOutcomeMessage = {
-    title: '',
-    description: [
-      <>
-        <EndingPage
-          minHeight="52vh"
-          icon={<IllusError size={60} />}
-          title={<Trans i18nKey="onboardingStep1_5.userNotAllowedError.title" />}
-          description={
-            <Trans i18nKey="onboardingStep1_5.userNotAllowedError.description">
-              Al momento, l’ente
-              {{ partyName: selectedParty?.description }}
-              non ha il permesso di aderire a{{ productName: selectedProduct?.title }}
-            </Trans>
-          }
-          variantTitle={'h4'}
-          variantDescription={'body1'}
-          buttonLabel={<Trans i18nKey="onboardingStep1_5.genericError.backAction" />}
+          buttonLabel={<Trans i18nKey="onboarding.userNotAllowedError.backActionNoParty" />}
           onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
         />
       </>,
@@ -175,7 +152,7 @@ export function OnboardingStep1_5({
           party_id: externalInstitutionId,
           product_id: productId,
         });
-        setOutcome(selectedParty ? notAllowedError : notAllowedErrorNoParty);
+        setOutcome(notAllowedErrorNoParty);
       } else {
         setOutcome(genericError);
       }
