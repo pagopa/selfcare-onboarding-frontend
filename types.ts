@@ -81,6 +81,7 @@ export type IPACatalogParty = {
 export type UserStatus = 'ACTIVE' | 'SUSPENDED';
 export type PartyRole = 'MANAGER' | 'DELEGATE' | 'SUB_DELEGATE' | 'OPERATOR';
 export type UserProductRole = 'ADMIN' | 'LIMITED';
+export type ProductStatus = 'ACTIVE' | 'INACTIVE' | 'PHASE_OUT' | 'TESTING';
 
 export type UserOnCreate = {
   name: string;
@@ -159,7 +160,7 @@ export interface ProblemError {
 export type Product = {
   id: string;
   title: string;
-  status: 'ACTIVE' | 'INACTIVE' | 'PHASE_OUT' | 'TESTING';
+  status: ProductStatus;
   parentId?: string;
 };
 
