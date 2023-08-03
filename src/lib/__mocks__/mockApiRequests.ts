@@ -2,6 +2,7 @@ import { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 import {
   Endpoint,
   InstitutionOnboardingInfoResource,
+  Product,
   SelfcareParty,
   UserOnCreate,
 } from '../../../types';
@@ -356,7 +357,7 @@ const mockedOnboardingData1: InstitutionOnboardingInfoResource = {
   },
 };
 
-const mockedProducts = [
+const mockedProducts: Array<Product> = [
   {
     id: 'prod-pn',
     title: 'Piattaforma Notifiche',

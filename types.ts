@@ -159,6 +159,7 @@ export interface ProblemError {
 export type Product = {
   id: string;
   title: string;
+  status: 'ACTIVE' | 'INACTIVE' | 'PHASE_OUT' | 'TESTING';
   parentId?: string;
 };
 
