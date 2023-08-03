@@ -244,20 +244,6 @@ const mockedUoCode: UoData = {
   tipoMail1: 'Pec',
 };
 
-const mockedParty = {
-  externalId: 'externalId1',
-  originId: 'originId1',
-  id: 'partyId1',
-  description: 'Comune di Milano',
-  urlLogo: 'logo',
-  address: 'address',
-  digitalAddress: 'a@aa.com',
-  taxCode: '33344455567',
-  zipCode: '12345',
-  origin: 'IPA',
-  userRole: 'ADMIN',
-};
-
 const mockedParties: Array<SelfcareParty> = [
   {
     externalId: 'externalId1',
@@ -506,7 +492,7 @@ export async function mockFetch(
 
   if (endpoint === 'ONBOARDING_GET_PARTY_FROM_CF') {
     return new Promise((resolve) =>
-      resolve({ data: mockedParty, status: 200, statusText: '200' } as AxiosResponse)
+      resolve({ data: mockedParties[0], status: 200, statusText: '200' } as AxiosResponse)
     );
   }
 
