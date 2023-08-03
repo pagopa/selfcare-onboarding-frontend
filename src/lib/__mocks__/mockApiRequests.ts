@@ -357,46 +357,49 @@ const mockedOnboardingData1: InstitutionOnboardingInfoResource = {
   },
 };
 
+const statusActive = 'ACTIVE';
+const statusTesting = 'TESTING';
+
 const mockedProducts: Array<Product> = [
   {
     id: 'prod-pn',
     title: 'Piattaforma Notifiche',
-    status: 'ACTIVE',
+    status: statusActive,
   },
   {
     id: 'prod-pagopa',
     title: 'Pagamenti PagoPA',
-    status: 'ACTIVE',
+    status: statusActive,
   },
   {
     id: 'prod-io',
     title: 'App IO',
-    status: 'ACTIVE',
+    status: statusActive,
   },
   {
     id: 'prod-io-sign',
     title: 'Firma con IO',
-    status: 'TESTING', // Use case for not allowed onboarding
+    status: statusTesting, // Use case for not allowed onboarding
   },
   {
     id: 'prod-ciban',
     title: 'Check-IBAN',
-    status: 'TESTING', // Use case for not allowed onboarding
+    status: statusTesting, // Use case for not allowed onboarding
   },
   {
     id: 'prod-interop',
     title: 'Interoperabilità',
-    status: 'ACTIVE',
+    status: statusActive,
   },
   {
     id: 'prod-idpay',
     title: 'IdPay',
-    status: 'ACTIVE',
+    status: statusActive,
   },
   {
     id: 'prod-cgn',
     title: 'Carta Giovani',
-    status: 'ACTIVE',
+    status: statusActive,
   },
 ];
 
