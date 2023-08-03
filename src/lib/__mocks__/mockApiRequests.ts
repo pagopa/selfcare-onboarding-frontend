@@ -402,9 +402,14 @@ const mockedProducts = [
     status: 'ACTIVE',
   },
   {
+    id: 'prod-idpay',
+    title: 'IdPay',
+    status: 'ACTIVE',
+  },
+  {
     id: 'prod-cgn',
     title: 'Carta Giovani',
-    status: 'TESTING',
+    status: 'ACTIVE',
   },
 ];
 
@@ -548,7 +553,7 @@ export async function mockFetch(
       case 'notAllowed':
         return notAllowedError;
       default:
-        if (endpointParams.productId === 'prod-io') {
+        if (endpointParams.productId === 'prod-pagopa') {
           // eslint-disable-next-line sonarjs/no-identical-functions
           return new Promise((resolve) =>
             resolve({
