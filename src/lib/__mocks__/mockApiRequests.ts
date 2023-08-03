@@ -369,24 +369,44 @@ const mockedOnboardingData1: InstitutionOnboardingInfoResource = {
     },
   },
 };
-const mockedProductPn = {
-  title: 'Piattaforma Notifiche',
-  id: 'prod-pn',
-};
-const mockedProductPagopa = {
-  title: 'Piattaforma Notifiche',
-  id: 'prod-pagopa',
-};
-const mockedSubProduct = {
-  title: 'Premium',
-  id: 'prod-io-premium',
-  parentId: 'prod-io',
-};
-const mockedProdIoSign = {
-  title: 'Firma con Io',
-  id: 'prod-io-sign',
-};
-const defaultProduct = mockedProductPagopa;
+
+const mockedProducts = [
+  {
+    id: 'prod-pn',
+    title: 'Piattaforma Notifiche',
+    status: 'ACTIVE',
+  },
+  {
+    id: 'prod-pagopa',
+    title: 'Pagamenti PagoPA',
+    status: 'ACTIVE',
+  },
+  {
+    id: 'prod-io',
+    title: 'App IO',
+    status: 'ACTIVE',
+  },
+  {
+    id: 'prod-io-sign',
+    title: 'Firma con IO',
+    status: 'TESTING', // Use case for not allowed onboarding
+  },
+  {
+    id: 'prod-ciban',
+    title: 'Check-IBAN',
+    status: 'TESTING', // Use case for not allowed onboarding
+  },
+  {
+    id: 'prod-interop',
+    title: 'Interoperabilità',
+    status: 'ACTIVE',
+  },
+  {
+    id: 'prod-cgn',
+    title: 'Carta Giovani',
+    status: 'TESTING',
+  },
+];
 
 const mockedResponseError = {
   detail: 'Request took too long to complete.',
@@ -497,6 +517,9 @@ export async function mockFetch(
     );
   }
   if (endpoint === 'VERIFY_ONBOARDING') {
+    const selectedProductInTesting = mockedProducts.find(
+      (p) => p.id === endpointParams.productId && p.status === 'TESTING'
+    );
     switch (endpointParams.externalInstitutionId) {
       case 'infoError':
         return genericError;
@@ -534,13 +557,16 @@ export async function mockFetch(
             } as AxiosResponse)
           );
         }
-        return new Promise((resolve) =>
-          resolve({
-            isAxiosError: true,
-            response: { data: '', status: 400, statusText: 'Bad Request' },
-          } as AxiosError)
-        );
     }
+    if (selectedProductInTesting) {
+      return notAllowedError;
+    }
+    return new Promise((resolve) =>
+      resolve({
+        isAxiosError: true,
+        response: { data: '', status: 400, statusText: 'Bad Request' },
+      } as AxiosError)
+    );
   }
 
   if (endpoint === 'ONBOARDING_GET_ONBOARDING_DATA') {
@@ -566,26 +592,13 @@ export async function mockFetch(
   }
 
   if (endpoint === 'ONBOARDING_VERIFY_PRODUCT') {
-    switch (endpointParams.productId) {
-      case 'error':
-        return genericError;
-      case 'prod-pn':
-        return new Promise((resolve) =>
-          resolve({ data: mockedProductPn, status: 200, statusText: '200' } as AxiosResponse)
-        );
-      case 'prod-io-premium':
-        return new Promise((resolve) =>
-          resolve({ data: mockedSubProduct, status: 200, statusText: '200' } as AxiosResponse)
-        );
-      case 'prod-io-sign':
-        return new Promise((resolve) =>
-          resolve({ data: mockedProdIoSign, status: 200, statusText: '200' } as AxiosResponse)
-        );
-      // eslint-disable-next-line sonarjs/no-duplicated-branches
-      default:
-        return new Promise((resolve) =>
-          resolve({ data: defaultProduct, status: 200, statusText: '200' } as AxiosResponse)
-        );
+    const selectedProduct = mockedProducts.find((p) => p.id === endpointParams.productId);
+    if (selectedProduct) {
+      return new Promise((resolve) =>
+        resolve({ data: selectedProduct, status: 200, statusText: '200' } as AxiosResponse)
+      );
+    } else {
+      return genericError;
     }
   }
 
