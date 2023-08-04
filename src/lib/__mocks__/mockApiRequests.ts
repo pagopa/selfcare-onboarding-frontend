@@ -2,6 +2,7 @@ import { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 import {
   Endpoint,
   InstitutionOnboardingInfoResource,
+  Product,
   SelfcareParty,
   UserOnCreate,
 } from '../../../types';
@@ -244,20 +245,6 @@ const mockedUoCode: UoData = {
   tipoMail1: 'Pec',
 };
 
-const mockedParty = {
-  externalId: 'externalId1',
-  originId: 'originId1',
-  id: 'partyId1',
-  description: 'Comune di Milano',
-  urlLogo: 'logo',
-  address: 'address',
-  digitalAddress: 'a@aa.com',
-  taxCode: '33344455567',
-  zipCode: '12345',
-  origin: 'IPA',
-  userRole: 'ADMIN',
-};
-
 const mockedParties: Array<SelfcareParty> = [
   {
     externalId: 'externalId1',
@@ -369,24 +356,52 @@ const mockedOnboardingData1: InstitutionOnboardingInfoResource = {
     },
   },
 };
-const mockedProductPn = {
-  title: 'Piattaforma Notifiche',
-  id: 'prod-pn',
-};
-const mockedProductPagopa = {
-  title: 'Piattaforma Notifiche',
-  id: 'prod-pagopa',
-};
-const mockedSubProduct = {
-  title: 'Premium',
-  id: 'prod-io-premium',
-  parentId: 'prod-io',
-};
-const mockedProdIoSign = {
-  title: 'Firma con Io',
-  id: 'prod-io-sign',
-};
-const defaultProduct = mockedProductPagopa;
+
+const statusActive = 'ACTIVE';
+const statusTesting = 'TESTING';
+
+const mockedProducts: Array<Product> = [
+  {
+    id: 'prod-pn',
+    title: 'Piattaforma Notifiche',
+    status: statusActive,
+  },
+  {
+    id: 'prod-pagopa',
+    title: 'Pagamenti PagoPA',
+    status: statusActive,
+  },
+  {
+    id: 'prod-io',
+    title: 'App IO',
+    status: statusActive,
+  },
+  {
+    id: 'prod-io-sign',
+    title: 'Firma con IO',
+    status: statusTesting, // Use case for not allowed onboarding
+  },
+  {
+    id: 'prod-ciban',
+    title: 'Check-IBAN',
+    status: statusTesting, // Use case for not allowed onboarding
+  },
+  {
+    id: 'prod-interop',
+    title: 'Interoperabilità',
+    status: statusActive,
+  },
+  {
+    id: 'prod-idpay',
+    title: 'IdPay',
+    status: statusActive,
+  },
+  {
+    id: 'prod-cgn',
+    title: 'Carta Giovani',
+    status: statusActive,
+  },
+];
 
 const mockedResponseError = {
   detail: 'Request took too long to complete.',
@@ -481,7 +496,7 @@ export async function mockFetch(
 
   if (endpoint === 'ONBOARDING_GET_PARTY_FROM_CF') {
     return new Promise((resolve) =>
-      resolve({ data: mockedParty, status: 200, statusText: '200' } as AxiosResponse)
+      resolve({ data: mockedParties[0], status: 200, statusText: '200' } as AxiosResponse)
     );
   }
 
@@ -497,6 +512,9 @@ export async function mockFetch(
     );
   }
   if (endpoint === 'VERIFY_ONBOARDING') {
+    const selectedProductInTesting = mockedProducts.find(
+      (p) => p.id === endpointParams.productId && p.status === 'TESTING'
+    );
     switch (endpointParams.externalInstitutionId) {
       case 'infoError':
         return genericError;
@@ -525,7 +543,7 @@ export async function mockFetch(
       case 'notAllowed':
         return notAllowedError;
       default:
-        if (endpointParams.productId === 'prod-io') {
+        if (endpointParams.productId === 'prod-pagopa') {
           // eslint-disable-next-line sonarjs/no-identical-functions
           return new Promise((resolve) =>
             resolve({
@@ -534,13 +552,16 @@ export async function mockFetch(
             } as AxiosResponse)
           );
         }
-        return new Promise((resolve) =>
-          resolve({
-            isAxiosError: true,
-            response: { data: '', status: 400, statusText: 'Bad Request' },
-          } as AxiosError)
-        );
     }
+    if (selectedProductInTesting) {
+      return notAllowedError;
+    }
+    return new Promise((resolve) =>
+      resolve({
+        isAxiosError: true,
+        response: { data: '', status: 400, statusText: 'Bad Request' },
+      } as AxiosError)
+    );
   }
 
   if (endpoint === 'ONBOARDING_GET_ONBOARDING_DATA') {
@@ -566,26 +587,13 @@ export async function mockFetch(
   }
 
   if (endpoint === 'ONBOARDING_VERIFY_PRODUCT') {
-    switch (endpointParams.productId) {
-      case 'error':
-        return genericError;
-      case 'prod-pn':
-        return new Promise((resolve) =>
-          resolve({ data: mockedProductPn, status: 200, statusText: '200' } as AxiosResponse)
-        );
-      case 'prod-io-premium':
-        return new Promise((resolve) =>
-          resolve({ data: mockedSubProduct, status: 200, statusText: '200' } as AxiosResponse)
-        );
-      case 'prod-io-sign':
-        return new Promise((resolve) =>
-          resolve({ data: mockedProdIoSign, status: 200, statusText: '200' } as AxiosResponse)
-        );
-      // eslint-disable-next-line sonarjs/no-duplicated-branches
-      default:
-        return new Promise((resolve) =>
-          resolve({ data: defaultProduct, status: 200, statusText: '200' } as AxiosResponse)
-        );
+    const selectedProduct = mockedProducts.find((p) => p.id === endpointParams.productId);
+    if (selectedProduct) {
+      return new Promise((resolve) =>
+        resolve({ data: selectedProduct, status: 200, statusText: '200' } as AxiosResponse)
+      );
+    } else {
+      return genericError;
     }
   }
 

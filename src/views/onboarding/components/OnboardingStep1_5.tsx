@@ -1,7 +1,5 @@
-/* eslint-disable sonarjs/cognitive-complexity */
 import { AxiosError } from 'axios';
 import { useEffect, useState, useContext, useRef } from 'react';
-import { Link } from '@mui/material';
 import { Trans, useTranslation } from 'react-i18next';
 import { IllusError } from '@pagopa/mui-italia';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
@@ -20,6 +18,7 @@ import { HeaderContext, UserContext } from '../../../lib/context';
 import { unregisterUnloadEvent } from '../../../utils/unloadEvent-utils';
 import { LoadingOverlay } from '../../../components/LoadingOverlay';
 import { MessageNoAction } from '../../../components/MessageNoAction';
+import UserNotAllowedPage from '../../UserNotAllowedPage';
 
 type Props = StepperStepComponentProps & {
   externalInstitutionId: string;
@@ -87,26 +86,9 @@ export function OnboardingStep1_5({
     title: '',
     description: [
       <>
-        <EndingPage
-          minHeight="52vh"
-          icon={<IllusError size={60} />}
-          title={<Trans i18nKey="onboarding.userNotAllowedError.titleNoParty" />}
-          description={
-            <Trans i18nKey="onboardingStep1_5.userNotAllowedError.descriptionNoParty">
-              Al momento l&apos;ente indicato non può aderire a{' '}
-              {{ productName: selectedProduct?.title }}. <br /> Per maggiori dettagli contatta
-              <Link
-                sx={{ cursro: 'pointer', textDecoration: 'none' }}
-                href={ENV.ASSISTANCE.ENABLE ? ENV.URL_FE.ASSISTANCE : ''}
-              >
-                &nbsp;l&apos;assistenza
-              </Link>
-            </Trans>
-          }
-          variantTitle={'h4'}
-          variantDescription={'body1'}
-          buttonLabel={<Trans i18nKey="onboarding.userNotAllowedError.backActionNoParty" />}
-          onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+        <UserNotAllowedPage
+          partyName={selectedParty?.description}
+          productTitle={selectedProduct?.title}
         />
       </>,
     ],
