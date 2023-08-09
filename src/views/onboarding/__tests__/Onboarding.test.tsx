@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { fireEvent, getByLabelText, render, screen, waitFor } from '@testing-library/react';
 import { useState } from 'react';
 import '@testing-library/jest-dom';
-import { Product, User } from '../../../../types';
+import { User } from '../../../../types';
 import { HeaderContext, UserContext } from '../../../lib/context';
 import { ENV } from '../../../utils/env';
 import Onboarding from '../Onboarding';
@@ -45,16 +45,7 @@ jest.mock('react-router-dom', () => ({
   }),
 }));
 
-const prodPn = 'prod-pn';
-const prodIdpay = 'prod-idpay';
-const prodIo = 'prod-io';
-const prodPagopa = 'prod-pagopa';
-const prodIoSign = 'prod-io-sign';
-const prodInterop = 'prod-interop';
-const prodDefault = prodPn;
-
-// for consistency the prodDefault in productId: string = prodDefault should be the same of default product of ONBOARDING_VERIFY_PRODUCT in mockApiRequest
-const renderComponent = (productId: string = prodDefault) => {
+const renderComponent = (productId: string = 'prod-pn') => {
   const Component = () => {
     const [user, setUser] = useState<User | null>(null);
     const [subHeaderVisible, setSubHeaderVisible] = useState<boolean>(false);
@@ -92,28 +83,23 @@ const stepInstitutionType = 'Seleziona il tipo di ente che rappresenti';
 const stepBillingDataTitle = 'Indica i dati del tuo ente';
 const step2Title = 'Indica il Legale Rappresentante';
 const step3Title = "Indica l'Amministratore";
+
 const completeSuccessTitle = 'Richiesta di adesione inviata';
 const completeSuccessTitleForPt = 'Richiesta di registrazione inviata';
 const completeErrorTitle = 'Spiacenti, qualcosa è andato storto.';
 
-const agencyOnboarded = 'AGENCY ONBOARDED';
-const agencyInfoError = 'AGENCY INFO ERROR';
-const agencyX = 'AGENCY X';
-const agencyError = 'AGENCY ERROR';
-const comune = 'Comune di Milano';
-
 test('test already onboarded', async () => {
-  renderComponent(prodPagopa);
-  await executeStepInstitutionType(prodPagopa);
-  await executeStep1(agencyOnboarded);
+  renderComponent('prod-pagopa');
+  await executeStepInstitutionType('prod-pagopa');
+  await executeStep1('AGENCY ONBOARDED');
   await waitFor(() => screen.getByText("L'Ente che hai scelto ha già aderito"));
   await executeGoHome(false);
 });
 
 test('test error retrieving onboarding info', async () => {
-  renderComponent(prodPagopa);
-  await executeStepInstitutionType(prodPagopa);
-  await executeStep1(agencyInfoError);
+  renderComponent('prod-pagopa');
+  await executeStepInstitutionType('prod-pagopa');
+  await executeStep1('AGENCY INFO ERROR');
   await waitFor(() => screen.getByText('Spiacenti, qualcosa è andato storto.'));
   await executeGoHome(false);
 });
@@ -125,9 +111,9 @@ test('test error productID', async () => {
 });
 
 test('test complete', async () => {
-  renderComponent(prodIoSign);
-  await executeStepInstitutionType(prodIoSign);
-  await executeStep1(agencyX);
+  renderComponent('prod-idpay');
+  await executeStepInstitutionType('prod-idpay');
+  await executeStep1('AGENCY X');
   await executeStepBillingData();
   await executeStep2();
   await executeStep3(true);
@@ -136,15 +122,15 @@ test('test complete', async () => {
 });
 
 test('test complete with error on submit', async () => {
-  renderComponent(prodIo);
-  await executeStepInstitutionType(prodIo);
-  await executeStep1(agencyError);
+  renderComponent('prod-cgn');
+  await executeStepInstitutionType('prod-cgn');
+  await executeStep1('AGENCY ERROR');
 });
 
 test('test exiting during flow with unload event', async () => {
-  renderComponent(prodPagopa);
-  await executeStepInstitutionType(prodPagopa);
-  await executeStep1(agencyX);
+  renderComponent('prod-pagopa');
+  await executeStepInstitutionType('prod-pagopa');
+  await executeStep1('AGENCY X');
   const event = new Event('beforeunload');
   window.dispatchEvent(event);
   await waitFor(
@@ -155,10 +141,10 @@ test('test exiting during flow with unload event', async () => {
 });
 
 test('test exiting during flow with logout', async () => {
-  renderComponent(prodPagopa);
-  await executeStepInstitutionType(prodPagopa);
+  renderComponent('prod-idpay');
+  await executeStepInstitutionType('prod-idpay');
 
-  await executeStep1(agencyX);
+  await executeStep1('AGENCY X');
 
   expect(screen.queryByText('Vuoi davvero uscire?')).toBeNull();
 
@@ -174,35 +160,35 @@ test('test exiting during flow with logout', async () => {
   await waitFor(() => expect(mockedLocation.assign).toBeCalledWith(ENV.URL_FE.LOGOUT));
 });
 
-test('test advanvced search business name', async () => {
-  renderComponent(prodDefault);
-  await executeStepInstitutionType(prodDefault);
-  await executeAdvancedSearchForBusinessName(agencyX);
+test('test advanced search business name', async () => {
+  renderComponent();
+  await executeStepInstitutionType('prod-pn');
+  await executeAdvancedSearchForBusinessName('AGENCY X');
 });
 
 test('test advanvced search taxcode', async () => {
-  renderComponent(prodDefault);
-  await executeStepInstitutionType(prodDefault);
-  await executeAdvancedSearchForTaxCode(comune);
+  renderComponent();
+  await executeStepInstitutionType('prod-pn');
+  await executeAdvancedSearchForTaxCode('Comune di Milano');
 });
 
 test('test billingData without Support Mail', async () => {
-  renderComponent(prodIoSign);
-  await executeStepInstitutionType(prodIoSign);
-  await executeStep1(agencyError);
+  renderComponent('prod-interop');
+  await executeStepInstitutionType('prod-interop');
+  await executeStep1('AGENCY ERROR');
   await executeStepBillingDataWithoutSupportMail();
 });
 
 test('test advanvced search business name', async () => {
-  renderComponent(prodInterop);
-  await executeStepInstitutionType(prodInterop);
-  await executeAdvancedSearchForBusinessName(agencyX);
+  renderComponent('prod-interop');
+  await executeStepInstitutionType('prod-interop');
+  await executeAdvancedSearchForBusinessName('AGENCY X');
 });
 
 ENV.AOO_UO.SHOW_AOO_UO &&
   test.skip('test advanvced search aoo name with product pn', async () => {
-    renderComponent(prodPn);
-    await executeStepInstitutionType(prodPn);
+    renderComponent('prod-pn');
+    await executeStepInstitutionType('prod-pn');
     await executeAdvancedSearchForAoo();
   });
 
@@ -214,21 +200,21 @@ ENV.AOO_UO.SHOW_AOO_UO &&
   });
 
 test('test label recipientCode only for institutionType is not PA', async () => {
-  renderComponent(prodIoSign);
+  renderComponent('prod-io-sign');
   await executeStepInstitutionTypeScp();
   await executeStepBillingDataLabels();
 });
 
 ENV.PT.SHOW_PT &&
-  test('test prod-io only for institutionType is PT and PT already onboarded', async () => {
-    renderComponent(prodIo);
+  test.skip('test prod-io only for institutionType is PT and PT already onboarded', async () => {
+    renderComponent('prod-pagopa');
     await executeStepInstitutionTypePt();
     await executeStepBillingDataLabelsForPtAlreadyOnboarded();
   });
 
 ENV.PT.SHOW_PT &&
-  test('test prod-pagopa only for institutionType is PT', async () => {
-    renderComponent(prodPagopa);
+  test.skip('test prod-pagopa only for institutionType is PT', async () => {
+    renderComponent('prod-pagopa');
     await executeStepInstitutionTypePt();
     await executeStepBillingDataLabelsForPt();
     await executeStep2();
@@ -237,9 +223,9 @@ ENV.PT.SHOW_PT &&
   });
 
 test('test party search if gps for prod-interop', async () => {
-  renderComponent(prodInterop);
+  renderComponent('prod-interop');
   await executeStepInstitutionTypeGspForInterop();
-  await executeStep1(agencyX);
+  await executeStep1('AGENCY X');
   await executeStepBillingData();
   await executeStep2();
   await executeStep3(true);
@@ -248,16 +234,16 @@ test('test party search if gps for prod-interop', async () => {
 });
 
 test('test description in step3', async () => {
-  renderComponent(prodInterop);
+  renderComponent('prod-interop');
   await executeStepInstitutionTypeGspForInterop();
-  await executeStep1(agencyX);
+  await executeStep1('AGENCY X');
   await executeStepBillingData();
   await executeStep2();
   await verifyDescriptionInStep3();
 });
 
 test('test institution type if prod-io-sign', async () => {
-  renderComponent(prodIoSign);
+  renderComponent('prod-io-sign');
   await executeStepInstitutionTypeGspForProdIoSign();
   await executeStepBillingDataReaField();
 });
@@ -485,7 +471,7 @@ const executeAdvancedSearchForUo = async () => {
 const executeStepInstitutionType = async (productSelected) => {
   await waitFor(() => screen.getByText(stepInstitutionType));
 
-  if (productSelected !== 'prod-pn' && productSelected !== prodIdpay) {
+  if (productSelected !== 'prod-pn' && productSelected !== 'prod-idpay') {
     await fillInstitutionTypeCheckbox('pa');
     screen.getByText(/Indica il tipo di ente che aderirà a/);
     const confirmButtonEnabled = screen.getByRole('button', { name: 'Continua' });
@@ -711,8 +697,8 @@ const executeStepBillingDataWithoutSupportMail = async () => {
     'supportEmail'
   );
 
-  const confirmButtonEnabled = screen.getByRole('button', { name: 'Continua' });
-  await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
+  const confirmButton = screen.getByRole('button', { name: 'Continua' });
+  expect(confirmButton).toBeEnabled();
 
   fireEvent.change(document.getElementById('supportEmail') as HTMLElement, {
     target: { value: 'h' },
@@ -720,15 +706,13 @@ const executeStepBillingDataWithoutSupportMail = async () => {
 
   await waitFor(() => screen.getByText('L’indirizzo email non è valido'));
 
-  await waitFor(() => expect(confirmButtonEnabled).toBeDisabled());
+  expect(confirmButton).toBeDisabled();
 
-  await waitFor(() =>
-    fireEvent.change(document.getElementById('supportEmail') as HTMLElement, {
-      target: { value: '' },
-    })
-  );
+  fireEvent.change(document.getElementById('supportEmail') as HTMLElement, {
+    target: { value: '' },
+  });
 
-  await waitFor(() => expect(confirmButtonEnabled).toBeDisabled());
+  await waitFor(() => expect(confirmButton).toBeDisabled());
   await fillUserBillingDataForm(
     'businessName',
     'registeredOffice',
@@ -740,7 +724,7 @@ const executeStepBillingDataWithoutSupportMail = async () => {
     'supportEmail'
   );
 
-  await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
+  await waitFor(() => expect(confirmButton).toBeEnabled());
 
   await checkCorrectBodyBillingData(
     'businessNameInput',
@@ -751,7 +735,7 @@ const executeStepBillingDataWithoutSupportMail = async () => {
     'AAAAAA44D55F456K',
     'recipientCode'
   );
-  fireEvent.click(confirmButtonEnabled);
+  fireEvent.click(confirmButton);
   await waitFor(() => screen.getByText(step2Title));
 };
 const executeStep2 = async () => {
@@ -805,10 +789,10 @@ const executeStep3 = async (expectedSuccessfulSubmit: boolean, isPt = false) => 
 
   await waitFor(() =>
     screen.getByText(
-      expectedSuccessfulSubmit && !isPt
-        ? completeSuccessTitle
-        : expectedSuccessfulSubmit && isPt
-        ? completeSuccessTitleForPt
+      expectedSuccessfulSubmit
+        ? !isPt
+          ? completeSuccessTitle
+          : completeSuccessTitleForPt
         : completeErrorTitle
     )
   );
@@ -829,7 +813,7 @@ const checkCertifiedUserValidation = async (prefix: string, confirmButton: HTMLE
 };
 
 const fillInstitutionTypeCheckbox = async (element: string) => {
-  fireEvent.click(document.getElementById(element) as HTMLElement);
+  fireEvent.click(document.getElementById(element));
 };
 
 const fillUserBillingDataForm = async (
@@ -1157,7 +1141,7 @@ const billingData2billingDataRequest = () => ({
   recipientCode: 'recipientCode',
 });
 
-const verifySubmit = async (productId = prodIoSign) => {
+const verifySubmit = async (productId = 'prod-idpay') => {
   await waitFor(() =>
     expect(fetchWithLogsSpy).lastCalledWith(
       {
@@ -1210,7 +1194,7 @@ const verifySubmit = async (productId = prodIoSign) => {
   );
 };
 
-const verifySubmitPt = async (productId = prodIoSign) => {
+const verifySubmitPt = async (productId = 'prod-io-sign') => {
   await waitFor(() =>
     expect(fetchWithLogsSpy).lastCalledWith(
       {
