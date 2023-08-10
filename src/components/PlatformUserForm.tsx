@@ -53,7 +53,7 @@ const fields: Array<Field> = [
   {
     id: 'email',
     width: 12,
-    regexp: new RegExp('^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$'),
+    regexp: new RegExp('^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,5}$'),
     regexpMessageKey: 'invalid',
     hasDescription: true,
     unique: true,
