@@ -232,7 +232,13 @@ function OnboardingComponent({ productId }: { productId: string }) {
   ) => {
     setAooSelected(aooResult);
     setUoSelected(uoResult);
-    setExternalInstitutionId(party.externalId);
+    setExternalInstitutionId(
+      aooResult
+        ? aooResult?.codiceFiscaleEnte
+        : uoResult
+        ? uoResult.codiceFiscaleEnte
+        : party.externalId
+    );
     setOrigin(party.origin);
     setOnboardingFormData({
       businessName: aooResult
