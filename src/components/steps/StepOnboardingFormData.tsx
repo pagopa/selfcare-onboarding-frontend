@@ -95,7 +95,8 @@ export default function StepOnboardingFormData({
     institutionType !== 'PT' &&
     (productId === 'prod-io' || productId === 'prod-io-sign');
   const isProdIoSign = productId === 'prod-io-sign';
-
+  const aooCode = aooSelected?.codiceUniAoo;
+  const uoCode = uoSelected?.codiceUniUo;
   const [openModifyModal, setOpenModifyModal] = useState<boolean>(false);
   const [openAddModal, setOpenAddModal] = useState<boolean>(false);
   const { setRequiredLogin } = useContext(UserContext);
@@ -117,11 +118,14 @@ export default function StepOnboardingFormData({
     const onboardingData = await fetchWithLogs(
       {
         endpoint: 'ONBOARDING_GET_PREVIOUS_GEOTAXONOMIES',
-        endpointParams: {
-          externalInstitutionId,
+      },
+      {
+        method: 'GET',
+        params: {
+          taxCode: externalInstitutionId,
+          ...(aooSelected ? { subunitCode: aooCode } : uoSelected && { subunitCode: uoCode }),
         },
       },
-      { method: 'GET' },
       () => setRequiredLogin(true)
     );
 
