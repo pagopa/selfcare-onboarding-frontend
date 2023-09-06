@@ -401,6 +401,11 @@ const mockedProducts: Array<Product> = [
     title: 'Carta Giovani',
     status: statusActive,
   },
+  {
+    id: 'prod-fd',
+    title: 'Fideiussioni',
+    status: statusActive,
+  },
 ];
 
 const mockedResponseError = {
@@ -515,6 +520,7 @@ export async function mockFetch(
     const selectedProductInTesting = mockedProducts.find(
       (p) => p.id === endpointParams.productId && p.status === 'TESTING'
     );
+
     switch (endpointParams.externalInstitutionId) {
       case 'infoError':
         return genericError;
@@ -552,6 +558,20 @@ export async function mockFetch(
             } as AxiosResponse)
           );
         }
+    }
+
+    switch (endpointParams.vatNumber) {
+      case '12345678901':
+        return new Promise((resolve) => {
+          resolve({ data: '', status: 204, statusText: 'No Content' } as AxiosResponse);
+        });
+      case '12345678902':
+        return new Promise((resolve) => {
+          resolve({
+            isAxiosError: true,
+            response: { status: 404, statusText: 'Not Found' },
+          } as AxiosError);
+        });
     }
     if (selectedProductInTesting) {
       return notAllowedError;

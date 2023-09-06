@@ -1,13 +1,12 @@
 /* eslint-disable sonarjs/cognitive-complexity */
 /* eslint-disable complexity */
 
-import { Box } from '@mui/system';
-import { Grid, Typography, TextField } from '@mui/material';
-import { useFormik } from 'formik';
-import { useTranslation } from 'react-i18next';
-import { useContext, useEffect, useState } from 'react';
+import { Grid, TextField, Typography } from '@mui/material';
+import { Box, styled } from '@mui/system';
 import { AxiosResponse } from 'axios';
-import { styled } from '@mui/system';
+import { useFormik } from 'formik';
+import { useContext, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   InstitutionType,
   Party,
@@ -15,21 +14,21 @@ import {
   RequestOutcomeMessage,
   StepperStepComponentProps,
 } from '../../../types';
-import { OnboardingStepActions } from '../OnboardingStepActions';
-import { useHistoryState } from '../useHistoryState';
-import { MessageNoAction } from '../MessageNoAction';
-import { OnboardingFormData } from '../../model/OnboardingFormData';
-import PersonalAndBillingDataSection from '../onboardingFormData/PersonalAndBillingDataSection';
-import DpoSection from '../onboardingFormData/DpoSection';
-import GeoTaxonomySection from '../onboardingFormData/taxonomy/GeoTaxonomySection';
-import GeoTaxSessionModal from '../onboardingFormData/taxonomy/GeoTaxSessionModal';
-import { GeographicTaxonomy, nationalValue } from '../../model/GeographicTaxonomies';
 import { fetchWithLogs } from '../../lib/api-utils';
 import { UserContext } from '../../lib/context';
 import { getFetchOutcome } from '../../lib/error-utils';
-import { ENV } from '../../utils/env';
 import { AooData } from '../../model/AooData';
+import { GeographicTaxonomy, nationalValue } from '../../model/GeographicTaxonomies';
+import { OnboardingFormData } from '../../model/OnboardingFormData';
 import { UoData } from '../../model/UoModel';
+import { ENV } from '../../utils/env';
+import { MessageNoAction } from '../MessageNoAction';
+import { OnboardingStepActions } from '../OnboardingStepActions';
+import DpoSection from '../onboardingFormData/DpoSection';
+import PersonalAndBillingDataSection from '../onboardingFormData/PersonalAndBillingDataSection';
+import GeoTaxSessionModal from '../onboardingFormData/taxonomy/GeoTaxSessionModal';
+import GeoTaxonomySection from '../onboardingFormData/taxonomy/GeoTaxonomySection';
+import { useHistoryState } from '../useHistoryState';
 
 const mailPECRegexp = new RegExp('^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,5}$');
 const fiscalAndVatCodeRegexp = new RegExp(
@@ -95,10 +94,12 @@ export default function StepOnboardingFormData({
     institutionType !== 'PT' &&
     (productId === 'prod-io' || productId === 'prod-io-sign');
   const isProdIoSign = productId === 'prod-io-sign';
+  const isProdFideiussioni = productId === 'prod-fd';
   const aooCode = aooSelected?.codiceUniAoo;
   const uoCode = uoSelected?.codiceUniUo;
   const [openModifyModal, setOpenModifyModal] = useState<boolean>(false);
   const [openAddModal, setOpenAddModal] = useState<boolean>(false);
+  const [isVatRegistrated, setIsVatRegistrated] = useState<boolean>(false);
   const { setRequiredLogin } = useContext(UserContext);
 
   const [previousGeotaxononomies, setPreviousGeotaxononomies] = useState<Array<GeographicTaxonomy>>(
@@ -275,6 +276,8 @@ export default function StepOnboardingFormData({
               stepHistoryState.isTaxCodeEquals2PIVA &&
               !fiscalAndVatCodeRegexp.test(values.taxCode)
             ? t('onboardingFormData.billingDataSection.invalidVatNumber')
+            : isVatRegistrated
+            ? t('onboardingFormData.billingDataSection.vatNumberAlreadyRegistered')
             : undefined,
         digitalAddress: !values.digitalAddress
           ? requiredError
@@ -362,6 +365,36 @@ export default function StepOnboardingFormData({
     },
   });
 
+  const verifyVatNumber = async () => {
+
+
+    const onboardingStatus = await fetchWithLogs(
+      {
+        endpoint: 'VERIFY_ONBOARDING',
+        endpointParams: {
+          externalInstitutionId,
+          productId,
+          verifyType: 'EXTERNAL',
+          vatNumber: formik.values.vatNumber,
+        },
+      },
+      { method: 'HEAD' },
+      () => setRequiredLogin(true)
+    );
+
+
+
+    const restOutcome = getFetchOutcome(onboardingStatus);
+
+    if (restOutcome === 'success') {
+      console.log('onboardingStatus', onboardingStatus);
+      setIsVatRegistrated(true);
+    } else {
+      console.log('onboardingStatusError', onboardingStatus);
+      setIsVatRegistrated(false);
+    }
+  };
+
   useEffect(() => {
     if (
       !stepHistoryState.isTaxCodeEquals2PIVA &&
@@ -380,6 +413,12 @@ export default function StepOnboardingFormData({
       });
     }
   }, [formik.values.taxCode, formik.values.vatNumber]);
+
+  useEffect(() => {
+    if (isProdFideiussioni && formik.values.vatNumber.length === 11) {
+      void verifyVatNumber();
+    }
+  }, [formik.values.vatNumber]);
 
   const baseTextFieldProps = (
     field: keyof OnboardingFormData,
