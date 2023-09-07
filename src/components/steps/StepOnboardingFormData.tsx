@@ -376,7 +376,7 @@ export default function StepOnboardingFormData({
       {
         method: 'HEAD',
         params: {
-          taxCode: externalInstitutionId,
+          taxCode: institutionType === 'PA' ? externalInstitutionId : formik.values?.taxCode,
           productId,
           verifyType: 'EXTERNAL',
           vatNumber: stepHistoryState.isTaxCodeEquals2PIVA
