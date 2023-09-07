@@ -560,7 +560,19 @@ export async function mockFetch(
         }
     }
 
-    switch (endpointParams.vatNumber) {
+    if (selectedProductInTesting) {
+      return notAllowedError;
+    }
+    return new Promise((resolve) =>
+      resolve({
+        isAxiosError: true,
+        response: { data: '', status: 400, statusText: 'Bad Request' },
+      } as AxiosError)
+    );
+  }
+
+  if (endpoint === 'VERIFY_ONBOARDED_VAT_NUMBER') {
+    switch (params.vatNumber) {
       case '12345678901':
         return new Promise((resolve) => {
           resolve({ data: '', status: 204, statusText: 'No Content' } as AxiosResponse);
@@ -573,15 +585,6 @@ export async function mockFetch(
           } as AxiosError);
         });
     }
-    if (selectedProductInTesting) {
-      return notAllowedError;
-    }
-    return new Promise((resolve) =>
-      resolve({
-        isAxiosError: true,
-        response: { data: '', status: 400, statusText: 'Bad Request' },
-      } as AxiosError)
-    );
   }
 
   if (endpoint === 'ONBOARDING_GET_ONBOARDING_DATA') {

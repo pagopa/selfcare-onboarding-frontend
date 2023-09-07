@@ -155,7 +155,7 @@ export default function StepOnboardingFormData({
 
   useEffect(() => {
     void formik.validateForm();
-  }, [stepHistoryState.isTaxCodeEquals2PIVA]);
+  }, [stepHistoryState.isTaxCodeEquals2PIVA, isVatRegistrated]);
 
   const saveHistoryState = () => {
     setStepHistoryState(stepHistoryState);
@@ -366,23 +366,24 @@ export default function StepOnboardingFormData({
   });
 
   const verifyVatNumber = async () => {
-
-
+    setIsVatRegistrated(false);
     const onboardingStatus = await fetchWithLogs(
       {
-        endpoint: 'VERIFY_ONBOARDING',
-        endpointParams: {
-          externalInstitutionId,
+        endpoint: 'VERIFY_ONBOARDED_VAT_NUMBER',
+      },
+      {
+        method: 'HEAD',
+        params: {
+          taxCode: externalInstitutionId,
           productId,
           verifyType: 'EXTERNAL',
-          vatNumber: formik.values.vatNumber,
+          vatNumber: stepHistoryState.isTaxCodeEquals2PIVA
+            ? formik.values.taxCode
+            : formik.values.vatNumber,
         },
       },
-      { method: 'HEAD' },
       () => setRequiredLogin(true)
     );
-
-
 
     const restOutcome = getFetchOutcome(onboardingStatus);
 
@@ -415,10 +416,15 @@ export default function StepOnboardingFormData({
   }, [formik.values.taxCode, formik.values.vatNumber]);
 
   useEffect(() => {
-    if (isProdFideiussioni && formik.values.vatNumber.length === 11) {
+    if (
+      (isProdFideiussioni && formik.values.vatNumber.length === 11) ||
+      (isProdFideiussioni &&
+        stepHistoryState.isTaxCodeEquals2PIVA &&
+        formik.values.taxCode.length === 11)
+    ) {
       void verifyVatNumber();
     }
-  }, [formik.values.vatNumber]);
+  }, [formik.values.vatNumber, stepHistoryState.isTaxCodeEquals2PIVA]);
 
   const baseTextFieldProps = (
     field: keyof OnboardingFormData,
