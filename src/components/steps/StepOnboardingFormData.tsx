@@ -7,6 +7,8 @@ import { AxiosResponse } from 'axios';
 import { useFormik } from 'formik';
 import { useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { uniqueId } from 'lodash';
+import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
 import {
   InstitutionType,
   Party,
@@ -366,7 +368,7 @@ export default function StepOnboardingFormData({
   });
 
   const verifyVatNumber = async () => {
-    setIsVatRegistrated(false);
+    const requestId = uniqueId('verify-onboarding-vatnumber');
     const onboardingStatus = await fetchWithLogs(
       {
         endpoint: 'VERIFY_ONBOARDED_VAT_NUMBER',
@@ -388,10 +390,9 @@ export default function StepOnboardingFormData({
     const restOutcome = getFetchOutcome(onboardingStatus);
 
     if (restOutcome === 'success') {
-      console.log('onboardingStatus', onboardingStatus);
       setIsVatRegistrated(true);
+      trackEvent('VERIFY_ONBOARDED_VAT_NUMBER', { request_id: requestId });
     } else {
-      console.log('onboardingStatusError', onboardingStatus);
       setIsVatRegistrated(false);
     }
   };
