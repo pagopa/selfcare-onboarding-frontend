@@ -406,6 +406,11 @@ const mockedProducts: Array<Product> = [
     title: 'Fideiussioni',
     status: statusActive,
   },
+  {
+    id: 'prod-fd-garantito',
+    title: 'Fideiussioni',
+    status: statusActive,
+  },
 ];
 
 const mockedResponseError = {
