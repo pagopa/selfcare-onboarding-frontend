@@ -49,6 +49,10 @@ export const API = {
     URL: ENV.URL_API.ONBOARDING + '/institutions/{{externalInstitutionId}}/products/{{productId}}',
   },
 
+  VERIFY_ONBOARDED_VAT_NUMBER: {
+    URL: ENV.URL_API.ONBOARDING + '/institutions/onboarding',
+  },
+
   ONBOARDING_VERIFY_PRODUCT: {
     URL: ENV.URL_API.ONBOARDING + '/product/{{productId}}',
   },
