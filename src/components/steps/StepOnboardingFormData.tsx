@@ -96,7 +96,7 @@ export default function StepOnboardingFormData({
     institutionType !== 'PT' &&
     (productId === 'prod-io' || productId === 'prod-io-sign');
   const isProdIoSign = productId === 'prod-io-sign';
-  const isProdFideiussioni = productId !== undefined && productId.startsWith('prod-fd');
+  const isProdFideiussioni = productId?.startsWith('prod-fd') ?? false;
   const aooCode = aooSelected?.codiceUniAoo;
   const uoCode = uoSelected?.codiceUniUo;
   const [openModifyModal, setOpenModifyModal] = useState<boolean>(false);
