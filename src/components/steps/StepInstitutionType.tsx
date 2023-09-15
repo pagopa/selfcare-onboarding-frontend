@@ -2,19 +2,17 @@ import {
   FormControl,
   FormControlLabel,
   Grid,
+  Paper,
   Radio,
   RadioGroup,
   Typography,
-  Paper,
   useTheme,
 } from '@mui/material';
-import { IllusError } from '@pagopa/mui-italia';
-import { EndingPage } from '@pagopa/selfcare-common-frontend';
-import React, { useEffect, useRef, useState } from 'react';
-import { useTranslation, Trans } from 'react-i18next';
+import React, { useRef } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import {
-  InstitutionType,
   IPACatalogParty,
+  InstitutionType,
   Product,
   StepperStepComponentProps,
 } from '../../../types';
@@ -125,31 +123,7 @@ export default function StepInstitutionType({
     }
   };
 
-  const [errorPageVisible, setErrorPageVisible] = useState<boolean>(false);
-  useEffect(() => {
-    if (selectedProduct && selectedProduct.id === 'prod-io') {
-      setErrorPageVisible(true);
-    }
-  }, [selectedProduct]);
-
-  const isAlertVisible = ENV.BANNER.ENABLE;
-
-  return errorPageVisible && isAlertVisible ? (
-    <>
-      <EndingPage
-        minHeight="52vh"
-        icon={<IllusError size={60} />}
-        variantTitle={'h4'}
-        variantDescription={'body1'}
-        title={'Aggiornamento in corso'}
-        description={
-          'Per un aggiornamento dell’Area Riservata, oggi non sarà possibile aderire all’app IO. Le adesioni riprenderanno domani, ci scusiamo per il disagio.'
-        }
-        buttonLabel={'Torna alla home'}
-        onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
-      />
-    </>
-  ) : (
+  return (
     <Grid container display="flex" justifyContent="center" alignItems="center">
       <Grid item xs={12} display="flex" justifyContent="center">
         <Typography variant="h3" align="center" pb={4}>
