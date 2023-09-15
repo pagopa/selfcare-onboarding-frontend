@@ -208,7 +208,6 @@ function OnBoardingSubProduct() {
         SubProductStepSelectPricingPlan({
           forward: forwardWitSelectedPricingPlan,
           product,
-          subProduct,
         }),
     },
     {
