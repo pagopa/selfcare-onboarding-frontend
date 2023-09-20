@@ -1,13 +1,14 @@
 /* eslint-disable sonarjs/cognitive-complexity */
 /* eslint-disable complexity */
 
-import { Box } from '@mui/system';
-import { Grid, Typography, TextField } from '@mui/material';
-import { useFormik } from 'formik';
-import { useTranslation } from 'react-i18next';
-import { useContext, useEffect, useState } from 'react';
+import { Grid, TextField, Typography } from '@mui/material';
+import { Box, styled } from '@mui/system';
 import { AxiosResponse } from 'axios';
-import { styled } from '@mui/system';
+import { useFormik } from 'formik';
+import { useContext, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { uniqueId } from 'lodash';
+import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
 import {
   InstitutionType,
   Party,
@@ -15,23 +16,23 @@ import {
   RequestOutcomeMessage,
   StepperStepComponentProps,
 } from '../../../types';
-import { OnboardingStepActions } from '../OnboardingStepActions';
-import { useHistoryState } from '../useHistoryState';
-import { MessageNoAction } from '../MessageNoAction';
-import { OnboardingFormData } from '../../model/OnboardingFormData';
-import PersonalAndBillingDataSection from '../onboardingFormData/PersonalAndBillingDataSection';
-import DpoSection from '../onboardingFormData/DpoSection';
-import GeoTaxonomySection from '../onboardingFormData/taxonomy/GeoTaxonomySection';
-import GeoTaxSessionModal from '../onboardingFormData/taxonomy/GeoTaxSessionModal';
-import { GeographicTaxonomy, nationalValue } from '../../model/GeographicTaxonomies';
 import { fetchWithLogs } from '../../lib/api-utils';
 import { UserContext } from '../../lib/context';
 import { getFetchOutcome } from '../../lib/error-utils';
-import { ENV } from '../../utils/env';
 import { AooData } from '../../model/AooData';
+import { GeographicTaxonomy, nationalValue } from '../../model/GeographicTaxonomies';
+import { OnboardingFormData } from '../../model/OnboardingFormData';
 import { UoData } from '../../model/UoModel';
+import { ENV } from '../../utils/env';
+import { MessageNoAction } from '../MessageNoAction';
+import { OnboardingStepActions } from '../OnboardingStepActions';
+import DpoSection from '../onboardingFormData/DpoSection';
+import PersonalAndBillingDataSection from '../onboardingFormData/PersonalAndBillingDataSection';
+import GeoTaxSessionModal from '../onboardingFormData/taxonomy/GeoTaxSessionModal';
+import GeoTaxonomySection from '../onboardingFormData/taxonomy/GeoTaxonomySection';
+import { useHistoryState } from '../useHistoryState';
 
-const mailPECRegexp = new RegExp('^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$');
+const mailPECRegexp = new RegExp('^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,5}$');
 const fiscalAndVatCodeRegexp = new RegExp(
   /(^[A-Za-z]{6}[0-9lmnpqrstuvLMNPQRSTUV]{2}[abcdehlmprstABCDEHLMPRST]{1}[0-9lmnpqrstuvLMNPQRSTUV]{2}[A-Za-z]{1}[0-9lmnpqrstuvLMNPQRSTUV]{3}[A-Za-z]{1}$|^[0-9]{11}$)/
 );
@@ -95,9 +96,12 @@ export default function StepOnboardingFormData({
     institutionType !== 'PT' &&
     (productId === 'prod-io' || productId === 'prod-io-sign');
   const isProdIoSign = productId === 'prod-io-sign';
-
+  const isProdFideiussioni = productId?.startsWith('prod-fd') ?? false;
+  const aooCode = aooSelected?.codiceUniAoo;
+  const uoCode = uoSelected?.codiceUniUo;
   const [openModifyModal, setOpenModifyModal] = useState<boolean>(false);
   const [openAddModal, setOpenAddModal] = useState<boolean>(false);
+  const [isVatRegistrated, setIsVatRegistrated] = useState<boolean>(false);
   const { setRequiredLogin } = useContext(UserContext);
 
   const [previousGeotaxononomies, setPreviousGeotaxononomies] = useState<Array<GeographicTaxonomy>>(
@@ -117,11 +121,14 @@ export default function StepOnboardingFormData({
     const onboardingData = await fetchWithLogs(
       {
         endpoint: 'ONBOARDING_GET_PREVIOUS_GEOTAXONOMIES',
-        endpointParams: {
-          externalInstitutionId,
+      },
+      {
+        method: 'GET',
+        params: {
+          taxCode: externalInstitutionId,
+          ...(aooSelected ? { subunitCode: aooCode } : uoSelected && { subunitCode: uoCode }),
         },
       },
-      { method: 'GET' },
       () => setRequiredLogin(true)
     );
 
@@ -150,7 +157,7 @@ export default function StepOnboardingFormData({
 
   useEffect(() => {
     void formik.validateForm();
-  }, [stepHistoryState.isTaxCodeEquals2PIVA]);
+  }, [stepHistoryState.isTaxCodeEquals2PIVA, isVatRegistrated]);
 
   const saveHistoryState = () => {
     setStepHistoryState(stepHistoryState);
@@ -271,6 +278,8 @@ export default function StepOnboardingFormData({
               stepHistoryState.isTaxCodeEquals2PIVA &&
               !fiscalAndVatCodeRegexp.test(values.taxCode)
             ? t('onboardingFormData.billingDataSection.invalidVatNumber')
+            : isVatRegistrated
+            ? t('onboardingFormData.billingDataSection.vatNumberAlreadyRegistered')
             : undefined,
         digitalAddress: !values.digitalAddress
           ? requiredError
@@ -358,6 +367,36 @@ export default function StepOnboardingFormData({
     },
   });
 
+  const verifyVatNumber = async () => {
+    const requestId = uniqueId('verify-onboarding-vatnumber');
+    const onboardingStatus = await fetchWithLogs(
+      {
+        endpoint: 'VERIFY_ONBOARDED_VAT_NUMBER',
+      },
+      {
+        method: 'HEAD',
+        params: {
+          taxCode: institutionType === 'PA' ? externalInstitutionId : formik.values?.taxCode,
+          productId,
+          verifyType: 'EXTERNAL',
+          vatNumber: stepHistoryState.isTaxCodeEquals2PIVA
+            ? formik.values.taxCode
+            : formik.values.vatNumber,
+        },
+      },
+      () => setRequiredLogin(true)
+    );
+
+    const restOutcome = getFetchOutcome(onboardingStatus);
+
+    if (restOutcome === 'success') {
+      setIsVatRegistrated(true);
+      trackEvent('VERIFY_ONBOARDED_VAT_NUMBER', { request_id: requestId });
+    } else {
+      setIsVatRegistrated(false);
+    }
+  };
+
   useEffect(() => {
     if (
       !stepHistoryState.isTaxCodeEquals2PIVA &&
@@ -376,6 +415,17 @@ export default function StepOnboardingFormData({
       });
     }
   }, [formik.values.taxCode, formik.values.vatNumber]);
+
+  useEffect(() => {
+    if (
+      (isProdFideiussioni && formik.values.vatNumber.length === 11) ||
+      (isProdFideiussioni &&
+        stepHistoryState.isTaxCodeEquals2PIVA &&
+        formik.values.taxCode.length === 11)
+    ) {
+      void verifyVatNumber();
+    }
+  }, [formik.values.vatNumber, stepHistoryState.isTaxCodeEquals2PIVA]);
 
   const baseTextFieldProps = (
     field: keyof OnboardingFormData,

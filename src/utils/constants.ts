@@ -49,6 +49,10 @@ export const API = {
     URL: ENV.URL_API.ONBOARDING + '/institutions/{{externalInstitutionId}}/products/{{productId}}',
   },
 
+  VERIFY_ONBOARDED_VAT_NUMBER: {
+    URL: ENV.URL_API.ONBOARDING + '/institutions/onboarding',
+  },
+
   ONBOARDING_VERIFY_PRODUCT: {
     URL: ENV.URL_API.ONBOARDING + '/product/{{productId}}',
   },
@@ -89,7 +93,7 @@ export const API = {
     URL: ENV.URL_API.PARTY_REGISTRY_PROXY + '/geotaxonomies',
   },
   ONBOARDING_GET_PREVIOUS_GEOTAXONOMIES: {
-    URL: ENV.URL_API.ONBOARDING + '/institutions/{{externalInstitutionId}}/geographicTaxonomy',
+    URL: ENV.URL_API.ONBOARDING + '/institutions/geographicTaxonomies',
   },
   ONBOARDING_GET_UO_CODE_INFO: {
     URL: ENV.URL_API.PARTY_REGISTRY_PROXY + '/uo/{{codiceUniUo}}',

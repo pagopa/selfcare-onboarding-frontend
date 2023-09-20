@@ -477,6 +477,7 @@ export default {
       invalidReaField: 'Il Campo REA non è valido',
       invalidMailSupport: 'L’indirizzo email non è valido',
       invalidShareCapitalField: 'Il campo capitale sociale non è valido',
+      vatNumberAlreadyRegistered: 'La P. IVA che hai inserito è già stata registrata.',
       centralPartyLabel: 'Ente centrale',
       businessName: 'Ragione sociale',
       aooName: 'Denominazione AOO',

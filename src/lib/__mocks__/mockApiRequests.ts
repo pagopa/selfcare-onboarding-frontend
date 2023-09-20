@@ -401,6 +401,16 @@ const mockedProducts: Array<Product> = [
     title: 'Carta Giovani',
     status: statusActive,
   },
+  {
+    id: 'prod-fd',
+    title: 'Fideiussioni',
+    status: statusActive,
+  },
+  {
+    id: 'prod-fd-garantito',
+    title: 'Fideiussioni',
+    status: statusActive,
+  },
 ];
 
 const mockedResponseError = {
@@ -515,6 +525,7 @@ export async function mockFetch(
     const selectedProductInTesting = mockedProducts.find(
       (p) => p.id === endpointParams.productId && p.status === 'TESTING'
     );
+
     switch (endpointParams.externalInstitutionId) {
       case 'infoError':
         return genericError;
@@ -553,6 +564,7 @@ export async function mockFetch(
           );
         }
     }
+
     if (selectedProductInTesting) {
       return notAllowedError;
     }
@@ -562,6 +574,22 @@ export async function mockFetch(
         response: { data: '', status: 400, statusText: 'Bad Request' },
       } as AxiosError)
     );
+  }
+
+  if (endpoint === 'VERIFY_ONBOARDED_VAT_NUMBER') {
+    switch (params.vatNumber) {
+      case '12345678901':
+        return new Promise((resolve) => {
+          resolve({ data: '', status: 204, statusText: 'No Content' } as AxiosResponse);
+        });
+      case '12345678902':
+        return new Promise((resolve) => {
+          resolve({
+            isAxiosError: true,
+            response: { status: 404, statusText: 'Not Found' },
+          } as AxiosError);
+        });
+    }
   }
 
   if (endpoint === 'ONBOARDING_GET_ONBOARDING_DATA') {
