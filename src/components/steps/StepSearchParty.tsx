@@ -250,6 +250,9 @@ export function StepSearchParty({
           <Typography variant="body1" align="center" color={theme.palette.text.primary}>
             {selected
               ? `Prosegui con l’adesione a ${product?.title} per l’ente selezionato`
+              : institutionType === 'SA'
+              ? // TODO
+                'Se sei tra i gestori di piattaforma privati che hanno chiesto la certificazione ad AgID, inserisci uno dei dati richiesti e cerca l’ente per cui vuoi richiedere l’adesione a <nome prodotto>'
               : subTitle}
           </Typography>
         </Grid>
@@ -329,40 +332,40 @@ export function StepSearchParty({
           />
         </Grid>
       </Grid>
-
-      <Grid container item justifyContent="center">
-        <Grid item xs={6}>
-          <Box
-            sx={{
-              fontSize: '14px',
-              lineHeight: '24px',
-              textAlign: 'center',
-            }}
-          >
-            <Typography
+      {institutionType !== 'SA' && (
+        <Grid container item justifyContent="center">
+          <Grid item xs={6}>
+            <Box
               sx={{
+                fontSize: '14px',
+                lineHeight: '24px',
                 textAlign: 'center',
               }}
-              variant="caption"
-              color={theme.palette.text.primary}
             >
-              <Trans i18nKey="onboardingStep1.onboarding.ipaDescription">
-                Non trovi il tuo ente nell&apos;IPA? In
-                <Link
-                  sx={{ textDecoration: 'none', color: theme.palette.primary.main }}
-                  href="https://indicepa.gov.it/ipa-portale/servizi-enti/accreditamento-ente"
-                >
-                  questa pagina
-                </Link>
-                trovi maggiori
-                <br />
-                informazioni sull&apos;indice e su come accreditarsi
-              </Trans>
-            </Typography>
-          </Box>
+              <Typography
+                sx={{
+                  textAlign: 'center',
+                }}
+                variant="caption"
+                color={theme.palette.text.primary}
+              >
+                <Trans i18nKey="onboardingStep1.onboarding.ipaDescription">
+                  Non trovi il tuo ente nell&apos;IPA? In
+                  <Link
+                    sx={{ textDecoration: 'none', color: theme.palette.primary.main }}
+                    href="https://indicepa.gov.it/ipa-portale/servizi-enti/accreditamento-ente"
+                  >
+                    questa pagina
+                  </Link>
+                  trovi maggiori
+                  <br />
+                  informazioni sull&apos;indice e su come accreditarsi
+                </Trans>
+              </Typography>
+            </Box>
+          </Grid>
         </Grid>
-      </Grid>
-
+      )}
       <Grid item mt={4}>
         <OnboardingStepActions
           back={
