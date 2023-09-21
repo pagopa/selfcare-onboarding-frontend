@@ -205,4 +205,4 @@ export type InstitutionOnboardingInfoResource = {
   institution: InstitutionData;
 };
 
-export type InstitutionType = 'PA' | 'GSP' | 'SCP' | 'PT' | 'PSP';
+export type InstitutionType = 'PA' | 'GSP' | 'SCP' | 'PT' | 'PSP' | 'SA';

@@ -447,6 +447,7 @@ export default {
       scp: 'Società a controllo pubblico',
       pt: 'Partner tecnologico',
       psp: 'Prestatori Servizi di Pagamento',
+      sa: 'Piattaforme procurement',
     },
     cadArticle2A: 'art. 2, comma 2, lettera A del CAD',
     cadArticle2B: 'art. 2, comma 2, lettera B del CAD',
