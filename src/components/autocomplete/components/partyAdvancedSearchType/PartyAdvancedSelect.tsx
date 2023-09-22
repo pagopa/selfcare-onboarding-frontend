@@ -112,7 +112,7 @@ export default function PartyAdvancedSelect({
         </MenuItem>
 
         {filteredByProductsAndType && (
-          // TODO Temporary hide until seach by CF API is avaible of "SA"
+          // TODO Temporary hide until search by CF API is avaible of "SA"
           <MenuItem
             id="taxCode"
             data-testid="taxCode"
