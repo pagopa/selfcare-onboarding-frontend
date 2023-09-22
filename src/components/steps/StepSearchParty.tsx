@@ -1,25 +1,24 @@
-import { Grid, Link, Typography, useTheme, Alert } from '@mui/material';
+import { Alert, Grid, Link, Typography, useTheme } from '@mui/material';
 import { Box } from '@mui/system';
-import { useContext, useEffect, useState } from 'react';
 import { AxiosError, AxiosResponse } from 'axios';
-import { useTranslation, Trans } from 'react-i18next';
-import { ReactElement } from 'react';
+import { ReactElement, useContext, useEffect, useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import {
-  InstitutionType,
   IPACatalogParty,
+  InstitutionType,
   Party,
   Product,
   StepperStepComponentProps,
 } from '../../../types';
-import { Autocomplete } from '../autocomplete/Autocomplete';
-import { getFetchOutcome } from '../../lib/error-utils';
 import { fetchWithLogs } from '../../lib/api-utils';
 import { UserContext } from '../../lib/context';
-import { OnboardingStepActions } from '../OnboardingStepActions';
-import { useHistoryState } from '../useHistoryState';
-import { LoadingOverlay } from '../LoadingOverlay';
+import { getFetchOutcome } from '../../lib/error-utils';
 import { AooData } from '../../model/AooData';
 import { UoData } from '../../model/UoModel';
+import { LoadingOverlay } from '../LoadingOverlay';
+import { OnboardingStepActions } from '../OnboardingStepActions';
+import { Autocomplete } from '../autocomplete/Autocomplete';
+import { useHistoryState } from '../useHistoryState';
 
 type Props = {
   subTitle: string | ReactElement;
@@ -248,12 +247,17 @@ export function StepSearchParty({
       <Grid container item justifyContent="center" mt={1}>
         <Grid item xs={12}>
           <Typography variant="body1" align="center" color={theme.palette.text.primary}>
-            {selected
-              ? `Prosegui con l’adesione a ${product?.title} per l’ente selezionato`
-              : institutionType === 'SA'
-              ? // TODO
-                'Se sei tra i gestori di piattaforma privati che hanno chiesto la certificazione ad AgID, inserisci uno dei dati richiesti e cerca l’ente per cui vuoi richiedere l’adesione a <nome prodotto>'
-              : subTitle}
+            {selected ? (
+              `Prosegui con l’adesione a ${product?.title} per l’ente selezionato`
+            ) : institutionType === 'SA' ? (
+              <Trans i18nKey="onboardingStep1.onboarding.saSubTitle">
+                Se sei tra i gestori privati di piattaforma e-procurement e hai <br /> già chiesto
+                la certificazione ad AgID, inserisci uno dei dati <br /> richiesti e cerca l’ente
+                per cui vuoi richiedere l’adesione a <br /> Interoperabilità.
+              </Trans>
+            ) : (
+              subTitle
+            )}
           </Typography>
         </Grid>
       </Grid>

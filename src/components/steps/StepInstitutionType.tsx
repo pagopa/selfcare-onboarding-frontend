@@ -123,8 +123,7 @@ export default function StepInstitutionType({
     } else if (selectedProductId === 'prod-pagopa' && itValue === 'PSP') {
       return t('stepInstitutionType.cadPsp');
     } else if (selectedProductId === 'prod-interop' && itValue === 'SA') {
-      // TODO translation
-      return 'art da definire';
+      return '';
     } else {
       return t('stepInstitutionType.cadArticle2A');
     }
