@@ -112,35 +112,39 @@ export default function PartyAdvancedSelect({
         </MenuItem>
 
         {!isSA && (
-          // TODO Temporary hide until search by CF API is avaible of "SA"
-          <MenuItem
-            id="taxCode"
-            data-testid="taxCode"
-            value={'taxCode'}
-            onClick={() => onSelectValue(false, true, false, false)}
-          >
-            {t('partyAdvancedSelect.taxCode')}
-          </MenuItem>
-        )}
-        {ENV.AOO_UO.SHOW_AOO_UO && filteredByProducts && !isSA && (
-          <MenuItem
-            id="aooCode"
-            data-testid="aooCode"
-            value={'aooCode'}
-            onClick={() => onSelectValue(false, false, true, false)}
-          >
-            {t('partyAdvancedSelect.aooCode')}
-          </MenuItem>
-        )}
-        {ENV.AOO_UO.SHOW_AOO_UO && filteredByProducts && !isSA && (
-          <MenuItem
-            id="uoCode"
-            data-testid="uoCode"
-            value={'uoCode'}
-            onClick={() => onSelectValue(false, false, false, true)}
-          >
-            {t('partyAdvancedSelect.uoCode')}
-          </MenuItem>
+          <>
+            {/* TODO Temporary hide until search by CF API is available for "SA" */}
+            <MenuItem
+              id="taxCode"
+              data-testid="taxCode"
+              value={'taxCode'}
+              onClick={() => onSelectValue(false, true, false, false)}
+            >
+              {t('partyAdvancedSelect.taxCode')}
+            </MenuItem>
+
+            {ENV.AOO_UO.SHOW_AOO_UO && filteredByProducts && (
+              <>
+                <MenuItem
+                  id="aooCode"
+                  data-testid="aooCode"
+                  value={'aooCode'}
+                  onClick={() => onSelectValue(false, false, true, false)}
+                >
+                  {t('partyAdvancedSelect.aooCode')}
+                </MenuItem>
+
+                <MenuItem
+                  id="uoCode"
+                  data-testid="uoCode"
+                  value={'uoCode'}
+                  onClick={() => onSelectValue(false, false, false, true)}
+                >
+                  {t('partyAdvancedSelect.uoCode')}
+                </MenuItem>
+              </>
+            )}
+          </>
         )}
       </Select>
     </FormControl>
