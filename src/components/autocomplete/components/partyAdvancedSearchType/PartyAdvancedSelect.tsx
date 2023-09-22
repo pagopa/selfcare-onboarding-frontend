@@ -5,7 +5,7 @@ import { FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import { InstitutionResource } from '../../../../model/InstitutionResource';
 import { AooData } from '../../../../model/AooData';
 import { UoData } from '../../../../model/UoModel';
-import { Product } from '../../../../../types';
+import { InstitutionType, Product } from '../../../../../types';
 import { ENV } from '../../../../utils/env';
 
 type Props = {
@@ -27,6 +27,7 @@ type Props = {
   isAooCodeSelected?: boolean;
   isUoCodeSelected?: boolean;
   product?: Product | null;
+  institutionType?: InstitutionType;
 };
 
 export default function PartyAdvancedSelect({
@@ -47,6 +48,7 @@ export default function PartyAdvancedSelect({
   setUoResultHistory,
   setAooResultHistory,
   product,
+  institutionType,
 }: Props) {
   const { t } = useTranslation();
 
@@ -87,7 +89,8 @@ export default function PartyAdvancedSelect({
     }
   }, []);
 
-  const filteredByProducts = product && product.id === 'prod-interop';
+  const filteredByProductsAndType =
+    product && product.id === 'prod-interop' && institutionType !== 'SA';
 
   return (
     <FormControl fullWidth size="small">
@@ -107,16 +110,19 @@ export default function PartyAdvancedSelect({
         >
           {t('partyAdvancedSelect.businessName')}
         </MenuItem>
-        <MenuItem
-          id="taxCode"
-          data-testid="taxCode"
-          value={'taxCode'}
-          onClick={() => onSelectValue(false, true, false, false)}
-        >
-          {t('partyAdvancedSelect.taxCode')}
-        </MenuItem>
 
-        {ENV.AOO_UO.SHOW_AOO_UO && filteredByProducts && (
+        {filteredByProductsAndType && (
+          // TODO Temporary hide until seach by CF API is avaible of "SA"
+          <MenuItem
+            id="taxCode"
+            data-testid="taxCode"
+            value={'taxCode'}
+            onClick={() => onSelectValue(false, true, false, false)}
+          >
+            {t('partyAdvancedSelect.taxCode')}
+          </MenuItem>
+        )}
+        {ENV.AOO_UO.SHOW_AOO_UO && filteredByProductsAndType && (
           <MenuItem
             id="aooCode"
             data-testid="aooCode"
@@ -126,7 +132,7 @@ export default function PartyAdvancedSelect({
             {t('partyAdvancedSelect.aooCode')}
           </MenuItem>
         )}
-        {ENV.AOO_UO.SHOW_AOO_UO && filteredByProducts && (
+        {ENV.AOO_UO.SHOW_AOO_UO && filteredByProductsAndType && (
           <MenuItem
             id="uoCode"
             data-testid="uoCode"

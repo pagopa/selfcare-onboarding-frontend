@@ -101,6 +101,9 @@ export const API = {
   ONBOARDING_GET_AOO_CODE_INFO: {
     URL: ENV.URL_API.PARTY_REGISTRY_PROXY + '/aoo/{{codiceUniAoo}}',
   },
+  ONBOARDING_GET_SA_PARTIES_NAME: {
+    URL: ENV.URL_API.PARTY_REGISTRY_PROXY + '/pdnd',
+  },
 };
 
 export const USER_ROLE_LABEL = {

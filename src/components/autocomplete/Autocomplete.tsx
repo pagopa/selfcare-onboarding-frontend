@@ -1,8 +1,6 @@
-import React, { Dispatch, SetStateAction, useState } from 'react';
-
 import { Grid, Paper, Theme } from '@mui/material';
-
-import { Endpoint, Product } from '../../../types';
+import React, { Dispatch, SetStateAction, useState } from 'react';
+import { Endpoint, InstitutionType, Product } from '../../../types';
 import { AooData } from '../../model/AooData';
 import { InstitutionResource } from '../../model/InstitutionResource';
 import { UoData } from '../../model/UoModel';
@@ -27,6 +25,7 @@ type AutocompleteProps = {
   setUoResultHistory: (t: UoData | undefined) => void;
   setAooResultHistory: (t: AooData | undefined) => void;
   externalInstitutionId: string;
+  institutionType?: InstitutionType;
 };
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
@@ -48,6 +47,7 @@ export function Autocomplete({
   setUoResultHistory,
   setAooResultHistory,
   externalInstitutionId,
+  institutionType,
 }: AutocompleteProps) {
   const [options, setOptions] = useState<Array<InstitutionResource>>([]);
   const [cfResult, setCfResult] = useState<InstitutionResource>();
@@ -94,6 +94,7 @@ export function Autocomplete({
               setUoResultHistory={setUoResultHistory}
               setAooResultHistory={setAooResultHistory}
               product={product}
+              institutionType={institutionType}
             />
           </Grid>
         )}
@@ -125,6 +126,7 @@ export function Autocomplete({
           setUoResultHistory={setUoResultHistory}
           setAooResultHistory={setAooResultHistory}
           externalInstitutionId={externalInstitutionId}
+          institutionType={institutionType}
         />
       </Grid>
     </Paper>

@@ -326,6 +326,7 @@ export function StepSearchParty({
             setUoResultHistory={setUoResultHistory}
             setAooResultHistory={setAooResultHistory}
             externalInstitutionId={externalInstitutionId}
+            institutionType={institutionType}
           />
         </Grid>
       </Grid>
