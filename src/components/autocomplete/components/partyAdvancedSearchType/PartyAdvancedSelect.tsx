@@ -89,8 +89,8 @@ export default function PartyAdvancedSelect({
     }
   }, []);
 
-  const filteredByProductsAndType =
-    product && product.id === 'prod-interop' && institutionType !== 'SA';
+  const filteredByProducts = product && product.id === 'prod-interop';
+  const isSA = institutionType === 'SA';
 
   return (
     <FormControl fullWidth size="small">
@@ -111,7 +111,7 @@ export default function PartyAdvancedSelect({
           {t('partyAdvancedSelect.businessName')}
         </MenuItem>
 
-        {filteredByProductsAndType && (
+        {!isSA && (
           // TODO Temporary hide until search by CF API is avaible of "SA"
           <MenuItem
             id="taxCode"
@@ -122,7 +122,7 @@ export default function PartyAdvancedSelect({
             {t('partyAdvancedSelect.taxCode')}
           </MenuItem>
         )}
-        {ENV.AOO_UO.SHOW_AOO_UO && filteredByProductsAndType && (
+        {ENV.AOO_UO.SHOW_AOO_UO && filteredByProducts && !isSA && (
           <MenuItem
             id="aooCode"
             data-testid="aooCode"
@@ -132,7 +132,7 @@ export default function PartyAdvancedSelect({
             {t('partyAdvancedSelect.aooCode')}
           </MenuItem>
         )}
-        {ENV.AOO_UO.SHOW_AOO_UO && filteredByProductsAndType && (
+        {ENV.AOO_UO.SHOW_AOO_UO && filteredByProducts && !isSA && (
           <MenuItem
             id="uoCode"
             data-testid="uoCode"
