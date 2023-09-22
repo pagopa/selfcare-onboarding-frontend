@@ -1,25 +1,24 @@
-import { Grid, Link, Typography, useTheme, Alert } from '@mui/material';
+import { Alert, Grid, Link, Typography, useTheme } from '@mui/material';
 import { Box } from '@mui/system';
-import { useContext, useEffect, useState } from 'react';
 import { AxiosError, AxiosResponse } from 'axios';
-import { useTranslation, Trans } from 'react-i18next';
-import { ReactElement } from 'react';
+import { ReactElement, useContext, useEffect, useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import {
-  InstitutionType,
   IPACatalogParty,
+  InstitutionType,
   Party,
   Product,
   StepperStepComponentProps,
 } from '../../../types';
-import { Autocomplete } from '../autocomplete/Autocomplete';
-import { getFetchOutcome } from '../../lib/error-utils';
 import { fetchWithLogs } from '../../lib/api-utils';
 import { UserContext } from '../../lib/context';
-import { OnboardingStepActions } from '../OnboardingStepActions';
-import { useHistoryState } from '../useHistoryState';
-import { LoadingOverlay } from '../LoadingOverlay';
+import { getFetchOutcome } from '../../lib/error-utils';
 import { AooData } from '../../model/AooData';
 import { UoData } from '../../model/UoModel';
+import { LoadingOverlay } from '../LoadingOverlay';
+import { OnboardingStepActions } from '../OnboardingStepActions';
+import { Autocomplete } from '../autocomplete/Autocomplete';
+import { useHistoryState } from '../useHistoryState';
 
 type Props = {
   subTitle: string | ReactElement;
@@ -248,9 +247,17 @@ export function StepSearchParty({
       <Grid container item justifyContent="center" mt={1}>
         <Grid item xs={12}>
           <Typography variant="body1" align="center" color={theme.palette.text.primary}>
-            {selected
-              ? `Prosegui con l’adesione a ${product?.title} per l’ente selezionato`
-              : subTitle}
+            {selected ? (
+              `Prosegui con l’adesione a ${product?.title} per l’ente selezionato`
+            ) : institutionType === 'SA' ? (
+              <Trans i18nKey="onboardingStep1.onboarding.saSubTitle">
+                Se sei tra i gestori privati di piattaforma e-procurement e hai <br /> già chiesto
+                la certificazione ad AgID, inserisci uno dei dati <br /> richiesti e cerca l’ente
+                per cui vuoi richiedere l’adesione a <br /> Interoperabilità.
+              </Trans>
+            ) : (
+              subTitle
+            )}
           </Typography>
         </Grid>
       </Grid>
@@ -326,43 +333,44 @@ export function StepSearchParty({
             setUoResultHistory={setUoResultHistory}
             setAooResultHistory={setAooResultHistory}
             externalInstitutionId={externalInstitutionId}
+            institutionType={institutionType}
           />
         </Grid>
       </Grid>
-
-      <Grid container item justifyContent="center">
-        <Grid item xs={6}>
-          <Box
-            sx={{
-              fontSize: '14px',
-              lineHeight: '24px',
-              textAlign: 'center',
-            }}
-          >
-            <Typography
+      {institutionType !== 'SA' && (
+        <Grid container item justifyContent="center">
+          <Grid item xs={6}>
+            <Box
               sx={{
+                fontSize: '14px',
+                lineHeight: '24px',
                 textAlign: 'center',
               }}
-              variant="caption"
-              color={theme.palette.text.primary}
             >
-              <Trans i18nKey="onboardingStep1.onboarding.ipaDescription">
-                Non trovi il tuo ente nell&apos;IPA? In
-                <Link
-                  sx={{ textDecoration: 'none', color: theme.palette.primary.main }}
-                  href="https://indicepa.gov.it/ipa-portale/servizi-enti/accreditamento-ente"
-                >
-                  questa pagina
-                </Link>
-                trovi maggiori
-                <br />
-                informazioni sull&apos;indice e su come accreditarsi
-              </Trans>
-            </Typography>
-          </Box>
+              <Typography
+                sx={{
+                  textAlign: 'center',
+                }}
+                variant="caption"
+                color={theme.palette.text.primary}
+              >
+                <Trans i18nKey="onboardingStep1.onboarding.ipaDescription">
+                  Non trovi il tuo ente nell&apos;IPA? In
+                  <Link
+                    sx={{ textDecoration: 'none', color: theme.palette.primary.main }}
+                    href="https://indicepa.gov.it/ipa-portale/servizi-enti/accreditamento-ente"
+                  >
+                    questa pagina
+                  </Link>
+                  trovi maggiori
+                  <br />
+                  informazioni sull&apos;indice e su come accreditarsi
+                </Trans>
+              </Typography>
+            </Box>
+          </Grid>
         </Grid>
-      </Grid>
-
+      )}
       <Grid item mt={4}>
         <OnboardingStepActions
           back={
