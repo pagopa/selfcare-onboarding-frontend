@@ -510,6 +510,8 @@ export default {
         commercialRegisterNumber: 'Luogo di iscrizione al Registro delle Imprese (facoltativo)',
         rea: 'REA',
         shareCapital: 'Capitale sociale (facoltativo)',
+        requiredCommercialRegisterNumber: 'Luogo di iscrizione al Registro delle Imprese',
+        requiredShareCapital: 'Capitale sociale',
       },
       assistanceContact: {
         supportEmail: 'Indirizzo email visibile ai cittadini',
