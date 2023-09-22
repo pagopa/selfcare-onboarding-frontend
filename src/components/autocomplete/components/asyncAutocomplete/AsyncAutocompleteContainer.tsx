@@ -2,11 +2,9 @@ import { AxiosError, AxiosResponse } from 'axios';
 import debounce from 'lodash/debounce';
 import { Dispatch, SetStateAction, useContext, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-
 import { Grid, Theme, Typography } from '@mui/material';
 import { Box } from '@mui/system';
-
-import { Endpoint, Product } from '../../../../../types';
+import { Endpoint, InstitutionType, Product } from '../../../../../types';
 import { ReactComponent as PartyIcon } from '../../../../assets/onboarding_party_icon.svg';
 import { fetchWithLogs } from '../../../../lib/api-utils';
 import { UserContext } from '../../../../lib/context';
@@ -47,6 +45,7 @@ type Props = {
   aooResult?: AooData;
   uoResult?: UoData;
   externalInstitutionId: string;
+  institutionType?: InstitutionType;
 };
 
 // TODO: handle cognitive-complexity
@@ -78,6 +77,7 @@ export default function AsyncAutocompleteContainer({
   setUoResultHistory,
   setAooResultHistory,
   externalInstitutionId,
+  institutionType,
 }: Props) {
   const { setRequiredLogin } = useContext(UserContext);
   const { t } = useTranslation();
@@ -102,7 +102,6 @@ export default function AsyncAutocompleteContainer({
           limit: ENV.MAX_INSTITUTIONS_FETCH,
           page: 1,
           search: query,
-          ...(prodPn && { categories: 'L6,L4,L45' }),
         },
       },
       () => setRequiredLogin(true)
@@ -188,13 +187,42 @@ export default function AsyncAutocompleteContainer({
     setIsLoading(false);
   };
 
+  const handleSearchSAByBusinessName = async (query: string) => {
+    const searchResponse = await fetchWithLogs(
+      { endpoint: 'ONBOARDING_GET_SA_PARTIES_NAME' },
+      {
+        method: 'GET',
+        params: {
+          limit: ENV.MAX_INSTITUTIONS_FETCH,
+          page: 1,
+          search: query,
+          ...(prodPn && { categories: 'L6,L4,L45' }),
+        },
+      },
+      () => setRequiredLogin(true)
+    );
+    const outcome = getFetchOutcome(searchResponse);
+
+    if (outcome === 'success') {
+      setOptions(transformFn((searchResponse as AxiosResponse).data));
+    } else if ((searchResponse as AxiosError).response?.status === 404) {
+      setOptions([]);
+    }
+    setIsLoading(false);
+  };
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   const handleChange = (event: any) => {
     const value = event.target.value as string;
     setInput(value);
+
     if (value !== '') {
       setSelected(null);
       if (value.length >= 3 && isBusinessNameSelected && !isTaxCodeSelected) {
-        void debounce(handleSearchByBusinessName, 100)(value);
+        if (institutionType !== 'SA') {
+          void debounce(handleSearchByBusinessName, 100)(value);
+        } else {
+          void debounce(handleSearchSAByBusinessName, 100)(value);
+        }
       } else if (isTaxCodeSelected && value.length === 11) {
         void handleSearchByTaxCode(value);
       } else if (isAooCodeSelected && !isUoCodeSelected && value.length === 7) {

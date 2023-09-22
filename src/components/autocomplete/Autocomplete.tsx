@@ -1,7 +1,5 @@
-import React, { Dispatch, SetStateAction, useState } from 'react';
-
 import { Grid, Paper, Theme } from '@mui/material';
-
+import React, { Dispatch, SetStateAction, useState } from 'react';
 import { Endpoint, InstitutionType, Product } from '../../../types';
 import { AooData } from '../../model/AooData';
 import { InstitutionResource } from '../../model/InstitutionResource';
@@ -128,6 +126,7 @@ export function Autocomplete({
           setUoResultHistory={setUoResultHistory}
           setAooResultHistory={setAooResultHistory}
           externalInstitutionId={externalInstitutionId}
+          institutionType={institutionType}
         />
       </Grid>
     </Paper>
