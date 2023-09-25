@@ -298,6 +298,9 @@ export default function StepOnboardingFormData({
                 'onboardingFormData.billingDataSection.pspDataSection.invalidCommercialRegisterNumber'
               )
             : undefined,
+
+        businessRegisterPlace: isSa && !values.businessRegisterPlace ? requiredError : undefined,
+
         registrationInRegister: isPSP && !values.registrationInRegister ? requiredError : undefined,
         dpoAddress: isPSP && !values.dpoAddress ? requiredError : undefined,
         registerNumber:
@@ -342,9 +345,11 @@ export default function StepOnboardingFormData({
             ? t('onboardingFormData.billingDataSection.invalidReaField')
             : undefined,
         shareCapital:
-          values.shareCapital &&
-          !currencyField.test(values.shareCapital) &&
-          t('onboardingFormData.billingDataSection.invalidShareCapitalField'),
+          isSa && !values.shareCapital
+            ? requiredError
+            : values.shareCapital && !currencyField.test(values.shareCapital)
+            ? t('onboardingFormData.billingDataSection.invalidShareCapitalField')
+            : undefined,
         supportEmail:
           !institutionAvoidGeotax && !values.supportEmail && !premiumFlow && isProdIoSign
             ? requiredError
