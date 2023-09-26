@@ -86,10 +86,11 @@ export default function StepOnboardingFormData({
 }: Props) {
   const requiredError = 'Required';
 
-  const institutionAvoidGeotax = 'PT';
+  const institutionAvoidGeotax = ['PT', 'SA'].includes(institutionType);
 
   const premiumFlow = !!subProductId;
   const isPSP = institutionType === 'PSP';
+  const isSa = institutionType === 'SA';
   const isInformationCompany =
     institutionType !== 'PA' &&
     institutionType !== 'PSP' &&
@@ -182,7 +183,7 @@ export default function StepOnboardingFormData({
       ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY &&
       previousGeotaxononomies &&
       previousGeotaxononomies.length > 0 &&
-      institutionType !== institutionAvoidGeotax
+      !institutionAvoidGeotax
     ) {
       const changedNational2Local =
         previousGeotaxononomies.some((rv) => rv?.code === nationalValue) &&
@@ -297,6 +298,9 @@ export default function StepOnboardingFormData({
                 'onboardingFormData.billingDataSection.pspDataSection.invalidCommercialRegisterNumber'
               )
             : undefined,
+
+        businessRegisterPlace: isSa && !values.businessRegisterPlace ? requiredError : undefined,
+
         registrationInRegister: isPSP && !values.registrationInRegister ? requiredError : undefined,
         dpoAddress: isPSP && !values.dpoAddress ? requiredError : undefined,
         registerNumber:
@@ -323,10 +327,10 @@ export default function StepOnboardingFormData({
             : isPSP && values.dpoPecAddress && !mailPECRegexp.test(values.dpoPecAddress)
             ? t('onboardingFormData.billingDataSection.invalidEmail')
             : undefined,
-        recipientCode: !values.recipientCode ? requiredError : undefined,
+        recipientCode: !isSa && !values.recipientCode ? requiredError : undefined,
         geographicTaxonomies:
           ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY &&
-          institutionType !== institutionAvoidGeotax &&
+          !institutionAvoidGeotax &&
           (!values.geographicTaxonomies ||
             values.geographicTaxonomies.length === 0 ||
             values.geographicTaxonomies.some(
@@ -341,14 +345,13 @@ export default function StepOnboardingFormData({
             ? t('onboardingFormData.billingDataSection.invalidReaField')
             : undefined,
         shareCapital:
-          values.shareCapital &&
-          !currencyField.test(values.shareCapital) &&
-          t('onboardingFormData.billingDataSection.invalidShareCapitalField'),
+          isSa && !values.shareCapital
+            ? requiredError
+            : values.shareCapital && !currencyField.test(values.shareCapital)
+            ? t('onboardingFormData.billingDataSection.invalidShareCapitalField')
+            : undefined,
         supportEmail:
-          institutionType !== institutionAvoidGeotax &&
-          !values.supportEmail &&
-          !premiumFlow &&
-          isProdIoSign
+          !institutionAvoidGeotax && !values.supportEmail && !premiumFlow && isProdIoSign
             ? requiredError
             : !mailPECRegexp.test(values.supportEmail as string) && values.supportEmail
             ? t('onboardingFormData.billingDataSection.invalidMailSupport')
@@ -494,7 +497,7 @@ export default function StepOnboardingFormData({
           institutionAvoidGeotax={institutionAvoidGeotax}
         />
         {/* DATI RELATIVI ALLA TASSONOMIA */}
-        {ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY && institutionType !== institutionAvoidGeotax ? (
+        {ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY && !institutionAvoidGeotax ? (
           <Grid item xs={12} display="flex" justifyContent={'center'}>
             <GeoTaxonomySection
               retrievedTaxonomies={previousGeotaxononomies}
