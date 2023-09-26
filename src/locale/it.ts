@@ -19,7 +19,7 @@ export default {
   partyAdvancedSelect: {
     advancedSearchLabel: 'Cerca per',
     businessName: 'Ragione Sociale',
-    taxCode: 'Codice Fiscale dell’ente',
+    taxCode: 'Codice Fiscale ente',
     aooCode: 'Codice univoco AOO',
     uoCode: 'Codice univoco UO',
   },

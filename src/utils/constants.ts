@@ -104,6 +104,9 @@ export const API = {
   ONBOARDING_GET_SA_PARTIES_NAME: {
     URL: ENV.URL_API.PARTY_REGISTRY_PROXY + '/pdnd',
   },
+  ONBOARDING_GET_SA_PARTY_FROM_FC: {
+    URL: ENV.URL_API.PARTY_REGISTRY_PROXY + '/station/{{id}}',
+  }
 };
 
 export const USER_ROLE_LABEL = {

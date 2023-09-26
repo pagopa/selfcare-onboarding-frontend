@@ -217,7 +217,7 @@ export type ANACParty = {
   anacEngaged?: boolean;
 };
 
-export type PDNDResource = {
+export type StationResource = {
   count: number;
   items: Array<ANACParty>;
 };

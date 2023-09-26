@@ -1,6 +1,6 @@
 import { Grid, Paper, Theme } from '@mui/material';
 import React, { Dispatch, SetStateAction, useState } from 'react';
-import { Endpoint, InstitutionType, Product } from '../../../types';
+import { ANACParty, Endpoint, InstitutionType, Product } from '../../../types';
 import { AooData } from '../../model/AooData';
 import { InstitutionResource } from '../../model/InstitutionResource';
 import { UoData } from '../../model/UoModel';
@@ -50,7 +50,7 @@ export function Autocomplete({
   institutionType,
 }: AutocompleteProps) {
   const [options, setOptions] = useState<Array<InstitutionResource>>([]);
-  const [cfResult, setCfResult] = useState<InstitutionResource>();
+  const [cfResult, setCfResult] = useState<InstitutionResource | ANACParty>();
 
   const [isBusinessNameSelected, setIsBusinessNameSelected] = useState<boolean>(true);
   const [isAooCodeSelected, setIsAooCodeSelected] = useState<boolean>(false);
