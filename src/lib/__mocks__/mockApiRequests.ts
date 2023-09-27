@@ -2,7 +2,7 @@ import { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 import {
   Endpoint,
   InstitutionOnboardingInfoResource,
-  PDNDResource,
+  StationResource,
   Product,
   SelfcareParty,
   UserOnCreate,
@@ -414,7 +414,7 @@ const mockedProducts: Array<Product> = [
   },
 ];
 
-const mockedPDNDResource: PDNDResource = {
+const mockedStationResource: StationResource = {
   count: 0,
   items: [
     {
@@ -436,6 +436,16 @@ const mockedPDNDResource: PDNDResource = {
       taxCode: '22245678913',
     },
   ],
+};
+
+const mockedANACParty = {
+  anacEnabled: false,
+  anacEngaged: false,
+  description: 'description',
+  digitalAddress: 'email@example.com',
+  id: 'id2',
+  originId: 'string',
+  taxCode: '12345678911',
 };
 
 const mockedResponseError = {
@@ -603,7 +613,13 @@ export async function mockFetch(
 
   if (endpoint === 'ONBOARDING_GET_SA_PARTIES_NAME') {
     return new Promise((resolve) =>
-      resolve({ data: mockedPDNDResource, status: 200, statusText: '200' } as AxiosResponse)
+      resolve({ data: mockedStationResource, status: 200, statusText: '200' } as AxiosResponse)
+    );
+  }
+
+  if (endpoint === 'ONBOARDING_GET_SA_PARTY_FROM_FC') {
+    return new Promise((resolve) =>
+      resolve({ data: mockedANACParty, status: 200, statusText: '200' } as AxiosResponse)
     );
   }
 

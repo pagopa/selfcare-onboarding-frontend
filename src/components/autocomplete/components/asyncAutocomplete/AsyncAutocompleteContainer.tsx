@@ -1,10 +1,10 @@
+import { Grid, Theme, Typography } from '@mui/material';
+import { Box } from '@mui/system';
 import { AxiosError, AxiosResponse } from 'axios';
 import debounce from 'lodash/debounce';
 import { Dispatch, SetStateAction, useContext, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Grid, Theme, Typography } from '@mui/material';
-import { Box } from '@mui/system';
-import { Endpoint, InstitutionType, Product } from '../../../../../types';
+import { ANACParty, Endpoint, InstitutionType, Product } from '../../../../../types';
 import { ReactComponent as PartyIcon } from '../../../../assets/onboarding_party_icon.svg';
 import { fetchWithLogs } from '../../../../lib/api-utils';
 import { UserContext } from '../../../../lib/context';
@@ -33,8 +33,8 @@ type Props = {
   theme: Theme;
   options: Array<any>;
   isSearchFieldSelected: boolean;
-  setCfResult: React.Dispatch<React.SetStateAction<InstitutionResource | undefined>>;
-  cfResult?: InstitutionResource;
+  setCfResult: React.Dispatch<React.SetStateAction<InstitutionResource | ANACParty | undefined>>;
+  cfResult?: InstitutionResource | ANACParty;
   product?: Product | null;
   isAooCodeSelected: boolean;
   isUoCodeSelected: boolean;
@@ -196,7 +196,6 @@ export default function AsyncAutocompleteContainer({
           limit: ENV.MAX_INSTITUTIONS_FETCH,
           page: 1,
           search: query,
-          ...(prodPn && { categories: 'L6,L4,L45' }),
         },
       },
       () => setRequiredLogin(true)
@@ -208,6 +207,28 @@ export default function AsyncAutocompleteContainer({
     } else if ((searchResponse as AxiosError).response?.status === 404) {
       setOptions([]);
     }
+    setIsLoading(false);
+  };
+
+  const handleSearchSaByTaxCode = async (query: string) => {
+    setIsLoading(true);
+
+    const searchResponse = await fetchWithLogs(
+      { endpoint: 'ONBOARDING_GET_SA_PARTY_FROM_FC', endpointParams: { id: query } },
+      {
+        method: 'GET',
+      },
+      () => setRequiredLogin(true)
+    );
+
+    const outcome = getFetchOutcome(searchResponse);
+
+    if (outcome === 'success') {
+      setCfResult((searchResponse as AxiosResponse).data);
+    } else if ((searchResponse as AxiosError).response?.status === 404) {
+      setCfResult(undefined);
+    }
+
     setIsLoading(false);
   };
   // eslint-disable-next-line sonarjs/cognitive-complexity
@@ -224,7 +245,11 @@ export default function AsyncAutocompleteContainer({
           void debounce(handleSearchSAByBusinessName, 100)(value);
         }
       } else if (isTaxCodeSelected && value.length === 11) {
-        void handleSearchByTaxCode(value);
+        if (institutionType !== 'SA') {
+          void handleSearchByTaxCode(value);
+        } else {
+          void handleSearchSaByTaxCode(value);
+        }
       } else if (isAooCodeSelected && !isUoCodeSelected && value.length === 7) {
         void handleSearchByAooCode(value);
       } else if (isUoCodeSelected && !isAooCodeSelected && value.length === 6) {

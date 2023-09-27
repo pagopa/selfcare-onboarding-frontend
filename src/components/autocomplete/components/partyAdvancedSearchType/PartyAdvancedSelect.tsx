@@ -1,11 +1,11 @@
+import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
+import { SelectChangeEvent } from '@mui/material/Select';
 import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { SelectChangeEvent } from '@mui/material/Select';
-import { FormControl, InputLabel, Select, MenuItem } from '@mui/material';
-import { InstitutionResource } from '../../../../model/InstitutionResource';
+import { ANACParty, InstitutionType, Product } from '../../../../../types';
 import { AooData } from '../../../../model/AooData';
+import { InstitutionResource } from '../../../../model/InstitutionResource';
 import { UoData } from '../../../../model/UoModel';
-import { InstitutionType, Product } from '../../../../../types';
 import { ENV } from '../../../../utils/env';
 
 type Props = {
@@ -17,7 +17,7 @@ type Props = {
   setIsAooCodeSelected: React.Dispatch<React.SetStateAction<boolean>>;
   setIsUoCodeSelected: React.Dispatch<React.SetStateAction<boolean>>;
   selected: boolean;
-  setCfResult: React.Dispatch<React.SetStateAction<InstitutionResource | undefined>>;
+  setCfResult: React.Dispatch<React.SetStateAction<InstitutionResource | ANACParty | undefined>>;
   setAooResult: Dispatch<SetStateAction<AooData | undefined>>;
   setUoResult: Dispatch<SetStateAction<UoData | undefined>>;
   setUoResultHistory: (t: UoData | undefined) => void;
@@ -92,6 +92,23 @@ export default function PartyAdvancedSelect({
   const filteredByProducts = product && product.id === 'prod-interop';
   const isSA = institutionType === 'SA';
 
+  const menuItems = [
+    {
+      id: 'aooCode',
+      ['data-testid']: 'aooCode',
+      value: 'aooCode',
+      onClick: () => onSelectValue(false, false, true, false),
+      label: t('partyAdvancedSelect.aooCode'),
+    },
+    {
+      id: 'uoCode',
+      ['data-testid']: 'uoCode',
+      value: 'uoCode',
+      onClick: () => onSelectValue(false, false, false, true),
+      label: t('partyAdvancedSelect.uoCode'),
+    },
+  ];
+
   return (
     <FormControl fullWidth size="small">
       <InputLabel id="advancedSearch">{t('partyAdvancedSelect.advancedSearchLabel')}</InputLabel>
@@ -110,42 +127,29 @@ export default function PartyAdvancedSelect({
         >
           {t('partyAdvancedSelect.businessName')}
         </MenuItem>
+        <MenuItem
+          id="taxCode"
+          data-testid="taxCode"
+          value={'taxCode'}
+          onClick={() => onSelectValue(false, true, false, false)}
+        >
+          {t('partyAdvancedSelect.taxCode')}
+        </MenuItem>
 
-        {!isSA && (
-          <>
-            {/* TODO Temporary hide until search by CF API is available for "SA" */}
+        {ENV.AOO_UO.SHOW_AOO_UO &&
+          filteredByProducts &&
+          !isSA &&
+          menuItems.map((item) => (
             <MenuItem
-              id="taxCode"
-              data-testid="taxCode"
-              value={'taxCode'}
-              onClick={() => onSelectValue(false, true, false, false)}
+              key={item.id}
+              id={item.id}
+              data-testid={item['data-testid']}
+              value={item.value}
+              onClick={item.onClick}
             >
-              {t('partyAdvancedSelect.taxCode')}
+              {item.label}
             </MenuItem>
-
-            {ENV.AOO_UO.SHOW_AOO_UO && filteredByProducts && (
-              <>
-                <MenuItem
-                  id="aooCode"
-                  data-testid="aooCode"
-                  value={'aooCode'}
-                  onClick={() => onSelectValue(false, false, true, false)}
-                >
-                  {t('partyAdvancedSelect.aooCode')}
-                </MenuItem>
-
-                <MenuItem
-                  id="uoCode"
-                  data-testid="uoCode"
-                  value={'uoCode'}
-                  onClick={() => onSelectValue(false, false, false, true)}
-                >
-                  {t('partyAdvancedSelect.uoCode')}
-                </MenuItem>
-              </>
-            )}
-          </>
-        )}
+          ))}
       </Select>
     </FormControl>
   );
