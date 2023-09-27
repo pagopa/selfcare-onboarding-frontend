@@ -205,4 +205,19 @@ export type InstitutionOnboardingInfoResource = {
   institution: InstitutionData;
 };
 
-export type InstitutionType = 'PA' | 'GSP' | 'SCP' | 'PT' | 'PSP';
+export type InstitutionType = 'PA' | 'GSP' | 'SCP' | 'PT' | 'PSP' | 'SA';
+
+export type ANACParty = {
+  description: string;
+  digitalAddress: string;
+  id: string;
+  originId: string;
+  taxCode: string;
+  anacEnabled?: boolean;
+  anacEngaged?: boolean;
+};
+
+export type StationResource = {
+  count: number;
+  items: Array<ANACParty>;
+};

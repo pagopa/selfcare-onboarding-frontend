@@ -4,6 +4,7 @@ import { PartyAccountItemButton } from '@pagopa/mui-italia/dist/components/Party
 import { AooData } from '../../../../../model/AooData';
 import { InstitutionResource } from '../../../../../model/InstitutionResource';
 import { UoData } from '../../../../../model/UoModel';
+import { ANACParty } from '../../../../../../types';
 
 const CustomBox = styled(Box)({
   /* width */
@@ -32,8 +33,8 @@ type Props = {
   isLoading: boolean;
   getOptionLabel: (option: any) => string;
   getOptionKey: (option: any) => string;
-  cfResult?: InstitutionResource;
-  setCfResult: React.Dispatch<React.SetStateAction<InstitutionResource | undefined>>;
+  cfResult?: InstitutionResource | ANACParty;
+  setCfResult: React.Dispatch<React.SetStateAction<InstitutionResource | ANACParty | undefined>>;
   uoResult?: UoData;
   aooResult?: AooData;
   isTaxCodeSelected?: boolean;
