@@ -237,8 +237,6 @@ function OnboardingComponent({ productId }: { productId: string }) {
         ? aooResult?.codiceFiscaleEnte
         : uoResult
         ? uoResult.codiceFiscaleEnte
-        : institutionType === 'SA'
-        ? party.taxCode
         : party.externalId
     );
     setOrigin(party.origin);
