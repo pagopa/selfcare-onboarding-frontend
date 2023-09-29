@@ -43,6 +43,7 @@ export function BodyLogger() {
         <Header
           withSecondHeader={subHeaderVisible}
           onExit={onExit}
+          enableAssistanceButton={ENV.ENV !== 'UAT'}
           assistanceEmail={ENV.ASSISTANCE.ENABLE ? ENV.ASSISTANCE.EMAIL : undefined}
           enableLogin={enableLogin}
           loggedUser={
