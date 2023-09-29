@@ -179,25 +179,23 @@ test('test billingData without Support Mail', async () => {
   await executeStepBillingDataWithoutSupportMail();
 });
 
-test('test advanvced search business name', async () => {
+test('test advanced search business name', async () => {
   renderComponent('prod-interop');
   await executeStepInstitutionType('prod-interop');
   await executeAdvancedSearchForBusinessName('AGENCY X');
 });
 
-ENV.AOO_UO.SHOW_AOO_UO &&
-  test.skip('test advanvced search aoo name with product pn', async () => {
-    renderComponent('prod-pn');
-    await executeStepInstitutionType('prod-pn');
-    await executeAdvancedSearchForAoo();
-  });
+test('test advanced search aoo name with product interop', async () => {
+  renderComponent('prod-interop');
+  await executeStepInstitutionType('prod-interop');
+  await executeAdvancedSearchForAoo();
+});
 
-ENV.AOO_UO.SHOW_AOO_UO &&
-  test.skip('test advanvced search uo name with product pn', async () => {
-    renderComponent('prod-pn');
-    await executeStepInstitutionType('prod-pn');
-    await executeAdvancedSearchForUo();
-  });
+test('test advanced search uo name with product pn', async () => {
+  renderComponent('prod-interop');
+  await executeStepInstitutionType('prod-interop');
+  await executeAdvancedSearchForUo();
+});
 
 test('test label recipientCode only for institutionType is not PA', async () => {
   renderComponent('prod-io-sign');
@@ -322,6 +320,8 @@ const executeStep1 = async (partyName: string) => {
         limit: ENV.MAX_INSTITUTIONS_FETCH,
         page: 1,
         search: 'XXX',
+        categories:
+          'C17,C16,L10,L19,L13,L2,C10,L20,L21,L22,L15,L1,C13,C5,L40,L11,L39,L46,L8,L34,L7,L35,L45,L47,L6,L12,L24,L28,L42,L36,L44,C8,C3,C7,C14,L16,C11,L33,C12,L43,C2,L38,C1,L5,L4,L31,L18,L17,S01,SA',
       },
     },
     expect.any(Function)
