@@ -102,9 +102,9 @@ export default function AsyncAutocompleteContainer({
           limit: ENV.MAX_INSTITUTIONS_FETCH,
           page: 1,
           search: query,
-          categories:
-            institutionType === 'PA' &&
-            'C17,C16,L10,L19,L13,L2,C10,L20,L21,L22,L15,L1,C13,C5,L40,L11,L39,L46,L8,L34,L7,L35,L45,L47,L6,L12,L24,L28,L42,L36,L44,C8,C3,C7,C14,L16,C11,L33,C12,L43,C2,L38,C1,L5,L4,L31,L18,L17,S01,SA',
+          categories: prodPn
+            ? 'L6,L4,L45'
+            : 'C17,C16,L10,L19,L13,L2,C10,L20,L21,L22,L15,L1,C13,C5,L40,L11,L39,L46,L8,L34,L7,L35,L45,L47,L6,L12,L24,L28,L42,L36,L44,C8,C3,C7,C14,L16,C11,L33,C12,L43,C2,L38,C1,L5,L4,L31,L18,L17,S01,SA',
         },
       },
       () => setRequiredLogin(true)
@@ -129,7 +129,10 @@ export default function AsyncAutocompleteContainer({
       {
         method: 'GET',
         params: {
-          ...(prodPn && { categories: 'L6,L4,L45', origin: 'IPA' }),
+          origin: 'IPA',
+          categories: prodPn
+            ? 'L6,L4,L45'
+            : 'C17,C16,L10,L19,L13,L2,C10,L20,L21,L22,L15,L1,C13,C5,L40,L11,L39,L46,L8,L34,L7,L35,L45,L47,L6,L12,L24,L28,L42,L36,L44,C8,C3,C7,C14,L16,C11,L33,C12,L43,C2,L38,C1,L5,L4,L31,L18,L17,S01,SA',
         },
       },
       () => setRequiredLogin(true)
