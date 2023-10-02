@@ -106,7 +106,7 @@ export const API = {
   },
   ONBOARDING_GET_SA_PARTY_FROM_FC: {
     URL: ENV.URL_API.PARTY_REGISTRY_PROXY + '/stations/{{id}}',
-  }
+  },
 };
 
 export const USER_ROLE_LABEL = {
