@@ -89,7 +89,8 @@ export default function PartyAdvancedSelect({
     }
   }, []);
 
-  const filteredByProducts = product && product.id === 'prod-interop';
+  const filteredByProducts =
+    product && (product.id === 'prod-interop' || product.id === 'prod-io-sign');
   const isSA = institutionType === 'SA';
 
   const menuItems = [
