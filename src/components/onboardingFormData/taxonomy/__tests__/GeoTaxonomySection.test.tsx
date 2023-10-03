@@ -4,33 +4,6 @@ import { nationalValue } from '../../../../model/GeographicTaxonomies';
 import { renderComponentWithProviders } from '../../../../utils/test-utils';
 import GeoTaxonomySection from '../GeoTaxonomySection';
 
-const oldWindowLocation = global.window.location;
-const initialLocation = {
-  assign: jest.fn(),
-  pathname: '',
-  origin: 'MOCKED_ORIGIN',
-  search: '?pricingPlan=FA',
-  hash: '',
-  state: undefined,
-};
-const mockedLocation = Object.assign({}, initialLocation);
-
-beforeAll(() => {
-  Object.defineProperty(window, 'location', { value: mockedLocation });
-});
-afterAll(() => {
-  Object.defineProperty(window, 'location', { value: oldWindowLocation });
-});
-
-beforeEach(() => Object.assign(mockedLocation, initialLocation));
-
-jest.mock('react-router-dom', () => ({
-  useHistory: () => ({
-    location: mockedLocation,
-    replace: (nextLocation) => Object.assign(mockedLocation, nextLocation),
-  }),
-}));
-
 const mockedNationalGeoTaxonomy = [
   {
     code: nationalValue,
@@ -68,18 +41,6 @@ const mockedNationalGeoTaxonomy = [
     endDate: null,
     enable: true,
   },
-  {
-    code: '015456',
-    desc: 'Milazzo - Comune',
-    region: '08',
-    province: '016',
-    provinceAbbreviation: 'GE',
-    country: '100',
-    countryAbbreviation: 'IT',
-    startDate: '1861-03-18',
-    endDate: null,
-    enable: true,
-  },
 ];
 
 const mockedNonNationalGeoTaxonomy = [
@@ -96,36 +57,12 @@ const mockedNonNationalGeoTaxonomy = [
     enable: true,
   },
   {
-    code: '015146',
+    code: '015143',
     desc: 'Milano - Comune',
     region: '03',
     province: '015',
     provinceAbbreviation: 'MI',
     country: 'ITA',
-    countryAbbreviation: 'IT',
-    startDate: '1861-03-18',
-    endDate: null,
-    enable: true,
-  },
-  {
-    code: '015456',
-    desc: 'Napoli - Comune',
-    region: '08',
-    province: '018',
-    provinceAbbreviation: 'NA',
-    country: '100',
-    countryAbbreviation: 'IT',
-    startDate: '1861-03-18',
-    endDate: null,
-    enable: true,
-  },
-  {
-    code: '015456',
-    desc: 'Milazzo - Comune',
-    region: '08',
-    province: '016',
-    provinceAbbreviation: 'GE',
-    country: '100',
     countryAbbreviation: 'IT',
     startDate: '1861-03-18',
     endDate: null,
