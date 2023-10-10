@@ -113,8 +113,6 @@ test('should render PersonalAndBillingDataSection with institutionType PA. Codic
     />
   );
 
-  screen.debug(undefined, 999999);
-
   const codiceSDI = await screen.findByText(
     'È il codice necessario per ricevere le fatture elettroniche'
   );

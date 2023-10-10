@@ -7,7 +7,7 @@ import { HeaderContext, UserContext } from './../lib/context';
 import { ENV } from './env';
 
 export const renderComponentWithProviders = (
-  component: React.ReactElement,
+  component: React.ReactElement | React.ReactNode,
   productId: string = 'prod-pn',
   injectedHistory?: ReturnType<typeof createMemoryHistory>
 ) => {
