@@ -378,6 +378,12 @@ const mockedProducts: Array<Product> = [
     status: statusActive,
   },
   {
+    id: 'prod-io-premium',
+    title: 'App IO Premium',
+    parentId: 'prod-io',
+    status: statusActive,
+  },
+  {
     id: 'prod-io-sign',
     title: 'Firma con IO',
     status: statusTesting, // Use case for not allowed onboarding
