@@ -91,6 +91,7 @@ export default function StepOnboardingFormData({
   const premiumFlow = !!subProductId;
   const isPSP = institutionType === 'PSP';
   const isSa = institutionType === 'SA';
+  const isTechPartner = institutionType === 'PT';
   const isInformationCompany =
     institutionType !== 'PA' &&
     institutionType !== 'PSP' &&
@@ -327,7 +328,7 @@ export default function StepOnboardingFormData({
             : isPSP && values.dpoPecAddress && !mailPECRegexp.test(values.dpoPecAddress)
             ? t('onboardingFormData.billingDataSection.invalidEmail')
             : undefined,
-        recipientCode: !isSa && !values.recipientCode ? requiredError : undefined,
+        recipientCode: !isSa && !isTechPartner && !values.recipientCode ? requiredError : undefined,
         geographicTaxonomies:
           ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY &&
           !institutionAvoidGeotax &&
