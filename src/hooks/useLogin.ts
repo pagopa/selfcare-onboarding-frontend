@@ -1,15 +1,16 @@
 import { useContext } from 'react';
 import isEmpty from 'lodash/isEmpty';
 import { storageTokenOps, storageUserOps } from '@pagopa/selfcare-common-frontend/utils/storage';
-import { MOCK_USER } from '../utils/constants';
 import { ENV } from '../utils/env';
 import { UserContext } from '../lib/context';
 
 const testToken =
-  'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Imp3dF84Njo3NDoxZTozNTphZTphNjpkODo0YjpkYzplOTpmYzo4ZTphMDozNTo2ODpiNSJ9.eyJlbWFpbCI6ImZ1cmlvdml0YWxlQG1hcnRpbm8uaXQiLCJmYW1pbHlfbmFtZSI6IlNhcnRvcmkiLCJmaXNjYWxfbnVtYmVyIjoiU1JUTkxNMDlUMDZHNjM1UyIsIm5hbWUiOiJBbnNlbG1vIiwiZnJvbV9hYSI6ZmFsc2UsInVpZCI6IjUwOTZlNGM2LTI1YTEtNDVkNS05YmRmLTJmYjk3NGE3YzFjOCIsImxldmVsIjoiTDIiLCJpYXQiOjE2NzQ4MTQxODAsImF1ZCI6ImFwaS5kZXYuc2VsZmNhcmUucGFnb3BhLml0IiwiaXNzIjoiU1BJRCIsImp0aSI6IjAxR1FTQjhLSDNCSks4QkFTRDE4MlZKSDhEIn0.JOfxEC3o8Wor0l430Fq68mWVl4h-NUpFlFuSf6Xgxmu-wqeQyUjRKIfl3M9J0H_8ihxyNMEu5u3PqqQBubGx1mjy24uEsoRPFdLQxlGnpMAM-15SFv8ShDWvMaTSz8hO6vCRJxUtNQgX7SplIG7ZlBBSt7ihwioW1CsKWFISuG0tHwe797NWwaMJlRnzW3R7BIrsGU1eJeue2QqYUnKXZIwYQh21E3EssCNFrusATEuJT_opGaTMzSHpUZxI6cCG2pOE8Cmm0Z75Q2HAM2eoi1_Mx8llZvuk1oVhgDGsACpNRb9Vyxt6jAPUEh3DlkGpLqS8AUD1vRQydzNifiSb4A';
+  'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Imp3dF82ZDplNTphNDo4NToyYjplMDpjYjplYToyZDo5Yzo1MjoxMjpmZTphNTpmMjo2MCJ9.eyJlbWFpbCI6ImJlbmVkZXR0YS5kZWx2ZWNjaGlvQG50dGRhdGEuY29tIiwiZmFtaWx5X25hbWUiOiJEZWx2ZWNjaGlvIiwiZmlzY2FsX251bWJlciI6IkRMVkJEVDkyQTQxRjIwNUMiLCJuYW1lIjoiQmVuZWRldHRhIiwiZnJvbV9hYSI6ZmFsc2UsInVpZCI6ImQ3Y2FlZjhhLTZiYmUtNGY5My1iMWI4LTkzNGE4OGEyMmIxNyIsImxldmVsIjoiTDIiLCJpYXQiOjE2OTY5NDQ4MzQsImV4cCI6MTY5Njk3NzIzNCwiYXVkIjoiYXBpLmRldi5zZWxmY2FyZS5wYWdvcGEuaXQiLCJpc3MiOiJTUElEIiwianRpIjoiXzM0OTkzOGZlNWM3Njg5ZGFiNGRiIn0.bynNihmyuz_E1siKts-28XSQejX2x8M4qKNHZU78I3vOszS1xjbyUp5oBTvD4ccLgL4ATHPUhdyrvBrVveULUM-VeoalRegfk9lDjWJNtiTMa_jqB0-HPOAi0QXivJj4MZmkFaNMyDbY_Ognxak6t_g41f4eTUq_BhA-9L1iWlu7BZL-NC6RECWPzBG4E93iVReZLw9IqHPm9cfvme0sF-Xl0h0kbkJdd2O68Gm0zOljI5v00HJavs1OxiiCI7BesJYEQ8uo-Grcn5waKexdm9Ok3VpXvWP8C-1EWjCt3so7qkdpeEq99P1lgsui0jkoEbWGd0z2-aMbhkGjPK0qZg';
 
 export const useLogin = () => {
   const { setUser } = useContext(UserContext);
+
+  const mock = false;
 
   // This happens when the user does a hard refresh when logged in
   // Instead of losing the user, we attempt at logging it back in
@@ -17,7 +18,7 @@ export const useLogin = () => {
   // WARNING: this is not secure and will ultimately be rewritten
   // See PIN-403
   const attemptSilentLogin = async () => {
-    if (MOCK_USER) {
+    if (mock) {
       setUser({
         uid: '0',
         taxCode: 'LGGLGD80A01B354S',

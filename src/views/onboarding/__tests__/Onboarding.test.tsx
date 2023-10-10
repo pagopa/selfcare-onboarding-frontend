@@ -760,7 +760,7 @@ const executeStep2 = async () => {
   await waitFor(() => screen.getByText(step3Title));
 };
 
-const executeStep3 = async (expectedSuccessfulSubmit: boolean, isPt = false) => {
+const executeStep3 = async (expectedSuccessfulSubmit: boolean, isTechPartner = false) => {
   console.log('Testing step 3');
 
   await waitFor(() => screen.getByText(step3Title));
@@ -796,7 +796,7 @@ const executeStep3 = async (expectedSuccessfulSubmit: boolean, isPt = false) => 
   await waitFor(() =>
     screen.getByText(
       expectedSuccessfulSubmit
-        ? !isPt
+        ? !isTechPartner
           ? completeSuccessTitle
           : completeSuccessTitleForPt
         : completeErrorTitle
