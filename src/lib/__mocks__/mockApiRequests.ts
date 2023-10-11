@@ -1,3 +1,4 @@
+import { UserRole } from '@pagopa/selfcare-common-frontend/utils/constants';
 import { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 import {
   Endpoint,
@@ -12,8 +13,16 @@ import { nationalValue } from '../../model/GeographicTaxonomies';
 import { UoData } from '../../model/UoModel';
 import { AooData } from './../../model/AooData';
 
-const ipaOrigin = 'IPA';
-const adminUserRole = 'ADMIN';
+const commonMockPartyRegistry = {
+  origin: 'IPA',
+  category: 'c7',
+  address: 'sede legale',
+};
+
+const commonParties = {
+  userRole: 'ADMIN' as UserRole,
+  origin: 'IPA',
+};
 
 const mockPartyRegistry = {
   items: [
@@ -25,14 +34,12 @@ const mockPartyRegistry = {
       taxCode: '00000000000',
       zipCode: '44332',
       administrationCode: '00000000000',
-      category: 'c7',
       managerName: 'Mario',
       managerSurname: 'Rossi',
       description: 'AGENCY X',
       digitalAddress: 'mail@pec.mail.org',
-      origin: ipaOrigin,
       originId: 'originId1',
-      address: 'sede legale1',
+      ...commonMockPartyRegistry,
     },
     {
       id: 'error',
@@ -42,14 +49,12 @@ const mockPartyRegistry = {
       taxCode: '11111111111',
       zipCode: '01345',
       administrationCode: '11111111111',
-      category: 'c7',
       managerName: 'Mario:ERROR',
       managerSurname: 'Rossi_ERROR',
       description: 'AGENCY ERROR',
       digitalAddress: 'mail_ERROR_@pec.mail.org',
-      origin: ipaOrigin,
       originId: 'originId2',
-      address: 'sede legale2',
+      ...commonMockPartyRegistry,
     },
     {
       id: 'onboarded',
@@ -59,14 +64,12 @@ const mockPartyRegistry = {
       taxCode: '22222222222',
       zipCode: '12345',
       administrationCode: '22222222222',
-      category: 'c7',
       managerName: 'Mario_ONBOARDED',
       managerSurname: 'Rossi_ONBOARDED',
       description: 'AGENCY ONBOARDED',
       digitalAddress: 'mail_ONBOARDED_@pec.mail.org',
-      origin: ipaOrigin,
       originId: 'originId3',
-      address: 'sede legale3',
+      ...commonMockPartyRegistry,
     },
     {
       id: 'pending',
@@ -76,14 +79,12 @@ const mockPartyRegistry = {
       taxCode: '33333333333',
       zipCode: '54321',
       administrationCode: '33333333333',
-      category: 'c7',
       managerName: 'Mario_PENDING',
       managerSurname: 'Rossi_PENDING',
       description: 'AGENCY PENDING',
       digitalAddress: 'mail_PENDING_@pec.mail.org',
-      origin: ipaOrigin,
       originId: 'originId4',
-      address: 'sede legale4',
+      ...commonMockPartyRegistry,
     },
     {
       id: 'infoError',
@@ -93,14 +94,12 @@ const mockPartyRegistry = {
       taxCode: '99999999999',
       zipCode: '12122',
       administrationCode: '99999999999',
-      category: 'c7',
       managerName: 'Mario_INFOERROR',
       managerSurname: 'Rossi_INFOERROR',
       description: 'AGENCY INFO ERROR',
       digitalAddress: 'mail_INFOERROR_@pec.mail.org',
-      origin: ipaOrigin,
       originId: 'originId5',
-      address: 'sede legale5',
+      ...commonMockPartyRegistry,
     },
     {
       id: 'notAllowed',
@@ -110,14 +109,12 @@ const mockPartyRegistry = {
       taxCode: '44444444444',
       zipCode: '070889',
       administrationCode: '44444444444',
-      category: 'c7',
       managerName: 'Mario_NOTALLOWED',
       managerSurname: 'Rossi_NOTALLOWED',
       description: 'Not Allowed',
       digitalAddress: 'mail_NOTALLOWED_@pec.mail.org',
-      origin: ipaOrigin,
       originId: 'originId6',
-      address: 'sede legale6',
+      ...commonMockPartyRegistry,
     },
     {
       id: 'notAllowedInSubmit',
@@ -127,14 +124,12 @@ const mockPartyRegistry = {
       taxCode: '44444444444',
       zipCode: '07089',
       administrationCode: '44444444444',
-      category: 'c7',
       managerName: 'Maria_NOTALLOWED',
       managerSurname: 'Rossa_NOTALLOWED',
       description: 'Not Allowed Error on Submit',
       digitalAddress: 'mail_NOTALLOWEDINSUBMIT_@pec.mail.org',
-      origin: ipaOrigin,
       originId: 'originId7',
-      address: 'sede legale7',
+      ...commonMockPartyRegistry,
     },
     // use case added for easily test new feature about taxCode equal to vatCode
     {
@@ -145,14 +140,14 @@ const mockPartyRegistry = {
       taxCode: '98765432123',
       zipCode: '44382',
       administrationCode: '98765432123',
-      category: 'c432',
       managerName: 'Ugo',
       managerSurname: 'Diaz',
       description: 'AGENCY NOT IPA',
       digitalAddress: 'mail@pec.mail.org',
-      origin: 'IPAIPA', // origin not IPA for fields editability
       originId: 'originId1',
-      address: 'sede legale',
+      origin: 'IPAIPA',
+      category: 'c17',
+      address: 'mockaddress',
     },
   ],
   count: 8,
@@ -226,8 +221,7 @@ const mockedParties: Array<SelfcareParty> = [
     digitalAddress: 'a@aa.com',
     taxCode: '33344455567',
     zipCode: '22345',
-    origin: ipaOrigin,
-    userRole: adminUserRole,
+    ...commonParties,
   },
   {
     externalId: 'externalId2',
@@ -239,8 +233,7 @@ const mockedParties: Array<SelfcareParty> = [
     digitalAddress: 'a@cd.com',
     taxCode: '11122233345',
     zipCode: '22395',
-    origin: ipaOrigin,
-    userRole: adminUserRole,
+    ...commonParties,
   },
   {
     externalId: 'externalId3',
@@ -252,7 +245,7 @@ const mockedParties: Array<SelfcareParty> = [
     digitalAddress: 'a@aa.com',
     taxCode: '33322268945',
     zipCode: '02102',
-    origin: ipaOrigin,
+    origin: 'IPA',
     userRole: 'LIMITED',
   },
   {
@@ -265,8 +258,7 @@ const mockedParties: Array<SelfcareParty> = [
     digitalAddress: 'b@bb.com',
     taxCode: '33445673210',
     zipCode: '00022',
-    origin: ipaOrigin,
-    userRole: adminUserRole,
+    ...commonParties,
   },
   {
     externalId: '33445673211',
@@ -278,8 +270,7 @@ const mockedParties: Array<SelfcareParty> = [
     digitalAddress: 'b@cc.com',
     taxCode: '33445673211',
     zipCode: '33344',
-    origin: ipaOrigin,
-    userRole: adminUserRole,
+    ...commonParties,
   },
   {
     externalId: 'onboarded_externalId',
@@ -291,7 +282,7 @@ const mockedParties: Array<SelfcareParty> = [
     digitalAddress: 'a@aa.com',
     taxCode: 'BBBBBB22B22B234K',
     zipCode: '12125',
-    origin: ipaOrigin,
+    origin: 'IPA',
     userRole: 'LIMITED',
   },
 ];
