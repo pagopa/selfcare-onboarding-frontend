@@ -97,7 +97,6 @@ const renderComponent = (
   render(<Component />);
 };
 
-const stepSelectInstitutionUnreleatedTitle = 'Seleziona il tuo ente';
 const stepSelectInstitutionReleatedTitle = 'Seleziona il tuo ente';
 const stepBillingDataTitle = 'Indica i dati del tuo ente';
 const stepAddManagerTitle = 'Indica il Legale Rappresentante';
@@ -144,27 +143,14 @@ test('test onboarding complete', async () => {
   await verifySubmitPostLegals();
 });
 
-// test.skip('test complete with error on submit', async () => {
-//   renderComponent('prod-io', 'prod-io-premium');
-//   await executeStepSelectPricingPlan();
-//   await executeStepSelectInstitutionUnreleated(agencyError);
-//   await executeStepBillingData();
-//   await executeStepAddManager(false);
-//   await executeClickHomeButton();
-// });
-
-// test('test exiting during flow with unload event', async () => {
-//   renderComponent('prod-io', 'prod-io-premium');
-//   await executeStepSelectPricingPlan();
-//   await executeStepSelectInstitutionUnreleated(agencyX);
-//   const event = new Event('beforeunload');
-//   window.dispatchEvent(event);
-//   await waitFor(
-//     () =>
-//       (event.returnValue as unknown as string) ===
-//       "Warning!\n\nNavigating away from this page will delete your text if you haven't already saved it."
-//   );
-// });
+test('test complete with error on submit', async () => {
+  renderComponent('prod-io', 'prod-io-premium');
+  await executeStepSelectPricingPlan();
+  await executeStepSelectInstitution('Comune di Udine');
+  await executeStepBillingData();
+  await executeStepAddManager(false);
+  await executeClickHomeButton();
+});
 
 test('test complete with error on submit', async () => {
   renderComponent('prod-io', 'prod-io-premium');
