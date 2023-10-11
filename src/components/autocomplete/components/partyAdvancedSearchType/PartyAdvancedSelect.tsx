@@ -90,7 +90,10 @@ export default function PartyAdvancedSelect({
   }, []);
 
   const filteredByProducts =
-    product && (product.id === 'prod-interop' || product.id === 'prod-io-sign');
+    product &&
+    (product.id === 'prod-interop' ||
+      product.id === 'prod-io-sign' ||
+      product.id === 'prod-pn-dev');
   const isSA = institutionType === 'SA';
 
   const menuItems = [
