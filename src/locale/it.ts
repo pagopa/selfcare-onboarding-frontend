@@ -19,7 +19,7 @@ export default {
   partyAdvancedSelect: {
     advancedSearchLabel: 'Cerca per',
     businessName: 'Ragione Sociale',
-    taxCode: 'Codice Fiscale dell’ente',
+    taxCode: 'Codice Fiscale ente',
     aooCode: 'Codice univoco AOO',
     uoCode: 'Codice univoco UO',
   },
@@ -90,6 +90,8 @@ export default {
       bodyDescription:
         'Inserisci uno dei dati richiesti e cerca dall’Indice della Pubblica <1/> Amministrazione (IPA) l’ente per cui vuoi richiedere l’adesione a <3/>{{productTitle}}',
       ipaDescription: `Non trovi il tuo ente nell'IPA? In <1>questa pagina</1> trovi maggiori <3/> informazioni sull'indice e su come accreditarsi `,
+      saSubTitle:
+        'Se sei tra i gestori privati di piattaforma e-procurement e hai <1/>già chiesto la certificazione ad AgID, inserisci uno dei dati<3/> richiesti e cerca l’ente per cui vuoi richiedere l’adesione a<5/> Interoperabilità.',
       asyncAutocomplete: {
         placeholder: 'Cerca',
       },
@@ -447,6 +449,7 @@ export default {
       scp: 'Società a controllo pubblico',
       pt: 'Partner tecnologico',
       psp: 'Prestatori Servizi di Pagamento',
+      sa: 'Gestore privato di piattaforma e-procurement',
     },
     cadArticle2A: 'art. 2, comma 2, lettera A del CAD',
     cadArticle2B: 'art. 2, comma 2, lettera B del CAD',
@@ -507,6 +510,8 @@ export default {
         commercialRegisterNumber: 'Luogo di iscrizione al Registro delle Imprese (facoltativo)',
         rea: 'REA',
         shareCapital: 'Capitale sociale (facoltativo)',
+        requiredCommercialRegisterNumber: 'Luogo di iscrizione al Registro delle Imprese',
+        requiredShareCapital: 'Capitale sociale',
       },
       assistanceContact: {
         supportEmail: 'Indirizzo email visibile ai cittadini',

@@ -3,7 +3,7 @@ import { styled } from '@mui/system';
 import { useTranslation } from 'react-i18next';
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 import { Dispatch, SetStateAction, useEffect } from 'react';
-import { IPACatalogParty } from '../../../../../../types';
+import { ANACParty, IPACatalogParty } from '../../../../../../types';
 import { useHistoryState } from '../../../../useHistoryState';
 import { InstitutionResource } from '../../../../../model/InstitutionResource';
 import { AooData } from '../../../../../model/AooData';
@@ -41,7 +41,7 @@ type Props = {
   isUoCodeSelected?: boolean;
   isTaxCodeSelected?: boolean;
   isBusinessNameSelected?: boolean;
-  setCfResult: React.Dispatch<React.SetStateAction<InstitutionResource | undefined>>;
+  setCfResult: React.Dispatch<React.SetStateAction<InstitutionResource | ANACParty | undefined>>;
   setAooResult: React.Dispatch<React.SetStateAction<AooData | undefined>>;
   setUoResult: React.Dispatch<React.SetStateAction<UoData | undefined>>;
   externalInstitutionId: string;

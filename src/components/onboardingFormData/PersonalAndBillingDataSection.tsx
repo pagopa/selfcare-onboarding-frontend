@@ -38,10 +38,10 @@ type Props = StepperStepComponentProps & {
   isInformationCompany: boolean;
   aooSelected?: AooData;
   uoSelected?: UoData;
-  institutionAvoidGeotax: string;
+  institutionAvoidGeotax: boolean;
 };
 
-// eslint-disable-next-line sonarjs/cognitive-complexity
+// eslint-disable-next-line sonarjs/cognitive-complexity, complexity
 export default function PersonalAndBillingDataSection({
   institutionType,
   baseTextFieldProps,
@@ -60,6 +60,8 @@ export default function PersonalAndBillingDataSection({
   const isFromIPA = origin === 'IPA';
   const isPSP = institutionType === 'PSP';
   const isPA = institutionType === 'PA';
+  const isSA = institutionType === 'SA';
+  const isTechPartner = institutionType === 'PT';
   const isDisabled = premiumFlow || (isFromIPA && !isPA && !isPSP) || isPA;
   const requiredError = 'Required';
   const isAooUo = aooSelected || uoSelected;
@@ -184,7 +186,7 @@ export default function PersonalAndBillingDataSection({
                   400,
                   18
                 )}
-                disabled={isDisabled}
+                disabled={isDisabled || isSA}
               />
             </Grid>
           )}
@@ -223,7 +225,7 @@ export default function PersonalAndBillingDataSection({
                 400,
                 18
               )}
-              disabled={isDisabled}
+              disabled={isDisabled || isSA}
             />
           </Grid>
           {/* Codice fiscale */}
@@ -235,7 +237,7 @@ export default function PersonalAndBillingDataSection({
                 400,
                 18
               )}
-              disabled={isDisabled && !isAooUo}
+              disabled={(isDisabled && !isAooUo) || isSA}
             />
           </Grid>
           {/* Checkbox codice fiscale = P.IVA */}
@@ -298,41 +300,46 @@ export default function PersonalAndBillingDataSection({
                   </Typography>
                 </Box>
               )}
-              {/* Codice destinatario */}
-              <Grid item xs={12} mt={3}>
-                <CustomTextField
-                  {...baseTextFieldProps(
-                    'recipientCode',
-                    t('onboardingFormData.billingDataSection.sdiCode'),
-                    400,
-                    18
-                  )}
-                />
-                {/* descrizione destinatario */}
-                <Typography
-                  component={'span'}
-                  sx={{
-                    fontSize: '12px!important',
-                    fontWeight: 600,
-                    color: theme.palette.text.secondary,
-                  }}
-                >
-                  {t('onboardingFormData.billingDataSection.recipientCodeDescription')}
-                </Typography>
-              </Grid>
+              {!isSA && !isTechPartner && (
+                <Grid item xs={12} mt={3}>
+                  <CustomTextField
+                    {...baseTextFieldProps(
+                      'recipientCode',
+                      t('onboardingFormData.billingDataSection.sdiCode'),
+                      400,
+                      18
+                    )}
+                  />
+                  {/* Description for recipient code */}
+                  <Typography
+                    component={'span'}
+                    sx={{
+                      fontSize: '12px!important',
+                      fontWeight: 600,
+                      color: theme.palette.text.secondary,
+                    }}
+                  >
+                    {t('onboardingFormData.billingDataSection.recipientCodeDescription')}
+                  </Typography>
+                </Grid>
+              )}
             </Typography>
           </Grid>
           {/* institutionType !== 'PA' && institutionType !== 'PSP' && productId === 'prod-io'; */}
-          {isInformationCompany && (
+          {(isInformationCompany || isSA) && (
             <>
               <Grid item xs={12}>
                 {/* Luogo di iscrizione al Registro delle Imprese facoltativo per institution Type !== 'PA' e 'PSP */}
                 <CustomTextField
                   {...baseTextFieldProps(
                     'businessRegisterPlace',
-                    t(
-                      'onboardingFormData.billingDataSection.informationCompanies.commercialRegisterNumber'
-                    ),
+                    isSA
+                      ? t(
+                          'onboardingFormData.billingDataSection.informationCompanies.requiredCommercialRegisterNumber'
+                        )
+                      : t(
+                          'onboardingFormData.billingDataSection.informationCompanies.commercialRegisterNumber'
+                        ),
                     400,
                     18
                   )}
@@ -356,7 +363,13 @@ export default function PersonalAndBillingDataSection({
                   name={'shareCapital'}
                   {...baseTextFieldProps(
                     'shareCapital',
-                    t('onboardingFormData.billingDataSection.informationCompanies.shareCapital'),
+                    isSA
+                      ? t(
+                          'onboardingFormData.billingDataSection.informationCompanies.requiredShareCapital'
+                        )
+                      : t(
+                          'onboardingFormData.billingDataSection.informationCompanies.shareCapital'
+                        ),
                     400,
                     18
                   )}
@@ -429,7 +442,7 @@ export default function PersonalAndBillingDataSection({
             </>
           )}
           {/* indirizzo mail di supporto */}
-          {institutionType !== institutionAvoidGeotax && (
+          {!institutionAvoidGeotax && (
             <Grid item xs={12}>
               <CustomTextField
                 {...baseTextFieldProps(

@@ -2,6 +2,7 @@ import { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 import {
   Endpoint,
   InstitutionOnboardingInfoResource,
+  StationResource,
   Product,
   SelfcareParty,
   UserOnCreate,
@@ -413,6 +414,40 @@ const mockedProducts: Array<Product> = [
   },
 ];
 
+const mockedStationResource: StationResource = {
+  count: 0,
+  items: [
+    {
+      anacEnabled: false,
+      anacEngaged: false,
+      description: 'description',
+      digitalAddress: 'email@example.com',
+      id: 'id2',
+      originId: 'string',
+      taxCode: '12345678911',
+    },
+    {
+      anacEnabled: false,
+      anacEngaged: false,
+      description: 'description2',
+      digitalAddress: 'email2@example.com',
+      id: 'id2',
+      originId: 'originI2',
+      taxCode: '22245678913',
+    },
+  ],
+};
+
+const mockedANACParty = {
+  anacEnabled: false,
+  anacEngaged: false,
+  description: 'description',
+  digitalAddress: 'email@example.com',
+  id: 'id2',
+  originId: 'string',
+  taxCode: '12345678911',
+};
+
 const mockedResponseError = {
   detail: 'Request took too long to complete.',
   status: 503,
@@ -573,6 +608,18 @@ export async function mockFetch(
         isAxiosError: true,
         response: { data: '', status: 400, statusText: 'Bad Request' },
       } as AxiosError)
+    );
+  }
+
+  if (endpoint === 'ONBOARDING_GET_SA_PARTIES_NAME') {
+    return new Promise((resolve) =>
+      resolve({ data: mockedStationResource, status: 200, statusText: '200' } as AxiosResponse)
+    );
+  }
+
+  if (endpoint === 'ONBOARDING_GET_SA_PARTY_FROM_FC') {
+    return new Promise((resolve) =>
+      resolve({ data: mockedANACParty, status: 200, statusText: '200' } as AxiosResponse)
     );
   }
 

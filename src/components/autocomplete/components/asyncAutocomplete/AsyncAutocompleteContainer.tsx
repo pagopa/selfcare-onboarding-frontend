@@ -1,12 +1,10 @@
+import { Grid, Theme, Typography } from '@mui/material';
+import { Box } from '@mui/system';
 import { AxiosError, AxiosResponse } from 'axios';
 import debounce from 'lodash/debounce';
 import { Dispatch, SetStateAction, useContext, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-
-import { Grid, Theme, Typography } from '@mui/material';
-import { Box } from '@mui/system';
-
-import { Endpoint, Product } from '../../../../../types';
+import { ANACParty, Endpoint, InstitutionType, Product } from '../../../../../types';
 import { ReactComponent as PartyIcon } from '../../../../assets/onboarding_party_icon.svg';
 import { fetchWithLogs } from '../../../../lib/api-utils';
 import { UserContext } from '../../../../lib/context';
@@ -35,8 +33,8 @@ type Props = {
   theme: Theme;
   options: Array<any>;
   isSearchFieldSelected: boolean;
-  setCfResult: React.Dispatch<React.SetStateAction<InstitutionResource | undefined>>;
-  cfResult?: InstitutionResource;
+  setCfResult: React.Dispatch<React.SetStateAction<InstitutionResource | ANACParty | undefined>>;
+  cfResult?: InstitutionResource | ANACParty;
   product?: Product | null;
   isAooCodeSelected: boolean;
   isUoCodeSelected: boolean;
@@ -47,6 +45,7 @@ type Props = {
   aooResult?: AooData;
   uoResult?: UoData;
   externalInstitutionId: string;
+  institutionType?: InstitutionType;
 };
 
 // TODO: handle cognitive-complexity
@@ -78,6 +77,7 @@ export default function AsyncAutocompleteContainer({
   setUoResultHistory,
   setAooResultHistory,
   externalInstitutionId,
+  institutionType,
 }: Props) {
   const { setRequiredLogin } = useContext(UserContext);
   const { t } = useTranslation();
@@ -90,7 +90,14 @@ export default function AsyncAutocompleteContainer({
     optionLabel !== undefined ? (o) => o[optionLabel] : (o) => o.label ?? o;
 
   const showBusinessNameElement = input !== undefined && input.length >= 3;
-  const prodPn = product?.id === 'prod-pn';
+
+  const filterByCategory =
+    product?.id === 'prod-pn'
+      ? 'L6,L4,L45'
+      : institutionType === 'GSP'
+      ? 'L37,SAG'
+      : 'C17,C16,L10,L19,L13,L2,C10,L20,L21,L22,L15,L1,C13,C5,L40,L11,L39,L46,L8,L34,L7,L35,L45,L47,L6,L12,L24,L28,L42,L36,L44,C8,C3,C7,C14,L16,C11,L33,C12,L43,C2,L38,C1,L5,L4,L31,L18,L17,S01,SA';
+
   const handleSearchByBusinessName = async (query: string) => {
     setIsLoading(true);
 
@@ -102,7 +109,7 @@ export default function AsyncAutocompleteContainer({
           limit: ENV.MAX_INSTITUTIONS_FETCH,
           page: 1,
           search: query,
-          ...(prodPn && { categories: 'L6,L4,L45' }),
+          categories: filterByCategory,
         },
       },
       () => setRequiredLogin(true)
@@ -126,7 +133,10 @@ export default function AsyncAutocompleteContainer({
       { endpoint: 'ONBOARDING_GET_PARTY_FROM_CF', endpointParams: { id: query } },
       {
         method: 'GET',
-        params: { ...(prodPn && { categories: 'L6,L4,L45', origin: 'IPA' }) },
+        params: {
+          origin: 'IPA',
+          categories: filterByCategory,
+        },
       },
       () => setRequiredLogin(true)
     );
@@ -148,7 +158,10 @@ export default function AsyncAutocompleteContainer({
       { endpoint: 'ONBOARDING_GET_AOO_CODE_INFO', endpointParams: { codiceUniAoo: query } },
       {
         method: 'GET',
-        params: { ...(prodPn && { categories: 'L6,L4,L45', origin: 'IPA' }) },
+        params: {
+          origin: 'IPA',
+          categories: filterByCategory,
+        },
       },
       () => setRequiredLogin(true)
     );
@@ -171,7 +184,10 @@ export default function AsyncAutocompleteContainer({
       { endpoint: 'ONBOARDING_GET_UO_CODE_INFO', endpointParams: { codiceUniUo: query } },
       {
         method: 'GET',
-        params: { ...(prodPn && { categories: 'L6,L4,L45', origin: 'IPA' }) },
+        params: {
+          origin: 'IPA',
+          categories: filterByCategory,
+        },
       },
       () => setRequiredLogin(true)
     );
@@ -188,15 +204,69 @@ export default function AsyncAutocompleteContainer({
     setIsLoading(false);
   };
 
+  const handleSearchSAByBusinessName = async (query: string) => {
+    const searchResponse = await fetchWithLogs(
+      { endpoint: 'ONBOARDING_GET_SA_PARTIES_NAME' },
+      {
+        method: 'GET',
+        params: {
+          limit: ENV.MAX_INSTITUTIONS_FETCH,
+          page: 1,
+          search: query,
+        },
+      },
+      () => setRequiredLogin(true)
+    );
+    const outcome = getFetchOutcome(searchResponse);
+
+    if (outcome === 'success') {
+      setOptions(transformFn((searchResponse as AxiosResponse).data));
+    } else if ((searchResponse as AxiosError).response?.status === 404) {
+      setOptions([]);
+    }
+    setIsLoading(false);
+  };
+
+  const handleSearchSaByTaxCode = async (query: string) => {
+    setIsLoading(true);
+
+    const searchResponse = await fetchWithLogs(
+      { endpoint: 'ONBOARDING_GET_SA_PARTY_FROM_FC', endpointParams: { id: query } },
+      {
+        method: 'GET',
+      },
+      () => setRequiredLogin(true)
+    );
+
+    const outcome = getFetchOutcome(searchResponse);
+
+    if (outcome === 'success') {
+      setCfResult((searchResponse as AxiosResponse).data);
+    } else if ((searchResponse as AxiosError).response?.status === 404) {
+      setCfResult(undefined);
+    }
+
+    setIsLoading(false);
+  };
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   const handleChange = (event: any) => {
     const value = event.target.value as string;
     setInput(value);
+
     if (value !== '') {
       setSelected(null);
       if (value.length >= 3 && isBusinessNameSelected && !isTaxCodeSelected) {
-        void debounce(handleSearchByBusinessName, 100)(value);
+        if (institutionType !== 'SA') {
+          void debounce(handleSearchByBusinessName, 100)(value);
+        } else {
+          void debounce(handleSearchSAByBusinessName, 100)(value);
+        }
       } else if (isTaxCodeSelected && value.length === 11) {
-        void handleSearchByTaxCode(value);
+        if (institutionType !== 'SA') {
+          void handleSearchByTaxCode(value);
+        } else {
+          void handleSearchSaByTaxCode(value);
+        }
       } else if (isAooCodeSelected && !isUoCodeSelected && value.length === 7) {
         void handleSearchByAooCode(value);
       } else if (isUoCodeSelected && !isAooCodeSelected && value.length === 6) {
