@@ -36,6 +36,9 @@ variables:
     react_app_url_fe_landing: '$(UAT_REACT_APP_URL_FE_LANDING)'
     react_app_url_fe_assistance: '$(UAT_REACT_APP_URL_FE_ASSISTANCE)'
 
+    react_app_url_privacy_disclaimer: '$(UAT_REACT_APP_URL_PRIVACY_DISCLAIMER)'
+    react_app_url_terms_and_conditions: '$(UAT_REACT_APP_URL_TERMS_AND_CONDITIONS)'
+
     react_app_url_api_onboarding: '$(UAT_REACT_APP_URL_API_ONBOARDING)'
     react_app_url_api_party_registry_proxy: '$(UAT_REACT_APP_URL_API_PARTY_REGISTRY_PROXY)'
 
@@ -55,8 +58,6 @@ variables:
 
     react_app_enable_pt: '$(UAT_PT_ENABLED)'
 
-    react_app_banner_enabled: '$(UAT_REACT_APP_BANNER_ENABLED)'
-
   ${{ elseif eq(variables['Build.SourceBranch'], 'refs/heads/main') }}:
     environment: 'PROD'
     azure_subscription: $(PROD_AZURE_SUBSCRIPTION)
@@ -71,6 +72,9 @@ variables:
     react_app_url_fe_dashboard: '$(PROD_REACT_APP_URL_FE_DASHBOARD)'
     react_app_url_fe_landing: '$(PROD_REACT_APP_URL_FE_LANDING)'
     react_app_url_fe_assistance: '$(PROD_REACT_APP_URL_FE_ASSISTANCE)'
+
+    react_app_url_privacy_disclaimer: '$(PROD_REACT_APP_URL_PRIVACY_DISCLAIMER)'
+    react_app_url_terms_and_conditions: '$(PROD_REACT_APP_URL_TERMS_AND_CONDITIONS)'
 
     react_app_url_api_onboarding: '$(PROD_REACT_APP_URL_API_ONBOARDING)'
     react_app_url_api_party_registry_proxy: '$(PROD_REACT_APP_URL_API_PARTY_REGISTRY_PROXY)'
@@ -91,8 +95,6 @@ variables:
 
     react_app_enable_pt: '$(PROD_PT_ENABLED)'
 
-    react_app_banner_enabled: '$(PROD_REACT_APP_BANNER_ENABLED)'
-
   # every branch different from past will be considered as DEV
   #  ${{ if startsWith(variables['Build.SourceBranch'], 'refs/heads/release-dev') }}:
   ${{ else }}:
@@ -110,6 +112,9 @@ variables:
     react_app_url_fe_landing: '$(DEV_REACT_APP_URL_FE_LANDING)'
     react_app_url_fe_assistance: '$(DEV_REACT_APP_URL_FE_ASSISTANCE)'
 
+    react_app_url_privacy_disclaimer: '$(DEV_REACT_APP_URL_PRIVACY_DISCLAIMER)'
+    react_app_url_terms_and_conditions: '$(DEV_REACT_APP_URL_TERMS_AND_CONDITIONS)'
+
     react_app_url_api_onboarding: '$(DEV_REACT_APP_URL_API_ONBOARDING)'
     react_app_url_api_party_registry_proxy: '$(DEV_REACT_APP_URL_API_PARTY_REGISTRY_PROXY)'
 
@@ -126,8 +131,6 @@ variables:
     react_app_onetrust_domain_id: '$(DEV_ONETRUST_DOMAIN_ID)'
 
     react_app_enable_aoo_uo: '$(DEV_AOO_UO_ENABLED)'
-
-    react_app_banner_enabled: '$(DEV_REACT_APP_BANNER_ENABLED)'
 
     react_app_enable_pt: '$(DEV_PT_ENABLED)'
 
@@ -213,6 +216,9 @@ stages:
               REACT_APP_URL_FE_LANDING: '$(react_app_url_fe_landing)'
               REACT_APP_URL_FE_ASSISTANCE: '$(react_app_url_fe_assistance)'
 
+              REACT_APP_URL_PRIVACY_DISCLAIMER: '$(react_app_url_privacy_disclaimer)'
+              REACT_APP_URL_TERMS_AND_CONDITIONS: '$(react_app_url_terms_and_conditions)'
+
               REACT_APP_URL_API_ONBOARDING: '$(react_app_url_api_onboarding)'
               REACT_APP_URL_API_PARTY_REGISTRY_PROXY: '$(react_app_url_api_party_registry_proxy)'
               REACT_APP_URL_GEOTAXONOMY: '$(react_app_url_api_geotaxonomy)'
@@ -232,7 +238,6 @@ stages:
 
               REACT_APP_ENABLE_PT: '$(react_app_enable_pt)'
 
-              REACT_APP_BANNER_ENABLE: '$(react_app_banner_enabled)'
           - bash: |
               printf "$EXECUTION_ID\n$(git name-rev --name-only FETCH_HEAD) $(git rev-parse HEAD)" > $(System.DefaultWorkingDirectory)/build/build.info
             env:
