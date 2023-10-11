@@ -32,7 +32,7 @@ const mockPartyRegistry = {
       digitalAddress: 'mail@pec.mail.org',
       origin: ipaOrigin,
       originId: 'originId1',
-      address: 'sede legale',
+      address: 'sede legale1',
     },
     {
       id: 'error',
@@ -49,7 +49,7 @@ const mockPartyRegistry = {
       digitalAddress: 'mail_ERROR_@pec.mail.org',
       origin: ipaOrigin,
       originId: 'originId2',
-      address: 'sede legale',
+      address: 'sede legale2',
     },
     {
       id: 'onboarded',
@@ -66,7 +66,7 @@ const mockPartyRegistry = {
       digitalAddress: 'mail_ONBOARDED_@pec.mail.org',
       origin: ipaOrigin,
       originId: 'originId3',
-      address: 'sede legale',
+      address: 'sede legale3',
     },
     {
       id: 'pending',
@@ -83,7 +83,7 @@ const mockPartyRegistry = {
       digitalAddress: 'mail_PENDING_@pec.mail.org',
       origin: ipaOrigin,
       originId: 'originId4',
-      address: 'sede legale',
+      address: 'sede legale4',
     },
     {
       id: 'infoError',
@@ -100,7 +100,7 @@ const mockPartyRegistry = {
       digitalAddress: 'mail_INFOERROR_@pec.mail.org',
       origin: ipaOrigin,
       originId: 'originId5',
-      address: 'sede legale',
+      address: 'sede legale5',
     },
     {
       id: 'notAllowed',
@@ -117,7 +117,7 @@ const mockPartyRegistry = {
       digitalAddress: 'mail_NOTALLOWED_@pec.mail.org',
       origin: ipaOrigin,
       originId: 'originId6',
-      address: 'sede legale',
+      address: 'sede legale6',
     },
     {
       id: 'notAllowedInSubmit',
@@ -134,7 +134,7 @@ const mockPartyRegistry = {
       digitalAddress: 'mail_NOTALLOWEDINSUBMIT_@pec.mail.org',
       origin: ipaOrigin,
       originId: 'originId7',
-      address: 'sede legale',
+      address: 'sede legale7',
     },
     // use case added for easily test new feature about taxCode equal to vatCode
     {
