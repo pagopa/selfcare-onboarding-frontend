@@ -605,7 +605,18 @@ export async function mockFetch(
           );
         }
     }
-
+    // Use case introduced for test already subscribed premium
+    if (
+      endpointParams.productId === 'prod-io-premium' &&
+      endpointParams.externalInstitutionId === 'externalId3'
+    ) {
+      return new Promise((resolve) =>
+        resolve({
+          status: 200,
+          statusText: 'No content',
+        } as AxiosResponse)
+      );
+    }
     if (selectedProductInTesting) {
       return notAllowedError;
     }
@@ -699,6 +710,7 @@ export async function mockFetch(
   if (endpoint === 'ONBOARDING_POST_LEGALS') {
     switch (mockedOnboardingData1.institution.billingData.taxCode) {
       case 'error':
+      case '11122233345':
         return genericError;
       case 'notAllowedInSubmit':
         return notAllowedError;
