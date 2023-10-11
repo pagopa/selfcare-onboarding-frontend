@@ -412,6 +412,11 @@ const mockedProducts: Array<Product> = [
     title: 'Fideiussioni',
     status: statusActive,
   },
+  {
+    id: 'prod-pn-dev',
+    title: 'SEND-DEV',
+    status: statusActive,
+  },
 ];
 
 const mockedStationResource: StationResource = {
