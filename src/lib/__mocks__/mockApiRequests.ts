@@ -7,6 +7,7 @@ import {
   SelfcareParty,
   UserOnCreate,
 } from '../../../types';
+import { BillingDataDto } from '../../model/BillingData';
 import { nationalValue } from '../../model/GeographicTaxonomies';
 import { UoData } from '../../model/UoModel';
 import { AooData } from './../../model/AooData';
@@ -248,7 +249,7 @@ const mockedUoCode: UoData = {
 
 const mockedParties: Array<SelfcareParty> = [
   {
-    externalId: 'externalId1',
+    externalId: '33445673222',
     originId: 'originId1',
     id: 'partyId1',
     description: 'Comune di Milano',
@@ -256,7 +257,7 @@ const mockedParties: Array<SelfcareParty> = [
     address: 'address',
     digitalAddress: 'a@aa.com',
     taxCode: '33344455567',
-    zipCode: 'zipCode',
+    zipCode: '22345',
     origin: 'IPA',
     userRole: 'ADMIN',
   },
@@ -269,7 +270,7 @@ const mockedParties: Array<SelfcareParty> = [
     address: 'address',
     digitalAddress: 'a@aa.com',
     taxCode: '11122233345',
-    zipCode: 'zipCode',
+    zipCode: '22345',
     origin: 'IPA',
     userRole: 'ADMIN',
   },
@@ -277,8 +278,7 @@ const mockedParties: Array<SelfcareParty> = [
     externalId: 'externalId3',
     originId: 'originId3',
     id: 'partyId3',
-    description:
-      'Commissario straordinario per la realizzazione di approdi temporanei e di interventi complementari per la salvaguardia di Venezia e della sua laguna e ulteriori interventi per la salvaguardia della laguna di Venezia',
+    description: 'Comune di Venezia',
     urlLogo: 'logo',
     address: 'address',
     digitalAddress: 'a@aa.com',
@@ -286,6 +286,32 @@ const mockedParties: Array<SelfcareParty> = [
     zipCode: '02102',
     origin: 'IPA',
     userRole: 'LIMITED',
+  },
+  {
+    externalId: 'externalId4',
+    originId: 'originId4',
+    id: 'partyId4',
+    description: 'Comune di Gessate',
+    urlLogo: 'logo',
+    address: 'address4',
+    digitalAddress: 'b@bb.com',
+    taxCode: '33445673210',
+    zipCode: '00022',
+    origin: 'IPA',
+    userRole: 'ADMIN',
+  },
+  {
+    externalId: '33445673211',
+    originId: 'originId5',
+    id: 'partyId5',
+    description: 'Comune di Udine',
+    urlLogo: 'logo',
+    address: 'address5',
+    digitalAddress: 'b@cc.com',
+    taxCode: '33445673211',
+    zipCode: '33344',
+    origin: 'IPA',
+    userRole: 'ADMIN',
   },
   {
     externalId: 'onboarded_externalId',
@@ -302,61 +328,93 @@ const mockedParties: Array<SelfcareParty> = [
   },
 ];
 
-const mockedOnboardingData0: InstitutionOnboardingInfoResource = {
-  institution: {
-    id: '55897f04-bafd-4bc9-b646-0fd027620c1b',
-    billingData: {
-      businessName: 'Comune di Milano',
-      registeredOffice: 'Milano, Piazza Colonna 370',
-      zipCode: '20021',
-      digitalAddress: 'comune.milano@pec.it',
-      taxCode: 'AAAAAA11A11A123K',
-      vatNumber: 'AAAAAA11A11A123K',
-      recipientCode: 'M5UXCR1',
-      geographicTaxonomies: [
-        {
-          code: '058091',
-          desc: 'Firenze - Comune',
-        },
-      ],
-      supportEmail: 'comune.bollate@pec.it',
-    },
-    institutionType: 'PA',
-    origin: 'IPA',
-  },
-};
-
-const mockedOnboardingData1: InstitutionOnboardingInfoResource = {
-  institution: {
-    id: '370c63d8-1b76-4376-a725-4caf2a73822a',
-    billingData: {
-      businessName: 'Comune di Bollate',
-      registeredOffice: 'Bollate, Piazza Colonna 370',
-      zipCode: '20021',
-      digitalAddress: 'comune.bollate@pec.it',
-      taxCode: 'BBBBBB11A11A123K',
-      vatNumber: '12345678901',
-      recipientCode: 'M2UHYR1',
-      geographicTaxonomies: [
-        {
-          code: '058091',
-          desc: 'Firenze - Comune',
-        },
-      ],
-      supportEmail: 'comune.bollate@pec.it',
-    },
-    institutionType: 'PA',
-    origin: 'IPA',
-    assistanceContacts: {
-      supportEmail: 'a@a.it',
-    },
-    companyInformations: {
-      businessRegisterPlace: 'register Place test',
-      rea: 'RM-123456',
-      shareCapital: '123456',
+const mockedOnboardingData: Array<InstitutionOnboardingInfoResource> = [
+  {
+    institution: {
+      id: '55897f04-bafd-4bc9-b646-0fd027620c1b',
+      billingData: {
+        businessName: 'Comune di Milano',
+        registeredOffice: 'Milano, Piazza Colonna 370',
+        zipCode: '20021',
+        digitalAddress: 'comune.milano@pec.it',
+        taxCode: '33445673222',
+        vatNumber: '33445673221',
+        recipientCode: 'M5UXCR1',
+        geographicTaxonomies: [
+          {
+            code: '058091',
+            desc: 'Firenze - Comune',
+          },
+        ],
+        supportEmail: 'comune.bollate@pec.it',
+      },
+      institutionType: 'PA',
+      origin: 'IPA',
     },
   },
-};
+  {
+    institution: {
+      id: '999c63d8-554d-4376-233s-4caf2a73822a',
+      billingData: {
+        businessName: 'Comune di Udine',
+        registeredOffice: 'Udine, Piazza Colonna 370',
+        zipCode: '21200',
+        digitalAddress: 'comune.udine@pectest.it',
+        taxCode: '33445673211',
+        vatNumber: '33445673211',
+        recipientCode: 'M2UHYR1',
+        geographicTaxonomies: [
+          {
+            code: '058091',
+            desc: 'Udine - Comune',
+          },
+        ],
+        supportEmail: 'comune.udine@pec.it',
+      },
+      institutionType: 'PA',
+      origin: 'IPA',
+      assistanceContacts: {
+        supportEmail: 'supportemail@mockmail.it',
+      },
+      companyInformations: {
+        businessRegisterPlace: 'register Place test',
+        rea: 'RM-654321',
+        shareCapital: '23456',
+      },
+    },
+  },
+  {
+    institution: {
+      id: '370c63d8-1b76-4376-a725-4caf2a73822a',
+      billingData: {
+        businessName: 'Comune di Bollate',
+        registeredOffice: 'Bollate, Piazza Colonna 370',
+        zipCode: '20021',
+        digitalAddress: 'comune.bollate@pec.it',
+        taxCode: 'BBBBBB11A11A123K',
+        vatNumber: '12345678901',
+        recipientCode: 'M2UHYR1',
+        geographicTaxonomies: [
+          {
+            code: '058091',
+            desc: 'Firenze - Comune',
+          },
+        ],
+        supportEmail: 'comune.bollate@pec.it',
+      },
+      institutionType: 'PA',
+      origin: 'IPA',
+      assistanceContacts: {
+        supportEmail: 'a@a.it',
+      },
+      companyInformations: {
+        businessRegisterPlace: 'register Place test',
+        rea: 'RM-123456',
+        shareCapital: '123456',
+      },
+    },
+  },
+];
 
 const statusActive = 'ACTIVE';
 const statusTesting = 'TESTING';
@@ -460,7 +518,14 @@ const mockedResponseError = {
   title: 'Service Unavailable',
 };
 
-const notFoundError: Promise<AxiosError> = new Promise((resolve) =>
+const noContent: Promise<AxiosResponse> = new Promise((resolve) =>
+  resolve({
+    status: 204,
+    statusText: 'No Content',
+  } as AxiosResponse)
+);
+
+const notFound: Promise<AxiosError> = new Promise((resolve) =>
   resolve({
     isAxiosError: true,
     response: { data: '', status: 404, statusText: 'Not Found' },
@@ -563,69 +628,37 @@ export async function mockFetch(
     );
   }
   if (endpoint === 'VERIFY_ONBOARDING') {
-    const selectedProductInTesting = mockedProducts.find(
-      (p) => p.id === endpointParams.productId && p.status === 'TESTING'
-    );
-
     switch (endpointParams.externalInstitutionId) {
       case 'infoError':
+      case 'externalId4':
         return genericError;
-      case 'onboarded':
-        return new Promise((resolve) =>
-          resolve({
-            status: 204,
-            statusText: 'No Content',
-          } as AxiosResponse)
-        );
-      case 'pending':
-        return notFoundError;
-      case 'externalId1':
-      case 'externalId2':
-        if (endpointParams.productId === 'prod-io') {
-          // eslint-disable-next-line sonarjs/no-identical-functions
-          return new Promise((resolve) =>
-            resolve({
-              status: 204,
-              statusText: 'No Content',
-            } as AxiosResponse)
-          );
-        } else {
-          return notFoundError;
-        }
       case 'notAllowed':
         return notAllowedError;
+      case 'onboarded_externalId':
+      case 'onboarded':
+        return noContent;
+      case 'pending':
+        return notFound;
+      // Use case for test not base adhesion
+      case 'externalId3':
+        return notFound;
+      // Use case for test already subscribed premium
+      case 'externalId2':
+        if (
+          endpointParams.productId === 'prod-io' ||
+          endpointParams.productId === 'prod-io-premium'
+        ) {
+          return noContent;
+        } else {
+          return notFound;
+        }
       default:
-        if (endpointParams.productId === 'prod-pagopa') {
-          // eslint-disable-next-line sonarjs/no-identical-functions
-          return new Promise((resolve) =>
-            resolve({
-              status: 204,
-              statusText: 'No Content',
-            } as AxiosResponse)
-          );
+        if (endpointParams.productId !== 'prod-io') {
+          return notFound;
+        } else {
+          return noContent;
         }
     }
-    // Use case introduced for test already subscribed premium
-    if (
-      endpointParams.productId === 'prod-io-premium' &&
-      endpointParams.externalInstitutionId === 'externalId3'
-    ) {
-      return new Promise((resolve) =>
-        resolve({
-          status: 200,
-          statusText: 'No content',
-        } as AxiosResponse)
-      );
-    }
-    if (selectedProductInTesting) {
-      return notAllowedError;
-    }
-    return new Promise((resolve) =>
-      resolve({
-        isAxiosError: true,
-        response: { data: '', status: 400, statusText: 'Bad Request' },
-      } as AxiosError)
-    );
   }
 
   if (endpoint === 'ONBOARDING_GET_SA_PARTIES_NAME') {
@@ -643,38 +676,26 @@ export async function mockFetch(
   if (endpoint === 'VERIFY_ONBOARDED_VAT_NUMBER') {
     switch (params.vatNumber) {
       case '12345678901':
-        return new Promise((resolve) => {
-          resolve({ data: '', status: 204, statusText: 'No Content' } as AxiosResponse);
-        });
+        return noContent;
       case '12345678902':
-        return new Promise((resolve) => {
-          resolve({
-            isAxiosError: true,
-            response: { status: 404, statusText: 'Not Found' },
-          } as AxiosError);
-        });
+        return notFound;
     }
   }
 
   if (endpoint === 'ONBOARDING_GET_ONBOARDING_DATA') {
-    switch (endpointParams.externalInstitutionId) {
-      case 'externalId1':
-        return new Promise((resolve) =>
-          resolve({ data: mockedOnboardingData0, status: 200, statusText: '200' } as AxiosResponse)
-        );
-      case 'externalId2':
-      case 'id':
-      case 'error':
-        return new Promise((resolve) =>
-          resolve({ data: mockedOnboardingData1, status: 200, statusText: '200' } as AxiosResponse)
-        );
-      default:
-        return new Promise((resolve) =>
-          resolve({
-            isAxiosError: true,
-            response: { status: 404, statusText: 'Not Found' },
-          } as AxiosError)
-        );
+    const onboardingData = mockedOnboardingData.find(
+      (od) => od.institution.billingData.taxCode === endpointParams.externalInstitutionId
+    );
+    if (onboardingData) {
+      return new Promise((resolve) =>
+        resolve({
+          data: onboardingData,
+          status: 200,
+          statusText: '200',
+        } as AxiosResponse)
+      );
+    } else {
+      return notFound;
     }
   }
 
@@ -708,12 +729,12 @@ export async function mockFetch(
     }
   }
   if (endpoint === 'ONBOARDING_POST_LEGALS') {
-    switch (mockedOnboardingData1.institution.billingData.taxCode) {
-      case 'error':
-      case '11122233345':
-        return genericError;
-      case 'notAllowedInSubmit':
+    switch (((data as any).billingData as BillingDataDto).taxCode) {
+      case '44444444444':
         return notAllowedError;
+      case '11111111111':
+      case '33445673211':
+        return genericError;
       default:
         const certifiedUser: UserOnCreate | undefined = (
           (data as any).users as Array<UserOnCreate>
@@ -725,7 +746,7 @@ export async function mockFetch(
           return error409;
         } else {
           return new Promise((resolve) =>
-            resolve({ data: '', status: 200, statusText: '200' } as AxiosResponse)
+            resolve({ data: '', status: 201, statusText: 'Created' } as AxiosResponse)
           );
         }
     }
@@ -741,13 +762,7 @@ export async function mockFetch(
         resolve({ data: fetched, status: 200, statusText: '200' } as AxiosResponse)
       );
     } else {
-      // eslint-disable-next-line sonarjs/no-identical-functions
-      return new Promise((resolve) =>
-        resolve({
-          isAxiosError: true,
-          response: { status: 404, statusText: 'Not Found' },
-        } as AxiosError)
-      );
+      return notFound;
     }
   }
 
@@ -770,7 +785,7 @@ export async function mockFetch(
 
   if (endpoint === 'ONBOARDING_TOKEN_VALIDATION') {
     if (window.location.search === '?jwt=tokenNotFound') {
-      return notFoundError;
+      return notFound;
     } else if (window.location.search === '?jwt=tokenAlreadyConsumed') {
       return error409;
     } else if (window.location.search === '?jwt=tokenNotValid') {
