@@ -301,6 +301,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
       setExternalInstitutionId(newOnboardingFormData.taxCode);
 
       const partyVerifyOnboarded = async () => {
+        setLoading(true);
         const onboardingStatus = await fetchWithLogs(
           {
             endpoint: 'VERIFY_ONBOARDING',
@@ -331,6 +332,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
             setOutcome(genericError);
           }
         }
+        setLoading(false);
       };
 
       void partyVerifyOnboarded();
@@ -705,7 +707,13 @@ function OnboardingComponent({ productId }: { productId: string }) {
               });
             });
           },
-          back,
+          back: () => {
+            if (isTechPartner) {
+              setActiveStep(activeStep - 2);
+            } else {
+              setActiveStep(activeStep - 1);
+            }
+          },
         }),
     },
   ];
