@@ -61,6 +61,7 @@ export default function PersonalAndBillingDataSection({
   const isPSP = institutionType === 'PSP';
   const isPA = institutionType === 'PA';
   const isSA = institutionType === 'SA';
+  const isTechPartner = institutionType === 'PT';
   const isDisabled = premiumFlow || (isFromIPA && !isPA && !isPSP) || isPA;
   const requiredError = 'Required';
   const isAooUo = aooSelected || uoSelected;
@@ -299,7 +300,7 @@ export default function PersonalAndBillingDataSection({
                   </Typography>
                 </Box>
               )}
-              {!isSA && (
+              {!isSA && !isTechPartner && (
                 <Grid item xs={12} mt={3}>
                   <CustomTextField
                     {...baseTextFieldProps(
