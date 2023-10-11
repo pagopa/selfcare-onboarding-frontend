@@ -12,6 +12,9 @@ import { nationalValue } from '../../model/GeographicTaxonomies';
 import { UoData } from '../../model/UoModel';
 import { AooData } from './../../model/AooData';
 
+const ipaOrigin = 'IPA';
+const adminUserRole = 'ADMIN';
+
 const mockPartyRegistry = {
   items: [
     {
@@ -27,7 +30,7 @@ const mockPartyRegistry = {
       managerSurname: 'Rossi',
       description: 'AGENCY X',
       digitalAddress: 'mail@pec.mail.org',
-      origin: 'IPA',
+      origin: ipaOrigin,
       originId: 'originId1',
       address: 'sede legale',
     },
@@ -44,7 +47,7 @@ const mockPartyRegistry = {
       managerSurname: 'Rossi_ERROR',
       description: 'AGENCY ERROR',
       digitalAddress: 'mail_ERROR_@pec.mail.org',
-      origin: 'IPA',
+      origin: ipaOrigin,
       originId: 'originId2',
       address: 'sede legale',
     },
@@ -61,7 +64,7 @@ const mockPartyRegistry = {
       managerSurname: 'Rossi_ONBOARDED',
       description: 'AGENCY ONBOARDED',
       digitalAddress: 'mail_ONBOARDED_@pec.mail.org',
-      origin: 'IPA',
+      origin: ipaOrigin,
       originId: 'originId3',
       address: 'sede legale',
     },
@@ -78,7 +81,7 @@ const mockPartyRegistry = {
       managerSurname: 'Rossi_PENDING',
       description: 'AGENCY PENDING',
       digitalAddress: 'mail_PENDING_@pec.mail.org',
-      origin: 'IPA',
+      origin: ipaOrigin,
       originId: 'originId4',
       address: 'sede legale',
     },
@@ -95,7 +98,7 @@ const mockPartyRegistry = {
       managerSurname: 'Rossi_INFOERROR',
       description: 'AGENCY INFO ERROR',
       digitalAddress: 'mail_INFOERROR_@pec.mail.org',
-      origin: 'IPA',
+      origin: ipaOrigin,
       originId: 'originId5',
       address: 'sede legale',
     },
@@ -112,7 +115,7 @@ const mockPartyRegistry = {
       managerSurname: 'Rossi_NOTALLOWED',
       description: 'Not Allowed',
       digitalAddress: 'mail_NOTALLOWED_@pec.mail.org',
-      origin: 'IPA',
+      origin: ipaOrigin,
       originId: 'originId6',
       address: 'sede legale',
     },
@@ -129,7 +132,7 @@ const mockPartyRegistry = {
       managerSurname: 'Rossa_NOTALLOWED',
       description: 'Not Allowed Error on Submit',
       digitalAddress: 'mail_NOTALLOWEDINSUBMIT_@pec.mail.org',
-      origin: 'IPA',
+      origin: ipaOrigin,
       originId: 'originId7',
       address: 'sede legale',
     },
@@ -168,41 +171,6 @@ const mockedGeoTaxonomy = [
     endDate: null,
     enable: true,
   },
-  // {
-  //   code: '015146',
-  //   desc: 'Milano - Comune',
-  //   region: '03',
-  //   province: '015',
-  //   provinceAbbreviation: 'MI',
-  //   country: 'ITA',
-  //   countryAbbreviation: 'IT',
-  //   startDate: '1861-03-18',
-  //   endDate: null,
-  //   enable: true
-  // }, {
-  //   code: "015456",
-  //   desc: "Napoli - Comune",
-  //   region: "08",
-  //   province: "018",
-  //   provinceAbbreviation: "NA",
-  //   country: "100",
-  //   countryAbbreviation: "IT",
-  //   startDate: "1861-03-18",
-  //   endDate: null,
-  //   enable: true
-  //   },
-  //   {
-  //     code: "015456",
-  //     desc: "Milazzo - Comune",
-  //     region: "08",
-  //     province: "016",
-  //     provinceAbbreviation: "GE",
-  //     country: "100",
-  //     countryAbbreviation: "IT",
-  //     startDate: "1861-03-18",
-  //     endDate: null,
-  //     enable: true
-  // }
 ];
 
 const mockedAooCode: AooData = {
@@ -253,26 +221,26 @@ const mockedParties: Array<SelfcareParty> = [
     originId: 'originId1',
     id: 'partyId1',
     description: 'Comune di Milano',
-    urlLogo: 'logo',
-    address: 'address',
+    urlLogo: 'logo1',
+    address: 'address1',
     digitalAddress: 'a@aa.com',
     taxCode: '33344455567',
     zipCode: '22345',
-    origin: 'IPA',
-    userRole: 'ADMIN',
+    origin: ipaOrigin,
+    userRole: adminUserRole,
   },
   {
     externalId: 'externalId2',
     originId: 'originId2',
     id: 'partyId2',
     description: 'Comune di Bollate',
-    urlLogo: 'logo',
-    address: 'address',
-    digitalAddress: 'a@aa.com',
+    urlLogo: 'logo2',
+    address: 'address2',
+    digitalAddress: 'a@cd.com',
     taxCode: '11122233345',
-    zipCode: '22345',
-    origin: 'IPA',
-    userRole: 'ADMIN',
+    zipCode: '22395',
+    origin: ipaOrigin,
+    userRole: adminUserRole,
   },
   {
     externalId: 'externalId3',
@@ -284,7 +252,7 @@ const mockedParties: Array<SelfcareParty> = [
     digitalAddress: 'a@aa.com',
     taxCode: '33322268945',
     zipCode: '02102',
-    origin: 'IPA',
+    origin: ipaOrigin,
     userRole: 'LIMITED',
   },
   {
@@ -297,8 +265,8 @@ const mockedParties: Array<SelfcareParty> = [
     digitalAddress: 'b@bb.com',
     taxCode: '33445673210',
     zipCode: '00022',
-    origin: 'IPA',
-    userRole: 'ADMIN',
+    origin: ipaOrigin,
+    userRole: adminUserRole,
   },
   {
     externalId: '33445673211',
@@ -310,8 +278,8 @@ const mockedParties: Array<SelfcareParty> = [
     digitalAddress: 'b@cc.com',
     taxCode: '33445673211',
     zipCode: '33344',
-    origin: 'IPA',
-    userRole: 'ADMIN',
+    origin: ipaOrigin,
+    userRole: adminUserRole,
   },
   {
     externalId: 'onboarded_externalId',
@@ -323,7 +291,7 @@ const mockedParties: Array<SelfcareParty> = [
     digitalAddress: 'a@aa.com',
     taxCode: 'BBBBBB22B22B234K',
     zipCode: '12125',
-    origin: 'IPA',
+    origin: ipaOrigin,
     userRole: 'LIMITED',
   },
 ];
