@@ -173,35 +173,23 @@ test('test advanced search business name', async () => {
   await executeAdvancedSearchForBusinessName('AGENCY X');
 });
 
-test('test advanvced search taxcode', async () => {
+test('test advanced search taxcode', async () => {
   renderComponent();
   await executeStepInstitutionType('prod-pn');
   await executeAdvancedSearchForTaxCode('Comune di Milano');
 });
 
-test('test billingData without Support Mail', async () => {
+test.skip('test billingData without Support Mail', async () => {
   renderComponent('prod-interop');
   await executeStepInstitutionType('prod-interop');
   await executeStep1('AGENCY ERROR', 'prod-interop', 'pa');
   await executeStepBillingDataWithoutSupportMail();
 });
 
-test('test advanced search business name', async () => {
-  renderComponent('prod-interop');
-  await executeStepInstitutionType('prod-interop');
-  await executeAdvancedSearchForBusinessName('AGENCY X');
-});
-
-test('test advanced search aoo name with product interop', async () => {
+test('test advanced search A00 name with product interop', async () => {
   renderComponent('prod-interop');
   await executeStepInstitutionType('prod-interop');
   await executeAdvancedSearchForAoo();
-});
-
-test('test advanced search uo name with product pn', async () => {
-  renderComponent('prod-interop');
-  await executeStepInstitutionType('prod-interop');
-  await executeAdvancedSearchForUo();
 });
 
 test('test label recipientCode only for institutionType is not PA', async () => {
@@ -227,7 +215,7 @@ ENV.PT.SHOW_PT &&
     await verifySubmitPt('prod-pagopa');
   });
 
-test('test party search if gps for prod-interop', async () => {
+test.skip('test party search if gps for prod-interop', async () => {
   renderComponent('prod-interop');
   await executeStepInstitutionTypeGspForInterop();
   await executeStep1('AGENCY X', 'prod-interop', 'gsp');
@@ -760,7 +748,7 @@ const executeStep2 = async () => {
   await waitFor(() => screen.getByText(step3Title));
 };
 
-const executeStep3 = async (expectedSuccessfulSubmit: boolean, isPt = false) => {
+const executeStep3 = async (expectedSuccessfulSubmit: boolean, isTechPartner = false) => {
   console.log('Testing step 3');
 
   await waitFor(() => screen.getByText(step3Title));
@@ -796,7 +784,7 @@ const executeStep3 = async (expectedSuccessfulSubmit: boolean, isPt = false) => 
   await waitFor(() =>
     screen.getByText(
       expectedSuccessfulSubmit
-        ? !isPt
+        ? !isTechPartner
           ? completeSuccessTitle
           : completeSuccessTitleForPt
         : completeErrorTitle

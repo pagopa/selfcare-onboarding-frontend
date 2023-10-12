@@ -97,76 +97,11 @@ const renderComponent = (
   render(<Component />);
 };
 
-const stepSelectInstitutionUnreleatedTitle = 'Seleziona il tuo ente';
 const stepSelectInstitutionReleatedTitle = 'Seleziona il tuo ente';
 const stepBillingDataTitle = 'Indica i dati del tuo ente';
 const stepAddManagerTitle = 'Indica il Legale Rappresentante';
 const successOnboardingSubProductTitle = 'La richiesta di adesione è stata inviata con successo';
 const errorOnboardingSubProductTitle = 'Qualcosa è andato storto';
-
-const agencyOnboarded = 'AGENCY ONBOARDED';
-const agencyInfoError = 'AGENCY INFO ERROR';
-const agencyX = 'AGENCY X';
-const agencyError = 'AGENCY ERROR';
-const agencyPending = 'AGENCY PENDING';
-const onboardedWithPricingPlan = 'onboardedWithPricingPlan';
-
-// TODO all unreleated old test where commented in order to develop SELC-2237
-// test('test select pricing plan', async () => {
-//   renderComponent('prod-io', 'prod-io-premium');
-//   await executeStepSelectPricingPlan();
-//   await executeStepSelectInstitutionUnreleated('onboarded');
-//   await waitFor(() => screen.getByText('Sottoscrizione già avvenuta'));
-//   await executeClickCloseButton();
-// });
-
-// test.skip('test not base product adhesion', async () => {
-//   renderComponent('prod-io', 'prod-io-premium');
-//   await executeStepSelectPricingPlan();
-//   await executeStepSelectInstitutionUnreleated(agencyPending);
-//   await waitFor(() => screen.getByText('Errore'));
-//   await executeClickAdhesionButton();
-// });
-
-// test.skip('test error retrieving onboarding info', async () => {
-//   renderComponent('prod-io', 'prod-io-premium');
-//   await executeStepSelectPricingPlan();
-//   await executeStepSelectInstitutionUnreleated(agencyInfoError);
-//   await waitFor(() => screen.getByText('Spiacenti, qualcosa è andato storto.'));
-//   await executeClickCloseButton();
-// });
-
-// test.skip('test complete', async () => {
-//   renderComponent('prod-io', 'prod-io-premium');
-//   await executeStepSelectPricingPlan();
-//   await executeStepSelectInstitutionUnreleated(agencyX);
-//   await executeStepBillingData();
-//   await executeStepAddManager(true);
-//   await executeClickCloseButton();
-//   await verifySubmitPostLegals();
-// });
-
-// test.skip('test complete with error on submit', async () => {
-//   renderComponent('prod-io', 'prod-io-premium');
-//   await executeStepSelectPricingPlan();
-//   await executeStepSelectInstitutionUnreleated(agencyError);
-//   await executeStepBillingData();
-//   await executeStepAddManager(false);
-//   await executeClickHomeButton();
-// });
-
-// test('test exiting during flow with unload event', async () => {
-//   renderComponent('prod-io', 'prod-io-premium');
-//   await executeStepSelectPricingPlan();
-//   await executeStepSelectInstitutionUnreleated(agencyX);
-//   const event = new Event('beforeunload');
-//   window.dispatchEvent(event);
-//   await waitFor(
-//     () =>
-//       (event.returnValue as unknown as string) ===
-//       "Warning!\n\nNavigating away from this page will delete your text if you haven't already saved it."
-//   );
-// });
 
 test('test error subProductID', async () => {
   renderComponent('error', 'error');
@@ -174,32 +109,82 @@ test('test error subProductID', async () => {
   await waitFor(() => screen.getByText('Impossibile individuare il prodotto desiderato'));
 });
 
+test('test not base product adhesion', async () => {
+  renderComponent('prod-io', 'prod-io-premium');
+  await executeStepSelectPricingPlan();
+  await executeStepSelectInstitution('Comune di Venezia');
+  await waitFor(() => screen.getByText("L'ente non ha aderito a App IO"));
+  await executeClickAdhesionButton();
+});
+
+test('test already onboarded premium', async () => {
+  renderComponent('prod-io', 'prod-io-premium');
+  await executeStepSelectPricingPlan();
+  await executeStepSelectInstitution('Comune di Bollate');
+  await waitFor(() => screen.getByText('Sottoscrizione già avvenuta'));
+  await executeClickCloseButton();
+});
+
+test('test error retrieving onboarding info', async () => {
+  renderComponent('prod-io', 'prod-io-premium');
+  await executeStepSelectPricingPlan();
+  await executeStepSelectInstitution('Comune di Gessate');
+  await waitFor(() => screen.getByText('Spiacenti, qualcosa è andato storto.'));
+  await executeClickCloseButton();
+});
+
+test('test onboarding complete', async () => {
+  renderComponent('prod-io', 'prod-io-premium');
+  await executeStepSelectPricingPlan();
+  await executeStepSelectInstitution('Comune di Milano');
+  await executeStepBillingData();
+  await executeStepAddManager(true);
+  await executeClickCloseButton();
+  await verifySubmitPostLegals();
+});
+
+test('test complete with error on submit', async () => {
+  renderComponent('prod-io', 'prod-io-premium');
+  await executeStepSelectPricingPlan();
+  await executeStepSelectInstitution('Comune di Udine');
+  await executeStepBillingData();
+  await executeStepAddManager(false);
+  await executeClickHomeButton();
+});
+
+test('test complete with error on submit', async () => {
+  renderComponent('prod-io', 'prod-io-premium');
+  await executeStepSelectPricingPlan();
+  await executeStepSelectInstitution('Comune di Udine');
+  await executeStepBillingData();
+  await executeStepAddManager(false);
+  await executeClickHomeButton();
+});
+
+// TODO Skipped test, add unload event
 test.skip('test exiting during flow with logout', async () => {
   renderComponent('prod-io', 'prod-io-premium');
   await executeStepSelectPricingPlan();
-  await executeStepSelectInstitutionReleated('Comune di Milano');
+  await executeStepSelectInstitution('Comune di Milano');
 
   expect(screen.queryByText('Vuoi davvero uscire?')).toBeNull();
 
   const logoutButton = screen.getByText('LOGOUT');
   await performLogout(logoutButton);
 
-  await performLogout(logoutButton);
   fireEvent.click(screen.getByRole('button', { name: 'Annulla' }));
-  await waitFor(() => expect(screen.queryByText('Vuoi davvero uscire?')).toBeNull());
-
-  await performLogout(logoutButton);
-  await waitFor(() => expect(screen.getByText('Vuoi davvero uscire?')).not.toBeNull());
+  await waitFor(() => expect(screen.queryByText('Vuoi davvero uscire?')).not.toBeNull());
 
   await performLogout(logoutButton);
   fireEvent.click(screen.getByRole('button', { name: 'Esci' }));
   await waitFor(() => expect(mockedLocation.assign).toBeCalledWith(ENV.URL_FE.LOGOUT));
 });
 
+// TODO Skipped test, add unload event
 test.skip('test exiting during flow with unload event', async () => {
   renderComponent('prod-io', 'prod-io-premium');
   await executeStepSelectPricingPlan();
-  await executeStepSelectInstitutionReleated('Comune di Milano');
+  await executeStepSelectInstitution('Comune di Milano');
 
   const event = new Event('beforeunload');
   window.dispatchEvent(event);
@@ -208,16 +193,6 @@ test.skip('test exiting during flow with unload event', async () => {
       (event.returnValue as unknown as string) ===
       "Warning!\n\nNavigating away from this page will delete your text if you haven't already saved it."
   );
-});
-
-test.skip('test complete', async () => {
-  renderComponent('prod-io', 'prod-io-premium');
-  await executeStepSelectPricingPlan();
-  await executeStepSelectInstitutionReleated('Comune di Milano');
-  await executeStepBillingDataUnrelated();
-  await executeStepAddManager(true);
-  await executeClickCloseButton();
-  await verifySubmitPostLegals();
 });
 
 const performLogout = async (logoutButton: HTMLElement) => {
@@ -239,22 +214,17 @@ const retrieveNavigationButtons = async () => {
   return [goBackButton, confirmButton];
 };
 
-const checkBackForwardNavigation = async (
-  previousStepTitle: string,
-  actualStepTitle: string
-): Promise<Array<HTMLElement>> => {
+const checkBackForwardNavigation = async (title: string): Promise<Array<HTMLElement>> => {
   const [goBackButton] = await retrieveNavigationButtons();
   expect(goBackButton).toBeEnabled();
   fireEvent.click(goBackButton);
 
-  await waitFor(() => screen.getByText('Conferma l’ente selezionato'));
+  screen.getByText(title);
   const goForwardButton = screen.getByRole('button', {
     name: 'Continua',
   });
   expect(goForwardButton).toBeEnabled();
-  fireEvent.click(goForwardButton);
-
-  await waitFor(() => screen.getByText(actualStepTitle));
+  await waitFor(() => fireEvent.click(goForwardButton));
 
   return await retrieveNavigationButtons();
 };
@@ -275,51 +245,28 @@ const executeStepSelectPricingPlan = async () => {
   fireEvent.click(forwardBtn);
 };
 
-const executeStepSelectInstitutionUnreleated = async (partyName: string) => {
-  console.log('Testing step select institution UNRELEATED');
-
-  const newInstitutionAdhesion = await waitFor(() => screen.getByText('Registra un nuovo ente'));
-  fireEvent.click(newInstitutionAdhesion);
-
-  await waitFor(() => screen.getByText('Cerca il tuo ente'));
-  await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(3));
-  const inputPartyName = document.getElementById('Parties') as HTMLElement;
-
-  expect(inputPartyName).toBeTruthy();
-  fireEvent.change(inputPartyName, { target: { value: 'XXX' } });
-
-  const partyNameSelection = await waitFor(() => screen.getByText(partyName));
-  expect(fetchWithLogsSpy).toBeCalledTimes(4);
-
-  fireEvent.click(partyNameSelection);
-
-  const confirmButton = screen.getByRole('button', { name: 'Continua' });
-
-  fireEvent.click(confirmButton);
-  await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(5));
-};
-
-const executeStepSelectInstitutionReleated = async (partyName: string) => {
-  console.log('Testing step select institution RELEATED');
+const executeStepSelectInstitution = async (partyName: string) => {
+  console.log('Testing step select institution');
 
   await waitFor(() => screen.getByText(stepSelectInstitutionReleatedTitle));
+  const continueButton = screen.getByText('Continua');
+  expect(continueButton).toBeDisabled();
+
   await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(4));
-  const inputPartyName = await waitFor(() => screen.getByText(partyName));
+  const party = screen.getByText(partyName);
 
-  expect(inputPartyName).toBeTruthy();
+  expect(party).toBeTruthy();
 
-  const partyNameSelection = await waitFor(() => screen.getByText(partyName));
   expect(fetchWithLogsSpy).toBeCalledTimes(4);
 
-  fireEvent.click(partyNameSelection);
+  fireEvent.click(party);
 
-  const confirmButton = screen.getByRole('button', { name: 'Continua' });
-  expect(confirmButton).toBeEnabled();
+  expect(continueButton).toBeEnabled();
 
-  fireEvent.click(confirmButton);
+  fireEvent.click(continueButton);
 };
 
-const executeStepBillingDataUnrelated = async () => {
+const executeStepBillingData = async () => {
   console.log('Testing step Billing Data');
   await waitFor(() => screen.getByText(stepBillingDataTitle));
 
@@ -337,62 +284,14 @@ const executeStepBillingDataUnrelated = async () => {
   fireEvent.click(confirmButtonEnabled);
   await waitFor(() => screen.getByText(stepAddManagerTitle));
 };
-const executeStepBillingData = async () => {
-  console.log('Testing step Billing Data');
-  await waitFor(() => screen.getByText(stepBillingDataTitle));
-
-  await checkBackForwardNavigation(stepSelectInstitutionUnreleatedTitle, stepBillingDataTitle);
-
-  await fillUserBillingDataForm(
-    'businessName',
-    'registeredOffice',
-    'digitalAddress',
-    'taxCode',
-    'vatNumber',
-    'zipCode',
-    'recipientCode',
-    'supportEmail'
-  );
-
-  const confirmButtonEnabled = screen.getByRole('button', { name: 'Continua' });
-  await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
-
-  fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
-    target: { value: '' },
-  });
-  await waitFor(() => expect(confirmButtonEnabled).toBeDisabled());
-
-  await fillUserBillingDataForm(
-    'businessName',
-    'registeredOffice',
-    'digitalAddress',
-    'taxCode',
-    'vatNumber',
-    'zipCode',
-    'recipientCode',
-    'supportEmail'
-  );
-
-  await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
-
-  await checkCorrectBodyBillingData(
-    'businessNameInput',
-    'registeredOfficeInput',
-    'a@a.com',
-    'AAAAAA44D55F456K',
-    'AAAAAA44D55F456K',
-    'AM23EIX'
-  );
-
-  fireEvent.click(confirmButtonEnabled);
-  await waitFor(() => screen.getByText(stepAddManagerTitle));
-};
 
 const executeStepAddManager = async (expectedSuccessfulSubmit: boolean) => {
   console.log('Testing step add manager');
   await waitFor(() => screen.getByText(stepAddManagerTitle));
 
   const confirmButton = screen.getByRole('button', { name: 'Continua' });
+
+  expect(confirmButton).toBeDisabled();
 
   await fillUserForm();
 
@@ -434,7 +333,7 @@ const executeClickAdhesionButton = async () => {
   expect(adhesionButton).toBeEnabled();
   fireEvent.click(adhesionButton);
   await waitFor(() =>
-    expect(mockedHistoryPush).toBeCalledWith('/onboarding/prod-io?partyExternalId=pending')
+    expect(mockedHistoryPush).toBeCalledWith('/onboarding/prod-io?partyExternalId=externalId3')
   );
 };
 
@@ -469,7 +368,7 @@ const fillUserBillingDataForm = async (
   fireEvent.change(document.getElementById(supportEmail) as HTMLElement, {
     target: { value: 'a@a.it' },
   });
-  // TODO: remove comment if REACT_APP_ENABLE_GEOTAXONOMY is true -- fireEvent.click(document.getElementById('national_geographicTaxonomies'));
+  fireEvent.click(document.getElementById('national_geographicTaxonomies'));
 };
 
 const fillTextFieldAndCheck = async (prefix: string, field: string, value: string) => {
@@ -530,8 +429,8 @@ const billingData2billingDataRequest = () => ({
   registeredOffice: 'Milano, Piazza Colonna 370',
   digitalAddress: 'comune.milano@pec.it',
   zipCode: '20021',
-  taxCode: 'AAAAAA11A11A123K',
-  vatNumber: 'AAAAAA11A11A123K',
+  taxCode: '33445673222',
+  vatNumber: '33445673221',
   recipientCode: 'M5UXCR1',
 });
 
@@ -565,7 +464,7 @@ const verifySubmitPostLegals = async () => {
           productId: 'prod-io-premium',
           subunitCode: undefined,
           subunitType: undefined,
-          taxCode: 'AAAAAA11A11A123K',
+          taxCode: '33445673222',
           companyInformations: undefined,
         },
       },

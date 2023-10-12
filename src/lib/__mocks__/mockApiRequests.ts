@@ -1,158 +1,288 @@
+import { UserRole } from '@pagopa/selfcare-common-frontend/utils/constants';
 import { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 import {
   Endpoint,
   InstitutionOnboardingInfoResource,
   StationResource,
   Product,
-  SelfcareParty,
   UserOnCreate,
 } from '../../../types';
+import { BillingDataDto } from '../../model/BillingData';
 import { nationalValue } from '../../model/GeographicTaxonomies';
 import { UoData } from '../../model/UoModel';
 import { AooData } from './../../model/AooData';
 
+const createPartyRegistryEntity = (
+  id: string,
+  o: string,
+  ou: string,
+  aoo: string,
+  taxCode: string,
+  zipCode: string,
+  administrationCode: string,
+  managerName: string,
+  managerSurname: string,
+  description: string,
+  digitalAddress: string,
+  originId: string,
+  origin: string,
+  category: string,
+  address: string
+) => ({
+  id,
+  o,
+  ou,
+  aoo,
+  taxCode,
+  zipCode,
+  administrationCode,
+  managerName,
+  managerSurname,
+  description,
+  digitalAddress,
+  originId,
+  origin,
+  category,
+  address,
+});
+
+const createPartyEntity = (
+  externalId: string,
+  originId: string,
+  id: string,
+  description: string,
+  urlLogo: string,
+  address: string,
+  digitalAddress: string,
+  taxCode: string,
+  zipCode: string,
+  userRole: UserRole = 'ADMIN',
+  origin: string = 'IPA'
+) => ({
+  externalId,
+  originId,
+  id,
+  description,
+  urlLogo,
+  address,
+  digitalAddress,
+  taxCode,
+  zipCode,
+  userRole,
+  origin,
+});
+
 const mockPartyRegistry = {
   items: [
-    {
-      id: 'id',
-      o: 'o',
-      ou: 'ou',
-      aoo: 'aoo',
-      taxCode: '00000000000',
-      zipCode: '44332',
-      administrationCode: '00000000000',
-      category: 'c7',
-      managerName: 'Mario',
-      managerSurname: 'Rossi',
-      description: 'AGENCY X',
-      digitalAddress: 'mail@pec.mail.org',
-      origin: 'IPA',
-      originId: 'originId1',
-      address: 'sede legale',
-    },
-    {
-      id: 'error',
-      o: 'errorO',
-      ou: 'errorUu',
-      aoo: 'errorAoo',
-      taxCode: '11111111111',
-      zipCode: '01345',
-      administrationCode: '11111111111',
-      category: 'c7',
-      managerName: 'Mario:ERROR',
-      managerSurname: 'Rossi_ERROR',
-      description: 'AGENCY ERROR',
-      digitalAddress: 'mail_ERROR_@pec.mail.org',
-      origin: 'IPA',
-      originId: 'originId2',
-      address: 'sede legale',
-    },
-    {
-      id: 'onboarded',
-      o: 'onboardedO',
-      ou: 'onboardedUu',
-      aoo: 'onboardedAoo',
-      taxCode: '22222222222',
-      zipCode: '12345',
-      administrationCode: '22222222222',
-      category: 'c7',
-      managerName: 'Mario_ONBOARDED',
-      managerSurname: 'Rossi_ONBOARDED',
-      description: 'AGENCY ONBOARDED',
-      digitalAddress: 'mail_ONBOARDED_@pec.mail.org',
-      origin: 'IPA',
-      originId: 'originId3',
-      address: 'sede legale',
-    },
-    {
-      id: 'pending',
-      o: 'pendingO',
-      ou: 'pendingUu',
-      aoo: 'pendingAoo',
-      taxCode: '33333333333',
-      zipCode: '54321',
-      administrationCode: '33333333333',
-      category: 'c7',
-      managerName: 'Mario_PENDING',
-      managerSurname: 'Rossi_PENDING',
-      description: 'AGENCY PENDING',
-      digitalAddress: 'mail_PENDING_@pec.mail.org',
-      origin: 'IPA',
-      originId: 'originId4',
-      address: 'sede legale',
-    },
-    {
-      id: 'infoError',
-      o: 'infoErrorO',
-      ou: 'infoErrorUu',
-      aoo: 'infoErrorAoo',
-      taxCode: '99999999999',
-      zipCode: '12122',
-      administrationCode: '99999999999',
-      category: 'c7',
-      managerName: 'Mario_INFOERROR',
-      managerSurname: 'Rossi_INFOERROR',
-      description: 'AGENCY INFO ERROR',
-      digitalAddress: 'mail_INFOERROR_@pec.mail.org',
-      origin: 'IPA',
-      originId: 'originId5',
-      address: 'sede legale',
-    },
-    {
-      id: 'notAllowed',
-      o: 'notAllowedO',
-      ou: 'notAllowedUu',
-      aoo: 'notAllowedAoo',
-      taxCode: '44444444444',
-      zipCode: '070889',
-      administrationCode: '44444444444',
-      category: 'c7',
-      managerName: 'Mario_NOTALLOWED',
-      managerSurname: 'Rossi_NOTALLOWED',
-      description: 'Not Allowed',
-      digitalAddress: 'mail_NOTALLOWED_@pec.mail.org',
-      origin: 'IPA',
-      originId: 'originId6',
-      address: 'sede legale',
-    },
-    {
-      id: 'notAllowedInSubmit',
-      o: 'notAllowedO',
-      ou: 'notAllowedUDu',
-      aoo: 'notAllowedAooe',
-      taxCode: '44444444444',
-      zipCode: '07089',
-      administrationCode: '44444444444',
-      category: 'c7',
-      managerName: 'Maria_NOTALLOWED',
-      managerSurname: 'Rossa_NOTALLOWED',
-      description: 'Not Allowed Error on Submit',
-      digitalAddress: 'mail_NOTALLOWEDINSUBMIT_@pec.mail.org',
-      origin: 'IPA',
-      originId: 'originId7',
-      address: 'sede legale',
-    },
+    createPartyRegistryEntity(
+      'id',
+      'o',
+      'ou',
+      'aoo',
+      '00000000000',
+      '44332',
+      '00000000000',
+      'Mario',
+      'Rossi',
+      'AGENCY X',
+      'mail@pec.mail.org',
+      '991',
+      'IPA',
+      'g1122',
+      'largo torino'
+    ),
+    createPartyRegistryEntity(
+      'error',
+      'oerfd',
+      'gfgfgf',
+      'dfdfdf',
+      '11111111111',
+      '01345',
+      '11111111111',
+      'Franco',
+      'Bianchi',
+      'AGENCY ERROR',
+      'mail_ERROR_@pec.mail.org',
+      '352',
+      'IPA',
+      'c723',
+      'via lombardia'
+    ),
+    createPartyRegistryEntity(
+      'onboarded',
+      'dfdff',
+      'wertg',
+      'gggfs',
+      '22222222222',
+      '12345',
+      '22222222222',
+      'Francesco',
+      'Verdi',
+      'AGENCY ONBOARDED',
+      'mail_ONBOARDED_@pec.mail.org',
+      '442',
+      'IPA',
+      'c11',
+      'piazza rossi'
+    ),
+    createPartyRegistryEntity(
+      'pending',
+      'gg4ed',
+      'dss3r',
+      'jtyte',
+      '33333333333',
+      '54321',
+      '33333333333',
+      'Luca',
+      'Verde',
+      'AGENCY PENDING',
+      'mail_PENDING_@pec.mail.org',
+      '221',
+      'IPA',
+      'c2234',
+      'legal_se'
+    ),
+    createPartyRegistryEntity(
+      'infoError',
+      'erer',
+      'fdfew',
+      'iyjrfggh',
+      '99999999999',
+      '12122',
+      '99999999999',
+      'Paolo',
+      'Bianchi',
+      'AGENCY INFO ERROR',
+      'mail_INFOERROR_@pec.mail.org',
+      '235',
+      'IPA',
+      'c14',
+      'sede'
+    ),
+    createPartyRegistryEntity(
+      'notAllowed',
+      'fdfdft',
+      'bbfdf',
+      'kyuehfw',
+      '44444444444',
+      '070889',
+      '44444444444',
+      'Mario_NOTALLOWED',
+      'Rossi_NOTALLOWED',
+      'Not Allowed',
+      'mail_NOTALLOWED_@pec.mail.org',
+      'originId6',
+      'IPA',
+      'c17',
+      'leg'
+    ),
+    createPartyRegistryEntity(
+      'notAllowedInSubmit',
+      'ererjfdv',
+      'nnffse',
+      'wewewett',
+      '44444444444',
+      '07089',
+      '44444444444',
+      'Maria_NOTALLOWED',
+      'Rossa_NOTALLOWED',
+      'Not Allowed Error on Submit',
+      'mail_NOTALLOWEDINSUBMIT_@pec.mail.org',
+      'originId7',
+      'IPA',
+      'c18',
+      'ss'
+    ),
     // use case added for easily test new feature about taxCode equal to vatCode
-    {
-      id: 'idNotIpa',
-      o: 'od',
-      ou: 'oud',
-      aoo: 'aood',
-      taxCode: '98765432123',
-      zipCode: '44382',
-      administrationCode: '98765432123',
-      category: 'c432',
-      managerName: 'Ugo',
-      managerSurname: 'Diaz',
-      description: 'AGENCY NOT IPA',
-      digitalAddress: 'mail@pec.mail.org',
-      origin: 'IPAIPA', // origin not IPA for fields editability
-      originId: 'originId1',
-      address: 'sede legale',
-    },
+    createPartyRegistryEntity(
+      'idNotIpa',
+      'od',
+      'oud',
+      'aood',
+      '98765432123',
+      '44382',
+      '98765432123',
+      'Ugo',
+      'Diaz',
+      'AGENCY NOT IPA',
+      'mail@pec.mail.org',
+      'originId1',
+      'IPAIPA', // Origin not equal to IPA, enabled field
+      'c17',
+      'mockaddress'
+    ),
   ],
   count: 8,
 };
+
+const mockedParties = [
+  createPartyEntity(
+    '33445673222',
+    '8576',
+    '43446',
+    'Comune di Milano',
+    'logo1',
+    'address1',
+    'a@aa.com',
+    '33344455567',
+    '22345'
+  ),
+  createPartyEntity(
+    'externalId2',
+    '656653',
+    '23231',
+    'Comune di Bollate',
+    'logo2',
+    'address2',
+    'a@cd.com',
+    '11122233345',
+    '22395'
+  ),
+  createPartyEntity(
+    'externalId3',
+    '3232245',
+    '76767645',
+    'Comune di Venezia',
+    'logo',
+    'address',
+    'a@aa.com',
+    '33322268945',
+    '02102'
+  ),
+  createPartyEntity(
+    'externalId4',
+    '4545fg',
+    '775644',
+    'Comune di Gessate',
+    'logo',
+    'address4',
+    'b@bb.com',
+    '33445673210',
+    '00022'
+  ),
+  createPartyEntity(
+    '33445673211',
+    '57677',
+    '5454679',
+    'Comune di Udine',
+    'logo',
+    'address5',
+    'b@cc.com',
+    '33445673211',
+    '33344'
+  ),
+  createPartyEntity(
+    'onboarded_externalId',
+    'or2325',
+    'p4341',
+    'onboarded',
+    'logo',
+    'address',
+    'a@aa.com',
+    'BBBBBB22B22B234K',
+    '12125'
+  ),
+];
 
 const mockedGeoTaxonomy = [
   {
@@ -167,41 +297,6 @@ const mockedGeoTaxonomy = [
     endDate: null,
     enable: true,
   },
-  // {
-  //   code: '015146',
-  //   desc: 'Milano - Comune',
-  //   region: '03',
-  //   province: '015',
-  //   provinceAbbreviation: 'MI',
-  //   country: 'ITA',
-  //   countryAbbreviation: 'IT',
-  //   startDate: '1861-03-18',
-  //   endDate: null,
-  //   enable: true
-  // }, {
-  //   code: "015456",
-  //   desc: "Napoli - Comune",
-  //   region: "08",
-  //   province: "018",
-  //   provinceAbbreviation: "NA",
-  //   country: "100",
-  //   countryAbbreviation: "IT",
-  //   startDate: "1861-03-18",
-  //   endDate: null,
-  //   enable: true
-  //   },
-  //   {
-  //     code: "015456",
-  //     desc: "Milazzo - Comune",
-  //     region: "08",
-  //     province: "016",
-  //     provinceAbbreviation: "GE",
-  //     country: "100",
-  //     countryAbbreviation: "IT",
-  //     startDate: "1861-03-18",
-  //     endDate: null,
-  //     enable: true
-  // }
 ];
 
 const mockedAooCode: AooData = {
@@ -246,117 +341,93 @@ const mockedUoCode: UoData = {
   tipoMail1: 'Pec',
 };
 
-const mockedParties: Array<SelfcareParty> = [
+const mockedOnboardingData: Array<InstitutionOnboardingInfoResource> = [
   {
-    externalId: 'externalId1',
-    originId: 'originId1',
-    id: 'partyId1',
-    description: 'Comune di Milano',
-    urlLogo: 'logo',
-    address: 'address',
-    digitalAddress: 'a@aa.com',
-    taxCode: '33344455567',
-    zipCode: 'zipCode',
-    origin: 'IPA',
-    userRole: 'ADMIN',
+    institution: {
+      id: '55897f04-bafd-4bc9-b646-0fd027620c1b',
+      billingData: {
+        businessName: 'Comune di Milano',
+        registeredOffice: 'Milano, Piazza Colonna 370',
+        zipCode: '20021',
+        digitalAddress: 'comune.milano@pec.it',
+        taxCode: '33445673222',
+        vatNumber: '33445673221',
+        recipientCode: 'M5UXCR1',
+        geographicTaxonomies: [
+          {
+            code: '058091',
+            desc: 'Firenze - Comune',
+          },
+        ],
+        supportEmail: 'comune.bollate@pec.it',
+      },
+      institutionType: 'PA',
+      origin: 'IPA',
+    },
   },
   {
-    externalId: 'externalId2',
-    originId: 'originId2',
-    id: 'partyId2',
-    description: 'Comune di Bollate',
-    urlLogo: 'logo',
-    address: 'address',
-    digitalAddress: 'a@aa.com',
-    taxCode: '11122233345',
-    zipCode: 'zipCode',
-    origin: 'IPA',
-    userRole: 'ADMIN',
+    institution: {
+      id: '999c63d8-554d-4376-233s-4caf2a73822a',
+      billingData: {
+        businessName: 'Comune di Udine',
+        registeredOffice: 'Udine, Piazza Colonna 370',
+        zipCode: '21200',
+        digitalAddress: 'comune.udine@pectest.it',
+        taxCode: '33445673211',
+        vatNumber: '33445673211',
+        recipientCode: 'M2UHYR1',
+        geographicTaxonomies: [
+          {
+            code: '058091',
+            desc: 'Udine - Comune',
+          },
+        ],
+        supportEmail: 'comune.udine@pec.it',
+      },
+      institutionType: 'PA',
+      origin: 'IPA',
+      assistanceContacts: {
+        supportEmail: 'supportemail@mockmail.it',
+      },
+      companyInformations: {
+        businessRegisterPlace: 'register Place test',
+        rea: 'RM-654321',
+        shareCapital: '23456',
+      },
+    },
   },
   {
-    externalId: 'externalId3',
-    originId: 'originId3',
-    id: 'partyId3',
-    description:
-      'Commissario straordinario per la realizzazione di approdi temporanei e di interventi complementari per la salvaguardia di Venezia e della sua laguna e ulteriori interventi per la salvaguardia della laguna di Venezia',
-    urlLogo: 'logo',
-    address: 'address',
-    digitalAddress: 'a@aa.com',
-    taxCode: '33322268945',
-    zipCode: '02102',
-    origin: 'IPA',
-    userRole: 'LIMITED',
-  },
-  {
-    externalId: 'onboarded_externalId',
-    originId: 'onboarded_originId',
-    id: 'onboarded_partyId',
-    description: 'onboarded',
-    urlLogo: 'logo',
-    address: 'address',
-    digitalAddress: 'a@aa.com',
-    taxCode: 'BBBBBB22B22B234K',
-    zipCode: '12125',
-    origin: 'IPA',
-    userRole: 'LIMITED',
+    institution: {
+      id: '370c63d8-1b76-4376-a725-4caf2a73822a',
+      billingData: {
+        businessName: 'Comune di Bollate',
+        registeredOffice: 'Bollate, Piazza Colonna 370',
+        zipCode: '20021',
+        digitalAddress: 'comune.bollate@pec.it',
+        taxCode: 'BBBBBB11A11A123K',
+        vatNumber: '12345678901',
+        recipientCode: 'M2UHYR1',
+        geographicTaxonomies: [
+          {
+            code: '058091',
+            desc: 'Firenze - Comune',
+          },
+        ],
+        supportEmail: 'comune.bollate@pec.it',
+      },
+      institutionType: 'PA',
+      origin: 'IPA',
+      assistanceContacts: {
+        supportEmail: 'a@a.it',
+      },
+      companyInformations: {
+        businessRegisterPlace: 'register Place test',
+        rea: 'RM-123456',
+        shareCapital: '123456',
+      },
+    },
   },
 ];
-
-const mockedOnboardingData0: InstitutionOnboardingInfoResource = {
-  institution: {
-    id: '55897f04-bafd-4bc9-b646-0fd027620c1b',
-    billingData: {
-      businessName: 'Comune di Milano',
-      registeredOffice: 'Milano, Piazza Colonna 370',
-      zipCode: '20021',
-      digitalAddress: 'comune.milano@pec.it',
-      taxCode: 'AAAAAA11A11A123K',
-      vatNumber: 'AAAAAA11A11A123K',
-      recipientCode: 'M5UXCR1',
-      geographicTaxonomies: [
-        {
-          code: '058091',
-          desc: 'Firenze - Comune',
-        },
-      ],
-      supportEmail: 'comune.bollate@pec.it',
-    },
-    institutionType: 'PA',
-    origin: 'IPA',
-  },
-};
-
-const mockedOnboardingData1: InstitutionOnboardingInfoResource = {
-  institution: {
-    id: '370c63d8-1b76-4376-a725-4caf2a73822a',
-    billingData: {
-      businessName: 'Comune di Bollate',
-      registeredOffice: 'Bollate, Piazza Colonna 370',
-      zipCode: '20021',
-      digitalAddress: 'comune.bollate@pec.it',
-      taxCode: 'BBBBBB11A11A123K',
-      vatNumber: '12345678901',
-      recipientCode: 'M2UHYR1',
-      geographicTaxonomies: [
-        {
-          code: '058091',
-          desc: 'Firenze - Comune',
-        },
-      ],
-      supportEmail: 'comune.bollate@pec.it',
-    },
-    institutionType: 'PA',
-    origin: 'IPA',
-    assistanceContacts: {
-      supportEmail: 'a@a.it',
-    },
-    companyInformations: {
-      businessRegisterPlace: 'register Place test',
-      rea: 'RM-123456',
-      shareCapital: '123456',
-    },
-  },
-};
 
 const statusActive = 'ACTIVE';
 const statusTesting = 'TESTING';
@@ -375,6 +446,12 @@ const mockedProducts: Array<Product> = [
   {
     id: 'prod-io',
     title: 'App IO',
+    status: statusActive,
+  },
+  {
+    id: 'prod-io-premium',
+    title: 'App IO Premium',
+    parentId: 'prod-io',
     status: statusActive,
   },
   {
@@ -459,7 +536,14 @@ const mockedResponseError = {
   title: 'Service Unavailable',
 };
 
-const notFoundError: Promise<AxiosError> = new Promise((resolve) =>
+const noContent: Promise<AxiosResponse> = new Promise((resolve) =>
+  resolve({
+    status: 204,
+    statusText: 'No Content',
+  } as AxiosResponse)
+);
+
+const notFound: Promise<AxiosError> = new Promise((resolve) =>
   resolve({
     isAxiosError: true,
     response: { data: '', status: 404, statusText: 'Not Found' },
@@ -562,58 +646,37 @@ export async function mockFetch(
     );
   }
   if (endpoint === 'VERIFY_ONBOARDING') {
-    const selectedProductInTesting = mockedProducts.find(
-      (p) => p.id === endpointParams.productId && p.status === 'TESTING'
-    );
-
     switch (endpointParams.externalInstitutionId) {
       case 'infoError':
+      case 'externalId4':
         return genericError;
-      case 'onboarded':
-        return new Promise((resolve) =>
-          resolve({
-            status: 204,
-            statusText: 'No Content',
-          } as AxiosResponse)
-        );
-      case 'pending':
-        return notFoundError;
-      case 'externalId1':
-      case 'externalId2':
-        if (endpointParams.productId === 'prod-io') {
-          // eslint-disable-next-line sonarjs/no-identical-functions
-          return new Promise((resolve) =>
-            resolve({
-              status: 204,
-              statusText: 'No Content',
-            } as AxiosResponse)
-          );
-        } else {
-          return notFoundError;
-        }
       case 'notAllowed':
         return notAllowedError;
+      case 'onboarded_externalId':
+      case 'onboarded':
+        return noContent;
+      case 'pending':
+        return notFound;
+      // Use case for test not base adhesion
+      case 'externalId3':
+        return notFound;
+      // Use case for test already subscribed premium
+      case 'externalId2':
+        if (
+          endpointParams.productId === 'prod-io' ||
+          endpointParams.productId === 'prod-io-premium'
+        ) {
+          return noContent;
+        } else {
+          return notFound;
+        }
       default:
-        if (endpointParams.productId === 'prod-pagopa') {
-          // eslint-disable-next-line sonarjs/no-identical-functions
-          return new Promise((resolve) =>
-            resolve({
-              status: 204,
-              statusText: 'No Content',
-            } as AxiosResponse)
-          );
+        if (endpointParams.productId !== 'prod-io') {
+          return notFound;
+        } else {
+          return noContent;
         }
     }
-
-    if (selectedProductInTesting) {
-      return notAllowedError;
-    }
-    return new Promise((resolve) =>
-      resolve({
-        isAxiosError: true,
-        response: { data: '', status: 400, statusText: 'Bad Request' },
-      } as AxiosError)
-    );
   }
 
   if (endpoint === 'ONBOARDING_GET_SA_PARTIES_NAME') {
@@ -631,38 +694,26 @@ export async function mockFetch(
   if (endpoint === 'VERIFY_ONBOARDED_VAT_NUMBER') {
     switch (params.vatNumber) {
       case '12345678901':
-        return new Promise((resolve) => {
-          resolve({ data: '', status: 204, statusText: 'No Content' } as AxiosResponse);
-        });
+        return noContent;
       case '12345678902':
-        return new Promise((resolve) => {
-          resolve({
-            isAxiosError: true,
-            response: { status: 404, statusText: 'Not Found' },
-          } as AxiosError);
-        });
+        return notFound;
     }
   }
 
   if (endpoint === 'ONBOARDING_GET_ONBOARDING_DATA') {
-    switch (endpointParams.externalInstitutionId) {
-      case 'externalId1':
-        return new Promise((resolve) =>
-          resolve({ data: mockedOnboardingData0, status: 200, statusText: '200' } as AxiosResponse)
-        );
-      case 'externalId2':
-      case 'id':
-      case 'error':
-        return new Promise((resolve) =>
-          resolve({ data: mockedOnboardingData1, status: 200, statusText: '200' } as AxiosResponse)
-        );
-      default:
-        return new Promise((resolve) =>
-          resolve({
-            isAxiosError: true,
-            response: { status: 404, statusText: 'Not Found' },
-          } as AxiosError)
-        );
+    const onboardingData = mockedOnboardingData.find(
+      (od) => od.institution.billingData.taxCode === endpointParams.externalInstitutionId
+    );
+    if (onboardingData) {
+      return new Promise((resolve) =>
+        resolve({
+          data: onboardingData,
+          status: 200,
+          statusText: '200',
+        } as AxiosResponse)
+      );
+    } else {
+      return notFound;
     }
   }
 
@@ -696,11 +747,12 @@ export async function mockFetch(
     }
   }
   if (endpoint === 'ONBOARDING_POST_LEGALS') {
-    switch (mockedOnboardingData1.institution.billingData.taxCode) {
-      case 'error':
-        return genericError;
-      case 'notAllowedInSubmit':
+    switch (((data as any).billingData as BillingDataDto).taxCode) {
+      case '44444444444':
         return notAllowedError;
+      case '11111111111':
+      case '33445673211':
+        return genericError;
       default:
         const certifiedUser: UserOnCreate | undefined = (
           (data as any).users as Array<UserOnCreate>
@@ -712,7 +764,7 @@ export async function mockFetch(
           return error409;
         } else {
           return new Promise((resolve) =>
-            resolve({ data: '', status: 200, statusText: '200' } as AxiosResponse)
+            resolve({ data: '', status: 201, statusText: 'Created' } as AxiosResponse)
           );
         }
     }
@@ -728,13 +780,7 @@ export async function mockFetch(
         resolve({ data: fetched, status: 200, statusText: '200' } as AxiosResponse)
       );
     } else {
-      // eslint-disable-next-line sonarjs/no-identical-functions
-      return new Promise((resolve) =>
-        resolve({
-          isAxiosError: true,
-          response: { status: 404, statusText: 'Not Found' },
-        } as AxiosError)
-      );
+      return notFound;
     }
   }
 
@@ -757,7 +803,7 @@ export async function mockFetch(
 
   if (endpoint === 'ONBOARDING_TOKEN_VALIDATION') {
     if (window.location.search === '?jwt=tokenNotFound') {
-      return notFoundError;
+      return notFound;
     } else if (window.location.search === '?jwt=tokenAlreadyConsumed') {
       return error409;
     } else if (window.location.search === '?jwt=tokenNotValid') {
