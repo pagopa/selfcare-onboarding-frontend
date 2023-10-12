@@ -106,42 +106,43 @@ function OnboardingComponent({ productId }: { productId: string }) {
   const subunitCodeByQuery =
     new URLSearchParams(window.location.hash.substr(1)).get('subunitCode') ?? '';
 
+  const isTechPartner = institutionType === 'PT';
+
   const alreadyOnboarded: RequestOutcomeMessage = {
     title: '',
-    description:
-      institutionType === 'PT'
-        ? [
-            <Grid key="0">
-              <EndingPage
-                minHeight="52vh"
-                variantTitle={'h4'}
-                variantDescription={'body1'}
-                icon={<IllusError size={60} />}
-                title={<Trans i18nKey="onboardingStep1_5.ptAlreadyOnboarded.title" />}
-                description={
-                  <Trans i18nKey="onboardingStep1_5.ptAlreadyOnboarded.description">
-                    Per operare su un prodotto, chiedi a un Amministratore di <br /> aggiungerti
-                    nella sezione Utenti.
-                  </Trans>
-                }
-                buttonLabel={<Trans i18nKey="onboardingStep1_5.ptAlreadyOnboarded.backAction" />}
-                onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
-              />
-            </Grid>,
-          ]
-        : [
-            <Grid key="0">
-              <EndingPage
-                minHeight="52vh"
-                variantTitle={'h4'}
-                variantDescription={'body1'}
-                title={<Trans i18nKey="onboardingStep1_5.alreadyOnboarded.title" />}
-                description={<Trans i18nKey="onboardingStep1_5.alreadyOnboarded.description" />}
-                buttonLabel={<Trans i18nKey="onboardingStep1_5.alreadyOnboarded.backAction" />}
-                onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
-              />
-            </Grid>,
-          ],
+    description: isTechPartner
+      ? [
+          <Grid key="0">
+            <EndingPage
+              minHeight="52vh"
+              variantTitle={'h4'}
+              variantDescription={'body1'}
+              icon={<IllusError size={60} />}
+              title={<Trans i18nKey="onboardingStep1_5.ptAlreadyOnboarded.title" />}
+              description={
+                <Trans i18nKey="onboardingStep1_5.ptAlreadyOnboarded.description">
+                  Per operare su un prodotto, chiedi a un Amministratore di <br /> aggiungerti nella
+                  sezione Utenti.
+                </Trans>
+              }
+              buttonLabel={<Trans i18nKey="onboardingStep1_5.ptAlreadyOnboarded.backAction" />}
+              onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+            />
+          </Grid>,
+        ]
+      : [
+          <Grid key="0">
+            <EndingPage
+              minHeight="52vh"
+              variantTitle={'h4'}
+              variantDescription={'body1'}
+              title={<Trans i18nKey="onboardingStep1_5.alreadyOnboarded.title" />}
+              description={<Trans i18nKey="onboardingStep1_5.alreadyOnboarded.description" />}
+              buttonLabel={<Trans i18nKey="onboardingStep1_5.alreadyOnboarded.backAction" />}
+              onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+            />
+          </Grid>,
+        ],
   };
 
   useEffect(() => {
@@ -300,6 +301,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
       setExternalInstitutionId(newOnboardingFormData.taxCode);
 
       const partyVerifyOnboarded = async () => {
+        setLoading(true);
         const onboardingStatus = await fetchWithLogs(
           {
             endpoint: 'VERIFY_ONBOARDING',
@@ -319,13 +321,18 @@ function OnboardingComponent({ productId }: { productId: string }) {
             (onboardingStatus as AxiosError<any>).response?.status === 400
           ) {
             setOutcome(null);
-            forward();
+            if (isTechPartner) {
+              setActiveStep(activeStep + 2);
+            } else {
+              forward();
+            }
           } else if ((onboardingStatus as AxiosError<any>).response?.status === 403) {
             setOutcome(notAllowedError);
           } else {
             setOutcome(genericError);
           }
         }
+        setLoading(false);
       };
 
       void partyVerifyOnboarded();
@@ -684,7 +691,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
         OnBoardingProductStepDelegates({
           externalInstitutionId,
           product: selectedProduct,
-          legal: (formData as any).users[0],
+          legal: (formData as any)?.users[0],
           forward: (newFormData: Partial<FormData>) => {
             setFormData({ ...formData, ...newFormData });
             trackEvent('ONBOARDING_ADD_DELEGATE', {
@@ -700,7 +707,13 @@ function OnboardingComponent({ productId }: { productId: string }) {
               });
             });
           },
-          back,
+          back: () => {
+            if (isTechPartner) {
+              setActiveStep(activeStep - 2);
+            } else {
+              setActiveStep(activeStep - 1);
+            }
+          },
         }),
     },
   ];
