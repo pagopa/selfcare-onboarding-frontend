@@ -45,6 +45,7 @@ export function BodyLogger() {
           onExit={onExit}
           enableAssistanceButton={ENV.ENV !== 'UAT'}
           assistanceEmail={ENV.ASSISTANCE.ENABLE ? ENV.ASSISTANCE.EMAIL : undefined}
+          onDocumentationClick={() => window.open(ENV.URL_DOCUMENTATION, '_blank')}
           enableLogin={enableLogin}
           loggedUser={
             user
