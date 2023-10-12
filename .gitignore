@@ -49,6 +49,7 @@ __pycache__/
 coverage
 
 yarn-error.log
+mockApiRequest.ts
 
 *.zip
 
