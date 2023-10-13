@@ -28,7 +28,7 @@ export type UsersObject = { [key: string]: UserOnCreate };
 export type UsersError = { [key: string]: { [userField: string]: Array<string> } };
 
 type Props = StepperStepComponentProps & {
-  legal: UserOnCreate;
+  legal?: UserOnCreate;
   externalInstitutionId: string;
 };
 
@@ -60,7 +60,7 @@ export function OnBoardingProductStepDelegates({
     }
   }, [isAuthUser]);
 
-  const allPeople = { ...people, LEGAL: legal };
+  const allPeople = { ...people, LEGAL: legal } as UsersObject;
 
   const validateUsers = (index: number, peopleErrors: UsersError) => {
     const userIds = Object.keys(people);

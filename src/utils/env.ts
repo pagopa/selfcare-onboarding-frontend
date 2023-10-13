@@ -16,6 +16,8 @@ export const ENV = {
     EMAIL: env.get('REACT_APP_PAGOPA_HELP_EMAIL').required().asString(),
   },
 
+  URL_DOCUMENTATION: 'https://docs.pagopa.it/area-riservata/',
+
   URL_FE: {
     LOGIN: env.get('REACT_APP_URL_FE_LOGIN').required().asString(),
     LOGOUT: env.get('REACT_APP_URL_FE_LOGOUT').required().asString(),

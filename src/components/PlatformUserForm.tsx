@@ -91,7 +91,7 @@ export function validateUser(
 function validateNoMandatory(
   userTempId: keyof UsersObject,
   user: UserOnCreate,
-  users: UsersObject,
+  users?: UsersObject,
   isAuthUser?: boolean
 ): Array<ValidationErrorCode> {
   const usersArray = users

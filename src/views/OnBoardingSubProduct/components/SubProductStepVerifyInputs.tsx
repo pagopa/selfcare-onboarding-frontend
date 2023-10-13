@@ -140,19 +140,14 @@ function SubProductStepVerifyInputs({
 
   useEffect(() => {
     if (
-      selectedProduct !== undefined &&
-      selectedSubProduct !== undefined &&
-      parties !== undefined
+      selectedProduct &&
+      selectedSubProduct &&
+      parties &&
+      selectedSubProduct.parentId === productId
     ) {
-      if (
-        selectedProduct === null ||
-        selectedSubProduct === null ||
-        selectedSubProduct.parentId !== productId
-      ) {
-        setError(true);
-      } else {
-        forward(selectedProduct, selectedSubProduct, parties);
-      }
+      forward(selectedProduct, selectedSubProduct, parties);
+    } else {
+      setError(true);
     }
   }, [selectedProduct, selectedSubProduct, parties]);
 
