@@ -69,10 +69,11 @@ type ValidationErrorCode =
   | `${keyof UserOnCreate}-conflict`;
 
 function stringEquals(str1?: string, str2?: string, caseSensitive?: boolean) {
-  return (
-    (!str1 && !str2) ||
-    (!caseSensitive ? str1?.toUpperCase() === str2?.toUpperCase() : str1 === str2)
-  );
+  return caseSensitive
+    ? str1?.toUpperCase() === str2?.toUpperCase()
+    : str1 && str2
+    ? str1 === str2
+    : false;
 }
 
 export function validateUser(
@@ -99,10 +100,11 @@ function validateNoMandatory(
         .filter((u) => u[0] !== userTempId)
         .map((u) => u[1])
     : [];
+  console.log(usersArray);
   return (
     fields
       // eslint-disable-next-line complexity
-      .map(({ id, regexp, unique, caseSensitive }) =>
+      .map(({ id, regexp, unique, caseSensitive }, index) =>
         regexp &&
         user[id] &&
         user.taxCode &&
@@ -112,7 +114,9 @@ function validateNoMandatory(
           ? `${id}-regexp`
           : regexp && user[id] && !regexp.test(user[id] as string) && id === 'email'
           ? `${id}-regexp`
-          : unique && usersArray.findIndex((u) => stringEquals(u[id], user[id], caseSensitive)) > -1
+          : unique &&
+            usersArray[index] &&
+            usersArray.findIndex((u) => stringEquals(u[id], user[id], caseSensitive)) > -1
           ? `${id}-unique`
           : id === 'name' &&
             user.name &&
