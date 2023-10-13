@@ -331,10 +331,9 @@ function OnboardingComponent({ productId }: { productId: string }) {
           } else {
             setOutcome(genericError);
           }
+          setLoading(false);
         }
-        setLoading(false);
       };
-
       void partyVerifyOnboarded();
     }
     forward();
