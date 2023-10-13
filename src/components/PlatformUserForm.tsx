@@ -100,7 +100,6 @@ function validateNoMandatory(
         .filter((u) => u[0] !== userTempId)
         .map((u) => u[1])
     : [];
-  console.log(usersArray);
   return (
     fields
       // eslint-disable-next-line complexity
