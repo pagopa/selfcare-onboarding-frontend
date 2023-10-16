@@ -112,7 +112,9 @@ function validateNoMandatory(
           ? `${id}-regexp`
           : regexp && user[id] && !regexp.test(user[id] as string) && id === 'email'
           ? `${id}-regexp`
-          : unique && usersArray.findIndex((u) => stringEquals(u[id], user[id], caseSensitive)) > -1
+          : unique &&
+            usersArray &&
+            usersArray.findIndex((u) => stringEquals(u[id], user[id], caseSensitive)) > -1
           ? `${id}-unique`
           : id === 'name' &&
             user.name &&
