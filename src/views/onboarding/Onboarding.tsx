@@ -703,7 +703,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
               party_id: externalInstitutionId,
               product_id: productId,
             });
-            submit(isTechPartner ? usersWithoutLegal : (newFormData as any).users).catch(() => {
+            submit(isTechPartner ? usersWithoutLegal : users).catch(() => {
               trackEvent('ONBOARDING_ADD_DELEGATE', {
                 request_id: requestIdRef.current,
                 party_id: externalInstitutionId,
