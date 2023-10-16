@@ -301,7 +301,6 @@ function OnboardingComponent({ productId }: { productId: string }) {
       setExternalInstitutionId(newOnboardingFormData.taxCode);
 
       const partyVerifyOnboarded = async () => {
-        setLoading(true);
         const onboardingStatus = await fetchWithLogs(
           {
             endpoint: 'VERIFY_ONBOARDING',
@@ -332,12 +331,11 @@ function OnboardingComponent({ productId }: { productId: string }) {
             setOutcome(genericError);
           }
         }
-        setLoading(false);
       };
-
       void partyVerifyOnboarded();
+    } else {
+      forward();
     }
-    forward();
   };
 
   const outcomeContent: RequestOutcomeOptions = {
@@ -691,7 +689,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
         OnBoardingProductStepDelegates({
           externalInstitutionId,
           product: selectedProduct,
-          legal: (formData as any)?.users[0],
+          legal: isTechPartner ? undefined : (formData as any)?.users[0],
           forward: (newFormData: Partial<FormData>) => {
             setFormData({ ...formData, ...newFormData });
             trackEvent('ONBOARDING_ADD_DELEGATE', {
