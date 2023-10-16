@@ -220,7 +220,11 @@ function OnboardingComponent({ productId }: { productId: string }) {
   };
 
   const forwardWithData = (newFormData: Partial<FormData>) => {
-    setFormData({ ...formData, ...newFormData });
+    if (formData) {
+      setFormData({ ...formData, ...newFormData });
+    } else {
+      setFormData(newFormData);
+    }
     forward();
   };
 
@@ -691,13 +695,15 @@ function OnboardingComponent({ productId }: { productId: string }) {
           product: selectedProduct,
           legal: isTechPartner ? undefined : (formData as any)?.users[0],
           forward: (newFormData: Partial<FormData>) => {
+            const users = (newFormData as any).users as Array<UserOnCreate>;
+            const usersWithoutLegal = users.slice(0, 0).concat(users.slice(0 + 1));
             setFormData({ ...formData, ...newFormData });
             trackEvent('ONBOARDING_ADD_DELEGATE', {
               request_id: requestIdRef.current,
               party_id: externalInstitutionId,
               product_id: productId,
             });
-            submit((newFormData as any).users).catch(() => {
+            submit(isTechPartner ? usersWithoutLegal : users).catch(() => {
               trackEvent('ONBOARDING_ADD_DELEGATE', {
                 request_id: requestIdRef.current,
                 party_id: externalInstitutionId,

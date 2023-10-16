@@ -60,7 +60,7 @@ export function OnBoardingProductStepDelegates({
     }
   }, [isAuthUser]);
 
-  const allPeople = { ...people, LEGAL: legal } as UsersObject;
+  const allPeople = legal ? ({ ...people, LEGAL: legal } as UsersObject) : people;
 
   const validateUsers = (index: number, peopleErrors: UsersError) => {
     const userIds = Object.keys(people);
