@@ -689,7 +689,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
         OnBoardingProductStepDelegates({
           externalInstitutionId,
           product: selectedProduct,
-          legal: isTechPartner ? [] : (formData as any)?.users[0],
+          legal: isTechPartner ? undefined : (formData as any)?.users[0],
           forward: (newFormData: Partial<FormData>) => {
             setFormData({ ...formData, ...newFormData });
             trackEvent('ONBOARDING_ADD_DELEGATE', {
