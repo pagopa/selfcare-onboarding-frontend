@@ -33,6 +33,7 @@ const institutionTypeValues: Array<{ labelKey: string; value: InstitutionType }>
   { labelKey: 'pt', value: 'PT' },
   { labelKey: 'psp', value: 'PSP' },
   { labelKey: 'sa', value: 'SA' },
+  { labelKey: 'as', value: 'AS' },
 ];
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
@@ -67,7 +68,11 @@ export default function StepInstitutionType({
     switch (id) {
       case 'prod-interop':
         return institutionTypeValues.filter(
-          (it) => it.labelKey === 'pa' || it.labelKey === 'gsp' || it.labelKey === 'sa'
+          (it) =>
+            it.labelKey === 'pa' ||
+            it.labelKey === 'gsp' ||
+            it.labelKey === 'sa' ||
+            it.labelKey === 'as'
         );
       case 'prod-pagopa':
         return institutionTypeValues.filter(
@@ -122,7 +127,7 @@ export default function StepInstitutionType({
       return t('stepInstitutionType.cadArticle165');
     } else if (selectedProductId === 'prod-pagopa' && itValue === 'PSP') {
       return t('stepInstitutionType.cadPsp');
-    } else if (selectedProductId === 'prod-interop' && itValue === 'SA') {
+    } else if (selectedProductId === 'prod-interop' && (itValue === 'SA' || itValue === 'AS')) {
       return '';
     } else {
       return t('stepInstitutionType.cadArticle2A');
