@@ -450,6 +450,7 @@ export default {
       pt: 'Partner tecnologico',
       psp: 'Prestatori Servizi di Pagamento',
       sa: 'Gestore privato di piattaforma e-procurement',
+      as: 'Società di assicurazione',
     },
     cadArticle2A: 'art. 2, comma 2, lettera A del CAD',
     cadArticle2B: 'art. 2, comma 2, lettera B del CAD',
