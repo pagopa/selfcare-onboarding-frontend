@@ -60,7 +60,7 @@ export default function PersonalAndBillingDataSection({
   const isFromIPA = origin === 'IPA';
   const isPSP = institutionType === 'PSP';
   const isPA = institutionType === 'PA';
-  const isSA = institutionType === 'SA';
+  const isContractingAuthority = institutionType === 'SA';
   const isTechPartner = institutionType === 'PT';
   const isDisabled = premiumFlow || (isFromIPA && !isPA && !isPSP) || isPA;
   const requiredError = 'Required';
@@ -186,7 +186,7 @@ export default function PersonalAndBillingDataSection({
                   400,
                   18
                 )}
-                disabled={isDisabled || isSA}
+                disabled={isDisabled || isContractingAuthority}
               />
             </Grid>
           )}
@@ -225,7 +225,7 @@ export default function PersonalAndBillingDataSection({
                 400,
                 18
               )}
-              disabled={isDisabled || isSA}
+              disabled={isDisabled || isContractingAuthority}
             />
           </Grid>
           {/* Codice fiscale */}
@@ -237,7 +237,7 @@ export default function PersonalAndBillingDataSection({
                 400,
                 18
               )}
-              disabled={(isDisabled && !isAooUo) || isSA}
+              disabled={(isDisabled && !isAooUo) || isContractingAuthority}
             />
           </Grid>
           {/* Checkbox codice fiscale = P.IVA */}
@@ -300,7 +300,7 @@ export default function PersonalAndBillingDataSection({
                   </Typography>
                 </Box>
               )}
-              {!isSA && !isTechPartner && (
+              {!isContractingAuthority && !isTechPartner && (
                 <Grid item xs={12} mt={3}>
                   <CustomTextField
                     {...baseTextFieldProps(
@@ -326,14 +326,14 @@ export default function PersonalAndBillingDataSection({
             </Typography>
           </Grid>
           {/* institutionType !== 'PA' && institutionType !== 'PSP' && productId === 'prod-io'; */}
-          {(isInformationCompany || isSA) && (
+          {(isInformationCompany || isContractingAuthority) && (
             <>
               <Grid item xs={12}>
                 {/* Luogo di iscrizione al Registro delle Imprese facoltativo per institution Type !== 'PA' e 'PSP */}
                 <CustomTextField
                   {...baseTextFieldProps(
                     'businessRegisterPlace',
-                    isSA
+                    isContractingAuthority
                       ? t(
                           'onboardingFormData.billingDataSection.informationCompanies.requiredCommercialRegisterNumber'
                         )
@@ -363,7 +363,7 @@ export default function PersonalAndBillingDataSection({
                   name={'shareCapital'}
                   {...baseTextFieldProps(
                     'shareCapital',
-                    isSA
+                    isContractingAuthority
                       ? t(
                           'onboardingFormData.billingDataSection.informationCompanies.requiredShareCapital'
                         )

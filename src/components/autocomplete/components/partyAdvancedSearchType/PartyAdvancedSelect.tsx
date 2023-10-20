@@ -94,8 +94,8 @@ export default function PartyAdvancedSelect({
     (product.id === 'prod-interop' ||
       product.id === 'prod-io-sign' ||
       product.id === 'prod-pn-dev');
-  const isSA = institutionType === 'SA';
-  const isAS = institutionType === 'AS';
+  const isContractingAuthority = institutionType === 'SA';
+  const isInsuranceCompany = institutionType === 'AS';
 
   const menuItems = [
     {
@@ -143,8 +143,8 @@ export default function PartyAdvancedSelect({
 
         {ENV.AOO_UO.SHOW_AOO_UO &&
           filteredByProducts &&
-          !isSA &&
-          !isAS &&
+          !isContractingAuthority &&
+          !isInsuranceCompany &&
           menuItems.map((item) => (
             <MenuItem
               key={item.id}
