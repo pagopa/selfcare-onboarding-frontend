@@ -256,7 +256,7 @@ export function StepSearchParty({
                 per cui vuoi richiedere l’adesione a <br /> Interoperabilità.
               </Trans>
             ) : institutionType === 'AS' ? (
-              <Trans i18nKey="onboardingStep1.onboarding.saSubTitle">
+              <Trans i18nKey="onboardingStep1.onboarding.asSubTitle">
                 Se sei una società di assicurazione presente nell’Albo delle <br /> imprese IVASS,
                 inserisci uno dei dati richiesti e cerca l’ente per
                 <br /> cui vuoi richiedere l’adesione a Interoperabilità.
