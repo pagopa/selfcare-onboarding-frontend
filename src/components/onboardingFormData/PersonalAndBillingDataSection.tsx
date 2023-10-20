@@ -61,10 +61,10 @@ export default function PersonalAndBillingDataSection({
   const isPSP = institutionType === 'PSP';
   const isPA = institutionType === 'PA';
   const isContractingAuthority = institutionType === 'SA';
-  const isInsurance = institutionType === 'AS';
+  const isInsuranceCompany = institutionType === 'AS';
   const isTechPartner = institutionType === 'PT';
   const isDisabled = premiumFlow || (isFromIPA && !isPA && !isPSP) || isPA;
-  const recipientCodeVisible = !isContractingAuthority && !isTechPartner && !isInsurance;
+  const recipientCodeVisible = !isContractingAuthority && !isTechPartner && !isInsuranceCompany;
   const requiredError = 'Required';
   const isAooUo = aooSelected || uoSelected;
   const baseNumericFieldProps = (
@@ -188,7 +188,7 @@ export default function PersonalAndBillingDataSection({
                   400,
                   18
                 )}
-                disabled={isDisabled || isContractingAuthority || isInsurance}
+                disabled={isDisabled || isContractingAuthority || isInsuranceCompany}
               />
             </Grid>
           )}
@@ -198,13 +198,13 @@ export default function PersonalAndBillingDataSection({
             <CustomTextField
               {...baseTextFieldProps(
                 'registeredOffice',
-                isInsurance
+                isInsuranceCompany
                   ? t('onboardingFormData.billingDataSection.fullLegalAddress')
                   : t('onboardingFormData.billingDataSection.registeredOffice'),
                 400,
                 18
               )}
-              disabled={!isAooUo && isDisabled && !isInsurance}
+              disabled={!isAooUo && isDisabled && !isInsuranceCompany}
             />
           </Grid>
           {/* CAP */}
@@ -217,7 +217,7 @@ export default function PersonalAndBillingDataSection({
                 400,
                 18
               )}
-              disabled={!isAooUo && isDisabled && !isInsurance}
+              disabled={!isAooUo && isDisabled && !isInsuranceCompany}
             />
           </Grid>
           {/* Indirizzo PEC */}
@@ -229,7 +229,7 @@ export default function PersonalAndBillingDataSection({
                 400,
                 18
               )}
-              disabled={isDisabled || isContractingAuthority || isInsurance}
+              disabled={isDisabled || isContractingAuthority || isInsuranceCompany}
             />
           </Grid>
           {/* Codice fiscale */}
@@ -241,7 +241,7 @@ export default function PersonalAndBillingDataSection({
                 400,
                 18
               )}
-              disabled={(isDisabled && !isAooUo) || isContractingAuthority || isInsurance}
+              disabled={(isDisabled && !isAooUo) || isContractingAuthority || isInsuranceCompany}
             />
           </Grid>
           {/* Checkbox codice fiscale = P.IVA */}
@@ -329,7 +329,7 @@ export default function PersonalAndBillingDataSection({
               )}
             </Typography>
           </Grid>
-          {isInsurance && (
+          {isInsuranceCompany && (
             <Grid item xs={12}>
               <CustomTextField
                 {...baseTextFieldProps(

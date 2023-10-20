@@ -92,7 +92,7 @@ export default function StepOnboardingFormData({
   const premiumFlow = !!subProductId;
   const isPSP = institutionType === 'PSP';
   const isContractingAuthority = institutionType === 'SA';
-  const isInsurance = institutionType === 'AS';
+  const isInsuranceCompany = institutionType === 'AS';
   const isTechPartner = institutionType === 'PT';
   const isInformationCompany =
     institutionType !== 'PA' &&
@@ -335,7 +335,7 @@ export default function StepOnboardingFormData({
             ? t('onboardingFormData.billingDataSection.invalidEmail')
             : undefined,
         recipientCode:
-          !isContractingAuthority && !isTechPartner && !isInsurance && !values.recipientCode
+          !isContractingAuthority && !isTechPartner && !isInsuranceCompany && !values.recipientCode
             ? requiredError
             : undefined,
         geographicTaxonomies:
