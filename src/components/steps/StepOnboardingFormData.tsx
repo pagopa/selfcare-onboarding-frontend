@@ -285,11 +285,14 @@ export default function StepOnboardingFormData({
             : isVatRegistrated
             ? t('onboardingFormData.billingDataSection.vatNumberAlreadyRegistered')
             : undefined,
-        ivassCode: !values.ivassCode
-          ? requiredError
-          : values.ivassCode && !fiveCharactersAlphanumeric.test(values.ivassCode)
-          ? t('onboardingFormData.billingDataSection.invalidIvassCode')
-          : undefined,
+        ivassCode:
+          isInsuranceCompany && !values.ivassCode
+            ? requiredError
+            : isInsuranceCompany &&
+              values.ivassCode &&
+              !fiveCharactersAlphanumeric.test(values.ivassCode)
+            ? t('onboardingFormData.billingDataSection.invalidIvassCode')
+            : undefined,
         digitalAddress: !values.digitalAddress
           ? requiredError
           : !emailRegexp.test(values.digitalAddress)
