@@ -503,7 +503,7 @@ const mockedStationResource: StationResource = {
     {
       anacEnabled: false,
       anacEngaged: false,
-      description: 'description',
+      description: 'descriptionAS',
       digitalAddress: 'email@example.com',
       id: 'id2',
       originId: 'string',
@@ -526,7 +526,7 @@ const mockedInsuranceResource: InsuranceCompaniesResource = {
   items: [
     {
       address: 'addres',
-      description: 'description',
+      description: 'descriptionInsurance',
       digitalAddress: 'email@example.com',
       id: '12345678911',
       origin: 'IVASS',
@@ -541,7 +541,7 @@ const mockedInsuranceResource: InsuranceCompaniesResource = {
 const mockedANACParty = {
   anacEnabled: false,
   anacEngaged: false,
-  description: 'description',
+  description: 'descriptionAnac',
   digitalAddress: 'email@example.com',
   id: 'id2',
   originId: 'string',

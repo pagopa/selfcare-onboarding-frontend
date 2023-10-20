@@ -262,7 +262,7 @@ export default function AsyncAutocompleteContainer({
       if (value.length >= 3 && isBusinessNameSelected && !isTaxCodeSelected) {
         seachByInstitutionType(value, institutionType);
       } else if (isTaxCodeSelected && value.length === 11) {
-        if (institutionType !== 'SA') {
+        if (institutionType === 'SA') {
           void handleSearchSaByTaxCode(value);
         } else {
           void handleSearchByTaxCode(value);
