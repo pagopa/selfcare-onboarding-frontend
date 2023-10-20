@@ -255,6 +255,12 @@ export function StepSearchParty({
                 la certificazione ad AgID, inserisci uno dei dati <br /> richiesti e cerca l’ente
                 per cui vuoi richiedere l’adesione a <br /> Interoperabilità.
               </Trans>
+            ) : institutionType === 'AS' ? (
+              <Trans i18nKey="onboardingStep1.onboarding.asSubTitle">
+                Se sei una società di assicurazione presente nell’Albo delle <br /> imprese IVASS,
+                inserisci uno dei dati richiesti e cerca l’ente per
+                <br /> cui vuoi richiedere l’adesione a Interoperabilità.
+              </Trans>
             ) : (
               subTitle
             )}
@@ -337,7 +343,7 @@ export function StepSearchParty({
           />
         </Grid>
       </Grid>
-      {institutionType !== 'SA' && (
+      {institutionType !== 'SA' && institutionType !== 'AS' && (
         <Grid container item justifyContent="center">
           <Grid item xs={6}>
             <Box

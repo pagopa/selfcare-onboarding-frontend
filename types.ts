@@ -221,3 +221,19 @@ export type StationResource = {
   count: number;
   items: Array<ANACParty>;
 };
+export type InsuranceCompanyResource = {
+  address: string;
+  description: string;
+  digitalAddress: string;
+  id: string;
+  origin: string;
+  originId: string;
+  registerType: string;
+  taxCode: string;
+  workType: string;
+};
+
+export type InsuranceCompaniesResource = {
+  count: number;
+  items: Array<InsuranceCompanyResource>;
+};

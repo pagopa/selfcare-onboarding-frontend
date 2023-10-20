@@ -6,6 +6,7 @@ import {
   StationResource,
   Product,
   UserOnCreate,
+  InsuranceCompaniesResource,
 } from '../../../types';
 import { BillingDataDto } from '../../model/BillingData';
 import { nationalValue } from '../../model/GeographicTaxonomies';
@@ -502,7 +503,7 @@ const mockedStationResource: StationResource = {
     {
       anacEnabled: false,
       anacEngaged: false,
-      description: 'description',
+      description: 'descriptionAS',
       digitalAddress: 'email@example.com',
       id: 'id2',
       originId: 'string',
@@ -520,10 +521,27 @@ const mockedStationResource: StationResource = {
   ],
 };
 
+const mockedInsuranceResource: InsuranceCompaniesResource = {
+  count: 0,
+  items: [
+    {
+      address: 'addres',
+      description: 'descriptionInsurance',
+      digitalAddress: 'email@example.com',
+      id: '12345678911',
+      origin: 'IVASS',
+      originId: 'codice IVASS',
+      registerType: 'string',
+      taxCode: '12345678911',
+      workType: 'string',
+    },
+  ],
+};
+
 const mockedANACParty = {
   anacEnabled: false,
   anacEngaged: false,
-  description: 'description',
+  description: 'descriptionAnac',
   digitalAddress: 'email@example.com',
   id: 'id2',
   originId: 'string',
@@ -682,6 +700,12 @@ export async function mockFetch(
   if (endpoint === 'ONBOARDING_GET_SA_PARTIES_NAME') {
     return new Promise((resolve) =>
       resolve({ data: mockedStationResource, status: 200, statusText: '200' } as AxiosResponse)
+    );
+  }
+
+  if (endpoint === 'ONBOARDING_GET_INSURANCE_COMPANIES_BY_NAME') {
+    return new Promise((resolve) =>
+      resolve({ data: mockedInsuranceResource, status: 200, statusText: '200' } as AxiosResponse)
     );
   }
 

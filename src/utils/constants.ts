@@ -107,6 +107,9 @@ export const API = {
   ONBOARDING_GET_SA_PARTY_FROM_FC: {
     URL: ENV.URL_API.PARTY_REGISTRY_PROXY + '/stations/{{id}}',
   },
+  ONBOARDING_GET_INSURANCE_COMPANIES_BY_NAME: {
+    URL: ENV.URL_API.PARTY_REGISTRY_PROXY + '/insurance-companies',
+  },
 };
 
 export const USER_ROLE_LABEL = {
