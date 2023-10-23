@@ -338,7 +338,7 @@ export default function PersonalAndBillingDataSection({
                   400,
                   18
                 )}
-                value={formik.values.originId} // ivassCode === originId
+                value={formik.values.ivassCode}
               />
             </Grid>
           )}
