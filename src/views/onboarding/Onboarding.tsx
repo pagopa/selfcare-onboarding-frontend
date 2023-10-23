@@ -280,6 +280,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
       vatNumber: '',
       zipCode: aooResult ? aooResult.CAP : uoResult ? uoResult.CAP : party.zipCode,
       geographicTaxonomies: onboardingFormData?.geographicTaxonomies as Array<GeographicTaxonomy>,
+      ivassCode: institutionType === 'AS' ? party.originId : undefined,
     });
     forwardWithData(newFormData);
     trackEvent('ONBOARDING_PARTY_SELECTION', {
@@ -445,6 +446,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
               ? companyInformationsDto2pspDataRequest(onboardingFormData as OnboardingFormData)
               : undefined,
           institutionType,
+          ivassCode: onboardingFormData?.ivassCode,
           geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY //
             ? onboardingFormData?.geographicTaxonomies?.map((gt) =>
                 onboardedInstitutionInfo2geographicTaxonomy(gt)

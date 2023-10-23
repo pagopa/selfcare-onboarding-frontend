@@ -209,11 +209,17 @@ export default function AsyncAutocompleteContainer({
     setIsLoading(false);
   };
 
-  const handleSearchSaByTaxCode = async (query: string) => {
+  const contractingInsuranceFromTaxId = async (query: string) => {
     setIsLoading(true);
 
     const searchResponse = await fetchWithLogs(
-      { endpoint: 'ONBOARDING_GET_SA_PARTY_FROM_FC', endpointParams: { id: query } },
+      {
+        endpoint:
+          institutionType === 'SA'
+            ? 'ONBOARDING_GET_SA_PARTY_FROM_FC'
+            : 'ONBOARDING_GET_INSURANCE_COMPANIES_BY_TAXCODE',
+        endpointParams: institutionType === 'SA' ? { id: query } : { taxId: query },
+      },
       {
         method: 'GET',
       },
@@ -262,8 +268,8 @@ export default function AsyncAutocompleteContainer({
       if (value.length >= 3 && isBusinessNameSelected && !isTaxCodeSelected) {
         seachByInstitutionType(value, institutionType);
       } else if (isTaxCodeSelected && value.length === 11) {
-        if (institutionType === 'SA') {
-          void handleSearchSaByTaxCode(value);
+        if (institutionType === 'SA' || institutionType === 'AS') {
+          void contractingInsuranceFromTaxId(value);
         } else {
           void handleSearchByTaxCode(value);
         }
