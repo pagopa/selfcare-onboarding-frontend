@@ -92,6 +92,8 @@ export default {
       ipaDescription: `Non trovi il tuo ente nell'IPA? In <1>questa pagina</1> trovi maggiori <3/> informazioni sull'indice e su come accreditarsi `,
       saSubTitle:
         'Se sei tra i gestori privati di piattaforma e-procurement e hai <1/>già chiesto la certificazione ad AgID, inserisci uno dei dati<3/> richiesti e cerca l’ente per cui vuoi richiedere l’adesione a<5/> Interoperabilità.',
+      asSubTitle:
+        'Se sei una società di assicurazione presente nell’Albo delle <1/>imprese IVASS, inserisci uno dei dati richiesti e cerca l’ente per<3/> cui vuoi richiedere l’adesione a Interoperabilità.',
       asyncAutocomplete: {
         placeholder: 'Cerca',
       },
@@ -477,6 +479,7 @@ export default {
       invalidFiscalCode: 'Il Codice Fiscale non è valido',
       invalidZipCode: 'Il CAP non è valido',
       invalidVatNumber: 'La Partita IVA non è valida',
+      invalidIvassCode: 'Il Codice Ivass non è valido',
       invalidEmail: 'L’indirizzo email non è valido',
       invalidReaField: 'Il Campo REA non è valido',
       invalidMailSupport: 'L’indirizzo email non è valido',
@@ -489,12 +492,14 @@ export default {
       aooUniqueCode: 'Codice Univoco AOO',
       uoUniqueCode: 'Codice Univoco UO',
       registeredOffice: 'Sede legale',
+      fullLegalAddress: 'Indirizzo e numero civico della sede legale',
       zipCode: 'CAP',
       digitalAddress: 'Indirizzo PEC',
       taxCodeEquals2PIVAdescription: 'La Partita IVA coincide con il Codice Fiscale',
       vatNumberGroup: 'La Partita IVA è di gruppo',
       taxCode: 'Codice Fiscale',
       vatNumber: 'Partita IVA',
+      ivassCode: 'Codice IVASS',
       sdiCode: 'Codice SDI',
       recipientCodeDescription: 'È il codice necessario per ricevere le fatture elettroniche',
       gspDescription: 'Sono gestore di almeno uno dei pubblici servizi: Gas, Energia, Telco.',

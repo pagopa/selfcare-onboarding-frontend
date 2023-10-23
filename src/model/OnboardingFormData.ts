@@ -13,6 +13,8 @@ export type OnboardingFormData = {
   taxCode: string;
   // Partita iva
   vatNumber: string;
+  // IVASS code
+  ivassCode?: string;
   // Codice destinatario
   recipientCode: string;
   // servizi pubblici
