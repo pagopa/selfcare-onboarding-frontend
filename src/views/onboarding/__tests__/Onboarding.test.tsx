@@ -111,6 +111,17 @@ test('test error retrieving onboarding info', async () => {
   await executeGoHome(false);
 });
 
+test('test search trying to type invalid characters', async () => {
+  renderComponent('prod-pagopa');
+  await executeStepInstitutionType('prod-pagopa');
+  const inputPartyName = document.getElementById('Parties') as HTMLElement;
+
+  expect(inputPartyName).toBeTruthy();
+  fireEvent.change(inputPartyName, { target: { value: 'AGENCY ERROR ())!/!/££!' } });
+
+  const partyName = await waitFor(() => screen.getByText('AGENCY ERROR'));
+});
+
 test('test error productID', async () => {
   renderComponent('error');
   await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(1));

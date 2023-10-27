@@ -260,8 +260,20 @@ export default function AsyncAutocompleteContainer({
   };
   // eslint-disable-next-line sonarjs/cognitive-complexity
   const handleChange = (event: any) => {
-    const value = event.target.value as string;
-    setInput(value);
+    const typedInput = event.target.value as string;
+
+    const cleanerInput = typedInput
+      .replace(/[$%&'()!£[\]{}*+/:;<>@=?^|~]/g, '')
+      .replace("''", "'")
+      .replace('""', '"')
+      .replace('--', '-')
+      .replace('__', '_')
+      .replace(',,', ',')
+      .replace('..', '.');
+
+    setInput(cleanerInput);
+
+    const value = cleanerInput;
 
     if (value !== '') {
       setSelected(null);
