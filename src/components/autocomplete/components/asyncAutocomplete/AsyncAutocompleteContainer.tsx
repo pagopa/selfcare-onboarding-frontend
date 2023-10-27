@@ -263,7 +263,7 @@ export default function AsyncAutocompleteContainer({
     const typedInput = event.target.value as string;
 
     const cleanerInput = typedInput
-      .replace(/[$%&'()!£[\]{}*+/:;<>@=?^|~]/g, '')
+      .replace(/[$%&’()§#!£[\]{}*+/:;<>@=?^|~]/g, '')
       .replace("''", "'")
       .replace('""', '"')
       .replace('--', '-')
