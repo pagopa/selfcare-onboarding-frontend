@@ -126,5 +126,3 @@ export const USER_PLATFORM_ROLE_LABEL = {
   security: 'operatore di sicurezza',
   api: 'operatore API',
 };
-
-export const specialCharactersRegExp = /[$%&’()§#!£[\]{}*+/:;<>@=?^|~]/g;

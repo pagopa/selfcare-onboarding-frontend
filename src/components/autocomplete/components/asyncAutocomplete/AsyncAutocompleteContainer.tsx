@@ -12,7 +12,6 @@ import { getFetchOutcome } from '../../../../lib/error-utils';
 import { AooData } from '../../../../model/AooData';
 import { InstitutionResource } from '../../../../model/InstitutionResource';
 import { UoData } from '../../../../model/UoModel';
-import { specialCharactersRegExp } from '../../../../utils/constants';
 import { ENV } from '../../../../utils/env';
 import AsyncAutocompleteResultsBusinessName from './components/AsyncAutocompleteResultsBusinessName';
 import AsyncAutocompleteResultsCode from './components/AsyncAutocompleteResultsCode';
@@ -263,8 +262,9 @@ export default function AsyncAutocompleteContainer({
   const handleChange = (event: any) => {
     const typedInput = event.target.value as string;
 
+    const newRegExp = new RegExp('[$%&’()\\[\\]{}*+/:;<>@=?^|~]', 'g');
     const cleanerInput = typedInput
-      .replace(specialCharactersRegExp, '')
+      .replace(newRegExp, '')
       .replace("''", "'")
       .replace('""', '"')
       .replace('--', '-')
