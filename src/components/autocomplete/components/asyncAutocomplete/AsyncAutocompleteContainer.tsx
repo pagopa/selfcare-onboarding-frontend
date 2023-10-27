@@ -262,19 +262,23 @@ export default function AsyncAutocompleteContainer({
   const handleChange = (event: any) => {
     const typedInput = event.target.value as string;
 
-    const newRegExp = new RegExp('[$%&’()\\[\\]{}*+/:;<>@=?^|~]', 'g');
-    const cleanerInput = typedInput
-      .replace(newRegExp, '')
-      .replace("''", "'")
-      .replace('""', '"')
-      .replace('--', '-')
-      .replace('__', '_')
-      .replace(',,', ',')
-      .replace('..', '.');
+    const removeSpecialCharacters = (typedInput: string) => {
+      const specialCharacters = '[$%&’()§#!£{}*+/:;<>@=?^|~]';
 
-    setInput(cleanerInput);
+      return typedInput
+        .split('')
+        .map((char) => (specialCharacters.includes(char) ? '' : char))
+        .join('')
+        .replace("''", "'")
+        .replace('""', '"')
+        .replace('--', '-')
+        .replace('__', '_')
+        .replace(',,', ',')
+        .replace('..', '.');
+    };
 
-    const value = cleanerInput;
+    const value = removeSpecialCharacters(typedInput);
+    setInput(value);
 
     if (value !== '') {
       setSelected(null);
