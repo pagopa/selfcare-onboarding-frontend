@@ -147,8 +147,16 @@ export function SubProductStepOnBoardingStatus({
 
   const checkProduct = async (): Promise<boolean> => {
     const onboardingProductStatus = await fetchWithLogs(
-      { endpoint: 'VERIFY_ONBOARDING', endpointParams: { externalInstitutionId, productId } },
-      { method: 'HEAD' },
+      {
+        endpoint: 'VERIFY_ONBOARDING',
+      },
+      {
+        method: 'HEAD',
+        params: {
+          taxCode: externalInstitutionId,
+          productId,
+        },
+      },
       () => setRequiredLogin(true)
     );
     const restOutcomeProduct = getFetchOutcome(onboardingProductStatus);
@@ -174,9 +182,14 @@ export function SubProductStepOnBoardingStatus({
     const onboardingSubProductStatus = await fetchWithLogs(
       {
         endpoint: 'VERIFY_ONBOARDING',
-        endpointParams: { externalInstitutionId, productId: subProductId },
       },
-      { method: 'HEAD' },
+      {
+        method: 'HEAD',
+        params: {
+          taxCode: externalInstitutionId,
+          productId: subProductId,
+        },
+      },
       () => setRequiredLogin(true)
     );
     const restOutcomeSubProduct = getFetchOutcome(onboardingSubProductStatus);
