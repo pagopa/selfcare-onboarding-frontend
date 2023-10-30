@@ -387,7 +387,7 @@ export default function StepOnboardingFormData({
     const requestId = uniqueId('verify-onboarding-vatnumber');
     const onboardingStatus = await fetchWithLogs(
       {
-        endpoint: 'VERIFY_ONBOARDED_VAT_NUMBER',
+        endpoint: 'VERIFY_ONBOARDING',
       },
       {
         method: 'HEAD',
@@ -407,7 +407,7 @@ export default function StepOnboardingFormData({
 
     if (restOutcome === 'success') {
       setIsVatRegistrated(true);
-      trackEvent('VERIFY_ONBOARDED_VAT_NUMBER', { request_id: requestId });
+      trackEvent('VERIFY_ONBOARDING', { request_id: requestId });
     } else {
       setIsVatRegistrated(false);
     }

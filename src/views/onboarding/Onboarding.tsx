@@ -309,9 +309,19 @@ function OnboardingComponent({ productId }: { productId: string }) {
         const onboardingStatus = await fetchWithLogs(
           {
             endpoint: 'VERIFY_ONBOARDING',
-            endpointParams: { externalInstitutionId: newOnboardingFormData.taxCode, productId },
           },
-          { method: 'HEAD' },
+          {
+            method: 'HEAD',
+            params: {
+              taxCode: externalInstitutionId,
+              productId,
+              subunitCode: aooSelected
+                ? aooSelected.codiceUniAoo
+                : uoSelected
+                ? uoSelected.codiceUniUo
+                : undefined,
+            },
+          },
           () => setRequiredLogin(true)
         );
         const restOutcome = getFetchOutcome(onboardingStatus);
@@ -615,6 +625,8 @@ function OnboardingComponent({ productId }: { productId: string }) {
           productId,
           selectedProduct,
           selectedParty,
+          aooSelected,
+          uoSelected,
         }),
     },
     {
