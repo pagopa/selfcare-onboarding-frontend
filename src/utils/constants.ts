@@ -45,11 +45,8 @@ export const ROUTES: RoutesObject = {
 };
 
 export const API = {
-  VERIFY_ONBOARDING: {
-    URL: ENV.URL_API.ONBOARDING + '/institutions/{{externalInstitutionId}}/products/{{productId}}',
-  },
 
-  VERIFY_ONBOARDED_VAT_NUMBER: {
+  VERIFY_ONBOARDING: {
     URL: ENV.URL_API.ONBOARDING + '/institutions/onboarding',
   },
 

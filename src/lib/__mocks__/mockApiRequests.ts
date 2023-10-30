@@ -283,6 +283,17 @@ const mockedParties = [
     'BBBBBB22B22B234K',
     '12125'
   ),
+  createPartyEntity(
+    'aooId',
+    'or2325',
+    'p4341',
+    'test Aooo',
+    'logo',
+    'address',
+    'a@aa.com',
+    'BBBBBB22B22B234K',
+    '12125'
+  ),
 ];
 
 const mockedGeoTaxonomy = [
@@ -685,8 +696,9 @@ export async function mockFetch(
       resolve({ data: mockedUoCode, status: 200, statusText: '200' } as AxiosResponse)
     );
   }
+
   if (endpoint === 'VERIFY_ONBOARDING') {
-    switch (endpointParams.externalInstitutionId) {
+    switch (params.taxCode) {
       case 'infoError':
       case 'externalId4':
         return genericError;
@@ -702,16 +714,20 @@ export async function mockFetch(
         return notFound;
       // Use case for test already subscribed premium
       case 'externalId2':
-        if (
-          endpointParams.productId === 'prod-io' ||
-          endpointParams.productId === 'prod-io-premium'
-        ) {
+        if (params.productId === 'prod-io' || params.productId === 'prod-io-premium') {
+          return noContent;
+        } else {
+          return notFound;
+        }
+      // Use case for test aoo
+      case 'aooId':
+        if (params.subunitCode) {
           return noContent;
         } else {
           return notFound;
         }
       default:
-        if (endpointParams.productId !== 'prod-io') {
+        if (params.productId !== 'prod-io') {
           return notFound;
         } else {
           return noContent;
@@ -744,15 +760,6 @@ export async function mockFetch(
     return new Promise((resolve) =>
       resolve({ data: matchedInstitution, status: 200, statusText: '200' } as AxiosResponse)
     );
-  }
-
-  if (endpoint === 'VERIFY_ONBOARDED_VAT_NUMBER') {
-    switch (params.vatNumber) {
-      case '12345678901':
-        return noContent;
-      case '12345678902':
-        return notFound;
-    }
   }
 
   if (endpoint === 'ONBOARDING_GET_ONBOARDING_DATA') {
