@@ -201,6 +201,12 @@ test('test complete onboarding AOO with product interop', async () => {
   renderComponent('prod-interop');
   await executeStepInstitutionType('prod-interop');
   await executeAdvancedSearchForAoo();
+  await executeStep2();
+  await executeStep3(true);
+  const onboardingComlpeted = await waitFor(() =>
+    screen.getByText('Richiesta di adesione inviata')
+  );
+  expect(onboardingComlpeted).toBeInTheDocument();
 });
 
 test('test label recipientCode only for institutionType is not PA', async () => {
@@ -447,6 +453,20 @@ const executeAdvancedSearchForAoo = async () => {
 
   await waitFor(() => expect(aooCode.value).toBe('A356E00'));
   await waitFor(() => expect(aooName.value).toBe('Denominazione Aoo Test'));
+
+  const isTaxCodeEquals2PIVA = document.getElementById('onboardingFormData');
+  expect(isTaxCodeEquals2PIVA).toBeTruthy();
+
+  const vatNumber = document.getElementById('vatNumber') as HTMLInputElement;
+
+  fireEvent.change(vatNumber as HTMLElement, {
+    target: { value: 'AAAAAA44D55F456K' },
+  });
+
+  const continueButton = await waitFor(() => screen.getByRole('button', { name: 'Continua' }));
+  expect(continueButton).toBeEnabled();
+
+  fireEvent.click(continueButton);
 };
 
 const executeAdvancedSearchForUo = async () => {
