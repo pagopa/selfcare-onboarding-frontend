@@ -16,11 +16,15 @@ import { fetchWithLogs } from '../../lib/api-utils';
 import { getFetchOutcome } from '../../lib/error-utils';
 import { unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
 import { ENV } from '../../utils/env';
+import { AooData } from '../../model/AooData';
+import { UoData } from '../../model/UoModel';
 
 type Props = StepperStepComponentProps & {
   externalInstitutionId: string;
   productId: string;
   institutionType?: InstitutionType;
+  aooSelected?: AooData;
+  uoSelected?: UoData;
 };
 
 const genericError: RequestOutcomeMessage = {
@@ -48,7 +52,15 @@ const genericError: RequestOutcomeMessage = {
   ],
 };
 
-function StepOnboardingData({ forward, externalInstitutionId, productId, institutionType }: Props) {
+// eslint-disable-next-line sonarjs/cognitive-complexity
+function StepOnboardingData({
+  forward,
+  externalInstitutionId,
+  productId,
+  institutionType,
+  aooSelected,
+  uoSelected,
+}: Props) {
   const { t } = useTranslation();
 
   const [loading, setLoading] = useState(true);
@@ -63,7 +75,11 @@ function StepOnboardingData({ forward, externalInstitutionId, productId, institu
       {
         endpoint: 'ONBOARDING_GET_ONBOARDING_DATA',
         endpointParams: {
-          externalInstitutionId,
+          externalInstitutionId: aooSelected
+            ? `${externalInstitutionId}_${aooSelected.codiceUniAoo}`
+            : uoSelected
+            ? `${externalInstitutionId}_${uoSelected.codiceUniUo}`
+            : externalInstitutionId,
           productId,
         },
       },
