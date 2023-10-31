@@ -197,7 +197,7 @@ test.skip('test billingData without Support Mail', async () => {
   await executeStepBillingDataWithoutSupportMail();
 });
 
-test('test advanced search A00 name with product interop', async () => {
+test('test complete onboarding AOO with product interop', async () => {
   renderComponent('prod-interop');
   await executeStepInstitutionType('prod-interop');
   await executeAdvancedSearchForAoo();
@@ -425,7 +425,7 @@ const executeAdvancedSearchForAoo = async () => {
   const input = selectWrapper?.firstChild as HTMLElement;
   fireEvent.keyDown(input, { keyCode: 40 });
 
-  const option = (await document.getElementById('aooCode')) as HTMLElement;
+  const option = document.getElementById('aooCode') as HTMLElement;
   fireEvent.click(option);
   expect(inputPartyName).toBeTruthy();
   fireEvent.change(inputPartyName, { target: { value: 'A356E00' } });
@@ -441,6 +441,12 @@ const executeAdvancedSearchForAoo = async () => {
 
   fireEvent.click(confirmButton);
   await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(6));
+
+  const aooCode = document.getElementById('aooUniqueCode') as HTMLInputElement;
+  const aooName = document.getElementById('aooName') as HTMLInputElement;
+
+  await waitFor(() => expect(aooCode.value).toBe('A356E00'));
+  await waitFor(() => expect(aooName.value).toBe('Denominazione Aoo Test'));
 };
 
 const executeAdvancedSearchForUo = async () => {
