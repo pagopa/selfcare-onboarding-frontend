@@ -494,6 +494,8 @@ export default {
       registeredOffice: 'Sede legale',
       fullLegalAddress: 'Indirizzo e numero civico della sede legale',
       zipCode: 'CAP',
+      city: 'Città',
+      province: 'Provincia',
       digitalAddress: 'Indirizzo PEC',
       taxCodeEquals2PIVAdescription: 'La Partita IVA coincide con il Codice Fiscale',
       vatNumberGroup: 'La Partita IVA è di gruppo',
