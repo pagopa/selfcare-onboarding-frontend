@@ -1,9 +1,10 @@
 import { Box, styled } from '@mui/system';
 import { useEffect, useState } from 'react';
-import { Grid, TextField, Typography, Paper } from '@mui/material';
+import { Grid, TextField, Typography, Paper, MenuItem } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import Checkbox from '@mui/material/Checkbox';
 import { theme } from '@pagopa/mui-italia';
+import Autocomplete from '@mui/lab/Autocomplete';
 import { InstitutionType, StepperStepComponentProps } from '../../../types';
 import { OnboardingFormData } from '../../model/OnboardingFormData';
 import { StepBillingDataHistoryState } from '../steps/StepOnboardingFormData';
@@ -57,6 +58,20 @@ export default function PersonalAndBillingDataSection({
 }: Props) {
   const { t } = useTranslation();
 
+  const [shrinkValue, setShrinkValue] = useState<boolean>(false);
+
+  useEffect(() => {
+    const shareCapitalIsNan = isNaN(formik.values.shareCapital);
+    if (shareCapitalIsNan) {
+      formik.setFieldValue('shareCapital', undefined);
+    }
+    if (formik.values.shareCapital) {
+      setShrinkValue(true);
+    } else {
+      setShrinkValue(false);
+    }
+  }, [formik.values.shareCapital]);
+
   const isFromIPA = origin === 'IPA';
   const isPSP = institutionType === 'PSP';
   const isPA = institutionType === 'PA';
@@ -98,18 +113,20 @@ export default function PersonalAndBillingDataSection({
       },
     };
   };
-  const [shrinkValue, setShrinkValue] = useState<boolean>(false);
-  useEffect(() => {
-    const shareCapitalIsNan = isNaN(formik.values.shareCapital);
-    if (shareCapitalIsNan) {
-      formik.setFieldValue('shareCapital', undefined);
-    }
-    if (formik.values.shareCapital) {
-      setShrinkValue(true);
-    } else {
-      setShrinkValue(false);
-    }
-  }, [formik.values.shareCapital]);
+
+  // TODO Remove this
+  const cities = [
+    { description: 'desc1' },
+    { description: 'desc2' },
+    { description: 'desc3' },
+    { description: 'desc4' },
+    { description: 'desc5' },
+    { description: 'desc6' },
+    { description: 'desc7' },
+    { description: 'desc8' },
+    { description: 'desc9' },
+    { description: 'desc10' },
+  ];
 
   return (
     <>
@@ -194,32 +211,97 @@ export default function PersonalAndBillingDataSection({
           )}
 
           {/* Sede legale */}
-          <Grid item xs={8}>
-            <CustomTextField
-              {...baseTextFieldProps(
-                'registeredOffice',
-                isInsuranceCompany
-                  ? t('onboardingFormData.billingDataSection.fullLegalAddress')
-                  : t('onboardingFormData.billingDataSection.registeredOffice'),
-                400,
-                18
-              )}
-              disabled={!isAooUo && isDisabled && !isInsuranceCompany}
-            />
+          <Grid container spacing={2} pl={3} pt={3}>
+            <Grid item xs={7}>
+              <CustomTextField
+                {...baseTextFieldProps(
+                  'registeredOffice',
+                  isInsuranceCompany
+                    ? t('onboardingFormData.billingDataSection.fullLegalAddress')
+                    : t('onboardingFormData.billingDataSection.registeredOffice'),
+                  400,
+                  18
+                )}
+                disabled={!isAooUo && isDisabled && !isInsuranceCompany}
+              />
+            </Grid>
+            {/* CAP */}
+            <Grid item xs={5}>
+              <CustomNumberField
+                inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
+                {...baseNumericFieldProps(
+                  'zipCode',
+                  t('onboardingFormData.billingDataSection.zipCode'),
+                  400,
+                  18
+                )}
+                disabled={!isAooUo && isDisabled && !isInsuranceCompany}
+              />
+            </Grid>
           </Grid>
-          {/* CAP */}
-          <Grid item xs={4} paddingLeft={1}>
-            <CustomNumberField
-              inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
-              {...baseNumericFieldProps(
-                'zipCode',
-                t('onboardingFormData.billingDataSection.zipCode'),
-                400,
-                18
-              )}
-              disabled={!isAooUo && isDisabled && !isInsuranceCompany}
-            />
-          </Grid>
+          {institutionType !== 'PA' && (
+            <Grid container spacing={2} pl={3} pt={3}>
+              <Grid item xs={7}>
+                <Autocomplete
+                  id="city-select"
+                  onChange={(_e: any, value: string) => formik.setFieldValue('city', value)}
+                  options={cities}
+                  autoHighlight
+                  getOptionLabel={(option) => option.description}
+                  value={formik.values.city}
+                  ListboxProps={{
+                    style: {
+                      overflow: 'visible',
+                    },
+                  }}
+                  componentsProps={{
+                    paper: {
+                      sx: {
+                        '&::-webkit-scrollbar': {
+                          width: 4,
+                        },
+                        '&::-webkit-scrollbar-track': {
+                          boxShadow: `inset 10px 10px  #E6E9F2`,
+                          marginY: '3px',
+                        },
+                        '&::-webkit-scrollbar-thumb': {
+                          backgroundColor: '#0073E6',
+                          borderRadius: '16px',
+                        },
+                        overflowY: 'auto',
+                        maxHeight: '200px',
+                        boxShadow:
+                          '0px 6px 30px 5px rgba(0, 43, 85, 0.10), 0px 16px 24px 2px rgba(0, 43, 85, 0.05), 0px 8px 10px -5px rgba(0, 43, 85, 0.10)',
+                      },
+                    },
+                  }}
+                  renderOption={(props, option) => (
+                    <MenuItem {...props} sx={{ height: '44px' }}>
+                      {option.description}
+                    </MenuItem>
+                  )}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label={t('onboardingFormData.billingDataSection.city')}
+                    />
+                  )}
+                />
+              </Grid>
+              <Grid item xs={5}>
+                <CustomTextField
+                  {...baseTextFieldProps(
+                    'province',
+                    t('onboardingFormData.billingDataSection.province'),
+                    400,
+                    18
+                  )}
+                  // TODO Temporary enabled to always allow private onboarding
+                  // disabled={true}
+                />
+              </Grid>
+            </Grid>
+          )}
           {/* Indirizzo PEC */}
           <Grid item xs={12}>
             <CustomTextField
