@@ -637,6 +637,8 @@ function OnboardingComponent({ productId }: { productId: string }) {
           productId,
           institutionType,
           forward: forwardWithOnboardingData,
+          aooSelected,
+          uoSelected,
         }),
     },
     {

@@ -312,14 +312,14 @@ const mockedGeoTaxonomy = [
 ];
 
 const mockedAooCode: AooData = {
-  codAoo: 'ND',
+  codAoo: 'A356E00',
   codiceFiscaleEnte: '92078570527',
   codiceIpa: '03YBQ4C7',
   codiceUniAoo: 'A356E00',
   denominazioneAoo: 'Denominazione Aoo Test',
   denominazioneEnte: 'Comune Test',
   id: 'A356E00',
-  mail1: 'test.it',
+  mail1: 'test@test.it',
   origin: 'IPA',
   CAP: '53100',
   codiceCatastaleComune: 'I726',
@@ -418,6 +418,37 @@ const mockedOnboardingData: Array<InstitutionOnboardingInfoResource> = [
         digitalAddress: 'comune.bollate@pec.it',
         taxCode: 'BBBBBB11A11A123K',
         vatNumber: '12345678901',
+        recipientCode: 'M2UHYR1',
+        geographicTaxonomies: [
+          {
+            code: '058091',
+            desc: 'Firenze - Comune',
+          },
+        ],
+        supportEmail: 'comune.bollate@pec.it',
+      },
+      institutionType: 'PA',
+      origin: 'IPA',
+      assistanceContacts: {
+        supportEmail: 'a@a.it',
+      },
+      companyInformations: {
+        businessRegisterPlace: 'register Place test',
+        rea: 'RM-123456',
+        shareCapital: '123456',
+      },
+    },
+  },
+  {
+    institution: {
+      id: '92078570527',
+      billingData: {
+        businessName: 'Comune di Bollate AOO',
+        registeredOffice: 'Bollate, Piazza Colonna 370',
+        zipCode: '20021',
+        digitalAddress: 'comune.bollate@pec.it',
+        taxCode: '92078570527',
+        vatNumber: '92078570523',
         recipientCode: 'M2UHYR1',
         geographicTaxonomies: [
           {
@@ -720,11 +751,11 @@ export async function mockFetch(
           return notFound;
         }
       // Use case for test aoo
-      case 'aooId':
+      case '92078570527':
         if (params.subunitCode) {
-          return noContent;
-        } else {
           return notFound;
+        } else {
+          return noContent;
         }
       default:
         if (params.productId !== 'prod-io') {
@@ -766,6 +797,11 @@ export async function mockFetch(
     const onboardingData = mockedOnboardingData.find(
       (od) => od.institution.billingData.taxCode === endpointParams.externalInstitutionId
     );
+    if (endpointParams.externalInstitutionId === '92078570527') {
+      return new Promise((resolve) =>
+        resolve({ data: onboardingData, status: 200, statusText: '200' } as AxiosResponse)
+      );
+    }
     if (onboardingData) {
       return new Promise((resolve) =>
         resolve({
