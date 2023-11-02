@@ -1,15 +1,21 @@
 import { Box, styled } from '@mui/system';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Grid, TextField, Typography, Paper, MenuItem } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import Checkbox from '@mui/material/Checkbox';
 import { theme } from '@pagopa/mui-italia';
-import Autocomplete from '@mui/lab/Autocomplete';
+import Autocomplete from '@mui/material/Autocomplete';
+import { AxiosResponse } from 'axios';
 import { InstitutionType, StepperStepComponentProps } from '../../../types';
 import { OnboardingFormData } from '../../model/OnboardingFormData';
 import { StepBillingDataHistoryState } from '../steps/StepOnboardingFormData';
 import { AooData } from '../../model/AooData';
 import { UoData } from '../../model/UoModel';
+import { fetchWithLogs } from '../../lib/api-utils';
+import { getFetchOutcome } from '../../lib/error-utils';
+import { GeographicTaxonomyResource } from '../../model/GeographicTaxonomies';
+import { Country } from '../../model/Country';
+import { UserContext } from '../../lib/context';
 import NumberDecimalFormat from './NumberDecimalFormat';
 
 const CustomTextField = styled(TextField)({
@@ -57,8 +63,10 @@ export default function PersonalAndBillingDataSection({
   institutionAvoidGeotax,
 }: Props) {
   const { t } = useTranslation();
+  const { setRequiredLogin } = useContext(UserContext);
 
   const [shrinkValue, setShrinkValue] = useState<boolean>(false);
+  const [countries, setCountries] = useState<Array<Country>>();
 
   useEffect(() => {
     const shareCapitalIsNan = isNaN(formik.values.shareCapital);
@@ -114,19 +122,40 @@ export default function PersonalAndBillingDataSection({
     };
   };
 
-  // TODO Remove this
-  const cities = [
-    { description: 'desc1' },
-    { description: 'desc2' },
-    { description: 'desc3' },
-    { description: 'desc4' },
-    { description: 'desc5' },
-    { description: 'desc6' },
-    { description: 'desc7' },
-    { description: 'desc8' },
-    { description: 'desc9' },
-    { description: 'desc10' },
-  ];
+  const getCountriesFromGeotaxonomies = async (query: string) => {
+    const searchGeotaxonomy = await fetchWithLogs(
+      {
+        endpoint: 'ONBOARDING_GET_GEOTAXONOMY',
+      },
+      {
+        method: 'GET',
+        params: { description: query },
+      },
+      () => setRequiredLogin(true)
+    );
+    const outcome = getFetchOutcome(searchGeotaxonomy);
+
+    if (outcome === 'success') {
+      const geographicTaxonomies = (searchGeotaxonomy as AxiosResponse).data;
+
+      const mappedResponse = geographicTaxonomies.map((gt: GeographicTaxonomyResource) => ({
+        county: 'IT',
+        code: gt.code,
+        desc: gt.desc,
+        country: gt.country_abbreviation,
+        province: gt.province_abbreviation,
+      })) as Array<Country>;
+
+      const onlyCountries = mappedResponse
+        .filter((r) => r.desc.includes('- COMUNE'))
+        .map((r) => ({
+          ...r,
+          desc: r.desc.replace('- COMUNE', '').trim(),
+        }));
+
+      setCountries(onlyCountries);
+    }
+  };
 
   return (
     <>
@@ -244,11 +273,16 @@ export default function PersonalAndBillingDataSection({
               <Grid item xs={7}>
                 <Autocomplete
                   id="city-select"
-                  onChange={(_e: any, value: string) => formik.setFieldValue('city', value)}
-                  options={cities}
-                  autoHighlight
-                  getOptionLabel={(option) => option.description}
-                  value={formik.values.city}
+                  onInput={(e: any) => {
+                    const value = e.target.value as string;
+                    if (value.length >= 3) {
+                      void getCountriesFromGeotaxonomies(value);
+                    }
+                  }}
+                  onChange={(_e: any, selected: any) => formik.setFieldValue('city', selected)}
+                  getOptionLabel={(o) => o.desc}
+                  options={countries ?? []}
+                  noOptionsText={t('onboardingFormData.billingDataSection.noResult')}
                   ListboxProps={{
                     style: {
                       overflow: 'visible',
@@ -275,9 +309,9 @@ export default function PersonalAndBillingDataSection({
                       },
                     },
                   }}
-                  renderOption={(props, option) => (
-                    <MenuItem {...props} sx={{ height: '44px' }}>
-                      {option.description}
+                  renderOption={(props, option: Country) => (
+                    <MenuItem key={option.code} {...props} sx={{ height: '44px' }}>
+                      {option?.desc}
                     </MenuItem>
                   )}
                   renderInput={(params) => (
