@@ -58,6 +58,20 @@ export default function PersonalAndBillingDataSection({
 }: Props) {
   const { t } = useTranslation();
 
+  const [shrinkValue, setShrinkValue] = useState<boolean>(false);
+
+  useEffect(() => {
+    const shareCapitalIsNan = isNaN(formik.values.shareCapital);
+    if (shareCapitalIsNan) {
+      formik.setFieldValue('shareCapital', undefined);
+    }
+    if (formik.values.shareCapital) {
+      setShrinkValue(true);
+    } else {
+      setShrinkValue(false);
+    }
+  }, [formik.values.shareCapital]);
+
   const isFromIPA = origin === 'IPA';
   const isPSP = institutionType === 'PSP';
   const isPA = institutionType === 'PA';
@@ -99,18 +113,6 @@ export default function PersonalAndBillingDataSection({
       },
     };
   };
-  const [shrinkValue, setShrinkValue] = useState<boolean>(false);
-  useEffect(() => {
-    const shareCapitalIsNan = isNaN(formik.values.shareCapital);
-    if (shareCapitalIsNan) {
-      formik.setFieldValue('shareCapital', undefined);
-    }
-    if (formik.values.shareCapital) {
-      setShrinkValue(true);
-    } else {
-      setShrinkValue(false);
-    }
-  }, [formik.values.shareCapital]);
 
   // TODO Remove this
   const cities = [
@@ -242,9 +244,11 @@ export default function PersonalAndBillingDataSection({
               <Grid item xs={7}>
                 <Autocomplete
                   id="city-select"
+                  onChange={(_e: any, value: string) => formik.setFieldValue('city', value)}
                   options={cities}
                   autoHighlight
                   getOptionLabel={(option) => option.description}
+                  value={formik.values.city}
                   ListboxProps={{
                     style: {
                       overflow: 'visible',
