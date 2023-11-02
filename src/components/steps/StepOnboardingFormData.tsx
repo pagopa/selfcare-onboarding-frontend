@@ -85,6 +85,23 @@ export default function StepOnboardingFormData({
   aooSelected,
   uoSelected,
 }: Props) {
+  const { t } = useTranslation();
+  const { setRequiredLogin } = useContext(UserContext);
+
+  const [openModifyModal, setOpenModifyModal] = useState<boolean>(false);
+  const [openAddModal, setOpenAddModal] = useState<boolean>(false);
+  const [isVatRegistrated, setIsVatRegistrated] = useState<boolean>(false);
+  const [previousGeotaxononomies, setPreviousGeotaxononomies] = useState<Array<GeographicTaxonomy>>(
+    []
+  );
+
+  const [stepHistoryState, setStepHistoryState, setStepHistoryStateHistory] =
+    useHistoryState<StepBillingDataHistoryState>('onboardingFormData', {
+      externalInstitutionId,
+      isTaxCodeEquals2PIVA:
+        !!initialFormData.vatNumber && initialFormData.taxCode === initialFormData.vatNumber,
+    });
+
   const requiredError = 'Required';
 
   const institutionAvoidGeotax = ['PT', 'SA', 'AS'].includes(institutionType);
@@ -103,23 +120,6 @@ export default function StepOnboardingFormData({
   const isProdFideiussioni = productId?.startsWith('prod-fd') ?? false;
   const aooCode = aooSelected?.codiceUniAoo;
   const uoCode = uoSelected?.codiceUniUo;
-  const [openModifyModal, setOpenModifyModal] = useState<boolean>(false);
-  const [openAddModal, setOpenAddModal] = useState<boolean>(false);
-  const [isVatRegistrated, setIsVatRegistrated] = useState<boolean>(false);
-  const { setRequiredLogin } = useContext(UserContext);
-
-  const [previousGeotaxononomies, setPreviousGeotaxononomies] = useState<Array<GeographicTaxonomy>>(
-    []
-  );
-
-  const { t } = useTranslation();
-
-  const [stepHistoryState, setStepHistoryState, setStepHistoryStateHistory] =
-    useHistoryState<StepBillingDataHistoryState>('onboardingFormData', {
-      externalInstitutionId,
-      isTaxCodeEquals2PIVA:
-        !!initialFormData.vatNumber && initialFormData.taxCode === initialFormData.vatNumber,
-    });
 
   const getPreviousGeotaxononomies = async () => {
     const onboardingData = await fetchWithLogs(
