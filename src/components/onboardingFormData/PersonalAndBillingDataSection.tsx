@@ -67,6 +67,7 @@ export default function PersonalAndBillingDataSection({
 
   const [shrinkValue, setShrinkValue] = useState<boolean>(false);
   const [countries, setCountries] = useState<Array<Country>>();
+  const [selectedCountry, setSelectedCountry] = useState<Country>();
 
   useEffect(() => {
     const shareCapitalIsNan = isNaN(formik.values.shareCapital);
@@ -79,6 +80,18 @@ export default function PersonalAndBillingDataSection({
       setShrinkValue(false);
     }
   }, [formik.values.shareCapital]);
+
+  useEffect(() => {
+    if (selectedCountry) {
+      formik.setFieldValue('city', selectedCountry?.desc);
+      formik.setFieldValue('province', selectedCountry?.province);
+      setShrinkValue(true);
+    } else {
+      formik.setFieldValue('city', undefined);
+      formik.setFieldValue('province', undefined);
+      setShrinkValue(false);
+    }
+  }, [selectedCountry]);
 
   const isFromIPA = origin === 'IPA';
   const isPSP = institutionType === 'PSP';
@@ -279,7 +292,17 @@ export default function PersonalAndBillingDataSection({
                       void getCountriesFromGeotaxonomies(value);
                     }
                   }}
-                  onChange={(_e: any, selected: any) => formik.setFieldValue('city', selected)}
+                  onChange={(_e: any, selected: any) => {
+                    if (selected) {
+                      setShrinkValue(true);
+                      setSelectedCountry(selected);
+                      formik.setFieldValue('city', selected.desc);
+                      formik.setFieldValue('province', selected.province);
+                    } else {
+                      setShrinkValue(false);
+                      formik.setFieldValue('province', undefined);
+                    }
+                  }}
                   getOptionLabel={(o) => o.desc}
                   options={countries ?? []}
                   noOptionsText={t('onboardingFormData.billingDataSection.noResult')}
@@ -317,6 +340,12 @@ export default function PersonalAndBillingDataSection({
                   renderInput={(params) => (
                     <TextField
                       {...params}
+                      sx={{
+                        '& .MuiOutlinedInput-input.MuiInputBase-input.MuiInputBase-inputAdornedEnd.MuiAutocomplete-input.MuiAutocomplete-inputFocused':
+                          {
+                            marginLeft: '16px',
+                          },
+                      }}
                       label={t('onboardingFormData.billingDataSection.city')}
                     />
                   )}
@@ -330,8 +359,8 @@ export default function PersonalAndBillingDataSection({
                     400,
                     18
                   )}
-                  // TODO Temporary enabled to always allow private onboarding
-                  // disabled={true}
+                  InputLabelProps={{ shrink: shrinkValue }}
+                  disabled={true}
                 />
               </Grid>
             </Grid>
