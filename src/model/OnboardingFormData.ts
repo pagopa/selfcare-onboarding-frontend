@@ -7,8 +7,9 @@ export type OnboardingFormData = {
   digitalAddress: string;
   taxCode: string;
   vatNumber: string;
+  county?: string;
+  country?: string;
   city?: string;
-  province?: string;
   ivassCode?: string;
   recipientCode: string;
   publicServices?: boolean;

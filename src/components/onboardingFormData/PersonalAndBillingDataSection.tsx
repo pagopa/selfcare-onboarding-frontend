@@ -14,8 +14,8 @@ import { UoData } from '../../model/UoModel';
 import { fetchWithLogs } from '../../lib/api-utils';
 import { getFetchOutcome } from '../../lib/error-utils';
 import { GeographicTaxonomyResource } from '../../model/GeographicTaxonomies';
-import { Country } from '../../model/Country';
 import { UserContext } from '../../lib/context';
+import { InstitutionLocationData } from '../../model/InstitutionLocationData';
 import NumberDecimalFormat from './NumberDecimalFormat';
 
 const CustomTextField = styled(TextField)({
@@ -66,8 +66,8 @@ export default function PersonalAndBillingDataSection({
   const { setRequiredLogin } = useContext(UserContext);
 
   const [shrinkValue, setShrinkValue] = useState<boolean>(false);
-  const [countries, setCountries] = useState<Array<Country>>();
-  const [selectedCountry, setSelectedCountry] = useState<Country>();
+  const [countries, setCountries] = useState<Array<InstitutionLocationData>>();
+  const [institutionLocationData, setInstitutionLocationData] = useState<InstitutionLocationData>();
 
   useEffect(() => {
     const shareCapitalIsNan = isNaN(formik.values.shareCapital);
@@ -82,16 +82,18 @@ export default function PersonalAndBillingDataSection({
   }, [formik.values.shareCapital]);
 
   useEffect(() => {
-    if (selectedCountry) {
-      formik.setFieldValue('city', selectedCountry?.desc);
-      formik.setFieldValue('province', selectedCountry?.province);
+    if (institutionLocationData) {
+      formik.setFieldValue('country', institutionLocationData.country);
+      formik.setFieldValue('county', institutionLocationData.county);
+      formik.setFieldValue('city', institutionLocationData.city);
       setShrinkValue(true);
     } else {
+      formik.setFieldValue('country', undefined);
+      formik.setFieldValue('county', undefined);
       formik.setFieldValue('city', undefined);
-      formik.setFieldValue('province', undefined);
       setShrinkValue(false);
     }
-  }, [selectedCountry]);
+  }, [institutionLocationData]);
 
   const isFromIPA = origin === 'IPA';
   const isPSP = institutionType === 'PSP';
@@ -152,18 +154,17 @@ export default function PersonalAndBillingDataSection({
       const geographicTaxonomies = (searchGeotaxonomy as AxiosResponse).data;
 
       const mappedResponse = geographicTaxonomies.map((gt: GeographicTaxonomyResource) => ({
-        county: 'IT',
         code: gt.code,
-        desc: gt.desc,
         country: gt.country_abbreviation,
-        province: gt.province_abbreviation,
-      })) as Array<Country>;
+        county: gt.province_abbreviation,
+        city: gt.desc,
+      })) as Array<InstitutionLocationData>;
 
       const onlyCountries = mappedResponse
-        .filter((r) => r.desc.includes('- COMUNE'))
+        .filter((r) => r.city.includes('- COMUNE'))
         .map((r) => ({
           ...r,
-          desc: r.desc.replace('- COMUNE', '').trim(),
+          desc: r.city.replace('- COMUNE', '').trim(),
         }));
 
       setCountries(onlyCountries);
@@ -295,15 +296,17 @@ export default function PersonalAndBillingDataSection({
                   onChange={(_e: any, selected: any) => {
                     if (selected) {
                       setShrinkValue(true);
-                      setSelectedCountry(selected);
+                      setInstitutionLocationData(selected);
                       formik.setFieldValue('city', selected.desc);
-                      formik.setFieldValue('province', selected.province);
+                      formik.setFieldValue('county', selected.county);
+                      formik.setFieldValue('country', selected.country);
                     } else {
                       setShrinkValue(false);
-                      formik.setFieldValue('province', undefined);
+                      formik.setFieldValue('county', undefined);
+                      formik.setFieldValue('country', undefined);
                     }
                   }}
-                  getOptionLabel={(o) => o.desc}
+                  getOptionLabel={(o) => o.city}
                   options={countries ?? []}
                   noOptionsText={t('onboardingFormData.billingDataSection.noResult')}
                   ListboxProps={{
@@ -332,9 +335,9 @@ export default function PersonalAndBillingDataSection({
                       },
                     },
                   }}
-                  renderOption={(props, option: Country) => (
+                  renderOption={(props, option: InstitutionLocationData) => (
                     <MenuItem key={option.code} {...props} sx={{ height: '44px' }}>
-                      {option?.desc}
+                      {option?.city}
                     </MenuItem>
                   )}
                   renderInput={(params) => (
@@ -354,8 +357,8 @@ export default function PersonalAndBillingDataSection({
               <Grid item xs={5}>
                 <CustomTextField
                   {...baseTextFieldProps(
-                    'province',
-                    t('onboardingFormData.billingDataSection.province'),
+                    'county',
+                    t('onboardingFormData.billingDataSection.county'),
                     400,
                     18
                   )}
