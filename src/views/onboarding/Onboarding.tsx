@@ -301,7 +301,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
     });
 
     setOnboardingFormData(newOnboardingFormData);
-    if (institutionType === 'PSP' || institutionType !== 'PA') {
+    if (institutionType !== 'PA') {
       // TODO: fix when party registry proxy will return externalInstitutionId
       setExternalInstitutionId(newOnboardingFormData.taxCode);
 
@@ -313,7 +313,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
           {
             method: 'HEAD',
             params: {
-              taxCode: onboardingFormData?.taxCode,
+              taxCode: newOnboardingFormData.taxCode,
               productId,
               subunitCode: aooSelected
                 ? aooSelected.codiceUniAoo
