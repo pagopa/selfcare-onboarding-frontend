@@ -65,7 +65,8 @@ export default function PersonalAndBillingDataSection({
   const { t } = useTranslation();
   const { setRequiredLogin } = useContext(UserContext);
 
-  const [shrinkValue, setShrinkValue] = useState<boolean>(false);
+  const [shrinkRea, setShrinkRea] = useState<boolean>(false);
+  const [shrinkCounty, setShrinkCounty] = useState<boolean>(false);
   const [countries, setCountries] = useState<Array<InstitutionLocationData>>();
   const [institutionLocationData, setInstitutionLocationData] = useState<InstitutionLocationData>();
 
@@ -75,9 +76,9 @@ export default function PersonalAndBillingDataSection({
       formik.setFieldValue('shareCapital', undefined);
     }
     if (formik.values.shareCapital) {
-      setShrinkValue(true);
+      setShrinkRea(true);
     } else {
-      setShrinkValue(false);
+      setShrinkRea(false);
     }
   }, [formik.values.shareCapital]);
 
@@ -86,12 +87,12 @@ export default function PersonalAndBillingDataSection({
       formik.setFieldValue('country', institutionLocationData.country);
       formik.setFieldValue('county', institutionLocationData.county);
       formik.setFieldValue('city', institutionLocationData.city);
-      setShrinkValue(true);
+      setShrinkCounty(true);
     } else {
       formik.setFieldValue('country', undefined);
       formik.setFieldValue('county', undefined);
       formik.setFieldValue('city', undefined);
-      setShrinkValue(false);
+      setShrinkCounty(false);
     }
   }, [institutionLocationData]);
 
@@ -128,7 +129,7 @@ export default function PersonalAndBillingDataSection({
           fontSize,
           fontWeight,
           lineHeight: '24px',
-          color: '#5C6F82',
+          color: theme.palette.text.secondary,
           textAlign: 'start' as const,
           paddingLeft: '16px',
           borderRadius: '4px',
@@ -164,7 +165,10 @@ export default function PersonalAndBillingDataSection({
         .filter((r) => r.city.includes('- COMUNE'))
         .map((r) => ({
           ...r,
-          desc: r.city.replace('- COMUNE', '').trim(),
+          city: r.city
+            .charAt(0)
+            .toUpperCase()
+            .concat(r.city.substring(1).toLowerCase().replace('- comune', '').trim()),
         }));
 
       setCountries(onlyCountries);
@@ -282,7 +286,7 @@ export default function PersonalAndBillingDataSection({
               />
             </Grid>
           </Grid>
-          {institutionType !== 'PA' && (
+          {institutionType !== 'PA' && origin !== 'IPA' && (
             <Grid container spacing={2} pl={3} pt={3}>
               <Grid item xs={7}>
                 <Autocomplete
@@ -295,13 +299,13 @@ export default function PersonalAndBillingDataSection({
                   }}
                   onChange={(_e: any, selected: any) => {
                     if (selected) {
-                      setShrinkValue(true);
+                      setShrinkCounty(true);
                       setInstitutionLocationData(selected);
                       formik.setFieldValue('city', selected.desc);
                       formik.setFieldValue('county', selected.county);
                       formik.setFieldValue('country', selected.country);
                     } else {
-                      setShrinkValue(false);
+                      setShrinkCounty(false);
                       formik.setFieldValue('county', undefined);
                       formik.setFieldValue('country', undefined);
                     }
@@ -347,6 +351,9 @@ export default function PersonalAndBillingDataSection({
                         '& .MuiOutlinedInput-input.MuiInputBase-input.MuiInputBase-inputAdornedEnd.MuiAutocomplete-input.MuiAutocomplete-inputFocused':
                           {
                             marginLeft: '16px',
+                            fontWeight: 'fontWeightRegular',
+                            textTransform: 'capitalize',
+                            color: theme.palette.text.secondary,
                           },
                       }}
                       label={t('onboardingFormData.billingDataSection.city')}
@@ -362,7 +369,7 @@ export default function PersonalAndBillingDataSection({
                     400,
                     18
                   )}
-                  InputLabelProps={{ shrink: shrinkValue }}
+                  InputLabelProps={{ shrink: shrinkCounty }}
                   disabled={true}
                 />
               </Grid>
@@ -467,7 +474,7 @@ export default function PersonalAndBillingDataSection({
                     component={'span'}
                     sx={{
                       fontSize: '12px!important',
-                      fontWeight: 600,
+                      fontWeight: 'fontWeightMedium',
                       color: theme.palette.text.secondary,
                     }}
                   >
@@ -538,13 +545,13 @@ export default function PersonalAndBillingDataSection({
                     400,
                     18
                   )}
-                  onClick={() => setShrinkValue(true)}
+                  onClick={() => setShrinkRea(true)}
                   onBlur={() => {
                     if (!formik.values.shareCapital) {
-                      setShrinkValue(false);
+                      setShrinkRea(false);
                     }
                   }}
-                  InputLabelProps={{ shrink: shrinkValue }}
+                  InputLabelProps={{ shrink: shrinkRea }}
                   InputProps={{
                     inputComponent: NumberDecimalFormat,
                   }}
@@ -622,7 +629,7 @@ export default function PersonalAndBillingDataSection({
                 component={'span'}
                 sx={{
                   fontSize: '12px!important',
-                  fontWeight: 600,
+                  fontWeight: 'fontWeightMedium',
                   color: theme.palette.text.secondary,
                 }}
               >
