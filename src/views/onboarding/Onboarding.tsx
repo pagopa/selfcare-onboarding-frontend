@@ -313,7 +313,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
           {
             method: 'HEAD',
             params: {
-              taxCode: externalInstitutionId,
+              taxCode: onboardingFormData?.taxCode,
               productId,
               subunitCode: aooSelected
                 ? aooSelected.codiceUniAoo
