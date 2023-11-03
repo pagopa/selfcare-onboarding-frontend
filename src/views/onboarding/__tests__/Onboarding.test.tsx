@@ -1215,11 +1215,7 @@ const verifySubmit = async (productId = 'prod-idpay') => {
           geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY
             ? [{ code: nationalValue, desc: 'ITALIA' }]
             : [],
-          institutionLocationData: {
-            country: undefined,
-            county: undefined,
-            city: undefined,
-          },
+          institutionLocationData: undefined,
           assistanceContacts: { supportEmail: 'a@a.it' },
           productId,
           subunitCode: undefined,
