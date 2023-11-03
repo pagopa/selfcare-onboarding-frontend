@@ -127,8 +127,6 @@ test('should render GeoTaxonomySection with mocked retrievedTaxonomies and click
 
   const addButton = screen.getByText('Aggiungi area') as HTMLButtonElement;
 
-  console.log(addButton.disabled);
-
   fireEvent.click(addButton);
 });
 

@@ -1185,6 +1185,7 @@ const verifySubmit = async (productId = 'prod-idpay') => {
         data: {
           billingData: billingData2billingDataRequest(),
           pspData: undefined,
+          ivassCode: undefined,
           institutionType: 'PA',
           origin: 'IPA',
           users: [
@@ -1214,6 +1215,11 @@ const verifySubmit = async (productId = 'prod-idpay') => {
           geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY
             ? [{ code: nationalValue, desc: 'ITALIA' }]
             : [],
+          institutionLocationData: {
+            country: undefined,
+            county: undefined,
+            city: undefined,
+          },
           assistanceContacts: { supportEmail: 'a@a.it' },
           productId,
           subunitCode: undefined,

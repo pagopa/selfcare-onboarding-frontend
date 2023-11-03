@@ -457,11 +457,16 @@ function OnboardingComponent({ productId }: { productId: string }) {
               : undefined,
           institutionType,
           ivassCode: onboardingFormData?.ivassCode,
-          geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY //
+          geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY
             ? onboardingFormData?.geographicTaxonomies?.map((gt) =>
                 onboardedInstitutionInfo2geographicTaxonomy(gt)
               )
             : [],
+          institutionLocationData: {
+            country: onboardingFormData?.country,
+            county: onboardingFormData?.county,
+            city: onboardingFormData?.city,
+          },
           origin,
           users: users.map((u) => ({
             ...u,
