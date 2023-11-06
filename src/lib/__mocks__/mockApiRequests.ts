@@ -764,7 +764,7 @@ export async function mockFetch(
   if (endpoint === 'VERIFY_ONBOARDING') {
     switch (params.taxCode) {
       case '99999999999':
-      case '33445673210':
+      case 'externalId4':
         return genericError;
       case '44444444444':
         return notAllowedError;
