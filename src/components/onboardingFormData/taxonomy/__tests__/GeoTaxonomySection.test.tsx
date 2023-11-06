@@ -4,8 +4,6 @@ import { nationalValue } from '../../../../model/GeographicTaxonomies';
 import { renderComponentWithProviders } from '../../../../utils/test-utils';
 import GeoTaxonomySection from '../GeoTaxonomySection';
 
-jest.setTimeout(6000);
-
 const mockedNationalGeoTaxonomy = [
   {
     code: nationalValue,

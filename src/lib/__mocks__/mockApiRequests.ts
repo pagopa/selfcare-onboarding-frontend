@@ -256,9 +256,9 @@ const mockedParties = [
     '775644',
     'Comune di Gessate',
     'logo',
-    '33445673210',
     'address4',
     'b@bb.com',
+    '33445673210',
     '00022'
   ),
   createPartyEntity(
@@ -763,15 +763,15 @@ export async function mockFetch(
 
   if (endpoint === 'VERIFY_ONBOARDING') {
     switch (params.taxCode) {
-      case '99999999999':
+      case 'infoError':
       case 'externalId4':
         return genericError;
-      case '44444444444':
+      case 'notAllowed':
         return notAllowedError;
       case 'onboarded_externalId':
-      case '22222222222':
+      case 'onboarded':
         return noContent;
-      case '33333333333':
+      case 'pending':
         return notFound;
       // Use case for test not base adhesion
       case 'externalId3':
