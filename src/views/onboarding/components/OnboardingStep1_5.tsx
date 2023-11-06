@@ -118,7 +118,7 @@ export function OnboardingStep1_5({
       {
         method: 'HEAD',
         params: {
-          taxCode: externalInstitutionId,
+          taxCode: selectedParty?.taxCode,
           productId,
           subunitCode: aooSelected
             ? aooSelected.codiceUniAoo

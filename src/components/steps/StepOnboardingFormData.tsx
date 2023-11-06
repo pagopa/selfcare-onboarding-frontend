@@ -7,8 +7,6 @@ import { AxiosResponse } from 'axios';
 import { useFormik } from 'formik';
 import { useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { uniqueId } from 'lodash';
-import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
 import { emailRegexp } from '@pagopa/selfcare-common-frontend/utils/constants';
 import {
   InstitutionType,
@@ -386,7 +384,6 @@ export default function StepOnboardingFormData({
   });
 
   const verifyVatNumber = async () => {
-    const requestId = uniqueId('verify-onboarding-vatnumber');
     const onboardingStatus = await fetchWithLogs(
       {
         endpoint: 'VERIFY_ONBOARDING',
@@ -409,7 +406,6 @@ export default function StepOnboardingFormData({
 
     if (restOutcome === 'success') {
       setIsVatRegistrated(true);
-      trackEvent('VERIFY_ONBOARDING', { request_id: requestId });
     } else {
       setIsVatRegistrated(false);
     }
