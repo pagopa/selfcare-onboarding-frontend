@@ -9,6 +9,7 @@ import { useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { uniqueId } from 'lodash';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
+import { emailRegexp } from '@pagopa/selfcare-common-frontend/utils/constants';
 import {
   InstitutionType,
   Party,
@@ -32,10 +33,10 @@ import GeoTaxSessionModal from '../onboardingFormData/taxonomy/GeoTaxSessionModa
 import GeoTaxonomySection from '../onboardingFormData/taxonomy/GeoTaxonomySection';
 import { useHistoryState } from '../useHistoryState';
 
-const mailPECRegexp = new RegExp('^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,5}$');
 const fiscalAndVatCodeRegexp = new RegExp(
   /(^[A-Za-z]{6}[0-9lmnpqrstuvLMNPQRSTUV]{2}[abcdehlmprstABCDEHLMPRST]{1}[0-9lmnpqrstuvLMNPQRSTUV]{2}[A-Za-z]{1}[0-9lmnpqrstuvLMNPQRSTUV]{3}[A-Za-z]{1}$|^[0-9]{11}$)/
 );
+const fiveCharactersAlphanumeric = new RegExp('^([a-zA-Z0-9_-]){5}$');
 
 const fiveCharactersAllowed = new RegExp('^\\d{5}$');
 const reaValidation = new RegExp('^[A-Za-z]{2}');
@@ -86,11 +87,12 @@ export default function StepOnboardingFormData({
 }: Props) {
   const requiredError = 'Required';
 
-  const institutionAvoidGeotax = ['PT', 'SA'].includes(institutionType);
+  const institutionAvoidGeotax = ['PT', 'SA', 'AS'].includes(institutionType);
 
   const premiumFlow = !!subProductId;
   const isPSP = institutionType === 'PSP';
-  const isSa = institutionType === 'SA';
+  const isContractingAuthority = institutionType === 'SA';
+  const isInsuranceCompany = institutionType === 'AS';
   const isTechPartner = institutionType === 'PT';
   const isInformationCompany =
     institutionType !== 'PA' &&
@@ -283,9 +285,17 @@ export default function StepOnboardingFormData({
             : isVatRegistrated
             ? t('onboardingFormData.billingDataSection.vatNumberAlreadyRegistered')
             : undefined,
+        ivassCode:
+          isInsuranceCompany && !values.ivassCode
+            ? requiredError
+            : isInsuranceCompany &&
+              values.ivassCode &&
+              !fiveCharactersAlphanumeric.test(values.ivassCode)
+            ? t('onboardingFormData.billingDataSection.invalidIvassCode')
+            : undefined,
         digitalAddress: !values.digitalAddress
           ? requiredError
-          : !mailPECRegexp.test(values.digitalAddress)
+          : !emailRegexp.test(values.digitalAddress)
           ? t('onboardingFormData.billingDataSection.invalidEmail')
           : undefined,
 
@@ -299,9 +309,8 @@ export default function StepOnboardingFormData({
                 'onboardingFormData.billingDataSection.pspDataSection.invalidCommercialRegisterNumber'
               )
             : undefined,
-
-        businessRegisterPlace: isSa && !values.businessRegisterPlace ? requiredError : undefined,
-
+        businessRegisterPlace:
+          isContractingAuthority && !values.businessRegisterPlace ? requiredError : undefined,
         registrationInRegister: isPSP && !values.registrationInRegister ? requiredError : undefined,
         dpoAddress: isPSP && !values.dpoAddress ? requiredError : undefined,
         registerNumber:
@@ -319,16 +328,19 @@ export default function StepOnboardingFormData({
         dopEmailAddress:
           isPSP && !values.dopEmailAddress
             ? requiredError
-            : isPSP && values.dopEmailAddress && !mailPECRegexp.test(values.dopEmailAddress)
+            : isPSP && values.dopEmailAddress && !emailRegexp.test(values.dopEmailAddress)
             ? t('onboardingFormData.billingDataSection.invalidEmail')
             : undefined,
         dpoPecAddress:
           isPSP && !values.dpoPecAddress
             ? requiredError
-            : isPSP && values.dpoPecAddress && !mailPECRegexp.test(values.dpoPecAddress)
+            : isPSP && values.dpoPecAddress && !emailRegexp.test(values.dpoPecAddress)
             ? t('onboardingFormData.billingDataSection.invalidEmail')
             : undefined,
-        recipientCode: !isSa && !isTechPartner && !values.recipientCode ? requiredError : undefined,
+        recipientCode:
+          !isContractingAuthority && !isTechPartner && !isInsuranceCompany && !values.recipientCode
+            ? requiredError
+            : undefined,
         geographicTaxonomies:
           ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY &&
           !institutionAvoidGeotax &&
@@ -346,7 +358,7 @@ export default function StepOnboardingFormData({
             ? t('onboardingFormData.billingDataSection.invalidReaField')
             : undefined,
         shareCapital:
-          isSa && !values.shareCapital
+          isContractingAuthority && !values.shareCapital
             ? requiredError
             : values.shareCapital && !currencyField.test(values.shareCapital)
             ? t('onboardingFormData.billingDataSection.invalidShareCapitalField')
@@ -354,7 +366,7 @@ export default function StepOnboardingFormData({
         supportEmail:
           !institutionAvoidGeotax && !values.supportEmail && !premiumFlow && isProdIoSign
             ? requiredError
-            : !mailPECRegexp.test(values.supportEmail as string) && values.supportEmail
+            : !emailRegexp.test(values.supportEmail as string) && values.supportEmail
             ? t('onboardingFormData.billingDataSection.invalidMailSupport')
             : undefined,
       }).filter(([_key, value]) => value)
@@ -375,7 +387,7 @@ export default function StepOnboardingFormData({
     const requestId = uniqueId('verify-onboarding-vatnumber');
     const onboardingStatus = await fetchWithLogs(
       {
-        endpoint: 'VERIFY_ONBOARDED_VAT_NUMBER',
+        endpoint: 'VERIFY_ONBOARDING',
       },
       {
         method: 'HEAD',
@@ -395,7 +407,7 @@ export default function StepOnboardingFormData({
 
     if (restOutcome === 'success') {
       setIsVatRegistrated(true);
-      trackEvent('VERIFY_ONBOARDED_VAT_NUMBER', { request_id: requestId });
+      trackEvent('VERIFY_ONBOARDING', { request_id: requestId });
     } else {
       setIsVatRegistrated(false);
     }

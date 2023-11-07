@@ -106,42 +106,43 @@ function OnboardingComponent({ productId }: { productId: string }) {
   const subunitCodeByQuery =
     new URLSearchParams(window.location.hash.substr(1)).get('subunitCode') ?? '';
 
+  const isTechPartner = institutionType === 'PT';
+
   const alreadyOnboarded: RequestOutcomeMessage = {
     title: '',
-    description:
-      institutionType === 'PT'
-        ? [
-            <Grid key="0">
-              <EndingPage
-                minHeight="52vh"
-                variantTitle={'h4'}
-                variantDescription={'body1'}
-                icon={<IllusError size={60} />}
-                title={<Trans i18nKey="onboardingStep1_5.ptAlreadyOnboarded.title" />}
-                description={
-                  <Trans i18nKey="onboardingStep1_5.ptAlreadyOnboarded.description">
-                    Per operare su un prodotto, chiedi a un Amministratore di <br /> aggiungerti
-                    nella sezione Utenti.
-                  </Trans>
-                }
-                buttonLabel={<Trans i18nKey="onboardingStep1_5.ptAlreadyOnboarded.backAction" />}
-                onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
-              />
-            </Grid>,
-          ]
-        : [
-            <Grid key="0">
-              <EndingPage
-                minHeight="52vh"
-                variantTitle={'h4'}
-                variantDescription={'body1'}
-                title={<Trans i18nKey="onboardingStep1_5.alreadyOnboarded.title" />}
-                description={<Trans i18nKey="onboardingStep1_5.alreadyOnboarded.description" />}
-                buttonLabel={<Trans i18nKey="onboardingStep1_5.alreadyOnboarded.backAction" />}
-                onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
-              />
-            </Grid>,
-          ],
+    description: isTechPartner
+      ? [
+          <Grid key="0">
+            <EndingPage
+              minHeight="52vh"
+              variantTitle={'h4'}
+              variantDescription={'body1'}
+              icon={<IllusError size={60} />}
+              title={<Trans i18nKey="onboardingStep1_5.ptAlreadyOnboarded.title" />}
+              description={
+                <Trans i18nKey="onboardingStep1_5.ptAlreadyOnboarded.description">
+                  Per operare su un prodotto, chiedi a un Amministratore di <br /> aggiungerti nella
+                  sezione Utenti.
+                </Trans>
+              }
+              buttonLabel={<Trans i18nKey="onboardingStep1_5.ptAlreadyOnboarded.backAction" />}
+              onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+            />
+          </Grid>,
+        ]
+      : [
+          <Grid key="0">
+            <EndingPage
+              minHeight="52vh"
+              variantTitle={'h4'}
+              variantDescription={'body1'}
+              title={<Trans i18nKey="onboardingStep1_5.alreadyOnboarded.title" />}
+              description={<Trans i18nKey="onboardingStep1_5.alreadyOnboarded.description" />}
+              buttonLabel={<Trans i18nKey="onboardingStep1_5.alreadyOnboarded.backAction" />}
+              onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+            />
+          </Grid>,
+        ],
   };
 
   useEffect(() => {
@@ -219,7 +220,11 @@ function OnboardingComponent({ productId }: { productId: string }) {
   };
 
   const forwardWithData = (newFormData: Partial<FormData>) => {
-    setFormData({ ...formData, ...newFormData });
+    if (formData) {
+      setFormData({ ...formData, ...newFormData });
+    } else {
+      setFormData(newFormData);
+    }
     forward();
   };
 
@@ -275,6 +280,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
       vatNumber: '',
       zipCode: aooResult ? aooResult.CAP : uoResult ? uoResult.CAP : party.zipCode,
       geographicTaxonomies: onboardingFormData?.geographicTaxonomies as Array<GeographicTaxonomy>,
+      ivassCode: institutionType === 'AS' ? party.originId : undefined,
     });
     forwardWithData(newFormData);
     trackEvent('ONBOARDING_PARTY_SELECTION', {
@@ -303,9 +309,19 @@ function OnboardingComponent({ productId }: { productId: string }) {
         const onboardingStatus = await fetchWithLogs(
           {
             endpoint: 'VERIFY_ONBOARDING',
-            endpointParams: { externalInstitutionId: newOnboardingFormData.taxCode, productId },
           },
-          { method: 'HEAD' },
+          {
+            method: 'HEAD',
+            params: {
+              taxCode: externalInstitutionId,
+              productId,
+              subunitCode: aooSelected
+                ? aooSelected.codiceUniAoo
+                : uoSelected
+                ? uoSelected.codiceUniUo
+                : undefined,
+            },
+          },
           () => setRequiredLogin(true)
         );
         const restOutcome = getFetchOutcome(onboardingStatus);
@@ -319,7 +335,11 @@ function OnboardingComponent({ productId }: { productId: string }) {
             (onboardingStatus as AxiosError<any>).response?.status === 400
           ) {
             setOutcome(null);
-            forward();
+            if (isTechPartner) {
+              setActiveStep(activeStep + 2);
+            } else {
+              forward();
+            }
           } else if ((onboardingStatus as AxiosError<any>).response?.status === 403) {
             setOutcome(notAllowedError);
           } else {
@@ -327,10 +347,10 @@ function OnboardingComponent({ productId }: { productId: string }) {
           }
         }
       };
-
       void partyVerifyOnboarded();
+    } else {
+      forward();
     }
-    forward();
   };
 
   const outcomeContent: RequestOutcomeOptions = {
@@ -436,6 +456,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
               ? companyInformationsDto2pspDataRequest(onboardingFormData as OnboardingFormData)
               : undefined,
           institutionType,
+          ivassCode: onboardingFormData?.ivassCode,
           geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY //
             ? onboardingFormData?.geographicTaxonomies?.map((gt) =>
                 onboardedInstitutionInfo2geographicTaxonomy(gt)
@@ -604,6 +625,8 @@ function OnboardingComponent({ productId }: { productId: string }) {
           productId,
           selectedProduct,
           selectedParty,
+          aooSelected,
+          uoSelected,
         }),
     },
     {
@@ -614,6 +637,8 @@ function OnboardingComponent({ productId }: { productId: string }) {
           productId,
           institutionType,
           forward: forwardWithOnboardingData,
+          aooSelected,
+          uoSelected,
         }),
     },
     {
@@ -684,15 +709,17 @@ function OnboardingComponent({ productId }: { productId: string }) {
         OnBoardingProductStepDelegates({
           externalInstitutionId,
           product: selectedProduct,
-          legal: (formData as any).users[0],
+          legal: isTechPartner ? undefined : (formData as any)?.users[0],
           forward: (newFormData: Partial<FormData>) => {
+            const users = (newFormData as any).users as Array<UserOnCreate>;
+            const usersWithoutLegal = users.slice(0, 0).concat(users.slice(0 + 1));
             setFormData({ ...formData, ...newFormData });
             trackEvent('ONBOARDING_ADD_DELEGATE', {
               request_id: requestIdRef.current,
               party_id: externalInstitutionId,
               product_id: productId,
             });
-            submit((newFormData as any).users).catch(() => {
+            submit(isTechPartner ? usersWithoutLegal : users).catch(() => {
               trackEvent('ONBOARDING_ADD_DELEGATE', {
                 request_id: requestIdRef.current,
                 party_id: externalInstitutionId,
@@ -700,7 +727,13 @@ function OnboardingComponent({ productId }: { productId: string }) {
               });
             });
           },
-          back,
+          back: () => {
+            if (isTechPartner) {
+              setActiveStep(activeStep - 2);
+            } else {
+              setActiveStep(activeStep - 1);
+            }
+          },
         }),
     },
   ];

@@ -60,9 +60,11 @@ export default function PersonalAndBillingDataSection({
   const isFromIPA = origin === 'IPA';
   const isPSP = institutionType === 'PSP';
   const isPA = institutionType === 'PA';
-  const isSA = institutionType === 'SA';
+  const isContractingAuthority = institutionType === 'SA';
+  const isInsuranceCompany = institutionType === 'AS';
   const isTechPartner = institutionType === 'PT';
   const isDisabled = premiumFlow || (isFromIPA && !isPA && !isPSP) || isPA;
+  const recipientCodeVisible = !isContractingAuthority && !isTechPartner && !isInsuranceCompany;
   const requiredError = 'Required';
   const isAooUo = aooSelected || uoSelected;
   const baseNumericFieldProps = (
@@ -186,7 +188,7 @@ export default function PersonalAndBillingDataSection({
                   400,
                   18
                 )}
-                disabled={isDisabled || isSA}
+                disabled={isDisabled || isContractingAuthority || isInsuranceCompany}
               />
             </Grid>
           )}
@@ -196,11 +198,13 @@ export default function PersonalAndBillingDataSection({
             <CustomTextField
               {...baseTextFieldProps(
                 'registeredOffice',
-                t('onboardingFormData.billingDataSection.registeredOffice'),
+                isInsuranceCompany
+                  ? t('onboardingFormData.billingDataSection.fullLegalAddress')
+                  : t('onboardingFormData.billingDataSection.registeredOffice'),
                 400,
                 18
               )}
-              disabled={!isAooUo && isDisabled}
+              disabled={!isAooUo && isDisabled && !isInsuranceCompany}
             />
           </Grid>
           {/* CAP */}
@@ -213,7 +217,7 @@ export default function PersonalAndBillingDataSection({
                 400,
                 18
               )}
-              disabled={!isAooUo && isDisabled}
+              disabled={!isAooUo && isDisabled && !isInsuranceCompany}
             />
           </Grid>
           {/* Indirizzo PEC */}
@@ -225,7 +229,7 @@ export default function PersonalAndBillingDataSection({
                 400,
                 18
               )}
-              disabled={isDisabled || isSA}
+              disabled={isDisabled || isContractingAuthority || isInsuranceCompany}
             />
           </Grid>
           {/* Codice fiscale */}
@@ -237,7 +241,7 @@ export default function PersonalAndBillingDataSection({
                 400,
                 18
               )}
-              disabled={(isDisabled && !isAooUo) || isSA}
+              disabled={(isDisabled && !isAooUo) || isContractingAuthority || isInsuranceCompany}
             />
           </Grid>
           {/* Checkbox codice fiscale = P.IVA */}
@@ -300,7 +304,7 @@ export default function PersonalAndBillingDataSection({
                   </Typography>
                 </Box>
               )}
-              {!isSA && !isTechPartner && (
+              {recipientCodeVisible && (
                 <Grid item xs={12} mt={3}>
                   <CustomTextField
                     {...baseTextFieldProps(
@@ -325,15 +329,28 @@ export default function PersonalAndBillingDataSection({
               )}
             </Typography>
           </Grid>
+          {isInsuranceCompany && (
+            <Grid item xs={12}>
+              <CustomTextField
+                {...baseTextFieldProps(
+                  'ivassCode',
+                  t('onboardingFormData.billingDataSection.ivassCode'),
+                  400,
+                  18
+                )}
+                value={formik.values.ivassCode}
+              />
+            </Grid>
+          )}
           {/* institutionType !== 'PA' && institutionType !== 'PSP' && productId === 'prod-io'; */}
-          {(isInformationCompany || isSA) && (
+          {(isInformationCompany || isContractingAuthority) && (
             <>
               <Grid item xs={12}>
                 {/* Luogo di iscrizione al Registro delle Imprese facoltativo per institution Type !== 'PA' e 'PSP */}
                 <CustomTextField
                   {...baseTextFieldProps(
                     'businessRegisterPlace',
-                    isSA
+                    isContractingAuthority
                       ? t(
                           'onboardingFormData.billingDataSection.informationCompanies.requiredCommercialRegisterNumber'
                         )
@@ -363,7 +380,7 @@ export default function PersonalAndBillingDataSection({
                   name={'shareCapital'}
                   {...baseTextFieldProps(
                     'shareCapital',
-                    isSA
+                    isContractingAuthority
                       ? t(
                           'onboardingFormData.billingDataSection.informationCompanies.requiredShareCapital'
                         )

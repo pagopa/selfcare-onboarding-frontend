@@ -4,6 +4,7 @@ import { useTranslation, TFunction } from 'react-i18next';
 import { verifyNameMatchWithTaxCode } from '@pagopa/selfcare-common-frontend/utils/verifyNameMatchWithTaxCode';
 import { verifySurnameMatchWithTaxCode } from '@pagopa/selfcare-common-frontend/utils/verifySurnameMatchWithTaxCode';
 import { verifyChecksumMatchWithTaxCode } from '@pagopa/selfcare-common-frontend/utils/verifyChecksumMatchWithTaxCode';
+import { emailRegexp } from '@pagopa/selfcare-common-frontend/utils/constants';
 import { UserOnCreate, PartyRole } from '../../types';
 import { UsersError, UsersObject } from './steps/StepAddManager';
 
@@ -53,7 +54,7 @@ const fields: Array<Field> = [
   {
     id: 'email',
     width: 12,
-    regexp: new RegExp('^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,5}$'),
+    regexp: emailRegexp,
     regexpMessageKey: 'invalid',
     hasDescription: true,
     unique: true,
@@ -91,7 +92,7 @@ export function validateUser(
 function validateNoMandatory(
   userTempId: keyof UsersObject,
   user: UserOnCreate,
-  users: UsersObject,
+  users?: UsersObject,
   isAuthUser?: boolean
 ): Array<ValidationErrorCode> {
   const usersArray = users
@@ -112,7 +113,9 @@ function validateNoMandatory(
           ? `${id}-regexp`
           : regexp && user[id] && !regexp.test(user[id] as string) && id === 'email'
           ? `${id}-regexp`
-          : unique && usersArray.findIndex((u) => stringEquals(u[id], user[id], caseSensitive)) > -1
+          : unique &&
+            usersArray &&
+            usersArray.findIndex((u) => stringEquals(u[id], user[id], caseSensitive)) > -1
           ? `${id}-unique`
           : id === 'name' &&
             user.name &&

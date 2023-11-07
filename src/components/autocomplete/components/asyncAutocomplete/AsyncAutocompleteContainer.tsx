@@ -98,7 +98,12 @@ export default function AsyncAutocompleteContainer({
       ? 'L37,SAG'
       : 'C17,C16,L10,L19,L13,L2,C10,L20,L21,L22,L15,L1,C13,C5,L40,L11,L39,L46,L8,L34,L7,L35,L45,L47,L6,L12,L24,L28,L42,L36,L44,C8,C3,C7,C14,L16,C11,L33,C12,L43,C2,L38,C1,L5,L4,L31,L18,L17,S01,SA';
 
-  const handleSearchByBusinessName = async (query: string) => {
+  const handleSearchByName = async (
+    query: string,
+    endpoint: Endpoint,
+    limit?: number,
+    categories?: string
+  ) => {
     setIsLoading(true);
 
     const searchResponse = await fetchWithLogs(
@@ -106,10 +111,10 @@ export default function AsyncAutocompleteContainer({
       {
         method: 'GET',
         params: {
-          limit: ENV.MAX_INSTITUTIONS_FETCH,
+          limit,
           page: 1,
           search: query,
-          categories: filterByCategory,
+          categories,
         },
       },
       () => setRequiredLogin(true)
@@ -204,34 +209,17 @@ export default function AsyncAutocompleteContainer({
     setIsLoading(false);
   };
 
-  const handleSearchSAByBusinessName = async (query: string) => {
-    const searchResponse = await fetchWithLogs(
-      { endpoint: 'ONBOARDING_GET_SA_PARTIES_NAME' },
-      {
-        method: 'GET',
-        params: {
-          limit: ENV.MAX_INSTITUTIONS_FETCH,
-          page: 1,
-          search: query,
-        },
-      },
-      () => setRequiredLogin(true)
-    );
-    const outcome = getFetchOutcome(searchResponse);
-
-    if (outcome === 'success') {
-      setOptions(transformFn((searchResponse as AxiosResponse).data));
-    } else if ((searchResponse as AxiosError).response?.status === 404) {
-      setOptions([]);
-    }
-    setIsLoading(false);
-  };
-
-  const handleSearchSaByTaxCode = async (query: string) => {
+  const contractingInsuranceFromTaxId = async (query: string) => {
     setIsLoading(true);
 
     const searchResponse = await fetchWithLogs(
-      { endpoint: 'ONBOARDING_GET_SA_PARTY_FROM_FC', endpointParams: { id: query } },
+      {
+        endpoint:
+          institutionType === 'SA'
+            ? 'ONBOARDING_GET_SA_PARTY_FROM_FC'
+            : 'ONBOARDING_GET_INSURANCE_COMPANIES_BY_TAXCODE',
+        endpointParams: institutionType === 'SA' ? { id: query } : { taxId: query },
+      },
       {
         method: 'GET',
       },
@@ -248,24 +236,59 @@ export default function AsyncAutocompleteContainer({
 
     setIsLoading(false);
   };
+
+  const seachByInstitutionType = (value: string, institutionType?: string) => {
+    switch (institutionType) {
+      case 'AS':
+        void debounce(handleSearchByName, 100)(value, {
+          endpoint: 'ONBOARDING_GET_INSURANCE_COMPANIES_BY_NAME',
+        });
+        break;
+      case 'SA':
+        void debounce(handleSearchByName, 100)(value, {
+          endpoint: 'ONBOARDING_GET_SA_PARTIES_NAME',
+        });
+        break;
+      default:
+        void debounce(handleSearchByName, 100)(
+          value,
+          endpoint,
+          ENV.MAX_INSTITUTIONS_FETCH,
+          filterByCategory
+        );
+    }
+  };
   // eslint-disable-next-line sonarjs/cognitive-complexity
   const handleChange = (event: any) => {
-    const value = event.target.value as string;
+    const typedInput = event.target.value as string;
+
+    const removeSpecialCharacters = (typedInput: string) => {
+      const specialCharacters = '[$%&’()§#!£{}*+/:;<>@=?^|~]';
+
+      return typedInput
+        .split('')
+        .map((char) => (specialCharacters.includes(char) ? '' : char))
+        .join('')
+        .replace("''", "'")
+        .replace('""', '"')
+        .replace('--', '-')
+        .replace('__', '_')
+        .replace(',,', ',')
+        .replace('..', '.');
+    };
+
+    const value = removeSpecialCharacters(typedInput);
     setInput(value);
 
     if (value !== '') {
       setSelected(null);
       if (value.length >= 3 && isBusinessNameSelected && !isTaxCodeSelected) {
-        if (institutionType !== 'SA') {
-          void debounce(handleSearchByBusinessName, 100)(value);
-        } else {
-          void debounce(handleSearchSAByBusinessName, 100)(value);
-        }
+        seachByInstitutionType(value, institutionType);
       } else if (isTaxCodeSelected && value.length === 11) {
-        if (institutionType !== 'SA') {
-          void handleSearchByTaxCode(value);
+        if (institutionType === 'SA' || institutionType === 'AS') {
+          void contractingInsuranceFromTaxId(value);
         } else {
-          void handleSearchSaByTaxCode(value);
+          void handleSearchByTaxCode(value);
         }
       } else if (isAooCodeSelected && !isUoCodeSelected && value.length === 7) {
         void handleSearchByAooCode(value);

@@ -19,12 +19,16 @@ import { unregisterUnloadEvent } from '../../../utils/unloadEvent-utils';
 import { LoadingOverlay } from '../../../components/LoadingOverlay';
 import { MessageNoAction } from '../../../components/MessageNoAction';
 import UserNotAllowedPage from '../../UserNotAllowedPage';
+import { AooData } from '../../../model/AooData';
+import { UoData } from '../../../model/UoModel';
 
 type Props = StepperStepComponentProps & {
   externalInstitutionId: string;
   productId: string;
   selectedProduct?: Product | null;
   selectedParty?: Party;
+  aooSelected?: AooData;
+  uoSelected?: UoData;
 };
 
 const alreadyOnboarded: RequestOutcomeMessage = {
@@ -68,12 +72,15 @@ export const genericError: RequestOutcomeMessage = {
   ],
 };
 
+// eslint-disable-next-line sonarjs/cognitive-complexity
 export function OnboardingStep1_5({
   forward,
   externalInstitutionId,
   productId,
   selectedProduct,
   selectedParty,
+  aooSelected,
+  uoSelected,
 }: Props) {
   const [loading, setLoading] = useState(true);
   const [outcome, setOutcome] = useState<RequestOutcomeMessage | null>();
@@ -105,8 +112,21 @@ export function OnboardingStep1_5({
     setLoading(true);
 
     const onboardingStatus = await fetchWithLogs(
-      { endpoint: 'VERIFY_ONBOARDING', endpointParams: { externalInstitutionId, productId } },
-      { method: 'HEAD' },
+      {
+        endpoint: 'VERIFY_ONBOARDING',
+      },
+      {
+        method: 'HEAD',
+        params: {
+          taxCode: externalInstitutionId,
+          productId,
+          subunitCode: aooSelected
+            ? aooSelected.codiceUniAoo
+            : uoSelected
+            ? uoSelected.codiceUniUo
+            : undefined,
+        },
+      },
       () => setRequiredLogin(true)
     );
 

@@ -205,7 +205,7 @@ export type InstitutionOnboardingInfoResource = {
   institution: InstitutionData;
 };
 
-export type InstitutionType = 'PA' | 'GSP' | 'SCP' | 'PT' | 'PSP' | 'SA';
+export type InstitutionType = 'PA' | 'GSP' | 'SCP' | 'PT' | 'PSP' | 'SA' | 'AS';
 
 export type ANACParty = {
   description: string;
@@ -220,4 +220,20 @@ export type ANACParty = {
 export type StationResource = {
   count: number;
   items: Array<ANACParty>;
+};
+export type InsuranceCompanyResource = {
+  address: string;
+  description: string;
+  digitalAddress: string;
+  id: string;
+  origin: string;
+  originId: string;
+  registerType: string;
+  taxCode: string;
+  workType: string;
+};
+
+export type InsuranceCompaniesResource = {
+  count: number;
+  items: Array<InsuranceCompanyResource>;
 };
