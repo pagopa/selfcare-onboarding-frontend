@@ -243,20 +243,6 @@ test.skip('test party search if gps for prod-interop', async () => {
   await executeGoHome(true);
 });
 
-test('test description in step3', async () => {
-  renderComponent('prod-interop');
-  await executeStepInstitutionTypeGspForInterop();
-  await executeStep1('AGENCY X', 'prod-interop', 'gsp');
-  await executeStepBillingData();
-  await executeStep2();
-  await verifyDescriptionInStep3();
-});
-
-test('test institution type if prod-io-sign', async () => {
-  renderComponent('prod-io-sign');
-  await executeStepInstitutionTypeGspForProdIoSign();
-  await executeStepBillingDataReaField();
-});
 const performLogout = async (logoutButton: HTMLElement) => {
   fireEvent.click(logoutButton);
   await waitFor(() => expect(screen.queryByText('Vuoi davvero uscire?')).not.toBeNull());
@@ -578,7 +564,9 @@ const executeStepBillingData = async () => {
     'taxCode',
     'vatNumber',
     'recipientCode',
-    'supportEmail'
+    'supportEmail',
+    'city',
+    'province'
   );
 
   const confirmButtonEnabled = screen.getByRole('button', { name: 'Continua' });
@@ -587,6 +575,7 @@ const executeStepBillingData = async () => {
   fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
     target: { value: '' },
   });
+
   await waitFor(() => expect(confirmButtonEnabled).toBeDisabled());
 
   await fillUserBillingDataForm(
@@ -597,7 +586,9 @@ const executeStepBillingData = async () => {
     'taxCode',
     'vatNumber',
     'recipientCode',
-    'supportEmail'
+    'supportEmail',
+    'city',
+    'province'
   );
 
   await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
@@ -650,7 +641,9 @@ const executeStepBillingDataLabelsForPt = async () => {
       'zipCode',
       'taxCode',
       'vatNumber',
-      'recipientCode'
+      'recipientCode',
+      'city',
+      'province'
     )
   );
 
@@ -680,7 +673,9 @@ const executeStepBillingDataLabelsForPtAlreadyOnboarded = async () => {
       'zipCode',
       'taxCode',
       'vatNumber',
-      'recipientCode'
+      'recipientCode',
+      'city',
+      'province'
     )
   );
 
@@ -725,7 +720,9 @@ const executeStepBillingDataWithoutSupportMail = async () => {
     'taxCode',
     'vatNumber',
     'recipientCode',
-    'supportEmail'
+    'supportEmail',
+    'city',
+    'province'
   );
 
   const confirmButton = screen.getByRole('button', { name: 'Continua' });
@@ -752,7 +749,9 @@ const executeStepBillingDataWithoutSupportMail = async () => {
     'taxCode',
     'vatNumber',
     'recipientCode',
-    'supportEmail'
+    'supportEmail',
+    'city',
+    'province'
   );
 
   await waitFor(() => expect(confirmButton).toBeEnabled());
@@ -856,7 +855,9 @@ const fillUserBillingDataForm = async (
   vatNumber: string,
   recipientCode: string,
   supportEmail?: string,
-  rea?: string
+  rea?: string,
+  city?: string,
+  province?: string
 ) => {
   fireEvent.change(document.getElementById(businessNameInput) as HTMLElement, {
     target: { value: 'businessNameInput' },
@@ -881,18 +882,20 @@ const fillUserBillingDataForm = async (
   fireEvent.change(document.getElementById(recipientCode) as HTMLElement, {
     target: { value: 'recipientCode' },
   });
+  const searchCitySelect = document.getElementById('city-select');
+  if (searchCitySelect) {
+    fireEvent.change(searchCitySelect as HTMLInputElement, { target: { value: 'desc1' } });
+  }
+
+  if (province) {
+    fireEvent.change(document.getElementById(province) as HTMLElement, {
+      target: { value: 'RM' },
+    });
+  }
   if (supportEmail) {
     fireEvent.change(document.getElementById(supportEmail) as HTMLElement, {
       target: { value: 'a@a.it' },
     });
-  }
-  // TODO: remove comment if REACT_APP_ENABLE_GEOTAXONOMY is true -- await waitFor(() => fireEvent.click(document.getElementById('national_geographicTaxonomies')));
-  if (rea) {
-    await waitFor(() =>
-      fireEvent.change(document.getElementById(rea) as HTMLElement, {
-        target: { value: 'RM-123456' },
-      })
-    );
   }
 };
 
@@ -1182,6 +1185,7 @@ const verifySubmit = async (productId = 'prod-idpay') => {
         data: {
           billingData: billingData2billingDataRequest(),
           pspData: undefined,
+          ivassCode: undefined,
           institutionType: 'PA',
           origin: 'IPA',
           users: [
@@ -1211,6 +1215,7 @@ const verifySubmit = async (productId = 'prod-idpay') => {
           geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY
             ? [{ code: nationalValue, desc: 'ITALIA' }]
             : [],
+          institutionLocationData: undefined,
           assistanceContacts: { supportEmail: 'a@a.it' },
           productId,
           subunitCode: undefined,

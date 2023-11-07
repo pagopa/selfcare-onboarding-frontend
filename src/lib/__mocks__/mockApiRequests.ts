@@ -9,7 +9,7 @@ import {
   InsuranceCompaniesResource,
 } from '../../../types';
 import { BillingDataDto } from '../../model/BillingData';
-import { nationalValue } from '../../model/GeographicTaxonomies';
+import { GeographicTaxonomyResource, nationalValue } from '../../model/GeographicTaxonomies';
 import { UoData } from '../../model/UoModel';
 import { AooData } from './../../model/AooData';
 
@@ -256,9 +256,9 @@ const mockedParties = [
     '775644',
     'Comune di Gessate',
     'logo',
+    '33445673210',
     'address4',
     'b@bb.com',
-    '33445673210',
     '00022'
   ),
   createPartyEntity(
@@ -296,18 +296,51 @@ const mockedParties = [
   ),
 ];
 
-const mockedGeoTaxonomy = [
+export const mockedGeoTaxonomy: Array<GeographicTaxonomyResource> = [
   {
     code: nationalValue,
     desc: 'ITALIA',
-    region: '12',
-    province: '058',
-    provinceAbbreviation: 'RM',
-    country: 'ITA',
-    countryAbbreviation: 'IT',
-    startDate: '1871-01-15',
-    endDate: null,
-    enable: true,
+    country_abbreviation: 'IT',
+    enabled: true,
+    istat_code: '1212343',
+    province_abbreviation: 'RM',
+    province_id: '058',
+    region_id: '12',
+    country: 'ITALY',
+  },
+  {
+    code: '2334',
+    country: '232',
+    country_abbreviation: 'IT',
+    desc: 'MILANO - COMUNE',
+    enabled: true,
+    province_abbreviation: 'MI',
+    province_id: '334',
+    region_id: '43',
+    istat_code: '233',
+  },
+  // Use case for verify correct elimination of - PROVINCIA geotaxonomies
+  {
+    code: '55556',
+    country: '323',
+    country_abbreviation: 'IT',
+    desc: 'MILANO - PROVINCIA',
+    enabled: true,
+    province_abbreviation: 'MI',
+    province_id: '2332',
+    region_id: '66',
+    istat_code: '754',
+  },
+  {
+    code: '545456',
+    country: '232',
+    country_abbreviation: 'IT',
+    desc: 'MILLESIMO - COMUNE',
+    enabled: true,
+    istat_code: '2233445',
+    province_abbreviation: 'SV',
+    province_id: '433',
+    region_id: '65',
   },
 ];
 
@@ -730,15 +763,15 @@ export async function mockFetch(
 
   if (endpoint === 'VERIFY_ONBOARDING') {
     switch (params.taxCode) {
-      case 'infoError':
+      case '99999999999':
       case 'externalId4':
         return genericError;
-      case 'notAllowed':
+      case '44444444444':
         return notAllowedError;
       case 'onboarded_externalId':
-      case 'onboarded':
+      case '22222222222':
         return noContent;
-      case 'pending':
+      case '33333333333':
         return notFound;
       // Use case for test not base adhesion
       case 'externalId3':

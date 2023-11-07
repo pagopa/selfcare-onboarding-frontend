@@ -301,7 +301,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
     });
 
     setOnboardingFormData(newOnboardingFormData);
-    if (institutionType === 'PSP' || institutionType !== 'PA') {
+    if (institutionType !== 'PA') {
       // TODO: fix when party registry proxy will return externalInstitutionId
       setExternalInstitutionId(newOnboardingFormData.taxCode);
 
@@ -313,7 +313,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
           {
             method: 'HEAD',
             params: {
-              taxCode: externalInstitutionId,
+              taxCode: newOnboardingFormData.taxCode,
               productId,
               subunitCode: aooSelected
                 ? aooSelected.codiceUniAoo
@@ -457,11 +457,19 @@ function OnboardingComponent({ productId }: { productId: string }) {
               : undefined,
           institutionType,
           ivassCode: onboardingFormData?.ivassCode,
-          geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY //
+          geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY
             ? onboardingFormData?.geographicTaxonomies?.map((gt) =>
                 onboardedInstitutionInfo2geographicTaxonomy(gt)
               )
             : [],
+          institutionLocationData:
+            institutionType !== 'PA' && origin !== 'IPA'
+              ? {
+                  country: onboardingFormData?.country,
+                  county: onboardingFormData?.county,
+                  city: onboardingFormData?.city,
+                }
+              : undefined,
           origin,
           users: users.map((u) => ({
             ...u,
