@@ -6,7 +6,7 @@ import Checkbox from '@mui/material/Checkbox';
 import { theme } from '@pagopa/mui-italia';
 import Autocomplete from '@mui/material/Autocomplete';
 import { AxiosResponse } from 'axios';
-import { InstitutionType, StepperStepComponentProps } from '../../../types';
+import { InstitutionType, Party, StepperStepComponentProps } from '../../../types';
 import { OnboardingFormData } from '../../model/OnboardingFormData';
 import { StepBillingDataHistoryState } from '../steps/StepOnboardingFormData';
 import { AooData } from '../../model/AooData';
@@ -16,6 +16,7 @@ import { getFetchOutcome } from '../../lib/error-utils';
 import { GeographicTaxonomyResource } from '../../model/GeographicTaxonomies';
 import { UserContext } from '../../lib/context';
 import { InstitutionLocationData } from '../../model/InstitutionLocationData';
+import { formatCity } from '../../utils/formatting-utils';
 import NumberDecimalFormat from './NumberDecimalFormat';
 
 const CustomTextField = styled(TextField)({
@@ -46,6 +47,7 @@ type Props = StepperStepComponentProps & {
   aooSelected?: AooData;
   uoSelected?: UoData;
   institutionAvoidGeotax: boolean;
+  selectedParty?: Party;
 };
 
 // eslint-disable-next-line sonarjs/cognitive-complexity, complexity
@@ -61,6 +63,7 @@ export default function PersonalAndBillingDataSection({
   aooSelected,
   uoSelected,
   institutionAvoidGeotax,
+  selectedParty,
 }: Props) {
   const { t } = useTranslation();
   const { setRequiredLogin } = useContext(UserContext);
@@ -85,9 +88,14 @@ export default function PersonalAndBillingDataSection({
   useEffect(() => {
     if (institutionLocationData) {
       formik.setFieldValue('country', institutionLocationData.country);
+
       formik.setFieldValue('county', institutionLocationData.county);
       formik.setFieldValue('city', institutionLocationData.city);
+
       setShrinkCounty(true);
+      console.log('city', formik.values.city);
+      console.log('county', formik.values.county);
+      console.log('country', formik.values.country);
     } else {
       formik.setFieldValue('country', undefined);
       formik.setFieldValue('county', undefined);
@@ -106,6 +114,13 @@ export default function PersonalAndBillingDataSection({
   const recipientCodeVisible = !isContractingAuthority && !isTechPartner && !isInsuranceCompany;
   const requiredError = 'Required';
   const isAooUo = aooSelected || uoSelected;
+
+  useEffect(() => {
+    if (isFromIPA && isPA && selectedParty?.istatCode) {
+      void getLocationFromIstatCode(selectedParty.istatCode);
+    }
+  }, [institutionType, selectedParty]);
+
   const baseNumericFieldProps = (
     field: keyof OnboardingFormData,
     label: string,
@@ -165,13 +180,41 @@ export default function PersonalAndBillingDataSection({
         .filter((r) => r.city.includes('- COMUNE'))
         .map((r) => ({
           ...r,
-          city: r.city
-            .charAt(0)
-            .toUpperCase()
-            .concat(r.city.substring(1).toLowerCase().replace('- comune', '').trim()),
+          city: formatCity(r.city),
         }));
 
       setCountries(onlyCountries);
+    }
+  };
+
+  const getLocationFromIstatCode = async (istatCode: string) => {
+    const getLocation = await fetchWithLogs(
+      {
+        endpoint: 'ONBOARDING_GET_LOCATION_BY_ISTAT_CODE',
+        endpointParams: {
+          geoTaxId: istatCode,
+        },
+      },
+      { method: 'GET' },
+      () => setRequiredLogin(true)
+    );
+    const outcome = getFetchOutcome(getLocation);
+
+    if (outcome === 'success') {
+      const result = (getLocation as AxiosResponse).data;
+      if (result) {
+        const mappedObject = {
+          code: result.code,
+          country: result.country_abbreviation,
+          county: result.province_abbreviation,
+          city: formatCity(result.desc),
+        };
+
+        console.log('modifiedCity', mappedObject);
+        setInstitutionLocationData(mappedObject);
+        console.log('institutionLocationData', institutionLocationData);
+        formik.setFieldValue('city', mappedObject.city);
+      }
     }
   };
 
@@ -286,95 +329,99 @@ export default function PersonalAndBillingDataSection({
               />
             </Grid>
           </Grid>
-          {institutionType !== 'PA' && origin !== 'IPA' && (
-            <Grid container spacing={2} pl={3} pt={3}>
-              <Grid item xs={7}>
-                <Autocomplete
-                  id="city-select"
-                  onInput={(e: any) => {
-                    const value = e.target.value as string;
-                    if (value.length >= 3) {
-                      void getCountriesFromGeotaxonomies(value);
-                    }
-                  }}
-                  onChange={(_e: any, selected: any) => {
-                    if (selected) {
-                      setShrinkCounty(true);
-                      setInstitutionLocationData(selected);
-                      formik.setFieldValue('city', selected.desc);
-                      formik.setFieldValue('county', selected.county);
-                      formik.setFieldValue('country', selected.country);
-                    } else {
-                      setShrinkCounty(false);
-                      formik.setFieldValue('county', undefined);
-                      formik.setFieldValue('country', undefined);
-                    }
-                  }}
-                  getOptionLabel={(o) => o.city}
-                  options={countries ?? []}
-                  noOptionsText={t('onboardingFormData.billingDataSection.noResult')}
-                  ListboxProps={{
-                    style: {
-                      overflow: 'visible',
-                    },
-                  }}
-                  componentsProps={{
-                    paper: {
-                      sx: {
-                        '&::-webkit-scrollbar': {
-                          width: 4,
-                        },
-                        '&::-webkit-scrollbar-track': {
-                          boxShadow: `inset 10px 10px  #E6E9F2`,
-                          marginY: '3px',
-                        },
-                        '&::-webkit-scrollbar-thumb': {
-                          backgroundColor: '#0073E6',
-                          borderRadius: '16px',
-                        },
-                        overflowY: 'auto',
-                        maxHeight: '200px',
-                        boxShadow:
-                          '0px 6px 30px 5px rgba(0, 43, 85, 0.10), 0px 16px 24px 2px rgba(0, 43, 85, 0.05), 0px 8px 10px -5px rgba(0, 43, 85, 0.10)',
+
+          <Grid container spacing={2} pl={3} pt={3}>
+            <Grid item xs={7}>
+              <Autocomplete
+                id="city-select"
+                onInput={(e: any) => {
+                  const value = e.target.value as string;
+                  if (value.length >= 3) {
+                    void getCountriesFromGeotaxonomies(value);
+                  }
+                }}
+                onChange={(_e: any, selected: any) => {
+                  if (selected) {
+                    setShrinkCounty(true);
+                    setInstitutionLocationData(selected);
+                    formik.setFieldValue('city', selected.desc);
+                    formik.setFieldValue('county', selected.county);
+                    formik.setFieldValue('country', selected.country);
+                  } else {
+                    setShrinkCounty(false);
+                    formik.setFieldValue('county', undefined);
+                    formik.setFieldValue('country', undefined);
+                  }
+                }}
+                getOptionLabel={(o) => o}
+                defaultValue={institutionLocationData?.city}
+                freeSolo={isPA && isFromIPA}
+                options={countries ?? []}
+                noOptionsText={t('onboardingFormData.billingDataSection.noResult')}
+                ListboxProps={{
+                  style: {
+                    overflow: 'visible',
+                  },
+                }}
+                componentsProps={{
+                  paper: {
+                    sx: {
+                      '&::-webkit-scrollbar': {
+                        width: 4,
                       },
+                      '&::-webkit-scrollbar-track': {
+                        boxShadow: `inset 10px 10px  #E6E9F2`,
+                        marginY: '3px',
+                      },
+                      '&::-webkit-scrollbar-thumb': {
+                        backgroundColor: '#0073E6',
+                        borderRadius: '16px',
+                      },
+                      overflowY: 'auto',
+                      maxHeight: '200px',
+                      boxShadow:
+                        '0px 6px 30px 5px rgba(0, 43, 85, 0.10), 0px 16px 24px 2px rgba(0, 43, 85, 0.05), 0px 8px 10px -5px rgba(0, 43, 85, 0.10)',
                     },
-                  }}
-                  renderOption={(props, option: InstitutionLocationData) => (
-                    <MenuItem key={option.code} {...props} sx={{ height: '44px' }}>
-                      {option?.city}
-                    </MenuItem>
-                  )}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      sx={{
-                        '& .MuiOutlinedInput-input.MuiInputBase-input.MuiInputBase-inputAdornedEnd.MuiAutocomplete-input.MuiAutocomplete-inputFocused':
-                          {
-                            marginLeft: '16px',
-                            fontWeight: 'fontWeightRegular',
-                            textTransform: 'capitalize',
-                            color: theme.palette.text.secondary,
-                          },
-                      }}
-                      label={t('onboardingFormData.billingDataSection.city')}
-                    />
-                  )}
-                />
-              </Grid>
-              <Grid item xs={5}>
-                <CustomTextField
-                  {...baseTextFieldProps(
-                    'county',
-                    t('onboardingFormData.billingDataSection.county'),
-                    400,
-                    18
-                  )}
-                  InputLabelProps={{ shrink: shrinkCounty }}
-                  disabled={true}
-                />
-              </Grid>
+                  },
+                }}
+                renderOption={(props, option: InstitutionLocationData) => (
+                  <MenuItem key={option.code} {...props} sx={{ height: '44px' }}>
+                    {option?.city}
+                  </MenuItem>
+                )}
+                readOnly={isPA && isFromIPA}
+                disabled={isPA && isFromIPA}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    sx={{
+                      '& .MuiOutlinedInput-input.MuiInputBase-input.MuiInputBase-inputAdornedEnd.MuiAutocomplete-input.MuiAutocomplete-inputFocused':
+                        {
+                          marginLeft: '16px',
+                          fontWeight: 'fontWeightRegular',
+                          textTransform: 'capitalize',
+                          color: theme.palette.text.secondary,
+                        },
+                    }}
+                    label={t('onboardingFormData.billingDataSection.city')}
+                  />
+                )}
+              />
             </Grid>
-          )}
+            <Grid item xs={5}>
+              <CustomTextField
+                {...baseTextFieldProps(
+                  'county',
+                  t('onboardingFormData.billingDataSection.county'),
+                  400,
+                  18
+                )}
+                InputLabelProps={{ shrink: shrinkCounty }}
+                disabled={true}
+              />
+            </Grid>
+          </Grid>
+
           {/* Indirizzo PEC */}
           <Grid item xs={12}>
             <CustomTextField

@@ -82,6 +82,7 @@ export default function StepOnboardingFormData({
   subProductId,
   aooSelected,
   uoSelected,
+  selectedParty,
 }: Props) {
   const { t } = useTranslation();
   const { setRequiredLogin } = useContext(UserContext);
@@ -506,6 +507,7 @@ export default function StepOnboardingFormData({
           aooSelected={aooSelected}
           uoSelected={uoSelected}
           institutionAvoidGeotax={institutionAvoidGeotax}
+          selectedParty={selectedParty}
         />
         {/* DATI RELATIVI ALLA TASSONOMIA */}
         {ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY && !institutionAvoidGeotax ? (
