@@ -1,22 +1,22 @@
-import { Box, styled } from '@mui/system';
-import { useContext, useEffect, useState } from 'react';
-import { Grid, TextField, Typography, Paper, MenuItem } from '@mui/material';
-import { useTranslation } from 'react-i18next';
-import Checkbox from '@mui/material/Checkbox';
-import { theme } from '@pagopa/mui-italia';
+import { Grid, MenuItem, Paper, TextField, Typography } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
+import Checkbox from '@mui/material/Checkbox';
+import { Box, styled } from '@mui/system';
+import { theme } from '@pagopa/mui-italia';
 import { AxiosResponse } from 'axios';
+import { useContext, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { InstitutionType, Party, StepperStepComponentProps } from '../../../types';
-import { OnboardingFormData } from '../../model/OnboardingFormData';
-import { StepBillingDataHistoryState } from '../steps/StepOnboardingFormData';
-import { AooData } from '../../model/AooData';
-import { UoData } from '../../model/UoModel';
 import { fetchWithLogs } from '../../lib/api-utils';
-import { getFetchOutcome } from '../../lib/error-utils';
-import { GeographicTaxonomyResource } from '../../model/GeographicTaxonomies';
 import { UserContext } from '../../lib/context';
+import { getFetchOutcome } from '../../lib/error-utils';
+import { AooData } from '../../model/AooData';
+import { GeographicTaxonomyResource } from '../../model/GeographicTaxonomies';
 import { InstitutionLocationData } from '../../model/InstitutionLocationData';
+import { OnboardingFormData } from '../../model/OnboardingFormData';
+import { UoData } from '../../model/UoModel';
 import { formatCity } from '../../utils/formatting-utils';
+import { StepBillingDataHistoryState } from '../steps/StepOnboardingFormData';
 import NumberDecimalFormat from './NumberDecimalFormat';
 
 const CustomTextField = styled(TextField)({
@@ -88,14 +88,9 @@ export default function PersonalAndBillingDataSection({
   useEffect(() => {
     if (institutionLocationData) {
       formik.setFieldValue('country', institutionLocationData.country);
-
       formik.setFieldValue('county', institutionLocationData.county);
       formik.setFieldValue('city', institutionLocationData.city);
-
       setShrinkCounty(true);
-      console.log('city', formik.values.city);
-      console.log('county', formik.values.county);
-      console.log('country', formik.values.country);
     } else {
       formik.setFieldValue('country', undefined);
       formik.setFieldValue('county', undefined);
@@ -116,8 +111,8 @@ export default function PersonalAndBillingDataSection({
   const isAooUo = aooSelected || uoSelected;
 
   useEffect(() => {
-    if (isFromIPA && isPA && selectedParty?.istatCode) {
-      void getLocationFromIstatCode(selectedParty.istatCode);
+    if (isFromIPA && selectedParty?.istat_code) {
+      void getLocationFromIstatCode(selectedParty.istat_code);
     }
   }, [institutionType, selectedParty]);
 
@@ -353,11 +348,11 @@ export default function PersonalAndBillingDataSection({
                     formik.setFieldValue('country', undefined);
                   }
                 }}
-                getOptionLabel={(o) => o}
-                defaultValue={institutionLocationData?.city}
-                freeSolo={isPA && isFromIPA}
+                getOptionLabel={(o) => o.city}
                 options={countries ?? []}
                 noOptionsText={t('onboardingFormData.billingDataSection.noResult')}
+                popupIcon={isFromIPA ? '' : undefined}
+                readOnly={isFromIPA}
                 ListboxProps={{
                   style: {
                     overflow: 'visible',
@@ -389,11 +384,12 @@ export default function PersonalAndBillingDataSection({
                     {option?.city}
                   </MenuItem>
                 )}
-                readOnly={isPA && isFromIPA}
-                disabled={isPA && isFromIPA}
                 renderInput={(params) => (
                   <TextField
                     {...params}
+                    InputLabelProps={
+                      isFromIPA ? { shrink: !!institutionLocationData?.city } : undefined
+                    }
                     sx={{
                       '& .MuiOutlinedInput-input.MuiInputBase-input.MuiInputBase-inputAdornedEnd.MuiAutocomplete-input.MuiAutocomplete-inputFocused':
                         {
@@ -402,8 +398,18 @@ export default function PersonalAndBillingDataSection({
                           textTransform: 'capitalize',
                           color: theme.palette.text.secondary,
                         },
+                      '.css-177og1b-MuiInputBase-input-MuiOutlinedInput-input.Mui-disabled': {
+                        '-webkit-text-fill-color': '#0d0e0e',
+                      },
                     }}
+                    value={formik.value?.city}
+                    placeholder={
+                      isFromIPA && institutionLocationData
+                        ? institutionLocationData.city
+                        : undefined
+                    }
                     label={t('onboardingFormData.billingDataSection.city')}
+                    disabled={isFromIPA}
                   />
                 )}
               />
