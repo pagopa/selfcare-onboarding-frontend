@@ -29,7 +29,7 @@ const createPartyRegistryEntity = (
   origin: string,
   category: string,
   address: string,
-  istat_code: string
+  istatCode: string
 ) => ({
   id,
   o,
@@ -46,7 +46,7 @@ const createPartyRegistryEntity = (
   origin,
   category,
   address,
-  istat_code,
+  istatCode,
 });
 
 const createPartyEntity = (
@@ -59,7 +59,7 @@ const createPartyEntity = (
   digitalAddress: string,
   taxCode: string,
   zipCode: string,
-  istat_code: string,
+  istatCode: string,
   userRole: UserRole = 'ADMIN',
   origin: string = 'IPA',
   
@@ -75,7 +75,7 @@ const createPartyEntity = (
   zipCode,
   userRole,
   origin,
-  istat_code,
+  istatCode,
 });
 
 const mockPartyRegistry = {
