@@ -329,6 +329,8 @@ export default function PersonalAndBillingDataSection({
                   const value = e.target.value as string;
                   if (value.length >= 3) {
                     void getCountriesFromGeotaxonomies(value);
+                  } else {
+                    setCountries(undefined);
                   }
                 }}
                 onChange={(_e: any, selected: any) => {
