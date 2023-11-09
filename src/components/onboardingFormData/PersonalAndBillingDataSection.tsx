@@ -111,8 +111,8 @@ export default function PersonalAndBillingDataSection({
   const isAooUo = aooSelected || uoSelected;
 
   useEffect(() => {
-    if (isFromIPA && selectedParty?.istat_code) {
-      void getLocationFromIstatCode(selectedParty.istat_code);
+    if (isFromIPA && selectedParty?.istatCode) {
+      void getLocationFromIstatCode(selectedParty.istatCode);
     }
   }, [institutionType, selectedParty]);
 
