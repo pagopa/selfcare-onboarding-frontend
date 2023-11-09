@@ -284,8 +284,12 @@ export default function StepOnboardingFormData({
             : isVatRegistrated
             ? t('onboardingFormData.billingDataSection.vatNumberAlreadyRegistered')
             : undefined,
-        city: institutionType !== 'PA' && !values.city ? requiredError : undefined,
-        county: institutionType !== 'PA' && !values.county ? requiredError : undefined,
+        city:
+          institutionType !== 'PA' && origin !== 'IPA' && !values.city ? requiredError : undefined,
+        county:
+          institutionType !== 'PA' && origin !== 'IPA' && !values.county
+            ? requiredError
+            : undefined,
         ivassCode:
           isInsuranceCompany && !values.ivassCode
             ? requiredError
