@@ -103,6 +103,30 @@ test('test already onboarded', async () => {
   await executeGoHome(false);
 });
 
+test('onboarding of pa with origin IPA', async () => {
+  renderComponent('prod-pagopa');
+  await executeStepInstitutionType('prod-pagopa');
+  await executeStep1('AGENCY X', 'prod-pagopa', 'pa');
+  const searchCitySelect = document.getElementById('city-select') as HTMLInputElement;
+  const searchCounty = document.getElementById('county');
+
+  await waitFor(() => expect(searchCitySelect.value).toBe('Palermo'));
+  await waitFor(() => expect(searchCounty).toBeDisabled());
+  await fillUserBillingDataForm(
+    'businessName',
+    'registeredOffice',
+    'digitalAddress',
+    'zipCode',
+    'taxCode',
+    'vatNumber',
+    'recipientCode',
+    'supportEmail'
+  );
+
+  const confirmButtonEnabled = screen.getByRole('button', { name: 'Continua' });
+  await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
+});
+
 test('test error retrieving onboarding info', async () => {
   renderComponent('prod-pagopa');
   await executeStepInstitutionType('prod-pagopa');
@@ -203,10 +227,10 @@ test('test complete onboarding AOO with product interop', async () => {
   await executeAdvancedSearchForAoo();
   await executeStep2();
   await executeStep3(true);
-  const onboardingComlpeted = await waitFor(() =>
+  const onboardingCompleted = await waitFor(() =>
     screen.getByText('Richiesta di adesione inviata')
   );
-  expect(onboardingComlpeted).toBeInTheDocument();
+  expect(onboardingCompleted).toBeInTheDocument();
 });
 
 test('test label recipientCode only for institutionType is not PA', async () => {
@@ -432,7 +456,7 @@ const executeAdvancedSearchForAoo = async () => {
   expect(confirmButton).toBeEnabled();
 
   fireEvent.click(confirmButton);
-  await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(6));
+  await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(7));
 
   const aooCode = document.getElementById('aooUniqueCode') as HTMLInputElement;
   const aooName = document.getElementById('aooName') as HTMLInputElement;

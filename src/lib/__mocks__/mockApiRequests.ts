@@ -28,7 +28,8 @@ const createPartyRegistryEntity = (
   originId: string,
   origin: string,
   category: string,
-  address: string
+  address: string,
+  istat_code: string
 ) => ({
   id,
   o,
@@ -45,6 +46,7 @@ const createPartyRegistryEntity = (
   origin,
   category,
   address,
+  istat_code,
 });
 
 const createPartyEntity = (
@@ -57,8 +59,10 @@ const createPartyEntity = (
   digitalAddress: string,
   taxCode: string,
   zipCode: string,
+  istat_code: string,
   userRole: UserRole = 'ADMIN',
-  origin: string = 'IPA'
+  origin: string = 'IPA',
+  
 ) => ({
   externalId,
   originId,
@@ -71,6 +75,7 @@ const createPartyEntity = (
   zipCode,
   userRole,
   origin,
+  istat_code,
 });
 
 const mockPartyRegistry = {
@@ -90,7 +95,8 @@ const mockPartyRegistry = {
       '991',
       'IPA',
       'g1122',
-      'largo torino'
+      'largo torino',
+      'istat1'
     ),
     createPartyRegistryEntity(
       'error',
@@ -107,7 +113,8 @@ const mockPartyRegistry = {
       '352',
       'IPA',
       'c723',
-      'via lombardia'
+      'via lombardia',
+      'istat2'
     ),
     createPartyRegistryEntity(
       'onboarded',
@@ -124,7 +131,8 @@ const mockPartyRegistry = {
       '442',
       'IPA',
       'c11',
-      'piazza rossi'
+      'piazza rossi',
+      'istat3'
     ),
     createPartyRegistryEntity(
       'pending',
@@ -141,7 +149,8 @@ const mockPartyRegistry = {
       '221',
       'IPA',
       'c2234',
-      'legal_se'
+      'legal_se',
+      'istat4'
     ),
     createPartyRegistryEntity(
       'infoError',
@@ -158,7 +167,8 @@ const mockPartyRegistry = {
       '235',
       'IPA',
       'c14',
-      'sede'
+      'sede',
+      'istat5'
     ),
     createPartyRegistryEntity(
       'notAllowed',
@@ -175,7 +185,8 @@ const mockPartyRegistry = {
       'originId6',
       'IPA',
       'c17',
-      'leg'
+      'leg',
+      'istat6'
     ),
     createPartyRegistryEntity(
       'notAllowedInSubmit',
@@ -192,7 +203,8 @@ const mockPartyRegistry = {
       'originId7',
       'IPA',
       'c18',
-      'ss'
+      'ss',
+      'istat7'
     ),
     // use case added for easily test new feature about taxCode equal to vatCode
     createPartyRegistryEntity(
@@ -210,7 +222,8 @@ const mockPartyRegistry = {
       'originId1',
       'IPAIPA', // Origin not equal to IPA, enabled field
       'c17',
-      'mockaddress'
+      'mockaddress',
+      'istat8'
     ),
   ],
   count: 8,
@@ -226,7 +239,8 @@ const mockedParties = [
     'address1',
     'a@aa.com',
     '33344455567',
-    '22345'
+    '22345',
+    'istat1'
   ),
   createPartyEntity(
     'externalId2',
@@ -237,7 +251,8 @@ const mockedParties = [
     'address2',
     'a@cd.com',
     '11122233345',
-    '22395'
+    '22395',
+    'istat2'
   ),
   createPartyEntity(
     'externalId3',
@@ -248,7 +263,8 @@ const mockedParties = [
     'address',
     'a@aa.com',
     '33322268945',
-    '02102'
+    '02102',
+    'istat3'
   ),
   createPartyEntity(
     'externalId4',
@@ -259,7 +275,8 @@ const mockedParties = [
     '33445673210',
     'address4',
     'b@bb.com',
-    '00022'
+    '00022',
+    'istat4'
   ),
   createPartyEntity(
     '33445673211',
@@ -270,7 +287,8 @@ const mockedParties = [
     'address5',
     'b@cc.com',
     '33445673211',
-    '33344'
+    '33344',
+    'istat5'
   ),
   createPartyEntity(
     'onboarded_externalId',
@@ -281,7 +299,8 @@ const mockedParties = [
     'address',
     'a@aa.com',
     'BBBBBB22B22B234K',
-    '12125'
+    '12125',
+    'istat6',
   ),
   createPartyEntity(
     'aooId',
@@ -292,7 +311,8 @@ const mockedParties = [
     'address',
     'a@aa.com',
     'BBBBBB22B22B234K',
-    '12125'
+    '12125',
+    'istat7',
   ),
 ];
 
@@ -343,6 +363,18 @@ export const mockedGeoTaxonomy: Array<GeographicTaxonomyResource> = [
     region_id: '65',
   },
 ];
+
+export const mockedGeoTaxByIstatCode: GeographicTaxonomyResource = {
+  country: '100',
+  enabled: true,
+  code: '082053',
+  desc: 'PALERMO - COMUNE',
+  istat_code: '082053',
+  province_id: '082',
+  province_abbreviation: 'PA',
+  region_id: '19',
+  country_abbreviation: 'IT',
+};
 
 const mockedAooCode: AooData = {
   codAoo: 'A356E00',
@@ -740,6 +772,12 @@ export async function mockFetch(
   if (endpoint === 'ONBOARDING_GET_PREVIOUS_GEOTAXONOMIES') {
     return new Promise((resolve) =>
       resolve({ data: mockedGeoTaxonomy, status: 200, statusText: '200' } as AxiosResponse)
+    );
+  }
+
+  if (endpoint === 'ONBOARDING_GET_LOCATION_BY_ISTAT_CODE') {
+    return new Promise((resolve) =>
+      resolve({ data: mockedGeoTaxByIstatCode, status: 200, statusText: '200' } as AxiosResponse)
     );
   }
 
