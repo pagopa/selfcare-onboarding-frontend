@@ -111,8 +111,8 @@ export default function PersonalAndBillingDataSection({
   const isAooUo = aooSelected || uoSelected;
 
   useEffect(() => {
-    if ((isFromIPA || isPA) && selectedParty?.istatCode) {
-      void getLocationFromIstatCode(selectedParty.istatCode);
+    if (isFromIPA && selectedParty?.istat_code) {
+      void getLocationFromIstatCode(selectedParty.istat_code);
     }
   }, [institutionType, selectedParty]);
 
@@ -344,6 +344,8 @@ export default function PersonalAndBillingDataSection({
                 getOptionLabel={(o) => o.city}
                 options={countries ?? []}
                 noOptionsText={t('onboardingFormData.billingDataSection.noResult')}
+                popupIcon={isFromIPA ? '' : undefined}
+                readOnly={isFromIPA}
                 ListboxProps={{
                   style: {
                     overflow: 'visible',
