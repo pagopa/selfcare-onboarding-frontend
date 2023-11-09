@@ -59,9 +59,10 @@ const createPartyEntity = (
   digitalAddress: string,
   taxCode: string,
   zipCode: string,
+  istat_code: string,
   userRole: UserRole = 'ADMIN',
   origin: string = 'IPA',
-  istat_code: string = 'istat111'
+  
 ) => ({
   externalId,
   originId,
@@ -238,7 +239,8 @@ const mockedParties = [
     'address1',
     'a@aa.com',
     '33344455567',
-    '22345'
+    '22345',
+    'istat1'
   ),
   createPartyEntity(
     'externalId2',
@@ -249,7 +251,8 @@ const mockedParties = [
     'address2',
     'a@cd.com',
     '11122233345',
-    '22395'
+    '22395',
+    'istat2'
   ),
   createPartyEntity(
     'externalId3',
@@ -260,7 +263,8 @@ const mockedParties = [
     'address',
     'a@aa.com',
     '33322268945',
-    '02102'
+    '02102',
+    'istat3'
   ),
   createPartyEntity(
     'externalId4',
@@ -271,7 +275,8 @@ const mockedParties = [
     '33445673210',
     'address4',
     'b@bb.com',
-    '00022'
+    '00022',
+    'istat4'
   ),
   createPartyEntity(
     '33445673211',
@@ -282,7 +287,8 @@ const mockedParties = [
     'address5',
     'b@cc.com',
     '33445673211',
-    '33344'
+    '33344',
+    'istat5'
   ),
   createPartyEntity(
     'onboarded_externalId',
@@ -293,7 +299,8 @@ const mockedParties = [
     'address',
     'a@aa.com',
     'BBBBBB22B22B234K',
-    '12125'
+    '12125',
+    'istat6',
   ),
   createPartyEntity(
     'aooId',
@@ -304,7 +311,8 @@ const mockedParties = [
     'address',
     'a@aa.com',
     'BBBBBB22B22B234K',
-    '12125'
+    '12125',
+    'istat7',
   ),
 ];
 

@@ -45,6 +45,7 @@ export const ROUTES: RoutesObject = {
 };
 
 export const API = {
+  
   VERIFY_ONBOARDING: {
     URL: ENV.URL_API.ONBOARDING + '/institutions/onboarding',
   },

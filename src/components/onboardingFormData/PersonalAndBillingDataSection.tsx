@@ -345,7 +345,7 @@ export default function PersonalAndBillingDataSection({
                 options={countries ?? []}
                 noOptionsText={t('onboardingFormData.billingDataSection.noResult')}
                 popupIcon={isFromIPA ? '' : undefined}
-                readOnly={isFromIPA}
+                disabled={isFromIPA}
                 ListboxProps={{
                   style: {
                     overflow: 'visible',
@@ -382,7 +382,7 @@ export default function PersonalAndBillingDataSection({
                     {...params}
                     inputProps={{
                       ...params.inputProps,
-                      value: isFromIPA || isPA ? formik.values.city : params.inputProps.value,
+                      value: isFromIPA ? formik.values.city : params.inputProps.value,
                     }}
                     label={t('onboardingFormData.billingDataSection.city')}
                     InputLabelProps={{
@@ -397,7 +397,7 @@ export default function PersonalAndBillingDataSection({
                           color: theme.palette.text.secondary,
                         },
                     }}
-                    disabled={isPA || isFromIPA}
+                    disabled={isFromIPA}
                   />
                 )}
               />
