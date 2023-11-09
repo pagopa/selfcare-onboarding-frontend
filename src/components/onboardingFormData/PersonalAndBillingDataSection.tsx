@@ -88,17 +88,12 @@ export default function PersonalAndBillingDataSection({
   useEffect(() => {
     if (institutionLocationData) {
       formik.setFieldValue('country', institutionLocationData.country);
-
       formik.setFieldValue('county', institutionLocationData.county);
       formik.setFieldValue('city', institutionLocationData.city);
-
       setShrinkCounty(true);
-      console.log('city', formik.values.city);
-      console.log('county', formik.values.county);
-      console.log('country', formik.values.country);
     } else {
-      formik.setFieldValue('country', undefined);
-      formik.setFieldValue('county', undefined);
+      formik.setFieldValue('country', '');
+      formik.setFieldValue('county', '');
       formik.setFieldValue('city', undefined);
       setShrinkCounty(false);
     }
@@ -209,11 +204,7 @@ export default function PersonalAndBillingDataSection({
           county: result.province_abbreviation,
           city: formatCity(result.desc),
         };
-
-        console.log('modifiedCity', mappedObject);
         setInstitutionLocationData(mappedObject);
-        console.log('institutionLocationData', institutionLocationData);
-        formik.setFieldValue('city', mappedObject.city);
       }
     }
   };
@@ -344,18 +335,13 @@ export default function PersonalAndBillingDataSection({
                   if (selected) {
                     setShrinkCounty(true);
                     setInstitutionLocationData(selected);
-                    formik.setFieldValue('city', selected.desc);
-                    formik.setFieldValue('county', selected.county);
-                    formik.setFieldValue('country', selected.country);
                   } else {
                     setShrinkCounty(false);
-                    formik.setFieldValue('county', undefined);
-                    formik.setFieldValue('country', undefined);
+                    setCountries(undefined);
+                    setInstitutionLocationData(undefined);
                   }
                 }}
-                getOptionLabel={(o) => o}
-                defaultValue={institutionLocationData?.city}
-                freeSolo={isPA && isFromIPA}
+                getOptionLabel={(o) => o.city}
                 options={countries ?? []}
                 noOptionsText={t('onboardingFormData.billingDataSection.noResult')}
                 ListboxProps={{
@@ -389,11 +375,17 @@ export default function PersonalAndBillingDataSection({
                     {option?.city}
                   </MenuItem>
                 )}
-                readOnly={isPA && isFromIPA}
-                disabled={isPA && isFromIPA}
-                renderInput={(params) => (
+                renderInput={(params: any) => (
                   <TextField
                     {...params}
+                    inputProps={{
+                      ...params.inputProps,
+                      value: isFromIPA || isPA ? formik.values.city : params.inputProps.value,
+                    }}
+                    label={t('onboardingFormData.billingDataSection.city')}
+                    InputLabelProps={{
+                      shrink: formik.values.city && formik.values.city !== '',
+                    }}
                     sx={{
                       '& .MuiOutlinedInput-input.MuiInputBase-input.MuiInputBase-inputAdornedEnd.MuiAutocomplete-input.MuiAutocomplete-inputFocused':
                         {
@@ -403,7 +395,7 @@ export default function PersonalAndBillingDataSection({
                           color: theme.palette.text.secondary,
                         },
                     }}
-                    label={t('onboardingFormData.billingDataSection.city')}
+                    disabled={isPA || isFromIPA}
                   />
                 )}
               />
