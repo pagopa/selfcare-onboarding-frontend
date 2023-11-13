@@ -462,14 +462,11 @@ function OnboardingComponent({ productId }: { productId: string }) {
                 onboardedInstitutionInfo2geographicTaxonomy(gt)
               )
             : [],
-          institutionLocationData:
-            institutionType !== 'PA' && origin !== 'IPA'
-              ? {
-                  country: onboardingFormData?.country,
-                  county: onboardingFormData?.county,
-                  city: onboardingFormData?.city,
-                }
-              : undefined,
+          institutionLocationData: {
+            country: onboardingFormData?.country,
+            county: onboardingFormData?.county,
+            city: onboardingFormData?.city,
+          },
           origin,
           users: users.map((u) => ({
             ...u,

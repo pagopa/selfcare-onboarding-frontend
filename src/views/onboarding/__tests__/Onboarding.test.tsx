@@ -1239,7 +1239,11 @@ const verifySubmit = async (productId = 'prod-idpay') => {
           geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY
             ? [{ code: nationalValue, desc: 'ITALIA' }]
             : [],
-          institutionLocationData: undefined,
+          institutionLocationData: {
+            city: 'Palermo',
+            country: 'IT',
+            county: 'PA',
+          },
           assistanceContacts: { supportEmail: 'a@a.it' },
           productId,
           subunitCode: undefined,
