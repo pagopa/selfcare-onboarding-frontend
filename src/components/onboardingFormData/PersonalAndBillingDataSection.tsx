@@ -72,6 +72,7 @@ export default function PersonalAndBillingDataSection({
   const [shrinkCounty, setShrinkCounty] = useState<boolean>(false);
   const [countries, setCountries] = useState<Array<InstitutionLocationData>>();
   const [institutionLocationData, setInstitutionLocationData] = useState<InstitutionLocationData>();
+  const [isCitySelected, setIsCitySelected] = useState<boolean>(false);
 
   useEffect(() => {
     const shareCapitalIsNan = isNaN(formik.values.shareCapital);
@@ -337,8 +338,16 @@ export default function PersonalAndBillingDataSection({
                   if (selected) {
                     setShrinkCounty(true);
                     setInstitutionLocationData(selected);
+                    setIsCitySelected(true);
                   } else {
                     setShrinkCounty(false);
+                    setCountries(undefined);
+                    setInstitutionLocationData(undefined);
+                    setIsCitySelected(false);
+                  }
+                }}
+                onBlur={() => {
+                  if (!isCitySelected) {
                     setCountries(undefined);
                     setInstitutionLocationData(undefined);
                   }
@@ -346,7 +355,8 @@ export default function PersonalAndBillingDataSection({
                 getOptionLabel={(o) => o.city}
                 options={countries ?? []}
                 noOptionsText={t('onboardingFormData.billingDataSection.noResult')}
-                popupIcon={isFromIPA ? '' : undefined}
+                clearOnBlur={true}
+                forcePopupIcon={isFromIPA ? false : true}
                 disabled={isFromIPA}
                 ListboxProps={{
                   style: {
