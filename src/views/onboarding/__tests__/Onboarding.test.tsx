@@ -464,6 +464,9 @@ const executeAdvancedSearchForAoo = async () => {
   await waitFor(() => expect(aooCode.value).toBe('A356E00'));
   await waitFor(() => expect(aooName.value).toBe('Denominazione Aoo Test'));
 
+  const searchCitySelect = document.getElementById('city-select') as HTMLInputElement;
+  expect(searchCitySelect.value).toBe('Palermo');
+
   const isTaxCodeEquals2PIVA = document.getElementById('onboardingFormData');
   expect(isTaxCodeEquals2PIVA).toBeTruthy();
 
