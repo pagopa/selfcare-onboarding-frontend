@@ -112,10 +112,16 @@ export default function PersonalAndBillingDataSection({
   const isAooUo = aooSelected || uoSelected;
 
   useEffect(() => {
-    if (isFromIPA && selectedParty?.istatCode) {
-      void getLocationFromIstatCode(selectedParty.istatCode);
+    if (isFromIPA) {
+      if (aooSelected) {
+        void getLocationFromIstatCode(aooSelected.codiceComuneISTAT);
+      } else if (uoSelected) {
+        void getLocationFromIstatCode(uoSelected.codiceComuneISTAT);
+      } else if  (selectedParty?.istatCode){
+        void getLocationFromIstatCode(selectedParty.istatCode);
+      }
     }
-  }, [institutionType, selectedParty]);
+  }, [isFromIPA, selectedParty,aooSelected, uoSelected]);
 
   const baseNumericFieldProps = (
     field: keyof OnboardingFormData,
