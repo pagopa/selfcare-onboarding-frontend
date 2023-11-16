@@ -213,6 +213,7 @@ export function PlatformUserForm({
             const prefixErrorCode = `${id}-`;
             const error = checkErrors(id, prefixErrorCode);
             const isError = error && error.length > 0;
+            console.log('isAuthUser: ', isAuthUser);
             return (
               <Grid item key={id} xs={width} mb={2}>
                 <TextField
@@ -224,6 +225,10 @@ export function PlatformUserForm({
                   onChange={buildSetPerson(id)}
                   sx={{
                     width: '100%',
+                    '& .MuiOutlinedInput-root.MuiInputBase-root': {
+                      fontWeight:
+                        isAuthUser && id !== 'email' ? 'fontWeightRegular' : 'fontWeightMedium',
+                    },
                   }}
                   inputProps={{
                     style: {
