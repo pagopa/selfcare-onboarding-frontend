@@ -8,6 +8,7 @@ import { useFormik } from 'formik';
 import { useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { emailRegexp } from '@pagopa/selfcare-common-frontend/utils/constants';
+import { theme } from '@pagopa/mui-italia';
 import {
   InstitutionType,
   Party,
@@ -445,8 +446,10 @@ export default function StepOnboardingFormData({
   const baseTextFieldProps = (
     field: keyof OnboardingFormData,
     label: string,
-    fontWeight: number = 400,
-    fontSize: number = 16
+    fontWeight: number = origin === 'IPA' || premiumFlow ? 400 : 600,
+    color: string = origin === 'IPA' || premiumFlow
+      ? theme.palette.text.secondary
+      : theme.palette.text.primary
   ) => {
     const isError = !!formik.errors[field] && formik.errors[field] !== requiredError;
     return {
@@ -462,10 +465,10 @@ export default function StepOnboardingFormData({
       sx: { width: '100%' },
       InputProps: {
         style: {
-          fontSize,
+          fontSize: '18px',
           fontWeight,
           lineHeight: '24px',
-          color: '#5C6F82',
+          color,
           textAlign: 'start' as const,
           paddingLeft: '16px',
           borderRadius: '4px',
