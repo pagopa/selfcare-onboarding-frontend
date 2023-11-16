@@ -239,9 +239,7 @@ export default function PersonalAndBillingDataSection({
                 <CustomTextField
                   {...baseTextFieldProps(
                     'aooName',
-                    t('onboardingFormData.billingDataSection.aooName'),
-                    isDisabled ? 400 : 600,
-                    isDisabled ? theme.palette.text.secondary : theme.palette.text.primary
+                    t('onboardingFormData.billingDataSection.aooName')
                   )}
                   disabled={isDisabled}
                 />
@@ -250,9 +248,7 @@ export default function PersonalAndBillingDataSection({
                 <CustomTextField
                   {...baseTextFieldProps(
                     'aooUniqueCode',
-                    t('onboardingFormData.billingDataSection.aooUniqueCode'),
-                    isDisabled ? 400 : 600,
-                    isDisabled ? theme.palette.text.secondary : theme.palette.text.primary
+                    t('onboardingFormData.billingDataSection.aooUniqueCode')
                   )}
                   disabled={isDisabled}
                 />
@@ -265,9 +261,7 @@ export default function PersonalAndBillingDataSection({
                 <CustomTextField
                   {...baseTextFieldProps(
                     'uoName',
-                    t('onboardingFormData.billingDataSection.uoName'),
-                    isDisabled ? 400 : 600,
-                    isDisabled ? theme.palette.text.secondary : theme.palette.text.primary
+                    t('onboardingFormData.billingDataSection.uoName')
                   )}
                   disabled={isDisabled}
                 />
@@ -276,9 +270,7 @@ export default function PersonalAndBillingDataSection({
                 <CustomTextField
                   {...baseTextFieldProps(
                     'uoUniqueCode',
-                    t('onboardingFormData.billingDataSection.uoUniqueCode'),
-                    isDisabled ? 400 : 600,
-                    isDisabled ? theme.palette.text.secondary : theme.palette.text.primary
+                    t('onboardingFormData.billingDataSection.uoUniqueCode')
                   )}
                   disabled={isDisabled}
                 />
@@ -290,9 +282,7 @@ export default function PersonalAndBillingDataSection({
               <CustomTextField
                 {...baseTextFieldProps(
                   'businessName',
-                  t('onboardingFormData.billingDataSection.businessName'),
-                  isDisabled ? 400 : 600,
-                  isDisabled ? theme.palette.text.secondary : theme.palette.text.primary
+                  t('onboardingFormData.billingDataSection.businessName')
                 )}
                 disabled={isDisabled || isContractingAuthority || isInsuranceCompany}
               />
@@ -307,9 +297,7 @@ export default function PersonalAndBillingDataSection({
                   'registeredOffice',
                   isInsuranceCompany
                     ? t('onboardingFormData.billingDataSection.fullLegalAddress')
-                    : t('onboardingFormData.billingDataSection.registeredOffice'),
-                  isDisabled ? 400 : 600,
-                  isDisabled ? theme.palette.text.secondary : theme.palette.text.primary
+                    : t('onboardingFormData.billingDataSection.registeredOffice')
                 )}
                 disabled={!isAooUo && isDisabled && !isInsuranceCompany}
               />

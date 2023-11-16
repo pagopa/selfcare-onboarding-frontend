@@ -446,8 +446,10 @@ export default function StepOnboardingFormData({
   const baseTextFieldProps = (
     field: keyof OnboardingFormData,
     label: string,
-    fontWeight: number = 400,
-    color: string = theme.palette.text.primary
+    fontWeight: number = origin === 'IPA' || premiumFlow ? 400 : 600,
+    color: string = origin === 'IPA' || premiumFlow
+      ? theme.palette.text.secondary
+      : theme.palette.text.primary
   ) => {
     const isError = !!formik.errors[field] && formik.errors[field] !== requiredError;
     return {
