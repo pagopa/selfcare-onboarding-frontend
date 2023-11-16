@@ -8,6 +8,7 @@ import { ENV } from '../../../utils/env';
 import Onboarding from '../Onboarding';
 import '../../../locale';
 import { nationalValue } from '../../../model/GeographicTaxonomies';
+import { mockedProducts } from '../../../lib/__mocks__/mockApiRequests';
 
 jest.mock('../../../lib/api-utils');
 jest.setTimeout(30000);
@@ -272,6 +273,16 @@ test.skip('test party search if gps for prod-interop', async () => {
   await executeGoHome(true);
 });
 
+test('test institution type radiobuttons field based from product', async () => {
+  const onlyChoosableInstitutionTypeProducts = mockedProducts.filter(
+    (p) => p.id !== 'prod-io-premium' && p.id !== 'prod-pn' && p.id !== 'prod-idpay'
+  );
+  onlyChoosableInstitutionTypeProducts.forEach((product) => {
+    renderComponent(product.id);
+    executeStepInstitutionType('pa', product.id);
+  });
+});
+
 const performLogout = async (logoutButton: HTMLElement) => {
   fireEvent.click(logoutButton);
   await waitFor(() => expect(screen.queryByText('Vuoi davvero uscire?')).not.toBeNull());
@@ -330,7 +341,37 @@ const executeStepInstitutionType = async (institutionType: string, productId: st
   await waitFor(() => screen.getByText(stepInstitutionType));
 
   if (productId !== 'prod-pn' && productId !== 'prod-idpay') {
-    screen.getByText(/Indica il tipo di ente che aderirà a/);
+    screen.getAllByText(/Indica il tipo di ente che aderirà a/)[0];
+    const publicAdministration = document.getElementById('pa');
+    const publicServiceManager = document.getElementById('gsp');
+    const publiclyControlledCompany = document.getElementById('scp');
+    const privatePlatformManager = document.getElementById('sa');
+    const insuranceCompany = document.getElementById('as');
+    const techPartner = document.getElementById('pt');
+    const paymentServiceProvider = document.getElementById('psp');
+
+    switch (productId) {
+      case 'prod-interop':
+        expect(publicAdministration).toBeInTheDocument();
+        expect(publicServiceManager).toBeInTheDocument();
+        expect(privatePlatformManager).toBeInTheDocument();
+        expect(insuranceCompany).toBeInTheDocument();
+      case 'prod-io':
+        expect(publicAdministration).toBeInTheDocument();
+        expect(publicServiceManager).toBeInTheDocument();
+        expect(publiclyControlledCompany).toBeInTheDocument();
+      case 'prod-io-sign':
+        expect(publicAdministration).toBeInTheDocument();
+        expect(publicServiceManager).toBeInTheDocument();
+        expect(publiclyControlledCompany).toBeInTheDocument();
+      case 'prod-pagopa':
+        expect(publicAdministration).toBeInTheDocument();
+        expect(publicServiceManager).toBeInTheDocument();
+        expect(publiclyControlledCompany).toBeInTheDocument();
+        expect(techPartner).toBeInTheDocument();
+        expect(paymentServiceProvider).toBeInTheDocument();
+    }
+
     const continueButton = screen.getByRole('button', { name: 'Continua' });
     expect(continueButton).toBeDisabled();
     await fillInstitutionTypeCheckbox(institutionType);

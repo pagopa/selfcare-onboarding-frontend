@@ -540,7 +540,7 @@ const mockedOnboardingData: Array<InstitutionOnboardingInfoResource> = [
 const statusActive = 'ACTIVE';
 const statusTesting = 'TESTING';
 
-const mockedProducts: Array<Product> = [
+export const mockedProducts: Array<Product> = [
   {
     id: 'prod-pn',
     title: 'Piattaforma Notifiche',
