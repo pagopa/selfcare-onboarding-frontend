@@ -45,7 +45,7 @@ export const ROUTES: RoutesObject = {
 };
 
 export const API = {
-
+  
   VERIFY_ONBOARDING: {
     URL: ENV.URL_API.ONBOARDING + '/institutions/onboarding',
   },
@@ -91,6 +91,9 @@ export const API = {
   },
   ONBOARDING_GET_PREVIOUS_GEOTAXONOMIES: {
     URL: ENV.URL_API.ONBOARDING + '/institutions/geographicTaxonomies',
+  },
+  ONBOARDING_GET_LOCATION_BY_ISTAT_CODE: {
+    URL: ENV.URL_API.PARTY_REGISTRY_PROXY + '/geotaxonomies/{{geoTaxId}}',
   },
   ONBOARDING_GET_UO_CODE_INFO: {
     URL: ENV.URL_API.PARTY_REGISTRY_PROXY + '/uo/{{codiceUniUo}}',

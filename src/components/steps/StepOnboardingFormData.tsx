@@ -7,8 +7,6 @@ import { AxiosResponse } from 'axios';
 import { useFormik } from 'formik';
 import { useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { uniqueId } from 'lodash';
-import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
 import { emailRegexp } from '@pagopa/selfcare-common-frontend/utils/constants';
 import {
   InstitutionType,
@@ -84,7 +82,25 @@ export default function StepOnboardingFormData({
   subProductId,
   aooSelected,
   uoSelected,
+  selectedParty,
 }: Props) {
+  const { t } = useTranslation();
+  const { setRequiredLogin } = useContext(UserContext);
+
+  const [openModifyModal, setOpenModifyModal] = useState<boolean>(false);
+  const [openAddModal, setOpenAddModal] = useState<boolean>(false);
+  const [isVatRegistrated, setIsVatRegistrated] = useState<boolean>(false);
+  const [previousGeotaxononomies, setPreviousGeotaxononomies] = useState<Array<GeographicTaxonomy>>(
+    []
+  );
+
+  const [stepHistoryState, setStepHistoryState, setStepHistoryStateHistory] =
+    useHistoryState<StepBillingDataHistoryState>('onboardingFormData', {
+      externalInstitutionId,
+      isTaxCodeEquals2PIVA:
+        !!initialFormData.vatNumber && initialFormData.taxCode === initialFormData.vatNumber,
+    });
+
   const requiredError = 'Required';
 
   const institutionAvoidGeotax = ['PT', 'SA', 'AS'].includes(institutionType);
@@ -103,23 +119,6 @@ export default function StepOnboardingFormData({
   const isProdFideiussioni = productId?.startsWith('prod-fd') ?? false;
   const aooCode = aooSelected?.codiceUniAoo;
   const uoCode = uoSelected?.codiceUniUo;
-  const [openModifyModal, setOpenModifyModal] = useState<boolean>(false);
-  const [openAddModal, setOpenAddModal] = useState<boolean>(false);
-  const [isVatRegistrated, setIsVatRegistrated] = useState<boolean>(false);
-  const { setRequiredLogin } = useContext(UserContext);
-
-  const [previousGeotaxononomies, setPreviousGeotaxononomies] = useState<Array<GeographicTaxonomy>>(
-    []
-  );
-
-  const { t } = useTranslation();
-
-  const [stepHistoryState, setStepHistoryState, setStepHistoryStateHistory] =
-    useHistoryState<StepBillingDataHistoryState>('onboardingFormData', {
-      externalInstitutionId,
-      isTaxCodeEquals2PIVA:
-        !!initialFormData.vatNumber && initialFormData.taxCode === initialFormData.vatNumber,
-    });
 
   const getPreviousGeotaxononomies = async () => {
     const onboardingData = await fetchWithLogs(
@@ -285,6 +284,8 @@ export default function StepOnboardingFormData({
             : isVatRegistrated
             ? t('onboardingFormData.billingDataSection.vatNumberAlreadyRegistered')
             : undefined,
+        city: !values.city ? requiredError : undefined,
+        county: !values.county ? requiredError : undefined,
         ivassCode:
           isInsuranceCompany && !values.ivassCode
             ? requiredError
@@ -384,7 +385,6 @@ export default function StepOnboardingFormData({
   });
 
   const verifyVatNumber = async () => {
-    const requestId = uniqueId('verify-onboarding-vatnumber');
     const onboardingStatus = await fetchWithLogs(
       {
         endpoint: 'VERIFY_ONBOARDING',
@@ -407,7 +407,6 @@ export default function StepOnboardingFormData({
 
     if (restOutcome === 'success') {
       setIsVatRegistrated(true);
-      trackEvent('VERIFY_ONBOARDING', { request_id: requestId });
     } else {
       setIsVatRegistrated(false);
     }
@@ -508,6 +507,7 @@ export default function StepOnboardingFormData({
           aooSelected={aooSelected}
           uoSelected={uoSelected}
           institutionAvoidGeotax={institutionAvoidGeotax}
+          selectedParty={selectedParty}
         />
         {/* DATI RELATIVI ALLA TASSONOMIA */}
         {ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY && !institutionAvoidGeotax ? (

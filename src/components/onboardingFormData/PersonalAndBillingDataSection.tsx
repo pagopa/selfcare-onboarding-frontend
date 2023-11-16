@@ -1,14 +1,22 @@
-import { Box, styled } from '@mui/system';
-import { useEffect, useState } from 'react';
-import { Grid, TextField, Typography, Paper } from '@mui/material';
-import { useTranslation } from 'react-i18next';
+import { Grid, MenuItem, Paper, TextField, Typography } from '@mui/material';
+import Autocomplete from '@mui/material/Autocomplete';
 import Checkbox from '@mui/material/Checkbox';
+import { Box, styled } from '@mui/system';
 import { theme } from '@pagopa/mui-italia';
-import { InstitutionType, StepperStepComponentProps } from '../../../types';
-import { OnboardingFormData } from '../../model/OnboardingFormData';
-import { StepBillingDataHistoryState } from '../steps/StepOnboardingFormData';
+import { AxiosResponse } from 'axios';
+import { useContext, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { InstitutionType, Party, StepperStepComponentProps } from '../../../types';
+import { fetchWithLogs } from '../../lib/api-utils';
+import { UserContext } from '../../lib/context';
+import { getFetchOutcome } from '../../lib/error-utils';
 import { AooData } from '../../model/AooData';
+import { GeographicTaxonomyResource } from '../../model/GeographicTaxonomies';
+import { InstitutionLocationData } from '../../model/InstitutionLocationData';
+import { OnboardingFormData } from '../../model/OnboardingFormData';
 import { UoData } from '../../model/UoModel';
+import { formatCity } from '../../utils/formatting-utils';
+import { StepBillingDataHistoryState } from '../steps/StepOnboardingFormData';
 import NumberDecimalFormat from './NumberDecimalFormat';
 
 const CustomTextField = styled(TextField)({
@@ -39,6 +47,7 @@ type Props = StepperStepComponentProps & {
   aooSelected?: AooData;
   uoSelected?: UoData;
   institutionAvoidGeotax: boolean;
+  selectedParty?: Party;
 };
 
 // eslint-disable-next-line sonarjs/cognitive-complexity, complexity
@@ -54,8 +63,42 @@ export default function PersonalAndBillingDataSection({
   aooSelected,
   uoSelected,
   institutionAvoidGeotax,
+  selectedParty,
 }: Props) {
   const { t } = useTranslation();
+  const { setRequiredLogin } = useContext(UserContext);
+
+  const [shrinkRea, setShrinkRea] = useState<boolean>(false);
+  const [shrinkCounty, setShrinkCounty] = useState<boolean>(false);
+  const [countries, setCountries] = useState<Array<InstitutionLocationData>>();
+  const [institutionLocationData, setInstitutionLocationData] = useState<InstitutionLocationData>();
+  const [isCitySelected, setIsCitySelected] = useState<boolean>(false);
+
+  useEffect(() => {
+    const shareCapitalIsNan = isNaN(formik.values.shareCapital);
+    if (shareCapitalIsNan) {
+      formik.setFieldValue('shareCapital', undefined);
+    }
+    if (formik.values.shareCapital) {
+      setShrinkRea(true);
+    } else {
+      setShrinkRea(false);
+    }
+  }, [formik.values.shareCapital]);
+
+  useEffect(() => {
+    if (institutionLocationData) {
+      formik.setFieldValue('country', institutionLocationData.country);
+      formik.setFieldValue('county', institutionLocationData.county);
+      formik.setFieldValue('city', institutionLocationData.city);
+      setShrinkCounty(true);
+    } else {
+      formik.setFieldValue('country', '');
+      formik.setFieldValue('county', '');
+      formik.setFieldValue('city', undefined);
+      setShrinkCounty(false);
+    }
+  }, [institutionLocationData]);
 
   const isFromIPA = origin === 'IPA';
   const isPSP = institutionType === 'PSP';
@@ -67,6 +110,19 @@ export default function PersonalAndBillingDataSection({
   const recipientCodeVisible = !isContractingAuthority && !isTechPartner && !isInsuranceCompany;
   const requiredError = 'Required';
   const isAooUo = aooSelected || uoSelected;
+
+  useEffect(() => {
+    if (isFromIPA) {
+      if (aooSelected?.codiceComuneISTAT) {
+        void getLocationFromIstatCode(aooSelected.codiceComuneISTAT);
+      } else if (uoSelected?.codiceComuneISTAT) {
+        void getLocationFromIstatCode(uoSelected.codiceComuneISTAT);
+      } else if (selectedParty?.istatCode) {
+        void getLocationFromIstatCode(selectedParty.istatCode);
+      }
+    }
+  }, [isFromIPA, selectedParty, aooSelected, uoSelected]);
+
   const baseNumericFieldProps = (
     field: keyof OnboardingFormData,
     label: string,
@@ -90,7 +146,7 @@ export default function PersonalAndBillingDataSection({
           fontSize,
           fontWeight,
           lineHeight: '24px',
-          color: '#5C6F82',
+          color: theme.palette.text.secondary,
           textAlign: 'start' as const,
           paddingLeft: '16px',
           borderRadius: '4px',
@@ -98,18 +154,67 @@ export default function PersonalAndBillingDataSection({
       },
     };
   };
-  const [shrinkValue, setShrinkValue] = useState<boolean>(false);
-  useEffect(() => {
-    const shareCapitalIsNan = isNaN(formik.values.shareCapital);
-    if (shareCapitalIsNan) {
-      formik.setFieldValue('shareCapital', undefined);
+
+  const getCountriesFromGeotaxonomies = async (query: string) => {
+    const searchGeotaxonomy = await fetchWithLogs(
+      {
+        endpoint: 'ONBOARDING_GET_GEOTAXONOMY',
+      },
+      {
+        method: 'GET',
+        params: { description: query },
+      },
+      () => setRequiredLogin(true)
+    );
+    const outcome = getFetchOutcome(searchGeotaxonomy);
+
+    if (outcome === 'success') {
+      const geographicTaxonomies = (searchGeotaxonomy as AxiosResponse).data;
+
+      const mappedResponse = geographicTaxonomies.map((gt: GeographicTaxonomyResource) => ({
+        code: gt.code,
+        country: gt.country_abbreviation,
+        county: gt.province_abbreviation,
+        city: gt.desc,
+      })) as Array<InstitutionLocationData>;
+
+      const onlyCountries = mappedResponse
+        .filter((r) => r.city.includes('- COMUNE'))
+        .map((r) => ({
+          ...r,
+          city: formatCity(r.city),
+        }));
+
+      setCountries(onlyCountries);
     }
-    if (formik.values.shareCapital) {
-      setShrinkValue(true);
-    } else {
-      setShrinkValue(false);
+  };
+
+  const getLocationFromIstatCode = async (istatCode: string) => {
+    const getLocation = await fetchWithLogs(
+      {
+        endpoint: 'ONBOARDING_GET_LOCATION_BY_ISTAT_CODE',
+        endpointParams: {
+          geoTaxId: istatCode,
+        },
+      },
+      { method: 'GET' },
+      () => setRequiredLogin(true)
+    );
+    const outcome = getFetchOutcome(getLocation);
+
+    if (outcome === 'success') {
+      const result = (getLocation as AxiosResponse).data;
+      if (result) {
+        const mappedObject = {
+          code: result.code,
+          country: result.country_abbreviation,
+          county: result.province_abbreviation,
+          city: formatCity(result.desc),
+        };
+        setInstitutionLocationData(mappedObject);
+      }
     }
-  }, [formik.values.shareCapital]);
+  };
 
   return (
     <>
@@ -194,32 +299,141 @@ export default function PersonalAndBillingDataSection({
           )}
 
           {/* Sede legale */}
-          <Grid item xs={8}>
-            <CustomTextField
-              {...baseTextFieldProps(
-                'registeredOffice',
-                isInsuranceCompany
-                  ? t('onboardingFormData.billingDataSection.fullLegalAddress')
-                  : t('onboardingFormData.billingDataSection.registeredOffice'),
-                400,
-                18
-              )}
-              disabled={!isAooUo && isDisabled && !isInsuranceCompany}
-            />
+          <Grid container spacing={2} pl={3} pt={3}>
+            <Grid item xs={7}>
+              <CustomTextField
+                {...baseTextFieldProps(
+                  'registeredOffice',
+                  isInsuranceCompany
+                    ? t('onboardingFormData.billingDataSection.fullLegalAddress')
+                    : t('onboardingFormData.billingDataSection.registeredOffice'),
+                  400,
+                  18
+                )}
+                disabled={!isAooUo && isDisabled && !isInsuranceCompany}
+              />
+            </Grid>
+            {/* CAP */}
+            <Grid item xs={5}>
+              <CustomNumberField
+                inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
+                {...baseNumericFieldProps(
+                  'zipCode',
+                  t('onboardingFormData.billingDataSection.zipCode'),
+                  400,
+                  18
+                )}
+                disabled={!isAooUo && isDisabled && !isInsuranceCompany}
+              />
+            </Grid>
           </Grid>
-          {/* CAP */}
-          <Grid item xs={4} paddingLeft={1}>
-            <CustomNumberField
-              inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
-              {...baseNumericFieldProps(
-                'zipCode',
-                t('onboardingFormData.billingDataSection.zipCode'),
-                400,
-                18
-              )}
-              disabled={!isAooUo && isDisabled && !isInsuranceCompany}
-            />
+
+          <Grid container spacing={2} pl={3} pt={3}>
+            <Grid item xs={7}>
+              <Autocomplete
+                id="city-select"
+                onInput={(e: any) => {
+                  const value = e.target.value as string;
+                  if (value.length >= 3) {
+                    void getCountriesFromGeotaxonomies(value);
+                  } else {
+                    setCountries(undefined);
+                  }
+                }}
+                onChange={(_e: any, selected: any) => {
+                  if (selected) {
+                    setShrinkCounty(true);
+                    setInstitutionLocationData(selected);
+                    setIsCitySelected(true);
+                  } else {
+                    setShrinkCounty(false);
+                    setCountries(undefined);
+                    setInstitutionLocationData(undefined);
+                    setIsCitySelected(false);
+                  }
+                }}
+                onBlur={() => {
+                  if (!isCitySelected) {
+                    setCountries(undefined);
+                    setInstitutionLocationData(undefined);
+                  }
+                }}
+                getOptionLabel={(o) => o.city}
+                options={countries ?? []}
+                noOptionsText={t('onboardingFormData.billingDataSection.noResult')}
+                clearOnBlur={true}
+                forcePopupIcon={isFromIPA ? false : true}
+                disabled={isFromIPA}
+                ListboxProps={{
+                  style: {
+                    overflow: 'visible',
+                  },
+                }}
+                componentsProps={{
+                  paper: {
+                    sx: {
+                      '&::-webkit-scrollbar': {
+                        width: 4,
+                      },
+                      '&::-webkit-scrollbar-track': {
+                        boxShadow: `inset 10px 10px  #E6E9F2`,
+                        marginY: '3px',
+                      },
+                      '&::-webkit-scrollbar-thumb': {
+                        backgroundColor: '#0073E6',
+                        borderRadius: '16px',
+                      },
+                      overflowY: 'auto',
+                      maxHeight: '200px',
+                      boxShadow:
+                        '0px 6px 30px 5px rgba(0, 43, 85, 0.10), 0px 16px 24px 2px rgba(0, 43, 85, 0.05), 0px 8px 10px -5px rgba(0, 43, 85, 0.10)',
+                    },
+                  },
+                }}
+                renderOption={(props, option: InstitutionLocationData) => (
+                  <MenuItem key={option.code} {...props} sx={{ height: '44px' }}>
+                    {option?.city}
+                  </MenuItem>
+                )}
+                renderInput={(params: any) => (
+                  <TextField
+                    {...params}
+                    inputProps={{
+                      ...params.inputProps,
+                      value: isFromIPA ? formik.values.city : params.inputProps.value,
+                    }}
+                    label={t('onboardingFormData.billingDataSection.city')}
+                    InputLabelProps={{
+                      shrink: formik.values.city && formik.values.city !== '',
+                    }}
+                    sx={{
+                      '& .MuiOutlinedInput-input.MuiInputBase-input.MuiInputBase-inputAdornedEnd.MuiAutocomplete-input.MuiAutocomplete-inputFocused':
+                        {
+                          marginLeft: '16px',
+                          fontWeight: 'fontWeightRegular',
+                          textTransform: 'capitalize',
+                          color: theme.palette.text.secondary,
+                        },
+                    }}
+                    disabled={isFromIPA}
+                  />
+                )}
+              />
+            </Grid>
+            <Grid item xs={5}>
+              <CustomTextField
+                {...baseTextFieldProps(
+                  'county',
+                  t('onboardingFormData.billingDataSection.county'),
+                  400,
+                  18
+                )}
+                InputLabelProps={{ shrink: shrinkCounty }}
+                disabled={true}
+              />
+            </Grid>
           </Grid>
+
           {/* Indirizzo PEC */}
           <Grid item xs={12}>
             <CustomTextField
@@ -319,7 +533,7 @@ export default function PersonalAndBillingDataSection({
                     component={'span'}
                     sx={{
                       fontSize: '12px!important',
-                      fontWeight: 600,
+                      fontWeight: 'fontWeightMedium',
                       color: theme.palette.text.secondary,
                     }}
                   >
@@ -390,13 +604,13 @@ export default function PersonalAndBillingDataSection({
                     400,
                     18
                   )}
-                  onClick={() => setShrinkValue(true)}
+                  onClick={() => setShrinkRea(true)}
                   onBlur={() => {
                     if (!formik.values.shareCapital) {
-                      setShrinkValue(false);
+                      setShrinkRea(false);
                     }
                   }}
-                  InputLabelProps={{ shrink: shrinkValue }}
+                  InputLabelProps={{ shrink: shrinkRea }}
                   InputProps={{
                     inputComponent: NumberDecimalFormat,
                   }}
@@ -474,7 +688,7 @@ export default function PersonalAndBillingDataSection({
                 component={'span'}
                 sx={{
                   fontSize: '12px!important',
-                  fontWeight: 600,
+                  fontWeight: 'fontWeightMedium',
                   color: theme.palette.text.secondary,
                 }}
               >

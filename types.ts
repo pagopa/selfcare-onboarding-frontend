@@ -190,6 +190,7 @@ export type Party = {
   origin: string;
   // indirizzo mail supporto
   supportEmail?: string;
+  istatCode?: string;
 };
 
 export type InstitutionData = {

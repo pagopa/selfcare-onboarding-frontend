@@ -103,6 +103,30 @@ test('test already onboarded', async () => {
   await executeGoHome(false);
 });
 
+test('onboarding of pa with origin IPA', async () => {
+  renderComponent('prod-pagopa');
+  await executeStepInstitutionType('prod-pagopa');
+  await executeStep1('AGENCY X', 'prod-pagopa', 'pa');
+  const searchCitySelect = document.getElementById('city-select') as HTMLInputElement;
+  const searchCounty = document.getElementById('county');
+
+  await waitFor(() => expect(searchCitySelect.value).toBe('Palermo'));
+  await waitFor(() => expect(searchCounty).toBeDisabled());
+  await fillUserBillingDataForm(
+    'businessName',
+    'registeredOffice',
+    'digitalAddress',
+    'zipCode',
+    'taxCode',
+    'vatNumber',
+    'recipientCode',
+    'supportEmail'
+  );
+
+  const confirmButtonEnabled = screen.getByRole('button', { name: 'Continua' });
+  await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
+});
+
 test('test error retrieving onboarding info', async () => {
   renderComponent('prod-pagopa');
   await executeStepInstitutionType('prod-pagopa');
@@ -203,10 +227,10 @@ test('test complete onboarding AOO with product interop', async () => {
   await executeAdvancedSearchForAoo();
   await executeStep2();
   await executeStep3(true);
-  const onboardingComlpeted = await waitFor(() =>
+  const onboardingCompleted = await waitFor(() =>
     screen.getByText('Richiesta di adesione inviata')
   );
-  expect(onboardingComlpeted).toBeInTheDocument();
+  expect(onboardingCompleted).toBeInTheDocument();
 });
 
 test('test label recipientCode only for institutionType is not PA', async () => {
@@ -243,20 +267,6 @@ test.skip('test party search if gps for prod-interop', async () => {
   await executeGoHome(true);
 });
 
-test('test description in step3', async () => {
-  renderComponent('prod-interop');
-  await executeStepInstitutionTypeGspForInterop();
-  await executeStep1('AGENCY X', 'prod-interop', 'gsp');
-  await executeStepBillingData();
-  await executeStep2();
-  await verifyDescriptionInStep3();
-});
-
-test('test institution type if prod-io-sign', async () => {
-  renderComponent('prod-io-sign');
-  await executeStepInstitutionTypeGspForProdIoSign();
-  await executeStepBillingDataReaField();
-});
 const performLogout = async (logoutButton: HTMLElement) => {
   fireEvent.click(logoutButton);
   await waitFor(() => expect(screen.queryByText('Vuoi davvero uscire?')).not.toBeNull());
@@ -446,13 +456,16 @@ const executeAdvancedSearchForAoo = async () => {
   expect(confirmButton).toBeEnabled();
 
   fireEvent.click(confirmButton);
-  await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(6));
+  await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(7));
 
   const aooCode = document.getElementById('aooUniqueCode') as HTMLInputElement;
   const aooName = document.getElementById('aooName') as HTMLInputElement;
 
   await waitFor(() => expect(aooCode.value).toBe('A356E00'));
   await waitFor(() => expect(aooName.value).toBe('Denominazione Aoo Test'));
+
+  const searchCitySelect = document.getElementById('city-select') as HTMLInputElement;
+  expect(searchCitySelect.value).toBe('Palermo');
 
   const isTaxCodeEquals2PIVA = document.getElementById('onboardingFormData');
   expect(isTaxCodeEquals2PIVA).toBeTruthy();
@@ -578,7 +591,9 @@ const executeStepBillingData = async () => {
     'taxCode',
     'vatNumber',
     'recipientCode',
-    'supportEmail'
+    'supportEmail',
+    'city',
+    'province'
   );
 
   const confirmButtonEnabled = screen.getByRole('button', { name: 'Continua' });
@@ -587,6 +602,7 @@ const executeStepBillingData = async () => {
   fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
     target: { value: '' },
   });
+
   await waitFor(() => expect(confirmButtonEnabled).toBeDisabled());
 
   await fillUserBillingDataForm(
@@ -597,7 +613,9 @@ const executeStepBillingData = async () => {
     'taxCode',
     'vatNumber',
     'recipientCode',
-    'supportEmail'
+    'supportEmail',
+    'city',
+    'province'
   );
 
   await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
@@ -650,7 +668,9 @@ const executeStepBillingDataLabelsForPt = async () => {
       'zipCode',
       'taxCode',
       'vatNumber',
-      'recipientCode'
+      'recipientCode',
+      'city',
+      'province'
     )
   );
 
@@ -680,7 +700,9 @@ const executeStepBillingDataLabelsForPtAlreadyOnboarded = async () => {
       'zipCode',
       'taxCode',
       'vatNumber',
-      'recipientCode'
+      'recipientCode',
+      'city',
+      'province'
     )
   );
 
@@ -725,7 +747,9 @@ const executeStepBillingDataWithoutSupportMail = async () => {
     'taxCode',
     'vatNumber',
     'recipientCode',
-    'supportEmail'
+    'supportEmail',
+    'city',
+    'province'
   );
 
   const confirmButton = screen.getByRole('button', { name: 'Continua' });
@@ -752,7 +776,9 @@ const executeStepBillingDataWithoutSupportMail = async () => {
     'taxCode',
     'vatNumber',
     'recipientCode',
-    'supportEmail'
+    'supportEmail',
+    'city',
+    'province'
   );
 
   await waitFor(() => expect(confirmButton).toBeEnabled());
@@ -856,7 +882,9 @@ const fillUserBillingDataForm = async (
   vatNumber: string,
   recipientCode: string,
   supportEmail?: string,
-  rea?: string
+  rea?: string,
+  city?: string,
+  province?: string
 ) => {
   fireEvent.change(document.getElementById(businessNameInput) as HTMLElement, {
     target: { value: 'businessNameInput' },
@@ -881,18 +909,20 @@ const fillUserBillingDataForm = async (
   fireEvent.change(document.getElementById(recipientCode) as HTMLElement, {
     target: { value: 'recipientCode' },
   });
+  const searchCitySelect = document.getElementById('city-select');
+  if (searchCitySelect) {
+    fireEvent.change(searchCitySelect as HTMLInputElement, { target: { value: 'desc1' } });
+  }
+
+  if (province) {
+    fireEvent.change(document.getElementById(province) as HTMLElement, {
+      target: { value: 'RM' },
+    });
+  }
   if (supportEmail) {
     fireEvent.change(document.getElementById(supportEmail) as HTMLElement, {
       target: { value: 'a@a.it' },
     });
-  }
-  // TODO: remove comment if REACT_APP_ENABLE_GEOTAXONOMY is true -- await waitFor(() => fireEvent.click(document.getElementById('national_geographicTaxonomies')));
-  if (rea) {
-    await waitFor(() =>
-      fireEvent.change(document.getElementById(rea) as HTMLElement, {
-        target: { value: 'RM-123456' },
-      })
-    );
   }
 };
 
@@ -1182,6 +1212,7 @@ const verifySubmit = async (productId = 'prod-idpay') => {
         data: {
           billingData: billingData2billingDataRequest(),
           pspData: undefined,
+          ivassCode: undefined,
           institutionType: 'PA',
           origin: 'IPA',
           users: [
@@ -1211,6 +1242,11 @@ const verifySubmit = async (productId = 'prod-idpay') => {
           geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY
             ? [{ code: nationalValue, desc: 'ITALIA' }]
             : [],
+          institutionLocationData: {
+            city: 'Palermo',
+            country: 'IT',
+            county: 'PA',
+          },
           assistanceContacts: { supportEmail: 'a@a.it' },
           productId,
           subunitCode: undefined,
