@@ -224,6 +224,10 @@ export function PlatformUserForm({
                   onChange={buildSetPerson(id)}
                   sx={{
                     width: '100%',
+                    '& .MuiOutlinedInput-root.MuiInputBase-root': {
+                      fontWeight:
+                        isAuthUser && id !== 'email' ? 'fontWeightRegular' : 'fontWeightMedium',
+                    },
                   }}
                   inputProps={{
                     style: {
