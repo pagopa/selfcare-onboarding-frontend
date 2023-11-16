@@ -4,7 +4,7 @@ import NumberFormat from 'react-number-format';
 const NumberDecimalFormat = React.forwardRef(function NumberDecimalFormat(props: any, ref) {
   const { onChange, ...other } = props;
   return (
-    <div style={{ fontWeight: 'normal', width: '90%' }}>
+    <div style={{ width: '90%' }}>
       <NumberFormat
         {...other}
         getInputRef={ref}
