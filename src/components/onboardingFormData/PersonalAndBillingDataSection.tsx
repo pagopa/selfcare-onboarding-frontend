@@ -669,7 +669,8 @@ export default function PersonalAndBillingDataSection({
                 {...baseTextFieldProps(
                   'supportEmail',
                   t('onboardingFormData.billingDataSection.assistanceContact.supportEmail'),
-                  600
+                  600,
+                  theme.palette.text.primary
                 )}
               />
               {/* descrizione indirizzo mail di supporto */}
