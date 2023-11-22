@@ -48,6 +48,7 @@ type Props = StepperStepComponentProps & {
   uoSelected?: UoData;
   institutionAvoidGeotax: boolean;
   selectedParty?: Party;
+  retrievedIstat?: string;
 };
 
 // eslint-disable-next-line sonarjs/cognitive-complexity, complexity
@@ -64,6 +65,7 @@ export default function PersonalAndBillingDataSection({
   uoSelected,
   institutionAvoidGeotax,
   selectedParty,
+  retrievedIstat,
 }: Props) {
   const { t } = useTranslation();
   const { setRequiredLogin } = useContext(UserContext);
@@ -74,6 +76,7 @@ export default function PersonalAndBillingDataSection({
   const [institutionLocationData, setInstitutionLocationData] = useState<InstitutionLocationData>();
   const [isCitySelected, setIsCitySelected] = useState<boolean>(false);
 
+  console.log('retrievedIstat', retrievedIstat);
   useEffect(() => {
     const shareCapitalIsNan = isNaN(formik.values.shareCapital);
     if (shareCapitalIsNan) {
@@ -113,15 +116,18 @@ export default function PersonalAndBillingDataSection({
 
   useEffect(() => {
     if (isFromIPA) {
+      console.log('retrievedIstat', retrievedIstat);
       if (aooSelected?.codiceComuneISTAT) {
         void getLocationFromIstatCode(aooSelected.codiceComuneISTAT);
       } else if (uoSelected?.codiceComuneISTAT) {
         void getLocationFromIstatCode(uoSelected.codiceComuneISTAT);
       } else if (selectedParty?.istatCode) {
         void getLocationFromIstatCode(selectedParty.istatCode);
+      } else if (retrievedIstat) {
+        void getLocationFromIstatCode(retrievedIstat);
       }
     }
-  }, [isFromIPA, selectedParty, aooSelected, uoSelected]);
+  }, [isFromIPA, selectedParty, aooSelected, uoSelected, retrievedIstat]);
 
   const baseNumericFieldProps = (
     field: keyof OnboardingFormData,
