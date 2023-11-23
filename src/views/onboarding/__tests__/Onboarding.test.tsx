@@ -417,7 +417,7 @@ const executeAdvancedSearchForTaxCode = async (partyName: string) => {
   fireEvent.click(option);
 
   expect(inputPartyName).toBeTruthy();
-  await waitFor(() => fireEvent.change(inputPartyName, { target: { value: '33344455567' } }));
+  await waitFor(() => fireEvent.change(inputPartyName, { target: { value: '33445673222' } }));
 
   expect(fetchWithLogsSpy).toBeCalledTimes(2);
 
@@ -456,7 +456,7 @@ const executeAdvancedSearchForAoo = async () => {
   expect(confirmButton).toBeEnabled();
 
   fireEvent.click(confirmButton);
-  await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(7));
+  await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(6));
 
   const aooCode = document.getElementById('aooUniqueCode') as HTMLInputElement;
   const aooName = document.getElementById('aooName') as HTMLInputElement;

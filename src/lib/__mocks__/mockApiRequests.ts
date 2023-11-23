@@ -402,7 +402,7 @@ const mockedAooCode: AooData = {
   origin: 'IPA',
   CAP: '53100',
   codiceCatastaleComune: 'I726',
-  codiceComuneISTAT: '052032',
+  codiceComuneISTAT: '082050',
   cognomeResponsabile: 'Bielli',
   nomeResponsabile: 'Silvia',
   dataIstituzione: '2023-01-27',

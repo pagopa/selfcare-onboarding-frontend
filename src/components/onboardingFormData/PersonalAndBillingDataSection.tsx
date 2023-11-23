@@ -111,10 +111,10 @@ export default function PersonalAndBillingDataSection({
   const isDisabled = premiumFlow || (isFromIPA && !isPA && !isPSP) || isPA;
   const recipientCodeVisible = !isContractingAuthority && !isTechPartner && !isInsuranceCompany;
   const requiredError = 'Required';
-  const isAooUo = aooSelected || uoSelected;
+  const isAooUo = !!(aooSelected || uoSelected);
 
   useEffect(() => {
-    if (isFromIPA) {
+    if (isFromIPA || isAooUo) {
       if (aooSelected?.codiceComuneISTAT) {
         void getLocationFromIstatCode(aooSelected.codiceComuneISTAT);
       } else if (uoSelected?.codiceComuneISTAT) {
@@ -354,7 +354,7 @@ export default function PersonalAndBillingDataSection({
                 noOptionsText={t('onboardingFormData.billingDataSection.noResult')}
                 clearOnBlur={true}
                 forcePopupIcon={isFromIPA ? false : true}
-                disabled={isFromIPA}
+                disabled={isFromIPA || isAooUo}
                 ListboxProps={{
                   style: {
                     overflow: 'visible',
@@ -391,7 +391,7 @@ export default function PersonalAndBillingDataSection({
                     {...params}
                     inputProps={{
                       ...params.inputProps,
-                      value: isFromIPA ? formik.values.city : params.inputProps.value,
+                      value: isFromIPA || isAooUo ? formik.values.city : params.inputProps.value,
                     }}
                     label={t('onboardingFormData.billingDataSection.city')}
                     InputLabelProps={{
@@ -407,7 +407,7 @@ export default function PersonalAndBillingDataSection({
                           : theme.palette.text.primary,
                       },
                     }}
-                    disabled={isFromIPA}
+                    disabled={isFromIPA || isAooUo}
                   />
                 )}
               />
