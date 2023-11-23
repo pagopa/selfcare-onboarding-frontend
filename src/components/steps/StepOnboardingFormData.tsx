@@ -94,6 +94,7 @@ export default function StepOnboardingFormData({
   const [previousGeotaxononomies, setPreviousGeotaxononomies] = useState<Array<GeographicTaxonomy>>(
     []
   );
+  const [retrievedIstat, setRetrievedIstat] = useState<string>();
 
   const [stepHistoryState, setStepHistoryState, setStepHistoryStateHistory] =
     useHistoryState<StepBillingDataHistoryState>('onboardingFormData', {
@@ -120,6 +121,33 @@ export default function StepOnboardingFormData({
   const isProdFideiussioni = productId?.startsWith('prod-fd') ?? false;
   const aooCode = aooSelected?.codiceUniAoo;
   const uoCode = uoSelected?.codiceUniUo;
+
+  const filterByCategory =
+    productId === 'prod-pn'
+      ? 'L6,L4,L45'
+      : institutionType === 'GSP'
+      ? 'L37,SAG'
+      : 'C17,C16,L10,L19,L13,L2,C10,L20,L21,L22,L15,L1,C13,C5,L40,L11,L39,L46,L8,L34,L7,L35,L45,L47,L6,L12,L24,L28,L42,L36,L44,C8,C3,C7,C14,L16,C11,L33,C12,L43,C2,L38,C1,L5,L4,L31,L18,L17,S01,SA';
+
+  const handleSearchByTaxCode = async (query: string) => {
+    const searchResponse = await fetchWithLogs(
+      { endpoint: 'ONBOARDING_GET_PARTY_FROM_CF', endpointParams: { id: query } },
+      {
+        method: 'GET',
+        params: {
+          origin: 'IPA',
+          categories: filterByCategory,
+        },
+      },
+      () => setRequiredLogin(true)
+    );
+
+    const outcome = getFetchOutcome(searchResponse);
+
+    if (outcome === 'success') {
+      setRetrievedIstat((searchResponse as AxiosResponse).data.istatCode);
+    }
+  };
 
   const getPreviousGeotaxononomies = async () => {
     const onboardingData = await fetchWithLogs(
@@ -158,6 +186,12 @@ export default function StepOnboardingFormData({
   useEffect(() => {
     void getPreviousGeotaxononomies();
   }, []);
+
+  useEffect(() => {
+    if (premiumFlow && institutionType === 'PA') {
+      void handleSearchByTaxCode(initialFormData.taxCode);
+    }
+  }, [premiumFlow]);
 
   useEffect(() => {
     void formik.validateForm();
@@ -511,6 +545,7 @@ export default function StepOnboardingFormData({
           uoSelected={uoSelected}
           institutionAvoidGeotax={institutionAvoidGeotax}
           selectedParty={selectedParty}
+          retrievedIstat={retrievedIstat}
         />
         {/* DATI RELATIVI ALLA TASSONOMIA */}
         {ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY && !institutionAvoidGeotax ? (
