@@ -95,7 +95,7 @@ const mockPartyRegistry = {
       'IPA',
       'g1122',
       'largo torino',
-      'istat1'
+      '082050'
     ),
     createPartyRegistryEntity(
       'error',
