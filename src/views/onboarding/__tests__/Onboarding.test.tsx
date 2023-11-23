@@ -417,7 +417,7 @@ const executeAdvancedSearchForTaxCode = async (partyName: string) => {
   fireEvent.click(option);
 
   expect(inputPartyName).toBeTruthy();
-  await waitFor(() => fireEvent.change(inputPartyName, { target: { value: '33344455567' } }));
+  await waitFor(() => fireEvent.change(inputPartyName, { target: { value: '33445673222' } }));
 
   expect(fetchWithLogsSpy).toBeCalledTimes(2);
 
