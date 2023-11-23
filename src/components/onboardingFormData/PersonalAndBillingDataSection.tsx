@@ -76,7 +76,6 @@ export default function PersonalAndBillingDataSection({
   const [institutionLocationData, setInstitutionLocationData] = useState<InstitutionLocationData>();
   const [isCitySelected, setIsCitySelected] = useState<boolean>(false);
 
-  console.log('retrievedIstat', retrievedIstat);
   useEffect(() => {
     const shareCapitalIsNan = isNaN(formik.values.shareCapital);
     if (shareCapitalIsNan) {
@@ -116,7 +115,6 @@ export default function PersonalAndBillingDataSection({
 
   useEffect(() => {
     if (isFromIPA) {
-      console.log('retrievedIstat', retrievedIstat);
       if (aooSelected?.codiceComuneISTAT) {
         void getLocationFromIstatCode(aooSelected.codiceComuneISTAT);
       } else if (uoSelected?.codiceComuneISTAT) {

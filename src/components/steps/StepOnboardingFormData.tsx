@@ -145,7 +145,6 @@ export default function StepOnboardingFormData({
     const outcome = getFetchOutcome(searchResponse);
 
     if (outcome === 'success') {
-      console.log((searchResponse as AxiosResponse).data.istatCode);
       setRetrievedIstat((searchResponse as AxiosResponse).data.istatCode);
     }
   };
@@ -189,7 +188,7 @@ export default function StepOnboardingFormData({
   }, []);
 
   useEffect(() => {
-    if (premiumFlow && selectedParty?.origin === 'IPA') {
+    if (premiumFlow && institutionType === 'PA') {
       void handleSearchByTaxCode(initialFormData.taxCode);
     }
   }, [premiumFlow]);
