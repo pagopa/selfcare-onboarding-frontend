@@ -70,6 +70,11 @@ export const subProductSubmitFetch = async ({
           institutionType !== 'PSP' && institutionType !== 'PA'
             ? companyInformationsDto2pspDataRequest(billingData as OnboardingFormData)
             : undefined,
+        institutionLocationData: {
+          country: billingData?.country,
+          county: billingData?.county,
+          city: billingData?.city,
+        },
         productId: subProduct.id,
         subunitCode: undefined,
         subunitType: undefined,
