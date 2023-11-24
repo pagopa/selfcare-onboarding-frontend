@@ -143,7 +143,7 @@ test('test search trying to type invalid characters', async () => {
   expect(inputPartyName).toBeTruthy();
   fireEvent.change(inputPartyName, { target: { value: 'AGENCY ERROR ())!/!/££!' } });
 
-  const partyName = await waitFor(() => screen.getByText('AGENCY ERROR'));
+  await waitFor(() => screen.getByText('AGENCY ERROR'));
 });
 
 test('test error productID', async () => {
@@ -238,7 +238,6 @@ test('test label recipientCode only for institutionType is not PA', async () => 
   await executeStepInstitutionTypeScp();
   await executeStepBillingDataLabels();
 });
-
 ENV.PT.SHOW_PT &&
   test.skip('test prod-io only for institutionType is PT and PT already onboarded', async () => {
     renderComponent('prod-pagopa');
@@ -1137,7 +1136,7 @@ const searchUserFormFromRemoveBtn = (removeButton: HTMLElement) => {
     return null;
   } else {
     const parent = removeButton.parentElement as HTMLElement;
-    if (parent.getAttribute('role') === 'userForm') {
+    if (parent.getAttribute('role') === 'add-delegate-form') {
       return parent;
     } else {
       return searchUserFormFromRemoveBtn(parent);
