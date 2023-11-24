@@ -1,10 +1,11 @@
-import { Grid, Paper, TextField } from '@mui/material';
+import { Grid, Paper, TextField, Typography, IconButton } from '@mui/material';
 import React from 'react';
 import { useTranslation, TFunction } from 'react-i18next';
 import { verifyNameMatchWithTaxCode } from '@pagopa/selfcare-common-frontend/utils/verifyNameMatchWithTaxCode';
 import { verifySurnameMatchWithTaxCode } from '@pagopa/selfcare-common-frontend/utils/verifySurnameMatchWithTaxCode';
 import { verifyChecksumMatchWithTaxCode } from '@pagopa/selfcare-common-frontend/utils/verifyChecksumMatchWithTaxCode';
 import { emailRegexp } from '@pagopa/selfcare-common-frontend/utils/constants';
+import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 import { UserOnCreate, PartyRole } from '../../types';
 import { UsersError, UsersObject } from './steps/StepAddManager';
 
@@ -18,6 +19,9 @@ type PlatformUserFormProps = {
   readOnly?: boolean;
   readOnlyFields?: Array<keyof UserOnCreate>;
   isAuthUser?: boolean;
+  isExtraDelegate?: boolean;
+  buildRemoveDelegateForm?: (idToRemove: string) => (_: React.SyntheticEvent) => void;
+  delegateId?: string;
 };
 
 type Field = {
@@ -150,6 +154,9 @@ export function PlatformUserForm({
   readOnly,
   readOnlyFields = [],
   isAuthUser,
+  isExtraDelegate,
+  buildRemoveDelegateForm,
+  delegateId,
 }: PlatformUserFormProps) {
   const { t } = useTranslation();
 
@@ -198,6 +205,30 @@ export function PlatformUserForm({
 
   return (
     <Paper sx={{ borderRadius: '16px', p: 4, width: '704px' }}>
+      {isExtraDelegate && delegateId && buildRemoveDelegateForm && (
+        <Grid container xs={12} pb={3} alignItems="center" width="100%">
+          <Grid item xs={6}>
+            <Typography
+              component="div"
+              variant="caption"
+              sx={{ fontWeight: 'fontWeightBold' }}
+              data-testid="extra-delegate"
+            >
+              {t('onboardingStep3.addUserLabel')}
+            </Typography>
+          </Grid>
+          <Grid item xs={6} display="flex" justifyContent="flex-end" flexGrow={1}>
+            <IconButton
+              data-testid="removeButton"
+              color="primary"
+              onClick={buildRemoveDelegateForm(delegateId)}
+              sx={{ p: '8px', display: 'flex', marginTop: 'auto' }}
+            >
+              <ClearOutlinedIcon />
+            </IconButton>
+          </Grid>
+        </Grid>
+      )}
       <Grid container spacing={2} mb="-16px">
         {fields.map(
           ({

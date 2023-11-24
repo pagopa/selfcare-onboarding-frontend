@@ -1,17 +1,6 @@
-import React, { ChangeEvent, useContext, useEffect, useState } from 'react';
-import {
-  Checkbox,
-  FormControlLabel,
-  IconButton,
-  Link,
-  Grid,
-  Typography,
-  useTheme,
-  Box,
-  Paper,
-} from '@mui/material';
+import { ChangeEvent, useContext, useEffect, useState } from 'react';
+import { Checkbox, FormControlLabel, Link, Grid, Typography, useTheme, Box } from '@mui/material';
 import Add from '@mui/icons-material/Add';
-import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 import { omit, uniqueId } from 'lodash';
 import { useTranslation, Trans } from 'react-i18next';
 import SessionModal from '@pagopa/selfcare-common-frontend/components/SessionModal';
@@ -129,6 +118,7 @@ export function OnBoardingProductStepDelegates({
       [newId]: {} as UserOnCreate,
     });
   };
+
   const buildRemoveDelegateForm = (idToRemove: string) => (_: React.SyntheticEvent) => {
     const filteredDelegateFormIds = delegateFormIds.filter((id) => id !== idToRemove);
     setDelegateFormIds(filteredDelegateFormIds);
@@ -181,11 +171,7 @@ export function OnBoardingProductStepDelegates({
   };
 
   return (
-    <Grid
-      container
-      // mt={16}
-      direction="column"
-    >
+    <Grid container direction="column">
       <Grid container item justifyContent="center">
         <Grid item xs={12}>
           <Typography variant="h3" component="h2" align="center">
@@ -234,58 +220,22 @@ export function OnBoardingProductStepDelegates({
             isAuthUser={isAuthUser}
           />
         </Grid>
-
-        {delegateFormIds.map((id, index) => (
-          <React.Fragment key={id}>
-            <Grid item xs={8} width="704px" display={'flex'} justifyContent="center">
-              <Paper elevation={8} sx={{ borderRadius: 3, mt: 4 }} role="userForm">
-                <Grid container>
-                  <Grid
-                    item
-                    xs={6}
-                    display="flex"
-                    justifyContent="flex-start"
-                    alignItems="center"
-                    p="32px 0 0 32px "
-                  >
-                    <Typography
-                      component="div"
-                      variant="caption"
-                      sx={{ fontWeight: 'fontWeightBold' }}
-                      data-testid="extra-delegate"
-                    >
-                      {t('onboardingStep3.addUserLabel')}
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={6} p="24px 32px 0 0px ">
-                    <Box display={'flex'} justifyContent={'flex-end'}>
-                      <IconButton
-                        id={`id_${index}`}
-                        data-testid="removeButton"
-                        color="primary"
-                        onClick={buildRemoveDelegateForm(id)}
-                        sx={{ p: '8px', display: 'flex', justifyContent: 'flex-end' }}
-                      >
-                        <ClearOutlinedIcon />
-                      </IconButton>
-                    </Box>
-                  </Grid>
-                </Grid>
-                <PlatformUserForm
-                  prefix={id}
-                  role="DELEGATE"
-                  people={people}
-                  peopleErrors={peopleErrors}
-                  allPeople={allPeople}
-                  setPeople={setPeople}
-                />
-              </Paper>
-            </Grid>
-          </React.Fragment>
+        {delegateFormIds.map((id) => (
+          <Grid item xs={8} mt={4} display="flex" justifyContent={'center'} key={id}>
+            <PlatformUserForm
+              prefix={id}
+              role="DELEGATE"
+              people={people}
+              peopleErrors={peopleErrors}
+              allPeople={allPeople}
+              setPeople={setPeople}
+              isExtraDelegate={true}
+              delegateId={id}
+              buildRemoveDelegateForm={buildRemoveDelegateForm}
+            />
+          </Grid>
         ))}
       </Grid>
-
-      {/* <Box sx={{ textAlign: 'center' }} > */}
 
       <Grid container item my={4} display="flex" justifyContent="center">
         <Grid item xs={6} sx={{ display: 'flex', justifyContent: 'center' }}>
@@ -337,7 +287,7 @@ export function OnBoardingProductStepDelegates({
         }
         onCloseLabel={t('onboarding.outcomeContent.error.backActionLabel')}
         handleClose={handleCloseGenericErrorModal}
-      ></SessionModal>
+      />
     </Grid>
   );
 }
