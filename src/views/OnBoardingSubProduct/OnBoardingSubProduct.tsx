@@ -73,6 +73,7 @@ function OnBoardingSubProduct() {
   const requestIdRef = useRef<string>('');
   const [assistanceContacts, setAssistanceContacts] = useState<AssistanceContacts>();
   const [companyInformations, setCompanyInformations] = useState<CompanyInformations>();
+  const [partyName, setPartyName] = useState<string>('');
 
   useEffect(() => {
     registerUnloadEvent(setOnExit, setOpenExitModal, setOnExitAction);
@@ -137,6 +138,7 @@ function OnBoardingSubProduct() {
 
   const forwardWithInstitution = (party: Party, isUserParty: boolean) => {
     setExternalInstitutionId(party.externalId);
+    setPartyName(party.description);
     setOrigin(party.origin);
     setBillingData({
       businessName: party.description,
@@ -315,6 +317,7 @@ function OnBoardingSubProduct() {
           readOnly: false,
           externalInstitutionId,
           product,
+          partyName,
           forward: forwardWithManagerData,
           back: () => {
             if (window.location.search.indexOf(`partyExternalId=${externalInstitutionId}`) > -1) {
