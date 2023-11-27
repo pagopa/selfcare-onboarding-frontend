@@ -284,13 +284,7 @@ export function OnBoardingProductStepDelegates({
               .some((prefix) => !validateUser(prefix, people[prefix], allPeople, isAuthUser)),
         }}
       />
-      <ConfirmOnboardingModal
-        open={openConfirmationModal}
-        partyName={partyName}
-        productName={product?.title}
-        handleClose={handleCloseConfirmationModal}
-        onConfirm={onForwardAction}
-      />
+      
 
       <SessionModal
         open={genericError}

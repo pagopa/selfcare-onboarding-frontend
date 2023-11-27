@@ -715,11 +715,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
           externalInstitutionId,
           product: selectedProduct,
           legal: isTechPartner ? undefined : (formData as any)?.users[0],
-          partyName:
-            selectedParty?.description ||
-            aooSelected?.denominazioneAoo ||
-            uoSelected?.descrizioneUo ||
-            '',
+          partyName: onboardingFormData?.businessName || '',
           forward: (newFormData: Partial<FormData>) => {
             const users = (newFormData as any).users as Array<UserOnCreate>;
             const usersWithoutLegal = users.slice(0, 0).concat(users.slice(0 + 1));

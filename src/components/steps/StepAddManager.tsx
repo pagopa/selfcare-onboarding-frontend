@@ -9,7 +9,6 @@ import { userValidate } from '../../utils/api/userValidate';
 import { OnboardingStepActions } from '../OnboardingStepActions';
 import { PlatformUserForm, validateUser } from '../PlatformUserForm';
 import { useHistoryState } from '../useHistoryState';
-import { ConfirmOnboardingModal } from '../ConfirmOnboardingRequest';
 
 // Could be an ES6 Set but it's too bothersome for now
 export type UsersObject = { [key: string]: UserOnCreate };
@@ -19,7 +18,6 @@ type Props = StepperStepComponentProps & {
   externalInstitutionId: string;
   readOnly?: boolean;
   subProduct?: Product;
-  partyName?: string;
 };
 
 export function StepAddManager({
@@ -29,19 +27,17 @@ export function StepAddManager({
   forward,
   back,
   subProduct,
-  partyName,
 }: Props) {
   const { setRequiredLogin } = useContext(UserContext);
   const [_loading, setLoading] = useState(true);
   const [people, setPeople, setPeopleHistory] = useHistoryState<UsersObject>('people_step2', {});
   const [peopleErrors, setPeopleErrors] = useState<UsersError>();
   const [genericError, setGenericError] = useState<boolean>(false);
-  const [openConfirmationModal, setOpenConfirmationModal] = useState(false);
   const { t } = useTranslation();
 
   const onUserValidateSuccess = () => {
     setGenericError(false);
-    setOpenConfirmationModal(true);
+    onForwardAction();
   };
 
   const onUserValidateError = (userId: string, errors: { [fieldName: string]: Array<string> }) => {
@@ -153,13 +149,6 @@ export function StepAddManager({
           }}
         />
       </Grid>
-      <ConfirmOnboardingModal
-        open={openConfirmationModal}
-        handleClose={() => setOpenConfirmationModal(false)}
-        partyName={partyName}
-        onConfirm={onForwardAction}
-        productName={subProduct?.title}
-      />
       <SessionModal
         open={genericError}
         title={t('onboarding.outcomeContent.error.title')}
@@ -169,6 +158,7 @@ export function StepAddManager({
             {'Ti chiediamo di riprovare più tardi.'}
           </Trans>
         }
+        onCloseLabel={t('onboarding.outcomeContent.error.backActionLabel')}
         handleClose={handleCloseGenericErrorModal}
       ></SessionModal>
     </Grid>
