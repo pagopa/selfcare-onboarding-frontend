@@ -29,6 +29,7 @@ import { AssistanceContacts } from '../../model/AssistanceContacts';
 import { CompanyInformations } from '../../model/CompanyInformations';
 import { registerUnloadEvent, unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
 import { useHistoryState } from '../../components/useHistoryState';
+import { ConfirmOnboardingModal } from '../../components/ConfirmOnboardingRequest';
 import SubProductStepVerifyInputs from './components/SubProductStepVerifyInputs';
 import SubProductStepSubmit from './components/SubProductStepSubmit';
 import SubProductStepSuccess from './components/SubProductStepSuccess';
@@ -73,6 +74,8 @@ function OnBoardingSubProduct() {
   const requestIdRef = useRef<string>('');
   const [assistanceContacts, setAssistanceContacts] = useState<AssistanceContacts>();
   const [companyInformations, setCompanyInformations] = useState<CompanyInformations>();
+  const [openConfirmationModal, setOpenConfirmationModal] = useState(false);
+  const [partyName, setPartyName] = useState('');
 
   useEffect(() => {
     registerUnloadEvent(setOnExit, setOpenExitModal, setOnExitAction);
@@ -132,12 +135,14 @@ function OnBoardingSubProduct() {
       product_id: productId,
       subproduct_id: subProductId,
     });
-    forward();
+    setOpenConfirmationModal(true);
   };
 
   const forwardWithInstitution = (party: Party, isUserParty: boolean) => {
     setExternalInstitutionId(party.externalId);
+    setPartyName(party.description);
     setOrigin(party.origin);
+    setPartyName(party.description);
     setBillingData({
       businessName: party.description,
       registeredOffice: party.address,
@@ -188,6 +193,11 @@ function OnBoardingSubProduct() {
     setPricingPlan(pp);
     setActiveStep(parties.length === 0 ? 3 : 2);
     window.scrollTo(0, 0);
+  };
+
+  const handleOnConfirmModal = () => {
+    setOpenConfirmationModal(false);
+    forward();
   };
 
   const steps: Array<StepperStep> = [
@@ -401,6 +411,13 @@ function OnBoardingSubProduct() {
         message={t('onBoardingSubProduct.exitModal.message')}
         onConfirmLabel={t('onBoardingSubProduct.exitModal.backButton')}
         onCloseLabel={t('onBoardingSubProduct.exitModal.cancelButton')}
+      />
+      <ConfirmOnboardingModal
+        open={openConfirmationModal}
+        handleClose={() => setOpenConfirmationModal(false)}
+        partyName={partyName}
+        onConfirm={handleOnConfirmModal}
+        productName={subProduct?.title}
       />
       {loading && <LoadingOverlay loadingText={t('onBoardingSubProduct.loading.loadingText')} />}
     </Container>
