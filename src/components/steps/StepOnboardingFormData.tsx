@@ -319,8 +319,8 @@ export default function StepOnboardingFormData({
             : isVatRegistrated
             ? t('onboardingFormData.billingDataSection.vatNumberAlreadyRegistered')
             : undefined,
-        city: !values.city ? requiredError : undefined,
-        county: !values.county ? requiredError : undefined,
+        city: !premiumFlow && !values.city ? requiredError : undefined,
+        county: !premiumFlow && !values.county ? requiredError : undefined,
         ivassCode:
           isInsuranceCompany && !values.ivassCode
             ? requiredError
