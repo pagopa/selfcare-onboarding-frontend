@@ -247,6 +247,13 @@ export default {
       onConfirmLabel: 'Esci',
       onCloseLabel: 'Annulla',
     },
+    confirmationModal: {
+      title: 'Confermi la richiesta di invio?',
+      description:
+        'Stai inviando una richiesta di adesione al prodotto <1>{{productName}}</1> per l’ente <3>{{institutionName}}</3>. <5 /> L’accordo di adesione arriverà alla PEC istituzionale dell’ente e dovrà essere sottoscritta dal Legale Rappresentante. Assicurati di essere autorizzato come dipendente a effettuare questa richiesta.',
+      confirmLabel: 'Conferma',
+      cancelLabel: 'Annulla',
+    },
     loading: {
       loadingText: 'Stiamo verificando i tuoi dati',
     },
