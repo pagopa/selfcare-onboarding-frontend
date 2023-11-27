@@ -843,6 +843,10 @@ const executeStep3 = async (expectedSuccessfulSubmit: boolean, isTechPartner = f
 
   await waitFor(() => fireEvent.click(confirmButton));
 
+  const confimationModalBtn = await waitFor(() => screen.getByText('Conferma'));
+
+  await waitFor(() => fireEvent.click(confimationModalBtn));
+
   await waitFor(() =>
     screen.getByText(
       expectedSuccessfulSubmit

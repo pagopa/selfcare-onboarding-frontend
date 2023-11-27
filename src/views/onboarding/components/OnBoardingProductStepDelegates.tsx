@@ -1,17 +1,17 @@
-import { ChangeEvent, useContext, useEffect, useState } from 'react';
-import { Checkbox, FormControlLabel, Link, Grid, Typography, useTheme, Box } from '@mui/material';
 import Add from '@mui/icons-material/Add';
-import { omit, uniqueId } from 'lodash';
-import { useTranslation, Trans } from 'react-i18next';
+import { Box, Checkbox, FormControlLabel, Grid, Link, Typography, useTheme } from '@mui/material';
 import SessionModal from '@pagopa/selfcare-common-frontend/components/SessionModal';
-import { objectIsEmpty } from '../../../lib/object-utils';
+import { omit, uniqueId } from 'lodash';
+import { ChangeEvent, useContext, useEffect, useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import { StepperStepComponentProps, UserOnCreate } from '../../../../types';
-import { UserContext } from '../../../lib/context';
+import { ConfirmOnboardingModal } from '../../../components/ConfirmOnboardingRequest';
 import { OnboardingStepActions } from '../../../components/OnboardingStepActions';
 import { PlatformUserForm, validateUser } from '../../../components/PlatformUserForm';
 import { useHistoryState } from '../../../components/useHistoryState';
+import { UserContext } from '../../../lib/context';
+import { objectIsEmpty } from '../../../lib/object-utils';
 import { userValidate } from '../../../utils/api/userValidate';
-import { ConfirmOnboardingModal } from '../../../components/ConfirmOnboardingRequest';
 
 // Could be an ES6 Set but it's too bothersome for now
 export type UsersObject = { [key: string]: UserOnCreate };
@@ -285,7 +285,13 @@ export function OnBoardingProductStepDelegates({
         }}
       />
       
-
+      <ConfirmOnboardingModal
+        open={openConfirmationModal}
+        partyName={partyName}
+        productName={product?.title}
+        handleClose={handleCloseConfirmationModal}
+        onConfirm={onForwardAction}
+      />
       <SessionModal
         open={genericError}
         title={t('onboarding.outcomeContent.error.title')}
