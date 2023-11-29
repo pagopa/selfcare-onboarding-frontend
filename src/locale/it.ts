@@ -91,7 +91,7 @@ export default {
         'Inserisci uno dei dati richiesti e cerca dall’Indice della Pubblica <1/> Amministrazione (IPA) l’ente per cui vuoi richiedere l’adesione a <3/>{{productTitle}}',
       ipaDescription: `Non trovi il tuo ente nell'IPA? In <1>questa pagina</1> trovi maggiori <3/> informazioni sull'indice e su come accreditarsi `,
       saSubTitle:
-        'Se sei tra i gestori privati di piattaforma e-procurement e hai <1/>già chiesto la certificazione ad AgID, inserisci uno dei dati<3/> richiesti e cerca l’ente per cui vuoi richiedere l’adesione a<5/> Interoperabilità.',
+        'Se sei tra i gestori privati di piattaforma e-procurement e hai <1/> già ottenuto la <3>certificazione da AgID</3>, inserisci uno dei dati <5/> richiesti e cerca l’ente per cui vuoi richiedere l’adesione a <7/> Interoperabilità.',
       asSubTitle:
         'Se sei una società di assicurazione presente nell’Albo delle <1/>imprese IVASS, inserisci uno dei dati richiesti e cerca l’ente per<3/> cui vuoi richiedere l’adesione a Interoperabilità.',
       asyncAutocomplete: {
