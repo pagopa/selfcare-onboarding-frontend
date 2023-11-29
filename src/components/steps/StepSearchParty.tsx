@@ -251,9 +251,21 @@ export function StepSearchParty({
               `Prosegui con l’adesione a ${product?.title} per l’ente selezionato`
             ) : institutionType === 'SA' ? (
               <Trans i18nKey="onboardingStep1.onboarding.saSubTitle">
-                Se sei tra i gestori privati di piattaforma e-procurement e hai <br /> già chiesto
-                la certificazione ad AgID, inserisci uno dei dati <br /> richiesti e cerca l’ente
-                per cui vuoi richiedere l’adesione a <br /> Interoperabilità.
+                Se sei tra i gestori privati di piattaforma e-procurement e hai <br /> già ottenuto
+                la
+                <Link
+                  sx={{
+                    color: theme.palette.text.primary,
+                    textDecorationColor: theme.palette.text.primary,
+                  }}
+                  href="https://www.agid.gov.it/it/piattaforme/procurement/certificazione-componenti-piattaforme"
+                  target='_blank'
+                >
+                  certificazione da AgID
+                </Link>
+                , inserisci uno dei dati
+                <br /> richiesti e cerca l’ente per cui vuoi richiedere l’adesione a <br />
+                Interoperabilità.
               </Trans>
             ) : institutionType === 'AS' ? (
               <Trans i18nKey="onboardingStep1.onboarding.asSubTitle">
