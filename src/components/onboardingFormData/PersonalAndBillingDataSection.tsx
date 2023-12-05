@@ -48,7 +48,6 @@ type Props = StepperStepComponentProps & {
   uoSelected?: UoData;
   institutionAvoidGeotax: boolean;
   selectedParty?: Party;
-  retrievedIstat?: string;
 };
 
 // eslint-disable-next-line sonarjs/cognitive-complexity, complexity
@@ -65,7 +64,6 @@ export default function PersonalAndBillingDataSection({
   uoSelected,
   institutionAvoidGeotax,
   selectedParty,
-  retrievedIstat,
 }: Props) {
   const { t } = useTranslation();
   const { setRequiredLogin } = useContext(UserContext);
@@ -111,28 +109,25 @@ export default function PersonalAndBillingDataSection({
   const isDisabled = premiumFlow || (isFromIPA && !isPA && !isPSP) || isPA;
   const recipientCodeVisible = !isContractingAuthority && !isTechPartner && !isInsuranceCompany;
   const requiredError = 'Required';
-  const isAooUo = !!(aooSelected || uoSelected);
+  const isAooUo = aooSelected || uoSelected;
 
   useEffect(() => {
-    if (isFromIPA || isAooUo) {
+    if (isFromIPA) {
       if (aooSelected?.codiceComuneISTAT) {
         void getLocationFromIstatCode(aooSelected.codiceComuneISTAT);
       } else if (uoSelected?.codiceComuneISTAT) {
         void getLocationFromIstatCode(uoSelected.codiceComuneISTAT);
       } else if (selectedParty?.istatCode) {
         void getLocationFromIstatCode(selectedParty.istatCode);
-      } else if (retrievedIstat) {
-        void getLocationFromIstatCode(retrievedIstat);
       }
     }
-  }, [isFromIPA, selectedParty, aooSelected, uoSelected, retrievedIstat]);
+  }, [isFromIPA, selectedParty, aooSelected, uoSelected]);
 
   const baseNumericFieldProps = (
     field: keyof OnboardingFormData,
     label: string,
-    fontWeight: number = isDisabled ? 400 : 600,
-    fontSize: number = 18,
-    color: string = isDisabled ? theme.palette.text.secondary : theme.palette.text.primary
+    fontWeight: number = 400,
+    fontSize: number = 16
   ) => {
     const isError = !!formik.errors[field] && formik.errors[field] !== requiredError;
     return {
@@ -151,7 +146,7 @@ export default function PersonalAndBillingDataSection({
           fontSize,
           fontWeight,
           lineHeight: '24px',
-          color,
+          color: theme.palette.text.secondary,
           textAlign: 'start' as const,
           paddingLeft: '16px',
           borderRadius: '4px',
@@ -243,7 +238,9 @@ export default function PersonalAndBillingDataSection({
                 <CustomTextField
                   {...baseTextFieldProps(
                     'aooName',
-                    t('onboardingFormData.billingDataSection.aooName')
+                    t('onboardingFormData.billingDataSection.aooName'),
+                    400,
+                    18
                   )}
                   disabled={isDisabled}
                 />
@@ -252,7 +249,9 @@ export default function PersonalAndBillingDataSection({
                 <CustomTextField
                   {...baseTextFieldProps(
                     'aooUniqueCode',
-                    t('onboardingFormData.billingDataSection.aooUniqueCode')
+                    t('onboardingFormData.billingDataSection.aooUniqueCode'),
+                    400,
+                    18
                   )}
                   disabled={isDisabled}
                 />
@@ -265,7 +264,9 @@ export default function PersonalAndBillingDataSection({
                 <CustomTextField
                   {...baseTextFieldProps(
                     'uoName',
-                    t('onboardingFormData.billingDataSection.uoName')
+                    t('onboardingFormData.billingDataSection.uoName'),
+                    400,
+                    18
                   )}
                   disabled={isDisabled}
                 />
@@ -274,7 +275,9 @@ export default function PersonalAndBillingDataSection({
                 <CustomTextField
                   {...baseTextFieldProps(
                     'uoUniqueCode',
-                    t('onboardingFormData.billingDataSection.uoUniqueCode')
+                    t('onboardingFormData.billingDataSection.uoUniqueCode'),
+                    400,
+                    18
                   )}
                   disabled={isDisabled}
                 />
@@ -286,7 +289,9 @@ export default function PersonalAndBillingDataSection({
               <CustomTextField
                 {...baseTextFieldProps(
                   'businessName',
-                  t('onboardingFormData.billingDataSection.businessName')
+                  t('onboardingFormData.billingDataSection.businessName'),
+                  400,
+                  18
                 )}
                 disabled={isDisabled || isContractingAuthority || isInsuranceCompany}
               />
@@ -301,7 +306,9 @@ export default function PersonalAndBillingDataSection({
                   'registeredOffice',
                   isInsuranceCompany
                     ? t('onboardingFormData.billingDataSection.fullLegalAddress')
-                    : t('onboardingFormData.billingDataSection.registeredOffice')
+                    : t('onboardingFormData.billingDataSection.registeredOffice'),
+                  400,
+                  18
                 )}
                 disabled={!isAooUo && isDisabled && !isInsuranceCompany}
               />
@@ -312,7 +319,9 @@ export default function PersonalAndBillingDataSection({
                 inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
                 {...baseNumericFieldProps(
                   'zipCode',
-                  t('onboardingFormData.billingDataSection.zipCode')
+                  t('onboardingFormData.billingDataSection.zipCode'),
+                  400,
+                  18
                 )}
                 disabled={!isAooUo && isDisabled && !isInsuranceCompany}
               />
@@ -354,7 +363,7 @@ export default function PersonalAndBillingDataSection({
                 noOptionsText={t('onboardingFormData.billingDataSection.noResult')}
                 clearOnBlur={true}
                 forcePopupIcon={isFromIPA ? false : true}
-                disabled={isFromIPA || isAooUo}
+                disabled={isFromIPA}
                 ListboxProps={{
                   style: {
                     overflow: 'visible',
@@ -391,23 +400,22 @@ export default function PersonalAndBillingDataSection({
                     {...params}
                     inputProps={{
                       ...params.inputProps,
-                      value: isFromIPA || isAooUo ? formik.values.city : params.inputProps.value,
+                      value: isFromIPA ? formik.values.city : params.inputProps.value,
                     }}
                     label={t('onboardingFormData.billingDataSection.city')}
                     InputLabelProps={{
                       shrink: formik.values.city && formik.values.city !== '',
                     }}
                     sx={{
-                      '& .MuiOutlinedInput-input.MuiInputBase-input': {
-                        marginLeft: '15px',
-                        fontWeight: isFromIPA ? 'fontWeightRegular' : 'fontWeightMedium',
-                        textTransform: 'capitalize',
-                        color: isFromIPA
-                          ? theme.palette.text.secondary
-                          : theme.palette.text.primary,
-                      },
+                      '& .MuiOutlinedInput-input.MuiInputBase-input.MuiInputBase-inputAdornedEnd.MuiAutocomplete-input.MuiAutocomplete-inputFocused':
+                        {
+                          marginLeft: '16px',
+                          fontWeight: 'fontWeightRegular',
+                          textTransform: 'capitalize',
+                          color: theme.palette.text.secondary,
+                        },
                     }}
-                    disabled={isFromIPA || isAooUo}
+                    disabled={isFromIPA}
                   />
                 )}
               />
@@ -417,10 +425,8 @@ export default function PersonalAndBillingDataSection({
                 {...baseTextFieldProps(
                   'county',
                   t('onboardingFormData.billingDataSection.county'),
-                  isFromIPA || institutionLocationData?.county ? 400 : 600,
-                  isFromIPA || institutionLocationData?.county
-                    ? theme.palette.text.secondary
-                    : theme.palette.text.primary
+                  400,
+                  18
                 )}
                 InputLabelProps={{ shrink: shrinkCounty }}
                 disabled={true}
@@ -434,8 +440,8 @@ export default function PersonalAndBillingDataSection({
               {...baseTextFieldProps(
                 'digitalAddress',
                 t('onboardingFormData.billingDataSection.digitalAddress'),
-                isDisabled ? 400 : 600,
-                isDisabled ? theme.palette.text.secondary : theme.palette.text.primary
+                400,
+                18
               )}
               disabled={isDisabled || isContractingAuthority || isInsuranceCompany}
             />
@@ -446,8 +452,8 @@ export default function PersonalAndBillingDataSection({
               {...baseTextFieldProps(
                 'taxCode',
                 t('onboardingFormData.billingDataSection.taxCode'),
-                isDisabled ? 400 : 600,
-                isDisabled ? theme.palette.text.secondary : theme.palette.text.primary
+                400,
+                18
               )}
               disabled={(isDisabled && !isAooUo) || isContractingAuthority || isInsuranceCompany}
             />
@@ -456,7 +462,7 @@ export default function PersonalAndBillingDataSection({
           <Grid item xs={12}>
             <Box display="flex" alignItems="center">
               <Checkbox
-                id="onboardingFormData"
+                id="taxCodePivaEquals"
                 checked={stepHistoryState.isTaxCodeEquals2PIVA}
                 disabled={premiumFlow}
                 inputProps={{
@@ -484,10 +490,8 @@ export default function PersonalAndBillingDataSection({
                 {...baseTextFieldProps(
                   'vatNumber',
                   t('onboardingFormData.billingDataSection.vatNumber'),
-                  stepHistoryState.isTaxCodeEquals2PIVA ? 400 : 600,
-                  stepHistoryState.isTaxCodeEquals2PIVA
-                    ? theme.palette.text.secondary
-                    : theme.palette.text.primary
+                  400,
+                  18
                 )}
                 value={
                   stepHistoryState.isTaxCodeEquals2PIVA
@@ -520,8 +524,8 @@ export default function PersonalAndBillingDataSection({
                     {...baseTextFieldProps(
                       'recipientCode',
                       t('onboardingFormData.billingDataSection.sdiCode'),
-                      600,
-                      theme.palette.text.primary
+                      400,
+                      18
                     )}
                   />
                   {/* Description for recipient code */}
@@ -545,8 +549,8 @@ export default function PersonalAndBillingDataSection({
                 {...baseTextFieldProps(
                   'ivassCode',
                   t('onboardingFormData.billingDataSection.ivassCode'),
-                  600,
-                  theme.palette.text.primary
+                  400,
+                  18
                 )}
                 value={formik.values.ivassCode}
               />
@@ -567,8 +571,8 @@ export default function PersonalAndBillingDataSection({
                       : t(
                           'onboardingFormData.billingDataSection.informationCompanies.commercialRegisterNumber'
                         ),
-                    600,
-                    theme.palette.text.primary
+                    400,
+                    18
                   )}
                 />
               </Grid>
@@ -579,8 +583,8 @@ export default function PersonalAndBillingDataSection({
                   {...baseTextFieldProps(
                     'rea',
                     t('onboardingFormData.billingDataSection.informationCompanies.rea'),
-                    600,
-                    theme.palette.text.primary
+                    400,
+                    18
                   )}
                 />
               </Grid>
@@ -597,8 +601,8 @@ export default function PersonalAndBillingDataSection({
                       : t(
                           'onboardingFormData.billingDataSection.informationCompanies.shareCapital'
                         ),
-                    600,
-                    theme.palette.text.primary
+                    400,
+                    18
                   )}
                   onClick={() => setShrinkRea(true)}
                   onBlur={() => {
@@ -625,8 +629,8 @@ export default function PersonalAndBillingDataSection({
                     t(
                       'onboardingFormData.billingDataSection.pspDataSection.commercialRegisterNumber'
                     ),
-                    600,
-                    theme.palette.text.primary
+                    400,
+                    18
                   )}
                 />
               </Grid>
@@ -638,8 +642,8 @@ export default function PersonalAndBillingDataSection({
                     t(
                       'onboardingFormData.billingDataSection.pspDataSection.registrationInRegister'
                     ),
-                    600,
-                    theme.palette.text.primary
+                    400,
+                    18
                   )}
                 />
               </Grid>
@@ -650,7 +654,8 @@ export default function PersonalAndBillingDataSection({
                   {...baseTextFieldProps(
                     'registerNumber',
                     t('onboardingFormData.billingDataSection.pspDataSection.registerNumber'),
-                    600
+                    400,
+                    18
                   )}
                 />
               </Grid>
@@ -660,7 +665,8 @@ export default function PersonalAndBillingDataSection({
                   {...baseTextFieldProps(
                     'abiCode',
                     t('onboardingFormData.billingDataSection.pspDataSection.abiCode'),
-                    600
+                    400,
+                    18
                   )}
                 />
               </Grid>
@@ -673,8 +679,8 @@ export default function PersonalAndBillingDataSection({
                 {...baseTextFieldProps(
                   'supportEmail',
                   t('onboardingFormData.billingDataSection.assistanceContact.supportEmail'),
-                  600,
-                  theme.palette.text.primary
+                  400,
+                  18
                 )}
               />
               {/* descrizione indirizzo mail di supporto */}
