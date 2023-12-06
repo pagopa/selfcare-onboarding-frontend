@@ -166,7 +166,7 @@ test('Test: exiting during flow with logout', async () => {
 
   expect(screen.queryByText('Vuoi davvero uscire?')).toBeNull();
 
-  const logoutButton = screen.getByRole('button', { name: 'LOGOUT' });
+  const logoutButton = await waitFor(() => screen.getByRole('button', { name: 'LOGOUT' }));
   await performLogout(logoutButton);
 
   await performLogout(logoutButton);
@@ -218,6 +218,7 @@ test.skip('test complete onboarding AOO with product interop', async () => {
   await executeStepDelegatesAndSubmit(true);
 });
 
+// FAIL BECAUSE verifySubmit is different
 test.skip('test complete onboarding with public service manager for product prod-interop', async () => {
   renderComponent('prod-interop');
   await executeStepInstitutionType('prod-interop', 'gsp');
@@ -229,28 +230,20 @@ test.skip('test complete onboarding with public service manager for product prod
   await executeGoHome(true);
 });
 
-test.skip('test label recipientCode only for institutionType is not PA', async () => {
-  renderComponent('prod-io-sign');
-  await executeStepInstitutionType('prod-io-sign', 'scp');
-  await executeStepPersonalAndBillingDataLabels();
+test.skip('test prod-io only for institutionType is PT and PT already onboarded', async () => {
+  renderComponent('prod-pagopa');
+  await executeStepInstitutionType('prod-pagopa', 'pt');
+  await executeStepPersonalAndBillingDataLabelsForPtAlreadyOnboarded();
 });
 
-ENV.PT.SHOW_PT &&
-  test.skip('test prod-io only for institutionType is PT and PT already onboarded', async () => {
-    renderComponent('prod-pagopa');
-    await executeStepInstitutionType('prod-pagopa', 'pt');
-    await executeStepPersonalAndBillingDataLabelsForPtAlreadyOnboarded();
-  });
-
-ENV.PT.SHOW_PT &&
-  test.skip('test prod-pagopa only for institutionType is PT', async () => {
-    renderComponent('prod-pagopa');
-    await executeStepInstitutionType('prod-pagopa', 'pt');
-    await executeStepPersonalAndBillingDataLabelsForPt();
-    await executeStepAddManager();
-    await executeStepDelegatesAndSubmit(true, true);
-    await verifySubmitPt('prod-pagopa');
-  });
+test.skip('test prod-pagopa only for institutionType is PT', async () => {
+  renderComponent('prod-pagopa');
+  await executeStepInstitutionType('prod-pagopa', 'pt');
+  await executeStepPersonalAndBillingDataLabelsForPt();
+  await executeStepAddManager();
+  await executeStepDelegatesAndSubmit(true, true);
+  await verifySubmitPt('prod-pagopa');
+});
 
 const performLogout = async (logoutButton: HTMLElement) => {
   fireEvent.click(logoutButton);
@@ -575,6 +568,7 @@ const executeStepPersonalAndBillingDataLabelsForPt = async () => {
   const backButton = screen.getByRole('button', { name: 'Indietro' });
 
   await waitFor(() => screen.getByText('Inserisci i dati'));
+  screen.debug(document, 10000000000000);
   expect(screen.getByText('Codice SDI'));
 
   const geotaxArea = screen.queryByText('INDICA L’AREA GEOGRAFICA');
