@@ -102,6 +102,16 @@ export default function PersonalAndBillingDataSection({
     }
   }, [institutionLocationData]);
 
+  useEffect(() => {
+    if (premiumFlow) {
+      setInstitutionLocationData({
+        country: formik.values.country,
+        county: formik.values.county,
+        city: formik.values.city,
+      });
+    }
+  }, [premiumFlow]);
+
   const isFromIPA = origin === 'IPA';
   const isPSP = institutionType === 'PSP';
   const isPA = institutionType === 'PA';
@@ -114,7 +124,7 @@ export default function PersonalAndBillingDataSection({
   const isAooUo = !!(aooSelected || uoSelected);
 
   useEffect(() => {
-    if (isFromIPA || isAooUo) {
+    if (!premiumFlow && (isFromIPA || isAooUo)) {
       if (aooSelected?.codiceComuneISTAT) {
         void getLocationFromIstatCode(aooSelected.codiceComuneISTAT);
       } else if (uoSelected?.codiceComuneISTAT) {
@@ -125,7 +135,7 @@ export default function PersonalAndBillingDataSection({
         void getLocationFromIstatCode(retrievedIstat);
       }
     }
-  }, [isFromIPA, selectedParty, aooSelected, uoSelected, retrievedIstat]);
+  }, [isFromIPA, selectedParty, aooSelected, uoSelected, retrievedIstat, premiumFlow]);
 
   const baseNumericFieldProps = (
     field: keyof OnboardingFormData,
