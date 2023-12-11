@@ -79,6 +79,7 @@ function OnBoardingSubProduct() {
   const [country, setCountry] = useState('');
   const [city, setCity] = useState('');
   const [county, setCounty] = useState('');
+  const [isCityEditable, setIsCityEditable] = useState(false);
 
   useEffect(() => {
     registerUnloadEvent(setOnExit, setOpenExitModal, setOnExitAction);
@@ -198,6 +199,9 @@ function OnBoardingSubProduct() {
     if (city) {
       setCity(city);
     }
+    if (!city) {
+      setIsCityEditable(true);
+    }
     if (county) {
       setCounty(county);
     }
@@ -305,6 +309,7 @@ function OnBoardingSubProduct() {
           subProductId: subProduct?.id,
           selectedProduct: subProduct,
           externalInstitutionId,
+          isCityEditable,
           initialFormData: {
             ...(billingData ?? {
               businessName: '',
