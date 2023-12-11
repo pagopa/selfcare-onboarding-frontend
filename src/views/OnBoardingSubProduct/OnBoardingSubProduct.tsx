@@ -76,6 +76,9 @@ function OnBoardingSubProduct() {
   const [companyInformations, setCompanyInformations] = useState<CompanyInformations>();
   const [openConfirmationModal, setOpenConfirmationModal] = useState(false);
   const [partyName, setPartyName] = useState('');
+  const [country, setCountry] = useState('');
+  const [city, setCity] = useState('');
+  const [county, setCounty] = useState('');
 
   useEffect(() => {
     registerUnloadEvent(setOnExit, setOpenExitModal, setOnExitAction);
@@ -172,7 +175,10 @@ function OnBoardingSubProduct() {
     institutionType?: InstitutionType,
     partyId?: string,
     assistanceContacts?: AssistanceContacts,
-    companyInformations?: CompanyInformations
+    companyInformations?: CompanyInformations,
+    country?: string,
+    city?: string,
+    county?: string
   ) => {
     setStepAddManagerHistoryState({});
 
@@ -184,6 +190,16 @@ function OnBoardingSubProduct() {
     }
     if (companyInformations) {
       setCompanyInformations(companyInformations);
+    }
+
+    if (country) {
+      setCountry(country);
+    }
+    if (city) {
+      setCity(city);
+    }
+    if (county) {
+      setCounty(county);
     }
     setInstitutionType(institutionType);
     setPartyId(partyId);
@@ -302,6 +318,9 @@ function OnBoardingSubProduct() {
             }),
             ...assistanceContacts,
             ...companyInformations,
+            city: city ?? '',
+            county: county ?? '',
+            country: country ?? '',
           },
           institutionType: institutionType as InstitutionType,
           origin,
