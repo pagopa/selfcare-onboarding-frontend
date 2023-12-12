@@ -49,6 +49,7 @@ type Props = StepperStepComponentProps & {
   institutionAvoidGeotax: boolean;
   selectedParty?: Party;
   retrievedIstat?: string;
+  isCityEditable?: boolean;
 };
 
 // eslint-disable-next-line sonarjs/cognitive-complexity, complexity
@@ -66,6 +67,7 @@ export default function PersonalAndBillingDataSection({
   institutionAvoidGeotax,
   selectedParty,
   retrievedIstat,
+  isCityEditable,
 }: Props) {
   const { t } = useTranslation();
   const { setRequiredLogin } = useContext(UserContext);
@@ -102,6 +104,16 @@ export default function PersonalAndBillingDataSection({
     }
   }, [institutionLocationData]);
 
+  useEffect(() => {
+    if (premiumFlow) {
+      setInstitutionLocationData({
+        country: formik.values.country,
+        county: formik.values.county,
+        city: formik.values.city,
+      });
+    }
+  }, [premiumFlow]);
+
   const isFromIPA = origin === 'IPA';
   const isPSP = institutionType === 'PSP';
   const isPA = institutionType === 'PA';
@@ -114,7 +126,7 @@ export default function PersonalAndBillingDataSection({
   const isAooUo = !!(aooSelected || uoSelected);
 
   useEffect(() => {
-    if (isFromIPA || isAooUo) {
+    if (!premiumFlow && (isFromIPA || isAooUo)) {
       if (aooSelected?.codiceComuneISTAT) {
         void getLocationFromIstatCode(aooSelected.codiceComuneISTAT);
       } else if (uoSelected?.codiceComuneISTAT) {
@@ -125,7 +137,7 @@ export default function PersonalAndBillingDataSection({
         void getLocationFromIstatCode(retrievedIstat);
       }
     }
-  }, [isFromIPA, selectedParty, aooSelected, uoSelected, retrievedIstat]);
+  }, [isFromIPA, selectedParty, aooSelected, uoSelected, retrievedIstat, premiumFlow]);
 
   const baseNumericFieldProps = (
     field: keyof OnboardingFormData,
@@ -354,7 +366,7 @@ export default function PersonalAndBillingDataSection({
                 noOptionsText={t('onboardingFormData.billingDataSection.noResult')}
                 clearOnBlur={true}
                 forcePopupIcon={isFromIPA ? false : true}
-                disabled={isFromIPA || isAooUo}
+                disabled={(premiumFlow && !isCityEditable) || isFromIPA || isAooUo}
                 ListboxProps={{
                   style: {
                     overflow: 'visible',
@@ -407,7 +419,7 @@ export default function PersonalAndBillingDataSection({
                           : theme.palette.text.primary,
                       },
                     }}
-                    disabled={isFromIPA || isAooUo}
+                    disabled={(premiumFlow && !isCityEditable) || isFromIPA || isAooUo}
                   />
                 )}
               />
