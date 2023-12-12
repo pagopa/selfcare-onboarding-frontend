@@ -294,7 +294,7 @@ const mockedParties = [
   createPartyEntity(
     'onboarded_externalId',
     'or2325',
-    'p4341',
+    'p23412',
     'onboarded',
     'logo',
     'address',
@@ -452,8 +452,11 @@ const mockedOnboardingData: Array<InstitutionOnboardingInfoResource> = [
         ],
         supportEmail: 'comune.bollate@pec.it',
       },
+      city: 'Milano',
+      country: 'IT',
+      county: 'MI',
       institutionType: 'PA',
-      origin: 'IPA',
+      origin: 'ANAC',
     },
   },
   {
@@ -475,6 +478,9 @@ const mockedOnboardingData: Array<InstitutionOnboardingInfoResource> = [
         ],
         supportEmail: 'comune.udine@pec.it',
       },
+      city: 'Udine',
+      country: 'IT',
+      county: 'UD',
       // Use case not retrieved institution local data
       institutionType: 'GSP',
       origin: 'IPA',
@@ -507,6 +513,9 @@ const mockedOnboardingData: Array<InstitutionOnboardingInfoResource> = [
         ],
         supportEmail: 'comune.bollate@pec.it',
       },
+      city: 'Bollate',
+      country: 'IT',
+      county: 'BO',
       institutionType: 'PA',
       origin: 'IPA',
       assistanceContacts: {
@@ -539,6 +548,9 @@ const mockedOnboardingData: Array<InstitutionOnboardingInfoResource> = [
         supportEmail: 'comune.bollate@pec.it',
       },
       institutionType: 'PA',
+      city: 'Bollate',
+      country: 'IT',
+      county: 'BO',
       origin: 'IPA',
       assistanceContacts: {
         supportEmail: 'a@a.it',

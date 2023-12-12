@@ -1,5 +1,5 @@
 export type InstitutionLocationData = {
-  code: string;
+  code?: string;
   county: string;
   country: string;
   city: string;

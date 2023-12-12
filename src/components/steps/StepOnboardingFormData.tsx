@@ -68,6 +68,7 @@ type Props = StepperStepComponentProps & {
   outcome?: RequestOutcomeMessage | null;
   aooSelected?: AooData;
   uoSelected?: UoData;
+  isCityEditable?: boolean;
 };
 
 export default function StepOnboardingFormData({
@@ -84,6 +85,7 @@ export default function StepOnboardingFormData({
   aooSelected,
   uoSelected,
   selectedParty,
+  isCityEditable,
 }: Props) {
   const { t } = useTranslation();
   const { setRequiredLogin } = useContext(UserContext);
@@ -546,6 +548,7 @@ export default function StepOnboardingFormData({
           institutionAvoidGeotax={institutionAvoidGeotax}
           selectedParty={selectedParty}
           retrievedIstat={retrievedIstat}
+          isCityEditable={isCityEditable}
         />
         {/* DATI RELATIVI ALLA TASSONOMIA */}
         {ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY && !institutionAvoidGeotax ? (

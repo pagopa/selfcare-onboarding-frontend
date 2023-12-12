@@ -202,6 +202,9 @@ export type InstitutionData = {
   companyInformations?: CompanyInformations;
   assistanceContacts?: AssistanceContacts;
   geographicTaxonomies?: Array<GeographicTaxonomy>;
+  country?: string;
+  county?: string;
+  city?: string;
 };
 
 export type InstitutionOnboardingInfoResource = {
