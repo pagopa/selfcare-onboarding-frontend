@@ -11,7 +11,6 @@ export default function DpoSection({ baseTextFieldProps }: Props) {
 
   return (
     <>
-      {/* DATI DEL DPO */}
       <Paper elevation={8} sx={{ borderRadius: theme.spacing(2), p: 4, width: '704px', my: 2 }}>
         <Grid container item pb={3}>
           <Grid item xs={12}>
@@ -26,8 +25,7 @@ export default function DpoSection({ baseTextFieldProps }: Props) {
               {...baseTextFieldProps(
                 'dpoAddress',
                 t('onboardingFormData.dpoDataSection.dpoAddress'),
-                400,
-                18
+                600
               )}
             />
           </Grid>
@@ -36,8 +34,7 @@ export default function DpoSection({ baseTextFieldProps }: Props) {
               {...baseTextFieldProps(
                 'dpoPecAddress',
                 t('onboardingFormData.dpoDataSection.dpoPecAddress'),
-                400,
-                18
+                600
               )}
             />
           </Grid>
@@ -46,8 +43,7 @@ export default function DpoSection({ baseTextFieldProps }: Props) {
               {...baseTextFieldProps(
                 'dopEmailAddress',
                 t('onboardingFormData.dpoDataSection.dopEmailAddress'),
-                400,
-                18
+                600
               )}
             />
           </Grid>

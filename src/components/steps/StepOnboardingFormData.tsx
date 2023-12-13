@@ -8,6 +8,7 @@ import { useFormik } from 'formik';
 import { useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { emailRegexp } from '@pagopa/selfcare-common-frontend/utils/constants';
+import { theme } from '@pagopa/mui-italia';
 import {
   InstitutionType,
   Party,
@@ -67,6 +68,7 @@ type Props = StepperStepComponentProps & {
   outcome?: RequestOutcomeMessage | null;
   aooSelected?: AooData;
   uoSelected?: UoData;
+  isCityEditable?: boolean;
 };
 
 export default function StepOnboardingFormData({
@@ -83,6 +85,7 @@ export default function StepOnboardingFormData({
   aooSelected,
   uoSelected,
   selectedParty,
+  isCityEditable,
 }: Props) {
   const { t } = useTranslation();
   const { setRequiredLogin } = useContext(UserContext);
@@ -93,6 +96,7 @@ export default function StepOnboardingFormData({
   const [previousGeotaxononomies, setPreviousGeotaxononomies] = useState<Array<GeographicTaxonomy>>(
     []
   );
+  const [retrievedIstat, setRetrievedIstat] = useState<string>();
 
   const [stepHistoryState, setStepHistoryState, setStepHistoryStateHistory] =
     useHistoryState<StepBillingDataHistoryState>('onboardingFormData', {
@@ -119,6 +123,33 @@ export default function StepOnboardingFormData({
   const isProdFideiussioni = productId?.startsWith('prod-fd') ?? false;
   const aooCode = aooSelected?.codiceUniAoo;
   const uoCode = uoSelected?.codiceUniUo;
+
+  const filterByCategory =
+    productId === 'prod-pn'
+      ? 'L6,L4,L45'
+      : institutionType === 'GSP'
+      ? 'L37,SAG'
+      : 'C17,C16,L10,L19,L13,L2,C10,L20,L21,L22,L15,L1,C13,C5,L40,L11,L39,L46,L8,L34,L7,L35,L45,L47,L6,L12,L24,L28,L42,L36,L44,C8,C3,C7,C14,L16,C11,L33,C12,L43,C2,L38,C1,L5,L4,L31,L18,L17,S01,SA';
+
+  const handleSearchByTaxCode = async (query: string) => {
+    const searchResponse = await fetchWithLogs(
+      { endpoint: 'ONBOARDING_GET_PARTY_FROM_CF', endpointParams: { id: query } },
+      {
+        method: 'GET',
+        params: {
+          origin: 'IPA',
+          categories: filterByCategory,
+        },
+      },
+      () => setRequiredLogin(true)
+    );
+
+    const outcome = getFetchOutcome(searchResponse);
+
+    if (outcome === 'success') {
+      setRetrievedIstat((searchResponse as AxiosResponse).data.istatCode);
+    }
+  };
 
   const getPreviousGeotaxononomies = async () => {
     const onboardingData = await fetchWithLogs(
@@ -159,8 +190,10 @@ export default function StepOnboardingFormData({
   }, []);
 
   useEffect(() => {
-    void formik.validateForm();
-  }, [stepHistoryState.isTaxCodeEquals2PIVA, isVatRegistrated]);
+    if (premiumFlow && institutionType === 'PA') {
+      void handleSearchByTaxCode(initialFormData.taxCode);
+    }
+  }, [premiumFlow]);
 
   const saveHistoryState = () => {
     setStepHistoryState(stepHistoryState);
@@ -299,7 +332,6 @@ export default function StepOnboardingFormData({
           : !emailRegexp.test(values.digitalAddress)
           ? t('onboardingFormData.billingDataSection.invalidEmail')
           : undefined,
-
         commercialRegisterNumber:
           isPSP && !values.commercialRegisterNumber
             ? requiredError
@@ -384,6 +416,10 @@ export default function StepOnboardingFormData({
     },
   });
 
+  useEffect(() => {
+    void formik.validateForm();
+  }, [stepHistoryState.isTaxCodeEquals2PIVA, isVatRegistrated, formik.values]);
+
   const verifyVatNumber = async () => {
     const onboardingStatus = await fetchWithLogs(
       {
@@ -445,8 +481,10 @@ export default function StepOnboardingFormData({
   const baseTextFieldProps = (
     field: keyof OnboardingFormData,
     label: string,
-    fontWeight: number = 400,
-    fontSize: number = 16
+    fontWeight: number = origin === 'IPA' || premiumFlow ? 400 : 600,
+    color: string = origin === 'IPA' || premiumFlow
+      ? theme.palette.text.secondary
+      : theme.palette.text.primary
   ) => {
     const isError = !!formik.errors[field] && formik.errors[field] !== requiredError;
     return {
@@ -462,10 +500,10 @@ export default function StepOnboardingFormData({
       sx: { width: '100%' },
       InputProps: {
         style: {
-          fontSize,
+          fontSize: '18px',
           fontWeight,
           lineHeight: '24px',
-          color: '#5C6F82',
+          color,
           textAlign: 'start' as const,
           paddingLeft: '16px',
           borderRadius: '4px',
@@ -508,6 +546,8 @@ export default function StepOnboardingFormData({
           uoSelected={uoSelected}
           institutionAvoidGeotax={institutionAvoidGeotax}
           selectedParty={selectedParty}
+          retrievedIstat={retrievedIstat}
+          isCityEditable={isCityEditable}
         />
         {/* DATI RELATIVI ALLA TASSONOMIA */}
         {ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY && !institutionAvoidGeotax ? (

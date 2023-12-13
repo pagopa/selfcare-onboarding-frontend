@@ -61,8 +61,7 @@ const createPartyEntity = (
   zipCode: string,
   istatCode: string,
   userRole: UserRole = 'ADMIN',
-  origin: string = 'IPA',
-  
+  origin: string = 'IPA'
 ) => ({
   externalId,
   originId,
@@ -96,7 +95,7 @@ const mockPartyRegistry = {
       'IPA',
       'g1122',
       'largo torino',
-      'istat1'
+      '082050'
     ),
     createPartyRegistryEntity(
       'error',
@@ -238,9 +237,9 @@ const mockedParties = [
     'logo1',
     'address1',
     'a@aa.com',
-    '33344455567',
+    '33445673222',
     '22345',
-    'istat1'
+    '082050'
   ),
   createPartyEntity(
     'externalId2',
@@ -288,19 +287,21 @@ const mockedParties = [
     'b@cc.com',
     '33445673211',
     '33344',
-    'istat5'
+    '082051',
+    'ADMIN',
+    'INFOCAMERE'
   ),
   createPartyEntity(
     'onboarded_externalId',
     'or2325',
-    'p4341',
+    'p23412',
     'onboarded',
     'logo',
     'address',
     'a@aa.com',
     'BBBBBB22B22B234K',
     '12125',
-    'istat6',
+    'istat6'
   ),
   createPartyEntity(
     'aooId',
@@ -312,7 +313,7 @@ const mockedParties = [
     'a@aa.com',
     'BBBBBB22B22B234K',
     '12125',
-    'istat7',
+    'istat7'
   ),
 ];
 
@@ -364,17 +365,30 @@ export const mockedGeoTaxonomy: Array<GeographicTaxonomyResource> = [
   },
 ];
 
-export const mockedGeoTaxByIstatCode: GeographicTaxonomyResource = {
-  country: '100',
-  enabled: true,
-  code: '082053',
-  desc: 'PALERMO - COMUNE',
-  istat_code: '082053',
-  province_id: '082',
-  province_abbreviation: 'PA',
-  region_id: '19',
-  country_abbreviation: 'IT',
-};
+export const mockedGeotaxonomies: Array<GeographicTaxonomyResource> = [
+  {
+    country: '100',
+    enabled: true,
+    code: '082053',
+    desc: 'PALERMO - COMUNE',
+    istat_code: '082050',
+    province_id: '082',
+    province_abbreviation: 'PA',
+    region_id: '19',
+    country_abbreviation: 'IT',
+  },
+  {
+    country: '100',
+    enabled: true,
+    code: '082053',
+    desc: 'ROMA - COMUNE',
+    istat_code: '082051',
+    province_id: '082',
+    province_abbreviation: 'PA',
+    region_id: '19',
+    country_abbreviation: 'IT',
+  },
+];
 
 const mockedAooCode: AooData = {
   codAoo: 'A356E00',
@@ -388,7 +402,7 @@ const mockedAooCode: AooData = {
   origin: 'IPA',
   CAP: '53100',
   codiceCatastaleComune: 'I726',
-  codiceComuneISTAT: '052032',
+  codiceComuneISTAT: '082050',
   cognomeResponsabile: 'Bielli',
   nomeResponsabile: 'Silvia',
   dataIstituzione: '2023-01-27',
@@ -438,8 +452,11 @@ const mockedOnboardingData: Array<InstitutionOnboardingInfoResource> = [
         ],
         supportEmail: 'comune.bollate@pec.it',
       },
+      city: 'Milano',
+      country: 'IT',
+      county: 'MI',
       institutionType: 'PA',
-      origin: 'IPA',
+      origin: 'ANAC',
     },
   },
   {
@@ -461,7 +478,8 @@ const mockedOnboardingData: Array<InstitutionOnboardingInfoResource> = [
         ],
         supportEmail: 'comune.udine@pec.it',
       },
-      institutionType: 'PA',
+      // Use case not retrieved institution local data
+      institutionType: 'GSP',
       origin: 'IPA',
       assistanceContacts: {
         supportEmail: 'supportemail@mockmail.it',
@@ -492,6 +510,9 @@ const mockedOnboardingData: Array<InstitutionOnboardingInfoResource> = [
         ],
         supportEmail: 'comune.bollate@pec.it',
       },
+      city: 'Bollate',
+      country: 'IT',
+      county: 'BO',
       institutionType: 'PA',
       origin: 'IPA',
       assistanceContacts: {
@@ -524,6 +545,9 @@ const mockedOnboardingData: Array<InstitutionOnboardingInfoResource> = [
         supportEmail: 'comune.bollate@pec.it',
       },
       institutionType: 'PA',
+      city: 'Bollate',
+      country: 'IT',
+      county: 'BO',
       origin: 'IPA',
       assistanceContacts: {
         supportEmail: 'a@a.it',
@@ -776,14 +800,19 @@ export async function mockFetch(
   }
 
   if (endpoint === 'ONBOARDING_GET_LOCATION_BY_ISTAT_CODE') {
+    const retrievedLocalization = mockedGeotaxonomies.find(
+      (l) => endpointParams.geoTaxId === l.istat_code
+    );
     return new Promise((resolve) =>
-      resolve({ data: mockedGeoTaxByIstatCode, status: 200, statusText: '200' } as AxiosResponse)
+      resolve({ data: retrievedLocalization, status: 200, statusText: '200' } as AxiosResponse)
     );
   }
 
   if (endpoint === 'ONBOARDING_GET_PARTY_FROM_CF') {
+    const matchedParty = mockedParties.find((p) => p.taxCode === endpointParams.id);
+
     return new Promise((resolve) =>
-      resolve({ data: mockedParties[0], status: 200, statusText: '200' } as AxiosResponse)
+      resolve({ data: matchedParty, status: 200, statusText: '200' } as AxiosResponse)
     );
   }
 

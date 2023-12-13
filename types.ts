@@ -7,6 +7,7 @@ import { API } from './src/utils/constants';
 import { OnboardingFormData } from './src/model/OnboardingFormData';
 import { AssistanceContacts } from './src/model/AssistanceContacts';
 import { CompanyInformations } from './src/model/CompanyInformations';
+import { GeographicTaxonomy } from './src/model/GeographicTaxonomies';
 
 /*
  * Fetch data and router related types
@@ -200,6 +201,10 @@ export type InstitutionData = {
   origin: string;
   companyInformations?: CompanyInformations;
   assistanceContacts?: AssistanceContacts;
+  geographicTaxonomies?: Array<GeographicTaxonomy>;
+  country?: string;
+  county?: string;
+  city?: string;
 };
 
 export type InstitutionOnboardingInfoResource = {
