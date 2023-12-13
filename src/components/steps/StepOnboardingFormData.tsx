@@ -195,10 +195,6 @@ export default function StepOnboardingFormData({
     }
   }, [premiumFlow]);
 
-  useEffect(() => {
-    void formik.validateForm();
-  }, [stepHistoryState.isTaxCodeEquals2PIVA, isVatRegistrated]);
-
   const saveHistoryState = () => {
     setStepHistoryState(stepHistoryState);
     setStepHistoryStateHistory(stepHistoryState);
@@ -321,8 +317,8 @@ export default function StepOnboardingFormData({
             : isVatRegistrated
             ? t('onboardingFormData.billingDataSection.vatNumberAlreadyRegistered')
             : undefined,
-        city: !premiumFlow && !values.city ? requiredError : undefined,
-        county: !premiumFlow && !values.county ? requiredError : undefined,
+        city: !values.city ? requiredError : undefined,
+        county: !values.county ? requiredError : undefined,
         ivassCode:
           isInsuranceCompany && !values.ivassCode
             ? requiredError
@@ -336,7 +332,6 @@ export default function StepOnboardingFormData({
           : !emailRegexp.test(values.digitalAddress)
           ? t('onboardingFormData.billingDataSection.invalidEmail')
           : undefined,
-
         commercialRegisterNumber:
           isPSP && !values.commercialRegisterNumber
             ? requiredError
@@ -420,6 +415,10 @@ export default function StepOnboardingFormData({
       forward(values);
     },
   });
+
+  useEffect(() => {
+    void formik.validateForm();
+  }, [stepHistoryState.isTaxCodeEquals2PIVA, isVatRegistrated, formik.values]);
 
   const verifyVatNumber = async () => {
     const onboardingStatus = await fetchWithLogs(

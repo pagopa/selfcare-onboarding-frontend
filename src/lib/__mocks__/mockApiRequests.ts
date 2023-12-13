@@ -478,9 +478,6 @@ const mockedOnboardingData: Array<InstitutionOnboardingInfoResource> = [
         ],
         supportEmail: 'comune.udine@pec.it',
       },
-      city: 'Udine',
-      country: 'IT',
-      county: 'UD',
       // Use case not retrieved institution local data
       institutionType: 'GSP',
       origin: 'IPA',
