@@ -97,7 +97,12 @@ function StepOnboardingData({
         result.institution.assistanceContacts,
         result.institution.companyInformations,
         result.institution.country,
-        result.institution.city,
+        result.institution.city
+          ? result.institution.city
+              .charAt(0)
+              .toUpperCase()
+              .concat(result.institution.city.substring(1).toLowerCase().trim())
+          : result.institution.city,
         result.institution.county
       );
     } else if (
