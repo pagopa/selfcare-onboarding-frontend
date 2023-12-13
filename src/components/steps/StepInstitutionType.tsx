@@ -74,20 +74,13 @@ export default function StepInstitutionType({
             it.labelKey === 'sa' ||
             it.labelKey === 'as'
         );
-      case 'prod-pagopa':
-        return institutionTypeValues.filter(
-          (it) =>
-            it.labelKey === 'pa' ||
-            it.labelKey === 'gsp' ||
-            it.labelKey === 'scp' ||
-            it.labelKey === 'psp' ||
-            (ENV.PT.SHOW_PT ? it.labelKey === 'pt' : '')
-        );
       case 'prod-pn':
         return institutionTypeValues.filter((it) => it.labelKey === 'pa');
       case 'prod-idpay':
         return institutionTypeValues.filter((it) => it.labelKey === 'pa');
       case 'prod-io':
+      case 'prod-pagopa':
+        // Temporary disabled psp radiobutton for prod-pagopa, the radio buttons are now the same for prod-io and prod-pagopa.
         return institutionTypeValues.filter(
           (it) =>
             it.labelKey === 'pa' ||
