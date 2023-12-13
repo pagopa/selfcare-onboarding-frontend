@@ -91,7 +91,7 @@ export default function PersonalAndBillingDataSection({
   }, [formik.values.shareCapital]);
 
   useEffect(() => {
-    if (institutionLocationData) {
+    if (institutionLocationData && institutionLocationData.city) {
       formik.setFieldValue('country', institutionLocationData.country);
       formik.setFieldValue('county', institutionLocationData.county);
       formik.setFieldValue('city', institutionLocationData.city);
@@ -365,7 +365,7 @@ export default function PersonalAndBillingDataSection({
                 options={countries ?? []}
                 noOptionsText={t('onboardingFormData.billingDataSection.noResult')}
                 clearOnBlur={true}
-                forcePopupIcon={isFromIPA ? false : true}
+                forcePopupIcon={isFromIPA || !isCityEditable ? false : true}
                 disabled={(premiumFlow && !isCityEditable) || isFromIPA || isAooUo}
                 ListboxProps={{
                   style: {
@@ -403,7 +403,10 @@ export default function PersonalAndBillingDataSection({
                     {...params}
                     inputProps={{
                       ...params.inputProps,
-                      value: isFromIPA || isAooUo ? formik.values.city : params.inputProps.value,
+                      value:
+                        !isCityEditable || isFromIPA || isAooUo
+                          ? formik.values.city
+                          : params.inputProps.value,
                     }}
                     label={t('onboardingFormData.billingDataSection.city')}
                     InputLabelProps={{
