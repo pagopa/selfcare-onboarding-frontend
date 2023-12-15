@@ -487,8 +487,6 @@ function OnboardingComponent({ productId }: { productId: string }) {
             ? 'AOO'
             : uoSelected
             ? 'UO'
-            : !aooSelected && !uoSelected && institutionType === 'PA'
-            ? 'EC'
             : undefined,
           taxCode: onboardingFormData?.taxCode,
         },
