@@ -1253,7 +1253,7 @@ const verifySubmit = async (productId = 'prod-idpay') => {
           assistanceContacts: { supportEmail: 'a@a.it' },
           productId,
           subunitCode: undefined,
-          subunitType: 'EC',
+          subunitType: undefined,
           taxCode: 'AAAAAA44D55F456K',
           companyInformations: undefined,
         },
