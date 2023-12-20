@@ -65,10 +65,10 @@ export const API = {
     URL: ENV.URL_API.PARTY_REGISTRY_PROXY + '/institutions/{{id}}',
   },
   ONBOARDING_POST_LEGALS: {
-    URL: ENV.URL_API.ONBOARDING + '/institutions/onboarding',
+    URL: ENV.URL_API.ONBOARDING_V2 + '/institutions/onboarding',
   },
   ONBOARDING_COMPLETE_REGISTRATION: {
-    URL: ENV.URL_API.ONBOARDING + '/tokens/{{token}}/complete',
+    URL: ENV.URL_API.ONBOARDING_V2 + '/tokens/{{token}}/complete',
   },
 
   // institutions present on self care db
@@ -84,7 +84,7 @@ export const API = {
     URL: ENV.URL_API.ONBOARDING + '/users/validate',
   },
   ONBOARDING_TOKEN_VALIDATION: {
-    URL: ENV.URL_API.ONBOARDING + '/tokens/{{token}}/verify',
+    URL: ENV.URL_API.ONBOARDING_V2 + '/tokens/{{token}}/verify',
   },
   ONBOARDING_GET_GEOTAXONOMY: {
     URL: ENV.URL_API.PARTY_REGISTRY_PROXY + '/geotaxonomies',

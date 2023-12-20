@@ -483,13 +483,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
             : uoSelected
             ? uoSelected.codiceUniUo
             : undefined,
-          subunitType: aooSelected
-            ? 'AOO'
-            : uoSelected
-            ? 'UO'
-            : !aooSelected && !uoSelected && institutionType === 'PA'
-            ? 'EC'
-            : undefined,
+          subunitType: aooSelected ? 'AOO' : uoSelected ? 'UO' : undefined,
           taxCode: onboardingFormData?.taxCode,
         },
       },
