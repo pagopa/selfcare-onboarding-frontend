@@ -1,6 +1,6 @@
 import '@pagopa/selfcare-common-frontend/common-polyfill';
 import React from 'react';
-import ReactDOM from 'react-dom';
+import ReactDOM from 'react-dom/client';
 // import '@pagopa/selfcare-common-frontend/index.css';
 import { BrowserRouter } from 'react-router-dom';
 import { CONFIG } from '@pagopa/selfcare-common-frontend/config/env';
@@ -22,7 +22,8 @@ CONFIG.URL_FE.LOGOUT = ENV.URL_FE.LOGOUT;
 // eslint-disable-next-line functional/immutable-data
 CONFIG.URL_FE.ASSISTANCE = ENV.URL_FE.ASSISTANCE;
 
-ReactDOM.render(
+const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
+root.render(
   <React.StrictMode>
     <ThemeProvider theme={theme}>
       <CssBaseline />
@@ -30,8 +31,7 @@ ReactDOM.render(
         <App />
       </BrowserRouter>
     </ThemeProvider>
-  </React.StrictMode>,
-  document.getElementById('root')
+  </React.StrictMode>
 );
 
 // If you want to start measuring performance in your app, pass a function

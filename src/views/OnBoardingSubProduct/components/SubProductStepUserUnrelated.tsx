@@ -55,8 +55,11 @@ export default function SubProductStepUserUnrelated({ product, productId }: Prop
         <Grid container item justifyContent="center">
           <Grid item xs={6}>
             <Typography variant={'h4'}>
-              <Trans i18nKey="onBoardingSubProduct.subProductStepUserUnrelated.title">
-                Non puoi aderire a {{ selectedProduct: product?.title }}Premium
+              <Trans
+                i18nKey="onBoardingSubProduct.subProductStepUserUnrelated.title"
+                values={{ selectedProduct: product?.title }}
+              >
+                {`Non puoi aderire a {{selectedProduct}} Premium`}
               </Trans>
             </Typography>
           </Grid>
@@ -64,11 +67,11 @@ export default function SubProductStepUserUnrelated({ product, productId }: Prop
         <Grid container item justifyContent="center" mb={4} mt={1}>
           <Grid item xs={6}>
             <Typography variant={'body1'}>
-              <Trans i18nKey="onBoardingSubProduct.subProductStepUserUnrelated.title.description">
-                Il tuo ente non ha aderito ad {{ selectedProduct: product?.title }}, o non hai un
-                ruolo per gestire il prodotto. <br /> Chiedi ad un Amministratore di aggiungerti
-                nella sezione Utenti, oppure richiedi l’adesione ad{' '}
-                {{ selectedProduct: product?.title }} per il tuo ente.
+              <Trans
+                i18nKey="onBoardingSubProduct.subProductStepUserUnrelated.description"
+                values={{ selectedProduct: product?.title }}
+              >
+                {`Il tuo ente non ha aderito ad {{selectedProduct}}, o non hai un ruolo per gestire il prodotto. <1/> Chiedi ad un Amministratore di aggiungerti nella sezione Utenti, oppure richiedi l’adesione ad {{selectedProduct}} per il tuo ente.`}
               </Trans>
             </Typography>
           </Grid>

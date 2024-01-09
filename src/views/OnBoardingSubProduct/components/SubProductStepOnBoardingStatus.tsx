@@ -71,14 +71,19 @@ const buildNotBasicProduct = (
         minHeight="52vh"
         icon={<IllusError size={60} />}
         title={
-          <Trans i18nKey="onBoardingSubProduct.notBasicProductError.title">
-            L&apos;ente non ha aderito a {{ selectedProduct: productTitle }}
+          <Trans
+            i18nKey="onBoardingSubProduct.notBasicProductError.title"
+            values={{ selectedProduct: productTitle }}
+          >
+            {`L'ente non ha aderito a {{selectedProduct}}`}
           </Trans>
         }
         description={
-          <Trans i18nKey="onBoardingSubProduct.notBasicProductError.message">
-            Per poter sottoscrivere l&apos;offerta Premium, l&apos;ente che hai <br />
-            selezionato deve prima aderire al prodotto {{ selectedProduct: productTitle }}
+          <Trans
+            i18nKey="onBoardingSubProduct.notBasicProductError.message"
+            values={{ selectedProduct: productTitle }}
+          >
+            {`Per poter sottoscrivere l'offerta Premium, l'ente che hai <1 />selezionato deve prima aderire al prodotto {{selectedProduct}}`}
           </Trans>
         }
         variantTitle={'h4'}
