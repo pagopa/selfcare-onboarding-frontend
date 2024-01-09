@@ -138,8 +138,11 @@ export default function StepInstitutionType({
       </Grid>
       <Grid item xs={12} display="flex" justifyContent="center">
         <Typography variant="body1" align="center" pb={4}>
-          <Trans i18nKey="stepInstitutionType.subtitle">
-            Indica il tipo di ente che aderirà a {{ productName: selectedProduct?.title }}
+          <Trans
+            i18nKey="stepInstitutionType.subtitle"
+            values={{ productName: selectedProduct?.title }}
+          >
+            {`Indica il tipo di ente che aderirà a {{productName}}`}
           </Trans>
         </Typography>
       </Grid>
