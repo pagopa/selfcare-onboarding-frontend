@@ -11,7 +11,7 @@ export type OnboardingFormData = {
   country?: string;
   city?: string;
   ivassCode?: string;
-  recipientCode: string;
+  recipientCode?: string;
   publicServices?: boolean;
   commercialRegisterNumber?: string;
   registrationInRegister?: string;
