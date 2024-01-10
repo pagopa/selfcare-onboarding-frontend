@@ -18,18 +18,22 @@ export default function UserNotAllowedPage({ partyName, productTitle }: Props) {
       icon={<IllusError size={60} />}
       title={<Trans i18nKey="onboardingStep1_5.userNotAllowedError.title" />}
       description={
-        <Trans i18nKey="onboardingStep1_5.userNotAllowedError.description">
-          Al momento, l’ente
-          {{
+        <Trans
+          i18nKey="onboardingStep1_5.userNotAllowedError.description"
+          values={{
+            productTitle,
             partyName: partyName ?? t('onboardingStep1_5.userNotAllowedError.noSelectedParty'),
           }}
-          non può aderire a {{ productTitle }}. <br /> Per maggiori dettagli contatta
-          <Link
-            sx={{ cursor: 'pointer', textDecoration: 'none' }}
-            href={ENV.ASSISTANCE.ENABLE ? ENV.URL_FE.ASSISTANCE : ''}
-          >
-            &nbsp;l&apos;assistenza.
-          </Link>
+          components={{
+            7: (
+              <Link
+                sx={{ cursor: 'pointer', textDecoration: 'none' }}
+                href={ENV.ASSISTANCE.ENABLE ? ENV.URL_FE.ASSISTANCE : ''}
+              />
+            ),
+          }}
+        >
+          {`Al momento, l'ente <1>{{partyName}}</1> non può aderire a <3>{{productTitle}}</3>. <5 /> Per maggiori dettagli contatta <7>l'assistenza</7>.`}
         </Trans>
       }
       variantTitle={'h4'}
