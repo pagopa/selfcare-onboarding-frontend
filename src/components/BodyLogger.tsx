@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Box } from '@mui/system';
 import { Footer, Header } from '@pagopa/selfcare-common-frontend';
+import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
 import { logAction } from '../lib/action-log';
 import { ENV } from '../utils/env';
 import { Main } from './Main';
@@ -45,7 +46,12 @@ export function BodyLogger() {
           onExit={onExit}
           enableAssistanceButton={ENV.ENV !== 'UAT'}
           assistanceEmail={ENV.ASSISTANCE.ENABLE ? ENV.ASSISTANCE.EMAIL : undefined}
-          onDocumentationClick={() => window.open(ENV.URL_DOCUMENTATION, '_blank')}
+          onDocumentationClick={() => {
+            trackEvent('OPEN_OPERATIVE_MANUAL', {
+              from: 'onboarding',
+            });
+            window.open(ENV.URL_DOCUMENTATION, '_blank');
+          }}
           enableLogin={enableLogin}
           loggedUser={
             user

@@ -873,7 +873,10 @@ const checkCertifiedUserValidation = async (prefix: string, confirmButton: HTMLE
 };
 
 const fillInstitutionTypeCheckbox = async (element: string) => {
-  fireEvent.click(document.getElementById(element));
+  const selectedInstitutionType = document.getElementById(element) as HTMLElement;
+  expect(selectedInstitutionType).not.toBeChecked();
+  fireEvent.click(selectedInstitutionType);
+  await waitFor(() => expect(selectedInstitutionType).toBeChecked());
 };
 
 const fillUserBillingDataForm = async (
@@ -1253,7 +1256,7 @@ const verifySubmit = async (productId = 'prod-idpay') => {
           assistanceContacts: { supportEmail: 'a@a.it' },
           productId,
           subunitCode: undefined,
-          subunitType: 'EC',
+          subunitType: undefined,
           taxCode: 'AAAAAA44D55F456K',
           companyInformations: undefined,
         },

@@ -483,13 +483,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
             : uoSelected
             ? uoSelected.codiceUniUo
             : undefined,
-          subunitType: aooSelected
-            ? 'AOO'
-            : uoSelected
-            ? 'UO'
-            : !aooSelected && !uoSelected && institutionType === 'PA'
-            ? 'EC'
-            : undefined,
+          subunitType: aooSelected ? 'AOO' : uoSelected ? 'UO' : undefined,
           taxCode: onboardingFormData?.taxCode,
         },
       },
@@ -602,11 +596,11 @@ function OnboardingComponent({ productId }: { productId: string }) {
         StepSearchParty({
           externalInstitutionId,
           subTitle: (
-            <Trans i18nKey="onboardingStep1.onboarding.bodyDescription">
-              Inserisci uno dei dati richiesti e cerca dall&apos;Indice della Pubblica
-              <br />
-              Amministrazione (IPA) l&apos;ente per cui vuoi richiedere l&apos;adesione a <br />
-              {{ productTitle: selectedProduct?.title }}
+            <Trans
+              i18nKey="onboardingStep1.onboarding.bodyDescription"
+              values={{ productTitle: selectedProduct?.title }}
+            >
+              {`Inserisci uno dei dati richiesti e cerca dall’Indice della Pubblica <1/> Amministrazione (IPA) l’ente per cui vuoi richiedere l’adesione a <3/>{{productTitle}}`}
             </Trans>
           ),
           institutionType,

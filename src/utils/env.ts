@@ -28,6 +28,7 @@ export const ENV = {
 
   URL_API: {
     ONBOARDING: env.get('REACT_APP_URL_API_ONBOARDING').required().asString(),
+    ONBOARDING_V2: env.get('REACT_APP_URL_API_ONBOARDING_V2').required().asString(),
     PARTY_REGISTRY_PROXY: env.get('REACT_APP_URL_API_PARTY_REGISTRY_PROXY').required().asString(),
     GEOTAXONOMY: env.get('REACT_APP_URL_GEOTAXONOMY').required().asString(),
   },
