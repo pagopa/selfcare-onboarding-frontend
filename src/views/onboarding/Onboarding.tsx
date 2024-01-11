@@ -266,7 +266,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
           ? aooResult.codiceUniAoo
           : uoResult && uoResult.codiceUniUo
           ? uoResult.codiceUniUo
-          : '',
+          : undefined,
       registeredOffice: aooResult
         ? aooResult.indirizzo
         : uoResult

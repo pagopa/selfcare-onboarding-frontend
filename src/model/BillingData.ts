@@ -6,7 +6,7 @@ export type BillingDataDto = {
     // Indirizzo PEC
     digitalAddress: string;
     // Codice destinatario
-    recipientCode: string;
+    recipientCode?: string;
     // Sede legale
     registeredOffice: string;
     // Codice fiscale
