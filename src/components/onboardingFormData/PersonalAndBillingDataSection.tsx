@@ -50,6 +50,7 @@ type Props = StepperStepComponentProps & {
   selectedParty?: Party;
   retrievedIstat?: string;
   isCityEditable?: boolean;
+  isProdInterop: boolean;
 };
 
 // eslint-disable-next-line sonarjs/cognitive-complexity, complexity
@@ -68,6 +69,7 @@ export default function PersonalAndBillingDataSection({
   selectedParty,
   retrievedIstat,
   isCityEditable,
+  isProdInterop,
 }: Props) {
   const { t } = useTranslation();
   const { setRequiredLogin } = useContext(UserContext);
@@ -121,7 +123,8 @@ export default function PersonalAndBillingDataSection({
   const isInsuranceCompany = institutionType === 'AS';
   const isTechPartner = institutionType === 'PT';
   const isDisabled = premiumFlow || (isFromIPA && !isPA && !isPSP) || isPA;
-  const recipientCodeVisible = !isContractingAuthority && !isTechPartner && !isInsuranceCompany;
+  const recipientCodeVisible =
+    !isContractingAuthority && !isTechPartner && !isInsuranceCompany && !isProdInterop;
   const requiredError = 'Required';
   const isAooUo = !!(aooSelected || uoSelected);
 

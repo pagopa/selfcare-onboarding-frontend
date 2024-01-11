@@ -121,6 +121,7 @@ export default function StepOnboardingFormData({
     (productId === 'prod-io' || productId === 'prod-io-sign');
   const isProdIoSign = productId === 'prod-io-sign';
   const isProdFideiussioni = productId?.startsWith('prod-fd') ?? false;
+  const isProdInterop = productId === 'prod-interop';
   const aooCode = aooSelected?.codiceUniAoo;
   const uoCode = uoSelected?.codiceUniUo;
 
@@ -371,7 +372,11 @@ export default function StepOnboardingFormData({
             ? t('onboardingFormData.billingDataSection.invalidEmail')
             : undefined,
         recipientCode:
-          !isContractingAuthority && !isTechPartner && !isInsuranceCompany && !values.recipientCode
+          !isContractingAuthority &&
+          !isTechPartner &&
+          !isInsuranceCompany &&
+          !values.recipientCode &&
+          !isProdInterop
             ? requiredError
             : undefined,
         geographicTaxonomies:
@@ -548,6 +553,7 @@ export default function StepOnboardingFormData({
           selectedParty={selectedParty}
           retrievedIstat={retrievedIstat}
           isCityEditable={isCityEditable}
+          isProdInterop={isProdInterop}
         />
         {/* DATI RELATIVI ALLA TASSONOMIA */}
         {ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY && !institutionAvoidGeotax ? (
