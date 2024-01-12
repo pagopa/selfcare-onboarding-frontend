@@ -3,7 +3,7 @@
 
 import { Grid, TextField, Typography } from '@mui/material';
 import { Box, styled } from '@mui/system';
-import { AxiosResponse } from 'axios';
+import { AxiosError, AxiosResponse } from 'axios';
 import { useFormik } from 'formik';
 import { useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -93,6 +93,7 @@ export default function StepOnboardingFormData({
   const [openModifyModal, setOpenModifyModal] = useState<boolean>(false);
   const [openAddModal, setOpenAddModal] = useState<boolean>(false);
   const [isVatRegistrated, setIsVatRegistrated] = useState<boolean>(false);
+  const [vatVerificationGenericError, setVatVerificationGenericError] = useState<boolean>(false);
   const [previousGeotaxononomies, setPreviousGeotaxononomies] = useState<Array<GeographicTaxonomy>>(
     []
   );
@@ -317,6 +318,8 @@ export default function StepOnboardingFormData({
             ? t('onboardingFormData.billingDataSection.invalidVatNumber')
             : isVatRegistrated
             ? t('onboardingFormData.billingDataSection.vatNumberAlreadyRegistered')
+            : vatVerificationGenericError
+            ? t('onboardingFormData.billingDataSection.vatNumberVerificationError')
             : undefined,
         city: !values.city ? requiredError : undefined,
         county: !values.county ? requiredError : undefined,
@@ -423,7 +426,12 @@ export default function StepOnboardingFormData({
 
   useEffect(() => {
     void formik.validateForm();
-  }, [stepHistoryState.isTaxCodeEquals2PIVA, isVatRegistrated, formik.values]);
+  }, [
+    stepHistoryState.isTaxCodeEquals2PIVA,
+    isVatRegistrated,
+    vatVerificationGenericError,
+    formik.values,
+  ]);
 
   const verifyVatNumber = async () => {
     const onboardingStatus = await fetchWithLogs(
@@ -448,8 +456,12 @@ export default function StepOnboardingFormData({
 
     if (restOutcome === 'success') {
       setIsVatRegistrated(true);
-    } else {
+      setVatVerificationGenericError(false);
+    } else if ((onboardingStatus as AxiosError).response?.status === 404) {
       setIsVatRegistrated(false);
+      setVatVerificationGenericError(false);
+    } else {
+      setVatVerificationGenericError(true);
     }
   };
 
