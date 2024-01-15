@@ -11,6 +11,10 @@ export const ENV = {
     SUFFIX: env.get('REACT_APP_URL_INSTITUTION_LOGO_SUFFIX').required().asString(),
   },
 
+  JSON_URL: {
+    PLAN_PRICES: env.get('REACT_APP_PLAN_PRICES').required().asString(),
+  },
+
   ASSISTANCE: {
     ENABLE: env.get('REACT_APP_ENABLE_ASSISTANCE').required().asBool(),
     EMAIL: env.get('REACT_APP_PAGOPA_HELP_EMAIL').required().asString(),
