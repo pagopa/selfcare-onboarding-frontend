@@ -299,7 +299,7 @@ export default {
       carnetPlan: {
         caption: 'PIANO A CARNET - UNA TANTUM',
         discountBoxLabel: '25% di sconto',
-        title: 'Scegli tra i 7 carnet differenti pensati per ogni tua esigenza',
+        title: 'Scegli tra i {{carnetCount}} carnet differenti pensati per ogni tua esigenza',
         showMore: 'Scopri di più',
         showLess: 'Mostra meno',
         description:
