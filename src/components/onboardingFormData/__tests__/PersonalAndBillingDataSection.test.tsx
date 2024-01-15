@@ -110,6 +110,7 @@ test('should render PersonalAndBillingDataSection with institutionType PA. Codic
       premiumFlow={false}
       isInformationCompany={false}
       institutionAvoidGeotax={false}
+      isRecipientCodeVisible={true}
     />
   );
 
