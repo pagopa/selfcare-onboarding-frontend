@@ -93,6 +93,8 @@ export default function StepOnboardingFormData({
   const [openModifyModal, setOpenModifyModal] = useState<boolean>(false);
   const [openAddModal, setOpenAddModal] = useState<boolean>(false);
   const [isVatRegistrated, setIsVatRegistrated] = useState<boolean>(false);
+  // TODO Temporary removed waiting for prod-fd fix
+  // const [vatVerificationGenericError, setVatVerificationGenericError] = useState<boolean>(false);
   const [previousGeotaxononomies, setPreviousGeotaxononomies] = useState<Array<GeographicTaxonomy>>(
     []
   );
@@ -317,7 +319,10 @@ export default function StepOnboardingFormData({
             ? t('onboardingFormData.billingDataSection.invalidVatNumber')
             : isVatRegistrated
             ? t('onboardingFormData.billingDataSection.vatNumberAlreadyRegistered')
-            : undefined,
+            : // TODO Temporary commented wait for fix error by prod-fd
+              // : vatVerificationGenericError
+              // ? t('onboardingFormData.billingDataSection.vatNumberVerificationError')
+              undefined,
         city: !values.city ? requiredError : undefined,
         county: !values.county ? requiredError : undefined,
         ivassCode:
@@ -448,7 +453,15 @@ export default function StepOnboardingFormData({
 
     if (restOutcome === 'success') {
       setIsVatRegistrated(true);
+      // TODO Temporary commented waiting for fix prod-fd
+      // setVatVerificationGenericError(false);
+    } /*
+      else if ((onboardingStatus as AxiosError).response?.status === 404) {
+      setIsVatRegistrated(false);
+      setVatVerificationGenericError(false);
     } else {
+      setVatVerificationGenericError(true);
+    } */ else {
       setIsVatRegistrated(false);
     }
   };
