@@ -110,6 +110,8 @@ export default function SubProductStepSelectPricingPlan({ forward, product }: Pr
         .replace('.', ',')
     : '';
 
+  const carnetCount = plansPrices?.carnetPlans.length;
+
   return (
     <>
       <Box width={'100%'} sx={{ backgroundColor: 'primary.main' }} mt={'-88px'}>
@@ -201,7 +203,9 @@ export default function SubProductStepSelectPricingPlan({ forward, product }: Pr
                 discountBoxLabel={t(
                   'onBoardingSubProduct.subProductStepSelectPricingPlan.carnetPlan.discountBoxLabel'
                 )}
-                title={t('onBoardingSubProduct.subProductStepSelectPricingPlan.carnetPlan.title')}
+                title={t('onBoardingSubProduct.subProductStepSelectPricingPlan.carnetPlan.title', {
+                  carnetCount,
+                })}
                 minCarnetMessagePrice={minCarnetMessagePrice}
                 maxCarnetMessagePrice={maxCarnetMessagePrice}
                 minConsumptionMessagePrice={minConsumptionMessagePrice}
