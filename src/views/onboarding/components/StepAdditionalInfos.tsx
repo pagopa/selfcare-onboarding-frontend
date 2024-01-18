@@ -27,6 +27,7 @@ export function StepAdditionalInfos({ forward, back }: Props) {
     fromBelongsRegulatedMarket: '',
     isFromIPA: '',
     isConcessionaireOfPublicService: '',
+    optionalPartyInformations: '',
   });
 
   const [blockData, setBlockData] = useState<{
@@ -37,14 +38,16 @@ export function StepAdditionalInfos({ forward, back }: Props) {
     [field: string]: string;
   }>({});
 
+  const [isChecked, setIsChecked] = useState<boolean>(false);
   const [disabled, setDisabled] = useState<boolean>(false);
 
   useEffect(() => {
-    const isContinueButtonEnabled =
-      Object.values(radioValues).every((value) => value !== '') &&
-      !Object.values(errors).some((error) => error !== '');
-    setDisabled(!isContinueButtonEnabled);
-  }, [radioValues, errors]);
+    const isContinueButtonEnabled = Object.entries(radioValues).every(([key, value]) =>
+      key === 'optionalPartyInformations' ? true : value !== ''
+    );
+
+    setDisabled(!isContinueButtonEnabled || Object.values(errors).some((error) => error !== ''));
+  }, [radioValues, errors, isChecked]);
 
   const handleRadioChange = (field: any, value: any) => {
     setRadioValues((prevValues) => ({
@@ -83,6 +86,19 @@ export function StepAdditionalInfos({ forward, back }: Props) {
       return acc;
     }, {});
 
+    if (
+      isChecked &&
+      (!blockData.optionalPartyInformations ||
+        blockData.optionalPartyInformations?.textFieldValue === '')
+    ) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        optionalPartyInformations: t(
+          'additionalDataPage.formQuestions.textFields.errors.optionalPartyInformations'
+        ),
+      }));
+    }
+
     if (Object.keys(newErrors).length > 0) {
       setErrors((prevErrors) => ({
         ...prevErrors,
@@ -91,7 +107,6 @@ export function StepAdditionalInfos({ forward, back }: Props) {
       setDisabled(true);
     } else {
       setErrors({});
-      setDisabled(false);
       forward();
     }
   };
@@ -157,8 +172,12 @@ export function StepAdditionalInfos({ forward, back }: Props) {
         <Divider />
         <Grid item pb={4}>
           <FormControlLabel
-            value="other"
+            value={isChecked}
             control={<Checkbox size="small" />}
+            onClick={() => {
+              handleRadioChange('optionalPartyInformations', !isChecked);
+              setIsChecked(!isChecked);
+            }}
             label={t('additionalDataPage.formQuestions.other')}
             sx={{
               marginY: 2,
@@ -174,6 +193,11 @@ export function StepAdditionalInfos({ forward, back }: Props) {
             label={t('additionalDataPage.formQuestions.optionalPartyInformations')}
             fullWidth
             sx={{ color: theme.palette.text.secondary }}
+            onChange={(e: any) => {
+              handleTextFieldChange(true, 'optionalPartyInformations', e.target.value);
+            }}
+            error={!!errors.optionalPartyInformations}
+            helperText={errors.optionalPartyInformations || ''}
           />
         </Grid>
       </Paper>
