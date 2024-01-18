@@ -121,6 +121,40 @@ export default {
       label: "Sono io l'Amministratore",
     },
   },
+  additionalDataPage: {
+    title: 'Inserisci ulteriori dettagli',
+    subTitle:
+      'Scegli l’opzione che descrive il tuo ente. Se nessuna è appropriata, seleziona “Altro” e <1 /> inserisci maggiori dettagli.',
+    formQuestions: {
+      textFields: {
+        labels: {
+          note: 'Note',
+          ipa: 'Inserisci il codice IPA di riferimento',
+        },
+        errors: {
+          isEstabilishedRegulatoryProvision: 'Non hai inserito nessuna nota',
+          fromBelongsRegulatedMarket: 'Non hai inserito nessuna nota',
+          isFromIPA: 'Inserisci il codice IPA di riferimento',
+          isConcessionaireOfPublicService: 'Non hai inserito nessuna nota',
+          optionalPartyInformations: 'Campo obbligatorio',
+        },
+      },
+      estabilishedRegulatoryProvision:
+        'L’ente è una società costituita ex legge da un provvedimento normativo',
+      belongsRegulatedMarket:
+        'L’ente appartiene ad un mercato regolamentato (es. energia, gas, acqua, <1 />trasporti, servizi postali ecc…)',
+      registratedOnIPA: 'L’ente è censito su IPA',
+      concessionaireOfPublicService: 'L’ente è una concessionaria di un pubblico servizio',
+      other: 'Altro',
+      optionalPartyInformations: 'Scrivi qui le informazioni sul tuo ente',
+    },
+    options: {
+      yes: 'Sì',
+      no: 'No',
+    },
+    addNote: 'Aggiungi una nota',
+    allowedCharacters: 'Massimo 300 caratteri',
+  },
   platformUserForm: {
     helperText: 'Il Campo non è valido',
     fields: {
