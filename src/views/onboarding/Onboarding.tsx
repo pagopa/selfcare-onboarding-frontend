@@ -46,6 +46,7 @@ import StepInstitutionType from '../../components/steps/StepInstitutionType';
 import UserNotAllowedPage from '../UserNotAllowedPage';
 import { genericError, OnboardingStep1_5 } from './components/OnboardingStep1_5';
 import { OnBoardingProductStepDelegates } from './components/OnBoardingProductStepDelegates';
+import { StepAdditionalInfos } from './components/StepAdditionalInfos';
 
 export type ValidateErrorType = 'conflictError';
 
@@ -336,9 +337,11 @@ function OnboardingComponent({ productId }: { productId: string }) {
           ) {
             setOutcome(null);
             if (isTechPartner) {
-              setActiveStep(activeStep + 2);
-            } else {
+              setActiveStep(activeStep + 3);
+            } else if (productId === 'prod-pagopa' && institutionType === 'GSP') {
               forward();
+            } else {
+              setActiveStep(activeStep + 2);
             }
           } else if ((onboardingStatus as AxiosError<any>).response?.status === 403) {
             setOutcome(notAllowedError);
@@ -349,7 +352,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
       };
       void partyVerifyOnboarded();
     } else {
-      forward();
+      setActiveStep(activeStep + 2);
     }
   };
 
@@ -599,6 +602,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
             <Trans
               i18nKey="onboardingStep1.onboarding.bodyDescription"
               values={{ productTitle: selectedProduct?.title }}
+              components={{ 1: <br />, 3: <br /> }}
             >
               {`Inserisci uno dei dati richiesti e cerca dall’Indice della Pubblica <1/> Amministrazione (IPA) l’ente per cui vuoi richiedere l’adesione a <3/>{{productTitle}}`}
             </Trans>
@@ -686,6 +690,10 @@ function OnboardingComponent({ productId }: { productId: string }) {
         }),
     },
     {
+      label: 'Additional Info',
+      Component: () => StepAdditionalInfos({ forward, back }),
+    },
+    {
       label: 'Inserisci i dati del rappresentante legale',
       Component: () =>
         StepAddManager({
@@ -699,7 +707,13 @@ function OnboardingComponent({ productId }: { productId: string }) {
             });
             forwardWithData(newFormData);
           },
-          back,
+          back: () => {
+            if (productId === 'prod-pagopa' && institutionType === 'GSP') {
+              back();
+            } else {
+              setActiveStep(activeStep - 2);
+            }
+          },
         }),
     },
     {
