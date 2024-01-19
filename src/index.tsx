@@ -12,6 +12,7 @@ import { MOCK_USER } from './utils/constants';
 import { ENV } from './utils/env';
 import './consentAndAnalyticsConfiguration.ts';
 import './locale';
+import './index.css';
 
 // eslint-disable-next-line functional/immutable-data
 CONFIG.MOCKS.MOCK_USER = MOCK_USER;
