@@ -12,26 +12,22 @@ import { useTranslation, Trans } from 'react-i18next';
 import { useEffect, useState } from 'react';
 import { OnboardingStepActions } from '../../../components/OnboardingStepActions';
 import { RadioWithTextField } from '../../../components/RadioWithTextField';
+import { StepperStepComponentProps } from '../../../../types';
 
-type Props = {
-  forward: () => void;
-  back: () => void;
-};
-
-export function StepAdditionalInfos({ forward, back }: Props) {
+export function StepAdditionalInformations({ forward, back }: StepperStepComponentProps) {
   const { t } = useTranslation();
   const theme = useTheme();
 
   const [radioValues, setRadioValues] = useState({
-    isEstabilishedRegulatoryProvision: '',
-    fromBelongsRegulatedMarket: '',
-    isFromIPA: '',
-    isConcessionaireOfPublicService: '',
-    optionalPartyInformations: '',
+    isEstabilishedRegulatoryProvision: undefined,
+    fromBelongsRegulatedMarket: undefined,
+    isFromIPA: undefined,
+    isConcessionaireOfPublicService: undefined,
+    optionalPartyInformations: false,
   });
 
-  const [blockData, setBlockData] = useState<{
-    [field: string]: { openTextField: boolean; textFieldValue: string; errorText: string };
+  const [additionalData, setAdditionalData] = useState<{
+    [field: string]: { openTextField: boolean; textFieldValue: string; choice: boolean };
   }>({});
 
   const [errors, setErrors] = useState<{
@@ -43,10 +39,16 @@ export function StepAdditionalInfos({ forward, back }: Props) {
 
   useEffect(() => {
     const isContinueButtonEnabled = Object.entries(radioValues).every(([key, value]) =>
-      key === 'optionalPartyInformations' ? true : value !== ''
+      key === 'optionalPartyInformations' ? true : value !== undefined
     );
 
-    setDisabled(!isContinueButtonEnabled || Object.values(errors).some((error) => error !== ''));
+    const allFalseAndUnchecked = Object.values(radioValues).every((value) => !value) && !isChecked;
+
+    setDisabled(
+      !isContinueButtonEnabled ||
+        allFalseAndUnchecked ||
+        Object.values(errors).some((error) => error !== '')
+    );
   }, [radioValues, errors, isChecked]);
 
   const handleRadioChange = (field: any, value: any) => {
@@ -65,19 +67,24 @@ export function StepAdditionalInfos({ forward, back }: Props) {
       ...prevErrors,
       [field]: '',
     }));
-    setBlockData((prevBlockData) => ({
-      ...prevBlockData,
+    setAdditionalData((prevAdditionalData) => ({
+      ...prevAdditionalData,
       [field]: {
         openTextField: open,
         textFieldValue: value,
-        errorText: '',
+        choice: false,
       },
     }));
   };
 
   const validateTextField = () => {
-    const newErrors = Object.entries(radioValues).reduce((acc, [field]) => {
-      if (blockData[field]?.openTextField && blockData[field]?.textFieldValue === '') {
+    const newErrors = Object.keys(radioValues).reduce((acc, field) => {
+      if (
+        (additionalData[field]?.openTextField && additionalData[field]?.textFieldValue === '') ||
+        (isChecked &&
+          field === 'optionalPartyInformations' &&
+          !additionalData[field]?.textFieldValue)
+      ) {
         return {
           ...acc,
           [field]: t(`additionalDataPage.formQuestions.textFields.errors.${field}`),
@@ -86,20 +93,7 @@ export function StepAdditionalInfos({ forward, back }: Props) {
       return acc;
     }, {});
 
-    if (
-      isChecked &&
-      (!blockData.optionalPartyInformations ||
-        blockData.optionalPartyInformations?.textFieldValue === '')
-    ) {
-      setErrors((prevErrors) => ({
-        ...prevErrors,
-        optionalPartyInformations: t(
-          'additionalDataPage.formQuestions.textFields.errors.optionalPartyInformations'
-        ),
-      }));
-    }
-
-    if (Object.keys(newErrors).length > 0) {
+    if (Object.keys(newErrors).length) {
       setErrors((prevErrors) => ({
         ...prevErrors,
         ...newErrors,
@@ -107,7 +101,17 @@ export function StepAdditionalInfos({ forward, back }: Props) {
       setDisabled(true);
     } else {
       setErrors({});
-      forward();
+
+      const choices = Object.values(radioValues);
+
+      const additionalDataWithChoice = Object.keys(radioValues).reduce(
+        (result, key, index) => ({
+          ...result,
+          [key]: { ...additionalData[key], choice: choices[index] },
+        }),
+        {}
+      );
+      forward(additionalDataWithChoice);
     }
   };
 
@@ -129,9 +133,7 @@ export function StepAdditionalInfos({ forward, back }: Props) {
           title={t('additionalDataPage.formQuestions.estabilishedRegulatoryProvision')}
           label={t('additionalDataPage.formQuestions.textFields.labels.note')}
           field={'isEstabilishedRegulatoryProvision'}
-          onRadioChange={(value: any) =>
-            handleRadioChange('isEstabilishedRegulatoryProvision', value)
-          }
+          onRadioChange={handleRadioChange}
           onTextFieldChange={handleTextFieldChange}
           errorText={errors.isEstabilishedRegulatoryProvision || ''}
         />
@@ -145,7 +147,7 @@ export function StepAdditionalInfos({ forward, back }: Props) {
           }
           label={t('additionalDataPage.formQuestions.textFields.labels.note')}
           field={'fromBelongsRegulatedMarket'}
-          onRadioChange={(value: any) => handleRadioChange('fromBelongsRegulatedMarket', value)}
+          onRadioChange={handleRadioChange}
           onTextFieldChange={handleTextFieldChange}
           errorText={errors.fromBelongsRegulatedMarket || ''}
         />
@@ -154,7 +156,7 @@ export function StepAdditionalInfos({ forward, back }: Props) {
           title={t('additionalDataPage.formQuestions.registratedOnIPA')}
           label={t('additionalDataPage.formQuestions.textFields.labels.ipa')}
           field={'isFromIPA'}
-          onRadioChange={(value: any) => handleRadioChange('isFromIPA', value)}
+          onRadioChange={handleRadioChange}
           onTextFieldChange={handleTextFieldChange}
           errorText={errors.isFromIPA || ''}
         />
@@ -163,9 +165,7 @@ export function StepAdditionalInfos({ forward, back }: Props) {
           title={t('additionalDataPage.formQuestions.concessionaireOfPublicService')}
           label={t('additionalDataPage.formQuestions.textFields.labels.note')}
           field={'isConcessionaireOfPublicService'}
-          onRadioChange={(value: any) =>
-            handleRadioChange('isConcessionaireOfPublicService', value)
-          }
+          onRadioChange={handleRadioChange}
           onTextFieldChange={handleTextFieldChange}
           errorText={errors.isConcessionaireOfPublicService || ''}
         />

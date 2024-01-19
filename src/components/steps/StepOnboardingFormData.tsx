@@ -3,10 +3,9 @@
 
 import { Grid, TextField, Typography } from '@mui/material';
 import { Box, styled } from '@mui/system';
+import { AxiosError, AxiosResponse } from 'axios';
 import { theme } from '@pagopa/mui-italia';
 import { emailRegexp } from '@pagopa/selfcare-common-frontend/utils/constants';
-// import { AxiosError, AxiosResponse } from 'axios';
-import { AxiosResponse } from 'axios';
 import { useFormik } from 'formik';
 import { useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -94,8 +93,7 @@ export default function StepOnboardingFormData({
   const [openModifyModal, setOpenModifyModal] = useState<boolean>(false);
   const [openAddModal, setOpenAddModal] = useState<boolean>(false);
   const [isVatRegistrated, setIsVatRegistrated] = useState<boolean>(false);
-  // TODO Temporary removed waiting for prod-fd fix
-  // const [vatVerificationGenericError, setVatVerificationGenericError] = useState<boolean>(false);
+  const [vatVerificationGenericError, setVatVerificationGenericError] = useState<boolean>(false);
   const [previousGeotaxononomies, setPreviousGeotaxononomies] = useState<Array<GeographicTaxonomy>>(
     []
   );
@@ -321,10 +319,9 @@ export default function StepOnboardingFormData({
             ? t('onboardingFormData.billingDataSection.invalidVatNumber')
             : isVatRegistrated
             ? t('onboardingFormData.billingDataSection.vatNumberAlreadyRegistered')
-            : // TODO Temporary commented wait for fix error by prod-fd
-              // : vatVerificationGenericError
-              // ? t('onboardingFormData.billingDataSection.vatNumberVerificationError')
-              undefined,
+            : vatVerificationGenericError
+            ? t('onboardingFormData.billingDataSection.vatNumberVerificationError')
+            : undefined,
         city: !values.city ? requiredError : undefined,
         county: !values.county ? requiredError : undefined,
         ivassCode:
@@ -423,7 +420,12 @@ export default function StepOnboardingFormData({
 
   useEffect(() => {
     void formik.validateForm();
-  }, [stepHistoryState.isTaxCodeEquals2PIVA, isVatRegistrated, formik.values]);
+  }, [
+    stepHistoryState.isTaxCodeEquals2PIVA,
+    isVatRegistrated,
+    vatVerificationGenericError,
+    formik.values,
+  ]);
 
   const verifyVatNumber = async () => {
     const onboardingStatus = await fetchWithLogs(
@@ -448,16 +450,12 @@ export default function StepOnboardingFormData({
 
     if (restOutcome === 'success') {
       setIsVatRegistrated(true);
-      // TODO Temporary commented waiting for fix prod-fd
-      // setVatVerificationGenericError(false);
-    } /*
-      else if ((onboardingStatus as AxiosError).response?.status === 404) {
+      setVatVerificationGenericError(false);
+    } else if ((onboardingStatus as AxiosError).response?.status === 404) {
       setIsVatRegistrated(false);
       setVatVerificationGenericError(false);
     } else {
       setVatVerificationGenericError(true);
-    } */ else {
-      setIsVatRegistrated(false);
     }
   };
 
@@ -532,7 +530,7 @@ export default function StepOnboardingFormData({
       <Grid container item xs={8} display="flex" justifyContent="center">
         <Grid item xs={12}>
           <Typography variant="h3" component="h2" align="center" sx={{ lineHeight: '1.2' }}>
-            {institutionType === 'PSP' && productId === 'prod-pagopa'
+            {institutionType === 'PSP' || productId === 'prod-pagopa'
               ? t('onboardingFormData.pspAndProdPagoPATitle')
               : institutionType === 'PT'
               ? t('onboardingFormData.billingDataPt.title')
