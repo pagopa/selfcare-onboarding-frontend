@@ -4,6 +4,8 @@
 import { Grid, TextField, Typography } from '@mui/material';
 import { Box, styled } from '@mui/system';
 import { AxiosError, AxiosResponse } from 'axios';
+import { theme } from '@pagopa/mui-italia';
+import { emailRegexp } from '@pagopa/selfcare-common-frontend/utils/constants';
 import { useFormik } from 'formik';
 import { useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
