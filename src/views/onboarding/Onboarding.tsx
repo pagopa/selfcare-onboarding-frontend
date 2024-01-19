@@ -44,9 +44,10 @@ import StepOnboardingFormData from '../../components/steps/StepOnboardingFormDat
 import { registerUnloadEvent, unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
 import StepInstitutionType from '../../components/steps/StepInstitutionType';
 import UserNotAllowedPage from '../UserNotAllowedPage';
+import { AdditionalData, AdditionalInformations } from '../../model/AdditionalInformations';
 import { genericError, OnboardingStep1_5 } from './components/OnboardingStep1_5';
 import { OnBoardingProductStepDelegates } from './components/OnBoardingProductStepDelegates';
-import { StepAdditionalInfos } from './components/StepAdditionalInfos';
+import { StepAdditionalInformations } from './components/StepAdditionalInformations';
 
 export type ValidateErrorType = 'conflictError';
 
@@ -83,6 +84,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
   const [openExitModal, setOpenExitModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>();
   const [onboardingFormData, setOnboardingFormData] = useState<OnboardingFormData>();
+  const [additionalInformations, setAdditionalInformations] = useState<AdditionalInformations>();
   const [institutionType, setInstitutionType] = useState<InstitutionType>();
   const [origin, setOrigin] = useState<string>();
   const [pricingPlan, setPricingPlan] = useState<string>();
@@ -356,6 +358,26 @@ function OnboardingComponent({ productId }: { productId: string }) {
     }
   };
 
+  const forwardWithAdditionalGSPInfo = (newAdditionalInformations: {
+    [key: string]: AdditionalData;
+  }) => {
+    setAdditionalInformations({
+      agentOfPublicService: newAdditionalInformations.isConcessionaireOfPublicService?.choice,
+      agentOfPublicServiceNote:
+        newAdditionalInformations.isConcessionaireOfPublicService?.textFieldValue,
+      belongRegulatedMarket: newAdditionalInformations.fromBelongsRegulatedMarket?.choice,
+      regulatedMarketNote: newAdditionalInformations.fromBelongsRegulatedMarket?.textFieldValue,
+      establishedByRegulatoryProvision:
+        newAdditionalInformations.isEstabilishedRegulatoryProvision?.choice,
+      establishedByRegulatoryProvisionNote:
+        newAdditionalInformations.isEstabilishedRegulatoryProvision?.textFieldValue,
+      ipa: newAdditionalInformations.isFromIPA?.choice,
+      ipaCode: newAdditionalInformations.isFromIPA?.textFieldValue,
+      otherNote: newAdditionalInformations.optionalPartyInformations?.textFieldValue ?? '',
+    });
+    forward();
+  };
+
   const outcomeContent: RequestOutcomeOptions = {
     success: {
       title: '',
@@ -450,6 +472,22 @@ function OnboardingComponent({ productId }: { productId: string }) {
         method: 'POST',
         data: {
           billingData: billingData2billingDataRequest(onboardingFormData as OnboardingFormData),
+          additionalInformations:
+            institutionType === 'GSP' && selectedProduct?.id === 'prod-pagopa'
+              ? {
+                  agentOfPublicService: additionalInformations?.agentOfPublicService,
+                  agentOfPublicServiceNote: additionalInformations?.agentOfPublicServiceNote,
+                  belongRegulatedMarket: additionalInformations?.belongRegulatedMarket,
+                  regulatedMarketNote: additionalInformations?.regulatedMarketNote,
+                  establishedByRegulatoryProvision:
+                    additionalInformations?.establishedByRegulatoryProvision,
+                  establishedByRegulatoryProvisionNote:
+                    additionalInformations?.establishedByRegulatoryProvisionNote,
+                  ipa: additionalInformations?.ipa,
+                  ipaCode: additionalInformations?.ipaCode,
+                  otherNote: additionalInformations?.otherNote,
+                }
+              : undefined,
           pspData:
             institutionType === 'PSP'
               ? pspData2pspDataRequest(onboardingFormData as OnboardingFormData)
@@ -691,7 +729,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
     },
     {
       label: 'Additional Info',
-      Component: () => StepAdditionalInfos({ forward, back }),
+      Component: () => StepAdditionalInformations({ forward: forwardWithAdditionalGSPInfo, back }),
     },
     {
       label: 'Inserisci i dati del rappresentante legale',
