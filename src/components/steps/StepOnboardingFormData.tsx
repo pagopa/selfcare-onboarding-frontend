@@ -532,7 +532,7 @@ export default function StepOnboardingFormData({
       <Grid container item xs={8} display="flex" justifyContent="center">
         <Grid item xs={12}>
           <Typography variant="h3" component="h2" align="center" sx={{ lineHeight: '1.2' }}>
-            {institutionType === 'PSP' && productId === 'prod-pagopa'
+            {institutionType === 'PSP' || productId === 'prod-pagopa'
               ? t('onboardingFormData.pspAndProdPagoPATitle')
               : institutionType === 'PT'
               ? t('onboardingFormData.billingDataPt.title')
