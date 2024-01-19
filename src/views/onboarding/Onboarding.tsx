@@ -44,8 +44,10 @@ import StepOnboardingFormData from '../../components/steps/StepOnboardingFormDat
 import { registerUnloadEvent, unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
 import StepInstitutionType from '../../components/steps/StepInstitutionType';
 import UserNotAllowedPage from '../UserNotAllowedPage';
+import { AdditionalData, AdditionalInformations } from '../../model/AdditionalInformations';
 import { genericError, OnboardingStep1_5 } from './components/OnboardingStep1_5';
 import { OnBoardingProductStepDelegates } from './components/OnBoardingProductStepDelegates';
+import { StepAdditionalInformations } from './components/StepAdditionalInformations';
 
 export type ValidateErrorType = 'conflictError';
 
@@ -82,6 +84,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
   const [openExitModal, setOpenExitModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>();
   const [onboardingFormData, setOnboardingFormData] = useState<OnboardingFormData>();
+  const [additionalInformations, setAdditionalInformations] = useState<AdditionalInformations>();
   const [institutionType, setInstitutionType] = useState<InstitutionType>();
   const [origin, setOrigin] = useState<string>();
   const [pricingPlan, setPricingPlan] = useState<string>();
@@ -336,9 +339,11 @@ function OnboardingComponent({ productId }: { productId: string }) {
           ) {
             setOutcome(null);
             if (isTechPartner) {
-              setActiveStep(activeStep + 2);
-            } else {
+              setActiveStep(activeStep + 3);
+            } else if (productId === 'prod-pagopa' && institutionType === 'GSP') {
               forward();
+            } else {
+              setActiveStep(activeStep + 2);
             }
           } else if ((onboardingStatus as AxiosError<any>).response?.status === 403) {
             setOutcome(notAllowedError);
@@ -349,8 +354,28 @@ function OnboardingComponent({ productId }: { productId: string }) {
       };
       void partyVerifyOnboarded();
     } else {
-      forward();
+      setActiveStep(activeStep + 2);
     }
+  };
+
+  const forwardWithAdditionalGSPInfo = (newAdditionalInformations: {
+    [key: string]: AdditionalData;
+  }) => {
+    setAdditionalInformations({
+      agentOfPublicService: newAdditionalInformations.isConcessionaireOfPublicService?.choice,
+      agentOfPublicServiceNote:
+        newAdditionalInformations.isConcessionaireOfPublicService?.textFieldValue,
+      belongRegulatedMarket: newAdditionalInformations.fromBelongsRegulatedMarket?.choice,
+      regulatedMarketNote: newAdditionalInformations.fromBelongsRegulatedMarket?.textFieldValue,
+      establishedByRegulatoryProvision:
+        newAdditionalInformations.isEstabilishedRegulatoryProvision?.choice,
+      establishedByRegulatoryProvisionNote:
+        newAdditionalInformations.isEstabilishedRegulatoryProvision?.textFieldValue,
+      ipa: newAdditionalInformations.isFromIPA?.choice,
+      ipaCode: newAdditionalInformations.isFromIPA?.textFieldValue,
+      otherNote: newAdditionalInformations.optionalPartyInformations?.textFieldValue ?? '',
+    });
+    forward();
   };
 
   const outcomeContent: RequestOutcomeOptions = {
@@ -447,6 +472,22 @@ function OnboardingComponent({ productId }: { productId: string }) {
         method: 'POST',
         data: {
           billingData: billingData2billingDataRequest(onboardingFormData as OnboardingFormData),
+          additionalInformations:
+            institutionType === 'GSP' && selectedProduct?.id === 'prod-pagopa'
+              ? {
+                  agentOfPublicService: additionalInformations?.agentOfPublicService,
+                  agentOfPublicServiceNote: additionalInformations?.agentOfPublicServiceNote,
+                  belongRegulatedMarket: additionalInformations?.belongRegulatedMarket,
+                  regulatedMarketNote: additionalInformations?.regulatedMarketNote,
+                  establishedByRegulatoryProvision:
+                    additionalInformations?.establishedByRegulatoryProvision,
+                  establishedByRegulatoryProvisionNote:
+                    additionalInformations?.establishedByRegulatoryProvisionNote,
+                  ipa: additionalInformations?.ipa,
+                  ipaCode: additionalInformations?.ipaCode,
+                  otherNote: additionalInformations?.otherNote,
+                }
+              : undefined,
           pspData:
             institutionType === 'PSP'
               ? pspData2pspDataRequest(onboardingFormData as OnboardingFormData)
@@ -599,6 +640,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
             <Trans
               i18nKey="onboardingStep1.onboarding.bodyDescription"
               values={{ productTitle: selectedProduct?.title }}
+              components={{ 1: <br />, 3: <br /> }}
             >
               {`Inserisci uno dei dati richiesti e cerca dall’Indice della Pubblica <1/> Amministrazione (IPA) l’ente per cui vuoi richiedere l’adesione a <3/>{{productTitle}}`}
             </Trans>
@@ -686,6 +728,10 @@ function OnboardingComponent({ productId }: { productId: string }) {
         }),
     },
     {
+      label: 'Additional Info',
+      Component: () => StepAdditionalInformations({ forward: forwardWithAdditionalGSPInfo, back }),
+    },
+    {
       label: 'Inserisci i dati del rappresentante legale',
       Component: () =>
         StepAddManager({
@@ -699,7 +745,13 @@ function OnboardingComponent({ productId }: { productId: string }) {
             });
             forwardWithData(newFormData);
           },
-          back,
+          back: () => {
+            if (productId === 'prod-pagopa' && institutionType === 'GSP') {
+              back();
+            } else {
+              setActiveStep(activeStep - 2);
+            }
+          },
         }),
     },
     {

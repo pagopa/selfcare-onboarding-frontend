@@ -7,8 +7,6 @@ import { AxiosError, AxiosResponse } from 'axios';
 import { useFormik } from 'formik';
 import { useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { emailRegexp } from '@pagopa/selfcare-common-frontend/utils/constants';
-import { theme } from '@pagopa/mui-italia';
 import {
   InstitutionType,
   Party,
@@ -114,7 +112,6 @@ export default function StepOnboardingFormData({
   const isPSP = institutionType === 'PSP';
   const isContractingAuthority = institutionType === 'SA';
   const isInsuranceCompany = institutionType === 'AS';
-  const isTechPartner = institutionType === 'PT';
   const isInformationCompany =
     institutionType !== 'PA' &&
     institutionType !== 'PSP' &&
@@ -125,6 +122,8 @@ export default function StepOnboardingFormData({
   const isProdInterop = productId === 'prod-interop';
   const aooCode = aooSelected?.codiceUniAoo;
   const uoCode = uoSelected?.codiceUniUo;
+  const isRecipientCodeVisible =
+    !isContractingAuthority && institutionType !== 'PT' && !isInsuranceCompany && !isProdInterop;
 
   const filterByCategory =
     productId === 'prod-pn'
@@ -374,14 +373,7 @@ export default function StepOnboardingFormData({
             : isPSP && values.dpoPecAddress && !emailRegexp.test(values.dpoPecAddress)
             ? t('onboardingFormData.billingDataSection.invalidEmail')
             : undefined,
-        recipientCode:
-          !isContractingAuthority &&
-          !isTechPartner &&
-          !isInsuranceCompany &&
-          !values.recipientCode &&
-          !isProdInterop
-            ? requiredError
-            : undefined,
+        recipientCode: isRecipientCodeVisible && !values.recipientCode ? requiredError : undefined,
         geographicTaxonomies:
           ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY &&
           !institutionAvoidGeotax &&
@@ -536,7 +528,7 @@ export default function StepOnboardingFormData({
       <Grid container item xs={8} display="flex" justifyContent="center">
         <Grid item xs={12}>
           <Typography variant="h3" component="h2" align="center" sx={{ lineHeight: '1.2' }}>
-            {institutionType === 'PSP' && productId === 'prod-pagopa'
+            {institutionType === 'PSP' || productId === 'prod-pagopa'
               ? t('onboardingFormData.pspAndProdPagoPATitle')
               : institutionType === 'PT'
               ? t('onboardingFormData.billingDataPt.title')
@@ -565,7 +557,7 @@ export default function StepOnboardingFormData({
           selectedParty={selectedParty}
           retrievedIstat={retrievedIstat}
           isCityEditable={isCityEditable}
-          isProdInterop={isProdInterop}
+          isRecipientCodeVisible={isRecipientCodeVisible}
         />
         {/* DATI RELATIVI ALLA TASSONOMIA */}
         {ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY && !institutionAvoidGeotax ? (

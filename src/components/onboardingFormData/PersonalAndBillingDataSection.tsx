@@ -50,7 +50,7 @@ type Props = StepperStepComponentProps & {
   selectedParty?: Party;
   retrievedIstat?: string;
   isCityEditable?: boolean;
-  isProdInterop: boolean;
+  isRecipientCodeVisible: boolean;
 };
 
 // eslint-disable-next-line sonarjs/cognitive-complexity, complexity
@@ -69,7 +69,7 @@ export default function PersonalAndBillingDataSection({
   selectedParty,
   retrievedIstat,
   isCityEditable,
-  isProdInterop,
+  isRecipientCodeVisible,
 }: Props) {
   const { t } = useTranslation();
   const { setRequiredLogin } = useContext(UserContext);
@@ -121,10 +121,11 @@ export default function PersonalAndBillingDataSection({
   const isPA = institutionType === 'PA';
   const isContractingAuthority = institutionType === 'SA';
   const isInsuranceCompany = institutionType === 'AS';
-  const isTechPartner = institutionType === 'PT';
   const isDisabled = premiumFlow || (isFromIPA && !isPA && !isPSP) || isPA;
+  /*
   const recipientCodeVisible =
     !isContractingAuthority && !isTechPartner && !isInsuranceCompany && !isProdInterop;
+    */
   const requiredError = 'Required';
   const isAooUo = !!(aooSelected || uoSelected);
 
@@ -532,7 +533,7 @@ export default function PersonalAndBillingDataSection({
                   </Typography>
                 </Box>
               )}
-              {recipientCodeVisible && (
+              {isRecipientCodeVisible && (
                 <Grid item xs={12} mt={3}>
                   <CustomTextField
                     {...baseTextFieldProps(

@@ -2,39 +2,38 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import { Box, useTheme } from '@mui/material';
-import { Trans, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
+
 type Props = {
   discount: boolean;
   caption: string;
   discountBoxLabel: string;
   title: React.ReactNode;
-  firstNumberBeforeComma: string;
-  firstNumberAfterComma: string;
-  secondNumberBeforeComma: string;
-  secondNumberAfterComma: string;
-  carnetPlan: boolean;
+  isCarnetPlans: boolean;
+  minCarnetMessagePrice: string;
+  maxCarnetMessagePrice: string;
+  minConsumptionMessagePrice: string;
+  maxConsumptionMessagePrice: string;
 };
+
 export default function HeaderPlanCard({
   discount,
   caption,
   discountBoxLabel,
   title,
-  firstNumberBeforeComma,
-  firstNumberAfterComma,
-  secondNumberBeforeComma,
-  secondNumberAfterComma,
-  carnetPlan,
+  minCarnetMessagePrice,
+  maxCarnetMessagePrice,
+  minConsumptionMessagePrice,
+  maxConsumptionMessagePrice,
+  isCarnetPlans,
 }: Props) {
-  const theme = useTheme();
-  const fontBigBlue = { color: '#0073E6', fontSize: '50px', fontWeight: '700' };
-  const fontMediumBlueRegular = { color: '#0073E6', fontSize: '32px', marginRight: '8px' };
-  const cardWidth = '530px';
   const { t } = useTranslation();
+  const theme = useTheme();
 
   return (
     <Card
       sx={{
-        width: cardWidth,
+        width: '530px',
         height: '241px',
         borderRadius: '16px 16px 0 0',
       }}
@@ -79,37 +78,41 @@ export default function HeaderPlanCard({
             alignItems="center"
             fontFamily="Titillium Web !important"
           >
-            <Trans
-              i18nKey={
-                carnetPlan
-                  ? `onBoardingSubProduct.subProductStepSelectPricingPlan.carnetPlan.${
-                      discount ? 'infoLabelDiscounted' : 'infoLabel'
-                    }`
-                  : `onBoardingSubProduct.subProductStepSelectPricingPlan.consumptionPlan.${
-                      discount ? 'infoLabelDiscounted' : 'infoLabel'
-                    }`
-              }
-            >
-              <span style={{ color: '#5C6F82', fontSize: '16px', marginRight: '8px' }}>
-                {t('onBoardingSubProduct.subProductStepSelectPricingPlan.headerPlanCard.from')}
-              </span>
+            <span style={{ color: '#5C6F82', fontSize: '16px', marginRight: '8px' }}>
+              {t('onBoardingSubProduct.subProductStepSelectPricingPlan.headerPlanCard.from')}
+            </span>
 
-              <span style={fontBigBlue}>{firstNumberBeforeComma}</span>
+            <span style={{ color: '#0073E6', fontSize: '50px', fontWeight: '700' }}>
+              {isCarnetPlans
+                ? minCarnetMessagePrice?.slice(0, 1).concat(',')
+                : minConsumptionMessagePrice?.slice(0, 1).concat(',')}
+            </span>
 
-              <span style={fontMediumBlueRegular}>{firstNumberAfterComma}</span>
+            <span style={{ color: '#0073E6', fontSize: '32px', marginRight: '8px' }}>
+              {isCarnetPlans
+                ? minCarnetMessagePrice?.slice(-2).concat('€')
+                : minConsumptionMessagePrice?.slice(-2).concat('€')}
+            </span>
 
-              <span style={{ color: '#5C6F82', fontSize: '16px', marginRight: '8px' }}>
-                {t('onBoardingSubProduct.subProductStepSelectPricingPlan.headerPlanCard.to')}
-              </span>
+            <span style={{ color: '#5C6F82', fontSize: '16px', marginRight: '8px' }}>
+              {t('onBoardingSubProduct.subProductStepSelectPricingPlan.headerPlanCard.to')}
+            </span>
 
-              <span style={fontBigBlue}>{secondNumberBeforeComma}</span>
+            <span style={{ color: '#0073E6', fontSize: '50px', fontWeight: '700' }}>
+              {isCarnetPlans
+                ? maxCarnetMessagePrice?.slice(0, 1).concat(',')
+                : maxConsumptionMessagePrice?.slice(0, 1).concat(',')}
+            </span>
 
-              <span style={fontMediumBlueRegular}>{secondNumberAfterComma}</span>
+            <span style={{ color: '#0073E6', fontSize: '32px', marginRight: '8px' }}>
+              {isCarnetPlans
+                ? maxCarnetMessagePrice?.slice(-2)
+                : maxConsumptionMessagePrice?.slice(-2)}
+            </span>
 
-              <span style={{ color: '#5C6F82', fontSize: '16px', marginRight: '8px' }}>
-                {t('onBoardingSubProduct.subProductStepSelectPricingPlan.headerPlanCard.mess')}
-              </span>
-            </Trans>
+            <span style={{ color: '#5C6F82', fontSize: '16px', marginRight: '8px' }}>
+              {t('onBoardingSubProduct.subProductStepSelectPricingPlan.headerPlanCard.mess')}
+            </span>
           </Typography>
         </Box>
       </CardContent>

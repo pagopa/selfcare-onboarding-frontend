@@ -5,13 +5,14 @@ import { Box } from '@mui/system';
 import SessionModal from '@pagopa/selfcare-common-frontend/components/SessionModal';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
 import { AxiosResponse } from 'axios';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { Product, SelfcareParty, StepperStepComponentProps } from '../../../../../types';
 import { fetchWithLogs } from '../../../../lib/api-utils';
 import { UserContext } from '../../../../lib/context';
 import { getFetchOutcome } from '../../../../lib/error-utils';
 import { ENV } from '../../../../utils/env';
+import { PlansPrices } from '../../../../model/PlansPrices';
 import HeaderPlanCard from './components/HeaderPlanCard';
 import FooterCarnet from './components/carnetPlanComponent/FooterCarnet';
 import FooterConsumptionCard from './components/consumptionPlanComponent/FooterConsumptionCard';
@@ -20,12 +21,13 @@ type Props = StepperStepComponentProps & {
   product?: Product;
 };
 export default function SubProductStepSelectPricingPlan({ forward, product }: Props) {
-  const discount = false;
   const { t } = useTranslation();
   const theme = useTheme();
   const { setRequiredLogin } = useContext(UserContext);
 
   const [openExitModal, setOpenExitModal] = useState<boolean>(false);
+  const [plansPrices, setPlansPrices] = useState<PlansPrices>();
+
   const onReject = () => {
     setOpenExitModal(true);
   };
@@ -51,6 +53,64 @@ export default function SubProductStepSelectPricingPlan({ forward, product }: Pr
     }
     setOpenExitModal(false);
   };
+
+  const retrievePlanPrices = async () => {
+    try {
+      const response = await fetch(ENV.JSON_URL.PLAN_PRICES);
+      const res = await response.json();
+      setPlansPrices(res);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    void retrievePlanPrices();
+  }, []);
+
+  const discount = false;
+
+  const minCarnetMessagePrice = plansPrices?.carnetPlans
+    ? plansPrices.carnetPlans
+        .reduce((minPrice, cp) => {
+          const currentPrice = Number(cp.messagePrice.replace(',', '.'));
+          return currentPrice < minPrice ? currentPrice : minPrice;
+        }, Infinity)
+        .toString()
+        .replace('.', ',')
+    : '';
+
+  const maxCarnetMessagePrice = plansPrices?.carnetPlans
+    ? plansPrices.carnetPlans
+        .reduce((maxPrice, cp) => {
+          const currentPrice = Number(cp.messagePrice.replace(',', '.'));
+          return currentPrice > maxPrice ? currentPrice : maxPrice;
+        }, 0)
+        .toString()
+        .replace('.', ',')
+    : '';
+
+  const minConsumptionMessagePrice = plansPrices?.consumptionPlan.echelons
+    ? plansPrices.consumptionPlan.echelons
+        .reduce((minPrice, cp) => {
+          const currentPrice = Number(cp.price.replace(',', '.'));
+          return currentPrice < minPrice ? currentPrice : minPrice;
+        }, Infinity)
+        .toString()
+        .replace('.', ',')
+    : '';
+
+  const maxConsumptionMessagePrice = plansPrices?.consumptionPlan.echelons
+    ? plansPrices.consumptionPlan.echelons
+        .reduce((maxPrice, cp) => {
+          const currentPrice = Number(cp.price.replace(',', '.'));
+          return currentPrice > maxPrice ? currentPrice : maxPrice;
+        }, 0)
+        .toString()
+        .replace('.', ',')
+    : '';
+
+  const carnetCount = plansPrices?.carnetPlans.length;
 
   return (
     <>
@@ -135,7 +195,6 @@ export default function SubProductStepSelectPricingPlan({ forward, product }: Pr
           </Grid>
           <Grid container item justifyContent={'center'}>
             <Box mr={3} sx={{ borderRadius: '16px' }}>
-              {/* <HeaderCarnetCard discount={discount} /> */}
               <HeaderPlanCard
                 discount={discount}
                 caption={t(
@@ -144,12 +203,14 @@ export default function SubProductStepSelectPricingPlan({ forward, product }: Pr
                 discountBoxLabel={t(
                   'onBoardingSubProduct.subProductStepSelectPricingPlan.carnetPlan.discountBoxLabel'
                 )}
-                title={t('onBoardingSubProduct.subProductStepSelectPricingPlan.carnetPlan.title')}
-                firstNumberBeforeComma={'0,'}
-                firstNumberAfterComma={discount ? '15€' : '20€'}
-                secondNumberBeforeComma={'0,'}
-                secondNumberAfterComma={discount ? '165€' : '22€'}
-                carnetPlan={true}
+                title={t('onBoardingSubProduct.subProductStepSelectPricingPlan.carnetPlan.title', {
+                  carnetCount,
+                })}
+                minCarnetMessagePrice={minCarnetMessagePrice}
+                maxCarnetMessagePrice={maxCarnetMessagePrice}
+                minConsumptionMessagePrice={minConsumptionMessagePrice}
+                maxConsumptionMessagePrice={maxConsumptionMessagePrice}
+                isCarnetPlans={true}
               />
             </Box>
             <Box mr={3} sx={{ borderRadius: '16px' }}>
@@ -170,11 +231,11 @@ export default function SubProductStepSelectPricingPlan({ forward, product }: Pr
                     Scegli di pagare solo i messaggi <br /> effettivi che invii
                   </Trans>
                 }
-                firstNumberBeforeComma={'0,'}
-                firstNumberAfterComma={discount ? '15€' : '20€'}
-                secondNumberBeforeComma={'0,'}
-                secondNumberAfterComma={discount ? '187€' : '25€'}
-                carnetPlan={false}
+                minCarnetMessagePrice={minCarnetMessagePrice}
+                maxCarnetMessagePrice={maxCarnetMessagePrice}
+                minConsumptionMessagePrice={minConsumptionMessagePrice}
+                maxConsumptionMessagePrice={maxConsumptionMessagePrice}
+                isCarnetPlans={false}
               />
             </Box>
           </Grid>
@@ -183,10 +244,19 @@ export default function SubProductStepSelectPricingPlan({ forward, product }: Pr
       <Box>
         <Grid container item justifyContent={'center'}>
           <Box mr={3} sx={{ borderRadius: '16px' }}>
-            <FooterCarnet forward={forward} discount={discount} />
+            <FooterCarnet
+              carnetPlans={plansPrices?.carnetPlans}
+              forward={forward}
+              discount={discount}
+            />
           </Box>
           <Box mr={3} sx={{ borderRadius: '16px' }}>
-            <FooterConsumptionCard forward={forward} discount={discount} />
+            <FooterConsumptionCard
+              pricingPlan={plansPrices?.consumptionPlan.pricingPlan}
+              consumptionPlan={plansPrices?.consumptionPlan.echelons}
+              forward={forward}
+              discount={discount}
+            />
           </Box>
         </Grid>
         {/* forward action */}
