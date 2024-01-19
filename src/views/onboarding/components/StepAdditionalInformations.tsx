@@ -38,10 +38,9 @@ export function StepAdditionalInformations({ forward, back }: StepperStepCompone
   const [disabled, setDisabled] = useState<boolean>(false);
 
   useEffect(() => {
-    const isContinueButtonEnabled =
-      Object.entries(radioValues).every(([key, value]) =>
-        key === 'optionalPartyInformations' ? true : value !== undefined
-      ) || isChecked;
+    const isContinueButtonEnabled = Object.entries(radioValues).every(([key, value]) =>
+      key === 'optionalPartyInformations' ? true : value !== undefined
+    );
 
     const allFalseAndUnchecked = Object.values(radioValues).every((value) => !value) && !isChecked;
 
@@ -79,8 +78,13 @@ export function StepAdditionalInformations({ forward, back }: StepperStepCompone
   };
 
   const validateTextField = () => {
-    const newErrors = Object.entries(radioValues).reduce((acc, [field]) => {
-      if (additionalData[field]?.openTextField && additionalData[field]?.textFieldValue === '') {
+    const newErrors = Object.keys(radioValues).reduce((acc, field) => {
+      if (
+        (additionalData[field]?.openTextField && additionalData[field]?.textFieldValue === '') ||
+        (isChecked &&
+          field === 'optionalPartyInformations' &&
+          !additionalData[field]?.textFieldValue)
+      ) {
         return {
           ...acc,
           [field]: t(`additionalDataPage.formQuestions.textFields.errors.${field}`),
@@ -88,19 +92,6 @@ export function StepAdditionalInformations({ forward, back }: StepperStepCompone
       }
       return acc;
     }, {});
-
-    if (
-      isChecked &&
-      (!additionalData.optionalPartyInformations ||
-        additionalData.optionalPartyInformations?.textFieldValue === '')
-    ) {
-      setErrors((prevErrors) => ({
-        ...prevErrors,
-        optionalPartyInformations: t(
-          'additionalDataPage.formQuestions.textFields.errors.optionalPartyInformations'
-        ),
-      }));
-    }
 
     if (Object.keys(newErrors).length) {
       setErrors((prevErrors) => ({
