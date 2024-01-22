@@ -144,7 +144,7 @@ export default {
       belongsRegulatedMarket:
         'L’ente appartiene ad un mercato regolamentato (es. energia, gas, acqua, <1 />trasporti, servizi postali ecc…)',
       registratedOnIPA: 'L’ente è censito su IPA',
-      concessionaireOfPublicService: 'L’ente è una società concessionaria di un pubblico servizio',
+      concessionaireOfPublicService: 'L’ente è una concessionaria di un pubblico servizio',
       other: 'Altro',
       optionalPartyInformations: 'Scrivi qui le informazioni sul tuo ente',
     },
