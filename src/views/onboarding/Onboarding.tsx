@@ -475,7 +475,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
           additionalInformations:
             institutionType === 'GSP' && selectedProduct?.id === 'prod-pagopa'
               ? {
-                  agentOfPublicService: additionalInformations?.agentOfPublicService,
+                  isAgentOfPublicService: additionalInformations?.agentOfPublicService,
                   agentOfPublicServiceNote: additionalInformations?.agentOfPublicServiceNote,
                   belongRegulatedMarket: additionalInformations?.belongRegulatedMarket,
                   regulatedMarketNote: additionalInformations?.regulatedMarketNote,
@@ -483,7 +483,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
                     additionalInformations?.establishedByRegulatoryProvision,
                   establishedByRegulatoryProvisionNote:
                     additionalInformations?.establishedByRegulatoryProvisionNote,
-                  ipa: additionalInformations?.ipa,
+                  isIpa: additionalInformations?.ipa,
                   ipaCode: additionalInformations?.ipaCode,
                   otherNote: additionalInformations?.otherNote,
                 }
