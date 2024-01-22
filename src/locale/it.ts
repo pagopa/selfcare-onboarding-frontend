@@ -454,7 +454,7 @@ export default {
       invalidMailSupport: 'L’indirizzo email non è valido',
       invalidShareCapitalField: 'Il campo capitale sociale non è valido',
       vatNumberAlreadyRegistered: 'La P. IVA che hai inserito è già stata registrata.',
-      vatNumberVerificationError: 'Si è verificato un errore durante la verifica della P. IVA.',
+      vatNumberVerificationError: 'Non è stato possibile verificare la P.IVA',
       centralPartyLabel: 'Ente centrale',
       businessName: 'Ragione sociale',
       aooName: 'Denominazione AOO',
