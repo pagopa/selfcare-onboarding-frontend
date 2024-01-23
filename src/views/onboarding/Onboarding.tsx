@@ -781,7 +781,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
           },
           back: () => {
             if (isTechPartner) {
-              setActiveStep(activeStep - 2);
+              setActiveStep(activeStep - 3);
             } else {
               setActiveStep(activeStep - 1);
             }
