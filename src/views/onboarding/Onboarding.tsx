@@ -475,7 +475,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
           additionalInformations:
             institutionType === 'GSP' && selectedProduct?.id === 'prod-pagopa'
               ? {
-                  isAgentOfPublicService: additionalInformations?.agentOfPublicService,
+                  agentOfPublicService: additionalInformations?.agentOfPublicService,
                   agentOfPublicServiceNote: additionalInformations?.agentOfPublicServiceNote,
                   belongRegulatedMarket: additionalInformations?.belongRegulatedMarket,
                   regulatedMarketNote: additionalInformations?.regulatedMarketNote,
@@ -483,7 +483,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
                     additionalInformations?.establishedByRegulatoryProvision,
                   establishedByRegulatoryProvisionNote:
                     additionalInformations?.establishedByRegulatoryProvisionNote,
-                  isIpa: additionalInformations?.ipa,
+                  ipa: additionalInformations?.ipa,
                   ipaCode: additionalInformations?.ipaCode,
                   otherNote: additionalInformations?.otherNote,
                 }
@@ -781,7 +781,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
           },
           back: () => {
             if (isTechPartner) {
-              setActiveStep(activeStep - 2);
+              setActiveStep(activeStep - 3);
             } else {
               setActiveStep(activeStep - 1);
             }
