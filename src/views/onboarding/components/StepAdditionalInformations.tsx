@@ -79,16 +79,27 @@ export function StepAdditionalInformations({ forward, back }: StepperStepCompone
 
   const validateTextField = () => {
     const newErrors = Object.keys(radioValues).reduce((acc, field) => {
-      if (
-        (additionalData[field]?.openTextField && additionalData[field]?.textFieldValue === '') ||
-        (isChecked &&
-          field === 'optionalPartyInformations' &&
-          !additionalData[field]?.textFieldValue)
-      ) {
-        return {
-          ...acc,
-          [field]: t(`additionalDataPage.formQuestions.textFields.errors.${field}`),
-        };
+      switch (field) {
+        case 'optionalPartyInformations':
+          if (isChecked && !additionalData.optionalPartyInformations?.textFieldValue) {
+            return {
+              ...acc,
+              [field]: t(
+                `additionalDataPage.formQuestions.textFields.errors.optionalPartyInformations`
+              ),
+            };
+          }
+          break;
+        default:
+          if (
+            additionalData[field]?.openTextField &&
+            additionalData[field]?.textFieldValue === ''
+          ) {
+            return {
+              ...acc,
+              [field]: t(`additionalDataPage.formQuestions.textFields.errors.${field}`),
+            };
+          }
       }
       return acc;
     }, {});
@@ -177,6 +188,15 @@ export function StepAdditionalInformations({ forward, back }: StepperStepCompone
             onClick={() => {
               handleRadioChange('optionalPartyInformations', !isChecked);
               setIsChecked(!isChecked);
+              if (isChecked) {
+                setAdditionalData({
+                  ['optionalPartyInformations']: {
+                    openTextField: true,
+                    textFieldValue: '',
+                    choice: isChecked,
+                  },
+                });
+              }
             }}
             label={t('additionalDataPage.formQuestions.other')}
             sx={{
@@ -198,6 +218,7 @@ export function StepAdditionalInformations({ forward, back }: StepperStepCompone
             }}
             error={!!errors.optionalPartyInformations}
             helperText={errors.optionalPartyInformations || ''}
+            value={isChecked ? additionalData.optionalPartyInformations?.textFieldValue : ''}
           />
         </Grid>
       </Paper>
