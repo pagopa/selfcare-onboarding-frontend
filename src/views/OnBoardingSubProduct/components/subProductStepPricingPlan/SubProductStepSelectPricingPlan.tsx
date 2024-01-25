@@ -19,14 +19,29 @@ import FooterConsumptionCard from './components/consumptionPlanComponent/FooterC
 
 type Props = StepperStepComponentProps & {
   product?: Product;
+  setAvailablePricingPlanIds: React.Dispatch<React.SetStateAction<Array<string> | undefined>>;
 };
-export default function SubProductStepSelectPricingPlan({ forward, product }: Props) {
+
+export default function SubProductStepSelectPricingPlan({
+  forward,
+  product,
+  setAvailablePricingPlanIds,
+}: Props) {
   const { t } = useTranslation();
   const theme = useTheme();
   const { setRequiredLogin } = useContext(UserContext);
 
   const [openExitModal, setOpenExitModal] = useState<boolean>(false);
   const [plansPrices, setPlansPrices] = useState<PlansPrices>();
+
+  useEffect(() => {
+    if (plansPrices) {
+      const pricingPlanIds = plansPrices?.carnetPlans
+        .map((p) => p.pricingPlan)
+        .concat(plansPrices.consumptionPlan.pricingPlan);
+      setAvailablePricingPlanIds(pricingPlanIds);
+    }
+  }, [plansPrices]);
 
   const onReject = () => {
     setOpenExitModal(true);
