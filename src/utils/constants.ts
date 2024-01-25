@@ -66,13 +66,13 @@ export const API = {
   ONBOARDING_POST_LEGALS: {
     URL:
       ENV.ENV === 'DEV'
-        ? ENV.URL_API.ONBOARDING_V2 + '/institutions/onboarding'
+        ? ENV.URL_API.ONBOARDING_V2 + '/v2/institutions/onboarding'
         : ENV.URL_API.ONBOARDING + '/institutions/onboarding',
   },
   ONBOARDING_COMPLETE_REGISTRATION: {
     URL:
       ENV.ENV === 'DEV'
-        ? ENV.URL_API.ONBOARDING_V2 + '/tokens/{{token}}/complete'
+        ? ENV.URL_API.ONBOARDING_V2 + '/v2/tokens/{{token}}/complete'
         : ENV.URL_API.ONBOARDING + '/tokens/{{token}}/complete',
   },
 
@@ -89,7 +89,10 @@ export const API = {
     URL: ENV.URL_API.ONBOARDING + '/users/validate',
   },
   ONBOARDING_TOKEN_VALIDATION: {
-    URL: ENV.URL_API.ONBOARDING_V2 + '/v2/tokens/{{token}}/verify',
+    URL:
+      ENV.ENV === 'DEV'
+        ? ENV.URL_API.ONBOARDING_V2 + '/v2/tokens/{{token}}/verify'
+        : ENV.URL_API.ONBOARDING + '/tokens/{{token}}/verify',
   },
   ONBOARDING_GET_GEOTAXONOMY: {
     URL: ENV.URL_API.PARTY_REGISTRY_PROXY + '/geotaxonomies',
