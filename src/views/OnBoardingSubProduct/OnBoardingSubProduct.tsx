@@ -80,6 +80,7 @@ function OnBoardingSubProduct() {
   const [city, setCity] = useState('');
   const [county, setCounty] = useState('');
   const [isCityEditable, setIsCityEditable] = useState(false);
+  const [availablePricingPlanIds, setAvailablePricingPlanIds] = useState<Array<string>>();
 
   useEffect(() => {
     registerUnloadEvent(setOnExit, setOpenExitModal, setOnExitAction);
@@ -209,8 +210,8 @@ function OnBoardingSubProduct() {
     setPartyId(partyId);
     forward();
   };
-  const forwardWitSelectedPricingPlan = (pp: string) => {
-    setPricingPlan(pp);
+  const forwardWitSelectedPricingPlan = (selectedPricingPlan: string) => {
+    setPricingPlan(selectedPricingPlan);
     setActiveStep(parties.length === 0 ? 3 : 2);
     window.scrollTo(0, 0);
   };
@@ -236,6 +237,7 @@ function OnBoardingSubProduct() {
       label: 'Select Pricing Plan',
       Component: () =>
         SubProductStepSelectPricingPlan({
+          setAvailablePricingPlanIds,
           forward: forwardWitSelectedPricingPlan,
           product,
         }),
@@ -394,15 +396,7 @@ function OnBoardingSubProduct() {
     setOnExitAction(undefined);
   };
 
-  return pricingPlan &&
-    pricingPlan !== 'C0' &&
-    pricingPlan !== 'C1' &&
-    pricingPlan !== 'C2' &&
-    pricingPlan !== 'C3' &&
-    pricingPlan !== 'C4' &&
-    pricingPlan !== 'C5' &&
-    pricingPlan !== 'C6' &&
-    pricingPlan !== 'C7' ? (
+  return pricingPlan && !availablePricingPlanIds?.includes(pricingPlan) ? (
     <EndingPage
       minHeight="52vh"
       icon={<IllusError size={60} />}

@@ -3,12 +3,12 @@
 
 import { Grid, TextField, Typography } from '@mui/material';
 import { Box, styled } from '@mui/system';
-import { AxiosResponse } from 'axios';
+import { AxiosError, AxiosResponse } from 'axios';
+import { theme } from '@pagopa/mui-italia';
+import { emailRegexp } from '@pagopa/selfcare-common-frontend/utils/constants';
 import { useFormik } from 'formik';
 import { useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { emailRegexp } from '@pagopa/selfcare-common-frontend/utils/constants';
-import { theme } from '@pagopa/mui-italia';
 import {
   InstitutionType,
   Party,
@@ -93,6 +93,7 @@ export default function StepOnboardingFormData({
   const [openModifyModal, setOpenModifyModal] = useState<boolean>(false);
   const [openAddModal, setOpenAddModal] = useState<boolean>(false);
   const [isVatRegistrated, setIsVatRegistrated] = useState<boolean>(false);
+  const [vatVerificationGenericError, setVatVerificationGenericError] = useState<boolean>(false);
   const [previousGeotaxononomies, setPreviousGeotaxononomies] = useState<Array<GeographicTaxonomy>>(
     []
   );
@@ -113,7 +114,6 @@ export default function StepOnboardingFormData({
   const isPSP = institutionType === 'PSP';
   const isContractingAuthority = institutionType === 'SA';
   const isInsuranceCompany = institutionType === 'AS';
-  const isTechPartner = institutionType === 'PT';
   const isInformationCompany =
     institutionType !== 'PA' &&
     institutionType !== 'PSP' &&
@@ -121,8 +121,11 @@ export default function StepOnboardingFormData({
     (productId === 'prod-io' || productId === 'prod-io-sign');
   const isProdIoSign = productId === 'prod-io-sign';
   const isProdFideiussioni = productId?.startsWith('prod-fd') ?? false;
+  const isProdInterop = productId === 'prod-interop';
   const aooCode = aooSelected?.codiceUniAoo;
   const uoCode = uoSelected?.codiceUniUo;
+  const isRecipientCodeVisible =
+    !isContractingAuthority && institutionType !== 'PT' && !isInsuranceCompany && !isProdInterop;
 
   const filterByCategory =
     productId === 'prod-pn'
@@ -316,6 +319,8 @@ export default function StepOnboardingFormData({
             ? t('onboardingFormData.billingDataSection.invalidVatNumber')
             : isVatRegistrated
             ? t('onboardingFormData.billingDataSection.vatNumberAlreadyRegistered')
+            : vatVerificationGenericError
+            ? t('onboardingFormData.billingDataSection.vatNumberVerificationError')
             : undefined,
         city: !values.city ? requiredError : undefined,
         county: !values.county ? requiredError : undefined,
@@ -370,10 +375,7 @@ export default function StepOnboardingFormData({
             : isPSP && values.dpoPecAddress && !emailRegexp.test(values.dpoPecAddress)
             ? t('onboardingFormData.billingDataSection.invalidEmail')
             : undefined,
-        recipientCode:
-          !isContractingAuthority && !isTechPartner && !isInsuranceCompany && !values.recipientCode
-            ? requiredError
-            : undefined,
+        recipientCode: isRecipientCodeVisible && !values.recipientCode ? requiredError : undefined,
         geographicTaxonomies:
           ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY &&
           !institutionAvoidGeotax &&
@@ -418,7 +420,12 @@ export default function StepOnboardingFormData({
 
   useEffect(() => {
     void formik.validateForm();
-  }, [stepHistoryState.isTaxCodeEquals2PIVA, isVatRegistrated, formik.values]);
+  }, [
+    stepHistoryState.isTaxCodeEquals2PIVA,
+    isVatRegistrated,
+    vatVerificationGenericError,
+    formik.values,
+  ]);
 
   const verifyVatNumber = async () => {
     const onboardingStatus = await fetchWithLogs(
@@ -443,8 +450,12 @@ export default function StepOnboardingFormData({
 
     if (restOutcome === 'success') {
       setIsVatRegistrated(true);
-    } else {
+      setVatVerificationGenericError(false);
+    } else if ((onboardingStatus as AxiosError).response?.status === 404) {
       setIsVatRegistrated(false);
+      setVatVerificationGenericError(false);
+    } else {
+      setVatVerificationGenericError(true);
     }
   };
 
@@ -519,7 +530,7 @@ export default function StepOnboardingFormData({
       <Grid container item xs={8} display="flex" justifyContent="center">
         <Grid item xs={12}>
           <Typography variant="h3" component="h2" align="center" sx={{ lineHeight: '1.2' }}>
-            {institutionType === 'PSP' && productId === 'prod-pagopa'
+            {institutionType === 'PSP' || productId === 'prod-pagopa'
               ? t('onboardingFormData.pspAndProdPagoPATitle')
               : institutionType === 'PT'
               ? t('onboardingFormData.billingDataPt.title')
@@ -548,6 +559,7 @@ export default function StepOnboardingFormData({
           selectedParty={selectedParty}
           retrievedIstat={retrievedIstat}
           isCityEditable={isCityEditable}
+          isRecipientCodeVisible={isRecipientCodeVisible}
         />
         {/* DATI RELATIVI ALLA TASSONOMIA */}
         {ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY && !institutionAvoidGeotax ? (

@@ -36,10 +36,13 @@ variables:
     react_app_url_fe_landing: '$(UAT_REACT_APP_URL_FE_LANDING)'
     react_app_url_fe_assistance: '$(UAT_REACT_APP_URL_FE_ASSISTANCE)'
 
+    react_app_plans_prices: '$(UAT_REACT_APP_PLANS_PRICES)'
+
     react_app_url_privacy_disclaimer: '$(UAT_REACT_APP_URL_PRIVACY_DISCLAIMER)'
     react_app_url_terms_and_conditions: '$(UAT_REACT_APP_URL_TERMS_AND_CONDITIONS)'
 
     react_app_url_api_onboarding: '$(UAT_REACT_APP_URL_API_ONBOARDING)'
+    react_app_url_api_onboarding_v2: '$(UAT_REACT_APP_URL_API_ONBOARDING_V2)'
     react_app_url_api_party_registry_proxy: '$(UAT_REACT_APP_URL_API_PARTY_REGISTRY_PROXY)'
 
     react_app_url_api_geotaxonomy: '$(UAT_REACT_APP_URL_GEOTAXONOMY)'
@@ -73,10 +76,13 @@ variables:
     react_app_url_fe_landing: '$(PROD_REACT_APP_URL_FE_LANDING)'
     react_app_url_fe_assistance: '$(PROD_REACT_APP_URL_FE_ASSISTANCE)'
 
+    react_app_plans_prices: '$(PROD_REACT_APP_PLANS_PRICES)'
+
     react_app_url_privacy_disclaimer: '$(PROD_REACT_APP_URL_PRIVACY_DISCLAIMER)'
     react_app_url_terms_and_conditions: '$(PROD_REACT_APP_URL_TERMS_AND_CONDITIONS)'
 
     react_app_url_api_onboarding: '$(PROD_REACT_APP_URL_API_ONBOARDING)'
+    react_app_url_api_onboarding_v2: '$(PROD_REACT_APP_URL_API_ONBOARDING_V2)'
     react_app_url_api_party_registry_proxy: '$(PROD_REACT_APP_URL_API_PARTY_REGISTRY_PROXY)'
 
     react_app_url_api_geotaxonomy: '$(PROD_REACT_APP_URL_GEOTAXONOMY)'
@@ -112,10 +118,13 @@ variables:
     react_app_url_fe_landing: '$(DEV_REACT_APP_URL_FE_LANDING)'
     react_app_url_fe_assistance: '$(DEV_REACT_APP_URL_FE_ASSISTANCE)'
 
+    react_app_plans_prices: '$(DEV_REACT_APP_PLANS_PRICES)'
+
     react_app_url_privacy_disclaimer: '$(DEV_REACT_APP_URL_PRIVACY_DISCLAIMER)'
     react_app_url_terms_and_conditions: '$(DEV_REACT_APP_URL_TERMS_AND_CONDITIONS)'
 
     react_app_url_api_onboarding: '$(DEV_REACT_APP_URL_API_ONBOARDING)'
+    react_app_url_api_onboarding_v2: '$(DEV_REACT_APP_URL_API_ONBOARDING_V2)'
     react_app_url_api_party_registry_proxy: '$(DEV_REACT_APP_URL_API_PARTY_REGISTRY_PROXY)'
 
     react_app_url_api_geotaxonomy: '$(DEV_REACT_APP_URL_GEOTAXONOMY)'
@@ -216,10 +225,13 @@ stages:
               REACT_APP_URL_FE_LANDING: '$(react_app_url_fe_landing)'
               REACT_APP_URL_FE_ASSISTANCE: '$(react_app_url_fe_assistance)'
 
+              REACT_APP_PLANS_PRICES: '$(react_app_plans_prices)'
+
               REACT_APP_URL_PRIVACY_DISCLAIMER: '$(react_app_url_privacy_disclaimer)'
               REACT_APP_URL_TERMS_AND_CONDITIONS: '$(react_app_url_terms_and_conditions)'
 
               REACT_APP_URL_API_ONBOARDING: '$(react_app_url_api_onboarding)'
+              REACT_APP_URL_API_ONBOARDING_V2: '$(react_app_url_api_onboarding_v2)'
               REACT_APP_URL_API_PARTY_REGISTRY_PROXY: '$(react_app_url_api_party_registry_proxy)'
               REACT_APP_URL_GEOTAXONOMY: '$(react_app_url_api_geotaxonomy)'
 

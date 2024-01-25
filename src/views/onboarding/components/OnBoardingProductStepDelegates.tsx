@@ -191,10 +191,12 @@ export function OnBoardingProductStepDelegates({
       <Grid container item justifyContent="center" mt={1}>
         <Grid item xs={8}>
           <Typography variant="body1" align="center">
-            <Trans i18nKey="onboardingStep3.bodyDescription1">
-              Puoi aggiungere da uno a tre Amministratori o suoi delegati. <br /> Saranno i
-              responsabili della gestione di {{ productTitle: product?.title }} e presenti nel
-              contratto di adesione come delegati dal Legale Rappresentante.
+            <Trans
+              i18nKey="onboardingStep3.bodyDescription1"
+              values={{ productTitle: product?.title }}
+              components={{ 1: <br />, 3: <br /> }}
+            >
+              {`Puoi aggiungere da uno a tre Amministratori o suoi delegati. <1/> Saranno i responsabili della gestione di {{productTitle}} e presenti nel contratto di <3 />adesione come delegati dal Legale Rappresentante.`}
             </Trans>
           </Typography>
         </Grid>
@@ -284,7 +286,7 @@ export function OnBoardingProductStepDelegates({
               .some((prefix) => !validateUser(prefix, people[prefix], allPeople, isAuthUser)),
         }}
       />
-      
+
       <ConfirmOnboardingModal
         open={openConfirmationModal}
         partyName={partyName}

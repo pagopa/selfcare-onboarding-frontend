@@ -23,18 +23,12 @@ export const ConfirmOnboardingModal = ({
       open={open}
       title={t('onboarding.confirmationModal.title')}
       message={
-        <Trans i18nKey="onboarding.confirmationModal.description">
-          Stai inviando una richiesta di adesione al prodotto
-          <b>
-            {{
-              productName,
-            }}
-          </b>
-          per l’ente <b>{{ institutionName: partyName }}</b>.
-          <br />
-          L&apos;accordo di adesione arriverà alla PEC istituzionale dell’ente e dovrà essere
-          sottoscritta dal Legale Rappresentante. Assicurati di essere autorizzato come dipendente a
-          effettuare questa richiesta.
+        <Trans
+          i18nKey="onboarding.confirmationModal.description"
+          values={{ productName, institutionName: partyName }}
+          components={{ 1: <strong />, 3: <strong /> }}
+        >
+          {`Stai inviando una richiesta di adesione al prodotto <1>{{productName}}</1> per l’ente <3>{{institutionName}}</3>. <5 /> L’accordo di adesione arriverà alla PEC istituzionale dell’ente e dovrà essere sottoscritta dal Legale Rappresentante. Assicurati di essere autorizzato come dipendente a effettuare questa richiesta.`}
         </Trans>
       }
       onCloseLabel={t('onboarding.confirmationModal.cancelLabel')}

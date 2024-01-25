@@ -11,6 +11,10 @@ export const ENV = {
     SUFFIX: env.get('REACT_APP_URL_INSTITUTION_LOGO_SUFFIX').required().asString(),
   },
 
+  JSON_URL: {
+    PLAN_PRICES: env.get('REACT_APP_PLANS_PRICES').required().asString(),
+  },
+
   ASSISTANCE: {
     ENABLE: env.get('REACT_APP_ENABLE_ASSISTANCE').required().asBool(),
     EMAIL: env.get('REACT_APP_PAGOPA_HELP_EMAIL').required().asString(),
@@ -28,6 +32,7 @@ export const ENV = {
 
   URL_API: {
     ONBOARDING: env.get('REACT_APP_URL_API_ONBOARDING').required().asString(),
+    ONBOARDING_V2: env.get('REACT_APP_URL_API_ONBOARDING_V2').required().asString(),
     PARTY_REGISTRY_PROXY: env.get('REACT_APP_URL_API_PARTY_REGISTRY_PROXY').required().asString(),
     GEOTAXONOMY: env.get('REACT_APP_URL_GEOTAXONOMY').required().asString(),
   },
