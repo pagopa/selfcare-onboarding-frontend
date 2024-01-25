@@ -36,6 +36,7 @@ export function StepAdditionalInformations({ forward, back }: StepperStepCompone
 
   const [isChecked, setIsChecked] = useState<boolean>(false);
   const [disabled, setDisabled] = useState<boolean>(false);
+  const [shrink, setShrink] = useState<boolean>(false);
 
   useEffect(() => {
     const isContinueButtonEnabled = Object.entries(radioValues).every(([key, value]) =>
@@ -188,12 +189,17 @@ export function StepAdditionalInformations({ forward, back }: StepperStepCompone
             onClick={() => {
               handleRadioChange('optionalPartyInformations', !isChecked);
               setIsChecked(!isChecked);
-              if (isChecked) {
+              if (
+                additionalData.optionalPartyInformations?.textFieldValue &&
+                isChecked &&
+                additionalData.optionalPartyInformations?.textFieldValue !== ''
+              ) {
+                setShrink(false);
                 setAdditionalData({
                   ['optionalPartyInformations']: {
                     openTextField: true,
                     textFieldValue: '',
-                    choice: isChecked,
+                    choice: !isChecked,
                   },
                 });
               }
@@ -216,9 +222,23 @@ export function StepAdditionalInformations({ forward, back }: StepperStepCompone
             onChange={(e: any) => {
               handleTextFieldChange(true, 'optionalPartyInformations', e.target.value);
             }}
+            onClick={() => setShrink(true)}
+            onBlur={() => {
+              if (
+                additionalData.optionalPartyInformations?.textFieldValue &&
+                additionalData.optionalPartyInformations?.textFieldValue !== ''
+              ) {
+                setShrink(true);
+              } else {
+                setShrink(false);
+              }
+            }}
             error={!!errors.optionalPartyInformations}
+            InputLabelProps={{
+              shrink,
+            }}
             helperText={errors.optionalPartyInformations || ''}
-            value={isChecked ? additionalData.optionalPartyInformations?.textFieldValue : ''}
+            value={additionalData.optionalPartyInformations?.textFieldValue}
           />
         </Grid>
       </Paper>
