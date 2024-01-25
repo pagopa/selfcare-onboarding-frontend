@@ -36,6 +36,7 @@ export function StepAdditionalInformations({ forward, back }: StepperStepCompone
 
   const [isChecked, setIsChecked] = useState<boolean>(false);
   const [disabled, setDisabled] = useState<boolean>(false);
+  const [shrink, setShrink] = useState<boolean>(false);
 
   useEffect(() => {
     const isContinueButtonEnabled = Object.entries(radioValues).every(([key, value]) =>
@@ -79,16 +80,27 @@ export function StepAdditionalInformations({ forward, back }: StepperStepCompone
 
   const validateTextField = () => {
     const newErrors = Object.keys(radioValues).reduce((acc, field) => {
-      if (
-        (additionalData[field]?.openTextField && additionalData[field]?.textFieldValue === '') ||
-        (isChecked &&
-          field === 'optionalPartyInformations' &&
-          !additionalData[field]?.textFieldValue)
-      ) {
-        return {
-          ...acc,
-          [field]: t(`additionalDataPage.formQuestions.textFields.errors.${field}`),
-        };
+      switch (field) {
+        case 'optionalPartyInformations':
+          if (isChecked && !additionalData.optionalPartyInformations?.textFieldValue) {
+            return {
+              ...acc,
+              [field]: t(
+                `additionalDataPage.formQuestions.textFields.errors.optionalPartyInformations`
+              ),
+            };
+          }
+          break;
+        default:
+          if (
+            additionalData[field]?.openTextField &&
+            additionalData[field]?.textFieldValue === ''
+          ) {
+            return {
+              ...acc,
+              [field]: t(`additionalDataPage.formQuestions.textFields.errors.${field}`),
+            };
+          }
       }
       return acc;
     }, {});
@@ -177,6 +189,20 @@ export function StepAdditionalInformations({ forward, back }: StepperStepCompone
             onClick={() => {
               handleRadioChange('optionalPartyInformations', !isChecked);
               setIsChecked(!isChecked);
+              if (
+                additionalData.optionalPartyInformations?.textFieldValue &&
+                isChecked &&
+                additionalData.optionalPartyInformations?.textFieldValue !== ''
+              ) {
+                setShrink(false);
+                setAdditionalData({
+                  ['optionalPartyInformations']: {
+                    openTextField: true,
+                    textFieldValue: '',
+                    choice: !isChecked,
+                  },
+                });
+              }
             }}
             label={t('additionalDataPage.formQuestions.other')}
             sx={{
@@ -196,8 +222,23 @@ export function StepAdditionalInformations({ forward, back }: StepperStepCompone
             onChange={(e: any) => {
               handleTextFieldChange(true, 'optionalPartyInformations', e.target.value);
             }}
+            onClick={() => setShrink(true)}
+            onBlur={() => {
+              if (
+                additionalData.optionalPartyInformations?.textFieldValue &&
+                additionalData.optionalPartyInformations?.textFieldValue !== ''
+              ) {
+                setShrink(true);
+              } else {
+                setShrink(false);
+              }
+            }}
             error={!!errors.optionalPartyInformations}
+            InputLabelProps={{
+              shrink,
+            }}
             helperText={errors.optionalPartyInformations || ''}
+            value={additionalData.optionalPartyInformations?.textFieldValue}
           />
         </Grid>
       </Paper>
