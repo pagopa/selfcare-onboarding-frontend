@@ -57,21 +57,22 @@ export default function SubProductStepUserUnrelated({ product, productId }: Prop
             <Typography variant={'h4'}>
               <Trans
                 i18nKey="onBoardingSubProduct.subProductStepUserUnrelated.title"
-                values={{ selectedProduct: product?.title }}
+                values={{ selectedProduct: product?.title.substring(4) }}
               >
                 {`Non puoi aderire a {{selectedProduct}} Premium`}
               </Trans>
             </Typography>
           </Grid>
         </Grid>
-        <Grid container item justifyContent="center" mb={4} mt={1}>
+        <Grid container item justifyContent="center" mb={4} mt={2}>
           <Grid item xs={6}>
             <Typography variant={'body1'}>
               <Trans
                 i18nKey="onBoardingSubProduct.subProductStepUserUnrelated.description"
                 values={{ selectedProduct: product?.title }}
+                components={{ 1: <br />, 3: <br />, 5: <br /> }}
               >
-                {`Il tuo ente non ha aderito ad {{selectedProduct}}, o non hai un ruolo per gestire il prodotto. <1/> Chiedi ad un Amministratore di aggiungerti nella sezione Utenti, oppure richiedi l’adesione ad {{selectedProduct}} per il tuo ente.`}
+                {`Il tuo ente non ha aderito ad {{selectedProduct}}, o non hai un ruolo per <1/>gestire il prodotto. <3/> Chiedi ad un Amministratore di aggiungerti nella sezione <5/>Utenti, oppure richiedi l’adesione ad {{selectedProduct}} per il tuo ente.`}
               </Trans>
             </Typography>
           </Grid>
@@ -81,7 +82,7 @@ export default function SubProductStepUserUnrelated({ product, productId }: Prop
           <Box>
             <Button
               variant="outlined"
-              sx={{ alignSelf: 'center', mr: 1 }}
+              sx={{ alignSelf: 'center', mr: 2 }}
               onClick={onExitPremiumFlow}
             >
               {t('onBoardingSubProduct.subProductStepUserUnrelated.backHomeLabelBtn')}
