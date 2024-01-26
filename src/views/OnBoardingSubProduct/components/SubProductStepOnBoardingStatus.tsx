@@ -82,6 +82,7 @@ const buildNotBasicProduct = (
           <Trans
             i18nKey="onBoardingSubProduct.notBasicProductError.message"
             values={{ selectedProduct: productTitle }}
+            components={{ 1: <br /> }}
           >
             {`Per poter sottoscrivere l'offerta Premium, l'ente che hai <1 />selezionato deve prima aderire al prodotto {{selectedProduct}}`}
           </Trans>
