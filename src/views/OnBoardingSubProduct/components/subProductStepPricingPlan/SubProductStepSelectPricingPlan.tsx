@@ -4,10 +4,10 @@ import Button from '@mui/material/Button';
 import { Box } from '@mui/system';
 import SessionModal from '@pagopa/selfcare-common-frontend/components/SessionModal';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
-import { AxiosResponse } from 'axios';
+import { AxiosError, AxiosResponse } from 'axios';
 import { useContext, useEffect, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
-import { Product, SelfcareParty, StepperStepComponentProps } from '../../../../../types';
+import { Problem, Product, SelfcareParty, StepperStepComponentProps } from '../../../../../types';
 import { fetchWithLogs } from '../../../../lib/api-utils';
 import { UserContext } from '../../../../lib/context';
 import { getFetchOutcome } from '../../../../lib/error-utils';
@@ -51,6 +51,7 @@ export default function SubProductStepSelectPricingPlan({
   };
 
   const onExitPremiumFlow = async () => {
+    trackEvent('PREMIUM_USER EXIT');
     const searchResponse = await fetchWithLogs(
       { endpoint: 'ONBOARDING_GET_USER_PARTIES' },
       { method: 'GET' },
@@ -64,7 +65,11 @@ export default function SubProductStepSelectPricingPlan({
     } else if (outcome === 'success' && response.length === 0) {
       window.location.assign('https://www.pagopa.it/it/prodotti-e-servizi/app-io');
     } else {
-      trackEvent('ONBOARDING_REDIRECT_TO_ONBOARDING_FAILURE', { product_id: product?.id });
+      const errorBody = (searchResponse as AxiosError<Problem>).response?.data;
+      trackEvent('ONBOARDING_REDIRECT_TO_ONBOARDING_FAILURE', {
+        product_id: product?.id,
+        reason: errorBody?.detail,
+      });
     }
     setOpenExitModal(false);
   };
@@ -81,6 +86,7 @@ export default function SubProductStepSelectPricingPlan({
 
   useEffect(() => {
     void retrievePlanPrices();
+    trackEvent('PREMIUM_LANDING VIEW');
   }, []);
 
   const discount = false;

@@ -7,6 +7,7 @@ import Button from '@mui/material/Button';
 import { Box, useTheme } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
+import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
 import { StepperStepComponentProps } from '../../../../../../../types';
 import { Echelon } from '../../../../../../model/PlansPrices';
 
@@ -30,10 +31,16 @@ export default function FooterConsumptionCard({
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
+    if (!expanded) {
+      trackEvent('PREMIUM_SHOW_CONSUMO');
+    }
   };
 
   const onForwardAction = () => {
     forward(pricingPlan);
+    trackEvent('PREMIUM_ATTIVATION_START', {
+      selected_plan: 'consumo',
+    });
   };
 
   return (
