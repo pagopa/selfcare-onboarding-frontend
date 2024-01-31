@@ -1,13 +1,13 @@
+import { Box, useTheme } from '@mui/material';
+import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
 import CardActions from '@mui/material/CardActions';
+import CardContent from '@mui/material/CardContent';
 import Collapse from '@mui/material/Collapse';
 import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
-import { Box, useTheme } from '@mui/material';
-import { useTranslation } from 'react-i18next';
-import { useState } from 'react';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { StepperStepComponentProps } from '../../../../../../../types';
 import { Echelon } from '../../../../../../model/PlansPrices';
 
