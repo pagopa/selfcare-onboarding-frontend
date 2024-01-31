@@ -32,7 +32,7 @@ export default function FooterConsumptionCard({
   const handleExpandClick = () => {
     setExpanded(!expanded);
     if (!expanded) {
-      trackEvent('PREMIUM_SHOW_CONSUMO');
+      trackEvent('PREMIUM_SHOW_CONSUMPTION');
     }
   };
 

@@ -235,6 +235,8 @@ function OnBoardingSubProduct() {
       Component: () =>
         SubProductStepSelectUserParty({
           parties,
+          subProductId,
+          productId,
           forward: (party?: Party) => {
             if (party) {
               forwardWithInstitution(party, true);
