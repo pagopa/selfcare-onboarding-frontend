@@ -1,9 +1,9 @@
 import { IllusError } from '@pagopa/mui-italia';
 import { Grid, Box, Typography, Button } from '@mui/material';
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 import { resolvePathVariables } from '@pagopa/selfcare-common-frontend/utils/routes-utils';
 import { Trans, useTranslation } from 'react-i18next';
-import { AxiosResponse } from 'axios';
+import { AxiosError, AxiosResponse } from 'axios';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
 import { useHistory } from 'react-router-dom';
 import { ROUTES } from '../../../utils/constants';
@@ -11,7 +11,7 @@ import { fetchWithLogs } from '../../../lib/api-utils';
 import { UserContext } from '../../../lib/context';
 import { getFetchOutcome } from '../../../lib/error-utils';
 import { ENV } from '../../../utils/env';
-import { Product, SelfcareParty } from '../../../../types';
+import { Problem, Product, SelfcareParty } from '../../../../types';
 
 type Props = {
   product?: Product;
@@ -22,6 +22,10 @@ export default function SubProductStepUserUnrelated({ product, productId }: Prop
   const history = useHistory();
   const { setRequiredLogin } = useContext(UserContext);
   const { t } = useTranslation();
+
+  useEffect(() => {
+    trackEvent('ONBOARDING_PREMIUM_JOIN_NOT_ALLOWED');
+  }, []);
 
   const onExitPremiumFlow = async () => {
     const searchResponse = await fetchWithLogs(
@@ -36,7 +40,11 @@ export default function SubProductStepUserUnrelated({ product, productId }: Prop
     } else if (outcome === 'success' && response.length === 0) {
       window.location.assign('https://www.pagopa.it/it/prodotti-e-servizi/app-io');
     } else {
-      trackEvent('ONBOARDING_REDIRECT_TO_ONBOARDING_FAILURE', { product_id: productId });
+      const errorBody = (searchResponse as AxiosError<Problem>).response?.data;
+      trackEvent('ONBOARDING_REDIRECT_TO_ONBOARDING_FAILURE', {
+        product_id: productId,
+        reason: errorBody?.detail,
+      });
     }
   };
 

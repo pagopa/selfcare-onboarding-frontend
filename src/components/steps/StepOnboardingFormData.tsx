@@ -7,8 +7,10 @@ import { AxiosError, AxiosResponse } from 'axios';
 import { theme } from '@pagopa/mui-italia';
 import { emailRegexp } from '@pagopa/selfcare-common-frontend/utils/constants';
 import { useFormik } from 'formik';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
+import { uniqueId } from 'lodash';
 import {
   InstitutionType,
   Party,
@@ -105,6 +107,7 @@ export default function StepOnboardingFormData({
       isTaxCodeEquals2PIVA:
         !!initialFormData.vatNumber && initialFormData.taxCode === initialFormData.vatNumber,
     });
+  const requestIdRef = useRef<string>();
 
   const requiredError = 'Required';
 
@@ -193,8 +196,22 @@ export default function StepOnboardingFormData({
   }, []);
 
   useEffect(() => {
-    if (premiumFlow && institutionType === 'PA') {
-      void handleSearchByTaxCode(initialFormData.taxCode);
+    if (premiumFlow) {
+      // eslint-disable-next-line functional/immutable-data
+      requestIdRef.current = uniqueId(
+        `onboarding-step-manager-${externalInstitutionId}-${productId}-${subProductId}`
+      );
+
+      trackEvent('ONBOARDING_PREMIUM_BILLING_DATA', {
+        request_id: requestIdRef?.current,
+        party_id: externalInstitutionId,
+        product_id: productId,
+        subproduct_id: subProductId,
+      });
+
+      if (institutionType === 'PA') {
+        void handleSearchByTaxCode(initialFormData.taxCode);
+      }
     }
   }, [premiumFlow]);
 
