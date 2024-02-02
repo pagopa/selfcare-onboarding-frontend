@@ -200,8 +200,13 @@ export function OnBoardingProductStepDelegates({
         </Grid>
       </Grid>
 
-      <Grid container item justifyContent="center" mt={1}>
-        <Grid item xs={8}>
+      <Grid
+        container
+        item
+        sx={{ justifyContent: 'center', justifyItems: 'center', display: 'grid' }}
+        mt={1}
+      >
+        <Grid item xs={12} mb={4}>
           <Typography variant="body1" align="center">
             <Trans
               i18nKey="onboardingStep3.bodyDescription1"
@@ -212,9 +217,19 @@ export function OnBoardingProductStepDelegates({
             </Trans>
           </Typography>
         </Grid>
+        <Grid item xs={8}>
+          <Link
+            onClick={() =>
+              window.open('https://docs.pagopa.it/area-riservata/area-riservata/ruoli')
+            }
+            sx={{ fontWeight: 'fontWeightBold', fontSize: '14px', cursor: 'pointer' }}
+          >
+            {t('moreInformationOnRoles')}
+          </Link>
+        </Grid>
       </Grid>
 
-      <Grid container item justifyContent="center" mt={4}>
+      <Grid container item justifyContent="center" mt={3}>
         <Grid item xs={4} display="flex" justifyContent="center">
           <FormControlLabel
             control={<Checkbox checked={isAuthUser} onChange={handleAuthUser} />}
@@ -229,7 +244,7 @@ export function OnBoardingProductStepDelegates({
         </Grid>
       </Grid>
 
-      <Grid container item justifyContent="center" mt={4}>
+      <Grid container item justifyContent="center" mt={3}>
         <Grid item xs={8} display="flex" justifyContent={'center'}>
           <PlatformUserForm
             prefix={'delegate-initial'}
