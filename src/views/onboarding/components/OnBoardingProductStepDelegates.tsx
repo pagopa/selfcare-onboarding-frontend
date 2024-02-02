@@ -21,6 +21,7 @@ type Props = StepperStepComponentProps & {
   legal?: UserOnCreate;
   externalInstitutionId: string;
   partyName: string;
+  isTechPartner: boolean;
 };
 
 export function OnBoardingProductStepDelegates({
@@ -30,6 +31,7 @@ export function OnBoardingProductStepDelegates({
   forward,
   back,
   partyName,
+  isTechPartner,
 }: Props) {
   const { user, setRequiredLogin } = useContext(UserContext);
   const [_loading, setLoading] = useState(true);
@@ -59,7 +61,12 @@ export function OnBoardingProductStepDelegates({
     const userIds = Object.keys(people);
     if (index === userIds.length) {
       if (Object.keys(peopleErrors).length === 0) {
-        setOpenConfirmationModal(true);
+        // TODO hide modal for PT until copy is changed. Remove if case isTechPartner after copy is changed
+        if (isTechPartner) {
+          onForwardAction();
+        } else {
+          setOpenConfirmationModal(true);
+        }
       }
       setPeopleErrors(peopleErrors);
       setLoading(false);
@@ -68,7 +75,12 @@ export function OnBoardingProductStepDelegates({
     if (!isAuthUser) {
       validateUserData(people[userId], externalInstitutionId, userId, index, peopleErrors);
     } else {
-      setOpenConfirmationModal(true);
+      // TODO hide modal for PT until copy is changed. Remove if case isTechPartner after copy is changed
+      if (isTechPartner) {
+        onForwardAction();
+      } else {
+        setOpenConfirmationModal(true);
+      }
     }
   };
 
