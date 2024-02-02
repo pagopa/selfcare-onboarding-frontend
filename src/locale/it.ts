@@ -47,6 +47,7 @@ export default {
   inlineSupportLink: {
     assistanceLink: "contatta l'assistenza",
   },
+  moreInformationOnRoles: 'Più informazioni sui ruoli',
   onboardingStep0: {
     title: 'Benvenuto sul Portale Self-care',
     description: 'In pochi passaggi il tuo Ente potrà aderire e gestire tutti i prodotti PagoPA.',
@@ -104,21 +105,21 @@ export default {
     },
   },
   onboardingStep2: {
-    bodyTitle: 'Indica il Legale <1/> Rappresentante',
-    bodyDescription: `Inserisci i dati del Legale Rappresentante o del procuratore del tuo ente. <1/> La persona che indicherai sarà firmataria del contratto per <3/>.`,
+    bodyTitle: 'Indica il Legale Rappresentante',
+    bodyDescription: `Inserisci i dati del Legale Rappresentante o del procuratore del tuo ente. <1/> Sarà responsabile della firma del contratto per {{productTitle}} <3/> e avrà il ruolo di Amministratore per questo prodotto nell'Area Riservata.`,
     premiumBodyDescription: `Inserisci i dati del Legale Rappresentante o del procuratore del tuo ente. <1/> La persona che indicherai sarà firmataria del contratto per <3/> Premium.`,
     backLabel: 'Indietro',
     confirmLabel: 'Continua',
   },
   onboardingStep3: {
     bodyTitle: "Indica l'Amministratore",
-    bodyDescription1: `Puoi aggiungere da uno a tre Amministratori o suoi delegati. <1/> Saranno i responsabili della gestione di {{productTitle}} e presenti nel contratto di adesione come delegati dal Legale Rappresentante.`,
+    bodyDescription1: `Puoi aggiungere da uno a tre Amministratori o suoi delegati. <1/> Saranno i responsabili della gestione di {{productTitle}} e presenti nel contratto di <3 />adesione come delegati dal Legale Rappresentante.`,
     addUserLabel: 'AGGIUNGI UN ALTRO AMMINISTRATORE',
     addUserLink: 'Aggiungi un altro Amministratore',
     backLabel: 'Indietro',
     confirmLabel: 'Continua',
     formControl: {
-      label: "Sono io l'Amministratore",
+      label: 'Aggiungi me come Amministratore',
     },
   },
   additionalDataPage: {
