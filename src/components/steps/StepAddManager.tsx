@@ -1,4 +1,4 @@
-import { Grid, Typography } from '@mui/material';
+import { Grid, Typography, Link } from '@mui/material';
 import SessionModal from '@pagopa/selfcare-common-frontend/components/SessionModal';
 import { useContext, useEffect, useRef, useState } from 'react';
 import { useTranslation, Trans } from 'react-i18next';
@@ -113,15 +113,13 @@ export function StepAddManager({
       <Grid container item justifyContent="center">
         <Grid item xs={12}>
           <Typography variant="h3" component="h2" align="center" sx={{ lineHeight: '1.2' }}>
-            <Trans i18nKey="onboardingStep2.bodyTitle">
-              Indica il Legale <br /> Rappresentante
-            </Trans>
+            <Trans i18nKey="onboardingStep2.bodyTitle">Indica il Legale Rappresentante</Trans>
           </Typography>
         </Grid>
       </Grid>
 
       <Grid container item justifyContent="center" mt={1}>
-        <Grid item xs={12}>
+        <Grid item xs={12} mb={1}>
           <Typography sx={{ fontWeight: 400 }} variant="body1" component="h2" align="center">
             <Trans
               i18nKey={
@@ -129,13 +127,22 @@ export function StepAddManager({
                   ? 'onboardingStep2.premiumBodyDescription'
                   : 'onboardingStep2.bodyDescription'
               }
+              components={{ 1: <br />, 3: <br /> }}
+              values={{ productTitle: product?.title }}
             >
-              Inserisci i dati del Legale Rappresentante o del procuratore del tuo ente.
-              <br />
-              La persona che indicherai sarà firmataria del contratto per
-              {`${product?.title}`}.
+              {`Inserisci i dati del Legale Rappresentante o del procuratore del tuo ente. <1/> Sarà responsabile della firma del contratto per {{productTitle}} <3/> e avrà il ruolo di Amministratore per questo prodotto nell'Area Riservata.`}
             </Trans>
           </Typography>
+        </Grid>
+        <Grid item>
+          <Link
+            onClick={() =>
+              window.open('https://docs.pagopa.it/area-riservata/area-riservata/ruoli')
+            }
+            sx={{ fontWeight: 'fontWeightBold', fontSize: '14px', cursor: 'pointer' }}
+          >
+            {t('moreInformationOnRoles')}
+          </Link>
         </Grid>
       </Grid>
 
