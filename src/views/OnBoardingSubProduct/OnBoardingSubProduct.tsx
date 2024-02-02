@@ -121,12 +121,6 @@ function OnBoardingSubProduct() {
   };
 
   const forwardWithBillingData = (newBillingData: OnboardingFormData) => {
-    trackEvent('ONBOARDING_PREMIUM_BILLING_DATA', {
-      request_id: requestIdRef.current,
-      party_id: externalInstitutionId,
-      product_id: productId,
-      subproduct_id: subProductId,
-    });
     setBillingData(newBillingData);
     forward();
   };
@@ -134,12 +128,6 @@ function OnBoardingSubProduct() {
   const forwardWithManagerData = (formData: any) => {
     setManager(formData.users[0]);
     setUsers(formData.users);
-    trackEvent('ONBOARDING_PREMIUM_ADD_MANAGER', {
-      request_id: requestIdRef.current,
-      party_id: externalInstitutionId,
-      product_id: productId,
-      subproduct_id: subProductId,
-    });
     setOpenConfirmationModal(true);
   };
 
@@ -247,6 +235,8 @@ function OnBoardingSubProduct() {
       Component: () =>
         SubProductStepSelectUserParty({
           parties,
+          subProductId,
+          productId,
           forward: (party?: Party) => {
             if (party) {
               forwardWithInstitution(party, true);
