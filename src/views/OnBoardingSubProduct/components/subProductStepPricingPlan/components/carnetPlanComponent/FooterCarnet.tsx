@@ -7,6 +7,7 @@ import Button from '@mui/material/Button';
 import { Box, useTheme, Radio, RadioGroup, FormControlLabel } from '@mui/material';
 import { useTranslation, Trans } from 'react-i18next';
 import { useState } from 'react';
+import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
 import { StepperStepComponentProps } from '../../../../../../../types';
 import { CarnetPlan } from '../../../../../../model/PlansPrices';
 
@@ -26,6 +27,9 @@ export default function FooterCarnet({ carnetPlans, forward, discount }: Props) 
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
+    if (!expanded) {
+      trackEvent('PREMIUM_SHOW_CARNET');
+    }
   };
 
   const setPpFunction = (pp: string) => {
@@ -34,6 +38,9 @@ export default function FooterCarnet({ carnetPlans, forward, discount }: Props) 
 
   const onForwardAction = () => {
     forward(pricingPlanSelected);
+    trackEvent('PREMIUM_ATTIVATION_START', {
+      selected_plan: 'carnet',
+    });
   };
 
   return (

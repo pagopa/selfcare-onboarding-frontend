@@ -93,6 +93,7 @@ export const subProductSubmitFetch = async ({
       party_id: externalInstitutionId,
       product_id: product?.id,
       subproduct_id: subProduct?.id,
+      selected_plan: pricingPlan === 'C0' ? 'consumo' : 'carnet',
     });
     forward();
   } else {
@@ -105,6 +106,7 @@ export const subProductSubmitFetch = async ({
       request_id: requestId,
       product_id: product?.id,
       subproduct_id: subProduct?.id,
+      reason: (postLegalsResponse as AxiosError<Problem>).response?.data?.detail,
     });
     setError(true);
   }

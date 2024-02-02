@@ -1,10 +1,12 @@
 import { Grid, Link, Typography, useTheme, Paper } from '@mui/material';
 import { Box } from '@mui/system';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { styled } from '@mui/material/styles';
 import { useTranslation, Trans } from 'react-i18next';
 import { PartyAccountItemButton } from '@pagopa/mui-italia/dist/components/PartyAccountItemButton';
 import { roleLabels } from '@pagopa/selfcare-common-frontend/utils/constants';
+import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
+import { uniqueId } from 'lodash';
 import { Party, SelfcareParty, StepperStepComponentProps } from '../../../../types';
 import { OnboardingStepActions } from '../../../components/OnboardingStepActions';
 import { useHistoryState } from '../../../components/useHistoryState';
@@ -12,6 +14,8 @@ import PartySelectionSearchInput from './PartySelectionSearchInput';
 
 type Props = {
   parties: Array<SelfcareParty>;
+  subProductId: string;
+  productId: string;
 } & StepperStepComponentProps;
 
 const CustomBox = styled(Box)({
@@ -30,8 +34,15 @@ const CustomBox = styled(Box)({
 });
 const verifyPartyFilter = (party: Party, filter: string) =>
   party.description.toUpperCase().indexOf(filter.toUpperCase()) >= 0;
-export function SubProductStepSelectUserParty({ forward, parties, back }: Props) {
+export function SubProductStepSelectUserParty({
+  forward,
+  parties,
+  back,
+  productId,
+  subProductId,
+}: Props) {
   const partyExternalIdByQuery = new URLSearchParams(window.location.search).get('partyExternalId');
+  const requestIdRef = useRef<string>('');
 
   const { t } = useTranslation();
 
@@ -53,6 +64,18 @@ export function SubProductStepSelectUserParty({ forward, parties, back }: Props)
   };
 
   useEffect(() => {
+    // eslint-disable-next-line functional/immutable-data
+    requestIdRef.current = uniqueId(
+      `onboarding-premium-party-selection-${partyExternalIdByQuery}-${productId}-${subProductId}`
+    );
+
+    trackEvent('ONBOARDING_PREMIUM_PARTY_SELECTION', {
+      party_id: partyExternalIdByQuery,
+      request_id: requestIdRef.current,
+      product_id: productId,
+      subproduct_id: subProductId,
+    });
+
     if (partyExternalIdByQuery) {
       const selectedParty = parties.find((p) => p.externalId === partyExternalIdByQuery);
       if (selectedParty) {

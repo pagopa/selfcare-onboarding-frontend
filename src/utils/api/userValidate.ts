@@ -44,6 +44,7 @@ export async function userValidate(
   ) {
     trackEvent(`${eventName}_CONFLICT_ERROR`, {
       party_id: partyId,
+      reason: errorBody?.detail,
     });
     onValidationError(
       userId,
@@ -52,6 +53,7 @@ export async function userValidate(
   } else {
     trackEvent(`${eventName}_GENERIC_ERROR`, {
       party_id: partyId,
+      reason: errorBody?.detail,
     });
     onGenericError(userId);
   }
