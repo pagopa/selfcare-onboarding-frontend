@@ -75,7 +75,6 @@ export default function PersonalAndBillingDataSection({
   const { setRequiredLogin } = useContext(UserContext);
 
   const [shrinkRea, setShrinkRea] = useState<boolean>(false);
-  const [shrinkCounty, setShrinkCounty] = useState<boolean>(false);
   const [countries, setCountries] = useState<Array<InstitutionLocationData>>();
   const [institutionLocationData, setInstitutionLocationData] = useState<InstitutionLocationData>();
   const [isCitySelected, setIsCitySelected] = useState<boolean>(false);
@@ -97,12 +96,7 @@ export default function PersonalAndBillingDataSection({
       formik.setFieldValue('country', institutionLocationData.country);
       formik.setFieldValue('county', institutionLocationData.county);
       formik.setFieldValue('city', institutionLocationData.city);
-      setShrinkCounty(true);
-    } else {
-      formik.setFieldValue('country', '');
-      formik.setFieldValue('county', '');
-      formik.setFieldValue('city', undefined);
-      setShrinkCounty(false);
+      // setShrinkCounty(true);
     }
   }, [institutionLocationData]);
 
@@ -339,23 +333,22 @@ export default function PersonalAndBillingDataSection({
             <Grid item xs={7}>
               <Autocomplete
                 id="city-select"
-                onInput={(e: any) => {
-                  const value = e.target.value as string;
+                onInput={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  const value = e.target.value;
+                  formik.setFieldValue('city', value);
                   if (value.length >= 3) {
                     void getCountriesFromGeotaxonomies(value);
                   } else {
                     setCountries(undefined);
                   }
                 }}
+                inputValue={formik.values.city || ''}
                 onChange={(_e: any, selected: any) => {
+                  formik.setFieldValue('city', selected?.city || ''); // handle undefined case
                   if (selected) {
-                    setShrinkCounty(true);
                     setInstitutionLocationData(selected);
                     setIsCitySelected(true);
                   } else {
-                    setShrinkCounty(false);
-                    setCountries(undefined);
-                    setInstitutionLocationData(undefined);
                     setIsCitySelected(false);
                   }
                 }}
@@ -441,7 +434,6 @@ export default function PersonalAndBillingDataSection({
                     ? theme.palette.text.secondary
                     : theme.palette.text.primary
                 )}
-                InputLabelProps={{ shrink: shrinkCounty }}
                 disabled={true}
               />
             </Grid>
