@@ -96,7 +96,6 @@ export default function PersonalAndBillingDataSection({
       formik.setFieldValue('country', institutionLocationData.country);
       formik.setFieldValue('county', institutionLocationData.county);
       formik.setFieldValue('city', institutionLocationData.city);
-      // setShrinkCounty(true);
     }
   }, [institutionLocationData]);
 
