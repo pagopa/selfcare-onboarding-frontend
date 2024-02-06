@@ -111,6 +111,14 @@ function OnboardingComponent({ productId }: { productId: string }) {
 
   const isTechPartner = institutionType === 'PT';
 
+  const institutionTypeByUrl = new URLSearchParams(window.location.search).get('institutionType');
+
+  useEffect(() => {
+    if (institutionTypeByUrl === 'PT' && productId === 'prod-pagopa') {
+      forwardWithInstitutionType('PT');
+    }
+  }, [institutionTypeByUrl]);
+
   const alreadyOnboarded: RequestOutcomeMessage = {
     title: '',
     description: isTechPartner
