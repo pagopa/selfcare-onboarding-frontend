@@ -259,7 +259,7 @@ export function StepSearchParty({
                     textDecorationColor: theme.palette.text.primary,
                   }}
                   href="https://www.agid.gov.it/it/piattaforme/procurement/certificazione-componenti-piattaforme"
-                  target='_blank'
+                  target="_blank"
                 >
                   certificazione da AgID
                 </Link>
@@ -287,19 +287,24 @@ export function StepSearchParty({
               <Box display="flex" justifyContent="center" mb={5}>
                 <Alert severity="warning" sx={{ width: '100%' }}>
                   <Typography sx={{ fontSize: '16px', a: { color: theme.palette.text.primary } }}>
-                    Al momento possono aderire a Piattaforma Notifiche le
-                    <strong> Pubbliche Amministrazioni Locali </strong> presenti in IPA come{' '}
-                    <a href="https://www.indicepa.gov.it/ipa-portale/consultazione/indirizzo-sede/ricerca-ente?categoria=L45">
-                      Città Metropolitane
-                    </a>
-                    ,{' '}
-                    <a href="https://www.indicepa.gov.it/ipa-portale/consultazione/indirizzo-sede/ricerca-ente?categoria=L6">
-                      Comuni e loro Consorzi e Associazioni
-                    </a>{' '}
-                    e{' '}
-                    <a href="https://www.indicepa.gov.it/ipa-portale/consultazione/indirizzo-sede/ricerca-ente?categoria=L4">
-                      Regioni, Province Autonome e loro Consorzi e Associazioni
-                    </a>
+                    <Trans
+                      i18nKey={'onboardingStep1.onboarding.disclaimer.description'}
+                      components={{
+                        1: <strong />,
+                        3: (
+                          <a href="https://www.indicepa.gov.it/ipa-portale/consultazione/indirizzo-sede/ricerca-ente?categoria=L45" />
+                        ),
+                        5: <br />,
+                        6: (
+                          <a href="https://www.indicepa.gov.it/ipa-portale/consultazione/indirizzo-sede/ricerca-ente?categoria=L6" />
+                        ),
+                        8: (
+                          <a href="https://www.indicepa.gov.it/ipa-portale/consultazione/indirizzo-sede/ricerca-ente?categoria=L4" />
+                        ),
+                      }}
+                    >
+                      {`Al momento possono aderire a SEND tramite Area Riservata solo le <1>Pubbliche Amministrazioni Locali</1> presenti in IPA come <3>Città<5 />Metropolitane</3>, <6>Comuni e loro Consorzi e Associazioni</6> e <8>Regioni, Province Autonome e loro Consorzi e Associazioni</8>`}
+                    </Trans>
                   </Typography>
                 </Alert>
               </Box>
