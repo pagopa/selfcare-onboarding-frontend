@@ -533,7 +533,7 @@ export default function PersonalAndBillingDataSection({
                       600,
                       theme.palette.text.primary
                     )}
-                    inputProps={{ maxLength: 7 }}
+                    inputProps={{ maxLength: 7, style: { textTransform: 'uppercase' } }}
                   />
                   {/* Description for recipient code */}
                   <Typography
