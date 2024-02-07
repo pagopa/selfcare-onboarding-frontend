@@ -88,6 +88,9 @@ export default {
     onboarding: {
       bodyTitle: 'Cerca il tuo ente',
       codyTitleSelected: 'Conferma l’ente selezionato',
+      disclaimer: {
+        description: `Al momento possono aderire a SEND tramite Area Riservata solo le <1>Pubbliche Amministrazioni Locali</1> presenti in IPA come <3>Città<5 />Metropolitane</3>, <6>Comuni e loro Consorzi e Associazioni</6> e <8>Regioni, Province Autonome e loro Consorzi e Associazioni</8>`,
+      },
       bodyDescription:
         'Inserisci uno dei dati richiesti e cerca dall’Indice della Pubblica <1/> Amministrazione (IPA) l’ente per cui vuoi richiedere l’adesione a <3/>{{productTitle}}',
       ipaDescription: `Non trovi il tuo ente nell'IPA? In <1>questa pagina</1> trovi maggiori <3/> informazioni sull'indice e su come accreditarsi `,
