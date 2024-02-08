@@ -130,7 +130,7 @@ export default function StepInstitutionType({
   return (
     <Grid container display="flex" justifyContent="center" alignItems="center">
       <Grid item xs={12} display="flex" justifyContent="center">
-        <Typography variant="h3" align="center" pb={4}>
+        <Typography variant="h3" align="center" pb={1}>
           <Trans i18nKey="stepInstitutionType.title">
             Seleziona il tipo di ente che <br /> rappresenti
           </Trans>

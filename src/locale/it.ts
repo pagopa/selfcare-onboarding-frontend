@@ -47,6 +47,7 @@ export default {
   inlineSupportLink: {
     assistanceLink: "contatta l'assistenza",
   },
+  moreInformationOnRoles: 'Più informazioni sui ruoli',
   onboardingStep0: {
     title: 'Benvenuto sul Portale Self-care',
     description: 'In pochi passaggi il tuo Ente potrà aderire e gestire tutti i prodotti PagoPA.',
@@ -87,6 +88,9 @@ export default {
     onboarding: {
       bodyTitle: 'Cerca il tuo ente',
       codyTitleSelected: 'Conferma l’ente selezionato',
+      disclaimer: {
+        description: `Al momento possono aderire a SEND tramite Area Riservata solo le <1>Pubbliche Amministrazioni Locali</1> presenti in IPA come <3>Città<5 />Metropolitane</3>, <6>Comuni e loro Consorzi e Associazioni</6> e <8>Regioni, Province Autonome e loro Consorzi e Associazioni</8>`,
+      },
       bodyDescription:
         'Inserisci uno dei dati richiesti e cerca dall’Indice della Pubblica <1/> Amministrazione (IPA) l’ente per cui vuoi richiedere l’adesione a <3/>{{productTitle}}',
       ipaDescription: `Non trovi il tuo ente nell'IPA? In <1>questa pagina</1> trovi maggiori <3/> informazioni sull'indice e su come accreditarsi `,
@@ -104,21 +108,21 @@ export default {
     },
   },
   onboardingStep2: {
-    bodyTitle: 'Indica il Legale <1/> Rappresentante',
-    bodyDescription: `Inserisci i dati del Legale Rappresentante o del procuratore del tuo ente. <1/> La persona che indicherai sarà firmataria del contratto per <3/>.`,
+    bodyTitle: 'Indica il Legale Rappresentante',
+    bodyDescription: `Inserisci i dati del Legale Rappresentante o del procuratore del tuo ente. <1/> Sarà responsabile della firma del contratto per {{productTitle}} <3/> e avrà il ruolo di Amministratore per questo prodotto nell'Area Riservata.`,
     premiumBodyDescription: `Inserisci i dati del Legale Rappresentante o del procuratore del tuo ente. <1/> La persona che indicherai sarà firmataria del contratto per <3/> Premium.`,
     backLabel: 'Indietro',
     confirmLabel: 'Continua',
   },
   onboardingStep3: {
     bodyTitle: "Indica l'Amministratore",
-    bodyDescription1: `Puoi aggiungere da uno a tre Amministratori o suoi delegati. <1/> Saranno i responsabili della gestione di {{productTitle}} e presenti nel contratto di adesione come delegati dal Legale Rappresentante.`,
+    bodyDescription1: `Puoi aggiungere da uno a tre Amministratori o suoi delegati. <1/> Saranno i responsabili della gestione di {{productTitle}} e presenti nel contratto di <3 />adesione come delegati dal Legale Rappresentante.`,
     addUserLabel: 'AGGIUNGI UN ALTRO AMMINISTRATORE',
     addUserLink: 'Aggiungi un altro Amministratore',
     backLabel: 'Indietro',
     confirmLabel: 'Continua',
     formControl: {
-      label: "Sono io l'Amministratore",
+      label: 'Aggiungi me come Amministratore',
     },
   },
   additionalDataPage: {
@@ -364,7 +368,7 @@ export default {
     subProductStepUserUnrelated: {
       title: 'Non puoi aderire a {{selectedProduct}} Premium',
       description:
-        'Il tuo ente non ha aderito ad {{selectedProduct}}, o non hai un ruolo per gestire il prodotto. <1/> Chiedi ad un Amministratore di aggiungerti nella sezione Utenti, oppure richiedi l’adesione ad {{selectedProduct}} per il tuo ente.',
+        'Il tuo ente non ha aderito ad {{selectedProduct}}, o non hai un ruolo per <1/>gestire il prodotto. <3/> Chiedi ad un Amministratore di aggiungerti nella sezione <5/>Utenti, oppure richiedi l’adesione ad {{selectedProduct}} per il tuo ente.',
       backHomeLabelBtn: 'Torna alla home',
       goToBtnLabel: 'Vai all’adesione',
     },

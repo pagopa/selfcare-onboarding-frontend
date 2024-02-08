@@ -1205,7 +1205,7 @@ const billingData2billingDataRequest = () => ({
   zipCode: '09010',
   taxCode: 'AAAAAA44D55F456K',
   vatNumber: 'AAAAAA44D55F456K',
-  recipientCode: 'recipientCode',
+  recipientCode: 'recipientCode'.toUpperCase(),
 });
 
 const verifySubmit = async (productId = 'prod-idpay') => {
