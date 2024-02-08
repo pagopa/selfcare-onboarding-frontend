@@ -598,8 +598,9 @@ function OnboardingComponent({ productId }: { productId: string }) {
     setInstitutionType(newInstitutionType);
     forward();
     if (
-      (newInstitutionType === 'PSP' || newInstitutionType !== 'PA') &&
-      productId !== 'prod-interop'
+      newInstitutionType !== 'GSP' &&
+      newInstitutionType !== 'PA' &&
+      newInstitutionType !== 'SA'
     ) {
       if (newInstitutionType !== institutionType) {
         setOnboardingFormData({

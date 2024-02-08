@@ -9,7 +9,7 @@ export default {
     noResultsLabel: 'Nessun risultato',
     lessThen3CharacterLabel: 'Digita almeno 3 caratteri',
     lessThen11CharacterLabel: 'Digita almeno 11 caratteri',
-    serachLabel: 'Cerca ente',
+    searchLabel: 'Cerca ente',
     aooLabel: 'Inserisci il codice univoco AOO',
     uoLabel: 'Inserisci il codice univoco UO',
     ariaLabel: `Seleziona la tipologia di ricerca dell'ente`,
@@ -94,6 +94,7 @@ export default {
       bodyDescription:
         'Inserisci uno dei dati richiesti e cerca dall’Indice della Pubblica <1/> Amministrazione (IPA) l’ente per cui vuoi richiedere l’adesione a <3/>{{productTitle}}',
       ipaDescription: `Non trovi il tuo ente nell'IPA? In <1>questa pagina</1> trovi maggiori <3/> informazioni sull'indice e su come accreditarsi `,
+      gpsDescription: `Non trovi il tuo ente nell'IPA?<1 /><2>Inserisci manualmente i dati del tuo ente.</2>`,
       saSubTitle:
         'Se sei tra i gestori privati di piattaforma e-procurement e hai <1/> già ottenuto la <3>certificazione da AgID</3>, inserisci uno dei dati <5/> richiesti e cerca l’ente per cui vuoi richiedere l’adesione a <7/> Interoperabilità.',
       asSubTitle:
