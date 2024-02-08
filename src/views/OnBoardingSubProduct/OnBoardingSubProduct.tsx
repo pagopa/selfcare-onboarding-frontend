@@ -205,6 +205,10 @@ function OnBoardingSubProduct() {
   };
 
   const handleOnConfirmModal = () => {
+    trackEvent('ONBOARDING_PREMIUM_UX_CONVERSION', {
+      party_id: partyId,
+      selected_plan: pricingPlan === 'C0' ? 'consumo' : 'carnet',
+    });
     setOpenConfirmationModal(false);
     forward();
   };
