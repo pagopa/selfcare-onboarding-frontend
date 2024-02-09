@@ -100,19 +100,24 @@ export default function AsyncAutocompleteContainer({
       ? 'L37,SAG'
       : 'C17,C16,L10,L19,L13,L2,C10,L20,L21,L22,L15,L1,C13,C5,L40,L11,L39,L46,L8,L34,L7,L35,L45,L47,L6,L12,L24,L28,L42,L36,L44,C8,C3,C7,C14,L16,C11,L33,C12,L43,C2,L38,C1,L5,L4,L31,L18,L17,S01,SA';
 
+  const disabledButton =
+    institutionType === 'GSP' && product?.id !== 'prod-interop'
+      ? isBusinessNameSelected
+        ? input.length < 3
+        : isTaxCodeSelected
+        ? input.length < 11
+        : isAooCodeSelected
+        ? !!aooResult
+        : !!uoResult
+      : !selected;
+
   useEffect(() => {
-    const disabledButton =
-      institutionType === 'GSP' && product?.id !== 'prod-interop'
-        ? isBusinessNameSelected
-          ? input.length < 3
-          : isTaxCodeSelected
-          ? input.length < 11
-          : isAooCodeSelected
-          ? !!aooResult
-          : !!uoResult
-        : !selected;
-    setDisabled(disabledButton);
-  }, [input, options, selected]);
+    if (input) {
+      setDisabled(disabledButton);
+    } else {
+      setDisabled(!selected);
+    }
+  }, [input, selected]);
 
   const handleSearchByName = async (
     query: string,
