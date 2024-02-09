@@ -168,19 +168,32 @@ export function StepSearchParty({
     setAooResultHistory(aooResult);
     setUoResultHistory(uoResult);
     setSelectedHistory(selected);
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const { id } = selected!;
-    forward(
-      {
-        externalId: dataFromAooUo ? dataFromAooUo.id : id,
-      },
-      aooResult || uoResult
-        ? ({ ...dataFromAooUo } as Party)
-        : ({ ...selected, externalId: id } as Party),
-      aooResult,
-      uoResult,
-      institutionType
-    );
+
+    if (
+      !selected?.id &&
+      institutionType === 'GSP' &&
+      (product?.id === 'prod-io' || product?.id === 'prod-pagopa')
+    ) {
+      forward(
+        { externalId: '' },
+        { ...selected, externalId: '' } as Party,
+        aooResult,
+        uoResult,
+        institutionType
+      );
+    } else {
+      forward(
+        {
+          externalId: dataFromAooUo ? dataFromAooUo.id : selected?.id,
+        },
+        aooResult || uoResult
+          ? ({ ...dataFromAooUo } as Party)
+          : ({ ...selected, externalId: selected?.id } as Party),
+        aooResult,
+        uoResult,
+        institutionType
+      );
+    }
   };
 
   const { t } = useTranslation();
@@ -391,7 +404,7 @@ export function StepSearchParty({
                             color: theme.palette.primary.main,
                             cursor: 'pointer',
                           }}
-                          href={forward}
+                          onClick={onForwardAction}
                         />
                       ),
                     }}
