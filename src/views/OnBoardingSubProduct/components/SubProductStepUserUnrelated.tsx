@@ -78,9 +78,9 @@ export default function SubProductStepUserUnrelated({ product, productId }: Prop
               <Trans
                 i18nKey="onBoardingSubProduct.subProductStepUserUnrelated.description"
                 values={{ selectedProduct: product?.title }}
-                components={{ 1: <br />, 3: <br />, 5: <br /> }}
+                components={{ 3: <br />, 5: <br />, 7: <br /> }}
               >
-                {`Il tuo ente non ha aderito ad {{selectedProduct}}, o non hai un ruolo per <1/>gestire il prodotto. <3/> Chiedi ad un Amministratore di aggiungerti nella sezione <5/>Utenti, oppure richiedi l’adesione ad {{selectedProduct}} per il tuo ente.`}
+                {`Il tuo ente non ha aderito ad <strong>{{selectedProduct}}</strong>, o non hai un ruolo per <1/>gestire il prodotto. <3/> Chiedi ad un Amministratore di aggiungerti nella sezione <5/>Utenti, oppure richiedi l’adesione ad <strong>{{selectedProduct}}</strong> per il tuo ente.`}
               </Trans>
             </Typography>
           </Grid>

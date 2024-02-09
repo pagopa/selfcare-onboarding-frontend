@@ -648,9 +648,9 @@ function OnboardingComponent({ productId }: { productId: string }) {
             <Trans
               i18nKey="onboardingStep1.onboarding.bodyDescription"
               values={{ productTitle: selectedProduct?.title }}
-              components={{ 1: <br />, 3: <br /> }}
+              components={{ 1: <br />, 3: <br />, 4: <strong /> }}
             >
-              {`Inserisci uno dei dati richiesti e cerca dall’Indice della Pubblica <1/> Amministrazione (IPA) l’ente per cui vuoi richiedere l’adesione a <3/>{{productTitle}}`}
+              {`Inserisci uno dei dati richiesti e cerca dall’Indice della Pubblica <1/> Amministrazione (IPA) l’ente per cui vuoi richiedere l’adesione a <3/><strong>{{productTitle}}</strong>`}
             </Trans>
           ),
           institutionType,

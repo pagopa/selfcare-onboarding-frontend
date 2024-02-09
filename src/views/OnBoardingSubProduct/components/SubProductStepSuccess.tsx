@@ -25,7 +25,7 @@ const successfulOutCome = {
             <br />
             Al suo interno troverai le istruzioni per completare la
             <br />
-            sottoscrizione all&apos;offerta Premium.
+            sottoscrizione all&apos;offerta <strong>Premium</strong>.
           </Trans>
         }
         buttonLabel={
