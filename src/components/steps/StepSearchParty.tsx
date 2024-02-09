@@ -87,6 +87,7 @@ export function StepSearchParty({
     null
   );
   const [dataFromAooUo, setDataFromAooUo] = useState<IPACatalogParty | null>();
+  const [disabled, setDisabled] = useState<boolean>(false);
 
   const handleSearchTaxCodeFromAooUo = async (query: string) => {
     const searchResponse = await fetchWithLogs(
@@ -167,19 +168,32 @@ export function StepSearchParty({
     setAooResultHistory(aooResult);
     setUoResultHistory(uoResult);
     setSelectedHistory(selected);
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const { id } = selected!;
-    forward(
-      {
-        externalId: dataFromAooUo ? dataFromAooUo.id : id,
-      },
-      aooResult || uoResult
-        ? ({ ...dataFromAooUo } as Party)
-        : ({ ...selected, externalId: id } as Party),
-      aooResult,
-      uoResult,
-      institutionType
-    );
+
+    if (
+      !selected?.id &&
+      institutionType === 'GSP' &&
+      (product?.id === 'prod-io' || product?.id === 'prod-pagopa')
+    ) {
+      forward(
+        { externalId: '' },
+        { ...selected, externalId: '' } as Party,
+        aooResult,
+        uoResult,
+        institutionType
+      );
+    } else {
+      forward(
+        {
+          externalId: dataFromAooUo ? dataFromAooUo.id : selected?.id,
+        },
+        aooResult || uoResult
+          ? ({ ...dataFromAooUo } as Party)
+          : ({ ...selected, externalId: selected?.id } as Party),
+        aooResult,
+        uoResult,
+        institutionType
+      );
+    }
   };
 
   const { t } = useTranslation();
@@ -358,6 +372,7 @@ export function StepSearchParty({
           <Autocomplete
             theme={theme}
             selected={selected}
+            setDisabled={setDisabled}
             setSelected={setSelected}
             endpoint={{ endpoint: 'ONBOARDING_GET_SEARCH_PARTIES' }}
             transformFn={(data: { items: Array<IPACatalogParty> }) =>
@@ -397,21 +412,48 @@ export function StepSearchParty({
                 sx={{
                   textAlign: 'center',
                 }}
-                variant="caption"
-                color={theme.palette.text.primary}
+                variant="body1"
+                color={theme.palette.text.secondary}
               >
-                <Trans i18nKey="onboardingStep1.onboarding.ipaDescription">
-                  Non trovi il tuo ente nell&apos;IPA? In
-                  <Link
-                    sx={{ textDecoration: 'none', color: theme.palette.primary.main }}
-                    href="https://indicepa.gov.it/ipa-portale/servizi-enti/accreditamento-ente"
+                {institutionType === 'GSP' && product?.id !== 'prod-interop' ? (
+                  <Trans
+                    i18nKey="onboardingStep1.onboarding.gpsDescription"
+                    components={{
+                      1: <br />,
+                      2: (
+                        <Link
+                          sx={{
+                            textDecoration: 'underline',
+                            color: theme.palette.primary.main,
+                            cursor: 'pointer',
+                          }}
+                          onClick={onForwardAction}
+                        />
+                      ),
+                    }}
                   >
-                    questa pagina
-                  </Link>
-                  trovi maggiori
-                  <br />
-                  informazioni sull&apos;indice e su come accreditarsi
-                </Trans>
+                    {`Non trovi il tuo ente nell'IPA?<1 /><2>Inserisci manualmente i dati del tuo ente.</2>`}
+                  </Trans>
+                ) : (
+                  <Trans
+                    i18nKey="onboardingStep1.onboarding.ipaDescription"
+                    components={{
+                      1: (
+                        <Link
+                          sx={{
+                            textDecoration: 'none',
+                            color: theme.palette.primary.main,
+                            cursor: 'pointer',
+                          }}
+                          href="https://indicepa.gov.it/ipa-portale/servizi-enti/accreditamento-ente"
+                        />
+                      ),
+                      3: <br />,
+                    }}
+                  >
+                    {`Non trovi il tuo ente nell'IPA? In <1>questa pagina</1> trovi maggiori <3/> informazioni sull'indice e su come accreditarsi `}
+                  </Trans>
+                )}
               </Typography>
             </Box>
           </Grid>
@@ -431,7 +473,7 @@ export function StepSearchParty({
           forward={{
             action: onForwardAction,
             label: t('onboardingStep1.onboarding.onboardingStepActions.confirmAction'),
-            disabled: !selected,
+            disabled,
           }}
         />
       </Grid>

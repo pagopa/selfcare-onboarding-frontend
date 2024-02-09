@@ -120,7 +120,7 @@ export default function AsyncAutocompleteSearch({
               ? t('asyncAutocomplete.aooLabel')
               : isUoCodeSelected
               ? t('asyncAutocomplete.uoLabel')
-              : t('asyncAutocomplete.serachLabel')
+              : t('asyncAutocomplete.searchLabel')
             : ''
         }
         variant={!selected ? 'outlined' : 'standard'}
@@ -133,7 +133,7 @@ export default function AsyncAutocompleteSearch({
             lineHeight: '24px',
             color: theme.palette.text.primary,
             textAlign: 'start',
-            paddingLeft: '8px',
+            paddingLeft: '16px',
             ...(selected && {
               ...truncatedText,
               WebkitLineClamp: 1,
