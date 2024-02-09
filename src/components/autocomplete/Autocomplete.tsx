@@ -26,6 +26,7 @@ type AutocompleteProps = {
   setAooResultHistory: (t: AooData | undefined) => void;
   externalInstitutionId: string;
   institutionType?: InstitutionType;
+  setDisabled: Dispatch<SetStateAction<boolean>>;
 };
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
@@ -48,6 +49,7 @@ export function Autocomplete({
   setAooResultHistory,
   externalInstitutionId,
   institutionType,
+  setDisabled,
 }: AutocompleteProps) {
   const [options, setOptions] = useState<Array<InstitutionResource>>([]);
   const [cfResult, setCfResult] = useState<InstitutionResource | ANACParty>();
@@ -127,6 +129,7 @@ export function Autocomplete({
           setAooResultHistory={setAooResultHistory}
           externalInstitutionId={externalInstitutionId}
           institutionType={institutionType}
+          setDisabled={setDisabled}
         />
       </Grid>
     </Paper>

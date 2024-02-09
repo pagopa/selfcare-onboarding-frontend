@@ -598,8 +598,10 @@ function OnboardingComponent({ productId }: { productId: string }) {
     setInstitutionType(newInstitutionType);
     forward();
     if (
-      (newInstitutionType === 'PSP' || newInstitutionType !== 'PA') &&
-      productId !== 'prod-interop'
+      newInstitutionType !== 'GSP' &&
+      newInstitutionType !== 'PA' &&
+      newInstitutionType !== 'SA' &&
+      newInstitutionType !== 'AS'
     ) {
       if (newInstitutionType !== institutionType) {
         setOnboardingFormData({
@@ -726,7 +728,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
               setOpenExitModal(true);
             } else if (
               institutionType === 'PSP' ||
-              (institutionType !== 'PA' && institutionType !== 'SA')
+              (institutionType !== 'PA' && institutionType !== 'SA' && institutionType !== 'GSP')
             ) {
               setActiveStep(0);
             } else {
