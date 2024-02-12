@@ -45,7 +45,7 @@ const alreadyOnboardedSubProduct: RequestOutcomeMessage = {
           description={
             <Trans i18nKey="onBoardingSubProduct.alreadyOnboardedError.message">
               L&apos;ente che hai selezionato ha già sottoscritto l&apos;offerta <br />
-              Premium.
+              <strong>Premium</strong>.
             </Trans>
           }
           buttonLabel={
@@ -84,7 +84,7 @@ const buildNotBasicProduct = (
             values={{ selectedProduct: productTitle }}
             components={{ 1: <br /> }}
           >
-            {`Per poter sottoscrivere l'offerta Premium, l'ente che hai <1 />selezionato deve prima aderire al prodotto {{selectedProduct}}`}
+            {`Per poter sottoscrivere l'offerta <strong>Premium<strong>, l'ente che hai <1 />selezionato deve prima aderire al prodotto <strong>{{selectedProduct}}</strong>`}
           </Trans>
         }
         variantTitle={'h4'}

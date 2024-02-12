@@ -211,9 +211,9 @@ export function OnBoardingProductStepDelegates({
             <Trans
               i18nKey="onboardingStep3.bodyDescription1"
               values={{ productTitle: product?.title }}
-              components={{ 1: <br />, 3: <br /> }}
+              components={{ 1: <br />, 3: <strong />, 4: <br /> }}
             >
-              {`Puoi aggiungere da uno a tre Amministratori o suoi delegati. <1/> Saranno i responsabili della gestione di {{productTitle}} e presenti nel contratto di <3 />adesione come delegati dal Legale Rappresentante.`}
+              {`Puoi aggiungere da uno a tre Amministratori o suoi delegati. <1/> Saranno i responsabili della gestione di <3>{{productTitle}}</3> e presenti nel contratto di <4 />adesione come delegati dal Legale Rappresentante.`}
             </Trans>
           </Typography>
         </Grid>
