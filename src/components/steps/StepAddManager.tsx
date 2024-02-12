@@ -127,10 +127,10 @@ export function StepAddManager({
                   ? 'onboardingStep2.premiumBodyDescription'
                   : 'onboardingStep2.bodyDescription'
               }
-              components={{ 1: <br />, 3: <br /> }}
+              components={{ 1: <br />, 3: <strong />, 4: <br /> }}
               values={{ productTitle: product?.title }}
             >
-              {`Inserisci i dati del Legale Rappresentante o del procuratore del tuo ente. <1/> Sarà responsabile della firma del contratto per {{productTitle}} <3/> e avrà il ruolo di Amministratore per questo prodotto nell'Area Riservata.`}
+              {`Inserisci i dati del Legale Rappresentante o del procuratore del tuo ente. <1/> Sarà responsabile della firma del contratto per <3>{{productTitle}}</3>. <4/> e avrà il ruolo di Amministratore per questo prodotto nell'Area Riservata.`}
             </Trans>
           </Typography>
         </Grid>

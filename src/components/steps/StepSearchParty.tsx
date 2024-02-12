@@ -262,7 +262,13 @@ export function StepSearchParty({
         <Grid item xs={12}>
           <Typography variant="body1" align="center" color={theme.palette.text.primary}>
             {selected ? (
-              `Prosegui con l’adesione a ${product?.title} per l’ente selezionato`
+              <Trans
+                i18nKey="onboardingStep1.onboarding.selectedInstitution"
+                values={{ productName: product?.title }}
+                components={{ 1: <strong /> }}
+              >
+                {`Prosegui con l’adesione a <strong>{{ productName }}</strong> per l’ente selezionato`}
+              </Trans>
             ) : institutionType === 'SA' ? (
               <Trans i18nKey="onboardingStep1.onboarding.saSubTitle">
                 Se sei tra i gestori privati di piattaforma e-procurement e hai <br /> già ottenuto
@@ -279,13 +285,13 @@ export function StepSearchParty({
                 </Link>
                 , inserisci uno dei dati
                 <br /> richiesti e cerca l’ente per cui vuoi richiedere l’adesione a <br />
-                Interoperabilità.
+                <strong>Interoperabilità.</strong>
               </Trans>
             ) : institutionType === 'AS' ? (
               <Trans i18nKey="onboardingStep1.onboarding.asSubTitle">
                 Se sei una società di assicurazione presente nell’Albo delle <br /> imprese IVASS,
                 inserisci uno dei dati richiesti e cerca l’ente per
-                <br /> cui vuoi richiedere l’adesione a Interoperabilità.
+                <br /> cui vuoi richiedere l’adesione a <strong>Interoperabilità.</strong>
               </Trans>
             ) : (
               subTitle
