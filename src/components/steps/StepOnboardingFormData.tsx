@@ -33,6 +33,7 @@ import PersonalAndBillingDataSection from '../onboardingFormData/PersonalAndBill
 import GeoTaxSessionModal from '../onboardingFormData/taxonomy/GeoTaxSessionModal';
 import GeoTaxonomySection from '../onboardingFormData/taxonomy/GeoTaxonomySection';
 import { useHistoryState } from '../useHistoryState';
+import { ErrorModalVatNumber } from '../onboardingFormData/ErrorPIVAModal';
 
 const fiscalAndVatCodeRegexp = new RegExp(
   /(^[A-Za-z]{6}[0-9lmnpqrstuvLMNPQRSTUV]{2}[abcdehlmprstABCDEHLMPRST]{1}[0-9lmnpqrstuvLMNPQRSTUV]{2}[A-Za-z]{1}[0-9lmnpqrstuvLMNPQRSTUV]{3}[A-Za-z]{1}$|^[0-9]{11}$)/
@@ -94,8 +95,9 @@ export default function StepOnboardingFormData({
 
   const [openModifyModal, setOpenModifyModal] = useState<boolean>(false);
   const [openAddModal, setOpenAddModal] = useState<boolean>(false);
-  const [isVatRegistrated, setIsVatRegistrated] = useState<boolean>(false);
+  const [openVatNumberErrorModal, setOpenVatNumberErrorModal] = useState<boolean>(false);
   const [vatVerificationGenericError, setVatVerificationGenericError] = useState<boolean>(false);
+  const [isVatRegistrated, setIsVatRegistrated] = useState<boolean>(false);
   const [previousGeotaxononomies, setPreviousGeotaxononomies] = useState<Array<GeographicTaxonomy>>(
     []
   );
@@ -337,7 +339,7 @@ export default function StepOnboardingFormData({
             : isVatRegistrated
             ? t('onboardingFormData.billingDataSection.vatNumberAlreadyRegistered')
             : vatVerificationGenericError
-            ? t('onboardingFormData.billingDataSection.vatNumberVerificationError')
+            ? requiredError
             : undefined,
         city: !values.city ? requiredError : undefined,
         county: !values.county ? requiredError : undefined,
@@ -466,12 +468,13 @@ export default function StepOnboardingFormData({
     const restOutcome = getFetchOutcome(onboardingStatus);
 
     if (restOutcome === 'success') {
-      setIsVatRegistrated(true);
       setVatVerificationGenericError(false);
+      setIsVatRegistrated(true);
     } else if ((onboardingStatus as AxiosError).response?.status === 404) {
       setIsVatRegistrated(false);
       setVatVerificationGenericError(false);
     } else {
+      setOpenVatNumberErrorModal(true);
       setVatVerificationGenericError(true);
     }
   };
@@ -614,6 +617,10 @@ export default function StepOnboardingFormData({
         openAddModal={openAddModal}
         onForwardAction={onForwardAction}
         handleClose={handleClose}
+      />
+      <ErrorModalVatNumber
+        openVatNumberErrorModal={openVatNumberErrorModal}
+        setOpenVatNumberErrorModal={setOpenVatNumberErrorModal}
       />
     </Box>
   );
