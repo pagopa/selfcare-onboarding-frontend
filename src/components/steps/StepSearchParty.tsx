@@ -87,6 +87,7 @@ export function StepSearchParty({
     null
   );
   const [dataFromAooUo, setDataFromAooUo] = useState<IPACatalogParty | null>();
+  const [disabled, setDisabled] = useState<boolean>(false);
 
   const handleSearchTaxCodeFromAooUo = async (query: string) => {
     const searchResponse = await fetchWithLogs(
@@ -111,7 +112,7 @@ export function StepSearchParty({
       { endpoint: 'ONBOARDING_GET_AOO_CODE_INFO', endpointParams: { codiceUniAoo: query } },
       {
         method: 'GET',
-        params: { ...(prodPn && { categories: 'L6,L4,L45', origin: 'IPA' }) },
+        params: { ...(prodPn && { categories: 'L6,L4,L45,L35,L5,L17', origin: 'IPA' }) },
       },
       () => setRequiredLogin(true)
     );
@@ -130,7 +131,7 @@ export function StepSearchParty({
       { endpoint: 'ONBOARDING_GET_UO_CODE_INFO', endpointParams: { codiceUniUo: query } },
       {
         method: 'GET',
-        params: { ...(prodPn && { categories: 'L6,L4,L45', origin: 'IPA' }) },
+        params: { ...(prodPn && { categories: 'L6,L4,L45,L35,L5,L17', origin: 'IPA' }) },
       },
       () => setRequiredLogin(true)
     );
@@ -167,19 +168,32 @@ export function StepSearchParty({
     setAooResultHistory(aooResult);
     setUoResultHistory(uoResult);
     setSelectedHistory(selected);
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const { id } = selected!;
-    forward(
-      {
-        externalId: dataFromAooUo ? dataFromAooUo.id : id,
-      },
-      aooResult || uoResult
-        ? ({ ...dataFromAooUo } as Party)
-        : ({ ...selected, externalId: id } as Party),
-      aooResult,
-      uoResult,
-      institutionType
-    );
+
+    if (
+      !selected?.id &&
+      institutionType === 'GSP' &&
+      (product?.id === 'prod-io' || product?.id === 'prod-pagopa')
+    ) {
+      forward(
+        { externalId: '' },
+        { ...selected, externalId: '' } as Party,
+        aooResult,
+        uoResult,
+        institutionType
+      );
+    } else {
+      forward(
+        {
+          externalId: dataFromAooUo ? dataFromAooUo.id : selected?.id,
+        },
+        aooResult || uoResult
+          ? ({ ...dataFromAooUo } as Party)
+          : ({ ...selected, externalId: selected?.id } as Party),
+        aooResult,
+        uoResult,
+        institutionType
+      );
+    }
   };
 
   const { t } = useTranslation();
@@ -248,7 +262,13 @@ export function StepSearchParty({
         <Grid item xs={12}>
           <Typography variant="body1" align="center" color={theme.palette.text.primary}>
             {selected ? (
-              `Prosegui con l’adesione a ${product?.title} per l’ente selezionato`
+              <Trans
+                i18nKey="onboardingStep1.onboarding.selectedInstitution"
+                values={{ productName: product?.title }}
+                components={{ 1: <strong /> }}
+              >
+                {`Prosegui con l’adesione a <strong>{{ productName }}</strong> per l’ente selezionato`}
+              </Trans>
             ) : institutionType === 'SA' ? (
               <Trans i18nKey="onboardingStep1.onboarding.saSubTitle">
                 Se sei tra i gestori privati di piattaforma e-procurement e hai <br /> già ottenuto
@@ -265,13 +285,13 @@ export function StepSearchParty({
                 </Link>
                 , inserisci uno dei dati
                 <br /> richiesti e cerca l’ente per cui vuoi richiedere l’adesione a <br />
-                Interoperabilità.
+                <strong>Interoperabilità.</strong>
               </Trans>
             ) : institutionType === 'AS' ? (
               <Trans i18nKey="onboardingStep1.onboarding.asSubTitle">
                 Se sei una società di assicurazione presente nell’Albo delle <br /> imprese IVASS,
                 inserisci uno dei dati richiesti e cerca l’ente per
-                <br /> cui vuoi richiedere l’adesione a Interoperabilità.
+                <br /> cui vuoi richiedere l’adesione a <strong>Interoperabilità.</strong>
               </Trans>
             ) : (
               subTitle
@@ -283,31 +303,54 @@ export function StepSearchParty({
       <Grid container item justifyContent="center" mt={4} mb={4}>
         {product?.id === 'prod-pn' && (
           <Grid container item justifyContent="center">
-            <Grid item xs={10}>
-              <Box display="flex" justifyContent="center" mb={5}>
-                <Alert severity="warning" sx={{ width: '100%' }}>
-                  <Typography sx={{ fontSize: '16px', a: { color: theme.palette.text.primary } }}>
-                    <Trans
-                      i18nKey={'onboardingStep1.onboarding.disclaimer.description'}
-                      components={{
-                        1: <strong />,
-                        3: (
-                          <a href="https://www.indicepa.gov.it/ipa-portale/consultazione/indirizzo-sede/ricerca-ente?categoria=L45" />
-                        ),
-                        5: <br />,
-                        6: (
-                          <a href="https://www.indicepa.gov.it/ipa-portale/consultazione/indirizzo-sede/ricerca-ente?categoria=L6" />
-                        ),
-                        8: (
-                          <a href="https://www.indicepa.gov.it/ipa-portale/consultazione/indirizzo-sede/ricerca-ente?categoria=L4" />
-                        ),
-                      }}
-                    >
-                      {`Al momento possono aderire a SEND tramite Area Riservata solo le <1>Pubbliche Amministrazioni Locali</1> presenti in IPA come <3>Città<5 />Metropolitane</3>, <6>Comuni e loro Consorzi e Associazioni</6> e <8>Regioni, Province Autonome e loro Consorzi e Associazioni</8>`}
-                    </Trans>
-                  </Typography>
-                </Alert>
-              </Box>
+            <Grid item display="flex" justifyContent="center" mb={5}>
+              <Alert
+                severity="warning"
+                sx={{
+                  width: '100%',
+                  paddingRight: '56px !important',
+                  paddingBottom: '0px !important',
+                }}
+              >
+                <Typography sx={{ fontSize: '16px', a: { color: theme.palette.text.primary } }}>
+                  <Trans
+                    i18nKey={'onboardingStep1.onboarding.disclaimer.description'}
+                    components={{
+                      1: <strong />,
+                      3: (
+                        <a href="https://www.indicepa.gov.it/ipa-portale/consultazione/indirizzo-sede/ricerca-ente?categoria=L45" />
+                      ),
+                      5: <br />,
+                      6: (
+                        <a href="https://www.indicepa.gov.it/ipa-portale/consultazione/indirizzo-sede/ricerca-ente?categoria=L6" />
+                      ),
+                      8: (
+                        <a href="https://www.indicepa.gov.it/ipa-portale/consultazione/indirizzo-sede/ricerca-ente?categoria=L4" />
+                      ),
+                      9: (
+                        <a href="https://www.indicepa.gov.it/ipa-portale/consultazione/indirizzo-sede/ricerca-ente?categoria=L35" />
+                      ),
+                      10: (
+                        <a href="https://www.indicepa.gov.it/ipa-portale/consultazione/indirizzo-sede/ricerca-ente?categoria=L5" />
+                      ),
+                      11: (
+                        <a href="https://www.indicepa.gov.it/ipa-portale/consultazione/indirizzo-sede/ricerca-ente?categoria=L17" />
+                      ),
+                      12: (
+                        <ul
+                          style={{
+                            listStyleType: 'square',
+                            paddingLeft: '28px',
+                          }}
+                        />
+                      ),
+                      13: <li />,
+                    }}
+                  >
+                    {`Al momento possono aderire a SEND tramite Area Riservata solo le seguenti <1>Pubbliche <5 />Amministrazioni Locali</1> presenti in IPA: <5 /><12><13><3>Città Metropolitane</3></13><13><6>Comuni e loro Consorzi e Associazioni</6></13><13><8>Regioni, Province Autonome e loro Consorzi e Associazioni</8></13><13><9>Camere di Commercio, Industria, Artigianato e Agricoltura e loro Unioni Regionali</9></13><13><10>Province</10></13><13><11>Università</11></13></12>`}
+                  </Trans>
+                </Typography>
+              </Alert>
             </Grid>
           </Grid>
         )}
@@ -335,6 +378,7 @@ export function StepSearchParty({
           <Autocomplete
             theme={theme}
             selected={selected}
+            setDisabled={setDisabled}
             setSelected={setSelected}
             endpoint={{ endpoint: 'ONBOARDING_GET_SEARCH_PARTIES' }}
             transformFn={(data: { items: Array<IPACatalogParty> }) =>
@@ -374,21 +418,48 @@ export function StepSearchParty({
                 sx={{
                   textAlign: 'center',
                 }}
-                variant="caption"
-                color={theme.palette.text.primary}
+                variant="body1"
+                color={theme.palette.text.secondary}
               >
-                <Trans i18nKey="onboardingStep1.onboarding.ipaDescription">
-                  Non trovi il tuo ente nell&apos;IPA? In
-                  <Link
-                    sx={{ textDecoration: 'none', color: theme.palette.primary.main }}
-                    href="https://indicepa.gov.it/ipa-portale/servizi-enti/accreditamento-ente"
+                {institutionType === 'GSP' && product?.id !== 'prod-interop' ? (
+                  <Trans
+                    i18nKey="onboardingStep1.onboarding.gpsDescription"
+                    components={{
+                      1: <br />,
+                      2: (
+                        <Link
+                          sx={{
+                            textDecoration: 'underline',
+                            color: theme.palette.primary.main,
+                            cursor: 'pointer',
+                          }}
+                          onClick={onForwardAction}
+                        />
+                      ),
+                    }}
                   >
-                    questa pagina
-                  </Link>
-                  trovi maggiori
-                  <br />
-                  informazioni sull&apos;indice e su come accreditarsi
-                </Trans>
+                    {`Non trovi il tuo ente nell'IPA?<1 /><2>Inserisci manualmente i dati del tuo ente.</2>`}
+                  </Trans>
+                ) : (
+                  <Trans
+                    i18nKey="onboardingStep1.onboarding.ipaDescription"
+                    components={{
+                      1: (
+                        <Link
+                          sx={{
+                            textDecoration: 'none',
+                            color: theme.palette.primary.main,
+                            cursor: 'pointer',
+                          }}
+                          href="https://indicepa.gov.it/ipa-portale/servizi-enti/accreditamento-ente"
+                        />
+                      ),
+                      3: <br />,
+                    }}
+                  >
+                    {`Non trovi il tuo ente nell'IPA? In <1>questa pagina</1> trovi maggiori <3/> informazioni sull'indice e su come accreditarsi `}
+                  </Trans>
+                )}
               </Typography>
             </Box>
           </Grid>
@@ -408,7 +479,7 @@ export function StepSearchParty({
           forward={{
             action: onForwardAction,
             label: t('onboardingStep1.onboarding.onboardingStepActions.confirmAction'),
-            disabled: !selected,
+            disabled,
           }}
         />
       </Grid>

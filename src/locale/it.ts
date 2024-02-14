@@ -9,7 +9,7 @@ export default {
     noResultsLabel: 'Nessun risultato',
     lessThen3CharacterLabel: 'Digita almeno 3 caratteri',
     lessThen11CharacterLabel: 'Digita almeno 11 caratteri',
-    serachLabel: 'Cerca ente',
+    searchLabel: 'Cerca ente',
     aooLabel: 'Inserisci il codice univoco AOO',
     uoLabel: 'Inserisci il codice univoco UO',
     ariaLabel: `Seleziona la tipologia di ricerca dell'ente`,
@@ -89,15 +89,18 @@ export default {
       bodyTitle: 'Cerca il tuo ente',
       codyTitleSelected: 'Conferma l’ente selezionato',
       disclaimer: {
-        description: `Al momento possono aderire a SEND tramite Area Riservata solo le <1>Pubbliche Amministrazioni Locali</1> presenti in IPA come <3>Città<5 />Metropolitane</3>, <6>Comuni e loro Consorzi e Associazioni</6> e <8>Regioni, Province Autonome e loro Consorzi e Associazioni</8>`,
+        description: `Al momento possono aderire a SEND tramite Area Riservata solo le seguenti <1>Pubbliche <5 />Amministrazioni Locali</1> presenti in IPA: <5 /><12><13><3>Città Metropolitane</3></13><13><6>Comuni e loro Consorzi e Associazioni</6></13><13><8>Regioni, Province Autonome e loro Consorzi e Associazioni</8></13><13><9>Camere di Commercio, Industria, Artigianato e Agricoltura e loro Unioni Regionali</9></13><13><10>Province</10></13><13><11>Università</11></13></12>`,
       },
       bodyDescription:
-        'Inserisci uno dei dati richiesti e cerca dall’Indice della Pubblica <1/> Amministrazione (IPA) l’ente per cui vuoi richiedere l’adesione a <3/>{{productTitle}}',
+        'Inserisci uno dei dati richiesti e cerca dall’Indice della Pubblica <1/> Amministrazione (IPA) l’ente per cui vuoi richiedere l’adesione a <3/><4>{{productTitle}}</4>.',
       ipaDescription: `Non trovi il tuo ente nell'IPA? In <1>questa pagina</1> trovi maggiori <3/> informazioni sull'indice e su come accreditarsi `,
+      selectedInstitution:
+        'Prosegui con l’adesione a <1>{{productName}}</1> per l’ente selezionato',
+      gpsDescription: `Non trovi il tuo ente nell'IPA?<1 /><2>Inserisci manualmente i dati del tuo ente.</2>`,
       saSubTitle:
-        'Se sei tra i gestori privati di piattaforma e-procurement e hai <1/> già ottenuto la <3>certificazione da AgID</3>, inserisci uno dei dati <5/> richiesti e cerca l’ente per cui vuoi richiedere l’adesione a <7/> Interoperabilità.',
+        'Se sei tra i gestori privati di piattaforma e-procurement e hai <1/> già ottenuto la <3>certificazione da AgID</3>, inserisci uno dei dati <5/> richiesti e cerca l’ente per cui vuoi richiedere l’adesione a <7/> <8>Interoperabilità.</8>',
       asSubTitle:
-        'Se sei una società di assicurazione presente nell’Albo delle <1/>imprese IVASS, inserisci uno dei dati richiesti e cerca l’ente per<3/> cui vuoi richiedere l’adesione a Interoperabilità.',
+        'Se sei una società di assicurazione presente nell’Albo delle <1/>imprese IVASS, inserisci uno dei dati richiesti e cerca l’ente per<3/> cui vuoi richiedere l’adesione a <5>Interoperabilità.</5>',
       asyncAutocomplete: {
         placeholder: 'Cerca',
       },
@@ -109,14 +112,14 @@ export default {
   },
   onboardingStep2: {
     bodyTitle: 'Indica il Legale Rappresentante',
-    bodyDescription: `Inserisci i dati del Legale Rappresentante o del procuratore del tuo ente. <1/> Sarà responsabile della firma del contratto per {{productTitle}} <3/> e avrà il ruolo di Amministratore per questo prodotto nell'Area Riservata.`,
-    premiumBodyDescription: `Inserisci i dati del Legale Rappresentante o del procuratore del tuo ente. <1/> La persona che indicherai sarà firmataria del contratto per <3/> Premium.`,
+    bodyDescription: `Inserisci i dati del Legale Rappresentante o del procuratore del tuo ente. <1/> Sarà responsabile della firma del contratto per <3>{{productTitle}}</3> <4/> e avrà il ruolo di Amministratore per questo prodotto nell'Area Riservata.`,
+    premiumBodyDescription: `Inserisci i dati del Legale Rappresentante o del procuratore del tuo ente. <1/> La persona che indicherai sarà firmataria del contratto per <3/> <strong>Premium<strong/>.`,
     backLabel: 'Indietro',
     confirmLabel: 'Continua',
   },
   onboardingStep3: {
     bodyTitle: "Indica l'Amministratore",
-    bodyDescription1: `Puoi aggiungere da uno a tre Amministratori o suoi delegati. <1/> Saranno i responsabili della gestione di {{productTitle}} e presenti nel contratto di <3 />adesione come delegati dal Legale Rappresentante.`,
+    bodyDescription1: `Puoi aggiungere da uno a tre Amministratori o suoi delegati. <1/> Saranno i responsabili della gestione di <3>{{productTitle}}</3> e presenti nel contratto di <4 />adesione come delegati dal Legale Rappresentante.`,
     addUserLabel: 'AGGIUNGI UN ALTRO AMMINISTRATORE',
     addUserLink: 'Aggiungi un altro Amministratore',
     backLabel: 'Indietro',
@@ -305,13 +308,14 @@ export default {
   onBoardingSubProduct: {
     alreadyOnboardedError: {
       title: 'Sottoscrizione già avvenuta',
-      message: "L'ente che hai selezionato ha già sottoscritto l'offerta <1 />Premium.",
+      message:
+        "L'ente che hai selezionato ha già sottoscritto l'offerta <1 /><strong>Premium</strong>.",
       closeButton: 'Chiudi',
     },
     notBasicProductError: {
       title: "L'ente non ha aderito a {{selectedProduct}}",
       message:
-        "Per poter sottoscrivere l'offerta Premium, l'ente che hai <1 />selezionato deve prima aderire al prodotto {{selectedProduct}}",
+        "Per poter sottoscrivere l'offerta <strong>Premium</strong>, l'ente che hai <3 />selezionato deve prima aderire al prodotto <strong>{{selectedProduct}}</strong>.",
       adhesionButton: 'Aderisci',
     },
     subProductStepSelectPricingPlan: {
@@ -368,14 +372,14 @@ export default {
     subProductStepUserUnrelated: {
       title: 'Non puoi aderire a {{selectedProduct}} Premium',
       description:
-        'Il tuo ente non ha aderito ad {{selectedProduct}}, o non hai un ruolo per <1/>gestire il prodotto. <3/> Chiedi ad un Amministratore di aggiungerti nella sezione <5/>Utenti, oppure richiedi l’adesione ad {{selectedProduct}} per il tuo ente.',
+        'Il tuo ente non ha aderito ad <strong>{{selectedProduct}}</strong>, o non hai un ruolo per <3/>gestire il prodotto. <5/> Chiedi ad un Amministratore di aggiungerti nella sezione <7/>Utenti, oppure richiedi l’adesione ad <strong>{{selectedProduct}}</strong> per il tuo ente.',
       backHomeLabelBtn: 'Torna alla home',
       goToBtnLabel: 'Vai all’adesione',
     },
     selectUserPartyStep: {
       title: 'Seleziona il tuo ente',
       subTitle:
-        "Seleziona l'ente per il quale stai richiedendo la sottoscrizione <1 />all'offerta Premium",
+        "Seleziona l'ente per il quale stai richiedendo la sottoscrizione <1 />all'offerta <3>Premium</3>",
       searchLabel: 'Cerca ente',
       notFoundResults: 'Nessun risultato',
       IPAsubTitle:
@@ -392,7 +396,7 @@ export default {
     successfulAdhesion: {
       title: 'La richiesta di adesione è stata <1/>inviata con successo',
       message:
-        "Riceverai una PEC all’indirizzo istituzionale dell’ente.<1 />Al suo interno troverai le istruzioni per completare la <3 /> sottoscrizione all'offerta Premium.",
+        "Riceverai una PEC all’indirizzo istituzionale dell’ente.<1 />Al suo interno troverai le istruzioni per completare la <3 /> sottoscrizione all'offerta <strong>Premium</strong>.",
       closeButton: 'Chiudi',
     },
     billingData: {
@@ -417,7 +421,7 @@ export default {
   },
   stepInstitutionType: {
     title: 'Seleziona il tipo di ente che <1/> rappresenti',
-    subtitle: 'Indica il tipo di ente che aderirà a {{productName}}',
+    subtitle: 'Indica il tipo di ente che aderirà a <1>{{productName}}</1>',
     institutionTypeValues: {
       pa: 'Pubblica Amministrazione',
       gsp: 'Gestore di servizi pubblici',

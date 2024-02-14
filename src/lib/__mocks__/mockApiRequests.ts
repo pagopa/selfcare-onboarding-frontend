@@ -567,7 +567,7 @@ const statusTesting = 'TESTING';
 const mockedProducts: Array<Product> = [
   {
     id: 'prod-pn',
-    title: 'Piattaforma Notifiche',
+    title: 'SEND - Servizio Notifiche digitali',
     status: statusActive,
   },
   {

@@ -598,8 +598,10 @@ function OnboardingComponent({ productId }: { productId: string }) {
     setInstitutionType(newInstitutionType);
     forward();
     if (
-      (newInstitutionType === 'PSP' || newInstitutionType !== 'PA') &&
-      productId !== 'prod-interop'
+      newInstitutionType !== 'GSP' &&
+      newInstitutionType !== 'PA' &&
+      newInstitutionType !== 'SA' &&
+      newInstitutionType !== 'AS'
     ) {
       if (newInstitutionType !== institutionType) {
         setOnboardingFormData({
@@ -648,9 +650,9 @@ function OnboardingComponent({ productId }: { productId: string }) {
             <Trans
               i18nKey="onboardingStep1.onboarding.bodyDescription"
               values={{ productTitle: selectedProduct?.title }}
-              components={{ 1: <br />, 3: <br /> }}
+              components={{ 1: <br />, 3: <br />, 4: <strong /> }}
             >
-              {`Inserisci uno dei dati richiesti e cerca dall’Indice della Pubblica <1/> Amministrazione (IPA) l’ente per cui vuoi richiedere l’adesione a <3/>{{productTitle}}`}
+              {`Inserisci uno dei dati richiesti e cerca dall’Indice della Pubblica <1/> Amministrazione (IPA) l’ente per cui vuoi richiedere l’adesione a <3/><strong>{{productTitle}}</strong>`}
             </Trans>
           ),
           institutionType,
@@ -726,7 +728,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
               setOpenExitModal(true);
             } else if (
               institutionType === 'PSP' ||
-              (institutionType !== 'PA' && institutionType !== 'SA')
+              (institutionType !== 'PA' && institutionType !== 'SA' && institutionType !== 'GSP')
             ) {
               setActiveStep(0);
             } else {
