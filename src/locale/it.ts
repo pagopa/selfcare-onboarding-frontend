@@ -448,6 +448,7 @@ export default {
     pspAndProdPagoPATitle: 'Inserisci i dati',
     backLabel: 'Indietro',
     confirmLabel: 'Continua',
+    closeBtnLabel: 'Chiudi',
     billingDataPt: {
       title: 'Inserisci i dati',
       subTitle: 'Inserisci le informazioni richieste, assicurandoti che siano corrette.',
@@ -462,7 +463,9 @@ export default {
       invalidMailSupport: 'L’indirizzo email non è valido',
       invalidShareCapitalField: 'Il campo capitale sociale non è valido',
       vatNumberAlreadyRegistered: 'La P. IVA che hai inserito è già stata registrata.',
-      vatNumberVerificationError: 'Non è stato possibile verificare la P.IVA',
+      vatNumberVerificationErrorTitle: 'La verifica non è andata a buon fine',
+      vatNumberVerificationErrorDescription:
+        'Non è stato possibile verificare la P.IVA al momento. Riprova più tardi.',
       centralPartyLabel: 'Ente centrale',
       businessName: 'Ragione sociale',
       aooName: 'Denominazione AOO',
