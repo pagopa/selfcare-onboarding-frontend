@@ -95,7 +95,9 @@ export default function PartyAdvancedSelect({
       product.id === 'prod-io-sign' ||
       product.id === 'prod-pn-dev' ||
       product.id === 'prod-pn');
-  const optionsAvailable4InstitutionType = institutionType !== 'SA' && institutionType !== 'AS';
+      
+  const optionsAvailable4InstitutionType =
+    institutionType !== 'SA' && institutionType !== 'AS' && institutionType !== 'GSP';
 
   const menuItems = [
     {
