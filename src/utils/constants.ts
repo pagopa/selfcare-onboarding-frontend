@@ -65,13 +65,13 @@ export const API = {
   },
   ONBOARDING_POST_LEGALS: {
     URL:
-      ENV.ENV === 'DEV'
+      ENV.ENV !== 'PROD'
         ? ENV.URL_API.ONBOARDING_V2 + '/v2/institutions/onboarding'
         : ENV.URL_API.ONBOARDING + '/institutions/onboarding',
   },
   ONBOARDING_COMPLETE_REGISTRATION: {
     URL:
-      ENV.ENV === 'DEV'
+      ENV.ENV !== 'PROD'
         ? ENV.URL_API.ONBOARDING_V2 + '/v2/tokens/{{token}}/complete'
         : ENV.URL_API.ONBOARDING + '/tokens/{{token}}/complete',
   },
@@ -90,7 +90,7 @@ export const API = {
   },
   ONBOARDING_TOKEN_VALIDATION: {
     URL:
-      ENV.ENV === 'DEV'
+      ENV.ENV !== 'PROD'
         ? ENV.URL_API.ONBOARDING_V2 + '/v2/tokens/{{token}}/verify'
         : ENV.URL_API.ONBOARDING + '/tokens/{{token}}/verify',
   },
