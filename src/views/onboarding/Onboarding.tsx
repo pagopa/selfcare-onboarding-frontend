@@ -716,9 +716,17 @@ function OnboardingComponent({ productId }: { productId: string }) {
           origin,
           institutionType: institutionType as InstitutionType,
           subtitle:
-            institutionType !== 'PT'
-              ? t('onBoardingSubProduct.billingData.subTitle')
-              : t('onboardingFormData.billingDataPt.subTitle'),
+            institutionType !== 'PT' ? (
+              t('onBoardingSubProduct.billingData.subTitle')
+            ) : (
+              <Trans
+                i18nKey="onBoardingSubProduct.billingDataPt.subTitle"
+                values={{ nameProduct: selectedProduct?.title }}
+                components={{ 1: <br />, 3: <br />, 5: <strong /> }}
+              >
+                {`Inserisci le informazioni richieste e assicurati che siano corrette.<1 /> Serviranno a registrarti come Partner tecnologico per il<3/> prodotto <5>{{nameProduct}}</5>.`}
+              </Trans>
+            ),
           forward: forwardWithBillingData,
           back: () => {
             if (fromDashboard && !productAvoidStep) {
