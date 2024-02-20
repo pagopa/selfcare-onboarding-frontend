@@ -120,6 +120,8 @@ export default {
   onboardingStep3: {
     bodyTitle: "Indica l'Amministratore",
     bodyDescription1: `Puoi aggiungere da uno a tre Amministratori o suoi delegati. <1/> Saranno i responsabili della gestione di <3>{{productTitle}}</3> e presenti nel contratto di <4 />adesione come delegati dal Legale Rappresentante.`,
+    bodyDescriptionPt:
+      'Puoi aggiungere da uno a tre Amministratori o suoi delegati.<1/> Si occuperanno della gestione degli utenti e dei prodotti per conto degli enti.',
     addUserLabel: 'AGGIUNGI UN ALTRO AMMINISTRATORE',
     addUserLink: 'Aggiungi un altro Amministratore',
     backLabel: 'Indietro',
@@ -451,7 +453,8 @@ export default {
     closeBtnLabel: 'Chiudi',
     billingDataPt: {
       title: 'Inserisci i dati',
-      subTitle: 'Inserisci le informazioni richieste, assicurandoti che siano corrette.',
+      subTitle:
+        'Inserisci le informazioni richieste e assicurati che siano corrette.<1 /> Serviranno a registrarti come Partner tecnologico per il<3 /> prodotto <5>{{nameProduct}}</5>.',
     },
     billingDataSection: {
       invalidFiscalCode: 'Il Codice Fiscale non è valido',
