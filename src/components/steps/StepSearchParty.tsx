@@ -309,7 +309,6 @@ export function StepSearchParty({
                 sx={{
                   width: '100%',
                   paddingRight: '56px !important',
-                  paddingBottom: '0px !important',
                 }}
               >
                 <Typography sx={{ fontSize: '16px', a: { color: theme.palette.text.primary } }}>
@@ -317,37 +316,17 @@ export function StepSearchParty({
                     i18nKey={'onboardingStep1.onboarding.disclaimer.description'}
                     components={{
                       1: <strong />,
-                      3: (
-                        <a href="https://www.indicepa.gov.it/ipa-portale/consultazione/indirizzo-sede/ricerca-ente?categoria=L45" />
-                      ),
-                      5: <br />,
-                      6: (
-                        <a href="https://www.indicepa.gov.it/ipa-portale/consultazione/indirizzo-sede/ricerca-ente?categoria=L6" />
-                      ),
-                      8: (
-                        <a href="https://www.indicepa.gov.it/ipa-portale/consultazione/indirizzo-sede/ricerca-ente?categoria=L4" />
-                      ),
-                      9: (
-                        <a href="https://www.indicepa.gov.it/ipa-portale/consultazione/indirizzo-sede/ricerca-ente?categoria=L35" />
-                      ),
-                      10: (
-                        <a href="https://www.indicepa.gov.it/ipa-portale/consultazione/indirizzo-sede/ricerca-ente?categoria=L5" />
-                      ),
-                      11: (
-                        <a href="https://www.indicepa.gov.it/ipa-portale/consultazione/indirizzo-sede/ricerca-ente?categoria=L17" />
-                      ),
-                      12: (
-                        <ul
-                          style={{
-                            listStyleType: 'square',
-                            paddingLeft: '28px',
-                          }}
+                      3: <br />,
+                      5: (
+                        <a
+                          href="https://docs.pagopa.it/area-riservata/area-riservata/come-aderire"
+                          target="_blank"
+                          rel="noreferrer"
                         />
                       ),
-                      13: <li />,
                     }}
                   >
-                    {`Al momento possono aderire a SEND tramite Area Riservata solo le seguenti <1>Pubbliche <5 />Amministrazioni Locali</1> presenti in IPA: <5 /><12><13><3>Città Metropolitane</3></13><13><6>Comuni e loro Consorzi e Associazioni</6></13><13><8>Regioni, Province Autonome e loro Consorzi e Associazioni</8></13><13><9>Camere di Commercio, Industria, Artigianato e Agricoltura e loro Unioni Regionali</9></13><13><10>Province</10></13><13><11>Università</11></13></12>`}
+                    {`Al momento possono aderire a SEND tramite Area Riservata solo le <1>Pubbliche <3>Amministrazioni Locali </1> presenti su IPA che trovi a <5>questo link</5>.`}
                   </Trans>
                 </Typography>
               </Alert>
