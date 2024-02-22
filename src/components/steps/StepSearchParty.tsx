@@ -305,7 +305,7 @@ export function StepSearchParty({
           <Grid container item justifyContent="center">
             <Grid item display="flex" justifyContent="center" mb={5}>
               <Alert
-                severity="warning"
+                severity="info"
                 sx={{
                   width: '100%',
                   paddingRight: '56px !important',
