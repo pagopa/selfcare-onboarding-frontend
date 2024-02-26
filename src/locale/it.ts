@@ -89,7 +89,7 @@ export default {
       bodyTitle: 'Cerca il tuo ente',
       codyTitleSelected: 'Conferma l’ente selezionato',
       disclaimer: {
-        description: `Al momento possono aderire a SEND tramite Area Riservata solo le seguenti <1>Pubbliche <5 />Amministrazioni Locali</1> presenti in IPA: <5 /><12><13><3>Città Metropolitane</3></13><13><6>Comuni e loro Consorzi e Associazioni</6></13><13><8>Regioni, Province Autonome e loro Consorzi e Associazioni</8></13><13><9>Camere di Commercio, Industria, Artigianato e Agricoltura e loro Unioni Regionali</9></13><13><10>Province</10></13><13><11>Università</11></13></12>`,
+        description: `Al momento possono aderire a SEND tramite Area Riservata solo le <1>Pubbliche <3 /> Amministrazioni Locali </1> presenti su IPA che trovi a <5>questo link</5>.`,
       },
       bodyDescription:
         'Inserisci uno dei dati richiesti e cerca dall’Indice della Pubblica <1/> Amministrazione (IPA) l’ente per cui vuoi richiedere l’adesione a <3/><4>{{productTitle}}</4>.',
@@ -120,6 +120,8 @@ export default {
   onboardingStep3: {
     bodyTitle: "Indica l'Amministratore",
     bodyDescription1: `Puoi aggiungere da uno a tre Amministratori o suoi delegati. <1/> Saranno i responsabili della gestione di <3>{{productTitle}}</3> e presenti nel contratto di <4 />adesione come delegati dal Legale Rappresentante.`,
+    bodyDescriptionPt:
+      'Puoi aggiungere da uno a tre Amministratori o suoi delegati.<1/> Si occuperanno della gestione degli utenti e dei prodotti per conto degli enti.',
     addUserLabel: 'AGGIUNGI UN ALTRO AMMINISTRATORE',
     addUserLink: 'Aggiungi un altro Amministratore',
     backLabel: 'Indietro',
@@ -448,9 +450,11 @@ export default {
     pspAndProdPagoPATitle: 'Inserisci i dati',
     backLabel: 'Indietro',
     confirmLabel: 'Continua',
+    closeBtnLabel: 'Chiudi',
     billingDataPt: {
       title: 'Inserisci i dati',
-      subTitle: 'Inserisci le informazioni richieste, assicurandoti che siano corrette.',
+      subTitle:
+        'Inserisci le informazioni richieste e assicurati che siano corrette.<1 /> Serviranno a registrarti come Partner tecnologico per il<3 /> prodotto <5>{{nameProduct}}</5>.',
     },
     billingDataSection: {
       invalidFiscalCode: 'Il Codice Fiscale non è valido',
@@ -462,7 +466,9 @@ export default {
       invalidMailSupport: 'L’indirizzo email non è valido',
       invalidShareCapitalField: 'Il campo capitale sociale non è valido',
       vatNumberAlreadyRegistered: 'La P. IVA che hai inserito è già stata registrata.',
-      vatNumberVerificationError: 'Non è stato possibile verificare la P.IVA',
+      vatNumberVerificationErrorTitle: 'La verifica non è andata a buon fine',
+      vatNumberVerificationErrorDescription:
+        'Non è stato possibile verificare la P.IVA al momento. Riprova più tardi.',
       centralPartyLabel: 'Ente centrale',
       businessName: 'Ragione sociale',
       aooName: 'Denominazione AOO',

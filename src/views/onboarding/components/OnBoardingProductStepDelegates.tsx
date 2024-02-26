@@ -206,15 +206,22 @@ export function OnBoardingProductStepDelegates({
         sx={{ justifyContent: 'center', justifyItems: 'center', display: 'grid' }}
         mt={1}
       >
-        <Grid item xs={12} mb={4}>
+        <Grid item xs={12} mb={2}>
           <Typography variant="body1" align="center">
-            <Trans
-              i18nKey="onboardingStep3.bodyDescription1"
-              values={{ productTitle: product?.title }}
-              components={{ 1: <br />, 3: <strong />, 4: <br /> }}
-            >
-              {`Puoi aggiungere da uno a tre Amministratori o suoi delegati. <1/> Saranno i responsabili della gestione di <3>{{productTitle}}</3> e presenti nel contratto di <4 />adesione come delegati dal Legale Rappresentante.`}
-            </Trans>
+            {isTechPartner ? (
+              <Trans i18nKey="onboardingStep3.bodyDescriptionPt" components={{ 1: <br /> }}>
+                {`Puoi aggiungere da uno a tre Amministratori o suoi delegati.<1/> 
+              Si occuperanno della gestione degli utenti e dei prodotti per conto degli enti.`}
+              </Trans>
+            ) : (
+              <Trans
+                i18nKey="onboardingStep3.bodyDescription1"
+                values={{ productTitle: product?.title }}
+                components={{ 1: <br />, 3: <strong />, 4: <br /> }}
+              >
+                {`Puoi aggiungere da uno a tre Amministratori o suoi delegati. <1/> Saranno i responsabili della gestione di <3>{{productTitle}}</3> e presenti nel contratto di <4 />adesione come delegati dal Legale Rappresentante.`}
+              </Trans>
+            )}
           </Typography>
         </Grid>
         <Grid item xs={8}>

@@ -127,7 +127,7 @@ export function RadioWithTextField({
                 color: theme.palette.text.secondary,
                 marginBottom: field === 'isFromIPA' ? 3 : 0,
               }}
-              inputProps={{ maxLength: field === 'isFromIPA' ? 6 : 300 }}
+              inputProps={{ maxLength: field === 'isFromIPA' ? 16 : 300 }}
               onChange={(e: any) => {
                 onTextFieldChange(true, field, e.target.value);
               }}
