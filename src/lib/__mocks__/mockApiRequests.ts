@@ -572,7 +572,7 @@ const mockedProducts: Array<Product> = [
   },
   {
     id: 'prod-pagopa',
-    title: 'Pagamenti PagoPA',
+    title: 'Piattaforma pagoPA',
     status: statusActive,
   },
   {
