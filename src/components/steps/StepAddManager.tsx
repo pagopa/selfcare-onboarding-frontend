@@ -1,9 +1,11 @@
-import { Grid, Typography, Link } from '@mui/material';
+import MenuBookIcon from '@mui/icons-material/MenuBook';
+import { Grid, Typography } from '@mui/material';
+import { ButtonNaked } from '@pagopa/mui-italia';
 import SessionModal from '@pagopa/selfcare-common-frontend/components/SessionModal';
-import { useContext, useEffect, useRef, useState } from 'react';
-import { useTranslation, Trans } from 'react-i18next';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
 import { uniqueId } from 'lodash';
+import { useContext, useEffect, useRef, useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import { Product, StepperStepComponentProps, UserOnCreate } from '../../../types';
 import { UserContext } from '../../lib/context';
 import { objectIsEmpty } from '../../lib/object-utils';
@@ -119,7 +121,7 @@ export function StepAddManager({
       </Grid>
 
       <Grid container item justifyContent="center" mt={1}>
-        <Grid item xs={12} mb={1}>
+        <Grid item xs={12} mb={2}>
           <Typography sx={{ fontWeight: 400 }} variant="body1" component="h2" align="center">
             <Trans
               i18nKey={
@@ -135,14 +137,17 @@ export function StepAddManager({
           </Typography>
         </Grid>
         <Grid item>
-          <Link
+          <ButtonNaked
+            component="button"
+            color="primary"
+            startIcon={<MenuBookIcon />}
+            sx={{ fontWeight: 700 }}
             onClick={() =>
               window.open('https://docs.pagopa.it/area-riservata/area-riservata/ruoli')
             }
-            sx={{ fontWeight: 'fontWeightBold', fontSize: '14px', cursor: 'pointer' }}
           >
             {t('moreInformationOnRoles')}
-          </Link>
+          </ButtonNaked>
         </Grid>
       </Grid>
 
