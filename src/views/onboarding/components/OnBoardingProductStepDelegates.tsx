@@ -1,5 +1,7 @@
 import Add from '@mui/icons-material/Add';
+import MenuBookIcon from '@mui/icons-material/MenuBook';
 import { Box, Checkbox, FormControlLabel, Grid, Link, Typography, useTheme } from '@mui/material';
+import { ButtonNaked } from '@pagopa/mui-italia';
 import SessionModal from '@pagopa/selfcare-common-frontend/components/SessionModal';
 import { omit, uniqueId } from 'lodash';
 import { ChangeEvent, useContext, useEffect, useState } from 'react';
@@ -206,7 +208,7 @@ export function OnBoardingProductStepDelegates({
         sx={{ justifyContent: 'center', justifyItems: 'center', display: 'grid' }}
         mt={1}
       >
-        <Grid item xs={12} mb={2}>
+        <Grid item xs={12} mb={1}>
           <Typography variant="body1" align="center">
             {isTechPartner ? (
               <Trans i18nKey="onboardingStep3.bodyDescriptionPt" components={{ 1: <br /> }}>
@@ -225,18 +227,21 @@ export function OnBoardingProductStepDelegates({
           </Typography>
         </Grid>
         <Grid item xs={8}>
-          <Link
+          <ButtonNaked
+            component="button"
+            color="primary"
+            startIcon={<MenuBookIcon />}
+            sx={{ fontWeight: 700 }}
             onClick={() =>
               window.open('https://docs.pagopa.it/area-riservata/area-riservata/ruoli')
             }
-            sx={{ fontWeight: 'fontWeightBold', fontSize: '14px', cursor: 'pointer' }}
           >
             {t('moreInformationOnRoles')}
-          </Link>
+          </ButtonNaked>
         </Grid>
       </Grid>
 
-      <Grid container item justifyContent="center" mt={3}>
+      <Grid container item justifyContent="center" mt={4}>
         <Grid item xs={4} display="flex" justifyContent="center">
           <FormControlLabel
             control={<Checkbox checked={isAuthUser} onChange={handleAuthUser} />}
