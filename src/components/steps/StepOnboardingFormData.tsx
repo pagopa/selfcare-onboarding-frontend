@@ -3,7 +3,7 @@
 
 import { Grid, TextField, Typography } from '@mui/material';
 import { Box, styled } from '@mui/system';
-import { AxiosError, AxiosResponse } from 'axios';
+import { AxiosResponse } from 'axios';
 import { theme } from '@pagopa/mui-italia';
 import { emailRegexp } from '@pagopa/selfcare-common-frontend/utils/constants';
 import { useFormik } from 'formik';
@@ -96,8 +96,8 @@ export default function StepOnboardingFormData({
   const [openModifyModal, setOpenModifyModal] = useState<boolean>(false);
   const [openAddModal, setOpenAddModal] = useState<boolean>(false);
   const [openVatNumberErrorModal, setOpenVatNumberErrorModal] = useState<boolean>(false);
-  const [vatVerificationGenericError, setVatVerificationGenericError] = useState<boolean>(false);
-  const [isVatRegistrated, setIsVatRegistrated] = useState<boolean>(false);
+  const [vatVerificationGenericError, _setVatVerificationGenericError] = useState<boolean>(false);
+  const [isVatRegistrated, _setIsVatRegistrated] = useState<boolean>(false);
   const [previousGeotaxononomies, setPreviousGeotaxononomies] = useState<Array<GeographicTaxonomy>>(
     []
   );
@@ -445,7 +445,7 @@ export default function StepOnboardingFormData({
     vatVerificationGenericError,
     formik.values,
   ]);
-
+  /*
   const verifyVatNumber = async () => {
     const onboardingStatus = await fetchWithLogs(
       {
@@ -478,7 +478,7 @@ export default function StepOnboardingFormData({
       setVatVerificationGenericError(true);
     }
   };
-
+*/
   useEffect(() => {
     if (
       !stepHistoryState.isTaxCodeEquals2PIVA &&
