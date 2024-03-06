@@ -125,7 +125,7 @@ export default function StepOnboardingFormData({
     institutionType !== 'PT' &&
     (productId === 'prod-io' || productId === 'prod-io-sign');
   const isProdIoSign = productId === 'prod-io-sign';
-  const isProdFideiussioni = productId?.startsWith('prod-fd') ?? false;
+  // const isProdFideiussioni = productId?.startsWith('prod-fd') ?? false;
   const isProdInterop = productId === 'prod-interop';
   const aooCode = aooSelected?.codiceUniAoo;
   const uoCode = uoSelected?.codiceUniUo;
@@ -497,7 +497,7 @@ export default function StepOnboardingFormData({
       });
     }
   }, [formik.values.taxCode, formik.values.vatNumber]);
-
+  /*
   useEffect(() => {
     if (
       (isProdFideiussioni && formik.values.vatNumber.length === 11) ||
@@ -505,10 +505,10 @@ export default function StepOnboardingFormData({
         stepHistoryState.isTaxCodeEquals2PIVA &&
         formik.values.taxCode.length === 11)
     ) {
-      void verifyVatNumber();
+       void verifyVatNumber();
     }
   }, [formik.values.vatNumber, stepHistoryState.isTaxCodeEquals2PIVA]);
-
+*/
   const baseTextFieldProps = (
     field: keyof OnboardingFormData,
     label: string,
