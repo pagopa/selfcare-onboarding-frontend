@@ -112,7 +112,7 @@ export function StepSearchParty({
       { endpoint: 'ONBOARDING_GET_AOO_CODE_INFO', endpointParams: { codiceUniAoo: query } },
       {
         method: 'GET',
-        params: { ...(prodPn && { categories: 'L6,L4,L45,L35,L5,L17', origin: 'IPA' }) },
+        params: { ...(prodPn && { categories: 'L6,L4,L45,L35,L5,L17,L15,C14', origin: 'IPA' }) },
       },
       () => setRequiredLogin(true)
     );
@@ -131,7 +131,7 @@ export function StepSearchParty({
       { endpoint: 'ONBOARDING_GET_UO_CODE_INFO', endpointParams: { codiceUniUo: query } },
       {
         method: 'GET',
-        params: { ...(prodPn && { categories: 'L6,L4,L45,L35,L5,L17', origin: 'IPA' }) },
+        params: { ...(prodPn && { categories: 'L6,L4,L45,L35,L5,L17,L15,C14', origin: 'IPA' }) },
       },
       () => setRequiredLogin(true)
     );
