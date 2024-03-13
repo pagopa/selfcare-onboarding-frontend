@@ -208,8 +208,9 @@ export default {
     },
   },
   completeRegistration: {
-    title: 'Qualcosa è andato storto.',
-    description: `Non siamo riusciti a indirizzarti alla pagina di caricamento<1 />per completare la procedura.`,
+    title: 'La pagina che cercavi non è disponibile',
+    description:
+      'Al momento non è possibile procedere. Riprova tra qualche <1 />minuto, o contatta l’assistenza',
     contactAssistanceButton: 'Contatta l’assistenza',
     sessionModal: {
       onConfirmLabel: 'Carica di nuovo',
