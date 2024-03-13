@@ -1,4 +1,4 @@
-import { Grid, Typography, Link, Theme } from '@mui/material';
+import { Grid, Typography, Theme, Button } from '@mui/material';
 import { DropEvent, FileRejection, useDropzone } from 'react-dropzone';
 import { Box } from '@mui/system';
 import { ReactComponent as CloudUpload } from '../assets/cloud-upload.svg';
@@ -44,9 +44,9 @@ export function FileUploader({
       onClick={() => {}}
       container
       direction="row"
-      justifyItems={'center'}
-      alignItems={'center'}
-      justifyContent={'center'}
+      justifyItems="center"
+      alignItems="center"
+      justifyContent="center"
     >
       <input {...getInputProps()} />
 
@@ -70,6 +70,7 @@ export function FileUploader({
             sx={{
               borderRadius: '10px',
               border: `2px dashed ${theme.palette.primary.main}`,
+              backgroundColor: '#0073E614',
             }}
           >
             <Grid container direction="column" alignItems={'center'} py={3} px={6}>
@@ -82,21 +83,17 @@ export function FileUploader({
               >
                 {title}
               </Typography>
-              <Typography
+              <Button
+                variant="outlined"
                 sx={{
-                  fontWeight: 'normal',
-                  color: theme.palette.text.primary,
+                  marginTop: 1,
+                  background: theme.palette.primary.main,
+                  color: theme.palette.primary.contrastText,
                 }}
-                variant={'body2'}
-                align="center"
+                onClick={(dropzoneRootProps as any).onClick}
               >
-                <Link
-                  sx={{ cursor: 'pointer', textDecoration: 'none' }}
-                  onClick={(dropzoneRootProps as any).onClick}
-                >
-                  {descriptionLink}
-                </Link>
-              </Typography>
+                {descriptionLink}
+              </Button>
             </Grid>
           </Box>
         </Box>
