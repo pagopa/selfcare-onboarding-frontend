@@ -46,14 +46,14 @@ test('test', async () => {
   mockedLocation.search = 'jwt=asd';
 
   render(<CompleteRegistrationComponent />);
-  await waitFor(() => screen.getByText('Segui le istruzioni'));
+  await waitFor(() => screen.getByText('Carica l’Accordo firmato'));
   const goOnButton = await waitFor(() =>
     screen.getByRole('button', {
-      name: 'Continua',
+      name: 'Vai al caricamento',
     })
   );
   fireEvent.click(goOnButton);
-  screen.getByText('selezionalo dal tuo computer');
+  screen.getByText('carica il file');
 
   const sendButton = screen.getByRole('button', {
     name: 'Continua',

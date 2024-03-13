@@ -24,9 +24,20 @@ export default {
     uoCode: 'Codice univoco UO',
   },
   confirmRegistrationStep0: {
-    title: "Carica l'Accordo di Adesione",
-    description: `<0>Segui le istruzioni</0> per inviare il documento firmato,<2/> servirà a completare l'adesione al prodotto scelto.`,
-    confirmAction: 'Continua',
+    download: {
+      title: 'Scarica l’Accordo di adesione',
+      description: `Per completare l’adesione, scarica l’Accordo e fai apporre la firma digitale in <1 /><2>formato p7m</2> dal Legale Rappresentante dell’ente o da un suo procuratore.`,
+      downloadContract: 'Scarica l’Accordo',
+      disclaimer:
+        'Firmando l’Accordo, il Legale Rappresentante dell’ente, o un suo procuratore, accetta espressamente e specificamente anche le singole clausole indicate nel paragrafo “Clausole ai sensi degli artt. 1341 e 1342 c.c.”',
+    },
+    upload: {
+      title: 'Carica l’Accordo firmato',
+      description: `Una volta firmato l’Accordo, segui le istruzioni per inviarlo e completare <1 />
+    l’adesione al prodotto scelto. Ricorda di caricare l’Accordo
+    <3>entro 30 giorni.</3>`,
+      goToUpload: 'Vai al caricamento',
+    },
   },
   confirmRegistrationStep1: {
     errorAlertTitle: 'Caricamento non riuscito',
@@ -34,10 +45,10 @@ export default {
       'Il caricamento del documento non è andato a buon fine. <1 />Carica un solo file in formato <3>p7m</3>.',
     errorAlertRetryLabel: 'Carica di nuovo',
     errorAlertCloseLabel: 'Esci',
-    pageTitle: "Carica l'Accordo di Adesione",
-    pageSubtitle: `Carica l’Accordo di Adesione ricevuto all’indirizzo PEC <1 />primario dell’ente, firmato digitalmente in p7m dal Legale <3 />Rappresentante.`,
+    pageTitle: "Carica l'Accordo di adesione",
+    pageSubtitle: `Carica l’Accordo di adesione firmato digitalmente <1 /> in p7m dal Legale Rappresentante.`,
     fileUploaderTitle: 'Trascina qui l’Accordo di Adesione firmato oppure',
-    fileUploaderDescriptionLink: 'selezionalo dal tuo computer',
+    fileUploaderDescriptionLink: 'carica il file',
     confirmAction: 'Continua',
   },
   fileUploadPreview: {
