@@ -319,10 +319,10 @@ export default function CompleteRegistrationComponent() {
             variantDescription={'body1'}
             title={t('completeRegistration.title')}
             description={
-              <Trans i18nKey="completeRegistration.description">
-                Non siamo riusciti a indirizzarti alla pagina di caricamento
-                <br />
-                per completare la procedura.
+              <Trans i18nKey="completeRegistration.description" components={{ 1: <br /> }}>
+                {
+                  'Al momento non è possibile procedere. Riprova tra qualche <1 />minuto, o contatta l’assistenza'
+                }
               </Trans>
             }
             buttonLabel={t('completeRegistration.contactAssistanceButton')}
