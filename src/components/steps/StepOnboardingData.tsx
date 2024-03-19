@@ -108,7 +108,7 @@ function StepOnboardingData({
               .charAt(0)
               .toUpperCase()
               .concat(result.institution.city.substring(1).toLowerCase().trim())
-          : undefined,
+          : result.institution.city,
         result.institution.county
       );
     } else if (
