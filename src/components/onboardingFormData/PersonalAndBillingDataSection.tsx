@@ -343,7 +343,8 @@ export default function PersonalAndBillingDataSection({
                 }}
                 inputValue={formik.values.city || ''}
                 onChange={(_e: any, selected: any) => {
-                  formik.setFieldValue('city', selected?.city || ''); // handle undefined case
+                  formik.setFieldValue('city', selected?.city || '');
+                  formik.setFieldValue('county', selected?.city || '');
                   if (selected) {
                     setInstitutionLocationData(selected);
                     setIsCitySelected(true);
@@ -354,6 +355,7 @@ export default function PersonalAndBillingDataSection({
                 onBlur={() => {
                   if (!isCitySelected) {
                     setCountries(undefined);
+
                     setInstitutionLocationData(undefined);
                   }
                 }}
