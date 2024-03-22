@@ -7,6 +7,7 @@ import {
   Product,
   UserOnCreate,
   InsuranceCompaniesResource,
+  OnboardingRequestData,
 } from '../../../types';
 import { BillingDataDto } from '../../model/BillingData';
 import { GeographicTaxonomyResource, nationalValue } from '../../model/GeographicTaxonomies';
@@ -707,6 +708,33 @@ const mockedResponseError = {
   title: 'Service Unavailable',
 };
 
+const mockedOnboardingRequestData: Array<OnboardingRequestData> = [
+  // Already approved onboarding request
+  {
+    productId: 'prod-pagopa',
+    status: 'COMPLETED',
+    expiringDate: '2024-04-31T01:30:00.000-05:00',
+  },
+  // Already rejected onboarding request
+  {
+    productId: 'prod-pagopa',
+    status: 'REJECTED',
+    expiringDate: '2024-04-31T09:30:00.000-08:00',
+  },
+  // Pending onboarding request
+  {
+    productId: 'prod-pagopa',
+    status: 'PENDING',
+    expiringDate: '2024-04-31T01:30:00.000-05:00',
+  },
+  // Expired onboarding request
+  {
+    productId: 'prod-pagopa',
+    status: 'PENDING',
+    expiringDate: '2024-02-31T09:30:00.000-08:00',
+  },
+];
+
 const noContent: Promise<AxiosResponse> = new Promise((resolve) =>
   resolve({
     status: 204,
@@ -714,7 +742,7 @@ const noContent: Promise<AxiosResponse> = new Promise((resolve) =>
   } as AxiosResponse)
 );
 
-const notFound: Promise<AxiosError> = new Promise((resolve) =>
+const notFoundError: Promise<AxiosError> = new Promise((resolve) =>
   resolve({
     isAxiosError: true,
     response: { data: '', status: 404, statusText: 'Not Found' },
@@ -735,16 +763,10 @@ const genericError: Promise<AxiosError> = new Promise((resolve) =>
   } as AxiosError)
 );
 
-const error409: Promise<AxiosError> = new Promise((resolve) =>
+const conflictError: Promise<AxiosError> = new Promise((resolve) =>
   resolve({
     isAxiosError: true,
     response: { data: '', status: 409, statusText: '409' },
-  } as AxiosError)
-);
-const error400: Promise<AxiosError> = new Promise((resolve) =>
-  resolve({
-    isAxiosError: true,
-    response: { data: '', status: 400, statusText: '400' },
   } as AxiosError)
 );
 
@@ -839,27 +861,27 @@ export async function mockFetch(
       case '22222222222':
         return noContent;
       case '33333333333':
-        return notFound;
+        return notFoundError;
       // Use case for test not base adhesion
       case 'externalId3':
-        return notFound;
+        return notFoundError;
       // Use case for test already subscribed premium
       case 'externalId2':
         if (params.productId === 'prod-io' || params.productId === 'prod-io-premium') {
           return noContent;
         } else {
-          return notFound;
+          return notFoundError;
         }
       // Use case for test aoo
       case '92078570527':
         if (params.subunitCode) {
-          return notFound;
+          return notFoundError;
         } else {
           return noContent;
         }
       default:
         if (params.productId !== 'prod-io') {
-          return notFound;
+          return notFoundError;
         } else {
           return noContent;
         }
@@ -911,7 +933,7 @@ export async function mockFetch(
         } as AxiosResponse)
       );
     } else {
-      return notFound;
+      return notFoundError;
     }
   }
 
@@ -959,7 +981,7 @@ export async function mockFetch(
           certifiedUser &&
           (certifiedUser.name !== 'CERTIFIED_NAME' || certifiedUser.surname !== 'CERTIFIED_SURNAME')
         ) {
-          return error409;
+          return conflictError;
         } else {
           return new Promise((resolve) =>
             resolve({ data: '', status: 201, statusText: 'Created' } as AxiosResponse)
@@ -978,7 +1000,7 @@ export async function mockFetch(
         resolve({ data: fetched, status: 200, statusText: '200' } as AxiosResponse)
       );
     } else {
-      return notFound;
+      return notFoundError;
     }
   }
 
@@ -986,10 +1008,8 @@ export async function mockFetch(
     switch (endpointParams.token) {
       case 'error':
         return genericError;
-      default:
-        return new Promise((resolve) =>
-          resolve({ data: undefined, status: 200, statusText: '200' } as AxiosResponse)
-        );
+      case 'pendingRequest':
+        return noContent;
     }
   }
 
@@ -1000,16 +1020,42 @@ export async function mockFetch(
   }
 
   if (endpoint === 'ONBOARDING_TOKEN_VALIDATION') {
-    if (window.location.search === '?jwt=tokenNotFound') {
-      return notFound;
-    } else if (window.location.search === '?jwt=tokenAlreadyConsumed') {
-      return error409;
-    } else if (window.location.search === '?jwt=tokenNotValid') {
-      return error400;
-    } else {
-      return new Promise((resolve) =>
-        resolve({ data: '', status: 200, statusText: '200' } as AxiosResponse)
-      );
+    switch (endpointParams.token) {
+      case 'expired':
+        return new Promise((resolve) =>
+          resolve({
+            data: mockedOnboardingRequestData[3],
+            status: 200,
+            statusText: '200',
+          } as AxiosResponse)
+        );
+      case 'alreadyApproved':
+        return new Promise((resolve) =>
+          resolve({
+            data: mockedOnboardingRequestData[0],
+            status: 200,
+            statusText: '200',
+          } as AxiosResponse)
+        );
+      case 'alreadyRejected':
+        return new Promise((resolve) =>
+          resolve({
+            data: mockedOnboardingRequestData[1],
+            status: 200,
+            statusText: '200',
+          } as AxiosResponse)
+        );
+      case 'pendingRequest':
+      case 'error':
+        return new Promise((resolve) =>
+          resolve({
+            data: mockedOnboardingRequestData[2],
+            status: 200,
+            statusText: '200',
+          } as AxiosResponse)
+        );
+      default:
+        return notFoundError;
     }
   }
 

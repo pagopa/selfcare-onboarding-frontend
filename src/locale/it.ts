@@ -208,10 +208,6 @@ export default {
     },
   },
   completeRegistration: {
-    title: 'La pagina che cercavi non è disponibile',
-    description:
-      'Al momento non è possibile procedere. Riprova tra qualche <1 />minuto, o contatta l’assistenza',
-    contactAssistanceButton: 'Contatta l’assistenza',
     sessionModal: {
       onConfirmLabel: 'Carica di nuovo',
       onCloseLabel: 'Esci',
@@ -224,17 +220,39 @@ export default {
         label: "Carica l'Atto di Adesione",
       },
     },
+    request: {
+      notFound: {
+        title: 'La pagina che cercavi non è disponibile',
+        description:
+          'Al momento non è possibile procedere. Riprova tra qualche <1 />minuto, o contatta l’assistenza',
+        contactAssistanceButton: 'Contatta l’assistenza',
+      },
+      expired: {
+        title: 'La richiesta di adesione è scaduta',
+        description: `Sono trascorsi oltre 30 giorni dalla richiesta di adesione. Se <2 />desideri ancora aderire al prodotto {{productTitle}}, invia <4 />una nuova richiesta.`,
+        backHome: 'Torna alla home',
+      },
+      alreadyCompleted: {
+        title: 'La richiesta di adesione è stata accettata',
+        description: `Per gestire il prodotto, accedi tramite SPID o CIE`,
+        logIn: 'Accedi',
+      },
+      alreadyRejected: {
+        title: 'La richiesta di adesione è stata annullata',
+        description: `La richiesta di adesione non è andata a buon fine. Se <2 />desideri ancora aderire al prodotto {{productTitle}}, invia <4 />una nuova richiesta.`,
+        backHome: 'Torna alla home',
+      },
+    },
     outcomeContent: {
       success: {
         title: 'Adesione completata!',
         description: `Comunicheremo l'avvenuta adesione all'indirizzo PEC <1/> primario dell'ente. Da questo momento, gli Amministratori <3/> inseriti in fase di richiesta possono accedere all'Area <5 />Riservata.`,
-        backActionLabel: 'Torna alla home',
+        backHome: 'Torna alla home',
       },
       error: {
-        alt: 'Error',
-        title: 'Richiesta di adesione in errore',
-        descriptionWithoutToken: 'Il link usato non è valido!',
-        descriptionWithToken: 'Il salvataggio dei dati inseriti non è andato a buon fine.',
+        title: 'Caricamento non riuscito',
+        description: 'Il caricamento del documento non è andato a buon fine.',
+        backToUpload: 'Carica di nuovo',
       },
     },
     errors: {
@@ -263,11 +281,6 @@ export default {
         message:
           'Il caricamento del documento non è andato a buon fine. <1 />Carica un solo file in formato <3>p7m</3>.',
       },
-    },
-    jwtNotValid: {
-      title: 'Richiesta di adesione non più <1 /> valida',
-      subtitle: 'Questa richiesta è stata accolta, annullata o è scaduta.',
-      backHome: 'Torna alla home',
     },
   },
   noProductPage: {
@@ -574,10 +587,10 @@ export default {
           'A causa di un errore del sistema non è possibile completare la procedura. <1 /> Ti chiediamo di riprovare più tardi.',
         backActionLabel: 'Torna alla home',
       },
-      loading: {
+      verify: {
         loadingText: 'Stiamo verificando i tuoi dati',
       },
-      notOutcome: {
+      delete: {
         loadingText: 'Stiamo cancellando la tua iscrizione',
       },
       jwtNotValid: {

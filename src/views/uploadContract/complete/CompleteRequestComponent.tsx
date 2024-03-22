@@ -4,23 +4,34 @@ import SessionModal from '@pagopa/selfcare-common-frontend/components/SessionMod
 import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
 import { useTranslation, Trans } from 'react-i18next';
 import { uniqueId } from 'lodash';
-import { IllusCompleted } from '@pagopa/mui-italia';
-import { IllusError } from '@pagopa/mui-italia';
-import { EndingPage } from '@pagopa/selfcare-common-frontend';
-import { StepperStep, Problem, RequestOutcomeOptionsJwt, RequestOutcomeJwt } from '../../types';
-import { ConfirmRegistrationStep0 } from '../components/ConfirmRegistrationStep0';
-import { ConfirmRegistrationStep1 } from '../components/ConfirmRegistrationStep1';
-import { useHistoryState } from '../components/useHistoryState';
-import { redirectToLogin } from '../utils/unloadEvent-utils';
-import { fetchWithLogs } from '../lib/api-utils';
-import { getFetchOutcome } from '../lib/error-utils';
-import redXIllustration from '../assets/red-x-illustration.svg';
-import { ENV } from '../utils/env';
-import { MessageNoAction } from '../components/MessageNoAction';
-import { HeaderContext, UserContext } from '../lib/context';
-import { jwtNotValid } from '../services/tokenServices';
-import { getOnboardingMagicLinkJwt } from './RejectRegistration';
-import JwtInvalidPage from './JwtInvalidPage';
+import { productId2ProductTitle } from '@pagopa/selfcare-common-frontend/utils/productId2ProductTitle';
+import {
+  StepperStep,
+  Problem,
+  RequestOutcomeOptionsJwt,
+  RequestOutcomeJwt,
+  OnboardingRequestData,
+  RequestOutcomeOptions,
+  RequestOutcomeMessage,
+} from '../../../../types';
+import { ConfirmRegistrationStep0 } from '../../../components/ConfirmRegistrationStep0';
+import { ConfirmRegistrationStep1 } from '../../../components/ConfirmRegistrationStep1';
+import { useHistoryState } from '../../../components/useHistoryState';
+import { redirectToLogin } from '../../../utils/unloadEvent-utils';
+import { fetchWithLogs } from '../../../lib/api-utils';
+import { getFetchOutcome } from '../../../lib/error-utils';
+import { ENV } from '../../../utils/env';
+import { MessageNoAction } from '../../../components/MessageNoAction';
+import { HeaderContext, UserContext } from '../../../lib/context';
+import { verifyRequest } from '../../../services/tokenServices';
+import NotFoundPage from '../outcomePages/NotFoundPage';
+import ExpiredRequestPage from '../outcomePages/ExpiredRequestPage';
+import AlreadyCompletedRequestPage from '../outcomePages/AlreadyCompletedRequestPage';
+import AlreadyRejectedRequestPage from '../outcomePages/AlreadyRejectedRequestPage';
+import { LoadingOverlay } from '../../../components/LoadingOverlay';
+import { getRequestJwt } from '../../../utils/getRequestJwt';
+import CompleteRequestSuccessPage from './pages/CompleteRequestSuccessPage';
+import { CompleteRequestFailPage } from './pages/CompleteRequestFailPage';
 
 type FileErrorAttempt = {
   fileName: string;
@@ -78,30 +89,30 @@ const transcodeErrorCode = (data: Problem): keyof typeof errors => {
 };
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
-export default function CompleteRegistrationComponent() {
+export default function CompleteRequestComponent() {
+  const { t } = useTranslation();
   const { setSubHeaderVisible, setOnExit, setEnableLogin } = useContext(HeaderContext);
   const { setRequiredLogin } = useContext(UserContext);
-  const token = getOnboardingMagicLinkJwt();
 
+  const token = getRequestJwt();
   const [activeStep, setActiveStep, setActiveStepHistory] = useHistoryState(
     'complete_registration_step',
     0
   );
-
-  const [outcome, setOutcome] = useState<RequestOutcomeJwt | null>(!token ? 'error' : null);
+  const [outcomeState, setOutcomeState] = useState<RequestOutcomeMessage | null>();
+  const [outcomeContentState, setOutcomeContentState] = useState<RequestOutcomeJwt | null>(
+    !token ? 'notFound' : null
+  );
   const [errorCode, setErrorCode] = useState<keyof typeof errors>('GENERIC');
   const [open, setOpen] = useState<boolean>(false);
-
+  const [error, setError] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
-
   const [lastFileErrorAttempt, setLastFileErrorAttempt] = useState<FileErrorAttempt>();
-  const [showBlockingError, setShowBlockingError] = useState(false);
-
   const [uploadedFiles, setUploadedFiles, setUploadedFilesHistory] = useHistoryState<Array<File>>(
     'uploaded_files',
     []
   );
-  const { t } = useTranslation();
+  const [requestData, setRequestData] = useState<OnboardingRequestData>();
 
   useEffect(() => {
     setSubHeaderVisible(true);
@@ -113,12 +124,21 @@ export default function CompleteRegistrationComponent() {
     };
   }, []);
 
+  const handleVerifyRequest = async (token: string) => {
+    setLoading(true);
+    await verifyRequest({
+      token,
+      setRequiredLogin,
+      setOutcomeContentState,
+      setRequestData,
+    }).finally(() => setLoading(false));
+  };
+
   useEffect(() => {
     if (!token) {
-      setOutcome('error');
+      setOutcomeContentState('notFound');
     } else {
-      setLoading(true);
-      jwtNotValid({ token, setRequiredLogin, setOutcome }).finally(() => setLoading(false));
+      void handleVerifyRequest(token);
     }
   }, []);
 
@@ -131,6 +151,10 @@ export default function CompleteRegistrationComponent() {
     setActiveStepHistory(activeStep + 1);
     setUploadedFilesHistory(uploadedFiles);
     setActiveStep(activeStep + 1);
+  };
+
+  const back = () => {
+    setOutcomeContentState('toBeCompleted');
   };
 
   const submit = async (file: File) => {
@@ -149,10 +173,10 @@ export default function CompleteRegistrationComponent() {
 
     setLoading(false);
     const outcome = getFetchOutcome(uploadDocument);
-    setOutcome(outcome);
 
     if (outcome === 'success') {
       trackEvent('ONBOARDING_SUCCESS', { request_id: requestId, party_id: token });
+      setOutcomeState(outcomes[outcome]);
     }
 
     if (outcome === 'error') {
@@ -168,8 +192,7 @@ export default function CompleteRegistrationComponent() {
           errorCount,
         });
         if (errorCount > ENV.UPLOAD_CONTRACT_MAX_LOOP_ERROR) {
-          setShowBlockingError(true);
-          return;
+          setError(true);
         }
       } else {
         setLastFileErrorAttempt({
@@ -209,7 +232,6 @@ export default function CompleteRegistrationComponent() {
   };
 
   const handleErrorModalConfirm = () => {
-    console.log('EXIT');
     setOpen(false);
     setUploadedFiles([]);
   };
@@ -230,75 +252,67 @@ export default function CompleteRegistrationComponent() {
     },
   ];
 
-  const Step = steps[activeStep].Component;
-
-  const outcomeContent: RequestOutcomeOptionsJwt = {
+  const outcomes: RequestOutcomeOptions = {
     success: {
       title: '',
       description: [
         <>
-          <EndingPage
-            minHeight="52vh"
-            icon={<IllusCompleted size={60} />}
-            title={t('completeRegistration.outcomeContent.success.title')}
-            description={
-              <Trans i18nKey="completeRegistration.outcomeContent.success.description">
-                Comunicheremo l&apos;avvenuta adesione all&apos;indirizzo PEC
-                <br />
-                primario dell&apos;ente. Da questo momento, gli Amministratori
-                <br />
-                inseriti in fase di richiesta possono accedere all&apos;Area
-                <br />
-                Riservata.`,
-              </Trans>
-            }
-            variantTitle="h4"
-            variantDescription="body1"
-            buttonLabel={t('completeRegistration.outcomeContent.success.backActionLabel')}
-            onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
-          ></EndingPage>
-        </>,
-      ],
-    },
-    jwtsuccess: {
-      title: '',
-      description: [
-        <>
-          <EndingPage
-            minHeight="52vh"
-            icon={<IllusCompleted size={60} />}
-            variantTitle="h4"
-            variantDescription="body1"
-            title={t('rejectRegistration.outcomeContent.success.title')}
-            description={
-              <Trans i18nKey="rejectRegistration.outcomeContent.success.description">
-                Nella home dell’Area Riservata puoi vedere i prodotti
-                <br />
-                disponibili e richiedere l’adesione per il tuo ente.
-              </Trans>
-            }
-            buttonLabel={t('rejectRegistration.outcomeContent.success.backActionLabel')}
-            onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
-          />
+          <CompleteRequestSuccessPage />
         </>,
       ],
     },
     error: {
-      img: { src: redXIllustration, alt: t('completeRegistration.outcomeContent.error.alt') },
-      title: t('completeRegistration.outcomeContent.error.title'),
-      description: [
-        <div key="0">
-          {!token
-            ? t('completeRegistration.outcomeContent.error.descriptionWithoutToken')
-            : t('completeRegistration.outcomeContent.error.descriptionWithToken')}
-        </div>,
-      ],
-    },
-    jwterror: {
       title: '',
       description: [
         <>
-          <JwtInvalidPage />
+          <CompleteRequestFailPage back={back} />
+        </>,
+      ],
+    },
+  };
+
+  const Step = steps[activeStep].Component;
+
+  const outcomeContent: RequestOutcomeOptionsJwt = {
+    toBeCompleted: {
+      title: '',
+      description: [
+        <>
+          <Step />
+        </>,
+      ],
+    },
+    alreadyRejected: {
+      title: '',
+      description: [
+        <>
+          <AlreadyRejectedRequestPage
+            productTitle={productId2ProductTitle(requestData?.productId ?? '')}
+          />
+        </>,
+      ],
+    },
+    alreadyCompleted: {
+      title: '',
+      description: [
+        <>
+          <AlreadyCompletedRequestPage />
+        </>,
+      ],
+    },
+    expired: {
+      title: '',
+      description: [
+        <>
+          <ExpiredRequestPage productTitle={productId2ProductTitle(requestData?.productId ?? '')} />
+        </>,
+      ],
+    },
+    notFound: {
+      title: '',
+      description: [
+        <>
+          <NotFoundPage />
         </>,
       ],
     },
@@ -306,57 +320,40 @@ export default function CompleteRegistrationComponent() {
 
   return (
     <>
-      {outcome === 'jwterror' ? (
-        <MessageNoAction {...outcomeContent[outcome]} />
-      ) : outcome === 'success' ? (
-        <MessageNoAction {...outcomeContent[outcome]} />
-      ) : outcome === 'error' ? (
-        !token || showBlockingError ? (
-          <EndingPage
-            minHeight="52vh"
-            icon={<IllusError size={60} />}
-            variantTitle={'h4'}
-            variantDescription={'body1'}
-            title={t('completeRegistration.title')}
-            description={
-              <Trans i18nKey="completeRegistration.description" components={{ 1: <br /> }}>
-                {
-                  'Al momento non è possibile procedere. Riprova tra qualche <1 />minuto, o contatta l’assistenza'
-                }
-              </Trans>
-            }
-            buttonLabel={t('completeRegistration.contactAssistanceButton')}
-            onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
-          />
-        ) : (
-          <>
-            <SessionModal
-              handleClose={handleErrorModalClose}
-              handleExit={handleErrorModalExit}
-              onConfirm={handleErrorModalConfirm}
-              open={open}
-              title={t(`completeRegistration.errors.${errorCode}.title`)}
-              message={
-                errorCode === 'INVALID_SIGN_FORMAT' ? (
-                  <Trans i18nKey={`completeRegistration.errors.INVALID_SIGN_FORMAT.message`}>
-                    {'Il caricamento del documento non è andato a buon fine.'}
-                    <br />
-                    {'Carica un solo file in formato '}
-                    <strong>{'p7m'}</strong>
-                    {'.'}
-                  </Trans>
-                ) : (
-                  t(`completeRegistration.errors.${errorCode}.message`)
-                )
-              }
-              onConfirmLabel={t('completeRegistration.sessionModal.onConfirmLabel')}
-              onCloseLabel={t('completeRegistration.sessionModal.onCloseLabel')}
-            />
-            <Step />
-          </>
-        )
+      {loading ? (
+        <LoadingOverlay loadingText={t('onboarding.loading.loadingText')} />
+      ) : outcomeState ? (
+        <MessageNoAction {...outcomeState} />
+      ) : outcomeContentState && !error ? (
+        <MessageNoAction {...outcomeContent[outcomeContentState]} />
+      ) : error ? (
+        <CompleteRequestFailPage back={back} />
       ) : (
-        outcome === 'jwtsuccess' && <Step />
+        <>
+          <SessionModal
+            handleClose={handleErrorModalClose}
+            handleExit={handleErrorModalExit}
+            onConfirm={handleErrorModalConfirm}
+            open={open}
+            title={t(`completeRegistration.errors.${errorCode}.title`)}
+            message={
+              errorCode === 'INVALID_SIGN_FORMAT' ? (
+                <Trans i18nKey={`completeRegistration.errors.INVALID_SIGN_FORMAT.message`}>
+                  {'Il caricamento del documento non è andato a buon fine.'}
+                  <br />
+                  {'Carica un solo file in formato '}
+                  <strong>{'p7m'}</strong>
+                  {'.'}
+                </Trans>
+              ) : (
+                t(`completeRegistration.errors.${errorCode}.message`)
+              )
+            }
+            onConfirmLabel={t('completeRegistration.sessionModal.onConfirmLabel')}
+            onCloseLabel={t('completeRegistration.sessionModal.onCloseLabel')}
+          />
+          <Step />
+        </>
       )}
     </>
   );

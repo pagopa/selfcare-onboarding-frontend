@@ -36,7 +36,12 @@ export type RouteConfig = {
 
 export type Image = { src: string; alt: string };
 export type RequestOutcome = 'success' | 'error';
-export type RequestOutcomeJwt = 'success' | 'error' | 'jwterror' | 'jwtsuccess';
+export type RequestOutcomeJwt =
+  | 'toBeCompleted'
+  | 'alreadyCompleted'
+  | 'alreadyRejected'
+  | 'expired'
+  | 'notFound';
 export type RequestOutcomeMessage = {
   title: string;
   description: Array<JSX.Element>;
@@ -242,4 +247,10 @@ export type InsuranceCompanyResource = {
 export type InsuranceCompaniesResource = {
   count: number;
   items: Array<InsuranceCompanyResource>;
+};
+
+export type OnboardingRequestData = {
+  productId: string;
+  status: string;
+  expiringDate: string;
 };
