@@ -4,13 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { uniqueId } from 'lodash';
 import { productId2ProductTitle } from '@pagopa/selfcare-common-frontend/utils/productId2ProductTitle';
 import { MessageNoAction } from '../../../components/MessageNoAction';
-import {
-  OnboardingRequestData,
-  RequestOutcome,
-  RequestOutcomeJwt,
-  RequestOutcomeOptions,
-  RequestOutcomeOptionsJwt,
-} from '../../../../types';
+import { OnboardingRequestData, RequestOutcomeComplete } from '../../../../types';
 import { fetchWithLogs } from '../../../lib/api-utils';
 import { LoadingOverlay } from '../../../components/LoadingOverlay';
 import { HeaderContext, UserContext } from '../../../lib/context';
@@ -32,8 +26,7 @@ export default function CancelRequestComponent() {
   const { setRequiredLogin } = useContext(UserContext);
 
   const token = getRequestJwt();
-  const [outcomeState, setOutcomeState] = useState<RequestOutcome | null>();
-  const [outcomeContentState, setOutcomeContentState] = useState<RequestOutcomeJwt | null>(
+  const [outcomeContentState, setOutcomeContentState] = useState<RequestOutcomeComplete | null>(
     !token ? 'notFound' : null
   );
   const [loading, setLoading] = useState(false);
@@ -85,10 +78,10 @@ export default function CancelRequestComponent() {
 
       if (response === 'success') {
         trackEvent('ONBOARDING_CANCEL_SUCCESS', { request_id: requestId, party_id: token });
-        setOutcomeState(response);
+        setOutcomeContentState(response);
       } else {
         trackEvent('ONBOARDING_CANCEL_FAILURE', { request_id: requestId, party_id: token });
-        setOutcomeState(response);
+        setOutcomeContentState(response);
       }
       setLoading(false);
       setRequestType(undefined);
@@ -102,7 +95,7 @@ export default function CancelRequestComponent() {
     }
   };
 
-  const outcome: RequestOutcomeOptions = {
+  const outcomeContent = {
     success: {
       title: '',
       description: [
@@ -119,9 +112,6 @@ export default function CancelRequestComponent() {
         </>,
       ],
     },
-  };
-
-  const outcomeContent: RequestOutcomeOptionsJwt = {
     toBeCompleted: {
       title: '',
       description: [
@@ -170,8 +160,6 @@ export default function CancelRequestComponent() {
     <LoadingOverlay
       loadingText={t(`rejectRegistration.outcomeContent.${requestType}.loadingText`)}
     />
-  ) : outcomeState ? (
-    <MessageNoAction {...outcome[outcomeState]} />
   ) : (
     outcomeContentState && <MessageNoAction {...outcomeContent[outcomeContentState]} />
   );

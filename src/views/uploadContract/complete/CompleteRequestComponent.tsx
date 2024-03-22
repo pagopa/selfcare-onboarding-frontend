@@ -8,11 +8,8 @@ import { productId2ProductTitle } from '@pagopa/selfcare-common-frontend/utils/p
 import {
   StepperStep,
   Problem,
-  RequestOutcomeOptionsJwt,
-  RequestOutcomeJwt,
   OnboardingRequestData,
-  RequestOutcomeOptions,
-  RequestOutcomeMessage,
+  RequestOutcomeComplete,
 } from '../../../../types';
 import { ConfirmRegistrationStep0 } from '../../../components/ConfirmRegistrationStep0';
 import { ConfirmRegistrationStep1 } from '../../../components/ConfirmRegistrationStep1';
@@ -88,7 +85,6 @@ const transcodeErrorCode = (data: Problem): keyof typeof errors => {
   return 'GENERIC';
 };
 
-// eslint-disable-next-line sonarjs/cognitive-complexity
 export default function CompleteRequestComponent() {
   const { t } = useTranslation();
   const { setSubHeaderVisible, setOnExit, setEnableLogin } = useContext(HeaderContext);
@@ -99,13 +95,11 @@ export default function CompleteRequestComponent() {
     'complete_registration_step',
     0
   );
-  const [outcomeState, setOutcomeState] = useState<RequestOutcomeMessage | null>();
-  const [outcomeContentState, setOutcomeContentState] = useState<RequestOutcomeJwt | null>(
+  const [outcomeContentState, setOutcomeContentState] = useState<RequestOutcomeComplete | null>(
     !token ? 'notFound' : null
   );
   const [errorCode, setErrorCode] = useState<keyof typeof errors>('GENERIC');
   const [open, setOpen] = useState<boolean>(false);
-  const [error, setError] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [lastFileErrorAttempt, setLastFileErrorAttempt] = useState<FileErrorAttempt>();
   const [uploadedFiles, setUploadedFiles, setUploadedFilesHistory] = useHistoryState<Array<File>>(
@@ -154,6 +148,7 @@ export default function CompleteRequestComponent() {
   };
 
   const back = () => {
+    setUploadedFiles([]);
     setOutcomeContentState('toBeCompleted');
   };
 
@@ -176,7 +171,7 @@ export default function CompleteRequestComponent() {
 
     if (outcome === 'success') {
       trackEvent('ONBOARDING_SUCCESS', { request_id: requestId, party_id: token });
-      setOutcomeState(outcomes[outcome]);
+      setOutcomeContentState(outcome);
     }
 
     if (outcome === 'error') {
@@ -192,7 +187,7 @@ export default function CompleteRequestComponent() {
           errorCount,
         });
         if (errorCount > ENV.UPLOAD_CONTRACT_MAX_LOOP_ERROR) {
-          setError(true);
+          setOutcomeContentState('error');
         }
       } else {
         setLastFileErrorAttempt({
@@ -252,28 +247,9 @@ export default function CompleteRequestComponent() {
     },
   ];
 
-  const outcomes: RequestOutcomeOptions = {
-    success: {
-      title: '',
-      description: [
-        <>
-          <CompleteRequestSuccessPage />
-        </>,
-      ],
-    },
-    error: {
-      title: '',
-      description: [
-        <>
-          <CompleteRequestFailPage back={back} />
-        </>,
-      ],
-    },
-  };
-
   const Step = steps[activeStep].Component;
 
-  const outcomeContent: RequestOutcomeOptionsJwt = {
+  const outcomeContent = {
     toBeCompleted: {
       title: '',
       description: [
@@ -316,18 +292,30 @@ export default function CompleteRequestComponent() {
         </>,
       ],
     },
+    success: {
+      title: '',
+      description: [
+        <>
+          <CompleteRequestSuccessPage />
+        </>,
+      ],
+    },
+    error: {
+      title: '',
+      description: [
+        <>
+          <CompleteRequestFailPage back={back} />
+        </>,
+      ],
+    },
   };
 
   return (
     <>
       {loading ? (
         <LoadingOverlay loadingText={t('onboarding.loading.loadingText')} />
-      ) : outcomeState ? (
-        <MessageNoAction {...outcomeState} />
-      ) : outcomeContentState && !error ? (
+      ) : outcomeContentState ? (
         <MessageNoAction {...outcomeContent[outcomeContentState]} />
-      ) : error ? (
-        <CompleteRequestFailPage back={back} />
       ) : (
         <>
           <SessionModal

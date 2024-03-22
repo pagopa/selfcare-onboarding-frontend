@@ -2,18 +2,17 @@ import { AxiosError, AxiosResponse } from 'axios';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
 import React from 'react';
 import { fetchWithLogs } from '../lib/api-utils';
-import { OnboardingRequestData, Problem, RequestOutcomeJwt } from '../../types';
+import { OnboardingRequestData, Problem, RequestOutcomeComplete } from '../../types';
 import { redirectToLogin } from '../utils/unloadEvent-utils';
 import { getFetchOutcome } from '../lib/error-utils';
 
 type Props = {
   token: string;
   setRequiredLogin: (value: React.SetStateAction<boolean>) => void;
-  setOutcomeContentState: React.Dispatch<React.SetStateAction<RequestOutcomeJwt | null>>;
+  setOutcomeContentState: React.Dispatch<React.SetStateAction<RequestOutcomeComplete | null>>;
   setRequestData: React.Dispatch<React.SetStateAction<OnboardingRequestData | undefined>>;
 };
 
-// TODO Must be reviewed?
 const getMixPanelEvent = (errorStatus: number | undefined) => {
   const errors = {
     409: 'ONBOARDING_TOKEN_VALIDATION_JWT_CONFIRMED',
