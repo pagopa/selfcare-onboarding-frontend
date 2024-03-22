@@ -40,8 +40,7 @@ jest.mock('@pagopa/selfcare-common-frontend/services/assistanceService', () => (
   buildAssistanceURI: jest.fn(),
 }));
 
-// TODO Code duplication in unit tests
-test.skip("Test: The onboarding request can't be cancel because is not found (jwt queryparam is empty)", async () => {
+test("Test: The onboarding request can't be cancel because is not found (jwt queryparam is empty)", async () => {
   mockedLocation.search = 'jwt=';
 
   render(<CancelRequestComponent />);
@@ -55,7 +54,7 @@ test.skip("Test: The onboarding request can't be cancel because is not found (jw
   waitFor(() => expect(buildAssistanceURI).toBeCalledWith(ENV.ASSISTANCE.EMAIL));
 });
 
-test.skip("Test: The onboarding request can't be cancel because is not found (not found the request jwt)", async () => {
+test("Test: The onboarding request can't be cancel because is not found (not found the request jwt)", async () => {
   mockedLocation.search = 'jwt=wrongJwt';
   render(<CancelRequestComponent />);
   await waitFor(() => screen.getByText('La pagina che cercavi non è disponibile'));
@@ -66,7 +65,7 @@ test.skip("Test: The onboarding request can't be cancel because is not found (no
   waitFor(() => expect(buildAssistanceURI).toBeCalledWith(ENV.ASSISTANCE.EMAIL));
 });
 
-test.skip("Test: The onboarding request can't be cancel because is already approved", async () => {
+test("Test: The onboarding request can't be cancel because is already approved", async () => {
   mockedLocation.search = 'jwt=alreadyApproved';
   render(<CancelRequestComponent />);
 
@@ -78,7 +77,7 @@ test.skip("Test: The onboarding request can't be cancel because is already appro
   waitFor(() => expect(buildAssistanceURI).toBeCalledWith(ENV.URL_FE.LOGIN));
 });
 
-test.skip("Test: The onboarding request can't be cancel because is expired", async () => {
+test("Test: The onboarding request can't be cancel because is expired", async () => {
   mockedLocation.search = 'jwt=expired';
   render(<CancelRequestComponent />);
 
@@ -90,7 +89,7 @@ test.skip("Test: The onboarding request can't be cancel because is expired", asy
   waitFor(() => expect(buildAssistanceURI).toBeCalledWith(ENV.URL_FE.LANDING));
 });
 
-test.skip('Test: The jwt exist and the request is correctly retrieved, cancel onboarding request flow is started and correcly deleted', async () => {
+test('Test: The jwt exist and the request is correctly retrieved, cancel onboarding request flow is started and correcly deleted', async () => {
   mockedLocation.search = 'jwt=pendingRequest';
   render(<CancelRequestComponent />);
 
