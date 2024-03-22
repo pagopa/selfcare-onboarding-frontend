@@ -25,6 +25,7 @@ type Props = StepperStepComponentProps & {
   institutionType?: InstitutionType;
   aooSelected?: AooData;
   uoSelected?: UoData;
+  subProductFlow?: boolean;
 };
 
 const genericError: RequestOutcomeMessage = {
@@ -60,6 +61,7 @@ function StepOnboardingData({
   institutionType,
   aooSelected,
   uoSelected,
+  subProductFlow,
 }: Props) {
   const { t } = useTranslation();
 
@@ -74,16 +76,20 @@ function StepOnboardingData({
     const onboardingData = await fetchWithLogs(
       {
         endpoint: 'ONBOARDING_GET_ONBOARDING_DATA',
-        endpointParams: {
-          externalInstitutionId: aooSelected
-            ? `${externalInstitutionId}_${aooSelected.codiceUniAoo}`
+      },
+
+      {
+        method: 'GET',
+        params: {
+          taxCode: externalInstitutionId,
+          subunitCode: aooSelected
+            ? aooSelected.codiceUniAoo
             : uoSelected
-            ? `${externalInstitutionId}_${uoSelected.codiceUniUo}`
-            : externalInstitutionId,
+            ? uoSelected.codiceUniUo
+            : undefined,
           productId,
         },
       },
-      { method: 'GET' },
       () => setRequiredLogin(true)
     );
 
@@ -117,8 +123,13 @@ function StepOnboardingData({
   };
 
   useEffect(() => {
-    void submit();
-  }, []);
+    if (subProductFlow === true) {
+      void submit();
+    } else {
+      forward(undefined, institutionType, undefined);
+      setLoading(false);
+    }
+  }, [productId]);
 
   if (outcome) {
     unregisterUnloadEvent(setOnExit);

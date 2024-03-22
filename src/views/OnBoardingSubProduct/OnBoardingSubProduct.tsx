@@ -76,9 +76,6 @@ function OnBoardingSubProduct() {
   const [companyInformations, setCompanyInformations] = useState<CompanyInformations>();
   const [openConfirmationModal, setOpenConfirmationModal] = useState(false);
   const [partyName, setPartyName] = useState('');
-  const [country, setCountry] = useState('');
-  const [city, setCity] = useState('');
-  const [county, setCounty] = useState('');
   const [isCityEditable, setIsCityEditable] = useState(false);
   const [availablePricingPlanIds, setAvailablePricingPlanIds] = useState<Array<string>>();
 
@@ -145,6 +142,9 @@ function OnBoardingSubProduct() {
       vatNumber: '',
       recipientCode: party.origin === 'IPA' ? party.originId : '',
       geographicTaxonomies: [],
+      city: '',
+      country: '',
+      county: '',
     });
     const event = isUserParty
       ? 'ONBOARDING_PREMIUM_ASSOCIATED_PARTY_SELECTION'
@@ -173,7 +173,12 @@ function OnBoardingSubProduct() {
     setStepAddManagerHistoryState({});
 
     if (billingData) {
-      setBillingData(billingData);
+      setBillingData({
+        ...billingData,
+        city,
+        country,
+        county,
+      });
     }
     if (assistanceContacts) {
       setAssistanceContacts(assistanceContacts);
@@ -182,18 +187,10 @@ function OnBoardingSubProduct() {
       setCompanyInformations(companyInformations);
     }
 
-    if (country) {
-      setCountry(country);
-    }
-    if (city) {
-      setCity(city);
-    }
-    if (!city) {
+    if (!billingData?.city) {
       setIsCityEditable(true);
     }
-    if (county) {
-      setCounty(county);
-    }
+
     setInstitutionType(institutionType);
     setPartyId(partyId);
     forward();
@@ -295,6 +292,7 @@ function OnBoardingSubProduct() {
           externalInstitutionId,
           productId,
           forward: forwardWithOnboardingData,
+          subProductFlow: true,
         }),
     },
     {
@@ -316,12 +314,12 @@ function OnBoardingSubProduct() {
               vatNumber: '',
               recipientCode: '',
               geographicTaxonomies: [],
+              city: '',
+              county: '',
+              country: '',
             }),
             ...assistanceContacts,
             ...companyInformations,
-            city: city ?? '',
-            county: county ?? '',
-            country: country ?? '',
           },
           institutionType: institutionType as InstitutionType,
           origin,

@@ -924,9 +924,9 @@ export async function mockFetch(
 
   if (endpoint === 'ONBOARDING_GET_ONBOARDING_DATA') {
     const onboardingData = mockedOnboardingData.find(
-      (od) => od.institution.billingData.taxCode === endpointParams.externalInstitutionId
+      (od) => od.institution.billingData.taxCode === params.taxCode
     );
-    if (endpointParams.externalInstitutionId === '92078570527') {
+    if (params.taxCode === '92078570527') {
       return new Promise((resolve) =>
         resolve({ data: onboardingData, status: 200, statusText: '200' } as AxiosResponse)
       );
