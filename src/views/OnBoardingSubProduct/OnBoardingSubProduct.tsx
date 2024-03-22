@@ -191,6 +191,10 @@ function OnBoardingSubProduct() {
       setIsCityEditable(true);
     }
 
+    if (city) {
+      setIsCityEditable(false);
+    }
+
     setInstitutionType(institutionType);
     setPartyId(partyId);
     forward();
