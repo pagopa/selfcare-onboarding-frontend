@@ -1027,7 +1027,7 @@ export async function mockFetch(
   }
 
   if (endpoint === 'ONBOARDING_TOKEN_VALIDATION') {
-    switch (endpointParams.token) {
+    switch (endpointParams.onboardingId) {
       case 'expired':
         return new Promise((resolve) =>
           resolve({

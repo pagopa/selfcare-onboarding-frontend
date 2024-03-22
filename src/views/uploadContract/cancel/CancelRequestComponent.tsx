@@ -47,7 +47,7 @@ export default function CancelRequestComponent() {
     setRequestType('verify');
     setLoading(true);
     await verifyRequest({
-      token,
+      onboardingId: token,
       setRequiredLogin,
       setOutcomeContentState,
       setRequestData,

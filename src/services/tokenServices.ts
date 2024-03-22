@@ -7,7 +7,7 @@ import { redirectToLogin } from '../utils/unloadEvent-utils';
 import { getFetchOutcome } from '../lib/error-utils';
 
 type Props = {
-  token: string;
+  onboardingId: string;
   setRequiredLogin: (value: React.SetStateAction<boolean>) => void;
   setOutcomeContentState: React.Dispatch<React.SetStateAction<RequestOutcomeComplete | null>>;
   setRequestData: React.Dispatch<React.SetStateAction<OnboardingRequestData | undefined>>;
@@ -22,9 +22,13 @@ const getMixPanelEvent = (errorStatus: number | undefined) => {
   return errors[errorStatus as keyof typeof errors] ?? 'ONBOARDING_TOKEN_VALIDATION_ERROR';
 };
 
-export const verifyRequest = async ({ token, setOutcomeContentState, setRequestData }: Props) => {
+export const verifyRequest = async ({
+  onboardingId,
+  setOutcomeContentState,
+  setRequestData,
+}: Props) => {
   const fetchJwt = await fetchWithLogs(
-    { endpoint: 'ONBOARDING_TOKEN_VALIDATION', endpointParams: { onboardingId: token } },
+    { endpoint: 'ONBOARDING_TOKEN_VALIDATION', endpointParams: { onboardingId } },
     { method: 'POST', headers: { 'Content-Type': 'application/json' } },
     redirectToLogin
   );
@@ -56,7 +60,7 @@ export const verifyRequest = async ({ token, setOutcomeContentState, setRequestD
     setRequestData(requestData);
   } else {
     trackEvent(getMixPanelEvent((fetchJwt as AxiosError<Problem>).response?.status), {
-      party_id: token,
+      party_id: onboardingId,
     });
     setOutcomeContentState('notFound');
   }

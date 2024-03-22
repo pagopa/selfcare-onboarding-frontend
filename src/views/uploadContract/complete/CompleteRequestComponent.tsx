@@ -122,7 +122,7 @@ export default function CompleteRequestComponent() {
   const handleVerifyRequest = async (token: string) => {
     setLoading(true);
     await verifyRequest({
-      token,
+      onboardingId: token,
       setRequiredLogin,
       setOutcomeContentState,
       setRequestData,
