@@ -1,10 +1,11 @@
 import { IllusCompleted } from '@pagopa/mui-italia';
 import { Trans, useTranslation } from 'react-i18next';
 import { EndingPage } from '@pagopa/selfcare-common-frontend';
-import { ENV } from '../utils/env';
+import { ENV } from '../../../../utils/env';
 
-export default function RejectContentSuccessPage() {
+export default function CancelRequestSuccessPage() {
   const { t } = useTranslation();
+
   return (
     <>
       <EndingPage

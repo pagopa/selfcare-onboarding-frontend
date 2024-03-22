@@ -5,9 +5,15 @@ import { createMemoryHistory } from 'history';
 import { Router } from 'react-router';
 import './../locale';
 
-jest.mock('../views/onboarding/Onboarding', () => () => 'ONBOARDING');
-jest.mock('../views/RejectRegistration', () => () => 'REJECT ONBOARDING');
-jest.mock('../views/CompleteRegistrationComponent', () => () => 'CONFIRM ONBOARDING');
+jest.mock('../views/onboarding/Onboarding', () => () => 'Onboarding');
+jest.mock(
+  '../views/uploadContract/cancel/CancelRequestComponent',
+  () => () => 'Cancel onboarding request'
+);
+jest.mock(
+  '../views/uploadContract/complete/CompleteRequestComponent',
+  () => () => 'Complete onboarding request'
+);
 
 let history;
 
@@ -36,7 +42,7 @@ test('test OnBoarding', () => {
       <App />
     </Router>
   );
-  screen.getByText('ONBOARDING');
+  screen.getByText('Onboarding');
   checkRedirect(history, false);
 });
 
@@ -49,7 +55,7 @@ test('test Reject OnBoarding', () => {
       <App />
     </Router>
   );
-  screen.getByText('REJECT ONBOARDING');
+  screen.getByText('Cancel onboarding request');
   checkRedirect(history, false);
 });
 
@@ -62,7 +68,7 @@ test('test Confirm OnBoarding', () => {
       <App />
     </Router>
   );
-  screen.getByText('CONFIRM ONBOARDING');
+  screen.getByText('Complete onboarding request');
   checkRedirect(history, false);
 });
 

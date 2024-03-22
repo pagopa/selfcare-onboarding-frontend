@@ -455,7 +455,7 @@ const executeAdvancedSearchForAoo = async () => {
   expect(confirmButton).toBeEnabled();
 
   fireEvent.click(confirmButton);
-  await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(7));
+  await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(6));
 
   const aooCode = document.getElementById('aooUniqueCode') as HTMLInputElement;
   const aooName = document.getElementById('aooName') as HTMLInputElement;
