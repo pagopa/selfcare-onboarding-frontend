@@ -187,7 +187,7 @@ function OnBoardingSubProduct() {
       setCompanyInformations(companyInformations);
     }
 
-    if (!billingData?.city) {
+    if (!city) {
       setIsCityEditable(true);
     }
 

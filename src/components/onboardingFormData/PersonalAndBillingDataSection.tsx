@@ -364,7 +364,7 @@ export default function PersonalAndBillingDataSection({
                 noOptionsText={t('onboardingFormData.billingDataSection.noResult')}
                 clearOnBlur={true}
                 forcePopupIcon={isFromIPA || !isCityEditable ? false : true}
-                disabled={(premiumFlow && !isCityEditable) || isFromIPA || isAooUo}
+                disabled={premiumFlow && isCityEditable ? false : isFromIPA || isAooUo}
                 ListboxProps={{
                   style: {
                     overflow: 'visible',
@@ -420,7 +420,7 @@ export default function PersonalAndBillingDataSection({
                           : theme.palette.text.primary,
                       },
                     }}
-                    disabled={(premiumFlow && !isCityEditable) || isFromIPA || isAooUo}
+                    disabled={premiumFlow && isCityEditable ? false : isFromIPA || isAooUo}
                   />
                 )}
               />
