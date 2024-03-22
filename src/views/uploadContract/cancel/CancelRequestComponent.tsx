@@ -160,7 +160,9 @@ export default function CancelRequestComponent() {
     <LoadingOverlay
       loadingText={t(`rejectRegistration.outcomeContent.${requestType}.loadingText`)}
     />
+  ) : outcomeContentState ? (
+    <MessageNoAction {...outcomeContent[outcomeContentState]} />
   ) : (
-    outcomeContentState && <MessageNoAction {...outcomeContent[outcomeContentState]} />
+    <MessageNoAction {...outcomeContent.notFound} />
   );
 }

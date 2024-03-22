@@ -341,6 +341,6 @@ export default function CompleteRequestComponent() {
       />
     </>
   ) : (
-    <MessageNoAction {...outcomeContent.error} />
+    <MessageNoAction {...outcomeContent.notFound} />
   );
 }
