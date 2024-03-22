@@ -77,7 +77,7 @@ test("Test: The onboarding request can't be cancel because is already approved",
   waitFor(() => expect(buildAssistanceURI).toBeCalledWith(ENV.URL_FE.LOGIN));
 });
 
-test("The onboarding request can't be cancel because is expired", async () => {
+test("Test: The onboarding request can't be cancel because is expired", async () => {
   mockedLocation.search = 'jwt=expired';
   render(<CancelRequestComponent />);
 
