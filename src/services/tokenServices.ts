@@ -24,7 +24,7 @@ const getMixPanelEvent = (errorStatus: number | undefined) => {
 
 export const verifyRequest = async ({ token, setOutcomeContentState, setRequestData }: Props) => {
   const fetchJwt = await fetchWithLogs(
-    { endpoint: 'ONBOARDING_TOKEN_VALIDATION', endpointParams: { token } },
+    { endpoint: 'ONBOARDING_TOKEN_VALIDATION', endpointParams: { onboardingId: token } },
     { method: 'POST', headers: { 'Content-Type': 'application/json' } },
     redirectToLogin
   );
