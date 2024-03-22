@@ -1,9 +1,9 @@
 import { RoutesObject } from '../../types';
-import CompleteRegistrationComponent from '../views/uploadContract/complete/CompleteRequestComponent';
+import CompleteRequestComponent from '../views/uploadContract/complete/CompleteRequestComponent';
 import NoProductPage from '../views/NoProductPage';
 import Onboarding from '../views/onboarding/Onboarding';
 import OnBoardingSubProduct from '../views/OnBoardingSubProduct/OnBoardingSubProduct';
-import RejectRegistration from '../views/uploadContract/cancel/CancelRequestComponent';
+import CancelRequestComponent from '../views/uploadContract/cancel/CancelRequestComponent';
 import { ENV } from './env';
 
 const IS_DEVELOP = process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test';
@@ -23,12 +23,12 @@ export const ROUTES: RoutesObject = {
   REGISTRATION_FINALIZE_COMPLETE: {
     PATH: `${BASE_ROUTE}/confirm`,
     LABEL: 'Completa la procedura di onboarding',
-    COMPONENT: CompleteRegistrationComponent,
+    COMPONENT: CompleteRequestComponent,
   },
   REGISTRATION_FINALIZE_REJECT: {
     PATH: `${BASE_ROUTE}/cancel`,
     LABEL: 'Cancella la procedura di onboarding',
-    COMPONENT: RejectRegistration,
+    COMPONENT: CancelRequestComponent,
   },
   ONBOARDING: {
     PATH: `${BASE_ROUTE}/:productId`,

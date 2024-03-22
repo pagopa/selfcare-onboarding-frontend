@@ -85,6 +85,7 @@ const transcodeErrorCode = (data: Problem): keyof typeof errors => {
   return 'GENERIC';
 };
 
+// eslint-disable-next-line sonarjs/cognitive-complexity
 export default function CompleteRequestComponent() {
   const { t } = useTranslation();
   const { setSubHeaderVisible, setOnExit, setEnableLogin } = useContext(HeaderContext);
@@ -187,6 +188,7 @@ export default function CompleteRequestComponent() {
           errorCount,
         });
         if (errorCount > ENV.UPLOAD_CONTRACT_MAX_LOOP_ERROR) {
+          setOpen(false);
           setOutcomeContentState('error');
         }
       } else {
@@ -310,39 +312,35 @@ export default function CompleteRequestComponent() {
     },
   };
 
-  return (
+  return loading ? (
+    <LoadingOverlay loadingText={t('onboarding.loading.loadingText')} />
+  ) : outcomeContentState && outcomeContentState !== 'error' ? (
     <>
-      {loading ? (
-        <LoadingOverlay loadingText={t('onboarding.loading.loadingText')} />
-      ) : outcomeContentState ? (
-        <MessageNoAction {...outcomeContent[outcomeContentState]} />
-      ) : (
-        <>
-          <SessionModal
-            handleClose={handleErrorModalClose}
-            handleExit={handleErrorModalExit}
-            onConfirm={handleErrorModalConfirm}
-            open={open}
-            title={t(`completeRegistration.errors.${errorCode}.title`)}
-            message={
-              errorCode === 'INVALID_SIGN_FORMAT' ? (
-                <Trans i18nKey={`completeRegistration.errors.INVALID_SIGN_FORMAT.message`}>
-                  {'Il caricamento del documento non è andato a buon fine.'}
-                  <br />
-                  {'Carica un solo file in formato '}
-                  <strong>{'p7m'}</strong>
-                  {'.'}
-                </Trans>
-              ) : (
-                t(`completeRegistration.errors.${errorCode}.message`)
-              )
-            }
-            onConfirmLabel={t('completeRegistration.sessionModal.onConfirmLabel')}
-            onCloseLabel={t('completeRegistration.sessionModal.onCloseLabel')}
-          />
-          <Step />
-        </>
-      )}
+      <MessageNoAction {...outcomeContent[outcomeContentState]} />
+      <SessionModal
+        handleClose={handleErrorModalClose}
+        handleExit={handleErrorModalExit}
+        onConfirm={handleErrorModalConfirm}
+        open={open}
+        title={t(`completeRegistration.errors.${errorCode}.title`)}
+        message={
+          errorCode === 'INVALID_SIGN_FORMAT' ? (
+            <Trans i18nKey={`completeRegistration.errors.INVALID_SIGN_FORMAT.message`}>
+              {'Il caricamento del documento non è andato a buon fine.'}
+              <br />
+              {'Carica un solo file in formato '}
+              <strong>{'p7m'}</strong>
+              {'.'}
+            </Trans>
+          ) : (
+            t(`completeRegistration.errors.${errorCode}.message`)
+          )
+        }
+        onConfirmLabel={t('completeRegistration.sessionModal.onConfirmLabel')}
+        onCloseLabel={t('completeRegistration.sessionModal.onCloseLabel')}
+      />
     </>
+  ) : (
+    <MessageNoAction {...outcomeContent.error} />
   );
 }

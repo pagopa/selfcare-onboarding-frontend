@@ -709,19 +709,19 @@ const mockedResponseError = {
 };
 
 const mockedOnboardingRequestData: Array<OnboardingRequestData> = [
-  // Already approved onboarding request
+  // Already approved onboarding request not expired
   {
     productId: 'prod-pagopa',
     status: 'COMPLETED',
-    expiringDate: '2024-04-31T01:30:00.000-05:00',
+    expiringDate: '2030-02-31T01:30:00.000-05:00',
   },
-  // Already rejected onboarding request
+  // Already rejected onboarding request not expired
   {
     productId: 'prod-pagopa',
     status: 'REJECTED',
-    expiringDate: '2024-04-31T09:30:00.000-08:00',
+    expiringDate: '2030-02-31T09:30:00.000-08:00',
   },
-  // Pending onboarding request
+  // Pending onboarding request not expired
   {
     productId: 'prod-pagopa',
     status: 'PENDING',
@@ -760,6 +760,13 @@ const genericError: Promise<AxiosError> = new Promise((resolve) =>
   resolve({
     isAxiosError: true,
     response: { data: mockedResponseError, status: 503, statusText: '503' },
+  } as AxiosError)
+);
+
+const badRequestError: Promise<AxiosError> = new Promise((resolve) =>
+  resolve({
+    isAxiosError: true,
+    response: { data: '', status: 400, statusText: '400' },
   } as AxiosError)
 );
 
@@ -1007,7 +1014,7 @@ export async function mockFetch(
   if (endpoint === 'ONBOARDING_COMPLETE_REGISTRATION') {
     switch (endpointParams.token) {
       case 'error':
-        return genericError;
+        return badRequestError;
       case 'pendingRequest':
         return noContent;
     }
