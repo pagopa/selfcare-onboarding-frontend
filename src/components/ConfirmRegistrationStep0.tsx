@@ -30,12 +30,25 @@ export function ConfirmRegistrationStep0({ forward }: StepperStepComponentProps)
       { method: 'GET' },
       () => setRequiredLogin(true)
     );
+
     const outcome = getFetchOutcome(searchResponse);
-    const response = (searchResponse as AxiosResponse).data.file;
 
     if (outcome === 'success') {
-      const file = URL.createObjectURL(new Blob([response]));
-      window.open(file);
+      const response = (searchResponse as AxiosResponse).data;
+
+      const blob = new Blob([response]);
+
+      const blobUrl = URL.createObjectURL(blob);
+
+      const link = document.createElement('a');
+      // eslint-disable-next-line functional/immutable-data
+      link.href = blobUrl;
+      // eslint-disable-next-line functional/immutable-data
+      link.download = 'contract.pdf';
+      document.body.appendChild(link);
+      link.click();
+
+      URL.revokeObjectURL(blobUrl);
     } else {
       setOpenModal(true);
     }
