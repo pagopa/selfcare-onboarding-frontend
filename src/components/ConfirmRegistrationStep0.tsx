@@ -4,18 +4,16 @@ import { useTranslation, Trans } from 'react-i18next';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import DownloadIcon from '@mui/icons-material/Download';
 import { SessionModal } from '@pagopa/selfcare-common-frontend';
-import { useContext, useState } from 'react';
-import { AxiosResponse } from 'axios';
+import { useState } from 'react';
+import { storageTokenOps } from '@pagopa/selfcare-common-frontend/utils/storage';
 import { StepperStepComponentProps } from '../../types';
-import { getFetchOutcome } from '../lib/error-utils';
-import { fetchWithLogs } from '../lib/api-utils';
-import { UserContext } from '../lib/context';
 import { getRequestJwt } from '../utils/getRequestJwt';
+import { ENV } from '../utils/env';
 
 export function ConfirmRegistrationStep0({ forward }: StepperStepComponentProps) {
   const { t } = useTranslation();
   const theme = useTheme();
-  const { setRequiredLogin } = useContext(UserContext);
+
   const [openModal, setOpenModal] = useState<boolean>(false);
 
   const token = getRequestJwt();
@@ -24,34 +22,63 @@ export function ConfirmRegistrationStep0({ forward }: StepperStepComponentProps)
     forward();
   };
 
-  const getContract = async () => {
-    const searchResponse = await fetchWithLogs(
-      { endpoint: 'ONBOARDING_GET_CONTRACT', endpointParams: { onboardingId: token } },
-      { method: 'GET' },
-      () => setRequiredLogin(true)
-    );
+  const fileFromReader = async (
+    reader: ReadableStreamDefaultReader<Uint8Array> | undefined
+  ): Promise<string> => {
+    const stream = new ReadableStream({
+      start(controller) {
+        return pump();
+        function pump(): Promise<any> | undefined {
+          return reader?.read().then(({ done, value }) => {
+            if (done) {
+              controller.close();
+              return;
+            }
+            controller.enqueue(value);
+            return pump();
+          });
+        }
+      },
+    });
+    const response = new Response(stream);
 
-    const outcome = getFetchOutcome(searchResponse);
+    const blob = await response.blob();
+    return URL.createObjectURL(blob);
+  };
 
-    if (outcome === 'success') {
-      const response = (searchResponse as AxiosResponse).data;
-
-      const blob = new Blob([response]);
-
-      const blobUrl = URL.createObjectURL(blob);
-
-      const link = document.createElement('a');
-      // eslint-disable-next-line functional/immutable-data
-      link.href = blobUrl;
-      // eslint-disable-next-line functional/immutable-data
-      link.download = 'contract.pdf';
-      document.body.appendChild(link);
-      link.click();
-
-      URL.revokeObjectURL(blobUrl);
-    } else {
-      setOpenModal(true);
-    }
+  const getContract = () => {
+    const sessionToken = storageTokenOps.read();
+    fetch(ENV.URL_API.ONBOARDING_V2 + `/v2/tokens/${token}/contract`, {
+      headers: {
+        accept: 'application/json, text/plain, */*',
+        'accept-language': 'it-IT,it;q=0.9,en-US;q=0.8,en;q=0.7',
+        authorization: `Bearer ${sessionToken}`,
+        'content-type': 'application/octet-stream',
+      },
+      method: 'GET',
+    })
+      .then((response) => {
+        const contentDisposition = response.headers.get('content-disposition') ?? 'contract';
+        return response.blob().then((blob) => {
+          const reader = blob.stream().getReader();
+          fileFromReader(reader)
+            .then((url) => {
+              const link = document.createElement('a');
+              // eslint-disable-next-line functional/immutable-data
+              link.href = url;
+              // eslint-disable-next-line functional/immutable-data
+              link.download = contentDisposition.concat('.pdf');
+              document.body.appendChild(link);
+              link.click();
+            })
+            .catch(() => {
+              setOpenModal(true);
+            });
+        });
+      })
+      .catch(() => {
+        setOpenModal(true);
+      });
   };
 
   return (
@@ -159,7 +186,13 @@ export function ConfirmRegistrationStep0({ forward }: StepperStepComponentProps)
       <SessionModal
         open={openModal}
         title={t('onboardingStep1_5.genericError.title')}
-        message={'onboardingStep1_5.genericError.message'}
+        message={
+          <Trans i18nKey={'onboardingStep1_5.genericError.description'} components={{ 1: <br /> }}>
+            {`A causa di un errore del sistema non è possibile completare la procedura.
+        <1/>
+        Ti chiediamo di riprovare più tardi.`}
+          </Trans>
+        }
         handleClose={() => setOpenModal(false)}
       />
     </>
