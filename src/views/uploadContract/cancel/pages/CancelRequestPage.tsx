@@ -1,14 +1,14 @@
 import { Button, Typography } from '@mui/material';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
 import { Trans, useTranslation } from 'react-i18next';
-import { ENV } from '../utils/env';
-import { ReactComponent as PaymentCompleted } from './../assets/payment_completed.svg';
+import { ENV } from '../../../../utils/env';
+import { ReactComponent as PaymentCompleted } from '../../../../assets/payment_completed.svg';
 
 type Props = {
-  setIsConfirmPageVisible: (value: React.SetStateAction<boolean>) => void;
   deleteRequest: () => void;
 };
-export default function ConfirmCancellationPage({ setIsConfirmPageVisible, deleteRequest }: Props) {
+
+export default function CancelRequestPage({ deleteRequest }: Props) {
   const { t } = useTranslation();
 
   return (
@@ -37,14 +37,7 @@ export default function ConfirmCancellationPage({ setIsConfirmPageVisible, delet
         >
           {t('rejectRegistration.outcomeContent.success.backActionLabel')}
         </Button>
-        <Button
-          variant="contained"
-          sx={{ alignSelf: 'center' }}
-          onClick={() => {
-            setIsConfirmPageVisible(false);
-            deleteRequest();
-          }}
-        >
+        <Button variant="contained" sx={{ alignSelf: 'center' }} onClick={() => deleteRequest()}>
           {t('rejectRegistration.confirmCancellatione.confirmActionLabel')}
         </Button>
       </Typography>

@@ -36,7 +36,16 @@ export type RouteConfig = {
 
 export type Image = { src: string; alt: string };
 export type RequestOutcome = 'success' | 'error';
-export type RequestOutcomeJwt = 'success' | 'error' | 'jwterror' | 'jwtsuccess';
+
+export type RequestOutcomeComplete =
+  | 'success'
+  | 'error'
+  | 'toBeCompleted'
+  | 'alreadyCompleted'
+  | 'alreadyRejected'
+  | 'expired'
+  | 'notFound';
+
 export type RequestOutcomeMessage = {
   title: string;
   description: Array<JSX.Element>;
@@ -46,7 +55,7 @@ export type RequestOutcomeMessage = {
     | ((props: DefaultComponentProps<SvgIconTypeMap>) => JSX.Element);
 };
 export type RequestOutcomeOptions = { [key in RequestOutcome]: RequestOutcomeMessage };
-export type RequestOutcomeOptionsJwt = { [key in RequestOutcomeJwt]: RequestOutcomeMessage };
+export type RequestOutcomeOptionsJwt = { [key in RequestOutcomeComplete]: RequestOutcomeMessage };
 
 /*
  * Onboarding component
@@ -242,4 +251,10 @@ export type InsuranceCompanyResource = {
 export type InsuranceCompaniesResource = {
   count: number;
   items: Array<InsuranceCompanyResource>;
+};
+
+export type OnboardingRequestData = {
+  productId: string;
+  status: string;
+  expiringDate: string;
 };
