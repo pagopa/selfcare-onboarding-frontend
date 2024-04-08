@@ -7,7 +7,7 @@ import { redirectToLogin } from '../utils/unloadEvent-utils';
 import { getFetchOutcome } from '../lib/error-utils';
 
 type Props = {
-  onboardingId: string;
+  onboardingId?: string;
   setRequiredLogin: (value: React.SetStateAction<boolean>) => void;
   setOutcomeContentState: React.Dispatch<React.SetStateAction<RequestOutcomeComplete | null>>;
   setRequestData: React.Dispatch<React.SetStateAction<OnboardingRequestData | undefined>>;
@@ -27,6 +27,10 @@ export const verifyRequest = async ({
   setOutcomeContentState,
   setRequestData,
 }: Props) => {
+  if (!onboardingId) {
+    return setOutcomeContentState('notFound');
+  }
+
   const fetchJwt = await fetchWithLogs(
     { endpoint: 'ONBOARDING_TOKEN_VALIDATION', endpointParams: { onboardingId } },
     { method: 'POST', headers: { 'Content-Type': 'application/json' } },

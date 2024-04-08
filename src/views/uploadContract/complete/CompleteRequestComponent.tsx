@@ -119,22 +119,14 @@ export default function CompleteRequestComponent() {
     };
   }, []);
 
-  const handleVerifyRequest = async (token: string) => {
+  useEffect(() => {
     setLoading(true);
-    await verifyRequest({
+    verifyRequest({
       onboardingId: token,
       setRequiredLogin,
       setOutcomeContentState,
       setRequestData,
     }).finally(() => setLoading(false));
-  };
-
-  useEffect(() => {
-    if (!token) {
-      setOutcomeContentState('notFound');
-    } else {
-      void handleVerifyRequest(token);
-    }
   }, []);
 
   const setUploadedFilesAndWriteHistory = (files: Array<File>) => {
