@@ -75,15 +75,16 @@ export const API = {
     URL: ENV.URL_API.ONBOARDING + '/institutions',
   },
   ONBOARDING_GET_ONBOARDING_DATA: {
-    URL:
-      ENV.URL_API.ONBOARDING +
-      '/institutions/onboarding/',
+    URL: ENV.URL_API.ONBOARDING + '/institutions/onboarding/',
   },
   ONBOARDING_USER_VALIDATION: {
     URL: ENV.URL_API.ONBOARDING + '/users/validate',
   },
   ONBOARDING_TOKEN_VALIDATION: {
     URL: ENV.URL_API.ONBOARDING_V2 + '/v2/tokens/{{onboardingId}}/verify',
+  },
+  ONBOARDING_GET_CONTRACT: {
+    URL: ENV.URL_API.ONBOARDING_V2 + '/v2/tokens/{{onboardingId}}/contract',
   },
   ONBOARDING_GET_GEOTAXONOMY: {
     URL: ENV.URL_API.PARTY_REGISTRY_PROXY + '/geotaxonomies',
