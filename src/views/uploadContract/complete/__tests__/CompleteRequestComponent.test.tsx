@@ -36,7 +36,7 @@ test('Test: The jwt is not present and the onboarding request is not retrieved, 
   mockedLocation.search = 'jwt=';
   render(<CompleteRequestComponent />);
 
-  screen.getByText('La pagina che cercavi non è disponibile');
+  await waitFor(() => screen.getByText('La pagina che cercavi non è disponibile'));
   const assistanceButton = screen.getByRole('button', {
     name: 'Contatta l’assistenza',
   });
