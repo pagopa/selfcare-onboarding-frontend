@@ -58,7 +58,10 @@ export function ConfirmRegistrationStep0({ forward }: StepperStepComponentProps)
       method: 'GET',
     })
       .then((response) => {
-        const contentDisposition = response.headers.get('content-disposition') ?? 'contract';
+        const contentDisposition = response.headers.get('content-disposition');
+        const matchedIndex = contentDisposition?.indexOf('=') as number;
+        const fileName =
+          contentDisposition?.substring(matchedIndex + 1) ?? 'Accordo_di_adesione.pdf';
         return response.blob().then((blob) => {
           const reader = blob.stream().getReader();
           fileFromReader(reader)
@@ -67,7 +70,7 @@ export function ConfirmRegistrationStep0({ forward }: StepperStepComponentProps)
               // eslint-disable-next-line functional/immutable-data
               link.href = url;
               // eslint-disable-next-line functional/immutable-data
-              link.download = contentDisposition.concat('.pdf');
+              link.download = fileName;
               document.body.appendChild(link);
               link.click();
             })
