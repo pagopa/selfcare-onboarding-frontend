@@ -119,6 +119,16 @@ export default function CompleteRequestComponent() {
     };
   }, []);
 
+  const handleVerifyRequest = async (token: string) => {
+    setLoading(true);
+    await verifyRequest({
+      onboardingId: token,
+      setRequiredLogin,
+      setOutcomeContentState,
+      setRequestData,
+    }).finally(() => setLoading(false));
+  };
+
   useEffect(() => {
     setLoading(true);
     verifyRequest({
