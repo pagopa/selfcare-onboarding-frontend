@@ -50,7 +50,7 @@ export function ConfirmRegistrationStep0({ forward }: StepperStepComponentProps)
     const sessionToken = storageTokenOps.read();
     fetch(ENV.URL_API.ONBOARDING_V2 + `/v2/tokens/${token}/contract`, {
       headers: {
-        accept: 'application/json, text/plain, */*',
+        accept: '*/*',
         'accept-language': 'it-IT,it;q=0.9,en-US;q=0.8,en;q=0.7',
         authorization: `Bearer ${sessionToken}`,
         'content-type': 'application/octet-stream',
