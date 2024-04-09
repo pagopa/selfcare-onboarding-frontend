@@ -44,7 +44,7 @@ test("Test: The onboarding request can't be cancel because is not found (jwt que
   mockedLocation.search = 'jwt=';
 
   render(<CancelRequestComponent />);
-  screen.getByText('La pagina che cercavi non è disponibile');
+  await waitFor(() => screen.getByText('La pagina che cercavi non è disponibile'));
   const assistanceButton = screen.getByRole('button', {
     name: 'Contatta l’assistenza',
   });
@@ -97,9 +97,7 @@ test('Test: The jwt exist and the request is correctly retrieved, cancel onboard
     screen.getByText('Vuoi eliminare la richiesta di adesione?', { exact: false });
   });
 
-  const confirm = screen.getByRole('button', {
-    name: 'Elimina la richiesta',
-  });
+  const confirm = screen.getByText('Elimina la richiesta');
   fireEvent.click(confirm);
 
   await waitFor(() => {

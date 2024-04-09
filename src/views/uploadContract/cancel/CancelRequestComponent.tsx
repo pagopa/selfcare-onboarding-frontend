@@ -19,7 +19,6 @@ import CancelRequestSuccessPage from '../cancel/pages/CancelRequestSuccessPage';
 import { getFetchOutcome } from '../../../lib/error-utils';
 import CancelRequestPage from './pages/CancelRequestPage';
 
-// eslint-disable-next-line sonarjs/cognitive-complexity
 export default function CancelRequestComponent() {
   const { t } = useTranslation();
   const { setSubHeaderVisible, setOnExit, setEnableLogin } = useContext(HeaderContext);
@@ -31,7 +30,6 @@ export default function CancelRequestComponent() {
   );
   const [loading, setLoading] = useState(false);
   const [requestData, setRequestData] = useState<OnboardingRequestData | undefined>();
-  const [requestType, setRequestType] = useState<'verify' | 'delete'>();
 
   useEffect(() => {
     setSubHeaderVisible(true);
@@ -43,29 +41,18 @@ export default function CancelRequestComponent() {
     };
   }, []);
 
-  const handleVerifyRequest = async (token: string) => {
-    setRequestType('verify');
+  useEffect(() => {
     setLoading(true);
-    await verifyRequest({
+    verifyRequest({
       onboardingId: token,
       setRequiredLogin,
       setOutcomeContentState,
       setRequestData,
     }).finally(() => setLoading(false));
-    setRequestType(undefined);
-  };
-
-  useEffect(() => {
-    if (!token) {
-      setOutcomeContentState('notFound');
-    } else {
-      void handleVerifyRequest(token);
-    }
   }, []);
 
   const deleteRequest = () => {
     const requestId = uniqueId('contract-reject-');
-    setRequestType('delete');
     async function asyncSendDeleteRequest() {
       // Send DELETE request
       const deleteOnboardingResponse = await fetchWithLogs(
@@ -84,7 +71,6 @@ export default function CancelRequestComponent() {
         setOutcomeContentState(response);
       }
       setLoading(false);
-      setRequestType(undefined);
     }
 
     if (!token) {
@@ -157,9 +143,7 @@ export default function CancelRequestComponent() {
   };
 
   return loading ? (
-    <LoadingOverlay
-      loadingText={t(`rejectRegistration.outcomeContent.${requestType}.loadingText`)}
-    />
+    <LoadingOverlay loadingText={t(`rejectRegistration.outcomeContent.delete.loadingText`)} />
   ) : outcomeContentState ? (
     <MessageNoAction {...outcomeContent[outcomeContentState]} />
   ) : (
