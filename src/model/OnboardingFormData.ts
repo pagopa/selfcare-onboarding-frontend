@@ -3,10 +3,10 @@ import { GeographicTaxonomy } from './GeographicTaxonomies';
 export type OnboardingFormData = {
   businessName: string;
   registeredOffice: string;
-  zipCode: string;
+  zipCode?: string;
   digitalAddress: string;
-  taxCode: string;
-  vatNumber: string;
+  taxCode?: string;
+  vatNumber?: string;
   county?: string;
   country?: string;
   city?: string;
@@ -30,4 +30,5 @@ export type OnboardingFormData = {
   uoName?: string;
   aooUniqueCode?: string;
   uoUniqueCode?: string;
+  isForeignOffice?: boolean;
 };
