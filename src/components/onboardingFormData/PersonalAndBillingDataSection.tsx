@@ -310,9 +310,11 @@ export default function PersonalAndBillingDataSection({
                 onChange={() => {
                   setIsForeignOffice(!isForeignOffice);
                   formik.setFieldValue('isForeignOffice', !isForeignOffice);
-
                   if (!formik.values.isForeignOffice) {
                     formik.setFieldValue('zipCode', undefined);
+                    formik.setFieldValue('city', undefined);
+                    formik.setFieldValue('county', undefined);
+                    formik.setFieldValue('country', undefined);
                   }
                 }}
               />
@@ -349,7 +351,7 @@ export default function PersonalAndBillingDataSection({
 
           <Grid container spacing={2} pl={3} pt={3}>
             <Grid item xs={7}>
-              {isInsuranceCompany ? (
+              {isInsuranceCompany && isForeignOffice ? (
                 <CustomTextField
                   {...baseTextFieldProps('city', t('onboardingFormData.billingDataSection.city'))}
                   disabled={isDisabled}
@@ -452,7 +454,7 @@ export default function PersonalAndBillingDataSection({
               )}
             </Grid>
             <Grid item xs={5}>
-              {isInsuranceCompany ? (
+              {isInsuranceCompany && isForeignOffice ? (
                 <CustomTextField
                   {...baseTextFieldProps(
                     'country',
@@ -491,22 +493,19 @@ export default function PersonalAndBillingDataSection({
               disabled={isDisabled || isContractingAuthority || isInsuranceCompany}
             />
           </Grid>
-          {!isInsuranceCompany ||
-            (isInsuranceCompany && selectedParty?.taxCode && (
-              <Grid item xs={12}>
-                <CustomTextField
-                  {...baseTextFieldProps(
-                    'taxCode',
-                    t('onboardingFormData.billingDataSection.taxCode'),
-                    isDisabled ? 400 : 600,
-                    isDisabled ? theme.palette.text.secondary : theme.palette.text.primary
-                  )}
-                  disabled={
-                    (isDisabled && !isAooUo) || isContractingAuthority || isInsuranceCompany
-                  }
-                />
-              </Grid>
-            ))}
+          {(!isInsuranceCompany || selectedParty?.taxCode) && (
+            <Grid item xs={12}>
+              <CustomTextField
+                {...baseTextFieldProps(
+                  'taxCode',
+                  t('onboardingFormData.billingDataSection.taxCode'),
+                  isDisabled ? 400 : 600,
+                  isDisabled ? theme.palette.text.secondary : theme.palette.text.primary
+                )}
+                disabled={(isDisabled && !isAooUo) || isContractingAuthority || isInsuranceCompany}
+              />
+            </Grid>
+          )}
 
           {!isInsuranceCompany && (
             <Grid item xs={12}>
