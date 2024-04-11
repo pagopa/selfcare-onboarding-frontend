@@ -1,20 +1,13 @@
 import { OnboardingFormData } from './OnboardingFormData';
 
 export type BillingDataDto = {
-  // Ragione sociale
   businessName: string;
-  // Indirizzo PEC
   digitalAddress: string;
-  // Codice destinatario
   recipientCode?: string;
-  // Sede legale
   registeredOffice: string;
-  // Codice fiscale
-  taxCode: string;
-  // Partita iva
-  vatNumber: string;
-  // CAP
-  zipCode: string;
+  taxCode?: string;
+  vatNumber?: string;
+  zipCode?: string;
 };
 
 export const billingData2billingDataRequest = (
@@ -24,7 +17,7 @@ export const billingData2billingDataRequest = (
   digitalAddress: billingData.digitalAddress,
   recipientCode: billingData.recipientCode ? billingData.recipientCode.toUpperCase() : undefined,
   registeredOffice: billingData.registeredOffice,
-  taxCode: billingData.taxCode,
-  vatNumber: billingData.vatNumber,
-  zipCode: billingData.zipCode,
+  taxCode: billingData.taxCode ?? '', // TODO This will be removed when SELC-4465 is released
+  vatNumber: billingData.vatNumber ?? '', // TODO This will be removed when SELC-4465 is released
+  zipCode: billingData.zipCode ?? '', // TODO This will be removed when SELC-4465 is released
 });
