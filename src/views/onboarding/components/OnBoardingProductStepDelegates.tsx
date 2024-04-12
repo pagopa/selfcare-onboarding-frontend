@@ -232,9 +232,12 @@ export function OnBoardingProductStepDelegates({
             color="primary"
             startIcon={<MenuBookIcon />}
             sx={{ fontWeight: 700 }}
-            onClick={() =>
-              window.open('https://docs.pagopa.it/area-riservata/area-riservata/ruoli')
-            }
+            onClick={() => {
+              const docLink = isTechPartner
+                ? 'https://docs.pagopa.it/manuale-di-area-riservata-per-partner-tecnologici/area-riservata/ruoli'
+                : 'https://docs.pagopa.it/area-riservata/area-riservata/ruoli';
+              window.open(docLink);
+            }}
           >
             {t('moreInformationOnRoles')}
           </ButtonNaked>

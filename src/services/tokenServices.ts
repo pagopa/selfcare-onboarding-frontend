@@ -1,13 +1,16 @@
 import { AxiosError, AxiosResponse } from 'axios';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
+import React from 'react';
 import { fetchWithLogs } from '../lib/api-utils';
-import { Problem, RequestOutcomeJwt } from '../../types';
+import { OnboardingRequestData, Problem, RequestOutcomeComplete } from '../../types';
 import { redirectToLogin } from '../utils/unloadEvent-utils';
+import { getFetchOutcome } from '../lib/error-utils';
 
 type Props = {
-  token: string;
+  onboardingId?: string;
   setRequiredLogin: (value: React.SetStateAction<boolean>) => void;
-  setOutcome: React.Dispatch<React.SetStateAction<RequestOutcomeJwt | null>>;
+  setOutcomeContentState: React.Dispatch<React.SetStateAction<RequestOutcomeComplete | null>>;
+  setRequestData: React.Dispatch<React.SetStateAction<OnboardingRequestData | undefined>>;
 };
 
 const getMixPanelEvent = (errorStatus: number | undefined) => {
@@ -19,25 +22,50 @@ const getMixPanelEvent = (errorStatus: number | undefined) => {
   return errors[errorStatus as keyof typeof errors] ?? 'ONBOARDING_TOKEN_VALIDATION_ERROR';
 };
 
-export const jwtNotValid = async ({ token, setOutcome }: Props) => {
+export const verifyRequest = async ({
+  onboardingId,
+  setOutcomeContentState,
+  setRequestData,
+}: Props) => {
+  if (!onboardingId) {
+    return setOutcomeContentState('notFound');
+  }
+
   const fetchJwt = await fetchWithLogs(
-    { endpoint: 'ONBOARDING_TOKEN_VALIDATION', endpointParams: { token } },
+    { endpoint: 'ONBOARDING_TOKEN_VALIDATION', endpointParams: { onboardingId } },
     { method: 'POST', headers: { 'Content-Type': 'application/json' } },
     redirectToLogin
   );
 
-  if (
-    (fetchJwt as AxiosError<Problem>).response?.status === 409 ||
-    (fetchJwt as AxiosError<Problem>).response?.status === 400 ||
-    (fetchJwt as AxiosError<Problem>).response?.status === 404
-  ) {
-    setOutcome('jwterror');
-    trackEvent(getMixPanelEvent((fetchJwt as AxiosError<Problem>).response?.status), {
-      party_id: token,
-    });
-  } else if ((fetchJwt as AxiosResponse).status !== 200) {
-    setOutcome('error');
+  const result = getFetchOutcome(fetchJwt);
+
+  if (result === 'success') {
+    const requestData = (fetchJwt as AxiosResponse).data as OnboardingRequestData;
+
+    const isExpiredRequest = requestData?.expiringDate
+      ? new Date(requestData?.expiringDate) <= new Date()
+      : false;
+
+    if (!isExpiredRequest) {
+      switch (requestData.status) {
+        case 'COMPLETED':
+          setOutcomeContentState('alreadyCompleted');
+          break;
+        case 'REJECTED':
+          setOutcomeContentState('alreadyRejected');
+          break;
+        case 'PENDING':
+          setOutcomeContentState('toBeCompleted');
+          break;
+      }
+    } else {
+      setOutcomeContentState('expired');
+    }
+    setRequestData(requestData);
   } else {
-    setOutcome('jwtsuccess');
+    trackEvent(getMixPanelEvent((fetchJwt as AxiosError<Problem>).response?.status), {
+      party_id: onboardingId,
+    });
+    setOutcomeContentState('notFound');
   }
 };

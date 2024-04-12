@@ -343,7 +343,8 @@ export default function PersonalAndBillingDataSection({
                 }}
                 inputValue={formik.values.city || ''}
                 onChange={(_e: any, selected: any) => {
-                  formik.setFieldValue('city', selected?.city || ''); // handle undefined case
+                  formik.setFieldValue('city', selected?.city || '');
+                  formik.setFieldValue('county', selected?.city || '');
                   if (selected) {
                     setInstitutionLocationData(selected);
                     setIsCitySelected(true);
@@ -354,6 +355,7 @@ export default function PersonalAndBillingDataSection({
                 onBlur={() => {
                   if (!isCitySelected) {
                     setCountries(undefined);
+
                     setInstitutionLocationData(undefined);
                   }
                 }}
@@ -362,7 +364,7 @@ export default function PersonalAndBillingDataSection({
                 noOptionsText={t('onboardingFormData.billingDataSection.noResult')}
                 clearOnBlur={true}
                 forcePopupIcon={isFromIPA || !isCityEditable ? false : true}
-                disabled={(premiumFlow && !isCityEditable) || isFromIPA || isAooUo}
+                disabled={premiumFlow && isCityEditable ? false : isFromIPA || isAooUo}
                 ListboxProps={{
                   style: {
                     overflow: 'visible',
@@ -418,7 +420,7 @@ export default function PersonalAndBillingDataSection({
                           : theme.palette.text.primary,
                       },
                     }}
-                    disabled={(premiumFlow && !isCityEditable) || isFromIPA || isAooUo}
+                    disabled={premiumFlow && isCityEditable ? false : isFromIPA || isAooUo}
                   />
                 )}
               />

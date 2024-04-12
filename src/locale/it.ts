@@ -24,9 +24,20 @@ export default {
     uoCode: 'Codice univoco UO',
   },
   confirmRegistrationStep0: {
-    title: "Carica l'Accordo di Adesione",
-    description: `<0>Segui le istruzioni</0> per inviare il documento firmato,<2/> servirà a completare l'adesione al prodotto scelto.`,
-    confirmAction: 'Continua',
+    download: {
+      title: 'Scarica l’Accordo di adesione',
+      description: `Per completare l’adesione, scarica l’Accordo e fai apporre la firma digitale in <1 /><2>formato p7m</2> dal Legale Rappresentante dell’ente o da un suo procuratore.`,
+      downloadContract: 'Scarica l’Accordo',
+      disclaimer:
+        'Firmando l’Accordo, il Legale Rappresentante dell’ente, o un suo procuratore, accetta espressamente e specificamente anche le singole clausole indicate nel paragrafo “Clausole ai sensi degli artt. 1341 e 1342 c.c.”',
+    },
+    upload: {
+      title: 'Carica l’Accordo firmato',
+      description: `Una volta firmato l’Accordo, segui le istruzioni per inviarlo e completare <1 />
+    l’adesione al prodotto scelto. Ricorda di caricare l’Accordo
+    <3>entro 30 giorni.</3>`,
+      goToUpload: 'Vai al caricamento',
+    },
   },
   confirmRegistrationStep1: {
     errorAlertTitle: 'Caricamento non riuscito',
@@ -34,10 +45,10 @@ export default {
       'Il caricamento del documento non è andato a buon fine. <1 />Carica un solo file in formato <3>p7m</3>.',
     errorAlertRetryLabel: 'Carica di nuovo',
     errorAlertCloseLabel: 'Esci',
-    pageTitle: "Carica l'Accordo di Adesione",
-    pageSubtitle: `Carica l’Accordo di Adesione ricevuto all’indirizzo PEC <1 />primario dell’ente, firmato digitalmente in p7m dal Legale <3 />Rappresentante.`,
+    pageTitle: "Carica l'Accordo di adesione",
+    pageSubtitle: `Carica l’Accordo di adesione firmato digitalmente <1 /> in p7m dal Legale Rappresentante.`,
     fileUploaderTitle: 'Trascina qui l’Accordo di Adesione firmato oppure',
-    fileUploaderDescriptionLink: 'selezionalo dal tuo computer',
+    fileUploaderDescriptionLink: 'carica il file',
     confirmAction: 'Continua',
   },
   fileUploadPreview: {
@@ -197,9 +208,6 @@ export default {
     },
   },
   completeRegistration: {
-    title: 'Qualcosa è andato storto.',
-    description: `Non siamo riusciti a indirizzarti alla pagina di caricamento<1 />per completare la procedura.`,
-    contactAssistanceButton: 'Contatta l’assistenza',
     sessionModal: {
       onConfirmLabel: 'Carica di nuovo',
       onCloseLabel: 'Esci',
@@ -212,17 +220,39 @@ export default {
         label: "Carica l'Atto di Adesione",
       },
     },
+    request: {
+      notFound: {
+        title: 'La pagina che cercavi non è disponibile',
+        description:
+          'Al momento non è possibile procedere. Riprova tra qualche <1 />minuto, o contatta l’assistenza',
+        contactAssistanceButton: 'Contatta l’assistenza',
+      },
+      expired: {
+        title: 'La richiesta di adesione è scaduta',
+        description: `Sono trascorsi oltre 30 giorni dalla richiesta di adesione. Se <2 />desideri ancora aderire al prodotto {{productTitle}}, invia <4 />una nuova richiesta.`,
+        backHome: 'Torna alla home',
+      },
+      alreadyCompleted: {
+        title: 'La richiesta di adesione è stata accettata',
+        description: `Per gestire il prodotto, accedi tramite SPID o CIE`,
+        logIn: 'Accedi',
+      },
+      alreadyRejected: {
+        title: 'La richiesta di adesione è stata annullata',
+        description: `La richiesta di adesione non è andata a buon fine. Se <2 />desideri ancora aderire al prodotto {{productTitle}}, invia <4 />una nuova richiesta.`,
+        backHome: 'Torna alla home',
+      },
+    },
     outcomeContent: {
       success: {
         title: 'Adesione completata!',
         description: `Comunicheremo l'avvenuta adesione all'indirizzo PEC <1/> primario dell'ente. Da questo momento, gli Amministratori <3/> inseriti in fase di richiesta possono accedere all'Area <5 />Riservata.`,
-        backActionLabel: 'Torna alla home',
+        backHome: 'Torna alla home',
       },
       error: {
-        alt: 'Error',
-        title: 'Richiesta di adesione in errore',
-        descriptionWithoutToken: 'Il link usato non è valido!',
-        descriptionWithToken: 'Il salvataggio dei dati inseriti non è andato a buon fine.',
+        title: 'Caricamento non riuscito',
+        description: 'Il caricamento del documento non è andato a buon fine.',
+        backToUpload: 'Carica di nuovo',
       },
     },
     errors: {
@@ -251,11 +281,6 @@ export default {
         message:
           'Il caricamento del documento non è andato a buon fine. <1 />Carica un solo file in formato <3>p7m</3>.',
       },
-    },
-    jwtNotValid: {
-      title: 'Richiesta di adesione non più <1 /> valida',
-      subtitle: 'Questa richiesta è stata accolta, annullata o è scaduta.',
-      backHome: 'Torna alla home',
     },
   },
   noProductPage: {
@@ -562,10 +587,10 @@ export default {
           'A causa di un errore del sistema non è possibile completare la procedura. <1 /> Ti chiediamo di riprovare più tardi.',
         backActionLabel: 'Torna alla home',
       },
-      loading: {
+      verify: {
         loadingText: 'Stiamo verificando i tuoi dati',
       },
-      notOutcome: {
+      delete: {
         loadingText: 'Stiamo cancellando la tua iscrizione',
       },
       jwtNotValid: {
