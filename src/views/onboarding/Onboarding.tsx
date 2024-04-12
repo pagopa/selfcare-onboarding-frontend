@@ -314,7 +314,9 @@ function OnboardingComponent({ productId }: { productId: string }) {
     setOnboardingFormData(newOnboardingFormData);
     if (institutionType !== 'PA') {
       // TODO: fix when party registry proxy will return externalInstitutionId
-      setExternalInstitutionId(newOnboardingFormData.taxCode);
+      if (newOnboardingFormData.taxCode) {
+        setExternalInstitutionId(newOnboardingFormData.taxCode);
+      }
 
       const partyVerifyOnboarded = async () => {
         const onboardingStatus = await fetchWithLogs(
@@ -717,7 +719,9 @@ function OnboardingComponent({ productId }: { productId: string }) {
           institutionType: institutionType as InstitutionType,
           subtitle:
             institutionType !== 'PT' ? (
-              t('onBoardingSubProduct.billingData.subTitle')
+              <Trans i18next="onBoardingSubProduct.billingData.subTitle" components={{ 1: <br /> }}>
+                {`Conferma, modifica o inserisci i dati richiesti, assicurandoti che siano corretti. <1 />Verranno usati anche per richiedere l’adesione ad altri prodotti e in caso di fatturazione`}
+              </Trans>
             ) : (
               <Trans
                 i18nKey="onBoardingSubProduct.billingDataPt.subTitle"
