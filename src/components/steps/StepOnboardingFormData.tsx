@@ -46,6 +46,7 @@ const reaValidation = new RegExp('^[A-Za-z]{2}');
 const commercialRegisterNumberRegexp = new RegExp('^\\d{11}$');
 const numericField = new RegExp('^[0-9]*$');
 const currencyField = new RegExp('^(0|[1-9][0-9]*(?:(,[0-9]*)*|[0-9]*))((\\.|,)[0-9]+)*$');
+const onlyCharacters = new RegExp(/^[A-Za-z\s]*$/);
 
 export type StepBillingDataHistoryState = {
   externalInstitutionId: string;
@@ -211,7 +212,7 @@ export default function StepOnboardingFormData({
         subproduct_id: subProductId,
       });
 
-      if (institutionType === 'PA') {
+      if (institutionType === 'PA' && initialFormData.taxCode) {
         void handleSearchByTaxCode(initialFormData.taxCode);
       }
     }
@@ -315,18 +316,20 @@ export default function StepOnboardingFormData({
       Object.entries({
         businessName: !values.businessName ? requiredError : undefined,
         registeredOffice: !values.registeredOffice ? requiredError : undefined,
-        zipCode: !values.zipCode
-          ? requiredError
-          : !fiveCharactersAllowed.test(values.zipCode)
-          ? t('onboardingFormData.billingDataSection.invalidZipCode')
-          : undefined,
-        taxCode: !values.taxCode
-          ? requiredError
-          : values.taxCode && !fiscalAndVatCodeRegexp.test(values.taxCode)
-          ? t('onboardingFormData.billingDataSection.invalidFiscalCode')
-          : undefined,
+        zipCode:
+          !values.zipCode && !values.isForeignOffice
+            ? requiredError
+            : values.zipCode && !fiveCharactersAllowed.test(values.zipCode ?? '')
+            ? t('onboardingFormData.billingDataSection.invalidZipCode')
+            : undefined,
+        taxCode:
+          !values.taxCode && !isInsuranceCompany
+            ? requiredError
+            : values.taxCode && !fiscalAndVatCodeRegexp.test(values.taxCode)
+            ? t('onboardingFormData.billingDataSection.invalidFiscalCode')
+            : undefined,
         vatNumber:
-          !values.vatNumber && !stepHistoryState.isTaxCodeEquals2PIVA
+          !values.vatNumber && !stepHistoryState.isTaxCodeEquals2PIVA && !isInsuranceCompany
             ? requiredError
             : values.vatNumber &&
               !fiscalAndVatCodeRegexp.test(values.vatNumber) &&
@@ -341,8 +344,17 @@ export default function StepOnboardingFormData({
             : vatVerificationGenericError
             ? requiredError
             : undefined,
-        city: !values.city ? requiredError : undefined,
-        county: !values.county ? requiredError : undefined,
+        city: !values.city
+          ? requiredError
+          : isInsuranceCompany
+          ? !onlyCharacters.test(values.city)
+          : undefined,
+        county: !values.county && !isInsuranceCompany ? requiredError : undefined,
+        country: !values.country
+          ? requiredError
+          : isInsuranceCompany
+          ? !onlyCharacters.test(values.country)
+          : undefined,
         ivassCode:
           isInsuranceCompany && !values.ivassCode
             ? requiredError
@@ -483,6 +495,7 @@ export default function StepOnboardingFormData({
     if (
       !stepHistoryState.isTaxCodeEquals2PIVA &&
       formik.values.taxCode === formik.values.vatNumber &&
+      formik.values.taxCode &&
       formik.values.taxCode.length > 0
     ) {
       setStepHistoryState({
@@ -490,7 +503,6 @@ export default function StepOnboardingFormData({
         isTaxCodeEquals2PIVA: true,
       });
     } else if (stepHistoryState.isTaxCodeEquals2PIVA && formik.values?.taxCode?.length === 0) {
-      void formik.setFieldValue('vatNumber', '');
       setStepHistoryState({
         ...stepHistoryState,
         isTaxCodeEquals2PIVA: false,
@@ -500,9 +512,10 @@ export default function StepOnboardingFormData({
 
   useEffect(() => {
     if (
-      (isProdFideiussioni && formik.values.vatNumber.length === 11) ||
+      (isProdFideiussioni && formik.values.vatNumber && formik.values.vatNumber.length === 11) ||
       (isProdFideiussioni &&
         stepHistoryState.isTaxCodeEquals2PIVA &&
+        formik.values.taxCode &&
         formik.values.taxCode.length === 11)
     ) {
       void verifyVatNumber();
@@ -558,7 +571,7 @@ export default function StepOnboardingFormData({
           </Typography>
         </Grid>
         <Grid container item justifyContent="center" mt={2} mb={4}>
-          <Grid item xs={premiumFlow ? 7 : 10}>
+          <Grid item xs={premiumFlow ? 7 : 12}>
             <Typography variant="body1" align="center">
               {subtitle}
             </Typography>

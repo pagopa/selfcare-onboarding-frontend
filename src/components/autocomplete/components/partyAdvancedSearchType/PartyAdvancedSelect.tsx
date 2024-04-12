@@ -11,6 +11,7 @@ import { ENV } from '../../../../utils/env';
 type Props = {
   setIsBusinessNameSelected: React.Dispatch<React.SetStateAction<boolean>>;
   setIsTaxCodeSelected: React.Dispatch<React.SetStateAction<boolean | undefined>>;
+  setIsIvassCodeSelected: React.Dispatch<React.SetStateAction<boolean>>;
   setOptions: React.Dispatch<React.SetStateAction<Array<any>>>;
   setInput: React.Dispatch<React.SetStateAction<string>>;
   setIsSearchFieldSelected: React.Dispatch<React.SetStateAction<boolean>>;
@@ -24,6 +25,7 @@ type Props = {
   setAooResultHistory: (t: AooData | undefined) => void;
   isBusinessNameSelected?: boolean;
   isTaxCodeSelected?: boolean;
+  isIvassCodeSelected?: boolean;
   isAooCodeSelected?: boolean;
   isUoCodeSelected?: boolean;
   product?: Product | null;
@@ -33,6 +35,7 @@ type Props = {
 export default function PartyAdvancedSelect({
   setIsBusinessNameSelected,
   setIsTaxCodeSelected,
+  setIsIvassCodeSelected,
   setOptions,
   setInput,
   setIsSearchFieldSelected,
@@ -43,6 +46,7 @@ export default function PartyAdvancedSelect({
   setUoResult,
   isBusinessNameSelected,
   isTaxCodeSelected,
+  isIvassCodeSelected,
   isAooCodeSelected,
   isUoCodeSelected,
   setUoResultHistory,
@@ -61,11 +65,13 @@ export default function PartyAdvancedSelect({
   const onSelectValue = (
     isBusinessNameSelected: boolean,
     isTaxCodeSelected: boolean,
+    isIvassCodeSelected: boolean,
     isAooCodeSelected: boolean,
     isUoCodeSelected: boolean
   ) => {
     setIsBusinessNameSelected(isBusinessNameSelected);
     setIsTaxCodeSelected(isTaxCodeSelected);
+    setIsIvassCodeSelected(isIvassCodeSelected);
     setIsAooCodeSelected(isAooCodeSelected);
     setIsUoCodeSelected(isUoCodeSelected);
     setOptions([]);
@@ -86,6 +92,8 @@ export default function PartyAdvancedSelect({
       setTypeOfSearch('aooCode');
     } else if (isUoCodeSelected) {
       setTypeOfSearch('uoCode');
+    } else if (isIvassCodeSelected) {
+      setTypeOfSearch('ivassCode');
     }
   }, []);
 
@@ -95,7 +103,6 @@ export default function PartyAdvancedSelect({
       product.id === 'prod-io-sign' ||
       product.id === 'prod-pn-dev' ||
       product.id === 'prod-pn');
-      
   const optionsAvailable4InstitutionType =
     institutionType !== 'SA' && institutionType !== 'AS' && institutionType !== 'GSP';
 
@@ -104,14 +111,14 @@ export default function PartyAdvancedSelect({
       id: 'aooCode',
       ['data-testid']: 'aooCode',
       value: 'aooCode',
-      onClick: () => onSelectValue(false, false, true, false),
+      onClick: () => onSelectValue(false, false, false, true, false),
       label: t('partyAdvancedSelect.aooCode'),
     },
     {
       id: 'uoCode',
       ['data-testid']: 'uoCode',
       value: 'uoCode',
-      onClick: () => onSelectValue(false, false, false, true),
+      onClick: () => onSelectValue(false, false, false, false, true),
       label: t('partyAdvancedSelect.uoCode'),
     },
   ];
@@ -130,18 +137,29 @@ export default function PartyAdvancedSelect({
           id="businessName"
           data-testid="businessName"
           value={'businessName'}
-          onClick={() => onSelectValue(true, false, false, false)}
+          onClick={() => onSelectValue(true, false, false, false, false)}
         >
           {t('partyAdvancedSelect.businessName')}
         </MenuItem>
-        <MenuItem
-          id="taxCode"
-          data-testid="taxCode"
-          value={'taxCode'}
-          onClick={() => onSelectValue(false, true, false, false)}
-        >
-          {t('partyAdvancedSelect.taxCode')}
-        </MenuItem>
+        {institutionType === 'AS' ? (
+          <MenuItem
+            id="ivassCode"
+            data-testid="ivassCode"
+            value={'ivassCode'}
+            onClick={() => onSelectValue(false, false, true, false, false)}
+          >
+            {t('partyAdvancedSelect.ivassCode')}
+          </MenuItem>
+        ) : (
+          <MenuItem
+            id="taxCode"
+            data-testid="taxCode"
+            value={'taxCode'}
+            onClick={() => onSelectValue(false, true, false, false, false)}
+          >
+            {t('partyAdvancedSelect.taxCode')}
+          </MenuItem>
+        )}
 
         {ENV.AOO_UO.SHOW_AOO_UO &&
           filteredByProducts &&
