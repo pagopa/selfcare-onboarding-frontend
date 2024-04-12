@@ -59,6 +59,7 @@ export function Autocomplete({
   const [isUoCodeSelected, setIsUoCodeSelected] = useState<boolean>(false);
 
   const [isTaxCodeSelected, setIsTaxCodeSelected] = useState<boolean>();
+  const [isIvassCodeSelected, setIsIvassCodeSelected] = useState<boolean>(false);
   const [input, setInput] = useState<string>('');
 
   return (
@@ -80,6 +81,7 @@ export function Autocomplete({
             <PartyAdvancedSelect
               setIsTaxCodeSelected={setIsTaxCodeSelected}
               setIsBusinessNameSelected={setIsBusinessNameSelected}
+              setIsIvassCodeSelected={setIsIvassCodeSelected}
               setIsAooCodeSelected={setIsAooCodeSelected}
               setIsUoCodeSelected={setIsUoCodeSelected}
               setOptions={setOptions}
@@ -91,6 +93,7 @@ export function Autocomplete({
               setCfResult={setCfResult}
               isBusinessNameSelected={isBusinessNameSelected}
               isTaxCodeSelected={isTaxCodeSelected}
+              isIvassCodeSelected={isIvassCodeSelected}
               isAooCodeSelected={isAooCodeSelected}
               isUoCodeSelected={isUoCodeSelected}
               setUoResultHistory={setUoResultHistory}

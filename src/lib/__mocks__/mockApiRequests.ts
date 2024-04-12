@@ -907,15 +907,15 @@ export async function mockFetch(
     );
   }
 
-  if (endpoint === 'ONBOARDING_GET_INSURANCE_COMPANIES_BY_NAME') {
+  if (endpoint === 'ONBOARDING_GET_INSURANCE_COMPANIES_FROM_BUSINESSNAME') {
     return new Promise((resolve) =>
       resolve({ data: mockedInsuranceResource, status: 200, statusText: '200' } as AxiosResponse)
     );
   }
 
-  if (endpoint === 'ONBOARDING_GET_INSURANCE_COMPANIES_BY_TAXCODE') {
+  if (endpoint === 'ONBOARDING_GET_INSURANCE_COMPANIES_FROM_IVASSCODE') {
     const matchedInstitution = mockedInsuranceResource.items.find(
-      (i) => i.taxCode === endpointParams.taxId
+      (i) => i.originId === endpointParams.code
     );
     return new Promise((resolve) =>
       resolve({ data: matchedInstitution, status: 200, statusText: '200' } as AxiosResponse)

@@ -238,8 +238,8 @@ export default function AsyncAutocompleteContainer({
         endpoint:
           institutionType === 'SA'
             ? 'ONBOARDING_GET_SA_PARTY_FROM_FC'
-            : 'ONBOARDING_GET_INSURANCE_COMPANIES_BY_TAXCODE',
-        endpointParams: institutionType === 'SA' ? { id: query } : { taxId: query },
+            : 'ONBOARDING_GET_INSURANCE_COMPANIES_FROM_IVASSCODE',
+        endpointParams: institutionType === 'SA' ? { code: query } : { taxId: query },
       },
       {
         method: 'GET',
@@ -262,7 +262,7 @@ export default function AsyncAutocompleteContainer({
     switch (institutionType) {
       case 'AS':
         void debounce(handleSearchByName, 100)(value, {
-          endpoint: 'ONBOARDING_GET_INSURANCE_COMPANIES_BY_NAME',
+          endpoint: 'ONBOARDING_GET_INSURANCE_COMPANIES_FROM_BUSINESSNAME',
         });
         break;
       case 'SA':
