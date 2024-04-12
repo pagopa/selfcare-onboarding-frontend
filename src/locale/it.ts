@@ -428,7 +428,7 @@ export default {
     },
     billingData: {
       subTitle:
-        'Conferma, modifica o inserisci i dati richiesti, assicurandoti che siano corretti. Verranno usati anche per richiedere l’adesione ad altri prodotti e in caso di fatturazione',
+        'Conferma, modifica o inserisci i dati richiesti, assicurandoti che siano corretti. <1 />Verranno usati anche per richiedere l’adesione ad altri prodotti e in caso di fatturazione',
     },
     exitModal: {
       title: 'Vuoi davvero uscire?',
@@ -496,6 +496,7 @@ export default {
         'Non è stato possibile verificare la P.IVA al momento. Riprova più tardi.',
       centralPartyLabel: 'Ente centrale',
       businessName: 'Ragione sociale',
+      foreignOffice: 'Il mio ente ha sede all’estero',
       aooName: 'Denominazione AOO',
       uoName: 'Denominazione UO',
       aooUniqueCode: 'Codice Univoco AOO',
@@ -506,6 +507,7 @@ export default {
       city: 'Città',
       noResult: 'Nessun risultato',
       county: 'Provincia',
+      country: 'Nazione',
       digitalAddress: 'Indirizzo PEC',
       taxCodeEquals2PIVAdescription: 'La Partita IVA coincide con il Codice Fiscale',
       vatNumberGroup: 'La Partita IVA è di gruppo',
