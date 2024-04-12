@@ -114,6 +114,7 @@ export function Autocomplete({
           setSelected={setSelected}
           isBusinessNameSelected={isBusinessNameSelected}
           isTaxCodeSelected={isTaxCodeSelected}
+          isIvassCodeSelected={isIvassCodeSelected}
           setIsTaxCodeSelected={setIsTaxCodeSelected}
           selected={selected}
           theme={theme}

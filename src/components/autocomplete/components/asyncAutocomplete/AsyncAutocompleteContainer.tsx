@@ -44,6 +44,7 @@ type Props = {
   setAooResultHistory: (t: AooData | undefined) => void;
   aooResult?: AooData;
   uoResult?: UoData;
+  isIvassCodeSelected: boolean;
   externalInstitutionId: string;
   institutionType?: InstitutionType;
   setDisabled: Dispatch<SetStateAction<boolean>>;
@@ -69,6 +70,7 @@ export default function AsyncAutocompleteContainer({
   setCfResult,
   cfResult,
   product,
+  isIvassCodeSelected,
   isAooCodeSelected,
   isUoCodeSelected,
   setAooResult,
@@ -239,7 +241,7 @@ export default function AsyncAutocompleteContainer({
           institutionType === 'SA'
             ? 'ONBOARDING_GET_SA_PARTY_FROM_FC'
             : 'ONBOARDING_GET_INSURANCE_COMPANIES_FROM_IVASSCODE',
-        endpointParams: institutionType === 'SA' ? { code: query } : { taxId: query },
+        endpointParams: institutionType === 'SA' ? { taxId: query } : { code: query },
       },
       {
         method: 'GET',
@@ -305,7 +307,10 @@ export default function AsyncAutocompleteContainer({
       setSelected(null);
       if (value.length >= 3 && isBusinessNameSelected && !isTaxCodeSelected) {
         seachByInstitutionType(value, institutionType);
-      } else if (isTaxCodeSelected && value.length === 11) {
+      } else if (
+        (isTaxCodeSelected && value.length === 11) ||
+        (isIvassCodeSelected && value.length === 5)
+      ) {
         if (institutionType === 'SA' || institutionType === 'AS') {
           void contractingInsuranceFromTaxId(value);
         } else {
