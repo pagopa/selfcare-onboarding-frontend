@@ -1,9 +1,9 @@
 import { RoutesObject } from '../../types';
-import CompleteRegistrationComponent from '../views/CompleteRegistrationComponent';
+import CompleteRequestComponent from '../views/uploadContract/complete/CompleteRequestComponent';
 import NoProductPage from '../views/NoProductPage';
 import Onboarding from '../views/onboarding/Onboarding';
 import OnBoardingSubProduct from '../views/OnBoardingSubProduct/OnBoardingSubProduct';
-import RejectRegistration from '../views/RejectRegistration';
+import CancelRequestComponent from '../views/uploadContract/cancel/CancelRequestComponent';
 import { ENV } from './env';
 
 const IS_DEVELOP = process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test';
@@ -23,12 +23,12 @@ export const ROUTES: RoutesObject = {
   REGISTRATION_FINALIZE_COMPLETE: {
     PATH: `${BASE_ROUTE}/confirm`,
     LABEL: 'Completa la procedura di onboarding',
-    COMPONENT: CompleteRegistrationComponent,
+    COMPONENT: CompleteRequestComponent,
   },
   REGISTRATION_FINALIZE_REJECT: {
     PATH: `${BASE_ROUTE}/cancel`,
     LABEL: 'Cancella la procedura di onboarding',
-    COMPONENT: RejectRegistration,
+    COMPONENT: CancelRequestComponent,
   },
   ONBOARDING: {
     PATH: `${BASE_ROUTE}/:productId`,
@@ -75,15 +75,16 @@ export const API = {
     URL: ENV.URL_API.ONBOARDING + '/institutions',
   },
   ONBOARDING_GET_ONBOARDING_DATA: {
-    URL:
-      ENV.URL_API.ONBOARDING +
-      '/institutions/{{externalInstitutionId}}/products/{{productId}}/onboarded-institution-info',
+    URL: ENV.URL_API.ONBOARDING + '/institutions/onboarding/',
   },
   ONBOARDING_USER_VALIDATION: {
     URL: ENV.URL_API.ONBOARDING + '/users/validate',
   },
   ONBOARDING_TOKEN_VALIDATION: {
-    URL: ENV.URL_API.ONBOARDING_V2 + '/v2/tokens/{{token}}/verify',
+    URL: ENV.URL_API.ONBOARDING_V2 + '/v2/tokens/{{onboardingId}}/verify',
+  },
+  ONBOARDING_GET_CONTRACT: {
+    URL: ENV.URL_API.ONBOARDING_V2 + '/v2/tokens/{{onboardingId}}/contract',
   },
   ONBOARDING_GET_GEOTAXONOMY: {
     URL: ENV.URL_API.PARTY_REGISTRY_PROXY + '/geotaxonomies',
