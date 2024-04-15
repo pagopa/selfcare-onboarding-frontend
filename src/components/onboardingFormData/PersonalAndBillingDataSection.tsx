@@ -206,13 +206,15 @@ export default function PersonalAndBillingDataSection({
   };
 
   const getCountriesFromCSV = async (_query: string) => {
-    await fetch(ENV.JSON_URL.COUNTRIES)
-      .then((res) => res.json())
-      .then((r) => {
-        const mapped = Object.values(r);
-        console.log('response: ', mapped);
-      })
-      .catch((e) => console.error(e));
+    try {
+      const response = await fetch(ENV.JSON_URL.COUNTRIES);
+      const countries = await response.json();
+      console.log('countries: ', countries);
+      const mappedCountries = Object.entries(countries);
+      console.log('mapped countries: ', mappedCountries);
+    } catch (reason) {
+      console.error(reason);
+    }
   };
 
   const getLocationFromIstatCode = async (istatCode: string) => {
