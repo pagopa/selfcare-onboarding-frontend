@@ -17,6 +17,7 @@ import { OnboardingFormData } from '../../model/OnboardingFormData';
 import { UoData } from '../../model/UoModel';
 import { formatCity } from '../../utils/formatting-utils';
 import { StepBillingDataHistoryState } from '../steps/StepOnboardingFormData';
+import { ENV } from '../../utils/env';
 import NumberDecimalFormat from './NumberDecimalFormat';
 
 const CustomTextField = styled(TextField)({
@@ -202,6 +203,13 @@ export default function PersonalAndBillingDataSection({
 
       setCountries(onlyCountries);
     }
+  };
+
+  const getCountriesFromCSV = async (_query: string) => {
+    await fetch(ENV.CSV_URL.COUNTRIES)
+      .then((res) => res)
+      .then((r) => console.log('regions: ', r))
+      .catch((e) => e);
   };
 
   const getLocationFromIstatCode = async (istatCode: string) => {
@@ -455,14 +463,89 @@ export default function PersonalAndBillingDataSection({
             </Grid>
             <Grid item xs={5}>
               {isInsuranceCompany && isForeignOffice ? (
-                <CustomTextField
-                  {...baseTextFieldProps(
-                    'country',
-                    t('onboardingFormData.billingDataSection.country'),
-                    isFromIPA || institutionLocationData?.country ? 400 : 600,
-                    isFromIPA || institutionLocationData?.country
-                      ? theme.palette.text.secondary
-                      : theme.palette.text.primary
+                <Autocomplete
+                  id="country-select"
+                  onInput={(e: React.ChangeEvent<HTMLInputElement>) => {
+                    const value = e.target.value;
+                    formik.setFieldValue('country', value);
+                    if (value.length >= 3) {
+                      void getCountriesFromCSV(value);
+                    } // else {
+                    // setCountries({ ...countries, country: undefined });
+                    // }
+                  }}
+                  inputValue={formik.values.country || ''}
+                  onChange={(_e: any, selected: any) => {
+                    if (selected) {
+                      setInstitutionLocationData(selected);
+                      setIsCitySelected(true);
+                    } else {
+                      setIsCitySelected(false);
+                    }
+                  }}
+                  // getOptionLabel={(o) => o.country}
+                  options={[]}
+                  noOptionsText={t('onboardingFormData.billingDataSection.noResult')}
+                  clearOnBlur={true}
+                  forcePopupIcon={isFromIPA || !isCityEditable ? false : true}
+                  disabled={premiumFlow && isCityEditable ? false : isFromIPA || isAooUo}
+                  ListboxProps={{
+                    style: {
+                      overflow: 'visible',
+                    },
+                  }}
+                  componentsProps={{
+                    paper: {
+                      sx: {
+                        '&::-webkit-scrollbar': {
+                          width: 4,
+                        },
+                        '&::-webkit-scrollbar-track': {
+                          boxShadow: `inset 10px 10px  #E6E9F2`,
+                          marginY: '3px',
+                        },
+                        '&::-webkit-scrollbar-thumb': {
+                          backgroundColor: '#0073E6',
+                          borderRadius: '16px',
+                        },
+                        overflowY: 'auto',
+                        maxHeight: '200px',
+                        boxShadow:
+                          '0px 6px 30px 5px rgba(0, 43, 85, 0.10), 0px 16px 24px 2px rgba(0, 43, 85, 0.05), 0px 8px 10px -5px rgba(0, 43, 85, 0.10)',
+                      },
+                    },
+                  }}
+                  /* renderOption={(props, option: InstitutionLocationData) => (
+                    <MenuItem key={option.code} {...props} sx={{ height: '44px' }}>
+                      {''}
+                    </MenuItem>
+                  )} */
+                  renderInput={(params: any) => (
+                    <TextField
+                      {...params}
+                      inputProps={{
+                        ...params.inputProps,
+                        value:
+                          !isCityEditable || isFromIPA || isAooUo
+                            ? formik.values.city
+                            : params.inputProps.value,
+                      }}
+                      label={t('onboardingFormData.billingDataSection.country')}
+                      InputLabelProps={{
+                        shrink: formik.values.city && formik.values.city !== '',
+                      }}
+                      sx={{
+                        '& .MuiOutlinedInput-input.MuiInputBase-input': {
+                          marginLeft: '15px',
+                          fontWeight: isFromIPA ? 'fontWeightRegular' : 'fontWeightMedium',
+                          textTransform: 'capitalize',
+                          color: isFromIPA
+                            ? theme.palette.text.secondary
+                            : theme.palette.text.primary,
+                        },
+                      }}
+                      disabled={premiumFlow && isCityEditable ? false : isFromIPA || isAooUo}
+                    />
                   )}
                 />
               ) : (
