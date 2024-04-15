@@ -13,12 +13,8 @@ export const ENV = {
 
   JSON_URL: {
     PLAN_PRICES: env.get('REACT_APP_PLANS_PRICES').required().asString(),
-  },
-
-  /*
-  CSV_URL: {
     COUNTRIES: env.get('REACT_APP_COUNTRY_DATA').required().asString(),
-  }, */
+  },
 
   ASSISTANCE: {
     ENABLE: env.get('REACT_APP_ENABLE_ASSISTANCE').required().asBool(),

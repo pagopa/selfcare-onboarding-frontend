@@ -17,7 +17,7 @@ import { OnboardingFormData } from '../../model/OnboardingFormData';
 import { UoData } from '../../model/UoModel';
 import { formatCity } from '../../utils/formatting-utils';
 import { StepBillingDataHistoryState } from '../steps/StepOnboardingFormData';
-// import { ENV } from '../../utils/env';
+import { ENV } from '../../utils/env';
 import NumberDecimalFormat from './NumberDecimalFormat';
 
 const CustomTextField = styled(TextField)({
@@ -206,10 +206,13 @@ export default function PersonalAndBillingDataSection({
   };
 
   const getCountriesFromCSV = async (_query: string) => {
-    await fetch('https://dev.selfcare.pagopa.it/country-data.json')
-      .then((res) => res)
-      .then((r) => console.log('regions: ', r))
-      .catch((e) => e);
+    await fetch(ENV.JSON_URL.COUNTRIES)
+      .then((res) => res.json())
+      .then((r) => {
+        const mapped = Object.values(r);
+        console.log('response: ', mapped);
+      })
+      .catch((e) => console.error(e));
   };
 
   const getLocationFromIstatCode = async (istatCode: string) => {
