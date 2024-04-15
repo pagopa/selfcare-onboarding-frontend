@@ -15,10 +15,12 @@ export default {
     ariaLabel: `Seleziona la tipologia di ricerca dell'ente`,
     businessName: 'Ragione Sociale',
     taxcode: 'Codice Fiscale ente',
+    ivassCode: 'Codice IVASS',
   },
   partyAdvancedSelect: {
     advancedSearchLabel: 'Cerca per',
     businessName: 'Ragione Sociale',
+    ivassCode: 'Codice IVASS',
     taxCode: 'Codice Fiscale ente',
     aooCode: 'Codice univoco AOO',
     uoCode: 'Codice univoco UO',

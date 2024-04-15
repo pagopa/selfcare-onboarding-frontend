@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 type Props = {
   setIsTaxCodeSelected: React.Dispatch<React.SetStateAction<boolean | undefined>>;
   setIsBusinessNameSelected: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsIvassCodeSelected: React.Dispatch<React.SetStateAction<boolean>>;
   setOptions: React.Dispatch<React.SetStateAction<Array<any>>>;
   setInput: React.Dispatch<React.SetStateAction<string>>;
 };
@@ -14,12 +15,18 @@ type Props = {
 export default function PartyAdvancedRadioButton({
   setIsTaxCodeSelected,
   setIsBusinessNameSelected,
+  setIsIvassCodeSelected,
   setOptions,
   setInput,
 }: Props) {
-  const onSelectValue = (isBusinessNameSelected: boolean, isTaxCodeSelected: boolean) => {
+  const onSelectValue = (
+    isBusinessNameSelected: boolean,
+    isTaxCodeSelected: boolean,
+    isIvassCodeSelected: boolean
+  ) => {
     setIsBusinessNameSelected(isBusinessNameSelected);
     setIsTaxCodeSelected(isTaxCodeSelected);
+    setIsIvassCodeSelected(isIvassCodeSelected);
     setOptions([]);
     setInput('');
   };
@@ -37,14 +44,21 @@ export default function PartyAdvancedRadioButton({
           id="businessName"
           control={<Radio />}
           label={t('asyncAutocomplete.businessName')}
-          onClick={() => onSelectValue(true, false)}
+          onClick={() => onSelectValue(true, false, false)}
         />
         <FormControlLabel
           id="taxcode"
           value="taxCode"
           control={<Radio />}
           label={t('asyncAutocomplete.taxcode')}
-          onClick={() => onSelectValue(false, true)}
+          onClick={() => onSelectValue(false, true, false)}
+        />
+        <FormControlLabel
+          id="ivassCode"
+          value="ivassCode"
+          control={<Radio />}
+          label={t('asyncAutocomplete.ivassCode')}
+          onClick={() => onSelectValue(false, false, true)}
         />
       </RadioGroup>
     </FormControl>

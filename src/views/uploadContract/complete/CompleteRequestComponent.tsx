@@ -141,6 +141,7 @@ export default function CompleteRequestComponent() {
   };
 
   const back = () => {
+    setOpen(false);
     setUploadedFiles([]);
     setOutcomeContentState('toBeCompleted');
   };
@@ -160,6 +161,7 @@ export default function CompleteRequestComponent() {
     );
 
     setLoading(false);
+
     const outcome = getFetchOutcome(uploadDocument);
 
     if (outcome === 'success') {
@@ -333,6 +335,6 @@ export default function CompleteRequestComponent() {
       />
     </>
   ) : (
-    <MessageNoAction {...outcomeContent.notFound} />
+    <MessageNoAction {...outcomeContent.error} />
   );
 }
