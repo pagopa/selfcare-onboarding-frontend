@@ -29,31 +29,6 @@ import { LoadingOverlay } from '../../../components/LoadingOverlay';
 import { getRequestJwt } from '../../../utils/getRequestJwt';
 import CompleteRequestSuccessPage from './pages/CompleteRequestSuccessPage';
 import { CompleteRequestFailPage } from './pages/CompleteRequestFailPage';
-import { productId2ProductTitle } from '@pagopa/selfcare-common-frontend/utils/productId2ProductTitle';
-import {
-  StepperStep,
-  Problem,
-  OnboardingRequestData,
-  RequestOutcomeComplete,
-} from '../../../../types';
-import { ConfirmRegistrationStep0 } from '../../../components/ConfirmRegistrationStep0';
-import { ConfirmRegistrationStep1 } from '../../../components/ConfirmRegistrationStep1';
-import { useHistoryState } from '../../../components/useHistoryState';
-import { redirectToLogin } from '../../../utils/unloadEvent-utils';
-import { fetchWithLogs } from '../../../lib/api-utils';
-import { getFetchOutcome } from '../../../lib/error-utils';
-import { ENV } from '../../../utils/env';
-import { MessageNoAction } from '../../../components/MessageNoAction';
-import { HeaderContext, UserContext } from '../../../lib/context';
-import { verifyRequest } from '../../../services/tokenServices';
-import NotFoundPage from '../outcomePages/NotFoundPage';
-import ExpiredRequestPage from '../outcomePages/ExpiredRequestPage';
-import AlreadyCompletedRequestPage from '../outcomePages/AlreadyCompletedRequestPage';
-import AlreadyRejectedRequestPage from '../outcomePages/AlreadyRejectedRequestPage';
-import { LoadingOverlay } from '../../../components/LoadingOverlay';
-import { getRequestJwt } from '../../../utils/getRequestJwt';
-import CompleteRequestSuccessPage from './pages/CompleteRequestSuccessPage';
-import { CompleteRequestFailPage } from './pages/CompleteRequestFailPage';
 
 type FileErrorAttempt = {
   fileName: string;
