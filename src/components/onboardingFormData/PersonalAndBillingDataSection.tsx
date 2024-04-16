@@ -18,6 +18,7 @@ import { UoData } from '../../model/UoModel';
 import { formatCity } from '../../utils/formatting-utils';
 import { StepBillingDataHistoryState } from '../steps/StepOnboardingFormData';
 import { ENV } from '../../utils/env';
+import { CountryResource } from '../../model/CountryResource';
 import NumberDecimalFormat from './NumberDecimalFormat';
 
 const CustomTextField = styled(TextField)({
@@ -80,6 +81,7 @@ export default function PersonalAndBillingDataSection({
   const [institutionLocationData, setInstitutionLocationData] = useState<InstitutionLocationData>();
   const [isCitySelected, setIsCitySelected] = useState<boolean>(false);
   const [isForeignOffice, setIsForeignOffice] = useState<boolean>(false);
+  const [nationalCountries, setNationalCountries] = useState<Array<CountryResource>>();
 
   useEffect(() => {
     const shareCapitalIsNan = isNaN(formik.values.shareCapital);
@@ -137,6 +139,10 @@ export default function PersonalAndBillingDataSection({
       }
     }
   }, [isFromIPA, selectedParty, aooSelected, uoSelected, retrievedIstat, premiumFlow]);
+
+  useEffect(() => {
+    setIsForeignOffice(formik.values.isForeignOffice);
+  }, [formik.values.isForeignOffice]);
 
   const baseNumericFieldProps = (
     field: keyof OnboardingFormData,
@@ -205,14 +211,23 @@ export default function PersonalAndBillingDataSection({
     }
   };
 
-  const getCountriesFromCSV = async (_query: string) => {
+  const getNationalCountries = async (_query: string) => {
     try {
       const response = await fetch(ENV.JSON_URL.COUNTRIES);
       const countries = await response.json();
-      console.log('countries: ', countries);
-      const mappedCountries = Object.entries(countries);
-      console.log('mapped countries: ', mappedCountries);
+      const resource2CountryResource = countries.map((c: any) => ({
+        country_code: c.country_code,
+        name: c.name,
+        alpha_2: c.alpha_2,
+        alpha_3: c.alpha_3,
+        region_code: c.region_code,
+        region: c.region,
+        sub_region_code: c.sub_region_code,
+        sub_region: c.sub_region,
+      }));
+      setNationalCountries(resource2CountryResource);
     } catch (reason) {
+      // TODO Properly error
       console.error(reason);
     }
   };
@@ -320,10 +335,11 @@ export default function PersonalAndBillingDataSection({
               <Checkbox
                 id={'foreign-office'}
                 value={isForeignOffice}
+                checked={isForeignOffice}
                 onChange={() => {
                   setIsForeignOffice(!isForeignOffice);
                   formik.setFieldValue('isForeignOffice', !isForeignOffice);
-                  if (!formik.values.isForeignOffice) {
+                  if (!isForeignOffice) {
                     formik.setFieldValue('zipCode', undefined);
                     formik.setFieldValue('city', undefined);
                     formik.setFieldValue('county', undefined);
@@ -474,26 +490,23 @@ export default function PersonalAndBillingDataSection({
                     const value = e.target.value;
                     formik.setFieldValue('country', value);
                     if (value.length >= 3) {
-                      void getCountriesFromCSV(value);
-                    } // else {
-                    // setCountries({ ...countries, country: undefined });
-                    // }
-                  }}
-                  inputValue={formik.values.country || ''}
-                  onChange={(_e: any, selected: any) => {
-                    if (selected) {
-                      setInstitutionLocationData(selected);
-                      setIsCitySelected(true);
+                      void getNationalCountries(value);
                     } else {
-                      setIsCitySelected(false);
+                      setNationalCountries(undefined);
                     }
                   }}
-                  // getOptionLabel={(o) => o.country}
-                  options={[]}
+                  inputValue={formik.values.extendedCountry ?? (formik.values.country || '')}
+                  onChange={(_e: any, selected: any) => {
+                    if (selected) {
+                      formik.setFieldValue('country', selected.alpha_3);
+                      formik.setFieldValue('extendedCountry', selected.name);
+                      setInstitutionLocationData({ ...selected, country: selected.alpha_3 });
+                    }
+                  }}
+                  getOptionLabel={(o) => o.name}
+                  options={nationalCountries ?? []}
                   noOptionsText={t('onboardingFormData.billingDataSection.noResult')}
                   clearOnBlur={true}
-                  forcePopupIcon={isFromIPA || !isCityEditable ? false : true}
-                  disabled={premiumFlow && isCityEditable ? false : isFromIPA || isAooUo}
                   ListboxProps={{
                     style: {
                       overflow: 'visible',
@@ -520,36 +533,27 @@ export default function PersonalAndBillingDataSection({
                       },
                     },
                   }}
-                  /* renderOption={(props, option: InstitutionLocationData) => (
-                    <MenuItem key={option.code} {...props} sx={{ height: '44px' }}>
-                      {''}
+                  renderOption={(props, option) => (
+                    <MenuItem key={option.country_code} {...props} sx={{ height: '44px' }}>
+                      {option.name}
                     </MenuItem>
-                  )} */
+                  )}
                   renderInput={(params: any) => (
                     <TextField
                       {...params}
                       inputProps={{
                         ...params.inputProps,
-                        value:
-                          !isCityEditable || isFromIPA || isAooUo
-                            ? formik.values.city
-                            : params.inputProps.value,
+                        value: params.inputProps.value,
                       }}
                       label={t('onboardingFormData.billingDataSection.country')}
-                      InputLabelProps={{
-                        shrink: formik.values.city && formik.values.city !== '',
-                      }}
                       sx={{
                         '& .MuiOutlinedInput-input.MuiInputBase-input': {
                           marginLeft: '15px',
-                          fontWeight: isFromIPA ? 'fontWeightRegular' : 'fontWeightMedium',
+                          fontWeight: 'fontWeightMedium',
                           textTransform: 'capitalize',
-                          color: isFromIPA
-                            ? theme.palette.text.secondary
-                            : theme.palette.text.primary,
+                          color: theme.palette.text.primary,
                         },
                       }}
-                      disabled={premiumFlow && isCityEditable ? false : isFromIPA || isAooUo}
                     />
                   )}
                 />
