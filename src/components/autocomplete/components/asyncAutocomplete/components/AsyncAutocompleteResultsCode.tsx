@@ -38,6 +38,7 @@ type Props = {
   uoResult?: UoData;
   aooResult?: AooData;
   isTaxCodeSelected?: boolean;
+  isIvassCodeSelected?: boolean;
   isAooCodeSelected?: boolean;
   isUoCodeSelected?: boolean;
 };
@@ -51,16 +52,18 @@ export default function AsyncAutocompleteResultsCode({
   uoResult,
   aooResult,
   isTaxCodeSelected,
+  isIvassCodeSelected,
   isAooCodeSelected,
   isUoCodeSelected,
 }: Props) {
-  const visibleCode = isTaxCodeSelected
-    ? cfResult
-    : isAooCodeSelected
-    ? aooResult
-    : isUoCodeSelected
-    ? uoResult
-    : '';
+  const visibleCode =
+    isTaxCodeSelected || isIvassCodeSelected
+      ? cfResult
+      : isAooCodeSelected
+      ? aooResult
+      : isUoCodeSelected
+      ? uoResult
+      : '';
   return (
     <CustomBox my={2} {...cfResult} width="90%" maxHeight="200px" overflow="auto">
       {!isLoading && (
@@ -78,7 +81,7 @@ export default function AsyncAutocompleteResultsCode({
         >
           <PartyAccountItemButton
             partyName={
-              isTaxCodeSelected && cfResult?.description
+              (isTaxCodeSelected || isIvassCodeSelected) && cfResult?.description
                 ? cfResult?.description.toLocaleLowerCase()
                 : isAooCodeSelected && aooResult?.denominazioneAoo
                 ? aooResult?.denominazioneAoo.toLocaleLowerCase()
