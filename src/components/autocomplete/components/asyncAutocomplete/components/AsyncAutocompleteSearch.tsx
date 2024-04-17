@@ -39,6 +39,7 @@ type Props = {
   isSearchFieldSelected: boolean;
   isAooCodeSelected?: boolean;
   isUoCodeSelected?: boolean;
+  isIvassCodeSelected?: boolean;
   isTaxCodeSelected?: boolean;
   isBusinessNameSelected?: boolean;
   setCfResult: React.Dispatch<React.SetStateAction<InstitutionResource | ANACParty | undefined>>;
@@ -59,6 +60,7 @@ export default function AsyncAutocompleteSearch({
   isAooCodeSelected,
   isUoCodeSelected,
   isTaxCodeSelected,
+  isIvassCodeSelected,
   isBusinessNameSelected,
   setCfResult,
   setAooResult,
@@ -82,10 +84,8 @@ export default function AsyncAutocompleteSearch({
     whiteSpace: 'normal' as const,
   };
   const valueSelected =
-    isBusinessNameSelected && selected?.description
+    (isBusinessNameSelected || isTaxCodeSelected || isIvassCodeSelected) && selected?.description
       ? selected.description
-      : isTaxCodeSelected && selected?.description
-      ? selected?.description
       : selected && isAooCodeSelected && selected?.denominazioneAoo
       ? selected?.denominazioneAoo
       : selected && isUoCodeSelected && selected.descrizioneUo

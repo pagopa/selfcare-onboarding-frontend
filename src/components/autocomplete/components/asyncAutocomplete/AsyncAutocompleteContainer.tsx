@@ -357,6 +357,7 @@ export default function AsyncAutocompleteContainer({
           isAooCodeSelected={isAooCodeSelected}
           isUoCodeSelected={isUoCodeSelected}
           isTaxCodeSelected={isTaxCodeSelected}
+          isIvassCodeSelected={isIvassCodeSelected}
           isBusinessNameSelected={isBusinessNameSelected}
           setCfResult={setCfResult}
           setAooResult={setAooResult}
