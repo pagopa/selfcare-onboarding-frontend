@@ -9,6 +9,7 @@ export type OnboardingFormData = {
   vatNumber?: string;
   county?: string;
   country?: string;
+  extendedCountry?: string;
   city?: string;
   ivassCode?: string;
   recipientCode?: string;
