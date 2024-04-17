@@ -215,16 +215,18 @@ export default function PersonalAndBillingDataSection({
     try {
       const response = await fetch(ENV.JSON_URL.COUNTRIES);
       const countries = await response.json();
-      const resource2CountryResource = countries.map((c: any) => ({
-        country_code: c.country_code,
-        name: c.name,
-        alpha_2: c.alpha_2,
-        alpha_3: c.alpha_3,
-        region_code: c.region_code,
-        region: c.region,
-        sub_region_code: c.sub_region_code,
-        sub_region: c.sub_region,
-      }));
+      const resource2CountryResource = countries
+        .map((c: any) => ({
+          country_code: c.country_code,
+          name: c.name,
+          alpha_2: c.alpha_2,
+          alpha_3: c.alpha_3,
+          region_code: c.region_code,
+          region: c.region,
+          sub_region_code: c.sub_region_code,
+          sub_region: c.sub_region,
+        }))
+        .filter((cm: CountryResource) => cm.alpha_2 !== 'IT');
       setNationalCountries(resource2CountryResource);
     } catch (reason) {
       // TODO Properly error
@@ -498,9 +500,13 @@ export default function PersonalAndBillingDataSection({
                   inputValue={formik.values.extendedCountry ?? (formik.values.country || '')}
                   onChange={(_e: any, selected: any) => {
                     if (selected) {
-                      formik.setFieldValue('country', selected.alpha_3);
+                      formik.setFieldValue('country', selected.alpha_2);
                       formik.setFieldValue('extendedCountry', selected.name);
-                      setInstitutionLocationData({ ...selected, country: selected.alpha_3 });
+                      setInstitutionLocationData({ ...selected, country: selected.alpha_2 });
+                    } else {
+                      formik.setFieldValue('country', undefined);
+                      formik.setFieldValue('extendedCountry', undefined);
+                      setInstitutionLocationData({ ...selected, country: undefined });
                     }
                   }}
                   getOptionLabel={(o) => o.name}
