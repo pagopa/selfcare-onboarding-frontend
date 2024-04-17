@@ -17,6 +17,8 @@ import { OnboardingFormData } from '../../model/OnboardingFormData';
 import { UoData } from '../../model/UoModel';
 import { formatCity } from '../../utils/formatting-utils';
 import { StepBillingDataHistoryState } from '../steps/StepOnboardingFormData';
+import { ENV } from '../../utils/env';
+import { CountryResource } from '../../model/CountryResource';
 import NumberDecimalFormat from './NumberDecimalFormat';
 
 const CustomTextField = styled(TextField)({
@@ -79,6 +81,7 @@ export default function PersonalAndBillingDataSection({
   const [institutionLocationData, setInstitutionLocationData] = useState<InstitutionLocationData>();
   const [isCitySelected, setIsCitySelected] = useState<boolean>(false);
   const [isForeignOffice, setIsForeignOffice] = useState<boolean>(false);
+  const [nationalCountries, setNationalCountries] = useState<Array<CountryResource>>();
 
   useEffect(() => {
     const shareCapitalIsNan = isNaN(formik.values.shareCapital);
@@ -136,6 +139,10 @@ export default function PersonalAndBillingDataSection({
       }
     }
   }, [isFromIPA, selectedParty, aooSelected, uoSelected, retrievedIstat, premiumFlow]);
+
+  useEffect(() => {
+    setIsForeignOffice(formik.values.isForeignOffice);
+  }, [formik.values.isForeignOffice]);
 
   const baseNumericFieldProps = (
     field: keyof OnboardingFormData,
@@ -201,6 +208,29 @@ export default function PersonalAndBillingDataSection({
         }));
 
       setCountries(onlyCountries);
+    }
+  };
+
+  const getNationalCountries = async (_query: string) => {
+    try {
+      const response = await fetch(ENV.JSON_URL.COUNTRIES);
+      const countries = await response.json();
+      const resource2CountryResource = countries
+        .map((c: any) => ({
+          country_code: c.country_code,
+          name: c.name,
+          alpha_2: c.alpha_2,
+          alpha_3: c.alpha_3,
+          region_code: c.region_code,
+          region: c.region,
+          sub_region_code: c.sub_region_code,
+          sub_region: c.sub_region,
+        }))
+        .filter((cm: CountryResource) => cm.alpha_2 !== 'IT');
+      setNationalCountries(resource2CountryResource);
+    } catch (reason) {
+      // TODO Properly error
+      console.error(reason);
     }
   };
 
@@ -307,10 +337,11 @@ export default function PersonalAndBillingDataSection({
               <Checkbox
                 id={'foreign-office'}
                 value={isForeignOffice}
+                checked={isForeignOffice}
                 onChange={() => {
                   setIsForeignOffice(!isForeignOffice);
                   formik.setFieldValue('isForeignOffice', !isForeignOffice);
-                  if (!formik.values.isForeignOffice) {
+                  if (!isForeignOffice) {
                     formik.setFieldValue('zipCode', undefined);
                     formik.setFieldValue('city', undefined);
                     formik.setFieldValue('county', undefined);
@@ -455,14 +486,81 @@ export default function PersonalAndBillingDataSection({
             </Grid>
             <Grid item xs={5}>
               {isInsuranceCompany && isForeignOffice ? (
-                <CustomTextField
-                  {...baseTextFieldProps(
-                    'country',
-                    t('onboardingFormData.billingDataSection.country'),
-                    isFromIPA || institutionLocationData?.country ? 400 : 600,
-                    isFromIPA || institutionLocationData?.country
-                      ? theme.palette.text.secondary
-                      : theme.palette.text.primary
+                <Autocomplete
+                  id="country-select"
+                  onInput={(e: React.ChangeEvent<HTMLInputElement>) => {
+                    const value = e.target.value;
+                    formik.setFieldValue('country', value);
+                    if (value.length >= 3) {
+                      void getNationalCountries(value);
+                    } else {
+                      setNationalCountries(undefined);
+                    }
+                  }}
+                  inputValue={formik.values.extendedCountry ?? (formik.values.country || '')}
+                  onChange={(_e: any, selected: any) => {
+                    if (selected) {
+                      formik.setFieldValue('country', selected.alpha_2);
+                      formik.setFieldValue('extendedCountry', selected.name);
+                      setInstitutionLocationData({ ...selected, country: selected.alpha_2 });
+                    } else {
+                      formik.setFieldValue('country', undefined);
+                      formik.setFieldValue('extendedCountry', undefined);
+                      setInstitutionLocationData({ ...selected, country: undefined });
+                    }
+                  }}
+                  getOptionLabel={(o) => o.name}
+                  options={nationalCountries ?? []}
+                  noOptionsText={t('onboardingFormData.billingDataSection.noResult')}
+                  clearOnBlur={true}
+                  ListboxProps={{
+                    style: {
+                      overflow: 'visible',
+                    },
+                  }}
+                  componentsProps={{
+                    paper: {
+                      sx: {
+                        '&::-webkit-scrollbar': {
+                          width: 4,
+                        },
+                        '&::-webkit-scrollbar-track': {
+                          boxShadow: `inset 10px 10px  #E6E9F2`,
+                          marginY: '3px',
+                        },
+                        '&::-webkit-scrollbar-thumb': {
+                          backgroundColor: '#0073E6',
+                          borderRadius: '16px',
+                        },
+                        overflowY: 'auto',
+                        maxHeight: '200px',
+                        boxShadow:
+                          '0px 6px 30px 5px rgba(0, 43, 85, 0.10), 0px 16px 24px 2px rgba(0, 43, 85, 0.05), 0px 8px 10px -5px rgba(0, 43, 85, 0.10)',
+                      },
+                    },
+                  }}
+                  renderOption={(props, option) => (
+                    <MenuItem key={option.country_code} {...props} sx={{ height: '44px' }}>
+                      {option.name}
+                    </MenuItem>
+                  )}
+                  renderInput={(params: any) => (
+                    <TextField
+                      {...params}
+                      inputProps={{
+                        ...params.inputProps,
+                        value: params.inputProps.value,
+                      }}
+                      label={t('onboardingFormData.billingDataSection.country')}
+                      sx={{
+                        '& .MuiOutlinedInput-input.MuiInputBase-input': {
+                          marginLeft: '15px',
+                          fontWeight: 'fontWeightMedium',
+                          textTransform: 'capitalize',
+                          color: theme.palette.text.primary,
+                        },
+                      }}
+                    />
                   )}
                 />
               ) : (

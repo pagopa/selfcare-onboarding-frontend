@@ -17,7 +17,7 @@ export const billingData2billingDataRequest = (
   digitalAddress: billingData.digitalAddress,
   recipientCode: billingData.recipientCode ? billingData.recipientCode.toUpperCase() : undefined,
   registeredOffice: billingData.registeredOffice,
-  taxCode: billingData.taxCode ?? '', // TODO This will be removed when SELC-4465 is released
-  vatNumber: billingData.vatNumber ?? '', // TODO This will be removed when SELC-4465 is released
-  zipCode: billingData.zipCode ?? '', // TODO This will be removed when SELC-4465 is released
+  taxCode: billingData.taxCode,
+  vatNumber: billingData.vatNumber,
+  zipCode: billingData.zipCode,
 });
