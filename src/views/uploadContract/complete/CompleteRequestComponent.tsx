@@ -161,6 +161,7 @@ export default function CompleteRequestComponent() {
     );
 
     setLoading(false);
+
     const outcome = getFetchOutcome(uploadDocument);
 
     if (outcome === 'success') {

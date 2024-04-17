@@ -402,10 +402,10 @@ export default function AsyncAutocompleteContainer({
           </>
         ) : (
           <>
-            {(isTaxCodeSelected || isAooCodeSelected || isUoCodeSelected) &&
+            {(isTaxCodeSelected || isAooCodeSelected || isUoCodeSelected || isIvassCodeSelected) &&
             !isBusinessNameSelected &&
             input !== undefined &&
-            input?.length >= 6 &&
+            input?.length >= 5 &&
             !selected &&
             (cfResult || uoResult || aooResult) ? (
               <AsyncAutocompleteResultsCode
@@ -418,6 +418,7 @@ export default function AsyncAutocompleteContainer({
                 aooResult={aooResult}
                 uoResult={uoResult}
                 isTaxCodeSelected={isTaxCodeSelected}
+                isIvassCodeSelected={isIvassCodeSelected}
                 isAooCodeSelected={isAooCodeSelected}
                 isUoCodeSelected={isUoCodeSelected}
               />
