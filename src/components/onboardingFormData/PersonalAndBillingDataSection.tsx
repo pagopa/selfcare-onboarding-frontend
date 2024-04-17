@@ -226,7 +226,7 @@ export default function PersonalAndBillingDataSection({
           sub_region_code: c.sub_region_code,
           sub_region: c.sub_region,
         }))
-        .filter((cm: CountryResource) => cm.name !== 'Italia');
+        .filter((cm: CountryResource) => cm.alpha_2 !== 'IT');
       setNationalCountries(resource2CountryResource);
     } catch (reason) {
       // TODO Properly error
@@ -500,9 +500,9 @@ export default function PersonalAndBillingDataSection({
                   inputValue={formik.values.extendedCountry ?? (formik.values.country || '')}
                   onChange={(_e: any, selected: any) => {
                     if (selected) {
-                      formik.setFieldValue('country', selected.alpha_3);
+                      formik.setFieldValue('country', selected.alpha_2);
                       formik.setFieldValue('extendedCountry', selected.name);
-                      setInstitutionLocationData({ ...selected, country: selected.alpha_3 });
+                      setInstitutionLocationData({ ...selected, country: selected.alpha_2 });
                     } else {
                       formik.setFieldValue('country', undefined);
                       formik.setFieldValue('extendedCountry', undefined);
