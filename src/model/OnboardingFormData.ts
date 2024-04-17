@@ -3,8 +3,9 @@ import { GeographicTaxonomy } from './GeographicTaxonomies';
 export type OnboardingFormData = {
   businessName: string;
   registeredOffice: string;
-  zipCode?: string;
   digitalAddress: string;
+  geographicTaxonomies: Array<GeographicTaxonomy>;
+  zipCode?: string;
   taxCode?: string;
   vatNumber?: string;
   county?: string;
@@ -22,7 +23,6 @@ export type OnboardingFormData = {
   dpoAddress?: string;
   dpoPecAddress?: string;
   dopEmailAddress?: string;
-  geographicTaxonomies: Array<GeographicTaxonomy>;
   businessRegisterPlace?: string;
   rea?: string;
   shareCapital?: string;

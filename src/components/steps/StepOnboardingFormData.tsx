@@ -348,7 +348,7 @@ export default function StepOnboardingFormData({
         city: !values.city
           ? requiredError
           : isInsuranceCompany
-          ? !onlyCharacters.test(values.city)
+          ? !onlyCharacters.test(values.city) // TODO Add error helperText when available
           : undefined,
         county: !values.county && !isInsuranceCompany ? requiredError : undefined,
         country: !values.country
