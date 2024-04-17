@@ -330,7 +330,7 @@ export default function StepOnboardingFormData({
             ? t('onboardingFormData.billingDataSection.invalidFiscalCode')
             : undefined,
         vatNumber:
-          !values.vatNumber && !stepHistoryState.isTaxCodeEquals2PIVA && !isInsuranceCompany
+          !values.vatNumber && !stepHistoryState.isTaxCodeEquals2PIVA && !values.isForeignOffice
             ? requiredError
             : values.vatNumber &&
               !fiscalAndVatCodeRegexp.test(values.vatNumber) &&
