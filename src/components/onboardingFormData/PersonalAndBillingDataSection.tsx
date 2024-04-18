@@ -605,7 +605,7 @@ export default function PersonalAndBillingDataSection({
             </Grid>
           )}
 
-          {!isInsuranceCompany && (
+          {!isForeignOffice && (
             <Grid item xs={12}>
               <Box display="flex" alignItems="center">
                 <Checkbox
@@ -631,7 +631,7 @@ export default function PersonalAndBillingDataSection({
               </Box>
             </Grid>
           )}
-          {!isInsuranceCompany && (
+          {!isForeignOffice && (
             <Grid item xs={12}>
               <Typography component={'span'}>
                 <CustomTextField
