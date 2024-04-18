@@ -229,7 +229,9 @@ export default function StepOnboardingFormData({
       ...formik.values,
       vatNumber: stepHistoryState.isTaxCodeEquals2PIVA
         ? formik.values.taxCode
-        : formik.values.vatNumber,
+        : formik.values.hasVatnumber && !formik.values.isForeignOffice
+        ? formik.values.vatNumber
+        : undefined,
     });
   };
 
@@ -330,7 +332,7 @@ export default function StepOnboardingFormData({
             ? t('onboardingFormData.billingDataSection.invalidFiscalCode')
             : undefined,
         vatNumber:
-          !values.vatNumber && !stepHistoryState.isTaxCodeEquals2PIVA && !values.isForeignOffice
+          !values.vatNumber && values.hasVatnumber && !stepHistoryState.isTaxCodeEquals2PIVA
             ? requiredError
             : values.vatNumber &&
               !fiscalAndVatCodeRegexp.test(values.vatNumber) &&
@@ -458,6 +460,12 @@ export default function StepOnboardingFormData({
     vatVerificationGenericError,
     formik.values,
   ]);
+
+  useEffect(() => {
+    if (!formik.values.hasVatnumber) {
+      void formik.setFieldValue('vatNumber', undefined);
+    }
+  }, [!formik.values.hasVatnumber]);
 
   const verifyVatNumber = async () => {
     const onboardingStatus = await fetchWithLogs(

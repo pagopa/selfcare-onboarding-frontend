@@ -5,7 +5,7 @@ import { Box, styled } from '@mui/system';
 import { theme } from '@pagopa/mui-italia';
 import { AxiosResponse } from 'axios';
 import { useContext, useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { useTranslation, Trans } from 'react-i18next';
 import { InstitutionType, Party, StepperStepComponentProps } from '../../../types';
 import { fetchWithLogs } from '../../lib/api-utils';
 import { UserContext } from '../../lib/context';
@@ -141,6 +141,7 @@ export default function PersonalAndBillingDataSection({
   }, [isFromIPA, selectedParty, aooSelected, uoSelected, retrievedIstat, premiumFlow]);
 
   useEffect(() => {
+    formik.setFieldValue('hasVatnumber', !formik.values.isForeignOffice);
     setIsForeignOffice(formik.values.isForeignOffice);
   }, [formik.values.isForeignOffice]);
 
@@ -341,11 +342,12 @@ export default function PersonalAndBillingDataSection({
                 onChange={() => {
                   setIsForeignOffice(!isForeignOffice);
                   formik.setFieldValue('isForeignOffice', !isForeignOffice);
+                  formik.setFieldValue('zipCode', undefined);
+                  formik.setFieldValue('city', undefined);
+                  formik.setFieldValue('county', undefined);
+                  formik.setFieldValue('country', undefined);
                   if (!isForeignOffice) {
-                    formik.setFieldValue('zipCode', undefined);
-                    formik.setFieldValue('city', undefined);
-                    formik.setFieldValue('county', undefined);
-                    formik.setFieldValue('country', undefined);
+                    formik.setFieldValue('hasVatnumber', true);
                   }
                 }}
               />
@@ -606,32 +608,77 @@ export default function PersonalAndBillingDataSection({
           )}
 
           {!isForeignOffice && (
-            <Grid item xs={12}>
-              <Box display="flex" alignItems="center">
-                <Checkbox
-                  id="onboardingFormData"
-                  checked={stepHistoryState.isTaxCodeEquals2PIVA}
-                  disabled={premiumFlow}
-                  inputProps={{
-                    'aria-label': t(
-                      'onboardingFormData.billingDataSection.taxCodeEquals2PIVAdescription'
-                    ),
-                  }}
-                  onChange={() => {
-                    void formik.setFieldValue('vatNumber', '');
-                    setStepHistoryState({
-                      ...stepHistoryState,
-                      isTaxCodeEquals2PIVA: !stepHistoryState.isTaxCodeEquals2PIVA,
-                    });
-                  }}
-                />
-                <Typography component={'span'}>
-                  {t('onboardingFormData.billingDataSection.taxCodeEquals2PIVAdescription')}
-                </Typography>
-              </Box>
+            <Grid container spacing={3} xs={12} pl={3} pt={formik.values.hasVatnumber ? 3 : 0}>
+              <Grid item>
+                {formik.values.hasVatnumber && (
+                  <Box display="flex" alignItems="center">
+                    <Checkbox
+                      id="onboardingFormData"
+                      checked={stepHistoryState.isTaxCodeEquals2PIVA}
+                      disabled={premiumFlow}
+                      inputProps={{
+                        'aria-label': t(
+                          'onboardingFormData.billingDataSection.taxCodeEquals2PIVAdescription'
+                        ),
+                      }}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setStepHistoryState({
+                            ...stepHistoryState,
+                            isTaxCodeEquals2PIVA: true,
+                          });
+                          formik.setFieldValue('vatNumber', formik.values.taxCode);
+                        } else {
+                          setStepHistoryState({
+                            ...stepHistoryState,
+                            isTaxCodeEquals2PIVA: false,
+                          });
+                          formik.setFieldValue('vatNumber', '');
+                        }
+                      }}
+                    />
+                    <Typography component={'span'}>
+                      {t('onboardingFormData.billingDataSection.taxCodeEquals2PIVAdescription')}
+                    </Typography>
+                  </Box>
+                )}
+              </Grid>
+              <Grid item>
+                <Box display="flex" alignItems="center">
+                  <Checkbox
+                    id="party_without_vatnumber"
+                    inputProps={{
+                      'aria-label': t(
+                        'onboardingFormData.billingDataSection.partyWithoutVatNumber'
+                      ),
+                    }}
+                    onChange={(e) => {
+                      formik.setFieldValue('hasVatnumber', !e.target.checked);
+                      setStepHistoryState({
+                        ...stepHistoryState,
+                        isTaxCodeEquals2PIVA: false,
+                      });
+                    }}
+                  />
+                  <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                    <Typography component={'span'}>
+                      {t('onboardingFormData.billingDataSection.partyWithoutVatNumber')}
+                    </Typography>
+                    <Typography variant={'caption'} sx={{ fontWeight: '400', color: '#5C6F82' }}>
+                      <Trans
+                        i18nKey="onboardingFormData.billingDataSection.partyWIthoutVatNumberSubtitle"
+                        components={{ 1: <br /> }}
+                      >
+                        {`Indica solo il Codice Fiscale se il tuo ente non agisce nell'esercizio d'impresa,
+                arte o professione <1 />(cfr. art. 21, comma 2, lett. f, DPR n. 633/1972)`}
+                      </Trans>
+                    </Typography>
+                  </Box>
+                </Box>
+              </Grid>
             </Grid>
           )}
-          {!isForeignOffice && (
+          {formik.values.hasVatnumber && !isForeignOffice && (
             <Grid item xs={12}>
               <Typography component={'span'}>
                 <CustomTextField
@@ -643,14 +690,10 @@ export default function PersonalAndBillingDataSection({
                       ? theme.palette.text.secondary
                       : theme.palette.text.primary
                   )}
-                  value={
-                    stepHistoryState.isTaxCodeEquals2PIVA
-                      ? formik.values.taxCode
-                      : formik.values.vatNumber
-                  }
+                  value={formik.values.vatNumber}
                   disabled={stepHistoryState.isTaxCodeEquals2PIVA || premiumFlow}
                 />
-                {isPSP && (
+                {isPSP && formik.values.hasVatnumber && (
                   <Box display="flex" alignItems="center" mt="2px">
                     {/* Checkbox la aprtita IVA è di gruppo */}
                     <Checkbox

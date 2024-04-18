@@ -32,4 +32,5 @@ export type OnboardingFormData = {
   aooUniqueCode?: string;
   uoUniqueCode?: string;
   isForeignOffice?: boolean;
+  hasVatnumber?: boolean;
 };
