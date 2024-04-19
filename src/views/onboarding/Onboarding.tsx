@@ -333,6 +333,8 @@ function OnboardingComponent({ productId }: { productId: string }) {
                 : uoSelected
                 ? uoSelected.codiceUniUo
                 : undefined,
+              origin: institutionType === 'AS' ? 'IVASS' : undefined,
+              originId: newOnboardingFormData?.ivassCode ?? undefined,
             },
           },
           () => setRequiredLogin(true)

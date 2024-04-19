@@ -125,6 +125,8 @@ export function OnboardingStep1_5({
             : uoSelected
             ? uoSelected.codiceUniUo
             : undefined,
+          origin: selectedParty?.origin,
+          originId: selectedParty?.originId,
         },
       },
       () => setRequiredLogin(true)
