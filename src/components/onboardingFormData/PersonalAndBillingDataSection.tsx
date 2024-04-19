@@ -593,7 +593,7 @@ export default function PersonalAndBillingDataSection({
               disabled={isDisabled || isContractingAuthority || isInsuranceCompany}
             />
           </Grid>
-          {selectedParty?.taxCode !== '' && selectedParty?.taxCode && (
+          {(!isInsuranceCompany || (selectedParty?.taxCode !== '' && selectedParty?.taxCode)) && (
             <Grid item xs={12}>
               <CustomTextField
                 {...baseTextFieldProps(
@@ -614,48 +614,50 @@ export default function PersonalAndBillingDataSection({
               xs={12}
               pl={3}
               pt={
-                formik.values.hasVatnumber &&
-                selectedParty?.taxCode !== '' &&
-                selectedParty?.taxCode
+                !isInsuranceCompany ||
+                (formik.values.hasVatnumber &&
+                  selectedParty?.taxCode !== '' &&
+                  selectedParty?.taxCode)
                   ? 3
                   : 0
               }
             >
               <Grid item>
-                {formik.values.hasVatnumber &&
-                  selectedParty?.taxCode !== '' &&
-                  selectedParty?.taxCode && (
-                    <Box display="flex" alignItems="center">
-                      <Checkbox
-                        id="onboardingFormData"
-                        checked={stepHistoryState.isTaxCodeEquals2PIVA}
-                        disabled={premiumFlow}
-                        inputProps={{
-                          'aria-label': t(
-                            'onboardingFormData.billingDataSection.taxCodeEquals2PIVAdescription'
-                          ),
-                        }}
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            setStepHistoryState({
-                              ...stepHistoryState,
-                              isTaxCodeEquals2PIVA: true,
-                            });
-                            formik.setFieldValue('vatNumber', formik.values.taxCode);
-                          } else {
-                            setStepHistoryState({
-                              ...stepHistoryState,
-                              isTaxCodeEquals2PIVA: false,
-                            });
-                            formik.setFieldValue('vatNumber', '');
-                          }
-                        }}
-                      />
-                      <Typography component={'span'}>
-                        {t('onboardingFormData.billingDataSection.taxCodeEquals2PIVAdescription')}
-                      </Typography>
-                    </Box>
-                  )}
+                {(!isInsuranceCompany ||
+                  (formik.values.hasVatnumber &&
+                    selectedParty?.taxCode !== '' &&
+                    selectedParty?.taxCode)) && (
+                  <Box display="flex" alignItems="center">
+                    <Checkbox
+                      id="onboardingFormData"
+                      checked={stepHistoryState.isTaxCodeEquals2PIVA}
+                      disabled={premiumFlow}
+                      inputProps={{
+                        'aria-label': t(
+                          'onboardingFormData.billingDataSection.taxCodeEquals2PIVAdescription'
+                        ),
+                      }}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setStepHistoryState({
+                            ...stepHistoryState,
+                            isTaxCodeEquals2PIVA: true,
+                          });
+                          formik.setFieldValue('vatNumber', formik.values.taxCode);
+                        } else {
+                          setStepHistoryState({
+                            ...stepHistoryState,
+                            isTaxCodeEquals2PIVA: false,
+                          });
+                          formik.setFieldValue('vatNumber', '');
+                        }
+                      }}
+                    />
+                    <Typography component={'span'}>
+                      {t('onboardingFormData.billingDataSection.taxCodeEquals2PIVAdescription')}
+                    </Typography>
+                  </Box>
+                )}
               </Grid>
               <Grid item>
                 <Box display="flex" alignItems="center">
