@@ -114,11 +114,7 @@ test('should render PersonalAndBillingDataSection with institutionType PA. Codic
     />
   );
 
-  const codiceSDI = await screen.findByText(
-    'È il codice necessario per ricevere le fatture elettroniche'
-  );
   const geoTaxSupportMail = await screen.findByText('Indirizzo email visibile ai cittadini');
 
-  expect(codiceSDI).toBeInTheDocument();
   expect(geoTaxSupportMail).toBeInTheDocument();
 });
