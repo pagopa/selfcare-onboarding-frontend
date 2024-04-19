@@ -17,7 +17,7 @@ export const billingData2billingDataRequest = (
   digitalAddress: billingData.digitalAddress,
   recipientCode: billingData.recipientCode ? billingData.recipientCode.toUpperCase() : undefined,
   registeredOffice: billingData.registeredOffice,
-  taxCode: billingData.taxCode !== '' ? billingData.taxCode : undefined,
+  taxCode: billingData.taxCode,
   vatNumber: billingData.vatNumber,
   zipCode: billingData.zipCode,
 });
