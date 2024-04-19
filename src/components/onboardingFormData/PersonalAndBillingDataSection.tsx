@@ -593,7 +593,7 @@ export default function PersonalAndBillingDataSection({
               disabled={isDisabled || isContractingAuthority || isInsuranceCompany}
             />
           </Grid>
-          {(!isInsuranceCompany || selectedParty?.taxCode) && (
+          {(!isInsuranceCompany || (selectedParty?.taxCode !== '' && selectedParty?.taxCode)) && (
             <Grid item xs={12}>
               <CustomTextField
                 {...baseTextFieldProps(
@@ -608,9 +608,25 @@ export default function PersonalAndBillingDataSection({
           )}
 
           {!isForeignOffice && (
-            <Grid container spacing={3} xs={12} pl={3} pt={formik.values.hasVatnumber ? 3 : 0}>
+            <Grid
+              container
+              spacing={3}
+              xs={12}
+              pl={3}
+              pt={
+                !isInsuranceCompany ||
+                (formik.values.hasVatnumber &&
+                  selectedParty?.taxCode !== '' &&
+                  selectedParty?.taxCode)
+                  ? 3
+                  : 0
+              }
+            >
               <Grid item>
-                {formik.values.hasVatnumber && (
+                {(!isInsuranceCompany ||
+                  (formik.values.hasVatnumber &&
+                    selectedParty?.taxCode !== '' &&
+                    selectedParty?.taxCode)) && (
                   <Box display="flex" alignItems="center">
                     <Checkbox
                       id="onboardingFormData"

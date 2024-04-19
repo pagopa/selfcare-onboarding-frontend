@@ -232,6 +232,8 @@ export default function StepOnboardingFormData({
         : formik.values.hasVatnumber && !formik.values.isForeignOffice
         ? formik.values.vatNumber
         : undefined,
+      taxCode:
+        formik.values.taxCode !== '' && formik.values.taxCode ? formik.values.taxCode : undefined,
     });
   };
 

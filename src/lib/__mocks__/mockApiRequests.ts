@@ -689,6 +689,27 @@ const mockedInsuranceResource: InsuranceCompaniesResource = {
       taxCode: '66557744831',
       workType: 'worktype',
     },
+    {
+      address: 'addres',
+      description: 'emptyTaxcode',
+      digitalAddress: 'email@example.com',
+      id: '11223323',
+      origin: 'IVASS',
+      originId: '6654D',
+      registerType: 'string',
+      taxCode: '',
+      workType: 'string',
+    },
+    {
+      address: 'addres',
+      description: 'withoutTaxcode',
+      digitalAddress: 'email@example.com',
+      id: '11223323',
+      origin: 'IVASS',
+      originId: '4431B',
+      registerType: 'string',
+      workType: 'string',
+    },
   ],
 };
 
