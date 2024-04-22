@@ -334,15 +334,9 @@ export default function StepOnboardingFormData({
             ? t('onboardingFormData.billingDataSection.invalidFiscalCode')
             : undefined,
         vatNumber:
-          !values.vatNumber && values.hasVatnumber && !stepHistoryState.isTaxCodeEquals2PIVA
+          !values.vatNumber && values.hasVatnumber
             ? requiredError
-            : values.vatNumber &&
-              !fiscalAndVatCodeRegexp.test(values.vatNumber) &&
-              !stepHistoryState.isTaxCodeEquals2PIVA
-            ? t('onboardingFormData.billingDataSection.invalidVatNumber')
-            : values.taxCode &&
-              stepHistoryState.isTaxCodeEquals2PIVA &&
-              !fiscalAndVatCodeRegexp.test(values.taxCode)
+            : values.vatNumber && !fiscalAndVatCodeRegexp.test(values.vatNumber)
             ? t('onboardingFormData.billingDataSection.invalidVatNumber')
             : isVatRegistrated
             ? t('onboardingFormData.billingDataSection.vatNumberAlreadyRegistered')
@@ -355,11 +349,12 @@ export default function StepOnboardingFormData({
           ? !onlyCharacters.test(values.city) // TODO Add error helperText when available
           : undefined,
         county: !values.county && !isInsuranceCompany ? requiredError : undefined,
-        country: !values.country
-          ? requiredError
-          : isInsuranceCompany
-          ? !onlyCharacters.test(values.country)
-          : undefined,
+        country:
+          !values.country && values.isForeignOffice
+            ? requiredError
+            : isInsuranceCompany && values?.country
+            ? !onlyCharacters.test(values.country)
+            : undefined,
         ivassCode:
           isInsuranceCompany && !values.ivassCode
             ? requiredError
