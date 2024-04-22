@@ -77,6 +77,7 @@ export default function PersonalAndBillingDataSection({
   const { setRequiredLogin } = useContext(UserContext);
 
   const [shrinkRea, setShrinkRea] = useState<boolean>(false);
+  const [shrinkVatNumber, setShrinkVatNumber] = useState<boolean>(false);
   const [countries, setCountries] = useState<Array<InstitutionLocationData>>();
   const [institutionLocationData, setInstitutionLocationData] = useState<InstitutionLocationData>();
   const [isCitySelected, setIsCitySelected] = useState<boolean>(false);
@@ -614,53 +615,60 @@ export default function PersonalAndBillingDataSection({
               xs={12}
               pl={3}
               pt={
-                !isInsuranceCompany ||
+                !isForeignOffice ||
                 (formik.values.hasVatnumber &&
                   selectedParty?.taxCode !== '' &&
                   selectedParty?.taxCode)
                   ? 3
                   : 0
               }
+              mb={
+                !formik.values.hasVatnumber && isRecipientCodeVisible && isInsuranceCompany ? -3 : 0
+              }
             >
-              <Grid item>
-                {(!isInsuranceCompany ||
-                  (formik.values.hasVatnumber &&
-                    selectedParty?.taxCode !== '' &&
-                    selectedParty?.taxCode)) && (
-                  <Box display="flex" alignItems="center">
-                    <Checkbox
-                      id="onboardingFormData"
-                      checked={stepHistoryState.isTaxCodeEquals2PIVA}
-                      disabled={premiumFlow}
-                      inputProps={{
-                        'aria-label': t(
-                          'onboardingFormData.billingDataSection.taxCodeEquals2PIVAdescription'
-                        ),
-                      }}
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setStepHistoryState({
-                            ...stepHistoryState,
-                            isTaxCodeEquals2PIVA: true,
-                          });
-                          formik.setFieldValue('vatNumber', formik.values.taxCode);
-                        } else {
-                          setStepHistoryState({
-                            ...stepHistoryState,
-                            isTaxCodeEquals2PIVA: false,
-                          });
-                          formik.setFieldValue('vatNumber', '');
-                        }
-                      }}
-                    />
-                    <Typography component={'span'}>
-                      {t('onboardingFormData.billingDataSection.taxCodeEquals2PIVAdescription')}
-                    </Typography>
-                  </Box>
+              {!isForeignOffice &&
+                formik.values.hasVatnumber &&
+                selectedParty?.taxCode !== '' &&
+                selectedParty?.taxCode && (
+                  <Grid item>
+                    <Box display="flex" alignItems="center">
+                      <Checkbox
+                        id="onboardingFormData"
+                        checked={stepHistoryState.isTaxCodeEquals2PIVA}
+                        disabled={premiumFlow}
+                        inputProps={{
+                          'aria-label': t(
+                            'onboardingFormData.billingDataSection.taxCodeEquals2PIVAdescription'
+                          ),
+                        }}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setStepHistoryState({
+                              ...stepHistoryState,
+                              isTaxCodeEquals2PIVA: true,
+                            });
+                            formik.setFieldValue('vatNumber', formik.values.taxCode);
+                          } else {
+                            setStepHistoryState({
+                              ...stepHistoryState,
+                              isTaxCodeEquals2PIVA: false,
+                            });
+                            formik.setFieldValue('vatNumber', '');
+                          }
+                        }}
+                      />
+                      <Typography component={'span'}>
+                        {t('onboardingFormData.billingDataSection.taxCodeEquals2PIVAdescription')}
+                      </Typography>
+                    </Box>
+                  </Grid>
                 )}
-              </Grid>
               <Grid item>
-                <Box display="flex" alignItems="center">
+                <Box
+                  display="flex"
+                  alignItems="center"
+                  marginBottom={!formik.values.hasVatnumber && isRecipientCodeVisible ? -2 : 0}
+                >
                   <Checkbox
                     id="party_without_vatnumber"
                     inputProps={{
@@ -694,9 +702,10 @@ export default function PersonalAndBillingDataSection({
               </Grid>
             </Grid>
           )}
-          {formik.values.hasVatnumber && !isForeignOffice && (
-            <Grid item xs={12}>
-              <Typography component={'span'}>
+
+          <Grid item xs={12}>
+            <Typography component={'span'}>
+              {formik.values.hasVatnumber && !isForeignOffice && (
                 <CustomTextField
                   {...baseTextFieldProps(
                     'vatNumber',
@@ -708,54 +717,59 @@ export default function PersonalAndBillingDataSection({
                   )}
                   value={formik.values.vatNumber}
                   disabled={stepHistoryState.isTaxCodeEquals2PIVA || premiumFlow}
+                  onClick={() => setShrinkVatNumber(true)}
+                  onBlur={() => setShrinkVatNumber(false)}
+                  InputLabelProps={{
+                    shrink: shrinkVatNumber || stepHistoryState.isTaxCodeEquals2PIVA,
+                  }}
                 />
-                {isPSP && formik.values.hasVatnumber && (
-                  <Box display="flex" alignItems="center" mt="2px">
-                    {/* Checkbox la aprtita IVA è di gruppo */}
-                    <Checkbox
-                      inputProps={{
-                        'aria-label': t('onboardingFormData.billingDataSection.vatNumberGroup'),
-                      }}
-                      checked={formik.values.vatNumberGroup}
-                      onChange={(_, checked: boolean) =>
-                        formik.setFieldValue('vatNumberGroup', checked, true)
-                      }
-                      value={formik.values.vatNumberGroup}
-                    />
-                    <Typography component={'span'}>
-                      {t('onboardingFormData.billingDataSection.vatNumberGroup')}
-                    </Typography>
-                  </Box>
-                )}
-                {isRecipientCodeVisible && (
-                  <Grid item xs={12} mt={3}>
-                    <CustomTextField
-                      {...baseTextFieldProps(
-                        'recipientCode',
-                        t('onboardingFormData.billingDataSection.sdiCode'),
-                        600,
-                        theme.palette.text.primary
-                      )}
-                      inputProps={{ maxLength: 7, style: { textTransform: 'uppercase' } }}
-                    />
-                    {/* Description for recipient code */}
-                    <Typography
-                      component={'span'}
-                      sx={{
-                        fontSize: '12px!important',
-                        fontWeight: 'fontWeightMedium',
-                        color: theme.palette.text.secondary,
-                      }}
-                    >
-                      {t('onboardingFormData.billingDataSection.recipientCodeDescription')}
-                    </Typography>
-                  </Grid>
-                )}
-              </Typography>
-            </Grid>
-          )}
+              )}
+              {isPSP && formik.values.hasVatnumber && (
+                <Box display="flex" alignItems="center" mt="2px">
+                  {/* Checkbox la aprtita IVA è di gruppo */}
+                  <Checkbox
+                    inputProps={{
+                      'aria-label': t('onboardingFormData.billingDataSection.vatNumberGroup'),
+                    }}
+                    checked={formik.values.vatNumberGroup}
+                    onChange={(_, checked: boolean) =>
+                      formik.setFieldValue('vatNumberGroup', checked, true)
+                    }
+                    value={formik.values.vatNumberGroup}
+                  />
+                  <Typography component={'span'}>
+                    {t('onboardingFormData.billingDataSection.vatNumberGroup')}
+                  </Typography>
+                </Box>
+              )}
+              {isRecipientCodeVisible && (
+                <Grid item xs={12} mt={3}>
+                  <CustomTextField
+                    {...baseTextFieldProps(
+                      'recipientCode',
+                      t('onboardingFormData.billingDataSection.sdiCode'),
+                      600,
+                      theme.palette.text.primary
+                    )}
+                    inputProps={{ maxLength: 7, style: { textTransform: 'uppercase' } }}
+                  />
+                  {/* Description for recipient code */}
+                  <Typography
+                    component={'span'}
+                    sx={{
+                      fontSize: '12px!important',
+                      fontWeight: 'fontWeightMedium',
+                      color: theme.palette.text.secondary,
+                    }}
+                  >
+                    {t('onboardingFormData.billingDataSection.recipientCodeDescription')}
+                  </Typography>
+                </Grid>
+              )}
+            </Typography>
+          </Grid>
           {isInsuranceCompany && (
-            <Grid item xs={12}>
+            <Grid item xs={12} marginTop={isForeignOffice ? -3 : 0}>
               <CustomTextField
                 {...baseTextFieldProps(
                   'ivassCode',
