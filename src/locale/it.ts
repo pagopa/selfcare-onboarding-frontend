@@ -487,7 +487,6 @@ export default {
       invalidFiscalCode: 'Il Codice Fiscale non è valido',
       invalidZipCode: 'Il CAP non è valido',
       invalidVatNumber: 'La Partita IVA non è valida',
-      invalidIvassCode: 'Il Codice Ivass non è valido',
       invalidEmail: 'L’indirizzo email non è valido',
       invalidReaField: 'Il Campo REA non è valido',
       invalidMailSupport: 'L’indirizzo email non è valido',

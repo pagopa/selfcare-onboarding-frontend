@@ -38,7 +38,6 @@ import { ErrorModalVatNumber } from '../onboardingFormData/ErrorPIVAModal';
 const fiscalAndVatCodeRegexp = new RegExp(
   /(^[A-Za-z]{6}[0-9lmnpqrstuvLMNPQRSTUV]{2}[abcdehlmprstABCDEHLMPRST]{1}[0-9lmnpqrstuvLMNPQRSTUV]{2}[A-Za-z]{1}[0-9lmnpqrstuvLMNPQRSTUV]{3}[A-Za-z]{1}$|^[0-9]{11}$)/
 );
-const fiveCharactersAlphanumeric = new RegExp('^([a-zA-Z0-9_-]){5}$');
 
 const fiveCharactersAllowed = new RegExp('^\\d{5}$');
 const reaValidation = new RegExp('^[A-Za-z]{2}');
@@ -355,14 +354,7 @@ export default function StepOnboardingFormData({
             : isInsuranceCompany && values?.country
             ? !onlyCharacters.test(values.country)
             : undefined,
-        ivassCode:
-          isInsuranceCompany && !values.ivassCode
-            ? requiredError
-            : isInsuranceCompany &&
-              values.ivassCode &&
-              !fiveCharactersAlphanumeric.test(values.ivassCode)
-            ? t('onboardingFormData.billingDataSection.invalidIvassCode')
-            : undefined,
+        ivassCode: isInsuranceCompany && !values.ivassCode ? requiredError : undefined,
         digitalAddress: !values.digitalAddress
           ? requiredError
           : !emailRegexp.test(values.digitalAddress)
