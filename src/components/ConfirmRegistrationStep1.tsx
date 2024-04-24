@@ -51,7 +51,7 @@ export function ConfirmRegistrationStep1(
       <Grid item xs={11} pb={3}>
         <Typography color={theme.palette.text.primary} variant={'body1'} align="center">
           <Trans i18nKey="confirmRegistrationStep1.pageSubtitle" components={{ 1: <br /> }}>
-            {`Carica l’Accordo di adesione firmato digitalmente <1 /> in p7m dal Legale Rappresentante.`}
+            {`Carica l’accordo di adesione firmato digitalmente <1 /> in p7m dal Legale Rappresentante.`}
           </Trans>
         </Typography>
       </Grid>

@@ -117,7 +117,7 @@ export function ConfirmRegistrationStep0({ forward }: StepperStepComponentProps)
                     i18nKey="confirmRegistrationStep0.download.description"
                     components={{ 1: <br />, 2: <strong /> }}
                   >
-                    {`Per completare l’adesione, scarica l’Accordo e fai apporre la firma digitale in <1 /><2>formato p7m</2> dal Legale Rappresentante dell’ente o da un suo procuratore.`}
+                    {`Per completare l’adesione, scarica l’accordo e fai apporre la firma digitale in <1 /><2>formato p7m</2> dal Legale Rappresentante dell’ente o da un suo procuratore.`}
                   </Trans>
                 </Typography>
               </Grid>
@@ -170,8 +170,8 @@ export function ConfirmRegistrationStep0({ forward }: StepperStepComponentProps)
                     i18nKey="confirmRegistrationStep0.upload.description"
                     components={{ 1: <br />, 3: <strong /> }}
                   >
-                    {`Una volta firmato l’Accordo, segui le istruzioni per inviarlo e completare <1 />
-            l’adesione al prodotto scelto. Ricorda di caricare l’Accordo
+                    {`Una volta firmato l’accordo, segui le istruzioni per inviarlo e completare <1 />
+            l’adesione al prodotto scelto. Ricorda di caricare l’accordo
             <3>entro 30 giorni.</3>`}
                   </Trans>
                 </Typography>
