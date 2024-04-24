@@ -201,6 +201,7 @@ export type Party = {
   // indirizzo mail supporto
   supportEmail?: string;
   istatCode?: string;
+  registerType?: string;
 };
 
 export type InstitutionData = {

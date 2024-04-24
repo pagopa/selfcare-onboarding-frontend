@@ -50,9 +50,11 @@ type Props = StepperStepComponentProps & {
   uoSelected?: UoData;
   institutionAvoidGeotax: boolean;
   selectedParty?: Party;
+  productId?: string;
   retrievedIstat?: string;
   isCityEditable?: boolean;
   isRecipientCodeVisible: boolean;
+  isForeignInsurance?: boolean;
 };
 
 // eslint-disable-next-line sonarjs/cognitive-complexity, complexity
@@ -72,6 +74,8 @@ export default function PersonalAndBillingDataSection({
   retrievedIstat,
   isCityEditable,
   isRecipientCodeVisible,
+  isForeignInsurance,
+  productId,
 }: Props) {
   const { t } = useTranslation();
   const { setRequiredLogin } = useContext(UserContext);
@@ -81,7 +85,6 @@ export default function PersonalAndBillingDataSection({
   const [countries, setCountries] = useState<Array<InstitutionLocationData>>();
   const [institutionLocationData, setInstitutionLocationData] = useState<InstitutionLocationData>();
   const [isCitySelected, setIsCitySelected] = useState<boolean>(false);
-  const [isForeignOffice, setIsForeignOffice] = useState<boolean>(false);
   const [nationalCountries, setNationalCountries] = useState<Array<CountryResource>>();
   const [input, setInput] = useState<string>();
 
@@ -143,9 +146,17 @@ export default function PersonalAndBillingDataSection({
   }, [isFromIPA, selectedParty, aooSelected, uoSelected, retrievedIstat, premiumFlow]);
 
   useEffect(() => {
-    formik.setFieldValue('hasVatnumber', !formik.values.isForeignOffice);
-    setIsForeignOffice(formik.values.isForeignOffice);
-  }, [formik.values.isForeignOffice]);
+    if (isForeignInsurance) {
+      formik.setFieldValue('isForeignInsurance', true);
+      formik.setFieldValue('zipCode', undefined);
+      formik.setFieldValue('city', undefined);
+      formik.setFieldValue('county', undefined);
+      formik.setFieldValue('country', undefined);
+    } else {
+      formik.setFieldValue('isForeignInsurance', false);
+      formik.setFieldValue('hasVatnumber', true);
+    }
+  }, [isForeignInsurance]);
 
   const baseNumericFieldProps = (
     field: keyof OnboardingFormData,
@@ -334,30 +345,9 @@ export default function PersonalAndBillingDataSection({
               />
             </Grid>
           )}
-          {isInsuranceCompany && (
-            <Grid item xs={12} display="flex" flexDirection="row" alignItems="center">
-              <Checkbox
-                id={'foreign-office'}
-                value={isForeignOffice}
-                checked={isForeignOffice}
-                onChange={() => {
-                  setIsForeignOffice(!isForeignOffice);
-                  formik.setFieldValue('isForeignOffice', !isForeignOffice);
-                  formik.setFieldValue('zipCode', undefined);
-                  formik.setFieldValue('city', undefined);
-                  formik.setFieldValue('county', undefined);
-                  formik.setFieldValue('country', undefined);
-                  if (!isForeignOffice) {
-                    formik.setFieldValue('hasVatnumber', true);
-                  }
-                }}
-              />
-              <Typography>{t('onboardingFormData.billingDataSection.foreignOffice')}</Typography>
-            </Grid>
-          )}
           {/* Sede legale */}
           <Grid container spacing={2} pl={3} pt={3}>
-            <Grid item xs={isForeignOffice ? 12 : 7}>
+            <Grid item xs={isForeignInsurance ? 12 : 7}>
               <CustomTextField
                 {...baseTextFieldProps(
                   'registeredOffice',
@@ -369,7 +359,7 @@ export default function PersonalAndBillingDataSection({
               />
             </Grid>
             {/* CAP */}
-            {!isForeignOffice && (
+            {!isForeignInsurance && (
               <Grid item xs={5}>
                 <CustomNumberField
                   inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
@@ -385,7 +375,7 @@ export default function PersonalAndBillingDataSection({
 
           <Grid container spacing={2} pl={3} pt={3}>
             <Grid item xs={7}>
-              {isInsuranceCompany && isForeignOffice ? (
+              {isInsuranceCompany && isForeignInsurance ? (
                 <CustomTextField
                   {...baseTextFieldProps('city', t('onboardingFormData.billingDataSection.city'))}
                   disabled={isDisabled}
@@ -488,7 +478,7 @@ export default function PersonalAndBillingDataSection({
               )}
             </Grid>
             <Grid item xs={5}>
-              {isInsuranceCompany && isForeignOffice ? (
+              {isInsuranceCompany && isForeignInsurance ? (
                 <Autocomplete
                   id="country-select"
                   onInput={(e: React.ChangeEvent<HTMLInputElement>) => {
@@ -608,14 +598,14 @@ export default function PersonalAndBillingDataSection({
             </Grid>
           )}
 
-          {!isForeignOffice && (
+          {!isForeignInsurance && (
             <Grid
               container
               spacing={3}
               xs={12}
               pl={3}
               pt={
-                !isForeignOffice ||
+                !isForeignInsurance ||
                 (formik.values.hasVatnumber &&
                   selectedParty?.taxCode !== '' &&
                   selectedParty?.taxCode)
@@ -626,7 +616,7 @@ export default function PersonalAndBillingDataSection({
                 !formik.values.hasVatnumber && isRecipientCodeVisible && isInsuranceCompany ? -3 : 0
               }
             >
-              {!isForeignOffice &&
+              {!isForeignInsurance &&
                 formik.values.hasVatnumber &&
                 selectedParty?.taxCode !== '' &&
                 selectedParty?.taxCode && (
@@ -663,49 +653,51 @@ export default function PersonalAndBillingDataSection({
                     </Box>
                   </Grid>
                 )}
-              <Grid item>
-                <Box
-                  display="flex"
-                  alignItems="center"
-                  marginBottom={!formik.values.hasVatnumber && isRecipientCodeVisible ? -2 : 0}
-                >
-                  <Checkbox
-                    id="party_without_vatnumber"
-                    inputProps={{
-                      'aria-label': t(
-                        'onboardingFormData.billingDataSection.partyWithoutVatNumber'
-                      ),
-                    }}
-                    onChange={(e) => {
-                      formik.setFieldValue('hasVatnumber', !e.target.checked);
-                      setStepHistoryState({
-                        ...stepHistoryState,
-                        isTaxCodeEquals2PIVA: false,
-                      });
-                    }}
-                  />
-                  <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                    <Typography component={'span'}>
-                      {t('onboardingFormData.billingDataSection.partyWithoutVatNumber')}
-                    </Typography>
-                    <Typography variant={'caption'} sx={{ fontWeight: '400', color: '#5C6F82' }}>
-                      <Trans
-                        i18nKey="onboardingFormData.billingDataSection.partyWIthoutVatNumberSubtitle"
-                        components={{ 1: <br /> }}
-                      >
-                        {`Indica solo il Codice Fiscale se il tuo ente non agisce nell'esercizio d'impresa,
+              {productId !== 'prod-fd' && productId !== 'prod-fd-garantito' && (
+                <Grid item>
+                  <Box
+                    display="flex"
+                    alignItems="center"
+                    marginBottom={!formik.values.hasVatnumber && isRecipientCodeVisible ? -2 : 0}
+                  >
+                    <Checkbox
+                      id="party_without_vatnumber"
+                      inputProps={{
+                        'aria-label': t(
+                          'onboardingFormData.billingDataSection.partyWithoutVatNumber'
+                        ),
+                      }}
+                      onChange={(e) => {
+                        formik.setFieldValue('hasVatnumber', !e.target.checked);
+                        setStepHistoryState({
+                          ...stepHistoryState,
+                          isTaxCodeEquals2PIVA: false,
+                        });
+                      }}
+                    />
+                    <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                      <Typography component={'span'}>
+                        {t('onboardingFormData.billingDataSection.partyWithoutVatNumber')}
+                      </Typography>
+                      <Typography variant={'caption'} sx={{ fontWeight: '400', color: '#5C6F82' }}>
+                        <Trans
+                          i18nKey="onboardingFormData.billingDataSection.partyWIthoutVatNumberSubtitle"
+                          components={{ 1: <br /> }}
+                        >
+                          {`Indica solo il Codice Fiscale se il tuo ente non agisce nell'esercizio d'impresa,
                 arte o professione <1 />(cfr. art. 21, comma 2, lett. f, DPR n. 633/1972)`}
-                      </Trans>
-                    </Typography>
+                        </Trans>
+                      </Typography>
+                    </Box>
                   </Box>
-                </Box>
-              </Grid>
+                </Grid>
+              )}
             </Grid>
           )}
 
           <Grid item xs={12}>
             <Typography component={'span'}>
-              {formik.values.hasVatnumber && !isForeignOffice && (
+              {formik.values.hasVatnumber && !isForeignInsurance && (
                 <CustomTextField
                   {...baseTextFieldProps(
                     'vatNumber',
@@ -720,7 +712,10 @@ export default function PersonalAndBillingDataSection({
                   onClick={() => setShrinkVatNumber(true)}
                   onBlur={() => setShrinkVatNumber(false)}
                   InputLabelProps={{
-                    shrink: shrinkVatNumber || stepHistoryState.isTaxCodeEquals2PIVA,
+                    shrink:
+                      shrinkVatNumber ||
+                      stepHistoryState.isTaxCodeEquals2PIVA ||
+                      formik.values.vatNumber,
                   }}
                 />
               )}
@@ -769,7 +764,7 @@ export default function PersonalAndBillingDataSection({
             </Typography>
           </Grid>
           {isInsuranceCompany && (
-            <Grid item xs={12} marginTop={isForeignOffice ? -3 : 0}>
+            <Grid item xs={12} marginTop={isForeignInsurance ? -3 : 0}>
               <CustomTextField
                 {...baseTextFieldProps(
                   'ivassCode',

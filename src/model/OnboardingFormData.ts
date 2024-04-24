@@ -31,6 +31,6 @@ export type OnboardingFormData = {
   uoName?: string;
   aooUniqueCode?: string;
   uoUniqueCode?: string;
-  isForeignOffice?: boolean;
+  isForeignInsurance?: boolean;
   hasVatnumber?: boolean;
 };
