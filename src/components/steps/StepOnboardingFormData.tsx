@@ -578,6 +578,7 @@ export default function StepOnboardingFormData({
           </Grid>
         </Grid>
         <PersonalAndBillingDataSection
+          productId={productId}
           origin={origin}
           institutionType={institutionType}
           baseTextFieldProps={baseTextFieldProps}

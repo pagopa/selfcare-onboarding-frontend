@@ -50,6 +50,7 @@ type Props = StepperStepComponentProps & {
   uoSelected?: UoData;
   institutionAvoidGeotax: boolean;
   selectedParty?: Party;
+  productId?: string;
   retrievedIstat?: string;
   isCityEditable?: boolean;
   isRecipientCodeVisible: boolean;
@@ -74,6 +75,7 @@ export default function PersonalAndBillingDataSection({
   isCityEditable,
   isRecipientCodeVisible,
   isForeignInsurance,
+  productId,
 }: Props) {
   const { t } = useTranslation();
   const { setRequiredLogin } = useContext(UserContext);
@@ -651,43 +653,45 @@ export default function PersonalAndBillingDataSection({
                     </Box>
                   </Grid>
                 )}
-              <Grid item>
-                <Box
-                  display="flex"
-                  alignItems="center"
-                  marginBottom={!formik.values.hasVatnumber && isRecipientCodeVisible ? -2 : 0}
-                >
-                  <Checkbox
-                    id="party_without_vatnumber"
-                    inputProps={{
-                      'aria-label': t(
-                        'onboardingFormData.billingDataSection.partyWithoutVatNumber'
-                      ),
-                    }}
-                    onChange={(e) => {
-                      formik.setFieldValue('hasVatnumber', !e.target.checked);
-                      setStepHistoryState({
-                        ...stepHistoryState,
-                        isTaxCodeEquals2PIVA: false,
-                      });
-                    }}
-                  />
-                  <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                    <Typography component={'span'}>
-                      {t('onboardingFormData.billingDataSection.partyWithoutVatNumber')}
-                    </Typography>
-                    <Typography variant={'caption'} sx={{ fontWeight: '400', color: '#5C6F82' }}>
-                      <Trans
-                        i18nKey="onboardingFormData.billingDataSection.partyWIthoutVatNumberSubtitle"
-                        components={{ 1: <br /> }}
-                      >
-                        {`Indica solo il Codice Fiscale se il tuo ente non agisce nell'esercizio d'impresa,
+              {productId !== 'prod-fd' && productId !== 'prod-fd-garantito' && (
+                <Grid item>
+                  <Box
+                    display="flex"
+                    alignItems="center"
+                    marginBottom={!formik.values.hasVatnumber && isRecipientCodeVisible ? -2 : 0}
+                  >
+                    <Checkbox
+                      id="party_without_vatnumber"
+                      inputProps={{
+                        'aria-label': t(
+                          'onboardingFormData.billingDataSection.partyWithoutVatNumber'
+                        ),
+                      }}
+                      onChange={(e) => {
+                        formik.setFieldValue('hasVatnumber', !e.target.checked);
+                        setStepHistoryState({
+                          ...stepHistoryState,
+                          isTaxCodeEquals2PIVA: false,
+                        });
+                      }}
+                    />
+                    <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                      <Typography component={'span'}>
+                        {t('onboardingFormData.billingDataSection.partyWithoutVatNumber')}
+                      </Typography>
+                      <Typography variant={'caption'} sx={{ fontWeight: '400', color: '#5C6F82' }}>
+                        <Trans
+                          i18nKey="onboardingFormData.billingDataSection.partyWIthoutVatNumberSubtitle"
+                          components={{ 1: <br /> }}
+                        >
+                          {`Indica solo il Codice Fiscale se il tuo ente non agisce nell'esercizio d'impresa,
                 arte o professione <1 />(cfr. art. 21, comma 2, lett. f, DPR n. 633/1972)`}
-                      </Trans>
-                    </Typography>
+                        </Trans>
+                      </Typography>
+                    </Box>
                   </Box>
-                </Box>
-              </Grid>
+                </Grid>
+              )}
             </Grid>
           )}
 
@@ -708,7 +712,10 @@ export default function PersonalAndBillingDataSection({
                   onClick={() => setShrinkVatNumber(true)}
                   onBlur={() => setShrinkVatNumber(false)}
                   InputLabelProps={{
-                    shrink: shrinkVatNumber || stepHistoryState.isTaxCodeEquals2PIVA,
+                    shrink:
+                      shrinkVatNumber ||
+                      stepHistoryState.isTaxCodeEquals2PIVA ||
+                      formik.values.vatNumber,
                   }}
                 />
               )}
