@@ -497,7 +497,6 @@ export default {
         'Non è stato possibile verificare la P.IVA al momento. Riprova più tardi.',
       centralPartyLabel: 'Ente centrale',
       businessName: 'Ragione sociale',
-      foreignOffice: 'Il mio ente ha sede all’estero',
       aooName: 'Denominazione AOO',
       uoName: 'Denominazione UO',
       aooUniqueCode: 'Codice Univoco AOO',
