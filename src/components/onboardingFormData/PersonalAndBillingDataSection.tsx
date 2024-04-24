@@ -84,6 +84,7 @@ export default function PersonalAndBillingDataSection({
   const [institutionLocationData, setInstitutionLocationData] = useState<InstitutionLocationData>();
   const [isCitySelected, setIsCitySelected] = useState<boolean>(false);
   const [nationalCountries, setNationalCountries] = useState<Array<CountryResource>>();
+  const [input, setInput] = useState<string>();
 
   useEffect(() => {
     const shareCapitalIsNan = isNaN(formik.values.shareCapital);
@@ -240,7 +241,6 @@ export default function PersonalAndBillingDataSection({
         .filter((cm: CountryResource) => cm.alpha_2 !== 'IT');
       setNationalCountries(resource2CountryResource);
     } catch (reason) {
-      // TODO Properly error
       console.error(reason);
     }
   };
@@ -481,14 +481,14 @@ export default function PersonalAndBillingDataSection({
                   id="country-select"
                   onInput={(e: React.ChangeEvent<HTMLInputElement>) => {
                     const value = e.target.value;
-                    formik.setFieldValue('country', value);
+                    setInput(value);
                     if (value.length >= 3) {
                       void getNationalCountries(value);
                     } else {
                       setNationalCountries(undefined);
                     }
                   }}
-                  inputValue={formik.values.extendedCountry ?? (formik.values.country || '')}
+                  inputValue={formik.values.extendedCountry ?? input}
                   onChange={(_e: any, selected: any) => {
                     if (selected) {
                       formik.setFieldValue('country', selected.alpha_2);
@@ -698,7 +698,7 @@ export default function PersonalAndBillingDataSection({
                   {...baseTextFieldProps(
                     'vatNumber',
                     t('onboardingFormData.billingDataSection.vatNumber'),
-                    stepHistoryState.isTaxCodeEquals2PIVA ? 400 : 600,
+                    600,
                     stepHistoryState.isTaxCodeEquals2PIVA
                       ? theme.palette.text.secondary
                       : theme.palette.text.primary
@@ -766,6 +766,7 @@ export default function PersonalAndBillingDataSection({
                   theme.palette.text.primary
                 )}
                 value={formik.values.ivassCode}
+                disabled={true}
               />
             </Grid>
           )}
