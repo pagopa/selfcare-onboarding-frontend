@@ -500,11 +500,7 @@ export default function PersonalAndBillingDataSection({
                       setNationalCountries(undefined);
                     }
                   }}
-                  inputValue={
-                    formik.values.extendedCountry ?? formik.values.country
-                      ? formik.values.country
-                      : input || ''
-                  }
+                  inputValue={formik.values.extendedCountry ?? input}
                   onChange={(_e: any, selected: any) => {
                     if (selected) {
                       formik.setFieldValue('country', selected.alpha_2);
