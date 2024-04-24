@@ -86,8 +86,8 @@ test('Test: The jwt exist and the request is correctly retrieved and waiting for
   mockedLocation.search = 'jwt=pendingRequest';
   render(<CompleteRequestComponent />);
 
-  await waitFor(() => screen.getByText('Carica l’Accordo firmato'));
-  await waitFor(() => screen.getByText('Scarica l’Accordo di adesione'));
+  await waitFor(() => screen.getByText('Carica l’accordo firmato'));
+  await waitFor(() => screen.getByText('Scarica l’accordo di adesione'));
 
   const uploadContract = await waitFor(() =>
     screen.getByRole('button', {
