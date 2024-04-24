@@ -132,6 +132,8 @@ export default function StepOnboardingFormData({
   const isRecipientCodeVisible =
     !isContractingAuthority && institutionType !== 'PT' && !isInsuranceCompany && !isProdInterop;
 
+  const isForeignInsurance = selectedParty?.registerType?.includes('Elenco II');
+
   const filterByCategory =
     productId === 'prod-pn'
       ? 'L6,L4,L45,L35,L5,L17,L15,C14'
@@ -228,7 +230,7 @@ export default function StepOnboardingFormData({
       ...formik.values,
       vatNumber: stepHistoryState.isTaxCodeEquals2PIVA
         ? formik.values.taxCode
-        : formik.values.hasVatnumber && !formik.values.isForeignOffice
+        : formik.values.hasVatnumber && !formik.values.isForeignInsurance
         ? formik.values.vatNumber
         : undefined,
       taxCode:
@@ -321,7 +323,7 @@ export default function StepOnboardingFormData({
         businessName: !values.businessName ? requiredError : undefined,
         registeredOffice: !values.registeredOffice ? requiredError : undefined,
         zipCode:
-          !values.zipCode && !values.isForeignOffice
+          !values.zipCode && !values.isForeignInsurance
             ? requiredError
             : values.zipCode && !fiveCharactersAllowed.test(values.zipCode ?? '')
             ? t('onboardingFormData.billingDataSection.invalidZipCode')
@@ -344,12 +346,12 @@ export default function StepOnboardingFormData({
             : undefined,
         city: !values.city
           ? requiredError
-          : isInsuranceCompany
+          : values.isForeignInsurance
           ? !onlyCharacters.test(values.city) // TODO Add error helperText when available
           : undefined,
         county: !values.county && !isInsuranceCompany ? requiredError : undefined,
         country:
-          !values.country && values.isForeignOffice
+          !values.country && values.isForeignInsurance
             ? requiredError
             : isInsuranceCompany && values?.country
             ? !onlyCharacters.test(values.country)
@@ -584,6 +586,7 @@ export default function StepOnboardingFormData({
           formik={formik}
           premiumFlow={premiumFlow}
           isInformationCompany={isInformationCompany}
+          isForeignInsurance={isForeignInsurance}
           aooSelected={aooSelected}
           uoSelected={uoSelected}
           institutionAvoidGeotax={institutionAvoidGeotax}
