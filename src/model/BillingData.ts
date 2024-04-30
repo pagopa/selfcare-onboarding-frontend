@@ -1,20 +1,13 @@
 import { OnboardingFormData } from './OnboardingFormData';
 
 export type BillingDataDto = {
-  // Ragione sociale
   businessName: string;
-  // Indirizzo PEC
   digitalAddress: string;
-  // Codice destinatario
   recipientCode?: string;
-  // Sede legale
   registeredOffice: string;
-  // Codice fiscale
-  taxCode: string;
-  // Partita iva
-  vatNumber: string;
-  // CAP
-  zipCode: string;
+  taxCode?: string;
+  vatNumber?: string;
+  zipCode?: string;
 };
 
 export const billingData2billingDataRequest = (

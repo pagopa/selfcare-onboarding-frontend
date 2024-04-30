@@ -201,6 +201,7 @@ export type Party = {
   // indirizzo mail supporto
   supportEmail?: string;
   istatCode?: string;
+  registerType?: string;
 };
 
 export type InstitutionData = {
@@ -244,8 +245,8 @@ export type InsuranceCompanyResource = {
   origin: string;
   originId: string;
   registerType: string;
-  taxCode: string;
   workType: string;
+  taxCode?: string;
 };
 
 export type InsuranceCompaniesResource = {

@@ -37,6 +37,7 @@ variables:
     react_app_url_fe_assistance: '$(UAT_REACT_APP_URL_FE_ASSISTANCE)'
 
     react_app_plans_prices: '$(UAT_REACT_APP_PLANS_PRICES)'
+    react_app_country_data: '$(UAT_REACT_APP_COUNTRY_DATA)'
 
     react_app_url_privacy_disclaimer: '$(UAT_REACT_APP_URL_PRIVACY_DISCLAIMER)'
     react_app_url_terms_and_conditions: '$(UAT_REACT_APP_URL_TERMS_AND_CONDITIONS)'
@@ -77,6 +78,7 @@ variables:
     react_app_url_fe_assistance: '$(PROD_REACT_APP_URL_FE_ASSISTANCE)'
 
     react_app_plans_prices: '$(PROD_REACT_APP_PLANS_PRICES)'
+    react_app_country_data: '$(PROD_REACT_APP_COUNTRY_DATA)'
 
     react_app_url_privacy_disclaimer: '$(PROD_REACT_APP_URL_PRIVACY_DISCLAIMER)'
     react_app_url_terms_and_conditions: '$(PROD_REACT_APP_URL_TERMS_AND_CONDITIONS)'
@@ -119,6 +121,7 @@ variables:
     react_app_url_fe_assistance: '$(DEV_REACT_APP_URL_FE_ASSISTANCE)'
 
     react_app_plans_prices: '$(DEV_REACT_APP_PLANS_PRICES)'
+    react_app_country_data: '$(DEV_REACT_APP_COUNTRY_DATA)'
 
     react_app_url_privacy_disclaimer: '$(DEV_REACT_APP_URL_PRIVACY_DISCLAIMER)'
     react_app_url_terms_and_conditions: '$(DEV_REACT_APP_URL_TERMS_AND_CONDITIONS)'
@@ -226,6 +229,7 @@ stages:
               REACT_APP_URL_FE_ASSISTANCE: '$(react_app_url_fe_assistance)'
 
               REACT_APP_PLANS_PRICES: '$(react_app_plans_prices)'
+              REACT_APP_COUNTRY_DATA: '$(react_app_country_data)'
 
               REACT_APP_URL_PRIVACY_DISCLAIMER: '$(react_app_url_privacy_disclaimer)'
               REACT_APP_URL_TERMS_AND_CONDITIONS: '$(react_app_url_terms_and_conditions)'

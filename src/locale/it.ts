@@ -15,26 +15,28 @@ export default {
     ariaLabel: `Seleziona la tipologia di ricerca dell'ente`,
     businessName: 'Ragione Sociale',
     taxcode: 'Codice Fiscale ente',
+    ivassCode: 'Codice IVASS',
   },
   partyAdvancedSelect: {
     advancedSearchLabel: 'Cerca per',
     businessName: 'Ragione Sociale',
+    ivassCode: 'Codice IVASS',
     taxCode: 'Codice Fiscale ente',
     aooCode: 'Codice univoco AOO',
     uoCode: 'Codice univoco UO',
   },
   confirmRegistrationStep0: {
     download: {
-      title: 'Scarica l’Accordo di adesione',
-      description: `Per completare l’adesione, scarica l’Accordo e fai apporre la firma digitale in <1 /><2>formato p7m</2> dal Legale Rappresentante dell’ente o da un suo procuratore.`,
-      downloadContract: 'Scarica l’Accordo',
+      title: 'Scarica l’accordo di adesione',
+      description: `Per completare l’adesione, scarica l’accordo e fai apporre la firma digitale in <1 /><2>formato p7m</2> dal Legale Rappresentante dell’ente o da un suo procuratore.`,
+      downloadContract: 'Scarica l’accordo',
       disclaimer:
-        'Firmando l’Accordo, il Legale Rappresentante dell’ente, o un suo procuratore, accetta espressamente e specificamente anche le singole clausole indicate nel paragrafo “Clausole ai sensi degli artt. 1341 e 1342 c.c.”',
+        'Firmando l’accordo, il Legale Rappresentante dell’ente, o un suo procuratore, accetta espressamente e specificamente anche le singole clausole indicate nel paragrafo “Clausole ai sensi degli artt. 1341 e 1342 c.c.”',
     },
     upload: {
-      title: 'Carica l’Accordo firmato',
-      description: `Una volta firmato l’Accordo, segui le istruzioni per inviarlo e completare <1 />
-    l’adesione al prodotto scelto. Ricorda di caricare l’Accordo
+      title: 'Carica l’accordo firmato',
+      description: `Una volta firmato l’accordo, segui le istruzioni per inviarlo e completare <1 />
+    l’adesione al prodotto scelto. Ricorda di caricare l’accordo
     <3>entro 30 giorni.</3>`,
       goToUpload: 'Vai al caricamento',
     },
@@ -45,9 +47,9 @@ export default {
       'Il caricamento del documento non è andato a buon fine. <1 />Carica un solo file in formato <3>p7m</3>.',
     errorAlertRetryLabel: 'Carica di nuovo',
     errorAlertCloseLabel: 'Esci',
-    pageTitle: "Carica l'Accordo di adesione",
-    pageSubtitle: `Carica l’Accordo di adesione firmato digitalmente <1 /> in p7m dal Legale Rappresentante.`,
-    fileUploaderTitle: 'Trascina qui l’Accordo di Adesione firmato oppure',
+    pageTitle: "Carica l'accordo di adesione",
+    pageSubtitle: `Carica l’accordo di adesione firmato digitalmente <1 /> in p7m dal Legale Rappresentante.`,
+    fileUploaderTitle: 'Trascina qui l’accordo di Adesione firmato oppure',
     fileUploaderDescriptionLink: 'carica il file',
     confirmAction: 'Continua',
   },
@@ -428,7 +430,7 @@ export default {
     },
     billingData: {
       subTitle:
-        'Conferma, modifica o inserisci i dati richiesti, assicurandoti che siano corretti. Verranno usati anche per richiedere l’adesione ad altri prodotti e in caso di fatturazione',
+        'Conferma, modifica o inserisci i dati richiesti, assicurandoti che siano corretti. <1 />Verranno usati anche per richiedere l’adesione ad altri prodotti e in caso di fatturazione',
     },
     exitModal: {
       title: 'Vuoi davvero uscire?',
@@ -485,7 +487,6 @@ export default {
       invalidFiscalCode: 'Il Codice Fiscale non è valido',
       invalidZipCode: 'Il CAP non è valido',
       invalidVatNumber: 'La Partita IVA non è valida',
-      invalidIvassCode: 'Il Codice Ivass non è valido',
       invalidEmail: 'L’indirizzo email non è valido',
       invalidReaField: 'Il Campo REA non è valido',
       invalidMailSupport: 'L’indirizzo email non è valido',
@@ -506,8 +507,12 @@ export default {
       city: 'Città',
       noResult: 'Nessun risultato',
       county: 'Provincia',
+      country: 'Nazione',
       digitalAddress: 'Indirizzo PEC',
       taxCodeEquals2PIVAdescription: 'La Partita IVA coincide con il Codice Fiscale',
+      partyWithoutVatNumber: 'Il mio ente non ha la partita IVA',
+      partyWIthoutVatNumberSubtitle: `Indica solo il Codice Fiscale se il tuo ente non agisce nell'esercizio d'impresa,
+      arte o professione <1 />(cfr. art. 21, comma 2, lett. f, DPR n. 633/1972)`,
       vatNumberGroup: 'La Partita IVA è di gruppo',
       taxCode: 'Codice Fiscale',
       vatNumber: 'Partita IVA',

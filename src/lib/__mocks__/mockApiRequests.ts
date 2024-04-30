@@ -663,7 +663,7 @@ const mockedInsuranceResource: InsuranceCompaniesResource = {
       id: '12345678911',
       origin: 'IVASS',
       originId: '233DC',
-      registerType: 'string',
+      registerType: 'Elenco II -',
       taxCode: '12345678911',
       workType: 'string',
     },
@@ -674,7 +674,7 @@ const mockedInsuranceResource: InsuranceCompaniesResource = {
       id: '11987654321',
       origin: 'IVASS',
       originId: '2323H',
-      registerType: 'reg',
+      registerType: 'Elenco II -',
       taxCode: '11987654321',
       workType: 'worktype',
     },
@@ -685,9 +685,30 @@ const mockedInsuranceResource: InsuranceCompaniesResource = {
       id: '66557744831',
       origin: 'IVASS',
       originId: '232DC',
-      registerType: 'regG',
+      registerType: 'Elenco I -',
       taxCode: '66557744831',
       workType: 'worktype',
+    },
+    {
+      address: 'addres',
+      description: 'emptyTaxcode',
+      digitalAddress: 'email@example.com',
+      id: '11223323',
+      origin: 'IVASS',
+      originId: '6654D',
+      registerType: 'Sezione II -',
+      taxCode: '',
+      workType: 'string',
+    },
+    {
+      address: 'addres',
+      description: 'withoutTaxcode',
+      digitalAddress: 'email@example.com',
+      id: '11223323',
+      origin: 'IVASS',
+      originId: '4431B',
+      registerType: 'Sezione I -',
+      workType: 'string',
     },
   ],
 };
@@ -907,15 +928,15 @@ export async function mockFetch(
     );
   }
 
-  if (endpoint === 'ONBOARDING_GET_INSURANCE_COMPANIES_BY_NAME') {
+  if (endpoint === 'ONBOARDING_GET_INSURANCE_COMPANIES_FROM_BUSINESSNAME') {
     return new Promise((resolve) =>
       resolve({ data: mockedInsuranceResource, status: 200, statusText: '200' } as AxiosResponse)
     );
   }
 
-  if (endpoint === 'ONBOARDING_GET_INSURANCE_COMPANIES_BY_TAXCODE') {
+  if (endpoint === 'ONBOARDING_GET_INSURANCE_COMPANIES_FROM_IVASSCODE') {
     const matchedInstitution = mockedInsuranceResource.items.find(
-      (i) => i.taxCode === endpointParams.taxId
+      (i) => i.originId === endpointParams.code
     );
     return new Promise((resolve) =>
       resolve({ data: matchedInstitution, status: 200, statusText: '200' } as AxiosResponse)

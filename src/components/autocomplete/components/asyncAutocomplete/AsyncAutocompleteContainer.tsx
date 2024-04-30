@@ -44,6 +44,7 @@ type Props = {
   setAooResultHistory: (t: AooData | undefined) => void;
   aooResult?: AooData;
   uoResult?: UoData;
+  isIvassCodeSelected: boolean;
   externalInstitutionId: string;
   institutionType?: InstitutionType;
   setDisabled: Dispatch<SetStateAction<boolean>>;
@@ -69,6 +70,7 @@ export default function AsyncAutocompleteContainer({
   setCfResult,
   cfResult,
   product,
+  isIvassCodeSelected,
   isAooCodeSelected,
   isUoCodeSelected,
   setAooResult,
@@ -238,8 +240,8 @@ export default function AsyncAutocompleteContainer({
         endpoint:
           institutionType === 'SA'
             ? 'ONBOARDING_GET_SA_PARTY_FROM_FC'
-            : 'ONBOARDING_GET_INSURANCE_COMPANIES_BY_TAXCODE',
-        endpointParams: institutionType === 'SA' ? { id: query } : { taxId: query },
+            : 'ONBOARDING_GET_INSURANCE_COMPANIES_FROM_IVASSCODE',
+        endpointParams: institutionType === 'SA' ? { taxId: query } : { code: query },
       },
       {
         method: 'GET',
@@ -262,7 +264,7 @@ export default function AsyncAutocompleteContainer({
     switch (institutionType) {
       case 'AS':
         void debounce(handleSearchByName, 100)(value, {
-          endpoint: 'ONBOARDING_GET_INSURANCE_COMPANIES_BY_NAME',
+          endpoint: 'ONBOARDING_GET_INSURANCE_COMPANIES_FROM_BUSINESSNAME',
         });
         break;
       case 'SA':
@@ -305,7 +307,10 @@ export default function AsyncAutocompleteContainer({
       setSelected(null);
       if (value.length >= 3 && isBusinessNameSelected && !isTaxCodeSelected) {
         seachByInstitutionType(value, institutionType);
-      } else if (isTaxCodeSelected && value.length === 11) {
+      } else if (
+        (isTaxCodeSelected && value.length === 11) ||
+        (isIvassCodeSelected && value.length === 5)
+      ) {
         if (institutionType === 'SA' || institutionType === 'AS') {
           void contractingInsuranceFromTaxId(value);
         } else {
@@ -352,6 +357,7 @@ export default function AsyncAutocompleteContainer({
           isAooCodeSelected={isAooCodeSelected}
           isUoCodeSelected={isUoCodeSelected}
           isTaxCodeSelected={isTaxCodeSelected}
+          isIvassCodeSelected={isIvassCodeSelected}
           isBusinessNameSelected={isBusinessNameSelected}
           setCfResult={setCfResult}
           setAooResult={setAooResult}
@@ -397,10 +403,10 @@ export default function AsyncAutocompleteContainer({
           </>
         ) : (
           <>
-            {(isTaxCodeSelected || isAooCodeSelected || isUoCodeSelected) &&
+            {(isTaxCodeSelected || isAooCodeSelected || isUoCodeSelected || isIvassCodeSelected) &&
             !isBusinessNameSelected &&
             input !== undefined &&
-            input?.length >= 6 &&
+            input?.length >= 5 &&
             !selected &&
             (cfResult || uoResult || aooResult) ? (
               <AsyncAutocompleteResultsCode
@@ -413,6 +419,7 @@ export default function AsyncAutocompleteContainer({
                 aooResult={aooResult}
                 uoResult={uoResult}
                 isTaxCodeSelected={isTaxCodeSelected}
+                isIvassCodeSelected={isIvassCodeSelected}
                 isAooCodeSelected={isAooCodeSelected}
                 isUoCodeSelected={isUoCodeSelected}
               />
