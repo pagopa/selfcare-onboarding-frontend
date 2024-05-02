@@ -605,10 +605,7 @@ export default function PersonalAndBillingDataSection({
               xs={12}
               pl={3}
               pt={
-                !isForeignInsurance ||
-                (formik.values.hasVatnumber &&
-                  selectedParty?.taxCode !== '' &&
-                  selectedParty?.taxCode)
+                !isForeignInsurance || (formik.values.hasVatnumber && selectedParty?.taxCode !== '')
                   ? 3
                   : 0
               }
@@ -618,8 +615,7 @@ export default function PersonalAndBillingDataSection({
             >
               {!isForeignInsurance &&
                 formik.values.hasVatnumber &&
-                selectedParty?.taxCode !== '' &&
-                selectedParty?.taxCode && (
+                selectedParty?.taxCode !== '' && (
                   <Grid item>
                     <Box display="flex" alignItems="center">
                       <Checkbox
