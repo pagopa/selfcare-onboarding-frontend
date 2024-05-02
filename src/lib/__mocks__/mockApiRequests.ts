@@ -746,7 +746,7 @@ const mockedOnboardingRequestData: Array<OnboardingRequestData> = [
   {
     productId: 'prod-pagopa',
     status: 'PENDING',
-    expiringDate: '2024-04-31T01:30:00.000-05:00',
+    expiringDate: '2030-04-31T01:30:00.000-05:00',
   },
   // Expired onboarding request
   {
