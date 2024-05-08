@@ -7,11 +7,12 @@ type ErrorModalProps = {
   setOpenVatNumberErrorModal: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-export const ErrorModalVatNumber = ({
+export const VatNumberErrorModal = ({
   openVatNumberErrorModal,
   setOpenVatNumberErrorModal,
 }: ErrorModalProps) => {
   const { t } = useTranslation();
+
   return (
     <SessionModal
       open={openVatNumberErrorModal}
@@ -21,6 +22,6 @@ export const ErrorModalVatNumber = ({
       onConfirmLabel={t('onboardingFormData.closeBtnLabel')}
       onConfirm={() => window.location.assign(ENV.URL_FE.DASHBOARD)}
       handleClose={() => setOpenVatNumberErrorModal(false)}
-    ></SessionModal>
+    />
   );
 };

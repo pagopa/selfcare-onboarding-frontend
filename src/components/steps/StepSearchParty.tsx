@@ -19,6 +19,7 @@ import { LoadingOverlay } from '../LoadingOverlay';
 import { OnboardingStepActions } from '../OnboardingStepActions';
 import { Autocomplete } from '../autocomplete/Autocomplete';
 import { useHistoryState } from '../useHistoryState';
+import { filterByCategory } from '../../utils/constants';
 
 type Props = {
   subTitle: string | ReactElement;
@@ -64,12 +65,9 @@ export function StepSearchParty({
   subunitTypeByQuery,
   subunitCodeByQuery,
 }: Props) {
-  const partyExternalIdByQuery = new URLSearchParams(window.location.search).get('partyExternalId');
-
-  const { setRequiredLogin } = useContext(UserContext);
   const theme = useTheme();
+  const { setRequiredLogin } = useContext(UserContext);
 
-  const productAllowed = product?.id === 'prod-pn';
   const [aooResult, setAooResult, setAooResultHistory] = useHistoryState<AooData | undefined>(
     'aooSelected_step1',
     undefined
@@ -79,8 +77,9 @@ export function StepSearchParty({
     undefined
   );
 
-  const [isSearchFieldSelected, setIsSearchFieldSelected] = useState<boolean>(true);
+  const partyExternalIdByQuery = new URLSearchParams(window.location.search).get('partyExternalId');
 
+  const [isSearchFieldSelected, setIsSearchFieldSelected] = useState<boolean>(true);
   const [loading, setLoading] = useState(!!partyExternalIdByQuery);
   const [selected, setSelected, setSelectedHistory] = useHistoryState<IPACatalogParty | null>(
     'selected_step1',
@@ -88,6 +87,8 @@ export function StepSearchParty({
   );
   const [dataFromAooUo, setDataFromAooUo] = useState<IPACatalogParty | null>();
   const [disabled, setDisabled] = useState<boolean>(false);
+
+  const isEnabledProduct2AooUo = product?.id === 'prod-pn';
 
   const handleSearchTaxCodeFromAooUo = async (query: string) => {
     const searchResponse = await fetchWithLogs(
@@ -106,13 +107,18 @@ export function StepSearchParty({
       setDataFromAooUo(undefined);
     }
   };
-  const prodPn = product?.id === 'prod-pn';
+
   const handleSearchByAooCode = async (query: string) => {
     const searchResponse = await fetchWithLogs(
       { endpoint: 'ONBOARDING_GET_AOO_CODE_INFO', endpointParams: { codiceUniAoo: query } },
       {
         method: 'GET',
-        params: { ...(prodPn && { categories: 'L6,L4,L45,L35,L5,L17,L15,C14', origin: 'IPA' }) },
+        params: {
+          ...(product?.id === 'prod-pn' && {
+            categories: filterByCategory(institutionType, product?.id),
+            origin: 'IPA',
+          }),
+        },
       },
       () => setRequiredLogin(true)
     );
@@ -131,7 +137,12 @@ export function StepSearchParty({
       { endpoint: 'ONBOARDING_GET_UO_CODE_INFO', endpointParams: { codiceUniUo: query } },
       {
         method: 'GET',
-        params: { ...(prodPn && { categories: 'L6,L4,L45,L35,L5,L17,L15,C14', origin: 'IPA' }) },
+        params: {
+          ...(product?.id === 'prod-pn' && {
+            categories: filterByCategory(institutionType, product?.id),
+            origin: 'IPA',
+          }),
+        },
       },
       () => setRequiredLogin(true)
     );
@@ -147,14 +158,14 @@ export function StepSearchParty({
   };
 
   useEffect(() => {
-    if (productAllowed) {
+    if (isEnabledProduct2AooUo) {
       if (subunitTypeByQuery === 'UO') {
         void handleSearchByUoCode(subunitCodeByQuery);
       } else if (subunitTypeByQuery === 'AOO') {
         void handleSearchByAooCode(subunitCodeByQuery);
       }
     }
-  }, [productAllowed]);
+  }, [isEnabledProduct2AooUo]);
 
   useEffect(() => {
     if (aooResult) {
@@ -230,7 +241,7 @@ export function StepSearchParty({
       selected &&
       partyExternalIdByQuery &&
       ((subunitCodeByQuery === '' && subunitTypeByQuery === '') ||
-        ((aooResult || uoResult) && productAllowed))
+        ((aooResult || uoResult) && isEnabledProduct2AooUo))
     ) {
       onForwardAction();
     }

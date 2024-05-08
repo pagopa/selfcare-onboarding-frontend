@@ -19,6 +19,7 @@ import { formatCity } from '../../utils/formatting-utils';
 import { StepBillingDataHistoryState } from '../steps/StepOnboardingFormData';
 import { ENV } from '../../utils/env';
 import { CountryResource } from '../../model/CountryResource';
+import { requiredError } from '../../utils/constants';
 import NumberDecimalFormat from './NumberDecimalFormat';
 
 const CustomTextField = styled(TextField)({
@@ -44,7 +45,8 @@ type Props = StepperStepComponentProps & {
   stepHistoryState: StepBillingDataHistoryState;
   setStepHistoryState: React.Dispatch<React.SetStateAction<StepBillingDataHistoryState>>;
   formik: any;
-  premiumFlow: boolean;
+  isDisabled: boolean;
+  isPremium: boolean;
   isInformationCompany: boolean;
   aooSelected?: AooData;
   uoSelected?: UoData;
@@ -65,7 +67,8 @@ export default function PersonalAndBillingDataSection({
   stepHistoryState,
   setStepHistoryState,
   formik,
-  premiumFlow,
+  isDisabled,
+  isPremium,
   isInformationCompany,
   aooSelected,
   uoSelected,
@@ -109,30 +112,23 @@ export default function PersonalAndBillingDataSection({
   }, [institutionLocationData]);
 
   useEffect(() => {
-    if (premiumFlow) {
+    if (isPremium) {
       setInstitutionLocationData({
         country: formik.values.country,
         county: formik.values.county,
         city: formik.values.city,
       });
     }
-  }, [premiumFlow]);
+  }, [isPremium]);
 
   const isFromIPA = origin === 'IPA';
-  const isPSP = institutionType === 'PSP';
-  const isPA = institutionType === 'PA';
+  const isPaymentServiceProvider = institutionType === 'PSP';
   const isContractingAuthority = institutionType === 'SA';
   const isInsuranceCompany = institutionType === 'AS';
-  const isDisabled = premiumFlow || (isFromIPA && !isPA && !isPSP) || isPA;
-  /*
-  const recipientCodeVisible =
-    !isContractingAuthority && !isTechPartner && !isInsuranceCompany && !isProdInterop;
-    */
-  const requiredError = 'Required';
   const isAooUo = !!(aooSelected || uoSelected);
 
   useEffect(() => {
-    if (!premiumFlow && (isFromIPA || isAooUo)) {
+    if (!isPremium && (isFromIPA || isAooUo)) {
       if (aooSelected?.codiceComuneISTAT) {
         void getLocationFromIstatCode(aooSelected.codiceComuneISTAT);
       } else if (uoSelected?.codiceComuneISTAT) {
@@ -143,7 +139,7 @@ export default function PersonalAndBillingDataSection({
         void getLocationFromIstatCode(retrievedIstat);
       }
     }
-  }, [isFromIPA, selectedParty, aooSelected, uoSelected, retrievedIstat, premiumFlow]);
+  }, [isFromIPA, selectedParty, aooSelected, uoSelected, retrievedIstat, isPremium]);
 
   useEffect(() => {
     if (isForeignInsurance) {
@@ -161,7 +157,7 @@ export default function PersonalAndBillingDataSection({
   const baseNumericFieldProps = (
     field: keyof OnboardingFormData,
     label: string,
-    fontWeight: number = isDisabled ? 400 : 600,
+    fontWeight: string | number = isDisabled ? 'fontWeightRegular' : 'fontWeightMedium',
     fontSize: number = 18,
     color: string = isDisabled ? theme.palette.text.secondary : theme.palette.text.primary
   ) => {
@@ -290,7 +286,6 @@ export default function PersonalAndBillingDataSection({
             </Box>
           )}
           {aooSelected ? (
-            // ao Description
             <>
               <Grid item xs={8}>
                 <CustomTextField
@@ -312,7 +307,6 @@ export default function PersonalAndBillingDataSection({
               </Grid>
             </>
           ) : uoSelected ? (
-            // uo Description
             <>
               <Grid item xs={8}>
                 <CustomTextField
@@ -334,7 +328,6 @@ export default function PersonalAndBillingDataSection({
               </Grid>
             </>
           ) : (
-            // Ragione sociale
             <Grid item xs={12}>
               <CustomTextField
                 {...baseTextFieldProps(
@@ -415,7 +408,7 @@ export default function PersonalAndBillingDataSection({
                   noOptionsText={t('onboardingFormData.billingDataSection.noResult')}
                   clearOnBlur={true}
                   forcePopupIcon={isFromIPA || !isCityEditable ? false : true}
-                  disabled={premiumFlow && isCityEditable ? false : isFromIPA || isAooUo}
+                  disabled={isPremium && isCityEditable ? false : isFromIPA || isAooUo}
                   ListboxProps={{
                     style: {
                       overflow: 'visible',
@@ -471,7 +464,7 @@ export default function PersonalAndBillingDataSection({
                             : theme.palette.text.primary,
                         },
                       }}
-                      disabled={premiumFlow && isCityEditable ? false : isFromIPA || isAooUo}
+                      disabled={isPremium && isCityEditable ? false : isFromIPA || isAooUo}
                     />
                   )}
                 />
@@ -578,8 +571,10 @@ export default function PersonalAndBillingDataSection({
               {...baseTextFieldProps(
                 'digitalAddress',
                 t('onboardingFormData.billingDataSection.digitalAddress'),
-                isDisabled ? 400 : 600,
-                isDisabled ? theme.palette.text.secondary : theme.palette.text.primary
+                isDisabled || isContractingAuthority || isInsuranceCompany ? 400 : 600,
+                isDisabled || isContractingAuthority || isInsuranceCompany
+                  ? theme.palette.text.secondary
+                  : theme.palette.text.primary
               )}
               disabled={isDisabled || isContractingAuthority || isInsuranceCompany}
             />
@@ -590,8 +585,12 @@ export default function PersonalAndBillingDataSection({
                 {...baseTextFieldProps(
                   'taxCode',
                   t('onboardingFormData.billingDataSection.taxCode'),
-                  isDisabled ? 400 : 600,
-                  isDisabled ? theme.palette.text.secondary : theme.palette.text.primary
+                  (isDisabled && !isAooUo) || isContractingAuthority || isInsuranceCompany
+                    ? 400
+                    : 600,
+                  (isDisabled && !isAooUo) || isContractingAuthority || isInsuranceCompany
+                    ? theme.palette.text.secondary
+                    : theme.palette.text.primary
                 )}
                 disabled={(isDisabled && !isAooUo) || isContractingAuthority || isInsuranceCompany}
               />
@@ -619,9 +618,9 @@ export default function PersonalAndBillingDataSection({
                   <Grid item>
                     <Box display="flex" alignItems="center">
                       <Checkbox
-                        id="onboardingFormData"
+                        id="taxCodeEquals2VatNumber"
                         checked={stepHistoryState.isTaxCodeEquals2PIVA}
-                        disabled={premiumFlow}
+                        disabled={isPremium}
                         inputProps={{
                           'aria-label': t(
                             'onboardingFormData.billingDataSection.taxCodeEquals2PIVAdescription'
@@ -697,14 +696,10 @@ export default function PersonalAndBillingDataSection({
                 <CustomTextField
                   {...baseTextFieldProps(
                     'vatNumber',
-                    t('onboardingFormData.billingDataSection.vatNumber'),
-                    600,
-                    stepHistoryState.isTaxCodeEquals2PIVA
-                      ? theme.palette.text.secondary
-                      : theme.palette.text.primary
+                    t('onboardingFormData.billingDataSection.vatNumber')
                   )}
                   value={formik.values.vatNumber}
-                  disabled={stepHistoryState.isTaxCodeEquals2PIVA || premiumFlow}
+                  disabled={stepHistoryState.isTaxCodeEquals2PIVA || isPremium}
                   onClick={() => setShrinkVatNumber(true)}
                   onBlur={() => setShrinkVatNumber(false)}
                   InputLabelProps={{
@@ -715,7 +710,7 @@ export default function PersonalAndBillingDataSection({
                   }}
                 />
               )}
-              {isPSP && formik.values.hasVatnumber && (
+              {isPaymentServiceProvider && formik.values.hasVatnumber && (
                 <Box display="flex" alignItems="center" mt="2px">
                   {/* Checkbox la aprtita IVA è di gruppo */}
                   <Checkbox
@@ -773,6 +768,7 @@ export default function PersonalAndBillingDataSection({
               />
             </Grid>
           )}
+          {/* TODO Write more clearly */}
           {/* institutionType !== 'PA' && institutionType !== 'PSP' && productId === 'prod-io'; */}
           {(isInformationCompany || isContractingAuthority) && (
             <>
@@ -835,7 +831,7 @@ export default function PersonalAndBillingDataSection({
               </Grid>
             </>
           )}
-          {isPSP && (
+          {isPaymentServiceProvider && (
             <>
               <Grid item xs={12}>
                 {/* n. Iscrizione al Registro delle Imprese */}
