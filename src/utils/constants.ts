@@ -130,7 +130,7 @@ export const USER_PLATFORM_ROLE_LABEL = {
 export const requiredError = 'Required';
 
 export const fiscalAndVatCodeRegexp = new RegExp(
-  /(^[A-Za-z]{6}[0-9lmnpqrstuvLMNPQRSTUV]{2}[abcdehlmprstABCDEHLMPRST]{1}[0-9lmnpqrstuvLMNPQRSTUV]{2}[A-Za-z]{1}[0-9lmnpqrstuvLMNPQRSTUV]{3}[A-Za-z]{1}$|^[0-9]{11}$)/
+  /^[A-Za-z]{6}[0-9lmnpqrstuvLMNPQRSTUV]{2}[abcdehlmprstABCDEHLMPRST][0-9lmnpqrstuvLMNPQRSTUV]{2}[A-Za-z][0-9lmnpqrstuvLMNPQRSTUV]{3}[A-Za-z]$|^[0-9]{11}$/
 );
 export const fiveCharactersAllowed = new RegExp('^\\d{5}$');
 export const reaValidation = new RegExp('^[A-Za-z]{2}');
