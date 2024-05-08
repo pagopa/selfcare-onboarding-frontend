@@ -182,7 +182,7 @@ export default function AsyncAutocompleteContainer({
         method: 'GET',
         params: {
           origin: 'IPA',
-          categories: filterByCategory,
+          categories: filterByCategory(institutionType, product?.id),
         },
       },
       () => setRequiredLogin(true)
@@ -208,7 +208,7 @@ export default function AsyncAutocompleteContainer({
         method: 'GET',
         params: {
           origin: 'IPA',
-          categories: filterByCategory,
+          categories: filterByCategory(institutionType, product?.id),
         },
       },
       () => setRequiredLogin(true)
