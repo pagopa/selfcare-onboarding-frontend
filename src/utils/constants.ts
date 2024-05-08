@@ -136,7 +136,7 @@ export const fiveCharactersAllowed = new RegExp('^\\d{5}$');
 export const reaValidation = new RegExp('^[A-Za-z]{2}');
 export const commercialRegisterNumberRegexp = new RegExp('^\\d{11}$');
 export const numericField = new RegExp('^[0-9]*$');
-export const currencyField = new RegExp(/^(0|[1-9]\d{0,2}(,\d{3})*)(\.\d{1,2})?$/);
+export const currencyField = new RegExp(/^(0|[1-9][0-9]*(?:(,[0-9]*)*|[0-9]*))((\\.|,)[0-9]+)*$/);
 export const onlyCharacters = new RegExp(/^[A-Za-z\s]*$/);
 
 export const filterByCategory = (institutionType?: string, productId?: string) =>
