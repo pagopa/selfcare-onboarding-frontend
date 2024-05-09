@@ -1,9 +1,16 @@
-import { screen } from '@testing-library/react';
+import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { useFormik } from 'formik';
 import React from 'react';
 import { OnboardingFormData } from '../../../model/OnboardingFormData';
 import { renderComponentWithProviders } from '../../../utils/test-utils';
 import PersonalAndBillingDataSection from '../PersonalAndBillingDataSection';
+import {
+  institutionTypes,
+  mockPartyRegistry,
+  mockedAooCode,
+  mockedProducts,
+  mockedUoCode,
+} from '../../../lib/__mocks__/mockApiRequests';
 
 jest.mock('formik', () => ({
   useFormik: jest.fn(),
@@ -29,15 +36,16 @@ const mockFormik = {
 
 const formik = {
   values: {
-    zipCode: '12345', // Mock zipCode value
+    businessName: '',
+    zipCode: '12345',
   },
   errors: {
-    zipCode: 'Invalid zip code', // Mock error message for zipCode
+    zipCode: 'Invalid zip code',
   },
-  setFieldValue: jest.fn(), // Mock setFieldValue function
-  setErrors: jest.fn(), // Mock setErrors function
-  setTouched: jest.fn(), // Mock setTouched function
-  handleChange: jest.fn(), // Mock handleChange function
+  setFieldValue: jest.fn(),
+  setErrors: jest.fn(),
+  setTouched: jest.fn(),
+  handleChange: jest.fn(),
 };
 
 const mockBaseTextFieldProps = (
@@ -53,7 +61,7 @@ const mockBaseTextFieldProps = (
     type: 'text',
     value: formik.values[field] || '',
     label,
-    error: isError || false, // Handle undefined or null errors
+    error: isError || false,
     helperText: isError ? formik.errors[field] : undefined,
     required: true,
     variant: 'outlined',
@@ -73,48 +81,188 @@ const mockBaseTextFieldProps = (
   };
 };
 
-test('should render PersonalAndBillingDataSection with institutionType PT. Codice Sdi input field and geo tax section should not visible in page', async () => {
-  renderComponentWithProviders(
-    <PersonalAndBillingDataSection
-      institutionType={'PT'}
-      baseTextFieldProps={mockBaseTextFieldProps}
-      stepHistoryState={{
-        externalInstitutionId: '',
-        isTaxCodeEquals2PIVA: false,
-      }}
-      setStepHistoryState={jest.fn()}
-      formik={formik}
-      premiumFlow={false}
-      isInformationCompany={false}
-      institutionAvoidGeotax={true}
-    />
-  );
-  const codiceSDI = screen.queryByText('Codice Sdi');
-  const geoTaxSupportMail = screen.queryByText('Indirizzo email visibile ai cittadini');
+test('Test: Rendered PersonalAndBillingDataSection component with all possible business cases', () => {
+  let componentRendered = false;
+  const conditionsMap = {};
+  let party;
+  let aooSelected;
+  let uoSelected;
 
-  expect(codiceSDI).not.toBeInTheDocument();
-  expect(geoTaxSupportMail).not.toBeInTheDocument();
-});
+  // TODO Temporary excluded the PSP institutionType
+  mockedProducts.forEach((product) => {
+    institutionTypes.forEach((institutionType) => {
+      if (!componentRendered) {
+        const productId = product.id;
 
-test('should render PersonalAndBillingDataSection with institutionType PA. Codice Sdi input field and geo tax section should be visible in page', async () => {
-  renderComponentWithProviders(
-    <PersonalAndBillingDataSection
-      institutionType={'PA'}
-      baseTextFieldProps={mockBaseTextFieldProps}
-      stepHistoryState={{
-        externalInstitutionId: '',
-        isTaxCodeEquals2PIVA: false,
-      }}
-      setStepHistoryState={jest.fn()}
-      formik={formik}
-      premiumFlow={false}
-      isInformationCompany={false}
-      institutionAvoidGeotax={false}
-      isRecipientCodeVisible={true}
-    />
-  );
+        switch (productId) {
+          case 'prod-pn':
+            aooSelected = mockedAooCode;
+            party = mockedAooCode;
+          case 'prod-pn-dev':
+            uoSelected = mockedUoCode;
+            party = mockedUoCode;
+          default:
+            party = mockPartyRegistry.items[0];
+        }
 
-  const geoTaxSupportMail = await screen.findByText('Indirizzo email visibile ai cittadini');
+        const institutionAvoidGeotax = ['PT', 'SA', 'AS'].includes(institutionType);
 
-  expect(geoTaxSupportMail).toBeInTheDocument();
+        const isInsuranceCompany = institutionType === 'AS';
+        const isForeignInsurance = party?.registerType?.includes('Elenco II');
+        const isPremium = !!product.parentId;
+        const isDisabled =
+          isPremium ||
+          (origin === 'IPA' && institutionType !== 'PA' && institutionType !== 'PSP') ||
+          institutionType === 'PA';
+        const isRecipientCodeVisible =
+          institutionType !== 'SA' &&
+          institutionType !== 'PT' &&
+          institutionType !== 'AS' &&
+          productId !== 'prod-interop';
+        const isInformationCompany =
+          (institutionType === 'GSP' || institutionType === 'SCP') &&
+          (productId === 'prod-io' || productId === 'prod-io-sign');
+
+        conditionsMap[`${productId}-${institutionType}`] = {
+          isPremium,
+          isRecipientCodeVisible,
+          isInformationCompany,
+          isForeignInsurance,
+          institutionAvoidGeotax,
+          isInsuranceCompany,
+        };
+
+        renderComponentWithProviders(
+          <PersonalAndBillingDataSection
+            productId={productId}
+            origin={party.origin}
+            institutionType={institutionType}
+            baseTextFieldProps={mockBaseTextFieldProps}
+            stepHistoryState={{
+              externalInstitutionId: '',
+              isTaxCodeEquals2PIVA: false,
+            }}
+            setStepHistoryState={jest.fn()}
+            formik={formik}
+            isPremium={isPremium}
+            isInformationCompany={isInformationCompany}
+            isForeignInsurance={isForeignInsurance}
+            institutionAvoidGeotax={institutionAvoidGeotax}
+            selectedParty={party}
+            isRecipientCodeVisible={isRecipientCodeVisible}
+            aooSelected={aooSelected}
+            uoSelected={uoSelected}
+            isDisabled={isDisabled}
+          />
+        );
+
+        componentRendered = true;
+      }
+    });
+  });
+
+  Object.keys(conditionsMap).forEach((key) => {
+    const {
+      isRecipientCodeVisible,
+      isInformationCompany,
+      isForeignInsurance,
+      institutionAvoidGeotax,
+      isInsuranceCompany,
+    } = conditionsMap[key];
+
+    const centralParty = screen.queryByText('Ente centrale');
+    const aooDenomination = screen.queryByText('Denominazione AOO');
+    const aooUniqueCode = screen.queryByText('Codice Univoco AOO');
+    const uoDenomination = screen.queryByText('Denominazione UO');
+    const uoUniqueCode = screen.queryByText('Denominazione UO');
+
+    const businessName = screen.queryByText('Ragione sociale');
+    const registeredOffice = screen.queryByText('Sede legale');
+    const fullLegalAddress = screen.queryByText('Indirizzo e numero civico della sede legale');
+    const zipCode = screen.getByText('CAP');
+    const city = document.getElementById(
+      isForeignInsurance ? 'city' : 'city-select'
+    ) as HTMLInputElement;
+    const county = screen.getByText('Provincia');
+    const country = screen.queryByText('Nazione');
+    const pec = screen.getByText('Indirizzo PEC');
+    const taxCode = screen.getByText('Codice Fiscale');
+    const vatNumber = screen.queryByText('Partita IVA');
+    const commercialRegisterNumber = screen.queryByText(
+      'Luogo di iscrizione al Registro delle Imprese (facoltativo)'
+    );
+    const rea = screen.queryByText('REA');
+    const sdiCode = screen.queryByText('Codice SDI');
+    const shareCapital = screen.queryByText('Capitale sociale (facoltativo)');
+    const visibleCitizenMail = screen.queryByText('Indirizzo email visibile ai cittadini');
+
+    if (aooSelected) {
+      expect(businessName).not.toBeInTheDocument();
+      expect(centralParty).toBeInTheDocument();
+      expect(aooDenomination).toBeInTheDocument();
+      expect(aooUniqueCode).toBeInTheDocument();
+    } else if (uoSelected) {
+      expect(businessName).not.toBeInTheDocument();
+      expect(centralParty).toBeInTheDocument();
+      expect(uoDenomination).toBeInTheDocument();
+      expect(uoUniqueCode).toBeInTheDocument();
+    } else {
+      expect(centralParty).not.toBeInTheDocument();
+      expect(aooDenomination).not.toBeInTheDocument();
+      expect(aooUniqueCode).not.toBeInTheDocument();
+      expect(uoDenomination).not.toBeInTheDocument();
+      expect(uoUniqueCode).not.toBeInTheDocument();
+
+      expect(businessName).toBeInTheDocument();
+    }
+
+    if (isInsuranceCompany) {
+      expect(registeredOffice).not.toBeInTheDocument();
+      expect(fullLegalAddress).toBeInTheDocument();
+    } else {
+      expect(registeredOffice).toBeInTheDocument();
+      expect(fullLegalAddress).not.toBeInTheDocument();
+    }
+
+    expect(city).toBeInTheDocument();
+    if (isForeignInsurance) {
+      expect(zipCode).not.toBeInTheDocument();
+      expect(county).not.toBeInTheDocument();
+      expect(country).toBeInTheDocument();
+    } else {
+      expect(zipCode).toBeInTheDocument();
+      expect(county).toBeInTheDocument();
+      expect(country).not.toBeInTheDocument();
+    }
+
+    expect(pec).toBeInTheDocument();
+    expect(taxCode).toBeInTheDocument();
+
+    if (isRecipientCodeVisible) {
+      expect(sdiCode).toBeInTheDocument();
+    } else {
+      expect(sdiCode).not.toBeInTheDocument();
+    }
+
+    if (isInformationCompany) {
+      expect(commercialRegisterNumber).toBeInTheDocument();
+      expect(rea).toBeInTheDocument();
+      expect(shareCapital).toBeInTheDocument();
+    } else {
+      expect(commercialRegisterNumber).not.toBeInTheDocument();
+      expect(rea).not.toBeInTheDocument();
+      expect(shareCapital).not.toBeInTheDocument();
+    }
+
+    if (institutionAvoidGeotax) {
+      expect(visibleCitizenMail).not.toBeInTheDocument();
+    } else {
+      expect(visibleCitizenMail).toBeInTheDocument();
+    }
+
+    const isTaxCodeEquals2PIVA = document.getElementById('taxCodeEquals2VatNumber');
+    expect(isTaxCodeEquals2PIVA).toBeFalsy();
+    const hasVatNumber = document.getElementById('party_without_vatnumber');
+    expect(hasVatNumber).toBeTruthy();
+  });
 });

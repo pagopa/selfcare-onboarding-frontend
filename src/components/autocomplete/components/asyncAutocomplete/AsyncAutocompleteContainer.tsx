@@ -13,6 +13,7 @@ import { AooData } from '../../../../model/AooData';
 import { InstitutionResource } from '../../../../model/InstitutionResource';
 import { UoData } from '../../../../model/UoModel';
 import { ENV } from '../../../../utils/env';
+import { filterByCategory } from '../../../../utils/constants';
 import AsyncAutocompleteResultsBusinessName from './components/AsyncAutocompleteResultsBusinessName';
 import AsyncAutocompleteResultsCode from './components/AsyncAutocompleteResultsCode';
 import AsyncAutocompleteSearch from './components/AsyncAutocompleteSearch';
@@ -95,13 +96,6 @@ export default function AsyncAutocompleteContainer({
 
   const showBusinessNameElement = input !== undefined && input.length >= 3;
 
-  const filterByCategory =
-    product?.id === 'prod-pn'
-      ? 'L6,L4,L45,L35,L5,L17,L15,C14'
-      : institutionType === 'GSP'
-      ? 'L37,SAG'
-      : 'C17,C16,L10,L19,L13,L2,C10,L20,L21,L22,L15,L1,C13,C5,L40,L11,L39,L46,L8,L34,L7,L35,L45,L47,L6,L12,L24,L28,L42,L36,L44,C8,C3,C7,C14,L16,C11,L33,C12,L43,C2,L38,C1,L5,L4,L31,L18,L17,S01,SA';
-
   const disabledButton =
     institutionType === 'GSP' && product?.id !== 'prod-interop'
       ? isBusinessNameSelected
@@ -163,7 +157,7 @@ export default function AsyncAutocompleteContainer({
         method: 'GET',
         params: {
           origin: 'IPA',
-          categories: filterByCategory,
+          categories: filterByCategory(institutionType, product?.id),
         },
       },
       () => setRequiredLogin(true)
@@ -188,7 +182,7 @@ export default function AsyncAutocompleteContainer({
         method: 'GET',
         params: {
           origin: 'IPA',
-          categories: filterByCategory,
+          categories: filterByCategory(institutionType, product?.id),
         },
       },
       () => setRequiredLogin(true)
@@ -214,7 +208,7 @@ export default function AsyncAutocompleteContainer({
         method: 'GET',
         params: {
           origin: 'IPA',
-          categories: filterByCategory,
+          categories: filterByCategory(institutionType, product?.id),
         },
       },
       () => setRequiredLogin(true)
@@ -277,7 +271,7 @@ export default function AsyncAutocompleteContainer({
           value,
           endpoint,
           ENV.MAX_INSTITUTIONS_FETCH,
-          filterByCategory
+          filterByCategory(institutionType, product?.id)
         );
     }
   };

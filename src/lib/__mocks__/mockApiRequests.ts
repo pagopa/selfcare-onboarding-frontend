@@ -8,6 +8,7 @@ import {
   UserOnCreate,
   InsuranceCompaniesResource,
   OnboardingRequestData,
+  InstitutionType,
 } from '../../../types';
 import { BillingDataDto } from '../../model/BillingData';
 import { GeographicTaxonomyResource, nationalValue } from '../../model/GeographicTaxonomies';
@@ -78,7 +79,7 @@ const createPartyEntity = (
   istatCode,
 });
 
-const mockPartyRegistry = {
+export const mockPartyRegistry = {
   items: [
     createPartyRegistryEntity(
       'id',
@@ -391,7 +392,7 @@ export const mockedGeotaxonomies: Array<GeographicTaxonomyResource> = [
   },
 ];
 
-const mockedAooCode: AooData = {
+export const mockedAooCode: AooData = {
   codAoo: 'A356E00',
   codiceFiscaleEnte: '92078570527',
   codiceIpa: '03YBQ4C7',
@@ -413,7 +414,7 @@ const mockedAooCode: AooData = {
   tipoMail1: 'Pec',
 };
 
-const mockedUoCode: UoData = {
+export const mockedUoCode: UoData = {
   codiceFiscaleEnte: '92078570527',
   codiceIpa: '03YBQ4C7',
   codiceUniUo: 'UF9YK6',
@@ -565,7 +566,7 @@ const mockedOnboardingData: Array<InstitutionOnboardingInfoResource> = [
 const statusActive = 'ACTIVE';
 const statusTesting = 'TESTING';
 
-const mockedProducts: Array<Product> = [
+export const mockedProducts: Array<Product> = [
   {
     id: 'prod-pn',
     title: 'SEND - Servizio Notifiche digitali',
@@ -629,7 +630,10 @@ const mockedProducts: Array<Product> = [
   },
 ];
 
-const mockedStationResource: StationResource = {
+// TODO Temporary excluded PSP
+export const institutionTypes: Array<InstitutionType> = ['PA', 'GSP', 'SCP', 'PT', 'AS', 'SA'];
+
+export const mockedStationResource: StationResource = {
   count: 0,
   items: [
     {
@@ -653,12 +657,12 @@ const mockedStationResource: StationResource = {
   ],
 };
 
-const mockedInsuranceResource: InsuranceCompaniesResource = {
+export const mockedInsuranceResource: InsuranceCompaniesResource = {
   count: 3,
   items: [
     {
       address: 'addres',
-      description: 'descriptionInsurance',
+      description: 'mocked foreign insurance company 1',
       digitalAddress: 'email@example.com',
       id: '12345678911',
       origin: 'IVASS',
@@ -669,7 +673,7 @@ const mockedInsuranceResource: InsuranceCompaniesResource = {
     },
     {
       address: 'addressd',
-      description: 'insur',
+      description: 'mocked foreign insurance company 2',
       digitalAddress: 'email@mailtest.com',
       id: '11987654321',
       origin: 'IVASS',
@@ -680,7 +684,7 @@ const mockedInsuranceResource: InsuranceCompaniesResource = {
     },
     {
       address: 'addressd54',
-      description: 'ins',
+      description: 'mocked italian insurance company 1',
       digitalAddress: 'email@mock.com',
       id: '66557744831',
       origin: 'IVASS',
@@ -691,7 +695,7 @@ const mockedInsuranceResource: InsuranceCompaniesResource = {
     },
     {
       address: 'addres',
-      description: 'emptyTaxcode',
+      description: 'mocked italian insurance company 2',
       digitalAddress: 'email@example.com',
       id: '11223323',
       origin: 'IVASS',
@@ -702,7 +706,7 @@ const mockedInsuranceResource: InsuranceCompaniesResource = {
     },
     {
       address: 'addres',
-      description: 'withoutTaxcode',
+      description: 'mocked italian insurance company without taxcode',
       digitalAddress: 'email@example.com',
       id: '11223323',
       origin: 'IVASS',

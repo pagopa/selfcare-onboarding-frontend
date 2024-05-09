@@ -1,13 +1,9 @@
-/* eslint-disable sonarjs/cognitive-complexity */
-/* eslint-disable complexity */
-
-import { Grid, TextField, Typography } from '@mui/material';
-import { Box, styled } from '@mui/system';
+import { Box, Grid, TextField } from '@mui/material';
+import { styled } from '@mui/system';
 import { AxiosError, AxiosResponse } from 'axios';
 import { theme } from '@pagopa/mui-italia';
-import { emailRegexp } from '@pagopa/selfcare-common-frontend/utils/constants';
 import { useFormik } from 'formik';
-import { useContext, useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useReducer, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
 import { uniqueId } from 'lodash';
@@ -22,7 +18,7 @@ import { fetchWithLogs } from '../../lib/api-utils';
 import { UserContext } from '../../lib/context';
 import { getFetchOutcome } from '../../lib/error-utils';
 import { AooData } from '../../model/AooData';
-import { GeographicTaxonomy, nationalValue } from '../../model/GeographicTaxonomies';
+import { GeographicTaxonomy } from '../../model/GeographicTaxonomies';
 import { OnboardingFormData } from '../../model/OnboardingFormData';
 import { UoData } from '../../model/UoModel';
 import { ENV } from '../../utils/env';
@@ -30,22 +26,14 @@ import { MessageNoAction } from '../MessageNoAction';
 import { OnboardingStepActions } from '../OnboardingStepActions';
 import DpoSection from '../onboardingFormData/DpoSection';
 import PersonalAndBillingDataSection from '../onboardingFormData/PersonalAndBillingDataSection';
-import GeoTaxSessionModal from '../onboardingFormData/taxonomy/GeoTaxSessionModal';
+import UpdateGeotaxonomy from '../onboardingFormData/taxonomy/UpdateGeotaxonomy';
 import GeoTaxonomySection from '../onboardingFormData/taxonomy/GeoTaxonomySection';
 import { useHistoryState } from '../useHistoryState';
-import { ErrorModalVatNumber } from '../onboardingFormData/ErrorPIVAModal';
-
-const fiscalAndVatCodeRegexp = new RegExp(
-  /(^[A-Za-z]{6}[0-9lmnpqrstuvLMNPQRSTUV]{2}[abcdehlmprstABCDEHLMPRST]{1}[0-9lmnpqrstuvLMNPQRSTUV]{2}[A-Za-z]{1}[0-9lmnpqrstuvLMNPQRSTUV]{3}[A-Za-z]{1}$|^[0-9]{11}$)/
-);
-
-const fiveCharactersAllowed = new RegExp('^\\d{5}$');
-const reaValidation = new RegExp('^[A-Za-z]{2}');
-
-const commercialRegisterNumberRegexp = new RegExp('^\\d{11}$');
-const numericField = new RegExp('^[0-9]*$');
-const currencyField = new RegExp('^(0|[1-9][0-9]*(?:(,[0-9]*)*|[0-9]*))((\\.|,)[0-9]+)*$');
-const onlyCharacters = new RegExp(/^[A-Za-z\s]*$/);
+import { VatNumberErrorModal } from '../onboardingFormData/VatNumberErrorModal';
+import { filterByCategory, requiredError } from '../../utils/constants';
+import Heading from '../onboardingFormData/Heading';
+import { validateFields } from '../../utils/validateFields';
+import { handleGeotaxonomies } from '../../utils/handleGeotaxonomies';
 
 export type StepBillingDataHistoryState = {
   externalInstitutionId: string;
@@ -74,6 +62,7 @@ type Props = StepperStepComponentProps & {
   isCityEditable?: boolean;
 };
 
+/* eslint-disable sonarjs/cognitive-complexity */
 export default function StepOnboardingFormData({
   initialFormData,
   back,
@@ -93,8 +82,6 @@ export default function StepOnboardingFormData({
   const { t } = useTranslation();
   const { setRequiredLogin } = useContext(UserContext);
 
-  const [openModifyModal, setOpenModifyModal] = useState<boolean>(false);
-  const [openAddModal, setOpenAddModal] = useState<boolean>(false);
   const [openVatNumberErrorModal, setOpenVatNumberErrorModal] = useState<boolean>(false);
   const [vatVerificationGenericError, setVatVerificationGenericError] = useState<boolean>(false);
   const [isVatRegistrated, setIsVatRegistrated] = useState<boolean>(false);
@@ -102,6 +89,17 @@ export default function StepOnboardingFormData({
     []
   );
   const [retrievedIstat, setRetrievedIstat] = useState<string>();
+
+  const [geotaxonomy, updateGeotaxonomy] = useReducer(
+    (prev: { add: boolean; edit: boolean }, next: { add: boolean; edit: boolean }) => ({
+      ...prev,
+      ...next,
+    }),
+    {
+      add: false,
+      edit: false,
+    }
+  );
 
   const [stepHistoryState, setStepHistoryState, setStepHistoryStateHistory] =
     useHistoryState<StepBillingDataHistoryState>('onboardingFormData', {
@@ -111,35 +109,25 @@ export default function StepOnboardingFormData({
     });
   const requestIdRef = useRef<string>();
 
-  const requiredError = 'Required';
-
   const institutionAvoidGeotax = ['PT', 'SA', 'AS'].includes(institutionType);
 
-  const premiumFlow = !!subProductId;
-  const isPSP = institutionType === 'PSP';
-  const isContractingAuthority = institutionType === 'SA';
-  const isInsuranceCompany = institutionType === 'AS';
+  const isPremium = !!subProductId;
+  const isPaymentServiceProvider = institutionType === 'PSP';
+
   const isInformationCompany =
-    institutionType !== 'PA' &&
-    institutionType !== 'PSP' &&
-    institutionType !== 'PT' &&
+    (institutionType === 'GSP' || institutionType === 'SCP') &&
     (productId === 'prod-io' || productId === 'prod-io-sign');
-  const isProdIoSign = productId === 'prod-io-sign';
   const isProdFideiussioni = productId?.startsWith('prod-fd') ?? false;
-  const isProdInterop = productId === 'prod-interop';
-  const aooCode = aooSelected?.codiceUniAoo;
-  const uoCode = uoSelected?.codiceUniUo;
   const isRecipientCodeVisible =
-    !isContractingAuthority && institutionType !== 'PT' && !isInsuranceCompany && !isProdInterop;
-
+    institutionType !== 'SA' &&
+    institutionType !== 'PT' &&
+    institutionType !== 'AS' &&
+    productId !== 'prod-interop';
   const isForeignInsurance = selectedParty?.registerType?.includes('Elenco II');
-
-  const filterByCategory =
-    productId === 'prod-pn'
-      ? 'L6,L4,L45,L35,L5,L17,L15,C14'
-      : institutionType === 'GSP'
-      ? 'L37,SAG'
-      : 'C17,C16,L10,L19,L13,L2,C10,L20,L21,L22,L15,L1,C13,C5,L40,L11,L39,L46,L8,L34,L7,L35,L45,L47,L6,L12,L24,L28,L42,L36,L44,C8,C3,C7,C14,L16,C11,L33,C12,L43,C2,L38,C1,L5,L4,L31,L18,L17,S01,SA';
+  const isDisabled =
+    isPremium ||
+    (origin === 'IPA' && institutionType !== 'PA' && !isPaymentServiceProvider) ||
+    institutionType === 'PA';
 
   const handleSearchByTaxCode = async (query: string) => {
     const searchResponse = await fetchWithLogs(
@@ -148,7 +136,7 @@ export default function StepOnboardingFormData({
         method: 'GET',
         params: {
           origin: 'IPA',
-          categories: filterByCategory,
+          categories: filterByCategory(institutionType, productId),
         },
       },
       () => setRequiredLogin(true)
@@ -170,7 +158,9 @@ export default function StepOnboardingFormData({
         method: 'GET',
         params: {
           taxCode: externalInstitutionId,
-          ...(aooSelected ? { subunitCode: aooCode } : uoSelected && { subunitCode: uoCode }),
+          ...(aooSelected
+            ? { subunitCode: aooSelected?.codiceUniAoo }
+            : uoSelected && { subunitCode: uoSelected?.codiceUniUo }),
         },
       },
       () => setRequiredLogin(true)
@@ -200,7 +190,7 @@ export default function StepOnboardingFormData({
   }, []);
 
   useEffect(() => {
-    if (premiumFlow) {
+    if (isPremium) {
       // eslint-disable-next-line functional/immutable-data
       requestIdRef.current = uniqueId(
         `onboarding-step-manager-${externalInstitutionId}-${productId}-${subProductId}`
@@ -217,7 +207,7 @@ export default function StepOnboardingFormData({
         void handleSearchByTaxCode(initialFormData.taxCode);
       }
     }
-  }, [premiumFlow]);
+  }, [isPremium]);
 
   const saveHistoryState = () => {
     setStepHistoryState(stepHistoryState);
@@ -249,187 +239,32 @@ export default function StepOnboardingFormData({
   const [_geotaxonomiesHistory, setGeotaxonomiesHistory, setGeotaxonomiesHistoryState] =
     useHistoryState<Array<GeographicTaxonomy>>('geotaxonomies', []);
 
-  const onBeforeForwardAction = () => {
-    if (
-      ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY &&
-      previousGeotaxononomies &&
-      previousGeotaxononomies.length > 0 &&
-      !institutionAvoidGeotax
-    ) {
-      const changedNational2Local =
-        previousGeotaxononomies.some((rv) => rv?.code === nationalValue) &&
-        !formik.values.geographicTaxonomies.some((gv) => gv?.code === nationalValue);
-      const changedToLocal2National =
-        !previousGeotaxononomies.some((rv) => rv?.code === nationalValue) &&
-        formik.values.geographicTaxonomies.some((gv) => gv?.code === nationalValue);
+  const onBeforeForwardAction = () =>
+    handleGeotaxonomies(
+      previousGeotaxononomies,
+      institutionAvoidGeotax,
+      formik,
+      updateGeotaxonomy,
+      onForwardAction
+    );
 
-      if (changedNational2Local || changedToLocal2National) {
-        setOpenModifyModal(true);
-      } else {
-        const deltaLength =
-          previousGeotaxononomies.length - formik.values.geographicTaxonomies.length;
-        // eslint-disable-next-line functional/no-let
-        let array1 = previousGeotaxononomies;
-        // eslint-disable-next-line functional/no-let
-        let array2 = formik.values.geographicTaxonomies;
-        if (deltaLength < 0) {
-          array2 = previousGeotaxononomies;
-          array1 = formik.values.geographicTaxonomies;
-        }
-        const arrayDifferences = array1.filter((elementarray1) =>
-          array2.some((elementArray2) => elementarray1?.code === elementArray2?.code) ? false : true
-        );
-        if (deltaLength === 0) {
-          if (arrayDifferences.length > 0) {
-            // modify element
-            setOpenModifyModal(true);
-          } else {
-            onForwardAction();
-          }
-        } else if (arrayDifferences.length === Math.abs(deltaLength)) {
-          if (deltaLength > 0) {
-            // remove element
-            setOpenModifyModal(true);
-          } else {
-            // add element
-            setOpenAddModal(true);
-          }
-        } else if (deltaLength > 0) {
-          // modify element
-          setOpenModifyModal(true);
-        } else if (deltaLength < 0) {
-          setOpenModifyModal(true);
-        } else {
-          onForwardAction();
-        }
-      }
-    } else {
-      onForwardAction();
-    }
-  };
+  const handleClose = () => updateGeotaxonomy({ add: false, edit: false });
 
-  const handleClose = () => {
-    if (openModifyModal) {
-      setOpenModifyModal(false);
-    } else {
-      setOpenAddModal(false);
-    }
-  };
-
-  // eslint-disable-next-line sonarjs/cognitive-complexity
   const validate = (values: Partial<OnboardingFormData>) =>
     Object.fromEntries(
-      Object.entries({
-        businessName: !values.businessName ? requiredError : undefined,
-        registeredOffice: !values.registeredOffice ? requiredError : undefined,
-        zipCode:
-          !values.zipCode && !values.isForeignInsurance
-            ? requiredError
-            : values.zipCode && !fiveCharactersAllowed.test(values.zipCode ?? '')
-            ? t('onboardingFormData.billingDataSection.invalidZipCode')
-            : undefined,
-        taxCode:
-          !values.taxCode && !isInsuranceCompany
-            ? requiredError
-            : values.taxCode && !fiscalAndVatCodeRegexp.test(values.taxCode)
-            ? t('onboardingFormData.billingDataSection.invalidFiscalCode')
-            : undefined,
-        vatNumber:
-          !values.vatNumber && values.hasVatnumber
-            ? requiredError
-            : values.vatNumber && !fiscalAndVatCodeRegexp.test(values.vatNumber)
-            ? t('onboardingFormData.billingDataSection.invalidVatNumber')
-            : isVatRegistrated
-            ? t('onboardingFormData.billingDataSection.vatNumberAlreadyRegistered')
-            : vatVerificationGenericError
-            ? requiredError
-            : undefined,
-        city: !values.city
-          ? requiredError
-          : values.isForeignInsurance
-          ? !onlyCharacters.test(values.city) // TODO Add error helperText when available
-          : undefined,
-        county: !values.county && !isInsuranceCompany ? requiredError : undefined,
-        country:
-          !values.country && values.isForeignInsurance
-            ? requiredError
-            : isInsuranceCompany && values?.country
-            ? !onlyCharacters.test(values.country)
-            : undefined,
-        ivassCode: isInsuranceCompany && !values.ivassCode ? requiredError : undefined,
-        digitalAddress: !values.digitalAddress
-          ? requiredError
-          : !emailRegexp.test(values.digitalAddress)
-          ? t('onboardingFormData.billingDataSection.invalidEmail')
-          : undefined,
-        commercialRegisterNumber:
-          isPSP && !values.commercialRegisterNumber
-            ? requiredError
-            : values.commercialRegisterNumber &&
-              !commercialRegisterNumberRegexp.test(values.commercialRegisterNumber) &&
-              isPSP
-            ? t(
-                'onboardingFormData.billingDataSection.pspDataSection.invalidCommercialRegisterNumber'
-              )
-            : undefined,
-        businessRegisterPlace:
-          isContractingAuthority && !values.businessRegisterPlace ? requiredError : undefined,
-        registrationInRegister: isPSP && !values.registrationInRegister ? requiredError : undefined,
-        dpoAddress: isPSP && !values.dpoAddress ? requiredError : undefined,
-        registerNumber:
-          isPSP && !values.registerNumber
-            ? requiredError
-            : isPSP && values.registerNumber && !numericField.test(values.registerNumber)
-            ? t('onboardingFormData.billingDataSection.pspDataSection.invalidregisterNumber')
-            : undefined,
-        abiCode:
-          isPSP && !values.abiCode
-            ? requiredError
-            : isPSP && values.abiCode && !fiveCharactersAllowed.test(values.abiCode)
-            ? t('onboardingFormData.billingDataSection.pspDataSection.invalidabiCode')
-            : undefined,
-        dopEmailAddress:
-          isPSP && !values.dopEmailAddress
-            ? requiredError
-            : isPSP && values.dopEmailAddress && !emailRegexp.test(values.dopEmailAddress)
-            ? t('onboardingFormData.billingDataSection.invalidEmail')
-            : undefined,
-        dpoPecAddress:
-          isPSP && !values.dpoPecAddress
-            ? requiredError
-            : isPSP && values.dpoPecAddress && !emailRegexp.test(values.dpoPecAddress)
-            ? t('onboardingFormData.billingDataSection.invalidEmail')
-            : undefined,
-        recipientCode: isRecipientCodeVisible && !values.recipientCode ? requiredError : undefined,
-        geographicTaxonomies:
-          ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY &&
-          !institutionAvoidGeotax &&
-          (!values.geographicTaxonomies ||
-            values.geographicTaxonomies.length === 0 ||
-            values.geographicTaxonomies.some(
-              (geoValue) => geoValue?.code === '' || geoValue === null
-            ))
-            ? requiredError
-            : undefined,
-        rea:
-          isInformationCompany && !values.rea
-            ? requiredError
-            : !reaValidation.test(values.rea as string)
-            ? t('onboardingFormData.billingDataSection.invalidReaField')
-            : undefined,
-        shareCapital:
-          isContractingAuthority && !values.shareCapital
-            ? requiredError
-            : values.shareCapital && !currencyField.test(values.shareCapital)
-            ? t('onboardingFormData.billingDataSection.invalidShareCapitalField')
-            : undefined,
-        supportEmail:
-          !institutionAvoidGeotax && !values.supportEmail && !premiumFlow && isProdIoSign
-            ? requiredError
-            : !emailRegexp.test(values.supportEmail as string) && values.supportEmail
-            ? t('onboardingFormData.billingDataSection.invalidMailSupport')
-            : undefined,
-      }).filter(([_key, value]) => value)
+      validateFields(
+        values,
+        t,
+        institutionType,
+        isVatRegistrated,
+        vatVerificationGenericError,
+        isPaymentServiceProvider,
+        isRecipientCodeVisible,
+        isInformationCompany,
+        institutionAvoidGeotax,
+        isPremium,
+        productId
+      )
     );
 
   const formik = useFormik<OnboardingFormData>({
@@ -512,11 +347,11 @@ export default function StepOnboardingFormData({
 
   useEffect(() => {
     if (
-      (isProdFideiussioni && formik.values.vatNumber && formik.values.vatNumber.length === 11) ||
-      (isProdFideiussioni &&
-        stepHistoryState.isTaxCodeEquals2PIVA &&
-        formik.values.taxCode &&
-        formik.values.taxCode.length === 11)
+      isProdFideiussioni &&
+      ((formik.values.vatNumber && formik.values.vatNumber.length === 11) ||
+        (stepHistoryState.isTaxCodeEquals2PIVA &&
+          formik.values.taxCode &&
+          formik.values.taxCode.length === 11))
     ) {
       void verifyVatNumber();
     }
@@ -525,10 +360,8 @@ export default function StepOnboardingFormData({
   const baseTextFieldProps = (
     field: keyof OnboardingFormData,
     label: string,
-    fontWeight: number = origin === 'IPA' || premiumFlow ? 400 : 600,
-    color: string = origin === 'IPA' || premiumFlow
-      ? theme.palette.text.secondary
-      : theme.palette.text.primary
+    fontWeight: string | number = isDisabled ? 'fontWeightRegular' : 'fontWeightMedium',
+    color: string = isDisabled ? theme.palette.text.secondary : theme.palette.text.primary
   ) => {
     const isError = !!formik.errors[field] && formik.errors[field] !== requiredError;
     return {
@@ -561,22 +394,14 @@ export default function StepOnboardingFormData({
   ) : (
     <Box display="flex" justifyContent="center">
       <Grid container item xs={8} display="flex" justifyContent="center">
-        <Grid item xs={12}>
-          <Typography variant="h3" component="h2" align="center" sx={{ lineHeight: '1.2' }}>
-            {institutionType === 'PSP' || productId === 'prod-pagopa'
-              ? t('onboardingFormData.pspAndProdPagoPATitle')
-              : institutionType === 'PT'
-              ? t('onboardingFormData.billingDataPt.title')
-              : t('onboardingFormData.title')}
-          </Typography>
-        </Grid>
-        <Grid container item justifyContent="center" mt={2} mb={4}>
-          <Grid item xs={premiumFlow ? 7 : 12}>
-            <Typography variant="body1" align="center">
-              {subtitle}
-            </Typography>
-          </Grid>
-        </Grid>
+        <Heading
+          t={t}
+          institutionType={institutionType}
+          productId={productId}
+          subtitle={subtitle}
+          isPremium={isPremium}
+          isPaymentServiceProvider={isPaymentServiceProvider}
+        />
         <PersonalAndBillingDataSection
           productId={productId}
           origin={origin}
@@ -585,7 +410,8 @@ export default function StepOnboardingFormData({
           stepHistoryState={stepHistoryState}
           setStepHistoryState={setStepHistoryState}
           formik={formik}
-          premiumFlow={premiumFlow}
+          isDisabled={isDisabled}
+          isPremium={isPremium}
           isInformationCompany={isInformationCompany}
           isForeignInsurance={isForeignInsurance}
           aooSelected={aooSelected}
@@ -596,8 +422,8 @@ export default function StepOnboardingFormData({
           isCityEditable={isCityEditable}
           isRecipientCodeVisible={isRecipientCodeVisible}
         />
-        {/* DATI RELATIVI ALLA TASSONOMIA */}
-        {ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY && !institutionAvoidGeotax ? (
+
+        {ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY && !institutionAvoidGeotax && (
           <Grid item xs={12} display="flex" justifyContent={'center'}>
             <GeoTaxonomySection
               retrievedTaxonomies={previousGeotaxononomies}
@@ -607,10 +433,8 @@ export default function StepOnboardingFormData({
               formik={formik}
             />
           </Grid>
-        ) : (
-          <></>
         )}
-        {isPSP && <DpoSection baseTextFieldProps={baseTextFieldProps} />}
+        {isPaymentServiceProvider && <DpoSection baseTextFieldProps={baseTextFieldProps} />}
         <Grid item xs={12} my={2}>
           <OnboardingStepActions
             back={{
@@ -625,18 +449,16 @@ export default function StepOnboardingFormData({
             }}
           />
         </Grid>
+        <UpdateGeotaxonomy
+          geotaxonomy={geotaxonomy}
+          onForwardAction={onForwardAction}
+          handleClose={handleClose}
+        />
+        <VatNumberErrorModal
+          openVatNumberErrorModal={openVatNumberErrorModal}
+          setOpenVatNumberErrorModal={setOpenVatNumberErrorModal}
+        />
       </Grid>
-
-      <GeoTaxSessionModal
-        openModifyModal={openModifyModal}
-        openAddModal={openAddModal}
-        onForwardAction={onForwardAction}
-        handleClose={handleClose}
-      />
-      <ErrorModalVatNumber
-        openVatNumberErrorModal={openVatNumberErrorModal}
-        setOpenVatNumberErrorModal={setOpenVatNumberErrorModal}
-      />
     </Box>
   );
 }

@@ -123,7 +123,7 @@ function StepOnboardingData({
   };
 
   useEffect(() => {
-    if (subProductFlow === true) {
+    if (subProductFlow) {
       void submit();
     } else {
       forward(undefined, institutionType, undefined);
