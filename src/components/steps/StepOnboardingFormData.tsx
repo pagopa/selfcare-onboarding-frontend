@@ -115,8 +115,9 @@ export default function StepOnboardingFormData({
   const isPaymentServiceProvider = institutionType === 'PSP';
 
   const isInformationCompany =
+    origin !== 'IPA' &&
     (institutionType === 'GSP' || institutionType === 'SCP') &&
-    (productId === 'prod-io' || productId === 'prod-io-sign');
+    (productId === 'prod-io' || productId === 'prod-io-sign' || productId === 'prod-pagopa');
   const isProdFideiussioni = productId?.startsWith('prod-fd') ?? false;
   const isRecipientCodeVisible =
     institutionType !== 'SA' &&
