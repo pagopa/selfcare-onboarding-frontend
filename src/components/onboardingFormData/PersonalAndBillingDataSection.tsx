@@ -734,12 +734,12 @@ export default function PersonalAndBillingDataSection({
                 <Grid item xs={12} mt={3}>
                   <CustomTextField
                     {...baseTextFieldProps(
-                      'sfeTaxCode',
-                      t('onboardingFormData.billingDataSection.sfeTaxCode'),
+                      'taxCodeInvoicing',
+                      t('onboardingFormData.billingDataSection.taxCodeInvoicing'),
                       600,
                       theme.palette.text.primary
                     )}
-                    value={formik.values.sfeTaxCode}
+                    value={formik.values.taxCodeInvoicing}
                   />
                 </Grid>
               )}
