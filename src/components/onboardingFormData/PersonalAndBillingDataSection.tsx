@@ -735,7 +735,9 @@ export default function PersonalAndBillingDataSection({
                   <CustomTextField
                     {...baseTextFieldProps(
                       'sfeTaxCode',
-                      t('onboardingFormData.billingDataSection.sfeTaxCode')
+                      t('onboardingFormData.billingDataSection.sfeTaxCode'),
+                      600,
+                      theme.palette.text.primary
                     )}
                     value={formik.values.sfeTaxCode}
                   />

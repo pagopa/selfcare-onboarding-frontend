@@ -439,7 +439,7 @@ const executeAdvancedSearchForAoo = async () => {
   expect(inputPartyName).toBeTruthy();
   fireEvent.change(inputPartyName, { target: { value: 'A356E00' } });
 
-  const partyNameSelection = await waitFor(() => screen.getByText('denominazione aoo test'));
+  const partyNameSelection = await waitFor(() => screen.getByText('denominazione aoo test 1'));
 
   expect(fetchWithLogsSpy).toBeCalledTimes(3);
 
@@ -455,7 +455,7 @@ const executeAdvancedSearchForAoo = async () => {
   const aooName = document.getElementById('aooName') as HTMLInputElement;
 
   await waitFor(() => expect(aooCode.value).toBe('A356E00'));
-  await waitFor(() => expect(aooName.value).toBe('Denominazione Aoo Test'));
+  await waitFor(() => expect(aooName.value).toBe('Denominazione Aoo Test 1'));
 
   const searchCitySelect = document.getElementById('city-select') as HTMLInputElement;
   expect(searchCitySelect.value).toBe('Palermo');
