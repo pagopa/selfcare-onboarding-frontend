@@ -119,7 +119,7 @@ export default function StepOnboardingFormData({
     (institutionType === 'GSP' || institutionType === 'SCP') &&
     (productId === 'prod-io' || productId === 'prod-io-sign' || productId === 'prod-pagopa');
   const isProdFideiussioni = productId?.startsWith('prod-fd') ?? false;
-  const isRecipientCodeVisible =
+  const canInvoice =
     institutionType !== 'SA' &&
     institutionType !== 'PT' &&
     institutionType !== 'AS' &&
@@ -260,7 +260,7 @@ export default function StepOnboardingFormData({
         isVatRegistrated,
         vatVerificationGenericError,
         isPaymentServiceProvider,
-        isRecipientCodeVisible,
+        canInvoice,
         isInformationCompany,
         institutionAvoidGeotax,
         isPremium,
@@ -421,7 +421,7 @@ export default function StepOnboardingFormData({
           selectedParty={selectedParty}
           retrievedIstat={retrievedIstat}
           isCityEditable={isCityEditable}
-          isRecipientCodeVisible={isRecipientCodeVisible}
+          canInvoice={canInvoice}
         />
 
         {ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY && !institutionAvoidGeotax && (

@@ -516,6 +516,7 @@ export default {
       vatNumberGroup: 'La Partita IVA è di gruppo',
       taxCode: 'Codice Fiscale',
       vatNumber: 'Partita IVA',
+      sfeTaxCode: 'Codice Fiscale SFE',
       ivassCode: 'Codice IVASS',
       sdiCode: 'Codice SDI',
       recipientCodeDescription: 'È il codice necessario per ricevere le fatture elettroniche',

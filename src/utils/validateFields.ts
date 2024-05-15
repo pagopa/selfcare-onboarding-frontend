@@ -23,7 +23,7 @@ export const validateFields = (
   isVatRegistrated: boolean,
   vatVerificationGenericError: boolean,
   isPaymentServiceProvider: boolean,
-  isRecipientCodeVisible: boolean,
+  canInvoice: boolean,
   isInformationCompany: boolean,
   institutionAvoidGeotax: boolean,
   isPremium: boolean,
@@ -115,7 +115,7 @@ export const validateFields = (
           !emailRegexp.test(values.dpoPecAddress)
         ? t('onboardingFormData.billingDataSection.invalidEmail')
         : undefined,
-    recipientCode: isRecipientCodeVisible && !values.recipientCode ? requiredError : undefined,
+    recipientCode: canInvoice && !values.recipientCode ? requiredError : undefined,
     geographicTaxonomies:
       ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY &&
       !institutionAvoidGeotax &&
