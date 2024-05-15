@@ -239,6 +239,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
     forward();
   };
 
+  /* eslint-disable complexity */
   const forwardWithDataAndInstitution = (
     newFormData: Partial<FormData>,
     party: Party,
@@ -289,6 +290,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
         ? uoResult.codiceFiscaleEnte
         : party.taxCode,
       vatNumber: '',
+      sfeTaxCode: uoResult?.codiceFiscaleSfe,
       zipCode: aooResult ? aooResult.CAP : uoResult ? uoResult.CAP : party.zipCode,
       geographicTaxonomies: onboardingFormData?.geographicTaxonomies as Array<GeographicTaxonomy>,
       ivassCode: institutionType === 'AS' ? party.originId : undefined,

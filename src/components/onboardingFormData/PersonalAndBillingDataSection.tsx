@@ -55,7 +55,7 @@ type Props = StepperStepComponentProps & {
   productId?: string;
   retrievedIstat?: string;
   isCityEditable?: boolean;
-  isRecipientCodeVisible: boolean;
+  canInvoice: boolean;
   isForeignInsurance?: boolean;
 };
 
@@ -76,7 +76,7 @@ export default function PersonalAndBillingDataSection({
   selectedParty,
   retrievedIstat,
   isCityEditable,
-  isRecipientCodeVisible,
+  canInvoice,
   isForeignInsurance,
   productId,
 }: Props) {
@@ -157,9 +157,9 @@ export default function PersonalAndBillingDataSection({
   const baseNumericFieldProps = (
     field: keyof OnboardingFormData,
     label: string,
-    fontWeight: string | number = isDisabled ? 'fontWeightRegular' : 'fontWeightMedium',
+    fontWeight: string | number = 'fontWeightMedium',
     fontSize: number = 18,
-    color: string = isDisabled ? theme.palette.text.secondary : theme.palette.text.primary
+    color: string = isDisabled ? theme.palette.text.disabled : theme.palette.text.primary
   ) => {
     const isError = !!formik.errors[field] && formik.errors[field] !== requiredError;
     return {
@@ -291,7 +291,9 @@ export default function PersonalAndBillingDataSection({
                 <CustomTextField
                   {...baseTextFieldProps(
                     'aooName',
-                    t('onboardingFormData.billingDataSection.aooName')
+                    t('onboardingFormData.billingDataSection.aooName'),
+                    600,
+                    isDisabled ? theme.palette.text.disabled : theme.palette.text.primary
                   )}
                   disabled={isDisabled}
                 />
@@ -300,7 +302,9 @@ export default function PersonalAndBillingDataSection({
                 <CustomTextField
                   {...baseTextFieldProps(
                     'aooUniqueCode',
-                    t('onboardingFormData.billingDataSection.aooUniqueCode')
+                    t('onboardingFormData.billingDataSection.aooUniqueCode'),
+                    600,
+                    isDisabled ? theme.palette.text.disabled : theme.palette.text.primary
                   )}
                   disabled={isDisabled}
                 />
@@ -312,7 +316,9 @@ export default function PersonalAndBillingDataSection({
                 <CustomTextField
                   {...baseTextFieldProps(
                     'uoName',
-                    t('onboardingFormData.billingDataSection.uoName')
+                    t('onboardingFormData.billingDataSection.uoName'),
+                    600,
+                    isDisabled ? theme.palette.text.disabled : theme.palette.text.primary
                   )}
                   disabled={isDisabled}
                 />
@@ -321,7 +327,9 @@ export default function PersonalAndBillingDataSection({
                 <CustomTextField
                   {...baseTextFieldProps(
                     'uoUniqueCode',
-                    t('onboardingFormData.billingDataSection.uoUniqueCode')
+                    t('onboardingFormData.billingDataSection.uoUniqueCode'),
+                    600,
+                    isDisabled ? theme.palette.text.disabled : theme.palette.text.primary
                   )}
                   disabled={isDisabled}
                 />
@@ -332,7 +340,11 @@ export default function PersonalAndBillingDataSection({
               <CustomTextField
                 {...baseTextFieldProps(
                   'businessName',
-                  t('onboardingFormData.billingDataSection.businessName')
+                  t('onboardingFormData.billingDataSection.businessName'),
+                  600,
+                  isDisabled || isContractingAuthority || isInsuranceCompany
+                    ? theme.palette.text.disabled
+                    : theme.palette.text.primary
                 )}
                 disabled={isDisabled || isContractingAuthority || isInsuranceCompany}
               />
@@ -346,7 +358,11 @@ export default function PersonalAndBillingDataSection({
                   'registeredOffice',
                   isInsuranceCompany
                     ? t('onboardingFormData.billingDataSection.fullLegalAddress')
-                    : t('onboardingFormData.billingDataSection.registeredOffice')
+                    : t('onboardingFormData.billingDataSection.registeredOffice'),
+                  600,
+                  !isAooUo && isDisabled && !isInsuranceCompany
+                    ? theme.palette.text.disabled
+                    : theme.palette.text.primary
                 )}
                 disabled={!isAooUo && isDisabled && !isInsuranceCompany}
               />
@@ -370,7 +386,12 @@ export default function PersonalAndBillingDataSection({
             <Grid item xs={7}>
               {isInsuranceCompany && isForeignInsurance ? (
                 <CustomTextField
-                  {...baseTextFieldProps('city', t('onboardingFormData.billingDataSection.city'))}
+                  {...baseTextFieldProps(
+                    'city',
+                    t('onboardingFormData.billingDataSection.city'),
+                    600,
+                    isDisabled ? theme.palette.text.disabled : theme.palette.text.primary
+                  )}
                   disabled={isDisabled}
                 />
               ) : (
@@ -457,14 +478,15 @@ export default function PersonalAndBillingDataSection({
                       sx={{
                         '& .MuiOutlinedInput-input.MuiInputBase-input': {
                           marginLeft: '15px',
-                          fontWeight: isFromIPA ? 'fontWeightRegular' : 'fontWeightMedium',
+                          fontWeight: 'fontWeightMedium',
                           textTransform: 'capitalize',
-                          color: isFromIPA
-                            ? theme.palette.text.secondary
-                            : theme.palette.text.primary,
+                          color:
+                            isFromIPA || isAooUo
+                              ? theme.palette.text.disabled
+                              : theme.palette.text.primary,
                         },
                       }}
-                      disabled={isPremium && isCityEditable ? false : isFromIPA || isAooUo}
+                      disabled={isFromIPA || isAooUo}
                     />
                   )}
                 />
@@ -554,10 +576,8 @@ export default function PersonalAndBillingDataSection({
                   {...baseTextFieldProps(
                     'county',
                     t('onboardingFormData.billingDataSection.county'),
-                    isFromIPA || institutionLocationData?.county ? 400 : 600,
-                    isFromIPA || institutionLocationData?.county
-                      ? theme.palette.text.secondary
-                      : theme.palette.text.primary
+                    600,
+                    theme.palette.text.disabled
                   )}
                   disabled={true}
                 />
@@ -571,9 +591,9 @@ export default function PersonalAndBillingDataSection({
               {...baseTextFieldProps(
                 'digitalAddress',
                 t('onboardingFormData.billingDataSection.digitalAddress'),
-                isDisabled || isContractingAuthority || isInsuranceCompany ? 400 : 600,
+                600,
                 isDisabled || isContractingAuthority || isInsuranceCompany
-                  ? theme.palette.text.secondary
+                  ? theme.palette.text.disabled
                   : theme.palette.text.primary
               )}
               disabled={isDisabled || isContractingAuthority || isInsuranceCompany}
@@ -585,11 +605,9 @@ export default function PersonalAndBillingDataSection({
                 {...baseTextFieldProps(
                   'taxCode',
                   t('onboardingFormData.billingDataSection.taxCode'),
+                  600,
                   (isDisabled && !isAooUo) || isContractingAuthority || isInsuranceCompany
-                    ? 400
-                    : 600,
-                  (isDisabled && !isAooUo) || isContractingAuthority || isInsuranceCompany
-                    ? theme.palette.text.secondary
+                    ? theme.palette.text.disabled
                     : theme.palette.text.primary
                 )}
                 disabled={(isDisabled && !isAooUo) || isContractingAuthority || isInsuranceCompany}
@@ -608,9 +626,7 @@ export default function PersonalAndBillingDataSection({
                   ? 3
                   : 0
               }
-              mb={
-                !formik.values.hasVatnumber && isRecipientCodeVisible && isInsuranceCompany ? -3 : 0
-              }
+              mb={!formik.values.hasVatnumber && canInvoice && isInsuranceCompany ? -3 : 0}
             >
               {!isForeignInsurance &&
                 formik.values.hasVatnumber &&
@@ -653,7 +669,7 @@ export default function PersonalAndBillingDataSection({
                   <Box
                     display="flex"
                     alignItems="center"
-                    marginBottom={!formik.values.hasVatnumber && isRecipientCodeVisible ? -2 : 0}
+                    marginBottom={!formik.values.hasVatnumber && canInvoice ? -2 : 0}
                   >
                     <Checkbox
                       id="party_without_vatnumber"
@@ -696,7 +712,11 @@ export default function PersonalAndBillingDataSection({
                 <CustomTextField
                   {...baseTextFieldProps(
                     'vatNumber',
-                    t('onboardingFormData.billingDataSection.vatNumber')
+                    t('onboardingFormData.billingDataSection.vatNumber'),
+                    600,
+                    stepHistoryState.isTaxCodeEquals2PIVA || isPremium
+                      ? theme.palette.text.disabled
+                      : theme.palette.text.primary
                   )}
                   value={formik.values.vatNumber}
                   disabled={stepHistoryState.isTaxCodeEquals2PIVA || isPremium}
@@ -710,6 +730,20 @@ export default function PersonalAndBillingDataSection({
                   }}
                 />
               )}
+              {uoSelected && canInvoice && (
+                <Grid item xs={12} mt={3}>
+                  <CustomTextField
+                    {...baseTextFieldProps(
+                      'sfeTaxCode',
+                      t('onboardingFormData.billingDataSection.sfeTaxCode'),
+                      600,
+                      theme.palette.text.primary
+                    )}
+                    value={formik.values.sfeTaxCode}
+                  />
+                </Grid>
+              )}
+
               {isPaymentServiceProvider && formik.values.hasVatnumber && (
                 <Box display="flex" alignItems="center" mt="2px">
                   {/* Checkbox la aprtita IVA è di gruppo */}
@@ -728,7 +762,7 @@ export default function PersonalAndBillingDataSection({
                   </Typography>
                 </Box>
               )}
-              {isRecipientCodeVisible && (
+              {canInvoice && (
                 <Grid item xs={12} mt={3}>
                   <CustomTextField
                     {...baseTextFieldProps(
@@ -761,7 +795,7 @@ export default function PersonalAndBillingDataSection({
                   'ivassCode',
                   t('onboardingFormData.billingDataSection.ivassCode'),
                   600,
-                  theme.palette.text.primary
+                  theme.palette.text.disabled
                 )}
                 value={formik.values.ivassCode}
                 disabled={true}
@@ -867,7 +901,8 @@ export default function PersonalAndBillingDataSection({
                   {...baseTextFieldProps(
                     'registerNumber',
                     t('onboardingFormData.billingDataSection.pspDataSection.registerNumber'),
-                    600
+                    600,
+                    theme.palette.text.primary
                   )}
                 />
               </Grid>
@@ -877,7 +912,8 @@ export default function PersonalAndBillingDataSection({
                   {...baseTextFieldProps(
                     'abiCode',
                     t('onboardingFormData.billingDataSection.pspDataSection.abiCode'),
-                    600
+                    600,
+                    theme.palette.text.primary
                   )}
                 />
               </Grid>

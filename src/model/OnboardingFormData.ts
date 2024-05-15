@@ -8,6 +8,7 @@ export type OnboardingFormData = {
   zipCode?: string;
   taxCode?: string;
   vatNumber?: string;
+  sfeTaxCode?: string;
   county?: string;
   country?: string;
   extendedCountry?: string;

@@ -114,7 +114,7 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
           isPremium ||
           (origin === 'IPA' && institutionType !== 'PA' && institutionType !== 'PSP') ||
           institutionType === 'PA';
-        const isRecipientCodeVisible =
+        const canInvoice =
           institutionType !== 'SA' &&
           institutionType !== 'PT' &&
           institutionType !== 'AS' &&
@@ -125,7 +125,7 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
 
         conditionsMap[`${productId}-${institutionType}`] = {
           isPremium,
-          isRecipientCodeVisible,
+          canInvoice,
           isInformationCompany,
           isForeignInsurance,
           institutionAvoidGeotax,
@@ -149,7 +149,7 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
             isForeignInsurance={isForeignInsurance}
             institutionAvoidGeotax={institutionAvoidGeotax}
             selectedParty={party}
-            isRecipientCodeVisible={isRecipientCodeVisible}
+            canInvoice={canInvoice}
             aooSelected={aooSelected}
             uoSelected={uoSelected}
             isDisabled={isDisabled}
@@ -163,7 +163,7 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
 
   Object.keys(conditionsMap).forEach((key) => {
     const {
-      isRecipientCodeVisible,
+      canInvoice,
       isInformationCompany,
       isForeignInsurance,
       institutionAvoidGeotax,
@@ -238,7 +238,7 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
     expect(pec).toBeInTheDocument();
     expect(taxCode).toBeInTheDocument();
 
-    if (isRecipientCodeVisible) {
+    if (canInvoice) {
       expect(sdiCode).toBeInTheDocument();
     } else {
       expect(sdiCode).not.toBeInTheDocument();
