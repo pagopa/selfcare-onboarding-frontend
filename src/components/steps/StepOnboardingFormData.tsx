@@ -288,6 +288,7 @@ export default function StepOnboardingFormData({
     isVatRegistrated,
     vatVerificationGenericError,
     formik.values,
+    invalidTaxCodeInvoicing
   ]);
 
   useEffect(() => {

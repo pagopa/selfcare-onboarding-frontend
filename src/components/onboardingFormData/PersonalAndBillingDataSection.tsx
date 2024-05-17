@@ -288,10 +288,13 @@ export default function PersonalAndBillingDataSection({
     const outcome = getFetchOutcome(getUoList);
 
     if (outcome === 'success') {
-      console.log('OK');
-    } else {
-      setInvalidTaxCodeInvoicing(true);
-    }
+      const matchesNumber = (getUoList as AxiosResponse).data.count;
+      if(matchesNumber === 0){
+        setInvalidTaxCodeInvoicing(true);
+      } else {
+        setInvalidTaxCodeInvoicing(false);
+      }
+    } 
   };
 
   return (
@@ -765,10 +768,12 @@ export default function PersonalAndBillingDataSection({
                       600,
                       theme.palette.text.primary
                     )}
-                    value={formik.values.taxCodeInvoicing}
                     onChange={(e) => {
+                      formik.setFieldValue('taxCodeInvoicing', e.target.value);
                       if(e.target.value.length === 11){
                         void verifyTaxCodeInvoicing(e.target.value);
+                      } else {
+                        setInvalidTaxCodeInvoicing(false);
                       }
                     }}
                   />
