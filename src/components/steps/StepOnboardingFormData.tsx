@@ -262,6 +262,7 @@ export default function StepOnboardingFormData({
         vatVerificationGenericError,
         isPaymentServiceProvider,
         canInvoice,
+        uoSelected,
         isInformationCompany,
         institutionAvoidGeotax,
         isPremium,

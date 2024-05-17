@@ -2,6 +2,7 @@ import { emailRegexp } from '@pagopa/selfcare-common-frontend/utils/constants';
 import { TFunction } from 'i18next';
 import { OnboardingFormData } from '../model/OnboardingFormData';
 import { InstitutionType } from '../../types';
+import { UoData } from '../model/UoModel';
 import {
   requiredError,
   fiveCharactersAllowed,
@@ -24,6 +25,7 @@ export const validateFields = (
   vatVerificationGenericError: boolean,
   isPaymentServiceProvider: boolean,
   canInvoice: boolean,
+  uoSelected: UoData | undefined,
   isInformationCompany: boolean,
   institutionAvoidGeotax: boolean,
   isPremium: boolean,
@@ -45,7 +47,8 @@ export const validateFields = (
         : values.taxCode && !fiscalAndVatCodeRegexp.test(values.taxCode)
         ? t('onboardingFormData.billingDataSection.invalidFiscalCode')
         : undefined,
-    taxCodeInvoicing: canInvoice && (!values.taxCodeInvoicing || values.taxCodeInvoicing && !fiscalAndVatCodeRegexp.test(values.taxCodeInvoicing))
+    taxCodeInvoicing: 
+      (canInvoice && uoSelected) && (!values.taxCodeInvoicing || values.taxCodeInvoicing && !fiscalAndVatCodeRegexp.test(values.taxCodeInvoicing))
         ? requiredError 
         : invalidTaxCodeInvoicing 
         ? t('onboardingFormData.billingDataSection.invalidTaxCodeInvoicing') 
