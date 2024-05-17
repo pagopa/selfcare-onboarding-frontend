@@ -258,7 +258,7 @@ export function PlatformUserForm({
                     width: '100%',
                     '& .MuiOutlinedInput-root.MuiInputBase-root': {
                       fontWeight:
-                        isAuthUser && id !== 'email' ? 'fontWeightRegular' : 'fontWeightMedium',
+                      'fontWeightMedium',
                     },
                   }}
                   inputProps={{

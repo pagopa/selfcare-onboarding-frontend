@@ -378,7 +378,7 @@ export default function StepOnboardingFormData({
       sx: { width: '100%' },
       InputProps: {
         style: {
-          fontSize: '18px',
+          fontSize: '16px',
           fontWeight,
           lineHeight: '24px',
           color,
