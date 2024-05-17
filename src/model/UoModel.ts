@@ -6,7 +6,7 @@ export type UoData = {
   codiceUniUoPadre?: string;
   denominazioneEnte: string;
   descrizioneUo: string;
-  taxCodeInvoicing?: string;
+  codiceFiscaleSfe?: string;
   id?: string;
   mail1: string;
   origin: string;
