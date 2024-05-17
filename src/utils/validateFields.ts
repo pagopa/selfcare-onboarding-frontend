@@ -45,9 +45,9 @@ export const validateFields = (
         : values.taxCode && !fiscalAndVatCodeRegexp.test(values.taxCode)
         ? t('onboardingFormData.billingDataSection.invalidFiscalCode')
         : undefined,
-    sfeTaxCode: !values.sfeTaxCode && canInvoice 
+    taxCodeInvoicing: !values.taxCodeInvoicing && canInvoice 
         ? requiredError 
-        : values.sfeTaxCode && invalidTaxCodeInvoicing 
+        : values.taxCodeInvoicing && invalidTaxCodeInvoicing 
         ? t('onboardingFormData.billingDataSection.invalidTaxCodeInvoicing') 
         : undefined,
     vatNumber:
