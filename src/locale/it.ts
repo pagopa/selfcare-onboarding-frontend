@@ -485,6 +485,7 @@ export default {
     },
     billingDataSection: {
       invalidFiscalCode: 'Il Codice Fiscale non è valido',
+      invalidTaxCodeInvoicing: 'Il Codice Fiscale inserito non è relativo al tuo ente',
       invalidZipCode: 'Il CAP non è valido',
       invalidVatNumber: 'La Partita IVA non è valida',
       invalidEmail: 'L’indirizzo email non è valido',

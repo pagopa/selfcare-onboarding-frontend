@@ -27,6 +27,7 @@ export const validateFields = (
   isInformationCompany: boolean,
   institutionAvoidGeotax: boolean,
   isPremium: boolean,
+  invalidTaxCodeInvoicing: boolean,
   productId?: string
 ) =>
   Object.entries({
@@ -43,6 +44,11 @@ export const validateFields = (
         ? requiredError
         : values.taxCode && !fiscalAndVatCodeRegexp.test(values.taxCode)
         ? t('onboardingFormData.billingDataSection.invalidFiscalCode')
+        : undefined,
+    sfeTaxCode: !values.sfeTaxCode && canInvoice 
+        ? requiredError 
+        : values.sfeTaxCode && invalidTaxCodeInvoicing 
+        ? t('onboardingFormData.billingDataSection.invalidTaxCodeInvoicing') 
         : undefined,
     vatNumber:
       !values.vatNumber && values.hasVatnumber

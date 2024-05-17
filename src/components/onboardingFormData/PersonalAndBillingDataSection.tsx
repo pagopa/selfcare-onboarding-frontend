@@ -57,6 +57,7 @@ type Props = StepperStepComponentProps & {
   isCityEditable?: boolean;
   canInvoice: boolean;
   isForeignInsurance?: boolean;
+  setInvalidTaxCodeInvoicing: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 // eslint-disable-next-line sonarjs/cognitive-complexity, complexity
@@ -79,6 +80,7 @@ export default function PersonalAndBillingDataSection({
   canInvoice,
   isForeignInsurance,
   productId,
+  setInvalidTaxCodeInvoicing
 }: Props) {
   const { t } = useTranslation();
   const { setRequiredLogin } = useContext(UserContext);
@@ -267,6 +269,28 @@ export default function PersonalAndBillingDataSection({
         };
         setInstitutionLocationData(mappedObject);
       }
+    }
+  };
+
+  const verifyTaxCodeInvoicing = async (taxCodeInvoicing: string) => {
+    const getUoList = await fetchWithLogs(
+      {
+        endpoint: 'ONBOARDING_GET_UO_LIST',
+        
+      },
+      { method: 'GET', params: {
+        taxCodeInvoicing
+      } 
+    },
+      () => setRequiredLogin(true)
+    );
+
+    const outcome = getFetchOutcome(getUoList);
+
+    if (outcome === 'success') {
+      console.log('OK');
+    } else {
+      setInvalidTaxCodeInvoicing(true);
     }
   };
 
@@ -740,6 +764,11 @@ export default function PersonalAndBillingDataSection({
                       theme.palette.text.primary
                     )}
                     value={formik.values.sfeTaxCode}
+                    onChange={(e) => {
+                      if(e.target.value.length === 11){
+                        void verifyTaxCodeInvoicing(e.target.value);
+                      }
+                    }}
                   />
                 </Grid>
               )}

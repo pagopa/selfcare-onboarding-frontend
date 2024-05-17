@@ -89,6 +89,7 @@ export default function StepOnboardingFormData({
     []
   );
   const [retrievedIstat, setRetrievedIstat] = useState<string>();
+  const [invalidTaxCodeInvoicing, setInvalidTaxCodeInvoicing] = useState<boolean>(false);
 
   const [geotaxonomy, updateGeotaxonomy] = useReducer(
     (prev: { add: boolean; edit: boolean }, next: { add: boolean; edit: boolean }) => ({
@@ -264,6 +265,7 @@ export default function StepOnboardingFormData({
         isInformationCompany,
         institutionAvoidGeotax,
         isPremium,
+        invalidTaxCodeInvoicing,
         productId
       )
     );
@@ -422,6 +424,7 @@ export default function StepOnboardingFormData({
           retrievedIstat={retrievedIstat}
           isCityEditable={isCityEditable}
           canInvoice={canInvoice}
+          setInvalidTaxCodeInvoicing={setInvalidTaxCodeInvoicing}
         />
 
         {ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY && !institutionAvoidGeotax && (
