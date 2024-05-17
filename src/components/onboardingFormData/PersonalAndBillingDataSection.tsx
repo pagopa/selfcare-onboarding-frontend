@@ -288,11 +288,12 @@ export default function PersonalAndBillingDataSection({
     const outcome = getFetchOutcome(getUoList);
 
     if (outcome === 'success') {
-      const matchesNumber = (getUoList as AxiosResponse).data.count;
-      if(matchesNumber === 0){
-        setInvalidTaxCodeInvoicing(true);
-      } else {
+      const uoList = (getUoList as AxiosResponse).data.items;
+      const match = uoList.find((uo: any) => uo.codiceFiscaleEnte === formik.values.taxCode);
+      if (match) {
         setInvalidTaxCodeInvoicing(false);
+      } else {
+        setInvalidTaxCodeInvoicing(true);
       }
     } 
   };
@@ -633,13 +634,13 @@ export default function PersonalAndBillingDataSection({
               <CustomTextField
                 {...baseTextFieldProps(
                   'taxCode',
-                  t('onboardingFormData.billingDataSection.taxCode'),
+                  isAooUo ? t('onboardingFormData.billingDataSection.taxCodeCentralParty') : t('onboardingFormData.billingDataSection.taxCode'),
                   600,
-                  (isDisabled && !isAooUo) || isContractingAuthority || isInsuranceCompany
+                  isDisabled || isContractingAuthority || isInsuranceCompany
                     ? theme.palette.text.disabled
                     : theme.palette.text.primary
                 )}
-                disabled={(isDisabled && !isAooUo) || isContractingAuthority || isInsuranceCompany}
+                disabled={isDisabled || isContractingAuthority || isInsuranceCompany}
               />
             </Grid>
           )}

@@ -426,7 +426,7 @@ const mockedAoos: Array<AooData> = [
     origin: 'IPA',
     CAP: '54321',
     codiceCatastaleComune: 'D456',
-    codiceComuneISTAT: '543210',
+    codiceComuneISTAT: '082050',
     cognomeResponsabile: 'Verdi',
     nomeResponsabile: 'Paola',
     dataIstituzione: '2023-03-20',
@@ -440,7 +440,7 @@ const mockedAoos: Array<AooData> = [
 const mockedUos: Array<UoData> = [
   {
     codiceFiscaleEnte: '98765432109',
-    taxCodeInvoicing: '87654321098',
+    codiceFiscaleSfe: '87654321098',
     codiceIpa: 'ABCDEF12',
     codiceUniUo: 'UF9YK7',
     codiceUniUoPadre: '',
@@ -451,7 +451,7 @@ const mockedUos: Array<UoData> = [
     origin: 'IPA',
     CAP: '54321',
     codiceCatastaleComune: 'E789',
-    codiceComuneISTAT: '098765',
+    codiceComuneISTAT: '082050',
     cognomeResponsabile: 'Bianchi',
     dataAggiornamento: '2020-10-10',
     dataIstituzione: '2017-10-15',
@@ -471,7 +471,7 @@ const mockedUos: Array<UoData> = [
     origin: 'IPA',
     CAP: '12345',
     codiceCatastaleComune: 'F012',
-    codiceComuneISTAT: '210987',
+    codiceComuneISTAT: '082050',
     cognomeResponsabile: 'Russo',
     dataAggiornamento: '2020-11-20',
     dataIstituzione: '2017-11-25',
@@ -931,9 +931,9 @@ export async function mockFetch(
   }
 
   if (endpoint === 'ONBOARDING_GET_UO_LIST'){
-    const retrievedUos = mockedUos.filter((uo) => uo.taxCodeInvoicing === params.taxCodeInvoicing);
+    const retrievedUos = mockedUos.filter((uo) => uo.codiceFiscaleEnte === params.taxCodeInvoicing);
     return new Promise((resolve) =>
-      resolve({ data: retrievedUos, status: 200, statusText: '200' } as AxiosResponse)
+      resolve({ data: {items: retrievedUos, count: retrievedUos.length }, status: 200, statusText: '200' } as AxiosResponse)
     );
   }
 

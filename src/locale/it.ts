@@ -516,6 +516,7 @@ export default {
       arte o professione <1 />(cfr. art. 21, comma 2, lett. f, DPR n. 633/1972)`,
       vatNumberGroup: 'La Partita IVA è di gruppo',
       taxCode: 'Codice Fiscale',
+      taxCodeCentralParty: 'Codice Fiscale ente centrale',
       vatNumber: 'Partita IVA',
       taxCodeInvoicing: 'Codice Fiscale SFE',
       ivassCode: 'Codice IVASS',
