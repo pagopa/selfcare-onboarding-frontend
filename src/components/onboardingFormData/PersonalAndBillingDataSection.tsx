@@ -398,14 +398,16 @@ export default function PersonalAndBillingDataSection({
                   inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
                   {...baseNumericFieldProps(
                     'zipCode',
-                    t('onboardingFormData.billingDataSection.zipCode')
+                    t('onboardingFormData.billingDataSection.zipCode'),
+                    600,
+                    16,
+                    !isAooUo && isDisabled && !isInsuranceCompany ? theme.palette.text.disabled : theme.palette.text.primary
                   )}
                   disabled={!isAooUo && isDisabled && !isInsuranceCompany}
                 />
               </Grid>
             )}
           </Grid>
-
           <Grid container spacing={2} pl={3} pt={3}>
             <Grid item xs={7}>
               {isInsuranceCompany && isForeignInsurance ? (
@@ -758,12 +760,12 @@ export default function PersonalAndBillingDataSection({
                 <Grid item xs={12} mt={3}>
                   <CustomTextField
                     {...baseTextFieldProps(
-                      'sfeTaxCode',
-                      t('onboardingFormData.billingDataSection.sfeTaxCode'),
+                      'taxCodeInvoicing',
+                      t('onboardingFormData.billingDataSection.taxCodeInvoicing'),
                       600,
                       theme.palette.text.primary
                     )}
-                    value={formik.values.sfeTaxCode}
+                    value={formik.values.taxCodeInvoicing}
                     onChange={(e) => {
                       if(e.target.value.length === 11){
                         void verifyTaxCodeInvoicing(e.target.value);
