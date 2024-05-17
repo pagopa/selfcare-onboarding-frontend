@@ -440,7 +440,7 @@ const mockedAoos: Array<AooData> = [
 const mockedUos: Array<UoData> = [
   {
     codiceFiscaleEnte: '98765432109',
-    codiceFiscaleSfe: '87654321098',
+    taxCodeInvoicing: '87654321098',
     codiceIpa: 'ABCDEF12',
     codiceUniUo: 'UF9YK7',
     codiceUniUoPadre: '',
@@ -927,6 +927,13 @@ export async function mockFetch(
     const retrievedUo = mockedUos.find((uo) => uo.codiceUniUo === endpointParams.codiceUniUo);
     return new Promise((resolve) =>
       resolve({ data: retrievedUo, status: 200, statusText: '200' } as AxiosResponse)
+    );
+  }
+
+  if (endpoint === 'ONBOARDING_GET_UO_LIST'){
+    const retrievedUos = mockedUos.filter((uo) => uo.taxCodeInvoicing === params.taxCodeInvoicing);
+    return new Promise((resolve) =>
+      resolve({ data: retrievedUos, status: 200, statusText: '200' } as AxiosResponse)
     );
   }
 

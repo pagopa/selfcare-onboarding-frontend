@@ -98,6 +98,9 @@ export const API = {
   ONBOARDING_GET_UO_CODE_INFO: {
     URL: ENV.URL_API.PARTY_REGISTRY_PROXY + '/uo/{{codiceUniUo}}',
   },
+  ONBOARDING_GET_UO_LIST: {
+    URL: ENV.URL_API.PARTY_REGISTRY_PROXY + '/uo',
+  },
   ONBOARDING_GET_AOO_CODE_INFO: {
     URL: ENV.URL_API.PARTY_REGISTRY_PROXY + '/aoo/{{codiceUniAoo}}',
   },

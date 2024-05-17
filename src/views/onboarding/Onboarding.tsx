@@ -290,7 +290,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
         ? uoResult.codiceFiscaleEnte
         : party.taxCode,
       vatNumber: '',
-      taxCodeInvoicing: uoResult?.codiceFiscaleSfe,
+      taxCodeInvoicing: uoResult?.taxCodeInvoicing,
       zipCode: aooResult ? aooResult.CAP : uoResult ? uoResult.CAP : party.zipCode,
       geographicTaxonomies: onboardingFormData?.geographicTaxonomies as Array<GeographicTaxonomy>,
       ivassCode: institutionType === 'AS' ? party.originId : undefined,
