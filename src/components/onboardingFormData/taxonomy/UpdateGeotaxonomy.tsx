@@ -2,23 +2,17 @@ import { SessionModal } from '@pagopa/selfcare-common-frontend';
 import { useTranslation, Trans } from 'react-i18next';
 
 type Props = {
-  openModifyModal: boolean;
-  openAddModal: boolean;
+  geotaxonomy: { add: boolean; edit: boolean };
   onForwardAction: () => void;
   handleClose: () => void;
 };
 
-export default function GeoTaxSessionModal({
-  openModifyModal,
-  openAddModal,
-  onForwardAction,
-  handleClose,
-}: Props) {
+export default function UpdateGeotaxonomy({ geotaxonomy, onForwardAction, handleClose }: Props) {
   const { t } = useTranslation();
   return (
     <>
       <SessionModal
-        open={openModifyModal}
+        open={geotaxonomy.edit}
         title={t('onboardingFormData.taxonomySection.modal.modifyModal.title')}
         message={
           <Trans i18nKey="onboardingFormData.taxonomySection.modal.modifyModal.descroption">
@@ -33,7 +27,7 @@ export default function GeoTaxSessionModal({
       />
 
       <SessionModal
-        open={openAddModal}
+        open={geotaxonomy.add}
         title={t('onboardingFormData.taxonomySection.modal.addModal.title')}
         message={
           <Trans i18nKey="onboardingFormData.taxonomySection.modal.addModal.descroption">
