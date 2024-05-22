@@ -327,7 +327,11 @@ function OnBoardingSubProduct() {
           },
           institutionType: institutionType as InstitutionType,
           origin,
-          subtitle: t('onBoardingSubProduct.billingData.subTitle'),
+          subtitle: (
+            <Trans i18nKey="onBoardingSubProduct.billingData.subTitle" components={{ 1: <br /> }}>
+              {`Conferma, modifica o inserisci i dati richiesti, assicurandoti che siano corretti. <1 />Verranno usati anche per richiedere l’adesione ad altri prodotti e in caso di fatturazione.`}
+            </Trans>
+          ),
           forward: forwardWithBillingData,
           back: () => {
             if (window.location.search.indexOf(`partyExternalId=${externalInstitutionId}`) > -1) {

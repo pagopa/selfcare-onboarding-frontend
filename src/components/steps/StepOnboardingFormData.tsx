@@ -289,7 +289,7 @@ export default function StepOnboardingFormData({
     isVatRegistrated,
     vatVerificationGenericError,
     formik.values,
-    invalidTaxCodeInvoicing
+    invalidTaxCodeInvoicing,
   ]);
 
   useEffect(() => {
@@ -400,11 +400,9 @@ export default function StepOnboardingFormData({
     <Box display="flex" justifyContent="center">
       <Grid container item xs={8} display="flex" justifyContent="center">
         <Heading
-          t={t}
           institutionType={institutionType}
           productId={productId}
           subtitle={subtitle}
-          isPremium={isPremium}
           isPaymentServiceProvider={isPaymentServiceProvider}
         />
         <PersonalAndBillingDataSection
