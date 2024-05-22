@@ -126,17 +126,17 @@ function OnboardingComponent({ productId }: { productId: string }) {
           <Grid key="0">
             <EndingPage
               minHeight="52vh"
-              variantTitle={'h4'}
-              variantDescription={'body1'}
+              variantTitle="h4"
+              variantDescription="body1"
               icon={<IllusError size={60} />}
-              title={<Trans i18nKey="onboardingStep1_5.ptAlreadyOnboarded.title" />}
-              description={
-                <Trans i18nKey="onboardingStep1_5.ptAlreadyOnboarded.description">
-                  Per operare su un prodotto, chiedi a un Amministratore di <br /> aggiungerti nella
-                  sezione Utenti.
-                </Trans>
-              }
-              buttonLabel={<Trans i18nKey="onboardingStep1_5.ptAlreadyOnboarded.backAction" />}
+              title={t('onboardingStep1_5.ptAlreadyOnboarded.title', {
+                partnerName: onboardingFormData?.businessName as string,
+              })}
+              description={t('onboardingStep1_5.ptAlreadyOnboarded.description', {
+                interpolation: { escapeValue: false },
+                components: [<br key="1" />],
+              })}
+              buttonLabel={t('onboardingStep1_5.ptAlreadyOnboarded.backAction')}
               onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
             />
           </Grid>,
@@ -148,8 +148,17 @@ function OnboardingComponent({ productId }: { productId: string }) {
               variantTitle={'h4'}
               variantDescription={'body1'}
               title={<Trans i18nKey="onboardingStep1_5.alreadyOnboarded.title" />}
-              description={<Trans i18nKey="onboardingStep1_5.alreadyOnboarded.description" />}
-              buttonLabel={<Trans i18nKey="onboardingStep1_5.alreadyOnboarded.backAction" />}
+              description={
+                <Trans
+                  i18nKey="onboardingStep1_5.alreadyOnboarded.description"
+                  components={{ 1: <br /> }}
+                >
+                  {
+                    'Per operare sul prodotto, chiedi a un Amministratore di <1/>aggiungerti nella sezione Utenti.'
+                  }
+                </Trans>
+              }
+              buttonLabel={<Trans i18nKey="onboardingStep1_5.alreadyOnboarded.backHome" />}
               onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
             />
           </Grid>,
