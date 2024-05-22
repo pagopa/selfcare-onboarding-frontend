@@ -430,7 +430,7 @@ export default {
     },
     billingData: {
       subTitle:
-        'Conferma, modifica o inserisci i dati richiesti, assicurandoti che siano corretti. <1 />Verranno usati anche per richiedere l’adesione ad altri prodotti e in caso di fatturazione',
+      `Conferma, modifica o inserisci i dati richiesti, assicurandoti che siano corretti.<1 /> Verranno usati anche per richiedere l’adesione ad altri prodotti e in caso di fatturazione.`,
     },
     exitModal: {
       title: 'Vuoi davvero uscire?',

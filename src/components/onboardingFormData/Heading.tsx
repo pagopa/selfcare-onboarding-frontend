@@ -1,24 +1,21 @@
 import { Grid, Typography } from '@mui/material';
-import { TFunction } from 'i18next';
+import { useTranslation } from 'react-i18next';
 import { InstitutionType } from '../../../types';
 
 type Props = {
-  t: TFunction<'translation', undefined>;
   institutionType: InstitutionType;
   isPaymentServiceProvider: boolean;
-  isPremium: boolean;
   subtitle: string | JSX.Element;
   productId?: string;
 };
 
 export default function Heading({
-  t,
   institutionType,
   isPaymentServiceProvider,
-  isPremium,
   subtitle,
   productId,
 }: Props) {
+  const { t } = useTranslation();
   return (
     <Grid container sx={{ textAlign: 'center', justifyContent: 'center' }}>
       <Grid item xs={12}>
@@ -30,10 +27,8 @@ export default function Heading({
             : t('onboardingFormData.title')}
         </Typography>
       </Grid>
-      <Grid item mt={2} mb={4}>
-        <Grid item xs={isPremium ? 7 : 12}>
-          <Typography variant="body1">{subtitle}</Typography>
-        </Grid>
+      <Grid item xs={12} marginTop={1} marginBottom={4}>
+        <Typography variant="body1">{subtitle}</Typography>
       </Grid>
     </Grid>
   );
