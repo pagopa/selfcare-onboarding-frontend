@@ -80,7 +80,7 @@ export default function PersonalAndBillingDataSection({
   canInvoice,
   isForeignInsurance,
   productId,
-  setInvalidTaxCodeInvoicing
+  setInvalidTaxCodeInvoicing,
 }: Props) {
   const { t } = useTranslation();
   const { setRequiredLogin } = useContext(UserContext);
@@ -276,12 +276,13 @@ export default function PersonalAndBillingDataSection({
     const getUoList = await fetchWithLogs(
       {
         endpoint: 'ONBOARDING_GET_UO_LIST',
-        
       },
-      { method: 'GET', params: {
-        taxCodeInvoicing
-      } 
-    },
+      {
+        method: 'GET',
+        params: {
+          taxCodeInvoicing,
+        },
+      },
       () => setRequiredLogin(true)
     );
 
@@ -295,7 +296,7 @@ export default function PersonalAndBillingDataSection({
       } else {
         setInvalidTaxCodeInvoicing(true);
       }
-    } 
+    }
   };
 
   return (
@@ -405,7 +406,9 @@ export default function PersonalAndBillingDataSection({
                     t('onboardingFormData.billingDataSection.zipCode'),
                     600,
                     16,
-                    !isAooUo && isDisabled && !isInsuranceCompany ? theme.palette.text.disabled : theme.palette.text.primary
+                    !isAooUo && isDisabled && !isInsuranceCompany
+                      ? theme.palette.text.disabled
+                      : theme.palette.text.primary
                   )}
                   disabled={!isAooUo && isDisabled && !isInsuranceCompany}
                 />
@@ -514,6 +517,9 @@ export default function PersonalAndBillingDataSection({
                             isFromIPA || isAooUo
                               ? theme.palette.text.disabled
                               : theme.palette.text.primary,
+                        },
+                        '& .MuiInputBase-root': {
+                          height: '56px',
                         },
                       }}
                       disabled={isFromIPA || isAooUo}
@@ -634,7 +640,9 @@ export default function PersonalAndBillingDataSection({
               <CustomTextField
                 {...baseTextFieldProps(
                   'taxCode',
-                  isAooUo ? t('onboardingFormData.billingDataSection.taxCodeCentralParty') : t('onboardingFormData.billingDataSection.taxCode'),
+                  isAooUo
+                    ? t('onboardingFormData.billingDataSection.taxCodeCentralParty')
+                    : t('onboardingFormData.billingDataSection.taxCode'),
                   600,
                   isDisabled || isContractingAuthority || isInsuranceCompany
                     ? theme.palette.text.disabled
@@ -771,7 +779,7 @@ export default function PersonalAndBillingDataSection({
                     )}
                     onChange={(e) => {
                       formik.setFieldValue('taxCodeInvoicing', e.target.value);
-                      if(e.target.value.length === 11){
+                      if (e.target.value.length === 11) {
                         void verifyTaxCodeInvoicing(e.target.value);
                       } else {
                         setInvalidTaxCodeInvoicing(false);
