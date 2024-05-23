@@ -72,7 +72,7 @@ export const API = {
 
   // institutions present on self care db
   ONBOARDING_GET_USER_PARTIES: {
-    URL: ENV.URL_API.partyExternalId + '/institutions',
+    URL: ENV.URL_API.ONBOARDING + '/institutions',
   },
   ONBOARDING_GET_ONBOARDING_DATA: {
     URL: ENV.URL_API.ONBOARDING + '/institutions/onboarding/',
