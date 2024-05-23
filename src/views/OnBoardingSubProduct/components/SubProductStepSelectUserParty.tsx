@@ -41,7 +41,7 @@ export function SubProductStepSelectUserParty({
   productId,
   subProductId,
 }: Props) {
-  const partyExternalIdByQuery = new URLSearchParams(window.location.search).get('partyExternalId');
+  const partyIdByQuery = new URLSearchParams(window.location.search).get('partyId');
   const requestIdRef = useRef<string>('');
 
   const { t } = useTranslation();
@@ -67,19 +67,18 @@ export function SubProductStepSelectUserParty({
   useEffect(() => {
     // eslint-disable-next-line functional/immutable-data
     requestIdRef.current = uniqueId(
-      `onboarding-premium-party-selection-${partyExternalIdByQuery}-${productId}-${subProductId}`
+      `onboarding-premium-party-selection-${partyIdByQuery}-${productId}-${subProductId}`
     );
 
     trackEvent('ONBOARDING_PREMIUM_PARTY_SELECTION', {
-      party_id: partyExternalIdByQuery,
+      party_id: partyIdByQuery,
       request_id: requestIdRef.current,
       product_id: productId,
       subproduct_id: subProductId,
     });
 
-    if (partyExternalIdByQuery) {
-      // TODO WRONG
-      const selectedParty = parties.find((p) => p.id === partyExternalIdByQuery);
+    if (partyIdByQuery) {
+      const selectedParty = parties.find((p) => p.id === partyIdByQuery);
       if (selectedParty) {
         setSelected(selectedParty);
       } else {
@@ -90,7 +89,7 @@ export function SubProductStepSelectUserParty({
 
   // callback of previous useEffect
   useEffect(() => {
-    if (partyExternalIdByQuery && selected) {
+    if (partyIdByQuery && selected) {
       onForwardAction();
     }
   }, [selected]);
