@@ -94,7 +94,7 @@ test('test already onboarded', async () => {
   await executeStepInstitutionType('prod-pagopa');
   await executeStep1('AGENCY ONBOARDED', 'prod-pagopa', 'pa');
   await waitFor(() => screen.getByText('L’ente selezionato ha già aderito'));
-  await executeGoHome(false);
+  await executeGoHome(true);
 });
 
 test('onboarding of pa with origin IPA', async () => {
