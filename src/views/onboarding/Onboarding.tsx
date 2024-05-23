@@ -129,14 +129,14 @@ function OnboardingComponent({ productId }: { productId: string }) {
               variantTitle="h4"
               variantDescription="body1"
               icon={<IllusError size={60} />}
-              title={t('onboardingStep1_5.ptAlreadyOnboarded.title', {
-                partnerName: onboardingFormData?.businessName as string,
-              })}
-              description={t('onboardingStep1_5.ptAlreadyOnboarded.description', {
-                interpolation: { escapeValue: false },
-                components: [<br key="1" />],
-              })}
-              buttonLabel={t('onboardingStep1_5.ptAlreadyOnboarded.backAction')}
+              title={<Trans i18nKey="onboardingStep1_5.ptAlreadyOnboarded.title" />}
+              description={
+                <Trans i18nKey="onboardingStep1_5.ptAlreadyOnboarded.description">
+                  Per operare su un prodotto, chiedi a un Amministratore di <br /> aggiungerti nella
+                  sezione Utenti.
+                </Trans>
+              }
+              buttonLabel={<Trans i18nKey="onboardingStep1_5.ptAlreadyOnboarded.backAction" />}
               onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
             />
           </Grid>,
