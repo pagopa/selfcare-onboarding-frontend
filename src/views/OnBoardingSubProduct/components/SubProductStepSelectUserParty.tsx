@@ -7,7 +7,7 @@ import { PartyAccountItemButton } from '@pagopa/mui-italia/dist/components/Party
 import { roleLabels } from '@pagopa/selfcare-common-frontend/utils/constants';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
 import { uniqueId } from 'lodash';
-import { Party, SelfcareParty, StepperStepComponentProps } from '../../../../types';
+import { SelfcareParty, StepperStepComponentProps } from '../../../../types';
 import { OnboardingStepActions } from '../../../components/OnboardingStepActions';
 import { useHistoryState } from '../../../components/useHistoryState';
 import PartySelectionSearchInput from './PartySelectionSearchInput';
@@ -55,8 +55,7 @@ export function SubProductStepSelectUserParty({
 
   const onForwardAction = () => {
     setSelectedHistory(selected);
-    // TODO
-    forward(selected as unknown as Party);
+    forward(selected);
   };
   const bodyTitle = t('onBoardingSubProduct.selectUserPartyStep.title');
 

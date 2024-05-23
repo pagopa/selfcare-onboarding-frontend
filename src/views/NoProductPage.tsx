@@ -9,6 +9,6 @@ export default () => {
       description={t('noProductPage.description')}
       variantTitle={'h4'}
       variantDescription={'body1'}
-    ></EndingPage>
+    />
   );
 };

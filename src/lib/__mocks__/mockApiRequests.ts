@@ -496,6 +496,7 @@ const mockedUos: Array<UoData> = [
 
 const mockedOnboardingData: Array<InstitutionOnboardingInfoResource> = [
   {
+    geographicTaxonomies: [{ code: '23233', desc: 'Milano'}],
     institution: {
       id: '55897f04-bafd-4bc9-b646-0fd027620c1b',
       billingData: {
@@ -522,6 +523,7 @@ const mockedOnboardingData: Array<InstitutionOnboardingInfoResource> = [
     },
   },
   {
+    geographicTaxonomies: [{ code: '23233', desc: 'Milano'}],
     institution: {
       id: '999c63d8-554d-4376-233s-4caf2a73822a',
       billingData: {
@@ -554,6 +556,7 @@ const mockedOnboardingData: Array<InstitutionOnboardingInfoResource> = [
     },
   },
   {
+    geographicTaxonomies: [{ code: '23233', desc: 'Milano'}],
     institution: {
       id: '370c63d8-1b76-4376-a725-4caf2a73822a',
       billingData: {
@@ -588,6 +591,7 @@ const mockedOnboardingData: Array<InstitutionOnboardingInfoResource> = [
     },
   },
   {
+    geographicTaxonomies: [],
     institution: {
       id: '92078570527',
       billingData: {
@@ -1017,26 +1021,19 @@ export async function mockFetch(
   }
 
   if (endpoint === 'ONBOARDING_GET_ONBOARDING_DATA') {
-    const onboardingData = mockedOnboardingData.find(
-      (od) => od.institution.billingData.taxCode === params.taxCode
-    );
-    if (params.taxCode === '92078570527') {
-      return new Promise((resolve) =>
-        resolve({ data: onboardingData, status: 200, statusText: '200' } as AxiosResponse)
+    switch(params.institutionId){
+      case '232323':
+        return new Promise((resolve) =>
+        resolve({ data: mockedOnboardingData[0], status: 200, statusText: '200' } as AxiosResponse)
       );
+      case '2323':
+        return notFoundError;
+      default:
+        return new Promise((resolve) =>
+          resolve({ data: mockedOnboardingData[1], status: 200, statusText: '200' } as AxiosResponse)
+        );
     }
-    if (onboardingData) {
-      return new Promise((resolve) =>
-        resolve({
-          data: onboardingData,
-          status: 200,
-          statusText: '200',
-        } as AxiosResponse)
-      );
-    } else {
-      return notFoundError;
     }
-  }
 
   if (endpoint === 'ONBOARDING_VERIFY_PRODUCT') {
     const selectedProduct = mockedProducts.find((p) => p.id === endpointParams.productId);

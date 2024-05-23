@@ -847,8 +847,6 @@ export default function PersonalAndBillingDataSection({
               />
             </Grid>
           )}
-          {/* TODO Write more clearly */}
-          {/* institutionType !== 'PA' && institutionType !== 'PSP' && productId === 'prod-io'; */}
           {(isInformationCompany || isContractingAuthority) && (
             <>
               <Grid item xs={12}>

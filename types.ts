@@ -210,6 +210,7 @@ export type InstitutionData = {
 };
 
 export type InstitutionOnboardingInfoResource = {
+  geographicTaxonomies: Array<GeographicTaxonomy>;
   institution: InstitutionData;
 };
 

@@ -690,12 +690,9 @@ function OnboardingComponent({ productId }: { productId: string }) {
       label: 'Get Onboarding Data',
       Component: () =>
         StepOnboardingData({
-          externalInstitutionId,
           productId,
           institutionType,
           forward: forwardWithOnboardingData,
-          aooSelected,
-          uoSelected,
         }),
     },
     {
