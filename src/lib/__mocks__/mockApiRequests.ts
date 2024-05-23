@@ -9,6 +9,7 @@ import {
   InsuranceCompaniesResource,
   OnboardingRequestData,
   InstitutionType,
+  SelfcareParty,
 } from '../../../types';
 import { BillingDataDto } from '../../model/BillingData';
 import { GeographicTaxonomyResource, nationalValue } from '../../model/GeographicTaxonomies';
@@ -229,6 +230,19 @@ export const mockPartyRegistry = {
   ],
   count: 8,
 };
+
+const mockedBaseParties: Array<SelfcareParty> = [
+  {
+    id: '43446',
+    description: 'Comune di Milano',
+    userRole: 'ADMIN',
+  },
+  {
+    id: '323234',
+    description: 'Comune di Torino',
+    userRole: 'ADMIN',
+  }
+];
 
 const mockedParties = [
   createPartyEntity(
@@ -1102,7 +1116,7 @@ export async function mockFetch(
 
   if (endpoint === 'ONBOARDING_GET_USER_PARTIES') {
     return new Promise((resolve) =>
-      resolve({ data: mockedParties, status: 200, statusText: '200' } as AxiosResponse)
+      resolve({ data: mockedBaseParties, status: 200, statusText: '200' } as AxiosResponse)
     );
   }
 

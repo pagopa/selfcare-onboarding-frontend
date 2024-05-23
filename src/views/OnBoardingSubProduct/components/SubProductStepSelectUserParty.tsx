@@ -32,7 +32,7 @@ const CustomBox = styled(Box)({
   overflowY: 'auto',
   overflowX: 'hidden',
 });
-const verifyPartyFilter = (party: Party, filter: string) =>
+const verifyPartyFilter = (party: SelfcareParty, filter: string) =>
   party.description.toUpperCase().indexOf(filter.toUpperCase()) >= 0;
 export function SubProductStepSelectUserParty({
   forward,
@@ -52,9 +52,11 @@ export function SubProductStepSelectUserParty({
     'SubProductStepSelectUserParty',
     null
   );
+
   const onForwardAction = () => {
     setSelectedHistory(selected);
-    forward(selected as Party);
+    // TODO
+    forward(selected as unknown as Party);
   };
   const bodyTitle = t('onBoardingSubProduct.selectUserPartyStep.title');
 
@@ -77,7 +79,8 @@ export function SubProductStepSelectUserParty({
     });
 
     if (partyExternalIdByQuery) {
-      const selectedParty = parties.find((p) => p.externalId === partyExternalIdByQuery);
+      // TODO WRONG
+      const selectedParty = parties.find((p) => p.id === partyExternalIdByQuery);
       if (selectedParty) {
         setSelected(selectedParty);
       } else {
@@ -101,10 +104,10 @@ export function SubProductStepSelectUserParty({
 
   const [input, setInput] = useState('');
   const [filteredParties, setFilteredParties] = useState<Array<SelfcareParty>>(parties);
-  const [selectedParty, setSelectedParty] = useState<Party | null>(
+  const [selectedParty, setSelectedParty] = useState<SelfcareParty | null>(
     parties.length === 1 ? parties[0] : null
   );
-  const onPartySelectionChange = (selectedParty: Party | null) => {
+  const onPartySelectionChange = (selectedParty: SelfcareParty | null) => {
     setSelectedParty(selectedParty);
   };
 
@@ -169,7 +172,7 @@ export function SubProductStepSelectUserParty({
             >
               {filteredParties.map((p) => (
                 <Grid
-                  key={p.externalId}
+                  key={p.id}
                   aria-label={p.description}
                   sx={{
                     width: '480px',

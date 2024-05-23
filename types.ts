@@ -176,17 +176,9 @@ export type Product = {
 
 export type SelfcareParty = {
   id: string;
-  originId: string;
-  externalId: string;
-  institutionType?: string;
   description: string;
+  userRole: UserRole
   urlLogo?: string;
-  address: string;
-  digitalAddress: string;
-  taxCode: string;
-  zipCode: string;
-  origin: string;
-  userRole: UserRole;
 };
 
 export type Party = {
