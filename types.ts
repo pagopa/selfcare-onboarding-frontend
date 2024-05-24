@@ -177,7 +177,7 @@ export type Product = {
 export type SelfcareParty = {
   id: string;
   description: string;
-  userRole: UserRole
+  userRole: UserRole;
   urlLogo?: string;
 };
 
