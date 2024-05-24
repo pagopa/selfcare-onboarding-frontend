@@ -302,7 +302,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
       taxCodeInvoicing: uoResult?.codiceFiscaleSfe,
       zipCode: aooResult ? aooResult.CAP : uoResult ? uoResult.CAP : party.zipCode,
       geographicTaxonomies: onboardingFormData?.geographicTaxonomies as Array<GeographicTaxonomy>,
-      ivassCode: institutionType === 'AS' ? party.originId : undefined,
+      originId: institutionType === 'AS' ? party.originId : undefined,
     });
     forwardWithData(newFormData);
     trackEvent('ONBOARDING_PARTY_SELECTION', {
