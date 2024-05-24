@@ -75,7 +75,7 @@ export const validateFields = (
         : institutionType === 'AS' && values?.country
         ? !onlyCharacters.test(values.country)
         : undefined,
-    ivassCode: institutionType === 'AS' && !values.ivassCode ? requiredError : undefined,
+    originId: institutionType === 'AS' && !values.originId ? requiredError : undefined,
     digitalAddress: !values.digitalAddress
       ? requiredError
       : !emailRegexp.test(values.digitalAddress)

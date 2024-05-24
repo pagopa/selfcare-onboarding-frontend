@@ -839,12 +839,12 @@ export default function PersonalAndBillingDataSection({
             <Grid item xs={12} marginTop={isForeignInsurance ? -3 : 0}>
               <CustomTextField
                 {...baseTextFieldProps(
-                  'ivassCode',
-                  t('onboardingFormData.billingDataSection.ivassCode'),
+                  'originId',
+                  t('onboardingFormData.billingDataSection.originId'),
                   600,
                   theme.palette.text.disabled
                 )}
-                value={formik.values.ivassCode}
+                value={formik.values.originId}
                 disabled={true}
               />
             </Grid>
