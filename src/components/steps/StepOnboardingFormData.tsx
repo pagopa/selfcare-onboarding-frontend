@@ -297,10 +297,12 @@ export default function StepOnboardingFormData({
   ]);
 
   useEffect(() => {
-    if (!formik.values.hasVatnumber) {
+    if (formik.values.hasVatnumber) {
+      void formik.setFieldValue('vatNumber', formik.initialValues.vatNumber);
+    } else {
       void formik.setFieldValue('vatNumber', undefined);
     }
-  }, [!formik.values.hasVatnumber]);
+  }, [formik.values.hasVatnumber]);
 
   const verifyVatNumber = async () => {
     const onboardingStatus = await fetchWithLogs(
