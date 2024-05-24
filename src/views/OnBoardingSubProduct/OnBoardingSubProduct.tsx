@@ -9,20 +9,12 @@ import { useTranslation, Trans } from 'react-i18next';
 import { EndingPage } from '@pagopa/selfcare-common-frontend';
 import { IllusError } from '@pagopa/mui-italia';
 import { withLogin } from '../../components/withLogin';
-import {
-  InstitutionType,
-  SelfcareParty,
-  Product,
-  StepperStep,
-  UserOnCreate,
-  Party,
-} from '../../../types';
+import { InstitutionType, SelfcareParty, Product, StepperStep, UserOnCreate } from '../../../types';
 import { OnboardingFormData } from '../../model/OnboardingFormData';
 import { LoadingOverlay } from '../../components/LoadingOverlay';
 import { ENV } from '../../utils/env';
 import { HeaderContext } from '../../lib/context';
 import { StepAddManager, UsersObject } from '../../components/steps/StepAddManager';
-// import { StepSearchParty } from '../../components/steps/StepSearchParty';
 import StepOnboardingData from '../../components/steps/StepOnboardingData';
 import StepOnboardingFormData from '../../components/steps/StepOnboardingFormData';
 import { AssistanceContacts } from '../../model/AssistanceContacts';
@@ -34,7 +26,6 @@ import SubProductStepVerifyInputs from './components/SubProductStepVerifyInputs'
 import SubProductStepSubmit from './components/SubProductStepSubmit';
 import SubProductStepSuccess from './components/SubProductStepSuccess';
 import { SubProductStepSelectUserParty } from './components/SubProductStepSelectUserParty';
-import SubProductStepOnBoardingStatus from './components/SubProductStepOnBoardingStatus';
 import SubProductStepSelectPricingPlan from './components/subProductStepPricingPlan/SubProductStepSelectPricingPlan';
 import SubProductStepUserUnrelated from './components/SubProductStepUserUnrelated';
 
@@ -53,8 +44,9 @@ function OnBoardingSubProduct() {
   const [subProduct, setSubProduct] = useState<Product>();
   const [product, setProduct] = useState<Product>();
   const [parties, setParties] = useState<Array<SelfcareParty>>([]);
+  const [selectedParty, setSelectedParty] = useState<SelfcareParty>();
 
-  const [externalInstitutionId, setExternalInstitutionId] = useState<string>('');
+  const [externalInstitutionId, _setExternalInstitutionId] = useState<string>('');
   const [origin, setOrigin] = useState<string>('');
 
   const [_manager, setManager] = useState<UserOnCreate>();
@@ -75,7 +67,6 @@ function OnBoardingSubProduct() {
   const [assistanceContacts, setAssistanceContacts] = useState<AssistanceContacts>();
   const [companyInformations, setCompanyInformations] = useState<CompanyInformations>();
   const [openConfirmationModal, setOpenConfirmationModal] = useState(false);
-  const [partyName, setPartyName] = useState('');
   const [isCityEditable, setIsCityEditable] = useState(false);
   const [availablePricingPlanIds, setAvailablePricingPlanIds] = useState<Array<string>>();
 
@@ -128,29 +119,13 @@ function OnBoardingSubProduct() {
     setOpenConfirmationModal(true);
   };
 
-  const forwardWithInstitution = (party: Party, isUserParty: boolean) => {
-    setExternalInstitutionId(party.externalId);
-    setPartyName(party.description);
-    setOrigin(party.origin);
-    setPartyName(party.description);
-    setBillingData({
-      businessName: party.description,
-      registeredOffice: party.address,
-      zipCode: party.zipCode,
-      digitalAddress: party.digitalAddress,
-      taxCode: party.taxCode,
-      vatNumber: '',
-      recipientCode: party.origin === 'IPA' ? party.originId : '',
-      geographicTaxonomies: [],
-      city: '',
-      country: '',
-      county: '',
-    });
+  const forwardWithInstitution = (party: SelfcareParty, isUserParty: boolean) => {
+    setSelectedParty(party);
     const event = isUserParty
       ? 'ONBOARDING_PREMIUM_ASSOCIATED_PARTY_SELECTION'
       : 'ONBOARDING_PREMIUM_PARTY_SELECTION';
     trackEvent(event, {
-      party_id: party.externalId,
+      party_id: party.id,
       request_id: requestIdRef.current,
       product_id: productId,
       subproduct_id: subProductId,
@@ -161,6 +136,7 @@ function OnBoardingSubProduct() {
   };
 
   const forwardWithOnboardingData = (
+    origin: string,
     billingData?: OnboardingFormData,
     institutionType?: InstitutionType,
     partyId?: string,
@@ -195,6 +171,7 @@ function OnBoardingSubProduct() {
       setIsCityEditable(false);
     }
 
+    setOrigin(origin);
     setInstitutionType(institutionType);
     setPartyId(partyId);
     forward();
@@ -242,7 +219,7 @@ function OnBoardingSubProduct() {
           parties,
           subProductId,
           productId,
-          forward: (party?: Party) => {
+          forward: (party?: SelfcareParty) => {
             if (party) {
               forwardWithInstitution(party, true);
             } else {
@@ -275,26 +252,11 @@ function OnBoardingSubProduct() {
       // }),
     },
     {
-      // TODO: remove if not used
-      label: 'Verify OnBoarding Status',
-      Component: () =>
-        SubProductStepOnBoardingStatus({
-          externalInstitutionId,
-          productId,
-          productTitle: (product as Product).title,
-          subProductId,
-          forward,
-          back: () => {
-            setActiveStep(activeStep - 2);
-          },
-        }),
-    },
-    {
       label: 'Get Onboarding Data',
       Component: () =>
         StepOnboardingData({
-          externalInstitutionId,
           productId,
+          partyId: selectedParty?.id,
           forward: forwardWithOnboardingData,
           subProductFlow: true,
         }),
@@ -433,7 +395,7 @@ function OnBoardingSubProduct() {
       <ConfirmOnboardingModal
         open={openConfirmationModal}
         handleClose={() => setOpenConfirmationModal(false)}
-        partyName={partyName}
+        partyName={selectedParty?.description}
         onConfirm={handleOnConfirmModal}
         productName={subProduct?.title}
       />

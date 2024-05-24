@@ -87,6 +87,7 @@ export default function PersonalAndBillingDataSection({
 
   const [shrinkRea, setShrinkRea] = useState<boolean>(false);
   const [shrinkVatNumber, setShrinkVatNumber] = useState<boolean>(false);
+  const [shrinkCity, setShrinkCity] = useState<boolean>(false);
   const [countries, setCountries] = useState<Array<InstitutionLocationData>>();
   const [institutionLocationData, setInstitutionLocationData] = useState<InstitutionLocationData>();
   const [isCitySelected, setIsCitySelected] = useState<boolean>(false);
@@ -506,23 +507,24 @@ export default function PersonalAndBillingDataSection({
                       }}
                       label={t('onboardingFormData.billingDataSection.city')}
                       InputLabelProps={{
-                        shrink: formik.values.city && formik.values.city !== '',
+                        shrink: (formik.values.city && formik.values.city !== '') || shrinkCity,
                       }}
                       sx={{
                         '& .MuiOutlinedInput-input.MuiInputBase-input': {
                           marginLeft: '15px',
                           fontWeight: 'fontWeightMedium',
                           textTransform: 'capitalize',
-                          color:
-                            isFromIPA || isAooUo
-                              ? theme.palette.text.disabled
-                              : theme.palette.text.primary,
+                          color: isDisabled
+                            ? theme.palette.text.disabled
+                            : theme.palette.text.primary,
                         },
                         '& .MuiInputBase-root': {
                           height: '56px',
                         },
                       }}
-                      disabled={isFromIPA || isAooUo}
+                      onClick={() => setShrinkCity(true)}
+                      onBlur={() => setShrinkCity(false)}
+                      disabled={isDisabled}
                     />
                   )}
                 />
@@ -847,8 +849,6 @@ export default function PersonalAndBillingDataSection({
               />
             </Grid>
           )}
-          {/* TODO Write more clearly */}
-          {/* institutionType !== 'PA' && institutionType !== 'PSP' && productId === 'prod-io'; */}
           {(isInformationCompany || isContractingAuthority) && (
             <>
               <Grid item xs={12}>

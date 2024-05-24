@@ -9,6 +9,7 @@ import {
   InsuranceCompaniesResource,
   OnboardingRequestData,
   InstitutionType,
+  SelfcareParty,
 } from '../../../types';
 import { BillingDataDto } from '../../model/BillingData';
 import { GeographicTaxonomyResource, nationalValue } from '../../model/GeographicTaxonomies';
@@ -229,6 +230,34 @@ export const mockPartyRegistry = {
   ],
   count: 8,
 };
+
+const mockedBaseParties: Array<SelfcareParty> = [
+  {
+    id: '43446',
+    description: 'Comune di Milano',
+    userRole: 'ADMIN',
+  },
+  {
+    id: '775644',
+    description: 'Comune di Gessate',
+    userRole: 'ADMIN',
+  },
+  {
+    id: '76767645',
+    description: 'Comune di Venezia',
+    userRole: 'ADMIN',
+  },
+  {
+    id: '23231',
+    description: 'Comune di Bollate',
+    userRole: 'ADMIN',
+  },
+  {
+    id: '5454679',
+    description: 'Comune di Udine',
+    userRole: 'ADMIN',
+  }
+];
 
 const mockedParties = [
   createPartyEntity(
@@ -482,6 +511,7 @@ const mockedUos: Array<UoData> = [
 
 const mockedOnboardingData: Array<InstitutionOnboardingInfoResource> = [
   {
+    geographicTaxonomies: [{ code: '23233', desc: 'Milano'}],
     institution: {
       id: '55897f04-bafd-4bc9-b646-0fd027620c1b',
       billingData: {
@@ -504,10 +534,11 @@ const mockedOnboardingData: Array<InstitutionOnboardingInfoResource> = [
       country: 'IT',
       county: 'MI',
       institutionType: 'PA',
-      origin: 'ANAC',
+      origin: 'IPA',
     },
   },
   {
+    geographicTaxonomies: [{ code: '23233', desc: 'Milano'}],
     institution: {
       id: '999c63d8-554d-4376-233s-4caf2a73822a',
       billingData: {
@@ -526,7 +557,9 @@ const mockedOnboardingData: Array<InstitutionOnboardingInfoResource> = [
         ],
         supportEmail: 'comune.udine@pec.it',
       },
-      // Use case not retrieved institution local data
+      city: 'Milano',
+      county: 'MI',
+      country: 'IT',
       institutionType: 'GSP',
       origin: 'IPA',
       assistanceContacts: {
@@ -540,6 +573,7 @@ const mockedOnboardingData: Array<InstitutionOnboardingInfoResource> = [
     },
   },
   {
+    geographicTaxonomies: [{ code: '23233', desc: 'Milano'}],
     institution: {
       id: '370c63d8-1b76-4376-a725-4caf2a73822a',
       billingData: {
@@ -574,6 +608,7 @@ const mockedOnboardingData: Array<InstitutionOnboardingInfoResource> = [
     },
   },
   {
+    geographicTaxonomies: [],
     institution: {
       id: '92078570527',
       billingData: {
@@ -1003,26 +1038,27 @@ export async function mockFetch(
   }
 
   if (endpoint === 'ONBOARDING_GET_ONBOARDING_DATA') {
-    const onboardingData = mockedOnboardingData.find(
-      (od) => od.institution.billingData.taxCode === params.taxCode
-    );
-    if (params.taxCode === '92078570527') {
-      return new Promise((resolve) =>
-        resolve({ data: onboardingData, status: 200, statusText: '200' } as AxiosResponse)
+    switch(params.institutionId){
+      case '43446':
+        return new Promise((resolve) =>
+        resolve({ data: mockedOnboardingData[0], status: 200, statusText: '200' } as AxiosResponse)
       );
-    }
-    if (onboardingData) {
-      return new Promise((resolve) =>
-        resolve({
-          data: onboardingData,
-          status: 200,
-          statusText: '200',
-        } as AxiosResponse)
+      case '23231':
+        return new Promise((resolve) =>
+        resolve({ data: mockedOnboardingData[2], status: 200, statusText: '200' } as AxiosResponse)
       );
-    } else {
-      return notFoundError;
+      case '5454679':
+        return new Promise((resolve) =>
+        resolve({ data: mockedOnboardingData[1], status: 200, statusText: '200' } as AxiosResponse)
+      );
+      case '775644':
+        return genericError;
+      default:
+        return new Promise((resolve) =>
+          resolve({ data: mockedOnboardingData[3], status: 200, statusText: '200' } as AxiosResponse)
+        );
     }
-  }
+    }
 
   if (endpoint === 'ONBOARDING_VERIFY_PRODUCT') {
     const selectedProduct = mockedProducts.find((p) => p.id === endpointParams.productId);
@@ -1102,7 +1138,7 @@ export async function mockFetch(
 
   if (endpoint === 'ONBOARDING_GET_USER_PARTIES') {
     return new Promise((resolve) =>
-      resolve({ data: mockedParties, status: 200, statusText: '200' } as AxiosResponse)
+      resolve({ data: mockedBaseParties, status: 200, statusText: '200' } as AxiosResponse)
     );
   }
 
