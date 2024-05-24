@@ -238,8 +238,23 @@ const mockedBaseParties: Array<SelfcareParty> = [
     userRole: 'ADMIN',
   },
   {
-    id: '323234',
-    description: 'Comune di Torino',
+    id: '775644',
+    description: 'Comune di Gessate',
+    userRole: 'ADMIN',
+  },
+  {
+    id: '76767645',
+    description: 'Comune di Venezia',
+    userRole: 'ADMIN',
+  },
+  {
+    id: '23231',
+    description: 'Comune di Bollate',
+    userRole: 'ADMIN',
+  },
+  {
+    id: '5454679',
+    description: 'Comune di Udine',
     userRole: 'ADMIN',
   }
 ];
@@ -519,7 +534,7 @@ const mockedOnboardingData: Array<InstitutionOnboardingInfoResource> = [
       country: 'IT',
       county: 'MI',
       institutionType: 'PA',
-      origin: 'ANAC',
+      origin: 'IPA',
     },
   },
   {
@@ -542,7 +557,9 @@ const mockedOnboardingData: Array<InstitutionOnboardingInfoResource> = [
         ],
         supportEmail: 'comune.udine@pec.it',
       },
-      // Use case not retrieved institution local data
+      city: 'Milano',
+      county: 'MI',
+      country: 'IT',
       institutionType: 'GSP',
       origin: 'IPA',
       assistanceContacts: {
@@ -1022,15 +1039,23 @@ export async function mockFetch(
 
   if (endpoint === 'ONBOARDING_GET_ONBOARDING_DATA') {
     switch(params.institutionId){
-      case '232323':
+      case '43446':
         return new Promise((resolve) =>
         resolve({ data: mockedOnboardingData[0], status: 200, statusText: '200' } as AxiosResponse)
       );
-      case '2323':
-        return notFoundError;
+      case '23231':
+        return new Promise((resolve) =>
+        resolve({ data: mockedOnboardingData[2], status: 200, statusText: '200' } as AxiosResponse)
+      );
+      case '5454679':
+        return new Promise((resolve) =>
+        resolve({ data: mockedOnboardingData[1], status: 200, statusText: '200' } as AxiosResponse)
+      );
+      case '775644':
+        return genericError;
       default:
         return new Promise((resolve) =>
-          resolve({ data: mockedOnboardingData[1], status: 200, statusText: '200' } as AxiosResponse)
+          resolve({ data: mockedOnboardingData[3], status: 200, statusText: '200' } as AxiosResponse)
         );
     }
     }
