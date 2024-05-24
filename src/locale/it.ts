@@ -15,7 +15,7 @@ export default {
     ariaLabel: `Seleziona la tipologia di ricerca dell'ente`,
     businessName: 'Ragione Sociale',
     taxcode: 'Codice Fiscale ente',
-    ivassCode: 'Codice IVASS',
+    originId: 'Codice IVASS',
   },
   partyAdvancedSelect: {
     advancedSearchLabel: 'Cerca per',
@@ -513,7 +513,7 @@ export default {
       taxCodeCentralParty: 'Codice Fiscale ente centrale',
       vatNumber: 'Partita IVA',
       taxCodeInvoicing: 'Codice Fiscale SFE',
-      ivassCode: 'Codice IVASS',
+      originId: 'Codice IVASS',
       sdiCode: 'Codice SDI',
       recipientCodeDescription: 'È il codice necessario per ricevere le fatture elettroniche',
       gspDescription: 'Sono gestore di almeno uno dei pubblici servizi: Gas, Energia, Telco.',

@@ -1211,7 +1211,7 @@ const verifySubmit = async (productId = 'prod-idpay') => {
         data: {
           billingData: billingData2billingDataRequest(),
           pspData: undefined,
-          ivassCode: undefined,
+          originId: undefined,
           institutionType: 'PA',
           origin: 'IPA',
           users: [

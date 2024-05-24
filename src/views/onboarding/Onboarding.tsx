@@ -345,7 +345,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
                 ? uoSelected.codiceUniUo
                 : undefined,
               origin: institutionType === 'AS' ? 'IVASS' : undefined,
-              originId: newOnboardingFormData?.ivassCode ?? undefined,
+              originId: newOnboardingFormData?.originId ?? undefined,
             },
           },
           () => setRequiredLogin(true)
@@ -520,7 +520,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
               ? companyInformationsDto2pspDataRequest(onboardingFormData as OnboardingFormData)
               : undefined,
           institutionType,
-          ivassCode: onboardingFormData?.ivassCode,
+          originId: onboardingFormData?.originId,
           geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY
             ? onboardingFormData?.geographicTaxonomies?.map((gt) =>
                 onboardedInstitutionInfo2geographicTaxonomy(gt)
