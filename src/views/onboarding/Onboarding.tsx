@@ -302,7 +302,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
       taxCodeInvoicing: uoResult?.codiceFiscaleSfe,
       zipCode: aooResult ? aooResult.CAP : uoResult ? uoResult.CAP : party.zipCode,
       geographicTaxonomies: onboardingFormData?.geographicTaxonomies as Array<GeographicTaxonomy>,
-      ivassCode: institutionType === 'AS' ? party.originId : undefined,
+      originId: institutionType === 'AS' ? party.originId : undefined,
     });
     forwardWithData(newFormData);
     trackEvent('ONBOARDING_PARTY_SELECTION', {
@@ -345,7 +345,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
                 ? uoSelected.codiceUniUo
                 : undefined,
               origin: institutionType === 'AS' ? 'IVASS' : undefined,
-              originId: newOnboardingFormData?.ivassCode ?? undefined,
+              originId: newOnboardingFormData?.originId ?? undefined,
             },
           },
           () => setRequiredLogin(true)
@@ -520,7 +520,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
               ? companyInformationsDto2pspDataRequest(onboardingFormData as OnboardingFormData)
               : undefined,
           institutionType,
-          ivassCode: onboardingFormData?.ivassCode,
+          originId: onboardingFormData?.originId,
           geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY
             ? onboardingFormData?.geographicTaxonomies?.map((gt) =>
                 onboardedInstitutionInfo2geographicTaxonomy(gt)
@@ -699,12 +699,9 @@ function OnboardingComponent({ productId }: { productId: string }) {
       label: 'Get Onboarding Data',
       Component: () =>
         StepOnboardingData({
-          externalInstitutionId,
           productId,
           institutionType,
           forward: forwardWithOnboardingData,
-          aooSelected,
-          uoSelected,
         }),
     },
     {

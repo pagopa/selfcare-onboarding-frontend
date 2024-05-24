@@ -15,7 +15,7 @@ export default {
     ariaLabel: `Seleziona la tipologia di ricerca dell'ente`,
     businessName: 'Ragione Sociale',
     taxcode: 'Codice Fiscale ente',
-    ivassCode: 'Codice IVASS',
+    originId: 'Codice IVASS',
   },
   partyAdvancedSelect: {
     advancedSearchLabel: 'Cerca per',
@@ -341,12 +341,6 @@ export default {
         "L'ente che hai selezionato ha già sottoscritto l'offerta <1 /><strong>Premium</strong>.",
       closeButton: 'Chiudi',
     },
-    notBasicProductError: {
-      title: "L'ente non ha aderito a {{selectedProduct}}",
-      message:
-        "Per poter sottoscrivere l'offerta <strong>Premium</strong>, l'ente che hai <3 />selezionato deve prima aderire al prodotto <strong>{{selectedProduct}}</strong>.",
-      adhesionButton: 'Aderisci',
-    },
     subProductStepSelectPricingPlan: {
       discountLabelData: '25% di sconto Fino al 30 giugno 2023 ',
       title: 'Passa a IO Premium e migliora le <1/> performance dei messaggi',
@@ -519,7 +513,7 @@ export default {
       taxCodeCentralParty: 'Codice Fiscale ente centrale',
       vatNumber: 'Partita IVA',
       taxCodeInvoicing: 'Codice Fiscale SFE',
-      ivassCode: 'Codice IVASS',
+      originId: 'Codice IVASS',
       sdiCode: 'Codice SDI',
       recipientCodeDescription: 'È il codice necessario per ricevere le fatture elettroniche',
       gspDescription: 'Sono gestore di almeno uno dei pubblici servizi: Gas, Energia, Telco.',

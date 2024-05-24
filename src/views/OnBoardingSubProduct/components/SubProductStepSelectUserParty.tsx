@@ -7,7 +7,7 @@ import { PartyAccountItemButton } from '@pagopa/mui-italia/dist/components/Party
 import { roleLabels } from '@pagopa/selfcare-common-frontend/utils/constants';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
 import { uniqueId } from 'lodash';
-import { Party, SelfcareParty, StepperStepComponentProps } from '../../../../types';
+import { SelfcareParty, StepperStepComponentProps } from '../../../../types';
 import { OnboardingStepActions } from '../../../components/OnboardingStepActions';
 import { useHistoryState } from '../../../components/useHistoryState';
 import PartySelectionSearchInput from './PartySelectionSearchInput';
@@ -32,7 +32,7 @@ const CustomBox = styled(Box)({
   overflowY: 'auto',
   overflowX: 'hidden',
 });
-const verifyPartyFilter = (party: Party, filter: string) =>
+const verifyPartyFilter = (party: SelfcareParty, filter: string) =>
   party.description.toUpperCase().indexOf(filter.toUpperCase()) >= 0;
 export function SubProductStepSelectUserParty({
   forward,
@@ -41,7 +41,7 @@ export function SubProductStepSelectUserParty({
   productId,
   subProductId,
 }: Props) {
-  const partyExternalIdByQuery = new URLSearchParams(window.location.search).get('partyExternalId');
+  const partyIdByQuery = new URLSearchParams(window.location.search).get('partyId');
   const requestIdRef = useRef<string>('');
 
   const { t } = useTranslation();
@@ -52,9 +52,10 @@ export function SubProductStepSelectUserParty({
     'SubProductStepSelectUserParty',
     null
   );
+
   const onForwardAction = () => {
     setSelectedHistory(selected);
-    forward(selected as Party);
+    forward(selected);
   };
   const bodyTitle = t('onBoardingSubProduct.selectUserPartyStep.title');
 
@@ -66,18 +67,18 @@ export function SubProductStepSelectUserParty({
   useEffect(() => {
     // eslint-disable-next-line functional/immutable-data
     requestIdRef.current = uniqueId(
-      `onboarding-premium-party-selection-${partyExternalIdByQuery}-${productId}-${subProductId}`
+      `onboarding-premium-party-selection-${partyIdByQuery}-${productId}-${subProductId}`
     );
 
     trackEvent('ONBOARDING_PREMIUM_PARTY_SELECTION', {
-      party_id: partyExternalIdByQuery,
+      party_id: partyIdByQuery,
       request_id: requestIdRef.current,
       product_id: productId,
       subproduct_id: subProductId,
     });
 
-    if (partyExternalIdByQuery) {
-      const selectedParty = parties.find((p) => p.externalId === partyExternalIdByQuery);
+    if (partyIdByQuery) {
+      const selectedParty = parties.find((p) => p.id === partyIdByQuery);
       if (selectedParty) {
         setSelected(selectedParty);
       } else {
@@ -88,7 +89,7 @@ export function SubProductStepSelectUserParty({
 
   // callback of previous useEffect
   useEffect(() => {
-    if (partyExternalIdByQuery && selected) {
+    if (partyIdByQuery && selected) {
       onForwardAction();
     }
   }, [selected]);
@@ -101,10 +102,10 @@ export function SubProductStepSelectUserParty({
 
   const [input, setInput] = useState('');
   const [filteredParties, setFilteredParties] = useState<Array<SelfcareParty>>(parties);
-  const [selectedParty, setSelectedParty] = useState<Party | null>(
+  const [selectedParty, setSelectedParty] = useState<SelfcareParty | null>(
     parties.length === 1 ? parties[0] : null
   );
-  const onPartySelectionChange = (selectedParty: Party | null) => {
+  const onPartySelectionChange = (selectedParty: SelfcareParty | null) => {
     setSelectedParty(selectedParty);
   };
 
@@ -169,7 +170,7 @@ export function SubProductStepSelectUserParty({
             >
               {filteredParties.map((p) => (
                 <Grid
-                  key={p.externalId}
+                  key={p.id}
                   aria-label={p.description}
                   sx={{
                     width: '480px',

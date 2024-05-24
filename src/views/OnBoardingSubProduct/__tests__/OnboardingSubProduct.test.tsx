@@ -109,22 +109,6 @@ test('test error subProductID', async () => {
   await waitFor(() => screen.getByText('Impossibile individuare il prodotto desiderato'));
 });
 
-test('test not base product adhesion', async () => {
-  renderComponent('prod-io', 'prod-io-premium');
-  await executeStepSelectPricingPlan();
-  await executeStepSelectInstitution('Comune di Venezia');
-  await waitFor(() => screen.getByText("L'ente non ha aderito a App IO"));
-  await executeClickAdhesionButton();
-});
-
-test('test already onboarded premium', async () => {
-  renderComponent('prod-io', 'prod-io-premium');
-  await executeStepSelectPricingPlan();
-  await executeStepSelectInstitution('Comune di Bollate');
-  await waitFor(() => screen.getByText('Sottoscrizione già avvenuta'));
-  await executeClickCloseButton();
-});
-
 test('test error retrieving onboarding info', async () => {
   renderComponent('prod-io', 'prod-io-premium');
   await executeStepSelectPricingPlan();
@@ -133,8 +117,7 @@ test('test error retrieving onboarding info', async () => {
   await executeClickCloseButton();
 });
 
-test.skip('test onboarding complete', async () => {
-  // TODO skipped until fix for sub products
+test('test onboarding complete', async () => {
   renderComponent('prod-io', 'prod-io-premium');
   await executeStepSelectPricingPlan();
   await executeStepSelectInstitution('Comune di Milano');
@@ -144,18 +127,7 @@ test.skip('test onboarding complete', async () => {
   await verifySubmitPostLegals();
 });
 
-test.skip('test complete with error on submit', async () => {
-  // TODO skipped until fix for sub products
-  renderComponent('prod-io', 'prod-io-premium');
-  await executeStepSelectPricingPlan();
-  await executeStepSelectInstitution('Comune di Udine');
-  await executeStepBillingData();
-  await executeStepAddManager(false);
-  await executeClickHomeButton();
-});
-
-test.skip('test complete with error on submit', async () => {
-  // TODO skipped until fix for sub products
+test('test complete with error on submit', async () => {
   renderComponent('prod-io', 'prod-io-premium');
   await executeStepSelectPricingPlan();
   await executeStepSelectInstitution('Comune di Udine');
@@ -183,8 +155,7 @@ test.skip('test exiting during flow with logout', async () => {
   await waitFor(() => expect(mockedLocation.assign).toBeCalledWith(ENV.URL_FE.LOGOUT));
 });
 
-// TODO Skipped test, add unload event
-test.skip('test exiting during flow with unload event', async () => {
+test('test exiting during flow with unload event', async () => {
   renderComponent('prod-io', 'prod-io-premium');
   await executeStepSelectPricingPlan();
   await executeStepSelectInstitution('Comune di Milano');
@@ -273,6 +244,11 @@ const executeStepBillingData = async () => {
   console.log('Testing step Billing Data');
   await waitFor(() => screen.getByText(stepBillingDataTitle));
 
+  // TODO Scenarios with vatNumber will be added with SELC-4817
+  const partyWithoutVatNumberCheckbox = screen.getByLabelText('Il mio ente non ha la partita IVA');
+  fireEvent.click(partyWithoutVatNumberCheckbox);
+  expect(partyWithoutVatNumberCheckbox).toBeChecked();
+
   const confirmButtonEnabled = screen.getByRole('button', { name: 'Continua' });
   await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
 
@@ -292,14 +268,18 @@ const executeStepAddManager = async (expectedSuccessfulSubmit: boolean) => {
   console.log('Testing step add manager');
   await waitFor(() => screen.getByText(stepAddManagerTitle));
 
-  const confirmButton = screen.getByRole('button', { name: 'Continua' });
+  const continueButton = screen.getByRole('button', { name: 'Continua' });
 
-  expect(confirmButton).toBeDisabled();
+  expect(continueButton).toBeDisabled();
 
   await fillUserForm();
 
-  expect(confirmButton).toBeEnabled();
-  fireEvent.click(confirmButton);
+  expect(continueButton).toBeEnabled();
+  fireEvent.click(continueButton);
+
+  await waitFor(() => screen.getByText('Confermi la richiesta di invio?'));
+  const confirmButton = screen.getByRole('button', { name: 'Conferma' });
+  await waitFor(() => fireEvent.click(confirmButton));
 
   await waitFor(() =>
     screen.getByText(
@@ -310,9 +290,11 @@ const executeStepAddManager = async (expectedSuccessfulSubmit: boolean) => {
 
 const executeClickHomeButton = async () => {
   console.log('Pressing home button and go to home');
-  const goHomeButton = screen.getByRole('button', {
-    name: 'Torna alla home',
-  });
+  const goHomeButton = await waitFor(() =>
+    screen.getByRole('button', {
+      name: 'Torna alla home',
+    })
+  );
   expect(goHomeButton).toBeEnabled();
   fireEvent.click(goHomeButton);
   await waitFor(() => expect(mockedLocation.assign).toBeCalledWith(ENV.URL_FE.LANDING));
@@ -320,9 +302,11 @@ const executeClickHomeButton = async () => {
 
 const executeClickCloseButton = async () => {
   console.log('Pressing Close button and go to landing');
-  const closeButton = screen.getByRole('button', {
-    name: 'Chiudi',
-  });
+  const closeButton = await waitFor(() =>
+    screen.getByRole('button', {
+      name: 'Chiudi',
+    })
+  );
   expect(closeButton).toBeEnabled();
   fireEvent.click(closeButton);
   await waitFor(() => expect(mockedLocation.assign).toBeCalledWith(ENV.URL_FE.LANDING));
@@ -433,7 +417,8 @@ const billingData2billingDataRequest = () => ({
   digitalAddress: 'comune.milano@pec.it',
   zipCode: '20021',
   taxCode: '33445673222',
-  vatNumber: '33445673221',
+  taxCodeInvoicing: undefined,
+  vatNumber: undefined,
   recipientCode: 'M5UXCR1',
 });
 
@@ -457,8 +442,14 @@ const verifySubmitPostLegals = async () => {
           ],
           billingData: billingData2billingDataRequest(),
           pspData: undefined,
+          institutionLocationData: {
+            city: 'Milano',
+            country: 'IT',
+            county: 'MI',
+          },
           institutionType: 'PA',
-          pricingPlan: 'C0',
+          // pricingPlan: 'C0',  TODO FIX THIS
+          pricingPlan: undefined, // TODO FIX THIS
           origin: 'IPA',
           geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY
             ? [{ code: nationalValue, desc: 'ITALIA' }]

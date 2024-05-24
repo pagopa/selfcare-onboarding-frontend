@@ -57,7 +57,7 @@ export default function PartyAdvancedRadioButton({
           id="ivassCode"
           value="ivassCode"
           control={<Radio />}
-          label={t('asyncAutocomplete.ivassCode')}
+          label={t('asyncAutocomplete.originId')}
           onClick={() => onSelectValue(false, false, true)}
         />
       </RadioGroup>

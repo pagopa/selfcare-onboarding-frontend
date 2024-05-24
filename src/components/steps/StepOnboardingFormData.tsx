@@ -1,7 +1,6 @@
 import { Box, Grid, TextField } from '@mui/material';
 import { styled } from '@mui/system';
 import { AxiosError, AxiosResponse } from 'axios';
-import { theme } from '@pagopa/mui-italia';
 import { useFormik } from 'formik';
 import { useContext, useEffect, useReducer, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -188,7 +187,12 @@ export default function StepOnboardingFormData({
   }, []);
 
   useEffect(() => {
-    void getPreviousGeotaxononomies();
+    // TODO Check this
+    if (!isPremium) {
+      void getPreviousGeotaxononomies();
+    } else {
+      setPreviousGeotaxononomies(initialFormData.geographicTaxonomies);
+    }
   }, []);
 
   useEffect(() => {
@@ -293,10 +297,12 @@ export default function StepOnboardingFormData({
   ]);
 
   useEffect(() => {
-    if (!formik.values.hasVatnumber) {
+    if (formik.values.hasVatnumber) {
+      void formik.setFieldValue('vatNumber', formik.initialValues.vatNumber);
+    } else {
       void formik.setFieldValue('vatNumber', undefined);
     }
-  }, [!formik.values.hasVatnumber]);
+  }, [formik.values.hasVatnumber]);
 
   const verifyVatNumber = async () => {
     const onboardingStatus = await fetchWithLogs(
@@ -366,7 +372,7 @@ export default function StepOnboardingFormData({
     field: keyof OnboardingFormData,
     label: string,
     fontWeight: string | number = isDisabled ? 'fontWeightRegular' : 'fontWeightMedium',
-    color: string = isDisabled ? theme.palette.text.secondary : theme.palette.text.primary
+    color: string
   ) => {
     const isError = !!formik.errors[field] && formik.errors[field] !== requiredError;
     return {
