@@ -15,7 +15,7 @@ export default {
     ariaLabel: `Seleziona la tipologia di ricerca dell'ente`,
     businessName: 'Ragione Sociale',
     taxcode: 'Codice Fiscale ente',
-    ivassCode: 'Codice IVASS',
+    originId: 'Codice IVASS',
   },
   partyAdvancedSelect: {
     advancedSearchLabel: 'Cerca per',
@@ -77,10 +77,10 @@ export default {
       backAction: 'Chiudi',
     },
     alreadyOnboarded: {
-      title: "L'Ente che hai scelto ha già aderito",
+      title: "L’ente selezionato ha già aderito",
       description:
-        'Per accedere, chiedi al Referente incaricato di abilitarti nella sezione Referenti del portale.',
-      backAction: 'Chiudi',
+        'Per operare sul prodotto, chiedi a un Amministratore di <1/>aggiungerti nella sezione Utenti.',
+      backHome: 'Torna alla home',
     },
     genericError: {
       title: 'Spiacenti, qualcosa è andato storto.',
@@ -269,9 +269,9 @@ export default {
           'La Firma Digitale non è riconducibile al Legale Rappresentante indicato in fase di adesione. Verifica la corrispondenza e carica di nuovo il documento.',
       },
       ALREADY_ONBOARDED: {
-        title: `L'Ente che hai scelto ha già aderito`,
+        title: `L’ente selezionato ha già aderito`,
         message:
-          'Per accedere, chiedi al Referente incaricato di abilitarti nella sezione Referenti del portale.',
+          'Per operare sul prodotto, chiedi a un Amministratore di <1 />aggiungerti nella sezione Utenti.',
       },
       GENERIC: {
         title: 'Caricamento non riuscito',
@@ -341,12 +341,6 @@ export default {
         "L'ente che hai selezionato ha già sottoscritto l'offerta <1 /><strong>Premium</strong>.",
       closeButton: 'Chiudi',
     },
-    notBasicProductError: {
-      title: "L'ente non ha aderito a {{selectedProduct}}",
-      message:
-        "Per poter sottoscrivere l'offerta <strong>Premium</strong>, l'ente che hai <3 />selezionato deve prima aderire al prodotto <strong>{{selectedProduct}}</strong>.",
-      adhesionButton: 'Aderisci',
-    },
     subProductStepSelectPricingPlan: {
       discountLabelData: '25% di sconto Fino al 30 giugno 2023 ',
       title: 'Passa a IO Premium e migliora le <1/> performance dei messaggi',
@@ -401,7 +395,7 @@ export default {
     subProductStepUserUnrelated: {
       title: 'Non puoi aderire a {{selectedProduct}} Premium',
       description:
-        'Il tuo ente non ha aderito ad <strong>{{selectedProduct}}</strong>, o non hai un ruolo per <3/>gestire il prodotto. <5/> Chiedi ad un Amministratore di aggiungerti nella sezione <7/>Utenti, oppure richiedi l’adesione ad <strong>{{selectedProduct}}</strong> per il tuo ente.',
+        'Il tuo ente non ha aderito ad <strong>{{selectedProduct}}</strong>, o non hai un ruolo per <3/>gestire il prodotto. <5/> Chiedi ad un Amministratore di <1/>aggiungerti nella sezione <7/>Utenti, oppure richiedi l’adesione ad <strong>{{selectedProduct}}</strong> per il tuo ente.',
       backHomeLabelBtn: 'Torna alla home',
       goToBtnLabel: 'Vai all’adesione',
     },
@@ -430,7 +424,7 @@ export default {
     },
     billingData: {
       subTitle:
-        'Conferma, modifica o inserisci i dati richiesti, assicurandoti che siano corretti. <1 />Verranno usati anche per richiedere l’adesione ad altri prodotti e in caso di fatturazione',
+      `Conferma, modifica o inserisci i dati richiesti, assicurandoti che siano corretti.<1 /> Verranno usati anche per richiedere l’adesione ad altri prodotti e in caso di fatturazione.`,
     },
     exitModal: {
       title: 'Vuoi davvero uscire?',
@@ -485,6 +479,7 @@ export default {
     },
     billingDataSection: {
       invalidFiscalCode: 'Il Codice Fiscale non è valido',
+      invalidTaxCodeInvoicing: 'Il Codice Fiscale inserito non è relativo al tuo ente',
       invalidZipCode: 'Il CAP non è valido',
       invalidVatNumber: 'La Partita IVA non è valida',
       invalidEmail: 'L’indirizzo email non è valido',
@@ -515,8 +510,10 @@ export default {
       arte o professione <1 />(cfr. art. 21, comma 2, lett. f, DPR n. 633/1972)`,
       vatNumberGroup: 'La Partita IVA è di gruppo',
       taxCode: 'Codice Fiscale',
+      taxCodeCentralParty: 'Codice Fiscale ente centrale',
       vatNumber: 'Partita IVA',
-      ivassCode: 'Codice IVASS',
+      taxCodeInvoicing: 'Codice Fiscale SFE',
+      originId: 'Codice IVASS',
       sdiCode: 'Codice SDI',
       recipientCodeDescription: 'È il codice necessario per ricevere le fatture elettroniche',
       gspDescription: 'Sono gestore di almeno uno dei pubblici servizi: Gas, Energia, Telco.',

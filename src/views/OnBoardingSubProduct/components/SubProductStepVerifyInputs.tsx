@@ -67,12 +67,11 @@ const handleSearchUserParties = async (
     },
     () => setRequiredLogin(true)
   );
-  const baseProducts = (searchResponseBase as AxiosResponse).data as Array<SelfcareParty>;
-  const premiumProducts = (searchResponsePremium as AxiosResponse).data;
+  const partiesWithBaseProduct = (searchResponseBase as AxiosResponse).data as Array<SelfcareParty>;
+  const partiesWithPremiumProduct = (searchResponsePremium as AxiosResponse).data;
 
-  const filteredArrayWithoutPremium = baseProducts.filter(
-    (beseProduct) =>
-      !premiumProducts.find((premiumProduct: any) => beseProduct.id === premiumProduct.id)
+  const partiesWithoutPremium = partiesWithBaseProduct.filter(
+    (pb) => !partiesWithPremiumProduct.find((pp: any) => pb.id === pp.id)
   );
 
   const outcome = getFetchOutcome(searchResponseBase);
@@ -80,14 +79,14 @@ const handleSearchUserParties = async (
   if (outcome === 'success') {
     if (process.env.REACT_APP_MOCK_API === 'true') {
       setParties(
-        baseProducts.map((p) => ({
+        partiesWithBaseProduct.map((p) => ({
           ...p,
           urlLogo: buildUrlLog(p.id),
         }))
       );
     } else {
       setParties(
-        filteredArrayWithoutPremium.map((p) => ({
+        partiesWithoutPremium.map((p) => ({
           ...p,
           urlLogo: buildUrlLog(p.id),
         }))

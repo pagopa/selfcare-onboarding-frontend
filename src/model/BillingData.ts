@@ -6,6 +6,7 @@ export type BillingDataDto = {
   recipientCode?: string;
   registeredOffice: string;
   taxCode?: string;
+  taxCodeInvoicing?: string;
   vatNumber?: string;
   zipCode?: string;
 };
@@ -18,6 +19,7 @@ export const billingData2billingDataRequest = (
   recipientCode: billingData.recipientCode ? billingData.recipientCode.toUpperCase() : undefined,
   registeredOffice: billingData.registeredOffice,
   taxCode: billingData.taxCode,
+  taxCodeInvoicing: billingData.taxCodeInvoicing,
   vatNumber: billingData.vatNumber,
   zipCode: billingData.zipCode,
 });

@@ -8,6 +8,7 @@ import { ENV } from '../../../utils/env';
 import Onboarding from '../Onboarding';
 import '../../../locale';
 import { nationalValue } from '../../../model/GeographicTaxonomies';
+import { filterByCategory } from '../../../utils/constants';
 
 jest.mock('../../../lib/api-utils');
 jest.setTimeout(30000);
@@ -88,19 +89,12 @@ const completeSuccessTitle = 'Richiesta di adesione inviata';
 const completeSuccessTitleForPt = 'Richiesta di registrazione inviata';
 const completeErrorTitle = 'Spiacenti, qualcosa è andato storto.';
 
-const filterByCategory = (productId: string, institutionType: string) =>
-  productId === 'prod-pn'
-    ? 'L6,L4,L45,L35,L5,L17,L15,C14'
-    : institutionType === 'gsp'
-    ? 'L37,SAG'
-    : 'C17,C16,L10,L19,L13,L2,C10,L20,L21,L22,L15,L1,C13,C5,L40,L11,L39,L46,L8,L34,L7,L35,L45,L47,L6,L12,L24,L28,L42,L36,L44,C8,C3,C7,C14,L16,C11,L33,C12,L43,C2,L38,C1,L5,L4,L31,L18,L17,S01,SA';
-
 test('test already onboarded', async () => {
   renderComponent('prod-pagopa');
   await executeStepInstitutionType('prod-pagopa');
   await executeStep1('AGENCY ONBOARDED', 'prod-pagopa', 'pa');
-  await waitFor(() => screen.getByText("L'Ente che hai scelto ha già aderito"));
-  await executeGoHome(false);
+  await waitFor(() => screen.getByText('L’ente selezionato ha già aderito'));
+  await executeGoHome(true);
 });
 
 test('onboarding of pa with origin IPA', async () => {
@@ -341,7 +335,7 @@ const executeStep1 = async (partyName: string, productId: string, institutionTyp
         limit: ENV.MAX_INSTITUTIONS_FETCH,
         page: 1,
         search: 'XXX',
-        categories: filterByCategory(productId, institutionType),
+        categories: filterByCategory(institutionType, productId),
       },
     },
     expect.any(Function)
@@ -445,7 +439,7 @@ const executeAdvancedSearchForAoo = async () => {
   expect(inputPartyName).toBeTruthy();
   fireEvent.change(inputPartyName, { target: { value: 'A356E00' } });
 
-  const partyNameSelection = await waitFor(() => screen.getByText('denominazione aoo test'));
+  const partyNameSelection = await waitFor(() => screen.getByText('denominazione aoo test 1'));
 
   expect(fetchWithLogsSpy).toBeCalledTimes(3);
 
@@ -461,12 +455,12 @@ const executeAdvancedSearchForAoo = async () => {
   const aooName = document.getElementById('aooName') as HTMLInputElement;
 
   await waitFor(() => expect(aooCode.value).toBe('A356E00'));
-  await waitFor(() => expect(aooName.value).toBe('Denominazione Aoo Test'));
+  await waitFor(() => expect(aooName.value).toBe('Denominazione Aoo Test 1'));
 
   const searchCitySelect = document.getElementById('city-select') as HTMLInputElement;
   expect(searchCitySelect.value).toBe('Palermo');
 
-  document.getElementById('onboardingFormData');
+  document.getElementById('taxCodeEquals2VatNumber');
 
   const vatNumber = document.getElementById('vatNumber') as HTMLInputElement;
 
@@ -905,7 +899,7 @@ const fillUserBillingDataForm = async (
     target: { value: 'AAAAAA44D55F456K' },
   });
 
-  const isTaxCodeEquals2PIVA = document.getElementById('onboardingFormData');
+  const isTaxCodeEquals2PIVA = document.getElementById('taxCodeEquals2VatNumber');
   expect(isTaxCodeEquals2PIVA).toBeTruthy();
 
   fireEvent.change(document.getElementById(vatNumber) as HTMLElement, {
@@ -1217,7 +1211,7 @@ const verifySubmit = async (productId = 'prod-idpay') => {
         data: {
           billingData: billingData2billingDataRequest(),
           pspData: undefined,
-          ivassCode: undefined,
+          originId: undefined,
           institutionType: 'PA',
           origin: 'IPA',
           users: [

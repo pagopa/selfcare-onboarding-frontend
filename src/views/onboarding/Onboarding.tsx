@@ -126,8 +126,8 @@ function OnboardingComponent({ productId }: { productId: string }) {
           <Grid key="0">
             <EndingPage
               minHeight="52vh"
-              variantTitle={'h4'}
-              variantDescription={'body1'}
+              variantTitle="h4"
+              variantDescription="body1"
               icon={<IllusError size={60} />}
               title={<Trans i18nKey="onboardingStep1_5.ptAlreadyOnboarded.title" />}
               description={
@@ -148,8 +148,17 @@ function OnboardingComponent({ productId }: { productId: string }) {
               variantTitle={'h4'}
               variantDescription={'body1'}
               title={<Trans i18nKey="onboardingStep1_5.alreadyOnboarded.title" />}
-              description={<Trans i18nKey="onboardingStep1_5.alreadyOnboarded.description" />}
-              buttonLabel={<Trans i18nKey="onboardingStep1_5.alreadyOnboarded.backAction" />}
+              description={
+                <Trans
+                  i18nKey="onboardingStep1_5.alreadyOnboarded.description"
+                  components={{ 1: <br /> }}
+                >
+                  {
+                    'Per operare sul prodotto, chiedi a un Amministratore di <1/>aggiungerti nella sezione Utenti.'
+                  }
+                </Trans>
+              }
+              buttonLabel={<Trans i18nKey="onboardingStep1_5.alreadyOnboarded.backHome" />}
               onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
             />
           </Grid>,
@@ -239,6 +248,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
     forward();
   };
 
+  /* eslint-disable complexity */
   const forwardWithDataAndInstitution = (
     newFormData: Partial<FormData>,
     party: Party,
@@ -289,9 +299,10 @@ function OnboardingComponent({ productId }: { productId: string }) {
         ? uoResult.codiceFiscaleEnte
         : party.taxCode,
       vatNumber: '',
+      taxCodeInvoicing: uoResult?.codiceFiscaleSfe,
       zipCode: aooResult ? aooResult.CAP : uoResult ? uoResult.CAP : party.zipCode,
       geographicTaxonomies: onboardingFormData?.geographicTaxonomies as Array<GeographicTaxonomy>,
-      ivassCode: institutionType === 'AS' ? party.originId : undefined,
+      originId: institutionType === 'AS' ? party.originId : undefined,
     });
     forwardWithData(newFormData);
     trackEvent('ONBOARDING_PARTY_SELECTION', {
@@ -334,7 +345,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
                 ? uoSelected.codiceUniUo
                 : undefined,
               origin: institutionType === 'AS' ? 'IVASS' : undefined,
-              originId: newOnboardingFormData?.ivassCode ?? undefined,
+              originId: newOnboardingFormData?.originId ?? undefined,
             },
           },
           () => setRequiredLogin(true)
@@ -509,7 +520,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
               ? companyInformationsDto2pspDataRequest(onboardingFormData as OnboardingFormData)
               : undefined,
           institutionType,
-          ivassCode: onboardingFormData?.ivassCode,
+          originId: onboardingFormData?.originId,
           geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY
             ? onboardingFormData?.geographicTaxonomies?.map((gt) =>
                 onboardedInstitutionInfo2geographicTaxonomy(gt)
@@ -688,12 +699,9 @@ function OnboardingComponent({ productId }: { productId: string }) {
       label: 'Get Onboarding Data',
       Component: () =>
         StepOnboardingData({
-          externalInstitutionId,
           productId,
           institutionType,
           forward: forwardWithOnboardingData,
-          aooSelected,
-          uoSelected,
         }),
     },
     {
@@ -721,8 +729,8 @@ function OnboardingComponent({ productId }: { productId: string }) {
           institutionType: institutionType as InstitutionType,
           subtitle:
             institutionType !== 'PT' ? (
-              <Trans i18next="onBoardingSubProduct.billingData.subTitle" components={{ 1: <br /> }}>
-                {`Conferma, modifica o inserisci i dati richiesti, assicurandoti che siano corretti. <1 />Verranno usati anche per richiedere l’adesione ad altri prodotti e in caso di fatturazione`}
+              <Trans i18nKey="onBoardingSubProduct.billingData.subTitle" components={{ 1: <br /> }}>
+                {`Conferma, modifica o inserisci i dati richiesti, assicurandoti che siano corretti. <1 />Verranno usati anche per richiedere l’adesione ad altri prodotti e in caso di fatturazione.`}
               </Trans>
             ) : (
               <Trans

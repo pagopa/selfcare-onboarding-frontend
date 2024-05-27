@@ -8,6 +8,8 @@ import {
   UserOnCreate,
   InsuranceCompaniesResource,
   OnboardingRequestData,
+  InstitutionType,
+  SelfcareParty,
 } from '../../../types';
 import { BillingDataDto } from '../../model/BillingData';
 import { GeographicTaxonomyResource, nationalValue } from '../../model/GeographicTaxonomies';
@@ -78,7 +80,7 @@ const createPartyEntity = (
   istatCode,
 });
 
-const mockPartyRegistry = {
+export const mockPartyRegistry = {
   items: [
     createPartyRegistryEntity(
       'id',
@@ -228,6 +230,34 @@ const mockPartyRegistry = {
   ],
   count: 8,
 };
+
+const mockedBaseParties: Array<SelfcareParty> = [
+  {
+    id: '43446',
+    description: 'Comune di Milano',
+    userRole: 'ADMIN',
+  },
+  {
+    id: '775644',
+    description: 'Comune di Gessate',
+    userRole: 'ADMIN',
+  },
+  {
+    id: '76767645',
+    description: 'Comune di Venezia',
+    userRole: 'ADMIN',
+  },
+  {
+    id: '23231',
+    description: 'Comune di Bollate',
+    userRole: 'ADMIN',
+  },
+  {
+    id: '5454679',
+    description: 'Comune di Udine',
+    userRole: 'ADMIN',
+  }
+];
 
 const mockedParties = [
   createPartyEntity(
@@ -391,50 +421,97 @@ export const mockedGeotaxonomies: Array<GeographicTaxonomyResource> = [
   },
 ];
 
-const mockedAooCode: AooData = {
-  codAoo: 'A356E00',
-  codiceFiscaleEnte: '92078570527',
-  codiceIpa: '03YBQ4C7',
-  codiceUniAoo: 'A356E00',
-  denominazioneAoo: 'Denominazione Aoo Test',
-  denominazioneEnte: 'Comune Test',
-  id: 'A356E00',
-  mail1: 'test@test.it',
-  origin: 'IPA',
-  CAP: '53100',
-  codiceCatastaleComune: 'I726',
-  codiceComuneISTAT: '082050',
-  cognomeResponsabile: 'Bielli',
-  nomeResponsabile: 'Silvia',
-  dataIstituzione: '2023-01-27',
-  indirizzo: 'Via Nenni 6',
-  mailResponsabile: 'test@gmail.com',
-  telefonoResponsabile: '3357080675',
-  tipoMail1: 'Pec',
-};
+const mockedAoos: Array<AooData> = [
+  {
+    codAoo: 'A356E00',
+    codiceFiscaleEnte: '92078570527',
+    codiceIpa: '03YBQ4C7',
+    codiceUniAoo: 'A356E00',
+    denominazioneAoo: 'Denominazione Aoo Test 1',
+    denominazioneEnte: 'Comune Test 1',
+    id: 'A356E00',
+    mail1: 'test@test.it',
+    origin: 'IPA',
+    CAP: '53100',
+    codiceCatastaleComune: 'I726',
+    codiceComuneISTAT: '082050',
+    cognomeResponsabile: 'Bielli',
+    nomeResponsabile: 'Silvia',
+    dataIstituzione: '2023-01-27',
+    indirizzo: 'Via Nenni 6',
+    mailResponsabile: 'test@gmail.com',
+    telefonoResponsabile: '3357080675',
+    tipoMail1: 'Pec',
+  },
+  {
+    codAoo: 'A356E01',
+    codiceFiscaleEnte: '98765432109',
+    codiceIpa: 'GHIJKL34',
+    codiceUniAoo: 'A356E01',
+    denominazioneAoo: 'Denominazione Aoo Test 2',
+    denominazioneEnte: 'Comune Test 2',
+    id: 'A356E01',
+    mail1: 'test2@test.it',
+    origin: 'IPA',
+    CAP: '54321',
+    codiceCatastaleComune: 'D456',
+    codiceComuneISTAT: '082050',
+    cognomeResponsabile: 'Verdi',
+    nomeResponsabile: 'Paola',
+    dataIstituzione: '2023-03-20',
+    indirizzo: 'Via Milano 2',
+    mailResponsabile: 'test2@gmail.com',
+    telefonoResponsabile: '3334445566',
+    tipoMail1: 'Pec',
+  },
+];
 
-const mockedUoCode: UoData = {
-  codiceFiscaleEnte: '92078570527',
-  codiceIpa: '03YBQ4C7',
-  codiceUniUo: 'UF9YK6',
-  codiceUniUoPadre: '',
-  denominazioneEnte: 'denominazione uo test',
-  descrizioneUo: 'Ufficio per la transizione al Digitale',
-  id: 'UF9YK6',
-  mail1: 'test@fnofi.it',
-  origin: 'IPA',
-  CAP: '84014',
-  codiceCatastaleComune: 'F912',
-  codiceComuneISTAT: '065078',
-  cognomeResponsabile: 'Ventura',
-  dataAggiornamento: '2020-09-22',
-  dataIstituzione: '2017-09-29',
-  indirizzo: 'Via San Pietro, 10',
-  tipoMail1: 'Pec',
-};
+const mockedUos: Array<UoData> = [
+  {
+    codiceFiscaleEnte: '98765432109',
+    codiceFiscaleSfe: '87654321098',
+    codiceIpa: 'ABCDEF12',
+    codiceUniUo: 'UF9YK7',
+    codiceUniUoPadre: '',
+    denominazioneEnte: 'denominazione uo test 1',
+    descrizioneUo: 'Unità operativa 1',
+    id: 'UF9YK7',
+    mail1: 'test1@fnofi.it',
+    origin: 'IPA',
+    CAP: '54321',
+    codiceCatastaleComune: 'E789',
+    codiceComuneISTAT: '082050',
+    cognomeResponsabile: 'Bianchi',
+    dataAggiornamento: '2020-10-10',
+    dataIstituzione: '2017-10-15',
+    indirizzo: 'Via Venezia 3',
+    tipoMail1: 'Pec',
+  },
+  // use case without codiceFiscaleSfe
+  {
+    codiceFiscaleEnte: '12345678901',
+    codiceIpa: 'GHIJKL34',
+    codiceUniUo: 'UF9YK8',
+    codiceUniUoPadre: '',
+    denominazioneEnte: 'denominazione uo test 2',
+    descrizioneUo: 'Unità operativa 2',
+    id: 'UF9YK8',
+    mail1: 'test2@fnofi.it',
+    origin: 'IPA',
+    CAP: '12345',
+    codiceCatastaleComune: 'F012',
+    codiceComuneISTAT: '082050',
+    cognomeResponsabile: 'Russo',
+    dataAggiornamento: '2020-11-20',
+    dataIstituzione: '2017-11-25',
+    indirizzo: 'Via Firenze 4',
+    tipoMail1: 'Pec',
+  },
+];
 
 const mockedOnboardingData: Array<InstitutionOnboardingInfoResource> = [
   {
+    geographicTaxonomies: [{ code: '23233', desc: 'Milano'}],
     institution: {
       id: '55897f04-bafd-4bc9-b646-0fd027620c1b',
       billingData: {
@@ -457,10 +534,11 @@ const mockedOnboardingData: Array<InstitutionOnboardingInfoResource> = [
       country: 'IT',
       county: 'MI',
       institutionType: 'PA',
-      origin: 'ANAC',
+      origin: 'IPA',
     },
   },
   {
+    geographicTaxonomies: [{ code: '23233', desc: 'Milano'}],
     institution: {
       id: '999c63d8-554d-4376-233s-4caf2a73822a',
       billingData: {
@@ -479,7 +557,9 @@ const mockedOnboardingData: Array<InstitutionOnboardingInfoResource> = [
         ],
         supportEmail: 'comune.udine@pec.it',
       },
-      // Use case not retrieved institution local data
+      city: 'Milano',
+      county: 'MI',
+      country: 'IT',
       institutionType: 'GSP',
       origin: 'IPA',
       assistanceContacts: {
@@ -493,6 +573,7 @@ const mockedOnboardingData: Array<InstitutionOnboardingInfoResource> = [
     },
   },
   {
+    geographicTaxonomies: [{ code: '23233', desc: 'Milano'}],
     institution: {
       id: '370c63d8-1b76-4376-a725-4caf2a73822a',
       billingData: {
@@ -527,6 +608,7 @@ const mockedOnboardingData: Array<InstitutionOnboardingInfoResource> = [
     },
   },
   {
+    geographicTaxonomies: [],
     institution: {
       id: '92078570527',
       billingData: {
@@ -565,7 +647,7 @@ const mockedOnboardingData: Array<InstitutionOnboardingInfoResource> = [
 const statusActive = 'ACTIVE';
 const statusTesting = 'TESTING';
 
-const mockedProducts: Array<Product> = [
+export const mockedProducts: Array<Product> = [
   {
     id: 'prod-pn',
     title: 'SEND - Servizio Notifiche digitali',
@@ -629,7 +711,10 @@ const mockedProducts: Array<Product> = [
   },
 ];
 
-const mockedStationResource: StationResource = {
+// TODO Temporary excluded PSP
+export const institutionTypes: Array<InstitutionType> = ['PA', 'GSP', 'SCP', 'PT', 'AS', 'SA'];
+
+export const mockedStationResource: StationResource = {
   count: 0,
   items: [
     {
@@ -653,12 +738,12 @@ const mockedStationResource: StationResource = {
   ],
 };
 
-const mockedInsuranceResource: InsuranceCompaniesResource = {
+export const mockedInsuranceResource: InsuranceCompaniesResource = {
   count: 3,
   items: [
     {
       address: 'addres',
-      description: 'descriptionInsurance',
+      description: 'mocked foreign insurance company 1',
       digitalAddress: 'email@example.com',
       id: '12345678911',
       origin: 'IVASS',
@@ -669,7 +754,7 @@ const mockedInsuranceResource: InsuranceCompaniesResource = {
     },
     {
       address: 'addressd',
-      description: 'insur',
+      description: 'mocked foreign insurance company 2',
       digitalAddress: 'email@mailtest.com',
       id: '11987654321',
       origin: 'IVASS',
@@ -680,7 +765,7 @@ const mockedInsuranceResource: InsuranceCompaniesResource = {
     },
     {
       address: 'addressd54',
-      description: 'ins',
+      description: 'mocked italian insurance company 1',
       digitalAddress: 'email@mock.com',
       id: '66557744831',
       origin: 'IVASS',
@@ -691,7 +776,7 @@ const mockedInsuranceResource: InsuranceCompaniesResource = {
     },
     {
       address: 'addres',
-      description: 'emptyTaxcode',
+      description: 'mocked italian insurance company 2',
       digitalAddress: 'email@example.com',
       id: '11223323',
       origin: 'IVASS',
@@ -702,7 +787,7 @@ const mockedInsuranceResource: InsuranceCompaniesResource = {
     },
     {
       address: 'addres',
-      description: 'withoutTaxcode',
+      description: 'mocked italian insurance company without taxcode',
       digitalAddress: 'email@example.com',
       id: '11223323',
       origin: 'IVASS',
@@ -746,7 +831,7 @@ const mockedOnboardingRequestData: Array<OnboardingRequestData> = [
   {
     productId: 'prod-pagopa',
     status: 'PENDING',
-    expiringDate: '2024-04-31T01:30:00.000-05:00',
+    expiringDate: '2030-04-31T01:30:00.000-05:00',
   },
   // Expired onboarding request
   {
@@ -867,14 +952,23 @@ export async function mockFetch(
   }
 
   if (endpoint === 'ONBOARDING_GET_AOO_CODE_INFO') {
+    const retrievedAoo = mockedAoos.find((ao) => ao.codiceUniAoo === endpointParams.codiceUniAoo);
     return new Promise((resolve) =>
-      resolve({ data: mockedAooCode, status: 200, statusText: '200' } as AxiosResponse)
+      resolve({ data: retrievedAoo, status: 200, statusText: '200' } as AxiosResponse)
     );
   }
 
   if (endpoint === 'ONBOARDING_GET_UO_CODE_INFO') {
+    const retrievedUo = mockedUos.find((uo) => uo.codiceUniUo === endpointParams.codiceUniUo);
     return new Promise((resolve) =>
-      resolve({ data: mockedUoCode, status: 200, statusText: '200' } as AxiosResponse)
+      resolve({ data: retrievedUo, status: 200, statusText: '200' } as AxiosResponse)
+    );
+  }
+
+  if (endpoint === 'ONBOARDING_GET_UO_LIST'){
+    const retrievedUos = mockedUos.filter((uo) => uo.codiceFiscaleEnte === params.taxCodeInvoicing);
+    return new Promise((resolve) =>
+      resolve({ data: {items: retrievedUos, count: retrievedUos.length }, status: 200, statusText: '200' } as AxiosResponse)
     );
   }
 
@@ -944,26 +1038,27 @@ export async function mockFetch(
   }
 
   if (endpoint === 'ONBOARDING_GET_ONBOARDING_DATA') {
-    const onboardingData = mockedOnboardingData.find(
-      (od) => od.institution.billingData.taxCode === params.taxCode
-    );
-    if (params.taxCode === '92078570527') {
-      return new Promise((resolve) =>
-        resolve({ data: onboardingData, status: 200, statusText: '200' } as AxiosResponse)
+    switch(params.institutionId){
+      case '43446':
+        return new Promise((resolve) =>
+        resolve({ data: mockedOnboardingData[0], status: 200, statusText: '200' } as AxiosResponse)
       );
-    }
-    if (onboardingData) {
-      return new Promise((resolve) =>
-        resolve({
-          data: onboardingData,
-          status: 200,
-          statusText: '200',
-        } as AxiosResponse)
+      case '23231':
+        return new Promise((resolve) =>
+        resolve({ data: mockedOnboardingData[2], status: 200, statusText: '200' } as AxiosResponse)
       );
-    } else {
-      return notFoundError;
+      case '5454679':
+        return new Promise((resolve) =>
+        resolve({ data: mockedOnboardingData[1], status: 200, statusText: '200' } as AxiosResponse)
+      );
+      case '775644':
+        return genericError;
+      default:
+        return new Promise((resolve) =>
+          resolve({ data: mockedOnboardingData[3], status: 200, statusText: '200' } as AxiosResponse)
+        );
     }
-  }
+    }
 
   if (endpoint === 'ONBOARDING_VERIFY_PRODUCT') {
     const selectedProduct = mockedProducts.find((p) => p.id === endpointParams.productId);
@@ -1043,7 +1138,7 @@ export async function mockFetch(
 
   if (endpoint === 'ONBOARDING_GET_USER_PARTIES') {
     return new Promise((resolve) =>
-      resolve({ data: mockedParties, status: 200, statusText: '200' } as AxiosResponse)
+      resolve({ data: mockedBaseParties, status: 200, statusText: '200' } as AxiosResponse)
     );
   }
 

@@ -16,15 +16,11 @@ import { fetchWithLogs } from '../../lib/api-utils';
 import { getFetchOutcome } from '../../lib/error-utils';
 import { unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
 import { ENV } from '../../utils/env';
-import { AooData } from '../../model/AooData';
-import { UoData } from '../../model/UoModel';
 
 type Props = StepperStepComponentProps & {
-  externalInstitutionId: string;
   productId: string;
+  partyId?: string;
   institutionType?: InstitutionType;
-  aooSelected?: AooData;
-  uoSelected?: UoData;
   subProductFlow?: boolean;
 };
 
@@ -53,14 +49,11 @@ const genericError: RequestOutcomeMessage = {
   ],
 };
 
-// eslint-disable-next-line sonarjs/cognitive-complexity
 function StepOnboardingData({
   forward,
-  externalInstitutionId,
+  partyId,
   productId,
   institutionType,
-  aooSelected,
-  uoSelected,
   subProductFlow,
 }: Props) {
   const { t } = useTranslation();
@@ -70,23 +63,17 @@ function StepOnboardingData({
   const { setOnExit } = useContext(HeaderContext);
   const { setRequiredLogin } = useContext(UserContext);
 
-  const submit = async () => {
+  const submit = async (institutionId?: string) => {
     setLoading(true);
 
     const onboardingData = await fetchWithLogs(
       {
         endpoint: 'ONBOARDING_GET_ONBOARDING_DATA',
       },
-
       {
         method: 'GET',
         params: {
-          taxCode: externalInstitutionId,
-          subunitCode: aooSelected
-            ? aooSelected.codiceUniAoo
-            : uoSelected
-            ? uoSelected.codiceUniUo
-            : undefined,
+          institutionId,
           productId,
         },
       },
@@ -96,20 +83,24 @@ function StepOnboardingData({
     const restOutcomeData = getFetchOutcome(onboardingData);
     if (restOutcomeData === 'success') {
       const result = (onboardingData as AxiosResponse).data as InstitutionOnboardingInfoResource;
+      const billingData = {
+        ...result.institution.billingData,
+        geographicTaxonomies: result.geographicTaxonomies,
+      };
+
       forward(
-        result.institution.billingData,
-        result.institution.institutionType ? result.institution.institutionType : institutionType,
+        result.institution.origin,
+        billingData,
+        result.institution.institutionType ?? institutionType,
         result.institution.id,
         result.institution.assistanceContacts,
         result.institution.companyInformations,
         result.institution.country,
-        result.institution.city
-          ? result.institution.city
-              .charAt(0)
-              .toUpperCase()
-              .concat(result.institution.city.substring(1).toLowerCase().trim())
-          : result.institution.city,
-        result.institution.county
+        result.institution?.city
+          ?.charAt(0)
+          .toUpperCase()
+          .concat(result.institution?.city.substring(1).toLowerCase().trim()),
+        result.institution?.county
       );
     } else if (
       (onboardingData as AxiosError<any>).response?.status === 404 ||
@@ -123,8 +114,8 @@ function StepOnboardingData({
   };
 
   useEffect(() => {
-    if (subProductFlow === true) {
-      void submit();
+    if (subProductFlow) {
+      void submit(partyId);
     } else {
       forward(undefined, institutionType, undefined);
       setLoading(false);
