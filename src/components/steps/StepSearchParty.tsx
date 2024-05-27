@@ -90,6 +90,9 @@ export function StepSearchParty({
 
   const isEnabledProduct2AooUo = product?.id === 'prod-pn';
 
+  const noMandatoryIpaProducts =
+    product?.id !== 'prod-interop' && product?.id !== 'prod-io' && product?.id !== 'prod-io-sign';
+
   const handleSearchTaxCodeFromAooUo = async (query: string) => {
     const searchResponse = await fetchWithLogs(
       { endpoint: 'ONBOARDING_GET_PARTY_FROM_CF', endpointParams: { id: query } },
@@ -411,7 +414,7 @@ export function StepSearchParty({
                 variant="body1"
                 color={theme.palette.text.secondary}
               >
-                {institutionType === 'GSP' && product?.id !== 'prod-interop' ? (
+                {institutionType === 'GSP' && noMandatoryIpaProducts ? (
                   <Trans
                     i18nKey="onboardingStep1.onboarding.gpsDescription"
                     components={{
