@@ -19,7 +19,7 @@ import { LoadingOverlay } from '../LoadingOverlay';
 import { OnboardingStepActions } from '../OnboardingStepActions';
 import { Autocomplete } from '../autocomplete/Autocomplete';
 import { useHistoryState } from '../useHistoryState';
-import { filterByCategory } from '../../utils/constants';
+import { filterByCategory, noMandatoryIpaProducts } from '../../utils/constants';
 
 type Props = {
   subTitle: string | ReactElement;
@@ -89,9 +89,6 @@ export function StepSearchParty({
   const [disabled, setDisabled] = useState<boolean>(false);
 
   const isEnabledProduct2AooUo = product?.id === 'prod-pn';
-
-  const noMandatoryIpaProducts =
-    product?.id !== 'prod-interop' && product?.id !== 'prod-io' && product?.id !== 'prod-io-sign';
 
   const handleSearchTaxCodeFromAooUo = async (query: string) => {
     const searchResponse = await fetchWithLogs(
@@ -414,7 +411,7 @@ export function StepSearchParty({
                 variant="body1"
                 color={theme.palette.text.secondary}
               >
-                {institutionType === 'GSP' && noMandatoryIpaProducts ? (
+                {institutionType === 'GSP' && noMandatoryIpaProducts(product?.id) ? (
                   <Trans
                     i18nKey="onboardingStep1.onboarding.gpsDescription"
                     components={{

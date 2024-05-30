@@ -13,7 +13,7 @@ import { AooData } from '../../../../model/AooData';
 import { InstitutionResource } from '../../../../model/InstitutionResource';
 import { UoData } from '../../../../model/UoModel';
 import { ENV } from '../../../../utils/env';
-import { filterByCategory } from '../../../../utils/constants';
+import { filterByCategory, noMandatoryIpaProducts } from '../../../../utils/constants';
 import AsyncAutocompleteResultsBusinessName from './components/AsyncAutocompleteResultsBusinessName';
 import AsyncAutocompleteResultsCode from './components/AsyncAutocompleteResultsCode';
 import AsyncAutocompleteSearch from './components/AsyncAutocompleteSearch';
@@ -97,7 +97,7 @@ export default function AsyncAutocompleteContainer({
   const showBusinessNameElement = input !== undefined && input.length >= 3;
 
   const disabledButton =
-    institutionType === 'GSP' && product?.id !== 'prod-interop'
+    institutionType === 'GSP' && noMandatoryIpaProducts(product?.id)
       ? isBusinessNameSelected
         ? input.length < 3
         : isTaxCodeSelected
