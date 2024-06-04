@@ -19,7 +19,7 @@ import { LoadingOverlay } from '../LoadingOverlay';
 import { OnboardingStepActions } from '../OnboardingStepActions';
 import { Autocomplete } from '../autocomplete/Autocomplete';
 import { useHistoryState } from '../useHistoryState';
-import { filterByCategory } from '../../utils/constants';
+import { filterByCategory, noMandatoryIpaProducts } from '../../utils/constants';
 
 type Props = {
   subTitle: string | ReactElement;
@@ -411,7 +411,7 @@ export function StepSearchParty({
                 variant="body1"
                 color={theme.palette.text.secondary}
               >
-                {institutionType === 'GSP' && product?.id !== 'prod-interop' ? (
+                {institutionType === 'GSP' && noMandatoryIpaProducts(product?.id) ? (
                   <Trans
                     i18nKey="onboardingStep1.onboarding.gpsDescription"
                     components={{
