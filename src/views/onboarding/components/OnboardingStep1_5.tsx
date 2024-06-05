@@ -5,6 +5,7 @@ import { IllusError } from '@pagopa/mui-italia';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
 import { uniqueId } from 'lodash';
 import { EndingPage } from '@pagopa/selfcare-common-frontend';
+import { Grid, Link } from '@mui/material';
 import {
   Party,
   Product,
@@ -21,6 +22,7 @@ import { MessageNoAction } from '../../../components/MessageNoAction';
 import UserNotAllowedPage from '../../UserNotAllowedPage';
 import { AooData } from '../../../model/AooData';
 import { UoData } from '../../../model/UoModel';
+import { RolesInformations } from '../../../components/RolesInformations';
 
 type Props = StepperStepComponentProps & {
   externalInstitutionId: string;
@@ -42,12 +44,28 @@ const alreadyOnboarded: RequestOutcomeMessage = {
         icon={<IllusError size={60} />}
         title={<Trans i18nKey="onboardingStep1_5.alreadyOnboarded.title" />}
         description={
+          <Grid container sx={{ display: 'flex', flexDirection: 'column' }}>
+            <Trans
+              i18nKey="onboardingStep1_5.alreadyOnboarded.description"
+              components={{ 1: <br /> }}
+            >
+              {
+                'Per operare sul prodotto, chiedi a un Amministratore di <1/>aggiungerti nella sezione Utenti.'
+              }
+            </Trans>
+            <Grid item>
+              <RolesInformations />
+            </Grid>
+          </Grid>
+        }
+        isParagraphPresent={true}
+        paragraph={
           <Trans
-            i18nKey="onboardingStep1_5.alreadyOnboarded.description"
-            components={{ 1: <br /> }}
+            i18nKey="onboardingStep1_5.alreadyOnboarded.addNewAdmin"
+            components={{ 1: <br />, 3: <Link underline="none" onClick={() => {}} /> }}
           >
             {
-              'Per operare sul prodotto, chiedi a un Amministratore di <1/>aggiungerti nella sezione Utenti.'
+              'Gli attuali Amministratori non sono più disponibili e hai l’esigenza <1 />di gestire i prodotti? <3>Aggiungi un nuovo Amministratore</3>'
             }
           </Trans>
         }

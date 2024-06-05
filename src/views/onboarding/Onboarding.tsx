@@ -769,6 +769,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
         StepAddManager({
           externalInstitutionId,
           product: selectedProduct,
+          isTechPartner,
           forward: (newFormData: Partial<FormData>) => {
             trackEvent('ONBOARDING_ADD_MANAGER', {
               request_id: requestIdRef.current,
