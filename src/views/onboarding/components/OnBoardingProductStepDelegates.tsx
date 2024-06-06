@@ -1,7 +1,5 @@
 import Add from '@mui/icons-material/Add';
-import MenuBookIcon from '@mui/icons-material/MenuBook';
 import { Box, Checkbox, FormControlLabel, Grid, Link, Typography, useTheme } from '@mui/material';
-import { ButtonNaked } from '@pagopa/mui-italia';
 import SessionModal from '@pagopa/selfcare-common-frontend/components/SessionModal';
 import { omit, uniqueId } from 'lodash';
 import { ChangeEvent, useContext, useEffect, useState } from 'react';
@@ -14,6 +12,7 @@ import { useHistoryState } from '../../../components/useHistoryState';
 import { UserContext } from '../../../lib/context';
 import { objectIsEmpty } from '../../../lib/object-utils';
 import { userValidate } from '../../../utils/api/userValidate';
+import { RolesInformations } from '../../../components/RolesInformations';
 
 // Could be an ES6 Set but it's too bothersome for now
 export type UsersObject = { [key: string]: UserOnCreate };
@@ -227,20 +226,7 @@ export function OnBoardingProductStepDelegates({
           </Typography>
         </Grid>
         <Grid item xs={8}>
-          <ButtonNaked
-            component="button"
-            color="primary"
-            startIcon={<MenuBookIcon />}
-            sx={{ fontWeight: 700 }}
-            onClick={() => {
-              const docLink = isTechPartner
-                ? 'https://docs.pagopa.it/manuale-di-area-riservata-per-partner-tecnologici/area-riservata/ruoli'
-                : 'https://docs.pagopa.it/area-riservata/area-riservata/ruoli';
-              window.open(docLink);
-            }}
-          >
-            {t('moreInformationOnRoles')}
-          </ButtonNaked>
+          <RolesInformations isTechPartner={isTechPartner} />
         </Grid>
       </Grid>
 
