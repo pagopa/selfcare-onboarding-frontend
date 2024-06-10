@@ -19,6 +19,7 @@ export type UsersError = { [key: string]: { [userField: string]: Array<string> }
 
 type Props = StepperStepComponentProps & {
   externalInstitutionId: string;
+  addUserFlow: boolean;
   readOnly?: boolean;
   subProduct?: Product;
   isTechPartner?: boolean;
@@ -32,6 +33,7 @@ export function StepAddManager({
   back,
   subProduct,
   isTechPartner,
+  addUserFlow,
 }: Props) {
   const { setRequiredLogin } = useContext(UserContext);
   const [_loading, setLoading] = useState(true);
@@ -152,6 +154,7 @@ export function StepAddManager({
             allPeople={people}
             setPeople={setPeople}
             readOnly={readOnly}
+            addUserFlow={addUserFlow}
           />
         </Grid>
       </Grid>
@@ -168,7 +171,8 @@ export function StepAddManager({
               validateUserData(people.LEGAL, 'LEGAL', externalInstitutionId, subProduct);
             },
             label: t('onboardingStep2.confirmLabel'),
-            disabled: objectIsEmpty(people) || !validateUser('LEGAL', people.LEGAL, people),
+            disabled:
+              objectIsEmpty(people) || !validateUser('LEGAL', people.LEGAL, people, addUserFlow),
           }}
         />
       </Grid>

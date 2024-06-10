@@ -163,6 +163,21 @@ test('test complete with error on submit', async () => {
   await executeStep1('AGENCY ERROR', 'prod-cgn', 'pa');
 });
 
+test('test add new user for already onboarded party', async () => {
+  renderComponent('prod-io');
+  await executeStepInstitutionType('prod-io');
+  await executeStep1('AGENCY X', 'prod-io', 'pa');
+
+  screen.getByText(/L’ente selezionato ha già aderito/);
+
+  const addNewAdmin = screen.getByText('Aggiungi un nuovo Amministratore');
+  fireEvent.click(addNewAdmin);
+
+  screen.getByText('Indica il Legale Rappresentante');
+  await executeStep2();
+  await executeStep3(true, false, true);
+});
+
 test('test exiting during flow with unload event', async () => {
   renderComponent('prod-pagopa');
   await executeStepInstitutionType('prod-pagopa');
@@ -803,7 +818,11 @@ const executeStep2 = async () => {
   await waitFor(() => screen.getByText(step3Title));
 };
 
-const executeStep3 = async (expectedSuccessfulSubmit: boolean, isTechPartner = false) => {
+const executeStep3 = async (
+  expectedSuccessfulSubmit: boolean,
+  isTechPartner = false,
+  addUserFlow = false
+) => {
   console.log('Testing step 3');
 
   await waitFor(() => screen.getByText(step3Title));
@@ -825,12 +844,14 @@ const executeStep3 = async (expectedSuccessfulSubmit: boolean, isTechPartner = f
     'a@a.AA',
     true,
     'SRNNMA80A01A794F',
-    1,
+    addUserFlow ? 0 : 1,
     'b@b.bb',
-    1
+    addUserFlow ? 0 : 1
   );
 
-  await waitFor(() => checkAdditionalUsers(confirmButton));
+  expect(addDelegateButton).toBeEnabled();
+
+  await waitFor(() => checkAdditionalUsers(confirmButton, addUserFlow));
 
   await waitFor(() => expect(confirmButton).toBeEnabled());
 
@@ -848,14 +869,6 @@ const executeStep3 = async (expectedSuccessfulSubmit: boolean, isTechPartner = f
           : completeSuccessTitleForPt
         : completeErrorTitle
     )
-  );
-};
-
-const verifyDescriptionInStep3 = async () => {
-  console.log('Testing step 3');
-  await waitFor(() => screen.getByText(step3Title));
-  expect(
-    waitFor(() => screen.getByText('Puoi aggiungere da uno a tre Amministratori o suoi delegati.'))
   );
 };
 
@@ -981,14 +994,16 @@ const checkAlreadyExistentValues = async (
 ) => {
   if (existentTaxCode) {
     await fillTextFieldAndCheckButton(prefix, 'taxCode', existentTaxCode, confirmButton, false);
-    const duplicateTaxCodeErrors = screen.getAllByText('Il codice fiscale inserito è già presente');
+    const duplicateTaxCodeErrors = screen.queryAllByText(
+      'Il codice fiscale inserito è già presente'
+    );
     expect(duplicateTaxCodeErrors.length).toBe(expectedDuplicateTaxCodeMessages);
   }
   await fillTextFieldAndCheckButton(prefix, 'taxCode', taxCode, confirmButton, true);
 
   if (existentEmail) {
     await fillTextFieldAndCheckButton(prefix, 'email', existentEmail, confirmButton, false);
-    const duplicateEmailErrors = screen.getAllByText("L'indirizzo email inserito è già presente");
+    const duplicateEmailErrors = screen.queryAllByText("L'indirizzo email inserito è già presente");
     expect(duplicateEmailErrors.length).toBe(expectedDuplicateEmailMessages);
   }
   await fillTextFieldAndCheckButton(prefix, 'email', email, confirmButton, true);
@@ -1072,11 +1087,11 @@ const clickAdminCheckBoxAndTestValues = (
   expect(addDelegateButton).toBeDisabled();
 };
 
-const checkAdditionalUsers = async (confirmButton: HTMLElement) => {
+const checkAdditionalUsers = async (confirmButton: HTMLElement, addUserFlow: boolean) => {
   console.log('Adding additional user');
   await checkRemovingEmptyAdditionalUser(0, confirmButton);
 
-  await fillAdditionalUserAndCheckUniqueValues(0, confirmButton);
+  await fillAdditionalUserAndCheckUniqueValues(0, confirmButton, addUserFlow);
 };
 
 const checkRemovingEmptyAdditionalUser = async (index: number, confirmButton: HTMLElement) => {
@@ -1145,7 +1160,8 @@ const searchUserFormFromRemoveBtn = (removeButton: HTMLElement) => {
 };
 const fillAdditionalUserAndCheckUniqueValues = async (
   index: number,
-  confirmButton: HTMLElement
+  confirmButton: HTMLElement,
+  addUserFlow: boolean
 ) => {
   const removeUserButtons = await addAdditionEmptyUser(index, confirmButton);
 
@@ -1165,16 +1181,16 @@ const fillAdditionalUserAndCheckUniqueValues = async (
     email,
     true,
     'SRNNMA80A01A794F',
-    1,
+    addUserFlow ? 0 : 1,
     'b@b.bb',
-    1
+    addUserFlow ? 0 : 1
   );
   await checkAlreadyExistentValues(
     prefix,
     confirmButton,
     'SRNNMA80A01A794F',
     taxCode,
-    1,
+    addUserFlow ? 0 : 1,
     'a@a.aa',
     email,
     2
@@ -1184,7 +1200,7 @@ const fillAdditionalUserAndCheckUniqueValues = async (
     confirmButton,
     'SRNNMA80A01A794F',
     taxCode,
-    1,
+    addUserFlow ? 0 : 1,
     'a@a.aa',
     email,
     2
