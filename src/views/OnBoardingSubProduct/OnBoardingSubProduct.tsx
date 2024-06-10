@@ -312,6 +312,7 @@ function OnBoardingSubProduct() {
         StepAddManager({
           readOnly: false,
           externalInstitutionId,
+          addUserFlow: false,
           product,
           forward: forwardWithManagerData,
           back: () => {

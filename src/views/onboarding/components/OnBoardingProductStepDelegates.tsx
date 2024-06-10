@@ -23,6 +23,7 @@ type Props = StepperStepComponentProps & {
   externalInstitutionId: string;
   partyName: string;
   isTechPartner: boolean;
+  addUserFlow: boolean;
 };
 
 export function OnBoardingProductStepDelegates({
@@ -33,6 +34,7 @@ export function OnBoardingProductStepDelegates({
   back,
   partyName,
   isTechPartner,
+  addUserFlow,
 }: Props) {
   const { user, setRequiredLogin } = useContext(UserContext);
   const [_loading, setLoading] = useState(true);
@@ -180,7 +182,9 @@ export function OnBoardingProductStepDelegates({
     objectIsEmpty(people) ||
     Object.keys(people)
       .filter((prefix) => 'LEGAL' !== prefix)
-      .some((prefix) => !validateUser(prefix, people[prefix], allPeople, isAuthUser)) ||
+      .some(
+        (prefix) => !validateUser(prefix, people[prefix], allPeople, addUserFlow, isAuthUser)
+      ) ||
     Object.keys(people).length === 3;
 
   const handleCloseGenericErrorModal = () => {
@@ -256,6 +260,7 @@ export function OnBoardingProductStepDelegates({
             setPeople={setPeople}
             readOnlyFields={isAuthUser ? ['name', 'surname', 'taxCode'] : []}
             isAuthUser={isAuthUser}
+            addUserFlow={addUserFlow}
           />
         </Grid>
         {delegateFormIds.map((id) => (
@@ -270,6 +275,7 @@ export function OnBoardingProductStepDelegates({
               isExtraDelegate={true}
               delegateId={id}
               buildRemoveDelegateForm={buildRemoveDelegateForm}
+              addUserFlow={addUserFlow}
             />
           </Grid>
         ))}
@@ -311,7 +317,10 @@ export function OnBoardingProductStepDelegates({
             objectIsEmpty(people) ||
             Object.keys(people)
               .filter((prefix) => 'LEGAL' !== prefix)
-              .some((prefix) => !validateUser(prefix, people[prefix], allPeople, isAuthUser)),
+              .some(
+                (prefix) =>
+                  !validateUser(prefix, people[prefix], allPeople, addUserFlow, isAuthUser)
+              ),
         }}
       />
 
