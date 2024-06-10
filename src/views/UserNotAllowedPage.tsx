@@ -16,13 +16,13 @@ export default function UserNotAllowedPage({ partyName, productTitle }: Props) {
     <EndingPage
       minHeight="52vh"
       icon={<IllusError size={60} />}
-      title={<Trans i18nKey="onboardingStep1_5.userNotAllowedError.title" />}
+      title={<Trans i18nKey="stepVerifyOnboarding.userNotAllowedError.title" />}
       description={
         <Trans
-          i18nKey="onboardingStep1_5.userNotAllowedError.description"
+          i18nKey="stepVerifyOnboarding.userNotAllowedError.description"
           values={{
             productTitle,
-            partyName: partyName ?? t('onboardingStep1_5.userNotAllowedError.noSelectedParty'),
+            partyName: partyName ?? t('stepVerifyOnboarding.userNotAllowedError.noSelectedParty'),
           }}
           components={{
             7: (
@@ -38,7 +38,7 @@ export default function UserNotAllowedPage({ partyName, productTitle }: Props) {
       }
       variantTitle={'h4'}
       variantDescription={'body1'}
-      buttonLabel={<Trans i18nKey="onboardingStep1_5.userNotAllowedError.backToHome" />}
+      buttonLabel={<Trans i18nKey="stepVerifyOnboarding.userNotAllowedError.backToHome" />}
       onButtonClick={() => window.location.assign(ENV.URL_FE.DASHBOARD)}
     />
   );

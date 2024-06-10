@@ -188,9 +188,12 @@ export function ConfirmRegistrationStep0({ forward }: StepperStepComponentProps)
       </Grid>
       <SessionModal
         open={openModal}
-        title={t('onboardingStep1_5.genericError.title')}
+        title={t('stepVerifyOnboarding.genericError.title')}
         message={
-          <Trans i18nKey={'onboardingStep1_5.genericError.description'} components={{ 1: <br /> }}>
+          <Trans
+            i18nKey={'stepVerifyOnboarding.genericError.description'}
+            components={{ 1: <br /> }}
+          >
             {`A causa di un errore del sistema non è possibile completare la procedura.
         <1/>
         Ti chiediamo di riprovare più tardi.`}

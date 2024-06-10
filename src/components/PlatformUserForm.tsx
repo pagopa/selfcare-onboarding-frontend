@@ -23,6 +23,7 @@ type PlatformUserFormProps = {
   isExtraDelegate?: boolean;
   buildRemoveDelegateForm?: (idToRemove: string) => (_: React.SyntheticEvent) => void;
   delegateId?: string;
+  addUserFlow: boolean;
 };
 
 type Field = {
@@ -85,11 +86,12 @@ export function validateUser(
   userTempId: keyof UsersObject,
   user: UserOnCreate,
   users: UsersObject,
+  addUserFlow: boolean,
   isAuthUser?: boolean
 ): boolean {
   return (
     fields.filter(({ id }) => !user[id]).map(({ id }) => id).length === 0 && // mandatory fields
-    validateNoMandatory(userTempId, user, users, isAuthUser).length === 0
+    validateNoMandatory(userTempId, user, addUserFlow, users, isAuthUser).length === 0
   );
 }
 
@@ -97,6 +99,7 @@ export function validateUser(
 function validateNoMandatory(
   userTempId: keyof UsersObject,
   user: UserOnCreate,
+  addUserFlow: boolean,
   users?: UsersObject,
   isAuthUser?: boolean
 ): Array<ValidationErrorCode> {
@@ -120,7 +123,11 @@ function validateNoMandatory(
           ? `${id}-regexp`
           : unique &&
             usersArray &&
-            usersArray.findIndex((u) => stringEquals(u[id], user[id], caseSensitive)) > -1
+            usersArray.findIndex(
+              (u) =>
+                (u.role === user.role || !addUserFlow) &&
+                stringEquals(u[id], user[id], caseSensitive)
+            ) > -1
           ? `${id}-unique`
           : id === 'name' &&
             user.name &&
@@ -158,6 +165,7 @@ export function PlatformUserForm({
   isExtraDelegate,
   buildRemoveDelegateForm,
   delegateId,
+  addUserFlow,
 }: PlatformUserFormProps) {
   const { t } = useTranslation();
 
@@ -173,7 +181,7 @@ export function PlatformUserForm({
   };
 
   const errors: Array<ValidationErrorCode> = people[prefix]
-    ? validateNoMandatory(prefix, people[prefix], allPeople, isAuthUser)
+    ? validateNoMandatory(prefix, people[prefix], addUserFlow, allPeople, isAuthUser)
     : [];
 
   const externalErrors: { [errorsUserData: string]: Array<string> } | undefined =
@@ -257,8 +265,7 @@ export function PlatformUserForm({
                   sx={{
                     width: '100%',
                     '& .MuiOutlinedInput-root.MuiInputBase-root': {
-                      fontWeight:
-                      'fontWeightMedium',
+                      fontWeight: 'fontWeightMedium',
                     },
                   }}
                   inputProps={{

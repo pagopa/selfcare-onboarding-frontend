@@ -68,7 +68,7 @@ export default {
     privacyPolicyLink: 'l’Informativa Privacy e i Termini e Condizioni d’Uso del servizio',
     actionLabel: 'Continua',
   },
-  onboardingStep1_5: {
+  stepVerifyOnboarding: {
     loadingText: 'Stiamo verificando i tuoi dati',
     ptAlreadyOnboarded: {
       title: 'Il Partner è già registrato',
