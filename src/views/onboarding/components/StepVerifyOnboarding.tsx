@@ -5,6 +5,7 @@ import { IllusError } from '@pagopa/mui-italia';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
 import { uniqueId } from 'lodash';
 import { EndingPage } from '@pagopa/selfcare-common-frontend';
+import { Grid, Link } from '@mui/material';
 import {
   Party,
   Product,
@@ -21,6 +22,7 @@ import { MessageNoAction } from '../../../components/MessageNoAction';
 import UserNotAllowedPage from '../../UserNotAllowedPage';
 import { AooData } from '../../../model/AooData';
 import { UoData } from '../../../model/UoModel';
+import { RolesInformations } from '../../../components/RolesInformations';
 
 type Props = StepperStepComponentProps & {
   externalInstitutionId: string;
@@ -31,33 +33,6 @@ type Props = StepperStepComponentProps & {
   uoSelected?: UoData;
 };
 
-const alreadyOnboarded: RequestOutcomeMessage = {
-  title: '',
-  description: [
-    <>
-      <EndingPage
-        minHeight="52vh"
-        variantTitle={'h4'}
-        variantDescription={'body1'}
-        icon={<IllusError size={60} />}
-        title={<Trans i18nKey="onboardingStep1_5.alreadyOnboarded.title" />}
-        description={
-          <Trans
-            i18nKey="onboardingStep1_5.alreadyOnboarded.description"
-            components={{ 1: <br /> }}
-          >
-            {
-              'Per operare sul prodotto, chiedi a un Amministratore di <1/>aggiungerti nella sezione Utenti.'
-            }
-          </Trans>
-        }
-        buttonLabel={<Trans i18nKey="onboardingStep1_5.alreadyOnboarded.backHome" />}
-        onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
-      />
-    </>,
-  ],
-};
-
 export const genericError: RequestOutcomeMessage = {
   title: '',
   description: [
@@ -65,9 +40,9 @@ export const genericError: RequestOutcomeMessage = {
       <EndingPage
         minHeight="52vh"
         icon={<IllusError size={60} />}
-        title={<Trans i18nKey="onboardingStep1_5.genericError.title" />}
+        title={<Trans i18nKey="stepVerifyOnboarding.genericError.title" />}
         description={
-          <Trans i18nKey="onboardingStep1_5.genericError.description">
+          <Trans i18nKey="stepVerifyOnboarding.genericError.description">
             A causa di un errore del sistema non è possibile completare la procedura.
             <br />
             Ti chiediamo di riprovare più tardi.
@@ -75,7 +50,7 @@ export const genericError: RequestOutcomeMessage = {
         }
         variantTitle={'h4'}
         variantDescription={'body1'}
-        buttonLabel={<Trans i18nKey="onboardingStep1_5.genericError.backAction" />}
+        buttonLabel={<Trans i18nKey="stepVerifyOnboarding.genericError.backAction" />}
         onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
       />
     </>,
@@ -83,7 +58,7 @@ export const genericError: RequestOutcomeMessage = {
 };
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
-export function OnboardingStep1_5({
+export function StepVerifyOnboarding({
   forward,
   externalInstitutionId,
   productId,
@@ -106,6 +81,54 @@ export function OnboardingStep1_5({
         <UserNotAllowedPage
           partyName={selectedParty?.description}
           productTitle={selectedProduct?.title}
+        />
+      </>,
+    ],
+  };
+
+  const alreadyOnboarded: RequestOutcomeMessage = {
+    title: '',
+    description: [
+      <>
+        <EndingPage
+          minHeight="52vh"
+          variantTitle={'h4'}
+          variantDescription={'body1'}
+          icon={<IllusError size={60} />}
+          title={<Trans i18nKey="stepVerifyOnboarding.alreadyOnboarded.title" />}
+          description={
+            <Grid container sx={{ display: 'flex', flexDirection: 'column' }}>
+              <Trans
+                i18nKey="stepVerifyOnboarding.alreadyOnboarded.description"
+                components={{ 1: <br /> }}
+              >
+                {
+                  'Per operare sul prodotto, chiedi a un Amministratore di <1/>aggiungerti nella sezione Utenti.'
+                }
+              </Trans>
+              <Grid item>
+                <RolesInformations />
+              </Grid>
+            </Grid>
+          }
+          isParagraphPresent={true}
+          paragraph={
+            <Trans
+              i18nKey="stepVerifyOnboarding.alreadyOnboarded.addNewAdmin"
+              components={{
+                1: <br />,
+                3: (
+                  <Link underline="none" sx={{ cursor: 'pointer' }} onClick={() => forward(true)} />
+                ),
+              }}
+            >
+              {
+                'Gli attuali Amministratori non sono più disponibili e hai l’esigenza <1 />di gestire i prodotti? <3>Aggiungi un nuovo Amministratore</3>'
+              }
+            </Trans>
+          }
+          buttonLabel={<Trans i18nKey="stepVerifyOnboarding.alreadyOnboarded.backHome" />}
+          onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
         />
       </>,
     ],
@@ -185,11 +208,11 @@ export function OnboardingStep1_5({
     unregisterUnloadEvent(setOnExit);
   }
   return loading ? (
-    <LoadingOverlay loadingText={t('onboardingStep1_5.loadingText')} />
+    <LoadingOverlay loadingText={t('stepVerifyOnboarding.loadingText')} />
   ) : outcome ? (
     <MessageNoAction {...outcome} />
   ) : (
     <></>
   );
 }
-export default OnboardingStep1_5;
+export default StepVerifyOnboarding;

@@ -1,7 +1,5 @@
 import Add from '@mui/icons-material/Add';
-import MenuBookIcon from '@mui/icons-material/MenuBook';
 import { Box, Checkbox, FormControlLabel, Grid, Link, Typography, useTheme } from '@mui/material';
-import { ButtonNaked } from '@pagopa/mui-italia';
 import SessionModal from '@pagopa/selfcare-common-frontend/components/SessionModal';
 import { omit, uniqueId } from 'lodash';
 import { ChangeEvent, useContext, useEffect, useState } from 'react';
@@ -14,6 +12,7 @@ import { useHistoryState } from '../../../components/useHistoryState';
 import { UserContext } from '../../../lib/context';
 import { objectIsEmpty } from '../../../lib/object-utils';
 import { userValidate } from '../../../utils/api/userValidate';
+import { RolesInformations } from '../../../components/RolesInformations';
 
 // Could be an ES6 Set but it's too bothersome for now
 export type UsersObject = { [key: string]: UserOnCreate };
@@ -24,6 +23,7 @@ type Props = StepperStepComponentProps & {
   externalInstitutionId: string;
   partyName: string;
   isTechPartner: boolean;
+  addUserFlow: boolean;
 };
 
 export function OnBoardingProductStepDelegates({
@@ -34,6 +34,7 @@ export function OnBoardingProductStepDelegates({
   back,
   partyName,
   isTechPartner,
+  addUserFlow,
 }: Props) {
   const { user, setRequiredLogin } = useContext(UserContext);
   const [_loading, setLoading] = useState(true);
@@ -181,7 +182,9 @@ export function OnBoardingProductStepDelegates({
     objectIsEmpty(people) ||
     Object.keys(people)
       .filter((prefix) => 'LEGAL' !== prefix)
-      .some((prefix) => !validateUser(prefix, people[prefix], allPeople, isAuthUser)) ||
+      .some(
+        (prefix) => !validateUser(prefix, people[prefix], allPeople, addUserFlow, isAuthUser)
+      ) ||
     Object.keys(people).length === 3;
 
   const handleCloseGenericErrorModal = () => {
@@ -227,20 +230,7 @@ export function OnBoardingProductStepDelegates({
           </Typography>
         </Grid>
         <Grid item xs={8}>
-          <ButtonNaked
-            component="button"
-            color="primary"
-            startIcon={<MenuBookIcon />}
-            sx={{ fontWeight: 700 }}
-            onClick={() => {
-              const docLink = isTechPartner
-                ? 'https://docs.pagopa.it/manuale-di-area-riservata-per-partner-tecnologici/area-riservata/ruoli'
-                : 'https://docs.pagopa.it/area-riservata/area-riservata/ruoli';
-              window.open(docLink);
-            }}
-          >
-            {t('moreInformationOnRoles')}
-          </ButtonNaked>
+          <RolesInformations isTechPartner={isTechPartner} />
         </Grid>
       </Grid>
 
@@ -270,6 +260,7 @@ export function OnBoardingProductStepDelegates({
             setPeople={setPeople}
             readOnlyFields={isAuthUser ? ['name', 'surname', 'taxCode'] : []}
             isAuthUser={isAuthUser}
+            addUserFlow={addUserFlow}
           />
         </Grid>
         {delegateFormIds.map((id) => (
@@ -284,6 +275,7 @@ export function OnBoardingProductStepDelegates({
               isExtraDelegate={true}
               delegateId={id}
               buildRemoveDelegateForm={buildRemoveDelegateForm}
+              addUserFlow={addUserFlow}
             />
           </Grid>
         ))}
@@ -325,7 +317,10 @@ export function OnBoardingProductStepDelegates({
             objectIsEmpty(people) ||
             Object.keys(people)
               .filter((prefix) => 'LEGAL' !== prefix)
-              .some((prefix) => !validateUser(prefix, people[prefix], allPeople, isAuthUser)),
+              .some(
+                (prefix) =>
+                  !validateUser(prefix, people[prefix], allPeople, addUserFlow, isAuthUser)
+              ),
         }}
       />
 

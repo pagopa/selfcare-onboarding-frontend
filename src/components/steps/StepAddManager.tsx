@@ -1,6 +1,4 @@
-import MenuBookIcon from '@mui/icons-material/MenuBook';
 import { Grid, Typography } from '@mui/material';
-import { ButtonNaked } from '@pagopa/mui-italia';
 import SessionModal from '@pagopa/selfcare-common-frontend/components/SessionModal';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
 import { uniqueId } from 'lodash';
@@ -13,6 +11,7 @@ import { userValidate } from '../../utils/api/userValidate';
 import { OnboardingStepActions } from '../OnboardingStepActions';
 import { PlatformUserForm, validateUser } from '../PlatformUserForm';
 import { useHistoryState } from '../useHistoryState';
+import { RolesInformations } from '../RolesInformations';
 
 // Could be an ES6 Set but it's too bothersome for now
 export type UsersObject = { [key: string]: UserOnCreate };
@@ -20,8 +19,10 @@ export type UsersError = { [key: string]: { [userField: string]: Array<string> }
 
 type Props = StepperStepComponentProps & {
   externalInstitutionId: string;
+  addUserFlow: boolean;
   readOnly?: boolean;
   subProduct?: Product;
+  isTechPartner?: boolean;
 };
 
 export function StepAddManager({
@@ -31,6 +32,8 @@ export function StepAddManager({
   forward,
   back,
   subProduct,
+  isTechPartner,
+  addUserFlow,
 }: Props) {
   const { setRequiredLogin } = useContext(UserContext);
   const [_loading, setLoading] = useState(true);
@@ -137,17 +140,7 @@ export function StepAddManager({
           </Typography>
         </Grid>
         <Grid item>
-          <ButtonNaked
-            component="button"
-            color="primary"
-            startIcon={<MenuBookIcon />}
-            sx={{ fontWeight: 700 }}
-            onClick={() =>
-              window.open('https://docs.pagopa.it/area-riservata/area-riservata/ruoli')
-            }
-          >
-            {t('moreInformationOnRoles')}
-          </ButtonNaked>
+          <RolesInformations isTechPartner={isTechPartner} />
         </Grid>
       </Grid>
 
@@ -161,6 +154,7 @@ export function StepAddManager({
             allPeople={people}
             setPeople={setPeople}
             readOnly={readOnly}
+            addUserFlow={addUserFlow}
           />
         </Grid>
       </Grid>
@@ -177,7 +171,8 @@ export function StepAddManager({
               validateUserData(people.LEGAL, 'LEGAL', externalInstitutionId, subProduct);
             },
             label: t('onboardingStep2.confirmLabel'),
-            disabled: objectIsEmpty(people) || !validateUser('LEGAL', people.LEGAL, people),
+            disabled:
+              objectIsEmpty(people) || !validateUser('LEGAL', people.LEGAL, people, addUserFlow),
           }}
         />
       </Grid>

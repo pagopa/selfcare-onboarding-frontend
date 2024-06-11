@@ -45,7 +45,7 @@ import { registerUnloadEvent, unregisterUnloadEvent } from '../../utils/unloadEv
 import StepInstitutionType from '../../components/steps/StepInstitutionType';
 import UserNotAllowedPage from '../UserNotAllowedPage';
 import { AdditionalData, AdditionalInformations } from '../../model/AdditionalInformations';
-import { genericError, OnboardingStep1_5 } from './components/OnboardingStep1_5';
+import { genericError, StepVerifyOnboarding } from './components/StepVerifyOnboarding';
 import { OnBoardingProductStepDelegates } from './components/OnBoardingProductStepDelegates';
 import { StepAdditionalInformations } from './components/StepAdditionalInformations';
 
@@ -97,6 +97,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
 
   const [aooSelected, setAooSelected] = useState<AooData>();
   const [uoSelected, setUoSelected] = useState<UoData>();
+  const [addUserFlow, setAddUserFlow] = useState<boolean>(false);
 
   const productAvoidStep =
     selectedProduct?.id === 'prod-pn' || selectedProduct?.id === 'prod-idpay';
@@ -119,6 +120,15 @@ function OnboardingComponent({ productId }: { productId: string }) {
     }
   }, [institutionTypeByUrl]);
 
+  const forwardAfterVerify = (addNewUserFlow: boolean) => {
+    if (addNewUserFlow) {
+      setAddUserFlow(true);
+      setActiveStep(activeStep + 4);
+    } else {
+      forward();
+    }
+  };
+
   const alreadyOnboarded: RequestOutcomeMessage = {
     title: '',
     description: isTechPartner
@@ -129,14 +139,14 @@ function OnboardingComponent({ productId }: { productId: string }) {
               variantTitle="h4"
               variantDescription="body1"
               icon={<IllusError size={60} />}
-              title={<Trans i18nKey="onboardingStep1_5.ptAlreadyOnboarded.title" />}
+              title={<Trans i18nKey="stepVerifyOnboarding.ptAlreadyOnboarded.title" />}
               description={
-                <Trans i18nKey="onboardingStep1_5.ptAlreadyOnboarded.description">
+                <Trans i18nKey="stepVerifyOnboarding.ptAlreadyOnboarded.description">
                   Per operare su un prodotto, chiedi a un Amministratore di <br /> aggiungerti nella
                   sezione Utenti.
                 </Trans>
               }
-              buttonLabel={<Trans i18nKey="onboardingStep1_5.ptAlreadyOnboarded.backAction" />}
+              buttonLabel={<Trans i18nKey="stepVerifyOnboarding.ptAlreadyOnboarded.backAction" />}
               onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
             />
           </Grid>,
@@ -147,10 +157,10 @@ function OnboardingComponent({ productId }: { productId: string }) {
               minHeight="52vh"
               variantTitle={'h4'}
               variantDescription={'body1'}
-              title={<Trans i18nKey="onboardingStep1_5.alreadyOnboarded.title" />}
+              title={<Trans i18nKey="stepVerifyOnboarding.alreadyOnboarded.title" />}
               description={
                 <Trans
-                  i18nKey="onboardingStep1_5.alreadyOnboarded.description"
+                  i18nKey="stepVerifyOnboarding.alreadyOnboarded.description"
                   components={{ 1: <br /> }}
                 >
                   {
@@ -158,7 +168,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
                   }
                 </Trans>
               }
-              buttonLabel={<Trans i18nKey="onboardingStep1_5.alreadyOnboarded.backHome" />}
+              buttonLabel={<Trans i18nKey="stepVerifyOnboarding.alreadyOnboarded.backHome" />}
               onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
             />
           </Grid>,
@@ -684,9 +694,9 @@ function OnboardingComponent({ productId }: { productId: string }) {
     {
       label: 'Verifica ente',
       Component: () =>
-        OnboardingStep1_5({
+        StepVerifyOnboarding({
           product: selectedProduct,
-          forward,
+          forward: forwardAfterVerify,
           externalInstitutionId,
           productId,
           selectedProduct,
@@ -768,7 +778,9 @@ function OnboardingComponent({ productId }: { productId: string }) {
       Component: () =>
         StepAddManager({
           externalInstitutionId,
+          addUserFlow,
           product: selectedProduct,
+          isTechPartner,
           forward: (newFormData: Partial<FormData>) => {
             trackEvent('ONBOARDING_ADD_MANAGER', {
               request_id: requestIdRef.current,
@@ -791,6 +803,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
       Component: () =>
         OnBoardingProductStepDelegates({
           externalInstitutionId,
+          addUserFlow,
           product: selectedProduct,
           legal: isTechPartner ? undefined : (formData as any)?.users[0],
           partyName: onboardingFormData?.businessName || '',

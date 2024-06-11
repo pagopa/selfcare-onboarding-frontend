@@ -68,7 +68,7 @@ export default {
     privacyPolicyLink: 'l’Informativa Privacy e i Termini e Condizioni d’Uso del servizio',
     actionLabel: 'Continua',
   },
-  onboardingStep1_5: {
+  stepVerifyOnboarding: {
     loadingText: 'Stiamo verificando i tuoi dati',
     ptAlreadyOnboarded: {
       title: 'Il Partner è già registrato',
@@ -80,6 +80,7 @@ export default {
       title: "L’ente selezionato ha già aderito",
       description:
         'Per operare sul prodotto, chiedi a un Amministratore di <1/>aggiungerti nella sezione Utenti.',
+      addNewAdmin: 'Gli attuali Amministratori non sono più disponibili e hai l’esigenza <1 />di gestire i prodotti? <3>Aggiungi un nuovo Amministratore</3>',
       backHome: 'Torna alla home',
     },
     genericError: {
