@@ -447,7 +447,7 @@ export function StepSearchParty({
                       3: <br />,
                     }}
                   >
-                    {`Non trovi il tuo ente nell'IPA? In <1>questa pagina</1> trovi maggiori <3/> informazioni sull'indice e su come accreditarsi `}
+                    {`Non trovi il tuo ente nell'IPA? <1>In questa pagina</1> trovi maggiori <3/> informazioni sull'indice e su come accreditarsi `}
                   </Trans>
                 )}
               </Typography>
@@ -455,7 +455,7 @@ export function StepSearchParty({
           </Grid>
         </Grid>
       )}
-      <Grid item mt={4}>
+      <Grid item mt={2}>
         <OnboardingStepActions
           back={
             !productAvoidStep

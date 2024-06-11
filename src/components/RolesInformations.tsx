@@ -14,7 +14,7 @@ export function RolesInformations({ isTechPartner }: Props) {
       component="button"
       color="primary"
       startIcon={<MenuBookIcon />}
-      sx={{ fontWeight: 700 }}
+      sx={{ fontWeight: 'fontWeightBold', fontSize: 'fontSize' }}
       onClick={() => {
         const docLink = isTechPartner
           ? 'https://docs.pagopa.it/manuale-di-area-riservata-per-partner-tecnologici/area-riservata/ruoli'

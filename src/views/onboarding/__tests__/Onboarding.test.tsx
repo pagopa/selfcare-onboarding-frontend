@@ -828,12 +828,13 @@ const executeStep3 = async (
   await waitFor(() => screen.getByText(step3Title));
   const [_, confirmButton] = await checkBackForwardNavigation(step2Title, step3Title);
 
-  const addDelegateButton = screen.getByRole('button', {
-    name: 'Aggiungi un altro Amministratore',
-  });
-  expect(addDelegateButton).toBeDisabled();
-
-  await checkLoggedUserAsAdminCheckbox(confirmButton, addDelegateButton);
+  if (!addUserFlow) {
+    const addDelegateButton = screen.getByRole('button', {
+      name: 'Aggiungi un altro Amministratore',
+    });
+    expect(addDelegateButton).toBeDisabled();
+    await checkLoggedUserAsAdminCheckbox(confirmButton, addDelegateButton);
+  }
 
   await checkCertifiedUserValidation('delegate-initial', confirmButton);
 
@@ -849,11 +850,15 @@ const executeStep3 = async (
     addUserFlow ? 0 : 1
   );
 
-  expect(addDelegateButton).toBeEnabled();
-
-  await waitFor(() => checkAdditionalUsers(confirmButton, addUserFlow));
-
   await waitFor(() => expect(confirmButton).toBeEnabled());
+
+  if (!addUserFlow) {
+    const addDelegateButton = screen.getByRole('button', {
+      name: 'Aggiungi un altro Amministratore',
+    });
+    expect(addDelegateButton).toBeEnabled();
+    await waitFor(() => checkAdditionalUsers(confirmButton, addUserFlow));
+  }
 
   await waitFor(() => fireEvent.click(confirmButton));
 
