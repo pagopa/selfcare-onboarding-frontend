@@ -118,7 +118,7 @@ export function StepAddManager({
       <Grid container item justifyContent="center">
         <Grid item xs={12}>
           <Typography variant="h3" component="h2" align="center" sx={{ lineHeight: '1.2' }}>
-            <Trans i18nKey="onboardingStep2.bodyTitle">Indica il Legale Rappresentante</Trans>
+            <Trans i18nKey="stepAddManager.title">Indica il Legale Rappresentante</Trans>
           </Typography>
         </Grid>
       </Grid>
@@ -129,13 +129,19 @@ export function StepAddManager({
             <Trans
               i18nKey={
                 subProduct
-                  ? 'onboardingStep2.premiumBodyDescription'
-                  : 'onboardingStep2.bodyDescription'
+                  ? 'stepAddManager.subTitle.flow.premium'
+                  : addUserFlow
+                  ? 'stepAddManager.subTitle.flow.addNewUser'
+                  : 'stepAddManager.subTitle.flow.base'
               }
               components={{ 1: <br />, 3: <strong />, 4: <br /> }}
               values={{ productTitle: product?.title }}
             >
-              {`Inserisci i dati del Legale Rappresentante o del procuratore del tuo ente. <1/> Sarà responsabile della firma del contratto per <3>{{productTitle}}</3>. <4/> e avrà il ruolo di Amministratore per questo prodotto nell'Area Riservata.`}
+              {subProduct
+                ? `Inserisci i dati del Legale Rappresentante o del procuratore del tuo ente. <1/> La persona che indicherai sarà firmataria del contratto per <3/> <strong>Premium<strong/>.`
+                : addUserFlow
+                ? `La persona indicata firmerà il Modulo di aggiunta per il nuovo Amministratore e lo <1 />autorizzerà ad operare sul prodotto <3>{{productTitle}}</3> per il tuo ente.`
+                : `Inserisci i dati del Legale Rappresentante o del procuratore del tuo ente. <1/> Sarà responsabile della firma del contratto per <3>{{productTitle}}</3>. <4/> e avrà il ruolo di Amministratore per questo prodotto nell'Area Riservata.`}
             </Trans>
           </Typography>
         </Grid>
@@ -163,14 +169,14 @@ export function StepAddManager({
         <OnboardingStepActions
           back={{
             action: onBackAction,
-            label: t('onboardingStep2.backLabel'),
+            label: t('stepAddManager.back'),
             disabled: false,
           }}
           forward={{
             action: () => {
               validateUserData(people.LEGAL, 'LEGAL', externalInstitutionId, subProduct);
             },
-            label: t('onboardingStep2.confirmLabel'),
+            label: t('stepAddManager.continue'),
             disabled:
               objectIsEmpty(people) || !validateUser('LEGAL', people.LEGAL, people, addUserFlow),
           }}

@@ -124,12 +124,17 @@ export default {
       },
     },
   },
-  onboardingStep2: {
-    bodyTitle: 'Indica il Legale Rappresentante',
-    bodyDescription: `Inserisci i dati del Legale Rappresentante o del procuratore del tuo ente. <1/> Sarà responsabile della firma del contratto per <3>{{productTitle}}</3> <4/> e avrà il ruolo di Amministratore per questo prodotto nell'Area Riservata.`,
-    premiumBodyDescription: `Inserisci i dati del Legale Rappresentante o del procuratore del tuo ente. <1/> La persona che indicherai sarà firmataria del contratto per <3/> <strong>Premium<strong/>.`,
-    backLabel: 'Indietro',
-    confirmLabel: 'Continua',
+  stepAddManager: {
+    title: 'Indica il Legale Rappresentante',
+    subTitle: {
+      flow: {
+        base: `Inserisci i dati del Legale Rappresentante o del procuratore del tuo ente. <1/> Sarà responsabile della firma del contratto per <3>{{productTitle}}</3> <4/> e avrà il ruolo di Amministratore per questo prodotto nell'Area Riservata.`,
+        premium: `Inserisci i dati del Legale Rappresentante o del procuratore del tuo ente. <1/> La persona che indicherai sarà firmataria del contratto per <3/> <strong>Premium<strong/>.`,
+        addNewUser: `La persona indicata firmerà il Modulo di aggiunta per il nuovo Amministratore e lo <1 />autorizzerà ad operare sul prodotto <3>{{productTitle}}</3> per il tuo ente.`,
+      }
+    },
+    back: 'Indietro',
+    continue: 'Continua',
   },
   onboardingStep3: {
     bodyTitle: "Indica l'Amministratore",
