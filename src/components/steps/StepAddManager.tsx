@@ -193,7 +193,7 @@ export function StepAddManager({
         }
         onCloseLabel={t('onboarding.outcomeContent.error.backActionLabel')}
         handleClose={handleCloseGenericErrorModal}
-      ></SessionModal>
+      />
     </Grid>
   );
 }

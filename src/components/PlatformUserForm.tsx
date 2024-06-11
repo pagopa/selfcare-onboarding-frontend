@@ -24,7 +24,6 @@ type PlatformUserFormProps = {
   buildRemoveDelegateForm?: (idToRemove: string) => (_: React.SyntheticEvent) => void;
   delegateId?: string;
   addUserFlow: boolean;
-  addUserFlow: boolean;
 };
 
 type Field = {
@@ -92,7 +91,6 @@ export function validateUser(
 ): boolean {
   return (
     fields.filter(({ id }) => !user[id]).map(({ id }) => id).length === 0 && // mandatory fields
-    validateNoMandatory(userTempId, user, addUserFlow, users, isAuthUser).length === 0
     validateNoMandatory(userTempId, user, addUserFlow, users, isAuthUser).length === 0
   );
 }
