@@ -151,3 +151,5 @@ export const filterByCategory = (institutionType?: string, productId?: string) =
 
 export const noMandatoryIpaProducts = (productId?: string) =>
   productId !== 'prod-interop' && productId !== 'prod-io' && productId !== 'prod-io-sign' && productId !== 'prod-idpay' && !productId?.includes('prod-pn');
+
+export const addUserFlowProducts = (productId: string) => productId.includes('prod-interop') || productId.includes('prod-pn') || productId === 'prod-io' || productId === 'prod-pagopa';

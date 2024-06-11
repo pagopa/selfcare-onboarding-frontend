@@ -124,9 +124,7 @@ function validateNoMandatory(
           : unique &&
             usersArray &&
             usersArray.findIndex(
-              (u) =>
-                (u.role === user.role || !addUserFlow) &&
-                stringEquals(u[id], user[id], caseSensitive)
+              (u) => !addUserFlow && stringEquals(u[id], user[id], caseSensitive)
             ) > -1
           ? `${id}-unique`
           : id === 'name' &&
@@ -213,7 +211,11 @@ export function PlatformUserForm({
       : '';
 
   return (
-    <Paper sx={{ borderRadius: '16px', p: 4, width: '704px' }} role="add-delegate-form">
+    <Paper
+      elevation={8}
+      sx={{ borderRadius: '16px', p: 4, width: '704px' }}
+      role="add-delegate-form"
+    >
       {isExtraDelegate && delegateId && buildRemoveDelegateForm && (
         <Grid container xs={12} pb={3} alignItems="center" width="100%">
           <Grid item xs={6}>
@@ -223,7 +225,7 @@ export function PlatformUserForm({
               sx={{ fontWeight: 'fontWeightBold' }}
               data-testid="extra-delegate"
             >
-              {t('onboardingStep3.addUserLabel')}
+              {t('stepAddDelegates.addUserLabel')}
             </Typography>
           </Grid>
           <Grid item xs={6} display="flex" justifyContent="flex-end" flexGrow={1}>
