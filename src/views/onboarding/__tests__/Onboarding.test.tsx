@@ -178,6 +178,21 @@ test('test add new user for already onboarded party', async () => {
   await executeStep3(true, false, true);
 });
 
+test('test add new user for already onboarded party', async () => {
+  renderComponent('prod-io');
+  await executeStepInstitutionType('prod-io');
+  await executeStep1('AGENCY X', 'prod-io', 'pa');
+
+  screen.getByText(/L’ente selezionato ha già aderito/);
+
+  const addNewAdmin = screen.getByText('Aggiungi un nuovo Amministratore');
+  fireEvent.click(addNewAdmin);
+
+  screen.getByText('Indica il Legale Rappresentante');
+  await executeStep2();
+  await executeStep3(true, false, true);
+});
+
 test('test exiting during flow with unload event', async () => {
   renderComponent('prod-pagopa');
   await executeStepInstitutionType('prod-pagopa');
@@ -828,12 +843,13 @@ const executeStep3 = async (
   await waitFor(() => screen.getByText(step3Title));
   const [_, confirmButton] = await checkBackForwardNavigation(step2Title, step3Title);
 
-  const addDelegateButton = screen.getByRole('button', {
-    name: 'Aggiungi un altro Amministratore',
-  });
-  expect(addDelegateButton).toBeDisabled();
-
-  await checkLoggedUserAsAdminCheckbox(confirmButton, addDelegateButton);
+  if (!addUserFlow) {
+    const addDelegateButton = screen.getByRole('button', {
+      name: 'Aggiungi un altro Amministratore',
+    });
+    expect(addDelegateButton).toBeDisabled();
+    await checkLoggedUserAsAdminCheckbox(confirmButton, addDelegateButton);
+  }
 
   await checkCertifiedUserValidation('delegate-initial', confirmButton);
 
@@ -849,11 +865,17 @@ const executeStep3 = async (
     addUserFlow ? 0 : 1
   );
 
-  expect(addDelegateButton).toBeEnabled();
-
-  await waitFor(() => checkAdditionalUsers(confirmButton, addUserFlow));
+  await waitFor(() => checkAdditionalUsers(confirmButton));
 
   await waitFor(() => expect(confirmButton).toBeEnabled());
+
+  if (!addUserFlow) {
+    const addDelegateButton = screen.getByRole('button', {
+      name: 'Aggiungi un altro Amministratore',
+    });
+    expect(addDelegateButton).toBeEnabled();
+    await waitFor(() => checkAdditionalUsers(confirmButton, addUserFlow));
+  }
 
   await waitFor(() => fireEvent.click(confirmButton));
 

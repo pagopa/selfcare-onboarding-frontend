@@ -445,7 +445,7 @@ export default function StepOnboardingFormData({
           </Grid>
         )}
         {isPaymentServiceProvider && <DpoSection baseTextFieldProps={baseTextFieldProps} />}
-        <Grid item xs={12} my={2}>
+        <Grid item xs={12} mb={2}>
           <OnboardingStepActions
             back={{
               action: onBackAction,

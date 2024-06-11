@@ -107,7 +107,7 @@ export default {
       },
       bodyDescription:
         'Inserisci uno dei dati richiesti e cerca dall’Indice della Pubblica <1/> Amministrazione (IPA) l’ente per cui vuoi richiedere l’adesione a <3/><4>{{productTitle}}</4>.',
-      ipaDescription: `Non trovi il tuo ente nell'IPA? In <1>questa pagina</1> trovi maggiori <3/> informazioni sull'indice e su come accreditarsi `,
+      ipaDescription: `Non trovi il tuo ente nell'IPA? <1>In questa pagina</1> trovi maggiori <3/> informazioni sull'indice e su come accreditarsi `,
       selectedInstitution:
         'Prosegui con l’adesione a <1>{{productName}}</1> per l’ente selezionato',
       gpsDescription: `Non trovi il tuo ente nell'IPA?<1 /><2>Inserisci manualmente i dati del tuo ente.</2>`,
@@ -136,11 +136,15 @@ export default {
     back: 'Indietro',
     continue: 'Continua',
   },
-  onboardingStep3: {
-    bodyTitle: "Indica l'Amministratore",
-    bodyDescription1: `Puoi aggiungere da uno a tre Amministratori o suoi delegati. <1/> Saranno i responsabili della gestione di <3>{{productTitle}}</3> e presenti nel contratto di <4 />adesione come delegati dal Legale Rappresentante.`,
-    bodyDescriptionPt:
-      'Puoi aggiungere da uno a tre Amministratori o suoi delegati.<1/> Si occuperanno della gestione degli utenti e dei prodotti per conto degli enti.',
+  stepAddDelegates: {
+    title: "Indica l'Amministratore",
+    description: {
+      flow: {
+        onboarding: `Puoi aggiungere da uno a tre Amministratori o suoi delegati. <1/> Saranno i responsabili della gestione di <3>{{productTitle}}</3> e presenti nel contratto di <4 />adesione come delegati dal Legale Rappresentante.`,
+        pt:  'Puoi aggiungere da uno a tre Amministratori o suoi delegati.<1/> Si occuperanno della gestione degli utenti e dei prodotti per conto degli enti.',
+        addNewUser: `Puoi aggiungere un Amministratore o un suo delegato. Puoi inserire anche la persona che <1 />hai già indicato come Legale Rappresentante. Se aggiungi una persona già presente con un <3 />ruolo diverso per questo prodotto, verrà inserita come Amministratore.`
+      }
+    },
     addUserLabel: 'AGGIUNGI UN ALTRO AMMINISTRATORE',
     addUserLink: 'Aggiungi un altro Amministratore',
     backLabel: 'Indietro',

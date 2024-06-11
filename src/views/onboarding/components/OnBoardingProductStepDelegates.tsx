@@ -175,7 +175,6 @@ export function OnBoardingProductStepDelegates({
     }
     setIsAuthUser(value);
   };
-  const bodyTitle = t('onboardingStep3.bodyTitle');
 
   const theme = useTheme();
   const peopleCondition =
@@ -200,7 +199,7 @@ export function OnBoardingProductStepDelegates({
       <Grid container item justifyContent="center">
         <Grid item xs={12}>
           <Typography variant="h3" component="h2" align="center">
-            {bodyTitle}
+            {t('stepAddDelegates.title')}
           </Typography>
         </Grid>
       </Grid>
@@ -212,15 +211,22 @@ export function OnBoardingProductStepDelegates({
         mt={1}
       >
         <Grid item xs={12} mb={1}>
-          <Typography variant="body1" align="center">
+          <Typography variant="body1" color={theme.palette.text.primary} align="center">
             {isTechPartner ? (
-              <Trans i18nKey="onboardingStep3.bodyDescriptionPt" components={{ 1: <br /> }}>
+              <Trans i18nKey="stepAddDelegates.description.flow.pt" components={{ 1: <br /> }}>
                 {`Puoi aggiungere da uno a tre Amministratori o suoi delegati.<1/> 
               Si occuperanno della gestione degli utenti e dei prodotti per conto degli enti.`}
               </Trans>
+            ) : addUserFlow ? (
+              <Trans
+                i18nKey="stepAddDelegates.description.flow.addNewUser"
+                components={{ 1: <br />, 3: <br /> }}
+              >
+                {`Puoi aggiungere un Amministratore o un suo delegato. Puoi inserire anche la persona che <1 />hai già indicato come Legale Rappresentante. Se aggiungi una persona già presente con un <3 />ruolo diverso per questo prodotto, verrà inserita come Amministratore.`}
+              </Trans>
             ) : (
               <Trans
-                i18nKey="onboardingStep3.bodyDescription1"
+                i18nKey="stepAddDelegates.description.flow.onboarding"
                 values={{ productTitle: product?.title }}
                 components={{ 1: <br />, 3: <strong />, 4: <br /> }}
               >
@@ -229,17 +235,17 @@ export function OnBoardingProductStepDelegates({
             )}
           </Typography>
         </Grid>
-        <Grid item xs={8}>
+        <Grid item xs={8} mt={1}>
           <RolesInformations isTechPartner={isTechPartner} />
         </Grid>
       </Grid>
 
-      <Grid container item justifyContent="center" mt={4}>
+      <Grid container item justifyContent="center" mt={3}>
         <Grid item xs={4} display="flex" justifyContent="center">
           <FormControlLabel
             control={<Checkbox checked={isAuthUser} onChange={handleAuthUser} />}
             label={
-              <Typography variant="body1">{t('onboardingStep3.formControl.label')}</Typography>
+              <Typography variant="body1">{t('stepAddDelegates.formControl.label')}</Typography>
             }
             sx={{
               alignSelf: 'center',
@@ -281,8 +287,8 @@ export function OnBoardingProductStepDelegates({
         ))}
       </Grid>
 
-      <Grid container item my={4} display="flex" justifyContent="center">
-        <Grid item xs={6} sx={{ display: 'flex', justifyContent: 'center' }}>
+      <Grid container item my={addUserFlow ? 0 : 4} display="flex" justifyContent="center">
+        <Grid item xs={6} sx={{ display: addUserFlow ? 'none' : 'flex', justifyContent: 'center' }}>
           {Object.keys(people).length !== 3 && (
             <Link
               component="button"
@@ -297,7 +303,7 @@ export function OnBoardingProductStepDelegates({
               <Box display={'flex'} alignItems={'center'}>
                 <Add fontSize="small" color="primary" sx={{ mr: 1 }} />
                 <Typography color="primary" sx={{ fontWeight: 'fontWeightBold', fontSize: '18px' }}>
-                  {t('onboardingStep3.addUserLink')}
+                  {t('stepAddDelegates.addUserLink')}
                 </Typography>
               </Box>
             </Link>
@@ -306,13 +312,14 @@ export function OnBoardingProductStepDelegates({
       </Grid>
 
       <OnboardingStepActions
-        back={{ action: onBackAction, label: t('onboardingStep3.backLabel'), disabled: false }}
+        addUserFlow={addUserFlow}
+        back={{ action: onBackAction, label: t('stepAddDelegates.backLabel'), disabled: false }}
         forward={{
           action: () => {
             setLoading(true);
             validateUsers(0, {});
           },
-          label: t('onboardingStep3.confirmLabel'),
+          label: t('stepAddDelegates.confirmLabel'),
           disabled:
             objectIsEmpty(people) ||
             Object.keys(people)

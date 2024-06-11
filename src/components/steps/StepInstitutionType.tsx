@@ -141,7 +141,7 @@ export default function StepInstitutionType({
           <Trans
             i18nKey="stepInstitutionType.subtitle"
             values={{ productName: selectedProduct?.title }}
-            components={{1: <strong/>}}
+            components={{ 1: <strong /> }}
           >
             {`Indica il tipo di ente che aderirà a <1>{{productName}}</1>`}
           </Trans>
@@ -186,7 +186,7 @@ export default function StepInstitutionType({
           </Grid>
         </Grid>
       </Paper>
-      <Grid item xs={12} mt={4}>
+      <Grid item xs={12} mt={2}>
         <OnboardingStepActions
           back={
             fromDashboard
