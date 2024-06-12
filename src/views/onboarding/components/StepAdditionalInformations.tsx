@@ -247,12 +247,12 @@ export function StepAdditionalInformations({ forward, back }: StepperStepCompone
         <OnboardingStepActions
           back={{
             action: back,
-            label: t('onboardingStep2.backLabel'),
+            label: t('stepAddManager.back'),
             disabled: false,
           }}
           forward={{
             action: validateTextField,
-            label: t('onboardingStep2.confirmLabel'),
+            label: t('stepAddManager.continue'),
             disabled,
           }}
         />
