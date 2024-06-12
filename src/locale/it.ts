@@ -295,27 +295,32 @@ export default {
     description: 'Impossibile individuare il prodotto desiderato',
   },
   onboarding: {
-    outcomeContent: {
-      ptSuccess: {
-        title: 'Richiesta di registrazione inviata',
-        description:
-          'Invieremo un’email con l’esito della richiesta all’indirizzo  <1 /> PEC indicato.',
-      },
-      success: {
-        title: 'Richiesta di adesione inviata',
-        notPaDescription:
-          "Invieremo un'email all'indirizzo PEC indicato. <1 /> Al suo interno, ci sono le istruzioni per completare <3 />l'adesione.",
-        paDescription:
-          "Invieremo un'email all'indirizzo PEC primario dell'ente. <1 /> Al suo interno, ci sono le istruzioni per completare <3 />l'adesione.",
-        backHome: 'Torna alla home',
-      },
-      error: {
-        title: 'Spiacenti, qualcosa è andato storto.',
-        description:
-          'A causa di un errore del sistema non è possibile completare la procedura. <1 /> Ti chiediamo di riprovare più tardi.',
-        backActionLabel: 'Chiudi',
+    success: {
+      flow: {
+        product: {
+          title: 'Richiesta di adesione inviata',
+          publicAdministration: {
+            description: `Invieremo un’email all’indirizzo PEC primario dell’ente. <1 /> Al suo interno, ci sono le istruzioni per completare <3 />l’adesione.`
+          },
+          notPublicAdministration: {
+            description: `Invieremo un’email all’indirizzo PEC indicato. <1 /> Al suo interno, ci sono le istruzioni per completare <3 />l’adesione.`
+          } 
+        },
+        techPartner: {
+          title: 'Richiesta di registrazione inviata',
+          description: `Invieremo un’email con l’esito della richiesta all’indirizzo <1 />PEC indicato.`
+        },
+        user: {
+          title: 'Hai inviato la richiesta',
+          description: `Invieremo un’email all’indirizzo PEC primario dell’ente. <1 /> Al suo interno, ci sono le istruzioni per completare <3 />l’operazione.`
+        },
       },
     },
+    error: {
+      title: 'Qualcosa è andato storto.',
+      description: `A causa di un errore del sistema non è possibile completare <1 />la procedura. Ti chiediamo di riprovare più tardi.`,
+    },
+    backHome: 'Torna alla home',
     sessionModal: {
       title: 'Vuoi davvero uscire?',
       message: 'Se esci, la richiesta di adesione andrà persa.',
@@ -327,11 +332,11 @@ export default {
       description: { 
         flow: {
           base: 'Stai inviando una richiesta di adesione al prodotto <1>{{productName}}</1> per l’ente <3>{{institutionName}}</3>. <5 /> L’accordo di adesione arriverà alla PEC istituzionale dell’ente e dovrà essere sottoscritta dal Legale Rappresentante. Assicurati di essere autorizzato come dipendente a effettuare questa richiesta.',
-          addNewUser: `Stai aggiungendo un nuovo Amministratore per l’ente <1>{{institutionName}}</1>. L’ente riceverà un modulo alla PEC istituzionale e dovrà essere firmato dal Legale Rappresentante che hai indicato. <3 />Assicurati di essere autorizzato dall’ente a effettuare questa richiesta.`
+          addNewUser: `Stai aggiungendo un nuovo Amministratore per l’ente <1>{{institutionName}}</1>. <3 />L’ente riceverà un modulo alla PEC istituzionale e dovrà essere firmato dal Legale Rappresentante che hai indicato. <3 />Assicurati di essere autorizzato dall’ente a effettuare questa richiesta.`
         }
       },
-      confirmLabel: 'Conferma',
-      cancelLabel: 'Annulla',
+      confirm: 'Conferma',
+      back: 'Indietro',
     },
     loading: {
       loadingText: 'Stiamo verificando i tuoi dati',

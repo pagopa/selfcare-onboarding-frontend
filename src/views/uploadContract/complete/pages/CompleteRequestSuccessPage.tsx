@@ -13,7 +13,7 @@ export default function CompleteRequestSuccessPage() {
         icon={<IllusCompleted size={60} />}
         variantTitle="h4"
         variantDescription="body1"
-        title={t('completeRegistration.outcomeContent.success.title')}
+        title={t('completeRegistration.flow.product.title')}
         description={
           <Trans
             i18nKey="completeRegistration.outcomeContent.success.description"
@@ -22,7 +22,7 @@ export default function CompleteRequestSuccessPage() {
             {`Comunicheremo l'avvenuta adesione all'indirizzo PEC <1/> primario dell'ente. Da questo momento, gli Amministratori <3/> inseriti in fase di richiesta possono accedere all'Area <5 />Riservata.`}
           </Trans>
         }
-        buttonLabel={t('completeRegistration.outcomeContent.success.backHome')}
+        buttonLabel={t('completeRegistration.onboarding.backHome')}
         onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
       />
     </>

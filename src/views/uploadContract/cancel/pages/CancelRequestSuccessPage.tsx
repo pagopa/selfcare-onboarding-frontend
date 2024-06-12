@@ -13,7 +13,7 @@ export default function CancelRequestSuccessPage() {
         icon={<IllusCompleted size={60} />}
         variantTitle="h4"
         variantDescription="body1"
-        title={t('rejectRegistration.outcomeContent.success.title')}
+        title={t('rejectRegistration.flow.product.title')}
         description={
           <Trans i18nKey="rejectRegistration.outcomeContent.success.description">
             Nella home dell’Area Riservata puoi vedere i prodotti

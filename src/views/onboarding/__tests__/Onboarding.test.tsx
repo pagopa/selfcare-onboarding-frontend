@@ -85,10 +85,6 @@ const stepBillingDataTitle = 'Indica i dati del tuo ente';
 const step2Title = 'Indica il Legale Rappresentante';
 const step3Title = "Indica l'Amministratore";
 
-const completeSuccessTitle = 'Richiesta di adesione inviata';
-const completeSuccessTitleForPt = 'Richiesta di registrazione inviata';
-const completeErrorTitle = 'Spiacenti, qualcosa è andato storto.';
-
 test('test already onboarded', async () => {
   renderComponent('prod-pagopa');
   await executeStepInstitutionType('prod-pagopa');
@@ -163,10 +159,10 @@ test('test complete with error on submit', async () => {
   await executeStep1('AGENCY ERROR', 'prod-cgn', 'pa');
 });
 
-test('test add new user for already onboarded party', async () => {
-  renderComponent('prod-io');
-  await executeStepInstitutionType('prod-io');
-  await executeStep1('AGENCY X', 'prod-io', 'pa');
+test('test success add new user for already onboarded party', async () => {
+  renderComponent('prod-pagopa');
+  await executeStepInstitutionType('prod-pagopa');
+  await executeStep1('AGENCY ONBOARDED', 'prod-pagopa', 'pa');
 
   screen.getByText(/L’ente selezionato ha già aderito/);
 
@@ -176,6 +172,21 @@ test('test add new user for already onboarded party', async () => {
   screen.getByText('Indica il Legale Rappresentante');
   await executeStep2();
   await executeStep3(true, false, true);
+});
+
+test('test error add new user for already onboarded party', async () => {
+  renderComponent('prod-io');
+  await executeStepInstitutionType('prod-io');
+  await executeStep1('AGENCY ONBOARDED', 'prod-io', 'pa');
+
+  screen.getByText(/L’ente selezionato ha già aderito/);
+
+  const addNewAdmin = screen.getByText('Aggiungi un nuovo Amministratore');
+  fireEvent.click(addNewAdmin);
+
+  screen.getByText('Indica il Legale Rappresentante');
+  await executeStep2();
+  await executeStep3(false, false, true);
 });
 
 test('test exiting during flow with unload event', async () => {
@@ -869,10 +880,12 @@ const executeStep3 = async (
   await waitFor(() =>
     screen.getByText(
       expectedSuccessfulSubmit
-        ? !isTechPartner
-          ? completeSuccessTitle
-          : completeSuccessTitleForPt
-        : completeErrorTitle
+        ? addUserFlow
+          ? 'Hai inviato la richiesta'
+          : !isTechPartner
+          ? 'Richiesta di adesione inviata'
+          : 'Richiesta di registrazione inviata'
+        : 'Qualcosa è andato storto.'
     )
   );
 };
