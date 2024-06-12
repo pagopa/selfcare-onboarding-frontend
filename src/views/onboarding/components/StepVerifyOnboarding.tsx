@@ -1,11 +1,11 @@
 import { AxiosError } from 'axios';
 import { useEffect, useState, useContext, useRef } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
-import { IllusError, theme } from '@pagopa/mui-italia';
+import { IllusError } from '@pagopa/mui-italia';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
 import { uniqueId } from 'lodash';
 import { EndingPage } from '@pagopa/selfcare-common-frontend';
-import { Grid, Link, Typography } from '@mui/material';
+import { Grid, Link } from '@mui/material';
 import {
   Party,
   Product,
@@ -23,7 +23,6 @@ import UserNotAllowedPage from '../../UserNotAllowedPage';
 import { AooData } from '../../../model/AooData';
 import { UoData } from '../../../model/UoModel';
 import { RolesInformations } from '../../../components/RolesInformations';
-import { addUserFlowProducts } from '../../../utils/constants';
 
 type Props = StepperStepComponentProps & {
   externalInstitutionId: string;
@@ -107,32 +106,26 @@ export function StepVerifyOnboarding({
                   'Per operare sul prodotto, chiedi a un Amministratore di <1/>aggiungerti nella sezione Utenti.'
                 }
               </Trans>
-              <Grid item pt="4px">
+              <Grid item>
                 <RolesInformations />
               </Grid>
             </Grid>
           }
-          isParagraphPresent={addUserFlowProducts(productId)}
+          isParagraphPresent={true}
           paragraph={
-            <Typography sx={{ fontVariant: 'body1', color: theme.palette.text.secondary }}>
-              <Trans
-                i18nKey="stepVerifyOnboarding.alreadyOnboarded.addNewAdmin"
-                components={{
-                  1: <br />,
-                  3: (
-                    <Link
-                      underline="none"
-                      sx={{ cursor: 'pointer' }}
-                      onClick={() => forward(true)}
-                    />
-                  ),
-                }}
-              >
-                {
-                  'Gli attuali Amministratori non sono più disponibili e hai l’esigenza <1 />di gestire i prodotti? <3>Aggiungi un nuovo Amministratore</3>'
-                }
-              </Trans>
-            </Typography>
+            <Trans
+              i18nKey="stepVerifyOnboarding.alreadyOnboarded.addNewAdmin"
+              components={{
+                1: <br />,
+                3: (
+                  <Link underline="none" sx={{ cursor: 'pointer' }} onClick={() => forward(true)} />
+                ),
+              }}
+            >
+              {
+                'Gli attuali Amministratori non sono più disponibili e hai l’esigenza <1 />di gestire i prodotti? <3>Aggiungi un nuovo Amministratore</3>'
+              }
+            </Trans>
           }
           buttonLabel={<Trans i18nKey="stepVerifyOnboarding.alreadyOnboarded.backHome" />}
           onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
