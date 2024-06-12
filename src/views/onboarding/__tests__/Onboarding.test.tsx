@@ -158,6 +158,20 @@ test('test complete with error on submit', async () => {
   await executeStepInstitutionType('prod-cgn');
   await executeStep1('AGENCY ERROR', 'prod-cgn', 'pa');
 });
+test('test add new user for already onboarded party', async () => {
+  renderComponent('prod-io');
+  await executeStepInstitutionType('prod-io');
+  await executeStep1('AGENCY X', 'prod-io', 'pa');
+
+  screen.getByText(/L’ente selezionato ha già aderito/);
+
+  const addNewAdmin = screen.getByText('Aggiungi un nuovo Amministratore');
+  fireEvent.click(addNewAdmin);
+
+  screen.getByText('Indica il Legale Rappresentante');
+  await executeStep2();
+  await executeStep3(true, false, true);
+});
 
 test('test success add new user for already onboarded party', async () => {
   renderComponent('prod-pagopa');

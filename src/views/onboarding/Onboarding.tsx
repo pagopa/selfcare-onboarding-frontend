@@ -828,6 +828,8 @@ function OnboardingComponent({ productId }: { productId: string }) {
           back: () => {
             if (productId === 'prod-pagopa' && institutionType === 'GSP') {
               back();
+            } else if (addUserFlow) {
+              setActiveStep(1);
             } else {
               setActiveStep(activeStep - 2);
             }
