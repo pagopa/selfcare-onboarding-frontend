@@ -497,7 +497,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
     ],
   };
 
-  const submit = async (users: Array<UserOnCreate>) => {
+  const onboardingSubmit = async (users: Array<UserOnCreate>) => {
     setLoading(true);
     const postLegalsResponse = await fetchWithLogs(
       { endpoint: 'ONBOARDING_POST_LEGALS' },
@@ -596,6 +596,47 @@ function OnboardingComponent({ productId }: { productId: string }) {
       } else {
         setOutcome(outcomeContent[outcome]);
       }
+    }
+  };
+
+  const addUserRequest = async (users: Array<UserOnCreate>) => {
+    setLoading(true);
+    const addUserResponse = await fetchWithLogs(
+      { endpoint: 'ONBOARDING_NEW_USER' },
+      {
+        method: 'POST',
+        data: {
+          productId,
+          origin,
+          originId: onboardingFormData?.originId,
+          users: users.map((u) => ({
+            ...u,
+            taxCode: u.taxCode.toUpperCase(),
+            email: u.email.toLowerCase(),
+          })),
+        },
+      },
+      () => setRequiredLogin(true)
+    );
+
+    setLoading(false);
+
+    const outcome = getFetchOutcome(addUserResponse);
+
+    setOutcome(outcomeContent[outcome]);
+
+    if (outcome === 'success') {
+      trackEvent('ONBOARDING_USER_SUCCESS', {
+        request_id: requestIdRef.current,
+        party_id: externalInstitutionId,
+        product_id: productId,
+      });
+    } else {
+      trackEvent('ONBOARDING_USER_ERROR', {
+        request_id: requestIdRef.current,
+        party_id: externalInstitutionId,
+        product_id: productId,
+      });
     }
   };
 
@@ -817,13 +858,23 @@ function OnboardingComponent({ productId }: { productId: string }) {
               party_id: externalInstitutionId,
               product_id: productId,
             });
-            submit(isTechPartner ? usersWithoutLegal : users).catch(() => {
-              trackEvent('ONBOARDING_ADD_DELEGATE', {
-                request_id: requestIdRef.current,
-                party_id: externalInstitutionId,
-                product_id: productId,
+            if (addUserFlow) {
+              addUserRequest(users).catch(() => {
+                trackEvent('ONBOARDING_ADD_NEW_USER', {
+                  request_id: requestIdRef.current,
+                  party_id: externalInstitutionId,
+                  product_id: productId,
+                });
               });
-            });
+            } else {
+              onboardingSubmit(isTechPartner ? usersWithoutLegal : users).catch(() => {
+                trackEvent('ONBOARDING_ADD_DELEGATE', {
+                  request_id: requestIdRef.current,
+                  party_id: externalInstitutionId,
+                  product_id: productId,
+                });
+              });
+            }
           },
           back: () => {
             if (isTechPartner) {

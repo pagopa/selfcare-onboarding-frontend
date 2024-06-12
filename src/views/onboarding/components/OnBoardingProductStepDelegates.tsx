@@ -333,6 +333,7 @@ export function OnBoardingProductStepDelegates({
 
       <ConfirmOnboardingModal
         open={openConfirmationModal}
+        addUser={addUserFlow}
         partyName={partyName}
         productName={product?.title}
         handleClose={handleCloseConfirmationModal}
