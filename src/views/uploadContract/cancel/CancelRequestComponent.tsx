@@ -33,6 +33,7 @@ export default function CancelRequestComponent() {
 
   const addUserFlow =
     new URLSearchParams(window.location.hash.substring(1)).get('add-user') === 'true';
+  const translationKeyValue = addUserFlow ? 'user' : 'product';
 
   useEffect(() => {
     setSubHeaderVisible(true);
@@ -113,7 +114,7 @@ export default function CancelRequestComponent() {
       title: '',
       description: [
         <>
-          <AlreadyCompletedRequestPage addUserFlow={addUserFlow} />
+          <AlreadyCompletedRequestPage translationKeyValue={translationKeyValue} />
         </>,
       ],
     },
@@ -122,7 +123,7 @@ export default function CancelRequestComponent() {
       description: [
         <>
           <AlreadyRejectedRequestPage
-            addUserFlow={addUserFlow}
+            translationKeyValue={translationKeyValue}
             productTitle={productId2ProductTitle(requestData?.productId ?? '')}
           />
         </>,
@@ -133,7 +134,7 @@ export default function CancelRequestComponent() {
       description: [
         <>
           <ExpiredRequestPage
-            addUserFlow={addUserFlow}
+            translationKeyValue={translationKeyValue}
             productTitle={productId2ProductTitle(requestData?.productId ?? '')}
           />
         </>,

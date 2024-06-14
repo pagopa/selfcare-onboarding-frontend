@@ -5,32 +5,24 @@ import { ENV } from '../../../utils/env';
 
 type Props = {
   productTitle: string;
-  addUserFlow: boolean;
+  translationKeyValue: string;
 };
 
-export default function AlreadyRejectedRequestPage({ productTitle, addUserFlow }: Props) {
+export default function AlreadyRejectedRequestPage({ productTitle, translationKeyValue }: Props) {
   const { t } = useTranslation();
 
   return (
     <EndingPage
       minHeight="52vh"
       icon={<IllusError size={60} />}
-      title={
-        addUserFlow
-          ? t('completeRegistration.request.alreadyRejected.user.title')
-          : t('completeRegistration.request.alreadyRejected.product.title')
-      }
+      title={t(`completeRegistration.request.alreadyRejected.${translationKeyValue}.title`)}
       description={
         <Trans
-          i18nKey={
-            addUserFlow
-              ? 'completeRegistration.request.alreadyRejected.user.description'
-              : 'completeRegistration.request.alreadyRejected.product.description'
-          }
+          i18nKey={`completeRegistration.request.alreadyRejected.${translationKeyValue}.description`}
           components={{ 2: <br />, 4: <br /> }}
           values={{ productTitle }}
         >
-          {addUserFlow
+          {translationKeyValue === 'user'
             ? `Il tuo ente ha annullato la richiesta. Per aggiungere un <2 />nuovo Amministratore, inviane una nuova.`
             : `La richiesta di adesione non è andata a buon fine. Se <2 />desideri ancora aderire al prodotto {{productTitle}}, invia <4 />una nuova richiesta.`}
         </Trans>

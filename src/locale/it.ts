@@ -32,26 +32,24 @@ export default {
             title: 'Scarica l’accordo di adesione',
             description: `Per completare l’adesione, scarica l’accordo e fai apporre la firma digitale in <1 /><2>formato p7m</2> dal Legale Rappresentante dell’ente o da un suo procuratore.`,
             downloadContract: 'Scarica l’accordo',
-            disclaimer: 'Firmando l’accordo, il Legale Rappresentante dell’ente, o un suo procuratore, accetta espressamente e specificamente anche le singole clausole indicate nel paragrafo “Clausole ai sensi degli artt. 1341 e 1342 c.c.”',
           },
           user: {
             title: 'Scarica il Modulo di aggiunta',
             description: `Per completare l’adesione, scarica il Modulo di aggiunta e fai apporre la <1 />firma digitale in <2>formato p7m</2> dal Legale Rappresentante dell’ente.`,
             downloadContract: 'Scarica il Modulo',
-            disclaimer: 'Firmando l’accordo, il Legale Rappresentante dell’ente, o un suo procuratore, accetta espressamente e specificamente anche le singole clausole indicate nel paragrafo “Clausole ai sensi degli artt. 1341 e 1342 c.c.”',
-          }
+          },
+          disclaimer: 'Firmando l’accordo, il Legale Rappresentante dell’ente, o un suo procuratore, accetta espressamente e specificamente anche le singole clausole indicate nel paragrafo “Clausole ai sensi degli artt. 1341 e 1342 c.c.”',
         },
         upload: {
           product: {
             title: 'Carica l’accordo firmato',
             description: `Una volta firmato l’accordo, segui le istruzioni per inviarlo e completare <1 /> l’adesione al prodotto scelto. Ricorda di caricare l’accordo <3>entro 30 giorni.</3>`,
-            goToUpload: 'Vai al caricamento',
           },
           user: {
             title: 'Carica il Modulo firmato',
             description: `Una volta firmato il Modulo, segui le istruzioni per inviarlo e completare <1 /> l’aggiunta di uno o più Amministratori.`,
-            goToUpload: 'Vai al caricamento',
-          }
+          },
+          goToUpload: 'Vai al caricamento',
         },
       },
       upload:{
@@ -274,7 +272,7 @@ export default {
         },
         user: {
           title: 'La richiesta è scaduta',
-          description: `Sono trascorsi oltre 30 giorni dalla richiesta di aggiunta di un Amministratore. Per procedere, invia una nuova <2 /> richiesta.`,
+          description: `Sono trascorsi oltre 30 giorni dalla richiesta di aggiunta di <2 />un Amministratore. Per procedere, invia una nuova <2 /> richiesta.`,
         },
         backHome: 'Torna alla home',
       },
