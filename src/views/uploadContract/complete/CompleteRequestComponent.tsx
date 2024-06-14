@@ -109,6 +109,9 @@ export default function CompleteRequestComponent() {
   );
   const [requestData, setRequestData] = useState<OnboardingRequestData>();
 
+  const addUserFlow =
+    new URLSearchParams(window.location.hash.substring(1)).get('add-user') === 'true';
+
   useEffect(() => {
     setSubHeaderVisible(true);
     setEnableLogin(false);
@@ -236,6 +239,7 @@ export default function CompleteRequestComponent() {
       label: t('completeRegistration.steps.step1.label'),
       Component: () =>
         ConfirmRegistrationStep1(
+          addUserFlow,
           { forward: submit },
           { loading },
           { uploadedFiles, setUploadedFiles: setUploadedFilesAndWriteHistory }
@@ -259,6 +263,7 @@ export default function CompleteRequestComponent() {
       description: [
         <>
           <AlreadyRejectedRequestPage
+            addUserFlow={addUserFlow}
             productTitle={productId2ProductTitle(requestData?.productId ?? '')}
           />
         </>,
@@ -268,7 +273,7 @@ export default function CompleteRequestComponent() {
       title: '',
       description: [
         <>
-          <AlreadyCompletedRequestPage />
+          <AlreadyCompletedRequestPage addUserFlow={addUserFlow} />
         </>,
       ],
     },
@@ -276,7 +281,10 @@ export default function CompleteRequestComponent() {
       title: '',
       description: [
         <>
-          <ExpiredRequestPage productTitle={productId2ProductTitle(requestData?.productId ?? '')} />
+          <ExpiredRequestPage
+            addUserFlow={addUserFlow}
+            productTitle={productId2ProductTitle(requestData?.productId ?? '')}
+          />
         </>,
       ],
     },
@@ -292,7 +300,7 @@ export default function CompleteRequestComponent() {
       title: '',
       description: [
         <>
-          <CompleteRequestSuccessPage />
+          <CompleteRequestSuccessPage addUserFlow={addUserFlow} />
         </>,
       ],
     },
@@ -319,15 +327,19 @@ export default function CompleteRequestComponent() {
         title={t(`completeRegistration.errors.${errorCode}.title`)}
         message={
           errorCode === 'INVALID_SIGN_FORMAT' ? (
-            <Trans i18nKey={`completeRegistration.errors.INVALID_SIGN_FORMAT.message`}>
+            <Trans i18nKey={`completeRegistration.errors.${errorCode}.message`}>
               {'Il caricamento del documento non è andato a buon fine.'}
               <br />
               {'Carica un solo file in formato '}
               <strong>{'p7m'}</strong>
               {'.'}
             </Trans>
-          ) : (
+          ) : errorCode === 'GENERIC' ? (
             t(`completeRegistration.errors.${errorCode}.message`)
+          ) : addUserFlow ? (
+            t(`completeRegistration.errors.${errorCode}.user.message`)
+          ) : (
+            t(`completeRegistration.errors.${errorCode}.product.message`)
           )
         }
         onConfirmLabel={t('completeRegistration.sessionModal.onConfirmLabel')}

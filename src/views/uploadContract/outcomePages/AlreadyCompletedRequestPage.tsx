@@ -3,14 +3,22 @@ import { EndingPage } from '@pagopa/selfcare-common-frontend';
 import { useTranslation } from 'react-i18next';
 import { ENV } from '../../../utils/env';
 
-export default function AlreadyCompletedRequestPage() {
+type Props = {
+  addUserFlow: boolean;
+};
+
+export default function AlreadyCompletedRequestPage({ addUserFlow }: Props) {
   const { t } = useTranslation();
 
   return (
     <EndingPage
       minHeight="52vh"
       icon={<IllusError size={60} />}
-      title={t('completeRegistration.request.alreadyCompleted.title')}
+      title={
+        addUserFlow
+          ? t('completeRegistration.request.alreadyCompleted.user.title')
+          : t('completeRegistration.request.alreadyCompleted.product.title')
+      }
       description={t('completeRegistration.request.alreadyCompleted.description')}
       variantTitle={'h4'}
       variantDescription={'body1'}

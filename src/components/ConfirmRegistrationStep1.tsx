@@ -8,6 +8,7 @@ import { StepperStepComponentProps } from '../../types';
 import { FileUploader } from './FileUploader';
 
 export function ConfirmRegistrationStep1(
+  addUserFlow: boolean,
   { forward }: StepperStepComponentProps,
   { loading }: any,
   { uploadedFiles, setUploadedFiles }: any
@@ -36,6 +37,7 @@ export function ConfirmRegistrationStep1(
   const theme = useTheme();
 
   const uploaderImageWidth = 180;
+
   return (
     <Grid container display="flex" justifyContent="center" alignItems="center">
       <Grid item xs={12}>
@@ -45,20 +47,39 @@ export function ConfirmRegistrationStep1(
       </Grid>
       <Grid item xs={10} pb={1} mt={3}>
         <Typography color={theme.palette.text.primary} align="center" variant="h4">
-          {t('confirmRegistrationStep1.pageTitle')}
+          {addUserFlow
+            ? t('confirmOnboarding.upload.user.title')
+            : t('confirmOnboarding.upload.product.title')}
         </Typography>
       </Grid>
-      <Grid item xs={11} pb={3}>
+      <Grid item xs={11} pb={4}>
         <Typography color={theme.palette.text.primary} variant={'body1'} align="center">
-          <Trans i18nKey="confirmRegistrationStep1.pageSubtitle" components={{ 1: <br /> }}>
-            {`Carica l’accordo di adesione firmato digitalmente <1 /> in p7m dal Legale Rappresentante.`}
+          <Trans
+            i18nKey={
+              addUserFlow
+                ? 'confirmOnboarding.upload.user.description'
+                : 'confirmOnboarding.upload.product.description'
+            }
+            components={{ 1: <br /> }}
+          >
+            {addUserFlow
+              ? `Carica il Modulo di aggiunta, firmato digitalmente in <1 />p7m dal Legale Rappresentante.`
+              : `Carica l’accordo di adesione, firmato digitalmente in <1 />p7m dal Legale Rappresentante.`}
           </Trans>
         </Typography>
       </Grid>
       <Grid item xs={12} display="flex" justifyContent="center" pb={4}>
         <FileUploader
-          title={t('confirmRegistrationStep1.fileUploaderTitle')}
-          descriptionLink={t('confirmRegistrationStep1.fileUploaderDescriptionLink')}
+          title={
+            addUserFlow
+              ? t('confirmOnboarding.upload.user.dropArea.title')
+              : t('confirmOnboarding.upload.product.dropArea.title')
+          }
+          descriptionLink={
+            addUserFlow
+              ? t('confirmOnboarding.upload.user.dropArea.link')
+              : t('confirmOnboarding.upload.product.dropArea.link')
+          }
           uploadedFiles={uploadedFiles}
           deleteUploadedFiles={deleteUploadedFiles}
           onDropAccepted={onDropAccepted}
@@ -71,9 +92,9 @@ export function ConfirmRegistrationStep1(
       </Grid>
       <SessionModal
         open={rejectedError}
-        title={t('confirmRegistrationStep1.errorAlertTitle')}
+        title={t('confirmOnboarding.upload.error.title')}
         message={
-          <Trans i18nKey="confirmRegistrationStep1.errorAlertDescription">
+          <Trans i18nKey="confirmOnboarding.upload.error.description">
             {'Il caricamento del documento non è andato a buon fine.'}
             <br />
             {'Carica un solo file in formato '}
@@ -81,8 +102,8 @@ export function ConfirmRegistrationStep1(
             {'.'}
           </Trans>
         }
-        onConfirmLabel={t('confirmRegistrationStep1.errorAlertRetryLabel')}
-        onCloseLabel={t('confirmRegistrationStep1.errorAlertCloseLabel')}
+        onConfirmLabel={t('confirmOnboarding.upload.error.retry')}
+        onCloseLabel={t('confirmOnboarding.upload.error.close')}
         onConfirm={handleClose}
         handleClose={handleClose}
       />
@@ -96,7 +117,7 @@ export function ConfirmRegistrationStep1(
             disabled={!(uploadedFiles && uploadedFiles.length > 0)}
             onClick={onSubmit}
           >
-            {t('confirmRegistrationStep1.confirmAction')}
+            {t('confirmOnboarding.upload.continue')}
           </Button>
         </Grid>
       </Grid>

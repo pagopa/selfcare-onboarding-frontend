@@ -24,7 +24,7 @@ export default function NotFoundPage() {
         </Trans>
       }
       buttonLabel={t('completeRegistration.request.notFound.contactAssistanceButton')}
-      onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+      onButtonClick={() => window.location.assign(ENV.URL_FE.ASSISTANCE)}
     />
   );
 }

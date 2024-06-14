@@ -31,6 +31,9 @@ export default function CancelRequestComponent() {
   const [loading, setLoading] = useState(false);
   const [requestData, setRequestData] = useState<OnboardingRequestData | undefined>();
 
+  const addUserFlow =
+    new URLSearchParams(window.location.hash.substring(1)).get('add-user') === 'true';
+
   useEffect(() => {
     setSubHeaderVisible(true);
     setEnableLogin(false);
@@ -110,7 +113,7 @@ export default function CancelRequestComponent() {
       title: '',
       description: [
         <>
-          <AlreadyCompletedRequestPage />
+          <AlreadyCompletedRequestPage addUserFlow={addUserFlow} />
         </>,
       ],
     },
@@ -119,6 +122,7 @@ export default function CancelRequestComponent() {
       description: [
         <>
           <AlreadyRejectedRequestPage
+            addUserFlow={addUserFlow}
             productTitle={productId2ProductTitle(requestData?.productId ?? '')}
           />
         </>,
@@ -128,7 +132,10 @@ export default function CancelRequestComponent() {
       title: '',
       description: [
         <>
-          <ExpiredRequestPage productTitle={productId2ProductTitle(requestData?.productId ?? '')} />
+          <ExpiredRequestPage
+            addUserFlow={addUserFlow}
+            productTitle={productId2ProductTitle(requestData?.productId ?? '')}
+          />
         </>,
       ],
     },
