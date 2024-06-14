@@ -34,7 +34,7 @@ export function FileUploadedPreview({
                 p: 1,
               }}
             >
-              <Box sx={{ borderRadius: '10px', border: `3px solid ${theme.palette.primary.main}` }}>
+              <Box sx={{ borderRadius: '10px', border: `1px solid ${theme.palette.primary.main}` }}>
                 <Grid
                   container
                   justifyContent="space-evenly"
@@ -66,71 +66,58 @@ export function FileUploadedPreview({
                 p: 1,
               }}
             >
-              <Box sx={{ borderRadius: '10px', border: `3px solid ${theme.palette.primary.main}` }}>
-                <Grid
-                  container
-                  justifyContent="space-evenly"
-                  alignItems="center"
-                  width="400px"
-                  height="66px"
-                >
-                  <Grid item xs={1}>
-                    <Box px={2} sx={{ color: theme.palette.primary.main }}>
-                      <ClipFileUploaded />
-                    </Box>
-                  </Grid>
-                  <Grid item xs={8}>
-                    <Box display="flex" flexDirection="column">
-                      <Box>
-                        <Tooltip title={file.name} placement="top" arrow={true}>
-                          <Typography
-                            sx={{
-                              color: theme.palette.primary.main,
-                              fontStyle: 'normal',
-                              overflow: 'hidden',
-                              whiteSpace: 'nowrap',
-                              textOverflow: 'ellipsis',
-                              width: '100%',
-                              fontSize: '14px',
-                              fontWeight: 700, // if is inserted the variant, the ellipsis doesn't work'
-                            }}
-                          >
-                            {file.name}
-                          </Typography>
-                        </Tooltip>
-                      </Box>
-                      <Box>
-                        <Typography
-                          sx={{
-                            fontStyle: 'normal',
-                            fontWeight: 600,
-                            fontSize: '14px',
-                            lineHeight: '24px',
-                            textTransform: 'uppercase',
-                            color: theme.palette.text.primary,
-                          }}
-                          variant={'body1'}
-                          align="left"
-                        >
-                          {`${(file.size / 1024).toFixed(0)} KB`}
-                        </Typography>
-                      </Box>
-                    </Box>
-                  </Grid>
-                  <Grid item xs={1}>
-                    <ClearOutlinedIcon
-                      onClick={deleteUploadedFiles}
-                      sx={{
-                        mt: 0.5,
-                        ml: 1,
-                        color: theme.palette.text.primary,
-                        fontSize: '24px',
-                        cursor: 'pointer',
-                      }}
-                    />
-                  </Grid>
+              <Grid
+                container
+                sx={{
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  borderRadius: '10px',
+                  border: `1px solid ${theme.palette.primary.main}`,
+                  width: '400px',
+                  height: '66px',
+                }}
+              >
+                <Grid item xs={1} pr={1}>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      justifyContent: 'center',
+                      color: theme.palette.primary.main,
+                    }}
+                  >
+                    <ClipFileUploaded height={24} />
+                  </Box>
                 </Grid>
-              </Box>
+                <Grid item xs={8}>
+                  <Box display="flex" flexDirection="column">
+                    <Tooltip title={file.name} placement="top" arrow={true}>
+                      <Typography
+                        sx={{
+                          color: theme.palette.primary.main,
+                          fontStyle: 'normal',
+                          overflow: 'hidden',
+                          whiteSpace: 'nowrap',
+                          textOverflow: 'ellipsis',
+                          width: '100%',
+                          fontSize: '14px',
+                        }}
+                      >
+                        {file.name}
+                      </Typography>
+                    </Tooltip>
+                  </Box>
+                </Grid>
+                <Grid item xs={1} display="flex" justifyContent="flex-end">
+                  <ClearOutlinedIcon
+                    onClick={deleteUploadedFiles}
+                    sx={{
+                      color: theme.palette.text.primary,
+                      fontSize: '24px',
+                      cursor: 'pointer',
+                    }}
+                  />
+                </Grid>
+              </Grid>
             </Box>
           </Box>
         )
