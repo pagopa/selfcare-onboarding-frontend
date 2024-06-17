@@ -159,7 +159,10 @@ export default function CompleteRequestComponent() {
     formData.append('contract', file);
 
     const uploadDocument = await fetchWithLogs(
-      { endpoint: 'ONBOARDING_COMPLETE_REGISTRATION', endpointParams: { token } },
+      {
+        endpoint: addUserFlow ? 'USER_COMPLETE_REGISTRATION' : 'ONBOARDING_COMPLETE_REGISTRATION',
+        endpointParams: { token },
+      },
       { method: 'POST', data: formData, headers: { 'Content-Type': 'multipart/form-data' } },
       redirectToLogin
     );
