@@ -67,7 +67,7 @@ export const API = {
     URL: ENV.URL_API.ONBOARDING_V2 + '/v2/institutions/onboarding',
   },
   ONBOARDING_NEW_USER: {
-    URL: ENV.URL_API.ONBOARDING_V2 + '/v1/onboarding/users',
+    URL: ENV.URL_API.ONBOARDING_V2 + '/v1/users/onboarding',
   },
   ONBOARDING_COMPLETE_REGISTRATION: {
     URL: ENV.URL_API.ONBOARDING_V2 + '/v2/tokens/{{token}}/complete',

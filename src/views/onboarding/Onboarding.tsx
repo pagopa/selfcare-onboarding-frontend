@@ -606,8 +606,15 @@ function OnboardingComponent({ productId }: { productId: string }) {
         method: 'POST',
         data: {
           productId,
+          institutionType,
           origin,
           originId: onboardingFormData?.originId,
+          subunitCode: aooSelected
+            ? aooSelected.codiceUniAoo
+            : uoSelected
+            ? uoSelected.codiceUniUo
+            : undefined,
+          taxCode: onboardingFormData?.taxCode,
           users,
         },
       },
