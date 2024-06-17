@@ -3,7 +3,11 @@ import { Trans, useTranslation } from 'react-i18next';
 import { EndingPage } from '@pagopa/selfcare-common-frontend';
 import { ENV } from '../../../../utils/env';
 
-export default function CompleteRequestSuccessPage() {
+type Props = {
+  addUserFlow: boolean;
+};
+
+export default function CompleteRequestSuccessPage({ addUserFlow }: Props) {
   const { t } = useTranslation();
 
   return (
@@ -13,13 +17,23 @@ export default function CompleteRequestSuccessPage() {
         icon={<IllusCompleted size={60} />}
         variantTitle="h4"
         variantDescription="body1"
-        title={t('completeRegistration.flow.product.title')}
+        title={
+          addUserFlow
+            ? t('completeRegistration.outcomeContent.success.user.title')
+            : t('completeRegistration.outcomeContent.success.product.title')
+        }
         description={
           <Trans
-            i18nKey="completeRegistration.outcomeContent.success.description"
-            components={{ 1: <br />, 3: <br />, 5: <br /> }}
+            i18nKey={
+              addUserFlow
+                ? 'completeRegistration.outcomeContent.success.user.description'
+                : 'completeRegistration.outcomeContent.success.product.description'
+            }
+            components={{ 1: <br />, 3: <br /> }}
           >
-            {`Comunicheremo l'avvenuta adesione all'indirizzo PEC <1/> primario dell'ente. Da questo momento, gli Amministratori <3/> inseriti in fase di richiesta possono accedere all'Area <5 />Riservata.`}
+            {addUserFlow
+              ? `Da questo momento gli Amministratori indicati possono <1 />accedere all’Area Riservata.`
+              : `Comunicheremo l'avvenuta adesione all'indirizzo PEC <1/> primario dell'ente. Da questo momento è possibile <3 />accedere all'Area Riservata.`}
           </Trans>
         }
         buttonLabel={t('completeRegistration.onboarding.backHome')}

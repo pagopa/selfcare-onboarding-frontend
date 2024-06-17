@@ -18,6 +18,11 @@ export function ConfirmRegistrationStep0({ forward }: StepperStepComponentProps)
 
   const token = getRequestJwt();
 
+  const addUserFlow =
+    new URLSearchParams(window.location.hash.substring(1)).get('add-user') === 'true';
+
+  const translationKeyValue = addUserFlow ? 'user' : 'product';
+
   const onForwardAction = () => {
     forward();
   };
@@ -108,22 +113,26 @@ export function ConfirmRegistrationStep0({ forward }: StepperStepComponentProps)
                   justifyContent="center"
                   variant="h4"
                 >
-                  {t('confirmRegistrationStep0.download.title')}
+                  {t(`confirmOnboarding.chooseOption.download.${translationKeyValue}.title`)}
                 </Typography>
               </Grid>
               <Grid item xs={12} display="flex" justifyContent="center">
                 <Typography color={theme.palette.text.primary} variant="body1" align={'center'}>
                   <Trans
-                    i18nKey="confirmRegistrationStep0.download.description"
+                    i18nKey={`confirmOnboarding.chooseOption.download.${translationKeyValue}.description`}
                     components={{ 1: <br />, 2: <strong /> }}
                   >
-                    {`Per completare l’adesione, scarica l’accordo e fai apporre la firma digitale in <1 /><2>formato p7m</2> dal Legale Rappresentante dell’ente o da un suo procuratore.`}
+                    {translationKeyValue === 'user'
+                      ? `Per completare l’adesione, scarica il Modulo di aggiunta e fai apporre la <1 />firma digitale in <2>formato p7m</2> dal Legale Rappresentante dell’ente.`
+                      : `Per completare l’adesione, scarica l’accordo e fai apporre la firma digitale in <1 /><2>formato p7m</2> dal Legale Rappresentante dell’ente o da un suo procuratore.`}
                   </Trans>
                 </Typography>
               </Grid>
               <Grid item py={4}>
                 <Button fullWidth color="primary" variant="contained" onClick={getContract}>
-                  {t('confirmRegistrationStep0.download.downloadContract')}
+                  {t(
+                    `confirmOnboarding.chooseOption.download.${translationKeyValue}.downloadContract`
+                  )}
                   <DownloadIcon fontSize="small" sx={{ marginLeft: 1 }} />
                 </Button>
               </Grid>
@@ -135,7 +144,7 @@ export function ConfirmRegistrationStep0({ forward }: StepperStepComponentProps)
                     textAlign: 'center',
                   }}
                 >
-                  {t('confirmRegistrationStep0.download.disclaimer')}
+                  {t('confirmOnboarding.chooseOption.download.disclaimer')}
                 </Typography>
               </Grid>
             </Grid>
@@ -161,24 +170,24 @@ export function ConfirmRegistrationStep0({ forward }: StepperStepComponentProps)
                   justifyContent="center"
                   variant="h4"
                 >
-                  {t('confirmRegistrationStep0.upload.title')}
+                  {t(`confirmOnboarding.chooseOption.upload.${translationKeyValue}.title`)}
                 </Typography>
               </Grid>
               <Grid item xs={12} display="flex" justifyContent="center" pb={4}>
                 <Typography color={theme.palette.text.primary} variant="body1" align={'center'}>
                   <Trans
-                    i18nKey="confirmRegistrationStep0.upload.description"
+                    i18nKey={`confirmOnboarding.chooseOption.upload.${translationKeyValue}.description`}
                     components={{ 1: <br />, 3: <strong /> }}
                   >
-                    {`Una volta firmato l’accordo, segui le istruzioni per inviarlo e completare <1 />
-            l’adesione al prodotto scelto. Ricorda di caricare l’accordo
-            <3>entro 30 giorni.</3>`}
+                    {translationKeyValue === 'user'
+                      ? `Una volta firmato il Modulo, segui le istruzioni per inviarlo e completare <1 /> l’aggiunta di uno o più Amministratori.`
+                      : `Una volta firmato l’accordo, segui le istruzioni per inviarlo e completare <1 /> l’adesione al prodotto scelto. Ricorda di caricare l’accordo <3>entro 30 giorni.</3>`}
                   </Trans>
                 </Typography>
               </Grid>
               <Grid item pb={1}>
                 <Button fullWidth color="primary" variant="contained" onClick={onForwardAction}>
-                  {t('confirmRegistrationStep0.upload.goToUpload')}
+                  {t('confirmOnboarding.chooseOption.upload.goToUpload')}
                   <ArrowForwardIcon fontSize="small" sx={{ marginLeft: 1 }} />
                 </Button>
               </Grid>

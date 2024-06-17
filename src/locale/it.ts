@@ -25,33 +25,60 @@ export default {
     aooCode: 'Codice univoco AOO',
     uoCode: 'Codice univoco UO',
   },
-  confirmRegistrationStep0: {
-    download: {
-      title: 'Scarica l’accordo di adesione',
-      description: `Per completare l’adesione, scarica l’accordo e fai apporre la firma digitale in <1 /><2>formato p7m</2> dal Legale Rappresentante dell’ente o da un suo procuratore.`,
-      downloadContract: 'Scarica l’accordo',
-      disclaimer:
-        'Firmando l’accordo, il Legale Rappresentante dell’ente, o un suo procuratore, accetta espressamente e specificamente anche le singole clausole indicate nel paragrafo “Clausole ai sensi degli artt. 1341 e 1342 c.c.”',
-    },
-    upload: {
-      title: 'Carica l’accordo firmato',
-      description: `Una volta firmato l’accordo, segui le istruzioni per inviarlo e completare <1 />
-    l’adesione al prodotto scelto. Ricorda di caricare l’accordo
-    <3>entro 30 giorni.</3>`,
-      goToUpload: 'Vai al caricamento',
-    },
-  },
-  confirmRegistrationStep1: {
-    errorAlertTitle: 'Caricamento non riuscito',
-    errorAlertDescription:
-      'Il caricamento del documento non è andato a buon fine. <1 />Carica un solo file in formato <3>p7m</3>.',
-    errorAlertRetryLabel: 'Carica di nuovo',
-    errorAlertCloseLabel: 'Esci',
-    pageTitle: "Carica l'accordo di adesione",
-    pageSubtitle: `Carica l’accordo di adesione firmato digitalmente <1 /> in p7m dal Legale Rappresentante.`,
-    fileUploaderTitle: 'Trascina qui l’accordo di Adesione firmato oppure',
-    fileUploaderDescriptionLink: 'carica il file',
-    confirmAction: 'Continua',
+  confirmOnboarding: {
+      chooseOption:{
+        download: {
+          product: {
+            title: 'Scarica l’accordo di adesione',
+            description: `Per completare l’adesione, scarica l’accordo e fai apporre la firma digitale in <1 /><2>formato p7m</2> dal Legale Rappresentante dell’ente o da un suo procuratore.`,
+            downloadContract: 'Scarica l’accordo',
+          },
+          user: {
+            title: 'Scarica il Modulo di aggiunta',
+            description: `Per completare l’adesione, scarica il Modulo di aggiunta e fai apporre la <1 />firma digitale in <2>formato p7m</2> dal Legale Rappresentante dell’ente.`,
+            downloadContract: 'Scarica il Modulo',
+          },
+          disclaimer: 'Firmando l’accordo, il Legale Rappresentante dell’ente, o un suo procuratore, accetta espressamente e specificamente anche le singole clausole indicate nel paragrafo “Clausole ai sensi degli artt. 1341 e 1342 c.c.”',
+        },
+        upload: {
+          product: {
+            title: 'Carica l’accordo firmato',
+            description: `Una volta firmato l’accordo, segui le istruzioni per inviarlo e completare <1 /> l’adesione al prodotto scelto. Ricorda di caricare l’accordo <3>entro 30 giorni.</3>`,
+          },
+          user: {
+            title: 'Carica il Modulo firmato',
+            description: `Una volta firmato il Modulo, segui le istruzioni per inviarlo e completare <1 /> l’aggiunta di uno o più Amministratori.`,
+          },
+          goToUpload: 'Vai al caricamento',
+        },
+      },
+      upload:{
+        product: {
+          title: "Carica l'accordo di adesione",
+          description: `Carica l’accordo di adesione, firmato digitalmente in <1 />p7m dal Legale Rappresentante.`,
+          dropArea: {
+            title: 'Trascina qui l’accordo di Adesione firmato oppure',
+            link: 'carica il file'
+          },
+        },
+        user:{
+          title: "Carica il modulo",
+          description: `Carica il Modulo di aggiunta, firmato digitalmente in <1 />p7m dal Legale Rappresentante.`,
+          dropArea: {
+            title: 'Trascina qui il modulo firmato oppure',
+            link: 'carica il file'
+          },
+          continue: 'Continua',
+        },
+        continue: 'Continua',
+        error: {
+          title: 'Caricamento non riuscito',
+          description: 'Il caricamento del documento non è andato a buon fine. <1 />Carica un solo file in formato <3>p7m</3>.',
+          close: 'Esci',
+          retry: 'Carica di nuovo',
+        }, 
+      },
+      
   },
   fileUploadPreview: {
     loadingStatus: 'Caricamento...',
@@ -235,30 +262,52 @@ export default {
     request: {
       notFound: {
         title: 'La pagina che cercavi non è disponibile',
-        description:
-          'Al momento non è possibile procedere. Riprova tra qualche <1 />minuto, o contatta l’assistenza',
+        description: 'Al momento non è possibile procedere. Riprova tra qualche <1 />minuto, o contatta l’assistenza',
         contactAssistanceButton: 'Contatta l’assistenza',
       },
       expired: {
-        title: 'La richiesta di adesione è scaduta',
-        description: `Sono trascorsi oltre 30 giorni dalla richiesta di adesione. Se <2 />desideri ancora aderire al prodotto {{productTitle}}, invia <4 />una nuova richiesta.`,
+        product: {
+          title: 'La richiesta di adesione è scaduta',
+          description: `Sono trascorsi oltre 30 giorni dalla richiesta di adesione. Se <2 />desideri ancora aderire al prodotto {{productTitle}}, invia <4 />una nuova richiesta.`,
+        },
+        user: {
+          title: 'La richiesta è scaduta',
+          description: `Sono trascorsi oltre 30 giorni dalla richiesta di aggiunta di <2 />un Amministratore. Per procedere, invia una nuova <2 /> richiesta.`,
+        },
         backHome: 'Torna alla home',
       },
       alreadyCompleted: {
-        title: 'La richiesta di adesione è stata accettata',
+        product: {
+          title: 'La richiesta di adesione è stata accettata',
+        }, 
+        user: {
+          title: 'La richiesta è già stata accettata',
+        },
         description: `Per gestire il prodotto, accedi tramite SPID o CIE`,
         logIn: 'Accedi',
       },
       alreadyRejected: {
-        title: 'La richiesta di adesione è stata annullata',
-        description: `La richiesta di adesione non è andata a buon fine. Se <2 />desideri ancora aderire al prodotto {{productTitle}}, invia <4 />una nuova richiesta.`,
+        product: {
+          title: 'La richiesta di adesione è stata annullata',
+          description: `La richiesta di adesione non è andata a buon fine. Se <2 />desideri ancora aderire al prodotto {{productTitle}}, invia <4 />una nuova richiesta.`,
+        },
+        user: {
+          title: 'La richiesta non è più valida',
+          description: `Il tuo ente ha annullato la richiesta. Per aggiungere un <2 />nuovo Amministratore, inviane una nuova.`,
+        },
         backHome: 'Torna alla home',
-      },
+      }, 
     },
     outcomeContent: {
       success: {
-        title: 'Adesione completata!',
-        description: `Comunicheremo l'avvenuta adesione all'indirizzo PEC <1/> primario dell'ente. Da questo momento, gli Amministratori <3/> inseriti in fase di richiesta possono accedere all'Area <5 />Riservata.`,
+        product: {
+          title: 'Adesione completata!',
+          description: `Comunicheremo l'avvenuta adesione all'indirizzo PEC <1/> primario dell'ente. Da questo momento è possibile <3 />accedere all'Area Riservata.`,
+        },
+        user: {
+          title: 'Richiesta completata',
+          description: `Da questo momento gli Amministratori indicati possono <1 />accedere all’Area Riservata.`
+        },
         backHome: 'Torna alla home',
       },
       error: {
@@ -270,13 +319,21 @@ export default {
     errors: {
       INVALID_DOCUMENT: {
         title: 'Controlla il documento',
-        message:
-          "Il documento caricato non corrisponde all'Atto di Adesione. Verifica che sia corretto e caricalo di nuovo.",
+        product: {
+          message: "Il documento caricato non corrisponde all'Atto di Adesione. Verifica che sia corretto e caricalo di nuovo."
+        },
+        user: {
+          message: "Il documento caricato non corrisponde al modulo che hai ricevuto via email. Verifica che sia corretto e caricalo di nuovo."
+        }
       },
       INVALID_SIGN: {
         title: 'Controlla il documento',
-        message:
-          'La Firma Digitale non è riconducibile al Legale Rappresentante indicato in fase di adesione. Verifica la corrispondenza e carica di nuovo il documento.',
+        product: {
+          message: 'La Firma Digitale non è riconducibile al Legale Rappresentante indicato in fase di adesione. Verifica la corrispondenza e carica di nuovo il documento.',
+        },
+        user: {
+          message: 'La Firma Digitale non è riconducibile al Legale Rappresentante indicato in fase di richiesta. Verifica la corrispondenza e carica di nuovo il documento.'
+        }
       },
       ALREADY_ONBOARDED: {
         title: `L’ente selezionato ha già aderito`,

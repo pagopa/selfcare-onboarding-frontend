@@ -69,8 +69,9 @@ export function FileUploader({
             m={1}
             sx={{
               borderRadius: '10px',
-              border: `2px dashed ${theme.palette.primary.main}`,
-              backgroundColor: '#0073E614',
+              backgroundImage: `url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' rx='16' ry='16' stroke='%230073E6FF' stroke-width='2' stroke-dasharray='5.5' stroke-dashoffset='0' stroke-linecap='square'/%3e%3c/svg%3e"); border-radius: 16px;`,
+              width: '400px',
+              backgroundColor: '#0073E612',
             }}
           >
             <Grid container direction="column" alignItems={'center'} py={3} px={6}>
