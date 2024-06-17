@@ -36,7 +36,7 @@ export default function CompleteRequestSuccessPage({ addUserFlow }: Props) {
               : `Comunicheremo l'avvenuta adesione all'indirizzo PEC <1/> primario dell'ente. Da questo momento è possibile <3 />accedere all'Area Riservata.`}
           </Trans>
         }
-        buttonLabel={t('completeRegistration.onboarding.backHome')}
+        buttonLabel={t('completeRegistration.outcomeContent.success.backHome')}
         onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
       />
     </>
