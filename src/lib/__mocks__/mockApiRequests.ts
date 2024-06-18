@@ -1113,6 +1113,17 @@ export async function mockFetch(
     }
   }
 
+  if (endpoint === 'ONBOARDING_NEW_USER') {
+    switch ((data as any).productId) {
+      case 'prod-io':
+      return badRequestError;
+      default:
+        return new Promise((resolve) =>
+          resolve({ data: {}, status: 200, statusText: '200' } as AxiosResponse)
+        );
+    }
+  }
+
   if (endpoint === 'ONBOARDING_GET_PARTY') {
     const fetched = mockPartyRegistry.items.find(
       (p) => p.id === endpointParams.externalInstitutionId

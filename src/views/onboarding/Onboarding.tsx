@@ -416,47 +416,52 @@ function OnboardingComponent({ productId }: { productId: string }) {
       title: '',
       description: [
         <>
-          {institutionType !== 'PT' ? (
-            <EndingPage
-              icon={<IllusCompleted size={60} />}
-              title={t('onboarding.outcomeContent.success.title')}
-              description={
-                institutionType === 'PA' ? (
-                  <Trans i18nKey="onboarding.outcomeContent.success.paDescription">
-                    Invieremo un&apos;email all&apos;indirizzo PEC primario dell&apos;ente.
-                    <br />
-                    Al suo interno, ci sono le istruzioni per completare <br />
-                    l&apos;adesione.
-                  </Trans>
-                ) : (
-                  <Trans i18nKey="onboarding.outcomeContent.success.notPaDescription">
-                    Invieremo un&apos;email all&apos;indirizzo PEC indicato.
-                    <br />
-                    Al suo interno, ci sono le istruzioni per completare <br />
-                    l&apos;adesione.
-                  </Trans>
-                )
-              }
-              variantTitle={'h4'}
-              variantDescription={'body1'}
-              buttonLabel={t('onboarding.outcomeContent.success.backHome')}
-              onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
-            />
-          ) : (
-            <EndingPage
-              icon={<IllusCompleted size={60} />}
-              title={t('onboarding.outcomeContent.ptSuccess.title')}
-              description={
-                <Trans i18nKey="onboarding.outcomeContent.success.description">
-                  Invieremo un’email con l’esito della richiesta all’indirizzo <br /> PEC indicato.
+          <EndingPage
+            minHeight="52vh"
+            icon={<IllusCompleted size={60} />}
+            title={
+              addUserFlow
+                ? t('onboarding.success.flow.user.title')
+                : institutionType === 'PT'
+                ? t('onboarding.success.flow.techPartner.title')
+                : t('onboarding.success.flow.product.title')
+            }
+            description={
+              addUserFlow ? (
+                <Trans
+                  i18nKey="onboarding.success.flow.user.description"
+                  components={{ 1: <br />, 3: <br /> }}
+                >
+                  {`Invieremo un’email all’indirizzo PEC primario dell’ente. <1 /> Al suo interno, ci sono le istruzioni per completare <3 />l’operazione.`}
                 </Trans>
-              }
-              variantTitle={'h4'}
-              variantDescription={'body1'}
-              buttonLabel={t('onboarding.outcomeContent.success.backHome')}
-              onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
-            />
-          )}
+              ) : institutionType === 'PT' ? (
+                <Trans
+                  i18nKey="onboarding.success.flow.techPartner.description"
+                  components={{ 1: <br /> }}
+                >
+                  {`Invieremo un’email con l’esito della richiesta all’indirizzo <1 />PEC indicato.`}
+                </Trans>
+              ) : institutionType === 'PA' ? (
+                <Trans
+                  i18nKey="onboarding.success.flow.product.publicAdministration.description"
+                  components={{ 1: <br />, 3: <br /> }}
+                >
+                  {`Invieremo un’email all’indirizzo PEC primario dell’ente. <1 /> Al suo interno, ci sono le istruzioni per completare <3 />l’adesione.`}
+                </Trans>
+              ) : (
+                <Trans
+                  i18nKey="onboarding.success.flow.product.notPublicAdministration.description"
+                  components={{ 1: <br />, 3: <br /> }}
+                >
+                  {`Invieremo un’email all’indirizzo PEC indicato. <1 /> Al suo interno, ci sono le istruzioni per completare <3 />l’adesione.`}
+                </Trans>
+              )
+            }
+            variantTitle={'h4'}
+            variantDescription={'body1'}
+            buttonLabel={t('onboarding.backHome')}
+            onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+          />
         </>,
       ],
     },
@@ -469,15 +474,13 @@ function OnboardingComponent({ productId }: { productId: string }) {
             icon={<IllusError size={60} />}
             variantTitle={'h4'}
             variantDescription={'body1'}
-            title={t('onboarding.outcomeContent.error.title')}
+            title={t('onboarding.error.title')}
             description={
-              <Trans i18nKey="onboarding.outcomeContent.error.description">
-                A causa di un errore del sistema non è possibile completare la procedura.
-                <br />
-                Ti chiediamo di riprovare più tardi.
+              <Trans i18nKey="onboarding.error.description" components={{ 1: <br /> }}>
+                {`A causa di un errore del sistema non è possibile completare <1 />la procedura. Ti chiediamo di riprovare più tardi.`}
               </Trans>
             }
-            buttonLabel={t('onboarding.outcomeContent.error.backActionLabel')}
+            buttonLabel={t('onboarding.backHome')}
             onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
           />
         </>,
@@ -497,7 +500,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
     ],
   };
 
-  const submit = async (users: Array<UserOnCreate>) => {
+  const onboardingSubmit = async (users: Array<UserOnCreate>) => {
     setLoading(true);
     const postLegalsResponse = await fetchWithLogs(
       { endpoint: 'ONBOARDING_POST_LEGALS' },
@@ -542,11 +545,7 @@ function OnboardingComponent({ productId }: { productId: string }) {
             city: onboardingFormData?.city,
           },
           origin,
-          users: users.map((u) => ({
-            ...u,
-            taxCode: u.taxCode.toUpperCase(),
-            email: u.email.toLowerCase(),
-          })),
+          users,
           pricingPlan,
           assistanceContacts: assistanceConcatsDto2pspDataRequest(
             onboardingFormData as OnboardingFormData
@@ -596,6 +595,50 @@ function OnboardingComponent({ productId }: { productId: string }) {
       } else {
         setOutcome(outcomeContent[outcome]);
       }
+    }
+  };
+
+  const addUserRequest = async (users: Array<UserOnCreate>) => {
+    setLoading(true);
+    const addUserResponse = await fetchWithLogs(
+      { endpoint: 'ONBOARDING_NEW_USER' },
+      {
+        method: 'POST',
+        data: {
+          productId,
+          institutionType,
+          origin,
+          originId: onboardingFormData?.originId,
+          subunitCode: aooSelected
+            ? aooSelected.codiceUniAoo
+            : uoSelected
+            ? uoSelected.codiceUniUo
+            : undefined,
+          taxCode: onboardingFormData?.taxCode,
+          users,
+        },
+      },
+      () => setRequiredLogin(true)
+    );
+
+    setLoading(false);
+
+    const outcome = getFetchOutcome(addUserResponse);
+
+    setOutcome(outcomeContent[outcome]);
+
+    if (outcome === 'success') {
+      trackEvent('ONBOARDING_USER_SUCCESS', {
+        request_id: requestIdRef.current,
+        party_id: externalInstitutionId,
+        product_id: productId,
+      });
+    } else {
+      trackEvent('ONBOARDING_USER_ERROR', {
+        request_id: requestIdRef.current,
+        party_id: externalInstitutionId,
+        product_id: productId,
+      });
     }
   };
 
@@ -811,7 +854,12 @@ function OnboardingComponent({ productId }: { productId: string }) {
           partyName: onboardingFormData?.businessName || '',
           isTechPartner,
           forward: (newFormData: Partial<FormData>) => {
-            const users = (newFormData as any).users as Array<UserOnCreate>;
+            const users = ((newFormData as any).users as Array<UserOnCreate>).map((u) => ({
+              ...u,
+              taxCode: u?.taxCode.toUpperCase(),
+              email: u?.email.toLowerCase(),
+            }));
+
             const usersWithoutLegal = users.slice(0, 0).concat(users.slice(0 + 1));
             setFormData({ ...formData, ...newFormData });
             trackEvent('ONBOARDING_ADD_DELEGATE', {
@@ -819,13 +867,23 @@ function OnboardingComponent({ productId }: { productId: string }) {
               party_id: externalInstitutionId,
               product_id: productId,
             });
-            submit(isTechPartner ? usersWithoutLegal : users).catch(() => {
-              trackEvent('ONBOARDING_ADD_DELEGATE', {
-                request_id: requestIdRef.current,
-                party_id: externalInstitutionId,
-                product_id: productId,
+            if (addUserFlow) {
+              addUserRequest(users).catch(() => {
+                trackEvent('ONBOARDING_ADD_NEW_USER', {
+                  request_id: requestIdRef.current,
+                  party_id: externalInstitutionId,
+                  product_id: productId,
+                });
               });
-            });
+            } else {
+              onboardingSubmit(isTechPartner ? usersWithoutLegal : users).catch(() => {
+                trackEvent('ONBOARDING_ADD_DELEGATE', {
+                  request_id: requestIdRef.current,
+                  party_id: externalInstitutionId,
+                  product_id: productId,
+                });
+              });
+            }
           },
           back: () => {
             if (isTechPartner) {

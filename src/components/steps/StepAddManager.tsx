@@ -184,14 +184,14 @@ export function StepAddManager({
       </Grid>
       <SessionModal
         open={genericError}
-        title={t('onboarding.outcomeContent.error.title')}
+        title={t('onboarding.error.title')}
         message={
-          <Trans i18nKey="onboarding.outcomeContent.error.description">
+          <Trans i18nKey="onboarding.error.description">
             {'A causa di un errore del sistema non è possibile completare la procedura.'} <br />
             {'Ti chiediamo di riprovare più tardi.'}
           </Trans>
         }
-        onCloseLabel={t('onboarding.outcomeContent.error.backActionLabel')}
+        onCloseLabel={t('onboarding.backHome')}
         handleClose={handleCloseGenericErrorModal}
       />
     </Grid>
