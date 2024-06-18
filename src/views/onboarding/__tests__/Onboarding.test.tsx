@@ -158,7 +158,7 @@ test('test complete with error on submit', async () => {
   await executeStepInstitutionType('prod-cgn');
   await executeStep1('AGENCY ERROR', 'prod-cgn', 'pa');
 });
-test('test add new user for already onboarded party', async () => {
+test('test error add new user for already onboarded party', async () => {
   renderComponent('prod-io');
   await executeStepInstitutionType('prod-io');
   await executeStep1('AGENCY X', 'prod-io', 'pa');
@@ -170,7 +170,7 @@ test('test add new user for already onboarded party', async () => {
 
   screen.getByText('Indica il Legale Rappresentante');
   await executeStep2();
-  await executeStep3(true, false, true);
+  await executeStep3(false, false, true);
 });
 
 test('test success add new user for already onboarded party', async () => {
