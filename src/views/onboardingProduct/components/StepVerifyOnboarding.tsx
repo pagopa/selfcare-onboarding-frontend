@@ -6,6 +6,8 @@ import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsS
 import { uniqueId } from 'lodash';
 import { EndingPage } from '@pagopa/selfcare-common-frontend';
 import { Grid, Link } from '@mui/material';
+import { resolvePathVariables } from '@pagopa/selfcare-common-frontend/utils/routes-utils';
+import { useHistory } from 'react-router-dom';
 import {
   Party,
   Product,
@@ -23,6 +25,7 @@ import UserNotAllowedPage from '../../UserNotAllowedPage';
 import { AooData } from '../../../model/AooData';
 import { UoData } from '../../../model/UoModel';
 import { RolesInformations } from '../../../components/RolesInformations';
+import { ROUTES } from '../../../utils/constants';
 
 type Props = StepperStepComponentProps & {
   externalInstitutionId: string;
@@ -73,6 +76,7 @@ export function StepVerifyOnboarding({
   const { setRequiredLogin } = useContext(UserContext);
   const requestIdRef = useRef<string>();
   const { t } = useTranslation();
+  const history = useHistory();
 
   const notAllowedErrorNoParty: RequestOutcomeMessage = {
     title: '',
@@ -118,7 +122,19 @@ export function StepVerifyOnboarding({
               components={{
                 1: <br />,
                 3: (
-                  <Link underline="none" sx={{ cursor: 'pointer' }} onClick={() => forward(true)} />
+                  <Link
+                    underline="none"
+                    sx={{ cursor: 'pointer' }}
+                    onClick={() => {
+                      if (selectedParty) {
+                        console.log('selectedParty', selectedParty);
+                        history.push(
+                          resolvePathVariables(ROUTES.ONBOARDING_USER.PATH, { productId }),
+                          { data: selectedParty }
+                        );
+                      }
+                    }}
+                  />
                 ),
               }}
             >

@@ -39,16 +39,16 @@ const errorOutCome = {
         variantTitle={'h4'}
         variantDescription={'body1'}
         title={
-          <Trans i18nKey="onBoardingSubProduct.genericError.title">Qualcosa è andato storto</Trans>
+          <Trans i18nKey="onboardingSubProduct.genericError.title">Qualcosa è andato storto</Trans>
         }
         description={
-          <Trans i18nKey="onBoardingSubProduct.genericError.message">
+          <Trans i18nKey="onboardingSubProduct.genericError.message">
             A causa di un errore del sistema non è possibile completare <br />
             la procedura. Ti chiediamo di riprovare più tardi.
           </Trans>
         }
         buttonLabel={
-          <Trans i18nKey="onBoardingSubProduct.genericError.homeButton">Torna alla home</Trans>
+          <Trans i18nKey="onboardingSubProduct.genericError.homeButton">Torna alla home</Trans>
         }
         onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
       />

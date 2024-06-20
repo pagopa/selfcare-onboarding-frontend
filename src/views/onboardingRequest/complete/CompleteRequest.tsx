@@ -21,10 +21,10 @@ import { ENV } from '../../../utils/env';
 import { MessageNoAction } from '../../../components/MessageNoAction';
 import { HeaderContext, UserContext } from '../../../lib/context';
 import { verifyRequest } from '../../../services/tokenServices';
-import NotFoundPage from '../outcomePages/NotFoundPage';
-import ExpiredRequestPage from '../outcomePages/ExpiredRequestPage';
-import AlreadyCompletedRequestPage from '../outcomePages/AlreadyCompletedRequestPage';
-import AlreadyRejectedRequestPage from '../outcomePages/AlreadyRejectedRequestPage';
+import NotFoundPage from '../status/NotFoundPage';
+import ExpiredRequestPage from '../status/ExpiredPage';
+import AlreadyCompletedRequest from '../status/AlreadyCompletedPage';
+import AlreadyRejectedRequest from '../status/AlreadyRejectedPage';
 import { LoadingOverlay } from '../../../components/LoadingOverlay';
 import { getRequestJwt } from '../../../utils/getRequestJwt';
 import CompleteRequestSuccessPage from './pages/CompleteRequestSuccessPage';
@@ -266,7 +266,7 @@ export default function CompleteRequestComponent() {
       title: '',
       description: [
         <>
-          <AlreadyRejectedRequestPage
+          <AlreadyRejectedRequest
             translationKeyValue={translationKeyValue}
             productTitle={productId2ProductTitle(requestData?.productId ?? '')}
           />
@@ -277,7 +277,7 @@ export default function CompleteRequestComponent() {
       title: '',
       description: [
         <>
-          <AlreadyCompletedRequestPage translationKeyValue={translationKeyValue} />
+          <AlreadyCompletedRequest translationKeyValue={translationKeyValue} />
         </>,
       ],
     },

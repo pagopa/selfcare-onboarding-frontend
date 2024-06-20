@@ -29,15 +29,15 @@ import { SubProductStepSelectUserParty } from './components/SubProductStepSelect
 import SubProductStepSelectPricingPlan from './components/subProductStepPricingPlan/SubProductStepSelectPricingPlan';
 import SubProductStepUserUnrelated from './components/SubProductStepUserUnrelated';
 
-type OnBoardingSubProductUrlParams = {
+type OnboardingPremiumUrlParams = {
   productId: string;
   subProductId: string;
 };
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
-function OnBoardingSubProduct() {
+function OnboardingPremiumComponent() {
   const { t } = useTranslation();
-  const { subProductId, productId } = useParams<OnBoardingSubProductUrlParams>();
+  const { subProductId, productId } = useParams<OnboardingPremiumUrlParams>();
   const [loading, setLoading] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
 
@@ -237,7 +237,7 @@ function OnBoardingSubProduct() {
       // TODO temporary commented in order to develop SELC-2237
       // StepSearchParty({
       //   subTitle: (
-      //     <Trans i18nKey="onBoardingSubProduct.selectUserPartyStep.IPAsubTitle">
+      //     <Trans i18nKey="onboardingSubProduct.selectUserPartyStep.IPAsubTitle">
       //       Seleziona dall&apos;Indice della Pubblica Amministrazione (IPA) l&apos;ente
       //       <br /> per cui vuoi richiedere l&apos;adesione a{' '}
       //       {{
@@ -290,7 +290,7 @@ function OnBoardingSubProduct() {
           institutionType: institutionType as InstitutionType,
           origin,
           subtitle: (
-            <Trans i18nKey="onBoardingSubProduct.billingData.subTitle" components={{ 1: <br /> }}>
+            <Trans i18nKey="onboardingSubProduct.billingData.subTitle" components={{ 1: <br /> }}>
               {`Conferma, modifica o inserisci i dati richiesti, assicurandoti che siano corretti. <1 />Verranno usati anche per richiedere l’adesione ad altri prodotti e in caso di fatturazione.`}
             </Trans>
           ),
@@ -388,10 +388,10 @@ function OnBoardingSubProduct() {
           }
         }}
         open={openExitModal}
-        title={t('onBoardingSubProduct.exitModal.title')}
-        message={t('onBoardingSubProduct.exitModal.message')}
-        onConfirmLabel={t('onBoardingSubProduct.exitModal.backButton')}
-        onCloseLabel={t('onBoardingSubProduct.exitModal.cancelButton')}
+        title={t('onboardingSubProduct.exitModal.title')}
+        message={t('onboardingSubProduct.exitModal.message')}
+        onConfirmLabel={t('onboardingSubProduct.exitModal.backButton')}
+        onCloseLabel={t('onboardingSubProduct.exitModal.cancelButton')}
       />
       <ConfirmOnboardingModal
         open={openConfirmationModal}
@@ -400,9 +400,9 @@ function OnBoardingSubProduct() {
         onConfirm={handleOnConfirmModal}
         productName={subProduct?.title}
       />
-      {loading && <LoadingOverlay loadingText={t('onBoardingSubProduct.loading.loadingText')} />}
+      {loading && <LoadingOverlay loadingText={t('onboardingSubProduct.loading.loadingText')} />}
     </Container>
   );
 }
 
-export default withLogin(OnBoardingSubProduct);
+export default withLogin(OnboardingPremiumComponent);

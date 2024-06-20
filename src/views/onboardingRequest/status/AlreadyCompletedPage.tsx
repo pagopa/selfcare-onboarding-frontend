@@ -7,7 +7,7 @@ type Props = {
   translationKeyValue: string;
 };
 
-export default function AlreadyCompletedRequestPage({ translationKeyValue }: Props) {
+export default function AlreadyCompletedPage({ translationKeyValue }: Props) {
   const { t } = useTranslation();
 
   return (

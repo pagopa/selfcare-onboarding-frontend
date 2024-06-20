@@ -49,7 +49,7 @@ export default function SubProductStepUserUnrelated({ product, productId }: Prop
   };
 
   const onButtonGoTo = () => {
-    history.push(resolvePathVariables(ROUTES.ONBOARDING.PATH, { productId }));
+    history.push(resolvePathVariables(ROUTES.ONBOARDING_PRODUCT.PATH, { productId }));
   };
 
   return (
@@ -64,7 +64,7 @@ export default function SubProductStepUserUnrelated({ product, productId }: Prop
           <Grid item xs={6}>
             <Typography variant={'h4'}>
               <Trans
-                i18nKey="onBoardingSubProduct.subProductStepUserUnrelated.title"
+                i18nKey="onboardingSubProduct.subProductStepUserUnrelated.title"
                 values={{ selectedProduct: product?.title.substring(4) }}
               >
                 {`Non puoi aderire a {{selectedProduct}} Premium`}
@@ -76,7 +76,7 @@ export default function SubProductStepUserUnrelated({ product, productId }: Prop
           <Grid item xs={6}>
             <Typography variant={'body1'}>
               <Trans
-                i18nKey="onBoardingSubProduct.subProductStepUserUnrelated.description"
+                i18nKey="onboardingSubProduct.subProductStepUserUnrelated.description"
                 values={{ selectedProduct: product?.title }}
                 components={{ 3: <br />, 5: <br />, 7: <br /> }}
               >
@@ -93,12 +93,12 @@ export default function SubProductStepUserUnrelated({ product, productId }: Prop
               sx={{ alignSelf: 'center', mr: 2 }}
               onClick={onExitPremiumFlow}
             >
-              {t('onBoardingSubProduct.subProductStepUserUnrelated.backHomeLabelBtn')}
+              {t('onboardingSubProduct.subProductStepUserUnrelated.backHomeLabelBtn')}
             </Button>
           </Box>
           <Box>
             <Button variant="contained" sx={{ alignSelf: 'center' }} onClick={onButtonGoTo}>
-              {t('onBoardingSubProduct.subProductStepUserUnrelated.goToBtnLabel')}
+              {t('onboardingSubProduct.subProductStepUserUnrelated.goToBtnLabel')}
             </Button>
           </Box>
         </Box>

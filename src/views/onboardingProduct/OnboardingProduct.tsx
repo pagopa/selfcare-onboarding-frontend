@@ -74,7 +74,7 @@ export const prodPhaseOutErrorPage: RequestOutcomeMessage = {
 };
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
-function OnboardingComponent({ productId }: { productId: string }) {
+function OnboardingProductComponent({ productId }: { productId: string }) {
   const [loading, setLoading] = useState(true);
   const [activeStep, setActiveStep] = useState(0);
   const [formData, setFormData] = useState<Partial<FormData>>();
@@ -782,12 +782,12 @@ function OnboardingComponent({ productId }: { productId: string }) {
           institutionType: institutionType as InstitutionType,
           subtitle:
             institutionType !== 'PT' ? (
-              <Trans i18nKey="onBoardingSubProduct.billingData.subTitle" components={{ 1: <br /> }}>
+              <Trans i18nKey="onboardingSubProduct.billingData.subTitle" components={{ 1: <br /> }}>
                 {`Conferma, modifica o inserisci i dati richiesti, assicurandoti che siano corretti. <1 />Verranno usati anche per richiedere l’adesione ad altri prodotti e in caso di fatturazione.`}
               </Trans>
             ) : (
               <Trans
-                i18nKey="onBoardingSubProduct.billingDataPt.subTitle"
+                i18nKey="onboardingSubProduct.billingDataPt.subTitle"
                 values={{ nameProduct: selectedProduct?.title }}
                 components={{ 1: <br />, 3: <br />, 5: <strong /> }}
               >
@@ -952,4 +952,4 @@ function OnboardingComponent({ productId }: { productId: string }) {
   );
 }
 
-export default withLogin(OnboardingComponent);
+export default withLogin(OnboardingProductComponent);

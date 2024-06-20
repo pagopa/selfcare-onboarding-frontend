@@ -57,7 +57,7 @@ export function SubProductStepSelectUserParty({
     setSelectedHistory(selected);
     forward(selected);
   };
-  const bodyTitle = t('onBoardingSubProduct.selectUserPartyStep.title');
+  const bodyTitle = t('onboardingSubProduct.selectUserPartyStep.title');
 
   const backAction = () => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -137,7 +137,7 @@ export function SubProductStepSelectUserParty({
         <Grid item xs={12}>
           <Typography variant="body1" align="center" color={theme.palette.text.primary}>
             <Trans
-              i18nKey="onBoardingSubProduct.selectUserPartyStep.subTitle"
+              i18nKey="onboardingSubProduct.selectUserPartyStep.subTitle"
               components={{ 1: <br />, 3: <strong /> }}
             >
               {`Seleziona l&apos;ente per il quale stai richiedendo la sottoscrizione <br />
@@ -158,7 +158,7 @@ export function SubProductStepSelectUserParty({
               input={input}
               onChange={(e) => onFilterChange(e.target.value)}
               iconColor={'#17324D'}
-              label={t('onBoardingSubProduct.selectUserPartyStep.searchLabel')}
+              label={t('onboardingSubProduct.selectUserPartyStep.searchLabel')}
             />
           )}
           {filteredParties.length >= 1 ? (
@@ -204,7 +204,7 @@ export function SubProductStepSelectUserParty({
                 justifyContent: 'flex-start',
               }}
             >
-              {t('onBoardingSubProduct.selectUserPartyStep.notFoundResults')}
+              {t('onboardingSubProduct.selectUserPartyStep.notFoundResults')}
             </Typography>
           )}
         </Paper>
@@ -227,7 +227,7 @@ export function SubProductStepSelectUserParty({
               variant="caption"
               color={theme.palette.text.primary}
             >
-              <Trans i18nKey="onBoardingSubProduct.selectUserPartyStep.helperLink">
+              <Trans i18nKey="onboardingSubProduct.selectUserPartyStep.helperLink">
                 Non lo trovi?
                 <Link sx={{ cursor: 'pointer' }} onClick={() => forward()}>
                   Registra un nuovo ente
@@ -242,7 +242,7 @@ export function SubProductStepSelectUserParty({
         <OnboardingStepActions
           forward={{
             action: onForwardAction,
-            label: t('onBoardingSubProduct.selectUserPartyStep.confirmButton'),
+            label: t('onboardingSubProduct.selectUserPartyStep.confirmButton'),
             disabled: parties.length > 1 && (selected === undefined || selected === null),
           }}
           back={{

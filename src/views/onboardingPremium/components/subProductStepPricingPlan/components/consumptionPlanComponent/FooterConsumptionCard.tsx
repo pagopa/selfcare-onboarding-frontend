@@ -67,16 +67,16 @@ export default function FooterConsumptionCard({
                   {consumptionPlan.length - 1 !== index ? (
                     <Typography variant="h6" height={'55px'}>
                       {t(
-                        'onBoardingSubProduct.subProductStepSelectPricingPlan.headerPlanCard.from'
+                        'onboardingSubProduct.subProductStepSelectPricingPlan.headerPlanCard.from'
                       )}{' '}
                       {cp.from}{' '}
-                      {t('onBoardingSubProduct.subProductStepSelectPricingPlan.headerPlanCard.to')}{' '}
+                      {t('onboardingSubProduct.subProductStepSelectPricingPlan.headerPlanCard.to')}{' '}
                       <br /> {cp.to} <span style={{ fontSize: '16px' }}>mess</span>
                     </Typography>
                   ) : (
                     <Typography variant="h6" height={'55px'}>
                       {t(
-                        'onBoardingSubProduct.subProductStepSelectPricingPlan.headerPlanCard.beyond'
+                        'onboardingSubProduct.subProductStepSelectPricingPlan.headerPlanCard.beyond'
                       )}{' '}
                       <br /> {cp.from}
                     </Typography>
@@ -88,7 +88,7 @@ export default function FooterConsumptionCard({
                       <Typography pr={1} sx={{ color: 'text.secondary' }}>
                         <s>
                           {t(
-                            'onBoardingSubProduct.subProductStepSelectPricingPlan.consumptionPlan.rangeValuesDiscount.r1'
+                            'onboardingSubProduct.subProductStepSelectPricingPlan.consumptionPlan.rangeValuesDiscount.r1'
                           )}
                         </s>
                       </Typography>
@@ -154,7 +154,7 @@ export default function FooterConsumptionCard({
                       >
                         <Typography variant="subtitle2">
                           {t(
-                            'onBoardingSubProduct.subProductStepSelectPricingPlan.consumptionPlan.rangeLabelsDiscount'
+                            'onboardingSubProduct.subProductStepSelectPricingPlan.consumptionPlan.rangeLabelsDiscount'
                           )}
                         </Typography>
                       </Box>
@@ -170,7 +170,7 @@ export default function FooterConsumptionCard({
                 sx={{ color: 'text.secondary', textAlign: 'center', display: 'flex', mt: 3 }}
               >
                 {t(
-                  'onBoardingSubProduct.subProductStepSelectPricingPlan.consumptionPlan.description'
+                  'onboardingSubProduct.subProductStepSelectPricingPlan.consumptionPlan.description'
                 )}
               </Typography>
             </Box>
@@ -179,7 +179,7 @@ export default function FooterConsumptionCard({
             <Box mt={3} display="flex" justifyContent={'center'}>
               <Button variant="contained" onClick={onForwardAction} id={'forwardConsumptionPlan'}>
                 {t(
-                  'onBoardingSubProduct.subProductStepSelectPricingPlan.consumptionPlan.btnActionLabel'
+                  'onboardingSubProduct.subProductStepSelectPricingPlan.consumptionPlan.btnActionLabel'
                 )}
               </Button>
             </Box>
@@ -208,14 +208,14 @@ export default function FooterConsumptionCard({
                 variant="caption"
                 sx={{ color: 'primary.main', fontWeight: 'fontWeightBold' }}
               >
-                {t('onBoardingSubProduct.subProductStepSelectPricingPlan.consumptionPlan.showLess')}
+                {t('onboardingSubProduct.subProductStepSelectPricingPlan.consumptionPlan.showLess')}
               </Typography>
             ) : (
               <Typography
                 variant="caption"
                 sx={{ color: 'primary.main', fontWeight: 'fontWeightBold' }}
               >
-                {t('onBoardingSubProduct.subProductStepSelectPricingPlan.consumptionPlan.showMore')}
+                {t('onboardingSubProduct.subProductStepSelectPricingPlan.consumptionPlan.showMore')}
               </Typography>
             )}
           </Button>

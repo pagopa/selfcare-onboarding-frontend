@@ -13,14 +13,14 @@ const successfulOutCome = {
         variantTitle="h4"
         variantDescription="body1"
         title={
-          <Trans i18nKey="onBoardingSubProduct.successfulAdhesion.title">
+          <Trans i18nKey="onboardingSubProduct.successfulAdhesion.title">
             La richiesta di adesione è stata
             <br />
             inviata con successo
           </Trans>
         }
         description={
-          <Trans i18nKey="onBoardingSubProduct.successfulAdhesion.message">
+          <Trans i18nKey="onboardingSubProduct.successfulAdhesion.message">
             Riceverai una PEC all’indirizzo istituzionale dell&apos;ente.
             <br />
             Al suo interno troverai le istruzioni per completare la
@@ -29,7 +29,7 @@ const successfulOutCome = {
           </Trans>
         }
         buttonLabel={
-          <Trans i18nKey="onBoardingSubProduct.successfulAdhesion.closeButton"> Chiudi </Trans>
+          <Trans i18nKey="onboardingSubProduct.successfulAdhesion.closeButton"> Chiudi </Trans>
         }
         onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
       />

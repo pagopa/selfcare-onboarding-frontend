@@ -8,7 +8,7 @@ type Props = {
   translationKeyValue: string;
 };
 
-export default function AlreadyRejectedRequestPage({ productTitle, translationKeyValue }: Props) {
+export default function AlreadyRejectedPage({ productTitle, translationKeyValue }: Props) {
   const { t } = useTranslation();
 
   return (

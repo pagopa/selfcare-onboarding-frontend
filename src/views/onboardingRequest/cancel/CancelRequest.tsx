@@ -10,13 +10,13 @@ import { LoadingOverlay } from '../../../components/LoadingOverlay';
 import { HeaderContext, UserContext } from '../../../lib/context';
 import { verifyRequest } from '../../../services/tokenServices';
 import { redirectToLogin } from '../../../utils/unloadEvent-utils';
-import NotFoundPage from '../outcomePages/NotFoundPage';
-import AlreadyCompletedRequestPage from '../outcomePages/AlreadyCompletedRequestPage';
-import AlreadyRejectedRequestPage from '../outcomePages/AlreadyRejectedRequestPage';
-import ExpiredRequestPage from '../outcomePages/ExpiredRequestPage';
+import NotFoundPage from '../status/NotFoundPage';
+import AlreadyCompletedRequest from '../status/AlreadyCompletedPage';
+import AlreadyRejectedRequest from '../status/AlreadyRejectedPage';
+import ExpiredRequestPage from '../status/ExpiredPage';
 import { getRequestJwt } from '../../../utils/getRequestJwt';
-import CancelRequestSuccessPage from '../cancel/pages/CancelRequestSuccessPage';
 import { getFetchOutcome } from '../../../lib/error-utils';
+import CancelRequestSuccessPage from './pages/CancelRequestSuccessPage';
 import CancelRequestPage from './pages/CancelRequestPage';
 
 export default function CancelRequestComponent() {
@@ -114,7 +114,7 @@ export default function CancelRequestComponent() {
       title: '',
       description: [
         <>
-          <AlreadyCompletedRequestPage translationKeyValue={translationKeyValue} />
+          <AlreadyCompletedRequest translationKeyValue={translationKeyValue} />
         </>,
       ],
     },
@@ -122,7 +122,7 @@ export default function CancelRequestComponent() {
       title: '',
       description: [
         <>
-          <AlreadyRejectedRequestPage
+          <AlreadyRejectedRequest
             translationKeyValue={translationKeyValue}
             productTitle={productId2ProductTitle(requestData?.productId ?? '')}
           />

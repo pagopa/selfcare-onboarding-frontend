@@ -8,7 +8,7 @@ type Props = {
   productTitle: string;
 };
 
-export default function ExpiredRequestPage({ productTitle, translationKeyValue }: Props) {
+export default function ExpiredPage({ productTitle, translationKeyValue }: Props) {
   const { t } = useTranslation();
 
   return (

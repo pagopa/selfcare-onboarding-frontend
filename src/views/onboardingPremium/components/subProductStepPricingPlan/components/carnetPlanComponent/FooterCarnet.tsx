@@ -82,8 +82,8 @@ export default function FooterCarnet({ carnetPlans, forward, discount }: Props) 
                         <Trans
                           i18nKey={
                             discount
-                              ? 'onBoardingSubProduct.subProductStepSelectPricingPlan.carnetPlan.carnetLabelsWithScount.c1'
-                              : 'onBoardingSubProduct.subProductStepSelectPricingPlan.carnetPlan.carnetLabelsWithoutScount.c1'
+                              ? 'onboardingSubProduct.subProductStepSelectPricingPlan.carnetPlan.carnetLabelsWithScount.c1'
+                              : 'onboardingSubProduct.subProductStepSelectPricingPlan.carnetPlan.carnetLabelsWithoutScount.c1'
                           }
                         >
                           {cp.messages}
@@ -110,7 +110,7 @@ export default function FooterCarnet({ carnetPlans, forward, discount }: Props) 
                         <Typography pr={1} sx={{ color: 'text.secondary' }}>
                           <s>
                             {t(
-                              'onBoardingSubProduct.subProductStepSelectPricingPlan.carnetPlan.carnetValuesDiscount.c1'
+                              'onboardingSubProduct.subProductStepSelectPricingPlan.carnetPlan.carnetValuesDiscount.c1'
                             )}
                           </s>
                         </Typography>
@@ -118,7 +118,7 @@ export default function FooterCarnet({ carnetPlans, forward, discount }: Props) 
                     )}
                     <Box>
                       {discount ? (
-                        <Trans i18nKey="onBoardingSubProduct.subProductStepSelectPricingPlan.carnetPlan.carnetValuesDiscounted.c1">
+                        <Trans i18nKey="onboardingSubProduct.subProductStepSelectPricingPlan.carnetPlan.carnetValuesDiscounted.c1">
                           <span
                             style={{
                               color: '#0073E6',
@@ -139,7 +139,7 @@ export default function FooterCarnet({ carnetPlans, forward, discount }: Props) 
                           </span>
                         </Trans>
                       ) : (
-                        <Trans i18nKey="onBoardingSubProduct.subProductStepSelectPricingPlan.carnetPlan.carnetValues.c1">
+                        <Trans i18nKey="onboardingSubProduct.subProductStepSelectPricingPlan.carnetPlan.carnetValues.c1">
                           <span
                             style={{
                               color: '#0073E6',
@@ -175,7 +175,7 @@ export default function FooterCarnet({ carnetPlans, forward, discount }: Props) 
                         >
                           <Typography variant="subtitle2">
                             {t(
-                              'onBoardingSubProduct.subProductStepSelectPricingPlan.carnetPlan.carnetLabelsDiscount.c1'
+                              'onboardingSubProduct.subProductStepSelectPricingPlan.carnetPlan.carnetLabelsDiscount.c1'
                             )}
                           </Typography>
                         </Box>
@@ -190,7 +190,7 @@ export default function FooterCarnet({ carnetPlans, forward, discount }: Props) 
                   variant="caption"
                   sx={{ color: 'text.secondary', textAlign: 'center', display: 'flex', mt: 3 }}
                 >
-                  {t('onBoardingSubProduct.subProductStepSelectPricingPlan.carnetPlan.description')}
+                  {t('onboardingSubProduct.subProductStepSelectPricingPlan.carnetPlan.description')}
                 </Typography>
               </Box>
 
@@ -202,7 +202,7 @@ export default function FooterCarnet({ carnetPlans, forward, discount }: Props) 
                   onClick={onForwardAction}
                 >
                   {t(
-                    'onBoardingSubProduct.subProductStepSelectPricingPlan.carnetPlan.btnActionLabel'
+                    'onboardingSubProduct.subProductStepSelectPricingPlan.carnetPlan.btnActionLabel'
                   )}
                 </Button>
               </Box>
@@ -232,14 +232,14 @@ export default function FooterCarnet({ carnetPlans, forward, discount }: Props) 
                 variant="caption"
                 sx={{ color: 'primary.main', fontWeight: 'fontWeightBold' }}
               >
-                {t('onBoardingSubProduct.subProductStepSelectPricingPlan.carnetPlan.showLess')}
+                {t('onboardingSubProduct.subProductStepSelectPricingPlan.carnetPlan.showLess')}
               </Typography>
             ) : (
               <Typography
                 variant="caption"
                 sx={{ color: 'primary.main', fontWeight: 'fontWeightBold' }}
               >
-                {t('onBoardingSubProduct.subProductStepSelectPricingPlan.carnetPlan.showMore')}
+                {t('onboardingSubProduct.subProductStepSelectPricingPlan.carnetPlan.showMore')}
               </Typography>
             )}
           </Button>

@@ -79,7 +79,7 @@ export default function HeaderPlanCard({
             fontFamily="Titillium Web !important"
           >
             <span style={{ color: '#5C6F82', fontSize: '16px', marginRight: '8px' }}>
-              {t('onBoardingSubProduct.subProductStepSelectPricingPlan.headerPlanCard.from')}
+              {t('onboardingSubProduct.subProductStepSelectPricingPlan.headerPlanCard.from')}
             </span>
 
             <span style={{ color: '#0073E6', fontSize: '50px', fontWeight: '700' }}>
@@ -95,7 +95,7 @@ export default function HeaderPlanCard({
             </span>
 
             <span style={{ color: '#5C6F82', fontSize: '16px', marginRight: '8px' }}>
-              {t('onBoardingSubProduct.subProductStepSelectPricingPlan.headerPlanCard.to')}
+              {t('onboardingSubProduct.subProductStepSelectPricingPlan.headerPlanCard.to')}
             </span>
 
             <span style={{ color: '#0073E6', fontSize: '50px', fontWeight: '700' }}>
@@ -111,7 +111,7 @@ export default function HeaderPlanCard({
             </span>
 
             <span style={{ color: '#5C6F82', fontSize: '16px', marginRight: '8px' }}>
-              {t('onBoardingSubProduct.subProductStepSelectPricingPlan.headerPlanCard.mess')}
+              {t('onboardingSubProduct.subProductStepSelectPricingPlan.headerPlanCard.mess')}
             </span>
           </Typography>
         </Box>

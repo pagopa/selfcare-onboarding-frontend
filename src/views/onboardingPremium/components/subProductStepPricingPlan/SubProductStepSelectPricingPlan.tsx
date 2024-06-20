@@ -158,7 +158,7 @@ export default function SubProductStepSelectPricingPlan({
                 justifyContent="center"
               >
                 <Typography variant="subtitle2">
-                  {t('onBoardingSubProduct.subProductStepSelectPricingPlan.discountLabelData')}{' '}
+                  {t('onboardingSubProduct.subProductStepSelectPricingPlan.discountLabelData')}{' '}
                 </Typography>
               </Box>
             ) : (
@@ -175,7 +175,7 @@ export default function SubProductStepSelectPricingPlan({
               color="white"
               textAlign="center"
             >
-              <Trans i18nKey="onBoardingSubProduct.subProductStepSelectPricingPlan.title">
+              <Trans i18nKey="onboardingSubProduct.subProductStepSelectPricingPlan.title">
                 Passa a IO Premium e migliora le <br /> performance dei messaggi
               </Trans>
             </Typography>
@@ -185,19 +185,19 @@ export default function SubProductStepSelectPricingPlan({
             <Box display={'flex'} justifyContent="center">
               <CheckCircleIcon style={{ color: 'white' }} fontSize="small" />
               <Typography pl={1} fontSize="fontSize" color={'white'}>
-                {t('onBoardingSubProduct.subProductStepSelectPricingPlan.firstCheckLabel')}
+                {t('onboardingSubProduct.subProductStepSelectPricingPlan.firstCheckLabel')}
               </Typography>
             </Box>
             <Box display={'flex'} justifyContent="center" pt={1}>
               <CheckCircleIcon style={{ color: 'white' }} fontSize="small" />
               <Typography pl={1} fontSize="fontSize" color={'white'}>
-                {t('onBoardingSubProduct.subProductStepSelectPricingPlan.secondCheckLabel')}
+                {t('onboardingSubProduct.subProductStepSelectPricingPlan.secondCheckLabel')}
               </Typography>
             </Box>
             <Box display={'flex'} justifyContent="center" pt={1}>
               <CheckCircleIcon style={{ color: 'white' }} fontSize="small" />
               <Typography pl={1} fontSize="fontSize" color={'white'}>
-                {t('onBoardingSubProduct.subProductStepSelectPricingPlan.thirdCheckLabel')}
+                {t('onboardingSubProduct.subProductStepSelectPricingPlan.thirdCheckLabel')}
               </Typography>
             </Box>
           </Grid>
@@ -205,7 +205,7 @@ export default function SubProductStepSelectPricingPlan({
           <Grid container item justifyContent={'center'} mt={4} mb={5}>
             <Grid item xs={7}>
               <Typography fontSize={'fontSize'} color="white" textAlign={'center'}>
-                <Trans i18nKey="onBoardingSubProduct.subProductStepSelectPricingPlan.infoSectionLabel">
+                <Trans i18nKey="onboardingSubProduct.subProductStepSelectPricingPlan.infoSectionLabel">
                   Se il tuo ente ha già aderito ad app IO, scegli qual è il piano che più soddisfa
                   le sue esigenze. <br /> Il piano a carnet è attivabile una sola volta. Una volta
                   terminato il numero di messaggi del piano a <br /> carnet, si attiverà
@@ -219,12 +219,12 @@ export default function SubProductStepSelectPricingPlan({
               <HeaderPlanCard
                 discount={discount}
                 caption={t(
-                  'onBoardingSubProduct.subProductStepSelectPricingPlan.carnetPlan.caption'
+                  'onboardingSubProduct.subProductStepSelectPricingPlan.carnetPlan.caption'
                 )}
                 discountBoxLabel={t(
-                  'onBoardingSubProduct.subProductStepSelectPricingPlan.carnetPlan.discountBoxLabel'
+                  'onboardingSubProduct.subProductStepSelectPricingPlan.carnetPlan.discountBoxLabel'
                 )}
-                title={t('onBoardingSubProduct.subProductStepSelectPricingPlan.carnetPlan.title', {
+                title={t('onboardingSubProduct.subProductStepSelectPricingPlan.carnetPlan.title', {
                   carnetCount,
                 })}
                 minCarnetMessagePrice={minCarnetMessagePrice}
@@ -238,15 +238,15 @@ export default function SubProductStepSelectPricingPlan({
               <HeaderPlanCard
                 discount={discount}
                 caption={t(
-                  'onBoardingSubProduct.subProductStepSelectPricingPlan.consumptionPlan.caption'
+                  'onboardingSubProduct.subProductStepSelectPricingPlan.consumptionPlan.caption'
                 )}
                 discountBoxLabel={t(
-                  'onBoardingSubProduct.subProductStepSelectPricingPlan.consumptionPlan.discountBoxLabel'
+                  'onboardingSubProduct.subProductStepSelectPricingPlan.consumptionPlan.discountBoxLabel'
                 )}
                 title={
                   <Trans
                     i18nKey={
-                      'onBoardingSubProduct.subProductStepSelectPricingPlan.consumptionPlan.title'
+                      'onboardingSubProduct.subProductStepSelectPricingPlan.consumptionPlan.title'
                     }
                   >
                     Scegli di pagare solo i messaggi <br /> effettivi che invii
@@ -287,22 +287,22 @@ export default function SubProductStepSelectPricingPlan({
             sx={{ mt: 5, ':hover': { backgroundColor: 'transparent' } }}
             disableRipple
           >
-            {t('onBoardingSubProduct.subProductStepSelectPricingPlan.btnRejectLabel')}
+            {t('onboardingSubProduct.subProductStepSelectPricingPlan.btnRejectLabel')}
           </Button>
         </Grid>
         <SessionModal
           open={openExitModal}
           title={t(
-            'onBoardingSubProduct.subProductStepSelectPricingPlan.pricingPlanExitModal.title'
+            'onboardingSubProduct.subProductStepSelectPricingPlan.pricingPlanExitModal.title'
           )}
           message={t(
-            'onBoardingSubProduct.subProductStepSelectPricingPlan.pricingPlanExitModal.subtitle'
+            'onboardingSubProduct.subProductStepSelectPricingPlan.pricingPlanExitModal.subtitle'
           )}
           onConfirmLabel={t(
-            'onBoardingSubProduct.subProductStepSelectPricingPlan.pricingPlanExitModal.closeBtnLabel'
+            'onboardingSubProduct.subProductStepSelectPricingPlan.pricingPlanExitModal.closeBtnLabel'
           )}
           onCloseLabel={t(
-            'onBoardingSubProduct.subProductStepSelectPricingPlan.pricingPlanExitModal.confirmBtnLabel'
+            'onboardingSubProduct.subProductStepSelectPricingPlan.pricingPlanExitModal.confirmBtnLabel'
           )}
           onConfirm={onExitPremiumFlow}
           handleClose={handleClose}
