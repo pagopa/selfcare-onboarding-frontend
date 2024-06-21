@@ -5,10 +5,13 @@ import '@testing-library/jest-dom';
 import { User } from '../../../../types';
 import { HeaderContext, UserContext } from '../../../lib/context';
 import { ENV } from '../../../utils/env';
-import Onboarding from '../Onboarding';
+import OnboardingProduct from '../OnboardingProduct';
 import '../../../locale';
 import { nationalValue } from '../../../model/GeographicTaxonomies';
 import { filterByCategory } from '../../../utils/constants';
+import { createMemoryHistory } from 'history';
+import { Router } from 'react-router-dom';
+import { mockPartyRegistry, mockedProducts } from '../../../lib/__mocks__/mockApiRequests';
 
 jest.mock('../../../lib/api-utils');
 jest.setTimeout(30000);
@@ -29,6 +32,7 @@ const initialLocation = {
   state: undefined,
 };
 const mockedLocation = Object.assign({}, initialLocation);
+const mockedHistoryPush = jest.fn();
 
 beforeAll(() => {
   Object.defineProperty(window, 'location', { value: mockedLocation });
@@ -40,9 +44,11 @@ afterAll(() => {
 beforeEach(() => Object.assign(mockedLocation, initialLocation));
 
 jest.mock('react-router-dom', () => ({
+  ...jest.requireActual('react-router-dom'),
   useHistory: () => ({
     location: mockedLocation,
     replace: (nextLocation) => Object.assign(mockedLocation, nextLocation),
+    push: mockedHistoryPush,
   }),
 }));
 
@@ -52,6 +58,8 @@ const renderComponent = (productId: string = 'prod-pn') => {
     const [subHeaderVisible, setSubHeaderVisible] = useState<boolean>(false);
     const [onExit, setOnExit] = useState<(exitAction: () => void) => void | undefined>();
     const [enableLogin, setEnableLogin] = useState<boolean>(true);
+
+    const history = createMemoryHistory();
 
     return (
       <HeaderContext.Provider
@@ -70,13 +78,16 @@ const renderComponent = (productId: string = 'prod-pn') => {
           <button onClick={() => onExit?.(() => window.location.assign(ENV.URL_FE.LOGOUT))}>
             LOGOUT
           </button>
-          <Onboarding productId={productId} />
+          <Router history={history}>
+            <OnboardingProduct productId={productId} />
+          </Router>
         </UserContext.Provider>
       </HeaderContext.Provider>
     );
   };
 
   render(<Component />);
+  return { history };
 };
 
 const step1Title = 'Cerca il tuo ente';
@@ -158,49 +169,18 @@ test('test complete with error on submit', async () => {
   await executeStepInstitutionType('prod-cgn');
   await executeStep1('AGENCY ERROR', 'prod-cgn', 'pa');
 });
-test('test error add new user for already onboarded party', async () => {
-  renderComponent('prod-io');
+
+test('Test: The addUser button in already onboarded party error page should redirect to add new user flow', async () => {
+  const { history } = renderComponent('prod-io');
   await executeStepInstitutionType('prod-io');
   await executeStep1('AGENCY X', 'prod-io', 'pa');
 
   screen.getByText(/L’ente selezionato ha già aderito/);
 
-  const addNewAdmin = screen.getByText('Aggiungi un nuovo Amministratore');
-  fireEvent.click(addNewAdmin);
+  const addNewUser = screen.getByText('Aggiungi un nuovo Amministratore');
+  await waitFor(() => fireEvent.click(addNewUser));
 
-  screen.getByText('Indica il Legale Rappresentante');
-  await executeStep2();
-  await executeStep3(false, false, true);
-});
-
-test('test success add new user for already onboarded party', async () => {
-  renderComponent('prod-pagopa');
-  await executeStepInstitutionType('prod-pagopa');
-  await executeStep1('AGENCY ONBOARDED', 'prod-pagopa', 'pa');
-
-  screen.getByText(/L’ente selezionato ha già aderito/);
-
-  const addNewAdmin = screen.getByText('Aggiungi un nuovo Amministratore');
-  fireEvent.click(addNewAdmin);
-
-  screen.getByText('Indica il Legale Rappresentante');
-  await executeStep2();
-  await executeStep3(true, false, true);
-});
-
-test('test error add new user for already onboarded party', async () => {
-  renderComponent('prod-io');
-  await executeStepInstitutionType('prod-io');
-  await executeStep1('AGENCY ONBOARDED', 'prod-io', 'pa');
-
-  screen.getByText(/L’ente selezionato ha già aderito/);
-
-  const addNewAdmin = screen.getByText('Aggiungi un nuovo Amministratore');
-  fireEvent.click(addNewAdmin);
-
-  screen.getByText('Indica il Legale Rappresentante');
-  await executeStep2();
-  await executeStep3(false, false, true);
+  expect(history.length).toBe(1);
 });
 
 test('test exiting during flow with unload event', async () => {
@@ -843,23 +823,17 @@ const executeStep2 = async () => {
   await waitFor(() => screen.getByText(step3Title));
 };
 
-const executeStep3 = async (
-  expectedSuccessfulSubmit: boolean,
-  isTechPartner = false,
-  addUserFlow = false
-) => {
+const executeStep3 = async (expectedSuccessfulSubmit: boolean, isTechPartner = false) => {
   console.log('Testing step 3');
 
   await waitFor(() => screen.getByText(step3Title));
   const [_, confirmButton] = await checkBackForwardNavigation(step2Title, step3Title);
 
-  if (!addUserFlow) {
-    const addDelegateButton = screen.getByRole('button', {
-      name: 'Aggiungi un altro Amministratore',
-    });
-    expect(addDelegateButton).toBeDisabled();
-    await checkLoggedUserAsAdminCheckbox(confirmButton, addDelegateButton);
-  }
+  const addDelegateButton = screen.getByRole('button', {
+    name: 'Aggiungi un altro Amministratore',
+  });
+  expect(addDelegateButton).toBeDisabled();
+  await checkLoggedUserAsAdminCheckbox(confirmButton, addDelegateButton);
 
   await checkCertifiedUserValidation('delegate-initial', confirmButton);
 
@@ -870,20 +844,15 @@ const executeStep3 = async (
     'a@a.AA',
     true,
     'SRNNMA80A01A794F',
-    addUserFlow ? 0 : 1,
+    1,
     'b@b.bb',
-    addUserFlow ? 0 : 1
+    1
   );
 
   await waitFor(() => expect(confirmButton).toBeEnabled());
 
-  if (!addUserFlow) {
-    const addDelegateButton = screen.getByRole('button', {
-      name: 'Aggiungi un altro Amministratore',
-    });
-    expect(addDelegateButton).toBeEnabled();
-    await waitFor(() => checkAdditionalUsers(confirmButton, addUserFlow));
-  }
+  expect(addDelegateButton).toBeEnabled();
+  await waitFor(() => checkAdditionalUsers(confirmButton));
 
   await waitFor(() => fireEvent.click(confirmButton));
 
@@ -893,12 +862,10 @@ const executeStep3 = async (
 
   await waitFor(() =>
     screen.getByText(
-      expectedSuccessfulSubmit
-        ? addUserFlow
-          ? 'Hai inviato la richiesta'
-          : !isTechPartner
-          ? 'Richiesta di adesione inviata'
-          : 'Richiesta di registrazione inviata'
+      expectedSuccessfulSubmit && !isTechPartner
+        ? 'Richiesta di adesione inviata'
+        : expectedSuccessfulSubmit
+        ? 'Richiesta di registrazione inviata'
         : 'Qualcosa è andato storto.'
     )
   );
@@ -1119,11 +1086,11 @@ const clickAdminCheckBoxAndTestValues = (
   expect(addDelegateButton).toBeDisabled();
 };
 
-const checkAdditionalUsers = async (confirmButton: HTMLElement, addUserFlow: boolean) => {
+const checkAdditionalUsers = async (confirmButton: HTMLElement) => {
   console.log('Adding additional user');
   await checkRemovingEmptyAdditionalUser(0, confirmButton);
 
-  await fillAdditionalUserAndCheckUniqueValues(0, confirmButton, addUserFlow);
+  await fillAdditionalUserAndCheckUniqueValues(0, confirmButton);
 };
 
 const checkRemovingEmptyAdditionalUser = async (index: number, confirmButton: HTMLElement) => {
@@ -1192,8 +1159,7 @@ const searchUserFormFromRemoveBtn = (removeButton: HTMLElement) => {
 };
 const fillAdditionalUserAndCheckUniqueValues = async (
   index: number,
-  confirmButton: HTMLElement,
-  addUserFlow: boolean
+  confirmButton: HTMLElement
 ) => {
   const removeUserButtons = await addAdditionEmptyUser(index, confirmButton);
 
@@ -1213,16 +1179,16 @@ const fillAdditionalUserAndCheckUniqueValues = async (
     email,
     true,
     'SRNNMA80A01A794F',
-    addUserFlow ? 0 : 1,
+    1,
     'b@b.bb',
-    addUserFlow ? 0 : 1
+    1
   );
   await checkAlreadyExistentValues(
     prefix,
     confirmButton,
     'SRNNMA80A01A794F',
     taxCode,
-    addUserFlow ? 0 : 1,
+    1,
     'a@a.aa',
     email,
     2
@@ -1232,7 +1198,7 @@ const fillAdditionalUserAndCheckUniqueValues = async (
     confirmButton,
     'SRNNMA80A01A794F',
     taxCode,
-    addUserFlow ? 0 : 1,
+    1,
     'a@a.aa',
     email,
     2

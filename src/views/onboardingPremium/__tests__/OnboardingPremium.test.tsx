@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { User } from '../../../../types';
 import { HeaderContext, UserContext } from '../../../lib/context';
 import { ENV } from '../../../utils/env';
-import OnboardingSubProduct from '../OnboardingSubProduct';
+import OnboardingPremium from '../OnboardingPremium';
 import '../../../locale';
 import { Route, Router, Switch } from 'react-router';
 import { createMemoryHistory } from 'history';
@@ -85,7 +85,7 @@ const renderComponent = (
             </button>
             <Switch>
               <Route path="/:productId/:subProductId">
-                <OnboardingSubProduct />
+                <OnboardingPremium />
               </Route>
             </Switch>
           </UserContext.Provider>

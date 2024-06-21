@@ -1,6 +1,6 @@
 import { useEffect, useState, useContext, useRef, useMemo } from 'react';
 import { useHistory } from 'react-router-dom';
-import { Container, Grid } from '@mui/material';
+import { Container } from '@mui/material';
 import { AxiosError, AxiosResponse } from 'axios';
 import SessionModal from '@pagopa/selfcare-common-frontend/components/SessionModal';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
@@ -45,6 +45,7 @@ import { registerUnloadEvent, unregisterUnloadEvent } from '../../utils/unloadEv
 import StepInstitutionType from '../../components/steps/StepInstitutionType';
 import UserNotAllowedPage from '../UserNotAllowedPage';
 import { AdditionalData, AdditionalInformations } from '../../model/AdditionalInformations';
+import AlreadyOnboarded from '../AlreadyOnboarded';
 import { genericError, StepVerifyOnboarding } from './components/StepVerifyOnboarding';
 import { OnBoardingProductStepDelegates } from './components/OnBoardingProductStepDelegates';
 import { StepAdditionalInformations } from './components/StepAdditionalInformations';
@@ -97,7 +98,6 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
 
   const [aooSelected, setAooSelected] = useState<AooData>();
   const [uoSelected, setUoSelected] = useState<UoData>();
-  const [addUserFlow, setAddUserFlow] = useState<boolean>(false);
 
   const productAvoidStep =
     selectedProduct?.id === 'prod-pn' || selectedProduct?.id === 'prod-idpay';
@@ -120,15 +120,8 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     }
   }, [institutionTypeByUrl]);
 
-  const forwardAfterVerify = (addNewUserFlow: boolean) => {
-    if (addNewUserFlow) {
-      setAddUserFlow(true);
-      setActiveStep(activeStep + 4);
-    } else {
-      forward();
-    }
-  };
-
+  // TODO CHECK THIS
+  /* 
   const alreadyOnboarded: RequestOutcomeMessage = {
     title: '',
     description: isTechPartner
@@ -173,7 +166,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
             />
           </Grid>,
         ],
-  };
+  }; */
 
   useEffect(() => {
     if (
@@ -420,21 +413,12 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
             minHeight="52vh"
             icon={<IllusCompleted size={60} />}
             title={
-              addUserFlow
-                ? t('onboarding.success.flow.user.title')
-                : institutionType === 'PT'
+              institutionType === 'PT'
                 ? t('onboarding.success.flow.techPartner.title')
                 : t('onboarding.success.flow.product.title')
             }
             description={
-              addUserFlow ? (
-                <Trans
-                  i18nKey="onboarding.success.flow.user.description"
-                  components={{ 1: <br />, 3: <br /> }}
-                >
-                  {`Invieremo un’email all’indirizzo PEC primario dell’ente. <1 /> Al suo interno, ci sono le istruzioni per completare <3 />l’operazione.`}
-                </Trans>
-              ) : institutionType === 'PT' ? (
+              institutionType === 'PT' ? (
                 <Trans
                   i18nKey="onboarding.success.flow.techPartner.description"
                   components={{ 1: <br /> }}
@@ -488,6 +472,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     },
   };
 
+  // TODO THIS TWO CAN BE EXPORTED FROM ANOTHER FILE
   const notAllowedError: RequestOutcomeMessage = {
     title: '',
     description: [
@@ -495,6 +480,19 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
         <UserNotAllowedPage
           partyName={selectedParty?.description}
           productTitle={selectedProduct?.title}
+        />
+      </>,
+    ],
+  };
+
+  const alreadyOnboarded: RequestOutcomeMessage = {
+    title: '',
+    description: [
+      <>
+        <AlreadyOnboarded
+          institutionType={institutionType}
+          selectedParty={selectedParty}
+          selectedProduct={selectedProduct}
         />
       </>,
     ],
@@ -598,50 +596,6 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     }
   };
 
-  const addUserRequest = async (users: Array<UserOnCreate>) => {
-    setLoading(true);
-    const addUserResponse = await fetchWithLogs(
-      { endpoint: 'ONBOARDING_NEW_USER' },
-      {
-        method: 'POST',
-        data: {
-          productId,
-          institutionType,
-          origin,
-          originId: onboardingFormData?.originId,
-          subunitCode: aooSelected
-            ? aooSelected.codiceUniAoo
-            : uoSelected
-            ? uoSelected.codiceUniUo
-            : undefined,
-          taxCode: onboardingFormData?.taxCode,
-          users,
-        },
-      },
-      () => setRequiredLogin(true)
-    );
-
-    setLoading(false);
-
-    const outcome = getFetchOutcome(addUserResponse);
-
-    setOutcome(outcomeContent[outcome]);
-
-    if (outcome === 'success') {
-      trackEvent('ONBOARDING_USER_SUCCESS', {
-        request_id: requestIdRef.current,
-        party_id: externalInstitutionId,
-        product_id: productId,
-      });
-    } else {
-      trackEvent('ONBOARDING_USER_ERROR', {
-        request_id: requestIdRef.current,
-        party_id: externalInstitutionId,
-        product_id: productId,
-      });
-    }
-  };
-
   const forwardWithOnboardingData = (
     onboardingFormData?: OnboardingFormData,
     institutionType?: InstitutionType,
@@ -739,13 +693,14 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
       Component: () =>
         StepVerifyOnboarding({
           product: selectedProduct,
-          forward: forwardAfterVerify,
+          forward,
           externalInstitutionId,
           productId,
           selectedProduct,
           selectedParty,
           aooSelected,
           uoSelected,
+          institutionType,
         }),
     },
     {
@@ -821,7 +776,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
       Component: () =>
         StepAddManager({
           externalInstitutionId,
-          addUserFlow,
+          addUserFlow: false,
           product: selectedProduct,
           isTechPartner,
           forward: (newFormData: Partial<FormData>) => {
@@ -835,8 +790,6 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           back: () => {
             if (productId === 'prod-pagopa' && institutionType === 'GSP') {
               back();
-            } else if (addUserFlow) {
-              setActiveStep(1);
             } else {
               setActiveStep(activeStep - 2);
             }
@@ -848,7 +801,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
       Component: () =>
         OnBoardingProductStepDelegates({
           externalInstitutionId,
-          addUserFlow,
+          addUserFlow: false,
           product: selectedProduct,
           legal: isTechPartner ? undefined : (formData as any)?.users[0],
           partyName: onboardingFormData?.businessName || '',
@@ -867,23 +820,13 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
               party_id: externalInstitutionId,
               product_id: productId,
             });
-            if (addUserFlow) {
-              addUserRequest(users).catch(() => {
-                trackEvent('ONBOARDING_ADD_NEW_USER', {
-                  request_id: requestIdRef.current,
-                  party_id: externalInstitutionId,
-                  product_id: productId,
-                });
+            onboardingSubmit(isTechPartner ? usersWithoutLegal : users).catch(() => {
+              trackEvent('ONBOARDING_ADD_DELEGATE', {
+                request_id: requestIdRef.current,
+                party_id: externalInstitutionId,
+                product_id: productId,
               });
-            } else {
-              onboardingSubmit(isTechPartner ? usersWithoutLegal : users).catch(() => {
-                trackEvent('ONBOARDING_ADD_DELEGATE', {
-                  request_id: requestIdRef.current,
-                  party_id: externalInstitutionId,
-                  product_id: productId,
-                });
-              });
-            }
+            });
           },
           back: () => {
             if (isTechPartner) {

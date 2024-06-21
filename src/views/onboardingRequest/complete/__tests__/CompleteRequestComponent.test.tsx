@@ -1,5 +1,5 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import CompleteRequestComponent from '../CompleteRequestComponent';
+import CompleteRequestComponent from '../CompleteRequest';
 import '../../../../locale';
 import React from 'react';
 import { ENV } from '../../../../utils/env';

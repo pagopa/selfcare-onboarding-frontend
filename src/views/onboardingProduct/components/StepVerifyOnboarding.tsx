@@ -5,10 +5,8 @@ import { IllusError } from '@pagopa/mui-italia';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
 import { uniqueId } from 'lodash';
 import { EndingPage } from '@pagopa/selfcare-common-frontend';
-import { Grid, Link } from '@mui/material';
-import { resolvePathVariables } from '@pagopa/selfcare-common-frontend/utils/routes-utils';
-import { useHistory } from 'react-router-dom';
 import {
+  InstitutionType,
   Party,
   Product,
   RequestOutcomeMessage,
@@ -24,8 +22,7 @@ import { MessageNoAction } from '../../../components/MessageNoAction';
 import UserNotAllowedPage from '../../UserNotAllowedPage';
 import { AooData } from '../../../model/AooData';
 import { UoData } from '../../../model/UoModel';
-import { RolesInformations } from '../../../components/RolesInformations';
-import { ROUTES } from '../../../utils/constants';
+import AlreadyOnboarded from '../../AlreadyOnboarded';
 
 type Props = StepperStepComponentProps & {
   externalInstitutionId: string;
@@ -34,6 +31,7 @@ type Props = StepperStepComponentProps & {
   selectedParty?: Party;
   aooSelected?: AooData;
   uoSelected?: UoData;
+  institutionType?: InstitutionType;
 };
 
 export const genericError: RequestOutcomeMessage = {
@@ -69,6 +67,7 @@ export function StepVerifyOnboarding({
   selectedParty,
   aooSelected,
   uoSelected,
+  institutionType,
 }: Props) {
   const [loading, setLoading] = useState(true);
   const [outcome, setOutcome] = useState<RequestOutcomeMessage | null>();
@@ -76,7 +75,6 @@ export function StepVerifyOnboarding({
   const { setRequiredLogin } = useContext(UserContext);
   const requestIdRef = useRef<string>();
   const { t } = useTranslation();
-  const history = useHistory();
 
   const notAllowedErrorNoParty: RequestOutcomeMessage = {
     title: '',
@@ -90,61 +88,15 @@ export function StepVerifyOnboarding({
     ],
   };
 
+  // TODO Check this
   const alreadyOnboarded: RequestOutcomeMessage = {
     title: '',
     description: [
       <>
-        <EndingPage
-          minHeight="52vh"
-          variantTitle={'h4'}
-          variantDescription={'body1'}
-          icon={<IllusError size={60} />}
-          title={<Trans i18nKey="stepVerifyOnboarding.alreadyOnboarded.title" />}
-          description={
-            <Grid container sx={{ display: 'flex', flexDirection: 'column' }}>
-              <Trans
-                i18nKey="stepVerifyOnboarding.alreadyOnboarded.description"
-                components={{ 1: <br /> }}
-              >
-                {
-                  'Per operare sul prodotto, chiedi a un Amministratore di <1/>aggiungerti nella sezione Utenti.'
-                }
-              </Trans>
-              <Grid item>
-                <RolesInformations />
-              </Grid>
-            </Grid>
-          }
-          isParagraphPresent={true}
-          paragraph={
-            <Trans
-              i18nKey="stepVerifyOnboarding.alreadyOnboarded.addNewAdmin"
-              components={{
-                1: <br />,
-                3: (
-                  <Link
-                    underline="none"
-                    sx={{ cursor: 'pointer' }}
-                    onClick={() => {
-                      if (selectedParty) {
-                        console.log('selectedParty', selectedParty);
-                        history.push(
-                          resolvePathVariables(ROUTES.ONBOARDING_USER.PATH, { productId }),
-                          { data: selectedParty }
-                        );
-                      }
-                    }}
-                  />
-                ),
-              }}
-            >
-              {
-                'Gli attuali Amministratori non sono più disponibili e hai l’esigenza <1 />di gestire i prodotti? <3>Aggiungi un nuovo Amministratore</3>'
-              }
-            </Trans>
-          }
-          buttonLabel={<Trans i18nKey="stepVerifyOnboarding.alreadyOnboarded.backHome" />}
-          onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+        <AlreadyOnboarded
+          institutionType={institutionType}
+          selectedParty={selectedParty}
+          selectedProduct={selectedProduct}
         />
       </>,
     ],

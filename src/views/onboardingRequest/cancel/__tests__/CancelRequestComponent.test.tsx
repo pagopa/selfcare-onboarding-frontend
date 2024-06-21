@@ -3,7 +3,7 @@ import { ENV } from '../../../../utils/env';
 import CancelRequestPage from '../pages/CancelRequestPage';
 import '../../../../locale';
 import { buildAssistanceURI } from '@pagopa/selfcare-common-frontend/services/assistanceService';
-import CancelRequestComponent from '../CancelRequestComponent';
+import CancelRequestComponent from '../CancelRequest';
 
 jest.mock('../../../../lib/api-utils');
 

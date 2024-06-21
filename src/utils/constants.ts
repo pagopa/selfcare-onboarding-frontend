@@ -128,6 +128,9 @@ export const API = {
   ONBOARDING_GET_INSURANCE_COMPANIES_FROM_IVASSCODE: {
     URL: ENV.URL_API.PARTY_REGISTRY_PROXY + '/insurance-companies/origin/{{code}}',
   },
+  ONBOARDING_GET_PRODUCTS: {
+    URL: ENV.URL_API.ONBOARDING + '/products'
+  }
 };
 
 export const USER_ROLE_LABEL = {
