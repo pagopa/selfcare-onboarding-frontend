@@ -1,9 +1,10 @@
 import { RoutesObject } from '../../types';
-import CompleteRequestComponent from '../views/uploadContract/complete/CompleteRequestComponent';
+import CompleteRequest from '../views/onboardingRequest/complete/CompleteRequest';
 import NoProductPage from '../views/NoProductPage';
-import Onboarding from '../views/onboarding/Onboarding';
-import OnBoardingSubProduct from '../views/OnBoardingSubProduct/OnBoardingSubProduct';
-import CancelRequestComponent from '../views/uploadContract/cancel/CancelRequestComponent';
+import OnboardingProduct from '../views/onboardingProduct/OnboardingProduct';
+import OnboardingPremium from '../views/onboardingPremium/OnboardingPremium';
+import CancelRequest from '../views/onboardingRequest/cancel/CancelRequest';
+import OnboardingUser from '../views/onboardingUser/OnboardingUser';
 import { ENV } from './env';
 
 const IS_DEVELOP = process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test';
@@ -22,25 +23,30 @@ export const ROUTES: RoutesObject = {
   },
   REGISTRATION_FINALIZE_COMPLETE: {
     PATH: `${BASE_ROUTE}/confirm`,
-    LABEL: 'Completa la procedura di onboarding',
-    COMPONENT: CompleteRequestComponent,
+    LABEL: 'Complete onboarding request',
+    COMPONENT: CompleteRequest,
   },
   REGISTRATION_FINALIZE_REJECT: {
     PATH: `${BASE_ROUTE}/cancel`,
-    LABEL: 'Cancella la procedura di onboarding',
-    COMPONENT: CancelRequestComponent,
+    LABEL: 'Cancel onboarding request',
+    COMPONENT: CancelRequest,
   },
-  ONBOARDING: {
+  ONBOARDING_USER: {
+    PATH: `${BASE_ROUTE}/user/:productId`,
+    LABEL: 'Onboarding user',
+    COMPONENT: OnboardingUser,
+  },
+  ONBOARDING_PRODUCT: {
     PATH: `${BASE_ROUTE}/:productId`,
-    LABEL: 'Onboarding',
+    LABEL: 'Onboarding product',
     EXACT: true,
-    COMPONENT: Onboarding,
+    COMPONENT: OnboardingProduct,
   },
-  ONBOARDING_SUBPRODUCT: {
+  ONBOARDING_PREMIUM: {
     PATH: `${BASE_ROUTE}/:productId/:subProductId`,
-    LABEL: 'Onboarding SubProduct',
+    LABEL: 'Onboarding premium',
     EXACT: true,
-    COMPONENT: OnBoardingSubProduct,
+    COMPONENT: OnboardingPremium,
   },
 };
 
@@ -122,6 +128,9 @@ export const API = {
   ONBOARDING_GET_INSURANCE_COMPANIES_FROM_IVASSCODE: {
     URL: ENV.URL_API.PARTY_REGISTRY_PROXY + '/insurance-companies/origin/{{code}}',
   },
+  ONBOARDING_GET_PRODUCTS: {
+    URL: ENV.URL_API.ONBOARDING + '/products'
+  }
 };
 
 export const USER_ROLE_LABEL = {

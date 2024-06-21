@@ -410,7 +410,7 @@ export default {
       backAction: 'Torna alla home',
     },
   },
-  onBoardingSubProduct: {
+  onboardingSubProduct: {
     alreadyOnboardedError: {
       title: 'Sottoscrizione già avvenuta',
       message:
