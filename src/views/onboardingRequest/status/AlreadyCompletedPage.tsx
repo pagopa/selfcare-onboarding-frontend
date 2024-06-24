@@ -15,9 +15,7 @@ export default function AlreadyCompletedPage({ translationKeyValue }: Props) {
       minHeight="52vh"
       icon={<IllusError size={60} />}
       title={t(`completeRegistration.request.alreadyCompleted.${translationKeyValue}.title`)}
-      description={t(
-        `completeRegistration.request.alreadyCompleted.${translationKeyValue}.description`
-      )}
+      description={t(`completeRegistration.request.alreadyCompleted.description`)}
       variantTitle={'h4'}
       variantDescription={'body1'}
       buttonLabel={t('completeRegistration.request.alreadyCompleted.logIn')}

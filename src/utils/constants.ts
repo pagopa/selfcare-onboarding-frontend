@@ -1,4 +1,4 @@
-import { RoutesObject } from '../../types';
+import { InstitutionType, RoutesObject } from '../../types';
 import CompleteRequest from '../views/onboardingRequest/complete/CompleteRequest';
 import NoProductPage from '../views/NoProductPage';
 import OnboardingProduct from '../views/onboardingProduct/OnboardingProduct';
@@ -32,8 +32,9 @@ export const ROUTES: RoutesObject = {
     COMPONENT: CancelRequest,
   },
   ONBOARDING_USER: {
-    PATH: `${BASE_ROUTE}/user/:productId`,
+    PATH: `${BASE_ROUTE}/user`,
     LABEL: 'Onboarding user',
+    EXACT: true,
     COMPONENT: OnboardingUser,
   },
   ONBOARDING_PRODUCT: {
@@ -129,8 +130,8 @@ export const API = {
     URL: ENV.URL_API.PARTY_REGISTRY_PROXY + '/insurance-companies/origin/{{code}}',
   },
   ONBOARDING_GET_PRODUCTS: {
-    URL: ENV.URL_API.ONBOARDING + '/products'
-  }
+    URL: ENV.URL_API.ONBOARDING + '/products',
+  },
 };
 
 export const USER_ROLE_LABEL = {
@@ -165,6 +166,73 @@ export const filterByCategory = (institutionType?: string, productId?: string) =
     : 'C17,C16,L10,L19,L13,L2,C10,L20,L21,L22,L15,L1,C13,C5,L40,L11,L39,L46,L8,L34,L7,L35,L45,L47,L6,L12,L24,L28,L42,L36,L44,C8,C3,C7,C14,L16,C11,L33,C12,L43,C2,L38,C1,L5,L4,L31,L18,L17,S01,SA';
 
 export const noMandatoryIpaProducts = (productId?: string) =>
-  productId !== 'prod-interop' && productId !== 'prod-io' && productId !== 'prod-io-sign' && productId !== 'prod-idpay' && !productId?.includes('prod-pn');
+  productId !== 'prod-interop' &&
+  productId !== 'prod-io' &&
+  productId !== 'prod-io-sign' &&
+  productId !== 'prod-idpay' &&
+  !productId?.includes('prod-pn');
 
-export const addUserFlowProducts = (productId: string) => productId.includes('prod-interop') || productId.includes('prod-pn') || productId === 'prod-io' || productId === 'prod-pagopa';
+export const addUserFlowProducts = (productId: string) =>
+  productId.includes('prod-interop') ||
+  productId.includes('prod-pn') ||
+  productId === 'prod-io' ||
+  productId === 'prod-pagopa';
+
+export const institutionTypes: Array<{ labelKey: string; value: InstitutionType }> = [
+  { labelKey: 'pa', value: 'PA' },
+  { labelKey: 'gsp', value: 'GSP' },
+  { labelKey: 'scp', value: 'SCP' },
+  { labelKey: 'pt', value: 'PT' },
+  { labelKey: 'psp', value: 'PSP' },
+  { labelKey: 'sa', value: 'SA' },
+  { labelKey: 'as', value: 'AS' },
+];
+
+export const institutionType4Product = (productId: string | undefined) => {
+  switch (productId) {
+    case 'prod-interop':
+      return institutionTypes.filter(
+        (it) =>
+          it.labelKey === 'pa' ||
+          it.labelKey === 'gsp' ||
+          it.labelKey === 'sa' ||
+          it.labelKey === 'as'
+      );
+    case 'prod-pn':
+      return institutionTypes.filter((it) => it.labelKey === 'pa');
+    case 'prod-idpay':
+      return institutionTypes.filter((it) => it.labelKey === 'pa');
+    case 'prod-io':
+    case 'prod-pagopa':
+      // Temporary disabled psp radiobutton for prod-pagopa, the radio buttons are now the same for prod-io and prod-pagopa.
+      return institutionTypes.filter(
+        (it) =>
+          it.labelKey === 'pa' ||
+          it.labelKey === 'gsp' ||
+          it.labelKey === 'scp' ||
+          (ENV.PT.SHOW_PT ? it.labelKey === 'pt' : '')
+      );
+    default:
+      return institutionTypes.filter(
+        (it) => it.labelKey === 'pa' || it.labelKey === 'gsp' || it.labelKey === 'scp'
+      );
+  }
+};
+
+export const description4InstitutionType = (institutionType: InstitutionType) => {
+  switch (institutionType) {
+    case 'PT':
+      return 'stepInstitutionType.institutionTypes.pt.description';
+    case 'PA':
+      return 'stepInstitutionType.institutionTypes.pa.description';
+    case 'GSP':
+      return 'stepInstitutionType.institutionTypes.gsp.description';
+    case 'SCP':
+      return 'stepInstitutionType.institutionTypes.scp.description';
+    case 'PSP':
+    case 'SA':
+    case 'AS':
+    default:
+      return '';
+  }
+};

@@ -1,7 +1,6 @@
 import { Grid, Link } from '@mui/material';
 import { IllusError } from '@pagopa/mui-italia';
 import { EndingPage } from '@pagopa/selfcare-common-frontend';
-import { resolvePathVariables } from '@pagopa/selfcare-common-frontend/utils/routes-utils';
 import { Trans } from 'react-i18next';
 import { useHistory } from 'react-router';
 import { RolesInformations } from '../components/RolesInformations';
@@ -55,13 +54,9 @@ export default function AlreadyOnboarded({
                 sx={{ cursor: 'pointer' }}
                 onClick={() => {
                   if (selectedParty) {
-                    history.push(
-                      resolvePathVariables(
-                        ROUTES.ONBOARDING_USER.PATH.concat(`?institutionType=${institutionType}`),
-                        { productId: selectedProduct?.id ?? '' }
-                      ),
-                      { data: { party: selectedParty, product: selectedProduct } }
-                    );
+                    history.push(ROUTES.ONBOARDING_USER.PATH, {
+                      data: { institutionType, party: selectedParty, product: selectedProduct },
+                    });
                   }
                 }}
               />
