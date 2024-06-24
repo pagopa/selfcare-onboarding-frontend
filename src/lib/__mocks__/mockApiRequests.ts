@@ -421,7 +421,7 @@ export const mockedGeotaxonomies: Array<GeographicTaxonomyResource> = [
   },
 ];
 
-const mockedAoos: Array<AooData> = [
+export const mockedAoos: Array<AooData> = [
   {
     codAoo: 'A356E00',
     codiceFiscaleEnte: '92078570527',
@@ -466,7 +466,7 @@ const mockedAoos: Array<AooData> = [
   },
 ];
 
-const mockedUos: Array<UoData> = [
+export const mockedUos: Array<UoData> = [
   {
     codiceFiscaleEnte: '98765432109',
     codiceFiscaleSfe: '87654321098',

@@ -8,6 +8,7 @@ import { useTranslation, Trans } from 'react-i18next';
 import { uniqueId } from 'lodash';
 import { IllusCompleted, IllusError } from '@pagopa/mui-italia';
 import { EndingPage } from '@pagopa/selfcare-common-frontend';
+import React from 'react';
 import { withLogin } from '../../components/withLogin';
 import { AooData } from '../../model/AooData';
 import { UoData } from '../../model/UoModel';
@@ -120,13 +121,11 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     }
   }, [institutionTypeByUrl]);
 
-  // TODO CHECK THIS
-  /* 
   const alreadyOnboarded: RequestOutcomeMessage = {
     title: '',
     description: isTechPartner
       ? [
-          <Grid key="0">
+          <React.Fragment key="0">
             <EndingPage
               minHeight="52vh"
               variantTitle="h4"
@@ -142,31 +141,18 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
               buttonLabel={<Trans i18nKey="stepVerifyOnboarding.ptAlreadyOnboarded.backAction" />}
               onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
             />
-          </Grid>,
+          </React.Fragment>,
         ]
       : [
-          <Grid key="0">
-            <EndingPage
-              minHeight="52vh"
-              variantTitle={'h4'}
-              variantDescription={'body1'}
-              title={<Trans i18nKey="stepVerifyOnboarding.alreadyOnboarded.title" />}
-              description={
-                <Trans
-                  i18nKey="stepVerifyOnboarding.alreadyOnboarded.description"
-                  components={{ 1: <br /> }}
-                >
-                  {
-                    'Per operare sul prodotto, chiedi a un Amministratore di <1/>aggiungerti nella sezione Utenti.'
-                  }
-                </Trans>
-              }
-              buttonLabel={<Trans i18nKey="stepVerifyOnboarding.alreadyOnboarded.backHome" />}
-              onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+          <React.Fragment key="0">
+            <AlreadyOnboarded
+              selectedParty={selectedParty}
+              selectedProduct={selectedProduct}
+              institutionType={institutionType}
             />
-          </Grid>,
+          </React.Fragment>,
         ],
-  }; */
+  };
 
   useEffect(() => {
     if (
@@ -479,19 +465,6 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
         <UserNotAllowedPage
           partyName={selectedParty?.description}
           productTitle={selectedProduct?.title}
-        />
-      </>,
-    ],
-  };
-
-  const alreadyOnboarded: RequestOutcomeMessage = {
-    title: '',
-    description: [
-      <>
-        <AlreadyOnboarded
-          institutionType={institutionType}
-          selectedParty={selectedParty}
-          selectedProduct={selectedProduct}
         />
       </>,
     ],

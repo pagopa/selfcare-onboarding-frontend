@@ -31,8 +31,7 @@ export default function CancelRequestComponent() {
   const [loading, setLoading] = useState(false);
   const [requestData, setRequestData] = useState<OnboardingRequestData | undefined>();
 
-  const addUserFlow =
-    new URLSearchParams(window.location.hash.substring(1)).get('add-user') === 'true';
+  const addUserFlow = new URLSearchParams(window.location.search).get('add-user') === 'true';
   const translationKeyValue = addUserFlow ? 'user' : 'product';
 
   useEffect(() => {
