@@ -12,7 +12,7 @@ import {
 import { theme } from '@pagopa/mui-italia';
 import { useContext, useEffect, useState } from 'react';
 import { AxiosResponse } from 'axios';
-import { useTranslation } from 'react-i18next';
+import { useTranslation, Trans } from 'react-i18next';
 import { RolesInformations } from '../../../components/RolesInformations';
 import { fetchWithLogs } from '../../../lib/api-utils';
 import { UserContext } from '../../../lib/context';
@@ -62,14 +62,16 @@ export function StepSelectProduct({ back, forward }: StepperStepComponentProps) 
       <Grid container sx={{ display: 'flex', flexDirection: 'column', textAlign: 'center' }}>
         <Grid item mb={1}>
           <Typography variant="h3" fontWeight="fontWeightBold">
-            Aggiungi un nuovo <br /> Amministratore
+            <Trans i18nKey="addUser.title" components={{ 1: <br /> }}>
+              {`Aggiungi un nuovo <1 /> Amministratore`}
+            </Trans>
           </Typography>
         </Grid>
         <Grid item mb={1}>
           <Typography variant="body1" fontWeight="fontWeightRegular">
-            Indica per quale prodotto vuoi aggiungere un nuovo
-            <br />
-            Amministratore
+            <Trans i18nKey="addUser.subTitle" components={{ 1: <br /> }}>
+              {`Indica per quale prodotto vuoi aggiungere un nuovo<1 />Amministratore`}
+            </Trans>
           </Typography>
         </Grid>
         <Grid item mb={4}>
@@ -83,7 +85,7 @@ export function StepSelectProduct({ back, forward }: StepperStepComponentProps) 
         >
           <Grid item px={3} pt={3}>
             <Typography sx={{ fontSize: '14px', fontWeight: 'fontWeightBold' }}>
-              SELEZIONA IL PRODOTTO
+              {t('addUser.stepSelectProduct.title')}
             </Typography>
           </Grid>
           <Grid item py={1}>

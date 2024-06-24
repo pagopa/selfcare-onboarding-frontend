@@ -256,7 +256,7 @@ const mockedBaseParties: Array<SelfcareParty> = [
     id: '5454679',
     description: 'Comune di Udine',
     userRole: 'ADMIN',
-  }
+  },
 ];
 
 const mockedParties = [
@@ -511,7 +511,7 @@ const mockedUos: Array<UoData> = [
 
 const mockedOnboardingData: Array<InstitutionOnboardingInfoResource> = [
   {
-    geographicTaxonomies: [{ code: '23233', desc: 'Milano'}],
+    geographicTaxonomies: [{ code: '23233', desc: 'Milano' }],
     institution: {
       id: '55897f04-bafd-4bc9-b646-0fd027620c1b',
       billingData: {
@@ -538,7 +538,7 @@ const mockedOnboardingData: Array<InstitutionOnboardingInfoResource> = [
     },
   },
   {
-    geographicTaxonomies: [{ code: '23233', desc: 'Milano'}],
+    geographicTaxonomies: [{ code: '23233', desc: 'Milano' }],
     institution: {
       id: '999c63d8-554d-4376-233s-4caf2a73822a',
       billingData: {
@@ -573,7 +573,7 @@ const mockedOnboardingData: Array<InstitutionOnboardingInfoResource> = [
     },
   },
   {
-    geographicTaxonomies: [{ code: '23233', desc: 'Milano'}],
+    geographicTaxonomies: [{ code: '23233', desc: 'Milano' }],
     institution: {
       id: '370c63d8-1b76-4376-a725-4caf2a73822a',
       billingData: {
@@ -965,10 +965,14 @@ export async function mockFetch(
     );
   }
 
-  if (endpoint === 'ONBOARDING_GET_UO_LIST'){
+  if (endpoint === 'ONBOARDING_GET_UO_LIST') {
     const retrievedUos = mockedUos.filter((uo) => uo.codiceFiscaleEnte === params.taxCodeInvoicing);
     return new Promise((resolve) =>
-      resolve({ data: {items: retrievedUos, count: retrievedUos.length }, status: 200, statusText: '200' } as AxiosResponse)
+      resolve({
+        data: { items: retrievedUos, count: retrievedUos.length },
+        status: 200,
+        statusText: '200',
+      } as AxiosResponse)
     );
   }
 
@@ -1038,27 +1042,43 @@ export async function mockFetch(
   }
 
   if (endpoint === 'ONBOARDING_GET_ONBOARDING_DATA') {
-    switch(params.institutionId){
+    switch (params.institutionId) {
       case '43446':
         return new Promise((resolve) =>
-        resolve({ data: mockedOnboardingData[0], status: 200, statusText: '200' } as AxiosResponse)
-      );
+          resolve({
+            data: mockedOnboardingData[0],
+            status: 200,
+            statusText: '200',
+          } as AxiosResponse)
+        );
       case '23231':
         return new Promise((resolve) =>
-        resolve({ data: mockedOnboardingData[2], status: 200, statusText: '200' } as AxiosResponse)
-      );
+          resolve({
+            data: mockedOnboardingData[2],
+            status: 200,
+            statusText: '200',
+          } as AxiosResponse)
+        );
       case '5454679':
         return new Promise((resolve) =>
-        resolve({ data: mockedOnboardingData[1], status: 200, statusText: '200' } as AxiosResponse)
-      );
+          resolve({
+            data: mockedOnboardingData[1],
+            status: 200,
+            statusText: '200',
+          } as AxiosResponse)
+        );
       case '775644':
         return genericError;
       default:
         return new Promise((resolve) =>
-          resolve({ data: mockedOnboardingData[3], status: 200, statusText: '200' } as AxiosResponse)
+          resolve({
+            data: mockedOnboardingData[3],
+            status: 200,
+            statusText: '200',
+          } as AxiosResponse)
         );
     }
-    }
+  }
 
   if (endpoint === 'ONBOARDING_VERIFY_PRODUCT') {
     const selectedProduct = mockedProducts.find((p) => p.id === endpointParams.productId);
@@ -1116,7 +1136,7 @@ export async function mockFetch(
   if (endpoint === 'ONBOARDING_NEW_USER') {
     switch ((data as any).productId) {
       case 'prod-io':
-      return badRequestError;
+        return badRequestError;
       default:
         return new Promise((resolve) =>
           resolve({ data: {}, status: 200, statusText: '200' } as AxiosResponse)
@@ -1139,6 +1159,15 @@ export async function mockFetch(
   }
 
   if (endpoint === 'ONBOARDING_COMPLETE_REGISTRATION') {
+    switch (endpointParams.token) {
+      case 'error':
+        return badRequestError;
+      case 'pendingRequest':
+        return noContent;
+    }
+  }
+
+  if (endpoint === 'USER_COMPLETE_REGISTRATION') {
     switch (endpointParams.token) {
       case 'error':
         return badRequestError;

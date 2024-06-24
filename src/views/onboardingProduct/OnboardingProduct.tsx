@@ -650,7 +650,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
 
   const steps: Array<StepperStep> = [
     {
-      label: 'Seleziona il tipo di ente',
+      label: 'Select institution type',
       Component: () =>
         StepInstitutionType({
           institutionType: institutionType as InstitutionType,
@@ -664,7 +664,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
         }),
     },
     {
-      label: "Seleziona l'ente",
+      label: 'Search and select party',
       Component: () =>
         StepSearchParty({
           externalInstitutionId,
@@ -689,7 +689,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
         }),
     },
     {
-      label: 'Verifica ente',
+      label: 'Verify onboarding',
       Component: () =>
         StepVerifyOnboarding({
           product: selectedProduct,
@@ -704,7 +704,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
         }),
     },
     {
-      label: 'Get Onboarding Data',
+      label: 'Get onboarding data',
       Component: () =>
         StepOnboardingData({
           productId,
@@ -713,7 +713,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
         }),
     },
     {
-      label: 'Insert Billing Data',
+      label: 'Insert billing data',
       Component: () =>
         StepOnboardingFormData({
           outcome,
@@ -768,11 +768,11 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
         }),
     },
     {
-      label: 'Additional Info',
+      label: 'Insert additional info',
       Component: () => StepAdditionalInformations({ forward: forwardWithAdditionalGSPInfo, back }),
     },
     {
-      label: 'Inserisci i dati del rappresentante legale',
+      label: 'Insert manager data',
       Component: () =>
         StepAddManager({
           externalInstitutionId,
@@ -797,7 +797,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
         }),
     },
     {
-      label: 'Inserisci i dati degli amministratori',
+      label: 'Insert admins data',
       Component: () =>
         OnBoardingProductStepDelegates({
           externalInstitutionId,

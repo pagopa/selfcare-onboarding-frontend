@@ -1,5 +1,4 @@
 import Container from '@mui/material/Container';
-import { useParams } from 'react-router';
 import { useLocation, useHistory } from 'react-router-dom';
 import { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { EndingPage, SessionModal } from '@pagopa/selfcare-common-frontend';
@@ -27,13 +26,8 @@ import { unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
 import { selected2OnboardingData } from '../../utils/selected2OnboardingData';
 import { StepSelectProduct } from './components/StepSelectProduct';
 
-type OnboardingUserUrlParams = {
-  productId: string;
-};
-
 // eslint-disable-next-line sonarjs/cognitive-complexity
 function OnboardingUserComponent() {
-  const { productId } = useParams<OnboardingUserUrlParams>();
   const { t } = useTranslation();
   const location = useLocation();
   const history = useHistory();
@@ -46,16 +40,13 @@ function OnboardingUserComponent() {
   const [formData, setFormData] = useState<Partial<FormData>>();
   const [selectedParty, setSelectedParty] = useState<any>(); // TODO Add correct model
   const [selectedProduct, setSelectedProduct] = useState<Product>();
+  const [institutionType, setInstitutionType] = useState<InstitutionType>();
   const [onboardingFormData, setOnboardingFormData] = useState<OnboardingFormData>();
   const [onExitAction, setOnExitAction] = useState<(() => void) | undefined>();
   const [openExitModal, setOpenExitModal] = useState(false);
 
   const { setOnExit } = useContext(HeaderContext);
   const { setRequiredLogin } = useContext(UserContext);
-
-  const institutionType = new URLSearchParams(window.location.search).get(
-    'institutionType'
-  ) as InstitutionType;
 
   const isTechPartner = institutionType === 'PT';
 
@@ -72,6 +63,7 @@ function OnboardingUserComponent() {
     if ((location.state as any)?.data) {
       setSelectedParty((location.state as any).data.party);
       setSelectedProduct((location.state as any).data.product); // TODO FIX THIS
+      setInstitutionType((location.state as any).data.institutionType); // TODO FIX THIS
     }
   }, [(location.state as any)?.data]);
 
@@ -103,9 +95,9 @@ function OnboardingUserComponent() {
       {
         method: 'POST',
         data: {
-          productId,
+          productId: selectedProduct?.id,
           institutionType,
-          origin,
+          origin: selectedParty.origin,
           originId: onboardingFormData?.originId,
           subunitCode: selectedParty.codiceUniUo
             ? selectedParty.codiceUniUo
@@ -126,7 +118,7 @@ function OnboardingUserComponent() {
     trackEvent(outcome === 'success' ? 'ONBOARDING_USER_SUCCESS' : 'ONBOARDING_USER_ERROR', {
       request_id: requestIdRef.current,
       party_id: selectedParty?.externalId,
-      product_id: productId,
+      product_id: selectedProduct?.id,
     });
   };
 
@@ -195,7 +187,7 @@ function OnboardingUserComponent() {
             trackEvent('ONBOARDING_ADD_MANAGER', {
               request_id: requestIdRef.current,
               party_id: selectedParty?.externalId,
-              product_id: productId,
+              product_id: selectedProduct?.id,
             });
             forwardWithData(newFormData);
           },
@@ -223,13 +215,13 @@ function OnboardingUserComponent() {
             trackEvent('ONBOARDING_ADD_DELEGATE', {
               request_id: requestIdRef.current,
               party_id: selectedParty?.externalId,
-              product_id: productId,
+              product_id: selectedProduct?.id,
             });
             addUserRequest(users).catch(() => {
               trackEvent('ONBOARDING_ADD_NEW_USER', {
                 request_id: requestIdRef.current,
                 party_id: selectedParty?.externalId,
-                product_id: productId,
+                product_id: selectedProduct?.id,
               });
             });
           },
