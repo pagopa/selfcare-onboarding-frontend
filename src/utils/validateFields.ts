@@ -47,11 +47,14 @@ export const validateFields = (
         : values.taxCode && !fiscalAndVatCodeRegexp.test(values.taxCode)
         ? t('onboardingFormData.billingDataSection.invalidFiscalCode')
         : undefined,
-    taxCodeInvoicing: 
-      (canInvoice && uoSelected) && (!values.taxCodeInvoicing || values.taxCodeInvoicing && !fiscalAndVatCodeRegexp.test(values.taxCodeInvoicing))
-        ? requiredError 
-        : invalidTaxCodeInvoicing 
-        ? t('onboardingFormData.billingDataSection.invalidTaxCodeInvoicing') 
+    taxCodeInvoicing:
+      canInvoice &&
+      uoSelected &&
+      (!values.taxCodeInvoicing ||
+        (values.taxCodeInvoicing && !fiscalAndVatCodeRegexp.test(values.taxCodeInvoicing)))
+        ? requiredError
+        : invalidTaxCodeInvoicing
+        ? t('onboardingFormData.billingDataSection.invalidTaxCodeInvoicing')
         : undefined,
     vatNumber:
       !values.vatNumber && values.hasVatnumber

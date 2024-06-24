@@ -1,4 +1,3 @@
-/* eslint-disable complexity */
 import { InstitutionType, RoutesObject } from '../../types';
 import CompleteRequest from '../views/onboardingRequest/complete/CompleteRequest';
 import NoProductPage from '../views/NoProductPage';

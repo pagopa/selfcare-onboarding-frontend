@@ -251,7 +251,6 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     forward();
   };
 
-  /* eslint-disable complexity */
   const forwardWithDataAndInstitution = (
     newFormData: Partial<FormData>,
     party: Party,
