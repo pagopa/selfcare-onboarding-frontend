@@ -48,7 +48,7 @@ import UserNotAllowedPage from '../UserNotAllowedPage';
 import { AdditionalData, AdditionalInformations } from '../../model/AdditionalInformations';
 import AlreadyOnboarded from '../AlreadyOnboarded';
 import { genericError, StepVerifyOnboarding } from './components/StepVerifyOnboarding';
-import { OnBoardingProductStepDelegates } from './components/OnBoardingProductStepDelegates';
+import { StepAddAdmin } from './components/StepAddAdmin';
 import { StepAdditionalInformations } from './components/StepAdditionalInformations';
 
 export type ValidateErrorType = 'conflictError';
@@ -146,7 +146,15 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
       : [
           <React.Fragment key="0">
             <AlreadyOnboarded
-              selectedParty={selectedParty}
+              selectedParty={
+                aooSelected
+                  ? aooSelected
+                  : uoSelected
+                  ? uoSelected
+                  : selectedParty
+                  ? selectedParty
+                  : onboardingFormData
+              }
               selectedProduct={selectedProduct}
               institutionType={institutionType}
             />
@@ -318,6 +326,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
       }
 
       const partyVerifyOnboarded = async () => {
+        setLoading(true);
         const onboardingStatus = await fetchWithLogs(
           {
             endpoint: 'VERIFY_ONBOARDING',
@@ -339,6 +348,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           () => setRequiredLogin(true)
         );
         const restOutcome = getFetchOutcome(onboardingStatus);
+        setLoading(false);
         // party is already onboarded
         if (restOutcome === 'success') {
           setOutcome(alreadyOnboarded);
@@ -771,7 +781,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     {
       label: 'Insert admins data',
       Component: () =>
-        OnBoardingProductStepDelegates({
+        StepAddAdmin({
           externalInstitutionId,
           addUserFlow: false,
           product: selectedProduct,

@@ -95,7 +95,7 @@ export function StepVerifyOnboarding({
       <>
         <AlreadyOnboarded
           institutionType={institutionType}
-          selectedParty={selectedParty}
+          selectedParty={aooSelected ? aooSelected : uoSelected ? uoSelected : selectedParty}
           selectedProduct={selectedProduct}
         />
       </>,

@@ -14,7 +14,7 @@ import {
   StepperStep,
   UserOnCreate,
 } from '../../../types';
-import { OnBoardingProductStepDelegates } from '../onboardingProduct/components/OnBoardingProductStepDelegates';
+import { StepAddAdmin } from '../onboardingProduct/components/StepAddAdmin';
 import { StepAddManager } from '../../components/steps/StepAddManager';
 import { fetchWithLogs } from '../../lib/api-utils';
 import { getFetchOutcome } from '../../lib/error-utils';
@@ -24,6 +24,7 @@ import { ENV } from '../../utils/env';
 import { MessageNoAction } from '../../components/MessageNoAction';
 import { unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
 import { selected2OnboardingData } from '../../utils/selected2OnboardingData';
+import { LoadingOverlay } from '../../components/LoadingOverlay';
 import { StepSelectProduct } from './components/StepSelectProduct';
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
@@ -34,7 +35,7 @@ function OnboardingUserComponent() {
 
   const requestIdRef = useRef<string>();
 
-  const [_loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(true);
   const [activeStep, setActiveStep] = useState<number>(0);
   const [outcome, setOutcome] = useState<RequestOutcomeMessage | null>();
   const [formData, setFormData] = useState<Partial<FormData>>();
@@ -74,7 +75,9 @@ function OnboardingUserComponent() {
         state: null,
       });
       // TODO Can be removed?
+      console.log(selectedParty);
       const onboardingData = selected2OnboardingData(selectedParty);
+      console.log(onboardingData);
       setOnboardingFormData(onboardingData);
       setActiveStep(1);
     }
@@ -101,7 +104,7 @@ function OnboardingUserComponent() {
           originId: onboardingFormData?.originId,
           subunitCode: selectedParty.codiceUniUo
             ? selectedParty.codiceUniUo
-            : selectedParty.codiceUniAoo, // TODO CHECK THIS
+            : selectedParty.codiceUniAoo,
           taxCode: onboardingFormData?.taxCode,
           users,
         },
@@ -173,7 +176,7 @@ function OnboardingUserComponent() {
   const steps: Array<StepperStep> = [
     {
       label: 'Select product',
-      Component: () => StepSelectProduct({ back, forward }),
+      Component: () => StepSelectProduct({ forward, setLoading, institutionType }),
     },
     {
       label: 'Insert manager data',
@@ -197,12 +200,16 @@ function OnboardingUserComponent() {
     {
       label: 'Insert admin data',
       Component: () =>
-        OnBoardingProductStepDelegates({
+        StepAddAdmin({
           externalInstitutionId: selectedParty?.externalId,
           addUserFlow: true,
           product: selectedProduct,
           legal: isTechPartner ? undefined : (formData as any)?.users[0],
-          partyName: selectedParty?.description || '',
+          partyName: selectedParty?.codiceUniAoo
+            ? selectedParty.denominazioneAoo
+            : selectedParty?.codiceUniUo
+            ? selectedParty.descrizioneUo
+            : selectedParty?.description,
           isTechPartner,
           forward: (newFormData: Partial<FormData>) => {
             const users = ((newFormData as any).users as Array<UserOnCreate>).map((u) => ({
@@ -263,6 +270,7 @@ function OnboardingUserComponent() {
         onConfirmLabel={t('onboarding.sessionModal.onConfirmLabel')}
         onCloseLabel={t('onboarding.sessionModal.onCloseLabel')}
       />
+      {loading && <LoadingOverlay loadingText={t('onboarding.loading.loadingText')} />}
     </Container>
   );
 }

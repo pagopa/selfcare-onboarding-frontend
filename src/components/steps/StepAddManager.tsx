@@ -124,7 +124,7 @@ export function StepAddManager({
       </Grid>
 
       <Grid container item justifyContent="center" mt={1}>
-        <Grid item xs={12} mb={2}>
+        <Grid item xs={12} mb={1}>
           <Typography sx={{ fontWeight: 400 }} variant="body1" component="h2" align="center">
             <Trans
               i18nKey={
@@ -150,7 +150,7 @@ export function StepAddManager({
         </Grid>
       </Grid>
 
-      <Grid container item display="flex" justifyContent="center" mt={4}>
+      <Grid container item display="flex" justifyContent="center" mt={3}>
         <Grid item xs={8} display="flex" justifyContent="center">
           <PlatformUserForm
             prefix="LEGAL"
@@ -165,7 +165,7 @@ export function StepAddManager({
         </Grid>
       </Grid>
 
-      <Grid item mb={10} mt={4}>
+      <Grid item mb={10} mt={2}>
         <OnboardingStepActions
           back={{
             action: onBackAction,
