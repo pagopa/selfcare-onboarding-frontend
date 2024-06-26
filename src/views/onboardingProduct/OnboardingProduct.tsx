@@ -8,6 +8,7 @@ import { useTranslation, Trans } from 'react-i18next';
 import { uniqueId } from 'lodash';
 import { IllusCompleted, IllusError } from '@pagopa/mui-italia';
 import { EndingPage } from '@pagopa/selfcare-common-frontend';
+import React from 'react';
 import { withLogin } from '../../components/withLogin';
 import { AooData } from '../../model/AooData';
 import { UoData } from '../../model/UoModel';
@@ -47,7 +48,7 @@ import UserNotAllowedPage from '../UserNotAllowedPage';
 import { AdditionalData, AdditionalInformations } from '../../model/AdditionalInformations';
 import AlreadyOnboarded from '../AlreadyOnboarded';
 import { genericError, StepVerifyOnboarding } from './components/StepVerifyOnboarding';
-import { OnBoardingProductStepDelegates } from './components/OnBoardingProductStepDelegates';
+import { StepAddAdmin } from './components/StepAddAdmin';
 import { StepAdditionalInformations } from './components/StepAdditionalInformations';
 
 export type ValidateErrorType = 'conflictError';
@@ -120,13 +121,11 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     }
   }, [institutionTypeByUrl]);
 
-  // TODO CHECK THIS
-  /* 
   const alreadyOnboarded: RequestOutcomeMessage = {
     title: '',
     description: isTechPartner
       ? [
-          <Grid key="0">
+          <React.Fragment key="0">
             <EndingPage
               minHeight="52vh"
               variantTitle="h4"
@@ -142,31 +141,26 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
               buttonLabel={<Trans i18nKey="stepVerifyOnboarding.ptAlreadyOnboarded.backAction" />}
               onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
             />
-          </Grid>,
+          </React.Fragment>,
         ]
       : [
-          <Grid key="0">
-            <EndingPage
-              minHeight="52vh"
-              variantTitle={'h4'}
-              variantDescription={'body1'}
-              title={<Trans i18nKey="stepVerifyOnboarding.alreadyOnboarded.title" />}
-              description={
-                <Trans
-                  i18nKey="stepVerifyOnboarding.alreadyOnboarded.description"
-                  components={{ 1: <br /> }}
-                >
-                  {
-                    'Per operare sul prodotto, chiedi a un Amministratore di <1/>aggiungerti nella sezione Utenti.'
-                  }
-                </Trans>
+          <React.Fragment key="0">
+            <AlreadyOnboarded
+              selectedParty={
+                aooSelected
+                  ? aooSelected
+                  : uoSelected
+                  ? uoSelected
+                  : onboardingFormData
+                  ? onboardingFormData
+                  : selectedParty
               }
-              buttonLabel={<Trans i18nKey="stepVerifyOnboarding.alreadyOnboarded.backHome" />}
-              onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+              selectedProduct={selectedProduct}
+              institutionType={institutionType}
             />
-          </Grid>,
+          </React.Fragment>,
         ],
-  }; */
+  };
 
   useEffect(() => {
     if (
@@ -210,6 +204,15 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     }
   }, [selectedProduct]);
 
+  useEffect(() => {
+    if (onboardingFormData && onboardingFormData?.businessName !== '' && institutionType !== 'PA') {
+      if (onboardingFormData.taxCode) {
+        setExternalInstitutionId(onboardingFormData.taxCode);
+      }
+      void insertedPartyVerifyOnboarding(onboardingFormData);
+    }
+  }, [onboardingFormData]);
+
   const checkProductId = async () => {
     const onboardingProducts = await fetchWithLogs(
       { endpoint: 'ONBOARDING_VERIFY_PRODUCT', endpointParams: { productId } },
@@ -231,6 +234,52 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
 
     if ((onboardingProducts as AxiosResponse).data?.status === 'PHASE_OUT') {
       setOutcome(prodPhaseOutErrorPage);
+    }
+  };
+
+  const insertedPartyVerifyOnboarding = async (onboardingFormData: OnboardingFormData) => {
+    const onboardingStatus = await fetchWithLogs(
+      {
+        endpoint: 'VERIFY_ONBOARDING',
+      },
+      {
+        method: 'HEAD',
+        params: {
+          taxCode: onboardingFormData.taxCode,
+          productId,
+          subunitCode: aooSelected
+            ? aooSelected.codiceUniAoo
+            : uoSelected
+            ? uoSelected.codiceUniUo
+            : undefined,
+          origin: institutionType === 'AS' ? 'IVASS' : undefined,
+          originId: onboardingFormData?.originId ?? undefined,
+        },
+      },
+      () => setRequiredLogin(true)
+    );
+    const restOutcome = getFetchOutcome(onboardingStatus);
+
+    if (restOutcome === 'success') {
+      setOutcome(alreadyOnboarded);
+    } else {
+      if (
+        (onboardingStatus as AxiosError<any>).response?.status === 404 ||
+        (onboardingStatus as AxiosError<any>).response?.status === 400
+      ) {
+        setOutcome(null);
+        if (isTechPartner) {
+          setActiveStep(activeStep + 3);
+        } else if (productId === 'prod-pagopa' && institutionType === 'GSP') {
+          forward();
+        } else {
+          setActiveStep(activeStep + 2);
+        }
+      } else if ((onboardingStatus as AxiosError<any>).response?.status === 403) {
+        setOutcome(notAllowedError);
+      } else {
+        setOutcome(genericError);
+      }
     }
   };
 
@@ -323,62 +372,8 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
       product_id: productId,
       geographic_taxonomies: newOnboardingFormData.geographicTaxonomies,
     });
-
     setOnboardingFormData(newOnboardingFormData);
-    if (institutionType !== 'PA') {
-      // TODO: fix when party registry proxy will return externalInstitutionId
-      if (newOnboardingFormData.taxCode) {
-        setExternalInstitutionId(newOnboardingFormData.taxCode);
-      }
-
-      const partyVerifyOnboarded = async () => {
-        const onboardingStatus = await fetchWithLogs(
-          {
-            endpoint: 'VERIFY_ONBOARDING',
-          },
-          {
-            method: 'HEAD',
-            params: {
-              taxCode: newOnboardingFormData.taxCode,
-              productId,
-              subunitCode: aooSelected
-                ? aooSelected.codiceUniAoo
-                : uoSelected
-                ? uoSelected.codiceUniUo
-                : undefined,
-              origin: institutionType === 'AS' ? 'IVASS' : undefined,
-              originId: newOnboardingFormData?.originId ?? undefined,
-            },
-          },
-          () => setRequiredLogin(true)
-        );
-        const restOutcome = getFetchOutcome(onboardingStatus);
-        // party is already onboarded
-        if (restOutcome === 'success') {
-          setOutcome(alreadyOnboarded);
-        } else {
-          // party is NOT already onboarded
-          if (
-            (onboardingStatus as AxiosError<any>).response?.status === 404 ||
-            (onboardingStatus as AxiosError<any>).response?.status === 400
-          ) {
-            setOutcome(null);
-            if (isTechPartner) {
-              setActiveStep(activeStep + 3);
-            } else if (productId === 'prod-pagopa' && institutionType === 'GSP') {
-              forward();
-            } else {
-              setActiveStep(activeStep + 2);
-            }
-          } else if ((onboardingStatus as AxiosError<any>).response?.status === 403) {
-            setOutcome(notAllowedError);
-          } else {
-            setOutcome(genericError);
-          }
-        }
-      };
-      void partyVerifyOnboarded();
-    } else {
+    if (institutionType === 'PA') {
       setActiveStep(activeStep + 2);
     }
   };
@@ -479,19 +474,6 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
         <UserNotAllowedPage
           partyName={selectedParty?.description}
           productTitle={selectedProduct?.title}
-        />
-      </>,
-    ],
-  };
-
-  const alreadyOnboarded: RequestOutcomeMessage = {
-    title: '',
-    description: [
-      <>
-        <AlreadyOnboarded
-          institutionType={institutionType}
-          selectedParty={selectedParty}
-          selectedProduct={selectedProduct}
         />
       </>,
     ],
@@ -798,7 +780,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     {
       label: 'Insert admins data',
       Component: () =>
-        OnBoardingProductStepDelegates({
+        StepAddAdmin({
           externalInstitutionId,
           addUserFlow: false,
           product: selectedProduct,

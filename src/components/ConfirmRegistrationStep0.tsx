@@ -18,8 +18,7 @@ export function ConfirmRegistrationStep0({ forward }: StepperStepComponentProps)
 
   const token = getRequestJwt();
 
-  const addUserFlow =
-    new URLSearchParams(window.location.hash.substring(1)).get('add-user') === 'true';
+  const addUserFlow = new URLSearchParams(window.location.search).get('add-user') === 'true';
 
   const translationKeyValue = addUserFlow ? 'user' : 'product';
 

@@ -88,14 +88,13 @@ export function StepVerifyOnboarding({
     ],
   };
 
-  // TODO Check this
   const alreadyOnboarded: RequestOutcomeMessage = {
     title: '',
     description: [
       <>
         <AlreadyOnboarded
           institutionType={institutionType}
-          selectedParty={selectedParty}
+          selectedParty={aooSelected ? aooSelected : uoSelected ? uoSelected : selectedParty}
           selectedProduct={selectedProduct}
         />
       </>,

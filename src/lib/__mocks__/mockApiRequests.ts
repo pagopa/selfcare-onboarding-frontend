@@ -421,7 +421,7 @@ export const mockedGeotaxonomies: Array<GeographicTaxonomyResource> = [
   },
 ];
 
-const mockedAoos: Array<AooData> = [
+export const mockedAoos: Array<AooData> = [
   {
     codAoo: 'A356E00',
     codiceFiscaleEnte: '92078570527',
@@ -466,7 +466,7 @@ const mockedAoos: Array<AooData> = [
   },
 ];
 
-const mockedUos: Array<UoData> = [
+export const mockedUos: Array<UoData> = [
   {
     codiceFiscaleEnte: '98765432109',
     codiceFiscaleSfe: '87654321098',
@@ -502,6 +502,25 @@ const mockedUos: Array<UoData> = [
     codiceCatastaleComune: 'F012',
     codiceComuneISTAT: '082050',
     cognomeResponsabile: 'Russo',
+    dataAggiornamento: '2020-11-20',
+    dataIstituzione: '2017-11-25',
+    indirizzo: 'Via Firenze 4',
+    tipoMail1: 'Pec',
+  },
+  {
+    codiceFiscaleEnte: '12345678901',
+    codiceIpa: 'GHIJKL34',
+    codiceUniUo: 'BRE23D',
+    codiceUniUoPadre: '',
+    denominazioneEnte: 'denominazione uo test 3',
+    descrizioneUo: 'Unità operativa 3',
+    id: 'BRE23D',
+    mail1: 'test2@fnofi.it',
+    origin: 'IPA',
+    CAP: '54321',
+    codiceCatastaleComune: 'F012',
+    codiceComuneISTAT: '082050',
+    cognomeResponsabile: 'Bianchi',
     dataAggiornamento: '2020-11-20',
     dataIstituzione: '2017-11-25',
     indirizzo: 'Via Firenze 4',
@@ -998,18 +1017,12 @@ export async function mockFetch(
         } else {
           return notFoundError;
         }
-      // Use case for test aoo
-      case '92078570527':
-        if (params.subunitCode) {
-          return notFoundError;
-        } else {
-          return noContent;
-        }
       default:
-        if (params.productId !== 'prod-io') {
-          return notFoundError;
-        } else {
+        // Use case for test already onboarded AOO and UO
+        if (params.subunitCode === 'A356E01' || params.subunitCode === 'BRE23D') {
           return noContent;
+        } else {
+          return notFoundError;
         }
     }
   }

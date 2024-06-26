@@ -6,10 +6,10 @@ import { useHistory } from 'react-router';
 import { RolesInformations } from '../components/RolesInformations';
 import { ROUTES } from '../utils/constants';
 import { ENV } from '../utils/env';
-import { InstitutionType, Party, Product } from '../../types';
+import { InstitutionType, Product } from '../../types';
 
 type Props = {
-  selectedParty?: Party;
+  selectedParty?: any;
   selectedProduct?: Product | null;
   institutionType?: InstitutionType;
 };
@@ -29,16 +29,18 @@ export default function AlreadyOnboarded({
       title={<Trans i18nKey="stepVerifyOnboarding.alreadyOnboarded.title" />}
       description={
         <Grid container sx={{ display: 'flex', flexDirection: 'column' }}>
-          <Trans
-            i18nKey="stepVerifyOnboarding.alreadyOnboarded.description"
-            components={{ 1: <br /> }}
-          >
-            {
-              'Per operare sul prodotto, chiedi a un Amministratore di <1/>aggiungerti nella sezione Utenti.'
-            }
-          </Trans>
           <Grid item>
-            <RolesInformations />
+            <Trans
+              i18nKey="stepVerifyOnboarding.alreadyOnboarded.description"
+              components={{ 1: <br /> }}
+            >
+              {
+                'Per operare sul prodotto, chiedi a un Amministratore di <1/>aggiungerti nella sezione Utenti.'
+              }
+            </Trans>
+          </Grid>
+          <Grid item>
+            <RolesInformations isTechPartner={institutionType === 'PT'} />
           </Grid>
         </Grid>
       }
@@ -53,11 +55,9 @@ export default function AlreadyOnboarded({
                 underline="none"
                 sx={{ cursor: 'pointer' }}
                 onClick={() => {
-                  if (selectedParty) {
-                    history.push(ROUTES.ONBOARDING_USER.PATH, {
-                      data: { institutionType, party: selectedParty, product: selectedProduct },
-                    });
-                  }
+                  history.push(ROUTES.ONBOARDING_USER.PATH, {
+                    data: { institutionType, party: selectedParty, product: selectedProduct },
+                  });
                 }}
               />
             ),

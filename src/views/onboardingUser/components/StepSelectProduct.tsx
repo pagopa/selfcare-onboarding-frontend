@@ -19,15 +19,22 @@ import { UserContext } from '../../../lib/context';
 import { getFetchOutcome } from '../../../lib/error-utils';
 import { ProductResource } from '../../../model/ProductResource';
 import { OnboardingStepActions } from '../../../components/OnboardingStepActions';
-import { StepperStepComponentProps } from '../../../../types';
+import { InstitutionType, StepperStepComponentProps } from '../../../../types';
+import { ENV } from '../../../utils/env';
 
-export function StepSelectProduct({ back, forward }: StepperStepComponentProps) {
+type Props = {
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  institutionType?: InstitutionType;
+} & StepperStepComponentProps;
+
+export function StepSelectProduct({ forward, setLoading, institutionType }: Props) {
   const { setRequiredLogin } = useContext(UserContext);
   const { t } = useTranslation();
   const [products, setProducts] = useState<Array<ProductResource>>();
   const [selectedProduct, setSelectedProduct] = useState<ProductResource>();
 
   const getProducts = async () => {
+    setLoading(true);
     const getProductsRequest = await fetchWithLogs(
       {
         endpoint: 'ONBOARDING_GET_PRODUCTS',
@@ -38,7 +45,7 @@ export function StepSelectProduct({ back, forward }: StepperStepComponentProps) 
       () => setRequiredLogin(true)
     );
     const outcome = getFetchOutcome(getProductsRequest);
-
+    setLoading(false);
     if (outcome === 'success') {
       const products = (getProductsRequest as AxiosResponse).data as Array<ProductResource>;
       const enabledAddUserProducts = products.filter(
@@ -48,9 +55,12 @@ export function StepSelectProduct({ back, forward }: StepperStepComponentProps) 
           p.id === 'prod-interop' ||
           p.id === 'prod-pn'
       );
-      console.log(enabledAddUserProducts);
       setProducts(enabledAddUserProducts);
     }
+  };
+
+  const onBackAction = () => {
+    window.location.assign(ENV.URL_FE.DASHBOARD);
   };
 
   useEffect(() => {
@@ -74,8 +84,8 @@ export function StepSelectProduct({ back, forward }: StepperStepComponentProps) 
             </Trans>
           </Typography>
         </Grid>
-        <Grid item mb={4}>
-          <RolesInformations />
+        <Grid item mb={3}>
+          <RolesInformations isTechPartner={institutionType === 'PT'} />
         </Grid>
       </Grid>
       <Grid container item sx={{ justifyContent: 'center' }}>
@@ -175,7 +185,7 @@ export function StepSelectProduct({ back, forward }: StepperStepComponentProps) 
         <Grid item xs={12} mt={2} mb={5}>
           <OnboardingStepActions
             back={{
-              action: back,
+              action: onBackAction,
               label: t('onboardingStep1.onboarding.onboardingStepActions.backAction'),
               disabled: false,
             }}

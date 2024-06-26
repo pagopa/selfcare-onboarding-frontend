@@ -10,13 +10,13 @@ import { MemoryRouter } from 'react-router-dom';
 import OnboardingUser from '../OnboardingUser';
 import { mockPartyRegistry, mockedProducts } from '../../../lib/__mocks__/mockApiRequests';
 
-const renderComponent = () => {
+const renderComponent = (productId: string) => {
   const Component = () => {
     const [user, setUser] = useState<User | null>(null);
     const [subHeaderVisible, setSubHeaderVisible] = useState<boolean>(false);
     const [onExit, setOnExit] = useState<(exitAction: () => void) => void | undefined>();
     const [enableLogin, setEnableLogin] = useState<boolean>(true);
-
+    const product = mockedProducts.find((p) => p.id === productId);
     return (
       <HeaderContext.Provider
         value={{
@@ -37,9 +37,11 @@ const renderComponent = () => {
           <MemoryRouter
             initialEntries={[
               {
-                pathname: `/user/:productId`,
-                search: '?institutionType=PA',
-                state: { data: { party: mockPartyRegistry.items[2], product: mockedProducts[1] } },
+                pathname: `/user`,
+                search: '',
+                state: {
+                  data: { party: mockPartyRegistry.items[2], product, institutionType: 'PA' },
+                },
               },
             ]}
           >
@@ -232,7 +234,13 @@ const checkCertifiedUserValidation = async (prefix: string, confirmButton: HTMLE
 };
 
 test('Test: Added new manager for a party who has already onboarded to the PagoPA platform product', async () => {
-  renderComponent();
+  renderComponent('prod-pagopa');
   await executeStep2();
   await executeStep3(true);
+});
+
+test('Test: Added new manager for a party who has already onboarded to the App IO product', async () => {
+  renderComponent('prod-io');
+  await executeStep2();
+  await executeStep3(false);
 });

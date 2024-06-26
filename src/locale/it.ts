@@ -595,7 +595,6 @@ export default {
       uoName: 'Denominazione UO',
       aooUniqueCode: 'Codice Univoco AOO',
       uoUniqueCode: 'Codice Univoco UO',
-      registeredOffice: 'Sede legale',
       fullLegalAddress: 'Indirizzo e numero civico della sede legale',
       zipCode: 'CAP',
       city: 'Città',

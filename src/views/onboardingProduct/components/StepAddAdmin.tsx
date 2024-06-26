@@ -26,7 +26,7 @@ type Props = StepperStepComponentProps & {
   addUserFlow: boolean;
 };
 
-export function OnBoardingProductStepDelegates({
+export function StepAddAdmin({
   externalInstitutionId,
   product,
   legal,
@@ -235,7 +235,7 @@ export function OnBoardingProductStepDelegates({
             )}
           </Typography>
         </Grid>
-        <Grid item xs={8} mt={1}>
+        <Grid item xs={8}>
           <RolesInformations isTechPartner={isTechPartner} />
         </Grid>
       </Grid>
