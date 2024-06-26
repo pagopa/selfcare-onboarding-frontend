@@ -88,7 +88,6 @@ export function StepVerifyOnboarding({
     ],
   };
 
-  // TODO Check this
   const alreadyOnboarded: RequestOutcomeMessage = {
     title: '',
     description: [

@@ -151,9 +151,9 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
                   ? aooSelected
                   : uoSelected
                   ? uoSelected
-                  : selectedParty
-                  ? selectedParty
                   : onboardingFormData
+                  ? onboardingFormData
+                  : selectedParty
               }
               selectedProduct={selectedProduct}
               institutionType={institutionType}
@@ -204,6 +204,15 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     }
   }, [selectedProduct]);
 
+  useEffect(() => {
+    if (onboardingFormData && onboardingFormData?.businessName !== '' && institutionType !== 'PA') {
+      if (onboardingFormData.taxCode) {
+        setExternalInstitutionId(onboardingFormData.taxCode);
+      }
+      void insertedPartyVerifyOnboarding(onboardingFormData);
+    }
+  }, [onboardingFormData]);
+
   const checkProductId = async () => {
     const onboardingProducts = await fetchWithLogs(
       { endpoint: 'ONBOARDING_VERIFY_PRODUCT', endpointParams: { productId } },
@@ -225,6 +234,52 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
 
     if ((onboardingProducts as AxiosResponse).data?.status === 'PHASE_OUT') {
       setOutcome(prodPhaseOutErrorPage);
+    }
+  };
+
+  const insertedPartyVerifyOnboarding = async (onboardingFormData: OnboardingFormData) => {
+    const onboardingStatus = await fetchWithLogs(
+      {
+        endpoint: 'VERIFY_ONBOARDING',
+      },
+      {
+        method: 'HEAD',
+        params: {
+          taxCode: onboardingFormData.taxCode,
+          productId,
+          subunitCode: aooSelected
+            ? aooSelected.codiceUniAoo
+            : uoSelected
+            ? uoSelected.codiceUniUo
+            : undefined,
+          origin: institutionType === 'AS' ? 'IVASS' : undefined,
+          originId: onboardingFormData?.originId ?? undefined,
+        },
+      },
+      () => setRequiredLogin(true)
+    );
+    const restOutcome = getFetchOutcome(onboardingStatus);
+
+    if (restOutcome === 'success') {
+      setOutcome(alreadyOnboarded);
+    } else {
+      if (
+        (onboardingStatus as AxiosError<any>).response?.status === 404 ||
+        (onboardingStatus as AxiosError<any>).response?.status === 400
+      ) {
+        setOutcome(null);
+        if (isTechPartner) {
+          setActiveStep(activeStep + 3);
+        } else if (productId === 'prod-pagopa' && institutionType === 'GSP') {
+          forward();
+        } else {
+          setActiveStep(activeStep + 2);
+        }
+      } else if ((onboardingStatus as AxiosError<any>).response?.status === 403) {
+        setOutcome(notAllowedError);
+      } else {
+        setOutcome(genericError);
+      }
     }
   };
 
@@ -317,64 +372,8 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
       product_id: productId,
       geographic_taxonomies: newOnboardingFormData.geographicTaxonomies,
     });
-
     setOnboardingFormData(newOnboardingFormData);
-    if (institutionType !== 'PA') {
-      // TODO: fix when party registry proxy will return externalInstitutionId
-      if (newOnboardingFormData.taxCode) {
-        setExternalInstitutionId(newOnboardingFormData.taxCode);
-      }
-
-      const partyVerifyOnboarded = async () => {
-        setLoading(true);
-        const onboardingStatus = await fetchWithLogs(
-          {
-            endpoint: 'VERIFY_ONBOARDING',
-          },
-          {
-            method: 'HEAD',
-            params: {
-              taxCode: newOnboardingFormData.taxCode,
-              productId,
-              subunitCode: aooSelected
-                ? aooSelected.codiceUniAoo
-                : uoSelected
-                ? uoSelected.codiceUniUo
-                : undefined,
-              origin: institutionType === 'AS' ? 'IVASS' : undefined,
-              originId: newOnboardingFormData?.originId ?? undefined,
-            },
-          },
-          () => setRequiredLogin(true)
-        );
-        const restOutcome = getFetchOutcome(onboardingStatus);
-        setLoading(false);
-        // party is already onboarded
-        if (restOutcome === 'success') {
-          setOutcome(alreadyOnboarded);
-        } else {
-          // party is NOT already onboarded
-          if (
-            (onboardingStatus as AxiosError<any>).response?.status === 404 ||
-            (onboardingStatus as AxiosError<any>).response?.status === 400
-          ) {
-            setOutcome(null);
-            if (isTechPartner) {
-              setActiveStep(activeStep + 3);
-            } else if (productId === 'prod-pagopa' && institutionType === 'GSP') {
-              forward();
-            } else {
-              setActiveStep(activeStep + 2);
-            }
-          } else if ((onboardingStatus as AxiosError<any>).response?.status === 403) {
-            setOutcome(notAllowedError);
-          } else {
-            setOutcome(genericError);
-          }
-        }
-      };
-      void partyVerifyOnboarded();
-    } else {
+    if (institutionType === 'PA') {
       setActiveStep(activeStep + 2);
     }
   };

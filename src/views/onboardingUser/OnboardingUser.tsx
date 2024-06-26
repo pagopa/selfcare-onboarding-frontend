@@ -63,8 +63,8 @@ function OnboardingUserComponent() {
   useEffect(() => {
     if ((location.state as any)?.data) {
       setSelectedParty((location.state as any).data.party);
-      setSelectedProduct((location.state as any).data.product); // TODO FIX THIS
-      setInstitutionType((location.state as any).data.institutionType); // TODO FIX THIS
+      setSelectedProduct((location.state as any).data.product);
+      setInstitutionType((location.state as any).data.institutionType);
     }
   }, [(location.state as any)?.data]);
 
@@ -74,11 +74,12 @@ function OnboardingUserComponent() {
         ...history.location,
         state: null,
       });
-      // TODO Can be removed?
-      console.log(selectedParty);
-      const onboardingData = selected2OnboardingData(selectedParty);
-      console.log(onboardingData);
-      setOnboardingFormData(onboardingData);
+      if (!selectedParty.businessName) {
+        const onboardingData = selected2OnboardingData(selectedParty);
+        setOnboardingFormData(onboardingData);
+      } else {
+        setOnboardingFormData(selectedParty);
+      }
       setActiveStep(1);
     }
   }, [selectedParty, history]);
@@ -93,6 +94,7 @@ function OnboardingUserComponent() {
 
   const addUserRequest = async (users: Array<UserOnCreate>) => {
     setLoading(true);
+
     const addUserResponse = await fetchWithLogs(
       { endpoint: 'ONBOARDING_NEW_USER' },
       {
@@ -209,6 +211,8 @@ function OnboardingUserComponent() {
             ? selectedParty.denominazioneAoo
             : selectedParty?.codiceUniUo
             ? selectedParty.descrizioneUo
+            : selectedParty.businessName
+            ? selectedParty.businessName
             : selectedParty?.description,
           isTechPartner,
           forward: (newFormData: Partial<FormData>) => {
