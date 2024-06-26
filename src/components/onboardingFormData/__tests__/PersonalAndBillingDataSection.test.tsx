@@ -7,9 +7,9 @@ import PersonalAndBillingDataSection from '../PersonalAndBillingDataSection';
 import {
   institutionTypes,
   mockPartyRegistry,
-  mockedAooCode,
   mockedProducts,
-  mockedUoCode,
+  mockedAoos,
+  mockedUos,
 } from '../../../lib/__mocks__/mockApiRequests';
 
 jest.mock('formik', () => ({
@@ -96,11 +96,11 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
 
         switch (productId) {
           case 'prod-pn':
-            aooSelected = mockedAooCode;
-            party = mockedAooCode;
+            aooSelected = mockedAoos[0];
+            party = mockedAoos[0];
           case 'prod-pn-dev':
-            uoSelected = mockedUoCode;
-            party = mockedUoCode;
+            uoSelected = mockedUos[0];
+            party = mockedUos[0];
           default:
             party = mockPartyRegistry.items[0];
         }
@@ -177,7 +177,6 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
     const uoUniqueCode = screen.queryByText('Denominazione UO');
 
     const businessName = screen.queryByText('Ragione sociale');
-    const registeredOffice = screen.queryByText('Sede legale');
     const fullLegalAddress = screen.queryByText('Indirizzo e numero civico della sede legale');
     const zipCode = screen.getByText('CAP');
     const city = document.getElementById(
@@ -186,7 +185,8 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
     const county = screen.getByText('Provincia');
     const country = screen.queryByText('Nazione');
     const pec = screen.getByText('Indirizzo PEC');
-    const taxCode = screen.getByText('Codice Fiscale');
+    const taxCode = screen.queryByText('Codice Fiscale');
+    const taxCodeEc = screen.getByText('Codice Fiscale ente centrale');
     const vatNumber = screen.queryByText('Partita IVA');
     const commercialRegisterNumber = screen.queryByText(
       'Luogo di iscrizione al Registro delle Imprese (facoltativo)'
@@ -201,28 +201,26 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
       expect(centralParty).toBeInTheDocument();
       expect(aooDenomination).toBeInTheDocument();
       expect(aooUniqueCode).toBeInTheDocument();
+      expect(taxCode).not.toBeInTheDocument();
+      expect(taxCodeEc).toBeInTheDocument();
     } else if (uoSelected) {
       expect(businessName).not.toBeInTheDocument();
       expect(centralParty).toBeInTheDocument();
       expect(uoDenomination).toBeInTheDocument();
       expect(uoUniqueCode).toBeInTheDocument();
+      expect(taxCode).not.toBeInTheDocument();
+      expect(taxCodeEc).toBeInTheDocument();
     } else {
       expect(centralParty).not.toBeInTheDocument();
       expect(aooDenomination).not.toBeInTheDocument();
       expect(aooUniqueCode).not.toBeInTheDocument();
       expect(uoDenomination).not.toBeInTheDocument();
       expect(uoUniqueCode).not.toBeInTheDocument();
-
       expect(businessName).toBeInTheDocument();
+      expect(taxCode).toBeInTheDocument();
+      expect(taxCodeEc).not.toBeInTheDocument();
     }
-
-    if (isInsuranceCompany) {
-      expect(registeredOffice).not.toBeInTheDocument();
-      expect(fullLegalAddress).toBeInTheDocument();
-    } else {
-      expect(registeredOffice).toBeInTheDocument();
-      expect(fullLegalAddress).not.toBeInTheDocument();
-    }
+    expect(fullLegalAddress).toBeInTheDocument();
 
     expect(city).toBeInTheDocument();
     if (isForeignInsurance) {
@@ -236,7 +234,6 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
     }
 
     expect(pec).toBeInTheDocument();
-    expect(taxCode).toBeInTheDocument();
 
     if (canInvoice) {
       expect(sdiCode).toBeInTheDocument();

@@ -14,7 +14,7 @@ type ActionStepsProps = {
 
 export function OnboardingStepActions({ forward, back, addUserFlow }: ActionStepsProps) {
   return (
-    <Grid container justifyContent="center" spacing={2} mt={addUserFlow ? 3 : 0}>
+    <Grid container justifyContent="center" spacing={2} mt={addUserFlow ? 2 : 0}>
       {back && (
         <Grid item>
           <Button

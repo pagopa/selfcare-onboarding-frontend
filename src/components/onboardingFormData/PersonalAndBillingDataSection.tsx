@@ -386,9 +386,7 @@ export default function PersonalAndBillingDataSection({
               <CustomTextField
                 {...baseTextFieldProps(
                   'registeredOffice',
-                  isInsuranceCompany
-                    ? t('onboardingFormData.billingDataSection.fullLegalAddress')
-                    : t('onboardingFormData.billingDataSection.registeredOffice'),
+                  t('onboardingFormData.billingDataSection.fullLegalAddress'),
                   600,
                   !isAooUo && isDisabled && !isInsuranceCompany
                     ? theme.palette.text.disabled

@@ -187,7 +187,6 @@ export default function StepOnboardingFormData({
   }, []);
 
   useEffect(() => {
-    // TODO Check this
     if (!isPremium) {
       void getPreviousGeotaxononomies();
     } else {
