@@ -63,7 +63,7 @@ export type RequestOutcomeOptionsJwt = { [key in RequestOutcomeComplete]: Reques
 export type StepperStepComponentProps = {
   product?: Product | null;
   forward?: any;
-  back?: VoidFunction;
+  back?: any;
   updateFormData?: React.Dispatch<React.SetStateAction<any>>;
 };
 

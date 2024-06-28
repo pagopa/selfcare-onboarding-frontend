@@ -198,6 +198,7 @@ function OnboardingUserComponent() {
       Component: () =>
         StepSelectProduct({
           forward: forwardWithProduct,
+          back,
           setLoading,
           institutionType,
         }),
