@@ -17,7 +17,6 @@ type Props = {
   setIsSearchFieldSelected: React.Dispatch<React.SetStateAction<boolean>>;
   setIsAooCodeSelected: React.Dispatch<React.SetStateAction<boolean>>;
   setIsUoCodeSelected: React.Dispatch<React.SetStateAction<boolean>>;
-  selected: boolean;
   setCfResult: React.Dispatch<React.SetStateAction<InstitutionResource | ANACParty | undefined>>;
   setAooResult: Dispatch<SetStateAction<AooData | undefined>>;
   setUoResult: Dispatch<SetStateAction<UoData | undefined>>;
@@ -30,6 +29,8 @@ type Props = {
   isUoCodeSelected?: boolean;
   product?: Product | null;
   institutionType?: InstitutionType;
+  addUser: boolean;
+  selectedProduct?: Product;
 };
 
 export default function PartyAdvancedSelect({
@@ -53,6 +54,8 @@ export default function PartyAdvancedSelect({
   setAooResultHistory,
   product,
   institutionType,
+  addUser,
+  selectedProduct,
 }: Props) {
   const { t } = useTranslation();
 
@@ -97,7 +100,17 @@ export default function PartyAdvancedSelect({
     }
   }, []);
 
-  const filteredByProducts =
+  useEffect(() => {
+    if (addUser) {
+      setTypeOfSearch('taxCode');
+      setIsTaxCodeSelected(true);
+    } else {
+      setTypeOfSearch('businessName');
+      setIsBusinessNameSelected(true);
+    }
+  }, []);
+
+  const filteredByProducts = (product?: Product) =>
     product &&
     (product.id === 'prod-interop' ||
       product.id === 'prod-io-sign' ||
@@ -133,14 +146,16 @@ export default function PartyAdvancedSelect({
         label={t('partyAdvancedSelect.advancedSearchLabel')}
         onChange={handleTypeSearchChange}
       >
-        <MenuItem
-          id="businessName"
-          data-testid="businessName"
-          value={'businessName'}
-          onClick={() => onSelectValue(true, false, false, false, false)}
-        >
-          {t('partyAdvancedSelect.businessName')}
-        </MenuItem>
+        {!addUser && (
+          <MenuItem
+            id="businessName"
+            data-testid="businessName"
+            value={'businessName'}
+            onClick={() => onSelectValue(true, false, false, false, false)}
+          >
+            {t('partyAdvancedSelect.businessName')}
+          </MenuItem>
+        )}
         {institutionType === 'AS' ? (
           <MenuItem
             id="ivassCode"
@@ -161,9 +176,10 @@ export default function PartyAdvancedSelect({
           </MenuItem>
         )}
 
-        {ENV.AOO_UO.SHOW_AOO_UO &&
-          filteredByProducts &&
+        {((ENV.AOO_UO.SHOW_AOO_UO &&
           optionsAvailable4InstitutionType &&
+          filteredByProducts(product as Product)) ||
+          (addUser && ENV.AOO_UO.SHOW_AOO_UO && filteredByProducts(selectedProduct))) &&
           menuItems.map((item) => (
             <MenuItem
               key={item.id}

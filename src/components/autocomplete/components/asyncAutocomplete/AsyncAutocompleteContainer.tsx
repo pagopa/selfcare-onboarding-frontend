@@ -4,7 +4,13 @@ import { AxiosError, AxiosResponse } from 'axios';
 import debounce from 'lodash/debounce';
 import { Dispatch, SetStateAction, useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ANACParty, Endpoint, InstitutionType, Product } from '../../../../../types';
+import {
+  ANACParty,
+  ApiEndpointKey,
+  Endpoint,
+  InstitutionType,
+  Product,
+} from '../../../../../types';
 import { ReactComponent as PartyIcon } from '../../../../assets/onboarding_party_icon.svg';
 import { fetchWithLogs } from '../../../../lib/api-utils';
 import { UserContext } from '../../../../lib/context';
@@ -49,6 +55,8 @@ type Props = {
   externalInstitutionId: string;
   institutionType?: InstitutionType;
   setDisabled: Dispatch<SetStateAction<boolean>>;
+  addUser: boolean;
+  selectedProduct?: Product;
 };
 
 // TODO: handle cognitive-complexity
@@ -83,6 +91,8 @@ export default function AsyncAutocompleteContainer({
   externalInstitutionId,
   institutionType,
   setDisabled,
+  addUser,
+  selectedProduct,
 }: Props) {
   const { setRequiredLogin } = useContext(UserContext);
   const { t } = useTranslation();
@@ -148,17 +158,19 @@ export default function AsyncAutocompleteContainer({
     setIsLoading(false);
   };
 
-  const handleSearchByTaxCode = async (query: string) => {
+  const handleSearchByTaxCode = async (
+    addUser: boolean,
+    endpoint: ApiEndpointKey,
+    params: any,
+    query: string
+  ) => {
     setIsLoading(true);
 
     const searchResponse = await fetchWithLogs(
-      { endpoint: 'ONBOARDING_GET_PARTY_FROM_CF', endpointParams: { id: query } },
+      { endpoint, endpointParams: addUser ? undefined : { id: query } },
       {
         method: 'GET',
-        params: {
-          origin: 'IPA',
-          categories: filterByCategory(institutionType, product?.id),
-        },
+        params: { ...params },
       },
       () => setRequiredLogin(true)
     );
@@ -173,17 +185,24 @@ export default function AsyncAutocompleteContainer({
 
     setIsLoading(false);
   };
-  const handleSearchByAooCode = async (query: string) => {
+  const handleSearchByAooCode = async (
+    addUser: boolean,
+    endpoint: ApiEndpointKey,
+    params: any,
+    query: string
+  ) => {
     setIsLoading(true);
 
     const searchResponse = await fetchWithLogs(
-      { endpoint: 'ONBOARDING_GET_AOO_CODE_INFO', endpointParams: { codiceUniAoo: query } },
+      { endpoint, endpointParams: addUser ? undefined : { codiceUniAoo: query } },
       {
         method: 'GET',
-        params: {
-          origin: 'IPA',
-          categories: filterByCategory(institutionType, product?.id),
-        },
+        params: addUser
+          ? params
+          : {
+              origin: 'IPA',
+              categories: filterByCategory(institutionType, product?.id),
+            },
       },
       () => setRequiredLogin(true)
     );
@@ -199,17 +218,24 @@ export default function AsyncAutocompleteContainer({
 
     setIsLoading(false);
   };
-  const handleSearchByUoCode = async (query: string) => {
+  const handleSearchByUoCode = async (
+    addUser: boolean,
+    endpoint: ApiEndpointKey,
+    params: any,
+    query: string
+  ) => {
     setIsLoading(true);
 
     const searchResponse = await fetchWithLogs(
-      { endpoint: 'ONBOARDING_GET_UO_CODE_INFO', endpointParams: { codiceUniUo: query } },
+      { endpoint, endpointParams: addUser ? undefined : { codiceUniUo: query } },
       {
         method: 'GET',
-        params: {
-          origin: 'IPA',
-          categories: filterByCategory(institutionType, product?.id),
-        },
+        params: addUser
+          ? params
+          : {
+              origin: 'IPA',
+              categories: filterByCategory(institutionType, product?.id),
+            },
       },
       () => setRequiredLogin(true)
     );
@@ -226,19 +252,26 @@ export default function AsyncAutocompleteContainer({
     setIsLoading(false);
   };
 
-  const contractingInsuranceFromTaxId = async (query: string) => {
+  const contractingInsuranceFromTaxId = async (
+    addUser: boolean,
+    endpoint: ApiEndpointKey,
+    params: any,
+    query: string
+  ) => {
     setIsLoading(true);
 
     const searchResponse = await fetchWithLogs(
       {
-        endpoint:
-          institutionType === 'SA'
-            ? 'ONBOARDING_GET_SA_PARTY_FROM_FC'
-            : 'ONBOARDING_GET_INSURANCE_COMPANIES_FROM_IVASSCODE',
-        endpointParams: institutionType === 'SA' ? { taxId: query } : { code: query },
+        endpoint,
+        endpointParams: addUser
+          ? undefined
+          : institutionType === 'SA'
+          ? { taxId: query }
+          : { code: query },
       },
       {
         method: 'GET',
+        params: addUser ? params : undefined,
       },
       () => setRequiredLogin(true)
     );
@@ -275,9 +308,19 @@ export default function AsyncAutocompleteContainer({
         );
     }
   };
-  // eslint-disable-next-line sonarjs/cognitive-complexity
-  const handleChange = (event: any) => {
+
+  // eslint-disable-next-line complexity
+  const handleChange = (
+    event: any
+    // eslint-disable-next-line sonarjs/cognitive-complexity
+  ) => {
     const typedInput = event.target.value as string;
+
+    const params = {
+      productId: selectedProduct?.id,
+      taxCode: isTaxCodeSelected ? typedInput : undefined,
+      subunitCode: isAooCodeSelected || isUoCodeSelected ? typedInput : undefined,
+    };
 
     const removeSpecialCharacters = (typedInput: string) => {
       const specialCharacters = '[$%&’()§#!£{}*+/:;<>@=?^|~]';
@@ -306,14 +349,23 @@ export default function AsyncAutocompleteContainer({
         (isIvassCodeSelected && value.length === 5)
       ) {
         if (institutionType === 'SA' || institutionType === 'AS') {
-          void contractingInsuranceFromTaxId(value);
+          const endpoint = addUser
+            ? 'ONBOARDING_GET_INSTITUTIONS'
+            : institutionType === 'SA'
+            ? 'ONBOARDING_GET_SA_PARTY_FROM_FC'
+            : 'ONBOARDING_GET_INSURANCE_COMPANIES_FROM_IVASSCODE';
+
+          void contractingInsuranceFromTaxId(addUser, endpoint, params, value);
         } else {
-          void handleSearchByTaxCode(value);
+          const endpoint = addUser ? 'ONBOARDING_GET_INSTITUTIONS' : 'ONBOARDING_GET_PARTY_FROM_CF';
+          void handleSearchByTaxCode(addUser, endpoint, params, value);
         }
       } else if (isAooCodeSelected && !isUoCodeSelected && value.length === 7) {
-        void handleSearchByAooCode(value);
+        const endpoint = addUser ? 'ONBOARDING_GET_INSTITUTIONS' : 'ONBOARDING_GET_AOO_CODE_INFO';
+        void handleSearchByAooCode(addUser, endpoint, params, value);
       } else if (isUoCodeSelected && !isAooCodeSelected && value.length === 6) {
-        void handleSearchByUoCode(value);
+        const endpoint = addUser ? 'ONBOARDING_GET_INSTITUTIONS' : 'ONBOARDING_GET_UO_CODE_INFO';
+        void handleSearchByUoCode(addUser, endpoint, params, value);
       }
     }
     if (value === '') {
@@ -331,7 +383,7 @@ export default function AsyncAutocompleteContainer({
         display="flex"
         justifyContent="center"
         width="100%"
-        pt={selected ? 4 : 2}
+        pt={selected ? 4 : 3}
         pb={input?.length === 0 || selected ? 4 : 0}
       >
         {selected && (

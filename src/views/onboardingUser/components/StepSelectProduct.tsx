@@ -99,87 +99,86 @@ export function StepSelectProduct({ forward, setLoading, institutionType }: Prop
             </Typography>
           </Grid>
           <Grid item py={1}>
-            {products?.map((p, index) => (
-              <Grid item key={index}>
-                <FormControl sx={{ paddingLeft: 2 }}>
-                  <RadioGroup
-                    name="choose-product"
-                    value={selectedProduct?.id}
-                    onChange={(e) => {
-                      const productSelected = products.find((p) => p.id === e.target.value);
-                      setSelectedProduct(productSelected);
-                    }}
-                  >
-                    <FormControlLabel
-                      sx={{ pl: 1, py: 1.5, pr: 2 }}
-                      value={p.id}
-                      control={<Radio id={p.id} checked={selectedProduct?.id === p.id} />}
-                      label={
+            <FormControl sx={{ paddingLeft: 2 }}>
+              <RadioGroup
+                name="choose-product"
+                value={selectedProduct?.id}
+                onChange={(e) => {
+                  const productSelected = products?.find((p) => p.id === e.target.value);
+                  setSelectedProduct(productSelected);
+                }}
+              >
+                {products?.map((p, index) => (
+                  <FormControlLabel
+                    key={index}
+                    sx={{ pl: 1, py: 1.5, pr: 2 }}
+                    value={p.id}
+                    control={<Radio checked={selectedProduct?.id === p.id} />}
+                    label={
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          paddingLeft: 1,
+                        }}
+                      >
                         <Box
                           sx={{
                             display: 'flex',
-                            flexDirection: 'row',
                             alignItems: 'center',
-                            paddingLeft: 1,
+                            justifyContent: 'center',
+                            position: 'relative',
+                            width: '48px',
+                            height: '48px',
+                            backgroundColor: p.logoBgColor
+                              ? p.logoBgColor
+                              : theme.palette.background.paper,
+                            boxSizing: 'border-box',
+                            padding: theme.spacing(1),
+                            borderRadius: theme.spacing(1),
+                            '&:after': {
+                              content: "''",
+                              position: 'absolute',
+                              left: 0,
+                              right: 0,
+                              top: 0,
+                              bottom: 0,
+                              boxShadow: p.logoBgColor
+                                ? `inset 0 0 0 1px ${alpha(theme.palette.common.black, 0.1)}`
+                                : `inset 0 0 0 1px ${theme.palette.divider}`,
+                              borderRadius: 'inherit',
+                            },
                           }}
                         >
-                          <Box
+                          <img
+                            src={p.logo}
+                            alt={`${p.title} logo`}
+                            style={{
+                              width: '100%',
+                              height: '100%',
+                              objectFit: 'contain',
+                              objectPosition: 'center',
+                            }}
+                          />
+                        </Box>
+                        <Box pl={1.5}>
+                          <Typography
                             sx={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              position: 'relative',
-                              width: '48px',
-                              height: '48px',
-                              backgroundColor: p.logoBgColor
-                                ? p.logoBgColor
-                                : theme.palette.background.paper,
-                              boxSizing: 'border-box',
-                              padding: theme.spacing(1),
-                              borderRadius: theme.spacing(1),
-                              '&:after': {
-                                content: "''",
-                                position: 'absolute',
-                                left: 0,
-                                right: 0,
-                                top: 0,
-                                bottom: 0,
-                                boxShadow: p.logoBgColor
-                                  ? `inset 0 0 0 1px ${alpha(theme.palette.common.black, 0.1)}`
-                                  : `inset 0 0 0 1px ${theme.palette.divider}`,
-                                borderRadius: 'inherit',
-                              },
+                              fontWeight: 'fontWeightMedium',
+                              fontSize: '18px',
+                              color: theme.palette.text.primary,
                             }}
                           >
-                            <img
-                              src={p.logo}
-                              alt={`${p.title} logo`}
-                              style={{
-                                width: '100%',
-                                height: '100%',
-                                objectFit: 'contain',
-                                objectPosition: 'center',
-                              }}
-                            />
-                          </Box>
-                          <Box pl={1.5}>
-                            <Typography
-                              sx={{
-                                fontWeight: 'fontWeightMedium',
-                                fontSize: '18px',
-                                color: theme.palette.text.primary,
-                              }}
-                            >
-                              {p.title}
-                            </Typography>
-                          </Box>
+                            {p.title}
+                          </Typography>
                         </Box>
-                      }
-                    />
-                  </RadioGroup>
-                </FormControl>
-              </Grid>
-            ))}
+                      </Box>
+                    }
+                  />
+                ))}
+              </RadioGroup>
+            </FormControl>
           </Grid>
         </Paper>
         <Grid item xs={12} mt={2} mb={5}>
@@ -190,7 +189,11 @@ export function StepSelectProduct({ forward, setLoading, institutionType }: Prop
               disabled: false,
             }}
             forward={{
-              action: forward,
+              action: () => {
+                if (selectedProduct) {
+                  forward(selectedProduct);
+                }
+              },
               label: t('stepInstitutionType.confirmLabel'),
               disabled: !selectedProduct,
             }}

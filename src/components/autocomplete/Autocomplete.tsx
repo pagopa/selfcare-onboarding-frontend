@@ -1,9 +1,12 @@
-import { Grid, Paper, Theme } from '@mui/material';
+import { Grid, Paper, Typography } from '@mui/material';
 import React, { Dispatch, SetStateAction, useState } from 'react';
+import { theme } from '@pagopa/mui-italia';
+import { useTranslation } from 'react-i18next';
 import { ANACParty, Endpoint, InstitutionType, Product } from '../../../types';
 import { AooData } from '../../model/AooData';
 import { InstitutionResource } from '../../model/InstitutionResource';
 import { UoData } from '../../model/UoModel';
+import { useHistoryState } from '../useHistoryState';
 import AsyncAutocompleteContainer from './components/asyncAutocomplete/AsyncAutocompleteContainer';
 import PartyAdvancedSelect from './components/partyAdvancedSearchType/PartyAdvancedSelect';
 
@@ -14,7 +17,6 @@ type AutocompleteProps = {
   transformFn: any;
   optionKey?: string;
   optionLabel?: string;
-  theme: Theme;
   isSearchFieldSelected: boolean;
   setIsSearchFieldSelected: React.Dispatch<React.SetStateAction<boolean>>;
   product?: Product | null;
@@ -22,11 +24,10 @@ type AutocompleteProps = {
   uoResult?: UoData;
   setAooResult: Dispatch<SetStateAction<AooData | undefined>>;
   setUoResult: Dispatch<SetStateAction<UoData | undefined>>;
-  setUoResultHistory: (t: UoData | undefined) => void;
-  setAooResultHistory: (t: AooData | undefined) => void;
   externalInstitutionId: string;
   institutionType?: InstitutionType;
   setDisabled: Dispatch<SetStateAction<boolean>>;
+  selectedProduct?: Product;
 };
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
@@ -37,7 +38,6 @@ export function Autocomplete({
   transformFn,
   optionKey,
   optionLabel,
-  theme,
   isSearchFieldSelected,
   product,
   aooResult,
@@ -45,12 +45,12 @@ export function Autocomplete({
   setAooResult,
   setUoResult,
   setIsSearchFieldSelected,
-  setUoResultHistory,
-  setAooResultHistory,
   externalInstitutionId,
   institutionType,
   setDisabled,
+  selectedProduct,
 }: AutocompleteProps) {
+  const { t } = useTranslation();
   const [options, setOptions] = useState<Array<InstitutionResource>>([]);
   const [cfResult, setCfResult] = useState<InstitutionResource | ANACParty>();
 
@@ -61,6 +61,14 @@ export function Autocomplete({
   const [isTaxCodeSelected, setIsTaxCodeSelected] = useState<boolean>();
   const [isIvassCodeSelected, setIsIvassCodeSelected] = useState<boolean>(false);
   const [input, setInput] = useState<string>('');
+
+  const setAooResultHistory = useHistoryState<AooData | undefined>(
+    'aooSelected_step1',
+    undefined
+  )[2];
+  const setUoResultHistory = useHistoryState<UoData | undefined>('uoSelected_step1', undefined)[2];
+
+  const addUser = window.location.pathname.includes('/user');
 
   return (
     <Paper
@@ -78,6 +86,11 @@ export function Autocomplete({
       <Grid container mx={selected ? 4 : undefined}>
         {!selected && (
           <Grid item xs={12} px={4} pt={4}>
+            {addUser && (
+              <Typography sx={{ fontWeight: '700', fontSize: '14px' }} mb={3}>
+                {t('onboardingStep1.onboarding.bodyTitle').toUpperCase()}
+              </Typography>
+            )}
             <PartyAdvancedSelect
               setIsTaxCodeSelected={setIsTaxCodeSelected}
               setIsBusinessNameSelected={setIsBusinessNameSelected}
@@ -87,7 +100,7 @@ export function Autocomplete({
               setOptions={setOptions}
               setInput={setInput}
               setIsSearchFieldSelected={setIsSearchFieldSelected}
-              selected={selected}
+              addUser={addUser}
               setAooResult={setAooResult}
               setUoResult={setUoResult}
               setCfResult={setCfResult}
@@ -100,6 +113,7 @@ export function Autocomplete({
               setAooResultHistory={setAooResultHistory}
               product={product}
               institutionType={institutionType}
+              selectedProduct={selectedProduct}
             />
           </Grid>
         )}
@@ -134,6 +148,8 @@ export function Autocomplete({
           externalInstitutionId={externalInstitutionId}
           institutionType={institutionType}
           setDisabled={setDisabled}
+          addUser={addUser}
+          selectedProduct={selectedProduct}
         />
       </Grid>
     </Paper>
