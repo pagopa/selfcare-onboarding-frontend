@@ -37,7 +37,7 @@ export function StepSelectProduct({ forward, setLoading, institutionType }: Prop
     setLoading(true);
     const getProductsRequest = await fetchWithLogs(
       {
-        endpoint: 'ONBOARDING_GET_PRODUCTS',
+        endpoint: 'ONBOARDING_GET_ALLOWED_ADD_USER_PRODUCTS',
       },
       {
         method: 'GET',
@@ -47,15 +47,9 @@ export function StepSelectProduct({ forward, setLoading, institutionType }: Prop
     const outcome = getFetchOutcome(getProductsRequest);
     setLoading(false);
     if (outcome === 'success') {
-      const products = (getProductsRequest as AxiosResponse).data as Array<ProductResource>;
-      const enabledAddUserProducts = products.filter(
-        (p) =>
-          p.id === 'prod-io' ||
-          p.id === 'prod-pagopa' ||
-          p.id === 'prod-interop' ||
-          p.id === 'prod-pn'
-      );
-      setProducts(enabledAddUserProducts);
+      const retrievedProducts = (getProductsRequest as AxiosResponse)
+        .data as Array<ProductResource>;
+      setProducts(retrievedProducts);
     }
   };
 

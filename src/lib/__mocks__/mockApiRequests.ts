@@ -14,6 +14,7 @@ import {
 import { BillingDataDto } from '../../model/BillingData';
 import { GeographicTaxonomyResource, nationalValue } from '../../model/GeographicTaxonomies';
 import { UoData } from '../../model/UoModel';
+import { addUserFlowProducts } from '../../utils/constants';
 import { AooData } from './../../model/AooData';
 
 const createPartyRegistryEntity = (
@@ -1238,6 +1239,13 @@ export async function mockFetch(
   if (endpoint === 'ONBOARDING_GET_PRODUCTS') {
     return new Promise((resolve) =>
       resolve({ data: mockedProducts, status: 200, statusText: '200' } as AxiosResponse)
+    );
+  }
+
+  if (endpoint === 'ONBOARDING_GET_ALLOWED_ADD_USER_PRODUCTS') {
+    const allowedAddUserProduct = mockedProducts.filter((p) => addUserFlowProducts(p.id));
+    return new Promise((resolve) =>
+      resolve({ data: allowedAddUserProduct, status: 200, statusText: '200' } as AxiosResponse)
     );
   }
 
