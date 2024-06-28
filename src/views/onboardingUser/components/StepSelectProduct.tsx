@@ -12,8 +12,7 @@ import {
 import { theme } from '@pagopa/mui-italia';
 import { useContext, useEffect, useState } from 'react';
 import { AxiosResponse } from 'axios';
-import { useTranslation, Trans } from 'react-i18next';
-import { RolesInformations } from '../../../components/RolesInformations';
+import { useTranslation } from 'react-i18next';
 import { fetchWithLogs } from '../../../lib/api-utils';
 import { UserContext } from '../../../lib/context';
 import { getFetchOutcome } from '../../../lib/error-utils';
@@ -21,6 +20,7 @@ import { ProductResource } from '../../../model/ProductResource';
 import { OnboardingStepActions } from '../../../components/OnboardingStepActions';
 import { InstitutionType, StepperStepComponentProps } from '../../../../types';
 import { ENV } from '../../../utils/env';
+import AddUserHeading from '../AddUserHeading';
 
 type Props = {
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
@@ -69,25 +69,7 @@ export function StepSelectProduct({ forward, setLoading, institutionType }: Prop
 
   return (
     <Grid container item>
-      <Grid container sx={{ display: 'flex', flexDirection: 'column', textAlign: 'center' }}>
-        <Grid item mb={1}>
-          <Typography variant="h3" fontWeight="fontWeightBold">
-            <Trans i18nKey="addUser.title" components={{ 1: <br /> }}>
-              {`Aggiungi un nuovo <1 /> Amministratore`}
-            </Trans>
-          </Typography>
-        </Grid>
-        <Grid item mb={1}>
-          <Typography variant="body1" fontWeight="fontWeightRegular">
-            <Trans i18nKey="addUser.subTitle" components={{ 1: <br /> }}>
-              {`Indica per quale prodotto vuoi aggiungere un nuovo<1 />Amministratore`}
-            </Trans>
-          </Typography>
-        </Grid>
-        <Grid item mb={3}>
-          <RolesInformations isTechPartner={institutionType === 'PT'} />
-        </Grid>
-      </Grid>
+      <AddUserHeading institutionType={institutionType} />
       <Grid container item sx={{ justifyContent: 'center' }}>
         <Paper
           elevation={8}

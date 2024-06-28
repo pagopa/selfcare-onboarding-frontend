@@ -1,12 +1,10 @@
 import { Box, Grid, IconButton, Paper, Typography, alpha } from '@mui/material';
-import { Trans } from 'react-i18next';
 import { theme } from '@pagopa/mui-italia';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 import { withLogin } from '../../../components/withLogin';
 import { IPACatalogParty, InstitutionType, StepperStepComponentProps } from '../../../../types';
-import { RolesInformations } from '../../../components/RolesInformations';
 import { ProductResource } from '../../../model/ProductResource';
 import { Autocomplete } from '../../../components/autocomplete/Autocomplete';
 import { useHistoryState } from '../../../components/useHistoryState';
@@ -14,6 +12,7 @@ import { AooData } from '../../../model/AooData';
 import { UoData } from '../../../model/UoModel';
 import { OnboardingStepActions } from '../../../components/OnboardingStepActions';
 import { SelfcareParty } from '../../../model/SelfcareParty';
+import AddUserHeading from '../AddUserHeading';
 
 type Props = {
   institutionType?: InstitutionType;
@@ -34,25 +33,7 @@ function StepSearchOnboardedParty({ institutionType, selectedProduct, forward, b
 
   return (
     <Grid container item>
-      <Grid container sx={{ display: 'flex', flexDirection: 'column', textAlign: 'center' }}>
-        <Grid item mb={1}>
-          <Typography variant="h3" fontWeight="fontWeightBold">
-            <Trans i18nKey="addUser.title" components={{ 1: <br /> }}>
-              {`Aggiungi un nuovo <1 /> Amministratore`}
-            </Trans>
-          </Typography>
-        </Grid>
-        <Grid item mb={1}>
-          <Typography variant="body1" fontWeight="fontWeightRegular">
-            <Trans i18nKey="addUser.subTitle" components={{ 1: <br /> }}>
-              {`Indica per quale prodotto vuoi aggiungere un nuovo<1 />Amministratore`}
-            </Trans>
-          </Typography>
-        </Grid>
-        <Grid item mb={3}>
-          <RolesInformations isTechPartner={institutionType === 'PT'} />
-        </Grid>
-      </Grid>
+      <AddUserHeading institutionType={institutionType} />
       <Grid container sx={{ justifyContent: 'center' }}>
         <Grid container item sx={{ justifyContent: 'center', marginBottom: 4 }}>
           <Paper
