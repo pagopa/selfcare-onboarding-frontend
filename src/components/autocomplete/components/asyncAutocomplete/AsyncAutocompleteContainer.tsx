@@ -178,7 +178,11 @@ export default function AsyncAutocompleteContainer({
     const outcome = getFetchOutcome(searchResponse);
 
     if (outcome === 'success') {
-      setCfResult((searchResponse as AxiosResponse).data);
+      if (addUser) {
+        setCfResult((searchResponse as AxiosResponse).data[0]);
+      } else {
+        setCfResult((searchResponse as AxiosResponse).data);
+      }
     } else if ((searchResponse as AxiosError).response?.status === 404) {
       setCfResult(undefined);
     }

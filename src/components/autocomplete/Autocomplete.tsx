@@ -1,5 +1,5 @@
 import { Grid, Paper, Typography } from '@mui/material';
-import React, { Dispatch, SetStateAction, useState } from 'react';
+import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { theme } from '@pagopa/mui-italia';
 import { useTranslation } from 'react-i18next';
 import { ANACParty, Endpoint, InstitutionType, Product } from '../../../types';
@@ -70,6 +70,12 @@ export function Autocomplete({
 
   const addUser = window.location.pathname.includes('/user');
 
+  useEffect(() => {
+    if (addUser) {
+      setIsBusinessNameSelected(false);
+    }
+  }, []);
+
   return (
     <Paper
       elevation={8}
@@ -83,7 +89,7 @@ export function Autocomplete({
         borderRadius: theme.spacing(2),
       }}
     >
-      <Grid container mx={selected ? 4 : undefined}>
+      <Grid container mr={selected ? '18px' : undefined} ml={selected ? '28px' : undefined}>
         {!selected && (
           <Grid item xs={12} px={4} pt={4}>
             {addUser && (
