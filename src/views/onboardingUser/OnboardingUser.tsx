@@ -219,6 +219,9 @@ function OnboardingUserComponent() {
           externalInstitutionId: selectedParty?.externalId,
           addUserFlow: true,
           product: selectedProduct,
+          onboardingFormData,
+          selectedParty,
+          institutionType,
           isTechPartner,
           forward: (newFormData: Partial<FormData>) => {
             trackEvent('ONBOARDING_ADD_MANAGER', {

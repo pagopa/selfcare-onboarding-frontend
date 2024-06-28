@@ -162,6 +162,11 @@ export default {
         addNewUser: `La persona indicata firmerà il Modulo di aggiunta per il nuovo Amministratore e lo <1 />autorizzerà ad operare sul prodotto <3>{{productTitle}}</3> per il tuo ente.`,
       },
     },
+    changedManager: {
+      title: 'Stai aggiungendo un Legale Rappresentante',
+      message:
+        'I dati del Legale Rappresentante inseriti sono diversi da quelli indicati in <1 />precedenza. Vuoi continuare?',
+    },
     back: 'Indietro',
     continue: 'Continua',
   },

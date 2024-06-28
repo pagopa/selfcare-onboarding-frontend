@@ -4,7 +4,8 @@ import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsS
 import { uniqueId } from 'lodash';
 import { useContext, useEffect, useRef, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
-import { Product, StepperStepComponentProps, UserOnCreate } from '../../../types';
+import { AxiosResponse } from 'axios';
+import { InstitutionType, Product, StepperStepComponentProps, UserOnCreate } from '../../../types';
 import { UserContext } from '../../lib/context';
 import { objectIsEmpty } from '../../lib/object-utils';
 import { userValidate } from '../../utils/api/userValidate';
@@ -12,6 +13,9 @@ import { OnboardingStepActions } from '../OnboardingStepActions';
 import { PlatformUserForm, validateUser } from '../PlatformUserForm';
 import { useHistoryState } from '../useHistoryState';
 import { RolesInformations } from '../RolesInformations';
+import { fetchWithLogs } from '../../lib/api-utils';
+import { OnboardingFormData } from '../../model/OnboardingFormData';
+import { getFetchOutcome } from '../../lib/error-utils';
 
 // Could be an ES6 Set but it's too bothersome for now
 export type UsersObject = { [key: string]: UserOnCreate };
@@ -23,6 +27,9 @@ type Props = StepperStepComponentProps & {
   readOnly?: boolean;
   subProduct?: Product;
   isTechPartner?: boolean;
+  onboardingFormData?: OnboardingFormData;
+  selectedParty?: any;
+  institutionType?: InstitutionType;
 };
 
 export function StepAddManager({
@@ -34,12 +41,16 @@ export function StepAddManager({
   subProduct,
   isTechPartner,
   addUserFlow,
+  onboardingFormData,
+  selectedParty,
+  institutionType,
 }: Props) {
   const { setRequiredLogin } = useContext(UserContext);
   const [_loading, setLoading] = useState(true);
   const [people, setPeople, setPeopleHistory] = useHistoryState<UsersObject>('people_step2', {});
   const [peopleErrors, setPeopleErrors] = useState<UsersError>();
   const [genericError, setGenericError] = useState<boolean>(false);
+  const [isChangedManager, setIsChangedManager] = useState<boolean>(false);
   const requestIdRef = useRef<string>();
   const { t } = useTranslation();
   const premiumFlow = !!subProduct;
@@ -73,6 +84,38 @@ export function StepAddManager({
 
   const onUserValidateGenericError = () => {
     setGenericError(true);
+  };
+
+  const checkManager = async (user: UserOnCreate) => {
+    const request = await fetchWithLogs(
+      {
+        endpoint: 'ONBOARDING_USER_VALIDATION',
+      },
+      {
+        method: 'POST',
+        data: {
+          institutionType,
+          origin: selectedParty?.origin,
+          originId: selectedParty?.originId,
+          productId: product?.id,
+          subunitCode: onboardingFormData?.aooUniqueCode ?? onboardingFormData?.uoUniqueCode,
+          taxCode: selectedParty?.taxCode ?? onboardingFormData?.taxCode,
+          user: [user],
+        },
+      },
+      () => setRequiredLogin(true)
+    );
+
+    const result = getFetchOutcome(request);
+
+    if (result === 'success') {
+      const response = (request as AxiosResponse).data;
+      if (response === true) {
+        setIsChangedManager(false);
+      } else {
+        setIsChangedManager(true);
+      }
+    }
   };
 
   const validateUserData = (
@@ -175,6 +218,7 @@ export function StepAddManager({
           forward={{
             action: () => {
               validateUserData(people.LEGAL, 'LEGAL', externalInstitutionId, subProduct);
+              void checkManager(people.LEGAL);
             },
             label: t('stepAddManager.continue'),
             disabled:
@@ -193,6 +237,21 @@ export function StepAddManager({
         }
         onCloseLabel={t('onboarding.backHome')}
         handleClose={handleCloseGenericErrorModal}
+      />
+      <SessionModal
+        open={isChangedManager}
+        title={t('stepAddManager.changedManager.title')}
+        message={
+          <Trans i18nKey="stepAddManager.changedManager.message" components={{ 1: <br /> }}>
+            {
+              'I dati del Legale Rappresentante inseriti sono diversi da quelli indicati in <1 />precedenza. Vuoi continuare?'
+            }
+          </Trans>
+        }
+        onCloseLabel={t('stepAddManager.back')}
+        onConfirmLabel={t('stepAddManager.continue')}
+        onConfirm={() => forward()}
+        handleClose={() => setIsChangedManager(false)}
       />
     </Grid>
   );

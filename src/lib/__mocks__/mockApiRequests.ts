@@ -15,6 +15,7 @@ import { BillingDataDto } from '../../model/BillingData';
 import { GeographicTaxonomyResource, nationalValue } from '../../model/GeographicTaxonomies';
 import { UoData } from '../../model/UoModel';
 import { AooData } from './../../model/AooData';
+import { OnboardedParty } from './../../model/OnboardedParty';
 
 const createPartyRegistryEntity = (
   id: string,
@@ -663,6 +664,26 @@ const mockedOnboardingData: Array<InstitutionOnboardingInfoResource> = [
   },
 ];
 
+const mockedOnboardedParties: Array<OnboardedParty> = [
+  {
+    id: '1',
+    institutionType: 'PA',
+    origin: 'IPA',
+    originId: 'sdsdee',
+    productId: 'prod-io',
+    taxCode: '00000000000',
+  },
+  {
+    id: '1',
+    institutionType: 'PA',
+    origin: 'IPA',
+    originId: 'sdsdee',
+    productId: 'prod-io',
+    taxCode: '00000000000',
+    subunitCode: 'AAA111',
+  },
+];
+
 const statusActive = 'ACTIVE';
 const statusTesting = 'TESTING';
 
@@ -1232,6 +1253,29 @@ export async function mockFetch(
         );
       default:
         return notFoundError;
+    }
+  }
+
+  if (endpoint === 'ONBOARDING_GET_INSTITUTIONS') {
+    switch (params.taxCode) {
+      case '00000000000':
+        return new Promise((resolve) =>
+          resolve({
+            data: mockedOnboardedParties[0],
+            status: 200,
+            statusText: '200',
+          } as AxiosResponse)
+        );
+    }
+    switch (params.subunitCode) {
+      case 'AAA111':
+        return new Promise((resolve) =>
+          resolve({
+            data: mockedOnboardedParties[1],
+            status: 200,
+            statusText: '200',
+          } as AxiosResponse)
+        );
     }
   }
 

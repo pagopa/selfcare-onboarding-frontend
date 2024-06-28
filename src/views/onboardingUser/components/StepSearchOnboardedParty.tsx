@@ -11,7 +11,7 @@ import { useHistoryState } from '../../../components/useHistoryState';
 import { AooData } from '../../../model/AooData';
 import { UoData } from '../../../model/UoModel';
 import { OnboardingStepActions } from '../../../components/OnboardingStepActions';
-import { SelfcareParty } from '../../../model/SelfcareParty';
+import { OnboardedParty } from '../../../model/OnboardedParty';
 import AddUserHeading from '../AddUserHeading';
 
 type Props = {
@@ -123,7 +123,7 @@ function StepSearchOnboardedParty({ institutionType, selectedProduct, forward, b
             endpoint={{ endpoint: 'ONBOARDING_GET_INSTITUTIONS' }}
             externalInstitutionId=""
             isSearchFieldSelected={true}
-            transformFn={(data: { items: Array<SelfcareParty> }) =>
+            transformFn={(data: { items: Array<OnboardedParty> }) =>
               /* removed transformation into lower case in order to send data to BE as obtained from registry
                   // eslint-disable-next-line functional/immutable-data
                   data.items.forEach((i) => (i.description = i.description.toLowerCase()));
