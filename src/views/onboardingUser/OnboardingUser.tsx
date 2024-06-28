@@ -8,7 +8,6 @@ import { Trans, useTranslation } from 'react-i18next';
 import { withLogin } from '../../components/withLogin';
 import {
   InstitutionType,
-  Product,
   RequestOutcomeMessage,
   RequestOutcomeOptions,
   StepperStep,
@@ -25,7 +24,9 @@ import { MessageNoAction } from '../../components/MessageNoAction';
 import { unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
 import { selected2OnboardingData } from '../../utils/selected2OnboardingData';
 import { LoadingOverlay } from '../../components/LoadingOverlay';
+import { ProductResource } from '../../model/ProductResource';
 import { StepSelectProduct } from './components/StepSelectProduct';
+import StepSearchOnboardedParty from './components/StepSearchOnboardedParty';
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
 function OnboardingUserComponent() {
@@ -40,7 +41,7 @@ function OnboardingUserComponent() {
   const [outcome, setOutcome] = useState<RequestOutcomeMessage | null>();
   const [formData, setFormData] = useState<Partial<FormData>>();
   const [selectedParty, setSelectedParty] = useState<any>(); // TODO Add correct model
-  const [selectedProduct, setSelectedProduct] = useState<Product>();
+  const [selectedProduct, setSelectedProduct] = useState<ProductResource>();
   const [institutionType, setInstitutionType] = useState<InstitutionType>();
   const [onboardingFormData, setOnboardingFormData] = useState<OnboardingFormData>();
   const [onExitAction, setOnExitAction] = useState<(() => void) | undefined>();
@@ -80,7 +81,7 @@ function OnboardingUserComponent() {
       } else {
         setOnboardingFormData(selectedParty);
       }
-      setActiveStep(1);
+      setActiveStep(2);
     }
   }, [selectedParty, history]);
 
@@ -90,6 +91,22 @@ function OnboardingUserComponent() {
 
   const forward = () => {
     setActiveStep(activeStep + 1);
+  };
+
+  const forwardWithProduct = (productSelected: ProductResource) => {
+    setSelectedProduct(productSelected);
+    forward();
+  };
+
+  // TODO Fix me
+  const forwardWithInstitution = (partySelected: any) => {
+    setSelectedParty(partySelected);
+    forward();
+  };
+
+  const onBackAction = () => {
+    setSelectedProduct(undefined);
+    back();
   };
 
   const addUserRequest = async (users: Array<UserOnCreate>) => {
@@ -178,7 +195,22 @@ function OnboardingUserComponent() {
   const steps: Array<StepperStep> = [
     {
       label: 'Select product',
-      Component: () => StepSelectProduct({ forward, setLoading, institutionType }),
+      Component: () =>
+        StepSelectProduct({
+          forward: forwardWithProduct,
+          setLoading,
+          institutionType,
+        }),
+    },
+    {
+      label: 'Search onboarded party',
+      Component: () =>
+        StepSearchOnboardedParty({
+          selectedProduct,
+          institutionType,
+          forward: forwardWithInstitution,
+          back: onBackAction,
+        }),
     },
     {
       label: 'Insert manager data',
