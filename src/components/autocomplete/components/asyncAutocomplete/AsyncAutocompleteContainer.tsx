@@ -214,8 +214,13 @@ export default function AsyncAutocompleteContainer({
     const outcome = getFetchOutcome(searchResponse);
 
     if (outcome === 'success') {
-      setAooResult((searchResponse as AxiosResponse).data);
-      setAooResultHistory((searchResponse as AxiosResponse).data);
+      if (addUser) {
+        setAooResult((searchResponse as AxiosResponse).data[0]);
+        setAooResultHistory((searchResponse as AxiosResponse).data[0]);
+      } else {
+        setAooResult((searchResponse as AxiosResponse).data);
+        setAooResultHistory((searchResponse as AxiosResponse).data);
+      }
     } else if ((searchResponse as AxiosError).response?.status === 404) {
       setAooResult(undefined);
     }
@@ -247,8 +252,13 @@ export default function AsyncAutocompleteContainer({
     const outcome = getFetchOutcome(searchResponse);
 
     if (outcome === 'success') {
-      setUoResult((searchResponse as AxiosResponse).data);
-      setUoResultHistory((searchResponse as AxiosResponse).data);
+      if (addUser) {
+        setUoResult((searchResponse as AxiosResponse).data[0]);
+        setUoResultHistory((searchResponse as AxiosResponse).data[0]);
+      } else {
+        setUoResult((searchResponse as AxiosResponse).data);
+        setUoResultHistory((searchResponse as AxiosResponse).data);
+      }
     } else if ((searchResponse as AxiosError).response?.status === 404) {
       setUoResult(undefined);
     }
