@@ -227,6 +227,7 @@ export default function AsyncAutocompleteContainer({
 
     setIsLoading(false);
   };
+
   const handleSearchByUoCode = async (
     addUser: boolean,
     endpoint: ApiEndpointKey,
@@ -423,6 +424,7 @@ export default function AsyncAutocompleteContainer({
           setAooResult={setAooResult}
           setUoResult={setUoResult}
           externalInstitutionId={externalInstitutionId}
+          addUser={addUser}
         />
       </Grid>
       <Grid

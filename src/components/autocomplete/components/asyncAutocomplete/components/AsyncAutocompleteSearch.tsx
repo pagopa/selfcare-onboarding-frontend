@@ -46,6 +46,7 @@ type Props = {
   setAooResult: React.Dispatch<React.SetStateAction<AooData | undefined>>;
   setUoResult: React.Dispatch<React.SetStateAction<UoData | undefined>>;
   externalInstitutionId: string;
+  addUser: boolean;
 };
 
 // eslint-disable-next-line sonarjs/cognitive-complexity, complexity
@@ -66,6 +67,7 @@ export default function AsyncAutocompleteSearch({
   setAooResult,
   setUoResult,
   externalInstitutionId,
+  addUser,
 }: Props) {
   const setSelectedHistory = useHistoryState<IPACatalogParty | null>('selected_step1', null)[2];
   const { t } = useTranslation();
@@ -90,6 +92,8 @@ export default function AsyncAutocompleteSearch({
       ? selected?.denominazioneAoo
       : selected && isUoCodeSelected && selected.descrizioneUo
       ? selected?.descrizioneUo
+      : addUser && selected && (isAooCodeSelected || isUoCodeSelected) && selected?.description
+      ? selected.description
       : input;
 
   useEffect(() => {

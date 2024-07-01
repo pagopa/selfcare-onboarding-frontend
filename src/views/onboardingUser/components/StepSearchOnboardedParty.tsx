@@ -11,7 +11,7 @@ import { useHistoryState } from '../../../components/useHistoryState';
 import { AooData } from '../../../model/AooData';
 import { UoData } from '../../../model/UoModel';
 import { OnboardingStepActions } from '../../../components/OnboardingStepActions';
-import { SelfcareParty } from '../../../model/SelfcareParty';
+import { OnboardedParty } from '../../../model/OnboardedParty';
 import AddUserHeading from '../AddUserHeading';
 
 type Props = {
@@ -26,8 +26,15 @@ function StepSearchOnboardedParty({ institutionType, selectedProduct, forward, b
     'selected_step1',
     null
   );
-  const setAooResult = useHistoryState<AooData | undefined>('aooSelected_step1', undefined)[1];
-  const setUoResult = useHistoryState<UoData | undefined>('uoSelected_step1', undefined)[1];
+
+  const [aooResult, setAooResult, _setAooResultHistory] = useHistoryState<AooData | undefined>(
+    'aooSelected_step1',
+    undefined
+  );
+  const [uoResult, setUoResult, _setUoResultHistory] = useHistoryState<UoData | undefined>(
+    'aooSelected_step1',
+    undefined
+  );
 
   const [disabled, setDisabled] = useState<boolean>(false);
 
@@ -123,15 +130,17 @@ function StepSearchOnboardedParty({ institutionType, selectedProduct, forward, b
             endpoint={{ endpoint: 'ONBOARDING_GET_INSTITUTIONS' }}
             externalInstitutionId=""
             isSearchFieldSelected={true}
-            transformFn={(data: { items: Array<SelfcareParty> }) =>
+            transformFn={(data: { items: Array<OnboardedParty> }) =>
               /* removed transformation into lower case in order to send data to BE as obtained from registry
                   // eslint-disable-next-line functional/immutable-data
                   data.items.forEach((i) => (i.description = i.description.toLowerCase()));
                   */
               data.items
             }
-            selected={selected}
+            selected={selected as any}
             setSelected={setSelected}
+            aooResult={aooResult}
+            uoResult={uoResult}
             setAooResult={setAooResult}
             setUoResult={setUoResult}
             setDisabled={setDisabled}
