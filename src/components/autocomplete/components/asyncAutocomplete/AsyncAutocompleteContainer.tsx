@@ -424,6 +424,7 @@ export default function AsyncAutocompleteContainer({
           setAooResult={setAooResult}
           setUoResult={setUoResult}
           externalInstitutionId={externalInstitutionId}
+          addUser={addUser}
         />
       </Grid>
       <Grid
@@ -465,6 +466,8 @@ export default function AsyncAutocompleteContainer({
         ) : (
           <>
             {(isTaxCodeSelected || isAooCodeSelected || isUoCodeSelected || isIvassCodeSelected) &&
+            !isBusinessNameSelected &&
+            input !== undefined &&
             input?.length >= 5 &&
             !selected &&
             (cfResult || uoResult || aooResult) ? (

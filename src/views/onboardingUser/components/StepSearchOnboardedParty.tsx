@@ -26,8 +26,15 @@ function StepSearchOnboardedParty({ institutionType, selectedProduct, forward, b
     'selected_step1',
     null
   );
-  const setAooResult = useHistoryState<AooData | undefined>('aooSelected_step1', undefined)[1];
-  const setUoResult = useHistoryState<UoData | undefined>('uoSelected_step1', undefined)[1];
+
+  const [aooResult, setAooResult, _setAooResultHistory] = useHistoryState<AooData | undefined>(
+    'aooSelected_step1',
+    undefined
+  );
+  const [uoResult, setUoResult, _setUoResultHistory] = useHistoryState<UoData | undefined>(
+    'aooSelected_step1',
+    undefined
+  );
 
   const [disabled, setDisabled] = useState<boolean>(false);
 
@@ -130,8 +137,10 @@ function StepSearchOnboardedParty({ institutionType, selectedProduct, forward, b
                   */
               data.items
             }
-            selected={selected}
+            selected={selected as any}
             setSelected={setSelected}
+            aooResult={aooResult}
+            uoResult={uoResult}
             setAooResult={setAooResult}
             setUoResult={setUoResult}
             setDisabled={setDisabled}
