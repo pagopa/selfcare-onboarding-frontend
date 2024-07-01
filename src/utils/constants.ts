@@ -132,6 +132,15 @@ export const API = {
   ONBOARDING_GET_PRODUCTS: {
     URL: ENV.URL_API.ONBOARDING + '/products',
   },
+  ONBOARDING_GET_ALLOWED_ADD_USER_PRODUCTS: {
+    URL: ENV.URL_API.ONBOARDING_V2 + '/v1/products/admin',
+  },
+  ONBOARDING_GET_INSTITUTIONS: {
+    URL: ENV.URL_API.ONBOARDING_V2 + '/v2/institutions',
+  },
+  ONBOARDING_CHECK_MANAGER: {
+    URL: ENV.URL_API.ONBOARDING_V2 + '/v1/users/check-manager',
+  },
 };
 
 export const USER_ROLE_LABEL = {
@@ -173,8 +182,8 @@ export const noMandatoryIpaProducts = (productId?: string) =>
   !productId?.includes('prod-pn');
 
 export const addUserFlowProducts = (productId: string) =>
-  productId.includes('prod-interop') ||
-  productId.includes('prod-pn') ||
+  productId === 'prod-interop' ||
+  productId === 'prod-pn' ||
   productId === 'prod-io' ||
   productId === 'prod-pagopa';
 

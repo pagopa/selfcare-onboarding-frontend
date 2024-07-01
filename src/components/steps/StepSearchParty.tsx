@@ -366,12 +366,11 @@ export function StepSearchParty({
 
         <Grid item xs={8} md={6} lg={5}>
           <Autocomplete
-            theme={theme}
             selected={selected}
-            setDisabled={setDisabled}
             setSelected={setSelected}
+            setDisabled={setDisabled}
             endpoint={{ endpoint: 'ONBOARDING_GET_SEARCH_PARTIES' }}
-            transformFn={(data: { items: Array<IPACatalogParty> }) =>
+            transformFn={(data: { items: any }) =>
               /* removed transformation into lower case in order to send data to BE as obtained from registry
                   // eslint-disable-next-line functional/immutable-data
                   data.items.forEach((i) => (i.description = i.description.toLowerCase()));
@@ -387,8 +386,6 @@ export function StepSearchParty({
             uoResult={uoResult}
             setAooResult={setAooResult}
             setUoResult={setUoResult}
-            setUoResultHistory={setUoResultHistory}
-            setAooResultHistory={setAooResultHistory}
             externalInstitutionId={externalInstitutionId}
             institutionType={institutionType}
           />

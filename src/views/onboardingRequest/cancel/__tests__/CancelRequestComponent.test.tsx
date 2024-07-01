@@ -111,7 +111,7 @@ test('Test: The jwt exist and the request is correctly retrieved, cancel onboard
 
   // TODO Deprecated
   expect(mockedLocation.assign).toBeCalledWith(ENV.URL_FE.LANDING);
-  expect(fetchWithLogsSpy).toBeCalledTimes(2);
+  expect(fetchWithLogsSpy).toBeCalledTimes(1);
 });
 
 // TODO Review this

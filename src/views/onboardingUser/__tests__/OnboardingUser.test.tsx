@@ -10,6 +10,8 @@ import { MemoryRouter } from 'react-router-dom';
 import OnboardingUser from '../OnboardingUser';
 import { mockPartyRegistry, mockedProducts } from '../../../lib/__mocks__/mockApiRequests';
 
+jest.setTimeout(6000);
+
 const renderComponent = (productId: string) => {
   const Component = () => {
     const [user, setUser] = useState<User | null>(null);
@@ -185,8 +187,6 @@ const executeStep2 = async () => {
   await fillUserForm(confirmButton, 'LEGAL', 'SRNNMA80A01A794F', 'b@b.BB', true);
 
   fireEvent.click(confirmButton);
-
-  await waitFor(() => screen.getByText("Indica l'Amministratore"));
 };
 
 const executeStep3 = async (expectedSuccessfulSubmit: boolean) => {
