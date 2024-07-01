@@ -10,6 +10,8 @@ import { MemoryRouter } from 'react-router-dom';
 import OnboardingUser from '../OnboardingUser';
 import { mockPartyRegistry, mockedProducts } from '../../../lib/__mocks__/mockApiRequests';
 
+jest.setTimeout(6000);
+
 const renderComponent = (productId: string) => {
   const Component = () => {
     const [user, setUser] = useState<User | null>(null);

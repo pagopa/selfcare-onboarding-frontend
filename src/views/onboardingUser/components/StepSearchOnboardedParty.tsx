@@ -118,7 +118,7 @@ function StepSearchOnboardedParty({ institutionType, selectedProduct, forward, b
             )}
           </Paper>
         </Grid>
-        <Grid container item sx={{ justifyContent: 'center', width: '480px' }}>
+        <Grid container item sx={{ justifyContent: 'center', width: '480px', height: 'auto' }}>
           <Autocomplete
             endpoint={{ endpoint: 'ONBOARDING_GET_INSTITUTIONS' }}
             externalInstitutionId=""

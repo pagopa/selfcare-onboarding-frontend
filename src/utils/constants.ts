@@ -132,6 +132,9 @@ export const API = {
   ONBOARDING_GET_PRODUCTS: {
     URL: ENV.URL_API.ONBOARDING + '/products',
   },
+  ONBOARDING_GET_ALLOWED_ADD_USER_PRODUCTS: {
+    URL: ENV.URL_API.ONBOARDING_V2 + '/v1/products/admin',
+  },
   ONBOARDING_GET_INSTITUTIONS: {
     URL: ENV.URL_API.ONBOARDING_V2 + '/v2/institutions',
   },
