@@ -112,6 +112,9 @@ export function StepAddManager({
     if (result === 'success') {
       const response = (request as AxiosResponse).data.result;
       setIsChangedManager(!response);
+      if (response) {
+        validateUserData(people.LEGAL, 'LEGAL', externalInstitutionId, subProduct);
+      }
     }
     setLoading(false);
   };
@@ -217,7 +220,7 @@ export function StepAddManager({
             action: () => {
               if (addUserFlow) {
                 void checkManager(people.LEGAL);
-              } else if (!isChangedManager) {
+              } else {
                 validateUserData(people.LEGAL, 'LEGAL', externalInstitutionId, subProduct);
               }
             },

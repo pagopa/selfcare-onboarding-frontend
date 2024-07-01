@@ -1293,6 +1293,12 @@ export async function mockFetch(
     );
   }
 
+  if (endpoint === 'ONBOARDING_CHECK_MANAGER') {
+    return new Promise((resolve) =>
+      resolve({ data: { result: true }, status: 200, statusText: '200' } as AxiosResponse)
+    );
+  }
+
   const msg = `NOT MOCKED REQUEST! {endpoint: ${endpoint}, endpointParams: ${JSON.stringify(
     endpointParams
   )}, params: ${JSON.stringify(params)}}`;
