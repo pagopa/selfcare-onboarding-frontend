@@ -210,14 +210,15 @@ export default function AsyncAutocompleteContainer({
     const outcome = getFetchOutcome(searchResponse);
 
     if (outcome === 'success') {
-      setAooResult((searchResponse as AxiosResponse).data);
-      setAooResultHistory((searchResponse as AxiosResponse).data);
+      setAooResult((searchResponse as AxiosResponse).data[0]);
+      setAooResultHistory((searchResponse as AxiosResponse).data[0]);
     } else if ((searchResponse as AxiosError).response?.status === 404) {
       setAooResult(undefined);
     }
 
     setIsLoading(false);
   };
+
   const handleSearchByUoCode = async (
     addUser: boolean,
     endpoint: ApiEndpointKey,
@@ -450,8 +451,6 @@ export default function AsyncAutocompleteContainer({
         ) : (
           <>
             {(isTaxCodeSelected || isAooCodeSelected || isUoCodeSelected || isIvassCodeSelected) &&
-            !isBusinessNameSelected &&
-            input !== undefined &&
             input?.length >= 5 &&
             !selected &&
             (cfResult || uoResult || aooResult) ? (

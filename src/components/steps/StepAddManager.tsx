@@ -87,9 +87,10 @@ export function StepAddManager({
   };
 
   const checkManager = async (user: UserOnCreate) => {
+    setLoading(true);
     const request = await fetchWithLogs(
       {
-        endpoint: 'ONBOARDING_USER_VALIDATION',
+        endpoint: 'ONBOARDING_CHECK_MANAGER',
       },
       {
         method: 'POST',
@@ -100,7 +101,7 @@ export function StepAddManager({
           productId: product?.id,
           subunitCode: onboardingFormData?.aooUniqueCode ?? onboardingFormData?.uoUniqueCode,
           taxCode: selectedParty?.taxCode ?? onboardingFormData?.taxCode,
-          user: [user],
+          users: [user],
         },
       },
       () => setRequiredLogin(true)
@@ -109,13 +110,10 @@ export function StepAddManager({
     const result = getFetchOutcome(request);
 
     if (result === 'success') {
-      const response = (request as AxiosResponse).data;
-      if (response === true) {
-        setIsChangedManager(false);
-      } else {
-        setIsChangedManager(true);
-      }
+      const response = (request as AxiosResponse).data.result;
+      setIsChangedManager(!response);
     }
+    setLoading(false);
   };
 
   const validateUserData = (
@@ -217,8 +215,11 @@ export function StepAddManager({
           }}
           forward={{
             action: () => {
-              validateUserData(people.LEGAL, 'LEGAL', externalInstitutionId, subProduct);
-              void checkManager(people.LEGAL);
+              if (addUserFlow) {
+                void checkManager(people.LEGAL);
+              } else if (!isChangedManager) {
+                validateUserData(people.LEGAL, 'LEGAL', externalInstitutionId, subProduct);
+              }
             },
             label: t('stepAddManager.continue'),
             disabled:
@@ -250,7 +251,7 @@ export function StepAddManager({
         }
         onCloseLabel={t('stepAddManager.back')}
         onConfirmLabel={t('stepAddManager.continue')}
-        onConfirm={() => forward()}
+        onConfirm={() => validateUserData(people.LEGAL, 'LEGAL', externalInstitutionId, subProduct)}
         handleClose={() => setIsChangedManager(false)}
       />
     </Grid>
