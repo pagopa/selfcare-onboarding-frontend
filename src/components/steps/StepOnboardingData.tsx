@@ -41,7 +41,7 @@ const genericError: RequestOutcomeMessage = {
             Ti chiediamo di riprovare più tardi.
           </Trans>
         }
-        buttonLabel={<Trans i18nKey="stepVerifyOnboarding.genericError.backAction" />}
+        buttonLabel={<Trans i18nKey="stepVerifyOnboarding.genericError.backHome" />}
         onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
       />
       ,
