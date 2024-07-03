@@ -4,6 +4,7 @@ import { renderComponentWithProviders } from '../../utils/test-utils';
 import StepInstitutionType from '../steps/StepInstitutionType';
 import { screen } from '@testing-library/react';
 import '../../locale';
+import React from 'react';
 
 test('Test: Render test', async () => {
   renderComponentWithProviders(
@@ -30,10 +31,10 @@ test('Test: The correct institution types with the expected descriptions, can be
       switch (p.id) {
         case 'prod-io':
         case 'prod-pagopa':
-          expect(institutionTypeValues).toStrictEqual(['PA', 'GSP', 'SCP', 'PT']);
+          expect(institutionTypeValues).toStrictEqual(['PA', 'GSP', 'PT']);
           break;
         case 'prod-io-sign':
-          expect(institutionTypeValues).toStrictEqual(['PA', 'GSP', 'SCP']);
+          expect(institutionTypeValues).toStrictEqual(['PA', 'GSP']);
           break;
         case 'prod-idpay':
         case 'prod-pn':
