@@ -113,11 +113,9 @@ export default {
       backHome: 'Torna alla home',
     },
     genericError: {
-      title: 'Spiacenti, qualcosa è andato storto.',
-      description: `A causa di un errore del sistema non è possibile completare la procedura.
-      <1/>
-      Ti chiediamo di riprovare più tardi.`,
-      backAction: 'Chiudi',
+      title: 'Qualcosa è andato storto',
+      description: `A causa di un errore del sistema non è possibile completare <br />la procedura. Ti chiediamo di riprovare più tardi.`,
+      backHome: 'Torna alla home',
     },
     userNotAllowedError: {
       title: 'Non puoi aderire a questo prodotto',

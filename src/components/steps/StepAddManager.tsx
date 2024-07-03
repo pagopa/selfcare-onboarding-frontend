@@ -5,7 +5,13 @@ import { uniqueId } from 'lodash';
 import { useContext, useEffect, useRef, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { AxiosResponse } from 'axios';
-import { InstitutionType, Product, StepperStepComponentProps, UserOnCreate } from '../../../types';
+import {
+  InstitutionType,
+  Product,
+  RequestOutcomeMessage,
+  StepperStepComponentProps,
+  UserOnCreate,
+} from '../../../types';
 import { UserContext } from '../../lib/context';
 import { objectIsEmpty } from '../../lib/object-utils';
 import { userValidate } from '../../utils/api/userValidate';
@@ -16,6 +22,7 @@ import { RolesInformations } from '../RolesInformations';
 import { fetchWithLogs } from '../../lib/api-utils';
 import { OnboardingFormData } from '../../model/OnboardingFormData';
 import { getFetchOutcome } from '../../lib/error-utils';
+import { genericError } from '../../views/onboardingProduct/components/StepVerifyOnboarding';
 
 // Could be an ES6 Set but it's too bothersome for now
 export type UsersObject = { [key: string]: UserOnCreate };
@@ -30,6 +37,7 @@ type Props = StepperStepComponentProps & {
   onboardingFormData?: OnboardingFormData;
   selectedParty?: any;
   institutionType?: InstitutionType;
+  setOutcome: React.Dispatch<React.SetStateAction<RequestOutcomeMessage | null | undefined>>;
 };
 
 export function StepAddManager({
@@ -44,12 +52,13 @@ export function StepAddManager({
   onboardingFormData,
   selectedParty,
   institutionType,
+  setOutcome,
 }: Props) {
   const { setRequiredLogin } = useContext(UserContext);
   const [_loading, setLoading] = useState(true);
   const [people, setPeople, setPeopleHistory] = useHistoryState<UsersObject>('people_step2', {});
   const [peopleErrors, setPeopleErrors] = useState<UsersError>();
-  const [genericError, setGenericError] = useState<boolean>(false);
+  const [isGenericError, setIsGenericError] = useState<boolean>(false);
   const [isChangedManager, setIsChangedManager] = useState<boolean>(false);
   const requestIdRef = useRef<string>();
   const { t } = useTranslation();
@@ -72,7 +81,7 @@ export function StepAddManager({
   }, [premiumFlow]);
 
   const onUserValidateSuccess = () => {
-    setGenericError(false);
+    setIsGenericError(false);
     onForwardAction();
   };
 
@@ -83,7 +92,7 @@ export function StepAddManager({
   };
 
   const onUserValidateGenericError = () => {
-    setGenericError(true);
+    setIsGenericError(true);
   };
 
   const checkManager = async (user: UserOnCreate) => {
@@ -115,6 +124,8 @@ export function StepAddManager({
       if (response) {
         validateUserData(people.LEGAL, 'LEGAL', externalInstitutionId, subProduct);
       }
+    } else {
+      setOutcome(genericError);
     }
     setLoading(false);
   };
@@ -154,7 +165,7 @@ export function StepAddManager({
   };
 
   const handleCloseGenericErrorModal = () => {
-    setGenericError(false);
+    setIsGenericError(false);
   };
 
   return (
@@ -231,7 +242,7 @@ export function StepAddManager({
         />
       </Grid>
       <SessionModal
-        open={genericError}
+        open={isGenericError}
         title={t('onboarding.error.title')}
         message={
           <Trans i18nKey="onboarding.error.description">
