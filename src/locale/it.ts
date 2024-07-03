@@ -136,6 +136,7 @@ export default {
       },
       bodyDescription:
         'Inserisci uno dei dati richiesti e cerca dall’Indice della Pubblica <1/> Amministrazione (IPA) l’ente per cui vuoi richiedere l’adesione a <3/><4>{{productTitle}}</4>.',
+      aggregator: 'Sono un ente aggregatore',
       ipaDescription: `Non trovi il tuo ente nell'IPA? <1>In questa pagina</1> trovi maggiori <3/> informazioni sull'indice e su come accreditarsi `,
       selectedInstitution:
         'Prosegui con l’adesione a <1>{{productName}}</1> per l’ente selezionato',
