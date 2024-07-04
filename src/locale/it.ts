@@ -637,6 +637,7 @@ export default {
       },
       assistanceContact: {
         supportEmail: 'Indirizzo email visibile ai cittadini',
+        supportEmailOptional: "Indirizzo email visibile ai cittadini (facoltativo)",
         supportEmailDescriprion:
           'È il contatto che i cittadini visualizzano per richiedere assistenza all’ente',
       },
