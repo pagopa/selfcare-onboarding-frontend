@@ -87,12 +87,13 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
   let party;
   let aooSelected;
   let uoSelected;
+  let productId;
 
   // TODO Temporary excluded the PSP institutionType
   mockedProducts.forEach((product) => {
     institutionTypes.forEach((institutionType) => {
       if (!componentRendered) {
-        const productId = product.id;
+        productId = product.id;
 
         switch (productId) {
           case 'prod-pn':
@@ -153,6 +154,7 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
             aooSelected={aooSelected}
             uoSelected={uoSelected}
             isDisabled={isDisabled}
+            setInvalidTaxCodeInvoicing={jest.fn()}
           />
         );
 
@@ -195,6 +197,7 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
     const sdiCode = screen.queryByText('Codice SDI');
     const shareCapital = screen.queryByText('Capitale sociale (facoltativo)');
     const visibleCitizenMail = screen.queryByText('Indirizzo email visibile ai cittadini');
+    const visibleCitizenMailOptional = screen.queryByText('Indirizzo email visibile ai cittadini (facoltativo)');
 
     if (aooSelected) {
       expect(businessName).not.toBeInTheDocument();
@@ -254,7 +257,7 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
     if (institutionAvoidGeotax) {
       expect(visibleCitizenMail).not.toBeInTheDocument();
     } else {
-      expect(visibleCitizenMail).toBeInTheDocument();
+      expect(productId === "prod-io" ? visibleCitizenMail : visibleCitizenMailOptional).toBeInTheDocument();
     }
 
     const isTaxCodeEquals2PIVA = document.getElementById('taxCodeEquals2VatNumber');
