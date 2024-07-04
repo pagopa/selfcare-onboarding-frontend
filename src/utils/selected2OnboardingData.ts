@@ -26,4 +26,5 @@ export const selected2OnboardingData = (selectedParty: any): OnboardingFormData 
   zipCode: selectedParty?.CAP ? selectedParty.CAP : selectedParty?.zipCode,
   geographicTaxonomies: [],
   originId: selectedParty?.originId,
+  origin: selectedParty?.origin,
 });
