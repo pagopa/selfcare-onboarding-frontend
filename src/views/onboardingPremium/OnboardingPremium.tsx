@@ -314,6 +314,7 @@ function OnboardingPremiumComponent() {
           externalInstitutionId,
           addUserFlow: false,
           product,
+          setOutcome: () => {},
           forward: forwardWithManagerData,
           back: () => {
             if (window.location.search.indexOf(`partyExternalId=${externalInstitutionId}`) > -1) {

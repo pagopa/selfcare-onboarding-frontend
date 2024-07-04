@@ -132,7 +132,7 @@ test('test error retrieving onboarding info', async () => {
   renderComponent('prod-pagopa');
   await executeStepInstitutionType('prod-pagopa');
   await executeStep1('AGENCY INFO ERROR', 'prod-pagopa', 'pa');
-  await waitFor(() => screen.getByText('Spiacenti, qualcosa è andato storto.'));
+  await waitFor(() => screen.getByText('Qualcosa è andato storto'));
   await executeGoHome(false);
 });
 
@@ -247,11 +247,6 @@ test('test complete onboarding AOO with product interop', async () => {
   expect(onboardingCompleted).toBeInTheDocument();
 });
 
-test('test label recipientCode only for institutionType is not PA', async () => {
-  renderComponent('prod-io-sign');
-  await executeStepInstitutionTypeScp();
-  await executeStepBillingDataLabels();
-});
 ENV.PT.SHOW_PT &&
   test.skip('test prod-io only for institutionType is PT and PT already onboarded', async () => {
     renderComponent('prod-pagopa');
@@ -301,13 +296,9 @@ const retrieveNavigationButtons = async () => {
 
 const executeGoHome = async (expectedSuccessfulSubmit) => {
   console.log('Go Home');
-  const goHomeButton = !expectedSuccessfulSubmit
-    ? screen.getByRole('button', {
-        name: 'Chiudi',
-      })
-    : screen.getByRole('button', {
-        name: 'Torna alla home',
-      });
+  const goHomeButton = screen.getByRole('button', {
+    name: 'Torna alla home',
+  });
   expect(goHomeButton).toBeEnabled();
   fireEvent.click(goHomeButton);
   await waitFor(() => expect(mockedLocation.assign).toBeCalledWith(ENV.URL_FE.LANDING));
@@ -521,19 +512,6 @@ const executeStepInstitutionType = async (productSelected) => {
     fireEvent.click(confirmButtonEnabled);
   }
   await waitFor(() => screen.getByText(step1Title));
-};
-
-const executeStepInstitutionTypeScp = async () => {
-  console.log('Testing step Institution Type');
-  await waitFor(() => screen.getByText(stepInstitutionType));
-
-  await fillInstitutionTypeCheckbox('scp');
-
-  const confirmButtonEnabled = screen.getByRole('button', { name: 'Continua' });
-  expect(confirmButtonEnabled).toBeEnabled();
-
-  fireEvent.click(confirmButtonEnabled);
-  await waitFor(() => screen.getByText('Indica i dati del tuo ente'));
 };
 
 const executeStepInstitutionTypePt = async () => {

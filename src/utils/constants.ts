@@ -218,8 +218,13 @@ export const institutionType4Product = (productId: string | undefined) => {
         (it) =>
           it.labelKey === 'pa' ||
           it.labelKey === 'gsp' ||
-          it.labelKey === 'scp' ||
           (ENV.PT.SHOW_PT ? it.labelKey === 'pt' : '')
+      );
+    case 'prod-io-sign':
+      return institutionTypes.filter(
+        (it) =>
+          it.labelKey === 'pa' ||
+          it.labelKey === 'gsp'
       );
     default:
       return institutionTypes.filter(
