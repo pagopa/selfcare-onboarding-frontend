@@ -44,14 +44,13 @@ export const genericError: RequestOutcomeMessage = {
         title={<Trans i18nKey="stepVerifyOnboarding.genericError.title" />}
         description={
           <Trans i18nKey="stepVerifyOnboarding.genericError.description">
-            A causa di un errore del sistema non è possibile completare la procedura.
-            <br />
-            Ti chiediamo di riprovare più tardi.
+            A causa di un errore del sistema non è possibile completare <br />
+            la procedura. Ti chiediamo di riprovare più tardi.
           </Trans>
         }
         variantTitle={'h4'}
         variantDescription={'body1'}
-        buttonLabel={<Trans i18nKey="stepVerifyOnboarding.genericError.backAction" />}
+        buttonLabel={<Trans i18nKey="stepVerifyOnboarding.genericError.backHome" />}
         onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
       />
     </>,
