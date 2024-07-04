@@ -4,7 +4,7 @@ import { EndingPage } from '@pagopa/selfcare-common-frontend';
 import { Trans } from 'react-i18next';
 import { useHistory } from 'react-router';
 import { RolesInformations } from '../components/RolesInformations';
-import { ROUTES } from '../utils/constants';
+import { ROUTES, addUserFlowProducts } from '../utils/constants';
 import { ENV } from '../utils/env';
 import { InstitutionType, Product } from '../../types';
 
@@ -20,6 +20,9 @@ export default function AlreadyOnboarded({
   institutionType,
 }: Props) {
   const history = useHistory();
+  const isEnabledProduct2AddUser = !!(
+    selectedProduct?.id && addUserFlowProducts(selectedProduct.id)
+  );
   return (
     <EndingPage
       minHeight="52vh"
@@ -44,29 +47,31 @@ export default function AlreadyOnboarded({
           </Grid>
         </Grid>
       }
-      isParagraphPresent={true}
+      isParagraphPresent={isEnabledProduct2AddUser}
       paragraph={
-        <Trans
-          i18nKey="stepVerifyOnboarding.alreadyOnboarded.addNewAdmin"
-          components={{
-            1: <br />,
-            3: (
-              <Link
-                underline="none"
-                sx={{ cursor: 'pointer' }}
-                onClick={() => {
-                  history.push(ROUTES.ONBOARDING_USER.PATH, {
-                    data: { institutionType, party: selectedParty, product: selectedProduct },
-                  });
-                }}
-              />
-            ),
-          }}
-        >
-          {
-            'Gli attuali Amministratori non sono più disponibili e hai l’esigenza <1 />di gestire i prodotti? <3>Aggiungi un nuovo Amministratore</3>'
-          }
-        </Trans>
+        isEnabledProduct2AddUser && (
+          <Trans
+            i18nKey="stepVerifyOnboarding.alreadyOnboarded.addNewAdmin"
+            components={{
+              1: <br />,
+              3: (
+                <Link
+                  underline="none"
+                  sx={{ cursor: 'pointer' }}
+                  onClick={() => {
+                    history.push(ROUTES.ONBOARDING_USER.PATH, {
+                      data: { institutionType, party: selectedParty, product: selectedProduct },
+                    });
+                  }}
+                />
+              ),
+            }}
+          >
+            {
+              'Gli attuali Amministratori non sono più disponibili e hai l’esigenza <1 />di gestire i prodotti? <3>Aggiungi un nuovo Amministratore</3>'
+            }
+          </Trans>
+        )
       }
       buttonLabel={<Trans i18nKey="stepVerifyOnboarding.alreadyOnboarded.backHome" />}
       onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
