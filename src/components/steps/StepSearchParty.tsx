@@ -4,6 +4,7 @@ import { AxiosError, AxiosResponse } from 'axios';
 import { ReactElement, useContext, useEffect, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import Checkbox from '@mui/material/Checkbox';
+import { SessionModal } from '@pagopa/selfcare-common-frontend';
 import {
   IPACatalogParty,
   InstitutionType,
@@ -88,6 +89,8 @@ export function StepSearchParty({
   );
   const [dataFromAooUo, setDataFromAooUo] = useState<IPACatalogParty | null>();
   const [disabled, setDisabled] = useState<boolean>(false);
+  const [isAggregator, setIsAggregator] = useState<boolean>(false);
+  const [open, setOpen] = useState<boolean>(false);
 
   const isEnabledProduct2AooUo = product?.id === 'prod-pn';
 
@@ -396,7 +399,7 @@ export function StepSearchParty({
             <FormControlLabel
               value={false}
               control={<Checkbox size="small" />}
-              onClick={() => {}}
+              onClick={() => setIsAggregator(true)}
               label={t('onboardingStep1.onboarding.aggregator')}
             />
           </Grid>
@@ -475,12 +478,35 @@ export function StepSearchParty({
               : undefined
           }
           forward={{
-            action: onForwardAction,
+            action: () => {
+              if (isAggregator) {
+                setOpen(true);
+              } else {
+                onForwardAction();
+              }
+            },
             label: t('onboardingStep1.onboarding.onboardingStepActions.confirmAction'),
             disabled,
           }}
         />
       </Grid>
+      <SessionModal
+        open={open}
+        title={t('onboardingStep1.onboarding.aggregatorModal.title')}
+        message={
+          <Trans
+            i18nKey={'onboardingStep1.onboarding.aggregatorModal.message'}
+            components={{ 1: <br /> }}
+            values={{ partyName: selected?.description }}
+          >
+            {`Stai richiedendo l’adesione come ente aggregatore per {{partyName}}.<1 />Per completare l’adesione, dovrai indicare gli enti da aggregare.`}
+          </Trans>
+        }
+        onCloseLabel={t('onboardingStep1.onboarding.aggregatorModal.back')}
+        onConfirmLabel={t('onboardingStep1.onboarding.aggregatorModal.forward')}
+        handleClose={() => setOpen(false)}
+        onConfirm={onForwardAction}
+      />
     </Grid>
   );
 }
