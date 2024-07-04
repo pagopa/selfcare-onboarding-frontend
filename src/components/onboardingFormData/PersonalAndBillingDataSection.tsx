@@ -856,11 +856,11 @@ export default function PersonalAndBillingDataSection({
                     'businessRegisterPlace',
                     isContractingAuthority
                       ? t(
-                          'onboardingFormData.billingDataSection.informationCompanies.requiredCommercialRegisterNumber'
-                        )
+                        'onboardingFormData.billingDataSection.informationCompanies.requiredCommercialRegisterNumber'
+                      )
                       : t(
-                          'onboardingFormData.billingDataSection.informationCompanies.commercialRegisterNumber'
-                        ),
+                        'onboardingFormData.billingDataSection.informationCompanies.commercialRegisterNumber'
+                      ),
                     600,
                     theme.palette.text.primary
                   )}
@@ -886,11 +886,11 @@ export default function PersonalAndBillingDataSection({
                     'shareCapital',
                     isContractingAuthority
                       ? t(
-                          'onboardingFormData.billingDataSection.informationCompanies.requiredShareCapital'
-                        )
+                        'onboardingFormData.billingDataSection.informationCompanies.requiredShareCapital'
+                      )
                       : t(
-                          'onboardingFormData.billingDataSection.informationCompanies.shareCapital'
-                        ),
+                        'onboardingFormData.billingDataSection.informationCompanies.shareCapital'
+                      ),
                     600,
                     theme.palette.text.primary
                   )}
@@ -968,9 +968,11 @@ export default function PersonalAndBillingDataSection({
               <CustomTextField
                 {...baseTextFieldProps(
                   'supportEmail',
-                  t('onboardingFormData.billingDataSection.assistanceContact.supportEmail'),
+                  t(productId === "prod-io-sign"
+                    ? 'onboardingFormData.billingDataSection.assistanceContact.supportEmail'
+                    : 'onboardingFormData.billingDataSection.assistanceContact.supportEmailOptional'),
                   600,
-                  theme.palette.text.primary
+                  theme.palette.text.primary,
                 )}
               />
               {/* descrizione indirizzo mail di supporto */}
