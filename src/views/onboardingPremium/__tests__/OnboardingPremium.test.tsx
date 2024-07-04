@@ -113,8 +113,8 @@ test('test error retrieving onboarding info', async () => {
   renderComponent('prod-io', 'prod-io-premium');
   await executeStepSelectPricingPlan();
   await executeStepSelectInstitution('Comune di Gessate');
-  await waitFor(() => screen.getByText('Spiacenti, qualcosa è andato storto.'));
-  await executeClickCloseButton();
+  await waitFor(() => screen.getByText('Qualcosa è andato storto'));
+  await executeClickCloseButton(false);
 });
 
 test('test onboarding complete', async () => {
@@ -123,7 +123,7 @@ test('test onboarding complete', async () => {
   await executeStepSelectInstitution('Comune di Milano');
   await executeStepBillingData();
   await executeStepAddManager(true);
-  await executeClickCloseButton();
+  await executeClickCloseButton(true);
   await verifySubmitPostLegals();
 });
 
@@ -300,11 +300,11 @@ const executeClickHomeButton = async () => {
   await waitFor(() => expect(mockedLocation.assign).toBeCalledWith(ENV.URL_FE.LANDING));
 };
 
-const executeClickCloseButton = async () => {
+const executeClickCloseButton = async (expectedSuccessfulSubmit: boolean) => {
   console.log('Pressing Close button and go to landing');
   const closeButton = await waitFor(() =>
     screen.getByRole('button', {
-      name: 'Chiudi',
+      name: expectedSuccessfulSubmit ? 'Chiudi' : 'Torna alla home',
     })
   );
   expect(closeButton).toBeEnabled();

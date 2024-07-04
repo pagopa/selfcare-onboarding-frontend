@@ -31,6 +31,9 @@ test('Test: Expected link that allow the public service manager to insert party 
 
   screen.getByText(/Inserisci manualmente i dati del tuo ente./);
 
+  const aggregator = screen.queryByText('Sono un ente aggregatore');
+  expect(aggregator).not.toBeInTheDocument();
+
   const selectSearchMode = document.getElementById('party-type-select') as HTMLInputElement;
   fireEvent.mouseDown(selectSearchMode);
 
@@ -88,6 +91,9 @@ test('Test: The public service manager that onboard one of this products must se
 
   screen.getByText(/informazioni sull'indice e su come accreditarsi/);
 
+  const aggregator = screen.queryByText('Sono un ente aggregatore');
+  expect(aggregator).not.toBeInTheDocument();
+
   const selectSearchMode = document.getElementById('party-type-select') as HTMLInputElement;
   fireEvent.mouseDown(selectSearchMode);
 
@@ -119,4 +125,27 @@ test('Test: The public service manager that onboard one of this products must se
 
   fireEvent.change(inputSearch, { target: { value: 'val' } });
   expect(continueButton).toBeDisabled();
+});
+
+test('Test: Onboarding as PA institution type, expected the aggregator checkbox', async () => {
+  let componentRendered = false;
+
+  mockedProducts.forEach((p) => {
+    if (!componentRendered) {
+      renderComponentWithProviders(
+        <StepSearchParty
+          subTitle={''}
+          externalInstitutionId={mockPartyRegistry.items[0].taxCode}
+          institutionType="PA"
+          product={p}
+        />
+      );
+      componentRendered = true;
+    }
+  });
+
+  screen.getByText(/informazioni sull'indice e su come accreditarsi/);
+
+  const aggregator = screen.queryByText('Sono un ente aggregatore');
+  expect(aggregator).toBeInTheDocument();
 });

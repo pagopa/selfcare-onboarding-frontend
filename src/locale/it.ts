@@ -113,11 +113,9 @@ export default {
       backHome: 'Torna alla home',
     },
     genericError: {
-      title: 'Spiacenti, qualcosa è andato storto.',
-      description: `A causa di un errore del sistema non è possibile completare la procedura.
-      <1/>
-      Ti chiediamo di riprovare più tardi.`,
-      backAction: 'Chiudi',
+      title: 'Qualcosa è andato storto',
+      description: `A causa di un errore del sistema non è possibile completare <br />la procedura. Ti chiediamo di riprovare più tardi.`,
+      backHome: 'Torna alla home',
     },
     userNotAllowedError: {
       title: 'Non puoi aderire a questo prodotto',
@@ -136,6 +134,7 @@ export default {
       },
       bodyDescription:
         'Inserisci uno dei dati richiesti e cerca dall’Indice della Pubblica <1/> Amministrazione (IPA) l’ente per cui vuoi richiedere l’adesione a <3/><4>{{productTitle}}</4>.',
+      aggregator: 'Sono un ente aggregatore',
       ipaDescription: `Non trovi il tuo ente nell'IPA? <1>In questa pagina</1> trovi maggiori <3/> informazioni sull'indice e su come accreditarsi `,
       selectedInstitution:
         'Prosegui con l’adesione a <1>{{productName}}</1> per l’ente selezionato',

@@ -132,7 +132,7 @@ test('test error retrieving onboarding info', async () => {
   renderComponent('prod-pagopa');
   await executeStepInstitutionType('prod-pagopa');
   await executeStep1('AGENCY INFO ERROR', 'prod-pagopa', 'pa');
-  await waitFor(() => screen.getByText('Spiacenti, qualcosa è andato storto.'));
+  await waitFor(() => screen.getByText('Qualcosa è andato storto'));
   await executeGoHome(false);
 });
 
@@ -296,13 +296,9 @@ const retrieveNavigationButtons = async () => {
 
 const executeGoHome = async (expectedSuccessfulSubmit) => {
   console.log('Go Home');
-  const goHomeButton = !expectedSuccessfulSubmit
-    ? screen.getByRole('button', {
-        name: 'Chiudi',
-      })
-    : screen.getByRole('button', {
-        name: 'Torna alla home',
-      });
+  const goHomeButton = screen.getByRole('button', {
+    name: 'Torna alla home',
+  });
   expect(goHomeButton).toBeEnabled();
   fireEvent.click(goHomeButton);
   await waitFor(() => expect(mockedLocation.assign).toBeCalledWith(ENV.URL_FE.LANDING));

@@ -1,8 +1,9 @@
-import { Alert, Grid, Link, Typography, useTheme } from '@mui/material';
+import { Alert, FormControlLabel, Grid, Link, Typography, useTheme } from '@mui/material';
 import { Box } from '@mui/system';
 import { AxiosError, AxiosResponse } from 'axios';
 import { ReactElement, useContext, useEffect, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
+import Checkbox from '@mui/material/Checkbox';
 import {
   IPACatalogParty,
   InstitutionType,
@@ -311,7 +312,7 @@ export function StepSearchParty({
         </Grid>
       </Grid>
 
-      <Grid container item justifyContent="center" mt={4} mb={4}>
+      <Grid container item sx={{ alignItems: 'center', flexDirection: 'column' }} mt={4} mb={4}>
         {product?.id === 'prod-pn' && (
           <Grid container item justifyContent="center">
             <Grid item display="flex" justifyContent="center" mb={5}>
@@ -390,6 +391,16 @@ export function StepSearchParty({
             institutionType={institutionType}
           />
         </Grid>
+        {institutionType === 'PA' && (
+          <Grid item mt={3}>
+            <FormControlLabel
+              value={false}
+              control={<Checkbox size="small" />}
+              onClick={() => {}}
+              label={t('onboardingStep1.onboarding.aggregator')}
+            />
+          </Grid>
+        )}
       </Grid>
       {institutionType !== 'SA' && institutionType !== 'AS' && (
         <Grid container item justifyContent="center">
