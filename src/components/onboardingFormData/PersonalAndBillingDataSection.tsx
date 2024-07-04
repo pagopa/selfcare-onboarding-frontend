@@ -968,7 +968,7 @@ export default function PersonalAndBillingDataSection({
               <CustomTextField
                 {...baseTextFieldProps(
                   'supportEmail',
-                  t(productId === "prod-io"
+                  t(productId === "prod-io-sign"
                     ? 'onboardingFormData.billingDataSection.assistanceContact.supportEmail'
                     : 'onboardingFormData.billingDataSection.assistanceContact.supportEmailOptional'),
                   600,
