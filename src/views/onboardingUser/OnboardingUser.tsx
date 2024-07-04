@@ -200,6 +200,7 @@ function OnboardingUserComponent() {
           forward: forwardWithProduct,
           back,
           setLoading,
+          setOutcome,
           institutionType,
         }),
     },
