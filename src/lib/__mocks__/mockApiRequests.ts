@@ -668,6 +668,7 @@ const mockedOnboardingData: Array<InstitutionOnboardingInfoResource> = [
 const mockedOnboardedParties: Array<OnboardedParty> = [
   {
     id: '1',
+    description: 'onboardedParty1',
     institutionType: 'PA',
     origin: 'IPA',
     originId: 'sdsdee',
@@ -676,6 +677,7 @@ const mockedOnboardedParties: Array<OnboardedParty> = [
   },
   {
     id: '1',
+    description: 'onboardedParty2',
     institutionType: 'PA',
     origin: 'IPA',
     originId: 'sdsdee',

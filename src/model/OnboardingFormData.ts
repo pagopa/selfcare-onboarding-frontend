@@ -34,4 +34,5 @@ export type OnboardingFormData = {
   uoUniqueCode?: string;
   isForeignInsurance?: boolean;
   hasVatnumber?: boolean;
+  origin?: string;
 };
