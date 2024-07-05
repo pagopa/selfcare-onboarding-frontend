@@ -221,11 +221,7 @@ export const institutionType4Product = (productId: string | undefined) => {
           (ENV.PT.SHOW_PT ? it.labelKey === 'pt' : '')
       );
     case 'prod-io-sign':
-      return institutionTypes.filter(
-        (it) =>
-          it.labelKey === 'pa' ||
-          it.labelKey === 'gsp'
-      );
+      return institutionTypes.filter((it) => it.labelKey === 'pa' || it.labelKey === 'gsp');
     default:
       return institutionTypes.filter(
         (it) => it.labelKey === 'pa' || it.labelKey === 'gsp' || it.labelKey === 'scp'
@@ -250,3 +246,6 @@ export const description4InstitutionType = (institutionType: InstitutionType) =>
       return '';
   }
 };
+
+export const buildUrlLogo = (partyId: string) =>
+  `${ENV.URL_INSTITUTION_LOGO.PREFIX}${partyId}${ENV.URL_INSTITUTION_LOGO.SUFFIX}`;

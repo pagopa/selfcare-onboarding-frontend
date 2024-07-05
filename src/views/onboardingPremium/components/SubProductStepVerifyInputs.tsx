@@ -7,7 +7,7 @@ import { fetchWithLogs } from '../../../lib/api-utils';
 import { getFetchOutcome } from '../../../lib/error-utils';
 import NoProductPage from '../../NoProductPage';
 import { unregisterUnloadEvent } from '../../../utils/unloadEvent-utils';
-import { ENV } from '../../../utils/env';
+import { buildUrlLogo } from '../../../utils/constants';
 
 type Props = StepperStepComponentProps & {
   requestId: string;
@@ -38,9 +38,6 @@ const checkProduct = async (
     setter(null);
   }
 };
-
-const buildUrlLog = (partyId: string) =>
-  `${ENV.URL_INSTITUTION_LOGO.PREFIX}${partyId}${ENV.URL_INSTITUTION_LOGO.SUFFIX}`;
 
 const handleSearchUserParties = async (
   setParties: (parties: Array<SelfcareParty>) => void,
@@ -81,14 +78,14 @@ const handleSearchUserParties = async (
       setParties(
         partiesWithBaseProduct.map((p) => ({
           ...p,
-          urlLogo: buildUrlLog(p.id),
+          urlLogo: buildUrlLogo(p.id),
         }))
       );
     } else {
       setParties(
         partiesWithoutPremium.map((p) => ({
           ...p,
-          urlLogo: buildUrlLog(p.id),
+          urlLogo: buildUrlLogo(p.id),
         }))
       );
     }
