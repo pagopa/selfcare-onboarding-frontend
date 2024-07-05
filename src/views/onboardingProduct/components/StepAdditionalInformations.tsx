@@ -14,7 +14,7 @@ import { OnboardingStepActions } from '../../../components/OnboardingStepActions
 import { RadioWithTextField } from '../../../components/RadioWithTextField';
 import { StepperStepComponentProps } from '../../../../types';
 
-export function StepAdditionalInformations({ forward, back }: StepperStepComponentProps) {
+export function StepAdditionalInformations({ forward, back }: StepperStepComponentProps, origin?: string) {
   const { t } = useTranslation();
   const theme = useTheme();
 
@@ -171,6 +171,7 @@ export function StepAdditionalInformations({ forward, back }: StepperStepCompone
           onRadioChange={handleRadioChange}
           onTextFieldChange={handleTextFieldChange}
           errorText={errors.isFromIPA || ''}
+          isIPA={origin === "IPA"}
         />
         <Divider />
         <RadioWithTextField

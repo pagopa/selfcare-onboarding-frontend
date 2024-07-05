@@ -19,15 +19,17 @@ type Props = {
   title: React.ReactNode;
   label: string;
   field:
-    | 'isEstabilishedRegulatoryProvision'
-    | 'fromBelongsRegulatedMarket'
-    | 'isFromIPA'
-    | 'isConcessionaireOfPublicService';
+  | 'isEstabilishedRegulatoryProvision'
+  | 'fromBelongsRegulatedMarket'
+  | 'isFromIPA'
+  | 'isConcessionaireOfPublicService';
   errorText: string;
   onRadioChange: (field: any, value: any) => void;
   onTextFieldChange: (open: boolean, field: string, value: string) => void;
+  isIPA?: boolean;
 };
 
+// eslint-disable-next-line sonarjs/cognitive-complexity
 export function RadioWithTextField({
   title,
   label,
@@ -35,11 +37,16 @@ export function RadioWithTextField({
   errorText,
   onRadioChange,
   onTextFieldChange,
+  isIPA,
 }: Props) {
   const theme = useTheme();
   const { t } = useTranslation();
 
   const [openTextField, setOpenTextField] = useState<boolean>(false);
+  const [checked, setChecked] = useState<boolean | null>(null);
+  const fieldIsFromIPA = field === 'isFromIPA';
+
+  // const handleChangeCheckEvent = (e: React.ChangeEvent<HTMLInputElement>): any => setChecked(!e.currentTarget.checked);
 
   useEffect(() => {
     if (openTextField) {
@@ -48,6 +55,12 @@ export function RadioWithTextField({
       onTextFieldChange(false, field, '');
     }
   }, [openTextField]);
+
+  useEffect(() => {
+    if (fieldIsFromIPA && typeof isIPA !== 'undefined') {
+      setChecked(isIPA);
+    }
+  }, [isIPA, fieldIsFromIPA]);
 
   return (
     <Grid item sx={{ width: '620px' }}>
@@ -68,10 +81,22 @@ export function RadioWithTextField({
         <RadioGroup sx={{ marginY: 2, paddingLeft: 1 }}>
           <FormControlLabel
             value={true}
-            control={<Radio size="small" />}
-            onClick={() => {
+            control={
+              <Radio
+                size="small"
+              />
+            }
+            checked={fieldIsFromIPA ? checked === true : undefined}
+            disabled={fieldIsFromIPA && isIPA}
+            // onChange={() => handleChangeCheckEvent}
+            onClick={(e) => {
+              if (fieldIsFromIPA && isIPA) {
+                e.preventDefault();
+                return;
+              }
+              setChecked(true);
               onRadioChange(field, true);
-              if (field === 'isFromIPA') {
+              if (fieldIsFromIPA) {
                 setOpenTextField(true);
               }
             }}
@@ -79,10 +104,22 @@ export function RadioWithTextField({
           />
           <FormControlLabel
             value={false}
-            control={<Radio size="small" />}
-            onClick={() => {
+            control={
+              <Radio
+                size="small"
+              />
+            }
+            checked={fieldIsFromIPA ? checked === false : undefined}
+            disabled={fieldIsFromIPA && isIPA}
+            // onChange={() => handleChangeCheckEvent}
+            onClick={(e) => {
+              if (fieldIsFromIPA && isIPA) {
+                e.preventDefault();
+                return;
+              }
+              setChecked(false);
               onRadioChange(field, false);
-              if (field !== 'isFromIPA' && openTextField) {
+              if (!fieldIsFromIPA && openTextField) {
                 setOpenTextField(true);
               } else {
                 setOpenTextField(false);
@@ -92,7 +129,7 @@ export function RadioWithTextField({
           />
         </RadioGroup>
       </FormControl>
-      <Grid item xs={12} mb={field === 'isFromIPA' ? 0 : 3} display="flex" flexDirection="row">
+      <Grid item xs={12} mb={fieldIsFromIPA ? 0 : 3} display="flex" flexDirection="row">
         {openTextField ? (
           <>
             {field !== 'isFromIPA' && (
@@ -118,16 +155,16 @@ export function RadioWithTextField({
               helperText={
                 errorText !== ''
                   ? errorText
-                  : field === 'isFromIPA'
-                  ? ''
-                  : t('additionalDataPage.allowedCharacters')
+                  : fieldIsFromIPA
+                    ? ''
+                    : t('additionalDataPage.allowedCharacters')
               }
               fullWidth
               sx={{
                 color: theme.palette.text.secondary,
-                marginBottom: field === 'isFromIPA' ? 3 : 0,
+                marginBottom: fieldIsFromIPA ? 3 : 0,
               }}
-              inputProps={{ maxLength: field === 'isFromIPA' ? 16 : 300 }}
+              inputProps={{ maxLength: fieldIsFromIPA ? 16 : 300 }}
               onChange={(e: any) => {
                 onTextFieldChange(true, field, e.target.value);
               }}

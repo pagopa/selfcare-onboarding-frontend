@@ -125,41 +125,41 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     title: '',
     description: isTechPartner
       ? [
-          <React.Fragment key="0">
-            <EndingPage
-              minHeight="52vh"
-              variantTitle="h4"
-              variantDescription="body1"
-              icon={<IllusError size={60} />}
-              title={<Trans i18nKey="stepVerifyOnboarding.ptAlreadyOnboarded.title" />}
-              description={
-                <Trans i18nKey="stepVerifyOnboarding.ptAlreadyOnboarded.description">
-                  Per operare su un prodotto, chiedi a un Amministratore di <br /> aggiungerti nella
-                  sezione Utenti.
-                </Trans>
-              }
-              buttonLabel={<Trans i18nKey="stepVerifyOnboarding.ptAlreadyOnboarded.backAction" />}
-              onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
-            />
-          </React.Fragment>,
-        ]
+        <React.Fragment key="0">
+          <EndingPage
+            minHeight="52vh"
+            variantTitle="h4"
+            variantDescription="body1"
+            icon={<IllusError size={60} />}
+            title={<Trans i18nKey="stepVerifyOnboarding.ptAlreadyOnboarded.title" />}
+            description={
+              <Trans i18nKey="stepVerifyOnboarding.ptAlreadyOnboarded.description">
+                Per operare su un prodotto, chiedi a un Amministratore di <br /> aggiungerti nella
+                sezione Utenti.
+              </Trans>
+            }
+            buttonLabel={<Trans i18nKey="stepVerifyOnboarding.ptAlreadyOnboarded.backAction" />}
+            onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+          />
+        </React.Fragment>,
+      ]
       : [
-          <React.Fragment key="0">
-            <AlreadyOnboarded
-              selectedParty={
-                aooSelected
-                  ? aooSelected
-                  : uoSelected
+        <React.Fragment key="0">
+          <AlreadyOnboarded
+            selectedParty={
+              aooSelected
+                ? aooSelected
+                : uoSelected
                   ? uoSelected
                   : onboardingFormData
-                  ? onboardingFormData
-                  : selectedParty
-              }
-              selectedProduct={selectedProduct}
-              institutionType={institutionType}
-            />
-          </React.Fragment>,
-        ],
+                    ? onboardingFormData
+                    : selectedParty
+            }
+            selectedProduct={selectedProduct}
+            institutionType={institutionType}
+          />
+        </React.Fragment>,
+      ],
   };
 
   useEffect(() => {
@@ -250,8 +250,8 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           subunitCode: aooSelected
             ? aooSelected.codiceUniAoo
             : uoSelected
-            ? uoSelected.codiceUniUo
-            : undefined,
+              ? uoSelected.codiceUniUo
+              : undefined,
           origin: institutionType === 'AS' ? 'IVASS' : undefined,
           originId: onboardingFormData?.originId ?? undefined,
         },
@@ -313,16 +313,16 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
       aooResult
         ? aooResult?.codiceFiscaleEnte
         : uoResult
-        ? uoResult.codiceFiscaleEnte
-        : party.externalId
+          ? uoResult.codiceFiscaleEnte
+          : party.externalId
     );
     setOrigin(party.origin);
     setOnboardingFormData({
       businessName: aooResult
         ? aooResult?.denominazioneAoo
         : uoResult
-        ? uoResult.descrizioneUo
-        : party.description,
+          ? uoResult.descrizioneUo
+          : party.description,
       aooName: aooResult?.denominazioneAoo,
       uoName: uoResult?.descrizioneUo,
       aooUniqueCode: aooResult?.codiceUniAoo,
@@ -331,24 +331,24 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
         aooResult && aooResult.tipoMail1 === 'Pec'
           ? aooResult.mail1
           : uoResult && uoResult.tipoMail1 === 'Pec'
-          ? uoResult.mail1
-          : party.digitalAddress,
+            ? uoResult.mail1
+            : party.digitalAddress,
       recipientCode:
         aooResult && aooResult.codiceUniAoo
           ? aooResult.codiceUniAoo
           : uoResult && uoResult.codiceUniUo
-          ? uoResult.codiceUniUo
-          : undefined,
+            ? uoResult.codiceUniUo
+            : undefined,
       registeredOffice: aooResult
         ? aooResult.indirizzo
         : uoResult
-        ? uoResult.indirizzo
-        : party.address,
+          ? uoResult.indirizzo
+          : party.address,
       taxCode: aooResult
         ? aooResult.codiceFiscaleEnte
         : uoResult
-        ? uoResult.codiceFiscaleEnte
-        : party.taxCode,
+          ? uoResult.codiceFiscaleEnte
+          : party.taxCode,
       vatNumber: '',
       taxCodeInvoicing: uoResult?.codiceFiscaleSfe,
       zipCode: aooResult ? aooResult.CAP : uoResult ? uoResult.CAP : party.zipCode,
@@ -490,18 +490,18 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           additionalInformations:
             institutionType === 'GSP' && selectedProduct?.id === 'prod-pagopa'
               ? {
-                  agentOfPublicService: additionalInformations?.agentOfPublicService,
-                  agentOfPublicServiceNote: additionalInformations?.agentOfPublicServiceNote,
-                  belongRegulatedMarket: additionalInformations?.belongRegulatedMarket,
-                  regulatedMarketNote: additionalInformations?.regulatedMarketNote,
-                  establishedByRegulatoryProvision:
-                    additionalInformations?.establishedByRegulatoryProvision,
-                  establishedByRegulatoryProvisionNote:
-                    additionalInformations?.establishedByRegulatoryProvisionNote,
-                  ipa: additionalInformations?.ipa,
-                  ipaCode: additionalInformations?.ipaCode,
-                  otherNote: additionalInformations?.otherNote,
-                }
+                agentOfPublicService: additionalInformations?.agentOfPublicService,
+                agentOfPublicServiceNote: additionalInformations?.agentOfPublicServiceNote,
+                belongRegulatedMarket: additionalInformations?.belongRegulatedMarket,
+                regulatedMarketNote: additionalInformations?.regulatedMarketNote,
+                establishedByRegulatoryProvision:
+                  additionalInformations?.establishedByRegulatoryProvision,
+                establishedByRegulatoryProvisionNote:
+                  additionalInformations?.establishedByRegulatoryProvisionNote,
+                ipa: additionalInformations?.ipa,
+                ipaCode: additionalInformations?.ipaCode,
+                otherNote: additionalInformations?.otherNote,
+              }
               : undefined,
           pspData:
             institutionType === 'PSP'
@@ -515,8 +515,8 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           originId: onboardingFormData?.originId,
           geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY
             ? onboardingFormData?.geographicTaxonomies?.map((gt) =>
-                onboardedInstitutionInfo2geographicTaxonomy(gt)
-              )
+              onboardedInstitutionInfo2geographicTaxonomy(gt)
+            )
             : [],
           institutionLocationData: {
             country: onboardingFormData?.country,
@@ -533,8 +533,8 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           subunitCode: aooSelected
             ? aooSelected.codiceUniAoo
             : uoSelected
-            ? uoSelected.codiceUniUo
-            : undefined,
+              ? uoSelected.codiceUniUo
+              : undefined,
           subunitType: aooSelected ? 'AOO' : uoSelected ? 'UO' : undefined,
           taxCode: onboardingFormData?.taxCode,
         },
@@ -750,7 +750,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     },
     {
       label: 'Insert additional info',
-      Component: () => StepAdditionalInformations({ forward: forwardWithAdditionalGSPInfo, back }),
+      Component: () => StepAdditionalInformations({ forward: forwardWithAdditionalGSPInfo, back }, origin),
     },
     {
       label: 'Insert manager data',
