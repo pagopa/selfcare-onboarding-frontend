@@ -88,9 +88,9 @@ export default function AsyncAutocompleteResultsCode({
             }
             partyRole={
               !isTaxCodeSelected && aooResult
-                ? aooResult.denominazioneEnte
+                ? aooResult.denominazioneEnte || aooResult.parentDescription
                 : uoResult
-                ? uoResult?.denominazioneEnte
+                ? uoResult?.denominazioneEnte || uoResult.parentDescription
                 : ''
             }
             image={' '}

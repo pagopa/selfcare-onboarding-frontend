@@ -166,7 +166,7 @@ export default function AsyncAutocompleteSearch({
                     }),
                   }}
                 >
-                  {selected.denominazioneEnte}
+                  {selected.denominazioneEnte ?? selected.parentDescription}
                 </Typography>
               )}
             </Box>
