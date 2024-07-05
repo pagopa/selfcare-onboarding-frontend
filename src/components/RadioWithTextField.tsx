@@ -27,6 +27,7 @@ type Props = {
   onRadioChange: (field: any, value: any) => void;
   onTextFieldChange: (open: boolean, field: string, value: string) => void;
   isIPA?: boolean;
+  ipaCode?: string;
 };
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
@@ -38,6 +39,7 @@ export function RadioWithTextField({
   onRadioChange,
   onTextFieldChange,
   isIPA,
+  ipaCode
 }: Props) {
   const theme = useTheme();
   const { t } = useTranslation();
@@ -45,8 +47,6 @@ export function RadioWithTextField({
   const [openTextField, setOpenTextField] = useState<boolean>(false);
   const [checked, setChecked] = useState<boolean | null>(null);
   const fieldIsFromIPA = field === 'isFromIPA';
-
-  // const handleChangeCheckEvent = (e: React.ChangeEvent<HTMLInputElement>): any => setChecked(!e.currentTarget.checked);
 
   useEffect(() => {
     if (openTextField) {
@@ -57,8 +57,14 @@ export function RadioWithTextField({
   }, [openTextField]);
 
   useEffect(() => {
-    if (fieldIsFromIPA && typeof isIPA !== 'undefined') {
-      setChecked(isIPA);
+    if (fieldIsFromIPA) {
+      if (isIPA) {
+        setChecked(true);
+        setOpenTextField(true);
+      } else {
+        setChecked(false);
+        setOpenTextField(false);
+      }
     }
   }, [isIPA, fieldIsFromIPA]);
 
@@ -111,7 +117,6 @@ export function RadioWithTextField({
             }
             checked={fieldIsFromIPA ? checked === false : undefined}
             disabled={fieldIsFromIPA && isIPA}
-            // onChange={() => handleChangeCheckEvent}
             onClick={(e) => {
               if (fieldIsFromIPA && isIPA) {
                 e.preventDefault();
@@ -168,6 +173,8 @@ export function RadioWithTextField({
               onChange={(e: any) => {
                 onTextFieldChange(true, field, e.target.value);
               }}
+              value={fieldIsFromIPA && checked === true && isIPA? ipaCode : undefined}
+              disabled={fieldIsFromIPA && checked === true && isIPA}
               error={errorText !== ''}
             />
           </>

@@ -751,7 +751,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     },
     {
       label: 'Insert additional info',
-      Component: () => StepAdditionalInformations({ forward: forwardWithAdditionalGSPInfo, back }, origin),
+      Component: () => StepAdditionalInformations({ forward: forwardWithAdditionalGSPInfo, back }, onboardingFormData?.originId, origin),
     },
     {
       label: 'Insert manager data',
