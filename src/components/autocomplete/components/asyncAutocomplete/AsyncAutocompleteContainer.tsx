@@ -4,6 +4,7 @@ import { AxiosError, AxiosResponse } from 'axios';
 import debounce from 'lodash/debounce';
 import { Dispatch, SetStateAction, useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import OnboardingPartyIcon from '../../../../assets/onboarding_party_icon.svg';
 import {
   ANACParty,
   ApiEndpointKey,
@@ -11,7 +12,6 @@ import {
   InstitutionType,
   Product,
 } from '../../../../../types';
-import { ReactComponent as PartyIcon } from '../../../../assets/onboarding_party_icon.svg';
 import { fetchWithLogs } from '../../../../lib/api-utils';
 import { UserContext } from '../../../../lib/context';
 import { getFetchOutcome } from '../../../../lib/error-utils';
@@ -19,7 +19,11 @@ import { AooData } from '../../../../model/AooData';
 import { InstitutionResource } from '../../../../model/InstitutionResource';
 import { UoData } from '../../../../model/UoModel';
 import { ENV } from '../../../../utils/env';
-import { filterByCategory, noMandatoryIpaProducts } from '../../../../utils/constants';
+import {
+  buildUrlLogo,
+  filterByCategory,
+  noMandatoryIpaProducts,
+} from '../../../../utils/constants';
 import AsyncAutocompleteResultsBusinessName from './components/AsyncAutocompleteResultsBusinessName';
 import AsyncAutocompleteResultsCode from './components/AsyncAutocompleteResultsCode';
 import AsyncAutocompleteSearch from './components/AsyncAutocompleteSearch';
@@ -97,6 +101,9 @@ export default function AsyncAutocompleteContainer({
   const { setRequiredLogin } = useContext(UserContext);
   const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(false);
+  const [partyLogo, setPartyLogo] = useState<string>(
+    selected ? buildUrlLogo(selected.id) : OnboardingPartyIcon
+  );
 
   const getOptionKey: (option: any) => string =
     optionKey !== undefined ? (o) => o[optionKey] : (o) => o.label ?? o;
@@ -124,6 +131,15 @@ export default function AsyncAutocompleteContainer({
       setDisabled(!selected);
     }
   }, [input, selected]);
+
+  useEffect(() => {
+    if (selected) {
+      const logoUrl = buildUrlLogo(selected.id);
+      setPartyLogo(logoUrl);
+    } else {
+      setPartyLogo(OnboardingPartyIcon);
+    }
+  }, [selected]);
 
   const handleSearchByName = async (
     query: string,
@@ -403,7 +419,11 @@ export default function AsyncAutocompleteContainer({
       >
         {selected && (
           <Box display="flex" alignItems="center">
-            <PartyIcon width={50} />
+            <img
+              style={{ height: 50, width: 50 }}
+              onError={() => setPartyLogo(OnboardingPartyIcon)}
+              src={partyLogo}
+            />
           </Box>
         )}
 
