@@ -67,4 +67,8 @@ export const ENV = {
   PT: {
     SHOW_PT: env.get('REACT_APP_ENABLE_PT').default('false').asBool(),
   },
+
+  AGGREGATOR: {
+    SHOW_AGGREGATOR: env.get('REACT_APP_ENABLE_AGGREGATOR').default('false').asBool(),
+  },
 };

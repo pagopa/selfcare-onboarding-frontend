@@ -22,6 +22,7 @@ import { OnboardingStepActions } from '../OnboardingStepActions';
 import { Autocomplete } from '../autocomplete/Autocomplete';
 import { useHistoryState } from '../useHistoryState';
 import { filterByCategory, noMandatoryIpaProducts } from '../../utils/constants';
+import { ENV } from '../../utils/env';
 
 type Props = {
   subTitle: string | ReactElement;
@@ -394,7 +395,7 @@ export function StepSearchParty({
             institutionType={institutionType}
           />
         </Grid>
-        {institutionType === 'PA' && (
+        {ENV.AGGREGATOR.SHOW_AGGREGATOR && institutionType === 'PA' && (
           <Grid item mt={3}>
             <FormControlLabel
               value={false}
