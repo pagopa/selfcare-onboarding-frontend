@@ -353,6 +353,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
       taxCodeInvoicing: uoResult?.codiceFiscaleSfe,
       zipCode: aooResult ? aooResult.CAP : uoResult ? uoResult.CAP : party.zipCode,
       geographicTaxonomies: onboardingFormData?.geographicTaxonomies as Array<GeographicTaxonomy>,
+      origin: party.origin,
       originId: party.originId,
     });
     forwardWithData(newFormData);
