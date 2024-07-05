@@ -18,16 +18,22 @@ import { UserContext } from '../../../lib/context';
 import { getFetchOutcome } from '../../../lib/error-utils';
 import { ProductResource } from '../../../model/ProductResource';
 import { OnboardingStepActions } from '../../../components/OnboardingStepActions';
-import { InstitutionType, StepperStepComponentProps } from '../../../../types';
+import {
+  InstitutionType,
+  RequestOutcomeMessage,
+  StepperStepComponentProps,
+} from '../../../../types';
 import { ENV } from '../../../utils/env';
 import AddUserHeading from '../AddUserHeading';
+import { genericError } from '../../onboardingProduct/components/StepVerifyOnboarding';
 
 type Props = {
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
   institutionType?: InstitutionType;
+  setOutcome: React.Dispatch<React.SetStateAction<RequestOutcomeMessage | null | undefined>>;
 } & StepperStepComponentProps;
 
-export function StepSelectProduct({ forward, setLoading, institutionType }: Props) {
+export function StepSelectProduct({ forward, setLoading, setOutcome, institutionType }: Props) {
   const { setRequiredLogin } = useContext(UserContext);
   const { t } = useTranslation();
   const [products, setProducts] = useState<Array<ProductResource>>();
@@ -45,12 +51,15 @@ export function StepSelectProduct({ forward, setLoading, institutionType }: Prop
       () => setRequiredLogin(true)
     );
     const outcome = getFetchOutcome(getProductsRequest);
-    setLoading(false);
+
     if (outcome === 'success') {
       const retrievedProducts = (getProductsRequest as AxiosResponse)
         .data as Array<ProductResource>;
       setProducts(retrievedProducts);
+    } else {
+      setOutcome(genericError);
     }
+    setLoading(false);
   };
 
   const onBackAction = () => {
