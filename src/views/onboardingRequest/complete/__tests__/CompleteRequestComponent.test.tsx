@@ -3,7 +3,7 @@ import CompleteRequestComponent from '../CompleteRequest';
 import '../../../../locale';
 import React from 'react';
 import { ENV } from '../../../../utils/env';
-import { buildAssistanceURI } from '@pagopa/selfcare-common-frontend/services/assistanceService';
+import { buildAssistanceURI } from '@pagopa/selfcare-common-frontend/lib/services/assistanceService';
 
 const oldWindowLocation = global.window.location;
 const mockedLocation = {
@@ -28,7 +28,7 @@ jest.mock('react-router-dom', () => ({
   }),
 }));
 
-jest.mock('@pagopa/selfcare-common-frontend/services/assistanceService', () => ({
+jest.mock('@pagopa/selfcare-common-frontend/lib/services/assistanceService', () => ({
   buildAssistanceURI: jest.fn(),
 }));
 

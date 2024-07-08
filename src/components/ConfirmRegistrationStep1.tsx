@@ -1,7 +1,7 @@
 import { Button, Grid, Typography, useTheme } from '@mui/material';
 import { Box } from '@mui/system';
 import { IllusUploadFile } from '@pagopa/mui-italia';
-import SessionModal from '@pagopa/selfcare-common-frontend/components/SessionModal';
+import SessionModal from '@pagopa/selfcare-common-frontend/lib/components/SessionModal';
 import { useState } from 'react';
 import { useTranslation, Trans } from 'react-i18next';
 import { StepperStepComponentProps } from '../../types';

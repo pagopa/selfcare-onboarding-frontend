@@ -1,6 +1,6 @@
 import Add from '@mui/icons-material/Add';
 import { Box, Checkbox, FormControlLabel, Grid, Link, Typography, useTheme } from '@mui/material';
-import SessionModal from '@pagopa/selfcare-common-frontend/components/SessionModal';
+import SessionModal from '@pagopa/selfcare-common-frontend/lib/components/SessionModal';
 import { omit, uniqueId } from 'lodash';
 import { ChangeEvent, useContext, useEffect, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';

@@ -1,12 +1,12 @@
 import { useEffect, useState, useContext, useRef, useMemo } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Container } from '@mui/material';
-import SessionModal from '@pagopa/selfcare-common-frontend/components/SessionModal';
-import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
+import SessionModal from '@pagopa/selfcare-common-frontend/lib/components/SessionModal';
+import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
 import { uniqueId } from 'lodash';
 import { useParams } from 'react-router';
 import { useTranslation, Trans } from 'react-i18next';
-import { EndingPage } from '@pagopa/selfcare-common-frontend';
+import { EndingPage } from '@pagopa/selfcare-common-frontend/lib';
 import { IllusError } from '@pagopa/mui-italia';
 import { withLogin } from '../../components/withLogin';
 import { InstitutionType, SelfcareParty, Product, StepperStep, UserOnCreate } from '../../../types';

@@ -4,7 +4,7 @@ import { AxiosError, AxiosResponse } from 'axios';
 import { useFormik } from 'formik';
 import { useContext, useEffect, useReducer, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
+import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
 import { uniqueId } from 'lodash';
 import {
   InstitutionType,

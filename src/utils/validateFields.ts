@@ -1,4 +1,4 @@
-import { emailRegexp } from '@pagopa/selfcare-common-frontend/utils/constants';
+import { emailRegexp } from '@pagopa/selfcare-common-frontend/lib/utils/constants';
 import { TFunction } from 'i18next';
 import { OnboardingFormData } from '../model/OnboardingFormData';
 import { InstitutionType } from '../../types';

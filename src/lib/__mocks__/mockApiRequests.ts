@@ -1,4 +1,4 @@
-import { UserRole } from '@pagopa/selfcare-common-frontend/utils/constants';
+import { UserRole } from '@pagopa/selfcare-common-frontend/lib/utils/constants';
 import { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 import {
   Endpoint,

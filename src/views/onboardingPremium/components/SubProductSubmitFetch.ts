@@ -1,4 +1,4 @@
-import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
+import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
 import { AxiosError } from 'axios';
 import { InstitutionType, Problem, Product, UserOnCreate } from '../../../../types';
 import { fetchWithLogs } from '../../../lib/api-utils';
