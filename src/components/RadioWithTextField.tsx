@@ -45,7 +45,7 @@ export function RadioWithTextField({
   const { t } = useTranslation();
 
   const [openTextField, setOpenTextField] = useState<boolean>(false);
-  const [checked, setChecked] = useState<boolean | undefined>(undefined);
+  const [checked, setChecked] = useState<boolean>();
   const fieldIsFromIPA = field === 'isFromIPA';
 
   useEffect(() => {
