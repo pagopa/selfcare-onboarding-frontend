@@ -14,7 +14,11 @@ import { OnboardingStepActions } from '../../../components/OnboardingStepActions
 import { RadioWithTextField } from '../../../components/RadioWithTextField';
 import { StepperStepComponentProps } from '../../../../types';
 
-export function StepAdditionalInformations({ forward, back }: StepperStepComponentProps) {
+type Props = StepperStepComponentProps & {
+  originId?: string;
+  origin?: string;
+};
+export function StepAdditionalInformations({ forward, back, originId, origin }: Props) {
   const { t } = useTranslation();
   const theme = useTheme();
 
@@ -47,8 +51,8 @@ export function StepAdditionalInformations({ forward, back }: StepperStepCompone
 
     setDisabled(
       !isContinueButtonEnabled ||
-        allFalseAndUnchecked ||
-        Object.values(errors).some((error) => error !== '')
+      allFalseAndUnchecked ||
+      Object.values(errors).some((error) => error !== '')
     );
   }, [radioValues, errors, isChecked]);
 
@@ -61,7 +65,18 @@ export function StepAdditionalInformations({ forward, back }: StepperStepCompone
       ...prevErrors,
       [field]: '',
     }));
+    if (field === 'isFromIPA' && value) {
+      handleTextFieldChange(true, field, originId || '');
+    }
   };
+
+  useEffect(() => {
+    if (origin === "IPA") {
+      handleRadioChange('isFromIPA', true);
+    } else {
+      handleRadioChange('isFromIPA', false);
+    }
+  }, [origin, originId]);
 
   const handleTextFieldChange = (open: boolean, field: string, value: string) => {
     setErrors((prevErrors) => ({
@@ -78,6 +93,7 @@ export function StepAdditionalInformations({ forward, back }: StepperStepCompone
     }));
   };
 
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   const validateTextField = () => {
     const newErrors = Object.keys(radioValues).reduce((acc, field) => {
       switch (field) {
@@ -88,6 +104,18 @@ export function StepAdditionalInformations({ forward, back }: StepperStepCompone
               [field]: t(
                 `additionalDataPage.formQuestions.textFields.errors.optionalPartyInformations`
               ),
+            };
+          }
+          break;
+        case 'isFromIPA':
+          if (
+            additionalData[field]?.openTextField &&
+            additionalData[field]?.textFieldValue === '' &&
+            !(radioValues[field] && origin === "IPA")
+          ) {
+            return {
+              ...acc,
+              [field]: t(`additionalDataPage.formQuestions.textFields.errors.${field}`),
             };
           }
           break;
@@ -171,6 +199,8 @@ export function StepAdditionalInformations({ forward, back }: StepperStepCompone
           onRadioChange={handleRadioChange}
           onTextFieldChange={handleTextFieldChange}
           errorText={errors.isFromIPA || ''}
+          isIPA={origin === "IPA"}
+          ipaCode={originId}
         />
         <Divider />
         <RadioWithTextField
