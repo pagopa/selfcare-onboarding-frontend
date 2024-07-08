@@ -58,13 +58,9 @@ export function RadioWithTextField({
 
   useEffect(() => {
     if (fieldIsFromIPA) {
-      if (isIPA) {
-        setChecked(true);
-        setOpenTextField(true);
-      } else {
-        setChecked(false);
-        setOpenTextField(false);
-      }
+      const isChecked = isIPA ?? false;
+      setChecked(isChecked);
+      setOpenTextField(isChecked);
     }
   }, [isIPA, fieldIsFromIPA]);
 
@@ -173,7 +169,7 @@ export function RadioWithTextField({
               onChange={(e: any) => {
                 onTextFieldChange(true, field, e.target.value);
               }}
-              value={fieldIsFromIPA && checked === true && isIPA? ipaCode : undefined}
+              value={fieldIsFromIPA && checked === true && isIPA ? ipaCode : undefined}
               disabled={fieldIsFromIPA && checked === true && isIPA}
               error={errorText !== ''}
             />
