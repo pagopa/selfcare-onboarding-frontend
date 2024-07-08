@@ -84,13 +84,13 @@ export default function AsyncAutocompleteResultsCode({
                 ? aooResult?.denominazioneAoo.toLocaleLowerCase()
                 : isUoCodeSelected && uoResult?.descrizioneUo
                 ? uoResult?.descrizioneUo.toLocaleLowerCase()
-                : visibleCode.description
+                : visibleCode?.description
             }
             partyRole={
               !isTaxCodeSelected && aooResult
-                ? aooResult.denominazioneEnte
+                ? aooResult.denominazioneEnte || aooResult.parentDescription
                 : uoResult
-                ? uoResult?.denominazioneEnte
+                ? uoResult?.denominazioneEnte || uoResult.parentDescription
                 : ''
             }
             image={' '}
