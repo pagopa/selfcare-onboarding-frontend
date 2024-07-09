@@ -25,9 +25,10 @@ type Props = {
   | 'isConcessionaireOfPublicService';
   errorText: string;
   onRadioChange: (field: any, value: any) => void;
-  onTextFieldChange: (open: boolean, field: string, value: string) => void;
+  onTextFieldChange: (open: boolean, field: string, value: string, choice: boolean) => void;
   isIPA?: boolean;
   ipaCode?: string;
+  additionalData: { [field: string]: { openTextField: boolean; textFieldValue: string; choice: boolean } };
 };
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
@@ -39,30 +40,28 @@ export function RadioWithTextField({
   onRadioChange,
   onTextFieldChange,
   isIPA,
-  ipaCode
+  ipaCode,
+  additionalData
 }: Props) {
   const theme = useTheme();
   const { t } = useTranslation();
 
   const [openTextField, setOpenTextField] = useState<boolean>(false);
-  const [checked, setChecked] = useState<boolean>();
   const fieldIsFromIPA = field === 'isFromIPA';
 
   useEffect(() => {
     if (openTextField) {
-      onTextFieldChange(true, field, '');
+      onTextFieldChange(true, field, '', additionalData[field]?.choice);
     } else {
-      onTextFieldChange(false, field, '');
+      onTextFieldChange(false, field, '', additionalData[field]?.choice);
     }
   }, [openTextField]);
 
   useEffect(() => {
-    if (fieldIsFromIPA) {
-      const isChecked = isIPA ?? false;
-      setChecked(isChecked);
-      setOpenTextField(isChecked);
+    if(fieldIsFromIPA && isIPA) {
+      setOpenTextField(true);
     }
-  }, [isIPA, fieldIsFromIPA]);
+  }, []);
 
   return (
     <Grid item sx={{ width: '620px' }}>
@@ -88,19 +87,11 @@ export function RadioWithTextField({
                 size="small"
               />
             }
-            checked={fieldIsFromIPA ? checked : undefined}
-            disabled={fieldIsFromIPA && isIPA}
-            // onChange={() => handleChangeCheckEvent}
+            checked={additionalData[field]?.choice}
+            disabled={isIPA && fieldIsFromIPA}
             onClick={(e) => {
-              if (fieldIsFromIPA && isIPA) {
-                e.preventDefault();
-                return;
-              }
-              setChecked(true);
+              e.preventDefault();
               onRadioChange(field, true);
-              if (fieldIsFromIPA) {
-                setOpenTextField(true);
-              }
             }}
             label={t('additionalDataPage.options.yes')}
           />
@@ -111,20 +102,11 @@ export function RadioWithTextField({
                 size="small"
               />
             }
-            checked={fieldIsFromIPA ? !checked : undefined}
-            disabled={fieldIsFromIPA && isIPA}
+            checked={!additionalData[field]?.choice}
+            disabled={isIPA && fieldIsFromIPA}
             onClick={(e) => {
-              if (fieldIsFromIPA && isIPA) {
-                e.preventDefault();
-                return;
-              }
-              setChecked(false);
+              e.preventDefault();
               onRadioChange(field, false);
-              if (!fieldIsFromIPA && openTextField) {
-                setOpenTextField(true);
-              } else {
-                setOpenTextField(false);
-              }
             }}
             label={t('additionalDataPage.options.no')}
           />
@@ -167,10 +149,10 @@ export function RadioWithTextField({
               }}
               inputProps={{ maxLength: fieldIsFromIPA ? 16 : 300 }}
               onChange={(e: any) => {
-                onTextFieldChange(true, field, e.target.value);
+                onTextFieldChange(true, field, e.target.value, additionalData[field]?.choice);
               }}
-              value={fieldIsFromIPA && checked && isIPA ? ipaCode : undefined}
-              disabled={fieldIsFromIPA && checked && isIPA}
+              value={fieldIsFromIPA && openTextField && isIPA ? ipaCode : undefined}
+              disabled={fieldIsFromIPA && openTextField && isIPA}
               error={errorText !== ''}
             />
           </>

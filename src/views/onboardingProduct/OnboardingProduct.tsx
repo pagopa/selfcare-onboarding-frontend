@@ -516,8 +516,8 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           originId: aooSelected
             ? aooSelected.codiceUniAoo
             : uoSelected
-            ? uoSelected.codiceUniUo
-            : onboardingFormData?.originId,
+              ? uoSelected.codiceUniUo
+              : onboardingFormData?.originId,
           geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY
             ? onboardingFormData?.geographicTaxonomies?.map((gt) =>
               onboardedInstitutionInfo2geographicTaxonomy(gt)

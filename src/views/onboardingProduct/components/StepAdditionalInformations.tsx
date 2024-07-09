@@ -38,7 +38,6 @@ export function StepAdditionalInformations({ forward, back, originId, origin }: 
     [field: string]: string;
   }>({});
 
-  const [isChecked, setIsChecked] = useState<boolean>(false);
   const [disabled, setDisabled] = useState<boolean>(false);
   const [shrink, setShrink] = useState<boolean>(false);
 
@@ -47,38 +46,43 @@ export function StepAdditionalInformations({ forward, back, originId, origin }: 
       key === 'optionalPartyInformations' ? true : value !== undefined
     );
 
-    const allFalseAndUnchecked = Object.values(radioValues).every((value) => !value) && !isChecked;
+    const allFalseAndUnchecked = Object.values(radioValues).every((value) => !value) && !additionalData.optionalPartyInformations?.choice;
 
     setDisabled(
       !isContinueButtonEnabled ||
       allFalseAndUnchecked ||
       Object.values(errors).some((error) => error !== '')
     );
-  }, [radioValues, errors, isChecked]);
+  }, [radioValues, errors, additionalData.optionalPartyInformations?.choice]);
 
   const handleRadioChange = (field: any, value: any) => {
     setRadioValues((prevValues) => ({
       ...prevValues,
-      [field]: value,
+      [field]: value
+    }));
+    setAdditionalData((prevValues) => ({
+      ...prevValues,
+      [field]: { ...prevValues[field], choice: value }
     }));
     setErrors((prevErrors) => ({
       ...prevErrors,
       [field]: '',
     }));
-    if (field === 'isFromIPA' && value) {
-      handleTextFieldChange(true, field, originId || '');
-    }
   };
 
+  console.log("additionalData", additionalData);
+
   useEffect(() => {
-    if (origin === "IPA") {
+    if (origin === "IPA" && originId) {
       handleRadioChange('isFromIPA', true);
+      handleTextFieldChange(true, "isFromIPA", originId, true);
     } else {
       handleRadioChange('isFromIPA', false);
+      handleTextFieldChange(false, "isFromIPA", "", false);
     }
   }, [origin, originId]);
 
-  const handleTextFieldChange = (open: boolean, field: string, value: string) => {
+  const handleTextFieldChange = (open: boolean, field: string, value: string, choice: boolean) => {
     setErrors((prevErrors) => ({
       ...prevErrors,
       [field]: '',
@@ -88,7 +92,8 @@ export function StepAdditionalInformations({ forward, back, originId, origin }: 
       [field]: {
         openTextField: open,
         textFieldValue: value,
-        choice: false,
+        // choice: false,
+        choice
       },
     }));
   };
@@ -98,7 +103,7 @@ export function StepAdditionalInformations({ forward, back, originId, origin }: 
     const newErrors = Object.keys(radioValues).reduce((acc, field) => {
       switch (field) {
         case 'optionalPartyInformations':
-          if (isChecked && !additionalData.optionalPartyInformations?.textFieldValue) {
+          if (additionalData.optionalPartyInformations?.choice && !additionalData.optionalPartyInformations?.textFieldValue) {
             return {
               ...acc,
               [field]: t(
@@ -143,6 +148,9 @@ export function StepAdditionalInformations({ forward, back, originId, origin }: 
       setErrors({});
 
       const choices = Object.values(radioValues);
+      const textFieldValue = Object.values(additionalData);
+
+      console.log("textFieldValue", textFieldValue);
 
       const additionalDataWithChoice = Object.keys(radioValues).reduce(
         (result, key, index) => ({
@@ -176,6 +184,7 @@ export function StepAdditionalInformations({ forward, back, originId, origin }: 
           onRadioChange={handleRadioChange}
           onTextFieldChange={handleTextFieldChange}
           errorText={errors.isEstabilishedRegulatoryProvision || ''}
+          additionalData={additionalData}
         />
         <Divider />
         <RadioWithTextField
@@ -190,6 +199,7 @@ export function StepAdditionalInformations({ forward, back, originId, origin }: 
           onRadioChange={handleRadioChange}
           onTextFieldChange={handleTextFieldChange}
           errorText={errors.fromBelongsRegulatedMarket || ''}
+          additionalData={additionalData}
         />
         <Divider />
         <RadioWithTextField
@@ -201,6 +211,7 @@ export function StepAdditionalInformations({ forward, back, originId, origin }: 
           errorText={errors.isFromIPA || ''}
           isIPA={origin === "IPA"}
           ipaCode={originId}
+          additionalData={additionalData}
         />
         <Divider />
         <RadioWithTextField
@@ -210,18 +221,18 @@ export function StepAdditionalInformations({ forward, back, originId, origin }: 
           onRadioChange={handleRadioChange}
           onTextFieldChange={handleTextFieldChange}
           errorText={errors.isConcessionaireOfPublicService || ''}
+          additionalData={additionalData}
         />
         <Divider />
         <Grid item pb={4}>
           <FormControlLabel
-            value={isChecked}
+            value={additionalData.optionalPartyInformations?.choice}
             control={<Checkbox size="small" />}
             onClick={() => {
-              handleRadioChange('optionalPartyInformations', !isChecked);
-              setIsChecked(!isChecked);
+              handleRadioChange('optionalPartyInformations', !additionalData.optionalPartyInformations?.choice);
               if (
                 additionalData.optionalPartyInformations?.textFieldValue &&
-                isChecked &&
+                additionalData.optionalPartyInformations?.choice &&
                 additionalData.optionalPartyInformations?.textFieldValue !== ''
               ) {
                 setShrink(false);
@@ -229,7 +240,7 @@ export function StepAdditionalInformations({ forward, back, originId, origin }: 
                   ['optionalPartyInformations']: {
                     openTextField: true,
                     textFieldValue: '',
-                    choice: !isChecked,
+                    choice: !additionalData.optionalPartyInformations?.choice,
                   },
                 });
               }
@@ -250,7 +261,7 @@ export function StepAdditionalInformations({ forward, back, originId, origin }: 
             fullWidth
             sx={{ color: theme.palette.text.secondary }}
             onChange={(e: any) => {
-              handleTextFieldChange(true, 'optionalPartyInformations', e.target.value);
+              handleTextFieldChange(true, 'optionalPartyInformations', e.target.value, true);
             }}
             onClick={() => setShrink(true)}
             onBlur={() => {
