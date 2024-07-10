@@ -14,7 +14,10 @@ export function ConfirmRegistrationStep1(
   { uploadedFiles, setUploadedFiles }: any
 ) {
   const { t } = useTranslation();
+  const theme = useTheme();
+
   const [rejectedError, setRejectedError] = useState<boolean>(false);
+
   const onDropAccepted = (acceptedFiles: Array<File>) => {
     setUploadedFiles(acceptedFiles);
   };
@@ -34,9 +37,6 @@ export function ConfirmRegistrationStep1(
   const deleteUploadedFiles = (): void => {
     setUploadedFiles([]);
   };
-  const theme = useTheme();
-
-  const uploaderImageWidth = 180;
 
   return (
     <Grid container display="flex" justifyContent="center" alignItems="center">
@@ -85,7 +85,6 @@ export function ConfirmRegistrationStep1(
           onDropAccepted={onDropAccepted}
           onDropRejected={onDropRejected}
           accept={['.pdf', '.p7z', '.p7m', '.p7c']}
-          uploaderImageWidth={uploaderImageWidth}
           loading={loading}
           theme={theme}
         />

@@ -207,7 +207,8 @@ export function StepSearchParty({
           : ({ ...selected, externalId: selected?.id } as Party),
         aooResult,
         uoResult,
-        institutionType
+        institutionType,
+        isAggregator
       );
     }
   };
@@ -497,10 +498,10 @@ export function StepSearchParty({
         message={
           <Trans
             i18nKey={'onboardingStep1.onboarding.aggregatorModal.message'}
-            components={{ 1: <br /> }}
+            components={{ 1: <strong />, 3: <br /> }}
             values={{ partyName: selected?.description }}
           >
-            {`Stai richiedendo l’adesione come ente aggregatore per {{partyName}}.<1 />Per completare l’adesione, dovrai indicare gli enti da aggregare.`}
+            {`Stai richiedendo l’adesione come ente aggregatore per <1>{{partyName}}</1>.<3 />Per completare l’adesione, dovrai indicare gli enti da aggregare.`}
           </Trans>
         }
         onCloseLabel={t('onboardingStep1.onboarding.aggregatorModal.back')}

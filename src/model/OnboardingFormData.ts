@@ -35,4 +35,5 @@ export type OnboardingFormData = {
   isForeignInsurance?: boolean;
   hasVatnumber?: boolean;
   origin?: string;
+  isAggregator?: boolean;
 };
