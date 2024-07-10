@@ -19,15 +19,17 @@ type Props = {
   title: React.ReactNode;
   label: string;
   field:
-  | 'isEstabilishedRegulatoryProvision'
-  | 'fromBelongsRegulatedMarket'
-  | 'isFromIPA'
-  | 'isConcessionaireOfPublicService';
+    | 'isEstabilishedRegulatoryProvision'
+    | 'fromBelongsRegulatedMarket'
+    | 'isFromIPA'
+    | 'isConcessionaireOfPublicService';
   errorText: string;
   onRadioChange: (field: any, value: any) => void;
   onTextFieldChange: (open: boolean, field: string, value: string, choice: boolean) => void;
   isIPA?: boolean;
-  additionalData: { [field: string]: { openTextField: boolean; textFieldValue: string; choice: boolean } };
+  additionalData: {
+    [field: string]: { openTextField: boolean; textFieldValue: string; choice: boolean };
+  };
 };
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
@@ -39,7 +41,7 @@ export function RadioWithTextField({
   onRadioChange,
   onTextFieldChange,
   isIPA,
-  additionalData
+  additionalData,
 }: Props) {
   const theme = useTheme();
   const { t } = useTranslation();
@@ -49,7 +51,12 @@ export function RadioWithTextField({
 
   useEffect(() => {
     if (openTextField) {
-      onTextFieldChange(true, field, additionalData[field].textFieldValue, additionalData[field]?.choice);
+      onTextFieldChange(
+        true,
+        field,
+        additionalData[field].textFieldValue,
+        additionalData[field]?.choice
+      );
     } else {
       onTextFieldChange(false, field, '', additionalData[field]?.choice);
     }
@@ -85,7 +92,7 @@ export function RadioWithTextField({
             control={
               <Radio
                 size="small"
-                checked={additionalData[field]?.choice === true}
+                checked={additionalData[field]?.choice}
                 disabled={isIPA && fieldIsFromIPA}
               />
             }
@@ -133,8 +140,8 @@ export function RadioWithTextField({
                 errorText !== ''
                   ? errorText
                   : fieldIsFromIPA
-                    ? ''
-                    : t('additionalDataPage.allowedCharacters')
+                  ? ''
+                  : t('additionalDataPage.allowedCharacters')
               }
               fullWidth
               sx={{
