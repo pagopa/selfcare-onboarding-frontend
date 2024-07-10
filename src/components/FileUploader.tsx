@@ -13,7 +13,6 @@ type FileUploaderOption = {
   onDropRejected?: (fileRejections: Array<FileRejection>, event?: DropEvent) => void;
   maxFiles?: number;
   accept?: Array<string> | undefined;
-  uploaderImageWidth?: number;
   loading: boolean;
   theme: Theme;
 };
@@ -74,7 +73,7 @@ export function FileUploader({
               backgroundColor: '#0073E612',
             }}
           >
-            <Grid container direction="column" alignItems={'center'} py={3} px={6}>
+            <Grid container xs={12} direction="column" alignItems={'center'} py={3} px={6}>
               <CloudUpload />
               <Typography
                 color={theme.palette.text.primary}
@@ -86,6 +85,7 @@ export function FileUploader({
               </Typography>
               <Button
                 variant="outlined"
+                size="small"
                 sx={{
                   marginTop: 1,
                   background: theme.palette.primary.main,
