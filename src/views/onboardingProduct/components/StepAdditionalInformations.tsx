@@ -46,7 +46,9 @@ export function StepAdditionalInformations({ forward, back, originId, origin }: 
       key === 'optionalPartyInformations' ? true : value !== undefined
     );
 
-    const allFalseAndUnchecked = Object.values(radioValues).every((value) => !value) && !additionalData.optionalPartyInformations?.choice;
+    const allFalseAndUnchecked =
+      Object.values(radioValues).every((value) => !value) &&
+      !additionalData.optionalPartyInformations?.choice;
 
     setDisabled(
       !isContinueButtonEnabled ||
@@ -58,11 +60,11 @@ export function StepAdditionalInformations({ forward, back, originId, origin }: 
   const handleRadioChange = (field: any, value: any) => {
     setRadioValues((prevValues) => ({
       ...prevValues,
-      [field]: value
+      [field]: value,
     }));
     setAdditionalData((prevValues) => ({
       ...prevValues,
-      [field]: { ...prevValues[field], choice: value }
+      [field]: { ...prevValues[field], choice: value },
     }));
     setErrors((prevErrors) => ({
       ...prevErrors,
@@ -70,15 +72,19 @@ export function StepAdditionalInformations({ forward, back, originId, origin }: 
     }));
   };
 
-  console.log("additionalData", additionalData);
+
+
+  console.log('additionalData', additionalData);
 
   useEffect(() => {
-    if (origin === "IPA" && originId) {
+    if (origin === 'IPA' && originId) {
       handleRadioChange('isFromIPA', true);
-      handleTextFieldChange(true, "isFromIPA", originId, true);
+      handleTextFieldChange(true, 'isFromIPA', originId, true);
+      handleTextFieldChange(true, 'optionalPartyInformations', '', false);
     } else {
       handleRadioChange('isFromIPA', false);
-      handleTextFieldChange(false, "isFromIPA", "", false);
+      handleTextFieldChange(false, 'isFromIPA', '', false);
+      handleTextFieldChange(true, 'optionalPartyInformations', '', false);
     }
   }, [origin, originId]);
 
@@ -92,8 +98,7 @@ export function StepAdditionalInformations({ forward, back, originId, origin }: 
       [field]: {
         openTextField: open,
         textFieldValue: value,
-        // choice: false,
-        choice
+        choice,
       },
     }));
   };
@@ -103,7 +108,10 @@ export function StepAdditionalInformations({ forward, back, originId, origin }: 
     const newErrors = Object.keys(radioValues).reduce((acc, field) => {
       switch (field) {
         case 'optionalPartyInformations':
-          if (additionalData.optionalPartyInformations?.choice && !additionalData.optionalPartyInformations?.textFieldValue) {
+          if (
+            additionalData.optionalPartyInformations?.choice &&
+            !additionalData.optionalPartyInformations?.textFieldValue
+          ) {
             return {
               ...acc,
               [field]: t(
@@ -116,7 +124,7 @@ export function StepAdditionalInformations({ forward, back, originId, origin }: 
           if (
             additionalData[field]?.openTextField &&
             additionalData[field]?.textFieldValue === '' &&
-            !(radioValues[field] && origin === "IPA")
+            !(radioValues[field] && origin === 'IPA')
           ) {
             return {
               ...acc,
@@ -148,10 +156,6 @@ export function StepAdditionalInformations({ forward, back, originId, origin }: 
       setErrors({});
 
       const choices = Object.values(radioValues);
-      const textFieldValue = Object.values(additionalData);
-
-      console.log("textFieldValue", textFieldValue);
-
       const additionalDataWithChoice = Object.keys(radioValues).reduce(
         (result, key, index) => ({
           ...result,
@@ -209,8 +213,7 @@ export function StepAdditionalInformations({ forward, back, originId, origin }: 
           onRadioChange={handleRadioChange}
           onTextFieldChange={handleTextFieldChange}
           errorText={errors.isFromIPA || ''}
-          isIPA={origin === "IPA"}
-          ipaCode={originId}
+          isIPA={origin === 'IPA'}
           additionalData={additionalData}
         />
         <Divider />
@@ -236,13 +239,14 @@ export function StepAdditionalInformations({ forward, back, originId, origin }: 
                 additionalData.optionalPartyInformations?.textFieldValue !== ''
               ) {
                 setShrink(false);
-                setAdditionalData({
+                setAdditionalData((prevValues) => ({
+                  ...prevValues,
                   ['optionalPartyInformations']: {
                     openTextField: true,
                     textFieldValue: '',
                     choice: !additionalData.optionalPartyInformations?.choice,
                   },
-                });
+                }));
               }
             }}
             label={t('additionalDataPage.formQuestions.other')}
@@ -261,7 +265,7 @@ export function StepAdditionalInformations({ forward, back, originId, origin }: 
             fullWidth
             sx={{ color: theme.palette.text.secondary }}
             onChange={(e: any) => {
-              handleTextFieldChange(true, 'optionalPartyInformations', e.target.value, true);
+              handleTextFieldChange(true, 'optionalPartyInformations', e.target.value, additionalData.optionalPartyInformations?.choice);
             }}
             onClick={() => setShrink(true)}
             onBlur={() => {

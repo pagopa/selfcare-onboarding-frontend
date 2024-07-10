@@ -27,7 +27,6 @@ type Props = {
   onRadioChange: (field: any, value: any) => void;
   onTextFieldChange: (open: boolean, field: string, value: string, choice: boolean) => void;
   isIPA?: boolean;
-  ipaCode?: string;
   additionalData: { [field: string]: { openTextField: boolean; textFieldValue: string; choice: boolean } };
 };
 
@@ -40,7 +39,6 @@ export function RadioWithTextField({
   onRadioChange,
   onTextFieldChange,
   isIPA,
-  ipaCode,
   additionalData
 }: Props) {
   const theme = useTheme();
@@ -51,14 +49,14 @@ export function RadioWithTextField({
 
   useEffect(() => {
     if (openTextField) {
-      onTextFieldChange(true, field, '', additionalData[field]?.choice);
+      onTextFieldChange(true, field, additionalData[field].textFieldValue, additionalData[field]?.choice);
     } else {
       onTextFieldChange(false, field, '', additionalData[field]?.choice);
     }
   }, [openTextField]);
 
   useEffect(() => {
-    if(fieldIsFromIPA && isIPA) {
+    if (fieldIsFromIPA && isIPA) {
       setOpenTextField(true);
     }
   }, []);
@@ -85,14 +83,11 @@ export function RadioWithTextField({
             control={
               <Radio
                 size="small"
+                checked={additionalData[field]?.choice ? additionalData[field]?.choice : undefined}
+                disabled={isIPA && fieldIsFromIPA}
               />
             }
-            checked={additionalData[field]?.choice}
-            disabled={isIPA && fieldIsFromIPA}
-            onClick={(e) => {
-              e.preventDefault();
-              onRadioChange(field, true);
-            }}
+            onChange={() => onRadioChange(field, true)}
             label={t('additionalDataPage.options.yes')}
           />
           <FormControlLabel
@@ -100,14 +95,11 @@ export function RadioWithTextField({
             control={
               <Radio
                 size="small"
+                checked={additionalData[field]?.choice ? !additionalData[field]?.choice : undefined}
+                disabled={isIPA && fieldIsFromIPA}
               />
             }
-            checked={!additionalData[field]?.choice}
-            disabled={isIPA && fieldIsFromIPA}
-            onClick={(e) => {
-              e.preventDefault();
-              onRadioChange(field, false);
-            }}
+            onChange={() => onRadioChange(field, false)}
             label={t('additionalDataPage.options.no')}
           />
         </RadioGroup>
@@ -151,8 +143,8 @@ export function RadioWithTextField({
               onChange={(e: any) => {
                 onTextFieldChange(true, field, e.target.value, additionalData[field]?.choice);
               }}
-              value={fieldIsFromIPA && openTextField && isIPA ? ipaCode : undefined}
-              disabled={fieldIsFromIPA && openTextField && isIPA}
+              value={additionalData[field].textFieldValue}
+              disabled={isIPA}
               error={errorText !== ''}
             />
           </>
