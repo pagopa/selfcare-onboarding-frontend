@@ -1,5 +1,5 @@
 import { AxiosError, AxiosResponse } from 'axios';
-import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
+import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
 import React from 'react';
 import { fetchWithLogs } from '../lib/api-utils';
 import { OnboardingRequestData, Problem, RequestOutcomeComplete } from '../../types';

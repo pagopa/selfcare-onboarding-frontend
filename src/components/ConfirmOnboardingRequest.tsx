@@ -1,6 +1,6 @@
 import { Typography } from '@mui/material';
 import { theme } from '@pagopa/mui-italia';
-import { SessionModal } from '@pagopa/selfcare-common-frontend';
+import { SessionModal } from '@pagopa/selfcare-common-frontend/lib';
 import { Trans, useTranslation } from 'react-i18next';
 
 type ModalProps = {

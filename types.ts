@@ -2,7 +2,7 @@ import { SvgIconTypeMap } from '@mui/material/SvgIcon';
 import { DefaultComponentProps } from '@mui/material/OverridableComponent';
 import { AxiosRequestConfig } from 'axios';
 import { FunctionComponent, SVGProps } from 'react';
-import { UserRole } from '@pagopa/selfcare-common-frontend/utils/constants';
+import { UserRole } from '@pagopa/selfcare-common-frontend/lib/utils/constants';
 import { API } from './src/utils/constants';
 import { OnboardingFormData } from './src/model/OnboardingFormData';
 import { AssistanceContacts } from './src/model/AssistanceContacts';

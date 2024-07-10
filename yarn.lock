@@ -2082,10 +2082,10 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
-"@pagopa/mui-italia@^1.4.0":
-  version "1.4.1"
-  resolved "https://registry.yarnpkg.com/@pagopa/mui-italia/-/mui-italia-1.4.1.tgz#3c7406bd6407532e4b44cbac4e30eb8763118895"
-  integrity sha512-lRqg8qgaacihuCBecW2+P5mmTPtq5snvNfnRu2xIwgyrD1JSpmrIR2XQJkyYSHWyaB9IxQuI4IoDRQpBVos/7Q==
+"@pagopa/mui-italia@^1.5.0":
+  version "1.5.0"
+  resolved "https://registry.npmjs.org/@pagopa/mui-italia/-/mui-italia-1.5.0.tgz#05be80c5c8f03c9dffcd6e583a415006b31c7b76"
+  integrity sha512-rBPd0SzVARcB5zmeviavmOK1Cih60yZ6gkZHAYqhlrrlpZnNVKW0c4K++3b3f4O4xvJNtpT0fSriKL/pM6HIoQ==
   dependencies:
     "@fontsource/dm-mono" "^4.5.10"
     "@fontsource/titillium-web" "^4.5.9"
@@ -2093,21 +2093,10 @@
     fp-ts "^2.12.3"
     io-ts "^2.2.18"
 
-"@pagopa/mui-italia@^1.4.3":
-  version "1.4.3"
-  resolved "https://registry.yarnpkg.com/@pagopa/mui-italia/-/mui-italia-1.4.3.tgz#29c2d67e0a24221c6637cf0cb1bca0ffcf9e51d5"
-  integrity sha512-7AW28WXTUQorP3jWZfCRRSwdeEv1EMqpN+P7Ji87h0kMmm71lRCwy+CypvXOYfF6WNkZtN+nRYZTkF5T1SRElw==
-  dependencies:
-    "@fontsource/dm-mono" "^4.5.10"
-    "@fontsource/titillium-web" "^4.5.9"
-    clsx "^1.2.1"
-    fp-ts "^2.12.3"
-    io-ts "^2.2.18"
-
-"@pagopa/selfcare-common-frontend@^1.34.20":
-  version "1.34.20"
-  resolved "https://registry.yarnpkg.com/@pagopa/selfcare-common-frontend/-/selfcare-common-frontend-1.34.20.tgz#a948d07cd041d8cfa0903c3f03b65ecc48b47104"
-  integrity sha512-kOjZgQk7QkgFJahz80yV5c0oCaas17SCy37eT9GtKn6hHlA6Iaud8SvRDyASD+1zdwkMiM0Q8WfcVB/Lu/mQ9A==
+"@pagopa/selfcare-common-frontend@^1.34.32":
+  version "1.34.32"
+  resolved "https://registry.yarnpkg.com/@pagopa/selfcare-common-frontend/-/selfcare-common-frontend-1.34.32.tgz#ade4688eed940e21ac298d47e239d441dd1fb8d9"
+  integrity sha512-TZI98HVezpvTujj32M/cuAd686JGAtMhdxrCdQP8izXhq8uYJXOoIaOByf4KahBQ+QtCd6Oy/yMkpElL526cyA==
   dependencies:
     "@emotion/react" "^11.11.1"
     "@emotion/styled" "^11.11.0"
@@ -2115,7 +2104,7 @@
     "@mui/lab" "^5.0.0-alpha.137"
     "@mui/material" "^5.14.1"
     "@mui/system" "^5.14.1"
-    "@pagopa/mui-italia" "^1.4.0"
+    "@pagopa/mui-italia" "^1.5.0"
     "@pagopa/ts-commons" "^10.2.1"
     "@reduxjs/toolkit" "^1.6.2"
     "@types/lodash" "^4.14.172"

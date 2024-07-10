@@ -1,6 +1,6 @@
 import { IllusCompleted } from '@pagopa/mui-italia';
 import { Trans, useTranslation } from 'react-i18next';
-import { EndingPage } from '@pagopa/selfcare-common-frontend';
+import { EndingPage } from '@pagopa/selfcare-common-frontend/lib';
 import { ENV } from '../../../../utils/env';
 
 export default function CancelRequestSuccessPage() {

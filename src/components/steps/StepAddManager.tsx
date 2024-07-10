@@ -1,6 +1,6 @@
 import { Grid, Typography } from '@mui/material';
-import SessionModal from '@pagopa/selfcare-common-frontend/components/SessionModal';
-import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
+import SessionModal from '@pagopa/selfcare-common-frontend/lib/components/SessionModal';
+import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
 import { uniqueId } from 'lodash';
 import { useContext, useEffect, useRef, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';

@@ -1,5 +1,5 @@
 import { Button, Typography } from '@mui/material';
-import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
+import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
 import { Trans, useTranslation } from 'react-i18next';
 import { ENV } from '../../../../utils/env';
 import { ReactComponent as PaymentCompleted } from '../../../../assets/payment_completed.svg';

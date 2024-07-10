@@ -1,7 +1,7 @@
 import { AxiosError, AxiosResponse } from 'axios';
 import { useContext, useEffect, useState } from 'react';
 import { useTranslation, Trans } from 'react-i18next';
-import { EndingPage } from '@pagopa/selfcare-common-frontend';
+import { EndingPage } from '@pagopa/selfcare-common-frontend/lib';
 import { IllusError } from '@pagopa/mui-italia';
 import {
   InstitutionOnboardingInfoResource,

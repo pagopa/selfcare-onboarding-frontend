@@ -1,9 +1,9 @@
 import Container from '@mui/material/Container';
 import { useLocation, useHistory } from 'react-router-dom';
 import { useContext, useEffect, useMemo, useRef, useState } from 'react';
-import { EndingPage, SessionModal } from '@pagopa/selfcare-common-frontend';
+import { EndingPage, SessionModal } from '@pagopa/selfcare-common-frontend/lib';
 import { IllusCompleted, IllusError } from '@pagopa/mui-italia';
-import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
+import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
 import { Trans, useTranslation } from 'react-i18next';
 import { withLogin } from '../../components/withLogin';
 import {

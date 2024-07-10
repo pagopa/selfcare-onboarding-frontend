@@ -1,8 +1,8 @@
 import { useEffect, useState, useContext } from 'react';
-import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
+import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
 import { useTranslation } from 'react-i18next';
 import { uniqueId } from 'lodash';
-import { productId2ProductTitle } from '@pagopa/selfcare-common-frontend/utils/productId2ProductTitle';
+import { productId2ProductTitle } from '@pagopa/selfcare-common-frontend/lib/utils/productId2ProductTitle';
 import { MessageNoAction } from '../../../components/MessageNoAction';
 import { OnboardingRequestData, RequestOutcomeComplete } from '../../../../types';
 import { fetchWithLogs } from '../../../lib/api-utils';

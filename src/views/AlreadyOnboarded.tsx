@@ -1,6 +1,6 @@
 import { Grid, Link } from '@mui/material';
 import { IllusError } from '@pagopa/mui-italia';
-import { EndingPage } from '@pagopa/selfcare-common-frontend';
+import { EndingPage } from '@pagopa/selfcare-common-frontend/lib';
 import { Trans } from 'react-i18next';
 import { useHistory } from 'react-router';
 import { RolesInformations } from '../components/RolesInformations';

@@ -4,7 +4,7 @@ import { AxiosError, AxiosResponse } from 'axios';
 import { ReactElement, useContext, useEffect, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import Checkbox from '@mui/material/Checkbox';
-import { SessionModal } from '@pagopa/selfcare-common-frontend';
+import { SessionModal } from '@pagopa/selfcare-common-frontend/lib';
 import {
   IPACatalogParty,
   InstitutionType,
