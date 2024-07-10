@@ -25,33 +25,61 @@ export default {
     aooCode: 'Codice univoco AOO',
     uoCode: 'Codice univoco UO',
   },
-  confirmRegistrationStep0: {
-    download: {
-      title: 'Scarica l’accordo di adesione',
-      description: `Per completare l’adesione, scarica l’accordo e fai apporre la firma digitale in <1 /><2>formato p7m</2> dal Legale Rappresentante dell’ente o da un suo procuratore.`,
-      downloadContract: 'Scarica l’accordo',
-      disclaimer:
-        'Firmando l’accordo, il Legale Rappresentante dell’ente, o un suo procuratore, accetta espressamente e specificamente anche le singole clausole indicate nel paragrafo “Clausole ai sensi degli artt. 1341 e 1342 c.c.”',
+  confirmOnboarding: {
+    chooseOption: {
+      download: {
+        product: {
+          title: 'Scarica l’accordo di adesione',
+          description: `Per completare l’adesione, scarica l’accordo e fai apporre la firma digitale in <1 /><2>formato p7m</2> dal Legale Rappresentante dell’ente o da un suo procuratore.`,
+          downloadContract: 'Scarica l’accordo',
+        },
+        user: {
+          title: 'Scarica il Modulo di aggiunta',
+          description: `Per completare l’adesione, scarica il Modulo di aggiunta e fai apporre la <1 />firma digitale in <2>formato p7m</2> dal Legale Rappresentante dell’ente.`,
+          downloadContract: 'Scarica il Modulo',
+        },
+        disclaimer:
+          'Firmando l’accordo, il Legale Rappresentante dell’ente, o un suo procuratore, accetta espressamente e specificamente anche le singole clausole indicate nel paragrafo “Clausole ai sensi degli artt. 1341 e 1342 c.c.”',
+      },
+      upload: {
+        product: {
+          title: 'Carica l’accordo firmato',
+          description: `Una volta firmato l’accordo, segui le istruzioni per inviarlo e completare <1 /> l’adesione al prodotto scelto. Ricorda di caricare l’accordo <3>entro 30 giorni.</3>`,
+        },
+        user: {
+          title: 'Carica il Modulo firmato',
+          description: `Una volta firmato il Modulo, segui le istruzioni per inviarlo e completare <1 /> l’aggiunta di uno o più Amministratori.`,
+        },
+        goToUpload: 'Vai al caricamento',
+      },
     },
     upload: {
-      title: 'Carica l’accordo firmato',
-      description: `Una volta firmato l’accordo, segui le istruzioni per inviarlo e completare <1 />
-    l’adesione al prodotto scelto. Ricorda di caricare l’accordo
-    <3>entro 30 giorni.</3>`,
-      goToUpload: 'Vai al caricamento',
+      product: {
+        title: "Carica l'accordo di adesione",
+        description: `Carica l’accordo di adesione, firmato digitalmente in <1 />p7m dal Legale Rappresentante.`,
+        dropArea: {
+          title: 'Trascina qui l’accordo di Adesione firmato oppure',
+          link: 'carica il file',
+        },
+      },
+      user: {
+        title: 'Carica il modulo',
+        description: `Carica il Modulo di aggiunta, firmato digitalmente in <1 />p7m dal Legale Rappresentante.`,
+        dropArea: {
+          title: 'Trascina qui il modulo firmato oppure',
+          link: 'carica il file',
+        },
+        continue: 'Continua',
+      },
+      continue: 'Continua',
+      error: {
+        title: 'Caricamento non riuscito',
+        description:
+          'Il caricamento del documento non è andato a buon fine. <1 />Carica un solo file in formato <3>p7m</3>.',
+        close: 'Esci',
+        retry: 'Carica di nuovo',
+      },
     },
-  },
-  confirmRegistrationStep1: {
-    errorAlertTitle: 'Caricamento non riuscito',
-    errorAlertDescription:
-      'Il caricamento del documento non è andato a buon fine. <1 />Carica un solo file in formato <3>p7m</3>.',
-    errorAlertRetryLabel: 'Carica di nuovo',
-    errorAlertCloseLabel: 'Esci',
-    pageTitle: "Carica l'accordo di adesione",
-    pageSubtitle: `Carica l’accordo di adesione firmato digitalmente <1 /> in p7m dal Legale Rappresentante.`,
-    fileUploaderTitle: 'Trascina qui l’accordo di Adesione firmato oppure',
-    fileUploaderDescriptionLink: 'carica il file',
-    confirmAction: 'Continua',
   },
   fileUploadPreview: {
     loadingStatus: 'Caricamento...',
@@ -68,7 +96,7 @@ export default {
     privacyPolicyLink: 'l’Informativa Privacy e i Termini e Condizioni d’Uso del servizio',
     actionLabel: 'Continua',
   },
-  onboardingStep1_5: {
+  stepVerifyOnboarding: {
     loadingText: 'Stiamo verificando i tuoi dati',
     ptAlreadyOnboarded: {
       title: 'Il Partner è già registrato',
@@ -77,17 +105,17 @@ export default {
       backAction: 'Chiudi',
     },
     alreadyOnboarded: {
-      title: "L’ente selezionato ha già aderito",
+      title: 'L’ente selezionato ha già aderito',
       description:
         'Per operare sul prodotto, chiedi a un Amministratore di <1/>aggiungerti nella sezione Utenti.',
+      addNewAdmin:
+        'Gli attuali Amministratori non sono più disponibili e hai l’esigenza <1 />di gestire i prodotti? <3>Aggiungi un nuovo Amministratore</3>',
       backHome: 'Torna alla home',
     },
     genericError: {
-      title: 'Spiacenti, qualcosa è andato storto.',
-      description: `A causa di un errore del sistema non è possibile completare la procedura.
-      <1/>
-      Ti chiediamo di riprovare più tardi.`,
-      backAction: 'Chiudi',
+      title: 'Qualcosa è andato storto',
+      description: `A causa di un errore del sistema non è possibile completare <br />la procedura. Ti chiediamo di riprovare più tardi.`,
+      backHome: 'Torna alla home',
     },
     userNotAllowedError: {
       title: 'Non puoi aderire a questo prodotto',
@@ -106,7 +134,14 @@ export default {
       },
       bodyDescription:
         'Inserisci uno dei dati richiesti e cerca dall’Indice della Pubblica <1/> Amministrazione (IPA) l’ente per cui vuoi richiedere l’adesione a <3/><4>{{productTitle}}</4>.',
-      ipaDescription: `Non trovi il tuo ente nell'IPA? In <1>questa pagina</1> trovi maggiori <3/> informazioni sull'indice e su come accreditarsi `,
+      aggregator: 'Sono un ente aggregatore',
+      aggregatorModal: {
+        title: 'Ente aggregatore',
+        message: `Stai richiedendo l’adesione come ente aggregatore per {{partyName}}.<1 />Per completare l’adesione, dovrai indicare gli enti da aggregare.`,
+        back: 'Indietro',
+        forward: 'Continua',
+      },
+      ipaDescription: `Non trovi il tuo ente nell'IPA? <1>In questa pagina</1> trovi maggiori <3/> informazioni sull'indice e su come accreditarsi `,
       selectedInstitution:
         'Prosegui con l’adesione a <1>{{productName}}</1> per l’ente selezionato',
       gpsDescription: `Non trovi il tuo ente nell'IPA?<1 /><2>Inserisci manualmente i dati del tuo ente.</2>`,
@@ -123,18 +158,32 @@ export default {
       },
     },
   },
-  onboardingStep2: {
-    bodyTitle: 'Indica il Legale Rappresentante',
-    bodyDescription: `Inserisci i dati del Legale Rappresentante o del procuratore del tuo ente. <1/> Sarà responsabile della firma del contratto per <3>{{productTitle}}</3> <4/> e avrà il ruolo di Amministratore per questo prodotto nell'Area Riservata.`,
-    premiumBodyDescription: `Inserisci i dati del Legale Rappresentante o del procuratore del tuo ente. <1/> La persona che indicherai sarà firmataria del contratto per <3/> <strong>Premium<strong/>.`,
-    backLabel: 'Indietro',
-    confirmLabel: 'Continua',
+  stepAddManager: {
+    title: 'Indica il Legale Rappresentante',
+    subTitle: {
+      flow: {
+        base: `Inserisci i dati del Legale Rappresentante o del procuratore del tuo ente. <1/> Sarà responsabile della firma del contratto per <3>{{productTitle}}</3> <4/> e avrà il ruolo di Amministratore per questo prodotto nell'Area Riservata.`,
+        premium: `Inserisci i dati del Legale Rappresentante o del procuratore del tuo ente. <1/> La persona che indicherai sarà firmataria del contratto per <3/> <strong>Premium<strong/>.`,
+        addNewUser: `La persona indicata firmerà il Modulo di aggiunta per il nuovo Amministratore e lo <1 />autorizzerà ad operare sul prodotto <3>{{productTitle}}</3> per il tuo ente.`,
+      },
+    },
+    changedManager: {
+      title: 'Stai aggiungendo un Legale Rappresentante',
+      message:
+        'I dati del Legale Rappresentante inseriti sono diversi da quelli indicati in <1 />precedenza. Vuoi continuare?',
+    },
+    back: 'Indietro',
+    continue: 'Continua',
   },
-  onboardingStep3: {
-    bodyTitle: "Indica l'Amministratore",
-    bodyDescription1: `Puoi aggiungere da uno a tre Amministratori o suoi delegati. <1/> Saranno i responsabili della gestione di <3>{{productTitle}}</3> e presenti nel contratto di <4 />adesione come delegati dal Legale Rappresentante.`,
-    bodyDescriptionPt:
-      'Puoi aggiungere da uno a tre Amministratori o suoi delegati.<1/> Si occuperanno della gestione degli utenti e dei prodotti per conto degli enti.',
+  stepAddDelegates: {
+    title: "Indica l'Amministratore",
+    description: {
+      flow: {
+        onboarding: `Puoi aggiungere da uno a tre Amministratori o suoi delegati. <1/> Saranno i responsabili della gestione di <3>{{productTitle}}</3> e presenti nel contratto di <4 />adesione come delegati dal Legale Rappresentante.`,
+        pt: 'Puoi aggiungere da uno a tre Amministratori o suoi delegati.<1/> Si occuperanno della gestione degli utenti e dei prodotti per conto degli enti.',
+        addNewUser: `Puoi aggiungere un Amministratore o un suo delegato. Puoi inserire anche la persona che <1 />hai già indicato come Legale Rappresentante. Se aggiungi una persona già presente con un <3 />ruolo diverso per questo prodotto, verrà inserita come Amministratore.`,
+      },
+    },
     addUserLabel: 'AGGIUNGI UN ALTRO AMMINISTRATORE',
     addUserLink: 'Aggiungi un altro Amministratore',
     backLabel: 'Indietro',
@@ -176,6 +225,13 @@ export default {
     },
     addNote: 'Aggiungi una nota',
     allowedCharacters: 'Massimo 300 caratteri',
+  },
+  addUser: {
+    title: `Aggiungi un nuovo <1 /> Amministratore`,
+    subTitle: `Indica per quale prodotto vuoi aggiungere un nuovo<1 />Amministratore`,
+    stepSelectProduct: {
+      title: 'SELEZIONA IL PRODOTTO',
+    },
   },
   platformUserForm: {
     helperText: 'Il Campo non è valido',
@@ -230,25 +286,48 @@ export default {
         contactAssistanceButton: 'Contatta l’assistenza',
       },
       expired: {
-        title: 'La richiesta di adesione è scaduta',
-        description: `Sono trascorsi oltre 30 giorni dalla richiesta di adesione. Se <2 />desideri ancora aderire al prodotto {{productTitle}}, invia <4 />una nuova richiesta.`,
+        product: {
+          title: 'La richiesta di adesione è scaduta',
+          description: `Sono trascorsi oltre 30 giorni dalla richiesta di adesione. Se <2 />desideri ancora aderire al prodotto {{productTitle}}, invia <4 />una nuova richiesta.`,
+        },
+        user: {
+          title: 'La richiesta è scaduta',
+          description: `Sono trascorsi oltre 30 giorni dalla richiesta di aggiunta di <2 />un Amministratore. Per procedere, invia una nuova <2 /> richiesta.`,
+        },
         backHome: 'Torna alla home',
       },
       alreadyCompleted: {
-        title: 'La richiesta di adesione è stata accettata',
+        product: {
+          title: 'La richiesta di adesione è stata accettata',
+        },
+        user: {
+          title: 'La richiesta è già stata accettata',
+        },
         description: `Per gestire il prodotto, accedi tramite SPID o CIE`,
         logIn: 'Accedi',
       },
       alreadyRejected: {
-        title: 'La richiesta di adesione è stata annullata',
-        description: `La richiesta di adesione non è andata a buon fine. Se <2 />desideri ancora aderire al prodotto {{productTitle}}, invia <4 />una nuova richiesta.`,
+        product: {
+          title: 'La richiesta di adesione è stata annullata',
+          description: `La richiesta di adesione non è andata a buon fine. Se <2 />desideri ancora aderire al prodotto {{productTitle}}, invia <4 />una nuova richiesta.`,
+        },
+        user: {
+          title: 'La richiesta non è più valida',
+          description: `Il tuo ente ha annullato la richiesta. Per aggiungere un <2 />nuovo Amministratore, inviane una nuova.`,
+        },
         backHome: 'Torna alla home',
       },
     },
     outcomeContent: {
       success: {
-        title: 'Adesione completata!',
-        description: `Comunicheremo l'avvenuta adesione all'indirizzo PEC <1/> primario dell'ente. Da questo momento, gli Amministratori <3/> inseriti in fase di richiesta possono accedere all'Area <5 />Riservata.`,
+        product: {
+          title: 'Adesione completata!',
+          description: `Comunicheremo l'avvenuta adesione all'indirizzo PEC <1/> primario dell'ente. Da questo momento è possibile <3 />accedere all'Area Riservata.`,
+        },
+        user: {
+          title: 'Richiesta completata',
+          description: `Da questo momento gli Amministratori indicati possono <1 />accedere all’Area Riservata.`,
+        },
         backHome: 'Torna alla home',
       },
       error: {
@@ -260,13 +339,25 @@ export default {
     errors: {
       INVALID_DOCUMENT: {
         title: 'Controlla il documento',
-        message:
-          "Il documento caricato non corrisponde all'Atto di Adesione. Verifica che sia corretto e caricalo di nuovo.",
+        product: {
+          message:
+            "Il documento caricato non corrisponde all'Atto di Adesione. Verifica che sia corretto e caricalo di nuovo.",
+        },
+        user: {
+          message:
+            'Il documento caricato non corrisponde al modulo che hai ricevuto via email. Verifica che sia corretto e caricalo di nuovo.',
+        },
       },
       INVALID_SIGN: {
         title: 'Controlla il documento',
-        message:
-          'La Firma Digitale non è riconducibile al Legale Rappresentante indicato in fase di adesione. Verifica la corrispondenza e carica di nuovo il documento.',
+        product: {
+          message:
+            'La Firma Digitale non è riconducibile al Legale Rappresentante indicato in fase di adesione. Verifica la corrispondenza e carica di nuovo il documento.',
+        },
+        user: {
+          message:
+            'La Firma Digitale non è riconducibile al Legale Rappresentante indicato in fase di richiesta. Verifica la corrispondenza e carica di nuovo il documento.',
+        },
       },
       ALREADY_ONBOARDED: {
         title: `L’ente selezionato ha già aderito`,
@@ -290,27 +381,32 @@ export default {
     description: 'Impossibile individuare il prodotto desiderato',
   },
   onboarding: {
-    outcomeContent: {
-      ptSuccess: {
-        title: 'Richiesta di registrazione inviata',
-        description:
-          'Invieremo un’email con l’esito della richiesta all’indirizzo  <1 /> PEC indicato.',
-      },
-      success: {
-        title: 'Richiesta di adesione inviata',
-        notPaDescription:
-          "Invieremo un'email all'indirizzo PEC indicato. <1 /> Al suo interno, ci sono le istruzioni per completare <3 />l'adesione.",
-        paDescription:
-          "Invieremo un'email all'indirizzo PEC primario dell'ente. <1 /> Al suo interno, ci sono le istruzioni per completare <3 />l'adesione.",
-        backHome: 'Torna alla home',
-      },
-      error: {
-        title: 'Spiacenti, qualcosa è andato storto.',
-        description:
-          'A causa di un errore del sistema non è possibile completare la procedura. <1 /> Ti chiediamo di riprovare più tardi.',
-        backActionLabel: 'Chiudi',
+    success: {
+      flow: {
+        product: {
+          title: 'Richiesta di adesione inviata',
+          publicAdministration: {
+            description: `Invieremo un’email all’indirizzo PEC primario dell’ente. <1 /> Al suo interno, ci sono le istruzioni per completare <3 />l’adesione.`,
+          },
+          notPublicAdministration: {
+            description: `Invieremo un’email all’indirizzo PEC indicato. <1 /> Al suo interno, ci sono le istruzioni per completare <3 />l’adesione.`,
+          },
+        },
+        techPartner: {
+          title: 'Richiesta di registrazione inviata',
+          description: `Invieremo un’email con l’esito della richiesta all’indirizzo <1 />PEC indicato.`,
+        },
+        user: {
+          title: 'Hai inviato la richiesta',
+          description: `Invieremo un’email all’indirizzo PEC primario dell’ente. <1 /> Al suo interno, ci sono le istruzioni per completare <3 />l’operazione.`,
+        },
       },
     },
+    error: {
+      title: 'Qualcosa è andato storto.',
+      description: `A causa di un errore del sistema non è possibile completare <1 />la procedura. Ti chiediamo di riprovare più tardi.`,
+    },
+    backHome: 'Torna alla home',
     sessionModal: {
       title: 'Vuoi davvero uscire?',
       message: 'Se esci, la richiesta di adesione andrà persa.',
@@ -319,10 +415,14 @@ export default {
     },
     confirmationModal: {
       title: 'Confermi la richiesta di invio?',
-      description:
-        'Stai inviando una richiesta di adesione al prodotto <1>{{productName}}</1> per l’ente <3>{{institutionName}}</3>. <5 /> L’accordo di adesione arriverà alla PEC istituzionale dell’ente e dovrà essere sottoscritta dal Legale Rappresentante. Assicurati di essere autorizzato come dipendente a effettuare questa richiesta.',
-      confirmLabel: 'Conferma',
-      cancelLabel: 'Annulla',
+      description: {
+        flow: {
+          base: 'Stai inviando una richiesta di adesione al prodotto <1>{{productName}}</1> per l’ente <3>{{institutionName}}</3>. <5 /> L’accordo di adesione arriverà alla PEC istituzionale dell’ente e dovrà essere sottoscritta dal Legale Rappresentante. Assicurati di essere autorizzato come dipendente a effettuare questa richiesta.',
+          addNewUser: `Stai aggiungendo un nuovo Amministratore per l’ente <1>{{institutionName}}</1>. <3 />L’ente riceverà un modulo alla PEC istituzionale e dovrà essere firmato dal Legale Rappresentante che hai indicato. <3 />Assicurati di essere autorizzato dall’ente a effettuare questa richiesta.`,
+        },
+      },
+      confirm: 'Conferma',
+      back: 'Indietro',
     },
     loading: {
       loadingText: 'Stiamo verificando i tuoi dati',
@@ -334,7 +434,7 @@ export default {
       backAction: 'Torna alla home',
     },
   },
-  onBoardingSubProduct: {
+  onboardingSubProduct: {
     alreadyOnboardedError: {
       title: 'Sottoscrizione già avvenuta',
       message:
@@ -423,8 +523,7 @@ export default {
       closeButton: 'Chiudi',
     },
     billingData: {
-      subTitle:
-      `Conferma, modifica o inserisci i dati richiesti, assicurandoti che siano corretti.<1 /> Verranno usati anche per richiedere l’adesione ad altri prodotti e in caso di fatturazione.`,
+      subTitle: `Conferma, modifica o inserisci i dati richiesti, assicurandoti che siano corretti.<1 /> Verranno usati anche per richiedere l’adesione ad altri prodotti e in caso di fatturazione.`,
     },
     exitModal: {
       title: 'Vuoi davvero uscire?',
@@ -445,24 +544,34 @@ export default {
   stepInstitutionType: {
     title: 'Seleziona il tipo di ente che <1/> rappresenti',
     subtitle: 'Indica il tipo di ente che aderirà a <1>{{productName}}</1>',
-    institutionTypeValues: {
-      pa: 'Pubblica Amministrazione',
-      gsp: 'Gestore di servizi pubblici',
-      scp: 'Società a controllo pubblico',
-      pt: 'Partner tecnologico',
-      psp: 'Prestatori Servizi di Pagamento',
-      sa: 'Gestore privato di piattaforma e-procurement',
-      as: 'Società di assicurazione',
+    institutionTypes: {
+      pa: {
+        title: 'Pubblica Amministrazione',
+        description: 'art. 2, comma 2, lettera A del CAD',
+      },
+      gsp: {
+        title: 'Gestore di servizi pubblici',
+        description: 'art. 2, comma 2, lettera B del CAD',
+      },
+      scp: {
+        title: 'Società a controllo pubblico',
+        description: 'art. 2, comma 2, lettera C del CAD',
+      },
+      pt: {
+        title: 'Partner tecnologico',
+        description:
+          'Ai sensi di IO - Paragrafo 6.1.3 delle “Linee Guida sul punto di accesso telematico ai servizi della Pubblica Amministrazione” emanate da AgID ai sensi dell’art- 64-bis del CAD',
+      },
+      psp: {
+        title: 'Prestatori Servizi di Pagamento',
+      },
+      sa: {
+        title: 'Gestore privato di piattaforma e-procurement',
+      },
+      as: {
+        title: 'Società di assicurazione',
+      },
     },
-    cadArticle2A: 'art. 2, comma 2, lettera A del CAD',
-    cadArticle2B: 'art. 2, comma 2, lettera B del CAD',
-    cadArticle2C: 'art. 2, comma 2, lettera C del CAD',
-    cadArticle165: 'articolo 1, comma 2, del decreto legislativo 30 marzo 2001, n. 165',
-    cadArticle6AppIo:
-      'Ai sensi di IO - Paragrafo 6.1.3 delle “Linee Guida sul punto di accesso telematico ai servizi della Pubblica Amministrazione” emanate da AgID ai sensi dell’art- 64-bis del CAD',
-    cadArticle6:
-      'par. 6 delle “Linee Guida sul punto di accesso telematico ai servizi della Pubblica Amministrazione” ( art. 64bis del CAD)',
-    cadPsp: '',
     backLabel: 'Indietro',
     confirmLabel: 'Continua',
   },
@@ -496,7 +605,6 @@ export default {
       uoName: 'Denominazione UO',
       aooUniqueCode: 'Codice Univoco AOO',
       uoUniqueCode: 'Codice Univoco UO',
-      registeredOffice: 'Sede legale',
       fullLegalAddress: 'Indirizzo e numero civico della sede legale',
       zipCode: 'CAP',
       city: 'Città',
@@ -535,6 +643,7 @@ export default {
       },
       assistanceContact: {
         supportEmail: 'Indirizzo email visibile ai cittadini',
+        supportEmailOptional: "Indirizzo email visibile ai cittadini (facoltativo)",
         supportEmailDescriprion:
           'È il contatto che i cittadini visualizzano per richiedere assistenza all’ente',
       },

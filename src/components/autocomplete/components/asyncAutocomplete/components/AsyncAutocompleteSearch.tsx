@@ -46,6 +46,7 @@ type Props = {
   setAooResult: React.Dispatch<React.SetStateAction<AooData | undefined>>;
   setUoResult: React.Dispatch<React.SetStateAction<UoData | undefined>>;
   externalInstitutionId: string;
+  addUser: boolean;
 };
 
 // eslint-disable-next-line sonarjs/cognitive-complexity, complexity
@@ -66,6 +67,7 @@ export default function AsyncAutocompleteSearch({
   setAooResult,
   setUoResult,
   externalInstitutionId,
+  addUser,
 }: Props) {
   const setSelectedHistory = useHistoryState<IPACatalogParty | null>('selected_step1', null)[2];
   const { t } = useTranslation();
@@ -90,6 +92,8 @@ export default function AsyncAutocompleteSearch({
       ? selected?.denominazioneAoo
       : selected && isUoCodeSelected && selected.descrizioneUo
       ? selected?.descrizioneUo
+      : addUser && selected && (isAooCodeSelected || isUoCodeSelected) && selected?.description
+      ? selected.description
       : input;
 
   useEffect(() => {
@@ -109,14 +113,17 @@ export default function AsyncAutocompleteSearch({
         id="Parties"
         sx={{
           width: '100%',
-          mx: selected ? 1 : 4,
+          mx: selected ? '6px' : 4,
+          ml: selected ? '12px' : 4,
           '& input#Parties': { display: selected && 'none !important' },
         }}
         onChange={handleChange}
         value={!selected ? valueSelected : ''}
         label={
           !selected
-            ? isAooCodeSelected
+            ? isBusinessNameSelected || isTaxCodeSelected
+              ? t('asyncAutocomplete.searchLabel')
+              : isAooCodeSelected
               ? t('asyncAutocomplete.aooLabel')
               : isUoCodeSelected
               ? t('asyncAutocomplete.uoLabel')
@@ -128,7 +135,7 @@ export default function AsyncAutocompleteSearch({
           // maxLength: isTaxCodeSelected ? '11' : undefined,
           style: {
             fontStyle: 'normal',
-            fontWeight: '700',
+            fontWeight: '600',
             fontSize: '16px',
             lineHeight: '24px',
             color: theme.palette.text.primary,
@@ -159,7 +166,7 @@ export default function AsyncAutocompleteSearch({
                     }),
                   }}
                 >
-                  {selected.denominazioneEnte}
+                  {selected.denominazioneEnte ?? selected.parentDescription}
                 </Typography>
               )}
             </Box>

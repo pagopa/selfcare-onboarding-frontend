@@ -1,9 +1,10 @@
-import { RoutesObject } from '../../types';
-import CompleteRequestComponent from '../views/uploadContract/complete/CompleteRequestComponent';
+import { InstitutionType, RoutesObject } from '../../types';
+import CompleteRequest from '../views/onboardingRequest/complete/CompleteRequest';
 import NoProductPage from '../views/NoProductPage';
-import Onboarding from '../views/onboarding/Onboarding';
-import OnBoardingSubProduct from '../views/OnBoardingSubProduct/OnBoardingSubProduct';
-import CancelRequestComponent from '../views/uploadContract/cancel/CancelRequestComponent';
+import OnboardingProduct from '../views/onboardingProduct/OnboardingProduct';
+import OnboardingPremium from '../views/onboardingPremium/OnboardingPremium';
+import CancelRequest from '../views/onboardingRequest/cancel/CancelRequest';
+import OnboardingUser from '../views/onboardingUser/OnboardingUser';
 import { ENV } from './env';
 
 const IS_DEVELOP = process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test';
@@ -22,25 +23,31 @@ export const ROUTES: RoutesObject = {
   },
   REGISTRATION_FINALIZE_COMPLETE: {
     PATH: `${BASE_ROUTE}/confirm`,
-    LABEL: 'Completa la procedura di onboarding',
-    COMPONENT: CompleteRequestComponent,
+    LABEL: 'Complete onboarding request',
+    COMPONENT: CompleteRequest,
   },
   REGISTRATION_FINALIZE_REJECT: {
     PATH: `${BASE_ROUTE}/cancel`,
-    LABEL: 'Cancella la procedura di onboarding',
-    COMPONENT: CancelRequestComponent,
+    LABEL: 'Cancel onboarding request',
+    COMPONENT: CancelRequest,
   },
-  ONBOARDING: {
+  ONBOARDING_USER: {
+    PATH: `${BASE_ROUTE}/user`,
+    LABEL: 'Onboarding user',
+    EXACT: true,
+    COMPONENT: OnboardingUser,
+  },
+  ONBOARDING_PRODUCT: {
     PATH: `${BASE_ROUTE}/:productId`,
-    LABEL: 'Onboarding',
+    LABEL: 'Onboarding product',
     EXACT: true,
-    COMPONENT: Onboarding,
+    COMPONENT: OnboardingProduct,
   },
-  ONBOARDING_SUBPRODUCT: {
+  ONBOARDING_PREMIUM: {
     PATH: `${BASE_ROUTE}/:productId/:subProductId`,
-    LABEL: 'Onboarding SubProduct',
+    LABEL: 'Onboarding premium',
     EXACT: true,
-    COMPONENT: OnBoardingSubProduct,
+    COMPONENT: OnboardingPremium,
   },
 };
 
@@ -66,8 +73,14 @@ export const API = {
   ONBOARDING_POST_LEGALS: {
     URL: ENV.URL_API.ONBOARDING_V2 + '/v2/institutions/onboarding',
   },
+  ONBOARDING_NEW_USER: {
+    URL: ENV.URL_API.ONBOARDING_V2 + '/v1/users/onboarding',
+  },
   ONBOARDING_COMPLETE_REGISTRATION: {
     URL: ENV.URL_API.ONBOARDING_V2 + '/v2/tokens/{{token}}/complete',
+  },
+  USER_COMPLETE_REGISTRATION: {
+    URL: ENV.URL_API.ONBOARDING_V2 + '/v2/tokens/{{token}}/completeOnboardingUsers',
   },
 
   // institutions present on self care db
@@ -116,6 +129,18 @@ export const API = {
   ONBOARDING_GET_INSURANCE_COMPANIES_FROM_IVASSCODE: {
     URL: ENV.URL_API.PARTY_REGISTRY_PROXY + '/insurance-companies/origin/{{code}}',
   },
+  ONBOARDING_GET_PRODUCTS: {
+    URL: ENV.URL_API.ONBOARDING + '/products',
+  },
+  ONBOARDING_GET_ALLOWED_ADD_USER_PRODUCTS: {
+    URL: ENV.URL_API.ONBOARDING_V2 + '/v1/products/admin',
+  },
+  ONBOARDING_GET_INSTITUTIONS: {
+    URL: ENV.URL_API.ONBOARDING_V2 + '/v2/institutions',
+  },
+  ONBOARDING_CHECK_MANAGER: {
+    URL: ENV.URL_API.ONBOARDING_V2 + '/v1/users/check-manager',
+  },
 };
 
 export const USER_ROLE_LABEL = {
@@ -150,4 +175,77 @@ export const filterByCategory = (institutionType?: string, productId?: string) =
     : 'C17,C16,L10,L19,L13,L2,C10,L20,L21,L22,L15,L1,C13,C5,L40,L11,L39,L46,L8,L34,L7,L35,L45,L47,L6,L12,L24,L28,L42,L36,L44,C8,C3,C7,C14,L16,C11,L33,C12,L43,C2,L38,C1,L5,L4,L31,L18,L17,S01,SA';
 
 export const noMandatoryIpaProducts = (productId?: string) =>
-  productId !== 'prod-interop' && productId !== 'prod-io' && productId !== 'prod-io-sign' && productId !== 'prod-idpay' && !productId?.includes('prod-pn');
+  productId !== 'prod-interop' &&
+  productId !== 'prod-io' &&
+  productId !== 'prod-io-sign' &&
+  productId !== 'prod-idpay' &&
+  !productId?.includes('prod-pn');
+
+export const addUserFlowProducts = (productId: string) =>
+  productId === 'prod-interop' ||
+  productId === 'prod-pn' ||
+  productId === 'prod-io' ||
+  productId === 'prod-pagopa';
+
+export const institutionTypes: Array<{ labelKey: string; value: InstitutionType }> = [
+  { labelKey: 'pa', value: 'PA' },
+  { labelKey: 'gsp', value: 'GSP' },
+  { labelKey: 'scp', value: 'SCP' },
+  { labelKey: 'pt', value: 'PT' },
+  { labelKey: 'psp', value: 'PSP' },
+  { labelKey: 'sa', value: 'SA' },
+  { labelKey: 'as', value: 'AS' },
+];
+
+export const institutionType4Product = (productId: string | undefined) => {
+  switch (productId) {
+    case 'prod-interop':
+      return institutionTypes.filter(
+        (it) =>
+          it.labelKey === 'pa' ||
+          it.labelKey === 'gsp' ||
+          it.labelKey === 'sa' ||
+          it.labelKey === 'as'
+      );
+    case 'prod-pn':
+      return institutionTypes.filter((it) => it.labelKey === 'pa');
+    case 'prod-idpay':
+      return institutionTypes.filter((it) => it.labelKey === 'pa');
+    case 'prod-io':
+    case 'prod-pagopa':
+      // Temporary disabled psp radiobutton for prod-pagopa, the radio buttons are now the same for prod-io and prod-pagopa.
+      return institutionTypes.filter(
+        (it) =>
+          it.labelKey === 'pa' ||
+          it.labelKey === 'gsp' ||
+          (ENV.PT.SHOW_PT ? it.labelKey === 'pt' : '')
+      );
+    case 'prod-io-sign':
+      return institutionTypes.filter((it) => it.labelKey === 'pa' || it.labelKey === 'gsp');
+    default:
+      return institutionTypes.filter(
+        (it) => it.labelKey === 'pa' || it.labelKey === 'gsp' || it.labelKey === 'scp'
+      );
+  }
+};
+
+export const description4InstitutionType = (institutionType: InstitutionType) => {
+  switch (institutionType) {
+    case 'PT':
+      return 'stepInstitutionType.institutionTypes.pt.description';
+    case 'PA':
+      return 'stepInstitutionType.institutionTypes.pa.description';
+    case 'GSP':
+      return 'stepInstitutionType.institutionTypes.gsp.description';
+    case 'SCP':
+      return 'stepInstitutionType.institutionTypes.scp.description';
+    case 'PSP':
+    case 'SA':
+    case 'AS':
+    default:
+      return '';
+  }
+};
+
+export const buildUrlLogo = (partyId: string) =>
+  `${ENV.URL_INSTITUTION_LOGO.PREFIX}${partyId}${ENV.URL_INSTITUTION_LOGO.SUFFIX}`;

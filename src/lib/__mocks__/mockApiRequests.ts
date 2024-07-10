@@ -14,7 +14,9 @@ import {
 import { BillingDataDto } from '../../model/BillingData';
 import { GeographicTaxonomyResource, nationalValue } from '../../model/GeographicTaxonomies';
 import { UoData } from '../../model/UoModel';
+import { addUserFlowProducts } from '../../utils/constants';
 import { AooData } from './../../model/AooData';
+import { OnboardedParty } from './../../model/OnboardedParty';
 
 const createPartyRegistryEntity = (
   id: string,
@@ -256,7 +258,7 @@ const mockedBaseParties: Array<SelfcareParty> = [
     id: '5454679',
     description: 'Comune di Udine',
     userRole: 'ADMIN',
-  }
+  },
 ];
 
 const mockedParties = [
@@ -421,7 +423,7 @@ export const mockedGeotaxonomies: Array<GeographicTaxonomyResource> = [
   },
 ];
 
-const mockedAoos: Array<AooData> = [
+export const mockedAoos: Array<AooData> = [
   {
     codAoo: 'A356E00',
     codiceFiscaleEnte: '92078570527',
@@ -466,7 +468,7 @@ const mockedAoos: Array<AooData> = [
   },
 ];
 
-const mockedUos: Array<UoData> = [
+export const mockedUos: Array<UoData> = [
   {
     codiceFiscaleEnte: '98765432109',
     codiceFiscaleSfe: '87654321098',
@@ -507,11 +509,30 @@ const mockedUos: Array<UoData> = [
     indirizzo: 'Via Firenze 4',
     tipoMail1: 'Pec',
   },
+  {
+    codiceFiscaleEnte: '12345678901',
+    codiceIpa: 'GHIJKL34',
+    codiceUniUo: 'BRE23D',
+    codiceUniUoPadre: '',
+    denominazioneEnte: 'denominazione uo test 3',
+    descrizioneUo: 'Unità operativa 3',
+    id: 'BRE23D',
+    mail1: 'test2@fnofi.it',
+    origin: 'IPA',
+    CAP: '54321',
+    codiceCatastaleComune: 'F012',
+    codiceComuneISTAT: '082050',
+    cognomeResponsabile: 'Bianchi',
+    dataAggiornamento: '2020-11-20',
+    dataIstituzione: '2017-11-25',
+    indirizzo: 'Via Firenze 4',
+    tipoMail1: 'Pec',
+  },
 ];
 
 const mockedOnboardingData: Array<InstitutionOnboardingInfoResource> = [
   {
-    geographicTaxonomies: [{ code: '23233', desc: 'Milano'}],
+    geographicTaxonomies: [{ code: '23233', desc: 'Milano' }],
     institution: {
       id: '55897f04-bafd-4bc9-b646-0fd027620c1b',
       billingData: {
@@ -538,7 +559,7 @@ const mockedOnboardingData: Array<InstitutionOnboardingInfoResource> = [
     },
   },
   {
-    geographicTaxonomies: [{ code: '23233', desc: 'Milano'}],
+    geographicTaxonomies: [{ code: '23233', desc: 'Milano' }],
     institution: {
       id: '999c63d8-554d-4376-233s-4caf2a73822a',
       billingData: {
@@ -573,7 +594,7 @@ const mockedOnboardingData: Array<InstitutionOnboardingInfoResource> = [
     },
   },
   {
-    geographicTaxonomies: [{ code: '23233', desc: 'Milano'}],
+    geographicTaxonomies: [{ code: '23233', desc: 'Milano' }],
     institution: {
       id: '370c63d8-1b76-4376-a725-4caf2a73822a',
       billingData: {
@@ -641,6 +662,28 @@ const mockedOnboardingData: Array<InstitutionOnboardingInfoResource> = [
         shareCapital: '123456',
       },
     },
+  },
+];
+
+const mockedOnboardedParties: Array<OnboardedParty> = [
+  {
+    id: '1',
+    description: 'onboardedParty1',
+    institutionType: 'PA',
+    origin: 'IPA',
+    originId: 'sdsdee',
+    productId: 'prod-io',
+    taxCode: '00000000000',
+  },
+  {
+    id: '1',
+    description: 'onboardedParty2',
+    institutionType: 'PA',
+    origin: 'IPA',
+    originId: 'sdsdee',
+    productId: 'prod-io',
+    taxCode: '00000000000',
+    subunitCode: 'AAA111',
   },
 ];
 
@@ -965,10 +1008,14 @@ export async function mockFetch(
     );
   }
 
-  if (endpoint === 'ONBOARDING_GET_UO_LIST'){
+  if (endpoint === 'ONBOARDING_GET_UO_LIST') {
     const retrievedUos = mockedUos.filter((uo) => uo.codiceFiscaleEnte === params.taxCodeInvoicing);
     return new Promise((resolve) =>
-      resolve({ data: {items: retrievedUos, count: retrievedUos.length }, status: 200, statusText: '200' } as AxiosResponse)
+      resolve({
+        data: { items: retrievedUos, count: retrievedUos.length },
+        status: 200,
+        statusText: '200',
+      } as AxiosResponse)
     );
   }
 
@@ -994,18 +1041,12 @@ export async function mockFetch(
         } else {
           return notFoundError;
         }
-      // Use case for test aoo
-      case '92078570527':
-        if (params.subunitCode) {
-          return notFoundError;
-        } else {
-          return noContent;
-        }
       default:
-        if (params.productId !== 'prod-io') {
-          return notFoundError;
-        } else {
+        // Use case for test already onboarded AOO and UO
+        if (params.subunitCode === 'A356E01' || params.subunitCode === 'BRE23D') {
           return noContent;
+        } else {
+          return notFoundError;
         }
     }
   }
@@ -1038,27 +1079,43 @@ export async function mockFetch(
   }
 
   if (endpoint === 'ONBOARDING_GET_ONBOARDING_DATA') {
-    switch(params.institutionId){
+    switch (params.institutionId) {
       case '43446':
         return new Promise((resolve) =>
-        resolve({ data: mockedOnboardingData[0], status: 200, statusText: '200' } as AxiosResponse)
-      );
+          resolve({
+            data: mockedOnboardingData[0],
+            status: 200,
+            statusText: '200',
+          } as AxiosResponse)
+        );
       case '23231':
         return new Promise((resolve) =>
-        resolve({ data: mockedOnboardingData[2], status: 200, statusText: '200' } as AxiosResponse)
-      );
+          resolve({
+            data: mockedOnboardingData[2],
+            status: 200,
+            statusText: '200',
+          } as AxiosResponse)
+        );
       case '5454679':
         return new Promise((resolve) =>
-        resolve({ data: mockedOnboardingData[1], status: 200, statusText: '200' } as AxiosResponse)
-      );
+          resolve({
+            data: mockedOnboardingData[1],
+            status: 200,
+            statusText: '200',
+          } as AxiosResponse)
+        );
       case '775644':
         return genericError;
       default:
         return new Promise((resolve) =>
-          resolve({ data: mockedOnboardingData[3], status: 200, statusText: '200' } as AxiosResponse)
+          resolve({
+            data: mockedOnboardingData[3],
+            status: 200,
+            statusText: '200',
+          } as AxiosResponse)
         );
     }
-    }
+  }
 
   if (endpoint === 'ONBOARDING_VERIFY_PRODUCT') {
     const selectedProduct = mockedProducts.find((p) => p.id === endpointParams.productId);
@@ -1113,6 +1170,17 @@ export async function mockFetch(
     }
   }
 
+  if (endpoint === 'ONBOARDING_NEW_USER') {
+    switch ((data as any).productId) {
+      case 'prod-io':
+        return badRequestError;
+      default:
+        return new Promise((resolve) =>
+          resolve({ data: {}, status: 200, statusText: '200' } as AxiosResponse)
+        );
+    }
+  }
+
   if (endpoint === 'ONBOARDING_GET_PARTY') {
     const fetched = mockPartyRegistry.items.find(
       (p) => p.id === endpointParams.externalInstitutionId
@@ -1128,6 +1196,15 @@ export async function mockFetch(
   }
 
   if (endpoint === 'ONBOARDING_COMPLETE_REGISTRATION') {
+    switch (endpointParams.token) {
+      case 'error':
+        return badRequestError;
+      case 'pendingRequest':
+        return noContent;
+    }
+  }
+
+  if (endpoint === 'USER_COMPLETE_REGISTRATION') {
     switch (endpointParams.token) {
       case 'error':
         return badRequestError;
@@ -1180,6 +1257,48 @@ export async function mockFetch(
       default:
         return notFoundError;
     }
+  }
+
+  if (endpoint === 'ONBOARDING_GET_INSTITUTIONS') {
+    switch (params.taxCode) {
+      case '00000000000':
+        return new Promise((resolve) =>
+          resolve({
+            data: mockedOnboardedParties[0],
+            status: 200,
+            statusText: '200',
+          } as AxiosResponse)
+        );
+    }
+    switch (params.subunitCode) {
+      case 'AAA111':
+        return new Promise((resolve) =>
+          resolve({
+            data: mockedOnboardedParties[1],
+            status: 200,
+            statusText: '200',
+          } as AxiosResponse)
+        );
+    }
+  }
+
+  if (endpoint === 'ONBOARDING_GET_PRODUCTS') {
+    return new Promise((resolve) =>
+      resolve({ data: mockedProducts, status: 200, statusText: '200' } as AxiosResponse)
+    );
+  }
+
+  if (endpoint === 'ONBOARDING_GET_ALLOWED_ADD_USER_PRODUCTS') {
+    const allowedAddUserProduct = mockedProducts.filter((p) => addUserFlowProducts(p.id));
+    return new Promise((resolve) =>
+      resolve({ data: allowedAddUserProduct, status: 200, statusText: '200' } as AxiosResponse)
+    );
+  }
+
+  if (endpoint === 'ONBOARDING_CHECK_MANAGER') {
+    return new Promise((resolve) =>
+      resolve({ data: { result: true }, status: 200, statusText: '200' } as AxiosResponse)
+    );
   }
 
   const msg = `NOT MOCKED REQUEST! {endpoint: ${endpoint}, endpointParams: ${JSON.stringify(

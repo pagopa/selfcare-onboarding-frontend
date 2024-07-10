@@ -1,8 +1,10 @@
-import { Alert, Grid, Link, Typography, useTheme } from '@mui/material';
+import { Alert, FormControlLabel, Grid, Link, Typography, useTheme } from '@mui/material';
 import { Box } from '@mui/system';
 import { AxiosError, AxiosResponse } from 'axios';
 import { ReactElement, useContext, useEffect, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
+import Checkbox from '@mui/material/Checkbox';
+import { SessionModal } from '@pagopa/selfcare-common-frontend';
 import {
   IPACatalogParty,
   InstitutionType,
@@ -20,6 +22,7 @@ import { OnboardingStepActions } from '../OnboardingStepActions';
 import { Autocomplete } from '../autocomplete/Autocomplete';
 import { useHistoryState } from '../useHistoryState';
 import { filterByCategory, noMandatoryIpaProducts } from '../../utils/constants';
+import { ENV } from '../../utils/env';
 
 type Props = {
   subTitle: string | ReactElement;
@@ -87,6 +90,8 @@ export function StepSearchParty({
   );
   const [dataFromAooUo, setDataFromAooUo] = useState<IPACatalogParty | null>();
   const [disabled, setDisabled] = useState<boolean>(false);
+  const [isAggregator, setIsAggregator] = useState<boolean>(false);
+  const [open, setOpen] = useState<boolean>(false);
 
   const isEnabledProduct2AooUo = product?.id === 'prod-pn';
 
@@ -311,7 +316,7 @@ export function StepSearchParty({
         </Grid>
       </Grid>
 
-      <Grid container item justifyContent="center" mt={4} mb={4}>
+      <Grid container item sx={{ alignItems: 'center', flexDirection: 'column' }} mt={4} mb={4}>
         {product?.id === 'prod-pn' && (
           <Grid container item justifyContent="center">
             <Grid item display="flex" justifyContent="center" mb={5}>
@@ -366,12 +371,11 @@ export function StepSearchParty({
 
         <Grid item xs={8} md={6} lg={5}>
           <Autocomplete
-            theme={theme}
             selected={selected}
-            setDisabled={setDisabled}
             setSelected={setSelected}
+            setDisabled={setDisabled}
             endpoint={{ endpoint: 'ONBOARDING_GET_SEARCH_PARTIES' }}
-            transformFn={(data: { items: Array<IPACatalogParty> }) =>
+            transformFn={(data: { items: any }) =>
               /* removed transformation into lower case in order to send data to BE as obtained from registry
                   // eslint-disable-next-line functional/immutable-data
                   data.items.forEach((i) => (i.description = i.description.toLowerCase()));
@@ -387,12 +391,20 @@ export function StepSearchParty({
             uoResult={uoResult}
             setAooResult={setAooResult}
             setUoResult={setUoResult}
-            setUoResultHistory={setUoResultHistory}
-            setAooResultHistory={setAooResultHistory}
             externalInstitutionId={externalInstitutionId}
             institutionType={institutionType}
           />
         </Grid>
+        {ENV.AGGREGATOR.SHOW_AGGREGATOR && institutionType === 'PA' && (
+          <Grid item mt={3}>
+            <FormControlLabel
+              value={false}
+              control={<Checkbox size="small" />}
+              onClick={() => setIsAggregator(true)}
+              label={t('onboardingStep1.onboarding.aggregator')}
+            />
+          </Grid>
+        )}
       </Grid>
       {institutionType !== 'SA' && institutionType !== 'AS' && (
         <Grid container item justifyContent="center">
@@ -447,7 +459,7 @@ export function StepSearchParty({
                       3: <br />,
                     }}
                   >
-                    {`Non trovi il tuo ente nell'IPA? In <1>questa pagina</1> trovi maggiori <3/> informazioni sull'indice e su come accreditarsi `}
+                    {`Non trovi il tuo ente nell'IPA? <1>In questa pagina</1> trovi maggiori <3/> informazioni sull'indice e su come accreditarsi `}
                   </Trans>
                 )}
               </Typography>
@@ -455,7 +467,7 @@ export function StepSearchParty({
           </Grid>
         </Grid>
       )}
-      <Grid item mt={4}>
+      <Grid item mt={2}>
         <OnboardingStepActions
           back={
             !productAvoidStep
@@ -467,12 +479,35 @@ export function StepSearchParty({
               : undefined
           }
           forward={{
-            action: onForwardAction,
+            action: () => {
+              if (isAggregator) {
+                setOpen(true);
+              } else {
+                onForwardAction();
+              }
+            },
             label: t('onboardingStep1.onboarding.onboardingStepActions.confirmAction'),
             disabled,
           }}
         />
       </Grid>
+      <SessionModal
+        open={open}
+        title={t('onboardingStep1.onboarding.aggregatorModal.title')}
+        message={
+          <Trans
+            i18nKey={'onboardingStep1.onboarding.aggregatorModal.message'}
+            components={{ 1: <br /> }}
+            values={{ partyName: selected?.description }}
+          >
+            {`Stai richiedendo l’adesione come ente aggregatore per {{partyName}}.<1 />Per completare l’adesione, dovrai indicare gli enti da aggregare.`}
+          </Trans>
+        }
+        onCloseLabel={t('onboardingStep1.onboarding.aggregatorModal.back')}
+        onConfirmLabel={t('onboardingStep1.onboarding.aggregatorModal.forward')}
+        handleClose={() => setOpen(false)}
+        onConfirm={onForwardAction}
+      />
     </Grid>
   );
 }

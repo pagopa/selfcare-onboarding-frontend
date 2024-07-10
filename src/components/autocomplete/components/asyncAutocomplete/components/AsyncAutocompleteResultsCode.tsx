@@ -1,9 +1,6 @@
 import { Box, styled } from '@mui/system';
 import { PartyAccountItemButton } from '@pagopa/mui-italia/dist/components/PartyAccountItemButton';
-
-import { AooData } from '../../../../../model/AooData';
 import { InstitutionResource } from '../../../../../model/InstitutionResource';
-import { UoData } from '../../../../../model/UoModel';
 import { ANACParty } from '../../../../../../types';
 
 const CustomBox = styled(Box)({
@@ -35,8 +32,8 @@ type Props = {
   getOptionKey: (option: any) => string;
   cfResult?: InstitutionResource | ANACParty;
   setCfResult: React.Dispatch<React.SetStateAction<InstitutionResource | ANACParty | undefined>>;
-  uoResult?: UoData;
-  aooResult?: AooData;
+  uoResult?: any;
+  aooResult?: any;
   isTaxCodeSelected?: boolean;
   isIvassCodeSelected?: boolean;
   isAooCodeSelected?: boolean;
@@ -87,13 +84,13 @@ export default function AsyncAutocompleteResultsCode({
                 ? aooResult?.denominazioneAoo.toLocaleLowerCase()
                 : isUoCodeSelected && uoResult?.descrizioneUo
                 ? uoResult?.descrizioneUo.toLocaleLowerCase()
-                : ''
+                : visibleCode?.description
             }
             partyRole={
               !isTaxCodeSelected && aooResult
-                ? aooResult.denominazioneEnte
+                ? aooResult.denominazioneEnte || aooResult.parentDescription
                 : uoResult
-                ? uoResult?.denominazioneEnte
+                ? uoResult?.denominazioneEnte || uoResult.parentDescription
                 : ''
             }
             image={' '}
