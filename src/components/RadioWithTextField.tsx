@@ -56,10 +56,12 @@ export function RadioWithTextField({
   }, [openTextField]);
 
   useEffect(() => {
-    if (fieldIsFromIPA && isIPA) {
+    if (fieldIsFromIPA && additionalData.isFromIPA?.choice) {
       setOpenTextField(true);
+    } else {
+      setOpenTextField(false);
     }
-  }, []);
+  }, [additionalData.isFromIPA?.choice]);
 
   return (
     <Grid item sx={{ width: '620px' }}>
@@ -83,7 +85,7 @@ export function RadioWithTextField({
             control={
               <Radio
                 size="small"
-                checked={additionalData[field]?.choice ? additionalData[field]?.choice : undefined}
+                checked={additionalData[field]?.choice === true}
                 disabled={isIPA && fieldIsFromIPA}
               />
             }
@@ -95,7 +97,7 @@ export function RadioWithTextField({
             control={
               <Radio
                 size="small"
-                checked={additionalData[field]?.choice ? !additionalData[field]?.choice : undefined}
+                checked={additionalData[field]?.choice === false}
                 disabled={isIPA && fieldIsFromIPA}
               />
             }

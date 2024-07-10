@@ -73,9 +73,6 @@ export function StepAdditionalInformations({ forward, back, originId, origin }: 
   };
 
 
-
-  console.log('additionalData', additionalData);
-
   useEffect(() => {
     if (origin === 'IPA' && originId) {
       handleRadioChange('isFromIPA', true);
