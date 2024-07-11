@@ -205,6 +205,7 @@ export const institutionType4Product = (productId: string | undefined) => {
           it.labelKey === 'pa' ||
           it.labelKey === 'gsp' ||
           it.labelKey === 'sa' ||
+          it.labelKey === 'scp' ||
           it.labelKey === 'as'
       );
     case 'prod-pn':
