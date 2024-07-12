@@ -160,9 +160,15 @@ export default {
   },
   stepUploadAggregates: {
     title: `Indica gli enti da aggregare per {{productName}}`,
+    errorAlert: {
+      title: 'Il file contiene più errori',
+      description:
+        '<1>Scarica il report</1> per verificare le informazioni e carica di nuovo il file.',
+    },
     dropArea: {
       title: 'Trascina qui il file .csv con la lista degli enti aggregati oppure',
       button: 'carica il file',
+      valid: 'File valido',
     },
     back: 'Indietro',
     forward: 'Continua',
