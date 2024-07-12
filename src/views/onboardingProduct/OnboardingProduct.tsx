@@ -585,15 +585,14 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     }
   };
 
-  const onSubmit = (newFormData: Partial<FormData>) => {
-    const users = ((newFormData as any).users as Array<UserOnCreate>).map((u) => ({
+  const onSubmit = () => {
+    const users = ((formData as any).users as Array<UserOnCreate>).map((u) => ({
       ...u,
       taxCode: u?.taxCode.toUpperCase(),
       email: u?.email.toLowerCase(),
     }));
 
     const usersWithoutLegal = users.slice(0, 0).concat(users.slice(0 + 1));
-    setFormData({ ...formData, ...newFormData });
 
     onboardingSubmit(isTechPartner ? usersWithoutLegal : users).catch(() => {
       trackEvent('ONBOARDING_ADD_DELEGATE', {
@@ -822,7 +821,14 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           partyName: onboardingFormData?.businessName || '',
           isTechPartner,
           isAggregator: onboardingFormData?.isAggregator,
-          forward: (newFormData: Partial<FormData>) => onSubmit(newFormData),
+          forward: (newFormData: Partial<FormData>) => {
+            setFormData({ ...formData, ...newFormData });
+            if (onboardingFormData?.isAggregator) {
+              setActiveStep(activeStep + 1);
+            } else {
+              onSubmit();
+            }
+          },
           back: () => {
             if (isTechPartner) {
               setActiveStep(activeStep - 3);
@@ -840,7 +846,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           loading,
           setLoading,
           setOutcome,
-          forward: (newFormData: Partial<FormData>) => onSubmit(newFormData),
+          forward: onSubmit,
           back,
         }),
     },
