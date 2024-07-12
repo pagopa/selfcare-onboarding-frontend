@@ -141,6 +141,9 @@ export const API = {
   ONBOARDING_CHECK_MANAGER: {
     URL: ENV.URL_API.ONBOARDING_V2 + '/v1/users/check-manager',
   },
+  ONBOARDING_VERIFY_AGGREGATES: {
+    URL: ENV.URL_API.ONBOARDING_V2 + '/v2/institutions/onboarding/aggregation/verification',
+  },
 };
 
 export const USER_ROLE_LABEL = {
@@ -205,6 +208,7 @@ export const institutionType4Product = (productId: string | undefined) => {
           it.labelKey === 'pa' ||
           it.labelKey === 'gsp' ||
           it.labelKey === 'sa' ||
+          it.labelKey === 'scp' ||
           it.labelKey === 'as'
       );
     case 'prod-pn':

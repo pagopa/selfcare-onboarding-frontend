@@ -7,7 +7,7 @@ import Button from '@mui/material/Button';
 import { Box, useTheme, Radio, RadioGroup, FormControlLabel } from '@mui/material';
 import { useTranslation, Trans } from 'react-i18next';
 import { useState } from 'react';
-import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
+import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
 import { StepperStepComponentProps } from '../../../../../../../types';
 import { CarnetPlan } from '../../../../../../model/PlansPrices';
 

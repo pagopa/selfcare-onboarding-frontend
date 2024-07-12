@@ -2,12 +2,12 @@ import { useEffect, useState, useContext, useRef, useMemo } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Container } from '@mui/material';
 import { AxiosError, AxiosResponse } from 'axios';
-import SessionModal from '@pagopa/selfcare-common-frontend/components/SessionModal';
-import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
+import SessionModal from '@pagopa/selfcare-common-frontend/lib/components/SessionModal';
+import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
 import { useTranslation, Trans } from 'react-i18next';
 import { uniqueId } from 'lodash';
 import { IllusCompleted, IllusError } from '@pagopa/mui-italia';
-import { EndingPage } from '@pagopa/selfcare-common-frontend';
+import { EndingPage } from '@pagopa/selfcare-common-frontend/lib';
 import React from 'react';
 import { withLogin } from '../../components/withLogin';
 import { AooData } from '../../model/AooData';
@@ -50,6 +50,7 @@ import AlreadyOnboarded from '../AlreadyOnboarded';
 import { genericError, StepVerifyOnboarding } from './components/StepVerifyOnboarding';
 import { StepAddAdmin } from './components/StepAddAdmin';
 import { StepAdditionalInformations } from './components/StepAdditionalInformations';
+import { StepUploadAggregates } from './components/StepUploadAggregates';
 
 export type ValidateErrorType = 'conflictError';
 
@@ -305,7 +306,8 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     party: Party,
     aooResult: AooData,
     uoResult: UoData,
-    institutionType: InstitutionType
+    institutionType: InstitutionType,
+    isAggregator: boolean
   ) => {
     setAooSelected(aooResult);
     setUoSelected(uoResult);
@@ -355,6 +357,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
       geographicTaxonomies: onboardingFormData?.geographicTaxonomies as Array<GeographicTaxonomy>,
       origin: party.origin,
       originId: party.originId,
+      isAggregator,
     });
     forwardWithData(newFormData);
     trackEvent('ONBOARDING_PARTY_SELECTION', {
@@ -582,6 +585,25 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     }
   };
 
+  const onSubmit = (userData?: Partial<FormData> | undefined) => {
+    const data = userData ?? formData;
+    const users = ((data as any).users as Array<UserOnCreate>).map((u) => ({
+      ...u,
+      taxCode: u?.taxCode.toUpperCase(),
+      email: u?.email.toLowerCase(),
+    }));
+
+    const usersWithoutLegal = users.slice(0, 0).concat(users.slice(0 + 1));
+
+    onboardingSubmit(isTechPartner ? usersWithoutLegal : users).catch(() => {
+      trackEvent('ONBOARDING_ADD_DELEGATE', {
+        request_id: requestIdRef.current,
+        party_id: externalInstitutionId,
+        product_id: productId,
+      });
+    });
+  };
+
   const forwardWithOnboardingData = (
     onboardingFormData?: OnboardingFormData,
     institutionType?: InstitutionType,
@@ -755,7 +777,13 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     },
     {
       label: 'Insert additional info',
-      Component: () => StepAdditionalInformations({ forward: forwardWithAdditionalGSPInfo, back }),
+      Component: () =>
+        StepAdditionalInformations({
+          forward: forwardWithAdditionalGSPInfo,
+          back,
+          originId: onboardingFormData?.originId,
+          origin,
+        }),
     },
     {
       label: 'Insert manager data',
@@ -793,27 +821,15 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           legal: isTechPartner ? undefined : (formData as any)?.users[0],
           partyName: onboardingFormData?.businessName || '',
           isTechPartner,
+          isAggregator: onboardingFormData?.isAggregator,
           forward: (newFormData: Partial<FormData>) => {
-            const users = ((newFormData as any).users as Array<UserOnCreate>).map((u) => ({
-              ...u,
-              taxCode: u?.taxCode.toUpperCase(),
-              email: u?.email.toLowerCase(),
-            }));
-
-            const usersWithoutLegal = users.slice(0, 0).concat(users.slice(0 + 1));
-            setFormData({ ...formData, ...newFormData });
-            trackEvent('ONBOARDING_ADD_DELEGATE', {
-              request_id: requestIdRef.current,
-              party_id: externalInstitutionId,
-              product_id: productId,
-            });
-            onboardingSubmit(isTechPartner ? usersWithoutLegal : users).catch(() => {
-              trackEvent('ONBOARDING_ADD_DELEGATE', {
-                request_id: requestIdRef.current,
-                party_id: externalInstitutionId,
-                product_id: productId,
-              });
-            });
+            const userData = { ...formData, ...newFormData };
+            setFormData(userData);
+            if (onboardingFormData?.isAggregator) {
+              forward();
+            } else {
+              onSubmit(userData);
+            }
           },
           back: () => {
             if (isTechPartner) {
@@ -822,6 +838,18 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
               setActiveStep(activeStep - 1);
             }
           },
+        }),
+    },
+    {
+      label: 'Upload aggregate list',
+      Component: () =>
+        StepUploadAggregates({
+          productName: selectedProduct?.title,
+          loading,
+          setLoading,
+          setOutcome,
+          forward: onSubmit,
+          back,
         }),
     },
   ];

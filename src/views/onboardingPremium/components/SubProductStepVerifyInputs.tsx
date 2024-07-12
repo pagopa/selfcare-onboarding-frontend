@@ -1,6 +1,6 @@
 import { AxiosError, AxiosResponse } from 'axios';
 import { useContext, useEffect, useState } from 'react';
-import { trackAppError } from '@pagopa/selfcare-common-frontend/services/analyticsService';
+import { trackAppError } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
 import { SelfcareParty, Product, StepperStepComponentProps } from '../../../../types';
 import { HeaderContext, UserContext } from '../../../lib/context';
 import { fetchWithLogs } from '../../../lib/api-utils';

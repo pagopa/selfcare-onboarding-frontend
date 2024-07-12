@@ -1,6 +1,6 @@
 import Add from '@mui/icons-material/Add';
 import { Box, Checkbox, FormControlLabel, Grid, Link, Typography, useTheme } from '@mui/material';
-import SessionModal from '@pagopa/selfcare-common-frontend/components/SessionModal';
+import SessionModal from '@pagopa/selfcare-common-frontend/lib/components/SessionModal';
 import { omit, uniqueId } from 'lodash';
 import { ChangeEvent, useContext, useEffect, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
@@ -24,6 +24,7 @@ type Props = StepperStepComponentProps & {
   partyName: string;
   isTechPartner: boolean;
   addUserFlow: boolean;
+  isAggregator?: boolean;
 };
 
 export function StepAddAdmin({
@@ -35,6 +36,7 @@ export function StepAddAdmin({
   partyName,
   isTechPartner,
   addUserFlow,
+  isAggregator,
 }: Props) {
   const { user, setRequiredLogin } = useContext(UserContext);
   const [_loading, setLoading] = useState(true);
@@ -79,7 +81,7 @@ export function StepAddAdmin({
       validateUserData(people[userId], externalInstitutionId, userId, index, peopleErrors);
     } else {
       // TODO hide modal for PT until copy is changed. Remove if case isTechPartner after copy is changed
-      if (isTechPartner) {
+      if (isTechPartner || isAggregator) {
         onForwardAction();
       } else {
         setOpenConfirmationModal(true);
