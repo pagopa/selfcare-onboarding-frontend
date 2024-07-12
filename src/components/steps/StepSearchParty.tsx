@@ -310,6 +310,11 @@ export function StepSearchParty({
                 inserisci uno dei dati richiesti e cerca l’ente per
                 <br /> cui vuoi richiedere l’adesione a <strong>Interoperabilità.</strong>
               </Trans>
+            ) : institutionType === 'SCP' ? (
+              <Trans i18nKey="onboardingStep1.onboarding.scpSubtitle">
+                Inserisci uno dei dati richiesti e cerca da Infocamere l’ente <br />
+                per cui vuoi richiedere l’adesione a <strong>Interoperabilità.</strong>
+              </Trans>
             ) : (
               subTitle
             )}
@@ -407,7 +412,7 @@ export function StepSearchParty({
           </Grid>
         )}
       </Grid>
-      {institutionType !== 'SA' && institutionType !== 'AS' && (
+      {institutionType !== 'SA' && institutionType !== 'AS' && institutionType !== 'SCP' && (
         <Grid container item justifyContent="center">
           <Grid item xs={6}>
             <Box
@@ -473,10 +478,10 @@ export function StepSearchParty({
           back={
             !productAvoidStep
               ? {
-                  action: onBackAction,
-                  label: t('stepInstitutionType.backLabel'),
-                  disabled: false,
-                }
+                action: onBackAction,
+                label: t('stepInstitutionType.backLabel'),
+                disabled: false,
+              }
               : undefined
           }
           forward={{

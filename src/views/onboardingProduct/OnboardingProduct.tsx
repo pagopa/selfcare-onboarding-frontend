@@ -612,7 +612,8 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
       newInstitutionType !== 'GSP' &&
       newInstitutionType !== 'PA' &&
       newInstitutionType !== 'SA' &&
-      newInstitutionType !== 'AS'
+      newInstitutionType !== 'AS' &&
+      newInstitutionType !== 'SCP'
     ) {
       if (newInstitutionType !== institutionType) {
         setOnboardingFormData({

@@ -994,6 +994,13 @@ export async function mockFetch(
     );
   }
 
+  if (endpoint === 'ONBOARDING_GET_PARTY_BY_CF_FROM_INFOCAMERE') {
+    const matchedParty = mockedParties.find((p) => p.taxCode === endpointParams.id);
+    return new Promise((resolve) =>
+      resolve({ data: matchedParty, status: 200, statusText: '200' } as AxiosResponse)
+    );
+  }
+
   if (endpoint === 'ONBOARDING_GET_AOO_CODE_INFO') {
     const retrievedAoo = mockedAoos.find((ao) => ao.codiceUniAoo === endpointParams.codiceUniAoo);
     return new Promise((resolve) =>
