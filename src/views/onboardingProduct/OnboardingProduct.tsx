@@ -519,8 +519,8 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           originId: aooSelected
             ? aooSelected.codiceUniAoo
             : uoSelected
-              ? uoSelected.codiceUniUo
-              : onboardingFormData?.originId,
+            ? uoSelected.codiceUniUo
+            : onboardingFormData?.originId,
           geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY
             ? onboardingFormData?.geographicTaxonomies?.map((gt) =>
                 onboardedInstitutionInfo2geographicTaxonomy(gt)
@@ -583,6 +583,25 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
         setOutcome(outcomeContent[outcome]);
       }
     }
+  };
+
+  const onSubmit = (userData?: Partial<FormData> | undefined) => {
+    const data = userData ?? formData;
+    const users = ((data as any).users as Array<UserOnCreate>).map((u) => ({
+      ...u,
+      taxCode: u?.taxCode.toUpperCase(),
+      email: u?.email.toLowerCase(),
+    }));
+
+    const usersWithoutLegal = users.slice(0, 0).concat(users.slice(0 + 1));
+
+    onboardingSubmit(isTechPartner ? usersWithoutLegal : users).catch(() => {
+      trackEvent('ONBOARDING_ADD_DELEGATE', {
+        request_id: requestIdRef.current,
+        party_id: externalInstitutionId,
+        product_id: productId,
+      });
+    });
   };
 
   const forwardWithOnboardingData = (
@@ -804,30 +823,12 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           isTechPartner,
           isAggregator: onboardingFormData?.isAggregator,
           forward: (newFormData: Partial<FormData>) => {
-            const users = ((newFormData as any).users as Array<UserOnCreate>).map((u) => ({
-              ...u,
-              taxCode: u?.taxCode.toUpperCase(),
-              email: u?.email.toLowerCase(),
-            }));
-
-            const usersWithoutLegal = users.slice(0, 0).concat(users.slice(0 + 1));
-            setFormData({ ...formData, ...newFormData });
-            trackEvent('ONBOARDING_ADD_DELEGATE', {
-              request_id: requestIdRef.current,
-              party_id: externalInstitutionId,
-              product_id: productId,
-            });
-            // TODO This code will be edited with SELC-5206
-            if (!onboardingFormData?.isAggregator) {
-              onboardingSubmit(isTechPartner ? usersWithoutLegal : users).catch(() => {
-                trackEvent('ONBOARDING_ADD_DELEGATE', {
-                  request_id: requestIdRef.current,
-                  party_id: externalInstitutionId,
-                  product_id: productId,
-                });
-              });
-            } else {
+            const userData = { ...formData, ...newFormData };
+            setFormData(userData);
+            if (onboardingFormData?.isAggregator) {
               forward();
+            } else {
+              onSubmit(userData);
             }
           },
           back: () => {
@@ -846,16 +847,8 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           productName: selectedProduct?.title,
           loading,
           setLoading,
-          forward: () => {
-            // TODO This code will be edited with SELC-5206
-            // eslint-disable-next-line sonarjs/no-identical-functions
-            const users = ((formData as any).users as Array<UserOnCreate>).map((u) => ({
-              ...u,
-              taxCode: u?.taxCode.toUpperCase(),
-              email: u?.email.toLowerCase(),
-            }));
-            void onboardingSubmit(users);
-          },
+          setOutcome,
+          forward: onSubmit,
           back,
         }),
     },

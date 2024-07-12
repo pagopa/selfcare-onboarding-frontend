@@ -87,6 +87,7 @@ export function ConfirmRegistrationStep1(
           accept={['.pdf', '.p7z', '.p7m', '.p7c']}
           loading={loading}
           theme={theme}
+          isAggregatesUpload={false}
         />
       </Grid>
       <SessionModal
