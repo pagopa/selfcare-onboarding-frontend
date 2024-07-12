@@ -585,8 +585,9 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     }
   };
 
-  const onSubmit = () => {
-    const users = ((formData as any).users as Array<UserOnCreate>).map((u) => ({
+  const onSubmit = (userData?: Partial<FormData> | undefined) => {
+    const data = userData ?? formData;
+    const users = ((data as any).users as Array<UserOnCreate>).map((u) => ({
       ...u,
       taxCode: u?.taxCode.toUpperCase(),
       email: u?.email.toLowerCase(),
@@ -822,11 +823,12 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           isTechPartner,
           isAggregator: onboardingFormData?.isAggregator,
           forward: (newFormData: Partial<FormData>) => {
-            setFormData({ ...formData, ...newFormData });
+            const userData = { ...formData, ...newFormData };
+            setFormData(userData);
             if (onboardingFormData?.isAggregator) {
-              setActiveStep(activeStep + 1);
+              forward();
             } else {
-              onSubmit();
+              onSubmit(userData);
             }
           },
           back: () => {
