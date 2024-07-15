@@ -40,6 +40,7 @@ export function StepUploadAggregates({
   const [uploadedFile, setUploadedFiles] = useState<Array<File>>([]);
   const [disabled, setDisabled] = useState<boolean>(true);
   const [foundErrors, setFoundErrors] = useState<Array<RowError>>();
+  const [errorCsv, setErrorCsv] = useState<string>();
 
   useEffect(() => {
     if (uploadedFile[0]?.name) {
@@ -61,6 +62,28 @@ export function StepUploadAggregates({
   const deleteUploadedFiles = (): void => {
     setUploadedFiles([]);
     setFoundErrors(undefined);
+  };
+
+  const parseJson2Csv = (errorJson: Array<RowError>) => {
+    if (errorJson.length === 0) {
+      return;
+    }
+
+    const replacer = (_key: any, value: any) => (value === null ? '' : value);
+    const header = Object.keys(errorJson[0]);
+
+    const csv = [
+      header.join(','),
+      ...errorJson.map((row: any) =>
+        header.map((fieldName) => JSON.stringify(row[fieldName], replacer)).join(',')
+      ),
+    ].join('\r\n');
+
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const downloadUrl = URL.createObjectURL(blob);
+
+    setErrorCsv(downloadUrl);
+    setUploadedFiles([]);
   };
 
   const verifyAggregates = async (file: File) => {
@@ -88,6 +111,7 @@ export function StepUploadAggregates({
 
     if (result === 'success') {
       const errors = (verifyAggregates as AxiosResponse).data.errors as Array<RowError>;
+      parseJson2Csv(errors);
 
       if (errors.length === 0) {
         setDisabled(false);
@@ -132,7 +156,15 @@ export function StepUploadAggregates({
             <AlertTitle>{t('stepUploadAggregates.errorAlert.title')}</AlertTitle>
             <Trans
               i18nKey={'stepUploadAggregates.errorAlert.description'}
-              components={{ 1: <a href={'#'} style={{ color: theme.palette.text.primary }} /> }}
+              components={{
+                1: (
+                  <a
+                    download={'aggregates_errors.csv'}
+                    href={errorCsv}
+                    style={{ color: theme.palette.text.primary }}
+                  />
+                ),
+              }}
             >
               {'<1>Scarica il report</1> per verificare le informazioni e carica di nuovo il file.'}
             </Trans>
