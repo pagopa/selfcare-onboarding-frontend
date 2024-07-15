@@ -129,6 +129,7 @@ test('Test: The public service manager that onboard one of this products must se
 
 test('Test: Onboarding as PA institution type, expected the aggregator checkbox', async () => {
   let componentRendered = false;
+  let product = '';
 
   mockedProducts.forEach((p) => {
     if (!componentRendered) {
@@ -141,11 +142,18 @@ test('Test: Onboarding as PA institution type, expected the aggregator checkbox'
         />
       );
       componentRendered = true;
+
+      product = p.id;
     }
   });
 
-  screen.getByText(/informazioni sull'indice e su come accreditarsi/);
-
   const aggregator = screen.queryByText('Sono un ente aggregatore');
-  expect(aggregator).toBeInTheDocument();
+
+  if (product === 'prod-io') {
+    expect(aggregator).toBeInTheDocument();
+  } else {
+    expect(aggregator).not.toBeInTheDocument();
+  }
+
+  screen.getByText(/informazioni sull'indice e su come accreditarsi/);
 });
