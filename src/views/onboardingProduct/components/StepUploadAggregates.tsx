@@ -20,7 +20,6 @@ type Props = {
   loading: boolean;
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
   setOutcome: React.Dispatch<React.SetStateAction<RequestOutcomeMessage | null | undefined>>;
-  setAggregates: React.Dispatch<React.SetStateAction<Array<AggregateInstitution> | undefined>>;
   productName?: string;
   institutionType?: InstitutionType;
 } & StepperStepComponentProps;
@@ -29,7 +28,6 @@ export function StepUploadAggregates({
   loading,
   setLoading,
   setOutcome,
-  setAggregates,
   productName,
   institutionType,
   forward,
@@ -48,6 +46,7 @@ export function StepUploadAggregates({
   useEffect(() => {
     if (uploadedFile[0]?.name) {
       setDisabled(false);
+      setFoundErrors(undefined);
     } else {
       setDisabled(true);
     }
@@ -72,12 +71,15 @@ export function StepUploadAggregates({
       return;
     }
 
+    // eslint-disable-next-line functional/immutable-data
+    const orderedErrorJson = errorJson.sort((a, b) => a.row - b.row);
+
     const replacer = (_key: any, value: any) => (value === null ? '' : value);
-    const header = Object.keys(errorJson[0]);
+    const header = Object.keys(orderedErrorJson[0]);
 
     const csv = [
       header.join(','),
-      ...errorJson.map((row: any) =>
+      ...orderedErrorJson.map((row: any) =>
         header.map((fieldName) => JSON.stringify(row[fieldName], replacer)).join(',')
       ),
     ].join('\r\n');
@@ -119,9 +121,8 @@ export function StepUploadAggregates({
       parseJson2Csv(errors);
 
       if (errors.length === 0) {
-        setAggregates(aggregatesList);
         setDisabled(false);
-        forward();
+        forward(undefined, aggregatesList);
       } else {
         setDisabled(true);
         setFoundErrors(errors);
