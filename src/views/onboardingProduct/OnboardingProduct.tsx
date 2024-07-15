@@ -545,6 +545,9 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
             : undefined,
           subunitType: aooSelected ? 'AOO' : uoSelected ? 'UO' : undefined,
           taxCode: onboardingFormData?.taxCode,
+          isAggregator: onboardingFormData?.isAggregator
+            ? onboardingFormData?.isAggregator
+            : undefined,
         },
       },
       () => setRequiredLogin(true)
