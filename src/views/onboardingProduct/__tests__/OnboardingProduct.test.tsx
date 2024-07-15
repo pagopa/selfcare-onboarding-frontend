@@ -1229,6 +1229,7 @@ const verifySubmit = async (productId = 'prod-idpay') => {
           subunitType: undefined,
           taxCode: 'AAAAAA44D55F456K',
           companyInformations: undefined,
+          aggregates: undefined,
         },
         method: 'POST',
       },

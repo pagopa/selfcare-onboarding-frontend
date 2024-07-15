@@ -13,12 +13,14 @@ import { RowError } from '../../../model/RowError';
 import { fetchWithLogs } from '../../../lib/api-utils';
 import { getFetchOutcome } from '../../../lib/error-utils';
 import { UserContext } from '../../../lib/context';
+import { AggregateInstitution } from '../../../model/AggregateInstitution';
 import { genericError } from './StepVerifyOnboarding';
 
 type Props = {
   loading: boolean;
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
   setOutcome: React.Dispatch<React.SetStateAction<RequestOutcomeMessage | null | undefined>>;
+  setAggregates: React.Dispatch<React.SetStateAction<Array<AggregateInstitution> | undefined>>;
   productName?: string;
   institutionType?: InstitutionType;
 } & StepperStepComponentProps;
@@ -27,6 +29,7 @@ export function StepUploadAggregates({
   loading,
   setLoading,
   setOutcome,
+  setAggregates,
   productName,
   institutionType,
   forward,
@@ -111,15 +114,17 @@ export function StepUploadAggregates({
 
     if (result === 'success') {
       const errors = (verifyAggregates as AxiosResponse).data.errors as Array<RowError>;
+      const aggregatesList = (verifyAggregates as AxiosResponse).data
+        .aggregates as Array<AggregateInstitution>;
       parseJson2Csv(errors);
 
       if (errors.length === 0) {
+        setAggregates(aggregatesList);
         setDisabled(false);
         forward();
       } else {
         setDisabled(true);
         setFoundErrors(errors);
-        // TODO Parsing json errors to csv will be developed with SELC-5207
       }
     } else {
       setOutcome(genericError);
