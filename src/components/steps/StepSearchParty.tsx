@@ -401,9 +401,7 @@ export function StepSearchParty({
           product?.id === 'prod-io' && (
             <Grid item mt={3}>
               <FormControlLabel
-                value={false}
-                control={<Checkbox size="small" />}
-                onClick={() => setIsAggregator(true)}
+                control={<Checkbox size="small" onChange={() => setIsAggregator(!isAggregator)} />}
                 label={t('onboardingStep1.onboarding.aggregator')}
               />
             </Grid>
