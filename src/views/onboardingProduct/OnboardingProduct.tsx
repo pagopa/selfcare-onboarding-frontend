@@ -47,6 +47,7 @@ import StepInstitutionType from '../../components/steps/StepInstitutionType';
 import UserNotAllowedPage from '../UserNotAllowedPage';
 import { AdditionalData, AdditionalInformations } from '../../model/AdditionalInformations';
 import AlreadyOnboarded from '../AlreadyOnboarded';
+import { AggregateInstitution } from '../../model/AggregateInstitution';
 import { genericError, StepVerifyOnboarding } from './components/StepVerifyOnboarding';
 import { StepAddAdmin } from './components/StepAddAdmin';
 import { StepAdditionalInformations } from './components/StepAdditionalInformations';
@@ -97,6 +98,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
   const { t } = useTranslation();
   const [onExitAction, setOnExitAction] = useState<(() => void) | undefined>();
   const [selectedParty, setSelectedParty] = useState<Party>();
+  const [aggregates, setAggregates] = useState<Array<AggregateInstitution>>();
 
   const [aooSelected, setAooSelected] = useState<AooData>();
   const [uoSelected, setUoSelected] = useState<UoData>();
@@ -548,6 +550,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           isAggregator: onboardingFormData?.isAggregator
             ? onboardingFormData?.isAggregator
             : undefined,
+          aggregates,
         },
       },
       () => setRequiredLogin(true)
@@ -850,6 +853,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           productName: selectedProduct?.title,
           institutionType,
           loading,
+          setAggregates,
           setLoading,
           setOutcome,
           forward: onSubmit,
