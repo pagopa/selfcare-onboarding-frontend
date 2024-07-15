@@ -98,7 +98,6 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
   const { t } = useTranslation();
   const [onExitAction, setOnExitAction] = useState<(() => void) | undefined>();
   const [selectedParty, setSelectedParty] = useState<Party>();
-  const [aggregates, setAggregates] = useState<Array<AggregateInstitution>>();
 
   const [aooSelected, setAooSelected] = useState<AooData>();
   const [uoSelected, setUoSelected] = useState<UoData>();
@@ -485,7 +484,10 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     ],
   };
 
-  const onboardingSubmit = async (users: Array<UserOnCreate>) => {
+  const onboardingSubmit = async (
+    users: Array<UserOnCreate>,
+    aggregates?: Array<AggregateInstitution>
+  ) => {
     setLoading(true);
     const postLegalsResponse = await fetchWithLogs(
       { endpoint: 'ONBOARDING_POST_LEGALS' },
@@ -591,7 +593,10 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     }
   };
 
-  const onSubmit = (userData?: Partial<FormData> | undefined) => {
+  const onSubmit = (
+    userData?: Partial<FormData> | undefined,
+    aggregates?: Array<AggregateInstitution>
+  ) => {
     const data = userData ?? formData;
     const users = ((data as any).users as Array<UserOnCreate>).map((u) => ({
       ...u,
@@ -601,7 +606,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
 
     const usersWithoutLegal = users.slice(0, 0).concat(users.slice(0 + 1));
 
-    onboardingSubmit(isTechPartner ? usersWithoutLegal : users).catch(() => {
+    onboardingSubmit(isTechPartner ? usersWithoutLegal : users, aggregates).catch(() => {
       trackEvent('ONBOARDING_ADD_DELEGATE', {
         request_id: requestIdRef.current,
         party_id: externalInstitutionId,
@@ -853,7 +858,6 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           productName: selectedProduct?.title,
           institutionType,
           loading,
-          setAggregates,
           setLoading,
           setOutcome,
           forward: onSubmit,
