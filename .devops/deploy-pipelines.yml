@@ -62,6 +62,7 @@ variables:
 
     react_app_enable_pt: '$(UAT_PT_ENABLED)'
     react_app_enable_aggregator: '$(UAT_AGGREGATOR_ENABLED)'
+    react_app_enable_scp_infocamere: '$(UAT_SCP_INFOCAMERE_ENABLED)'
 
   ${{ elseif eq(variables['Build.SourceBranch'], 'refs/heads/main') }}:
     environment: 'PROD'
@@ -104,6 +105,7 @@ variables:
 
     react_app_enable_pt: '$(PROD_PT_ENABLED)'
     react_app_enable_aggregator: '$(PROD_AGGREGATOR_ENABLED)'
+    react_app_enable_scp_infocamere: '$(PROD_SCP_INFOCAMERE_ENABLED)'
 
   # every branch different from past will be considered as DEV
   #  ${{ if startsWith(variables['Build.SourceBranch'], 'refs/heads/release-dev') }}:
@@ -148,6 +150,7 @@ variables:
 
     react_app_enable_pt: '$(DEV_PT_ENABLED)'
     react_app_enable_aggregator: '$(DEV_AGGREGATOR_ENABLED)'
+    react_app_enable_scp_infocamere: '$(DEV_SCP_INFOCAMERE_ENABLED)'
 
 # Automatically triggered on PR
 # https://docs.microsoft.com/en-us/azure/devops/pipelines/yaml-schema?view=azure-devops&tabs=schema%2Cparameter-schema#pr-trigger
