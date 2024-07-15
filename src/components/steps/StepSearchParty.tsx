@@ -396,16 +396,18 @@ export function StepSearchParty({
             institutionType={institutionType}
           />
         </Grid>
-        {ENV.AGGREGATOR.SHOW_AGGREGATOR && institutionType === 'PA' && (
-          <Grid item mt={3}>
-            <FormControlLabel
-              value={false}
-              control={<Checkbox size="small" />}
-              onClick={() => setIsAggregator(true)}
-              label={t('onboardingStep1.onboarding.aggregator')}
-            />
-          </Grid>
-        )}
+        {ENV.AGGREGATOR.SHOW_AGGREGATOR &&
+          institutionType === 'PA' &&
+          product?.id === 'prod-io' && (
+            <Grid item mt={3}>
+              <FormControlLabel
+                value={false}
+                control={<Checkbox size="small" />}
+                onClick={() => setIsAggregator(true)}
+                label={t('onboardingStep1.onboarding.aggregator')}
+              />
+            </Grid>
+          )}
       </Grid>
       {institutionType !== 'SA' && institutionType !== 'AS' && (
         <Grid container item justifyContent="center">

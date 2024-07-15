@@ -848,6 +848,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
       Component: () =>
         StepUploadAggregates({
           productName: selectedProduct?.title,
+          institutionType,
           loading,
           setLoading,
           setOutcome,
