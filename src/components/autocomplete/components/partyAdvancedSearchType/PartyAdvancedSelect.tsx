@@ -87,7 +87,7 @@ export default function PartyAdvancedSelect({
   };
 
   useEffect(() => {
-    if(product?.id === 'prod-interop' && institutionType === 'SCP') {
+    if (product?.id === 'prod-interop' && institutionType === 'SCP') {
       onSelectValue(false, true, false, false, false);
       setTypeOfSearch('taxCode');
     }
@@ -110,7 +110,7 @@ export default function PartyAdvancedSelect({
   }, []);
 
   useEffect(() => {
-    if (addUser || institutionType === 'SCP') {
+    if (addUser || (product?.id === 'prod-interop' && institutionType === 'SCP')) {
       setTypeOfSearch('taxCode');
       setIsTaxCodeSelected(true);
     } else {
