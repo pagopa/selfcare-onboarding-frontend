@@ -311,8 +311,8 @@ export function StepSearchParty({
                 <br /> cui vuoi richiedere l’adesione a <strong>Interoperabilità.</strong>
               </Trans>
             ) : institutionType === 'SCP' ? (
-              <Trans i18nKey="onboardingStep1.onboarding.scpSubtitle">
-                Inserisci uno dei dati richiesti e cerca da Infocamere l’ente <br />
+              <Trans i18nKey="onboardingStep1.onboarding.scpSubtitle" components={{ 3: <br />, 5: <strong /> }}>
+                Inserisci uno dei dati richiesti e cerca da Infocamere l’ente <br/>
                 per cui vuoi richiedere l’adesione a <strong>Interoperabilità.</strong>
               </Trans>
             ) : (

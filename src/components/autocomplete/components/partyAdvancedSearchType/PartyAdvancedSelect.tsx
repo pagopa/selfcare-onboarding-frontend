@@ -59,9 +59,7 @@ export default function PartyAdvancedSelect({
 }: Props) {
   const { t } = useTranslation();
 
-  const [typeOfSearch, setTypeOfSearch] = useState(
-    product?.id === 'prod-interop' && institutionType === 'SCP' ? 'taxCode' : 'businessName'
-  );
+  const [typeOfSearch, setTypeOfSearch] = useState('businessName');
 
   const handleTypeSearchChange = (event: SelectChangeEvent) => {
     setTypeOfSearch(event.target.value as string);
@@ -87,6 +85,13 @@ export default function PartyAdvancedSelect({
     setUoResultHistory(undefined);
     setAooResultHistory(undefined);
   };
+
+  useEffect(() => {
+    if(product?.id === 'prod-interop' && institutionType === 'SCP') {
+      onSelectValue(false, true, false, false, false);
+      setTypeOfSearch('taxCode');
+    }
+  }, []);
 
   useEffect(() => {
     if (isBusinessNameSelected) {
