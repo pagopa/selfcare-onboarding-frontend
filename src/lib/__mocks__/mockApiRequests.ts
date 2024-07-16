@@ -1,4 +1,4 @@
-import { UserRole } from '@pagopa/selfcare-common-frontend/utils/constants';
+import { UserRole } from '@pagopa/selfcare-common-frontend/lib/utils/constants';
 import { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 import {
   Endpoint,
@@ -1298,6 +1298,16 @@ export async function mockFetch(
   if (endpoint === 'ONBOARDING_CHECK_MANAGER') {
     return new Promise((resolve) =>
       resolve({ data: { result: true }, status: 200, statusText: '200' } as AxiosResponse)
+    );
+  }
+
+  if (endpoint === 'ONBOARDING_VERIFY_AGGREGATES') {
+    return new Promise((resolve) =>
+      resolve({
+        data: { aggregates: [], errors: [] },
+        status: 200,
+        statusText: '200',
+      } as AxiosResponse)
     );
   }
 

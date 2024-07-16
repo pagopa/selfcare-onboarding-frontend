@@ -1,10 +1,10 @@
 import { useState, useContext, useEffect } from 'react';
 import { AxiosError } from 'axios';
-import SessionModal from '@pagopa/selfcare-common-frontend/components/SessionModal';
-import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
+import SessionModal from '@pagopa/selfcare-common-frontend/lib/components/SessionModal';
+import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
 import { useTranslation, Trans } from 'react-i18next';
 import { uniqueId } from 'lodash';
-import { productId2ProductTitle } from '@pagopa/selfcare-common-frontend/utils/productId2ProductTitle';
+import { productId2ProductTitle } from '@pagopa/selfcare-common-frontend/lib/utils/productId2ProductTitle';
 import {
   StepperStep,
   Problem,

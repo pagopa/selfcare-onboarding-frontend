@@ -4,7 +4,7 @@ import { AxiosError, AxiosResponse } from 'axios';
 import { ReactElement, useContext, useEffect, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import Checkbox from '@mui/material/Checkbox';
-import { SessionModal } from '@pagopa/selfcare-common-frontend';
+import { SessionModal } from '@pagopa/selfcare-common-frontend/lib';
 import {
   IPACatalogParty,
   InstitutionType,
@@ -207,7 +207,8 @@ export function StepSearchParty({
           : ({ ...selected, externalId: selected?.id } as Party),
         aooResult,
         uoResult,
-        institutionType
+        institutionType,
+        isAggregator
       );
     }
   };
@@ -395,16 +396,16 @@ export function StepSearchParty({
             institutionType={institutionType}
           />
         </Grid>
-        {ENV.AGGREGATOR.SHOW_AGGREGATOR && institutionType === 'PA' && (
-          <Grid item mt={3}>
-            <FormControlLabel
-              value={false}
-              control={<Checkbox size="small" />}
-              onClick={() => setIsAggregator(true)}
-              label={t('onboardingStep1.onboarding.aggregator')}
-            />
-          </Grid>
-        )}
+        {ENV.AGGREGATOR.SHOW_AGGREGATOR &&
+          institutionType === 'PA' &&
+          product?.id === 'prod-io' && (
+            <Grid item mt={3}>
+              <FormControlLabel
+                control={<Checkbox size="small" onChange={() => setIsAggregator(!isAggregator)} />}
+                label={t('onboardingStep1.onboarding.aggregator')}
+              />
+            </Grid>
+          )}
       </Grid>
       {institutionType !== 'SA' && institutionType !== 'AS' && (
         <Grid container item justifyContent="center">
@@ -497,10 +498,10 @@ export function StepSearchParty({
         message={
           <Trans
             i18nKey={'onboardingStep1.onboarding.aggregatorModal.message'}
-            components={{ 1: <br /> }}
+            components={{ 1: <strong />, 3: <br /> }}
             values={{ partyName: selected?.description }}
           >
-            {`Stai richiedendo l’adesione come ente aggregatore per {{partyName}}.<1 />Per completare l’adesione, dovrai indicare gli enti da aggregare.`}
+            {`Stai richiedendo l’adesione come ente aggregatore per <1>{{partyName}}</1>.<3 />Per completare l’adesione, dovrai indicare gli enti da aggregare.`}
           </Trans>
         }
         onCloseLabel={t('onboardingStep1.onboarding.aggregatorModal.back')}

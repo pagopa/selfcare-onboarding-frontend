@@ -1,4 +1,4 @@
-import { SessionModal } from '@pagopa/selfcare-common-frontend';
+import { SessionModal } from '@pagopa/selfcare-common-frontend/lib';
 import { useTranslation, Trans } from 'react-i18next';
 
 type Props = {

@@ -1,6 +1,6 @@
 import { IllusError } from '@pagopa/mui-italia';
 import { useTranslation } from 'react-i18next';
-import { EndingPage } from '@pagopa/selfcare-common-frontend';
+import { EndingPage } from '@pagopa/selfcare-common-frontend/lib';
 
 type Props = {
   back: () => void;

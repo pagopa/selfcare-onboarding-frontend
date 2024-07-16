@@ -137,7 +137,7 @@ export default {
       aggregator: 'Sono un ente aggregatore',
       aggregatorModal: {
         title: 'Ente aggregatore',
-        message: `Stai richiedendo l’adesione come ente aggregatore per {{partyName}}.<1 />Per completare l’adesione, dovrai indicare gli enti da aggregare.`,
+        message: `Stai richiedendo l’adesione come ente aggregatore per <1>{{partyName}}</1>.<3 />Per completare l’adesione, dovrai indicare gli enti da aggregare.`,
         back: 'Indietro',
         forward: 'Continua',
       },
@@ -157,6 +157,21 @@ export default {
         backAction: 'Indietro',
       },
     },
+  },
+  stepUploadAggregates: {
+    title: `Indica gli enti da aggregare per {{productName}}`,
+    errorAlert: {
+      title: 'Il file contiene più errori',
+      description:
+        '<1>Scarica il report</1> per verificare le informazioni e carica di nuovo il file.',
+    },
+    dropArea: {
+      title: 'Trascina qui il file .csv con la lista degli enti aggregati oppure',
+      button: 'carica il file',
+      valid: 'File valido',
+    },
+    back: 'Indietro',
+    forward: 'Continua',
   },
   stepAddManager: {
     title: 'Indica il Legale Rappresentante',
@@ -643,7 +658,7 @@ export default {
       },
       assistanceContact: {
         supportEmail: 'Indirizzo email visibile ai cittadini',
-        supportEmailOptional: "Indirizzo email visibile ai cittadini (facoltativo)",
+        supportEmailOptional: 'Indirizzo email visibile ai cittadini (facoltativo)',
         supportEmailDescriprion:
           'È il contatto che i cittadini visualizzano per richiedere assistenza all’ente',
       },

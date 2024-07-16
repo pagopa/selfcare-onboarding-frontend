@@ -1,10 +1,10 @@
 import { IllusError } from '@pagopa/mui-italia';
 import { Grid, Box, Typography, Button } from '@mui/material';
 import { useContext, useEffect } from 'react';
-import { resolvePathVariables } from '@pagopa/selfcare-common-frontend/utils/routes-utils';
+import { resolvePathVariables } from '@pagopa/selfcare-common-frontend/lib/utils/routes-utils';
 import { Trans, useTranslation } from 'react-i18next';
 import { AxiosError, AxiosResponse } from 'axios';
-import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
+import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
 import { useHistory } from 'react-router-dom';
 import { ROUTES } from '../../../utils/constants';
 import { fetchWithLogs } from '../../../lib/api-utils';

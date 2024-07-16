@@ -14,7 +14,11 @@ import { OnboardingStepActions } from '../../../components/OnboardingStepActions
 import { RadioWithTextField } from '../../../components/RadioWithTextField';
 import { StepperStepComponentProps } from '../../../../types';
 
-export function StepAdditionalInformations({ forward, back }: StepperStepComponentProps) {
+type Props = StepperStepComponentProps & {
+  originId?: string;
+  origin?: string;
+};
+export function StepAdditionalInformations({ forward, back, originId, origin }: Props) {
   const { t } = useTranslation();
   const theme = useTheme();
 
@@ -34,7 +38,6 @@ export function StepAdditionalInformations({ forward, back }: StepperStepCompone
     [field: string]: string;
   }>({});
 
-  const [isChecked, setIsChecked] = useState<boolean>(false);
   const [disabled, setDisabled] = useState<boolean>(false);
   const [shrink, setShrink] = useState<boolean>(false);
 
@@ -43,19 +46,25 @@ export function StepAdditionalInformations({ forward, back }: StepperStepCompone
       key === 'optionalPartyInformations' ? true : value !== undefined
     );
 
-    const allFalseAndUnchecked = Object.values(radioValues).every((value) => !value) && !isChecked;
+    const allFalseAndUnchecked =
+      Object.values(radioValues).every((value) => !value) &&
+      !additionalData.optionalPartyInformations?.choice;
 
     setDisabled(
       !isContinueButtonEnabled ||
-        allFalseAndUnchecked ||
-        Object.values(errors).some((error) => error !== '')
+      allFalseAndUnchecked ||
+      Object.values(errors).some((error) => error !== '')
     );
-  }, [radioValues, errors, isChecked]);
+  }, [radioValues, errors, additionalData.optionalPartyInformations?.choice]);
 
   const handleRadioChange = (field: any, value: any) => {
     setRadioValues((prevValues) => ({
       ...prevValues,
       [field]: value,
+    }));
+    setAdditionalData((prevValues) => ({
+      ...prevValues,
+      [field]: { ...prevValues[field], choice: value },
     }));
     setErrors((prevErrors) => ({
       ...prevErrors,
@@ -63,7 +72,20 @@ export function StepAdditionalInformations({ forward, back }: StepperStepCompone
     }));
   };
 
-  const handleTextFieldChange = (open: boolean, field: string, value: string) => {
+
+  useEffect(() => {
+    if (origin === 'IPA' && originId) {
+      handleRadioChange('isFromIPA', true);
+      handleTextFieldChange(true, 'isFromIPA', originId, true);
+      handleTextFieldChange(true, 'optionalPartyInformations', '', false);
+    } else {
+      handleRadioChange('isFromIPA', false);
+      handleTextFieldChange(false, 'isFromIPA', '', false);
+      handleTextFieldChange(true, 'optionalPartyInformations', '', false);
+    }
+  }, [origin, originId]);
+
+  const handleTextFieldChange = (open: boolean, field: string, value: string, choice: boolean) => {
     setErrors((prevErrors) => ({
       ...prevErrors,
       [field]: '',
@@ -73,21 +95,37 @@ export function StepAdditionalInformations({ forward, back }: StepperStepCompone
       [field]: {
         openTextField: open,
         textFieldValue: value,
-        choice: false,
+        choice,
       },
     }));
   };
 
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   const validateTextField = () => {
     const newErrors = Object.keys(radioValues).reduce((acc, field) => {
       switch (field) {
         case 'optionalPartyInformations':
-          if (isChecked && !additionalData.optionalPartyInformations?.textFieldValue) {
+          if (
+            additionalData.optionalPartyInformations?.choice &&
+            !additionalData.optionalPartyInformations?.textFieldValue
+          ) {
             return {
               ...acc,
               [field]: t(
                 `additionalDataPage.formQuestions.textFields.errors.optionalPartyInformations`
               ),
+            };
+          }
+          break;
+        case 'isFromIPA':
+          if (
+            additionalData[field]?.openTextField &&
+            additionalData[field]?.textFieldValue === '' &&
+            !(radioValues[field] && origin === 'IPA')
+          ) {
+            return {
+              ...acc,
+              [field]: t(`additionalDataPage.formQuestions.textFields.errors.${field}`),
             };
           }
           break;
@@ -115,7 +153,6 @@ export function StepAdditionalInformations({ forward, back }: StepperStepCompone
       setErrors({});
 
       const choices = Object.values(radioValues);
-
       const additionalDataWithChoice = Object.keys(radioValues).reduce(
         (result, key, index) => ({
           ...result,
@@ -148,6 +185,7 @@ export function StepAdditionalInformations({ forward, back }: StepperStepCompone
           onRadioChange={handleRadioChange}
           onTextFieldChange={handleTextFieldChange}
           errorText={errors.isEstabilishedRegulatoryProvision || ''}
+          additionalData={additionalData}
         />
         <Divider />
         <RadioWithTextField
@@ -162,6 +200,7 @@ export function StepAdditionalInformations({ forward, back }: StepperStepCompone
           onRadioChange={handleRadioChange}
           onTextFieldChange={handleTextFieldChange}
           errorText={errors.fromBelongsRegulatedMarket || ''}
+          additionalData={additionalData}
         />
         <Divider />
         <RadioWithTextField
@@ -171,6 +210,8 @@ export function StepAdditionalInformations({ forward, back }: StepperStepCompone
           onRadioChange={handleRadioChange}
           onTextFieldChange={handleTextFieldChange}
           errorText={errors.isFromIPA || ''}
+          isIPA={origin === 'IPA'}
+          additionalData={additionalData}
         />
         <Divider />
         <RadioWithTextField
@@ -180,28 +221,29 @@ export function StepAdditionalInformations({ forward, back }: StepperStepCompone
           onRadioChange={handleRadioChange}
           onTextFieldChange={handleTextFieldChange}
           errorText={errors.isConcessionaireOfPublicService || ''}
+          additionalData={additionalData}
         />
         <Divider />
         <Grid item pb={4}>
           <FormControlLabel
-            value={isChecked}
+            value={additionalData.optionalPartyInformations?.choice}
             control={<Checkbox size="small" />}
             onClick={() => {
-              handleRadioChange('optionalPartyInformations', !isChecked);
-              setIsChecked(!isChecked);
+              handleRadioChange('optionalPartyInformations', !additionalData.optionalPartyInformations?.choice);
               if (
                 additionalData.optionalPartyInformations?.textFieldValue &&
-                isChecked &&
+                additionalData.optionalPartyInformations?.choice &&
                 additionalData.optionalPartyInformations?.textFieldValue !== ''
               ) {
                 setShrink(false);
-                setAdditionalData({
+                setAdditionalData((prevValues) => ({
+                  ...prevValues,
                   ['optionalPartyInformations']: {
                     openTextField: true,
                     textFieldValue: '',
-                    choice: !isChecked,
+                    choice: !additionalData.optionalPartyInformations?.choice,
                   },
-                });
+                }));
               }
             }}
             label={t('additionalDataPage.formQuestions.other')}
@@ -220,7 +262,7 @@ export function StepAdditionalInformations({ forward, back }: StepperStepCompone
             fullWidth
             sx={{ color: theme.palette.text.secondary }}
             onChange={(e: any) => {
-              handleTextFieldChange(true, 'optionalPartyInformations', e.target.value);
+              handleTextFieldChange(true, 'optionalPartyInformations', e.target.value, additionalData.optionalPartyInformations?.choice);
             }}
             onClick={() => setShrink(true)}
             onBlur={() => {

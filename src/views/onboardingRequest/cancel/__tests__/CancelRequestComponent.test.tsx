@@ -2,7 +2,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { ENV } from '../../../../utils/env';
 import CancelRequestPage from '../pages/CancelRequestPage';
 import '../../../../locale';
-import { buildAssistanceURI } from '@pagopa/selfcare-common-frontend/services/assistanceService';
+import { buildAssistanceURI } from '@pagopa/selfcare-common-frontend/lib/services/assistanceService';
 import CancelRequestComponent from '../CancelRequest';
 
 jest.mock('../../../../lib/api-utils');
@@ -36,7 +36,7 @@ jest.mock('react-router-dom', () => ({
   }),
 }));
 
-jest.mock('@pagopa/selfcare-common-frontend/services/assistanceService', () => ({
+jest.mock('@pagopa/selfcare-common-frontend/lib/services/assistanceService', () => ({
   buildAssistanceURI: jest.fn(),
 }));
 
