@@ -71,4 +71,8 @@ export const ENV = {
   AGGREGATOR: {
     SHOW_AGGREGATOR: env.get('REACT_APP_ENABLE_AGGREGATOR').default('false').asBool(),
   },
+
+  SCP_INFOCAMERE: {
+    SHOW: env.get('REACT_APP_ENABLE_SCP_INFOCAMERE').default('false').asBool(),
+  },
 };

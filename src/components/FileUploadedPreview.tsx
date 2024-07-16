@@ -1,7 +1,9 @@
+/* eslint-disable sonarjs/cognitive-complexity */
 import { Box } from '@mui/system';
-import { Grid, LinearProgress, Theme, Tooltip, Typography } from '@mui/material';
+import { Chip, Grid, LinearProgress, Theme, Tooltip, Typography } from '@mui/material';
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 import { useTranslation } from 'react-i18next';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { ReactComponent as ClipFileUploaded } from '../assets/clip_file_uploaded.svg';
 
 type FileUploadedPreviewParams = {
@@ -10,6 +12,7 @@ type FileUploadedPreviewParams = {
   deleteUploadedFiles: ((event: any) => void) | undefined;
   loading: boolean;
   theme: Theme;
+  isAggregatesUpload: boolean;
 };
 
 export function FileUploadedPreview({
@@ -18,6 +21,7 @@ export function FileUploadedPreview({
   deleteUploadedFiles,
   theme,
   loading,
+  isAggregatesUpload,
 }: FileUploadedPreviewParams): JSX.Element {
   const { t } = useTranslation();
 
@@ -39,8 +43,8 @@ export function FileUploadedPreview({
                   container
                   justifyContent="space-evenly"
                   alignItems="center"
-                  width="390px"
-                  height="90px"
+                  width={isAggregatesUpload ? '480px' : '390px'}
+                  height={isAggregatesUpload ? '62px' : '90px'}
                 >
                   <Grid item xs={6}>
                     <Typography align="center" variant="body1">
@@ -60,10 +64,13 @@ export function FileUploadedPreview({
           <Box key={file.name} sx={{ maxWidth: { xs: 300, md: 500, lg: 900 }, ...sx }}>
             <Box
               sx={{
-                boxShadow:
-                  '0px 8px 10px -5px rgba(0, 43, 85, 0.1), 0px 16px 24px 2px rgba(0, 43, 85, 0.05), 0px 6px 30px 5px rgba(0, 43, 85, 0.1)',
+                boxShadow: isAggregatesUpload
+                  ? 'none'
+                  : '0px 8px 10px -5px rgba(0, 43, 85, 0.1), 0px 16px 24px 2px rgba(0, 43, 85, 0.05), 0px 6px 30px 5px rgba(0, 43, 85, 0.1)',
                 borderRadius: '16px',
                 p: 1,
+                border: isAggregatesUpload ? `1px solid ${theme.palette.divider}` : 'none',
+                backgroundColor: theme.palette.background.paper,
               }}
             >
               <Grid
@@ -72,9 +79,9 @@ export function FileUploadedPreview({
                   justifyContent: 'center',
                   alignItems: 'center',
                   borderRadius: '10px',
-                  border: `1px solid ${theme.palette.primary.main}`,
-                  width: '400px',
-                  height: '66px',
+                  border: isAggregatesUpload ? 'none' : `1px solid ${theme.palette.primary.main}`,
+                  width: '440px',
+                  height: isAggregatesUpload ? '46px' : '66px',
                 }}
               >
                 <Grid item xs={1} pr={1}>
@@ -85,19 +92,33 @@ export function FileUploadedPreview({
                       color: theme.palette.primary.main,
                     }}
                   >
-                    <ClipFileUploaded height={24} />
+                    {isAggregatesUpload ? (
+                      <CheckCircleIcon style={{ color: theme.palette.success.light }} height={20} />
+                    ) : (
+                      <ClipFileUploaded height={24} />
+                    )}
                   </Box>
                 </Grid>
-                <Grid item xs={8}>
-                  <Box display="flex" flexDirection="column">
+                <Grid
+                  item
+                  xs={isAggregatesUpload ? 9 : 8}
+                  display="flex"
+                  flexDirection="row"
+                  alignItems="center"
+                  justifyContent="space-between"
+                >
+                  <Box display="flex" flexDirection="row">
                     <Tooltip title={file.name} placement="top" arrow={true}>
                       <Typography
                         sx={{
-                          color: theme.palette.primary.main,
+                          color: isAggregatesUpload
+                            ? theme.palette.text.primary
+                            : theme.palette.primary.main,
                           fontStyle: 'normal',
-                          overflow: 'hidden',
+                          fontWeight: isAggregatesUpload ? 'fontWeightMedium' : 'fontWeightRegular',
+                          overflow: isAggregatesUpload ? 'visible' : 'hidden',
                           whiteSpace: 'nowrap',
-                          textOverflow: 'ellipsis',
+                          textOverflow: isAggregatesUpload ? '-moz-initial' : 'ellipsis',
                           width: '100%',
                           fontSize: '14px',
                         }}
@@ -105,7 +126,32 @@ export function FileUploadedPreview({
                         {file.name}
                       </Typography>
                     </Tooltip>
+                    {isAggregatesUpload && (
+                      <Typography
+                        sx={{
+                          color: isAggregatesUpload
+                            ? theme.palette.text.primary
+                            : theme.palette.primary.main,
+                          fontStyle: 'normal',
+                          fontWeight: isAggregatesUpload ? 'fontWeightMedium' : 'fontWeightRegular',
+                          overflow: 'hidden',
+                          whiteSpace: 'nowrap',
+                          textOverflow: 'ellipsis',
+                          width: '100%',
+                          fontSize: '14px',
+                          pl: 4,
+                        }}
+                      >
+                        {file.size.toString().concat(' KB')}
+                      </Typography>
+                    )}
                   </Box>
+                  {isAggregatesUpload && (
+                    <Chip
+                      style={{ backgroundColor: theme.palette.success.light }}
+                      label={t('stepUploadAggregates.dropArea.valid')}
+                    />
+                  )}
                 </Grid>
                 <Grid item xs={1} display="flex" justifyContent="flex-end">
                   <ClearOutlinedIcon

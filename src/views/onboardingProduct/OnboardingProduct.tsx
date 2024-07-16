@@ -47,6 +47,7 @@ import StepInstitutionType from '../../components/steps/StepInstitutionType';
 import UserNotAllowedPage from '../UserNotAllowedPage';
 import { AdditionalData, AdditionalInformations } from '../../model/AdditionalInformations';
 import AlreadyOnboarded from '../AlreadyOnboarded';
+import { AggregateInstitution } from '../../model/AggregateInstitution';
 import { genericError, StepVerifyOnboarding } from './components/StepVerifyOnboarding';
 import { StepAddAdmin } from './components/StepAddAdmin';
 import { StepAdditionalInformations } from './components/StepAdditionalInformations';
@@ -483,7 +484,10 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     ],
   };
 
-  const onboardingSubmit = async (users: Array<UserOnCreate>) => {
+  const onboardingSubmit = async (
+    users: Array<UserOnCreate>,
+    aggregates?: Array<AggregateInstitution>
+  ) => {
     setLoading(true);
     const postLegalsResponse = await fetchWithLogs(
       { endpoint: 'ONBOARDING_POST_LEGALS' },
@@ -545,6 +549,10 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
             : undefined,
           subunitType: aooSelected ? 'AOO' : uoSelected ? 'UO' : undefined,
           taxCode: onboardingFormData?.taxCode,
+          isAggregator: onboardingFormData?.isAggregator
+            ? onboardingFormData?.isAggregator
+            : undefined,
+          aggregates,
         },
       },
       () => setRequiredLogin(true)
@@ -583,6 +591,28 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
         setOutcome(outcomeContent[outcome]);
       }
     }
+  };
+
+  const onSubmit = (
+    userData?: Partial<FormData> | undefined,
+    aggregates?: Array<AggregateInstitution>
+  ) => {
+    const data = userData ?? formData;
+    const users = ((data as any).users as Array<UserOnCreate>).map((u) => ({
+      ...u,
+      taxCode: u?.taxCode.toUpperCase(),
+      email: u?.email.toLowerCase(),
+    }));
+
+    const usersWithoutLegal = users.slice(0, 0).concat(users.slice(0 + 1));
+
+    onboardingSubmit(isTechPartner ? usersWithoutLegal : users, aggregates).catch(() => {
+      trackEvent('ONBOARDING_ADD_DELEGATE', {
+        request_id: requestIdRef.current,
+        party_id: externalInstitutionId,
+        product_id: productId,
+      });
+    });
   };
 
   const forwardWithOnboardingData = (
@@ -805,30 +835,12 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           isTechPartner,
           isAggregator: onboardingFormData?.isAggregator,
           forward: (newFormData: Partial<FormData>) => {
-            const users = ((newFormData as any).users as Array<UserOnCreate>).map((u) => ({
-              ...u,
-              taxCode: u?.taxCode.toUpperCase(),
-              email: u?.email.toLowerCase(),
-            }));
-
-            const usersWithoutLegal = users.slice(0, 0).concat(users.slice(0 + 1));
-            setFormData({ ...formData, ...newFormData });
-            trackEvent('ONBOARDING_ADD_DELEGATE', {
-              request_id: requestIdRef.current,
-              party_id: externalInstitutionId,
-              product_id: productId,
-            });
-            // TODO This code will be edited with SELC-5206
-            if (!onboardingFormData?.isAggregator) {
-              onboardingSubmit(isTechPartner ? usersWithoutLegal : users).catch(() => {
-                trackEvent('ONBOARDING_ADD_DELEGATE', {
-                  request_id: requestIdRef.current,
-                  party_id: externalInstitutionId,
-                  product_id: productId,
-                });
-              });
-            } else {
+            const userData = { ...formData, ...newFormData };
+            setFormData(userData);
+            if (onboardingFormData?.isAggregator) {
               forward();
+            } else {
+              onSubmit(userData);
             }
           },
           back: () => {
@@ -845,18 +857,11 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
       Component: () =>
         StepUploadAggregates({
           productName: selectedProduct?.title,
+          institutionType,
           loading,
           setLoading,
-          forward: () => {
-            // TODO This code will be edited with SELC-5206
-            // eslint-disable-next-line sonarjs/no-identical-functions
-            const users = ((formData as any).users as Array<UserOnCreate>).map((u) => ({
-              ...u,
-              taxCode: u?.taxCode.toUpperCase(),
-              email: u?.email.toLowerCase(),
-            }));
-            void onboardingSubmit(users);
-          },
+          setOutcome,
+          forward: onSubmit,
           back,
         }),
     },
