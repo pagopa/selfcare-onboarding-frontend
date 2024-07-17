@@ -84,7 +84,7 @@ export default function AsyncAutocompleteResultsCode({
                 ? aooResult?.denominazioneAoo.toLocaleLowerCase()
                 : isUoCodeSelected && uoResult?.descrizioneUo
                 ? uoResult?.descrizioneUo.toLocaleLowerCase()
-                : visibleCode?.description
+                : (cfResult as any).businessName
             }
             partyRole={
               !isTaxCodeSelected && aooResult

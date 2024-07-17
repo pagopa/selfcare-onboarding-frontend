@@ -346,7 +346,6 @@ export default function AsyncAutocompleteContainer({
     // eslint-disable-next-line sonarjs/cognitive-complexity
   ) => {
     const typedInput = event.target.value as string;
-
     const params = {
       productId: selectedProduct?.id,
       taxCode: isTaxCodeSelected ? typedInput : undefined,
@@ -388,8 +387,19 @@ export default function AsyncAutocompleteContainer({
 
           void contractingInsuranceFromTaxId(addUser, endpoint, params, value);
         } else {
-          const endpoint = addUser ? 'ONBOARDING_GET_INSTITUTIONS' : 'ONBOARDING_GET_PARTY_FROM_CF';
-          void handleSearchByTaxCode(addUser, endpoint, params, value);
+          const endpoint = addUser
+            ? 'ONBOARDING_GET_INSTITUTIONS'
+            : product?.id === 'prod-interop' && institutionType === 'SCP'
+            ? 'ONBOARDING_GET_PARTY_BY_CF_FROM_INFOCAMERE'
+            : 'ONBOARDING_GET_PARTY_FROM_CF';
+          void handleSearchByTaxCode(
+            addUser,
+            endpoint,
+            product?.id === 'prod-interop' && institutionType === 'SCP'
+              ? { ...params, taxCode: undefined }
+              : params,
+            value
+          );
         }
       } else if (isAooCodeSelected && !isUoCodeSelected && value.length === 7) {
         const endpoint = addUser ? 'ONBOARDING_GET_INSTITUTIONS' : 'ONBOARDING_GET_AOO_CODE_INFO';
