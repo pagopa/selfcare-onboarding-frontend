@@ -194,7 +194,7 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
       'Luogo di iscrizione al Registro delle Imprese (facoltativo)'
     );
     const rea = screen.queryByText('REA');
-    const sdiCode = screen.queryByText('Codice SDI');
+    const sdiCode = screen.queryByText('Codice univoco o SDI');
     const shareCapital = screen.queryByText('Capitale sociale (facoltativo)');
     const visibleCitizenMail = screen.queryByText('Indirizzo email visibile ai cittadini');
     const visibleCitizenMailOptional = screen.queryByText('Indirizzo email visibile ai cittadini (facoltativo)');
