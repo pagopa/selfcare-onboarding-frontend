@@ -812,11 +812,24 @@ export default function PersonalAndBillingDataSection({
                   <CustomTextField
                     {...baseTextFieldProps(
                       'recipientCode',
-                      t('onboardingFormData.billingDataSection.sdiCode'),
+                      institutionType === 'PA' || isAooUo
+                        ? t('onboardingFormData.billingDataSection.sdiCodePaAooUo')
+                        : t('onboardingFormData.billingDataSection.sdiCode'),
                       600,
                       theme.palette.text.primary
                     )}
-                    inputProps={{ maxLength: 7, style: { textTransform: 'uppercase' } }}
+                    inputProps={{
+                      maxLength: 7,
+                      style: { textTransform: 'uppercase' },
+                      onInput: (event) => {
+                        const input = event.target as HTMLInputElement;
+                        const cleanedValue = input.value
+                          .toUpperCase()
+                          .replace(/[^A-Z0-9]/g, '');
+                        // eslint-disable-next-line functional/immutable-data
+                        input.value = cleanedValue;
+                      }
+                    }}
                   />
                   {/* Description for recipient code */}
                   <Typography
@@ -827,7 +840,9 @@ export default function PersonalAndBillingDataSection({
                       color: theme.palette.text.secondary,
                     }}
                   >
-                    {t('onboardingFormData.billingDataSection.recipientCodeDescription')}
+                    {institutionType === 'PA' || isAooUo
+                      ? t('onboardingFormData.billingDataSection.sdiCodePaAooUoDescription')
+                      : t('onboardingFormData.billingDataSection.recipientCodeDescription')}
                   </Typography>
                 </Grid>
               )}
@@ -968,11 +983,13 @@ export default function PersonalAndBillingDataSection({
               <CustomTextField
                 {...baseTextFieldProps(
                   'supportEmail',
-                  t(productId === "prod-io-sign"
-                    ? 'onboardingFormData.billingDataSection.assistanceContact.supportEmail'
-                    : 'onboardingFormData.billingDataSection.assistanceContact.supportEmailOptional'),
+                  t(
+                    productId === 'prod-io-sign'
+                      ? 'onboardingFormData.billingDataSection.assistanceContact.supportEmail'
+                      : 'onboardingFormData.billingDataSection.assistanceContact.supportEmailOptional'
+                  ),
                   600,
-                  theme.palette.text.primary,
+                  theme.palette.text.primary
                 )}
               />
               {/* descrizione indirizzo mail di supporto */}

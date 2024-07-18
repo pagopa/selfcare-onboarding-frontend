@@ -639,6 +639,8 @@ export default {
       taxCodeInvoicing: 'Codice Fiscale SFE',
       originId: 'Codice IVASS',
       sdiCode: 'Codice SDI',
+      sdiCodePaAooUo: 'Codice univoco o SDI',
+      sdiCodePaAooUoDescription: 'È il codice univoco necessario per ricevere le fatture elettroniche. Può essere del tuo ente o della sua Unità Organizzativa di riferimento.',
       recipientCodeDescription: 'È il codice necessario per ricevere le fatture elettroniche',
       gspDescription: 'Sono gestore di almeno uno dei pubblici servizi: Gas, Energia, Telco.',
       pspDataSection: {
