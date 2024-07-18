@@ -93,7 +93,7 @@ export const validateFields = (
         ? t('onboardingFormData.billingDataSection.pspDataSection.invalidCommercialRegisterNumber')
         : undefined,
     businessRegisterPlace:
-      institutionType === 'SA' && !values.businessRegisterPlace ? requiredError : undefined,
+      institutionType === 'SA' || institutionType === 'SCP' && productId === 'prod-interop' && !values.businessRegisterPlace ? requiredError : undefined,
     registrationInRegister:
       isPaymentServiceProvider && !values.registrationInRegister ? requiredError : undefined,
     dpoAddress: isPaymentServiceProvider && !values.dpoAddress ? requiredError : undefined,
@@ -143,7 +143,7 @@ export const validateFields = (
         ? t('onboardingFormData.billingDataSection.invalidReaField')
         : undefined,
     shareCapital:
-      institutionType === 'SA' && !values.shareCapital
+      institutionType === 'SA' || institutionType === 'SCP' && productId === 'prod-interop' && !values.shareCapital
         ? requiredError
         : values.shareCapital && !currencyField.test(values.shareCapital)
         ? t('onboardingFormData.billingDataSection.invalidShareCapitalField')

@@ -20,6 +20,8 @@ import { StepBillingDataHistoryState } from '../steps/StepOnboardingFormData';
 import { ENV } from '../../utils/env';
 import { CountryResource } from '../../model/CountryResource';
 import { requiredError } from '../../utils/constants';
+import { PDNDBusinessResource } from '../../model/PDNDBusinessResource';
+import { getTaxCode, isParty } from '../../utils/typeGuard-utils';
 import NumberDecimalFormat from './NumberDecimalFormat';
 
 const CustomTextField = styled(TextField)({
@@ -51,7 +53,7 @@ type Props = StepperStepComponentProps & {
   aooSelected?: AooData;
   uoSelected?: UoData;
   institutionAvoidGeotax: boolean;
-  selectedParty?: Party;
+  selectedParty?: Party | PDNDBusinessResource;
   productId?: string;
   retrievedIstat?: string;
   isCityEditable?: boolean;
@@ -129,6 +131,7 @@ export default function PersonalAndBillingDataSection({
   const isContractingAuthority = institutionType === 'SA';
   const isInsuranceCompany = institutionType === 'AS';
   const isAooUo = !!(aooSelected || uoSelected);
+  const taxId = getTaxCode(selectedParty);
 
   useEffect(() => {
     if (!isPremium && (isFromIPA || isAooUo)) {
@@ -136,7 +139,7 @@ export default function PersonalAndBillingDataSection({
         void getLocationFromIstatCode(aooSelected.codiceComuneISTAT);
       } else if (uoSelected?.codiceComuneISTAT) {
         void getLocationFromIstatCode(uoSelected.codiceComuneISTAT);
-      } else if (selectedParty?.istatCode) {
+      } else if (isParty(selectedParty) && selectedParty.istatCode) {
         void getLocationFromIstatCode(selectedParty.istatCode);
       } else if (retrievedIstat) {
         void getLocationFromIstatCode(retrievedIstat);
@@ -376,7 +379,12 @@ export default function PersonalAndBillingDataSection({
                     ? theme.palette.text.disabled
                     : theme.palette.text.primary
                 )}
-                disabled={isDisabled || isContractingAuthority || isInsuranceCompany}
+                disabled={
+                  isDisabled ||
+                  isContractingAuthority ||
+                  isInsuranceCompany ||
+                  (isInformationCompany && formik.values.businessName)
+                }
               />
             </Grid>
           )}
@@ -632,10 +640,15 @@ export default function PersonalAndBillingDataSection({
                   ? theme.palette.text.disabled
                   : theme.palette.text.primary
               )}
-              disabled={isDisabled || isContractingAuthority || isInsuranceCompany}
+              disabled={
+                isDisabled ||
+                isContractingAuthority ||
+                isInsuranceCompany ||
+                (isInformationCompany && formik.values.digitalAddress)
+              }
             />
           </Grid>
-          {(!isInsuranceCompany || (selectedParty?.taxCode !== '' && selectedParty?.taxCode)) && (
+          {(!isInsuranceCompany || (taxId && taxId !== '')) && (
             <Grid item xs={12}>
               <CustomTextField
                 {...baseTextFieldProps(
@@ -648,7 +661,12 @@ export default function PersonalAndBillingDataSection({
                     ? theme.palette.text.disabled
                     : theme.palette.text.primary
                 )}
-                disabled={isDisabled || isContractingAuthority || isInsuranceCompany}
+                disabled={
+                  isDisabled ||
+                  isContractingAuthority ||
+                  isInsuranceCompany ||
+                  (isInformationCompany && formik.values.taxCode)
+                }
               />
             </Grid>
           )}
@@ -660,15 +678,15 @@ export default function PersonalAndBillingDataSection({
               xs={12}
               pl={3}
               pt={
-                !isForeignInsurance || (formik.values.hasVatnumber && selectedParty?.taxCode !== '')
+                !isForeignInsurance ||
+                  (formik.values.hasVatnumber && taxId !== '')
                   ? 3
                   : 0
               }
               mb={!formik.values.hasVatnumber && canInvoice && isInsuranceCompany ? -3 : 0}
             >
               {!isForeignInsurance &&
-                formik.values.hasVatnumber &&
-                selectedParty?.taxCode !== '' && (
+                formik.values.hasVatnumber && taxId !== '' && (
                   <Grid item>
                     <Box display="flex" alignItems="center">
                       <Checkbox
@@ -847,67 +865,71 @@ export default function PersonalAndBillingDataSection({
               />
             </Grid>
           )}
-          {(isInformationCompany || isContractingAuthority) && (
-            <>
-              <Grid item xs={12}>
-                {/* Luogo di iscrizione al Registro delle Imprese facoltativo per institution Type !== 'PA' e 'PSP */}
-                <CustomTextField
-                  {...baseTextFieldProps(
-                    'businessRegisterPlace',
-                    isContractingAuthority
-                      ? t(
-                        'onboardingFormData.billingDataSection.informationCompanies.requiredCommercialRegisterNumber'
-                      )
-                      : t(
-                        'onboardingFormData.billingDataSection.informationCompanies.commercialRegisterNumber'
-                      ),
-                    600,
-                    theme.palette.text.primary
-                  )}
-                />
-              </Grid>
-              <Grid item xs={6}>
-                {/* REA facoltativo per institution Type !== 'PA' e 'PSP */}
-                <CustomTextField
-                  placeholder={'RM-123456'}
-                  {...baseTextFieldProps(
-                    'rea',
-                    t('onboardingFormData.billingDataSection.informationCompanies.rea'),
-                    600,
-                    theme.palette.text.primary
-                  )}
-                />
-              </Grid>
-              <Grid item xs={6}>
-                {/* capitale sociale facoltativo per institution Type !== 'PA' e 'PSP */}
-                <CustomTextField
-                  name={'shareCapital'}
-                  {...baseTextFieldProps(
-                    'shareCapital',
-                    isContractingAuthority
-                      ? t(
-                        'onboardingFormData.billingDataSection.informationCompanies.requiredShareCapital'
-                      )
-                      : t(
-                        'onboardingFormData.billingDataSection.informationCompanies.shareCapital'
-                      ),
-                    600,
-                    theme.palette.text.primary
-                  )}
-                  onClick={() => setShrinkRea(true)}
-                  onBlur={() => {
-                    if (!formik.values.shareCapital) {
-                      setShrinkRea(false);
-                    }
-                  }}
-                  InputLabelProps={{ shrink: shrinkRea }}
-                  InputProps={{
-                    inputComponent: NumberDecimalFormat,
-                  }}
-                />
-              </Grid>
-            </>
-          )}
+          {(isInformationCompany ||
+            isContractingAuthority ||
+            (productId === 'prod-interop' && institutionType === 'SCP')) && (
+              <>
+                <Grid item xs={12}>
+                  {/* Luogo di iscrizione al Registro delle Imprese facoltativo per institution Type !== 'PA' e 'PSP */}
+                  <CustomTextField
+                    {...baseTextFieldProps(
+                      'businessRegisterPlace',
+                      isContractingAuthority ||
+                        (productId === 'prod-interop' && institutionType === 'SCP')
+                        ? t(
+                          'onboardingFormData.billingDataSection.informationCompanies.requiredCommercialRegisterNumber'
+                        )
+                        : t(
+                          'onboardingFormData.billingDataSection.informationCompanies.commercialRegisterNumber'
+                        ),
+                      600,
+                      theme.palette.text.primary
+                    )}
+                  />
+                </Grid>
+                <Grid item xs={6}>
+                  {/* REA facoltativo per institution Type !== 'PA' e 'PSP */}
+                  <CustomTextField
+                    placeholder={'RM-123456'}
+                    {...baseTextFieldProps(
+                      'rea',
+                      t('onboardingFormData.billingDataSection.informationCompanies.rea'),
+                      600,
+                      theme.palette.text.primary
+                    )}
+                  />
+                </Grid>
+                <Grid item xs={6}>
+                  {/* capitale sociale facoltativo per institution Type !== 'PA' e 'PSP */}
+                  <CustomTextField
+                    name={'shareCapital'}
+                    {...baseTextFieldProps(
+                      'shareCapital',
+                      isContractingAuthority ||
+                        (productId === 'prod-interop' && institutionType === 'SCP')
+                        ? t(
+                          'onboardingFormData.billingDataSection.informationCompanies.requiredShareCapital'
+                        )
+                        : t(
+                          'onboardingFormData.billingDataSection.informationCompanies.shareCapital'
+                        ),
+                      600,
+                      theme.palette.text.primary
+                    )}
+                    onClick={() => setShrinkRea(true)}
+                    onBlur={() => {
+                      if (!formik.values.shareCapital) {
+                        setShrinkRea(false);
+                      }
+                    }}
+                    InputLabelProps={{ shrink: shrinkRea }}
+                    InputProps={{
+                      inputComponent: NumberDecimalFormat,
+                    }}
+                  />
+                </Grid>
+              </>
+            )}
           {isPaymentServiceProvider && (
             <>
               <Grid item xs={12}>
@@ -963,16 +985,19 @@ export default function PersonalAndBillingDataSection({
             </>
           )}
           {/* indirizzo mail di supporto */}
-          {!institutionAvoidGeotax && (
+          {!institutionAvoidGeotax && productId !== 'prod-interop' && (
             <Grid item xs={12}>
               <CustomTextField
                 {...baseTextFieldProps(
                   'supportEmail',
-                  t(productId === "prod-io-sign"
-                    ? 'onboardingFormData.billingDataSection.assistanceContact.supportEmail'
-                    : 'onboardingFormData.billingDataSection.assistanceContact.supportEmailOptional'),
+                  t(
+                    productId === 'prod-io-sign' ||
+                      (productId === 'prod-interop' && institutionType === 'SCP')
+                      ? 'onboardingFormData.billingDataSection.assistanceContact.supportEmail'
+                      : 'onboardingFormData.billingDataSection.assistanceContact.supportEmailOptional'
+                  ),
                   600,
-                  theme.palette.text.primary,
+                  theme.palette.text.primary
                 )}
               />
               {/* descrizione indirizzo mail di supporto */}

@@ -82,6 +82,35 @@ const createPartyEntity = (
   istatCode,
 });
 
+const createPartyEntityInfoCamere = (
+  businessTaxId: string,
+  businessName: string,
+  legalNature: string,
+  legalNatureDescription: string,
+  cciaa: string,
+  nRea: string,
+  businessStatus: string,
+  city: string,
+  county: string,
+  zipCode: string,
+  address: string,
+  digitalAddress: string,
+) => ({
+  businessTaxId,
+  businessName,
+  legalNature,
+  legalNatureDescription,
+  cciaa,
+  nRea,
+  businessStatus,
+  city,
+  county,
+  zipCode,
+  address,
+  digitalAddress,
+});
+
+
 export const mockPartyRegistry = {
   items: [
     createPartyRegistryEntity(
@@ -348,6 +377,23 @@ const mockedParties = [
     '12125',
     'istat7'
   ),
+];
+
+const mockedPartyFromInfoCamere = [
+  createPartyEntityInfoCamere(
+    "00159560366",
+    "FERRARI-SOCIETA'PER AZIONI ESERCIZIO FABBRICHE AUTOMOBILI E CORSE O SEMPLICEMENTE: FERRARI S.P.A.",
+    "SP",
+    "SOCIETA' PER AZIONI",
+    "MO",
+    "88683",
+    "Registrata",
+    "MODENA",
+    "MO",
+    "41122",
+    "VIA EMILIA EST 1163",
+    "FERRARI@PEC.FERRARI.COM"
+  )
 ];
 
 export const mockedGeoTaxonomy: Array<GeographicTaxonomyResource> = [
@@ -981,9 +1027,7 @@ export async function mockFetch(
     const retrievedLocalization = mockedGeotaxonomies.find(
       (l) => endpointParams.geoTaxId === l.istat_code
     );
-    return new Promise((resolve) =>
-      resolve({ data: retrievedLocalization, status: 200, statusText: '200' } as AxiosResponse)
-    );
+    return Promise.resolve({ data: retrievedLocalization, status: 200, statusText: '200' } as AxiosResponse);
   }
 
   if (endpoint === 'ONBOARDING_GET_PARTY_FROM_CF') {
@@ -995,7 +1039,7 @@ export async function mockFetch(
   }
 
   if (endpoint === 'ONBOARDING_GET_PARTY_BY_CF_FROM_INFOCAMERE') {
-    const matchedParty = mockedParties.find((p) => p.taxCode === endpointParams.id);
+    const matchedParty = mockedPartyFromInfoCamere.find((p) => p.businessTaxId === endpointParams.id);
     return new Promise((resolve) =>
       resolve({ data: matchedParty, status: 200, statusText: '200' } as AxiosResponse)
     );
@@ -1138,7 +1182,7 @@ export async function mockFetch(
   if (endpoint === 'ONBOARDING_USER_VALIDATION') {
     if (
       ['CRTCTF90B12C123K', 'CRTCTF91B12C123K', 'CRTCTF92B12C123K'].indexOf((data as any)?.taxCode) >
-        -1 &&
+      -1 &&
       ((data as any)?.name !== 'CERTIFIED_NAME' || (data as any)?.surname !== 'CERTIFIED_SURNAME')
     ) {
       return buildOnboardingUserValidation409(

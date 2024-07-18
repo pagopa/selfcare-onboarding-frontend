@@ -197,6 +197,14 @@ export function StepSearchParty({
         uoResult,
         institutionType
       );
+    } else if (institutionType === 'SCP' && product?.id === 'prod-interop') {
+      forward(
+        {externalId: (selected as any).businessTaxid},
+        { ...selected, externalId: (selected as any).businessTaxid } as Party,
+        aooResult,
+        uoResult,
+        institutionType,
+      );
     } else {
       forward(
         {
@@ -312,7 +320,7 @@ export function StepSearchParty({
               </Trans>
             ) : institutionType === 'SCP' ? (
               <Trans i18nKey="onboardingStep1.onboarding.scpSubtitle" components={{ 3: <br />, 5: <strong /> }}>
-                Inserisci uno dei dati richiesti e cerca da Infocamere l’ente <br/>
+                Inserisci uno dei dati richiesti e cerca da Infocamere l’ente <br />
                 per cui vuoi richiedere l’adesione a <strong>Interoperabilità.</strong>
               </Trans>
             ) : (
