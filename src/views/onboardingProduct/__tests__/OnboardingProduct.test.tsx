@@ -228,6 +228,28 @@ test('test advanced search taxcode', async () => {
   await executeAdvancedSearchForTaxCode('Comune di Milano');
 });
 
+test('test correct validation of recipientCode input', async () => {
+  renderComponent('prod-pagopa');
+  await executeStepInstitutionType('prod-pagopa');
+  await executeStep1('AGENCY X', 'prod-pagopa', 'pa');
+  const confirmButtonEnabled = screen.getByRole('button', { name: 'Continua' });
+  fireEvent.click(confirmButtonEnabled);
+
+  const recipientCodeInput = document.getElementById('recipientCode') as HTMLInputElement;
+
+  fireEvent.input(recipientCodeInput, { target: { value: 'abc123!@#' } });
+  expect(recipientCodeInput.value).toBe('ABC123');
+
+  fireEvent.input(recipientCodeInput, { target: { value: '!@#$%^&*' } });
+  expect(recipientCodeInput.value).toBe('');
+
+  fireEvent.input(recipientCodeInput, { target: { value: 'ab@c1#2' } });
+  expect(recipientCodeInput.value).toBe('ABC12');
+
+  fireEvent.input(recipientCodeInput, { target: { value: 'AB123CD' } });
+  expect(recipientCodeInput.value).toBe('AB123CD');
+});
+
 test.skip('test billingData without Support Mail', async () => {
   renderComponent('prod-interop');
   await executeStepInstitutionType('prod-interop');
@@ -602,7 +624,7 @@ const executeStepBillingData = async () => {
     '09010',
     'AAAAAA44D55F456K',
     'AAAAAA44D55F456K',
-    'recipientCode'
+    'A1B2C3D'
   );
   fireEvent.click(confirmButtonEnabled);
   await waitFor(() => screen.getByText(step2Title));
@@ -765,7 +787,7 @@ const executeStepBillingDataWithoutSupportMail = async () => {
     '09010',
     'AAAAAA44D55F456K',
     'AAAAAA44D55F456K',
-    'recipientCode'
+    'A1B2C3D'
   );
   fireEvent.click(confirmButton);
   await waitFor(() => screen.getByText(step2Title));
@@ -881,7 +903,7 @@ const fillUserBillingDataForm = async (
     target: { value: 'AAAAAA44D55F456K' },
   });
   fireEvent.change(document.getElementById(recipientCode) as HTMLElement, {
-    target: { value: 'recipientCode' },
+    target: { value: 'A1B2C3D' },
   });
   const searchCitySelect = document.getElementById('city-select');
   if (searchCitySelect) {
@@ -1175,7 +1197,7 @@ const billingData2billingDataRequest = () => ({
   zipCode: '09010',
   taxCode: 'AAAAAA44D55F456K',
   vatNumber: 'AAAAAA44D55F456K',
-  recipientCode: 'recipientCode'.toUpperCase(),
+  recipientCode: 'A1B2C3D'.toUpperCase(),
 });
 
 const verifySubmit = async (productId = 'prod-idpay') => {
