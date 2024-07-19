@@ -199,8 +199,8 @@ export function StepSearchParty({
       );
     } else if (institutionType === 'SCP' && product?.id === 'prod-interop') {
       forward(
-        {externalId: (selected as any).businessTaxid},
-        { ...selected, externalId: (selected as any).businessTaxid } as Party,
+        {externalId: (selected as any).businessTaxId},
+        { ...selected, externalId: (selected as any).businessTaxId } as Party,
         aooResult,
         uoResult,
         institutionType,

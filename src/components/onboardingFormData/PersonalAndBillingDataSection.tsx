@@ -985,7 +985,7 @@ export default function PersonalAndBillingDataSection({
             </>
           )}
           {/* indirizzo mail di supporto */}
-          {!institutionAvoidGeotax && productId !== 'prod-interop' && (
+          {!institutionAvoidGeotax && (
             <Grid item xs={12}>
               <CustomTextField
                 {...baseTextFieldProps(

@@ -10,6 +10,7 @@ import {
   mockedProducts,
   mockedAoos,
   mockedUos,
+  mockedPartyFromInfoCamere,
 } from '../../../lib/__mocks__/mockApiRequests';
 
 jest.mock('formik', () => ({
@@ -102,6 +103,8 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
           case 'prod-pn-dev':
             uoSelected = mockedUos[0];
             party = mockedUos[0];
+          case 'prod-interop':
+            party = mockedPartyFromInfoCamere;
           default:
             party = mockPartyRegistry.items[0];
         }
@@ -122,7 +125,7 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
           productId !== 'prod-interop';
         const isInformationCompany =
           (institutionType === 'GSP' || institutionType === 'SCP') &&
-          (productId === 'prod-io' || productId === 'prod-io-sign');
+          (productId === 'prod-io' || productId === 'prod-io-sign' || productId === 'prod-interop');
 
         conditionsMap[`${productId}-${institutionType}`] = {
           isPremium,

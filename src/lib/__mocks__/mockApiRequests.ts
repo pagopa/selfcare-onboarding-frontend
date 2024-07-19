@@ -379,20 +379,20 @@ const mockedParties = [
   ),
 ];
 
-const mockedPartyFromInfoCamere = [
+export const mockedPartyFromInfoCamere = [
   createPartyEntityInfoCamere(
-    "00159560366",
-    "FERRARI-SOCIETA'PER AZIONI ESERCIZIO FABBRICHE AUTOMOBILI E CORSE O SEMPLICEMENTE: FERRARI S.P.A.",
+    "00112233445",
+    "Scuderia Ferrari",
     "SP",
-    "SOCIETA' PER AZIONI",
+    "Società per azioni",
     "MO",
-    "88683",
+    "123456",
     "Registrata",
-    "MODENA",
+    "Modena",
     "MO",
-    "41122",
-    "VIA EMILIA EST 1163",
-    "FERRARI@PEC.FERRARI.COM"
+    "44444",
+    "Via Enzo Ferrari 1",
+    "Ferrari@test.pec.com"
   )
 ];
 
