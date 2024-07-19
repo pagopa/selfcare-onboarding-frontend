@@ -94,7 +94,7 @@ export default function AsyncAutocompleteSearch({
       ? selected?.descrizioneUo
       : addUser && selected && (isAooCodeSelected || isUoCodeSelected) && selected?.description
       ? selected.description
-      : input;
+      : selected?.businessName;
 
   useEffect(() => {
     if (selected && selected?.denominazioneAoo) {

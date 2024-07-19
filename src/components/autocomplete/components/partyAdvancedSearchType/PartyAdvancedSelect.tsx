@@ -87,6 +87,13 @@ export default function PartyAdvancedSelect({
   };
 
   useEffect(() => {
+    if (product?.id === 'prod-interop' && institutionType === 'SCP') {
+      onSelectValue(false, true, false, false, false);
+      setTypeOfSearch('taxCode');
+    }
+  }, []);
+
+  useEffect(() => {
     if (isBusinessNameSelected) {
       setTypeOfSearch('businessName');
     } else if (isTaxCodeSelected) {
@@ -97,11 +104,13 @@ export default function PartyAdvancedSelect({
       setTypeOfSearch('uoCode');
     } else if (isIvassCodeSelected) {
       setTypeOfSearch('ivassCode');
+    } else {
+      setTypeOfSearch('');
     }
   }, []);
 
   useEffect(() => {
-    if (addUser) {
+    if (addUser || (product?.id === 'prod-interop' && institutionType === 'SCP')) {
       setTypeOfSearch('taxCode');
       setIsTaxCodeSelected(true);
     } else {
@@ -116,6 +125,7 @@ export default function PartyAdvancedSelect({
       product.id === 'prod-io-sign' ||
       product.id === 'prod-pn-dev' ||
       product.id === 'prod-pn');
+
   const optionsAvailable4InstitutionType =
     institutionType !== 'SA' && institutionType !== 'AS' && institutionType !== 'GSP';
 
@@ -146,7 +156,7 @@ export default function PartyAdvancedSelect({
         label={t('partyAdvancedSelect.advancedSearchLabel')}
         onChange={handleTypeSearchChange}
       >
-        {!addUser && (
+        {!addUser && institutionType !== 'SCP' && (
           <MenuItem
             id="businessName"
             data-testid="businessName"
@@ -178,6 +188,7 @@ export default function PartyAdvancedSelect({
 
         {((ENV.AOO_UO.SHOW_AOO_UO &&
           optionsAvailable4InstitutionType &&
+          institutionType !== 'SCP' &&
           filteredByProducts(product as Product)) ||
           (addUser && ENV.AOO_UO.SHOW_AOO_UO && filteredByProducts(selectedProduct))) &&
           menuItems.map((item) => (
