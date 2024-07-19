@@ -874,8 +874,7 @@ export default function PersonalAndBillingDataSection({
                   <CustomTextField
                     {...baseTextFieldProps(
                       'businessRegisterPlace',
-                      isContractingAuthority ||
-                        (productId === 'prod-interop' && institutionType === 'SCP')
+                      isContractingAuthority
                         ? t(
                           'onboardingFormData.billingDataSection.informationCompanies.requiredCommercialRegisterNumber'
                         )
@@ -905,8 +904,7 @@ export default function PersonalAndBillingDataSection({
                     name={'shareCapital'}
                     {...baseTextFieldProps(
                       'shareCapital',
-                      isContractingAuthority ||
-                        (productId === 'prod-interop' && institutionType === 'SCP')
+                      isContractingAuthority
                         ? t(
                           'onboardingFormData.billingDataSection.informationCompanies.requiredShareCapital'
                         )
@@ -991,8 +989,7 @@ export default function PersonalAndBillingDataSection({
                 {...baseTextFieldProps(
                   'supportEmail',
                   t(
-                    productId === 'prod-io-sign' ||
-                      (productId === 'prod-interop' && institutionType === 'SCP')
+                    productId === 'prod-io-sign'
                       ? 'onboardingFormData.billingDataSection.assistanceContact.supportEmail'
                       : 'onboardingFormData.billingDataSection.assistanceContact.supportEmailOptional'
                   ),
