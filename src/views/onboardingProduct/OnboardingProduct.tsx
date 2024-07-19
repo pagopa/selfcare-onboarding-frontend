@@ -461,67 +461,6 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     aggregates?: Array<AggregateInstitution>
   ) => {
     setLoading(true);
-    console.log("Submit dati:", {
-      billingData: billingData2billingDataRequest(onboardingFormData as OnboardingFormData),
-      additionalInformations:
-        institutionType === 'GSP' && selectedProduct?.id === 'prod-pagopa'
-          ? {
-            agentOfPublicService: additionalInformations?.agentOfPublicService,
-            agentOfPublicServiceNote: additionalInformations?.agentOfPublicServiceNote,
-            belongRegulatedMarket: additionalInformations?.belongRegulatedMarket,
-            regulatedMarketNote: additionalInformations?.regulatedMarketNote,
-            establishedByRegulatoryProvision:
-              additionalInformations?.establishedByRegulatoryProvision,
-            establishedByRegulatoryProvisionNote:
-              additionalInformations?.establishedByRegulatoryProvisionNote,
-            ipa: additionalInformations?.ipa,
-            ipaCode: additionalInformations?.ipaCode,
-            otherNote: additionalInformations?.otherNote,
-          }
-          : undefined,
-      pspData:
-        institutionType === 'PSP'
-          ? pspData2pspDataRequest(onboardingFormData as OnboardingFormData)
-          : undefined,
-      companyInformations:
-        institutionType !== 'PSP' && institutionType !== 'PA'
-          ? companyInformationsDto2pspDataRequest(onboardingFormData as OnboardingFormData)
-          : undefined,
-      institutionType,
-      originId: aooSelected
-        ? aooSelected.codiceUniAoo
-        : uoSelected
-          ? uoSelected.codiceUniUo
-          : onboardingFormData?.originId,
-      geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY
-        ? onboardingFormData?.geographicTaxonomies?.map((gt) =>
-          onboardedInstitutionInfo2geographicTaxonomy(gt)
-        )
-        : [],
-      institutionLocationData: {
-        country: onboardingFormData?.country,
-        county: onboardingFormData?.county,
-        city: onboardingFormData?.city,
-      },
-      origin,
-      users,
-      pricingPlan,
-      assistanceContacts: assistanceConcatsDto2pspDataRequest(
-        onboardingFormData as OnboardingFormData
-      ),
-      productId,
-      subunitCode: aooSelected
-        ? aooSelected.codiceUniAoo
-        : uoSelected
-          ? uoSelected.codiceUniUo
-          : undefined,
-      subunitType: aooSelected ? 'AOO' : uoSelected ? 'UO' : undefined,
-      taxCode: onboardingFormData?.taxCode,
-      isAggregator: onboardingFormData?.isAggregator
-        ? onboardingFormData?.isAggregator
-        : undefined,
-      aggregates,
-    });
     const postLegalsResponse = await fetchWithLogs(
       { endpoint: 'ONBOARDING_POST_LEGALS' },
       {
