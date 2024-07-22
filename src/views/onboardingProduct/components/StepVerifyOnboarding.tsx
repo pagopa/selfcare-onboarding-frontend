@@ -23,12 +23,14 @@ import UserNotAllowedPage from '../../UserNotAllowedPage';
 import { AooData } from '../../../model/AooData';
 import { UoData } from '../../../model/UoModel';
 import AlreadyOnboarded from '../../AlreadyOnboarded';
+import { PDNDBusinessResource } from '../../../model/PDNDBusinessResource';
+import { getTaxCode } from '../../../utils/typeGuard-utils';
 
 type Props = StepperStepComponentProps & {
   externalInstitutionId: string;
   productId: string;
   selectedProduct?: Product | null;
-  selectedParty?: Party;
+  selectedParty?: Party | PDNDBusinessResource;
   aooSelected?: AooData;
   uoSelected?: UoData;
   institutionType?: InstitutionType;
@@ -74,13 +76,14 @@ export function StepVerifyOnboarding({
   const { setRequiredLogin } = useContext(UserContext);
   const requestIdRef = useRef<string>();
   const { t } = useTranslation();
+  const taxId = getTaxCode(selectedParty);
 
   const notAllowedErrorNoParty: RequestOutcomeMessage = {
     title: '',
     description: [
       <>
         <UserNotAllowedPage
-          partyName={selectedParty?.description}
+          partyName={(selectedParty as Party)?.description}
           productTitle={selectedProduct?.title}
         />
       </>,
@@ -117,15 +120,15 @@ export function StepVerifyOnboarding({
       {
         method: 'HEAD',
         params: {
-          taxCode: selectedParty?.taxCode,
+          taxCode: taxId,
           productId,
           subunitCode: aooSelected
             ? aooSelected.codiceUniAoo
             : uoSelected
             ? uoSelected.codiceUniUo
             : undefined,
-          origin: selectedParty?.origin,
-          originId: selectedParty?.originId,
+          origin: (selectedParty as Party)?.origin,
+          originId: (selectedParty as Party)?.originId,
         },
       },
       () => setRequiredLogin(true)
@@ -138,7 +141,7 @@ export function StepVerifyOnboarding({
     if (restOutcome === 'success') {
       trackEvent('ONBOARDING_PRODUCT_ALREADY_SUBSCRIBED', {
         request_id: requestIdRef.current,
-        party_id: selectedParty?.externalId,
+        party_id: (selectedParty as Party)?.externalId,
         product_id: selectedProduct?.id,
       });
       setOutcome(alreadyOnboarded);

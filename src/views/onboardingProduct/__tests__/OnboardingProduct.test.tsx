@@ -107,9 +107,10 @@ test('test already onboarded', async () => {
 test('onboarding of pa with origin IPA', async () => {
   renderComponent('prod-pagopa');
   await executeStepInstitutionType('prod-pagopa');
-  await executeStep1('AGENCY X', 'prod-pagopa', 'pa');
-  const searchCitySelect = document.getElementById('city-select') as HTMLInputElement;
-  const searchCounty = document.getElementById('county');
+  await executeStep1('AGENCY X', 'prod-pagopa', 'PA');
+  
+  // const searchCitySelect = document.getElementById('city-select') as HTMLInputElement;
+  // const searchCounty = document.getElementById('county');
 
   // await waitFor(() => expect(searchCitySelect.value).toBe('Palermo'));
   // await waitFor(() => expect(searchCounty).toBeDisabled());
@@ -792,6 +793,7 @@ const executeStepBillingDataWithoutSupportMail = async () => {
   fireEvent.click(confirmButton);
   await waitFor(() => screen.getByText(step2Title));
 };
+
 const executeStep2 = async () => {
   console.log('Testing step 2');
   await waitFor(() => screen.getByText(step2Title));
@@ -916,7 +918,7 @@ const fillUserBillingDataForm = async (
     });
   }
   if (supportEmail) {
-    fireEvent.change(document.getElementById(supportEmail) as HTMLElement, {
+    fireEvent.change(document.getElementById(supportEmail) as HTMLInputElement, {
       target: { value: 'a@a.it' },
     });
   }
