@@ -33,6 +33,7 @@ import { filterByCategory, requiredError } from '../../utils/constants';
 import Heading from '../onboardingFormData/Heading';
 import { validateFields } from '../../utils/validateFields';
 import { handleGeotaxonomies } from '../../utils/handleGeotaxonomies';
+import { PDNDBusinessResource } from '../../model/PDNDBusinessResource';
 
 export type StepBillingDataHistoryState = {
   externalInstitutionId: string;
@@ -53,7 +54,7 @@ type Props = StepperStepComponentProps & {
   origin?: string;
   productId?: string;
   subProductId?: string;
-  selectedParty?: Party;
+  selectedParty?: Party | PDNDBusinessResource;
   selectedProduct?: Product | null;
   outcome?: RequestOutcomeMessage | null;
   aooSelected?: AooData;
@@ -117,14 +118,14 @@ export default function StepOnboardingFormData({
   const isInformationCompany =
     origin !== 'IPA' &&
     (institutionType === 'GSP' || institutionType === 'SCP') &&
-    (productId === 'prod-io' || productId === 'prod-io-sign' || productId === 'prod-pagopa');
+    (productId === 'prod-io' || productId === 'prod-io-sign' || productId === 'prod-pagopa' || productId === 'prod-interop');
   const isProdFideiussioni = productId?.startsWith('prod-fd') ?? false;
   const canInvoice =
     institutionType !== 'SA' &&
     institutionType !== 'PT' &&
     institutionType !== 'AS' &&
     productId !== 'prod-interop';
-  const isForeignInsurance = selectedParty?.registerType?.includes('Elenco II');
+  const isForeignInsurance = (selectedParty as Party)?.registerType?.includes('Elenco II');
   const isDisabled =
     isPremium ||
     (origin === 'IPA' && institutionType !== 'PA' && !isPaymentServiceProvider) ||
