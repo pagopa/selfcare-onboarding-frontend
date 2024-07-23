@@ -1048,9 +1048,9 @@ export async function mockFetch(
   }
 
   if (endpoint === 'ONBOARDING_RECIPIENT_CODE_VALIDATION') {
-    const randomStatus = mockRecipientCodeValidation[0];
+    const mockAcceptedResponse = mockRecipientCodeValidation[0];
     return new Promise((resolve) =>
-      resolve({ data: randomStatus, status: 200, statusText: '200'} as AxiosResponse)
+      resolve({ data: mockAcceptedResponse, status: 200, statusText: '200'} as AxiosResponse)
     );
   }
 
