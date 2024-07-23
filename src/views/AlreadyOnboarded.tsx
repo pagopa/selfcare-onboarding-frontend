@@ -3,6 +3,7 @@ import { IllusError } from '@pagopa/mui-italia';
 import { EndingPage } from '@pagopa/selfcare-common-frontend/lib';
 import { Trans } from 'react-i18next';
 import { useHistory } from 'react-router';
+import { useTranslation } from 'react-i18next';
 import { RolesInformations } from '../components/RolesInformations';
 import { ROUTES, addUserFlowProducts } from '../utils/constants';
 import { ENV } from '../utils/env';
@@ -19,10 +20,13 @@ export default function AlreadyOnboarded({
   selectedProduct,
   institutionType,
 }: Props) {
+  const { t } = useTranslation();
   const history = useHistory();
+
   const isEnabledProduct2AddUser = !!(
     selectedProduct?.id && addUserFlowProducts(selectedProduct.id)
   );
+
   return (
     <EndingPage
       minHeight="52vh"
@@ -43,7 +47,10 @@ export default function AlreadyOnboarded({
             </Trans>
           </Grid>
           <Grid item>
-            <RolesInformations isTechPartner={institutionType === 'PT'} />
+            <RolesInformations
+              isTechPartner={institutionType === 'PT'}
+              linkLabel={t('moreInformationOnRoles')}
+            />
           </Grid>
         </Grid>
       }
