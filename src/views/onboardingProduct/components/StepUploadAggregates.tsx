@@ -208,7 +208,7 @@ export function StepUploadAggregates({
               components={{
                 1: (
                   <a
-                    download={`${partyName}_${productName}_aggregati_errore.csv`.replace(' ', '_')}
+                    download={`${partyName}_${productName}_aggregati_errore.csv`.replace(/ /g, '_')}
                     href={errorCsv}
                     style={{ color: theme.palette.text.primary }}
                   />
@@ -260,7 +260,10 @@ export function StepUploadAggregates({
                   <a
                     onClick={getExampleAggregatesCsv}
                     href={exampleCsv}
-                    download={`${partyName}_${productName}_aggregati_esempio.csv`.replace(' ', '_')}
+                    download={`${partyName}_${productName}_aggregati_esempio.csv`.replace(
+                      / /g,
+                      '_'
+                    )}
                     style={{
                       cursor: 'pointer',
                       textDecoration: 'underline',
