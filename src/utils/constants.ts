@@ -180,8 +180,8 @@ export const filterByCategory = (institutionType?: string, productId?: string) =
   productId === 'prod-pn'
     ? 'L6,L4,L45,L35,L5,L17,L15,C14'
     : institutionType === 'GSP'
-      ? 'L37,SAG'
-      : 'C17,C16,L10,L19,L13,L2,C10,L20,L21,L22,L15,L1,C13,C5,L40,L11,L39,L46,L8,L34,L7,L35,L45,L47,L6,L12,L24,L28,L42,L36,L44,C8,C3,C7,C14,L16,C11,L33,C12,L43,C2,L38,C1,L5,L4,L31,L18,L17,S01,SA';
+    ? 'L37,SAG'
+    : 'C17,C16,L10,L19,L13,L2,C10,L20,L21,L22,L15,L1,C13,C5,L40,L11,L39,L46,L8,L34,L7,L35,L45,L47,L6,L12,L24,L28,L42,L36,L44,C8,C3,C7,C14,L16,C11,L33,C12,L43,C2,L38,C1,L5,L4,L31,L18,L17,S01,SA';
 
 export const noMandatoryIpaProducts = (productId?: string) =>
   productId !== 'prod-interop' &&
@@ -206,6 +206,7 @@ export const institutionTypes: Array<{ labelKey: string; value: InstitutionType 
   { labelKey: 'as', value: 'AS' },
 ];
 
+// eslint-disable-next-line sonarjs/cognitive-complexity
 export const institutionType4Product = (productId: string | undefined) => {
   switch (productId) {
     case 'prod-interop':
@@ -222,12 +223,19 @@ export const institutionType4Product = (productId: string | undefined) => {
     case 'prod-idpay':
       return institutionTypes.filter((it) => it.labelKey === 'pa');
     case 'prod-io':
-    case 'prod-pagopa':
-      // Temporary disabled psp radiobutton for prod-pagopa, the radio buttons are now the same for prod-io and prod-pagopa.
       return institutionTypes.filter(
         (it) =>
           it.labelKey === 'pa' ||
           it.labelKey === 'gsp' ||
+          (ENV.PT.SHOW_PT ? it.labelKey === 'pt' : '')
+      );
+    case 'prod-pagopa':
+      // Temporary re-enabled psp radiobutton for prod-pagopa only for dev environment.
+      return institutionTypes.filter(
+        (it) =>
+          it.labelKey === 'pa' ||
+          it.labelKey === 'gsp' ||
+          (ENV.ENV === 'DEV' && it.labelKey === 'psp') ||
           (ENV.PT.SHOW_PT ? it.labelKey === 'pt' : '')
       );
     case 'prod-io-sign':

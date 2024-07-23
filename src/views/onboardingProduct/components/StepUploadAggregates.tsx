@@ -1,4 +1,4 @@
-import { Alert, AlertTitle, Grid, Typography, useTheme } from '@mui/material';
+import { Alert, AlertTitle, Grid, Link, Typography, useTheme } from '@mui/material';
 import { useTranslation, Trans } from 'react-i18next';
 import { useContext, useEffect, useState } from 'react';
 import { AxiosResponse } from 'axios';
@@ -14,6 +14,7 @@ import { fetchWithLogs } from '../../../lib/api-utils';
 import { getFetchOutcome } from '../../../lib/error-utils';
 import { UserContext } from '../../../lib/context';
 import { AggregateInstitution } from '../../../model/AggregateInstitution';
+import { RolesInformations } from '../../../components/RolesInformations';
 import { genericError } from './StepVerifyOnboarding';
 
 type Props = {
@@ -21,6 +22,7 @@ type Props = {
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
   setOutcome: React.Dispatch<React.SetStateAction<RequestOutcomeMessage | null | undefined>>;
   productName?: string;
+  partyName?: string;
   institutionType?: InstitutionType;
 } & StepperStepComponentProps;
 
@@ -29,6 +31,7 @@ export function StepUploadAggregates({
   setLoading,
   setOutcome,
   productName,
+  partyName,
   institutionType,
   forward,
   back,
@@ -40,12 +43,14 @@ export function StepUploadAggregates({
 
   const [uploadedFile, setUploadedFiles] = useState<Array<File>>([]);
   const [disabled, setDisabled] = useState<boolean>(true);
+  const [invalidFile, setInvalidFile] = useState<boolean>(false);
   const [foundErrors, setFoundErrors] = useState<Array<RowError>>();
   const [errorCsv, setErrorCsv] = useState<string>();
 
   useEffect(() => {
     if (uploadedFile[0]?.name) {
       setDisabled(false);
+      setInvalidFile(false);
       setFoundErrors(undefined);
     } else {
       setDisabled(true);
@@ -59,6 +64,7 @@ export function StepUploadAggregates({
 
   const onDropRejected = () => {
     setDisabled(true);
+    setInvalidFile(true);
   };
 
   const deleteUploadedFiles = (): void => {
@@ -135,22 +141,30 @@ export function StepUploadAggregates({
 
   return (
     <Grid container direction="column">
-      <Grid container item justifyContent="center" mb={foundErrors ? 3 : 6}>
-        <Grid item xs={12}>
-          <Typography variant="h3" component="h2" align="center">
+      <Grid container item xs={8} justifyContent="center" textAlign="center" mb={3}>
+        <Grid item xs={8}>
+          <Typography variant="h3">
             <Trans i18nKey="stepUploadAggregates.title" values={{ productName }}>
               {`Indica gli enti da aggregare per ${productName}`}
             </Trans>
           </Typography>
+          <Typography variant="body1" mt={1}>
+            {t('stepUploadAggregates.subTitle')}
+          </Typography>
+          <RolesInformations
+            isTechPartner={institutionType === 'PT'}
+            linkLabel={t('stepUploadAggregates.findOutMore')}
+            documentationLink={'.'} // TODO Add documentation link when available
+          />
         </Grid>
       </Grid>
-      {foundErrors && (
+      {(invalidFile || foundErrors) && (
         <Grid item pt={2} pb={4} sx={{ display: 'flex', justifyContent: 'center' }}>
           <Alert
             severity="error"
             sx={{
-              width: '480px',
-              height: '97px',
+              width: '684px',
+              height: '77px',
               fontSize: 'fontSize',
               alignItems: 'center',
               color: 'colorTextPrimary',
@@ -159,37 +173,71 @@ export function StepUploadAggregates({
               borderLeftWidth: '4px',
             }}
           >
-            <AlertTitle>{t('stepUploadAggregates.errorAlert.title')}</AlertTitle>
+            <AlertTitle>
+              {t(`stepUploadAggregates.errors.${foundErrors ? 'onCsv' : 'invalidFormat'}.title`)}
+            </AlertTitle>
             <Trans
-              i18nKey={'stepUploadAggregates.errorAlert.description'}
+              i18nKey={t(
+                `stepUploadAggregates.errors.${foundErrors ? 'onCsv' : 'invalidFormat'}.description`
+              )}
               components={{
                 1: (
                   <a
-                    download={'aggregates_errors.csv'}
+                    download={`${partyName}_${productName}_aggregati_errore.csv`.replace(' ', '_')}
                     href={errorCsv}
                     style={{ color: theme.palette.text.primary }}
                   />
                 ),
               }}
             >
-              {'<1>Scarica il report</1> per verificare le informazioni e carica di nuovo il file.'}
+              {foundErrors
+                ? '<1>Scarica il report</1> per verificare le informazioni e carica di nuovo il file.'
+                : 'È possibile caricare solo file in formato .csv'}
             </Trans>
           </Alert>
         </Grid>
       )}
-      <Grid item xs={12} display="flex" justifyContent="center" pb={4}>
-        <FileUploader
-          title={t('stepUploadAggregates.dropArea.title')}
-          descriptionLink={t('stepUploadAggregates.dropArea.button')}
-          uploadedFiles={uploadedFile}
-          deleteUploadedFiles={deleteUploadedFiles}
-          onDropAccepted={onDropAccepted}
-          onDropRejected={onDropRejected}
-          accept={['.csv']}
-          loading={loading}
-          isAggregatesUpload={true}
-          theme={theme}
-        />
+      <Grid
+        container
+        item
+        xs={12}
+        display="flex"
+        justifyContent="center"
+        alignContent="center"
+        alignItems="self-start"
+        flexDirection="column"
+      >
+        <Grid item mb={3}>
+          <FileUploader
+            title={t('stepUploadAggregates.dropArea.title')}
+            descriptionLink={t('stepUploadAggregates.dropArea.button')}
+            uploadedFiles={uploadedFile}
+            deleteUploadedFiles={deleteUploadedFiles}
+            onDropAccepted={onDropAccepted}
+            onDropRejected={onDropRejected}
+            accept={['.csv']}
+            loading={loading}
+            isAggregatesUpload={true}
+            theme={theme}
+          />
+          <Typography
+            sx={{
+              fontSize: '12px',
+              fontWeight: 'fontWeightMedium',
+              color: theme.palette.text.secondary,
+              marginLeft: 3,
+            }}
+          >
+            <Trans
+              i18nKey={'stepUploadAggregates.downloadExampleCsv'}
+              components={{
+                1: <Link href="#" style={{ cursor: 'pointer', fontWeight: 'fontWeightMedium' }} />,
+              }}
+            >
+              {'Non sai come preparare il file? <1>Scarica l’esempio</1>'}
+            </Trans>
+          </Typography>
+        </Grid>
       </Grid>
       <OnboardingStepActions
         back={{ label: t('stepUploadAggregates.back'), action: back, disabled: false }}
