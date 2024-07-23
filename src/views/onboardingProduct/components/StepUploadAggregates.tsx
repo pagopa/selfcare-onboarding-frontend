@@ -14,6 +14,7 @@ import { fetchWithLogs } from '../../../lib/api-utils';
 import { getFetchOutcome } from '../../../lib/error-utils';
 import { UserContext } from '../../../lib/context';
 import { AggregateInstitution } from '../../../model/AggregateInstitution';
+import { RolesInformations } from '../../../components/RolesInformations';
 import { genericError } from './StepVerifyOnboarding';
 
 type Props = {
@@ -40,6 +41,7 @@ export function StepUploadAggregates({
 
   const [uploadedFile, setUploadedFiles] = useState<Array<File>>([]);
   const [disabled, setDisabled] = useState<boolean>(true);
+  const [invalidFile, setInvalidFile] = useState<boolean>(false);
   const [foundErrors, setFoundErrors] = useState<Array<RowError>>();
   const [errorCsv, setErrorCsv] = useState<string>();
 
@@ -59,6 +61,7 @@ export function StepUploadAggregates({
 
   const onDropRejected = () => {
     setDisabled(true);
+    setInvalidFile(true);
   };
 
   const deleteUploadedFiles = (): void => {
@@ -135,21 +138,28 @@ export function StepUploadAggregates({
 
   return (
     <Grid container direction="column">
-      <Grid container item justifyContent="center" mb={foundErrors ? 3 : 6}>
-        <Grid item xs={12}>
-          <Typography variant="h3" component="h2" align="center">
+      <Grid container item xs={8} justifyContent="center" textAlign="center" mb={3}>
+        <Grid item xs={8}>
+          <Typography variant="h3">
             <Trans i18nKey="stepUploadAggregates.title" values={{ productName }}>
               {`Indica gli enti da aggregare per ${productName}`}
             </Trans>
           </Typography>
+          <Typography variant="body1" mt={1}>
+            {t('stepUploadAggregates.subTitle')}
+          </Typography>
+          <RolesInformations
+            isTechPartner={institutionType === 'PT'}
+            linkLabel={t('stepUploadAggregates.findOutMore')}
+            documentationLink={'.'} // TODO Add documentation link when available
+          />
         </Grid>
       </Grid>
-      {foundErrors && (
+      {(invalidFile || foundErrors) && (
         <Grid item pt={2} pb={4} sx={{ display: 'flex', justifyContent: 'center' }}>
           <Alert
             severity="error"
             sx={{
-              width: '480px',
               height: '97px',
               fontSize: 'fontSize',
               alignItems: 'center',
@@ -159,9 +169,13 @@ export function StepUploadAggregates({
               borderLeftWidth: '4px',
             }}
           >
-            <AlertTitle>{t('stepUploadAggregates.errorAlert.title')}</AlertTitle>
+            <AlertTitle>
+              {t(`stepUploadAggregates.errors.${foundErrors ? 'onCsv' : 'invalidFormat'}.title`)}
+            </AlertTitle>
             <Trans
-              i18nKey={'stepUploadAggregates.errorAlert.description'}
+              i18nKey={t(
+                `stepUploadAggregates.errors.${foundErrors ? 'onCsv' : 'invalidFormat'}.description`
+              )}
               components={{
                 1: (
                   <a
@@ -172,7 +186,9 @@ export function StepUploadAggregates({
                 ),
               }}
             >
-              {'<1>Scarica il report</1> per verificare le informazioni e carica di nuovo il file.'}
+              {foundErrors
+                ? '<1>Scarica il report</1> per verificare le informazioni e carica di nuovo il file.'
+                : 'È possibile caricare solo file in formato .csv'}
             </Trans>
           </Alert>
         </Grid>

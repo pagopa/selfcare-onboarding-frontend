@@ -201,7 +201,10 @@ export function StepAddManager({
           </Typography>
         </Grid>
         <Grid item>
-          <RolesInformations isTechPartner={isTechPartner} />
+          <RolesInformations
+            isTechPartner={isTechPartner}
+            linkLabel={t('moreInformationOnRoles')}
+          />
         </Grid>
       </Grid>
 

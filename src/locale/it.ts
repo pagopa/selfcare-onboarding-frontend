@@ -155,16 +155,24 @@ export default {
     },
   },
   stepUploadAggregates: {
-    title: `Indica gli enti da aggregare per {{productName}}`,
-    errorAlert: {
-      title: 'Il file contiene più errori',
-      description:
-        '<1>Scarica il report</1> per verificare le informazioni e carica di nuovo il file.',
+    title: `Indica i soggetti aggregati per {{productName}}`,
+    subTitle:
+      'Scarica il file di esempio, compilalo seguendo le indicazioni e carica il documento per aggiungere/dichiarare gli enti da aggregare. <saranno allegati al contratto e dopo la firma diventeranno automaticamente tuoi aggregati>',
+    findOutMore: 'Dubbi? Vai al manuale',
+    errors: {
+      onCsv: {
+        title: 'Il file contiene più errori',
+        description:
+          '<1>Scarica il report</1> per verificare le informazioni e carica di nuovo il file.',
+      },
+      invalidFormat: {
+        title: 'Il formato del file non è valido',
+        description: 'È possibile caricare solo file in formato .csv',
+      },
     },
     dropArea: {
-      title: 'Trascina qui il file .csv con la lista degli enti aggregati oppure',
+      title: "Trascina qui il file .csv con l'elenco degli enti aggregati oppure",
       button: 'carica il file',
-      valid: 'File valido',
     },
     back: 'Indietro',
     forward: 'Continua',
@@ -635,7 +643,8 @@ export default {
       originId: 'Codice IVASS',
       sdiCode: 'Codice SDI',
       sdiCodePaAooUo: 'Codice univoco o SDI',
-      sdiCodePaAooUoDescription: 'È il codice univoco necessario per ricevere le fatture elettroniche. Può essere del tuo ente o della sua Unità Organizzativa di riferimento.',
+      sdiCodePaAooUoDescription:
+        'È il codice univoco necessario per ricevere le fatture elettroniche. Può essere del tuo ente o della sua Unità Organizzativa di riferimento.',
       recipientCodeDescription: 'È il codice necessario per ricevere le fatture elettroniche',
       gspDescription: 'Sono gestore di almeno uno dei pubblici servizi: Gas, Energia, Telco.',
       pspDataSection: {
