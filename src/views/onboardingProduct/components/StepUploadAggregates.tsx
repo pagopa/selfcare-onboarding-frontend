@@ -14,7 +14,6 @@ import { fetchWithLogs } from '../../../lib/api-utils';
 import { getFetchOutcome } from '../../../lib/error-utils';
 import { UserContext } from '../../../lib/context';
 import { AggregateInstitution } from '../../../model/AggregateInstitution';
-import { RolesInformations } from '../../../components/RolesInformations';
 import { ENV } from '../../../utils/env';
 import { genericError } from './StepVerifyOnboarding';
 
@@ -145,17 +144,18 @@ export function StepUploadAggregates({
     try {
       const response = await fetch(ENV.EXAMPLE_CSV, {
         method: 'GET',
-        headers: { 'Content-Type': 'multipart/form-data' },
+        headers: { 'Content-Type': 'text/csv' },
       });
 
       if (!response.ok) {
         console.error(`Response status: ${response.status}`);
       }
 
-      const json = await response.json();
-      console.log('json response', json);
+      const csvText = await response.text();
 
-      setExampleCsv(json);
+      const blob = new Blob([csvText], { type: 'text/csv' });
+      const downloadUrl = window.URL.createObjectURL(blob);
+      setExampleCsv(downloadUrl);
     } catch (error: any) {
       console.error(error.message);
     }
@@ -173,11 +173,14 @@ export function StepUploadAggregates({
           <Typography variant="body1" mt={1}>
             {t('stepUploadAggregates.subTitle')}
           </Typography>
+
+          {/* 
+          TODO Temporary commented because is not yet available the 
           <RolesInformations
             isTechPartner={institutionType === 'PT'}
             linkLabel={t('stepUploadAggregates.findOutMore')}
-            documentationLink={'.'} // TODO Add documentation link when available
-          />
+            documentationLink={'.'} 
+          /> */}
         </Grid>
       </Grid>
       {(invalidFile || foundErrors) && (
@@ -256,7 +259,8 @@ export function StepUploadAggregates({
                 1: (
                   <a
                     onClick={getExampleAggregatesCsv}
-                    download={exampleCsv}
+                    href={exampleCsv}
+                    download={`${partyName}_${productName}_aggregati_esempio.csv`.replace(' ', '_')}
                     style={{
                       cursor: 'pointer',
                       textDecoration: 'underline',
