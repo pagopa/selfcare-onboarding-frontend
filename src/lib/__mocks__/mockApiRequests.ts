@@ -930,6 +930,14 @@ const mockedOnboardingRequestData: Array<OnboardingRequestData> = [
   },
 ];
 
+const getRandomRecipientCodeStatus = (obj: { [key: string]: string }): string => {
+  const keys = Object.keys(obj);
+  const randomKey = keys[Math.floor(Math.random() * keys.length)];
+  return obj[randomKey];
+};
+
+const mockRecipientCodeValidation = {accepted: 'ACCEPTED', denied_no_ass: 'DENIED_NO_ASSOCIATION', denied_no_bill: 'DENIED_NO_BILLING'};
+
 const noContent: Promise<AxiosResponse> = new Promise((resolve) =>
   resolve({
     status: 204,
@@ -1042,6 +1050,13 @@ export async function mockFetch(
     const matchedParty = mockedPartyFromInfoCamere.find((p) => p.businessTaxId === endpointParams.id);
     return new Promise((resolve) =>
       resolve({ data: matchedParty, status: 200, statusText: '200' } as AxiosResponse)
+    );
+  }
+
+  if (endpoint === 'ONBOARDING_RECIPIENT_CODE_VALIDATION') {
+    const randomStatus = getRandomRecipientCodeStatus(mockRecipientCodeValidation);
+    return new Promise((resolve) =>
+      resolve({ data: randomStatus, status: 200, statusText: '200'} as AxiosResponse)
     );
   }
 

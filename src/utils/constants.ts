@@ -96,6 +96,9 @@ export const API = {
   ONBOARDING_TOKEN_VALIDATION: {
     URL: ENV.URL_API.ONBOARDING_V2 + '/v2/tokens/{{onboardingId}}/verify',
   },
+  ONBOARDING_RECIPIENT_CODE_VALIDATION: {
+    URL: ENV.URL_API.ONBOARDING_V2 + '/v2/institutions/onboarding/recipientCode/verification',
+  },
   ONBOARDING_GET_CONTRACT: {
     URL: ENV.URL_API.ONBOARDING_V2 + '/v2/tokens/{{onboardingId}}/contract',
   },

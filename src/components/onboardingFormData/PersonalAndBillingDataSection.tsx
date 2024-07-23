@@ -160,6 +160,21 @@ export default function PersonalAndBillingDataSection({
     }
   }, [isForeignInsurance]);
 
+  useEffect(() => {
+    if (aooSelected) {
+      formik.setFieldValue('recipientCode', undefined);
+    }
+  }, [aooSelected]);
+
+  useEffect(() => {
+    if (formik.values.recipientCode && formik.values.recipientCode.length === 6) {
+      void verifyRecipientCodeIsValid(
+        formik.values.recipientCode,
+        (selectedParty as Party).originId
+      );
+    }
+  }, [formik.values.recipientCode]);
+
   const baseNumericFieldProps = (
     field: keyof OnboardingFormData,
     label: string,
@@ -191,6 +206,32 @@ export default function PersonalAndBillingDataSection({
         },
       },
     };
+  };
+
+  const validateRecipientCode = (recipientCodeStatus: string) => {
+    if (
+      canInvoice &&
+      formik.values.recipientCode &&
+      formik.values.recipientCode.length === 6 &&
+      recipientCodeStatus === 'DENIED_NO_ASSOCIATION'
+    ) {
+      formik.setFieldError(
+        'recipientCode',
+        t('onboardingFormData.billingDataSection.invalidRecipientCodeNoAssociation')
+      );
+    } else if (
+      canInvoice &&
+      formik.values.recipientCode &&
+      formik.values.recipientCode.length === 6 &&
+      recipientCodeStatus === 'DENIED_NO_BILLING'
+    ) {
+      formik.setFieldError(
+        'recipientCode',
+        t('onboardingFormData.billingDataSection.invalidRecipientCodeNoBilling')
+      );
+    } else {
+      formik.setFieldError('recipientCode', undefined);
+    }
   };
 
   const getCountriesFromGeotaxonomies = async (query: string) => {
@@ -299,6 +340,34 @@ export default function PersonalAndBillingDataSection({
         setInvalidTaxCodeInvoicing(false);
       } else {
         setInvalidTaxCodeInvoicing(true);
+      }
+    }
+  };
+
+  const verifyRecipientCodeIsValid = async (recipientCode: string, originId: string) => {
+    const getRecipientCodeValidation = await fetchWithLogs(
+      {
+        endpoint: 'ONBOARDING_RECIPIENT_CODE_VALIDATION',
+      },
+      {
+        method: 'GET',
+        params: {
+          recipientCode,
+          originId,
+        },
+      },
+      () => setRequiredLogin(true)
+    );
+
+    const outcome = getFetchOutcome(getRecipientCodeValidation);
+
+    if (outcome === 'success') {
+      const result = (getRecipientCodeValidation as AxiosResponse).data;
+      if (result) {
+        validateRecipientCode(result);
+        if (uoSelected && result === 'DENIED_NO_BILLING') {
+          formik.setFieldValue('recipientCode', undefined);
+        }
       }
     }
   };
@@ -677,49 +746,43 @@ export default function PersonalAndBillingDataSection({
               spacing={3}
               xs={12}
               pl={3}
-              pt={
-                !isForeignInsurance ||
-                  (formik.values.hasVatnumber && taxId !== '')
-                  ? 3
-                  : 0
-              }
+              pt={!isForeignInsurance || (formik.values.hasVatnumber && taxId !== '') ? 3 : 0}
               mb={!formik.values.hasVatnumber && canInvoice && isInsuranceCompany ? -3 : 0}
             >
-              {!isForeignInsurance &&
-                formik.values.hasVatnumber && taxId !== '' && (
-                  <Grid item>
-                    <Box display="flex" alignItems="center">
-                      <Checkbox
-                        id="taxCodeEquals2VatNumber"
-                        checked={stepHistoryState.isTaxCodeEquals2PIVA}
-                        disabled={isPremium}
-                        inputProps={{
-                          'aria-label': t(
-                            'onboardingFormData.billingDataSection.taxCodeEquals2PIVAdescription'
-                          ),
-                        }}
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            setStepHistoryState({
-                              ...stepHistoryState,
-                              isTaxCodeEquals2PIVA: true,
-                            });
-                            formik.setFieldValue('vatNumber', formik.values.taxCode);
-                          } else {
-                            setStepHistoryState({
-                              ...stepHistoryState,
-                              isTaxCodeEquals2PIVA: false,
-                            });
-                            formik.setFieldValue('vatNumber', '');
-                          }
-                        }}
-                      />
-                      <Typography component={'span'}>
-                        {t('onboardingFormData.billingDataSection.taxCodeEquals2PIVAdescription')}
-                      </Typography>
-                    </Box>
-                  </Grid>
-                )}
+              {!isForeignInsurance && formik.values.hasVatnumber && taxId !== '' && (
+                <Grid item>
+                  <Box display="flex" alignItems="center">
+                    <Checkbox
+                      id="taxCodeEquals2VatNumber"
+                      checked={stepHistoryState.isTaxCodeEquals2PIVA}
+                      disabled={isPremium}
+                      inputProps={{
+                        'aria-label': t(
+                          'onboardingFormData.billingDataSection.taxCodeEquals2PIVAdescription'
+                        ),
+                      }}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setStepHistoryState({
+                            ...stepHistoryState,
+                            isTaxCodeEquals2PIVA: true,
+                          });
+                          formik.setFieldValue('vatNumber', formik.values.taxCode);
+                        } else {
+                          setStepHistoryState({
+                            ...stepHistoryState,
+                            isTaxCodeEquals2PIVA: false,
+                          });
+                          formik.setFieldValue('vatNumber', '');
+                        }
+                      }}
+                    />
+                    <Typography component={'span'}>
+                      {t('onboardingFormData.billingDataSection.taxCodeEquals2PIVAdescription')}
+                    </Typography>
+                  </Box>
+                </Grid>
+              )}
               {productId !== 'prod-fd' && productId !== 'prod-fd-garantito' && (
                 <Grid item>
                   <Box
@@ -841,12 +904,10 @@ export default function PersonalAndBillingDataSection({
                       style: { textTransform: 'uppercase' },
                       onInput: (event) => {
                         const input = event.target as HTMLInputElement;
-                        const cleanedValue = input.value
-                          .toUpperCase()
-                          .replace(/[^A-Z0-9]/g, '');
+                        const cleanedValue = input.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
                         // eslint-disable-next-line functional/immutable-data
                         input.value = cleanedValue;
-                      }
+                      },
                     }}
                   />
                   {/* Description for recipient code */}
@@ -883,66 +944,66 @@ export default function PersonalAndBillingDataSection({
           {(isInformationCompany ||
             isContractingAuthority ||
             (productId === 'prod-interop' && institutionType === 'SCP')) && (
-              <>
-                <Grid item xs={12}>
-                  {/* Luogo di iscrizione al Registro delle Imprese facoltativo per institution Type !== 'PA' e 'PSP */}
-                  <CustomTextField
-                    {...baseTextFieldProps(
-                      'businessRegisterPlace',
-                      isContractingAuthority
-                        ? t(
+            <>
+              <Grid item xs={12}>
+                {/* Luogo di iscrizione al Registro delle Imprese facoltativo per institution Type !== 'PA' e 'PSP */}
+                <CustomTextField
+                  {...baseTextFieldProps(
+                    'businessRegisterPlace',
+                    isContractingAuthority
+                      ? t(
                           'onboardingFormData.billingDataSection.informationCompanies.requiredCommercialRegisterNumber'
                         )
-                        : t(
+                      : t(
                           'onboardingFormData.billingDataSection.informationCompanies.commercialRegisterNumber'
                         ),
-                      600,
-                      theme.palette.text.primary
-                    )}
-                  />
-                </Grid>
-                <Grid item xs={6}>
-                  {/* REA facoltativo per institution Type !== 'PA' e 'PSP */}
-                  <CustomTextField
-                    placeholder={'RM-123456'}
-                    {...baseTextFieldProps(
-                      'rea',
-                      t('onboardingFormData.billingDataSection.informationCompanies.rea'),
-                      600,
-                      theme.palette.text.primary
-                    )}
-                  />
-                </Grid>
-                <Grid item xs={6}>
-                  {/* capitale sociale facoltativo per institution Type !== 'PA' e 'PSP */}
-                  <CustomTextField
-                    name={'shareCapital'}
-                    {...baseTextFieldProps(
-                      'shareCapital',
-                      isContractingAuthority
-                        ? t(
+                    600,
+                    theme.palette.text.primary
+                  )}
+                />
+              </Grid>
+              <Grid item xs={6}>
+                {/* REA facoltativo per institution Type !== 'PA' e 'PSP */}
+                <CustomTextField
+                  placeholder={'RM-123456'}
+                  {...baseTextFieldProps(
+                    'rea',
+                    t('onboardingFormData.billingDataSection.informationCompanies.rea'),
+                    600,
+                    theme.palette.text.primary
+                  )}
+                />
+              </Grid>
+              <Grid item xs={6}>
+                {/* capitale sociale facoltativo per institution Type !== 'PA' e 'PSP */}
+                <CustomTextField
+                  name={'shareCapital'}
+                  {...baseTextFieldProps(
+                    'shareCapital',
+                    isContractingAuthority
+                      ? t(
                           'onboardingFormData.billingDataSection.informationCompanies.requiredShareCapital'
                         )
-                        : t(
+                      : t(
                           'onboardingFormData.billingDataSection.informationCompanies.shareCapital'
                         ),
-                      600,
-                      theme.palette.text.primary
-                    )}
-                    onClick={() => setShrinkRea(true)}
-                    onBlur={() => {
-                      if (!formik.values.shareCapital) {
-                        setShrinkRea(false);
-                      }
-                    }}
-                    InputLabelProps={{ shrink: shrinkRea }}
-                    InputProps={{
-                      inputComponent: NumberDecimalFormat,
-                    }}
-                  />
-                </Grid>
-              </>
-            )}
+                    600,
+                    theme.palette.text.primary
+                  )}
+                  onClick={() => setShrinkRea(true)}
+                  onBlur={() => {
+                    if (!formik.values.shareCapital) {
+                      setShrinkRea(false);
+                    }
+                  }}
+                  InputLabelProps={{ shrink: shrinkRea }}
+                  InputProps={{
+                    inputComponent: NumberDecimalFormat,
+                  }}
+                />
+              </Grid>
+            </>
+          )}
           {isPaymentServiceProvider && (
             <>
               <Grid item xs={12}>
