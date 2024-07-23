@@ -174,6 +174,7 @@ export default {
       title: "Trascina qui il file .csv con l'elenco degli enti aggregati oppure",
       button: 'carica il file',
     },
+    downloadExampleCsv: '',
     back: 'Indietro',
     forward: 'Continua',
   },

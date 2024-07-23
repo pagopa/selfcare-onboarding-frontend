@@ -1,4 +1,4 @@
-import { Alert, AlertTitle, Grid, Typography, useTheme } from '@mui/material';
+import { Alert, AlertTitle, Grid, Link, Typography, useTheme } from '@mui/material';
 import { useTranslation, Trans } from 'react-i18next';
 import { useContext, useEffect, useState } from 'react';
 import { AxiosResponse } from 'axios';
@@ -22,6 +22,7 @@ type Props = {
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
   setOutcome: React.Dispatch<React.SetStateAction<RequestOutcomeMessage | null | undefined>>;
   productName?: string;
+  partyName?: string;
   institutionType?: InstitutionType;
 } & StepperStepComponentProps;
 
@@ -30,6 +31,7 @@ export function StepUploadAggregates({
   setLoading,
   setOutcome,
   productName,
+  partyName,
   institutionType,
   forward,
   back,
@@ -181,7 +183,7 @@ export function StepUploadAggregates({
               components={{
                 1: (
                   <a
-                    download={'aggregates_errors.csv'}
+                    download={`${partyName}_${productName}_aggregati_errore.csv`.replace(' ', '_')}
                     href={errorCsv}
                     style={{ color: theme.palette.text.primary }}
                   />
@@ -195,19 +197,47 @@ export function StepUploadAggregates({
           </Alert>
         </Grid>
       )}
-      <Grid item xs={12} display="flex" justifyContent="center" pb={4}>
-        <FileUploader
-          title={t('stepUploadAggregates.dropArea.title')}
-          descriptionLink={t('stepUploadAggregates.dropArea.button')}
-          uploadedFiles={uploadedFile}
-          deleteUploadedFiles={deleteUploadedFiles}
-          onDropAccepted={onDropAccepted}
-          onDropRejected={onDropRejected}
-          accept={['.csv']}
-          loading={loading}
-          isAggregatesUpload={true}
-          theme={theme}
-        />
+      <Grid
+        container
+        item
+        xs={12}
+        display="flex"
+        justifyContent="center"
+        alignContent="center"
+        alignItems="self-start"
+        flexDirection="column"
+      >
+        <Grid item mb={3}>
+          <FileUploader
+            title={t('stepUploadAggregates.dropArea.title')}
+            descriptionLink={t('stepUploadAggregates.dropArea.button')}
+            uploadedFiles={uploadedFile}
+            deleteUploadedFiles={deleteUploadedFiles}
+            onDropAccepted={onDropAccepted}
+            onDropRejected={onDropRejected}
+            accept={['.csv']}
+            loading={loading}
+            isAggregatesUpload={true}
+            theme={theme}
+          />
+          <Typography
+            sx={{
+              fontSize: '12px',
+              fontWeight: 'fontWeightMedium',
+              color: theme.palette.text.secondary,
+              marginLeft: 3,
+            }}
+          >
+            <Trans
+              i18nKey={'stepUploadAggregates.downloadExampleCsv'}
+              components={{
+                1: <Link href="#" style={{ cursor: 'pointer', fontWeight: 'fontWeightMedium' }} />,
+              }}
+            >
+              {'Non sai come preparare il file? <1>Scarica l’esempio</1>'}
+            </Trans>
+          </Typography>
+        </Grid>
       </Grid>
       <OnboardingStepActions
         back={{ label: t('stepUploadAggregates.back'), action: back, disabled: false }}

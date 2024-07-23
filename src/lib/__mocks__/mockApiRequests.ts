@@ -94,7 +94,7 @@ const createPartyEntityInfoCamere = (
   county: string,
   zipCode: string,
   address: string,
-  digitalAddress: string,
+  digitalAddress: string
 ) => ({
   businessTaxId,
   businessName,
@@ -109,7 +109,6 @@ const createPartyEntityInfoCamere = (
   address,
   digitalAddress,
 });
-
 
 export const mockPartyRegistry = {
   items: [
@@ -381,19 +380,19 @@ const mockedParties = [
 
 export const mockedPartyFromInfoCamere = [
   createPartyEntityInfoCamere(
-    "00112233445",
-    "Scuderia Ferrari",
-    "SP",
-    "Società per azioni",
-    "MO",
-    "123456",
-    "Registrata",
-    "Modena",
-    "MO",
-    "44444",
-    "Via Enzo Ferrari 1",
-    "Ferrari@test.pec.com"
-  )
+    '00112233445',
+    'Scuderia Ferrari',
+    'SP',
+    'Società per azioni',
+    'MO',
+    '123456',
+    'Registrata',
+    'Modena',
+    'MO',
+    '44444',
+    'Via Enzo Ferrari 1',
+    'Ferrari@test.pec.com'
+  ),
 ];
 
 export const mockedGeoTaxonomy: Array<GeographicTaxonomyResource> = [
@@ -1027,7 +1026,11 @@ export async function mockFetch(
     const retrievedLocalization = mockedGeotaxonomies.find(
       (l) => endpointParams.geoTaxId === l.istat_code
     );
-    return Promise.resolve({ data: retrievedLocalization, status: 200, statusText: '200' } as AxiosResponse);
+    return Promise.resolve({
+      data: retrievedLocalization,
+      status: 200,
+      statusText: '200',
+    } as AxiosResponse);
   }
 
   if (endpoint === 'ONBOARDING_GET_PARTY_FROM_CF') {
@@ -1039,7 +1042,9 @@ export async function mockFetch(
   }
 
   if (endpoint === 'ONBOARDING_GET_PARTY_BY_CF_FROM_INFOCAMERE') {
-    const matchedParty = mockedPartyFromInfoCamere.find((p) => p.businessTaxId === endpointParams.id);
+    const matchedParty = mockedPartyFromInfoCamere.find(
+      (p) => p.businessTaxId === endpointParams.id
+    );
     return new Promise((resolve) =>
       resolve({ data: matchedParty, status: 200, statusText: '200' } as AxiosResponse)
     );
@@ -1182,7 +1187,7 @@ export async function mockFetch(
   if (endpoint === 'ONBOARDING_USER_VALIDATION') {
     if (
       ['CRTCTF90B12C123K', 'CRTCTF91B12C123K', 'CRTCTF92B12C123K'].indexOf((data as any)?.taxCode) >
-      -1 &&
+        -1 &&
       ((data as any)?.name !== 'CERTIFIED_NAME' || (data as any)?.surname !== 'CERTIFIED_SURNAME')
     ) {
       return buildOnboardingUserValidation409(
@@ -1355,7 +1360,7 @@ export async function mockFetch(
   if (endpoint === 'ONBOARDING_VERIFY_AGGREGATES') {
     return new Promise((resolve) =>
       resolve({
-        data: { aggregates: [], errors: [] },
+        data: { aggregates: [], errors: [{ error: 'error' }] },
         status: 200,
         statusText: '200',
       } as AxiosResponse)
