@@ -48,6 +48,7 @@ export function StepUploadAggregates({
   useEffect(() => {
     if (uploadedFile[0]?.name) {
       setDisabled(false);
+      setInvalidFile(false);
       setFoundErrors(undefined);
     } else {
       setDisabled(true);
@@ -160,7 +161,8 @@ export function StepUploadAggregates({
           <Alert
             severity="error"
             sx={{
-              height: '97px',
+              width: '684px',
+              height: '77px',
               fontSize: 'fontSize',
               alignItems: 'center',
               color: 'colorTextPrimary',

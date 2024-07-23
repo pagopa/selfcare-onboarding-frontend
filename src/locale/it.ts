@@ -161,7 +161,7 @@ export default {
     findOutMore: 'Dubbi? Vai al manuale',
     errors: {
       onCsv: {
-        title: 'Il file contiene più errori',
+        title: 'Il file contiene uno o più errori',
         description:
           '<1>Scarica il report</1> per verificare le informazioni e carica di nuovo il file.',
       },
