@@ -930,7 +930,11 @@ const mockedOnboardingRequestData: Array<OnboardingRequestData> = [
   },
 ];
 
-const mockRecipientCodeValidation = ['ACCEPTED', 'DENIED_NO_ASSOCIATION', 'DENIED_NO_BILLING'];
+const mockRecipientCodeValidation = [
+  { code: 'A1B2C3', value: 'ACCEPTED' },
+  { code: 'AABBC1', value: 'DENIED_NO_ASSOCIATION' },
+  { code: '2A3B4C', value: 'DENIED_NO_BILLING' },
+];
 
 const noContent: Promise<AxiosResponse> = new Promise((resolve) =>
   resolve({
@@ -1048,9 +1052,10 @@ export async function mockFetch(
   }
 
   if (endpoint === 'ONBOARDING_RECIPIENT_CODE_VALIDATION') {
-    const mockAcceptedResponse = mockRecipientCodeValidation[0];
+    const mockAcceptedResponse = mockRecipientCodeValidation.filter((r) => r.code === params.recipientCode);
+  const responseValue = mockAcceptedResponse[0]?.value.length > 0 ?  mockAcceptedResponse[0].value : '';
     return new Promise((resolve) =>
-      resolve({ data: mockAcceptedResponse, status: 200, statusText: '200'} as AxiosResponse)
+      resolve({ data: responseValue, status: 200, statusText: '200' } as AxiosResponse)
     );
   }
 
