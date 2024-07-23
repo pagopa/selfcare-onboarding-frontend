@@ -22,6 +22,7 @@ type Props = {
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
   setOutcome: React.Dispatch<React.SetStateAction<RequestOutcomeMessage | null | undefined>>;
   productName?: string;
+  partyName?: string;
   institutionType?: InstitutionType;
 } & StepperStepComponentProps;
 
@@ -30,6 +31,7 @@ export function StepUploadAggregates({
   setLoading,
   setOutcome,
   productName,
+  partyName,
   institutionType,
   forward,
   back,
@@ -181,7 +183,7 @@ export function StepUploadAggregates({
               components={{
                 1: (
                   <a
-                    download={'aggregates_errors.csv'}
+                    download={`${partyName}_${productName}_aggregati_errore.csv`}
                     href={errorCsv}
                     style={{ color: theme.palette.text.primary }}
                   />
