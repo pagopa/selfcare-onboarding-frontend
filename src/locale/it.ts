@@ -157,7 +157,7 @@ export default {
   stepUploadAggregates: {
     title: `Indica i soggetti aggregati per {{productName}}`,
     subTitle:
-      'Scarica il file di esempio, compilalo seguendo le indicazioni e carica il documento per aggiungere/dichiarare gli enti da aggregare. <saranno allegati al contratto e dopo la firma diventeranno automaticamente tuoi aggregati>',
+      'Scarica il file di esempio, compilalo seguendo le indicazioni e carica il documento per aggiungere/dichiarare gli enti da aggregare.',
     findOutMore: 'Dubbi? Vai al manuale',
     errors: {
       onCsv: {
@@ -174,7 +174,7 @@ export default {
       title: "Trascina qui il file .csv con l'elenco degli enti aggregati oppure",
       button: 'carica il file',
     },
-    downloadExampleCsv: '',
+    downloadExampleCsv: 'Non sai come preparare il file? <1>Scarica l’esempio</1>',
     back: 'Indietro',
     forward: 'Continua',
   },
