@@ -261,7 +261,7 @@ test.skip('test billingData without Support Mail', async () => {
 test('test complete onboarding AOO with product interop', async () => {
   renderComponent('prod-interop');
   await executeStepInstitutionType('prod-interop');
-  await executeAdvancedSearchForAoo();
+  await executeAdvancedSearchForAoo(); 
   await executeStep2();
   await executeStep3(true);
   const onboardingCompleted = await waitFor(() =>
