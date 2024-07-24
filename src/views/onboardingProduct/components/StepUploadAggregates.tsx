@@ -1,4 +1,4 @@
-import { Alert, AlertTitle, Grid, Link, Typography, useTheme } from '@mui/material';
+import { Alert, AlertTitle, Grid, Typography, useTheme } from '@mui/material';
 import { useTranslation, Trans } from 'react-i18next';
 import { useContext, useEffect, useState } from 'react';
 import { AxiosResponse } from 'axios';
@@ -14,7 +14,7 @@ import { fetchWithLogs } from '../../../lib/api-utils';
 import { getFetchOutcome } from '../../../lib/error-utils';
 import { UserContext } from '../../../lib/context';
 import { AggregateInstitution } from '../../../model/AggregateInstitution';
-import { RolesInformations } from '../../../components/RolesInformations';
+import { ENV } from '../../../utils/env';
 import { genericError } from './StepVerifyOnboarding';
 
 type Props = {
@@ -46,6 +46,7 @@ export function StepUploadAggregates({
   const [invalidFile, setInvalidFile] = useState<boolean>(false);
   const [foundErrors, setFoundErrors] = useState<Array<RowError>>();
   const [errorCsv, setErrorCsv] = useState<string>();
+  const [exampleCsv, setExampleCsv] = useState<string>();
 
   useEffect(() => {
     if (uploadedFile[0]?.name) {
@@ -139,6 +140,27 @@ export function StepUploadAggregates({
     setLoading(false);
   };
 
+  const getExampleAggregatesCsv = async () => {
+    try {
+      const response = await fetch(ENV.EXAMPLE_CSV, {
+        method: 'GET',
+        headers: { 'Content-Type': 'text/csv' },
+      });
+
+      if (!response.ok) {
+        console.error(`Response status: ${response.status}`);
+      }
+
+      const csvText = await response.text();
+
+      const blob = new Blob([csvText], { type: 'text/csv' });
+      const downloadUrl = window.URL.createObjectURL(blob);
+      setExampleCsv(downloadUrl);
+    } catch (error: any) {
+      console.error(error.message);
+    }
+  };
+
   return (
     <Grid container direction="column">
       <Grid container item xs={8} justifyContent="center" textAlign="center" mb={3}>
@@ -151,11 +173,14 @@ export function StepUploadAggregates({
           <Typography variant="body1" mt={1}>
             {t('stepUploadAggregates.subTitle')}
           </Typography>
+
+          {/* 
+          TODO Temporary commented because is not yet available the 
           <RolesInformations
             isTechPartner={institutionType === 'PT'}
             linkLabel={t('stepUploadAggregates.findOutMore')}
-            documentationLink={'.'} // TODO Add documentation link when available
-          />
+            documentationLink={'.'} 
+          /> */}
         </Grid>
       </Grid>
       {(invalidFile || foundErrors) && (
@@ -183,7 +208,7 @@ export function StepUploadAggregates({
               components={{
                 1: (
                   <a
-                    download={`${partyName}_${productName}_aggregati_errore.csv`.replace(' ', '_')}
+                    download={`${partyName}_${productName}_aggregati_errore.csv`.replace(/ /g, '_')}
                     href={errorCsv}
                     style={{ color: theme.palette.text.primary }}
                   />
@@ -231,7 +256,22 @@ export function StepUploadAggregates({
             <Trans
               i18nKey={'stepUploadAggregates.downloadExampleCsv'}
               components={{
-                1: <Link href="#" style={{ cursor: 'pointer', fontWeight: 'fontWeightMedium' }} />,
+                1: (
+                  <a
+                    onClick={getExampleAggregatesCsv}
+                    href={exampleCsv}
+                    download={`${partyName}_${productName}_aggregati_esempio.csv`.replace(
+                      / /g,
+                      '_'
+                    )}
+                    style={{
+                      cursor: 'pointer',
+                      textDecoration: 'underline',
+                      color: theme.palette.primary.main,
+                      fontWeight: 'fontWeightMedium',
+                    }}
+                  />
+                ),
               }}
             >
               {'Non sai come preparare il file? <1>Scarica l’esempio</1>'}
