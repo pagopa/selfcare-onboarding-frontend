@@ -130,6 +130,7 @@ export function StepUploadAggregates({
       if (errors.length === 0) {
         setDisabled(false);
         forward(undefined, aggregatesList);
+        setLoading(false);
       } else {
         setDisabled(true);
         setFoundErrors(errors);
@@ -245,38 +246,40 @@ export function StepUploadAggregates({
             isAggregatesUpload={true}
             theme={theme}
           />
-          <Typography
-            sx={{
-              fontSize: '12px',
-              fontWeight: 'fontWeightMedium',
-              color: theme.palette.text.secondary,
-              marginLeft: 3,
-            }}
-          >
-            <Trans
-              i18nKey={'stepUploadAggregates.downloadExampleCsv'}
-              components={{
-                1: (
-                  <a
-                    onClick={getExampleAggregatesCsv}
-                    href={exampleCsv}
-                    download={`${partyName}_${productName}_aggregati_esempio.csv`.replace(
-                      / /g,
-                      '_'
-                    )}
-                    style={{
-                      cursor: 'pointer',
-                      textDecoration: 'underline',
-                      color: theme.palette.primary.main,
-                      fontWeight: 'fontWeightMedium',
-                    }}
-                  />
-                ),
+          {!uploadedFile[0]?.name && (
+            <Typography
+              sx={{
+                fontSize: '12px',
+                fontWeight: 'fontWeightMedium',
+                color: theme.palette.text.secondary,
+                marginLeft: 3,
               }}
             >
-              {'Non sai come preparare il file? <1>Scarica l’esempio</1>'}
-            </Trans>
-          </Typography>
+              <Trans
+                i18nKey={'stepUploadAggregates.downloadExampleCsv'}
+                components={{
+                  1: (
+                    <a
+                      onClick={getExampleAggregatesCsv}
+                      href={exampleCsv}
+                      download={`${partyName}_${productName}_aggregati_esempio.csv`.replace(
+                        / /g,
+                        '_'
+                      )}
+                      style={{
+                        cursor: 'pointer',
+                        textDecoration: 'underline',
+                        color: theme.palette.primary.main,
+                        fontWeight: 'fontWeightMedium',
+                      }}
+                    />
+                  ),
+                }}
+              >
+                {'Non sai come preparare il file? <1>Scarica l’esempio</1>'}
+              </Trans>
+            </Typography>
+          )}
         </Grid>
       </Grid>
       <OnboardingStepActions
