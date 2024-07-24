@@ -452,7 +452,7 @@ export default function PersonalAndBillingDataSection({
                   isDisabled ||
                   isContractingAuthority ||
                   isInsuranceCompany ||
-                  (isInformationCompany && formik.values.businessName)
+                  (isInformationCompany && (selectedParty as PDNDBusinessResource)?.businessName)
                 }
               />
             </Grid>
@@ -713,7 +713,7 @@ export default function PersonalAndBillingDataSection({
                 isDisabled ||
                 isContractingAuthority ||
                 isInsuranceCompany ||
-                (isInformationCompany && formik.values.digitalAddress)
+                (isInformationCompany && (selectedParty as PDNDBusinessResource)?.digitalAddress)
               }
             />
           </Grid>
@@ -734,7 +734,7 @@ export default function PersonalAndBillingDataSection({
                   isDisabled ||
                   isContractingAuthority ||
                   isInsuranceCompany ||
-                  (isInformationCompany && formik.values.taxCode)
+                  (isInformationCompany && (selectedParty as PDNDBusinessResource)?.businessTaxId)
                 }
               />
             </Grid>
