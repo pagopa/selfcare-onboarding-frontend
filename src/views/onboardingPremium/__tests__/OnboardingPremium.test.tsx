@@ -257,7 +257,7 @@ const executeStepBillingData = async () => {
   });
   await waitFor(() => expect(confirmButtonEnabled).toBeDisabled());
   fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
-    target: { value: 'M5UXCR1' },
+    target: { value: 'A1B2C3' },
   });
   await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
   fireEvent.click(confirmButtonEnabled);
@@ -419,7 +419,7 @@ const billingData2billingDataRequest = () => ({
   taxCode: '33445673222',
   taxCodeInvoicing: undefined,
   vatNumber: undefined,
-  recipientCode: 'M5UXCR1',
+  recipientCode: 'A1B2C3',
 });
 
 const verifySubmitPostLegals = async () => {

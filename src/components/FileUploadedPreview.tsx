@@ -1,9 +1,8 @@
 /* eslint-disable sonarjs/cognitive-complexity */
 import { Box } from '@mui/system';
-import { Chip, Grid, LinearProgress, Theme, Tooltip, Typography } from '@mui/material';
+import { Grid, LinearProgress, Theme, Tooltip, Typography } from '@mui/material';
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 import { useTranslation } from 'react-i18next';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { ReactComponent as ClipFileUploaded } from '../assets/clip_file_uploaded.svg';
 
 type FileUploadedPreviewParams = {
@@ -43,7 +42,7 @@ export function FileUploadedPreview({
                   container
                   justifyContent="space-evenly"
                   alignItems="center"
-                  width={isAggregatesUpload ? '480px' : '390px'}
+                  width={isAggregatesUpload ? '684px' : '390px'}
                   height={isAggregatesUpload ? '62px' : '90px'}
                 >
                   <Grid item xs={6}>
@@ -61,7 +60,11 @@ export function FileUploadedPreview({
             </Box>
           </>
         ) : (
-          <Box key={file.name} sx={{ maxWidth: { xs: 300, md: 500, lg: 900 }, ...sx }}>
+          <Box
+            key={file.name}
+            sx={{ maxWidth: { xs: 300, md: 500, lg: 900 }, ...sx }}
+            mt={isAggregatesUpload ? 2 : 0}
+          >
             <Box
               sx={{
                 boxShadow: isAggregatesUpload
@@ -69,7 +72,7 @@ export function FileUploadedPreview({
                   : '0px 8px 10px -5px rgba(0, 43, 85, 0.1), 0px 16px 24px 2px rgba(0, 43, 85, 0.05), 0px 6px 30px 5px rgba(0, 43, 85, 0.1)',
                 borderRadius: '16px',
                 p: 1,
-                border: isAggregatesUpload ? `1px solid ${theme.palette.divider}` : 'none',
+                border: isAggregatesUpload ? `1px solid ${theme.palette.primary.main}` : 'none',
                 backgroundColor: theme.palette.background.paper,
               }}
             >
@@ -80,7 +83,7 @@ export function FileUploadedPreview({
                   alignItems: 'center',
                   borderRadius: '10px',
                   border: isAggregatesUpload ? 'none' : `1px solid ${theme.palette.primary.main}`,
-                  width: '440px',
+                  width: isAggregatesUpload ? '684px' : '440px',
                   height: isAggregatesUpload ? '46px' : '66px',
                 }}
               >
@@ -92,11 +95,7 @@ export function FileUploadedPreview({
                       color: theme.palette.primary.main,
                     }}
                   >
-                    {isAggregatesUpload ? (
-                      <CheckCircleIcon style={{ color: theme.palette.success.light }} height={20} />
-                    ) : (
-                      <ClipFileUploaded height={24} />
-                    )}
+                    <ClipFileUploaded height={24} />
                   </Box>
                 </Grid>
                 <Grid
@@ -111,11 +110,9 @@ export function FileUploadedPreview({
                     <Tooltip title={file.name} placement="top" arrow={true}>
                       <Typography
                         sx={{
-                          color: isAggregatesUpload
-                            ? theme.palette.text.primary
-                            : theme.palette.primary.main,
+                          color: theme.palette.primary.main,
                           fontStyle: 'normal',
-                          fontWeight: isAggregatesUpload ? 'fontWeightMedium' : 'fontWeightRegular',
+                          fontWeight: 'fontWeightRegular',
                           overflow: isAggregatesUpload ? 'visible' : 'hidden',
                           whiteSpace: 'nowrap',
                           textOverflow: isAggregatesUpload ? '-moz-initial' : 'ellipsis',
@@ -129,16 +126,13 @@ export function FileUploadedPreview({
                     {isAggregatesUpload && (
                       <Typography
                         sx={{
-                          color: isAggregatesUpload
-                            ? theme.palette.text.primary
-                            : theme.palette.primary.main,
-                          fontStyle: 'normal',
-                          fontWeight: isAggregatesUpload ? 'fontWeightMedium' : 'fontWeightRegular',
+                          color: theme.palette.text.primary,
+                          fontSize: '14px',
+                          fontWeight: 'fontWeightBold',
                           overflow: 'hidden',
                           whiteSpace: 'nowrap',
                           textOverflow: 'ellipsis',
                           width: '100%',
-                          fontSize: '14px',
                           pl: 4,
                         }}
                       >
@@ -146,12 +140,6 @@ export function FileUploadedPreview({
                       </Typography>
                     )}
                   </Box>
-                  {isAggregatesUpload && (
-                    <Chip
-                      style={{ backgroundColor: theme.palette.success.light }}
-                      label={t('stepUploadAggregates.dropArea.valid')}
-                    />
-                  )}
                 </Grid>
                 <Grid item xs={1} display="flex" justifyContent="flex-end">
                   <ClearOutlinedIcon

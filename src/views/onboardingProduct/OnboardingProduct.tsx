@@ -33,9 +33,7 @@ import { HeaderContext, UserContext } from '../../lib/context';
 import { billingData2billingDataRequest } from '../../model/BillingData';
 import { pspData2pspDataRequest } from '../../model/PspData';
 import NoProductPage from '../NoProductPage';
-import {
-  onboardedInstitutionInfo2geographicTaxonomy,
-} from '../../model/GeographicTaxonomies';
+import { onboardedInstitutionInfo2geographicTaxonomy } from '../../model/GeographicTaxonomies';
 import { companyInformationsDto2pspDataRequest } from '../../model/CompanyInformations';
 import { assistanceConcatsDto2pspDataRequest } from '../../model/AssistanceContacts';
 import { OnboardingFormData } from '../../model/OnboardingFormData';
@@ -127,41 +125,41 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     title: '',
     description: isTechPartner
       ? [
-        <React.Fragment key="0">
-          <EndingPage
-            minHeight="52vh"
-            variantTitle="h4"
-            variantDescription="body1"
-            icon={<IllusError size={60} />}
-            title={<Trans i18nKey="stepVerifyOnboarding.ptAlreadyOnboarded.title" />}
-            description={
-              <Trans i18nKey="stepVerifyOnboarding.ptAlreadyOnboarded.description">
-                Per operare su un prodotto, chiedi a un Amministratore di <br /> aggiungerti nella
-                sezione Utenti.
-              </Trans>
-            }
-            buttonLabel={<Trans i18nKey="stepVerifyOnboarding.ptAlreadyOnboarded.backAction" />}
-            onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
-          />
-        </React.Fragment>,
-      ]
+          <React.Fragment key="0">
+            <EndingPage
+              minHeight="52vh"
+              variantTitle="h4"
+              variantDescription="body1"
+              icon={<IllusError size={60} />}
+              title={<Trans i18nKey="stepVerifyOnboarding.ptAlreadyOnboarded.title" />}
+              description={
+                <Trans i18nKey="stepVerifyOnboarding.ptAlreadyOnboarded.description">
+                  Per operare su un prodotto, chiedi a un Amministratore di <br /> aggiungerti nella
+                  sezione Utenti.
+                </Trans>
+              }
+              buttonLabel={<Trans i18nKey="stepVerifyOnboarding.ptAlreadyOnboarded.backAction" />}
+              onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+            />
+          </React.Fragment>,
+        ]
       : [
-        <React.Fragment key="0">
-          <AlreadyOnboarded
-            selectedParty={
-              aooSelected
-                ? aooSelected
-                : uoSelected
+          <React.Fragment key="0">
+            <AlreadyOnboarded
+              selectedParty={
+                aooSelected
+                  ? aooSelected
+                  : uoSelected
                   ? uoSelected
                   : onboardingFormData
-                    ? onboardingFormData
-                    : selectedParty
-            }
-            selectedProduct={selectedProduct}
-            institutionType={institutionType}
-          />
-        </React.Fragment>,
-      ],
+                  ? onboardingFormData
+                  : selectedParty
+              }
+              selectedProduct={selectedProduct}
+              institutionType={institutionType}
+            />
+          </React.Fragment>,
+        ],
   };
 
   useEffect(() => {
@@ -252,8 +250,8 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           subunitCode: aooSelected
             ? aooSelected.codiceUniAoo
             : uoSelected
-              ? uoSelected.codiceUniUo
-              : undefined,
+            ? uoSelected.codiceUniUo
+            : undefined,
           origin: institutionType === 'AS' ? 'IVASS' : undefined,
           originId: onboardingFormData?.originId ?? undefined,
         },
@@ -317,8 +315,8 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
       aooResult
         ? aooResult?.codiceFiscaleEnte
         : uoResult
-          ? uoResult.codiceFiscaleEnte
-          : (party as Party)?.externalId
+        ? uoResult.codiceFiscaleEnte
+        : (party as Party)?.externalId
     );
     setOrigin((party as Party)?.origin);
     const data2Onboard = generateOnboardingFormData(
@@ -470,18 +468,18 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           additionalInformations:
             institutionType === 'GSP' && selectedProduct?.id === 'prod-pagopa'
               ? {
-                agentOfPublicService: additionalInformations?.agentOfPublicService,
-                agentOfPublicServiceNote: additionalInformations?.agentOfPublicServiceNote,
-                belongRegulatedMarket: additionalInformations?.belongRegulatedMarket,
-                regulatedMarketNote: additionalInformations?.regulatedMarketNote,
-                establishedByRegulatoryProvision:
-                  additionalInformations?.establishedByRegulatoryProvision,
-                establishedByRegulatoryProvisionNote:
-                  additionalInformations?.establishedByRegulatoryProvisionNote,
-                ipa: additionalInformations?.ipa,
-                ipaCode: additionalInformations?.ipaCode,
-                otherNote: additionalInformations?.otherNote,
-              }
+                  agentOfPublicService: additionalInformations?.agentOfPublicService,
+                  agentOfPublicServiceNote: additionalInformations?.agentOfPublicServiceNote,
+                  belongRegulatedMarket: additionalInformations?.belongRegulatedMarket,
+                  regulatedMarketNote: additionalInformations?.regulatedMarketNote,
+                  establishedByRegulatoryProvision:
+                    additionalInformations?.establishedByRegulatoryProvision,
+                  establishedByRegulatoryProvisionNote:
+                    additionalInformations?.establishedByRegulatoryProvisionNote,
+                  ipa: additionalInformations?.ipa,
+                  ipaCode: additionalInformations?.ipaCode,
+                  otherNote: additionalInformations?.otherNote,
+                }
               : undefined,
           pspData:
             institutionType === 'PSP'
@@ -495,12 +493,12 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           originId: aooSelected
             ? aooSelected.codiceUniAoo
             : uoSelected
-              ? uoSelected.codiceUniUo
-              : onboardingFormData?.originId,
+            ? uoSelected.codiceUniUo
+            : onboardingFormData?.originId,
           geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY
             ? onboardingFormData?.geographicTaxonomies?.map((gt) =>
-              onboardedInstitutionInfo2geographicTaxonomy(gt)
-            )
+                onboardedInstitutionInfo2geographicTaxonomy(gt)
+              )
             : [],
           institutionLocationData: {
             country: onboardingFormData?.country,
@@ -517,8 +515,8 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           subunitCode: aooSelected
             ? aooSelected.codiceUniAoo
             : uoSelected
-              ? uoSelected.codiceUniUo
-              : undefined,
+            ? uoSelected.codiceUniUo
+            : undefined,
           subunitType: aooSelected ? 'AOO' : uoSelected ? 'UO' : undefined,
           taxCode: onboardingFormData?.taxCode,
           isAggregator: onboardingFormData?.isAggregator
@@ -829,6 +827,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
       Component: () =>
         StepUploadAggregates({
           productName: selectedProduct?.title,
+          partyName: onboardingFormData?.businessName,
           institutionType,
           loading,
           setLoading,

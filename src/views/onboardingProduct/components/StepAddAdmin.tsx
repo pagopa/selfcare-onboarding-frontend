@@ -238,7 +238,10 @@ export function StepAddAdmin({
           </Typography>
         </Grid>
         <Grid item xs={8}>
-          <RolesInformations isTechPartner={isTechPartner} />
+          <RolesInformations
+            isTechPartner={isTechPartner}
+            linkLabel={t('moreInformationOnRoles')}
+          />
         </Grid>
       </Grid>
 
