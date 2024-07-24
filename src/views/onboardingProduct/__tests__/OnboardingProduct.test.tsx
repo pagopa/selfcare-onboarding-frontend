@@ -108,12 +108,6 @@ test('onboarding of pa with origin IPA', async () => {
   renderComponent('prod-pagopa');
   await executeStepInstitutionType('prod-pagopa');
   await executeStep1('AGENCY X', 'prod-pagopa', 'PA');
-  
-  // const searchCitySelect = document.getElementById('city-select') as HTMLInputElement;
-  // const searchCounty = document.getElementById('county');
-
-  // await waitFor(() => expect(searchCitySelect.value).toBe('Palermo'));
-  // await waitFor(() => expect(searchCounty).toBeDisabled());
   await fillUserBillingDataForm(
     'businessName',
     'registeredOffice',
@@ -124,6 +118,10 @@ test('onboarding of pa with origin IPA', async () => {
     'recipientCode',
     'supportEmail'
   );
+
+  fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
+    target: { value: 'A1B2C3' },
+  });
 
   const confirmButtonEnabled = screen.getByRole('button', { name: 'Continua' });
   await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
@@ -594,6 +592,10 @@ const executeStepBillingData = async () => {
     'province'
   );
 
+  fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
+    target: { value: 'A1B2C3' },
+  });
+
   const confirmButtonEnabled = screen.getByRole('button', { name: 'Continua' });
   await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
 
@@ -616,6 +618,10 @@ const executeStepBillingData = async () => {
     'province'
   );
 
+  fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
+    target: { value: 'A1B2C3' },
+  });
+
   await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
 
   await checkCorrectBodyBillingData(
@@ -625,7 +631,7 @@ const executeStepBillingData = async () => {
     '09010',
     'AAAAAA44D55F456K',
     'AAAAAA44D55F456K',
-    'A1B2C3D'
+    'A1B2C3'
   );
   fireEvent.click(confirmButtonEnabled);
   await waitFor(() => screen.getByText(step2Title));
@@ -904,6 +910,12 @@ const fillUserBillingDataForm = async (
   fireEvent.change(document.getElementById(vatNumber) as HTMLElement, {
     target: { value: 'AAAAAA44D55F456K' },
   });
+
+  const taxCodeInvoicing = document.getElementById('taxCodeInvoicing');
+  if (taxCodeInvoicing) {
+    fireEvent.change(taxCodeInvoicing, { target: { value: 'AAAAAA44D55F456K' } });
+  }
+
   fireEvent.change(document.getElementById(recipientCode) as HTMLElement, {
     target: { value: 'A1B2C3D' },
   });
@@ -1198,8 +1210,9 @@ const billingData2billingDataRequest = () => ({
   digitalAddress: 'a@a.it',
   zipCode: '09010',
   taxCode: 'AAAAAA44D55F456K',
+  taxCodeInvoicing: 'AAAAAA44D55F456K',
   vatNumber: 'AAAAAA44D55F456K',
-  recipientCode: 'A1B2C3D'.toUpperCase(),
+  recipientCode: 'A1B2C3'.toUpperCase(),
 });
 
 const verifySubmit = async (productId = 'prod-idpay') => {
@@ -1254,6 +1267,8 @@ const verifySubmit = async (productId = 'prod-idpay') => {
           taxCode: 'AAAAAA44D55F456K',
           companyInformations: undefined,
           aggregates: undefined,
+          additionalInformations: undefined,
+          isAggregator: undefined
         },
         method: 'POST',
       },

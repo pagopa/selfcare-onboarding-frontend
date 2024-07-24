@@ -30,6 +30,7 @@ export const validateFields = (
   institutionAvoidGeotax: boolean,
   isPremium: boolean,
   invalidTaxCodeInvoicing: boolean,
+  recipientCodeStatus?: string,
   productId?: string
 ) =>
   Object.entries({
@@ -127,7 +128,15 @@ export const validateFields = (
           !emailRegexp.test(values.dpoPecAddress)
         ? t('onboardingFormData.billingDataSection.invalidEmail')
         : undefined,
-    recipientCode: canInvoice && !values.recipientCode ? requiredError : undefined,
+    recipientCode: canInvoice
+      ? values.recipientCode && values.recipientCode.length === 6
+        ? recipientCodeStatus === 'DENIED_NO_ASSOCIATION'
+          ? t('onboardingFormData.billingDataSection.invalidRecipientCodeNoAssociation')
+          : recipientCodeStatus === 'DENIED_NO_BILLING'
+          ? t('onboardingFormData.billingDataSection.invalidRecipientCodeNoBilling')
+          : undefined
+        : requiredError
+      : undefined,
     geographicTaxonomies:
       ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY &&
       !institutionAvoidGeotax &&
