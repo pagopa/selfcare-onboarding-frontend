@@ -259,7 +259,7 @@ test.skip('test billingData without Support Mail', async () => {
 test('test complete onboarding AOO with product interop', async () => {
   renderComponent('prod-interop');
   await executeStepInstitutionType('prod-interop');
-  await executeAdvancedSearchForAoo(); 
+  await executeAdvancedSearchForAoo();
   await executeStep2();
   await executeStep3(true);
   const onboardingCompleted = await waitFor(() =>
@@ -619,11 +619,32 @@ const executeStepBillingData = async () => {
   );
 
   fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
+    target: { value: 'AABBC1' },
+  });
+  await waitFor(() => screen.getByText('Il codice inserito non è associato al tuo ente'));
+
+  fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
+    target: { value: '2A3B4C' },
+  });
+  await waitFor(() =>
+    screen.getByText(
+      'Il codice inserito è associato al codice fiscale di un ente che non ha il servizio di fatturazione attivo'
+    )
+  );
+
+  fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
     target: { value: 'A1B2C3' },
   });
 
   fireEvent.change(document.getElementById('taxCodeInvoicing') as HTMLElement, {
-    target: { value: '00000000000' }
+    target: { value: '87654321092' },
+  });
+  await waitFor(() => screen.getByText('Il Codice Fiscale inserito non è relativo al tuo ente'));
+
+  await waitFor(() => expect(confirmButtonEnabled).toBeDisabled());
+
+  fireEvent.change(document.getElementById('taxCodeInvoicing') as HTMLElement, {
+    target: { value: '87654321098' },
   });
 
   await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
@@ -1209,7 +1230,7 @@ const billingData2billingDataRequest = () => ({
   digitalAddress: 'a@a.it',
   zipCode: '09010',
   taxCode: '00000000000',
-  taxCodeInvoicing: '00000000000',
+  taxCodeInvoicing: '87654321098',
   vatNumber: '00000000000',
   recipientCode: 'A1B2C3'.toUpperCase(),
 });
@@ -1267,7 +1288,7 @@ const verifySubmit = async (productId = 'prod-idpay') => {
           companyInformations: undefined,
           aggregates: undefined,
           additionalInformations: undefined,
-          isAggregator: undefined
+          isAggregator: undefined,
         },
         method: 'POST',
       },

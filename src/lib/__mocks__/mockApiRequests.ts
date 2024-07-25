@@ -1057,9 +1057,17 @@ export async function mockFetch(
   }
 
   if (endpoint === 'ONBOARDING_RECIPIENT_CODE_VALIDATION') {
-    const mockAcceptedResponse = mockRecipientCodeValidation.filter((r) => r.code === params.recipientCode);
+    const mockAcceptedResponse = mockRecipientCodeValidation.filter(
+      (r) => r.code === params.recipientCode
+    );
     if (mockAcceptedResponse.length > 0) {
-      return new Promise((resolve) => { resolve({ data: mockAcceptedResponse[0]?.value, status: 200, statusText: '200' } as AxiosResponse); });
+      return new Promise((resolve) => {
+        resolve({
+          data: mockAcceptedResponse[0]?.value,
+          status: 200,
+          statusText: '200',
+        } as AxiosResponse);
+      });
     } else {
       return notFoundError;
     }
@@ -1080,7 +1088,7 @@ export async function mockFetch(
   }
 
   if (endpoint === 'ONBOARDING_GET_UO_LIST') {
-    const retrievedUos = mockedUos.filter((uo) => uo.codiceFiscaleEnte === params.taxCodeInvoicing);
+    const retrievedUos = mockedUos.filter((uo) => uo.codiceFiscaleSfe === params.taxCodeInvoicing);
     return new Promise((resolve) =>
       resolve({
         data: { items: retrievedUos, count: retrievedUos.length },

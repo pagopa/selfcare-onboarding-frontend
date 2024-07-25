@@ -803,6 +803,9 @@ export default function PersonalAndBillingDataSection({
                         setInvalidTaxCodeInvoicing(false);
                       }
                     }}
+                    inputProps={{
+                      maxLength: 11,
+                    }}
                   />
                 </Grid>
               )}

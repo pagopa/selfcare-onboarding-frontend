@@ -1,4 +1,4 @@
-import { fireEvent, screen, waitFor } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import { useFormik } from 'formik';
 import React from 'react';
 import { OnboardingFormData } from '../../../model/OnboardingFormData';
@@ -198,9 +198,12 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
     );
     const rea = screen.queryByText('REA');
     const sdiCode = screen.queryByText('Codice univoco o SDI');
+    const taxCodeSfe = screen.queryByText('Codice Fiscale SFE');
     const shareCapital = screen.queryByText('Capitale sociale (facoltativo)');
     const visibleCitizenMail = screen.queryByText('Indirizzo email visibile ai cittadini');
-    const visibleCitizenMailOptional = screen.queryByText('Indirizzo email visibile ai cittadini (facoltativo)');
+    const visibleCitizenMailOptional = screen.queryByText(
+      'Indirizzo email visibile ai cittadini (facoltativo)'
+    );
 
     if (aooSelected) {
       expect(businessName).not.toBeInTheDocument();
@@ -243,8 +246,10 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
 
     if (canInvoice) {
       expect(sdiCode).toBeInTheDocument();
+      expect(taxCodeSfe).toBeInTheDocument();
     } else {
       expect(sdiCode).not.toBeInTheDocument();
+      expect(taxCodeSfe).not.toBeInTheDocument();
     }
 
     if (isInformationCompany) {
@@ -260,7 +265,9 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
     if (institutionAvoidGeotax) {
       expect(visibleCitizenMail).not.toBeInTheDocument();
     } else {
-      expect(productId === "prod-io" ? visibleCitizenMail : visibleCitizenMailOptional).toBeInTheDocument();
+      expect(
+        productId === 'prod-io' ? visibleCitizenMail : visibleCitizenMailOptional
+      ).toBeInTheDocument();
     }
 
     const isTaxCodeEquals2PIVA = document.getElementById('taxCodeEquals2VatNumber');
