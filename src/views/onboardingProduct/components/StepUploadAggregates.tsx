@@ -130,15 +130,15 @@ export function StepUploadAggregates({
       if (errors.length === 0) {
         setDisabled(false);
         forward(undefined, aggregatesList);
-        setLoading(false);
       } else {
         setDisabled(true);
         setFoundErrors(errors);
+        setLoading(false);
       }
     } else {
       setOutcome(genericError);
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const getExampleAggregatesCsv = async () => {
@@ -185,11 +185,20 @@ export function StepUploadAggregates({
         </Grid>
       </Grid>
       {(invalidFile || foundErrors) && (
-        <Grid item pt={2} pb={4} sx={{ display: 'flex', justifyContent: 'center' }}>
+        <Grid
+          item
+          pt={2}
+          pb={4}
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+          }}
+        >
           <Alert
             severity="error"
             sx={{
               width: '684px',
+              maxWidth: { xs: 335, md: 484, lg: 684 },
               height: '77px',
               fontSize: 'fontSize',
               alignItems: 'center',
