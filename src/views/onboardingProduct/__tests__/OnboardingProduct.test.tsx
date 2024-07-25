@@ -482,7 +482,7 @@ const executeAdvancedSearchForAoo = async () => {
   const vatNumber = document.getElementById('vatNumber') as HTMLInputElement;
 
   fireEvent.change(vatNumber as HTMLElement, {
-    target: { value: 'AAAAAA44D55F456K' },
+    target: { value: '00000000000' },
   });
 
   const continueButton = await waitFor(() => screen.getByRole('button', { name: 'Continua' }));
@@ -622,6 +622,10 @@ const executeStepBillingData = async () => {
     target: { value: 'A1B2C3' },
   });
 
+  fireEvent.change(document.getElementById('taxCodeInvoicing') as HTMLElement, {
+    target: { value: '00000000000' }
+  });
+
   await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
 
   await checkCorrectBodyBillingData(
@@ -629,8 +633,8 @@ const executeStepBillingData = async () => {
     'registeredOfficeInput',
     'a@a.it',
     '09010',
-    'AAAAAA44D55F456K',
-    'AAAAAA44D55F456K',
+    '00000000000',
+    '00000000000',
     'A1B2C3'
   );
   fireEvent.click(confirmButtonEnabled);
@@ -792,9 +796,9 @@ const executeStepBillingDataWithoutSupportMail = async () => {
     'registeredOfficeInput',
     'a@a.it',
     '09010',
-    'AAAAAA44D55F456K',
-    'AAAAAA44D55F456K',
-    'A1B2C3D'
+    '00000000000',
+    '00000000000',
+    'A1B2C3'
   );
   fireEvent.click(confirmButton);
   await waitFor(() => screen.getByText(step2Title));
@@ -901,20 +905,15 @@ const fillUserBillingDataForm = async (
   });
   fireEvent.change(document.getElementById(zipCode) as HTMLElement, { target: { value: '09010' } });
   fireEvent.change(document.getElementById(taxCodeInput) as HTMLElement, {
-    target: { value: 'AAAAAA44D55F456K' },
+    target: { value: '00000000000' },
   });
 
   const isTaxCodeEquals2PIVA = document.getElementById('taxCodeEquals2VatNumber');
   expect(isTaxCodeEquals2PIVA).toBeTruthy();
 
   fireEvent.change(document.getElementById(vatNumber) as HTMLElement, {
-    target: { value: 'AAAAAA44D55F456K' },
+    target: { value: '00000000000' },
   });
-
-  const taxCodeInvoicing = document.getElementById('taxCodeInvoicing');
-  if (taxCodeInvoicing) {
-    fireEvent.change(taxCodeInvoicing, { target: { value: 'AAAAAA44D55F456K' } });
-  }
 
   fireEvent.change(document.getElementById(recipientCode) as HTMLElement, {
     target: { value: 'A1B2C3D' },
@@ -1209,9 +1208,9 @@ const billingData2billingDataRequest = () => ({
   registeredOffice: 'registeredOfficeInput',
   digitalAddress: 'a@a.it',
   zipCode: '09010',
-  taxCode: 'AAAAAA44D55F456K',
-  taxCodeInvoicing: 'AAAAAA44D55F456K',
-  vatNumber: 'AAAAAA44D55F456K',
+  taxCode: '00000000000',
+  taxCodeInvoicing: '00000000000',
+  vatNumber: '00000000000',
   recipientCode: 'A1B2C3'.toUpperCase(),
 });
 
@@ -1264,7 +1263,7 @@ const verifySubmit = async (productId = 'prod-idpay') => {
           productId,
           subunitCode: undefined,
           subunitType: undefined,
-          taxCode: 'AAAAAA44D55F456K',
+          taxCode: '00000000000',
           companyInformations: undefined,
           aggregates: undefined,
           additionalInformations: undefined,
@@ -1320,7 +1319,7 @@ const verifySubmitPt = async (productId = 'prod-io-sign') => {
           productId,
           subunitCode: undefined,
           subunitType: undefined,
-          taxCode: 'AAAAAA44D55F456K',
+          taxCode: '00000000000',
           companyInformations: {
             businessRegisterPlace: undefined,
             rea: undefined,

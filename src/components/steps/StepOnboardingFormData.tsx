@@ -363,7 +363,7 @@ export default function StepOnboardingFormData({
       }
       setRecipientCodeStatus(result);
     } else {
-      void formik.setFieldError('recipientCode', t('onboardingFormData.billingDataSection.invalidRecipientCodeNoAssociation'));
+      setRecipientCodeStatus('DENIED_NO_ASSOCIATION');
     }
   };
 
@@ -404,6 +404,10 @@ export default function StepOnboardingFormData({
         formik.values.recipientCode,
         (selectedParty as Party)?.originId
       );
+    }
+    
+    if(formik.values.recipientCode && formik.values.recipientCode.length === 7) {
+      setRecipientCodeStatus(undefined);
     }
   }, [formik.values.recipientCode]);
 

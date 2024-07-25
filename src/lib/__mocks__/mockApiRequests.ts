@@ -515,7 +515,7 @@ export const mockedAoos: Array<AooData> = [
 
 export const mockedUos: Array<UoData> = [
   {
-    codiceFiscaleEnte: '98765432109',
+    codiceFiscaleEnte: '00000000000',
     codiceFiscaleSfe: '87654321098',
     codiceIpa: 'ABCDEF12',
     codiceUniUo: 'UF9YK7',
@@ -1058,10 +1058,11 @@ export async function mockFetch(
 
   if (endpoint === 'ONBOARDING_RECIPIENT_CODE_VALIDATION') {
     const mockAcceptedResponse = mockRecipientCodeValidation.filter((r) => r.code === params.recipientCode);
-  const responseValue = mockAcceptedResponse[0]?.value.length > 0 ?  mockAcceptedResponse[0].value : '';
-    return new Promise((resolve) =>
-      resolve({ data: responseValue, status: 200, statusText: '200' } as AxiosResponse)
-    );
+    if (mockAcceptedResponse.length > 0) {
+      return new Promise((resolve) => { resolve({ data: mockAcceptedResponse[0]?.value, status: 200, statusText: '200' } as AxiosResponse); });
+    } else {
+      return notFoundError;
+    }
   }
 
   if (endpoint === 'ONBOARDING_GET_AOO_CODE_INFO') {

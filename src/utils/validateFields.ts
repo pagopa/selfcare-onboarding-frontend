@@ -129,7 +129,7 @@ export const validateFields = (
         ? t('onboardingFormData.billingDataSection.invalidEmail')
         : undefined,
     recipientCode: canInvoice
-      ? values.recipientCode && values.recipientCode.length === 6
+      ? values.recipientCode && values.recipientCode.length >= 6
         ? recipientCodeStatus === 'DENIED_NO_ASSOCIATION'
           ? t('onboardingFormData.billingDataSection.invalidRecipientCodeNoAssociation')
           : recipientCodeStatus === 'DENIED_NO_BILLING'
