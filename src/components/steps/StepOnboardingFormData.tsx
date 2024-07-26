@@ -405,12 +405,7 @@ export default function StepOnboardingFormData({
   ) : (
     <Box display="flex" justifyContent="center">
       <Grid container item xs={8} display="flex" justifyContent="center">
-        <Heading
-          institutionType={institutionType}
-          productId={productId}
-          subtitle={subtitle}
-          isPaymentServiceProvider={isPaymentServiceProvider}
-        />
+        <Heading subtitle={subtitle} />
         <PersonalAndBillingDataSection
           productId={productId}
           origin={origin}
