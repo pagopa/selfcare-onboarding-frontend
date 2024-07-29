@@ -165,15 +165,6 @@ export default function PersonalAndBillingDataSection({
     }
   }, [aooSelected]);
 
-  useEffect(() => {
-    if (formik.values.recipientCode && formik.values.recipientCode.length === 6) {
-      void verifyRecipientCodeIsValid(
-        formik.values.recipientCode,
-        (selectedParty as Party)?.originId
-      );
-    }
-  }, [formik.values.recipientCode]);
-
   const baseNumericFieldProps = (
     field: keyof OnboardingFormData,
     label: string,
@@ -205,32 +196,6 @@ export default function PersonalAndBillingDataSection({
         },
       },
     };
-  };
-
-  const validateRecipientCode = (recipientCodeStatus: string) => {
-    if (
-      canInvoice &&
-      formik.values.recipientCode &&
-      formik.values.recipientCode.length === 6 &&
-      recipientCodeStatus === 'DENIED_NO_ASSOCIATION'
-    ) {
-      formik.setFieldError(
-        'recipientCode',
-        t('onboardingFormData.billingDataSection.invalidRecipientCodeNoAssociation')
-      );
-    } else if (
-      canInvoice &&
-      formik.values.recipientCode &&
-      formik.values.recipientCode.length === 6 &&
-      recipientCodeStatus === 'DENIED_NO_BILLING'
-    ) {
-      formik.setFieldError(
-        'recipientCode',
-        t('onboardingFormData.billingDataSection.invalidRecipientCodeNoBilling')
-      );
-    } else {
-      formik.setFieldError('recipientCode', undefined);
-    }
   };
 
   const getCountriesFromGeotaxonomies = async (query: string) => {
@@ -339,34 +304,6 @@ export default function PersonalAndBillingDataSection({
         setInvalidTaxCodeInvoicing(false);
       } else {
         setInvalidTaxCodeInvoicing(true);
-      }
-    }
-  };
-
-  const verifyRecipientCodeIsValid = async (recipientCode: string, originId: string) => {
-    const getRecipientCodeValidation = await fetchWithLogs(
-      {
-        endpoint: 'ONBOARDING_RECIPIENT_CODE_VALIDATION',
-      },
-      {
-        method: 'GET',
-        params: {
-          recipientCode,
-          originId,
-        },
-      },
-      () => setRequiredLogin(true)
-    );
-
-    const outcome = getFetchOutcome(getRecipientCodeValidation);
-
-    if (outcome === 'success') {
-      const result = (getRecipientCodeValidation as AxiosResponse).data;
-      if (result) {
-        validateRecipientCode(result);
-        if (uoSelected && result === 'DENIED_NO_BILLING') {
-          formik.setFieldValue('recipientCode', undefined);
-        }
       }
     }
   };
@@ -857,7 +794,7 @@ export default function PersonalAndBillingDataSection({
                   }}
                 />
               )}
-              {uoSelected && canInvoice && (
+              {(uoSelected || institutionType === 'PA') && canInvoice && (
                 <Grid item xs={12} mt={3}>
                   <CustomTextField
                     {...baseTextFieldProps(
@@ -873,6 +810,9 @@ export default function PersonalAndBillingDataSection({
                       } else {
                         setInvalidTaxCodeInvoicing(false);
                       }
+                    }}
+                    inputProps={{
+                      maxLength: 11,
                     }}
                   />
                 </Grid>

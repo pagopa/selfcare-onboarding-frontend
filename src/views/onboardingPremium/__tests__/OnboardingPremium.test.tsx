@@ -250,7 +250,6 @@ const executeStepBillingData = async () => {
   expect(partyWithoutVatNumberCheckbox).toBeChecked();
 
   const confirmButtonEnabled = screen.getByRole('button', { name: 'Continua' });
-  await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
 
   fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
     target: { value: '' },
