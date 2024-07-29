@@ -92,7 +92,7 @@ const renderComponent = (productId: string = 'prod-pn') => {
 
 const step1Title = 'Cerca il tuo ente';
 const stepInstitutionType = 'Seleziona il tipo di ente che rappresenti';
-const stepBillingDataTitle = 'Indica i dati del tuo ente';
+const stepBillingDataTitle = 'Inserisci i dati dell’ente';
 const step2Title = 'Indica il Legale Rappresentante';
 const step3Title = "Indica l'Amministratore";
 
@@ -575,7 +575,7 @@ const executeStepInstitutionTypeGspForProdIoSign = async () => {
   expect(confirmButtonEnabled).toBeEnabled();
 
   fireEvent.click(confirmButtonEnabled);
-  await waitFor(() => screen.getByText('Indica i dati del tuo ente'));
+  await waitFor(() => screen.getByText(stepBillingDataTitle));
 };
 
 const executeStepBillingData = async () => {
@@ -636,7 +636,7 @@ const executeStepBillingDataLabels = async () => {
 
   const backButton = screen.getByRole('button', { name: 'Indietro' });
 
-  await waitFor(() => screen.getByText('Indica i dati del tuo ente'));
+  await waitFor(() => screen.getByText(stepBillingDataTitle));
   expect(screen.getByText('Codice SDI'));
 
   expect(backButton).toBeEnabled();

@@ -596,7 +596,7 @@ export default {
     confirmLabel: 'Continua',
   },
   onboardingFormData: {
-    title: 'Indica i dati del tuo ente',
+    title: 'Inserisci i dati dell’ente',
     pspAndProdPagoPATitle: 'Inserisci i dati',
     backLabel: 'Indietro',
     confirmLabel: 'Continua',
