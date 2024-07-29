@@ -90,7 +90,7 @@ export default function StepOnboardingFormData({
   );
   const [retrievedIstat, setRetrievedIstat] = useState<string>();
   const [invalidTaxCodeInvoicing, setInvalidTaxCodeInvoicing] = useState<boolean>(false);
-
+  const [recipientCodeStatus, setRecipientCodeStatus] = useState<string>();
   const [geotaxonomy, updateGeotaxonomy] = useReducer(
     (prev: { add: boolean; edit: boolean }, next: { add: boolean; edit: boolean }) => ({
       ...prev,
@@ -227,8 +227,8 @@ export default function StepOnboardingFormData({
       vatNumber: stepHistoryState.isTaxCodeEquals2PIVA
         ? formik.values.taxCode
         : formik.values.hasVatnumber && !formik.values.isForeignInsurance
-        ? formik.values.vatNumber
-        : undefined,
+          ? formik.values.vatNumber
+          : undefined,
       taxCode:
         formik.values.taxCode !== '' && formik.values.taxCode ? formik.values.taxCode : undefined,
     });
@@ -271,6 +271,7 @@ export default function StepOnboardingFormData({
         institutionAvoidGeotax,
         isPremium,
         invalidTaxCodeInvoicing,
+        recipientCodeStatus,
         productId
       )
     );
@@ -294,6 +295,7 @@ export default function StepOnboardingFormData({
     vatVerificationGenericError,
     formik.values,
     invalidTaxCodeInvoicing,
+    recipientCodeStatus
   ]);
 
   useEffect(() => {
@@ -337,6 +339,34 @@ export default function StepOnboardingFormData({
     }
   };
 
+  const verifyRecipientCodeIsValid = async (recipientCode: string, originId: string) => {
+    const getRecipientCodeValidation = await fetchWithLogs(
+      {
+        endpoint: 'ONBOARDING_RECIPIENT_CODE_VALIDATION',
+      },
+      {
+        method: 'GET',
+        params: {
+          recipientCode,
+          originId,
+        },
+      },
+      () => setRequiredLogin(true)
+    );
+
+    const outcome = getFetchOutcome(getRecipientCodeValidation);
+
+    if (outcome === 'success') {
+      const result = (getRecipientCodeValidation as AxiosResponse).data;
+      if (uoSelected && result && result === 'DENIED_NO_BILLING') {
+        void formik.setFieldValue('recipientCode', undefined);
+      }
+      setRecipientCodeStatus(result);
+    } else {
+      setRecipientCodeStatus('DENIED_NO_ASSOCIATION');
+    }
+  };
+
   useEffect(() => {
     if (
       !stepHistoryState.isTaxCodeEquals2PIVA &&
@@ -367,6 +397,19 @@ export default function StepOnboardingFormData({
       void verifyVatNumber();
     }
   }, [formik.values.vatNumber, stepHistoryState.isTaxCodeEquals2PIVA]);
+
+  useEffect(() => {
+    if (formik.values.recipientCode && formik.values.recipientCode.length === 6) {
+      void verifyRecipientCodeIsValid(
+        formik.values.recipientCode,
+        (selectedParty as Party)?.originId
+      );
+    }
+    
+    if(formik.values.recipientCode && formik.values.recipientCode.length === 7) {
+      setRecipientCodeStatus(undefined);
+    }
+  }, [formik.values.recipientCode]);
 
   const baseTextFieldProps = (
     field: keyof OnboardingFormData,
@@ -405,12 +448,7 @@ export default function StepOnboardingFormData({
   ) : (
     <Box display="flex" justifyContent="center">
       <Grid container item xs={8} display="flex" justifyContent="center">
-        <Heading
-          institutionType={institutionType}
-          productId={productId}
-          subtitle={subtitle}
-          isPaymentServiceProvider={isPaymentServiceProvider}
-        />
+        <Heading subtitle={subtitle} />
         <PersonalAndBillingDataSection
           productId={productId}
           origin={origin}

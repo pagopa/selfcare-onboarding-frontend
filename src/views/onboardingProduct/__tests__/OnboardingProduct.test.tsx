@@ -92,7 +92,7 @@ const renderComponent = (productId: string = 'prod-pn') => {
 
 const step1Title = 'Cerca il tuo ente';
 const stepInstitutionType = 'Seleziona il tipo di ente che rappresenti';
-const stepBillingDataTitle = 'Indica i dati del tuo ente';
+const stepBillingDataTitle = 'Inserisci i dati dell’ente';
 const step2Title = 'Indica il Legale Rappresentante';
 const step3Title = "Indica l'Amministratore";
 
@@ -108,12 +108,6 @@ test('onboarding of pa with origin IPA', async () => {
   renderComponent('prod-pagopa');
   await executeStepInstitutionType('prod-pagopa');
   await executeStep1('AGENCY X', 'prod-pagopa', 'PA');
-  
-  // const searchCitySelect = document.getElementById('city-select') as HTMLInputElement;
-  // const searchCounty = document.getElementById('county');
-
-  // await waitFor(() => expect(searchCitySelect.value).toBe('Palermo'));
-  // await waitFor(() => expect(searchCounty).toBeDisabled());
   await fillUserBillingDataForm(
     'businessName',
     'registeredOffice',
@@ -124,6 +118,10 @@ test('onboarding of pa with origin IPA', async () => {
     'recipientCode',
     'supportEmail'
   );
+
+  fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
+    target: { value: 'A1B2C3' },
+  });
 
   const confirmButtonEnabled = screen.getByRole('button', { name: 'Continua' });
   await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
@@ -261,7 +259,7 @@ test.skip('test billingData without Support Mail', async () => {
 test('test complete onboarding AOO with product interop', async () => {
   renderComponent('prod-interop');
   await executeStepInstitutionType('prod-interop');
-  await executeAdvancedSearchForAoo(); 
+  await executeAdvancedSearchForAoo();
   await executeStep2();
   await executeStep3(true);
   const onboardingCompleted = await waitFor(() =>
@@ -484,7 +482,7 @@ const executeAdvancedSearchForAoo = async () => {
   const vatNumber = document.getElementById('vatNumber') as HTMLInputElement;
 
   fireEvent.change(vatNumber as HTMLElement, {
-    target: { value: 'AAAAAA44D55F456K' },
+    target: { value: '00000000000' },
   });
 
   const continueButton = await waitFor(() => screen.getByRole('button', { name: 'Continua' }));
@@ -575,7 +573,7 @@ const executeStepInstitutionTypeGspForProdIoSign = async () => {
   expect(confirmButtonEnabled).toBeEnabled();
 
   fireEvent.click(confirmButtonEnabled);
-  await waitFor(() => screen.getByText('Indica i dati del tuo ente'));
+  await waitFor(() => screen.getByText(stepBillingDataTitle));
 };
 
 const executeStepBillingData = async () => {
@@ -593,6 +591,10 @@ const executeStepBillingData = async () => {
     'city',
     'province'
   );
+
+  fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
+    target: { value: 'A1B2C3' },
+  });
 
   const confirmButtonEnabled = screen.getByRole('button', { name: 'Continua' });
   await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
@@ -616,6 +618,35 @@ const executeStepBillingData = async () => {
     'province'
   );
 
+  fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
+    target: { value: 'AABBC1' },
+  });
+  await waitFor(() => screen.getByText('Il codice inserito non è associato al tuo ente'));
+
+  fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
+    target: { value: '2A3B4C' },
+  });
+  await waitFor(() =>
+    screen.getByText(
+      'Il codice inserito è associato al codice fiscale di un ente che non ha il servizio di fatturazione attivo'
+    )
+  );
+
+  fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
+    target: { value: 'A1B2C3' },
+  });
+
+  fireEvent.change(document.getElementById('taxCodeInvoicing') as HTMLElement, {
+    target: { value: '87654321092' },
+  });
+  await waitFor(() => screen.getByText('Il Codice Fiscale inserito non è relativo al tuo ente'));
+
+  await waitFor(() => expect(confirmButtonEnabled).toBeDisabled());
+
+  fireEvent.change(document.getElementById('taxCodeInvoicing') as HTMLElement, {
+    target: { value: '87654321098' },
+  });
+
   await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
 
   await checkCorrectBodyBillingData(
@@ -623,9 +654,9 @@ const executeStepBillingData = async () => {
     'registeredOfficeInput',
     'a@a.it',
     '09010',
-    'AAAAAA44D55F456K',
-    'AAAAAA44D55F456K',
-    'A1B2C3D'
+    '00000000000',
+    '00000000000',
+    'A1B2C3'
   );
   fireEvent.click(confirmButtonEnabled);
   await waitFor(() => screen.getByText(step2Title));
@@ -636,7 +667,7 @@ const executeStepBillingDataLabels = async () => {
 
   const backButton = screen.getByRole('button', { name: 'Indietro' });
 
-  await waitFor(() => screen.getByText('Indica i dati del tuo ente'));
+  await waitFor(() => screen.getByText(stepBillingDataTitle));
   expect(screen.getByText('Codice SDI'));
 
   expect(backButton).toBeEnabled();
@@ -786,9 +817,9 @@ const executeStepBillingDataWithoutSupportMail = async () => {
     'registeredOfficeInput',
     'a@a.it',
     '09010',
-    'AAAAAA44D55F456K',
-    'AAAAAA44D55F456K',
-    'A1B2C3D'
+    '00000000000',
+    '00000000000',
+    'A1B2C3'
   );
   fireEvent.click(confirmButton);
   await waitFor(() => screen.getByText(step2Title));
@@ -895,15 +926,16 @@ const fillUserBillingDataForm = async (
   });
   fireEvent.change(document.getElementById(zipCode) as HTMLElement, { target: { value: '09010' } });
   fireEvent.change(document.getElementById(taxCodeInput) as HTMLElement, {
-    target: { value: 'AAAAAA44D55F456K' },
+    target: { value: '00000000000' },
   });
 
   const isTaxCodeEquals2PIVA = document.getElementById('taxCodeEquals2VatNumber');
   expect(isTaxCodeEquals2PIVA).toBeTruthy();
 
   fireEvent.change(document.getElementById(vatNumber) as HTMLElement, {
-    target: { value: 'AAAAAA44D55F456K' },
+    target: { value: '00000000000' },
   });
+
   fireEvent.change(document.getElementById(recipientCode) as HTMLElement, {
     target: { value: 'A1B2C3D' },
   });
@@ -1197,9 +1229,10 @@ const billingData2billingDataRequest = () => ({
   registeredOffice: 'registeredOfficeInput',
   digitalAddress: 'a@a.it',
   zipCode: '09010',
-  taxCode: 'AAAAAA44D55F456K',
-  vatNumber: 'AAAAAA44D55F456K',
-  recipientCode: 'A1B2C3D'.toUpperCase(),
+  taxCode: '00000000000',
+  taxCodeInvoicing: '87654321098',
+  vatNumber: '00000000000',
+  recipientCode: 'A1B2C3'.toUpperCase(),
 });
 
 const verifySubmit = async (productId = 'prod-idpay') => {
@@ -1251,9 +1284,11 @@ const verifySubmit = async (productId = 'prod-idpay') => {
           productId,
           subunitCode: undefined,
           subunitType: undefined,
-          taxCode: 'AAAAAA44D55F456K',
+          taxCode: '00000000000',
           companyInformations: undefined,
           aggregates: undefined,
+          additionalInformations: undefined,
+          isAggregator: undefined,
         },
         method: 'POST',
       },
@@ -1305,7 +1340,7 @@ const verifySubmitPt = async (productId = 'prod-io-sign') => {
           productId,
           subunitCode: undefined,
           subunitType: undefined,
-          taxCode: 'AAAAAA44D55F456K',
+          taxCode: '00000000000',
           companyInformations: {
             businessRegisterPlace: undefined,
             rea: undefined,

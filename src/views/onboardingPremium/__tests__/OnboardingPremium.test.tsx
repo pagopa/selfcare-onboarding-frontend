@@ -98,7 +98,7 @@ const renderComponent = (
 };
 
 const stepSelectInstitutionReleatedTitle = 'Seleziona il tuo ente';
-const stepBillingDataTitle = 'Indica i dati del tuo ente';
+const stepBillingDataTitle = 'Inserisci i dati dell’ente';
 const stepAddManagerTitle = 'Indica il Legale Rappresentante';
 const successOnboardingSubProductTitle = 'La richiesta di adesione è stata inviata con successo';
 const errorOnboardingSubProductTitle = 'Qualcosa è andato storto';
@@ -250,7 +250,6 @@ const executeStepBillingData = async () => {
   expect(partyWithoutVatNumberCheckbox).toBeChecked();
 
   const confirmButtonEnabled = screen.getByRole('button', { name: 'Continua' });
-  await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
 
   fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
     target: { value: '' },
