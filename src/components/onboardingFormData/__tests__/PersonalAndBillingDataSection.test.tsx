@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react';
+import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { useFormik } from 'formik';
 import React from 'react';
 import { OnboardingFormData } from '../../../model/OnboardingFormData';
@@ -166,7 +166,7 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
     });
   });
 
-  Object.keys(conditionsMap).forEach((key) => {
+  Object.keys(conditionsMap).forEach(async (key) => {
     const {
       canInvoice,
       isInformationCompany,
@@ -197,8 +197,8 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
       'Luogo di iscrizione al Registro delle Imprese (facoltativo)'
     );
     const rea = screen.queryByText('REA');
-    const sdiCode = screen.queryByText('Codice univoco o SDI');
-    const taxCodeSfe = screen.queryByText('Codice Fiscale SFE');
+    const sdiCode = screen.queryByText('Codice univoco o SDI') as HTMLInputElement;
+    const taxCodeSfe = screen.queryByText('Codice Fiscale SFE') as HTMLInputElement;
     const shareCapital = screen.queryByText('Capitale sociale (facoltativo)');
     const visibleCitizenMail = screen.queryByText('Indirizzo email visibile ai cittadini');
     const visibleCitizenMailOptional = screen.queryByText(
@@ -243,10 +243,20 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
     }
 
     expect(pec).toBeInTheDocument();
-
+    
     if (canInvoice) {
       expect(sdiCode).toBeInTheDocument();
-      expect(taxCodeSfe).toBeInTheDocument();
+      fireEvent.change(document.getElementById('recipientCode') as HTMLInputElement, { target: { value: 'A1B2C3' } });
+      await waitFor(() => expect(taxCodeSfe as HTMLInputElement).toBeInTheDocument());
+
+      fireEvent.change(document.getElementById('recipientCode') as HTMLInputElement, { target: { value: 'AABBC1' } });
+      await waitFor(() => expect(taxCodeSfe as HTMLInputElement).not.toBeInTheDocument());
+
+      fireEvent.change(document.getElementById('recipientCode') as HTMLInputElement, { target: { value: '2A3B4C' } });
+      await waitFor(() => expect(taxCodeSfe as HTMLInputElement).not.toBeInTheDocument());
+
+      fireEvent.change(document.getElementById('recipientCode') as HTMLInputElement, { target: { value: '' } });
+      await waitFor(() => expect(taxCodeSfe as HTMLInputElement).not.toBeInTheDocument());
     } else {
       expect(sdiCode).not.toBeInTheDocument();
       expect(taxCodeSfe).not.toBeInTheDocument();
