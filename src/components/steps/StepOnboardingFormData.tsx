@@ -118,7 +118,10 @@ export default function StepOnboardingFormData({
   const isInformationCompany =
     origin !== 'IPA' &&
     (institutionType === 'GSP' || institutionType === 'SCP') &&
-    (productId === 'prod-io' || productId === 'prod-io-sign' || productId === 'prod-pagopa' || productId === 'prod-interop');
+    (productId === 'prod-io' ||
+      productId === 'prod-io-sign' ||
+      productId === 'prod-pagopa' ||
+      productId === 'prod-interop');
   const isProdFideiussioni = productId?.startsWith('prod-fd') ?? false;
   const canInvoice =
     institutionType !== 'SA' &&
@@ -227,8 +230,8 @@ export default function StepOnboardingFormData({
       vatNumber: stepHistoryState.isTaxCodeEquals2PIVA
         ? formik.values.taxCode
         : formik.values.hasVatnumber && !formik.values.isForeignInsurance
-          ? formik.values.vatNumber
-          : undefined,
+        ? formik.values.vatNumber
+        : undefined,
       taxCode:
         formik.values.taxCode !== '' && formik.values.taxCode ? formik.values.taxCode : undefined,
     });
@@ -295,7 +298,7 @@ export default function StepOnboardingFormData({
     vatVerificationGenericError,
     formik.values,
     invalidTaxCodeInvoicing,
-    recipientCodeStatus
+    recipientCodeStatus,
   ]);
 
   useEffect(() => {
@@ -399,14 +402,18 @@ export default function StepOnboardingFormData({
   }, [formik.values.vatNumber, stepHistoryState.isTaxCodeEquals2PIVA]);
 
   useEffect(() => {
-    if (formik.values.recipientCode && formik.values.recipientCode.length === 6) {
+    if (
+      (institutionType === 'PA' || aooSelected || uoSelected) &&
+      formik.values.recipientCode &&
+      formik.values.recipientCode.length === 6
+    ) {
       void verifyRecipientCodeIsValid(
         formik.values.recipientCode,
         (selectedParty as Party)?.originId
       );
     }
-    
-    if(formik.values.recipientCode && formik.values.recipientCode.length === 7) {
+
+    if (formik.values.recipientCode && formik.values.recipientCode.length === 7) {
       setRecipientCodeStatus(undefined);
     }
   }, [formik.values.recipientCode]);
