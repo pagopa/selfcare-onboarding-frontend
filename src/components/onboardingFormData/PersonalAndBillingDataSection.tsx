@@ -60,6 +60,7 @@ type Props = StepperStepComponentProps & {
   canInvoice: boolean;
   isForeignInsurance?: boolean;
   setInvalidTaxCodeInvoicing: React.Dispatch<React.SetStateAction<boolean>>;
+  recipientCodeStatus?: string;
 };
 
 // eslint-disable-next-line sonarjs/cognitive-complexity, complexity
@@ -83,6 +84,7 @@ export default function PersonalAndBillingDataSection({
   isForeignInsurance,
   productId,
   setInvalidTaxCodeInvoicing,
+  recipientCodeStatus
 }: Props) {
   const { t } = useTranslation();
   const { setRequiredLogin } = useContext(UserContext);
@@ -794,7 +796,7 @@ export default function PersonalAndBillingDataSection({
                   }}
                 />
               )}
-              {(uoSelected || institutionType === 'PA') && canInvoice && (
+              {(uoSelected || institutionType === 'PA') && canInvoice && formik.values.recipientCode?.length > 0 && recipientCodeStatus === 'ACCEPTED' && (
                 <Grid item xs={12} mt={3}>
                   <CustomTextField
                     {...baseTextFieldProps(
