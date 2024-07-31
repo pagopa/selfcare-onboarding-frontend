@@ -78,7 +78,7 @@ const renderComponent = (
           }}
         >
           <UserContext.Provider
-            value={{ user, setUser, requiredLogin: false, setRequiredLogin: () => {} }}
+            value={{ user, setUser, requiredLogin: false, setRequiredLogin: () => { } }}
           >
             <button onClick={() => onExit?.(() => window.location.assign(ENV.URL_FE.LOGOUT))}>
               LOGOUT
@@ -121,7 +121,7 @@ test('test onboarding complete', async () => {
   renderComponent('prod-io', 'prod-io-premium');
   await executeStepSelectPricingPlan();
   await executeStepSelectInstitution('Comune di Milano');
-  await executeStepBillingData();
+  await executeStepBillingDataWithTaxCodeInvoicing();
   await executeStepAddManager(true);
   await executeClickCloseButton(true);
   await verifySubmitPostLegals();
@@ -131,7 +131,7 @@ test('test complete with error on submit', async () => {
   renderComponent('prod-io', 'prod-io-premium');
   await executeStepSelectPricingPlan();
   await executeStepSelectInstitution('Comune di Udine');
-  await executeStepBillingData();
+  await executeStepBillingDataWithoutTaxCodeInvoicing();
   await executeStepAddManager(false);
   await executeClickHomeButton();
 });
@@ -240,7 +240,7 @@ const executeStepSelectInstitution = async (partyName: string) => {
   fireEvent.click(continueButton);
 };
 
-const executeStepBillingData = async () => {
+const executeStepBillingDataWithTaxCodeInvoicing = async () => {
   console.log('Testing step Billing Data');
   await waitFor(() => screen.getByText(stepBillingDataTitle));
 
@@ -258,6 +258,22 @@ const executeStepBillingData = async () => {
   fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
     target: { value: 'A1B2C3' },
   });
+  await waitFor(() => { expect(screen.getByText('Codice Fiscale SFE')).toBeInTheDocument(); });
+  await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
+  fireEvent.click(confirmButtonEnabled);
+  await waitFor(() => screen.getByText(stepAddManagerTitle));
+};
+
+const executeStepBillingDataWithoutTaxCodeInvoicing = async () => {
+  console.log('Testing step Billing Data');
+  await waitFor(() => screen.getByText(stepBillingDataTitle));
+
+  // TODO Scenarios with vatNumber will be added with SELC-4817
+  const partyWithoutVatNumberCheckbox = screen.getByLabelText('Il mio ente non ha la partita IVA');
+  fireEvent.click(partyWithoutVatNumberCheckbox);
+  expect(partyWithoutVatNumberCheckbox).toBeChecked();
+
+  const confirmButtonEnabled = screen.getByRole('button', { name: 'Continua' });
   await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
   fireEvent.click(confirmButtonEnabled);
   await waitFor(() => screen.getByText(stepAddManagerTitle));
@@ -416,7 +432,7 @@ const billingData2billingDataRequest = () => ({
   digitalAddress: 'comune.milano@pec.it',
   zipCode: '20021',
   taxCode: '33445673222',
-  taxCodeInvoicing: undefined,
+  taxCodeInvoicing: '87654321098',
   vatNumber: undefined,
   recipientCode: 'A1B2C3',
 });

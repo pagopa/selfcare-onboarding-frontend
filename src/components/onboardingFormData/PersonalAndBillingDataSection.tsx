@@ -84,7 +84,7 @@ export default function PersonalAndBillingDataSection({
   isForeignInsurance,
   productId,
   setInvalidTaxCodeInvoicing,
-  recipientCodeStatus
+  recipientCodeStatus,
 }: Props) {
   const { t } = useTranslation();
   const { setRequiredLogin } = useContext(UserContext);
@@ -97,6 +97,8 @@ export default function PersonalAndBillingDataSection({
   const [isCitySelected, setIsCitySelected] = useState<boolean>(false);
   const [nationalCountries, setNationalCountries] = useState<Array<CountryResource>>();
   const [input, setInput] = useState<string>();
+  const [disableTaxCodeInvoicing, setDisableTaxCodeInvoicing] = useState<boolean>(false);
+  const [taxCodeInvoicingVisible, setTaxCodeInovoicingVisible] = useState<boolean>(false);
 
   useEffect(() => {
     const shareCapitalIsNan = isNaN(formik.values.shareCapital);
@@ -166,6 +168,22 @@ export default function PersonalAndBillingDataSection({
       formik.setFieldValue('recipientCode', undefined);
     }
   }, [aooSelected]);
+
+  useEffect(() => {
+    if (
+      (uoSelected || institutionType === 'PA') &&
+      canInvoice &&
+      formik.values.recipientCode?.length === 6 &&
+      recipientCodeStatus === 'ACCEPTED'
+    ) {
+      void getUoInfoFromRecipientCode(formik.values.recipientCode);
+      setTaxCodeInovoicingVisible(true);
+    } else {
+      formik.setFieldValue('taxCodeInovoicing', undefined);
+      setDisableTaxCodeInvoicing(false);
+      setTaxCodeInovoicingVisible(false);
+    }
+  }, [formik.values.recipientCode, recipientCodeStatus]);
 
   const baseNumericFieldProps = (
     field: keyof OnboardingFormData,
@@ -307,6 +325,29 @@ export default function PersonalAndBillingDataSection({
       } else {
         setInvalidTaxCodeInvoicing(true);
       }
+    }
+  };
+
+  const getUoInfoFromRecipientCode = async (recipientCode: string) => {
+    const searchResponse = await fetchWithLogs(
+      { endpoint: 'ONBOARDING_GET_UO_CODE_INFO', endpointParams: { codiceUniUo: recipientCode } },
+      {
+        method: 'GET',
+        params: undefined,
+      },
+      () => setRequiredLogin(true)
+    );
+
+    const outcome = getFetchOutcome(searchResponse);
+
+    if (outcome === 'success') {
+      formik.setFieldValue(
+        'taxCodeInvoicing',
+        (searchResponse as AxiosResponse).data?.codiceFiscaleSfe
+      );
+      setDisableTaxCodeInvoicing(true);
+    } else {
+      setDisableTaxCodeInvoicing(false);
     }
   };
 
@@ -796,29 +837,32 @@ export default function PersonalAndBillingDataSection({
                   }}
                 />
               )}
-              {(uoSelected || institutionType === 'PA') && canInvoice && formik.values.recipientCode?.length > 0 && recipientCodeStatus === 'ACCEPTED' && (
-                <Grid item xs={12} mt={3}>
-                  <CustomTextField
-                    {...baseTextFieldProps(
-                      'taxCodeInvoicing',
-                      t('onboardingFormData.billingDataSection.taxCodeInvoicing'),
-                      600,
-                      theme.palette.text.primary
-                    )}
-                    onChange={(e) => {
-                      formik.setFieldValue('taxCodeInvoicing', e.target.value);
-                      if (e.target.value.length === 11) {
-                        void verifyTaxCodeInvoicing(e.target.value);
-                      } else {
-                        setInvalidTaxCodeInvoicing(false);
-                      }
-                    }}
-                    inputProps={{
-                      maxLength: 11,
-                    }}
-                  />
-                </Grid>
-              )}
+              {(uoSelected || institutionType === 'PA') &&
+                canInvoice &&
+                taxCodeInvoicingVisible && (
+                  <Grid item xs={12} mt={3}>
+                    <CustomTextField
+                      {...baseTextFieldProps(
+                        'taxCodeInvoicing',
+                        t('onboardingFormData.billingDataSection.taxCodeInvoicing'),
+                        600,
+                        theme.palette.text.primary
+                      )}
+                      onChange={(e) => {
+                        formik.setFieldValue('taxCodeInvoicing', e.target.value);
+                        if (e.target.value.length === 11) {
+                          void verifyTaxCodeInvoicing(e.target.value);
+                        } else {
+                          setInvalidTaxCodeInvoicing(false);
+                        }
+                      }}
+                      inputProps={{
+                        maxLength: 11,
+                      }}
+                      disabled={disableTaxCodeInvoicing}
+                    />
+                  </Grid>
+                )}
 
               {isPaymentServiceProvider && formik.values.hasVatnumber && (
                 <Box display="flex" alignItems="center" mt="2px">
