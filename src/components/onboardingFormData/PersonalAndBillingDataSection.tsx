@@ -170,12 +170,7 @@ export default function PersonalAndBillingDataSection({
   }, [aooSelected]);
 
   useEffect(() => {
-    if (
-      (uoSelected || institutionType === 'PA') &&
-      canInvoice &&
-      formik.values.recipientCode?.length === 6 &&
-      recipientCodeStatus === 'ACCEPTED'
-    ) {
+    if (formik.values.recipientCode?.length === 6 && recipientCodeStatus === 'ACCEPTED') {
       void getUoInfoFromRecipientCode(formik.values.recipientCode);
       setTaxCodeInovoicingVisible(true);
     } else {
