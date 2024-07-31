@@ -476,6 +476,7 @@ export default function StepOnboardingFormData({
           isCityEditable={isCityEditable}
           canInvoice={canInvoice}
           setInvalidTaxCodeInvoicing={setInvalidTaxCodeInvoicing}
+          recipientCodeStatus={recipientCodeStatus}
         />
 
         {ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY && !institutionAvoidGeotax && (
