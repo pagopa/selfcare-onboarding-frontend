@@ -235,7 +235,7 @@ export const institutionType4Product = (productId: string | undefined) => {
         (it) =>
           it.labelKey === 'pa' ||
           it.labelKey === 'gsp' ||
-          (ENV.ENV === 'DEV' && it.labelKey === 'psp') ||
+          (ENV.ENV !== 'PROD' && it.labelKey === 'psp') ||
           (ENV.PT.SHOW_PT ? it.labelKey === 'pt' : '')
       );
     case 'prod-io-sign':
