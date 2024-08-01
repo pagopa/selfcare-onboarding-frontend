@@ -617,6 +617,7 @@ const executeStepBillingData = async () => {
     'city',
     'province'
   );
+
   expect(document.getElementById('taxCodeInvoicing') as HTMLInputElement).not.toBeInTheDocument();
 
   fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
@@ -638,10 +639,17 @@ const executeStepBillingData = async () => {
   );
 
   fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
+    target: { value: 'A1B2C31' },
+  });
+
+  await waitFor(() => expect(document.getElementById('taxCodeInvoicing') as HTMLInputElement).not.toBeInTheDocument());
+
+  fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
     target: { value: 'A1B2C3' },
   });
 
   await waitFor(() => expect(document.getElementById('taxCodeInvoicing') as HTMLInputElement).toBeInTheDocument());
+  expect(document.getElementById('taxCodeInvoicing') as HTMLInputElement).toBeDisabled();
 
   fireEvent.change(document.getElementById('taxCodeInvoicing') as HTMLInputElement, {
     target: { value: '87654321092' },
