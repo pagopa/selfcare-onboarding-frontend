@@ -29,8 +29,10 @@ test('Test: The correct institution types with the expected descriptions, can be
       const institutionTypeValues = institutionTypesForProduct.map((it) => it.value);
 
       switch (p.id) {
-        case 'prod-io':
         case 'prod-pagopa':
+          expect(institutionTypeValues).toStrictEqual(['PA', 'GSP', 'PT', 'PSP']);
+          break;
+        case 'prod-io':
           expect(institutionTypeValues).toStrictEqual(['PA', 'GSP', 'PT']);
           break;
         case 'prod-io-sign':
@@ -41,7 +43,7 @@ test('Test: The correct institution types with the expected descriptions, can be
           expect(institutionTypeValues).toStrictEqual(['PA']);
           break;
         case 'prod-interop':
-          expect(institutionTypeValues).toStrictEqual(['PA', 'GSP', 'SCP', 'SA', 'AS',]);
+          expect(institutionTypeValues).toStrictEqual(['PA', 'GSP', 'SCP', 'SA', 'AS']);
           break;
         default:
           expect(institutionTypeValues).toStrictEqual(['PA', 'GSP', 'SCP']);
