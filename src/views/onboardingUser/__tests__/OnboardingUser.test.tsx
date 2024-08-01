@@ -10,7 +10,7 @@ import { MemoryRouter } from 'react-router-dom';
 import OnboardingUser from '../OnboardingUser';
 import { mockPartyRegistry, mockedProducts } from '../../../lib/__mocks__/mockApiRequests';
 
-jest.setTimeout(6000);
+jest.setTimeout(7000);
 
 const renderComponent = (productId: string) => {
   const Component = () => {

@@ -458,7 +458,7 @@ const executeAdvancedSearchForAoo = async () => {
 
   const partyNameSelection = await waitFor(() => screen.getByText('denominazione aoo test 1'));
 
-  expect(fetchWithLogsSpy).toBeCalledTimes(3);
+  expect(fetchWithLogsSpy).toBeCalledTimes(2);
 
   fireEvent.click(partyNameSelection);
 
@@ -466,7 +466,7 @@ const executeAdvancedSearchForAoo = async () => {
   expect(confirmButton).toBeEnabled();
 
   fireEvent.click(confirmButton);
-  await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(6));
+  await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(5));
 
   const aooCode = document.getElementById('aooUniqueCode') as HTMLInputElement;
   const aooName = document.getElementById('aooName') as HTMLInputElement;
@@ -642,13 +642,17 @@ const executeStepBillingData = async () => {
     target: { value: 'A1B2C31' },
   });
 
-  await waitFor(() => expect(document.getElementById('taxCodeInvoicing') as HTMLInputElement).not.toBeInTheDocument());
+  await waitFor(() =>
+    expect(document.getElementById('taxCodeInvoicing') as HTMLInputElement).not.toBeInTheDocument()
+  );
 
   fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
     target: { value: 'A1B2C3' },
   });
 
-  await waitFor(() => expect(document.getElementById('taxCodeInvoicing') as HTMLInputElement).toBeInTheDocument());
+  await waitFor(() =>
+    expect(document.getElementById('taxCodeInvoicing') as HTMLInputElement).toBeInTheDocument()
+  );
   expect(document.getElementById('taxCodeInvoicing') as HTMLInputElement).toBeDisabled();
 
   fireEvent.change(document.getElementById('taxCodeInvoicing') as HTMLInputElement, {

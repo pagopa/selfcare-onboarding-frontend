@@ -36,4 +36,7 @@ export type OnboardingFormData = {
   hasVatnumber?: boolean;
   origin?: string;
   isAggregator?: boolean;
+  externalId?: string;
+  istatCode?: string;
+  registerType?: string;
 };

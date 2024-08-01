@@ -8,7 +8,6 @@ import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyt
 import { uniqueId } from 'lodash';
 import {
   InstitutionType,
-  Party,
   Product,
   RequestOutcomeMessage,
   StepperStepComponentProps,
@@ -20,7 +19,6 @@ import { AooData } from '../../model/AooData';
 import { GeographicTaxonomy } from '../../model/GeographicTaxonomies';
 import { OnboardingFormData } from '../../model/OnboardingFormData';
 import { UoData } from '../../model/UoModel';
-import { ENV } from '../../utils/env';
 import { MessageNoAction } from '../MessageNoAction';
 import { OnboardingStepActions } from '../OnboardingStepActions';
 import DpoSection from '../onboardingFormData/DpoSection';
@@ -33,7 +31,6 @@ import { filterByCategory, requiredError } from '../../utils/constants';
 import Heading from '../onboardingFormData/Heading';
 import { validateFields } from '../../utils/validateFields';
 import { handleGeotaxonomies } from '../../utils/handleGeotaxonomies';
-import { PDNDBusinessResource } from '../../model/PDNDBusinessResource';
 
 export type StepBillingDataHistoryState = {
   externalInstitutionId: string;
@@ -54,7 +51,7 @@ type Props = StepperStepComponentProps & {
   origin?: string;
   productId?: string;
   subProductId?: string;
-  selectedParty?: Party | PDNDBusinessResource;
+  onboardingFormData?: OnboardingFormData;
   selectedProduct?: Product | null;
   outcome?: RequestOutcomeMessage | null;
   aooSelected?: AooData;
@@ -76,7 +73,7 @@ export default function StepOnboardingFormData({
   subProductId,
   aooSelected,
   uoSelected,
-  selectedParty,
+  onboardingFormData,
   isCityEditable,
 }: Props) {
   const { t } = useTranslation();
@@ -128,7 +125,7 @@ export default function StepOnboardingFormData({
     institutionType !== 'PT' &&
     institutionType !== 'AS' &&
     productId !== 'prod-interop';
-  const isForeignInsurance = (selectedParty as Party)?.registerType?.includes('Elenco II');
+  const isForeignInsurance = onboardingFormData?.registerType?.includes('Elenco II');
   const isDisabled =
     isPremium ||
     (origin === 'IPA' && institutionType !== 'PA' && !isPaymentServiceProvider) ||
@@ -342,7 +339,7 @@ export default function StepOnboardingFormData({
     }
   };
 
-  const verifyRecipientCodeIsValid = async (recipientCode: string, originId: string) => {
+  const verifyRecipientCodeIsValid = async (recipientCode: string, originId?: string) => {
     const getRecipientCodeValidation = await fetchWithLogs(
       {
         endpoint: 'ONBOARDING_RECIPIENT_CODE_VALIDATION',
@@ -407,10 +404,7 @@ export default function StepOnboardingFormData({
       formik.values.recipientCode &&
       formik.values.recipientCode.length === 6
     ) {
-      void verifyRecipientCodeIsValid(
-        formik.values.recipientCode,
-        (selectedParty as Party)?.originId
-      );
+      void verifyRecipientCodeIsValid(formik.values.recipientCode, onboardingFormData?.originId);
     }
 
     if (formik.values.recipientCode && formik.values.recipientCode.length === 7) {
@@ -460,6 +454,7 @@ export default function StepOnboardingFormData({
           productId={productId}
           origin={origin}
           institutionType={institutionType}
+          onboardingFormData={onboardingFormData}
           baseTextFieldProps={baseTextFieldProps}
           stepHistoryState={stepHistoryState}
           setStepHistoryState={setStepHistoryState}
@@ -468,10 +463,7 @@ export default function StepOnboardingFormData({
           isPremium={isPremium}
           isInformationCompany={isInformationCompany}
           isForeignInsurance={isForeignInsurance}
-          aooSelected={aooSelected}
-          uoSelected={uoSelected}
           institutionAvoidGeotax={institutionAvoidGeotax}
-          selectedParty={selectedParty}
           retrievedIstat={retrievedIstat}
           isCityEditable={isCityEditable}
           canInvoice={canInvoice}
@@ -479,7 +471,7 @@ export default function StepOnboardingFormData({
           recipientCodeStatus={recipientCodeStatus}
         />
 
-        {ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY && !institutionAvoidGeotax && (
+        {!institutionAvoidGeotax && (
           <Grid item xs={12} display="flex" justifyContent={'center'}>
             <GeoTaxonomySection
               retrievedTaxonomies={previousGeotaxononomies}

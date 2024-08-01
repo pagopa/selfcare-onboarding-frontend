@@ -8,15 +8,16 @@ import { RolesInformations } from '../components/RolesInformations';
 import { ROUTES, addUserFlowProducts } from '../utils/constants';
 import { ENV } from '../utils/env';
 import { InstitutionType, Product } from '../../types';
+import { OnboardingFormData } from '../model/OnboardingFormData';
 
 type Props = {
-  selectedParty?: any;
+  onboardingFormData?: OnboardingFormData;
   selectedProduct?: Product | null;
   institutionType?: InstitutionType;
 };
 
 export default function AlreadyOnboarded({
-  selectedParty,
+  onboardingFormData,
   selectedProduct,
   institutionType,
 }: Props) {
@@ -67,7 +68,11 @@ export default function AlreadyOnboarded({
                   sx={{ cursor: 'pointer' }}
                   onClick={() => {
                     history.push(ROUTES.ONBOARDING_USER.PATH, {
-                      data: { institutionType, party: selectedParty, product: selectedProduct },
+                      data: {
+                        institutionType,
+                        party: onboardingFormData,
+                        product: selectedProduct,
+                      },
                     });
                   }}
                 />
