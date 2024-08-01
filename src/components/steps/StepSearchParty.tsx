@@ -5,12 +5,7 @@ import { ReactElement, useContext, useEffect, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import Checkbox from '@mui/material/Checkbox';
 import { SessionModal } from '@pagopa/selfcare-common-frontend/lib';
-import {
-  IPACatalogParty,
-  InstitutionType,
-  Product,
-  StepperStepComponentProps,
-} from '../../../types';
+import { InstitutionType, Product, PartyData, StepperStepComponentProps } from '../../../types';
 import { fetchWithLogs } from '../../lib/api-utils';
 import { UserContext } from '../../lib/context';
 import { getFetchOutcome } from '../../lib/error-utils';
@@ -40,7 +35,7 @@ type Props = {
 const handleSearchExternalId = async (
   externalInstitutionId: string,
   onRedirectToLogin: () => void
-): Promise<IPACatalogParty | null> => {
+): Promise<PartyData | null> => {
   const searchResponse = await fetchWithLogs(
     {
       endpoint: 'ONBOARDING_GET_PARTY',
@@ -53,7 +48,7 @@ const handleSearchExternalId = async (
   const outcome = getFetchOutcome(searchResponse);
 
   if (outcome === 'success') {
-    return (searchResponse as AxiosResponse).data as IPACatalogParty;
+    return (searchResponse as AxiosResponse).data;
   }
 
   return null;
@@ -79,7 +74,7 @@ export function StepSearchParty({
 
   const [isSearchFieldSelected, setIsSearchFieldSelected] = useState<boolean>(true);
   const [loading, setLoading] = useState(!!partyExternalIdByQuery);
-  const [selected, setSelected, _setSelectedHistory] = useHistoryState<IPACatalogParty | null>(
+  const [selected, setSelected, _setSelectedHistory] = useHistoryState<PartyData | null>(
     'selected_step1',
     null
   );
@@ -201,7 +196,7 @@ export function StepSearchParty({
 
   const onForwardAction = () => {
     const onboardingData = selected2OnboardingData(selected, isAggregator);
-    forward(onboardingData, institutionType, isAggregator);
+    forward(onboardingData, institutionType);
   };
 
   const onBackAction = () => {

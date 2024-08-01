@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 import { withLogin } from '../../../components/withLogin';
-import { IPACatalogParty, InstitutionType, StepperStepComponentProps } from '../../../../types';
+import { InstitutionType, PartyData, StepperStepComponentProps } from '../../../../types';
 import { ProductResource } from '../../../model/ProductResource';
 import { Autocomplete } from '../../../components/autocomplete/Autocomplete';
 import { useHistoryState } from '../../../components/useHistoryState';
@@ -22,7 +22,7 @@ type Props = {
 function StepSearchOnboardedParty({ institutionType, selectedProduct, forward, back }: Props) {
   const { t } = useTranslation();
 
-  const [selected, setSelected, _setSelectedHistory] = useHistoryState<IPACatalogParty | null>(
+  const [selected, setSelected, _setSelectedHistory] = useHistoryState<PartyData | null>(
     'selected_step1',
     null
   );
