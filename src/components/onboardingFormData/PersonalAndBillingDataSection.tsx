@@ -51,7 +51,7 @@ type Props = StepperStepComponentProps & {
   productId?: string;
   retrievedIstat?: string;
   isCityEditable?: boolean;
-  canInvoice: boolean;
+  isInvoiceable: boolean;
   isForeignInsurance?: boolean;
   setInvalidTaxCodeInvoicing: React.Dispatch<React.SetStateAction<boolean>>;
   recipientCodeStatus?: string;
@@ -72,7 +72,7 @@ export default function PersonalAndBillingDataSection({
   institutionAvoidGeotax,
   retrievedIstat,
   isCityEditable,
-  canInvoice,
+  isInvoiceable,
   isForeignInsurance,
   productId,
   setInvalidTaxCodeInvoicing,
@@ -708,7 +708,7 @@ export default function PersonalAndBillingDataSection({
                   ? 3
                   : 0
               }
-              mb={!formik.values.hasVatnumber && canInvoice && isInsuranceCompany ? -3 : 0}
+              mb={!formik.values.hasVatnumber && isInvoiceable && isInsuranceCompany ? -3 : 0}
             >
               {!isForeignInsurance &&
                 formik.values.hasVatnumber &&
@@ -751,7 +751,7 @@ export default function PersonalAndBillingDataSection({
                   <Box
                     display="flex"
                     alignItems="center"
-                    marginBottom={!formik.values.hasVatnumber && canInvoice ? -2 : 0}
+                    marginBottom={!formik.values.hasVatnumber && isInvoiceable ? -2 : 0}
                   >
                     <Checkbox
                       id="party_without_vatnumber"
@@ -813,7 +813,7 @@ export default function PersonalAndBillingDataSection({
                 />
               )}
               {(onboardingFormData?.uoUniqueCode || institutionType === 'PA') &&
-                canInvoice &&
+                isInvoiceable &&
                 taxCodeInvoicingVisible && (
                   <Grid item xs={12} mt={3}>
                     <CustomTextField
@@ -857,7 +857,7 @@ export default function PersonalAndBillingDataSection({
                   </Typography>
                 </Box>
               )}
-              {canInvoice && (
+              {isInvoiceable && (
                 <Grid item xs={12} mt={3}>
                   <CustomTextField
                     {...baseTextFieldProps(

@@ -114,7 +114,7 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
           isPremium ||
           (origin === 'IPA' && institutionType !== 'PA' && institutionType !== 'PSP') ||
           institutionType === 'PA';
-        const canInvoice =
+        const isInvoiceable =
           institutionType !== 'SA' &&
           institutionType !== 'PT' &&
           institutionType !== 'AS' &&
@@ -125,7 +125,7 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
 
         conditionsMap[`${productId}-${institutionType}`] = {
           isPremium,
-          canInvoice,
+          isInvoiceable,
           isInformationCompany,
           isForeignInsurance,
           institutionAvoidGeotax,
@@ -149,7 +149,7 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
             isForeignInsurance={isForeignInsurance}
             institutionAvoidGeotax={institutionAvoidGeotax}
             onboardingFormData={onboardingFormData}
-            canInvoice={canInvoice}
+            isInvoiceable={isInvoiceable}
             isDisabled={isDisabled}
             setInvalidTaxCodeInvoicing={jest.fn()}
           />
@@ -162,7 +162,7 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
 
   Object.keys(conditionsMap).forEach(async (key) => {
     const {
-      canInvoice,
+      isInvoiceable,
       isInformationCompany,
       isForeignInsurance,
       institutionAvoidGeotax,
@@ -238,7 +238,7 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
 
     expect(pec).toBeInTheDocument();
 
-    if (canInvoice) {
+    if (isInvoiceable) {
       expect(sdiCode).toBeInTheDocument();
       fireEvent.change(document.getElementById('recipientCode') as HTMLInputElement, {
         target: { value: 'A1B2C3' },

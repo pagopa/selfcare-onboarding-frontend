@@ -78,7 +78,7 @@ const renderComponent = (
           }}
         >
           <UserContext.Provider
-            value={{ user, setUser, requiredLogin: false, setRequiredLogin: () => { } }}
+            value={{ user, setUser, requiredLogin: false, setRequiredLogin: () => {} }}
           >
             <button onClick={() => onExit?.(() => window.location.assign(ENV.URL_FE.LOGOUT))}>
               LOGOUT
@@ -258,7 +258,9 @@ const executeStepBillingDataWithTaxCodeInvoicing = async () => {
   fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
     target: { value: 'A1B2C3' },
   });
-  await waitFor(() => { expect(screen.getByText('Codice Fiscale SFE')).toBeInTheDocument(); });
+  await waitFor(() => {
+    expect(screen.getByText('Codice Fiscale SFE')).toBeInTheDocument();
+  });
   await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
   fireEvent.click(confirmButtonEnabled);
   await waitFor(() => screen.getByText(stepAddManagerTitle));

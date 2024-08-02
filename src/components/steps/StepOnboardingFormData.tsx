@@ -27,7 +27,7 @@ import UpdateGeotaxonomy from '../onboardingFormData/taxonomy/UpdateGeotaxonomy'
 import GeoTaxonomySection from '../onboardingFormData/taxonomy/GeoTaxonomySection';
 import { useHistoryState } from '../useHistoryState';
 import { VatNumberErrorModal } from '../onboardingFormData/VatNumberErrorModal';
-import { filterByCategory, requiredError } from '../../utils/constants';
+import { canInvoice, filterByCategory, requiredError } from '../../utils/constants';
 import Heading from '../onboardingFormData/Heading';
 import { validateFields } from '../../utils/validateFields';
 import { handleGeotaxonomies } from '../../utils/handleGeotaxonomies';
@@ -120,11 +120,7 @@ export default function StepOnboardingFormData({
       productId === 'prod-pagopa' ||
       productId === 'prod-interop');
   const isProdFideiussioni = productId?.startsWith('prod-fd') ?? false;
-  const canInvoice =
-    institutionType !== 'SA' &&
-    institutionType !== 'PT' &&
-    institutionType !== 'AS' &&
-    productId !== 'prod-interop';
+  const isInvoiceable = canInvoice(institutionType, productId);
   const isForeignInsurance = onboardingFormData?.registerType?.includes('Elenco II');
   const isDisabled =
     isPremium ||
@@ -265,7 +261,7 @@ export default function StepOnboardingFormData({
         isVatRegistrated,
         vatVerificationGenericError,
         isPaymentServiceProvider,
-        canInvoice,
+        isInvoiceable,
         uoSelected,
         isInformationCompany,
         institutionAvoidGeotax,
@@ -466,7 +462,7 @@ export default function StepOnboardingFormData({
           institutionAvoidGeotax={institutionAvoidGeotax}
           retrievedIstat={retrievedIstat}
           isCityEditable={isCityEditable}
-          canInvoice={canInvoice}
+          isInvoiceable={isInvoiceable}
           setInvalidTaxCodeInvoicing={setInvalidTaxCodeInvoicing}
           recipientCodeStatus={recipientCodeStatus}
         />
