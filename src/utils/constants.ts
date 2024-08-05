@@ -200,6 +200,7 @@ export const addUserFlowProducts = (productId: string) =>
   productId === 'prod-interop' ||
   productId === 'prod-pn' ||
   productId === 'prod-io' ||
+  productId === 'prod-io-sign' ||
   productId === 'prod-pagopa';
 
 export const institutionTypes: Array<{ labelKey: string; value: InstitutionType }> = [

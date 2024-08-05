@@ -144,7 +144,7 @@ export default {
       asSubTitle:
         'Se sei una società di assicurazione presente nell’Albo delle <1/>imprese IVASS, inserisci uno dei dati richiesti e cerca l’ente per<3/> cui vuoi richiedere l’adesione a <5>Interoperabilità.</5>',
       scpSubtitle:
-        'Inserisci uno dei dati richiesti e cerca da Infocamere l’ente <3/> per cui vuoi richiedere l’adesione a <5>Interoperabilità.</5>',
+        'Inserisci uno dei dati richiesti e cerca da InfoCamere l’ente <3/> per cui vuoi richiedere l’adesione a <5>Interoperabilità.</5>',
       asyncAutocomplete: {
         placeholder: 'Cerca',
       },

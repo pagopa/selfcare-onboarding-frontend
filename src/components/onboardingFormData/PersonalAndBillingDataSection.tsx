@@ -812,33 +812,6 @@ export default function PersonalAndBillingDataSection({
                   }}
                 />
               )}
-              {(onboardingFormData?.uoUniqueCode || institutionType === 'PA') &&
-                isInvoiceable &&
-                taxCodeInvoicingVisible && (
-                  <Grid item xs={12} mt={3}>
-                    <CustomTextField
-                      {...baseTextFieldProps(
-                        'taxCodeInvoicing',
-                        t('onboardingFormData.billingDataSection.taxCodeInvoicing'),
-                        600,
-                        theme.palette.text.primary
-                      )}
-                      onChange={(e) => {
-                        formik.setFieldValue('taxCodeInvoicing', e.target.value);
-                        if (e.target.value.length === 11) {
-                          void verifyTaxCodeInvoicing(e.target.value);
-                        } else {
-                          setInvalidTaxCodeInvoicing(false);
-                        }
-                      }}
-                      inputProps={{
-                        maxLength: 11,
-                      }}
-                      disabled={disableTaxCodeInvoicing}
-                    />
-                  </Grid>
-                )}
-
               {isPaymentServiceProvider && formik.values.hasVatnumber && (
                 <Box display="flex" alignItems="center" mt="2px">
                   {/* Checkbox la aprtita IVA è di gruppo */}
@@ -894,6 +867,32 @@ export default function PersonalAndBillingDataSection({
                   </Typography>
                 </Grid>
               )}
+              {(uoSelected || institutionType === 'PA') &&
+                canInvoice &&
+                taxCodeInvoicingVisible && (
+                  <Grid item xs={12} mt={3}>
+                    <CustomTextField
+                      {...baseTextFieldProps(
+                        'taxCodeInvoicing',
+                        t('onboardingFormData.billingDataSection.taxCodeInvoicing'),
+                        600,
+                        theme.palette.text.primary
+                      )}
+                      onChange={(e) => {
+                        formik.setFieldValue('taxCodeInvoicing', e.target.value);
+                        if (e.target.value.length === 11) {
+                          void verifyTaxCodeInvoicing(e.target.value);
+                        } else {
+                          setInvalidTaxCodeInvoicing(false);
+                        }
+                      }}
+                      inputProps={{
+                        maxLength: 11,
+                      }}
+                      disabled={disableTaxCodeInvoicing}
+                    />
+                  </Grid>
+                )}
             </Typography>
           </Grid>
           {isInsuranceCompany && (
