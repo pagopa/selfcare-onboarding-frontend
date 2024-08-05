@@ -7,7 +7,6 @@ import { uniqueId } from 'lodash';
 import { EndingPage } from '@pagopa/selfcare-common-frontend/lib';
 import {
   InstitutionType,
-  Party,
   Product,
   RequestOutcomeMessage,
   StepperStepComponentProps,
@@ -23,14 +22,13 @@ import UserNotAllowedPage from '../../UserNotAllowedPage';
 import { AooData } from '../../../model/AooData';
 import { UoData } from '../../../model/UoModel';
 import AlreadyOnboarded from '../../AlreadyOnboarded';
-import { PDNDBusinessResource } from '../../../model/PDNDBusinessResource';
-import { getTaxCode } from '../../../utils/typeGuard-utils';
+import { OnboardingFormData } from '../../../model/OnboardingFormData';
 
 type Props = StepperStepComponentProps & {
   externalInstitutionId: string;
   productId: string;
   selectedProduct?: Product | null;
-  selectedParty?: Party | PDNDBusinessResource;
+  onboardingFormData?: OnboardingFormData;
   aooSelected?: AooData;
   uoSelected?: UoData;
   institutionType?: InstitutionType;
@@ -65,7 +63,7 @@ export function StepVerifyOnboarding({
   externalInstitutionId,
   productId,
   selectedProduct,
-  selectedParty,
+  onboardingFormData,
   aooSelected,
   uoSelected,
   institutionType,
@@ -76,14 +74,13 @@ export function StepVerifyOnboarding({
   const { setRequiredLogin } = useContext(UserContext);
   const requestIdRef = useRef<string>();
   const { t } = useTranslation();
-  const taxId = getTaxCode(selectedParty);
 
   const notAllowedErrorNoParty: RequestOutcomeMessage = {
     title: '',
     description: [
       <>
         <UserNotAllowedPage
-          partyName={(selectedParty as Party)?.description}
+          partyName={onboardingFormData?.businessName}
           productTitle={selectedProduct?.title}
         />
       </>,
@@ -96,7 +93,7 @@ export function StepVerifyOnboarding({
       <>
         <AlreadyOnboarded
           institutionType={institutionType}
-          selectedParty={aooSelected ? aooSelected : uoSelected ? uoSelected : selectedParty}
+          onboardingFormData={onboardingFormData}
           selectedProduct={selectedProduct}
         />
       </>,
@@ -120,15 +117,15 @@ export function StepVerifyOnboarding({
       {
         method: 'HEAD',
         params: {
-          taxCode: taxId,
+          taxCode: onboardingFormData?.taxCode,
           productId,
           subunitCode: aooSelected
             ? aooSelected.codiceUniAoo
             : uoSelected
             ? uoSelected.codiceUniUo
             : undefined,
-          origin: (selectedParty as Party)?.origin,
-          originId: (selectedParty as Party)?.originId,
+          origin: onboardingFormData?.origin,
+          originId: onboardingFormData?.originId,
         },
       },
       () => setRequiredLogin(true)
@@ -141,7 +138,7 @@ export function StepVerifyOnboarding({
     if (restOutcome === 'success') {
       trackEvent('ONBOARDING_PRODUCT_ALREADY_SUBSCRIBED', {
         request_id: requestIdRef.current,
-        party_id: (selectedParty as Party)?.externalId,
+        party_id: onboardingFormData?.externalId,
         product_id: selectedProduct?.id,
       });
       setOutcome(alreadyOnboarded);

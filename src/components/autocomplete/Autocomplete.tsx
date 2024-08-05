@@ -30,7 +30,6 @@ type AutocompleteProps = {
   selectedProduct?: Product;
 };
 
-// eslint-disable-next-line sonarjs/cognitive-complexity
 export function Autocomplete({
   selected,
   setSelected,

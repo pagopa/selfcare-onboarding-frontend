@@ -146,7 +146,7 @@ export const mockPartyRegistry = {
       'IPA',
       'c723',
       'via lombardia',
-      'istat2'
+      '082050'
     ),
     createPartyRegistryEntity(
       'onboarded',
