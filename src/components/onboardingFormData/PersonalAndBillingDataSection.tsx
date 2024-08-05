@@ -852,7 +852,6 @@ export default function PersonalAndBillingDataSection({
                       },
                     }}
                   />
-                  {/* Description for recipient code */}
                   <Typography
                     component={'span'}
                     sx={{
@@ -867,8 +866,8 @@ export default function PersonalAndBillingDataSection({
                   </Typography>
                 </Grid>
               )}
-              {(uoSelected || institutionType === 'PA') &&
-                canInvoice &&
+              {(onboardingFormData?.uoUniqueCode || institutionType === 'PA') &&
+                isInvoiceable &&
                 taxCodeInvoicingVisible && (
                   <Grid item xs={12} mt={3}>
                     <CustomTextField
