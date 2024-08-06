@@ -12,7 +12,12 @@ import { canInvoice, filterByCategory } from '../../../utils/constants';
 import { createMemoryHistory } from 'history';
 import { Router } from 'react-router-dom';
 import userEvent from '@testing-library/user-event';
-import { mockedParties, mockPartyRegistry } from '../../../lib/__mocks__/mockApiRequests';
+import {
+  mockedAoos,
+  mockedParties,
+  mockedUos,
+  mockPartyRegistry,
+} from '../../../lib/__mocks__/mockApiRequests';
 
 jest.mock('../../../lib/api-utils');
 jest.setTimeout(40000);
@@ -133,7 +138,7 @@ test('Test: Successfull complete onboarding request of AOO party for product pro
   await executeStepBillingData('prod-interop', 'pa', true, false, true, 'denominazione aoo test 1');
   await executeStepAddManager();
   await executeStepAddAdmin(true);
-  // TODO VERIFY SUBMIT
+  await verifySubmit('prod-interop', 'PA', false, false, false, 'aooCode');
   await executeGoHome(true);
 });
 
@@ -144,7 +149,7 @@ test('Test: Successfull complete onboarding request of UO party for product prod
   await executeStepBillingData('prod-io-sign', 'pa', false, true, true, 'denominazione uo test 1');
   await executeStepAddManager();
   await executeStepAddAdmin(true);
-  // TODO VERIFY SUBMIT
+  await verifySubmit('prod-io-sign', 'PA', false, true, false, 'uoCode');
   await executeGoHome(true);
 });
 
@@ -190,7 +195,14 @@ test('Test: Successfull complete onboarding request of GSP party without search 
   await executeGoHome(true);
 });
 
-// TODO TEST COMPLETE PT
+test('Test: Successfull complete onboarding request of PT for product prod-pagopa', async () => {
+  renderComponent('prod-pagopa');
+  await executeStepInstitutionType('prod-pagopa', 'pt');
+  await executeStepBillingData('prod-pagopa', 'pt', false, false, false);
+  await executeStepAddAdmin(true, true);
+  await verifySubmit('prod-pagopa', 'PT', true);
+  await executeGoHome(true);
+});
 
 // TODO TEST COMPLETE AS
 
@@ -198,9 +210,9 @@ test('Test: Successfull complete onboarding request of GSP party without search 
 
 // TODO TEST COMPLETE PSP
 
-// TODO TEST COMPLETE SCP PDND INFOCAMERE
-
 // TODO PA APP IO AGGREGATOR PARTY (IS AGGREGATE, UPLOAD AGGREGATE CSV ETC)
+
+// TODO TEST COMPLETE SCP PDND INFOCAMERE
 
 test('Test: Error on submit onboarding request of pa party for prod-io search by business name', async () => {
   renderComponent('prod-io');
@@ -213,8 +225,7 @@ test('Test: Error on submit onboarding request of pa party for prod-io search by
   await executeGoHome(true);
 });
 
-// TODO CAN THIS MERGE WITH executeStepSearchParty
-test('Test: The addUser button in already onboarded party error page should redirect to add new user flow', async () => {
+test('Test: Party already onboarded for a product that allow add new user, so the link is available', async () => {
   renderComponent('prod-pagopa');
   await executeStepInstitutionType('prod-pagopa', 'pa');
   await executeStepSearchParty(
@@ -228,8 +239,8 @@ test('Test: The addUser button in already onboarded party error page should redi
   );
   await waitFor(() => screen.getByText(/L’ente selezionato ha già aderito/));
 
-  const addNewUser = screen.getByText('Aggiungi un nuovo Amministratore');
-  await waitFor(() => fireEvent.click(addNewUser));
+  const addNewUserLink = screen.getByText('Aggiungi un nuovo Amministratore');
+  await waitFor(() => fireEvent.click(addNewUserLink));
 
   expect(history.length).toBe(1);
 });
@@ -382,6 +393,8 @@ const executeStepInstitutionType = async (productSelected: string, institutionTy
     expect(confirmButtonEnabled).toBeEnabled();
 
     fireEvent.click(confirmButtonEnabled);
+  } else {
+    await fillInstitutionTypeCheckbox('pa');
   }
 };
 
@@ -514,13 +527,12 @@ const executeStepBillingData = async (
   isAoo: boolean = false,
   isUo: boolean = false,
   fromIpa: boolean = true,
-  partyName: string
+  partyName?: string
 ) => {
   console.log('Testing step Billing Data..');
   await waitFor(() => screen.getByText('Inserisci i dati dell’ente'));
 
-  // TODO MANAGE ALL CASES
-  if (!isAoo && !isUo) {
+  if (!fromIpa) {
     await fillUserBillingDataForm(
       'businessName',
       'registeredOffice',
@@ -533,7 +545,8 @@ const executeStepBillingData = async (
       'rea',
       'city-select',
       'county',
-      fromIpa
+      fromIpa,
+      institutionType
     );
   } else {
     fireEvent.change(document.getElementById('vatNumber') as HTMLElement, {
@@ -546,7 +559,7 @@ const executeStepBillingData = async (
 
   const confirmButton = screen.getByRole('button', { name: 'Continua' });
 
-  const isInvoicable = canInvoice(institutionType, productId);
+  const isInvoicable = canInvoice(institutionType.toUpperCase(), productId);
   const recipientCodeInput =
     partyName === 'AGENCY ERROR'
       ? 'A2B3C4'
@@ -638,9 +651,9 @@ const executeStepBillingData = async (
     expect(document.getElementById('taxCodeInvoicing')).not.toBeInTheDocument();
   }
 
-  // TODO MANAGE ALL CASES
-  if (!isAoo && !isUo && !fromIpa) {
+  if (!fromIpa) {
     await checkCorrectBodyBillingData(
+      institutionType,
       'businessNameInput',
       'registeredOfficeInput',
       'a@a.it',
@@ -775,10 +788,10 @@ const executeStepAddAdmin = async (
   console.log('Testing step add admin..');
 
   await waitFor(() => screen.getByText("Indica l'Amministratore"));
-  const [_, confirmButton] = await checkBackForwardNavigation(
-    'Indica il Legale Rappresentante',
-    "Indica l'Amministratore"
-  );
+
+  const prevStep = isTechPartner ? 'Inserisci i dati dell’ente' : 'Indica il Legale Rappresentante';
+
+  const [_, confirmButton] = await checkBackForwardNavigation(prevStep, "Indica l'Amministratore");
 
   const addDelegateButton = screen.getByRole('button', {
     name: 'Aggiungi un altro Amministratore',
@@ -795,21 +808,23 @@ const executeStepAddAdmin = async (
     'a@a.AA',
     true,
     'SRNNMA80A01A794F',
-    1,
+    isTechPartner ? 0 : 1,
     'b@b.bb',
-    1
+    isTechPartner ? 0 : 1
   );
 
   await waitFor(() => expect(confirmButton).toBeEnabled());
 
   expect(addDelegateButton).toBeEnabled();
-  await waitFor(() => checkAdditionalUsers(confirmButton));
+  await waitFor(() => checkAdditionalUsers(confirmButton, isTechPartner));
 
   await waitFor(() => fireEvent.click(confirmButton));
 
-  const confimationModalBtn = await waitFor(() => screen.getByText('Conferma'));
+  if (!isTechPartner) {
+    const confimationModalBtn = await waitFor(() => screen.getByText('Conferma'));
 
-  await waitFor(() => fireEvent.click(confimationModalBtn));
+    await waitFor(() => fireEvent.click(confimationModalBtn));
+  }
 
   await waitFor(() =>
     screen.getByText(
@@ -830,7 +845,6 @@ const checkCertifiedUserValidation = async (prefix: string, confirmButton: HTMLE
 
 const fillInstitutionTypeCheckbox = async (element: string) => {
   const selectedInstitutionType = document.getElementById(element) as HTMLElement;
-  expect(selectedInstitutionType).not.toBeChecked();
   fireEvent.click(selectedInstitutionType);
   await waitFor(() => expect(selectedInstitutionType).toBeChecked());
 };
@@ -847,7 +861,8 @@ const fillUserBillingDataForm = async (
   rea?: string,
   city?: string,
   province?: string,
-  fromIpa: boolean = true
+  fromIpa: boolean = true,
+  institutionType?: string
 ) => {
   if (!fromIpa) {
     fireEvent.change(document.getElementById(businessNameInput) as HTMLElement, {
@@ -874,7 +889,7 @@ const fillUserBillingDataForm = async (
     fireEvent.click(option);
     expect(document.getElementById(province) as HTMLElement).toHaveValue('MI');
 
-    if (rea) {
+    if (institutionType !== 'pt') {
       fireEvent.change(document.getElementById(rea) as HTMLInputElement, {
         target: { value: 'MI-12345' },
       });
@@ -888,11 +903,10 @@ const fillUserBillingDataForm = async (
     target: { value: '00000000000' },
   });
 
-  fireEvent.change(document.getElementById(recipientCode) as HTMLElement, {
-    target: { value: 'A1B2C3D' },
-  });
-
-  if (supportEmail) {
+  if (institutionType !== 'pt') {
+    fireEvent.change(document.getElementById(recipientCode) as HTMLElement, {
+      target: { value: 'A1B2C3D' },
+    });
     fireEvent.change(document.getElementById(supportEmail) as HTMLInputElement, {
       target: { value: 'a@a.it' },
     });
@@ -1001,6 +1015,7 @@ const checkLoggedUserAsAdminCheckbox = async (
 };
 
 const checkCorrectBodyBillingData = (
+  institutionType: string,
   expectedBusinessName: string = '',
   expectedRegisteredOfficeInput: string = '',
   expectedMailPEC: string = '',
@@ -1023,11 +1038,15 @@ const checkCorrectBodyBillingData = (
   expect((document.getElementById('zipCode') as HTMLInputElement).value).toBe(expectedZipCode);
   expect((document.getElementById('taxCode') as HTMLInputElement).value).toBe(expectedTaxCode);
   expect((document.getElementById('vatNumber') as HTMLInputElement).value).toBe(expectedVatNumber);
-  expect((document.getElementById('recipientCode') as HTMLInputElement).value).toBe(
-    expectedRecipientCode
-  );
+
   expect((document.getElementById('city-select') as HTMLInputElement).value).toBe(expectedCity);
   expect((document.getElementById('county') as HTMLInputElement).value).toBe(expectedProvince);
+
+  if (institutionType !== 'pt') {
+    expect((document.getElementById('recipientCode') as HTMLInputElement).value).toBe(
+      expectedRecipientCode
+    );
+  }
 };
 
 const clickAdminCheckBoxAndTestValues = (
@@ -1052,11 +1071,11 @@ const clickAdminCheckBoxAndTestValues = (
   expect(addDelegateButton).toBeDisabled();
 };
 
-const checkAdditionalUsers = async (confirmButton: HTMLElement) => {
+const checkAdditionalUsers = async (confirmButton: HTMLElement, isTechPartner: boolean) => {
   console.log('Adding additional user');
   await checkRemovingEmptyAdditionalUser(0, confirmButton);
 
-  await fillAdditionalUserAndCheckUniqueValues(0, confirmButton);
+  await fillAdditionalUserAndCheckUniqueValues(0, confirmButton, isTechPartner);
 };
 
 const checkRemovingEmptyAdditionalUser = async (index: number, confirmButton: HTMLElement) => {
@@ -1125,7 +1144,8 @@ const searchUserFormFromRemoveBtn = (removeButton: HTMLElement) => {
 };
 const fillAdditionalUserAndCheckUniqueValues = async (
   index: number,
-  confirmButton: HTMLElement
+  confirmButton: HTMLElement,
+  isTechPartner: boolean
 ) => {
   const removeUserButtons = await addAdditionEmptyUser(index, confirmButton);
 
@@ -1145,16 +1165,16 @@ const fillAdditionalUserAndCheckUniqueValues = async (
     email,
     true,
     'SRNNMA80A01A794F',
-    1,
+    isTechPartner ? 0 : 1,
     'b@b.bb',
-    1
+    isTechPartner ? 0 : 1
   );
   await checkAlreadyExistentValues(
     prefix,
     confirmButton,
     'SRNNMA80A01A794F',
     taxCode,
-    1,
+    isTechPartner ? 0 : 1,
     'a@a.aa',
     email,
     2
@@ -1164,7 +1184,7 @@ const fillAdditionalUserAndCheckUniqueValues = async (
     confirmButton,
     'SRNNMA80A01A794F',
     taxCode,
-    1,
+    isTechPartner ? 0 : 1,
     'a@a.aa',
     email,
     2
@@ -1172,6 +1192,7 @@ const fillAdditionalUserAndCheckUniqueValues = async (
 };
 
 const billingData2billingDataRequest = (
+  institutionType: string,
   SfeAvailable?: boolean,
   withoutIpa?: boolean,
   errorOnSubmit?: boolean,
@@ -1183,6 +1204,10 @@ const billingData2billingDataRequest = (
     ? 'businessNameInput'
     : typeOfSearch === 'taxCode'
     ? mockedParties[0].description
+    : typeOfSearch === 'aooCode'
+    ? mockedAoos[0].denominazioneAoo
+    : typeOfSearch === 'uoCode'
+    ? mockedUos[0].descrizioneUo
     : mockPartyRegistry.items[0].description,
   registeredOffice: errorOnSubmit
     ? mockPartyRegistry.items[1].address
@@ -1190,6 +1215,10 @@ const billingData2billingDataRequest = (
     ? 'registeredOfficeInput'
     : typeOfSearch === 'taxCode'
     ? mockedParties[0].address
+    : typeOfSearch === 'aooCode'
+    ? mockedAoos[0].indirizzo
+    : typeOfSearch === 'uoCode'
+    ? mockedUos[0].indirizzo
     : mockPartyRegistry.items[0].address,
   digitalAddress: errorOnSubmit
     ? mockPartyRegistry.items[1].digitalAddress
@@ -1197,6 +1226,10 @@ const billingData2billingDataRequest = (
     ? 'a@a.it'
     : typeOfSearch === 'taxCode'
     ? mockedParties[0].digitalAddress
+    : typeOfSearch === 'aooCode'
+    ? mockedAoos[0].mail1
+    : typeOfSearch === 'uoCode'
+    ? mockedUos[0].mail1
     : mockPartyRegistry.items[0].digitalAddress,
   zipCode: errorOnSubmit
     ? mockPartyRegistry.items[1].zipCode
@@ -1204,6 +1237,10 @@ const billingData2billingDataRequest = (
     ? '09010'
     : typeOfSearch === 'taxCode'
     ? mockedParties[0].zipCode
+    : typeOfSearch === 'aooCode'
+    ? mockedAoos[0].CAP
+    : typeOfSearch === 'uoCode'
+    ? mockedUos[0].CAP
     : mockPartyRegistry.items[0].zipCode,
   taxCode: errorOnSubmit
     ? mockPartyRegistry.items[1].taxCode
@@ -1211,6 +1248,10 @@ const billingData2billingDataRequest = (
     ? '00000000000'
     : typeOfSearch === 'taxCode'
     ? mockedParties[0].taxCode
+    : typeOfSearch === 'aooCode'
+    ? mockedAoos[0].codiceFiscaleEnte
+    : typeOfSearch === 'uoCode'
+    ? mockedUos[0].codiceFiscaleEnte
     : mockPartyRegistry.items[0].taxCode,
   taxCodeInvoicing: SfeAvailable
     ? errorOnSubmit
@@ -1219,8 +1260,14 @@ const billingData2billingDataRequest = (
       ? '998877665544'
       : '87654321098'
     : undefined,
-  vatNumber: '00000000000',
-  recipientCode: errorOnSubmit ? 'A2B3C4' : typeOfSearch === 'taxCode' ? 'A3B4C5' : 'A1B2C3',
+  vatNumber: withoutIpa ? '00000000000' : '11111111111',
+  recipientCode: errorOnSubmit
+    ? 'A2B3C4'
+    : typeOfSearch === 'taxCode'
+    ? 'A3B4C5'
+    : typeOfSearch === 'aooCode' || institutionType === 'PT'
+    ? undefined
+    : 'A1B2C3',
 });
 
 const verifySubmit = async (
@@ -1240,6 +1287,7 @@ const verifySubmit = async (
       {
         data: {
           billingData: billingData2billingDataRequest(
+            institutionType,
             SfeAvailable,
             withoutIpa,
             errorOnSubmit,
@@ -1254,6 +1302,10 @@ const verifySubmit = async (
             ? mockPartyRegistry.items[1].originId
             : typeOfSearch === 'taxCode'
             ? mockedParties[0].originId
+            : typeOfSearch === 'aooCode'
+            ? mockedAoos[0].codiceUniAoo
+            : typeOfSearch === 'uoCode'
+            ? mockedUos[0].codiceUniUo
             : '991',
           taxCode: errorOnSubmit
             ? mockPartyRegistry.items[1].taxCode
@@ -1261,6 +1313,10 @@ const verifySubmit = async (
             ? '00000000000'
             : typeOfSearch === 'taxCode'
             ? mockedParties[0].taxCode
+            : typeOfSearch === 'aooCode'
+            ? mockedAoos[0].codiceFiscaleEnte
+            : typeOfSearch === 'uoCode'
+            ? mockedUos[0].codiceFiscaleEnte
             : mockPartyRegistry.items[0].taxCode,
           additionalInformations:
             productId === 'prod-pagopa' && institutionType === 'GSP'
@@ -1277,11 +1333,11 @@ const verifySubmit = async (
                 }
               : undefined,
           companyInformations:
-            institutionType === 'GSP' && productId === 'prod-pagopa'
-              ? withoutIpa
+            institutionType === 'GSP' || institutionType === 'PT'
+              ? withoutIpa && productId === 'prod-pagopa'
                 ? {
                     businessRegisterPlace: undefined,
-                    rea: 'MI-12345',
+                    rea: institutionType === 'PT' ? undefined : 'MI-12345',
                     shareCapital: undefined,
                   }
                 : {
@@ -1313,7 +1369,7 @@ const verifySubmit = async (
               surname: 'SURNAME',
               taxCode: 'SRNNMA80A01F205T',
             },
-          ],
+          ].filter((u) => (institutionType === 'PT' ? u.role !== 'MANAGER' : u)),
           pricingPlan: 'FA',
           geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY
             ? [{ code: nationalValue, desc: 'ITALIA' }]
@@ -1323,68 +1379,20 @@ const verifySubmit = async (
             country: 'IT',
             county: 'MI',
           },
-          assistanceContacts: { supportEmail: 'a@a.it' },
-          subunitCode: undefined,
-          subunitType: undefined,
+          assistanceContacts: {
+            supportEmail:
+              institutionType !== 'PT' ? (withoutIpa ? 'a@a.it' : 'mail@mailtest.com') : undefined,
+          },
+          subunitType:
+            typeOfSearch === 'aooCode' ? 'AOO' : typeOfSearch === 'uoCode' ? 'UO' : undefined,
+          subunitCode:
+            typeOfSearch === 'aooCode'
+              ? mockedAoos[0].codiceUniAoo
+              : typeOfSearch === 'uoCode'
+              ? mockedUos[0].codiceUniUo
+              : undefined,
           aggregates: undefined,
           isAggregator: undefined,
-        },
-        method: 'POST',
-      },
-      expect.any(Function)
-    )
-  );
-};
-
-const verifySubmitPt = async (productId = 'prod-io-sign') => {
-  await waitFor(() =>
-    expect(fetchWithLogsSpy).lastCalledWith(
-      {
-        endpoint: 'ONBOARDING_POST_LEGALS',
-      },
-      {
-        data: {
-          billingData: billingData2billingDataRequest(),
-          pspData: undefined,
-          institutionType: 'PT',
-          origin: undefined,
-          users: [
-            {
-              email: 'b@b.bb',
-              name: 'NAME',
-              role: 'MANAGER',
-              surname: 'SURNAME',
-              taxCode: 'SRNNMA80A01A794F',
-            },
-            {
-              email: 'a@a.aa',
-              name: 'NAME',
-              role: 'DELEGATE',
-              surname: 'SURNAME',
-              taxCode: 'SRNNMA80A01B354S',
-            },
-            {
-              email: '0@z.zz',
-              name: 'NAME',
-              role: 'DELEGATE',
-              surname: 'SURNAME',
-              taxCode: 'SRNNMA80A01F205T',
-            },
-          ],
-          pricingPlan: 'FA',
-          geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY
-            ? [{ code: nationalValue, desc: 'ITALIA' }]
-            : [],
-          assistanceContacts: { supportEmail: undefined },
-          productId,
-          subunitCode: undefined,
-          subunitType: undefined,
-          taxCode: '00000000000',
-          companyInformations: {
-            businessRegisterPlace: undefined,
-            rea: undefined,
-            shareCapital: undefined,
-          },
         },
         method: 'POST',
       },
