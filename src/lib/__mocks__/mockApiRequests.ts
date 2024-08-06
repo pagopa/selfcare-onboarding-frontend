@@ -289,7 +289,7 @@ const mockedBaseParties: Array<SelfcareParty> = [
   },
 ];
 
-const mockedParties = [
+export const mockedParties = [
   createPartyEntity(
     '33445673222',
     '8576',
@@ -448,10 +448,10 @@ export const mockedGeotaxonomies: Array<GeographicTaxonomyResource> = [
     country: '100',
     enabled: true,
     code: '082053',
-    desc: 'PALERMO - COMUNE',
+    desc: 'MILANO - COMUNE',
     istat_code: '082050',
     province_id: '082',
-    province_abbreviation: 'PA',
+    province_abbreviation: 'MI',
     region_id: '19',
     country_abbreviation: 'IT',
   },
@@ -532,6 +532,46 @@ export const mockedUos: Array<UoData> = [
     dataAggiornamento: '2020-10-10',
     dataIstituzione: '2017-10-15',
     indirizzo: 'Via Venezia 3',
+    tipoMail1: 'Pec',
+  },
+  {
+    codiceFiscaleEnte: '11111111111',
+    codiceFiscaleSfe: '75656445456',
+    codiceIpa: 'ABCDEF12',
+    codiceUniUo: 'A2B3C4',
+    codiceUniUoPadre: '',
+    denominazioneEnte: 'denominazione uo test 5',
+    descrizioneUo: 'Unità operativa 5',
+    id: 'A2B3C4',
+    mail1: 'test5@fnofi.it',
+    origin: 'IPA',
+    CAP: '12345',
+    codiceCatastaleComune: '8974',
+    codiceComuneISTAT: '082050',
+    cognomeResponsabile: 'Bianchi',
+    dataAggiornamento: '2020-10-10',
+    dataIstituzione: '2017-10-15',
+    indirizzo: 'Via Roma 3',
+    tipoMail1: 'Pec',
+  },
+  {
+    codiceFiscaleEnte: '33445673222',
+    codiceFiscaleSfe: '998877665544',
+    codiceIpa: 'ABCDEF12',
+    codiceUniUo: 'A3B4C5',
+    codiceUniUoPadre: '',
+    denominazioneEnte: 'denominazione uo test 12',
+    descrizioneUo: 'Unità operativa 12',
+    id: 'A3B4C5',
+    mail1: 'test5@fnofi.it',
+    origin: 'IPA',
+    CAP: '12345',
+    codiceCatastaleComune: '8974',
+    codiceComuneISTAT: '082050',
+    cognomeResponsabile: 'Bianchi',
+    dataAggiornamento: '2020-10-10',
+    dataIstituzione: '2017-10-15',
+    indirizzo: 'Via Roma 3',
     tipoMail1: 'Pec',
   },
   // use case without codiceFiscaleSfe
@@ -931,6 +971,8 @@ const mockedOnboardingRequestData: Array<OnboardingRequestData> = [
 
 const mockRecipientCodeValidation = [
   { code: 'A1B2C3', value: 'ACCEPTED' },
+  { code: 'A2B3C4', value: 'ACCEPTED' },
+  { code: 'A3B4C5', value: 'ACCEPTED' },
   { code: 'AABBC1', value: 'DENIED_NO_ASSOCIATION' },
   { code: '2A3B4C', value: 'DENIED_NO_BILLING' },
 ];

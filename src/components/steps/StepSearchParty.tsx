@@ -376,6 +376,7 @@ export function StepSearchParty({
                       1: <br />,
                       2: (
                         <Link
+                          id="no_ipa"
                           sx={{
                             textDecoration: 'underline',
                             color: theme.palette.primary.main,

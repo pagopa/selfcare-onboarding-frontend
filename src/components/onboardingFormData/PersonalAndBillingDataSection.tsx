@@ -461,6 +461,7 @@ export default function PersonalAndBillingDataSection({
                 />
               ) : (
                 <Autocomplete
+                  data-testid="city-autocomplete"
                   id="city-select"
                   onInput={(e: React.ChangeEvent<HTMLInputElement>) => {
                     const value = e.target.value;
@@ -536,6 +537,7 @@ export default function PersonalAndBillingDataSection({
                             ? formik.values.city
                             : params.inputProps.value,
                       }}
+                      id="city-field"
                       label={t('onboardingFormData.billingDataSection.city')}
                       InputLabelProps={{
                         shrink: (formik.values.city && formik.values.city !== '') || shrinkCity,
@@ -930,7 +932,6 @@ export default function PersonalAndBillingDataSection({
                 />
               </Grid>
               <Grid item xs={6}>
-                {/* REA facoltativo per institution Type !== 'PA' e 'PSP */}
                 <CustomTextField
                   placeholder={'RM-123456'}
                   {...baseTextFieldProps(
