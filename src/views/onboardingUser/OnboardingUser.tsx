@@ -114,12 +114,12 @@ function OnboardingUserComponent() {
         method: 'POST',
         data: {
           productId: selectedProduct?.id,
-          institutionType,
-          origin: selectedParty?.origin,
+          institutionType: onboardingFormData?.institutionType ?? institutionType,
+          origin: onboardingFormData?.origin,
           originId: onboardingFormData?.originId,
           subunitCode: selectedParty?.codiceUniUo
             ? selectedParty.codiceUniUo
-            : selectedParty?.codiceUniAoo,
+            : selectedParty?.codiceUniAoo ?? onboardingFormData?.originId,
           taxCode: onboardingFormData?.taxCode,
           users,
         },
