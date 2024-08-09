@@ -1,7 +1,6 @@
 import { Box, styled } from '@mui/system';
 import { PartyAccountItemButton } from '@pagopa/mui-italia/dist/components/PartyAccountItemButton';
-import { InstitutionResource } from '../../../../../model/InstitutionResource';
-import { ANACParty } from '../../../../../../types';
+import { PartyData } from '../../../../../../types';
 
 const CustomBox = styled(Box)({
   /* width */
@@ -30,8 +29,8 @@ type Props = {
   isLoading: boolean;
   getOptionLabel: (option: any) => string;
   getOptionKey: (option: any) => string;
-  cfResult?: InstitutionResource | ANACParty;
-  setCfResult: React.Dispatch<React.SetStateAction<InstitutionResource | ANACParty | undefined>>;
+  cfResult?: PartyData;
+  setCfResult: React.Dispatch<React.SetStateAction<PartyData | undefined>>;
   uoResult?: any;
   aooResult?: any;
   isTaxCodeSelected?: boolean;
@@ -84,7 +83,7 @@ export default function AsyncAutocompleteResultsCode({
                 ? aooResult?.denominazioneAoo.toLocaleLowerCase()
                 : isUoCodeSelected && uoResult?.descrizioneUo
                 ? uoResult?.descrizioneUo.toLocaleLowerCase()
-                : (cfResult as any).businessName
+                : visibleCode?.description ?? visibleCode?.businessName
             }
             partyRole={
               !isTaxCodeSelected && aooResult

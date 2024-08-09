@@ -23,7 +23,7 @@ export type OnboardingFormData = {
   vatNumberGroup?: boolean;
   dpoAddress?: string;
   dpoPecAddress?: string;
-  dopEmailAddress?: string;
+  dpoEmailAddress?: string;
   businessRegisterPlace?: string;
   rea?: string;
   shareCapital?: string;
@@ -36,4 +36,8 @@ export type OnboardingFormData = {
   hasVatnumber?: boolean;
   origin?: string;
   isAggregator?: boolean;
+  externalId?: string;
+  istatCode?: string;
+  registerType?: string;
+  originIdEc?: string;
 };

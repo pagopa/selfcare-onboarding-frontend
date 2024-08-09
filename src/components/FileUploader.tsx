@@ -49,7 +49,7 @@ export function FileUploader({
       alignItems="center"
       justifyContent="center"
     >
-      <input {...getInputProps()} />
+      <input id="file-uploader" {...getInputProps()} />
 
       {uploadedFiles && uploadedFiles.length > 0 ? (
         <FileUploadedPreview

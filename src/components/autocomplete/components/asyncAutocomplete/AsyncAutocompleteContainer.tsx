@@ -6,17 +6,16 @@ import { Dispatch, SetStateAction, useContext, useEffect, useState } from 'react
 import { useTranslation } from 'react-i18next';
 import OnboardingPartyIcon from '../../../../assets/onboarding_party_icon.svg';
 import {
-  ANACParty,
   ApiEndpointKey,
   Endpoint,
   InstitutionType,
+  PartyData,
   Product,
 } from '../../../../../types';
 import { fetchWithLogs } from '../../../../lib/api-utils';
 import { UserContext } from '../../../../lib/context';
 import { getFetchOutcome } from '../../../../lib/error-utils';
 import { AooData } from '../../../../model/AooData';
-import { InstitutionResource } from '../../../../model/InstitutionResource';
 import { UoData } from '../../../../model/UoModel';
 import { ENV } from '../../../../utils/env';
 import {
@@ -44,8 +43,8 @@ type Props = {
   theme: Theme;
   options: Array<any>;
   isSearchFieldSelected: boolean;
-  setCfResult: React.Dispatch<React.SetStateAction<InstitutionResource | ANACParty | undefined>>;
-  cfResult?: InstitutionResource | ANACParty;
+  setCfResult: React.Dispatch<React.SetStateAction<PartyData | undefined>>;
+  cfResult?: PartyData;
   product?: Product | null;
   isAooCodeSelected: boolean;
   isUoCodeSelected: boolean;
@@ -194,11 +193,7 @@ export default function AsyncAutocompleteContainer({
     const outcome = getFetchOutcome(searchResponse);
 
     if (outcome === 'success') {
-      if (addUser) {
-        setCfResult((searchResponse as AxiosResponse).data[0]);
-      } else {
-        setCfResult((searchResponse as AxiosResponse).data);
-      }
+      setCfResult((searchResponse as AxiosResponse).data);
     } else if ((searchResponse as AxiosError).response?.status === 404) {
       setCfResult(undefined);
     }
@@ -230,13 +225,11 @@ export default function AsyncAutocompleteContainer({
     const outcome = getFetchOutcome(searchResponse);
 
     if (outcome === 'success') {
-      if (addUser) {
-        setAooResult((searchResponse as AxiosResponse).data[0]);
-        setAooResultHistory((searchResponse as AxiosResponse).data[0]);
-      } else {
-        setAooResult((searchResponse as AxiosResponse).data);
-        setAooResultHistory((searchResponse as AxiosResponse).data);
-      }
+      const response = addUser
+        ? (searchResponse as AxiosResponse).data[0] ?? (searchResponse as AxiosResponse).data
+        : (searchResponse as AxiosResponse).data;
+      setAooResult(response);
+      setAooResultHistory(response);
     } else if ((searchResponse as AxiosError).response?.status === 404) {
       setAooResult(undefined);
     }
@@ -269,13 +262,11 @@ export default function AsyncAutocompleteContainer({
     const outcome = getFetchOutcome(searchResponse);
 
     if (outcome === 'success') {
-      if (addUser) {
-        setUoResult((searchResponse as AxiosResponse).data[0]);
-        setUoResultHistory((searchResponse as AxiosResponse).data[0]);
-      } else {
-        setUoResult((searchResponse as AxiosResponse).data);
-        setUoResultHistory((searchResponse as AxiosResponse).data);
-      }
+      const response = addUser
+        ? (searchResponse as AxiosResponse).data[0] ?? (searchResponse as AxiosResponse).data
+        : (searchResponse as AxiosResponse).data;
+      setUoResult(response);
+      setUoResultHistory(response);
     } else if ((searchResponse as AxiosError).response?.status === 404) {
       setUoResult(undefined);
     }
@@ -296,7 +287,7 @@ export default function AsyncAutocompleteContainer({
         endpoint,
         endpointParams: addUser
           ? undefined
-          : institutionType === 'SA'
+          : institutionType === 'SA' || institutionType === 'AS'
           ? { taxId: query }
           : { code: query },
       },
@@ -308,9 +299,11 @@ export default function AsyncAutocompleteContainer({
     );
 
     const outcome = getFetchOutcome(searchResponse);
-
     if (outcome === 'success') {
-      setCfResult((searchResponse as AxiosResponse).data);
+      const response = addUser
+        ? (searchResponse as AxiosResponse).data[0] ?? (searchResponse as AxiosResponse).data
+        : (searchResponse as AxiosResponse).data;
+      setCfResult(response);
     } else if ((searchResponse as AxiosError).response?.status === 404) {
       setCfResult(undefined);
     }
@@ -318,7 +311,7 @@ export default function AsyncAutocompleteContainer({
     setIsLoading(false);
   };
 
-  const seachByInstitutionType = (value: string, institutionType?: string) => {
+  const searchByInstitutionType = (value: string, institutionType?: string) => {
     switch (institutionType) {
       case 'AS':
         void debounce(handleSearchByName, 100)(value, {
@@ -373,7 +366,7 @@ export default function AsyncAutocompleteContainer({
     if (value !== '') {
       setSelected(null);
       if (value.length >= 3 && isBusinessNameSelected && !isTaxCodeSelected) {
-        seachByInstitutionType(value, institutionType);
+        searchByInstitutionType(value, institutionType);
       } else if (
         (isTaxCodeSelected && value.length === 11) ||
         (isIvassCodeSelected && value.length === 5)
@@ -408,8 +401,7 @@ export default function AsyncAutocompleteContainer({
         const endpoint = addUser ? 'ONBOARDING_GET_INSTITUTIONS' : 'ONBOARDING_GET_UO_CODE_INFO';
         void handleSearchByUoCode(addUser, endpoint, params, value);
       }
-    }
-    if (value === '') {
+    } else {
       setSelected(null);
     }
     if (selected) {

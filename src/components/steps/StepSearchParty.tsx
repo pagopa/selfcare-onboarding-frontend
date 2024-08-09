@@ -5,13 +5,7 @@ import { ReactElement, useContext, useEffect, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import Checkbox from '@mui/material/Checkbox';
 import { SessionModal } from '@pagopa/selfcare-common-frontend/lib';
-import {
-  IPACatalogParty,
-  InstitutionType,
-  Party,
-  Product,
-  StepperStepComponentProps,
-} from '../../../types';
+import { InstitutionType, Product, PartyData, StepperStepComponentProps } from '../../../types';
 import { fetchWithLogs } from '../../lib/api-utils';
 import { UserContext } from '../../lib/context';
 import { getFetchOutcome } from '../../lib/error-utils';
@@ -23,6 +17,7 @@ import { Autocomplete } from '../autocomplete/Autocomplete';
 import { useHistoryState } from '../useHistoryState';
 import { filterByCategory, noMandatoryIpaProducts } from '../../utils/constants';
 import { ENV } from '../../utils/env';
+import { selected2OnboardingData } from '../../utils/selected2OnboardingData';
 
 type Props = {
   subTitle: string | ReactElement;
@@ -37,7 +32,7 @@ type Props = {
 const handleSearchExternalId = async (
   externalInstitutionId: string,
   onRedirectToLogin: () => void
-): Promise<IPACatalogParty | null> => {
+): Promise<PartyData | null> => {
   const searchResponse = await fetchWithLogs(
     {
       endpoint: 'ONBOARDING_GET_PARTY',
@@ -50,12 +45,12 @@ const handleSearchExternalId = async (
   const outcome = getFetchOutcome(searchResponse);
 
   if (outcome === 'success') {
-    return (searchResponse as AxiosResponse).data as IPACatalogParty;
+    return (searchResponse as AxiosResponse).data;
   }
 
   return null;
 };
-// TODO remove cognitive-complexity
+
 // eslint-disable-next-line sonarjs/cognitive-complexity
 export function StepSearchParty({
   subTitle,
@@ -69,8 +64,20 @@ export function StepSearchParty({
   subunitCodeByQuery,
 }: Props) {
   const theme = useTheme();
+  const { t } = useTranslation();
   const { setRequiredLogin } = useContext(UserContext);
 
+  const partyExternalIdByQuery = new URLSearchParams(window.location.search).get('partyExternalId');
+
+  const [isSearchFieldSelected, setIsSearchFieldSelected] = useState<boolean>(true);
+  const [loading, setLoading] = useState(!!partyExternalIdByQuery);
+  const [selected, setSelected, setSelectedHistory] = useHistoryState<PartyData | null>(
+    'selected_step1',
+    null
+  );
+  const [disabled, setDisabled] = useState<boolean>(false);
+  const [isAggregator, setIsAggregator] = useState<boolean>(false);
+  const [open, setOpen] = useState<boolean>(false);
   const [aooResult, setAooResult, setAooResultHistory] = useHistoryState<AooData | undefined>(
     'aooSelected_step1',
     undefined
@@ -79,23 +86,11 @@ export function StepSearchParty({
     'uoSelected_step1',
     undefined
   );
-
-  const partyExternalIdByQuery = new URLSearchParams(window.location.search).get('partyExternalId');
-
-  const [isSearchFieldSelected, setIsSearchFieldSelected] = useState<boolean>(true);
-  const [loading, setLoading] = useState(!!partyExternalIdByQuery);
-  const [selected, setSelected, setSelectedHistory] = useHistoryState<IPACatalogParty | null>(
-    'selected_step1',
-    null
-  );
-  const [dataFromAooUo, setDataFromAooUo] = useState<IPACatalogParty | null>();
-  const [disabled, setDisabled] = useState<boolean>(false);
-  const [isAggregator, setIsAggregator] = useState<boolean>(false);
-  const [open, setOpen] = useState<boolean>(false);
+  const [ecData, setEcData] = useState<PartyData | null>(null);
 
   const isEnabledProduct2AooUo = product?.id === 'prod-pn';
 
-  const handleSearchTaxCodeFromAooUo = async (query: string) => {
+  const getECDataByCF = async (query: string) => {
     const searchResponse = await fetchWithLogs(
       { endpoint: 'ONBOARDING_GET_PARTY_FROM_CF', endpointParams: { id: query } },
       {
@@ -107,9 +102,9 @@ export function StepSearchParty({
     const outcome = getFetchOutcome(searchResponse);
 
     if (outcome === 'success') {
-      setDataFromAooUo((searchResponse as AxiosResponse).data);
+      setEcData((searchResponse as AxiosResponse).data);
     } else if ((searchResponse as AxiosError).response?.status === 404) {
-      setDataFromAooUo(undefined);
+      setEcData(null);
     }
   };
 
@@ -137,6 +132,7 @@ export function StepSearchParty({
       setAooResult(undefined);
     }
   };
+
   const handleSearchByUoCode = async (query: string) => {
     const searchResponse = await fetchWithLogs(
       { endpoint: 'ONBOARDING_GET_UO_CODE_INFO', endpointParams: { codiceUniUo: query } },
@@ -174,58 +170,11 @@ export function StepSearchParty({
 
   useEffect(() => {
     if (aooResult) {
-      void handleSearchTaxCodeFromAooUo(aooResult?.codiceFiscaleEnte);
+      void getECDataByCF(aooResult?.codiceFiscaleEnte);
     } else if (uoResult) {
-      void handleSearchTaxCodeFromAooUo(uoResult?.codiceFiscaleEnte);
+      void getECDataByCF(uoResult?.codiceFiscaleEnte);
     }
   }, [aooResult, uoResult]);
-
-  const onForwardAction = () => {
-    setAooResultHistory(aooResult);
-    setUoResultHistory(uoResult);
-    setSelectedHistory(selected);
-
-    if (
-      !selected?.id &&
-      institutionType === 'GSP' &&
-      (product?.id === 'prod-io' || product?.id === 'prod-pagopa')
-    ) {
-      forward(
-        { externalId: '' },
-        { ...selected, externalId: '' } as Party,
-        aooResult,
-        uoResult,
-        institutionType
-      );
-    } else if (institutionType === 'SCP' && product?.id === 'prod-interop') {
-      forward(
-        {externalId: (selected as any).businessTaxId},
-        { ...selected, externalId: (selected as any).businessTaxId } as Party,
-        aooResult,
-        uoResult,
-        institutionType,
-      );
-    } else {
-      forward(
-        {
-          externalId: dataFromAooUo ? dataFromAooUo.id : selected?.id,
-        },
-        aooResult || uoResult
-          ? ({ ...dataFromAooUo } as Party)
-          : ({ ...selected, externalId: selected?.id } as Party),
-        aooResult,
-        uoResult,
-        institutionType,
-        isAggregator
-      );
-    }
-  };
-
-  const { t } = useTranslation();
-  const onBackAction = () => {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    back!();
-  };
 
   useEffect(() => {
     if (partyExternalIdByQuery) {
@@ -268,6 +217,18 @@ export function StepSearchParty({
       setIsSearchFieldSelected(false);
     }
   }, [isSearchFieldSelected]);
+
+  const onForwardAction = () => {
+    const dataParty = aooResult || uoResult ? ({ ...selected, ...ecData } as PartyData) : selected;
+    setSelectedHistory(selected);
+    const onboardingData = selected2OnboardingData(dataParty, isAggregator);
+    forward(onboardingData, institutionType);
+  };
+
+  const onBackAction = () => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    back!();
+  };
 
   return loading ? (
     <LoadingOverlay loadingText={t('onboardingStep1.loadingOverlayText')} />
@@ -319,7 +280,10 @@ export function StepSearchParty({
                 <br /> cui vuoi richiedere l’adesione a <strong>Interoperabilità.</strong>
               </Trans>
             ) : institutionType === 'SCP' ? (
-              <Trans i18nKey="onboardingStep1.onboarding.scpSubtitle" components={{ 3: <br />, 5: <strong /> }}>
+              <Trans
+                i18nKey="onboardingStep1.onboarding.scpSubtitle"
+                components={{ 3: <br />, 5: <strong /> }}
+              >
                 Inserisci uno dei dati richiesti e cerca da Infocamere l’ente <br />
                 per cui vuoi richiedere l’adesione a <strong>Interoperabilità.</strong>
               </Trans>
@@ -389,13 +353,7 @@ export function StepSearchParty({
             setSelected={setSelected}
             setDisabled={setDisabled}
             endpoint={{ endpoint: 'ONBOARDING_GET_SEARCH_PARTIES' }}
-            transformFn={(data: { items: any }) =>
-              /* removed transformation into lower case in order to send data to BE as obtained from registry
-                  // eslint-disable-next-line functional/immutable-data
-                  data.items.forEach((i) => (i.description = i.description.toLowerCase()));
-                  */
-              data.items
-            }
+            transformFn={(data: { items: any }) => data.items}
             optionKey="id"
             optionLabel="description"
             isSearchFieldSelected={isSearchFieldSelected}
@@ -414,7 +372,14 @@ export function StepSearchParty({
           product?.id === 'prod-io' && (
             <Grid item mt={3}>
               <FormControlLabel
-                control={<Checkbox size="small" onChange={() => setIsAggregator(!isAggregator)} />}
+                control={
+                  <Checkbox
+                    name="aggregator-party"
+                    role="checkbox"
+                    size="small"
+                    onChange={() => setIsAggregator(!isAggregator)}
+                  />
+                }
                 label={t('onboardingStep1.onboarding.aggregator')}
               />
             </Grid>
@@ -444,6 +409,7 @@ export function StepSearchParty({
                       1: <br />,
                       2: (
                         <Link
+                          id="no_ipa"
                           sx={{
                             textDecoration: 'underline',
                             color: theme.palette.primary.main,
@@ -486,10 +452,10 @@ export function StepSearchParty({
           back={
             !productAvoidStep
               ? {
-                action: onBackAction,
-                label: t('stepInstitutionType.backLabel'),
-                disabled: false,
-              }
+                  action: onBackAction,
+                  label: t('stepInstitutionType.backLabel'),
+                  disabled: false,
+                }
               : undefined
           }
           forward={{

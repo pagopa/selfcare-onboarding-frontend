@@ -10,13 +10,10 @@ import { IllusCompleted, IllusError } from '@pagopa/mui-italia';
 import { EndingPage } from '@pagopa/selfcare-common-frontend/lib';
 import React from 'react';
 import { withLogin } from '../../components/withLogin';
-import { AooData } from '../../model/AooData';
-import { UoData } from '../../model/UoModel';
 import {
   InstitutionType,
   Product,
   RequestOutcomeOptions,
-  Party,
   StepperStep,
   UserOnCreate,
   Problem,
@@ -34,8 +31,6 @@ import { billingData2billingDataRequest } from '../../model/BillingData';
 import { pspData2pspDataRequest } from '../../model/PspData';
 import NoProductPage from '../NoProductPage';
 import { onboardedInstitutionInfo2geographicTaxonomy } from '../../model/GeographicTaxonomies';
-import { companyInformationsDto2pspDataRequest } from '../../model/CompanyInformations';
-import { assistanceConcatsDto2pspDataRequest } from '../../model/AssistanceContacts';
 import { OnboardingFormData } from '../../model/OnboardingFormData';
 import StepOnboardingData from '../../components/steps/StepOnboardingData';
 import StepOnboardingFormData from '../../components/steps/StepOnboardingFormData';
@@ -45,8 +40,6 @@ import UserNotAllowedPage from '../UserNotAllowedPage';
 import { AdditionalData, AdditionalInformations } from '../../model/AdditionalInformations';
 import AlreadyOnboarded from '../AlreadyOnboarded';
 import { AggregateInstitution } from '../../model/AggregateInstitution';
-import { PDNDBusinessResource } from '../../model/PDNDBusinessResource';
-import { generateOnboardingFormData } from '../../utils/selected2OnboardingData';
 import { genericError, StepVerifyOnboarding } from './components/StepVerifyOnboarding';
 import { StepAddAdmin } from './components/StepAddAdmin';
 import { StepAdditionalInformations } from './components/StepAdditionalInformations';
@@ -96,9 +89,6 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
   const requestIdRef = useRef<string>();
   const { t } = useTranslation();
   const [onExitAction, setOnExitAction] = useState<(() => void) | undefined>();
-  const [selectedParty, setSelectedParty] = useState<Party | PDNDBusinessResource>();
-  const [aooSelected, setAooSelected] = useState<AooData>();
-  const [uoSelected, setUoSelected] = useState<UoData>();
 
   const productAvoidStep =
     selectedProduct?.id === 'prod-pn' || selectedProduct?.id === 'prod-idpay';
@@ -146,15 +136,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
       : [
           <React.Fragment key="0">
             <AlreadyOnboarded
-              selectedParty={
-                aooSelected
-                  ? aooSelected
-                  : uoSelected
-                  ? uoSelected
-                  : onboardingFormData
-                  ? onboardingFormData
-                  : selectedParty
-              }
+              onboardingFormData={onboardingFormData}
               selectedProduct={selectedProduct}
               institutionType={institutionType}
             />
@@ -170,7 +152,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     ) {
       window.location.assign(ENV.URL_FE.DASHBOARD);
     }
-  }, [selectedProduct, aooSelected, uoSelected]);
+  }, [selectedProduct, onboardingFormData?.aooUniqueCode, onboardingFormData?.uoUniqueCode]);
 
   useEffect(() => {
     registerUnloadEvent(setOnExit, setOpenExitModal, setOnExitAction);
@@ -247,11 +229,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
         params: {
           taxCode: onboardingFormData.taxCode,
           productId,
-          subunitCode: aooSelected
-            ? aooSelected.codiceUniAoo
-            : uoSelected
-            ? uoSelected.codiceUniUo
-            : undefined,
+          subunitCode: onboardingFormData.uoUniqueCode ?? onboardingFormData.aooUniqueCode,
           origin: institutionType === 'AS' ? 'IVASS' : undefined,
           originId: onboardingFormData?.originId ?? undefined,
         },
@@ -300,42 +278,19 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     forward();
   };
 
-  // eslint-disable-next-line complexity
   const forwardWithDataAndInstitution = (
-    newFormData: Partial<FormData>,
-    party: Party | PDNDBusinessResource,
-    aooResult: AooData,
-    uoResult: UoData,
-    institutionType: InstitutionType,
-    isAggregator: boolean
+    onboardingData: OnboardingFormData,
+    institutionType: InstitutionType
   ) => {
-    setAooSelected(aooResult);
-    setUoSelected(uoResult);
-    setExternalInstitutionId(
-      aooResult
-        ? aooResult?.codiceFiscaleEnte
-        : uoResult
-        ? uoResult.codiceFiscaleEnte
-        : (party as Party)?.externalId
-    );
-    setOrigin((party as Party)?.origin);
-    const data2Onboard = generateOnboardingFormData(
-      party,
-      aooResult,
-      uoResult,
-      productId,
-      institutionType,
-      onboardingFormData,
-      isAggregator
-    );
-    setOnboardingFormData(data2Onboard);
-    forwardWithData(newFormData);
+    setOnboardingFormData(onboardingData);
+    setExternalInstitutionId(onboardingData.externalId ?? '');
+    setOrigin(onboardingData.origin);
+    forwardWithData(onboardingData as Partial<FormData>);
     trackEvent('ONBOARDING_PARTY_SELECTION', {
-      party_id: (party as Party)?.externalId,
+      party_id: onboardingData?.externalId,
       request_id: requestIdRef.current,
       product_id: productId,
     });
-    setSelectedParty(party);
     setInstitutionType(institutionType);
   };
 
@@ -440,13 +395,12 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     },
   };
 
-  // TODO THIS TWO CAN BE EXPORTED FROM ANOTHER FILE
   const notAllowedError: RequestOutcomeMessage = {
     title: '',
     description: [
       <>
         <UserNotAllowedPage
-          partyName={(selectedParty as Party)?.description}
+          partyName={onboardingFormData?.businessName}
           productTitle={selectedProduct?.title}
         />
       </>,
@@ -486,38 +440,48 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
               ? pspData2pspDataRequest(onboardingFormData as OnboardingFormData)
               : undefined,
           companyInformations:
-            institutionType !== 'PSP' && institutionType !== 'PA'
-              ? companyInformationsDto2pspDataRequest(onboardingFormData as OnboardingFormData)
+            onboardingFormData?.businessRegisterPlace ||
+            onboardingFormData?.rea ||
+            onboardingFormData?.shareCapital
+              ? {
+                  businessRegisterPlace: onboardingFormData?.businessRegisterPlace,
+                  rea: onboardingFormData?.rea,
+                  shareCapital: onboardingFormData?.shareCapital,
+                }
               : undefined,
           institutionType,
-          originId: aooSelected
-            ? aooSelected.codiceUniAoo
-            : uoSelected
-            ? uoSelected.codiceUniUo
-            : onboardingFormData?.originId,
+          originId: onboardingFormData?.originId,
           geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY
             ? onboardingFormData?.geographicTaxonomies?.map((gt) =>
                 onboardedInstitutionInfo2geographicTaxonomy(gt)
               )
             : [],
           institutionLocationData: {
-            country: onboardingFormData?.country,
+            country:
+              institutionType === 'SCP' && productId === 'prod-interop'
+                ? 'IT'
+                : onboardingFormData?.country,
             county: onboardingFormData?.county,
             city: onboardingFormData?.city,
           },
-          origin,
+          origin:
+            institutionType === 'SCP' && productId === 'prod-interop'
+              ? 'INFOCAMERE'
+              : institutionType === 'SA'
+              ? 'ANAC'
+              : origin,
           users,
           pricingPlan,
-          assistanceContacts: assistanceConcatsDto2pspDataRequest(
-            onboardingFormData as OnboardingFormData
-          ),
-          productId,
-          subunitCode: aooSelected
-            ? aooSelected.codiceUniAoo
-            : uoSelected
-            ? uoSelected.codiceUniUo
+          assistanceContacts: onboardingFormData?.supportEmail
+            ? { supportEmail: onboardingFormData.supportEmail }
             : undefined,
-          subunitType: aooSelected ? 'AOO' : uoSelected ? 'UO' : undefined,
+          productId,
+          subunitCode: onboardingFormData?.uoUniqueCode ?? onboardingFormData?.aooUniqueCode,
+          subunitType: onboardingFormData?.uoUniqueCode
+            ? 'UO'
+            : onboardingFormData?.aooUniqueCode
+            ? 'AOO'
+            : undefined,
           taxCode: onboardingFormData?.taxCode,
           isAggregator: onboardingFormData?.isAggregator
             ? onboardingFormData?.isAggregator
@@ -687,9 +651,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           externalInstitutionId,
           productId,
           selectedProduct,
-          selectedParty,
-          aooSelected,
-          uoSelected,
+          onboardingFormData,
           institutionType,
         }),
     },
@@ -708,7 +670,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
         StepOnboardingFormData({
           outcome,
           productId,
-          selectedParty,
+          onboardingFormData,
           selectedProduct,
           externalInstitutionId,
           initialFormData: onboardingFormData ?? {
@@ -721,8 +683,6 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
             recipientCode: '',
             geographicTaxonomies: [],
           },
-          aooSelected,
-          uoSelected,
           origin,
           institutionType: institutionType as InstitutionType,
           subtitle:
@@ -801,7 +761,11 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           addUserFlow: false,
           product: selectedProduct,
           legal: isTechPartner ? undefined : (formData as any)?.users[0],
-          partyName: onboardingFormData?.businessName || '',
+          partyName:
+            onboardingFormData?.uoName ??
+            onboardingFormData?.aooName ??
+            onboardingFormData?.businessName ??
+            '',
           isTechPartner,
           isAggregator: onboardingFormData?.isAggregator,
           forward: (newFormData: Partial<FormData>) => {

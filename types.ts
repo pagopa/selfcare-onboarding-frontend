@@ -8,6 +8,9 @@ import { OnboardingFormData } from './src/model/OnboardingFormData';
 import { AssistanceContacts } from './src/model/AssistanceContacts';
 import { CompanyInformations } from './src/model/CompanyInformations';
 import { GeographicTaxonomy } from './src/model/GeographicTaxonomies';
+import { PDNDBusinessResource } from './src/model/PDNDBusinessResource';
+import { AooData } from './src/model/AooData';
+import { UoData } from './src/model/UoModel';
 
 /*
  * Fetch data and router related types
@@ -173,6 +176,14 @@ export type Product = {
   status: ProductStatus;
   parentId?: string;
 };
+
+export type PartyData = IPACatalogParty &
+  Party &
+  AooData &
+  UoData &
+  InsuranceCompanyResource &
+  ANACParty &
+  PDNDBusinessResource;
 
 export type SelfcareParty = {
   id: string;
