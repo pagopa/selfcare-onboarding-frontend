@@ -23,7 +23,7 @@ export type OnboardingFormData = {
   vatNumberGroup?: boolean;
   dpoAddress?: string;
   dpoPecAddress?: string;
-  dopEmailAddress?: string;
+  dpoEmailAddress?: string;
   businessRegisterPlace?: string;
   rea?: string;
   shareCapital?: string;

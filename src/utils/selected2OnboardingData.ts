@@ -1,6 +1,7 @@
 import { PartyData } from '../../types';
 import { OnboardingFormData } from '../model/OnboardingFormData';
 
+// eslint-disable-next-line complexity
 export const selected2OnboardingData = (
   selectedParty: PartyData | null,
   isAggregator?: boolean
@@ -28,7 +29,7 @@ export const selected2OnboardingData = (
   taxCodeInvoicing: selectedParty?.codiceFiscaleSfe,
   zipCode: selectedParty?.CAP ?? selectedParty?.zipCode,
   geographicTaxonomies: [],
-  originId: selectedParty?.originId,
+  originId: selectedParty?.codiceUniUo ?? selectedParty?.codiceUniAoo ?? selectedParty?.originId,
   origin: selectedParty?.origin,
   rea:
     selectedParty?.cciaa && selectedParty?.nRea

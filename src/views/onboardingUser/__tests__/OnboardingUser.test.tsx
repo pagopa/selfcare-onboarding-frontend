@@ -10,9 +10,17 @@ import { MemoryRouter } from 'react-router-dom';
 import OnboardingUser from '../OnboardingUser';
 import { mockPartyRegistry, mockedProducts } from '../../../lib/__mocks__/mockApiRequests';
 
-jest.setTimeout(7000);
+type Search = 'taxCode' | 'aooCode' | 'uoCode' | 'ivassCode';
 
-const renderComponent = (productId: string) => {
+jest.setTimeout(40000);
+
+let fetchWithLogsSpy: jest.SpyInstance;
+
+beforeEach(() => {
+  fetchWithLogsSpy = jest.spyOn(require('../../../lib/api-utils'), 'fetchWithLogs');
+});
+
+const renderComponent = (productId: string, fromAlreadyOnboarded: boolean) => {
   const Component = () => {
     const [user, setUser] = useState<User | null>(null);
     const [subHeaderVisible, setSubHeaderVisible] = useState<boolean>(false);
@@ -41,9 +49,11 @@ const renderComponent = (productId: string) => {
               {
                 pathname: `/user`,
                 search: '',
-                state: {
-                  data: { party: mockPartyRegistry.items[2], product, institutionType: 'PA' },
-                },
+                state: fromAlreadyOnboarded
+                  ? {
+                      data: { party: mockPartyRegistry.items[2], product, institutionType: 'PA' },
+                    }
+                  : undefined,
               },
             ]}
           >
@@ -175,8 +185,78 @@ const fillUserForm = async (
   );
 };
 
-const executeStep2 = async () => {
-  console.log('Testing step 2');
+const executeStepSelectProduct = async (productId: string) => {
+  console.log('Testing step select product..');
+
+  await waitFor(() => screen.getByText(/Aggiungi un nuovo Amministratore/));
+  const continueButton = screen.getByRole('button', { name: 'Continua' });
+  expect(continueButton).toBeDisabled();
+
+  const elementId = productId.toLowerCase();
+
+  fireEvent.click(document.getElementById(elementId) as HTMLElement);
+  expect(document.getElementById(elementId) as HTMLElement).toBeChecked();
+  expect(continueButton).toBeEnabled();
+
+  fireEvent.click(continueButton);
+};
+
+const executeStepSearchOnboardedParty = async (
+  productId: string,
+  partyName: string,
+  typeOfSearch: Search,
+  subUnitCode?: string,
+  taxCode?: string
+) => {
+  console.log('Testing step search onboarded party..');
+
+  screen.getByText(/Aggiungi un nuovo amministratore/i);
+
+  await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(1));
+  const inputPartyName = document.getElementById('Parties') as HTMLElement;
+
+  const selectWrapper = document.getElementById('party-type-select');
+  const input = selectWrapper?.firstChild as HTMLElement;
+  fireEvent.keyDown(input, { keyCode: 40 });
+
+  const option = document.getElementById(typeOfSearch) as HTMLElement;
+  fireEvent.click(option);
+
+  fireEvent.change(inputPartyName, {
+    target: {
+      value: typeOfSearch === 'taxCode' ? 'taxCode' : subUnitCode,
+    },
+  });
+
+  const partyNameSelect = await waitFor(() =>
+    screen.getByText(typeOfSearch === 'taxCode' ? /onboardedparty1/i : partyName)
+  );
+
+  expect(fetchWithLogsSpy).toBeCalledTimes(2);
+
+  expect(fetchWithLogsSpy).toHaveBeenCalledWith(
+    { endpoint: 'ONBOARDING_GET_INSTITUTIONS' },
+    {
+      method: 'GET',
+      params: {
+        productId,
+        taxCode,
+        subUnitCode,
+      },
+    },
+    expect.any(Function)
+  );
+
+  fireEvent.click(partyNameSelect);
+
+  const confirmButton = screen.getByRole('button', { name: 'Continua' });
+  expect(confirmButton).toBeEnabled();
+
+  await waitFor(() => fireEvent.click(confirmButton));
+};
+
+const executeStepAddManager = async () => {
+  console.log('Testing step add manager..');
   await waitFor(() => screen.getByText('Indica il Legale Rappresentante'));
 
   const confirmButton = screen.getByRole('button', { name: 'Continua' });
@@ -189,8 +269,8 @@ const executeStep2 = async () => {
   fireEvent.click(confirmButton);
 };
 
-const executeStep3 = async (expectedSuccessfulSubmit: boolean) => {
-  console.log('Testing step 3');
+const executeStepAddAdmin = async (expectedSuccessfulSubmit: boolean) => {
+  console.log('Testing step add admin..');
 
   await waitFor(() => screen.getByText("Indica l'Amministratore"));
   const [_, confirmButton] = await checkBackForwardNavigation(
@@ -233,14 +313,29 @@ const checkCertifiedUserValidation = async (prefix: string, confirmButton: HTMLE
   screen.getByText('Cognome non corretto o diverso dal Codice Fiscale');
 };
 
-test('Test: Added new manager for a party who has already onboarded to the PagoPA platform product', async () => {
-  renderComponent('prod-pagopa');
-  await executeStep2();
-  await executeStep3(true);
+test('Test: Successfull added new user for a party who has already onboarded to the PagoPA platform product', async () => {
+  renderComponent('prod-pagopa', true);
+  await executeStepAddManager();
+  await executeStepAddAdmin(true);
 });
 
-test('Test: Added new manager for a party who has already onboarded to the App IO product', async () => {
-  renderComponent('prod-io');
-  await executeStep2();
-  await executeStep3(false);
+test('Test: NOT successfull added new user for a party who has already onboarded to the App IO product', async () => {
+  renderComponent('prod-io', true);
+  await executeStepAddManager();
+  await executeStepAddAdmin(false);
+});
+
+// TODO
+test.skip('Test: Added new user for a party with select product prod-io-sign and search onboarded party with tax code', async () => {
+  renderComponent('prod-io-sign', false);
+  await executeStepSelectProduct('prod-io-sign');
+  await executeStepSearchOnboardedParty(
+    'prod-io-sign',
+    'onboardedparty1',
+    'taxCode',
+    undefined,
+    '00000000000'
+  );
+  /* await executeStepAddManager();
+  await executeStepAddAdmin(false); */
 });

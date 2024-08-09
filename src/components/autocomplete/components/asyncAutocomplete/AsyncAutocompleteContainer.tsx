@@ -194,11 +194,7 @@ export default function AsyncAutocompleteContainer({
     const outcome = getFetchOutcome(searchResponse);
 
     if (outcome === 'success') {
-      if (addUser) {
-        setCfResult((searchResponse as AxiosResponse).data[0]);
-      } else {
-        setCfResult((searchResponse as AxiosResponse).data);
-      }
+      setCfResult((searchResponse as AxiosResponse).data);
     } else if ((searchResponse as AxiosError).response?.status === 404) {
       setCfResult(undefined);
     }
@@ -296,7 +292,7 @@ export default function AsyncAutocompleteContainer({
         endpoint,
         endpointParams: addUser
           ? undefined
-          : institutionType === 'SA'
+          : institutionType === 'SA' || institutionType === 'AS'
           ? { taxId: query }
           : { code: query },
       },
@@ -318,7 +314,7 @@ export default function AsyncAutocompleteContainer({
     setIsLoading(false);
   };
 
-  const seachByInstitutionType = (value: string, institutionType?: string) => {
+  const searchByInstitutionType = (value: string, institutionType?: string) => {
     switch (institutionType) {
       case 'AS':
         void debounce(handleSearchByName, 100)(value, {
@@ -372,8 +368,8 @@ export default function AsyncAutocompleteContainer({
 
     if (value !== '') {
       setSelected(null);
-      if (value.length >= 3 && isBusinessNameSelected && !isTaxCodeSelected) {
-        seachByInstitutionType(value, institutionType);
+      if (value.length >= 3 && isBusinessNameSelected) {
+        searchByInstitutionType(value, institutionType);
       } else if (
         (isTaxCodeSelected && value.length === 11) ||
         (isIvassCodeSelected && value.length === 5)
@@ -407,11 +403,15 @@ export default function AsyncAutocompleteContainer({
       } else if (isUoCodeSelected && !isAooCodeSelected && value.length === 6) {
         const endpoint = addUser ? 'ONBOARDING_GET_INSTITUTIONS' : 'ONBOARDING_GET_UO_CODE_INFO';
         void handleSearchByUoCode(addUser, endpoint, params, value);
+      } else {
+        setCfResult(undefined);
+        setSelected(undefined);
       }
+    } else {
+      setSelected(undefined);
+      setCfResult(undefined);
     }
-    if (value === '') {
-      setSelected(null);
-    }
+
     if (selected) {
       setInput(getOptionLabel(selected));
     }

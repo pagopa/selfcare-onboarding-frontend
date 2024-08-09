@@ -18,6 +18,7 @@ import { StepBillingDataHistoryState } from '../steps/StepOnboardingFormData';
 import { ENV } from '../../utils/env';
 import { CountryResource } from '../../model/CountryResource';
 import { requiredError } from '../../utils/constants';
+import { mockedCountries } from '../../lib/__mocks__/mockApiRequests';
 import NumberDecimalFormat from './NumberDecimalFormat';
 
 const CustomTextField = styled(TextField)({
@@ -165,6 +166,14 @@ export default function PersonalAndBillingDataSection({
     }
   }, [formik.values.recipientCode, recipientCodeStatus]);
 
+  useEffect(() => {
+    if (stepHistoryState.isTaxCodeEquals2PIVA) {
+      formik.setFieldValue('vatNumber', formik.values.taxCode);
+    } else {
+      formik.setFieldValue('vatNumber', '');
+    }
+  }, [stepHistoryState.isTaxCodeEquals2PIVA]);
+
   const baseNumericFieldProps = (
     field: keyof OnboardingFormData,
     label: string,
@@ -233,24 +242,20 @@ export default function PersonalAndBillingDataSection({
   };
 
   const getNationalCountries = async (_query: string) => {
-    try {
-      const response = await fetch(ENV.JSON_URL.COUNTRIES);
-      const countries = await response.json();
-      const resource2CountryResource = countries
-        .map((c: any) => ({
-          country_code: c.country_code,
-          name: c.name,
-          alpha_2: c.alpha_2,
-          alpha_3: c.alpha_3,
-          region_code: c.region_code,
-          region: c.region,
-          sub_region_code: c.sub_region_code,
-          sub_region: c.sub_region,
-        }))
-        .filter((cm: CountryResource) => cm.alpha_2 !== 'IT');
-      setNationalCountries(resource2CountryResource);
-    } catch (reason) {
-      console.error(reason);
+    if (process.env.REACT_APP_MOCK_API === 'true') {
+      const countriesWithoutIta = mockedCountries.filter(
+        (cm: CountryResource) => cm.alpha_2 !== 'IT'
+      );
+      setNationalCountries(countriesWithoutIta);
+    } else {
+      try {
+        const response = await fetch(ENV.JSON_URL.COUNTRIES);
+        const countries = await response.json();
+        const countriesWithoutIta = countries.filter((cm: CountryResource) => cm.alpha_2 !== 'IT');
+        setNationalCountries(countriesWithoutIta);
+      } catch (reason) {
+        console.error(reason);
+      }
     }
   };
 
@@ -712,34 +717,28 @@ export default function PersonalAndBillingDataSection({
               }
               mb={!formik.values.hasVatnumber && isInvoiceable && isInsuranceCompany ? -3 : 0}
             >
-              {!isForeignInsurance &&
-                formik.values.hasVatnumber &&
-                onboardingFormData?.taxCode !== '' && (
+              {formik.values.hasVatnumber &&
+                (!isInsuranceCompany ||
+                  (onboardingFormData?.taxCode && onboardingFormData?.taxCode !== '')) && (
                   <Grid item>
                     <Box display="flex" alignItems="center">
                       <Checkbox
                         id="taxCodeEquals2VatNumber"
-                        checked={stepHistoryState.isTaxCodeEquals2PIVA}
-                        disabled={isPremium}
+                        checked={
+                          stepHistoryState.isTaxCodeEquals2PIVA ||
+                          formik.values.taxCode === formik.values.vatNumber
+                        }
+                        disabled={isPremium || formik.values.taxCode.length !== 11}
                         inputProps={{
                           'aria-label': t(
                             'onboardingFormData.billingDataSection.taxCodeEquals2PIVAdescription'
                           ),
                         }}
                         onChange={(e) => {
-                          if (e.target.checked) {
-                            setStepHistoryState({
-                              ...stepHistoryState,
-                              isTaxCodeEquals2PIVA: true,
-                            });
-                            formik.setFieldValue('vatNumber', formik.values.taxCode);
-                          } else {
-                            setStepHistoryState({
-                              ...stepHistoryState,
-                              isTaxCodeEquals2PIVA: false,
-                            });
-                            formik.setFieldValue('vatNumber', '');
-                          }
+                          setStepHistoryState({
+                            ...stepHistoryState,
+                            isTaxCodeEquals2PIVA: e.target.checked,
+                          });
                         }}
                       />
                       <Typography component={'span'}>
@@ -818,6 +817,7 @@ export default function PersonalAndBillingDataSection({
                 <Box display="flex" alignItems="center" mt="2px">
                   {/* Checkbox la aprtita IVA è di gruppo */}
                   <Checkbox
+                    id={'vatNumberGroup'}
                     inputProps={{
                       'aria-label': t('onboardingFormData.billingDataSection.vatNumberGroup'),
                     }}

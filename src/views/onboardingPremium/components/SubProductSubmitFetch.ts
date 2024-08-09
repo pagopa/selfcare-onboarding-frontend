@@ -8,8 +8,6 @@ import { pspData2pspDataRequest } from '../../../model/PspData';
 import { OnboardingFormData } from '../../../model/OnboardingFormData';
 import { ENV } from '../../../utils/env';
 import { onboardedInstitutionInfo2geographicTaxonomy } from '../../../model/GeographicTaxonomies';
-import { assistanceConcatsDto2pspDataRequest } from '../../../model/AssistanceContacts';
-import { companyInformationsDto2pspDataRequest } from '../../../model/CompanyInformations';
 
 type Props = {
   externalInstitutionId: string;
@@ -65,10 +63,14 @@ export const subProductSubmitFetch = async ({
               onboardedInstitutionInfo2geographicTaxonomy(gt)
             )
           : [],
-        assistanceContacts: assistanceConcatsDto2pspDataRequest(billingData as OnboardingFormData),
+        assistanceContacts: { supportEmail: billingData.supportEmail },
         companyInformations:
-          institutionType !== 'PSP' && institutionType !== 'PA'
-            ? companyInformationsDto2pspDataRequest(billingData as OnboardingFormData)
+          institutionType !== 'PA'
+            ? {
+                businessRegisterPlace: billingData?.businessRegisterPlace,
+                rea: billingData?.rea,
+                shareCapital: billingData?.shareCapital,
+              }
             : undefined,
         institutionLocationData: {
           country: billingData?.country,

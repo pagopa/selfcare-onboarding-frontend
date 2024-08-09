@@ -11,7 +11,11 @@ export default function DpoSection({ baseTextFieldProps }: Props) {
 
   return (
     <>
-      <Paper elevation={8} sx={{ borderRadius: theme.spacing(2), p: 4, width: '704px', my: 2 }}>
+      <Paper
+        elevation={8}
+        id="dpo-data-section"
+        sx={{ borderRadius: theme.spacing(2), p: 4, width: '704px', my: 2 }}
+      >
         <Grid container item pb={3}>
           <Grid item xs={12}>
             <Typography variant="caption" sx={{ fontWeight: 'fontWeightBold' }}>
@@ -41,8 +45,8 @@ export default function DpoSection({ baseTextFieldProps }: Props) {
           <Grid item xs={12}>
             <CustomTextField
               {...baseTextFieldProps(
-                'dopEmailAddress',
-                t('onboardingFormData.dpoDataSection.dopEmailAddress'),
+                'dpoEmailAddress',
+                t('onboardingFormData.dpoDataSection.dpoEmailAddress'),
                 600
               )}
             />

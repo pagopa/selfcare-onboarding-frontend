@@ -112,12 +112,12 @@ export const validateFields = (
         : isPaymentServiceProvider && values.abiCode && !fiveCharactersAllowed.test(values.abiCode)
         ? t('onboardingFormData.billingDataSection.pspDataSection.invalidabiCode')
         : undefined,
-    dopEmailAddress:
-      isPaymentServiceProvider && !values.dopEmailAddress
+    dpoEmailAddress:
+      isPaymentServiceProvider && !values.dpoEmailAddress
         ? requiredError
         : isPaymentServiceProvider &&
-          values.dopEmailAddress &&
-          !emailRegexp.test(values.dopEmailAddress)
+          values.dpoEmailAddress &&
+          !emailRegexp.test(values.dpoEmailAddress)
         ? t('onboardingFormData.billingDataSection.invalidEmail')
         : undefined,
     dpoPecAddress:

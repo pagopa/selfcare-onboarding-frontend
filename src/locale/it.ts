@@ -616,7 +616,8 @@ export default {
       invalidMailSupport: 'L’indirizzo email non è valido',
       invalidShareCapitalField: 'Il campo capitale sociale non è valido',
       invalidRecipientCodeNoAssociation: 'Il codice inserito non è associato al tuo ente',
-      invalidRecipientCodeNoBilling: 'Il codice inserito è associato al codice fiscale di un ente che non ha il servizio di fatturazione attivo',
+      invalidRecipientCodeNoBilling:
+        'Il codice inserito è associato al codice fiscale di un ente che non ha il servizio di fatturazione attivo',
       vatNumberAlreadyRegistered: 'La P. IVA che hai inserito è già stata registrata.',
       vatNumberVerificationErrorTitle: 'La verifica non è andata a buon fine',
       vatNumberVerificationErrorDescription:
@@ -706,7 +707,7 @@ export default {
       dpoTitle: 'CONTATTI DEL RESPONSABILE DELLA PROTEZIONE DEI DATI',
       dpoAddress: 'Indirizzo',
       dpoPecAddress: 'Indirizzo PEC',
-      dopEmailAddress: 'Indirizzo email',
+      dpoEmailAddress: 'Indirizzo email',
     },
   },
   rejectRegistration: {
