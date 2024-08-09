@@ -755,7 +755,11 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           addUserFlow: false,
           product: selectedProduct,
           legal: isTechPartner ? undefined : (formData as any)?.users[0],
-          partyName: onboardingFormData?.businessName || '',
+          partyName:
+            onboardingFormData?.uoName ??
+            onboardingFormData?.aooName ??
+            onboardingFormData?.businessName ??
+            '',
           isTechPartner,
           isAggregator: onboardingFormData?.isAggregator,
           forward: (newFormData: Partial<FormData>) => {
