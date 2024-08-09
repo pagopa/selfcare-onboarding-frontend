@@ -1,6 +1,9 @@
 import { useContext } from 'react';
 import isEmpty from 'lodash/isEmpty';
-import { storageTokenOps, storageUserOps } from '@pagopa/selfcare-common-frontend/lib/utils/storage';
+import {
+  storageTokenOps,
+  storageUserOps,
+} from '@pagopa/selfcare-common-frontend/lib/utils/storage';
 import { MOCK_USER } from '../utils/constants';
 import { ENV } from '../utils/env';
 import { UserContext } from '../lib/context';

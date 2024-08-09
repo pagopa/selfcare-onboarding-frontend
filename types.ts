@@ -8,6 +8,9 @@ import { OnboardingFormData } from './src/model/OnboardingFormData';
 import { AssistanceContacts } from './src/model/AssistanceContacts';
 import { CompanyInformations } from './src/model/CompanyInformations';
 import { GeographicTaxonomy } from './src/model/GeographicTaxonomies';
+import { PDNDBusinessResource } from './src/model/PDNDBusinessResource';
+import { AooData } from './src/model/AooData';
+import { UoData } from './src/model/UoModel';
 
 /*
  * Fetch data and router related types
@@ -174,6 +177,15 @@ export type Product = {
   parentId?: string;
 };
 
+export type PartyData = IPACatalogParty &
+  Party &
+  AooData &
+  UoData &
+  InsuranceCompanyResource &
+  ANACParty &
+  PDNDBusinessResource &
+  OnboardedParty;
+
 export type SelfcareParty = {
   id: string;
   description: string;
@@ -184,7 +196,7 @@ export type SelfcareParty = {
 export type Party = {
   originId: string;
   externalId: string;
-  address: string;
+  registeredOffice: string;
   zipCode: string;
   description: string;
   digitalAddress: string;
@@ -194,6 +206,19 @@ export type Party = {
   supportEmail?: string;
   istatCode?: string;
   registerType?: string;
+};
+
+export type OnboardedParty = {
+  id: string;
+  description: string;
+  parentDescription: string;
+  originId: string;
+  institutionType: string;
+  digitalAddress: string;
+  address: string;
+  zipCode: string;
+  taxCode: string;
+  origin: string;
 };
 
 export type InstitutionData = {

@@ -97,19 +97,18 @@ const renderComponent = (
   render(<Component />);
 };
 
-const stepSelectInstitutionReleatedTitle = 'Seleziona il tuo ente';
-const stepBillingDataTitle = 'Indica i dati del tuo ente';
+const stepBillingDataTitle = 'Inserisci i dati dell’ente';
 const stepAddManagerTitle = 'Indica il Legale Rappresentante';
 const successOnboardingSubProductTitle = 'La richiesta di adesione è stata inviata con successo';
 const errorOnboardingSubProductTitle = 'Qualcosa è andato storto';
 
-test('test error subProductID', async () => {
+test('Test: Bad productId and subProductId', async () => {
   renderComponent('error', 'error');
   await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(3));
   await waitFor(() => screen.getByText('Impossibile individuare il prodotto desiderato'));
 });
 
-test('test error retrieving onboarding info', async () => {
+test('Test: Error retrieving onboarding info', async () => {
   renderComponent('prod-io', 'prod-io-premium');
   await executeStepSelectPricingPlan();
   await executeStepSelectInstitution('Comune di Gessate');
@@ -117,45 +116,26 @@ test('test error retrieving onboarding info', async () => {
   await executeClickCloseButton(false);
 });
 
-test('test onboarding complete', async () => {
+test('Test: Successfully complete onboarding request', async () => {
   renderComponent('prod-io', 'prod-io-premium');
   await executeStepSelectPricingPlan();
   await executeStepSelectInstitution('Comune di Milano');
-  await executeStepBillingData();
+  await executeStepBillingDataWithTaxCodeInvoicing();
   await executeStepAddManager(true);
   await executeClickCloseButton(true);
   await verifySubmitPostLegals();
 });
 
-test('test complete with error on submit', async () => {
+test('Test: Complete onboarding request with error on submit', async () => {
   renderComponent('prod-io', 'prod-io-premium');
   await executeStepSelectPricingPlan();
   await executeStepSelectInstitution('Comune di Udine');
-  await executeStepBillingData();
+  await executeStepBillingDataWithoutTaxCodeInvoicing();
   await executeStepAddManager(false);
   await executeClickHomeButton();
 });
 
-// TODO Skipped test, add unload event
-test.skip('test exiting during flow with logout', async () => {
-  renderComponent('prod-io', 'prod-io-premium');
-  await executeStepSelectPricingPlan();
-  await executeStepSelectInstitution('Comune di Milano');
-
-  expect(screen.queryByText('Vuoi davvero uscire?')).toBeNull();
-
-  const logoutButton = screen.getByText('LOGOUT');
-  await performLogout(logoutButton);
-
-  fireEvent.click(screen.getByRole('button', { name: 'Annulla' }));
-  await waitFor(() => expect(screen.queryByText('Vuoi davvero uscire?')).not.toBeNull());
-
-  await performLogout(logoutButton);
-  fireEvent.click(screen.getByRole('button', { name: 'Esci' }));
-  await waitFor(() => expect(mockedLocation.assign).toBeCalledWith(ENV.URL_FE.LOGOUT));
-});
-
-test('test exiting during flow with unload event', async () => {
+test('Test: exiting during flow with unload event', async () => {
   renderComponent('prod-io', 'prod-io-premium');
   await executeStepSelectPricingPlan();
   await executeStepSelectInstitution('Comune di Milano');
@@ -168,11 +148,6 @@ test('test exiting during flow with unload event', async () => {
       "Warning!\n\nNavigating away from this page will delete your text if you haven't already saved it."
   );
 });
-
-const performLogout = async (logoutButton: HTMLElement) => {
-  fireEvent.click(logoutButton);
-  await waitFor(() => expect(screen.queryByText('Vuoi davvero uscire?')).not.toBeNull());
-};
 
 const retrieveNavigationButtons = async () => {
   const goBackButton = screen.getByRole('button', {
@@ -204,25 +179,41 @@ const checkBackForwardNavigation = async (title: string): Promise<Array<HTMLElem
 };
 
 const executeStepSelectPricingPlan = async () => {
-  console.log('Testing step select pricingPlan');
+  console.log('Testing step select pricing plan..');
 
   await waitFor(() =>
     screen.getByText(/Passa a IO Premium e migliora le performance dei messaggi/)
   );
+  const showMoreCarnet = document.getElementById('showMoreCarnetPlan') as HTMLElement;
+  fireEvent.click(showMoreCarnet);
 
-  const showMoreBtn = document.getElementById('showMoreConsumptionPlan') as HTMLElement;
-  fireEvent.click(showMoreBtn);
+  const carnetList = ['C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7', 'C8'];
 
-  const forwardBtn = document.getElementById('forwardConsumptionPlan') as HTMLElement;
+  await waitFor(() =>
+    carnetList.forEach((c) => expect(document.getElementById(c) as HTMLElement).toBeInTheDocument())
+  );
 
-  expect(forwardBtn).toBeEnabled();
-  fireEvent.click(forwardBtn);
+  const showMoreConsumption = document.getElementById('showMoreConsumptionPlan') as HTMLElement;
+  fireEvent.click(showMoreConsumption);
+
+  const forwardWithCarnet = document.getElementById('forwardCarnetPlan') as HTMLElement;
+  expect(forwardWithCarnet).toBeDisabled();
+
+  fireEvent.click(document.getElementById('C1') as HTMLElement);
+  expect(forwardWithCarnet).toBeEnabled();
+
+  fireEvent.click(showMoreCarnet);
+
+  const chooseConsumption = document.getElementById('forwardConsumptionPlan') as HTMLElement;
+
+  expect(chooseConsumption).toBeEnabled();
+  fireEvent.click(chooseConsumption);
 };
 
 const executeStepSelectInstitution = async (partyName: string) => {
-  console.log('Testing step select institution');
+  console.log('Testing step select institution..');
 
-  await waitFor(() => screen.getByText(stepSelectInstitutionReleatedTitle));
+  await waitFor(() => screen.getByText('Seleziona il tuo ente'));
   const continueButton = screen.getByText('Continua');
   expect(continueButton).toBeDisabled();
 
@@ -240,25 +231,40 @@ const executeStepSelectInstitution = async (partyName: string) => {
   fireEvent.click(continueButton);
 };
 
-const executeStepBillingData = async () => {
+const executeStepBillingDataWithTaxCodeInvoicing = async () => {
   console.log('Testing step Billing Data');
   await waitFor(() => screen.getByText(stepBillingDataTitle));
 
-  // TODO Scenarios with vatNumber will be added with SELC-4817
   const partyWithoutVatNumberCheckbox = screen.getByLabelText('Il mio ente non ha la partita IVA');
   fireEvent.click(partyWithoutVatNumberCheckbox);
   expect(partyWithoutVatNumberCheckbox).toBeChecked();
 
   const confirmButtonEnabled = screen.getByRole('button', { name: 'Continua' });
-  await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
 
   fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
     target: { value: '' },
   });
   await waitFor(() => expect(confirmButtonEnabled).toBeDisabled());
   fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
-    target: { value: 'M5UXCR1' },
+    target: { value: 'A1B2C3' },
   });
+  await waitFor(() => {
+    expect(screen.getByText('Codice Fiscale SFE')).toBeInTheDocument();
+  });
+  await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
+  fireEvent.click(confirmButtonEnabled);
+  await waitFor(() => screen.getByText(stepAddManagerTitle));
+};
+
+const executeStepBillingDataWithoutTaxCodeInvoicing = async () => {
+  console.log('Testing step Billing Data');
+  await waitFor(() => screen.getByText(stepBillingDataTitle));
+
+  const partyWithoutVatNumberCheckbox = screen.getByLabelText('Il mio ente non ha la partita IVA');
+  fireEvent.click(partyWithoutVatNumberCheckbox);
+  expect(partyWithoutVatNumberCheckbox).toBeChecked();
+
+  const confirmButtonEnabled = screen.getByRole('button', { name: 'Continua' });
   await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
   fireEvent.click(confirmButtonEnabled);
   await waitFor(() => screen.getByText(stepAddManagerTitle));
@@ -417,9 +423,9 @@ const billingData2billingDataRequest = () => ({
   digitalAddress: 'comune.milano@pec.it',
   zipCode: '20021',
   taxCode: '33445673222',
-  taxCodeInvoicing: undefined,
+  taxCodeInvoicing: '87654321098',
   vatNumber: undefined,
-  recipientCode: 'M5UXCR1',
+  recipientCode: 'A1B2C3',
 });
 
 const verifySubmitPostLegals = async () => {
@@ -448,8 +454,7 @@ const verifySubmitPostLegals = async () => {
             county: 'MI',
           },
           institutionType: 'PA',
-          // pricingPlan: 'C0',  TODO FIX THIS
-          pricingPlan: undefined, // TODO FIX THIS
+          pricingPlan: 'C0',
           origin: 'IPA',
           geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY
             ? [{ code: nationalValue, desc: 'ITALIA' }]

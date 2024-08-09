@@ -7,7 +7,6 @@ import { uniqueId } from 'lodash';
 import { EndingPage } from '@pagopa/selfcare-common-frontend/lib';
 import {
   InstitutionType,
-  Party,
   Product,
   RequestOutcomeMessage,
   StepperStepComponentProps,
@@ -20,17 +19,14 @@ import { unregisterUnloadEvent } from '../../../utils/unloadEvent-utils';
 import { LoadingOverlay } from '../../../components/LoadingOverlay';
 import { MessageNoAction } from '../../../components/MessageNoAction';
 import UserNotAllowedPage from '../../UserNotAllowedPage';
-import { AooData } from '../../../model/AooData';
-import { UoData } from '../../../model/UoModel';
 import AlreadyOnboarded from '../../AlreadyOnboarded';
+import { OnboardingFormData } from '../../../model/OnboardingFormData';
 
 type Props = StepperStepComponentProps & {
   externalInstitutionId: string;
   productId: string;
   selectedProduct?: Product | null;
-  selectedParty?: Party;
-  aooSelected?: AooData;
-  uoSelected?: UoData;
+  onboardingFormData?: OnboardingFormData;
   institutionType?: InstitutionType;
 };
 
@@ -63,9 +59,7 @@ export function StepVerifyOnboarding({
   externalInstitutionId,
   productId,
   selectedProduct,
-  selectedParty,
-  aooSelected,
-  uoSelected,
+  onboardingFormData,
   institutionType,
 }: Props) {
   const [loading, setLoading] = useState(true);
@@ -80,7 +74,7 @@ export function StepVerifyOnboarding({
     description: [
       <>
         <UserNotAllowedPage
-          partyName={selectedParty?.description}
+          partyName={onboardingFormData?.businessName}
           productTitle={selectedProduct?.title}
         />
       </>,
@@ -93,7 +87,7 @@ export function StepVerifyOnboarding({
       <>
         <AlreadyOnboarded
           institutionType={institutionType}
-          selectedParty={aooSelected ? aooSelected : uoSelected ? uoSelected : selectedParty}
+          onboardingFormData={onboardingFormData}
           selectedProduct={selectedProduct}
         />
       </>,
@@ -117,15 +111,11 @@ export function StepVerifyOnboarding({
       {
         method: 'HEAD',
         params: {
-          taxCode: selectedParty?.taxCode,
+          taxCode: onboardingFormData?.taxCode,
           productId,
-          subunitCode: aooSelected
-            ? aooSelected.codiceUniAoo
-            : uoSelected
-            ? uoSelected.codiceUniUo
-            : undefined,
-          origin: selectedParty?.origin,
-          originId: selectedParty?.originId,
+          subunitCode: onboardingFormData?.uoUniqueCode ?? onboardingFormData?.aooUniqueCode,
+          origin: onboardingFormData?.origin,
+          originId: onboardingFormData?.originId,
         },
       },
       () => setRequiredLogin(true)
@@ -138,7 +128,7 @@ export function StepVerifyOnboarding({
     if (restOutcome === 'success') {
       trackEvent('ONBOARDING_PRODUCT_ALREADY_SUBSCRIBED', {
         request_id: requestIdRef.current,
-        party_id: selectedParty?.externalId,
+        party_id: onboardingFormData?.externalId,
         product_id: selectedProduct?.id,
       });
       setOutcome(alreadyOnboarded);

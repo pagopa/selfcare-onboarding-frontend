@@ -96,6 +96,9 @@ export const API = {
   ONBOARDING_TOKEN_VALIDATION: {
     URL: ENV.URL_API.ONBOARDING_V2 + '/v2/tokens/{{onboardingId}}/verify',
   },
+  ONBOARDING_RECIPIENT_CODE_VALIDATION: {
+    URL: ENV.URL_API.ONBOARDING_V2 + '/v2/institutions/onboarding/recipientCode/verification',
+  },
   ONBOARDING_GET_CONTRACT: {
     URL: ENV.URL_API.ONBOARDING_V2 + '/v2/tokens/{{onboardingId}}/contract',
   },
@@ -121,13 +124,16 @@ export const API = {
     URL: ENV.URL_API.PARTY_REGISTRY_PROXY + '/stations',
   },
   ONBOARDING_GET_SA_PARTY_FROM_FC: {
-    URL: ENV.URL_API.PARTY_REGISTRY_PROXY + '/stations/{{id}}',
+    URL: ENV.URL_API.PARTY_REGISTRY_PROXY + '/stations/{{taxId}}',
   },
   ONBOARDING_GET_INSURANCE_COMPANIES_FROM_BUSINESSNAME: {
     URL: ENV.URL_API.PARTY_REGISTRY_PROXY + '/insurance-companies',
   },
   ONBOARDING_GET_INSURANCE_COMPANIES_FROM_IVASSCODE: {
-    URL: ENV.URL_API.PARTY_REGISTRY_PROXY + '/insurance-companies/origin/{{code}}',
+    URL: ENV.URL_API.PARTY_REGISTRY_PROXY + '/insurance-companies/{{taxId}}',
+  },
+  ONBOARDING_GET_PARTY_BY_CF_FROM_INFOCAMERE: {
+    URL: ENV.URL_API.PARTY_REGISTRY_PROXY + '/infocamere-pdnd/institution/{{id}}',
   },
   ONBOARDING_GET_PRODUCTS: {
     URL: ENV.URL_API.ONBOARDING + '/products',
@@ -177,6 +183,12 @@ export const filterByCategory = (institutionType?: string, productId?: string) =
     ? 'L37,SAG'
     : 'C17,C16,L10,L19,L13,L2,C10,L20,L21,L22,L15,L1,C13,C5,L40,L11,L39,L46,L8,L34,L7,L35,L45,L47,L6,L12,L24,L28,L42,L36,L44,C8,C3,C7,C14,L16,C11,L33,C12,L43,C2,L38,C1,L5,L4,L31,L18,L17,S01,SA';
 
+export const canInvoice = (institutionType?: string, productId?: string) =>
+  institutionType !== 'SA' &&
+  institutionType !== 'PT' &&
+  institutionType !== 'AS' &&
+  productId !== 'prod-interop';
+
 export const noMandatoryIpaProducts = (productId?: string) =>
   productId !== 'prod-interop' &&
   productId !== 'prod-io' &&
@@ -188,6 +200,7 @@ export const addUserFlowProducts = (productId: string) =>
   productId === 'prod-interop' ||
   productId === 'prod-pn' ||
   productId === 'prod-io' ||
+  productId === 'prod-io-sign' ||
   productId === 'prod-pagopa';
 
 export const institutionTypes: Array<{ labelKey: string; value: InstitutionType }> = [
@@ -200,6 +213,7 @@ export const institutionTypes: Array<{ labelKey: string; value: InstitutionType 
   { labelKey: 'as', value: 'AS' },
 ];
 
+// eslint-disable-next-line sonarjs/cognitive-complexity
 export const institutionType4Product = (productId: string | undefined) => {
   switch (productId) {
     case 'prod-interop':
@@ -216,12 +230,19 @@ export const institutionType4Product = (productId: string | undefined) => {
     case 'prod-idpay':
       return institutionTypes.filter((it) => it.labelKey === 'pa');
     case 'prod-io':
-    case 'prod-pagopa':
-      // Temporary disabled psp radiobutton for prod-pagopa, the radio buttons are now the same for prod-io and prod-pagopa.
       return institutionTypes.filter(
         (it) =>
           it.labelKey === 'pa' ||
           it.labelKey === 'gsp' ||
+          (ENV.PT.SHOW_PT ? it.labelKey === 'pt' : '')
+      );
+    case 'prod-pagopa':
+      // Temporary re-enabled psp radiobutton for prod-pagopa only for dev environment.
+      return institutionTypes.filter(
+        (it) =>
+          it.labelKey === 'pa' ||
+          it.labelKey === 'gsp' ||
+          (ENV.ENV !== 'PROD' && it.labelKey === 'psp') ||
           (ENV.PT.SHOW_PT ? it.labelKey === 'pt' : '')
       );
     case 'prod-io-sign':

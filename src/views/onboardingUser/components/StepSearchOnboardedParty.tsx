@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 import { withLogin } from '../../../components/withLogin';
-import { IPACatalogParty, InstitutionType, StepperStepComponentProps } from '../../../../types';
+import { InstitutionType, PartyData, StepperStepComponentProps } from '../../../../types';
 import { ProductResource } from '../../../model/ProductResource';
 import { Autocomplete } from '../../../components/autocomplete/Autocomplete';
 import { useHistoryState } from '../../../components/useHistoryState';
@@ -13,6 +13,7 @@ import { UoData } from '../../../model/UoModel';
 import { OnboardingStepActions } from '../../../components/OnboardingStepActions';
 import { OnboardedParty } from '../../../model/OnboardedParty';
 import AddUserHeading from '../AddUserHeading';
+import { selected2OnboardingData } from '../../../utils/selected2OnboardingData';
 
 type Props = {
   institutionType?: InstitutionType;
@@ -22,7 +23,7 @@ type Props = {
 function StepSearchOnboardedParty({ institutionType, selectedProduct, forward, back }: Props) {
   const { t } = useTranslation();
 
-  const [selected, setSelected, _setSelectedHistory] = useHistoryState<IPACatalogParty | null>(
+  const [selected, setSelected, _setSelectedHistory] = useHistoryState<PartyData | null>(
     'selected_step1',
     null
   );
@@ -158,7 +159,8 @@ function StepSearchOnboardedParty({ institutionType, selectedProduct, forward, b
             forward={{
               action: () => {
                 if (selected) {
-                  forward(selected);
+                  const partyData = selected2OnboardingData(selected);
+                  forward(partyData);
                 }
               },
               label: t('stepInstitutionType.confirmLabel'),

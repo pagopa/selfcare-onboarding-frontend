@@ -8,7 +8,6 @@ import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyt
 import { uniqueId } from 'lodash';
 import {
   InstitutionType,
-  Party,
   Product,
   RequestOutcomeMessage,
   StepperStepComponentProps,
@@ -20,7 +19,6 @@ import { AooData } from '../../model/AooData';
 import { GeographicTaxonomy } from '../../model/GeographicTaxonomies';
 import { OnboardingFormData } from '../../model/OnboardingFormData';
 import { UoData } from '../../model/UoModel';
-import { ENV } from '../../utils/env';
 import { MessageNoAction } from '../MessageNoAction';
 import { OnboardingStepActions } from '../OnboardingStepActions';
 import DpoSection from '../onboardingFormData/DpoSection';
@@ -29,7 +27,7 @@ import UpdateGeotaxonomy from '../onboardingFormData/taxonomy/UpdateGeotaxonomy'
 import GeoTaxonomySection from '../onboardingFormData/taxonomy/GeoTaxonomySection';
 import { useHistoryState } from '../useHistoryState';
 import { VatNumberErrorModal } from '../onboardingFormData/VatNumberErrorModal';
-import { filterByCategory, requiredError } from '../../utils/constants';
+import { canInvoice, filterByCategory, requiredError } from '../../utils/constants';
 import Heading from '../onboardingFormData/Heading';
 import { validateFields } from '../../utils/validateFields';
 import { handleGeotaxonomies } from '../../utils/handleGeotaxonomies';
@@ -53,7 +51,7 @@ type Props = StepperStepComponentProps & {
   origin?: string;
   productId?: string;
   subProductId?: string;
-  selectedParty?: Party;
+  onboardingFormData?: OnboardingFormData;
   selectedProduct?: Product | null;
   outcome?: RequestOutcomeMessage | null;
   aooSelected?: AooData;
@@ -75,7 +73,7 @@ export default function StepOnboardingFormData({
   subProductId,
   aooSelected,
   uoSelected,
-  selectedParty,
+  onboardingFormData,
   isCityEditable,
 }: Props) {
   const { t } = useTranslation();
@@ -89,7 +87,7 @@ export default function StepOnboardingFormData({
   );
   const [retrievedIstat, setRetrievedIstat] = useState<string>();
   const [invalidTaxCodeInvoicing, setInvalidTaxCodeInvoicing] = useState<boolean>(false);
-
+  const [recipientCodeStatus, setRecipientCodeStatus] = useState<string>();
   const [geotaxonomy, updateGeotaxonomy] = useReducer(
     (prev: { add: boolean; edit: boolean }, next: { add: boolean; edit: boolean }) => ({
       ...prev,
@@ -117,14 +115,13 @@ export default function StepOnboardingFormData({
   const isInformationCompany =
     origin !== 'IPA' &&
     (institutionType === 'GSP' || institutionType === 'SCP') &&
-    (productId === 'prod-io' || productId === 'prod-io-sign' || productId === 'prod-pagopa');
+    (productId === 'prod-io' ||
+      productId === 'prod-io-sign' ||
+      productId === 'prod-pagopa' ||
+      productId === 'prod-interop');
   const isProdFideiussioni = productId?.startsWith('prod-fd') ?? false;
-  const canInvoice =
-    institutionType !== 'SA' &&
-    institutionType !== 'PT' &&
-    institutionType !== 'AS' &&
-    productId !== 'prod-interop';
-  const isForeignInsurance = selectedParty?.registerType?.includes('Elenco II');
+  const isInvoiceable = canInvoice(institutionType, productId);
+  const isForeignInsurance = onboardingFormData?.registerType?.includes('Elenco II');
   const isDisabled =
     isPremium ||
     (origin === 'IPA' && institutionType !== 'PA' && !isPaymentServiceProvider) ||
@@ -264,12 +261,13 @@ export default function StepOnboardingFormData({
         isVatRegistrated,
         vatVerificationGenericError,
         isPaymentServiceProvider,
-        canInvoice,
+        isInvoiceable,
         uoSelected,
         isInformationCompany,
         institutionAvoidGeotax,
         isPremium,
         invalidTaxCodeInvoicing,
+        recipientCodeStatus,
         productId
       )
     );
@@ -293,6 +291,7 @@ export default function StepOnboardingFormData({
     vatVerificationGenericError,
     formik.values,
     invalidTaxCodeInvoicing,
+    recipientCodeStatus,
   ]);
 
   useEffect(() => {
@@ -336,6 +335,34 @@ export default function StepOnboardingFormData({
     }
   };
 
+  const verifyRecipientCodeIsValid = async (recipientCode: string, originId?: string) => {
+    const getRecipientCodeValidation = await fetchWithLogs(
+      {
+        endpoint: 'ONBOARDING_RECIPIENT_CODE_VALIDATION',
+      },
+      {
+        method: 'GET',
+        params: {
+          recipientCode,
+          originId,
+        },
+      },
+      () => setRequiredLogin(true)
+    );
+
+    const outcome = getFetchOutcome(getRecipientCodeValidation);
+
+    if (outcome === 'success') {
+      const result = (getRecipientCodeValidation as AxiosResponse).data;
+      if (uoSelected && result && result === 'DENIED_NO_BILLING') {
+        void formik.setFieldValue('recipientCode', undefined);
+      }
+      setRecipientCodeStatus(result);
+    } else {
+      setRecipientCodeStatus('DENIED_NO_ASSOCIATION');
+    }
+  };
+
   useEffect(() => {
     if (
       !stepHistoryState.isTaxCodeEquals2PIVA &&
@@ -366,6 +393,20 @@ export default function StepOnboardingFormData({
       void verifyVatNumber();
     }
   }, [formik.values.vatNumber, stepHistoryState.isTaxCodeEquals2PIVA]);
+
+  useEffect(() => {
+    if (
+      (institutionType === 'PA' || aooSelected || uoSelected) &&
+      formik.values.recipientCode &&
+      formik.values.recipientCode.length === 6
+    ) {
+      void verifyRecipientCodeIsValid(formik.values.recipientCode, onboardingFormData?.originIdEc);
+    }
+
+    if (formik.values.recipientCode && formik.values.recipientCode.length === 7) {
+      setRecipientCodeStatus(undefined);
+    }
+  }, [formik.values.recipientCode]);
 
   const baseTextFieldProps = (
     field: keyof OnboardingFormData,
@@ -404,16 +445,12 @@ export default function StepOnboardingFormData({
   ) : (
     <Box display="flex" justifyContent="center">
       <Grid container item xs={8} display="flex" justifyContent="center">
-        <Heading
-          institutionType={institutionType}
-          productId={productId}
-          subtitle={subtitle}
-          isPaymentServiceProvider={isPaymentServiceProvider}
-        />
+        <Heading subtitle={subtitle} />
         <PersonalAndBillingDataSection
           productId={productId}
           origin={origin}
           institutionType={institutionType}
+          onboardingFormData={onboardingFormData}
           baseTextFieldProps={baseTextFieldProps}
           stepHistoryState={stepHistoryState}
           setStepHistoryState={setStepHistoryState}
@@ -422,17 +459,15 @@ export default function StepOnboardingFormData({
           isPremium={isPremium}
           isInformationCompany={isInformationCompany}
           isForeignInsurance={isForeignInsurance}
-          aooSelected={aooSelected}
-          uoSelected={uoSelected}
           institutionAvoidGeotax={institutionAvoidGeotax}
-          selectedParty={selectedParty}
           retrievedIstat={retrievedIstat}
           isCityEditable={isCityEditable}
-          canInvoice={canInvoice}
+          isInvoiceable={isInvoiceable}
           setInvalidTaxCodeInvoicing={setInvalidTaxCodeInvoicing}
+          recipientCodeStatus={recipientCodeStatus}
         />
 
-        {ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY && !institutionAvoidGeotax && (
+        {!institutionAvoidGeotax && (
           <Grid item xs={12} display="flex" justifyContent={'center'}>
             <GeoTaxonomySection
               retrievedTaxonomies={previousGeotaxononomies}

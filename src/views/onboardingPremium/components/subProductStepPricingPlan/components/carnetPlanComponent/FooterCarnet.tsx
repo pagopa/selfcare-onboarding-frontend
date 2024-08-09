@@ -71,6 +71,7 @@ export default function FooterCarnet({ carnetPlans, forward, discount }: Props) 
                   }}
                 >
                   <FormControlLabel
+                    id={cp.pricingPlan}
                     onClick={() => {
                       setIsPricingPlanSelected(true);
                       setPpFunction(cp.pricingPlan);
@@ -197,6 +198,7 @@ export default function FooterCarnet({ carnetPlans, forward, discount }: Props) 
               {/* forward action with pricing plan */}
               <Box mt={3} display="flex" justifyContent={'center'}>
                 <Button
+                  id="forwardCarnetPlan"
                   disabled={!isPricingPlanSelected || pricingPlanSelected === ''}
                   variant="contained"
                   onClick={onForwardAction}

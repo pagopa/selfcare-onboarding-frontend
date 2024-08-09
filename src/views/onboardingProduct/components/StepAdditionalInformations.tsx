@@ -52,8 +52,8 @@ export function StepAdditionalInformations({ forward, back, originId, origin }: 
 
     setDisabled(
       !isContinueButtonEnabled ||
-      allFalseAndUnchecked ||
-      Object.values(errors).some((error) => error !== '')
+        allFalseAndUnchecked ||
+        Object.values(errors).some((error) => error !== '')
     );
   }, [radioValues, errors, additionalData.optionalPartyInformations?.choice]);
 
@@ -71,7 +71,6 @@ export function StepAdditionalInformations({ forward, back, originId, origin }: 
       [field]: '',
     }));
   };
-
 
   useEffect(() => {
     if (origin === 'IPA' && originId) {
@@ -227,9 +226,12 @@ export function StepAdditionalInformations({ forward, back, originId, origin }: 
         <Grid item pb={4}>
           <FormControlLabel
             value={additionalData.optionalPartyInformations?.choice}
-            control={<Checkbox size="small" />}
+            control={<Checkbox id={`optionalPartyInformations-checked`} size="small" />}
             onClick={() => {
-              handleRadioChange('optionalPartyInformations', !additionalData.optionalPartyInformations?.choice);
+              handleRadioChange(
+                'optionalPartyInformations',
+                !additionalData.optionalPartyInformations?.choice
+              );
               if (
                 additionalData.optionalPartyInformations?.textFieldValue &&
                 additionalData.optionalPartyInformations?.choice &&
@@ -257,12 +259,18 @@ export function StepAdditionalInformations({ forward, back, originId, origin }: 
             }}
           />
           <TextField
+            id="optionalPartyInformations"
             variant="outlined"
             label={t('additionalDataPage.formQuestions.optionalPartyInformations')}
             fullWidth
             sx={{ color: theme.palette.text.secondary }}
             onChange={(e: any) => {
-              handleTextFieldChange(true, 'optionalPartyInformations', e.target.value, additionalData.optionalPartyInformations?.choice);
+              handleTextFieldChange(
+                true,
+                'optionalPartyInformations',
+                e.target.value,
+                additionalData.optionalPartyInformations?.choice
+              );
             }}
             onClick={() => setShrink(true)}
             onBlur={() => {

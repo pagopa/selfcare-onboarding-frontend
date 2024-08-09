@@ -4,6 +4,9 @@ import '../../../../locale';
 import React from 'react';
 import { ENV } from '../../../../utils/env';
 import { buildAssistanceURI } from '@pagopa/selfcare-common-frontend/lib/services/assistanceService';
+import userEvent from '@testing-library/user-event';
+
+let mockedContract: File;
 
 const oldWindowLocation = global.window.location;
 const mockedLocation = {
@@ -13,6 +16,10 @@ const mockedLocation = {
   search: '',
   hash: '',
 };
+
+beforeEach(() => {
+  mockedContract = new File(['pdf'], 'contract.pdf', { type: 'multipart/form-data' });
+});
 
 beforeAll(() => {
   Object.defineProperty(window, 'location', { value: mockedLocation });
@@ -42,7 +49,6 @@ test('Test: The jwt is not present and the onboarding request is not retrieved, 
   });
 
   fireEvent.click(assistanceButton);
-  // TODO Deprecated
   waitFor(() => expect(buildAssistanceURI).toBeCalledWith(ENV.ASSISTANCE.EMAIL));
 });
 
@@ -54,7 +60,6 @@ test('Test: The jwt is non-existent and the onboarding request is not retrieved,
   const assistanceButton = screen.getByText('Contatta l’assistenza');
 
   fireEvent.click(assistanceButton);
-  // TODO Deprecated
   waitFor(() => expect(buildAssistanceURI).toBeCalledWith(ENV.ASSISTANCE.EMAIL));
 });
 
@@ -66,7 +71,6 @@ test('Test: The jwt exist and the request is correct retrieved, but it is alread
   const login = screen.getByText('Accedi');
 
   fireEvent.click(login);
-  // TODO Deprecated
   waitFor(() => expect(buildAssistanceURI).toBeCalledWith(ENV.URL_FE.LOGIN));
 });
 
@@ -78,7 +82,6 @@ test('Test: The jwt exist but is expired', async () => {
   const login = screen.getByText('Torna alla home');
 
   fireEvent.click(login);
-  // TODO Deprecated
   waitFor(() => expect(buildAssistanceURI).toBeCalledWith(ENV.URL_FE.LANDING));
 });
 
@@ -101,4 +104,8 @@ test('Test: The jwt exist and the request is correctly retrieved and waiting for
     name: 'Continua',
   });
   expect(submit).toBeDisabled();
+
+  const upload = document.getElementById('file-uploader') as HTMLElement;
+
+  userEvent.upload(upload, mockedContract);
 });

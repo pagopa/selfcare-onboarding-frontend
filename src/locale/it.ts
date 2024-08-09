@@ -1,10 +1,4 @@
 export default {
-  alertDialog: {
-    title: 'Titolo',
-    description: 'Descrizione',
-    confirmLabel: 'Carica di nuovo',
-    cancelLabel: 'Esci',
-  },
   asyncAutocomplete: {
     noResultsLabel: 'Nessun risultato',
     lessThen3CharacterLabel: 'Digita almeno 3 caratteri',
@@ -30,7 +24,7 @@ export default {
       download: {
         product: {
           title: 'Scarica l’accordo di adesione',
-          description: `Per completare l’adesione, scarica l’accordo e fai apporre la firma digitale in <1 /><2>formato p7m</2> dal Legale Rappresentante dell’ente o da un suo procuratore.`,
+          description: `Per completare l’adesione, scarica l’accordo e fai apporre la firma digitale in <1 /><2>formato p7m</2> dal Legale Rappresentante dell’ente.`,
           downloadContract: 'Scarica l’accordo',
         },
         user: {
@@ -39,7 +33,7 @@ export default {
           downloadContract: 'Scarica il Modulo',
         },
         disclaimer:
-          'Firmando l’accordo, il Legale Rappresentante dell’ente, o un suo procuratore, accetta espressamente e specificamente anche le singole clausole indicate nel paragrafo “Clausole ai sensi degli artt. 1341 e 1342 c.c.”',
+          'Firmando l’accordo, il Legale Rappresentante dell’ente, accetta espressamente e specificamente anche le singole clausole indicate nel paragrafo “Clausole ai sensi degli artt. 1341 e 1342 c.c.”',
       },
       upload: {
         product: {
@@ -149,6 +143,8 @@ export default {
         'Se sei tra i gestori privati di piattaforma e-procurement e hai <1/> già ottenuto la <3>certificazione da AgID</3>, inserisci uno dei dati <5/> richiesti e cerca l’ente per cui vuoi richiedere l’adesione a <7/> <8>Interoperabilità.</8>',
       asSubTitle:
         'Se sei una società di assicurazione presente nell’Albo delle <1/>imprese IVASS, inserisci uno dei dati richiesti e cerca l’ente per<3/> cui vuoi richiedere l’adesione a <5>Interoperabilità.</5>',
+      scpSubtitle:
+        'Inserisci uno dei dati richiesti e cerca da InfoCamere l’ente <3/> per cui vuoi richiedere l’adesione a <5>Interoperabilità.</5>',
       asyncAutocomplete: {
         placeholder: 'Cerca',
       },
@@ -159,17 +155,26 @@ export default {
     },
   },
   stepUploadAggregates: {
-    title: `Indica gli enti da aggregare per {{productName}}`,
-    errorAlert: {
-      title: 'Il file contiene più errori',
-      description:
-        '<1>Scarica il report</1> per verificare le informazioni e carica di nuovo il file.',
+    title: `Indica i soggetti aggregati per {{productName}}`,
+    subTitle:
+      'Scarica il file di esempio, compilalo seguendo le indicazioni e carica il documento per aggiungere/dichiarare gli enti da aggregare.',
+    findOutMore: 'Dubbi? Vai al manuale',
+    errors: {
+      onCsv: {
+        title: 'Il file contiene uno o più errori',
+        description:
+          '<1>Scarica il report</1> per verificare le informazioni e carica di nuovo il file.',
+      },
+      invalidFormat: {
+        title: 'Il formato del file non è valido',
+        description: 'È possibile caricare solo file in formato .csv',
+      },
     },
     dropArea: {
-      title: 'Trascina qui il file .csv con la lista degli enti aggregati oppure',
+      title: "Trascina qui il file .csv con l'elenco degli enti aggregati oppure",
       button: 'carica il file',
-      valid: 'File valido',
     },
+    downloadExampleCsv: 'Non sai come preparare il file? <1>Scarica l’esempio</1>',
     back: 'Indietro',
     forward: 'Continua',
   },
@@ -177,8 +182,8 @@ export default {
     title: 'Indica il Legale Rappresentante',
     subTitle: {
       flow: {
-        base: `Inserisci i dati del Legale Rappresentante o del procuratore del tuo ente. <1/> Sarà responsabile della firma del contratto per <3>{{productTitle}}</3> <4/> e avrà il ruolo di Amministratore per questo prodotto nell'Area Riservata.`,
-        premium: `Inserisci i dati del Legale Rappresentante o del procuratore del tuo ente. <1/> La persona che indicherai sarà firmataria del contratto per <3/> <strong>Premium<strong/>.`,
+        base: `Inserisci i dati del Legale Rappresentante del tuo ente. <1/> Sarà responsabile della firma del contratto per <3>{{productTitle}}</3> <4/> e avrà il ruolo di Amministratore per questo prodotto nell'Area Riservata.`,
+        premium: `Inserisci i dati del Legale Rappresentante del tuo ente. <1/> La persona che indicherai sarà firmataria del contratto per <3/> <strong>Premium<strong/>.`,
         addNewUser: `La persona indicata firmerà il Modulo di aggiunta per il nuovo Amministratore e lo <1 />autorizzerà ad operare sul prodotto <3>{{productTitle}}</3> per il tuo ente.`,
       },
     },
@@ -591,7 +596,7 @@ export default {
     confirmLabel: 'Continua',
   },
   onboardingFormData: {
-    title: 'Indica i dati del tuo ente',
+    title: 'Inserisci i dati dell’ente',
     pspAndProdPagoPATitle: 'Inserisci i dati',
     backLabel: 'Indietro',
     confirmLabel: 'Continua',
@@ -610,6 +615,9 @@ export default {
       invalidReaField: 'Il Campo REA non è valido',
       invalidMailSupport: 'L’indirizzo email non è valido',
       invalidShareCapitalField: 'Il campo capitale sociale non è valido',
+      invalidRecipientCodeNoAssociation: 'Il codice inserito non è associato al tuo ente',
+      invalidRecipientCodeNoBilling:
+        'Il codice inserito è associato al codice fiscale di un ente che non ha il servizio di fatturazione attivo',
       vatNumberAlreadyRegistered: 'La P. IVA che hai inserito è già stata registrata.',
       vatNumberVerificationErrorTitle: 'La verifica non è andata a buon fine',
       vatNumberVerificationErrorDescription:
@@ -638,6 +646,9 @@ export default {
       taxCodeInvoicing: 'Codice Fiscale SFE',
       originId: 'Codice IVASS',
       sdiCode: 'Codice SDI',
+      sdiCodePaAooUo: 'Codice univoco o SDI',
+      sdiCodePaAooUoDescription:
+        'È il codice univoco necessario per ricevere le fatture elettroniche. Può essere del tuo ente o della sua Unità Organizzativa di riferimento.',
       recipientCodeDescription: 'È il codice necessario per ricevere le fatture elettroniche',
       gspDescription: 'Sono gestore di almeno uno dei pubblici servizi: Gas, Energia, Telco.',
       pspDataSection: {
@@ -696,7 +707,7 @@ export default {
       dpoTitle: 'CONTATTI DEL RESPONSABILE DELLA PROTEZIONE DEI DATI',
       dpoAddress: 'Indirizzo',
       dpoPecAddress: 'Indirizzo PEC',
-      dopEmailAddress: 'Indirizzo email',
+      dpoEmailAddress: 'Indirizzo email',
     },
   },
   rejectRegistration: {

@@ -14,7 +14,7 @@ export type BillingDataDto = {
 export const billingData2billingDataRequest = (
   billingData: OnboardingFormData
 ): BillingDataDto => ({
-  businessName: billingData.businessName,
+  businessName: billingData?.uoName ?? billingData?.aooName ?? billingData?.businessName,
   digitalAddress: billingData.digitalAddress,
   recipientCode: billingData.recipientCode ? billingData.recipientCode.toUpperCase() : undefined,
   registeredOffice: billingData.registeredOffice,

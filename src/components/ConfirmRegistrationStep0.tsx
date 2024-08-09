@@ -123,7 +123,7 @@ export function ConfirmRegistrationStep0({ forward }: StepperStepComponentProps)
                   >
                     {translationKeyValue === 'user'
                       ? `Per completare l’adesione, scarica il Modulo di aggiunta e fai apporre la <1 />firma digitale in <2>formato p7m</2> dal Legale Rappresentante dell’ente.`
-                      : `Per completare l’adesione, scarica l’accordo e fai apporre la firma digitale in <1 /><2>formato p7m</2> dal Legale Rappresentante dell’ente o da un suo procuratore.`}
+                      : `Per completare l’adesione, scarica l’accordo e fai apporre la firma digitale in <1 /><2>formato p7m</2> dal Legale Rappresentante dell’ente.`}
                   </Trans>
                 </Typography>
               </Grid>

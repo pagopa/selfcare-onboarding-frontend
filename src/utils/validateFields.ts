@@ -24,12 +24,13 @@ export const validateFields = (
   isVatRegistrated: boolean,
   vatVerificationGenericError: boolean,
   isPaymentServiceProvider: boolean,
-  canInvoice: boolean,
+  isInvoiceable: boolean,
   uoSelected: UoData | undefined,
   isInformationCompany: boolean,
   institutionAvoidGeotax: boolean,
   isPremium: boolean,
   invalidTaxCodeInvoicing: boolean,
+  recipientCodeStatus?: string,
   productId?: string
 ) =>
   Object.entries({
@@ -48,7 +49,7 @@ export const validateFields = (
         ? t('onboardingFormData.billingDataSection.invalidFiscalCode')
         : undefined,
     taxCodeInvoicing:
-      canInvoice &&
+      isInvoiceable &&
       uoSelected &&
       (!values.taxCodeInvoicing ||
         (values.taxCodeInvoicing && !fiscalAndVatCodeRegexp.test(values.taxCodeInvoicing)))
@@ -111,12 +112,12 @@ export const validateFields = (
         : isPaymentServiceProvider && values.abiCode && !fiveCharactersAllowed.test(values.abiCode)
         ? t('onboardingFormData.billingDataSection.pspDataSection.invalidabiCode')
         : undefined,
-    dopEmailAddress:
-      isPaymentServiceProvider && !values.dopEmailAddress
+    dpoEmailAddress:
+      isPaymentServiceProvider && !values.dpoEmailAddress
         ? requiredError
         : isPaymentServiceProvider &&
-          values.dopEmailAddress &&
-          !emailRegexp.test(values.dopEmailAddress)
+          values.dpoEmailAddress &&
+          !emailRegexp.test(values.dpoEmailAddress)
         ? t('onboardingFormData.billingDataSection.invalidEmail')
         : undefined,
     dpoPecAddress:
@@ -127,7 +128,15 @@ export const validateFields = (
           !emailRegexp.test(values.dpoPecAddress)
         ? t('onboardingFormData.billingDataSection.invalidEmail')
         : undefined,
-    recipientCode: canInvoice && !values.recipientCode ? requiredError : undefined,
+    recipientCode: isInvoiceable
+      ? values.recipientCode && values.recipientCode.length >= 6
+        ? recipientCodeStatus === 'DENIED_NO_ASSOCIATION'
+          ? t('onboardingFormData.billingDataSection.invalidRecipientCodeNoAssociation')
+          : recipientCodeStatus === 'DENIED_NO_BILLING'
+          ? t('onboardingFormData.billingDataSection.invalidRecipientCodeNoBilling')
+          : undefined
+        : requiredError
+      : undefined,
     geographicTaxonomies:
       ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY &&
       !institutionAvoidGeotax &&

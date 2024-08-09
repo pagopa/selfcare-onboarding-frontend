@@ -16,6 +16,8 @@ export const ENV = {
     COUNTRIES: env.get('REACT_APP_COUNTRY_DATA').required().asString(),
   },
 
+  EXAMPLE_CSV: env.get('REACT_APP_AGGREGATES_EXAMPLE_CSV').required().asString(),
+
   ASSISTANCE: {
     ENABLE: env.get('REACT_APP_ENABLE_ASSISTANCE').required().asBool(),
     EMAIL: env.get('REACT_APP_PAGOPA_HELP_EMAIL').required().asString(),

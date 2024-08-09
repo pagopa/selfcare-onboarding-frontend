@@ -1,5 +1,6 @@
 import { Grid, Typography } from '@mui/material';
 import { Trans } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import { RolesInformations } from '../../components/RolesInformations';
 import { InstitutionType } from '../../../types';
 
@@ -8,6 +9,8 @@ type Props = {
 };
 
 function AddUserHeading({ institutionType }: Props) {
+  const { t } = useTranslation();
+
   return (
     <Grid container sx={{ display: 'flex', flexDirection: 'column', textAlign: 'center' }}>
       <Grid item mb={1}>
@@ -25,7 +28,10 @@ function AddUserHeading({ institutionType }: Props) {
         </Typography>
       </Grid>
       <Grid item mb={3}>
-        <RolesInformations isTechPartner={institutionType === 'PT'} />
+        <RolesInformations
+          isTechPartner={institutionType === 'PT'}
+          linkLabel={t('moreInformationOnRoles')}
+        />
       </Grid>
     </Grid>
   );

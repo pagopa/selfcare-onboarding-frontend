@@ -2,9 +2,8 @@ import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 import { SelectChangeEvent } from '@mui/material/Select';
 import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ANACParty, InstitutionType, Product } from '../../../../../types';
+import { InstitutionType, PartyData, Product } from '../../../../../types';
 import { AooData } from '../../../../model/AooData';
-import { InstitutionResource } from '../../../../model/InstitutionResource';
 import { UoData } from '../../../../model/UoModel';
 import { ENV } from '../../../../utils/env';
 
@@ -17,7 +16,7 @@ type Props = {
   setIsSearchFieldSelected: React.Dispatch<React.SetStateAction<boolean>>;
   setIsAooCodeSelected: React.Dispatch<React.SetStateAction<boolean>>;
   setIsUoCodeSelected: React.Dispatch<React.SetStateAction<boolean>>;
-  setCfResult: React.Dispatch<React.SetStateAction<InstitutionResource | ANACParty | undefined>>;
+  setCfResult: React.Dispatch<React.SetStateAction<PartyData | undefined>>;
   setAooResult: Dispatch<SetStateAction<AooData | undefined>>;
   setUoResult: Dispatch<SetStateAction<UoData | undefined>>;
   setUoResultHistory: (t: UoData | undefined) => void;
@@ -87,6 +86,13 @@ export default function PartyAdvancedSelect({
   };
 
   useEffect(() => {
+    if (product?.id === 'prod-interop' && institutionType === 'SCP') {
+      onSelectValue(false, true, false, false, false);
+      setTypeOfSearch('taxCode');
+    }
+  }, []);
+
+  useEffect(() => {
     if (isBusinessNameSelected) {
       setTypeOfSearch('businessName');
     } else if (isTaxCodeSelected) {
@@ -97,11 +103,13 @@ export default function PartyAdvancedSelect({
       setTypeOfSearch('uoCode');
     } else if (isIvassCodeSelected) {
       setTypeOfSearch('ivassCode');
+    } else {
+      setTypeOfSearch('');
     }
   }, []);
 
   useEffect(() => {
-    if (addUser) {
+    if (addUser || (product?.id === 'prod-interop' && institutionType === 'SCP')) {
       setTypeOfSearch('taxCode');
       setIsTaxCodeSelected(true);
     } else {
@@ -116,6 +124,7 @@ export default function PartyAdvancedSelect({
       product.id === 'prod-io-sign' ||
       product.id === 'prod-pn-dev' ||
       product.id === 'prod-pn');
+
   const optionsAvailable4InstitutionType =
     institutionType !== 'SA' && institutionType !== 'AS' && institutionType !== 'GSP';
 
@@ -146,7 +155,7 @@ export default function PartyAdvancedSelect({
         label={t('partyAdvancedSelect.advancedSearchLabel')}
         onChange={handleTypeSearchChange}
       >
-        {!addUser && (
+        {!addUser && institutionType !== 'SCP' && (
           <MenuItem
             id="businessName"
             data-testid="businessName"
@@ -178,6 +187,7 @@ export default function PartyAdvancedSelect({
 
         {((ENV.AOO_UO.SHOW_AOO_UO &&
           optionsAvailable4InstitutionType &&
+          institutionType !== 'SCP' &&
           filteredByProducts(product as Product)) ||
           (addUser && ENV.AOO_UO.SHOW_AOO_UO && filteredByProducts(selectedProduct))) &&
           menuItems.map((item) => (
