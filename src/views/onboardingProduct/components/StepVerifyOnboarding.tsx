@@ -19,8 +19,6 @@ import { unregisterUnloadEvent } from '../../../utils/unloadEvent-utils';
 import { LoadingOverlay } from '../../../components/LoadingOverlay';
 import { MessageNoAction } from '../../../components/MessageNoAction';
 import UserNotAllowedPage from '../../UserNotAllowedPage';
-import { AooData } from '../../../model/AooData';
-import { UoData } from '../../../model/UoModel';
 import AlreadyOnboarded from '../../AlreadyOnboarded';
 import { OnboardingFormData } from '../../../model/OnboardingFormData';
 
@@ -29,8 +27,6 @@ type Props = StepperStepComponentProps & {
   productId: string;
   selectedProduct?: Product | null;
   onboardingFormData?: OnboardingFormData;
-  aooSelected?: AooData;
-  uoSelected?: UoData;
   institutionType?: InstitutionType;
 };
 
@@ -64,8 +60,6 @@ export function StepVerifyOnboarding({
   productId,
   selectedProduct,
   onboardingFormData,
-  aooSelected,
-  uoSelected,
   institutionType,
 }: Props) {
   const [loading, setLoading] = useState(true);
@@ -119,11 +113,7 @@ export function StepVerifyOnboarding({
         params: {
           taxCode: onboardingFormData?.taxCode,
           productId,
-          subunitCode: aooSelected
-            ? aooSelected.codiceUniAoo
-            : uoSelected
-            ? uoSelected.codiceUniUo
-            : undefined,
+          subunitCode: onboardingFormData?.uoUniqueCode ?? onboardingFormData?.aooUniqueCode,
           origin: onboardingFormData?.origin,
           originId: onboardingFormData?.originId,
         },

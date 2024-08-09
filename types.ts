@@ -183,7 +183,8 @@ export type PartyData = IPACatalogParty &
   UoData &
   InsuranceCompanyResource &
   ANACParty &
-  PDNDBusinessResource;
+  PDNDBusinessResource &
+  OnboardedParty;
 
 export type SelfcareParty = {
   id: string;
@@ -195,7 +196,7 @@ export type SelfcareParty = {
 export type Party = {
   originId: string;
   externalId: string;
-  address: string;
+  registeredOffice: string;
   zipCode: string;
   description: string;
   digitalAddress: string;
@@ -205,6 +206,19 @@ export type Party = {
   supportEmail?: string;
   istatCode?: string;
   registerType?: string;
+};
+
+export type OnboardedParty = {
+  id: string;
+  description: string;
+  parentDescription: string;
+  originId: string;
+  institutionType: string;
+  digitalAddress: string;
+  address: string;
+  zipCode: string;
+  taxCode: string;
+  origin: string;
 };
 
 export type InstitutionData = {

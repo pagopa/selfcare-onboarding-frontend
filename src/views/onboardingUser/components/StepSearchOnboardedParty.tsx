@@ -13,6 +13,7 @@ import { UoData } from '../../../model/UoModel';
 import { OnboardingStepActions } from '../../../components/OnboardingStepActions';
 import { OnboardedParty } from '../../../model/OnboardedParty';
 import AddUserHeading from '../AddUserHeading';
+import { selected2OnboardingData } from '../../../utils/selected2OnboardingData';
 
 type Props = {
   institutionType?: InstitutionType;
@@ -158,7 +159,8 @@ function StepSearchOnboardedParty({ institutionType, selectedProduct, forward, b
             forward={{
               action: () => {
                 if (selected) {
-                  forward(selected);
+                  const partyData = selected2OnboardingData(selected);
+                  forward(partyData);
                 }
               },
               label: t('stepInstitutionType.confirmLabel'),

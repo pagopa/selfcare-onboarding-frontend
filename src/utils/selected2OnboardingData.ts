@@ -18,7 +18,8 @@ export const selected2OnboardingData = (
   digitalAddress:
     selectedParty?.tipoMail1 === 'Pec' ? selectedParty?.mail1 : selectedParty?.digitalAddress ?? '',
   recipientCode: selectedParty?.codiceUniAoo ?? selectedParty?.codiceUniUo,
-  registeredOffice: selectedParty?.indirizzo ?? selectedParty?.address ?? '',
+  registeredOffice:
+    selectedParty?.registeredOffice ?? selectedParty?.indirizzo ?? selectedParty?.address ?? '',
   taxCode:
     selectedParty?.codiceFiscaleEnte ??
     selectedParty?.taxCode ??
@@ -41,4 +42,5 @@ export const selected2OnboardingData = (
   externalId: selectedParty?.businessTaxId ?? selectedParty?.id ?? '',
   istatCode: selectedParty?.codiceComuneISTAT ?? selectedParty?.istatCode,
   registerType: selectedParty?.registerType,
+  institutionType: selectedParty?.institutionType,
 });
