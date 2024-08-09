@@ -124,13 +124,13 @@ export const API = {
     URL: ENV.URL_API.PARTY_REGISTRY_PROXY + '/stations',
   },
   ONBOARDING_GET_SA_PARTY_FROM_FC: {
-    URL: ENV.URL_API.PARTY_REGISTRY_PROXY + '/stations/{{id}}',
+    URL: ENV.URL_API.PARTY_REGISTRY_PROXY + '/stations/{{taxId}}',
   },
   ONBOARDING_GET_INSURANCE_COMPANIES_FROM_BUSINESSNAME: {
     URL: ENV.URL_API.PARTY_REGISTRY_PROXY + '/insurance-companies',
   },
   ONBOARDING_GET_INSURANCE_COMPANIES_FROM_IVASSCODE: {
-    URL: ENV.URL_API.PARTY_REGISTRY_PROXY + '/insurance-companies/origin/{{code}}',
+    URL: ENV.URL_API.PARTY_REGISTRY_PROXY + '/insurance-companies/{{taxId}}',
   },
   ONBOARDING_GET_PARTY_BY_CF_FROM_INFOCAMERE: {
     URL: ENV.URL_API.PARTY_REGISTRY_PROXY + '/infocamere-pdnd/institution/{{id}}',

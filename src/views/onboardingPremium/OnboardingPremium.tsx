@@ -234,22 +234,6 @@ function OnboardingPremiumComponent() {
     {
       label: 'Select Institution unreleated',
       Component: () => SubProductStepUserUnrelated({ product, productId }),
-      // TODO temporary commented in order to develop SELC-2237
-      // StepSearchParty({
-      //   subTitle: (
-      //     <Trans i18nKey="onboardingSubProduct.selectUserPartyStep.IPAsubTitle">
-      //       Seleziona dall&apos;Indice della Pubblica Amministrazione (IPA) l&apos;ente
-      //       <br /> per cui vuoi richiedere l&apos;adesione a{' '}
-      //       {{
-      //         baseProduct: product?.title,
-      //       }}{' '}
-      //       Premium.
-      //     </Trans>
-      //   ),
-      //   product: subProduct,
-      //   forward: (_: any, party: Party) => forwardWithInstitution(party, false),
-      //   back: parties.length > 0 ? back : undefined,
-      // }),
     },
     {
       label: 'Get Onboarding Data',

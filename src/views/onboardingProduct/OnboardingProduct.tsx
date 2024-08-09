@@ -31,8 +31,6 @@ import { billingData2billingDataRequest } from '../../model/BillingData';
 import { pspData2pspDataRequest } from '../../model/PspData';
 import NoProductPage from '../NoProductPage';
 import { onboardedInstitutionInfo2geographicTaxonomy } from '../../model/GeographicTaxonomies';
-import { companyInformationsDto2pspDataRequest } from '../../model/CompanyInformations';
-import { assistanceConcatsDto2pspDataRequest } from '../../model/AssistanceContacts';
 import { OnboardingFormData } from '../../model/OnboardingFormData';
 import StepOnboardingData from '../../components/steps/StepOnboardingData';
 import StepOnboardingFormData from '../../components/steps/StepOnboardingFormData';
@@ -397,7 +395,6 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     },
   };
 
-  // TODO THIS TWO CAN BE EXPORTED FROM ANOTHER FILE
   const notAllowedError: RequestOutcomeMessage = {
     title: '',
     description: [
@@ -443,37 +440,43 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
               ? pspData2pspDataRequest(onboardingFormData as OnboardingFormData)
               : undefined,
           companyInformations:
-            institutionType !== 'PSP' && institutionType !== 'PA'
-              ? companyInformationsDto2pspDataRequest(onboardingFormData as OnboardingFormData)
+            onboardingFormData?.businessRegisterPlace ||
+            onboardingFormData?.rea ||
+            onboardingFormData?.shareCapital
+              ? {
+                  businessRegisterPlace: onboardingFormData?.businessRegisterPlace,
+                  rea: onboardingFormData?.rea,
+                  shareCapital: onboardingFormData?.shareCapital,
+                }
               : undefined,
           institutionType,
-          // TODO Move this in the mapper method
-          originId: onboardingFormData?.uoUniqueCode
-            ? onboardingFormData.uoUniqueCode
-            : onboardingFormData?.aooUniqueCode
-            ? onboardingFormData.aooUniqueCode
-            : onboardingFormData?.originId,
+          originId: onboardingFormData?.originId,
           geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY
             ? onboardingFormData?.geographicTaxonomies?.map((gt) =>
                 onboardedInstitutionInfo2geographicTaxonomy(gt)
               )
             : [],
           institutionLocationData: {
-            country: onboardingFormData?.country,
+            country:
+              institutionType === 'SCP' && productId === 'prod-interop'
+                ? 'IT'
+                : onboardingFormData?.country,
             county: onboardingFormData?.county,
             city: onboardingFormData?.city,
           },
-          origin,
+          origin:
+            institutionType === 'SCP' && productId === 'prod-interop'
+              ? 'INFOCAMERE'
+              : institutionType === 'SA'
+              ? 'ANAC'
+              : origin,
           users,
           pricingPlan,
-          assistanceContacts: assistanceConcatsDto2pspDataRequest(
-            onboardingFormData as OnboardingFormData
-          ),
+          assistanceContacts: onboardingFormData?.supportEmail
+            ? { supportEmail: onboardingFormData.supportEmail }
+            : undefined,
           productId,
-          // TODO Move this two in the mapper method
-          subunitCode: onboardingFormData?.uoUniqueCode
-            ? onboardingFormData.uoUniqueCode
-            : onboardingFormData?.aooUniqueCode,
+          subunitCode: onboardingFormData?.uoUniqueCode ?? onboardingFormData?.aooUniqueCode,
           subunitType: onboardingFormData?.uoUniqueCode
             ? 'UO'
             : onboardingFormData?.aooUniqueCode
@@ -758,7 +761,11 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           addUserFlow: false,
           product: selectedProduct,
           legal: isTechPartner ? undefined : (formData as any)?.users[0],
-          partyName: onboardingFormData?.businessName || '',
+          partyName:
+            onboardingFormData?.uoName ??
+            onboardingFormData?.aooName ??
+            onboardingFormData?.businessName ??
+            '',
           isTechPartner,
           isAggregator: onboardingFormData?.isAggregator,
           forward: (newFormData: Partial<FormData>) => {

@@ -1,15 +1,15 @@
 import { PartyData } from '../../types';
 import { OnboardingFormData } from '../model/OnboardingFormData';
 
+// eslint-disable-next-line complexity
 export const selected2OnboardingData = (
   selectedParty: PartyData | null,
   isAggregator?: boolean
 ): OnboardingFormData => ({
   businessName:
-    selectedParty?.denominazioneAoo ??
-    selectedParty?.descrizioneUo ??
     selectedParty?.description ??
     selectedParty?.businessName ??
+    selectedParty?.denominazioneEnte ??
     '',
   aooName: selectedParty?.denominazioneAoo,
   uoName: selectedParty?.descrizioneUo,
@@ -28,7 +28,8 @@ export const selected2OnboardingData = (
   taxCodeInvoicing: selectedParty?.codiceFiscaleSfe,
   zipCode: selectedParty?.CAP ?? selectedParty?.zipCode,
   geographicTaxonomies: [],
-  originId: selectedParty?.originId,
+  originIdEc: selectedParty?.originId,
+  originId: selectedParty?.codiceUniUo ?? selectedParty?.codiceUniAoo ?? selectedParty?.originId,
   origin: selectedParty?.origin,
   rea:
     selectedParty?.cciaa && selectedParty?.nRea
@@ -38,6 +39,6 @@ export const selected2OnboardingData = (
   county: selectedParty?.county,
   isAggregator,
   externalId: selectedParty?.businessTaxId ?? selectedParty?.id ?? '',
-  istatCode: selectedParty?.istatCode ?? selectedParty?.codiceComuneISTAT,
+  istatCode: selectedParty?.codiceComuneISTAT ?? selectedParty?.istatCode,
   registerType: selectedParty?.registerType,
 });

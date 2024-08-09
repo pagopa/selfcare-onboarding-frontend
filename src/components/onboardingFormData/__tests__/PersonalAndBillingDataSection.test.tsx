@@ -10,7 +10,7 @@ import {
   mockedProducts,
   mockedAoos,
   mockedUos,
-  mockedPartyFromInfoCamere,
+  mockedPartiesFromInfoCamere,
 } from '../../../lib/__mocks__/mockApiRequests';
 
 jest.mock('formik', () => ({
@@ -88,7 +88,6 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
   let onboardingFormData;
   let productId;
 
-  // TODO Temporary excluded the PSP institutionType
   mockedProducts.forEach((product) => {
     institutionTypes.forEach((institutionType) => {
       if (!componentRendered) {
@@ -97,10 +96,10 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
         switch (productId) {
           case 'prod-pn':
             onboardingFormData = mockedAoos[0];
-          case 'prod-pn-dev':
+          case 'prod-io-sign':
             onboardingFormData = mockedUos[0];
           case 'prod-interop':
-            onboardingFormData = mockedPartyFromInfoCamere;
+            onboardingFormData = mockedPartiesFromInfoCamere;
           default:
             onboardingFormData = mockPartyRegistry.items[0];
         }

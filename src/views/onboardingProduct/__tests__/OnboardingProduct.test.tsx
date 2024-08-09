@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { fireEvent, getByLabelText, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, getByLabelText, render, screen, waitFor, within } from '@testing-library/react';
 import { useState } from 'react';
 import '@testing-library/jest-dom';
 import { User } from '../../../../types';
@@ -11,11 +11,25 @@ import { nationalValue } from '../../../model/GeographicTaxonomies';
 import { canInvoice, filterByCategory } from '../../../utils/constants';
 import { createMemoryHistory } from 'history';
 import { Router } from 'react-router-dom';
+import userEvent from '@testing-library/user-event';
+import {
+  mockedANACParties,
+  mockedAoos,
+  mockedInsuranceResource,
+  mockedParties,
+  mockedPartiesFromInfoCamere,
+  mockedUos,
+  mockPartyRegistry,
+} from '../../../lib/__mocks__/mockApiRequests';
+
+type Source = 'IPA' | 'NO_IPA' | 'ANAC' | 'IVASS' | 'INFOCAMERE';
+type Search = 'businessName' | 'taxCode' | 'aooCode' | 'uoCode' | 'ivassCode';
 
 jest.mock('../../../lib/api-utils');
 jest.setTimeout(40000);
 
 let fetchWithLogsSpy: jest.SpyInstance;
+let aggregatesCsv: File;
 
 beforeEach(() => {
   fetchWithLogsSpy = jest.spyOn(require('../../../lib/api-utils'), 'fetchWithLogs');
@@ -41,6 +55,10 @@ afterAll(() => {
 });
 
 beforeEach(() => Object.assign(mockedLocation, initialLocation));
+
+beforeEach(() => {
+  aggregatesCsv = new File(['csv data'], 'aggregates.csv', { type: 'multipart/form-data' });
+});
 
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
@@ -91,140 +109,360 @@ const renderComponent = (productId: string = 'prod-pn') => {
 
 test('Test: Successfull complete onboarding request of PA party for prod-io search by business name', async () => {
   renderComponent('prod-io');
-  await executeStepInstitutionType('prod-io', 'pa');
-  await executeStepSearchParty('prod-io', 'pa', 'AGENCY X', 'businessName');
-  await executeStepBillingData('prod-io', 'pa');
+  await executeStepInstitutionType('prod-io', 'PA');
+  await executeStepSearchParty('prod-io', 'PA', 'AGENCY X', 'businessName');
+  await executeStepBillingData('prod-io', 'PA', false, false, 'IPA', 'AGENCY X');
   await executeStepAddManager();
   await executeStepAddAdmin(true);
-  await verifySubmit();
+  await verifySubmit('prod-io', 'PA', 'IPA', false, false, 'businessName');
   await executeGoHome(true);
 });
 
 test('Test: Successfull complete onboarding request of PA party for prod-io search by tax code', async () => {
   renderComponent('prod-io');
-  await executeStepInstitutionType('prod-io', 'pa');
+  await executeStepInstitutionType('prod-io', 'PA');
   await executeStepSearchParty(
     'prod-io',
-    'pa',
+    'PA',
     'Comune Di Milano',
     'taxCode',
     undefined,
     '33445673222'
   );
-  await executeStepBillingData('prod-io', 'pa');
+  await executeStepBillingData('prod-io', 'PA', false, false, 'IPA', 'Comune di Milano');
   await executeStepAddManager();
   await executeStepAddAdmin(true);
+  await verifySubmit('prod-io', 'PA', 'IPA', false, false, 'taxCode');
   await executeGoHome(true);
 });
 
 test('Test: Successfull complete onboarding request of AOO party for product prod-interop', async () => {
   renderComponent('prod-interop');
-  await executeStepInstitutionType('prod-interop', 'pa');
+  await executeStepInstitutionType('prod-interop', 'PA');
   await executeStepSearchParty(
     'prod-interop',
-    'pa',
+    'PA',
     'denominazione aoo test 1',
     'aooCode',
     'A356E00'
   );
-  await executeStepBillingData('prod-interop', 'pa', true);
+  await executeStepBillingData(
+    'prod-interop',
+    'PA',
+    true,
+    false,
+    'IPA',
+    'denominazione aoo test 1'
+  );
   await executeStepAddManager();
   await executeStepAddAdmin(true);
+  await verifySubmit('prod-interop', 'PA', 'IPA', false, false, 'aooCode');
   await executeGoHome(true);
 });
 
 test('Test: Successfull complete onboarding request of UO party for product prod-io-sign', async () => {
   renderComponent('prod-io-sign');
-  await executeStepInstitutionType('prod-io-sign', 'pa');
-  await executeStepSearchParty('prod-io-sign', 'pa', 'denominazione uo test 1', 'uoCode', 'A1B2C3');
-  await executeStepBillingData('prod-io-sign', 'pa', true);
+  await executeStepInstitutionType('prod-io-sign', 'PA');
+  await executeStepSearchParty('prod-io-sign', 'PA', 'denominazione uo test 1', 'uoCode', 'A1B2C3');
+  await executeStepBillingData('prod-io-sign', 'PA', false, true, 'IPA', 'denominazione uo test 1');
   await executeStepAddManager();
   await executeStepAddAdmin(true);
+  await verifySubmit('prod-io-sign', 'PA', 'IPA', true, false, 'uoCode');
   await executeGoHome(true);
 });
 
-test('Test: Successfull complete onboarding request of GSP party from IPA for product prod-pagopa', async () => {
+test('Test: Successfull complete onboarding request of GSP party search from IPA source for product prod-pagopa', async () => {
   renderComponent('prod-pagopa');
-  await executeStepInstitutionType('prod-pagopa', 'gsp');
-  await executeStepSearchParty('prod-pagopa', 'gsp', 'AGENCY X', 'businessName');
-  await executeStepBillingData('prod-pagopa', 'gsp');
-  await executeStepAddManager();
-  await executeStepAddAdmin(true);
-  await verifySubmit('prod-pagopa');
-  await executeGoHome(true);
-});
-
-// TODO TEST COMPLETE GSP WITHOUT USING IPA (STEP ADDITIONAL INFORMATION, RADIO WITH TEXTFIELD COMPONENT ETC)
-
-// TODO TEST COMPLETE PT
-
-// TODO TEST COMPLETE AS
-
-// TODO TEST COMPLETE SA
-
-// TODO TEST COMPLETE PSP
-
-// TODO TEST COMPLETE SCP PDND INFOCAMERE
-
-// TODO PA APP IO AGGREGATOR PARTY (IS AGGREGATE, UPLOAD AGGREGATE CSV ETC)
-
-test.skip('Test: Error on submit onboarding request of pa party for prod-io', async () => {
-  renderComponent('prod-io');
-  await executeStepInstitutionType('prod-io', 'pa');
-  await executeStepSearchParty('prod-io', 'pa', 'AGENCY ERROR', 'businessName');
-  await executeStepBillingData('prod-io', 'pa');
-  await executeStepAddManager();
-  await executeStepAddAdmin(false);
-  await verifySubmit();
-  await executeGoHome(true);
-});
-
-test('Test: The addUser button in already onboarded party error page should redirect to add new user flow', async () => {
-  renderComponent('prod-pagopa');
-  await executeStepInstitutionType('prod-pagopa', 'pa');
+  await executeStepInstitutionType('prod-pagopa', 'GSP');
   await executeStepSearchParty(
     'prod-pagopa',
-    'pa',
+    'GSP',
+    'AGENCY X',
+    'businessName',
+    undefined,
+    undefined,
+    undefined,
+    false,
+    false
+  );
+  await executeStepBillingData('prod-pagopa', 'GSP', false, false, 'IPA', 'AGENCY X');
+  await executeStepAdditionalInfo('IPA');
+  await executeStepAddManager();
+  await executeStepAddAdmin(true);
+  await verifySubmit('prod-pagopa', 'GSP', 'IPA');
+  await executeGoHome(true);
+});
+
+test('Test: Successfull complete onboarding request of GSP party without search on IPA source for product prod-pagopa', async () => {
+  renderComponent('prod-pagopa');
+  await executeStepInstitutionType('prod-pagopa', 'GSP');
+  await executeStepSearchParty(
+    'prod-pagopa',
+    'GSP',
+    'AGENCY X',
+    'businessName',
+    undefined,
+    undefined,
+    undefined,
+    false,
+    true
+  );
+  await executeStepBillingData('prod-pagopa', 'GSP', false, false, 'NO_IPA', 'AGENCY X');
+  await executeStepAdditionalInfo('NO_IPA');
+  await executeStepAddManager();
+  await executeStepAddAdmin(true);
+  await verifySubmit('prod-pagopa', 'GSP', 'NO_IPA');
+  await executeGoHome(true);
+});
+
+test('Test: Successfull complete onboarding request of PT for product prod-pagopa', async () => {
+  renderComponent('prod-pagopa');
+  await executeStepInstitutionType('prod-pagopa', 'PT');
+  await executeStepBillingData('prod-pagopa', 'PT', false, false, 'NO_IPA');
+  await executeStepAddAdmin(true, true);
+  await verifySubmit('prod-pagopa', 'PT', 'NO_IPA');
+  await executeGoHome(true);
+});
+
+test('Test: Successfull complete onboarding request of PSP for product prod-pagopa', async () => {
+  renderComponent('prod-pagopa');
+  await executeStepInstitutionType('prod-pagopa', 'PSP');
+  await executeStepBillingData('prod-pagopa', 'PSP', false, false, 'NO_IPA');
+  await executeStepAddManager();
+  await executeStepAddAdmin(true, false);
+  await verifySubmit('prod-pagopa', 'PSP', 'NO_IPA');
+  await executeGoHome(true);
+});
+
+test('Test: Successfull complete onboarding request of SA for product prod-interop search by business name', async () => {
+  renderComponent('prod-interop');
+  await executeStepInstitutionType('prod-interop', 'SA');
+  await executeStepSearchParty(
+    'prod-interop',
+    'SA',
+    'descriptionAnac1',
+    'businessName',
+    undefined,
+    undefined,
+    undefined,
+    false,
+    true
+  );
+  await executeStepBillingData('prod-interop', 'SA', false, false, 'ANAC', 'descriptionAnac1');
+  await executeStepAddManager();
+  await executeStepAddAdmin(true, false);
+  await verifySubmit('prod-interop', 'SA', 'ANAC', false, false, 'businessName');
+  await executeGoHome(true);
+});
+
+test('Test: Successfull complete onboarding request of SA for product prod-interop search by tax code', async () => {
+  renderComponent('prod-interop');
+  await executeStepInstitutionType('prod-interop', 'SA');
+  await executeStepSearchParty(
+    'prod-interop',
+    'SA',
+    'descriptionAnac1',
+    'taxCode',
+    undefined,
+    '12345678911',
+    undefined,
+    false,
+    true
+  );
+  await executeStepBillingData('prod-interop', 'SA', false, false, 'ANAC', 'descriptionAnac1');
+  await executeStepAddManager();
+  await executeStepAddAdmin(true, false);
+  await verifySubmit('prod-interop', 'SA', 'ANAC', false, false, 'taxCode');
+  await executeGoHome(true);
+});
+
+test('Test: Successfull complete onboarding request of foreign AS for product prod-interop search by business name', async () => {
+  renderComponent('prod-interop');
+  await executeStepInstitutionType('prod-interop', 'AS');
+  await executeStepSearchParty(
+    'prod-interop',
+    'AS',
+    'mocked foreign insurance company 1',
+    'businessName',
+    undefined,
+    undefined,
+    undefined,
+    false,
+    true
+  );
+  await executeStepBillingData(
+    'prod-interop',
+    'AS',
+    false,
+    false,
+    'IVASS',
+    'mocked foreign insurance company 1',
+    true
+  );
+  await executeStepAddManager();
+  await executeStepAddAdmin(true, false);
+  await verifySubmit('prod-interop', 'AS', 'IVASS', false, false, 'businessName', true);
+  await executeGoHome(true);
+});
+
+test('Test: Successfull complete onboarding request of italian AS for product prod-interop search by ivass code', async () => {
+  renderComponent('prod-interop');
+  await executeStepInstitutionType('prod-interop', 'AS');
+  await executeStepSearchParty(
+    'prod-interop',
+    'AS',
+    'mocked italian insurance company 1',
+    'ivassCode',
+    undefined,
+    undefined,
+    '232DC',
+    false,
+    true
+  );
+  await executeStepBillingData(
+    'prod-interop',
+    'AS',
+    false,
+    false,
+    'IVASS',
+    'mocked italian insurance company 1',
+    false
+  );
+  await executeStepAddManager();
+  await executeStepAddAdmin(true, false);
+  await verifySubmit('prod-interop', 'AS', 'IVASS', false, false, 'taxCode', false);
+  await executeGoHome(true);
+});
+
+test('Test: Successfull complete onboarding request of italian AS without tax code for product prod-interop search by ivass code', async () => {
+  renderComponent('prod-interop');
+  await executeStepInstitutionType('prod-interop', 'AS');
+  await executeStepSearchParty(
+    'prod-interop',
+    'AS',
+    'mocked italian insurance company without taxcode',
+    'ivassCode',
+    undefined,
+    undefined,
+    '4431B',
+    false,
+    true
+  );
+  await executeStepBillingData(
+    'prod-interop',
+    'AS',
+    false,
+    false,
+    'IVASS',
+    'mocked italian insurance company without taxcode',
+    false,
+    false
+  );
+  await executeStepAddManager();
+  await executeStepAddAdmin(true, false);
+  await verifySubmit('prod-interop', 'AS', 'IVASS', false, false, 'taxCode', false, false);
+  await executeGoHome(true);
+});
+
+test('Test: Successfull complete onboarding request of SCP for product prod-interop search from infocamere with tax code', async () => {
+  renderComponent('prod-interop');
+  await executeStepInstitutionType('prod-interop', 'SCP');
+  await executeStepSearchParty(
+    'prod-interop',
+    'SCP',
+    'Mocked business 1',
+    'taxCode',
+    undefined,
+    '00112233445',
+    undefined,
+    false,
+    true
+  );
+  await executeStepBillingData(
+    'prod-interop',
+    'SCP',
+    false,
+    false,
+    'INFOCAMERE',
+    'Mocked business 1',
+    false
+  );
+  await executeStepAddManager();
+  await executeStepAddAdmin(true, false);
+  await verifySubmit('prod-interop', 'SCP', 'INFOCAMERE', false, false, 'taxCode', false);
+  await executeGoHome(true);
+});
+
+test('Test: Successfull complete onboarding request of PA aggregator party for prod-io search by business name', async () => {
+  renderComponent('prod-io');
+  await executeStepInstitutionType('prod-io', 'PA');
+  await executeStepSearchParty(
+    'prod-io',
+    'PA',
+    'AGENCY X',
+    'businessName',
+    undefined,
+    undefined,
+    undefined,
+    false,
+    false,
+    true
+  );
+  await executeStepBillingData('prod-io', 'PA', false, false, 'IPA', 'AGENCY X');
+  await executeStepAddManager();
+  await executeStepAddAdmin(true, false, true);
+  await executeStepUploadAggregates();
+  await verifySubmit('prod-io', 'PA', 'IPA', false, false, 'businessName', undefined, true, true);
+  await executeGoHome(true);
+});
+
+test('Test: Error on submit onboarding request of PA party for prod-io search by business name', async () => {
+  renderComponent('prod-io');
+  await executeStepInstitutionType('prod-io', 'PA');
+  await executeStepSearchParty('prod-io', 'PA', 'AGENCY ERROR', 'businessName');
+  await executeStepBillingData('prod-io', 'PA', false, false, 'IPA', 'AGENCY ERROR');
+  await executeStepAddManager();
+  await executeStepAddAdmin(false, false);
+  await verifySubmit('prod-io', 'PA', 'IPA', false, true);
+  await executeGoHome(true);
+});
+
+test('Test: Party already onboarded for a product that allow add new user, so the link is available', async () => {
+  renderComponent('prod-pagopa');
+  await executeStepInstitutionType('prod-pagopa', 'PA');
+  await executeStepSearchParty(
+    'prod-pagopa',
+    'PA',
     'AGENCY ONBOARDED',
     'businessName',
+    undefined,
     undefined,
     undefined,
     true
   );
   await waitFor(() => screen.getByText(/L’ente selezionato ha già aderito/));
 
-  // TODO ADD A TEST THAT CHECK IF THIS LINK IS AVAILABLE ONLY FOR THE PRODUCTS
-  const addNewUser = screen.getByText('Aggiungi un nuovo Amministratore');
-  await waitFor(() => fireEvent.click(addNewUser));
+  const addNewUserLink = screen.getByText('Aggiungi un nuovo Amministratore');
+  await waitFor(() => fireEvent.click(addNewUserLink));
 
   expect(history.length).toBe(1);
 });
 
 test('Test: Error retrieving onboarding info', async () => {
   renderComponent('prod-pagopa');
-  await executeStepInstitutionType('prod-pagopa', 'pa');
+  await executeStepInstitutionType('prod-pagopa', 'PA');
   await executeStepSearchParty(
     'prod-pagopa',
-    'pa',
+    'PA',
     'AGENCY INFO ERROR',
     'businessName',
+    undefined,
     undefined,
     undefined,
     true
   );
   await waitFor(() => screen.getByText('Qualcosa è andato storto'));
   await executeGoHome(false);
-});
-
-test('Test: Search trying to type invalid characters', async () => {
-  renderComponent('prod-pagopa');
-  await executeStepInstitutionType('prod-pagopa', 'pa');
-  const inputPartyName = document.getElementById('Parties') as HTMLElement;
-
-  expect(inputPartyName).toBeTruthy();
-  fireEvent.change(inputPartyName, { target: { value: 'AGENCY X ())!/!/££!' } });
-
-  await waitFor(() => screen.getByText('AGENCY X'));
 });
 
 test('Test: Invalid productId', async () => {
@@ -235,8 +473,8 @@ test('Test: Invalid productId', async () => {
 
 test('Test: Exiting during flow with unload event', async () => {
   renderComponent('prod-pagopa');
-  await executeStepInstitutionType('prod-pagopa', 'pa');
-  await executeStepSearchParty('prod-pagopa', 'pa', 'AGENCY X', 'businessName');
+  await executeStepInstitutionType('prod-pagopa', 'PA');
+  await executeStepSearchParty('prod-pagopa', 'PA', 'AGENCY X', 'businessName');
   const event = new Event('beforeunload');
   window.dispatchEvent(event);
   await waitFor(
@@ -248,9 +486,9 @@ test('Test: Exiting during flow with unload event', async () => {
 
 test('Test: Exiting during flow with logout', async () => {
   renderComponent('prod-io');
-  await executeStepInstitutionType('prod-io', 'pa');
+  await executeStepInstitutionType('prod-io', 'PA');
 
-  await executeStepSearchParty('prod-io', 'pa', 'AGENCY X', 'businessName');
+  await executeStepSearchParty('prod-io', 'PA', 'AGENCY X', 'businessName');
 
   expect(screen.queryByText('Vuoi davvero uscire?')).toBeNull();
 
@@ -266,10 +504,21 @@ test('Test: Exiting during flow with logout', async () => {
   await waitFor(() => expect(mockedLocation.assign).toBeCalledWith(ENV.URL_FE.LOGOUT));
 });
 
+test('Test: Search trying to type invalid characters', async () => {
+  renderComponent('prod-pagopa');
+  await executeStepInstitutionType('prod-pagopa', 'PA');
+  const inputPartyName = document.getElementById('Parties') as HTMLElement;
+
+  expect(inputPartyName).toBeTruthy();
+  fireEvent.change(inputPartyName, { target: { value: 'AGENCY X ())!/!/££!' } });
+
+  await waitFor(() => screen.getByText('AGENCY X'));
+});
+
 test('Test: RecipientCode input client validation', async () => {
   renderComponent('prod-pagopa');
-  await executeStepInstitutionType('prod-pagopa', 'pa');
-  await executeStepSearchParty('prod-pagopa', 'pa', 'AGENCY X', 'businessName');
+  await executeStepInstitutionType('prod-pagopa', 'PA');
+  await executeStepSearchParty('prod-pagopa', 'PA', 'AGENCY X', 'businessName');
   const confirmButtonEnabled = screen.getByRole('button', { name: 'Continua' });
   fireEvent.click(confirmButtonEnabled);
 
@@ -339,15 +588,18 @@ const checkBackForwardNavigation = async (
 };
 
 const executeStepInstitutionType = async (productSelected: string, institutionType: string) => {
+  const institutionTypeElementId = institutionType.toLowerCase();
   await waitFor(() => screen.getByText('Seleziona il tipo di ente che rappresenti'));
 
   if (productSelected !== 'prod-pn' && productSelected !== 'prod-idpay') {
-    await fillInstitutionTypeCheckbox('pa');
     screen.getByText(/Indica il tipo di ente che aderirà a/);
+    await fillInstitutionTypeCheckbox(institutionTypeElementId);
     const confirmButtonEnabled = screen.getByRole('button', { name: 'Continua' });
     expect(confirmButtonEnabled).toBeEnabled();
 
     fireEvent.click(confirmButtonEnabled);
+  } else {
+    await fillInstitutionTypeCheckbox('pa');
   }
 };
 
@@ -355,16 +607,44 @@ const executeStepSearchParty = async (
   productId: string,
   institutionType: string,
   partyName: string,
-  typeOfSearch: 'businessName' | 'taxCode' | 'aooCode' | 'uoCode',
+  typeOfSearch: Search,
   subUnitCode?: string,
   taxCode?: string,
-  expectedError: boolean = false
+  ivassCode?: string,
+  expectedError: boolean = false,
+  withoutIpa: boolean = false,
+  isAggregator: boolean = false
 ) => {
-  console.log('Testing step 1');
+  console.log('Testing step search party..');
+
   screen.getByText('Cerca il tuo ente');
 
   await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(1));
   const inputPartyName = document.getElementById('Parties') as HTMLElement;
+
+  const withoutIpaLink = document.getElementById('no_ipa') as HTMLElement;
+  if (productId === 'prod-pagopa' && institutionType === 'GSP') {
+    expect(withoutIpaLink).toBeInTheDocument();
+    if (withoutIpa) {
+      fireEvent.click(withoutIpaLink);
+      return;
+    }
+  } else {
+    expect(withoutIpaLink).not.toBeInTheDocument();
+  }
+
+  const aggregatorCheckbox = screen.queryByLabelText('Sono un ente aggregatore');
+
+  if (productId === 'prod-io') {
+    expect(aggregatorCheckbox).toBeInTheDocument();
+    expect(aggregatorCheckbox).not.toBeChecked();
+    if (isAggregator) {
+      fireEvent.click(aggregatorCheckbox);
+      expect(aggregatorCheckbox).toBeChecked();
+    }
+  } else {
+    expect(aggregatorCheckbox).not.toBeInTheDocument();
+  }
 
   switch (typeOfSearch) {
     case 'businessName':
@@ -375,14 +655,27 @@ const executeStepSearchParty = async (
       expect(fetchWithLogsSpy).toBeCalledTimes(2);
 
       expect(fetchWithLogsSpy).toHaveBeenCalledWith(
-        { endpoint: 'ONBOARDING_GET_SEARCH_PARTIES' },
+        {
+          endpoint:
+            institutionType === 'SA'
+              ? 'ONBOARDING_GET_SA_PARTIES_NAME'
+              : institutionType === 'AS'
+              ? 'ONBOARDING_GET_INSURANCE_COMPANIES_FROM_BUSINESSNAME'
+              : 'ONBOARDING_GET_SEARCH_PARTIES',
+        },
         {
           method: 'GET',
           params: {
-            limit: ENV.MAX_INSTITUTIONS_FETCH,
+            limit:
+              institutionType === 'SA' || institutionType === 'AS'
+                ? undefined
+                : ENV.MAX_INSTITUTIONS_FETCH,
+            categories:
+              institutionType === 'SA' || institutionType === 'AS'
+                ? undefined
+                : filterByCategory(institutionType.toUpperCase(), productId),
             page: 1,
             search: 'XXX',
-            categories: filterByCategory(institutionType, productId),
           },
         },
         expect.any(Function)
@@ -392,6 +685,7 @@ const executeStepSearchParty = async (
     case 'taxCode':
     case 'aooCode':
     case 'uoCode':
+    case 'ivassCode':
       const selectWrapper = document.getElementById('party-type-select');
       const input = selectWrapper?.firstChild as HTMLElement;
       fireEvent.keyDown(input, { keyCode: 40 });
@@ -400,40 +694,65 @@ const executeStepSearchParty = async (
       fireEvent.click(option);
 
       fireEvent.change(inputPartyName, {
-        target: { value: typeOfSearch === 'taxCode' ? taxCode : subUnitCode },
+        target: {
+          value:
+            typeOfSearch === 'taxCode'
+              ? taxCode
+              : typeOfSearch === 'ivassCode'
+              ? ivassCode
+              : subUnitCode,
+        },
       });
 
       const partyNameSelect = await waitFor(() =>
-        screen.getByText(typeOfSearch === 'taxCode' ? partyName.toLowerCase() : partyName)
+        screen.getByText(
+          typeOfSearch === 'taxCode' && institutionType !== 'SCP'
+            ? partyName.toLowerCase()
+            : partyName
+        )
       );
 
       const endpoint =
         typeOfSearch === 'taxCode'
-          ? 'ONBOARDING_GET_PARTY_FROM_CF'
+          ? institutionType === 'SA'
+            ? 'ONBOARDING_GET_SA_PARTY_FROM_FC'
+            : institutionType === 'SCP'
+            ? 'ONBOARDING_GET_PARTY_BY_CF_FROM_INFOCAMERE'
+            : 'ONBOARDING_GET_PARTY_FROM_CF'
           : typeOfSearch === 'aooCode'
           ? 'ONBOARDING_GET_AOO_CODE_INFO'
-          : 'ONBOARDING_GET_UO_CODE_INFO';
+          : typeOfSearch === 'uoCode'
+          ? 'ONBOARDING_GET_UO_CODE_INFO'
+          : 'ONBOARDING_GET_INSURANCE_COMPANIES_FROM_IVASSCODE';
 
       const endpointParams =
         typeOfSearch === 'taxCode'
-          ? { id: taxCode }
+          ? institutionType === 'SA'
+            ? { taxId: taxCode }
+            : { id: taxCode }
           : typeOfSearch === 'aooCode'
           ? { codiceUniAoo: subUnitCode }
-          : { codiceUniUo: subUnitCode };
+          : typeOfSearch === 'uoCode'
+          ? { codiceUniUo: subUnitCode }
+          : { taxId: ivassCode };
 
       const params =
-        typeOfSearch === 'taxCode'
-          ? {
-              productId: undefined,
-              subunitCode: undefined,
-              taxCode,
-            }
+        typeOfSearch === 'taxCode' || typeOfSearch === 'ivassCode'
+          ? institutionType === 'SA' || institutionType === 'AS'
+            ? undefined
+            : {
+                productId: undefined,
+                subunitCode: undefined,
+                taxCode: institutionType === 'SCP' ? undefined : taxCode,
+              }
           : {
               origin: 'IPA',
               categories: filterByCategory(institutionType, productId),
             };
 
-      expect(fetchWithLogsSpy).toBeCalledTimes(2);
+      expect(fetchWithLogsSpy).toBeCalledTimes(
+        typeOfSearch === 'aooCode' || typeOfSearch === 'uoCode' ? 3 : 2
+      );
 
       expect(fetchWithLogsSpy).toHaveBeenCalledWith(
         { endpoint, endpointParams },
@@ -455,131 +774,263 @@ const executeStepSearchParty = async (
 
   await waitFor(() => fireEvent.click(confirmButton));
 
-  await waitFor(() =>
-    expect(fetchWithLogsSpy).toBeCalledTimes(expectedError ? 3 : typeOfSearch === 'uoCode' ? 7 : 5)
-  );
+  if (isAggregator) {
+    await waitFor(() => screen.getByText(/Stai richiedendo l’adesione come ente aggregatore per /));
+    const continueButtonModal = screen.getAllByText('Continua')[1];
+    fireEvent.click(continueButtonModal);
+  }
 };
 
 const executeStepBillingData = async (
   productId: string,
   institutionType: string,
-  isAooUo: boolean = false
+  isAoo: boolean = false,
+  isUo: boolean = false,
+  from: Source = 'IPA',
+  partyName?: string,
+  isForeignInsurance?: boolean,
+  haveTaxCode: boolean = true
 ) => {
-  console.log('Testing step Billing Data');
+  console.log('Testing step billing data..');
   await waitFor(() => screen.getByText('Inserisci i dati dell’ente'));
-  // TODO MANAGE ALL CASES
-  if (!isAooUo) {
-    await fillUserBillingDataForm(
-      'businessName',
-      'registeredOffice',
-      'digitalAddress',
-      'zipCode',
-      'taxCode',
-      'vatNumber',
-      'recipientCode',
-      'supportEmail',
-      'city',
-      'province'
-    );
-  } else {
-    fireEvent.change(document.getElementById('vatNumber') as HTMLElement, {
-      target: { value: '11111111111' },
-    });
-    fireEvent.change(document.getElementById('supportEmail') as HTMLElement, {
-      target: { value: 'mail@mailtest.com' },
-    });
-  }
 
-  const confirmButtonEnabled = screen.getByRole('button', { name: 'Continua' });
+  await fillUserBillingDataForm(
+    'businessName',
+    'registeredOffice',
+    'digitalAddress',
+    'zipCode',
+    'taxCode',
+    'vatNumber',
+    'recipientCode',
+    'supportEmail',
+    'rea',
+    'city-select',
+    'county',
+    'country-select',
+    from,
+    institutionType,
+    isAoo,
+    isForeignInsurance,
+    haveTaxCode
+  );
 
-  const isInvoicable = canInvoice(institutionType, productId);
+  const confirmButton = screen.getByRole('button', { name: 'Continua' });
+
+  const isInvoicable = canInvoice(institutionType.toUpperCase(), productId);
+  const recipientCodeInput =
+    partyName === 'AGENCY ERROR'
+      ? 'A2B3C4'
+      : partyName === 'Comune di Milano'
+      ? 'A3B4C5'
+      : 'A1B2C3';
+  const taxCodeInvoicingInput =
+    partyName === 'AGENCY ERROR'
+      ? '75656445456'
+      : partyName === 'Comune di Milano'
+      ? '998877665544'
+      : '87654321098';
 
   if (isInvoicable) {
     fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
-      target: { value: 'A1B2C3' },
-    });
-    await waitFor(() =>
-      expect(document.getElementById('taxCodeInvoicing')).toHaveValue('87654321098')
-    );
-    await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
-
-    fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
-      target: { value: '' },
-    });
-    expect(document.getElementById('taxCodeInvoicing') as HTMLInputElement).not.toBeInTheDocument();
-
-    await waitFor(() => expect(confirmButtonEnabled).toBeDisabled());
-
-    fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
-      target: { value: 'AABBC1' },
-    });
-    await waitFor(() => screen.getByText('Il codice inserito non è associato al tuo ente'));
-
-    expect(document.getElementById('taxCodeInvoicing') as HTMLInputElement).not.toBeInTheDocument();
-
-    fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
-      target: { value: '2A3B4C' },
+      target: { value: recipientCodeInput },
     });
 
-    expect(document.getElementById('taxCodeInvoicing') as HTMLInputElement).not.toBeInTheDocument();
-
-    await waitFor(() =>
-      screen.getByText(
-        'Il codice inserito è associato al codice fiscale di un ente che non ha il servizio di fatturazione attivo'
-      )
-    );
-
-    fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
-      target: { value: 'A1B2C31' },
-    });
-
-    await waitFor(() =>
+    if (isUo || institutionType === 'PA') {
+      await waitFor(() =>
+        expect(document.getElementById('taxCodeInvoicing')).toHaveValue(taxCodeInvoicingInput)
+      );
+      await waitFor(() => expect(confirmButton).toBeEnabled());
+      fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
+        target: { value: '' },
+      });
       expect(
         document.getElementById('taxCodeInvoicing') as HTMLInputElement
-      ).not.toBeInTheDocument()
-    );
+      ).not.toBeInTheDocument();
 
-    fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
-      target: { value: 'A1B2C3' },
-    });
+      await waitFor(() => expect(confirmButton).toBeDisabled());
 
-    await waitFor(() =>
-      expect(document.getElementById('taxCodeInvoicing') as HTMLInputElement).toBeInTheDocument()
-    );
-    expect(document.getElementById('taxCodeInvoicing') as HTMLInputElement).toBeDisabled();
+      fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
+        target: { value: 'AABBC1' },
+      });
+      await waitFor(() => screen.getByText('Il codice inserito non è associato al tuo ente'));
 
-    fireEvent.change(document.getElementById('taxCodeInvoicing') as HTMLInputElement, {
-      target: { value: '87654321092' },
-    });
-    await waitFor(() => screen.getByText('Il Codice Fiscale inserito non è relativo al tuo ente'));
+      expect(
+        document.getElementById('taxCodeInvoicing') as HTMLInputElement
+      ).not.toBeInTheDocument();
 
-    await waitFor(() => expect(confirmButtonEnabled).toBeDisabled());
+      fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
+        target: { value: '2A3B4C' },
+      });
 
-    fireEvent.change(document.getElementById('taxCodeInvoicing') as HTMLElement, {
-      target: { value: '87654321098' },
-    });
+      expect(
+        document.getElementById('taxCodeInvoicing') as HTMLInputElement
+      ).not.toBeInTheDocument();
+
+      await waitFor(() =>
+        screen.getByText(
+          'Il codice inserito è associato al codice fiscale di un ente che non ha il servizio di fatturazione attivo'
+        )
+      );
+
+      fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
+        target: { value: 'A1B2C31' },
+      });
+
+      await waitFor(() =>
+        expect(
+          document.getElementById('taxCodeInvoicing') as HTMLInputElement
+        ).not.toBeInTheDocument()
+      );
+
+      fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
+        target: { value: recipientCodeInput },
+      });
+
+      await waitFor(() =>
+        expect(document.getElementById('taxCodeInvoicing') as HTMLInputElement).toBeInTheDocument()
+      );
+      expect(document.getElementById('taxCodeInvoicing') as HTMLInputElement).toBeDisabled();
+
+      fireEvent.change(document.getElementById('taxCodeInvoicing') as HTMLInputElement, {
+        target: { value: '87654321092' },
+      });
+      await waitFor(() =>
+        screen.getByText('Il Codice Fiscale inserito non è relativo al tuo ente')
+      );
+
+      await waitFor(() => expect(confirmButton).toBeDisabled());
+
+      fireEvent.change(document.getElementById('taxCodeInvoicing') as HTMLElement, {
+        target: { value: taxCodeInvoicingInput },
+      });
+    }
+  } else {
+    expect(document.getElementById('taxCodeInvoicing')).not.toBeInTheDocument();
   }
 
-  // TODO MANAGE ALL CASES
-  if (!isAooUo) {
+  if (from !== 'IPA') {
     await checkCorrectBodyBillingData(
+      institutionType,
       'businessNameInput',
       'registeredOfficeInput',
       'a@a.it',
       '09010',
       '00000000000',
       '00000000000',
-      'A1B2C3'
+      'A1B2C3',
+      'Milano',
+      'MI',
+      isForeignInsurance,
+      haveTaxCode
     );
   }
 
-  await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
-  fireEvent.click(confirmButtonEnabled);
+  await waitFor(() => expect(confirmButton).toBeEnabled());
+  fireEvent.click(confirmButton);
+};
+
+const executeStepAdditionalInfo = async (from: 'IPA' | 'NO_IPA' = 'IPA') => {
+  console.log('Testing step additional informations..');
+
+  await waitFor(() => screen.getByText('Inserisci ulteriori dettagli'));
+
+  const continueButton = screen.getByText('Continua');
+  expect(continueButton).toBeDisabled();
+
+  if (from === 'IPA') {
+    expect(document.getElementById('isFromIPA-yes')).toBeChecked();
+    expect(document.getElementById('isFromIPA-no')).not.toBeChecked();
+  } else {
+    expect(document.getElementById('isFromIPA-yes')).not.toBeChecked();
+    expect(document.getElementById('isFromIPA-no')).toBeChecked();
+  }
+
+  fireEvent.click(document.getElementById('isEstabilishedRegulatoryProvision-no') as HTMLElement);
+  fireEvent.click(document.getElementById('fromBelongsRegulatedMarket-no') as HTMLElement);
+
+  fireEvent.click(document.getElementById('isConcessionaireOfPublicService-yes') as HTMLElement);
+  expect(continueButton).toBeEnabled();
+
+  fireEvent.click(document.getElementById('isConcessionaireOfPublicService-no') as HTMLElement);
+
+  if (from !== 'IPA') {
+    expect(continueButton).toBeDisabled();
+  }
+
+  fireEvent.click(document.getElementById('optionalPartyInformations-checked') as HTMLElement);
+  expect(continueButton).toBeEnabled();
+
+  fireEvent.click(continueButton);
+
+  expect(screen.queryByText('Campo obbligatorio')).toBeInTheDocument();
+  expect(continueButton).toBeDisabled();
+
+  fireEvent.change(document.getElementById('optionalPartyInformations') as HTMLElement, {
+    target: { value: 'optionalPartyInformations-note' },
+  });
+  expect(screen.queryByText('Campo obbligatorio')).not.toBeInTheDocument();
+  expect(continueButton).toBeEnabled();
+
+  fireEvent.click(
+    document.getElementById('isConcessionaireOfPublicService-add-note') as HTMLInputElement
+  );
+  expect(continueButton).toBeEnabled();
+
+  fireEvent.click(continueButton);
+
+  expect(
+    document.getElementById('isConcessionaireOfPublicService-note-helper-text')?.textContent
+  ).toBe('Non hai inserito nessuna nota');
+  expect(continueButton).toBeDisabled();
+
+  fireEvent.click(
+    document.getElementById('isConcessionaireOfPublicService-remove-field') as HTMLElement
+  );
+
+  expect(
+    document.getElementById('isConcessionaireOfPublicService-note-helper-text')?.textContent
+  ).toBeUndefined();
+  expect(continueButton).toBeEnabled();
+
+  expect(document.getElementById('fromBelongsRegulatedMarket-no')).toBeChecked();
+  fireEvent.click(document.getElementById('fromBelongsRegulatedMarket-yes') as HTMLElement);
+  expect(document.getElementById('fromBelongsRegulatedMarket-no')).not.toBeChecked();
+  expect(document.getElementById('fromBelongsRegulatedMarket-yes')).toBeChecked();
+
+  if (from !== 'IPA') {
+    expect(document.getElementById('isFromIPA-no')).toBeChecked();
+    fireEvent.click(document.getElementById('isFromIPA-yes') as HTMLElement);
+    expect(document.getElementById('isFromIPA-no')).not.toBeChecked();
+    expect(document.getElementById('isFromIPA-yes')).toBeChecked();
+
+    expect(screen.queryAllByText('Inserisci il codice IPA di riferimento')[0]).toBeInTheDocument();
+
+    fireEvent.click(continueButton);
+
+    expect(document.getElementById('isFromIPA-no')).not.toBeChecked();
+    expect(document.getElementById('isFromIPA-note-helper-text')?.textContent).toBe(
+      'Inserisci il codice IPA di riferimento'
+    );
+    expect(continueButton).toBeDisabled();
+
+    fireEvent.click(document.getElementById('isFromIPA-no') as HTMLElement);
+    expect(document.getElementById('isFromIPA-no')).toBeChecked();
+    expect(document.getElementById('isFromIPA-yes')).not.toBeChecked();
+
+    expect(document.getElementById('isFromIPA-note-helper-text')?.textContent).toBeUndefined();
+  }
+
+  expect(continueButton).toBeEnabled();
+
+  fireEvent.click(continueButton);
 };
 
 const executeStepAddManager = async () => {
-  console.log('Testing step 2');
+  console.log('Testing step add manager..');
+
   await waitFor(() => screen.getByText('Indica il Legale Rappresentante'));
+
+  screen.getByText('Più informazioni sui ruoli');
 
   const confirmButton = screen.getByRole('button', { name: 'Continua' });
   expect(confirmButton).toBeDisabled();
@@ -591,14 +1042,20 @@ const executeStepAddManager = async () => {
   fireEvent.click(confirmButton);
 };
 
-const executeStepAddAdmin = async (expectedSuccessfulSubmit: boolean, isTechPartner = false) => {
-  console.log('Testing step 3');
+const executeStepAddAdmin = async (
+  expectedSuccessfulSubmit: boolean,
+  isTechPartner: boolean = false,
+  isAggregator: boolean = false
+) => {
+  console.log('Testing step add admin..');
 
   await waitFor(() => screen.getByText("Indica l'Amministratore"));
-  const [_, confirmButton] = await checkBackForwardNavigation(
-    'Indica il Legale Rappresentante',
-    "Indica l'Amministratore"
-  );
+
+  screen.getByText('Più informazioni sui ruoli');
+
+  const prevStep = isTechPartner ? 'Inserisci i dati dell’ente' : 'Indica il Legale Rappresentante';
+
+  const [_, confirmButton] = await checkBackForwardNavigation(prevStep, "Indica l'Amministratore");
 
   const addDelegateButton = screen.getByRole('button', {
     name: 'Aggiungi un altro Amministratore',
@@ -615,31 +1072,60 @@ const executeStepAddAdmin = async (expectedSuccessfulSubmit: boolean, isTechPart
     'a@a.AA',
     true,
     'SRNNMA80A01A794F',
-    1,
+    isTechPartner ? 0 : 1,
     'b@b.bb',
-    1
+    isTechPartner ? 0 : 1
   );
 
   await waitFor(() => expect(confirmButton).toBeEnabled());
 
   expect(addDelegateButton).toBeEnabled();
-  await waitFor(() => checkAdditionalUsers(confirmButton));
+  await waitFor(() => checkAdditionalUsers(confirmButton, isTechPartner));
 
   await waitFor(() => fireEvent.click(confirmButton));
 
-  const confimationModalBtn = await waitFor(() => screen.getByText('Conferma'));
+  if (!isTechPartner) {
+    const confimationModalBtn = await waitFor(() => screen.getByText('Conferma'));
 
-  await waitFor(() => fireEvent.click(confimationModalBtn));
+    await waitFor(() => fireEvent.click(confimationModalBtn));
+  }
 
-  await waitFor(() =>
-    screen.getByText(
-      isTechPartner
-        ? 'Richiesta di registrazione inviata'
-        : expectedSuccessfulSubmit
-        ? 'Richiesta di adesione inviata'
-        : 'Qualcosa è andato storto.'
-    )
-  );
+  if (!isAggregator) {
+    await waitFor(() =>
+      screen.getByText(
+        isTechPartner && expectedSuccessfulSubmit
+          ? 'Richiesta di registrazione inviata'
+          : expectedSuccessfulSubmit
+          ? 'Richiesta di adesione inviata'
+          : 'Qualcosa è andato storto.'
+      )
+    );
+  }
+};
+
+const executeStepUploadAggregates = async () => {
+  console.log('Testing step upload aggregates..');
+
+  await waitFor(() => screen.getByText('Indica i soggetti aggregati per App IO'));
+
+  const upload = document.getElementById('file-uploader') as HTMLElement;
+  const continueButton = screen.getByRole('button', { name: 'Continua' });
+  const downloadExampleCsv = screen.getByText('Scarica l’esempio');
+  fireEvent.click(downloadExampleCsv);
+
+  const csvWithErrors = screen.queryByText(/Il file contiene uno o più errori/);
+  const invalidFormatFile = screen.queryByText(/Il formato del file non è valido/);
+
+  expect(continueButton).toBeDisabled();
+
+  userEvent.upload(upload, aggregatesCsv);
+
+  await waitFor(() => expect(continueButton).toBeEnabled());
+  fireEvent.click(continueButton);
+
+  expect(csvWithErrors).not.toBeInTheDocument();
+  expect(invalidFormatFile).not.toBeInTheDocument();
+  await waitFor(() => screen.getByText('Richiesta di adesione inviata'));
 };
 
 const checkCertifiedUserValidation = async (prefix: string, confirmButton: HTMLElement) => {
@@ -650,7 +1136,6 @@ const checkCertifiedUserValidation = async (prefix: string, confirmButton: HTMLE
 
 const fillInstitutionTypeCheckbox = async (element: string) => {
   const selectedInstitutionType = document.getElementById(element) as HTMLElement;
-  expect(selectedInstitutionType).not.toBeChecked();
   fireEvent.click(selectedInstitutionType);
   await waitFor(() => expect(selectedInstitutionType).toBeChecked());
 };
@@ -666,43 +1151,165 @@ const fillUserBillingDataForm = async (
   supportEmail?: string,
   rea?: string,
   city?: string,
-  province?: string
+  county?: string,
+  country?: string,
+  from: Source = 'IPA',
+  institutionType?: string,
+  isAoo?: boolean,
+  isForeignInsurance: boolean = false,
+  haveTaxCode: boolean = true
 ) => {
-  fireEvent.change(document.getElementById(businessNameInput) as HTMLElement, {
-    target: { value: 'businessNameInput' },
-  });
-  fireEvent.change(document.getElementById(registeredOfficeInput) as HTMLElement, {
-    target: { value: 'registeredOfficeInput' },
-  });
-  fireEvent.change(document.getElementById(mailPECInput) as HTMLElement, {
-    target: { value: 'a@a.it' },
-  });
-  fireEvent.change(document.getElementById(zipCode) as HTMLElement, { target: { value: '09010' } });
-  fireEvent.change(document.getElementById(taxCodeInput) as HTMLElement, {
-    target: { value: '00000000000' },
-  });
+  if (from !== 'IPA' && from !== 'INFOCAMERE') {
+    if (institutionType !== 'SA' && institutionType !== 'AS') {
+      fireEvent.change(document.getElementById(businessNameInput) as HTMLElement, {
+        target: { value: 'businessNameInput' },
+      });
+      fireEvent.change(document.getElementById(mailPECInput) as HTMLElement, {
+        target: { value: 'a@a.it' },
+      });
 
-  const isTaxCodeEquals2PIVA = document.getElementById('taxCodeEquals2VatNumber');
-  expect(isTaxCodeEquals2PIVA).toBeTruthy();
+      const taxCodeElement = document.getElementById(taxCodeInput) as HTMLElement;
 
-  fireEvent.change(document.getElementById(vatNumber) as HTMLElement, {
-    target: { value: '00000000000' },
-  });
+      if (haveTaxCode) {
+        fireEvent.change(taxCodeElement, {
+          target: { value: '00000000000' },
+        });
+      } else {
+        expect(taxCodeElement).not.toBeInTheDocument();
+      }
+    }
 
-  fireEvent.change(document.getElementById(recipientCode) as HTMLElement, {
-    target: { value: 'A1B2C3D' },
-  });
-  const searchCitySelect = document.getElementById('city-select');
-  if (searchCitySelect) {
-    fireEvent.change(searchCitySelect as HTMLInputElement, { target: { value: 'desc1' } });
+    fireEvent.change(document.getElementById(registeredOfficeInput) as HTMLElement, {
+      target: { value: 'registeredOfficeInput' },
+    });
+
+    const input = isForeignInsurance ? 'Spa' : 'Mil';
+    const expectedOption = isForeignInsurance ? 'Spagna' : 'Milano';
+
+    const autocomplete = document.getElementById((isForeignInsurance ? country : city) as string);
+    userEvent.type(autocomplete, input);
+
+    const option = await screen.findByText(expectedOption, {}, { timeout: 8000 });
+    expect(option).toBeInTheDocument();
+    fireEvent.click(option);
+
+    if (!isForeignInsurance) {
+      fireEvent.change(document.getElementById(zipCode) as HTMLElement, {
+        target: { value: '09010' },
+      });
+      expect(document.getElementById(county) as HTMLElement).toHaveValue('MI');
+    } else {
+      fireEvent.change(document.getElementById('city') as HTMLElement, {
+        target: { value: 'Valencia' },
+      });
+    }
+
+    if (institutionType !== 'PT' && institutionType !== 'AS' && institutionType !== 'PSP') {
+      fireEvent.change(document.getElementById(rea) as HTMLInputElement, {
+        target: { value: 'MI-12345' },
+      });
+    }
+  } else {
+    const isTaxCodeEquals2PIVA = document.getElementById('taxCodeEquals2VatNumber') as HTMLElement;
+    fireEvent.click(isTaxCodeEquals2PIVA);
+
+    expect((document.getElementById('vatNumber') as HTMLInputElement).value).toBe(
+      (document.getElementById('taxCode') as HTMLInputElement).value
+    );
   }
 
-  if (province) {
-    fireEvent.change(document.getElementById(province) as HTMLElement, {
-      target: { value: 'RM' },
+  if (from !== 'IVASS' || !isForeignInsurance) {
+    fireEvent.change(document.getElementById(vatNumber) as HTMLElement, {
+      target: { value: '00000000000' },
     });
   }
-  if (supportEmail) {
+
+  const vatNumberGroup = document.getElementById('vatNumberGroup') as HTMLElement;
+  const commercialRegisterNumber = document.getElementById(
+    'commercialRegisterNumber'
+  ) as HTMLElement;
+  const registrationInRegister = document.getElementById('registrationInRegister') as HTMLElement;
+  const registerNumber = document.getElementById('registerNumber') as HTMLElement;
+  const abiCode = document.getElementById('abiCode') as HTMLElement;
+  const dpoDataSection = document.getElementById('dpo-data-section') as HTMLElement;
+
+  if (institutionType === 'PSP') {
+    expect(dpoDataSection).toBeInTheDocument();
+    expect(vatNumberGroup).toBeInTheDocument();
+    fireEvent.click(vatNumberGroup);
+
+    const dpoAddress = document.getElementById('dpoAddress') as HTMLElement;
+    const dpoPecAddress = document.getElementById('dpoPecAddress') as HTMLElement;
+    const dpoEmailAddress = document.getElementById('dpoEmailAddress') as HTMLElement;
+
+    fireEvent.change(dpoAddress as HTMLInputElement, {
+      target: { value: 'Via milano 5' },
+    });
+    fireEvent.change(dpoPecAddress as HTMLInputElement, {
+      target: { value: 'dpopec@mailtest.com' },
+    });
+    fireEvent.change(dpoEmailAddress as HTMLInputElement, {
+      target: { value: 'dpomail@mailtest.com' },
+    });
+
+    fireEvent.change(commercialRegisterNumber as HTMLInputElement, {
+      target: { value: '1234455566' },
+    });
+    await waitFor(() =>
+      expect(document.getElementById('commercialRegisterNumber-helper-text')?.textContent).toBe(
+        'Il n. Iscrizione al Registro delle Imprese non è valido'
+      )
+    );
+
+    fireEvent.change(commercialRegisterNumber as HTMLInputElement, {
+      target: { value: '12344555667' },
+    });
+    await waitFor(() =>
+      expect(
+        document.getElementById('commercialRegisterNumber-helper-text')?.textContent
+      ).toBeUndefined()
+    );
+
+    fireEvent.change(registrationInRegister as HTMLInputElement, {
+      target: { value: '123' },
+    });
+
+    fireEvent.change(registerNumber as HTMLInputElement, {
+      target: { value: '24' },
+    });
+
+    fireEvent.change(abiCode as HTMLInputElement, {
+      target: { value: '4' },
+    });
+    await waitFor(() =>
+      expect(document.getElementById('abiCode-helper-text')?.textContent).toBe(
+        'Il Codice ABI non è valido'
+      )
+    );
+
+    fireEvent.change(abiCode as HTMLInputElement, {
+      target: { value: '23321' },
+    });
+    await waitFor(() =>
+      expect(document.getElementById('abiCode-helper-text')?.textContent).toBeUndefined()
+    );
+  } else {
+    expect(vatNumberGroup).not.toBeInTheDocument();
+    expect(commercialRegisterNumber).not.toBeInTheDocument();
+    expect(registrationInRegister).not.toBeInTheDocument();
+    expect(registerNumber).not.toBeInTheDocument();
+    expect(abiCode).not.toBeInTheDocument();
+    expect(dpoDataSection).not.toBeInTheDocument();
+  }
+
+  if (
+    (institutionType === 'PA' && !isAoo) ||
+    institutionType === 'GSP' ||
+    institutionType === 'PSP'
+  ) {
+    fireEvent.change(document.getElementById(recipientCode) as HTMLElement, {
+      target: { value: 'A1B2C3D' },
+    });
     fireEvent.change(document.getElementById(supportEmail) as HTMLInputElement, {
       target: { value: 'a@a.it' },
     });
@@ -811,28 +1418,100 @@ const checkLoggedUserAsAdminCheckbox = async (
 };
 
 const checkCorrectBodyBillingData = (
+  institutionType: string,
   expectedBusinessName: string = '',
   expectedRegisteredOfficeInput: string = '',
   expectedMailPEC: string = '',
   expectedZipCode: string = '',
   expectedTaxCode: string = '',
   expectedVatNumber: string = '',
-  expectedRecipientCode: string = ''
+  expectedRecipientCode: string = '',
+  expectedCity: string = '',
+  expectedCounty: string = '',
+  isForeignInsurance?: boolean,
+  haveTaxCode?: boolean
 ) => {
   expect((document.getElementById('businessName') as HTMLInputElement).value).toBe(
-    expectedBusinessName
-  );
-  expect((document.getElementById('registeredOffice') as HTMLInputElement).value).toBe(
-    expectedRegisteredOfficeInput
+    institutionType === 'SA'
+      ? mockedANACParties[0].description
+      : institutionType === 'AS'
+      ? haveTaxCode
+        ? isForeignInsurance
+          ? mockedInsuranceResource.items[0].description
+          : mockedInsuranceResource.items[2].description
+        : mockedInsuranceResource.items[4].description
+      : institutionType === 'SCP'
+      ? mockedPartiesFromInfoCamere[0].businessName
+      : expectedBusinessName
   );
   expect((document.getElementById('digitalAddress') as HTMLInputElement).value).toBe(
-    expectedMailPEC
+    institutionType === 'SA'
+      ? mockedANACParties[0].digitalAddress
+      : institutionType === 'AS'
+      ? haveTaxCode
+        ? isForeignInsurance
+          ? mockedInsuranceResource.items[0].digitalAddress
+          : mockedInsuranceResource.items[2].digitalAddress
+        : mockedInsuranceResource.items[4].digitalAddress
+      : institutionType === 'SCP'
+      ? mockedPartiesFromInfoCamere[0].digitalAddress
+      : expectedMailPEC
   );
-  expect((document.getElementById('zipCode') as HTMLInputElement).value).toBe(expectedZipCode);
-  expect((document.getElementById('taxCode') as HTMLInputElement).value).toBe(expectedTaxCode);
-  expect((document.getElementById('vatNumber') as HTMLInputElement).value).toBe(expectedVatNumber);
-  expect((document.getElementById('recipientCode') as HTMLInputElement).value).toBe(
-    expectedRecipientCode
+
+  if (haveTaxCode) {
+    expect((document.getElementById('taxCode') as HTMLInputElement).value).toBe(
+      institutionType === 'SA'
+        ? mockedANACParties[0].taxCode
+        : institutionType === 'AS'
+        ? isForeignInsurance
+          ? mockedInsuranceResource.items[0].taxCode
+          : mockedInsuranceResource.items[2].taxCode
+        : institutionType === 'SCP'
+        ? mockedPartiesFromInfoCamere[0].businessTaxId
+        : expectedTaxCode
+    );
+  }
+
+  if (isForeignInsurance) {
+    expect((document.getElementById('city') as HTMLInputElement).value).toBe('Valencia');
+    expect((document.getElementById('country-select') as HTMLInputElement).value).toBe('Spagna');
+  } else {
+    expect((document.getElementById('zipCode') as HTMLInputElement).value).toBe(
+      institutionType === 'SCP' ? mockedPartiesFromInfoCamere[0].zipCode : expectedZipCode
+    );
+    expect((document.getElementById('vatNumber') as HTMLInputElement).value).toBe(
+      expectedVatNumber
+    );
+    expect((document.getElementById('city-select') as HTMLInputElement).value).toBe(
+      institutionType === 'SCP' ? mockedPartiesFromInfoCamere[0].city : expectedCity
+    );
+    expect((document.getElementById('county') as HTMLInputElement).value).toBe(
+      institutionType === 'SCP' ? mockedPartiesFromInfoCamere[0].county : expectedCounty
+    );
+  }
+
+  if (institutionType === 'PA' || institutionType === 'GSP' || institutionType === 'PSP') {
+    expect((document.getElementById('recipientCode') as HTMLInputElement).value).toBe(
+      expectedRecipientCode
+    );
+  }
+
+  if (institutionType === 'SA') {
+    fireEvent.change(document.getElementById('businessRegisterPlace') as HTMLElement, {
+      target: { value: 'business register place' },
+    });
+    fireEvent.change(document.getElementById('rea') as HTMLElement, {
+      target: { value: 'MI-12345' },
+    });
+    fireEvent.change(document.getElementById('shareCapital') as HTMLElement, {
+      target: { value: '€ 332.323' },
+    });
+  }
+
+  expect((document.getElementById('registeredOffice') as HTMLInputElement).value).toBe(
+    institutionType === 'SCP'
+      ? mockedPartiesFromInfoCamere[0].address
+      : expectedRegisteredOfficeInput
   );
 };
 
@@ -858,11 +1537,11 @@ const clickAdminCheckBoxAndTestValues = (
   expect(addDelegateButton).toBeDisabled();
 };
 
-const checkAdditionalUsers = async (confirmButton: HTMLElement) => {
+const checkAdditionalUsers = async (confirmButton: HTMLElement, isTechPartner: boolean) => {
   console.log('Adding additional user');
   await checkRemovingEmptyAdditionalUser(0, confirmButton);
 
-  await fillAdditionalUserAndCheckUniqueValues(0, confirmButton);
+  await fillAdditionalUserAndCheckUniqueValues(0, confirmButton, isTechPartner);
 };
 
 const checkRemovingEmptyAdditionalUser = async (index: number, confirmButton: HTMLElement) => {
@@ -931,7 +1610,8 @@ const searchUserFormFromRemoveBtn = (removeButton: HTMLElement) => {
 };
 const fillAdditionalUserAndCheckUniqueValues = async (
   index: number,
-  confirmButton: HTMLElement
+  confirmButton: HTMLElement,
+  isTechPartner: boolean
 ) => {
   const removeUserButtons = await addAdditionEmptyUser(index, confirmButton);
 
@@ -951,16 +1631,16 @@ const fillAdditionalUserAndCheckUniqueValues = async (
     email,
     true,
     'SRNNMA80A01A794F',
-    1,
+    isTechPartner ? 0 : 1,
     'b@b.bb',
-    1
+    isTechPartner ? 0 : 1
   );
   await checkAlreadyExistentValues(
     prefix,
     confirmButton,
     'SRNNMA80A01A794F',
     taxCode,
-    1,
+    isTechPartner ? 0 : 1,
     'a@a.aa',
     email,
     2
@@ -970,25 +1650,165 @@ const fillAdditionalUserAndCheckUniqueValues = async (
     confirmButton,
     'SRNNMA80A01A794F',
     taxCode,
-    1,
+    isTechPartner ? 0 : 1,
     'a@a.aa',
     email,
     2
   );
 };
 
-const billingData2billingDataRequest = () => ({
-  businessName: 'businessNameInput',
-  registeredOffice: 'registeredOfficeInput',
-  digitalAddress: 'a@a.it',
-  zipCode: '09010',
-  taxCode: '00000000000',
-  taxCodeInvoicing: '87654321098',
-  vatNumber: '00000000000',
-  recipientCode: 'A1B2C3'.toUpperCase(),
+const billingData2billingDataRequest = (
+  institutionType: string,
+  SfeAvailable?: boolean,
+  from: Source = 'IPA',
+  errorOnSubmit?: boolean,
+  typeOfSearch: Search = 'businessName',
+  isForeignInsurance?: boolean,
+  haveTaxCode?: boolean
+) => ({
+  businessName: errorOnSubmit
+    ? mockPartyRegistry.items[1].description
+    : from === 'NO_IPA'
+    ? 'businessNameInput'
+    : from === 'ANAC'
+    ? mockedANACParties[0].description
+    : from === 'INFOCAMERE'
+    ? mockedPartiesFromInfoCamere[0].businessName
+    : from === 'IVASS'
+    ? haveTaxCode
+      ? isForeignInsurance
+        ? mockedInsuranceResource.items[0].description
+        : mockedInsuranceResource.items[2].description
+      : mockedInsuranceResource.items[4].description
+    : typeOfSearch === 'taxCode'
+    ? mockedParties[0].description
+    : typeOfSearch === 'aooCode'
+    ? mockedAoos[0].denominazioneAoo
+    : typeOfSearch === 'uoCode'
+    ? mockedUos[0].descrizioneUo
+    : mockPartyRegistry.items[0].description,
+  registeredOffice: errorOnSubmit
+    ? mockPartyRegistry.items[1].address
+    : from === 'INFOCAMERE'
+    ? mockedPartiesFromInfoCamere[0].address
+    : from !== 'IPA'
+    ? 'registeredOfficeInput'
+    : typeOfSearch === 'taxCode'
+    ? mockedParties[0].address
+    : typeOfSearch === 'aooCode'
+    ? mockedAoos[0].indirizzo
+    : typeOfSearch === 'uoCode'
+    ? mockedUos[0].indirizzo
+    : mockPartyRegistry.items[0].address,
+  digitalAddress: errorOnSubmit
+    ? mockPartyRegistry.items[1].digitalAddress
+    : from === 'NO_IPA'
+    ? 'a@a.it'
+    : from === 'ANAC'
+    ? mockedANACParties[0].digitalAddress
+    : from === 'INFOCAMERE'
+    ? mockedPartiesFromInfoCamere[0].digitalAddress
+    : from === 'IVASS'
+    ? haveTaxCode
+      ? isForeignInsurance
+        ? mockedInsuranceResource.items[0].digitalAddress
+        : mockedInsuranceResource.items[2].digitalAddress
+      : mockedInsuranceResource.items[4].digitalAddress
+    : typeOfSearch === 'taxCode'
+    ? mockedParties[0].digitalAddress
+    : typeOfSearch === 'aooCode'
+    ? mockedAoos[0].mail1
+    : typeOfSearch === 'uoCode'
+    ? mockedUos[0].mail1
+    : mockPartyRegistry.items[0].digitalAddress,
+  zipCode: errorOnSubmit
+    ? mockPartyRegistry.items[1].zipCode
+    : isForeignInsurance
+    ? undefined
+    : from === 'INFOCAMERE'
+    ? mockedPartiesFromInfoCamere[0].zipCode
+    : from !== 'IPA'
+    ? '09010'
+    : typeOfSearch === 'taxCode'
+    ? mockedParties[0].zipCode
+    : typeOfSearch === 'aooCode'
+    ? mockedAoos[0].CAP
+    : typeOfSearch === 'uoCode'
+    ? mockedUos[0].CAP
+    : mockPartyRegistry.items[0].zipCode,
+  taxCode: errorOnSubmit
+    ? mockPartyRegistry.items[1].taxCode
+    : from === 'IPA'
+    ? typeOfSearch === 'taxCode'
+      ? mockedParties[0].taxCode
+      : typeOfSearch === 'aooCode'
+      ? mockedAoos[0].codiceFiscaleEnte
+      : typeOfSearch === 'uoCode'
+      ? mockedUos[0].codiceFiscaleEnte
+      : mockPartyRegistry.items[0].taxCode
+    : from === 'NO_IPA'
+    ? '00000000000'
+    : from === 'ANAC'
+    ? mockedANACParties[0].taxCode
+    : from === 'INFOCAMERE'
+    ? mockedPartiesFromInfoCamere[0].businessTaxId
+    : from === 'IVASS'
+    ? haveTaxCode
+      ? isForeignInsurance
+        ? mockedInsuranceResource.items[0].taxCode
+        : mockedInsuranceResource.items[2].taxCode
+      : mockedInsuranceResource.items[4].taxCode
+    : '12345678911',
+  vatNumber: errorOnSubmit
+    ? mockPartyRegistry.items[1].taxCode
+    : from === 'INFOCAMERE'
+    ? mockedPartiesFromInfoCamere[0].businessTaxId
+    : from === 'IPA'
+    ? typeOfSearch === 'taxCode'
+      ? mockedParties[0].taxCode
+      : typeOfSearch === 'aooCode'
+      ? mockedAoos[0].codiceFiscaleEnte
+      : typeOfSearch === 'uoCode'
+      ? mockedUos[0].codiceFiscaleEnte
+      : mockPartyRegistry.items[0].taxCode
+    : from === 'NO_IPA' || from === 'ANAC'
+    ? '00000000000'
+    : from === 'IVASS'
+    ? isForeignInsurance
+      ? undefined
+      : '00000000000'
+    : '12345678911',
+  taxCodeInvoicing: SfeAvailable
+    ? errorOnSubmit
+      ? '75656445456'
+      : typeOfSearch === 'taxCode'
+      ? '998877665544'
+      : '87654321098'
+    : undefined,
+  recipientCode: errorOnSubmit
+    ? 'A2B3C4'
+    : // MERGE THIS CONDITIONS
+    institutionType === 'PSP'
+    ? 'A1B2C3'
+    : (from === 'IPA' || institutionType === 'GSP') && typeOfSearch !== 'aooCode'
+    ? typeOfSearch === 'taxCode'
+      ? 'A3B4C5'
+      : 'A1B2C3'
+    : undefined,
 });
 
-const verifySubmit = async (productId = 'prod-io') => {
+const verifySubmit = async (
+  productId: string = 'prod-io',
+  institutionType: string,
+  from: Source = 'IPA',
+  uo: boolean = false,
+  errorOnSubmit: boolean = false,
+  typeOfSearch: Search = 'businessName',
+  isForeignInsurance?: boolean | undefined,
+  haveTaxCode: boolean = true,
+  isAggregator?: boolean
+) => {
+  const SfeAvailable = (uo || institutionType === 'PA') && canInvoice(institutionType, productId);
   await waitFor(() =>
     expect(fetchWithLogsSpy).lastCalledWith(
       {
@@ -996,11 +1816,115 @@ const verifySubmit = async (productId = 'prod-io') => {
       },
       {
         data: {
-          billingData: billingData2billingDataRequest(),
-          pspData: undefined,
-          originId: '991',
-          institutionType: 'PA',
-          origin: 'IPA',
+          billingData: billingData2billingDataRequest(
+            institutionType,
+            SfeAvailable,
+            from,
+            errorOnSubmit,
+            typeOfSearch,
+            isForeignInsurance,
+            haveTaxCode
+          ),
+          institutionType,
+          productId,
+          origin:
+            from === 'IPA'
+              ? 'IPA'
+              : from === 'IVASS'
+              ? 'IVASS'
+              : from === 'INFOCAMERE'
+              ? 'INFOCAMERE'
+              : from === 'ANAC'
+              ? 'ANAC'
+              : undefined,
+          originId: errorOnSubmit
+            ? mockPartyRegistry.items[1].originId
+            : from === 'NO_IPA'
+            ? undefined
+            : from === 'ANAC'
+            ? mockedANACParties[0].originId
+            : from === 'IVASS'
+            ? haveTaxCode
+              ? isForeignInsurance
+                ? mockedInsuranceResource.items[0].originId
+                : mockedInsuranceResource.items[2].originId
+              : mockedInsuranceResource.items[4].originId
+            : from === 'INFOCAMERE'
+            ? undefined
+            : typeOfSearch === 'taxCode'
+            ? mockedParties[0].originId
+            : typeOfSearch === 'aooCode'
+            ? mockedAoos[0].codiceUniAoo
+            : typeOfSearch === 'uoCode'
+            ? mockedUos[0].codiceUniUo
+            : '991',
+          taxCode: errorOnSubmit
+            ? mockPartyRegistry.items[1].taxCode
+            : from === 'NO_IPA'
+            ? '00000000000'
+            : from === 'ANAC'
+            ? mockedANACParties[0].taxCode
+            : from === 'INFOCAMERE'
+            ? mockedPartiesFromInfoCamere[0].businessTaxId
+            : from === 'IVASS'
+            ? haveTaxCode
+              ? isForeignInsurance
+                ? mockedInsuranceResource.items[0].taxCode
+                : mockedInsuranceResource.items[2].taxCode
+              : mockedInsuranceResource.items[4]?.taxCode
+            : typeOfSearch === 'taxCode'
+            ? mockedParties[0].taxCode
+            : typeOfSearch === 'aooCode'
+            ? mockedAoos[0].codiceFiscaleEnte
+            : typeOfSearch === 'uoCode'
+            ? mockedUos[0].codiceFiscaleEnte
+            : mockPartyRegistry.items[0].taxCode,
+          additionalInformations:
+            productId === 'prod-pagopa' && institutionType === 'GSP'
+              ? {
+                  agentOfPublicService: false,
+                  agentOfPublicServiceNote: '',
+                  belongRegulatedMarket: true,
+                  establishedByRegulatoryProvision: false,
+                  establishedByRegulatoryProvisionNote: '',
+                  ipa: from === 'IPA',
+                  ipaCode: from === 'IPA' ? '991' : '',
+                  otherNote: 'optionalPartyInformations-note',
+                  regulatedMarketNote: '',
+                }
+              : undefined,
+          companyInformations:
+            (from === 'ANAC' ||
+              from === 'INFOCAMERE' ||
+              (institutionType === 'GSP' && from !== 'IPA')) &&
+            institutionType !== 'PT'
+              ? {
+                  businessRegisterPlace: from === 'ANAC' ? 'business register place' : undefined,
+                  shareCapital: from === 'ANAC' ? 332323 : undefined,
+                  rea:
+                    from === 'INFOCAMERE'
+                      ? mockedPartiesFromInfoCamere[0].cciaa.concat(
+                          '-',
+                          mockedPartiesFromInfoCamere[0].nRea
+                        )
+                      : 'MI-12345',
+                }
+              : undefined,
+          pspData:
+            institutionType === 'PSP'
+              ? {
+                  abiCode: '23321',
+                  businessRegisterNumber: '12344555667',
+                  dpoData: {
+                    address: 'Via milano 5',
+                    email: 'dpomail@mailtest.com',
+                    pec: 'dpopec@mailtest.com',
+                  },
+                  legalRegisterName: '123',
+                  legalRegisterNumber: '24',
+                  vatNumberGroup: true,
+                }
+              : undefined,
           users: [
             {
               email: 'b@b.bb',
@@ -1023,82 +1947,40 @@ const verifySubmit = async (productId = 'prod-io') => {
               surname: 'SURNAME',
               taxCode: 'SRNNMA80A01F205T',
             },
-          ],
+          ].filter((u) => (institutionType === 'PT' ? u.role !== 'MANAGER' : u)),
           pricingPlan: 'FA',
           geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY
             ? [{ code: nationalValue, desc: 'ITALIA' }]
             : [],
-          institutionLocationData: {
-            city: 'Palermo',
-            country: 'IT',
-            county: 'PA',
-          },
-          assistanceContacts: { supportEmail: 'a@a.it' },
-          productId,
-          subunitCode: undefined,
-          subunitType: undefined,
-          taxCode: '00000000000',
-          companyInformations: undefined,
-          aggregates: undefined,
-          additionalInformations: undefined,
-          isAggregator: undefined,
-        },
-        method: 'POST',
-      },
-      expect.any(Function)
-    )
-  );
-};
-
-const verifySubmitPt = async (productId = 'prod-io-sign') => {
-  await waitFor(() =>
-    expect(fetchWithLogsSpy).lastCalledWith(
-      {
-        endpoint: 'ONBOARDING_POST_LEGALS',
-      },
-      {
-        data: {
-          billingData: billingData2billingDataRequest(),
-          pspData: undefined,
-          institutionType: 'PT',
-          origin: undefined,
-          users: [
-            {
-              email: 'b@b.bb',
-              name: 'NAME',
-              role: 'MANAGER',
-              surname: 'SURNAME',
-              taxCode: 'SRNNMA80A01A794F',
-            },
-            {
-              email: 'a@a.aa',
-              name: 'NAME',
-              role: 'DELEGATE',
-              surname: 'SURNAME',
-              taxCode: 'SRNNMA80A01B354S',
-            },
-            {
-              email: '0@z.zz',
-              name: 'NAME',
-              role: 'DELEGATE',
-              surname: 'SURNAME',
-              taxCode: 'SRNNMA80A01F205T',
-            },
-          ],
-          pricingPlan: 'FA',
-          geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY
-            ? [{ code: nationalValue, desc: 'ITALIA' }]
-            : [],
-          assistanceContacts: { supportEmail: undefined },
-          productId,
-          subunitCode: undefined,
-          subunitType: undefined,
-          taxCode: '00000000000',
-          companyInformations: {
-            businessRegisterPlace: undefined,
-            rea: undefined,
-            shareCapital: undefined,
-          },
+          institutionLocationData: isForeignInsurance
+            ? { city: 'Valencia', country: 'ES', county: undefined }
+            : institutionType === 'SCP' && from === 'INFOCAMERE'
+            ? {
+                city: mockedPartiesFromInfoCamere[0].city,
+                county: mockedPartiesFromInfoCamere[0].county,
+                country: 'IT',
+              }
+            : {
+                city: 'Milano',
+                county: 'MI',
+                country: 'IT',
+              },
+          assistanceContacts:
+            typeOfSearch !== 'aooCode' &&
+            institutionType !== 'PT' &&
+            (from === 'IPA' || from === 'NO_IPA')
+              ? { supportEmail: 'a@a.it' }
+              : undefined,
+          subunitType:
+            typeOfSearch === 'aooCode' ? 'AOO' : typeOfSearch === 'uoCode' ? 'UO' : undefined,
+          subunitCode:
+            typeOfSearch === 'aooCode'
+              ? mockedAoos[0].codiceUniAoo
+              : typeOfSearch === 'uoCode'
+              ? mockedUos[0].codiceUniUo
+              : undefined,
+          isAggregator,
+          aggregates: isAggregator ? [] : undefined,
         },
         method: 'POST',
       },

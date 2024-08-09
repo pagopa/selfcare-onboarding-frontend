@@ -18,7 +18,6 @@ import { useHistoryState } from '../useHistoryState';
 import { filterByCategory, noMandatoryIpaProducts } from '../../utils/constants';
 import { ENV } from '../../utils/env';
 import { selected2OnboardingData } from '../../utils/selected2OnboardingData';
-import { OnboardingFormData } from '../../model/OnboardingFormData';
 
 type Props = {
   subTitle: string | ReactElement;
@@ -28,8 +27,6 @@ type Props = {
   externalInstitutionId: string;
   subunitTypeByQuery: string;
   subunitCodeByQuery: string;
-  onboardingFormData?: OnboardingFormData;
-  setOnboardingFormData?: React.Dispatch<React.SetStateAction<OnboardingFormData | undefined>>;
 } & StepperStepComponentProps;
 
 const handleSearchExternalId = async (
@@ -74,7 +71,7 @@ export function StepSearchParty({
 
   const [isSearchFieldSelected, setIsSearchFieldSelected] = useState<boolean>(true);
   const [loading, setLoading] = useState(!!partyExternalIdByQuery);
-  const [selected, setSelected, _setSelectedHistory] = useHistoryState<PartyData | null>(
+  const [selected, setSelected, setSelectedHistory] = useHistoryState<PartyData | null>(
     'selected_step1',
     null
   );
@@ -89,8 +86,27 @@ export function StepSearchParty({
     'uoSelected_step1',
     undefined
   );
+  const [ecData, setEcData] = useState<PartyData | null>(null);
 
   const isEnabledProduct2AooUo = product?.id === 'prod-pn';
+
+  const getECDataByCF = async (query: string) => {
+    const searchResponse = await fetchWithLogs(
+      { endpoint: 'ONBOARDING_GET_PARTY_FROM_CF', endpointParams: { id: query } },
+      {
+        method: 'GET',
+      },
+      () => setRequiredLogin(true)
+    );
+
+    const outcome = getFetchOutcome(searchResponse);
+
+    if (outcome === 'success') {
+      setEcData((searchResponse as AxiosResponse).data);
+    } else if ((searchResponse as AxiosError).response?.status === 404) {
+      setEcData(null);
+    }
+  };
 
   const handleSearchByAooCode = async (query: string) => {
     const searchResponse = await fetchWithLogs(
@@ -153,6 +169,14 @@ export function StepSearchParty({
   }, [isEnabledProduct2AooUo]);
 
   useEffect(() => {
+    if (aooResult) {
+      void getECDataByCF(aooResult?.codiceFiscaleEnte);
+    } else if (uoResult) {
+      void getECDataByCF(uoResult?.codiceFiscaleEnte);
+    }
+  }, [aooResult, uoResult]);
+
+  useEffect(() => {
     if (partyExternalIdByQuery) {
       handleSearchExternalId(partyExternalIdByQuery, () => setRequiredLogin(true))
         .then((ipaParty) => {
@@ -195,7 +219,9 @@ export function StepSearchParty({
   }, [isSearchFieldSelected]);
 
   const onForwardAction = () => {
-    const onboardingData = selected2OnboardingData(selected, isAggregator);
+    const dataParty = aooResult || uoResult ? ({ ...selected, ...ecData } as PartyData) : selected;
+    setSelectedHistory(selected);
+    const onboardingData = selected2OnboardingData(dataParty, isAggregator);
     forward(onboardingData, institutionType);
   };
 
@@ -346,7 +372,14 @@ export function StepSearchParty({
           product?.id === 'prod-io' && (
             <Grid item mt={3}>
               <FormControlLabel
-                control={<Checkbox size="small" onChange={() => setIsAggregator(!isAggregator)} />}
+                control={
+                  <Checkbox
+                    name="aggregator-party"
+                    role="checkbox"
+                    size="small"
+                    onChange={() => setIsAggregator(!isAggregator)}
+                  />
+                }
                 label={t('onboardingStep1.onboarding.aggregator')}
               />
             </Grid>
@@ -376,6 +409,7 @@ export function StepSearchParty({
                       1: <br />,
                       2: (
                         <Link
+                          id="no_ipa"
                           sx={{
                             textDecoration: 'underline',
                             color: theme.palette.primary.main,

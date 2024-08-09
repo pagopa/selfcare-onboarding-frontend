@@ -91,6 +91,7 @@ export function RadioWithTextField({
             value={true}
             control={
               <Radio
+                id={`${field}-yes`}
                 size="small"
                 checked={additionalData[field]?.choice}
                 disabled={isIPA && fieldIsFromIPA}
@@ -103,6 +104,7 @@ export function RadioWithTextField({
             value={false}
             control={
               <Radio
+                id={`${field}-no`}
                 size="small"
                 checked={additionalData[field]?.choice === false}
                 disabled={isIPA && fieldIsFromIPA}
@@ -128,12 +130,14 @@ export function RadioWithTextField({
                 }}
               >
                 <RemoveCircleOutlineOutlinedIcon
+                  id={`${field}-remove-field`}
                   fontSize="small"
                   sx={{ color: theme.palette.error.dark }}
                 />
               </IconButton>
             )}
             <TextField
+              id={`${field}-note`}
               variant="outlined"
               label={label}
               helperText={
@@ -159,6 +163,7 @@ export function RadioWithTextField({
           </>
         ) : field !== 'isFromIPA' ? (
           <ButtonNaked
+            id={`${field}-add-note`}
             component={'button'}
             startIcon={<AddIcon />}
             size="small"
