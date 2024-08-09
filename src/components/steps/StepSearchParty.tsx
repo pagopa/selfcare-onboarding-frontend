@@ -18,7 +18,6 @@ import { useHistoryState } from '../useHistoryState';
 import { filterByCategory, noMandatoryIpaProducts } from '../../utils/constants';
 import { ENV } from '../../utils/env';
 import { selected2OnboardingData } from '../../utils/selected2OnboardingData';
-import { OnboardingFormData } from '../../model/OnboardingFormData';
 
 type Props = {
   subTitle: string | ReactElement;
@@ -28,8 +27,6 @@ type Props = {
   externalInstitutionId: string;
   subunitTypeByQuery: string;
   subunitCodeByQuery: string;
-  onboardingFormData?: OnboardingFormData;
-  setOnboardingFormData?: React.Dispatch<React.SetStateAction<OnboardingFormData | undefined>>;
 } & StepperStepComponentProps;
 
 const handleSearchExternalId = async (
@@ -74,7 +71,7 @@ export function StepSearchParty({
 
   const [isSearchFieldSelected, setIsSearchFieldSelected] = useState<boolean>(true);
   const [loading, setLoading] = useState(!!partyExternalIdByQuery);
-  const [selected, setSelected, _setSelectedHistory] = useHistoryState<PartyData | null>(
+  const [selected, setSelected, setSelectedHistory] = useHistoryState<PartyData | null>(
     'selected_step1',
     null
   );
@@ -223,6 +220,7 @@ export function StepSearchParty({
 
   const onForwardAction = () => {
     const dataParty = aooResult || uoResult ? ({ ...selected, ...ecData } as PartyData) : selected;
+    setSelectedHistory(selected);
     const onboardingData = selected2OnboardingData(dataParty, isAggregator);
     forward(onboardingData, institutionType);
   };

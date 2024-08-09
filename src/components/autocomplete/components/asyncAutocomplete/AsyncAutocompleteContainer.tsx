@@ -393,8 +393,7 @@ export default function AsyncAutocompleteContainer({
         const endpoint = addUser ? 'ONBOARDING_GET_INSTITUTIONS' : 'ONBOARDING_GET_UO_CODE_INFO';
         void handleSearchByUoCode(addUser, endpoint, params, value);
       }
-    }
-    if (value === '') {
+    } else {
       setSelected(null);
     }
     if (selected) {
