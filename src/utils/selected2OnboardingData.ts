@@ -39,6 +39,6 @@ export const selected2OnboardingData = (
   county: selectedParty?.county,
   isAggregator,
   externalId: selectedParty?.businessTaxId ?? selectedParty?.id ?? '',
-  istatCode: selectedParty?.istatCode ?? selectedParty?.codiceComuneISTAT,
+  istatCode: selectedParty?.codiceComuneISTAT ?? selectedParty?.istatCode,
   registerType: selectedParty?.registerType,
 });

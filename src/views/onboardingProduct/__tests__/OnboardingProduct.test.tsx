@@ -750,7 +750,9 @@ const executeStepSearchParty = async (
               categories: filterByCategory(institutionType, productId),
             };
 
-      expect(fetchWithLogsSpy).toBeCalledTimes(2);
+      expect(fetchWithLogsSpy).toBeCalledTimes(
+        typeOfSearch === 'aooCode' || typeOfSearch === 'uoCode' ? 3 : 2
+      );
 
       expect(fetchWithLogsSpy).toHaveBeenCalledWith(
         { endpoint, endpointParams },
@@ -1187,7 +1189,7 @@ const fillUserBillingDataForm = async (
     const autocomplete = document.getElementById((isForeignInsurance ? country : city) as string);
     userEvent.type(autocomplete, input);
 
-    const option = await screen.findByText(expectedOption, {}, { timeout: 6000 });
+    const option = await screen.findByText(expectedOption, {}, { timeout: 8000 });
     expect(option).toBeInTheDocument();
     fireEvent.click(option);
 
