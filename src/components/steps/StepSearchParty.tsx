@@ -89,8 +89,27 @@ export function StepSearchParty({
     'uoSelected_step1',
     undefined
   );
+  const [ecData, setEcData] = useState<PartyData | null>(null);
 
   const isEnabledProduct2AooUo = product?.id === 'prod-pn';
+
+  const getECDataByCF = async (query: string) => {
+    const searchResponse = await fetchWithLogs(
+      { endpoint: 'ONBOARDING_GET_PARTY_FROM_CF', endpointParams: { id: query } },
+      {
+        method: 'GET',
+      },
+      () => setRequiredLogin(true)
+    );
+
+    const outcome = getFetchOutcome(searchResponse);
+
+    if (outcome === 'success') {
+      setEcData((searchResponse as AxiosResponse).data);
+    } else if ((searchResponse as AxiosError).response?.status === 404) {
+      setEcData(null);
+    }
+  };
 
   const handleSearchByAooCode = async (query: string) => {
     const searchResponse = await fetchWithLogs(
@@ -153,6 +172,14 @@ export function StepSearchParty({
   }, [isEnabledProduct2AooUo]);
 
   useEffect(() => {
+    if (aooResult) {
+      void getECDataByCF(aooResult?.codiceFiscaleEnte);
+    } else if (uoResult) {
+      void getECDataByCF(uoResult?.codiceFiscaleEnte);
+    }
+  }, [aooResult, uoResult]);
+
+  useEffect(() => {
     if (partyExternalIdByQuery) {
       handleSearchExternalId(partyExternalIdByQuery, () => setRequiredLogin(true))
         .then((ipaParty) => {
@@ -195,7 +222,8 @@ export function StepSearchParty({
   }, [isSearchFieldSelected]);
 
   const onForwardAction = () => {
-    const onboardingData = selected2OnboardingData(selected, isAggregator);
+    const dataParty = aooResult || uoResult ? ({ ...selected, ...ecData } as PartyData) : selected;
+    const onboardingData = selected2OnboardingData(dataParty, isAggregator);
     forward(onboardingData, institutionType);
   };
 
