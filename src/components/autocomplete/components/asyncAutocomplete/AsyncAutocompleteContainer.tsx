@@ -225,13 +225,8 @@ export default function AsyncAutocompleteContainer({
     const outcome = getFetchOutcome(searchResponse);
 
     if (outcome === 'success') {
-      if (addUser) {
-        setAooResult((searchResponse as AxiosResponse).data[0]);
-        setAooResultHistory((searchResponse as AxiosResponse).data[0]);
-      } else {
-        setAooResult((searchResponse as AxiosResponse).data);
-        setAooResultHistory((searchResponse as AxiosResponse).data);
-      }
+      setAooResult((searchResponse as AxiosResponse).data);
+      setAooResultHistory((searchResponse as AxiosResponse).data);
     } else if ((searchResponse as AxiosError).response?.status === 404) {
       setAooResult(undefined);
     }
@@ -264,13 +259,8 @@ export default function AsyncAutocompleteContainer({
     const outcome = getFetchOutcome(searchResponse);
 
     if (outcome === 'success') {
-      if (addUser) {
-        setUoResult((searchResponse as AxiosResponse).data[0]);
-        setUoResultHistory((searchResponse as AxiosResponse).data[0]);
-      } else {
-        setUoResult((searchResponse as AxiosResponse).data);
-        setUoResultHistory((searchResponse as AxiosResponse).data);
-      }
+      setUoResult((searchResponse as AxiosResponse).data);
+      setUoResultHistory((searchResponse as AxiosResponse).data);
     } else if ((searchResponse as AxiosError).response?.status === 404) {
       setUoResult(undefined);
     }
@@ -367,7 +357,7 @@ export default function AsyncAutocompleteContainer({
 
     if (value !== '') {
       setSelected(null);
-      if (value.length >= 3 && isBusinessNameSelected) {
+      if (value.length >= 3 && isBusinessNameSelected && !isTaxCodeSelected) {
         searchByInstitutionType(value, institutionType);
       } else if (
         (isTaxCodeSelected && value.length === 11) ||
@@ -402,15 +392,11 @@ export default function AsyncAutocompleteContainer({
       } else if (isUoCodeSelected && !isAooCodeSelected && value.length === 6) {
         const endpoint = addUser ? 'ONBOARDING_GET_INSTITUTIONS' : 'ONBOARDING_GET_UO_CODE_INFO';
         void handleSearchByUoCode(addUser, endpoint, params, value);
-      } else {
-        setCfResult(undefined);
-        setSelected(undefined);
       }
-    } else {
-      setSelected(undefined);
-      setCfResult(undefined);
     }
-
+    if (value === '') {
+      setSelected(null);
+    }
     if (selected) {
       setInput(getOptionLabel(selected));
     }
