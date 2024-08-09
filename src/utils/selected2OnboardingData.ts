@@ -7,10 +7,9 @@ export const selected2OnboardingData = (
   isAggregator?: boolean
 ): OnboardingFormData => ({
   businessName:
-    selectedParty?.denominazioneAoo ??
-    selectedParty?.descrizioneUo ??
     selectedParty?.description ??
     selectedParty?.businessName ??
+    selectedParty?.denominazioneEnte ??
     '',
   aooName: selectedParty?.denominazioneAoo,
   uoName: selectedParty?.descrizioneUo,
