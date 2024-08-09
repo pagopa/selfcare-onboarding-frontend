@@ -225,8 +225,11 @@ export default function AsyncAutocompleteContainer({
     const outcome = getFetchOutcome(searchResponse);
 
     if (outcome === 'success') {
-      setAooResult((searchResponse as AxiosResponse).data);
-      setAooResultHistory((searchResponse as AxiosResponse).data);
+      const response = addUser
+        ? (searchResponse as AxiosResponse).data[0] ?? (searchResponse as AxiosResponse).data
+        : (searchResponse as AxiosResponse).data;
+      setAooResult(response);
+      setAooResultHistory(response);
     } else if ((searchResponse as AxiosError).response?.status === 404) {
       setAooResult(undefined);
     }
@@ -259,8 +262,11 @@ export default function AsyncAutocompleteContainer({
     const outcome = getFetchOutcome(searchResponse);
 
     if (outcome === 'success') {
-      setUoResult((searchResponse as AxiosResponse).data);
-      setUoResultHistory((searchResponse as AxiosResponse).data);
+      const response = addUser
+        ? (searchResponse as AxiosResponse).data[0] ?? (searchResponse as AxiosResponse).data
+        : (searchResponse as AxiosResponse).data;
+      setUoResult(response);
+      setUoResultHistory(response);
     } else if ((searchResponse as AxiosError).response?.status === 404) {
       setUoResult(undefined);
     }
@@ -293,9 +299,11 @@ export default function AsyncAutocompleteContainer({
     );
 
     const outcome = getFetchOutcome(searchResponse);
-
     if (outcome === 'success') {
-      setCfResult((searchResponse as AxiosResponse).data);
+      const response = addUser
+        ? (searchResponse as AxiosResponse).data[0] ?? (searchResponse as AxiosResponse).data
+        : (searchResponse as AxiosResponse).data;
+      setCfResult(response);
     } else if ((searchResponse as AxiosError).response?.status === 404) {
       setCfResult(undefined);
     }
