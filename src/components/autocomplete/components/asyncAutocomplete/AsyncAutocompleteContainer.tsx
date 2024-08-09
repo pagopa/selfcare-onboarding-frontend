@@ -6,17 +6,16 @@ import { Dispatch, SetStateAction, useContext, useEffect, useState } from 'react
 import { useTranslation } from 'react-i18next';
 import OnboardingPartyIcon from '../../../../assets/onboarding_party_icon.svg';
 import {
-  ANACParty,
   ApiEndpointKey,
   Endpoint,
   InstitutionType,
+  PartyData,
   Product,
 } from '../../../../../types';
 import { fetchWithLogs } from '../../../../lib/api-utils';
 import { UserContext } from '../../../../lib/context';
 import { getFetchOutcome } from '../../../../lib/error-utils';
 import { AooData } from '../../../../model/AooData';
-import { InstitutionResource } from '../../../../model/InstitutionResource';
 import { UoData } from '../../../../model/UoModel';
 import { ENV } from '../../../../utils/env';
 import {
@@ -44,8 +43,8 @@ type Props = {
   theme: Theme;
   options: Array<any>;
   isSearchFieldSelected: boolean;
-  setCfResult: React.Dispatch<React.SetStateAction<InstitutionResource | ANACParty | undefined>>;
-  cfResult?: InstitutionResource | ANACParty;
+  setCfResult: React.Dispatch<React.SetStateAction<PartyData | undefined>>;
+  cfResult?: PartyData;
   product?: Product | null;
   isAooCodeSelected: boolean;
   isUoCodeSelected: boolean;
