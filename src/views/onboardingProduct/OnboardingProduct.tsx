@@ -407,6 +407,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     ],
   };
 
+  // eslint-disable-next-line complexity
   const onboardingSubmit = async (
     users: Array<UserOnCreate>,
     aggregates?: Array<AggregateInstitution>
@@ -463,7 +464,12 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
             county: onboardingFormData?.county,
             city: onboardingFormData?.city,
           },
-          origin: institutionType === 'SCP' && productId === 'prod-interop' ? 'INFOCAMERE' : origin,
+          origin:
+            institutionType === 'SCP' && productId === 'prod-interop'
+              ? 'INFOCAMERE'
+              : institutionType === 'SA'
+              ? 'ANAC'
+              : origin,
           users,
           pricingPlan,
           assistanceContacts: onboardingFormData?.supportEmail

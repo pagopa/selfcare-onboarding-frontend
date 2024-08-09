@@ -1832,6 +1832,8 @@ const verifySubmit = async (
               ? 'IVASS'
               : from === 'INFOCAMERE'
               ? 'INFOCAMERE'
+              : from === 'ANAC'
+              ? 'ANAC'
               : undefined,
           originId: errorOnSubmit
             ? mockPartyRegistry.items[1].originId

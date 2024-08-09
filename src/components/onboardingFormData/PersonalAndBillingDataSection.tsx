@@ -350,32 +350,7 @@ export default function PersonalAndBillingDataSection({
               </Typography>
             </Box>
           )}
-          {onboardingFormData?.aooUniqueCode ? (
-            <>
-              <Grid item xs={8}>
-                <CustomTextField
-                  {...baseTextFieldProps(
-                    'aooName',
-                    t('onboardingFormData.billingDataSection.aooName'),
-                    600,
-                    isDisabled ? theme.palette.text.disabled : theme.palette.text.primary
-                  )}
-                  disabled={isDisabled}
-                />
-              </Grid>
-              <Grid item xs={4}>
-                <CustomTextField
-                  {...baseTextFieldProps(
-                    'aooUniqueCode',
-                    t('onboardingFormData.billingDataSection.aooUniqueCode'),
-                    600,
-                    isDisabled ? theme.palette.text.disabled : theme.palette.text.primary
-                  )}
-                  disabled={isDisabled}
-                />
-              </Grid>
-            </>
-          ) : onboardingFormData?.uoUniqueCode ? (
+          {onboardingFormData?.uoUniqueCode ? (
             <>
               <Grid item xs={8}>
                 <CustomTextField
@@ -393,6 +368,31 @@ export default function PersonalAndBillingDataSection({
                   {...baseTextFieldProps(
                     'uoUniqueCode',
                     t('onboardingFormData.billingDataSection.uoUniqueCode'),
+                    600,
+                    isDisabled ? theme.palette.text.disabled : theme.palette.text.primary
+                  )}
+                  disabled={isDisabled}
+                />
+              </Grid>
+            </>
+          ) : onboardingFormData?.aooUniqueCode ? (
+            <>
+              <Grid item xs={8}>
+                <CustomTextField
+                  {...baseTextFieldProps(
+                    'aooName',
+                    t('onboardingFormData.billingDataSection.aooName'),
+                    600,
+                    isDisabled ? theme.palette.text.disabled : theme.palette.text.primary
+                  )}
+                  disabled={isDisabled}
+                />
+              </Grid>
+              <Grid item xs={4}>
+                <CustomTextField
+                  {...baseTextFieldProps(
+                    'aooUniqueCode',
+                    t('onboardingFormData.billingDataSection.aooUniqueCode'),
                     600,
                     isDisabled ? theme.palette.text.disabled : theme.palette.text.primary
                   )}
