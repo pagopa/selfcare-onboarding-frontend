@@ -39,4 +39,5 @@ export type OnboardingFormData = {
   externalId?: string;
   istatCode?: string;
   registerType?: string;
+  originIdEc?: string;
 };

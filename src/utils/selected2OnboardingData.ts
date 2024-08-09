@@ -28,6 +28,7 @@ export const selected2OnboardingData = (
   taxCodeInvoicing: selectedParty?.codiceFiscaleSfe,
   zipCode: selectedParty?.CAP ?? selectedParty?.zipCode,
   geographicTaxonomies: [],
+  originIdEc: selectedParty?.originId,
   originId: selectedParty?.codiceUniUo ?? selectedParty?.codiceUniAoo ?? selectedParty?.originId,
   origin: selectedParty?.origin,
   rea:

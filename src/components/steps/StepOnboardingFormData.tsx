@@ -400,7 +400,7 @@ export default function StepOnboardingFormData({
       formik.values.recipientCode &&
       formik.values.recipientCode.length === 6
     ) {
-      void verifyRecipientCodeIsValid(formik.values.recipientCode, onboardingFormData?.originId);
+      void verifyRecipientCodeIsValid(formik.values.recipientCode, onboardingFormData?.originIdEc);
     }
 
     if (formik.values.recipientCode && formik.values.recipientCode.length === 7) {
