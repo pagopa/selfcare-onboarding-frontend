@@ -2,7 +2,7 @@ import { Grid, Paper, Typography } from '@mui/material';
 import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { theme } from '@pagopa/mui-italia';
 import { useTranslation } from 'react-i18next';
-import { ANACParty, Endpoint, InstitutionType, Product } from '../../../types';
+import { Endpoint, InstitutionType, PartyData, Product } from '../../../types';
 import { AooData } from '../../model/AooData';
 import { InstitutionResource } from '../../model/InstitutionResource';
 import { UoData } from '../../model/UoModel';
@@ -30,7 +30,6 @@ type AutocompleteProps = {
   selectedProduct?: Product;
 };
 
-// eslint-disable-next-line sonarjs/cognitive-complexity
 export function Autocomplete({
   selected,
   setSelected,
@@ -52,7 +51,7 @@ export function Autocomplete({
 }: AutocompleteProps) {
   const { t } = useTranslation();
   const [options, setOptions] = useState<Array<InstitutionResource>>([]);
-  const [cfResult, setCfResult] = useState<InstitutionResource | ANACParty>();
+  const [cfResult, setCfResult] = useState<PartyData>();
 
   const [isBusinessNameSelected, setIsBusinessNameSelected] = useState<boolean>(true);
   const [isAooCodeSelected, setIsAooCodeSelected] = useState<boolean>(false);

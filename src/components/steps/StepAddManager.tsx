@@ -193,15 +193,18 @@ export function StepAddManager({
               values={{ productTitle: product?.title }}
             >
               {subProduct
-                ? `Inserisci i dati del Legale Rappresentante o del procuratore del tuo ente. <1/> La persona che indicherai sarà firmataria del contratto per <3/> <strong>Premium<strong/>.`
+                ? `Inserisci i dati del Legale Rappresentante del tuo ente. <1/> La persona che indicherai sarà firmataria del contratto per <3/> <strong>Premium<strong/>.`
                 : addUserFlow
                 ? `La persona indicata firmerà il Modulo di aggiunta per il nuovo Amministratore e lo <1 />autorizzerà ad operare sul prodotto <3>{{productTitle}}</3> per il tuo ente.`
-                : `Inserisci i dati del Legale Rappresentante o del procuratore del tuo ente. <1/> Sarà responsabile della firma del contratto per <3>{{productTitle}}</3>. <4/> e avrà il ruolo di Amministratore per questo prodotto nell'Area Riservata.`}
+                : `Inserisci i dati del Legale Rappresentante del tuo ente. <1/> Sarà responsabile della firma del contratto per <3>{{productTitle}}</3> <4/> e avrà il ruolo di Amministratore per questo prodotto nell'Area Riservata.`}
             </Trans>
           </Typography>
         </Grid>
         <Grid item>
-          <RolesInformations isTechPartner={isTechPartner} />
+          <RolesInformations
+            isTechPartner={isTechPartner}
+            linkLabel={t('moreInformationOnRoles')}
+          />
         </Grid>
       </Grid>
 

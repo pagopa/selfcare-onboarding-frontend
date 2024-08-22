@@ -10,6 +10,7 @@ import {
   mockedProducts,
   mockedAoos,
   mockedUos,
+  mockedPartiesFromInfoCamere,
 } from '../../../lib/__mocks__/mockApiRequests';
 
 jest.mock('formik', () => ({
@@ -84,12 +85,9 @@ const mockBaseTextFieldProps = (
 test('Test: Rendered PersonalAndBillingDataSection component with all possible business cases', () => {
   let componentRendered = false;
   const conditionsMap = {};
-  let party;
-  let aooSelected;
-  let uoSelected;
+  let onboardingFormData;
   let productId;
 
-  // TODO Temporary excluded the PSP institutionType
   mockedProducts.forEach((product) => {
     institutionTypes.forEach((institutionType) => {
       if (!componentRendered) {
@@ -97,36 +95,36 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
 
         switch (productId) {
           case 'prod-pn':
-            aooSelected = mockedAoos[0];
-            party = mockedAoos[0];
-          case 'prod-pn-dev':
-            uoSelected = mockedUos[0];
-            party = mockedUos[0];
+            onboardingFormData = mockedAoos[0];
+          case 'prod-io-sign':
+            onboardingFormData = mockedUos[0];
+          case 'prod-interop':
+            onboardingFormData = mockedPartiesFromInfoCamere;
           default:
-            party = mockPartyRegistry.items[0];
+            onboardingFormData = mockPartyRegistry.items[0];
         }
 
         const institutionAvoidGeotax = ['PT', 'SA', 'AS'].includes(institutionType);
 
         const isInsuranceCompany = institutionType === 'AS';
-        const isForeignInsurance = party?.registerType?.includes('Elenco II');
+        const isForeignInsurance = onboardingFormData?.registerType?.includes('Elenco II');
         const isPremium = !!product.parentId;
         const isDisabled =
           isPremium ||
           (origin === 'IPA' && institutionType !== 'PA' && institutionType !== 'PSP') ||
           institutionType === 'PA';
-        const canInvoice =
+        const isInvoiceable =
           institutionType !== 'SA' &&
           institutionType !== 'PT' &&
           institutionType !== 'AS' &&
           productId !== 'prod-interop';
         const isInformationCompany =
           (institutionType === 'GSP' || institutionType === 'SCP') &&
-          (productId === 'prod-io' || productId === 'prod-io-sign');
+          (productId === 'prod-io' || productId === 'prod-io-sign' || productId === 'prod-interop');
 
         conditionsMap[`${productId}-${institutionType}`] = {
           isPremium,
-          canInvoice,
+          isInvoiceable,
           isInformationCompany,
           isForeignInsurance,
           institutionAvoidGeotax,
@@ -136,7 +134,7 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
         renderComponentWithProviders(
           <PersonalAndBillingDataSection
             productId={productId}
-            origin={party.origin}
+            origin={onboardingFormData?.origin}
             institutionType={institutionType}
             baseTextFieldProps={mockBaseTextFieldProps}
             stepHistoryState={{
@@ -149,10 +147,8 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
             isInformationCompany={isInformationCompany}
             isForeignInsurance={isForeignInsurance}
             institutionAvoidGeotax={institutionAvoidGeotax}
-            selectedParty={party}
-            canInvoice={canInvoice}
-            aooSelected={aooSelected}
-            uoSelected={uoSelected}
+            onboardingFormData={onboardingFormData}
+            isInvoiceable={isInvoiceable}
             isDisabled={isDisabled}
             setInvalidTaxCodeInvoicing={jest.fn()}
           />
@@ -163,9 +159,9 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
     });
   });
 
-  Object.keys(conditionsMap).forEach((key) => {
+  Object.keys(conditionsMap).forEach(async (key) => {
     const {
-      canInvoice,
+      isInvoiceable,
       isInformationCompany,
       isForeignInsurance,
       institutionAvoidGeotax,
@@ -188,25 +184,28 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
     const country = screen.queryByText('Nazione');
     const pec = screen.getByText('Indirizzo PEC');
     const taxCode = screen.queryByText('Codice Fiscale');
-    const taxCodeEc = screen.getByText('Codice Fiscale ente centrale');
+    const taxCodeEc = screen.queryByText('Codice Fiscale ente centrale');
     const vatNumber = screen.queryByText('Partita IVA');
     const commercialRegisterNumber = screen.queryByText(
       'Luogo di iscrizione al Registro delle Imprese (facoltativo)'
     );
     const rea = screen.queryByText('REA');
-    const sdiCode = screen.queryByText('Codice SDI');
+    const sdiCode = screen.queryByText('Codice univoco o SDI') as HTMLInputElement;
+    const taxCodeSfe = screen.queryByText('Codice Fiscale SFE') as HTMLInputElement;
     const shareCapital = screen.queryByText('Capitale sociale (facoltativo)');
     const visibleCitizenMail = screen.queryByText('Indirizzo email visibile ai cittadini');
-    const visibleCitizenMailOptional = screen.queryByText('Indirizzo email visibile ai cittadini (facoltativo)');
+    const visibleCitizenMailOptional = screen.queryByText(
+      'Indirizzo email visibile ai cittadini (facoltativo)'
+    );
 
-    if (aooSelected) {
+    if (onboardingFormData?.aooUniqueCode) {
       expect(businessName).not.toBeInTheDocument();
       expect(centralParty).toBeInTheDocument();
       expect(aooDenomination).toBeInTheDocument();
       expect(aooUniqueCode).toBeInTheDocument();
       expect(taxCode).not.toBeInTheDocument();
       expect(taxCodeEc).toBeInTheDocument();
-    } else if (uoSelected) {
+    } else if (onboardingFormData?.uoUniqueCode) {
       expect(businessName).not.toBeInTheDocument();
       expect(centralParty).toBeInTheDocument();
       expect(uoDenomination).toBeInTheDocument();
@@ -238,10 +237,30 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
 
     expect(pec).toBeInTheDocument();
 
-    if (canInvoice) {
+    if (isInvoiceable) {
       expect(sdiCode).toBeInTheDocument();
+      fireEvent.change(document.getElementById('recipientCode') as HTMLInputElement, {
+        target: { value: 'A1B2C3' },
+      });
+      await waitFor(() => expect(taxCodeSfe as HTMLInputElement).toBeInTheDocument());
+
+      fireEvent.change(document.getElementById('recipientCode') as HTMLInputElement, {
+        target: { value: 'AABBC1' },
+      });
+      await waitFor(() => expect(taxCodeSfe as HTMLInputElement).not.toBeInTheDocument());
+
+      fireEvent.change(document.getElementById('recipientCode') as HTMLInputElement, {
+        target: { value: '2A3B4C' },
+      });
+      await waitFor(() => expect(taxCodeSfe as HTMLInputElement).not.toBeInTheDocument());
+
+      fireEvent.change(document.getElementById('recipientCode') as HTMLInputElement, {
+        target: { value: '' },
+      });
+      await waitFor(() => expect(taxCodeSfe as HTMLInputElement).not.toBeInTheDocument());
     } else {
       expect(sdiCode).not.toBeInTheDocument();
+      expect(taxCodeSfe).not.toBeInTheDocument();
     }
 
     if (isInformationCompany) {
@@ -257,7 +276,9 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
     if (institutionAvoidGeotax) {
       expect(visibleCitizenMail).not.toBeInTheDocument();
     } else {
-      expect(productId === "prod-io" ? visibleCitizenMail : visibleCitizenMailOptional).toBeInTheDocument();
+      expect(
+        productId === 'prod-io' ? visibleCitizenMail : visibleCitizenMailOptional
+      ).toBeInTheDocument();
     }
 
     const isTaxCodeEquals2PIVA = document.getElementById('taxCodeEquals2VatNumber');

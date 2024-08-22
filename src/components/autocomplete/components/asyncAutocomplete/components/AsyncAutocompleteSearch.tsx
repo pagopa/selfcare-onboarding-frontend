@@ -3,12 +3,11 @@ import { styled } from '@mui/system';
 import { useTranslation } from 'react-i18next';
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 import { Dispatch, SetStateAction, useEffect } from 'react';
-import { ANACParty, IPACatalogParty } from '../../../../../../types';
+import { IPACatalogParty, PartyData } from '../../../../../../types';
 import { useHistoryState } from '../../../../useHistoryState';
-import { InstitutionResource } from '../../../../../model/InstitutionResource';
-import { AooData } from '../../../../../model/AooData';
 import { UoData } from '../../../../../model/UoModel';
 import { StepBillingDataHistoryState } from '../../../../steps/StepOnboardingFormData';
+import { AooData } from '../../../../../model/AooData';
 
 const CustomTextField = styled(TextField)({
   justifyContent: 'center',
@@ -42,7 +41,7 @@ type Props = {
   isIvassCodeSelected?: boolean;
   isTaxCodeSelected?: boolean;
   isBusinessNameSelected?: boolean;
-  setCfResult: React.Dispatch<React.SetStateAction<InstitutionResource | ANACParty | undefined>>;
+  setCfResult: React.Dispatch<React.SetStateAction<PartyData | undefined>>;
   setAooResult: React.Dispatch<React.SetStateAction<AooData | undefined>>;
   setUoResult: React.Dispatch<React.SetStateAction<UoData | undefined>>;
   externalInstitutionId: string;
@@ -94,7 +93,7 @@ export default function AsyncAutocompleteSearch({
       ? selected?.descrizioneUo
       : addUser && selected && (isAooCodeSelected || isUoCodeSelected) && selected?.description
       ? selected.description
-      : input;
+      : selected?.businessName;
 
   useEffect(() => {
     if (selected && selected?.denominazioneAoo) {

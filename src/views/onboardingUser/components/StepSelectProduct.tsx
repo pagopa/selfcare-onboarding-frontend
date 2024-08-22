@@ -98,7 +98,7 @@ export function StepSelectProduct({ forward, setLoading, setOutcome, institution
                     key={index}
                     sx={{ pl: 1, py: 1.5, pr: 2 }}
                     value={p.id}
-                    control={<Radio checked={selectedProduct?.id === p.id} />}
+                    control={<Radio id={p.id} checked={selectedProduct?.id === p.id} />}
                     label={
                       <Box
                         sx={{

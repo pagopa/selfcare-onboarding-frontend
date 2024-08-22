@@ -50,7 +50,6 @@ test("Test: The onboarding request can't be cancel because is not found (jwt que
   });
 
   fireEvent.click(assistanceButton);
-  // TODO Deprecated
   waitFor(() => expect(buildAssistanceURI).toBeCalledWith(ENV.ASSISTANCE.EMAIL));
 });
 
@@ -61,7 +60,6 @@ test("Test: The onboarding request can't be cancel because is not found (not fou
   const assistanceButton = screen.getByText('Contatta l’assistenza');
 
   fireEvent.click(assistanceButton);
-  // TODO Deprecated
   waitFor(() => expect(buildAssistanceURI).toBeCalledWith(ENV.ASSISTANCE.EMAIL));
 });
 
@@ -73,7 +71,6 @@ test("Test: The onboarding request can't be cancel because is already approved",
   const login = screen.getByText('Accedi');
 
   fireEvent.click(login);
-  // TODO Deprecated
   waitFor(() => expect(buildAssistanceURI).toBeCalledWith(ENV.URL_FE.LOGIN));
 });
 
@@ -85,7 +82,6 @@ test("Test: The onboarding request can't be cancel because is expired", async ()
   const login = screen.getByText('Torna alla home');
 
   fireEvent.click(login);
-  // TODO Deprecated
   waitFor(() => expect(buildAssistanceURI).toBeCalledWith(ENV.URL_FE.LANDING));
 });
 
@@ -109,12 +105,10 @@ test('Test: The jwt exist and the request is correctly retrieved, cancel onboard
   });
   fireEvent.click(goHome);
 
-  // TODO Deprecated
   expect(mockedLocation.assign).toBeCalledWith(ENV.URL_FE.LANDING);
   expect(fetchWithLogsSpy).toBeCalledTimes(1);
 });
 
-// TODO Review this
 test('Test: The jwt exist and the request is correctly retrieved, cancel onboarding request flow is started and NOT correcly deleted', async () => {
   mockedLocation.search = 'jwt=error';
   render(<CancelRequestPage />);
@@ -134,6 +128,5 @@ test('Test: The jwt exist and the request is correctly retrieved, cancel onboard
   });
   fireEvent.click(goHome);
 
-  // TODO Deprecated
   expect(mockedLocation.assign).toBeCalledWith(ENV.URL_FE.LANDING);
 });

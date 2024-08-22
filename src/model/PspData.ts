@@ -22,7 +22,7 @@ export const pspData2pspDataRequest = (billingData: OnboardingFormData): PspData
   dpoData: {
     address: billingData.dpoAddress ?? '',
     pec: billingData.dpoPecAddress ?? '',
-    email: billingData.dopEmailAddress ?? '',
+    email: billingData.dpoEmailAddress ?? '',
   },
   legalRegisterNumber: billingData.registerNumber ?? '',
   legalRegisterName: billingData.registrationInRegister ?? '',

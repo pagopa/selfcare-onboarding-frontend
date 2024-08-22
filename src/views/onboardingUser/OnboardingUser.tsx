@@ -8,6 +8,7 @@ import { Trans, useTranslation } from 'react-i18next';
 import { withLogin } from '../../components/withLogin';
 import {
   InstitutionType,
+  PartyData,
   RequestOutcomeMessage,
   RequestOutcomeOptions,
   StepperStep,
@@ -40,7 +41,7 @@ function OnboardingUserComponent() {
   const [activeStep, setActiveStep] = useState<number>(0);
   const [outcome, setOutcome] = useState<RequestOutcomeMessage | null>();
   const [formData, setFormData] = useState<Partial<FormData>>();
-  const [selectedParty, setSelectedParty] = useState<any>(); // TODO Add correct model
+  const [selectedParty, setSelectedParty] = useState<PartyData>();
   const [selectedProduct, setSelectedProduct] = useState<ProductResource>();
   const [institutionType, setInstitutionType] = useState<InstitutionType>();
   const [onboardingFormData, setOnboardingFormData] = useState<OnboardingFormData>();
@@ -75,12 +76,8 @@ function OnboardingUserComponent() {
         ...history.location,
         state: null,
       });
-      if (!selectedParty.businessName) {
-        const onboardingData = selected2OnboardingData(selectedParty);
-        setOnboardingFormData(onboardingData);
-      } else {
-        setOnboardingFormData(selectedParty);
-      }
+      const onboardingData = selected2OnboardingData(selectedParty);
+      setOnboardingFormData(onboardingData);
       setActiveStep(2);
     }
   }, [selectedParty, history]);
@@ -98,8 +95,7 @@ function OnboardingUserComponent() {
     forward();
   };
 
-  // TODO Fix me
-  const forwardWithInstitution = (partySelected: any) => {
+  const forwardWithInstitution = (partySelected: PartyData) => {
     setSelectedParty(partySelected);
     forward();
   };
@@ -118,12 +114,12 @@ function OnboardingUserComponent() {
         method: 'POST',
         data: {
           productId: selectedProduct?.id,
-          institutionType,
-          origin: selectedParty.origin,
+          institutionType: onboardingFormData?.institutionType ?? institutionType,
+          origin: onboardingFormData?.origin,
           originId: onboardingFormData?.originId,
-          subunitCode: selectedParty.codiceUniUo
+          subunitCode: selectedParty?.codiceUniUo
             ? selectedParty.codiceUniUo
-            : selectedParty.codiceUniAoo,
+            : selectedParty?.codiceUniAoo ?? onboardingFormData?.originId,
           taxCode: onboardingFormData?.taxCode,
           users,
         },
@@ -218,7 +214,7 @@ function OnboardingUserComponent() {
       label: 'Insert manager data',
       Component: () =>
         StepAddManager({
-          externalInstitutionId: selectedParty?.externalId,
+          externalInstitutionId: selectedParty?.externalId ?? '',
           addUserFlow: true,
           product: selectedProduct,
           onboardingFormData,
@@ -241,7 +237,7 @@ function OnboardingUserComponent() {
       label: 'Insert admin data',
       Component: () =>
         StepAddAdmin({
-          externalInstitutionId: selectedParty?.externalId,
+          externalInstitutionId: selectedParty?.externalId ?? '',
           addUserFlow: true,
           product: selectedProduct,
           legal: isTechPartner ? undefined : (formData as any)?.users[0],
@@ -249,9 +245,9 @@ function OnboardingUserComponent() {
             ? selectedParty.denominazioneAoo
             : selectedParty?.codiceUniUo
             ? selectedParty.descrizioneUo
-            : selectedParty.businessName
+            : selectedParty?.businessName
             ? selectedParty.businessName
-            : selectedParty?.description,
+            : selectedParty?.description ?? '',
           isTechPartner,
           forward: (newFormData: Partial<FormData>) => {
             const users = ((newFormData as any).users as Array<UserOnCreate>).map((u) => ({
