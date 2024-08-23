@@ -876,6 +876,8 @@ const executeStepBillingData = async (
         target: { value: 'A1B2C31' },
       });
 
+      await waitFor(() => screen.getByText('Il codice inserito non è associato al tuo ente'));
+
       await waitFor(() =>
         expect(
           document.getElementById('taxCodeInvoicing') as HTMLInputElement

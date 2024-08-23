@@ -156,7 +156,7 @@ export default function PersonalAndBillingDataSection({
   }, [onboardingFormData?.aooUniqueCode]);
 
   useEffect(() => {
-    if (formik.values.recipientCode?.length === 6 && recipientCodeStatus === 'ACCEPTED') {
+    if (formik.values.recipientCode?.length >= 6 && recipientCodeStatus === 'ACCEPTED') {
       void getUoInfoFromRecipientCode(formik.values.recipientCode);
       setTaxCodeInovoicingVisible(true);
     } else {

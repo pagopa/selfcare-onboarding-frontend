@@ -9,8 +9,11 @@ import { Route, Router, Switch } from 'react-router';
 import { createMemoryHistory } from 'history';
 import { nationalValue } from '../../../model/GeographicTaxonomies';
 import React from 'react';
+import { mockRetrievePlanPrices } from '../../../lib/__mocks__/mockApiRequests';
 
 jest.mock('../../../lib/api-utils');
+
+const originalFetch = global.fetch;
 
 jest.setTimeout(20000);
 
@@ -19,6 +22,10 @@ let fetchWithLogsSpy: jest.SpyInstance;
 beforeEach(() => {
   fetchWithLogsSpy = jest.spyOn(require('../../../lib/api-utils'), 'fetchWithLogs');
 });
+
+afterEach(() => {
+  global.fetch = originalFetch;
+})
 
 const oldWindowLocation = global.window.location;
 const initialLocation = {
@@ -179,33 +186,39 @@ const checkBackForwardNavigation = async (title: string): Promise<Array<HTMLElem
 };
 
 const executeStepSelectPricingPlan = async () => {
-  console.log('Testing step select pricing plan..');
+  console.log('Testing step select pricing plan...');
+  global.fetch = jest.fn().mockResolvedValueOnce({
+    json: () => Promise.resolve(mockRetrievePlanPrices),
+  });
 
   await waitFor(() =>
     screen.getByText(/Passa a IO Premium e migliora le performance dei messaggi/)
   );
+
   const showMoreCarnet = document.getElementById('showMoreCarnetPlan') as HTMLElement;
   fireEvent.click(showMoreCarnet);
 
-  const carnetList = ['C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7', 'C8'];
-
   await waitFor(() =>
-    carnetList.forEach((c) => expect(document.getElementById(c) as HTMLElement).toBeInTheDocument())
+    mockRetrievePlanPrices.carnetPlans.forEach((c) => expect(document.getElementById(c.pricingPlan) as HTMLElement).toBeInTheDocument())
   );
 
-  const showMoreConsumption = document.getElementById('showMoreConsumptionPlan') as HTMLElement;
-  fireEvent.click(showMoreConsumption);
+  await waitFor(() => screen.getByText('1.000'));
 
   const forwardWithCarnet = document.getElementById('forwardCarnetPlan') as HTMLElement;
   expect(forwardWithCarnet).toBeDisabled();
 
-  fireEvent.click(document.getElementById('C1') as HTMLElement);
+  const carnetPlan = document.getElementById('C1') as HTMLElement;
+  fireEvent.click(carnetPlan);
   expect(forwardWithCarnet).toBeEnabled();
 
-  fireEvent.click(showMoreCarnet);
+  const showMoreConsumption = document.getElementById('showMoreConsumptionPlan') as HTMLElement;
+  fireEvent.click(showMoreConsumption);
+
+  await waitFor(() =>
+    mockRetrievePlanPrices.consumptionPlan.echelons.forEach((c) => expect(screen.getByText(c.price.slice(-2).concat('€ / mess'))).toBeInTheDocument())
+  );
 
   const chooseConsumption = document.getElementById('forwardConsumptionPlan') as HTMLElement;
-
   expect(chooseConsumption).toBeEnabled();
   fireEvent.click(chooseConsumption);
 };
