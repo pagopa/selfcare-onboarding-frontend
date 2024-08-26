@@ -9,8 +9,11 @@ import { Route, Router, Switch } from 'react-router';
 import { createMemoryHistory } from 'history';
 import { nationalValue } from '../../../model/GeographicTaxonomies';
 import React from 'react';
+import { mockRetrievePlanPrices } from '../../../lib/__mocks__/mockApiRequests';
 
 jest.mock('../../../lib/api-utils');
+
+const originalFetch = global.fetch;
 
 jest.setTimeout(20000);
 
@@ -19,6 +22,10 @@ let fetchWithLogsSpy: jest.SpyInstance;
 beforeEach(() => {
   fetchWithLogsSpy = jest.spyOn(require('../../../lib/api-utils'), 'fetchWithLogs');
 });
+
+afterEach(() => {
+  global.fetch = originalFetch;
+})
 
 const oldWindowLocation = global.window.location;
 const initialLocation = {
@@ -78,7 +85,7 @@ const renderComponent = (
           }}
         >
           <UserContext.Provider
-            value={{ user, setUser, requiredLogin: false, setRequiredLogin: () => {} }}
+            value={{ user, setUser, requiredLogin: false, setRequiredLogin: () => { } }}
           >
             <button onClick={() => onExit?.(() => window.location.assign(ENV.URL_FE.LOGOUT))}>
               LOGOUT
@@ -179,33 +186,133 @@ const checkBackForwardNavigation = async (title: string): Promise<Array<HTMLElem
 };
 
 const executeStepSelectPricingPlan = async () => {
-  console.log('Testing step select pricing plan..');
+  console.log('Testing step select pricing plan...');
+
+  const mockRetrievePlanPrices = {
+    consumptionPlan: {
+      pricingPlan: "C0",
+      echelons: [
+        {
+          from: "1",
+          to: "100.000",
+          price: "0,25"
+        },
+        {
+          from: "100.001",
+          to: "500.000",
+          price: "0,24"
+        },
+        {
+          from: "500.001",
+          to: "1.000.000",
+          price: "0,22"
+        },
+        {
+          from: "1.000.001",
+          to: "1.500.000",
+          price: "0,20"
+        },
+        {
+          from: "1.500.001",
+          to: "2.000.000",
+          price: "0,18"
+        },
+        {
+          from: "2.000.001",
+          to: "5.000.000",
+          price: "0,15"
+        },
+        {
+          from: "5.000.000",
+          to: "",
+          price: "0,11"
+        }
+      ]
+    },
+    carnetPlans: [
+      {
+        pricingPlan: "C1",
+        messages: "1.000",
+        messagePrice: "0,22",
+        carnetPrice: "220,00"
+      },
+      {
+        pricingPlan: "C2",
+        messages: "10.000",
+        messagePrice: "0,218",
+        carnetPrice: "2.175,00"
+      },
+      {
+        pricingPlan: "C3",
+        messages: "50.000",
+        messagePrice: "0,215",
+        carnetPrice: "10.750,00"
+      },
+      {
+        pricingPlan: "C4",
+        messages: "100.000",
+        messagePrice: "0,213",
+        carnetPrice: "21.250,00"
+      },
+      {
+        pricingPlan: "C5",
+        messages: "250.000",
+        messagePrice: "0,210",
+        carnetPrice: "52.500,00"
+      },
+      {
+        pricingPlan: "C6",
+        messages: "500.000",
+        messagePrice: "0,205",
+        carnetPrice: "102.500,00"
+      },
+      {
+        pricingPlan: "C7",
+        messages: "1.000.000",
+        messagePrice: "0,2",
+        carnetPrice: "200.000,00"
+      },
+      {
+        pricingPlan: "C8",
+        messages: "3.000.000",
+        messagePrice: "0,16",
+        carnetPrice: "480.000,00"
+      }
+    ]
+  };
+
+  global.fetch = jest.fn().mockResolvedValueOnce({
+    json: () => Promise.resolve(mockRetrievePlanPrices),
+  });
 
   await waitFor(() =>
     screen.getByText(/Passa a IO Premium e migliora le performance dei messaggi/)
   );
+
   const showMoreCarnet = document.getElementById('showMoreCarnetPlan') as HTMLElement;
   fireEvent.click(showMoreCarnet);
 
-  const carnetList = ['C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7', 'C8'];
-
   await waitFor(() =>
-    carnetList.forEach((c) => expect(document.getElementById(c) as HTMLElement).toBeInTheDocument())
+    mockRetrievePlanPrices.carnetPlans.forEach((c) => expect(document.getElementById(c.pricingPlan) as HTMLElement).toBeInTheDocument())
   );
 
-  const showMoreConsumption = document.getElementById('showMoreConsumptionPlan') as HTMLElement;
-  fireEvent.click(showMoreConsumption);
+  await waitFor(() => screen.getByText('1.000'));
 
   const forwardWithCarnet = document.getElementById('forwardCarnetPlan') as HTMLElement;
   expect(forwardWithCarnet).toBeDisabled();
 
-  fireEvent.click(document.getElementById('C1') as HTMLElement);
+  const carnetPlan = document.getElementById('C1') as HTMLElement;
+  fireEvent.click(carnetPlan);
   expect(forwardWithCarnet).toBeEnabled();
 
-  fireEvent.click(showMoreCarnet);
+  const showMoreConsumption = document.getElementById('showMoreConsumptionPlan') as HTMLElement;
+  fireEvent.click(showMoreConsumption);
+
+  await waitFor(() =>
+    mockRetrievePlanPrices.consumptionPlan.echelons.forEach((c) => expect(screen.getByText(c.price.slice(-2).concat('€ / mess'))).toBeInTheDocument())
+  );
 
   const chooseConsumption = document.getElementById('forwardConsumptionPlan') as HTMLElement;
-
   expect(chooseConsumption).toBeEnabled();
   fireEvent.click(chooseConsumption);
 };
