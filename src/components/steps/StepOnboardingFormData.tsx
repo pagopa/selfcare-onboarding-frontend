@@ -398,13 +398,9 @@ export default function StepOnboardingFormData({
     if (
       (institutionType === 'PA' || aooSelected || uoSelected) &&
       formik.values.recipientCode &&
-      formik.values.recipientCode.length === 6
+      formik.values.recipientCode.length >= 6
     ) {
       void verifyRecipientCodeIsValid(formik.values.recipientCode, onboardingFormData?.originIdEc);
-    }
-
-    if (formik.values.recipientCode && formik.values.recipientCode.length === 7) {
-      setRecipientCodeStatus(undefined);
     }
   }, [formik.values.recipientCode]);
 
