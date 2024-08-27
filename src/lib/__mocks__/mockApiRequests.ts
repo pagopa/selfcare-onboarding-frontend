@@ -904,6 +904,7 @@ export const institutionTypes: Array<InstitutionType> = [
   'AS',
   'SA',
   'PSP',
+  'PRV'
 ];
 
 export const mockedInsuranceResource: InsuranceCompaniesResource = {

@@ -51,7 +51,7 @@ const handleSearchExternalId = async (
   return null;
 };
 
-// eslint-disable-next-line sonarjs/cognitive-complexity
+// eslint-disable-next-line sonarjs/cognitive-complexity, complexity
 export function StepSearchParty({
   subTitle,
   forward,
@@ -279,7 +279,7 @@ export function StepSearchParty({
                 inserisci uno dei dati richiesti e cerca l’ente per
                 <br /> cui vuoi richiedere l’adesione a <strong>Interoperabilità.</strong>
               </Trans>
-            ) : institutionType === 'SCP' ? (
+            ) : institutionType === 'SCP' || institutionType === 'PRV' ? (
               <Trans
                 i18nKey="onboardingStep1.onboarding.scpSubtitle"
                 components={{ 3: <br />, 5: <strong /> }}
@@ -385,7 +385,7 @@ export function StepSearchParty({
             </Grid>
           )}
       </Grid>
-      {institutionType !== 'SA' && institutionType !== 'AS' && institutionType !== 'SCP' && (
+      {institutionType !== 'SA' && institutionType !== 'AS' && institutionType !== 'SCP' &&  institutionType !== 'PRV' && (
         <Grid container item justifyContent="center">
           <Grid item xs={6}>
             <Box
