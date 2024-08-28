@@ -382,13 +382,13 @@ export default function AsyncAutocompleteContainer({
         } else {
           const endpoint = addUser
             ? 'ONBOARDING_GET_INSTITUTIONS'
-            : product?.id === 'prod-interop' && institutionType === 'SCP'
+            : product?.id === 'prod-interop' && (institutionType === 'SCP' || institutionType === 'PRV')
             ? 'ONBOARDING_GET_PARTY_BY_CF_FROM_INFOCAMERE'
             : 'ONBOARDING_GET_PARTY_FROM_CF';
           void handleSearchByTaxCode(
             addUser,
             endpoint,
-            product?.id === 'prod-interop' && institutionType === 'SCP'
+            product?.id === 'prod-interop' && (institutionType === 'SCP' || institutionType === 'PRV')
               ? { ...params, taxCode: undefined }
               : params,
             value
