@@ -577,7 +577,8 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
       newInstitutionType !== 'PA' &&
       newInstitutionType !== 'SA' &&
       newInstitutionType !== 'AS' &&
-      newInstitutionType !== 'SCP'
+      newInstitutionType !== 'SCP'&&
+      newInstitutionType !== 'PRV'
     ) {
       if (newInstitutionType !== institutionType) {
         setOnboardingFormData({

@@ -239,7 +239,7 @@ export type InstitutionOnboardingInfoResource = {
   institution: InstitutionData;
 };
 
-export type InstitutionType = 'PA' | 'GSP' | 'SCP' | 'PT' | 'PSP' | 'SA' | 'AS';
+export type InstitutionType = 'PA' | 'GSP' | 'SCP' | 'PT' | 'PSP' | 'SA' | 'AS' | 'PRV';
 
 export type ANACParty = {
   description: string;

@@ -591,6 +591,9 @@ export default {
       as: {
         title: 'Società di assicurazione',
       },
+      prv: {
+        title: 'Privati'
+      }
     },
     backLabel: 'Indietro',
     confirmLabel: 'Continua',
