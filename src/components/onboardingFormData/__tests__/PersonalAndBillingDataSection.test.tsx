@@ -290,10 +290,13 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
     const hasVatNumber = document.getElementById('party_without_vatnumber');
     expect(hasVatNumber).toBeTruthy();
 
-    if(isPrivateParty) {
+    if (isPrivateParty) {
       expect(businessName).toBeDisabled();
       expect(pec).toBeDisabled();
       expect(taxCode).toBeDisabled();
+      expect(commercialRegisterNumber).toBeInTheDocument();
+      expect(rea).toBeInTheDocument();
+      expect(shareCapital).toBeInTheDocument();
     }
   });
 });
