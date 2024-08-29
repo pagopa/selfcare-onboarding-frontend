@@ -12,6 +12,7 @@ import {
   mockedUos,
   mockedPartiesFromInfoCamere,
 } from '../../../lib/__mocks__/mockApiRequests';
+import { institutionType4Product } from '../../../utils/constants';
 
 jest.mock('formik', () => ({
   useFormik: jest.fn(),
@@ -121,6 +122,7 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
         const isInformationCompany =
           (institutionType === 'GSP' || institutionType === 'SCP') &&
           (productId === 'prod-io' || productId === 'prod-io-sign' || productId === 'prod-interop');
+        const isPrivateParty = (productId === 'prod-interop' && institutionType === 'PRV');
 
         conditionsMap[`${productId}-${institutionType}`] = {
           isPremium,
@@ -129,6 +131,7 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
           isForeignInsurance,
           institutionAvoidGeotax,
           isInsuranceCompany,
+          isPrivateParty
         };
 
         renderComponentWithProviders(
@@ -166,6 +169,7 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
       isForeignInsurance,
       institutionAvoidGeotax,
       isInsuranceCompany,
+      isPrivateParty
     } = conditionsMap[key];
 
     const centralParty = screen.queryByText('Ente centrale');
@@ -285,5 +289,11 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
     expect(isTaxCodeEquals2PIVA).toBeFalsy();
     const hasVatNumber = document.getElementById('party_without_vatnumber');
     expect(hasVatNumber).toBeTruthy();
+
+    if(isPrivateParty) {
+      expect(businessName).toBeDisabled();
+      expect(pec).toBeDisabled();
+      expect(taxCode).toBeDisabled();
+    }
   });
 });
