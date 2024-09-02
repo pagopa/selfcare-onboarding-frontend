@@ -21,11 +21,30 @@ import { requiredError } from '../../utils/constants';
 import { mockedCountries } from '../../lib/__mocks__/mockApiRequests';
 import NumberDecimalFormat from './NumberDecimalFormat';
 
+interface CustomTextFieldNochedProps {
+  paddingValue?: string;
+}
+
 const CustomTextField = styled(TextField)({
   '.MuiInputLabel-asterisk': {
     display: 'none',
   },
 });
+
+const CustomTextFieldNotched = styled(TextField)<CustomTextFieldNochedProps>(({ paddingValue }) => ({
+  '.MuiInputLabel-asterisk': {
+    display: 'none',
+  },
+  '& .MuiOutlinedInput-notchedOutline legend': {
+    paddingRight: '0',
+  },
+  '&.Mui-focused .MuiOutlinedInput-notchedOutline legend': {
+    paddingRight: paddingValue ?? '0',
+  },
+  '& .MuiInputLabel-shrink + .MuiInputBase-root .MuiOutlinedInput-notchedOutline legend': {
+    paddingRight: paddingValue ?? '0',
+  },
+}));
 
 const CustomNumberField = styled(TextField)({
   'input::-webkit-inner-spin-button': {
@@ -422,7 +441,8 @@ export default function PersonalAndBillingDataSection({
         )}
         <Grid container spacing={2} pl={3} pt={3}>
           <Grid item xs={isForeignInsurance ? 12 : 7}>
-            <CustomTextField
+            <CustomTextFieldNotched
+              paddingValue='20px'
               {...baseTextFieldProps(
                 'registeredOffice',
                 t('onboardingFormData.billingDataSection.fullLegalAddress'),
@@ -836,7 +856,8 @@ export default function PersonalAndBillingDataSection({
             )}
             {isInvoiceable && (
               <Grid item xs={12} mt={3}>
-                <CustomTextField
+                <CustomTextFieldNotched
+                  paddingValue={institutionType === 'PA' || isAooUo ? '8px' : '0'}
                   {...baseTextFieldProps(
                     'recipientCode',
                     institutionType === 'PA' || isAooUo
@@ -919,7 +940,8 @@ export default function PersonalAndBillingDataSection({
             <>
               <Grid item xs={12}>
                 {/* Luogo di iscrizione al Registro delle Imprese facoltativo per institution Type !== 'PA' e 'PSP */}
-                <CustomTextField
+                <CustomTextFieldNotched
+                paddingValue={isContractingAuthority ? '20px' : '24px'}
                   {...baseTextFieldProps(
                     'businessRegisterPlace',
                     isContractingAuthority
@@ -1032,7 +1054,8 @@ export default function PersonalAndBillingDataSection({
         {/* indirizzo mail di supporto */}
         {!institutionAvoidGeotax && (
           <Grid item xs={12}>
-            <CustomTextField
+            <CustomTextFieldNotched
+            paddingValue={productId === 'prod-io-sign' ? '14px' : '20px'}
               {...baseTextFieldProps(
                 'supportEmail',
                 t(
