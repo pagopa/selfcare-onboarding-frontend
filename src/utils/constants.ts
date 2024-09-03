@@ -216,7 +216,6 @@ export const institutionTypes: Array<{ labelKey: string; value: InstitutionType 
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
 export const institutionType4Product = (productId: string | undefined) => {
-  console.log('ambiente', ENV.ENV);
   switch (productId) {
     case 'prod-interop':
       return institutionTypes.filter(
