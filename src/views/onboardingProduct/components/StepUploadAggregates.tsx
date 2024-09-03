@@ -1,19 +1,19 @@
 import { Alert, AlertTitle, Grid, Typography, useTheme } from '@mui/material';
-import { useTranslation, Trans } from 'react-i18next';
-import { useContext, useEffect, useState } from 'react';
 import { AxiosResponse } from 'axios';
+import { useContext, useEffect, useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import {
   InstitutionType,
   RequestOutcomeMessage,
   StepperStepComponentProps,
 } from '../../../../types';
-import { OnboardingStepActions } from '../../../components/OnboardingStepActions';
 import { FileUploader } from '../../../components/FileUploader';
-import { RowError } from '../../../model/RowError';
+import { OnboardingStepActions } from '../../../components/OnboardingStepActions';
 import { fetchWithLogs } from '../../../lib/api-utils';
-import { getFetchOutcome } from '../../../lib/error-utils';
 import { UserContext } from '../../../lib/context';
+import { getFetchOutcome } from '../../../lib/error-utils';
 import { AggregateInstitution } from '../../../model/AggregateInstitution';
+import { RowError } from '../../../model/RowError';
 import { ENV } from '../../../utils/env';
 import { genericError } from './StepVerifyOnboarding';
 
@@ -46,7 +46,6 @@ export function StepUploadAggregates({
   const [invalidFile, setInvalidFile] = useState<boolean>(false);
   const [foundErrors, setFoundErrors] = useState<Array<RowError>>();
   const [errorCsv, setErrorCsv] = useState<string>();
-  const [exampleCsv, setExampleCsv] = useState<string>();
 
   useEffect(() => {
     if (uploadedFile[0]?.name) {
@@ -156,7 +155,15 @@ export function StepUploadAggregates({
 
       const blob = new Blob([csvText], { type: 'text/csv' });
       const downloadUrl = window.URL.createObjectURL(blob);
-      setExampleCsv(downloadUrl);
+
+      const a = document.createElement('a');
+      // eslint-disable-next-line functional/immutable-data
+      a.href = downloadUrl;
+      // eslint-disable-next-line functional/immutable-data
+      a.download = `${partyName}_${productName}_aggregati_esempio.csv`.replace(/ /g, '_');
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
     } catch (error: any) {
       console.error(error.message);
     }
@@ -270,11 +277,6 @@ export function StepUploadAggregates({
                   1: (
                     <a
                       onClick={getExampleAggregatesCsv}
-                      href={exampleCsv}
-                      download={`${partyName}_${productName}_aggregati_esempio.csv`.replace(
-                        / /g,
-                        '_'
-                      )}
                       style={{
                         cursor: 'pointer',
                         textDecoration: 'underline',
