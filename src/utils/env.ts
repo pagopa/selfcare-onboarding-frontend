@@ -17,6 +17,7 @@ export const ENV = {
   },
 
   EXAMPLE_CSV: env.get('REACT_APP_AGGREGATES_EXAMPLE_CSV').required().asString(),
+  BASE_PATH_CDN_URL: env.get('REACT_APP_URL_CDN').required().asString(),
 
   ASSISTANCE: {
     ENABLE: env.get('REACT_APP_ENABLE_ASSISTANCE').required().asBool(),
