@@ -282,7 +282,9 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     onboardingData: OnboardingFormData,
     institutionType: InstitutionType
   ) => {
-    if (onboardingData.taxCode !== "") {
+    if (onboardingData.taxCode === "" && onboardingData.originId === "" && institutionType === "GSP") {
+      setActiveStep(activeStep + 3);
+    } else {
       setOnboardingFormData(onboardingData);
       setExternalInstitutionId(onboardingData.externalId ?? '');
       setOrigin(onboardingData.origin);
@@ -293,8 +295,6 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
         product_id: productId,
       });
       setInstitutionType(institutionType);
-    } else {
-      setActiveStep(activeStep + 3);
     }
   };
 
