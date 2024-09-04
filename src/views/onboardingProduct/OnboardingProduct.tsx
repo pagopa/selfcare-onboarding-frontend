@@ -282,7 +282,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     onboardingData: OnboardingFormData,
     institutionType: InstitutionType
   ) => {
-    if (onboardingData.taxCode === "" && onboardingData.originId === "" && institutionType === "GSP") {
+    if (onboardingData.taxCode === "" && onboardingData.originId === undefined && institutionType === "GSP") {
       setActiveStep(activeStep + 3);
     } else {
       setOnboardingFormData(onboardingData);
