@@ -240,6 +240,7 @@ stages:
               REACT_APP_PLANS_PRICES: '$(react_app_plans_prices)'
               REACT_APP_COUNTRY_DATA: '$(react_app_country_data)'
               REACT_APP_AGGREGATES_EXAMPLE_CSV: '$(react_app_aggregates_example_csv)'
+              REACT_APP_URL_CDN: '$(react_app_url_cdn)'
 
               REACT_APP_URL_PRIVACY_DISCLAIMER: '$(react_app_url_privacy_disclaimer)'
               REACT_APP_URL_TERMS_AND_CONDITIONS: '$(react_app_url_terms_and_conditions)'
