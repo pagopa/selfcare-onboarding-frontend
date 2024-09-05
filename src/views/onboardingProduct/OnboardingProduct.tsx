@@ -282,16 +282,20 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     onboardingData: OnboardingFormData,
     institutionType: InstitutionType
   ) => {
-    setOnboardingFormData(onboardingData);
-    setExternalInstitutionId(onboardingData.externalId ?? '');
-    setOrigin(onboardingData.origin);
-    forwardWithData(onboardingData as Partial<FormData>);
-    trackEvent('ONBOARDING_PARTY_SELECTION', {
-      party_id: onboardingData?.externalId,
-      request_id: requestIdRef.current,
-      product_id: productId,
-    });
-    setInstitutionType(institutionType);
+    if (onboardingData.taxCode === "" && onboardingData.originId === undefined && institutionType === "GSP") {
+      setActiveStep(activeStep + 3);
+    } else {
+      setOnboardingFormData(onboardingData);
+      setExternalInstitutionId(onboardingData.externalId ?? '');
+      setOrigin(onboardingData.origin);
+      forwardWithData(onboardingData as Partial<FormData>);
+      trackEvent('ONBOARDING_PARTY_SELECTION', {
+        party_id: onboardingData?.externalId,
+        request_id: requestIdRef.current,
+        product_id: productId,
+      });
+      setInstitutionType(institutionType);
+    }
   };
 
   const forwardWithBillingData = (newOnboardingFormData: OnboardingFormData) => {
