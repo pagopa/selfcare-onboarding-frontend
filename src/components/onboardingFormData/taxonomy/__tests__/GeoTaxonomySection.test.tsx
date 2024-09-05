@@ -53,11 +53,10 @@ test('should render GeoTaxonomySection with empty retrievedTaxonomies', async ()
 });
 
 test('should render GeoTaxonomySection with mocked retrievedTaxonomies and click on local radio button for changing the value of autocomplete', async () => {
-
   global.fetch = jest.fn().mockResolvedValueOnce({
     json: () => Promise.resolve(mockedGeoTaxonomy),
   });
-  
+
   renderComponentWithProviders(
     <GeoTaxonomySection
       retrievedTaxonomies={mockedGeoTaxonomy}
@@ -69,46 +68,34 @@ test('should render GeoTaxonomySection with mocked retrievedTaxonomies and click
   const radioLocal = screen.getByLabelText('Locale');
   fireEvent.click(radioLocal);
   expect(radioLocal).toBeChecked();
+
   const selectArea = screen.getAllByLabelText('Comune, Provincia o Regione') as HTMLSelectElement[];
   const clearButton = screen.getByLabelText('Clear');
+  const addButton = screen.getByText('Aggiungi area');
+
+  const selectAndVerifyArea = (inputValue: string, expectedText: string, expectedValue: string) => {
+    fireEvent.click(selectArea[0]);
+    fireEvent.change(selectArea[0], { target: { value: inputValue } });
+    fireEvent.click(screen.getByText(expectedText));
+    expect(selectArea[0].value).toBe(expectedValue);
+  };
 
   await waitFor(() => {
-    
-
-    fireEvent.click(selectArea[0]);
-    fireEvent.change(selectArea[0], { target: { value: 'Mil' } });
-    fireEvent.click(screen.getByText('Milano (MI) comune'));
-    expect(selectArea[0].value).toBe('Milano (MI)');
-
+    selectAndVerifyArea('Mil', 'Milano (MI) comune', 'Milano (MI)');
     fireEvent.click(clearButton);
-
-    const addButton = screen.getByText('Aggiungi area');
     fireEvent.click(addButton);
   });
 
   await waitFor(() => {
-    fireEvent.click(selectArea[0]);
-    fireEvent.change(selectArea[0], { target: { value: 'Mil' } });
-    fireEvent.click(screen.getByText('Milano e provincia'));
-    expect(selectArea[0].value).toBe('Milano e provincia');
+    selectAndVerifyArea('Mil', 'Milano e provincia', 'Milano e provincia');
     fireEvent.click(clearButton);
   });
-
+  
   await waitFor(() => {
-    fireEvent.click(selectArea[0]);
-    fireEvent.change(selectArea[0], { target: { value: 'Mil' } });
-    fireEvent.click(screen.getByText('Milano e provincia'));
-    expect(selectArea[0].value).toBe('Milano e provincia');
-    fireEvent.click(clearButton);
-  });
-
-  await waitFor(() => {
-    fireEvent.click(selectArea[0]);
-    fireEvent.change(selectArea[0], { target: { value: "l'A" } });
-    fireEvent.click(screen.getByText("l'Aquila (AQ) comune"));
-    expect(selectArea[0].value).toBe("l'Aquila (AQ)");
+    selectAndVerifyArea("l'A", "l'Aquila (AQ) comune", "l'Aquila (AQ)");
   });
 });
+
 
 test('should render GeoTaxonomySection with mocked retrievedTaxonomies and click on national radio button', async () => {
   renderComponentWithProviders(
