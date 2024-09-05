@@ -792,6 +792,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
       Component: () =>
         StepUploadAggregates({
           productName: selectedProduct?.title,
+          productId: selectedProduct?.id,
           partyName: onboardingFormData?.businessName,
           institutionType,
           loading,

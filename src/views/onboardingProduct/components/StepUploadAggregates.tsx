@@ -22,6 +22,7 @@ type Props = {
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
   setOutcome: React.Dispatch<React.SetStateAction<RequestOutcomeMessage | null | undefined>>;
   productName?: string;
+  productId?: string;
   partyName?: string;
   institutionType?: InstitutionType;
 } & StepperStepComponentProps;
@@ -31,6 +32,7 @@ export function StepUploadAggregates({
   setLoading,
   setOutcome,
   productName,
+  productId,
   partyName,
   institutionType,
   forward,
@@ -142,7 +144,7 @@ export function StepUploadAggregates({
 
   const getExampleAggregatesCsv = async () => {
     try {
-      const response = await fetch(ENV.EXAMPLE_CSV, {
+      const response = await fetch(`${ENV.BASE_PATH_CDN_URL}/resources/aggregates/${productId}_enti_aggregatori_template_esempio.csv`, {
         method: 'GET',
         headers: { 'Content-Type': 'text/csv' },
       });
