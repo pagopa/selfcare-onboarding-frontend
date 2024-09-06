@@ -365,61 +365,11 @@ test('Test: Successfull complete onboarding request of italian AS without tax co
 });
 
 test('Test: Successfull complete onboarding request of SCP for product prod-interop search from infocamere with tax code', async () => {
-  renderComponent('prod-interop');
-  await executeStepInstitutionType('prod-interop', 'SCP');
-  await executeStepSearchParty(
-    'prod-interop',
-    'SCP',
-    'Mocked business 1',
-    'taxCode',
-    undefined,
-    '00112233445',
-    undefined,
-    false,
-    true
-  );
-  await executeStepBillingData(
-    'prod-interop',
-    'SCP',
-    false,
-    false,
-    'PDND_INFOCAMERE',
-    'Mocked business 1',
-    false
-  );
-  await executeStepAddManager();
-  await executeStepAddAdmin(true, false);
-  await verifySubmit('prod-interop', 'SCP', 'PDND_INFOCAMERE', false, false, 'taxCode', false);
-  await executeGoHome(true);
+  await completeOnboardingPdndInfocamereRequest('SCP');
 });
 
 test('Test: Successfull complete onboarding request of PRV for product prod-interop search from infocamere with tax code', async () => {
-  renderComponent('prod-interop');
-  await executeStepInstitutionType('prod-interop', 'PRV');
-  await executeStepSearchParty(
-    'prod-interop',
-    'PRV',
-    'Mocked business 1',
-    'taxCode',
-    undefined,
-    '00112233445',
-    undefined,
-    false,
-    true
-  );
-  await executeStepBillingData(
-    'prod-interop',
-    'PRV',
-    false,
-    false,
-    'PDND_INFOCAMERE',
-    'Mocked business 1',
-    false
-  );
-  await executeStepAddManager();
-  await executeStepAddAdmin(true, false);
-  await verifySubmit('prod-interop', 'PRV', 'PDND_INFOCAMERE', false, false, 'taxCode', false);
-  await executeGoHome(true);
+  await completeOnboardingPdndInfocamereRequest('PRV');
 });
 
 test('Test: Successfull complete onboarding request of PA aggregator party for prod-io search by business name', async () => {
@@ -565,6 +515,35 @@ test('Test: RecipientCode input client validation', async () => {
   fireEvent.input(recipientCodeInput, { target: { value: 'AB123CD' } });
   expect(recipientCodeInput.value).toBe('AB123CD');
 });
+
+const completeOnboardingPdndInfocamereRequest = async (institutionType) => {
+  renderComponent('prod-interop');
+  await executeStepInstitutionType('prod-interop', institutionType);
+  await executeStepSearchParty(
+    'prod-interop',
+    institutionType,
+    'Mocked business 1',
+    'taxCode',
+    undefined,
+    '00112233445',
+    undefined,
+    false,
+    true
+  );
+  await executeStepBillingData(
+    'prod-interop',
+    institutionType,
+    false,
+    false,
+    'PDND_INFOCAMERE',
+    'Mocked business 1',
+    false
+  );
+  await executeStepAddManager();
+  await executeStepAddAdmin(true, false);
+  await verifySubmit('prod-interop', institutionType, 'PDND_INFOCAMERE', false, false, 'taxCode', false);
+  await executeGoHome(true);
+};
 
 const performLogout = async (logoutButton: HTMLElement) => {
   fireEvent.click(logoutButton);
