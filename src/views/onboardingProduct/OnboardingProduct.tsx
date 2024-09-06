@@ -464,12 +464,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
             county: onboardingFormData?.county,
             city: onboardingFormData?.city,
           },
-          origin:
-            institutionType === 'SCP' && productId === 'prod-interop'
-              ? 'INFOCAMERE'
-              : institutionType === 'SA'
-              ? 'ANAC'
-              : origin,
+          origin: institutionType === 'SA' ? 'ANAC' : origin,
           users,
           pricingPlan,
           assistanceContacts: onboardingFormData?.supportEmail
