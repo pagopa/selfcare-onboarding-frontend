@@ -211,6 +211,7 @@ export const institutionTypes: Array<{ labelKey: string; value: InstitutionType 
   { labelKey: 'psp', value: 'PSP' },
   { labelKey: 'sa', value: 'SA' },
   { labelKey: 'as', value: 'AS' },
+  { labelKey: 'prv', value: 'PRV' },
 ];
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
@@ -223,7 +224,8 @@ export const institutionType4Product = (productId: string | undefined) => {
           it.labelKey === 'gsp' ||
           it.labelKey === 'sa' ||
           (ENV.SCP_INFOCAMERE.SHOW && it.labelKey === 'scp') ||
-          it.labelKey === 'as'
+          it.labelKey === 'as' ||
+          (ENV.ENV !== 'PROD' && it.labelKey === 'prv')
       );
     case 'prod-pn':
       return institutionTypes.filter((it) => it.labelKey === 'pa');
@@ -267,6 +269,7 @@ export const description4InstitutionType = (institutionType: InstitutionType) =>
     case 'PSP':
     case 'SA':
     case 'AS':
+    case 'PRV':
     default:
       return '';
   }

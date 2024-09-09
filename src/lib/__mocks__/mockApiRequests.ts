@@ -443,6 +443,17 @@ export const mockedGeoTaxonomy: Array<GeographicTaxonomyResource> = [
     province_id: '433',
     region_id: '65',
   },
+  {
+    code: '123456',
+    country: '123',
+    country_abbreviation: 'IT',
+    desc: "L'AQUILA - COMUNE",
+    enabled: true,
+    istat_code: '2233445',
+    province_abbreviation: 'AQ',
+    province_id: '352',
+    region_id: '15',
+  },
 ];
 
 export const mockedGeotaxonomies: Array<GeographicTaxonomyResource> = [
@@ -904,6 +915,7 @@ export const institutionTypes: Array<InstitutionType> = [
   'AS',
   'SA',
   'PSP',
+  'PRV'
 ];
 
 export const mockedInsuranceResource: InsuranceCompaniesResource = {

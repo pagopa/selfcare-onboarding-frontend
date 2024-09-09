@@ -1,10 +1,12 @@
-import { PartyData } from '../../types';
+import { InstitutionType, PartyData } from '../../types';
 import { OnboardingFormData } from '../model/OnboardingFormData';
 
 // eslint-disable-next-line complexity
 export const selected2OnboardingData = (
   selectedParty: PartyData | null,
-  isAggregator?: boolean
+  isAggregator?: boolean,
+  institutionType?: InstitutionType
+// eslint-disable-next-line sonarjs/cognitive-complexity
 ): OnboardingFormData => ({
   businessName:
     selectedParty?.description ??
@@ -30,8 +32,14 @@ export const selected2OnboardingData = (
   zipCode: selectedParty?.CAP ?? selectedParty?.zipCode,
   geographicTaxonomies: [],
   originIdEc: selectedParty?.originId,
-  originId: selectedParty?.codiceUniUo ?? selectedParty?.codiceUniAoo ?? selectedParty?.originId,
-  origin: selectedParty?.origin,
+  originId:
+    institutionType === 'PRV' || institutionType === 'SCP'
+      ? selectedParty?.businessTaxId
+      : selectedParty?.codiceUniUo ?? selectedParty?.codiceUniAoo ?? selectedParty?.originId,
+  origin: 
+    institutionType === 'PRV' || institutionType === 'SCP'
+      ? 'PDND_INFOCAMERE' 
+      : selectedParty?.origin,
   rea:
     selectedParty?.cciaa && selectedParty?.nRea
       ? `${selectedParty?.cciaa}-${selectedParty?.nRea}`

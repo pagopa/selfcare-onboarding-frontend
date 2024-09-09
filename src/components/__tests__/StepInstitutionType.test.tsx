@@ -43,7 +43,7 @@ test('Test: The correct institution types with the expected descriptions, can be
           expect(institutionTypeValues).toStrictEqual(['PA']);
           break;
         case 'prod-interop':
-          expect(institutionTypeValues).toStrictEqual(['PA', 'GSP', 'SCP', 'SA', 'AS']);
+          expect(institutionTypeValues).toStrictEqual(['PA', 'GSP', 'SCP', 'SA', 'AS', 'PRV']);
           break;
         default:
           expect(institutionTypeValues).toStrictEqual(['PA', 'GSP', 'SCP']);

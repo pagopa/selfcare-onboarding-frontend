@@ -468,12 +468,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
             county: onboardingFormData?.county,
             city: onboardingFormData?.city,
           },
-          origin:
-            institutionType === 'SCP' && productId === 'prod-interop'
-              ? 'INFOCAMERE'
-              : institutionType === 'SA'
-              ? 'ANAC'
-              : origin,
+          origin: institutionType === 'SA' ? 'ANAC' : origin,
           users,
           pricingPlan,
           assistanceContacts: onboardingFormData?.supportEmail
@@ -581,7 +576,8 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
       newInstitutionType !== 'PA' &&
       newInstitutionType !== 'SA' &&
       newInstitutionType !== 'AS' &&
-      newInstitutionType !== 'SCP'
+      newInstitutionType !== 'SCP'&&
+      newInstitutionType !== 'PRV'
     ) {
       if (newInstitutionType !== institutionType) {
         setOnboardingFormData({
@@ -795,6 +791,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
       Component: () =>
         StepUploadAggregates({
           productName: selectedProduct?.title,
+          productId: selectedProduct?.id,
           partyName: onboardingFormData?.businessName,
           institutionType,
           loading,
