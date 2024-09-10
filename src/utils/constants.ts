@@ -212,6 +212,7 @@ export const institutionTypes: Array<{ labelKey: string; value: InstitutionType 
   { labelKey: 'sa', value: 'SA' },
   { labelKey: 'as', value: 'AS' },
   { labelKey: 'prv', value: 'PRV' },
+  { labelKey: 'pprv', value: 'PRV' },
 ];
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
@@ -245,7 +246,8 @@ export const institutionType4Product = (productId: string | undefined) => {
           it.labelKey === 'pa' ||
           it.labelKey === 'gsp' ||
           (ENV.ENV !== 'PROD' && it.labelKey === 'psp') ||
-          (ENV.PT.SHOW_PT ? it.labelKey === 'pt' : '')
+          (ENV.PT.SHOW_PT ? it.labelKey === 'pt' : '') ||
+          it.labelKey === 'pprv'
       );
     case 'prod-io-sign':
       return institutionTypes.filter((it) => it.labelKey === 'pa' || it.labelKey === 'gsp');
