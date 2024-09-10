@@ -594,7 +594,7 @@ export default {
       prv: {
         title: 'Privati'
       },
-      pprv: {
+      oth: {
         title: 'Altro'
       }
     },
