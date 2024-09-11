@@ -593,6 +593,9 @@ export default {
       },
       prv: {
         title: 'Privati'
+      },
+      oth: {
+        title: 'Altro'
       }
     },
     backLabel: 'Indietro',
