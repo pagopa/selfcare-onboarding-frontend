@@ -1,4 +1,4 @@
-import { useEffect, useState, useContext, useRef, useMemo } from 'react';
+import React, { useEffect, useState, useContext, useRef, useMemo }  from 'react';
 import { useHistory } from 'react-router-dom';
 import { Container } from '@mui/material';
 import { AxiosError, AxiosResponse } from 'axios';
@@ -8,7 +8,6 @@ import { useTranslation, Trans } from 'react-i18next';
 import { uniqueId } from 'lodash';
 import { IllusCompleted, IllusError } from '@pagopa/mui-italia';
 import { EndingPage } from '@pagopa/selfcare-common-frontend/lib';
-import React from 'react';
 import { withLogin } from '../../components/withLogin';
 import {
   InstitutionType,
@@ -40,6 +39,7 @@ import UserNotAllowedPage from '../UserNotAllowedPage';
 import { AdditionalData, AdditionalInformations } from '../../model/AdditionalInformations';
 import AlreadyOnboarded from '../AlreadyOnboarded';
 import { AggregateInstitution } from '../../model/AggregateInstitution';
+import { selected2OnboardingData } from '../../utils/selected2OnboardingData';
 import { genericError, StepVerifyOnboarding } from './components/StepVerifyOnboarding';
 import { StepAddAdmin } from './components/StepAddAdmin';
 import { StepAdditionalInformations } from './components/StepAdditionalInformations';
@@ -426,18 +426,18 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           additionalInformations:
             institutionType === 'GSP' && selectedProduct?.id === 'prod-pagopa'
               ? {
-                  agentOfPublicService: additionalInformations?.agentOfPublicService,
-                  agentOfPublicServiceNote: additionalInformations?.agentOfPublicServiceNote,
-                  belongRegulatedMarket: additionalInformations?.belongRegulatedMarket,
-                  regulatedMarketNote: additionalInformations?.regulatedMarketNote,
-                  establishedByRegulatoryProvision:
-                    additionalInformations?.establishedByRegulatoryProvision,
-                  establishedByRegulatoryProvisionNote:
-                    additionalInformations?.establishedByRegulatoryProvisionNote,
-                  ipa: additionalInformations?.ipa,
-                  ipaCode: additionalInformations?.ipaCode,
-                  otherNote: additionalInformations?.otherNote,
-                }
+                agentOfPublicService: additionalInformations?.agentOfPublicService,
+                agentOfPublicServiceNote: additionalInformations?.agentOfPublicServiceNote,
+                belongRegulatedMarket: additionalInformations?.belongRegulatedMarket,
+                regulatedMarketNote: additionalInformations?.regulatedMarketNote,
+                establishedByRegulatoryProvision:
+                  additionalInformations?.establishedByRegulatoryProvision,
+                establishedByRegulatoryProvisionNote:
+                  additionalInformations?.establishedByRegulatoryProvisionNote,
+                ipa: additionalInformations?.ipa,
+                ipaCode: additionalInformations?.ipaCode,
+                otherNote: additionalInformations?.otherNote,
+              }
               : undefined,
           pspData:
             institutionType === 'PSP'
@@ -445,20 +445,20 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
               : undefined,
           companyInformations:
             onboardingFormData?.businessRegisterPlace ||
-            onboardingFormData?.rea ||
-            onboardingFormData?.shareCapital
+              onboardingFormData?.rea ||
+              onboardingFormData?.shareCapital
               ? {
-                  businessRegisterPlace: onboardingFormData?.businessRegisterPlace,
-                  rea: onboardingFormData?.rea,
-                  shareCapital: onboardingFormData?.shareCapital,
-                }
+                businessRegisterPlace: onboardingFormData?.businessRegisterPlace,
+                rea: onboardingFormData?.rea,
+                shareCapital: onboardingFormData?.shareCapital,
+              }
               : undefined,
           institutionType,
           originId: onboardingFormData?.originId,
           geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY
             ? onboardingFormData?.geographicTaxonomies?.map((gt) =>
-                onboardedInstitutionInfo2geographicTaxonomy(gt)
-              )
+              onboardedInstitutionInfo2geographicTaxonomy(gt)
+            )
             : [],
           institutionLocationData: {
             country:
@@ -479,8 +479,8 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           subunitType: onboardingFormData?.uoUniqueCode
             ? 'UO'
             : onboardingFormData?.aooUniqueCode
-            ? 'AOO'
-            : undefined,
+              ? 'AOO'
+              : undefined,
           taxCode: onboardingFormData?.taxCode,
           isAggregator: onboardingFormData?.isAggregator
             ? onboardingFormData?.isAggregator
@@ -570,13 +570,21 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
       product_id: productId,
     });
     setInstitutionType(newInstitutionType);
-    forward();
+
+    if (newInstitutionType === 'PRV' && productId === 'prod-pagopa') {
+      selected2OnboardingData(null, undefined, newInstitutionType, productId);
+      setOnboardingFormData(selected2OnboardingData(null, undefined, newInstitutionType, productId));
+      setActiveStep(4);
+    } else {
+      forward();
+    }
+
     if (
       newInstitutionType !== 'GSP' &&
       newInstitutionType !== 'PA' &&
       newInstitutionType !== 'SA' &&
       newInstitutionType !== 'AS' &&
-      newInstitutionType !== 'SCP'&&
+      newInstitutionType !== 'SCP' &&
       newInstitutionType !== 'PRV'
     ) {
       if (newInstitutionType !== institutionType) {
