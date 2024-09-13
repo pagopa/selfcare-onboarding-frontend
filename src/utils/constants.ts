@@ -247,9 +247,9 @@ export const institutionType4Product = (productId: string | undefined) => {
         (it) =>
           it.labelKey === 'pa' ||
           it.labelKey === 'gsp' ||
-          (ENV.PRV.SHOW && it.labelKey === 'psp') ||
+          (ENV.ENV !== 'PROD' && it.labelKey === 'psp') ||
           (ENV.PT.SHOW_PT ? it.labelKey === 'pt' : '') ||
-          it.labelKey === 'oth'
+          (ENV.PRV.SHOW ? it.labelKey === 'oth' : '')
       );
     case 'prod-io-sign':
       return institutionTypes.filter((it) => it.labelKey === 'pa' || it.labelKey === 'gsp');
