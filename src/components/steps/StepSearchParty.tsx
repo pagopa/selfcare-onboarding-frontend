@@ -221,7 +221,7 @@ export function StepSearchParty({
   const onForwardAction = () => {
     const dataParty = aooResult || uoResult ? ({ ...selected, ...ecData } as PartyData) : selected;
     setSelectedHistory(selected);
-    const onboardingData = selected2OnboardingData(dataParty, isAggregator, institutionType);
+    const onboardingData = selected2OnboardingData(dataParty, isAggregator, institutionType, product?.id);
     forward(onboardingData, institutionType);
   };
 
