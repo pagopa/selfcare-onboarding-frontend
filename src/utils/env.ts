@@ -78,4 +78,8 @@ export const ENV = {
   SCP_INFOCAMERE: {
     SHOW: env.get('REACT_APP_ENABLE_SCP_INFOCAMERE').default('false').asBool(),
   },
+
+  PRV: {
+    SHOW: env.get('REACT_APP_ENABLE_PRV').default('false').asBool(),
+  }
 };
