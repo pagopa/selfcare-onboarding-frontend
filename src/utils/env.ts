@@ -81,5 +81,9 @@ export const ENV = {
 
   PRV: {
     SHOW: env.get('REACT_APP_ENABLE_PRV').default('false').asBool(),
+  },
+
+  PURE_PRV: {
+    SHOW: env.get('REACT_APP_ENABLE_PURE_PRV').default('false').asBool(),
   }
 };
