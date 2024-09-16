@@ -228,7 +228,7 @@ export const institutionType4Product = (productId: string | undefined) => {
           it.labelKey === 'sa' ||
           (ENV.SCP_INFOCAMERE.SHOW && it.labelKey === 'scp') ||
           it.labelKey === 'as' ||
-          (ENV.ENV !== 'PROD' && it.labelKey === 'prv')
+          (ENV.PRV.SHOW && it.labelKey === 'prv')
       );
     case 'prod-pn':
       return institutionTypes.filter((it) => it.labelKey === 'pa');
@@ -249,7 +249,7 @@ export const institutionType4Product = (productId: string | undefined) => {
           it.labelKey === 'gsp' ||
           (ENV.ENV !== 'PROD' && it.labelKey === 'psp') ||
           (ENV.PT.SHOW_PT ? it.labelKey === 'pt' : '') ||
-          it.labelKey === 'oth'
+          (ENV.PURE_PRV.SHOW ? it.labelKey === 'oth' : '')
       );
     case 'prod-io-sign':
       return institutionTypes.filter((it) => it.labelKey === 'pa' || it.labelKey === 'gsp');
