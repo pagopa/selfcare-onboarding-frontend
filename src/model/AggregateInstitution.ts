@@ -10,4 +10,5 @@ export type AggregateInstitution = {
   subunitCode?: string;
   subunitType?: string;
   zipCode?: string;
+  users?: Array<any>;
 };

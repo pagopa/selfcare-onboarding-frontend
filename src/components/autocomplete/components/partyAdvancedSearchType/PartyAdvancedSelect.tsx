@@ -86,7 +86,7 @@ export default function PartyAdvancedSelect({
   };
 
   useEffect(() => {
-    if (product?.id === 'prod-interop' && institutionType === 'SCP') {
+    if (product?.id === 'prod-interop' && (institutionType === 'SCP' || institutionType === 'PRV')) {
       onSelectValue(false, true, false, false, false);
       setTypeOfSearch('taxCode');
     }
@@ -109,7 +109,7 @@ export default function PartyAdvancedSelect({
   }, []);
 
   useEffect(() => {
-    if (addUser || (product?.id === 'prod-interop' && institutionType === 'SCP')) {
+    if (addUser || (product?.id === 'prod-interop' && (institutionType === 'SCP' || institutionType === 'PRV'))) {
       setTypeOfSearch('taxCode');
       setIsTaxCodeSelected(true);
     } else {
@@ -155,7 +155,7 @@ export default function PartyAdvancedSelect({
         label={t('partyAdvancedSelect.advancedSearchLabel')}
         onChange={handleTypeSearchChange}
       >
-        {!addUser && institutionType !== 'SCP' && (
+        {!addUser && institutionType !== 'SCP' && institutionType !== 'PRV' && (
           <MenuItem
             id="businessName"
             data-testid="businessName"
@@ -188,6 +188,7 @@ export default function PartyAdvancedSelect({
         {((ENV.AOO_UO.SHOW_AOO_UO &&
           optionsAvailable4InstitutionType &&
           institutionType !== 'SCP' &&
+          institutionType !== 'PRV' &&
           filteredByProducts(product as Product)) ||
           (addUser && ENV.AOO_UO.SHOW_AOO_UO && filteredByProducts(selectedProduct))) &&
           menuItems.map((item) => (
