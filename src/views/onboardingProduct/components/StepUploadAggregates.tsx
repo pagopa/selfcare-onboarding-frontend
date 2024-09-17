@@ -113,6 +113,7 @@ export function StepUploadAggregates({
         method: 'POST',
         params: {
           institutionType,
+          productId,
         },
         data: formData,
         headers: { 'Content-Type': 'multipart/form-data' },
@@ -144,10 +145,13 @@ export function StepUploadAggregates({
 
   const getExampleAggregatesCsv = async () => {
     try {
-      const response = await fetch(`${ENV.BASE_PATH_CDN_URL}/resources/aggregates/${productId}_enti_aggregatori_template_esempio.csv`, {
-        method: 'GET',
-        headers: { 'Content-Type': 'text/csv' },
-      });
+      const response = await fetch(
+        `${ENV.BASE_PATH_CDN_URL}/resources/aggregates/${productId}_enti_aggregatori_template_esempio.csv`,
+        {
+          method: 'GET',
+          headers: { 'Content-Type': 'text/csv' },
+        }
+      );
 
       if (!response.ok) {
         console.error(`Response status: ${response.status}`);
