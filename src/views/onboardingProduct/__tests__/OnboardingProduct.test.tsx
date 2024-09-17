@@ -748,7 +748,13 @@ const executeStepSearchParty = async (
         },
       });
 
-      const partyNameSelect = await waitFor(() => screen.getByText(partyName));
+      const partyNameSelect = await waitFor(() =>
+        screen.getByText(
+          typeOfSearch === 'taxCode' && institutionType !== 'SCP' && institutionType !== 'PRV'
+            ? partyName.toLocaleLowerCase()
+            : partyName
+        )
+      );
 
       const endpoint =
         typeOfSearch === 'taxCode'
