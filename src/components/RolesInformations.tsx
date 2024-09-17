@@ -1,4 +1,5 @@
-import { Link } from '@mui/material';
+import { ButtonNaked } from '@pagopa/mui-italia';
+import MenuBookIcon from '@mui/icons-material/MenuBook';
 
 type Props = {
   linkLabel: string;
@@ -8,12 +9,11 @@ type Props = {
 
 export function RolesInformations({ isTechPartner, linkLabel, documentationLink }: Props) {
   return (
-    <Link
+    <ButtonNaked
       component="button"
       color="primary"
-      // startIcon={<MenuBookIcon />}
-      sx={{ fontWeight: 'fontWeightBold', fontSize: 'fontSize'}}
-
+      startIcon={<MenuBookIcon />}
+      sx={{ fontWeight: 'fontWeightBold', fontSize: 'fontSize' }}
       onClick={() => {
         const docLink =
           documentationLink ?? isTechPartner
@@ -23,6 +23,6 @@ export function RolesInformations({ isTechPartner, linkLabel, documentationLink 
       }}
     >
       {linkLabel}
-    </Link>
+    </ButtonNaked>
   );
 }
