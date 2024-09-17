@@ -39,7 +39,6 @@ type Props = {
   isUoCodeSelected?: boolean;
 };
 
-// eslint-disable-next-line sonarjs/cognitive-complexity
 export default function AsyncAutocompleteResultsCode({
   setSelected,
   isLoading,
@@ -52,7 +51,7 @@ export default function AsyncAutocompleteResultsCode({
   isAooCodeSelected,
   isUoCodeSelected,
 }: Props) {
-  const visibleCode =
+  const party =
     isTaxCodeSelected || isIvassCodeSelected
       ? cfResult
       : isAooCodeSelected
@@ -60,6 +59,10 @@ export default function AsyncAutocompleteResultsCode({
       : isUoCodeSelected
       ? uoResult
       : '';
+
+  const partyName =
+    party?.description ?? party?.denominazioneAoo ?? party?.descrizioneUo ?? party[0].description;
+
   return (
     <CustomBox my={2} {...cfResult} width="90%" maxHeight="200px" overflow="auto">
       {!isLoading && (
@@ -70,21 +73,13 @@ export default function AsyncAutocompleteResultsCode({
           display="flex"
           onKeyDownCapture={(e) => {
             if (e.key === 'Enter' || e.key === ' ') {
-              setSelected(visibleCode);
+              setSelected(party);
               setCfResult(undefined);
             }
           }}
         >
           <PartyAccountItemButton
-            partyName={
-              (isTaxCodeSelected || isIvassCodeSelected) && cfResult?.description
-                ? cfResult?.description.toLocaleLowerCase()
-                : isAooCodeSelected && aooResult?.denominazioneAoo
-                ? aooResult?.denominazioneAoo.toLocaleLowerCase()
-                : isUoCodeSelected && uoResult?.descrizioneUo
-                ? uoResult?.descrizioneUo.toLocaleLowerCase()
-                : visibleCode?.description ?? visibleCode?.businessName
-            }
+            partyName={partyName.toLocaleLowerCase()}
             partyRole={
               !isTaxCodeSelected && aooResult
                 ? aooResult.denominazioneEnte || aooResult.parentDescription
@@ -94,7 +89,8 @@ export default function AsyncAutocompleteResultsCode({
             }
             image={' '}
             action={() => {
-              setSelected(visibleCode);
+              const partySelected = party[0] ?? party;
+              setSelected(partySelected);
               setCfResult(undefined);
             }}
             maxCharactersNumberMultiLine={20}
