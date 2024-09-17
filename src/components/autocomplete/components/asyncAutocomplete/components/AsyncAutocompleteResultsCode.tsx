@@ -69,11 +69,11 @@ export default function AsyncAutocompleteResultsCode({
       : isUoCodeSelected && uoResult?.descrizioneUo
       ? uoResult.descrizioneUo.toLocaleLowerCase()
       : party?.description
-      ? party.description.toLocaleLowerCase()
+      ? party.description
       : party?.businessName
-      ? party.businessName.toLocaleLowerCase()
+      ? party.businessName
       : party[0]?.description
-      ? party[0].description.toLocaleLowerCase()
+      ? party[0].description
       : '';
 
 
