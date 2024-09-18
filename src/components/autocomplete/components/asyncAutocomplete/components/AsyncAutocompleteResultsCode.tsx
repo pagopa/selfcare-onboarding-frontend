@@ -39,7 +39,6 @@ type Props = {
   isUoCodeSelected?: boolean;
 };
 
-// eslint-disable-next-line sonarjs/cognitive-complexity, complexity
 export default function AsyncAutocompleteResultsCode({
   setSelected,
   isLoading,
@@ -62,20 +61,11 @@ export default function AsyncAutocompleteResultsCode({
       : '';
 
   const partyName =
-    (isTaxCodeSelected || isIvassCodeSelected) && cfResult?.description
-      ? cfResult.description.toLocaleLowerCase()
-      : isAooCodeSelected && aooResult?.denominazioneAoo
-      ? aooResult.denominazioneAoo.toLocaleLowerCase()
-      : isUoCodeSelected && uoResult?.descrizioneUo
-      ? uoResult.descrizioneUo.toLocaleLowerCase()
-      : party?.description
-      ? party.description
-      : party?.businessName
-      ? party.businessName
-      : party[0]?.description
-      ? party[0].description
-      : '';
-
+    party?.description ??
+    party?.businessName ??
+    party?.denominazioneAoo ??
+    party?.descrizioneUo ??
+    party[0]?.description;
 
   return (
     <CustomBox my={2} {...cfResult} width="90%" maxHeight="200px" overflow="auto">
@@ -93,7 +83,7 @@ export default function AsyncAutocompleteResultsCode({
           }}
         >
           <PartyAccountItemButton
-            partyName={partyName}
+            partyName={partyName.toLocaleLowerCase()}
             partyRole={
               !isTaxCodeSelected && aooResult
                 ? aooResult.denominazioneEnte || aooResult.parentDescription
