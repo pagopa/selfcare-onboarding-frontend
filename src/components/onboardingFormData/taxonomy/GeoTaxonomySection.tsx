@@ -270,7 +270,7 @@ export default function GeoTaxonomySection({
     } else if (option.desc.includes('COMUNE') && type === 'desc') {
       return `${finalDesc} (${option.province_abbreviation?.toUpperCase()}) comune`;
     } else if (option.desc.includes('COMUNE') && type === 'value') {
-      return `${finalDesc} (${option.province_abbreviation?.toUpperCase()})`;
+      return `${finalDesc} (${(option.province_abbreviation ? option.province_abbreviation : formik.values.county ?? '').toUpperCase()})`;
     } else {
       return '';
     }
