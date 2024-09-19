@@ -92,7 +92,9 @@ export function StepUploadAggregates({
       ),
     ].join('\r\n');
 
-    const blob = new Blob([csv], { type: 'text/csv' });
+    const csvWithBom = '\uFEFF' + csv;
+
+    const blob = new Blob([csvWithBom], { type: 'text/csv;charset=utf-8;' });
     const downloadUrl = URL.createObjectURL(blob);
 
     setErrorCsv(downloadUrl);
