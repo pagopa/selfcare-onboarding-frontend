@@ -5,8 +5,9 @@ import { OnboardingFormData } from '../model/OnboardingFormData';
 export const selected2OnboardingData = (
   selectedParty: PartyData | null,
   isAggregator?: boolean,
-  institutionType?: InstitutionType
-// eslint-disable-next-line sonarjs/cognitive-complexity
+  institutionType?: InstitutionType,
+  productId?: string
+  // eslint-disable-next-line sonarjs/cognitive-complexity
 ): OnboardingFormData => ({
   businessName:
     selectedParty?.description ??
@@ -33,12 +34,12 @@ export const selected2OnboardingData = (
   geographicTaxonomies: [],
   originIdEc: selectedParty?.originId,
   originId:
-    institutionType === 'PRV' || institutionType === 'SCP'
+    institutionType === 'PRV' && productId === 'prod-interop' || institutionType === 'SCP'
       ? selectedParty?.businessTaxId
       : selectedParty?.codiceUniUo ?? selectedParty?.codiceUniAoo ?? selectedParty?.originId,
-  origin: 
-    institutionType === 'PRV' || institutionType === 'SCP'
-      ? 'PDND_INFOCAMERE' 
+  origin:
+    institutionType === 'PRV' && productId === 'prod-interop' || institutionType === 'SCP'
+      ? 'PDND_INFOCAMERE'
       : selectedParty?.origin,
   rea:
     selectedParty?.cciaa && selectedParty?.nRea
