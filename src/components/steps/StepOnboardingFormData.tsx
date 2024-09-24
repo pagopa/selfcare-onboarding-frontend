@@ -114,6 +114,7 @@ export default function StepOnboardingFormData({
 
   const isInformationCompany =
     origin !== 'IPA' &&
+    institutionType !== 'PRV' &&
     (institutionType === 'GSP' || institutionType === 'SCP') &&
     (productId === 'prod-io' ||
       productId === 'prod-io-sign' ||
@@ -296,9 +297,11 @@ export default function StepOnboardingFormData({
 
   useEffect(() => {
     if (formik.values.hasVatnumber) {
-      void formik.setFieldValue('vatNumber', formik.initialValues.vatNumber);
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      formik.setFieldValue('vatNumber', formik.initialValues.vatNumber);
     } else {
-      void formik.setFieldValue('vatNumber', undefined);
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      formik.setFieldValue('vatNumber', undefined);
     }
   }, [formik.values.hasVatnumber]);
 
@@ -355,7 +358,8 @@ export default function StepOnboardingFormData({
     if (outcome === 'success') {
       const result = (getRecipientCodeValidation as AxiosResponse).data;
       if (uoSelected && result && result === 'DENIED_NO_BILLING') {
-        void formik.setFieldValue('recipientCode', undefined);
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
+        formik.setFieldValue('recipientCode', undefined);
       }
       setRecipientCodeStatus(result);
     } else {
@@ -407,8 +411,8 @@ export default function StepOnboardingFormData({
   const baseTextFieldProps = (
     field: keyof OnboardingFormData,
     label: string,
+    color: string,
     fontWeight: string | number = isDisabled ? 'fontWeightRegular' : 'fontWeightMedium',
-    color: string
   ) => {
     const isError = !!formik.errors[field] && formik.errors[field] !== requiredError;
     return {

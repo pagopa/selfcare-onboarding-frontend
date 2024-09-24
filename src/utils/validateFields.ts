@@ -94,7 +94,10 @@ export const validateFields = (
         ? t('onboardingFormData.billingDataSection.pspDataSection.invalidCommercialRegisterNumber')
         : undefined,
     businessRegisterPlace:
-      institutionType === 'SA' && !values.businessRegisterPlace ? requiredError : undefined,
+      (institutionType === 'SA' || (institutionType === 'PRV' && productId === 'prod-pagopa')) &&
+      !values.businessRegisterPlace
+        ? requiredError
+        : undefined,
     registrationInRegister:
       isPaymentServiceProvider && !values.registrationInRegister ? requiredError : undefined,
     dpoAddress: isPaymentServiceProvider && !values.dpoAddress ? requiredError : undefined,

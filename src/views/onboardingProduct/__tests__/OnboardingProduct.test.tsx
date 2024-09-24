@@ -395,6 +395,34 @@ test('Test: Successfull complete onboarding request of PA aggregator party for p
   await executeGoHome(true);
 });
 
+test('Test: Successfull complete onboarding request of PRV for product prod-pagopa skipping step search party', async () => {
+  renderComponent('prod-pagopa');
+  await executeStepInstitutionType('prod-pagopa', 'oth');
+  await executeStepBillingData(
+    'prod-pagopa',
+    'PRV',
+    false,
+    false,
+    undefined,
+    'Mocked private 1',
+    false
+  );
+  await executeStepAddManager();
+  await executeStepAddAdmin(true, false);
+  await verifySubmit(
+    'prod-pagopa',
+    'PRV',
+    undefined,
+    false,
+    false,
+    undefined,
+    false,
+    undefined,
+    undefined
+  );
+  await executeGoHome(true);
+});
+
 test('Test: Error on submit onboarding request of PA party for prod-io search by business name', async () => {
   renderComponent('prod-io');
   await executeStepInstitutionType('prod-io', 'PA');
@@ -541,7 +569,15 @@ const completeOnboardingPdndInfocamereRequest = async (institutionType) => {
   );
   await executeStepAddManager();
   await executeStepAddAdmin(true, false);
-  await verifySubmit('prod-interop', institutionType, 'PDND_INFOCAMERE', false, false, 'taxCode', false);
+  await verifySubmit(
+    'prod-interop',
+    institutionType,
+    'PDND_INFOCAMERE',
+    false,
+    false,
+    'taxCode',
+    false
+  );
   await executeGoHome(true);
 };
 
@@ -641,7 +677,7 @@ const executeStepSearchParty = async (
     expect(withoutIpaLink).not.toBeInTheDocument();
   }
 
-  const aggregatorCheckbox = screen.queryByLabelText('Sono un ente aggregatore');
+  const aggregatorCheckbox = screen.queryByLabelText('Sono un ente aggregatore') as HTMLElement;
 
   if (productId === 'prod-io') {
     expect(aggregatorCheckbox).toBeInTheDocument();
@@ -713,11 +749,7 @@ const executeStepSearchParty = async (
       });
 
       const partyNameSelect = await waitFor(() =>
-        screen.getByText(
-          typeOfSearch === 'taxCode' && institutionType !== 'SCP' && institutionType !== 'PRV'
-            ? partyName.toLowerCase()
-            : partyName
-        )
+        screen.getByText(typeOfSearch === 'taxCode' ? partyName.toLocaleLowerCase() : partyName)
       );
 
       const endpoint =
@@ -804,6 +836,7 @@ const executeStepBillingData = async (
   await waitFor(() => screen.getByText('Inserisci i dati dell’ente'));
 
   await fillUserBillingDataForm(
+    productId,
     'businessName',
     'registeredOffice',
     'digitalAddress',
@@ -1152,6 +1185,7 @@ const fillInstitutionTypeCheckbox = async (element: string) => {
 };
 
 const fillUserBillingDataForm = async (
+  productId: string,
   businessNameInput: string,
   registeredOfficeInput: string,
   mailPECInput: string,
@@ -1197,7 +1231,9 @@ const fillUserBillingDataForm = async (
     const input = isForeignInsurance ? 'Spa' : 'Mil';
     const expectedOption = isForeignInsurance ? 'Spagna' : 'Milano';
 
-    const autocomplete = document.getElementById((isForeignInsurance ? country : city) as string);
+    const autocomplete = document.getElementById(
+      (isForeignInsurance ? country : city) as string
+    ) as HTMLElement;
     userEvent.type(autocomplete, input);
 
     const option = await screen.findByText(expectedOption, {}, { timeout: 8000 });
@@ -1208,7 +1244,7 @@ const fillUserBillingDataForm = async (
       fireEvent.change(document.getElementById(zipCode) as HTMLElement, {
         target: { value: '09010' },
       });
-      expect(document.getElementById(county) as HTMLElement).toHaveValue('MI');
+      expect(document.getElementById(county ?? '') as HTMLElement).toHaveValue('MI');
     } else {
       fireEvent.change(document.getElementById('city') as HTMLElement, {
         target: { value: 'Valencia' },
@@ -1216,11 +1252,51 @@ const fillUserBillingDataForm = async (
     }
 
     if (institutionType !== 'PT' && institutionType !== 'AS' && institutionType !== 'PSP') {
-      fireEvent.change(document.getElementById(rea) as HTMLInputElement, {
+      fireEvent.change(document.getElementById(rea ?? '') as HTMLInputElement, {
         target: { value: 'MI-12345' },
       });
     }
   } else {
+    if (institutionType === 'PRV' && productId === 'prod-pagopa') {
+      fireEvent.change(document.getElementById(businessNameInput) as HTMLElement, {
+        target: { value: mockPartyRegistry.items[0].description },
+      });
+      fireEvent.change(document.getElementById(mailPECInput) as HTMLElement, {
+        target: { value: mockPartyRegistry.items[0].digitalAddress },
+      });
+
+      fireEvent.change(document.getElementById(zipCode) as HTMLElement, {
+        target: { value: mockPartyRegistry.items[0].zipCode },
+      });
+
+      const autocomplete = document.getElementById(
+        (isForeignInsurance ? country : city) as string
+      ) as HTMLElement;
+      userEvent.type(autocomplete, 'Mil');
+
+      const option = await screen.findByText('Milano', {}, { timeout: 8000 });
+      expect(option).toBeInTheDocument();
+      fireEvent.click(option);
+
+      expect(document.getElementById(county ?? '') as HTMLElement).toHaveValue('MI');
+
+      fireEvent.change(document.getElementById('registeredOffice') as HTMLInputElement, {
+        target: { value: mockPartyRegistry.items[0].address },
+      });
+
+      fireEvent.change(document.getElementById(taxCodeInput) as HTMLElement, {
+        target: { value: mockPartyRegistry.items[0].taxCode },
+      });
+
+      fireEvent.change(document.getElementById(recipientCode) as HTMLElement, {
+        target: { value: 'A1B2C3D' },
+      });
+
+      fireEvent.change(document.getElementById('businessRegisterPlace') as HTMLElement, {
+        target: { value: '01234567891' },
+      });
+    }
+
     const isTaxCodeEquals2PIVA = document.getElementById('taxCodeEquals2VatNumber') as HTMLElement;
     fireEvent.click(isTaxCodeEquals2PIVA);
 
@@ -1321,7 +1397,7 @@ const fillUserBillingDataForm = async (
     fireEvent.change(document.getElementById(recipientCode) as HTMLElement, {
       target: { value: 'A1B2C3D' },
     });
-    fireEvent.change(document.getElementById(supportEmail) as HTMLInputElement, {
+    fireEvent.change(document.getElementById(supportEmail ?? '') as HTMLInputElement, {
       target: { value: 'a@a.it' },
     });
   }
@@ -1515,7 +1591,7 @@ const checkCorrectBodyBillingData = (
 
   if (institutionType === 'SA') {
     fireEvent.change(document.getElementById('businessRegisterPlace') as HTMLElement, {
-      target: { value: 'business register place' },
+      target: { value: '01234567891' },
     });
     fireEvent.change(document.getElementById('rea') as HTMLElement, {
       target: { value: 'MI-12345' },
@@ -1633,7 +1709,7 @@ const fillAdditionalUserAndCheckUniqueValues = async (
   const removeUserButtons = await addAdditionEmptyUser(index, confirmButton);
 
   const prefix = getByLabelText(
-    searchUserFormFromRemoveBtn(removeUserButtons[index]),
+    searchUserFormFromRemoveBtn(removeUserButtons[index]) as HTMLElement,
     'Nome'
   ).id.replace(/-name$/, '');
 
@@ -1817,7 +1893,7 @@ const billingData2billingDataRequest = (
 const verifySubmit = async (
   productId: string = 'prod-io',
   institutionType: string,
-  from: Source = 'IPA',
+  from?: Source,
   uo: boolean = false,
   errorOnSubmit: boolean = false,
   typeOfSearch: Search = 'businessName',
@@ -1878,6 +1954,8 @@ const verifySubmit = async (
             ? mockedAoos[0].codiceUniAoo
             : typeOfSearch === 'uoCode'
             ? mockedUos[0].codiceUniUo
+            : institutionType === 'PRV' && productId === 'prod-pagopa'
+            ? undefined
             : '991',
           taxCode: errorOnSubmit
             ? mockPartyRegistry.items[1].taxCode
@@ -1915,13 +1993,17 @@ const verifySubmit = async (
                 }
               : undefined,
           companyInformations:
-            (from === 'ANAC' ||
+            ((from === 'ANAC' ||
               from === 'INFOCAMERE' ||
               from === 'PDND_INFOCAMERE' ||
               (institutionType === 'GSP' && from !== 'IPA')) &&
-            institutionType !== 'PT'
+              institutionType !== 'PT') ||
+            (institutionType === 'PRV' && productId === 'prod-pagopa')
               ? {
-                  businessRegisterPlace: from === 'ANAC' ? 'business register place' : undefined,
+                  businessRegisterPlace:
+                    from === 'ANAC' || (institutionType === 'PRV' && productId === 'prod-pagopa')
+                      ? '01234567891'
+                      : undefined,
                   shareCapital: from === 'ANAC' ? 332323 : undefined,
                   rea:
                     from === 'INFOCAMERE' || from === 'PDND_INFOCAMERE'
@@ -1929,6 +2011,8 @@ const verifySubmit = async (
                           '-',
                           mockedPartiesFromInfoCamere[0].nRea
                         )
+                      : institutionType === 'PRV' && productId === 'prod-pagopa'
+                      ? undefined
                       : 'MI-12345',
                 }
               : undefined,

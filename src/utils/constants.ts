@@ -180,8 +180,8 @@ export const filterByCategory = (institutionType?: string, productId?: string) =
   productId === 'prod-pn'
     ? 'L6,L4,L45,L35,L5,L17,L15,C14'
     : institutionType === 'GSP'
-    ? 'L37,SAG'
-    : 'C17,C16,L10,L19,L13,L2,C10,L20,L21,L22,L15,L1,C13,C5,L40,L11,L39,L46,L8,L34,L7,L35,L45,L47,L6,L12,L24,L28,L42,L36,L44,C8,C3,C7,C14,L16,C11,L33,C12,L43,C2,L38,C1,L5,L4,L31,L18,L17,S01,SA';
+      ? 'L37,SAG'
+      : 'C17,C16,L10,L19,L13,L2,C10,L20,L21,L22,L15,L1,C13,C5,L40,L11,L39,L46,L8,L34,L7,L35,L45,L47,L6,L12,L24,L28,L42,L36,L44,C8,C3,C7,C14,L16,C11,L33,C12,L43,C2,L38,C1,L5,L4,L31,L18,L17,S01,SA';
 
 export const canInvoice = (institutionType?: string, productId?: string) =>
   institutionType !== 'SA' &&
@@ -212,6 +212,9 @@ export const institutionTypes: Array<{ labelKey: string; value: InstitutionType 
   { labelKey: 'sa', value: 'SA' },
   { labelKey: 'as', value: 'AS' },
   { labelKey: 'prv', value: 'PRV' },
+  /* both are private entities but for two different products:
+    prv -> "Enti Privati" (prod-interop), oth -> "Altro" (prod-pagopa) */
+  { labelKey: 'oth', value: 'PRV' },
 ];
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
@@ -225,7 +228,7 @@ export const institutionType4Product = (productId: string | undefined) => {
           it.labelKey === 'sa' ||
           (ENV.SCP_INFOCAMERE.SHOW && it.labelKey === 'scp') ||
           it.labelKey === 'as' ||
-          (ENV.ENV !== 'PROD' && it.labelKey === 'prv')
+          (ENV.PRV.SHOW && it.labelKey === 'prv')
       );
     case 'prod-pn':
       return institutionTypes.filter((it) => it.labelKey === 'pa');
@@ -245,7 +248,8 @@ export const institutionType4Product = (productId: string | undefined) => {
           it.labelKey === 'pa' ||
           it.labelKey === 'gsp' ||
           (ENV.ENV !== 'PROD' && it.labelKey === 'psp') ||
-          (ENV.PT.SHOW_PT ? it.labelKey === 'pt' : '')
+          (ENV.PT.SHOW_PT ? it.labelKey === 'pt' : '') ||
+          (ENV.PURE_PRV.SHOW ? it.labelKey === 'oth' : '')
       );
     case 'prod-io-sign':
       return institutionTypes.filter((it) => it.labelKey === 'pa' || it.labelKey === 'gsp');

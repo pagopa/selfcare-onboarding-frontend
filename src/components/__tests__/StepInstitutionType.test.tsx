@@ -30,7 +30,7 @@ test('Test: The correct institution types with the expected descriptions, can be
 
       switch (p.id) {
         case 'prod-pagopa':
-          expect(institutionTypeValues).toStrictEqual(['PA', 'GSP', 'PT', 'PSP']);
+          expect(institutionTypeValues).toStrictEqual(['PA', 'GSP', 'PT', 'PSP', 'PRV']);
           break;
         case 'prod-io':
           expect(institutionTypeValues).toStrictEqual(['PA', 'GSP', 'PT']);

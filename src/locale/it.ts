@@ -593,6 +593,9 @@ export default {
       },
       prv: {
         title: 'Privati'
+      },
+      oth: {
+        title: 'Altro'
       }
     },
     backLabel: 'Indietro',
@@ -665,7 +668,8 @@ export default {
       },
       informationCompanies: {
         commercialRegisterNumber: 'Luogo di iscrizione al Registro delle Imprese (facoltativo)',
-        rea: 'REA',
+        requiredRea: 'REA',
+        rea: 'REA (facoltativo)',
         shareCapital: 'Capitale sociale (facoltativo)',
         requiredCommercialRegisterNumber: 'Luogo di iscrizione al Registro delle Imprese',
         requiredShareCapital: 'Capitale sociale',
