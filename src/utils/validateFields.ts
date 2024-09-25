@@ -151,7 +151,7 @@ export const validateFields = (
     rea:
       isInformationCompany && !values.rea
         ? requiredError
-        : !reaValidation.test(values.rea as string)
+        : values.rea && !reaValidation.test(values.rea as string)
         ? t('onboardingFormData.billingDataSection.invalidReaField')
         : undefined,
     shareCapital:
