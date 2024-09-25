@@ -856,12 +856,12 @@ export const mockedProducts: Array<Product> = [
   },
   {
     id: 'prod-io',
-    title: 'App IO',
+    title: 'IO',
     status: statusActive,
   },
   {
     id: 'prod-io-premium',
-    title: 'App IO Premium',
+    title: 'IO Premium',
     parentId: 'prod-io',
     status: statusActive,
   },

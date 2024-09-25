@@ -8,7 +8,7 @@
     "@mui/lab": "^5.0.0-alpha.80",
     "@mui/material": "^5.8.2",
     "@pagopa/mui-italia": "^1.5.0",
-    "@pagopa/selfcare-common-frontend": "^1.34.36",
+    "@pagopa/selfcare-common-frontend": "^1.34.38",
     "@types/react": "^18.2.22",
     "@types/react-dom": "^18.2.7",
     "axios": "^0.21.1",
