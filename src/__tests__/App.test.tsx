@@ -5,13 +5,13 @@ import { createMemoryHistory } from 'history';
 import { Router } from 'react-router';
 import './../locale';
 
-jest.mock('../views/onboarding/Onboarding', () => () => 'Onboarding');
+jest.mock('../views/onboardingProduct/OnboardingProduct', () => () => 'OnboardingProduct');
 jest.mock(
-  '../views/uploadContract/cancel/CancelRequestComponent',
+  '../views/onboardingRequest/cancel/CancelRequest',
   () => () => 'Cancel onboarding request'
 );
 jest.mock(
-  '../views/uploadContract/complete/CompleteRequestComponent',
+  '../views/onboardingRequest/complete/CompleteRequest',
   () => () => 'Complete onboarding request'
 );
 
@@ -42,7 +42,7 @@ test('test OnBoarding', () => {
       <App />
     </Router>
   );
-  screen.getByText('Onboarding');
+  screen.getByText('OnboardingProduct');
   checkRedirect(history, false);
 });
 

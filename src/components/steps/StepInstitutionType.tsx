@@ -16,9 +16,9 @@ import {
   Product,
   StepperStepComponentProps,
 } from '../../../types';
-import { ENV } from '../../utils/env';
 import { OnboardingStepActions } from '../OnboardingStepActions';
 import { useHistoryState } from '../useHistoryState';
+import { description4InstitutionType, institutionType4Product } from '../../utils/constants';
 
 type Props = StepperStepComponentProps & {
   institutionType: InstitutionType;
@@ -26,17 +26,6 @@ type Props = StepperStepComponentProps & {
   selectedProduct?: Product | null;
 };
 
-const institutionTypeValues: Array<{ labelKey: string; value: InstitutionType }> = [
-  { labelKey: 'pa', value: 'PA' },
-  { labelKey: 'gsp', value: 'GSP' },
-  { labelKey: 'scp', value: 'SCP' },
-  { labelKey: 'pt', value: 'PT' },
-  { labelKey: 'psp', value: 'PSP' },
-  { labelKey: 'sa', value: 'SA' },
-  { labelKey: 'as', value: 'AS' },
-];
-
-// eslint-disable-next-line sonarjs/cognitive-complexity
 export default function StepInstitutionType({
   back,
   forward,
@@ -64,69 +53,6 @@ export default function StepInstitutionType({
     forward(selectedValue);
   };
 
-  const institutionTypeValueFiltered = (id: string | undefined) => {
-    switch (id) {
-      case 'prod-interop':
-        return institutionTypeValues.filter(
-          (it) =>
-            it.labelKey === 'pa' ||
-            it.labelKey === 'gsp' ||
-            it.labelKey === 'sa' ||
-            it.labelKey === 'as'
-        );
-      case 'prod-pn':
-        return institutionTypeValues.filter((it) => it.labelKey === 'pa');
-      case 'prod-idpay':
-        return institutionTypeValues.filter((it) => it.labelKey === 'pa');
-      case 'prod-io':
-      case 'prod-pagopa':
-        // Temporary disabled psp radiobutton for prod-pagopa, the radio buttons are now the same for prod-io and prod-pagopa.
-        return institutionTypeValues.filter(
-          (it) =>
-            it.labelKey === 'pa' ||
-            it.labelKey === 'gsp' ||
-            it.labelKey === 'scp' ||
-            (ENV.PT.SHOW_PT ? it.labelKey === 'pt' : '')
-        );
-      default:
-        return institutionTypeValues.filter(
-          (it) => it.labelKey === 'pa' || it.labelKey === 'gsp' || it.labelKey === 'scp'
-        );
-    }
-  };
-
-  // eslint-disable-next-line sonarjs/cognitive-complexity
-  const institutionTypeLabelFiltered = (selectedProductId: string | undefined, itValue: string) => {
-    if (selectedProductId === 'prod-io' && itValue === 'PT') {
-      return t('stepInstitutionType.cadArticle6AppIo');
-    } else if (
-      (selectedProductId === 'prod-io' ||
-        selectedProductId === 'prod-interop' ||
-        selectedProductId === 'prod-pagopa') &&
-      itValue === 'GSP'
-    ) {
-      return t('stepInstitutionType.cadArticle2B');
-    } else if (
-      (selectedProductId === 'prod-io' ||
-        selectedProductId === 'prod-interop' ||
-        selectedProductId === 'prod-pagopa') &&
-      itValue === 'SCP'
-    ) {
-      return t('stepInstitutionType.cadArticle2C');
-    } else if (
-      (selectedProductId === 'prod-pn' || selectedProductId === 'prod-idpay') &&
-      itValue === 'PA'
-    ) {
-      return t('stepInstitutionType.cadArticle165');
-    } else if (selectedProductId === 'prod-pagopa' && itValue === 'PSP') {
-      return t('stepInstitutionType.cadPsp');
-    } else if (selectedProductId === 'prod-interop' && (itValue === 'SA' || itValue === 'AS')) {
-      return '';
-    } else {
-      return t('stepInstitutionType.cadArticle2A');
-    }
-  };
-
   return (
     <Grid container display="flex" justifyContent="center" alignItems="center">
       <Grid item xs={12} display="flex" justifyContent="center">
@@ -141,7 +67,7 @@ export default function StepInstitutionType({
           <Trans
             i18nKey="stepInstitutionType.subtitle"
             values={{ productName: selectedProduct?.title }}
-            components={{1: <strong/>}}
+            components={{ 1: <strong /> }}
           >
             {`Indica il tipo di ente che aderirà a <1>{{productName}}</1>`}
           </Trans>
@@ -155,7 +81,7 @@ export default function StepInstitutionType({
           <Grid item xs={12} p={3}>
             <FormControl>
               <RadioGroup name="radio-buttons-group" defaultValue={institutionType}>
-                {institutionTypeValueFiltered(selectedProduct?.id).map((ot) => (
+                {institutionType4Product(selectedProduct?.id).map((ot) => (
                   <FormControlLabel
                     sx={{ p: '8px' }}
                     key={ot.labelKey}
@@ -165,7 +91,7 @@ export default function StepInstitutionType({
                     label={
                       <>
                         <Typography sx={{ fontWeight: 600, fontSize: '18px', color: '#17324D' }}>
-                          {t(`stepInstitutionType.institutionTypeValues.${ot.labelKey}`) as string}
+                          {t(`stepInstitutionType.institutionTypes.${ot.labelKey}.title`)}
                         </Typography>
                         <Typography
                           variant="subtitle2"
@@ -175,7 +101,7 @@ export default function StepInstitutionType({
                             color: '#5C6F82',
                           }}
                         >
-                          {institutionTypeLabelFiltered(selectedProduct?.id, ot.value)}
+                          {t(description4InstitutionType(ot.value))}
                         </Typography>
                       </>
                     }
@@ -186,7 +112,7 @@ export default function StepInstitutionType({
           </Grid>
         </Grid>
       </Paper>
-      <Grid item xs={12} mt={4}>
+      <Grid item xs={12} mt={2}>
         <OnboardingStepActions
           back={
             fromDashboard

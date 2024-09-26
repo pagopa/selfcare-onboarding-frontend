@@ -13,9 +13,9 @@ type FileUploaderOption = {
   onDropRejected?: (fileRejections: Array<FileRejection>, event?: DropEvent) => void;
   maxFiles?: number;
   accept?: Array<string> | undefined;
-  uploaderImageWidth?: number;
   loading: boolean;
   theme: Theme;
+  isAggregatesUpload: boolean;
 };
 
 export function FileUploader({
@@ -29,6 +29,7 @@ export function FileUploader({
   accept,
   loading,
   theme,
+  isAggregatesUpload,
 }: FileUploaderOption) {
   const { getRootProps, getInputProps } = useDropzone({
     onDropAccepted,
@@ -48,7 +49,7 @@ export function FileUploader({
       alignItems="center"
       justifyContent="center"
     >
-      <input {...getInputProps()} />
+      <input id="file-uploader" {...getInputProps()} />
 
       {uploadedFiles && uploadedFiles.length > 0 ? (
         <FileUploadedPreview
@@ -56,12 +57,15 @@ export function FileUploader({
           loading={loading}
           files={uploadedFiles}
           deleteUploadedFiles={deleteUploadedFiles}
+          isAggregatesUpload={isAggregatesUpload}
         />
       ) : (
         <Box
+          className="fileDrop"
           sx={{
-            boxShadow:
-              '0px 8px 10px -5px rgba(0, 43, 85, 0.1), 0px 16px 24px 2px rgba(0, 43, 85, 0.05), 0px 6px 30px 5px rgba(0, 43, 85, 0.1)',
+            boxShadow: isAggregatesUpload
+              ? 'none'
+              : '0px 8px 10px -5px rgba(0, 43, 85, 0.1), 0px 16px 24px 2px rgba(0, 43, 85, 0.05), 0px 6px 30px 5px rgba(0, 43, 85, 0.1)',
             borderRadius: '16px',
           }}
         >
@@ -69,11 +73,13 @@ export function FileUploader({
             m={1}
             sx={{
               borderRadius: '10px',
-              border: `2px dashed ${theme.palette.primary.main}`,
-              backgroundColor: '#0073E614',
+              backgroundImage: `url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' rx='16' ry='16' stroke='%230073E6FF' stroke-width='2' stroke-dasharray='5.5' stroke-dashoffset='0' stroke-linecap='square'/%3e%3c/svg%3e"); border-radius: 16px;`,
+              width: isAggregatesUpload ? '684px' : '465px',
+              backgroundColor: '#0073E612',
+              maxWidth: { xs: 375, md: 640, lg: 900 },
             }}
           >
-            <Grid container direction="column" alignItems={'center'} py={3} px={6}>
+            <Grid container xs={12} direction="column" alignItems={'center'} p={3}>
               <CloudUpload />
               <Typography
                 color={theme.palette.text.primary}
@@ -85,6 +91,7 @@ export function FileUploader({
               </Typography>
               <Button
                 variant="outlined"
+                size="small"
                 sx={{
                   marginTop: 1,
                   background: theme.palette.primary.main,
