@@ -1045,6 +1045,22 @@ const mockRecipientCodeValidation = [
   { code: '2A3B4C', value: 'DENIED_NO_BILLING' },
 ];
 
+const mockedCategories = {
+  product: {
+    ["prod-pn"]: {
+      ipa: {
+        PA: "A1,A2,A3,A4,A5,A6,A7,A8,A9"
+      }
+    },
+    default: {
+      ipa: {
+        GSP: "B1,B2",
+        PA: "C1,C2,C3,C4,C5,C6,C7,C8,C9C,C10,C11,C12,C13,C14,C15,C16,C17,C18,C19,C20,C21,C22,C23,C24,C25,C26,C27,C28,C29,C30"
+      }
+    }
+  }
+};
+
 const noContent: Promise<AxiosResponse> = new Promise((resolve) =>
   resolve({
     status: 204,
@@ -1120,6 +1136,13 @@ export async function mockFetch(
   { endpoint, endpointParams }: Endpoint,
   { params, data }: AxiosRequestConfig
 ): Promise<AxiosResponse | AxiosError> {
+
+  if (endpoint === "CONFIG_JSON_CDN_URL") {
+    return new Promise((resolve) =>
+      resolve({ data: mockedCategories, status: 200, statusText: '200' } as AxiosResponse)
+    );
+  }
+
   if (endpoint === 'ONBOARDING_GET_SEARCH_PARTIES') {
     return new Promise((resolve) =>
       resolve({ data: mockPartyRegistry, status: 200, statusText: '200' } as AxiosResponse)
@@ -1321,7 +1344,7 @@ export async function mockFetch(
   if (endpoint === 'ONBOARDING_USER_VALIDATION') {
     if (
       ['CRTCTF90B12C123K', 'CRTCTF91B12C123K', 'CRTCTF92B12C123K'].indexOf((data as any)?.taxCode) >
-        -1 &&
+      -1 &&
       ((data as any)?.name !== 'CERTIFIED_NAME' || (data as any)?.surname !== 'CERTIFIED_SURNAME')
     ) {
       return buildOnboardingUserValidation409(
