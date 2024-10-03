@@ -311,7 +311,7 @@ export default function AsyncAutocompleteContainer({
     setIsLoading(false);
   };
 
-  const searchByInstitutionType = (value: string, institutionType?: string) => {
+  const searchByInstitutionType = async (value: string, institutionType?: string) => {
     switch (institutionType) {
       case 'AS':
         void debounce(handleSearchByName, 100)(value, {
@@ -328,7 +328,7 @@ export default function AsyncAutocompleteContainer({
           value,
           endpoint,
           ENV.MAX_INSTITUTIONS_FETCH,
-          filterByCategory(institutionType, product?.id)
+          await filterByCategory(institutionType, product?.id)
         );
     }
   };
@@ -366,6 +366,7 @@ export default function AsyncAutocompleteContainer({
     if (value !== '') {
       setSelected(null);
       if (value.length >= 3 && isBusinessNameSelected && !isTaxCodeSelected) {
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
         searchByInstitutionType(value, institutionType);
       } else if (
         (isTaxCodeSelected && value.length === 11) ||
