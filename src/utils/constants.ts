@@ -285,8 +285,8 @@ export const institutionType4Product = (productId: string | undefined) => {
   }
 };
 
-export const description4InstitutionType = (institutionType: InstitutionType) => {
-  switch (institutionType) {
+export const description4InstitutionType = (institutionType: { labelKey: string; value: InstitutionType }) => {
+  switch (institutionType.value) {
     case 'PT':
       return 'stepInstitutionType.institutionTypes.pt.description';
     case 'PA':
@@ -299,6 +299,7 @@ export const description4InstitutionType = (institutionType: InstitutionType) =>
     case 'SA':
     case 'AS':
     case 'PRV':
+      return institutionType.labelKey === 'oth' ? 'stepInstitutionType.institutionTypes.oth.description' : '';
     default:
       return '';
   }
