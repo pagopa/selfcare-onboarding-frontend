@@ -1,3 +1,4 @@
+import { storageTokenOps } from '@pagopa/selfcare-common-frontend/lib/utils/storage';
 import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { ENV } from '../../../utils/env';
@@ -7,9 +8,16 @@ const DownloadCsvFile: React.FC = () => {
 
   useEffect(() => {
     if (onboardingId && productId) {
+      const sessionToken = storageTokenOps.read();
       fetch(
         `${ENV.URL_API.ONBOARDING_V2}/v2/tokens/${onboardingId}/products/${productId}/aggregates-csv`,
         {
+          headers: {
+            accept: '*/*',
+            'accept-language': 'it-IT,it;q=0.9,en-US;q=0.8,en;q=0.7',
+            'content-type': 'application/octet-stream',
+            authorization: `Bearer ${sessionToken}`,
+          },
           method: 'GET',
         }
       )
