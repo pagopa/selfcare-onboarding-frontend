@@ -9,11 +9,12 @@ type ActionStep = {
 type ActionStepsProps = {
   forward?: ActionStep;
   back?: ActionStep;
+  addUserFlow?: boolean;
 };
 
-export function OnboardingStepActions({ forward, back }: ActionStepsProps) {
+export function OnboardingStepActions({ forward, back, addUserFlow }: ActionStepsProps) {
   return (
-    <Grid container justifyContent="center" spacing={2}>
+    <Grid container justifyContent="center" spacing={2} mt={addUserFlow ? 2 : 0}>
       {back && (
         <Grid item>
           <Button

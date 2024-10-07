@@ -1,4 +1,4 @@
-import { emailRegexp } from '@pagopa/selfcare-common-frontend/utils/constants';
+import { emailRegexp } from '@pagopa/selfcare-common-frontend/lib/utils/constants';
 import { TFunction } from 'i18next';
 import { OnboardingFormData } from '../model/OnboardingFormData';
 import { InstitutionType } from '../../types';
@@ -24,12 +24,13 @@ export const validateFields = (
   isVatRegistrated: boolean,
   vatVerificationGenericError: boolean,
   isPaymentServiceProvider: boolean,
-  canInvoice: boolean,
+  isInvoiceable: boolean,
   uoSelected: UoData | undefined,
   isInformationCompany: boolean,
   institutionAvoidGeotax: boolean,
   isPremium: boolean,
   invalidTaxCodeInvoicing: boolean,
+  recipientCodeStatus?: string,
   productId?: string
 ) =>
   Object.entries({
@@ -47,11 +48,14 @@ export const validateFields = (
         : values.taxCode && !fiscalAndVatCodeRegexp.test(values.taxCode)
         ? t('onboardingFormData.billingDataSection.invalidFiscalCode')
         : undefined,
-    taxCodeInvoicing: 
-      (canInvoice && uoSelected) && (!values.taxCodeInvoicing || values.taxCodeInvoicing && !fiscalAndVatCodeRegexp.test(values.taxCodeInvoicing))
-        ? requiredError 
-        : invalidTaxCodeInvoicing 
-        ? t('onboardingFormData.billingDataSection.invalidTaxCodeInvoicing') 
+    taxCodeInvoicing:
+      isInvoiceable &&
+      uoSelected &&
+      (!values.taxCodeInvoicing ||
+        (values.taxCodeInvoicing && !fiscalAndVatCodeRegexp.test(values.taxCodeInvoicing)))
+        ? requiredError
+        : invalidTaxCodeInvoicing
+        ? t('onboardingFormData.billingDataSection.invalidTaxCodeInvoicing')
         : undefined,
     vatNumber:
       !values.vatNumber && values.hasVatnumber
@@ -108,12 +112,12 @@ export const validateFields = (
         : isPaymentServiceProvider && values.abiCode && !fiveCharactersAllowed.test(values.abiCode)
         ? t('onboardingFormData.billingDataSection.pspDataSection.invalidabiCode')
         : undefined,
-    dopEmailAddress:
-      isPaymentServiceProvider && !values.dopEmailAddress
+    dpoEmailAddress:
+      isPaymentServiceProvider && !values.dpoEmailAddress
         ? requiredError
         : isPaymentServiceProvider &&
-          values.dopEmailAddress &&
-          !emailRegexp.test(values.dopEmailAddress)
+          values.dpoEmailAddress &&
+          !emailRegexp.test(values.dpoEmailAddress)
         ? t('onboardingFormData.billingDataSection.invalidEmail')
         : undefined,
     dpoPecAddress:
@@ -124,7 +128,15 @@ export const validateFields = (
           !emailRegexp.test(values.dpoPecAddress)
         ? t('onboardingFormData.billingDataSection.invalidEmail')
         : undefined,
-    recipientCode: canInvoice && !values.recipientCode ? requiredError : undefined,
+    recipientCode: isInvoiceable
+      ? values.recipientCode && values.recipientCode.length >= 6
+        ? recipientCodeStatus === 'DENIED_NO_ASSOCIATION'
+          ? t('onboardingFormData.billingDataSection.invalidRecipientCodeNoAssociation')
+          : recipientCodeStatus === 'DENIED_NO_BILLING'
+          ? t('onboardingFormData.billingDataSection.invalidRecipientCodeNoBilling')
+          : undefined
+        : requiredError
+      : undefined,
     geographicTaxonomies:
       ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY &&
       !institutionAvoidGeotax &&
@@ -136,7 +148,7 @@ export const validateFields = (
     rea:
       isInformationCompany && !values.rea
         ? requiredError
-        : !reaValidation.test(values.rea as string)
+        : values.rea && !reaValidation.test(values.rea as string)
         ? t('onboardingFormData.billingDataSection.invalidReaField')
         : undefined,
     shareCapital:

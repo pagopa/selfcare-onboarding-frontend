@@ -16,6 +16,9 @@ export const ENV = {
     COUNTRIES: env.get('REACT_APP_COUNTRY_DATA').required().asString(),
   },
 
+  EXAMPLE_CSV: env.get('REACT_APP_AGGREGATES_EXAMPLE_CSV').required().asString(),
+  BASE_PATH_CDN_URL: env.get('REACT_APP_URL_CDN').required().asString(),
+
   ASSISTANCE: {
     ENABLE: env.get('REACT_APP_ENABLE_ASSISTANCE').required().asBool(),
     EMAIL: env.get('REACT_APP_PAGOPA_HELP_EMAIL').required().asString(),
@@ -67,4 +70,20 @@ export const ENV = {
   PT: {
     SHOW_PT: env.get('REACT_APP_ENABLE_PT').default('false').asBool(),
   },
+
+  AGGREGATOR: {
+    SHOW_AGGREGATOR: env.get('REACT_APP_ENABLE_AGGREGATOR').default('false').asBool(),
+  },
+
+  SCP_INFOCAMERE: {
+    SHOW: env.get('REACT_APP_ENABLE_SCP_INFOCAMERE').default('false').asBool(),
+  },
+
+  PRV: {
+    SHOW: env.get('REACT_APP_ENABLE_PRV').default('false').asBool(),
+  },
+
+  PURE_PRV: {
+    SHOW: env.get('REACT_APP_ENABLE_PURE_PRV').default('false').asBool(),
+  }
 };

@@ -4,8 +4,10 @@ export type CountryResource = {
   alpha_3: string;
   country_code: string;
   iso_3166_2: string;
-  regione: string;
-  sub_regione: string;
+  region: string;
+  sub_region: string;
   region_code: string;
-  sub_region_cod: string;
+  sub_region_code: string;
+  intermediate_region?: string;
+  intermediate_region_code?: string;
 };

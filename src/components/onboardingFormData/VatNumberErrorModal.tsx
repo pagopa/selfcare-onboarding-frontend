@@ -1,4 +1,4 @@
-import { SessionModal } from '@pagopa/selfcare-common-frontend';
+import { SessionModal } from '@pagopa/selfcare-common-frontend/lib';
 import { useTranslation } from 'react-i18next';
 import { ENV } from '../../utils/env';
 

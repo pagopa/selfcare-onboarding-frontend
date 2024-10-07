@@ -4,16 +4,25 @@ import { AxiosError, AxiosResponse } from 'axios';
 import debounce from 'lodash/debounce';
 import { Dispatch, SetStateAction, useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ANACParty, Endpoint, InstitutionType, Product } from '../../../../../types';
-import { ReactComponent as PartyIcon } from '../../../../assets/onboarding_party_icon.svg';
+import OnboardingPartyIcon from '../../../../assets/onboarding_party_icon.svg';
+import {
+  ApiEndpointKey,
+  Endpoint,
+  InstitutionType,
+  PartyData,
+  Product,
+} from '../../../../../types';
 import { fetchWithLogs } from '../../../../lib/api-utils';
 import { UserContext } from '../../../../lib/context';
 import { getFetchOutcome } from '../../../../lib/error-utils';
 import { AooData } from '../../../../model/AooData';
-import { InstitutionResource } from '../../../../model/InstitutionResource';
 import { UoData } from '../../../../model/UoModel';
 import { ENV } from '../../../../utils/env';
-import { filterByCategory } from '../../../../utils/constants';
+import {
+  buildUrlLogo,
+  filterByCategory,
+  noMandatoryIpaProducts,
+} from '../../../../utils/constants';
 import AsyncAutocompleteResultsBusinessName from './components/AsyncAutocompleteResultsBusinessName';
 import AsyncAutocompleteResultsCode from './components/AsyncAutocompleteResultsCode';
 import AsyncAutocompleteSearch from './components/AsyncAutocompleteSearch';
@@ -34,8 +43,8 @@ type Props = {
   theme: Theme;
   options: Array<any>;
   isSearchFieldSelected: boolean;
-  setCfResult: React.Dispatch<React.SetStateAction<InstitutionResource | ANACParty | undefined>>;
-  cfResult?: InstitutionResource | ANACParty;
+  setCfResult: React.Dispatch<React.SetStateAction<PartyData | undefined>>;
+  cfResult?: PartyData;
   product?: Product | null;
   isAooCodeSelected: boolean;
   isUoCodeSelected: boolean;
@@ -49,6 +58,8 @@ type Props = {
   externalInstitutionId: string;
   institutionType?: InstitutionType;
   setDisabled: Dispatch<SetStateAction<boolean>>;
+  addUser: boolean;
+  selectedProduct?: Product;
 };
 
 // TODO: handle cognitive-complexity
@@ -83,10 +94,15 @@ export default function AsyncAutocompleteContainer({
   externalInstitutionId,
   institutionType,
   setDisabled,
+  addUser,
+  selectedProduct,
 }: Props) {
   const { setRequiredLogin } = useContext(UserContext);
   const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(false);
+  const [partyLogo, setPartyLogo] = useState<string>(
+    selected ? buildUrlLogo(selected.id) : OnboardingPartyIcon
+  );
 
   const getOptionKey: (option: any) => string =
     optionKey !== undefined ? (o) => o[optionKey] : (o) => o.label ?? o;
@@ -97,7 +113,7 @@ export default function AsyncAutocompleteContainer({
   const showBusinessNameElement = input !== undefined && input.length >= 3;
 
   const disabledButton =
-    institutionType === 'GSP' && product?.id !== 'prod-interop'
+    institutionType === 'GSP' && noMandatoryIpaProducts(product?.id)
       ? isBusinessNameSelected
         ? input.length < 3
         : isTaxCodeSelected
@@ -114,6 +130,15 @@ export default function AsyncAutocompleteContainer({
       setDisabled(!selected);
     }
   }, [input, selected]);
+
+  useEffect(() => {
+    if (selected) {
+      const logoUrl = buildUrlLogo(selected.id);
+      setPartyLogo(logoUrl);
+    } else {
+      setPartyLogo(OnboardingPartyIcon);
+    }
+  }, [selected]);
 
   const handleSearchByName = async (
     query: string,
@@ -148,17 +173,19 @@ export default function AsyncAutocompleteContainer({
     setIsLoading(false);
   };
 
-  const handleSearchByTaxCode = async (query: string) => {
+  const handleSearchByTaxCode = async (
+    addUser: boolean,
+    endpoint: ApiEndpointKey,
+    params: any,
+    query: string
+  ) => {
     setIsLoading(true);
 
     const searchResponse = await fetchWithLogs(
-      { endpoint: 'ONBOARDING_GET_PARTY_FROM_CF', endpointParams: { id: query } },
+      { endpoint, endpointParams: addUser ? undefined : { id: query } },
       {
         method: 'GET',
-        params: {
-          origin: 'IPA',
-          categories: filterByCategory(institutionType, product?.id),
-        },
+        params: { ...params },
       },
       () => setRequiredLogin(true)
     );
@@ -173,17 +200,24 @@ export default function AsyncAutocompleteContainer({
 
     setIsLoading(false);
   };
-  const handleSearchByAooCode = async (query: string) => {
+  const handleSearchByAooCode = async (
+    addUser: boolean,
+    endpoint: ApiEndpointKey,
+    params: any,
+    query: string
+  ) => {
     setIsLoading(true);
 
     const searchResponse = await fetchWithLogs(
-      { endpoint: 'ONBOARDING_GET_AOO_CODE_INFO', endpointParams: { codiceUniAoo: query } },
+      { endpoint, endpointParams: addUser ? undefined : { codiceUniAoo: query } },
       {
         method: 'GET',
-        params: {
-          origin: 'IPA',
-          categories: filterByCategory(institutionType, product?.id),
-        },
+        params: addUser
+          ? params
+          : {
+              origin: 'IPA',
+              categories: filterByCategory(institutionType, product?.id),
+            },
       },
       () => setRequiredLogin(true)
     );
@@ -191,25 +225,36 @@ export default function AsyncAutocompleteContainer({
     const outcome = getFetchOutcome(searchResponse);
 
     if (outcome === 'success') {
-      setAooResult((searchResponse as AxiosResponse).data);
-      setAooResultHistory((searchResponse as AxiosResponse).data);
+      const response = addUser
+        ? (searchResponse as AxiosResponse).data[0] ?? (searchResponse as AxiosResponse).data
+        : (searchResponse as AxiosResponse).data;
+      setAooResult(response);
+      setAooResultHistory(response);
     } else if ((searchResponse as AxiosError).response?.status === 404) {
       setAooResult(undefined);
     }
 
     setIsLoading(false);
   };
-  const handleSearchByUoCode = async (query: string) => {
+
+  const handleSearchByUoCode = async (
+    addUser: boolean,
+    endpoint: ApiEndpointKey,
+    params: any,
+    query: string
+  ) => {
     setIsLoading(true);
 
     const searchResponse = await fetchWithLogs(
-      { endpoint: 'ONBOARDING_GET_UO_CODE_INFO', endpointParams: { codiceUniUo: query } },
+      { endpoint, endpointParams: addUser ? undefined : { codiceUniUo: query } },
       {
         method: 'GET',
-        params: {
-          origin: 'IPA',
-          categories: filterByCategory(institutionType, product?.id),
-        },
+        params: addUser
+          ? params
+          : {
+              origin: 'IPA',
+              categories: filterByCategory(institutionType, product?.id),
+            },
       },
       () => setRequiredLogin(true)
     );
@@ -217,8 +262,11 @@ export default function AsyncAutocompleteContainer({
     const outcome = getFetchOutcome(searchResponse);
 
     if (outcome === 'success') {
-      setUoResult((searchResponse as AxiosResponse).data);
-      setUoResultHistory((searchResponse as AxiosResponse).data);
+      const response = addUser
+        ? (searchResponse as AxiosResponse).data[0] ?? (searchResponse as AxiosResponse).data
+        : (searchResponse as AxiosResponse).data;
+      setUoResult(response);
+      setUoResultHistory(response);
     } else if ((searchResponse as AxiosError).response?.status === 404) {
       setUoResult(undefined);
     }
@@ -226,27 +274,36 @@ export default function AsyncAutocompleteContainer({
     setIsLoading(false);
   };
 
-  const contractingInsuranceFromTaxId = async (query: string) => {
+  const contractingInsuranceFromTaxId = async (
+    addUser: boolean,
+    endpoint: ApiEndpointKey,
+    params: any,
+    query: string
+  ) => {
     setIsLoading(true);
 
     const searchResponse = await fetchWithLogs(
       {
-        endpoint:
-          institutionType === 'SA'
-            ? 'ONBOARDING_GET_SA_PARTY_FROM_FC'
-            : 'ONBOARDING_GET_INSURANCE_COMPANIES_FROM_IVASSCODE',
-        endpointParams: institutionType === 'SA' ? { taxId: query } : { code: query },
+        endpoint,
+        endpointParams: addUser
+          ? undefined
+          : institutionType === 'SA' || institutionType === 'AS'
+          ? { taxId: query }
+          : { code: query },
       },
       {
         method: 'GET',
+        params: addUser ? params : undefined,
       },
       () => setRequiredLogin(true)
     );
 
     const outcome = getFetchOutcome(searchResponse);
-
     if (outcome === 'success') {
-      setCfResult((searchResponse as AxiosResponse).data);
+      const response = addUser
+        ? (searchResponse as AxiosResponse).data[0] ?? (searchResponse as AxiosResponse).data
+        : (searchResponse as AxiosResponse).data;
+      setCfResult(response);
     } else if ((searchResponse as AxiosError).response?.status === 404) {
       setCfResult(undefined);
     }
@@ -254,7 +311,7 @@ export default function AsyncAutocompleteContainer({
     setIsLoading(false);
   };
 
-  const seachByInstitutionType = (value: string, institutionType?: string) => {
+  const searchByInstitutionType = async (value: string, institutionType?: string) => {
     switch (institutionType) {
       case 'AS':
         void debounce(handleSearchByName, 100)(value, {
@@ -271,13 +328,22 @@ export default function AsyncAutocompleteContainer({
           value,
           endpoint,
           ENV.MAX_INSTITUTIONS_FETCH,
-          filterByCategory(institutionType, product?.id)
+          await filterByCategory(institutionType, product?.id)
         );
     }
   };
-  // eslint-disable-next-line sonarjs/cognitive-complexity
-  const handleChange = (event: any) => {
+
+  // eslint-disable-next-line complexity
+  const handleChange = (
+    event: any
+    // eslint-disable-next-line sonarjs/cognitive-complexity
+  ) => {
     const typedInput = event.target.value as string;
+    const params = {
+      productId: selectedProduct?.id,
+      taxCode: isTaxCodeSelected ? typedInput : undefined,
+      subunitCode: isAooCodeSelected || isUoCodeSelected ? typedInput : undefined,
+    };
 
     const removeSpecialCharacters = (typedInput: string) => {
       const specialCharacters = '[$%&’()§#!£{}*+/:;<>@=?^|~]';
@@ -300,23 +366,43 @@ export default function AsyncAutocompleteContainer({
     if (value !== '') {
       setSelected(null);
       if (value.length >= 3 && isBusinessNameSelected && !isTaxCodeSelected) {
-        seachByInstitutionType(value, institutionType);
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
+        searchByInstitutionType(value, institutionType);
       } else if (
         (isTaxCodeSelected && value.length === 11) ||
         (isIvassCodeSelected && value.length === 5)
       ) {
         if (institutionType === 'SA' || institutionType === 'AS') {
-          void contractingInsuranceFromTaxId(value);
+          const endpoint = addUser
+            ? 'ONBOARDING_GET_INSTITUTIONS'
+            : institutionType === 'SA'
+            ? 'ONBOARDING_GET_SA_PARTY_FROM_FC'
+            : 'ONBOARDING_GET_INSURANCE_COMPANIES_FROM_IVASSCODE';
+
+          void contractingInsuranceFromTaxId(addUser, endpoint, params, value);
         } else {
-          void handleSearchByTaxCode(value);
+          const endpoint = addUser
+            ? 'ONBOARDING_GET_INSTITUTIONS'
+            : product?.id === 'prod-interop' && (institutionType === 'SCP' || institutionType === 'PRV')
+            ? 'ONBOARDING_GET_PARTY_BY_CF_FROM_INFOCAMERE'
+            : 'ONBOARDING_GET_PARTY_FROM_CF';
+          void handleSearchByTaxCode(
+            addUser,
+            endpoint,
+            product?.id === 'prod-interop' && (institutionType === 'SCP' || institutionType === 'PRV')
+              ? { ...params, taxCode: undefined }
+              : params,
+            value
+          );
         }
       } else if (isAooCodeSelected && !isUoCodeSelected && value.length === 7) {
-        void handleSearchByAooCode(value);
+        const endpoint = addUser ? 'ONBOARDING_GET_INSTITUTIONS' : 'ONBOARDING_GET_AOO_CODE_INFO';
+        void handleSearchByAooCode(addUser, endpoint, params, value);
       } else if (isUoCodeSelected && !isAooCodeSelected && value.length === 6) {
-        void handleSearchByUoCode(value);
+        const endpoint = addUser ? 'ONBOARDING_GET_INSTITUTIONS' : 'ONBOARDING_GET_UO_CODE_INFO';
+        void handleSearchByUoCode(addUser, endpoint, params, value);
       }
-    }
-    if (value === '') {
+    } else {
       setSelected(null);
     }
     if (selected) {
@@ -331,12 +417,16 @@ export default function AsyncAutocompleteContainer({
         display="flex"
         justifyContent="center"
         width="100%"
-        pt={selected ? 4 : 2}
+        pt={selected ? 4 : 3}
         pb={input?.length === 0 || selected ? 4 : 0}
       >
         {selected && (
           <Box display="flex" alignItems="center">
-            <PartyIcon width={50} />
+            <img
+              style={{ height: 50, width: 50 }}
+              onError={() => setPartyLogo(OnboardingPartyIcon)}
+              src={partyLogo}
+            />
           </Box>
         )}
 
@@ -357,6 +447,7 @@ export default function AsyncAutocompleteContainer({
           setAooResult={setAooResult}
           setUoResult={setUoResult}
           externalInstitutionId={externalInstitutionId}
+          addUser={addUser}
         />
       </Grid>
       <Grid

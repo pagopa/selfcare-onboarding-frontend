@@ -1,10 +1,6 @@
 import { Box, styled } from '@mui/system';
 import { PartyAccountItemButton } from '@pagopa/mui-italia/dist/components/PartyAccountItemButton';
-
-import { AooData } from '../../../../../model/AooData';
-import { InstitutionResource } from '../../../../../model/InstitutionResource';
-import { UoData } from '../../../../../model/UoModel';
-import { ANACParty } from '../../../../../../types';
+import { PartyData } from '../../../../../../types';
 
 const CustomBox = styled(Box)({
   /* width */
@@ -33,17 +29,16 @@ type Props = {
   isLoading: boolean;
   getOptionLabel: (option: any) => string;
   getOptionKey: (option: any) => string;
-  cfResult?: InstitutionResource | ANACParty;
-  setCfResult: React.Dispatch<React.SetStateAction<InstitutionResource | ANACParty | undefined>>;
-  uoResult?: UoData;
-  aooResult?: AooData;
+  cfResult?: PartyData;
+  setCfResult: React.Dispatch<React.SetStateAction<PartyData | undefined>>;
+  uoResult?: any;
+  aooResult?: any;
   isTaxCodeSelected?: boolean;
   isIvassCodeSelected?: boolean;
   isAooCodeSelected?: boolean;
   isUoCodeSelected?: boolean;
 };
 
-// eslint-disable-next-line sonarjs/cognitive-complexity
 export default function AsyncAutocompleteResultsCode({
   setSelected,
   isLoading,
@@ -56,7 +51,7 @@ export default function AsyncAutocompleteResultsCode({
   isAooCodeSelected,
   isUoCodeSelected,
 }: Props) {
-  const visibleCode =
+  const party =
     isTaxCodeSelected || isIvassCodeSelected
       ? cfResult
       : isAooCodeSelected
@@ -64,6 +59,14 @@ export default function AsyncAutocompleteResultsCode({
       : isUoCodeSelected
       ? uoResult
       : '';
+
+  const partyName =
+    party?.description ??
+    party?.businessName ??
+    party?.denominazioneAoo ??
+    party?.descrizioneUo ??
+    party[0]?.description;
+
   return (
     <CustomBox my={2} {...cfResult} width="90%" maxHeight="200px" overflow="auto">
       {!isLoading && (
@@ -74,31 +77,24 @@ export default function AsyncAutocompleteResultsCode({
           display="flex"
           onKeyDownCapture={(e) => {
             if (e.key === 'Enter' || e.key === ' ') {
-              setSelected(visibleCode);
+              setSelected(party);
               setCfResult(undefined);
             }
           }}
         >
           <PartyAccountItemButton
-            partyName={
-              (isTaxCodeSelected || isIvassCodeSelected) && cfResult?.description
-                ? cfResult?.description.toLocaleLowerCase()
-                : isAooCodeSelected && aooResult?.denominazioneAoo
-                ? aooResult?.denominazioneAoo.toLocaleLowerCase()
-                : isUoCodeSelected && uoResult?.descrizioneUo
-                ? uoResult?.descrizioneUo.toLocaleLowerCase()
-                : ''
-            }
+            partyName={partyName.toLocaleLowerCase()}
             partyRole={
               !isTaxCodeSelected && aooResult
-                ? aooResult.denominazioneEnte
+                ? aooResult.denominazioneEnte || aooResult.parentDescription
                 : uoResult
-                ? uoResult?.denominazioneEnte
+                ? uoResult?.denominazioneEnte || uoResult.parentDescription
                 : ''
             }
             image={' '}
             action={() => {
-              setSelected(visibleCode);
+              const partySelected = party[0] ?? party;
+              setSelected(partySelected);
               setCfResult(undefined);
             }}
             maxCharactersNumberMultiLine={20}

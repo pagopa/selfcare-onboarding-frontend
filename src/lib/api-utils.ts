@@ -1,6 +1,6 @@
 import axios, { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import isEmpty from 'lodash/isEmpty';
-import { storageTokenOps } from '@pagopa/selfcare-common-frontend/utils/storage';
+import { storageTokenOps } from '@pagopa/selfcare-common-frontend/lib/utils/storage';
 import { Endpoint, RequestConfig } from '../../types';
 import { API } from '../utils/constants';
 import { ENV } from '../utils/env';

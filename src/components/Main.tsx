@@ -16,8 +16,8 @@ export function Main() {
         ))}
 
         {/* If on the ROOT, redirect to platform or login page based on whether the user is logged in */}
-        <Route path={ROUTES.ONBOARDING.PATH} exact={false}>
-          <Redirect to={ROUTES.ONBOARDING.PATH.replace(':productId', productId)} />
+        <Route path={ROUTES.ONBOARDING_PRODUCT.PATH} exact={false}>
+          <Redirect to={ROUTES.ONBOARDING_PRODUCT.PATH.replace(':productId', productId)} />
         </Route>
 
         <Route path="*">
