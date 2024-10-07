@@ -717,7 +717,7 @@ const executeStepSearchParty = async (
             categories:
               institutionType === 'SA' || institutionType === 'AS'
                 ? undefined
-                : filterByCategory(institutionType.toUpperCase(), productId),
+                : await filterByCategory(institutionType.toUpperCase(), productId),
             page: 1,
             search: 'XXX',
           },

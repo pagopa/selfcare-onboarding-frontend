@@ -595,7 +595,8 @@ export default {
         title: 'Privati'
       },
       oth: {
-        title: 'Altro'
+        title: 'Altro',
+        description: 'Enti creditori aderenti in via facoltativa'
       }
     },
     backLabel: 'Indietro',

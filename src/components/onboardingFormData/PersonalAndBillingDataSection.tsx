@@ -944,8 +944,7 @@ export default function PersonalAndBillingDataSection({
                 paddingValue={isContractingAuthority ? '20px' : '24px'}
                 {...baseTextFieldProps(
                   'businessRegisterPlace',
-                  isContractingAuthority ||
-                    (institutionType === 'PRV' && productId === 'prod-pagopa')
+                  isContractingAuthority
                     ? t(
                         'onboardingFormData.billingDataSection.informationCompanies.requiredCommercialRegisterNumber'
                       )
