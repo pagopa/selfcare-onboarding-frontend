@@ -33,7 +33,7 @@ export const ROUTES: RoutesObject = {
     COMPONENT: CancelRequest,
   },
   ONBOARDING_FILE_DOWNLOAD: {
-    PATH: `${BASE_ROUTE}/:onboardingId/products/:productId`,
+    PATH: `${BASE_ROUTE}/:onboardingId/products/:productId/aggregates`,
     LABEL: 'Csv file download',
     EXACT: true,
     COMPONENT: DownloadCsvFile,

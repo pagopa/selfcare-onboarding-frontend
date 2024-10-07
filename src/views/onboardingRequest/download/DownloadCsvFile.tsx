@@ -7,9 +7,12 @@ const DownloadCsvFile: React.FC = () => {
 
   useEffect(() => {
     if (onboardingId && productId) {
-      fetch(`${ENV.URL_API.ONBOARDING_V2}/${onboardingId}/products/${productId}/aggregates`, {
-        method: 'GET',
-      })
+      fetch(
+        `${ENV.URL_API.ONBOARDING_V2}/v2/tokens/${onboardingId}/products/${productId}/aggregates-csv`,
+        {
+          method: 'GET',
+        }
+      )
         .then((response) => {
           if (!response.ok) {
             return Promise.reject('Failed to download the file');
