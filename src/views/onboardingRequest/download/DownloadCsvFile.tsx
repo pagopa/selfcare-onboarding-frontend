@@ -32,7 +32,7 @@ const DownloadCsvFile: React.FC = () => {
           const link = document.createElement('a');
           // eslint-disable-next-line functional/immutable-data
           link.href = url;
-          link.setAttribute('download', `${productId}_aggregati.csv'`);
+          link.setAttribute('download', `${productId}_aggregati.csv`);
           document.body.appendChild(link);
           link.click();
           link.remove();
