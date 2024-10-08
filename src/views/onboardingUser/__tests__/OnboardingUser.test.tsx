@@ -319,7 +319,7 @@ test('Test: Successfull added new user for a party who has already onboarded to 
   await executeStepAddAdmin(true);
 });
 
-test('Test: NOT successfull added new user for a party who has already onboarded to the App IO product', async () => {
+test('Test: NOT successfull added new user for a party who has already onboarded to the IO product', async () => {
   renderComponent('prod-io', true);
   await executeStepAddManager();
   await executeStepAddAdmin(false);

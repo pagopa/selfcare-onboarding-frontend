@@ -746,10 +746,7 @@ export default function PersonalAndBillingDataSection({
                   <Box display="flex" alignItems="center">
                     <Checkbox
                       id="taxCodeEquals2VatNumber"
-                      checked={
-                        stepHistoryState.isTaxCodeEquals2PIVA ||
-                        formik.values.taxCode === formik.values.vatNumber
-                      }
+                      checked={stepHistoryState.isTaxCodeEquals2PIVA}
                       disabled={isPremium || formik.values.taxCode.length !== 11}
                       inputProps={{
                         'aria-label': t(
@@ -944,8 +941,7 @@ export default function PersonalAndBillingDataSection({
                 paddingValue={isContractingAuthority ? '20px' : '24px'}
                 {...baseTextFieldProps(
                   'businessRegisterPlace',
-                  isContractingAuthority ||
-                    (institutionType === 'PRV' && productId === 'prod-pagopa')
+                  isContractingAuthority
                     ? t(
                         'onboardingFormData.billingDataSection.informationCompanies.requiredCommercialRegisterNumber'
                       )

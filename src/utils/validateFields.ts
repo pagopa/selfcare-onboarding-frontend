@@ -94,10 +94,7 @@ export const validateFields = (
         ? t('onboardingFormData.billingDataSection.pspDataSection.invalidCommercialRegisterNumber')
         : undefined,
     businessRegisterPlace:
-      (institutionType === 'SA' || (institutionType === 'PRV' && productId === 'prod-pagopa')) &&
-      !values.businessRegisterPlace
-        ? requiredError
-        : undefined,
+      institutionType === 'SA' && !values.businessRegisterPlace ? requiredError : undefined,
     registrationInRegister:
       isPaymentServiceProvider && !values.registrationInRegister ? requiredError : undefined,
     dpoAddress: isPaymentServiceProvider && !values.dpoAddress ? requiredError : undefined,
@@ -151,7 +148,7 @@ export const validateFields = (
     rea:
       isInformationCompany && !values.rea
         ? requiredError
-        : !reaValidation.test(values.rea as string)
+        : values.rea && !reaValidation.test(values.rea as string)
         ? t('onboardingFormData.billingDataSection.invalidReaField')
         : undefined,
     shareCapital:

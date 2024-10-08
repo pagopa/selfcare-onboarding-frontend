@@ -101,7 +101,7 @@ export default function StepInstitutionType({
                             color: '#5C6F82',
                           }}
                         >
-                          {t(description4InstitutionType(ot.value))}
+                          {t(description4InstitutionType(ot))}
                         </Typography>
                       </>
                     }

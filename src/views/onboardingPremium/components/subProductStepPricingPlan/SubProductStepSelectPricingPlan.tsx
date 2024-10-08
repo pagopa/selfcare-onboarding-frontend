@@ -206,7 +206,7 @@ export default function SubProductStepSelectPricingPlan({
             <Grid item xs={7}>
               <Typography fontSize={'fontSize'} color="white" textAlign={'center'}>
                 <Trans i18nKey="onboardingSubProduct.subProductStepSelectPricingPlan.infoSectionLabel">
-                  Se il tuo ente ha già aderito ad app IO, scegli qual è il piano che più soddisfa
+                  Se il tuo ente ha già aderito ad IO, scegli qual è il piano che più soddisfa
                   le sue esigenze. <br /> Il piano a carnet è attivabile una sola volta. Una volta
                   terminato il numero di messaggi del piano a <br /> carnet, si attiverà
                   automaticamente il piano a consumo.

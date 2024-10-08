@@ -717,7 +717,7 @@ const executeStepSearchParty = async (
             categories:
               institutionType === 'SA' || institutionType === 'AS'
                 ? undefined
-                : filterByCategory(institutionType.toUpperCase(), productId),
+                : await filterByCategory(institutionType.toUpperCase(), productId),
             page: 1,
             search: 'XXX',
           },
@@ -1150,7 +1150,7 @@ const executeStepAddAdmin = async (
 const executeStepUploadAggregates = async () => {
   console.log('Testing step upload aggregates..');
 
-  await waitFor(() => screen.getByText('Indica i soggetti aggregati per App IO'));
+  await waitFor(() => screen.getByText('Indica i soggetti aggregati per IO'));
 
   const upload = document.getElementById('file-uploader') as HTMLElement;
   const continueButton = screen.getByRole('button', { name: 'Continua' });
