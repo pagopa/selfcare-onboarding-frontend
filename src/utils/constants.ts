@@ -1,9 +1,10 @@
 import { InstitutionType, RoutesObject } from '../../types';
-import CompleteRequest from '../views/onboardingRequest/complete/CompleteRequest';
 import NoProductPage from '../views/NoProductPage';
-import OnboardingProduct from '../views/onboardingProduct/OnboardingProduct';
 import OnboardingPremium from '../views/onboardingPremium/OnboardingPremium';
+import OnboardingProduct from '../views/onboardingProduct/OnboardingProduct';
 import CancelRequest from '../views/onboardingRequest/cancel/CancelRequest';
+import CompleteRequest from '../views/onboardingRequest/complete/CompleteRequest';
+import DownloadCsvFile from '../views/onboardingRequest/download/DownloadCsvFile';
 import OnboardingUser from '../views/onboardingUser/OnboardingUser';
 import { ENV } from './env';
 
@@ -30,6 +31,12 @@ export const ROUTES: RoutesObject = {
     PATH: `${BASE_ROUTE}/cancel`,
     LABEL: 'Cancel onboarding request',
     COMPONENT: CancelRequest,
+  },
+  ONBOARDING_FILE_DOWNLOAD: {
+    PATH: `${BASE_ROUTE}/:onboardingId/products/:productId/aggregates`,
+    LABEL: 'Csv file download',
+    EXACT: true,
+    COMPONENT: DownloadCsvFile,
   },
   ONBOARDING_USER: {
     PATH: `${BASE_ROUTE}/user`,
@@ -285,8 +292,8 @@ export const institutionType4Product = (productId: string | undefined) => {
   }
 };
 
-export const description4InstitutionType = (institutionType: InstitutionType) => {
-  switch (institutionType) {
+export const description4InstitutionType = (institutionType: { labelKey: string; value: InstitutionType }) => {
+  switch (institutionType.value) {
     case 'PT':
       return 'stepInstitutionType.institutionTypes.pt.description';
     case 'PA':
@@ -299,6 +306,7 @@ export const description4InstitutionType = (institutionType: InstitutionType) =>
     case 'SA':
     case 'AS':
     case 'PRV':
+      return institutionType.labelKey === 'oth' ? 'stepInstitutionType.institutionTypes.oth.description' : '';
     default:
       return '';
   }
