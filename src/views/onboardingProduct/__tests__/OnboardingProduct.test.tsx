@@ -8,13 +8,14 @@ import { ENV } from '../../../utils/env';
 import OnboardingProduct from '../OnboardingProduct';
 import '../../../locale';
 import { nationalValue } from '../../../model/GeographicTaxonomies';
-import { canInvoice, filterByCategory } from '../../../utils/constants';
+import { canInvoice } from '../../../utils/constants';
 import { createMemoryHistory } from 'history';
 import { Router } from 'react-router-dom';
 import userEvent from '@testing-library/user-event';
 import {
   mockedANACParties,
   mockedAoos,
+  mockedCategories,
   mockedInsuranceResource,
   mockedParties,
   mockedPartiesFromInfoCamere,
@@ -717,7 +718,11 @@ const executeStepSearchParty = async (
             categories:
               institutionType === 'SA' || institutionType === 'AS'
                 ? undefined
-                : await filterByCategory(institutionType.toUpperCase(), productId),
+                : productId === 'prod-pn'
+                ? mockedCategories.product['prod-pn'].ipa.PA
+                : productId !== 'prod-pn' && institutionType === 'GSP'
+                ? mockedCategories.product.default.ipa.GSP
+                : mockedCategories.product.default.ipa.PA,
             page: 1,
             search: 'XXX',
           },
@@ -788,7 +793,12 @@ const executeStepSearchParty = async (
               }
           : {
               origin: 'IPA',
-              categories: filterByCategory(institutionType, productId),
+              categories:
+                productId === 'prod-pn'
+                  ? mockedCategories.product['prod-pn'].ipa.PA
+                  : productId !== 'prod-pn' && institutionType === 'GSP'
+                  ? mockedCategories.product.default.ipa.GSP
+                  : mockedCategories.product.default.ipa.PA,
             };
 
       expect(fetchWithLogsSpy).toBeCalledTimes(
