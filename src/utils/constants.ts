@@ -192,7 +192,7 @@ export const onlyCharacters = new RegExp(/^[A-Za-z\s]*$/);
 export const filterByCategory = async (institutionType?: string, productId?: string) => {
   try {
     const response = await fetch(
-      `${ENV.BASE_PATH_CDN_URL}/assets/config.json`,
+     'CONFIG_JSON_CDN_URL',
       {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
