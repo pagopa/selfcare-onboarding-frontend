@@ -8,7 +8,7 @@ import { ENV } from '../../../utils/env';
 import OnboardingProduct from '../OnboardingProduct';
 import '../../../locale';
 import { nationalValue } from '../../../model/GeographicTaxonomies';
-import { canInvoice } from '../../../utils/constants';
+import { canInvoice, filterByCategory } from '../../../utils/constants';
 import { createMemoryHistory } from 'history';
 import { Router } from 'react-router-dom';
 import userEvent from '@testing-library/user-event';
@@ -718,11 +718,7 @@ const executeStepSearchParty = async (
             categories:
               institutionType === 'SA' || institutionType === 'AS'
                 ? undefined
-                : productId === 'prod-pn'
-                ? mockedCategories.product['prod-pn'].ipa.PA
-                : productId !== 'prod-pn' && institutionType === 'GSP'
-                ? mockedCategories.product.default.ipa.GSP
-                : mockedCategories.product.default.ipa.PA,
+                : filterByCategory(institutionType, productId),
             page: 1,
             search: 'XXX',
           },
@@ -793,12 +789,7 @@ const executeStepSearchParty = async (
               }
           : {
               origin: 'IPA',
-              categories:
-                productId === 'prod-pn'
-                  ? mockedCategories.product['prod-pn'].ipa.PA
-                  : productId !== 'prod-pn' && institutionType === 'GSP'
-                  ? mockedCategories.product.default.ipa.GSP
-                  : mockedCategories.product.default.ipa.PA,
+              categories: filterByCategory(institutionType, productId),
             };
 
       expect(fetchWithLogsSpy).toBeCalledTimes(
