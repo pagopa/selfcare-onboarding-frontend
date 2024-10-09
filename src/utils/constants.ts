@@ -189,31 +189,12 @@ export const numericField = new RegExp('^[0-9]*$');
 export const currencyField = new RegExp(/^(0|[1-9][0-9]*(?:(,[0-9]*)*|[0-9]*))((\\.|,)[0-9]+)*$/);
 export const onlyCharacters = new RegExp(/^[A-Za-z\s]*$/);
 
-export const filterByCategory = async (institutionType?: string, productId?: string) => {
-  try {
-    const response = await fetch(
-     'CONFIG_JSON_CDN_URL',
-      {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-      }
-    );
-    if (!response.ok) {
-      console.error(`Response status: ${response.status}`);
-    } else {
-      const res = await response.json();
-      if (productId === 'prod-pn') {
-        return res.product['prod-pn'].ipa.PA;
-      } else if (productId !== 'prod-pn' && institutionType === 'GSP') {
-        return res.product.default.ipa.GSP;
-      } else {
-        return res.product.defualt.ipa.PA;
-      }
-    }
-  } catch (error: any) {
-    console.error(error.message);
-  }
-};
+export const filterByCategory = (institutionType?: string, productId?: string) =>
+  productId === 'prod-pn'
+    ? 'L6,L4,L45,L35,L5,L17,L15,C14'
+    : institutionType === 'GSP'
+      ? 'L37,SAG'
+      : 'C17,C16,L10,L19,L13,L2,C10,L20,L21,L22,L15,L1,C13,C5,L40,L11,L39,L46,L8,L34,L7,L35,L45,L47,L6,L12,L24,L28,L42,L36,L44,C8,C3,C7,C14,L16,C11,L33,C12,L43,C2,L38,C1,L5,L4,L31,L18,L17,S01,SA';
 
 export const canInvoice = (institutionType?: string, productId?: string) =>
   institutionType !== 'SA' &&

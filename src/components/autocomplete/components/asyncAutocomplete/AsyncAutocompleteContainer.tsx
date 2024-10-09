@@ -140,7 +140,12 @@ export default function AsyncAutocompleteContainer({
     }
   }, [selected]);
 
-  const handleSearchByName = async (query: string, endpoint: Endpoint, limit?: number) => {
+  const handleSearchByName = async (
+    query: string,
+    endpoint: Endpoint,
+    limit?: number,
+    categories?: string
+  ) => {
     setIsLoading(true);
 
     const searchResponse = await fetchWithLogs(
@@ -151,8 +156,7 @@ export default function AsyncAutocompleteContainer({
           limit,
           page: 1,
           search: query,
-          categories:
-            product?.id === 'prod-pn' ? filterByCategory(institutionType, product?.id) : undefined,
+          categories,
         },
       },
       () => setRequiredLogin(true)
@@ -320,7 +324,12 @@ export default function AsyncAutocompleteContainer({
         });
         break;
       default:
-        void debounce(handleSearchByName, 100)(value, endpoint, ENV.MAX_INSTITUTIONS_FETCH);
+        void debounce(handleSearchByName, 100)(
+          value,
+          endpoint,
+          ENV.MAX_INSTITUTIONS_FETCH,
+          filterByCategory(institutionType, product?.id)
+        );
     }
   };
 
