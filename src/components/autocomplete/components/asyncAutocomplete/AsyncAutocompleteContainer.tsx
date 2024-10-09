@@ -328,7 +328,7 @@ export default function AsyncAutocompleteContainer({
           value,
           endpoint,
           ENV.MAX_INSTITUTIONS_FETCH,
-          await filterByCategory(institutionType, product?.id)
+          filterByCategory(institutionType, product?.id)
         );
     }
   };
@@ -383,14 +383,18 @@ export default function AsyncAutocompleteContainer({
         } else {
           const endpoint = addUser
             ? 'ONBOARDING_GET_INSTITUTIONS'
-            : product?.id === 'prod-interop' && (institutionType === 'SCP' || institutionType === 'PRV')
+            : product?.id === 'prod-interop' &&
+              (institutionType === 'SCP' || institutionType === 'PRV')
             ? 'ONBOARDING_GET_PARTY_BY_CF_FROM_INFOCAMERE'
             : 'ONBOARDING_GET_PARTY_FROM_CF';
           void handleSearchByTaxCode(
             addUser,
             endpoint,
-            product?.id === 'prod-interop' && (institutionType === 'SCP' || institutionType === 'PRV')
+            product?.id === 'prod-interop' &&
+              (institutionType === 'SCP' || institutionType === 'PRV')
               ? { ...params, taxCode: undefined }
+              : product?.id === 'prod-pn'
+              ? { ...params, categories: filterByCategory(institutionType, product.id) }
               : params,
             value
           );

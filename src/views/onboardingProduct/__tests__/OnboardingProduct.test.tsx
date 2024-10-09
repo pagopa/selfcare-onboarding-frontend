@@ -15,6 +15,7 @@ import userEvent from '@testing-library/user-event';
 import {
   mockedANACParties,
   mockedAoos,
+  mockedCategories,
   mockedInsuranceResource,
   mockedParties,
   mockedPartiesFromInfoCamere,
@@ -717,7 +718,7 @@ const executeStepSearchParty = async (
             categories:
               institutionType === 'SA' || institutionType === 'AS'
                 ? undefined
-                : await filterByCategory(institutionType.toUpperCase(), productId),
+                : filterByCategory(institutionType, productId),
             page: 1,
             search: 'XXX',
           },
