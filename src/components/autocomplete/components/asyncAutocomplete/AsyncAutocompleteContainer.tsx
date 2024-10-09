@@ -140,12 +140,7 @@ export default function AsyncAutocompleteContainer({
     }
   }, [selected]);
 
-  const handleSearchByName = async (
-    query: string,
-    endpoint: Endpoint,
-    limit?: number,
-    categories?: string
-  ) => {
+  const handleSearchByName = async (query: string, endpoint: Endpoint, limit?: number) => {
     setIsLoading(true);
 
     const searchResponse = await fetchWithLogs(
@@ -156,7 +151,8 @@ export default function AsyncAutocompleteContainer({
           limit,
           page: 1,
           search: query,
-          categories,
+          categories:
+            product?.id === 'prod-pn' ? filterByCategory(institutionType, product?.id) : undefined,
         },
       },
       () => setRequiredLogin(true)
@@ -324,12 +320,7 @@ export default function AsyncAutocompleteContainer({
         });
         break;
       default:
-        void debounce(handleSearchByName, 100)(
-          value,
-          endpoint,
-          ENV.MAX_INSTITUTIONS_FETCH,
-          await filterByCategory(institutionType, product?.id)
-        );
+        void debounce(handleSearchByName, 100)(value, endpoint, ENV.MAX_INSTITUTIONS_FETCH);
     }
   };
 
@@ -383,14 +374,18 @@ export default function AsyncAutocompleteContainer({
         } else {
           const endpoint = addUser
             ? 'ONBOARDING_GET_INSTITUTIONS'
-            : product?.id === 'prod-interop' && (institutionType === 'SCP' || institutionType === 'PRV')
+            : product?.id === 'prod-interop' &&
+              (institutionType === 'SCP' || institutionType === 'PRV')
             ? 'ONBOARDING_GET_PARTY_BY_CF_FROM_INFOCAMERE'
             : 'ONBOARDING_GET_PARTY_FROM_CF';
           void handleSearchByTaxCode(
             addUser,
             endpoint,
-            product?.id === 'prod-interop' && (institutionType === 'SCP' || institutionType === 'PRV')
+            product?.id === 'prod-interop' &&
+              (institutionType === 'SCP' || institutionType === 'PRV')
               ? { ...params, taxCode: undefined }
+              : product?.id === 'prod-pn'
+              ? { ...params, categories: filterByCategory(institutionType, product.id) }
               : params,
             value
           );
