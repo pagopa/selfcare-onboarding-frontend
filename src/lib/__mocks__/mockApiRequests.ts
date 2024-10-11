@@ -1045,7 +1045,7 @@ const mockRecipientCodeValidation = [
   { code: '2A3B4C', value: 'DENIED_NO_BILLING' },
 ];
 
-const mockedCategories = {
+export const mockedCategories = {
   product: {
     ["prod-pn"]: {
       ipa: {

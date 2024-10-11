@@ -27,7 +27,7 @@ import UpdateGeotaxonomy from '../onboardingFormData/taxonomy/UpdateGeotaxonomy'
 import GeoTaxonomySection from '../onboardingFormData/taxonomy/GeoTaxonomySection';
 import { useHistoryState } from '../useHistoryState';
 import { VatNumberErrorModal } from '../onboardingFormData/VatNumberErrorModal';
-import { canInvoice, filterByCategory, requiredError } from '../../utils/constants';
+import { canInvoice, requiredError } from '../../utils/constants';
 import Heading from '../onboardingFormData/Heading';
 import { validateFields } from '../../utils/validateFields';
 import { handleGeotaxonomies } from '../../utils/handleGeotaxonomies';
@@ -57,6 +57,7 @@ type Props = StepperStepComponentProps & {
   aooSelected?: AooData;
   uoSelected?: UoData;
   isCityEditable?: boolean;
+  filterCategoriesResponse?: any;
 };
 
 /* eslint-disable sonarjs/cognitive-complexity */
@@ -75,6 +76,7 @@ export default function StepOnboardingFormData({
   uoSelected,
   onboardingFormData,
   isCityEditable,
+  filterCategoriesResponse
 }: Props) {
   const { t } = useTranslation();
   const { setRequiredLogin } = useContext(UserContext);
@@ -98,7 +100,7 @@ export default function StepOnboardingFormData({
       edit: false,
     }
   );
-
+  const [filterCategories, setFilterCategories] = useState<string>();
   const [stepHistoryState, setStepHistoryState, setStepHistoryStateHistory] =
     useHistoryState<StepBillingDataHistoryState>('onboardingFormData', {
       externalInstitutionId,
@@ -135,7 +137,7 @@ export default function StepOnboardingFormData({
         method: 'GET',
         params: {
           origin: 'IPA',
-          categories: filterByCategory(institutionType, productId),
+          categories: filterCategories,
         },
       },
       () => setRequiredLogin(true)
@@ -211,6 +213,18 @@ export default function StepOnboardingFormData({
       }
     }
   }, [isPremium]);
+
+  useEffect(() => {
+    if (institutionType) {
+      if (productId === 'prod-pn') {
+        setFilterCategories(filterCategoriesResponse?.product['prod-pn'].ipa.PA);
+      } else if (institutionType === 'GSP') {
+        setFilterCategories(filterCategoriesResponse?.product.default.ipa.GSP);
+      } else {
+        setFilterCategories(filterCategoriesResponse?.product.default.ipa.PA);
+      }
+    }
+  }, []);
 
   const saveHistoryState = () => {
     setStepHistoryState(stepHistoryState);

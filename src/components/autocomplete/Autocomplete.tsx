@@ -28,6 +28,7 @@ type AutocompleteProps = {
   institutionType?: InstitutionType;
   setDisabled: Dispatch<SetStateAction<boolean>>;
   selectedProduct?: Product;
+  filterCategories?: string;
 };
 
 export function Autocomplete({
@@ -48,6 +49,7 @@ export function Autocomplete({
   institutionType,
   setDisabled,
   selectedProduct,
+  filterCategories
 }: AutocompleteProps) {
   const { t } = useTranslation();
   const [options, setOptions] = useState<Array<InstitutionResource>>([]);
@@ -155,6 +157,7 @@ export function Autocomplete({
           setDisabled={setDisabled}
           addUser={addUser}
           selectedProduct={selectedProduct}
+          filterCategories={filterCategories}
         />
       </Grid>
     </Paper>
