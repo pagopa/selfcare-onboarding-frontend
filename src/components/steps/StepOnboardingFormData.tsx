@@ -57,7 +57,7 @@ type Props = StepperStepComponentProps & {
   aooSelected?: AooData;
   uoSelected?: UoData;
   isCityEditable?: boolean;
-  filterCategoriesResponse?: any;
+  selectFilterCategories?: () => any;
 };
 
 /* eslint-disable sonarjs/cognitive-complexity */
@@ -76,7 +76,7 @@ export default function StepOnboardingFormData({
   uoSelected,
   onboardingFormData,
   isCityEditable,
-  filterCategoriesResponse
+  selectFilterCategories
 }: Props) {
   const { t } = useTranslation();
   const { setRequiredLogin } = useContext(UserContext);
@@ -215,14 +215,8 @@ export default function StepOnboardingFormData({
   }, [isPremium]);
 
   useEffect(() => {
-    if (institutionType) {
-      if (productId === 'prod-pn') {
-        setFilterCategories(filterCategoriesResponse?.product['prod-pn'].ipa.PA);
-      } else if (institutionType === 'GSP') {
-        setFilterCategories(filterCategoriesResponse?.product.default.ipa.GSP);
-      } else {
-        setFilterCategories(filterCategoriesResponse?.product.default.ipa.PA);
-      }
+    if (selectFilterCategories) {
+      setFilterCategories(selectFilterCategories());
     }
   }, []);
 
@@ -426,7 +420,7 @@ export default function StepOnboardingFormData({
     field: keyof OnboardingFormData,
     label: string,
     color: string,
-    fontWeight: string | number = isDisabled ? 'fontWeightRegular' : 'fontWeightMedium',
+    fontWeight: string | number = isDisabled ? 'fontWeightRegular' : 'fontWeightMedium'
   ) => {
     const isError = !!formik.errors[field] && formik.errors[field] !== requiredError;
     return {

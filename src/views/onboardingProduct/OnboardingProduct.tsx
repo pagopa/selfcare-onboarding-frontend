@@ -201,6 +201,16 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     void getFilterCategories();
   }, []);
 
+  const selectFilterCategories = () => {
+    if (productId === 'prod-pn') {
+      return filterCategoriesResponse?.product['prod-pn'].ipa.PA;
+    } else if (institutionType === 'GSP') {
+      return filterCategoriesResponse?.product.default.ipa.GSP;
+    } else {
+      return filterCategoriesResponse?.product.default.ipa.PA;
+    }
+  };
+
   const checkProductId = async () => {
     const onboardingProducts = await fetchWithLogs(
       { endpoint: 'ONBOARDING_VERIFY_PRODUCT', endpointParams: { productId } },
@@ -681,7 +691,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           },
           subunitTypeByQuery,
           subunitCodeByQuery,
-          filterCategoriesResponse,
+          selectFilterCategories,
         }),
     },
     {
@@ -741,7 +751,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
                 {`Inserisci le informazioni richieste e assicurati che siano corrette.<1 /> Serviranno a registrarti come Partner tecnologico per il<3/> prodotto <5>{{nameProduct}}</5>.`}
               </Trans>
             ),
-          filterCategoriesResponse,
+          selectFilterCategories,
           forward: forwardWithBillingData,
           back: () => {
             if (fromDashboard && !productAvoidStep) {

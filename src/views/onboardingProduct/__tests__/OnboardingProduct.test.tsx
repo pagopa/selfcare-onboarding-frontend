@@ -73,7 +73,7 @@ jest.mock('react-router-dom', () => ({
 const filterByCategory4Test = (institutionType?: string, productId?: string) => {
   if (productId === 'prod-pn') {
     return mockedCategories.product['prod-pn'].ipa.PA;
-  } else if (productId !== 'prod-pn' && institutionType === 'GSP') {
+  } else if (institutionType === 'GSP') {
     return mockedCategories.product.default.ipa.GSP;
   } else {
     return mockedCategories.product.default.ipa.PA;
