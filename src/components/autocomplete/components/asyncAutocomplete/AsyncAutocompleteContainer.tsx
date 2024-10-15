@@ -145,7 +145,6 @@ export default function AsyncAutocompleteContainer({
     categories?: string
   ) => {
     setIsLoading(true);
-
     const searchResponse = await fetchWithLogs(
       endpoint,
       {

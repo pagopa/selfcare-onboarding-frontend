@@ -57,7 +57,7 @@ type Props = StepperStepComponentProps & {
   aooSelected?: AooData;
   uoSelected?: UoData;
   isCityEditable?: boolean;
-  selectFilterCategories?: () => any;
+  filterCategories?: string;
 };
 
 /* eslint-disable sonarjs/cognitive-complexity */
@@ -76,7 +76,7 @@ export default function StepOnboardingFormData({
   uoSelected,
   onboardingFormData,
   isCityEditable,
-  selectFilterCategories
+  filterCategories
 }: Props) {
   const { t } = useTranslation();
   const { setRequiredLogin } = useContext(UserContext);
@@ -100,7 +100,6 @@ export default function StepOnboardingFormData({
       edit: false,
     }
   );
-  const [filterCategories, setFilterCategories] = useState<string>();
   const [stepHistoryState, setStepHistoryState, setStepHistoryStateHistory] =
     useHistoryState<StepBillingDataHistoryState>('onboardingFormData', {
       externalInstitutionId,
@@ -213,12 +212,6 @@ export default function StepOnboardingFormData({
       }
     }
   }, [isPremium]);
-
-  useEffect(() => {
-    if (selectFilterCategories) {
-      setFilterCategories(selectFilterCategories());
-    }
-  }, []);
 
   const saveHistoryState = () => {
     setStepHistoryState(stepHistoryState);

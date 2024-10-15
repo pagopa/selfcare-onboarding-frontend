@@ -27,7 +27,7 @@ type Props = {
   externalInstitutionId: string;
   subunitTypeByQuery: string;
   subunitCodeByQuery: string;
-  selectFilterCategories: () => any;
+  filterCategories?: string;
 } & StepperStepComponentProps;
 
 const handleSearchExternalId = async (
@@ -63,14 +63,13 @@ export function StepSearchParty({
   externalInstitutionId,
   subunitTypeByQuery,
   subunitCodeByQuery,
-  selectFilterCategories,
+  filterCategories,
 }: Props) {
   const theme = useTheme();
   const { t } = useTranslation();
   const { setRequiredLogin } = useContext(UserContext);
 
   const partyExternalIdByQuery = new URLSearchParams(window.location.search).get('partyExternalId');
-  const [filterCategories, setFilterCategories] = useState<string>();
   const [isSearchFieldSelected, setIsSearchFieldSelected] = useState<boolean>(true);
   const [loading, setLoading] = useState(!!partyExternalIdByQuery);
   const [selected, setSelected, setSelectedHistory] = useHistoryState<PartyData | null>(
@@ -219,10 +218,6 @@ export function StepSearchParty({
       setIsSearchFieldSelected(false);
     }
   }, [isSearchFieldSelected]);
-
-  useEffect(() => {
-    setFilterCategories(selectFilterCategories());
-  }, []);
 
   const onForwardAction = () => {
     const dataParty = aooResult || uoResult ? ({ ...selected, ...ecData } as PartyData) : selected;

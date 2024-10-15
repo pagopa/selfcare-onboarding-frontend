@@ -84,7 +84,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
   const [institutionType, setInstitutionType] = useState<InstitutionType>();
   const [origin, setOrigin] = useState<string>();
   const [pricingPlan, setPricingPlan] = useState<string>();
-  const [filterCategoriesResponse, setFilterCategoriesResponse] = useState<any>();
+  const filterCategoriesRef = useRef<string>();
   
   const { setOnExit } = useContext(HeaderContext);
   const { setRequiredLogin } = useContext(UserContext);
@@ -198,18 +198,10 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
   }, [onboardingFormData]);
 
   useEffect(() => {
-    void getFilterCategories();
-  }, []);
-
-  const selectFilterCategories = () => {
-    if (productId === 'prod-pn') {
-      return filterCategoriesResponse?.product['prod-pn'].ipa.PA;
-    } else if (institutionType === 'GSP') {
-      return filterCategoriesResponse?.product.default.ipa.GSP;
-    } else {
-      return filterCategoriesResponse?.product.default.ipa.PA;
+    if (institutionType && productId) {
+      void getFilterCategories();
     }
-  };
+  }, [productId, institutionType]);
 
   const checkProductId = async () => {
     const onboardingProducts = await fetchWithLogs(
@@ -292,9 +284,19 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     const restOutcome = getFetchOutcome(categories);
     if (restOutcome === 'success') {
       const response = (categories as AxiosResponse).data;
-      setFilterCategoriesResponse(response);
+      if (productId === 'prod-pn') {
+        // eslint-disable-next-line functional/immutable-data
+        filterCategoriesRef.current = response.product['prod-pn'].ipa.PA;
+      } else if (institutionType === 'GSP') {
+        // eslint-disable-next-line functional/immutable-data
+        filterCategoriesRef.current = response.product.default.ipa.GSP;
+      } else {
+        // eslint-disable-next-line functional/immutable-data
+        filterCategoriesRef.current = response.product.default.ipa.PA;
+      }
     } else {
-      setFilterCategoriesResponse(undefined);
+      // eslint-disable-next-line functional/immutable-data
+      filterCategoriesRef.current = undefined;
     }
   };
 
@@ -691,7 +693,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           },
           subunitTypeByQuery,
           subunitCodeByQuery,
-          selectFilterCategories,
+          filterCategories: filterCategoriesRef.current,
         }),
     },
     {
@@ -751,7 +753,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
                 {`Inserisci le informazioni richieste e assicurati che siano corrette.<1 /> Serviranno a registrarti come Partner tecnologico per il<3/> prodotto <5>{{nameProduct}}</5>.`}
               </Trans>
             ),
-          selectFilterCategories,
+          filterCategories: filterCategoriesRef.current,
           forward: forwardWithBillingData,
           back: () => {
             if (fromDashboard && !productAvoidStep) {
