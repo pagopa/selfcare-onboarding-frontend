@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext, useRef, useMemo }  from 'react';
+import React, { useEffect, useState, useContext, useRef, useMemo } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Container } from '@mui/material';
 import { AxiosError, AxiosResponse } from 'axios';
@@ -84,6 +84,8 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
   const [institutionType, setInstitutionType] = useState<InstitutionType>();
   const [origin, setOrigin] = useState<string>();
   const [pricingPlan, setPricingPlan] = useState<string>();
+  const [filterCategoriesResponse, setFilterCategoriesResponse] = useState<any>();
+
   const { setOnExit } = useContext(HeaderContext);
   const { setRequiredLogin } = useContext(UserContext);
   const requestIdRef = useRef<string>();
@@ -195,6 +197,20 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     }
   }, [onboardingFormData]);
 
+  useEffect(() => {
+    void getFilterCategories();
+  }, []);
+
+  const selectFilterCategories = () => {
+    if (productId === 'prod-pn') {
+      return filterCategoriesResponse?.product['prod-pn'].ipa.PA;
+    } else if (institutionType === 'GSP') {
+      return filterCategoriesResponse?.product.default.ipa.GSP;
+    } else {
+      return filterCategoriesResponse?.product.default.ipa.PA;
+    }
+  };
+
   const checkProductId = async () => {
     const onboardingProducts = await fetchWithLogs(
       { endpoint: 'ONBOARDING_VERIFY_PRODUCT', endpointParams: { productId } },
@@ -261,6 +277,27 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     }
   };
 
+  const getFilterCategories = async () => {
+    const categories = await fetchWithLogs(
+      {
+        endpoint: 'CONFIG_JSON_CDN_URL',
+      },
+      {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      },
+      () => setRequiredLogin(true)
+    );
+
+    const restOutcome = getFetchOutcome(categories);
+    if (restOutcome === 'success') {
+      const response = (categories as AxiosResponse).data;
+      setFilterCategoriesResponse(response);
+    } else {
+      setFilterCategoriesResponse(undefined);
+    }
+  };
+
   const back = () => {
     setActiveStep(activeStep - 1);
   };
@@ -282,7 +319,11 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     onboardingData: OnboardingFormData,
     institutionType: InstitutionType
   ) => {
-    if (onboardingData.taxCode === "" && onboardingData.originId === undefined && institutionType === "GSP") {
+    if (
+      onboardingData.taxCode === '' &&
+      onboardingData.originId === undefined &&
+      institutionType === 'GSP'
+    ) {
       setActiveStep(activeStep + 3);
     } else {
       setOnboardingFormData(onboardingData);
@@ -426,18 +467,18 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           additionalInformations:
             institutionType === 'GSP' && selectedProduct?.id === 'prod-pagopa'
               ? {
-                agentOfPublicService: additionalInformations?.agentOfPublicService,
-                agentOfPublicServiceNote: additionalInformations?.agentOfPublicServiceNote,
-                belongRegulatedMarket: additionalInformations?.belongRegulatedMarket,
-                regulatedMarketNote: additionalInformations?.regulatedMarketNote,
-                establishedByRegulatoryProvision:
-                  additionalInformations?.establishedByRegulatoryProvision,
-                establishedByRegulatoryProvisionNote:
-                  additionalInformations?.establishedByRegulatoryProvisionNote,
-                ipa: additionalInformations?.ipa,
-                ipaCode: additionalInformations?.ipaCode,
-                otherNote: additionalInformations?.otherNote,
-              }
+                  agentOfPublicService: additionalInformations?.agentOfPublicService,
+                  agentOfPublicServiceNote: additionalInformations?.agentOfPublicServiceNote,
+                  belongRegulatedMarket: additionalInformations?.belongRegulatedMarket,
+                  regulatedMarketNote: additionalInformations?.regulatedMarketNote,
+                  establishedByRegulatoryProvision:
+                    additionalInformations?.establishedByRegulatoryProvision,
+                  establishedByRegulatoryProvisionNote:
+                    additionalInformations?.establishedByRegulatoryProvisionNote,
+                  ipa: additionalInformations?.ipa,
+                  ipaCode: additionalInformations?.ipaCode,
+                  otherNote: additionalInformations?.otherNote,
+                }
               : undefined,
           pspData:
             institutionType === 'PSP'
@@ -445,20 +486,20 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
               : undefined,
           companyInformations:
             onboardingFormData?.businessRegisterPlace ||
-              onboardingFormData?.rea ||
-              onboardingFormData?.shareCapital
+            onboardingFormData?.rea ||
+            onboardingFormData?.shareCapital
               ? {
-                businessRegisterPlace: onboardingFormData?.businessRegisterPlace,
-                rea: onboardingFormData?.rea,
-                shareCapital: onboardingFormData?.shareCapital,
-              }
+                  businessRegisterPlace: onboardingFormData?.businessRegisterPlace,
+                  rea: onboardingFormData?.rea,
+                  shareCapital: onboardingFormData?.shareCapital,
+                }
               : undefined,
           institutionType,
           originId: onboardingFormData?.originId,
           geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY
             ? onboardingFormData?.geographicTaxonomies?.map((gt) =>
-              onboardedInstitutionInfo2geographicTaxonomy(gt)
-            )
+                onboardedInstitutionInfo2geographicTaxonomy(gt)
+              )
             : [],
           institutionLocationData: {
             country:
@@ -479,8 +520,8 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           subunitType: onboardingFormData?.uoUniqueCode
             ? 'UO'
             : onboardingFormData?.aooUniqueCode
-              ? 'AOO'
-              : undefined,
+            ? 'AOO'
+            : undefined,
           taxCode: onboardingFormData?.taxCode,
           isAggregator: onboardingFormData?.isAggregator
             ? onboardingFormData?.isAggregator
@@ -573,7 +614,9 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
 
     if (newInstitutionType === 'PRV' && productId === 'prod-pagopa') {
       selected2OnboardingData(null, undefined, newInstitutionType, productId);
-      setOnboardingFormData(selected2OnboardingData(null, undefined, newInstitutionType, productId));
+      setOnboardingFormData(
+        selected2OnboardingData(null, undefined, newInstitutionType, productId)
+      );
       setActiveStep(4);
     } else {
       forward();
@@ -648,6 +691,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           },
           subunitTypeByQuery,
           subunitCodeByQuery,
+          selectFilterCategories,
         }),
     },
     {
@@ -707,6 +751,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
                 {`Inserisci le informazioni richieste e assicurati che siano corrette.<1 /> Serviranno a registrarti come Partner tecnologico per il<3/> prodotto <5>{{nameProduct}}</5>.`}
               </Trans>
             ),
+          selectFilterCategories,
           forward: forwardWithBillingData,
           back: () => {
             if (fromDashboard && !productAvoidStep) {

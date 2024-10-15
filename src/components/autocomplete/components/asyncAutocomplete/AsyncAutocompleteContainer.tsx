@@ -18,11 +18,7 @@ import { getFetchOutcome } from '../../../../lib/error-utils';
 import { AooData } from '../../../../model/AooData';
 import { UoData } from '../../../../model/UoModel';
 import { ENV } from '../../../../utils/env';
-import {
-  buildUrlLogo,
-  filterByCategory,
-  noMandatoryIpaProducts,
-} from '../../../../utils/constants';
+import { buildUrlLogo, noMandatoryIpaProducts } from '../../../../utils/constants';
 import AsyncAutocompleteResultsBusinessName from './components/AsyncAutocompleteResultsBusinessName';
 import AsyncAutocompleteResultsCode from './components/AsyncAutocompleteResultsCode';
 import AsyncAutocompleteSearch from './components/AsyncAutocompleteSearch';
@@ -60,6 +56,7 @@ type Props = {
   setDisabled: Dispatch<SetStateAction<boolean>>;
   addUser: boolean;
   selectedProduct?: Product;
+  filterCategories?: string;
 };
 
 // TODO: handle cognitive-complexity
@@ -96,6 +93,7 @@ export default function AsyncAutocompleteContainer({
   setDisabled,
   addUser,
   selectedProduct,
+  filterCategories,
 }: Props) {
   const { setRequiredLogin } = useContext(UserContext);
   const { t } = useTranslation();
@@ -147,7 +145,6 @@ export default function AsyncAutocompleteContainer({
     categories?: string
   ) => {
     setIsLoading(true);
-
     const searchResponse = await fetchWithLogs(
       endpoint,
       {
@@ -181,11 +178,16 @@ export default function AsyncAutocompleteContainer({
   ) => {
     setIsLoading(true);
 
+    const updatedParams =
+      product?.id === 'prod-interop' && (institutionType === 'SCP' || institutionType === 'PRV')
+        ? { ...params, taxCode: undefined }
+        : { ...params, categories: filterCategories };
+
     const searchResponse = await fetchWithLogs(
       { endpoint, endpointParams: addUser ? undefined : { id: query } },
       {
         method: 'GET',
-        params: { ...params },
+        params: updatedParams,
       },
       () => setRequiredLogin(true)
     );
@@ -200,6 +202,7 @@ export default function AsyncAutocompleteContainer({
 
     setIsLoading(false);
   };
+
   const handleSearchByAooCode = async (
     addUser: boolean,
     endpoint: ApiEndpointKey,
@@ -208,16 +211,18 @@ export default function AsyncAutocompleteContainer({
   ) => {
     setIsLoading(true);
 
+    const updatedParams = addUser
+      ? params
+      : {
+          origin: 'IPA',
+          categories: filterCategories,
+        };
+
     const searchResponse = await fetchWithLogs(
       { endpoint, endpointParams: addUser ? undefined : { codiceUniAoo: query } },
       {
         method: 'GET',
-        params: addUser
-          ? params
-          : {
-              origin: 'IPA',
-              categories: filterByCategory(institutionType, product?.id),
-            },
+        params: updatedParams,
       },
       () => setRequiredLogin(true)
     );
@@ -245,16 +250,18 @@ export default function AsyncAutocompleteContainer({
   ) => {
     setIsLoading(true);
 
+    const updatedParams = addUser
+      ? params
+      : {
+          origin: 'IPA',
+          categories: filterCategories,
+        };
+
     const searchResponse = await fetchWithLogs(
       { endpoint, endpointParams: addUser ? undefined : { codiceUniUo: query } },
       {
         method: 'GET',
-        params: addUser
-          ? params
-          : {
-              origin: 'IPA',
-              categories: filterByCategory(institutionType, product?.id),
-            },
+        params: updatedParams,
       },
       () => setRequiredLogin(true)
     );
@@ -328,7 +335,7 @@ export default function AsyncAutocompleteContainer({
           value,
           endpoint,
           ENV.MAX_INSTITUTIONS_FETCH,
-          await filterByCategory(institutionType, product?.id)
+          filterCategories
         );
     }
   };
@@ -383,17 +390,11 @@ export default function AsyncAutocompleteContainer({
         } else {
           const endpoint = addUser
             ? 'ONBOARDING_GET_INSTITUTIONS'
-            : product?.id === 'prod-interop' && (institutionType === 'SCP' || institutionType === 'PRV')
+            : product?.id === 'prod-interop' &&
+              (institutionType === 'SCP' || institutionType === 'PRV')
             ? 'ONBOARDING_GET_PARTY_BY_CF_FROM_INFOCAMERE'
             : 'ONBOARDING_GET_PARTY_FROM_CF';
-          void handleSearchByTaxCode(
-            addUser,
-            endpoint,
-            product?.id === 'prod-interop' && (institutionType === 'SCP' || institutionType === 'PRV')
-              ? { ...params, taxCode: undefined }
-              : params,
-            value
-          );
+          void handleSearchByTaxCode(addUser, endpoint, params, value);
         }
       } else if (isAooCodeSelected && !isUoCodeSelected && value.length === 7) {
         const endpoint = addUser ? 'ONBOARDING_GET_INSTITUTIONS' : 'ONBOARDING_GET_AOO_CODE_INFO';
@@ -409,6 +410,7 @@ export default function AsyncAutocompleteContainer({
       setInput(getOptionLabel(selected));
     }
   };
+
   return (
     <>
       <Grid

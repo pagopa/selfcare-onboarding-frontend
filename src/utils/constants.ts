@@ -189,32 +189,6 @@ export const numericField = new RegExp('^[0-9]*$');
 export const currencyField = new RegExp(/^(0|[1-9][0-9]*(?:(,[0-9]*)*|[0-9]*))((\\.|,)[0-9]+)*$/);
 export const onlyCharacters = new RegExp(/^[A-Za-z\s]*$/);
 
-export const filterByCategory = async (institutionType?: string, productId?: string) => {
-  try {
-    const response = await fetch(
-      `${ENV.BASE_PATH_CDN_URL}/assets/config.json`,
-      {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-      }
-    );
-    if (!response.ok) {
-      console.error(`Response status: ${response.status}`);
-    } else {
-      const res = await response.json();
-      if (productId === 'prod-pn') {
-        return res.product['prod-pn'].ipa.PA;
-      } else if (productId !== 'prod-pn' && institutionType === 'GSP') {
-        return res.product.default.ipa.GSP;
-      } else {
-        return res.product.defualt.ipa.PA;
-      }
-    }
-  } catch (error: any) {
-    console.error(error.message);
-  }
-};
-
 export const canInvoice = (institutionType?: string, productId?: string) =>
   institutionType !== 'SA' &&
   institutionType !== 'PT' &&

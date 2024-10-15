@@ -15,7 +15,7 @@ import { LoadingOverlay } from '../LoadingOverlay';
 import { OnboardingStepActions } from '../OnboardingStepActions';
 import { Autocomplete } from '../autocomplete/Autocomplete';
 import { useHistoryState } from '../useHistoryState';
-import { filterByCategory, noMandatoryIpaProducts } from '../../utils/constants';
+import { noMandatoryIpaProducts } from '../../utils/constants';
 import { ENV } from '../../utils/env';
 import { selected2OnboardingData } from '../../utils/selected2OnboardingData';
 
@@ -27,6 +27,7 @@ type Props = {
   externalInstitutionId: string;
   subunitTypeByQuery: string;
   subunitCodeByQuery: string;
+  selectFilterCategories: () => any;
 } & StepperStepComponentProps;
 
 const handleSearchExternalId = async (
@@ -62,13 +63,13 @@ export function StepSearchParty({
   externalInstitutionId,
   subunitTypeByQuery,
   subunitCodeByQuery,
+  selectFilterCategories,
 }: Props) {
   const theme = useTheme();
   const { t } = useTranslation();
   const { setRequiredLogin } = useContext(UserContext);
 
   const partyExternalIdByQuery = new URLSearchParams(window.location.search).get('partyExternalId');
-
   const [isSearchFieldSelected, setIsSearchFieldSelected] = useState<boolean>(true);
   const [loading, setLoading] = useState(!!partyExternalIdByQuery);
   const [selected, setSelected, setSelectedHistory] = useHistoryState<PartyData | null>(
@@ -87,7 +88,7 @@ export function StepSearchParty({
     undefined
   );
   const [ecData, setEcData] = useState<PartyData | null>(null);
-
+  const [filterCategories, setFilterCategories] = useState<string>();
   const isEnabledProduct2AooUo = product?.id === 'prod-pn';
 
   const getECDataByCF = async (query: string) => {
@@ -115,7 +116,7 @@ export function StepSearchParty({
         method: 'GET',
         params: {
           ...(product?.id === 'prod-pn' && {
-            categories: filterByCategory(institutionType, product?.id),
+            categories: filterCategories,
             origin: 'IPA',
           }),
         },
@@ -140,7 +141,7 @@ export function StepSearchParty({
         method: 'GET',
         params: {
           ...(product?.id === 'prod-pn' && {
-            categories: filterByCategory(institutionType, product?.id),
+            categories: filterCategories,
             origin: 'IPA',
           }),
         },
@@ -218,10 +219,19 @@ export function StepSearchParty({
     }
   }, [isSearchFieldSelected]);
 
+  useEffect(() => {
+    setFilterCategories(selectFilterCategories());
+  }, []);
+
   const onForwardAction = () => {
     const dataParty = aooResult || uoResult ? ({ ...selected, ...ecData } as PartyData) : selected;
     setSelectedHistory(selected);
-    const onboardingData = selected2OnboardingData(dataParty, isAggregator, institutionType, product?.id);
+    const onboardingData = selected2OnboardingData(
+      dataParty,
+      isAggregator,
+      institutionType,
+      product?.id
+    );
     forward(onboardingData, institutionType);
   };
 
@@ -365,6 +375,7 @@ export function StepSearchParty({
             setUoResult={setUoResult}
             externalInstitutionId={externalInstitutionId}
             institutionType={institutionType}
+            filterCategories={filterCategories}
           />
         </Grid>
         {ENV.AGGREGATOR.SHOW_AGGREGATOR &&
@@ -385,68 +396,71 @@ export function StepSearchParty({
             </Grid>
           )}
       </Grid>
-      {institutionType !== 'SA' && institutionType !== 'AS' && institutionType !== 'SCP' &&  institutionType !== 'PRV' && (
-        <Grid container item justifyContent="center">
-          <Grid item xs={6}>
-            <Box
-              sx={{
-                fontSize: '14px',
-                lineHeight: '24px',
-                textAlign: 'center',
-              }}
-            >
-              <Typography
+      {institutionType !== 'SA' &&
+        institutionType !== 'AS' &&
+        institutionType !== 'SCP' &&
+        institutionType !== 'PRV' && (
+          <Grid container item justifyContent="center">
+            <Grid item xs={6}>
+              <Box
                 sx={{
+                  fontSize: '14px',
+                  lineHeight: '24px',
                   textAlign: 'center',
                 }}
-                variant="body1"
-                color={theme.palette.text.secondary}
               >
-                {institutionType === 'GSP' && noMandatoryIpaProducts(product?.id) ? (
-                  <Trans
-                    i18nKey="onboardingStep1.onboarding.gpsDescription"
-                    components={{
-                      1: <br />,
-                      2: (
-                        <Link
-                          id="no_ipa"
-                          sx={{
-                            textDecoration: 'underline',
-                            color: theme.palette.primary.main,
-                            cursor: 'pointer',
-                          }}
-                          onClick={onForwardAction}
-                        />
-                      ),
-                    }}
-                  >
-                    {`Non trovi il tuo ente nell'IPA?<1 /><2>Inserisci manualmente i dati del tuo ente.</2>`}
-                  </Trans>
-                ) : (
-                  <Trans
-                    i18nKey="onboardingStep1.onboarding.ipaDescription"
-                    components={{
-                      1: (
-                        <Link
-                          sx={{
-                            textDecoration: 'none',
-                            color: theme.palette.primary.main,
-                            cursor: 'pointer',
-                          }}
-                          href="https://indicepa.gov.it/ipa-portale/servizi-enti/accreditamento-ente"
-                        />
-                      ),
-                      3: <br />,
-                    }}
-                  >
-                    {`Non trovi il tuo ente nell'IPA? <1>In questa pagina</1> trovi maggiori <3/> informazioni sull'indice e su come accreditarsi `}
-                  </Trans>
-                )}
-              </Typography>
-            </Box>
+                <Typography
+                  sx={{
+                    textAlign: 'center',
+                  }}
+                  variant="body1"
+                  color={theme.palette.text.secondary}
+                >
+                  {institutionType === 'GSP' && noMandatoryIpaProducts(product?.id) ? (
+                    <Trans
+                      i18nKey="onboardingStep1.onboarding.gpsDescription"
+                      components={{
+                        1: <br />,
+                        2: (
+                          <Link
+                            id="no_ipa"
+                            sx={{
+                              textDecoration: 'underline',
+                              color: theme.palette.primary.main,
+                              cursor: 'pointer',
+                            }}
+                            onClick={onForwardAction}
+                          />
+                        ),
+                      }}
+                    >
+                      {`Non trovi il tuo ente nell'IPA?<1 /><2>Inserisci manualmente i dati del tuo ente.</2>`}
+                    </Trans>
+                  ) : (
+                    <Trans
+                      i18nKey="onboardingStep1.onboarding.ipaDescription"
+                      components={{
+                        1: (
+                          <Link
+                            sx={{
+                              textDecoration: 'none',
+                              color: theme.palette.primary.main,
+                              cursor: 'pointer',
+                            }}
+                            href="https://indicepa.gov.it/ipa-portale/servizi-enti/accreditamento-ente"
+                          />
+                        ),
+                        3: <br />,
+                      }}
+                    >
+                      {`Non trovi il tuo ente nell'IPA? <1>In questa pagina</1> trovi maggiori <3/> informazioni sull'indice e su come accreditarsi `}
+                    </Trans>
+                  )}
+                </Typography>
+              </Box>
+            </Grid>
           </Grid>
-        </Grid>
-      )}
+        )}
       <Grid item mt={2}>
         <OnboardingStepActions
           back={
