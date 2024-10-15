@@ -27,7 +27,7 @@ type Props = {
   externalInstitutionId: string;
   subunitTypeByQuery: string;
   subunitCodeByQuery: string;
-  filterCategories?: string;
+  selectFilterCategories: () => any;
 } & StepperStepComponentProps;
 
 const handleSearchExternalId = async (
@@ -63,7 +63,7 @@ export function StepSearchParty({
   externalInstitutionId,
   subunitTypeByQuery,
   subunitCodeByQuery,
-  filterCategories,
+  selectFilterCategories,
 }: Props) {
   const theme = useTheme();
   const { t } = useTranslation();
@@ -88,7 +88,7 @@ export function StepSearchParty({
     undefined
   );
   const [ecData, setEcData] = useState<PartyData | null>(null);
-
+  const [filterCategories, setFilterCategories] = useState<string>();
   const isEnabledProduct2AooUo = product?.id === 'prod-pn';
 
   const getECDataByCF = async (query: string) => {
@@ -218,6 +218,10 @@ export function StepSearchParty({
       setIsSearchFieldSelected(false);
     }
   }, [isSearchFieldSelected]);
+
+  useEffect(() => {
+    setFilterCategories(selectFilterCategories());
+  }, []);
 
   const onForwardAction = () => {
     const dataParty = aooResult || uoResult ? ({ ...selected, ...ecData } as PartyData) : selected;

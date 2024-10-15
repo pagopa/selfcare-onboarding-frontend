@@ -57,7 +57,7 @@ type Props = StepperStepComponentProps & {
   aooSelected?: AooData;
   uoSelected?: UoData;
   isCityEditable?: boolean;
-  filterCategories?: string;
+  selectFilterCategories?: () => any;
 };
 
 /* eslint-disable sonarjs/cognitive-complexity */
@@ -76,7 +76,7 @@ export default function StepOnboardingFormData({
   uoSelected,
   onboardingFormData,
   isCityEditable,
-  filterCategories
+  selectFilterCategories,
 }: Props) {
   const { t } = useTranslation();
   const { setRequiredLogin } = useContext(UserContext);
@@ -107,7 +107,7 @@ export default function StepOnboardingFormData({
         !!initialFormData.vatNumber && initialFormData.taxCode === initialFormData.vatNumber,
     });
   const requestIdRef = useRef<string>();
-
+  const [filterCategories, setFilterCategories] = useState<string>();
   const institutionAvoidGeotax = ['PT', 'SA', 'AS'].includes(institutionType);
 
   const isPremium = !!subProductId;
@@ -212,6 +212,12 @@ export default function StepOnboardingFormData({
       }
     }
   }, [isPremium]);
+
+  useEffect(() => {
+    if (selectFilterCategories) {
+      setFilterCategories(selectFilterCategories());
+    }
+  }, []);
 
   const saveHistoryState = () => {
     setStepHistoryState(stepHistoryState);
