@@ -112,7 +112,7 @@ export default function StepOnboardingFormData({
 
   const isPremium = !!subProductId;
   const isPaymentServiceProvider = institutionType === 'PSP';
-
+  const isPdndPrivate = institutionType === 'PRV' && productId === 'prod-interop';
   const isInformationCompany =
     origin !== 'IPA' &&
     institutionType !== 'PRV' &&
@@ -275,6 +275,7 @@ export default function StepOnboardingFormData({
         institutionAvoidGeotax,
         isPremium,
         invalidTaxCodeInvoicing,
+        isPdndPrivate,
         recipientCodeStatus,
         productId
       )
@@ -470,6 +471,7 @@ export default function StepOnboardingFormData({
           retrievedIstat={retrievedIstat}
           isCityEditable={isCityEditable}
           isInvoiceable={isInvoiceable}
+          isPdndPrivate={isPdndPrivate}
           setInvalidTaxCodeInvoicing={setInvalidTaxCodeInvoicing}
           recipientCodeStatus={recipientCodeStatus}
         />
