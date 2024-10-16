@@ -974,6 +974,7 @@ const executeStepBillingData = async (
   if (from !== 'IPA') {
     await checkCorrectBodyBillingData(
       institutionType,
+      productId,
       'businessNameInput',
       'registeredOfficeInput',
       'a@a.it',
@@ -1525,6 +1526,7 @@ const checkLoggedUserAsAdminCheckbox = async (
 
 const checkCorrectBodyBillingData = (
   institutionType: string,
+  productId: string,
   expectedBusinessName: string = '',
   expectedRegisteredOfficeInput: string = '',
   expectedMailPEC: string = '',
@@ -1608,12 +1610,14 @@ const checkCorrectBodyBillingData = (
     );
   }
 
-  if (institutionType === 'SA') {
+  if (institutionType === 'SA' || (institutionType === 'PRV' && productId === 'prod-interop')) {
     fireEvent.change(document.getElementById('businessRegisterPlace') as HTMLElement, {
       target: { value: '01234567891' },
     });
     fireEvent.change(document.getElementById('rea') as HTMLElement, {
-      target: { value: 'MI-12345' },
+      target: {
+        value: institutionType === 'PRV' && productId === 'prod-interop' ? 'MO-123456' : 'MI-12345',
+      },
     });
     fireEvent.change(document.getElementById('shareCapital') as HTMLElement, {
       target: { value: '€ 332.323' },
@@ -2020,10 +2024,15 @@ const verifySubmit = async (
             (institutionType === 'PRV' && productId === 'prod-pagopa')
               ? {
                   businessRegisterPlace:
-                    from === 'ANAC' || (institutionType === 'PRV' && productId === 'prod-pagopa')
+                    from === 'ANAC' ||
+                    (institutionType === 'PRV' &&
+                      (productId === 'prod-pagopa' || productId === 'prod-interop'))
                       ? '01234567891'
                       : undefined,
-                  shareCapital: from === 'ANAC' ? 332323 : undefined,
+                  shareCapital:
+                    from === 'ANAC' || (institutionType === 'PRV' && productId === 'prod-interop')
+                      ? 332323
+                      : undefined,
                   rea:
                     from === 'INFOCAMERE' || from === 'PDND_INFOCAMERE'
                       ? mockedPartiesFromInfoCamere[0].cciaa.concat(
