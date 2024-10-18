@@ -27,7 +27,7 @@ import UpdateGeotaxonomy from '../onboardingFormData/taxonomy/UpdateGeotaxonomy'
 import GeoTaxonomySection from '../onboardingFormData/taxonomy/GeoTaxonomySection';
 import { useHistoryState } from '../useHistoryState';
 import { VatNumberErrorModal } from '../onboardingFormData/VatNumberErrorModal';
-import { canInvoice, filterByCategory, requiredError } from '../../utils/constants';
+import { canInvoice, requiredError } from '../../utils/constants';
 import Heading from '../onboardingFormData/Heading';
 import { validateFields } from '../../utils/validateFields';
 import { handleGeotaxonomies } from '../../utils/handleGeotaxonomies';
@@ -57,6 +57,7 @@ type Props = StepperStepComponentProps & {
   aooSelected?: AooData;
   uoSelected?: UoData;
   isCityEditable?: boolean;
+  selectFilterCategories?: () => any;
 };
 
 /* eslint-disable sonarjs/cognitive-complexity */
@@ -75,6 +76,7 @@ export default function StepOnboardingFormData({
   uoSelected,
   onboardingFormData,
   isCityEditable,
+  selectFilterCategories,
 }: Props) {
   const { t } = useTranslation();
   const { setRequiredLogin } = useContext(UserContext);
@@ -98,7 +100,6 @@ export default function StepOnboardingFormData({
       edit: false,
     }
   );
-
   const [stepHistoryState, setStepHistoryState, setStepHistoryStateHistory] =
     useHistoryState<StepBillingDataHistoryState>('onboardingFormData', {
       externalInstitutionId,
@@ -106,12 +107,12 @@ export default function StepOnboardingFormData({
         !!initialFormData.vatNumber && initialFormData.taxCode === initialFormData.vatNumber,
     });
   const requestIdRef = useRef<string>();
-
+  const [filterCategories, setFilterCategories] = useState<string>();
   const institutionAvoidGeotax = ['PT', 'SA', 'AS'].includes(institutionType);
 
   const isPremium = !!subProductId;
   const isPaymentServiceProvider = institutionType === 'PSP';
-
+  const isPdndPrivate = institutionType === 'PRV' && productId === 'prod-interop';
   const isInformationCompany =
     origin !== 'IPA' &&
     institutionType !== 'PRV' &&
@@ -135,7 +136,7 @@ export default function StepOnboardingFormData({
         method: 'GET',
         params: {
           origin: 'IPA',
-          categories: filterByCategory(institutionType, productId),
+          categories: filterCategories,
         },
       },
       () => setRequiredLogin(true)
@@ -212,6 +213,12 @@ export default function StepOnboardingFormData({
     }
   }, [isPremium]);
 
+  useEffect(() => {
+    if (selectFilterCategories) {
+      setFilterCategories(selectFilterCategories());
+    }
+  }, []);
+
   const saveHistoryState = () => {
     setStepHistoryState(stepHistoryState);
     setStepHistoryStateHistory(stepHistoryState);
@@ -268,6 +275,7 @@ export default function StepOnboardingFormData({
         institutionAvoidGeotax,
         isPremium,
         invalidTaxCodeInvoicing,
+        isPdndPrivate,
         recipientCodeStatus,
         productId
       )
@@ -412,7 +420,7 @@ export default function StepOnboardingFormData({
     field: keyof OnboardingFormData,
     label: string,
     color: string,
-    fontWeight: string | number = isDisabled ? 'fontWeightRegular' : 'fontWeightMedium',
+    fontWeight: string | number = isDisabled ? 'fontWeightRegular' : 'fontWeightMedium'
   ) => {
     const isError = !!formik.errors[field] && formik.errors[field] !== requiredError;
     return {
@@ -463,6 +471,7 @@ export default function StepOnboardingFormData({
           retrievedIstat={retrievedIstat}
           isCityEditable={isCityEditable}
           isInvoiceable={isInvoiceable}
+          isPdndPrivate={isPdndPrivate}
           setInvalidTaxCodeInvoicing={setInvalidTaxCodeInvoicing}
           recipientCodeStatus={recipientCodeStatus}
         />
