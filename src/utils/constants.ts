@@ -35,7 +35,6 @@ export const ROUTES: RoutesObject = {
   ONBOARDING_FILE_DOWNLOAD: {
     PATH: `${BASE_ROUTE}/:onboardingId/products/:productId/aggregates`,
     LABEL: 'Csv file download',
-    EXACT: true,
     COMPONENT: DownloadCsvFile,
   },
   ONBOARDING_USER: {
