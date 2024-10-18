@@ -40,6 +40,7 @@ import { AdditionalData, AdditionalInformations } from '../../model/AdditionalIn
 import AlreadyOnboarded from '../AlreadyOnboarded';
 import { AggregateInstitution } from '../../model/AggregateInstitution';
 import { selected2OnboardingData } from '../../utils/selected2OnboardingData';
+import config from '../../utils/config.json';
 import { genericError, StepVerifyOnboarding } from './components/StepVerifyOnboarding';
 import { StepAddAdmin } from './components/StepAddAdmin';
 import { StepAdditionalInformations } from './components/StepAdditionalInformations';
@@ -294,7 +295,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
       const response = (categories as AxiosResponse).data;
       setFilterCategoriesResponse(response);
     } else {
-      setFilterCategoriesResponse(undefined);
+      setFilterCategoriesResponse(config);
     }
   };
 

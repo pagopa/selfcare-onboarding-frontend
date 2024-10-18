@@ -178,10 +178,14 @@ export default function AsyncAutocompleteContainer({
   ) => {
     setIsLoading(true);
 
-    const updatedParams =
-      product?.id === 'prod-interop' && (institutionType === 'SCP' || institutionType === 'PRV')
-        ? { ...params, taxCode: undefined }
-        : { ...params, categories: filterCategories };
+    const updatedParams = {
+      ...params,
+      taxCode: undefined,
+      categories:
+        product?.id === 'prod-interop' && (institutionType === 'SCP' || institutionType === 'PRV')
+          ? undefined
+          : filterCategories,
+    };
 
     const searchResponse = await fetchWithLogs(
       { endpoint, endpointParams: addUser ? undefined : { id: query } },
