@@ -794,8 +794,7 @@ const executeStepSearchParty = async (
             : {
                 productId: undefined,
                 subunitCode: undefined,
-                taxCode:
-                  institutionType === 'SCP' || institutionType === 'PRV' ? undefined : taxCode,
+                taxCode: undefined,
                 categories:
                   institutionType === 'SCP' || institutionType === 'PRV'
                     ? undefined
