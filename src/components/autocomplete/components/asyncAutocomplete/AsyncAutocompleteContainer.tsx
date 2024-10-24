@@ -180,7 +180,7 @@ export default function AsyncAutocompleteContainer({
 
     const updatedParams = {
       ...params,
-      taxCode: undefined,
+      taxCode: addUser ? query : undefined,
       categories:
         product?.id === 'prod-interop' && (institutionType === 'SCP' || institutionType === 'PRV')
           ? undefined
