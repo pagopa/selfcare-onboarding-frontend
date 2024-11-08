@@ -2,9 +2,8 @@ import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 import { SelectChangeEvent } from '@mui/material/Select';
 import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ANACParty, InstitutionType, Product } from '../../../../../types';
+import { InstitutionType, PartyData, Product } from '../../../../../types';
 import { AooData } from '../../../../model/AooData';
-import { InstitutionResource } from '../../../../model/InstitutionResource';
 import { UoData } from '../../../../model/UoModel';
 import { ENV } from '../../../../utils/env';
 
@@ -17,8 +16,7 @@ type Props = {
   setIsSearchFieldSelected: React.Dispatch<React.SetStateAction<boolean>>;
   setIsAooCodeSelected: React.Dispatch<React.SetStateAction<boolean>>;
   setIsUoCodeSelected: React.Dispatch<React.SetStateAction<boolean>>;
-  selected: boolean;
-  setCfResult: React.Dispatch<React.SetStateAction<InstitutionResource | ANACParty | undefined>>;
+  setCfResult: React.Dispatch<React.SetStateAction<PartyData | undefined>>;
   setAooResult: Dispatch<SetStateAction<AooData | undefined>>;
   setUoResult: Dispatch<SetStateAction<UoData | undefined>>;
   setUoResultHistory: (t: UoData | undefined) => void;
@@ -30,6 +28,8 @@ type Props = {
   isUoCodeSelected?: boolean;
   product?: Product | null;
   institutionType?: InstitutionType;
+  addUser: boolean;
+  selectedProduct?: Product;
 };
 
 export default function PartyAdvancedSelect({
@@ -53,6 +53,8 @@ export default function PartyAdvancedSelect({
   setAooResultHistory,
   product,
   institutionType,
+  addUser,
+  selectedProduct,
 }: Props) {
   const { t } = useTranslation();
 
@@ -84,6 +86,13 @@ export default function PartyAdvancedSelect({
   };
 
   useEffect(() => {
+    if (product?.id === 'prod-interop' && (institutionType === 'SCP' || institutionType === 'PRV')) {
+      onSelectValue(false, true, false, false, false);
+      setTypeOfSearch('taxCode');
+    }
+  }, []);
+
+  useEffect(() => {
     if (isBusinessNameSelected) {
       setTypeOfSearch('businessName');
     } else if (isTaxCodeSelected) {
@@ -94,15 +103,28 @@ export default function PartyAdvancedSelect({
       setTypeOfSearch('uoCode');
     } else if (isIvassCodeSelected) {
       setTypeOfSearch('ivassCode');
+    } else {
+      setTypeOfSearch('');
     }
   }, []);
 
-  const filteredByProducts =
+  useEffect(() => {
+    if (addUser || (product?.id === 'prod-interop' && (institutionType === 'SCP' || institutionType === 'PRV'))) {
+      setTypeOfSearch('taxCode');
+      setIsTaxCodeSelected(true);
+    } else {
+      setTypeOfSearch('businessName');
+      setIsBusinessNameSelected(true);
+    }
+  }, []);
+
+  const filteredByProducts = (product?: Product) =>
     product &&
     (product.id === 'prod-interop' ||
       product.id === 'prod-io-sign' ||
       product.id === 'prod-pn-dev' ||
       product.id === 'prod-pn');
+
   const optionsAvailable4InstitutionType =
     institutionType !== 'SA' && institutionType !== 'AS' && institutionType !== 'GSP';
 
@@ -133,14 +155,16 @@ export default function PartyAdvancedSelect({
         label={t('partyAdvancedSelect.advancedSearchLabel')}
         onChange={handleTypeSearchChange}
       >
-        <MenuItem
-          id="businessName"
-          data-testid="businessName"
-          value={'businessName'}
-          onClick={() => onSelectValue(true, false, false, false, false)}
-        >
-          {t('partyAdvancedSelect.businessName')}
-        </MenuItem>
+        {!addUser && institutionType !== 'SCP' && institutionType !== 'PRV' && (
+          <MenuItem
+            id="businessName"
+            data-testid="businessName"
+            value={'businessName'}
+            onClick={() => onSelectValue(true, false, false, false, false)}
+          >
+            {t('partyAdvancedSelect.businessName')}
+          </MenuItem>
+        )}
         {institutionType === 'AS' ? (
           <MenuItem
             id="ivassCode"
@@ -161,9 +185,12 @@ export default function PartyAdvancedSelect({
           </MenuItem>
         )}
 
-        {ENV.AOO_UO.SHOW_AOO_UO &&
-          filteredByProducts &&
+        {((ENV.AOO_UO.SHOW_AOO_UO &&
           optionsAvailable4InstitutionType &&
+          institutionType !== 'SCP' &&
+          institutionType !== 'PRV' &&
+          filteredByProducts(product as Product)) ||
+          (addUser && ENV.AOO_UO.SHOW_AOO_UO && filteredByProducts(selectedProduct))) &&
           menuItems.map((item) => (
             <MenuItem
               key={item.id}

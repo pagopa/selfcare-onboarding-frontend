@@ -1,3 +1,4 @@
+/* eslint-disable functional/no-let */
 import { useContext, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import debounce from 'lodash/debounce';
@@ -181,7 +182,7 @@ export default function GeoTaxonomySection({
       deleteError(index);
       setIsAddNewAutocompleteEnabled(false);
     }
-    if (formik.values.geographicTaxonomies.length > 0) {
+    if (formik?.values.geographicTaxonomies.length > 0) {
       setGeotaxonomiesHistory(formik.values.geographicTaxonomies);
       setGeotaxonomiesHistoryState(formik.values.geographicTaxonomies);
       // eslint-disable-next-line functional/immutable-data
@@ -238,6 +239,40 @@ export default function GeoTaxonomySection({
       }
     } else if ((searchGeotaxonomy as AxiosError).response?.status === 404) {
       setOptions([]);
+    }
+  };
+
+  const formatApostrophe = (str: string) =>
+    str.replace(/(\w)'(\w)/g, (_match, p1, p2) => `${p1.toLocaleLowerCase()}'${p2.toLocaleUpperCase()}`);
+
+  const geoTaxFormat = (option: any, type: 'desc' | 'value') => {
+    if (!option?.desc) {
+      return '';
+    }
+
+    let desc = option.desc;
+    if (desc.includes('PROVINCIA')) {
+      desc = desc.slice(0, -11).toLocaleLowerCase();
+    } else if (desc.includes('COMUNE')) {
+      desc = desc.slice(0, -8).toLocaleLowerCase();
+    }
+
+    const cleanedDesc = desc.replace(/-/g, ' ').trim();
+    const capitalizedDesc = cleanedDesc
+      .split(' ')
+      .map((word: string) => word.charAt(0).toLocaleUpperCase() + word.slice(1).toLocaleLowerCase())
+      .join(' ');
+
+    const finalDesc = capitalizedDesc.includes("'") ? formatApostrophe(capitalizedDesc) : capitalizedDesc;
+
+    if (option.desc.includes('PROVINCIA')) {
+      return `${finalDesc} e provincia`;
+    } else if (option.desc.includes('COMUNE') && type === 'desc') {
+      return `${finalDesc} (${option.province_abbreviation?.toUpperCase()}) comune`;
+    } else if (option.desc.includes('COMUNE') && type === 'value') {
+      return `${finalDesc} (${(option.province_abbreviation ? option.province_abbreviation : formik.values.county ?? '').toUpperCase()})`;
+    } else {
+      return '';
     }
   };
 
@@ -313,15 +348,12 @@ export default function GeoTaxonomySection({
                     sx={{
                       width: '100%',
                       pr: '0px !important',
-                      '& .MuiAutocomplete-inputRoot .MuiAutocomplete-input': {
-                        textTransform: 'capitalize',
-                      },
                     }}
                     onChange={(event: any, value: any) => handleChange(event, value, i)}
-                    value={geotaxonomiesHistory[i]?.desc?.toLowerCase() ?? val?.desc?.toLowerCase()}
+                    value={geoTaxFormat(geotaxonomiesHistory[i] ?? val, 'value')}
                     renderOption={(props, option) => (
-                      <span style={{ textTransform: 'capitalize' }} {...props}>
-                        {option.desc ? option.desc?.toLocaleLowerCase() : ''}
+                      <span {...props}>
+                        {geoTaxFormat(option, 'desc')}
                       </span>
                     )}
                     renderInput={(params) => (
