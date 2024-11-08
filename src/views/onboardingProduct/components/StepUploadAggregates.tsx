@@ -265,7 +265,7 @@ export function StepUploadAggregates({
             deleteUploadedFiles={deleteUploadedFiles}
             onDropAccepted={onDropAccepted}
             onDropRejected={onDropRejected}
-            accept={['.csv']}
+            accept={{ 'text/csv': ['.csv'] }}
             loading={loading}
             isAggregatesUpload={true}
             theme={theme}
