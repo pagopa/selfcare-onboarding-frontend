@@ -1,5 +1,5 @@
 import { Grid, Typography, Theme, Button } from '@mui/material';
-import { DropEvent, FileRejection, useDropzone } from 'react-dropzone';
+import { Accept, DropEvent, FileRejection, useDropzone } from 'react-dropzone';
 import { Box } from '@mui/system';
 import { ReactComponent as CloudUpload } from '../assets/cloud-upload.svg';
 import { FileUploadedPreview } from './FileUploadedPreview';
@@ -12,7 +12,7 @@ type FileUploaderOption = {
   onDropAccepted?: (t: Array<File>) => void;
   onDropRejected?: (fileRejections: Array<FileRejection>, event?: DropEvent) => void;
   maxFiles?: number;
-  accept?: Array<string> | undefined;
+  accept?: Accept | undefined;
   loading: boolean;
   theme: Theme;
   isAggregatesUpload: boolean;
