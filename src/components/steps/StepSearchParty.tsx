@@ -1,15 +1,11 @@
-import { Alert, Grid, Link, Typography, useTheme } from '@mui/material';
+import { Alert, FormControlLabel, Grid, Link, Typography, useTheme } from '@mui/material';
 import { Box } from '@mui/system';
 import { AxiosError, AxiosResponse } from 'axios';
 import { ReactElement, useContext, useEffect, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
-import {
-  IPACatalogParty,
-  InstitutionType,
-  Party,
-  Product,
-  StepperStepComponentProps,
-} from '../../../types';
+import Checkbox from '@mui/material/Checkbox';
+import { SessionModal } from '@pagopa/selfcare-common-frontend/lib';
+import { InstitutionType, Product, PartyData, StepperStepComponentProps } from '../../../types';
 import { fetchWithLogs } from '../../lib/api-utils';
 import { UserContext } from '../../lib/context';
 import { getFetchOutcome } from '../../lib/error-utils';
@@ -19,7 +15,9 @@ import { LoadingOverlay } from '../LoadingOverlay';
 import { OnboardingStepActions } from '../OnboardingStepActions';
 import { Autocomplete } from '../autocomplete/Autocomplete';
 import { useHistoryState } from '../useHistoryState';
-import { filterByCategory } from '../../utils/constants';
+import { noMandatoryIpaProducts } from '../../utils/constants';
+import { ENV } from '../../utils/env';
+import { selected2OnboardingData } from '../../utils/selected2OnboardingData';
 
 type Props = {
   subTitle: string | ReactElement;
@@ -29,12 +27,13 @@ type Props = {
   externalInstitutionId: string;
   subunitTypeByQuery: string;
   subunitCodeByQuery: string;
+  selectFilterCategories: () => any;
 } & StepperStepComponentProps;
 
 const handleSearchExternalId = async (
   externalInstitutionId: string,
   onRedirectToLogin: () => void
-): Promise<IPACatalogParty | null> => {
+): Promise<PartyData | null> => {
   const searchResponse = await fetchWithLogs(
     {
       endpoint: 'ONBOARDING_GET_PARTY',
@@ -47,13 +46,13 @@ const handleSearchExternalId = async (
   const outcome = getFetchOutcome(searchResponse);
 
   if (outcome === 'success') {
-    return (searchResponse as AxiosResponse).data as IPACatalogParty;
+    return (searchResponse as AxiosResponse).data;
   }
 
   return null;
 };
-// TODO remove cognitive-complexity
-// eslint-disable-next-line sonarjs/cognitive-complexity
+
+// eslint-disable-next-line sonarjs/cognitive-complexity, complexity
 export function StepSearchParty({
   subTitle,
   forward,
@@ -64,10 +63,22 @@ export function StepSearchParty({
   externalInstitutionId,
   subunitTypeByQuery,
   subunitCodeByQuery,
+  selectFilterCategories,
 }: Props) {
   const theme = useTheme();
+  const { t } = useTranslation();
   const { setRequiredLogin } = useContext(UserContext);
 
+  const partyExternalIdByQuery = new URLSearchParams(window.location.search).get('partyExternalId');
+  const [isSearchFieldSelected, setIsSearchFieldSelected] = useState<boolean>(true);
+  const [loading, setLoading] = useState(!!partyExternalIdByQuery);
+  const [selected, setSelected, setSelectedHistory] = useHistoryState<PartyData | null>(
+    'selected_step1',
+    null
+  );
+  const [disabled, setDisabled] = useState<boolean>(false);
+  const [isAggregator, setIsAggregator] = useState<boolean>(false);
+  const [open, setOpen] = useState<boolean>(false);
   const [aooResult, setAooResult, setAooResultHistory] = useHistoryState<AooData | undefined>(
     'aooSelected_step1',
     undefined
@@ -76,21 +87,11 @@ export function StepSearchParty({
     'uoSelected_step1',
     undefined
   );
-
-  const partyExternalIdByQuery = new URLSearchParams(window.location.search).get('partyExternalId');
-
-  const [isSearchFieldSelected, setIsSearchFieldSelected] = useState<boolean>(true);
-  const [loading, setLoading] = useState(!!partyExternalIdByQuery);
-  const [selected, setSelected, setSelectedHistory] = useHistoryState<IPACatalogParty | null>(
-    'selected_step1',
-    null
-  );
-  const [dataFromAooUo, setDataFromAooUo] = useState<IPACatalogParty | null>();
-  const [disabled, setDisabled] = useState<boolean>(false);
-
+  const [ecData, setEcData] = useState<PartyData | null>(null);
+  const [filterCategories, setFilterCategories] = useState<string>();
   const isEnabledProduct2AooUo = product?.id === 'prod-pn';
 
-  const handleSearchTaxCodeFromAooUo = async (query: string) => {
+  const getECDataByCF = async (query: string) => {
     const searchResponse = await fetchWithLogs(
       { endpoint: 'ONBOARDING_GET_PARTY_FROM_CF', endpointParams: { id: query } },
       {
@@ -102,9 +103,9 @@ export function StepSearchParty({
     const outcome = getFetchOutcome(searchResponse);
 
     if (outcome === 'success') {
-      setDataFromAooUo((searchResponse as AxiosResponse).data);
+      setEcData((searchResponse as AxiosResponse).data);
     } else if ((searchResponse as AxiosError).response?.status === 404) {
-      setDataFromAooUo(undefined);
+      setEcData(null);
     }
   };
 
@@ -115,7 +116,7 @@ export function StepSearchParty({
         method: 'GET',
         params: {
           ...(product?.id === 'prod-pn' && {
-            categories: filterByCategory(institutionType, product?.id),
+            categories: filterCategories,
             origin: 'IPA',
           }),
         },
@@ -132,6 +133,7 @@ export function StepSearchParty({
       setAooResult(undefined);
     }
   };
+
   const handleSearchByUoCode = async (query: string) => {
     const searchResponse = await fetchWithLogs(
       { endpoint: 'ONBOARDING_GET_UO_CODE_INFO', endpointParams: { codiceUniUo: query } },
@@ -139,7 +141,7 @@ export function StepSearchParty({
         method: 'GET',
         params: {
           ...(product?.id === 'prod-pn' && {
-            categories: filterByCategory(institutionType, product?.id),
+            categories: filterCategories,
             origin: 'IPA',
           }),
         },
@@ -169,49 +171,11 @@ export function StepSearchParty({
 
   useEffect(() => {
     if (aooResult) {
-      void handleSearchTaxCodeFromAooUo(aooResult?.codiceFiscaleEnte);
+      void getECDataByCF(aooResult?.codiceFiscaleEnte);
     } else if (uoResult) {
-      void handleSearchTaxCodeFromAooUo(uoResult?.codiceFiscaleEnte);
+      void getECDataByCF(uoResult?.codiceFiscaleEnte);
     }
   }, [aooResult, uoResult]);
-
-  const onForwardAction = () => {
-    setAooResultHistory(aooResult);
-    setUoResultHistory(uoResult);
-    setSelectedHistory(selected);
-
-    if (
-      !selected?.id &&
-      institutionType === 'GSP' &&
-      (product?.id === 'prod-io' || product?.id === 'prod-pagopa')
-    ) {
-      forward(
-        { externalId: '' },
-        { ...selected, externalId: '' } as Party,
-        aooResult,
-        uoResult,
-        institutionType
-      );
-    } else {
-      forward(
-        {
-          externalId: dataFromAooUo ? dataFromAooUo.id : selected?.id,
-        },
-        aooResult || uoResult
-          ? ({ ...dataFromAooUo } as Party)
-          : ({ ...selected, externalId: selected?.id } as Party),
-        aooResult,
-        uoResult,
-        institutionType
-      );
-    }
-  };
-
-  const { t } = useTranslation();
-  const onBackAction = () => {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    back!();
-  };
 
   useEffect(() => {
     if (partyExternalIdByQuery) {
@@ -254,6 +218,27 @@ export function StepSearchParty({
       setIsSearchFieldSelected(false);
     }
   }, [isSearchFieldSelected]);
+
+  useEffect(() => {
+    setFilterCategories(selectFilterCategories());
+  }, []);
+
+  const onForwardAction = () => {
+    const dataParty = aooResult || uoResult ? ({ ...selected, ...ecData } as PartyData) : selected;
+    setSelectedHistory(selected);
+    const onboardingData = selected2OnboardingData(
+      dataParty,
+      isAggregator,
+      institutionType,
+      product?.id
+    );
+    forward(onboardingData, institutionType);
+  };
+
+  const onBackAction = () => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    back!();
+  };
 
   return loading ? (
     <LoadingOverlay loadingText={t('onboardingStep1.loadingOverlayText')} />
@@ -304,6 +289,14 @@ export function StepSearchParty({
                 inserisci uno dei dati richiesti e cerca l’ente per
                 <br /> cui vuoi richiedere l’adesione a <strong>Interoperabilità.</strong>
               </Trans>
+            ) : institutionType === 'SCP' || institutionType === 'PRV' ? (
+              <Trans
+                i18nKey="onboardingStep1.onboarding.scpSubtitle"
+                components={{ 3: <br />, 5: <strong /> }}
+              >
+                Inserisci uno dei dati richiesti e cerca da Infocamere l’ente <br />
+                per cui vuoi richiedere l’adesione a <strong>Interoperabilità.</strong>
+              </Trans>
             ) : (
               subTitle
             )}
@@ -311,7 +304,7 @@ export function StepSearchParty({
         </Grid>
       </Grid>
 
-      <Grid container item justifyContent="center" mt={4} mb={4}>
+      <Grid container item sx={{ alignItems: 'center', flexDirection: 'column' }} mt={4} mb={4}>
         {product?.id === 'prod-pn' && (
           <Grid container item justifyContent="center">
             <Grid item display="flex" justifyContent="center" mb={5}>
@@ -366,18 +359,11 @@ export function StepSearchParty({
 
         <Grid item xs={8} md={6} lg={5}>
           <Autocomplete
-            theme={theme}
             selected={selected}
-            setDisabled={setDisabled}
             setSelected={setSelected}
+            setDisabled={setDisabled}
             endpoint={{ endpoint: 'ONBOARDING_GET_SEARCH_PARTIES' }}
-            transformFn={(data: { items: Array<IPACatalogParty> }) =>
-              /* removed transformation into lower case in order to send data to BE as obtained from registry
-                  // eslint-disable-next-line functional/immutable-data
-                  data.items.forEach((i) => (i.description = i.description.toLowerCase()));
-                  */
-              data.items
-            }
+            transformFn={(data: { items: any }) => data.items}
             optionKey="id"
             optionLabel="description"
             isSearchFieldSelected={isSearchFieldSelected}
@@ -387,75 +373,95 @@ export function StepSearchParty({
             uoResult={uoResult}
             setAooResult={setAooResult}
             setUoResult={setUoResult}
-            setUoResultHistory={setUoResultHistory}
-            setAooResultHistory={setAooResultHistory}
             externalInstitutionId={externalInstitutionId}
             institutionType={institutionType}
+            filterCategories={filterCategories}
           />
         </Grid>
+        {ENV.AGGREGATOR.SHOW_AGGREGATOR &&
+          institutionType === 'PA' &&
+          product?.id === 'prod-io' && (
+            <Grid item mt={3}>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    name="aggregator-party"
+                    role="checkbox"
+                    size="small"
+                    onChange={() => setIsAggregator(!isAggregator)}
+                  />
+                }
+                label={t('onboardingStep1.onboarding.aggregator')}
+              />
+            </Grid>
+          )}
       </Grid>
-      {institutionType !== 'SA' && institutionType !== 'AS' && (
-        <Grid container item justifyContent="center">
-          <Grid item xs={6}>
-            <Box
-              sx={{
-                fontSize: '14px',
-                lineHeight: '24px',
-                textAlign: 'center',
-              }}
-            >
-              <Typography
+      {institutionType !== 'SA' &&
+        institutionType !== 'AS' &&
+        institutionType !== 'SCP' &&
+        institutionType !== 'PRV' && (
+          <Grid container item justifyContent="center">
+            <Grid item xs={6}>
+              <Box
                 sx={{
+                  fontSize: '14px',
+                  lineHeight: '24px',
                   textAlign: 'center',
                 }}
-                variant="body1"
-                color={theme.palette.text.secondary}
               >
-                {institutionType === 'GSP' && product?.id !== 'prod-interop' ? (
-                  <Trans
-                    i18nKey="onboardingStep1.onboarding.gpsDescription"
-                    components={{
-                      1: <br />,
-                      2: (
-                        <Link
-                          sx={{
-                            textDecoration: 'underline',
-                            color: theme.palette.primary.main,
-                            cursor: 'pointer',
-                          }}
-                          onClick={onForwardAction}
-                        />
-                      ),
-                    }}
-                  >
-                    {`Non trovi il tuo ente nell'IPA?<1 /><2>Inserisci manualmente i dati del tuo ente.</2>`}
-                  </Trans>
-                ) : (
-                  <Trans
-                    i18nKey="onboardingStep1.onboarding.ipaDescription"
-                    components={{
-                      1: (
-                        <Link
-                          sx={{
-                            textDecoration: 'none',
-                            color: theme.palette.primary.main,
-                            cursor: 'pointer',
-                          }}
-                          href="https://indicepa.gov.it/ipa-portale/servizi-enti/accreditamento-ente"
-                        />
-                      ),
-                      3: <br />,
-                    }}
-                  >
-                    {`Non trovi il tuo ente nell'IPA? In <1>questa pagina</1> trovi maggiori <3/> informazioni sull'indice e su come accreditarsi `}
-                  </Trans>
-                )}
-              </Typography>
-            </Box>
+                <Typography
+                  sx={{
+                    textAlign: 'center',
+                  }}
+                  variant="body1"
+                  color={theme.palette.text.secondary}
+                >
+                  {institutionType === 'GSP' && noMandatoryIpaProducts(product?.id) ? (
+                    <Trans
+                      i18nKey="onboardingStep1.onboarding.gpsDescription"
+                      components={{
+                        1: <br />,
+                        2: (
+                          <Link
+                            id="no_ipa"
+                            sx={{
+                              textDecoration: 'underline',
+                              color: theme.palette.primary.main,
+                              cursor: 'pointer',
+                            }}
+                            onClick={onForwardAction}
+                          />
+                        ),
+                      }}
+                    >
+                      {`Non trovi il tuo ente nell'IPA?<1 /><2>Inserisci manualmente i dati del tuo ente.</2>`}
+                    </Trans>
+                  ) : (
+                    <Trans
+                      i18nKey="onboardingStep1.onboarding.ipaDescription"
+                      components={{
+                        1: (
+                          <Link
+                            sx={{
+                              textDecoration: 'none',
+                              color: theme.palette.primary.main,
+                              cursor: 'pointer',
+                            }}
+                            href="https://indicepa.gov.it/ipa-portale/servizi-enti/accreditamento-ente"
+                          />
+                        ),
+                        3: <br />,
+                      }}
+                    >
+                      {`Non trovi il tuo ente nell'IPA? <1>In questa pagina</1> trovi maggiori <3/> informazioni sull'indice e su come accreditarsi `}
+                    </Trans>
+                  )}
+                </Typography>
+              </Box>
+            </Grid>
           </Grid>
-        </Grid>
-      )}
-      <Grid item mt={4}>
+        )}
+      <Grid item mt={2}>
         <OnboardingStepActions
           back={
             !productAvoidStep
@@ -467,12 +473,35 @@ export function StepSearchParty({
               : undefined
           }
           forward={{
-            action: onForwardAction,
+            action: () => {
+              if (isAggregator) {
+                setOpen(true);
+              } else {
+                onForwardAction();
+              }
+            },
             label: t('onboardingStep1.onboarding.onboardingStepActions.confirmAction'),
             disabled,
           }}
         />
       </Grid>
+      <SessionModal
+        open={open}
+        title={t('onboardingStep1.onboarding.aggregatorModal.title')}
+        message={
+          <Trans
+            i18nKey={'onboardingStep1.onboarding.aggregatorModal.message'}
+            components={{ 1: <strong />, 3: <br /> }}
+            values={{ partyName: selected?.description }}
+          >
+            {`Stai richiedendo l’adesione come ente aggregatore per <1>{{partyName}}</1>.<3 />Per completare l’adesione, dovrai indicare gli enti da aggregare.`}
+          </Trans>
+        }
+        onCloseLabel={t('onboardingStep1.onboarding.aggregatorModal.back')}
+        onConfirmLabel={t('onboardingStep1.onboarding.aggregatorModal.forward')}
+        handleClose={() => setOpen(false)}
+        onConfirm={onForwardAction}
+      />
     </Grid>
   );
 }

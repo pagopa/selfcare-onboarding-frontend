@@ -1,7 +1,7 @@
 import { AxiosError, AxiosResponse } from 'axios';
 import { useContext, useEffect, useState } from 'react';
 import { useTranslation, Trans } from 'react-i18next';
-import { EndingPage } from '@pagopa/selfcare-common-frontend';
+import { EndingPage } from '@pagopa/selfcare-common-frontend/lib';
 import { IllusError } from '@pagopa/mui-italia';
 import {
   InstitutionOnboardingInfoResource,
@@ -33,15 +33,15 @@ const genericError: RequestOutcomeMessage = {
         icon={<IllusError size={60} />}
         variantTitle={'h4'}
         variantDescription={'body1'}
-        title={<Trans i18nKey="onboardingStep1_5.genericError.title" />}
+        title={<Trans i18nKey="stepVerifyOnboarding.genericError.title" />}
         description={
-          <Trans i18nKey="onboardingStep1_5.genericError.description">
+          <Trans i18nKey="stepVerifyOnboarding.genericError.description">
             A causa di un errore del sistema non è possibile completare la procedura.
             <br />
             Ti chiediamo di riprovare più tardi.
           </Trans>
         }
-        buttonLabel={<Trans i18nKey="onboardingStep1_5.genericError.backAction" />}
+        buttonLabel={<Trans i18nKey="stepVerifyOnboarding.genericError.backHome" />}
         onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
       />
       ,

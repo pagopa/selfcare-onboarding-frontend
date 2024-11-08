@@ -38,6 +38,7 @@ variables:
 
     react_app_plans_prices: '$(UAT_REACT_APP_PLANS_PRICES)'
     react_app_country_data: '$(UAT_REACT_APP_COUNTRY_DATA)'
+    react_app_aggregates_example_csv: '$(UAT_REACT_APP_AGGREGATES_EXAMPLE_CSV)'
 
     react_app_url_privacy_disclaimer: '$(UAT_REACT_APP_URL_PRIVACY_DISCLAIMER)'
     react_app_url_terms_and_conditions: '$(UAT_REACT_APP_URL_TERMS_AND_CONDITIONS)'
@@ -61,6 +62,10 @@ variables:
     react_app_enable_aoo_uo: '$(UAT_AOO_UO_ENABLED)'
 
     react_app_enable_pt: '$(UAT_PT_ENABLED)'
+    react_app_enable_aggregator: '$(UAT_AGGREGATOR_ENABLED)'
+    react_app_enable_scp_infocamere: '$(UAT_SCP_INFOCAMERE_ENABLED)'
+    react_app_enable_prv: '$(UAT_PRV_ENABLED)'
+    react_app_enable_pure_prv: '$(UAT_PURE_PRV_ENABLED)'
 
   ${{ elseif eq(variables['Build.SourceBranch'], 'refs/heads/main') }}:
     environment: 'PROD'
@@ -79,6 +84,7 @@ variables:
 
     react_app_plans_prices: '$(PROD_REACT_APP_PLANS_PRICES)'
     react_app_country_data: '$(PROD_REACT_APP_COUNTRY_DATA)'
+    react_app_aggregates_example_csv: '$(PROD_REACT_APP_AGGREGATES_EXAMPLE_CSV)'
 
     react_app_url_privacy_disclaimer: '$(PROD_REACT_APP_URL_PRIVACY_DISCLAIMER)'
     react_app_url_terms_and_conditions: '$(PROD_REACT_APP_URL_TERMS_AND_CONDITIONS)'
@@ -102,6 +108,10 @@ variables:
     react_app_enable_aoo_uo: '$(PROD_AOO_UO_ENABLED)'
 
     react_app_enable_pt: '$(PROD_PT_ENABLED)'
+    react_app_enable_aggregator: '$(PROD_AGGREGATOR_ENABLED)'
+    react_app_enable_scp_infocamere: '$(PROD_SCP_INFOCAMERE_ENABLED)'
+    react_app_enable_prv: '$(PROD_PRV_ENABLED)'
+    react_app_enable_pure_prv: '$(PROD_PURE_PRV_ENABLED)'
 
   # every branch different from past will be considered as DEV
   #  ${{ if startsWith(variables['Build.SourceBranch'], 'refs/heads/release-dev') }}:
@@ -122,6 +132,7 @@ variables:
 
     react_app_plans_prices: '$(DEV_REACT_APP_PLANS_PRICES)'
     react_app_country_data: '$(DEV_REACT_APP_COUNTRY_DATA)'
+    react_app_aggregates_example_csv: '$(DEV_REACT_APP_AGGREGATES_EXAMPLE_CSV)'
 
     react_app_url_privacy_disclaimer: '$(DEV_REACT_APP_URL_PRIVACY_DISCLAIMER)'
     react_app_url_terms_and_conditions: '$(DEV_REACT_APP_URL_TERMS_AND_CONDITIONS)'
@@ -145,6 +156,10 @@ variables:
     react_app_enable_aoo_uo: '$(DEV_AOO_UO_ENABLED)'
 
     react_app_enable_pt: '$(DEV_PT_ENABLED)'
+    react_app_enable_aggregator: '$(DEV_AGGREGATOR_ENABLED)'
+    react_app_enable_scp_infocamere: '$(DEV_SCP_INFOCAMERE_ENABLED)'
+    react_app_enable_prv: '$(DEV_PRV_ENABLED)'
+    react_app_enable_pure_prv: '$(DEV_PURE_PRV_ENABLED)'
 
 # Automatically triggered on PR
 # https://docs.microsoft.com/en-us/azure/devops/pipelines/yaml-schema?view=azure-devops&tabs=schema%2Cparameter-schema#pr-trigger
@@ -230,6 +245,8 @@ stages:
 
               REACT_APP_PLANS_PRICES: '$(react_app_plans_prices)'
               REACT_APP_COUNTRY_DATA: '$(react_app_country_data)'
+              REACT_APP_AGGREGATES_EXAMPLE_CSV: '$(react_app_aggregates_example_csv)'
+              REACT_APP_URL_CDN: '$(react_app_url_cdn)'
 
               REACT_APP_URL_PRIVACY_DISCLAIMER: '$(react_app_url_privacy_disclaimer)'
               REACT_APP_URL_TERMS_AND_CONDITIONS: '$(react_app_url_terms_and_conditions)'

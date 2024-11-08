@@ -2,12 +2,15 @@ import { SvgIconTypeMap } from '@mui/material/SvgIcon';
 import { DefaultComponentProps } from '@mui/material/OverridableComponent';
 import { AxiosRequestConfig } from 'axios';
 import { FunctionComponent, SVGProps } from 'react';
-import { UserRole } from '@pagopa/selfcare-common-frontend/utils/constants';
+import { UserRole } from '@pagopa/selfcare-common-frontend/lib/utils/constants';
 import { API } from './src/utils/constants';
 import { OnboardingFormData } from './src/model/OnboardingFormData';
 import { AssistanceContacts } from './src/model/AssistanceContacts';
 import { CompanyInformations } from './src/model/CompanyInformations';
 import { GeographicTaxonomy } from './src/model/GeographicTaxonomies';
+import { PDNDBusinessResource } from './src/model/PDNDBusinessResource';
+import { AooData } from './src/model/AooData';
+import { UoData } from './src/model/UoModel';
 
 /*
  * Fetch data and router related types
@@ -63,7 +66,7 @@ export type RequestOutcomeOptionsJwt = { [key in RequestOutcomeComplete]: Reques
 export type StepperStepComponentProps = {
   product?: Product | null;
   forward?: any;
-  back?: VoidFunction;
+  back?: any;
   updateFormData?: React.Dispatch<React.SetStateAction<any>>;
 };
 
@@ -162,6 +165,14 @@ export interface Problem {
   errors: Array<ProblemError>;
 }
 
+export interface ProblemUserValidate {
+  title: string;
+  status: number;
+  detail: string;
+  instance: string;
+  invalidParams?: Array<{ name: string; reason: string }>;
+}
+
 export interface ProblemError {
   code: string;
   detail: string;
@@ -174,6 +185,15 @@ export type Product = {
   parentId?: string;
 };
 
+export type PartyData = IPACatalogParty &
+  Party &
+  AooData &
+  UoData &
+  InsuranceCompanyResource &
+  ANACParty &
+  PDNDBusinessResource &
+  OnboardedParty;
+
 export type SelfcareParty = {
   id: string;
   description: string;
@@ -184,7 +204,7 @@ export type SelfcareParty = {
 export type Party = {
   originId: string;
   externalId: string;
-  address: string;
+  registeredOffice: string;
   zipCode: string;
   description: string;
   digitalAddress: string;
@@ -194,6 +214,19 @@ export type Party = {
   supportEmail?: string;
   istatCode?: string;
   registerType?: string;
+};
+
+export type OnboardedParty = {
+  id: string;
+  description: string;
+  parentDescription: string;
+  originId: string;
+  institutionType: string;
+  digitalAddress: string;
+  address: string;
+  zipCode: string;
+  taxCode: string;
+  origin: string;
 };
 
 export type InstitutionData = {
@@ -214,7 +247,7 @@ export type InstitutionOnboardingInfoResource = {
   institution: InstitutionData;
 };
 
-export type InstitutionType = 'PA' | 'GSP' | 'SCP' | 'PT' | 'PSP' | 'SA' | 'AS';
+export type InstitutionType = 'PA' | 'GSP' | 'SCP' | 'PT' | 'PSP' | 'SA' | 'AS' | 'PRV';
 
 export type ANACParty = {
   description: string;

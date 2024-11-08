@@ -1,9 +1,9 @@
 import { useContext, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Box } from '@mui/system';
-import { Footer, Header } from '@pagopa/selfcare-common-frontend';
-import { trackEvent } from '@pagopa/selfcare-common-frontend/services/analyticsService';
-import i18n from '@pagopa/selfcare-common-frontend/locale/locale-utils';
+import { Footer, Header } from '@pagopa/selfcare-common-frontend/lib';
+import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
+import i18n from '@pagopa/selfcare-common-frontend/lib/locale/locale-utils';
 import { logAction } from '../lib/action-log';
 import { ENV } from '../utils/env';
 import { Main } from './Main';

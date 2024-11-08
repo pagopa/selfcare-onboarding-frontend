@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import SessionModal from '@pagopa/selfcare-common-frontend/components/SessionModal';
+import SessionModal from '@pagopa/selfcare-common-frontend/lib/components/SessionModal';
 import { useTranslation } from 'react-i18next';
 import { User } from '../types';
 import { BodyLogger } from './components/BodyLogger';
