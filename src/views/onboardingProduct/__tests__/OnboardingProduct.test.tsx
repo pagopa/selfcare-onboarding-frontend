@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { fireEvent, getByLabelText, render, screen, waitFor, within } from '@testing-library/react';
+import React from 'react';
+import { fireEvent, getByLabelText, render, screen, waitFor } from '@testing-library/react';
 import { useState } from 'react';
 import '@testing-library/jest-dom';
 import { User } from '../../../../types';
@@ -8,13 +8,14 @@ import { ENV } from '../../../utils/env';
 import OnboardingProduct from '../OnboardingProduct';
 import '../../../locale';
 import { nationalValue } from '../../../model/GeographicTaxonomies';
-import { canInvoice, filterByCategory } from '../../../utils/constants';
+import { canInvoice } from '../../../utils/constants';
 import { createMemoryHistory } from 'history';
 import { Router } from 'react-router-dom';
 import userEvent from '@testing-library/user-event';
 import {
   mockedANACParties,
   mockedAoos,
+  mockedCategories,
   mockedInsuranceResource,
   mockedParties,
   mockedPartiesFromInfoCamere,
@@ -68,6 +69,16 @@ jest.mock('react-router-dom', () => ({
     push: mockedHistoryPush,
   }),
 }));
+
+const filterByCategory4Test = (institutionType?: string, productId?: string) => {
+  if (productId === 'prod-pn') {
+    return mockedCategories.product['prod-pn'].ipa.PA;
+  } else if (institutionType === 'GSP') {
+    return mockedCategories.product.default.ipa.GSP;
+  } else {
+    return mockedCategories.product.default.ipa.PA;
+  }
+};
 
 const renderComponent = (productId: string = 'prod-pn') => {
   const Component = () => {
@@ -474,7 +485,7 @@ test('Test: Error retrieving onboarding info', async () => {
 
 test('Test: Invalid productId', async () => {
   renderComponent('error');
-  await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(1));
+  await waitFor(() => expect(fetchWithLogsSpy).toHaveBeenCalledTimes(2));
   await waitFor(() => screen.getByText('Impossibile individuare il prodotto desiderato'));
 });
 
@@ -508,7 +519,7 @@ test('Test: Exiting during flow with logout', async () => {
 
   await performLogout(logoutButton);
   fireEvent.click(screen.getByRole('button', { name: 'Esci' }));
-  await waitFor(() => expect(mockedLocation.assign).toBeCalledWith(ENV.URL_FE.LOGOUT));
+  await waitFor(() => expect(mockedLocation.assign).toHaveBeenCalledWith(ENV.URL_FE.LOGOUT));
 });
 
 test('Test: Search trying to type invalid characters', async () => {
@@ -607,7 +618,7 @@ const executeGoHome = async (expectedSuccessfulSubmit) => {
   });
   expect(goHomeButton).toBeEnabled();
   fireEvent.click(goHomeButton);
-  await waitFor(() => expect(mockedLocation.assign).toBeCalledWith(ENV.URL_FE.LANDING));
+  await waitFor(() => expect(mockedLocation.assign).toHaveBeenCalledWith(ENV.URL_FE.LANDING));
 };
 
 const checkBackForwardNavigation = async (
@@ -663,7 +674,7 @@ const executeStepSearchParty = async (
 
   screen.getByText('Cerca il tuo ente');
 
-  await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(1));
+  await waitFor(() => expect(fetchWithLogsSpy).toHaveBeenCalledTimes(2));
   const inputPartyName = document.getElementById('Parties') as HTMLElement;
 
   const withoutIpaLink = document.getElementById('no_ipa') as HTMLElement;
@@ -696,9 +707,9 @@ const executeStepSearchParty = async (
 
       const partyNameSelection = await waitFor(() => screen.getByText(partyName));
 
-      expect(fetchWithLogsSpy).toBeCalledTimes(2);
-
-      expect(fetchWithLogsSpy).toHaveBeenCalledWith(
+      expect(fetchWithLogsSpy).toHaveBeenCalledTimes(3);
+      expect(fetchWithLogsSpy).toHaveBeenNthCalledWith(
+        3,
         {
           endpoint:
             institutionType === 'SA'
@@ -717,7 +728,7 @@ const executeStepSearchParty = async (
             categories:
               institutionType === 'SA' || institutionType === 'AS'
                 ? undefined
-                : await filterByCategory(institutionType.toUpperCase(), productId),
+                : filterByCategory4Test(institutionType.toUpperCase(), productId),
             page: 1,
             search: 'XXX',
           },
@@ -776,30 +787,37 @@ const executeStepSearchParty = async (
           ? { codiceUniUo: subUnitCode }
           : { taxId: ivassCode };
 
-      const params =
+      const updatedParams =
         typeOfSearch === 'taxCode' || typeOfSearch === 'ivassCode'
           ? institutionType === 'SA' || institutionType === 'AS'
             ? undefined
             : {
                 productId: undefined,
                 subunitCode: undefined,
-                taxCode:
-                  institutionType === 'SCP' || institutionType === 'PRV' ? undefined : taxCode,
+                taxCode: undefined,
+                categories:
+                  institutionType === 'SCP' || institutionType === 'PRV'
+                    ? undefined
+                    : filterByCategory4Test(institutionType, productId),
               }
           : {
               origin: 'IPA',
-              categories: filterByCategory(institutionType, productId),
+              categories: filterByCategory4Test(institutionType, productId),
             };
 
-      expect(fetchWithLogsSpy).toBeCalledTimes(
-        typeOfSearch === 'aooCode' || typeOfSearch === 'uoCode' ? 3 : 2
+      expect(fetchWithLogsSpy).toHaveBeenCalledTimes(
+        typeOfSearch === 'aooCode' || typeOfSearch === 'uoCode' ? 4 : 3
       );
 
-      expect(fetchWithLogsSpy).toHaveBeenCalledWith(
-        { endpoint, endpointParams },
+      expect(fetchWithLogsSpy).toHaveBeenNthCalledWith(
+        3,
+        {
+          endpoint: endpoint,
+          endpointParams: endpointParams,
+        },
         {
           method: 'GET',
-          params,
+          params: updatedParams,
         },
         expect.any(Function)
       );
@@ -955,6 +973,7 @@ const executeStepBillingData = async (
   if (from !== 'IPA') {
     await checkCorrectBodyBillingData(
       institutionType,
+      productId,
       'businessNameInput',
       'registeredOfficeInput',
       'a@a.it',
@@ -1506,6 +1525,7 @@ const checkLoggedUserAsAdminCheckbox = async (
 
 const checkCorrectBodyBillingData = (
   institutionType: string,
+  productId: string,
   expectedBusinessName: string = '',
   expectedRegisteredOfficeInput: string = '',
   expectedMailPEC: string = '',
@@ -1589,12 +1609,14 @@ const checkCorrectBodyBillingData = (
     );
   }
 
-  if (institutionType === 'SA') {
+  if (institutionType === 'SA' || (institutionType === 'PRV' && productId === 'prod-interop')) {
     fireEvent.change(document.getElementById('businessRegisterPlace') as HTMLElement, {
       target: { value: '01234567891' },
     });
     fireEvent.change(document.getElementById('rea') as HTMLElement, {
-      target: { value: 'MI-12345' },
+      target: {
+        value: institutionType === 'PRV' && productId === 'prod-interop' ? 'MO-123456' : 'MI-12345',
+      },
     });
     fireEvent.change(document.getElementById('shareCapital') as HTMLElement, {
       target: { value: '€ 332.323' },
@@ -1903,7 +1925,7 @@ const verifySubmit = async (
 ) => {
   const SfeAvailable = (uo || institutionType === 'PA') && canInvoice(institutionType, productId);
   await waitFor(() =>
-    expect(fetchWithLogsSpy).lastCalledWith(
+    expect(fetchWithLogsSpy).toHaveBeenLastCalledWith(
       {
         endpoint: 'ONBOARDING_POST_LEGALS',
       },
@@ -2001,10 +2023,15 @@ const verifySubmit = async (
             (institutionType === 'PRV' && productId === 'prod-pagopa')
               ? {
                   businessRegisterPlace:
-                    from === 'ANAC' || (institutionType === 'PRV' && productId === 'prod-pagopa')
+                    from === 'ANAC' ||
+                    (institutionType === 'PRV' &&
+                      (productId === 'prod-pagopa' || productId === 'prod-interop'))
                       ? '01234567891'
                       : undefined,
-                  shareCapital: from === 'ANAC' ? 332323 : undefined,
+                  shareCapital:
+                    from === 'ANAC' || (institutionType === 'PRV' && productId === 'prod-interop')
+                      ? 332323
+                      : undefined,
                   rea:
                     from === 'INFOCAMERE' || from === 'PDND_INFOCAMERE'
                       ? mockedPartiesFromInfoCamere[0].cciaa.concat(

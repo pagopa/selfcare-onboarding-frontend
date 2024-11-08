@@ -73,6 +73,7 @@ type Props = StepperStepComponentProps & {
   isCityEditable?: boolean;
   isInvoiceable: boolean;
   isForeignInsurance?: boolean;
+  isPdndPrivate: boolean;
   setInvalidTaxCodeInvoicing: React.Dispatch<React.SetStateAction<boolean>>;
   recipientCodeStatus?: string;
 };
@@ -95,6 +96,7 @@ export default function PersonalAndBillingDataSection({
   isInvoiceable,
   isForeignInsurance,
   productId,
+  isPdndPrivate,
   setInvalidTaxCodeInvoicing,
   recipientCodeStatus,
 }: Props) {
@@ -746,10 +748,7 @@ export default function PersonalAndBillingDataSection({
                   <Box display="flex" alignItems="center">
                     <Checkbox
                       id="taxCodeEquals2VatNumber"
-                      checked={
-                        stepHistoryState.isTaxCodeEquals2PIVA ||
-                        formik.values.taxCode === formik.values.vatNumber
-                      }
+                      checked={stepHistoryState.isTaxCodeEquals2PIVA}
                       disabled={isPremium || formik.values.taxCode.length !== 11}
                       inputProps={{
                         'aria-label': t(
@@ -944,7 +943,7 @@ export default function PersonalAndBillingDataSection({
                 paddingValue={isContractingAuthority ? '20px' : '24px'}
                 {...baseTextFieldProps(
                   'businessRegisterPlace',
-                  isContractingAuthority
+                  isContractingAuthority || isPdndPrivate
                     ? t(
                         'onboardingFormData.billingDataSection.informationCompanies.requiredCommercialRegisterNumber'
                       )
@@ -975,7 +974,7 @@ export default function PersonalAndBillingDataSection({
                 name={'shareCapital'}
                 {...baseTextFieldProps(
                   'shareCapital',
-                  isContractingAuthority
+                  isContractingAuthority || isPdndPrivate
                     ? t(
                         'onboardingFormData.billingDataSection.informationCompanies.requiredShareCapital'
                       )

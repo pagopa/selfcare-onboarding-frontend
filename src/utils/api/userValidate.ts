@@ -1,6 +1,6 @@
 import { AxiosError } from 'axios';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
-import { Problem, UserOnCreate } from '../../../types';
+import { Problem, ProblemUserValidate, UserOnCreate } from '../../../types';
 import { fetchWithLogs } from '../../lib/api-utils';
 import { getFetchOutcome } from '../../lib/error-utils';
 
@@ -33,7 +33,7 @@ export async function userValidate(
   );
 
   const result = getFetchOutcome(resultValidation);
-  const errorBody = (resultValidation as AxiosError).response?.data;
+  const errorBody = (resultValidation as AxiosError<ProblemUserValidate>).response?.data;
 
   if (result === 'success') {
     onSuccess(userId);
@@ -44,7 +44,7 @@ export async function userValidate(
   ) {
     trackEvent(`${eventName}_CONFLICT_ERROR`, {
       party_id: partyId,
-      reason: errorBody?.detail,
+      reason: errorBody.detail,
     });
     onValidationError(
       userId,

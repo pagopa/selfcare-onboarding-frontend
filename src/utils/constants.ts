@@ -1,9 +1,10 @@
 import { InstitutionType, RoutesObject } from '../../types';
-import CompleteRequest from '../views/onboardingRequest/complete/CompleteRequest';
 import NoProductPage from '../views/NoProductPage';
-import OnboardingProduct from '../views/onboardingProduct/OnboardingProduct';
 import OnboardingPremium from '../views/onboardingPremium/OnboardingPremium';
+import OnboardingProduct from '../views/onboardingProduct/OnboardingProduct';
 import CancelRequest from '../views/onboardingRequest/cancel/CancelRequest';
+import CompleteRequest from '../views/onboardingRequest/complete/CompleteRequest';
+import DownloadCsvFile from '../views/onboardingRequest/download/DownloadCsvFile';
 import OnboardingUser from '../views/onboardingUser/OnboardingUser';
 import { ENV } from './env';
 
@@ -30,6 +31,11 @@ export const ROUTES: RoutesObject = {
     PATH: `${BASE_ROUTE}/cancel`,
     LABEL: 'Cancel onboarding request',
     COMPONENT: CancelRequest,
+  },
+  ONBOARDING_FILE_DOWNLOAD: {
+    PATH: `${BASE_ROUTE}/:onboardingId/products/:productId/aggregates`,
+    LABEL: 'Csv file download',
+    COMPONENT: DownloadCsvFile,
   },
   ONBOARDING_USER: {
     PATH: `${BASE_ROUTE}/user`,
@@ -181,32 +187,6 @@ export const commercialRegisterNumberRegexp = new RegExp('^\\d{11}$');
 export const numericField = new RegExp('^[0-9]*$');
 export const currencyField = new RegExp(/^(0|[1-9][0-9]*(?:(,[0-9]*)*|[0-9]*))((\\.|,)[0-9]+)*$/);
 export const onlyCharacters = new RegExp(/^[A-Za-z\s]*$/);
-
-export const filterByCategory = async (institutionType?: string, productId?: string) => {
-  try {
-    const response = await fetch(
-      `${ENV.BASE_PATH_CDN_URL}/assets/config.json`,
-      {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-      }
-    );
-    if (!response.ok) {
-      console.error(`Response status: ${response.status}`);
-    } else {
-      const res = await response.json();
-      if (productId === 'prod-pn') {
-        return res.product['prod-pn'].ipa.PA;
-      } else if (productId !== 'prod-pn' && institutionType === 'GSP') {
-        return res.product.default.ipa.GSP;
-      } else {
-        return res.product.defualt.ipa.PA;
-      }
-    }
-  } catch (error: any) {
-    console.error(error.message);
-  }
-};
 
 export const canInvoice = (institutionType?: string, productId?: string) =>
   institutionType !== 'SA' &&
