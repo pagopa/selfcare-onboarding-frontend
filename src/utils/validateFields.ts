@@ -30,6 +30,7 @@ export const validateFields = (
   institutionAvoidGeotax: boolean,
   isPremium: boolean,
   invalidTaxCodeInvoicing: boolean,
+  isPdndPrivate: boolean,
   recipientCodeStatus?: string,
   productId?: string
 ) =>
@@ -94,7 +95,9 @@ export const validateFields = (
         ? t('onboardingFormData.billingDataSection.pspDataSection.invalidCommercialRegisterNumber')
         : undefined,
     businessRegisterPlace:
-      institutionType === 'SA' && !values.businessRegisterPlace ? requiredError : undefined,
+      (institutionType === 'SA' || isPdndPrivate) && !values.businessRegisterPlace
+        ? requiredError
+        : undefined,
     registrationInRegister:
       isPaymentServiceProvider && !values.registrationInRegister ? requiredError : undefined,
     dpoAddress: isPaymentServiceProvider && !values.dpoAddress ? requiredError : undefined,
@@ -146,13 +149,13 @@ export const validateFields = (
         ? requiredError
         : undefined,
     rea:
-      isInformationCompany && !values.rea
+      (isInformationCompany || isPdndPrivate) && !values.rea
         ? requiredError
         : values.rea && !reaValidation.test(values.rea as string)
         ? t('onboardingFormData.billingDataSection.invalidReaField')
         : undefined,
     shareCapital:
-      institutionType === 'SA' && !values.shareCapital
+      (institutionType === 'SA' || isPdndPrivate) && !values.shareCapital
         ? requiredError
         : values.shareCapital && !currencyField.test(values.shareCapital)
         ? t('onboardingFormData.billingDataSection.invalidShareCapitalField')

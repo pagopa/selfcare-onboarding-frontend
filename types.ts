@@ -165,6 +165,14 @@ export interface Problem {
   errors: Array<ProblemError>;
 }
 
+export interface ProblemUserValidate {
+  title: string;
+  status: number;
+  detail: string;
+  instance: string;
+  invalidParams?: Array<{ name: string; reason: string }>;
+}
+
 export interface ProblemError {
   code: string;
   detail: string;
