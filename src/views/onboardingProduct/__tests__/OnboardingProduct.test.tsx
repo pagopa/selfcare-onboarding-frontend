@@ -537,7 +537,9 @@ test('Test: RecipientCode input client validation', async () => {
   renderComponent('prod-pagopa');
   await executeStepInstitutionType('prod-pagopa', 'PA');
   await executeStepSearchParty('prod-pagopa', 'PA', 'AGENCY X', 'businessName');
-  const confirmButtonEnabled = screen.getByRole('button', { name: 'Continua' });
+  const confirmButtonEnabled = await waitFor(() =>
+    screen.getByRole('button', { name: 'Continua' })
+  );
   fireEvent.click(confirmButtonEnabled);
 
   const recipientCodeInput = document.getElementById('recipientCode') as HTMLInputElement;
@@ -649,7 +651,9 @@ const executeStepInstitutionType = async (productSelected: string, institutionTy
   if (productSelected !== 'prod-pn' && productSelected !== 'prod-idpay') {
     screen.getByText(/Indica il tipo di ente che aderirà a/);
     await fillInstitutionTypeCheckbox(institutionTypeElementId);
-    const confirmButtonEnabled = screen.getByRole('button', { name: 'Continua' });
+    const confirmButtonEnabled = await waitFor(() =>
+      screen.getByRole('button', { name: 'Continua' })
+    );
     expect(confirmButtonEnabled).toBeEnabled();
 
     fireEvent.click(confirmButtonEnabled);
