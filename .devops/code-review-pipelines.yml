@@ -97,10 +97,9 @@ stages:
               yarn test:coverage --watchAll=false
             displayName: 'Unit tests exec'
 
-  # Task: Prepare the environment for SonarCloud analysis
   # This step sets up the connection with SonarCloud, specifying the organization,
   # project key, and other required parameters for the analysis.
-  - task: SonarCloudPrepare@1
+  - stage: SonarCloudPrepare@1
     displayName: 'Prepare SonarCloud analysis configuration'
     inputs:
       SonarCloud: '$(SONARCLOUD_SERVICE_CONN)'
@@ -111,9 +110,8 @@ stages:
         sonar.projectName=$(SONARCLOUD_PROJECT_NAME)
         sonar.exclusions='src/locale/**'
 
-  # Task: Publish the SonarCloud results
   # This step ensures that the analysis results are published back to SonarCloud.
   # It allows for tracking issues and ensuring quality gates are respected.
-  - task: SonarCloudPublish@1
+  - stage: SonarCloudPublish@1
     inputs:
       pollingTimeoutSec: '300'
