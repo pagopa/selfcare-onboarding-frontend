@@ -102,7 +102,7 @@ stages:
     displayName: 'SonarCloud Analysis'
     dependsOn: []
     jobs:
-      - job: SonarCloudPrepare
+      - job: SonarCloudPrepare@1
         displayName: 'Prepare SonarCloud Analysis Configuration'
         steps:
           - task: SonarCloudPrepare@1
@@ -115,7 +115,7 @@ stages:
                 sonar.projectKey=$(SONARCLOUD_PROJECT_KEY)
                 sonar.projectName=$(SONARCLOUD_PROJECT_NAME)
                 sonar.exclusions=src/locale/**         # Exclude specific folder
-      - job: SonarCloudPublish
+      - job: SonarCloudPublish@1
         displayName: 'Publish SonarCloud Results'
         dependsOn: SonarCloudPrepare
         steps:
