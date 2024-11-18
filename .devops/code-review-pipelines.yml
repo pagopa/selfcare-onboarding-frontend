@@ -97,21 +97,29 @@ stages:
               yarn test:coverage --watchAll=false
             displayName: 'Unit tests exec'
 
-  # This step sets up the connection with SonarCloud, specifying the organization,
-  # project key, and other required parameters for the analysis.
-  - stage: SonarCloudPrepare@1
-    displayName: 'Prepare SonarCloud analysis configuration'
-    inputs:
-      SonarCloud: '$(SONARCLOUD_SERVICE_CONN)'
-      organization: '$(SONARCLOUD_ORG)'
-      scannerMode: Other
-      extraProperties: |
-        sonar.projectKey=$(SONARCLOUD_PROJECT_KEY)
-        sonar.projectName=$(SONARCLOUD_PROJECT_NAME)
-        sonar.exclusions='src/locale/**'
-
-  # This step ensures that the analysis results are published back to SonarCloud.
-  # It allows for tracking issues and ensuring quality gates are respected.
-  - stage: SonarCloudPublish@1
-    inputs:
-      pollingTimeoutSec: '300'
+  # Run SonarCloudAnalysis and publish
+  - stage: SonarCloudAnalysis
+    displayName: 'SonarCloud Analysis'
+    dependsOn: []
+    jobs:
+      - job: SonarCloudPrepare
+        displayName: 'Prepare SonarCloud Analysis Configuration'
+        steps:
+          - task: SonarCloudPrepare@1
+            displayName: 'Prepare SonarCloud analysis configuration'
+            inputs:
+              SonarCloud: '$(SONARCLOUD_SERVICE_CONN)'
+              organization: '$(SONARCLOUD_ORG)'
+              scannerMode: Other
+              extraProperties: |
+                sonar.projectKey=$(SONARCLOUD_PROJECT_KEY)
+                sonar.projectName=$(SONARCLOUD_PROJECT_NAME)
+                sonar.exclusions=src/locale/**         # Exclude specific folder
+      - job: SonarCloudPublish
+        displayName: 'Publish SonarCloud Results'
+        dependsOn: SonarCloudPrepare
+        steps:
+          - task: SonarCloudPublish@1
+            displayName: 'Publish SonarCloud results'
+            inputs:
+              pollingTimeoutSec: '300'
