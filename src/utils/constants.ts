@@ -220,6 +220,7 @@ export const institutionTypes: Array<{ labelKey: string; value: InstitutionType 
   /* both are private entities but for two different products:
     prv -> "Enti Privati" (prod-interop), oth -> "Altro" (prod-pagopa) */
   { labelKey: 'oth', value: 'PRV' },
+  { labelKey: 'gps', value: 'GPS' },
 ];
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
@@ -244,6 +245,7 @@ export const institutionType4Product = (productId: string | undefined) => {
         (it) =>
           it.labelKey === 'pa' ||
           it.labelKey === 'gsp' ||
+          it.labelKey === 'gps' ||
           (ENV.PT.SHOW_PT ? it.labelKey === 'pt' : '')
       );
     case 'prod-pagopa':
@@ -252,12 +254,13 @@ export const institutionType4Product = (productId: string | undefined) => {
         (it) =>
           it.labelKey === 'pa' ||
           it.labelKey === 'gsp' ||
+          it.labelKey === 'gps' ||
           (ENV.ENV !== 'PROD' && it.labelKey === 'psp') ||
           (ENV.PT.SHOW_PT ? it.labelKey === 'pt' : '') ||
           (ENV.PURE_PRV.SHOW ? it.labelKey === 'oth' : '')
       );
     case 'prod-io-sign':
-      return institutionTypes.filter((it) => it.labelKey === 'pa' || it.labelKey === 'gsp');
+      return institutionTypes.filter((it) => it.labelKey === 'pa' || it.labelKey === 'gsp' || it.labelKey === 'gps');
     default:
       return institutionTypes.filter(
         (it) => it.labelKey === 'pa' || it.labelKey === 'gsp' || it.labelKey === 'scp'
@@ -275,6 +278,8 @@ export const description4InstitutionType = (institutionType: { labelKey: string;
       return 'stepInstitutionType.institutionTypes.gsp.description';
     case 'SCP':
       return 'stepInstitutionType.institutionTypes.scp.description';
+    case 'GPS':
+      return 'stepInstitutionType.institutionTypes.gps.description';
     case 'PSP':
     case 'SA':
     case 'AS':

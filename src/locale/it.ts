@@ -573,6 +573,10 @@ export default {
         title: 'Gestore di servizi pubblici',
         description: 'art. 2, comma 2, lettera B del CAD',
       },
+      gps: {
+        title: 'Gestore di pubblica utilità e/o di interesse generale',
+        description: 'Enti creditori aderenti in via facoltativa'
+      },
       scp: {
         title: 'Società a controllo pubblico',
         description: 'art. 2, comma 2, lettera C del CAD',
