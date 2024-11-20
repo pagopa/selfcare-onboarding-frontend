@@ -11,10 +11,6 @@ variables:
   YARN_CACHE_FOLDER: $(Pipeline.Workspace)/.yarn
   # Execute agents (jobs) on latest Ubuntu version.
   vmImageNameDefault: 'ubuntu-latest'
-  SONARCLOUD_SERVICE_CONN: $(SONARCLOUD_SERVICE_CONN)
-  SONARCLOUD_ORG: $(SONARCLOUD_ORG)
-  SONARCLOUD_PROJECT_KEY: $(SONARCLOUD_PROJECT_KEY)
-  SONARCLOUD_PROJECT_NAME: $(SONARCLOUD_PROJECT_NAME)
 
 # Automatically triggered on PR
 # https://docs.microsoft.com/en-us/azure/devops/pipelines/yaml-schema?view=azure-devops&tabs=schema%2Cparameter-schema#pr-trigger
@@ -100,30 +96,3 @@ stages:
           - script: |
               yarn test:coverage --watchAll=false
             displayName: 'Unit tests exec'
-
-  # Run SonarCloudAnalysis and publish
-  - stage: SonarCloudAnalysis
-    displayName: 'SonarCloud Analysis'
-    dependsOn: []
-    jobs:
-      - job: SonarCloudPrepare
-        displayName: 'Prepare SonarCloud Analysis Configuration'
-        steps:
-          - task: SonarCloudPrepare@1
-            displayName: 'Prepare SonarCloud analysis configuration'
-            inputs:
-              SonarCloud: '$(SONARCLOUD_SERVICE_CONN)'
-              organization: '$(SONARCLOUD_ORG)'
-              scannerMode: Other
-              extraProperties: |
-                sonar.projectKey=$(SONARCLOUD_PROJECT_KEY)
-                sonar.projectName=$(SONARCLOUD_PROJECT_NAME)
-                sonar.exclusions=src/locale/**
-      - job: SonarCloudPublish
-        displayName: 'Publish SonarCloud Results'
-        dependsOn: SonarCloudPrepare
-        steps:
-          - task: SonarCloudPublish@1
-            displayName: 'Publish SonarCloud results'
-            inputs:
-              pollingTimeoutSec: '300'
