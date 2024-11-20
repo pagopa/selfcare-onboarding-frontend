@@ -45,6 +45,7 @@ import { genericError, StepVerifyOnboarding } from './components/StepVerifyOnboa
 import { StepAddAdmin } from './components/StepAddAdmin';
 import { StepAdditionalInformations } from './components/StepAdditionalInformations';
 import { StepUploadAggregates } from './components/StepUploadAggregates';
+import { StepAdditionalGpuInformations } from './components/StepAdditionalGpuInformations';
 
 export type ValidateErrorType = 'conflictError';
 
@@ -118,33 +119,33 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     title: '',
     description: isTechPartner
       ? [
-          <React.Fragment key="0">
-            <EndingPage
-              minHeight="52vh"
-              variantTitle="h4"
-              variantDescription="body1"
-              icon={<IllusError size={60} />}
-              title={<Trans i18nKey="stepVerifyOnboarding.ptAlreadyOnboarded.title" />}
-              description={
-                <Trans i18nKey="stepVerifyOnboarding.ptAlreadyOnboarded.description">
-                  Per operare su un prodotto, chiedi a un Amministratore di <br /> aggiungerti nella
-                  sezione Utenti.
-                </Trans>
-              }
-              buttonLabel={<Trans i18nKey="stepVerifyOnboarding.ptAlreadyOnboarded.backAction" />}
-              onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
-            />
-          </React.Fragment>,
-        ]
+        <React.Fragment key="0">
+          <EndingPage
+            minHeight="52vh"
+            variantTitle="h4"
+            variantDescription="body1"
+            icon={<IllusError size={60} />}
+            title={<Trans i18nKey="stepVerifyOnboarding.ptAlreadyOnboarded.title" />}
+            description={
+              <Trans i18nKey="stepVerifyOnboarding.ptAlreadyOnboarded.description">
+                Per operare su un prodotto, chiedi a un Amministratore di <br /> aggiungerti nella
+                sezione Utenti.
+              </Trans>
+            }
+            buttonLabel={<Trans i18nKey="stepVerifyOnboarding.ptAlreadyOnboarded.backAction" />}
+            onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+          />
+        </React.Fragment>,
+      ]
       : [
-          <React.Fragment key="0">
-            <AlreadyOnboarded
-              onboardingFormData={onboardingFormData}
-              selectedProduct={selectedProduct}
-              institutionType={institutionType}
-            />
-          </React.Fragment>,
-        ],
+        <React.Fragment key="0">
+          <AlreadyOnboarded
+            onboardingFormData={onboardingFormData}
+            selectedProduct={selectedProduct}
+            institutionType={institutionType}
+          />
+        </React.Fragment>,
+      ],
   };
 
   useEffect(() => {
@@ -341,15 +342,26 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
   };
 
   const forwardWithBillingData = (newOnboardingFormData: OnboardingFormData) => {
-    trackEvent('ONBOARDING_BILLING_DATA', {
+    const trackingData = {
       request_id: requestIdRef.current,
       party_id: externalInstitutionId,
       product_id: productId,
       geographic_taxonomies: newOnboardingFormData.geographicTaxonomies,
-    });
+    };
+    trackEvent('ONBOARDING_BILLING_DATA', trackingData);
     setOnboardingFormData(newOnboardingFormData);
-    if (institutionType === 'PA') {
-      setActiveStep(activeStep + 2);
+    switch (institutionType) {
+      case 'PA':
+        setActiveStep(activeStep + 2);
+        break;
+      case 'GPU':
+        console.log("passo da qui!");
+        console.log('activeStep', activeStep);
+        setActiveStep(3);
+        break;
+      default:
+        forward();
+        break;
     }
   };
 
@@ -468,18 +480,18 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           additionalInformations:
             institutionType === 'GSP' && selectedProduct?.id === 'prod-pagopa'
               ? {
-                  agentOfPublicService: additionalInformations?.agentOfPublicService,
-                  agentOfPublicServiceNote: additionalInformations?.agentOfPublicServiceNote,
-                  belongRegulatedMarket: additionalInformations?.belongRegulatedMarket,
-                  regulatedMarketNote: additionalInformations?.regulatedMarketNote,
-                  establishedByRegulatoryProvision:
-                    additionalInformations?.establishedByRegulatoryProvision,
-                  establishedByRegulatoryProvisionNote:
-                    additionalInformations?.establishedByRegulatoryProvisionNote,
-                  ipa: additionalInformations?.ipa,
-                  ipaCode: additionalInformations?.ipaCode,
-                  otherNote: additionalInformations?.otherNote,
-                }
+                agentOfPublicService: additionalInformations?.agentOfPublicService,
+                agentOfPublicServiceNote: additionalInformations?.agentOfPublicServiceNote,
+                belongRegulatedMarket: additionalInformations?.belongRegulatedMarket,
+                regulatedMarketNote: additionalInformations?.regulatedMarketNote,
+                establishedByRegulatoryProvision:
+                  additionalInformations?.establishedByRegulatoryProvision,
+                establishedByRegulatoryProvisionNote:
+                  additionalInformations?.establishedByRegulatoryProvisionNote,
+                ipa: additionalInformations?.ipa,
+                ipaCode: additionalInformations?.ipaCode,
+                otherNote: additionalInformations?.otherNote,
+              }
               : undefined,
           pspData:
             institutionType === 'PSP'
@@ -487,20 +499,20 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
               : undefined,
           companyInformations:
             onboardingFormData?.businessRegisterPlace ||
-            onboardingFormData?.rea ||
-            onboardingFormData?.shareCapital
+              onboardingFormData?.rea ||
+              onboardingFormData?.shareCapital
               ? {
-                  businessRegisterPlace: onboardingFormData?.businessRegisterPlace,
-                  rea: onboardingFormData?.rea,
-                  shareCapital: onboardingFormData?.shareCapital,
-                }
+                businessRegisterPlace: onboardingFormData?.businessRegisterPlace,
+                rea: onboardingFormData?.rea,
+                shareCapital: onboardingFormData?.shareCapital,
+              }
               : undefined,
           institutionType,
           originId: onboardingFormData?.originId,
           geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY
             ? onboardingFormData?.geographicTaxonomies?.map((gt) =>
-                onboardedInstitutionInfo2geographicTaxonomy(gt)
-              )
+              onboardedInstitutionInfo2geographicTaxonomy(gt)
+            )
             : [],
           institutionLocationData: {
             country:
@@ -521,8 +533,8 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           subunitType: onboardingFormData?.uoUniqueCode
             ? 'UO'
             : onboardingFormData?.aooUniqueCode
-            ? 'AOO'
-            : undefined,
+              ? 'AOO'
+              : undefined,
           taxCode: onboardingFormData?.taxCode,
           isAggregator: onboardingFormData?.isAggregator
             ? onboardingFormData?.isAggregator
@@ -629,7 +641,8 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
       newInstitutionType !== 'SA' &&
       newInstitutionType !== 'AS' &&
       newInstitutionType !== 'SCP' &&
-      newInstitutionType !== 'PRV'
+      newInstitutionType !== 'PRV' &&
+      newInstitutionType !== 'GPU'
     ) {
       if (newInstitutionType !== institutionType) {
         setOnboardingFormData({
@@ -769,6 +782,16 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
               setActiveStep(1);
             }
           },
+        }),
+    },
+    {
+      label: 'Insert additional GPU data info',
+      Component: () =>
+        StepAdditionalGpuInformations({
+          forward: () => console.log('forward!'),
+          back,
+          originId: onboardingFormData?.originId,
+          origin,
         }),
     },
     {
