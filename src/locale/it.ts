@@ -212,6 +212,37 @@ export default {
       label: 'Aggiungi me come Amministratore',
     },
   },
+  additionalGpuDataPage: {
+    title: 'Inserisci ulteriori dettagli',
+    subTitle: 'Seleziona tra le opzioni quella che descrive il tuo ente.',
+    firstBlock: {
+      yes: 'Si',
+      no: 'No',
+      question: {
+        isPartyRegistered: 'L’ente è iscritto a un Albo, Registro o Elenco?',
+        subscribedTo: 'Iscritto a:',
+        isPartyProvidingAService: 'L’ente eroga un servizio rivolto ai cittadini?',
+        gpuRequestAccessFor: 'Per quali servizi di pubblica utilità e/o di interesse generale l’ente richiede l’accesso?',
+        frequencyOfPayment: 'La frequenza dei pagamenti è continuativa?',
+      },
+      placeholder: {
+        registerBoardList: 'Registro/Albo/Elenco',
+        answer: 'Risposta',
+        numberOfSubscription: 'Numero iscrizione',
+      }
+    },
+    secondBlock: {
+      title: 'Il legale rappresentante dell’Ente Richiedente dichiara e rappresenta irrevocabilmente:',
+      boxes: {
+        first: 'di avere il potere di agire in nome e per conto dell’Ente Richiedente;',
+        second: 'che l’Ente, per il tramite del proprio legale rappresentante, il legale rappresentante e i propri Dirigenti sono in possesso di tutte le autorizzazioni previste dalla legge per lo svolgimento delle attività ad oggetto della richiesta e sottese alla stessa;',
+        third: 'che esso legale rappresentante e i dirigenti dell’Ente Richiedente non si trovano in una delle circostanze indicate nell’articolo 94 e 95 D.Lgs. n. 36/2023;',
+        fourth: 'che nei confronti dello stesso e dei dirigenti dell’Ente Richiedente non è pendente alcun procedimento per l’applicazione di una delle misure di prevenzione di cui all’art. 6 del D.Lgs. 159/2011 e che non sussiste nessuna delle cause ostative previste dall’art. 67 del D.Lgs. 159/2011;',
+        fifth: 'che l’Ente richiedente non è destinatario di provvedimenti giudiziari, né coinvolto in procedimenti pendenti che comportano l’applicazione di sanzioni amministrative di cui al decreto legislativo 8 giugno 2001, n. 231.',
+      },
+      legalBlockFooterInfo: 'Le dichiarazioni di cui al presente documento sono rilasciate ai sensi dell’art. 46 del D.P.R. 28.12.2000 n. 445. In caso di dichiarazioni mendaci si applicano le sanzioni, anche di natura penale, applicabili, tra cui le fattispecie previste e punite di cui al D.P.R. 28.12.2000 n. 445.'
+    }
+  },
   additionalDataPage: {
     title: 'Inserisci ulteriori dettagli',
     subTitle:

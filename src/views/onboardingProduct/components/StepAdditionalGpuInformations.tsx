@@ -1,6 +1,11 @@
 import {
+    FormControl,
+    FormControlLabel,
     Grid,
     Paper,
+    Radio,
+    RadioGroup,
+    TextField,
     Typography,
     useTheme,
 } from '@mui/material';
@@ -20,17 +25,116 @@ export function StepAdditionalGpuInformations({ back }: Props) {
         <Grid container item sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <Grid container sx={{ textAlign: 'center' }}>
                 <Grid item xs={12} mb={2}>
-                    <Typography variant="h3"> {t('additionalDataPage.title')}</Typography>
+                    <Typography variant="h3"> {t('additionalGpuDataPage.title')}</Typography>
                 </Grid>
                 <Grid item xs={12} mb={4}>
                     <Typography variant="body2" fontSize={'18px'}>
-                        <Trans i18nKey="additionalDataPage.subTitle" components={{ 1: <br /> }} />
+                        <Trans i18nKey="additionalGpuDataPage.subTitle" components={{ 1: <br /> }} />
                     </Typography>
                 </Grid>
             </Grid>
 
-            <Paper elevation={8} sx={{ borderRadius: theme.spacing(2), px: 4, pt: 1 }}>
-                Content
+            <Paper elevation={8} sx={{ borderRadius: theme.spacing(2), p: 4, justifyContent: 'center', width: '70%' }}>
+                <Grid container sx={{ textAlign: 'start' }}>
+                    <Grid item xs={12} my={1}>
+                        <Typography sx={{ fontSize: '18px', fontWeight: 600 }}> {t('additionalGpuDataPage.firstBlock.question.isPartyRegistered')}</Typography>
+                    </Grid>
+                    <Grid item xs={12} my={1}>
+                        <FormControl>
+                            <RadioGroup
+                                aria-labelledby="demo-controlled-radio-buttons-group"
+                                name="controlled-radio-buttons-group"
+                                value={''}
+                                onChange={() => ''}
+                            >
+                                <FormControlLabel value="female" control={<Radio />} label={t('additionalGpuDataPage.firstBlock.yes')} />
+                                <FormControlLabel value="male" control={<Radio />} label={t('additionalGpuDataPage.firstBlock.no')} />
+                            </RadioGroup>
+                        </FormControl>
+                    </Grid>
+                    <Grid item xs={12} my={1}>
+                        <Typography sx={{ fontSize: '18px', fontWeight: 600 }}> {t('additionalGpuDataPage.firstBlock.question.subscribedTo')}</Typography>
+                    </Grid>
+                    <Grid container item xs={12} my={1} sx={{ display: 'flex', flexDirection: 'row' }}>
+                        <Grid item xs={8} paddingRight={2}>
+                            <FormControl fullWidth>
+                                <TextField
+                                    id=""
+                                    variant="outlined"
+                                    label={t('additionalGpuDataPage.firstBlock.placeholder.registerBoardList')}
+                                    onChange={() => ''}
+                                    // error={!!errors.optionalPartyInformations}
+                                    // helperText={errors.optionalPartyInformations || ''}
+                                    value={''}
+                                    placeholder={t('additionalGpuDataPage.firstBlock.placeholder.registerBoardList')}
+                                />
+                            </FormControl>
+                        </Grid>
+                        <Grid item xs={4}>
+                            <FormControl fullWidth>
+                                <TextField
+                                    id=""
+                                    variant="outlined"
+                                    label={t('additionalGpuDataPage.firstBlock.placeholder.numberOfSubscription')}
+                                    onChange={() => ''}
+                                    // error={!!errors.optionalPartyInformations}
+                                    // helperText={errors.optionalPartyInformations || ''}
+                                    value={''}
+                                    placeholder={t('additionalGpuDataPage.firstBlock.placeholder.numberOfSubscription')}
+                                />
+                            </FormControl>
+                        </Grid>
+                    </Grid>
+                    <Grid item xs={12} my={1}>
+                        <Typography sx={{ fontSize: '18px', fontWeight: 600 }}> {t('additionalGpuDataPage.firstBlock.question.isPartyProvidingAService')}</Typography>
+                    </Grid>
+                    <Grid item xs={12} my={1}>
+                        <FormControl>
+                            <RadioGroup
+                                aria-labelledby="demo-controlled-radio-buttons-group"
+                                name="controlled-radio-buttons-group"
+                                value={''}
+                                onChange={() => ''}
+                            >
+                                <FormControlLabel value="female" control={<Radio />} label={t('additionalGpuDataPage.firstBlock.yes')} />
+                                <FormControlLabel value="male" control={<Radio />} label={t('additionalGpuDataPage.firstBlock.no')} />
+                            </RadioGroup>
+                        </FormControl>
+                    </Grid>
+                    <Grid item xs={12} my={1}>
+                        <Typography sx={{ fontSize: '18px', fontWeight: 600 }}> {t('additionalGpuDataPage.firstBlock.question.gpuRequestAccessFor')}</Typography>
+                    </Grid>
+                    <Grid item xs={12} my={1}>
+                        <FormControl fullWidth>
+                            <TextField
+                                id=""
+                                variant="outlined"
+                                label={t('additionalGpuDataPage.firstBlock.placeholder.answer')}
+                                onChange={() => ''}
+                                // error={!!errors.optionalPartyInformations}
+                                // helperText={errors.optionalPartyInformations || ''}
+                                value={''}
+                                placeholder={t('additionalGpuDataPage.firstBlock.placeholder.answer')}
+                            />
+                        </FormControl>
+                    </Grid>
+                    <Grid item xs={12} my={1}>
+                        <Typography sx={{ fontSize: '18px', fontWeight: 600 }}> {t('additionalGpuDataPage.firstBlock.question.frequencyOfPayment')}</Typography>
+                    </Grid>
+                    <Grid item xs={12} my={1}>
+                        <FormControl>
+                            <RadioGroup
+                                aria-labelledby="demo-controlled-radio-buttons-group"
+                                name="controlled-radio-buttons-group"
+                                value={''}
+                                onChange={() => ''}
+                            >
+                                <FormControlLabel value="female" control={<Radio />} label={t('additionalGpuDataPage.firstBlock.yes')} />
+                                <FormControlLabel value="male" control={<Radio />} label={t('additionalGpuDataPage.firstBlock.no')} />
+                            </RadioGroup>
+                        </FormControl>
+                    </Grid>
+                </Grid>
             </Paper>
 
             <Grid item mb={10} mt={4}>
