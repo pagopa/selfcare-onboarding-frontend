@@ -60,6 +60,7 @@ export function StepAddManager({
   const [peopleErrors, setPeopleErrors] = useState<UsersError>();
   const [isGenericError, setIsGenericError] = useState<boolean>(false);
   const [isChangedManager, setIsChangedManager] = useState<boolean>(false);
+  const requestId = uniqueId();
   const requestIdRef = useRef<string>();
   const { t } = useTranslation();
   const premiumFlow = !!subProduct;
@@ -123,7 +124,7 @@ export function StepAddManager({
       setIsChangedManager(!response);
       if (!response) {
         trackEvent('CHANGE_LEGAL_REPRESENTATIVE', {
-          request_id: requestIdRef.current,
+          request_id: requestId,
           party_id: externalInstitutionId,
           product_id: product?.id,
           from: 'onboarding',

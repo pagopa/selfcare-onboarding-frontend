@@ -175,7 +175,6 @@ export default function CompleteRequestComponent() {
         request_id: requestId,
         party_id: token,
         product_id: requestData?.productId,
-        from: 'onboarding',
       });
       setOutcomeContentState(outcome);
     }

@@ -1,10 +1,11 @@
 import Container from '@mui/material/Container';
 import { useLocation, useHistory } from 'react-router-dom';
-import { useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { useContext, useEffect, useMemo, useState } from 'react';
 import { EndingPage, SessionModal } from '@pagopa/selfcare-common-frontend/lib';
 import { IllusCompleted, IllusError } from '@pagopa/mui-italia';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
 import { Trans, useTranslation } from 'react-i18next';
+import { uniqueId } from 'lodash';
 import { withLogin } from '../../components/withLogin';
 import {
   InstitutionType,
@@ -34,8 +35,7 @@ function OnboardingUserComponent() {
   const { t } = useTranslation();
   const location = useLocation();
   const history = useHistory();
-
-  const requestIdRef = useRef<string>();
+  const requestId = uniqueId();
 
   const [loading, setLoading] = useState<boolean>(true);
   const [activeStep, setActiveStep] = useState<number>(0);
@@ -134,7 +134,7 @@ function OnboardingUserComponent() {
     setOutcome(outcomeContent[outcome]);
 
     trackEvent(outcome === 'success' ? 'ONBOARDING_USER_SUCCESS' : 'ONBOARDING_USER_ERROR', {
-      request_id: requestIdRef.current,
+      request_id: requestId,
       party_id: selectedParty?.externalId,
       product_id: selectedProduct?.id,
       from: 'onboarding',
@@ -225,7 +225,7 @@ function OnboardingUserComponent() {
           setOutcome,
           forward: (newFormData: Partial<FormData>) => {
             trackEvent('ONBOARDING_ADD_MANAGER', {
-              request_id: requestIdRef.current,
+              request_id: requestId,
               party_id: selectedParty?.externalId,
               product_id: selectedProduct?.id,
             });
@@ -259,13 +259,13 @@ function OnboardingUserComponent() {
 
             setFormData({ ...formData, ...newFormData });
             trackEvent('ONBOARDING_ADD_DELEGATE', {
-              request_id: requestIdRef.current,
+              request_id: requestId,
               party_id: selectedParty?.externalId,
               product_id: selectedProduct?.id,
             });
             addUserRequest(users).catch(() => {
               trackEvent('ONBOARDING_ADD_NEW_USER', {
-                request_id: requestIdRef.current,
+                request_id: requestId,
                 party_id: selectedParty?.externalId,
                 product_id: selectedProduct?.id,
                 from: 'onboarding',
