@@ -1,6 +1,8 @@
 import {
+    Checkbox,
     FormControl,
     FormControlLabel,
+    FormGroup,
     Grid,
     Paper,
     Radio,
@@ -133,6 +135,26 @@ export function StepAdditionalGpuInformations({ back }: Props) {
                                 <FormControlLabel value="male" control={<Radio />} label={t('additionalGpuDataPage.firstBlock.no')} />
                             </RadioGroup>
                         </FormControl>
+                    </Grid>
+                </Grid>
+            </Paper>
+
+            <Paper elevation={8} sx={{ borderRadius: theme.spacing(2), p: 4, justifyContent: 'center', width: '70%', mt: 4 }}>
+                <Grid container sx={{ textAlign: 'start' }}>
+                    <Grid item xs={12} my={1}>
+                        <Typography sx={{ fontSize: '18px', fontWeight: 600 }}> {t('additionalGpuDataPage.secondBlock.title')}</Typography>
+                    </Grid>
+                    <Grid item xs={12} my={1} p={2}>
+                        <FormGroup>
+                            <FormControlLabel control={<Checkbox />} label={t('additionalGpuDataPage.secondBlock.boxes.first')} sx={{ mb: 1 }} />
+                            <FormControlLabel control={<Checkbox />} label={t('additionalGpuDataPage.secondBlock.boxes.second')} sx={{ mb: 1 }} />
+                            <FormControlLabel control={<Checkbox />} label={t('additionalGpuDataPage.secondBlock.boxes.third')} sx={{ mb: 1 }} />
+                            <FormControlLabel control={<Checkbox />} label={t('additionalGpuDataPage.secondBlock.boxes.fourth')} sx={{ mb: 1 }} />
+                            <FormControlLabel control={<Checkbox />} label={t('additionalGpuDataPage.secondBlock.boxes.fifth')} />
+                        </FormGroup>
+                    </Grid>
+                    <Grid item xs={12} my={1}>
+                        <Typography sx={{ fontSize: '14px', fontWeight: 400, color: 'text.secondary' }}> {t('additionalGpuDataPage.secondBlock.legalBlockFooterInfo')}</Typography>
                     </Grid>
                 </Grid>
             </Paper>
