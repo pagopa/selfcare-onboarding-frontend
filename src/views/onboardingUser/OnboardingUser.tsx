@@ -137,6 +137,7 @@ function OnboardingUserComponent() {
       request_id: requestIdRef.current,
       party_id: selectedParty?.externalId,
       product_id: selectedProduct?.id,
+      from: 'onboarding',
     });
   };
 

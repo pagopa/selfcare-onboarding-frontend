@@ -120,6 +120,7 @@ export function StepAddManager({
 
     if (result === 'success') {
       const response = (request as AxiosResponse).data.result;
+      setIsChangedManager(!response);
       if (!response) {
         trackEvent('CHANGE_LEGAL_REPRESENTATIVE', {
           request_id: requestIdRef.current,
@@ -128,7 +129,6 @@ export function StepAddManager({
           from: 'onboarding',
         });
       }
-      setIsChangedManager(!response);
       if (response) {
         validateUserData(people.LEGAL, 'LEGAL', externalInstitutionId, subProduct);
       }
