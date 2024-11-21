@@ -120,6 +120,14 @@ export function StepAddManager({
 
     if (result === 'success') {
       const response = (request as AxiosResponse).data.result;
+      if (!response) {
+        trackEvent('CHANGE_LEGAL_REPRESENTATIVE', {
+          request_id: requestIdRef.current,
+          party_id: externalInstitutionId,
+          product_id: product?.id,
+          from: 'onboarding',
+        });
+      }
       setIsChangedManager(!response);
       if (response) {
         validateUserData(people.LEGAL, 'LEGAL', externalInstitutionId, subProduct);

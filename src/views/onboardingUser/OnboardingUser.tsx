@@ -117,7 +117,9 @@ function OnboardingUserComponent() {
           institutionType: onboardingFormData?.institutionType ?? institutionType,
           origin: onboardingFormData?.origin,
           originId: onboardingFormData?.originId,
-          subunitCode: selectedParty?.codiceUniUo ? selectedParty.codiceUniUo : selectedParty?.codiceUniAoo,
+          subunitCode: selectedParty?.codiceUniUo
+            ? selectedParty.codiceUniUo
+            : selectedParty?.codiceUniAoo,
           taxCode: onboardingFormData?.taxCode,
           users,
         },
@@ -242,10 +244,10 @@ function OnboardingUserComponent() {
           partyName: selectedParty?.codiceUniAoo
             ? selectedParty.denominazioneAoo
             : selectedParty?.codiceUniUo
-              ? selectedParty.descrizioneUo
-              : selectedParty?.businessName
-                ? selectedParty.businessName
-                : selectedParty?.description ?? '',
+            ? selectedParty.descrizioneUo
+            : selectedParty?.businessName
+            ? selectedParty.businessName
+            : selectedParty?.description ?? '',
           isTechPartner,
           forward: (newFormData: Partial<FormData>) => {
             const users = ((newFormData as any).users as Array<UserOnCreate>).map((u) => ({
@@ -265,6 +267,7 @@ function OnboardingUserComponent() {
                 request_id: requestIdRef.current,
                 party_id: selectedParty?.externalId,
                 product_id: selectedProduct?.id,
+                from: 'onboarding',
               });
             });
           },

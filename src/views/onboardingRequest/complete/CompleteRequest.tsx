@@ -171,7 +171,12 @@ export default function CompleteRequestComponent() {
     const outcome = getFetchOutcome(uploadDocument);
 
     if (outcome === 'success') {
-      trackEvent('ONBOARDING_SUCCESS', { request_id: requestId, party_id: token });
+      trackEvent(addUserFlow ? 'ONBOARDING_USER_SUCCESS' : 'ONBOARDING_SUCCESS', {
+        request_id: requestId,
+        party_id: token,
+        product_id: requestData?.productId,
+        from: 'onboarding',
+      });
       setOutcomeContentState(outcome);
     }
 
