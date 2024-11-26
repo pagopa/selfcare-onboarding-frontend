@@ -38,6 +38,7 @@ import StepInstitutionType from '../../components/steps/StepInstitutionType';
 import UserNotAllowedPage from '../UserNotAllowedPage';
 import { AdditionalData, AdditionalInformations } from '../../model/AdditionalInformations';
 import AlreadyOnboarded from '../AlreadyOnboarded';
+import { AdditionalGpuInformations } from '../../model/AdditionalGpuInformations';
 import { AggregateInstitution } from '../../model/AggregateInstitution';
 import { selected2OnboardingData } from '../../utils/selected2OnboardingData';
 import config from '../../utils/config.json';
@@ -74,7 +75,7 @@ export const prodPhaseOutErrorPage: RequestOutcomeMessage = {
 // eslint-disable-next-line sonarjs/cognitive-complexity
 function OnboardingProductComponent({ productId }: { productId: string }) {
   const [loading, setLoading] = useState(true);
-  const [activeStep, setActiveStep] = useState(0);
+  const [activeStep, setActiveStep] = useState(5);
   const [formData, setFormData] = useState<Partial<FormData>>();
   const [externalInstitutionId, setExternalInstitutionId] = useState<string>('');
   const [outcome, setOutcome] = useState<RequestOutcomeMessage | null>();
@@ -83,6 +84,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>();
   const [onboardingFormData, setOnboardingFormData] = useState<OnboardingFormData>();
   const [additionalInformations, setAdditionalInformations] = useState<AdditionalInformations>();
+  const [_additionalGPUInformations, setAdditionalGPUInformations] = useState<AdditionalGpuInformations>();
   const [institutionType, setInstitutionType] = useState<InstitutionType>();
   const [origin, setOrigin] = useState<string>();
   const [pricingPlan, setPricingPlan] = useState<string>();
@@ -355,8 +357,6 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
         setActiveStep(activeStep + 2);
         break;
       case 'GPU':
-        console.log("passo da qui!");
-        console.log('activeStep', activeStep);
         setActiveStep(3);
         break;
       default:
@@ -381,6 +381,20 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
       ipa: newAdditionalInformations.isFromIPA?.choice,
       ipaCode: newAdditionalInformations.isFromIPA?.textFieldValue,
       otherNote: newAdditionalInformations.optionalPartyInformations?.textFieldValue ?? '',
+    });
+    forward();
+  };
+
+  const forwardWithAdditionalGPUInfo = (newAdditionalGpuInformations: AdditionalGpuInformations) => {
+    setAdditionalGPUInformations({
+      businessRegisterNumber: newAdditionalGpuInformations?.businessRegisterNumber,
+      legalRegisterNumber: newAdditionalGpuInformations?.legalRegisterNumber,
+      legalRegisterName: newAdditionalGpuInformations.legalRegisterName,
+      manager: newAdditionalGpuInformations.manager,
+      managerAuthorized: newAdditionalGpuInformations.managerAuthorized,
+      managerEligible: newAdditionalGpuInformations.managerEligible,
+      managerProsecution: newAdditionalGpuInformations.managerProsecution,
+      institutionCourtMeasures: newAdditionalGpuInformations.institutionCourtMeasures,
     });
     forward();
   };
@@ -641,8 +655,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
       newInstitutionType !== 'SA' &&
       newInstitutionType !== 'AS' &&
       newInstitutionType !== 'SCP' &&
-      newInstitutionType !== 'PRV' &&
-      newInstitutionType !== 'GPU'
+      newInstitutionType !== 'PRV'
     ) {
       if (newInstitutionType !== institutionType) {
         setOnboardingFormData({
@@ -788,10 +801,8 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
       label: 'Insert additional GPU data info',
       Component: () =>
         StepAdditionalGpuInformations({
-          forward: () => console.log('forward!'),
+          forward: forwardWithAdditionalGPUInfo,
           back,
-          originId: onboardingFormData?.originId,
-          origin,
         }),
     },
     {
