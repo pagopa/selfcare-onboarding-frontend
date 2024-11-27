@@ -165,6 +165,14 @@ export interface Problem {
   errors: Array<ProblemError>;
 }
 
+export interface ProblemUserValidate {
+  title: string;
+  status: number;
+  detail: string;
+  instance: string;
+  invalidParams?: Array<{ name: string; reason: string }>;
+}
+
 export interface ProblemError {
   code: string;
   detail: string;
@@ -239,7 +247,7 @@ export type InstitutionOnboardingInfoResource = {
   institution: InstitutionData;
 };
 
-export type InstitutionType = 'PA' | 'GSP' | 'SCP' | 'PT' | 'PSP' | 'SA' | 'AS' | 'PRV';
+export type InstitutionType = 'PA' | 'GSP' | 'SCP' | 'PT' | 'PSP' | 'SA' | 'AS' | 'PRV' | 'GPU';
 
 export type ANACParty = {
   description: string;
