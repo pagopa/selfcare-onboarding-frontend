@@ -44,8 +44,8 @@ beforeEach(() => {
 });
 
 beforeAll(() => {
-  Object.defineProperty(window, 'location', { value: mockedLocation });
   i18n.changeLanguage('it');
+  Object.defineProperty(window, 'location', { value: mockedLocation });
 });
 
 afterEach(() => {
