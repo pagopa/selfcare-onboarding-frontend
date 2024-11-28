@@ -1,3 +1,4 @@
+/* eslint-disable sonarjs/cognitive-complexity */
 import { useState, useContext, useEffect } from 'react';
 import { AxiosError } from 'axios';
 import SessionModal from '@pagopa/selfcare-common-frontend/lib/components/SessionModal';

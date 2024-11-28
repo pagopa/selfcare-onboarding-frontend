@@ -67,7 +67,7 @@
     "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-react": "^7.26.1",
     "eslint-plugin-react-hooks": "^5.0.0",
-    "eslint-plugin-sonarjs": "^0.10.0",
+    "eslint-plugin-sonarjs": "^0.25.1",
     "prettier": "^3.3.3"
   },
   "resolutions": {
