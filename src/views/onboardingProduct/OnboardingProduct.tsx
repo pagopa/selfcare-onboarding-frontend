@@ -1,3 +1,4 @@
+/* eslint-disable sonarjs/cognitive-complexity */
 import React, { useEffect, useState, useContext, useRef, useMemo } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Container } from '@mui/material';
@@ -38,6 +39,7 @@ import StepInstitutionType from '../../components/steps/StepInstitutionType';
 import UserNotAllowedPage from '../UserNotAllowedPage';
 import { AdditionalData, AdditionalInformations } from '../../model/AdditionalInformations';
 import AlreadyOnboarded from '../AlreadyOnboarded';
+import { AdditionalGpuInformations } from '../../model/AdditionalGpuInformations';
 import { AggregateInstitution } from '../../model/AggregateInstitution';
 import { selected2OnboardingData } from '../../utils/selected2OnboardingData';
 import config from '../../utils/config.json';
@@ -45,6 +47,7 @@ import { genericError, StepVerifyOnboarding } from './components/StepVerifyOnboa
 import { StepAddAdmin } from './components/StepAddAdmin';
 import { StepAdditionalInformations } from './components/StepAdditionalInformations';
 import { StepUploadAggregates } from './components/StepUploadAggregates';
+import { StepAdditionalGpuInformations } from './components/StepAdditionalGpuInformations';
 
 export type ValidateErrorType = 'conflictError';
 
@@ -82,6 +85,8 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>();
   const [onboardingFormData, setOnboardingFormData] = useState<OnboardingFormData>();
   const [additionalInformations, setAdditionalInformations] = useState<AdditionalInformations>();
+  const [additionalGPUInformations, setAdditionalGPUInformations] =
+    useState<AdditionalGpuInformations>();
   const [institutionType, setInstitutionType] = useState<InstitutionType>();
   const [origin, setOrigin] = useState<string>();
   const [pricingPlan, setPricingPlan] = useState<string>();
@@ -341,15 +346,24 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
   };
 
   const forwardWithBillingData = (newOnboardingFormData: OnboardingFormData) => {
-    trackEvent('ONBOARDING_BILLING_DATA', {
+    const trackingData = {
       request_id: requestIdRef.current,
       party_id: externalInstitutionId,
       product_id: productId,
       geographic_taxonomies: newOnboardingFormData.geographicTaxonomies,
-    });
+    };
+    trackEvent('ONBOARDING_BILLING_DATA', trackingData);
     setOnboardingFormData(newOnboardingFormData);
-    if (institutionType === 'PA') {
-      setActiveStep(activeStep + 2);
+    switch (institutionType) {
+      case 'PA':
+        setActiveStep(activeStep + 3);
+        break;
+      case 'GPU':
+        setActiveStep(3);
+        break;
+      default:
+        forward();
+        break;
     }
   };
 
@@ -371,6 +385,22 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
       otherNote: newAdditionalInformations.optionalPartyInformations?.textFieldValue ?? '',
     });
     forward();
+  };
+
+  const forwardWithAdditionalGPUInfo = (
+    newAdditionalGpuInformations: AdditionalGpuInformations
+  ) => {
+    setAdditionalGPUInformations({
+      businessRegisterNumber: newAdditionalGpuInformations?.businessRegisterNumber,
+      legalRegisterNumber: newAdditionalGpuInformations?.legalRegisterNumber,
+      legalRegisterName: newAdditionalGpuInformations.legalRegisterName,
+      manager: newAdditionalGpuInformations.manager,
+      managerAuthorized: newAdditionalGpuInformations.managerAuthorized,
+      managerEligible: newAdditionalGpuInformations.managerEligible,
+      managerProsecution: newAdditionalGpuInformations.managerProsecution,
+      institutionCourtMeasures: newAdditionalGpuInformations.institutionCourtMeasures,
+    });
+    setActiveStep(activeStep + 2);
   };
 
   const outcomeContent: RequestOutcomeOptions = {
@@ -481,6 +511,14 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
                   otherNote: additionalInformations?.otherNote,
                 }
               : undefined,
+          gpuData:
+            institutionType === 'GPU' &&
+            (selectedProduct?.id === 'prod-pagopa' ||
+              selectedProduct?.id === 'prod-interop' ||
+              selectedProduct?.id === 'prod-io-sign' ||
+              selectedProduct?.id === 'prod-io')
+              ? additionalGPUInformations
+              : undefined,
           pspData:
             institutionType === 'PSP'
               ? pspData2pspDataRequest(onboardingFormData as OnboardingFormData)
@@ -521,8 +559,8 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           subunitType: onboardingFormData?.uoUniqueCode
             ? 'UO'
             : onboardingFormData?.aooUniqueCode
-            ? 'AOO'
-            : undefined,
+              ? 'AOO'
+              : undefined,
           taxCode: onboardingFormData?.taxCode,
           isAggregator: onboardingFormData?.isAggregator
             ? onboardingFormData?.isAggregator
@@ -772,11 +810,21 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
         }),
     },
     {
+      label: 'Insert additional GPU data info',
+      Component: () =>
+        StepAdditionalGpuInformations({
+          forward: forwardWithAdditionalGPUInfo,
+          back: () => setActiveStep(activeStep - 1),
+          originId: onboardingFormData?.originId,
+          origin,
+        }),
+    },
+    {
       label: 'Insert additional info',
       Component: () =>
         StepAdditionalInformations({
           forward: forwardWithAdditionalGSPInfo,
-          back,
+          back: () => setActiveStep(activeStep - 2),
           originId: onboardingFormData?.originId,
           origin,
         }),
@@ -833,7 +881,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           },
           back: () => {
             if (isTechPartner) {
-              setActiveStep(activeStep - 3);
+              setActiveStep(activeStep - 4);
             } else {
               setActiveStep(activeStep - 1);
             }

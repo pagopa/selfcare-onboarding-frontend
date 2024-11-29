@@ -1,3 +1,4 @@
+/* eslint-disable sonarjs/cognitive-complexity */
 import { Grid, Paper, TextField, Typography, IconButton } from '@mui/material';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -120,24 +121,24 @@ function validateNoMandatory(
         id === 'taxCode'
           ? `${id}-regexp`
           : regexp && user[id] && !regexp.test(user[id] as string) && id === 'email'
-          ? `${id}-regexp`
-          : unique &&
-            usersArray &&
-            usersArray.findIndex(
-              (u) => !addUserFlow && stringEquals(u[id], user[id], caseSensitive)
-            ) > -1
-          ? `${id}-unique`
-          : id === 'name' &&
-            user.name &&
-            verifyNameMatchWithTaxCode(user.name, user.taxCode) &&
-            !isAuthUser
-          ? `${id}-conflict`
-          : id === 'surname' &&
-            user.surname &&
-            verifySurnameMatchWithTaxCode(user.surname, user.taxCode) &&
-            !isAuthUser
-          ? `${id}-conflict`
-          : undefined
+            ? `${id}-regexp`
+            : unique &&
+                usersArray &&
+                usersArray.findIndex(
+                  (u) => !addUserFlow && stringEquals(u[id], user[id], caseSensitive)
+                ) > -1
+              ? `${id}-unique`
+              : id === 'name' &&
+                  user.name &&
+                  verifyNameMatchWithTaxCode(user.name, user.taxCode) &&
+                  !isAuthUser
+                ? `${id}-conflict`
+                : id === 'surname' &&
+                    user.surname &&
+                    verifySurnameMatchWithTaxCode(user.surname, user.taxCode) &&
+                    !isAuthUser
+                  ? `${id}-conflict`
+                  : undefined
       )
       .filter((x) => x)
       .map((x) => x as ValidationErrorCode)
@@ -150,6 +151,7 @@ const transcodeFormErrorKey = (
   t: TFunction<'translation', undefined>
 ) => (errorKey ? t(`platformUserForm.fields.${idField}.errors.${errorKey}`) : '');
 
+/* eslint-disable sonarjs/cognitive-complexity */
 export function PlatformUserForm({
   prefix,
   role,
@@ -202,13 +204,13 @@ export function PlatformUserForm({
       ? error.indexOf('regexp') > -1
         ? transcodeFormErrorKey(field, regexpMessageKey, t)
         : error.indexOf('unique') > -1
-        ? transcodeFormErrorKey(field, uniqueMessageKey, t)
-        : error.indexOf('conflict') > -1
-        ? transcodeFormErrorKey(field, conflictMessageKey, t)
-        : t('platformUserForm.helperText')
+          ? transcodeFormErrorKey(field, uniqueMessageKey, t)
+          : error.indexOf('conflict') > -1
+            ? transcodeFormErrorKey(field, conflictMessageKey, t)
+            : t('platformUserForm.helperText')
       : hasDescription
-      ? t(`platformUserForm.fields.${field}.description`)
-      : '';
+        ? t(`platformUserForm.fields.${field}.description`)
+        : '';
 
   return (
     <Paper
