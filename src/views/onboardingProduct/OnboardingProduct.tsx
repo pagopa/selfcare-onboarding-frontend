@@ -1,3 +1,4 @@
+/* eslint-disable sonarjs/cognitive-complexity */
 import React, { useEffect, useState, useContext, useRef, useMemo } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Container } from '@mui/material';
@@ -558,8 +559,8 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           subunitType: onboardingFormData?.uoUniqueCode
             ? 'UO'
             : onboardingFormData?.aooUniqueCode
-            ? 'AOO'
-            : undefined,
+              ? 'AOO'
+              : undefined,
           taxCode: onboardingFormData?.taxCode,
           isAggregator: onboardingFormData?.isAggregator
             ? onboardingFormData?.isAggregator

@@ -4,10 +4,15 @@ import CancelRequestPage from '../pages/CancelRequestPage';
 import '../../../../locale';
 import { buildAssistanceURI } from '@pagopa/selfcare-common-frontend/lib/services/assistanceService';
 import CancelRequestComponent from '../CancelRequest';
+import i18n from '@pagopa/selfcare-common-frontend/lib/locale/locale-utils';
 
 jest.mock('../../../../lib/api-utils');
 
 let fetchWithLogsSpy: jest.SpyInstance;
+
+beforeAll(() => {
+  i18n.changeLanguage('it');
+});
 
 beforeEach(() => {
   fetchWithLogsSpy = jest.spyOn(require('../../../../lib/api-utils'), 'fetchWithLogs');

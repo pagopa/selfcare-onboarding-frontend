@@ -10,22 +10,9 @@ import { createMemoryHistory } from 'history';
 import { nationalValue } from '../../../model/GeographicTaxonomies';
 import React from 'react';
 import { mockRetrievePlanPrices } from '../../../lib/__mocks__/mockApiRequests';
-
-jest.mock('../../../lib/api-utils');
-
-const originalFetch = global.fetch;
+import i18n from '@pagopa/selfcare-common-frontend/lib/locale/locale-utils';
 
 jest.setTimeout(20000);
-
-let fetchWithLogsSpy: jest.SpyInstance;
-
-beforeEach(() => {
-  fetchWithLogsSpy = jest.spyOn(require('../../../lib/api-utils'), 'fetchWithLogs');
-});
-
-afterEach(() => {
-  global.fetch = originalFetch;
-})
 
 const oldWindowLocation = global.window.location;
 const initialLocation = {
@@ -36,19 +23,13 @@ const initialLocation = {
   hash: '',
   state: undefined,
 };
+
 const mockedLocation = Object.assign({}, initialLocation);
-
-beforeAll(() => {
-  Object.defineProperty(window, 'location', { value: mockedLocation });
-});
-afterAll(() => {
-  Object.defineProperty(window, 'location', { value: oldWindowLocation });
-});
-
-beforeEach(() => Object.assign(mockedLocation, initialLocation));
-
 const mockedHistoryPush = jest.fn();
+const originalFetch = global.fetch;
+let fetchWithLogsSpy: jest.SpyInstance;
 
+jest.mock('../../../lib/api-utils');
 jest.mock('react-router-dom', () => ({
   useHistory: () => ({
     push: mockedHistoryPush,
@@ -56,6 +37,24 @@ jest.mock('react-router-dom', () => ({
     replace: (nextLocation) => Object.assign(mockedLocation, nextLocation),
   }),
 }));
+
+beforeEach(() => {
+  fetchWithLogsSpy = jest.spyOn(require('../../../lib/api-utils'), 'fetchWithLogs');
+  Object.assign(mockedLocation, initialLocation);
+});
+
+beforeAll(() => {
+  i18n.changeLanguage('it');
+  Object.defineProperty(window, 'location', { value: mockedLocation });
+});
+
+afterEach(() => {
+  global.fetch = originalFetch;
+});
+
+afterAll(() => {
+  Object.defineProperty(window, 'location', { value: oldWindowLocation });
+});
 
 const renderComponent = (
   productId: string = 'prod-io',
@@ -85,7 +84,7 @@ const renderComponent = (
           }}
         >
           <UserContext.Provider
-            value={{ user, setUser, requiredLogin: false, setRequiredLogin: () => { } }}
+            value={{ user, setUser, requiredLogin: false, setRequiredLogin: () => {} }}
           >
             <button onClick={() => onExit?.(() => window.location.assign(ENV.URL_FE.LOGOUT))}>
               LOGOUT
@@ -190,95 +189,95 @@ const executeStepSelectPricingPlan = async () => {
 
   const mockRetrievePlanPrices = {
     consumptionPlan: {
-      pricingPlan: "C0",
+      pricingPlan: 'C0',
       echelons: [
         {
-          from: "1",
-          to: "100.000",
-          price: "0,25"
+          from: '1',
+          to: '100.000',
+          price: '0,25',
         },
         {
-          from: "100.001",
-          to: "500.000",
-          price: "0,24"
+          from: '100.001',
+          to: '500.000',
+          price: '0,24',
         },
         {
-          from: "500.001",
-          to: "1.000.000",
-          price: "0,22"
+          from: '500.001',
+          to: '1.000.000',
+          price: '0,22',
         },
         {
-          from: "1.000.001",
-          to: "1.500.000",
-          price: "0,20"
+          from: '1.000.001',
+          to: '1.500.000',
+          price: '0,20',
         },
         {
-          from: "1.500.001",
-          to: "2.000.000",
-          price: "0,18"
+          from: '1.500.001',
+          to: '2.000.000',
+          price: '0,18',
         },
         {
-          from: "2.000.001",
-          to: "5.000.000",
-          price: "0,15"
+          from: '2.000.001',
+          to: '5.000.000',
+          price: '0,15',
         },
         {
-          from: "5.000.000",
-          to: "",
-          price: "0,11"
-        }
-      ]
+          from: '5.000.000',
+          to: '',
+          price: '0,11',
+        },
+      ],
     },
     carnetPlans: [
       {
-        pricingPlan: "C1",
-        messages: "1.000",
-        messagePrice: "0,22",
-        carnetPrice: "220,00"
+        pricingPlan: 'C1',
+        messages: '1.000',
+        messagePrice: '0,22',
+        carnetPrice: '220,00',
       },
       {
-        pricingPlan: "C2",
-        messages: "10.000",
-        messagePrice: "0,218",
-        carnetPrice: "2.175,00"
+        pricingPlan: 'C2',
+        messages: '10.000',
+        messagePrice: '0,218',
+        carnetPrice: '2.175,00',
       },
       {
-        pricingPlan: "C3",
-        messages: "50.000",
-        messagePrice: "0,215",
-        carnetPrice: "10.750,00"
+        pricingPlan: 'C3',
+        messages: '50.000',
+        messagePrice: '0,215',
+        carnetPrice: '10.750,00',
       },
       {
-        pricingPlan: "C4",
-        messages: "100.000",
-        messagePrice: "0,213",
-        carnetPrice: "21.250,00"
+        pricingPlan: 'C4',
+        messages: '100.000',
+        messagePrice: '0,213',
+        carnetPrice: '21.250,00',
       },
       {
-        pricingPlan: "C5",
-        messages: "250.000",
-        messagePrice: "0,210",
-        carnetPrice: "52.500,00"
+        pricingPlan: 'C5',
+        messages: '250.000',
+        messagePrice: '0,210',
+        carnetPrice: '52.500,00',
       },
       {
-        pricingPlan: "C6",
-        messages: "500.000",
-        messagePrice: "0,205",
-        carnetPrice: "102.500,00"
+        pricingPlan: 'C6',
+        messages: '500.000',
+        messagePrice: '0,205',
+        carnetPrice: '102.500,00',
       },
       {
-        pricingPlan: "C7",
-        messages: "1.000.000",
-        messagePrice: "0,2",
-        carnetPrice: "200.000,00"
+        pricingPlan: 'C7',
+        messages: '1.000.000',
+        messagePrice: '0,2',
+        carnetPrice: '200.000,00',
       },
       {
-        pricingPlan: "C8",
-        messages: "3.000.000",
-        messagePrice: "0,16",
-        carnetPrice: "480.000,00"
-      }
-    ]
+        pricingPlan: 'C8',
+        messages: '3.000.000',
+        messagePrice: '0,16',
+        carnetPrice: '480.000,00',
+      },
+    ],
   };
 
   global.fetch = jest.fn().mockResolvedValueOnce({
@@ -293,7 +292,9 @@ const executeStepSelectPricingPlan = async () => {
   fireEvent.click(showMoreCarnet);
 
   await waitFor(() =>
-    mockRetrievePlanPrices.carnetPlans.forEach((c) => expect(document.getElementById(c.pricingPlan) as HTMLElement).toBeInTheDocument())
+    mockRetrievePlanPrices.carnetPlans.forEach((c) =>
+      expect(document.getElementById(c.pricingPlan) as HTMLElement).toBeInTheDocument()
+    )
   );
 
   await waitFor(() => screen.getByText('1.000'));
@@ -309,7 +310,9 @@ const executeStepSelectPricingPlan = async () => {
   fireEvent.click(showMoreConsumption);
 
   await waitFor(() =>
-    mockRetrievePlanPrices.consumptionPlan.echelons.forEach((c) => expect(screen.getByText(c.price.slice(-2).concat('€ / mess'))).toBeInTheDocument())
+    mockRetrievePlanPrices.consumptionPlan.echelons.forEach((c) =>
+      expect(screen.getByText(c.price.slice(-2).concat('€ / mess'))).toBeInTheDocument()
+    )
   );
 
   const chooseConsumption = document.getElementById('forwardConsumptionPlan') as HTMLElement;

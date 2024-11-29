@@ -9,6 +9,7 @@ import '../../../locale';
 import { MemoryRouter } from 'react-router-dom';
 import OnboardingUser from '../OnboardingUser';
 import { mockPartyRegistry, mockedProducts } from '../../../lib/__mocks__/mockApiRequests';
+import i18n from '@pagopa/selfcare-common-frontend/lib/locale/locale-utils';
 
 type Search = 'taxCode' | 'aooCode' | 'uoCode' | 'ivassCode';
 
@@ -18,6 +19,10 @@ let fetchWithLogsSpy: jest.SpyInstance;
 
 beforeEach(() => {
   fetchWithLogsSpy = jest.spyOn(require('../../../lib/api-utils'), 'fetchWithLogs');
+});
+
+beforeAll(() => {
+  i18n.changeLanguage('it');
 });
 
 const renderComponent = (productId: string, fromAlreadyOnboarded: boolean) => {
