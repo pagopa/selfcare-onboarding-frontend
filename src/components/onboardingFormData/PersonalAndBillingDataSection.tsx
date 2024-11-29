@@ -935,7 +935,7 @@ export default function PersonalAndBillingDataSection({
         {(isInformationCompany ||
           isContractingAuthority ||
           ((productId === 'prod-interop' || productId === 'prod-pagopa') &&
-            (institutionType === 'SCP' || institutionType === 'PRV'))) && (
+            (institutionType === 'SCP' || institutionType === 'PRV' || institutionType === 'GPU'))) && (
             <>
               <Grid item xs={12}>
                 {/* Luogo di iscrizione al Registro delle Imprese facoltativo per institution Type !== 'PA' e 'PSP */}

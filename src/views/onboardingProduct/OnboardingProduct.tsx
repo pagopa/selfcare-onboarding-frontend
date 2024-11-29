@@ -75,7 +75,7 @@ export const prodPhaseOutErrorPage: RequestOutcomeMessage = {
 // eslint-disable-next-line sonarjs/cognitive-complexity
 function OnboardingProductComponent({ productId }: { productId: string }) {
   const [loading, setLoading] = useState(true);
-  const [activeStep, setActiveStep] = useState(5);
+  const [activeStep, setActiveStep] = useState(0);
   const [formData, setFormData] = useState<Partial<FormData>>();
   const [externalInstitutionId, setExternalInstitutionId] = useState<string>('');
   const [outcome, setOutcome] = useState<RequestOutcomeMessage | null>();
@@ -84,7 +84,8 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>();
   const [onboardingFormData, setOnboardingFormData] = useState<OnboardingFormData>();
   const [additionalInformations, setAdditionalInformations] = useState<AdditionalInformations>();
-  const [_additionalGPUInformations, setAdditionalGPUInformations] = useState<AdditionalGpuInformations>();
+  const [additionalGPUInformations, setAdditionalGPUInformations] =
+    useState<AdditionalGpuInformations>();
   const [institutionType, setInstitutionType] = useState<InstitutionType>();
   const [origin, setOrigin] = useState<string>();
   const [pricingPlan, setPricingPlan] = useState<string>();
@@ -121,33 +122,33 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     title: '',
     description: isTechPartner
       ? [
-        <React.Fragment key="0">
-          <EndingPage
-            minHeight="52vh"
-            variantTitle="h4"
-            variantDescription="body1"
-            icon={<IllusError size={60} />}
-            title={<Trans i18nKey="stepVerifyOnboarding.ptAlreadyOnboarded.title" />}
-            description={
-              <Trans i18nKey="stepVerifyOnboarding.ptAlreadyOnboarded.description">
-                Per operare su un prodotto, chiedi a un Amministratore di <br /> aggiungerti nella
-                sezione Utenti.
-              </Trans>
-            }
-            buttonLabel={<Trans i18nKey="stepVerifyOnboarding.ptAlreadyOnboarded.backAction" />}
-            onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
-          />
-        </React.Fragment>,
-      ]
+          <React.Fragment key="0">
+            <EndingPage
+              minHeight="52vh"
+              variantTitle="h4"
+              variantDescription="body1"
+              icon={<IllusError size={60} />}
+              title={<Trans i18nKey="stepVerifyOnboarding.ptAlreadyOnboarded.title" />}
+              description={
+                <Trans i18nKey="stepVerifyOnboarding.ptAlreadyOnboarded.description">
+                  Per operare su un prodotto, chiedi a un Amministratore di <br /> aggiungerti nella
+                  sezione Utenti.
+                </Trans>
+              }
+              buttonLabel={<Trans i18nKey="stepVerifyOnboarding.ptAlreadyOnboarded.backAction" />}
+              onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+            />
+          </React.Fragment>,
+        ]
       : [
-        <React.Fragment key="0">
-          <AlreadyOnboarded
-            onboardingFormData={onboardingFormData}
-            selectedProduct={selectedProduct}
-            institutionType={institutionType}
-          />
-        </React.Fragment>,
-      ],
+          <React.Fragment key="0">
+            <AlreadyOnboarded
+              onboardingFormData={onboardingFormData}
+              selectedProduct={selectedProduct}
+              institutionType={institutionType}
+            />
+          </React.Fragment>,
+        ],
   };
 
   useEffect(() => {
@@ -354,7 +355,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     setOnboardingFormData(newOnboardingFormData);
     switch (institutionType) {
       case 'PA':
-        setActiveStep(activeStep + 2);
+        setActiveStep(activeStep + 3);
         break;
       case 'GPU':
         setActiveStep(3);
@@ -385,7 +386,9 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     forward();
   };
 
-  const forwardWithAdditionalGPUInfo = (newAdditionalGpuInformations: AdditionalGpuInformations) => {
+  const forwardWithAdditionalGPUInfo = (
+    newAdditionalGpuInformations: AdditionalGpuInformations
+  ) => {
     setAdditionalGPUInformations({
       businessRegisterNumber: newAdditionalGpuInformations?.businessRegisterNumber,
       legalRegisterNumber: newAdditionalGpuInformations?.legalRegisterNumber,
@@ -396,7 +399,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
       managerProsecution: newAdditionalGpuInformations.managerProsecution,
       institutionCourtMeasures: newAdditionalGpuInformations.institutionCourtMeasures,
     });
-    forward();
+    setActiveStep(activeStep + 2);
   };
 
   const outcomeContent: RequestOutcomeOptions = {
@@ -494,18 +497,26 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           additionalInformations:
             institutionType === 'GSP' && selectedProduct?.id === 'prod-pagopa'
               ? {
-                agentOfPublicService: additionalInformations?.agentOfPublicService,
-                agentOfPublicServiceNote: additionalInformations?.agentOfPublicServiceNote,
-                belongRegulatedMarket: additionalInformations?.belongRegulatedMarket,
-                regulatedMarketNote: additionalInformations?.regulatedMarketNote,
-                establishedByRegulatoryProvision:
-                  additionalInformations?.establishedByRegulatoryProvision,
-                establishedByRegulatoryProvisionNote:
-                  additionalInformations?.establishedByRegulatoryProvisionNote,
-                ipa: additionalInformations?.ipa,
-                ipaCode: additionalInformations?.ipaCode,
-                otherNote: additionalInformations?.otherNote,
-              }
+                  agentOfPublicService: additionalInformations?.agentOfPublicService,
+                  agentOfPublicServiceNote: additionalInformations?.agentOfPublicServiceNote,
+                  belongRegulatedMarket: additionalInformations?.belongRegulatedMarket,
+                  regulatedMarketNote: additionalInformations?.regulatedMarketNote,
+                  establishedByRegulatoryProvision:
+                    additionalInformations?.establishedByRegulatoryProvision,
+                  establishedByRegulatoryProvisionNote:
+                    additionalInformations?.establishedByRegulatoryProvisionNote,
+                  ipa: additionalInformations?.ipa,
+                  ipaCode: additionalInformations?.ipaCode,
+                  otherNote: additionalInformations?.otherNote,
+                }
+              : undefined,
+          gpuData:
+            institutionType === 'GPU' &&
+            (selectedProduct?.id === 'prod-pagopa' ||
+              selectedProduct?.id === 'prod-interop' ||
+              selectedProduct?.id === 'prod-io-sign' ||
+              selectedProduct?.id === 'prod-io')
+              ? additionalGPUInformations
               : undefined,
           pspData:
             institutionType === 'PSP'
@@ -513,20 +524,20 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
               : undefined,
           companyInformations:
             onboardingFormData?.businessRegisterPlace ||
-              onboardingFormData?.rea ||
-              onboardingFormData?.shareCapital
+            onboardingFormData?.rea ||
+            onboardingFormData?.shareCapital
               ? {
-                businessRegisterPlace: onboardingFormData?.businessRegisterPlace,
-                rea: onboardingFormData?.rea,
-                shareCapital: onboardingFormData?.shareCapital,
-              }
+                  businessRegisterPlace: onboardingFormData?.businessRegisterPlace,
+                  rea: onboardingFormData?.rea,
+                  shareCapital: onboardingFormData?.shareCapital,
+                }
               : undefined,
           institutionType,
           originId: onboardingFormData?.originId,
           geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY
             ? onboardingFormData?.geographicTaxonomies?.map((gt) =>
-              onboardedInstitutionInfo2geographicTaxonomy(gt)
-            )
+                onboardedInstitutionInfo2geographicTaxonomy(gt)
+              )
             : [],
           institutionLocationData: {
             country:
@@ -547,8 +558,8 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           subunitType: onboardingFormData?.uoUniqueCode
             ? 'UO'
             : onboardingFormData?.aooUniqueCode
-              ? 'AOO'
-              : undefined,
+            ? 'AOO'
+            : undefined,
           taxCode: onboardingFormData?.taxCode,
           isAggregator: onboardingFormData?.isAggregator
             ? onboardingFormData?.isAggregator
@@ -802,7 +813,9 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
       Component: () =>
         StepAdditionalGpuInformations({
           forward: forwardWithAdditionalGPUInfo,
-          back,
+          back: () => setActiveStep(activeStep - 1),
+          originId: onboardingFormData?.originId,
+          origin,
         }),
     },
     {
@@ -810,7 +823,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
       Component: () =>
         StepAdditionalInformations({
           forward: forwardWithAdditionalGSPInfo,
-          back,
+          back: () => setActiveStep(activeStep - 2),
           originId: onboardingFormData?.originId,
           origin,
         }),
@@ -867,7 +880,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           },
           back: () => {
             if (isTechPartner) {
-              setActiveStep(activeStep - 3);
+              setActiveStep(activeStep - 4);
             } else {
               setActiveStep(activeStep - 1);
             }

@@ -24,10 +24,9 @@ type Props = StepperStepComponentProps & {
   originId?: string;
   origin?: string;
 };
-export function StepAdditionalGpuInformations({ back /* forward */ }: Props) {
+export function StepAdditionalGpuInformations({ back, forward /* origin, originId  */ }: Props) {
   const { t } = useTranslation();
   const theme = useTheme();
-
   const [additionalGpuInformations, setAdditionalGpuInformations] =
     useState<AdditionalGpuInformations>({
       businessRegisterNumber: undefined,
@@ -55,6 +54,7 @@ export function StepAdditionalGpuInformations({ back /* forward */ }: Props) {
     isPartyProvidingAService: true,
   });
 
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   const handleAbleDisableAndCleanField = (fieldName: string, value: any) => {
     // Una sola chiamata per aggiornare lo stato
     setAdditionalGpuInformations((prev) => {
@@ -96,6 +96,24 @@ export function StepAdditionalGpuInformations({ back /* forward */ }: Props) {
 
       return updatedDisabledState;
     });
+
+    setErrors((prev) => {
+      const updatedErrors = { ...prev };
+
+      if (fieldName === 'isPartyRegistered' && value === 'false') {
+        // eslint-disable-next-line functional/immutable-data
+        delete updatedErrors.businessRegisterNumber;
+        // eslint-disable-next-line functional/immutable-data
+        delete updatedErrors.legalRegisterNumber;
+      }
+
+      if (fieldName === 'isPartyProvidingAService' && value === 'false') {
+        // eslint-disable-next-line functional/immutable-data
+        delete updatedErrors.legalRegisterName;
+      }
+
+      return updatedErrors;
+    });
   };
 
   const handleFieldChange = (
@@ -105,6 +123,22 @@ export function StepAdditionalGpuInformations({ back /* forward */ }: Props) {
   ) => {
     switch (fieldType) {
       case 'text':
+        const onlyAlfaNumericValue =
+          typeof value === 'string' ? value.replace(/[^a-zA-Z0-9]/g, '') : value;
+        const onlyNumberValue = typeof value === 'string' ? value.replace(/[^0-9]/g, '') : value;
+        const onlyAlfaNumericWithSpaceValue =
+          typeof value === 'string' ? value.replace(/[^a-zA-Z0-9 ]/g, '') : value;
+
+        setAdditionalGpuInformations((prev) => ({
+          ...prev,
+          [fieldName]:
+            fieldName === 'businessRegisterNumber'
+              ? onlyAlfaNumericValue
+              : fieldName === 'legalRegisterNumber'
+              ? onlyNumberValue
+              : onlyAlfaNumericWithSpaceValue,
+        }));
+        return;
       case 'checkbox':
         setAdditionalGpuInformations((prev) => ({
           ...prev,
@@ -155,28 +189,8 @@ export function StepAdditionalGpuInformations({ back /* forward */ }: Props) {
       setErrors(newErrors);
     } else {
       // Procedi se non ci sono errori
-      //   forward(additionalGpuInformations);
+      forward(additionalGpuInformations);
       console.log('forward with this data: ', additionalGpuInformations);
-    }
-  };
-
-  const disabledContinueButton = () => {
-    if (
-      (radioValues.isPartyRegistered &&
-        radioValues.isPartyProvidingAService &&
-        radioValues.frequencyOfPayment) === null
-    ) {
-      return true;
-    } else if (
-      radioValues.isPartyRegistered &&
-      radioValues.isPartyProvidingAService &&
-      (additionalGpuInformations.businessRegisterNumber &&
-        additionalGpuInformations.legalRegisterNumber &&
-        additionalGpuInformations.legalRegisterName) !== undefined
-    ) {
-      return false;
-    } else {
-      return true;
     }
   };
 
@@ -188,7 +202,7 @@ export function StepAdditionalGpuInformations({ back /* forward */ }: Props) {
         </Grid>
         <Grid item xs={12} mb={4}>
           <Typography variant="body2" fontSize={'18px'}>
-            <Trans i18nKey="additionalGpuDataPage.subTitle" components={{ 1: <br /> }} />+
+            <Trans i18nKey="additionalGpuDataPage.subTitle" components={{ 1: <br /> }} />
           </Typography>
         </Grid>
       </Grid>
@@ -207,6 +221,7 @@ export function StepAdditionalGpuInformations({ back /* forward */ }: Props) {
           <Grid item xs={12} my={1}>
             <FormControl>
               <RadioGroup
+                id="isPartyRegistered"
                 aria-labelledby="demo-controlled-radio-buttons-group"
                 name="isPartyRegistered"
                 value={radioValues.isPartyRegistered}
@@ -215,11 +230,13 @@ export function StepAdditionalGpuInformations({ back /* forward */ }: Props) {
                 }
               >
                 <FormControlLabel
+                  id="isPartyRegisteredTrue"
                   value="true"
                   control={<Radio />}
                   label={t('additionalGpuDataPage.firstBlock.yes')}
                 />
                 <FormControlLabel
+                  id="isPartyRegisteredFalse"
                   value="false"
                   control={<Radio />}
                   label={t('additionalGpuDataPage.firstBlock.no')}
@@ -291,11 +308,13 @@ export function StepAdditionalGpuInformations({ back /* forward */ }: Props) {
                 }
               >
                 <FormControlLabel
+                  id="isPartyProvidingAServiceTrue"
                   value="true"
                   control={<Radio />}
                   label={t('additionalGpuDataPage.firstBlock.yes')}
                 />
                 <FormControlLabel
+                  id="isPartyProvidingAServiceFalse"
                   value="false"
                   control={<Radio />}
                   label={t('additionalGpuDataPage.firstBlock.no')}
@@ -345,12 +364,14 @@ export function StepAdditionalGpuInformations({ back /* forward */ }: Props) {
                 }
               >
                 <FormControlLabel
+                  id="frequencyOfPaymentTrue"
                   value="true"
                   control={<Radio />}
                   label={t('additionalGpuDataPage.firstBlock.yes')}
                 />
                 <FormControlLabel
                   value="false"
+                  id="frequencyOfPaymentFalse"
                   control={<Radio />}
                   label={t('additionalGpuDataPage.firstBlock.no')}
                 />
@@ -376,6 +397,7 @@ export function StepAdditionalGpuInformations({ back /* forward */ }: Props) {
               <FormControlLabel
                 control={
                   <Checkbox
+                    id="manager"
                     name="manager"
                     onChange={() =>
                       handleFieldChange('manager', !additionalGpuInformations.manager, 'checkbox')
@@ -389,6 +411,7 @@ export function StepAdditionalGpuInformations({ back /* forward */ }: Props) {
               <FormControlLabel
                 control={
                   <Checkbox
+                    id="managerAuthorized"
                     name="managerAuthorized"
                     onChange={() =>
                       handleFieldChange(
@@ -406,6 +429,7 @@ export function StepAdditionalGpuInformations({ back /* forward */ }: Props) {
               <FormControlLabel
                 control={
                   <Checkbox
+                    id="managerEligible"
                     name="managerEligible"
                     onChange={() =>
                       handleFieldChange(
@@ -423,6 +447,7 @@ export function StepAdditionalGpuInformations({ back /* forward */ }: Props) {
               <FormControlLabel
                 control={
                   <Checkbox
+                    id="managerProsecution"
                     name="managerProsecution"
                     onChange={() =>
                       handleFieldChange(
@@ -440,6 +465,7 @@ export function StepAdditionalGpuInformations({ back /* forward */ }: Props) {
               <FormControlLabel
                 control={
                   <Checkbox
+                    id="institutionCourtMeasures"
                     name="institutionCourtMeasures"
                     onChange={() =>
                       handleFieldChange(
@@ -474,7 +500,10 @@ export function StepAdditionalGpuInformations({ back /* forward */ }: Props) {
           forward={{
             action: validateAndProceed,
             label: t('stepAddManager.continue'),
-            disabled: disabledContinueButton(),
+            disabled:
+              radioValues.isPartyRegistered === null ||
+              radioValues.isPartyProvidingAService === null ||
+              radioValues.frequencyOfPayment === null,
           }}
         />
       </Grid>

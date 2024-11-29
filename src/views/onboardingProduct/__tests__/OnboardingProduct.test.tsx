@@ -216,13 +216,33 @@ test('Test: Successfull complete onboarding request of GSP party without search 
     undefined,
     undefined,
     false,
-    true
+    true,
+    false
   );
   await executeStepBillingData('prod-pagopa', 'GSP', false, false, 'NO_IPA', 'AGENCY X');
   await executeStepAdditionalInfo('NO_IPA');
   await executeStepAddManager();
   await executeStepAddAdmin(true);
   await verifySubmit('prod-pagopa', 'GSP', 'NO_IPA');
+  await executeGoHome(true);
+});
+
+test('Test: Successfull complete onboarding request of GPU for product prod-pagopa', async () => {
+  renderComponent('prod-pagopa');
+  await executeStepInstitutionType('prod-pagopa', 'GPU');
+  await executeStepBillingData(
+    'prod-pagopa',
+    'GPU',
+    false,
+    false,
+    'NO_IPA',
+    'Mocked GPU name',
+    false
+  );
+  await executeStepAdditionalGpuInformations();
+  await executeStepAddManager();
+  await executeStepAddAdmin(true);
+  await verifySubmit('prod-pagopa', 'GPU', 'NO_IPA');
   await executeGoHome(true);
 });
 
@@ -1002,14 +1022,18 @@ const executeStepAdditionalInfo = async (from: 'IPA' | 'NO_IPA' = 'IPA') => {
   await waitFor(() => screen.getByText('Inserisci ulteriori dettagli'));
 
   const continueButton = screen.getByText('Continua');
-  expect(continueButton).toBeDisabled();
+  await waitFor(() => expect(continueButton).toBeDisabled());
 
   if (from === 'IPA') {
-    expect(document.getElementById('isFromIPA-yes')).toBeChecked();
-    expect(document.getElementById('isFromIPA-no')).not.toBeChecked();
+    await waitFor(() => {
+      expect(document.getElementById('isFromIPA-yes')).toBeChecked();
+      expect(document.getElementById('isFromIPA-no')).not.toBeChecked();
+    });
   } else {
-    expect(document.getElementById('isFromIPA-yes')).not.toBeChecked();
-    expect(document.getElementById('isFromIPA-no')).toBeChecked();
+    await waitFor(() => {
+      expect(document.getElementById('isFromIPA-yes')).not.toBeChecked();
+      expect(document.getElementById('isFromIPA-no')).toBeChecked();
+    });
   }
 
   fireEvent.click(document.getElementById('isEstabilishedRegulatoryProvision-no') as HTMLElement);
@@ -1088,6 +1112,106 @@ const executeStepAdditionalInfo = async (from: 'IPA' | 'NO_IPA' = 'IPA') => {
   }
 
   expect(continueButton).toBeEnabled();
+  fireEvent.click(continueButton);
+};
+
+const executeStepAdditionalGpuInformations = async () => {
+  console.log('Testing step additional gpu informations...');
+
+  await waitFor(() =>
+    screen.getByText('Seleziona tra le opzioni quella che descrive il tuo ente.')
+  );
+
+  const continueButton = screen.getByText('Continua');
+  const businessRegisterNumber = document.getElementById(
+    'businessRegisterNumber'
+  ) as HTMLInputElement;
+  const legalRegisterNumber = document.getElementById('legalRegisterNumber') as HTMLInputElement;
+  const legalRegisterName = document.getElementById('legalRegisterName') as HTMLInputElement;
+  const isPartyRegisteredTrue = document.getElementById('isPartyRegisteredTrue') as HTMLElement;
+  const isPartyRegisteredFalse = document.getElementById('isPartyRegisteredFalse') as HTMLElement;
+  const isPartyProvidingAServiceTrue = document.getElementById(
+    'isPartyProvidingAServiceTrue'
+  ) as HTMLElement;
+  const isPartyProvidingAServiceFalse = document.getElementById(
+    'isPartyProvidingAServiceFalse'
+  ) as HTMLElement;
+  const frequencyOfPaymentTrue = document.getElementById('frequencyOfPaymentTrue') as HTMLElement;
+  const manager = document.getElementById('manager') as HTMLElement;
+  const managerAuthorized = document.getElementById('managerAuthorized') as HTMLElement;
+  const managerEligible = document.getElementById('managerEligible') as HTMLElement;
+  const managerProsecution = document.getElementById('managerProsecution') as HTMLElement;
+  const institutionCourtMeasures = document.getElementById(
+    'institutionCourtMeasures'
+  ) as HTMLElement;
+  expect(continueButton).toBeDisabled();
+
+  await waitFor(() => {
+    expect(businessRegisterNumber).toBeDisabled();
+    expect(legalRegisterNumber).toBeDisabled();
+    expect(legalRegisterName).toBeDisabled();
+  });
+
+  fireEvent.click(isPartyRegisteredTrue);
+  fireEvent.click(isPartyProvidingAServiceTrue);
+  fireEvent.click(frequencyOfPaymentTrue);
+
+  expect(continueButton).not.toBeDisabled();
+
+  // Casistica di controllo validazione campi
+  fireEvent.click(continueButton);
+
+  // Pulizia validazione campi
+  fireEvent.click(isPartyRegisteredFalse);
+  fireEvent.click(isPartyProvidingAServiceFalse);
+
+  // Riabilitazione campi di testo per effetturare il change
+  fireEvent.click(isPartyRegisteredTrue);
+  fireEvent.click(isPartyProvidingAServiceTrue);
+
+  await waitFor(() => {
+    expect(businessRegisterNumber).not.toBeDisabled();
+    expect(legalRegisterNumber).not.toBeDisabled();
+    expect(legalRegisterName).not.toBeDisabled();
+  });
+
+  fireEvent.change(businessRegisterNumber, { target: { value: 'a1 ' } });
+  fireEvent.change(legalRegisterNumber, { target: { value: 'a22' } });
+  fireEvent.change(legalRegisterName, { target: { value: 'a 1' } });
+
+  expect(businessRegisterNumber.value).toBe('a1');
+  expect(legalRegisterNumber.value).toBe('22');
+  expect(legalRegisterName.value).toBe('a 1');
+
+  fireEvent.click(isPartyRegisteredFalse);
+  fireEvent.click(isPartyProvidingAServiceFalse);
+
+  expect(businessRegisterNumber.value).toBe('');
+  expect(legalRegisterNumber.value).toBe('');
+  expect(legalRegisterName.value).toBe('');
+
+  fireEvent.click(isPartyRegisteredTrue);
+  fireEvent.click(isPartyProvidingAServiceTrue);
+
+  fireEvent.change(businessRegisterNumber, { target: { value: 'Comunale 12' } });
+  fireEvent.change(legalRegisterNumber, { target: { value: '250301' } });
+  fireEvent.change(legalRegisterName, { target: { value: 'SkiPass' } });
+
+  // Change di tutti i vari checkbox
+  fireEvent.click(manager);
+  fireEvent.click(managerAuthorized);
+  fireEvent.click(managerEligible);
+  fireEvent.click(managerEligible);
+  fireEvent.click(managerProsecution);
+  fireEvent.click(managerProsecution);
+  fireEvent.click(institutionCourtMeasures);
+  fireEvent.click(institutionCourtMeasures);
+
+  expect(manager).toBeChecked();
+  expect(managerAuthorized).toBeChecked();
+  expect(managerEligible).not.toBeChecked();
+  expect(managerProsecution).not.toBeChecked();
+  expect(institutionCourtMeasures).not.toBeChecked();
 
   fireEvent.click(continueButton);
 };
@@ -1909,7 +2033,10 @@ const billingData2billingDataRequest = (
     : // MERGE THIS CONDITIONS
     institutionType === 'PSP'
     ? 'A1B2C3'
-    : (from === 'IPA' || institutionType === 'GSP') && typeOfSearch !== 'aooCode'
+    : (from === 'IPA' ||
+        institutionType === 'GSP' ||
+        (from === 'NO_IPA' && institutionType === 'GPU')) &&
+      typeOfSearch !== 'aooCode'
     ? typeOfSearch === 'taxCode'
       ? 'A3B4C5'
       : 'A1B2C3'
@@ -1980,7 +2107,12 @@ const verifySubmit = async (
             ? mockedAoos[0].codiceUniAoo
             : typeOfSearch === 'uoCode'
             ? mockedUos[0].codiceUniUo
-            : institutionType === 'PRV' && productId === 'prod-pagopa'
+            : (institutionType === 'PRV' && productId === 'prod-pagopa') ||
+              (institutionType === 'GPU' &&
+                (productId === 'prod-pagopa' ||
+                  productId === 'prod-interop' ||
+                  productId === 'prod-io-sign' ||
+                  productId === 'prod-io'))
             ? undefined
             : '991',
           taxCode: errorOnSubmit
@@ -2018,11 +2150,28 @@ const verifySubmit = async (
                   regulatedMarketNote: '',
                 }
               : undefined,
+          gpuData:
+            institutionType === 'GPU' &&
+            (productId === 'prod-pagopa' ||
+              productId === 'prod-interop' ||
+              productId === 'prod-io-sign' ||
+              productId === 'prod-io')
+              ? {
+                  businessRegisterNumber: 'Comunale12',
+                  legalRegisterNumber: '250301',
+                  legalRegisterName: 'SkiPass',
+                  manager: true,
+                  managerAuthorized: true,
+                  managerEligible: false,
+                  managerProsecution: false,
+                  institutionCourtMeasures: false,
+                }
+              : undefined,
           companyInformations:
             ((from === 'ANAC' ||
               from === 'INFOCAMERE' ||
               from === 'PDND_INFOCAMERE' ||
-              (institutionType === 'GSP' && from !== 'IPA')) &&
+              ((institutionType === 'GSP' || institutionType === 'GPU') && from !== 'IPA')) &&
               institutionType !== 'PT') ||
             (institutionType === 'PRV' && productId === 'prod-pagopa')
               ? {
@@ -2111,6 +2260,7 @@ const verifySubmit = async (
           assistanceContacts:
             typeOfSearch !== 'aooCode' &&
             institutionType !== 'PT' &&
+            institutionType !== 'GPU' &&
             (from === 'IPA' || from === 'NO_IPA')
               ? { supportEmail: 'a@a.it' }
               : undefined,
