@@ -38,10 +38,10 @@ test('Test: The correct institution types with the expected descriptions, can be
           expect(institutionTypeValues).toStrictEqual(['PA', 'GSP', 'PT', 'PSP', 'PRV', 'GPU']);
           break;
         case 'prod-io':
-          expect(institutionTypeValues).toStrictEqual(['PA', 'GSP', 'PT', 'GPU']);
+          expect(institutionTypeValues).toStrictEqual(['PA', 'GSP', 'PT']);
           break;
         case 'prod-io-sign':
-          expect(institutionTypeValues).toStrictEqual(['PA', 'GSP', 'GPU']);
+          expect(institutionTypeValues).toStrictEqual(['PA', 'GSP']);
           break;
         case 'prod-idpay':
         case 'prod-pn':
