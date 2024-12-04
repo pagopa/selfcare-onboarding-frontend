@@ -49,7 +49,7 @@ export default {
     },
     upload: {
       product: {
-        title: "Télécharger l’accord d’adhésion",
+        title: 'Télécharger l’accord d’adhésion',
         description: `Carica l’accordo di adesione, firmato digitalmente in <1 />p7m dal Legale Rappresentante.`,
         dropArea: {
           title: 'Glisser/Déposer ici l’accord d’adhésion signé ou bien',
@@ -80,12 +80,13 @@ export default {
     labelStatus: 'Prêt à envoyer',
   },
   inlineSupportLink: {
-    assistanceLink: "contacter l’assistance",
+    assistanceLink: 'contacter l’assistance',
   },
   moreInformationOnRoles: 'Plus d’informations sur les rôles',
   onboardingStep0: {
     title: 'Bienvenue sur le portail Self-care',
-    description: 'En quelques étapes, votre Organisme pourra adhérer et gérer tous les produits PagoPA.',
+    description:
+      'En quelques étapes, votre Organisme pourra adhérer et gérer tous les produits PagoPA.',
     privacyPolicyDescription: 'J’ai lu et compris',
     privacyPolicyLink: 'la Charte de confidentialité et les Conditions d’utilisation du service',
     actionLabel: 'Continuer',
@@ -171,10 +172,11 @@ export default {
       },
     },
     dropArea: {
-      title: "Glisser/Déposer ici le fichier .cvs avec la liste des organismes agrégateurs ou bien",
+      title: 'Glisser/Déposer ici le fichier .cvs avec la liste des organismes agrégateurs ou bien',
       button: 'Charger un document',
     },
-    downloadExampleCsv: 'Vous ne savez pas comment préparer le fichier ? <1>Téléchargez l’exemple</1>',
+    downloadExampleCsv:
+      'Vous ne savez pas comment préparer le fichier ? <1>Téléchargez l’exemple</1>',
     back: 'Retour',
     forward: 'Continuer',
   },
@@ -196,7 +198,7 @@ export default {
     continue: 'Continuer',
   },
   stepAddDelegates: {
-    title: "Indiquer l’Administrateur",
+    title: 'Indiquer l’Administrateur',
     description: {
       flow: {
         onboarding: `Puoi aggiungere da uno a tre Amministratori o suoi delegati. <1/> Saranno i responsabili della gestione di <3>{{productTitle}}</3> e presenti nel contratto di <4 />adesione come delegati dal Legale Rappresentante.`,
@@ -278,8 +280,8 @@ export default {
       email: {
         label: 'E-mail institutionnel',
         errors: {
-          invalid: "L’adresse mail est invalide",
-          duplicate: "L’adresse mail saisie existe déjà",
+          invalid: 'L’adresse mail est invalide',
+          duplicate: 'L’adresse mail saisie existe déjà',
         },
         description: 'Saisir l’adresse e-mail institutionnelle utilisée pour l’organisme',
       },
@@ -292,10 +294,10 @@ export default {
     },
     steps: {
       step0: {
-        label: "Télécharger l’Accord d’Adhésion",
+        label: 'Télécharger l’Accord d’Adhésion',
       },
       step1: {
-        label: "Télécharger l’Accord d’Adhésion",
+        label: 'Télécharger l’Accord d’Adhésion',
       },
     },
     request: {
@@ -361,7 +363,7 @@ export default {
         title: 'Contrôler le document',
         product: {
           message:
-            "Le document téléchargé ne correspond pas à l’Acte d’Adhésion. Vérifiez qu’il est bien correct et téléchargez-le à nouveau.",
+            'Le document téléchargé ne correspond pas à l’Acte d’Adhésion. Vérifiez qu’il est bien correct et téléchargez-le à nouveau.',
         },
         user: {
           message:
@@ -458,7 +460,7 @@ export default {
     alreadyOnboardedError: {
       title: 'Déjà souscrit',
       message:
-        "L’organisme que vous avez sélectionné a déjà souscrit à l’offre <1 /><strong>Premium</strong>.",
+        'L’organisme que vous avez sélectionné a déjà souscrit à l’offre <1 /><strong>Premium</strong>.',
       closeButton: 'Fermer',
     },
     subProductStepSelectPricingPlan: {
@@ -484,7 +486,8 @@ export default {
       carnetPlan: {
         caption: 'PLAN À CARNETS - UNIQUE',
         discountBoxLabel: '25 % de réduction',
-        title: 'Choisissez parmi les {{carnetCount}} différents carnets conçus pour répondre à tous vos besoins',
+        title:
+          'Choisissez parmi les {{carnetCount}} différents carnets conçus pour répondre à tous vos besoins',
         showMore: 'En savoir plus',
         showLess: 'Voir moins',
         description:
@@ -522,11 +525,11 @@ export default {
     selectUserPartyStep: {
       title: 'Sélectionnez votre organisme',
       subTitle:
-        "Sélectionnez l’organisme pour lequel vous demandez à souscrire <1 />à l’offre <3>Premium</3>",
+        'Sélectionnez l’organisme pour lequel vous demandez à souscrire <1 />à l’offre <3>Premium</3>',
       searchLabel: 'Chercher un organisme',
       notFoundResults: 'Aucun résultat',
       IPAsubTitle:
-        "Sélectionnez sur l’Indice de l’Administration Publique (IAP/IPA) l’organisme <1/> pour lequel vous demandez l’adhésion à {{baseProduct}} Premium",
+        'Sélectionnez sur l’Indice de l’Administration Publique (IAP/IPA) l’organisme <1/> pour lequel vous demandez l’adhésion à {{baseProduct}} Premium',
       helperLink: 'Vous ne trouvez pas votre organisme ? <1>Découvrez pourquoi</1>',
       confirmButton: 'Continuer',
     },
@@ -539,7 +542,7 @@ export default {
     successfulAdhesion: {
       title: 'La demande d’adhésion a été <1/>correctement envoyée',
       message:
-        "Vous recevrez une PEC à l’adresse institutionnelle de l’organisme.<1 />Vous y trouverez les instructions pour compléter la <3 /> souscription à l’offre <strong>Premium</strong>.",
+        'Vous recevrez une PEC à l’adresse institutionnelle de l’organisme.<1 />Vous y trouverez les instructions pour compléter la <3 /> souscription à l’offre <strong>Premium</strong>.',
       closeButton: 'Fermer',
     },
     billingData: {
@@ -573,6 +576,10 @@ export default {
         title: 'Opérateur de services publics',
         description: 'art. 2, alinéa 2, lettre B du CAD',
       },
+      gpu: {
+        title: 'Responsable de service public et/ou d’intérêt général',
+        description: 'Établissements de crédit participant à titre facultatif',
+      },
       scp: {
         title: 'Société à contrôle public',
         description: 'art. 2, alinéa 2, lettre C du CAD',
@@ -592,12 +599,12 @@ export default {
         title: 'Compagnie d’assurance',
       },
       prv: {
-        title: 'Privés'
+        title: 'Privés',
       },
       oth: {
         title: 'Autres',
-        description: 'Organismes créanciers adhérents à titre facultatif'
-      }
+        description: 'Organismes créanciers adhérents à titre facultatif',
+      },
     },
     backLabel: 'Retour',
     confirmLabel: 'Continuer',
@@ -656,11 +663,13 @@ export default {
       sdiCodePaAooUo: 'Code unique ou SDI',
       sdiCodePaAooUoDescription:
         'È il codice univoco necessario per ricevere le fatture elettroniche. Può essere del tuo ente o della sua Unità Organizzativa di riferimento.',
-      recipientCodeDescription: 'Il s’agit du code nécessaire pour recevoir les factures électroniques',
+      recipientCodeDescription:
+        'Il s’agit du code nécessaire pour recevoir les factures électroniques',
       gspDescription: 'Je suis opérateur d’au moins un des services publics : Gaz, Énergie, Telco.',
       pspDataSection: {
         commercialRegisterNumber: 'n° Inscription au Registre du Commerce',
-        invalidCommercialRegisterNumber: 'Le n° d’Inscription au Registre du Commerce n’est pas valide',
+        invalidCommercialRegisterNumber:
+          'Le n° d’Inscription au Registre du Commerce n’est pas valide',
         registrationInRegister: 'Inscription au Registre',
         registerNumber: 'Numéro du Registre',
         invalidregisterNumber: 'Le Numéro du Registre est invalide',

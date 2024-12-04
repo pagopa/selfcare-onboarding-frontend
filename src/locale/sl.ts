@@ -49,7 +49,7 @@ export default {
     },
     upload: {
       product: {
-        title: "Naložite pogodbo o članstvu",
+        title: 'Naložite pogodbo o članstvu',
         description: `Carica l’accordo di adesione, firmato digitalmente in <1 />p7m dal Legale Rappresentante.`,
         dropArea: {
           title: 'Podpisano pogodbo o članstvu povlecite sem ali',
@@ -80,12 +80,13 @@ export default {
     labelStatus: 'Pripravljeno za pošiljanje',
   },
   inlineSupportLink: {
-    assistanceLink: "obrnite se na podporo",
+    assistanceLink: 'obrnite se na podporo',
   },
   moreInformationOnRoles: 'Več informacij o vlogah',
   onboardingStep0: {
     title: 'Dobrodošli na Portalu za samopomoč',
-    description: 'V samo nekaj korakih se bo vaša organizacija lahko pridružila in upravljala vse produkte PagoPA.',
+    description:
+      'V samo nekaj korakih se bo vaša organizacija lahko pridružila in upravljala vse produkte PagoPA.',
     privacyPolicyDescription: 'Prebral/-a sem in razumel/-a',
     privacyPolicyLink: 'izjavo o varstvu osebnih podatkov ter Pravila in pogoje uporabe storitve',
     actionLabel: 'Nadaljuj',
@@ -171,7 +172,7 @@ export default {
       },
     },
     dropArea: {
-      title: "Datoteko .csv s seznamom združenih organizacij povlecite sem ali",
+      title: 'Datoteko .csv s seznamom združenih organizacij povlecite sem ali',
       button: 'naložite datoteko',
     },
     downloadExampleCsv: 'Ne veste, kako pripraviti datoteko? <1>Prenesite primer</1>',
@@ -196,7 +197,7 @@ export default {
     continue: 'Nadaljuj',
   },
   stepAddDelegates: {
-    title: "Označuje skrbnika",
+    title: 'Označuje skrbnika',
     description: {
       flow: {
         onboarding: `Puoi aggiungere da uno a tre Amministratori o suoi delegati. <1/> Saranno i responsabili della gestione di <3>{{productTitle}}</3> e presenti nel contratto di <4 />adesione come delegati dal Legale Rappresentante.`,
@@ -278,8 +279,8 @@ export default {
       email: {
         label: 'Overjen e-poštni naslov',
         errors: {
-          invalid: "E-poštni naslov je neveljaven",
-          duplicate: "Vneseni e-poštni naslov že obstaja",
+          invalid: 'E-poštni naslov je neveljaven',
+          duplicate: 'Vneseni e-poštni naslov že obstaja',
         },
         description: 'Vnesite overjen e-poštni naslov, ki se uporablja za organizacijo',
       },
@@ -292,10 +293,10 @@ export default {
     },
     steps: {
       step0: {
-        label: "Naložite Akt o članstvu",
+        label: 'Naložite Akt o članstvu',
       },
       step1: {
-        label: "Naložite Akt o članstvu",
+        label: 'Naložite Akt o članstvu',
       },
     },
     request: {
@@ -361,7 +362,7 @@ export default {
         title: 'Preverite dokument',
         product: {
           message:
-            "Naloženi dokument ne ustreza Aktu o članstvu. Preverite, ali je pravilen, in ga znova naložite.",
+            'Naloženi dokument ne ustreza Aktu o članstvu. Preverite, ali je pravilen, in ga znova naložite.',
         },
         user: {
           message:
@@ -458,7 +459,7 @@ export default {
     alreadyOnboardedError: {
       title: 'Prijava za naročnino je že bila narejena',
       message:
-        "Organizacija, ki ste jo izbrali, je že naročena na ponudbo <1 /><strong>Premium</strong>.",
+        'Organizacija, ki ste jo izbrali, je že naročena na ponudbo <1 /><strong>Premium</strong>.',
       closeButton: 'Zapri',
     },
     subProductStepSelectPricingPlan: {
@@ -522,11 +523,11 @@ export default {
     selectUserPartyStep: {
       title: 'Izberite svojo organizacijo',
       subTitle:
-        "Izberite organizacijo, za katero zahtevate naročnino na <1 />ponudbo <3>Premium</3>",
+        'Izberite organizacijo, za katero zahtevate naročnino na <1 />ponudbo <3>Premium</3>',
       searchLabel: 'Poiščite organizacijo',
       notFoundResults: 'Brez rezultatov',
       IPAsubTitle:
-        "Iz indeksa javne uprave (IPA) izberite organizacijo <1/>, za katero želite zahtevati članstvo v {{baseProduct}} Premium",
+        'Iz indeksa javne uprave (IPA) izberite organizacijo <1/>, za katero želite zahtevati članstvo v {{baseProduct}} Premium',
       helperLink: 'Ne najdete svoje organizacije? <1>Ugotovite zakaj</1>',
       confirmButton: 'Nadaljuj',
     },
@@ -539,7 +540,7 @@ export default {
     successfulAdhesion: {
       title: 'Zahteva za članstvo je bila <1/>uspešno poslana',
       message:
-        "Na overjen naslov organizacije boste prejeli potrjeno e-poštno sporočilo, <1 />kjer boste našli navodila za <3 /> dokončanje naročnine na ponudbo <strong>Premium</strong>.",
+        'Na overjen naslov organizacije boste prejeli potrjeno e-poštno sporočilo, <1 />kjer boste našli navodila za <3 /> dokončanje naročnine na ponudbo <strong>Premium</strong>.',
       closeButton: 'Zapri',
     },
     billingData: {
@@ -573,6 +574,10 @@ export default {
         title: 'Vodja javne službe',
         description: 'člen 2, odstavek 2, črka B CAD',
       },
+      gpu: {
+        title: 'Manažér verejnej služby a/alebo všeobecného záujmu',
+        description: 'Úverové inštitúcie sa zúčastňujú na dobrovoľnom základe',
+      },
       scp: {
         title: 'Družba pod javnim nadzorom',
         description: 'člen 2, odstavek 2, črka C CAD',
@@ -592,12 +597,12 @@ export default {
         title: 'Zavarovalnica',
       },
       prv: {
-        title: 'Zasebni'
+        title: 'Zasebni',
       },
       oth: {
         title: 'Drugo',
-        description: 'Organizacije upnice, ki sodelujejo neobvezno'
-      }
+        description: 'Organizacije upnice, ki sodelujejo neobvezno',
+      },
     },
     backLabel: 'Nazaj',
     confirmLabel: 'Nadaljuj',
