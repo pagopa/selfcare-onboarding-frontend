@@ -245,7 +245,6 @@ export const institutionType4Product = (productId: string | undefined) => {
         (it) =>
           it.labelKey === 'pa' ||
           it.labelKey === 'gsp' ||
-          it.labelKey === 'gpu' ||
           (ENV.PT.SHOW_PT ? it.labelKey === 'pt' : '')
       );
     case 'prod-pagopa':
@@ -254,13 +253,13 @@ export const institutionType4Product = (productId: string | undefined) => {
         (it) =>
           it.labelKey === 'pa' ||
           it.labelKey === 'gsp' ||
-          it.labelKey === 'gpu' ||
+          (ENV.GPU.SHOW && it.labelKey === 'gpu') ||
           (ENV.ENV !== 'PROD' && it.labelKey === 'psp') ||
           (ENV.PT.SHOW_PT ? it.labelKey === 'pt' : '') ||
           (ENV.PURE_PRV.SHOW ? it.labelKey === 'oth' : '')
       );
     case 'prod-io-sign':
-      return institutionTypes.filter((it) => it.labelKey === 'pa' || it.labelKey === 'gsp' || it.labelKey === 'gpu');
+      return institutionTypes.filter((it) => it.labelKey === 'pa' || it.labelKey === 'gsp');
     default:
       return institutionTypes.filter(
         (it) => it.labelKey === 'pa' || it.labelKey === 'gsp' || it.labelKey === 'scp'
@@ -268,7 +267,10 @@ export const institutionType4Product = (productId: string | undefined) => {
   }
 };
 
-export const description4InstitutionType = (institutionType: { labelKey: string; value: InstitutionType }) => {
+export const description4InstitutionType = (institutionType: {
+  labelKey: string;
+  value: InstitutionType;
+}) => {
   switch (institutionType.value) {
     case 'PT':
       return 'stepInstitutionType.institutionTypes.pt.description';
@@ -284,7 +286,9 @@ export const description4InstitutionType = (institutionType: { labelKey: string;
     case 'SA':
     case 'AS':
     case 'PRV':
-      return institutionType.labelKey === 'oth' ? 'stepInstitutionType.institutionTypes.oth.description' : '';
+      return institutionType.labelKey === 'oth'
+        ? 'stepInstitutionType.institutionTypes.oth.description'
+        : '';
     default:
       return '';
   }
