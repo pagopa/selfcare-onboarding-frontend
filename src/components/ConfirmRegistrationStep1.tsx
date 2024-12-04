@@ -84,7 +84,13 @@ export function ConfirmRegistrationStep1(
           deleteUploadedFiles={deleteUploadedFiles}
           onDropAccepted={onDropAccepted}
           onDropRejected={onDropRejected}
-          accept={['.pdf', '.p7z', '.p7m', '.p7c']}
+          accept={{
+            'application/pdf': ['.pdf'],
+            'application/x-pkcs7-certificates': ['.p7c'],
+            'application/x-pkcs7-certreqresp': ['.p7r'],
+            'application/x-pkcs7-mime': ['.p7m'],
+            'application/x-pkcs7-signature': ['.p7z'],
+          }}
           loading={loading}
           theme={theme}
           isAggregatesUpload={false}

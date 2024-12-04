@@ -1,11 +1,11 @@
 import React from 'react';
-import NumberFormat from 'react-number-format';
+import { NumericFormat } from 'react-number-format';
 
 const NumberDecimalFormat = React.forwardRef(function NumberDecimalFormat(props: any, ref) {
   const { onChange, ...other } = props;
   return (
     <div style={{ width: '90%' }}>
-      <NumberFormat
+      <NumericFormat
         {...other}
         getInputRef={ref}
         onValueChange={(values) => {

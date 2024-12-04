@@ -35,7 +35,7 @@ export const renderComponentWithProviders = (
           <button onClick={() => onExit?.(() => window.location.assign(ENV.URL_FE.LOGOUT))}>
             LOGOUT
           </button>
-          <Router history={history}>
+          <Router history={history as any}>
             {React.createElement(component.type, { ...component.props, productId })}
           </Router>
         </UserContext.Provider>

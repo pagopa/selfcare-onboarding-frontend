@@ -12,11 +12,15 @@ import {
   mockedUos,
   mockedPartiesFromInfoCamere,
 } from '../../../lib/__mocks__/mockApiRequests';
-import { institutionType4Product } from '../../../utils/constants';
+import i18n from '@pagopa/selfcare-common-frontend/lib/locale/locale-utils';
 
 jest.mock('formik', () => ({
   useFormik: jest.fn(),
 }));
+
+beforeAll(() => {
+  i18n.changeLanguage('it');
+});
 
 const mockFormik = {
   initialValues: {
@@ -122,7 +126,7 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
         const isInformationCompany =
           (institutionType === 'GSP' || institutionType === 'SCP') &&
           (productId === 'prod-io' || productId === 'prod-io-sign' || productId === 'prod-interop');
-        const isPrivateParty = (productId === 'prod-interop' && institutionType === 'PRV');
+        const isPrivateParty = productId === 'prod-interop' && institutionType === 'PRV';
 
         conditionsMap[`${productId}-${institutionType}`] = {
           isPremium,
@@ -131,7 +135,7 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
           isForeignInsurance,
           institutionAvoidGeotax,
           isInsuranceCompany,
-          isPrivateParty
+          isPrivateParty,
         };
 
         renderComponentWithProviders(
@@ -169,7 +173,7 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
       isForeignInsurance,
       institutionAvoidGeotax,
       isInsuranceCompany,
-      isPrivateParty
+      isPrivateParty,
     } = conditionsMap[key];
 
     const centralParty = screen.queryByText('Ente centrale');

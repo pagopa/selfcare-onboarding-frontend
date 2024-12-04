@@ -1,5 +1,13 @@
 import { GeographicTaxonomy } from './GeographicTaxonomies';
 
+type AggregateUserResult = {
+  email: string;
+  name: string;
+  role?: string;
+  surname: string;
+  taxCode: string;
+};
+
 export type AggregateInstitution = {
   taxCode: string;
   description: string;
@@ -13,5 +21,6 @@ export type AggregateInstitution = {
   vatNumber?: string;
   city: string;
   county: string;
-  users?: Array<any>;
+  parentDescription?: string;
+  users?: Array<AggregateUserResult>;
 };

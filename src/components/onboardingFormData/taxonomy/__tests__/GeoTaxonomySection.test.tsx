@@ -5,12 +5,17 @@ import { renderComponentWithProviders } from '../../../../utils/test-utils';
 import GeoTaxonomySection from '../GeoTaxonomySection';
 import { mockedGeoTaxonomy } from '../../../../lib/__mocks__/mockApiRequests';
 import { fetchWithLogs } from '../../../../lib/api-utils';
+import i18n from '@pagopa/selfcare-common-frontend/lib/locale/locale-utils';
 
 const originalFetch = global.fetch;
 
+beforeAll(() => {
+  i18n.changeLanguage('it');
+});
+
 afterEach(() => {
   global.fetch = originalFetch;
-})
+});
 
 const mockedNonNationalGeoTaxonomy = [
   {
@@ -90,12 +95,11 @@ test('should render GeoTaxonomySection with mocked retrievedTaxonomies and click
     selectAndVerifyArea('Mil', 'Milano e provincia', 'Milano e provincia');
     fireEvent.click(clearButton);
   });
-  
+
   await waitFor(() => {
     selectAndVerifyArea("l'A", "l'Aquila (AQ) comune", "l'Aquila (AQ)");
   });
 });
-
 
 test('should render GeoTaxonomySection with mocked retrievedTaxonomies and click on national radio button', async () => {
   renderComponentWithProviders(

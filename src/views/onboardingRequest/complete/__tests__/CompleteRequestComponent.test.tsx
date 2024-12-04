@@ -5,6 +5,20 @@ import React from 'react';
 import { ENV } from '../../../../utils/env';
 import { buildAssistanceURI } from '@pagopa/selfcare-common-frontend/lib/services/assistanceService';
 import userEvent from '@testing-library/user-event';
+import i18n from '@pagopa/selfcare-common-frontend/lib/locale/locale-utils';
+
+jest.setTimeout(40000);
+
+jest.mock('react-router-dom', () => ({
+  useHistory: () => ({
+    location: mockedLocation,
+    replace: jest.fn(),
+  }),
+}));
+
+jest.mock('@pagopa/selfcare-common-frontend/lib/services/assistanceService', () => ({
+  buildAssistanceURI: jest.fn(),
+}));
 
 let mockedContract: File;
 
@@ -17,27 +31,18 @@ const mockedLocation = {
   hash: '',
 };
 
+beforeAll(() => {
+  i18n.changeLanguage('it');
+  Object.defineProperty(window, 'location', { value: mockedLocation });
+});
+
 beforeEach(() => {
   mockedContract = new File(['pdf'], 'contract.pdf', { type: 'multipart/form-data' });
 });
 
-beforeAll(() => {
-  Object.defineProperty(window, 'location', { value: mockedLocation });
-});
 afterAll(() => {
   Object.defineProperty(window, 'location', { value: oldWindowLocation });
 });
-
-jest.mock('react-router-dom', () => ({
-  useHistory: () => ({
-    location: mockedLocation,
-    replace: jest.fn(),
-  }),
-}));
-
-jest.mock('@pagopa/selfcare-common-frontend/lib/services/assistanceService', () => ({
-  buildAssistanceURI: jest.fn(),
-}));
 
 test('Test: The jwt is not present and the onboarding request is not retrieved, so the error page is showed', async () => {
   mockedLocation.search = 'jwt=';

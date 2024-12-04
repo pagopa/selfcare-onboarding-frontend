@@ -220,6 +220,7 @@ export const institutionTypes: Array<{ labelKey: string; value: InstitutionType 
   /* both are private entities but for two different products:
     prv -> "Enti Privati" (prod-interop), oth -> "Altro" (prod-pagopa) */
   { labelKey: 'oth', value: 'PRV' },
+  { labelKey: 'gpu', value: 'GPU' },
 ];
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
@@ -252,6 +253,7 @@ export const institutionType4Product = (productId: string | undefined) => {
         (it) =>
           it.labelKey === 'pa' ||
           it.labelKey === 'gsp' ||
+          (ENV.GPU.SHOW && it.labelKey === 'gpu') ||
           (ENV.ENV !== 'PROD' && it.labelKey === 'psp') ||
           (ENV.PT.SHOW_PT ? it.labelKey === 'pt' : '') ||
           (ENV.PURE_PRV.SHOW ? it.labelKey === 'oth' : '')
@@ -265,7 +267,10 @@ export const institutionType4Product = (productId: string | undefined) => {
   }
 };
 
-export const description4InstitutionType = (institutionType: { labelKey: string; value: InstitutionType }) => {
+export const description4InstitutionType = (institutionType: {
+  labelKey: string;
+  value: InstitutionType;
+}) => {
   switch (institutionType.value) {
     case 'PT':
       return 'stepInstitutionType.institutionTypes.pt.description';
@@ -275,11 +280,15 @@ export const description4InstitutionType = (institutionType: { labelKey: string;
       return 'stepInstitutionType.institutionTypes.gsp.description';
     case 'SCP':
       return 'stepInstitutionType.institutionTypes.scp.description';
+    case 'GPU':
+      return 'stepInstitutionType.institutionTypes.gpu.description';
     case 'PSP':
     case 'SA':
     case 'AS':
     case 'PRV':
-      return institutionType.labelKey === 'oth' ? 'stepInstitutionType.institutionTypes.oth.description' : '';
+      return institutionType.labelKey === 'oth'
+        ? 'stepInstitutionType.institutionTypes.oth.description'
+        : '';
     default:
       return '';
   }
