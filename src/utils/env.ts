@@ -85,5 +85,9 @@ export const ENV = {
 
   PURE_PRV: {
     SHOW: env.get('REACT_APP_ENABLE_PURE_PRV').default('false').asBool(),
+  },
+
+  GPU: {
+    SHOW: env.get('REACT_APP_ENABLE_GPU').default('false').asBool(),
   }
 };

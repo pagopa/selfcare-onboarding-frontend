@@ -49,7 +49,7 @@ export default {
     },
     upload: {
       product: {
-        title: "Beitrittsvereinbarung laden",
+        title: 'Beitrittsvereinbarung laden',
         description: `Carica l’accordo di adesione, firmato digitalmente in <1 />p7m dal Legale Rappresentante.`,
         dropArea: {
           title: 'Zieh die signierte Beitrittsvereinbarung hierhin oder',
@@ -80,14 +80,16 @@ export default {
     labelStatus: 'Versandbereit',
   },
   inlineSupportLink: {
-    assistanceLink: "Kundendienst kontaktieren",
+    assistanceLink: 'Kundendienst kontaktieren',
   },
   moreInformationOnRoles: 'Mehr Informationen über die Funktionen',
   onboardingStep0: {
     title: 'Willkommen auf dem Portal Self-Care',
-    description: 'In wenigen Schritten kann deine Körperschaft beitreten und alle PagoPA-Produkte verwalten.',
+    description:
+      'In wenigen Schritten kann deine Körperschaft beitreten und alle PagoPA-Produkte verwalten.',
     privacyPolicyDescription: 'Ich habe die',
-    privacyPolicyLink: 'Datenschutzrichtlinie und die Nutzungsbedingungen des Dienstes gelesen und verstanden',
+    privacyPolicyLink:
+      'Datenschutzrichtlinie und die Nutzungsbedingungen des Dienstes gelesen und verstanden',
     actionLabel: 'Weiter',
   },
   stepVerifyOnboarding: {
@@ -171,10 +173,11 @@ export default {
       },
     },
     dropArea: {
-      title: "Ziehe die .csv-Datei mit der Liste der Aggregierten hierin oder",
+      title: 'Ziehe die .csv-Datei mit der Liste der Aggregierten hierin oder',
       button: 'lade die Datei',
     },
-    downloadExampleCsv: 'Du weißt nicht, wie die Datei vorbereitet werden muss? <1>Beispiel herunterladen</1>',
+    downloadExampleCsv:
+      'Du weißt nicht, wie die Datei vorbereitet werden muss? <1>Beispiel herunterladen</1>',
     back: 'Zurück',
     forward: 'Weiter',
   },
@@ -196,7 +199,7 @@ export default {
     continue: 'Weiter',
   },
   stepAddDelegates: {
-    title: "Gib den Administrator an",
+    title: 'Gib den Administrator an',
     description: {
       flow: {
         onboarding: `Puoi aggiungere da uno a tre Amministratori o suoi delegati. <1/> Saranno i responsabili della gestione di <3>{{productTitle}}</3> e presenti nel contratto di <4 />adesione come delegati dal Legale Rappresentante.`,
@@ -235,7 +238,8 @@ export default {
       belongsRegulatedMarket:
         'L’ente appartiene ad un mercato regolamentato (es. energia, gas, acqua, <1 />trasporti, servizi postali ecc…)',
       registratedOnIPA: 'Die Körperschaft ist in IPA registriert',
-      concessionaireOfPublicService: 'Die Körperschaft ist ein Betreiber einer öffentlichen Dienstleistung',
+      concessionaireOfPublicService:
+        'Die Körperschaft ist ein Betreiber einer öffentlichen Dienstleistung',
       other: 'Sonstiges',
       optionalPartyInformations: 'Trage die Informationen über deine Körperschaft hier ein',
     },
@@ -278,8 +282,8 @@ export default {
       email: {
         label: 'Institutionelle -E-Mail-Adresse',
         errors: {
-          invalid: "Die E-Mail-Adresse ist ungültig",
-          duplicate: "Die eingegebene E-Mail-Adresse ist bereits vorhanden",
+          invalid: 'Die E-Mail-Adresse ist ungültig',
+          duplicate: 'Die eingegebene E-Mail-Adresse ist bereits vorhanden',
         },
         description: 'Gib die für die Körperschaft verwendete institutionelle -E-Mail-Adresse ein',
       },
@@ -292,10 +296,10 @@ export default {
     },
     steps: {
       step0: {
-        label: "Beitrittsakt laden",
+        label: 'Beitrittsakt laden',
       },
       step1: {
-        label: "Beitrittsakt laden",
+        label: 'Beitrittsakt laden',
       },
     },
     request: {
@@ -361,7 +365,7 @@ export default {
         title: 'Prüfe das Dokument',
         product: {
           message:
-            "Das geladene Dokument entspricht nicht dem Beitrittsakt. Prüfe es auf Korrektheit und lade es erneut.",
+            'Das geladene Dokument entspricht nicht dem Beitrittsakt. Prüfe es auf Korrektheit und lade es erneut.',
         },
         user: {
           message:
@@ -458,7 +462,7 @@ export default {
     alreadyOnboardedError: {
       title: 'Abonnement bereits erfolgt',
       message:
-        "Die von dir gewählte Körperschaft hat das <1 /><strong>Premium</strong>-Angebot bereits abonniert.",
+        'Die von dir gewählte Körperschaft hat das <1 /><strong>Premium</strong>-Angebot bereits abonniert.',
       closeButton: 'Beenden',
     },
     subProductStepSelectPricingPlan: {
@@ -484,7 +488,8 @@ export default {
       carnetPlan: {
         caption: 'CARNET-PLAN - PAUSCHAL',
         discountBoxLabel: '25% Skonto',
-        title: 'Wähle unter den {{carnetCount}} verschiedenen und genau auf deine Bedürfnisse zugeschnitten Carnets',
+        title:
+          'Wähle unter den {{carnetCount}} verschiedenen und genau auf deine Bedürfnisse zugeschnitten Carnets',
         showMore: 'Mehr hierzu',
         showLess: 'Weniger anzeigen',
         description:
@@ -503,7 +508,8 @@ export default {
       consumptionPlan: {
         caption: 'BEDARFSPLAN',
         discountBoxLabel: '25% Skonto',
-        title: 'Entscheide dich dafür, nur für die tatsächlich gesendeten Nachrichten <1/> zu zahlen',
+        title:
+          'Entscheide dich dafür, nur für die tatsächlich gesendeten Nachrichten <1/> zu zahlen',
         showMore: 'Mehr hierzu',
         showLess: 'Weniger anzeigen',
         description:
@@ -522,11 +528,11 @@ export default {
     selectUserPartyStep: {
       title: 'Wähle deine Körperschaft',
       subTitle:
-        "Wähle die Körperschaft, für die du ein Abonnement für das <1 />Premium <3>Angebot beantragst</3>",
+        'Wähle die Körperschaft, für die du ein Abonnement für das <1 />Premium <3>Angebot beantragst</3>',
       searchLabel: 'Körperschaft suchen',
       notFoundResults: 'Kein Ergebnis',
       IPAsubTitle:
-        "Wähle aus dem Index der öffentlichen Verwaltung (IPA) die Körperschaft, <1/> für die du den Beitritt zum {{baseProduct}} Premium beantragst",
+        'Wähle aus dem Index der öffentlichen Verwaltung (IPA) die Körperschaft, <1/> für die du den Beitritt zum {{baseProduct}} Premium beantragst',
       helperLink: 'Deine Körperschaft nicht gefunden? <1>Erfahre warum</1>',
       confirmButton: 'Weiter',
     },
@@ -539,7 +545,7 @@ export default {
     successfulAdhesion: {
       title: 'Der Beitrittsantrag wurde erfolgreich <1/>gesendet',
       message:
-        "Du erhältst eine PEC an die institutionelle Adresse der Körperschaft.<1 />Darin findest du die Anweisungen, um das <3 /> Abonnement am <strong>Premium</strong>-Angebot zu vervollständigen.",
+        'Du erhältst eine PEC an die institutionelle Adresse der Körperschaft.<1 />Darin findest du die Anweisungen, um das <3 /> Abonnement am <strong>Premium</strong>-Angebot zu vervollständigen.',
       closeButton: 'Schließen',
     },
     billingData: {
@@ -573,6 +579,10 @@ export default {
         title: 'Betreiber öffentlicher Dienstleistungen',
         description: 'Art. 2, Absatz 2, Buchstabe B del digitalen Verwaltungscodes CAD',
       },
+      gpu: {
+        title: 'Manager von öffentlichen Versorgungsbetrieben und/oder von allgemeinem Interesse',
+        description: 'Kreditinstitute nehmen optional teil',
+      },
       scp: {
         title: 'Öffentliche kontrollierte Gesellschaft',
         description: 'Art. 2, Absatz 2, Buchstabe C del digitalen Verwaltungscodes CAD',
@@ -592,12 +602,12 @@ export default {
         title: 'Versicherungsgesellschaft',
       },
       prv: {
-        title: 'Private'
+        title: 'Private',
       },
       oth: {
         title: 'Sonstiges',
-        description: 'Freiwillig beigetretene forderungsberechtigte Körperschaft'
-      }
+        description: 'Freiwillig beigetretene forderungsberechtigte Körperschaft',
+      },
     },
     backLabel: 'Zurück',
     confirmLabel: 'Weiter',
@@ -622,7 +632,8 @@ export default {
       invalidReaField: 'Das Feld REA ist ungültig',
       invalidMailSupport: 'Die E-Mail-Adresse ist ungültig',
       invalidShareCapitalField: 'Das Feld Stammkapital ist ungültig',
-      invalidRecipientCodeNoAssociation: 'Die eingegebene Nummer ist nicht mit deiner Körperschaft verknüpft',
+      invalidRecipientCodeNoAssociation:
+        'Die eingegebene Nummer ist nicht mit deiner Körperschaft verknüpft',
       invalidRecipientCodeNoBilling:
         'Il codice inserito è associato al codice fiscale di un ente che non ha il servizio di fatturazione attivo',
       vatNumberAlreadyRegistered: 'Die eingegebene USt-IdNr. ist bereits registriert worden.',
@@ -656,11 +667,14 @@ export default {
       sdiCodePaAooUo: 'Eindeutiger oder SDI-Code',
       sdiCodePaAooUoDescription:
         'È il codice univoco necessario per ricevere le fatture elettroniche. Può essere del tuo ente o della sua Unità Organizzativa di riferimento.',
-      recipientCodeDescription: 'Dieser Code ist für den Empfang elektronischer Rechnungen notwendig',
-      gspDescription: 'Ich bin Betreiber mindestens einer der öffentlichen Dienstleistungen: Gas, Energie, Telekommunikation.',
+      recipientCodeDescription:
+        'Dieser Code ist für den Empfang elektronischer Rechnungen notwendig',
+      gspDescription:
+        'Ich bin Betreiber mindestens einer der öffentlichen Dienstleistungen: Gas, Energie, Telekommunikation.',
       pspDataSection: {
         commercialRegisterNumber: 'Eintragungsnummer in das Handelsregister',
-        invalidCommercialRegisterNumber: 'Die Eintragungsnummer in das Handelsregister ist ungültig',
+        invalidCommercialRegisterNumber:
+          'Die Eintragungsnummer in das Handelsregister ist ungültig',
         registrationInRegister: 'Eintragung im Register',
         registerNumber: 'Nummer des Registers',
         invalidregisterNumber: 'Die Nummer des Registers ist ungültig',
