@@ -1,21 +1,34 @@
 import { useContext, useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 import { Box } from '@mui/system';
 import { Footer, Header } from '@pagopa/selfcare-common-frontend/lib';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
 import i18n from '@pagopa/selfcare-common-frontend/lib/locale/locale-utils';
 import { logAction } from '../lib/action-log';
 import { ENV } from '../utils/env';
+import { ROUTES } from '../utils/constants';
 import { Main } from './Main';
 import { HeaderContext, UserContext } from './../lib/context';
 
 export function BodyLogger() {
   const { user } = useContext(UserContext);
   const location = useLocation();
+  const history = useHistory();
   const [subHeaderVisible, setSubHeaderVisible] = useState<boolean>(false);
   const [onExit, setOnExit] = useState<((exitAction: () => void) => void) | undefined>();
   const [enableLogin, setEnableLogin] = useState<boolean>(true);
   const [showDocBtn, setShowDocBtn] = useState(false);
+
+  useEffect(() => {
+    if (location.pathname === '/onboarding/prod-io-premium') {
+      history.push(
+        ROUTES.ONBOARDING_PREMIUM.PATH.replace(':productId', 'prod-io').replace(
+          ':subProductId',
+          'prod-io-premium'
+        )
+      );
+    }
+  }, []);
 
   useEffect(() => {
     if (i18n.language === 'it') {

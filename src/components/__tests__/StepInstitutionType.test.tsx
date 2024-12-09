@@ -5,6 +5,11 @@ import StepInstitutionType from '../steps/StepInstitutionType';
 import { screen } from '@testing-library/react';
 import '../../locale';
 import React from 'react';
+import i18n from '@pagopa/selfcare-common-frontend/lib/locale/locale-utils';
+
+beforeAll(() => {
+  i18n.changeLanguage('it');
+});
 
 test('Test: Render test', async () => {
   renderComponentWithProviders(
@@ -30,7 +35,7 @@ test('Test: The correct institution types with the expected descriptions, can be
 
       switch (p.id) {
         case 'prod-pagopa':
-          expect(institutionTypeValues).toStrictEqual(['PA', 'GSP', 'PT', 'PSP', 'PRV']);
+          expect(institutionTypeValues).toStrictEqual(['PA', 'GSP', 'PT', 'PSP', 'PRV', 'GPU']);
           break;
         case 'prod-io':
           expect(institutionTypeValues).toStrictEqual(['PA', 'GSP', 'PT']);
