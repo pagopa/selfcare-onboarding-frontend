@@ -2030,16 +2030,16 @@ const billingData2billingDataRequest = (
   recipientCode: errorOnSubmit
     ? 'A2B3C4'
     : // MERGE THIS CONDITIONS
-    institutionType === 'PSP'
-    ? 'A1B2C3'
-    : (from === 'IPA' ||
-        institutionType === 'GSP' ||
-        (from === 'NO_IPA' && institutionType === 'GPU')) &&
-      typeOfSearch !== 'aooCode'
-    ? typeOfSearch === 'taxCode'
-      ? 'A3B4C5'
-      : 'A1B2C3'
-    : undefined,
+      institutionType === 'PSP'
+      ? 'A1B2C3'
+      : (from === 'IPA' ||
+            institutionType === 'GSP' ||
+            (from === 'NO_IPA' && institutionType === 'GPU')) &&
+          typeOfSearch !== 'aooCode'
+        ? typeOfSearch === 'taxCode'
+          ? 'A3B4C5'
+          : 'A1B2C3'
+        : undefined,
 });
 
 const verifySubmit = async (
@@ -2087,33 +2087,33 @@ const verifySubmit = async (
           originId: errorOnSubmit
             ? mockPartyRegistry.items[1].originId
             : from === 'NO_IPA'
-            ? undefined
-            : from === 'ANAC'
-            ? mockedANACParties[0].originId
-            : from === 'IVASS'
-            ? haveTaxCode
-              ? isForeignInsurance
-                ? mockedInsuranceResource.items[0].originId
-                : mockedInsuranceResource.items[2].originId
-              : mockedInsuranceResource.items[4].originId
-            : from === 'INFOCAMERE'
-            ? undefined
-            : from === 'PDND_INFOCAMERE'
-            ? '00112233445'
-            : typeOfSearch === 'taxCode'
-            ? mockedParties[0].originId
-            : typeOfSearch === 'aooCode'
-            ? mockedAoos[0].codiceUniAoo
-            : typeOfSearch === 'uoCode'
-            ? mockedUos[0].codiceUniUo
-            : (institutionType === 'PRV' && productId === 'prod-pagopa') ||
-              (institutionType === 'GPU' &&
-                (productId === 'prod-pagopa' ||
-                  productId === 'prod-interop' ||
-                  productId === 'prod-io-sign' ||
-                  productId === 'prod-io'))
-            ? undefined
-            : '991',
+              ? undefined
+              : from === 'ANAC'
+                ? mockedANACParties[0].originId
+                : from === 'IVASS'
+                  ? haveTaxCode
+                    ? isForeignInsurance
+                      ? mockedInsuranceResource.items[0].originId
+                      : mockedInsuranceResource.items[2].originId
+                    : mockedInsuranceResource.items[4].originId
+                  : from === 'INFOCAMERE'
+                    ? undefined
+                    : from === 'PDND_INFOCAMERE'
+                      ? '00112233445'
+                      : typeOfSearch === 'taxCode'
+                        ? mockedParties[0].originId
+                        : typeOfSearch === 'aooCode'
+                          ? mockedAoos[0].codiceUniAoo
+                          : typeOfSearch === 'uoCode'
+                            ? mockedUos[0].codiceUniUo
+                            : (institutionType === 'PRV' && productId === 'prod-pagopa') ||
+                                (institutionType === 'GPU' &&
+                                  (productId === 'prod-pagopa' ||
+                                    productId === 'prod-interop' ||
+                                    productId === 'prod-io-sign' ||
+                                    productId === 'prod-io'))
+                              ? undefined
+                              : '991',
           taxCode: errorOnSubmit
             ? mockPartyRegistry.items[1].taxCode
             : from === 'NO_IPA'
@@ -2150,15 +2150,12 @@ const verifySubmit = async (
                 }
               : undefined,
           gpuData:
-            institutionType === 'GPU' &&
-            (productId === 'prod-pagopa' ||
-              productId === 'prod-interop' ||
-              productId === 'prod-io-sign' ||
-              productId === 'prod-io')
+            institutionType === 'GPU' && productId === 'prod-pagopa'
               ? {
                   businessRegisterNumber: 'Comunale12',
                   legalRegisterNumber: '250301',
                   legalRegisterName: 'SkiPass',
+                  longTermPayments: true,
                   manager: true,
                   managerAuthorized: true,
                   managerEligible: false,
