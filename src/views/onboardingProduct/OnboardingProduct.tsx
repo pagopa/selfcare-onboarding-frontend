@@ -394,6 +394,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
       businessRegisterNumber: newAdditionalGpuInformations?.businessRegisterNumber,
       legalRegisterNumber: newAdditionalGpuInformations?.legalRegisterNumber,
       legalRegisterName: newAdditionalGpuInformations.legalRegisterName,
+      longTermPayments: newAdditionalGpuInformations.longTermPayments,
       manager: newAdditionalGpuInformations.manager,
       managerAuthorized: newAdditionalGpuInformations.managerAuthorized,
       managerEligible: newAdditionalGpuInformations.managerEligible,

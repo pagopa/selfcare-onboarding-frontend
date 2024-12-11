@@ -1135,7 +1135,7 @@ const executeStepAdditionalGpuInformations = async () => {
   const isPartyProvidingAServiceFalse = document.getElementById(
     'isPartyProvidingAServiceFalse'
   ) as HTMLElement;
-  const frequencyOfPaymentTrue = document.getElementById('frequencyOfPaymentTrue') as HTMLElement;
+  const longTermPaymentsTrue = document.getElementById('longTermPaymentsTrue') as HTMLElement;
   const manager = document.getElementById('manager') as HTMLElement;
   const managerAuthorized = document.getElementById('managerAuthorized') as HTMLElement;
   const managerEligible = document.getElementById('managerEligible') as HTMLElement;
@@ -1153,7 +1153,7 @@ const executeStepAdditionalGpuInformations = async () => {
 
   fireEvent.click(isPartyRegisteredTrue);
   fireEvent.click(isPartyProvidingAServiceTrue);
-  fireEvent.click(frequencyOfPaymentTrue);
+  fireEvent.click(longTermPaymentsTrue);
 
   expect(continueButton).not.toBeDisabled();
 
