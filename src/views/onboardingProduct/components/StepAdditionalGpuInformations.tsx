@@ -134,18 +134,16 @@ export function StepAdditionalGpuInformations({ back, forward /* origin, originI
       case 'text':
         const onlyAlfaNumericValue =
           typeof value === 'string' ? value.replace(/[^a-zA-Z0-9]/g, '') : value;
-        const onlyNumberValue = typeof value === 'string' ? value.replace(/[^0-9]/g, '') : value;
+        // const onlyNumberValue = typeof value === 'string' ? value.replace(/[^0-9]/g, '') : value;
         const onlyAlfaNumericWithSpaceValue =
           typeof value === 'string' ? value.replace(/[^a-zA-Z0-9 ]/g, '') : value;
 
         setAdditionalGpuInformations((prev) => ({
           ...prev,
           [fieldName]:
-            fieldName === 'businessRegisterNumber'
+            fieldName === 'legalRegisterNumber'
               ? onlyAlfaNumericValue
-              : fieldName === 'legalRegisterNumber'
-                ? onlyNumberValue
-                : onlyAlfaNumericWithSpaceValue,
+              : onlyAlfaNumericWithSpaceValue,
         }));
         return;
       case 'checkbox':
@@ -206,6 +204,13 @@ export function StepAdditionalGpuInformations({ back, forward /* origin, originI
       console.log('forward with this data: ', additionalGpuInformations);
     }
   };
+
+  const areAllCheckboxesChecked = () =>
+    additionalGpuInformations.manager &&
+    additionalGpuInformations.managerAuthorized &&
+    additionalGpuInformations.managerEligible &&
+    additionalGpuInformations.managerProsecution &&
+    additionalGpuInformations.institutionCourtMeasures;
 
   return (
     <Grid container item sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -516,7 +521,8 @@ export function StepAdditionalGpuInformations({ back, forward /* origin, originI
             disabled:
               radioValues.isPartyRegistered === null ||
               radioValues.isPartyProvidingAService === null ||
-              radioValues.longTermPayments === null,
+              radioValues.longTermPayments === null ||
+              !areAllCheckboxesChecked(),
           }}
         />
       </Grid>
