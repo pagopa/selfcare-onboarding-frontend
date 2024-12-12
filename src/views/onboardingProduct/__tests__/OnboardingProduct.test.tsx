@@ -1155,6 +1155,19 @@ const executeStepAdditionalGpuInformations = async () => {
   fireEvent.click(isPartyProvidingAServiceTrue);
   fireEvent.click(longTermPaymentsTrue);
 
+  // Change di tutti i vari checkbox
+  fireEvent.click(manager);
+  fireEvent.click(managerAuthorized);
+  fireEvent.click(managerEligible);
+  fireEvent.click(managerProsecution);
+  fireEvent.click(institutionCourtMeasures);
+
+  expect(manager).toBeChecked();
+  expect(managerAuthorized).toBeChecked();
+  expect(managerEligible).toBeChecked();
+  expect(managerProsecution).toBeChecked();
+  expect(institutionCourtMeasures).toBeChecked();
+
   expect(continueButton).not.toBeDisabled();
 
   // Casistica di controllo validazione campi
@@ -1174,12 +1187,12 @@ const executeStepAdditionalGpuInformations = async () => {
     expect(legalRegisterName).not.toBeDisabled();
   });
 
-  fireEvent.change(businessRegisterNumber, { target: { value: 'a1 ' } });
+  fireEvent.change(businessRegisterNumber, { target: { value: 'a 1' } });
   fireEvent.change(legalRegisterNumber, { target: { value: 'a22' } });
   fireEvent.change(legalRegisterName, { target: { value: 'a 1' } });
 
-  expect(businessRegisterNumber.value).toBe('a1');
-  expect(legalRegisterNumber.value).toBe('22');
+  expect(businessRegisterNumber.value).toBe('a 1');
+  expect(legalRegisterNumber.value).toBe('a22');
   expect(legalRegisterName.value).toBe('a 1');
 
   fireEvent.click(isPartyRegisteredFalse);
@@ -1195,22 +1208,6 @@ const executeStepAdditionalGpuInformations = async () => {
   fireEvent.change(businessRegisterNumber, { target: { value: 'Comunale 12' } });
   fireEvent.change(legalRegisterNumber, { target: { value: '250301' } });
   fireEvent.change(legalRegisterName, { target: { value: 'SkiPass' } });
-
-  // Change di tutti i vari checkbox
-  fireEvent.click(manager);
-  fireEvent.click(managerAuthorized);
-  fireEvent.click(managerEligible);
-  fireEvent.click(managerEligible);
-  fireEvent.click(managerProsecution);
-  fireEvent.click(managerProsecution);
-  fireEvent.click(institutionCourtMeasures);
-  fireEvent.click(institutionCourtMeasures);
-
-  expect(manager).toBeChecked();
-  expect(managerAuthorized).toBeChecked();
-  expect(managerEligible).not.toBeChecked();
-  expect(managerProsecution).not.toBeChecked();
-  expect(institutionCourtMeasures).not.toBeChecked();
 
   fireEvent.click(continueButton);
 };
@@ -2152,15 +2149,15 @@ const verifySubmit = async (
           gpuData:
             institutionType === 'GPU' && productId === 'prod-pagopa'
               ? {
-                  businessRegisterNumber: 'Comunale12',
+                  businessRegisterNumber: 'Comunale 12',
                   legalRegisterNumber: '250301',
                   legalRegisterName: 'SkiPass',
                   longTermPayments: true,
                   manager: true,
                   managerAuthorized: true,
-                  managerEligible: false,
-                  managerProsecution: false,
-                  institutionCourtMeasures: false,
+                  managerEligible: true,
+                  managerProsecution: true,
+                  institutionCourtMeasures: true,
                 }
               : undefined,
           companyInformations:
