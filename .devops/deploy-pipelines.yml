@@ -66,6 +66,7 @@ variables:
     react_app_enable_scp_infocamere: '$(UAT_SCP_INFOCAMERE_ENABLED)'
     react_app_enable_prv: '$(UAT_PRV_ENABLED)'
     react_app_enable_pure_prv: '$(UAT_PURE_PRV_ENABLED)'
+    react_app_enable_gpu: '$(UAT_GPU_ENABLED)'
 
   ${{ elseif eq(variables['Build.SourceBranch'], 'refs/heads/main') }}:
     environment: 'PROD'
@@ -112,6 +113,7 @@ variables:
     react_app_enable_scp_infocamere: '$(PROD_SCP_INFOCAMERE_ENABLED)'
     react_app_enable_prv: '$(PROD_PRV_ENABLED)'
     react_app_enable_pure_prv: '$(PROD_PURE_PRV_ENABLED)'
+    react_app_enable_gpu: '$(PROD_GPU_ENABLED)'
 
   # every branch different from past will be considered as DEV
   #  ${{ if startsWith(variables['Build.SourceBranch'], 'refs/heads/release-dev') }}:
@@ -160,6 +162,7 @@ variables:
     react_app_enable_scp_infocamere: '$(DEV_SCP_INFOCAMERE_ENABLED)'
     react_app_enable_prv: '$(DEV_PRV_ENABLED)'
     react_app_enable_pure_prv: '$(DEV_PURE_PRV_ENABLED)'
+    react_app_enable_gpu: '$(DEV_GPU_ENABLED)'
 
 # Automatically triggered on PR
 # https://docs.microsoft.com/en-us/azure/devops/pipelines/yaml-schema?view=azure-devops&tabs=schema%2Cparameter-schema#pr-trigger

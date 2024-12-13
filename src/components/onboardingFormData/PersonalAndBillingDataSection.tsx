@@ -31,20 +31,22 @@ const CustomTextField = styled(TextField)({
   },
 });
 
-const CustomTextFieldNotched = styled(TextField)<CustomTextFieldNochedProps>(({ paddingValue }) => ({
-  '.MuiInputLabel-asterisk': {
-    display: 'none',
-  },
-  '& .MuiOutlinedInput-notchedOutline legend': {
-    paddingRight: '0',
-  },
-  '&.Mui-focused .MuiOutlinedInput-notchedOutline legend': {
-    paddingRight: paddingValue ?? '0',
-  },
-  '& .MuiInputLabel-shrink + .MuiInputBase-root .MuiOutlinedInput-notchedOutline legend': {
-    paddingRight: paddingValue ?? '0',
-  },
-}));
+const CustomTextFieldNotched = styled(TextField)<CustomTextFieldNochedProps>(
+  ({ paddingValue }) => ({
+    '.MuiInputLabel-asterisk': {
+      display: 'none',
+    },
+    '& .MuiOutlinedInput-notchedOutline legend': {
+      paddingRight: '0',
+    },
+    '&.Mui-focused .MuiOutlinedInput-notchedOutline legend': {
+      paddingRight: paddingValue ?? '0',
+    },
+    '& .MuiInputLabel-shrink + .MuiInputBase-root .MuiOutlinedInput-notchedOutline legend': {
+      paddingRight: paddingValue ?? '0',
+    },
+  })
+);
 
 const CustomNumberField = styled(TextField)({
   'input::-webkit-inner-spin-button': {
@@ -550,7 +552,7 @@ export default function PersonalAndBillingDataSection({
                   },
                 }}
                 renderOption={(props, option: InstitutionLocationData) => (
-                  <MenuItem key={option.code} {...props} sx={{ height: '44px' }}>
+                  <MenuItem id={option.code} {...props} sx={{ height: '44px' }}>
                     {option?.city}
                   </MenuItem>
                 )}
@@ -647,7 +649,7 @@ export default function PersonalAndBillingDataSection({
                   },
                 }}
                 renderOption={(props, option) => (
-                  <MenuItem key={option.country_code} {...props} sx={{ height: '44px' }}>
+                  <MenuItem id={option.country_code} {...props} sx={{ height: '44px' }}>
                     {option.name}
                   </MenuItem>
                 )}
@@ -735,7 +737,7 @@ export default function PersonalAndBillingDataSection({
             pl={3}
             pt={
               !isForeignInsurance ||
-                (formik.values.hasVatnumber && onboardingFormData?.taxCode !== '')
+              (formik.values.hasVatnumber && onboardingFormData?.taxCode !== '')
                 ? 3
                 : 0
             }
@@ -935,11 +937,13 @@ export default function PersonalAndBillingDataSection({
         {(isInformationCompany ||
           isContractingAuthority ||
           ((productId === 'prod-interop' || productId === 'prod-pagopa') &&
-            (institutionType === 'SCP' || institutionType === 'PRV' || institutionType === 'GPU'))) && (
-            <>
-              <Grid item xs={12}>
-                {/* Luogo di iscrizione al Registro delle Imprese facoltativo per institution Type !== 'PA' e 'PSP */}
-                <CustomTextFieldNotched
+            (institutionType === 'SCP' ||
+              institutionType === 'PRV' ||
+              institutionType === 'GPU'))) && (
+          <>
+            <Grid item xs={12}>
+              {/* Luogo di iscrizione al Registro delle Imprese facoltativo per institution Type !== 'PA' e 'PSP */}
+              <CustomTextFieldNotched
                 paddingValue={isContractingAuthority ? '20px' : '24px'}
                 {...baseTextFieldProps(
                   'businessRegisterPlace',
@@ -1052,7 +1056,7 @@ export default function PersonalAndBillingDataSection({
         {!institutionAvoidGeotax && (
           <Grid item xs={12}>
             <CustomTextFieldNotched
-            paddingValue={productId === 'prod-io-sign' ? '14px' : '20px'}
+              paddingValue={productId === 'prod-io-sign' ? '14px' : '20px'}
               {...baseTextFieldProps(
                 'supportEmail',
                 t(
@@ -1073,12 +1077,11 @@ export default function PersonalAndBillingDataSection({
                 color: theme.palette.text.secondary,
               }}
             >
-              {t(
-                'onboardingFormData.billingDataSection.assistanceContact.supportEmailDescriprion'
-              )}
+              {t('onboardingFormData.billingDataSection.assistanceContact.supportEmailDescriprion')}
             </Typography>
           </Grid>
         )}
       </Grid>
-    </Paper>);
+    </Paper>
+  );
 }

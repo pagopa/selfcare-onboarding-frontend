@@ -224,7 +224,7 @@ export default {
         isPartyProvidingAService: 'L’ente eroga un servizio rivolto ai cittadini?',
         gpuRequestAccessFor:
           'Per quali servizi di pubblica utilità e/o di interesse generale l’ente richiede l’accesso?',
-        frequencyOfPayment: 'La frequenza dei pagamenti è continuativa?',
+        longTermPayments: 'La frequenza dei pagamenti è continuativa?',
       },
       placeholder: {
         registerBoardList: 'Registro/Albo/Elenco',
