@@ -32,6 +32,7 @@ export function StepAdditionalGpuInformations({ back, forward /* origin, originI
       businessRegisterNumber: undefined,
       legalRegisterNumber: undefined,
       legalRegisterName: undefined,
+      longTermPayments: undefined,
       manager: false,
       managerAuthorized: false,
       managerEligible: false,
@@ -42,7 +43,7 @@ export function StepAdditionalGpuInformations({ back, forward /* origin, originI
   const [radioValues, setRadioValues] = useState<AdditionalGpuInformationsRadio>({
     isPartyRegistered: null,
     isPartyProvidingAService: null,
-    frequencyOfPayment: null,
+    longTermPayments: null,
   });
 
   const [errors, setErrors] = useState<{
@@ -56,64 +57,72 @@ export function StepAdditionalGpuInformations({ back, forward /* origin, originI
 
   // eslint-disable-next-line sonarjs/cognitive-complexity
   const handleAbleDisableAndCleanField = (fieldName: string, value: any) => {
-    // Una sola chiamata per aggiornare lo stato
-    setAdditionalGpuInformations((prev) => {
-      // eslint-disable-next-line functional/no-let
-      let updatedState = { ...prev };
+    switch (fieldName) {
+      case 'isPartyRegistered':
+      case 'isPartyProvidingAService':
+        // Una sola chiamata per aggiornare lo stato
+        setAdditionalGpuInformations((prev) => {
+          // eslint-disable-next-line functional/no-let
+          let updatedState = { ...prev };
 
-      if (fieldName === 'isPartyRegistered' && value === 'false') {
-        // Ripulisci i campi collegati quando il valore di isPartyRegistered è 'false'
-        updatedState = {
-          ...updatedState,
-          businessRegisterNumber: undefined,
-          legalRegisterNumber: undefined,
-        };
-      }
+          if (fieldName === 'isPartyRegistered' && value === 'false') {
+            // Ripulisci i campi collegati quando il valore di isPartyRegistered è 'false'
+            updatedState = {
+              ...updatedState,
+              businessRegisterNumber: undefined,
+              legalRegisterNumber: undefined,
+            };
+          }
 
-      if (fieldName === 'isPartyProvidingAService' && value === 'false') {
-        // Ripulisci il campo collegato quando il valore di isPartyProvidingAService è 'false'
-        updatedState = {
-          ...updatedState,
-          legalRegisterName: undefined,
-        };
-      }
-      return updatedState;
-    });
+          if (fieldName === 'isPartyProvidingAService' && value === 'false') {
+            // Ripulisci il campo collegato quando il valore di isPartyProvidingAService è 'false'
+            updatedState = {
+              ...updatedState,
+              legalRegisterName: undefined,
+            };
+          }
+          console.log('updatedState', updatedState);
+          return updatedState;
+        });
 
-    // Gestione del disabilitamento dei campi
-    setFieldDisabled((prev) => {
-      const updatedDisabledState = { ...prev };
+        // Gestione del disabilitamento dei campi
+        setFieldDisabled((prev) => {
+          const updatedDisabledState = { ...prev };
 
-      if (fieldName === 'isPartyRegistered') {
-        // eslint-disable-next-line functional/immutable-data
-        updatedDisabledState.isPartyRegistered = value === 'false';
-      }
+          if (fieldName === 'isPartyRegistered') {
+            // eslint-disable-next-line functional/immutable-data
+            updatedDisabledState.isPartyRegistered = value === 'false';
+          }
 
-      if (fieldName === 'isPartyProvidingAService') {
-        // eslint-disable-next-line functional/immutable-data
-        updatedDisabledState.isPartyProvidingAService = value === 'false';
-      }
+          if (fieldName === 'isPartyProvidingAService') {
+            // eslint-disable-next-line functional/immutable-data
+            updatedDisabledState.isPartyProvidingAService = value === 'false';
+          }
 
-      return updatedDisabledState;
-    });
+          return updatedDisabledState;
+        });
 
-    setErrors((prev) => {
-      const updatedErrors = { ...prev };
+        setErrors((prev) => {
+          const updatedErrors = { ...prev };
 
-      if (fieldName === 'isPartyRegistered' && value === 'false') {
-        // eslint-disable-next-line functional/immutable-data
-        delete updatedErrors.businessRegisterNumber;
-        // eslint-disable-next-line functional/immutable-data
-        delete updatedErrors.legalRegisterNumber;
-      }
+          if (fieldName === 'isPartyRegistered' && value === 'false') {
+            // eslint-disable-next-line functional/immutable-data
+            delete updatedErrors.businessRegisterNumber;
+            // eslint-disable-next-line functional/immutable-data
+            delete updatedErrors.legalRegisterNumber;
+          }
 
-      if (fieldName === 'isPartyProvidingAService' && value === 'false') {
-        // eslint-disable-next-line functional/immutable-data
-        delete updatedErrors.legalRegisterName;
-      }
+          if (fieldName === 'isPartyProvidingAService' && value === 'false') {
+            // eslint-disable-next-line functional/immutable-data
+            delete updatedErrors.legalRegisterName;
+          }
 
-      return updatedErrors;
-    });
+          return updatedErrors;
+        });
+        break;
+      default:
+        break;
+    }
   };
 
   const handleFieldChange = (
@@ -125,17 +134,15 @@ export function StepAdditionalGpuInformations({ back, forward /* origin, originI
       case 'text':
         const onlyAlfaNumericValue =
           typeof value === 'string' ? value.replace(/[^a-zA-Z0-9]/g, '') : value;
-        const onlyNumberValue = typeof value === 'string' ? value.replace(/[^0-9]/g, '') : value;
+        // const onlyNumberValue = typeof value === 'string' ? value.replace(/[^0-9]/g, '') : value;
         const onlyAlfaNumericWithSpaceValue =
           typeof value === 'string' ? value.replace(/[^a-zA-Z0-9 ]/g, '') : value;
 
         setAdditionalGpuInformations((prev) => ({
           ...prev,
           [fieldName]:
-            fieldName === 'businessRegisterNumber'
+            fieldName === 'legalRegisterNumber'
               ? onlyAlfaNumericValue
-              : fieldName === 'legalRegisterNumber'
-              ? onlyNumberValue
               : onlyAlfaNumericWithSpaceValue,
         }));
         return;
@@ -146,6 +153,10 @@ export function StepAdditionalGpuInformations({ back, forward /* origin, originI
         }));
         break;
       case 'radio':
+        setAdditionalGpuInformations((prev) => ({
+          ...prev,
+          [fieldName]: fieldName === 'longTermPayments' ? value === 'true' : value,
+        }));
         setRadioValues((prev) => ({
           ...prev,
           [fieldName]: value === 'true',
@@ -193,6 +204,13 @@ export function StepAdditionalGpuInformations({ back, forward /* origin, originI
       console.log('forward with this data: ', additionalGpuInformations);
     }
   };
+
+  const areAllCheckboxesChecked = () =>
+    additionalGpuInformations.manager &&
+    additionalGpuInformations.managerAuthorized &&
+    additionalGpuInformations.managerEligible &&
+    additionalGpuInformations.managerProsecution &&
+    additionalGpuInformations.institutionCourtMeasures;
 
   return (
     <Grid container item sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -349,29 +367,29 @@ export function StepAdditionalGpuInformations({ back, forward /* origin, originI
           <Grid item xs={12} my={1}>
             <Typography sx={{ fontSize: '18px', fontWeight: 600 }}>
               {' '}
-              {t('additionalGpuDataPage.firstBlock.question.frequencyOfPayment')}
+              {t('additionalGpuDataPage.firstBlock.question.longTermPayments')}
             </Typography>
           </Grid>
           <Grid item xs={12} my={1}>
             <FormControl>
               <RadioGroup
-                id="frequencyOfPayment"
-                aria-labelledby="frequencyOfPayment"
-                name="frequencyOfPayment"
-                value={radioValues.frequencyOfPayment}
+                id="longTermPayments"
+                aria-labelledby="longTermPayments"
+                name="longTermPayments"
+                value={radioValues.longTermPayments}
                 onChange={(event) =>
-                  handleFieldChange('frequencyOfPayment', event.target.value, 'radio')
+                  handleFieldChange('longTermPayments', event.target.value, 'radio')
                 }
               >
                 <FormControlLabel
-                  id="frequencyOfPaymentTrue"
+                  id="longTermPaymentsTrue"
                   value="true"
                   control={<Radio />}
                   label={t('additionalGpuDataPage.firstBlock.yes')}
                 />
                 <FormControlLabel
                   value="false"
-                  id="frequencyOfPaymentFalse"
+                  id="longTermPaymentsFalse"
                   control={<Radio />}
                   label={t('additionalGpuDataPage.firstBlock.no')}
                 />
@@ -503,7 +521,8 @@ export function StepAdditionalGpuInformations({ back, forward /* origin, originI
             disabled:
               radioValues.isPartyRegistered === null ||
               radioValues.isPartyProvidingAService === null ||
-              radioValues.frequencyOfPayment === null,
+              radioValues.longTermPayments === null ||
+              !areAllCheckboxesChecked(),
           }}
         />
       </Grid>

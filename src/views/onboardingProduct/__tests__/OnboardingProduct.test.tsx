@@ -1135,7 +1135,7 @@ const executeStepAdditionalGpuInformations = async () => {
   const isPartyProvidingAServiceFalse = document.getElementById(
     'isPartyProvidingAServiceFalse'
   ) as HTMLElement;
-  const frequencyOfPaymentTrue = document.getElementById('frequencyOfPaymentTrue') as HTMLElement;
+  const longTermPaymentsTrue = document.getElementById('longTermPaymentsTrue') as HTMLElement;
   const manager = document.getElementById('manager') as HTMLElement;
   const managerAuthorized = document.getElementById('managerAuthorized') as HTMLElement;
   const managerEligible = document.getElementById('managerEligible') as HTMLElement;
@@ -1153,7 +1153,20 @@ const executeStepAdditionalGpuInformations = async () => {
 
   fireEvent.click(isPartyRegisteredTrue);
   fireEvent.click(isPartyProvidingAServiceTrue);
-  fireEvent.click(frequencyOfPaymentTrue);
+  fireEvent.click(longTermPaymentsTrue);
+
+  // Change di tutti i vari checkbox
+  fireEvent.click(manager);
+  fireEvent.click(managerAuthorized);
+  fireEvent.click(managerEligible);
+  fireEvent.click(managerProsecution);
+  fireEvent.click(institutionCourtMeasures);
+
+  expect(manager).toBeChecked();
+  expect(managerAuthorized).toBeChecked();
+  expect(managerEligible).toBeChecked();
+  expect(managerProsecution).toBeChecked();
+  expect(institutionCourtMeasures).toBeChecked();
 
   expect(continueButton).not.toBeDisabled();
 
@@ -1174,12 +1187,12 @@ const executeStepAdditionalGpuInformations = async () => {
     expect(legalRegisterName).not.toBeDisabled();
   });
 
-  fireEvent.change(businessRegisterNumber, { target: { value: 'a1 ' } });
+  fireEvent.change(businessRegisterNumber, { target: { value: 'a 1' } });
   fireEvent.change(legalRegisterNumber, { target: { value: 'a22' } });
   fireEvent.change(legalRegisterName, { target: { value: 'a 1' } });
 
-  expect(businessRegisterNumber.value).toBe('a1');
-  expect(legalRegisterNumber.value).toBe('22');
+  expect(businessRegisterNumber.value).toBe('a 1');
+  expect(legalRegisterNumber.value).toBe('a22');
   expect(legalRegisterName.value).toBe('a 1');
 
   fireEvent.click(isPartyRegisteredFalse);
@@ -1195,22 +1208,6 @@ const executeStepAdditionalGpuInformations = async () => {
   fireEvent.change(businessRegisterNumber, { target: { value: 'Comunale 12' } });
   fireEvent.change(legalRegisterNumber, { target: { value: '250301' } });
   fireEvent.change(legalRegisterName, { target: { value: 'SkiPass' } });
-
-  // Change di tutti i vari checkbox
-  fireEvent.click(manager);
-  fireEvent.click(managerAuthorized);
-  fireEvent.click(managerEligible);
-  fireEvent.click(managerEligible);
-  fireEvent.click(managerProsecution);
-  fireEvent.click(managerProsecution);
-  fireEvent.click(institutionCourtMeasures);
-  fireEvent.click(institutionCourtMeasures);
-
-  expect(manager).toBeChecked();
-  expect(managerAuthorized).toBeChecked();
-  expect(managerEligible).not.toBeChecked();
-  expect(managerProsecution).not.toBeChecked();
-  expect(institutionCourtMeasures).not.toBeChecked();
 
   fireEvent.click(continueButton);
 };
@@ -2030,16 +2027,16 @@ const billingData2billingDataRequest = (
   recipientCode: errorOnSubmit
     ? 'A2B3C4'
     : // MERGE THIS CONDITIONS
-    institutionType === 'PSP'
-    ? 'A1B2C3'
-    : (from === 'IPA' ||
-        institutionType === 'GSP' ||
-        (from === 'NO_IPA' && institutionType === 'GPU')) &&
-      typeOfSearch !== 'aooCode'
-    ? typeOfSearch === 'taxCode'
-      ? 'A3B4C5'
-      : 'A1B2C3'
-    : undefined,
+      institutionType === 'PSP'
+      ? 'A1B2C3'
+      : (from === 'IPA' ||
+            institutionType === 'GSP' ||
+            (from === 'NO_IPA' && institutionType === 'GPU')) &&
+          typeOfSearch !== 'aooCode'
+        ? typeOfSearch === 'taxCode'
+          ? 'A3B4C5'
+          : 'A1B2C3'
+        : undefined,
 });
 
 const verifySubmit = async (
@@ -2087,33 +2084,33 @@ const verifySubmit = async (
           originId: errorOnSubmit
             ? mockPartyRegistry.items[1].originId
             : from === 'NO_IPA'
-            ? undefined
-            : from === 'ANAC'
-            ? mockedANACParties[0].originId
-            : from === 'IVASS'
-            ? haveTaxCode
-              ? isForeignInsurance
-                ? mockedInsuranceResource.items[0].originId
-                : mockedInsuranceResource.items[2].originId
-              : mockedInsuranceResource.items[4].originId
-            : from === 'INFOCAMERE'
-            ? undefined
-            : from === 'PDND_INFOCAMERE'
-            ? '00112233445'
-            : typeOfSearch === 'taxCode'
-            ? mockedParties[0].originId
-            : typeOfSearch === 'aooCode'
-            ? mockedAoos[0].codiceUniAoo
-            : typeOfSearch === 'uoCode'
-            ? mockedUos[0].codiceUniUo
-            : (institutionType === 'PRV' && productId === 'prod-pagopa') ||
-              (institutionType === 'GPU' &&
-                (productId === 'prod-pagopa' ||
-                  productId === 'prod-interop' ||
-                  productId === 'prod-io-sign' ||
-                  productId === 'prod-io'))
-            ? undefined
-            : '991',
+              ? undefined
+              : from === 'ANAC'
+                ? mockedANACParties[0].originId
+                : from === 'IVASS'
+                  ? haveTaxCode
+                    ? isForeignInsurance
+                      ? mockedInsuranceResource.items[0].originId
+                      : mockedInsuranceResource.items[2].originId
+                    : mockedInsuranceResource.items[4].originId
+                  : from === 'INFOCAMERE'
+                    ? undefined
+                    : from === 'PDND_INFOCAMERE'
+                      ? '00112233445'
+                      : typeOfSearch === 'taxCode'
+                        ? mockedParties[0].originId
+                        : typeOfSearch === 'aooCode'
+                          ? mockedAoos[0].codiceUniAoo
+                          : typeOfSearch === 'uoCode'
+                            ? mockedUos[0].codiceUniUo
+                            : (institutionType === 'PRV' && productId === 'prod-pagopa') ||
+                                (institutionType === 'GPU' &&
+                                  (productId === 'prod-pagopa' ||
+                                    productId === 'prod-interop' ||
+                                    productId === 'prod-io-sign' ||
+                                    productId === 'prod-io'))
+                              ? undefined
+                              : '991',
           taxCode: errorOnSubmit
             ? mockPartyRegistry.items[1].taxCode
             : from === 'NO_IPA'
@@ -2150,20 +2147,17 @@ const verifySubmit = async (
                 }
               : undefined,
           gpuData:
-            institutionType === 'GPU' &&
-            (productId === 'prod-pagopa' ||
-              productId === 'prod-interop' ||
-              productId === 'prod-io-sign' ||
-              productId === 'prod-io')
+            institutionType === 'GPU' && productId === 'prod-pagopa'
               ? {
-                  businessRegisterNumber: 'Comunale12',
+                  businessRegisterNumber: 'Comunale 12',
                   legalRegisterNumber: '250301',
                   legalRegisterName: 'SkiPass',
+                  longTermPayments: true,
                   manager: true,
                   managerAuthorized: true,
-                  managerEligible: false,
-                  managerProsecution: false,
-                  institutionCourtMeasures: false,
+                  managerEligible: true,
+                  managerProsecution: true,
+                  institutionCourtMeasures: true,
                 }
               : undefined,
           companyInformations:
