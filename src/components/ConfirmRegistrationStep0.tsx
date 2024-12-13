@@ -62,6 +62,7 @@ export function ConfirmRegistrationStep0({ forward }: StepperStepComponentProps)
       method: 'GET',
     })
       .then((response) => {
+        console.log('response', response);
         const contentDisposition = response.headers.get('content-disposition');
         const matchedIndex = contentDisposition?.indexOf('=') as number;
         const fileName =
