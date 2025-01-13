@@ -574,6 +574,10 @@ export default {
         title: 'Public Service Provider',
         description: 'art. 2, para. 2, letter B of CAD (Digital Administration Code)',
       },
+      gpu: {
+        title: 'Manager of public utility and/or general interest',
+        description: 'Creditor institutions adhering on a voluntary basis',
+      },
       scp: {
         title: 'State-owned companies',
         description: 'art. 2, para. 2, letter C of CAD (Digital Administration Code)',
