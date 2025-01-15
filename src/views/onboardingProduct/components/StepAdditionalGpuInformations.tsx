@@ -81,7 +81,6 @@ export function StepAdditionalGpuInformations({ back, forward /* origin, originI
               legalRegisterName: undefined,
             };
           }
-          console.log('updatedState', updatedState);
           return updatedState;
         });
 
@@ -201,7 +200,6 @@ export function StepAdditionalGpuInformations({ back, forward /* origin, originI
     } else {
       // Procedi se non ci sono errori
       forward(additionalGpuInformations);
-      console.log('forward with this data: ', additionalGpuInformations);
     }
   };
 
