@@ -725,6 +725,7 @@ export default function PersonalAndBillingDataSection({
                 (isInformationCompany && onboardingFormData?.taxCode) ||
                 (institutionType === 'PRV' && productId !== 'prod-pagopa')
               }
+              maxLength={11}
             />
           </Grid>
         )}

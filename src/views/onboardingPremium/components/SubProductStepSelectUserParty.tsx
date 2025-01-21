@@ -33,7 +33,7 @@ const CustomBox = styled(Box)({
   overflowX: 'hidden',
 });
 const verifyPartyFilter = (party: SelfcareParty, filter: string) =>
-  party.description.toUpperCase().indexOf(filter.toUpperCase()) >= 0;
+  party.description?.toUpperCase().indexOf(filter.toUpperCase()) >= 0;
 export function SubProductStepSelectUserParty({
   forward,
   parties,

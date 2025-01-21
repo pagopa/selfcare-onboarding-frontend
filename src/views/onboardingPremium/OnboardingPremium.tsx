@@ -6,8 +6,6 @@ import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyt
 import { uniqueId } from 'lodash';
 import { useParams } from 'react-router';
 import { useTranslation, Trans } from 'react-i18next';
-import { EndingPage } from '@pagopa/selfcare-common-frontend/lib';
-import { IllusError } from '@pagopa/mui-italia';
 import { withLogin } from '../../components/withLogin';
 import { InstitutionType, SelfcareParty, Product, StepperStep, UserOnCreate } from '../../../types';
 import { OnboardingFormData } from '../../model/OnboardingFormData';
@@ -54,7 +52,7 @@ function OnboardingPremiumComponent() {
   const [billingData, setBillingData] = useState<OnboardingFormData>();
   const [institutionType, setInstitutionType] = useState<InstitutionType>();
   const [partyId, setPartyId] = useState<string>();
-  const [pricingPlan, setPricingPlan] = useState<string>();
+  const pricingPlan = 'C0';
 
   const setStepAddManagerHistoryState = useHistoryState<UsersObject>('people_step2', {})[2];
 
@@ -68,7 +66,6 @@ function OnboardingPremiumComponent() {
   const [companyInformations, setCompanyInformations] = useState<CompanyInformations>();
   const [openConfirmationModal, setOpenConfirmationModal] = useState(false);
   const [isCityEditable, setIsCityEditable] = useState(false);
-  const [availablePricingPlanIds, setAvailablePricingPlanIds] = useState<Array<string>>();
 
   useEffect(() => {
     registerUnloadEvent(setOnExit, setOpenExitModal, setOnExitAction);
@@ -105,7 +102,7 @@ function OnboardingPremiumComponent() {
     setProduct(newProduct);
     setSubProduct(newSubProduct);
     setParties(newParties);
-    setActiveStep(1);
+    setActiveStep(newSubProduct.id === 'prod-io-premium' ? 2 : 1);
   };
 
   const forwardWithBillingData = (newBillingData: OnboardingFormData) => {
@@ -176,8 +173,7 @@ function OnboardingPremiumComponent() {
     setPartyId(partyId);
     forward();
   };
-  const forwardWitSelectedPricingPlan = (selectedPricingPlan: string) => {
-    setPricingPlan(selectedPricingPlan);
+  const forwardWitSelectedPricingPlan = () => {
     setActiveStep(parties.length === 0 ? 3 : 2);
     window.scrollTo(0, 0);
   };
@@ -207,7 +203,7 @@ function OnboardingPremiumComponent() {
       label: 'Select Pricing Plan',
       Component: () =>
         SubProductStepSelectPricingPlan({
-          setAvailablePricingPlanIds,
+          setAvailablePricingPlanIds: undefined,
           forward: forwardWitSelectedPricingPlan,
           product,
         }),
@@ -227,7 +223,7 @@ function OnboardingPremiumComponent() {
             }
           },
           back: () => {
-            setActiveStep(1);
+            setActiveStep(0);
           },
         }),
     },
@@ -284,7 +280,7 @@ function OnboardingPremiumComponent() {
               setOnExitAction(() => window.location.assign(`${ENV.URL_FE.DASHBOARD}/${partyId}`));
               setOpenExitModal(true);
             } else {
-              setActiveStep(chooseFromMyParties.current ? 2 : 3);
+              setActiveStep(2);
               window.scrollTo(0, 0);
             }
           },
@@ -344,23 +340,7 @@ function OnboardingPremiumComponent() {
     setOnExitAction(undefined);
   };
 
-  return pricingPlan && !availablePricingPlanIds?.includes(pricingPlan) ? (
-    <EndingPage
-      minHeight="52vh"
-      icon={<IllusError size={60} />}
-      variantTitle={'h4'}
-      variantDescription={'body1'}
-      title={t('invalidPricingPlan.title')}
-      description={
-        <Trans i18nKey="invalidPricingPlan.description">
-          Non riusciamo a trovare la pagina che stai cercando. <br />
-          Assicurati che l’indirizzo sia corretto o torna alla home.
-        </Trans>
-      }
-      buttonLabel={t('invalidPricingPlan.backButton')}
-      onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
-    />
-  ) : (
+  return (
     <Container sx={{ px: '0px !important', maxWidth: '100% !important' }}>
       <Step />
       <SessionModal

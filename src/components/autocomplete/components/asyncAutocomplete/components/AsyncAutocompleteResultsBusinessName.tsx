@@ -41,7 +41,7 @@ export default function AsyncAutocompleteResultsBusinessName({
   getOptionKey,
 }: Props) {
   return (
-    <CustomBox my={2} {...options} width="90%" maxHeight="200px" overflow="auto">
+    <CustomBox my={2} width="90%" maxHeight="200px" overflow="auto">
       {!isLoading &&
         options.map((option) => (
           <Box
