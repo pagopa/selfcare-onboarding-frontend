@@ -6,12 +6,13 @@ import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyt
 import { uniqueId } from 'lodash';
 import { useParams } from 'react-router';
 import { useTranslation, Trans } from 'react-i18next';
+import { AxiosResponse } from 'axios';
 import { withLogin } from '../../components/withLogin';
 import { InstitutionType, SelfcareParty, Product, StepperStep, UserOnCreate } from '../../../types';
 import { OnboardingFormData } from '../../model/OnboardingFormData';
 import { LoadingOverlay } from '../../components/LoadingOverlay';
 import { ENV } from '../../utils/env';
-import { HeaderContext } from '../../lib/context';
+import { HeaderContext, UserContext } from '../../lib/context';
 import { StepAddManager, UsersObject } from '../../components/steps/StepAddManager';
 import StepOnboardingData from '../../components/steps/StepOnboardingData';
 import StepOnboardingFormData from '../../components/steps/StepOnboardingFormData';
@@ -20,6 +21,9 @@ import { CompanyInformations } from '../../model/CompanyInformations';
 import { registerUnloadEvent, unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
 import { useHistoryState } from '../../components/useHistoryState';
 import { ConfirmOnboardingModal } from '../../components/ConfirmOnboardingRequest';
+import { fetchWithLogs } from '../../lib/api-utils';
+import config from '../../utils/config.json';
+import { getFetchOutcome } from '../../lib/error-utils';
 import SubProductStepVerifyInputs from './components/SubProductStepVerifyInputs';
 import SubProductStepSubmit from './components/SubProductStepSubmit';
 import SubProductStepSuccess from './components/SubProductStepSuccess';
@@ -38,7 +42,7 @@ function OnboardingPremiumComponent() {
   const { subProductId, productId } = useParams<OnboardingPremiumUrlParams>();
   const [loading, setLoading] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
-
+  const { setRequiredLogin } = useContext(UserContext);
   const [subProduct, setSubProduct] = useState<Product>();
   const [product, setProduct] = useState<Product>();
   const [parties, setParties] = useState<Array<SelfcareParty>>([]);
@@ -52,7 +56,7 @@ function OnboardingPremiumComponent() {
   const [billingData, setBillingData] = useState<OnboardingFormData>();
   const [institutionType, setInstitutionType] = useState<InstitutionType>();
   const [partyId, setPartyId] = useState<string>();
-  const pricingPlan = 'C0';
+  const [pricingPlanCategory, setPricingPlanCategory] = useState<any>();
 
   const setStepAddManagerHistoryState = useHistoryState<UsersObject>('people_step2', {})[2];
 
@@ -83,6 +87,10 @@ function OnboardingPremiumComponent() {
       `onboarding-${externalInstitutionId}-${productId}-${subProductId}-`
     );
   }, [productId, subProductId]);
+
+  useEffect(() => {
+    void getPricingPlan();
+  }, []);
 
   const chooseFromMyParties = useRef(true);
 
@@ -181,10 +189,31 @@ function OnboardingPremiumComponent() {
   const handleOnConfirmModal = () => {
     trackEvent('ONBOARDING_PREMIUM_UX_CONVERSION', {
       party_id: partyId,
-      selected_plan: pricingPlan === 'C0' ? 'consumo' : 'carnet',
+      selected_plan: pricingPlanCategory.product['prod-io-premium']?.consumptionPlan.pricingPlan === 'C0' ? 'consumo' : 'carnet',
     });
     setOpenConfirmationModal(false);
     forward();
+  };
+
+  const getPricingPlan = async () => {
+    const configJsinResponse = await fetchWithLogs(
+      {
+        endpoint: 'CONFIG_JSON_CDN_URL',
+      },
+      {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      },
+      () => setRequiredLogin(true)
+    );
+
+    const restOutcome = getFetchOutcome(configJsinResponse);
+    if (restOutcome === 'success') {
+      const response = (configJsinResponse as AxiosResponse).data;
+      setPricingPlanCategory(response);
+    } else {
+      setPricingPlanCategory(config);
+    }
   };
 
   const steps: Array<StepperStep> = [
@@ -320,7 +349,7 @@ function OnboardingPremiumComponent() {
           users,
           billingData: billingData as OnboardingFormData,
           institutionType: institutionType as InstitutionType,
-          pricingPlan,
+          pricingPlan: pricingPlanCategory.product['prod-io-premium']?.consumptionPlan.pricingPlan,
           origin,
           setLoading,
           forward,

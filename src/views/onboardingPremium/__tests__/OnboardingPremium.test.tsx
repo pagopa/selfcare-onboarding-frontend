@@ -18,7 +18,7 @@ const initialLocation = {
   assign: jest.fn(),
   pathname: '/:productId/:subProductId',
   origin: 'MOCKED_ORIGIN',
-  search: '?pricingPlan=C1',
+  // search: '?pricingPlan=C1',
   hash: '',
   state: undefined,
 };
@@ -102,6 +102,8 @@ const renderComponent = (
   render(<Component />);
 };
 
+fetch;
+
 const stepBillingDataTitle = 'Inserisci i dati dell’ente';
 const stepAddManagerTitle = 'Indica il Legale Rappresentante';
 const successOnboardingSubProductTitle = 'La richiesta di adesione è stata inviata con successo';
@@ -109,7 +111,7 @@ const errorOnboardingSubProductTitle = 'Qualcosa è andato storto';
 
 test('Test: Bad productId and subProductId', async () => {
   renderComponent('error', 'error');
-  await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(3));
+  await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(5));
   await waitFor(() => screen.getByText('Impossibile individuare il prodotto desiderato'));
 });
 
@@ -326,12 +328,12 @@ const executeStepSelectInstitution = async (partyName: string) => {
   const continueButton = screen.getByText('Continua');
   expect(continueButton).toBeDisabled();
 
-  await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(4));
+  await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(5));
   const party = screen.getByText(partyName);
 
   expect(party).toBeTruthy();
 
-  expect(fetchWithLogsSpy).toBeCalledTimes(4);
+  expect(fetchWithLogsSpy).toBeCalledTimes(5);
 
   fireEvent.click(party);
 
@@ -358,7 +360,7 @@ const executeStepBillingDataWithTaxCodeInvoicing = async () => {
     target: { value: 'A1B2C3' },
   });
   await new Promise((resolve) => setTimeout(resolve, 300));
-   await waitFor(() => expect(screen.getByText('Codice Fiscale SFE')).toBeInTheDocument(), {
+  await waitFor(() => expect(screen.getByText('Codice Fiscale SFE')).toBeInTheDocument(), {
     timeout: 500, // Tempo massimo per l'attesa
   });
   await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
@@ -539,6 +541,7 @@ const billingData2billingDataRequest = () => ({
 });
 
 const verifySubmitPostLegals = async () => {
+
   await waitFor(() =>
     expect(fetchWithLogsSpy).lastCalledWith(
       {
@@ -564,7 +567,7 @@ const verifySubmitPostLegals = async () => {
             county: 'MI',
           },
           institutionType: 'PA',
-          pricingPlan: 'C0',
+          pricingPlan: "C0",
           origin: 'IPA',
           geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY
             ? [{ code: nationalValue, desc: 'ITALIA' }]
