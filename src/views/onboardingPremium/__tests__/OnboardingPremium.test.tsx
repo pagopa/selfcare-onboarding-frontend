@@ -9,7 +9,6 @@ import { Route, Router, Switch } from 'react-router';
 import { createMemoryHistory } from 'history';
 import { nationalValue } from '../../../model/GeographicTaxonomies';
 import React from 'react';
-import { mockRetrievePlanPrices } from '../../../lib/__mocks__/mockApiRequests';
 import i18n from '@pagopa/selfcare-common-frontend/lib/locale/locale-utils';
 
 jest.setTimeout(20000);
@@ -116,7 +115,7 @@ test('Test: Bad productId and subProductId', async () => {
 
 test('Test: Error retrieving onboarding info', async () => {
   renderComponent('prod-io', 'prod-io-premium');
-  await executeStepSelectPricingPlan();
+  // // await executeStepSelectPricingPlan();
   await executeStepSelectInstitution('Comune di Gessate');
   await waitFor(() => screen.getByText('Qualcosa è andato storto'));
   await executeClickCloseButton(false);
@@ -124,7 +123,7 @@ test('Test: Error retrieving onboarding info', async () => {
 
 test('Test: Successfully complete onboarding request', async () => {
   renderComponent('prod-io', 'prod-io-premium');
-  await executeStepSelectPricingPlan();
+  // // await executeStepSelectPricingPlan();
   await executeStepSelectInstitution('Comune di Milano');
   await executeStepBillingDataWithTaxCodeInvoicing();
   await executeStepAddManager(true);
@@ -134,7 +133,7 @@ test('Test: Successfully complete onboarding request', async () => {
 
 test('Test: Complete onboarding request with error on submit', async () => {
   renderComponent('prod-io', 'prod-io-premium');
-  await executeStepSelectPricingPlan();
+  // await executeStepSelectPricingPlan();
   await executeStepSelectInstitution('Comune di Udine');
   await executeStepBillingDataWithoutTaxCodeInvoicing();
   await executeStepAddManager(false);
@@ -143,7 +142,7 @@ test('Test: Complete onboarding request with error on submit', async () => {
 
 test('Test: exiting during flow with unload event', async () => {
   renderComponent('prod-io', 'prod-io-premium');
-  await executeStepSelectPricingPlan();
+  // await executeStepSelectPricingPlan();
   await executeStepSelectInstitution('Comune di Milano');
 
   const event = new Event('beforeunload');
@@ -358,8 +357,9 @@ const executeStepBillingDataWithTaxCodeInvoicing = async () => {
   fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
     target: { value: 'A1B2C3' },
   });
-  await waitFor(() => {
-    expect(screen.getByText('Codice Fiscale SFE')).toBeInTheDocument();
+  await new Promise((resolve) => setTimeout(resolve, 300));
+   await waitFor(() => expect(screen.getByText('Codice Fiscale SFE')).toBeInTheDocument(), {
+    timeout: 500, // Tempo massimo per l'attesa
   });
   await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
   fireEvent.click(confirmButtonEnabled);

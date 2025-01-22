@@ -19,7 +19,7 @@ import FooterConsumptionCard from './components/consumptionPlanComponent/FooterC
 
 type Props = StepperStepComponentProps & {
   product?: Product;
-  setAvailablePricingPlanIds: React.Dispatch<React.SetStateAction<Array<string> | undefined>>;
+  setAvailablePricingPlanIds: React.Dispatch<React.SetStateAction<Array<string> | undefined>> | undefined;
 };
 
 export default function SubProductStepSelectPricingPlan({
@@ -35,11 +35,11 @@ export default function SubProductStepSelectPricingPlan({
   const [plansPrices, setPlansPrices] = useState<PlansPrices>();
 
   useEffect(() => {
-    if (plansPrices) {
+    if (plansPrices && setAvailablePricingPlanIds) {
       const pricingPlanIds = plansPrices?.carnetPlans
         .map((p) => p.pricingPlan)
         .concat(plansPrices.consumptionPlan.pricingPlan);
-      setAvailablePricingPlanIds(pricingPlanIds);
+        setAvailablePricingPlanIds(pricingPlanIds);
     }
   }, [plansPrices]);
 

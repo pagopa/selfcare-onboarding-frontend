@@ -128,6 +128,7 @@ export default function StepOnboardingFormData({
     isPremium ||
     (origin === 'IPA' && institutionType !== 'PA' && !isPaymentServiceProvider) ||
     institutionType === 'PA';
+  const [originId4Premium, setOriginId4Premium] = useState<string>();
 
   const handleSearchByTaxCode = async (query: string) => {
     const searchResponse = await fetchWithLogs(
@@ -146,6 +147,7 @@ export default function StepOnboardingFormData({
 
     if (outcome === 'success') {
       setRetrievedIstat((searchResponse as AxiosResponse).data.istatCode);
+      setOriginId4Premium((searchResponse as AxiosResponse).data.originId);
     }
   };
 
@@ -193,25 +195,36 @@ export default function StepOnboardingFormData({
     }
   }, []);
 
-  useEffect(() => {
-    if (isPremium) {
-      // eslint-disable-next-line functional/immutable-data
-      requestIdRef.current = uniqueId(
-        `onboarding-step-manager-${externalInstitutionId}-${productId}-${subProductId}`
-      );
+  const handlePremiumBillingData = async () => {
+    // eslint-disable-next-line functional/immutable-data
+    requestIdRef.current = uniqueId(
+      `onboarding-step-manager-${externalInstitutionId}-${productId}-${subProductId}`
+    );
 
-      trackEvent('ONBOARDING_PREMIUM_BILLING_DATA', {
-        request_id: requestIdRef?.current,
-        party_id: externalInstitutionId,
-        product_id: productId,
-        subproduct_id: subProductId,
-      });
+    trackEvent('ONBOARDING_PREMIUM_BILLING_DATA', {
+      request_id: requestIdRef?.current,
+      party_id: externalInstitutionId,
+      product_id: productId,
+      subproduct_id: subProductId,
+    });
 
-      if (institutionType === 'PA' && initialFormData.taxCode) {
-        void handleSearchByTaxCode(initialFormData.taxCode);
+    if (institutionType === 'PA' && initialFormData.taxCode) {
+      try {
+        await handleSearchByTaxCode(initialFormData.taxCode);
+        if (
+          originId4Premium &&
+          formik.values.recipientCode &&
+          formik.values.recipientCode.length >= 6
+        ) {
+          await verifyRecipientCodeIsValid(formik.values.recipientCode, originId4Premium);
+        }
+      } catch (error) {
+        console.error('Error during premium billing data processing:', error);
       }
     }
-  }, [isPremium]);
+  };
+
+  
 
   useEffect(() => {
     if (selectFilterCategories) {
@@ -231,8 +244,8 @@ export default function StepOnboardingFormData({
       vatNumber: stepHistoryState.isTaxCodeEquals2PIVA
         ? formik.values.taxCode
         : formik.values.hasVatnumber && !formik.values.isForeignInsurance
-        ? formik.values.vatNumber
-        : undefined,
+          ? formik.values.vatNumber
+          : undefined,
       taxCode:
         formik.values.taxCode !== '' && formik.values.taxCode ? formik.values.taxCode : undefined,
     });
@@ -302,6 +315,12 @@ export default function StepOnboardingFormData({
     invalidTaxCodeInvoicing,
     recipientCodeStatus,
   ]);
+
+  useEffect(() => {
+    if (isPremium) {
+      void handlePremiumBillingData();
+    }
+  }, [originId4Premium, formik.values.recipientCode]);
 
   useEffect(() => {
     if (formik.values.hasVatnumber) {
@@ -409,6 +428,7 @@ export default function StepOnboardingFormData({
   useEffect(() => {
     if (
       (institutionType === 'PA' || aooSelected || uoSelected) &&
+      !isPremium &&
       formik.values.recipientCode &&
       formik.values.recipientCode.length >= 6
     ) {
