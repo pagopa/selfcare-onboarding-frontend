@@ -32,7 +32,7 @@ export default function SubProductStepSelectPricingPlan({
   const { setRequiredLogin } = useContext(UserContext);
 
   const [openExitModal, setOpenExitModal] = useState<boolean>(false);
-  const [plansPrices, setPlansPrices] = useState<PlansPrices>();
+  const [plansPrices, _setPlansPrices] = useState<PlansPrices>();
 
   useEffect(() => {
     if (plansPrices && setAvailablePricingPlanIds) {
@@ -74,7 +74,7 @@ export default function SubProductStepSelectPricingPlan({
     setOpenExitModal(false);
   };
 
-  const retrievePlanPrices = async () => {
+  /* const retrievePlanPrices = async () => {
     try {
       const response = await fetch(ENV.JSON_URL.PLAN_PRICES);
       const res = await response.json();
@@ -82,12 +82,12 @@ export default function SubProductStepSelectPricingPlan({
     } catch (error) {
       console.error(error);
     }
-  };
+  }; 
 
   useEffect(() => {
     void retrievePlanPrices();
     trackEvent('PREMIUM_LANDING VIEW');
-  }, []);
+  }, []); */
 
   const discount = false;
 
