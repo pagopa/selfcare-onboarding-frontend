@@ -102,8 +102,6 @@ const renderComponent = (
   render(<Component />);
 };
 
-fetch;
-
 const stepBillingDataTitle = 'Inserisci i dati dell’ente';
 const stepAddManagerTitle = 'Indica il Legale Rappresentante';
 const successOnboardingSubProductTitle = 'La richiesta di adesione è stata inviata con successo';
