@@ -251,9 +251,6 @@ function OnboardingPremiumComponent() {
               forward();
             }
           },
-          back: () => {
-            setActiveStep(0);
-          },
         }),
     },
     {

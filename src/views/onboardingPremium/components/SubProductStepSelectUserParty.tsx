@@ -37,7 +37,6 @@ const verifyPartyFilter = (party: SelfcareParty, filter: string) =>
 export function SubProductStepSelectUserParty({
   forward,
   parties,
-  back,
   productId,
   subProductId,
 }: Props) {
@@ -58,11 +57,6 @@ export function SubProductStepSelectUserParty({
     forward(selected);
   };
   const bodyTitle = t('onboardingSubProduct.selectUserPartyStep.title');
-
-  const backAction = () => {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    back!();
-  };
 
   useEffect(() => {
     // eslint-disable-next-line functional/immutable-data
@@ -154,7 +148,10 @@ export function SubProductStepSelectUserParty({
         >
           {moreThan3Parties && (
             <PartySelectionSearchInput
-              clearField={() => onFilterChange('')}
+              clearField={() => {
+                onFilterChange('');
+                setSelected(null);
+              }}
               input={input}
               onChange={(e) => onFilterChange(e.target.value)}
               iconColor={'#17324D'}
@@ -244,11 +241,6 @@ export function SubProductStepSelectUserParty({
             action: onForwardAction,
             label: t('onboardingSubProduct.selectUserPartyStep.confirmButton'),
             disabled: parties.length > 1 && (selected === undefined || selected === null),
-          }}
-          back={{
-            action: backAction,
-            label: t('stepInstitutionType.backLabel'),
-            disabled: false,
           }}
         />
       </Grid>
