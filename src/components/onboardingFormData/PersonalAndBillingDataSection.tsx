@@ -725,7 +725,16 @@ export default function PersonalAndBillingDataSection({
                 (isInformationCompany && onboardingFormData?.taxCode) ||
                 (institutionType === 'PRV' && productId !== 'prod-pagopa')
               }
-              inputProps={{ maxLength: 11 }}
+              inputProps={{
+                maxLength: 11
+              }}
+              value={formik.values.taxCode || ''}
+              onChange={(e) => {
+                const value = e.target.value.replace(/\D/g, ''); 
+                if (value.length <= 11) {
+                  formik.setFieldValue('taxCode', value);
+                }
+              }}
             />
           </Grid>
         )}
