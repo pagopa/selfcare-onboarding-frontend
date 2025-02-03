@@ -851,7 +851,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
             if (productId === 'prod-pagopa' && institutionType === 'GSP') {
               back();
             } else {
-              setActiveStep(activeStep - 2);
+              setActiveStep(activeStep - 3);
             }
           },
         }),
