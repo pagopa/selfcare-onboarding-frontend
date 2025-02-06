@@ -41,4 +41,5 @@ export type OnboardingFormData = {
   registerType?: string;
   originIdEc?: string;
   institutionType?: string;
+  certified?: boolean;
 };

@@ -6,7 +6,7 @@ import { theme } from '@pagopa/mui-italia';
 import { AxiosResponse } from 'axios';
 import { useContext, useEffect, useState } from 'react';
 import { useTranslation, Trans } from 'react-i18next';
-import { InstitutionType, StepperStepComponentProps } from '../../../types';
+import { InstitutionType, PspDataDto, StepperStepComponentProps } from '../../../types';
 import { fetchWithLogs } from '../../lib/api-utils';
 import { UserContext } from '../../lib/context';
 import { getFetchOutcome } from '../../lib/error-utils';
@@ -115,6 +115,7 @@ export default function PersonalAndBillingDataSection({
   const [input, setInput] = useState<string>();
   const [disableTaxCodeInvoicing, setDisableTaxCodeInvoicing] = useState<boolean>(false);
   const [taxCodeInvoicingVisible, setTaxCodeInvoicingVisible] = useState<boolean>(false);
+  const [pspData, setPspData] = useState<PspDataDto>();
 
   useEffect(() => {
     const shareCapitalIsNan = isNaN(formik.values.shareCapital);
@@ -129,6 +130,12 @@ export default function PersonalAndBillingDataSection({
   }, [formik.values.shareCapital]);
 
   useEffect(() => {
+    if (pspData?.abiCode) {
+      formik.setFieldValue('abiCode', pspData.abiCode);
+    }
+  }, [pspData]);
+
+  useEffect(() => {
     if (institutionLocationData?.city) {
       formik.setFieldValue('country', institutionLocationData.country);
       formik.setFieldValue('county', institutionLocationData.county);
@@ -138,6 +145,13 @@ export default function PersonalAndBillingDataSection({
 
   useEffect(() => {
     if (isPremium) {
+      setPspData({
+        businessRegisterNumber: formik.values.businessRegisterNumber,
+        legalRegisterName: formik.values.legalRegisterName,
+        legalRegisterNumber: formik.values.legalRegisterNumber,
+        vatNumberGroup: formik.values.vatNumberGroup,
+        abiCode: formik.values.abiCode,
+      });
       setInstitutionLocationData({
         country: formik.values.country,
         county: formik.values.county,
@@ -726,11 +740,11 @@ export default function PersonalAndBillingDataSection({
                 (institutionType === 'PRV' && productId !== 'prod-pagopa')
               }
               inputProps={{
-                maxLength: 11
+                maxLength: 11,
               }}
               value={formik.values.taxCode || ''}
               onChange={(e) => {
-                const value = e.target.value.replace(/\D/g, ''); 
+                const value = e.target.value.replace(/\D/g, '');
                 if (value.length <= 11) {
                   formik.setFieldValue('taxCode', value);
                 }
@@ -887,6 +901,7 @@ export default function PersonalAndBillingDataSection({
                       input.value = cleanedValue;
                     },
                   }}
+                  disabled={isPremium && formik.values.recipientCode}
                 />
                 <Typography
                   component={'span'}
@@ -1058,6 +1073,11 @@ export default function PersonalAndBillingDataSection({
                   600,
                   theme.palette.text.primary
                 )}
+                value={formik.values.abiCode}
+                InputLabelProps={{
+                  shrink: isPremium && formik.values.abiCode.length > 0,
+                }}
+                disabled={isDisabled && formik.values.abiCode.length > 0}
               />
             </Grid>
           </>
@@ -1077,6 +1097,7 @@ export default function PersonalAndBillingDataSection({
                 600,
                 theme.palette.text.primary
               )}
+              disabled={isPremium && formik.values.supportEmail?.length > 0}
             />
             {/* descrizione indirizzo mail di supporto */}
             <Typography

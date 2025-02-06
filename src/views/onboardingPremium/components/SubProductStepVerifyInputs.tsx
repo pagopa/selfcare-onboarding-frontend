@@ -41,54 +41,56 @@ const checkProduct = async (
 
 const handleSearchUserParties = async (
   setParties: (parties: Array<SelfcareParty>) => void,
-  setRequiredLogin: (required: boolean) => void
+  setRequiredLogin: (required: boolean) => void,
+  _productId: string,
+  subProductId: string
 ) => {
-  const searchResponseBase = await fetchWithLogs(
+  /* const searchResponseBase = await fetchWithLogs(
     { endpoint: 'ONBOARDING_GET_USER_PARTIES' },
     {
       method: 'GET',
       params: {
-        productFilter: 'prod-io',
+        productId,
       },
     },
     () => setRequiredLogin(true)
-  );
+  ); */
 
   const searchResponsePremium = await fetchWithLogs(
     { endpoint: 'ONBOARDING_GET_USER_PARTIES' },
     {
       method: 'GET',
       params: {
-        productFilter: 'prod-io-premium',
+        productId: subProductId,
       },
     },
     () => setRequiredLogin(true)
   );
-  const partiesWithBaseProduct = (searchResponseBase as AxiosResponse).data as Array<SelfcareParty>;
+  // const partiesWithBaseProduct = (searchResponseBase as AxiosResponse).data as Array<SelfcareParty>;
   const partiesWithPremiumProduct = (searchResponsePremium as AxiosResponse).data;
 
-  const partiesWithoutPremium = partiesWithBaseProduct.filter(
+  /* const partiesWithoutPremium = partiesWithBaseProduct.filter(
     (pb) => !partiesWithPremiumProduct.find((pp: any) => pb.id === pp.id)
-  );
+  ); */
 
-  const outcome = getFetchOutcome(searchResponseBase);
+  const outcome = getFetchOutcome(searchResponsePremium);
 
   if (outcome === 'success') {
-    if (process.env.REACT_APP_MOCK_API === 'true') {
+    /* if (process.env.REACT_APP_MOCK_API === 'true') { */
       setParties(
-        partiesWithBaseProduct.map((p) => ({
+        partiesWithPremiumProduct.map((p: any) => ({
           ...p,
           urlLogo: buildUrlLogo(p.id),
         }))
       );
-    } else {
+    /* } else {
       setParties(
         partiesWithoutPremium.map((p) => ({
           ...p,
           urlLogo: buildUrlLogo(p.id),
         }))
       );
-    }
+    } */
   } else {
     setParties([]);
   }
@@ -107,7 +109,7 @@ function SubProductStepVerifyInputs({
 
   const [selectedSubProduct, setSelectedSubProduct] = useState<Product | null>();
   const [selectedProduct, setSelectedProduct] = useState<Product | null>();
-
+  const [dataFetched, setDataFetched] = useState(false);
   const [parties, setParties] = useState<Array<SelfcareParty>>();
 
   const submit = () => {
@@ -115,7 +117,7 @@ function SubProductStepVerifyInputs({
     Promise.all([
       checkProduct(productId, setSelectedProduct, setRequiredLogin),
       checkProduct(subProductId, setSelectedSubProduct, setRequiredLogin),
-      handleSearchUserParties(setParties, setRequiredLogin),
+      handleSearchUserParties(setParties, setRequiredLogin, productId, subProductId),
     ])
       .catch((reason) => {
         trackAppError({
@@ -131,8 +133,11 @@ function SubProductStepVerifyInputs({
   };
 
   useEffect(() => {
-    submit();
-  }, [productId, subProductId]);
+    if (!dataFetched) {
+      submit();
+      setDataFetched(true);
+    }
+  }, [productId, subProductId, dataFetched]);
 
   useEffect(() => {
     if (

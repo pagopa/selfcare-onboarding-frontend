@@ -19,6 +19,7 @@ import { ENV } from '../../utils/env';
 
 type Props = StepperStepComponentProps & {
   productId: string;
+  subProductId?: string;
   partyId?: string;
   institutionType?: InstitutionType;
   subProductFlow?: boolean;
@@ -53,6 +54,7 @@ function StepOnboardingData({
   forward,
   partyId,
   productId,
+  subProductId,
   institutionType,
   subProductFlow,
 }: Props) {
@@ -74,7 +76,7 @@ function StepOnboardingData({
         method: 'GET',
         params: {
           institutionId,
-          productId,
+          productId: subProductFlow ? subProductId : productId,
         },
       },
       () => setRequiredLogin(true)
@@ -100,7 +102,9 @@ function StepOnboardingData({
           ?.charAt(0)
           .toUpperCase()
           .concat(result.institution?.city.substring(1).toLowerCase().trim()),
-        result.institution?.county
+        result.institution?.county,
+        result.institution?.pspData,
+        result.institution?.dpoData
       );
     } else if (
       (onboardingData as AxiosError<any>).response?.status === 404 ||

@@ -264,7 +264,7 @@ export const mockPartyRegistry = {
 };
 
 const mockedBaseParties: Array<SelfcareParty> = [
-  {
+  /* {
     id: '43446',
     description: 'Comune di Milano',
     userRole: 'ADMIN',
@@ -288,7 +288,51 @@ const mockedBaseParties: Array<SelfcareParty> = [
     id: '5454679',
     description: 'Comune di Udine',
     userRole: 'ADMIN',
+  }, */
+];
+
+const mockedBasePspParties: Array<SelfcareParty> = [
+  /* {
+    id: '54557',
+    description: 'Banca del Monte di Lucca S.p.A.',
+    userRole: 'ADMIN',
   },
+  {
+    id: '886755',
+    description: 'Banca del Fucino - S.p.A.',
+    userRole: 'ADMIN',
+  }, */
+];
+
+export const mockedPspParties = [
+  createPartyEntity(
+    '44556784333',
+    '8576',
+    '54557',
+    'Banca del Monte di Lucca S.p.A.',
+    'logo1',
+    'address1',
+    'a@aa.com',
+    '44556784333',
+    '33456',
+    '193161',
+    'ADMIN',
+    'N'
+  ),
+  createPartyEntity(
+    'externalId2',
+    '767764',
+    '886755',
+    'Banca del Fucino - S.p.A.',
+    'logo2',
+    'address2',
+    'a@cd.com',
+    '222333444567',
+    '33406',
+    'istat2',
+    'ADMIN',
+    'NONE'
+  ),
 ];
 
 export const mockedParties = [
@@ -818,6 +862,56 @@ const mockedOnboardingData: Array<InstitutionOnboardingInfoResource> = [
   },
 ];
 
+const mockedPspOnboardingData: Array<InstitutionOnboardingInfoResource> = [
+  {
+    institution: {
+      id: 'e8ea8aed-4c57-4f56-bc4e-7d52519a4c7a',
+      institutionType: 'PSP',
+      billingData: {
+        businessName: 'Antico Credito Arcorese',
+        registeredOffice: 'Via Umberto I',
+        digitalAddress: 'antico.credito.arcorese@test.it',
+        zipCode: '20862',
+        taxCode: '25301208621',
+        vatNumber: '25301208621',
+        recipientCode: 'A1B2V3',
+        publicServices: false,
+        certified: false,
+        geographicTaxonomies: [
+          {
+            code: '108004',
+            desc: 'ARCORE - COMUNE',
+          },
+        ],
+      },
+      pspData: {
+        businessRegisterNumber: '12345678910',
+        legalRegisterName: '12345',
+        legalRegisterNumber: '12',
+        abiCode: '25301',
+        vatNumberGroup: false,
+      },
+      dpoData: {
+        address: 'Via Parini 31',
+        pec: 'inidirizzo.test.pec@test.it',
+        email: 'parini@test.it',
+      },
+      city: 'Arcore',
+      county: 'MB',
+      country: 'IT',
+      origin: 'SELC',
+      companyInformations: {},
+      assistanceContacts: {},
+    },
+    geographicTaxonomies: [
+      {
+        code: '108004',
+        desc: 'ARCORE - COMUNE',
+      },
+    ],
+  },
+];
+
 const mockedOnboardedParties: Array<OnboardedParty> = [
   {
     id: '1',
@@ -863,6 +957,12 @@ export const mockedProducts: Array<Product> = [
     id: 'prod-io-premium',
     title: 'IO Premium',
     parentId: 'prod-io',
+    status: statusActive,
+  },
+  {
+    id: 'prod-dashboard-psp',
+    title: 'PSP Dashboard',
+    parentId: 'prod-pagopa',
     status: statusActive,
   },
   {
@@ -915,7 +1015,7 @@ export const institutionTypes: Array<InstitutionType> = [
   'AS',
   'SA',
   'PSP',
-  'PRV'
+  'PRV',
 ];
 
 export const mockedInsuranceResource: InsuranceCompaniesResource = {
@@ -1047,23 +1147,23 @@ const mockRecipientCodeValidation = [
 
 export const mockedCategories = {
   product: {
-    "prod-pn": {
+    'prod-pn': {
       ipa: {
-        PA: "A1,A2,A3,A4,A5,A6,A7,A8,A9"
-      }
+        PA: 'A1,A2,A3,A4,A5,A6,A7,A8,A9',
+      },
     },
-    "prod-io-premium": {
+    'prod-io-premium': {
       consumptionPlan: {
-        pricingPlan: "C0"
-      }
+        pricingPlan: 'C0',
+      },
     },
     default: {
       ipa: {
-        GSP: "B1,B2",
-        PA: "C1,C2,C3,C4,C5,C6,C7,C8,C9C,C10,C11,C12,C13,C14,C15,C16,C17,C18,C19,C20,C21,C22,C23,C24,C25,C26,C27,C28,C29,C30"
-      }
-    }
-  }
+        GSP: 'B1,B2',
+        PA: 'C1,C2,C3,C4,C5,C6,C7,C8,C9C,C10,C11,C12,C13,C14,C15,C16,C17,C18,C19,C20,C21,C22,C23,C24,C25,C26,C27,C28,C29,C30',
+      },
+    },
+  },
 };
 
 const noContent: Promise<AxiosResponse> = new Promise((resolve) =>
@@ -1141,8 +1241,7 @@ export async function mockFetch(
   { endpoint, endpointParams }: Endpoint,
   { params, data }: AxiosRequestConfig
 ): Promise<AxiosResponse | AxiosError> {
-
-  if (endpoint === "CONFIG_JSON_CDN_URL") {
+  if (endpoint === 'CONFIG_JSON_CDN_URL') {
     return new Promise((resolve) =>
       resolve({ data: mockedCategories, status: 200, statusText: '200' } as AxiosResponse)
     );
@@ -1297,41 +1396,70 @@ export async function mockFetch(
   }
 
   if (endpoint === 'ONBOARDING_GET_ONBOARDING_DATA') {
-    switch (params.institutionId) {
-      case '43446':
-        return new Promise((resolve) =>
-          resolve({
-            data: mockedOnboardingData[0],
-            status: 200,
-            statusText: '200',
-          } as AxiosResponse)
-        );
-      case '23231':
-        return new Promise((resolve) =>
-          resolve({
-            data: mockedOnboardingData[2],
-            status: 200,
-            statusText: '200',
-          } as AxiosResponse)
-        );
-      case '5454679':
-        return new Promise((resolve) =>
-          resolve({
-            data: mockedOnboardingData[1],
-            status: 200,
-            statusText: '200',
-          } as AxiosResponse)
-        );
-      case '775644':
-        return genericError;
-      default:
-        return new Promise((resolve) =>
-          resolve({
-            data: mockedOnboardingData[3],
-            status: 200,
-            statusText: '200',
-          } as AxiosResponse)
-        );
+    if (params.productId === 'prod-dashboard-psp') {
+      switch (params.institutionId) {
+        case '54557':
+          return new Promise((resolve) =>
+            resolve({
+              data: mockedPspOnboardingData[0],
+              status: 200,
+              statusText: '200',
+            } as AxiosResponse)
+          );
+        case '886755':
+          return new Promise((resolve) =>
+            resolve({
+              data: mockedPspOnboardingData[1],
+              status: 200,
+              statusText: '200',
+            } as AxiosResponse)
+          );
+        default:
+          return new Promise((resolve) =>
+            resolve({
+              data: mockedOnboardingData[3],
+              status: 200,
+              statusText: '200',
+            } as AxiosResponse)
+          );
+      }
+    } else {
+      switch (params.institutionId) {
+        case '43446':
+          return new Promise((resolve) =>
+            resolve({
+              data: mockedOnboardingData[0],
+              status: 200,
+              statusText: '200',
+            } as AxiosResponse)
+          );
+        case '23231':
+          return new Promise((resolve) =>
+            resolve({
+              data: mockedOnboardingData[2],
+              status: 200,
+              statusText: '200',
+            } as AxiosResponse)
+          );
+        case '5454679':
+          return new Promise((resolve) =>
+            resolve({
+              data: mockedOnboardingData[1],
+              status: 200,
+              statusText: '200',
+            } as AxiosResponse)
+          );
+        case '775644':
+          return genericError;
+        default:
+          return new Promise((resolve) =>
+            resolve({
+              data: mockedOnboardingData[3],
+              status: 200,
+              statusText: '200',
+            } as AxiosResponse)
+          );
+      }
     }
   }
 
@@ -1349,7 +1477,7 @@ export async function mockFetch(
   if (endpoint === 'ONBOARDING_USER_VALIDATION') {
     if (
       ['CRTCTF90B12C123K', 'CRTCTF91B12C123K', 'CRTCTF92B12C123K'].indexOf((data as any)?.taxCode) >
-      -1 &&
+        -1 &&
       ((data as any)?.name !== 'CERTIFIED_NAME' || (data as any)?.surname !== 'CERTIFIED_SURNAME')
     ) {
       return buildOnboardingUserValidation409(
@@ -1432,9 +1560,18 @@ export async function mockFetch(
   }
 
   if (endpoint === 'ONBOARDING_GET_USER_PARTIES') {
-    return new Promise((resolve) =>
-      resolve({ data: mockedBaseParties, status: 200, statusText: '200' } as AxiosResponse)
-    );
+    if (mockedBaseParties.length === 0 || mockedBasePspParties.length === 0) {
+      return notFoundError;
+    } else {
+      return new Promise((resolve) =>
+        resolve({
+          data:
+            params.productId === 'prod-dashboard-psp' ? mockedBasePspParties : mockedBaseParties,
+          status: 200,
+          statusText: '200',
+        } as AxiosResponse)
+      );
+    }
   }
 
   if (endpoint === 'ONBOARDING_TOKEN_VALIDATION') {

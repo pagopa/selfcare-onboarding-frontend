@@ -234,12 +234,28 @@ export type InstitutionData = {
   billingData: OnboardingFormData;
   institutionType: InstitutionType;
   origin: string;
+  pspData?: PspDataDto;
+  dpoData?: DpoDataDto;
   companyInformations?: CompanyInformations;
   assistanceContacts?: AssistanceContacts;
   geographicTaxonomies?: Array<GeographicTaxonomy>;
   country?: string;
   county?: string;
   city?: string;
+};
+
+export type DpoDataDto = {
+  email: string;
+  address: string;
+  pec: string;
+};
+
+export type PspDataDto = {
+  businessRegisterNumber: string;
+  legalRegisterName: string;
+  legalRegisterNumber: string;
+  abiCode: string;
+  vatNumberGroup: boolean;
 };
 
 export type InstitutionOnboardingInfoResource = {
