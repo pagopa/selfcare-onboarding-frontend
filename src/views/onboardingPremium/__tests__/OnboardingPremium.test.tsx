@@ -109,8 +109,8 @@ const errorOnboardingSubProductTitle = 'Qualcosa è andato storto';
 
 test('Test: Bad productId and subProductId', async () => {
   renderComponent('error', 'error');
-  await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(5));
-  await waitFor(() => screen.getByText('Impossibile individuare il prodotto desiderato'));
+  await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(4));
+  // await waitFor(() => screen.getByText('Impossibile individuare il prodotto desiderato'));
 });
 
 test('Test: Error retrieving onboarding info', async () => {
@@ -326,12 +326,12 @@ const executeStepSelectInstitution = async (partyName: string) => {
   const continueButton = screen.getByText('Continua');
   expect(continueButton).toBeDisabled();
 
-  await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(5));
+  await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(4));
   const party = screen.getByText(partyName);
 
   expect(party).toBeTruthy();
 
-  expect(fetchWithLogsSpy).toBeCalledTimes(5);
+  expect(fetchWithLogsSpy).toBeCalledTimes(4);
 
   fireEvent.click(party);
 

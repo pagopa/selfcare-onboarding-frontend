@@ -1086,7 +1086,7 @@ export default function PersonalAndBillingDataSection({
                 )}
                 value={formik.values.abiCode}
                 InputLabelProps={{
-                  shrink: isPremium && formik.values.abiCode.length > 0,
+                  shrink: isPremium && formik.values.abiCode?.length > 0,
                 }}
                 disabled={isDisabled && !!pspData?.abiCode}
               />

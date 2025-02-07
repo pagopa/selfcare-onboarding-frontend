@@ -54,7 +54,7 @@ function StepOnboardingData({
   forward,
   partyId,
   productId,
-  subProductId,
+  // subProductId,
   institutionType,
   subProductFlow,
 }: Props) {
@@ -76,7 +76,7 @@ function StepOnboardingData({
         method: 'GET',
         params: {
           institutionId,
-          productId: subProductFlow ? subProductId : productId,
+          productId
         },
       },
       () => setRequiredLogin(true)
