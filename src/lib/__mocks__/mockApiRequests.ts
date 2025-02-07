@@ -1398,18 +1398,11 @@ export async function mockFetch(
   if (endpoint === 'ONBOARDING_GET_ONBOARDING_DATA') {
     if (params.productId === 'prod-dashboard-psp') {
       switch (params.institutionId) {
+        case '886755':
         case '54557':
           return new Promise((resolve) =>
             resolve({
               data: mockedPspOnboardingData[0],
-              status: 200,
-              statusText: '200',
-            } as AxiosResponse)
-          );
-        case '886755':
-          return new Promise((resolve) =>
-            resolve({
-              data: mockedPspOnboardingData[1],
               status: 200,
               statusText: '200',
             } as AxiosResponse)

@@ -7,7 +7,6 @@ import { useTranslation } from 'react-i18next';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
 import { uniqueId } from 'lodash';
 import {
-  DpoDataDto,
   InstitutionType,
   Product,
   RequestOutcomeMessage,
@@ -101,7 +100,7 @@ export default function StepOnboardingFormData({
       edit: false,
     }
   );
-  const [dpoData, setDpoData] = useState<DpoDataDto>();
+
   const [stepHistoryState, setStepHistoryState, setStepHistoryStateHistory] =
     useHistoryState<StepBillingDataHistoryState>('onboardingFormData', {
       externalInstitutionId,
@@ -436,28 +435,6 @@ export default function StepOnboardingFormData({
     }
   }, [formik.values.recipientCode]);
 
-  useEffect(() => {
-    console.log('formik.values', formik.values);
-  }, []);
-
-  useEffect(() => {
-    if (dpoData) {
-      void formik.setFieldValue('dpoAddress', dpoData.address);
-      void formik.setFieldValue('dpoEmailAddress', dpoData.email);
-      void formik.setFieldValue('dpoPecAddress', dpoData.pec);
-    }
-  }, [dpoData]);
-
-  useEffect(() => {
-    if (isPremium) {
-      setDpoData({
-        address: formik.values.dpoAddress ?? '',
-        email: formik.values.dpoEmailAddress ?? '',
-        pec: formik.values.dpoPecAddress ?? '',
-      });
-    }
-  }, [isPremium]);
-
   const baseTextFieldProps = (
     field: keyof OnboardingFormData,
     label: string,
@@ -532,8 +509,6 @@ export default function StepOnboardingFormData({
         {isPaymentServiceProvider && (
           <DpoSection
             baseTextFieldProps={baseTextFieldProps}
-            isPremium={isPremium}
-            dpoData={formik.values}
           />
         )}
         <Grid item xs={12} mb={2}>

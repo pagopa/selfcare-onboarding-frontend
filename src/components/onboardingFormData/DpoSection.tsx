@@ -4,10 +4,8 @@ import { CustomTextField } from '../steps/StepOnboardingFormData';
 
 type Props = {
   baseTextFieldProps: any;
-  isPremium?: boolean;
-  dpoData: any;
 };
-export default function DpoSection({ isPremium, dpoData, baseTextFieldProps }: Props) {
+export default function DpoSection({ baseTextFieldProps }: Props) {
   const theme = useTheme();
   const { t } = useTranslation();
 
@@ -33,8 +31,6 @@ export default function DpoSection({ isPremium, dpoData, baseTextFieldProps }: P
                 t('onboardingFormData.dpoDataSection.dpoAddress'),
                 600
               )}
-              value={dpoData.address ?? ''}
-              disabled={isPremium && dpoData.address.length > 0}
             />
           </Grid>
           <Grid item xs={12}>
@@ -44,8 +40,6 @@ export default function DpoSection({ isPremium, dpoData, baseTextFieldProps }: P
                 t('onboardingFormData.dpoDataSection.dpoPecAddress'),
                 600
               )}
-              value={dpoData.pec ?? ''}
-              disabled={isPremium && dpoData.pec.length > 0}
             />
           </Grid>
           <Grid item xs={12}>
@@ -55,8 +49,6 @@ export default function DpoSection({ isPremium, dpoData, baseTextFieldProps }: P
                 t('onboardingFormData.dpoDataSection.dpoEmailAddress'),
                 600
               )}
-              value={dpoData.email ?? ''}
-              disabled={isPremium && dpoData.email.length > 0}
             />
           </Grid>
         </Grid>

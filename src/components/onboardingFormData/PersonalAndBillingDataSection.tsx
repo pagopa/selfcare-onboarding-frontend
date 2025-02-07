@@ -19,6 +19,7 @@ import { ENV } from '../../utils/env';
 import { CountryResource } from '../../model/CountryResource';
 import { requiredError } from '../../utils/constants';
 import { mockedCountries } from '../../lib/__mocks__/mockApiRequests';
+import { AssistanceContacts } from '../../model/AssistanceContacts';
 import NumberDecimalFormat from './NumberDecimalFormat';
 
 interface CustomTextFieldNochedProps {
@@ -115,6 +116,7 @@ export default function PersonalAndBillingDataSection({
   const [input, setInput] = useState<string>();
   const [disableTaxCodeInvoicing, setDisableTaxCodeInvoicing] = useState<boolean>(false);
   const [taxCodeInvoicingVisible, setTaxCodeInvoicingVisible] = useState<boolean>(false);
+  const [assistanceContacts, setAssistanceContacts] = useState<AssistanceContacts>();
   const [pspData, setPspData] = useState<PspDataDto>();
 
   useEffect(() => {
@@ -128,6 +130,12 @@ export default function PersonalAndBillingDataSection({
       setShrinkRea(false);
     }
   }, [formik.values.shareCapital]);
+
+  useEffect(() => {
+    if (assistanceContacts?.supportEmail) {
+      formik.setFieldValue('supportEmail', assistanceContacts.supportEmail);
+    }
+  }, [assistanceContacts]);
 
   useEffect(() => {
     if (pspData?.abiCode) {
@@ -145,6 +153,9 @@ export default function PersonalAndBillingDataSection({
 
   useEffect(() => {
     if (isPremium) {
+      setAssistanceContacts({
+        supportEmail: formik.values.supportEmail,
+      });
       setPspData({
         businessRegisterNumber: formik.values.businessRegisterNumber,
         legalRegisterName: formik.values.legalRegisterName,
@@ -1077,7 +1088,7 @@ export default function PersonalAndBillingDataSection({
                 InputLabelProps={{
                   shrink: isPremium && formik.values.abiCode.length > 0,
                 }}
-                disabled={isDisabled && formik.values.abiCode.length > 0}
+                disabled={isDisabled && !!pspData?.abiCode}
               />
             </Grid>
           </>
@@ -1097,7 +1108,7 @@ export default function PersonalAndBillingDataSection({
                 600,
                 theme.palette.text.primary
               )}
-              disabled={isPremium && formik.values.supportEmail?.length > 0}
+              disabled={isDisabled && !!assistanceContacts?.supportEmail}
             />
             {/* descrizione indirizzo mail di supporto */}
             <Typography

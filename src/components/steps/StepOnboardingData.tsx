@@ -103,8 +103,7 @@ function StepOnboardingData({
           .toUpperCase()
           .concat(result.institution?.city.substring(1).toLowerCase().trim()),
         result.institution?.county,
-        result.institution?.pspData,
-        result.institution?.dpoData
+        result.institution?.pspData
       );
     } else if (
       (onboardingData as AxiosError<any>).response?.status === 404 ||
