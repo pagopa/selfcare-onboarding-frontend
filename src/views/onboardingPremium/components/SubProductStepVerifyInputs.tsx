@@ -1,5 +1,5 @@
 import { AxiosError, AxiosResponse } from 'axios';
-import { useContext, useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useContext, useEffect, useState } from 'react';
 import { trackAppError } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
 import { SelfcareParty, Product, StepperStepComponentProps } from '../../../../types';
 import { HeaderContext, UserContext } from '../../../lib/context';
@@ -14,11 +14,12 @@ type Props = StepperStepComponentProps & {
   productId: string;
   subProductId: string;
   setLoading: (loading: boolean) => void;
+  setActiveStep: Dispatch<SetStateAction<number>>;
 };
 
 const checkProduct = async (
   id: string,
-  setter: (product: Product | null) => void,
+  setter: (product: Product | undefined) => void,
   setRequiredLogin: (required: boolean) => void
 ) => {
   const onboardingProducts = await fetchWithLogs(
@@ -32,10 +33,10 @@ const checkProduct = async (
     const product = (onboardingProducts as AxiosResponse).data;
     setter(product);
   } else if ((onboardingProducts as AxiosError).response?.status === 404) {
-    setter(null);
+    setter(undefined);
   } else {
     console.error('Unexpected response', (onboardingProducts as AxiosError).response);
-    setter(null);
+    setter(undefined);
   }
 };
 
@@ -77,12 +78,12 @@ const handleSearchUserParties = async (
 
   if (outcome === 'success') {
     /* if (process.env.REACT_APP_MOCK_API === 'true') { */
-      setParties(
-        partiesWithPremiumProduct.map((p: any) => ({
-          ...p,
-          urlLogo: buildUrlLogo(p.id),
-        }))
-      );
+    setParties(
+      partiesWithPremiumProduct.map((p: any) => ({
+        ...p,
+        urlLogo: buildUrlLogo(p.id),
+      }))
+    );
     /* } else {
       setParties(
         partiesWithoutPremium.map((p) => ({
@@ -102,12 +103,13 @@ function SubProductStepVerifyInputs({
   subProductId,
   requestId,
   setLoading,
+  setActiveStep,
 }: Props) {
   const [error, setError] = useState<boolean>(false);
   const { setOnExit } = useContext(HeaderContext);
   const { setRequiredLogin } = useContext(UserContext);
 
-  const [selectedSubProduct, setSelectedSubProduct] = useState<Product | null>();
+  const [selectedSubProduct, setSelectedSubProduct] = useState<Product | undefined>();
   const [selectedProduct, setSelectedProduct] = useState<Product | null>();
   const [dataFetched, setDataFetched] = useState(false);
   const [parties, setParties] = useState<Array<SelfcareParty>>();
@@ -140,15 +142,16 @@ function SubProductStepVerifyInputs({
   }, [productId, subProductId, dataFetched]);
 
   useEffect(() => {
-    if (
-      selectedProduct &&
-      selectedSubProduct &&
-      parties &&
-      selectedSubProduct.parentId === productId
-    ) {
-      forward(selectedProduct, selectedSubProduct, parties);
-    } else {
-      setError(true);
+    if (selectedProduct && selectedSubProduct && parties !== undefined) {
+      if (selectedSubProduct.parentId === productId) {
+        forward(selectedProduct, selectedSubProduct, parties);
+      } else {
+        setError(true);
+      }
+
+      if (parties.length === 0) {
+        setActiveStep(2);
+      }
     }
   }, [selectedProduct, selectedSubProduct, parties]);
 

@@ -15,7 +15,7 @@ import {
   /* StepperStep, */ UserOnCreate,
   StepperStep,
   DpoDataDto,
-  PspDataDto
+  PspDataDto,
 } from '../../../types';
 import { OnboardingFormData } from '../../model/OnboardingFormData';
 import { LoadingOverlay } from '../../components/LoadingOverlay';
@@ -120,7 +120,7 @@ function OnboardingPremiumComponent() {
     setProduct(newProduct);
     setSubProduct(newSubProduct);
     setParties(newParties);
-    setActiveStep(activeStep + 1);  
+    setActiveStep(activeStep + 1);
   };
 
   const forwardWithBillingData = (newBillingData: OnboardingFormData) => {
@@ -161,7 +161,7 @@ function OnboardingPremiumComponent() {
     city?: string,
     county?: string,
     pspData?: PspDataDto,
-    dpoData?: DpoDataDto,
+    dpoData?: DpoDataDto
   ) => {
     setStepAddManagerHistoryState({});
 
@@ -192,7 +192,7 @@ function OnboardingPremiumComponent() {
       setPspData(pspData);
     }
 
-    if(dpoData) {
+    if (dpoData) {
       setDpoData(dpoData);
     }
 
@@ -248,6 +248,7 @@ function OnboardingPremiumComponent() {
           productId,
           subProductId,
           setLoading,
+          setActiveStep,
           forward: forwardWithInputs,
         }),
     },
@@ -333,7 +334,7 @@ function OnboardingPremiumComponent() {
               setOnExitAction(() => window.location.assign(`${ENV.URL_FE.DASHBOARD}/${partyId}`));
               setOpenExitModal(true);
             } else {
-              setActiveStep(1);  
+              setActiveStep(1);
               window.scrollTo(0, 0);
             }
           },
@@ -356,7 +357,11 @@ function OnboardingPremiumComponent() {
               );
               setOpenExitModal(true);
             } else {
-              back();
+              if (subProductId === 'prod-dashboard-psp') {
+                setActiveStep(activeStep - 2);
+              } else {
+                back();
+              }
             }
           },
           subProduct,

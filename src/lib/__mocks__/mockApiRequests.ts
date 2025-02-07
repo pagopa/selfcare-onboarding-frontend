@@ -264,7 +264,7 @@ export const mockPartyRegistry = {
 };
 
 const mockedBaseParties: Array<SelfcareParty> = [
-  /* {
+  {
     id: '43446',
     description: 'Comune di Milano',
     userRole: 'ADMIN',
@@ -288,11 +288,11 @@ const mockedBaseParties: Array<SelfcareParty> = [
     id: '5454679',
     description: 'Comune di Udine',
     userRole: 'ADMIN',
-  }, */
+  },
 ];
 
 const mockedBasePspParties: Array<SelfcareParty> = [
-  /* {
+  {
     id: '54557',
     description: 'Banca del Monte di Lucca S.p.A.',
     userRole: 'ADMIN',
@@ -301,7 +301,7 @@ const mockedBasePspParties: Array<SelfcareParty> = [
     id: '886755',
     description: 'Banca del Fucino - S.p.A.',
     userRole: 'ADMIN',
-  }, */
+  },
 ];
 
 export const mockedPspParties = [
