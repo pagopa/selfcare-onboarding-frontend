@@ -225,6 +225,7 @@ function OnboardingPremiumComponent() {
           productId,
           subProductId,
           setLoading,
+          setActiveStep,
           forward: forwardWithInputs,
         }),
     },
