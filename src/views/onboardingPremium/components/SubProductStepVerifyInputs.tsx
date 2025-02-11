@@ -88,7 +88,6 @@ function SubProductStepVerifyInputs({
 
   const [selectedSubProduct, setSelectedSubProduct] = useState<Product | undefined>();
   const [selectedProduct, setSelectedProduct] = useState<Product | null>();
-  const [dataFetched, setDataFetched] = useState(false);
   const [parties, setParties] = useState<Array<SelfcareParty>>();
 
   const submit = () => {
@@ -112,11 +111,8 @@ function SubProductStepVerifyInputs({
   };
 
   useEffect(() => {
-    if (!dataFetched) {
       submit();
-      setDataFetched(true);
-    }
-  }, [productId, subProductId, dataFetched]);
+  }, [productId, subProductId]);
 
   useEffect(() => {
     if (selectedProduct && selectedSubProduct && parties !== undefined) {
