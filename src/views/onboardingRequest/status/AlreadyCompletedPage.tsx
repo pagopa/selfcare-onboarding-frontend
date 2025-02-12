@@ -1,7 +1,7 @@
 import { IllusError } from '@pagopa/mui-italia';
 import { EndingPage } from '@pagopa/selfcare-common-frontend/lib';
 import { useTranslation } from 'react-i18next';
-import { ENV } from '../../../utils/env';
+import { redirectToLogin } from '../../../utils/unloadEvent-utils';
 
 type Props = {
   translationKeyValue: string;
@@ -19,7 +19,7 @@ export default function AlreadyCompletedPage({ translationKeyValue }: Props) {
       variantTitle={'h4'}
       variantDescription={'body1'}
       buttonLabel={t('completeRegistration.request.alreadyCompleted.logIn')}
-      onButtonClick={() => window.location.assign(ENV.URL_FE.LOGIN)}
+      onButtonClick={() => redirectToLogin()}
     />
   );
 }

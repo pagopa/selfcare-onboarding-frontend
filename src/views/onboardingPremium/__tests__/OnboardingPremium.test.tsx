@@ -413,7 +413,7 @@ const executeClickHomeButton = async () => {
   );
   expect(goHomeButton).toBeEnabled();
   fireEvent.click(goHomeButton);
-  await waitFor(() => expect(mockedLocation.assign).toBeCalledWith(ENV.URL_FE.LANDING));
+  await waitFor(() => expect(mockedLocation.assign).toHaveBeenCalledWith(ENV.URL_FE.LANDING));
 };
 
 const executeClickCloseButton = async (expectedSuccessfulSubmit: boolean) => {
@@ -425,7 +425,7 @@ const executeClickCloseButton = async (expectedSuccessfulSubmit: boolean) => {
   );
   expect(closeButton).toBeEnabled();
   fireEvent.click(closeButton);
-  await waitFor(() => expect(mockedLocation.assign).toBeCalledWith(ENV.URL_FE.LANDING));
+  await waitFor(() => expect(mockedLocation.assign).toHaveBeenCalledWith(ENV.URL_FE.LANDING));
 };
 
 const executeClickAdhesionButton = async () => {
@@ -436,7 +436,7 @@ const executeClickAdhesionButton = async () => {
   expect(adhesionButton).toBeEnabled();
   fireEvent.click(adhesionButton);
   await waitFor(() =>
-    expect(mockedHistoryPush).toBeCalledWith('/onboarding/prod-io?partyExternalId=externalId3')
+    expect(mockedHistoryPush).toHaveBeenCalledWith('/onboarding/prod-io?partyExternalId=externalId3')
   );
 };
 
@@ -471,7 +471,7 @@ const fillUserBillingDataForm = async (
   fireEvent.change(document.getElementById(supportEmail) as HTMLElement, {
     target: { value: 'a@a.it' },
   });
-  fireEvent.click(document.getElementById('national_geographicTaxonomies'));
+  fireEvent.click(document.getElementById('national_geographicTaxonomies') as HTMLElement);
 };
 
 const fillTextFieldAndCheck = async (prefix: string, field: string, value: string) => {
