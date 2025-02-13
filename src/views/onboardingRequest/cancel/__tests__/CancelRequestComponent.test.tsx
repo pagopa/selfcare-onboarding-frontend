@@ -5,6 +5,7 @@ import '../../../../locale';
 import { buildAssistanceURI } from '@pagopa/selfcare-common-frontend/lib/services/assistanceService';
 import CancelRequestComponent from '../CancelRequest';
 import i18n from '@pagopa/selfcare-common-frontend/lib/locale/locale-utils';
+import React from 'react';
 
 jest.mock('../../../../lib/api-utils');
 
@@ -55,7 +56,7 @@ test("Test: The onboarding request can't be cancel because is not found (jwt que
   });
 
   fireEvent.click(assistanceButton);
-  waitFor(() => expect(buildAssistanceURI).toBeCalledWith(ENV.ASSISTANCE.EMAIL));
+  waitFor(() => expect(buildAssistanceURI).toHaveBeenCalledWith(ENV.ASSISTANCE.EMAIL));
 });
 
 test("Test: The onboarding request can't be cancel because is not found (not found the request jwt)", async () => {
@@ -65,7 +66,7 @@ test("Test: The onboarding request can't be cancel because is not found (not fou
   const assistanceButton = screen.getByText('Contatta l’assistenza');
 
   fireEvent.click(assistanceButton);
-  waitFor(() => expect(buildAssistanceURI).toBeCalledWith(ENV.ASSISTANCE.EMAIL));
+  waitFor(() => expect(buildAssistanceURI).toHaveBeenCalledWith(ENV.ASSISTANCE.EMAIL));
 });
 
 test("Test: The onboarding request can't be cancel because is already approved", async () => {
@@ -76,7 +77,7 @@ test("Test: The onboarding request can't be cancel because is already approved",
   const login = screen.getByText('Accedi');
 
   fireEvent.click(login);
-  waitFor(() => expect(buildAssistanceURI).toBeCalledWith(ENV.URL_FE.LOGIN));
+  waitFor(() => expect(buildAssistanceURI).toHaveBeenCalledWith(`${ENV.URL_FE.LOGIN}/login?onSuccess=`));
 });
 
 test("Test: The onboarding request can't be cancel because is expired", async () => {
@@ -87,7 +88,7 @@ test("Test: The onboarding request can't be cancel because is expired", async ()
   const login = screen.getByText('Torna alla home');
 
   fireEvent.click(login);
-  waitFor(() => expect(buildAssistanceURI).toBeCalledWith(ENV.URL_FE.LANDING));
+  waitFor(() => expect(buildAssistanceURI).toHaveBeenCalledWith(ENV.URL_FE.LANDING));
 });
 
 test('Test: The jwt exist and the request is correctly retrieved, cancel onboarding request flow is started and correcly deleted', async () => {
@@ -110,13 +111,13 @@ test('Test: The jwt exist and the request is correctly retrieved, cancel onboard
   });
   fireEvent.click(goHome);
 
-  expect(mockedLocation.assign).toBeCalledWith(ENV.URL_FE.LANDING);
+  expect(mockedLocation.assign).toHaveBeenCalledWith(ENV.URL_FE.LANDING);
   expect(fetchWithLogsSpy).toBeCalledTimes(1);
 });
 
 test('Test: The jwt exist and the request is correctly retrieved, cancel onboarding request flow is started and NOT correcly deleted', async () => {
   mockedLocation.search = 'jwt=error';
-  render(<CancelRequestPage />);
+  render(<CancelRequestPage deleteRequest={() => {}} />);
 
   await waitFor(() => {
     screen.getByText('Se la elimini, tutti i dati inseriti verranno persi.');
@@ -133,5 +134,5 @@ test('Test: The jwt exist and the request is correctly retrieved, cancel onboard
   });
   fireEvent.click(goHome);
 
-  expect(mockedLocation.assign).toBeCalledWith(ENV.URL_FE.LANDING);
+  expect(mockedLocation.assign).toHaveBeenCalledWith(ENV.URL_FE.LANDING);
 });

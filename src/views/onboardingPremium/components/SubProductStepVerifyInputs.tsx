@@ -46,16 +46,6 @@ const handleSearchUserParties = async (
   _productId: string,
   subProductId: string
 ) => {
-  /* const searchResponseBase = await fetchWithLogs(
-    { endpoint: 'ONBOARDING_GET_USER_PARTIES' },
-    {
-      method: 'GET',
-      params: {
-        productId,
-      },
-    },
-    () => setRequiredLogin(true)
-  ); */
 
   const searchResponsePremium = await fetchWithLogs(
     { endpoint: 'ONBOARDING_GET_USER_PARTIES' },
@@ -67,31 +57,18 @@ const handleSearchUserParties = async (
     },
     () => setRequiredLogin(true)
   );
-  // const partiesWithBaseProduct = (searchResponseBase as AxiosResponse).data as Array<SelfcareParty>;
+  
   const partiesWithPremiumProduct = (searchResponsePremium as AxiosResponse).data;
-
-  /* const partiesWithoutPremium = partiesWithBaseProduct.filter(
-    (pb) => !partiesWithPremiumProduct.find((pp: any) => pb.id === pp.id)
-  ); */
 
   const outcome = getFetchOutcome(searchResponsePremium);
 
   if (outcome === 'success') {
-    /* if (process.env.REACT_APP_MOCK_API === 'true') { */
     setParties(
       partiesWithPremiumProduct.map((p: any) => ({
         ...p,
         urlLogo: buildUrlLogo(p.id),
       }))
     );
-    /* } else {
-      setParties(
-        partiesWithoutPremium.map((p) => ({
-          ...p,
-          urlLogo: buildUrlLogo(p.id),
-        }))
-      );
-    } */
   } else {
     setParties([]);
   }
@@ -111,7 +88,6 @@ function SubProductStepVerifyInputs({
 
   const [selectedSubProduct, setSelectedSubProduct] = useState<Product | undefined>();
   const [selectedProduct, setSelectedProduct] = useState<Product | null>();
-  const [dataFetched, setDataFetched] = useState(false);
   const [parties, setParties] = useState<Array<SelfcareParty>>();
 
   const submit = () => {
@@ -135,11 +111,8 @@ function SubProductStepVerifyInputs({
   };
 
   useEffect(() => {
-    if (!dataFetched) {
       submit();
-      setDataFetched(true);
-    }
-  }, [productId, subProductId, dataFetched]);
+  }, [productId, subProductId]);
 
   useEffect(() => {
     if (selectedProduct && selectedSubProduct && parties !== undefined) {

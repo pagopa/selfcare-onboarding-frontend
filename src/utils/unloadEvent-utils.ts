@@ -33,5 +33,5 @@ const keepOnPage = (e: BeforeUnloadEvent) => {
 
 export const redirectToLogin = () => {
   const onSuccessEncoded = encodeURIComponent(location.pathname + location.search);
-  window.location.assign(`${ENV.URL_FE.LOGIN}?onSuccess=${onSuccessEncoded}`);
+  window.location.assign(`${ENV.URL_FE.LOGIN}/login?onSuccess=${onSuccessEncoded}`);
 };
