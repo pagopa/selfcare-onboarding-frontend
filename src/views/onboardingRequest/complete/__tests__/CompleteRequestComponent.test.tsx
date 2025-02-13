@@ -54,7 +54,7 @@ test('Test: The jwt is not present and the onboarding request is not retrieved, 
   });
 
   fireEvent.click(assistanceButton);
-  waitFor(() => expect(buildAssistanceURI).toBeCalledWith(ENV.ASSISTANCE.EMAIL));
+  waitFor(() => expect(buildAssistanceURI).toHaveBeenCalledWith(ENV.ASSISTANCE.EMAIL));
 });
 
 test('Test: The jwt is non-existent and the onboarding request is not retrieved, so the error page is showed', async () => {
@@ -65,7 +65,7 @@ test('Test: The jwt is non-existent and the onboarding request is not retrieved,
   const assistanceButton = screen.getByText('Contatta l’assistenza');
 
   fireEvent.click(assistanceButton);
-  waitFor(() => expect(buildAssistanceURI).toBeCalledWith(ENV.ASSISTANCE.EMAIL));
+  waitFor(() => expect(buildAssistanceURI).toHaveBeenCalledWith(ENV.ASSISTANCE.EMAIL));
 });
 
 test('Test: The jwt exist and the request is correct retrieved, but it is already approved', async () => {
@@ -76,7 +76,7 @@ test('Test: The jwt exist and the request is correct retrieved, but it is alread
   const login = screen.getByText('Accedi');
 
   fireEvent.click(login);
-  waitFor(() => expect(buildAssistanceURI).toBeCalledWith(ENV.URL_FE.LOGIN));
+  waitFor(() => expect(buildAssistanceURI).toHaveBeenCalledWith(`${ENV.URL_FE.LOGIN}/login?onSuccess=`));
 });
 
 test('Test: The jwt exist but is expired', async () => {
@@ -87,7 +87,7 @@ test('Test: The jwt exist but is expired', async () => {
   const login = screen.getByText('Torna alla home');
 
   fireEvent.click(login);
-  waitFor(() => expect(buildAssistanceURI).toBeCalledWith(ENV.URL_FE.LANDING));
+  waitFor(() => expect(buildAssistanceURI).toHaveBeenCalledWith(ENV.URL_FE.LANDING));
 });
 
 test('Test: The jwt exist and the request is correctly retrieved and waiting for upload/download contract, starting the upload flow', async () => {
@@ -107,8 +107,8 @@ test('Test: The jwt exist and the request is correctly retrieved and waiting for
 
   const submit = screen.getByRole('button', {
     name: 'Continua',
-  });
-  expect(submit).toBeDisabled();
+  }) as HTMLButtonElement;
+  expect(submit.disabled).toBe(true);
 
   const upload = document.getElementById('file-uploader') as HTMLElement;
 
