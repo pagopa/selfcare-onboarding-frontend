@@ -862,7 +862,7 @@ const mockedOnboardingData: Array<InstitutionOnboardingInfoResource> = [
   },
 ];
 
-const mockedPspOnboardingData: Array<InstitutionOnboardingInfoResource> = [
+export const mockedPspOnboardingData: Array<InstitutionOnboardingInfoResource> = [
   {
     institution: {
       id: 'e8ea8aed-4c57-4f56-bc4e-7d52519a4c7a',
@@ -884,14 +884,14 @@ const mockedPspOnboardingData: Array<InstitutionOnboardingInfoResource> = [
           },
         ],
       },
-      pspData: {
+      paymentServiceProvider: {
         businessRegisterNumber: '12345678910',
         legalRegisterName: '12345',
         legalRegisterNumber: '12',
         abiCode: '25301',
         vatNumberGroup: false,
       },
-      dpoData: {
+      dataProtectionOfficer: {
         address: 'Via Parini 31',
         pec: 'inidirizzo.test.pec@test.it',
         email: 'parini@test.it',
@@ -907,6 +907,100 @@ const mockedPspOnboardingData: Array<InstitutionOnboardingInfoResource> = [
       {
         code: '108004',
         desc: 'ARCORE - COMUNE',
+      },
+    ],
+  },
+  {
+    institution: {
+      id: 'b2d5f9c3-7a6b-4f89-9e8d-1f4cfa2b6e42',
+      institutionType: 'PSP',
+      billingData: {
+        businessName: 'Banca Popolare di Milano',
+        registeredOffice: 'Piazza Meda 4',
+        digitalAddress: 'info@bpm.it',
+        zipCode: '20121',
+        taxCode: '98765432101',
+        vatNumber: '98765432101',
+        recipientCode: 'Z9X8Y',
+        publicServices: false,
+        certified: true,
+        geographicTaxonomies: [
+          {
+            code: '201001',
+            desc: 'MILANO - COMUNE',
+          },
+        ],
+      },
+      paymentServiceProvider: {
+        businessRegisterNumber: '56789123456',
+        legalRegisterName: 'BP Milano',
+        legalRegisterNumber: '34',
+        abiCode: '98765',
+        vatNumberGroup: true,
+      },
+      dataProtectionOfficer: {
+        address: 'Via Manzoni 12',
+        pec: 'pec@bpm.it',
+        email: 'dpo@bpm.it',
+      },
+      city: 'Milano',
+      county: 'MI',
+      country: 'IT',
+      origin: 'SELC',
+      companyInformations: {},
+      assistanceContacts: {},
+    },
+    geographicTaxonomies: [
+      {
+        code: '201001',
+        desc: 'MILANO - COMUNE',
+      },
+    ],
+  },
+  {
+    institution: {
+      id: 'c3e1a7f2-5c6d-4d99-8b71-2e0fa8b3e932',
+      institutionType: 'PSP',
+      billingData: {
+        businessName: 'Credito Emiliano S.p.A.',
+        registeredOffice: 'Via Emilia Ovest 123',
+        digitalAddress: 'info@credem.it',
+        zipCode: '42122',
+        taxCode: '65432109876',
+        vatNumber: '65432109876',
+        recipientCode: 'Q1W2E3',
+        publicServices: true,
+        certified: false,
+        geographicTaxonomies: [
+          {
+            code: '404010',
+            desc: 'REGGIO EMILIA - COMUNE',
+          },
+        ],
+      },
+      paymentServiceProvider: {
+        businessRegisterNumber: '4321098765',
+        legalRegisterName: 'Credito Emiliano',
+        legalRegisterNumber: '56',
+        abiCode: '65432',
+        vatNumberGroup: false,
+      },
+      dataProtectionOfficer: {
+        address: 'Piazza Prampolini 5',
+        pec: 'pec@credem.it',
+        email: 'dpo@credem.it',
+      },
+      city: 'Reggio Emilia',
+      county: 'RE',
+      country: 'IT',
+      origin: 'SELC',
+      companyInformations: {},
+      assistanceContacts: {},
+    },
+    geographicTaxonomies: [
+      {
+        code: '404010',
+        desc: 'REGGIO EMILIA - COMUNE',
       },
     ],
   },
@@ -1399,7 +1493,6 @@ export async function mockFetch(
     if (params.productId === 'prod-dashboard-psp') {
       switch (params.institutionId) {
         case '886755':
-        case '54557':
           return new Promise((resolve) =>
             resolve({
               data: mockedPspOnboardingData[0],
@@ -1407,10 +1500,18 @@ export async function mockFetch(
               statusText: '200',
             } as AxiosResponse)
           );
+        case '54557':
+          return new Promise((resolve) =>
+            resolve({
+              data: mockedPspOnboardingData[1],
+              status: 200,
+              statusText: '200',
+            } as AxiosResponse)
+          );
         default:
           return new Promise((resolve) =>
             resolve({
-              data: mockedOnboardingData[3],
+              data: mockedPspOnboardingData[2],
               status: 200,
               statusText: '200',
             } as AxiosResponse)

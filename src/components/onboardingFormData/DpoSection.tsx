@@ -1,11 +1,13 @@
 import { Grid, Typography, useTheme, Paper } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { CustomTextField } from '../steps/StepOnboardingFormData';
+import { OnboardingFormData } from '../../model/OnboardingFormData';
 
 type Props = {
   baseTextFieldProps: any;
+  dpoData: OnboardingFormData;
 };
-export default function DpoSection({ baseTextFieldProps }: Props) {
+export default function DpoSection({ baseTextFieldProps, dpoData }: Props) {
   const theme = useTheme();
   const { t } = useTranslation();
 
@@ -27,28 +29,31 @@ export default function DpoSection({ baseTextFieldProps }: Props) {
           <Grid item xs={12}>
             <CustomTextField
               {...baseTextFieldProps(
-                'dpoAddress',
+                'address',
                 t('onboardingFormData.dpoDataSection.dpoAddress'),
                 600
               )}
+              value={dpoData?.address}
             />
           </Grid>
           <Grid item xs={12}>
             <CustomTextField
               {...baseTextFieldProps(
-                'dpoPecAddress',
+                'pec',
                 t('onboardingFormData.dpoDataSection.dpoPecAddress'),
                 600
               )}
+              value={dpoData?.pec}
             />
           </Grid>
           <Grid item xs={12}>
             <CustomTextField
               {...baseTextFieldProps(
-                'dpoEmailAddress',
+                'email',
                 t('onboardingFormData.dpoDataSection.dpoEmailAddress'),
                 600
               )}
+              value={dpoData?.email}
             />
           </Grid>
         </Grid>

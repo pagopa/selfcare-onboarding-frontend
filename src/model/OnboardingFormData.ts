@@ -21,9 +21,9 @@ export type OnboardingFormData = {
   registerNumber?: string;
   abiCode?: string;
   vatNumberGroup?: boolean;
-  dpoAddress?: string;
-  dpoPecAddress?: string;
-  dpoEmailAddress?: string;
+  address?: string;
+  pec?: string;
+  email?: string;
   businessRegisterPlace?: string;
   rea?: string;
   shareCapital?: string;

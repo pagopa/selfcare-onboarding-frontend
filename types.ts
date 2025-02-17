@@ -234,8 +234,8 @@ export type InstitutionData = {
   billingData: OnboardingFormData;
   institutionType: InstitutionType;
   origin: string;
-  pspData?: PspDataDto;
-  dpoData?: DpoDataDto;
+  paymentServiceProvider?: PaymentServiceProviderDto;
+  dataProtectionOfficer?: DataProtectionOfficerDto;
   companyInformations?: CompanyInformations;
   assistanceContacts?: AssistanceContacts;
   geographicTaxonomies?: Array<GeographicTaxonomy>;
@@ -244,13 +244,13 @@ export type InstitutionData = {
   city?: string;
 };
 
-export type DpoDataDto = {
-  email: string;
-  address: string;
-  pec: string;
+export type DataProtectionOfficerDto = {
+  email?: string;
+  address?: string;
+  pec?: string;
 };
 
-export type PspDataDto = {
+export type PaymentServiceProviderDto = {
   businessRegisterNumber: string;
   legalRegisterName: string;
   legalRegisterNumber: string;

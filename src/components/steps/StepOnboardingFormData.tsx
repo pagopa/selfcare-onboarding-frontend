@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
 import { uniqueId } from 'lodash';
 import {
+  DataProtectionOfficerDto,
   InstitutionType,
   Product,
   RequestOutcomeMessage,
@@ -130,6 +131,7 @@ export default function StepOnboardingFormData({
     (origin === 'IPA' && institutionType !== 'PA' && !isPaymentServiceProvider) ||
     institutionType === 'PA';
   const [originId4Premium, setOriginId4Premium] = useState<string>();
+  const [dpoData, setDpoData] = useState<DataProtectionOfficerDto>();
 
   const handleSearchByTaxCode = async (query: string) => {
     const searchResponse = await fetchWithLogs(
@@ -195,6 +197,24 @@ export default function StepOnboardingFormData({
       setPreviousGeotaxononomies(initialFormData.geographicTaxonomies);
     }
   }, []);
+
+  useEffect(() => {
+    if (dpoData) {
+      void formik.setFieldValue('address', dpoData.address);
+      void formik.setFieldValue('email', dpoData.email);
+      void formik.setFieldValue('pec', dpoData.pec);
+    }
+  }, [dpoData]);
+
+  useEffect(() => {
+    if (isPremium) {
+      setDpoData({
+        address: formik.values.address,
+        email: formik.values.email,
+        pec: formik.values.pec,
+      });
+    }
+  }, [isPremium]);
 
   const handlePremiumBillingData = async () => {
     // eslint-disable-next-line functional/immutable-data
@@ -289,7 +309,7 @@ export default function StepOnboardingFormData({
         invalidTaxCodeInvoicing,
         isPdndPrivate,
         recipientCodeStatus,
-        productId
+        productId,
       )
     );
 
@@ -313,6 +333,7 @@ export default function StepOnboardingFormData({
     formik.values,
     invalidTaxCodeInvoicing,
     recipientCodeStatus,
+    isPremium
   ]);
 
   useEffect(() => {
@@ -509,6 +530,7 @@ export default function StepOnboardingFormData({
         {isPaymentServiceProvider && (
           <DpoSection
             baseTextFieldProps={baseTextFieldProps}
+            dpoData={formik.values}
           />
         )}
         <Grid item xs={12} mb={2}>

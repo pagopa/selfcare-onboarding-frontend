@@ -14,8 +14,8 @@ import {
   Product,
   /* StepperStep, */ UserOnCreate,
   StepperStep,
-  DpoDataDto,
-  PspDataDto,
+  DataProtectionOfficerDto,
+  PaymentServiceProviderDto,
 } from '../../../types';
 import { OnboardingFormData } from '../../model/OnboardingFormData';
 import { LoadingOverlay } from '../../components/LoadingOverlay';
@@ -78,8 +78,8 @@ function OnboardingPremiumComponent() {
   const [companyInformations, setCompanyInformations] = useState<CompanyInformations>();
   const [openConfirmationModal, setOpenConfirmationModal] = useState(false);
   const [isCityEditable, setIsCityEditable] = useState(false);
-  const [dpoData, setDpoData] = useState<DpoDataDto>();
-  const [pspData, setPspData] = useState<PspDataDto>();
+  const [dpoData, setDpoData] = useState<DataProtectionOfficerDto>();
+  const [pspData, setPspData] = useState<PaymentServiceProviderDto>();
 
   useEffect(() => {
     registerUnloadEvent(setOnExit, setOpenExitModal, setOnExitAction);
@@ -160,8 +160,8 @@ function OnboardingPremiumComponent() {
     country?: string,
     city?: string,
     county?: string,
-    pspData?: PspDataDto,
-    dpoData?: DpoDataDto
+    pspData?: PaymentServiceProviderDto,
+    dpoData?: DataProtectionOfficerDto
   ) => {
     setStepAddManagerHistoryState({});
 
@@ -252,6 +252,7 @@ function OnboardingPremiumComponent() {
           forward: forwardWithInputs,
         }),
     },
+    // PRICING PLAN HAS BEEN DEACTIVATED
     // {
     //   label: 'Select Pricing Plan',
     //   Component: () =>
@@ -261,7 +262,6 @@ function OnboardingPremiumComponent() {
     //       product,
     //     }),
     // },
-
     {
       label: 'Select Institution related',
       Component: () =>
