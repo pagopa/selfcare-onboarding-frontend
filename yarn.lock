@@ -2084,10 +2084,10 @@
     fp-ts "^2.12.3"
     io-ts "^2.2.18"
 
-"@pagopa/selfcare-common-frontend@^1.34.51":
-  version "1.34.51"
-  resolved "https://registry.npmjs.org/@pagopa/selfcare-common-frontend/-/selfcare-common-frontend-1.34.51.tgz#d6c89b8f3f977c2e8954e1d4081f34484a6aa3b4"
-  integrity sha512-herIua+pko66rULhO0ztGra66yQdXB3F2iLvU9SGQWRlp9StENtjOGXiQIUDSm7EUS8BTivKRuLmGGU0lItalw==
+"@pagopa/selfcare-common-frontend@^1.34.55":
+  version "1.34.55"
+  resolved "https://registry.yarnpkg.com/@pagopa/selfcare-common-frontend/-/selfcare-common-frontend-1.34.55.tgz#1caf14eade366e8487ac0e532404885256274020"
+  integrity sha512-SiWOUde5HtwfmOj8QZj6CGgnWwXhs1Ca8DHdxQX5l7MpGpjM0JN6K1GomaFOO0PZLQESE22Z2U4fZ0tr9qR7fA==
   dependencies:
     "@emotion/react" "^11.11.1"
     "@emotion/styled" "^11.11.0"
@@ -2396,10 +2396,10 @@
     "@babel/runtime" "^7.12.5"
     "@testing-library/dom" "^8.0.0"
 
-"@testing-library/user-event@^14.6.0":
-  version "14.6.0"
-  resolved "https://registry.yarnpkg.com/@testing-library/user-event/-/user-event-14.6.0.tgz#6748ec1ac6df9291e92b6abc0f3530b3842bf34d"
-  integrity sha512-+jsfK7kVJbqnCYtLTln8Ja/NmVrZRwBJHmHR9IxIVccMWSOZ6Oy0FkDJNeyVu4QSpMNmRfy10Xb76ObRDlWWBQ==
+"@testing-library/user-event@^14.6.1":
+  version "14.6.1"
+  resolved "https://registry.yarnpkg.com/@testing-library/user-event/-/user-event-14.6.1.tgz#13e09a32d7a8b7060fe38304788ebf4197cd2149"
+  integrity sha512-vq7fv0rnt+QTXgPxr5Hjc210p6YKq2kmdziLgnsZGgLJ9e6VAShx1pACLuRjd/AS/sr7phAR58OIIpf0LlmQNw==
 
 "@tootallnate/once@1":
   version "1.1.2"
