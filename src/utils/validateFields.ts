@@ -41,14 +41,14 @@ export const validateFields = (
       !values.zipCode && !values.isForeignInsurance
         ? requiredError
         : values.zipCode && !fiveCharactersAllowed.test(values.zipCode ?? '')
-        ? t('onboardingFormData.billingDataSection.invalidZipCode')
-        : undefined,
+          ? t('onboardingFormData.billingDataSection.invalidZipCode')
+          : undefined,
     taxCode:
       !values.taxCode && institutionType !== 'AS'
         ? requiredError
         : values.taxCode && !fiscalAndVatCodeRegexp.test(values.taxCode)
-        ? t('onboardingFormData.billingDataSection.invalidFiscalCode')
-        : undefined,
+          ? t('onboardingFormData.billingDataSection.invalidFiscalCode')
+          : undefined,
     taxCodeInvoicing:
       isInvoiceable &&
       uoSelected &&
@@ -56,89 +56,87 @@ export const validateFields = (
         (values.taxCodeInvoicing && !fiscalAndVatCodeRegexp.test(values.taxCodeInvoicing)))
         ? requiredError
         : invalidTaxCodeInvoicing
-        ? t('onboardingFormData.billingDataSection.invalidTaxCodeInvoicing')
-        : undefined,
+          ? t('onboardingFormData.billingDataSection.invalidTaxCodeInvoicing')
+          : undefined,
     vatNumber:
       !values.vatNumber && values.hasVatnumber
         ? requiredError
         : values.vatNumber && !fiscalAndVatCodeRegexp.test(values.vatNumber)
-        ? t('onboardingFormData.billingDataSection.invalidVatNumber')
-        : isVatRegistrated
-        ? t('onboardingFormData.billingDataSection.vatNumberAlreadyRegistered')
-        : vatVerificationGenericError
-        ? requiredError
-        : undefined,
+          ? t('onboardingFormData.billingDataSection.invalidVatNumber')
+          : isVatRegistrated
+            ? t('onboardingFormData.billingDataSection.vatNumberAlreadyRegistered')
+            : vatVerificationGenericError
+              ? requiredError
+              : undefined,
     city: !values.city
       ? requiredError
       : values.isForeignInsurance
-      ? !onlyCharacters.test(values.city) // TODO Add error helperText when available
-      : undefined,
+        ? !onlyCharacters.test(values.city) // TODO Add error helperText when available
+        : undefined,
     county: !values.county && institutionType !== 'AS' ? requiredError : undefined,
     country:
       !values.country && values.isForeignInsurance
         ? requiredError
         : institutionType === 'AS' && values?.country
-        ? !onlyCharacters.test(values.country)
-        : undefined,
+          ? !onlyCharacters.test(values.country)
+          : undefined,
     originId: institutionType === 'AS' && !values.originId ? requiredError : undefined,
     digitalAddress: !values.digitalAddress
       ? requiredError
       : !emailRegexp.test(values.digitalAddress)
-      ? t('onboardingFormData.billingDataSection.invalidEmail')
-      : undefined,
+        ? t('onboardingFormData.billingDataSection.invalidEmail')
+        : undefined,
     commercialRegisterNumber:
       isPaymentServiceProvider && !values.commercialRegisterNumber
         ? requiredError
         : values.commercialRegisterNumber &&
-          !commercialRegisterNumberRegexp.test(values.commercialRegisterNumber) &&
-          isPaymentServiceProvider
+            !commercialRegisterNumberRegexp.test(values.commercialRegisterNumber) &&
+            isPaymentServiceProvider
         ? t('onboardingFormData.billingDataSection.pspDataSection.invalidCommercialRegisterNumber')
-        : undefined,
+          : undefined,
     businessRegisterPlace:
       (institutionType === 'SA' || isPdndPrivate) && !values.businessRegisterPlace
         ? requiredError
         : undefined,
     registrationInRegister:
       isPaymentServiceProvider && !values.registrationInRegister ? requiredError : undefined,
-    dpoAddress: isPaymentServiceProvider && !values.dpoAddress ? requiredError : undefined,
+    address: isPaymentServiceProvider && !values.address ? requiredError : undefined,
     registerNumber:
       isPaymentServiceProvider && !values.registerNumber
         ? requiredError
         : isPaymentServiceProvider &&
-          values.registerNumber &&
-          !numericField.test(values.registerNumber)
-        ? t('onboardingFormData.billingDataSection.pspDataSection.invalidregisterNumber')
-        : undefined,
+            values.registerNumber &&
+            !numericField.test(values.registerNumber)
+          ? t('onboardingFormData.billingDataSection.pspDataSection.invalidregisterNumber')
+          : undefined,
     abiCode:
       isPaymentServiceProvider && !values.abiCode
         ? requiredError
         : isPaymentServiceProvider && values.abiCode && !fiveCharactersAllowed.test(values.abiCode)
-        ? t('onboardingFormData.billingDataSection.pspDataSection.invalidabiCode')
-        : undefined,
-    dpoEmailAddress:
-      isPaymentServiceProvider && !values.dpoEmailAddress
+          ? t('onboardingFormData.billingDataSection.pspDataSection.invalidabiCode')
+          : undefined,
+    email:
+      isPaymentServiceProvider && !values.email
         ? requiredError
-        : isPaymentServiceProvider &&
-          values.dpoEmailAddress &&
-          !emailRegexp.test(values.dpoEmailAddress)
-        ? t('onboardingFormData.billingDataSection.invalidEmail')
-        : undefined,
-    dpoPecAddress:
-      isPaymentServiceProvider && !values.dpoPecAddress
+        : isPaymentServiceProvider && values.email && !emailRegexp.test(values.email)
+          ? t('onboardingFormData.billingDataSection.invalidEmail')
+          : undefined,
+    pec:
+      isPaymentServiceProvider && !values.pec
         ? requiredError
-        : isPaymentServiceProvider &&
-          values.dpoPecAddress &&
-          !emailRegexp.test(values.dpoPecAddress)
-        ? t('onboardingFormData.billingDataSection.invalidEmail')
-        : undefined,
+        : isPaymentServiceProvider && values.pec && !emailRegexp.test(values.pec)
+          ? t('onboardingFormData.billingDataSection.invalidEmail')
+          : undefined,
     recipientCode: isInvoiceable
-      ? values.recipientCode && values.recipientCode.length >= 6
-        ? recipientCodeStatus === 'DENIED_NO_ASSOCIATION'
-          ? t('onboardingFormData.billingDataSection.invalidRecipientCodeNoAssociation')
-          : recipientCodeStatus === 'DENIED_NO_BILLING'
-          ? t('onboardingFormData.billingDataSection.invalidRecipientCodeNoBilling')
-          : undefined
-        : requiredError
+      ? values.recipientCode && values.recipientCode.length >= 1 && values.recipientCode.length < 6
+        ? t('onboardingFormData.billingDataSection.recipientCodeMustBe6Chars')
+        : values.recipientCode && values.recipientCode.length >= 6
+          ? recipientCodeStatus === 'DENIED_NO_ASSOCIATION'
+            ? t('onboardingFormData.billingDataSection.invalidRecipientCodeNoAssociation')
+            : recipientCodeStatus === 'DENIED_NO_BILLING'
+              ? t('onboardingFormData.billingDataSection.invalidRecipientCodeNoBilling')
+              : undefined
+          : requiredError
       : undefined,
     geographicTaxonomies:
       ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY &&
@@ -152,18 +150,18 @@ export const validateFields = (
       (isInformationCompany || isPdndPrivate) && !values.rea
         ? requiredError
         : values.rea && !reaValidation.test(values.rea as string)
-        ? t('onboardingFormData.billingDataSection.invalidReaField')
-        : undefined,
+          ? t('onboardingFormData.billingDataSection.invalidReaField')
+          : undefined,
     shareCapital:
       (institutionType === 'SA' || isPdndPrivate) && !values.shareCapital
         ? requiredError
         : values.shareCapital && !currencyField.test(values.shareCapital)
-        ? t('onboardingFormData.billingDataSection.invalidShareCapitalField')
-        : undefined,
+          ? t('onboardingFormData.billingDataSection.invalidShareCapitalField')
+          : undefined,
     supportEmail:
       !institutionAvoidGeotax && !values.supportEmail && !isPremium && productId === 'prod-io-sign'
         ? requiredError
         : !emailRegexp.test(values.supportEmail as string) && values.supportEmail
-        ? t('onboardingFormData.billingDataSection.invalidMailSupport')
-        : undefined,
+          ? t('onboardingFormData.billingDataSection.invalidMailSupport')
+          : undefined,
   }).filter(([_key, value]) => value);

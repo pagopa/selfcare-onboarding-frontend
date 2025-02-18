@@ -65,9 +65,9 @@ export default function SubProductStepUserUnrelated({ product, productId }: Prop
             <Typography variant={'h4'}>
               <Trans
                 i18nKey="onboardingSubProduct.subProductStepUserUnrelated.title"
-                values={{ selectedProduct: product?.title.substring(4) }}
+                values={{ selectedProduct: product?.title }}
               >
-                {`Non puoi aderire a {{selectedProduct}} Premium`}
+                {`Non puoi aderire a {{selectedProduct}}`}
               </Trans>
             </Typography>
           </Grid>

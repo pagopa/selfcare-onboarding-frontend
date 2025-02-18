@@ -10,6 +10,8 @@ import { createMemoryHistory } from 'history';
 import { nationalValue } from '../../../model/GeographicTaxonomies';
 import React from 'react';
 import i18n from '@pagopa/selfcare-common-frontend/lib/locale/locale-utils';
+import '@testing-library/jest-dom';
+import { mockedPspOnboardingData } from '../../../lib/__mocks__/mockApiRequests';
 
 jest.setTimeout(20000);
 
@@ -18,7 +20,6 @@ const initialLocation = {
   assign: jest.fn(),
   pathname: '/:productId/:subProductId',
   origin: 'MOCKED_ORIGIN',
-  // search: '?pricingPlan=C1',
   hash: '',
   state: undefined,
 };
@@ -107,13 +108,19 @@ const stepAddManagerTitle = 'Indica il Legale Rappresentante';
 const successOnboardingSubProductTitle = 'La richiesta di adesione è stata inviata con successo';
 const errorOnboardingSubProductTitle = 'Qualcosa è andato storto';
 
-test('Test: Bad productId and subProductId', async () => {
+test('Test: Bad productId and subProductId for prod-io-premium', async () => {
   renderComponent('prod-io', 'prod-io');
   await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(4));
   await waitFor(() => screen.findByText('Impossibile individuare il prodotto desiderato'));
 });
 
-test('Test: Error retrieving onboarding info', async () => {
+test('Test: Bad productId and subProductId for prod-dashboard-psp', async () => {
+  renderComponent('prod-pagopa', 'prod-pagopa');
+  await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(4));
+  await waitFor(() => screen.findByText('Impossibile individuare il prodotto desiderato'));
+});
+
+test('Test: Error retrieving onboarding info for prod-io-premium', async () => {
   renderComponent('prod-io', 'prod-io-premium');
   // // await executeStepSelectPricingPlan();
   await executeStepSelectInstitution('Comune di Gessate');
@@ -121,14 +128,22 @@ test('Test: Error retrieving onboarding info', async () => {
   await executeClickCloseButton(false);
 });
 
-test('Test: Successfully complete onboarding request', async () => {
+test('Test: Successfully complete onboarding request for prod-io-premium', async () => {
   renderComponent('prod-io', 'prod-io-premium');
-  // // await executeStepSelectPricingPlan();
   await executeStepSelectInstitution('Comune di Milano');
-  await executeStepBillingDataWithTaxCodeInvoicing();
+  await executeStepBillingDataWithTaxCodeInvoicing('prod-io-premium');
   await executeStepAddManager(true);
   await executeClickCloseButton(true);
-  await verifySubmitPostLegals();
+  await verifySubmitPostLegalsIoPremium();
+});
+
+test('Test: Successfully complete onboarding request for prod-dashboard-psp', async () => {
+  renderComponent('prod-pagopa', 'prod-dashboard-psp');
+  await executeStepSelectInstitution('Banca del Fucino - S.p.A.');
+  await executeStepBillingDataWithTaxCodeInvoicing('prod-dashboard-psp');
+  await executeStepAddManager(true);
+  await executeClickCloseButton(true);
+  await verifySubmitPostLegalsPspDashBoard();
 });
 
 test('Test: Complete onboarding request with error on submit', async () => {
@@ -154,7 +169,7 @@ test('Test: exiting during flow with unload event', async () => {
   );
 });
 
-const retrieveNavigationButtons = async () => {
+/* const retrieveNavigationButtons = async () => {
   const goBackButton = screen.getByRole('button', {
     name: 'Indietro',
   });
@@ -166,7 +181,7 @@ const retrieveNavigationButtons = async () => {
   await waitFor(() => expect(confirmButton).toBeEnabled());
 
   return [goBackButton, confirmButton];
-};
+}; 
 
 const checkBackForwardNavigation = async (title: string): Promise<Array<HTMLElement>> => {
   const [goBackButton] = await retrieveNavigationButtons();
@@ -317,7 +332,7 @@ const executeStepSelectPricingPlan = async () => {
   const chooseConsumption = document.getElementById('forwardConsumptionPlan') as HTMLElement;
   expect(chooseConsumption).toBeEnabled();
   fireEvent.click(chooseConsumption);
-};
+}; */
 
 const executeStepSelectInstitution = async (partyName: string) => {
   console.log('Testing step select institution..');
@@ -340,7 +355,7 @@ const executeStepSelectInstitution = async (partyName: string) => {
   fireEvent.click(continueButton);
 };
 
-const executeStepBillingDataWithTaxCodeInvoicing = async () => {
+const executeStepBillingDataWithTaxCodeInvoicing = async (subProductId: string) => {
   console.log('Testing step Billing Data');
   await waitFor(() => screen.getByText(stepBillingDataTitle));
 
@@ -350,17 +365,20 @@ const executeStepBillingDataWithTaxCodeInvoicing = async () => {
 
   const confirmButtonEnabled = screen.getByRole('button', { name: 'Continua' });
 
-  fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
-    target: { value: '' },
-  });
-  await waitFor(() => expect(confirmButtonEnabled).toBeDisabled());
-  fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
-    target: { value: 'A1B2C3' },
-  });
-  await new Promise((resolve) => setTimeout(resolve, 300));
-  await waitFor(() => expect(screen.getByText('Codice Fiscale SFE')).toBeInTheDocument(), {
-    timeout: 500, // Tempo massimo per l'attesa
-  });
+  if (subProductId === 'prod-io-premium') {
+    fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
+      target: { value: '' },
+    });
+    await waitFor(() => expect(confirmButtonEnabled).toBeDisabled());
+    fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
+      target: { value: 'A1B2C3' },
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    await waitFor(() => expect(screen.getByText('Codice Fiscale SFE')).toBeInTheDocument(), {
+      timeout: 500, // Tempo massimo per l'attesa
+    });
+  }
   await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
   fireEvent.click(confirmButtonEnabled);
   await waitFor(() => screen.getByText(stepAddManagerTitle));
@@ -428,7 +446,7 @@ const executeClickCloseButton = async (expectedSuccessfulSubmit: boolean) => {
   await waitFor(() => expect(mockedLocation.assign).toHaveBeenCalledWith(ENV.URL_FE.LANDING));
 };
 
-const executeClickAdhesionButton = async () => {
+/* const executeClickAdhesionButton = async () => {
   console.log('Pressing Close button and go to adhesion');
   const adhesionButton = screen.getByRole('button', {
     name: 'Aderisci',
@@ -472,7 +490,7 @@ const fillUserBillingDataForm = async (
     target: { value: 'a@a.it' },
   });
   fireEvent.click(document.getElementById('national_geographicTaxonomies') as HTMLElement);
-};
+}; */
 
 const fillTextFieldAndCheck = async (prefix: string, field: string, value: string) => {
   fireEvent.change(document.getElementById(`${prefix}-${field}`) as HTMLElement, {
@@ -486,7 +504,7 @@ const fillUserForm = async () => {
   await fillTextFieldAndCheck('LEGAL', 'surname', 'Rossi');
 };
 
-const checkCorrectBodyBillingData = (
+/* const checkCorrectBodyBillingData = (
   expectedBusinessName: string = '',
   expectedRegisteredOfficeInput: string = '',
   expectedMailPEC: string = '',
@@ -525,9 +543,9 @@ const fillTextFieldAndCheckButton = async (
   } else {
     expect(confirmButton).toBeDisabled();
   }
-};
+}; */
 
-const billingData2billingDataRequest = () => ({
+const billingData2billingDataRequestIoPremium = () => ({
   businessName: 'Comune di Milano',
   registeredOffice: 'Milano, Piazza Colonna 370',
   digitalAddress: 'comune.milano@pec.it',
@@ -538,8 +556,17 @@ const billingData2billingDataRequest = () => ({
   recipientCode: 'A1B2C3',
 });
 
-const verifySubmitPostLegals = async () => {
-
+const billingData2billingDataRequestPspDashboard = () => ({
+  businessName: 'Antico Credito Arcorese',
+  registeredOffice: 'Via Umberto I',
+  digitalAddress: 'antico.credito.arcorese@test.it',
+  zipCode: '20862',
+  taxCode: '25301208621',
+  vatNumber: undefined,
+  taxCodeInvoicing: undefined,
+  recipientCode: 'A1B2V3',
+});
+const verifySubmitPostLegalsIoPremium = async () => {
   await waitFor(() =>
     expect(fetchWithLogsSpy).lastCalledWith(
       {
@@ -557,7 +584,7 @@ const verifySubmitPostLegals = async () => {
               email: 'm@ma.it',
             },
           ],
-          billingData: billingData2billingDataRequest(),
+          billingData: billingData2billingDataRequestIoPremium(),
           pspData: undefined,
           institutionLocationData: {
             city: 'Milano',
@@ -565,7 +592,7 @@ const verifySubmitPostLegals = async () => {
             county: 'MI',
           },
           institutionType: 'PA',
-          pricingPlan: "C0",
+          pricingPlan: 'C0',
           origin: 'IPA',
           geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY
             ? [{ code: nationalValue, desc: 'ITALIA' }]
@@ -576,6 +603,57 @@ const verifySubmitPostLegals = async () => {
           subunitType: undefined,
           taxCode: '33445673222',
           companyInformations: undefined,
+        },
+      },
+      expect.any(Function)
+    )
+  );
+};
+
+const verifySubmitPostLegalsPspDashBoard = async () => {
+  await waitFor(() =>
+    expect(fetchWithLogsSpy).toHaveBeenLastCalledWith(
+      {
+        endpoint: 'ONBOARDING_POST_LEGALS',
+      },
+      {
+        method: 'POST',
+        data: {
+          users: [
+            {
+              name: 'Mario',
+              surname: 'Rossi',
+              role: 'MANAGER',
+              taxCode: 'RSSMRA80A01H501U',
+              email: 'm@ma.it',
+            },
+          ],
+          billingData: billingData2billingDataRequestPspDashboard(),
+          pspData: {
+            ...mockedPspOnboardingData[0].institution.paymentServiceProvider,
+            dpoData: {
+              ...mockedPspOnboardingData[0].institution.dataProtectionOfficer,
+            },
+          },
+          institutionType: 'PSP',
+          origin: 'SELC',
+          assistanceContacts: { supportEmail: undefined },
+          companyInformations: {
+            businessRegisterPlace: undefined,
+            rea: undefined,
+            shareCapital: undefined,
+          },
+          geographicTaxonomies: [],
+          institutionLocationData: {
+            country: 'IT',
+            county: 'MB',
+            city: 'Arcore',
+          },
+          productId: 'prod-dashboard-psp',
+          taxCode: mockedPspOnboardingData[0].institution.billingData.taxCode,
+          pricingPlan: undefined,
+          subunitCode: undefined,
+          subunitType: undefined,
         },
       },
       expect.any(Function)

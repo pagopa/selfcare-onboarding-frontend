@@ -8,7 +8,15 @@ import { useParams } from 'react-router';
 import { useTranslation, Trans } from 'react-i18next';
 import { AxiosResponse } from 'axios';
 import { withLogin } from '../../components/withLogin';
-import { InstitutionType, SelfcareParty, Product, StepperStep, UserOnCreate } from '../../../types';
+import {
+  InstitutionType,
+  SelfcareParty,
+  Product,
+  /* StepperStep, */ UserOnCreate,
+  StepperStep,
+  DataProtectionOfficerDto,
+  PaymentServiceProviderDto,
+} from '../../../types';
 import { OnboardingFormData } from '../../model/OnboardingFormData';
 import { LoadingOverlay } from '../../components/LoadingOverlay';
 import { ENV } from '../../utils/env';
@@ -28,7 +36,7 @@ import SubProductStepVerifyInputs from './components/SubProductStepVerifyInputs'
 import SubProductStepSubmit from './components/SubProductStepSubmit';
 import SubProductStepSuccess from './components/SubProductStepSuccess';
 import { SubProductStepSelectUserParty } from './components/SubProductStepSelectUserParty';
-import SubProductStepSelectPricingPlan from './components/subProductStepPricingPlan/SubProductStepSelectPricingPlan';
+// import SubProductStepSelectPricingPlan from './components/subProductStepPricingPlan/SubProductStepSelectPricingPlan';
 import SubProductStepUserUnrelated from './components/SubProductStepUserUnrelated';
 
 type OnboardingPremiumUrlParams = {
@@ -70,6 +78,8 @@ function OnboardingPremiumComponent() {
   const [companyInformations, setCompanyInformations] = useState<CompanyInformations>();
   const [openConfirmationModal, setOpenConfirmationModal] = useState(false);
   const [isCityEditable, setIsCityEditable] = useState(false);
+  const [dpoData, setDpoData] = useState<DataProtectionOfficerDto>();
+  const [pspData, setPspData] = useState<PaymentServiceProviderDto>();
 
   useEffect(() => {
     registerUnloadEvent(setOnExit, setOpenExitModal, setOnExitAction);
@@ -110,7 +120,7 @@ function OnboardingPremiumComponent() {
     setProduct(newProduct);
     setSubProduct(newSubProduct);
     setParties(newParties);
-    setActiveStep(newSubProduct.id === 'prod-io-premium' ? 2 : 1);
+    setActiveStep(activeStep + 1);
   };
 
   const forwardWithBillingData = (newBillingData: OnboardingFormData) => {
@@ -149,7 +159,9 @@ function OnboardingPremiumComponent() {
     companyInformations?: CompanyInformations,
     country?: string,
     city?: string,
-    county?: string
+    county?: string,
+    pspData?: PaymentServiceProviderDto,
+    dpoData?: DataProtectionOfficerDto
   ) => {
     setStepAddManagerHistoryState({});
 
@@ -176,20 +188,31 @@ function OnboardingPremiumComponent() {
       setIsCityEditable(false);
     }
 
+    if (pspData) {
+      setPspData(pspData);
+    }
+
+    if (dpoData) {
+      setDpoData(dpoData);
+    }
+
     setOrigin(origin);
     setInstitutionType(institutionType);
     setPartyId(partyId);
     forward();
   };
-  const forwardWitSelectedPricingPlan = () => {
-    setActiveStep(parties.length === 0 ? 3 : 2);
-    window.scrollTo(0, 0);
-  };
+  // const forwardWitSelectedPricingPlan = () => {
+  //   setActiveStep(parties.length === 0 ? 3 : 2);
+  //   window.scrollTo(0, 0);
+  // };
 
   const handleOnConfirmModal = () => {
     trackEvent('ONBOARDING_PREMIUM_UX_CONVERSION', {
       party_id: partyId,
-      selected_plan: pricingPlanCategory.product['prod-io-premium']?.consumptionPlan.pricingPlan === 'C0' ? 'consumo' : 'carnet',
+      selected_plan:
+        pricingPlanCategory.product['prod-io-premium']?.consumptionPlan.pricingPlan === 'C0'
+          ? 'consumo'
+          : 'carnet',
     });
     setOpenConfirmationModal(false);
     forward();
@@ -229,17 +252,18 @@ function OnboardingPremiumComponent() {
           forward: forwardWithInputs,
         }),
     },
+    // PRICING PLAN HAS BEEN DEACTIVATED
+    // {
+    //   label: 'Select Pricing Plan',
+    //   Component: () =>
+    //     SubProductStepSelectPricingPlan({
+    //       setAvailablePricingPlanIds: undefined,
+    //       forward: forwardWitSelectedPricingPlan,
+    //       product,
+    //     }),
+    // },
     {
-      label: 'Select Pricing Plan',
-      Component: () =>
-        SubProductStepSelectPricingPlan({
-          setAvailablePricingPlanIds: undefined,
-          forward: forwardWitSelectedPricingPlan,
-          product,
-        }),
-    },
-    {
-      label: 'Select Institution releated',
+      label: 'Select Institution related',
       Component: () =>
         SubProductStepSelectUserParty({
           parties,
@@ -249,13 +273,13 @@ function OnboardingPremiumComponent() {
             if (party) {
               forwardWithInstitution(party, true);
             } else {
-              forward();
+              setActiveStep(activeStep + 1);
             }
           },
         }),
     },
     {
-      label: 'Select Institution unreleated',
+      label: 'Select Institution unrelated',
       Component: () => SubProductStepUserUnrelated({ product, productId }),
     },
     {
@@ -263,6 +287,7 @@ function OnboardingPremiumComponent() {
       Component: () =>
         StepOnboardingData({
           productId,
+          subProductId,
           partyId: selectedParty?.id,
           forward: forwardWithOnboardingData,
           subProductFlow: true,
@@ -293,6 +318,8 @@ function OnboardingPremiumComponent() {
             }),
             ...assistanceContacts,
             ...companyInformations,
+            ...pspData,
+            ...dpoData,
           },
           institutionType: institutionType as InstitutionType,
           origin,
@@ -307,7 +334,7 @@ function OnboardingPremiumComponent() {
               setOnExitAction(() => window.location.assign(`${ENV.URL_FE.DASHBOARD}/${partyId}`));
               setOpenExitModal(true);
             } else {
-              setActiveStep(2);
+              setActiveStep(1);
               window.scrollTo(0, 0);
             }
           },
@@ -330,7 +357,11 @@ function OnboardingPremiumComponent() {
               );
               setOpenExitModal(true);
             } else {
-              back();
+              if (subProductId === 'prod-dashboard-psp') {
+                setActiveStep(activeStep - 2);
+              } else {
+                back();
+              }
             }
           },
           subProduct,
@@ -347,7 +378,7 @@ function OnboardingPremiumComponent() {
           users,
           billingData: billingData as OnboardingFormData,
           institutionType: institutionType as InstitutionType,
-          pricingPlan: pricingPlanCategory.product['prod-io-premium']?.consumptionPlan.pricingPlan,
+          pricingPlan: pricingPlanCategory.product[subProductId]?.consumptionPlan.pricingPlan,
           origin,
           setLoading,
           forward,

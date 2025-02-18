@@ -6,7 +6,11 @@ import { theme } from '@pagopa/mui-italia';
 import { AxiosResponse } from 'axios';
 import { useContext, useEffect, useState } from 'react';
 import { useTranslation, Trans } from 'react-i18next';
-import { InstitutionType, StepperStepComponentProps } from '../../../types';
+import {
+  InstitutionType,
+  PaymentServiceProviderDto,
+  StepperStepComponentProps,
+} from '../../../types';
 import { fetchWithLogs } from '../../lib/api-utils';
 import { UserContext } from '../../lib/context';
 import { getFetchOutcome } from '../../lib/error-utils';
@@ -19,6 +23,7 @@ import { ENV } from '../../utils/env';
 import { CountryResource } from '../../model/CountryResource';
 import { requiredError } from '../../utils/constants';
 import { mockedCountries } from '../../lib/__mocks__/mockApiRequests';
+import { AssistanceContacts } from '../../model/AssistanceContacts';
 import NumberDecimalFormat from './NumberDecimalFormat';
 
 interface CustomTextFieldNochedProps {
@@ -115,6 +120,8 @@ export default function PersonalAndBillingDataSection({
   const [input, setInput] = useState<string>();
   const [disableTaxCodeInvoicing, setDisableTaxCodeInvoicing] = useState<boolean>(false);
   const [taxCodeInvoicingVisible, setTaxCodeInvoicingVisible] = useState<boolean>(false);
+  const [assistanceContacts, setAssistanceContacts] = useState<AssistanceContacts>();
+  const [pspData, setPspData] = useState<PaymentServiceProviderDto>();
 
   useEffect(() => {
     const shareCapitalIsNan = isNaN(formik.values.shareCapital);
@@ -129,6 +136,22 @@ export default function PersonalAndBillingDataSection({
   }, [formik.values.shareCapital]);
 
   useEffect(() => {
+    if (assistanceContacts?.supportEmail) {
+      formik.setFieldValue('supportEmail', assistanceContacts.supportEmail);
+    }
+  }, [assistanceContacts]);
+
+  useEffect(() => {
+    if (pspData) {
+      formik.setFieldValue('commercialRegisterNumber', pspData.businessRegisterNumber);
+      formik.setFieldValue('registrationInRegister', pspData.legalRegisterName);
+      formik.setFieldValue('registerNumber', pspData.legalRegisterNumber);
+      formik.setFieldValue('abiCode', pspData.abiCode);
+      formik.setFieldValue('vatNumberGroup', pspData.vatNumberGroup);
+    }
+  }, [pspData]);
+
+  useEffect(() => {
     if (institutionLocationData?.city) {
       formik.setFieldValue('country', institutionLocationData.country);
       formik.setFieldValue('county', institutionLocationData.county);
@@ -138,6 +161,16 @@ export default function PersonalAndBillingDataSection({
 
   useEffect(() => {
     if (isPremium) {
+      setAssistanceContacts({
+        supportEmail: formik.values.supportEmail,
+      });
+      setPspData({
+        businessRegisterNumber: formik.values.businessRegisterNumber,
+        legalRegisterName: formik.values.legalRegisterName,
+        legalRegisterNumber: formik.values.legalRegisterNumber,
+        vatNumberGroup: formik.values.vatNumberGroup,
+        abiCode: formik.values.abiCode,
+      });
       setInstitutionLocationData({
         country: formik.values.country,
         county: formik.values.county,
@@ -726,11 +759,11 @@ export default function PersonalAndBillingDataSection({
                 (institutionType === 'PRV' && productId !== 'prod-pagopa')
               }
               inputProps={{
-                maxLength: 11
+                maxLength: 11,
               }}
               value={formik.values.taxCode || ''}
               onChange={(e) => {
-                const value = e.target.value.replace(/\D/g, ''); 
+                const value = e.target.value.replace(/\D/g, '');
                 if (value.length <= 11) {
                   formik.setFieldValue('taxCode', value);
                 }
@@ -851,14 +884,16 @@ export default function PersonalAndBillingDataSection({
                 {/* Checkbox la aprtita IVA è di gruppo */}
                 <Checkbox
                   id={'vatNumberGroup'}
+                  name="vatNumberGroup"
                   inputProps={{
                     'aria-label': t('onboardingFormData.billingDataSection.vatNumberGroup'),
                   }}
                   checked={formik.values.vatNumberGroup}
                   onChange={(_, checked: boolean) =>
-                    formik.setFieldValue('vatNumberGroup', checked, true)
+                    formik.setFieldValue('vatNumberGroup', !checked)
                   }
                   value={formik.values.vatNumberGroup}
+                  disabled={isPremium && !!pspData?.vatNumberGroup}
                 />
                 <Typography component={'span'}>
                   {t('onboardingFormData.billingDataSection.vatNumberGroup')}
@@ -887,6 +922,11 @@ export default function PersonalAndBillingDataSection({
                       input.value = cleanedValue;
                     },
                   }}
+                  disabled={
+                    isPremium && formik.values.recipientCode && !formik.errors.recipientCode
+                  }
+                  helperText={formik.errors.recipientCode === 'Required' ? undefined : formik.errors.recipientCode}
+                  error={formik.errors.recipientCode === 'Required' ? false : !!formik.errors.recipientCode}
                 />
                 <Typography
                   component={'span'}
@@ -1024,6 +1064,7 @@ export default function PersonalAndBillingDataSection({
                   600,
                   theme.palette.text.primary
                 )}
+                disabled={isDisabled && !!pspData?.businessRegisterNumber}
               />
             </Grid>
             <Grid item xs={12}>
@@ -1035,6 +1076,7 @@ export default function PersonalAndBillingDataSection({
                   600,
                   theme.palette.text.primary
                 )}
+                disabled={isDisabled && !!pspData?.legalRegisterName}
               />
             </Grid>
             <Grid item xs={6}>
@@ -1047,6 +1089,7 @@ export default function PersonalAndBillingDataSection({
                   600,
                   theme.palette.text.primary
                 )}
+                disabled={isDisabled && !!pspData?.legalRegisterNumber}
               />
             </Grid>
             <Grid item xs={6}>
@@ -1058,6 +1101,11 @@ export default function PersonalAndBillingDataSection({
                   600,
                   theme.palette.text.primary
                 )}
+                value={formik.values.abiCode}
+                InputLabelProps={{
+                  shrink: formik.values.abiCode?.length > 0,
+                }}
+                disabled={isDisabled && !!pspData?.abiCode}
               />
             </Grid>
           </>
@@ -1077,6 +1125,7 @@ export default function PersonalAndBillingDataSection({
                 600,
                 theme.palette.text.primary
               )}
+              disabled={isDisabled && !!assistanceContacts?.supportEmail}
             />
             {/* descrizione indirizzo mail di supporto */}
             <Typography

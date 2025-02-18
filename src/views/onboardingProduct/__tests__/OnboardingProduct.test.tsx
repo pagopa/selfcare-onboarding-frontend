@@ -933,6 +933,11 @@ const executeStepBillingData = async (
       await waitFor(() => expect(confirmButton).toBeDisabled());
 
       fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
+        target: { value: 'AABBC' },
+      });
+      await waitFor(() => screen.getByText('Il codice deve essere di minimo 6 caratteri'));
+
+      fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
         target: { value: 'AABBC1' },
       });
       await waitFor(() => screen.getByText('Il codice inserito non è associato al tuo ente'));
@@ -1468,9 +1473,9 @@ const fillUserBillingDataForm = async (
     expect(vatNumberGroup).toBeInTheDocument();
     fireEvent.click(vatNumberGroup);
 
-    const dpoAddress = document.getElementById('dpoAddress') as HTMLElement;
-    const dpoPecAddress = document.getElementById('dpoPecAddress') as HTMLElement;
-    const dpoEmailAddress = document.getElementById('dpoEmailAddress') as HTMLElement;
+    const dpoAddress = document.getElementById('address') as HTMLElement;
+    const dpoPecAddress = document.getElementById('pec') as HTMLElement;
+    const dpoEmailAddress = document.getElementById('email') as HTMLElement;
 
     fireEvent.change(dpoAddress as HTMLInputElement, {
       target: { value: 'Via milano 5' },
@@ -2201,7 +2206,7 @@ const verifySubmit = async (
                   },
                   legalRegisterName: '123',
                   legalRegisterNumber: '24',
-                  vatNumberGroup: true,
+                  vatNumberGroup: false,
                 }
               : undefined,
           users: [

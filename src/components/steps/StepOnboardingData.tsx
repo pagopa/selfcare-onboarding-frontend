@@ -16,9 +16,11 @@ import { fetchWithLogs } from '../../lib/api-utils';
 import { getFetchOutcome } from '../../lib/error-utils';
 import { unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
 import { ENV } from '../../utils/env';
+import { MOCK_USER } from '../../utils/constants';
 
 type Props = StepperStepComponentProps & {
   productId: string;
+  subProductId?: string;
   partyId?: string;
   institutionType?: InstitutionType;
   subProductFlow?: boolean;
@@ -53,6 +55,7 @@ function StepOnboardingData({
   forward,
   partyId,
   productId,
+  subProductId,
   institutionType,
   subProductFlow,
 }: Props) {
@@ -74,7 +77,7 @@ function StepOnboardingData({
         method: 'GET',
         params: {
           institutionId,
-          productId,
+          productId: MOCK_USER ? subProductId : productId,
         },
       },
       () => setRequiredLogin(true)
@@ -100,7 +103,9 @@ function StepOnboardingData({
           ?.charAt(0)
           .toUpperCase()
           .concat(result.institution?.city.substring(1).toLowerCase().trim()),
-        result.institution?.county
+        result.institution?.county,
+        result.institution?.paymentServiceProvider,
+        result.institution?.dataProtectionOfficer
       );
     } else if (
       (onboardingData as AxiosError<any>).response?.status === 404 ||

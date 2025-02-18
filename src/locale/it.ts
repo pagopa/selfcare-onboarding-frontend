@@ -667,6 +667,7 @@ export default {
       invalidReaField: 'Il Campo REA non è valido',
       invalidMailSupport: 'L’indirizzo email non è valido',
       invalidShareCapitalField: 'Il campo capitale sociale non è valido',
+      recipientCodeMustBe6Chars: 'Il codice deve essere di minimo 6 caratteri',
       invalidRecipientCodeNoAssociation: 'Il codice inserito non è associato al tuo ente',
       invalidRecipientCodeNoBilling:
         'Il codice inserito è associato al codice fiscale di un ente che non ha il servizio di fatturazione attivo',
