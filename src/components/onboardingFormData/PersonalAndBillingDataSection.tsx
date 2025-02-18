@@ -775,6 +775,7 @@ export default function PersonalAndBillingDataSection({
         {!isForeignInsurance && (
           <Grid
             container
+            item
             spacing={3}
             xs={12}
             pl={3}

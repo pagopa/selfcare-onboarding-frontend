@@ -309,7 +309,7 @@ export default function StepOnboardingFormData({
         invalidTaxCodeInvoicing,
         isPdndPrivate,
         recipientCodeStatus,
-        productId,
+        productId
       )
     );
 
@@ -333,7 +333,7 @@ export default function StepOnboardingFormData({
     formik.values,
     invalidTaxCodeInvoicing,
     recipientCodeStatus,
-    isPremium
+    isPremium,
   ]);
 
   useEffect(() => {
@@ -516,7 +516,7 @@ export default function StepOnboardingFormData({
           recipientCodeStatus={recipientCodeStatus}
         />
 
-        {!institutionAvoidGeotax && (
+        {!institutionAvoidGeotax && subProductId !== 'prod-dashboard-psp' && (
           <Grid item xs={12} display="flex" justifyContent={'center'}>
             <GeoTaxonomySection
               retrievedTaxonomies={previousGeotaxononomies}
@@ -528,10 +528,7 @@ export default function StepOnboardingFormData({
           </Grid>
         )}
         {isPaymentServiceProvider && (
-          <DpoSection
-            baseTextFieldProps={baseTextFieldProps}
-            dpoData={formik.values}
-          />
+          <DpoSection baseTextFieldProps={baseTextFieldProps} dpoData={formik.values} />
         )}
         <Grid item xs={12} mb={2}>
           <OnboardingStepActions
