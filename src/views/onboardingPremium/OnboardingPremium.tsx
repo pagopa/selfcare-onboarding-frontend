@@ -287,7 +287,6 @@ function OnboardingPremiumComponent() {
       Component: () =>
         StepOnboardingData({
           productId,
-          subProductId,
           partyId: selectedParty?.id,
           forward: forwardWithOnboardingData,
           subProductFlow: true,

@@ -2206,7 +2206,7 @@ const verifySubmit = async (
                   },
                   legalRegisterName: '123',
                   legalRegisterNumber: '24',
-                  vatNumberGroup: false,
+                  vatNumberGroup: true,
                 }
               : undefined,
           users: [

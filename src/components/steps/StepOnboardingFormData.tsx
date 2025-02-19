@@ -528,7 +528,9 @@ export default function StepOnboardingFormData({
           </Grid>
         )}
         {isPaymentServiceProvider && (
-          <DpoSection baseTextFieldProps={baseTextFieldProps} dpoData={formik.values} />
+          <Grid item xs={12} display="flex" justifyContent={'center'}>
+            <DpoSection baseTextFieldProps={baseTextFieldProps} dpoData={formik.values} />
+          </Grid>
         )}
         <Grid item xs={12} mb={2}>
           <OnboardingStepActions
