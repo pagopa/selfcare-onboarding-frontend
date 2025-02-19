@@ -891,7 +891,7 @@ export default function PersonalAndBillingDataSection({
                   }}
                   checked={formik.values.vatNumberGroup}
                   onChange={(_, checked: boolean) =>
-                    formik.setFieldValue('vatNumberGroup', !checked)
+                    formik.setFieldValue('vatNumberGroup', checked, true)
                   }
                   value={formik.values.vatNumberGroup}
                   disabled={isPremium && !!pspData?.vatNumberGroup}
