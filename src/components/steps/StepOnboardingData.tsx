@@ -16,11 +16,9 @@ import { fetchWithLogs } from '../../lib/api-utils';
 import { getFetchOutcome } from '../../lib/error-utils';
 import { unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
 import { ENV } from '../../utils/env';
-import { MOCK_USER } from '../../utils/constants';
 
 type Props = StepperStepComponentProps & {
   productId: string;
-  subProductId?: string;
   partyId?: string;
   institutionType?: InstitutionType;
   subProductFlow?: boolean;
@@ -55,7 +53,6 @@ function StepOnboardingData({
   forward,
   partyId,
   productId,
-  subProductId,
   institutionType,
   subProductFlow,
 }: Props) {
@@ -77,7 +74,7 @@ function StepOnboardingData({
         method: 'GET',
         params: {
           institutionId,
-          productId: MOCK_USER ? subProductId : productId,
+          productId
         },
       },
       () => setRequiredLogin(true)

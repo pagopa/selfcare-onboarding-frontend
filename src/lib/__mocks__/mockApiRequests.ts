@@ -1490,7 +1490,10 @@ export async function mockFetch(
   }
 
   if (endpoint === 'ONBOARDING_GET_ONBOARDING_DATA') {
-    if (params.productId === 'prod-dashboard-psp') {
+    if (
+      params.productId === 'prod-pagopa' &&
+      (params.institutionId === '886755' || params.institutionId === '54557')
+    ) {
       switch (params.institutionId) {
         case '886755':
           return new Promise((resolve) =>
