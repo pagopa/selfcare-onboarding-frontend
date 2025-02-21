@@ -24,7 +24,7 @@ import {
 } from '../../../lib/__mocks__/mockApiRequests';
 import i18n from '@pagopa/selfcare-common-frontend/lib/locale/locale-utils';
 
-type Source = 'IPA' | 'NO_IPA' | 'ANAC' | 'IVASS' | 'INFOCAMERE' | 'PDND_INFOCAMERE';
+type Source = 'IPA' | 'NO_IPA' | 'ANAC' | 'IVASS' | 'INFOCAMERE' | 'PDND_INFOCAMERE' | 'SELC';
 type Search = 'businessName' | 'taxCode' | 'aooCode' | 'uoCode' | 'ivassCode';
 
 jest.setTimeout(40000);
@@ -1028,15 +1028,17 @@ const executeStepAdditionalInfo = async (from: 'IPA' | 'NO_IPA' = 'IPA') => {
   const continueButton = screen.getByText('Continua');
   await waitFor(() => expect(continueButton).toBeDisabled());
 
+  const isFromIPAYesInput = document.getElementById('isFromIPA-yes') as HTMLInputElement;
+  const isFromIPANoInput = document.getElementById('isFromIPA-no') as HTMLInputElement;
   if (from === 'IPA') {
     await waitFor(() => {
-      expect(document.getElementById('isFromIPA-yes')).toBeChecked();
-      expect(document.getElementById('isFromIPA-no')).not.toBeChecked();
+      expect(isFromIPAYesInput.value).toBe('true');
+      expect(isFromIPANoInput.value).toBe('false');
     });
   } else {
     await waitFor(() => {
-      expect(document.getElementById('isFromIPA-yes')).not.toBeChecked();
-      expect(document.getElementById('isFromIPA-no')).toBeChecked();
+      expect(isFromIPAYesInput.value).toBe('true');
+      expect(isFromIPANoInput.value).toBe('false');
     });
   }
 
@@ -2085,37 +2087,45 @@ const verifySubmit = async (
                     ? 'PDND_INFOCAMERE'
                     : from === 'ANAC'
                       ? 'ANAC'
-                      : undefined,
+                      : from === 'SELC' || (from === 'NO_IPA' && institutionType === 'PSP')
+                        ? 'SELC'
+                        : institutionType === 'GSP'
+                          ? undefined
+                          : undefined,
           originId: errorOnSubmit
-            ? mockPartyRegistry.items[1].originId
+            ? mockPartyRegistry.items[1].taxCode
             : from === 'NO_IPA'
-              ? undefined
+              ? mockPartyRegistry.items[0].taxCode
               : from === 'ANAC'
-                ? mockedANACParties[0].originId
+                ? mockedANACParties[0].taxCode
                 : from === 'IVASS'
                   ? haveTaxCode
                     ? isForeignInsurance
-                      ? mockedInsuranceResource.items[0].originId
-                      : mockedInsuranceResource.items[2].originId
-                    : mockedInsuranceResource.items[4].originId
+                      ? mockedInsuranceResource.items[0].taxCode
+                      : mockedInsuranceResource.items[2].taxCode
+                    : mockedInsuranceResource.items[4].taxCode
                   : from === 'INFOCAMERE'
                     ? undefined
                     : from === 'PDND_INFOCAMERE'
                       ? '00112233445'
-                      : typeOfSearch === 'taxCode'
-                        ? mockedParties[0].originId
-                        : typeOfSearch === 'aooCode'
-                          ? mockedAoos[0].codiceUniAoo
-                          : typeOfSearch === 'uoCode'
-                            ? mockedUos[0].codiceUniUo
-                            : (institutionType === 'PRV' && productId === 'prod-pagopa') ||
-                                (institutionType === 'GPU' &&
-                                  (productId === 'prod-pagopa' ||
-                                    productId === 'prod-interop' ||
-                                    productId === 'prod-io-sign' ||
-                                    productId === 'prod-io'))
-                              ? undefined
-                              : '991',
+                      : from === 'SELC'
+                        ? mockPartyRegistry.items[0].taxCode
+                        : typeOfSearch === 'taxCode'
+                          ? mockedParties[0].taxCode
+                          : typeOfSearch === 'aooCode'
+                            ? mockedAoos[0].codiceFiscaleEnte
+                            : typeOfSearch === 'uoCode'
+                              ? mockedUos[0].codiceFiscaleEnte
+                              : (institutionType === 'PRV' && productId === 'prod-pagopa') ||
+                                  (institutionType === 'GPU' &&
+                                    (productId === 'prod-interop' ||
+                                      productId === 'prod-io-sign' ||
+                                      productId === 'prod-io'))
+                                ? mockPartyRegistry.items[0].taxCode
+                                : (institutionType === 'GPU' || institutionType === 'PSP') &&
+                                    productId === 'prod-pagopa'
+                                  ? undefined
+                                  : mockPartyRegistry.items[0].taxCode,
           taxCode: errorOnSubmit
             ? mockPartyRegistry.items[1].taxCode
             : from === 'NO_IPA'
@@ -2145,8 +2155,8 @@ const verifySubmit = async (
                   belongRegulatedMarket: true,
                   establishedByRegulatoryProvision: false,
                   establishedByRegulatoryProvisionNote: '',
-                  ipa: from === 'IPA',
-                  ipaCode: from === 'IPA' ? '991' : '',
+                  ipa: false,
+                  ipaCode: '',
                   otherNote: 'optionalPartyInformations-note',
                   regulatedMarketNote: '',
                 }

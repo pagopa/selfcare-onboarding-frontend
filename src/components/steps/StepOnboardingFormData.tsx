@@ -50,6 +50,7 @@ type Props = StepperStepComponentProps & {
   subtitle: string | JSX.Element;
   externalInstitutionId: string;
   origin?: string;
+  originId?: string;
   productId?: string;
   subProductId?: string;
   onboardingFormData?: OnboardingFormData;
@@ -70,6 +71,7 @@ export default function StepOnboardingFormData({
   institutionType,
   externalInstitutionId,
   origin,
+  originId,
   outcome,
   productId,
   subProductId,
@@ -267,6 +269,7 @@ export default function StepOnboardingFormData({
           : undefined,
       taxCode:
         formik.values.taxCode !== '' && formik.values.taxCode ? formik.values.taxCode : undefined,
+      originId
     });
   };
 

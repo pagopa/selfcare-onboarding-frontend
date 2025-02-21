@@ -26,6 +26,7 @@ type Props = StepperStepComponentProps & {
   institutionType: InstitutionType;
   pricingPlan?: string;
   origin: string;
+  originId: string;
   setLoading: (loading: boolean) => void;
 };
 
@@ -68,6 +69,7 @@ function SubProductStepSubmit({
   institutionType,
   pricingPlan,
   origin,
+  originId
 }: Props) {
   const [error, setError] = useState<boolean>(false);
   const { setOnExit } = useContext(HeaderContext);
@@ -89,6 +91,7 @@ function SubProductStepSubmit({
         setError,
         forward,
         origin,
+        originId
       })
         .catch((_reason: any) => {
           setError(true);
