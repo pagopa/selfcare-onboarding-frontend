@@ -594,6 +594,7 @@ const verifySubmitPostLegalsIoPremium = async () => {
           institutionType: 'PA',
           pricingPlan: 'C0',
           origin: 'IPA',
+          originId: '1',
           geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY
             ? [{ code: nationalValue, desc: 'ITALIA' }]
             : [],
@@ -637,6 +638,7 @@ const verifySubmitPostLegalsPspDashBoard = async () => {
           },
           institutionType: 'PSP',
           origin: 'SELC',
+          originId: '25301208621',
           assistanceContacts: { supportEmail: undefined },
           companyInformations: {
             businessRegisterPlace: undefined,

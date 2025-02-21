@@ -535,7 +535,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
                 }
               : undefined,
           institutionType,
-          originId: onboardingFormData?.originId,
+          originId: onboardingFormData?.originId ?? onboardingFormData?.taxCode,
           geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY
             ? onboardingFormData?.geographicTaxonomies?.map((gt) =>
                 onboardedInstitutionInfo2geographicTaxonomy(gt)
@@ -549,7 +549,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
             county: onboardingFormData?.county,
             city: onboardingFormData?.city,
           },
-          origin: institutionType === 'SA' ? 'ANAC' : origin,
+          origin: institutionType === 'SA' ? 'ANAC' : institutionType === 'PSP' ? 'SELC' : origin,
           users,
           pricingPlan,
           assistanceContacts: onboardingFormData?.supportEmail

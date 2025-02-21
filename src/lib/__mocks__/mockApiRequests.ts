@@ -753,6 +753,7 @@ const mockedOnboardingData: Array<InstitutionOnboardingInfoResource> = [
       county: 'MI',
       institutionType: 'PA',
       origin: 'IPA',
+      originId: '1'
     },
   },
   {
@@ -780,6 +781,7 @@ const mockedOnboardingData: Array<InstitutionOnboardingInfoResource> = [
       country: 'IT',
       institutionType: 'GSP',
       origin: 'IPA',
+      originId: '1',
       assistanceContacts: {
         supportEmail: 'supportemail@mockmail.it',
       },
@@ -815,6 +817,7 @@ const mockedOnboardingData: Array<InstitutionOnboardingInfoResource> = [
       county: 'BO',
       institutionType: 'PA',
       origin: 'IPA',
+      originId: '1',
       assistanceContacts: {
         supportEmail: 'a@a.it',
       },
@@ -850,6 +853,7 @@ const mockedOnboardingData: Array<InstitutionOnboardingInfoResource> = [
       country: 'IT',
       county: 'BO',
       origin: 'IPA',
+      originId: '1',
       assistanceContacts: {
         supportEmail: 'a@a.it',
       },
@@ -900,6 +904,7 @@ export const mockedPspOnboardingData: Array<InstitutionOnboardingInfoResource> =
       county: 'MB',
       country: 'IT',
       origin: 'SELC',
+      originId: '1',
       companyInformations: {},
       assistanceContacts: {},
     },
@@ -947,6 +952,7 @@ export const mockedPspOnboardingData: Array<InstitutionOnboardingInfoResource> =
       county: 'MI',
       country: 'IT',
       origin: 'SELC',
+      originId: '1',
       companyInformations: {},
       assistanceContacts: {},
     },
@@ -994,6 +1000,7 @@ export const mockedPspOnboardingData: Array<InstitutionOnboardingInfoResource> =
       county: 'RE',
       country: 'IT',
       origin: 'SELC',
+      originId: '1',
       companyInformations: {},
       assistanceContacts: {},
     },
@@ -1179,7 +1186,7 @@ export const mockedANACParties: Array<ANACParty> = [
     description: 'descriptionAnac1',
     digitalAddress: 'email@example.com',
     id: 'id2',
-    originId: 'origin_23',
+    originId: '12345678911',
     taxCode: '12345678911',
   },
   {
@@ -1188,7 +1195,7 @@ export const mockedANACParties: Array<ANACParty> = [
     description: 'descriptionAnac2',
     digitalAddress: 'email2@example.com',
     id: 'id3',
-    originId: 'string',
+    originId: '11223344551',
     taxCode: '11223344551',
   },
 ];

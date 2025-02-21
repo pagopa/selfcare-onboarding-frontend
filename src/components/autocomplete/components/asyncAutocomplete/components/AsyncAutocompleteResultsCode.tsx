@@ -83,7 +83,7 @@ export default function AsyncAutocompleteResultsCode({
           }}
         >
           <PartyAccountItemButton
-            partyName={partyName.toLocaleLowerCase()}
+            partyName={partyName?.toLocaleLowerCase()}
             partyRole={
               !isTaxCodeSelected && aooResult
                 ? aooResult.denominazioneEnte || aooResult.parentDescription

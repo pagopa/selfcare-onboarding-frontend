@@ -234,6 +234,7 @@ export type InstitutionData = {
   billingData: OnboardingFormData;
   institutionType: InstitutionType;
   origin: string;
+  originId: string;
   paymentServiceProvider?: PaymentServiceProviderDto;
   dataProtectionOfficer?: DataProtectionOfficerDto;
   companyInformations?: CompanyInformations;

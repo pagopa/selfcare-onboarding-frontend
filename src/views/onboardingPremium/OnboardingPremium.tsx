@@ -58,7 +58,7 @@ function OnboardingPremiumComponent() {
 
   const [externalInstitutionId, _setExternalInstitutionId] = useState<string>('');
   const [origin, setOrigin] = useState<string>('');
-
+  const [originId, setOriginId] = useState<string>('');
   const [_manager, setManager] = useState<UserOnCreate>();
   const [users, setUsers] = useState<Array<UserOnCreate>>([]);
   const [billingData, setBillingData] = useState<OnboardingFormData>();
@@ -152,6 +152,7 @@ function OnboardingPremiumComponent() {
 
   const forwardWithOnboardingData = (
     origin: string,
+    originId: string,
     billingData?: OnboardingFormData,
     institutionType?: InstitutionType,
     partyId?: string,
@@ -197,6 +198,7 @@ function OnboardingPremiumComponent() {
     }
 
     setOrigin(origin);
+    setOriginId(originId);
     setInstitutionType(institutionType);
     setPartyId(partyId);
     forward();
@@ -322,6 +324,7 @@ function OnboardingPremiumComponent() {
           },
           institutionType: institutionType as InstitutionType,
           origin,
+          originId,
           subtitle: (
             <Trans i18nKey="onboardingSubProduct.billingData.subTitle" components={{ 1: <br /> }}>
               {`Conferma, modifica o inserisci i dati richiesti, assicurandoti che siano corretti. <1 />Verranno usati anche per richiedere l’adesione ad altri prodotti e in caso di fatturazione.`}
@@ -379,6 +382,7 @@ function OnboardingPremiumComponent() {
           institutionType: institutionType as InstitutionType,
           pricingPlan: pricingPlanCategory.product[subProductId]?.consumptionPlan.pricingPlan,
           origin,
+          originId: origin === 'SELC' ? billingData?.taxCode ?? '' : originId,
           setLoading,
           forward,
           back,

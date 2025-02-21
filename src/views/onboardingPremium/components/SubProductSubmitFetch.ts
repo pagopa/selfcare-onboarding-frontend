@@ -22,6 +22,7 @@ type Props = {
   setError: React.Dispatch<React.SetStateAction<boolean>>;
   forward: () => void;
   origin: string;
+  originId: string;
 };
 
 export const subProductSubmitFetch = async ({
@@ -37,6 +38,7 @@ export const subProductSubmitFetch = async ({
   setError,
   forward,
   origin,
+  originId
 }: Props) => {
   const postLegalsResponse = await fetchWithLogs(
     {
@@ -58,6 +60,7 @@ export const subProductSubmitFetch = async ({
         institutionType,
         pricingPlan,
         origin,
+        originId,
         geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY
           ? billingData.geographicTaxonomies?.map((gt) =>
               onboardedInstitutionInfo2geographicTaxonomy(gt)
