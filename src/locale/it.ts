@@ -658,6 +658,7 @@ export default {
       subTitle:
         'Inserisci le informazioni richieste e assicurati che siano corrette.<1 /> Serviranno a registrarti come Partner tecnologico per il<3 /> prodotto <5>{{nameProduct}}</5>.',
     },
+    pspDashboardWarning: 'Per aggiornare i dati presenti, contatta il servizio di <1>Assistenza</1>',
     billingDataSection: {
       invalidFiscalCode: 'Il Codice Fiscale non è valido',
       invalidTaxCodeInvoicing: 'Il Codice Fiscale inserito non è relativo al tuo ente',

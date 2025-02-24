@@ -804,6 +804,8 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
               (institutionType !== 'PA' && institutionType !== 'SA' && institutionType !== 'GSP')
             ) {
               setActiveStep(0);
+            } else if (fromDashboard && productId === 'prod-dashboard-psp') {
+              window.location.assign(`${ENV.URL_FE.DASHBOARD}/${externalInstitutionId}`);
             } else {
               setActiveStep(1);
             }
