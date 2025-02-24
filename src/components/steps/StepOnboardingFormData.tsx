@@ -1,9 +1,9 @@
-import { Box, Grid, TextField } from '@mui/material';
+import { Alert, Box, Grid, Link, TextField } from '@mui/material';
 import { styled } from '@mui/system';
 import { AxiosError, AxiosResponse } from 'axios';
 import { useFormik } from 'formik';
 import { useContext, useEffect, useReducer, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
 import { uniqueId } from 'lodash';
 import {
@@ -32,6 +32,7 @@ import { canInvoice, requiredError } from '../../utils/constants';
 import Heading from '../onboardingFormData/Heading';
 import { validateFields } from '../../utils/validateFields';
 import { handleGeotaxonomies } from '../../utils/handleGeotaxonomies';
+import { ENV } from '../../utils/env';
 
 export type StepBillingDataHistoryState = {
   externalInstitutionId: string;
@@ -269,7 +270,7 @@ export default function StepOnboardingFormData({
           : undefined,
       taxCode:
         formik.values.taxCode !== '' && formik.values.taxCode ? formik.values.taxCode : undefined,
-      originId
+      originId,
     });
   };
 
@@ -497,6 +498,21 @@ export default function StepOnboardingFormData({
     <Box display="flex" justifyContent="center">
       <Grid container item xs={8} display="flex" justifyContent="center">
         <Heading subtitle={subtitle} />
+        {subProductId === 'prod-dashboard-psp' && (
+          <Grid container item xs={8} display="flex" justifyContent="center" mb={5}>
+            <Alert severity="warning" variant="standard" sx={{ width: '90%' }}>
+              <Trans
+                i18nKey="onboardingFormData.pspDashboardWarning"
+                components={{
+                  1: <Link color={'inherit'} href={ENV.URL_FE.ASSISTANCE} />,
+                }}
+              >
+                {`Per aggiornare i dati presenti, contatta il servizio di <1>Assistenza</1>.`}
+              </Trans>
+            </Alert>
+          </Grid>
+        )}
+
         <PersonalAndBillingDataSection
           productId={productId}
           origin={origin}

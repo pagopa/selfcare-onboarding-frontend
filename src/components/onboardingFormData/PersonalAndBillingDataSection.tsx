@@ -557,7 +557,7 @@ export default function PersonalAndBillingDataSection({
                 noOptionsText={t('onboardingFormData.billingDataSection.noResult')}
                 clearOnBlur={true}
                 forcePopupIcon={!(isFromIPA || !isCityEditable)}
-                disabled={isPremium && isCityEditable ? false : isFromIPA || isAooUo}
+                disabled={isPremium || isFromIPA || isAooUo}
                 ListboxProps={{
                   style: {
                     overflow: 'visible',
@@ -924,10 +924,21 @@ export default function PersonalAndBillingDataSection({
                     },
                   }}
                   disabled={
-                    isPremium && formik.values.recipientCode && !formik.errors.recipientCode
+                    isPremium &&
+                    formik.values.recipientCode.length >= 6 &&
+                    formik.initialValues.recipientCode.length >= 6 &&
+                    !formik.errors.recipientCode
                   }
-                  helperText={formik.errors.recipientCode === 'Required' ? undefined : formik.errors.recipientCode}
-                  error={formik.errors.recipientCode === 'Required' ? false : !!formik.errors.recipientCode}
+                  helperText={
+                    formik.errors.recipientCode === 'Required'
+                      ? undefined
+                      : formik.errors.recipientCode
+                  }
+                  error={
+                    formik.errors.recipientCode === 'Required'
+                      ? false
+                      : !!formik.errors.recipientCode
+                  }
                 />
                 <Typography
                   component={'span'}

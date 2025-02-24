@@ -926,7 +926,7 @@ export const mockedPspOnboardingData: Array<InstitutionOnboardingInfoResource> =
         zipCode: '20121',
         taxCode: '98765432101',
         vatNumber: '98765432101',
-        recipientCode: 'Z9X8Y',
+        recipientCode: 'Z9X8Y1',
         publicServices: false,
         certified: true,
         geographicTaxonomies: [
