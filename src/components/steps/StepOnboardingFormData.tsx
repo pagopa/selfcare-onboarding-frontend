@@ -28,7 +28,7 @@ import UpdateGeotaxonomy from '../onboardingFormData/taxonomy/UpdateGeotaxonomy'
 import GeoTaxonomySection from '../onboardingFormData/taxonomy/GeoTaxonomySection';
 import { useHistoryState } from '../useHistoryState';
 import { VatNumberErrorModal } from '../onboardingFormData/VatNumberErrorModal';
-import { canInvoice, requiredError } from '../../utils/constants';
+import { canInvoice, PRODUCT_IDS, requiredError } from '../../utils/constants';
 import Heading from '../onboardingFormData/Heading';
 import { validateFields } from '../../utils/validateFields';
 import { handleGeotaxonomies } from '../../utils/handleGeotaxonomies';
@@ -117,16 +117,16 @@ export default function StepOnboardingFormData({
 
   const isPremium = !!subProductId;
   const isPaymentServiceProvider = institutionType === 'PSP';
-  const isPdndPrivate = institutionType === 'PRV' && productId === 'prod-interop';
+  const isPdndPrivate = institutionType === 'PRV' && productId === PRODUCT_IDS.INTEROP;
   const isInformationCompany =
     origin !== 'IPA' &&
     institutionType !== 'PRV' &&
     (institutionType === 'GSP' || institutionType === 'SCP') &&
-    (productId === 'prod-io' ||
-      productId === 'prod-io-sign' ||
-      productId === 'prod-pagopa' ||
-      productId === 'prod-interop');
-  const isProdFideiussioni = productId?.startsWith('prod-fd') ?? false;
+    (productId === PRODUCT_IDS.IO ||
+      productId === PRODUCT_IDS.IO_SIGN ||
+      productId === PRODUCT_IDS.PAGOPA ||
+      productId === PRODUCT_IDS.INTEROP);
+  const isProdFideiussioni = productId?.startsWith(PRODUCT_IDS.FD) ?? false;
   const isInvoiceable = canInvoice(institutionType, productId);
   const isForeignInsurance = onboardingFormData?.registerType?.includes('Elenco II');
   const isDisabled =
@@ -498,7 +498,7 @@ export default function StepOnboardingFormData({
     <Box display="flex" justifyContent="center">
       <Grid container item xs={8} display="flex" justifyContent="center">
         <Heading subtitle={subtitle} />
-        {subProductId === 'prod-dashboard-psp' && (
+        {subProductId === PRODUCT_IDS.DASHBOARD_PSP && (
           <Grid container item xs={8} display="flex" justifyContent="center" mb={5}>
             <Alert severity="warning" variant="standard" sx={{ width: '90%' }}>
               <Trans
@@ -535,7 +535,7 @@ export default function StepOnboardingFormData({
           recipientCodeStatus={recipientCodeStatus}
         />
 
-        {!institutionAvoidGeotax && subProductId !== 'prod-dashboard-psp' && (
+        {!institutionAvoidGeotax && subProductId !== PRODUCT_IDS.DASHBOARD_PSP && (
           <Grid item xs={12} display="flex" justifyContent={'center'}>
             <GeoTaxonomySection
               retrievedTaxonomies={previousGeotaxononomies}

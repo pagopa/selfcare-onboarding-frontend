@@ -176,6 +176,17 @@ export const USER_PLATFORM_ROLE_LABEL = {
   api: 'operatore API',
 };
 
+export const PRODUCT_IDS = {
+  PAGOPA: 'prod-pagopa',
+  IO: 'prod-io',
+  PN: 'prod-pn',
+  INTEROP: 'prod-interop',
+  IDPAY: 'prod-idpay',
+  IO_SIGN: 'prod-io-sign',
+  FD: 'prod-fd',
+  DASHBOARD_PSP: 'prod-dashboard-psp',
+};
+
 export const requiredError = 'Required';
 
 export const fiscalAndVatCodeRegexp = new RegExp(
