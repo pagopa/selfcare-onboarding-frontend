@@ -73,6 +73,10 @@ export const ENV = {
 
   AGGREGATOR: {
     SHOW_AGGREGATOR: env.get('REACT_APP_ENABLE_AGGREGATOR').default('false').asBool(),
+    ELIGIBLE_PRODUCTS: env
+      .get('REACT_APP_AGGREGATOR_ELIGIBLE_PRODUCTS')
+      .default('prod-io,prod-pn')
+      .asString(),
   },
 
   SCP_INFOCAMERE: {
@@ -89,5 +93,5 @@ export const ENV = {
 
   GPU: {
     SHOW: env.get('REACT_APP_ENABLE_GPU').default('false').asBool(),
-  }
+  },
 };

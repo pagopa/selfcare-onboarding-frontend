@@ -1,23 +1,23 @@
 import { Alert, FormControlLabel, Grid, Link, Typography, useTheme } from '@mui/material';
+import Checkbox from '@mui/material/Checkbox';
 import { Box } from '@mui/system';
+import { SessionModal } from '@pagopa/selfcare-common-frontend/lib';
 import { AxiosError, AxiosResponse } from 'axios';
 import { ReactElement, useContext, useEffect, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
-import Checkbox from '@mui/material/Checkbox';
-import { SessionModal } from '@pagopa/selfcare-common-frontend/lib';
-import { InstitutionType, Product, PartyData, StepperStepComponentProps } from '../../../types';
+import { InstitutionType, PartyData, Product, StepperStepComponentProps } from '../../../types';
 import { fetchWithLogs } from '../../lib/api-utils';
 import { UserContext } from '../../lib/context';
 import { getFetchOutcome } from '../../lib/error-utils';
 import { AooData } from '../../model/AooData';
 import { UoData } from '../../model/UoModel';
+import { noMandatoryIpaProducts } from '../../utils/constants';
+import { ENV } from '../../utils/env';
+import { selected2OnboardingData } from '../../utils/selected2OnboardingData';
 import { LoadingOverlay } from '../LoadingOverlay';
 import { OnboardingStepActions } from '../OnboardingStepActions';
 import { Autocomplete } from '../autocomplete/Autocomplete';
 import { useHistoryState } from '../useHistoryState';
-import { noMandatoryIpaProducts } from '../../utils/constants';
-import { ENV } from '../../utils/env';
-import { selected2OnboardingData } from '../../utils/selected2OnboardingData';
 
 type Props = {
   subTitle: string | ReactElement;
@@ -240,6 +240,8 @@ export function StepSearchParty({
     back!();
   };
 
+  const canAggregateProductList = ENV.AGGREGATOR.ELIGIBLE_PRODUCTS.split(',');
+
   return loading ? (
     <LoadingOverlay loadingText={t('onboardingStep1.loadingOverlayText')} />
   ) : (
@@ -380,7 +382,7 @@ export function StepSearchParty({
         </Grid>
         {ENV.AGGREGATOR.SHOW_AGGREGATOR &&
           institutionType === 'PA' &&
-          product?.id === 'prod-io' && (
+          canAggregateProductList.includes(product?.id ?? '') && (
             <Grid item mt={3}>
               <FormControlLabel
                 control={
