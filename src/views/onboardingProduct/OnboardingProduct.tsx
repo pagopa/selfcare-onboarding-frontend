@@ -776,6 +776,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
             geographicTaxonomies: [],
           },
           origin,
+          originId: onboardingFormData?.originId,
           institutionType: institutionType as InstitutionType,
           subtitle:
             institutionType !== 'PT' ? (

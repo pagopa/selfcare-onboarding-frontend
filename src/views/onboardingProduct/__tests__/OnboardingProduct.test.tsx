@@ -2093,17 +2093,17 @@ const verifySubmit = async (
                           ? undefined
                           : undefined,
           originId: errorOnSubmit
-            ? mockPartyRegistry.items[1].taxCode
+            ? mockPartyRegistry.items[1].originId
             : from === 'NO_IPA'
               ? mockPartyRegistry.items[0].taxCode
               : from === 'ANAC'
-                ? mockedANACParties[0].taxCode
+                ? mockedANACParties[0].originId
                 : from === 'IVASS'
                   ? haveTaxCode
                     ? isForeignInsurance
-                      ? mockedInsuranceResource.items[0].taxCode
-                      : mockedInsuranceResource.items[2].taxCode
-                    : mockedInsuranceResource.items[4].taxCode
+                      ? mockedInsuranceResource.items[0].originId
+                      : mockedInsuranceResource.items[2].originId
+                    : mockedInsuranceResource.items[4].originId
                   : from === 'INFOCAMERE'
                     ? undefined
                     : from === 'PDND_INFOCAMERE'
@@ -2111,21 +2111,24 @@ const verifySubmit = async (
                       : from === 'SELC'
                         ? mockPartyRegistry.items[0].taxCode
                         : typeOfSearch === 'taxCode'
-                          ? mockedParties[0].taxCode
+                          ? mockedParties[0].originId
                           : typeOfSearch === 'aooCode'
-                            ? mockedAoos[0].codiceFiscaleEnte
+                            ? mockedAoos[0].codiceUniAoo
                             : typeOfSearch === 'uoCode'
-                              ? mockedUos[0].codiceFiscaleEnte
-                              : (institutionType === 'PRV' && productId === 'prod-pagopa') ||
-                                  (institutionType === 'GPU' &&
-                                    (productId === 'prod-interop' ||
-                                      productId === 'prod-io-sign' ||
-                                      productId === 'prod-io'))
-                                ? mockPartyRegistry.items[0].taxCode
-                                : (institutionType === 'GPU' || institutionType === 'PSP') &&
-                                    productId === 'prod-pagopa'
-                                  ? undefined
-                                  : mockPartyRegistry.items[0].taxCode,
+                              ? mockedUos[0].codiceUniUo
+                              : (institutionType === 'PT' ||
+                                    institutionType === 'GPU' ||
+                                    institutionType === 'GSP') &&
+                                  productId === 'prod-pagopa'
+                                ? '991'
+                                : productId === 'prod-pagopa' && institutionType === 'PRV'
+                                  ? mockPartyRegistry.items[0].taxCode
+                                  : institutionType === 'GPU' &&
+                                      (productId === 'prod-interop' ||
+                                        productId === 'prod-io-sign' ||
+                                        productId === 'prod-io')
+                                    ? undefined
+                                    : '991',
           taxCode: errorOnSubmit
             ? mockPartyRegistry.items[1].taxCode
             : from === 'NO_IPA'
@@ -2155,8 +2158,8 @@ const verifySubmit = async (
                   belongRegulatedMarket: true,
                   establishedByRegulatoryProvision: false,
                   establishedByRegulatoryProvisionNote: '',
-                  ipa: false,
-                  ipaCode: '',
+                  ipa: from === 'IPA' ? true : false,
+                  ipaCode: from === 'IPA' ? '991' : '',
                   otherNote: 'optionalPartyInformations-note',
                   regulatedMarketNote: '',
                 }
