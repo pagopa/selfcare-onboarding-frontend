@@ -179,7 +179,7 @@ export const USER_PLATFORM_ROLE_LABEL = {
 export const PRODUCT_IDS = {
   PAGOPA: 'prod-pagopa',
   IO: 'prod-io',
-  PN: 'prod-pn',
+  SEND: 'prod-pn',
   INTEROP: 'prod-interop',
   IDPAY: 'prod-idpay',
   IO_SIGN: 'prod-io-sign',
