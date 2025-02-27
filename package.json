@@ -8,7 +8,7 @@
     "@mui/lab": "^5.0.0-alpha.80",
     "@mui/material": "^5.8.2",
     "@pagopa/mui-italia": "^1.5.0",
-    "@pagopa/selfcare-common-frontend": "^1.34.55",
+    "@pagopa/selfcare-common-frontend": "^1.34.56",
     "axios": "^1.7.9",
     "debounce": "^2.2.0",
     "formik": "^2.4.6",
