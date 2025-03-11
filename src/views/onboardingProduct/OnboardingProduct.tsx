@@ -549,7 +549,12 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
             county: onboardingFormData?.county,
             city: onboardingFormData?.city,
           },
-          origin: institutionType === 'SA' ? 'ANAC' : institutionType === 'PSP' ? 'SELC' : origin,
+          origin:
+            institutionType === 'SA'
+              ? 'ANAC'
+              : institutionType === 'PSP' || institutionType === 'PRV' && productId !== 'prod-interop' || institutionType === 'GPU'
+                ? 'SELC'
+                : origin,
           users,
           pricingPlan,
           assistanceContacts: onboardingFormData?.supportEmail

@@ -563,7 +563,7 @@ export default {
     selectUserPartyStep: {
       title: 'Seleziona il tuo ente',
       subTitle:
-        "Seleziona l'ente per il quale stai richiedendo la sottoscrizione <1 />all'offerta <3>Premium</3>",
+        "Seleziona l'ente per il quale stai richiedendo la sottoscrizione <1 />all'offerta <3>{{productName}}</3>",
       searchLabel: 'Cerca ente',
       notFoundResults: 'Nessun risultato',
       IPAsubTitle:

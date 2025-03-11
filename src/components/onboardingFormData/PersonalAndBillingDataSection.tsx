@@ -1101,7 +1101,7 @@ export default function PersonalAndBillingDataSection({
                   600,
                   theme.palette.text.primary
                 )}
-                disabled={isDisabled && !!pspData?.legalRegisterNumber}
+                disabled={isDisabled && !!pspData?.legalRegisterNumber && !!formik.errors.legalRegisterNumber}
               />
             </Grid>
             <Grid item xs={6}>

@@ -499,7 +499,7 @@ export default function StepOnboardingFormData({
       <Grid container item xs={8} display="flex" justifyContent="center">
         <Heading subtitle={subtitle} />
         {subProductId === PRODUCT_IDS.DASHBOARD_PSP && (
-          <Grid container item xs={8} display="flex" justifyContent="center" mb={5}>
+          <Grid item xs={12} display="flex" justifyContent="center" mb={5}>
             <Alert severity="warning" variant="standard" sx={{ width: '90%' }}>
               <Trans
                 i18nKey="onboardingFormData.pspDashboardWarning"

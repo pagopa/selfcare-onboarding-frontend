@@ -268,6 +268,7 @@ function OnboardingPremiumComponent() {
       label: 'Select Institution related',
       Component: () =>
         SubProductStepSelectUserParty({
+          subProduct,
           parties,
           subProductId,
           productId,

@@ -7,12 +7,13 @@ import { PartyAccountItemButton } from '@pagopa/mui-italia/dist/components/Party
 import { roleLabels } from '@pagopa/selfcare-common-frontend/lib/utils/constants';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
 import { uniqueId } from 'lodash';
-import { SelfcareParty, StepperStepComponentProps } from '../../../../types';
+import { Product, SelfcareParty, StepperStepComponentProps } from '../../../../types';
 import { OnboardingStepActions } from '../../../components/OnboardingStepActions';
 import { useHistoryState } from '../../../components/useHistoryState';
 import PartySelectionSearchInput from './PartySelectionSearchInput';
 
 type Props = {
+  subProduct: Product | undefined;
   parties: Array<SelfcareParty>;
   subProductId: string;
   productId: string;
@@ -35,10 +36,11 @@ const CustomBox = styled(Box)({
 const verifyPartyFilter = (party: SelfcareParty, filter: string) =>
   party.description?.toUpperCase().indexOf(filter.toUpperCase()) >= 0;
 export function SubProductStepSelectUserParty({
-  forward,
+  subProduct,
   parties,
   productId,
   subProductId,
+  forward,
 }: Props) {
   const partyIdByQuery = new URLSearchParams(window.location.search).get('partyId');
   const requestIdRef = useRef<string>('');
@@ -132,10 +134,11 @@ export function SubProductStepSelectUserParty({
           <Typography variant="body1" align="center" color={theme.palette.text.primary}>
             <Trans
               i18nKey="onboardingSubProduct.selectUserPartyStep.subTitle"
+              values={{ productName: subProduct?.title }}
               components={{ 1: <br />, 3: <strong /> }}
             >
               {`Seleziona l&apos;ente per il quale stai richiedendo la sottoscrizione <br />
-              all&apos;offerta <strong>Premium</strong>`}
+              all&apos;offerta {{productName}}.`}
             </Trans>
           </Typography>
         </Grid>

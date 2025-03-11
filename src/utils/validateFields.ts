@@ -92,7 +92,9 @@ export const validateFields = (
         : values.commercialRegisterNumber &&
             !commercialRegisterNumberRegexp.test(values.commercialRegisterNumber) &&
             isPaymentServiceProvider
-        ? t('onboardingFormData.billingDataSection.pspDataSection.invalidCommercialRegisterNumber')
+          ? t(
+              'onboardingFormData.billingDataSection.pspDataSection.invalidCommercialRegisterNumber'
+            )
           : undefined,
     businessRegisterPlace:
       (institutionType === 'SA' || isPdndPrivate) && !values.businessRegisterPlace
@@ -138,12 +140,13 @@ export const validateFields = (
               : undefined
           : requiredError
       : undefined,
-    geographicTaxonomies:
-      ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY &&
-      !institutionAvoidGeotax &&
-      (!values.geographicTaxonomies ||
-        values.geographicTaxonomies.length === 0 ||
-        values.geographicTaxonomies.some((gt) => gt?.code === '' || gt === null))
+    geographicTaxonomies: isPremium
+      ? undefined
+      : ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY &&
+          !institutionAvoidGeotax &&
+          (!values.geographicTaxonomies ||
+            values.geographicTaxonomies.length === 0 ||
+            values.geographicTaxonomies.some((gt) => gt?.code === '' || gt === null))
         ? requiredError
         : undefined,
     rea:
