@@ -552,7 +552,9 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           origin:
             institutionType === 'SA'
               ? 'ANAC'
-              : institutionType === 'PSP' || institutionType === 'PRV' && productId !== 'prod-interop' || institutionType === 'GPU'
+              : (institutionType === 'PSP' ||
+                  institutionType === 'GPU' ||
+                  (institutionType === 'PRV' && productId !== 'prod-interop'))
                 ? 'SELC'
                 : origin,
           users,

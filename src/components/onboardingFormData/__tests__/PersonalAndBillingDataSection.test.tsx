@@ -128,7 +128,7 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
           (institutionType === 'GSP' || institutionType === 'SCP') &&
           (productId === 'prod-io' || productId === 'prod-io-sign' || productId === 'prod-interop');
         const isPrivateParty = productId === 'prod-interop' && institutionType === 'PRV';
-        const isPdndPrivate = productId === 'prod-pn' && institutionType === 'PRV';
+        const isPdndPrivate = productId === 'prod-interop' && institutionType === 'PRV';
         conditionsMap[`${productId}-${institutionType}`] = {
           isPremium,
           isInvoiceable,
