@@ -2091,8 +2091,9 @@ const verifySubmit = async (
                         ? 'SELC'
                         : institutionType === 'GSP'
                           ? undefined
-                          : institutionType === 'GPU' ||
-                              (institutionType === 'PRV' && productId !== 'prod-interop')
+                          : (institutionType === 'PSP' ||
+                              institutionType === 'GPU' ||
+                              (institutionType === 'PRV' && productId !== 'prod-interop'))
                             ? 'SELC'
                             : undefined,
           originId: errorOnSubmit
