@@ -2091,7 +2091,11 @@ const verifySubmit = async (
                         ? 'SELC'
                         : institutionType === 'GSP'
                           ? undefined
-                          : undefined,
+                          : (institutionType === 'PSP' ||
+                              institutionType === 'GPU' ||
+                              (institutionType === 'PRV' && productId !== 'prod-interop'))
+                            ? 'SELC'
+                            : undefined,
           originId: errorOnSubmit
             ? mockPartyRegistry.items[1].originId
             : from === 'NO_IPA'
