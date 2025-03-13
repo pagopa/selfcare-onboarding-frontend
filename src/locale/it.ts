@@ -554,7 +554,7 @@ export default {
       },
     },
     subProductStepUserUnrelated: {
-      title: 'Non puoi aderire a {{selectedProduct}} Premium',
+      title: 'Non puoi aderire a {{selectedProduct}}',
       description:
         'Il tuo ente non ha aderito ad <strong>{{selectedProduct}}</strong>, o non hai un ruolo per <3/>gestire il prodotto. <5/> Chiedi ad un Amministratore di <1/>aggiungerti nella sezione <7/>Utenti, oppure richiedi l’adesione ad <strong>{{selectedProduct}}</strong> per il tuo ente.',
       backHomeLabelBtn: 'Torna alla home',
@@ -580,7 +580,7 @@ export default {
     successfulAdhesion: {
       title: 'La richiesta di adesione è stata <1/>inviata con successo',
       message:
-        "Riceverai una PEC all’indirizzo istituzionale dell’ente.<1 />Al suo interno troverai le istruzioni per completare la <3 /> sottoscrizione all'offerta <strong>Premium</strong>.",
+        "Riceverai una PEC all’indirizzo istituzionale dell’ente.<1 />Al suo interno troverai le istruzioni per completare la <3 /> sottoscrizione all'offerta <strong>{{title}}</strong>.",
       closeButton: 'Chiudi',
     },
     billingData: {

@@ -144,8 +144,14 @@ export default function PersonalAndBillingDataSection({
   useEffect(() => {
     if (pspData) {
       formik.setFieldValue('commercialRegisterNumber', pspData.businessRegisterNumber);
-      formik.setFieldValue('registrationInRegister', pspData.legalRegisterName);
-      formik.setFieldValue('registerNumber', pspData.legalRegisterNumber);
+      formik.setFieldValue(
+        'registrationInRegister',
+        pspData.legalRegisterName === 'N/A' ? '' : pspData.legalRegisterName
+      );
+      formik.setFieldValue(
+        'registerNumber',
+        pspData.legalRegisterNumber === 'N/A' ? '' : pspData.legalRegisterNumber
+      );
       formik.setFieldValue('abiCode', pspData.abiCode);
       formik.setFieldValue('vatNumberGroup', pspData.vatNumberGroup);
     }
@@ -1076,7 +1082,7 @@ export default function PersonalAndBillingDataSection({
                   600,
                   theme.palette.text.primary
                 )}
-                disabled={isDisabled && !!pspData?.businessRegisterNumber}
+                disabled={isDisabled && !!pspData?.businessRegisterNumber && !formik.errors.commercialRegisterNumber}
               />
             </Grid>
             <Grid item xs={12}>
@@ -1088,7 +1094,11 @@ export default function PersonalAndBillingDataSection({
                   600,
                   theme.palette.text.primary
                 )}
-                disabled={isDisabled && !!pspData?.legalRegisterName}
+                disabled={
+                  isDisabled &&
+                  !!pspData?.legalRegisterName &&
+                  formik.values.legalRegisterNumber !== 'N/A'
+                }
               />
             </Grid>
             <Grid item xs={6}>
@@ -1101,7 +1111,12 @@ export default function PersonalAndBillingDataSection({
                   600,
                   theme.palette.text.primary
                 )}
-                disabled={isDisabled && !!pspData?.legalRegisterNumber && !!formik.errors.legalRegisterNumber}
+                disabled={
+                  isDisabled &&
+                  !!pspData?.legalRegisterNumber &&
+                  !formik.errors.legalRegisterNumber &&
+                  formik.values.legalRegisterNumber !== 'N/A'
+                }
               />
             </Grid>
             <Grid item xs={6}>
@@ -1117,7 +1132,7 @@ export default function PersonalAndBillingDataSection({
                 InputLabelProps={{
                   shrink: formik.values.abiCode?.length > 0,
                 }}
-                disabled={isDisabled && !!pspData?.abiCode}
+                disabled={isDisabled && !!pspData?.abiCode && !formik.errors.abiCode}
               />
             </Grid>
           </>

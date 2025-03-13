@@ -15,10 +15,11 @@ import { Problem, Product, SelfcareParty } from '../../../../types';
 
 type Props = {
   product?: Product;
+  subProduct?: Product;
   productId: string;
 };
 
-export default function SubProductStepUserUnrelated({ product, productId }: Props) {
+export default function SubProductStepUserUnrelated({ product, subProduct, productId }: Props) {
   const history = useHistory();
   const { setRequiredLogin } = useContext(UserContext);
   const { t } = useTranslation();
@@ -65,7 +66,7 @@ export default function SubProductStepUserUnrelated({ product, productId }: Prop
             <Typography variant={'h4'}>
               <Trans
                 i18nKey="onboardingSubProduct.subProductStepUserUnrelated.title"
-                values={{ selectedProduct: product?.title }}
+                values={{ selectedProduct: subProduct?.title }}
               >
                 {`Non puoi aderire a {{selectedProduct}}`}
               </Trans>
