@@ -203,7 +203,7 @@ export default function StepOnboardingFormData({
 
   useEffect(() => {
     if (dpoData) {
-      void formik.setFieldValue('address', dpoData.address);
+      void formik.setFieldValue('address', dpoData.address === 'N/A' ? '' : dpoData.address);
       void formik.setFieldValue('email', dpoData.email);
       void formik.setFieldValue('pec', dpoData.pec);
     }
@@ -500,7 +500,7 @@ export default function StepOnboardingFormData({
         <Heading subtitle={subtitle} />
         {subProductId === PRODUCT_IDS.DASHBOARD_PSP && (
           <Grid item xs={12} display="flex" justifyContent="center" mb={5}>
-            <Alert severity="warning" variant="standard" sx={{ width: '90%' }}>
+            <Alert severity="warning" variant="standard" sx={{ width: '65%' }}>
               <Trans
                 i18nKey="onboardingFormData.pspDashboardWarning"
                 components={{

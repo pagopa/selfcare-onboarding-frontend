@@ -5,9 +5,10 @@ import { SelfcareParty, Product, StepperStepComponentProps } from '../../../../t
 import { HeaderContext, UserContext } from '../../../lib/context';
 import { fetchWithLogs } from '../../../lib/api-utils';
 import { getFetchOutcome } from '../../../lib/error-utils';
-import NoProductPage from '../../NoProductPage';
 import { unregisterUnloadEvent } from '../../../utils/unloadEvent-utils';
 import { buildUrlLogo } from '../../../utils/constants';
+import { genericError } from '../../onboardingProduct/components/StepVerifyOnboarding';
+import { MessageNoAction } from '../../../components/MessageNoAction';
 
 type Props = StepperStepComponentProps & {
   requestId: string;
@@ -20,7 +21,8 @@ type Props = StepperStepComponentProps & {
 const checkProduct = async (
   id: string,
   setter: (product: Product | undefined) => void,
-  setRequiredLogin: (required: boolean) => void
+  setRequiredLogin: (required: boolean) => void,
+  setError: Dispatch<SetStateAction<boolean>>
 ) => {
   const onboardingProducts = await fetchWithLogs(
     { endpoint: 'ONBOARDING_VERIFY_PRODUCT', endpointParams: { productId: id } },
@@ -35,6 +37,7 @@ const checkProduct = async (
   } else if ((onboardingProducts as AxiosError).response?.status === 404) {
     setter(undefined);
   } else {
+    setError(true);
     console.error('Unexpected response', (onboardingProducts as AxiosError).response);
     setter(undefined);
   }
@@ -93,8 +96,8 @@ function SubProductStepVerifyInputs({
   const submit = () => {
     setLoading(true);
     Promise.all([
-      checkProduct(productId, setSelectedProduct, setRequiredLogin),
-      checkProduct(subProductId, setSelectedSubProduct, setRequiredLogin),
+      checkProduct(productId, setSelectedProduct, setRequiredLogin, setError),
+      checkProduct(subProductId, setSelectedSubProduct, setRequiredLogin, setError),
       handleSearchUserParties(setParties, setRequiredLogin, productId, subProductId),
     ])
       .catch((reason) => {
@@ -132,7 +135,7 @@ function SubProductStepVerifyInputs({
     unregisterUnloadEvent(setOnExit);
   }
 
-  return error ? <NoProductPage /> : <></>;
+  return error ? <MessageNoAction {...genericError} /> : <></>;
 }
 
 export default SubProductStepVerifyInputs;

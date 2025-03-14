@@ -16,6 +16,7 @@ type Props = {
   subProduct: Product | undefined;
   parties: Array<SelfcareParty>;
   subProductId: string;
+  product?: Product;
   productId: string;
 } & StepperStepComponentProps;
 

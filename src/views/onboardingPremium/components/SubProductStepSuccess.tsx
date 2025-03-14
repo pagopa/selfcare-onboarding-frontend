@@ -3,8 +3,13 @@ import { EndingPage } from '@pagopa/selfcare-common-frontend/lib';
 import { Trans } from 'react-i18next';
 import { MessageNoAction } from '../../../components/MessageNoAction';
 import { ENV } from '../../../utils/env';
+import { Product } from '../../../../types';
 
-const successfulOutCome = {
+type Props = {
+  product: Product;
+};
+
+const successfulOutCome = (title: string) => ({
   title: '',
   description: [
     <>
@@ -20,12 +25,12 @@ const successfulOutCome = {
           </Trans>
         }
         description={
-          <Trans i18nKey="onboardingSubProduct.successfulAdhesion.message">
-            Riceverai una PEC all’indirizzo istituzionale dell&apos;ente.
-            <br />
-            Al suo interno troverai le istruzioni per completare la
-            <br />
-            sottoscrizione all&apos;offerta <strong>Premium</strong>.
+          <Trans
+            i18nKey="onboardingSubProduct.successfulAdhesion.message"
+            components={{ 1: <strong />, 3: <br /> }}
+            values={{ title }}
+          >
+            {`"Riceverai una PEC all’indirizzo istituzionale dell’ente.<3 />Al suo interno troverai le istruzioni per completare la <3 /> sottoscrizione all'offerta <1>{{title}}</1>."`}
           </Trans>
         }
         buttonLabel={
@@ -35,9 +40,9 @@ const successfulOutCome = {
       />
     </>,
   ],
-};
+});
 
-function SubProductStepSuccess() {
-  return <MessageNoAction {...successfulOutCome} />;
+function SubProductStepSuccess({ product }: Props) {
+  return <MessageNoAction {...successfulOutCome(product.title)} />;
 }
 export default SubProductStepSuccess;
