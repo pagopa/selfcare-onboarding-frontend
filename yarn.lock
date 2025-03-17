@@ -2073,10 +2073,10 @@
   resolved "https://registry.npmjs.org/@opentelemetry/semantic-conventions/-/semantic-conventions-1.28.0.tgz#337fb2bca0453d0726696e745f50064411f646d6"
   integrity sha512-lp4qAiMTD4sNWW4DbKLBkfiMZ4jbAboJIGOQr5DvciMRI494OapieI9qiODpOt0XBr1LjIDy1xAGAnVs5supTA==
 
-"@pagopa/mui-italia@^1.5.0":
-  version "1.5.0"
-  resolved "https://registry.npmjs.org/@pagopa/mui-italia/-/mui-italia-1.5.0.tgz#05be80c5c8f03c9dffcd6e583a415006b31c7b76"
-  integrity sha512-rBPd0SzVARcB5zmeviavmOK1Cih60yZ6gkZHAYqhlrrlpZnNVKW0c4K++3b3f4O4xvJNtpT0fSriKL/pM6HIoQ==
+"@pagopa/mui-italia@^1.5.0", "@pagopa/mui-italia@^1.5.1":
+  version "1.5.1"
+  resolved "https://registry.yarnpkg.com/@pagopa/mui-italia/-/mui-italia-1.5.1.tgz#672322aa8e5f19478d10f5a0979d1c14cf6b8beb"
+  integrity sha512-0ocotj0AMeAbeQlmOI68u5xDYq0v+9ur2rs8P4MyBs9xFcBidEq8FNclnZWd/7YRqBFh0tTRP/jMoM4frmHMOA==
   dependencies:
     "@fontsource/dm-mono" "^4.5.10"
     "@fontsource/titillium-web" "^4.5.9"
