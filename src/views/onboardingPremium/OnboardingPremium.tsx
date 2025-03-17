@@ -283,7 +283,7 @@ function OnboardingPremiumComponent() {
     },
     {
       label: 'Select Institution unrelated',
-      Component: () => SubProductStepUserUnrelated({ product, productId }),
+      Component: () => SubProductStepUserUnrelated({ product, subProduct, productId }),
     },
     {
       label: 'Get Onboarding Data',
@@ -391,7 +391,7 @@ function OnboardingPremiumComponent() {
     },
     {
       label: 'Success',
-      Component: () => SubProductStepSuccess(),
+      Component: () => SubProductStepSuccess({product: subProduct as Product}), 
     },
   ];
 

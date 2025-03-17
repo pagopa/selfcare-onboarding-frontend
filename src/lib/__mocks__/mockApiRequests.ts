@@ -1062,7 +1062,7 @@ export const mockedProducts: Array<Product> = [
   },
   {
     id: 'prod-dashboard-psp',
-    title: 'PSP Dashboard',
+    title: 'pagoPA Insights',
     parentId: 'prod-pagopa',
     status: statusActive,
   },
