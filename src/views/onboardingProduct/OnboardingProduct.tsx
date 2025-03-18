@@ -554,6 +554,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
               ? 'ANAC'
               : (institutionType === 'PSP' ||
                   institutionType === 'GPU' ||
+                  institutionType === 'PT' ||
                   (institutionType === 'PRV' && productId !== 'prod-interop'))
                 ? 'SELC'
                 : origin,
