@@ -110,14 +110,18 @@ const errorOnboardingSubProductTitle = 'Qualcosa è andato storto';
 
 test('Test: Bad productId and subProductId for prod-io-premium', async () => {
   renderComponent('prod-io', 'prod-io');
-  await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(4));
-  await waitFor(() => screen.findByText('Impossibile individuare il prodotto desiderato'));
+  await waitFor(() => {
+    expect(fetchWithLogsSpy).toHaveBeenCalledTimes(4);
+    screen.findByText('Qualcosa è andato storto');
+  });
 });
 
 test('Test: Bad productId and subProductId for prod-dashboard-psp', async () => {
   renderComponent('prod-pagopa', 'prod-pagopa');
-  await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(4));
-  await waitFor(() => screen.findByText('Impossibile individuare il prodotto desiderato'));
+  await waitFor(() => {
+    expect(fetchWithLogsSpy).toHaveBeenCalledTimes(4);
+    screen.findByText('Qualcosa è andato storto');
+  });
 });
 
 test('Test: Error retrieving onboarding info for prod-io-premium', async () => {

@@ -2093,6 +2093,7 @@ const verifySubmit = async (
                           ? undefined
                           : (institutionType === 'PSP' ||
                               institutionType === 'GPU' ||
+                              institutionType === 'PT' ||
                               (institutionType === 'PRV' && productId !== 'prod-interop'))
                             ? 'SELC'
                             : undefined,
