@@ -330,6 +330,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
       onboardingData.originId === undefined &&
       institutionType === 'GSP'
     ) {
+      setOrigin('SELC');
       setActiveStep(activeStep + 3);
     } else {
       setOnboardingFormData(onboardingData);
@@ -733,13 +734,13 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           institutionType,
           productAvoidStep,
           product: selectedProduct,
-          forward: forwardWithDataAndInstitution,
           back: () => {
             setActiveStep(0);
           },
           subunitTypeByQuery,
           subunitCodeByQuery,
           selectFilterCategories,
+          forward: forwardWithDataAndInstitution,
         }),
     },
     {

@@ -2087,16 +2087,15 @@ const verifySubmit = async (
                     ? 'PDND_INFOCAMERE'
                     : from === 'ANAC'
                       ? 'ANAC'
-                      : from === 'SELC' || (from === 'NO_IPA' && institutionType === 'PSP')
+                      : from === 'SELC' ||
+                          (from === 'NO_IPA' && institutionType === 'PSP') ||
+                          institutionType === 'PSP' ||
+                          institutionType === 'GPU' ||
+                          institutionType === 'PT' ||
+                          (institutionType === 'PRV' && productId !== 'prod-interop') ||
+                          (institutionType === 'GSP' && from === 'NO_IPA')
                         ? 'SELC'
-                        : institutionType === 'GSP'
-                          ? undefined
-                          : (institutionType === 'PSP' ||
-                              institutionType === 'GPU' ||
-                              institutionType === 'PT' ||
-                              (institutionType === 'PRV' && productId !== 'prod-interop'))
-                            ? 'SELC'
-                            : undefined,
+                        : undefined,
           originId: errorOnSubmit
             ? mockPartyRegistry.items[1].originId
             : from === 'NO_IPA'
