@@ -7,11 +7,15 @@ import OnboardingPremium from '../OnboardingPremium';
 import '../../../locale';
 import { Route, Router, Switch } from 'react-router';
 import { createMemoryHistory } from 'history';
-import { nationalValue } from '../../../model/GeographicTaxonomies';
 import React from 'react';
 import i18n from '@pagopa/selfcare-common-frontend/lib/locale/locale-utils';
 import '@testing-library/jest-dom';
-import { mockedPspOnboardingData } from '../../../lib/__mocks__/mockApiRequests';
+import {
+  checkCertifiedUserValidation,
+  fillUserForm,
+  verifySubmitPostLegalsIoPremium,
+  verifySubmitPostLegalsPspDashBoard,
+} from '../../../utils/test-utils';
 
 jest.setTimeout(20000);
 
@@ -105,8 +109,6 @@ const renderComponent = (
 
 const stepBillingDataTitle = 'Inserisci i dati dell’ente';
 const stepAddManagerTitle = 'Indica il Legale Rappresentante';
-const successOnboardingSubProductTitle = 'La richiesta di adesione è stata inviata con successo';
-const errorOnboardingSubProductTitle = 'Qualcosa è andato storto';
 
 test('Test: Bad productId and subProductId for prod-io-premium', async () => {
   renderComponent('prod-io', 'prod-io');
@@ -138,7 +140,7 @@ test('Test: Successfully complete onboarding request for prod-io-premium', async
   await executeStepBillingDataWithTaxCodeInvoicing('prod-io-premium');
   await executeStepAddManager(true);
   await executeClickCloseButton(true);
-  await verifySubmitPostLegalsIoPremium();
+  await verifySubmitPostLegalsIoPremium(fetchWithLogsSpy);
 });
 
 test('Test: Successfully complete onboarding request for prod-dashboard-psp', async () => {
@@ -147,12 +149,11 @@ test('Test: Successfully complete onboarding request for prod-dashboard-psp', as
   await executeStepBillingDataWithTaxCodeInvoicing('prod-dashboard-psp');
   await executeStepAddManager(true);
   await executeClickCloseButton(true);
-  await verifySubmitPostLegalsPspDashBoard();
+  await verifySubmitPostLegalsPspDashBoard(fetchWithLogsSpy);
 });
 
 test('Test: Complete onboarding request with error on submit', async () => {
   renderComponent('prod-io', 'prod-io-premium');
-  // await executeStepSelectPricingPlan();
   await executeStepSelectInstitution('Comune di Udine');
   await executeStepBillingDataWithoutTaxCodeInvoicing();
   await executeStepAddManager(false);
@@ -161,9 +162,7 @@ test('Test: Complete onboarding request with error on submit', async () => {
 
 test('Test: exiting during flow with unload event', async () => {
   renderComponent('prod-io', 'prod-io-premium');
-  // await executeStepSelectPricingPlan();
   await executeStepSelectInstitution('Comune di Milano');
-
   const event = new Event('beforeunload');
   window.dispatchEvent(event);
   await waitFor(
@@ -172,171 +171,6 @@ test('Test: exiting during flow with unload event', async () => {
       "Warning!\n\nNavigating away from this page will delete your text if you haven't already saved it."
   );
 });
-
-/* const retrieveNavigationButtons = async () => {
-  const goBackButton = screen.getByRole('button', {
-    name: 'Indietro',
-  });
-  expect(goBackButton).toBeEnabled();
-
-  const confirmButton = screen.getByRole('button', {
-    name: 'Continua',
-  });
-  await waitFor(() => expect(confirmButton).toBeEnabled());
-
-  return [goBackButton, confirmButton];
-}; 
-
-const checkBackForwardNavigation = async (title: string): Promise<Array<HTMLElement>> => {
-  const [goBackButton] = await retrieveNavigationButtons();
-  expect(goBackButton).toBeEnabled();
-  fireEvent.click(goBackButton);
-
-  screen.getByText(title);
-  const goForwardButton = screen.getByRole('button', {
-    name: 'Continua',
-  });
-  expect(goForwardButton).toBeEnabled();
-  await waitFor(() => fireEvent.click(goForwardButton));
-
-  return await retrieveNavigationButtons();
-};
-
-const executeStepSelectPricingPlan = async () => {
-  console.log('Testing step select pricing plan...');
-
-  const mockRetrievePlanPrices = {
-    consumptionPlan: {
-      pricingPlan: 'C0',
-      echelons: [
-        {
-          from: '1',
-          to: '100.000',
-          price: '0,25',
-        },
-        {
-          from: '100.001',
-          to: '500.000',
-          price: '0,24',
-        },
-        {
-          from: '500.001',
-          to: '1.000.000',
-          price: '0,22',
-        },
-        {
-          from: '1.000.001',
-          to: '1.500.000',
-          price: '0,20',
-        },
-        {
-          from: '1.500.001',
-          to: '2.000.000',
-          price: '0,18',
-        },
-        {
-          from: '2.000.001',
-          to: '5.000.000',
-          price: '0,15',
-        },
-        {
-          from: '5.000.000',
-          to: '',
-          price: '0,11',
-        },
-      ],
-    },
-    carnetPlans: [
-      {
-        pricingPlan: 'C1',
-        messages: '1.000',
-        messagePrice: '0,22',
-        carnetPrice: '220,00',
-      },
-      {
-        pricingPlan: 'C2',
-        messages: '10.000',
-        messagePrice: '0,218',
-        carnetPrice: '2.175,00',
-      },
-      {
-        pricingPlan: 'C3',
-        messages: '50.000',
-        messagePrice: '0,215',
-        carnetPrice: '10.750,00',
-      },
-      {
-        pricingPlan: 'C4',
-        messages: '100.000',
-        messagePrice: '0,213',
-        carnetPrice: '21.250,00',
-      },
-      {
-        pricingPlan: 'C5',
-        messages: '250.000',
-        messagePrice: '0,210',
-        carnetPrice: '52.500,00',
-      },
-      {
-        pricingPlan: 'C6',
-        messages: '500.000',
-        messagePrice: '0,205',
-        carnetPrice: '102.500,00',
-      },
-      {
-        pricingPlan: 'C7',
-        messages: '1.000.000',
-        messagePrice: '0,2',
-        carnetPrice: '200.000,00',
-      },
-      {
-        pricingPlan: 'C8',
-        messages: '3.000.000',
-        messagePrice: '0,16',
-        carnetPrice: '480.000,00',
-      },
-    ],
-  };
-
-  global.fetch = jest.fn().mockResolvedValueOnce({
-    json: () => Promise.resolve(mockRetrievePlanPrices),
-  });
-
-  await waitFor(() =>
-    screen.getByText(/Passa a IO Premium e migliora le performance dei messaggi/)
-  );
-
-  const showMoreCarnet = document.getElementById('showMoreCarnetPlan') as HTMLElement;
-  fireEvent.click(showMoreCarnet);
-
-  await waitFor(() =>
-    mockRetrievePlanPrices.carnetPlans.forEach((c) =>
-      expect(document.getElementById(c.pricingPlan) as HTMLElement).toBeInTheDocument()
-    )
-  );
-
-  await waitFor(() => screen.getByText('1.000'));
-
-  const forwardWithCarnet = document.getElementById('forwardCarnetPlan') as HTMLElement;
-  expect(forwardWithCarnet).toBeDisabled();
-
-  const carnetPlan = document.getElementById('C1') as HTMLElement;
-  fireEvent.click(carnetPlan);
-  expect(forwardWithCarnet).toBeEnabled();
-
-  const showMoreConsumption = document.getElementById('showMoreConsumptionPlan') as HTMLElement;
-  fireEvent.click(showMoreConsumption);
-
-  await waitFor(() =>
-    mockRetrievePlanPrices.consumptionPlan.echelons.forEach((c) =>
-      expect(screen.getByText(c.price.slice(-2).concat('€ / mess'))).toBeInTheDocument()
-    )
-  );
-
-  const chooseConsumption = document.getElementById('forwardConsumptionPlan') as HTMLElement;
-  expect(chooseConsumption).toBeEnabled();
-  fireEvent.click(chooseConsumption);
-}; */
 
 const executeStepSelectInstitution = async (partyName: string) => {
   console.log('Testing step select institution..');
@@ -383,7 +217,19 @@ const executeStepBillingDataWithTaxCodeInvoicing = async (subProductId: string) 
       timeout: 500, // Tempo massimo per l'attesa
     });
   }
+
+  if (subProductId === 'prod-dashboard-psp') {
+    const legalRegisterName = document.getElementById('registrationInRegister') as HTMLInputElement;
+    const legalRegisterAddress = document.getElementById('registerNumber') as HTMLInputElement;
+    const dtoAdpoAddress = document.getElementById('address') as HTMLInputElement;
+
+    fireEvent.change(legalRegisterName, { target: { value: 'Test' } });
+    fireEvent.change(legalRegisterAddress, { target: { value: '250301' } });
+    fireEvent.change(dtoAdpoAddress, { target: { value: 'Via Test 1' } });
+  }
+
   await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
+
   fireEvent.click(confirmButtonEnabled);
   await waitFor(() => screen.getByText(stepAddManagerTitle));
 };
@@ -403,25 +249,34 @@ const executeStepBillingDataWithoutTaxCodeInvoicing = async () => {
 };
 
 const executeStepAddManager = async (expectedSuccessfulSubmit: boolean) => {
-  console.log('Testing step add manager');
-  await waitFor(() => screen.getByText(stepAddManagerTitle));
+  console.log('Testing step add manager..');
+
+  await waitFor(() => screen.getByText('Indica il Legale Rappresentante'));
+
+  screen.getByText('Più informazioni sui ruoli');
 
   const continueButton = screen.getByRole('button', { name: 'Continua' });
-
   expect(continueButton).toBeDisabled();
 
-  await fillUserForm();
+  await checkCertifiedUserValidation('manager-initial', false, false);
 
-  expect(continueButton).toBeEnabled();
+  await fillUserForm('manager-initial', 'RSSMRA80A01H501U', 'm@ma.it', false, false, 'Mario', 'Rossi');
+
   fireEvent.click(continueButton);
 
   await waitFor(() => screen.getByText('Confermi la richiesta di invio?'));
   const confirmButton = screen.getByRole('button', { name: 'Conferma' });
+  if (!expectedSuccessfulSubmit) {
+    fetchWithLogsSpy.mockRejectedValue(() => Promise.reject({ status: 500 }));
+  }
+
   await waitFor(() => fireEvent.click(confirmButton));
 
   await waitFor(() =>
     screen.getByText(
-      expectedSuccessfulSubmit ? successOnboardingSubProductTitle : errorOnboardingSubProductTitle
+      expectedSuccessfulSubmit
+        ? 'La richiesta di adesione è stata inviata con successo'
+        : 'Qualcosa è andato storto'
     )
   );
 };
@@ -448,221 +303,4 @@ const executeClickCloseButton = async (expectedSuccessfulSubmit: boolean) => {
   expect(closeButton).toBeEnabled();
   fireEvent.click(closeButton);
   await waitFor(() => expect(mockedLocation.assign).toHaveBeenCalledWith(ENV.URL_FE.LANDING));
-};
-
-/* const executeClickAdhesionButton = async () => {
-  console.log('Pressing Close button and go to adhesion');
-  const adhesionButton = screen.getByRole('button', {
-    name: 'Aderisci',
-  });
-  expect(adhesionButton).toBeEnabled();
-  fireEvent.click(adhesionButton);
-  await waitFor(() =>
-    expect(mockedHistoryPush).toHaveBeenCalledWith('/onboarding/prod-io?partyExternalId=externalId3')
-  );
-};
-
-const fillUserBillingDataForm = async (
-  businessNameInput: string,
-  registeredOfficeInput: string,
-  mailPECInput: string,
-  taxCodeInput: string,
-  vatNumber: string,
-  zipCodeInput: string,
-  recipientCode: string,
-  supportEmail: string
-) => {
-  fireEvent.change(document.getElementById(businessNameInput) as HTMLElement, {
-    target: { value: 'businessNameInput' },
-  });
-  fireEvent.change(document.getElementById(registeredOfficeInput) as HTMLElement, {
-    target: { value: 'registeredOfficeInput' },
-  });
-  fireEvent.change(document.getElementById(mailPECInput) as HTMLElement, {
-    target: { value: 'a@a.com' },
-  });
-  fireEvent.change(document.getElementById(taxCodeInput) as HTMLElement, {
-    target: { value: 'AAAAAA44D55F456K' },
-  });
-  fireEvent.change(document.getElementById(zipCodeInput) as HTMLElement, {
-    target: { value: '09010' },
-  });
-  fireEvent.change(document.getElementById(recipientCode) as HTMLElement, {
-    target: { value: 'AM23EIX' },
-  });
-  fireEvent.change(document.getElementById(supportEmail) as HTMLElement, {
-    target: { value: 'a@a.it' },
-  });
-  fireEvent.click(document.getElementById('national_geographicTaxonomies') as HTMLElement);
-}; */
-
-const fillTextFieldAndCheck = async (prefix: string, field: string, value: string) => {
-  fireEvent.change(document.getElementById(`${prefix}-${field}`) as HTMLElement, {
-    target: { value },
-  });
-};
-const fillUserForm = async () => {
-  await fillTextFieldAndCheck('LEGAL', 'email', 'm@ma.it');
-  await fillTextFieldAndCheck('LEGAL', 'taxCode', 'RSSMRA80A01H501U');
-  await fillTextFieldAndCheck('LEGAL', 'name', 'Mario');
-  await fillTextFieldAndCheck('LEGAL', 'surname', 'Rossi');
-};
-
-/* const checkCorrectBodyBillingData = (
-  expectedBusinessName: string = '',
-  expectedRegisteredOfficeInput: string = '',
-  expectedMailPEC: string = '',
-  expectedTaxCode: string = '',
-  expectedVatNumber: string = '',
-  expectedRecipientCode: string = ''
-) => {
-  expect((document.getElementById('businessName') as HTMLInputElement).value).toBe(
-    expectedBusinessName
-  );
-  expect((document.getElementById('registeredOffice') as HTMLInputElement).value).toBe(
-    expectedRegisteredOfficeInput
-  );
-  expect((document.getElementById('digitalAddress') as HTMLInputElement).value).toBe(
-    expectedMailPEC
-  );
-  expect((document.getElementById('taxCode') as HTMLInputElement).value).toBe(expectedTaxCode);
-
-  expect((document.getElementById('recipientCode') as HTMLInputElement).value).toBe(
-    expectedRecipientCode
-  );
-};
-
-const fillTextFieldAndCheckButton = async (
-  prefix: string,
-  field: string,
-  value: string,
-  confirmButton: HTMLElement,
-  expectedEnabled: boolean
-) => {
-  fireEvent.change(document.getElementById(`${prefix}-${field}`) as HTMLElement, {
-    target: { value },
-  });
-  if (expectedEnabled) {
-    expect(confirmButton).toBeEnabled();
-  } else {
-    expect(confirmButton).toBeDisabled();
-  }
-}; */
-
-const billingData2billingDataRequestIoPremium = () => ({
-  businessName: 'Comune di Milano',
-  registeredOffice: 'Milano, Piazza Colonna 370',
-  digitalAddress: 'comune.milano@pec.it',
-  zipCode: '20021',
-  taxCode: '33445673222',
-  taxCodeInvoicing: '87654321098',
-  vatNumber: undefined,
-  recipientCode: 'A1B2C3',
-});
-
-const billingData2billingDataRequestPspDashboard = () => ({
-  businessName: 'Antico Credito Arcorese',
-  registeredOffice: 'Via Umberto I',
-  digitalAddress: 'antico.credito.arcorese@test.it',
-  zipCode: '20862',
-  taxCode: '25301208621',
-  vatNumber: undefined,
-  taxCodeInvoicing: undefined,
-  recipientCode: 'A1B2V3',
-});
-const verifySubmitPostLegalsIoPremium = async () => {
-  await waitFor(() =>
-    expect(fetchWithLogsSpy).lastCalledWith(
-      {
-        endpoint: 'ONBOARDING_POST_LEGALS',
-      },
-      {
-        method: 'POST',
-        data: {
-          users: [
-            {
-              name: 'Mario',
-              surname: 'Rossi',
-              role: 'MANAGER',
-              taxCode: 'RSSMRA80A01H501U',
-              email: 'm@ma.it',
-            },
-          ],
-          billingData: billingData2billingDataRequestIoPremium(),
-          pspData: undefined,
-          institutionLocationData: {
-            city: 'Milano',
-            country: 'IT',
-            county: 'MI',
-          },
-          institutionType: 'PA',
-          pricingPlan: 'C0',
-          origin: 'IPA',
-          originId: '1',
-          geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY
-            ? [{ code: nationalValue, desc: 'ITALIA' }]
-            : [],
-          assistanceContacts: { supportEmail: 'comune.bollate@pec.it' },
-          productId: 'prod-io-premium',
-          subunitCode: undefined,
-          subunitType: undefined,
-          taxCode: '33445673222',
-          companyInformations: undefined,
-        },
-      },
-      expect.any(Function)
-    )
-  );
-};
-
-const verifySubmitPostLegalsPspDashBoard = async () => {
-  await waitFor(() =>
-    expect(fetchWithLogsSpy).toHaveBeenLastCalledWith(
-      {
-        endpoint: 'ONBOARDING_POST_LEGALS',
-      },
-      {
-        method: 'POST',
-        data: {
-          users: [
-            {
-              name: 'Mario',
-              surname: 'Rossi',
-              role: 'MANAGER',
-              taxCode: 'RSSMRA80A01H501U',
-              email: 'm@ma.it',
-            },
-          ],
-          billingData: billingData2billingDataRequestPspDashboard(),
-          pspData: {
-            ...mockedPspOnboardingData[0].institution.paymentServiceProvider,
-            dpoData: {
-              ...mockedPspOnboardingData[0].institution.dataProtectionOfficer,
-            },
-          },
-          institutionType: 'PSP',
-          origin: 'SELC',
-          originId: '25301208621',
-          assistanceContacts: { supportEmail: undefined },
-          companyInformations: {
-            businessRegisterPlace: undefined,
-            rea: undefined,
-            shareCapital: undefined,
-          },
-          geographicTaxonomies: [],
-          institutionLocationData: {
-            country: 'IT',
-            county: 'MB',
-            city: 'Arcore',
-          },
-          productId: 'prod-dashboard-psp',
-          taxCode: mockedPspOnboardingData[0].institution.billingData.taxCode,
-          pricingPlan: undefined,
-          subunitCode: undefined,
-          subunitType: undefined,
-        },
-      },
-      expect.any(Function)
-    )
-  );
 };

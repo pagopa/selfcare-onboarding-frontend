@@ -60,7 +60,7 @@ export function StepAddAdmin({
     }
   }, [isAuthUser]);
 
-  const allPeople = legal ? ({ ...people, LEGAL: legal } as UsersObject) : people;
+  const allPeople = legal ? ({ ...people, ['manager-initial']: legal } as UsersObject) : people;
 
   const validateUsers = (index: number, peopleErrors: UsersError) => {
     const userIds = Object.keys(people);
@@ -182,7 +182,7 @@ export function StepAddAdmin({
   const peopleCondition =
     objectIsEmpty(people) ||
     Object.keys(people)
-      .filter((prefix) => 'LEGAL' !== prefix)
+      .filter((prefix) => 'manager-initial' !== prefix)
       .some(
         (prefix) => !validateUser(prefix, people[prefix], allPeople, addUserFlow, isAuthUser)
       ) ||
@@ -277,7 +277,7 @@ export function StepAddAdmin({
         {delegateFormIds.map((id) => (
           <Grid item xs={8} mt={4} display="flex" justifyContent={'center'} key={id}>
             <PlatformUserForm
-              prefix={id}
+              prefix='extra-delegate'
               role="DELEGATE"
               people={people}
               peopleErrors={peopleErrors}
@@ -328,7 +328,7 @@ export function StepAddAdmin({
           disabled:
             objectIsEmpty(people) ||
             Object.keys(people)
-              .filter((prefix) => 'LEGAL' !== prefix)
+              .filter((prefix) => 'manager-initial' !== prefix)
               .some(
                 (prefix) =>
                   !validateUser(prefix, people[prefix], allPeople, addUserFlow, isAuthUser)

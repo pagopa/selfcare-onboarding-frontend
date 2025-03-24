@@ -276,6 +276,7 @@ export function PlatformUserForm({
                     style: {
                       textTransform,
                     },
+                    'data-testid': `${prefix}-${id}`,
                   }}
                   error={isError}
                   helperText={transcodeHelperText(

@@ -39,7 +39,7 @@ const verifyPartyFilter = (party: SelfcareParty, filter: string) =>
 export function SubProductStepSelectUserParty({
   subProduct,
   parties,
-  product,
+  // product,
   productId,
   subProductId,
   forward,

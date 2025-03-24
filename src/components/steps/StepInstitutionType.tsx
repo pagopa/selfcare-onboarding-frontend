@@ -87,7 +87,16 @@ export default function StepInstitutionType({
                     key={ot.labelKey}
                     onChange={() => handleChange(ot.value)}
                     value={ot.value}
-                    control={<Radio id={ot.labelKey} />}
+                    control={
+                      <Radio
+                        id={ot.labelKey}
+                        inputProps={{
+                          'aria-label': t(
+                            `stepInstitutionType.institutionTypes.${ot.labelKey}.title`
+                          ),
+                        }}
+                      />
+                    }
                     label={
                       <>
                         <Typography sx={{ fontWeight: 600, fontSize: '18px', color: '#17324D' }}>
