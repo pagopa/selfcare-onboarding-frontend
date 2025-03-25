@@ -890,13 +890,13 @@ export const mockedPspOnboardingData: Array<InstitutionOnboardingInfoResource> =
       },
       paymentServiceProvider: {
         businessRegisterNumber: '12345678910',
-        legalRegisterName: '12345',
-        legalRegisterNumber: '12',
+        legalRegisterName: 'N/A',
+        legalRegisterNumber: 'N/A',
         abiCode: '25301',
         vatNumberGroup: false,
       },
       dataProtectionOfficer: {
-        address: 'Via Parini 31',
+        address: 'N/A',
         pec: 'inidirizzo.test.pec@test.it',
         email: 'parini@test.it',
       },

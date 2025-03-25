@@ -55,7 +55,7 @@
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@craco/craco": "^7.0.0",
     "@testing-library/jest-dom": "^6.6.3",
-    "@testing-library/react": "12.1.2",
+    "@testing-library/react": "^16.2.0",
     "@testing-library/user-event": "^14.6.1",
     "@types/jest": "^29.5.14",
     "@types/lodash": "^4.17.16",
@@ -95,7 +95,8 @@
       "src/reportWebVitals.ts",
       "src/utils/constants.ts",
       "src/consentAndAnalyticsConfiguration.ts",
-      "src/model"
+      "src/model",
+      "src/views/onboardingPremium/components/subProductStepPricingPlan/*"
     ],
     "moduleNameMapper": {
       "^.+\\.(css|less|scss)$": "babel-jest",

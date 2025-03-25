@@ -92,6 +92,7 @@ export function RadioWithTextField({
             control={
               <Radio
                 id={`${field}-yes`}
+                data-testid={`${field}-yes`}
                 size="small"
                 checked={additionalData[field]?.choice}
                 disabled={isIPA && fieldIsFromIPA}
@@ -105,6 +106,7 @@ export function RadioWithTextField({
             control={
               <Radio
                 id={`${field}-no`}
+                data-testid={`${field}-no`}
                 size="small"
                 checked={additionalData[field]?.choice === false}
                 disabled={isIPA && fieldIsFromIPA}
@@ -144,8 +146,8 @@ export function RadioWithTextField({
                 errorText !== ''
                   ? errorText
                   : fieldIsFromIPA
-                  ? ''
-                  : t('additionalDataPage.allowedCharacters')
+                    ? ''
+                    : t('additionalDataPage.allowedCharacters')
               }
               fullWidth
               sx={{

@@ -10,6 +10,11 @@ import { MemoryRouter } from 'react-router-dom';
 import OnboardingUser from '../OnboardingUser';
 import { mockPartyRegistry, mockedProducts } from '../../../lib/__mocks__/mockApiRequests';
 import i18n from '@pagopa/selfcare-common-frontend/lib/locale/locale-utils';
+import {
+  executeStepAddAdmin,
+  executeStepAddManager,
+  fillUserForm,
+} from '../../../utils/test-utils';
 
 type Search = 'taxCode' | 'aooCode' | 'uoCode' | 'ivassCode';
 
@@ -72,129 +77,11 @@ const renderComponent = (productId: string, fromAlreadyOnboarded: boolean) => {
   render(<Component />);
 };
 
-const retrieveNavigationButtons = async () => {
-  const goBackButton = screen.getByRole('button', {
-    name: 'Indietro',
-  });
-  expect(goBackButton).toBeEnabled();
-
-  const confirmButton = screen.getByRole('button', {
-    name: 'Continua',
-  });
-  expect(confirmButton).toBeDisabled();
-
-  return [goBackButton, confirmButton];
-};
-
-const checkBackForwardNavigation = async (
-  previousStepTitle: string,
-  actualStepTitle: string
-): Promise<Array<HTMLElement>> => {
-  const [goBackButton] = await retrieveNavigationButtons();
-  expect(goBackButton).toBeEnabled();
-  fireEvent.click(goBackButton);
-
-  await waitFor(() => screen.getByText(previousStepTitle));
-
-  const goForwardButton = screen.getByRole('button', {
-    name: 'Continua',
-  });
-  await waitFor(() => expect(goForwardButton).toBeEnabled());
-  fireEvent.click(goForwardButton);
-
-  await waitFor(() => screen.getByText(actualStepTitle));
-
-  return retrieveNavigationButtons();
-};
-
-const fillTextFieldAndCheckButton = async (
-  prefix: string,
-  field: string,
-  value: string,
-  confirmButton: HTMLElement,
-  expectedEnabled?: boolean
-) => {
-  fireEvent.change(document.getElementById(`${prefix}-${field}`) as HTMLElement, {
-    target: { value },
-  });
-};
-
-const checkAlreadyExistentValues = async (
-  prefix: string,
-  confirmButton: HTMLElement,
-  existentTaxCode: string | undefined,
-  taxCode: string,
-  expectedDuplicateTaxCodeMessages: number | undefined,
-  existentEmail: string | undefined,
-  email: string,
-  expectedDuplicateEmailMessages: number | undefined
-) => {
-  if (existentTaxCode) {
-    await fillTextFieldAndCheckButton(prefix, 'taxCode', existentTaxCode, confirmButton, false);
-    const duplicateTaxCodeErrors = screen.queryAllByText(
-      'Il codice fiscale inserito è già presente'
-    );
-    expect(duplicateTaxCodeErrors.length).toBe(expectedDuplicateTaxCodeMessages);
-  }
-  await fillTextFieldAndCheckButton(prefix, 'taxCode', taxCode, confirmButton, true);
-
-  if (existentEmail) {
-    await fillTextFieldAndCheckButton(prefix, 'email', existentEmail, confirmButton, false);
-    const duplicateEmailErrors = screen.queryAllByText("L'indirizzo email inserito è già presente");
-    expect(duplicateEmailErrors.length).toBe(expectedDuplicateEmailMessages);
-  }
-  await fillTextFieldAndCheckButton(prefix, 'email', email, confirmButton, true);
-};
-
-const fillUserForm = async (
-  confirmButton: HTMLElement,
-  prefix: string,
-  taxCode: string,
-  email: string,
-  expectedEnabled?: boolean,
-  existentTaxCode?: string,
-  expectedDuplicateTaxCodeMessages?: number,
-  existentEmail?: string,
-  expectedDuplicateEmailMessages?: number
-) => {
-  await fillTextFieldAndCheckButton(prefix, 'name', 'NAME', confirmButton, expectedEnabled);
-  await fillTextFieldAndCheckButton(prefix, 'surname', 'SURNAME', confirmButton, expectedEnabled);
-  await fillTextFieldAndCheckButton(prefix, 'taxCode', taxCode, confirmButton, expectedEnabled);
-  await fillTextFieldAndCheckButton(prefix, 'email', email, confirmButton, expectedEnabled);
-
-  await fillTextFieldAndCheckButton(prefix, 'taxCode', '', confirmButton, false);
-  await fillTextFieldAndCheckButton(prefix, 'taxCode', 'INVALIDTAXCODE', confirmButton, false);
-  screen.getByText('Il Codice Fiscale inserito non è valido');
-  await fillTextFieldAndCheckButton(prefix, 'taxCode', taxCode, confirmButton, expectedEnabled);
-
-  await fillTextFieldAndCheckButton(prefix, 'email', '', confirmButton, false);
-  await fillTextFieldAndCheckButton(prefix, 'email', 'INVALIDEMAIL', confirmButton, false);
-  screen.getByText("L'indirizzo email non è valido");
-  await fillTextFieldAndCheckButton(prefix, 'email', email, confirmButton, true);
-
-  await fillTextFieldAndCheckButton(prefix, 'name', '', confirmButton, false);
-  await fillTextFieldAndCheckButton(prefix, 'name', 'NAME', confirmButton, true);
-
-  await fillTextFieldAndCheckButton(prefix, 'surname', '', confirmButton, false);
-  await fillTextFieldAndCheckButton(prefix, 'surname', 'SURNAME', confirmButton, true);
-
-  await checkAlreadyExistentValues(
-    prefix,
-    confirmButton,
-    existentTaxCode,
-    taxCode,
-    expectedDuplicateTaxCodeMessages,
-    existentEmail,
-    email,
-    expectedDuplicateEmailMessages
-  );
-};
-
 const executeStepSelectProduct = async (productId: string) => {
   console.log('Testing step select product..');
 
   await waitFor(() => screen.getByText(/Aggiungi un nuovo Amministratore/));
-  const continueButton = screen.getByRole('button', { name: 'Continua' });
+  const continueButton = screen.getByText('Continua');
   expect(continueButton).toBeDisabled();
 
   const elementId = productId.toLowerCase();
@@ -254,80 +141,21 @@ const executeStepSearchOnboardedParty = async (
 
   fireEvent.click(partyNameSelect);
 
-  const confirmButton = screen.getByRole('button', { name: 'Continua' });
-  expect(confirmButton).toBeEnabled();
-
-  await waitFor(() => fireEvent.click(confirmButton));
-};
-
-const executeStepAddManager = async () => {
-  console.log('Testing step add manager..');
-  await waitFor(() => screen.getByText('Indica il Legale Rappresentante'));
-
-  const confirmButton = screen.getByRole('button', { name: 'Continua' });
-  expect(confirmButton).toBeDisabled();
-
-  await checkCertifiedUserValidation('LEGAL', confirmButton);
-
-  await fillUserForm(confirmButton, 'LEGAL', 'SRNNMA80A01A794F', 'b@b.BB', true);
-
-  fireEvent.click(confirmButton);
-};
-
-const executeStepAddAdmin = async (expectedSuccessfulSubmit: boolean) => {
-  console.log('Testing step add admin..');
-
-  await waitFor(() => screen.getByText("Indica l'Amministratore"));
-  const [_, confirmButton] = await checkBackForwardNavigation(
-    'Indica il Legale Rappresentante',
-    "Indica l'Amministratore"
-  );
-
-  await checkCertifiedUserValidation('delegate-initial', confirmButton);
-
-  await fillUserForm(
-    confirmButton,
-    'delegate-initial',
-    'SRNNMA80A01B354S',
-    'a@a.AA',
-    true,
-    'SRNNMA80A01A794F',
-    0,
-    'b@b.bb',
-    0
-  );
-
-  await waitFor(() => expect(confirmButton).toBeEnabled());
-
-  await waitFor(() => fireEvent.click(confirmButton));
-
-  const confimationModalBtn = await waitFor(() => screen.getByText('Conferma'));
-
-  await waitFor(() => fireEvent.click(confimationModalBtn));
-
-  await waitFor(() =>
-    screen.getByText(
-      expectedSuccessfulSubmit ? 'Hai inviato la richiesta' : 'Qualcosa è andato storto.'
-    )
-  );
-};
-
-const checkCertifiedUserValidation = async (prefix: string, confirmButton: HTMLElement) => {
-  await fillUserForm(confirmButton, prefix, 'FRRMRA80A01F205X', 'b@c.BB', false);
-  await waitFor(() => screen.getByText('Nome non corretto o diverso dal Codice Fiscale'));
-  screen.getByText('Cognome non corretto o diverso dal Codice Fiscale');
+  const continueButton = screen.getByText('Continua');
+  expect(continueButton).toBeEnabled();
+  fireEvent.click(continueButton);
 };
 
 test('Test: Successfull added new user for a party who has already onboarded to the PagoPA platform product', async () => {
   renderComponent('prod-pagopa', true);
-  await executeStepAddManager();
-  await executeStepAddAdmin(true);
+  await executeStepAddManager(true);
+  await executeStepAddAdmin(true, false, false, true, false);
 });
 
-test('Test: NOT successfull added new user for a party who has already onboarded to the IO product', async () => {
+test('Test: NOT successfull added new user for a party who has already onboarded to the IO product', async () => {   
   renderComponent('prod-io', true);
-  await executeStepAddManager();
-  await executeStepAddAdmin(false);
+  await executeStepAddManager(true);
+  await executeStepAddAdmin(false, false , false, true, false);
 });
 
 // TODO

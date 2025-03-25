@@ -34,6 +34,7 @@ export function OnboardingStepActions({ forward, back, addUserFlow }: ActionStep
             variant="contained"
             onClick={forward.action}
             disabled={forward.disabled}
+            aria-label={forward.label}
           >
             {forward.label}
           </Button>

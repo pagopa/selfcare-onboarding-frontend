@@ -131,7 +131,7 @@ export function StepAddManager({
         });
       }
       if (response) {
-        validateUserData(people.LEGAL, 'LEGAL', externalInstitutionId, subProduct);
+        validateUserData(people['manager-initial'], 'manager-initial', externalInstitutionId, subProduct);
       }
     } else {
       setOutcome(genericError);
@@ -220,7 +220,7 @@ export function StepAddManager({
       <Grid container item display="flex" justifyContent="center" mt={3}>
         <Grid item xs={8} display="flex" justifyContent="center">
           <PlatformUserForm
-            prefix="LEGAL"
+            prefix="manager-initial"
             role="MANAGER"
             people={people}
             peopleErrors={peopleErrors}
@@ -242,14 +242,14 @@ export function StepAddManager({
           forward={{
             action: () => {
               if (addUserFlow) {
-                void checkManager(people.LEGAL);
+                void checkManager(people['manager-initial']);
               } else {
-                validateUserData(people.LEGAL, 'LEGAL', externalInstitutionId, subProduct);
+                validateUserData(people['manager-initial'], 'manager-initial', externalInstitutionId, subProduct);          
               }
             },
             label: t('stepAddManager.continue'),
             disabled:
-              objectIsEmpty(people) || !validateUser('LEGAL', people.LEGAL, people, addUserFlow),
+              objectIsEmpty(people) || !validateUser('manager-initial', people['manager-initial'], people, addUserFlow),
           }}
         />
       </Grid>
@@ -277,7 +277,7 @@ export function StepAddManager({
         }
         onCloseLabel={t('stepAddManager.back')}
         onConfirmLabel={t('stepAddManager.continue')}
-        onConfirm={() => validateUserData(people.LEGAL, 'LEGAL', externalInstitutionId, subProduct)}
+        onConfirm={() => validateUserData(people['manager-initial'], 'manager-initial', externalInstitutionId, subProduct)}
         handleClose={() => setIsChangedManager(false)}
       />
     </Grid>
