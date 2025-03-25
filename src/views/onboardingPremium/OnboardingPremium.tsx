@@ -271,7 +271,6 @@ function OnboardingPremiumComponent() {
           subProduct,
           parties,
           subProductId,
-          product: subProduct,
           productId,
           forward: (party?: SelfcareParty) => {
             if (party) {
