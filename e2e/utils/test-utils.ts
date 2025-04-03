@@ -133,7 +133,7 @@ export const copyUniqueCodeIfSFEIsPresent = async (page: Page) => {
 
     if (codiceUnivocoText !== '' && cellSfeText !== '') {
       // save in the costant the value of the unique code
-      const uniqueCodeSelector = `xpath=//table/tbody/tr[${rows.indexOf(row) + 1}]/td[2]`;
+      const uniqueCodeSelector = `xpath=//table/tbody/tr[${Number(rows.indexOf(row)) + 1}]/td[2]`;
       const textToCopy = await page.locator(uniqueCodeSelector).innerText();
       console.log(
         'Trovata riga con codice univoco e altro valore nella quarta cella. Testo della quarta cella:',
@@ -151,7 +151,7 @@ export const copyUniqueCodeIfSFEIsPresent = async (page: Page) => {
 
 export const stepUploadAggregatorCsv = async (page: Page, title: string,fileCsv: string) => {
   await expect(page.getByText(title)).toBeInViewport({ timeout: 1000 });
-  // await page.click('');
+
   await page.setInputFiles('#file-uploader', fileCsv);
   await page.click('[aria-label="Continua"]');
   await expect(page.getByText('Richiesta di adesione inviata')).toBeInViewport({ timeout: 1000 });
