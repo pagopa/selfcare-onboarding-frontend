@@ -1,10 +1,7 @@
 import { Page, expect } from '@playwright/test';
 
-declare global {
-  // eslint-disable-next-line no-var
-  var copiedText: string;
-}
-
+// eslint-disable-next-line functional/no-let
+let copiedText: string;
 // eslint-disable-next-line functional/no-let
 let partyName: string;
 
@@ -72,7 +69,7 @@ export const stepFormDataWithIpaResearch4SDICode = async (
     await researchOnIpa(newPage, partyName);
     await page.waitForTimeout(500);
     await page.click('#recipientCode');
-    await page.fill('#recipientCode', global.copiedText, { timeout: 500 });
+    await page.fill('#recipientCode', copiedText, { timeout: 500 });
   }
   if (product === 'prod-io-sign') {
     await page.click('#supportEmail');
@@ -140,7 +137,7 @@ export const copyUniqueCodeIfSFEIsPresent = async (page: Page) => {
         textToCopy
       );
       // eslint-disable-next-line functional/immutable-data
-      global.copiedText = textToCopy;
+      copiedText = textToCopy;
       // afer we've saved the value in the global "copiedText" we're going to close the page
       await page.close();
     }

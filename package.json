@@ -101,6 +101,9 @@
     "moduleNameMapper": {
       "^.+\\.(css|less|scss)$": "babel-jest",
       "^axios$": "<rootDir>/node_modules/axios/dist/node/axios.cjs"
-    }
+    },
+    "collectCoverage": true,
+    "coverageReporters": ["lcov"],
+    "coverageDirectory": "coverage"
   }
 }

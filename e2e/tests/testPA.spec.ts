@@ -10,7 +10,8 @@ import {
   FILE_MOCK_CSV_AGGREGATOR,
 } from '../utils/test-utils';
 
-test.setTimeout(60000);
+test.beforeEach(() => test.setTimeout(60000));
+
 test('Test Success onboarding request for product prod-pagopa and institutionType PA', async ({
   page,
   context,
@@ -24,7 +25,6 @@ test('Test Success onboarding request for product prod-pagopa and institutionTyp
   await stepAddAdmin(page);
 });
 
-test.setTimeout(60000);
 test('Test Success onboarding request for product prod-io and institutionType PA', async ({
   page,
   context,
@@ -38,7 +38,6 @@ test('Test Success onboarding request for product prod-io and institutionType PA
   await stepAddAdmin(page);
 });
 
-test.setTimeout(60000);
 test('Test Success onboarding request for product prod-io and institutionType PA with aggregator party', async ({
   page,
   context,
@@ -57,7 +56,6 @@ test('Test Success onboarding request for product prod-io and institutionType PA
   );
 });
 
-test.setTimeout(60000);
 test('Test Success onboarding request for product prod-io-sign and institutionType PA', async ({
   page,
   context,
@@ -71,7 +69,6 @@ test('Test Success onboarding request for product prod-io-sign and institutionTy
   await stepAddAdmin(page);
 });
 
-test.setTimeout(60000);
 test('Test Success onboarding request for product prod-interop and institutionType PA', async ({
   page,
   context,
@@ -85,7 +82,6 @@ test('Test Success onboarding request for product prod-interop and institutionTy
   await stepAddAdmin(page);
 });
 
-test.setTimeout(60000);
 test('Test Success onboarding request for product prod-pn and institutionType PA (default)', async ({
   page,
   context,
@@ -98,7 +94,6 @@ test('Test Success onboarding request for product prod-pn and institutionType PA
   await stepAddAdmin(page);
 });
 
-test.setTimeout(60000);
 test('Test Success onboarding request for product prod-pn and institutionType PA (default) with aggregator party', async ({
   page,
   context,
