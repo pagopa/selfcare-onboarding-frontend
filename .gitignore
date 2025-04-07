@@ -59,6 +59,3 @@ yarn-error.log
 
 # Local .terraform directories
 **/.terraform/*
-
-# coverage directory
-coverage/*
