@@ -4,7 +4,7 @@
   "homepage": "onboarding",
   "private": true,
   "dependencies": {
-    "@mui/icons-material": "^5.16.14",
+    "@mui/icons-material": "^5.17.1",
     "@mui/lab": "^5.0.0-alpha.80",
     "@mui/material": "^5.8.2",
     "@pagopa/mui-italia": "^1.5.2",
