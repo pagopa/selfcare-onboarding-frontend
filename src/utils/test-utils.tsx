@@ -148,7 +148,12 @@ export const fillUserForm = async (
   await fillTextFieldAndCheckButton(prefix, 'email', email);
 };
 
-export const executeStepAddManager = async (addUserFlow: boolean) => {
+export const executeStepAddManager = async (
+  addUserFlow: boolean,
+  isPremium?: boolean,
+  expectedSuccessfulSubmit?: boolean,
+  fetchWithLogsSpy?: jest.SpyInstance
+) => {
   console.log('Testing step add manager..');
 
   await waitFor(() => screen.getByText('Indica il Legale Rappresentante'));
@@ -163,6 +168,24 @@ export const executeStepAddManager = async (addUserFlow: boolean) => {
   await fillUserForm('manager-initial', 'SRNNMA80A01A794F', 'b@b.BB', addUserFlow, false);
 
   fireEvent.click(continueButton);
+
+  if (isPremium) {
+    await waitFor(() => screen.getByText('Confermi la richiesta di invio?'));
+    const confirmButton = screen.getByRole('button', { name: 'Conferma' });
+    if (!expectedSuccessfulSubmit && fetchWithLogsSpy) {
+      fetchWithLogsSpy.mockRejectedValue(() => Promise.reject({ status: 500 }));
+    }
+
+    await waitFor(() => fireEvent.click(confirmButton));
+
+    await waitFor(() =>
+      screen.getByText(
+        expectedSuccessfulSubmit
+          ? 'La richiesta di adesione è stata inviata con successo'
+          : 'Qualcosa è andato storto'
+      )
+    );
+  }
 };
 
 const clickAdminCheckBoxAndTestValues = (
@@ -695,14 +718,14 @@ const billingData2billingDataRequestIoPremium = () => ({
 });
 
 const billingData2billingDataRequestPspDashboard = () => ({
-  businessName: 'Antico Credito Arcorese',
-  registeredOffice: 'Via Umberto I',
-  digitalAddress: 'antico.credito.arcorese@test.it',
-  zipCode: '20862',
-  taxCode: '25301208621',
-  vatNumber: '25301208621',
+  businessName: 'Banca Popolare di Milano',
+  registeredOffice: 'Piazza Meda 4',
+  digitalAddress: 'info@bpm.it',
+  zipCode: '20121',
+  taxCode: '98765432101',
+  vatNumber: undefined,
   taxCodeInvoicing: undefined,
-  recipientCode: 'A1B2V3',
+  recipientCode: 'Z9X8Y1',
 });
 export const verifySubmitPostLegalsIoPremium = async (
   fetchWithLogsSpy: jest.SpyInstance<any, any, any>
@@ -717,11 +740,11 @@ export const verifySubmitPostLegalsIoPremium = async (
         data: {
           users: [
             {
-              name: 'Mario',
-              surname: 'Rossi',
+              name: 'NAME',
+              surname: 'SURNAME',
               role: 'MANAGER',
-              taxCode: 'RSSMRA80A01H501U',
-              email: 'm@ma.it',
+              taxCode: 'SRNNMA80A01A794F',
+              email: 'b@b.bb',
             },
           ],
           billingData: billingData2billingDataRequestIoPremium(),
@@ -764,29 +787,29 @@ export const verifySubmitPostLegalsPspDashBoard = async (
         data: {
           users: [
             {
-              name: 'Mario',
-              surname: 'Rossi',
+              name: 'NAME',
+              surname: 'SURNAME',
               role: 'MANAGER',
-              taxCode: 'RSSMRA80A01H501U',
-              email: 'm@ma.it',
+              taxCode: 'SRNNMA80A01A794F',
+              email: 'b@b.bb',
             },
           ],
           billingData: billingData2billingDataRequestPspDashboard(),
           pspData: {
-            businessRegisterNumber: '12345678910',
-            legalRegisterName: 'Test',
-            legalRegisterNumber: '250301',
-            abiCode: '25301',
-            vatNumberGroup: false,
+            businessRegisterNumber: '56789123456',
+            legalRegisterName: 'BP Milano',
+            legalRegisterNumber: '34',
+            abiCode: '98765',
+            vatNumberGroup: true,
             dpoData: {
-              address: 'Via Test 1',
-              pec: 'inidirizzo.test.pec@test.it',
-              email: 'parini@test.it',
+              address: 'Via Manzoni 12',
+              pec: 'pec@bpm.it',
+              email: 'dpo@bpm.it',
             },
           },
           institutionType: 'PSP',
           origin: 'SELC',
-          originId: '25301208621',
+          originId: '98765432101',
           assistanceContacts: { supportEmail: undefined },
           companyInformations: {
             businessRegisterPlace: undefined,
@@ -796,11 +819,11 @@ export const verifySubmitPostLegalsPspDashBoard = async (
           geographicTaxonomies: [],
           institutionLocationData: {
             country: 'IT',
-            county: 'MB',
-            city: 'Arcore',
+            county: 'MI',
+            city: 'Milano',
           },
           productId: 'prod-dashboard-psp',
-          taxCode: mockedPspOnboardingData[0].institution.billingData.taxCode,
+          taxCode: mockedPspOnboardingData[1].institution.billingData.taxCode,
           pricingPlan: undefined,
           subunitCode: undefined,
           subunitType: undefined,
@@ -1075,7 +1098,7 @@ export const checkCorrectBodyBillingData = (
   expectedCounty: string = '',
   isForeignInsurance?: boolean,
   haveTaxCode?: boolean
-// eslint-disable-next-line sonarjs/cognitive-complexity
+  // eslint-disable-next-line sonarjs/cognitive-complexity
 ) => {
   expect((document.getElementById('businessName') as HTMLInputElement).value).toBe(
     institutionType === 'SA'

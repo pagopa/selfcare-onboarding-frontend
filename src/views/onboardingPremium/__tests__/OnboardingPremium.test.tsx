@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { useState } from 'react';
 import { User } from '../../../../types';
 import { HeaderContext, UserContext } from '../../../lib/context';
@@ -11,8 +11,7 @@ import React from 'react';
 import i18n from '@pagopa/selfcare-common-frontend/lib/locale/locale-utils';
 import '@testing-library/jest-dom';
 import {
-  checkCertifiedUserValidation,
-  fillUserForm,
+  executeStepAddManager,
   verifySubmitPostLegalsIoPremium,
   verifySubmitPostLegalsPspDashBoard,
 } from '../../../utils/test-utils';
@@ -54,6 +53,7 @@ beforeAll(() => {
 
 afterEach(() => {
   global.fetch = originalFetch;
+  cleanup();
 });
 
 afterAll(() => {
@@ -138,16 +138,16 @@ test('Test: Successfully complete onboarding request for prod-io-premium', async
   renderComponent('prod-io', 'prod-io-premium');
   await executeStepSelectInstitution('Comune di Milano');
   await executeStepBillingDataWithTaxCodeInvoicing('prod-io-premium');
-  await executeStepAddManager(true);
+  await executeStepAddManager(false, true, true, fetchWithLogsSpy);
   await executeClickCloseButton(true);
   await verifySubmitPostLegalsIoPremium(fetchWithLogsSpy);
 });
 
 test('Test: Successfully complete onboarding request for prod-dashboard-psp', async () => {
   renderComponent('prod-pagopa', 'prod-dashboard-psp');
-  await executeStepSelectInstitution('Banca del Fucino - S.p.A.');
+  await executeStepSelectInstitution('Banca del Monte di Lucca S.p.A.');
   await executeStepBillingDataWithTaxCodeInvoicing('prod-dashboard-psp');
-  await executeStepAddManager(true);
+  await executeStepAddManager(false, true, true, fetchWithLogsSpy);
   await executeClickCloseButton(true);
   await verifySubmitPostLegalsPspDashBoard(fetchWithLogsSpy);
 });
@@ -156,7 +156,7 @@ test('Test: Complete onboarding request with error on submit', async () => {
   renderComponent('prod-io', 'prod-io-premium');
   await executeStepSelectInstitution('Comune di Udine');
   await executeStepBillingDataWithoutTaxCodeInvoicing();
-  await executeStepAddManager(false);
+  await executeStepAddManager(false, true, false, fetchWithLogsSpy);
   await executeClickHomeButton();
 });
 
@@ -201,7 +201,7 @@ const executeStepBillingDataWithTaxCodeInvoicing = async (subProductId: string) 
   fireEvent.click(partyWithoutVatNumberCheckbox);
   expect(partyWithoutVatNumberCheckbox).toBeChecked();
 
-  const confirmButtonEnabled = screen.getByRole('button', { name: 'Continua' });
+  const confirmButtonEnabled = screen.getByLabelText('Continua');
 
   if (subProductId === 'prod-io-premium') {
     fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
@@ -218,20 +218,9 @@ const executeStepBillingDataWithTaxCodeInvoicing = async (subProductId: string) 
     });
   }
 
-  if (subProductId === 'prod-dashboard-psp') {
-    const legalRegisterName = document.getElementById('registrationInRegister') as HTMLInputElement;
-    const legalRegisterAddress = document.getElementById('registerNumber') as HTMLInputElement;
-    const dtoAdpoAddress = document.getElementById('address') as HTMLInputElement;
-
-    fireEvent.change(legalRegisterName, { target: { value: 'Test' } });
-    fireEvent.change(legalRegisterAddress, { target: { value: '250301' } });
-    fireEvent.change(dtoAdpoAddress, { target: { value: 'Via Test 1' } });
-  }
-
   await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
 
   fireEvent.click(confirmButtonEnabled);
-  await waitFor(() => screen.getByText(stepAddManagerTitle));
 };
 
 const executeStepBillingDataWithoutTaxCodeInvoicing = async () => {
@@ -245,40 +234,6 @@ const executeStepBillingDataWithoutTaxCodeInvoicing = async () => {
   const confirmButtonEnabled = screen.getByRole('button', { name: 'Continua' });
   await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
   fireEvent.click(confirmButtonEnabled);
-  await waitFor(() => screen.getByText(stepAddManagerTitle));
-};
-
-const executeStepAddManager = async (expectedSuccessfulSubmit: boolean) => {
-  console.log('Testing step add manager..');
-
-  await waitFor(() => screen.getByText('Indica il Legale Rappresentante'));
-
-  screen.getByText('Più informazioni sui ruoli');
-
-  const continueButton = screen.getByRole('button', { name: 'Continua' });
-  expect(continueButton).toBeDisabled();
-
-  await checkCertifiedUserValidation('manager-initial', false, false);
-
-  await fillUserForm('manager-initial', 'RSSMRA80A01H501U', 'm@ma.it', false, false, 'Mario', 'Rossi');
-
-  fireEvent.click(continueButton);
-
-  await waitFor(() => screen.getByText('Confermi la richiesta di invio?'));
-  const confirmButton = screen.getByRole('button', { name: 'Conferma' });
-  if (!expectedSuccessfulSubmit) {
-    fetchWithLogsSpy.mockRejectedValue(() => Promise.reject({ status: 500 }));
-  }
-
-  await waitFor(() => fireEvent.click(confirmButton));
-
-  await waitFor(() =>
-    screen.getByText(
-      expectedSuccessfulSubmit
-        ? 'La richiesta di adesione è stata inviata con successo'
-        : 'Qualcosa è andato storto'
-    )
-  );
 };
 
 const executeClickHomeButton = async () => {
