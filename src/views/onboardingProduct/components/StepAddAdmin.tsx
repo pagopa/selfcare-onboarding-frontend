@@ -277,7 +277,7 @@ export function StepAddAdmin({
         {delegateFormIds.map((id) => (
           <Grid item xs={8} mt={4} display="flex" justifyContent={'center'} key={id}>
             <PlatformUserForm
-              prefix='extra-delegate'
+              prefix={id}
               role="DELEGATE"
               people={people}
               peopleErrors={peopleErrors}
