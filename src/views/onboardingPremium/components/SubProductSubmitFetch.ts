@@ -104,16 +104,12 @@ export const subProductSubmitFetch = async ({
     });
     forward();
   } else {
-    // eslint-disable-next-line functional/no-let
-    let event;
+    const event =
+      (postLegalsResponse as AxiosError<Problem>).response?.status === 409
+        ? 'ONBOARDING_PREMIUM_SEND_CONFLICT_ERROR_FAILURE'
+        : 'ONBOARDING_PREMIUM_SEND_FAILURE';
 
-    if ((postLegalsResponse as AxiosError<Problem>).response?.status === 409) {
-      event = 'ONBOARDING_PREMIUM_SEND_CONFLICT_ERROR_FAILURE';
-      setConflictError(true);
-    } else {
-      event = 'ONBOARDING_PREMIUM_SEND_FAILURE';
-      setConflictError(false);
-    }
+    setConflictError((postLegalsResponse as AxiosError<Problem>).response?.status === 409);
 
     trackEvent(event, {
       party_id: externalInstitutionId,
