@@ -14,6 +14,7 @@ import { MessageNoAction } from '../../../components/MessageNoAction';
 import { unregisterUnloadEvent } from '../../../utils/unloadEvent-utils';
 import { OnboardingFormData } from '../../../model/OnboardingFormData';
 import { ENV } from '../../../utils/env';
+import AlreadyOnboarded from '../../AlreadyOnboarded';
 import { subProductSubmitFetch } from './SubProductSubmitFetch';
 
 type Props = StepperStepComponentProps & {
@@ -69,9 +70,10 @@ function SubProductStepSubmit({
   institutionType,
   pricingPlan,
   origin,
-  originId
+  originId,
 }: Props) {
   const [error, setError] = useState<boolean>(false);
+  const [conflictError, setConflictError] = useState<boolean>(false);
   const { setOnExit } = useContext(HeaderContext);
   const { setRequiredLogin } = useContext(UserContext);
 
@@ -91,7 +93,8 @@ function SubProductStepSubmit({
         setError,
         forward,
         origin,
-        originId
+        originId,
+        setConflictError,
       })
         .catch((_reason: any) => {
           setError(true);
@@ -111,6 +114,12 @@ function SubProductStepSubmit({
         });
     }
   }, []);
-  return error ? <MessageNoAction {...errorOutCome} /> : <></>;
+  return error && !conflictError ? (
+    <MessageNoAction {...errorOutCome} />
+  ) : error && conflictError ? (
+    <AlreadyOnboarded selectedProduct={subProduct} />
+  ) : (
+    <></>
+  );
 }
 export default SubProductStepSubmit;
