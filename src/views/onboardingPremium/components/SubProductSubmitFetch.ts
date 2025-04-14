@@ -23,6 +23,7 @@ type Props = {
   forward: () => void;
   origin: string;
   originId: string;
+  setConflictError: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 export const subProductSubmitFetch = async ({
@@ -38,7 +39,8 @@ export const subProductSubmitFetch = async ({
   setError,
   forward,
   origin,
-  originId
+  originId,
+  setConflictError,
 }: Props) => {
   const postLegalsResponse = await fetchWithLogs(
     {
@@ -106,6 +108,9 @@ export const subProductSubmitFetch = async ({
       (postLegalsResponse as AxiosError<Problem>).response?.status === 409
         ? 'ONBOARDING_PREMIUM_SEND_CONFLICT_ERROR_FAILURE'
         : 'ONBOARDING_PREMIUM_SEND_FAILURE';
+
+    setConflictError((postLegalsResponse as AxiosError<Problem>).response?.status === 409);
+
     trackEvent(event, {
       party_id: externalInstitutionId,
       request_id: requestId,
