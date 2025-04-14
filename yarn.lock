@@ -2073,7 +2073,7 @@
   resolved "https://registry.npmjs.org/@opentelemetry/semantic-conventions/-/semantic-conventions-1.28.0.tgz#337fb2bca0453d0726696e745f50064411f646d6"
   integrity sha512-lp4qAiMTD4sNWW4DbKLBkfiMZ4jbAboJIGOQr5DvciMRI494OapieI9qiODpOt0XBr1LjIDy1xAGAnVs5supTA==
 
-"@pagopa/mui-italia@^1.5.0", "@pagopa/mui-italia@^1.5.2":
+"@pagopa/mui-italia@^1.5.2":
   version "1.5.2"
   resolved "https://registry.yarnpkg.com/@pagopa/mui-italia/-/mui-italia-1.5.2.tgz#a3408efbe2cac697669ad147ffd7d8acaae57ee1"
   integrity sha512-J4xPrrPSM3dK0gjpnmdjdoCreawWmf5mMfQYPOMWu9mhyc/YSqVSfrpkqK8Tvy83b+LnKgwLCuhviUXy8AqSLg==
@@ -2084,10 +2084,21 @@
     fp-ts "^2.12.3"
     io-ts "^2.2.18"
 
-"@pagopa/selfcare-common-frontend@^1.34.56":
-  version "1.34.56"
-  resolved "https://registry.yarnpkg.com/@pagopa/selfcare-common-frontend/-/selfcare-common-frontend-1.34.56.tgz#3ccc7d1c668718854dbdcfac37f040da1901a636"
-  integrity sha512-uUhZxv9Zo/BG02yO97ANRR4wIVD8uykEx/QY9ZacgnA8F9W3yMmN2pRKsAcTSnT1eam06IqBbcImMISmzjKuqA==
+"@pagopa/mui-italia@^1.5.3-rc.20250403154846":
+  version "1.5.3-rc.20250403154846"
+  resolved "https://registry.yarnpkg.com/@pagopa/mui-italia/-/mui-italia-1.5.3-rc.20250403154846.tgz#bac4dd2e0f5d5e5b51e46eec1ec592a3d25fec69"
+  integrity sha512-O1JYKmdlfWPyTdceZtfVD/oP5Hh7OX3AU5LTEmyrfclqEBtNNOBu7SxbPMHLksy6bMFFN2UxzHX8cHvKbJ9jpA==
+  dependencies:
+    "@fontsource/dm-mono" "^4.5.10"
+    "@fontsource/titillium-web" "^4.5.9"
+    clsx "^1.2.1"
+    fp-ts "^2.12.3"
+    io-ts "^2.2.18"
+
+"@pagopa/selfcare-common-frontend@^1.34.57":
+  version "1.34.57"
+  resolved "https://registry.yarnpkg.com/@pagopa/selfcare-common-frontend/-/selfcare-common-frontend-1.34.57.tgz#dc29f54cb59fe9a7c1ecfc66c3069672f50e58e4"
+  integrity sha512-RO1uW3ESQAihjU4yBxwZSlhkZ4COsiSUPPob3gd2TPl0un13GqFaAfh2yxz+z0WRvX61PEcxyB8alhQj7wfqkw==
   dependencies:
     "@emotion/react" "^11.11.1"
     "@emotion/styled" "^11.11.0"
@@ -2095,7 +2106,7 @@
     "@mui/lab" "^5.0.0-alpha.137"
     "@mui/material" "^5.14.1"
     "@mui/system" "^5.14.1"
-    "@pagopa/mui-italia" "^1.5.0"
+    "@pagopa/mui-italia" "^1.5.3-rc.20250403154846"
     "@pagopa/ts-commons" "^13.1.2"
     "@reduxjs/toolkit" "^1.6.2"
     async "3.2.4"
