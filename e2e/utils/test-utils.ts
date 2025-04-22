@@ -1,3 +1,4 @@
+import { storageTokenOps } from '@pagopa/selfcare-common-frontend/lib/utils/storage';
 import { Page, expect } from '@playwright/test';
 
 // eslint-disable-next-line functional/no-let
@@ -22,8 +23,16 @@ export const login = async (page: Page, username: string, password: string, prod
   await page.getByRole('button', { name: 'Invia' }).click();
 };
 
-export const stepInstitutionType = async (page: Page) => {
-  await page.getByRole('radio', { name: 'Pubblica Amministrazione' }).click();
+export const updatedLogin = async (page: Page, product: string) => {
+  await page.goto(`https://dev.selfcare.pagopa.it/onboarding/${product}`);
+  storageTokenOps.write(
+    'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJmaXNjYWxfbnVtYmVyIjoiU1JUTkxNMDlUMDZHNjM1UyIsIm5hbWUiOiJBbnNlbG1vIiwiZmFtaWx5X25hbWUiOiJTYXJ0b3JpIiwidWlkIjoiNTA5NmU0YzYtMjVhMS00NWQ1LTliZGYtMmZiOTc0YTdjMWM4Iiwic3BpZF9sZXZlbCI6Imh0dHBzOi8vd3d3LnNwaWQuZ292Lml0L1NwaWRMMiIsImlzcyI6IlNQSUQiLCJhdWQiOiJhcGkuZGV2LnNlbGZjYXJlLnBhZ29wYS5pdCIsImlhdCI6MTc0NDcyOTIxOCwiZXhwIjoxNzQ0NzYxNjE4LCJqdGkiOiI0OTA1MWNkYy1kMDEzLTQ4NDMtYjc3Mi1mNWFkODgzOGMyMDkifQ.jJAc5dV8_vLu3jiyXP2Le9bGAffuSUsvzhd-Jk17IXNCo1T922sVAq_Vug0pJtI6rpvG-50NvyWgBJmFc5GM89IH8Ouc-2HD27RIIztue0V8cIOog0dQTNiStHLPds5U0-HSKmwR7VN5bIWVMkIMb8HvFgdhaKmVKeYlQeqWZuTBsaB3UfuStGw52E1U5pUeZxn2yLeZDk62lVi7OS4_jNmCpWpfXXQ_kcWgMKWzcAnU4dXw5MQwFdtcsPZQtNXtIK0W81vKRzUqrga32ygYH-3kqdQvzsQBpX5q4WdXWyp8Ai7udflhyPdtHoo7GEPs6f3ygF4ylydHwzuk4_xc0A'
+  );
+  await page.goto(`https://dev.selfcare.pagopa.it/onboarding/${product}`);
+};
+
+export const stepInstitutionType = async (page: Page, institutionType: string) => {
+  await page.getByRole('radio', { name: institutionType }).click();
   await page.getByRole('button', { name: 'Continua' }).waitFor({ timeout: 1000 });
   await page.getByRole('button', { name: 'Continua' }).click();
 };
@@ -31,7 +40,7 @@ export const stepInstitutionType = async (page: Page) => {
 export const stepSelectParty = async (page: Page, aggregator?: boolean) => {
   await page.click('#Parties');
   await page.fill('#Parties', 'com', { timeout: 2000 });
-  await page.click('.MuiBox-root:nth-child(25) > .MuiBox-root > .MuiBox-root');
+  await page.click('.MuiBox-root:nth-child(1) > .MuiBox-root > .MuiBox-root');
   partyName = await page.locator('div[aria-label] p.MuiTypography-root').innerText();
   console.log('Nome del party', partyName);
   if (aggregator) {
@@ -81,6 +90,73 @@ export const stepFormDataWithIpaResearch4SDICode = async (
   await page.getByRole('button', { name: 'Continua' }).click();
 };
 
+export const stepFormDataWithoutIpaResearch = async (
+  page: Page,
+  product: string,
+  institutionType?: string
+) => {
+  await page.getByLabel('La Partita IVA coincide con il Codice Fiscale').click();
+  if (product !== 'prod-interop') {
+    await page.click('#recipientCode');
+    await page.fill('#recipientCode', 'A1B2C3', { timeout: 500 });
+  }
+  if (product === 'prod-io-sign') {
+    await page.click('#supportEmail');
+    await page.fill('#supportEmail', 'test@test.it', { timeout: 500 });
+  }
+  await page.getByRole('radio', { name: 'Nazionale' }).waitFor({ timeout: 500 });
+  await page.getByRole('radio', { name: 'Nazionale' }).click();
+  await page.getByRole('button', { name: 'Continua' }).waitFor({ timeout: 500 });
+  await page.getByRole('button', { name: 'Continua' }).click();
+  if (institutionType === 'GPS') {
+    await page.getByRole('button', { name: 'Continua' }).waitFor({ timeout: 500 });
+    await page.getByRole('button', { name: 'Continua' }).click();
+  }
+};
+
+export const stepFormDataPartyNotFromIpa = async (page: Page, institutionType?: string) => {
+  await page.click('#businessName');
+  await page.fill('#businessName', 'test');
+
+  await page.click('#registeredOffice');
+  await page.fill('#registeredOffice', 'via test 1');
+
+  await page.click('#zipCode');
+  await page.fill('#zipCode', '20900');
+
+  await page.click('#city-select');
+  await page.fill('#city-select', 'milano');
+  await page.click('#city-select-option-0');
+
+  await page.click('#digitalAddress');
+  await page.fill('#digitalAddress', 'test@test.it');
+
+  await page.click('#taxCode');
+  await page.fill('#taxCode', '10293847565');
+
+  await page.click('#taxCodeEquals2VatNumber');
+
+  await page.click('#recipientCode');
+  await page.fill('#recipientCode', 'A1B2C3');
+
+  await page.click('#rea');
+  await page.fill('#rea', 'mi-12354');
+
+  await page.getByRole('button', { name: 'Continua' }).waitFor({ timeout: 500 });
+  await page.getByRole('button', { name: 'Continua' }).click();
+  if (institutionType === 'GPS') {
+    await page.getByRole('button', { name: 'Continua' }).waitFor({ timeout: 500 });
+    await page.getByRole('button', { name: 'Continua' }).click();
+  }
+};
+
+export const stepAdditionalInformation = async (page: Page) => {
+  await page.click('#isEstabilishedRegulatoryProvision-yes');
+  await page.click('#fromBelongsRegulatedMarket-no');
+  await page.click('#isConcessionaireOfPublicService-yes');
+  await page.getByRole('button', { name: 'Continua' }).click();
+};
+
 export const stepAddManager = async (page: Page) => {
   await page.click('#manager-initial-name');
   await page.fill('#manager-initial-name', 'Sigmund', {
@@ -111,8 +187,8 @@ export const stepAddAdmin = async (page: Page, aggregator?: boolean) => {
   if (!aggregator) {
     await page.getByRole('button', { name: 'Conferma' }).click();
     await expect(page.getByText('Richiesta di adesione inviata')).toBeInViewport({ timeout: 1000 });
-    await page.getByRole('button', { name: 'Torna alla home' }).waitFor({ timeout: 1000 });
-    await page.getByRole('button', { name: 'Torna alla home' }).click();
+    // await page.getByRole('button', { name: 'Torna alla home' }).waitFor({ timeout: 1000 });
+    // await page.getByRole('button', { name: 'Torna alla home' }).click();
   }
 };
 
@@ -146,7 +222,7 @@ export const copyUniqueCodeIfSFEIsPresent = async (page: Page) => {
   return '';
 };
 
-export const stepUploadAggregatorCsv = async (page: Page, title: string,fileCsv: string) => {
+export const stepUploadAggregatorCsv = async (page: Page, title: string, fileCsv: string) => {
   await expect(page.getByText(title)).toBeInViewport({ timeout: 1000 });
 
   await page.setInputFiles('#file-uploader', fileCsv);

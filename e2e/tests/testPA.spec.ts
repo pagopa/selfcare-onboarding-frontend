@@ -8,6 +8,7 @@ import {
   stepSelectParty,
   stepUploadAggregatorCsv,
   FILE_MOCK_CSV_AGGREGATOR,
+  updatedLogin,
 } from '../utils/test-utils';
 
 test.beforeEach(() => test.setTimeout(60000));
@@ -16,9 +17,8 @@ test('Test Success onboarding request for product prod-pagopa and institutionTyp
   page,
   context,
 }) => {
-  await page.setViewportSize({ width: 1280, height: 593 });
-  await login(page, 'test', 'test', 'prod-pagopa');
-  await stepInstitutionType(page);
+  await updatedLogin(page, 'prod-pagopa');
+  await stepInstitutionType(page,'Pubblica Amministrazione');
   await stepSelectParty(page);
   await stepFormDataWithIpaResearch4SDICode(page, context, 'prod-pagopa');
   await stepAddManager(page);
@@ -31,7 +31,7 @@ test('Test Success onboarding request for product prod-io and institutionType PA
 }) => {
   await page.setViewportSize({ width: 1280, height: 593 });
   await login(page, 'test', 'test', 'prod-io');
-  await stepInstitutionType(page);
+  await stepInstitutionType(page,'Pubblica Amministrazione');
   await stepSelectParty(page);
   await stepFormDataWithIpaResearch4SDICode(page, context, 'prod-io');
   await stepAddManager(page);
@@ -44,7 +44,7 @@ test('Test Success onboarding request for product prod-io and institutionType PA
 }) => {
   await page.setViewportSize({ width: 1280, height: 593 });
   await login(page, 'test', 'test', 'prod-io');
-  await stepInstitutionType(page);
+  await stepInstitutionType(page,'Pubblica Amministrazione');
   await stepSelectParty(page, true);
   await stepFormDataWithIpaResearch4SDICode(page, context, 'prod-io');
   await stepAddManager(page);
@@ -62,7 +62,7 @@ test('Test Success onboarding request for product prod-io-sign and institutionTy
 }) => {
   await page.setViewportSize({ width: 1280, height: 593 });
   await login(page, 'test', 'test', 'prod-io-sign');
-  await stepInstitutionType(page);
+  await stepInstitutionType(page,'Pubblica Amministrazione');
   await stepSelectParty(page);
   await stepFormDataWithIpaResearch4SDICode(page, context, 'prod-io-sign');
   await stepAddManager(page);
@@ -75,7 +75,7 @@ test('Test Success onboarding request for product prod-interop and institutionTy
 }) => {
   await page.setViewportSize({ width: 1280, height: 593 });
   await login(page, 'test', 'test', 'prod-interop');
-  await stepInstitutionType(page);
+  await stepInstitutionType(page,'Pubblica Amministrazione');
   await stepSelectParty(page);
   await stepFormDataWithIpaResearch4SDICode(page, context, 'prod-interop');
   await stepAddManager(page);
