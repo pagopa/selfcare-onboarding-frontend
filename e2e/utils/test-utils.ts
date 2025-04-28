@@ -52,6 +52,13 @@ export const stepSelectParty = async (page: Page, aggregator?: boolean) => {
   }
 };
 
+export const stepSelectPartyByCF = async (page: Page, cfParty: string) => {
+  await page.click('#Parties');
+  await page.fill('#Parties', cfParty, { timeout: 2000 });
+  await page.click('.MuiBox-root:nth-child(1) > .MuiBox-root > .MuiBox-root');
+  await page.click('[aria-label="Continua"]');
+};
+
 export const stepFormDataWithIpaResearch4SDICode = async (
   page: Page,
   context: any,
@@ -96,7 +103,7 @@ export const stepFormDataWithoutIpaResearch = async (
   institutionType?: string
 ) => {
   await page.getByLabel('La Partita IVA coincide con il Codice Fiscale').click();
-  if (product !== 'prod-interop') {
+  if (product !== 'prod-interop' && institutionType !== 'SCP') {
     await page.click('#recipientCode');
     await page.fill('#recipientCode', 'A1B2C3', { timeout: 500 });
   }
@@ -108,7 +115,7 @@ export const stepFormDataWithoutIpaResearch = async (
   await page.getByRole('radio', { name: 'Nazionale' }).click();
   await page.getByRole('button', { name: 'Continua' }).waitFor({ timeout: 500 });
   await page.getByRole('button', { name: 'Continua' }).click();
-  if (institutionType === 'GPS') {
+  if (institutionType === 'GPS' || institutionType === 'SCP') {
     await page.getByRole('button', { name: 'Continua' }).waitFor({ timeout: 500 });
     await page.getByRole('button', { name: 'Continua' }).click();
   }
