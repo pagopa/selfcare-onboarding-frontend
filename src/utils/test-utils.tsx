@@ -282,7 +282,15 @@ export const executeStepAddAdmin = async (
 
   await checkCertifiedUserValidation('delegate-initial', addUserFlow, onlyAdmin);
 
-  await fillUserForm('delegate-initial', 'SRNNMA80A01B354S', 'a@a.AA', addUserFlow, onlyAdmin);
+  await fillUserForm(
+    'delegate-initial',
+    'RSSLCU80A01F205N',
+    'a@a.AA',
+    addUserFlow,
+    onlyAdmin,
+    'LUCA',
+    'ROSSI'
+  );
 
   expect(continueButton).toBeEnabled();
   if (!addUserFlow) {
@@ -652,10 +660,10 @@ export const verifySubmit = async (
           },
           {
             email: 'a@a.aa',
-            name: 'NAME',
+            name: 'LUCA',
             role: 'DELEGATE',
-            surname: 'SURNAME',
-            taxCode: 'SRNNMA80A01B354S',
+            surname: 'ROSSI',
+            taxCode: 'RSSLCU80A01F205N',
           },
         ].filter((u) => (institutionType === 'PT' ? u.role !== 'MANAGER' : u)),
         pricingPlan: 'FA',

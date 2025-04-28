@@ -81,19 +81,10 @@ export function StepAddManager({
     }
   }, [premiumFlow]);
 
-  const onUserValidateSuccess = () => {
-    setIsGenericError(false);
-    onForwardAction();
-  };
-
   const onUserValidateError = (userId: string, errors: { [fieldName: string]: Array<string> }) => {
     setPeopleErrors({
       [userId]: errors,
     });
-  };
-
-  const onUserValidateGenericError = () => {
-    setIsGenericError(true);
   };
 
   const checkManager = async (user: UserOnCreate) => {
@@ -149,9 +140,8 @@ export function StepAddManager({
       externalInstitutionId,
       user,
       prefix,
-      onUserValidateSuccess,
+      onForwardAction,
       onUserValidateError,
-      onUserValidateGenericError,
       () => setRequiredLogin(true),
       setLoading,
       subProduct ? 'ONBOARDING_PREMIUM_ADD_MANAGER' : 'ONBOARDING_ADD_MANAGER'
