@@ -89,10 +89,6 @@ export function StepAddAdmin({
     }
   };
 
-  const onUserValidateSuccess = (_userId: string, index: number, peopleErrors: UsersError) => {
-    validateUsers(index + 1, peopleErrors);
-  };
-
   const onUserValidateError = (
     userId: string,
     errors: { [fieldName: string]: Array<string> },
@@ -106,11 +102,6 @@ export function StepAddAdmin({
     validateUsers(index + 1, nextPeopleErrors);
   };
 
-  const onUserValidateGenericError = (_userId: string, index: number, peopleErrors: UsersError) => {
-    setGenericError(true);
-    validateUsers(index + 1, peopleErrors);
-  };
-
   const validateUserData = (
     user: UserOnCreate,
     externalInstitutionId: string,
@@ -122,9 +113,8 @@ export function StepAddAdmin({
       externalInstitutionId,
       user,
       prefix,
-      (userId) => onUserValidateSuccess(userId, index, peopleErrors),
+      () => validateUsers(index + 1, peopleErrors),
       (userId, errors) => onUserValidateError(userId, errors, index, peopleErrors),
-      (userId) => onUserValidateGenericError(userId, index, peopleErrors),
       () => setRequiredLogin(true),
       () => {},
       'ONBOARDING_ADD_DELEGATE'
