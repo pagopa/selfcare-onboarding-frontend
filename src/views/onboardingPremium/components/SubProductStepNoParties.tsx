@@ -5,12 +5,12 @@ import { useTranslation, Trans } from 'react-i18next';
 import { SetStateAction } from 'react';
 import { Product } from '../../../../types';
 import { OnboardingStepActions } from '../../../components/OnboardingStepActions';
+import { ENV } from '../../../utils/env';
 
 type Props = {
   subProduct: Product | undefined;
   activeStep: number;
   setActiveStep: (value: SetStateAction<number>) => void;
-  back: () => void;
 };
 
 const CustomBox = styled(Box)({
@@ -27,9 +27,9 @@ const CustomBox = styled(Box)({
   overflowY: 'auto',
   overflowX: 'hidden',
 });
-export function SubProductStepNoParties({ subProduct, activeStep, setActiveStep, back }: Props) {
+export function SubProductStepNoParties({ subProduct, activeStep, setActiveStep }: Props) {
   const { t } = useTranslation();
-
+  const partyIdByQuery = new URLSearchParams(window.location.search).get('partyId');
   const theme = useTheme();
 
   return (
@@ -115,7 +115,7 @@ export function SubProductStepNoParties({ subProduct, activeStep, setActiveStep,
       <Grid item mt={3}>
         <OnboardingStepActions
           back={{
-            action: back,
+            action: () => window.location.assign(`${ENV.URL_FE.DASHBOARD}/${partyIdByQuery}`),
             label: t('onboardingSubProduct.noPartyStep.backButton'),
           }}
         />
