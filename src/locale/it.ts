@@ -571,6 +571,14 @@ export default {
       helperLink: 'Non trovi il tuo ente? <1>Scopri perché</1>',
       confirmButton: 'Continua',
     },
+    noPartyStep: {
+      title: 'Nessuno dei tuoi enti può <1/> aderire',
+      subTitle:
+        "Se non vedi enti disponibili nella lista, l'ente cercato potrebbe <1/> aver già aderito a <3>{{productName}}</3>",
+      notPartyAvailable: 'Nessun ente disponibile',
+      helperLink: 'Il tuo ente ha aderito ma non è disponibile? <1>Scopri perché</1>',
+      backButton: 'Indietro',
+    },
     genericError: {
       title: 'Qualcosa è andato storto',
       subTitle:
@@ -658,7 +666,8 @@ export default {
       subTitle:
         'Inserisci le informazioni richieste e assicurati che siano corrette.<1 /> Serviranno a registrarti come Partner tecnologico per il<3 /> prodotto <5>{{nameProduct}}</5>.',
     },
-    pspDashboardWarning: 'Per aggiornare i dati presenti, contatta il servizio di <1>Assistenza</1>',
+    pspDashboardWarning:
+      'Per aggiornare i dati presenti, contatta il servizio di <1>Assistenza</1>',
     billingDataSection: {
       invalidFiscalCode: 'Il Codice Fiscale non è valido',
       invalidTaxCodeInvoicing: 'Il Codice Fiscale inserito non è relativo al tuo ente',

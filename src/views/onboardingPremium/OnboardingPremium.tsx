@@ -38,6 +38,7 @@ import SubProductStepSuccess from './components/SubProductStepSuccess';
 import { SubProductStepSelectUserParty } from './components/SubProductStepSelectUserParty';
 // import SubProductStepSelectPricingPlan from './components/subProductStepPricingPlan/SubProductStepSelectPricingPlan';
 import SubProductStepUserUnrelated from './components/SubProductStepUserUnrelated';
+import { SubProductStepNoParties } from './components/SubProductStepNoParties';
 
 type OnboardingPremiumUrlParams = {
   productId: string;
@@ -147,7 +148,7 @@ function OnboardingPremiumComponent() {
     });
     // eslint-disable-next-line functional/immutable-data
     chooseFromMyParties.current = isUserParty;
-    forward(isUserParty ? 2 : 1);
+    forward(isUserParty ? 3 : 2);
   };
 
   const forwardWithOnboardingData = (
@@ -280,6 +281,10 @@ function OnboardingPremiumComponent() {
             }
           },
         }),
+    },
+    {
+      label: 'Step No Parties',
+      Component: () => SubProductStepNoParties({ subProduct, activeStep, setActiveStep, back: () => window.location.assign(`${ENV.URL_FE.DASHBOARD}/${partyId}`) }),
     },
     {
       label: 'Select Institution unrelated',
