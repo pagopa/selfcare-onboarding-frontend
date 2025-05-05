@@ -277,7 +277,7 @@ function OnboardingPremiumComponent() {
             if (party) {
               forwardWithInstitution(party, true);
             } else {
-              setActiveStep(activeStep + 1);
+              setActiveStep(activeStep + 2);
             }
           },
         }),
