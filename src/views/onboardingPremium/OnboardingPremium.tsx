@@ -284,7 +284,7 @@ function OnboardingPremiumComponent() {
     },
     {
       label: 'Step No Parties',
-      Component: () => SubProductStepNoParties({ subProduct, activeStep, setActiveStep, back: () => window.location.assign(`${ENV.URL_FE.DASHBOARD}/${partyId}`) }),
+      Component: () => SubProductStepNoParties({ subProduct, activeStep, setActiveStep }),
     },
     {
       label: 'Select Institution unrelated',
