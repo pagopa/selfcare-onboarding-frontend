@@ -229,9 +229,9 @@ export function SubProductStepSelectUserParty({
               color={theme.palette.text.primary}
             >
               <Trans i18nKey="onboardingSubProduct.selectUserPartyStep.helperLink">
-                Non lo trovi?
+              Non trovi il tuo ente?
                 <Link sx={{ cursor: 'pointer' }} onClick={() => forward()}>
-                  Registra un nuovo ente
+                  Scopri perchè?
                 </Link>
               </Trans>
             </Typography>
