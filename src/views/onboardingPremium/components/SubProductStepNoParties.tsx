@@ -115,7 +115,7 @@ export function SubProductStepNoParties({ subProduct, activeStep, setActiveStep 
       <Grid item mt={3}>
         <OnboardingStepActions
           back={{
-            action: () => window.location.assign(`${ENV.URL_FE.DASHBOARD}/${partyIdByQuery}`),
+            action: () => window.location.assign(partyIdByQuery ? `${ENV.URL_FE.DASHBOARD}/${partyIdByQuery}` : ENV.URL_FE.DASHBOARD),
             label: t('onboardingSubProduct.noPartyStep.backButton'),
           }}
         />
