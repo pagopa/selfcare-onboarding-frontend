@@ -1,52 +1,44 @@
 import { test } from '@playwright/test';
 import {
-  login,
   stepAddAdmin,
   stepAddManager,
-  stepFormDataWithIpaResearch4SDICode,
   stepInstitutionType,
   stepSelectParty,
+  BASE_URL_ONBOARDING,
+  stepFormDataWithoutIpaResearch,
   stepUploadAggregatorCsv,
   FILE_MOCK_CSV_AGGREGATOR,
-  updatedLogin,
 } from '../utils/test-utils';
-
-test.beforeEach(() => test.setTimeout(60000));
 
 test('Test Success onboarding request for product prod-pagopa and institutionType PA', async ({
   page,
-  context,
 }) => {
-  await updatedLogin(page, 'prod-pagopa');
-  await stepInstitutionType(page,'Pubblica Amministrazione');
+  await page.goto(`${BASE_URL_ONBOARDING}/prod-pagopa`);
+  await stepInstitutionType(page, 'Pubblica Amministrazione');
   await stepSelectParty(page);
-  await stepFormDataWithIpaResearch4SDICode(page, context, 'prod-pagopa');
+  await stepFormDataWithoutIpaResearch(page, 'prod-io');
   await stepAddManager(page);
   await stepAddAdmin(page);
 });
 
 test('Test Success onboarding request for product prod-io and institutionType PA', async ({
   page,
-  context,
 }) => {
-  await page.setViewportSize({ width: 1280, height: 593 });
-  await login(page, 'test', 'test', 'prod-io');
-  await stepInstitutionType(page,'Pubblica Amministrazione');
+  await page.goto(`${BASE_URL_ONBOARDING}/prod-io`);
+  await stepInstitutionType(page, 'Pubblica Amministrazione');
   await stepSelectParty(page);
-  await stepFormDataWithIpaResearch4SDICode(page, context, 'prod-io');
+  await stepFormDataWithoutIpaResearch(page, 'prod-io');
   await stepAddManager(page);
   await stepAddAdmin(page);
 });
 
 test('Test Success onboarding request for product prod-io and institutionType PA with aggregator party', async ({
   page,
-  context,
 }) => {
-  await page.setViewportSize({ width: 1280, height: 593 });
-  await login(page, 'test', 'test', 'prod-io');
-  await stepInstitutionType(page,'Pubblica Amministrazione');
+  await page.goto(`${BASE_URL_ONBOARDING}/prod-io`);
+  await stepInstitutionType(page, 'Pubblica Amministrazione');
   await stepSelectParty(page, true);
-  await stepFormDataWithIpaResearch4SDICode(page, context, 'prod-io');
+  await stepFormDataWithoutIpaResearch(page, 'prod-io');
   await stepAddManager(page);
   await stepAddAdmin(page, true);
   await stepUploadAggregatorCsv(
@@ -58,50 +50,42 @@ test('Test Success onboarding request for product prod-io and institutionType PA
 
 test('Test Success onboarding request for product prod-io-sign and institutionType PA', async ({
   page,
-  context,
 }) => {
-  await page.setViewportSize({ width: 1280, height: 593 });
-  await login(page, 'test', 'test', 'prod-io-sign');
-  await stepInstitutionType(page,'Pubblica Amministrazione');
+  await page.goto(`${BASE_URL_ONBOARDING}/prod-io-sign`);
+  await stepInstitutionType(page, 'Pubblica Amministrazione');
   await stepSelectParty(page);
-  await stepFormDataWithIpaResearch4SDICode(page, context, 'prod-io-sign');
+  await stepFormDataWithoutIpaResearch(page, 'prod-io-sign');
   await stepAddManager(page);
   await stepAddAdmin(page);
 });
 
 test('Test Success onboarding request for product prod-interop and institutionType PA', async ({
   page,
-  context,
 }) => {
-  await page.setViewportSize({ width: 1280, height: 593 });
-  await login(page, 'test', 'test', 'prod-interop');
-  await stepInstitutionType(page,'Pubblica Amministrazione');
+  await page.goto(`${BASE_URL_ONBOARDING}/prod-interop`);
+  await stepInstitutionType(page, 'Pubblica Amministrazione');
   await stepSelectParty(page);
-  await stepFormDataWithIpaResearch4SDICode(page, context, 'prod-interop');
+  await stepFormDataWithoutIpaResearch(page, 'prod-interop');
   await stepAddManager(page);
   await stepAddAdmin(page);
 });
 
 test('Test Success onboarding request for product prod-pn and institutionType PA (default)', async ({
   page,
-  context,
 }) => {
-  await page.setViewportSize({ width: 1280, height: 593 });
-  await login(page, 'test', 'test', 'prod-pn');
-  await stepSelectParty(page);
-  await stepFormDataWithIpaResearch4SDICode(page, context, 'prod-pn');
+  await page.goto(`${BASE_URL_ONBOARDING}/prod-pn`);
+  await stepSelectParty(page, undefined, 'Fondazione Toscana Gabriele');
+  await stepFormDataWithoutIpaResearch(page, 'prod-pn');
   await stepAddManager(page);
   await stepAddAdmin(page);
 });
 
 test('Test Success onboarding request for product prod-pn and institutionType PA (default) with aggregator party', async ({
   page,
-  context,
 }) => {
-  await page.setViewportSize({ width: 1280, height: 593 });
-  await login(page, 'test', 'test', 'prod-pn');
-  await stepSelectParty(page, true);
-  await stepFormDataWithIpaResearch4SDICode(page, context, 'prod-pn');
+  await page.goto(`${BASE_URL_ONBOARDING}/prod-pn`);
+  await stepSelectParty(page, true, 'Fondazione Toscana Gabriele');
+  await stepFormDataWithoutIpaResearch(page, 'prod-pn', 'PA');
   await stepAddManager(page);
   await stepAddAdmin(page, true);
   await stepUploadAggregatorCsv(

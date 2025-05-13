@@ -731,7 +731,7 @@ const billingData2billingDataRequestPspDashboard = () => ({
   digitalAddress: 'info@bpm.it',
   zipCode: '20121',
   taxCode: '98765432101',
-  vatNumber: undefined,
+  vatNumber: '98765432101',
   taxCodeInvoicing: undefined,
   recipientCode: 'Z9X8Y1',
 });
