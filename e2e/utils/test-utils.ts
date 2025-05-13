@@ -1,4 +1,5 @@
 import { Page, expect } from '@playwright/test';
+import { institutionTypes } from '../../src/lib/__mocks__/mockApiRequests';
 
 // eslint-disable-next-line functional/no-let
 // let copiedText: string;
@@ -20,7 +21,7 @@ export const stepInstitutionType = async (page: Page, institutionType: string) =
 
 export const stepSelectParty = async (page: Page, aggregator?: boolean, party?: string) => {
   await page.click('#Parties');
-  await page.fill('#Parties', party? party : 'Senato della Repubblica');
+  await page.fill('#Parties', party ? party : 'Senato della Repubblica');
   await page.click('.MuiBox-root:nth-child(1) > .MuiBox-root > .MuiBox-root');
   partyName = (await page.locator('div[aria-label] p.MuiTypography-root').innerText()) as string;
   console.log('Nome del party', partyName);
@@ -86,7 +87,9 @@ export const stepFormDataWithoutIpaResearch = async (
   await page.getByLabel('La Partita IVA coincide con il Codice Fiscale').click();
   if (product !== 'prod-interop' && institutionType !== 'SCP') {
     await page.click('#recipientCode');
-    await page.fill('#recipientCode', product === 'prod-pn' ? 'UFBM8M' : '14CB0I', { timeout: 500 });
+    await page.fill('#recipientCode', product === 'prod-pn' ? 'UFBM8M' : '14CB0I', {
+      timeout: 500,
+    });
   }
   if (product === 'prod-io-sign') {
     await page.click('#supportEmail');
@@ -122,43 +125,45 @@ export const stepFormDataPartyNotFromIpa = async (page: Page, institutionType?: 
 
   await page.click('#taxCodeEquals2VatNumber');
 
-  await page.click('#recipientCode');
-  await page.fill('#recipientCode', 'A1B2C3');
-
-  if (institutionType === 'GPS' || institutionType === 'SCP') {
+  if (institutionType !== 'PT') {
     await page.click('#recipientCode');
     await page.fill('#recipientCode', 'A1B2C3');
+
+    if (institutionType === 'GPS' || institutionType === 'SCP') {
+      await page.click('#recipientCode');
+      await page.fill('#recipientCode', 'A1B2C3');
+    }
+
+    if (institutionType === 'GPS') {
+      await page.click('#rea');
+      await page.fill('#rea', 'RM-123456');
+    }
+
+    if (institutionType === 'PSP') {
+      await page.click('#commercialRegisterNumber');
+      await page.fill('#commercialRegisterNumber', '19191919191');
+
+      await page.click('#registrationInRegister');
+      await page.fill('#registrationInRegister', 'tes');
+
+      await page.click('#registerNumber');
+      await page.fill('#registerNumber', '1');
+
+      await page.click('#abiCode');
+      await page.fill('#abiCode', '18276');
+
+      await page.click('#address');
+      await page.fill('#address', 'via test 1');
+
+      await page.click('#pec');
+      await page.fill('#pec', 'test@test.it');
+
+      await page.click('#email');
+      await page.fill('#email', 'test@test.it');
+    }
+
+    await page.getByRole('radio', { name: 'Nazionale' }).click();
   }
-
-  if(institutionType === 'GPS') {
-    await page.click('#rea');
-    await page.fill('#rea', 'RM-123456');
-  }
-
-  if (institutionType === 'PSP') {
-    await page.click('#commercialRegisterNumber');
-    await page.fill('#commercialRegisterNumber', '19191919191');
-
-    await page.click('#registrationInRegister');
-    await page.fill('#registrationInRegister', 'tes');
-
-    await page.click('#registerNumber');
-    await page.fill('#registerNumber', '1');
-
-    await page.click('#abiCode');
-    await page.fill('#abiCode', '18276');
-
-    await page.click('#address');
-    await page.fill('#address', 'via test 1');
-
-    await page.click('#pec');
-    await page.fill('#pec', 'test@test.it');
-
-    await page.click('#email');
-    await page.fill('#email', 'test@test.it');
-  }
-
-  await page.getByRole('radio', { name: 'Nazionale' }).click();
 
   await page.getByRole('button', { name: 'Continua' }).waitFor({ timeout: 500 });
   await page.getByRole('button', { name: 'Continua' }).click();
@@ -191,14 +196,14 @@ export const stepAddManager = async (page: Page) => {
   await page.click('[aria-label="Continua"]');
 };
 
-export const stepAddAdmin = async (page: Page, aggregator?: boolean) => {
+export const stepAddAdmin = async (page: Page, aggregator?: boolean, institutionType?: string) => {
   await page.getByLabel('Aggiungi me come Amministratore').click();
   await page.getByRole('textbox', { name: 'Email Istituzionale' }).click();
   await page.fill('#delegate-initial-email', 'a.sartori@test.it', {
     timeout: 500,
   });
   await page.click('[aria-label="Continua"]');
-  if (!aggregator) {
+  if (!aggregator && institutionType !== 'PT') {
     await page.getByRole('button', { name: 'Conferma' }).click();
     await expect(page.getByText('Richiesta di adesione inviata')).toBeInViewport();
   }
