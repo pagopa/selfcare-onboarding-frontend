@@ -1,4 +1,3 @@
-import fs from 'fs/promises';
 import path from 'path';
 import { chromium } from '@playwright/test';
 
@@ -6,12 +5,6 @@ async function globalSetup() {
   console.log(`GLOBAL SETUP: Starting`);
 
   try {
-    try {
-      await fs.mkdir(path.resolve(__dirname, '../test-results'), { recursive: true });
-      console.log('GLOBAL SETUP: Created test-results directory');
-    } catch (err) {
-      console.log('GLOBAL SETUP: test-results directory already exists or cannot be created');
-    }
     const browser = await chromium.launch();
     const context = await browser.newContext();
     const page = await context.newPage();
