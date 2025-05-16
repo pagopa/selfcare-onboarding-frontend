@@ -1749,6 +1749,16 @@ export async function mockFetch(
     );
   }
 
+  if (endpoint === 'ONBOARDING_SEARCH_USER') {
+    return new Promise((resolve) =>
+      resolve({
+        data: { id: '71d1fc35-debf-4763-879e-19329e77ca83' },
+        status: 200,
+        statusText: '200',
+      } as AxiosResponse)
+    );
+  }
+
   if (endpoint === 'ONBOARDING_VERIFY_AGGREGATES') {
     switch (mockPartyRegistry.items[0].taxCode) {
       case '00000000000':

@@ -156,6 +156,9 @@ export const API = {
   ONBOARDING_GET_INSTITUTIONS: {
     URL: ENV.URL_API.ONBOARDING_V2 + '/v2/institutions',
   },
+  ONBOARDING_SEARCH_USER: {
+    URL: ENV.URL_API.ONBOARDING_V2 + '/v1/users/search-user',
+  },
   ONBOARDING_CHECK_MANAGER: {
     URL: ENV.URL_API.ONBOARDING_V2 + '/v1/users/check-manager',
   },

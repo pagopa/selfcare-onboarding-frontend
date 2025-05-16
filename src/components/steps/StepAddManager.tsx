@@ -87,7 +87,36 @@ export function StepAddManager({
     });
   };
 
-  const checkManager = async (user: UserOnCreate) => {
+  const searchUserId = async (taxCode: string) => {
+    setLoading(true);
+
+    const request = await fetchWithLogs(
+      {
+        endpoint: 'ONBOARDING_SEARCH_USER',
+      },
+      {
+        method: 'POST',
+        data: {
+          taxCode: { taxCode },
+        },
+      },
+      () => setRequiredLogin(true)
+    );
+
+    const result = getFetchOutcome(request);
+
+    if (result === 'success') {
+      const response = (request as AxiosResponse).data.result;
+      if (response) {
+        void checkManager(response.id);
+      }
+    } else {
+      setOutcome(genericError);
+    }
+    setLoading(false);
+  };
+
+  const checkManager = async (userId: string) => {
     setLoading(true);
     const request = await fetchWithLogs(
       {
@@ -102,7 +131,7 @@ export function StepAddManager({
           productId: product?.id,
           subunitCode: onboardingFormData?.aooUniqueCode ?? onboardingFormData?.uoUniqueCode,
           taxCode: selectedParty?.taxCode ?? onboardingFormData?.taxCode,
-          users: [user],
+          userId,
         },
       },
       () => setRequiredLogin(true)
@@ -122,7 +151,7 @@ export function StepAddManager({
         });
       }
       if (response) {
-        validateUserData(people['manager-initial'], 'manager-initial', externalInstitutionId, subProduct);
+        void checkManager(response.id);
       }
     } else {
       setOutcome(genericError);
@@ -185,8 +214,8 @@ export function StepAddManager({
                 subProduct
                   ? 'stepAddManager.subTitle.flow.premium'
                   : addUserFlow
-                  ? 'stepAddManager.subTitle.flow.addNewUser'
-                  : 'stepAddManager.subTitle.flow.base'
+                    ? 'stepAddManager.subTitle.flow.addNewUser'
+                    : 'stepAddManager.subTitle.flow.base'
               }
               components={{ 1: <br />, 3: <strong />, 4: <br /> }}
               values={{ productTitle: product?.title, subProductTitle: subProduct?.title }}
@@ -194,8 +223,8 @@ export function StepAddManager({
               {subProduct
                 ? `Inserisci i dati del Legale Rappresentante del tuo ente. <1/> La persona che indicherai sarà firmataria del contratto per <3>{{subProductTitle}}<3/>.`
                 : addUserFlow
-                ? `La persona indicata firmerà il Modulo di aggiunta per il nuovo Amministratore e lo <1 />autorizzerà ad operare sul prodotto <3>{{productTitle}}</3> per il tuo ente.`
-                : `Inserisci i dati del Legale Rappresentante del tuo ente. <1/> Sarà responsabile della firma del contratto per <3>{{productTitle}}</3> <4/> e avrà il ruolo di Amministratore per questo prodotto nell'Area Riservata.`}
+                  ? `La persona indicata firmerà il Modulo di aggiunta per il nuovo Amministratore e lo <1 />autorizzerà ad operare sul prodotto <3>{{productTitle}}</3> per il tuo ente.`
+                  : `Inserisci i dati del Legale Rappresentante del tuo ente. <1/> Sarà responsabile della firma del contratto per <3>{{productTitle}}</3> <4/> e avrà il ruolo di Amministratore per questo prodotto nell'Area Riservata.`}
             </Trans>
           </Typography>
         </Grid>
@@ -232,14 +261,20 @@ export function StepAddManager({
           forward={{
             action: () => {
               if (addUserFlow) {
-                void checkManager(people['manager-initial']);
+                void searchUserId(people['manager-initial'].taxCode);
               } else {
-                validateUserData(people['manager-initial'], 'manager-initial', externalInstitutionId, subProduct);          
+                validateUserData(
+                  people['manager-initial'],
+                  'manager-initial',
+                  externalInstitutionId,
+                  subProduct
+                );
               }
             },
             label: t('stepAddManager.continue'),
             disabled:
-              objectIsEmpty(people) || !validateUser('manager-initial', people['manager-initial'], people, addUserFlow),
+              objectIsEmpty(people) ||
+              !validateUser('manager-initial', people['manager-initial'], people, addUserFlow),
           }}
         />
       </Grid>
@@ -267,7 +302,14 @@ export function StepAddManager({
         }
         onCloseLabel={t('stepAddManager.back')}
         onConfirmLabel={t('stepAddManager.continue')}
-        onConfirm={() => validateUserData(people['manager-initial'], 'manager-initial', externalInstitutionId, subProduct)}
+        onConfirm={() =>
+          validateUserData(
+            people['manager-initial'],
+            'manager-initial',
+            externalInstitutionId,
+            subProduct
+          )
+        }
         handleClose={() => setIsChangedManager(false)}
       />
     </Grid>
