@@ -97,7 +97,7 @@ export function StepAddManager({
       {
         method: 'POST',
         data: {
-          taxCode: { taxCode },
+          taxCode,
         },
       },
       () => setRequiredLogin(true)
