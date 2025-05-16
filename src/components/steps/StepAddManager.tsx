@@ -106,7 +106,7 @@ export function StepAddManager({
     const result = getFetchOutcome(request);
 
     if (result === 'success') {
-      const response = (request as AxiosResponse).data.result;
+      const response = (request as AxiosResponse).data;
       if (response) {
         void checkManager(response.id);
       }
@@ -151,7 +151,7 @@ export function StepAddManager({
         });
       }
       if (response) {
-        void checkManager(response.id);
+        validateUserData(people['manager-initial'], 'manager-initial', externalInstitutionId, subProduct);
       }
     } else {
       setOutcome(genericError);
