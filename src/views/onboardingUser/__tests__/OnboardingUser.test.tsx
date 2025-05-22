@@ -1,4 +1,3 @@
-import React from 'react';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { useState } from 'react';
 import '@testing-library/jest-dom';
@@ -10,11 +9,9 @@ import { MemoryRouter } from 'react-router-dom';
 import OnboardingUser from '../OnboardingUser';
 import { mockPartyRegistry, mockedProducts } from '../../../lib/__mocks__/mockApiRequests';
 import i18n from '@pagopa/selfcare-common-frontend/lib/locale/locale-utils';
-import {
-  executeStepAddAdmin,
-  executeStepAddManager,
-  fillUserForm,
-} from '../../../utils/test-utils';
+import { executeStepAddAdmin, executeStepAddManager } from '../../../utils/test-utils';
+import { createStore } from '../../../redux/store';
+import { Provider } from 'react-redux';
 
 type Search = 'taxCode' | 'aooCode' | 'uoCode' | 'ivassCode';
 
@@ -30,47 +27,54 @@ beforeAll(() => {
   i18n.changeLanguage('it');
 });
 
-const renderComponent = (productId: string, fromAlreadyOnboarded: boolean) => {
+const renderComponent = (
+  productId: string,
+  fromAlreadyOnboarded: boolean,
+  injectedStore?: ReturnType<typeof createStore>
+) => {
   const Component = () => {
     const [user, setUser] = useState<User | null>(null);
     const [subHeaderVisible, setSubHeaderVisible] = useState<boolean>(false);
     const [onExit, setOnExit] = useState<(exitAction: () => void) => void | undefined>();
     const [enableLogin, setEnableLogin] = useState<boolean>(true);
     const product = mockedProducts.find((p) => p.id === productId);
+    const store = injectedStore ? injectedStore : createStore();
     return (
-      <HeaderContext.Provider
-        value={{
-          subHeaderVisible,
-          setSubHeaderVisible,
-          onExit,
-          setOnExit,
-          enableLogin,
-          setEnableLogin,
-        }}
-      >
-        <UserContext.Provider
-          value={{ user, setUser, requiredLogin: false, setRequiredLogin: () => {} }}
+      <Provider store={store}>
+        <HeaderContext.Provider
+          value={{
+            subHeaderVisible,
+            setSubHeaderVisible,
+            onExit,
+            setOnExit,
+            enableLogin,
+            setEnableLogin,
+          }}
         >
-          <button onClick={() => onExit?.(() => window.location.assign(ENV.URL_FE.LOGOUT))}>
-            LOGOUT
-          </button>
-          <MemoryRouter
-            initialEntries={[
-              {
-                pathname: `/user`,
-                search: '',
-                state: fromAlreadyOnboarded
-                  ? {
-                      data: { party: mockPartyRegistry.items[2], product, institutionType: 'PA' },
-                    }
-                  : undefined,
-              },
-            ]}
+          <UserContext.Provider
+            value={{ user, setUser, requiredLogin: false, setRequiredLogin: () => {} }}
           >
-            <OnboardingUser />
-          </MemoryRouter>
-        </UserContext.Provider>
-      </HeaderContext.Provider>
+            <button onClick={() => onExit?.(() => window.location.assign(ENV.URL_FE.LOGOUT))}>
+              LOGOUT
+            </button>
+            <MemoryRouter
+              initialEntries={[
+                {
+                  pathname: `/user`,
+                  search: '',
+                  state: fromAlreadyOnboarded
+                    ? {
+                        data: { party: mockPartyRegistry.items[2], product, institutionType: 'PA' },
+                      }
+                    : undefined,
+                },
+              ]}
+            >
+              <OnboardingUser />
+            </MemoryRouter>
+          </UserContext.Provider>
+        </HeaderContext.Provider>
+      </Provider>
     );
   };
 

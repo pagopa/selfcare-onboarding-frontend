@@ -5,6 +5,7 @@ import React, { useState } from 'react';
 import { Router } from 'react-router-dom';
 import { createMemoryHistory } from 'history';
 import i18n from '@pagopa/selfcare-common-frontend/lib/locale/locale-utils';
+import { Provider } from 'react-redux';
 import { User } from '../../types';
 import {
   mockPartyRegistry,
@@ -17,6 +18,7 @@ import {
   mockedPspOnboardingData,
 } from '../lib/__mocks__/mockApiRequests';
 import { nationalValue } from '../model/GeographicTaxonomies';
+import { store } from '../redux/store';
 import { HeaderContext, UserContext } from './../lib/context';
 import { ENV } from './env';
 import { canInvoice } from './constants';
@@ -68,7 +70,11 @@ export const renderComponentWithProviders = (
     );
   };
 
-  render(<Component />);
+  render(
+    <Provider store={store}>
+      <Component />
+    </Provider>
+  );
 };
 
 export const checkCertifiedUserValidation = async (

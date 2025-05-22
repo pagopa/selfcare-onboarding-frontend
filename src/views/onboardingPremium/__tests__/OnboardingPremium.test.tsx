@@ -15,6 +15,8 @@ import {
   verifySubmitPostLegalsIoPremium,
   verifySubmitPostLegalsPspDashBoard,
 } from '../../../utils/test-utils';
+import { createStore } from '../../../redux/store';
+import { Provider } from 'react-redux';
 
 jest.setTimeout(20000);
 
@@ -63,7 +65,8 @@ afterAll(() => {
 const renderComponent = (
   productId: string = 'prod-io',
   subProductId: string = 'prod-io-premium',
-  injectedHistory?: ReturnType<typeof createMemoryHistory>
+  injectedHistory?: ReturnType<typeof createMemoryHistory>,
+  injectedStore?: ReturnType<typeof createStore>
 ) => {
   const Component = () => {
     const history = injectedHistory ? injectedHistory : createMemoryHistory();
@@ -71,36 +74,38 @@ const renderComponent = (
     const [subHeaderVisible, setSubHeaderVisible] = useState<boolean>(false);
     const [onExit, setOnExit] = useState<(exitAction: () => void) => void | undefined>();
     const [enableLogin, setEnableLogin] = useState<boolean>(true);
-
+    const store = injectedStore ? injectedStore : createStore();
     if (!injectedHistory) {
       history.push(`/${productId}/${subProductId}`);
     }
     return (
-      <Router history={history}>
-        <HeaderContext.Provider
-          value={{
-            subHeaderVisible,
-            setSubHeaderVisible,
-            onExit,
-            setOnExit,
-            enableLogin,
-            setEnableLogin,
-          }}
-        >
-          <UserContext.Provider
-            value={{ user, setUser, requiredLogin: false, setRequiredLogin: () => {} }}
+      <Provider store={store}>
+        <Router history={history}>
+          <HeaderContext.Provider
+            value={{
+              subHeaderVisible,
+              setSubHeaderVisible,
+              onExit,
+              setOnExit,
+              enableLogin,
+              setEnableLogin,
+            }}
           >
-            <button onClick={() => onExit?.(() => window.location.assign(ENV.URL_FE.LOGOUT))}>
-              LOGOUT
-            </button>
-            <Switch>
-              <Route path="/:productId/:subProductId">
-                <OnboardingPremium />
-              </Route>
-            </Switch>
-          </UserContext.Provider>
-        </HeaderContext.Provider>
-      </Router>
+            <UserContext.Provider
+              value={{ user, setUser, requiredLogin: false, setRequiredLogin: () => {} }}
+            >
+              <button onClick={() => onExit?.(() => window.location.assign(ENV.URL_FE.LOGOUT))}>
+                LOGOUT
+              </button>
+              <Switch>
+                <Route path="/:productId/:subProductId">
+                  <OnboardingPremium />
+                </Route>
+              </Switch>
+            </UserContext.Provider>
+          </HeaderContext.Provider>
+        </Router>
+      </Provider>
     );
   };
 

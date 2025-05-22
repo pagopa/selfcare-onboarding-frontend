@@ -222,7 +222,6 @@ function OnboardingUserComponent() {
           selectedParty,
           institutionType,
           isTechPartner,
-          setOutcome,
           forward: (newFormData: Partial<FormData>) => {
             trackEvent('ONBOARDING_ADD_MANAGER', {
               request_id: requestId,
