@@ -83,21 +83,37 @@ export const stepFormDataWithoutIpaResearch = async (
   product: string,
   institutionType?: string
 ) => {
+  if (product === 'prod-interop' && institutionType === 'SA') {
+    await page.click('#registeredOffice');
+    await page.fill('#registeredOffice', 'Via test 1');
+
+    await page.click('#zipCode');
+    await page.fill('#zipCode', '20000');
+
+    await page.click('#city-select');
+    await page.fill('#city-select', 'Milano');
+    await page.click('#city-select-option-0');
+  }
+
   await page.getByLabel('La Partita IVA coincide con il Codice Fiscale').click();
+
   if (product !== 'prod-interop' && institutionType !== 'SCP') {
     await page.click('#recipientCode');
     await page.fill('#recipientCode', product === 'prod-pn' ? 'UFBM8M' : '14CB0I', {
       timeout: 500,
     });
   }
+
   if (product === 'prod-io-sign') {
     await page.click('#supportEmail');
     await page.fill('#supportEmail', 'test@test.it', { timeout: 500 });
   }
-  if (institutionType !== 'SCP') {
+
+  if (institutionType !== 'SCP' && institutionType !== 'SA') {
     await page.getByRole('radio', { name: 'Nazionale' }).waitFor({ timeout: 500 });
     await page.getByRole('radio', { name: 'Nazionale' }).click();
   }
+
   await page.getByRole('button', { name: 'Continua' }).waitFor({ timeout: 500 });
   await page.getByRole('button', { name: 'Continua' }).click();
 };
