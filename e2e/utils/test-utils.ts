@@ -1,5 +1,4 @@
 import { Page, expect } from '@playwright/test';
-import { institutionTypes } from '../../src/lib/__mocks__/mockApiRequests';
 
 // eslint-disable-next-line functional/no-let
 // let copiedText: string;

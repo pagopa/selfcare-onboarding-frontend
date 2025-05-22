@@ -850,7 +850,6 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           addUserFlow: false,
           product: selectedProduct,
           isTechPartner,
-          setOutcome,
           forward: (newFormData: Partial<FormData>) => {
             trackEvent('ONBOARDING_ADD_MANAGER', {
               request_id: requestIdRef.current,

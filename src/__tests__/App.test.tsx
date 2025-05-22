@@ -4,6 +4,8 @@ import { ROUTES } from '../utils/constants';
 import { createMemoryHistory } from 'history';
 import { Router } from 'react-router';
 import './../locale';
+import { createStore } from '../redux/store';
+import { Provider } from 'react-redux';
 
 jest.mock('../views/onboardingProduct/OnboardingProduct', () => () => 'OnboardingProduct');
 jest.mock(
@@ -16,9 +18,11 @@ jest.mock(
 );
 
 let history;
+let store;
 
 beforeEach(() => {
   history = createMemoryHistory();
+  store = createStore();
 });
 
 test('test not served path', () => {
@@ -27,7 +31,9 @@ test('test not served path', () => {
 
   render(
     <Router history={history}>
-      <App />
+      <Provider store={store}>
+        <App />
+      </Provider>
     </Router>
   );
   expect(history.location.pathname).toBe(ROUTES.ONBOARDING_ROOT.PATH);
@@ -39,7 +45,9 @@ test('test OnBoarding', () => {
   jest.spyOn(history, 'push');
   render(
     <Router history={history}>
-      <App />
+      <Provider store={store}>
+        <App />
+      </Provider>
     </Router>
   );
   screen.getByText('OnboardingProduct');
@@ -52,7 +60,9 @@ test('test Reject OnBoarding', () => {
 
   render(
     <Router history={history}>
-      <App />
+      <Provider store={store}>
+        <App />
+      </Provider>
     </Router>
   );
   screen.getByText('Cancel onboarding request');
@@ -65,7 +75,9 @@ test('test Confirm OnBoarding', () => {
 
   render(
     <Router history={history}>
-      <App />
+      <Provider store={store}>
+        <App />
+      </Provider>
     </Router>
   );
   screen.getByText('Complete onboarding request');

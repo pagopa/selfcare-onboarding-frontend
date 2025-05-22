@@ -5,10 +5,10 @@ import { uniqueId } from 'lodash';
 import { useContext, useEffect, useRef, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { AxiosResponse } from 'axios';
+import useErrorDispatcher from '@pagopa/selfcare-common-frontend/lib/hooks/useErrorDispatcher';
 import {
   InstitutionType,
   Product,
-  RequestOutcomeMessage,
   StepperStepComponentProps,
   UserOnCreate,
 } from '../../../types';
@@ -22,7 +22,6 @@ import { RolesInformations } from '../RolesInformations';
 import { fetchWithLogs } from '../../lib/api-utils';
 import { OnboardingFormData } from '../../model/OnboardingFormData';
 import { getFetchOutcome } from '../../lib/error-utils';
-import { genericError } from '../../views/onboardingProduct/components/StepVerifyOnboarding';
 
 // Could be an ES6 Set but it's too bothersome for now
 export type UsersObject = { [key: string]: UserOnCreate };
@@ -37,7 +36,6 @@ type Props = StepperStepComponentProps & {
   onboardingFormData?: OnboardingFormData;
   selectedParty?: any;
   institutionType?: InstitutionType;
-  setOutcome: React.Dispatch<React.SetStateAction<RequestOutcomeMessage | null | undefined>>;
 };
 
 export function StepAddManager({
@@ -52,7 +50,6 @@ export function StepAddManager({
   onboardingFormData,
   selectedParty,
   institutionType,
-  setOutcome,
 }: Props) {
   const { setRequiredLogin } = useContext(UserContext);
   const [_loading, setLoading] = useState(true);
@@ -60,6 +57,7 @@ export function StepAddManager({
   const [peopleErrors, setPeopleErrors] = useState<UsersError>();
   const [isGenericError, setIsGenericError] = useState<boolean>(false);
   const [isChangedManager, setIsChangedManager] = useState<boolean>(false);
+  const addError = useErrorDispatcher();
   const requestId = uniqueId();
   const requestIdRef = useRef<string>();
   const { t } = useTranslation();
@@ -104,14 +102,25 @@ export function StepAddManager({
     );
 
     const result = getFetchOutcome(request);
-
+    const response = (request as AxiosResponse).data;
     if (result === 'success') {
-      const response = (request as AxiosResponse).data;
       if (response) {
         void checkManager(response.id);
       }
     } else {
-      setOutcome(genericError);
+      addError({
+        id: 'SEARCH_USER_ERROR',
+        blocking: false,
+        error: response as Error,
+        techDescription: `An error occurred while searching the user with the taxCode ${taxCode}`,
+        toNotify: true,
+      });
+      validateUserData(
+        people['manager-initial'],
+        'manager-initial',
+        externalInstitutionId,
+        subProduct
+      );
     }
     setLoading(false);
   };
@@ -138,9 +147,9 @@ export function StepAddManager({
     );
 
     const result = getFetchOutcome(request);
+    const response = (request as AxiosResponse).data.result;
 
     if (result === 'success') {
-      const response = (request as AxiosResponse).data.result;
       setIsChangedManager(!response);
       if (!response) {
         trackEvent('CHANGE_LEGAL_REPRESENTATIVE', {
@@ -154,7 +163,19 @@ export function StepAddManager({
         validateUserData(people['manager-initial'], 'manager-initial', externalInstitutionId, subProduct);
       }
     } else {
-      setOutcome(genericError);
+      addError({
+        id: 'CHECK_MANAGER_ERROR',
+        blocking: false,
+        error: response as Error,
+        techDescription: 'Failed to check manager status',
+        toNotify: true,
+      });
+      validateUserData(
+        people['manager-initial'],
+        'manager-initial',
+        externalInstitutionId,
+        subProduct
+      );
     }
     setLoading(false);
   };

@@ -1,4 +1,3 @@
-import React from 'react';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { useState } from 'react';
 import '@testing-library/jest-dom';
@@ -12,11 +11,7 @@ import { createMemoryHistory } from 'history';
 import { Router } from 'react-router-dom';
 import userEvent from '@testing-library/user-event';
 import {
-  mockedANACParties,
   mockedCategories,
-  mockedInsuranceResource,
-  mockedPartiesFromInfoCamere,
-  mockPartyRegistry,
 } from '../../../lib/__mocks__/mockApiRequests';
 import i18n from '@pagopa/selfcare-common-frontend/lib/locale/locale-utils';
 import {
@@ -31,6 +26,9 @@ import {
   Source,
   verifySubmit,
 } from '../../../utils/test-utils';
+import { createStore } from '../../../redux/store';
+import { Provider } from 'react-redux';
+
 
 jest.setTimeout(40000);
 
@@ -84,37 +82,42 @@ const filterByCategory4Test = (institutionType?: string, productId?: string) => 
   }
 };
 
-const renderComponent = (productId: string = 'prod-pn') => {
+const renderComponent = (
+  productId: string = 'prod-pn',
+  injectedStore?: ReturnType<typeof createStore>
+) => {
   const Component = () => {
     const [user, setUser] = useState<User | null>(null);
     const [subHeaderVisible, setSubHeaderVisible] = useState<boolean>(false);
     const [onExit, setOnExit] = useState<(exitAction: () => void) => void | undefined>();
     const [enableLogin, setEnableLogin] = useState<boolean>(true);
-
+    const store = injectedStore ? injectedStore : createStore();
     const history = createMemoryHistory();
 
     return (
-      <HeaderContext.Provider
-        value={{
-          subHeaderVisible,
-          setSubHeaderVisible,
-          onExit,
-          setOnExit,
-          enableLogin,
-          setEnableLogin,
-        }}
-      >
-        <UserContext.Provider
-          value={{ user, setUser, requiredLogin: false, setRequiredLogin: () => {} }}
+      <Provider store={store}>
+        <HeaderContext.Provider
+          value={{
+            subHeaderVisible,
+            setSubHeaderVisible,
+            onExit,
+            setOnExit,
+            enableLogin,
+            setEnableLogin,
+          }}
         >
-          <button onClick={() => onExit?.(() => window.location.assign(ENV.URL_FE.LOGOUT))}>
-            LOGOUT
-          </button>
-          <Router history={history}>
-            <OnboardingProduct productId={productId} />
-          </Router>
-        </UserContext.Provider>
-      </HeaderContext.Provider>
+          <UserContext.Provider
+            value={{ user, setUser, requiredLogin: false, setRequiredLogin: () => {} }}
+          >
+            <button onClick={() => onExit?.(() => window.location.assign(ENV.URL_FE.LOGOUT))}>
+              LOGOUT
+            </button>
+            <Router history={history}>
+              <OnboardingProduct productId={productId} />
+            </Router>
+          </UserContext.Provider>
+        </HeaderContext.Provider>
+      </Provider>
     );
   };
 
@@ -1021,16 +1024,32 @@ const executeStepBillingData = async (
 const executeStepAdditionalInfo = async (from: 'IPA' | 'NO_IPA' = 'IPA') => {
   console.log('Testing step additional informations..');
 
-  await waitFor(() => screen.getByText('Scegli l’opzione che descrive il tuo ente. Se nessuna è appropriata, seleziona “Altro” e inserisci maggiori dettagli.'));
-  
+  await waitFor(() =>
+    screen.getByText(
+      'Scegli l’opzione che descrive il tuo ente. Se nessuna è appropriata, seleziona “Altro” e inserisci maggiori dettagli.'
+    )
+  );
+
   const continueButton = screen.getByLabelText('Continua');
 
-  const isEstabilishedRegulatoryProvisionYesInput = screen.getByTestId('isEstabilishedRegulatoryProvision-yes').querySelector('input') as HTMLInputElement;
-  const isEstabilishedRegulatoryProvisionNoInput = screen.getByTestId('isEstabilishedRegulatoryProvision-no').querySelector('input') as HTMLInputElement;
-  const fromBelongsRegulatedMarketYesInput = screen.getByTestId('fromBelongsRegulatedMarket-yes').querySelector('input') as HTMLInputElement;
-  const fromBelongsRegulatedMarketNoInput = screen.getByTestId('fromBelongsRegulatedMarket-no').querySelector('input') as HTMLInputElement;
-  const isConcessionaireOfPublicServiceYesInput = screen.getByTestId('isConcessionaireOfPublicService-yes').querySelector('input') as HTMLInputElement;
-  const isConcessionaireOfPublicServiceNoInput = screen.getByTestId('isConcessionaireOfPublicService-no').querySelector('input') as HTMLInputElement;
+  const isEstabilishedRegulatoryProvisionYesInput = screen
+    .getByTestId('isEstabilishedRegulatoryProvision-yes')
+    .querySelector('input') as HTMLInputElement;
+  const isEstabilishedRegulatoryProvisionNoInput = screen
+    .getByTestId('isEstabilishedRegulatoryProvision-no')
+    .querySelector('input') as HTMLInputElement;
+  const fromBelongsRegulatedMarketYesInput = screen
+    .getByTestId('fromBelongsRegulatedMarket-yes')
+    .querySelector('input') as HTMLInputElement;
+  const fromBelongsRegulatedMarketNoInput = screen
+    .getByTestId('fromBelongsRegulatedMarket-no')
+    .querySelector('input') as HTMLInputElement;
+  const isConcessionaireOfPublicServiceYesInput = screen
+    .getByTestId('isConcessionaireOfPublicService-yes')
+    .querySelector('input') as HTMLInputElement;
+  const isConcessionaireOfPublicServiceNoInput = screen
+    .getByTestId('isConcessionaireOfPublicService-no')
+    .querySelector('input') as HTMLInputElement;
 
   fireEvent.click(isEstabilishedRegulatoryProvisionYesInput);
   expect(isEstabilishedRegulatoryProvisionYesInput).toBeChecked();
@@ -1047,8 +1066,12 @@ const executeStepAdditionalInfo = async (from: 'IPA' | 'NO_IPA' = 'IPA') => {
   fireEvent.click(isConcessionaireOfPublicServiceNoInput);
   expect(isConcessionaireOfPublicServiceNoInput).toBeChecked();
 
-  const isFromIPAYesInput = screen.getByTestId('isFromIPA-yes').querySelector('input') as HTMLInputElement;
-  const isFromIPANoInput = screen.getByTestId('isFromIPA-no').querySelector('input') as HTMLInputElement;
+  const isFromIPAYesInput = screen
+    .getByTestId('isFromIPA-yes')
+    .querySelector('input') as HTMLInputElement;
+  const isFromIPANoInput = screen
+    .getByTestId('isFromIPA-no')
+    .querySelector('input') as HTMLInputElement;
 
   if (from === 'IPA') {
     expect(isFromIPAYesInput).toBeDisabled();
