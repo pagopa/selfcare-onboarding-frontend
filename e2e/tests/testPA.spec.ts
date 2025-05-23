@@ -5,9 +5,9 @@ import {
   stepInstitutionType,
   stepSelectParty,
   BASE_URL_ONBOARDING,
-  stepFormDataWithoutIpaResearch,
   stepUploadAggregatorCsv,
   FILE_MOCK_CSV_AGGREGATOR,
+  stepFormData,
 } from '../utils/test-utils';
 
 test('Test Success onboarding request for product prod-pagopa and institutionType PA', async ({
@@ -16,7 +16,7 @@ test('Test Success onboarding request for product prod-pagopa and institutionTyp
   await page.goto(`${BASE_URL_ONBOARDING}/prod-pagopa`);
   await stepInstitutionType(page, 'Pubblica Amministrazione');
   await stepSelectParty(page);
-  await stepFormDataWithoutIpaResearch(page, 'prod-io');
+  await stepFormData(page, 'prod-io', 'PA');
   await stepAddManager(page);
   await stepAddAdmin(page);
 });
@@ -27,7 +27,7 @@ test('Test Success onboarding request for product prod-io and institutionType PA
   await page.goto(`${BASE_URL_ONBOARDING}/prod-io`);
   await stepInstitutionType(page, 'Pubblica Amministrazione');
   await stepSelectParty(page);
-  await stepFormDataWithoutIpaResearch(page, 'prod-io');
+  await stepFormData(page, 'prod-io', 'PA');
   await stepAddManager(page);
   await stepAddAdmin(page);
 });
@@ -38,7 +38,7 @@ test('Test Success onboarding request for product prod-io and institutionType PA
   await page.goto(`${BASE_URL_ONBOARDING}/prod-io`);
   await stepInstitutionType(page, 'Pubblica Amministrazione');
   await stepSelectParty(page, true);
-  await stepFormDataWithoutIpaResearch(page, 'prod-io');
+  await stepFormData(page, 'prod-io', 'PA');
   await stepAddManager(page);
   await stepAddAdmin(page, true);
   await stepUploadAggregatorCsv(
@@ -54,7 +54,7 @@ test('Test Success onboarding request for product prod-io-sign and institutionTy
   await page.goto(`${BASE_URL_ONBOARDING}/prod-io-sign`);
   await stepInstitutionType(page, 'Pubblica Amministrazione');
   await stepSelectParty(page);
-  await stepFormDataWithoutIpaResearch(page, 'prod-io-sign');
+  await stepFormData(page, 'prod-io-sign', 'PA');
   await stepAddManager(page);
   await stepAddAdmin(page);
 });
@@ -65,7 +65,7 @@ test('Test Success onboarding request for product prod-interop and institutionTy
   await page.goto(`${BASE_URL_ONBOARDING}/prod-interop`);
   await stepInstitutionType(page, 'Pubblica Amministrazione');
   await stepSelectParty(page);
-  await stepFormDataWithoutIpaResearch(page, 'prod-interop');
+  await stepFormData(page, 'prod-interop', 'PA');
   await stepAddManager(page);
   await stepAddAdmin(page);
 });
@@ -75,7 +75,7 @@ test('Test Success onboarding request for product prod-pn and institutionType PA
 }) => {
   await page.goto(`${BASE_URL_ONBOARDING}/prod-pn`);
   await stepSelectParty(page, undefined, 'Fondazione Toscana Gabriele');
-  await stepFormDataWithoutIpaResearch(page, 'prod-pn');
+  await stepFormData(page, 'prod-pn', 'PA');
   await stepAddManager(page);
   await stepAddAdmin(page);
 });
@@ -85,7 +85,7 @@ test('Test Success onboarding request for product prod-pn and institutionType PA
 }) => {
   await page.goto(`${BASE_URL_ONBOARDING}/prod-pn`);
   await stepSelectParty(page, true, 'Fondazione Toscana Gabriele');
-  await stepFormDataWithoutIpaResearch(page, 'prod-pn', 'PA');
+  await stepFormData(page, 'prod-pn', 'PA');
   await stepAddManager(page);
   await stepAddAdmin(page, true);
   await stepUploadAggregatorCsv(

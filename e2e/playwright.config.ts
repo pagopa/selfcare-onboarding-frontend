@@ -1,4 +1,3 @@
-import os from 'os';
 import path from 'path';
 import { defineConfig, devices } from '@playwright/test';
 
@@ -18,10 +17,10 @@ export default defineConfig({
   globalTeardown: path.resolve(__dirname, './utils/global.teardown.ts'),
   timeout: 60000,
   testDir: './tests',
-  fullyParallel: true,
+  fullyParallel: false,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
-  workers: process.env.CI ? 1 : Math.ceil(os.cpus().length / 2),
+  workers:1,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
