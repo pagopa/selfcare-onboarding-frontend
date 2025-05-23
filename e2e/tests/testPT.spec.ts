@@ -3,7 +3,7 @@ import {
   BASE_URL_ONBOARDING,
   stepInstitutionType,
   stepAddAdmin,
-  stepFormDataPartyNotFromIpa,
+  stepFormData,
 } from '../utils/test-utils';
 
 test('Test Success onboarding request for product prod-pagopa and institutionType PT', async ({
@@ -11,8 +11,6 @@ test('Test Success onboarding request for product prod-pagopa and institutionTyp
 }) => {
   await page.goto(`${BASE_URL_ONBOARDING}/prod-pagopa`);
   await stepInstitutionType(page, 'Partner tecnologico');
-  await stepFormDataPartyNotFromIpa(page, 'PT');
+  await stepFormData(page, 'PT');
   await stepAddAdmin(page, undefined, 'PT');
 });
-
-
