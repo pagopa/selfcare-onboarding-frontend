@@ -101,7 +101,11 @@ export const stepFormData = async (
     await page.click('#taxCodeEquals2VatNumber');
   }
 
-  if ((product === 'prod-interop' && actualInstitutionType === 'SA') || !isFromIpa) {
+  if (
+    (product === 'prod-interop' &&
+      (actualInstitutionType === 'SA' || actualInstitutionType === 'AS')) ||
+    !isFromIpa
+  ) {
     await page.click('#registeredOffice');
     await page.fill('#registeredOffice', isFromIpa ? 'Via test 1' : 'via test 1');
 
@@ -137,9 +141,17 @@ export const stepFormData = async (
     await page.fill('#supportEmail', 'test@test.it', { timeout: 500 });
   }
 
-  if (!isFromIpa && actualInstitutionType === 'GPS') {
+  if (actualInstitutionType === 'GPS' || actualInstitutionType === 'AS') {
     await page.click('#rea');
     await page.fill('#rea', 'RM-123456');
+  }
+
+  if (actualInstitutionType === 'AS') {
+    await page.click('#businessRegisterPlace');
+    await page.fill('#businessRegisterPlace', 'Comune di Milano');
+
+    await page.click('#shareCapital');
+    await page.fill('#shareCapital', '€ 1.5000');
   }
 
   if (!isFromIpa && actualInstitutionType === 'PSP') {
@@ -166,7 +178,9 @@ export const stepFormData = async (
   }
 
   const shouldShowNazionale = isFromIpa
-    ? actualInstitutionType !== 'SCP' && actualInstitutionType !== 'SA'
+    ? actualInstitutionType !== 'SCP' &&
+      actualInstitutionType !== 'SA' &&
+      actualInstitutionType !== 'AS'
     : actualInstitutionType !== 'PT';
 
   if (shouldShowNazionale) {
