@@ -88,7 +88,7 @@ export const stepFormData = async (
   const isFromIpa = institutionType !== undefined;
   const product = isFromIpa ? productOrInstitutionType : '';
   const actualInstitutionType = isFromIpa ? institutionType : productOrInstitutionType;
-  if (!isFromIpa) {
+  if (!isFromIpa || (product === 'prod-pagopa' && institutionType === 'PRV')) {
     await page.click('#businessName');
     await page.fill('#businessName', 'test');
 
@@ -104,7 +104,8 @@ export const stepFormData = async (
   if (
     (product === 'prod-interop' &&
       (actualInstitutionType === 'SA' || actualInstitutionType === 'AS')) ||
-    !isFromIpa
+    !isFromIpa ||
+    (product === 'prod-pagopa' && institutionType === 'PRV')
   ) {
     await page.click('#registeredOffice');
     await page.fill('#registeredOffice', isFromIpa ? 'Via test 1' : 'via test 1');
@@ -117,7 +118,7 @@ export const stepFormData = async (
     await page.click('#city-select-option-0');
   }
 
-  if (isFromIpa) {
+  if (isFromIpa && product !== 'prod-pagopa' && institutionType !== 'PRV') {
     await page.getByLabel('La Partita IVA coincide con il Codice Fiscale').click();
   }
 
@@ -141,12 +142,15 @@ export const stepFormData = async (
     await page.fill('#supportEmail', 'test@test.it', { timeout: 500 });
   }
 
-  if (actualInstitutionType === 'GPS' || actualInstitutionType === 'AS') {
+  if (actualInstitutionType === 'AS') {
     await page.click('#rea');
     await page.fill('#rea', 'RM-123456');
   }
 
-  if (actualInstitutionType === 'AS') {
+  if (
+    actualInstitutionType === 'AS' ||
+    (product === 'prod-interop' && actualInstitutionType === 'PRV')
+  ) {
     await page.click('#businessRegisterPlace');
     await page.fill('#businessRegisterPlace', 'Comune di Milano');
 
@@ -180,7 +184,8 @@ export const stepFormData = async (
   const shouldShowNazionale = isFromIpa
     ? actualInstitutionType !== 'SCP' &&
       actualInstitutionType !== 'SA' &&
-      actualInstitutionType !== 'AS'
+      actualInstitutionType !== 'AS' &&
+      (actualInstitutionType !== 'PRV' || product !== 'prod-interop')
     : actualInstitutionType !== 'PT';
 
   if (shouldShowNazionale) {
