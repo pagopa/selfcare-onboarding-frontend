@@ -17,7 +17,6 @@ async function globalSetup() {
     await page.getByRole('textbox', { name: 'Password' }).fill('password123');
     await page.getByRole('button', { name: 'Entra con SPID' }).click();
     await page.getByRole('button', { name: 'Conferma' }).click();
-    await page.getByRole('button', { name: 'Accetta tutti' }).click();
 
     await page.waitForURL('**/dashboard');
     await context.storageState({ path: path.resolve(__dirname, '../storageState.json') });
