@@ -88,7 +88,10 @@ export const stepFormData = async (
   const isFromIpa = institutionType !== undefined;
   const product = isFromIpa ? productOrInstitutionType : '';
   const actualInstitutionType = isFromIpa ? institutionType : productOrInstitutionType;
-  if (!isFromIpa || (product === 'prod-pagopa' && institutionType === 'PRV')) {
+  if (
+    !isFromIpa ||
+    (product === 'prod-pagopa' && (institutionType === 'PRV' || institutionType === 'GPU'))
+  ) {
     await page.click('#businessName');
     await page.fill('#businessName', 'test');
 
@@ -105,7 +108,7 @@ export const stepFormData = async (
     (product === 'prod-interop' &&
       (actualInstitutionType === 'SA' || actualInstitutionType === 'AS')) ||
     !isFromIpa ||
-    (product === 'prod-pagopa' && institutionType === 'PRV')
+    (product === 'prod-pagopa' && (institutionType === 'PRV' || institutionType === 'GPU'))
   ) {
     await page.click('#registeredOffice');
     await page.fill('#registeredOffice', isFromIpa ? 'Via test 1' : 'via test 1');
@@ -118,7 +121,12 @@ export const stepFormData = async (
     await page.click('#city-select-option-0');
   }
 
-  if (isFromIpa && product !== 'prod-pagopa' && institutionType !== 'PRV') {
+  if (
+    isFromIpa &&
+    product !== 'prod-pagopa' &&
+    institutionType !== 'PRV' &&
+    institutionType !== 'GPU'
+  ) {
     await page.getByLabel('La Partita IVA coincide con il Codice Fiscale').click();
   }
 
@@ -142,7 +150,7 @@ export const stepFormData = async (
     await page.fill('#supportEmail', 'test@test.it', { timeout: 500 });
   }
 
-  if (actualInstitutionType === 'AS') {
+  if (actualInstitutionType === 'AS' || actualInstitutionType === 'GPU') {
     await page.click('#rea');
     await page.fill('#rea', 'RM-123456');
   }
@@ -203,6 +211,30 @@ export const stepAdditionalInformation = async (page: Page) => {
   await page.click('#isEstabilishedRegulatoryProvision-yes');
   await page.click('#fromBelongsRegulatedMarket-no');
   await page.click('#isConcessionaireOfPublicService-yes');
+  await page.getByRole('button', { name: 'Continua' }).click();
+};
+
+export const stepAdditionalGPUInformation = async (page: Page) => {
+  await page.click('.MuiFormControlLabel-root:nth-child(1) [name="isPartyRegistered"]');
+
+  await page.click('#businessRegisterNumber');
+  await page.fill('#businessRegisterNumber', 'Registro test');
+
+  await page.click('#legalRegisterNumber');
+  await page.fill('#legalRegisterNumber', '15243');
+
+  await page.click('.MuiFormControlLabel-root:nth-child(2) [name="isPartyProvidingAService"]');
+  await page.click('.MuiFormControlLabel-root:nth-child(2) [name="longTermPayments"]');
+
+  await page.click('#manager');
+  await page.click('#managerAuthorized');
+
+  await page.click('#managerEligible');
+
+  await page.click('#managerProsecution');
+
+  await page.click('#institutionCourtMeasures');
+
   await page.getByRole('button', { name: 'Continua' }).click();
 };
 
