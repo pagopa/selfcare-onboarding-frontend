@@ -559,6 +559,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
                   (institutionType === 'PRV' && productId !== 'prod-interop'))
                 ? 'SELC'
                 : origin,
+          istatCode: origin !== 'IPA' ? onboardingFormData?.istatCode : undefined,
           users,
           pricingPlan,
           assistanceContacts: onboardingFormData?.supportEmail

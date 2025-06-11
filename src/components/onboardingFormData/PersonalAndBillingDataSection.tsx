@@ -290,6 +290,7 @@ export default function PersonalAndBillingDataSection({
         country: gt.country_abbreviation,
         county: gt.province_abbreviation,
         city: gt.desc,
+        istat_code: gt.istat_code,
       })) as Array<InstitutionLocationData>;
 
       const onlyCountries = mappedResponse
@@ -542,8 +543,10 @@ export default function PersonalAndBillingDataSection({
                 }}
                 inputValue={formik.values.city || ''}
                 onChange={(_e: any, selected: any) => {
+                  console.log('selected', selected);
                   formik.setFieldValue('city', selected?.city || '');
                   formik.setFieldValue('county', selected?.city || '');
+                  formik.setFieldValue('istatCode', !isFromIPA ? selected?.istat_code : undefined);
                   if (selected) {
                     setInstitutionLocationData(selected);
                     setIsCitySelected(true);
@@ -1082,7 +1085,11 @@ export default function PersonalAndBillingDataSection({
                   600,
                   theme.palette.text.primary
                 )}
-                disabled={isDisabled && !!pspData?.businessRegisterNumber && !formik.errors.commercialRegisterNumber}
+                disabled={
+                  isDisabled &&
+                  !!pspData?.businessRegisterNumber &&
+                  !formik.errors.commercialRegisterNumber
+                }
               />
             </Grid>
             <Grid item xs={12}>
