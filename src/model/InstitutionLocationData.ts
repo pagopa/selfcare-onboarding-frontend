@@ -3,4 +3,5 @@ export type InstitutionLocationData = {
   county: string;
   country: string;
   city: string;
+  istat_code?: string;
 };

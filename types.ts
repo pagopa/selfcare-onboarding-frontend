@@ -287,6 +287,7 @@ export type InsuranceCompanyResource = {
   id: string;
   origin: string;
   originId: string;
+  istatCode?: string;
   registerType: string;
   workType: string;
   taxCode?: string;
