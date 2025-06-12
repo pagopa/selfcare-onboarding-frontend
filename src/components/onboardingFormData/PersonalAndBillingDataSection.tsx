@@ -4,7 +4,7 @@ import Checkbox from '@mui/material/Checkbox';
 import { Box, styled } from '@mui/system';
 import { theme } from '@pagopa/mui-italia';
 import { AxiosResponse } from 'axios';
-import { useContext, useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useContext, useEffect, useState } from 'react';
 import { useTranslation, Trans } from 'react-i18next';
 import {
   InstitutionType,
@@ -14,7 +14,6 @@ import {
 import { fetchWithLogs } from '../../lib/api-utils';
 import { UserContext } from '../../lib/context';
 import { getFetchOutcome } from '../../lib/error-utils';
-import { GeographicTaxonomyResource } from '../../model/GeographicTaxonomies';
 import { InstitutionLocationData } from '../../model/InstitutionLocationData';
 import { OnboardingFormData } from '../../model/OnboardingFormData';
 import { formatCity } from '../../utils/formatting-utils';
@@ -83,6 +82,9 @@ type Props = StepperStepComponentProps & {
   isPdndPrivate: boolean;
   setInvalidTaxCodeInvoicing: React.Dispatch<React.SetStateAction<boolean>>;
   recipientCodeStatus?: string;
+  getCountriesFromGeotaxonomies: (query: string, setCountries: Dispatch<SetStateAction<Array<InstitutionLocationData> | undefined>>) => Promise<void>;
+  countries: Array<InstitutionLocationData> | undefined;
+  setCountries: Dispatch<SetStateAction<Array<InstitutionLocationData> | undefined>>;
 };
 
 // eslint-disable-next-line sonarjs/cognitive-complexity, complexity
@@ -106,6 +108,9 @@ export default function PersonalAndBillingDataSection({
   isPdndPrivate,
   setInvalidTaxCodeInvoicing,
   recipientCodeStatus,
+  getCountriesFromGeotaxonomies,
+  countries,
+  setCountries
 }: Props) {
   const { t } = useTranslation();
   const { setRequiredLogin } = useContext(UserContext);
@@ -113,7 +118,6 @@ export default function PersonalAndBillingDataSection({
   const [shrinkRea, setShrinkRea] = useState<boolean>(false);
   const [shrinkVatNumber, setShrinkVatNumber] = useState<boolean>(false);
   const [shrinkCity, setShrinkCity] = useState<boolean>(false);
-  const [countries, setCountries] = useState<Array<InstitutionLocationData>>();
   const [institutionLocationData, setInstitutionLocationData] = useState<InstitutionLocationData>();
   const [isCitySelected, setIsCitySelected] = useState<boolean>(false);
   const [nationalCountries, setNationalCountries] = useState<Array<CountryResource>>();
@@ -269,40 +273,6 @@ export default function PersonalAndBillingDataSection({
     };
   };
 
-  const getCountriesFromGeotaxonomies = async (query: string) => {
-    const searchGeotaxonomy = await fetchWithLogs(
-      {
-        endpoint: 'ONBOARDING_GET_GEOTAXONOMY',
-      },
-      {
-        method: 'GET',
-        params: { description: query },
-      },
-      () => setRequiredLogin(true)
-    );
-    const outcome = getFetchOutcome(searchGeotaxonomy);
-
-    if (outcome === 'success') {
-      const geographicTaxonomies = (searchGeotaxonomy as AxiosResponse).data;
-
-      const mappedResponse = geographicTaxonomies.map((gt: GeographicTaxonomyResource) => ({
-        code: gt.code,
-        country: gt.country_abbreviation,
-        county: gt.province_abbreviation,
-        city: gt.desc,
-      })) as Array<InstitutionLocationData>;
-
-      const onlyCountries = mappedResponse
-        .filter((r) => r.city.includes('- COMUNE'))
-        .map((r) => ({
-          ...r,
-          city: formatCity(r.city),
-        }));
-
-      setCountries(onlyCountries);
-    }
-  };
-
   const getNationalCountries = async (_query: string) => {
     if (process.env.REACT_APP_MOCK_API === 'true') {
       const countriesWithoutIta = mockedCountries.filter(
@@ -312,8 +282,8 @@ export default function PersonalAndBillingDataSection({
     } else {
       try {
         const response = await fetch(ENV.JSON_URL.COUNTRIES);
-        const countries = await response.json();
-        const countriesWithoutIta = countries.filter((cm: CountryResource) => cm.alpha_2 !== 'IT');
+        const nationalCountriesResponse = await response.json();
+        const countriesWithoutIta = nationalCountriesResponse.filter((cm: CountryResource) => cm.alpha_2 !== 'IT');
         setNationalCountries(countriesWithoutIta);
       } catch (reason) {
         console.error(reason);
@@ -535,15 +505,17 @@ export default function PersonalAndBillingDataSection({
                   const value = e.target.value;
                   formik.setFieldValue('city', value);
                   if (value.length >= 3) {
-                    void getCountriesFromGeotaxonomies(value);
+                    void getCountriesFromGeotaxonomies(value, setCountries);
                   } else {
                     setCountries(undefined);
                   }
                 }}
                 inputValue={formik.values.city || ''}
                 onChange={(_e: any, selected: any) => {
+                  console.log('selected', selected);
                   formik.setFieldValue('city', selected?.city || '');
                   formik.setFieldValue('county', selected?.city || '');
+                  formik.setFieldValue('istatCode', !isFromIPA ? selected?.istat_code : undefined);
                   if (selected) {
                     setInstitutionLocationData(selected);
                     setIsCitySelected(true);
@@ -554,7 +526,6 @@ export default function PersonalAndBillingDataSection({
                 onBlur={() => {
                   if (!isCitySelected) {
                     setCountries(undefined);
-
                     setInstitutionLocationData(undefined);
                   }
                 }}
@@ -1082,7 +1053,11 @@ export default function PersonalAndBillingDataSection({
                   600,
                   theme.palette.text.primary
                 )}
-                disabled={isDisabled && !!pspData?.businessRegisterNumber && !formik.errors.commercialRegisterNumber}
+                disabled={
+                  isDisabled &&
+                  !!pspData?.businessRegisterNumber &&
+                  !formik.errors.commercialRegisterNumber
+                }
               />
             </Grid>
             <Grid item xs={12}>

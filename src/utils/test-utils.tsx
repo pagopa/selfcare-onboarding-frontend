@@ -16,6 +16,7 @@ import {
   mockedAoos,
   mockedUos,
   mockedPspOnboardingData,
+  mockedGeoTaxonomy,
 } from '../lib/__mocks__/mockApiRequests';
 import { nationalValue } from '../model/GeographicTaxonomies';
 import { store } from '../redux/store';
@@ -563,6 +564,7 @@ export const verifySubmit = async (
                                       productId === 'prod-io')
                                   ? undefined
                                   : '991',
+        istatCode: from !== 'IPA' ? mockedGeoTaxonomy[1].istat_code : undefined,
         taxCode: errorOnSubmit
           ? mockPartyRegistry.items[1].taxCode
           : from === 'NO_IPA'

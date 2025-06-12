@@ -2,7 +2,15 @@ import { Alert, Box, Grid, Link, TextField } from '@mui/material';
 import { styled } from '@mui/system';
 import { AxiosError, AxiosResponse } from 'axios';
 import { useFormik } from 'formik';
-import { useContext, useEffect, useReducer, useRef, useState } from 'react';
+import {
+  Dispatch,
+  SetStateAction,
+  useContext,
+  useEffect,
+  useReducer,
+  useRef,
+  useState,
+} from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
 import { uniqueId } from 'lodash';
@@ -17,7 +25,7 @@ import { fetchWithLogs } from '../../lib/api-utils';
 import { UserContext } from '../../lib/context';
 import { getFetchOutcome } from '../../lib/error-utils';
 import { AooData } from '../../model/AooData';
-import { GeographicTaxonomy } from '../../model/GeographicTaxonomies';
+import { GeographicTaxonomy, GeographicTaxonomyResource } from '../../model/GeographicTaxonomies';
 import { OnboardingFormData } from '../../model/OnboardingFormData';
 import { UoData } from '../../model/UoModel';
 import { MessageNoAction } from '../MessageNoAction';
@@ -33,6 +41,8 @@ import Heading from '../onboardingFormData/Heading';
 import { validateFields } from '../../utils/validateFields';
 import { handleGeotaxonomies } from '../../utils/handleGeotaxonomies';
 import { ENV } from '../../utils/env';
+import { InstitutionLocationData } from '../../model/InstitutionLocationData';
+import { formatCity } from '../../utils/formatting-utils';
 
 export type StepBillingDataHistoryState = {
   externalInstitutionId: string;
@@ -135,6 +145,7 @@ export default function StepOnboardingFormData({
     institutionType === 'PA';
   const [originId4Premium, setOriginId4Premium] = useState<string>();
   const [dpoData, setDpoData] = useState<DataProtectionOfficerDto>();
+  const [countries, setCountries] = useState<Array<InstitutionLocationData>>();
 
   const handleSearchByTaxCode = async (query: string) => {
     const searchResponse = await fetchWithLogs(
@@ -389,6 +400,44 @@ export default function StepOnboardingFormData({
     }
   };
 
+  const getCountriesFromGeotaxonomies = async (
+    query: string,
+    setCountries: Dispatch<SetStateAction<Array<InstitutionLocationData> | undefined>>
+  ) => {
+    const searchGeotaxonomy = await fetchWithLogs(
+      {
+        endpoint: 'ONBOARDING_GET_GEOTAXONOMY',
+      },
+      {
+        method: 'GET',
+        params: { description: query },
+      },
+      () => setRequiredLogin(true)
+    );
+    const outcome = getFetchOutcome(searchGeotaxonomy);
+
+    if (outcome === 'success') {
+      const geographicTaxonomies = (searchGeotaxonomy as AxiosResponse).data;
+
+      const mappedResponse = geographicTaxonomies.map((gt: GeographicTaxonomyResource) => ({
+        code: gt.code,
+        country: gt.country_abbreviation,
+        county: gt.province_abbreviation,
+        city: gt.desc,
+        istat_code: gt.istat_code,
+      })) as Array<InstitutionLocationData>;
+
+      const onlyCountries = mappedResponse
+        .filter((r) => r.city.includes('- COMUNE'))
+        .map((r) => ({
+          ...r,
+          city: formatCity(r.city),
+        }));
+
+      setCountries(onlyCountries);
+    }
+  };
+
   const verifyRecipientCodeIsValid = async (recipientCode: string, originId?: string) => {
     const getRecipientCodeValidation = await fetchWithLogs(
       {
@@ -459,6 +508,18 @@ export default function StepOnboardingFormData({
       void verifyRecipientCodeIsValid(formik.values.recipientCode, onboardingFormData?.originIdEc);
     }
   }, [formik.values.recipientCode]);
+
+  useEffect(() => {
+    if (formik.values.city && origin !== 'IPA') {
+      void getCountriesFromGeotaxonomies(formik.values.city, setCountries);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (countries && countries.length > 0 && origin !== 'IPA' && !formik.values.istatCode) {
+      void formik.setFieldValue('istatCode', countries[0].istat_code);
+    }
+  }, [countries]);
 
   const baseTextFieldProps = (
     field: keyof OnboardingFormData,
@@ -533,6 +594,9 @@ export default function StepOnboardingFormData({
           isPdndPrivate={isPdndPrivate}
           setInvalidTaxCodeInvoicing={setInvalidTaxCodeInvoicing}
           recipientCodeStatus={recipientCodeStatus}
+          getCountriesFromGeotaxonomies={getCountriesFromGeotaxonomies}
+          countries={countries}
+          setCountries={setCountries}
         />
 
         {!institutionAvoidGeotax && subProductId !== PRODUCT_IDS.DASHBOARD_PSP && (
