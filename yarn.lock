@@ -2073,10 +2073,10 @@
   resolved "https://registry.npmjs.org/@opentelemetry/semantic-conventions/-/semantic-conventions-1.28.0.tgz#337fb2bca0453d0726696e745f50064411f646d6"
   integrity sha512-lp4qAiMTD4sNWW4DbKLBkfiMZ4jbAboJIGOQr5DvciMRI494OapieI9qiODpOt0XBr1LjIDy1xAGAnVs5supTA==
 
-"@pagopa/mui-italia@^1.5.0", "@pagopa/mui-italia@^1.5.2":
-  version "1.5.2"
-  resolved "https://registry.yarnpkg.com/@pagopa/mui-italia/-/mui-italia-1.5.2.tgz#a3408efbe2cac697669ad147ffd7d8acaae57ee1"
-  integrity sha512-J4xPrrPSM3dK0gjpnmdjdoCreawWmf5mMfQYPOMWu9mhyc/YSqVSfrpkqK8Tvy83b+LnKgwLCuhviUXy8AqSLg==
+"@pagopa/mui-italia@^1.5.2", "@pagopa/mui-italia@^1.6.1":
+  version "1.6.1"
+  resolved "https://registry.yarnpkg.com/@pagopa/mui-italia/-/mui-italia-1.6.1.tgz#ffeb35bc58ee4702b4d9a7b5e7fe6b1634cd0902"
+  integrity sha512-v3O16kSn4JHDJiNVOHKYklIeVRACKpmxnqrj6o6Y8qtURycVJmiMHAGW7uoNbw2yK1+ymJ+C7MSoZphXijKPFA==
   dependencies:
     "@fontsource/dm-mono" "^4.5.10"
     "@fontsource/titillium-web" "^4.5.9"
@@ -2084,10 +2084,10 @@
     fp-ts "^2.12.3"
     io-ts "^2.2.18"
 
-"@pagopa/selfcare-common-frontend@^1.34.56":
-  version "1.34.56"
-  resolved "https://registry.yarnpkg.com/@pagopa/selfcare-common-frontend/-/selfcare-common-frontend-1.34.56.tgz#3ccc7d1c668718854dbdcfac37f040da1901a636"
-  integrity sha512-uUhZxv9Zo/BG02yO97ANRR4wIVD8uykEx/QY9ZacgnA8F9W3yMmN2pRKsAcTSnT1eam06IqBbcImMISmzjKuqA==
+"@pagopa/selfcare-common-frontend@^1.34.62":
+  version "1.34.62"
+  resolved "https://registry.yarnpkg.com/@pagopa/selfcare-common-frontend/-/selfcare-common-frontend-1.34.62.tgz#6e520ff11a01d01e508fda81ad9a600084217df3"
+  integrity sha512-Yu9RRLJWfXKvv+DS02Uo4w/JrFOOTjGVF+6TXENS2xLmZEo474rynNmN1mip65BZj+M4HMH969mc0XZ0/8Gkag==
   dependencies:
     "@emotion/react" "^11.11.1"
     "@emotion/styled" "^11.11.0"
@@ -2095,7 +2095,7 @@
     "@mui/lab" "^5.0.0-alpha.137"
     "@mui/material" "^5.14.1"
     "@mui/system" "^5.14.1"
-    "@pagopa/mui-italia" "^1.5.0"
+    "@pagopa/mui-italia" "^1.6.1"
     "@pagopa/ts-commons" "^13.1.2"
     "@reduxjs/toolkit" "^1.6.2"
     async "3.2.4"
