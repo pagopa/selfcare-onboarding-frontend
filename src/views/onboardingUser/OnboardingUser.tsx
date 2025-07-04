@@ -118,7 +118,9 @@ function OnboardingUserComponent() {
           origin:
             (onboardingFormData?.institutionType ?? institutionType) === 'SA'
               ? 'ANAC'
-              : ['PSP', 'GPU','PT','PRV'].includes((onboardingFormData?.institutionType ?? institutionType) as InstitutionType)
+              : ['PSP', 'GPU', 'PT', 'PRV'].includes(
+                    (onboardingFormData?.institutionType ?? institutionType) as InstitutionType
+                  ) && selectedProduct?.id !== 'prod-interop'
                 ? 'SELC'
                 : onboardingFormData?.origin,
           originId: onboardingFormData?.originId ?? onboardingFormData?.taxCode,
