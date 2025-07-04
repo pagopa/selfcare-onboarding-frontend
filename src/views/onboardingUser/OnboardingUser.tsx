@@ -115,8 +115,13 @@ function OnboardingUserComponent() {
         data: {
           productId: selectedProduct?.id,
           institutionType: onboardingFormData?.institutionType ?? institutionType,
-          origin: onboardingFormData?.origin,
-          originId: onboardingFormData?.originId,
+          origin:
+            (onboardingFormData?.institutionType ?? institutionType) === 'SA'
+              ? 'ANAC'
+              : ['PSP', 'GPU','PT','PRV'].includes((onboardingFormData?.institutionType ?? institutionType) as InstitutionType)
+                ? 'SELC'
+                : onboardingFormData?.origin,
+          originId: onboardingFormData?.originId ?? onboardingFormData?.taxCode,
           subunitCode: selectedParty?.codiceUniUo
             ? selectedParty.codiceUniUo
             : selectedParty?.codiceUniAoo,
@@ -244,10 +249,10 @@ function OnboardingUserComponent() {
           partyName: selectedParty?.codiceUniAoo
             ? selectedParty.denominazioneAoo
             : selectedParty?.codiceUniUo
-            ? selectedParty.descrizioneUo
-            : selectedParty?.businessName
-            ? selectedParty.businessName
-            : selectedParty?.description ?? '',
+              ? selectedParty.descrizioneUo
+              : selectedParty?.businessName
+                ? selectedParty.businessName
+                : (selectedParty?.description ?? ''),
           isTechPartner,
           forward: (newFormData: Partial<FormData>) => {
             const users = ((newFormData as any).users as Array<UserOnCreate>).map((u) => ({
