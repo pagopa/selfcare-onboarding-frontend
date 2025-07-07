@@ -188,6 +188,7 @@ export const PRODUCT_IDS = {
   IO_SIGN: 'prod-io-sign',
   FD: 'prod-fd',
   DASHBOARD_PSP: 'prod-dashboard-psp',
+  IDPAY_MERCHANT: 'prod-idpay-merchant',
 };
 
 export const requiredError = 'Required';
@@ -240,7 +241,7 @@ export const institutionTypes: Array<{ labelKey: string; value: InstitutionType 
 // eslint-disable-next-line sonarjs/cognitive-complexity
 export const institutionType4Product = (productId: string | undefined) => {
   switch (productId) {
-    case 'prod-interop':
+    case PRODUCT_IDS.INTEROP:
       return institutionTypes.filter(
         (it) =>
           it.labelKey === 'pa' ||
@@ -250,18 +251,18 @@ export const institutionType4Product = (productId: string | undefined) => {
           it.labelKey === 'as' ||
           (ENV.PRV.SHOW && it.labelKey === 'prv')
       );
-    case 'prod-pn':
+    case PRODUCT_IDS.SEND:
       return institutionTypes.filter((it) => it.labelKey === 'pa');
-    case 'prod-idpay':
+    case PRODUCT_IDS.IDPAY:
       return institutionTypes.filter((it) => it.labelKey === 'pa');
-    case 'prod-io':
+    case PRODUCT_IDS.IO:
       return institutionTypes.filter(
         (it) =>
           it.labelKey === 'pa' ||
           it.labelKey === 'gsp' ||
           (ENV.PT.SHOW_PT ? it.labelKey === 'pt' : '')
       );
-    case 'prod-pagopa':
+    case PRODUCT_IDS.PAGOPA:
       // Temporary re-enabled psp radiobutton for prod-pagopa only for dev environment.
       return institutionTypes.filter(
         (it) =>
@@ -272,8 +273,10 @@ export const institutionType4Product = (productId: string | undefined) => {
           (ENV.PT.SHOW_PT ? it.labelKey === 'pt' : '') ||
           (ENV.PURE_PRV.SHOW ? it.labelKey === 'oth' : '')
       );
-    case 'prod-io-sign':
+    case PRODUCT_IDS.IO_SIGN:
       return institutionTypes.filter((it) => it.labelKey === 'pa' || it.labelKey === 'gsp');
+    case PRODUCT_IDS.IDPAY_MERCHANT:
+      return institutionTypes.filter((it) => it.labelKey === 'prv');
     default:
       return institutionTypes.filter(
         (it) => it.labelKey === 'pa' || it.labelKey === 'gsp' || it.labelKey === 'scp'
