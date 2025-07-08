@@ -1106,6 +1106,11 @@ export const mockedProducts: Array<Product> = [
     title: 'SEND_DEV',
     status: statusActive,
   },
+  {
+    id: 'prod-idpay-merchant',
+    title: 'IDPay - Esercenti',
+    status: statusActive,
+  }
 ];
 
 export const institutionTypes: Array<InstitutionType> = [

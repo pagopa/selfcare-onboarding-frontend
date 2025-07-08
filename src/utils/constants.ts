@@ -193,6 +193,7 @@ export const PRODUCT_IDS = {
   IO_PREMIUM: 'prod-io-premium',
   CIBAN: 'prod-ciban',
   CGN: 'prod-cgn',
+  IDPAY_MERCHANT: 'prod-idpay-merchant',
 };
 
 export const requiredError = 'Required';
@@ -279,6 +280,8 @@ export const institutionType4Product = (productId: string | undefined) => {
       );
     case PRODUCT_IDS.IO_SIGN:
       return institutionTypes.filter((it) => it.labelKey === 'pa' || it.labelKey === 'gsp');
+    case PRODUCT_IDS.IDPAY_MERCHANT:
+      return institutionTypes.filter((it) => it.labelKey === 'prv');
     default:
       return institutionTypes.filter(
         (it) => it.labelKey === 'pa' || it.labelKey === 'gsp' || it.labelKey === 'scp'

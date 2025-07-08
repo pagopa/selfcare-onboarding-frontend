@@ -193,6 +193,10 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     if (productAvoidStep) {
       forwardWithInstitutionType('PA');
     }
+
+    if (selectedProduct?.id === 'prod-idpay-merchant') {
+      setActiveStep(1);
+    }
   }, [selectedProduct]);
 
   useEffect(() => {

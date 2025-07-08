@@ -47,6 +47,9 @@ test('Test: The correct institution types with the expected descriptions, can be
         case PRODUCT_IDS.SEND:
           expect(institutionTypeValues).toStrictEqual(['PA']);
           break;
+        case 'prod-idpay-merchant':
+          expect(institutionTypeValues).toStrictEqual(['PRV']);
+          break;
         case PRODUCT_IDS.INTEROP:
           expect(institutionTypeValues).toStrictEqual(['PA', 'GSP', 'SCP', 'SA', 'AS', 'PRV']);
           break;
