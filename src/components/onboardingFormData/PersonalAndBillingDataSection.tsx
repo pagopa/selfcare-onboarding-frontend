@@ -20,7 +20,7 @@ import { formatCity } from '../../utils/formatting-utils';
 import { StepBillingDataHistoryState } from '../steps/StepOnboardingFormData';
 import { ENV } from '../../utils/env';
 import { CountryResource } from '../../model/CountryResource';
-import { requiredError } from '../../utils/constants';
+import { PRODUCT_IDS, requiredError } from '../../utils/constants';
 import { mockedCountries } from '../../lib/__mocks__/mockApiRequests';
 import { AssistanceContacts } from '../../model/AssistanceContacts';
 import NumberDecimalFormat from './NumberDecimalFormat';
@@ -447,7 +447,7 @@ export default function PersonalAndBillingDataSection({
                 isContractingAuthority ||
                 isInsuranceCompany ||
                 (isInformationCompany && onboardingFormData?.businessName) ||
-                (institutionType === 'PRV' && productId !== 'prod-pagopa')
+                (institutionType === 'PRV' && productId !== PRODUCT_IDS.PAGOPA)
               }
             />
           </Grid>
@@ -710,7 +710,7 @@ export default function PersonalAndBillingDataSection({
               isContractingAuthority ||
               isInsuranceCompany ||
               (isInformationCompany && onboardingFormData?.digitalAddress) ||
-              (institutionType === 'PRV' && productId !== 'prod-pagopa')
+              (institutionType === 'PRV' && productId !== PRODUCT_IDS.PAGOPA)
             }
           />
         </Grid>
@@ -733,7 +733,7 @@ export default function PersonalAndBillingDataSection({
                 isContractingAuthority ||
                 isInsuranceCompany ||
                 (isInformationCompany && onboardingFormData?.taxCode) ||
-                (institutionType === 'PRV' && productId !== 'prod-pagopa')
+                (institutionType === 'PRV' && productId !== PRODUCT_IDS.PAGOPA)
               }
               inputProps={{
                 maxLength: 11,
@@ -791,7 +791,7 @@ export default function PersonalAndBillingDataSection({
                   </Box>
                 </Grid>
               )}
-            {productId !== 'prod-fd' && productId !== 'prod-fd-garantito' && (
+            {productId !== PRODUCT_IDS.FD && productId !== PRODUCT_IDS.FD_GARANTITO && (
               <Grid item>
                 <Box
                   display="flex"
@@ -975,7 +975,7 @@ export default function PersonalAndBillingDataSection({
         )}
         {(isInformationCompany ||
           isContractingAuthority ||
-          ((productId === 'prod-interop' || productId === 'prod-pagopa') &&
+          ((productId === PRODUCT_IDS.INTEROP || productId === PRODUCT_IDS.PAGOPA) &&
             (institutionType === 'SCP' ||
               institutionType === 'PRV' ||
               institutionType === 'GPU'))) && (
@@ -1003,7 +1003,7 @@ export default function PersonalAndBillingDataSection({
                 placeholder={'RM-123456'}
                 {...baseTextFieldProps(
                   'rea',
-                  institutionType === 'PRV' && productId === 'prod-pagopa'
+                  institutionType === 'PRV' && productId === PRODUCT_IDS.PAGOPA
                     ? t('onboardingFormData.billingDataSection.informationCompanies.rea')
                     : t('onboardingFormData.billingDataSection.informationCompanies.requiredRea'),
                   600,
@@ -1116,11 +1116,11 @@ export default function PersonalAndBillingDataSection({
         {!institutionAvoidGeotax && (
           <Grid item xs={12}>
             <CustomTextFieldNotched
-              paddingValue={productId === 'prod-io-sign' ? '14px' : '20px'}
+              paddingValue={productId === PRODUCT_IDS.IO_SIGN ? '14px' : '20px'}
               {...baseTextFieldProps(
                 'supportEmail',
                 t(
-                  productId === 'prod-io-sign'
+                  productId === PRODUCT_IDS.IO_SIGN
                     ? 'onboardingFormData.billingDataSection.assistanceContact.supportEmail'
                     : 'onboardingFormData.billingDataSection.assistanceContact.supportEmailOptional'
                 ),

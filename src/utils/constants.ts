@@ -183,11 +183,16 @@ export const PRODUCT_IDS = {
   PAGOPA: 'prod-pagopa',
   IO: 'prod-io',
   SEND: 'prod-pn',
+  SEND_DEV: 'prod-pn-dev',
   INTEROP: 'prod-interop',
   IDPAY: 'prod-idpay',
   IO_SIGN: 'prod-io-sign',
   FD: 'prod-fd',
+  FD_GARANTITO: 'prod-fd-garantito',
   DASHBOARD_PSP: 'prod-dashboard-psp',
+  IO_PREMIUM: 'prod-io-premium',
+  CIBAN: 'prod-ciban',
+  CGN: 'prod-cgn',
 };
 
 export const requiredError = 'Required';
@@ -206,21 +211,21 @@ export const canInvoice = (institutionType?: string, productId?: string) =>
   institutionType !== 'SA' &&
   institutionType !== 'PT' &&
   institutionType !== 'AS' &&
-  productId !== 'prod-interop';
+  productId !== PRODUCT_IDS.INTEROP;
 
 export const noMandatoryIpaProducts = (productId?: string) =>
-  productId !== 'prod-interop' &&
-  productId !== 'prod-io' &&
-  productId !== 'prod-io-sign' &&
-  productId !== 'prod-idpay' &&
-  !productId?.includes('prod-pn');
+  productId !== PRODUCT_IDS.INTEROP &&
+  productId !== PRODUCT_IDS.IO &&
+  productId !== PRODUCT_IDS.IO_SIGN &&
+  productId !== PRODUCT_IDS.IDPAY &&
+  !productId?.includes(PRODUCT_IDS.SEND);
 
 export const addUserFlowProducts = (productId: string) =>
-  productId === 'prod-interop' ||
-  productId === 'prod-pn' ||
-  productId === 'prod-io' ||
-  productId === 'prod-io-sign' ||
-  productId === 'prod-pagopa';
+  productId === PRODUCT_IDS.INTEROP ||
+  productId === PRODUCT_IDS.SEND ||
+  productId === PRODUCT_IDS.IO ||
+  productId === PRODUCT_IDS.IO_SIGN ||
+  productId === PRODUCT_IDS.PAGOPA;
 
 export const institutionTypes: Array<{ labelKey: string; value: InstitutionType }> = [
   { labelKey: 'pa', value: 'PA' },
@@ -240,7 +245,7 @@ export const institutionTypes: Array<{ labelKey: string; value: InstitutionType 
 // eslint-disable-next-line sonarjs/cognitive-complexity
 export const institutionType4Product = (productId: string | undefined) => {
   switch (productId) {
-    case 'prod-interop':
+    case PRODUCT_IDS.INTEROP:
       return institutionTypes.filter(
         (it) =>
           it.labelKey === 'pa' ||
@@ -250,18 +255,18 @@ export const institutionType4Product = (productId: string | undefined) => {
           it.labelKey === 'as' ||
           (ENV.PRV.SHOW && it.labelKey === 'prv')
       );
-    case 'prod-pn':
+    case PRODUCT_IDS.SEND:
       return institutionTypes.filter((it) => it.labelKey === 'pa');
-    case 'prod-idpay':
+    case PRODUCT_IDS.IDPAY:
       return institutionTypes.filter((it) => it.labelKey === 'pa');
-    case 'prod-io':
+    case PRODUCT_IDS.IO:
       return institutionTypes.filter(
         (it) =>
           it.labelKey === 'pa' ||
           it.labelKey === 'gsp' ||
           (ENV.PT.SHOW_PT ? it.labelKey === 'pt' : '')
       );
-    case 'prod-pagopa':
+    case PRODUCT_IDS.PAGOPA:
       // Temporary re-enabled psp radiobutton for prod-pagopa only for dev environment.
       return institutionTypes.filter(
         (it) =>
@@ -272,7 +277,7 @@ export const institutionType4Product = (productId: string | undefined) => {
           (ENV.PT.SHOW_PT ? it.labelKey === 'pt' : '') ||
           (ENV.PURE_PRV.SHOW ? it.labelKey === 'oth' : '')
       );
-    case 'prod-io-sign':
+    case PRODUCT_IDS.IO_SIGN:
       return institutionTypes.filter((it) => it.labelKey === 'pa' || it.labelKey === 'gsp');
     default:
       return institutionTypes.filter(

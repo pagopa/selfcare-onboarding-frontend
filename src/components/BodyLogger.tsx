@@ -6,7 +6,7 @@ import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyt
 import i18n from '@pagopa/selfcare-common-frontend/lib/locale/locale-utils';
 import { logAction } from '../lib/action-log';
 import { ENV } from '../utils/env';
-import { ROUTES } from '../utils/constants';
+import { PRODUCT_IDS, ROUTES } from '../utils/constants';
 import { Main } from './Main';
 import { HeaderContext, UserContext } from './../lib/context';
 
@@ -22,9 +22,9 @@ export function BodyLogger() {
   useEffect(() => {
     if (location.pathname === '/onboarding/prod-io-premium') {
       history.push(
-        ROUTES.ONBOARDING_PREMIUM.PATH.replace(':productId', 'prod-io').replace(
+        ROUTES.ONBOARDING_PREMIUM.PATH.replace(':productId', PRODUCT_IDS.IO).replace(
           ':subProductId',
-          'prod-io-premium'
+          PRODUCT_IDS.IO_PREMIUM
         )
       );
     }

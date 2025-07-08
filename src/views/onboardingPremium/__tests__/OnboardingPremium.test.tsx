@@ -17,6 +17,7 @@ import {
 } from '../../../utils/test-utils';
 import { createStore } from '../../../redux/store';
 import { Provider } from 'react-redux';
+import { PRODUCT_IDS } from '../../../utils/constants';
 
 jest.setTimeout(20000);
 
@@ -63,8 +64,8 @@ afterAll(() => {
 });
 
 const renderComponent = (
-  productId: string = 'prod-io',
-  subProductId: string = 'prod-io-premium',
+  productId: string = PRODUCT_IDS.IO,
+  subProductId: string = PRODUCT_IDS.IO_PREMIUM,
   injectedHistory?: ReturnType<typeof createMemoryHistory>,
   injectedStore?: ReturnType<typeof createStore>
 ) => {
@@ -116,7 +117,7 @@ const stepBillingDataTitle = 'Inserisci i dati dell’ente';
 const stepAddManagerTitle = 'Indica il Legale Rappresentante';
 
 test('Test: Bad productId and subProductId for prod-io-premium', async () => {
-  renderComponent('prod-io', 'prod-io');
+  renderComponent(PRODUCT_IDS.IO, PRODUCT_IDS.IO);
   await waitFor(() => {
     expect(fetchWithLogsSpy).toHaveBeenCalledTimes(4);
     screen.findByText('Qualcosa è andato storto');
@@ -124,7 +125,7 @@ test('Test: Bad productId and subProductId for prod-io-premium', async () => {
 });
 
 test('Test: Bad productId and subProductId for prod-dashboard-psp', async () => {
-  renderComponent('prod-pagopa', 'prod-pagopa');
+  renderComponent(PRODUCT_IDS.PAGOPA, PRODUCT_IDS.PAGOPA);
   await waitFor(() => {
     expect(fetchWithLogsSpy).toHaveBeenCalledTimes(4);
     screen.findByText('Qualcosa è andato storto');
@@ -132,7 +133,7 @@ test('Test: Bad productId and subProductId for prod-dashboard-psp', async () => 
 });
 
 test('Test: Error retrieving onboarding info for prod-io-premium', async () => {
-  renderComponent('prod-io', 'prod-io-premium');
+  renderComponent(PRODUCT_IDS.IO, PRODUCT_IDS.IO_PREMIUM);
   // // await executeStepSelectPricingPlan();
   await executeStepSelectInstitution('Comune di Gessate');
   await waitFor(() => screen.getByText('Qualcosa è andato storto'));
@@ -140,25 +141,25 @@ test('Test: Error retrieving onboarding info for prod-io-premium', async () => {
 });
 
 test('Test: Successfully complete onboarding request for prod-io-premium', async () => {
-  renderComponent('prod-io', 'prod-io-premium');
+  renderComponent(PRODUCT_IDS.IO, PRODUCT_IDS.IO_PREMIUM);
   await executeStepSelectInstitution('Comune di Milano');
-  await executeStepBillingDataWithTaxCodeInvoicing('prod-io-premium');
+  await executeStepBillingDataWithTaxCodeInvoicing(PRODUCT_IDS.IO_PREMIUM);
   await executeStepAddManager(false, true, true, fetchWithLogsSpy);
   await executeClickCloseButton(true);
   await verifySubmitPostLegalsIoPremium(fetchWithLogsSpy);
 });
 
 test('Test: Successfully complete onboarding request for prod-dashboard-psp', async () => {
-  renderComponent('prod-pagopa', 'prod-dashboard-psp');
+  renderComponent(PRODUCT_IDS.PAGOPA, );
   await executeStepSelectInstitution('Banca del Monte di Lucca S.p.A.');
-  await executeStepBillingDataWithTaxCodeInvoicing('prod-dashboard-psp');
+  await executeStepBillingDataWithTaxCodeInvoicing(PRODUCT_IDS.DASHBOARD_PSP);
   await executeStepAddManager(false, true, true, fetchWithLogsSpy);
   await executeClickCloseButton(true);
   await verifySubmitPostLegalsPspDashBoard(fetchWithLogsSpy);
 });
 
 test('Test: Complete onboarding request with error on submit', async () => {
-  renderComponent('prod-io', 'prod-io-premium');
+  renderComponent(PRODUCT_IDS.IO, PRODUCT_IDS.IO_PREMIUM);
   await executeStepSelectInstitution('Comune di Udine');
   await executeStepBillingDataWithoutTaxCodeInvoicing();
   await executeStepAddManager(false, true, false, fetchWithLogsSpy);
@@ -166,7 +167,7 @@ test('Test: Complete onboarding request with error on submit', async () => {
 });
 
 test('Test: exiting during flow with unload event', async () => {
-  renderComponent('prod-io', 'prod-io-premium');
+  renderComponent(PRODUCT_IDS.IO, PRODUCT_IDS.IO_PREMIUM);
   await executeStepSelectInstitution('Comune di Milano');
   const event = new Event('beforeunload');
   window.dispatchEvent(event);
@@ -208,7 +209,7 @@ const executeStepBillingDataWithTaxCodeInvoicing = async (subProductId: string) 
 
   const confirmButtonEnabled = screen.getByLabelText('Continua');
 
-  if (subProductId === 'prod-io-premium') {
+  if (subProductId === PRODUCT_IDS.IO_PREMIUM) {
     fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
       target: { value: '' },
     });
