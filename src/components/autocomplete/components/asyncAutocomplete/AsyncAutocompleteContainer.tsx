@@ -115,10 +115,10 @@ export default function AsyncAutocompleteContainer({
       ? isBusinessNameSelected
         ? input.length < 3
         : isTaxCodeSelected
-        ? input.length < 11
-        : isAooCodeSelected
-        ? !!aooResult
-        : !!uoResult
+          ? input.length < 11
+          : isAooCodeSelected
+            ? !!aooResult
+            : !!uoResult
       : !selected;
 
   useEffect(() => {
@@ -199,6 +199,7 @@ export default function AsyncAutocompleteContainer({
     const outcome = getFetchOutcome(searchResponse);
 
     if (outcome === 'success') {
+      console.log('Visure response', (searchResponse as AxiosResponse).data);
       setCfResult((searchResponse as AxiosResponse).data);
     } else if ((searchResponse as AxiosError).response?.status === 404) {
       setCfResult(undefined);
@@ -235,7 +236,7 @@ export default function AsyncAutocompleteContainer({
 
     if (outcome === 'success') {
       const response = addUser
-        ? (searchResponse as AxiosResponse).data[0] ?? (searchResponse as AxiosResponse).data
+        ? ((searchResponse as AxiosResponse).data[0] ?? (searchResponse as AxiosResponse).data)
         : (searchResponse as AxiosResponse).data;
       setAooResult(response);
       setAooResultHistory(response);
@@ -274,7 +275,7 @@ export default function AsyncAutocompleteContainer({
 
     if (outcome === 'success') {
       const response = addUser
-        ? (searchResponse as AxiosResponse).data[0] ?? (searchResponse as AxiosResponse).data
+        ? ((searchResponse as AxiosResponse).data[0] ?? (searchResponse as AxiosResponse).data)
         : (searchResponse as AxiosResponse).data;
       setUoResult(response);
       setUoResultHistory(response);
@@ -299,8 +300,8 @@ export default function AsyncAutocompleteContainer({
         endpointParams: addUser
           ? undefined
           : institutionType === 'SA' || institutionType === 'AS'
-          ? { taxId: query }
-          : { code: query },
+            ? { taxId: query }
+            : { code: query },
       },
       {
         method: 'GET',
@@ -312,7 +313,7 @@ export default function AsyncAutocompleteContainer({
     const outcome = getFetchOutcome(searchResponse);
     if (outcome === 'success') {
       const response = addUser
-        ? (searchResponse as AxiosResponse).data[0] ?? (searchResponse as AxiosResponse).data
+        ? ((searchResponse as AxiosResponse).data[0] ?? (searchResponse as AxiosResponse).data)
         : (searchResponse as AxiosResponse).data;
       setCfResult(response);
     } else if ((searchResponse as AxiosError).response?.status === 404) {
@@ -387,17 +388,19 @@ export default function AsyncAutocompleteContainer({
           const endpoint = addUser
             ? 'ONBOARDING_GET_INSTITUTIONS'
             : institutionType === 'SA'
-            ? 'ONBOARDING_GET_SA_PARTY_FROM_FC'
-            : 'ONBOARDING_GET_INSURANCE_COMPANIES_FROM_IVASSCODE';
+              ? 'ONBOARDING_GET_SA_PARTY_FROM_FC'
+              : 'ONBOARDING_GET_INSURANCE_COMPANIES_FROM_IVASSCODE';
 
           void contractingInsuranceFromTaxId(addUser, endpoint, params, value);
         } else {
           const endpoint = addUser
             ? 'ONBOARDING_GET_INSTITUTIONS'
             : product?.id === 'prod-interop' &&
-              (institutionType === 'SCP' || institutionType === 'PRV')
-            ? 'ONBOARDING_GET_PARTY_BY_CF_FROM_INFOCAMERE'
-            : 'ONBOARDING_GET_PARTY_FROM_CF';
+                (institutionType === 'SCP' || institutionType === 'PRV')
+              ? 'ONBOARDING_GET_PARTY_BY_CF_FROM_INFOCAMERE'
+              : product?.id === 'prod-idpay-merchant'
+                ? 'ONBOARDING_GET_VISURA_INFOCAMERE_BY_CF'
+                : 'ONBOARDING_GET_PARTY_FROM_CF';
           void handleSearchByTaxCode(addUser, endpoint, params, value);
         }
       } else if (isAooCodeSelected && !isUoCodeSelected && value.length === 7) {

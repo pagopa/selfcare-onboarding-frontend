@@ -109,7 +109,7 @@ export default function PartyAdvancedSelect({
   }, []);
 
   useEffect(() => {
-    if (addUser || (product?.id === 'prod-interop' && (institutionType === 'SCP' || institutionType === 'PRV'))) {
+    if (addUser || ((product?.id === 'prod-interop' || product?.id === 'prod-idpay-merchant') && (institutionType === 'SCP' || institutionType === 'PRV'))) {
       setTypeOfSearch('taxCode');
       setIsTaxCodeSelected(true);
     } else {

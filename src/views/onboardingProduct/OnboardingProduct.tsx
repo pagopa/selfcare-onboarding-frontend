@@ -194,7 +194,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     }
 
     if (selectedProduct?.id === 'prod-idpay-merchant') {
-      setActiveStep(1);
+      forwardWithInstitutionType('PRV');
     }
   }, [selectedProduct]);
 
