@@ -194,7 +194,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
       forwardWithInstitutionType('PA');
     }
 
-    if (selectedProduct?.id === 'prod-idpay-merchant') {
+    if (selectedProduct?.id === PRODUCT_IDS.IDPAY_MERCHANT) {
       setActiveStep(1);
     }
   }, [selectedProduct]);
