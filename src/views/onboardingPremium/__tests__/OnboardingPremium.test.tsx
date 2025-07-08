@@ -150,7 +150,7 @@ test('Test: Successfully complete onboarding request for prod-io-premium', async
 });
 
 test('Test: Successfully complete onboarding request for prod-dashboard-psp', async () => {
-  renderComponent(PRODUCT_IDS.PAGOPA, );
+  renderComponent(PRODUCT_IDS.PAGOPA, PRODUCT_IDS.DASHBOARD_PSP);
   await executeStepSelectInstitution('Banca del Monte di Lucca S.p.A.');
   await executeStepBillingDataWithTaxCodeInvoicing(PRODUCT_IDS.DASHBOARD_PSP);
   await executeStepAddManager(false, true, true, fetchWithLogsSpy);

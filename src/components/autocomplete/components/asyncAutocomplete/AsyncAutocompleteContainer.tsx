@@ -18,7 +18,7 @@ import { getFetchOutcome } from '../../../../lib/error-utils';
 import { AooData } from '../../../../model/AooData';
 import { UoData } from '../../../../model/UoModel';
 import { ENV } from '../../../../utils/env';
-import { buildUrlLogo, noMandatoryIpaProducts } from '../../../../utils/constants';
+import { buildUrlLogo, noMandatoryIpaProducts, PRODUCT_IDS } from '../../../../utils/constants';
 import AsyncAutocompleteResultsBusinessName from './components/AsyncAutocompleteResultsBusinessName';
 import AsyncAutocompleteResultsCode from './components/AsyncAutocompleteResultsCode';
 import AsyncAutocompleteSearch from './components/AsyncAutocompleteSearch';

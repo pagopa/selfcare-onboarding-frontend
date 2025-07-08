@@ -15,7 +15,7 @@ import {
 import { BillingDataDto } from '../../model/BillingData';
 import { GeographicTaxonomyResource, nationalValue } from '../../model/GeographicTaxonomies';
 import { UoData } from '../../model/UoModel';
-import { addUserFlowProducts, PRODUCT_IDS } from '../../utils/constants';
+import { addUserFlowProducts } from '../../utils/constants';
 import { CountryResource } from '../../model/CountryResource';
 import { AooData } from './../../model/AooData';
 import { OnboardedParty } from './../../model/OnboardedParty';
@@ -1020,7 +1020,7 @@ const mockedOnboardedParties: Array<OnboardedParty> = [
     institutionType: 'PA',
     origin: 'IPA',
     originId: 'sdsdee',
-    productId: PRODUCT_IDS.IO,
+    productId: 'prod-io',
     taxCode: '00000000000',
   },
   {
@@ -1029,7 +1029,7 @@ const mockedOnboardedParties: Array<OnboardedParty> = [
     institutionType: 'PA',
     origin: 'IPA',
     originId: 'sdsdee',
-    productId: PRODUCT_IDS.IO,
+    productId: 'prod-io',
     taxCode: '00000000000',
     subunitCode: 'AAA111',
   },
@@ -1040,69 +1040,69 @@ const statusTesting = 'TESTING';
 
 export const mockedProducts: Array<Product> = [
   {
-    id: PRODUCT_IDS.SEND,
+    id: 'prod-pn',
     title: 'SEND - Servizio Notifiche digitali',
     status: statusActive,
   },
   {
-    id: PRODUCT_IDS.PAGOPA,
+    id: 'prod-pagopa',
     title: 'Piattaforma pagoPA',
     status: statusActive,
   },
   {
-    id: PRODUCT_IDS.IO,
+    id: 'prod-io',
     title: 'IO',
     status: statusActive,
   },
   {
-    id: PRODUCT_IDS.IO_PREMIUM,
+    id: 'prod-io-premium',
     title: 'IO Premium',
-    parentId: PRODUCT_IDS.IO,
+    parentId: 'prod-io',
     status: statusActive,
   },
   {
-    id: PRODUCT_IDS.DASHBOARD_PSP,
+    id: 'prod-dashboard-psp',
     title: 'pagoPA Insights',
-    parentId: PRODUCT_IDS.PAGOPA,
+    parentId: 'prod-pagopa',
     status: statusActive,
   },
   {
-    id: PRODUCT_IDS.IO_SIGN,
+    id: 'prod-io-sign',
     title: 'Firma con IO',
     status: statusTesting, // Use case for not allowed onboarding
   },
   {
-    id: PRODUCT_IDS.CIBAN,
+    id: 'prod-ciban',
     title: 'Check-IBAN',
     status: statusTesting, // Use case for not allowed onboarding
   },
   {
-    id: PRODUCT_IDS.INTEROP,
+    id: 'prod-interop',
     title: 'Interoperabilità',
     status: statusActive,
   },
   {
-    id: PRODUCT_IDS.IDPAY,
+    id: 'prod-idpay',
     title: 'IdPay',
     status: statusActive,
   },
   {
-    id: PRODUCT_IDS.CGN,
+    id: 'prod-cgn',
     title: 'Carta Giovani',
     status: statusActive,
   },
   {
-    id: PRODUCT_IDS.FD,
+    id: 'prod-fd',
     title: 'Fideiussioni',
     status: statusActive,
   },
   {
-    id: PRODUCT_IDS.FD_GARANTITO,
+    id: 'prod-fd-garantito',
     title: 'Fideiussioni',
     status: statusActive,
   },
   {
-    id: PRODUCT_IDS.SEND_DEV,
+    id: 'prod-pn-dev',
     title: 'SEND_DEV',
     status: statusActive,
   },
@@ -1219,25 +1219,25 @@ const mockedResponseError = {
 const mockedOnboardingRequestData: Array<OnboardingRequestData> = [
   // Already approved onboarding request not expired
   {
-    productId: PRODUCT_IDS.PAGOPA,
+    productId: 'prod-pagopa',
     status: 'COMPLETED',
     expiringDate: '2030-02-31T01:30:00.000-05:00',
   },
   // Already rejected onboarding request not expired
   {
-    productId: PRODUCT_IDS.PAGOPA,
+    productId: 'prod-pagopa',
     status: 'REJECTED',
     expiringDate: '2030-02-31T09:30:00.000-08:00',
   },
   // Pending onboarding request not expired
   {
-    productId: PRODUCT_IDS.PAGOPA,
+    productId: 'prod-pagopa',
     status: 'PENDING',
     expiringDate: '2030-04-31T01:30:00.000-05:00',
   },
   // Expired onboarding request
   {
-    productId: PRODUCT_IDS.PAGOPA,
+    productId: 'prod-pagopa',
     status: 'PENDING',
     expiringDate: '2024-02-31T09:30:00.000-08:00',
   },
@@ -1458,7 +1458,7 @@ export async function mockFetch(
         return notFoundError;
       // Use case for test already subscribed premium
       case 'externalId2':
-        if (params.productId.includes(PRODUCT_IDS.IO || PRODUCT_IDS.IO_PREMIUM)) {
+        if (params.productId === 'prod-io' || params.productId === 'prod-io-premium') {
           return noContent;
         } else {
           return notFoundError;
@@ -1503,7 +1503,7 @@ export async function mockFetch(
 
   if (endpoint === 'ONBOARDING_GET_ONBOARDING_DATA') {
     if (
-      params.productId === PRODUCT_IDS.PAGOPA &&
+      params.productId === 'prod-pagopa' &&
       (params.institutionId === '886755' || params.institutionId === '54557')
     ) {
       switch (params.institutionId) {
@@ -1627,7 +1627,7 @@ export async function mockFetch(
 
   if (endpoint === 'ONBOARDING_NEW_USER') {
     switch ((data as any).productId) {
-      case PRODUCT_IDS.IO:
+      case 'prod-io':
         return badRequestError;
       default:
         return new Promise((resolve) =>
@@ -1675,7 +1675,7 @@ export async function mockFetch(
       return new Promise((resolve) =>
         resolve({
           data:
-            params.productId === PRODUCT_IDS.DASHBOARD_PSP ? mockedBasePspParties : mockedBaseParties,
+            params.productId === 'prod-dashboard-psp' ? mockedBasePspParties : mockedBaseParties,
           status: 200,
           statusText: '200',
         } as AxiosResponse)
