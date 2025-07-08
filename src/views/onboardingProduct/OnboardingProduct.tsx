@@ -100,7 +100,9 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
   const [onExitAction, setOnExitAction] = useState<(() => void) | undefined>();
 
   const productAvoidStep =
-    selectedProduct?.id === PRODUCT_IDS.SEND || selectedProduct?.id === PRODUCT_IDS.IDPAY;
+    selectedProduct !== null &&
+    selectedProduct !== undefined &&
+    selectedProduct.id.includes(PRODUCT_IDS.SEND || PRODUCT_IDS.IDPAY);
 
   const fromDashboard =
     window.location.search.indexOf(`partyExternalId=${externalInstitutionId}`) > -1;
@@ -213,8 +215,8 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
   }, []);
 
   const selectFilterCategories = () => {
-    if (productId === PRODUCT_IDS.SEND) {
-      return filterCategoriesResponse?.product[PRODUCT_IDS.SEND].ipa.PA;
+    if (productId === 'prod-pn') {
+      return filterCategoriesResponse?.product['prod-pn']?.ipa.PA;
     } else if (institutionType === 'GSP') {
       return filterCategoriesResponse?.product.default.ipa.GSP;
     } else {
@@ -558,10 +560,10 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           origin:
             institutionType === 'SA'
               ? 'ANAC'
-              : (institutionType === 'PSP' ||
+              : institutionType === 'PSP' ||
                   institutionType === 'GPU' ||
                   institutionType === 'PT' ||
-                  (institutionType === 'PRV' && productId !== PRODUCT_IDS.INTEROP))
+                  (institutionType === 'PRV' && productId !== PRODUCT_IDS.INTEROP)
                 ? 'SELC'
                 : origin,
           istatCode: origin !== 'IPA' ? onboardingFormData?.istatCode : undefined,
