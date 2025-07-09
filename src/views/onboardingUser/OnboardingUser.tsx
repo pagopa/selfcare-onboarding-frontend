@@ -27,6 +27,7 @@ import { unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
 import { selected2OnboardingData } from '../../utils/selected2OnboardingData';
 import { LoadingOverlay } from '../../components/LoadingOverlay';
 import { ProductResource } from '../../model/ProductResource';
+import { PRODUCT_IDS } from '../../utils/constants';
 import { StepSelectProduct } from './components/StepSelectProduct';
 import StepSearchOnboardedParty from './components/StepSearchOnboardedParty';
 
@@ -120,7 +121,7 @@ function OnboardingUserComponent() {
               ? 'ANAC'
               : ['PSP', 'GPU', 'PT', 'PRV'].includes(
                     (onboardingFormData?.institutionType ?? institutionType) as InstitutionType
-                  ) && selectedProduct?.id !== 'prod-interop'
+                  ) && selectedProduct?.id !== PRODUCT_IDS.INTEROP
                 ? 'SELC'
                 : onboardingFormData?.origin,
           originId: onboardingFormData?.originId ?? onboardingFormData?.taxCode,

@@ -7,6 +7,7 @@ import {
   stepAddManager,
   stepAddAdmin,
 } from '../utils/test-utils';
+import { PRODUCT_IDS } from '../../src/utils/constants';
 
 test('Test Success onboarding request for product prod-interop and institutionType SA', async ({
   page,
@@ -14,7 +15,7 @@ test('Test Success onboarding request for product prod-interop and institutionTy
   await page.goto(`${BASE_URL_ONBOARDING}/prod-interop`);
   await stepInstitutionType(page, 'Società di assicurazione');
   await stepSelectParty(page, undefined, 'GENERALI ITALIA S.P.A.');
-  await stepFormData(page, 'prod-interop', 'SA');
+  await stepFormData(page, PRODUCT_IDS.INTEROP, 'SA');
   await stepAddManager(page);
   await stepAddAdmin(page);
 });

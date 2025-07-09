@@ -22,7 +22,7 @@ import { nationalValue } from '../model/GeographicTaxonomies';
 import { store } from '../redux/store';
 import { HeaderContext, UserContext } from './../lib/context';
 import { ENV } from './env';
-import { canInvoice } from './constants';
+import { canInvoice, PRODUCT_IDS } from './constants';
 
 export type Source =
   | 'IPA'
@@ -36,7 +36,7 @@ export type Search = 'businessName' | 'taxCode' | 'aooCode' | 'uoCode' | 'ivassC
 
 export const renderComponentWithProviders = (
   component: React.ReactElement,
-  productId: string = 'prod-pn',
+  productId: string = PRODUCT_IDS.SEND,
   injectedHistory?: ReturnType<typeof createMemoryHistory>
 ) => {
   const Component = () => {
@@ -474,7 +474,7 @@ export const billingData2billingDataRequest = (
 });
 
 export const verifySubmit = async (
-  productId: string = 'prod-io',
+  productId: string = PRODUCT_IDS.IO,
   institutionType: string,
   fetchWithLogsSpy: jest.SpyInstance<any, any, any>,
   from?: Source,
@@ -523,7 +523,7 @@ export const verifySubmit = async (
                         institutionType === 'PSP' ||
                         institutionType === 'GPU' ||
                         institutionType === 'PT' ||
-                        (institutionType === 'PRV' && productId !== 'prod-interop') ||
+                        (institutionType === 'PRV' && productId !== PRODUCT_IDS.INTEROP) ||
                         (institutionType === 'GSP' && from === 'NO_IPA')
                       ? 'SELC'
                       : undefined,
@@ -554,14 +554,14 @@ export const verifySubmit = async (
                             : (institutionType === 'PT' ||
                                   institutionType === 'GPU' ||
                                   institutionType === 'GSP') &&
-                                productId === 'prod-pagopa'
+                                productId === PRODUCT_IDS.PAGOPA
                               ? '991'
-                              : productId === 'prod-pagopa' && institutionType === 'PRV'
+                              : productId === PRODUCT_IDS.PAGOPA && institutionType === 'PRV'
                                 ? mockPartyRegistry.items[0].taxCode
                                 : institutionType === 'GPU' &&
-                                    (productId === 'prod-interop' ||
-                                      productId === 'prod-io-sign' ||
-                                      productId === 'prod-io')
+                                    (productId === PRODUCT_IDS.INTEROP ||
+                                      productId === PRODUCT_IDS.IO_SIGN ||
+                                      productId === PRODUCT_IDS.IO)
                                   ? undefined
                                   : '991',
         istatCode: from !== 'IPA' ? mockedGeoTaxonomy[1].istat_code : undefined,
@@ -587,7 +587,7 @@ export const verifySubmit = async (
                         ? mockedUos[0].codiceFiscaleEnte
                         : mockPartyRegistry.items[0].taxCode,
         additionalInformations:
-          productId === 'prod-pagopa' && institutionType === 'GSP'
+          productId === PRODUCT_IDS.PAGOPA && institutionType === 'GSP'
             ? {
                 agentOfPublicService: false,
                 agentOfPublicServiceNote: '',
@@ -601,7 +601,7 @@ export const verifySubmit = async (
               }
             : undefined,
         gpuData:
-          institutionType === 'GPU' && productId === 'prod-pagopa'
+          institutionType === 'GPU' && productId === PRODUCT_IDS.PAGOPA
             ? {
                 businessRegisterNumber: 'Comunale 12',
                 legalRegisterNumber: '250301',
@@ -620,16 +620,16 @@ export const verifySubmit = async (
             from === 'PDND_INFOCAMERE' ||
             ((institutionType === 'GSP' || institutionType === 'GPU') && from !== 'IPA')) &&
             institutionType !== 'PT') ||
-          (institutionType === 'PRV' && productId === 'prod-pagopa')
+          (institutionType === 'PRV' && productId === PRODUCT_IDS.PAGOPA)
             ? {
                 businessRegisterPlace:
                   from === 'ANAC' ||
                   (institutionType === 'PRV' &&
-                    (productId === 'prod-pagopa' || productId === 'prod-interop'))
+                    (productId === PRODUCT_IDS.PAGOPA || productId === PRODUCT_IDS.INTEROP))
                     ? '01234567891'
                     : undefined,
                 shareCapital:
-                  from === 'ANAC' || (institutionType === 'PRV' && productId === 'prod-interop')
+                  from === 'ANAC' || (institutionType === 'PRV' && productId === PRODUCT_IDS.INTEROP)
                     ? 332323
                     : undefined,
                 rea:
@@ -638,7 +638,7 @@ export const verifySubmit = async (
                         '-',
                         mockedPartiesFromInfoCamere[0].nRea
                       )
-                    : institutionType === 'PRV' && productId === 'prod-pagopa'
+                    : institutionType === 'PRV' && productId === PRODUCT_IDS.PAGOPA
                       ? undefined
                       : 'MI-12345',
               }
@@ -690,7 +690,7 @@ export const verifySubmit = async (
                 city: mockedPartiesFromInfoCamere[0].city,
                 county: mockedPartiesFromInfoCamere[0].county,
                 country:
-                  institutionType === 'SCP' && productId === 'prod-interop' ? 'IT' : undefined,
+                  institutionType === 'SCP' && productId === PRODUCT_IDS.INTEROP ? 'IT' : undefined,
               }
             : {
                 city: 'Milano',
@@ -778,7 +778,7 @@ export const verifySubmitPostLegalsIoPremium = async (
             ? [{ code: nationalValue, desc: 'ITALIA' }]
             : [],
           assistanceContacts: { supportEmail: 'comune.bollate@pec.it' },
-          productId: 'prod-io-premium',
+          productId: PRODUCT_IDS.IO_PREMIUM,
           subunitCode: undefined,
           subunitType: undefined,
           taxCode: '33445673222',
@@ -838,7 +838,7 @@ export const verifySubmitPostLegalsPspDashBoard = async (
             county: 'MI',
             city: 'Milano',
           },
-          productId: 'prod-dashboard-psp',
+          productId: PRODUCT_IDS.DASHBOARD_PSP,
           taxCode: mockedPspOnboardingData[1].institution.billingData.taxCode,
           pricingPlan: undefined,
           subunitCode: undefined,
@@ -954,7 +954,7 @@ export const fillUserBillingDataForm = async (
       });
     }
   } else {
-    if (institutionType === 'PRV' && productId === 'prod-pagopa') {
+    if (institutionType === 'PRV' && productId === PRODUCT_IDS.PAGOPA) {
       fireEvent.change(document.getElementById(businessNameInput) as HTMLElement, {
         target: { value: mockPartyRegistry.items[0].description },
       });
@@ -1187,13 +1187,13 @@ export const checkCorrectBodyBillingData = (
     );
   }
 
-  if (institutionType === 'SA' || (institutionType === 'PRV' && productId === 'prod-interop')) {
+  if (institutionType === 'SA' || (institutionType === 'PRV' && productId === PRODUCT_IDS.INTEROP)) {
     fireEvent.change(document.getElementById('businessRegisterPlace') as HTMLElement, {
       target: { value: '01234567891' },
     });
     fireEvent.change(document.getElementById('rea') as HTMLElement, {
       target: {
-        value: institutionType === 'PRV' && productId === 'prod-interop' ? 'MO-123456' : 'MI-12345',
+        value: institutionType === 'PRV' && productId === PRODUCT_IDS.INTEROP ? 'MO-123456' : 'MI-12345',
       },
     });
     fireEvent.change(document.getElementById('shareCapital') as HTMLElement, {

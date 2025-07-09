@@ -1,5 +1,5 @@
 import { institutionTypes, mockedProducts } from '../../lib/__mocks__/mockApiRequests';
-import { institutionType4Product } from '../../utils/constants';
+import { institutionType4Product, PRODUCT_IDS } from '../../utils/constants';
 import { renderComponentWithProviders } from '../../utils/test-utils';
 import StepInstitutionType from '../steps/StepInstitutionType';
 import { screen } from '@testing-library/react';
@@ -34,23 +34,23 @@ test('Test: The correct institution types with the expected descriptions, can be
       const institutionTypeValues = institutionTypesForProduct.map((it) => it.value);
 
       switch (p.id) {
-        case 'prod-pagopa':
+        case PRODUCT_IDS.PAGOPA:
           expect(institutionTypeValues).toStrictEqual(['PA', 'GSP', 'PT', 'PSP', 'PRV', 'GPU']);
           break;
-        case 'prod-io':
+        case PRODUCT_IDS.IO:
           expect(institutionTypeValues).toStrictEqual(['PA', 'GSP', 'PT']);
           break;
-        case 'prod-io-sign':
+        case PRODUCT_IDS.IO_SIGN:
           expect(institutionTypeValues).toStrictEqual(['PA', 'GSP']);
           break;
-        case 'prod-idpay':
-        case 'prod-pn':
+        case PRODUCT_IDS.IDPAY:
+        case PRODUCT_IDS.SEND:
           expect(institutionTypeValues).toStrictEqual(['PA']);
           break;
-        case 'prod-idpay-merchant':
+        case PRODUCT_IDS.IDPAY_MERCHANT:
           expect(institutionTypeValues).toStrictEqual(['PRV']);
           break;
-        case 'prod-interop':
+        case PRODUCT_IDS.INTEROP:
           expect(institutionTypeValues).toStrictEqual(['PA', 'GSP', 'SCP', 'SA', 'AS', 'PRV']);
           break;
         default:
@@ -58,7 +58,7 @@ test('Test: The correct institution types with the expected descriptions, can be
           break;
       }
 
-      if (p.id !== 'prod-pn' && p.id !== 'prod-idpay') {
+      if (p.id !== PRODUCT_IDS.SEND && p.id !== PRODUCT_IDS.IDPAY) {
         switch (it) {
           case 'PA':
             screen.getAllByText('art. 2, comma 2, lettera A del CAD');

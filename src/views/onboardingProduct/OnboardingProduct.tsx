@@ -43,6 +43,7 @@ import { AdditionalGpuInformations } from '../../model/AdditionalGpuInformations
 import { AggregateInstitution } from '../../model/AggregateInstitution';
 import { selected2OnboardingData } from '../../utils/selected2OnboardingData';
 import config from '../../utils/config.json';
+import { PRODUCT_IDS } from '../../utils/constants';
 import { genericError, StepVerifyOnboarding } from './components/StepVerifyOnboarding';
 import { StepAddAdmin } from './components/StepAddAdmin';
 import { StepAdditionalInformations } from './components/StepAdditionalInformations';
@@ -98,8 +99,9 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
   const { t } = useTranslation();
   const [onExitAction, setOnExitAction] = useState<(() => void) | undefined>();
 
-  const productAvoidStep =
-    selectedProduct?.id === 'prod-pn' || selectedProduct?.id === 'prod-idpay';
+  const productAvoidStep = [PRODUCT_IDS.SEND, PRODUCT_IDS.IDPAY].includes(
+    selectedProduct?.id ?? ''
+  );
 
   const fromDashboard =
     window.location.search.indexOf(`partyExternalId=${externalInstitutionId}`) > -1;
@@ -114,7 +116,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
   const institutionTypeByUrl = new URLSearchParams(window.location.search).get('institutionType');
 
   useEffect(() => {
-    if (institutionTypeByUrl === 'PT' && productId === 'prod-pagopa') {
+    if (institutionTypeByUrl === 'PT' && productId === PRODUCT_IDS.PAGOPA) {
       forwardWithInstitutionType('PT');
     }
   }, [institutionTypeByUrl]);
@@ -155,7 +157,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
   useEffect(() => {
     if (
       selectedProduct &&
-      selectedProduct?.id !== 'prod-pn' &&
+      selectedProduct?.id !== PRODUCT_IDS.SEND &&
       (subunitTypeByQuery || subunitCodeByQuery)
     ) {
       window.location.assign(ENV.URL_FE.DASHBOARD);
@@ -193,7 +195,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
       forwardWithInstitutionType('PA');
     }
 
-    if (selectedProduct?.id === 'prod-idpay-merchant') {
+    if (selectedProduct?.id === PRODUCT_IDS.IDPAY_MERCHANT) {
       setActiveStep(1);
     }
   }, [selectedProduct]);
@@ -213,7 +215,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
 
   const selectFilterCategories = () => {
     if (productId === 'prod-pn') {
-      return filterCategoriesResponse?.product['prod-pn'].ipa.PA;
+      return filterCategoriesResponse?.product['prod-pn']?.ipa.PA;
     } else if (institutionType === 'GSP') {
       return filterCategoriesResponse?.product.default.ipa.GSP;
     } else {
@@ -274,7 +276,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
         setOutcome(null);
         if (isTechPartner) {
           setActiveStep(activeStep + 3);
-        } else if (productId === 'prod-pagopa' && institutionType === 'GSP') {
+        } else if (productId === PRODUCT_IDS.PAGOPA && institutionType === 'GSP') {
           forward();
         } else {
           setActiveStep(activeStep + 2);
@@ -502,7 +504,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
         data: {
           billingData: billingData2billingDataRequest(onboardingFormData as OnboardingFormData),
           additionalInformations:
-            institutionType === 'GSP' && selectedProduct?.id === 'prod-pagopa'
+            institutionType === 'GSP' && selectedProduct?.id === PRODUCT_IDS.PAGOPA
               ? {
                   agentOfPublicService: additionalInformations?.agentOfPublicService,
                   agentOfPublicServiceNote: additionalInformations?.agentOfPublicServiceNote,
@@ -519,10 +521,10 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
               : undefined,
           gpuData:
             institutionType === 'GPU' &&
-            (selectedProduct?.id === 'prod-pagopa' ||
-              selectedProduct?.id === 'prod-interop' ||
-              selectedProduct?.id === 'prod-io-sign' ||
-              selectedProduct?.id === 'prod-io')
+            (selectedProduct?.id === PRODUCT_IDS.PAGOPA ||
+              selectedProduct?.id === PRODUCT_IDS.INTEROP ||
+              selectedProduct?.id === PRODUCT_IDS.IO_SIGN ||
+              selectedProduct?.id === PRODUCT_IDS.IO)
               ? additionalGPUInformations
               : undefined,
           pspData:
@@ -548,7 +550,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
             : [],
           institutionLocationData: {
             country:
-              institutionType === 'SCP' && productId === 'prod-interop'
+              institutionType === 'SCP' && productId === PRODUCT_IDS.INTEROP
                 ? 'IT'
                 : onboardingFormData?.country,
             county: onboardingFormData?.county,
@@ -557,10 +559,10 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           origin:
             institutionType === 'SA'
               ? 'ANAC'
-              : (institutionType === 'PSP' ||
+              : institutionType === 'PSP' ||
                   institutionType === 'GPU' ||
                   institutionType === 'PT' ||
-                  (institutionType === 'PRV' && productId !== 'prod-interop'))
+                  (institutionType === 'PRV' && productId !== PRODUCT_IDS.INTEROP)
                 ? 'SELC'
                 : origin,
           istatCode: origin !== 'IPA' ? onboardingFormData?.istatCode : undefined,
@@ -666,7 +668,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     });
     setInstitutionType(newInstitutionType);
 
-    if (newInstitutionType === 'PRV' && productId === 'prod-pagopa') {
+    if (newInstitutionType === 'PRV' && productId === PRODUCT_IDS.PAGOPA) {
       selected2OnboardingData(null, undefined, newInstitutionType, productId);
       setOnboardingFormData(
         selected2OnboardingData(null, undefined, newInstitutionType, productId)
@@ -819,7 +821,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
               (institutionType !== 'PA' && institutionType !== 'SA' && institutionType !== 'GSP')
             ) {
               setActiveStep(0);
-            } else if (fromDashboard && productId === 'prod-dashboard-psp') {
+            } else if (fromDashboard && productId === PRODUCT_IDS.DASHBOARD_PSP) {
               window.location.assign(`${ENV.URL_FE.DASHBOARD}/${externalInstitutionId}`);
             } else {
               setActiveStep(1);
@@ -864,7 +866,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
             forwardWithData(newFormData);
           },
           back: () => {
-            if (productId === 'prod-pagopa' && institutionType === 'GSP') {
+            if (productId === PRODUCT_IDS.PAGOPA && institutionType === 'GSP') {
               back();
             } else {
               setActiveStep(activeStep - 3);

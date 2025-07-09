@@ -11,7 +11,7 @@ import { UserContext } from '../../lib/context';
 import { getFetchOutcome } from '../../lib/error-utils';
 import { AooData } from '../../model/AooData';
 import { UoData } from '../../model/UoModel';
-import { noMandatoryIpaProducts } from '../../utils/constants';
+import { noMandatoryIpaProducts, PRODUCT_IDS } from '../../utils/constants';
 import { ENV } from '../../utils/env';
 import { selected2OnboardingData } from '../../utils/selected2OnboardingData';
 import { LoadingOverlay } from '../LoadingOverlay';
@@ -89,7 +89,7 @@ export function StepSearchParty({
   );
   const [ecData, setEcData] = useState<PartyData | null>(null);
   const [filterCategories, setFilterCategories] = useState<string>();
-  const isEnabledProduct2AooUo = product?.id === 'prod-pn';
+  const isEnabledProduct2AooUo = product?.id === PRODUCT_IDS.SEND;
 
   const getECDataByCF = async (query: string) => {
     const searchResponse = await fetchWithLogs(
@@ -115,7 +115,7 @@ export function StepSearchParty({
       {
         method: 'GET',
         params: {
-          ...(product?.id === 'prod-pn' && {
+          ...(product?.id === PRODUCT_IDS.SEND && {
             categories: filterCategories,
             origin: 'IPA',
           }),
@@ -140,7 +140,7 @@ export function StepSearchParty({
       {
         method: 'GET',
         params: {
-          ...(product?.id === 'prod-pn' && {
+          ...(product?.id === PRODUCT_IDS.SEND && {
             categories: filterCategories,
             origin: 'IPA',
           }),
@@ -307,7 +307,7 @@ export function StepSearchParty({
       </Grid>
 
       <Grid container item sx={{ alignItems: 'center', flexDirection: 'column' }} mt={4} mb={4}>
-        {product?.id === 'prod-pn' && (
+        {product?.id === PRODUCT_IDS.SEND && (
           <Grid container item justifyContent="center">
             <Grid item display="flex" justifyContent="center" mb={5}>
               <Alert
@@ -340,7 +340,7 @@ export function StepSearchParty({
           </Grid>
         )}
 
-        {product?.id === 'prod-interop' && institutionType === 'GSP' && (
+        {product?.id === PRODUCT_IDS.INTEROP && institutionType === 'GSP' && (
           <Grid container item justifyContent="center">
             <Grid item xs={9}>
               <Box display="flex" justifyContent="center" mb={5}>

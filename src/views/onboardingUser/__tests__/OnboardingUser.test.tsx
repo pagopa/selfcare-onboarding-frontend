@@ -12,6 +12,7 @@ import i18n from '@pagopa/selfcare-common-frontend/lib/locale/locale-utils';
 import { executeStepAddAdmin, executeStepAddManager } from '../../../utils/test-utils';
 import { createStore } from '../../../redux/store';
 import { Provider } from 'react-redux';
+import { PRODUCT_IDS } from '../../../utils/constants';
 
 type Search = 'taxCode' | 'aooCode' | 'uoCode' | 'ivassCode';
 
@@ -151,23 +152,23 @@ const executeStepSearchOnboardedParty = async (
 };
 
 test('Test: Successfull added new user for a party who has already onboarded to the PagoPA platform product', async () => {
-  renderComponent('prod-pagopa', true);
+  renderComponent(PRODUCT_IDS.PAGOPA, true);
   await executeStepAddManager(true);
   await executeStepAddAdmin(true, false, false, true, false);
 });
 
 test('Test: NOT successfull added new user for a party who has already onboarded to the IO product', async () => {   
-  renderComponent('prod-io', true);
+  renderComponent(PRODUCT_IDS.IO, true);
   await executeStepAddManager(true);
   await executeStepAddAdmin(false, false , false, true, false);
 });
 
 // TODO
 test.skip('Test: Added new user for a party with select product prod-io-sign and search onboarded party with tax code', async () => {
-  renderComponent('prod-io-sign', false);
-  await executeStepSelectProduct('prod-io-sign');
+  renderComponent(PRODUCT_IDS.IO_SIGN, false);
+  await executeStepSelectProduct(PRODUCT_IDS.IO_SIGN);
   await executeStepSearchOnboardedParty(
-    'prod-io-sign',
+    PRODUCT_IDS.IO_SIGN,
     'onboardedparty1',
     'taxCode',
     undefined,

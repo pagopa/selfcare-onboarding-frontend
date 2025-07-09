@@ -32,6 +32,7 @@ import { ConfirmOnboardingModal } from '../../components/ConfirmOnboardingReques
 import { fetchWithLogs } from '../../lib/api-utils';
 import config from '../../utils/config.json';
 import { getFetchOutcome } from '../../lib/error-utils';
+import { PRODUCT_IDS } from '../../utils/constants';
 import SubProductStepVerifyInputs from './components/SubProductStepVerifyInputs';
 import SubProductStepSubmit from './components/SubProductStepSubmit';
 import SubProductStepSuccess from './components/SubProductStepSuccess';
@@ -213,7 +214,7 @@ function OnboardingPremiumComponent() {
     trackEvent('ONBOARDING_PREMIUM_UX_CONVERSION', {
       party_id: partyId,
       selected_plan:
-        pricingPlanCategory.product['prod-io-premium']?.consumptionPlan.pricingPlan === 'C0'
+        pricingPlanCategory.product[PRODUCT_IDS.IO_PREMIUM]?.consumptionPlan.pricingPlan === 'C0'
           ? 'consumo'
           : 'carnet',
     });
@@ -364,7 +365,7 @@ function OnboardingPremiumComponent() {
               );
               setOpenExitModal(true);
             } else {
-              if (subProductId === 'prod-dashboard-psp') {
+              if (subProductId === PRODUCT_IDS.DASHBOARD_PSP) {
                 setActiveStep(activeStep - 2);
               } else {
                 back();
