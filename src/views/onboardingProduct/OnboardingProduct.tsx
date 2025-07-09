@@ -99,10 +99,9 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
   const { t } = useTranslation();
   const [onExitAction, setOnExitAction] = useState<(() => void) | undefined>();
 
-  const productAvoidStep =
-    selectedProduct !== null &&
-    selectedProduct !== undefined &&
-    selectedProduct.id.includes(PRODUCT_IDS.SEND || PRODUCT_IDS.IDPAY);
+  const productAvoidStep = [PRODUCT_IDS.SEND, PRODUCT_IDS.IDPAY].includes(
+    selectedProduct?.id ?? ''
+  );
 
   const fromDashboard =
     window.location.search.indexOf(`partyExternalId=${externalInstitutionId}`) > -1;
