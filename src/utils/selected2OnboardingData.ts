@@ -1,5 +1,6 @@
 import { InstitutionType, PartyData } from '../../types';
 import { OnboardingFormData } from '../model/OnboardingFormData';
+import { PRODUCT_IDS } from './constants';
 
 // eslint-disable-next-line complexity
 export const selected2OnboardingData = (
@@ -34,11 +35,11 @@ export const selected2OnboardingData = (
   geographicTaxonomies: [],
   originIdEc: selectedParty?.originId,
   originId:
-    institutionType === 'PRV' && productId === 'prod-interop' || institutionType === 'SCP'
+    institutionType === 'PRV' && productId === PRODUCT_IDS.INTEROP || institutionType === 'SCP'
       ? selectedParty?.businessTaxId
       : selectedParty?.codiceUniUo ?? selectedParty?.codiceUniAoo ?? selectedParty?.originId,
   origin:
-    institutionType === 'PRV' && productId === 'prod-interop' || institutionType === 'SCP'
+    institutionType === 'PRV' && productId === PRODUCT_IDS.INTEROP || institutionType === 'SCP'
       ? 'PDND_INFOCAMERE'
       : selectedParty?.origin,
   rea:

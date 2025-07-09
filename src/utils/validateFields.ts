@@ -12,6 +12,7 @@ import {
   numericField,
   reaValidation,
   currencyField,
+  PRODUCT_IDS,
 } from './constants';
 import { ENV } from './env';
 
@@ -162,7 +163,7 @@ export const validateFields = (
           ? t('onboardingFormData.billingDataSection.invalidShareCapitalField')
           : undefined,
     supportEmail:
-      !institutionAvoidGeotax && !values.supportEmail && !isPremium && productId === 'prod-io-sign'
+      !institutionAvoidGeotax && !values.supportEmail && !isPremium && productId === PRODUCT_IDS.IO_SIGN
         ? requiredError
         : !emailRegexp.test(values.supportEmail as string) && values.supportEmail
           ? t('onboardingFormData.billingDataSection.invalidMailSupport')

@@ -1104,7 +1104,7 @@ export const mockedProducts: Array<Product> = [
   },
   {
     id: 'prod-pn-dev',
-    title: 'SEND-DEV',
+    title: 'SEND_DEV',
     status: statusActive,
   },
   {

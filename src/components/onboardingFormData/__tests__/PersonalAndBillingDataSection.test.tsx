@@ -14,6 +14,8 @@ import {
 } from '../../../lib/__mocks__/mockApiRequests';
 import i18n from '@pagopa/selfcare-common-frontend/lib/locale/locale-utils';
 import '@testing-library/jest-dom';
+import { PRODUCT_IDS } from '../../../utils/constants';
+import { InstitutionLocationData } from '../../../model/InstitutionLocationData';
 
 jest.mock('formik', () => ({
   useFormik: jest.fn(),
@@ -100,11 +102,11 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
         productId = product.id;
 
         switch (productId) {
-          case 'prod-pn':
+          case PRODUCT_IDS.SEND:
             onboardingFormData = mockedAoos[0];
-          case 'prod-io-sign':
+          case PRODUCT_IDS.IO_SIGN:
             onboardingFormData = mockedUos[0];
-          case 'prod-interop':
+          case PRODUCT_IDS.INTEROP:
             onboardingFormData = mockedPartiesFromInfoCamere;
           default:
             onboardingFormData = mockPartyRegistry.items[0];
@@ -123,12 +125,14 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
           institutionType !== 'SA' &&
           institutionType !== 'PT' &&
           institutionType !== 'AS' &&
-          productId !== 'prod-interop';
+          productId !== PRODUCT_IDS.INTEROP;
         const isInformationCompany =
           (institutionType === 'GSP' || institutionType === 'SCP') &&
-          (productId === 'prod-io' || productId === 'prod-io-sign' || productId === 'prod-interop');
-        const isPrivateParty = productId === 'prod-interop' && institutionType === 'PRV';
-        const isPdndPrivate = productId === 'prod-interop' && institutionType === 'PRV';
+          (productId === PRODUCT_IDS.IO ||
+            productId === PRODUCT_IDS.IO_SIGN ||
+            productId === PRODUCT_IDS.INTEROP);
+        const isPrivateParty = productId === PRODUCT_IDS.INTEROP && institutionType === 'PRV';
+        const isPdndPrivate = productId === PRODUCT_IDS.INTEROP && institutionType === 'PRV';
         conditionsMap[`${productId}-${institutionType}`] = {
           isPremium,
           isInvoiceable,
@@ -160,6 +164,9 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
             isDisabled={isDisabled}
             setInvalidTaxCodeInvoicing={jest.fn()}
             isPdndPrivate={isPdndPrivate}
+            getCountriesFromGeotaxonomies={jest.fn()}
+            countries={undefined}
+            setCountries={jest.fn()}
           />
         );
 
@@ -287,7 +294,7 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
       expect(visibleCitizenMail).not.toBeInTheDocument();
     } else {
       expect(
-        productId === 'prod-io' ? visibleCitizenMail : visibleCitizenMailOptional
+        productId === PRODUCT_IDS.IO ? visibleCitizenMail : visibleCitizenMailOptional
       ).toBeInTheDocument();
     }
 

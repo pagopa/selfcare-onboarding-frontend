@@ -6,6 +6,8 @@ import { InstitutionType, PartyData, Product } from '../../../../../types';
 import { AooData } from '../../../../model/AooData';
 import { UoData } from '../../../../model/UoModel';
 import { ENV } from '../../../../utils/env';
+import { PRODUCT_IDS } from '../../../../utils/constants';
+
 
 type Props = {
   setIsBusinessNameSelected: React.Dispatch<React.SetStateAction<boolean>>;
@@ -86,7 +88,7 @@ export default function PartyAdvancedSelect({
   };
 
   useEffect(() => {
-    if (product?.id === 'prod-interop' && (institutionType === 'SCP' || institutionType === 'PRV')) {
+    if (product?.id === PRODUCT_IDS.INTEROP && (institutionType === 'SCP' || institutionType === 'PRV')) {
       onSelectValue(false, true, false, false, false);
       setTypeOfSearch('taxCode');
     }
@@ -109,7 +111,7 @@ export default function PartyAdvancedSelect({
   }, []);
 
   useEffect(() => {
-    if (addUser || ((product?.id === 'prod-interop' || product?.id === 'prod-idpay-merchant') && (institutionType === 'SCP' || institutionType === 'PRV'))) {
+    if (addUser || ((product?.id === PRODUCT_IDS.INTEROP || product?.id === 'prod-idpay-merchant') && (institutionType === 'SCP' || institutionType === 'PRV'))) {
       setTypeOfSearch('taxCode');
       setIsTaxCodeSelected(true);
     } else {
@@ -120,10 +122,10 @@ export default function PartyAdvancedSelect({
 
   const filteredByProducts = (product?: Product) =>
     product &&
-    (product.id === 'prod-interop' ||
-      product.id === 'prod-io-sign' ||
-      product.id === 'prod-pn-dev' ||
-      product.id === 'prod-pn');
+    (product.id === PRODUCT_IDS.INTEROP ||
+      product.id === PRODUCT_IDS.IO_SIGN ||
+      product.id === PRODUCT_IDS.SEND_DEV ||
+      product.id === PRODUCT_IDS.SEND);
 
   const optionsAvailable4InstitutionType =
     institutionType !== 'SA' && institutionType !== 'AS' && institutionType !== 'GSP';

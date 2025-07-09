@@ -18,7 +18,7 @@ import { getFetchOutcome } from '../../../../lib/error-utils';
 import { AooData } from '../../../../model/AooData';
 import { UoData } from '../../../../model/UoModel';
 import { ENV } from '../../../../utils/env';
-import { buildUrlLogo, noMandatoryIpaProducts } from '../../../../utils/constants';
+import { buildUrlLogo, noMandatoryIpaProducts, PRODUCT_IDS } from '../../../../utils/constants';
 import AsyncAutocompleteResultsBusinessName from './components/AsyncAutocompleteResultsBusinessName';
 import AsyncAutocompleteResultsCode from './components/AsyncAutocompleteResultsCode';
 import AsyncAutocompleteSearch from './components/AsyncAutocompleteSearch';
@@ -182,7 +182,8 @@ export default function AsyncAutocompleteContainer({
       ...params,
       taxCode: addUser ? query : undefined,
       categories:
-        product?.id === 'prod-interop' && (institutionType === 'SCP' || institutionType === 'PRV')
+        product?.id === PRODUCT_IDS.INTEROP &&
+        (institutionType === 'SCP' || institutionType === 'PRV')
           ? undefined
           : filterCategories,
     };
@@ -395,10 +396,10 @@ export default function AsyncAutocompleteContainer({
         } else {
           const endpoint = addUser
             ? 'ONBOARDING_GET_INSTITUTIONS'
-            : product?.id === 'prod-interop' &&
+            : product?.id === PRODUCT_IDS.INTEROP &&
                 (institutionType === 'SCP' || institutionType === 'PRV')
               ? 'ONBOARDING_GET_PARTY_BY_CF_FROM_INFOCAMERE'
-              : product?.id === 'prod-idpay-merchant'
+              : product?.id === PRODUCT_IDS.IDPAY_MERCHANT
                 ? 'ONBOARDING_GET_VISURA_INFOCAMERE_BY_CF'
                 : 'ONBOARDING_GET_PARTY_FROM_CF';
           void handleSearchByTaxCode(addUser, endpoint, params, value);

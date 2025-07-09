@@ -189,11 +189,16 @@ export const PRODUCT_IDS = {
   PAGOPA: 'prod-pagopa',
   IO: 'prod-io',
   SEND: 'prod-pn',
+  SEND_DEV: 'prod-pn-dev',
   INTEROP: 'prod-interop',
   IDPAY: 'prod-idpay',
   IO_SIGN: 'prod-io-sign',
   FD: 'prod-fd',
+  FD_GARANTITO: 'prod-fd-garantito',
   DASHBOARD_PSP: 'prod-dashboard-psp',
+  IO_PREMIUM: 'prod-io-premium',
+  CIBAN: 'prod-ciban',
+  CGN: 'prod-cgn',
   IDPAY_MERCHANT: 'prod-idpay-merchant',
 };
 
@@ -213,21 +218,21 @@ export const canInvoice = (institutionType?: string, productId?: string) =>
   institutionType !== 'SA' &&
   institutionType !== 'PT' &&
   institutionType !== 'AS' &&
-  productId !== 'prod-interop';
+  productId !== PRODUCT_IDS.INTEROP;
 
 export const noMandatoryIpaProducts = (productId?: string) =>
-  productId !== 'prod-interop' &&
-  productId !== 'prod-io' &&
-  productId !== 'prod-io-sign' &&
-  productId !== 'prod-idpay' &&
-  !productId?.includes('prod-pn');
+  productId !== PRODUCT_IDS.INTEROP &&
+  productId !== PRODUCT_IDS.IO &&
+  productId !== PRODUCT_IDS.IO_SIGN &&
+  productId !== PRODUCT_IDS.IDPAY &&
+  !productId?.includes(PRODUCT_IDS.SEND);
 
 export const addUserFlowProducts = (productId: string) =>
-  productId === 'prod-interop' ||
-  productId === 'prod-pn' ||
-  productId === 'prod-io' ||
-  productId === 'prod-io-sign' ||
-  productId === 'prod-pagopa';
+  productId === PRODUCT_IDS.INTEROP ||
+  productId === PRODUCT_IDS.SEND ||
+  productId === PRODUCT_IDS.IO ||
+  productId === PRODUCT_IDS.IO_SIGN ||
+  productId === PRODUCT_IDS.PAGOPA;
 
 export const institutionTypes: Array<{ labelKey: string; value: InstitutionType }> = [
   { labelKey: 'pa', value: 'PA' },
