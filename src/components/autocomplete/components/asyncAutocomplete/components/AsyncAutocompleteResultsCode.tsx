@@ -37,8 +37,10 @@ type Props = {
   isIvassCodeSelected?: boolean;
   isAooCodeSelected?: boolean;
   isUoCodeSelected?: boolean;
+  isReaCodeSelected?: boolean;
 };
 
+// eslint-disable-next-line sonarjs/cognitive-complexity
 export default function AsyncAutocompleteResultsCode({
   setSelected,
   isLoading,
@@ -50,15 +52,16 @@ export default function AsyncAutocompleteResultsCode({
   isIvassCodeSelected,
   isAooCodeSelected,
   isUoCodeSelected,
+  isReaCodeSelected,
 }: Props) {
   const party =
-    isTaxCodeSelected || isIvassCodeSelected
+    isTaxCodeSelected || isIvassCodeSelected || isReaCodeSelected
       ? cfResult
       : isAooCodeSelected
-      ? aooResult
-      : isUoCodeSelected
-      ? uoResult
-      : '';
+        ? aooResult
+        : isUoCodeSelected
+          ? uoResult
+          : '';
 
   const partyName =
     party?.description ??
@@ -88,8 +91,8 @@ export default function AsyncAutocompleteResultsCode({
               !isTaxCodeSelected && aooResult
                 ? aooResult.denominazioneEnte || aooResult.parentDescription
                 : uoResult
-                ? uoResult?.denominazioneEnte || uoResult.parentDescription
-                : ''
+                  ? uoResult?.denominazioneEnte || uoResult.parentDescription
+                  : ''
             }
             image={' '}
             action={() => {

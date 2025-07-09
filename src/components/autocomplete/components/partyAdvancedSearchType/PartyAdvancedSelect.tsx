@@ -8,7 +8,6 @@ import { UoData } from '../../../../model/UoModel';
 import { ENV } from '../../../../utils/env';
 import { PRODUCT_IDS } from '../../../../utils/constants';
 
-
 type Props = {
   setIsBusinessNameSelected: React.Dispatch<React.SetStateAction<boolean>>;
   setIsTaxCodeSelected: React.Dispatch<React.SetStateAction<boolean | undefined>>;
@@ -18,6 +17,7 @@ type Props = {
   setIsSearchFieldSelected: React.Dispatch<React.SetStateAction<boolean>>;
   setIsAooCodeSelected: React.Dispatch<React.SetStateAction<boolean>>;
   setIsUoCodeSelected: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsReaCodeSelected: React.Dispatch<React.SetStateAction<boolean>>;
   setCfResult: React.Dispatch<React.SetStateAction<PartyData | undefined>>;
   setAooResult: Dispatch<SetStateAction<AooData | undefined>>;
   setUoResult: Dispatch<SetStateAction<UoData | undefined>>;
@@ -28,6 +28,7 @@ type Props = {
   isIvassCodeSelected?: boolean;
   isAooCodeSelected?: boolean;
   isUoCodeSelected?: boolean;
+  isReaCodeSelected?: boolean;
   product?: Product | null;
   institutionType?: InstitutionType;
   addUser: boolean;
@@ -43,6 +44,7 @@ export default function PartyAdvancedSelect({
   setIsSearchFieldSelected,
   setIsAooCodeSelected,
   setIsUoCodeSelected,
+  setIsReaCodeSelected,
   setCfResult,
   setAooResult,
   setUoResult,
@@ -51,6 +53,7 @@ export default function PartyAdvancedSelect({
   isIvassCodeSelected,
   isAooCodeSelected,
   isUoCodeSelected,
+  isReaCodeSelected,
   setUoResultHistory,
   setAooResultHistory,
   product,
@@ -71,13 +74,15 @@ export default function PartyAdvancedSelect({
     isTaxCodeSelected: boolean,
     isIvassCodeSelected: boolean,
     isAooCodeSelected: boolean,
-    isUoCodeSelected: boolean
+    isUoCodeSelected: boolean,
+    isReaCodeSelected: boolean
   ) => {
     setIsBusinessNameSelected(isBusinessNameSelected);
     setIsTaxCodeSelected(isTaxCodeSelected);
     setIsIvassCodeSelected(isIvassCodeSelected);
     setIsAooCodeSelected(isAooCodeSelected);
     setIsUoCodeSelected(isUoCodeSelected);
+    setIsReaCodeSelected(isReaCodeSelected);
     setOptions([]);
     setInput('');
     setCfResult(undefined);
@@ -88,8 +93,11 @@ export default function PartyAdvancedSelect({
   };
 
   useEffect(() => {
-    if (product?.id === PRODUCT_IDS.INTEROP && (institutionType === 'SCP' || institutionType === 'PRV')) {
-      onSelectValue(false, true, false, false, false);
+    if (
+      (product?.id === PRODUCT_IDS.INTEROP || product?.id === PRODUCT_IDS.IDPAY_MERCHANT) &&
+      (institutionType === 'SCP' || institutionType === 'PRV')
+    ) {
+      onSelectValue(false, true, false, false, false, false);
       setTypeOfSearch('taxCode');
     }
   }, []);
@@ -105,13 +113,19 @@ export default function PartyAdvancedSelect({
       setTypeOfSearch('uoCode');
     } else if (isIvassCodeSelected) {
       setTypeOfSearch('ivassCode');
+    } else if (isReaCodeSelected) {
+      setTypeOfSearch('reaCode');
     } else {
       setTypeOfSearch('');
     }
   }, []);
 
   useEffect(() => {
-    if (addUser || ((product?.id === PRODUCT_IDS.INTEROP || product?.id === 'prod-idpay-merchant') && (institutionType === 'SCP' || institutionType === 'PRV'))) {
+    if (
+      addUser ||
+      ((product?.id === PRODUCT_IDS.INTEROP || product?.id === PRODUCT_IDS.IDPAY_MERCHANT) &&
+        (institutionType === 'SCP' || institutionType === 'PRV'))
+    ) {
       setTypeOfSearch('taxCode');
       setIsTaxCodeSelected(true);
     } else {
@@ -135,14 +149,14 @@ export default function PartyAdvancedSelect({
       id: 'aooCode',
       ['data-testid']: 'aooCode',
       value: 'aooCode',
-      onClick: () => onSelectValue(false, false, false, true, false),
+      onClick: () => onSelectValue(false, false, false, true, false, false),
       label: t('partyAdvancedSelect.aooCode'),
     },
     {
       id: 'uoCode',
       ['data-testid']: 'uoCode',
       value: 'uoCode',
-      onClick: () => onSelectValue(false, false, false, false, true),
+      onClick: () => onSelectValue(false, false, false, false, true, false),
       label: t('partyAdvancedSelect.uoCode'),
     },
   ];
@@ -162,7 +176,7 @@ export default function PartyAdvancedSelect({
             id="businessName"
             data-testid="businessName"
             value={'businessName'}
-            onClick={() => onSelectValue(true, false, false, false, false)}
+            onClick={() => onSelectValue(true, false, false, false, false, false)}
           >
             {t('partyAdvancedSelect.businessName')}
           </MenuItem>
@@ -172,7 +186,7 @@ export default function PartyAdvancedSelect({
             id="ivassCode"
             data-testid="ivassCode"
             value={'ivassCode'}
-            onClick={() => onSelectValue(false, false, true, false, false)}
+            onClick={() => onSelectValue(false, false, true, false, false, false)}
           >
             {t('partyAdvancedSelect.ivassCode')}
           </MenuItem>
@@ -181,9 +195,20 @@ export default function PartyAdvancedSelect({
             id="taxCode"
             data-testid="taxCode"
             value={'taxCode'}
-            onClick={() => onSelectValue(false, true, false, false, false)}
+            onClick={() => onSelectValue(false, true, false, false, false, false)}
           >
             {t('partyAdvancedSelect.taxCode')}
+          </MenuItem>
+        )}
+
+        {institutionType === 'PRV' && product?.id === PRODUCT_IDS.IDPAY_MERCHANT && (
+          <MenuItem
+            id="reaCode"
+            data-testid="reaCode"
+            value={'reaCode'}
+            onClick={() => onSelectValue(false, false, false, false, false, true)}
+          >
+            {t('partyAdvancedSelect.reaCode')}
           </MenuItem>
         )}
 

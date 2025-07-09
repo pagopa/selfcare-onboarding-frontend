@@ -18,6 +18,7 @@ export default {
     taxCode: 'Codice Fiscale ente',
     aooCode: 'Codice univoco AOO',
     uoCode: 'Codice univoco UO',
+    reaCode: 'Codice REA',
   },
   confirmOnboarding: {
     chooseOption: {

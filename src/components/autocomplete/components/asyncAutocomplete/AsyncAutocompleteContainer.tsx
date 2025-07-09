@@ -51,6 +51,7 @@ type Props = {
   aooResult?: AooData;
   uoResult?: UoData;
   isIvassCodeSelected: boolean;
+  isReaCodeSelected: boolean;
   externalInstitutionId: string;
   institutionType?: InstitutionType;
   setDisabled: Dispatch<SetStateAction<boolean>>;
@@ -82,6 +83,7 @@ export default function AsyncAutocompleteContainer({
   isIvassCodeSelected,
   isAooCodeSelected,
   isUoCodeSelected,
+  isReaCodeSelected,
   setAooResult,
   setUoResult,
   aooResult,
@@ -182,7 +184,7 @@ export default function AsyncAutocompleteContainer({
       ...params,
       taxCode: addUser ? query : undefined,
       categories:
-        product?.id === PRODUCT_IDS.INTEROP &&
+        (product?.id === PRODUCT_IDS.INTEROP || product?.id === PRODUCT_IDS.IDPAY_MERCHANT) &&
         (institutionType === 'SCP' || institutionType === 'PRV')
           ? undefined
           : filterCategories,
@@ -200,7 +202,55 @@ export default function AsyncAutocompleteContainer({
     const outcome = getFetchOutcome(searchResponse);
 
     if (outcome === 'success') {
-      console.log('Visure response', (searchResponse as AxiosResponse).data);
+      setCfResult((searchResponse as AxiosResponse).data);
+    } else if ((searchResponse as AxiosError).response?.status === 404) {
+      setCfResult(undefined);
+    }
+
+    setIsLoading(false);
+  };
+
+  const handleSearchByReaCode = async (
+    addUser: boolean,
+    endpoint: ApiEndpointKey,
+    params: any,
+    query: string
+  ) => {
+    setIsLoading(true);
+
+    // Validazione formato REA: deve essere 'XX-NNNNNN' (2 lettere maiuscole + trattino + 6 cifre)
+    const reaPattern = /^[A-Za-z]{2}-\d{6}$/;
+    if (!reaPattern.test(query)) {
+      setIsLoading(false);
+      setCfResult(undefined);
+      return;
+    }
+
+    // Split del codice REA per estrarre county (prime 2 lettere) e rea (codice completo)
+    const county = query.substring(0, 2);
+    const rea = query;
+
+    const updatedParams = addUser
+      ? params
+      : {
+          rea,
+          county,
+        };
+
+    const searchResponse = await fetchWithLogs(
+      {
+        endpoint,
+      },
+      {
+        method: 'GET',
+        params: updatedParams,
+      },
+      () => setRequiredLogin(true)
+    );
+
+    const outcome = getFetchOutcome(searchResponse);
+
+    if (outcome === 'success') {
       setCfResult((searchResponse as AxiosResponse).data);
     } else if ((searchResponse as AxiosError).response?.status === 404) {
       setCfResult(undefined);
@@ -399,7 +449,7 @@ export default function AsyncAutocompleteContainer({
             : product?.id === PRODUCT_IDS.INTEROP &&
                 (institutionType === 'SCP' || institutionType === 'PRV')
               ? 'ONBOARDING_GET_PARTY_BY_CF_FROM_INFOCAMERE'
-              : product?.id === PRODUCT_IDS.IDPAY_MERCHANT
+              : product?.id === PRODUCT_IDS.IDPAY_MERCHANT && isTaxCodeSelected
                 ? 'ONBOARDING_GET_VISURA_INFOCAMERE_BY_CF'
                 : 'ONBOARDING_GET_PARTY_FROM_CF';
           void handleSearchByTaxCode(addUser, endpoint, params, value);
@@ -410,6 +460,9 @@ export default function AsyncAutocompleteContainer({
       } else if (isUoCodeSelected && !isAooCodeSelected && value.length === 6) {
         const endpoint = addUser ? 'ONBOARDING_GET_INSTITUTIONS' : 'ONBOARDING_GET_UO_CODE_INFO';
         void handleSearchByUoCode(addUser, endpoint, params, value);
+      } else if (isReaCodeSelected && value.length > 1) {
+        const endpoint = addUser ? 'ONBOARDING_GET_INSTITUTIONS' : 'ONBOARDING_GET_VISURA_INFOCAMERE_BY_REA';
+        void handleSearchByReaCode(addUser, endpoint, params, value);
       }
     } else {
       setSelected(null);
@@ -498,7 +551,11 @@ export default function AsyncAutocompleteContainer({
           </>
         ) : (
           <>
-            {(isTaxCodeSelected || isAooCodeSelected || isUoCodeSelected || isIvassCodeSelected) &&
+            {(isTaxCodeSelected ||
+              isAooCodeSelected ||
+              isUoCodeSelected ||
+              isIvassCodeSelected ||
+              isReaCodeSelected) &&
             !isBusinessNameSelected &&
             input !== undefined &&
             input?.length >= 5 &&
@@ -517,6 +574,7 @@ export default function AsyncAutocompleteContainer({
                 isIvassCodeSelected={isIvassCodeSelected}
                 isAooCodeSelected={isAooCodeSelected}
                 isUoCodeSelected={isUoCodeSelected}
+                isReaCodeSelected={isReaCodeSelected}
               />
             ) : (
               input.length >= 1 &&
