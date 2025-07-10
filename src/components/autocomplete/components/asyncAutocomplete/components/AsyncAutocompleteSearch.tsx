@@ -45,6 +45,7 @@ type Props = {
   setCfResult: React.Dispatch<React.SetStateAction<PartyData | undefined>>;
   setAooResult: React.Dispatch<React.SetStateAction<AooData | undefined>>;
   setUoResult: React.Dispatch<React.SetStateAction<UoData | undefined>>;
+  setMerchantSearchResult?: Dispatch<SetStateAction<PartyData | undefined>>;
   externalInstitutionId: string;
   addUser: boolean;
 };
@@ -67,6 +68,7 @@ export default function AsyncAutocompleteSearch({
   setCfResult,
   setAooResult,
   setUoResult,
+  setMerchantSearchResult,
   externalInstitutionId,
   addUser,
 }: Props) {
@@ -92,12 +94,12 @@ export default function AsyncAutocompleteSearch({
     (isBusinessNameSelected || isTaxCodeSelected || isIvassCodeSelected) && selected?.description
       ? selected.description
       : selected && isAooCodeSelected && selected?.denominazioneAoo
-      ? selected?.denominazioneAoo
-      : selected && isUoCodeSelected && selected.descrizioneUo
-      ? selected?.descrizioneUo
-      : addUser && selected && (isAooCodeSelected || isUoCodeSelected) && selected?.description
-      ? selected.description
-      : selected?.businessName;
+        ? selected?.denominazioneAoo
+        : selected && isUoCodeSelected && selected.descrizioneUo
+          ? selected?.descrizioneUo
+          : addUser && selected && (isAooCodeSelected || isUoCodeSelected) && selected?.description
+            ? selected.description
+            : selected?.businessName;
 
   useEffect(() => {
     if (selected && selected?.denominazioneAoo) {
@@ -127,10 +129,10 @@ export default function AsyncAutocompleteSearch({
             ? isBusinessNameSelected || isTaxCodeSelected || isReaCodeSelected
               ? t('asyncAutocomplete.searchLabel')
               : isAooCodeSelected
-              ? t('asyncAutocomplete.aooLabel')
-              : isUoCodeSelected
-              ? t('asyncAutocomplete.uoLabel')
-              : t('asyncAutocomplete.searchLabel')
+                ? t('asyncAutocomplete.aooLabel')
+                : isUoCodeSelected
+                  ? t('asyncAutocomplete.uoLabel')
+                  : t('asyncAutocomplete.searchLabel')
             : ''
         }
         variant={!selected ? 'outlined' : 'standard'}
@@ -184,6 +186,7 @@ export default function AsyncAutocompleteSearch({
                 setCfResult(undefined);
                 setAooResult(undefined);
                 setUoResult(undefined);
+                setMerchantSearchResult?.(undefined);
                 setStepHistoryState({
                   ...stepHistoryState,
                   isTaxCodeEquals2PIVA: false,

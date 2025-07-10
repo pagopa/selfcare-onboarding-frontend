@@ -58,6 +58,8 @@ type Props = {
   addUser: boolean;
   selectedProduct?: Product;
   filterCategories?: string;
+  setIsPresentInAtecoWhiteList?: Dispatch<SetStateAction<boolean>>;
+  setMerchantSearchResult?: Dispatch<SetStateAction<PartyData | undefined>>;
 };
 
 // TODO: handle cognitive-complexity
@@ -96,6 +98,8 @@ export default function AsyncAutocompleteContainer({
   addUser,
   selectedProduct,
   filterCategories,
+  setIsPresentInAtecoWhiteList,
+  setMerchantSearchResult,
 }: Props) {
   const { setRequiredLogin } = useContext(UserContext);
   const { t } = useTranslation();
@@ -177,6 +181,7 @@ export default function AsyncAutocompleteContainer({
     endpoint: ApiEndpointKey,
     params: any,
     query: string
+    // eslint-disable-next-line sonarjs/cognitive-complexity
   ) => {
     setLoading(true);
 
@@ -202,9 +207,29 @@ export default function AsyncAutocompleteContainer({
     const outcome = getFetchOutcome(searchResponse);
 
     if (outcome === 'success') {
-      setCfResult((searchResponse as AxiosResponse).data);
+      const response = (searchResponse as AxiosResponse).data;
+      setCfResult(response);
+
+      if (product?.id === PRODUCT_IDS.IDPAY_MERCHANT) {
+        setMerchantSearchResult?.(response);
+        if (filterCategories && response.atecoCodes && Array.isArray(response.atecoCodes)) {
+          const whitelistCodes = filterCategories.split(',');
+          const hasMatchingCode = response.atecoCodes.some((code: string) =>
+            whitelistCodes.includes(code)
+          );
+          setIsPresentInAtecoWhiteList?.(hasMatchingCode);
+          setDisabled(!hasMatchingCode);
+        } else {
+          setIsPresentInAtecoWhiteList?.(false);
+          setDisabled(true);
+        }
+      }
     } else if ((searchResponse as AxiosError).response?.status === 404) {
       setCfResult(undefined);
+      if (product?.id === PRODUCT_IDS.IDPAY_MERCHANT) {
+        setIsPresentInAtecoWhiteList?.(false);
+        setMerchantSearchResult?.(undefined);
+      }
     }
 
     setLoading(false);
@@ -215,6 +240,7 @@ export default function AsyncAutocompleteContainer({
     endpoint: ApiEndpointKey,
     params: any,
     query: string
+    // eslint-disable-next-line sonarjs/cognitive-complexity
   ) => {
     setLoading(true);
 
@@ -222,6 +248,7 @@ export default function AsyncAutocompleteContainer({
     if (!reaPattern.test(query)) {
       setLoading(false);
       setCfResult(undefined);
+      setIsPresentInAtecoWhiteList?.(false);
       return;
     }
 
@@ -247,9 +274,29 @@ export default function AsyncAutocompleteContainer({
     const outcome = getFetchOutcome(searchResponse);
 
     if (outcome === 'success') {
-      setCfResult((searchResponse as AxiosResponse).data);
+      const response = (searchResponse as AxiosResponse).data;
+      setCfResult(response);
+
+      if (product?.id === PRODUCT_IDS.IDPAY_MERCHANT) {
+        setMerchantSearchResult?.(response);
+        if (filterCategories && response.atecoCodes && Array.isArray(response.atecoCodes)) {
+          const whitelistCodes = filterCategories.split(',');
+          const hasMatchingCode = response.atecoCodes.some((code: string) =>
+            whitelistCodes.includes(code)
+          );
+          setIsPresentInAtecoWhiteList?.(hasMatchingCode);
+          setDisabled(!hasMatchingCode);
+        } else {
+          setIsPresentInAtecoWhiteList?.(false);
+          setDisabled(true);
+        }
+      }
     } else if ((searchResponse as AxiosError).response?.status === 404) {
       setCfResult(undefined);
+      if (product?.id === PRODUCT_IDS.IDPAY_MERCHANT) {
+        setMerchantSearchResult?.(undefined);
+        setIsPresentInAtecoWhiteList?.(false);
+      }
     }
 
     setLoading(false);
@@ -457,7 +504,9 @@ export default function AsyncAutocompleteContainer({
         const endpoint = addUser ? 'ONBOARDING_GET_INSTITUTIONS' : 'ONBOARDING_GET_UO_CODE_INFO';
         void handleSearchByUoCode(addUser, endpoint, params, value);
       } else if (isReaCodeSelected && value.length > 1) {
-        const endpoint = addUser ? 'ONBOARDING_GET_INSTITUTIONS' : 'ONBOARDING_GET_VISURA_INFOCAMERE_BY_REA';
+        const endpoint = addUser
+          ? 'ONBOARDING_GET_INSTITUTIONS'
+          : 'ONBOARDING_GET_VISURA_INFOCAMERE_BY_REA';
         void handleSearchByReaCode(addUser, endpoint, params, value);
       }
     } else {
@@ -505,6 +554,7 @@ export default function AsyncAutocompleteContainer({
           setCfResult={setCfResult}
           setAooResult={setAooResult}
           setUoResult={setUoResult}
+          setMerchantSearchResult={setMerchantSearchResult}
           externalInstitutionId={externalInstitutionId}
           addUser={addUser}
         />
