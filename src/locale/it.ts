@@ -18,6 +18,7 @@ export default {
     taxCode: 'Codice Fiscale ente',
     aooCode: 'Codice univoco AOO',
     uoCode: 'Codice univoco UO',
+    reaCode: 'Codice REA',
   },
   confirmOnboarding: {
     chooseOption: {
@@ -145,6 +146,7 @@ export default {
         'Se sei una società di assicurazione presente nell’Albo delle <1/>imprese IVASS, inserisci uno dei dati richiesti e cerca l’ente per<3/> cui vuoi richiedere l’adesione a <5>Interoperabilità.</5>',
       scpSubtitle:
         'Inserisci uno dei dati richiesti e cerca da InfoCamere l’ente <3/> per cui vuoi richiedere l’adesione a <5>Interoperabilità.</5>',
+      merchantSubtitle: 'Inserisci uno dei dati richiesti per cercare su InfoCamere l’ente <3/> per cui vuoi richiedere l’adesione a <5>Portale Esercenti.</5>',
       asyncAutocomplete: {
         placeholder: 'Cerca',
       },

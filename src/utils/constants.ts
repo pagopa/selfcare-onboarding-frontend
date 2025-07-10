@@ -165,6 +165,12 @@ export const API = {
   ONBOARDING_VERIFY_AGGREGATES: {
     URL: ENV.URL_API.ONBOARDING_V2 + '/v2/institutions/onboarding/aggregation/verification',
   },
+  ONBOARDING_GET_VISURA_INFOCAMERE_BY_CF: {
+    URL: ENV.URL_API.PARTY_REGISTRY_PROXY + '/visura-infocamere-pdnd/institutions/{{id}}',
+  },
+  ONBOARDING_GET_VISURA_INFOCAMERE_BY_REA: {
+    URL: ENV.URL_API.PARTY_REGISTRY_PROXY + '/visura-infocamere-pdnd/institutions',
+  },
 };
 
 export const USER_ROLE_LABEL = {

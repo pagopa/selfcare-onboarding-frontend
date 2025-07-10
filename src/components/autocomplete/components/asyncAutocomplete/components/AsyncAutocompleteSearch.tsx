@@ -40,6 +40,7 @@ type Props = {
   isUoCodeSelected?: boolean;
   isIvassCodeSelected?: boolean;
   isTaxCodeSelected?: boolean;
+  isReaCodeSelected?: boolean;
   isBusinessNameSelected?: boolean;
   setCfResult: React.Dispatch<React.SetStateAction<PartyData | undefined>>;
   setAooResult: React.Dispatch<React.SetStateAction<AooData | undefined>>;
@@ -61,6 +62,7 @@ export default function AsyncAutocompleteSearch({
   isUoCodeSelected,
   isTaxCodeSelected,
   isIvassCodeSelected,
+  isReaCodeSelected,
   isBusinessNameSelected,
   setCfResult,
   setAooResult,
@@ -76,6 +78,7 @@ export default function AsyncAutocompleteSearch({
       externalInstitutionId,
       isTaxCodeEquals2PIVA: false,
     });
+
   const truncatedText = {
     overflow: 'hidden',
     textOverflow: 'ellipsis',
@@ -84,6 +87,7 @@ export default function AsyncAutocompleteSearch({
     width: '100%',
     whiteSpace: 'normal' as const,
   };
+
   const valueSelected =
     (isBusinessNameSelected || isTaxCodeSelected || isIvassCodeSelected) && selected?.description
       ? selected.description
@@ -120,7 +124,7 @@ export default function AsyncAutocompleteSearch({
         value={!selected ? valueSelected : ''}
         label={
           !selected
-            ? isBusinessNameSelected || isTaxCodeSelected
+            ? isBusinessNameSelected || isTaxCodeSelected || isReaCodeSelected
               ? t('asyncAutocomplete.searchLabel')
               : isAooCodeSelected
               ? t('asyncAutocomplete.aooLabel')

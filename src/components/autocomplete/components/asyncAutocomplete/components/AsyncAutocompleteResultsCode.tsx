@@ -26,7 +26,7 @@ const CustomBox = styled(Box)({
 
 type Props = {
   setSelected: React.Dispatch<React.SetStateAction<any>>;
-  isLoading: boolean;
+  loading: boolean;
   getOptionLabel: (option: any) => string;
   getOptionKey: (option: any) => string;
   cfResult?: PartyData;
@@ -37,11 +37,13 @@ type Props = {
   isIvassCodeSelected?: boolean;
   isAooCodeSelected?: boolean;
   isUoCodeSelected?: boolean;
+  isReaCodeSelected?: boolean;
 };
 
+// eslint-disable-next-line sonarjs/cognitive-complexity
 export default function AsyncAutocompleteResultsCode({
   setSelected,
-  isLoading,
+  loading,
   cfResult,
   setCfResult,
   uoResult,
@@ -50,15 +52,16 @@ export default function AsyncAutocompleteResultsCode({
   isIvassCodeSelected,
   isAooCodeSelected,
   isUoCodeSelected,
+  isReaCodeSelected,
 }: Props) {
   const party =
-    isTaxCodeSelected || isIvassCodeSelected
+    isTaxCodeSelected || isIvassCodeSelected || isReaCodeSelected
       ? cfResult
       : isAooCodeSelected
-      ? aooResult
-      : isUoCodeSelected
-      ? uoResult
-      : '';
+        ? aooResult
+        : isUoCodeSelected
+          ? uoResult
+          : '';
 
   const partyName =
     party?.description ??
@@ -69,7 +72,7 @@ export default function AsyncAutocompleteResultsCode({
 
   return (
     <CustomBox my={2} {...cfResult} width="90%" maxHeight="200px" overflow="auto">
-      {!isLoading && (
+      {!loading && (
         <Box
           sx={{ textTransform: 'capitalize' }}
           py={1}
@@ -88,8 +91,8 @@ export default function AsyncAutocompleteResultsCode({
               !isTaxCodeSelected && aooResult
                 ? aooResult.denominazioneEnte || aooResult.parentDescription
                 : uoResult
-                ? uoResult?.denominazioneEnte || uoResult.parentDescription
-                : ''
+                  ? uoResult?.denominazioneEnte || uoResult.parentDescription
+                  : ''
             }
             image={' '}
             action={() => {

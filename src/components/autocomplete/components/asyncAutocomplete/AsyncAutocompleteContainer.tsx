@@ -51,6 +51,7 @@ type Props = {
   aooResult?: AooData;
   uoResult?: UoData;
   isIvassCodeSelected: boolean;
+  isReaCodeSelected: boolean;
   externalInstitutionId: string;
   institutionType?: InstitutionType;
   setDisabled: Dispatch<SetStateAction<boolean>>;
@@ -82,6 +83,7 @@ export default function AsyncAutocompleteContainer({
   isIvassCodeSelected,
   isAooCodeSelected,
   isUoCodeSelected,
+  isReaCodeSelected,
   setAooResult,
   setUoResult,
   aooResult,
@@ -97,7 +99,7 @@ export default function AsyncAutocompleteContainer({
 }: Props) {
   const { setRequiredLogin } = useContext(UserContext);
   const { t } = useTranslation();
-  const [isLoading, setIsLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [partyLogo, setPartyLogo] = useState<string>(
     selected ? buildUrlLogo(selected.id) : OnboardingPartyIcon
   );
@@ -115,10 +117,10 @@ export default function AsyncAutocompleteContainer({
       ? isBusinessNameSelected
         ? input.length < 3
         : isTaxCodeSelected
-        ? input.length < 11
-        : isAooCodeSelected
-        ? !!aooResult
-        : !!uoResult
+          ? input.length < 11
+          : isAooCodeSelected
+            ? !!aooResult
+            : !!uoResult
       : !selected;
 
   useEffect(() => {
@@ -144,7 +146,7 @@ export default function AsyncAutocompleteContainer({
     limit?: number,
     categories?: string
   ) => {
-    setIsLoading(true);
+    setLoading(true);
     const searchResponse = await fetchWithLogs(
       endpoint,
       {
@@ -167,7 +169,7 @@ export default function AsyncAutocompleteContainer({
       setOptions([]);
     }
 
-    setIsLoading(false);
+    setLoading(false);
   };
 
   const handleSearchByTaxCode = async (
@@ -176,13 +178,14 @@ export default function AsyncAutocompleteContainer({
     params: any,
     query: string
   ) => {
-    setIsLoading(true);
+    setLoading(true);
 
     const updatedParams = {
       ...params,
       taxCode: addUser ? query : undefined,
       categories:
-        product?.id === PRODUCT_IDS.INTEROP && (institutionType === 'SCP' || institutionType === 'PRV')
+        (product?.id === PRODUCT_IDS.INTEROP || product?.id === PRODUCT_IDS.IDPAY_MERCHANT) &&
+        (institutionType === 'SCP' || institutionType === 'PRV')
           ? undefined
           : filterCategories,
     };
@@ -204,7 +207,52 @@ export default function AsyncAutocompleteContainer({
       setCfResult(undefined);
     }
 
-    setIsLoading(false);
+    setLoading(false);
+  };
+
+  const handleSearchByReaCode = async (
+    addUser: boolean,
+    endpoint: ApiEndpointKey,
+    params: any,
+    query: string
+  ) => {
+    setLoading(true);
+
+    const reaPattern = /^[A-Za-z]{2}-\d{7}$/;
+    if (!reaPattern.test(query)) {
+      setLoading(false);
+      setCfResult(undefined);
+      return;
+    }
+
+    const rea = query;
+
+    const updatedParams = addUser
+      ? params
+      : {
+          rea
+        };
+
+    const searchResponse = await fetchWithLogs(
+      {
+        endpoint,
+      },
+      {
+        method: 'GET',
+        params: updatedParams,
+      },
+      () => setRequiredLogin(true)
+    );
+
+    const outcome = getFetchOutcome(searchResponse);
+
+    if (outcome === 'success') {
+      setCfResult((searchResponse as AxiosResponse).data);
+    } else if ((searchResponse as AxiosError).response?.status === 404) {
+      setCfResult(undefined);
+    }
+
+    setLoading(false);
   };
 
   const handleSearchByAooCode = async (
@@ -213,7 +261,7 @@ export default function AsyncAutocompleteContainer({
     params: any,
     query: string
   ) => {
-    setIsLoading(true);
+    setLoading(true);
 
     const updatedParams = addUser
       ? params
@@ -235,7 +283,7 @@ export default function AsyncAutocompleteContainer({
 
     if (outcome === 'success') {
       const response = addUser
-        ? (searchResponse as AxiosResponse).data[0] ?? (searchResponse as AxiosResponse).data
+        ? ((searchResponse as AxiosResponse).data[0] ?? (searchResponse as AxiosResponse).data)
         : (searchResponse as AxiosResponse).data;
       setAooResult(response);
       setAooResultHistory(response);
@@ -243,7 +291,7 @@ export default function AsyncAutocompleteContainer({
       setAooResult(undefined);
     }
 
-    setIsLoading(false);
+    setLoading(false);
   };
 
   const handleSearchByUoCode = async (
@@ -252,7 +300,7 @@ export default function AsyncAutocompleteContainer({
     params: any,
     query: string
   ) => {
-    setIsLoading(true);
+    setLoading(true);
 
     const updatedParams = addUser
       ? params
@@ -274,7 +322,7 @@ export default function AsyncAutocompleteContainer({
 
     if (outcome === 'success') {
       const response = addUser
-        ? (searchResponse as AxiosResponse).data[0] ?? (searchResponse as AxiosResponse).data
+        ? ((searchResponse as AxiosResponse).data[0] ?? (searchResponse as AxiosResponse).data)
         : (searchResponse as AxiosResponse).data;
       setUoResult(response);
       setUoResultHistory(response);
@@ -282,7 +330,7 @@ export default function AsyncAutocompleteContainer({
       setUoResult(undefined);
     }
 
-    setIsLoading(false);
+    setLoading(false);
   };
 
   const contractingInsuranceFromTaxId = async (
@@ -291,7 +339,7 @@ export default function AsyncAutocompleteContainer({
     params: any,
     query: string
   ) => {
-    setIsLoading(true);
+    setLoading(true);
 
     const searchResponse = await fetchWithLogs(
       {
@@ -299,8 +347,8 @@ export default function AsyncAutocompleteContainer({
         endpointParams: addUser
           ? undefined
           : institutionType === 'SA' || institutionType === 'AS'
-          ? { taxId: query }
-          : { code: query },
+            ? { taxId: query }
+            : { code: query },
       },
       {
         method: 'GET',
@@ -312,14 +360,14 @@ export default function AsyncAutocompleteContainer({
     const outcome = getFetchOutcome(searchResponse);
     if (outcome === 'success') {
       const response = addUser
-        ? (searchResponse as AxiosResponse).data[0] ?? (searchResponse as AxiosResponse).data
+        ? ((searchResponse as AxiosResponse).data[0] ?? (searchResponse as AxiosResponse).data)
         : (searchResponse as AxiosResponse).data;
       setCfResult(response);
     } else if ((searchResponse as AxiosError).response?.status === 404) {
       setCfResult(undefined);
     }
 
-    setIsLoading(false);
+    setLoading(false);
   };
 
   const searchByInstitutionType = async (value: string, institutionType?: string) => {
@@ -387,17 +435,19 @@ export default function AsyncAutocompleteContainer({
           const endpoint = addUser
             ? 'ONBOARDING_GET_INSTITUTIONS'
             : institutionType === 'SA'
-            ? 'ONBOARDING_GET_SA_PARTY_FROM_FC'
-            : 'ONBOARDING_GET_INSURANCE_COMPANIES_FROM_IVASSCODE';
+              ? 'ONBOARDING_GET_SA_PARTY_FROM_FC'
+              : 'ONBOARDING_GET_INSURANCE_COMPANIES_FROM_IVASSCODE';
 
           void contractingInsuranceFromTaxId(addUser, endpoint, params, value);
         } else {
           const endpoint = addUser
             ? 'ONBOARDING_GET_INSTITUTIONS'
             : product?.id === PRODUCT_IDS.INTEROP &&
-              (institutionType === 'SCP' || institutionType === 'PRV')
-            ? 'ONBOARDING_GET_PARTY_BY_CF_FROM_INFOCAMERE'
-            : 'ONBOARDING_GET_PARTY_FROM_CF';
+                (institutionType === 'SCP' || institutionType === 'PRV')
+              ? 'ONBOARDING_GET_PARTY_BY_CF_FROM_INFOCAMERE'
+              : product?.id === PRODUCT_IDS.IDPAY_MERCHANT && isTaxCodeSelected
+                ? 'ONBOARDING_GET_VISURA_INFOCAMERE_BY_CF'
+                : 'ONBOARDING_GET_PARTY_FROM_CF';
           void handleSearchByTaxCode(addUser, endpoint, params, value);
         }
       } else if (isAooCodeSelected && !isUoCodeSelected && value.length === 7) {
@@ -406,6 +456,9 @@ export default function AsyncAutocompleteContainer({
       } else if (isUoCodeSelected && !isAooCodeSelected && value.length === 6) {
         const endpoint = addUser ? 'ONBOARDING_GET_INSTITUTIONS' : 'ONBOARDING_GET_UO_CODE_INFO';
         void handleSearchByUoCode(addUser, endpoint, params, value);
+      } else if (isReaCodeSelected && value.length > 1) {
+        const endpoint = addUser ? 'ONBOARDING_GET_INSTITUTIONS' : 'ONBOARDING_GET_VISURA_INFOCAMERE_BY_REA';
+        void handleSearchByReaCode(addUser, endpoint, params, value);
       }
     } else {
       setSelected(null);
@@ -470,7 +523,7 @@ export default function AsyncAutocompleteContainer({
                 setSelected={setSelected}
                 options={options}
                 setOptions={setOptions}
-                isLoading={isLoading}
+                loading={loading}
                 getOptionLabel={getOptionLabel}
                 getOptionKey={getOptionKey}
               />
@@ -494,7 +547,11 @@ export default function AsyncAutocompleteContainer({
           </>
         ) : (
           <>
-            {(isTaxCodeSelected || isAooCodeSelected || isUoCodeSelected || isIvassCodeSelected) &&
+            {(isTaxCodeSelected ||
+              isAooCodeSelected ||
+              isUoCodeSelected ||
+              isIvassCodeSelected ||
+              isReaCodeSelected) &&
             !isBusinessNameSelected &&
             input !== undefined &&
             input?.length >= 5 &&
@@ -504,7 +561,7 @@ export default function AsyncAutocompleteContainer({
                 setSelected={setSelected}
                 cfResult={cfResult}
                 setCfResult={setCfResult}
-                isLoading={isLoading}
+                loading={loading}
                 getOptionLabel={getOptionLabel}
                 getOptionKey={getOptionKey}
                 aooResult={aooResult}
@@ -513,6 +570,7 @@ export default function AsyncAutocompleteContainer({
                 isIvassCodeSelected={isIvassCodeSelected}
                 isAooCodeSelected={isAooCodeSelected}
                 isUoCodeSelected={isUoCodeSelected}
+                isReaCodeSelected={isReaCodeSelected}
               />
             ) : (
               input.length >= 1 &&

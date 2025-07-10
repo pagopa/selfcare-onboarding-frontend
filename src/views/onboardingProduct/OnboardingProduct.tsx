@@ -191,14 +191,18 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
 
   // avoid step 1 if selectedProduct is 'prod-pn' or 'prod-idpay'
   useEffect(() => {
-    if (productAvoidStep) {
-      forwardWithInstitutionType('PA');
-    }
-
-    if (selectedProduct?.id === PRODUCT_IDS.IDPAY_MERCHANT) {
-      setActiveStep(1);
-    }
-  }, [selectedProduct]);
+  if (productAvoidStep) {
+    setInstitutionType('PA');
+    setOrigin('IPA');
+    setActiveStep(1); // Vai direttamente allo step di ricerca
+  }
+  
+  if (selectedProduct?.id === PRODUCT_IDS.IDPAY_MERCHANT) {
+    setInstitutionType('PRV');
+    setOrigin(undefined);
+    setActiveStep(1); // Vai direttamente allo step di ricerca
+  }
+}, [selectedProduct]);
 
   useEffect(() => {
     if (onboardingFormData && onboardingFormData?.businessName !== '' && institutionType !== 'PA') {

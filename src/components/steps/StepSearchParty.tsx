@@ -291,7 +291,7 @@ export function StepSearchParty({
                 inserisci uno dei dati richiesti e cerca l’ente per
                 <br /> cui vuoi richiedere l’adesione a <strong>Interoperabilità.</strong>
               </Trans>
-            ) : institutionType === 'SCP' || institutionType === 'PRV' ? (
+            ) : institutionType === 'SCP' || (institutionType === 'PRV' && product?.id === 'prod-interop') ? (
               <Trans
                 i18nKey="onboardingStep1.onboarding.scpSubtitle"
                 components={{ 3: <br />, 5: <strong /> }}
@@ -299,7 +299,15 @@ export function StepSearchParty({
                 Inserisci uno dei dati richiesti e cerca da Infocamere l’ente <br />
                 per cui vuoi richiedere l’adesione a <strong>Interoperabilità.</strong>
               </Trans>
-            ) : (
+            ) : product?.id === 'prod-idpay-merchant' ? (
+              <Trans
+                i18nKey="onboardingStep1.onboarding.merchantSubtitle"
+                components={{ 3: <br />, 5: <strong /> }}
+              >
+                Inserisci uno dei dati richiesti per cercare su InfoCamere l’ente <br />
+                per cui vuoi richiedere l’adesione a <strong>Portale Esercenti.</strong>
+              </Trans>
+            ) :(
               subTitle
             )}
           </Typography>
