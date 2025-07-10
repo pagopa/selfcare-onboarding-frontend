@@ -218,7 +218,6 @@ export default function AsyncAutocompleteContainer({
   ) => {
     setLoading(true);
 
-    // Validazione formato REA: deve essere 'XX-NNNNNNN' (2 lettere maiuscole + trattino + 7 cifre)
     const reaPattern = /^[A-Za-z]{2}-\d{7}$/;
     if (!reaPattern.test(query)) {
       setLoading(false);
@@ -226,7 +225,6 @@ export default function AsyncAutocompleteContainer({
       return;
     }
 
-    // Split del codice REA per estrarre county (prime 2 lettere) e rea (codice completo)
     const rea = query;
 
     const updatedParams = addUser
