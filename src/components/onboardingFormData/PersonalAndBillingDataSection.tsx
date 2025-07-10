@@ -80,9 +80,13 @@ type Props = StepperStepComponentProps & {
   isInvoiceable: boolean;
   isForeignInsurance?: boolean;
   isPdndPrivate: boolean;
+  isPdndPrivateMerchant: boolean;
   setInvalidTaxCodeInvoicing: React.Dispatch<React.SetStateAction<boolean>>;
   recipientCodeStatus?: string;
-  getCountriesFromGeotaxonomies: (query: string, setCountries: Dispatch<SetStateAction<Array<InstitutionLocationData> | undefined>>) => Promise<void>;
+  getCountriesFromGeotaxonomies: (
+    query: string,
+    setCountries: Dispatch<SetStateAction<Array<InstitutionLocationData> | undefined>>
+  ) => Promise<void>;
   countries: Array<InstitutionLocationData> | undefined;
   setCountries: Dispatch<SetStateAction<Array<InstitutionLocationData> | undefined>>;
 };
@@ -106,11 +110,12 @@ export default function PersonalAndBillingDataSection({
   isForeignInsurance,
   productId,
   isPdndPrivate,
+  isPdndPrivateMerchant,
   setInvalidTaxCodeInvoicing,
   recipientCodeStatus,
   getCountriesFromGeotaxonomies,
   countries,
-  setCountries
+  setCountries,
 }: Props) {
   const { t } = useTranslation();
   const { setRequiredLogin } = useContext(UserContext);
@@ -283,7 +288,9 @@ export default function PersonalAndBillingDataSection({
       try {
         const response = await fetch(ENV.JSON_URL.COUNTRIES);
         const nationalCountriesResponse = await response.json();
-        const countriesWithoutIta = nationalCountriesResponse.filter((cm: CountryResource) => cm.alpha_2 !== 'IT');
+        const countriesWithoutIta = nationalCountriesResponse.filter(
+          (cm: CountryResource) => cm.alpha_2 !== 'IT'
+        );
         setNationalCountries(countriesWithoutIta);
       } catch (reason) {
         console.error(reason);
@@ -791,7 +798,7 @@ export default function PersonalAndBillingDataSection({
                   </Box>
                 </Grid>
               )}
-            {productId !== PRODUCT_IDS.FD && productId !== PRODUCT_IDS.FD_GARANTITO && (
+            {productId !== PRODUCT_IDS.FD && productId !== PRODUCT_IDS.FD_GARANTITO && !isPdndPrivateMerchant && (
               <Grid item>
                 <Box
                   display="flex"
@@ -975,7 +982,9 @@ export default function PersonalAndBillingDataSection({
         )}
         {(isInformationCompany ||
           isContractingAuthority ||
-          ((productId === PRODUCT_IDS.INTEROP || productId === PRODUCT_IDS.PAGOPA) &&
+          ((productId === PRODUCT_IDS.INTEROP ||
+            productId === PRODUCT_IDS.PAGOPA ||
+            productId === PRODUCT_IDS.IDPAY_MERCHANT) &&
             (institutionType === 'SCP' ||
               institutionType === 'PRV' ||
               institutionType === 'GPU'))) && (
@@ -986,7 +995,7 @@ export default function PersonalAndBillingDataSection({
                 paddingValue={isContractingAuthority ? '20px' : '24px'}
                 {...baseTextFieldProps(
                   'businessRegisterPlace',
-                  isContractingAuthority || isPdndPrivate
+                  isContractingAuthority || isPdndPrivate  || isPdndPrivateMerchant
                     ? t(
                         'onboardingFormData.billingDataSection.informationCompanies.requiredCommercialRegisterNumber'
                       )
@@ -1113,7 +1122,7 @@ export default function PersonalAndBillingDataSection({
           </>
         )}
         {/* indirizzo mail di supporto */}
-        {!institutionAvoidGeotax && (
+        {!institutionAvoidGeotax && !isPdndPrivateMerchant && (
           <Grid item xs={12}>
             <CustomTextFieldNotched
               paddingValue={productId === PRODUCT_IDS.IO_SIGN ? '14px' : '20px'}

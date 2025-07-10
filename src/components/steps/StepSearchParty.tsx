@@ -474,7 +474,7 @@ export function StepSearchParty({
       <Grid item mt={2}>
         <OnboardingStepActions
           back={
-            !productAvoidStep
+            !productAvoidStep && product?.id !== PRODUCT_IDS.IDPAY_MERCHANT
               ? {
                   action: onBackAction,
                   label: t('stepInstitutionType.backLabel'),

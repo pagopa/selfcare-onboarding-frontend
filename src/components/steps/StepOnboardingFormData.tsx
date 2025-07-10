@@ -128,6 +128,8 @@ export default function StepOnboardingFormData({
   const isPremium = !!subProductId;
   const isPaymentServiceProvider = institutionType === 'PSP';
   const isPdndPrivate = institutionType === 'PRV' && productId === PRODUCT_IDS.INTEROP;
+  const isPdndPrivateMerchant =
+    institutionType === 'PRV' && productId === PRODUCT_IDS.IDPAY_MERCHANT;
   const isInformationCompany =
     origin !== 'IPA' &&
     institutionType !== 'PRV' &&
@@ -592,6 +594,7 @@ export default function StepOnboardingFormData({
           isCityEditable={isCityEditable}
           isInvoiceable={isInvoiceable}
           isPdndPrivate={isPdndPrivate}
+          isPdndPrivateMerchant={isPdndPrivateMerchant}
           setInvalidTaxCodeInvoicing={setInvalidTaxCodeInvoicing}
           recipientCodeStatus={recipientCodeStatus}
           getCountriesFromGeotaxonomies={getCountriesFromGeotaxonomies}
