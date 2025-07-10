@@ -1291,7 +1291,7 @@ export const mockedPdndVisuraInfomacere: Array<PDNDBusinessResource> = [
     zipCode: "20121",
     address: "Via Giuseppe Verdi, 15",
     digitalAddress: "rossi.costruzioni@pec.it",
-    atecoCode: "41.20.00",
+    atecoCodes: ["41.20.00"],
     nRea: "MI-1234567"
   },
   {
@@ -1306,7 +1306,7 @@ export const mockedPdndVisuraInfomacere: Array<PDNDBusinessResource> = [
     zipCode: "00185",
     address: "Piazza della Repubblica, 32",
     digitalAddress: "info@tecnoinnovative.pec.it",
-    atecoCode: "62.01.00",
+    atecoCodes: ["62.01.00"],
     nRea: "RM-2345678"
   },
   {
@@ -1321,7 +1321,7 @@ export const mockedPdndVisuraInfomacere: Array<PDNDBusinessResource> = [
     zipCode: "10128",
     address: "Corso Francia, 89",
     digitalAddress: "maria.bianchi@alimentari.pec.it",
-    atecoCode: "47.11.10",
+    atecoCodes: ["47.11.10"],
     nRea: "TO-3456789"
   },
   {
@@ -1336,7 +1336,7 @@ export const mockedPdndVisuraInfomacere: Array<PDNDBusinessResource> = [
     zipCode: "50123",
     address: "Via dei Calzaiuoli, 7",
     digitalAddress: "segreteria@studiolegaleverdi.pec.it",
-    atecoCode: "69.10.10",
+    atecoCodes: ["69.10.10"],
     nRea: "FI-4567890"
   },
   {
@@ -1351,7 +1351,7 @@ export const mockedPdndVisuraInfomacere: Array<PDNDBusinessResource> = [
     zipCode: "24122",
     address: "Via Alessandro Manzoni, 44",
     digitalAddress: "amministrazione@meccanicaprecision.pec.it",
-    atecoCode: "25.62.00",
+    atecoCodes: ["25.62.00"],
     nRea: "BG-5678901"
   }
 ];

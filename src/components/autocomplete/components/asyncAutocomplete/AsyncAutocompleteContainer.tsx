@@ -99,7 +99,7 @@ export default function AsyncAutocompleteContainer({
 }: Props) {
   const { setRequiredLogin } = useContext(UserContext);
   const { t } = useTranslation();
-  const [isLoading, setIsLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [partyLogo, setPartyLogo] = useState<string>(
     selected ? buildUrlLogo(selected.id) : OnboardingPartyIcon
   );
@@ -146,7 +146,7 @@ export default function AsyncAutocompleteContainer({
     limit?: number,
     categories?: string
   ) => {
-    setIsLoading(true);
+    setLoading(true);
     const searchResponse = await fetchWithLogs(
       endpoint,
       {
@@ -169,7 +169,7 @@ export default function AsyncAutocompleteContainer({
       setOptions([]);
     }
 
-    setIsLoading(false);
+    setLoading(false);
   };
 
   const handleSearchByTaxCode = async (
@@ -178,7 +178,7 @@ export default function AsyncAutocompleteContainer({
     params: any,
     query: string
   ) => {
-    setIsLoading(true);
+    setLoading(true);
 
     const updatedParams = {
       ...params,
@@ -207,7 +207,7 @@ export default function AsyncAutocompleteContainer({
       setCfResult(undefined);
     }
 
-    setIsLoading(false);
+    setLoading(false);
   };
 
   const handleSearchByReaCode = async (
@@ -216,25 +216,23 @@ export default function AsyncAutocompleteContainer({
     params: any,
     query: string
   ) => {
-    setIsLoading(true);
+    setLoading(true);
 
-    // Validazione formato REA: deve essere 'XX-NNNNNN' (2 lettere maiuscole + trattino + 6 cifre)
-    const reaPattern = /^[A-Za-z]{2}-\d{6}$/;
+    // Validazione formato REA: deve essere 'XX-NNNNNNN' (2 lettere maiuscole + trattino + 7 cifre)
+    const reaPattern = /^[A-Za-z]{2}-\d{7}$/;
     if (!reaPattern.test(query)) {
-      setIsLoading(false);
+      setLoading(false);
       setCfResult(undefined);
       return;
     }
 
     // Split del codice REA per estrarre county (prime 2 lettere) e rea (codice completo)
-    const county = query.substring(0, 2);
     const rea = query;
 
     const updatedParams = addUser
       ? params
       : {
-          rea,
-          county,
+          rea
         };
 
     const searchResponse = await fetchWithLogs(
@@ -256,7 +254,7 @@ export default function AsyncAutocompleteContainer({
       setCfResult(undefined);
     }
 
-    setIsLoading(false);
+    setLoading(false);
   };
 
   const handleSearchByAooCode = async (
@@ -265,7 +263,7 @@ export default function AsyncAutocompleteContainer({
     params: any,
     query: string
   ) => {
-    setIsLoading(true);
+    setLoading(true);
 
     const updatedParams = addUser
       ? params
@@ -295,7 +293,7 @@ export default function AsyncAutocompleteContainer({
       setAooResult(undefined);
     }
 
-    setIsLoading(false);
+    setLoading(false);
   };
 
   const handleSearchByUoCode = async (
@@ -304,7 +302,7 @@ export default function AsyncAutocompleteContainer({
     params: any,
     query: string
   ) => {
-    setIsLoading(true);
+    setLoading(true);
 
     const updatedParams = addUser
       ? params
@@ -334,7 +332,7 @@ export default function AsyncAutocompleteContainer({
       setUoResult(undefined);
     }
 
-    setIsLoading(false);
+    setLoading(false);
   };
 
   const contractingInsuranceFromTaxId = async (
@@ -343,7 +341,7 @@ export default function AsyncAutocompleteContainer({
     params: any,
     query: string
   ) => {
-    setIsLoading(true);
+    setLoading(true);
 
     const searchResponse = await fetchWithLogs(
       {
@@ -371,7 +369,7 @@ export default function AsyncAutocompleteContainer({
       setCfResult(undefined);
     }
 
-    setIsLoading(false);
+    setLoading(false);
   };
 
   const searchByInstitutionType = async (value: string, institutionType?: string) => {
@@ -527,7 +525,7 @@ export default function AsyncAutocompleteContainer({
                 setSelected={setSelected}
                 options={options}
                 setOptions={setOptions}
-                isLoading={isLoading}
+                loading={loading}
                 getOptionLabel={getOptionLabel}
                 getOptionKey={getOptionKey}
               />
@@ -565,7 +563,7 @@ export default function AsyncAutocompleteContainer({
                 setSelected={setSelected}
                 cfResult={cfResult}
                 setCfResult={setCfResult}
-                isLoading={isLoading}
+                loading={loading}
                 getOptionLabel={getOptionLabel}
                 getOptionKey={getOptionKey}
                 aooResult={aooResult}

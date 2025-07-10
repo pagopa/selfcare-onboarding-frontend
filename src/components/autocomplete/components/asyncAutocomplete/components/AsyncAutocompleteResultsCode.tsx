@@ -26,7 +26,7 @@ const CustomBox = styled(Box)({
 
 type Props = {
   setSelected: React.Dispatch<React.SetStateAction<any>>;
-  isLoading: boolean;
+  loading: boolean;
   getOptionLabel: (option: any) => string;
   getOptionKey: (option: any) => string;
   cfResult?: PartyData;
@@ -43,7 +43,7 @@ type Props = {
 // eslint-disable-next-line sonarjs/cognitive-complexity
 export default function AsyncAutocompleteResultsCode({
   setSelected,
-  isLoading,
+  loading,
   cfResult,
   setCfResult,
   uoResult,
@@ -72,7 +72,7 @@ export default function AsyncAutocompleteResultsCode({
 
   return (
     <CustomBox my={2} {...cfResult} width="90%" maxHeight="200px" overflow="auto">
-      {!isLoading && (
+      {!loading && (
         <Box
           sx={{ textTransform: 'capitalize' }}
           py={1}

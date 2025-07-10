@@ -369,6 +369,9 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
       case 'PA':
         setActiveStep(activeStep + 3);
         break;
+      case 'GSP':
+        setActiveStep(activeStep + 2);
+        break;
       case 'GPU':
         setActiveStep(3);
         break;

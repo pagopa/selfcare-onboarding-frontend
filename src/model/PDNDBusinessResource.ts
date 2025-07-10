@@ -10,6 +10,6 @@ export type PDNDBusinessResource = {
   zipCode: string;
   address: string;
   digitalAddress: string;
-  atecoCode: string;
+  atecoCodes: Array<string>;
   nRea: string;
 };
