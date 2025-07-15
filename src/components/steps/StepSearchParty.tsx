@@ -1,4 +1,12 @@
-import { Alert, FormControlLabel, Grid, Link, Typography, useTheme } from '@mui/material';
+import {
+  Alert,
+  AlertTitle,
+  FormControlLabel,
+  Grid,
+  Link,
+  Typography,
+  useTheme,
+} from '@mui/material';
 import Checkbox from '@mui/material/Checkbox';
 import { Box } from '@mui/system';
 import { SessionModal } from '@pagopa/selfcare-common-frontend/lib';
@@ -87,10 +95,13 @@ export function StepSearchParty({
     'uoSelected_step1',
     undefined
   );
+  const [merchantSearchResult, setMerchantSearchResult] = useState();
   const [ecData, setEcData] = useState<PartyData | null>(null);
   const [filterCategories, setFilterCategories] = useState<string>();
   const isEnabledProduct2AooUo = product?.id === PRODUCT_IDS.SEND;
-
+  const [isPresentInAtecoWhiteList, setIsPresentInAtecoWhiteList] = useState<boolean>(
+    product?.id === PRODUCT_IDS.IDPAY_MERCHANT ? true : false
+  );
   const getECDataByCF = async (query: string) => {
     const searchResponse = await fetchWithLogs(
       { endpoint: 'ONBOARDING_GET_PARTY_FROM_CF', endpointParams: { id: query } },
@@ -221,7 +232,19 @@ export function StepSearchParty({
 
   useEffect(() => {
     setFilterCategories(selectFilterCategories());
-  }, []);
+  }, [selectFilterCategories]);
+
+  useEffect(() => {
+    if (product?.id === PRODUCT_IDS.IDPAY_MERCHANT) {
+      if (merchantSearchResult) {
+        setDisabled(!(selected && isPresentInAtecoWhiteList));
+      } else {
+        setDisabled(!selected);
+      }
+    } else {
+      setDisabled(!selected);
+    }
+  }, [selected, isPresentInAtecoWhiteList, merchantSearchResult, product?.id]);
 
   const onForwardAction = () => {
     const dataParty = aooResult || uoResult ? ({ ...selected, ...ecData } as PartyData) : selected;
@@ -291,7 +314,8 @@ export function StepSearchParty({
                 inserisci uno dei dati richiesti e cerca l’ente per
                 <br /> cui vuoi richiedere l’adesione a <strong>Interoperabilità.</strong>
               </Trans>
-            ) : institutionType === 'SCP' || (institutionType === 'PRV' && product?.id === 'prod-interop') ? (
+            ) : institutionType === 'SCP' ||
+              (institutionType === 'PRV' && product?.id === 'prod-interop') ? (
               <Trans
                 i18nKey="onboardingStep1.onboarding.scpSubtitle"
                 components={{ 3: <br />, 5: <strong /> }}
@@ -307,7 +331,7 @@ export function StepSearchParty({
                 Inserisci uno dei dati richiesti per cercare su InfoCamere l’ente <br />
                 per cui vuoi richiedere l’adesione a <strong>Portale Esercenti.</strong>
               </Trans>
-            ) :(
+            ) : (
               subTitle
             )}
           </Typography>
@@ -344,6 +368,42 @@ export function StepSearchParty({
                   </Trans>
                 </Typography>
               </Alert>
+            </Grid>
+          </Grid>
+        )}
+
+        {product?.id === PRODUCT_IDS.IDPAY_MERCHANT && (
+          <Grid container item justifyContent="center">
+            <Grid item xs={9}>
+              <Box display="flex" justifyContent="center" mb={5}>
+                {merchantSearchResult ? (
+                  isPresentInAtecoWhiteList ? (
+                    <Alert severity="info" sx={{ width: '100%' }}>
+                      <Typography
+                        sx={{ fontSize: '16px', a: { color: theme.palette.text.primary } }}
+                      >
+                        se l&#39;esercente fa parte di una catena è la società padre a dover aderire
+                      </Typography>
+                    </Alert>
+                  ) : (
+                    <Alert severity="error" sx={{ width: '100%' }}>
+                      <AlertTitle>Il tuo codice ATECO non è idoneo</AlertTitle>
+                      <Typography
+                        sx={{ fontSize: '16px', a: { color: theme.palette.text.primary } }}
+                      >
+                        Il codice ATECO al quale sei abilitato non corrisponde con quelli idonei al
+                        Bonus Elettrodomestici
+                      </Typography>
+                    </Alert>
+                  )
+                ) : (
+                  <Alert severity="info" sx={{ width: '100%' }}>
+                    <Typography sx={{ fontSize: '16px', a: { color: theme.palette.text.primary } }}>
+                      se l&#39;esercente fa parte di una catena è la società padre a dover aderire
+                    </Typography>
+                  </Alert>
+                )}
+              </Box>
             </Grid>
           </Grid>
         )}
@@ -386,6 +446,8 @@ export function StepSearchParty({
             externalInstitutionId={externalInstitutionId}
             institutionType={institutionType}
             filterCategories={filterCategories}
+            setIsPresentInAtecoWhiteList={setIsPresentInAtecoWhiteList}
+            setMerchantSearchResult={setMerchantSearchResult}
           />
         </Grid>
         {ENV.AGGREGATOR.SHOW_AGGREGATOR &&
