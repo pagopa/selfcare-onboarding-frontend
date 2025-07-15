@@ -827,8 +827,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
               (institutionType !== 'PA' &&
                 institutionType !== 'SA' &&
                 institutionType !== 'GSP' &&
-                institutionType !== 'PRV' &&
-                productId === PRODUCT_IDS.IDPAY_MERCHANT)
+                institutionType !== 'PRV')
             ) {
               setActiveStep(0);
             } else if (fromDashboard && productId === PRODUCT_IDS.DASHBOARD_PSP) {
