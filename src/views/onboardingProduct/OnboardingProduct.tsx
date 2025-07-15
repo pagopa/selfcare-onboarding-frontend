@@ -824,7 +824,10 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
               setOpenExitModal(true);
             } else if (
               institutionType === 'PSP' ||
-              (institutionType !== 'PA' && institutionType !== 'SA' && institutionType !== 'GSP')
+              (institutionType !== 'PA' &&
+                institutionType !== 'SA' &&
+                institutionType !== 'GSP' &&
+                institutionType !== 'PRV')
             ) {
               setActiveStep(0);
             } else if (fromDashboard && productId === PRODUCT_IDS.DASHBOARD_PSP) {

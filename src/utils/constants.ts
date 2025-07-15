@@ -218,7 +218,8 @@ export const canInvoice = (institutionType?: string, productId?: string) =>
   institutionType !== 'SA' &&
   institutionType !== 'PT' &&
   institutionType !== 'AS' &&
-  productId !== PRODUCT_IDS.INTEROP;
+  productId !== PRODUCT_IDS.INTEROP &&
+  productId !== PRODUCT_IDS.IDPAY_MERCHANT;;
 
 export const noMandatoryIpaProducts = (productId?: string) =>
   productId !== PRODUCT_IDS.INTEROP &&
