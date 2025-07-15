@@ -220,6 +220,8 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
   const selectFilterCategories = () => {
     if (productId === 'prod-pn') {
       return filterCategoriesResponse?.product['prod-pn']?.ipa.PA;
+    } else if (productId === 'prod-idpay-merchant') {
+      return filterCategoriesResponse?.product['prod-idpay-merchant']?.merchantDetails.atecoCodes;
     } else if (institutionType === 'GSP') {
       return filterCategoriesResponse?.product.default.ipa.GSP;
     } else {

@@ -1111,7 +1111,7 @@ export const mockedProducts: Array<Product> = [
     id: 'prod-idpay-merchant',
     title: 'Portale Esercenti',
     status: statusActive,
-  }
+  },
 ];
 
 export const institutionTypes: Array<InstitutionType> = [
@@ -1269,6 +1269,11 @@ export const mockedCategories = {
         pricingPlan: 'C0',
       },
     },
+    'prod-idpay-merchant': {
+      merchantDetails: {
+        atecoCodes: '47.43.00,95.11.00,47.12.10,47.21.01',
+      },
+    },
     default: {
       ipa: {
         GSP: 'B1,B2',
@@ -1280,80 +1285,80 @@ export const mockedCategories = {
 
 export const mockedPdndVisuraInfomacere: Array<PDNDBusinessResource> = [
   {
-    businessTaxId: "12345678901",
-    businessName: "Rossi Costruzioni S.r.l.",
-    legalNature: "SRL",
-    legalNatureDescription: "Società a responsabilità limitata",
-    cciaa: "MI",
-    businessStatus: "Attiva",
-    city: "Milano",
-    county: "Milano",
-    zipCode: "20121",
-    address: "Via Giuseppe Verdi, 15",
-    digitalAddress: "rossi.costruzioni@pec.it",
-    atecoCodes: ["41.20.00"],
-    nRea: "MI-1234567"
+    businessTaxId: '12345678901',
+    businessName: 'Rossi Costruzioni S.r.l.',
+    legalNature: 'SRL',
+    legalNatureDescription: 'Società a responsabilità limitata',
+    cciaa: 'MI',
+    businessStatus: 'Attiva',
+    city: 'Milano',
+    county: 'Milano',
+    zipCode: '20121',
+    address: 'Via Giuseppe Verdi, 15',
+    digitalAddress: 'rossi.costruzioni@pec.it',
+    atecoCodes: ['47.43.00'],
+    nRea: 'MI-1234567',
   },
   {
-    businessTaxId: "98765432109",
-    businessName: "Tecnologie Innovative S.p.A.",
-    legalNature: "SPA",
-    legalNatureDescription: "Società per azioni",
-    cciaa: "RM",
-    businessStatus: "Attiva",
-    city: "Roma",
-    county: "Roma",
-    zipCode: "00185",
-    address: "Piazza della Repubblica, 32",
-    digitalAddress: "info@tecnoinnovative.pec.it",
-    atecoCodes: ["62.01.00"],
-    nRea: "RM-2345678"
+    businessTaxId: '98765432109',
+    businessName: 'Tecnologie Innovative S.p.A.',
+    legalNature: 'SPA',
+    legalNatureDescription: 'Società per azioni',
+    cciaa: 'RM',
+    businessStatus: 'Attiva',
+    city: 'Roma',
+    county: 'Roma',
+    zipCode: '00185',
+    address: 'Piazza della Repubblica, 32',
+    digitalAddress: 'info@tecnoinnovative.pec.it',
+    atecoCodes: ['62.01.00'],
+    nRea: 'RM-2345678',
   },
   {
-    businessTaxId: "11223344556",
-    businessName: "Alimentari Freschi di Bianchi Maria",
-    legalNature: "II",
-    legalNatureDescription: "Impresa individuale",
-    cciaa: "TO",
-    businessStatus: "Attiva",
-    city: "Torino",
-    county: "Torino",
-    zipCode: "10128",
-    address: "Corso Francia, 89",
-    digitalAddress: "maria.bianchi@alimentari.pec.it",
-    atecoCodes: ["47.11.10"],
-    nRea: "TO-3456789"
+    businessTaxId: '11223344556',
+    businessName: 'Alimentari Freschi di Bianchi Maria',
+    legalNature: 'II',
+    legalNatureDescription: 'Impresa individuale',
+    cciaa: 'TO',
+    businessStatus: 'Attiva',
+    city: 'Torino',
+    county: 'Torino',
+    zipCode: '10128',
+    address: 'Corso Francia, 89',
+    digitalAddress: 'maria.bianchi@alimentari.pec.it',
+    atecoCodes: ['47.11.10'],
+    nRea: 'TO-3456789',
   },
   {
-    businessTaxId: "55667788990",
-    businessName: "Studio Legale Associato Verdi & Partners",
-    legalNature: "STP",
-    legalNatureDescription: "Società tra professionisti",
-    cciaa: "FI",
-    businessStatus: "Attiva",
-    city: "Firenze",
-    county: "Firenze",
-    zipCode: "50123",
-    address: "Via dei Calzaiuoli, 7",
-    digitalAddress: "segreteria@studiolegaleverdi.pec.it",
-    atecoCodes: ["69.10.10"],
-    nRea: "FI-4567890"
+    businessTaxId: '55667788990',
+    businessName: 'Studio Legale Associato Verdi & Partners',
+    legalNature: 'STP',
+    legalNatureDescription: 'Società tra professionisti',
+    cciaa: 'FI',
+    businessStatus: 'Attiva',
+    city: 'Firenze',
+    county: 'Firenze',
+    zipCode: '50123',
+    address: 'Via dei Calzaiuoli, 7',
+    digitalAddress: 'segreteria@studiolegaleverdi.pec.it',
+    atecoCodes: ['69.10.10'],
+    nRea: 'FI-4567890',
   },
   {
-    businessTaxId: "33445566778",
-    businessName: "Meccanica Precision S.n.c.",
-    legalNature: "SNC",
-    legalNatureDescription: "Società in nome collettivo",
-    cciaa: "BG",
-    businessStatus: "Cessata",
-    city: "Bergamo",
-    county: "Bergamo",
-    zipCode: "24122",
-    address: "Via Alessandro Manzoni, 44",
-    digitalAddress: "amministrazione@meccanicaprecision.pec.it",
-    atecoCodes: ["25.62.00"],
-    nRea: "BG-5678901"
-  }
+    businessTaxId: '33445566778',
+    businessName: 'Meccanica Precision S.n.c.',
+    legalNature: 'SNC',
+    legalNatureDescription: 'Società in nome collettivo',
+    cciaa: 'BG',
+    businessStatus: 'Cessata',
+    city: 'Bergamo',
+    county: 'Bergamo',
+    zipCode: '24122',
+    address: 'Via Alessandro Manzoni, 44',
+    digitalAddress: 'amministrazione@meccanicaprecision.pec.it',
+    atecoCodes: ['25.62.00'],
+    nRea: 'BG-5678901',
+  },
 ];
 
 const noContent: Promise<AxiosResponse> = new Promise((resolve) =>
@@ -1870,7 +1875,9 @@ export async function mockFetch(
   }
 
   if (endpoint === 'ONBOARDING_GET_VISURA_INFOCAMERE_BY_CF') {
-    const retrivedInstitutionByCF = mockedPdndVisuraInfomacere.find((p) => p.businessTaxId === endpointParams.id);
+    const retrivedInstitutionByCF = mockedPdndVisuraInfomacere.find(
+      (p) => p.businessTaxId === endpointParams.id
+    );
 
     return new Promise((resolve) =>
       resolve({
