@@ -309,27 +309,32 @@ export function StepSearchParty({
                 <strong>Interoperabilità.</strong>
               </Trans>
             ) : institutionType === 'AS' ? (
-              <Trans i18nKey="onboardingStep1.onboarding.asSubTitle">
-                Se sei una società di assicurazione presente nell’Albo delle <br /> imprese IVASS,
-                inserisci uno dei dati richiesti e cerca l’ente per
-                <br /> cui vuoi richiedere l’adesione a <strong>Interoperabilità.</strong>
+              <Trans
+                i18nKey="onboardingStep1.onboarding.asSubTitle"
+                values={{ productName: product?.title }}
+              >
+                {`Se sei una società di assicurazione presente nell’Albo delle <br /> imprese IVASS,
+                  inserisci uno dei dati richiesti e cerca l’ente per
+                  <br /> cui vuoi richiedere l’adesione a <strong>{{ productName }}.</strong>`}
               </Trans>
             ) : institutionType === 'SCP' ||
               (institutionType === 'PRV' && product?.id === 'prod-interop') ? (
               <Trans
                 i18nKey="onboardingStep1.onboarding.scpSubtitle"
                 components={{ 3: <br />, 5: <strong /> }}
+                values={{ productName: product?.title }}
               >
-                Inserisci uno dei dati richiesti e cerca da Infocamere l’ente <br />
-                per cui vuoi richiedere l’adesione a <strong>Interoperabilità.</strong>
+                {`Inserisci uno dei dati richiesti e cerca da Infocamere l’ente <br />
+                  per cui vuoi richiedere l’adesione a <strong>{{ productName }}.</strong>`}
               </Trans>
             ) : product?.id === 'prod-idpay-merchant' ? (
               <Trans
                 i18nKey="onboardingStep1.onboarding.merchantSubtitle"
                 components={{ 3: <br />, 5: <strong /> }}
+                values={{ productName: product?.title }}
               >
-                Inserisci uno dei dati richiesti per cercare su InfoCamere l’ente <br />
-                per cui vuoi richiedere l’adesione a <strong>Portale Esercenti.</strong>
+                {`Inserisci uno dei dati richiesti per cercare su InfoCamere l’ente <br />
+                  per cui vuoi richiedere l’adesione a <strong>{{ productName }}.</strong>`}
               </Trans>
             ) : (
               subTitle
