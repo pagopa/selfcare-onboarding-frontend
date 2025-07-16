@@ -5,6 +5,7 @@ export type PDNDBusinessResource = {
   legalNatureDescription: string;
   cciaa: string;
   businessStatus: string;
+  vatNumber: string;
   city: string;
   county: string;
   zipCode: string;

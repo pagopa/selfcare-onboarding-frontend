@@ -2,7 +2,7 @@ import { IconButton, TextField, Theme, Tooltip, Typography, Box } from '@mui/mat
 import { styled } from '@mui/system';
 import { useTranslation } from 'react-i18next';
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
-import { Dispatch, SetStateAction, useEffect } from 'react';
+import { Dispatch, SetStateAction, useEffect, useMemo } from 'react';
 import { IPACatalogParty, PartyData } from '../../../../../../types';
 import { useHistoryState } from '../../../../useHistoryState';
 import { UoData } from '../../../../../model/UoModel';
@@ -74,7 +74,6 @@ export default function AsyncAutocompleteSearch({
 }: Props) {
   const setSelectedHistory = useHistoryState<IPACatalogParty | null>('selected_step1', null)[2];
   const { t } = useTranslation();
-
   const [stepHistoryState, setStepHistoryState, setStepHistoryStateHistory] =
     useHistoryState<StepBillingDataHistoryState>('onboardingFormData', {
       externalInstitutionId,
@@ -111,6 +110,24 @@ export default function AsyncAutocompleteSearch({
     }
   }, []);
 
+  const label = useMemo(() => {
+    if (selected) {
+      return '';
+    }
+
+    if (isReaCodeSelected) {
+      return t('asyncAutocomplete.reaLabel');
+    }
+    if (isAooCodeSelected) {
+      return t('asyncAutocomplete.aooLabel');
+    }
+    if (isUoCodeSelected) {
+      return t('asyncAutocomplete.uoLabel');
+    }
+
+    return t('asyncAutocomplete.searchLabel');
+  }, [selected, isReaCodeSelected, isAooCodeSelected, isUoCodeSelected, t]);
+
   return (
     <Tooltip arrow title={selected?.description?.length > 20 ? selected?.description : ''}>
       <CustomTextField
@@ -124,17 +141,7 @@ export default function AsyncAutocompleteSearch({
         }}
         onChange={handleChange}
         value={!selected ? valueSelected : ''}
-        label={
-          !selected
-            ? isBusinessNameSelected || isTaxCodeSelected || isReaCodeSelected
-              ? t('asyncAutocomplete.searchLabel')
-              : isAooCodeSelected
-                ? t('asyncAutocomplete.aooLabel')
-                : isUoCodeSelected
-                  ? t('asyncAutocomplete.uoLabel')
-                  : t('asyncAutocomplete.searchLabel')
-            : ''
-        }
+        label={label}
         variant={!selected ? 'outlined' : 'standard'}
         inputProps={{
           // maxLength: isTaxCodeSelected ? '11' : undefined,

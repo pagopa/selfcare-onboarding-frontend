@@ -12,12 +12,12 @@ type Props = {
   setIsBusinessNameSelected: React.Dispatch<React.SetStateAction<boolean>>;
   setIsTaxCodeSelected: React.Dispatch<React.SetStateAction<boolean | undefined>>;
   setIsIvassCodeSelected: React.Dispatch<React.SetStateAction<boolean>>;
-  setOptions: React.Dispatch<React.SetStateAction<Array<any>>>;
-  setInput: React.Dispatch<React.SetStateAction<string>>;
-  setIsSearchFieldSelected: React.Dispatch<React.SetStateAction<boolean>>;
   setIsAooCodeSelected: React.Dispatch<React.SetStateAction<boolean>>;
   setIsUoCodeSelected: React.Dispatch<React.SetStateAction<boolean>>;
   setIsReaCodeSelected: React.Dispatch<React.SetStateAction<boolean>>;
+  setOptions: React.Dispatch<React.SetStateAction<Array<any>>>;
+  setInput: React.Dispatch<React.SetStateAction<string>>;
+  setIsSearchFieldSelected: React.Dispatch<React.SetStateAction<boolean>>;
   setCfResult: React.Dispatch<React.SetStateAction<PartyData | undefined>>;
   setAooResult: Dispatch<SetStateAction<AooData | undefined>>;
   setUoResult: Dispatch<SetStateAction<UoData | undefined>>;
@@ -39,12 +39,12 @@ export default function PartyAdvancedSelect({
   setIsBusinessNameSelected,
   setIsTaxCodeSelected,
   setIsIvassCodeSelected,
-  setOptions,
-  setInput,
-  setIsSearchFieldSelected,
   setIsAooCodeSelected,
   setIsUoCodeSelected,
   setIsReaCodeSelected,
+  setIsSearchFieldSelected,
+  setOptions,
+  setInput,
   setCfResult,
   setAooResult,
   setUoResult,
@@ -94,11 +94,15 @@ export default function PartyAdvancedSelect({
 
   useEffect(() => {
     if (
-      (product?.id === PRODUCT_IDS.INTEROP || product?.id === PRODUCT_IDS.IDPAY_MERCHANT) &&
-      (institutionType === 'SCP' || institutionType === 'PRV')
+      addUser ||
+      ((product?.id === PRODUCT_IDS.INTEROP || product?.id === PRODUCT_IDS.IDPAY_MERCHANT) &&
+        (institutionType === 'SCP' || institutionType === 'PRV'))
     ) {
       onSelectValue(false, true, false, false, false, false);
       setTypeOfSearch('taxCode');
+    } else {
+      onSelectValue(true, false, false, false, false, false);
+      setTypeOfSearch('businessName');
     }
   }, []);
 
@@ -118,21 +122,14 @@ export default function PartyAdvancedSelect({
     } else {
       setTypeOfSearch('');
     }
-  }, []);
-
-  useEffect(() => {
-    if (
-      addUser ||
-      ((product?.id === PRODUCT_IDS.INTEROP || product?.id === PRODUCT_IDS.IDPAY_MERCHANT) &&
-        (institutionType === 'SCP' || institutionType === 'PRV'))
-    ) {
-      setTypeOfSearch('taxCode');
-      setIsTaxCodeSelected(true);
-    } else {
-      setTypeOfSearch('businessName');
-      setIsBusinessNameSelected(true);
-    }
-  }, []);
+  }, [
+    isBusinessNameSelected,
+    isTaxCodeSelected,
+    isAooCodeSelected,
+    isUoCodeSelected,
+    isIvassCodeSelected,
+    isReaCodeSelected,
+  ]);
 
   const filteredByProducts = (product?: Product) =>
     product &&

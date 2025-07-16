@@ -27,6 +27,8 @@ type AutocompleteProps = {
   externalInstitutionId: string;
   institutionType?: InstitutionType;
   setDisabled: Dispatch<SetStateAction<boolean>>;
+  setApiLoading?: Dispatch<SetStateAction<boolean>>;
+  apiLoading?: boolean;
   selectedProduct?: Product;
   filterCategories?: string;
   setIsPresentInAtecoWhiteList?: Dispatch<SetStateAction<boolean>>;
@@ -50,6 +52,8 @@ export function Autocomplete({
   externalInstitutionId,
   institutionType,
   setDisabled,
+  setApiLoading,
+  apiLoading,
   selectedProduct,
   filterCategories,
   setIsPresentInAtecoWhiteList,
@@ -167,6 +171,8 @@ export function Autocomplete({
           filterCategories={filterCategories}
           setIsPresentInAtecoWhiteList={setIsPresentInAtecoWhiteList}
           setMerchantSearchResult={setMerchantSearchResult}
+          setApiLoading={setApiLoading}
+          apiLoading={apiLoading}
         />
       </Grid>
     </Paper>

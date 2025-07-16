@@ -20,7 +20,9 @@ export const selected2OnboardingData = (
   aooUniqueCode: selectedParty?.codiceUniAoo,
   uoUniqueCode: selectedParty?.codiceUniUo,
   digitalAddress:
-    selectedParty?.tipoMail1 === 'Pec' ? selectedParty?.mail1 : selectedParty?.digitalAddress ?? '',
+    selectedParty?.tipoMail1 === 'Pec'
+      ? selectedParty?.mail1
+      : (selectedParty?.digitalAddress ?? ''),
   recipientCode: selectedParty?.codiceUniAoo ?? selectedParty?.codiceUniUo,
   registeredOffice:
     selectedParty?.registeredOffice ?? selectedParty?.indirizzo ?? selectedParty?.address ?? '',
@@ -29,22 +31,24 @@ export const selected2OnboardingData = (
     selectedParty?.taxCode ??
     selectedParty?.businessTaxId ??
     '',
-  vatNumber: '',
+  vatNumber: selectedParty?.vatNumber ?? '',
   taxCodeInvoicing: selectedParty?.codiceFiscaleSfe,
   zipCode: selectedParty?.CAP ?? selectedParty?.zipCode,
   geographicTaxonomies: [],
   originIdEc: selectedParty?.originId,
   originId:
-    institutionType === 'PRV' && productId === PRODUCT_IDS.INTEROP || institutionType === 'SCP'
+    (institutionType === 'PRV' && productId === PRODUCT_IDS.INTEROP) || institutionType === 'SCP'
       ? selectedParty?.businessTaxId
-      : selectedParty?.codiceUniUo ?? selectedParty?.codiceUniAoo ?? selectedParty?.originId,
+      : (selectedParty?.codiceUniUo ?? selectedParty?.codiceUniAoo ?? selectedParty?.originId),
   origin:
-    institutionType === 'PRV' && productId === PRODUCT_IDS.INTEROP || institutionType === 'SCP'
+    (institutionType === 'PRV' && productId === PRODUCT_IDS.INTEROP) || institutionType === 'SCP'
       ? 'PDND_INFOCAMERE'
       : selectedParty?.origin,
   rea:
     selectedParty?.cciaa && selectedParty?.nRea
-      ? `${selectedParty?.cciaa}-${selectedParty?.nRea}`
+      ? process.env.REACT_APP_MOCK_API === 'true'
+        ? selectedParty?.nRea
+        : `${selectedParty?.cciaa}-${selectedParty?.nRea}`
       : undefined,
   city: selectedParty?.city,
   county: selectedParty?.county,

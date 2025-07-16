@@ -221,7 +221,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     if (productId === 'prod-pn') {
       return filterCategoriesResponse?.product['prod-pn']?.ipa.PA;
     } else if (productId === 'prod-idpay-merchant') {
-      return filterCategoriesResponse?.product['prod-idpay-merchant']?.merchantDetails.atecoCodes;
+      return filterCategoriesResponse?.product['prod-idpay-merchant']?.merchantDetails?.atecoCodes;
     } else if (institutionType === 'GSP') {
       return filterCategoriesResponse?.product.default.ipa.GSP;
     } else {
@@ -337,6 +337,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     onboardingData: OnboardingFormData,
     institutionType: InstitutionType
   ) => {
+    console.log('onboardingData', onboardingData);
     if (
       onboardingData.taxCode === '' &&
       onboardingData.originId === undefined &&

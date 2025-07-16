@@ -32,6 +32,7 @@ export const validateFields = (
   isPremium: boolean,
   invalidTaxCodeInvoicing: boolean,
   isPdndPrivate: boolean,
+  isPrivateMerchant: boolean,
   recipientCodeStatus?: string,
   productId?: string
 ) =>
@@ -98,7 +99,7 @@ export const validateFields = (
             )
           : undefined,
     businessRegisterPlace:
-      (institutionType === 'SA' || isPdndPrivate) && !values.businessRegisterPlace
+      (institutionType === 'SA' || isPdndPrivate || isPrivateMerchant) && !values.businessRegisterPlace
         ? requiredError
         : undefined,
     registrationInRegister:
@@ -151,7 +152,7 @@ export const validateFields = (
         ? requiredError
         : undefined,
     rea:
-      (isInformationCompany || isPdndPrivate) && !values.rea
+      (isInformationCompany || isPdndPrivate || isPrivateMerchant) && !values.rea
         ? requiredError
         : values.rea && !reaValidation.test(values.rea as string)
           ? t('onboardingFormData.billingDataSection.invalidReaField')

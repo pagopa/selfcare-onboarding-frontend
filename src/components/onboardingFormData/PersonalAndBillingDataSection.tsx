@@ -80,6 +80,7 @@ type Props = StepperStepComponentProps & {
   isInvoiceable: boolean;
   isForeignInsurance?: boolean;
   isPdndPrivate: boolean;
+  isPrivateMerchant: boolean;
   setInvalidTaxCodeInvoicing: React.Dispatch<React.SetStateAction<boolean>>;
   recipientCodeStatus?: string;
   getCountriesFromGeotaxonomies: (
@@ -109,6 +110,7 @@ export default function PersonalAndBillingDataSection({
   isForeignInsurance,
   productId,
   isPdndPrivate,
+  isPrivateMerchant,
   setInvalidTaxCodeInvoicing,
   recipientCodeStatus,
   getCountriesFromGeotaxonomies,
@@ -129,8 +131,6 @@ export default function PersonalAndBillingDataSection({
   const [taxCodeInvoicingVisible, setTaxCodeInvoicingVisible] = useState<boolean>(false);
   const [assistanceContacts, setAssistanceContacts] = useState<AssistanceContacts>();
   const [pspData, setPspData] = useState<PaymentServiceProviderDto>();
-  const isPrivateMerchant =
-    institutionType === 'PRV' && productId === PRODUCT_IDS.IDPAY_MERCHANT;
 
   useEffect(() => {
     const shareCapitalIsNan = isNaN(formik.values.shareCapital);
@@ -519,7 +519,6 @@ export default function PersonalAndBillingDataSection({
                 }}
                 inputValue={formik.values.city || ''}
                 onChange={(_e: any, selected: any) => {
-                  console.log('selected', selected);
                   formik.setFieldValue('city', selected?.city || '');
                   formik.setFieldValue('county', selected?.city || '');
                   formik.setFieldValue('istatCode', !isFromIPA ? selected?.istat_code : undefined);
@@ -773,7 +772,8 @@ export default function PersonalAndBillingDataSection({
           >
             {formik.values.hasVatnumber &&
               (!isInsuranceCompany ||
-                (onboardingFormData?.taxCode && onboardingFormData?.taxCode !== '')) && (
+                (onboardingFormData?.taxCode && onboardingFormData?.taxCode !== '')) &&
+              !isPrivateMerchant && (
                 <Grid item>
                   <Box display="flex" alignItems="center">
                     <Checkbox

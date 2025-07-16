@@ -27,7 +27,7 @@ type Props = {
   setSelected: React.Dispatch<React.SetStateAction<any>>;
   options: Array<any>;
   setOptions: React.Dispatch<React.SetStateAction<any>>;
-  loading: boolean;
+  apiLoading?: boolean;
   getOptionLabel: (option: any) => string;
   getOptionKey: (option: any) => string;
 };
@@ -36,13 +36,13 @@ export default function AsyncAutocompleteResultsBusinessName({
   setSelected,
   options,
   setOptions,
-  loading,
+  apiLoading,
   getOptionLabel,
   getOptionKey,
 }: Props) {
   return (
     <CustomBox my={2} width="90%" maxHeight="200px" overflow="auto">
-      {!loading &&
+      {!apiLoading &&
         options.map((option) => (
           <Box
             py={1}

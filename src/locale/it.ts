@@ -10,6 +10,7 @@ export default {
     businessName: 'Ragione Sociale',
     taxcode: 'Codice Fiscale ente',
     originId: 'Codice IVASS',
+    reaLabel: 'RM-123456'
   },
   partyAdvancedSelect: {
     advancedSearchLabel: 'Cerca per',
