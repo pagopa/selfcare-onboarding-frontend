@@ -12,6 +12,7 @@ import { Router } from 'react-router-dom';
 import userEvent from '@testing-library/user-event';
 import {
   mockedCategories,
+  mockedPdndVisuraInfomacere,
 } from '../../../lib/__mocks__/mockApiRequests';
 import i18n from '@pagopa/selfcare-common-frontend/lib/locale/locale-utils';
 import {
@@ -28,7 +29,6 @@ import {
 } from '../../../utils/test-utils';
 import { createStore } from '../../../redux/store';
 import { Provider } from 'react-redux';
-
 
 jest.setTimeout(40000);
 
@@ -75,6 +75,8 @@ beforeEach(() => {
 const filterByCategory4Test = (institutionType?: string, productId?: string) => {
   if (productId === PRODUCT_IDS.SEND) {
     return mockedCategories.product[PRODUCT_IDS.SEND].ipa.PA;
+  } else if (productId === PRODUCT_IDS.IDPAY_MERCHANT) {
+    return mockedCategories.product['prod-idpay-merchant']?.merchantDetails?.atecoCodes;
   } else if (institutionType === 'GSP') {
     return mockedCategories.product.default.ipa.GSP;
   } else {
@@ -82,10 +84,7 @@ const filterByCategory4Test = (institutionType?: string, productId?: string) => 
   }
 };
 
-const renderComponent = (
-  productId: string = PRODUCT_IDS.SEND,
-  injectedStore?: ReturnType<typeof createStore>
-) => {
+const renderComponent = (productId: string, injectedStore?: ReturnType<typeof createStore>) => {
   const Component = () => {
     const [user, setUser] = useState<User | null>(null);
     const [subHeaderVisible, setSubHeaderVisible] = useState<boolean>(false);
@@ -181,8 +180,21 @@ test('Test: Successfull complete onboarding request of AOO party for product pro
 test('Test: Successfull complete onboarding request of UO party for product prod-io-sign', async () => {
   renderComponent(PRODUCT_IDS.IO_SIGN);
   await executeStepInstitutionType(PRODUCT_IDS.IO_SIGN, 'PA');
-  await executeStepSearchParty(PRODUCT_IDS.IO_SIGN, 'PA', 'denominazione uo test 1', 'uoCode', 'A1B2C3');
-  await executeStepBillingData(PRODUCT_IDS.IO_SIGN, 'PA', false, true, 'IPA', 'denominazione uo test 1');
+  await executeStepSearchParty(
+    PRODUCT_IDS.IO_SIGN,
+    'PA',
+    'denominazione uo test 1',
+    'uoCode',
+    'A1B2C3'
+  );
+  await executeStepBillingData(
+    PRODUCT_IDS.IO_SIGN,
+    'PA',
+    false,
+    true,
+    'IPA',
+    'denominazione uo test 1'
+  );
   await executeStepAddManager(false);
   await executeStepAddAdmin(true, false, false, false, false);
   await verifySubmit(PRODUCT_IDS.IO_SIGN, 'PA', fetchWithLogsSpy, 'IPA', true, false, 'uoCode');
@@ -197,6 +209,7 @@ test('Test: Successfull complete onboarding request of GSP party searching from 
     'GSP',
     'AGENCY X',
     'businessName',
+    undefined,
     undefined,
     undefined,
     undefined,
@@ -219,6 +232,7 @@ test('Test: Successfull complete onboarding request of GSP party without searchi
     'GSP',
     'AGENCY X',
     'businessName',
+    undefined,
     undefined,
     undefined,
     undefined,
@@ -283,13 +297,22 @@ test('Test: Successfull complete onboarding request of SA for product prod-inter
     undefined,
     undefined,
     undefined,
+    undefined,
     false,
     true
   );
   await executeStepBillingData(PRODUCT_IDS.INTEROP, 'SA', false, false, 'ANAC', 'descriptionAnac1');
   await executeStepAddManager(false);
   await executeStepAddAdmin(true, false, false, false, false);
-  await verifySubmit(PRODUCT_IDS.INTEROP, 'SA', fetchWithLogsSpy, 'ANAC', false, false, 'businessName');
+  await verifySubmit(
+    PRODUCT_IDS.INTEROP,
+    'SA',
+    fetchWithLogsSpy,
+    'ANAC',
+    false,
+    false,
+    'businessName'
+  );
   await executeGoHome(mockedLocation);
 });
 
@@ -303,6 +326,7 @@ test('Test: Successfull complete onboarding request of SA for product prod-inter
     'taxCode',
     undefined,
     '12345678911',
+    undefined,
     undefined,
     false,
     true
@@ -322,6 +346,7 @@ test('Test: Successfull complete onboarding request of foreign AS for product pr
     'AS',
     'mocked foreign insurance company 1',
     'businessName',
+    undefined,
     undefined,
     undefined,
     undefined,
@@ -363,8 +388,10 @@ test('Test: Successfull complete onboarding request of italian AS for product pr
     undefined,
     undefined,
     '232DC',
+    undefined,
     false,
-    true
+    undefined,
+    false
   );
   await executeStepBillingData(
     PRODUCT_IDS.INTEROP,
@@ -401,6 +428,7 @@ test('Test: Successfull complete onboarding request of italian AS without tax co
     undefined,
     undefined,
     '4431B',
+    undefined,
     false,
     true
   );
@@ -446,6 +474,7 @@ test('Test: Successfull complete onboarding request of PA aggregator party for p
     'PA',
     'AGENCY X',
     'businessName',
+    undefined,
     undefined,
     undefined,
     undefined,
@@ -501,6 +530,60 @@ test('Test: Successfull complete onboarding request of PRV for product prod-pago
   await executeGoHome(mockedLocation);
 });
 
+test('Test: Successfull complete onboarding request of PRV party for prod-idpay-merchant search by taxCode', async () => {
+  renderComponent(PRODUCT_IDS.IDPAY_MERCHANT);
+  await executeStepInstitutionType(PRODUCT_IDS.IDPAY_MERCHANT, 'PRV');
+  await executeStepSearchParty(
+    PRODUCT_IDS.IDPAY_MERCHANT,
+    'PRV',
+    mockedPdndVisuraInfomacere[0].businessName,
+    'taxCode',
+    undefined,
+    '12345678901'
+  );
+  await executeStepBillingData(PRODUCT_IDS.IDPAY_MERCHANT, 'PRV', false, false, 'SELC');
+  await executeStepAddManager(false);
+  await executeStepAddAdmin(true, false, false, false, false);
+  await verifySubmit(
+    PRODUCT_IDS.IDPAY_MERCHANT,
+    'PRV',
+    fetchWithLogsSpy,
+    'SELC',
+    false,
+    false,
+    'taxCode'
+  );
+  await executeGoHome(mockedLocation);
+});
+
+test('Test: Successfull complete onboarding request of PRV party for prod-idpay-merchant search by reaCode', async () => {
+  renderComponent(PRODUCT_IDS.IDPAY_MERCHANT);
+  await executeStepInstitutionType(PRODUCT_IDS.IDPAY_MERCHANT, 'PRV');
+  await executeStepSearchParty(
+    PRODUCT_IDS.IDPAY_MERCHANT,
+    'PRV',
+    mockedPdndVisuraInfomacere[0].businessName,
+    'reaCode',
+    undefined,
+    undefined,
+    undefined,
+    'MI-123456'
+  );
+  await executeStepBillingData(PRODUCT_IDS.IDPAY_MERCHANT, 'PRV', false, false, 'SELC');
+  await executeStepAddManager(false);
+  await executeStepAddAdmin(true, false, false, false, false);
+  await verifySubmit(
+    PRODUCT_IDS.IDPAY_MERCHANT,
+    'PRV',
+    fetchWithLogsSpy,
+    'SELC',
+    false,
+    false,
+    'taxCode'
+  );
+  await executeGoHome(mockedLocation);
+});
+
 test('Test: Error on submit onboarding request of PA party for prod-io search by business name', async () => {
   renderComponent(PRODUCT_IDS.IO);
   await executeStepInstitutionType(PRODUCT_IDS.IO, 'PA');
@@ -523,6 +606,7 @@ test('Test: Party already onboarded for a product that allow add new user, so th
     undefined,
     undefined,
     undefined,
+    undefined,
     true
   );
   await waitFor(() => screen.getByText(/L’ente selezionato ha già aderito/));
@@ -541,6 +625,7 @@ test('Test: Error retrieving onboarding info', async () => {
     'PA',
     'AGENCY INFO ERROR',
     'businessName',
+    undefined,
     undefined,
     undefined,
     undefined,
@@ -635,6 +720,7 @@ const completeOnboardingPdndInfocamereRequest = async (institutionType) => {
     undefined,
     '00112233445',
     undefined,
+    undefined,
     false,
     true
   );
@@ -663,9 +749,14 @@ const completeOnboardingPdndInfocamereRequest = async (institutionType) => {
 };
 
 const executeStepInstitutionType = async (productSelected: string, institutionType: string) => {
-  await waitFor(() => screen.getByText('Seleziona il tipo di ente che rappresenti'));
+  console.log('productSelected', productSelected);
+  if (
+    productSelected !== PRODUCT_IDS.SEND &&
+    productSelected !== PRODUCT_IDS.IDPAY &&
+    productSelected !== PRODUCT_IDS.IDPAY_MERCHANT
+  ) {
+    await waitFor(() => screen.getByText('Seleziona il tipo di ente che rappresenti'));
 
-  if (productSelected !== PRODUCT_IDS.SEND && productSelected !== PRODUCT_IDS.IDPAY) {
     screen.getByText(/Indica il tipo di ente che aderirà a/);
 
     await waitFor(() => {
@@ -678,7 +769,13 @@ const executeStepInstitutionType = async (productSelected: string, institutionTy
       fireEvent.click(confirmButtonEnabled);
     });
   } else {
-    fillInstitutionTypeCheckbox('pa');
+    console.log('entro qua');
+    if (productSelected === PRODUCT_IDS.IDPAY_MERCHANT) {
+      await waitFor(() => screen.getByText('Cerca il tuo ente'), { timeout: 5000 });
+    } else {
+      // Per SEND e IDPAY
+      fillInstitutionTypeCheckbox('pa');
+    }
   }
 };
 
@@ -690,6 +787,7 @@ const executeStepSearchParty = async (
   subUnitCode?: string,
   taxCode?: string,
   ivassCode?: string,
+  reaCode?: string,
   expectedError: boolean = false,
   withoutIpa: boolean = false,
   isAggregator: boolean = false
@@ -765,6 +863,7 @@ const executeStepSearchParty = async (
     case 'aooCode':
     case 'uoCode':
     case 'ivassCode':
+    case 'reaCode':
       const selectWrapper = document.getElementById('party-type-select');
       const input = selectWrapper?.firstChild as HTMLElement;
       fireEvent.keyDown(input, { keyCode: 40 });
@@ -772,33 +871,78 @@ const executeStepSearchParty = async (
       const option = document.getElementById(typeOfSearch) as HTMLElement;
       fireEvent.click(option);
 
-      fireEvent.change(inputPartyName, {
-        target: {
-          value:
-            typeOfSearch === 'taxCode'
-              ? taxCode
-              : typeOfSearch === 'ivassCode'
-                ? ivassCode
-                : subUnitCode,
-        },
-      });
+      const valueToSet =
+        typeOfSearch === 'taxCode'
+          ? taxCode
+          : typeOfSearch === 'ivassCode'
+            ? ivassCode
+            : typeOfSearch === 'reaCode'
+              ? reaCode
+              : subUnitCode;
 
-      const partyNameSelect = await waitFor(() =>
-        screen.getByText(typeOfSearch === 'taxCode' ? partyName.toLocaleLowerCase() : partyName)
-      );
+      if (typeOfSearch === reaCode) {
+        expect(
+          screen.getByText(
+            'se ’esercente fa parte di una catena è la società padre a dover aderire'
+          )
+        ).toBeInTheDocument();
+
+        fireEvent.change(inputPartyName, { target: { value: valueToSet } });
+
+        expect(screen.getByRole('button', { name: 'Continua' })).toBeEnabled();
+
+        fireEvent.change(inputPartyName, { target: { value: 'RM-234567' } });
+
+        expect(
+          screen.getByText(
+            'Il codice ATECO al quale sei abilitato non corrisponde con quelli idonei al Bonus Elettrodomestici'
+          )
+        ).toBeInTheDocument();
+
+        expect(screen.getByRole('button', { name: 'Continua' })).toBeDisabled();
+      }
+
+      if (typeOfSearch === taxCode && productId === PRODUCT_IDS.IDPAY_MERCHANT) {
+        expect(
+          screen.getByText(
+            'se ’esercente fa parte di una catena è la società padre a dover aderire'
+          )
+        ).toBeInTheDocument();
+
+        fireEvent.change(inputPartyName, { target: { value: valueToSet } });
+
+        expect(screen.getByRole('button', { name: 'Continua' })).toBeEnabled();
+
+        fireEvent.change(inputPartyName, { target: { value: '98765432109' } });
+
+        expect(
+          screen.getByText(
+            'Il codice ATECO al quale sei abilitato non corrisponde con quelli idonei al Bonus Elettrodomestici'
+          )
+        ).toBeInTheDocument();
+
+        expect(screen.getByRole('button', { name: 'Continua' })).toBeDisabled();
+      }
+
+      fireEvent.change(inputPartyName, { target: { value: valueToSet } });
 
       const endpoint =
         typeOfSearch === 'taxCode'
           ? institutionType === 'SA'
             ? 'ONBOARDING_GET_SA_PARTY_FROM_FC'
-            : institutionType === 'SCP' || institutionType === 'PRV'
+            : institutionType === 'SCP' ||
+                (institutionType === 'PRV' && productId !== PRODUCT_IDS.IDPAY_MERCHANT)
               ? 'ONBOARDING_GET_PARTY_BY_CF_FROM_INFOCAMERE'
-              : 'ONBOARDING_GET_PARTY_FROM_CF'
+              : productId === PRODUCT_IDS.IDPAY_MERCHANT
+                ? 'ONBOARDING_GET_VISURA_INFOCAMERE_BY_CF'
+                : 'ONBOARDING_GET_PARTY_FROM_CF'
           : typeOfSearch === 'aooCode'
             ? 'ONBOARDING_GET_AOO_CODE_INFO'
             : typeOfSearch === 'uoCode'
               ? 'ONBOARDING_GET_UO_CODE_INFO'
-              : 'ONBOARDING_GET_INSURANCE_COMPANIES_FROM_IVASSCODE';
+              : typeOfSearch === 'reaCode'
+                ? 'ONBOARDING_GET_VISURA_INFOCAMERE_BY_REA'
+                : 'ONBOARDING_GET_INSURANCE_COMPANIES_FROM_IVASSCODE';
 
       const endpointParams =
         typeOfSearch === 'taxCode'
@@ -809,29 +953,31 @@ const executeStepSearchParty = async (
             ? { codiceUniAoo: subUnitCode }
             : typeOfSearch === 'uoCode'
               ? { codiceUniUo: subUnitCode }
-              : { taxId: ivassCode };
+              : typeOfSearch === 'reaCode'
+                ? undefined
+                : { taxId: ivassCode };
 
       const updatedParams =
-        typeOfSearch === 'taxCode' || typeOfSearch === 'ivassCode'
-          ? institutionType === 'SA' || institutionType === 'AS'
-            ? undefined
+        typeOfSearch === 'reaCode'
+          ? { rea: reaCode }
+          : typeOfSearch === 'taxCode' || typeOfSearch === 'ivassCode'
+            ? institutionType === 'SA' || institutionType === 'AS'
+              ? undefined
+              : {
+                  productId: undefined,
+                  subunitCode: undefined,
+                  taxCode: undefined,
+                  categories:
+                    institutionType === 'SCP' || institutionType === 'PRV'
+                      ? undefined
+                      : filterByCategory4Test(institutionType, productId),
+                }
             : {
-                productId: undefined,
-                subunitCode: undefined,
-                taxCode: undefined,
-                categories:
-                  institutionType === 'SCP' || institutionType === 'PRV'
-                    ? undefined
-                    : filterByCategory4Test(institutionType, productId),
-              }
-          : {
-              origin: 'IPA',
-              categories: filterByCategory4Test(institutionType, productId),
-            };
+                origin: 'IPA',
+                categories: filterByCategory4Test(institutionType, productId),
+              };
 
-      expect(fetchWithLogsSpy).toHaveBeenCalledTimes(
-        typeOfSearch === 'aooCode' || typeOfSearch === 'uoCode' ? 4 : 3
-      );
+      expect(fetchWithLogsSpy).toHaveBeenCalledTimes(3);
 
       expect(fetchWithLogsSpy).toHaveBeenNthCalledWith(
         3,
@@ -845,8 +991,18 @@ const executeStepSearchParty = async (
         },
         expect.any(Function)
       );
+      screen.debug(undefined, 9999999);
 
-      fireEvent.click(partyNameSelect);
+      await waitFor(() => {
+        fireEvent.click(
+          screen.getByText(
+            typeOfSearch === 'taxCode' || typeOfSearch === 'reaCode'
+              ? partyName.toLocaleLowerCase()
+              : partyName
+          )
+        );
+      });
+
       break;
     default:
       return '';
@@ -877,6 +1033,9 @@ const executeStepBillingData = async (
   console.log('Testing step billing data..');
   await waitFor(() => screen.getByText('Inserisci i dati dell’ente'));
 
+  const isPrivateMerchant = institutionType === 'PRV' && productId === PRODUCT_IDS.IDPAY_MERCHANT;
+  const isInvoicable = canInvoice(institutionType.toUpperCase(), productId);
+
   await fillUserBillingDataForm(
     productId,
     'businessName',
@@ -900,121 +1059,131 @@ const executeStepBillingData = async (
 
   const confirmButton = screen.getByRole('button', { name: 'Continua' });
 
-  const isInvoicable = canInvoice(institutionType.toUpperCase(), productId);
-  const recipientCodeInput =
-    partyName === 'AGENCY ERROR'
-      ? 'A2B3C4'
-      : partyName === 'Comune di Milano'
-        ? 'A3B4C5'
-        : 'A1B2C3';
-  const taxCodeInvoicingInput =
-    partyName === 'AGENCY ERROR'
-      ? '75656445456'
-      : partyName === 'Comune di Milano'
-        ? '998877665544'
-        : '87654321098';
+  if (isPrivateMerchant) {
+    expect(document.getElementById('recipientCode')).not.toBeInTheDocument();
+    expect(document.getElementById('taxCodeInvoicing')).not.toBeInTheDocument();
+    expect(document.getElementById('supportEmail')).not.toBeInTheDocument();
 
-  if (isInvoicable) {
-    fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
-      target: { value: recipientCodeInput },
-    });
+    expect(document.getElementById('businessRegisterPlace')).toBeInTheDocument();
+    expect(document.getElementById('rea')).toBeInTheDocument();
+  } else {
+    const recipientCodeInput =
+      partyName === 'AGENCY ERROR'
+        ? 'A2B3C4'
+        : partyName === 'Comune di Milano'
+          ? 'A3B4C5'
+          : 'A1B2C3';
+    const taxCodeInvoicingInput =
+      partyName === 'AGENCY ERROR'
+        ? '75656445456'
+        : partyName === 'Comune di Milano'
+          ? '998877665544'
+          : '87654321098';
 
-    if (isUo || institutionType === 'PA') {
-      await waitFor(() =>
-        expect(document.getElementById('taxCodeInvoicing')).toHaveValue(taxCodeInvoicingInput)
-      );
-      await waitFor(() => expect(confirmButton).toBeEnabled());
-      fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
-        target: { value: '' },
-      });
-      expect(
-        document.getElementById('taxCodeInvoicing') as HTMLInputElement
-      ).not.toBeInTheDocument();
-
-      await waitFor(() => expect(confirmButton).toBeDisabled());
-
-      fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
-        target: { value: 'AABBC' },
-      });
-      await waitFor(() => screen.getByText('Il codice deve essere di minimo 6 caratteri'));
-
-      fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
-        target: { value: 'AABBC1' },
-      });
-      await waitFor(() => screen.getByText('Il codice inserito non è associato al tuo ente'));
-
-      expect(
-        document.getElementById('taxCodeInvoicing') as HTMLInputElement
-      ).not.toBeInTheDocument();
-
-      fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
-        target: { value: '2A3B4C' },
-      });
-
-      expect(
-        document.getElementById('taxCodeInvoicing') as HTMLInputElement
-      ).not.toBeInTheDocument();
-
-      await waitFor(() =>
-        screen.getByText(
-          'Il codice inserito è associato al codice fiscale di un ente che non ha il servizio di fatturazione attivo'
-        )
-      );
-
-      fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
-        target: { value: 'A1B2C31' },
-      });
-
-      await waitFor(() => screen.getByText('Il codice inserito non è associato al tuo ente'));
-
-      await waitFor(() =>
-        expect(
-          document.getElementById('taxCodeInvoicing') as HTMLInputElement
-        ).not.toBeInTheDocument()
-      );
-
+    if (isInvoicable) {
       fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
         target: { value: recipientCodeInput },
       });
 
-      await waitFor(() =>
-        expect(document.getElementById('taxCodeInvoicing') as HTMLInputElement).toBeInTheDocument()
-      );
-      expect(document.getElementById('taxCodeInvoicing') as HTMLInputElement).toBeDisabled();
+      if (isUo || institutionType === 'PA') {
+        await waitFor(() =>
+          expect(document.getElementById('taxCodeInvoicing')).toHaveValue(taxCodeInvoicingInput)
+        );
+        await waitFor(() => expect(confirmButton).toBeEnabled());
+        fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
+          target: { value: '' },
+        });
+        expect(
+          document.getElementById('taxCodeInvoicing') as HTMLInputElement
+        ).not.toBeInTheDocument();
 
-      fireEvent.change(document.getElementById('taxCodeInvoicing') as HTMLInputElement, {
-        target: { value: '87654321092' },
-      });
-      await waitFor(() =>
-        screen.getByText('Il Codice Fiscale inserito non è relativo al tuo ente')
-      );
+        await waitFor(() => expect(confirmButton).toBeDisabled());
 
-      await waitFor(() => expect(confirmButton).toBeDisabled());
+        fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
+          target: { value: 'AABBC' },
+        });
+        await waitFor(() => screen.getByText('Il codice deve essere di minimo 6 caratteri'));
 
-      fireEvent.change(document.getElementById('taxCodeInvoicing') as HTMLElement, {
-        target: { value: taxCodeInvoicingInput },
-      });
+        fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
+          target: { value: 'AABBC1' },
+        });
+        await waitFor(() => screen.getByText('Il codice inserito non è associato al tuo ente'));
+
+        expect(
+          document.getElementById('taxCodeInvoicing') as HTMLInputElement
+        ).not.toBeInTheDocument();
+
+        fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
+          target: { value: '2A3B4C' },
+        });
+
+        expect(
+          document.getElementById('taxCodeInvoicing') as HTMLInputElement
+        ).not.toBeInTheDocument();
+
+        await waitFor(() =>
+          screen.getByText(
+            'Il codice inserito è associato al codice fiscale di un ente che non ha il servizio di fatturazione attivo'
+          )
+        );
+
+        fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
+          target: { value: 'A1B2C31' },
+        });
+
+        await waitFor(() => screen.getByText('Il codice inserito non è associato al tuo ente'));
+
+        await waitFor(() =>
+          expect(
+            document.getElementById('taxCodeInvoicing') as HTMLInputElement
+          ).not.toBeInTheDocument()
+        );
+
+        fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
+          target: { value: recipientCodeInput },
+        });
+
+        await waitFor(() =>
+          expect(
+            document.getElementById('taxCodeInvoicing') as HTMLInputElement
+          ).toBeInTheDocument()
+        );
+        expect(document.getElementById('taxCodeInvoicing') as HTMLInputElement).toBeDisabled();
+
+        fireEvent.change(document.getElementById('taxCodeInvoicing') as HTMLInputElement, {
+          target: { value: '87654321092' },
+        });
+        await waitFor(() =>
+          screen.getByText('Il Codice Fiscale inserito non è relativo al tuo ente')
+        );
+
+        await waitFor(() => expect(confirmButton).toBeDisabled());
+
+        fireEvent.change(document.getElementById('taxCodeInvoicing') as HTMLInputElement, {
+          target: { value: taxCodeInvoicingInput },
+        });
+      }
+    } else {
+      expect(document.getElementById('taxCodeInvoicing')).not.toBeInTheDocument();
     }
-  } else {
-    expect(document.getElementById('taxCodeInvoicing')).not.toBeInTheDocument();
-  }
 
-  if (from !== 'IPA') {
-    checkCorrectBodyBillingData(
-      institutionType,
-      productId,
-      'businessNameInput',
-      'registeredOfficeInput',
-      'a@a.it',
-      '09010',
-      '00000000000',
-      '00000000000',
-      'A1B2C3',
-      'Milano',
-      'MI',
-      isForeignInsurance,
-      haveTaxCode
-    );
+    if (from !== 'IPA') {
+      checkCorrectBodyBillingData(
+        institutionType,
+        productId,
+        'businessNameInput',
+        'registeredOfficeInput',
+        'a@a.it',
+        '09010',
+        '00000000000',
+        '00000000000',
+        'A1B2C3',
+        'Milano',
+        'MI',
+        isForeignInsurance,
+        haveTaxCode
+      );
+    }
   }
 
   await waitFor(() => expect(confirmButton).toBeEnabled());
