@@ -17,6 +17,7 @@ import {
   mockedUos,
   mockedPspOnboardingData,
   mockedGeoTaxonomy,
+  mockedPdndVisuraInfomacere,
 } from '../lib/__mocks__/mockApiRequests';
 import { nationalValue } from '../model/GeographicTaxonomies';
 import { store } from '../redux/store';
@@ -32,7 +33,7 @@ export type Source =
   | 'INFOCAMERE'
   | 'PDND_INFOCAMERE'
   | 'SELC';
-export type Search = 'businessName' | 'taxCode' | 'aooCode' | 'uoCode' | 'ivassCode';
+export type Search = 'businessName' | 'taxCode' | 'aooCode' | 'uoCode' | 'ivassCode' | 'reaCode';
 
 export const renderComponentWithProviders = (
   component: React.ReactElement,
@@ -336,142 +337,165 @@ export const billingData2billingDataRequest = (
   errorOnSubmit?: boolean,
   typeOfSearch: Search = 'businessName',
   isForeignInsurance?: boolean,
-  haveTaxCode?: boolean
+  haveTaxCode?: boolean,
+  productId?: string
   // eslint-disable-next-line sonarjs/cognitive-complexity
-) => ({
-  businessName: errorOnSubmit
-    ? mockPartyRegistry.items[1].description
-    : from === 'NO_IPA'
-      ? 'businessNameInput'
-      : from === 'ANAC'
-        ? mockedANACParties[0].description
-        : from === 'INFOCAMERE' || from === 'PDND_INFOCAMERE'
-          ? mockedPartiesFromInfoCamere[0].businessName
-          : from === 'IVASS'
-            ? haveTaxCode
-              ? isForeignInsurance
-                ? mockedInsuranceResource.items[0].description
-                : mockedInsuranceResource.items[2].description
-              : mockedInsuranceResource.items[4].description
-            : typeOfSearch === 'taxCode'
-              ? mockedParties[0].description
-              : typeOfSearch === 'aooCode'
-                ? mockedAoos[0].denominazioneAoo
-                : typeOfSearch === 'uoCode'
-                  ? mockedUos[0].descrizioneUo
-                  : mockPartyRegistry.items[0].description,
-  registeredOffice: errorOnSubmit
-    ? mockPartyRegistry.items[1].address
-    : from === 'INFOCAMERE' || from === 'PDND_INFOCAMERE'
-      ? mockedPartiesFromInfoCamere[0].address
-      : from !== 'IPA'
-        ? 'registeredOfficeInput'
-        : typeOfSearch === 'taxCode'
-          ? mockedParties[0].address
-          : typeOfSearch === 'aooCode'
-            ? mockedAoos[0].indirizzo
-            : typeOfSearch === 'uoCode'
-              ? mockedUos[0].indirizzo
-              : mockPartyRegistry.items[0].address,
-  digitalAddress: errorOnSubmit
-    ? mockPartyRegistry.items[1].digitalAddress
-    : from === 'NO_IPA'
-      ? 'a@a.it'
-      : from === 'ANAC'
-        ? mockedANACParties[0].digitalAddress
-        : from === 'INFOCAMERE' || from === 'PDND_INFOCAMERE'
-          ? mockedPartiesFromInfoCamere[0].digitalAddress
-          : from === 'IVASS'
-            ? haveTaxCode
-              ? isForeignInsurance
-                ? mockedInsuranceResource.items[0].digitalAddress
-                : mockedInsuranceResource.items[2].digitalAddress
-              : mockedInsuranceResource.items[4].digitalAddress
-            : typeOfSearch === 'taxCode'
-              ? mockedParties[0].digitalAddress
-              : typeOfSearch === 'aooCode'
-                ? mockedAoos[0].mail1
-                : typeOfSearch === 'uoCode'
-                  ? mockedUos[0].mail1
-                  : mockPartyRegistry.items[0].digitalAddress,
-  zipCode: errorOnSubmit
-    ? mockPartyRegistry.items[1].zipCode
-    : isForeignInsurance
-      ? undefined
+) => {
+  const isPrivateMerchant = institutionType === 'PRV' && productId === PRODUCT_IDS.IDPAY_MERCHANT;
+
+  return {
+    businessName: errorOnSubmit
+      ? mockPartyRegistry.items[1].description
+      : isPrivateMerchant && typeOfSearch === 'taxCode'
+        ? mockedPdndVisuraInfomacere[0].businessName
+        : from === 'NO_IPA'
+          ? 'businessNameInput'
+          : from === 'ANAC'
+            ? mockedANACParties[0].description
+            : from === 'INFOCAMERE' || from === 'PDND_INFOCAMERE'
+              ? mockedPartiesFromInfoCamere[0].businessName
+              : from === 'IVASS'
+                ? haveTaxCode
+                  ? isForeignInsurance
+                    ? mockedInsuranceResource.items[0].description
+                    : mockedInsuranceResource.items[2].description
+                  : mockedInsuranceResource.items[4].description
+                : typeOfSearch === 'taxCode'
+                  ? mockedParties[0].description
+                  : typeOfSearch === 'aooCode'
+                    ? mockedAoos[0].denominazioneAoo
+                    : typeOfSearch === 'uoCode'
+                      ? mockedUos[0].descrizioneUo
+                      : mockPartyRegistry.items[0].description,
+
+    registeredOffice: errorOnSubmit
+      ? mockPartyRegistry.items[1].address
       : from === 'INFOCAMERE' || from === 'PDND_INFOCAMERE'
-        ? mockedPartiesFromInfoCamere[0].zipCode
+        ? mockedPartiesFromInfoCamere[0].address
         : from !== 'IPA'
-          ? '09010'
+          ? 'registeredOfficeInput'
           : typeOfSearch === 'taxCode'
-            ? mockedParties[0].zipCode
+            ? mockedParties[0].address
             : typeOfSearch === 'aooCode'
-              ? mockedAoos[0].CAP
+              ? mockedAoos[0].indirizzo
               : typeOfSearch === 'uoCode'
-                ? mockedUos[0].CAP
-                : mockPartyRegistry.items[0].zipCode,
-  taxCode: errorOnSubmit
-    ? mockPartyRegistry.items[1].taxCode
-    : from === 'IPA'
-      ? typeOfSearch === 'taxCode'
-        ? mockedParties[0].taxCode
-        : typeOfSearch === 'aooCode'
-          ? mockedAoos[0].codiceFiscaleEnte
-          : typeOfSearch === 'uoCode'
-            ? mockedUos[0].codiceFiscaleEnte
-            : mockPartyRegistry.items[0].taxCode
-      : from === 'NO_IPA'
-        ? '00000000000'
-        : from === 'ANAC'
-          ? mockedANACParties[0].taxCode
+                ? mockedUos[0].indirizzo
+                : mockPartyRegistry.items[0].address,
+
+    digitalAddress: errorOnSubmit
+      ? mockPartyRegistry.items[1].digitalAddress
+      : isPrivateMerchant && typeOfSearch === 'taxCode'
+        ? mockedPdndVisuraInfomacere[0].digitalAddress
+        : from === 'NO_IPA'
+          ? 'a@a.it'
+          : from === 'ANAC'
+            ? mockedANACParties[0].digitalAddress
+            : from === 'INFOCAMERE' || from === 'PDND_INFOCAMERE'
+              ? mockedPartiesFromInfoCamere[0].digitalAddress
+              : from === 'IVASS'
+                ? haveTaxCode
+                  ? isForeignInsurance
+                    ? mockedInsuranceResource.items[0].digitalAddress
+                    : mockedInsuranceResource.items[2].digitalAddress
+                  : mockedInsuranceResource.items[4].digitalAddress
+                : typeOfSearch === 'taxCode'
+                  ? mockedParties[0].digitalAddress
+                  : typeOfSearch === 'aooCode'
+                    ? mockedAoos[0].mail1
+                    : typeOfSearch === 'uoCode'
+                      ? mockedUos[0].mail1
+                      : mockPartyRegistry.items[0].digitalAddress,
+
+    zipCode: errorOnSubmit
+      ? mockPartyRegistry.items[1].zipCode
+      : isForeignInsurance
+        ? undefined
+        : isPrivateMerchant && typeOfSearch === 'taxCode'
+          ? mockedPdndVisuraInfomacere[0].zipCode
           : from === 'INFOCAMERE' || from === 'PDND_INFOCAMERE'
-            ? mockedPartiesFromInfoCamere[0].businessTaxId
-            : from === 'IVASS'
-              ? haveTaxCode
+            ? mockedPartiesFromInfoCamere[0].zipCode
+            : from !== 'IPA'
+              ? '09010'
+              : typeOfSearch === 'taxCode'
+                ? mockedParties[0].zipCode
+                : typeOfSearch === 'aooCode'
+                  ? mockedAoos[0].CAP
+                  : typeOfSearch === 'uoCode'
+                    ? mockedUos[0].CAP
+                    : mockPartyRegistry.items[0].zipCode,
+
+    taxCode: errorOnSubmit
+      ? mockPartyRegistry.items[1].taxCode
+      : isPrivateMerchant
+        ? mockedPdndVisuraInfomacere[0].businessTaxId
+        : from === 'IPA'
+          ? typeOfSearch === 'taxCode'
+            ? mockedParties[0].taxCode
+            : typeOfSearch === 'aooCode'
+              ? mockedAoos[0].codiceFiscaleEnte
+              : typeOfSearch === 'uoCode'
+                ? mockedUos[0].codiceFiscaleEnte
+                : mockPartyRegistry.items[0].taxCode
+          : from === 'NO_IPA'
+            ? '00000000000'
+            : from === 'ANAC'
+              ? mockedANACParties[0].taxCode
+              : from === 'INFOCAMERE' || from === 'PDND_INFOCAMERE'
+                ? mockedPartiesFromInfoCamere[0].businessTaxId
+                : from === 'IVASS'
+                  ? haveTaxCode
+                    ? isForeignInsurance
+                      ? mockedInsuranceResource.items[0].taxCode
+                      : mockedInsuranceResource.items[2].taxCode
+                    : mockedInsuranceResource.items[4].taxCode
+                  : '12345678911',
+
+    vatNumber: errorOnSubmit
+      ? mockPartyRegistry.items[1].taxCode
+      : isPrivateMerchant
+        ? mockedPdndVisuraInfomacere[0].businessTaxId
+        : from === 'INFOCAMERE' || from === 'PDND_INFOCAMERE'
+          ? mockedPartiesFromInfoCamere[0].businessTaxId
+          : from === 'IPA'
+            ? typeOfSearch === 'taxCode'
+              ? mockedParties[0].taxCode
+              : typeOfSearch === 'aooCode'
+                ? mockedAoos[0].codiceFiscaleEnte
+                : typeOfSearch === 'uoCode'
+                  ? mockedUos[0].codiceFiscaleEnte
+                  : mockPartyRegistry.items[0].taxCode
+            : from === 'NO_IPA' || from === 'ANAC'
+              ? '00000000000'
+              : from === 'IVASS'
                 ? isForeignInsurance
-                  ? mockedInsuranceResource.items[0].taxCode
-                  : mockedInsuranceResource.items[2].taxCode
-                : mockedInsuranceResource.items[4].taxCode
-              : '12345678911',
-  vatNumber: errorOnSubmit
-    ? mockPartyRegistry.items[1].taxCode
-    : from === 'INFOCAMERE' || from === 'PDND_INFOCAMERE'
-      ? mockedPartiesFromInfoCamere[0].businessTaxId
-      : from === 'IPA'
-        ? typeOfSearch === 'taxCode'
-          ? mockedParties[0].taxCode
-          : typeOfSearch === 'aooCode'
-            ? mockedAoos[0].codiceFiscaleEnte
-            : typeOfSearch === 'uoCode'
-              ? mockedUos[0].codiceFiscaleEnte
-              : mockPartyRegistry.items[0].taxCode
-        : from === 'NO_IPA' || from === 'ANAC'
-          ? '00000000000'
-          : from === 'IVASS'
-            ? isForeignInsurance
-              ? undefined
-              : '00000000000'
-            : '12345678911',
-  taxCodeInvoicing: SfeAvailable
-    ? errorOnSubmit
-      ? '75656445456'
-      : typeOfSearch === 'taxCode'
-        ? '998877665544'
-        : '87654321098'
-    : undefined,
-  recipientCode: errorOnSubmit
-    ? 'A2B3C4'
-    : // MERGE THIS CONDITIONS
-      institutionType === 'PSP'
-      ? 'A1B2C3'
-      : (from === 'IPA' ||
-            institutionType === 'GSP' ||
-            (from === 'NO_IPA' && institutionType === 'GPU')) &&
-          typeOfSearch !== 'aooCode'
-        ? typeOfSearch === 'taxCode'
-          ? 'A3B4C5'
-          : 'A1B2C3'
-        : undefined,
-});
+                  ? undefined
+                  : '00000000000'
+                : '12345678911',
+
+    taxCodeInvoicing: SfeAvailable
+      ? errorOnSubmit
+        ? '75656445456'
+        : typeOfSearch === 'taxCode'
+          ? '998877665544'
+          : '87654321098'
+      : undefined,
+
+    recipientCode: isPrivateMerchant
+      ? undefined
+      : errorOnSubmit
+        ? 'A2B3C4'
+        : institutionType === 'PSP'
+          ? 'A1B2C3'
+          : (from === 'IPA' ||
+                institutionType === 'GSP' ||
+                (from === 'NO_IPA' && institutionType === 'GPU')) &&
+              typeOfSearch !== 'aooCode'
+            ? typeOfSearch === 'taxCode'
+              ? 'A3B4C5'
+              : 'A1B2C3'
+            : undefined,
+  };
+};
 
 export const verifySubmit = async (
   productId: string = PRODUCT_IDS.IO,
@@ -483,10 +507,10 @@ export const verifySubmit = async (
   typeOfSearch: Search = 'businessName',
   isForeignInsurance?: boolean | undefined,
   haveTaxCode: boolean = true,
-
   isAggregator?: boolean
   // eslint-disable-next-line sonarjs/cognitive-complexity
 ) => {
+  const isPrivateMerchant = institutionType === 'PRV' && productId === PRODUCT_IDS.IDPAY_MERCHANT;
   const SfeAvailable = (uo || institutionType === 'PA') && canInvoice(institutionType, productId);
 
   // eslint-disable-next-line functional/immutable-data
@@ -503,7 +527,8 @@ export const verifySubmit = async (
           errorOnSubmit,
           typeOfSearch,
           isForeignInsurance,
-          haveTaxCode
+          haveTaxCode,
+          productId
         ),
         institutionType,
         productId,
@@ -529,63 +554,67 @@ export const verifySubmit = async (
                       : undefined,
         originId: errorOnSubmit
           ? mockPartyRegistry.items[1].originId
-          : from === 'NO_IPA'
-            ? mockPartyRegistry.items[0].taxCode
-            : from === 'ANAC'
-              ? mockedANACParties[0].originId
-              : from === 'IVASS'
-                ? haveTaxCode
-                  ? isForeignInsurance
-                    ? mockedInsuranceResource.items[0].originId
-                    : mockedInsuranceResource.items[2].originId
-                  : mockedInsuranceResource.items[4].originId
-                : from === 'INFOCAMERE'
-                  ? undefined
-                  : from === 'PDND_INFOCAMERE'
-                    ? '00112233445'
-                    : from === 'SELC'
-                      ? mockPartyRegistry.items[0].taxCode
-                      : typeOfSearch === 'taxCode'
-                        ? mockedParties[0].originId
-                        : typeOfSearch === 'aooCode'
-                          ? mockedAoos[0].codiceUniAoo
-                          : typeOfSearch === 'uoCode'
-                            ? mockedUos[0].codiceUniUo
-                            : (institutionType === 'PT' ||
-                                  institutionType === 'GPU' ||
-                                  institutionType === 'GSP') &&
-                                productId === PRODUCT_IDS.PAGOPA
-                              ? '991'
-                              : productId === PRODUCT_IDS.PAGOPA && institutionType === 'PRV'
-                                ? mockPartyRegistry.items[0].taxCode
-                                : institutionType === 'GPU' &&
-                                    (productId === PRODUCT_IDS.INTEROP ||
-                                      productId === PRODUCT_IDS.IO_SIGN ||
-                                      productId === PRODUCT_IDS.IO)
-                                  ? undefined
-                                  : '991',
-        istatCode: from !== 'IPA' ? mockedGeoTaxonomy[1].istat_code : undefined,
-        taxCode: errorOnSubmit
-          ? mockPartyRegistry.items[1].taxCode
-          : from === 'NO_IPA'
-            ? '00000000000'
-            : from === 'ANAC'
-              ? mockedANACParties[0].taxCode
-              : from === 'INFOCAMERE' || from === 'PDND_INFOCAMERE'
-                ? mockedPartiesFromInfoCamere[0].businessTaxId
+          : isPrivateMerchant
+            ? mockedPdndVisuraInfomacere[0].businessTaxId
+            : from === 'NO_IPA'
+              ? mockPartyRegistry.items[0].taxCode
+              : from === 'ANAC'
+                ? mockedANACParties[0].originId
                 : from === 'IVASS'
                   ? haveTaxCode
                     ? isForeignInsurance
-                      ? mockedInsuranceResource.items[0].taxCode
-                      : mockedInsuranceResource.items[2].taxCode
-                    : mockedInsuranceResource.items[4]?.taxCode
-                  : typeOfSearch === 'taxCode'
-                    ? mockedParties[0].taxCode
-                    : typeOfSearch === 'aooCode'
-                      ? mockedAoos[0].codiceFiscaleEnte
-                      : typeOfSearch === 'uoCode'
-                        ? mockedUos[0].codiceFiscaleEnte
-                        : mockPartyRegistry.items[0].taxCode,
+                      ? mockedInsuranceResource.items[0].originId
+                      : mockedInsuranceResource.items[2].originId
+                    : mockedInsuranceResource.items[4].originId
+                  : from === 'INFOCAMERE'
+                    ? undefined
+                    : from === 'PDND_INFOCAMERE'
+                      ? '00112233445'
+                      : from === 'SELC'
+                        ? mockPartyRegistry.items[0].taxCode
+                        : typeOfSearch === 'taxCode'
+                          ? mockedParties[0].originId
+                          : typeOfSearch === 'aooCode'
+                            ? mockedAoos[0].codiceUniAoo
+                            : typeOfSearch === 'uoCode'
+                              ? mockedUos[0].codiceUniUo
+                              : (institutionType === 'PT' ||
+                                    institutionType === 'GPU' ||
+                                    institutionType === 'GSP') &&
+                                  productId === PRODUCT_IDS.PAGOPA
+                                ? '991'
+                                : productId === PRODUCT_IDS.PAGOPA && institutionType === 'PRV'
+                                  ? mockPartyRegistry.items[0].taxCode
+                                  : institutionType === 'GPU' &&
+                                      (productId === PRODUCT_IDS.INTEROP ||
+                                        productId === PRODUCT_IDS.IO_SIGN ||
+                                        productId === PRODUCT_IDS.IO)
+                                    ? undefined
+                                    : '991',
+        istatCode: from !== 'IPA' ? mockedGeoTaxonomy[1].istat_code : undefined,
+        taxCode: errorOnSubmit
+          ? mockPartyRegistry.items[1].taxCode
+          : isPrivateMerchant
+            ? mockedPdndVisuraInfomacere[0].businessTaxId
+            : from === 'NO_IPA'
+              ? '00000000000'
+              : from === 'ANAC'
+                ? mockedANACParties[0].taxCode
+                : from === 'INFOCAMERE' || from === 'PDND_INFOCAMERE'
+                  ? mockedPartiesFromInfoCamere[0].businessTaxId
+                  : from === 'IVASS'
+                    ? haveTaxCode
+                      ? isForeignInsurance
+                        ? mockedInsuranceResource.items[0].taxCode
+                        : mockedInsuranceResource.items[2].taxCode
+                      : mockedInsuranceResource.items[4]?.taxCode
+                    : typeOfSearch === 'taxCode'
+                      ? mockedParties[0].taxCode
+                      : typeOfSearch === 'aooCode'
+                        ? mockedAoos[0].codiceFiscaleEnte
+                        : typeOfSearch === 'uoCode'
+                          ? mockedUos[0].codiceFiscaleEnte
+                          : mockPartyRegistry.items[0].taxCode,
         additionalInformations:
           productId === PRODUCT_IDS.PAGOPA && institutionType === 'GSP'
             ? {
@@ -620,16 +649,20 @@ export const verifySubmit = async (
             from === 'PDND_INFOCAMERE' ||
             ((institutionType === 'GSP' || institutionType === 'GPU') && from !== 'IPA')) &&
             institutionType !== 'PT') ||
-          (institutionType === 'PRV' && productId === PRODUCT_IDS.PAGOPA)
+          (institutionType === 'PRV' && productId === PRODUCT_IDS.PAGOPA) ||
+          isPrivateMerchant
             ? {
                 businessRegisterPlace:
                   from === 'ANAC' ||
                   (institutionType === 'PRV' &&
-                    (productId === PRODUCT_IDS.PAGOPA || productId === PRODUCT_IDS.INTEROP))
+                    (productId === PRODUCT_IDS.PAGOPA ||
+                      productId === PRODUCT_IDS.INTEROP ||
+                      productId === PRODUCT_IDS.IDPAY_MERCHANT))
                     ? '01234567891'
                     : undefined,
                 shareCapital:
-                  from === 'ANAC' || (institutionType === 'PRV' && productId === PRODUCT_IDS.INTEROP)
+                  from === 'ANAC' ||
+                  (institutionType === 'PRV' && productId === PRODUCT_IDS.INTEROP)
                     ? 332323
                     : undefined,
                 rea:
@@ -640,7 +673,11 @@ export const verifySubmit = async (
                       )
                     : institutionType === 'PRV' && productId === PRODUCT_IDS.PAGOPA
                       ? undefined
-                      : 'MI-12345',
+                      : institutionType === 'PRV' && productId === PRODUCT_IDS.INTEROP
+                        ? 'MO-123456'
+                        : isPrivateMerchant
+                          ? mockedPdndVisuraInfomacere[0].nRea
+                          : 'MI-12345',
               }
             : undefined,
         pspData:
@@ -684,7 +721,8 @@ export const verifySubmit = async (
               county: undefined,
               country: 'ES',
             }
-          : (institutionType === 'SCP' || institutionType === 'PRV') &&
+          : (institutionType === 'SCP' ||
+                (institutionType === 'PRV' && productId === PRODUCT_IDS.INTEROP)) &&
               (from === 'INFOCAMERE' || from === 'PDND_INFOCAMERE')
             ? {
                 city: mockedPartiesFromInfoCamere[0].city,
@@ -698,6 +736,7 @@ export const verifySubmit = async (
                 country: 'IT',
               },
         assistanceContacts:
+          !isPrivateMerchant &&
           typeOfSearch !== 'aooCode' &&
           institutionType !== 'PT' &&
           institutionType !== 'GPU' &&
@@ -901,7 +940,9 @@ export const fillUserBillingDataForm = async (
   haveTaxCode: boolean = true
   // eslint-disable-next-line sonarjs/cognitive-complexity
 ) => {
-  if (from !== 'IPA' && from !== 'INFOCAMERE' && from !== 'PDND_INFOCAMERE') {
+  const isPrivateMerchant = institutionType === 'PRV' && productId === PRODUCT_IDS.IDPAY_MERCHANT;
+
+  if (from !== 'IPA' && from !== 'INFOCAMERE' && from !== 'PDND_INFOCAMERE' && !isPrivateMerchant) {
     if (institutionType !== 'SA' && institutionType !== 'AS') {
       fireEvent.change(document.getElementById(businessNameInput) as HTMLElement, {
         target: { value: 'businessNameInput' },
@@ -955,6 +996,7 @@ export const fillUserBillingDataForm = async (
     }
   } else {
     if (institutionType === 'PRV' && productId === PRODUCT_IDS.PAGOPA) {
+      // Logica esistente per PAGOPA + PRV
       fireEvent.change(document.getElementById(businessNameInput) as HTMLElement, {
         target: { value: mockPartyRegistry.items[0].description },
       });
@@ -992,17 +1034,63 @@ export const fillUserBillingDataForm = async (
       fireEvent.change(document.getElementById('businessRegisterPlace') as HTMLElement, {
         target: { value: '01234567891' },
       });
+    } else if (isPrivateMerchant) {
+      fireEvent.change(document.getElementById('businessRegisterPlace') as HTMLElement, {
+        target: { value: 'Comune' },
+      });
+      fireEvent.change(document.getElementById(rea ?? '') as HTMLInputElement, {
+        target: { value: mockedPdndVisuraInfomacere[0].nRea },
+      });
+      fireEvent.change(document.getElementById(businessNameInput) as HTMLElement, {
+        target: { value: mockedPdndVisuraInfomacere[0].businessName },
+      });
+      fireEvent.change(document.getElementById(mailPECInput) as HTMLElement, {
+        target: { value: mockedPdndVisuraInfomacere[0].digitalAddress },
+      });
+      fireEvent.change(document.getElementById(taxCodeInput) as HTMLElement, {
+        target: { value: mockedPdndVisuraInfomacere[0].businessTaxId },
+      });
+      fireEvent.change(document.getElementById(registeredOfficeInput) as HTMLElement, {
+        target: { value: 'registeredOfficeInput' },
+      });
+      fireEvent.change(document.getElementById(zipCode) as HTMLElement, {
+        target: { value: mockedPdndVisuraInfomacere[0].zipCode },
+      });
+
+      const autocomplete = document.getElementById(city as string) as HTMLElement;
+      await userEvent.type(autocomplete, 'Mil');
+      const option = await screen.findByText('Milano', {}, { timeout: 8000 });
+      expect(option).toBeInTheDocument();
+      fireEvent.click(option);
+
+      expect(document.getElementById(county ?? '') as HTMLElement).toHaveValue('MI');
+
+      fireEvent.change(document.getElementById('businessRegisterPlace') as HTMLElement, {
+        target: { value: '01234567891' },
+      });
+      fireEvent.change(document.getElementById(rea ?? '') as HTMLInputElement, {
+        target: { value: mockedPdndVisuraInfomacere[0].nRea },
+      });
     }
 
-    const isTaxCodeEquals2PIVA = document.getElementById('taxCodeEquals2VatNumber') as HTMLElement;
-    fireEvent.click(isTaxCodeEquals2PIVA);
-
-    expect((document.getElementById('vatNumber') as HTMLInputElement).value).toBe(
-      (document.getElementById('taxCode') as HTMLInputElement).value
-    );
+    if (!isPrivateMerchant) {
+      const isTaxCodeEquals2PIVA = document.getElementById(
+        'taxCodeEquals2VatNumber'
+      ) as HTMLElement;
+      if (isTaxCodeEquals2PIVA) {
+        fireEvent.click(isTaxCodeEquals2PIVA);
+        expect((document.getElementById('vatNumber') as HTMLInputElement).value).toBe(
+          (document.getElementById('taxCode') as HTMLInputElement).value
+        );
+      }
+    }
   }
 
-  if (from !== 'IVASS' || !isForeignInsurance) {
+  if (isPrivateMerchant) {
+    fireEvent.change(document.getElementById(vatNumber) as HTMLElement, {
+      target: { value: mockedPdndVisuraInfomacere[0].vatNumber },
+    });
+  } else if (from !== 'IVASS' || !isForeignInsurance) {
     fireEvent.change(document.getElementById(vatNumber) as HTMLElement, {
       target: { value: '00000000000' },
     });
@@ -1017,7 +1105,7 @@ export const fillUserBillingDataForm = async (
   const abiCode = document.getElementById('abiCode') as HTMLElement;
   const dpoDataSection = document.getElementById('dpo-data-section') as HTMLElement;
 
-  if (institutionType === 'PSP') {
+  if (institutionType === 'PSP' && !isPrivateMerchant) {
     expect(dpoDataSection).toBeInTheDocument();
     expect(vatNumberGroup).toBeInTheDocument();
     fireEvent.click(vatNumberGroup);
@@ -1087,16 +1175,18 @@ export const fillUserBillingDataForm = async (
   }
 
   if (
-    (institutionType === 'PA' && !isAoo) ||
-    institutionType === 'GSP' ||
-    institutionType === 'PSP'
+    !isPrivateMerchant &&
+    ((institutionType === 'PA' && !isAoo) || institutionType === 'GSP' || institutionType === 'PSP')
   ) {
     fireEvent.change(document.getElementById(recipientCode) as HTMLElement, {
       target: { value: 'A1B2C3D' },
     });
-    fireEvent.change(document.getElementById(supportEmail ?? '') as HTMLInputElement, {
-      target: { value: 'a@a.it' },
-    });
+
+    if (supportEmail) {
+      fireEvent.change(document.getElementById(supportEmail) as HTMLInputElement, {
+        target: { value: 'a@a.it' },
+      });
+    }
   }
 };
 
@@ -1116,6 +1206,8 @@ export const checkCorrectBodyBillingData = (
   haveTaxCode?: boolean
   // eslint-disable-next-line sonarjs/cognitive-complexity
 ) => {
+  const isPrivateMerchant = institutionType === 'PRV' && productId === PRODUCT_IDS.IDPAY_MERCHANT;
+
   expect((document.getElementById('businessName') as HTMLInputElement).value).toBe(
     institutionType === 'SA'
       ? mockedANACParties[0].description
@@ -1125,10 +1217,13 @@ export const checkCorrectBodyBillingData = (
             ? mockedInsuranceResource.items[0].description
             : mockedInsuranceResource.items[2].description
           : mockedInsuranceResource.items[4].description
-        : institutionType === 'SCP' || institutionType === 'PRV'
+        : institutionType === 'SCP' || (institutionType === 'PRV' && !isPrivateMerchant)
           ? mockedPartiesFromInfoCamere[0].businessName
-          : expectedBusinessName
+          : isPrivateMerchant
+            ? 'Rossi Costruzioni S.r.l.'
+            : expectedBusinessName
   );
+
   expect((document.getElementById('digitalAddress') as HTMLInputElement).value).toBe(
     institutionType === 'SA'
       ? mockedANACParties[0].digitalAddress
@@ -1138,9 +1233,11 @@ export const checkCorrectBodyBillingData = (
             ? mockedInsuranceResource.items[0].digitalAddress
             : mockedInsuranceResource.items[2].digitalAddress
           : mockedInsuranceResource.items[4].digitalAddress
-        : institutionType === 'SCP' || institutionType === 'PRV'
+        : institutionType === 'SCP' || (institutionType === 'PRV' && !isPrivateMerchant)
           ? mockedPartiesFromInfoCamere[0].digitalAddress
-          : expectedMailPEC
+          : isPrivateMerchant
+            ? 'rossi.costruzioni@pec.it'
+            : expectedMailPEC
   );
 
   if (haveTaxCode) {
@@ -1151,9 +1248,11 @@ export const checkCorrectBodyBillingData = (
           ? isForeignInsurance
             ? mockedInsuranceResource.items[0].taxCode
             : mockedInsuranceResource.items[2].taxCode
-          : institutionType === 'SCP' || institutionType === 'PRV'
+          : institutionType === 'SCP' || (institutionType === 'PRV' && !isPrivateMerchant)
             ? mockedPartiesFromInfoCamere[0].businessTaxId
-            : expectedTaxCode
+            : isPrivateMerchant
+              ? '12345678901'
+              : expectedTaxCode
     );
   }
 
@@ -1162,47 +1261,75 @@ export const checkCorrectBodyBillingData = (
     expect((document.getElementById('country-select') as HTMLInputElement).value).toBe('Spagna');
   } else {
     expect((document.getElementById('zipCode') as HTMLInputElement).value).toBe(
-      institutionType === 'SCP' || institutionType === 'PRV'
+      institutionType === 'SCP' || (institutionType === 'PRV' && !isPrivateMerchant)
         ? mockedPartiesFromInfoCamere[0].zipCode
-        : expectedZipCode
+        : isPrivateMerchant
+          ? '09010'
+          : expectedZipCode
     );
-    expect((document.getElementById('vatNumber') as HTMLInputElement).value).toBe(
-      expectedVatNumber
-    );
+
+    if (!isPrivateMerchant) {
+      expect((document.getElementById('vatNumber') as HTMLInputElement).value).toBe(
+        expectedVatNumber
+      );
+    }
+
     expect((document.getElementById('city-select') as HTMLInputElement).value).toBe(
-      institutionType === 'SCP' || institutionType === 'PRV'
+      institutionType === 'SCP' || (institutionType === 'PRV' && !isPrivateMerchant)
         ? mockedPartiesFromInfoCamere[0].city
-        : expectedCity
+        : isPrivateMerchant
+          ? 'Milano'
+          : expectedCity
     );
+
     expect((document.getElementById('county') as HTMLInputElement).value).toBe(
-      institutionType === 'SCP' || institutionType === 'PRV'
+      institutionType === 'SCP' || (institutionType === 'PRV' && !isPrivateMerchant)
         ? mockedPartiesFromInfoCamere[0].county
-        : expectedCounty
+        : isPrivateMerchant
+          ? 'MI'
+          : expectedCounty
     );
   }
 
-  if (institutionType === 'PA' || institutionType === 'GSP' || institutionType === 'PSP') {
+  if (
+    !isPrivateMerchant &&
+    (institutionType === 'PA' || institutionType === 'GSP' || institutionType === 'PSP')
+  ) {
     expect((document.getElementById('recipientCode') as HTMLInputElement).value).toBe(
       expectedRecipientCode
     );
   }
 
-  if (institutionType === 'SA' || (institutionType === 'PRV' && productId === PRODUCT_IDS.INTEROP)) {
+  if (isPrivateMerchant) {
+    expect((document.getElementById('businessRegisterPlace') as HTMLInputElement).value).toBe(
+      '01234567891'
+    );
+  }
+
+  if (
+    institutionType === 'SA' ||
+    (institutionType === 'PRV' && productId === PRODUCT_IDS.INTEROP)
+  ) {
     fireEvent.change(document.getElementById('businessRegisterPlace') as HTMLElement, {
       target: { value: '01234567891' },
     });
-    fireEvent.change(document.getElementById('rea') as HTMLElement, {
-      target: {
-        value: institutionType === 'PRV' && productId === PRODUCT_IDS.INTEROP ? 'MO-123456' : 'MI-12345',
-      },
-    });
-    fireEvent.change(document.getElementById('shareCapital') as HTMLElement, {
-      target: { value: '€ 332.323' },
-    });
+
+    expect((document.getElementById('rea') as HTMLInputElement).value).toBe(
+      institutionType === 'PRV' && productId === PRODUCT_IDS.INTEROP ? 'MO-123456' : 'MI-12345'
+    );
+
+    if (
+      institutionType === 'SA' ||
+      (institutionType === 'PRV' && productId === PRODUCT_IDS.INTEROP)
+    ) {
+      fireEvent.change(document.getElementById('shareCapital') as HTMLElement, {
+        target: { value: '€ 332.323' },
+      });
+    }
   }
 
   expect((document.getElementById('registeredOffice') as HTMLInputElement).value).toBe(
-    institutionType === 'SCP' || institutionType === 'PRV'
+    institutionType === 'SCP' || (institutionType === 'PRV' && !isPrivateMerchant)
       ? mockedPartiesFromInfoCamere[0].address
       : expectedRegisteredOfficeInput
   );

@@ -60,6 +60,8 @@ type Props = {
   filterCategories?: string;
   setIsPresentInAtecoWhiteList?: Dispatch<SetStateAction<boolean>>;
   setMerchantSearchResult?: Dispatch<SetStateAction<PartyData | undefined>>;
+  setApiLoading?: Dispatch<SetStateAction<boolean>>;
+  apiLoading?: boolean;
 };
 
 // TODO: handle cognitive-complexity
@@ -100,10 +102,11 @@ export default function AsyncAutocompleteContainer({
   filterCategories,
   setIsPresentInAtecoWhiteList,
   setMerchantSearchResult,
+  setApiLoading,
+  apiLoading,
 }: Props) {
   const { setRequiredLogin } = useContext(UserContext);
   const { t } = useTranslation();
-  const [loading, setLoading] = useState(false);
   const [partyLogo, setPartyLogo] = useState<string>(
     selected ? buildUrlLogo(selected.id) : OnboardingPartyIcon
   );
@@ -150,7 +153,7 @@ export default function AsyncAutocompleteContainer({
     limit?: number,
     categories?: string
   ) => {
-    setLoading(true);
+    setApiLoading?.(true);
     const searchResponse = await fetchWithLogs(
       endpoint,
       {
@@ -173,7 +176,7 @@ export default function AsyncAutocompleteContainer({
       setOptions([]);
     }
 
-    setLoading(false);
+    setApiLoading?.(false);
   };
 
   const handleSearchByTaxCode = async (
@@ -183,7 +186,7 @@ export default function AsyncAutocompleteContainer({
     query: string
     // eslint-disable-next-line sonarjs/cognitive-complexity
   ) => {
-    setLoading(true);
+    setApiLoading?.(true);
 
     const updatedParams = {
       ...params,
@@ -232,7 +235,7 @@ export default function AsyncAutocompleteContainer({
       }
     }
 
-    setLoading(false);
+    setApiLoading?.(false);
   };
 
   const handleSearchByReaCode = async (
@@ -242,22 +245,20 @@ export default function AsyncAutocompleteContainer({
     query: string
     // eslint-disable-next-line sonarjs/cognitive-complexity
   ) => {
-    setLoading(true);
+    setApiLoading?.(true);
 
-    const reaPattern = /^[A-Za-z]{2}-\d{7}$/;
+    const reaPattern = /^[A-Za-z]{2}-\d{6}$/;
     if (!reaPattern.test(query)) {
-      setLoading(false);
+      setApiLoading?.(false);
       setCfResult(undefined);
       setIsPresentInAtecoWhiteList?.(false);
       return;
     }
 
-    const rea = query;
-
     const updatedParams = addUser
       ? params
       : {
-          rea
+          rea: query
         };
 
     const searchResponse = await fetchWithLogs(
@@ -299,7 +300,7 @@ export default function AsyncAutocompleteContainer({
       }
     }
 
-    setLoading(false);
+    setApiLoading?.(false);
   };
 
   const handleSearchByAooCode = async (
@@ -308,7 +309,7 @@ export default function AsyncAutocompleteContainer({
     params: any,
     query: string
   ) => {
-    setLoading(true);
+    setApiLoading?.(true);
 
     const updatedParams = addUser
       ? params
@@ -338,7 +339,7 @@ export default function AsyncAutocompleteContainer({
       setAooResult(undefined);
     }
 
-    setLoading(false);
+    setApiLoading?.(false);
   };
 
   const handleSearchByUoCode = async (
@@ -347,7 +348,7 @@ export default function AsyncAutocompleteContainer({
     params: any,
     query: string
   ) => {
-    setLoading(true);
+    setApiLoading?.(true);
 
     const updatedParams = addUser
       ? params
@@ -377,7 +378,7 @@ export default function AsyncAutocompleteContainer({
       setUoResult(undefined);
     }
 
-    setLoading(false);
+    setApiLoading?.(false);
   };
 
   const contractingInsuranceFromTaxId = async (
@@ -386,7 +387,7 @@ export default function AsyncAutocompleteContainer({
     params: any,
     query: string
   ) => {
-    setLoading(true);
+    setApiLoading?.(true);
 
     const searchResponse = await fetchWithLogs(
       {
@@ -414,7 +415,7 @@ export default function AsyncAutocompleteContainer({
       setCfResult(undefined);
     }
 
-    setLoading(false);
+    setApiLoading?.(false);
   };
 
   const searchByInstitutionType = async (value: string, institutionType?: string) => {
@@ -551,6 +552,7 @@ export default function AsyncAutocompleteContainer({
           isTaxCodeSelected={isTaxCodeSelected}
           isIvassCodeSelected={isIvassCodeSelected}
           isBusinessNameSelected={isBusinessNameSelected}
+          isReaCodeSelected={isReaCodeSelected}
           setCfResult={setCfResult}
           setAooResult={setAooResult}
           setUoResult={setUoResult}
@@ -573,7 +575,7 @@ export default function AsyncAutocompleteContainer({
                 setSelected={setSelected}
                 options={options}
                 setOptions={setOptions}
-                loading={loading}
+                apiLoading={apiLoading}
                 getOptionLabel={getOptionLabel}
                 getOptionKey={getOptionKey}
               />
@@ -611,7 +613,7 @@ export default function AsyncAutocompleteContainer({
                 setSelected={setSelected}
                 cfResult={cfResult}
                 setCfResult={setCfResult}
-                loading={loading}
+                apiLoading={apiLoading}
                 getOptionLabel={getOptionLabel}
                 getOptionKey={getOptionKey}
                 aooResult={aooResult}

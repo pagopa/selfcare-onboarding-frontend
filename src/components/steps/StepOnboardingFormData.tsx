@@ -128,6 +128,7 @@ export default function StepOnboardingFormData({
   const isPremium = !!subProductId;
   const isPaymentServiceProvider = institutionType === 'PSP';
   const isPdndPrivate = institutionType === 'PRV' && productId === PRODUCT_IDS.INTEROP;
+  const isPrivateMerchant = institutionType === 'PRV' && productId === PRODUCT_IDS.IDPAY_MERCHANT;
   const isInformationCompany =
     origin !== 'IPA' &&
     institutionType !== 'PRV' &&
@@ -323,6 +324,7 @@ export default function StepOnboardingFormData({
         isPremium,
         invalidTaxCodeInvoicing,
         isPdndPrivate,
+        isPrivateMerchant,
         recipientCodeStatus,
         productId
       )
@@ -472,7 +474,8 @@ export default function StepOnboardingFormData({
       !stepHistoryState.isTaxCodeEquals2PIVA &&
       formik.values.taxCode === formik.values.vatNumber &&
       formik.values.taxCode &&
-      formik.values.taxCode.length > 0
+      formik.values.taxCode.length > 0 &&
+      !isPrivateMerchant
     ) {
       setStepHistoryState({
         ...stepHistoryState,
@@ -592,6 +595,7 @@ export default function StepOnboardingFormData({
           isCityEditable={isCityEditable}
           isInvoiceable={isInvoiceable}
           isPdndPrivate={isPdndPrivate}
+          isPrivateMerchant={isPrivateMerchant}
           setInvalidTaxCodeInvoicing={setInvalidTaxCodeInvoicing}
           recipientCodeStatus={recipientCodeStatus}
           getCountriesFromGeotaxonomies={getCountriesFromGeotaxonomies}
