@@ -274,8 +274,6 @@ export default function AsyncAutocompleteContainer({
 
     const outcome = getFetchOutcome(searchResponse);
 
-    console.log('response', (searchResponse as AxiosResponse).data);
-
     if (outcome === 'success') {
       const response = (searchResponse as AxiosResponse).data;
       setCfResult(response);

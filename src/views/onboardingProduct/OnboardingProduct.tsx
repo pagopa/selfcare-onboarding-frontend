@@ -337,7 +337,6 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     onboardingData: OnboardingFormData,
     institutionType: InstitutionType
   ) => {
-    console.log('onboardingData', onboardingData);
     if (
       onboardingData.taxCode === '' &&
       onboardingData.originId === undefined &&

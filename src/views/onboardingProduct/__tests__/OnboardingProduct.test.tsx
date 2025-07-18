@@ -749,7 +749,6 @@ const completeOnboardingPdndInfocamereRequest = async (institutionType) => {
 };
 
 const executeStepInstitutionType = async (productSelected: string, institutionType: string) => {
-  console.log('productSelected', productSelected);
   if (
     productSelected !== PRODUCT_IDS.SEND &&
     productSelected !== PRODUCT_IDS.IDPAY &&
@@ -769,7 +768,6 @@ const executeStepInstitutionType = async (productSelected: string, institutionTy
       fireEvent.click(confirmButtonEnabled);
     });
   } else {
-    console.log('entro qua');
     if (productSelected === PRODUCT_IDS.IDPAY_MERCHANT) {
       await waitFor(() => screen.getByText('Cerca il tuo ente'), { timeout: 5000 });
     } else {
