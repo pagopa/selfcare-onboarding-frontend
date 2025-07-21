@@ -509,6 +509,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
         method: 'POST',
         data: {
           billingData: billingData2billingDataRequest(onboardingFormData as OnboardingFormData),
+          atecoCodes: onboardingFormData?.atecoCodes,
           additionalInformations:
             institutionType === 'GSP' && selectedProduct?.id === PRODUCT_IDS.PAGOPA
               ? {

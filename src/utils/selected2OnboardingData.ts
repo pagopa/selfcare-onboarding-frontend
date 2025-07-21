@@ -16,6 +16,7 @@ export const selected2OnboardingData = (
     selectedParty?.denominazioneEnte ??
     '',
   aooName: selectedParty?.denominazioneAoo,
+  atecoCodes: selectedParty?.atecoCodes ,
   uoName: selectedParty?.descrizioneUo,
   aooUniqueCode: selectedParty?.codiceUniAoo,
   uoUniqueCode: selectedParty?.codiceUniUo,
