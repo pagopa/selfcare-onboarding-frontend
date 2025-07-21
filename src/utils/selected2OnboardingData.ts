@@ -37,11 +37,15 @@ export const selected2OnboardingData = (
   geographicTaxonomies: [],
   originIdEc: selectedParty?.originId,
   originId:
-    (institutionType === 'PRV' && productId === PRODUCT_IDS.INTEROP) || institutionType === 'SCP'
+    (institutionType === 'PRV' &&
+      (productId === PRODUCT_IDS.INTEROP || productId === PRODUCT_IDS.IDPAY_MERCHANT)) ||
+    institutionType === 'SCP'
       ? selectedParty?.businessTaxId
       : (selectedParty?.codiceUniUo ?? selectedParty?.codiceUniAoo ?? selectedParty?.originId),
   origin:
-    (institutionType === 'PRV' && productId === PRODUCT_IDS.INTEROP) || institutionType === 'SCP'
+    (institutionType === 'PRV' &&
+      (productId === PRODUCT_IDS.INTEROP || productId === PRODUCT_IDS.IDPAY_MERCHANT)) ||
+    institutionType === 'SCP'
       ? 'PDND_INFOCAMERE'
       : selectedParty?.origin,
   rea:
