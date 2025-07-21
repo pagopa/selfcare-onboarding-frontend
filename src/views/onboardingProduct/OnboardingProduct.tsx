@@ -568,7 +568,9 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
               : institutionType === 'PSP' ||
                   institutionType === 'GPU' ||
                   institutionType === 'PT' ||
-                  (institutionType === 'PRV' && productId !== PRODUCT_IDS.INTEROP)
+                  (institutionType === 'PRV' &&
+                    productId !== PRODUCT_IDS.INTEROP &&
+                    productId !== PRODUCT_IDS.IDPAY_MERCHANT)
                 ? 'SELC'
                 : origin,
           istatCode: origin !== 'IPA' ? onboardingFormData?.istatCode : undefined,
