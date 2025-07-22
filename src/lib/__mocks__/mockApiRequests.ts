@@ -499,6 +499,17 @@ export const mockedGeoTaxonomy: Array<GeographicTaxonomyResource> = [
     province_id: '352',
     region_id: '15',
   },
+  {
+    code: '345876',
+    country: '531',
+    country_abbreviation: 'IT',
+    desc: "MODENA - COMUNE",
+    enabled: true,
+    istat_code: '233',
+    province_abbreviation: 'MO',
+    province_id: '463',
+    region_id: '26',
+  },
 ];
 
 export const mockedGeotaxonomies: Array<GeographicTaxonomyResource> = [
