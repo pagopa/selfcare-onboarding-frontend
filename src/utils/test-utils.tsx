@@ -410,19 +410,17 @@ export const billingData2billingDataRequest = (
       ? mockPartyRegistry.items[1].zipCode
       : isForeignInsurance
         ? undefined
-        : isPrivateMerchant && typeOfSearch === 'taxCode'
-          ? mockedPdndVisuraInfomacere[0].zipCode
-          : from === 'INFOCAMERE' || from === 'PDND_INFOCAMERE'
-            ? mockedPartiesFromInfoCamere[0].zipCode
-            : from !== 'IPA'
-              ? '09010'
-              : typeOfSearch === 'taxCode'
-                ? mockedParties[0].zipCode
-                : typeOfSearch === 'aooCode'
-                  ? mockedAoos[0].CAP
-                  : typeOfSearch === 'uoCode'
-                    ? mockedUos[0].CAP
-                    : mockPartyRegistry.items[0].zipCode,
+        : from === 'INFOCAMERE' || from === 'PDND_INFOCAMERE'
+          ? mockedPartiesFromInfoCamere[0].zipCode
+          : from !== 'IPA'
+            ? '09010'
+            : typeOfSearch === 'taxCode'
+              ? mockedParties[0].zipCode
+              : typeOfSearch === 'aooCode'
+                ? mockedAoos[0].CAP
+                : typeOfSearch === 'uoCode'
+                  ? mockedUos[0].CAP
+                  : mockPartyRegistry.items[0].zipCode,
 
     taxCode: errorOnSubmit
       ? mockPartyRegistry.items[1].taxCode
@@ -548,7 +546,9 @@ export const verifySubmit = async (
                         institutionType === 'PSP' ||
                         institutionType === 'GPU' ||
                         institutionType === 'PT' ||
-                        (institutionType === 'PRV' && productId !== PRODUCT_IDS.INTEROP) ||
+                        (institutionType === 'PRV' &&
+                          productId !== PRODUCT_IDS.INTEROP &&
+                          productId !== PRODUCT_IDS.IDPAY_MERCHANT) ||
                         (institutionType === 'GSP' && from === 'NO_IPA')
                       ? 'SELC'
                       : undefined,
@@ -667,17 +667,15 @@ export const verifySubmit = async (
                     : undefined,
                 rea:
                   from === 'INFOCAMERE' || from === 'PDND_INFOCAMERE'
-                    ? mockedPartiesFromInfoCamere[0].cciaa.concat(
-                        '-',
-                        mockedPartiesFromInfoCamere[0].nRea
-                      )
+                    ? isPrivateMerchant
+                      ? mockedPdndVisuraInfomacere[0].nRea
+                      : mockedPartiesFromInfoCamere[0].cciaa.concat(
+                          '-',
+                          mockedPartiesFromInfoCamere[0].nRea
+                        )
                     : institutionType === 'PRV' && productId === PRODUCT_IDS.PAGOPA
                       ? undefined
-                      : institutionType === 'PRV' && productId === PRODUCT_IDS.INTEROP
-                        ? 'MO-123456'
-                        : isPrivateMerchant
-                          ? mockedPdndVisuraInfomacere[0].nRea
-                          : 'MI-12345',
+                      : 'MO-123456',
               }
             : undefined,
         pspData:
@@ -728,7 +726,10 @@ export const verifySubmit = async (
                 city: mockedPartiesFromInfoCamere[0].city,
                 county: mockedPartiesFromInfoCamere[0].county,
                 country:
-                  institutionType === 'SCP' && productId === PRODUCT_IDS.INTEROP ? 'IT' : undefined,
+                  (institutionType === 'SCP' && productId === PRODUCT_IDS.INTEROP) ||
+                  institutionType === 'PRV'
+                    ? 'IT'
+                    : undefined,
               }
             : {
                 city: 'Milano',
@@ -991,7 +992,7 @@ export const fillUserBillingDataForm = async (
 
     if (institutionType !== 'PT' && institutionType !== 'AS' && institutionType !== 'PSP') {
       fireEvent.change(document.getElementById(rea ?? '') as HTMLInputElement, {
-        target: { value: 'MI-12345' },
+        target: { value: 'MO-123456' },
       });
     }
   } else {
@@ -1051,10 +1052,10 @@ export const fillUserBillingDataForm = async (
         target: { value: mockedPdndVisuraInfomacere[0].businessTaxId },
       });
       fireEvent.change(document.getElementById(registeredOfficeInput) as HTMLElement, {
-        target: { value: 'registeredOfficeInput' },
+        target: { value: mockedPartiesFromInfoCamere[0].address },
       });
       fireEvent.change(document.getElementById(zipCode) as HTMLElement, {
-        target: { value: mockedPdndVisuraInfomacere[0].zipCode },
+        target: { value: mockedPartiesFromInfoCamere[0].zipCode },
       });
 
       const autocomplete = document.getElementById(city as string) as HTMLElement;
@@ -1071,6 +1072,48 @@ export const fillUserBillingDataForm = async (
       fireEvent.change(document.getElementById(rea ?? '') as HTMLInputElement, {
         target: { value: mockedPdndVisuraInfomacere[0].nRea },
       });
+    } else if (
+      (institutionType === 'SCP' || institutionType === 'PRV') &&
+      (from === 'INFOCAMERE' || from === 'PDND_INFOCAMERE')
+    ) {
+      fireEvent.change(document.getElementById(businessNameInput) as HTMLElement, {
+        target: { value: mockedPartiesFromInfoCamere[0].businessName },
+      });
+      fireEvent.change(document.getElementById(mailPECInput) as HTMLElement, {
+        target: { value: mockedPartiesFromInfoCamere[0].digitalAddress },
+      });
+      fireEvent.change(document.getElementById(taxCodeInput) as HTMLElement, {
+        target: { value: mockedPartiesFromInfoCamere[0].businessTaxId },
+      });
+      fireEvent.change(document.getElementById(registeredOfficeInput) as HTMLElement, {
+        target: { value: mockedPartiesFromInfoCamere[0].address },
+      });
+      fireEvent.change(document.getElementById(zipCode) as HTMLElement, {
+        target: { value: mockedPartiesFromInfoCamere[0].zipCode },
+      });
+
+      const autocomplete = document.getElementById(city as string) as HTMLElement;
+      await userEvent.type(autocomplete, 'Mod');
+      const option = await screen.findByText('Modena', {}, { timeout: 8000 });
+      expect(option).toBeInTheDocument();
+      fireEvent.click(option);
+
+      expect(document.getElementById(county ?? '') as HTMLElement).toHaveValue('MO');
+
+      fireEvent.change(document.getElementById(rea ?? '') as HTMLInputElement, {
+        target: {
+          value: mockedPartiesFromInfoCamere[0].cciaa.concat(
+            '-',
+            mockedPartiesFromInfoCamere[0].nRea
+          ),
+        },
+      });
+
+      if (institutionType === 'PRV' && productId === PRODUCT_IDS.INTEROP) {
+        fireEvent.change(document.getElementById('businessRegisterPlace') as HTMLElement, {
+          target: { value: '01234567891' },
+        });
+      }
     }
 
     if (!isPrivateMerchant) {
@@ -1286,7 +1329,7 @@ export const checkCorrectBodyBillingData = (
       institutionType === 'SCP' || (institutionType === 'PRV' && !isPrivateMerchant)
         ? mockedPartiesFromInfoCamere[0].county
         : isPrivateMerchant
-          ? 'MI'
+          ? 'MO'
           : expectedCounty
     );
   }
@@ -1314,9 +1357,7 @@ export const checkCorrectBodyBillingData = (
       target: { value: '01234567891' },
     });
 
-    expect((document.getElementById('rea') as HTMLInputElement).value).toBe(
-      institutionType === 'PRV' && productId === PRODUCT_IDS.INTEROP ? 'MO-123456' : 'MI-12345'
-    );
+    expect((document.getElementById('rea') as HTMLInputElement).value).toBe('MO-123456');
 
     if (
       institutionType === 'SA' ||
@@ -1329,7 +1370,7 @@ export const checkCorrectBodyBillingData = (
   }
 
   expect((document.getElementById('registeredOffice') as HTMLInputElement).value).toBe(
-    institutionType === 'SCP' || (institutionType === 'PRV' && !isPrivateMerchant)
+    institutionType === 'SCP' || institutionType === 'PRV'
       ? mockedPartiesFromInfoCamere[0].address
       : expectedRegisteredOfficeInput
   );

@@ -541,14 +541,14 @@ test('Test: Successfull complete onboarding request of PRV party for prod-idpay-
     undefined,
     '12345678901'
   );
-  await executeStepBillingData(PRODUCT_IDS.IDPAY_MERCHANT, 'PRV', false, false, 'SELC');
+  await executeStepBillingData(PRODUCT_IDS.IDPAY_MERCHANT, 'PRV', false, false, 'PDND_INFOCAMERE');
   await executeStepAddManager(false);
   await executeStepAddAdmin(true, false, false, false, false);
   await verifySubmit(
     PRODUCT_IDS.IDPAY_MERCHANT,
     'PRV',
     fetchWithLogsSpy,
-    'SELC',
+    'PDND_INFOCAMERE',
     false,
     false,
     'taxCode'
@@ -576,7 +576,7 @@ test('Test: Successfull complete onboarding request of PRV party for prod-idpay-
     PRODUCT_IDS.IDPAY_MERCHANT,
     'PRV',
     fetchWithLogsSpy,
-    'SELC',
+    'PDND_INFOCAMERE',
     false,
     false,
     'taxCode'
@@ -989,7 +989,6 @@ const executeStepSearchParty = async (
         },
         expect.any(Function)
       );
-      screen.debug(undefined, 9999999);
 
       await waitFor(() => {
         fireEvent.click(
