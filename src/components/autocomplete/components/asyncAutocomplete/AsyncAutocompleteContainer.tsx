@@ -189,9 +189,6 @@ export default function AsyncAutocompleteContainer({
     // eslint-disable-next-line sonarjs/cognitive-complexity
   ) => {
     setApiLoading?.(true);
-    console.log('sto entrando qua');
-    console.log('filterCategories', filterCategories);
-    console.log('query', query);
     const updatedParams = {
       ...params,
       taxCode: addUser ? query : undefined,
