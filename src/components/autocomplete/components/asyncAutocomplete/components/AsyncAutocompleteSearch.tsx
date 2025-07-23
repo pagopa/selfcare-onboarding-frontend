@@ -41,6 +41,7 @@ type Props = {
   isIvassCodeSelected?: boolean;
   isTaxCodeSelected?: boolean;
   isReaCodeSelected?: boolean;
+  isPersonalTaxCodeSelected?: boolean;
   isBusinessNameSelected?: boolean;
   setCfResult: React.Dispatch<React.SetStateAction<PartyData | undefined>>;
   setAooResult: React.Dispatch<React.SetStateAction<AooData | undefined>>;
@@ -64,6 +65,7 @@ export default function AsyncAutocompleteSearch({
   isTaxCodeSelected,
   isIvassCodeSelected,
   isReaCodeSelected,
+  isPersonalTaxCodeSelected,
   isBusinessNameSelected,
   setCfResult,
   setAooResult,
@@ -90,7 +92,11 @@ export default function AsyncAutocompleteSearch({
   };
 
   const valueSelected =
-    (isBusinessNameSelected || isTaxCodeSelected || isIvassCodeSelected) && selected?.description
+    (isBusinessNameSelected ||
+      isTaxCodeSelected ||
+      isIvassCodeSelected ||
+      isPersonalTaxCodeSelected) &&
+    selected?.description
       ? selected.description
       : selected && isAooCodeSelected && selected?.denominazioneAoo
         ? selected?.denominazioneAoo
@@ -109,6 +115,20 @@ export default function AsyncAutocompleteSearch({
       setInput(input);
     }
   }, []);
+
+  useEffect(() => {
+  if (!selected) {
+    setInput('');
+  }
+}, [
+  isBusinessNameSelected,
+  isTaxCodeSelected,
+  isIvassCodeSelected,
+  isAooCodeSelected,
+  isUoCodeSelected,
+  isReaCodeSelected,
+  isPersonalTaxCodeSelected
+]);
 
   const label = useMemo(() => {
     if (selected) {
@@ -140,7 +160,7 @@ export default function AsyncAutocompleteSearch({
           '& input#Parties': { display: selected && 'none !important' },
         }}
         onChange={handleChange}
-        value={!selected ? valueSelected : ''}
+        value={selected ? valueSelected : input}
         label={label}
         variant={!selected ? 'outlined' : 'standard'}
         inputProps={{

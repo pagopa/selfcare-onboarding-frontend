@@ -38,6 +38,7 @@ type Props = {
   isAooCodeSelected?: boolean;
   isUoCodeSelected?: boolean;
   isReaCodeSelected?: boolean;
+  isPersonalTaxCodeSelected?: boolean;
 };
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
@@ -53,9 +54,10 @@ export default function AsyncAutocompleteResultsCode({
   isAooCodeSelected,
   isUoCodeSelected,
   isReaCodeSelected,
+  isPersonalTaxCodeSelected
 }: Props) {
   const party =
-    isTaxCodeSelected || isIvassCodeSelected || isReaCodeSelected
+    isTaxCodeSelected || isIvassCodeSelected || isReaCodeSelected || isPersonalTaxCodeSelected
       ? cfResult
       : isAooCodeSelected
         ? aooResult

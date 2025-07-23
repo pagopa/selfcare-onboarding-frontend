@@ -15,6 +15,7 @@ type Props = {
   setIsAooCodeSelected: React.Dispatch<React.SetStateAction<boolean>>;
   setIsUoCodeSelected: React.Dispatch<React.SetStateAction<boolean>>;
   setIsReaCodeSelected: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsPersonalTaxCodeSelected: React.Dispatch<React.SetStateAction<boolean>>;
   setOptions: React.Dispatch<React.SetStateAction<Array<any>>>;
   setInput: React.Dispatch<React.SetStateAction<string>>;
   setIsSearchFieldSelected: React.Dispatch<React.SetStateAction<boolean>>;
@@ -29,6 +30,7 @@ type Props = {
   isAooCodeSelected?: boolean;
   isUoCodeSelected?: boolean;
   isReaCodeSelected?: boolean;
+  isPersonalTaxCodeSelected?: boolean;
   product?: Product | null;
   institutionType?: InstitutionType;
   addUser: boolean;
@@ -42,6 +44,7 @@ export default function PartyAdvancedSelect({
   setIsAooCodeSelected,
   setIsUoCodeSelected,
   setIsReaCodeSelected,
+  setIsPersonalTaxCodeSelected,
   setIsSearchFieldSelected,
   setOptions,
   setInput,
@@ -54,6 +57,7 @@ export default function PartyAdvancedSelect({
   isAooCodeSelected,
   isUoCodeSelected,
   isReaCodeSelected,
+  isPersonalTaxCodeSelected,
   setUoResultHistory,
   setAooResultHistory,
   product,
@@ -75,16 +79,18 @@ export default function PartyAdvancedSelect({
     isIvassCodeSelected: boolean,
     isAooCodeSelected: boolean,
     isUoCodeSelected: boolean,
-    isReaCodeSelected: boolean
+    isReaCodeSelected: boolean,
+    isPersonalTaxCodeSelected: boolean
   ) => {
+    setInput('');
     setIsBusinessNameSelected(isBusinessNameSelected);
     setIsTaxCodeSelected(isTaxCodeSelected);
     setIsIvassCodeSelected(isIvassCodeSelected);
     setIsAooCodeSelected(isAooCodeSelected);
     setIsUoCodeSelected(isUoCodeSelected);
     setIsReaCodeSelected(isReaCodeSelected);
+    setIsPersonalTaxCodeSelected(isPersonalTaxCodeSelected);
     setOptions([]);
-    setInput('');
     setCfResult(undefined);
     setAooResult(undefined);
     setUoResult(undefined);
@@ -98,15 +104,16 @@ export default function PartyAdvancedSelect({
       ((product?.id === PRODUCT_IDS.INTEROP || product?.id === PRODUCT_IDS.IDPAY_MERCHANT) &&
         (institutionType === 'SCP' || institutionType === 'PRV'))
     ) {
-      onSelectValue(false, true, false, false, false, false);
+      onSelectValue(false, true, false, false, false, false, false);
       setTypeOfSearch('taxCode');
     } else {
-      onSelectValue(true, false, false, false, false, false);
+      onSelectValue(true, false, false, false, false, false, false);
       setTypeOfSearch('businessName');
     }
   }, []);
 
   useEffect(() => {
+    setInput('');
     if (isBusinessNameSelected) {
       setTypeOfSearch('businessName');
     } else if (isTaxCodeSelected) {
@@ -119,6 +126,8 @@ export default function PartyAdvancedSelect({
       setTypeOfSearch('ivassCode');
     } else if (isReaCodeSelected) {
       setTypeOfSearch('reaCode');
+    } else if (isPersonalTaxCodeSelected) {
+      setTypeOfSearch('personalTaxCode');
     } else {
       setTypeOfSearch('');
     }
@@ -129,6 +138,7 @@ export default function PartyAdvancedSelect({
     isUoCodeSelected,
     isIvassCodeSelected,
     isReaCodeSelected,
+    isPersonalTaxCodeSelected,
   ]);
 
   const filteredByProducts = (product?: Product) =>
@@ -146,14 +156,14 @@ export default function PartyAdvancedSelect({
       id: 'aooCode',
       ['data-testid']: 'aooCode',
       value: 'aooCode',
-      onClick: () => onSelectValue(false, false, false, true, false, false),
+      onClick: () => onSelectValue(false, false, false, true, false, false, false),
       label: t('partyAdvancedSelect.aooCode'),
     },
     {
       id: 'uoCode',
       ['data-testid']: 'uoCode',
       value: 'uoCode',
-      onClick: () => onSelectValue(false, false, false, false, true, false),
+      onClick: () => onSelectValue(false, false, false, false, true, false, false),
       label: t('partyAdvancedSelect.uoCode'),
     },
   ];
@@ -173,7 +183,7 @@ export default function PartyAdvancedSelect({
             id="businessName"
             data-testid="businessName"
             value={'businessName'}
-            onClick={() => onSelectValue(true, false, false, false, false, false)}
+            onClick={() => onSelectValue(true, false, false, false, false, false, false)}
           >
             {t('partyAdvancedSelect.businessName')}
           </MenuItem>
@@ -183,7 +193,7 @@ export default function PartyAdvancedSelect({
             id="ivassCode"
             data-testid="ivassCode"
             value={'ivassCode'}
-            onClick={() => onSelectValue(false, false, true, false, false, false)}
+            onClick={() => onSelectValue(false, false, true, false, false, false, false)}
           >
             {t('partyAdvancedSelect.ivassCode')}
           </MenuItem>
@@ -192,22 +202,33 @@ export default function PartyAdvancedSelect({
             id="taxCode"
             data-testid="taxCode"
             value={'taxCode'}
-            onClick={() => onSelectValue(false, true, false, false, false, false)}
+            onClick={() => onSelectValue(false, true, false, false, false, false, false)}
           >
             {t('partyAdvancedSelect.taxCode')}
           </MenuItem>
         )}
 
-        {institutionType === 'PRV' && product?.id === PRODUCT_IDS.IDPAY_MERCHANT && (
-          <MenuItem
-            id="reaCode"
-            data-testid="reaCode"
-            value={'reaCode'}
-            onClick={() => onSelectValue(false, false, false, false, false, true)}
-          >
-            {t('partyAdvancedSelect.reaCode')}
-          </MenuItem>
-        )}
+        {institutionType === 'PRV' &&
+          product?.id === PRODUCT_IDS.IDPAY_MERCHANT && [
+            <MenuItem
+              key={'reaCode'}
+              id="reaCode"
+              data-testid="reaCode"
+              value={'reaCode'}
+              onClick={() => onSelectValue(false, false, false, false, false, true, false)}
+            >
+              {t('partyAdvancedSelect.reaCode')}
+            </MenuItem>,
+            <MenuItem
+              key={'personalTaxCode'}
+              id="personalTaxCode"
+              data-testid="personalTaxCode"
+              value={'personalTaxCode'}
+              onClick={() => onSelectValue(false, false, false, false, false, false, true)}
+            >
+              {t('partyAdvancedSelect.personalTaxCode')}
+            </MenuItem>,
+          ]}
 
         {((ENV.AOO_UO.SHOW_AOO_UO &&
           optionsAvailable4InstitutionType &&

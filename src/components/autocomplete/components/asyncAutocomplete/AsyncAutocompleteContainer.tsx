@@ -52,6 +52,7 @@ type Props = {
   uoResult?: UoData;
   isIvassCodeSelected: boolean;
   isReaCodeSelected: boolean;
+  isPersonalTaxCodeSelected: boolean;
   externalInstitutionId: string;
   institutionType?: InstitutionType;
   setDisabled: Dispatch<SetStateAction<boolean>>;
@@ -88,6 +89,7 @@ export default function AsyncAutocompleteContainer({
   isAooCodeSelected,
   isUoCodeSelected,
   isReaCodeSelected,
+  isPersonalTaxCodeSelected,
   setAooResult,
   setUoResult,
   aooResult,
@@ -187,7 +189,9 @@ export default function AsyncAutocompleteContainer({
     // eslint-disable-next-line sonarjs/cognitive-complexity
   ) => {
     setApiLoading?.(true);
-
+    console.log('sto entrando qua');
+    console.log('filterCategories', filterCategories);
+    console.log('query', query);
     const updatedParams = {
       ...params,
       taxCode: addUser ? query : undefined,
@@ -215,7 +219,7 @@ export default function AsyncAutocompleteContainer({
 
       if (product?.id === PRODUCT_IDS.IDPAY_MERCHANT) {
         setMerchantSearchResult?.(response);
-        if (filterCategories && response.atecoCodes && Array.isArray(response.atecoCodes)) {
+        if (filterCategories && response?.atecoCodes && Array.isArray(response.atecoCodes)) {
           const whitelistCodes = filterCategories.split(',');
           const hasMatchingCode = response.atecoCodes.some((code: string) =>
             whitelistCodes.includes(code)
@@ -258,7 +262,7 @@ export default function AsyncAutocompleteContainer({
     const updatedParams = addUser
       ? params
       : {
-          rea: query
+          rea: query,
         };
 
     const searchResponse = await fetchWithLogs(
@@ -445,10 +449,11 @@ export default function AsyncAutocompleteContainer({
     event: any
     // eslint-disable-next-line sonarjs/cognitive-complexity
   ) => {
+    setInput('');
     const typedInput = event.target.value as string;
     const params = {
       productId: selectedProduct?.id,
-      taxCode: isTaxCodeSelected ? typedInput : undefined,
+      taxCode: isTaxCodeSelected || isPersonalTaxCodeSelected ? typedInput : undefined,
       subunitCode: isAooCodeSelected || isUoCodeSelected ? typedInput : undefined,
     };
 
@@ -477,7 +482,8 @@ export default function AsyncAutocompleteContainer({
         searchByInstitutionType(value, institutionType);
       } else if (
         (isTaxCodeSelected && value.length === 11) ||
-        (isIvassCodeSelected && value.length === 5)
+        (isIvassCodeSelected && value.length === 5) ||
+        (isPersonalTaxCodeSelected && value.length === 16)
       ) {
         if (institutionType === 'SA' || institutionType === 'AS') {
           const endpoint = addUser
@@ -493,7 +499,8 @@ export default function AsyncAutocompleteContainer({
             : product?.id === PRODUCT_IDS.INTEROP &&
                 (institutionType === 'SCP' || institutionType === 'PRV')
               ? 'ONBOARDING_GET_PARTY_BY_CF_FROM_INFOCAMERE'
-              : product?.id === PRODUCT_IDS.IDPAY_MERCHANT && isTaxCodeSelected
+              : product?.id === PRODUCT_IDS.IDPAY_MERCHANT &&
+                  (isTaxCodeSelected || isPersonalTaxCodeSelected)
                 ? 'ONBOARDING_GET_VISURA_INFOCAMERE_BY_CF'
                 : 'ONBOARDING_GET_PARTY_FROM_CF';
           void handleSearchByTaxCode(addUser, endpoint, params, value);
@@ -553,6 +560,7 @@ export default function AsyncAutocompleteContainer({
           isIvassCodeSelected={isIvassCodeSelected}
           isBusinessNameSelected={isBusinessNameSelected}
           isReaCodeSelected={isReaCodeSelected}
+          isPersonalTaxCodeSelected={isPersonalTaxCodeSelected}
           setCfResult={setCfResult}
           setAooResult={setAooResult}
           setUoResult={setUoResult}
@@ -603,7 +611,8 @@ export default function AsyncAutocompleteContainer({
               isAooCodeSelected ||
               isUoCodeSelected ||
               isIvassCodeSelected ||
-              isReaCodeSelected) &&
+              isReaCodeSelected ||
+              isPersonalTaxCodeSelected) &&
             !isBusinessNameSelected &&
             input !== undefined &&
             input?.length >= 5 &&
@@ -623,6 +632,7 @@ export default function AsyncAutocompleteContainer({
                 isAooCodeSelected={isAooCodeSelected}
                 isUoCodeSelected={isUoCodeSelected}
                 isReaCodeSelected={isReaCodeSelected}
+                isPersonalTaxCodeSelected={isPersonalTaxCodeSelected}
               />
             ) : (
               input.length >= 1 &&

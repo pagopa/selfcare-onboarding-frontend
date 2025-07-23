@@ -67,6 +67,7 @@ export function Autocomplete({
   const [isAooCodeSelected, setIsAooCodeSelected] = useState<boolean>(false);
   const [isUoCodeSelected, setIsUoCodeSelected] = useState<boolean>(false);
   const [isReaCodeSelected, setIsReaCodeSelected] = useState<boolean>(false);
+  const [isPersonalTaxCodeSelected, setIsPersonalTaxCodeSelected] = useState<boolean>(false);
   const [isTaxCodeSelected, setIsTaxCodeSelected] = useState<boolean>();
   const [isIvassCodeSelected, setIsIvassCodeSelected] = useState<boolean>(false);
   const [input, setInput] = useState<string>('');
@@ -113,6 +114,7 @@ export function Autocomplete({
               setIsAooCodeSelected={setIsAooCodeSelected}
               setIsUoCodeSelected={setIsUoCodeSelected}
               setIsReaCodeSelected={setIsReaCodeSelected}
+              setIsPersonalTaxCodeSelected={setIsPersonalTaxCodeSelected}
               setOptions={setOptions}
               setInput={setInput}
               setIsSearchFieldSelected={setIsSearchFieldSelected}
@@ -126,6 +128,7 @@ export function Autocomplete({
               isAooCodeSelected={isAooCodeSelected}
               isUoCodeSelected={isUoCodeSelected}
               isReaCodeSelected={isReaCodeSelected}
+              isPersonalTaxCodeSelected={isPersonalTaxCodeSelected}
               setUoResultHistory={setUoResultHistory}
               setAooResultHistory={setAooResultHistory}
               product={product}
@@ -157,6 +160,7 @@ export function Autocomplete({
           isAooCodeSelected={isAooCodeSelected}
           isUoCodeSelected={isUoCodeSelected}
           isReaCodeSelected={isReaCodeSelected}
+          isPersonalTaxCodeSelected={isPersonalTaxCodeSelected}
           setAooResult={setAooResult}
           setUoResult={setUoResult}
           aooResult={aooResult}

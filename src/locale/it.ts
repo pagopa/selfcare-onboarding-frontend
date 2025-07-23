@@ -20,6 +20,7 @@ export default {
     aooCode: 'Codice univoco AOO',
     uoCode: 'Codice univoco UO',
     reaCode: 'Codice REA',
+    personalTaxCode: 'Codice Fiscale ditta individuale',
   },
   confirmOnboarding: {
     chooseOption: {
