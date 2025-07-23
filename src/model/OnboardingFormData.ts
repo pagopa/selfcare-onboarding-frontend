@@ -29,6 +29,7 @@ export type OnboardingFormData = {
   shareCapital?: string;
   supportEmail?: string;
   aooName?: string;
+  atecoCodes?: Array<string>;
   uoName?: string;
   aooUniqueCode?: string;
   uoUniqueCode?: string;
