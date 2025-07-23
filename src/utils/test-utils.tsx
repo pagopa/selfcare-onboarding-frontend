@@ -545,6 +545,12 @@ export const verifySubmit = async (
           haveTaxCode,
           productId
         ),
+        atecoCodes:
+          isPrivateMerchant && typeOfSearch === 'personalTaxCode'
+            ? mockedPdndVisuraInfomacere[5].atecoCodes
+            : isPrivateMerchant && typeOfSearch === 'taxCode'
+              ? mockedPdndVisuraInfomacere[0].atecoCodes
+              : undefined,
         institutionType,
         productId,
         origin:
