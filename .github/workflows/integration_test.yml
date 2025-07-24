@@ -7,7 +7,6 @@ on:
   pull_request:
     types: [opened, synchronize]
 
-
 jobs:
   test:
     runs-on: ubuntu-24.04
@@ -21,23 +20,12 @@ jobs:
         with:
           node-version: 18
 
-      - name: Install dependencies
-        run: npm install
-        
       - name: Install Yarn
-        run: npm install yarn
+        run: npm install -g yarn
 
-      - name: Install dependencies with Yarn
+      - name: Install dependencies
+        working-directory: ./e2e
         run: yarn install
-
-      - name: Install Playwright
-        run: yarn add -D playwright
-
-      - name: Build
-        run: yarn build
-
-      - name: Craco Build
-        run: yarn craco build
 
       - name: Run Playwright tests
         working-directory: ./e2e
