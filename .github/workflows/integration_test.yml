@@ -28,5 +28,8 @@ jobs:
       - name: Install dependencies with Yarn
         run: yarn install
 
+      - name: Build
+        run: yarn build
+
       - name: Run Playwright tests
         run: yarn test:e2e
