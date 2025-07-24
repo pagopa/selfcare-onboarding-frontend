@@ -27,6 +27,10 @@ jobs:
         working-directory: ./e2e
         run: yarn install
 
+      - name: Install Playwright
+        working-directory: ./e2e
+        run: yarn playwright install
+
       - name: Run Playwright tests
         working-directory: ./e2e
         run: yarn test:e2e
