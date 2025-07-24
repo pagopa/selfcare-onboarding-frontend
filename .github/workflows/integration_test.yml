@@ -40,4 +40,5 @@ jobs:
         run: yarn craco build
 
       - name: Run Playwright tests
+        working-directory: ./e2e
         run: yarn test:e2e
