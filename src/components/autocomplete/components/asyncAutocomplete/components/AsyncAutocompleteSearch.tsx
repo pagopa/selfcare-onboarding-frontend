@@ -8,6 +8,7 @@ import { useHistoryState } from '../../../../useHistoryState';
 import { UoData } from '../../../../../model/UoModel';
 import { StepBillingDataHistoryState } from '../../../../steps/StepOnboardingFormData';
 import { AooData } from '../../../../../model/AooData';
+import { SelectionsState } from '../../../../../model/Selection';
 
 const CustomTextField = styled(TextField)({
   justifyContent: 'center',
@@ -34,14 +35,9 @@ type Props = {
   setSelected: React.Dispatch<React.SetStateAction<any>>;
   setInput: Dispatch<SetStateAction<string>>;
   input: string;
-  handleChange: (event: any) => void;
   isSearchFieldSelected: boolean;
-  isAooCodeSelected?: boolean;
-  isUoCodeSelected?: boolean;
-  isIvassCodeSelected?: boolean;
-  isTaxCodeSelected?: boolean;
-  isReaCodeSelected?: boolean;
-  isBusinessNameSelected?: boolean;
+  selections: SelectionsState;
+  handleChange: (event: any) => void;
   setCfResult: React.Dispatch<React.SetStateAction<PartyData | undefined>>;
   setAooResult: React.Dispatch<React.SetStateAction<AooData | undefined>>;
   setUoResult: React.Dispatch<React.SetStateAction<UoData | undefined>>;
@@ -57,14 +53,9 @@ export default function AsyncAutocompleteSearch({
   setSelected,
   setInput,
   input,
-  handleChange,
   isSearchFieldSelected,
-  isAooCodeSelected,
-  isUoCodeSelected,
-  isTaxCodeSelected,
-  isIvassCodeSelected,
-  isReaCodeSelected,
-  isBusinessNameSelected,
+  selections,
+  handleChange,
   setCfResult,
   setAooResult,
   setUoResult,
@@ -90,13 +81,20 @@ export default function AsyncAutocompleteSearch({
   };
 
   const valueSelected =
-    (isBusinessNameSelected || isTaxCodeSelected || isIvassCodeSelected) && selected?.description
+    (selections.businessName ||
+      selections.taxCode ||
+      selections.ivassCode ||
+      selections.personalTaxCode) &&
+    selected?.description
       ? selected.description
-      : selected && isAooCodeSelected && selected?.denominazioneAoo
+      : selected && selections.aooCode && selected?.denominazioneAoo
         ? selected?.denominazioneAoo
-        : selected && isUoCodeSelected && selected.descrizioneUo
+        : selected && selections.uoCode && selected.descrizioneUo
           ? selected?.descrizioneUo
-          : addUser && selected && (isAooCodeSelected || isUoCodeSelected) && selected?.description
+          : addUser &&
+              selected &&
+              (selections.aooCode || selections.uoCode) &&
+              selected?.description
             ? selected.description
             : selected?.businessName;
 
@@ -110,23 +108,28 @@ export default function AsyncAutocompleteSearch({
     }
   }, []);
 
+  useEffect(
+    () => console.log('input', input, 'selected', selected, 'valueSelected', valueSelected),
+    [input, selected, valueSelected]
+  );
+
   const label = useMemo(() => {
     if (selected) {
       return '';
     }
 
-    if (isReaCodeSelected) {
+    if (selections.reaCode) {
       return t('asyncAutocomplete.reaLabel');
     }
-    if (isAooCodeSelected) {
+    if (selections.aooCode) {
       return t('asyncAutocomplete.aooLabel');
     }
-    if (isUoCodeSelected) {
+    if (selections.uoCode) {
       return t('asyncAutocomplete.uoLabel');
     }
 
     return t('asyncAutocomplete.searchLabel');
-  }, [selected, isReaCodeSelected, isAooCodeSelected, isUoCodeSelected, t]);
+  }, [selected, selections.reaCode, selections.aooCode, selections.uoCode, t]);
 
   return (
     <Tooltip arrow title={selected?.description?.length > 20 ? selected?.description : ''}>
@@ -140,7 +143,7 @@ export default function AsyncAutocompleteSearch({
           '& input#Parties': { display: selected && 'none !important' },
         }}
         onChange={handleChange}
-        value={!selected ? valueSelected : ''}
+        value={!selected ? input : valueSelected}
         label={label}
         variant={!selected ? 'outlined' : 'standard'}
         inputProps={{
@@ -165,8 +168,8 @@ export default function AsyncAutocompleteSearch({
               <Typography variant="body1" sx={{ fontWeight: 'fontWeightBold' }}>
                 {valueSelected}
               </Typography>
-              {(isAooCodeSelected ||
-                isUoCodeSelected ||
+              {(selections.aooCode ||
+                selections.uoCode ||
                 selected.denominazioneAoo ||
                 selected.descrizioneUo) && (
                 <Typography
