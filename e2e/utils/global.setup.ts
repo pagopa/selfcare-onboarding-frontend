@@ -1,5 +1,5 @@
 import path from 'path';
-import { chromium, test } from '@playwright/test';
+import { chromium } from '@playwright/test';
 
 async function globalSetup() {
   console.log(`GLOBAL SETUP: Starting`);
@@ -8,8 +8,6 @@ async function globalSetup() {
     const browser = await chromium.launch();
     const context = await browser.newContext();
     const page = await context.newPage();
-
-    test.setTimeout(120_000);
 
     console.log(`GLOBAL SETUP: ℹ️ Logging in...`);
     await page.goto('https://dev.selfcare.pagopa.it/auth/login');

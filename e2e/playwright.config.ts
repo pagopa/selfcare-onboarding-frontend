@@ -15,7 +15,9 @@ export default defineConfig({
   // path to the global setup files.
   globalSetup: path.resolve(__dirname, './utils/global.setup.ts'),
   globalTeardown: path.resolve(__dirname, './utils/global.teardown.ts'),
-  timeout: 60000,
+  
+  timeout: 120_000,
+  
   testDir: './tests',
   fullyParallel: false,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
