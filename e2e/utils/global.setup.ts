@@ -13,8 +13,13 @@ async function globalSetup() {
 
     await page.goto('https://dev.selfcare.pagopa.it/auth/login', { waitUntil: 'networkidle' });
 
-    const button = page.getByRole('button', { name: 'Entra con SPID' });
-    await button.waitFor({ state: 'visible', timeout: 100000 });
+   //const button = page.getByRole('button', { name: 'Entra con SPID' });
+   // await button.waitFor({ state: 'visible', timeout: 100000 });
+   //await button.click();
+
+
+    const button = page.locator('#spidButton');
+    await button.waitFor({ state: 'visible', timeout: 60000 });
     await button.click();
 
     await page.getByTestId('idp-button-https://validator.dev.oneid.pagopa.it/demo').click();
