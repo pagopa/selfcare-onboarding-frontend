@@ -12,11 +12,11 @@ async function globalSetup() {
     console.log(`GLOBAL SETUP: ℹ️ Logging in...`);
 
     await page.goto('https://dev.selfcare.pagopa.it/auth/login', { waitUntil: 'networkidle' });
-    const html = await page.content();
-    console.log(html);
 
+    const button = page.getByRole('button', { name: 'Entra con SPID' });
+    await button.waitFor({ state: 'visible', timeout: 100000 });
+    await button.click();
 
-    await page.getByRole('button', { name: 'Entra con SPID' }).click();
     await page.getByTestId('idp-button-https://validator.dev.oneid.pagopa.it/demo').click();
     await page.locator('#username').fill('cleopatra');
     await page.getByRole('textbox', { name: 'Password' }).fill('password123');
