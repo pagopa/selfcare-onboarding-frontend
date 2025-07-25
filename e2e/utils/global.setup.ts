@@ -11,6 +11,10 @@ async function globalSetup() {
 
     console.log(`GLOBAL SETUP: ℹ️ Logging in...`);
     await page.goto('https://dev.selfcare.pagopa.it/auth/login');
+
+    const html = await page.content();
+    console.log(html);
+
     await page.getByRole('button', { name: 'Entra con SPID' }).click();
     await page.getByTestId('idp-button-https://validator.dev.oneid.pagopa.it/demo').click();
     await page.locator('#username').fill('cleopatra');
