@@ -19,20 +19,26 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 18
+          cache: "yarn"
+          cache-dependency-path: "yarn.lock"
 
       - name: Install Yarn
         run: npm install -g yarn
 
       - name: Install dependencies
-        run: yarn install
+        run: yarn install --immutable
+        working-directory: .
 
       - name: Install dependencies e2e
         working-directory: ./e2e
         run: yarn install
 
       - name: Install Playwright
-        working-directory: ./e2e
+        #working-directory: ./e2e
         run: yarn playwright install --with-deps
+
+      - name: Build project
+        run: yarn build
         
       - name: Run Playwright tests
         #working-directory: ./e2e
