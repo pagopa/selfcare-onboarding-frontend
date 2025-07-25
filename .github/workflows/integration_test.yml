@@ -33,7 +33,10 @@ jobs:
         working-directory: ./e2e
         run: yarn install
 
-      - name: Install Playwright
+      - name: Install playwright
+        run: yarn add playwright
+
+      - name: Install Playwright addons
         #working-directory: ./e2e
         run: yarn playwright install --with-deps
 
