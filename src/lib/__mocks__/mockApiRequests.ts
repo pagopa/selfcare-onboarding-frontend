@@ -1282,7 +1282,7 @@ export const mockedCategories = {
     },
     'prod-idpay-merchant': {
       merchantDetails: {
-        atecoCodes: '47.43.00,95.11.00,47.12.10,47.21.01',
+        atecoCodes: '47.43.00,95.11.00,47.12.10,47.21.01,46.43.30',
       },
     },
     default: {
@@ -1374,6 +1374,38 @@ export const mockedPdndVisuraInfomacere: Array<PDNDBusinessResource> = [
     digitalAddress: 'amministrazione@meccanicaprecision.pec.it',
     atecoCodes: ['25.62.00'],
     nRea: 'BG-567890',
+  },
+  {
+    businessTaxId: 'LGGLGD80A01B354S',
+    businessName: 'Pedemontana S.p.A',
+    legalNature: 'SPA',
+    legalNatureDescription: 'Società per azione',
+    cciaa: 'MB',
+    businessStatus: 'Attiva',
+    city: 'Monza',
+    vatNumber: '44556677889',
+    county: 'Monza',
+    zipCode: '20900',
+    address: 'Via Lecco, 25',
+    digitalAddress: 'pedemonata@costruzioni.pec.it',
+    atecoCodes: ['46.43.30'],
+    nRea: 'MB-678910',
+  },
+  {
+    businessTaxId: 'RSSLCU80A01F205N',
+    businessName: 'Marst Acciaierie S.p.A.',
+    legalNature: 'SPA',
+    legalNatureDescription: 'Società per azione',
+    cciaa: 'BG',
+    businessStatus: 'Attiva',
+    city: 'Bergamo',
+    vatNumber: '55667788990',
+    county: 'Bergamo',
+    zipCode: '29999',
+    address: 'Via Maltasini Paolo, 22',
+    digitalAddress: 'marts@acciai.pec.it',
+    atecoCodes: ['43.22.80'],
+    nRea: 'BG-299990',
   },
 ];
 
