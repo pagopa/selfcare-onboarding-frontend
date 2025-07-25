@@ -1,6 +1,7 @@
 import { Box, styled } from '@mui/system';
 import { PartyAccountItemButton } from '@pagopa/mui-italia/dist/components/PartyAccountItemButton';
 import { PartyData } from '../../../../../../types';
+import { SelectionsState } from '../../../../../model/Selection';
 
 const CustomBox = styled(Box)({
   /* width */
@@ -33,12 +34,7 @@ type Props = {
   setCfResult: React.Dispatch<React.SetStateAction<PartyData | undefined>>;
   uoResult?: any;
   aooResult?: any;
-  isTaxCodeSelected?: boolean;
-  isIvassCodeSelected?: boolean;
-  isAooCodeSelected?: boolean;
-  isUoCodeSelected?: boolean;
-  isReaCodeSelected?: boolean;
-  isPersonalTaxCodeSelected?: boolean;
+  selections?: SelectionsState;
 };
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
@@ -49,19 +45,17 @@ export default function AsyncAutocompleteResultsCode({
   setCfResult,
   uoResult,
   aooResult,
-  isTaxCodeSelected,
-  isIvassCodeSelected,
-  isAooCodeSelected,
-  isUoCodeSelected,
-  isReaCodeSelected,
-  isPersonalTaxCodeSelected
+  selections,
 }: Props) {
   const party =
-    isTaxCodeSelected || isIvassCodeSelected || isReaCodeSelected || isPersonalTaxCodeSelected
+    selections?.taxCode ||
+    selections?.ivassCode ||
+    selections?.reaCode ||
+    selections?.personalTaxCode
       ? cfResult
-      : isAooCodeSelected
+      : selections?.aooCode
         ? aooResult
-        : isUoCodeSelected
+        : selections?.uoCode
           ? uoResult
           : '';
 
@@ -78,7 +72,7 @@ export default function AsyncAutocompleteResultsCode({
         <Box
           sx={{ textTransform: 'capitalize' }}
           py={1}
-          key={cfResult?.id}
+          key={`${cfResult?.id}`}
           display="flex"
           onKeyDownCapture={(e) => {
             if (e.key === 'Enter' || e.key === ' ') {
@@ -90,7 +84,7 @@ export default function AsyncAutocompleteResultsCode({
           <PartyAccountItemButton
             partyName={partyName?.toLocaleLowerCase()}
             partyRole={
-              !isTaxCodeSelected && aooResult
+              !selections?.taxCode && aooResult
                 ? aooResult.denominazioneEnte || aooResult.parentDescription
                 : uoResult
                   ? uoResult?.denominazioneEnte || uoResult.parentDescription

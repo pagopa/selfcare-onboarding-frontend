@@ -7,6 +7,7 @@ import { AooData } from '../../model/AooData';
 import { InstitutionResource } from '../../model/InstitutionResource';
 import { UoData } from '../../model/UoModel';
 import { useHistoryState } from '../useHistoryState';
+import { SelectionEnum, SelectionsState } from '../../model/Selection';
 import AsyncAutocompleteContainer from './components/asyncAutocomplete/AsyncAutocompleteContainer';
 import PartyAdvancedSelect from './components/partyAdvancedSearchType/PartyAdvancedSelect';
 
@@ -57,19 +58,36 @@ export function Autocomplete({
   selectedProduct,
   filterCategories,
   setIsPresentInAtecoWhiteList,
-  setMerchantSearchResult
+  setMerchantSearchResult,
 }: AutocompleteProps) {
   const { t } = useTranslation();
   const [options, setOptions] = useState<Array<InstitutionResource>>([]);
   const [cfResult, setCfResult] = useState<PartyData>();
 
-  const [isBusinessNameSelected, setIsBusinessNameSelected] = useState<boolean>(true);
-  const [isAooCodeSelected, setIsAooCodeSelected] = useState<boolean>(false);
-  const [isUoCodeSelected, setIsUoCodeSelected] = useState<boolean>(false);
-  const [isReaCodeSelected, setIsReaCodeSelected] = useState<boolean>(false);
-  const [isPersonalTaxCodeSelected, setIsPersonalTaxCodeSelected] = useState<boolean>(false);
-  const [isTaxCodeSelected, setIsTaxCodeSelected] = useState<boolean>();
-  const [isIvassCodeSelected, setIsIvassCodeSelected] = useState<boolean>(false);
+  const [selections, setSelections] = useState<SelectionsState>({
+    businessName: true,
+    aooCode: false,
+    uoCode: false,
+    reaCode: false,
+    personalTaxCode: false,
+    taxCode: false,
+    ivassCode: false,
+  });
+
+  const selectOnly = (field: SelectionEnum) => {
+    setSelections({
+      businessName: field === 'businessName',
+      aooCode: field === 'aooCode',
+      uoCode: field === 'uoCode',
+      reaCode: field === 'reaCode',
+      personalTaxCode: field === 'personalTaxCode',
+      taxCode: field === 'taxCode',
+      ivassCode: field === 'ivassCode',
+    });
+  };
+  const handleSelectionChange = (newSelection: SelectionEnum) => {
+    selectOnly(newSelection);
+  };
   const [input, setInput] = useState<string>('');
 
   const setAooResultHistory = useHistoryState<AooData | undefined>(
@@ -82,7 +100,7 @@ export function Autocomplete({
 
   useEffect(() => {
     if (addUser) {
-      setIsBusinessNameSelected(false);
+      setSelections({ ...selections, businessName: false });
     }
   }, []);
 
@@ -108,13 +126,9 @@ export function Autocomplete({
               </Typography>
             )}
             <PartyAdvancedSelect
-              setIsTaxCodeSelected={setIsTaxCodeSelected}
-              setIsBusinessNameSelected={setIsBusinessNameSelected}
-              setIsIvassCodeSelected={setIsIvassCodeSelected}
-              setIsAooCodeSelected={setIsAooCodeSelected}
-              setIsUoCodeSelected={setIsUoCodeSelected}
-              setIsReaCodeSelected={setIsReaCodeSelected}
-              setIsPersonalTaxCodeSelected={setIsPersonalTaxCodeSelected}
+              selections={selections}
+              setSelected={setSelected}
+              handleSelectionChange={handleSelectionChange}
               setOptions={setOptions}
               setInput={setInput}
               setIsSearchFieldSelected={setIsSearchFieldSelected}
@@ -122,13 +136,6 @@ export function Autocomplete({
               setAooResult={setAooResult}
               setUoResult={setUoResult}
               setCfResult={setCfResult}
-              isBusinessNameSelected={isBusinessNameSelected}
-              isTaxCodeSelected={isTaxCodeSelected}
-              isIvassCodeSelected={isIvassCodeSelected}
-              isAooCodeSelected={isAooCodeSelected}
-              isUoCodeSelected={isUoCodeSelected}
-              isReaCodeSelected={isReaCodeSelected}
-              isPersonalTaxCodeSelected={isPersonalTaxCodeSelected}
               setUoResultHistory={setUoResultHistory}
               setAooResultHistory={setAooResultHistory}
               product={product}
@@ -138,6 +145,7 @@ export function Autocomplete({
           </Grid>
         )}
         <AsyncAutocompleteContainer
+          selections={selections}
           optionKey={optionKey}
           optionLabel={optionLabel}
           input={input}
@@ -146,10 +154,6 @@ export function Autocomplete({
           transformFn={transformFn}
           setInput={setInput}
           setSelected={setSelected}
-          isBusinessNameSelected={isBusinessNameSelected}
-          isTaxCodeSelected={isTaxCodeSelected}
-          isIvassCodeSelected={isIvassCodeSelected}
-          setIsTaxCodeSelected={setIsTaxCodeSelected}
           selected={selected}
           theme={theme}
           options={options}
@@ -157,10 +161,6 @@ export function Autocomplete({
           setCfResult={setCfResult}
           cfResult={cfResult}
           product={product}
-          isAooCodeSelected={isAooCodeSelected}
-          isUoCodeSelected={isUoCodeSelected}
-          isReaCodeSelected={isReaCodeSelected}
-          isPersonalTaxCodeSelected={isPersonalTaxCodeSelected}
           setAooResult={setAooResult}
           setUoResult={setUoResult}
           aooResult={aooResult}

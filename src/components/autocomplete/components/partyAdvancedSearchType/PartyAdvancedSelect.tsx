@@ -4,18 +4,15 @@ import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { InstitutionType, PartyData, Product } from '../../../../../types';
 import { AooData } from '../../../../model/AooData';
+import { SelectionEnum, SelectionsState } from '../../../../model/Selection';
 import { UoData } from '../../../../model/UoModel';
-import { ENV } from '../../../../utils/env';
 import { PRODUCT_IDS } from '../../../../utils/constants';
+import { ENV } from '../../../../utils/env';
 
 type Props = {
-  setIsBusinessNameSelected: React.Dispatch<React.SetStateAction<boolean>>;
-  setIsTaxCodeSelected: React.Dispatch<React.SetStateAction<boolean | undefined>>;
-  setIsIvassCodeSelected: React.Dispatch<React.SetStateAction<boolean>>;
-  setIsAooCodeSelected: React.Dispatch<React.SetStateAction<boolean>>;
-  setIsUoCodeSelected: React.Dispatch<React.SetStateAction<boolean>>;
-  setIsReaCodeSelected: React.Dispatch<React.SetStateAction<boolean>>;
-  setIsPersonalTaxCodeSelected: React.Dispatch<React.SetStateAction<boolean>>;
+  selections: SelectionsState;
+  setSelected: React.Dispatch<React.SetStateAction<any>>;
+  handleSelectionChange: (newSelection: SelectionEnum) => void;
   setOptions: React.Dispatch<React.SetStateAction<Array<any>>>;
   setInput: React.Dispatch<React.SetStateAction<string>>;
   setIsSearchFieldSelected: React.Dispatch<React.SetStateAction<boolean>>;
@@ -24,13 +21,6 @@ type Props = {
   setUoResult: Dispatch<SetStateAction<UoData | undefined>>;
   setUoResultHistory: (t: UoData | undefined) => void;
   setAooResultHistory: (t: AooData | undefined) => void;
-  isBusinessNameSelected?: boolean;
-  isTaxCodeSelected?: boolean;
-  isIvassCodeSelected?: boolean;
-  isAooCodeSelected?: boolean;
-  isUoCodeSelected?: boolean;
-  isReaCodeSelected?: boolean;
-  isPersonalTaxCodeSelected?: boolean;
   product?: Product | null;
   institutionType?: InstitutionType;
   addUser: boolean;
@@ -38,26 +28,15 @@ type Props = {
 };
 
 export default function PartyAdvancedSelect({
-  setIsBusinessNameSelected,
-  setIsTaxCodeSelected,
-  setIsIvassCodeSelected,
-  setIsAooCodeSelected,
-  setIsUoCodeSelected,
-  setIsReaCodeSelected,
-  setIsPersonalTaxCodeSelected,
+  selections,
+  setSelected,
+  handleSelectionChange,
   setIsSearchFieldSelected,
   setOptions,
   setInput,
   setCfResult,
   setAooResult,
   setUoResult,
-  isBusinessNameSelected,
-  isTaxCodeSelected,
-  isIvassCodeSelected,
-  isAooCodeSelected,
-  isUoCodeSelected,
-  isReaCodeSelected,
-  isPersonalTaxCodeSelected,
   setUoResultHistory,
   setAooResultHistory,
   product,
@@ -70,26 +49,11 @@ export default function PartyAdvancedSelect({
   const [typeOfSearch, setTypeOfSearch] = useState('businessName');
 
   const handleTypeSearchChange = (event: SelectChangeEvent) => {
-    setTypeOfSearch(event.target.value as string);
+    handleSelectionChange(event.target.value as SelectionEnum);
     setIsSearchFieldSelected(true);
   };
-  const onSelectValue = (
-    isBusinessNameSelected: boolean,
-    isTaxCodeSelected: boolean,
-    isIvassCodeSelected: boolean,
-    isAooCodeSelected: boolean,
-    isUoCodeSelected: boolean,
-    isReaCodeSelected: boolean,
-    isPersonalTaxCodeSelected: boolean
-  ) => {
-    setInput('');
-    setIsBusinessNameSelected(isBusinessNameSelected);
-    setIsTaxCodeSelected(isTaxCodeSelected);
-    setIsIvassCodeSelected(isIvassCodeSelected);
-    setIsAooCodeSelected(isAooCodeSelected);
-    setIsUoCodeSelected(isUoCodeSelected);
-    setIsReaCodeSelected(isReaCodeSelected);
-    setIsPersonalTaxCodeSelected(isPersonalTaxCodeSelected);
+  const onSelectValue = (selectedOption: SelectionEnum) => {
+    handleSelectionChange(selectedOption);
     setOptions([]);
     setCfResult(undefined);
     setAooResult(undefined);
@@ -104,69 +68,88 @@ export default function PartyAdvancedSelect({
       ((product?.id === PRODUCT_IDS.INTEROP || product?.id === PRODUCT_IDS.IDPAY_MERCHANT) &&
         (institutionType === 'SCP' || institutionType === 'PRV'))
     ) {
-      onSelectValue(false, true, false, false, false, false, false);
-      setTypeOfSearch('taxCode');
+      onSelectValue(SelectionEnum.taxCode);
+      // setTypeOfSearch(SelectionEnum.taxCode);
     } else {
-      onSelectValue(true, false, false, false, false, false, false);
-      setTypeOfSearch('businessName');
+      onSelectValue(SelectionEnum.businessName);
+      // setTypeOfSearch(SelectionEnum.businessName);
     }
   }, []);
 
   useEffect(() => {
-    setInput('');
-    if (isBusinessNameSelected) {
-      setTypeOfSearch('businessName');
-    } else if (isTaxCodeSelected) {
-      setTypeOfSearch('taxCode');
-    } else if (isAooCodeSelected) {
-      setTypeOfSearch('aooCode');
-    } else if (isUoCodeSelected) {
-      setTypeOfSearch('uoCode');
-    } else if (isIvassCodeSelected) {
-      setTypeOfSearch('ivassCode');
-    } else if (isReaCodeSelected) {
-      setTypeOfSearch('reaCode');
-    } else if (isPersonalTaxCodeSelected) {
-      setTypeOfSearch('personalTaxCode');
-    } else {
-      setTypeOfSearch('');
+    const selectedKey = Object.keys(selections).find(
+      (key) => selections[key as keyof SelectionsState]
+    );
+    if (selectedKey) {
+      setTypeOfSearch(selectedKey);
+      setInput('');
+      setSelected(null);
     }
-  }, [
-    isBusinessNameSelected,
-    isTaxCodeSelected,
-    isAooCodeSelected,
-    isUoCodeSelected,
-    isIvassCodeSelected,
-    isReaCodeSelected,
-    isPersonalTaxCodeSelected,
-  ]);
-
-  const filteredByProducts = (product?: Product) =>
-    product &&
-    (product.id === PRODUCT_IDS.INTEROP ||
-      product.id === PRODUCT_IDS.IO_SIGN ||
-      product.id === PRODUCT_IDS.SEND_DEV ||
-      product.id === PRODUCT_IDS.SEND);
-
-  const optionsAvailable4InstitutionType =
-    institutionType !== 'SA' && institutionType !== 'AS' && institutionType !== 'GSP';
+  }, [selections]);
 
   const menuItems = [
-    {
-      id: 'aooCode',
-      ['data-testid']: 'aooCode',
-      value: 'aooCode',
-      onClick: () => onSelectValue(false, false, false, true, false, false, false),
-      label: t('partyAdvancedSelect.aooCode'),
-    },
-    {
-      id: 'uoCode',
-      ['data-testid']: 'uoCode',
-      value: 'uoCode',
-      onClick: () => onSelectValue(false, false, false, false, true, false, false),
-      label: t('partyAdvancedSelect.uoCode'),
-    },
-  ];
+    !addUser && institutionType !== 'SCP' && institutionType !== 'PRV' && (
+      <MenuItem
+        key="businessName"
+        id="businessName"
+        data-testid="businessName"
+        value={SelectionEnum.businessName}
+      >
+        {t('partyAdvancedSelect.businessName')}
+      </MenuItem>
+    ),
+    institutionType === 'AS' ? (
+      <MenuItem
+        key="ivassCode"
+        id="ivassCode"
+        data-testid="ivassCode"
+        value={SelectionEnum.ivassCode}
+      >
+        {t('partyAdvancedSelect.ivassCode')}
+      </MenuItem>
+    ) : (
+      <MenuItem key="taxCode" id="taxCode" data-testid="taxCode" value={SelectionEnum.taxCode}>
+        {t('partyAdvancedSelect.taxCode')}
+      </MenuItem>
+    ),
+    institutionType === 'PRV' &&
+      product?.id === PRODUCT_IDS.IDPAY_MERCHANT && [
+        <MenuItem key="reaCode" id="reaCode" data-testid="reaCode" value={SelectionEnum.reaCode}>
+          {t('partyAdvancedSelect.reaCode')}
+        </MenuItem>,
+        <MenuItem
+          key="personalTaxCode"
+          id="personalTaxCode"
+          data-testid="personalTaxCode"
+          value={SelectionEnum.personalTaxCode}
+        >
+          {t('partyAdvancedSelect.personalTaxCode')}
+        </MenuItem>,
+      ],
+    ((ENV.AOO_UO.SHOW_AOO_UO &&
+      institutionType !== 'SA' &&
+      institutionType !== 'AS' &&
+      institutionType !== 'GSP' &&
+      institutionType !== 'SCP' &&
+      institutionType !== 'PRV' &&
+      [PRODUCT_IDS.INTEROP, PRODUCT_IDS.IO_SIGN, PRODUCT_IDS.SEND_DEV, PRODUCT_IDS.SEND].includes(
+        product?.id ?? ''
+      )) ||
+      (addUser &&
+        ENV.AOO_UO.SHOW_AOO_UO &&
+        [PRODUCT_IDS.INTEROP, PRODUCT_IDS.IO_SIGN, PRODUCT_IDS.SEND_DEV, PRODUCT_IDS.SEND].includes(
+          selectedProduct?.id ?? ''
+        ))) && [
+      <MenuItem key="aooCode" id="aooCode" data-testid="aooCode" value={SelectionEnum.aooCode}>
+        {t('partyAdvancedSelect.aooCode')}
+      </MenuItem>,
+      <MenuItem key="uoCode" id="uoCode" data-testid="uoCode" value={SelectionEnum.uoCode}>
+        {t('partyAdvancedSelect.uoCode')}
+      </MenuItem>,
+    ],
+  ]
+    .flat()
+    .filter(Boolean);
 
   return (
     <FormControl fullWidth size="small">
@@ -174,79 +157,12 @@ export default function PartyAdvancedSelect({
       <Select
         labelId="advancedSearch"
         id="party-type-select"
+        data-testid="party-type-select"
         value={typeOfSearch}
         label={t('partyAdvancedSelect.advancedSearchLabel')}
         onChange={handleTypeSearchChange}
       >
-        {!addUser && institutionType !== 'SCP' && institutionType !== 'PRV' && (
-          <MenuItem
-            id="businessName"
-            data-testid="businessName"
-            value={'businessName'}
-            onClick={() => onSelectValue(true, false, false, false, false, false, false)}
-          >
-            {t('partyAdvancedSelect.businessName')}
-          </MenuItem>
-        )}
-        {institutionType === 'AS' ? (
-          <MenuItem
-            id="ivassCode"
-            data-testid="ivassCode"
-            value={'ivassCode'}
-            onClick={() => onSelectValue(false, false, true, false, false, false, false)}
-          >
-            {t('partyAdvancedSelect.ivassCode')}
-          </MenuItem>
-        ) : (
-          <MenuItem
-            id="taxCode"
-            data-testid="taxCode"
-            value={'taxCode'}
-            onClick={() => onSelectValue(false, true, false, false, false, false, false)}
-          >
-            {t('partyAdvancedSelect.taxCode')}
-          </MenuItem>
-        )}
-
-        {institutionType === 'PRV' &&
-          product?.id === PRODUCT_IDS.IDPAY_MERCHANT && [
-            <MenuItem
-              key={'reaCode'}
-              id="reaCode"
-              data-testid="reaCode"
-              value={'reaCode'}
-              onClick={() => onSelectValue(false, false, false, false, false, true, false)}
-            >
-              {t('partyAdvancedSelect.reaCode')}
-            </MenuItem>,
-            <MenuItem
-              key={'personalTaxCode'}
-              id="personalTaxCode"
-              data-testid="personalTaxCode"
-              value={'personalTaxCode'}
-              onClick={() => onSelectValue(false, false, false, false, false, false, true)}
-            >
-              {t('partyAdvancedSelect.personalTaxCode')}
-            </MenuItem>,
-          ]}
-
-        {((ENV.AOO_UO.SHOW_AOO_UO &&
-          optionsAvailable4InstitutionType &&
-          institutionType !== 'SCP' &&
-          institutionType !== 'PRV' &&
-          filteredByProducts(product as Product)) ||
-          (addUser && ENV.AOO_UO.SHOW_AOO_UO && filteredByProducts(selectedProduct))) &&
-          menuItems.map((item) => (
-            <MenuItem
-              key={item.id}
-              id={item.id}
-              data-testid={item['data-testid']}
-              value={item.value}
-              onClick={item.onClick}
-            >
-              {item.label}
-            </MenuItem>
-          ))}
+        {menuItems}
       </Select>
     </FormControl>
   );
