@@ -7,8 +7,8 @@ import {
   stepAddAdmin,
   BASE_URL_ONBOARDING,
   stepFormData,
+  PRODUCT_IDS_TEST_E2E
 } from '../utils/test-utils';
-import { PRODUCT_IDS } from '../../src/utils/constants';
 
 test('Test Success onboarding request for product prod-pagopa and institutionType GSP', async ({
   page,
@@ -20,7 +20,7 @@ test('Test Success onboarding request for product prod-pagopa and institutionTyp
     undefined,
     'Azienda Territoriale per L’Edilizia Residenziale Pubblica della Provincia di Viterbo'
   );
-  await stepFormData(page, PRODUCT_IDS.PAGOPA, 'GPS');
+  await stepFormData(page, PRODUCT_IDS_TEST_E2E.PAGOPA, 'GPS');
   await stepAdditionalInformation(page);
   await stepAddManager(page);
   await stepAddAdmin(page);
@@ -48,7 +48,7 @@ test('Test Success onboarding request for product prod-interop and institutionTy
     undefined,
     'Azienda Territoriale per L’Edilizia Residenziale Pubblica della Provincia di Viterbo'
   );
-  await stepFormData(page, PRODUCT_IDS.INTEROP, 'GPS');
+  await stepFormData(page, PRODUCT_IDS_TEST_E2E.INTEROP, 'GPS');
   await stepAddManager(page);
   await stepAddAdmin(page);
 });
@@ -59,7 +59,7 @@ test('Test Success onboarding request for product prod-io and institutionType GS
   await page.goto(`${BASE_URL_ONBOARDING}/prod-io`);
   await stepInstitutionType(page, 'Gestore di servizi pubblici');
   await stepSelectParty(page);
-  await stepFormData(page, PRODUCT_IDS.IO, 'GPS');
+  await stepFormData(page, PRODUCT_IDS_TEST_E2E.IO, 'GPS');
   await stepAddManager(page);
   await stepAddAdmin(page);
 });
@@ -70,7 +70,7 @@ test('Test Success onboarding request for product prod-io-sign and institutionTy
   await page.goto(`${BASE_URL_ONBOARDING}/prod-io-sign`);
   await stepInstitutionType(page, 'Gestore di servizi pubblici');
   await stepSelectParty(page);
-  await stepFormData(page, PRODUCT_IDS.IO_SIGN, 'GPS');
+  await stepFormData(page, PRODUCT_IDS_TEST_E2E.IO_SIGN, 'GPS');
   await stepAddManager(page);
   await stepAddAdmin(page);
 });
