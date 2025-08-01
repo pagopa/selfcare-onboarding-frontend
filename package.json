@@ -10,6 +10,7 @@
     "@pagopa/mui-italia": "^1.5.2",
     "@pagopa/selfcare-common-frontend": "^1.34.56",
     "axios": "^1.7.9",
+    "craco": "^0.0.3",
     "debounce": "^2.2.0",
     "formik": "^2.4.6",
     "query-string": "^9.1.1",
