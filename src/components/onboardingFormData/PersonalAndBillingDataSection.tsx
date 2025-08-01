@@ -855,7 +855,7 @@ export default function PersonalAndBillingDataSection({
                     : theme.palette.text.primary
                 )}
                 value={formik.values.vatNumber}
-                disabled={stepHistoryState.isTaxCodeEquals2PIVA || isPremium}
+                disabled={stepHistoryState.isTaxCodeEquals2PIVA || isPremium || isPrivateMerchant}
                 onClick={() => setShrinkVatNumber(true)}
                 onBlur={() => setShrinkVatNumber(false)}
                 InputLabelProps={{
