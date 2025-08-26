@@ -509,6 +509,12 @@ export const billingData2billingDataRequest = (
               ? 'A3B4C5'
               : 'A1B2C3'
             : undefined,
+    legalForm:
+      isPrivateMerchant && typeOfSearch === 'personalTaxCode'
+        ? mockedPdndVisuraInfomacere[5].legalForm
+        : isPrivateMerchant && typeOfSearch === 'taxCode'
+          ? mockedPdndVisuraInfomacere[0].legalForm
+          : undefined,
   };
 };
 

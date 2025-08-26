@@ -30,6 +30,7 @@ export type OnboardingFormData = {
   supportEmail?: string;
   aooName?: string;
   atecoCodes?: Array<string>;
+  legalForm?: string;
   uoName?: string;
   aooUniqueCode?: string;
   uoUniqueCode?: string;
