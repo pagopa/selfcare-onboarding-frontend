@@ -17,7 +17,10 @@ export const selected2OnboardingData = (
     '',
   aooName: selectedParty?.denominazioneAoo,
   atecoCodes: selectedParty?.atecoCodes,
-  legalForm: selectedParty?.legalForm,
+  legalForm:
+    institutionType === 'PRV' && productId === PRODUCT_IDS.IDPAY_MERCHANT
+      ? selectedParty?.legalForm
+      : undefined,
   uoName: selectedParty?.descrizioneUo,
   aooUniqueCode: selectedParty?.codiceUniAoo,
   uoUniqueCode: selectedParty?.codiceUniUo,
