@@ -3,7 +3,7 @@ import { chromium } from '@playwright/test';
 async function globalSetup() {
   console.log(`GLOBAL SETUP: Starting`);
   const browser = await chromium.launch({
-    headless: false,
+    headless: process.env.CI ? true : false,
   });
   const context = await browser.newContext();
   const page = await context.newPage();
@@ -28,11 +28,9 @@ async function globalSetup() {
     console.log(`GLOBAL SETUP: ℹ️ Selecting OneID provider...`);
     await page.getByTestId('idp-button-https://validator.dev.oneid.pagopa.it/demo').click();
     console.log(`GLOBAL SETUP: ℹ️ Waiting for all redirects to complete...`);
-    await page.waitForFunction(
-      () =>
-        document.querySelector('#username') !== null,
-      { timeout: 30000 }
-    );
+    await page.waitForFunction(() => document.querySelector('#username') !== null, {
+      timeout: 30000,
+    });
     console.log(`GLOBAL SETUP: ℹ️ Login form loaded at: ${page.url()}`);
     console.log(`GLOBAL SETUP: ℹ️ Filling credentials...`);
     await page.waitForSelector('#username', { state: 'visible', timeout: 10000 });
