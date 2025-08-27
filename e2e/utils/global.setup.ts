@@ -22,6 +22,15 @@ async function globalSetup() {
     await page.goto('https://dev.selfcare.pagopa.it', {
       timeout: 60000,
     });
+    page.on('request', (request) => {
+      console.log(`➡️ Request: ${request.method()} ${request.url()}`);
+    });
+    page.on('response', (response) => {
+      console.log(`⬅️ Response: ${response.status()} ${response.url()}`);
+    });
+    page.on('requestfailed', (request) => {
+      console.log(`❌ Request failed: ${request.url()} - ${request.failure()?.errorText}`);
+    });
     console.log(`GLOBAL SETUP: ℹ️ Clicking 'Entra con SPID'...`);
     await page.getByRole('button', { name: 'Entra con SPID' }).click({ noWaitAfter: true });
     await page.waitForLoadState('networkidle');
@@ -46,34 +55,19 @@ async function globalSetup() {
         'button[type="submit"], button:has-text("Entra"), button:has-text("Login"), button:has-text("Accedi")'
       )
       .first();
-
-    await Promise.all([
-      page.waitForURL((url) => !url.toString().includes('/login'), { timeout: 30000 }),
-      submitButton.click(),
-    ]);
+    await submitButton.click();
     await page.waitForLoadState('networkidle', { timeout: 15000 });
     console.log(`GLOBAL SETUP: ℹ️ After login submission: ${page.url()}`);
     try {
       console.log(`GLOBAL SETUP: ℹ️ Clicking confirm button...`);
-
-      await Promise.all([
-        page
-          .waitForURL(
-            (url) => url.toString().includes('dashboard') || url.toString().includes('selfcare'),
-            {
-              timeout: 15000,
-            }
-          )
-          .catch(() => {}),
-        page.getByRole('button', { name: 'Conferma' }).click(),
-      ]);
+      await page.getByRole('button', { name: 'Conferma' }).click();
     } catch (e) {
       console.log(`GLOBAL SETUP: ℹ️ No confirm button found or timeout, proceeding...`);
     }
     console.log(`GLOBAL SETUP: ℹ️ Waiting for redirect to dashboard...`);
     await page.waitForURL('**/dashboard**', {
       timeout: 60000,
-      waitUntil: 'domcontentloaded',
+      waitUntil: 'networkidle',
     });
     console.log(`GLOBAL SETUP: ✅ Successfully reached dashboard: ${page.url()}`);
     await page.waitForTimeout(2000);
@@ -95,11 +89,13 @@ async function globalSetup() {
       error instanceof Error ? error.message : String(error)
     );
     try {
-      if (page) {
-        console.error('GLOBAL SETUP: ❌ Current URL:', page.url());
-      }
-    } catch (screenshotError) {
-      console.log('GLOBAL SETUP: ❌ Could not take screenshot');
+      await page.screenshot({
+        path: path.resolve(__dirname, '../screenshots/error.png'),
+        fullPage: true,
+      });
+      console.error('GLOBAL SETUP: ❌ Screenshot salvato in caso di errore.');
+    } catch {
+      console.error('GLOBAL SETUP: ❌ Non sono riuscito a fare screenshot.');
     }
     throw error;
   }
