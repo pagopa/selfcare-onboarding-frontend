@@ -12,5 +12,6 @@ export type PDNDBusinessResource = {
   address: string;
   digitalAddress: string;
   atecoCodes: Array<string>;
+  legalForm: string;
   nRea: string;
 };
