@@ -23,11 +23,7 @@ async function globalSetup() {
       timeout: 60000,
     });
     console.log(`GLOBAL SETUP: ℹ️ Clicking 'Entra con SPID'...`);
-
-    await Promise.all([
-      page.waitForURL('**/login**', { timeout: 30000 }),
-      page.getByRole('button', { name: 'Entra con SPID' }).click(),
-    ]);
+    await page.getByRole('button', { name: 'Entra con SPID' }).click({ noWaitAfter: true });
     await page.waitForLoadState('networkidle');
     console.log(`GLOBAL SETUP: ℹ️ Selecting OneID provider...`);
     await page.getByTestId('idp-button-https://validator.dev.oneid.pagopa.it/demo').click();
