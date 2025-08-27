@@ -90,7 +90,8 @@ export const stepFormData = async (
   const actualInstitutionType = isFromIpa ? institutionType : productOrInstitutionType;
   if (
     !isFromIpa ||
-    (product === PRODUCT_IDS_TEST_E2E.PAGOPA && (institutionType === 'PRV' || institutionType === 'GPU'))
+    (product === PRODUCT_IDS_TEST_E2E.PAGOPA &&
+      (institutionType === 'PRV' || institutionType === 'GPU'))
   ) {
     await page.click('#businessName');
     await page.fill('#businessName', 'test');
@@ -104,11 +105,16 @@ export const stepFormData = async (
     await page.click('#taxCodeEquals2VatNumber');
   }
 
+  if (product === PRODUCT_IDS_TEST_E2E.PAGOPA && actualInstitutionType === 'GSP') {
+    await page.click('#taxCodeEquals2VatNumber');
+  }
+
   if (
     (product === PRODUCT_IDS_TEST_E2E.INTEROP &&
       (actualInstitutionType === 'SA' || actualInstitutionType === 'AS')) ||
     !isFromIpa ||
-    (product === PRODUCT_IDS_TEST_E2E.PAGOPA && (institutionType === 'PRV' || institutionType === 'GPU'))
+    (product === PRODUCT_IDS_TEST_E2E.PAGOPA &&
+      (institutionType === 'PRV' || institutionType === 'GPU'))
   ) {
     await page.click('#registeredOffice');
     await page.fill('#registeredOffice', isFromIpa ? 'Via test 1' : 'via test 1');
@@ -139,7 +145,7 @@ export const stepFormData = async (
     await page.click('#recipientCode');
     await page.fill('#recipientCode', 'A1B2C3');
 
-    if (actualInstitutionType === 'GPS' || actualInstitutionType === 'SCP') {
+    if (actualInstitutionType === 'GSP' || actualInstitutionType === 'SCP') {
       await page.click('#recipientCode');
       await page.fill('#recipientCode', 'A1B2C3');
     }
@@ -150,7 +156,11 @@ export const stepFormData = async (
     await page.fill('#supportEmail', 'test@test.it', { timeout: 500 });
   }
 
-  if (actualInstitutionType === 'AS' || actualInstitutionType === 'GPU' || actualInstitutionType === 'GPS') {
+  if (
+    actualInstitutionType === 'AS' ||
+    actualInstitutionType === 'GPU' ||
+    (actualInstitutionType === 'GSP' && !isFromIpa)
+  ) {
     await page.click('#rea');
     await page.fill('#rea', 'RM-123456');
   }
