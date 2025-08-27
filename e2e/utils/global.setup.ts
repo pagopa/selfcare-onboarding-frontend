@@ -23,6 +23,18 @@ async function globalSetup() {
       timeout: 60000,
     });
 
+    page.on('request', (request) => {
+      console.log(`➡️ Request: ${request.method()} ${request.url()}`);
+    });
+
+    page.on('response', (response) => {
+      console.log(`⬅️ Response: ${response.status()} ${response.url()}`);
+    });
+
+    page.on('requestfailed', (request) => {
+      console.log(`❌ Request failed: ${request.url()} - ${request.failure()?.errorText}`);
+    });
+
     console.log(`GLOBAL SETUP: ℹ️ Clicking 'Entra con SPID'...`);
     await page.getByRole('button', { name: 'Entra con SPID' }).click();
     await page.waitForLoadState('networkidle');

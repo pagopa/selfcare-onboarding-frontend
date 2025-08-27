@@ -27,9 +27,6 @@ jobs:
           cache: 'yarn'
           cache-dependency-path: 'yarn.lock'
 
-      - name: Install Playwright browsers
-        run: npx playwright install --with-deps
-
       - name: Install Yarn
         run: npm install -g yarn
 
