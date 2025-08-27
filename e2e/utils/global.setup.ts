@@ -23,7 +23,11 @@ async function globalSetup() {
       timeout: 60000,
     });
     console.log(`GLOBAL SETUP: ℹ️ Clicking 'Entra con SPID'...`);
-    await page.getByRole('button', { name: 'Entra con SPID' }).click();
+
+    await Promise.all([
+      page.waitForURL('**/login**', { timeout: 30000 }),
+      page.getByRole('button', { name: 'Entra con SPID' }).click(),
+    ]);
     await page.waitForLoadState('networkidle');
     console.log(`GLOBAL SETUP: ℹ️ Selecting OneID provider...`);
     await page.getByTestId('idp-button-https://validator.dev.oneid.pagopa.it/demo').click();
@@ -46,19 +50,34 @@ async function globalSetup() {
         'button[type="submit"], button:has-text("Entra"), button:has-text("Login"), button:has-text("Accedi")'
       )
       .first();
-    await submitButton.click();
+
+    await Promise.all([
+      page.waitForURL((url) => !url.toString().includes('/login'), { timeout: 30000 }),
+      submitButton.click(),
+    ]);
     await page.waitForLoadState('networkidle', { timeout: 15000 });
     console.log(`GLOBAL SETUP: ℹ️ After login submission: ${page.url()}`);
     try {
       console.log(`GLOBAL SETUP: ℹ️ Clicking confirm button...`);
-      await page.getByRole('button', { name: 'Conferma' }).click();
+
+      await Promise.all([
+        page
+          .waitForURL(
+            (url) => url.toString().includes('dashboard') || url.toString().includes('selfcare'),
+            {
+              timeout: 15000,
+            }
+          )
+          .catch(() => {}),
+        page.getByRole('button', { name: 'Conferma' }).click(),
+      ]);
     } catch (e) {
       console.log(`GLOBAL SETUP: ℹ️ No confirm button found or timeout, proceeding...`);
     }
     console.log(`GLOBAL SETUP: ℹ️ Waiting for redirect to dashboard...`);
     await page.waitForURL('**/dashboard**', {
       timeout: 60000,
-      waitUntil: 'networkidle',
+      waitUntil: 'domcontentloaded',
     });
     console.log(`GLOBAL SETUP: ✅ Successfully reached dashboard: ${page.url()}`);
     await page.waitForTimeout(2000);
