@@ -1,5 +1,4 @@
 import { Page, expect } from '@playwright/test';
-import { PRODUCT_IDS } from '../../src/utils/constants';
 
 // eslint-disable-next-line functional/no-let
 // let copiedText: string;
@@ -47,7 +46,7 @@ export const stepSelectPartyByCF = async (page: Page, cfParty: string) => {
   product: string
 ) => {
   await page.getByLabel('La Partita IVA coincide con il Codice Fiscale').click();
-  if (product !== PRODUCT_IDS.INTEROP) {
+  if (product !== PRODUCT_IDS_TEST_E2E.INTEROP) {
     page.on('dialog', async (dialog) => {
       console.log(`Dialogo rilevato: ${dialog.message()}`);
       await dialog.accept();
@@ -69,7 +68,7 @@ export const stepSelectPartyByCF = async (page: Page, cfParty: string) => {
     await page.click('#recipientCode');
     await page.fill('#recipientCode', copiedText, { timeout: 500 });
   }
-  if (product === PRODUCT_IDS.IO_SIGN) {
+  if (product === PRODUCT_IDS_TEST_E2E.IO_SIGN) {
     await page.click('#supportEmail');
     await page.fill('#supportEmail', 'test@test.it', { timeout: 500 });
   }
@@ -91,7 +90,7 @@ export const stepFormData = async (
   const actualInstitutionType = isFromIpa ? institutionType : productOrInstitutionType;
   if (
     !isFromIpa ||
-    (product === PRODUCT_IDS.PAGOPA && (institutionType === 'PRV' || institutionType === 'GPU'))
+    (product === PRODUCT_IDS_TEST_E2E.PAGOPA && (institutionType === 'PRV' || institutionType === 'GPU'))
   ) {
     await page.click('#businessName');
     await page.fill('#businessName', 'test');
@@ -106,10 +105,10 @@ export const stepFormData = async (
   }
 
   if (
-    (product === PRODUCT_IDS.INTEROP &&
+    (product === PRODUCT_IDS_TEST_E2E.INTEROP &&
       (actualInstitutionType === 'SA' || actualInstitutionType === 'AS')) ||
     !isFromIpa ||
-    (product === PRODUCT_IDS.PAGOPA && (institutionType === 'PRV' || institutionType === 'GPU'))
+    (product === PRODUCT_IDS_TEST_E2E.PAGOPA && (institutionType === 'PRV' || institutionType === 'GPU'))
   ) {
     await page.click('#registeredOffice');
     await page.fill('#registeredOffice', isFromIpa ? 'Via test 1' : 'via test 1');
@@ -124,16 +123,16 @@ export const stepFormData = async (
 
   if (
     isFromIpa &&
-    product !== PRODUCT_IDS.PAGOPA &&
+    product !== PRODUCT_IDS_TEST_E2E.PAGOPA &&
     institutionType !== 'PRV' &&
     institutionType !== 'GPU'
   ) {
     await page.getByLabel('La Partita IVA coincide con il Codice Fiscale').click();
   }
 
-  if (isFromIpa && product !== PRODUCT_IDS.INTEROP && actualInstitutionType !== 'SCP') {
+  if (isFromIpa && product !== PRODUCT_IDS_TEST_E2E.INTEROP && actualInstitutionType !== 'SCP') {
     await page.click('#recipientCode');
-    await page.fill('#recipientCode', product === PRODUCT_IDS.SEND ? 'UFBM8M' : '14CB0I', {
+    await page.fill('#recipientCode', product === PRODUCT_IDS_TEST_E2E.SEND ? 'UFBM8M' : '14CB0I', {
       timeout: 500,
     });
   } else if (!isFromIpa && actualInstitutionType !== 'PT') {
@@ -146,19 +145,19 @@ export const stepFormData = async (
     }
   }
 
-  if (isFromIpa && product === PRODUCT_IDS.IO_SIGN) {
+  if (isFromIpa && product === PRODUCT_IDS_TEST_E2E.IO_SIGN) {
     await page.click('#supportEmail');
     await page.fill('#supportEmail', 'test@test.it', { timeout: 500 });
   }
 
-  if (actualInstitutionType === 'AS' || actualInstitutionType === 'GPU') {
+  if (actualInstitutionType === 'AS' || actualInstitutionType === 'GPU' || actualInstitutionType === 'GPS') {
     await page.click('#rea');
     await page.fill('#rea', 'RM-123456');
   }
 
   if (
     actualInstitutionType === 'AS' ||
-    (product === PRODUCT_IDS.INTEROP && actualInstitutionType === 'PRV')
+    (product === PRODUCT_IDS_TEST_E2E.INTEROP && actualInstitutionType === 'PRV')
   ) {
     await page.click('#businessRegisterPlace');
     await page.fill('#businessRegisterPlace', 'Comune di Milano');
@@ -194,7 +193,7 @@ export const stepFormData = async (
     ? actualInstitutionType !== 'SCP' &&
       actualInstitutionType !== 'SA' &&
       actualInstitutionType !== 'AS' &&
-      (actualInstitutionType !== 'PRV' || product !== PRODUCT_IDS.INTEROP)
+      (actualInstitutionType !== 'PRV' || product !== PRODUCT_IDS_TEST_E2E.INTEROP)
     : actualInstitutionType !== 'PT';
 
   if (shouldShowNazionale) {
@@ -353,3 +352,20 @@ export const researchOnIpa = async (newPage: Page, partyName: string) => {
   await newPage.getByRole('img', { name: 'Elenco Unità Organizzative' }).click();
   await copyUniqueCodeIfSFEIsPresent(newPage);
 }; */
+
+export const PRODUCT_IDS_TEST_E2E = {
+  PAGOPA: 'prod-pagopa',
+  IO: 'prod-io',
+  SEND: 'prod-pn',
+  SEND_DEV: 'prod-pn-dev',
+  INTEROP: 'prod-interop',
+  IDPAY: 'prod-idpay',
+  IO_SIGN: 'prod-io-sign',
+  FD: 'prod-fd',
+  FD_GARANTITO: 'prod-fd-garantito',
+  DASHBOARD_PSP: 'prod-dashboard-psp',
+  IO_PREMIUM: 'prod-io-premium',
+  CIBAN: 'prod-ciban',
+  CGN: 'prod-cgn',
+  IDPAY_MERCHANT: 'prod-idpay-merchant',
+};

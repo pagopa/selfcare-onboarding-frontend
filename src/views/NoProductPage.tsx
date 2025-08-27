@@ -1,4 +1,4 @@
-import { EndingPage } from '@pagopa/selfcare-common-frontend/lib';
+import EndingPage from '@pagopa/selfcare-common-frontend/lib/components/EndingPage';
 import { useTranslation } from 'react-i18next';
 
 export default () => {
