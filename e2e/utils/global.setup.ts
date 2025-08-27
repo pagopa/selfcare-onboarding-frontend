@@ -22,6 +22,7 @@ async function globalSetup() {
     await page.goto('https://dev.selfcare.pagopa.it', {
       timeout: 60000,
     });
+
     console.log(`GLOBAL SETUP: ℹ️ Clicking 'Entra con SPID'...`);
     await page.getByRole('button', { name: 'Entra con SPID' }).click();
     await page.waitForLoadState('networkidle');
@@ -80,12 +81,15 @@ async function globalSetup() {
       error instanceof Error ? error.message : String(error)
     );
     try {
-      if (page) {
-        console.error('GLOBAL SETUP: ❌ Current URL:', page.url());
-      }
-    } catch (screenshotError) {
-      console.log('GLOBAL SETUP: ❌ Could not take screenshot');
+      await page.screenshot({
+        path: path.resolve(__dirname, '../screenshots/error.png'),
+        fullPage: true,
+      });
+      console.error('GLOBAL SETUP: ❌ Screenshot salvato in caso di errore.');
+    } catch {
+      console.error('GLOBAL SETUP: ❌ Non sono riuscito a fare screenshot.');
     }
+
     throw error;
   }
 }
