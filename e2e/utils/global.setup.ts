@@ -36,14 +36,24 @@ async function globalSetup() {
     });
 
     console.log(`GLOBAL SETUP: ℹ️ Clicking 'Entra con SPID'...`);
-    await page.getByRole('button', { name: 'Entra con SPID' }).click({ noWaitAfter: true });
-    await page.waitForLoadState('networkidle');
+    const spidButton = page.getByRole('button', { name: 'Entra con SPID' });
+    console.log(await page.content());
+    await spidButton.waitFor({ state: 'visible', timeout: 60000 });
+
+    console.log(`GLOBAL SETUP: ℹ️ Clicco 'Entra con SPID'...`);
+    await spidButton.click({ noWaitAfter: true });
+
+    await page.waitForURL(/oneid\.pagopa\.it\/login/, { timeout: 60000 });
+    console.log(`GLOBAL SETUP: ✅ Redirected to OneID: ${page.url()}`);
+
     console.log(`GLOBAL SETUP: ℹ️ Selecting OneID provider...`);
     await page.getByTestId('idp-button-https://validator.dev.oneid.pagopa.it/demo').click();
+
     console.log(`GLOBAL SETUP: ℹ️ Waiting for all redirects to complete...`);
     await page.waitForFunction(() => document.querySelector('#username') !== null, {
       timeout: 30000,
     });
+    
     console.log(`GLOBAL SETUP: ℹ️ Login form loaded at: ${page.url()}`);
     console.log(`GLOBAL SETUP: ℹ️ Filling credentials...`);
     await page.waitForSelector('#username', { state: 'visible', timeout: 10000 });
