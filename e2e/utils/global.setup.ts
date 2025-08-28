@@ -26,9 +26,6 @@ async function globalSetup() {
     const spidButton = page.getByRole('button', { name: 'Log in with SPID' });
     await spidButton.click({ timeout: 10000 });
 
-    await page.waitForURL('**/oneid.pagopa.it/**', { timeout: 30000 });
-    console.log(`✅ Arrived at OneID: ${page.url()}`);
-
     console.log(`GLOBAL SETUP: ℹ️ Selecting OneID provider...`);
 
     await page.getByTestId('idp-button-https://validator.dev.oneid.pagopa.it/demo').click();
