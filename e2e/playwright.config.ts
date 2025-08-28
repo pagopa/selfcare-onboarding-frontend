@@ -23,6 +23,7 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   workers: 1,
   use: {
+    javaScriptEnabled: true,
     locale: 'it-IT',
     trace: 'on-first-retry',
     storageState: path.resolve(__dirname, 'storageState.json'),
