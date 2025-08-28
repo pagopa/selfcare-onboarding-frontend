@@ -17,17 +17,16 @@ export default defineConfig({
   globalTeardown: path.resolve(__dirname, './utils/global.teardown.ts'),
 
   timeout: 120_000,
-
   testDir: './tests',
-  fullyParallel: false,
   forbidOnly: !!process.env.CI,
-  workers: 1,
+  fullyParallel: false,
+
   use: {
-    javaScriptEnabled: true,
     locale: 'it-IT',
     trace: 'on-first-retry',
     storageState: path.resolve(__dirname, 'storageState.json'),
   },
+
   /* Configure projects for major browsers */
   projects: [
     {
@@ -35,7 +34,7 @@ export default defineConfig({
       use: {
         ...devices['Desktop Chrome'],
         launchOptions: {
-          slowMo: 1000,
+          slowMo: process.env.CI ? 0 : 1000,
         },
       },
     },
