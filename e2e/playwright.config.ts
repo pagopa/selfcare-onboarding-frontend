@@ -15,12 +15,12 @@ export default defineConfig({
   // path to the global setup files.
   globalSetup: path.resolve(__dirname, './utils/global.setup.ts'),
   globalTeardown: path.resolve(__dirname, './utils/global.teardown.ts'),
-
+  workers: 1,
   timeout: 120_000,
   testDir: './tests',
   forbidOnly: !!process.env.CI,
   fullyParallel: false,
-
+  retries: 1,
   use: {
     locale: 'it-IT',
     trace: 'on-first-retry',
