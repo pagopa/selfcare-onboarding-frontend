@@ -12,7 +12,11 @@ async function globalSetup() {
     headless: process.env.CI ? true : false,
   });
 
-  const context = await browser.newContext();
+  const context = await browser.newContext({
+    locale: 'it-IT',
+    viewport: { width: 1280, height: 720 },
+  });
+
   const page = await context.newPage();
 
   try {
