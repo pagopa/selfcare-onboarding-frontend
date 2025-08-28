@@ -5,7 +5,7 @@ async function globalSetup() {
   const browser = await chromium.launch({
     headless: process.env.CI ? true : false,
   });
-  const context = await browser.newContext();
+  const context = await browser.newContext({ javaScriptEnabled: true });
   const page = await context.newPage();
   try {
     page.setDefaultTimeout(60000);
@@ -23,7 +23,7 @@ async function globalSetup() {
       timeout: 60000,
     });
     console.log(`GLOBAL SETUP: ℹ️ Clicking 'Entra con SPID'...`);
-    const spidButton = page.getByRole('button', { name: 'Entra con SPID' });
+    const spidButton = page.getByRole('button', { name: 'Log in with SPID' });
     await spidButton.click({ timeout: 10000 });
 
     await page.waitForURL('**/oneid.pagopa.it/**', { timeout: 30000 });
