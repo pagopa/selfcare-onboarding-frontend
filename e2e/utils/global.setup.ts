@@ -5,7 +5,7 @@ async function globalSetup() {
   const browser = await chromium.launch({
     headless: process.env.CI ? true : false,
   });
-  const context = await browser.newContext({ javaScriptEnabled: true });
+  const context = await browser.newContext();
   const page = await context.newPage();
   try {
     page.setDefaultTimeout(60000);
@@ -18,13 +18,20 @@ async function globalSetup() {
         console.log(`🔄 Navigated to: ${frame.url()}`);
       }
     });
+
     console.log(`GLOBAL SETUP: ℹ️ Starting from selfcare...`);
+
     await page.goto('https://dev.selfcare.pagopa.it', {
       timeout: 60000,
     });
+
     console.log(`GLOBAL SETUP: ℹ️ Clicking 'Entra con SPID'...`);
-    const spidButton = page.getByRole('button', { name: 'Log in with SPID' });
+
+    const spidButton = page.getByRole('button', { name: 'Entra con SPID' });
     await spidButton.click({ timeout: 10000 });
+
+    await page.waitForURL('**/uat.oneid.pagopa.it/**', { timeout: 30000 });
+    console.log(`✅ Arrived at OneID: ${page.url()}`);
 
     console.log(`GLOBAL SETUP: ℹ️ Selecting OneID provider...`);
 
