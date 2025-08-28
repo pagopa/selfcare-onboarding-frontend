@@ -105,7 +105,10 @@ export const stepFormData = async (
     await page.click('#taxCodeEquals2VatNumber');
   }
 
-  if (product === PRODUCT_IDS_TEST_E2E.PAGOPA && actualInstitutionType === 'GSP') {
+  if (
+    (product === PRODUCT_IDS_TEST_E2E.PAGOPA && actualInstitutionType === 'GSP') ||
+    (product === PRODUCT_IDS_TEST_E2E.INTEROP && actualInstitutionType === 'PRV')
+  ) {
     await page.click('#taxCodeEquals2VatNumber');
   }
 

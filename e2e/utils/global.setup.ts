@@ -25,6 +25,7 @@ async function globalSetup() {
     const visitedUrls: Array<string> = [];
     page.on('framenavigated', (frame) => {
       if (frame === page.mainFrame()) {
+        // eslint-disable-next-line functional/immutable-data
         visitedUrls.push(frame.url());
         console.log(`🔄 Navigated to: ${frame.url()}`);
       }
