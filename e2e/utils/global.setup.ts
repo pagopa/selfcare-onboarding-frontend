@@ -2,11 +2,14 @@ import path from 'path';
 import { chromium } from '@playwright/test';
 async function globalSetup() {
   console.log(`GLOBAL SETUP: Starting`);
+  
   const browser = await chromium.launch({
     headless: process.env.CI ? true : false,
   });
+  
   const context = await browser.newContext();
   const page = await context.newPage();
+  
   try {
     page.setDefaultTimeout(60000);
     page.setDefaultNavigationTimeout(60000);
@@ -18,32 +21,17 @@ async function globalSetup() {
         console.log(`🔄 Navigated to: ${frame.url()}`);
       }
     });
-    console.log(`GLOBAL SETUP: ℹ️ Starting from selfcare...`);
-    await page.goto('https://dev.selfcare.pagopa.it', {
-      timeout: 60000,
-    });
-
-    page.on('request', (request) => {
-      console.log(`➡️ Request: ${request.method()} ${request.url()}`);
-    });
-
-    page.on('response', (response) => {
-      console.log(`⬅️ Response: ${response.status()} ${response.url()}`);
-    });
-
-    page.on('requestfailed', (request) => {
-      console.log(`❌ Request failed: ${request.url()} - ${request.failure()?.errorText}`);
-    });
 
     console.log(`GLOBAL SETUP: ℹ️ Navigazione iniziale...`);
     await page.goto('https://dev.selfcare.pagopa.it/', { waitUntil: 'domcontentloaded' });
 
+    console.log(await page.content());
+
     console.log(`GLOBAL SETUP: ℹ️ Aspetto stabilizzazione pagina...`);
     await page.waitForLoadState('networkidle', { timeout: 60000 });
 
-    await page.screenshot({ path: 'before-click.png', fullPage: true });
-    console.log("GLOBAL SETUP: Screenshot 'before-click.png' salvato");
-
+    console.log(await page.content());
+    
     const spidButton = page.getByRole('button', { name: 'Entra con SPID' });
     await spidButton.waitFor({ state: 'visible', timeout: 60000 });
 
