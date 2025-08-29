@@ -1,12 +1,8 @@
 import path from 'path';
-import fs from 'fs';
 import { chromium } from '@playwright/test';
 
 async function globalSetup() {
   console.log(`GLOBAL SETUP: Starting`);
-
-  const screenshotsDir = path.resolve(__dirname, '../screenshots');
-  fs.mkdirSync(screenshotsDir, { recursive: true });
 
   const browser = await chromium.launch({
     headless: process.env.CI ? true : false,
@@ -112,14 +108,6 @@ async function globalSetup() {
       'GLOBAL SETUP: ❌ Error message:',
       error instanceof Error ? error.message : String(error)
     );
-
-    try {
-      const screenshotPath = path.resolve(screenshotsDir, `error-${Date.now()}.png`);
-      await page.screenshot({ path: screenshotPath, fullPage: true });
-      console.error(`GLOBAL SETUP: ❌ Screenshot salvato in caso di errore: ${screenshotPath}`);
-    } catch {
-      console.error('GLOBAL SETUP: ❌ Non sono riuscito a fare screenshot.');
-    }
 
     throw error;
   }

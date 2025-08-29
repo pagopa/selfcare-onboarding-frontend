@@ -6,10 +6,8 @@ permissions:
 
 on:
   workflow_dispatch:
-  #pull_request_review:
-  #  types: [submitted]
-  pull_request:
-    types: [opened, synchronize]
+    pull_request:
+      types: [opened, edited, synchronize, reopened, ready_for_review]
 
 jobs:
   execute_integration_test:
@@ -17,10 +15,10 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 18
           cache: 'yarn'
@@ -50,11 +48,3 @@ jobs:
       - name: Run Playwright tests
         #working-directory: ./e2e
         run: yarn test:e2e
-
-      - name: Upload Report
-        uses: actions/upload-artifact@v4
-        if: ${{ !cancelled() }}
-        with:
-          name: playwright-report
-          path: playwright-report/
-          retention-days: 30
