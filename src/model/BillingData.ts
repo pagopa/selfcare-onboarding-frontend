@@ -9,6 +9,7 @@ export type BillingDataDto = {
   taxCodeInvoicing?: string;
   vatNumber?: string;
   zipCode?: string;
+  legalForm?: string;
 };
 
 export const billingData2billingDataRequest = (
@@ -22,4 +23,5 @@ export const billingData2billingDataRequest = (
   taxCodeInvoicing: billingData.taxCodeInvoicing,
   vatNumber: billingData.vatNumber,
   zipCode: billingData.zipCode,
+  legalForm: billingData.legalForm,
 });
