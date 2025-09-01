@@ -20,7 +20,7 @@
     "react-scripts": "5.0.1",
     "react-select-event": "^5.5.1",
     "typescript": "^5.9.2",
-    "web-vitals": "^4.2.4"
+    "web-vitals": "^5.1.0"
   },
   "scripts": {
     "start": "craco start",
