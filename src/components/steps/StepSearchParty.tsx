@@ -303,34 +303,42 @@ export function StepSearchParty({
                   values={{ productName: product?.title }}
                   components={{ 1: <strong /> }}
                 >
-                  {`Prosegui con l’adesione a <strong>{{ productName }}</strong> per l’ente selezionato`}
+                  {`Prosegui con l’adesione a <strong>{{productName}}</strong> per l’ente selezionato`}
                 </Trans>
               ) : institutionType === 'SA' ? (
-                <Trans i18nKey="onboardingStep1.onboarding.saSubTitle">
-                  Se sei tra i gestori privati di piattaforma e-procurement e hai <br /> già
-                  ottenuto la
-                  <Link
-                    sx={{
-                      color: theme.palette.text.primary,
-                      textDecorationColor: theme.palette.text.primary,
-                    }}
-                    href="https://www.agid.gov.it/it/piattaforme/procurement/certificazione-componenti-piattaforme"
-                    target="_blank"
-                  >
-                    certificazione da AgID
-                  </Link>
-                  , inserisci uno dei dati
-                  <br /> richiesti e cerca l’ente per cui vuoi richiedere l’adesione a <br />
-                  <strong>Interoperabilità.</strong>
+                <Trans
+                  i18nKey="onboardingStep1.onboarding.saSubTitle"
+                  values={{
+                    productName: product?.title,
+                  }}
+                  components={{ 1: <br />, 3: <Link />, 5: <strong /> }}
+                >
+                  {`Se sei tra i gestori privati di piattaforma e-procurement e hai <1 /> già
+                  ottenuto la <3> ${(
+                    <Link
+                      sx={{
+                        color: theme.palette.text.primary,
+                        textDecorationColor: theme.palette.text.primary,
+                      }}
+                      href="https://www.agid.gov.it/it/piattaforme/procurement/certificazione-componenti-piattaforme"
+                      target="_blank"
+                    >
+                      certificazione da AgID
+                    </Link>
+                  )} <3 />, inserisci uno dei dati <1 />
+                  richiesti e cerca l’ente per cui vuoi richiedere l’adesione a <1 />
+                  <5>{{ productName }}</5>
+                `}
                 </Trans>
               ) : institutionType === 'AS' ? (
                 <Trans
                   i18nKey="onboardingStep1.onboarding.asSubTitle"
                   values={{ productName: product?.title }}
+                  components={{ 1: <br />, 3: <strong /> }}
                 >
-                  {`Se sei una società di assicurazione presente nell’Albo delle <br /> imprese IVASS,
+                  {`Se sei una società di assicurazione presente nell’Albo delle <1 /> imprese IVASS,
                   inserisci uno dei dati richiesti e cerca l’ente per
-                  <br /> cui vuoi richiedere l’adesione a <strong>{{ productName }}.</strong>`}
+                  <1 /> cui vuoi richiedere l’adesione a <3>{{ productName }}.</3>`}
                 </Trans>
               ) : institutionType === 'SCP' ||
                 (institutionType === 'PRV' && product?.id === 'prod-interop') ? (

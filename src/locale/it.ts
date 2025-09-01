@@ -10,7 +10,7 @@ export default {
     businessName: 'Ragione Sociale',
     taxcode: 'Codice Fiscale ente',
     originId: 'Codice IVASS',
-    reaLabel: 'RM-123456'
+    reaLabel: 'RM-123456',
   },
   partyAdvancedSelect: {
     advancedSearchLabel: 'Cerca per',
@@ -143,9 +143,9 @@ export default {
         'Prosegui con l’adesione a <1>{{productName}}</1> per l’ente selezionato',
       gpsDescription: `Non trovi il tuo ente nell'IPA?<1 /><2>Inserisci manualmente i dati del tuo ente.</2>`,
       saSubTitle:
-        'Se sei tra i gestori privati di piattaforma e-procurement e hai <1/> già ottenuto la <3>certificazione da AgID</3>, inserisci uno dei dati <5/> richiesti e cerca l’ente per cui vuoi richiedere l’adesione a <7/> <8>{{productName}}.</8>',
+        'Se sei tra i gestori privati di piattaforma e-procurement e hai <1/> già ottenuto la <3> certificazione da AgID </3>, inserisci uno dei dati <1/> richiesti e cerca l’ente per cui vuoi richiedere l’adesione a <1/> <5>{{productName}}.</5>',
       asSubTitle:
-        'Se sei una società di assicurazione presente nell’Albo delle <1/>imprese IVASS, inserisci uno dei dati richiesti e cerca l’ente per<3/> cui vuoi richiedere l’adesione a <5>{{productName}}.</5>',
+        'Se sei una società di assicurazione presente nell’Albo delle <1/>imprese IVASS, inserisci uno dei dati richiesti e cerca l’ente per <1/> cui vuoi richiedere l’adesione a <3>{{productName}}.</3>',
       scpSubtitle:
         'Inserisci uno dei dati richiesti e cerca da InfoCamere l’ente <3/> per cui vuoi richiedere l’adesione a <5>{{productName}}.</5>',
       merchantSubtitle:
