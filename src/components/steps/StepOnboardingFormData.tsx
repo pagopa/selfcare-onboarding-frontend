@@ -43,6 +43,7 @@ import { handleGeotaxonomies } from '../../utils/handleGeotaxonomies';
 import { ENV } from '../../utils/env';
 import { InstitutionLocationData } from '../../model/InstitutionLocationData';
 import { formatCity } from '../../utils/formatting-utils';
+import IbanSection from '../onboardingFormData/IbanSection';
 
 export type StepBillingDataHistoryState = {
   externalInstitutionId: string;
@@ -602,7 +603,9 @@ export default function StepOnboardingFormData({
           countries={countries}
           setCountries={setCountries}
         />
-
+        {isPrivateMerchant && (
+          <IbanSection baseTextFieldProps={baseTextFieldProps} formik={formik} />
+        )}
         {!institutionAvoidGeotax && subProductId !== PRODUCT_IDS.DASHBOARD_PSP && (
           <Grid item xs={12} display="flex" justifyContent={'center'}>
             <GeoTaxonomySection
