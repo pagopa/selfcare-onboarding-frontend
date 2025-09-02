@@ -778,6 +778,16 @@ export default {
       dpoPecAddress: 'Indirizzo PEC',
       dpoEmailAddress: 'Indirizzo email',
     },
+    ibanSection: {
+      title: 'INSERISCI IBAN PER RICEVERE I RIMBORSI',
+      owner: 'Intestatario',
+      iban: 'IBAN',
+      confirmIban: 'Conferma IBAN',
+      error: {
+        invalidIban: "Inserisci un IBAN valido",
+        ibanNotMatch: 'L’IBAN non corrisponde',
+      },
+    }
   },
   rejectRegistration: {
     outcomeContent: {
