@@ -529,8 +529,7 @@ export default function StepOnboardingFormData({
     field: keyof OnboardingFormData,
     label: string,
     color: string,
-    fontWeight: string | number = isDisabled ? 'fontWeightRegular' : 'fontWeightMedium',
-    helperText?: string
+    fontWeight: string | number = isDisabled ? 'fontWeightRegular' : 'fontWeightMedium'
   ) => {
     const isError = !!formik.errors[field] && formik.errors[field] !== requiredError;
     return {
@@ -539,7 +538,7 @@ export default function StepOnboardingFormData({
       value: formik.values[field] || '',
       label,
       error: isError,
-      helperText: isError ? formik.errors[field] : helperText,
+      helperText: isError ? formik.errors[field] : undefined,
       required: true,
       variant: 'outlined' as const,
       onChange: formik.handleChange,
