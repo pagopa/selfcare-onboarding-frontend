@@ -103,15 +103,15 @@ export const validateFields = (
       !values.businessRegisterPlace
         ? requiredError
         : undefined,
-    owner: !values.owner ? requiredError : undefined,
-    iban: !values.iban
+    owner: isPrivateMerchant && !values.owner ? requiredError : undefined,
+    iban: isPrivateMerchant && !values.iban
       ? requiredError
-      : values.iban.length === 27 && !/^IT[0-9]{2}[A-Z][0-9]{10}[A-Z0-9]{12}$/.test(values.iban)
+      : values.iban?.length === 27 && !/^IT[0-9]{2}[A-Z][0-9]{10}[A-Z0-9]{12}$/.test(values.iban)
         ? t('onboardingFormData.ibanSection.error.invalidIban')
         : undefined,
-    confirmIban: !values.confirmIban
+    confirmIban: isPrivateMerchant && !values.confirmIban
       ? requiredError
-      : values.confirmIban.length === 27 && values.confirmIban && values.iban !== values.confirmIban
+      : values.confirmIban?.length === 27 && values.confirmIban && values.iban !== values.confirmIban
         ? t('onboardingFormData.ibanSection.error.ibanNotMatch')
         : undefined,
     registrationInRegister:
