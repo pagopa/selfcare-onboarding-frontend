@@ -966,6 +966,9 @@ export const fillUserBillingDataForm = async (
   taxCodeInput: string,
   vatNumber: string,
   recipientCode: string,
+  owner?: string,
+  iban?: string,
+  confirmIban?: string,
   supportEmail?: string,
   rea?: string,
   city?: string,
@@ -1110,6 +1113,15 @@ export const fillUserBillingDataForm = async (
       });
       fireEvent.change(document.getElementById(rea ?? '') as HTMLInputElement, {
         target: { value: mockedPdndVisuraInfomacere[personalIndex].nRea },
+      });
+      fireEvent.change(document.getElementById(owner ?? '') as HTMLInputElement, {
+        target: { value: 'owner' },
+      });
+      fireEvent.change(document.getElementById(iban ?? '') as HTMLInputElement, {
+        target: { value: 'IT60X0542811101000000123456' },
+      });
+      fireEvent.change(document.getElementById(confirmIban ?? '') as HTMLInputElement, {
+        target: { value: 'IT60X0542811101000000123456' },
       });
     } else if (
       (institutionType === 'SCP' || institutionType === 'PRV') &&
