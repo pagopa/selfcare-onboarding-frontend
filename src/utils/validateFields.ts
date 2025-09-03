@@ -99,8 +99,20 @@ export const validateFields = (
             )
           : undefined,
     businessRegisterPlace:
-      (institutionType === 'SA' || isPdndPrivate || isPrivateMerchant) && !values.businessRegisterPlace
+      (institutionType === 'SA' || isPdndPrivate || isPrivateMerchant) &&
+      !values.businessRegisterPlace
         ? requiredError
+        : undefined,
+    owner: !values.owner ? requiredError : undefined,
+    iban: !values.iban
+      ? requiredError
+      : values.iban.length === 27 && !/^IT[0-9]{2}[A-Z][0-9]{10}[A-Z0-9]{12}$/.test(values.iban)
+        ? t('onboardingFormData.ibanSection.error.invalidIban')
+        : undefined,
+    confirmIban: !values.confirmIban
+      ? requiredError
+      : values.confirmIban.length === 27 && values.confirmIban && values.iban !== values.confirmIban
+        ? t('onboardingFormData.ibanSection.error.ibanNotMatch')
         : undefined,
     registrationInRegister:
       isPaymentServiceProvider && !values.registrationInRegister ? requiredError : undefined,
@@ -164,7 +176,10 @@ export const validateFields = (
           ? t('onboardingFormData.billingDataSection.invalidShareCapitalField')
           : undefined,
     supportEmail:
-      !institutionAvoidGeotax && !values.supportEmail && !isPremium && productId === PRODUCT_IDS.IO_SIGN
+      !institutionAvoidGeotax &&
+      !values.supportEmail &&
+      !isPremium &&
+      productId === PRODUCT_IDS.IO_SIGN
         ? requiredError
         : !emailRegexp.test(values.supportEmail as string) && values.supportEmail
           ? t('onboardingFormData.billingDataSection.invalidMailSupport')

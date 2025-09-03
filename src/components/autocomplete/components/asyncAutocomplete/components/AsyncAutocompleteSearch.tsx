@@ -108,11 +108,6 @@ export default function AsyncAutocompleteSearch({
     }
   }, []);
 
-  useEffect(
-    () => console.log('input', input, 'selected', selected, 'valueSelected', valueSelected),
-    [input, selected, valueSelected]
-  );
-
   const label = useMemo(() => {
     if (selected) {
       return '';
