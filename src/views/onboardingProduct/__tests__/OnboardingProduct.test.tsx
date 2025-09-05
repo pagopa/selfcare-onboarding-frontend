@@ -1127,7 +1127,7 @@ const executeStepBillingData = async (
     'taxCode',
     'vatNumber',
     'recipientCode',
-    'owner',
+    'holder',
     'iban',
     'confirmIban',
     'supportEmail',

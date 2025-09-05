@@ -68,8 +68,8 @@ export default function IbanSection({ baseTextFieldProps, formik }: Props) {
         <Grid item xs={12} pt={3}>
             <CustomTextField
               {...baseTextFieldProps(
-                'owner',
-                t('onboardingFormData.ibanSection.owner'),
+                'holder',
+                t('onboardingFormData.ibanSection.holder'),
                 600,
                 theme.palette.text.primary
               )}

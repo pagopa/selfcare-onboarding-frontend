@@ -664,6 +664,13 @@ export const verifySubmit = async (
                 regulatedMarketNote: '',
               }
             : undefined,
+        payment:
+          institutionType === 'PRV' && productId === PRODUCT_IDS.IDPAY_MERCHANT
+            ? {
+                holder: 'holder',
+                iban: 'IT60X0542811101000000123456',
+              }
+            : undefined,
         gpuData:
           institutionType === 'GPU' && productId === PRODUCT_IDS.PAGOPA
             ? {
@@ -966,7 +973,7 @@ export const fillUserBillingDataForm = async (
   taxCodeInput: string,
   vatNumber: string,
   recipientCode: string,
-  owner?: string,
+  holder?: string,
   iban?: string,
   confirmIban?: string,
   supportEmail?: string,
@@ -1114,8 +1121,8 @@ export const fillUserBillingDataForm = async (
       fireEvent.change(document.getElementById(rea ?? '') as HTMLInputElement, {
         target: { value: mockedPdndVisuraInfomacere[personalIndex].nRea },
       });
-      fireEvent.change(document.getElementById(owner ?? '') as HTMLInputElement, {
-        target: { value: 'owner' },
+      fireEvent.change(document.getElementById(holder ?? '') as HTMLInputElement, {
+        target: { value: 'holder' },
       });
       fireEvent.change(document.getElementById(iban ?? '') as HTMLInputElement, {
         target: { value: 'IT60X0542811101000000123456' },
