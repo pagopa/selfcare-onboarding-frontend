@@ -780,7 +780,7 @@ export default {
     },
     ibanSection: {
       title: 'INSERISCI IBAN PER RICEVERE I RIMBORSI',
-      owner: 'Intestatario',
+      holder: 'Intestatario',
       iban: 'IBAN',
       confirmIban: 'Conferma IBAN',
       error: {

@@ -526,6 +526,13 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
                   otherNote: additionalInformations?.otherNote,
                 }
               : undefined,
+          payment:
+            institutionType === 'PRV' && selectedProduct?.id === PRODUCT_IDS.IDPAY_MERCHANT
+              ? {
+                  holder: onboardingFormData?.holder,
+                  iban: onboardingFormData?.iban,
+                }
+              : undefined,
           gpuData:
             institutionType === 'GPU' &&
             (selectedProduct?.id === PRODUCT_IDS.PAGOPA ||

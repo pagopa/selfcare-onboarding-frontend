@@ -103,7 +103,7 @@ export const validateFields = (
       !values.businessRegisterPlace
         ? requiredError
         : undefined,
-    owner: isPrivateMerchant && !values.owner ? requiredError : undefined,
+    holder: isPrivateMerchant && !values.holder ? requiredError : undefined,
     iban: isPrivateMerchant && !values.iban
       ? requiredError
       : values.iban?.length === 27 && !/^IT[0-9]{2}[A-Z][0-9]{10}[A-Z0-9]{12}$/.test(values.iban)

@@ -17,7 +17,7 @@ export default function IbanSection({ baseTextFieldProps, formik }: Props) {
     color: string
   ) => {
     const baseProps = baseTextFieldProps(field, label, maxWidth, color);
-    const isIbanField = field === 'iban' || field === 'confirmIban';
+    // const isIbanField = field === 'iban' || field === 'confirmIban';
 
     return {
       ...baseProps,
@@ -27,12 +27,12 @@ export default function IbanSection({ baseTextFieldProps, formik }: Props) {
           textTransform: 'uppercase' as const,
           letterSpacing: '0.5px',
         },
-        // disable copy/paste/cut for IBAN fields
+        /* // disable copy/paste/cut for IBAN fields
         ...(isIbanField && {
           onPaste: (e: React.ClipboardEvent) => e.preventDefault(),
           onCopy: (e: React.ClipboardEvent) => e.preventDefault(),
           onCut: (e: React.ClipboardEvent) => e.preventDefault(),
-        }),
+        }), */
       },
       onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
         const cleanValue = e.target.value.replace(/\s/g, '').toUpperCase();
@@ -68,8 +68,8 @@ export default function IbanSection({ baseTextFieldProps, formik }: Props) {
         <Grid item xs={12} pt={3}>
             <CustomTextField
               {...baseTextFieldProps(
-                'owner',
-                t('onboardingFormData.ibanSection.owner'),
+                'holder',
+                t('onboardingFormData.ibanSection.holder'),
                 600,
                 theme.palette.text.primary
               )}
