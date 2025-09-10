@@ -133,6 +133,8 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
             productId === PRODUCT_IDS.INTEROP);
         const isPrivateParty = productId === PRODUCT_IDS.INTEROP && institutionType === 'PRV';
         const isPdndPrivate = productId === PRODUCT_IDS.INTEROP && institutionType === 'PRV';
+        const isPrivateMerchant = productId === PRODUCT_IDS.IDPAY_MERCHANT && institutionType === 'PRV';
+
         conditionsMap[`${productId}-${institutionType}`] = {
           isPremium,
           isInvoiceable,
@@ -141,6 +143,7 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
           institutionAvoidGeotax,
           isInsuranceCompany,
           isPrivateParty,
+          isPrivateMerchant
         };
 
         renderComponentWithProviders(
@@ -167,6 +170,7 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
             getCountriesFromGeotaxonomies={jest.fn()}
             countries={undefined}
             setCountries={jest.fn()}
+            isPrivateMerchant={isPrivateMerchant}
           />
         );
 
