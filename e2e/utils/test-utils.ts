@@ -40,6 +40,20 @@ export const stepSelectPartyByCF = async (page: Page, cfParty: string) => {
   await page.click('[aria-label="Continua"]');
 };
 
+export const stepSelectPartyByCF4PrivateMerchant = async (page: Page, cfParty: string) => {
+  await page.click('#Parties');
+  await page.fill('#Parties', cfParty);
+
+  const businessTaxIdSelector = `[businesstaxid="${cfParty}"]`;
+  await page.waitForSelector(businessTaxIdSelector, {
+    state: 'visible',
+    timeout: 10000,
+  });
+
+  await page.click(`${businessTaxIdSelector} [role="button"]`);
+  await page.click('[aria-label="Continua"]');
+};
+
 /* export const stepFormDataWithIpaResearch4SDICode = async (
   page: Page,
   context: any,
@@ -139,7 +153,12 @@ export const stepFormData = async (
     await page.getByLabel('La Partita IVA coincide con il Codice Fiscale').click();
   }
 
-  if (isFromIpa && product !== PRODUCT_IDS_TEST_E2E.INTEROP && actualInstitutionType !== 'SCP') {
+  if (
+    isFromIpa &&
+    product !== PRODUCT_IDS_TEST_E2E.INTEROP &&
+    product !== PRODUCT_IDS_TEST_E2E.IDPAY_MERCHANT &&
+    actualInstitutionType !== 'SCP'
+  ) {
     await page.click('#recipientCode');
     await page.fill('#recipientCode', product === PRODUCT_IDS_TEST_E2E.SEND ? 'UFBM8M' : '14CB0I', {
       timeout: 500,
@@ -200,6 +219,20 @@ export const stepFormData = async (
 
     await page.click('#email');
     await page.fill('#email', 'test@test.it');
+  }
+
+  if (actualInstitutionType === 'PRV' && product === PRODUCT_IDS_TEST_E2E.IDPAY_MERCHANT) {
+    await page.click('#businessRegisterPlace');
+    await page.fill('#businessRegisterPlace', 'Tecnologie Innovative S.p.A.');
+
+    await page.click('#holder');
+    await page.fill('#holder', 'Mario Rossi');
+
+    await page.click('#iban');
+    await page.fill('#iban', 'IT60X0542811101000000123456');
+
+    await page.click('#confirmIban');
+    await page.fill('#confirmIban', 'IT60X0542811101000000123456');
   }
 
   const shouldShowNazionale = isFromIpa
@@ -280,7 +313,9 @@ export const stepAddAdmin = async (page: Page, aggregator?: boolean, institution
   await page.click('[aria-label="Continua"]');
   if (!aggregator && institutionType !== 'PT') {
     await page.getByRole('button', { name: 'Conferma' }).click();
-    await expect(page.getByText('Richiesta di adesione inviata')).toBeInViewport();
+    await expect(page.getByText('Richiesta di adesione inviata')).toBeInViewport({
+      timeout: 10000,
+    });
   }
 };
 
