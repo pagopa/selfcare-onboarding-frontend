@@ -17,7 +17,6 @@ export default function IbanSection({ baseTextFieldProps, formik }: Props) {
     color: string
   ) => {
     const baseProps = baseTextFieldProps(field, label, maxWidth, color);
-    const isIbanField = field === 'iban' || field === 'confirmIban';
 
     return {
       ...baseProps,
@@ -28,7 +27,7 @@ export default function IbanSection({ baseTextFieldProps, formik }: Props) {
           letterSpacing: '0.5px',
         },
         // disable copy/paste/cut for IBAN fields
-        ...(isIbanField && {
+        ...(field === 'confirmIban' && {
           onPaste: (e: React.ClipboardEvent) => e.preventDefault(),
           onCopy: (e: React.ClipboardEvent) => e.preventDefault(),
           onCut: (e: React.ClipboardEvent) => e.preventDefault(),

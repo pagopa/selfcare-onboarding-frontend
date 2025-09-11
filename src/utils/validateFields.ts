@@ -104,16 +104,29 @@ export const validateFields = (
         ? requiredError
         : undefined,
     holder: isPrivateMerchant && !values.holder ? requiredError : undefined,
-    iban: isPrivateMerchant && !values.iban
-      ? requiredError
-      : values.iban?.length === 27 && !/^IT[0-9]{2}[A-Z][0-9]{10}[A-Z0-9]{12}$/.test(values.iban)
-        ? t('onboardingFormData.ibanSection.error.invalidIban')
-        : undefined,
-    confirmIban: isPrivateMerchant && !values.confirmIban
-      ? requiredError
-      : values.confirmIban?.length === 27 && values.confirmIban && values.iban !== values.confirmIban
-        ? t('onboardingFormData.ibanSection.error.ibanNotMatch')
-        : undefined,
+    iban:
+      isPrivateMerchant && !values.iban
+        ? requiredError
+        : values.iban?.length === 27 && !/^IT[0-9]{2}[A-Z][0-9]{10}[A-Z0-9]{12}$/.test(values.iban)
+          ? t('onboardingFormData.ibanSection.error.invalidIban')
+          : undefined,
+    confirmIban:
+      isPrivateMerchant && !values.confirmIban
+        ? requiredError
+        : isPrivateMerchant &&
+            values.confirmIban &&
+            values.confirmIban.length > 0 &&
+            values.confirmIban.length < 27
+          ? requiredError
+          : values.confirmIban &&
+              values.confirmIban.length === 27 &&
+              !/^IT[0-9]{2}[A-Z][0-9]{10}[A-Z0-9]{12}$/.test(values.confirmIban)
+            ? t('onboardingFormData.ibanSection.error.invalidIban')
+            : values.confirmIban &&
+                values.confirmIban.length === 27 &&
+                values.iban !== values.confirmIban
+              ? t('onboardingFormData.ibanSection.error.ibanNotMatch')
+              : undefined,
     registrationInRegister:
       isPaymentServiceProvider && !values.registrationInRegister ? requiredError : undefined,
     address: isPaymentServiceProvider && !values.address ? requiredError : undefined,
@@ -176,9 +189,7 @@ export const validateFields = (
           ? t('onboardingFormData.billingDataSection.invalidShareCapitalField')
           : undefined,
     supportEmail:
-      !institutionAvoidGeotax &&
-      !values.supportEmail &&
-      productId === PRODUCT_IDS.IO_SIGN
+      !institutionAvoidGeotax && !values.supportEmail && productId === PRODUCT_IDS.IO_SIGN
         ? requiredError
         : !emailRegexp.test(values.supportEmail as string) && values.supportEmail
           ? t('onboardingFormData.billingDataSection.invalidMailSupport')
