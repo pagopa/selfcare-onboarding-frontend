@@ -68,7 +68,6 @@ export const subProductSubmitFetch = async ({
               onboardedInstitutionInfo2geographicTaxonomy(gt)
             )
           : [],
-        assistanceContacts: { supportEmail: billingData.supportEmail },
         companyInformations:
           institutionType !== 'PA'
             ? {
@@ -78,9 +77,9 @@ export const subProductSubmitFetch = async ({
               }
             : undefined,
         institutionLocationData: {
+          city: billingData?.city,
           country: billingData?.country,
           county: billingData?.county,
-          city: billingData?.city,
         },
         productId: subProduct.id,
         subunitCode: undefined,

@@ -24,7 +24,6 @@ import { HeaderContext, UserContext } from '../../lib/context';
 import { StepAddManager, UsersObject } from '../../components/steps/StepAddManager';
 import StepOnboardingData from '../../components/steps/StepOnboardingData';
 import StepOnboardingFormData from '../../components/steps/StepOnboardingFormData';
-import { AssistanceContacts } from '../../model/AssistanceContacts';
 import { CompanyInformations } from '../../model/CompanyInformations';
 import { registerUnloadEvent, unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
 import { useHistoryState } from '../../components/useHistoryState';
@@ -76,7 +75,6 @@ function OnboardingPremiumComponent() {
   const { setOnExit } = useContext(HeaderContext);
   const [onExitAction, setOnExitAction] = useState<(() => void) | undefined>();
   const requestIdRef = useRef<string>('');
-  const [assistanceContacts, setAssistanceContacts] = useState<AssistanceContacts>();
   const [companyInformations, setCompanyInformations] = useState<CompanyInformations>();
   const [openConfirmationModal, setOpenConfirmationModal] = useState(false);
   const [isCityEditable, setIsCityEditable] = useState(false);
@@ -158,7 +156,6 @@ function OnboardingPremiumComponent() {
     billingData?: OnboardingFormData,
     institutionType?: InstitutionType,
     partyId?: string,
-    assistanceContacts?: AssistanceContacts,
     companyInformations?: CompanyInformations,
     country?: string,
     city?: string,
@@ -175,9 +172,6 @@ function OnboardingPremiumComponent() {
         country,
         county,
       });
-    }
-    if (assistanceContacts) {
-      setAssistanceContacts(assistanceContacts);
     }
     if (companyInformations) {
       setCompanyInformations(companyInformations);
@@ -324,7 +318,6 @@ function OnboardingPremiumComponent() {
               county: '',
               country: '',
             }),
-            ...assistanceContacts,
             ...companyInformations,
             ...pspData,
             ...dpoData,

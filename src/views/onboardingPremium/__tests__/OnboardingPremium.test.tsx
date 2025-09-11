@@ -224,6 +224,18 @@ const executeStepBillingDataWithTaxCodeInvoicing = async (subProductId: string) 
     });
   }
 
+  if( subProductId === PRODUCT_IDS.DASHBOARD_PSP) {
+    fireEvent.change(document.getElementById('address') as HTMLElement, {
+      target: { value: 'Via Manzoni 12' },
+    });
+    fireEvent.change(document.getElementById('pec') as HTMLElement, {
+      target: { value: 'pec@bpm.it' },
+    });
+    fireEvent.change(document.getElementById('email') as HTMLElement, {
+      target: { value: 'dpo@bpm.it' },
+    });
+  }
+
   await waitFor(() => expect(confirmButtonEnabled).toBeEnabled());
 
   fireEvent.click(confirmButtonEnabled);
