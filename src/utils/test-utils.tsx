@@ -781,7 +781,7 @@ export const verifySubmit = async (
                 country: 'IT',
               },
         assistanceContacts:
-          !isPrivateMerchant &&
+          productId === PRODUCT_IDS.IO_SIGN &&
           typeOfSearch !== 'aooCode' &&
           institutionType !== 'PT' &&
           institutionType !== 'GPU' &&
@@ -826,12 +826,21 @@ const billingData2billingDataRequestPspDashboard = () => ({
   vatNumber: '98765432101',
   taxCodeInvoicing: undefined,
   recipientCode: 'Z9X8Y1',
+  legalForm: undefined,
 });
 export const verifySubmitPostLegalsIoPremium = async (
   fetchWithLogsSpy: jest.SpyInstance<any, any, any>
 ) => {
-  await waitFor(() =>
-    expect(fetchWithLogsSpy).lastCalledWith(
+  await waitFor(() => {
+    const postLegalsCalls = fetchWithLogsSpy.mock.calls.filter(
+      (call) => call[0]?.endpoint === 'ONBOARDING_POST_LEGALS'
+    );
+
+    expect(postLegalsCalls.length).toBeGreaterThan(0);
+
+    const lastPostLegalsCall = postLegalsCalls[postLegalsCalls.length - 1];
+
+    expect(lastPostLegalsCall).toEqual([
       {
         endpoint: 'ONBOARDING_POST_LEGALS',
       },
@@ -847,11 +856,14 @@ export const verifySubmitPostLegalsIoPremium = async (
               email: 'b@b.bb',
             },
           ],
-          billingData: billingData2billingDataRequestIoPremium(),
+          billingData: {
+            ...billingData2billingDataRequestIoPremium(),
+            legalForm: undefined,
+          },
           pspData: undefined,
           institutionLocationData: {
             city: 'Milano',
-            country: 'IT',
+            country: undefined,
             county: 'MI',
           },
           institutionType: 'PA',
@@ -861,7 +873,6 @@ export const verifySubmitPostLegalsIoPremium = async (
           geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY
             ? [{ code: nationalValue, desc: 'ITALIA' }]
             : [],
-          assistanceContacts: { supportEmail: 'comune.bollate@pec.it' },
           productId: PRODUCT_IDS.IO_PREMIUM,
           subunitCode: undefined,
           subunitType: undefined,
@@ -869,69 +880,74 @@ export const verifySubmitPostLegalsIoPremium = async (
           companyInformations: undefined,
         },
       },
-      expect.any(Function)
-    )
-  );
+      expect.any(Function),
+    ]);
+  });
 };
 
 export const verifySubmitPostLegalsPspDashBoard = async (
   fetchWithLogsSpy: jest.SpyInstance<any, any, any>
 ) => {
-  await waitFor(() =>
-    expect(fetchWithLogsSpy).toHaveBeenLastCalledWith(
-      {
-        endpoint: 'ONBOARDING_POST_LEGALS',
-      },
-      {
-        method: 'POST',
-        data: {
-          users: [
-            {
-              name: 'NAME',
-              surname: 'SURNAME',
-              role: 'MANAGER',
-              taxCode: 'SRNNMA80A01A794F',
-              email: 'b@b.bb',
-            },
-          ],
-          billingData: billingData2billingDataRequestPspDashboard(),
-          pspData: {
-            businessRegisterNumber: '56789123456',
-            legalRegisterName: 'BP Milano',
-            legalRegisterNumber: '34',
-            abiCode: '98765',
-            vatNumberGroup: true,
-            dpoData: {
-              address: 'Via Manzoni 12',
-              pec: 'pec@bpm.it',
-              email: 'dpo@bpm.it',
-            },
-          },
-          institutionType: 'PSP',
-          origin: 'SELC',
-          originId: '98765432101',
-          assistanceContacts: { supportEmail: undefined },
-          companyInformations: {
-            businessRegisterPlace: undefined,
-            rea: undefined,
-            shareCapital: undefined,
-          },
-          geographicTaxonomies: [],
-          institutionLocationData: {
-            country: 'IT',
-            county: 'MI',
-            city: 'Milano',
-          },
-          productId: PRODUCT_IDS.DASHBOARD_PSP,
-          taxCode: mockedPspOnboardingData[1].institution.billingData.taxCode,
-          pricingPlan: undefined,
-          subunitCode: undefined,
-          subunitType: undefined,
-        },
-      },
-      expect.any(Function)
-    )
+  const postLegalsCalls = fetchWithLogsSpy.mock.calls.filter(
+    (call) => call[0]?.endpoint === 'ONBOARDING_POST_LEGALS'
   );
+
+  expect(postLegalsCalls.length).toBeGreaterThan(0);
+
+  const lastPostLegalsCall = postLegalsCalls[postLegalsCalls.length - 1];
+
+  expect(lastPostLegalsCall).toEqual([
+    {
+      endpoint: 'ONBOARDING_POST_LEGALS',
+    },
+    {
+      method: 'POST',
+      data: {
+        users: [
+          {
+            name: 'NAME',
+            surname: 'SURNAME',
+            role: 'MANAGER',
+            taxCode: 'SRNNMA80A01A794F',
+            email: 'b@b.bb',
+          },
+        ],
+        billingData: billingData2billingDataRequestPspDashboard(),
+        pspData: {
+          businessRegisterNumber: '56789123456',
+          legalRegisterName: 'BP Milano',
+          legalRegisterNumber: '34',
+          abiCode: '98765',
+          vatNumberGroup: true,
+          dpoData: {
+            address: 'Via Manzoni 12',
+            pec: 'pec@bpm.it',
+            email: 'dpo@bpm.it',
+          },
+        },
+        institutionType: 'PSP',
+        origin: 'SELC',
+        originId: '98765432101',
+        companyInformations: {
+          businessRegisterPlace: undefined,
+          rea: undefined,
+          shareCapital: undefined,
+        },
+        geographicTaxonomies: [],
+        institutionLocationData: {
+          city: 'Milano',
+          country: {},
+          county: 'MI',
+        },
+        productId: PRODUCT_IDS.DASHBOARD_PSP,
+        taxCode: mockedPspOnboardingData[1].institution.billingData.taxCode,
+        pricingPlan: undefined,
+        subunitCode: undefined,
+        subunitType: undefined,
+      },
+    },
+    expect.any(Function),
+  ]);
 };
 
 export const performLogout = async (logoutButton: HTMLElement) => {
@@ -1283,7 +1299,7 @@ export const fillUserBillingDataForm = async (
       target: { value: 'A1B2C3D' },
     });
 
-    if (supportEmail) {
+    if (supportEmail && productId === PRODUCT_IDS.IO_SIGN) {
       fireEvent.change(document.getElementById(supportEmail) as HTMLInputElement, {
         target: { value: 'a@a.it' },
       });

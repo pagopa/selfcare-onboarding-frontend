@@ -584,9 +584,10 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           istatCode: origin !== 'IPA' ? onboardingFormData?.istatCode : undefined,
           users,
           pricingPlan,
-          assistanceContacts: onboardingFormData?.supportEmail
-            ? { supportEmail: onboardingFormData.supportEmail }
-            : undefined,
+          assistanceContacts:
+            productId === PRODUCT_IDS.IO_SIGN
+              ? { supportEmail: onboardingFormData?.supportEmail }
+              : undefined,
           productId,
           subunitCode: onboardingFormData?.uoUniqueCode ?? onboardingFormData?.aooUniqueCode,
           subunitType: onboardingFormData?.uoUniqueCode

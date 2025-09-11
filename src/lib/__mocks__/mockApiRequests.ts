@@ -758,7 +758,6 @@ const mockedOnboardingData: Array<InstitutionOnboardingInfoResource> = [
             desc: 'Firenze - Comune',
           },
         ],
-        supportEmail: 'comune.bollate@pec.it',
       },
       city: 'Milano',
       country: 'IT',
@@ -934,6 +933,7 @@ export const mockedPspOnboardingData: Array<InstitutionOnboardingInfoResource> =
       billingData: {
         businessName: 'Banca Popolare di Milano',
         registeredOffice: 'Piazza Meda 4',
+        legalForm: undefined,
         digitalAddress: 'info@bpm.it',
         zipCode: '20121',
         taxCode: '98765432101',
@@ -961,12 +961,11 @@ export const mockedPspOnboardingData: Array<InstitutionOnboardingInfoResource> =
         email: 'dpo@bpm.it',
       },
       city: 'Milano',
-      county: 'MI',
       country: 'IT',
+      county: 'MI',
       origin: 'SELC',
       originId: '1',
       companyInformations: {},
-      assistanceContacts: {},
     },
     geographicTaxonomies: [
       {

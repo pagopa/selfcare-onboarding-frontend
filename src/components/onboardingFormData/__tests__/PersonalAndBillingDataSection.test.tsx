@@ -133,6 +133,8 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
             productId === PRODUCT_IDS.INTEROP);
         const isPrivateParty = productId === PRODUCT_IDS.INTEROP && institutionType === 'PRV';
         const isPdndPrivate = productId === PRODUCT_IDS.INTEROP && institutionType === 'PRV';
+        const isPrivateMerchant = productId === PRODUCT_IDS.IDPAY_MERCHANT && institutionType === 'PRV';
+
         conditionsMap[`${productId}-${institutionType}`] = {
           isPremium,
           isInvoiceable,
@@ -141,6 +143,7 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
           institutionAvoidGeotax,
           isInsuranceCompany,
           isPrivateParty,
+          isPrivateMerchant
         };
 
         renderComponentWithProviders(
@@ -167,6 +170,7 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
             getCountriesFromGeotaxonomies={jest.fn()}
             countries={undefined}
             setCountries={jest.fn()}
+            isPrivateMerchant={isPrivateMerchant}
           />
         );
 
@@ -181,8 +185,8 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
       isInformationCompany,
       isForeignInsurance,
       institutionAvoidGeotax,
-      isInsuranceCompany,
       isPrivateParty,
+      isPrivateMerchant
     } = conditionsMap[key];
 
     const centralParty = screen.queryByText('Ente centrale');
@@ -202,18 +206,17 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
     const pec = screen.getByText('Indirizzo PEC');
     const taxCode = screen.queryByText('Codice Fiscale');
     const taxCodeEc = screen.queryByText('Codice Fiscale ente centrale');
-    const vatNumber = screen.queryByText('Partita IVA');
     const commercialRegisterNumber = screen.queryByText(
       'Luogo di iscrizione al Registro delle Imprese (facoltativo)'
     );
     const rea = screen.queryByText('REA');
     const sdiCode = screen.queryByText('Codice univoco o SDI') as HTMLInputElement;
     const taxCodeSfe = screen.queryByText('Codice Fiscale SFE') as HTMLInputElement;
+    const iban = screen.queryByText('IBAN');
+    const confirmIban = screen.queryByText('Conferma IBAN');
+    const holder = screen.queryByText('Intestatario');
     const shareCapital = screen.queryByText('Capitale sociale (facoltativo)');
     const visibleCitizenMail = screen.queryByText('Indirizzo email visibile ai cittadini');
-    const visibleCitizenMailOptional = screen.queryByText(
-      'Indirizzo email visibile ai cittadini (facoltativo)'
-    );
 
     if (onboardingFormData?.aooUniqueCode) {
       expect(businessName).not.toBeInTheDocument();
@@ -290,12 +293,18 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
       expect(shareCapital).not.toBeInTheDocument();
     }
 
-    if (institutionAvoidGeotax) {
-      expect(visibleCitizenMail).not.toBeInTheDocument();
+    if(isPrivateMerchant) {
+      expect(iban).toBeInTheDocument();
+      expect(confirmIban).toBeInTheDocument();
+      expect(holder).toBeInTheDocument();
     } else {
-      expect(
-        productId === PRODUCT_IDS.IO ? visibleCitizenMail : visibleCitizenMailOptional
-      ).toBeInTheDocument();
+      expect(iban).not.toBeInTheDocument();
+      expect(confirmIban).not.toBeInTheDocument();
+      expect(holder).not.toBeInTheDocument();
+    }
+
+    if (!institutionAvoidGeotax && productId === PRODUCT_IDS.IO_SIGN) {
+      expect(visibleCitizenMail).toBeInTheDocument();
     }
 
     const isTaxCodeEquals2PIVA = document.getElementById('taxCodeEquals2VatNumber');

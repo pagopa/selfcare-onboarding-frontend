@@ -145,7 +145,7 @@ export default function PersonalAndBillingDataSection({
   }, [formik.values.shareCapital]);
 
   useEffect(() => {
-    if (assistanceContacts?.supportEmail) {
+    if (assistanceContacts?.supportEmail && productId === PRODUCT_IDS.IO_SIGN) {
       formik.setFieldValue('supportEmail', assistanceContacts.supportEmail);
     }
   }, [assistanceContacts]);
@@ -1124,17 +1124,13 @@ export default function PersonalAndBillingDataSection({
           </>
         )}
         {/* indirizzo mail di supporto */}
-        {!institutionAvoidGeotax && !isPrivateMerchant && (
+        {!institutionAvoidGeotax && productId === PRODUCT_IDS.IO_SIGN && (
           <Grid item xs={12}>
             <CustomTextFieldNotched
-              paddingValue={productId === PRODUCT_IDS.IO_SIGN ? '14px' : '20px'}
+              paddingValue={'14px'}
               {...baseTextFieldProps(
                 'supportEmail',
-                t(
-                  productId === PRODUCT_IDS.IO_SIGN
-                    ? 'onboardingFormData.billingDataSection.assistanceContact.supportEmail'
-                    : 'onboardingFormData.billingDataSection.assistanceContact.supportEmailOptional'
-                ),
+                t('onboardingFormData.billingDataSection.assistanceContact.supportEmail'),
                 600,
                 theme.palette.text.primary
               )}

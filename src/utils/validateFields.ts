@@ -178,7 +178,6 @@ export const validateFields = (
     supportEmail:
       !institutionAvoidGeotax &&
       !values.supportEmail &&
-      !isPremium &&
       productId === PRODUCT_IDS.IO_SIGN
         ? requiredError
         : !emailRegexp.test(values.supportEmail as string) && values.supportEmail
