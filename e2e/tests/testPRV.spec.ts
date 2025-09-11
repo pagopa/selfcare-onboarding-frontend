@@ -35,7 +35,7 @@ test('Test Success onboarding request for product prod-idpay-merchant and instit
   page,
 }) => {
   await page.goto(`${BASE_URL_ONBOARDING}/prod-idpay-merchant`);
-  await stepSelectPartyByCF4PrivateMerchant(page, '02180760965');
+  await stepSelectPartyByCF4PrivateMerchant(page, '13614770967');
   await stepFormData(page, PRODUCT_IDS_TEST_E2E.IDPAY_MERCHANT, 'PRV');
   await stepAddManager(page);
   await stepAddAdmin(page);
