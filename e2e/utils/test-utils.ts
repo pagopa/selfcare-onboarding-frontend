@@ -44,11 +44,16 @@ export const stepSelectPartyByCF4PrivateMerchant = async (page: Page, cfParty: s
   await page.click('#Parties');
   await page.fill('#Parties', cfParty);
 
+  await page.waitForSelector('.loading-spinner', { state: 'hidden', timeout: 30000 });
+
   const businessTaxIdSelector = `[businesstaxid="${cfParty}"]`;
-  await page.waitForSelector(businessTaxIdSelector, {
-    state: 'visible',
-    timeout: 10000,
-  });
+
+  try {
+    await page.waitForSelector(businessTaxIdSelector, { state: 'visible', timeout: 30000 });
+  } catch (e) {
+    console.error(`Party con CF ${cfParty} non trovato entro il timeout`);
+    throw e;
+  }
 
   await page.click(`${businessTaxIdSelector} [role="button"]`);
   await page.click('[aria-label="Continua"]');
