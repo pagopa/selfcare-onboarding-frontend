@@ -402,7 +402,7 @@ export function StepSearchParty({
 
           {product?.id === PRODUCT_IDS.IDPAY_MERCHANT && (
             <Grid container item justifyContent="center">
-              <Grid item xs={9}>
+              <Grid item xs={8}>
                 <Box display="flex" justifyContent="center" mb={5}>
                   {merchantSearchResult ? (
                     isPresentInAtecoWhiteList ? (
@@ -410,8 +410,7 @@ export function StepSearchParty({
                         <Typography
                           sx={{ fontSize: '16px', a: { color: theme.palette.text.primary } }}
                         >
-                          se l&#39;esercente fa parte di una catena è la società padre a dover
-                          aderire
+                          {t('onboardingStep1.onboarding.merchantAtecoValid')}
                         </Typography>
                       </Alert>
                     ) : (
@@ -420,8 +419,7 @@ export function StepSearchParty({
                         <Typography
                           sx={{ fontSize: '16px', a: { color: theme.palette.text.primary } }}
                         >
-                          Il codice ATECO al quale sei abilitato non corrisponde con quelli idonei
-                          al Bonus Elettrodomestici
+                          {t('onboardingStep1.onboarding.merchantAtecoNotValid')}
                         </Typography>
                       </Alert>
                     )
@@ -430,7 +428,7 @@ export function StepSearchParty({
                       <Typography
                         sx={{ fontSize: '16px', a: { color: theme.palette.text.primary } }}
                       >
-                        se l&#39;esercente fa parte di una catena è la società padre a dover aderire
+                        {t('onboardingStep1.onboarding.merchantAtecoValid')}
                       </Typography>
                     </Alert>
                   )}

@@ -150,6 +150,10 @@ export default {
         'Inserisci uno dei dati richiesti e cerca da InfoCamere l’ente <3/> per cui vuoi richiedere l’adesione a <5>{{productName}}.</5>',
       merchantSubtitle:
         'Inserisci uno dei dati richiesti per cercare su InfoCamere l’ente <3/> per cui vuoi richiedere l’adesione a <5>{{productName}}.</5>',
+      merchantAtecoValid:
+        'Se fai parte di una catena di negozi, l’adesione deve essere fatta dalla società capogruppo.',
+      merchantAtecoNotValid:
+        'I codici ATECO idonei per l’adesione al Bonus Elettrodomestici sono 47.54.00 e  47.12.10',
       asyncAutocomplete: {
         placeholder: 'Cerca',
       },
@@ -784,10 +788,10 @@ export default {
       iban: 'IBAN',
       confirmIban: 'Conferma IBAN',
       error: {
-        invalidIban: "Inserisci un IBAN valido",
+        invalidIban: 'Inserisci un IBAN valido',
         ibanNotMatch: 'L’IBAN non corrisponde',
       },
-    }
+    },
   },
   rejectRegistration: {
     outcomeContent: {
