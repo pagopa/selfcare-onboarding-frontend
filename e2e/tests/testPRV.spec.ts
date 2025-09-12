@@ -7,7 +7,7 @@ import {
   stepFormData,
   BASE_URL_ONBOARDING,
   PRODUCT_IDS_TEST_E2E,
-  stepSelectPartyByCF4PrivateMerchant
+  stepSelectPartyByCF4PrivateMerchant,
 } from '../utils/test-utils';
 
 test('Test Success onboarding request for product prod-interop and institutionType PRV', async ({
@@ -34,10 +34,26 @@ test('Test Success onboarding request for product prod-pagopa and institutionTyp
 test('Test Success onboarding request for product prod-idpay-merchant and institutionType PRV', async ({
   page,
 }) => {
-  await page.goto(`${BASE_URL_ONBOARDING}/prod-idpay-merchant`);
-  await stepSelectPartyByCF4PrivateMerchant(page, '13614770967');
-  await stepFormData(page, PRODUCT_IDS_TEST_E2E.IDPAY_MERCHANT, 'PRV');
-  await stepAddManager(page);
-  await stepAddAdmin(page);
-});
+  test.setTimeout(180000);
 
+  await test.step('Navigate to onboarding page', async () => {
+    await page.goto(`${BASE_URL_ONBOARDING}/prod-idpay-merchant`);
+    await page.waitForLoadState('networkidle');
+  });
+
+  await test.step('Select party by CF', async () => {
+    await stepSelectPartyByCF4PrivateMerchant(page, '13614770967');
+  });
+
+  await test.step('Fill form data', async () => {
+    await stepFormData(page, PRODUCT_IDS_TEST_E2E.IDPAY_MERCHANT, 'PRV');
+  });
+
+  await test.step('Add manager', async () => {
+    await stepAddManager(page);
+  });
+
+  await test.step('Add admin', async () => {
+    await stepAddAdmin(page);
+  });
+});
