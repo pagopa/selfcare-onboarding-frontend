@@ -153,7 +153,7 @@ export default {
       merchantAtecoValid:
         'Se fai parte di una catena di negozi, l’adesione deve essere fatta dalla società capogruppo.',
       merchantAtecoNotValid:
-        'I codici ATECO idonei per l’adesione al Bonus Elettrodomestici sono 47.54.00 e  47.12.10',
+        'Il codice ATECO al quale sei abilitato non corrisponde con quelli idonei al Bonus Elettrodomestici',
       asyncAutocomplete: {
         placeholder: 'Cerca',
       },

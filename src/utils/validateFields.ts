@@ -16,6 +16,195 @@ import {
 } from './constants';
 import { ENV } from './env';
 
+const ITALIAN_IBAN_REGEX = /^IT[0-9]{2}[A-Z][0-9]{10}[A-Z0-9]{12}$/;
+const IBAN_LENGTH = 27;
+
+const validateEmail = (email: string | undefined, t: TFunction) => {
+  if (!email) {
+    return requiredError;
+  }
+  return !emailRegexp.test(email)
+    ? t('onboardingFormData.billingDataSection.invalidEmail')
+    : undefined;
+};
+
+const validateZipCode = (
+  zipCode: string | undefined,
+  isForeignInsurance: boolean,
+  t: TFunction
+) => {
+  if (!zipCode && !isForeignInsurance) {
+    return requiredError;
+  }
+  if (zipCode && !fiveCharactersAllowed.test(zipCode)) {
+    return t('onboardingFormData.billingDataSection.invalidZipCode');
+  }
+  return undefined;
+};
+
+const validateTaxCode = (
+  taxCode: string | undefined,
+  institutionType: InstitutionType,
+  t: TFunction
+) => {
+  if (!taxCode && institutionType !== 'AS') {
+    return requiredError;
+  }
+  if (taxCode && !fiscalAndVatCodeRegexp.test(taxCode)) {
+    return t('onboardingFormData.billingDataSection.invalidFiscalCode');
+  }
+  return undefined;
+};
+
+const validateVatNumber = (
+  values: Partial<OnboardingFormData>,
+  isVatRegistrated: boolean,
+  vatVerificationGenericError: boolean,
+  t: TFunction
+) => {
+  if (!values.vatNumber && values.hasVatnumber) {
+    return requiredError;
+  }
+  if (values.vatNumber && !fiscalAndVatCodeRegexp.test(values.vatNumber)) {
+    return t('onboardingFormData.billingDataSection.invalidVatNumber');
+  }
+  if (isVatRegistrated) {
+    return t('onboardingFormData.billingDataSection.vatNumberAlreadyRegistered');
+  }
+  return vatVerificationGenericError ? requiredError : undefined;
+};
+
+const validateCity = (values: Partial<OnboardingFormData>) => {
+  if (!values.city) {
+    return requiredError;
+  }
+  if (values.isForeignInsurance && !onlyCharacters.test(values.city)) {
+    return true; // TODO: Add error helperText when available
+  }
+  return undefined;
+};
+
+const validateCountry = (values: Partial<OnboardingFormData>, institutionType: InstitutionType) => {
+  if (!values.country && values.isForeignInsurance) {
+    return requiredError;
+  }
+  if (institutionType === 'AS' && values?.country && !onlyCharacters.test(values.country)) {
+    return true;
+  }
+  return undefined;
+};
+
+const validateIban = (iban: string | undefined, isPrivateMerchant: boolean, t: TFunction) => {
+  if (isPrivateMerchant && !iban) {
+    return requiredError;
+  }
+  if (iban?.length === IBAN_LENGTH && !ITALIAN_IBAN_REGEX.test(iban)) {
+    return t('onboardingFormData.ibanSection.error.invalidIban');
+  }
+  return undefined;
+};
+
+const validateConfirmIban = (
+  confirmIban: string | undefined,
+  originalIban: string | undefined,
+  isPrivateMerchant: boolean,
+  t: TFunction
+) => {
+  if (isPrivateMerchant && !confirmIban) {
+    return requiredError;
+  }
+
+  if (
+    isPrivateMerchant &&
+    confirmIban &&
+    confirmIban.length > 0 &&
+    confirmIban.length < IBAN_LENGTH
+  ) {
+    return requiredError;
+  }
+
+  if (confirmIban?.length === IBAN_LENGTH) {
+    if (!ITALIAN_IBAN_REGEX.test(confirmIban)) {
+      return t('onboardingFormData.ibanSection.error.invalidIban');
+    }
+    if (originalIban !== confirmIban) {
+      return t('onboardingFormData.ibanSection.error.ibanNotMatch');
+    }
+  }
+
+  return undefined;
+};
+
+const validatePspField = (
+  value: string | undefined,
+  isRequired: boolean,
+  validator?: RegExp,
+  errorKey?: string,
+  t?: TFunction
+) => {
+  if (isRequired && !value) {
+    return requiredError;
+  }
+  if (value && validator && !validator.test(value) && errorKey && t) {
+    return t(errorKey);
+  }
+  return undefined;
+};
+
+const validateRecipientCode = (
+  recipientCode: string | undefined,
+  isInvoiceable: boolean,
+  recipientCodeStatus: string | undefined,
+  t: TFunction
+) => {
+  if (!isInvoiceable) {
+    return undefined;
+  }
+
+  if (recipientCode && recipientCode.length >= 1 && recipientCode.length < 6) {
+    return t('onboardingFormData.billingDataSection.recipientCodeMustBe6Chars');
+  }
+
+  if (recipientCode && recipientCode.length >= 6) {
+    if (recipientCodeStatus === 'DENIED_NO_ASSOCIATION') {
+      return t('onboardingFormData.billingDataSection.invalidRecipientCodeNoAssociation');
+    }
+    if (recipientCodeStatus === 'DENIED_NO_BILLING') {
+      return t('onboardingFormData.billingDataSection.invalidRecipientCodeNoBilling');
+    }
+    return undefined;
+  }
+
+  return requiredError;
+};
+
+const validateGeographicTaxonomies = (
+  values: Partial<OnboardingFormData>,
+  isPremium: boolean,
+  institutionAvoidGeotax: boolean
+) => {
+  if (isPremium) {
+    return undefined;
+  }
+
+  const shouldValidate = ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY && !institutionAvoidGeotax;
+  const hasInvalidTaxonomies =
+    !values.geographicTaxonomies ||
+    values.geographicTaxonomies.length === 0 ||
+    values.geographicTaxonomies.some((gt) => gt?.code === '' || gt === null);
+
+  return shouldValidate && hasInvalidTaxonomies ? requiredError : undefined;
+};
+
+const validateConditionalRequired = (value: string | undefined, condition: boolean) =>
+  condition && !value ? requiredError : undefined;
+
+const validateFieldWithPattern = (
+  value: string | undefined,
+  pattern: RegExp,
+  errorMessage: string
+) => (value && !pattern.test(value as string) ? errorMessage : undefined);
+
 /* eslint-disable sonarjs/cognitive-complexity */
 /* eslint-disable complexity */
 export const validateFields = (
@@ -35,22 +224,71 @@ export const validateFields = (
   isPrivateMerchant: boolean,
   recipientCodeStatus?: string,
   productId?: string
-) =>
-  Object.entries({
-    businessName: !values.businessName ? requiredError : undefined,
-    registeredOffice: !values.registeredOffice ? requiredError : undefined,
-    zipCode:
-      !values.zipCode && !values.isForeignInsurance
+) => {
+  const isRequiredForInfoCompany = isInformationCompany || isPdndPrivate || isPrivateMerchant;
+  const isRequiredForSaOrPrivate = institutionType === 'SA' || isPdndPrivate || isPrivateMerchant;
+  const validationRules = {
+    businessName: validateConditionalRequired(values.businessName, true),
+    registeredOffice: validateConditionalRequired(values.registeredOffice, true),
+    zipCode: validateZipCode(values.zipCode, !!values.isForeignInsurance, t),
+    taxCode: validateTaxCode(values.taxCode, institutionType, t),
+    vatNumber: validateVatNumber(values, isVatRegistrated, vatVerificationGenericError, t),
+    city: validateCity(values),
+    county: validateConditionalRequired(values.county, institutionType !== 'AS'),
+    country: validateCountry(values, institutionType),
+    digitalAddress: validateEmail(values.digitalAddress, t),
+    originId: validateConditionalRequired(values.originId, institutionType === 'AS'),
+    holder: validateConditionalRequired(values.holder, isPrivateMerchant),
+    iban: validateIban(values.iban, isPrivateMerchant, t),
+    confirmIban: validateConfirmIban(values.confirmIban, values.iban, isPrivateMerchant, t),
+    businessRegisterPlace: validateConditionalRequired(
+      values.businessRegisterPlace,
+      isRequiredForSaOrPrivate
+    ),
+    rea:
+      isRequiredForInfoCompany && !values.rea
         ? requiredError
-        : values.zipCode && !fiveCharactersAllowed.test(values.zipCode ?? '')
-          ? t('onboardingFormData.billingDataSection.invalidZipCode')
-          : undefined,
-    taxCode:
-      !values.taxCode && institutionType !== 'AS'
+        : validateFieldWithPattern(
+            values.rea,
+            reaValidation,
+            t('onboardingFormData.billingDataSection.invalidReaField')
+          ),
+    shareCapital:
+      (institutionType === 'SA' || isPdndPrivate) && !values.shareCapital
         ? requiredError
-        : values.taxCode && !fiscalAndVatCodeRegexp.test(values.taxCode)
-          ? t('onboardingFormData.billingDataSection.invalidFiscalCode')
-          : undefined,
+        : validateFieldWithPattern(
+            values.shareCapital,
+            currencyField,
+            t('onboardingFormData.billingDataSection.invalidShareCapitalField')
+          ),
+    commercialRegisterNumber: validatePspField(
+      values.commercialRegisterNumber,
+      isPaymentServiceProvider,
+      commercialRegisterNumberRegexp,
+      'onboardingFormData.billingDataSection.pspDataSection.invalidCommercialRegisterNumber',
+      t
+    ),
+    registrationInRegister: validateConditionalRequired(
+      values.registrationInRegister,
+      isPaymentServiceProvider
+    ),
+    address: validateConditionalRequired(values.address, isPaymentServiceProvider),
+    registerNumber: validatePspField(
+      values.registerNumber,
+      isPaymentServiceProvider,
+      numericField,
+      'onboardingFormData.billingDataSection.pspDataSection.invalidregisterNumber',
+      t
+    ),
+    abiCode: validatePspField(
+      values.abiCode,
+      isPaymentServiceProvider,
+      fiveCharactersAllowed,
+      'onboardingFormData.billingDataSection.pspDataSection.invalidabiCode',
+      t
+    ),
+    email: isPaymentServiceProvider ? validateEmail(values.email, t) : undefined,
+    pec: isPaymentServiceProvider ? validateEmail(values.pec, t) : undefined,
     taxCodeInvoicing:
       isInvoiceable &&
       uoSelected &&
@@ -60,127 +298,21 @@ export const validateFields = (
         : invalidTaxCodeInvoicing
           ? t('onboardingFormData.billingDataSection.invalidTaxCodeInvoicing')
           : undefined,
-    vatNumber:
-      !values.vatNumber && values.hasVatnumber
-        ? requiredError
-        : values.vatNumber && !fiscalAndVatCodeRegexp.test(values.vatNumber)
-          ? t('onboardingFormData.billingDataSection.invalidVatNumber')
-          : isVatRegistrated
-            ? t('onboardingFormData.billingDataSection.vatNumberAlreadyRegistered')
-            : vatVerificationGenericError
-              ? requiredError
-              : undefined,
-    city: !values.city
-      ? requiredError
-      : values.isForeignInsurance
-        ? !onlyCharacters.test(values.city) // TODO Add error helperText when available
-        : undefined,
-    county: !values.county && institutionType !== 'AS' ? requiredError : undefined,
-    country:
-      !values.country && values.isForeignInsurance
-        ? requiredError
-        : institutionType === 'AS' && values?.country
-          ? !onlyCharacters.test(values.country)
-          : undefined,
-    originId: institutionType === 'AS' && !values.originId ? requiredError : undefined,
-    digitalAddress: !values.digitalAddress
-      ? requiredError
-      : !emailRegexp.test(values.digitalAddress)
-        ? t('onboardingFormData.billingDataSection.invalidEmail')
-        : undefined,
-    commercialRegisterNumber:
-      isPaymentServiceProvider && !values.commercialRegisterNumber
-        ? requiredError
-        : values.commercialRegisterNumber &&
-            !commercialRegisterNumberRegexp.test(values.commercialRegisterNumber) &&
-            isPaymentServiceProvider
-          ? t(
-              'onboardingFormData.billingDataSection.pspDataSection.invalidCommercialRegisterNumber'
-            )
-          : undefined,
-    businessRegisterPlace:
-      (institutionType === 'SA' || isPdndPrivate || isPrivateMerchant) &&
-      !values.businessRegisterPlace
-        ? requiredError
-        : undefined,
-    holder: isPrivateMerchant && !values.holder ? requiredError : undefined,
-    iban: isPrivateMerchant && !values.iban
-      ? requiredError
-      : values.iban?.length === 27 && !/^IT[0-9]{2}[A-Z][0-9]{10}[A-Z0-9]{12}$/.test(values.iban)
-        ? t('onboardingFormData.ibanSection.error.invalidIban')
-        : undefined,
-    confirmIban: isPrivateMerchant && !values.confirmIban
-      ? requiredError
-      : values.confirmIban?.length === 27 && values.confirmIban && values.iban !== values.confirmIban
-        ? t('onboardingFormData.ibanSection.error.ibanNotMatch')
-        : undefined,
-    registrationInRegister:
-      isPaymentServiceProvider && !values.registrationInRegister ? requiredError : undefined,
-    address: isPaymentServiceProvider && !values.address ? requiredError : undefined,
-    registerNumber:
-      isPaymentServiceProvider && !values.registerNumber
-        ? requiredError
-        : isPaymentServiceProvider &&
-            values.registerNumber &&
-            !numericField.test(values.registerNumber)
-          ? t('onboardingFormData.billingDataSection.pspDataSection.invalidregisterNumber')
-          : undefined,
-    abiCode:
-      isPaymentServiceProvider && !values.abiCode
-        ? requiredError
-        : isPaymentServiceProvider && values.abiCode && !fiveCharactersAllowed.test(values.abiCode)
-          ? t('onboardingFormData.billingDataSection.pspDataSection.invalidabiCode')
-          : undefined,
-    email:
-      isPaymentServiceProvider && !values.email
-        ? requiredError
-        : isPaymentServiceProvider && values.email && !emailRegexp.test(values.email)
-          ? t('onboardingFormData.billingDataSection.invalidEmail')
-          : undefined,
-    pec:
-      isPaymentServiceProvider && !values.pec
-        ? requiredError
-        : isPaymentServiceProvider && values.pec && !emailRegexp.test(values.pec)
-          ? t('onboardingFormData.billingDataSection.invalidEmail')
-          : undefined,
-    recipientCode: isInvoiceable
-      ? values.recipientCode && values.recipientCode.length >= 1 && values.recipientCode.length < 6
-        ? t('onboardingFormData.billingDataSection.recipientCodeMustBe6Chars')
-        : values.recipientCode && values.recipientCode.length >= 6
-          ? recipientCodeStatus === 'DENIED_NO_ASSOCIATION'
-            ? t('onboardingFormData.billingDataSection.invalidRecipientCodeNoAssociation')
-            : recipientCodeStatus === 'DENIED_NO_BILLING'
-              ? t('onboardingFormData.billingDataSection.invalidRecipientCodeNoBilling')
-              : undefined
-          : requiredError
-      : undefined,
-    geographicTaxonomies: isPremium
-      ? undefined
-      : ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY &&
-          !institutionAvoidGeotax &&
-          (!values.geographicTaxonomies ||
-            values.geographicTaxonomies.length === 0 ||
-            values.geographicTaxonomies.some((gt) => gt?.code === '' || gt === null))
-        ? requiredError
-        : undefined,
-    rea:
-      (isInformationCompany || isPdndPrivate || isPrivateMerchant) && !values.rea
-        ? requiredError
-        : values.rea && !reaValidation.test(values.rea as string)
-          ? t('onboardingFormData.billingDataSection.invalidReaField')
-          : undefined,
-    shareCapital:
-      (institutionType === 'SA' || isPdndPrivate) && !values.shareCapital
-        ? requiredError
-        : values.shareCapital && !currencyField.test(values.shareCapital)
-          ? t('onboardingFormData.billingDataSection.invalidShareCapitalField')
-          : undefined,
+
+    recipientCode: validateRecipientCode(
+      values.recipientCode,
+      isInvoiceable,
+      recipientCodeStatus,
+      t
+    ),
+    geographicTaxonomies: validateGeographicTaxonomies(values, isPremium, institutionAvoidGeotax),
     supportEmail:
-      !institutionAvoidGeotax &&
-      !values.supportEmail &&
-      productId === PRODUCT_IDS.IO_SIGN
+      !institutionAvoidGeotax && !values.supportEmail && productId === PRODUCT_IDS.IO_SIGN
         ? requiredError
         : !emailRegexp.test(values.supportEmail as string) && values.supportEmail
           ? t('onboardingFormData.billingDataSection.invalidMailSupport')
           : undefined,
-  }).filter(([_key, value]) => value);
+  };
+
+  return Object.entries(validationRules).filter(([_key, value]) => value);
+};
