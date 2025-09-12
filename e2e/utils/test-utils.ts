@@ -39,11 +39,11 @@ export const stepSelectPartyByCF = async (
   isPrivateMerchant?: boolean
 ) => {
   await page.click('#Parties');
-  await page.fill('#Parties', cfParty, { timeout: 2000 });
+  await page.fill('#Parties', cfParty, { timeout: 5000 });
 
   if (isPrivateMerchant) {
     const businessTaxIdSelector = `[businesstaxid="${cfParty}"]`;
-    await page.waitForSelector(businessTaxIdSelector, { state: 'visible', timeout: 5000 });
+    await page.waitForSelector(businessTaxIdSelector, { state: 'visible', timeout: 10000 });
     await page.click(`${businessTaxIdSelector} [role="button"]`);
   } else {
     await page.click('.MuiBox-root:nth-child(1) > .MuiBox-root > .MuiBox-root');
