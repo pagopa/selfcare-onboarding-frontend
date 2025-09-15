@@ -9,7 +9,7 @@ import {
   PRODUCT_IDS_TEST_E2E,
 } from '../utils/test-utils';
 
-test.skip('Test Success onboarding request for product prod-idpay-merchant and institutionType PRV', async ({
+test('Test Success onboarding request for product prod-idpay-merchant and institutionType PRV', async ({
   page,
 }) => {
   test.setTimeout(180000);
