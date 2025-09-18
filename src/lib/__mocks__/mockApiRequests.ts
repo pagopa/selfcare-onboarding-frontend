@@ -510,6 +510,22 @@ export const mockedGeoTaxonomy: Array<GeographicTaxonomyResource> = [
     province_id: '463',
     region_id: '26',
   },
+  {
+    country: '100',
+    enabled: true,
+    code: '08',
+    desc: 'EMILIA-ROMAGNA - REGIONE',
+    region_id: '08',
+    country_abbreviation: 'IT',
+  },
+  {
+  country: "100",
+  enabled: true,
+  code: "04",
+  desc: "TRENTINO-ALTO ADIGE/SÜDTIROL - REGIONE",
+  region_id: "04",
+  country_abbreviation: "IT"
+}
 ];
 
 export const mockedGeotaxonomies: Array<GeographicTaxonomyResource> = [

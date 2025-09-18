@@ -243,8 +243,12 @@ export default function GeoTaxonomySection({
   };
 
   const formatApostrophe = (str: string) =>
-    str.replace(/(\w)'(\w)/g, (_match, p1, p2) => `${p1.toLocaleLowerCase()}'${p2.toLocaleUpperCase()}`);
+    str.replace(
+      /(\w)'(\w)/g,
+      (_match, p1, p2) => `${p1.toLocaleLowerCase()}'${p2.toLocaleUpperCase()}`
+    );
 
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   const geoTaxFormat = (option: any, type: 'desc' | 'value') => {
     if (!option?.desc) {
       return '';
@@ -255,22 +259,34 @@ export default function GeoTaxonomySection({
       desc = desc.slice(0, -11).toLocaleLowerCase();
     } else if (desc.includes('COMUNE')) {
       desc = desc.slice(0, -8).toLocaleLowerCase();
+    } else if (desc.includes('REGIONE')) {
+      desc = desc.slice(0, -9).toLocaleLowerCase();
     }
 
-    const cleanedDesc = desc.replace(/-/g, ' ').trim();
+    let cleanedDesc;
+    if (option.desc.includes('REGIONE')) {
+      cleanedDesc = desc.replace(/-/g, ' - ').replace(/\//g, ' / ').trim();
+    } else {
+      cleanedDesc = desc.replace(/-/g, ' ').replace(/\//g, ' / ').trim();
+    }
+
     const capitalizedDesc = cleanedDesc
       .split(' ')
       .map((word: string) => word.charAt(0).toLocaleUpperCase() + word.slice(1).toLocaleLowerCase())
       .join(' ');
 
-    const finalDesc = capitalizedDesc.includes("'") ? formatApostrophe(capitalizedDesc) : capitalizedDesc;
+    const finalDesc = capitalizedDesc.includes("'")
+      ? formatApostrophe(capitalizedDesc)
+      : capitalizedDesc;
 
     if (option.desc.includes('PROVINCIA')) {
       return `${finalDesc} e provincia`;
     } else if (option.desc.includes('COMUNE') && type === 'desc') {
       return `${finalDesc} (${option.province_abbreviation?.toUpperCase()}) comune`;
     } else if (option.desc.includes('COMUNE') && type === 'value') {
-      return `${finalDesc} (${(option.province_abbreviation ? option.province_abbreviation : formik.values.county ?? '').toUpperCase()})`;
+      return `${finalDesc} (${(option.province_abbreviation ? option.province_abbreviation : (formik.values.county ?? '')).toUpperCase()})`;
+    } else if (option.desc.includes('REGIONE')) {
+      return finalDesc;
     } else {
       return '';
     }
@@ -352,9 +368,7 @@ export default function GeoTaxonomySection({
                     onChange={(event: any, value: any) => handleChange(event, value, i)}
                     value={geoTaxFormat(geotaxonomiesHistory[i] ?? val, 'value')}
                     renderOption={(props, option) => (
-                      <span {...props}>
-                        {geoTaxFormat(option, 'desc')}
-                      </span>
+                      <span {...props}>{geoTaxFormat(option, 'desc')}</span>
                     )}
                     renderInput={(params) => (
                       <TextField

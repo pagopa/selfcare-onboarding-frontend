@@ -4,9 +4,9 @@ export type GeographicTaxonomyResource = {
   country_abbreviation: string;
   desc: string;
   enabled: boolean;
-  istat_code: string;
-  province_abbreviation: string;
-  province_id: string;
+  istat_code?: string;
+  province_abbreviation?: string;
+  province_id?: string;
   region_id: string;
 };
 
