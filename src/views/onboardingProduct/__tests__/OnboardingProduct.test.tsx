@@ -1,7 +1,7 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { useState } from 'react';
 import '@testing-library/jest-dom';
-import { User } from '../../../../types';
+import { InstitutionType, User } from '../../../../types';
 import { HeaderContext, UserContext } from '../../../lib/context';
 import { ENV } from '../../../utils/env';
 import OnboardingProduct from '../OnboardingProduct';
@@ -37,7 +37,7 @@ jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   useHistory: () => ({
     location: mockedLocation,
-    replace: (nextLocation) => Object.assign(mockedLocation, nextLocation),
+    replace: (nextLocation: any) => Object.assign(mockedLocation, nextLocation),
     push: mockedHistoryPush,
   }),
 }));
@@ -74,7 +74,7 @@ beforeEach(() => {
 
 const filterByCategory4Test = (institutionType?: string, productId?: string) => {
   if (productId === PRODUCT_IDS.SEND) {
-    return mockedCategories.product[PRODUCT_IDS.SEND].ipa.PA;
+    return mockedCategories.product['prod-pn'].ipa.PA;
   } else if (productId === PRODUCT_IDS.IDPAY_MERCHANT) {
     return mockedCategories.product['prod-idpay-merchant']?.merchantDetails?.atecoCodes;
   } else if (institutionType === 'GSP') {
@@ -758,7 +758,7 @@ test('Test: RecipientCode input client validation', async () => {
   expect(recipientCodeInput.value).toBe('AB123CD');
 });
 
-const completeOnboardingPdndInfocamereRequest = async (institutionType) => {
+const completeOnboardingPdndInfocamereRequest = async (institutionType: InstitutionType) => {
   renderComponent(PRODUCT_IDS.INTEROP);
   await executeStepInstitutionType(PRODUCT_IDS.INTEROP, institutionType);
   await executeStepSearchParty(

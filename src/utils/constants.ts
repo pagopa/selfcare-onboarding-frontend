@@ -213,13 +213,14 @@ export const commercialRegisterNumberRegexp = new RegExp('^\\d{11}$');
 export const numericField = new RegExp('^[0-9]*$');
 export const currencyField = new RegExp(/^(0|[1-9][0-9]*(?:(,[0-9]*)*|[0-9]*))((\\.|,)[0-9]+)*$/);
 export const onlyCharacters = new RegExp(/^[A-Za-z\s]*$/);
+export const fiscalCodeRegexp = /^[A-Z]{6}[0-9]{2}[A-Z][0-9]{2}[A-Z][0-9A-Z]{3}[A-Z0-9]$/;
 
 export const canInvoice = (institutionType?: string, productId?: string) =>
   institutionType !== 'SA' &&
   institutionType !== 'PT' &&
   institutionType !== 'AS' &&
   productId !== PRODUCT_IDS.INTEROP &&
-  productId !== PRODUCT_IDS.IDPAY_MERCHANT;;
+  productId !== PRODUCT_IDS.IDPAY_MERCHANT;
 
 export const noMandatoryIpaProducts = (productId?: string) =>
   productId !== PRODUCT_IDS.INTEROP &&

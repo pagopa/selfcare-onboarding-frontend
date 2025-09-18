@@ -36,7 +36,7 @@ import UpdateGeotaxonomy from '../onboardingFormData/taxonomy/UpdateGeotaxonomy'
 import GeoTaxonomySection from '../onboardingFormData/taxonomy/GeoTaxonomySection';
 import { useHistoryState } from '../useHistoryState';
 import { VatNumberErrorModal } from '../onboardingFormData/VatNumberErrorModal';
-import { canInvoice, PRODUCT_IDS, requiredError } from '../../utils/constants';
+import { canInvoice, fiscalCodeRegexp, PRODUCT_IDS, requiredError } from '../../utils/constants';
 import Heading from '../onboardingFormData/Heading';
 import { validateFields } from '../../utils/validateFields';
 import { handleGeotaxonomies } from '../../utils/handleGeotaxonomies';
@@ -524,6 +524,16 @@ export default function StepOnboardingFormData({
       void formik.setFieldValue('istatCode', countries[0].istat_code);
     }
   }, [countries]);
+
+  useEffect(() => {
+    if (
+      isPrivateMerchant &&
+      formik.values.taxCode &&
+      fiscalCodeRegexp.test(formik.values.taxCode)
+    ) {
+      void formik.setFieldValue('soleTrader', true);
+    }
+  }, [formik.values.taxCode]);
 
   const baseTextFieldProps = (
     field: keyof OnboardingFormData,
