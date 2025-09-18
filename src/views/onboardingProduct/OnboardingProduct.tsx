@@ -545,6 +545,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
             institutionType === 'PSP'
               ? pspData2pspDataRequest(onboardingFormData as OnboardingFormData)
               : undefined,
+          soleTrader: onboardingFormData?.soleTrader,
           companyInformations:
             onboardingFormData?.businessRegisterPlace ||
             onboardingFormData?.rea ||

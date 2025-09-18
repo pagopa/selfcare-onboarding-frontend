@@ -47,4 +47,5 @@ export type OnboardingFormData = {
   iban?: string;
   confirmIban?: string;
   holder?: string;
+  soleTrader?: boolean;
 };
