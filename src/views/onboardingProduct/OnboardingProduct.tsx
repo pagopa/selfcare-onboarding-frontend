@@ -362,7 +362,11 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     setOnboardingFormData(newOnboardingFormData);
     switch (institutionType) {
       case 'GSP':
-        setActiveStep(activeStep + 2);
+        if(productId === PRODUCT_IDS.PAGOPA) {
+          setActiveStep(activeStep + 2);
+        } else {
+          setActiveStep(activeStep + 3);
+        }
         break;
       case 'GPU':
         setActiveStep(activeStep + 1);
