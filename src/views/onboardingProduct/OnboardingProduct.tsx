@@ -280,13 +280,6 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
         (onboardingStatus as AxiosError<any>).response?.status === 400
       ) {
         setOutcome(null);
-        if (isTechPartner) {
-          setActiveStep(activeStep + 3);
-        } else if (productId === PRODUCT_IDS.PAGOPA && institutionType === 'GSP') {
-          forward();
-        } else {
-          setActiveStep(activeStep + 2);
-        }
       } else if ((onboardingStatus as AxiosError<any>).response?.status === 403) {
         setOutcome(notAllowedError);
       } else {
@@ -368,14 +361,17 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     trackEvent('ONBOARDING_BILLING_DATA', trackingData);
     setOnboardingFormData(newOnboardingFormData);
     switch (institutionType) {
-      case 'PA':
-        setActiveStep(activeStep + 3);
+      case 'GSP':
+        setActiveStep(activeStep + 2);
         break;
       case 'GPU':
-        setActiveStep(3);
+        setActiveStep(activeStep + 1);
+        break;
+      case 'PT':
+        setActiveStep(activeStep + 4);
         break;
       default:
-        forward();
+        setActiveStep(activeStep + 3);
         break;
     }
   };
@@ -886,10 +882,19 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
             forwardWithData(newFormData);
           },
           back: () => {
-            if (productId === PRODUCT_IDS.PAGOPA && institutionType === 'GSP') {
-              back();
-            } else {
-              setActiveStep(activeStep - 3);
+            switch (institutionType) {
+              case 'GSP':
+                setActiveStep(activeStep - 1);
+                break;
+              case 'GPU':
+                setActiveStep(activeStep - 2);
+                break;
+              case 'PT':
+                setActiveStep(activeStep - 4);
+                break;
+              default:
+                setActiveStep(activeStep - 3);
+                break;
             }
           },
         }),
