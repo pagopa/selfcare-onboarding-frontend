@@ -1,5 +1,5 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react';
-import React from 'react';
+import '@testing-library/jest-dom';
 import { nationalValue } from '../../../../model/GeographicTaxonomies';
 import { renderComponentWithProviders } from '../../../../utils/test-utils';
 import GeoTaxonomySection from '../GeoTaxonomySection';
@@ -72,7 +72,7 @@ test('should render GeoTaxonomySection with mocked retrievedTaxonomies and click
 
   const radioLocal = screen.getByLabelText('Locale');
   fireEvent.click(radioLocal);
-  expect(radioLocal).toBeChecked();
+  expect(radioLocal).toHaveProperty('checked', true);
 
   const selectArea = screen.getAllByLabelText('Comune, Provincia o Regione') as HTMLSelectElement[];
   const clearButton = screen.getByLabelText('Clear');
@@ -97,6 +97,11 @@ test('should render GeoTaxonomySection with mocked retrievedTaxonomies and click
   });
 
   await waitFor(() => {
+    selectAndVerifyArea('Emilia', 'Emilia - Romagna', 'Emilia - Romagna');
+    fireEvent.click(clearButton);
+  });
+
+  await waitFor(() => {
     selectAndVerifyArea("l'A", "l'Aquila (AQ) comune", "l'Aquila (AQ)");
   });
 });
@@ -116,7 +121,7 @@ test('should render GeoTaxonomySection with mocked retrievedTaxonomies and click
   // Simulate a click on the radio button
   fireEvent.click(radioNational);
 
-  expect(radioNational).toBeChecked();
+  expect(radioNational).toHaveProperty('checked', true);
 });
 
 test('should render GeoTaxonomySection with mocked retrievedTaxonomies and code !== ITA', async () => {
