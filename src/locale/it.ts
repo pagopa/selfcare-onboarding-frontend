@@ -153,7 +153,8 @@ export default {
       merchantAtecoValid:
         'Se fai parte di una catena di negozi, l’adesione deve essere fatta dalla società capogruppo.',
       merchantAtecoNotValid:
-        'Il codice ATECO al quale sei abilitato non corrisponde con quelli idonei al Bonus Elettrodomestici',
+        'Il codice ATECO inserito non è ammesso per l’adesione al portale',
+      merchantCompanyStatusDisabled: 'La tua società non può aderire al portale perché risulta cessata o in liquidazione',
       asyncAutocomplete: {
         placeholder: 'Cerca',
       },

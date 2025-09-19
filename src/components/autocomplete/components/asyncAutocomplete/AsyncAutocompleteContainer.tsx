@@ -57,6 +57,7 @@ type Props = {
   setMerchantSearchResult?: Dispatch<SetStateAction<PartyData | undefined>>;
   setApiLoading?: Dispatch<SetStateAction<boolean>>;
   apiLoading?: boolean;
+  disabledStatusCompany?: boolean;
 };
 
 // TODO: handle cognitive-complexity
@@ -94,6 +95,7 @@ export default function AsyncAutocompleteContainer({
   setMerchantSearchResult,
   setApiLoading,
   apiLoading,
+  disabledStatusCompany,
 }: Props) {
   const { setRequiredLogin } = useContext(UserContext);
   const { t } = useTranslation();
@@ -204,7 +206,9 @@ export default function AsyncAutocompleteContainer({
 
       if (product?.id === PRODUCT_IDS.IDPAY_MERCHANT) {
         setMerchantSearchResult?.(response);
-        if (filterCategories && response?.atecoCodes && Array.isArray(response.atecoCodes)) {
+        if (disabledStatusCompany) {
+          setDisabled(true);
+        } else if (filterCategories && response?.atecoCodes && Array.isArray(response.atecoCodes)) {
           const whitelistCodes = filterCategories.split(',');
           const hasMatchingCode = response.atecoCodes.some((code: string) =>
             whitelistCodes.includes(code)
@@ -269,7 +273,9 @@ export default function AsyncAutocompleteContainer({
 
       if (product?.id === PRODUCT_IDS.IDPAY_MERCHANT) {
         setMerchantSearchResult?.(response);
-        if (filterCategories && response.atecoCodes && Array.isArray(response.atecoCodes)) {
+        if (disabledStatusCompany) {
+          setDisabled(true);
+        } else if (filterCategories && response.atecoCodes && Array.isArray(response.atecoCodes)) {
           const whitelistCodes = filterCategories.split(',');
           const hasMatchingCode = response.atecoCodes.some((code: string) =>
             whitelistCodes.includes(code)

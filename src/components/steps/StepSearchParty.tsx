@@ -1,17 +1,9 @@
-import {
-  Alert,
-  AlertTitle,
-  FormControlLabel,
-  Grid,
-  Link,
-  Typography,
-  useTheme,
-} from '@mui/material';
+import { Alert, FormControlLabel, Grid, Link, Typography, useTheme } from '@mui/material';
 import Checkbox from '@mui/material/Checkbox';
 import { Box } from '@mui/system';
 import { SessionModal } from '@pagopa/selfcare-common-frontend/lib';
 import { AxiosError, AxiosResponse } from 'axios';
-import { ReactElement, useContext, useEffect, useState } from 'react';
+import { ReactElement, useContext, useEffect, useMemo, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { InstitutionType, PartyData, Product, StepperStepComponentProps } from '../../../types';
 import { fetchWithLogs } from '../../lib/api-utils';
@@ -97,12 +89,21 @@ export function StepSearchParty({
     'uoSelected_step1',
     undefined
   );
-  const [merchantSearchResult, setMerchantSearchResult] = useState();
+  const [merchantSearchResult, setMerchantSearchResult] = useState<any>();
   const [ecData, setEcData] = useState<PartyData | null>(null);
   const [filterCategories, setFilterCategories] = useState<string>();
   const isEnabledProduct2AooUo = product?.id === PRODUCT_IDS.SEND;
   const [isPresentInAtecoWhiteList, setIsPresentInAtecoWhiteList] = useState<boolean>(
     product?.id === PRODUCT_IDS.IDPAY_MERCHANT ? true : false
+  );
+
+  const disabledStatusCompany = useMemo(
+    () =>
+      merchantSearchResult?.statusCompanyRI !== undefined ||
+      merchantSearchResult?.disabledStateInstitution !== undefined ||
+      merchantSearchResult?.descriptionStateInstitution !== undefined ||
+      merchantSearchResult?.statusCompanyRD !== undefined,
+    [merchantSearchResult]
   );
   const getECDataByCF = async (query: string) => {
     setApiLoading(true);
@@ -245,14 +246,24 @@ export function StepSearchParty({
   useEffect(() => {
     if (product?.id === PRODUCT_IDS.IDPAY_MERCHANT) {
       if (merchantSearchResult) {
-        setDisabled(!(selected && isPresentInAtecoWhiteList));
+        if (disabledStatusCompany) {
+          setDisabled(true);
+        } else {
+          setDisabled(!(selected && isPresentInAtecoWhiteList));
+        }
       } else {
         setDisabled(!selected);
       }
     } else {
       setDisabled(!selected);
     }
-  }, [selected, isPresentInAtecoWhiteList, merchantSearchResult, product?.id]);
+  }, [
+    selected,
+    isPresentInAtecoWhiteList,
+    merchantSearchResult,
+    product?.id,
+    disabledStatusCompany,
+  ]);
 
   const onForwardAction = () => {
     const dataParty = aooResult || uoResult ? ({ ...selected, ...ecData } as PartyData) : selected;
@@ -272,6 +283,22 @@ export function StepSearchParty({
   };
 
   const canAggregateProductList = ENV.AGGREGATOR.ELIGIBLE_PRODUCTS.split(',');
+
+  const alertMerchantAtecoNotValid = () => (
+    <Alert severity="error" sx={{ width: '100%' }}>
+      <Typography sx={{ fontSize: '16px', a: { color: theme.palette.text.primary } }}>
+        {t('onboardingStep1.onboarding.merchantAtecoNotValid')}
+      </Typography>
+    </Alert>
+  );
+
+  const alertMerchantAtecoValid = () => (
+    <Alert severity="info" sx={{ width: '100%' }}>
+      <Typography sx={{ fontSize: '16px', a: { color: theme.palette.text.primary } }}>
+        {t('onboardingStep1.onboarding.merchantAtecoValid')}
+      </Typography>
+    </Alert>
+  );
 
   return loading ? (
     <LoadingOverlay loadingText={t('onboardingStep1.loadingOverlayText')} />
@@ -405,32 +432,21 @@ export function StepSearchParty({
               <Grid item xs={8}>
                 <Box display="flex" justifyContent="center" mb={5}>
                   {merchantSearchResult ? (
-                    isPresentInAtecoWhiteList ? (
-                      <Alert severity="info" sx={{ width: '100%' }}>
-                        <Typography
-                          sx={{ fontSize: '16px', a: { color: theme.palette.text.primary } }}
-                        >
-                          {t('onboardingStep1.onboarding.merchantAtecoValid')}
-                        </Typography>
-                      </Alert>
-                    ) : (
+                    disabledStatusCompany ? (
                       <Alert severity="error" sx={{ width: '100%' }}>
-                        <AlertTitle>Il tuo codice ATECO non è idoneo</AlertTitle>
                         <Typography
                           sx={{ fontSize: '16px', a: { color: theme.palette.text.primary } }}
                         >
-                          {t('onboardingStep1.onboarding.merchantAtecoNotValid')}
+                          {t('onboardingStep1.onboarding.merchantCompanyStatusDisabled')}
                         </Typography>
                       </Alert>
+                    ) : isPresentInAtecoWhiteList ? (
+                      alertMerchantAtecoValid()
+                    ) : (
+                      alertMerchantAtecoNotValid()
                     )
                   ) : (
-                    <Alert severity="info" sx={{ width: '100%' }}>
-                      <Typography
-                        sx={{ fontSize: '16px', a: { color: theme.palette.text.primary } }}
-                      >
-                        {t('onboardingStep1.onboarding.merchantAtecoValid')}
-                      </Typography>
-                    </Alert>
+                    alertMerchantAtecoValid()
                   )}
                 </Box>
               </Grid>
@@ -479,6 +495,7 @@ export function StepSearchParty({
               filterCategories={filterCategories}
               setIsPresentInAtecoWhiteList={setIsPresentInAtecoWhiteList}
               setMerchantSearchResult={setMerchantSearchResult}
+              disabledStatusCompany={disabledStatusCompany}
             />
           </Grid>
           {ENV.AGGREGATOR.SHOW_AGGREGATOR &&
