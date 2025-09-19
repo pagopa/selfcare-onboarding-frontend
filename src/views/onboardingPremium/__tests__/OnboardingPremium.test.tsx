@@ -40,7 +40,7 @@ jest.mock('react-router-dom', () => ({
   useHistory: () => ({
     push: mockedHistoryPush,
     location: mockedLocation,
-    replace: (nextLocation) => Object.assign(mockedLocation, nextLocation),
+    replace: (nextLocation: any) => Object.assign(mockedLocation, nextLocation),
   }),
 }));
 

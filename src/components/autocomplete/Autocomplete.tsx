@@ -34,6 +34,7 @@ type AutocompleteProps = {
   filterCategories?: string;
   setIsPresentInAtecoWhiteList?: Dispatch<SetStateAction<boolean>>;
   setMerchantSearchResult?: Dispatch<SetStateAction<any>>;
+  disabledStatusCompany?: boolean;
 };
 
 export function Autocomplete({
@@ -59,6 +60,7 @@ export function Autocomplete({
   filterCategories,
   setIsPresentInAtecoWhiteList,
   setMerchantSearchResult,
+  disabledStatusCompany
 }: AutocompleteProps) {
   const { t } = useTranslation();
   const [options, setOptions] = useState<Array<InstitutionResource>>([]);
@@ -177,6 +179,7 @@ export function Autocomplete({
           setMerchantSearchResult={setMerchantSearchResult}
           setApiLoading={setApiLoading}
           apiLoading={apiLoading}
+          disabledStatusCompany={disabledStatusCompany}
         />
       </Grid>
     </Paper>
