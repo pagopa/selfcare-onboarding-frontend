@@ -1429,6 +1429,23 @@ export const mockedPdndVisuraInfomacere: Array<PDNDBusinessResource> = [
     atecoCodes: ['43.22.80'],
     nRea: 'BG-299990',
   },
+  {
+    businessTaxId: "FRSMRA70D30G786G",
+    businessName: "FORVIAGGI DI FORASTIERO MARIO",
+    cciaa: "MT",
+    nRea: "203594",
+    vatNumber: "01366490777",
+    legalForm: "IMPRESA INDIVIDUALE",
+    city: "SAN GIORGIO LUCANO",
+    county: "MT",
+    zipCode: "75027",
+    address: "VIA CONFALONIERI, 3",
+    digitalAddress: "M.FORASTIERO@PEC.LIBERO.IT",
+    atecoCodes: [],
+    disabledStateInstitution: "I",
+    descriptionStateInstitution: "Impresa INATTIVA",
+    statusCompanyRI: "CANCELLATA",
+  }
 ];
 
 const noContent: Promise<AxiosResponse> = new Promise((resolve) =>

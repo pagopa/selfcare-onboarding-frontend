@@ -1,10 +1,10 @@
 export type PDNDBusinessResource = {
   businessTaxId: string;
   businessName: string;
-  legalNature: string;
-  legalNatureDescription: string;
+  legalNature?: string;
+  legalNatureDescription?: string;
   cciaa: string;
-  businessStatus: string;
+  businessStatus?: string;
   vatNumber: string;
   city: string;
   county: string;
@@ -12,6 +12,10 @@ export type PDNDBusinessResource = {
   address: string;
   digitalAddress: string;
   atecoCodes: Array<string>;
-  legalForm: string;
+  legalForm?: string;
   nRea: string;
+  disabledStateInstitution?: string;
+  descriptionStateInstitution?: string;
+  statusCompanyRI?: string;
+  statusCompanyRD?: string;
 };

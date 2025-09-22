@@ -935,7 +935,7 @@ const executeStepSearchParty = async (
       if (typeOfSearch === personalTaxCode) {
         expect(
           screen.getByText(
-            'se l’esercente fa parte di una catena è la società padre a dover aderire'
+            'Se fai parte di una catena di negozi, l’adesione deve essere fatta dalla società capogruppo.'
           )
         ).toBeInTheDocument();
 
@@ -947,7 +947,15 @@ const executeStepSearchParty = async (
 
         expect(
           screen.getByText(
-            'Il codice ATECO al quale sei abilitato non corrisponde con quelli idonei al Bonus Elettrodomestici'
+            'Il codice ATECO inserito non è ammesso per l’adesione al portale'
+          )
+        ).toBeInTheDocument();
+
+        fireEvent.change(inputPartyName, { target: { value: 'FRSMRA70D30G786G' } });
+
+        expect(
+          screen.getByText(
+            'La tua società non può aderire al portale perché risulta cessata o in liquidazione'
           )
         ).toBeInTheDocument();
 
