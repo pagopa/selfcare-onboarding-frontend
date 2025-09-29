@@ -889,7 +889,11 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           back: () => {
             switch (institutionType) {
               case 'GSP':
-                setActiveStep(activeStep - 1);
+                if(origin === 'IPA' && selectedProduct?.id === PRODUCT_IDS.INTEROP) {
+                  setActiveStep(activeStep - 3);
+                } else {
+                  setActiveStep(activeStep - 1);
+                }
                 break;
               case 'GPU':
                 setActiveStep(activeStep - 2);
