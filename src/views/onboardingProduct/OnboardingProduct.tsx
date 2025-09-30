@@ -218,12 +218,12 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
   }, []);
 
   const selectFilterCategories = () => {
-    if (productId === 'prod-pn') {
+    if (productId === PRODUCT_IDS.SEND) {
       return filterCategoriesResponse?.product['prod-pn']?.ipa.PA;
-    } else if (productId === 'prod-idpay-merchant') {
+    } else if (productId === PRODUCT_IDS.IDPAY_MERCHANT) {
       return filterCategoriesResponse?.product['prod-idpay-merchant']?.merchantDetails?.atecoCodes;
     } else if (institutionType === 'GSP') {
-      if (selectedProduct?.id === PRODUCT_IDS.INTEROP) {
+      if (productId === PRODUCT_IDS.INTEROP) {
         return filterCategoriesResponse?.product['prod-interop']?.ipa.GSP;
       } else {
         return filterCategoriesResponse?.product.default.ipa.GSP;
