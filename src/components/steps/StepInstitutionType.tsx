@@ -1,4 +1,5 @@
 import {
+  Alert,
   FormControl,
   FormControlLabel,
   Grid,
@@ -18,7 +19,11 @@ import {
 } from '../../../types';
 import { OnboardingStepActions } from '../OnboardingStepActions';
 import { useHistoryState } from '../useHistoryState';
-import { description4InstitutionType, institutionType4Product } from '../../utils/constants';
+import {
+  description4InstitutionType,
+  institutionType4Product,
+  PRODUCT_IDS,
+} from '../../utils/constants';
 
 type Props = StepperStepComponentProps & {
   institutionType: InstitutionType;
@@ -73,6 +78,18 @@ export default function StepInstitutionType({
           </Trans>
         </Typography>
       </Grid>
+      {selectedProduct?.id === PRODUCT_IDS.INTEROP && (
+        <Grid item display="flex" justifyContent="center" pb={4}>
+          <Alert severity="info" sx={{ width: '100%' }}>
+            <Typography sx={{ fontSize: '16px', a: { color: theme.palette.text.primary } }}>
+              Le Società in conto economico consolidato che si classificano in IPA con categoria
+              <br />
+              &#39;Gestori di Servizi Pubblici&#39; possono aderire selezionando la voce
+              corrispondente
+            </Typography>
+          </Alert>
+        </Grid>
+      )}
       <Paper
         elevation={8}
         sx={{ borderRadius: theme.spacing(2), p: 1, width: '580px', height: '100%' }}
