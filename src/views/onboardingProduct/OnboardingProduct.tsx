@@ -218,12 +218,16 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
   }, []);
 
   const selectFilterCategories = () => {
-    if (productId === 'prod-pn') {
+    if (productId === PRODUCT_IDS.SEND) {
       return filterCategoriesResponse?.product['prod-pn']?.ipa.PA;
-    } else if (productId === 'prod-idpay-merchant') {
+    } else if (productId === PRODUCT_IDS.IDPAY_MERCHANT) {
       return filterCategoriesResponse?.product['prod-idpay-merchant']?.merchantDetails?.atecoCodes;
     } else if (institutionType === 'GSP') {
-      return filterCategoriesResponse?.product.default.ipa.GSP;
+      if (productId === PRODUCT_IDS.INTEROP) {
+        return filterCategoriesResponse?.product['prod-interop']?.ipa.GSP;
+      } else {
+        return filterCategoriesResponse?.product.default.ipa.GSP;
+      }
     } else {
       return filterCategoriesResponse?.product.default.ipa.PA;
     }
@@ -362,7 +366,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     setOnboardingFormData(newOnboardingFormData);
     switch (institutionType) {
       case 'GSP':
-        if(productId === PRODUCT_IDS.PAGOPA) {
+        if (productId === PRODUCT_IDS.PAGOPA) {
           setActiveStep(activeStep + 2);
         } else {
           setActiveStep(activeStep + 3);
@@ -889,7 +893,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           back: () => {
             switch (institutionType) {
               case 'GSP':
-                if(origin === 'IPA' && selectedProduct?.id === PRODUCT_IDS.INTEROP) {
+                if (origin === 'IPA' && selectedProduct?.id === PRODUCT_IDS.INTEROP) {
                   setActiveStep(activeStep - 3);
                 } else {
                   setActiveStep(activeStep - 1);
