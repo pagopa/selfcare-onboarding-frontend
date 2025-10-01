@@ -152,9 +152,9 @@ export default {
         'Inserisci uno dei dati richiesti per cercare su InfoCamere l’ente <3/> per cui vuoi richiedere l’adesione a <5>{{productName}}.</5>',
       merchantAtecoValid:
         'Se fai parte di una catena di negozi, l’adesione deve essere fatta dalla società capogruppo.',
-      merchantAtecoNotValid:
-        'Il codice ATECO inserito non è ammesso per l’adesione al portale',
-      merchantCompanyStatusDisabled: 'La tua società non può aderire al portale perché risulta cessata o in liquidazione',
+      merchantAtecoNotValid: 'Il codice ATECO inserito non è ammesso per l’adesione al portale',
+      merchantCompanyStatusDisabled:
+        'La tua società non può aderire al portale perché risulta cessata o in liquidazione',
       asyncAutocomplete: {
         placeholder: 'Cerca',
       },
@@ -631,6 +631,9 @@ export default {
       gsp: {
         title: 'Gestore di servizi pubblici',
         description: 'art. 2, comma 2, lettera B del CAD',
+      },
+      scec: {
+        title: 'Società in conto economico consolidato',
       },
       gpu: {
         title: 'Gestore di pubblica utilità e/o di interesse generale',
