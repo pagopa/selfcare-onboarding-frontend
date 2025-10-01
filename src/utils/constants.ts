@@ -249,6 +249,7 @@ export const institutionTypes: Array<{ labelKey: string; value: InstitutionType 
     prv -> "Enti Privati" (prod-interop), oth -> "Altro" (prod-pagopa) */
   { labelKey: 'oth', value: 'PRV' },
   { labelKey: 'gpu', value: 'GPU' },
+  { labelKey: 'scec', value: 'SCEC' },
 ];
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
@@ -259,10 +260,11 @@ export const institutionType4Product = (productId: string | undefined) => {
         (it) =>
           it.labelKey === 'pa' ||
           it.labelKey === 'gsp' ||
+          it.labelKey === 'scec' ||
           it.labelKey === 'sa' ||
           (ENV.SCP_INFOCAMERE.SHOW && it.labelKey === 'scp') ||
           it.labelKey === 'as' ||
-          (ENV.PRV.SHOW && it.labelKey === 'prv')
+          (ENV.PRV.SHOW && it.labelKey === 'prv') 
       );
     case PRODUCT_IDS.SEND:
       return institutionTypes.filter((it) => it.labelKey === 'pa');
