@@ -222,12 +222,10 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
       return filterCategoriesResponse?.product['prod-pn']?.ipa.PA;
     } else if (productId === PRODUCT_IDS.IDPAY_MERCHANT) {
       return filterCategoriesResponse?.product['prod-idpay-merchant']?.merchantDetails?.atecoCodes;
+    } else if (productId === PRODUCT_IDS.INTEROP && institutionType === 'SCEC') {
+      return filterCategoriesResponse?.product['prod-interop']?.ipa.SCEC;
     } else if (institutionType === 'GSP') {
-      if (productId === PRODUCT_IDS.INTEROP) {
-        return filterCategoriesResponse?.product['prod-interop']?.ipa.GSP;
-      } else {
-        return filterCategoriesResponse?.product.default.ipa.GSP;
-      }
+      return filterCategoriesResponse?.product.default.ipa.GSP;
     } else {
       return filterCategoriesResponse?.product.default.ipa.PA;
     }
@@ -706,8 +704,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
       newInstitutionType !== 'SA' &&
       newInstitutionType !== 'AS' &&
       newInstitutionType !== 'SCP' &&
-      newInstitutionType !== 'PRV' &&
-      newInstitutionType !== 'SCEC'
+      newInstitutionType !== 'PRV'
     ) {
       if (newInstitutionType !== institutionType) {
         setOnboardingFormData({
