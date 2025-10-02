@@ -368,7 +368,7 @@ export default function GeoTaxonomySection({
                     onChange={(event: any, value: any) => handleChange(event, value, i)}
                     value={geoTaxFormat(geotaxonomiesHistory[i] ?? val, 'value')}
                     renderOption={(props, option) => (
-                      <span {...props}>{geoTaxFormat(option, 'desc')}</span>
+                      <li {...props}>{geoTaxFormat(option, 'desc')}</li>
                     )}
                     renderInput={(params) => (
                       <TextField
