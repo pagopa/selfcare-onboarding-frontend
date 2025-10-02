@@ -4,10 +4,9 @@ import {
   stepInstitutionType,
   stepFormData,
   PRODUCT_IDS_TEST_E2E,
-  stepAdditionalInformation,
   stepAddManager,
   stepAddAdmin,
-  stepSelectPartyByCF,
+  stepSelectParty,
 } from '../utils/test-utils';
 
 test('Test Success onboarding request for product prod-interop and institutionType SCEC', async ({
@@ -15,9 +14,8 @@ test('Test Success onboarding request for product prod-interop and institutionTy
 }) => {
   await page.goto(`${BASE_URL_ONBOARDING}/prod-interop`);
   await stepInstitutionType(page, 'Società in conto economico consolidato');
-  await stepSelectPartyByCF(page, '04570621005');
-  await stepFormData(page, PRODUCT_IDS_TEST_E2E.PAGOPA, 'GSP');
-  await stepAdditionalInformation(page);
+  await stepSelectParty(page, undefined, 'Comune di Genoni');
+  await stepFormData(page, PRODUCT_IDS_TEST_E2E.INTEROP, 'SCEC');
   await stepAddManager(page);
   await stepAddAdmin(page);
 });
