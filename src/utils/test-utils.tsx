@@ -685,7 +685,6 @@ export const verifySubmit = async (
                 institutionCourtMeasures: true,
               }
             : undefined,
-        soleTrader: isPrivateMerchant && typeOfSearch === 'personalTaxCode' ? true : undefined,
         companyInformations:
           ((from === 'ANAC' ||
             from === 'INFOCAMERE' ||
