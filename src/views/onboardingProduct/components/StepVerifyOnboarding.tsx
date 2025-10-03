@@ -21,7 +21,6 @@ import { MessageNoAction } from '../../../components/MessageNoAction';
 import UserNotAllowedPage from '../../UserNotAllowedPage';
 import AlreadyOnboarded from '../../AlreadyOnboarded';
 import { OnboardingFormData } from '../../../model/OnboardingFormData';
-import { fiscalCodeRegexp, PRODUCT_IDS } from '../../../utils/constants';
 
 type Props = StepperStepComponentProps & {
   externalInstitutionId: string;
