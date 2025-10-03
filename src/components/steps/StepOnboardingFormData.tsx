@@ -525,16 +525,6 @@ export default function StepOnboardingFormData({
     }
   }, [countries]);
 
-  useEffect(() => {
-    if (
-      isPrivateMerchant &&
-      formik.values.taxCode &&
-      fiscalCodeRegexp.test(formik.values.taxCode)
-    ) {
-      void formik.setFieldValue('soleTrader', true);
-    }
-  }, [formik.values.taxCode]);
-
   const baseTextFieldProps = (
     field: keyof OnboardingFormData,
     label: string,
