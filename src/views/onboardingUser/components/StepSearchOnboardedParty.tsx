@@ -147,6 +147,16 @@ function StepSearchOnboardedParty({ institutionType, selectedProduct, forward, b
             setDisabled={setDisabled}
             setIsSearchFieldSelected={() => {}}
             selectedProduct={selectedProduct}
+            selections={{
+              businessName: false,
+              aooCode: false,
+              uoCode: false,
+              reaCode: false,
+              taxCode: false,
+              personalTaxCode: false,
+              ivassCode: false,
+            }}
+            setSelections={() => {}}
           />
         </Grid>
         <Grid item xs={12} mt={2} mb={5}>

@@ -577,7 +577,7 @@ test('Test: Successfull complete onboarding request of PRV party for prod-idpay-
     undefined,
     'MI-123456'
   );
-  await executeStepBillingData(PRODUCT_IDS.IDPAY_MERCHANT, 'PRV', false, false, 'SELC');
+  await executeStepBillingData(PRODUCT_IDS.IDPAY_MERCHANT, 'PRV', false, false, 'PDND_INFOCAMERE');
   await executeStepAddManager(false);
   await executeStepAddAdmin(true, false, false, false, false);
   await verifySubmit(
@@ -592,7 +592,7 @@ test('Test: Successfull complete onboarding request of PRV party for prod-idpay-
   await executeGoHome(mockedLocation);
 });
 
-test('Test: Successfull complete onboarding request of PRV party for prod-idpay-merchant search by personalTaxCode', async () => {
+test('Test: Successfull complete onboarding request of PRV_PF party for prod-idpay-merchant search by personalTaxCode', async () => {
   renderComponent(PRODUCT_IDS.IDPAY_MERCHANT);
   await executeStepInstitutionType(PRODUCT_IDS.IDPAY_MERCHANT, 'PRV');
   await executeStepSearchParty(
@@ -608,7 +608,7 @@ test('Test: Successfull complete onboarding request of PRV party for prod-idpay-
   );
   await executeStepBillingData(
     PRODUCT_IDS.IDPAY_MERCHANT,
-    'PRV',
+    'PRV_PF',
     false,
     false,
     'PDND_INFOCAMERE',
@@ -621,7 +621,7 @@ test('Test: Successfull complete onboarding request of PRV party for prod-idpay-
   await executeStepAddAdmin(true, false, false, false, false);
   await verifySubmit(
     PRODUCT_IDS.IDPAY_MERCHANT,
-    'PRV',
+    'PRV_PF',
     fetchWithLogsSpy,
     'PDND_INFOCAMERE',
     false,
@@ -946,9 +946,7 @@ const executeStepSearchParty = async (
         fireEvent.change(inputPartyName, { target: { value: 'RSSLCU80A01F205N' } });
 
         expect(
-          screen.getByText(
-            'Il codice ATECO inserito non è ammesso per l’adesione al portale'
-          )
+          screen.getByText('Il codice ATECO inserito non è ammesso per l’adesione al portale')
         ).toBeInTheDocument();
 
         fireEvent.change(inputPartyName, { target: { value: 'FRSMRA70D30G786G' } });
@@ -1124,6 +1122,8 @@ const executeStepBillingData = async (
   await waitFor(() => screen.getByText('Inserisci i dati dell’ente'));
 
   const isPrivateMerchant = institutionType === 'PRV' && productId === PRODUCT_IDS.IDPAY_MERCHANT;
+  const isPrivateMerchantPF =
+    institutionType === 'PRV_PF' && productId === PRODUCT_IDS.IDPAY_MERCHANT;
   const isInvoicable = canInvoice(institutionType.toUpperCase(), productId);
 
   await fillUserBillingDataForm(
@@ -1153,7 +1153,7 @@ const executeStepBillingData = async (
 
   const confirmButton = screen.getByRole('button', { name: 'Continua' });
 
-  if (isPrivateMerchant) {
+  if (isPrivateMerchant || isPrivateMerchantPF) {
     expect(document.getElementById('recipientCode')).not.toBeInTheDocument();
     expect(document.getElementById('taxCodeInvoicing')).not.toBeInTheDocument();
     expect(document.getElementById('supportEmail')).not.toBeInTheDocument();

@@ -43,7 +43,7 @@ const mockFormik = {
 
 (useFormik as jest.Mock).mockReturnValue(mockFormik);
 
-const formik = {
+const formik: any = {
   values: {
     businessName: '',
     zipCode: '12345',
@@ -92,9 +92,9 @@ const mockBaseTextFieldProps = (
 
 test('Test: Rendered PersonalAndBillingDataSection component with all possible business cases', () => {
   let componentRendered = false;
-  const conditionsMap = {};
-  let onboardingFormData;
-  let productId;
+  const conditionsMap = {} as any;
+  let onboardingFormData: any;
+  let productId: string;
 
   mockedProducts.forEach((product) => {
     institutionTypes.forEach((institutionType) => {
@@ -134,6 +134,7 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
         const isPrivateParty = productId === PRODUCT_IDS.INTEROP && institutionType === 'PRV';
         const isPdndPrivate = productId === PRODUCT_IDS.INTEROP && institutionType === 'PRV';
         const isPrivateMerchant = productId === PRODUCT_IDS.IDPAY_MERCHANT && institutionType === 'PRV';
+        const isPrivateMerchantPF = productId === PRODUCT_IDS.IDPAY_MERCHANT && institutionType === 'PRV_PF';
 
         conditionsMap[`${productId}-${institutionType}`] = {
           isPremium,
@@ -143,7 +144,8 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
           institutionAvoidGeotax,
           isInsuranceCompany,
           isPrivateParty,
-          isPrivateMerchant
+          isPrivateMerchant,
+          isPrivateMerchantPF
         };
 
         renderComponentWithProviders(
@@ -171,6 +173,7 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
             countries={undefined}
             setCountries={jest.fn()}
             isPrivateMerchant={isPrivateMerchant}
+            isPrivateMerchantPF={isPrivateMerchantPF}
           />
         );
 
@@ -186,7 +189,8 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
       isForeignInsurance,
       institutionAvoidGeotax,
       isPrivateParty,
-      isPrivateMerchant
+      isPrivateMerchant,
+      isPrivateMerchantPF
     } = conditionsMap[key];
 
     const centralParty = screen.queryByText('Ente centrale');
@@ -293,7 +297,7 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
       expect(shareCapital).not.toBeInTheDocument();
     }
 
-    if(isPrivateMerchant) {
+    if(isPrivateMerchant || isPrivateMerchantPF) {
       expect(iban).toBeInTheDocument();
       expect(confirmIban).toBeInTheDocument();
       expect(holder).toBeInTheDocument();

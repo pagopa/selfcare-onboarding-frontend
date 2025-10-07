@@ -114,6 +114,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
   const isTechPartner = institutionType === 'PT';
 
   const institutionTypeByUrl = new URLSearchParams(window.location.search).get('institutionType');
+  const desiredOriginRef = useRef<string | undefined>();
 
   useEffect(() => {
     if (institutionTypeByUrl === 'PT' && productId === PRODUCT_IDS.PAGOPA) {
@@ -184,10 +185,28 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
   }, [productId]);
 
   useEffect(() => {
-    if (institutionType && (institutionType === 'PSP' || institutionType !== 'PA')) {
+    if (!institutionType) {
+      return;
+    }
+
+    if (desiredOriginRef.current) {
+      return;
+    }
+
+    const shouldPreserveOrigin =
+      (institutionType === 'PRV_PF' && productId === PRODUCT_IDS.IDPAY_MERCHANT) ||
+      (institutionType === 'PRV' &&
+        (productId === PRODUCT_IDS.IDPAY_MERCHANT || productId === PRODUCT_IDS.INTEROP)) ||
+      institutionType === 'SCP';
+
+    if (
+      institutionType &&
+      (institutionType === 'PSP' || institutionType !== 'PA') &&
+      !shouldPreserveOrigin
+    ) {
       setOrigin(undefined);
     }
-  }, [institutionType]);
+  }, [institutionType, productId]);
 
   // avoid step 1 if selectedProduct is 'prod-pn' or 'prod-idpay'
   useEffect(() => {
@@ -337,12 +356,21 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
       onboardingData.originId === undefined &&
       institutionType === 'GSP'
     ) {
+      // eslint-disable-next-line functional/immutable-data
+      desiredOriginRef.current = 'SELC';
       setOrigin('SELC');
       setActiveStep(activeStep + 3);
     } else {
       setOnboardingFormData(onboardingData);
       setExternalInstitutionId(onboardingData.externalId ?? '');
-      setOrigin(onboardingData.origin);
+      const originToSet = onboardingData.origin || origin;
+
+      if (originToSet) {
+        // eslint-disable-next-line functional/immutable-data
+        desiredOriginRef.current = originToSet;
+      }
+
+      setOrigin(originToSet);
       forwardWithData(onboardingData as Partial<FormData>);
       trackEvent('ONBOARDING_PARTY_SELECTION', {
         party_id: onboardingData?.externalId,
@@ -505,6 +533,8 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     aggregates?: Array<AggregateInstitution>
   ) => {
     setLoading(true);
+    console.log('institutionType', institutionType);
+    console.log('origin', origin);
     const postLegalsResponse = await fetchWithLogs(
       { endpoint: 'ONBOARDING_POST_LEGALS' },
       {
@@ -578,7 +608,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
               : institutionType === 'PSP' ||
                   institutionType === 'GPU' ||
                   institutionType === 'PT' ||
-                  (institutionType === 'PRV' &&
+                  ((institutionType === 'PRV' || institutionType === 'PRV_PF') &&
                     productId !== PRODUCT_IDS.INTEROP &&
                     productId !== PRODUCT_IDS.IDPAY_MERCHANT)
                 ? 'SELC'
@@ -767,6 +797,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           subunitTypeByQuery,
           subunitCodeByQuery,
           selectFilterCategories,
+          setInstitutionType,
           forward: forwardWithDataAndInstitution,
         }),
     },
@@ -841,7 +872,8 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
               (institutionType !== 'PA' &&
                 institutionType !== 'SA' &&
                 institutionType !== 'GSP' &&
-                institutionType !== 'PRV')
+                institutionType !== 'PRV' &&
+                institutionType !== 'PRV_PF')
             ) {
               setActiveStep(0);
             } else if (fromDashboard && productId === PRODUCT_IDS.DASHBOARD_PSP) {

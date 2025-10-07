@@ -264,7 +264,7 @@ export type InstitutionOnboardingInfoResource = {
   institution: InstitutionData;
 };
 
-export type InstitutionType = 'PA' | 'GSP' | 'SCP' | 'PT' | 'PSP' | 'SA' | 'AS' | 'PRV' | 'GPU' | 'SCEC';
+export type InstitutionType = 'PA' | 'GSP' | 'SCP' | 'PT' | 'PSP' | 'SA' | 'AS' | 'PRV' | 'GPU' | 'SCEC' | 'PRV_PF';
 
 export type ANACParty = {
   description: string;

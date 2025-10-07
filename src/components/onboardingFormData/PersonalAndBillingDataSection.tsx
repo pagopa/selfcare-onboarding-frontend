@@ -81,6 +81,7 @@ type Props = StepperStepComponentProps & {
   isForeignInsurance?: boolean;
   isPdndPrivate: boolean;
   isPrivateMerchant: boolean;
+  isPrivateMerchantPF: boolean;
   setInvalidTaxCodeInvoicing: React.Dispatch<React.SetStateAction<boolean>>;
   recipientCodeStatus?: string;
   getCountriesFromGeotaxonomies: (
@@ -111,6 +112,7 @@ export default function PersonalAndBillingDataSection({
   productId,
   isPdndPrivate,
   isPrivateMerchant,
+  isPrivateMerchantPF,
   setInvalidTaxCodeInvoicing,
   recipientCodeStatus,
   getCountriesFromGeotaxonomies,
@@ -773,7 +775,7 @@ export default function PersonalAndBillingDataSection({
             {formik.values.hasVatnumber &&
               (!isInsuranceCompany ||
                 (onboardingFormData?.taxCode && onboardingFormData?.taxCode !== '')) &&
-              !isPrivateMerchant && (
+              (!isPrivateMerchant || !isPrivateMerchantPF) && (
                 <Grid item>
                   <Box display="flex" alignItems="center">
                     <Checkbox
@@ -800,7 +802,7 @@ export default function PersonalAndBillingDataSection({
               )}
             {productId !== PRODUCT_IDS.FD &&
               productId !== PRODUCT_IDS.FD_GARANTITO &&
-              !isPrivateMerchant && (
+              (!isPrivateMerchant || !isPrivateMerchantPF) && (
                 <Grid item>
                   <Box
                     display="flex"
@@ -855,7 +857,12 @@ export default function PersonalAndBillingDataSection({
                     : theme.palette.text.primary
                 )}
                 value={formik.values.vatNumber}
-                disabled={stepHistoryState.isTaxCodeEquals2PIVA || isPremium || isPrivateMerchant}
+                disabled={
+                  stepHistoryState.isTaxCodeEquals2PIVA ||
+                  isPremium ||
+                  isPrivateMerchant ||
+                  isPrivateMerchantPF
+                }
                 onClick={() => setShrinkVatNumber(true)}
                 onBlur={() => setShrinkVatNumber(false)}
                 InputLabelProps={{
@@ -988,7 +995,8 @@ export default function PersonalAndBillingDataSection({
             productId === PRODUCT_IDS.PAGOPA ||
             productId === PRODUCT_IDS.IDPAY_MERCHANT) &&
             (institutionType === 'SCP' ||
-              institutionType === 'PRV' ||
+              institutionType === 'PRV' || 
+              institutionType === 'PRV_PF' ||
               institutionType === 'GPU'))) && (
           <>
             <Grid item xs={12}>
@@ -997,7 +1005,10 @@ export default function PersonalAndBillingDataSection({
                 paddingValue={isContractingAuthority ? '20px' : '24px'}
                 {...baseTextFieldProps(
                   'businessRegisterPlace',
-                  isContractingAuthority || isPdndPrivate || isPrivateMerchant
+                  isContractingAuthority ||
+                    isPdndPrivate ||
+                    isPrivateMerchant ||
+                    isPrivateMerchantPF
                     ? t(
                         'onboardingFormData.billingDataSection.informationCompanies.requiredCommercialRegisterNumber'
                       )
