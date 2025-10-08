@@ -559,7 +559,8 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
                 }
               : undefined,
           payment:
-            institutionType === 'PRV' && selectedProduct?.id === PRODUCT_IDS.IDPAY_MERCHANT
+            (institutionType === 'PRV' || institutionType === 'PRV_PF') &&
+            selectedProduct?.id === PRODUCT_IDS.IDPAY_MERCHANT
               ? {
                   holder: onboardingFormData?.holder,
                   iban: onboardingFormData?.iban,
