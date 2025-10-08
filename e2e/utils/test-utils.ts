@@ -36,13 +36,12 @@ export const stepSelectParty = async (page: Page, aggregator?: boolean, party?: 
 export const stepSelectPartyByCF = async (
   page: Page,
   cfParty: string,
-  isPrivateMerchant?: boolean,
-  isPrivateMerchantPF?: boolean
+  isPrivateMerchant?: boolean
 ) => {
   await page.click('#Parties');
   await page.fill('#Parties', cfParty, { timeout: 5000 });
 
-  if (isPrivateMerchant || isPrivateMerchantPF) {
+  if (isPrivateMerchant) {
     const businessTaxIdSelector = `[businesstaxid="${cfParty}"]`;
     await page.waitForSelector(businessTaxIdSelector, { state: 'visible', timeout: 10000 });
     await page.click(`${businessTaxIdSelector} [role="button"]`);

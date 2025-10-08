@@ -1121,9 +1121,9 @@ const executeStepBillingData = async (
   console.log('Testing step billing data..');
   await waitFor(() => screen.getByText('Inserisci i dati dell’ente'));
 
-  const isPrivateMerchant = institutionType === 'PRV' && productId === PRODUCT_IDS.IDPAY_MERCHANT;
-  const isPrivateMerchantPF =
-    institutionType === 'PRV_PF' && productId === PRODUCT_IDS.IDPAY_MERCHANT;
+  const isPrivateMerchant =
+    (institutionType === 'PRV' || institutionType === 'PRV_PF') &&
+    productId === PRODUCT_IDS.IDPAY_MERCHANT;
   const isInvoicable = canInvoice(institutionType.toUpperCase(), productId);
 
   await fillUserBillingDataForm(
@@ -1153,7 +1153,7 @@ const executeStepBillingData = async (
 
   const confirmButton = screen.getByRole('button', { name: 'Continua' });
 
-  if (isPrivateMerchant || isPrivateMerchantPF) {
+  if (isPrivateMerchant) {
     expect(document.getElementById('recipientCode')).not.toBeInTheDocument();
     expect(document.getElementById('taxCodeInvoicing')).not.toBeInTheDocument();
     expect(document.getElementById('supportEmail')).not.toBeInTheDocument();

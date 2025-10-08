@@ -1,21 +1,19 @@
+import i18n from '@pagopa/selfcare-common-frontend/lib/locale/locale-utils';
+import '@testing-library/jest-dom';
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { useFormik } from 'formik';
-import React from 'react';
-import { OnboardingFormData } from '../../../model/OnboardingFormData';
-import { renderComponentWithProviders } from '../../../utils/test-utils';
-import PersonalAndBillingDataSection from '../PersonalAndBillingDataSection';
 import {
   institutionTypes,
   mockPartyRegistry,
-  mockedProducts,
   mockedAoos,
-  mockedUos,
   mockedPartiesFromInfoCamere,
+  mockedProducts,
+  mockedUos,
 } from '../../../lib/__mocks__/mockApiRequests';
-import i18n from '@pagopa/selfcare-common-frontend/lib/locale/locale-utils';
-import '@testing-library/jest-dom';
+import { OnboardingFormData } from '../../../model/OnboardingFormData';
 import { PRODUCT_IDS } from '../../../utils/constants';
-import { InstitutionLocationData } from '../../../model/InstitutionLocationData';
+import { renderComponentWithProviders } from '../../../utils/test-utils';
+import PersonalAndBillingDataSection from '../PersonalAndBillingDataSection';
 
 jest.mock('formik', () => ({
   useFormik: jest.fn(),
@@ -133,8 +131,9 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
             productId === PRODUCT_IDS.INTEROP);
         const isPrivateParty = productId === PRODUCT_IDS.INTEROP && institutionType === 'PRV';
         const isPdndPrivate = productId === PRODUCT_IDS.INTEROP && institutionType === 'PRV';
-        const isPrivateMerchant = productId === PRODUCT_IDS.IDPAY_MERCHANT && institutionType === 'PRV';
-        const isPrivateMerchantPF = productId === PRODUCT_IDS.IDPAY_MERCHANT && institutionType === 'PRV_PF';
+        const isPrivateMerchant =
+          productId === PRODUCT_IDS.IDPAY_MERCHANT &&
+          (institutionType === 'PRV' || institutionType === 'PRV_PF');
 
         conditionsMap[`${productId}-${institutionType}`] = {
           isPremium,
@@ -145,7 +144,6 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
           isInsuranceCompany,
           isPrivateParty,
           isPrivateMerchant,
-          isPrivateMerchantPF
         };
 
         renderComponentWithProviders(
@@ -173,7 +171,6 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
             countries={undefined}
             setCountries={jest.fn()}
             isPrivateMerchant={isPrivateMerchant}
-            isPrivateMerchantPF={isPrivateMerchantPF}
           />
         );
 
@@ -190,7 +187,6 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
       institutionAvoidGeotax,
       isPrivateParty,
       isPrivateMerchant,
-      isPrivateMerchantPF
     } = conditionsMap[key];
 
     const centralParty = screen.queryByText('Ente centrale');
@@ -297,7 +293,7 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
       expect(shareCapital).not.toBeInTheDocument();
     }
 
-    if(isPrivateMerchant || isPrivateMerchantPF) {
+    if (isPrivateMerchant) {
       expect(iban).toBeInTheDocument();
       expect(confirmIban).toBeInTheDocument();
       expect(holder).toBeInTheDocument();

@@ -129,9 +129,9 @@ export default function StepOnboardingFormData({
   const isPremium = !!subProductId;
   const isPaymentServiceProvider = institutionType === 'PSP';
   const isPdndPrivate = institutionType === 'PRV' && productId === PRODUCT_IDS.INTEROP;
-  const isPrivateMerchant = institutionType === 'PRV' && productId === PRODUCT_IDS.IDPAY_MERCHANT;
-  const isPrivateMerchantPF =
-    institutionType === 'PRV_PF' && productId === PRODUCT_IDS.IDPAY_MERCHANT;
+  const isPrivateMerchant =
+    (institutionType === 'PRV' || institutionType === 'PRV_PF') &&
+    productId === PRODUCT_IDS.IDPAY_MERCHANT;
   const isInformationCompany =
     origin !== 'IPA' &&
     institutionType !== 'PRV' &&
@@ -329,7 +329,6 @@ export default function StepOnboardingFormData({
         invalidTaxCodeInvoicing,
         isPdndPrivate,
         isPrivateMerchant,
-        isPrivateMerchantPF,
         recipientCodeStatus,
         productId
       )
@@ -480,7 +479,7 @@ export default function StepOnboardingFormData({
       formik.values.taxCode === formik.values.vatNumber &&
       formik.values.taxCode &&
       formik.values.taxCode.length > 0 &&
-      (!isPrivateMerchant || !isPrivateMerchantPF)
+      !isPrivateMerchant
     ) {
       setStepHistoryState({
         ...stepHistoryState,
@@ -601,14 +600,13 @@ export default function StepOnboardingFormData({
           isInvoiceable={isInvoiceable}
           isPdndPrivate={isPdndPrivate}
           isPrivateMerchant={isPrivateMerchant}
-          isPrivateMerchantPF={isPrivateMerchantPF}
           setInvalidTaxCodeInvoicing={setInvalidTaxCodeInvoicing}
           recipientCodeStatus={recipientCodeStatus}
           getCountriesFromGeotaxonomies={getCountriesFromGeotaxonomies}
           countries={countries}
           setCountries={setCountries}
         />
-        {(isPrivateMerchant || isPrivateMerchantPF) && (
+        {isPrivateMerchant && (
           <IbanSection baseTextFieldProps={baseTextFieldProps} formik={formik} />
         )}
         {!institutionAvoidGeotax && subProductId !== PRODUCT_IDS.DASHBOARD_PSP && (

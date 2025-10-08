@@ -94,13 +94,8 @@ const validateCountry = (values: Partial<OnboardingFormData>, institutionType: I
   return undefined;
 };
 
-const validateIban = (
-  iban: string | undefined,
-  isPrivateMerchant: boolean,
-  isPrivateMerchantPF: boolean,
-  t: TFunction
-) => {
-  if ((isPrivateMerchant || isPrivateMerchantPF) && !iban) {
+const validateIban = (iban: string | undefined, isPrivateMerchant: boolean, t: TFunction) => {
+  if (isPrivateMerchant && !iban) {
     return requiredError;
   }
   if (iban?.length === IBAN_LENGTH && !ITALIAN_IBAN_REGEX.test(iban)) {
@@ -113,15 +108,14 @@ const validateConfirmIban = (
   confirmIban: string | undefined,
   originalIban: string | undefined,
   isPrivateMerchant: boolean,
-  isPrivateMerchantPF: boolean,
   t: TFunction
 ) => {
-  if ((isPrivateMerchant || isPrivateMerchantPF) && !confirmIban) {
+  if (isPrivateMerchant && !confirmIban) {
     return requiredError;
   }
 
   if (
-    (isPrivateMerchant || isPrivateMerchantPF) &&
+    isPrivateMerchant &&
     confirmIban &&
     confirmIban.length > 0 &&
     confirmIban.length < IBAN_LENGTH
@@ -228,12 +222,11 @@ export const validateFields = (
   invalidTaxCodeInvoicing: boolean,
   isPdndPrivate: boolean,
   isPrivateMerchant: boolean,
-  isPrivateMerchantPF: boolean,
   recipientCodeStatus?: string,
   productId?: string
 ) => {
-  const isRequiredForInfoCompany = isInformationCompany || isPdndPrivate || isPrivateMerchant || isPrivateMerchantPF;
-  const isRequiredForSaOrPrivate = institutionType === 'SA' || isPdndPrivate || isPrivateMerchant || isPrivateMerchantPF;
+  const isRequiredForInfoCompany = isInformationCompany || isPdndPrivate || isPrivateMerchant;
+  const isRequiredForSaOrPrivate = institutionType === 'SA' || isPdndPrivate || isPrivateMerchant;
   const validationRules = {
     businessName: validateConditionalRequired(values.businessName, true),
     registeredOffice: validateConditionalRequired(values.registeredOffice, true),
@@ -246,8 +239,8 @@ export const validateFields = (
     digitalAddress: validateEmail(values.digitalAddress, t),
     originId: validateConditionalRequired(values.originId, institutionType === 'AS'),
     holder: validateConditionalRequired(values.holder, isPrivateMerchant),
-    iban: validateIban(values.iban, isPrivateMerchant, isPrivateMerchantPF, t),
-    confirmIban: validateConfirmIban(values.confirmIban, values.iban, isPrivateMerchant, isPrivateMerchantPF, t),
+    iban: validateIban(values.iban, isPrivateMerchant, t),
+    confirmIban: validateConfirmIban(values.confirmIban, values.iban, isPrivateMerchant, t),
     businessRegisterPlace: validateConditionalRequired(
       values.businessRegisterPlace,
       isRequiredForSaOrPrivate

@@ -81,7 +81,6 @@ type Props = StepperStepComponentProps & {
   isForeignInsurance?: boolean;
   isPdndPrivate: boolean;
   isPrivateMerchant: boolean;
-  isPrivateMerchantPF: boolean;
   setInvalidTaxCodeInvoicing: React.Dispatch<React.SetStateAction<boolean>>;
   recipientCodeStatus?: string;
   getCountriesFromGeotaxonomies: (
@@ -112,7 +111,6 @@ export default function PersonalAndBillingDataSection({
   productId,
   isPdndPrivate,
   isPrivateMerchant,
-  isPrivateMerchantPF,
   setInvalidTaxCodeInvoicing,
   recipientCodeStatus,
   getCountriesFromGeotaxonomies,
@@ -775,7 +773,7 @@ export default function PersonalAndBillingDataSection({
             {formik.values.hasVatnumber &&
               (!isInsuranceCompany ||
                 (onboardingFormData?.taxCode && onboardingFormData?.taxCode !== '')) &&
-              (!isPrivateMerchant || !isPrivateMerchantPF) && (
+              !isPrivateMerchant && (
                 <Grid item>
                   <Box display="flex" alignItems="center">
                     <Checkbox
@@ -802,7 +800,7 @@ export default function PersonalAndBillingDataSection({
               )}
             {productId !== PRODUCT_IDS.FD &&
               productId !== PRODUCT_IDS.FD_GARANTITO &&
-              (!isPrivateMerchant || !isPrivateMerchantPF) && (
+              !isPrivateMerchant && (
                 <Grid item>
                   <Box
                     display="flex"
@@ -860,8 +858,7 @@ export default function PersonalAndBillingDataSection({
                 disabled={
                   stepHistoryState.isTaxCodeEquals2PIVA ||
                   isPremium ||
-                  isPrivateMerchant ||
-                  isPrivateMerchantPF
+                  isPrivateMerchant
                 }
                 onClick={() => setShrinkVatNumber(true)}
                 onBlur={() => setShrinkVatNumber(false)}
@@ -995,7 +992,7 @@ export default function PersonalAndBillingDataSection({
             productId === PRODUCT_IDS.PAGOPA ||
             productId === PRODUCT_IDS.IDPAY_MERCHANT) &&
             (institutionType === 'SCP' ||
-              institutionType === 'PRV' || 
+              institutionType === 'PRV' ||
               institutionType === 'PRV_PF' ||
               institutionType === 'GPU'))) && (
           <>
@@ -1007,8 +1004,7 @@ export default function PersonalAndBillingDataSection({
                   'businessRegisterPlace',
                   isContractingAuthority ||
                     isPdndPrivate ||
-                    isPrivateMerchant ||
-                    isPrivateMerchantPF
+                    isPrivateMerchant
                     ? t(
                         'onboardingFormData.billingDataSection.informationCompanies.requiredCommercialRegisterNumber'
                       )
