@@ -1,21 +1,19 @@
+import i18n from '@pagopa/selfcare-common-frontend/lib/locale/locale-utils';
+import '@testing-library/jest-dom';
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { useFormik } from 'formik';
-import React from 'react';
-import { OnboardingFormData } from '../../../model/OnboardingFormData';
-import { renderComponentWithProviders } from '../../../utils/test-utils';
-import PersonalAndBillingDataSection from '../PersonalAndBillingDataSection';
 import {
   institutionTypes,
   mockPartyRegistry,
-  mockedProducts,
   mockedAoos,
-  mockedUos,
   mockedPartiesFromInfoCamere,
+  mockedProducts,
+  mockedUos,
 } from '../../../lib/__mocks__/mockApiRequests';
-import i18n from '@pagopa/selfcare-common-frontend/lib/locale/locale-utils';
-import '@testing-library/jest-dom';
+import { OnboardingFormData } from '../../../model/OnboardingFormData';
 import { PRODUCT_IDS } from '../../../utils/constants';
-import { InstitutionLocationData } from '../../../model/InstitutionLocationData';
+import { renderComponentWithProviders } from '../../../utils/test-utils';
+import PersonalAndBillingDataSection from '../PersonalAndBillingDataSection';
 
 jest.mock('formik', () => ({
   useFormik: jest.fn(),
@@ -43,7 +41,7 @@ const mockFormik = {
 
 (useFormik as jest.Mock).mockReturnValue(mockFormik);
 
-const formik = {
+const formik: any = {
   values: {
     businessName: '',
     zipCode: '12345',
@@ -92,9 +90,9 @@ const mockBaseTextFieldProps = (
 
 test('Test: Rendered PersonalAndBillingDataSection component with all possible business cases', () => {
   let componentRendered = false;
-  const conditionsMap = {};
-  let onboardingFormData;
-  let productId;
+  const conditionsMap = {} as any;
+  let onboardingFormData: any;
+  let productId: string;
 
   mockedProducts.forEach((product) => {
     institutionTypes.forEach((institutionType) => {
@@ -133,7 +131,9 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
             productId === PRODUCT_IDS.INTEROP);
         const isPrivateParty = productId === PRODUCT_IDS.INTEROP && institutionType === 'PRV';
         const isPdndPrivate = productId === PRODUCT_IDS.INTEROP && institutionType === 'PRV';
-        const isPrivateMerchant = productId === PRODUCT_IDS.IDPAY_MERCHANT && institutionType === 'PRV';
+        const isPrivateMerchant =
+          productId === PRODUCT_IDS.IDPAY_MERCHANT &&
+          (institutionType === 'PRV' || institutionType === 'PRV_PF');
 
         conditionsMap[`${productId}-${institutionType}`] = {
           isPremium,
@@ -143,7 +143,7 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
           institutionAvoidGeotax,
           isInsuranceCompany,
           isPrivateParty,
-          isPrivateMerchant
+          isPrivateMerchant,
         };
 
         renderComponentWithProviders(
@@ -186,7 +186,7 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
       isForeignInsurance,
       institutionAvoidGeotax,
       isPrivateParty,
-      isPrivateMerchant
+      isPrivateMerchant,
     } = conditionsMap[key];
 
     const centralParty = screen.queryByText('Ente centrale');
@@ -293,7 +293,7 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
       expect(shareCapital).not.toBeInTheDocument();
     }
 
-    if(isPrivateMerchant) {
+    if (isPrivateMerchant) {
       expect(iban).toBeInTheDocument();
       expect(confirmIban).toBeInTheDocument();
       expect(holder).toBeInTheDocument();

@@ -129,10 +129,13 @@ export default function StepOnboardingFormData({
   const isPremium = !!subProductId;
   const isPaymentServiceProvider = institutionType === 'PSP';
   const isPdndPrivate = institutionType === 'PRV' && productId === PRODUCT_IDS.INTEROP;
-  const isPrivateMerchant = institutionType === 'PRV' && productId === PRODUCT_IDS.IDPAY_MERCHANT;
+  const isPrivateMerchant =
+    (institutionType === 'PRV' || institutionType === 'PRV_PF') &&
+    productId === PRODUCT_IDS.IDPAY_MERCHANT;
   const isInformationCompany =
     origin !== 'IPA' &&
     institutionType !== 'PRV' &&
+    institutionType !== 'PRV_PF' &&
     (institutionType === 'GSP' || institutionType === 'SCP') &&
     (productId === PRODUCT_IDS.IO ||
       productId === PRODUCT_IDS.IO_SIGN ||

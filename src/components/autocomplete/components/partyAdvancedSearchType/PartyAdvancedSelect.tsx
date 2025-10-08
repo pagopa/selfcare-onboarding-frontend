@@ -10,7 +10,7 @@ import { PRODUCT_IDS } from '../../../../utils/constants';
 import { ENV } from '../../../../utils/env';
 
 type Props = {
-  selections: SelectionsState;
+  selections?: SelectionsState;
   setSelected: React.Dispatch<React.SetStateAction<any>>;
   handleSelectionChange: (newSelection: SelectionEnum) => void;
   setOptions: React.Dispatch<React.SetStateAction<Array<any>>>;
@@ -77,8 +77,8 @@ export default function PartyAdvancedSelect({
   }, []);
 
   useEffect(() => {
-    const selectedKey = Object.keys(selections).find(
-      (key) => selections[key as keyof SelectionsState]
+    const selectedKey = Object.keys(selections ?? []).find(
+      (key) => selections && selections[key as keyof SelectionsState]
     );
     if (selectedKey) {
       setTypeOfSearch(selectedKey);

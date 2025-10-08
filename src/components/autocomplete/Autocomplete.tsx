@@ -35,6 +35,8 @@ type AutocompleteProps = {
   setIsPresentInAtecoWhiteList?: Dispatch<SetStateAction<boolean>>;
   setMerchantSearchResult?: Dispatch<SetStateAction<any>>;
   disabledStatusCompany?: boolean;
+  selections: SelectionsState;
+  setSelections: Dispatch<SetStateAction<SelectionsState>>;
 };
 
 export function Autocomplete({
@@ -60,21 +62,13 @@ export function Autocomplete({
   filterCategories,
   setIsPresentInAtecoWhiteList,
   setMerchantSearchResult,
-  disabledStatusCompany
+  disabledStatusCompany,
+  selections,
+  setSelections,
 }: AutocompleteProps) {
   const { t } = useTranslation();
   const [options, setOptions] = useState<Array<InstitutionResource>>([]);
   const [cfResult, setCfResult] = useState<PartyData>();
-
-  const [selections, setSelections] = useState<SelectionsState>({
-    businessName: true,
-    aooCode: false,
-    uoCode: false,
-    reaCode: false,
-    personalTaxCode: false,
-    taxCode: false,
-    ivassCode: false,
-  });
 
   const selectOnly = (field: SelectionEnum) => {
     setSelections({

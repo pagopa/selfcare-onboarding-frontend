@@ -86,7 +86,7 @@ async function globalSetup() {
       console.log(`GLOBAL SETUP: ℹ️ No confirm button found or timeout, proceeding...`);
     }
 
-    await page.waitForURL('**/dashboard**', {
+    await page.waitForURL('**/dashboard/**', {
       timeout: 60000,
       waitUntil: 'domcontentloaded',
     });

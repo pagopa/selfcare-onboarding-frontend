@@ -3,7 +3,15 @@ import Checkbox from '@mui/material/Checkbox';
 import { Box } from '@mui/system';
 import { SessionModal } from '@pagopa/selfcare-common-frontend/lib';
 import { AxiosError, AxiosResponse } from 'axios';
-import { ReactElement, useContext, useEffect, useMemo, useState } from 'react';
+import {
+  Dispatch,
+  ReactElement,
+  SetStateAction,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { InstitutionType, PartyData, Product, StepperStepComponentProps } from '../../../types';
 import { fetchWithLogs } from '../../lib/api-utils';
@@ -19,6 +27,7 @@ import { OnboardingStepActions } from '../OnboardingStepActions';
 import { Autocomplete } from '../autocomplete/Autocomplete';
 import { useHistoryState } from '../useHistoryState';
 import Loading4Api from '../Loading4Api';
+import { SelectionsState } from '../../model/Selection';
 
 type Props = {
   subTitle: string | ReactElement;
@@ -29,6 +38,7 @@ type Props = {
   subunitTypeByQuery: string;
   subunitCodeByQuery: string;
   selectFilterCategories: () => any;
+  setInstitutionType: Dispatch<SetStateAction<InstitutionType | undefined>>;
 } & StepperStepComponentProps;
 
 const handleSearchExternalId = async (
@@ -65,6 +75,7 @@ export function StepSearchParty({
   subunitTypeByQuery,
   subunitCodeByQuery,
   selectFilterCategories,
+  setInstitutionType,
 }: Props) {
   const theme = useTheme();
   const { t } = useTranslation();
@@ -105,6 +116,17 @@ export function StepSearchParty({
       merchantSearchResult?.statusCompanyRD !== undefined,
     [merchantSearchResult]
   );
+
+  const [selections, setSelections] = useState<SelectionsState>({
+    businessName: true,
+    aooCode: false,
+    uoCode: false,
+    reaCode: false,
+    personalTaxCode: false,
+    taxCode: false,
+    ivassCode: false,
+  });
+
   const getECDataByCF = async (query: string) => {
     setApiLoading(true);
     const searchResponse = await fetchWithLogs(
@@ -267,14 +289,23 @@ export function StepSearchParty({
 
   const onForwardAction = () => {
     const dataParty = aooResult || uoResult ? ({ ...selected, ...ecData } as PartyData) : selected;
+    const actualInstitutionType =
+      product?.id === PRODUCT_IDS.IDPAY_MERCHANT && selections.personalTaxCode
+        ? 'PRV_PF'
+        : institutionType;
     setSelectedHistory(selected);
     const onboardingData = selected2OnboardingData(
       dataParty,
       isAggregator,
-      institutionType,
+      actualInstitutionType,
       product?.id
     );
-    forward(onboardingData, institutionType);
+
+    if (actualInstitutionType !== institutionType) {
+      setInstitutionType(actualInstitutionType);
+    }
+
+    forward(onboardingData, actualInstitutionType);
   };
 
   const onBackAction = () => {
@@ -496,6 +527,8 @@ export function StepSearchParty({
               setIsPresentInAtecoWhiteList={setIsPresentInAtecoWhiteList}
               setMerchantSearchResult={setMerchantSearchResult}
               disabledStatusCompany={disabledStatusCompany}
+              selections={selections}
+              setSelections={setSelections}
             />
           </Grid>
           {ENV.AGGREGATOR.SHOW_AGGREGATOR &&

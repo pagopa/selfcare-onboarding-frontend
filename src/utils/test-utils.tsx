@@ -348,7 +348,9 @@ export const billingData2billingDataRequest = (
   productId?: string
   // eslint-disable-next-line sonarjs/cognitive-complexity
 ) => {
-  const isPrivateMerchant = institutionType === 'PRV' && productId === PRODUCT_IDS.IDPAY_MERCHANT;
+  const isPrivateMerchant =
+    (institutionType === 'PRV' || institutionType === 'PRV_PF') &&
+    productId === PRODUCT_IDS.IDPAY_MERCHANT;
 
   return {
     businessName: errorOnSubmit
@@ -531,7 +533,9 @@ export const verifySubmit = async (
   isAggregator?: boolean
   // eslint-disable-next-line sonarjs/cognitive-complexity
 ) => {
-  const isPrivateMerchant = institutionType === 'PRV' && productId === PRODUCT_IDS.IDPAY_MERCHANT;
+  const isPrivateMerchant =
+    (institutionType === 'PRV' || institutionType === 'PRV_PF') &&
+    productId === PRODUCT_IDS.IDPAY_MERCHANT;
   const SfeAvailable = (uo || institutionType === 'PA') && canInvoice(institutionType, productId);
 
   // eslint-disable-next-line functional/immutable-data
@@ -696,7 +700,7 @@ export const verifySubmit = async (
             ? {
                 businessRegisterPlace:
                   from === 'ANAC' ||
-                  (institutionType === 'PRV' &&
+                  ((institutionType === 'PRV' || institutionType === 'PRV_PF') &&
                     (productId === PRODUCT_IDS.PAGOPA ||
                       productId === PRODUCT_IDS.INTEROP ||
                       productId === PRODUCT_IDS.IDPAY_MERCHANT))
@@ -1005,8 +1009,9 @@ export const fillUserBillingDataForm = async (
   typeOfSearch?: Search
   // eslint-disable-next-line sonarjs/cognitive-complexity
 ) => {
-  const isPrivateMerchant = institutionType === 'PRV' && productId === PRODUCT_IDS.IDPAY_MERCHANT;
-
+  const isPrivateMerchant =
+    (institutionType === 'PRV' || institutionType === 'PRV_PF') &&
+    productId === PRODUCT_IDS.IDPAY_MERCHANT;
   if (from !== 'IPA' && from !== 'INFOCAMERE' && from !== 'PDND_INFOCAMERE' && !isPrivateMerchant) {
     if (institutionType !== 'SA' && institutionType !== 'AS') {
       fireEvent.change(document.getElementById(businessNameInput) as HTMLElement, {
@@ -1323,7 +1328,9 @@ export const checkCorrectBodyBillingData = (
   haveTaxCode?: boolean
   // eslint-disable-next-line sonarjs/cognitive-complexity
 ) => {
-  const isPrivateMerchant = institutionType === 'PRV' && productId === PRODUCT_IDS.IDPAY_MERCHANT;
+  const isPrivateMerchant =
+    (institutionType === 'PRV' || institutionType === 'PRV_PF') &&
+    productId === PRODUCT_IDS.IDPAY_MERCHANT;
 
   expect((document.getElementById('businessName') as HTMLInputElement).value).toBe(
     institutionType === 'SA'

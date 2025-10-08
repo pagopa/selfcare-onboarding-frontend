@@ -18,7 +18,8 @@ export const selected2OnboardingData = (
   aooName: selectedParty?.denominazioneAoo,
   atecoCodes: selectedParty?.atecoCodes,
   legalForm:
-    institutionType === 'PRV' && productId === PRODUCT_IDS.IDPAY_MERCHANT
+    (institutionType === 'PRV' || institutionType === 'PRV_PF') &&
+    productId === PRODUCT_IDS.IDPAY_MERCHANT
       ? selectedParty?.legalForm
       : undefined,
   uoName: selectedParty?.descrizioneUo,
@@ -48,7 +49,7 @@ export const selected2OnboardingData = (
       ? selectedParty?.businessTaxId
       : (selectedParty?.codiceUniUo ?? selectedParty?.codiceUniAoo ?? selectedParty?.originId),
   origin:
-    (institutionType === 'PRV' &&
+    ((institutionType === 'PRV' || institutionType === 'PRV_PF') &&
       (productId === PRODUCT_IDS.INTEROP || productId === PRODUCT_IDS.IDPAY_MERCHANT)) ||
     institutionType === 'SCP'
       ? 'PDND_INFOCAMERE'

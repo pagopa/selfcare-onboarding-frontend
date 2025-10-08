@@ -855,7 +855,11 @@ export default function PersonalAndBillingDataSection({
                     : theme.palette.text.primary
                 )}
                 value={formik.values.vatNumber}
-                disabled={stepHistoryState.isTaxCodeEquals2PIVA || isPremium || isPrivateMerchant}
+                disabled={
+                  stepHistoryState.isTaxCodeEquals2PIVA ||
+                  isPremium ||
+                  isPrivateMerchant
+                }
                 onClick={() => setShrinkVatNumber(true)}
                 onBlur={() => setShrinkVatNumber(false)}
                 InputLabelProps={{
@@ -989,6 +993,7 @@ export default function PersonalAndBillingDataSection({
             productId === PRODUCT_IDS.IDPAY_MERCHANT) &&
             (institutionType === 'SCP' ||
               institutionType === 'PRV' ||
+              institutionType === 'PRV_PF' ||
               institutionType === 'GPU'))) && (
           <>
             <Grid item xs={12}>
@@ -997,7 +1002,9 @@ export default function PersonalAndBillingDataSection({
                 paddingValue={isContractingAuthority ? '20px' : '24px'}
                 {...baseTextFieldProps(
                   'businessRegisterPlace',
-                  isContractingAuthority || isPdndPrivate || isPrivateMerchant
+                  isContractingAuthority ||
+                    isPdndPrivate ||
+                    isPrivateMerchant
                     ? t(
                         'onboardingFormData.billingDataSection.informationCompanies.requiredCommercialRegisterNumber'
                       )
