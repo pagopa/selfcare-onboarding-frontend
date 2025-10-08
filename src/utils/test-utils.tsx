@@ -669,7 +669,8 @@ export const verifySubmit = async (
               }
             : undefined,
         payment:
-          institutionType === 'PRV' && productId === PRODUCT_IDS.IDPAY_MERCHANT
+          (institutionType === 'PRV' || institutionType === 'PRV_PF') &&
+          productId === PRODUCT_IDS.IDPAY_MERCHANT
             ? {
                 holder: 'holder',
                 iban: 'IT60X0542811101000000123456',
