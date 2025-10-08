@@ -21,6 +21,7 @@ import { MessageNoAction } from '../../../components/MessageNoAction';
 import UserNotAllowedPage from '../../UserNotAllowedPage';
 import AlreadyOnboarded from '../../AlreadyOnboarded';
 import { OnboardingFormData } from '../../../model/OnboardingFormData';
+import { PRODUCT_IDS } from '../../../utils/constants';
 
 type Props = StepperStepComponentProps & {
   externalInstitutionId: string;
@@ -116,6 +117,10 @@ export function StepVerifyOnboarding({
           subunitCode: onboardingFormData?.uoUniqueCode ?? onboardingFormData?.aooUniqueCode,
           origin: onboardingFormData?.origin,
           originId: onboardingFormData?.originId,
+          institutionType:
+            productId === PRODUCT_IDS.IDPAY_MERCHANT && institutionType === 'PRV_PF'
+              ? 'PRV_PF'
+              : undefined,
         },
       },
       () => setRequiredLogin(true)
