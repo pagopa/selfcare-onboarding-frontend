@@ -1,19 +1,10 @@
 import { Alert, Box, Grid, Link, TextField } from '@mui/material';
 import { styled } from '@mui/system';
-import { AxiosError, AxiosResponse } from 'axios';
-import { useFormik } from 'formik';
-import {
-  Dispatch,
-  SetStateAction,
-  useContext,
-  useEffect,
-  useReducer,
-  useRef,
-  useState,
-} from 'react';
-import { Trans, useTranslation } from 'react-i18next';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
+import { useFormik } from 'formik';
 import { uniqueId } from 'lodash';
+import { useContext, useEffect, useReducer, useRef, useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import {
   DataProtectionOfficerDto,
   InstitutionType,
@@ -21,30 +12,35 @@ import {
   RequestOutcomeMessage,
   StepperStepComponentProps,
 } from '../../../types';
-import { fetchWithLogs } from '../../lib/api-utils';
+import { useOnboardingControllers } from '../../hooks/useOnboardingControllers';
 import { UserContext } from '../../lib/context';
-import { getFetchOutcome } from '../../lib/error-utils';
+
 import { AooData } from '../../model/AooData';
-import { GeographicTaxonomy, GeographicTaxonomyResource } from '../../model/GeographicTaxonomies';
+import { GeographicTaxonomy } from '../../model/GeographicTaxonomies';
+import { InstitutionLocationData } from '../../model/InstitutionLocationData';
 import { OnboardingFormData } from '../../model/OnboardingFormData';
 import { UoData } from '../../model/UoModel';
+import { verifyRecipientCodeIsValid } from '../../services/billingDataServices';
+import {
+  getCountriesFromGeotaxonomies,
+  getPreviousGeotaxononomies,
+} from '../../services/geoTaxonomyServices';
+import { handleSearchByTaxCode } from '../../services/institutionServices';
+import { verifyVatNumber } from '../../services/validationServices';
+import { PRODUCT_IDS, requiredError } from '../../utils/constants';
+import { ENV } from '../../utils/env';
+import { handleGeotaxonomies } from '../../utils/handleGeotaxonomies';
+import { validateFields } from '../../utils/validateFields';
 import { MessageNoAction } from '../MessageNoAction';
 import { OnboardingStepActions } from '../OnboardingStepActions';
 import DpoSection from '../onboardingFormData/DpoSection';
-import PersonalAndBillingDataSection from '../onboardingFormData/PersonalAndBillingDataSection';
-import UpdateGeotaxonomy from '../onboardingFormData/taxonomy/UpdateGeotaxonomy';
-import GeoTaxonomySection from '../onboardingFormData/taxonomy/GeoTaxonomySection';
-import { useHistoryState } from '../useHistoryState';
-import { VatNumberErrorModal } from '../onboardingFormData/VatNumberErrorModal';
-import { PRODUCT_IDS, requiredError } from '../../utils/constants';
 import Heading from '../onboardingFormData/Heading';
-import { validateFields } from '../../utils/validateFields';
-import { handleGeotaxonomies } from '../../utils/handleGeotaxonomies';
-import { ENV } from '../../utils/env';
-import { InstitutionLocationData } from '../../model/InstitutionLocationData';
-import { formatCity } from '../../utils/formatting-utils';
 import IbanSection from '../onboardingFormData/IbanSection';
-import { useOnboardingControllers } from '../../hooks/useOnboardingControllers';
+import PersonalAndBillingDataSection from '../onboardingFormData/PersonalAndBillingDataSection';
+import { VatNumberErrorModal } from '../onboardingFormData/VatNumberErrorModal';
+import GeoTaxonomySection from '../onboardingFormData/taxonomy/GeoTaxonomySection';
+import UpdateGeotaxonomy from '../onboardingFormData/taxonomy/UpdateGeotaxonomy';
+import { useHistoryState } from '../useHistoryState';
 
 export type StepBillingDataHistoryState = {
   externalInstitutionId: string;
@@ -140,53 +136,6 @@ export default function StepOnboardingFormData({
   const [dpoData, setDpoData] = useState<DataProtectionOfficerDto>();
   const [countries, setCountries] = useState<Array<InstitutionLocationData>>();
 
-  const handleSearchByTaxCode = async (query: string) => {
-    const searchResponse = await fetchWithLogs(
-      { endpoint: 'ONBOARDING_GET_PARTY_FROM_CF', endpointParams: { id: query } },
-      {
-        method: 'GET',
-        params: {
-          origin: 'IPA',
-          categories: filterCategories,
-        },
-      },
-      () => setRequiredLogin(true)
-    );
-
-    const outcome = getFetchOutcome(searchResponse);
-
-    if (outcome === 'success') {
-      setRetrievedIstat((searchResponse as AxiosResponse).data.istatCode);
-      setOriginId4Premium((searchResponse as AxiosResponse).data.originId);
-    }
-  };
-
-  const getPreviousGeotaxononomies = async () => {
-    const onboardingData = await fetchWithLogs(
-      {
-        endpoint: 'ONBOARDING_GET_PREVIOUS_GEOTAXONOMIES',
-      },
-      {
-        method: 'GET',
-        params: {
-          taxCode: externalInstitutionId,
-          ...(aooSelected
-            ? { subunitCode: aooSelected?.codiceUniAoo }
-            : uoSelected && { subunitCode: uoSelected?.codiceUniUo }),
-        },
-      },
-      () => setRequiredLogin(true)
-    );
-
-    const restOutcomeData = getFetchOutcome(onboardingData);
-    if (restOutcomeData === 'success') {
-      const result = (onboardingData as AxiosResponse).data;
-      if (result) {
-        setPreviousGeotaxononomies(result);
-      }
-    }
-  };
-
   useEffect(() => {
     if (externalInstitutionId !== stepHistoryState.externalInstitutionId) {
       setStepHistoryState({
@@ -199,7 +148,13 @@ export default function StepOnboardingFormData({
 
   useEffect(() => {
     if (!controllers.isPremium) {
-      void getPreviousGeotaxononomies();
+      void getPreviousGeotaxononomies(
+        externalInstitutionId,
+        aooSelected,
+        uoSelected,
+        setPreviousGeotaxononomies,
+        setRequiredLogin
+      );
     } else {
       setPreviousGeotaxononomies(initialFormData.geographicTaxonomies);
     }
@@ -238,13 +193,26 @@ export default function StepOnboardingFormData({
 
     if (institutionType === 'PA' && initialFormData.taxCode) {
       try {
-        await handleSearchByTaxCode(initialFormData.taxCode);
+        await handleSearchByTaxCode(
+          initialFormData.taxCode,
+          filterCategories,
+          setRequiredLogin,
+          setRetrievedIstat,
+          setOriginId4Premium
+        );
         if (
           originId4Premium &&
           formik.values.recipientCode &&
           formik.values.recipientCode.length >= 6
         ) {
-          await verifyRecipientCodeIsValid(formik.values.recipientCode, originId4Premium);
+          await verifyRecipientCodeIsValid(
+            formik.values.recipientCode,
+            uoSelected,
+            formik,
+            setRecipientCodeStatus,
+            setRequiredLogin,
+            originId4Premium
+          );
         }
       } catch (error) {
         console.error('Error during premium billing data processing:', error);
@@ -361,106 +329,6 @@ export default function StepOnboardingFormData({
     }
   }, [formik.values.hasVatnumber]);
 
-  const verifyVatNumber = async () => {
-    const onboardingStatus = await fetchWithLogs(
-      {
-        endpoint: 'VERIFY_ONBOARDING',
-      },
-      {
-        method: 'HEAD',
-        params: {
-          taxCode: institutionType === 'PA' ? externalInstitutionId : formik.values?.taxCode,
-          productId,
-          verifyType: 'EXTERNAL',
-          vatNumber: stepHistoryState.isTaxCodeEquals2PIVA
-            ? formik.values.taxCode
-            : formik.values.vatNumber,
-        },
-      },
-      () => setRequiredLogin(true)
-    );
-
-    const restOutcome = getFetchOutcome(onboardingStatus);
-
-    if (restOutcome === 'success') {
-      setVatVerificationGenericError(false);
-      setIsVatRegistrated(true);
-    } else if ((onboardingStatus as AxiosError).response?.status === 404) {
-      setIsVatRegistrated(false);
-      setVatVerificationGenericError(false);
-    } else {
-      setOpenVatNumberErrorModal(true);
-      setVatVerificationGenericError(true);
-    }
-  };
-
-  const getCountriesFromGeotaxonomies = async (
-    query: string,
-    setCountries: Dispatch<SetStateAction<Array<InstitutionLocationData> | undefined>>
-  ) => {
-    const searchGeotaxonomy = await fetchWithLogs(
-      {
-        endpoint: 'ONBOARDING_GET_GEOTAXONOMY',
-      },
-      {
-        method: 'GET',
-        params: { description: query },
-      },
-      () => setRequiredLogin(true)
-    );
-    const outcome = getFetchOutcome(searchGeotaxonomy);
-
-    if (outcome === 'success') {
-      const geographicTaxonomies = (searchGeotaxonomy as AxiosResponse).data;
-
-      const mappedResponse = geographicTaxonomies.map((gt: GeographicTaxonomyResource) => ({
-        code: gt.code,
-        country: gt.country_abbreviation,
-        county: gt.province_abbreviation,
-        city: gt.desc,
-        istat_code: gt.istat_code,
-      })) as Array<InstitutionLocationData>;
-
-      const onlyCountries = mappedResponse
-        .filter((r) => r.city.includes('- COMUNE'))
-        .map((r) => ({
-          ...r,
-          city: formatCity(r.city),
-        }));
-
-      setCountries(onlyCountries);
-    }
-  };
-
-  const verifyRecipientCodeIsValid = async (recipientCode: string, originId?: string) => {
-    const getRecipientCodeValidation = await fetchWithLogs(
-      {
-        endpoint: 'ONBOARDING_RECIPIENT_CODE_VALIDATION',
-      },
-      {
-        method: 'GET',
-        params: {
-          recipientCode,
-          originId,
-        },
-      },
-      () => setRequiredLogin(true)
-    );
-
-    const outcome = getFetchOutcome(getRecipientCodeValidation);
-
-    if (outcome === 'success') {
-      const result = (getRecipientCodeValidation as AxiosResponse).data;
-      if (uoSelected && result && result === 'DENIED_NO_BILLING') {
-        // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        formik.setFieldValue('recipientCode', undefined);
-      }
-      setRecipientCodeStatus(result);
-    } else {
-      setRecipientCodeStatus('DENIED_NO_ASSOCIATION');
-    }
-  };
-
   useEffect(() => {
     if (
       !stepHistoryState.isTaxCodeEquals2PIVA &&
@@ -489,7 +357,17 @@ export default function StepOnboardingFormData({
           formik.values.taxCode &&
           formik.values.taxCode.length === 11))
     ) {
-      void verifyVatNumber();
+      void verifyVatNumber(
+        institutionType,
+        externalInstitutionId,
+        formik,
+        stepHistoryState,
+        setVatVerificationGenericError,
+        setIsVatRegistrated,
+        setOpenVatNumberErrorModal,
+        setRequiredLogin,
+        productId
+      );
     }
   }, [formik.values.vatNumber, stepHistoryState.isTaxCodeEquals2PIVA]);
 
@@ -500,13 +378,20 @@ export default function StepOnboardingFormData({
       formik.values.recipientCode &&
       formik.values.recipientCode.length >= 6
     ) {
-      void verifyRecipientCodeIsValid(formik.values.recipientCode, onboardingFormData?.originIdEc);
+      void verifyRecipientCodeIsValid(
+        formik.values.recipientCode,
+        uoSelected,
+        formik,
+        setRecipientCodeStatus,
+        setRequiredLogin,
+        onboardingFormData?.originIdEc
+      );
     }
   }, [formik.values.recipientCode]);
 
   useEffect(() => {
     if (formik.values.city && origin !== 'IPA') {
-      void getCountriesFromGeotaxonomies(formik.values.city, setCountries);
+      void getCountriesFromGeotaxonomies(formik.values.city, setCountries, setRequiredLogin);
     }
   }, []);
 
@@ -582,7 +467,6 @@ export default function StepOnboardingFormData({
           controllers={controllers}
           setInvalidTaxCodeInvoicing={setInvalidTaxCodeInvoicing}
           recipientCodeStatus={recipientCodeStatus}
-          getCountriesFromGeotaxonomies={getCountriesFromGeotaxonomies}
           countries={countries}
           setCountries={setCountries}
         />

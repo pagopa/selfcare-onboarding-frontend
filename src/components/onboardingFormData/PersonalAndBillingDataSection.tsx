@@ -3,7 +3,6 @@ import Autocomplete from '@mui/material/Autocomplete';
 import Checkbox from '@mui/material/Checkbox';
 import { Box, styled } from '@mui/system';
 import { theme } from '@pagopa/mui-italia';
-import { AxiosResponse } from 'axios';
 import { Dispatch, SetStateAction, useContext, useEffect, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import {
@@ -13,16 +12,19 @@ import {
 } from '../../../types';
 import { OnboardingControllers } from '../../hooks/useOnboardingControllers';
 import { mockedCountries } from '../../lib/__mocks__/mockApiRequests';
-import { fetchWithLogs } from '../../lib/api-utils';
 import { UserContext } from '../../lib/context';
-import { getFetchOutcome } from '../../lib/error-utils';
 import { AssistanceContacts } from '../../model/AssistanceContacts';
 import { CountryResource } from '../../model/CountryResource';
 import { InstitutionLocationData } from '../../model/InstitutionLocationData';
 import { OnboardingFormData } from '../../model/OnboardingFormData';
+import { verifyTaxCodeInvoicing } from '../../services/billingDataServices';
+import {
+  getCountriesFromGeotaxonomies,
+  getLocationFromIstatCode,
+} from '../../services/geoTaxonomyServices';
+import { getUoInfoFromRecipientCode } from '../../services/institutionServices';
 import { PRODUCT_IDS, requiredError } from '../../utils/constants';
 import { ENV } from '../../utils/env';
-import { formatCity } from '../../utils/formatting-utils';
 import { StepBillingDataHistoryState } from '../steps/StepOnboardingFormData';
 import NumberDecimalFormat from './NumberDecimalFormat';
 
@@ -76,10 +78,6 @@ type Props = StepperStepComponentProps & {
   controllers: OnboardingControllers;
   setInvalidTaxCodeInvoicing: React.Dispatch<React.SetStateAction<boolean>>;
   recipientCodeStatus?: string;
-  getCountriesFromGeotaxonomies: (
-    query: string,
-    setCountries: Dispatch<SetStateAction<Array<InstitutionLocationData> | undefined>>
-  ) => Promise<void>;
   countries: Array<InstitutionLocationData> | undefined;
   setCountries: Dispatch<SetStateAction<Array<InstitutionLocationData> | undefined>>;
 };
@@ -98,7 +96,6 @@ export default function PersonalAndBillingDataSection({
   controllers,
   setInvalidTaxCodeInvoicing,
   recipientCodeStatus,
-  getCountriesFromGeotaxonomies,
   countries,
   setCountries,
 }: Props) {
@@ -182,7 +179,7 @@ export default function PersonalAndBillingDataSection({
   useEffect(() => {
     if (!controllers.isPremium && (controllers.isFromIPA || controllers.isAooUo)) {
       const istatCode = onboardingFormData?.istatCode ?? retrievedIstat;
-      void getLocationFromIstatCode(istatCode);
+      void getLocationFromIstatCode(setInstitutionLocationData, setRequiredLogin, istatCode);
     }
   }, [controllers.isPremium, controllers.isFromIPA, controllers.isAooUo]);
 
@@ -207,7 +204,12 @@ export default function PersonalAndBillingDataSection({
 
   useEffect(() => {
     if (formik.values.recipientCode?.length >= 6 && recipientCodeStatus === 'ACCEPTED') {
-      void getUoInfoFromRecipientCode(formik.values.recipientCode);
+      void getUoInfoFromRecipientCode(
+        formik.values.recipientCode,
+        setDisableTaxCodeInvoicing,
+        setRequiredLogin,
+        formik
+      );
       setTaxCodeInvoicingVisible(true);
     } else {
       formik.setFieldValue('taxCodeInovoicing', undefined);
@@ -276,83 +278,6 @@ export default function PersonalAndBillingDataSection({
       } catch (reason) {
         console.error(reason);
       }
-    }
-  };
-
-  const getLocationFromIstatCode = async (istatCode?: string) => {
-    const getLocation = await fetchWithLogs(
-      {
-        endpoint: 'ONBOARDING_GET_LOCATION_BY_ISTAT_CODE',
-        endpointParams: {
-          geoTaxId: istatCode,
-        },
-      },
-      { method: 'GET' },
-      () => setRequiredLogin(true)
-    );
-    const outcome = getFetchOutcome(getLocation);
-
-    if (outcome === 'success') {
-      const result = (getLocation as AxiosResponse).data;
-      if (result) {
-        const institutionLocation = {
-          code: result.code,
-          country: result.country_abbreviation,
-          county: result.province_abbreviation,
-          city: formatCity(result.desc),
-        };
-        setInstitutionLocationData(institutionLocation);
-      }
-    }
-  };
-
-  const verifyTaxCodeInvoicing = async (taxCodeInvoicing: string) => {
-    const getUoList = await fetchWithLogs(
-      {
-        endpoint: 'ONBOARDING_GET_UO_LIST',
-      },
-      {
-        method: 'GET',
-        params: {
-          taxCodeInvoicing,
-        },
-      },
-      () => setRequiredLogin(true)
-    );
-
-    const outcome = getFetchOutcome(getUoList);
-
-    if (outcome === 'success') {
-      const uoList = (getUoList as AxiosResponse).data.items;
-      const match = uoList.find((uo: any) => uo.codiceFiscaleEnte === formik.values.taxCode);
-      if (match) {
-        setInvalidTaxCodeInvoicing(false);
-      } else {
-        setInvalidTaxCodeInvoicing(true);
-      }
-    }
-  };
-
-  const getUoInfoFromRecipientCode = async (recipientCode: string) => {
-    const searchResponse = await fetchWithLogs(
-      { endpoint: 'ONBOARDING_GET_UO_CODE_INFO', endpointParams: { codiceUniUo: recipientCode } },
-      {
-        method: 'GET',
-        params: undefined,
-      },
-      () => setRequiredLogin(true)
-    );
-
-    const outcome = getFetchOutcome(searchResponse);
-
-    if (outcome === 'success') {
-      formik.setFieldValue(
-        'taxCodeInvoicing',
-        (searchResponse as AxiosResponse).data?.codiceFiscaleSfe
-      );
-      setDisableTaxCodeInvoicing(true);
-    } else {
-      setDisableTaxCodeInvoicing(false);
     }
   };
 
@@ -468,16 +393,12 @@ export default function PersonalAndBillingDataSection({
                   t('onboardingFormData.billingDataSection.zipCode'),
                   600,
                   16,
-                  !controllers.isAooUo &&
-                    controllers.isDisabled &&
-                    !controllers.isInsuranceCompany
+                  !controllers.isAooUo && controllers.isDisabled && !controllers.isInsuranceCompany
                     ? theme.palette.text.disabled
                     : theme.palette.text.primary
                 )}
                 disabled={
-                  !controllers.isAooUo &&
-                  controllers.isDisabled &&
-                  !controllers.isInsuranceCompany
+                  !controllers.isAooUo && controllers.isDisabled && !controllers.isInsuranceCompany
                 }
               />
             </Grid>
@@ -503,7 +424,7 @@ export default function PersonalAndBillingDataSection({
                   const value = e.target.value;
                   formik.setFieldValue('city', value);
                   if (value.length >= 3) {
-                    void getCountriesFromGeotaxonomies(value, setCountries);
+                    void getCountriesFromGeotaxonomies(value, setCountries, setRequiredLogin);
                   } else {
                     setCountries(undefined);
                   }
@@ -572,9 +493,7 @@ export default function PersonalAndBillingDataSection({
                     inputProps={{
                       ...params.inputProps,
                       value:
-                        !controllers.isCityEditable ||
-                        controllers.isFromIPA ||
-                        controllers.isAooUo
+                        !controllers.isCityEditable || controllers.isFromIPA || controllers.isAooUo
                           ? formik.values.city
                           : params.inputProps.value,
                     }}
@@ -811,9 +730,7 @@ export default function PersonalAndBillingDataSection({
                   <Box
                     display="flex"
                     alignItems="center"
-                    marginBottom={
-                      !formik.values.hasVatnumber && controllers.isInvoiceable ? -2 : 0
-                    }
+                    marginBottom={!formik.values.hasVatnumber && controllers.isInvoiceable ? -2 : 0}
                   >
                     <Checkbox
                       id="party_without_vatnumber"
@@ -966,7 +883,12 @@ export default function PersonalAndBillingDataSection({
                     onChange={(e) => {
                       formik.setFieldValue('taxCodeInvoicing', e.target.value);
                       if (e.target.value.length === 11) {
-                        void verifyTaxCodeInvoicing(e.target.value);
+                        void verifyTaxCodeInvoicing(
+                          e.target.value,
+                          formik,
+                          setInvalidTaxCodeInvoicing,
+                          setRequiredLogin
+                        );
                       } else {
                         setInvalidTaxCodeInvoicing(false);
                       }
