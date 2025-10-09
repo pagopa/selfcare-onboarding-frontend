@@ -19,6 +19,20 @@ jest.mock('formik', () => ({
   useFormik: jest.fn(),
 }));
 
+jest.mock('../../../services/geoTaxonomyServices', () => ({
+  getCountriesFromGeotaxonomies: jest.fn(),
+  getLocationFromIstatCode: jest.fn(),
+  getNationalCountries: jest.fn(),
+}));
+
+jest.mock('../../../services/institutionServices', () => ({
+  getUoInfoFromRecipientCode: jest.fn(),
+}));
+
+jest.mock('../../../services/billingDataServices', () => ({
+  verifyTaxCodeInvoicing: jest.fn(),
+}));
+
 beforeAll(() => {
   i18n.changeLanguage('it');
 });
@@ -115,9 +129,10 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
         const isInsuranceCompany = institutionType === 'AS';
         const isForeignInsurance = onboardingFormData?.registerType?.includes('Elenco II');
         const isPremium = !!product.parentId;
+        const isPaymentServiceProvider = institutionType === 'PSP';
         const isDisabled =
           isPremium ||
-          (origin === 'IPA' && institutionType !== 'PA' && institutionType !== 'PSP') ||
+          (origin === 'IPA' && institutionType !== 'PA' && !isPaymentServiceProvider) ||
           institutionType === 'PA';
         const isInvoiceable =
           institutionType !== 'SA' &&
@@ -134,6 +149,9 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
         const isPrivateMerchant =
           productId === PRODUCT_IDS.IDPAY_MERCHANT &&
           (institutionType === 'PRV' || institutionType === 'PRV_PF');
+        const isFromIPA = origin === 'IPA';
+        const isContractingAuthority = institutionType === 'SA';
+        const isAooUo = !!(onboardingFormData?.uoUniqueCode ?? onboardingFormData?.aooUniqueCode);
 
         conditionsMap[`${productId}-${institutionType}`] = {
           isPremium,
@@ -146,10 +164,27 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
           isPrivateMerchant,
         };
 
+        const mockControllers = {
+          isPremium,
+          isPaymentServiceProvider,
+          isPdndPrivate,
+          isPrivateMerchant,
+          isInformationCompany,
+          isInvoiceable,
+          isForeignInsurance,
+          isProdFideiussioni: false,
+          isDisabled,
+          isCityEditable: undefined,
+          isVatRegistrated: undefined,
+          isFromIPA,
+          isContractingAuthority,
+          isInsuranceCompany,
+          isAooUo,
+        };
+
         renderComponentWithProviders(
           <PersonalAndBillingDataSection
             productId={productId}
-            origin={onboardingFormData?.origin}
             institutionType={institutionType}
             baseTextFieldProps={mockBaseTextFieldProps}
             stepHistoryState={{
@@ -158,19 +193,12 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
             }}
             setStepHistoryState={jest.fn()}
             formik={formik}
-            isPremium={isPremium}
-            isInformationCompany={isInformationCompany}
-            isForeignInsurance={isForeignInsurance}
             institutionAvoidGeotax={institutionAvoidGeotax}
             onboardingFormData={onboardingFormData}
-            isInvoiceable={isInvoiceable}
-            isDisabled={isDisabled}
+            controllers={mockControllers}
             setInvalidTaxCodeInvoicing={jest.fn()}
-            isPdndPrivate={isPdndPrivate}
-            getCountriesFromGeotaxonomies={jest.fn()}
             countries={undefined}
             setCountries={jest.fn()}
-            isPrivateMerchant={isPrivateMerchant}
           />
         );
 

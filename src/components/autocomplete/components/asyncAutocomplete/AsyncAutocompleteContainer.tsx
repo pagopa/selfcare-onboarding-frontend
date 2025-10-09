@@ -2,7 +2,15 @@ import { Grid, Theme, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { AxiosError, AxiosResponse } from 'axios';
 import debounce from 'lodash/debounce';
-import { Dispatch, SetStateAction, useContext, useEffect, useState } from 'react';
+import {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   ApiEndpointKey,
@@ -114,7 +122,7 @@ export default function AsyncAutocompleteContainer({
   const disabledButton =
     institutionType === 'GSP' && noMandatoryIpaProducts(product?.id)
       ? selections.businessName
-        ? input.length < 3
+        ? input.length <= 3
         : selections.taxCode
           ? input.length < 11
           : selections.aooCode
@@ -139,37 +147,48 @@ export default function AsyncAutocompleteContainer({
     }
   }, [selected]);
 
-  const handleSearchByName = async (
-    query: string,
-    endpoint: Endpoint,
-    limit?: number,
-    categories?: string
-  ) => {
-    setApiLoading?.(true);
-    const searchResponse = await fetchWithLogs(
-      endpoint,
-      {
-        method: 'GET',
-        params: {
-          limit,
-          page: 1,
-          search: query,
-          categories,
+  const handleSearchByName = useCallback(
+    async (query: string, endpoint: Endpoint, limit?: number, categories?: string) => {
+      setApiLoading?.(true);
+      const searchResponse = await fetchWithLogs(
+        endpoint,
+        {
+          method: 'GET',
+          params: {
+            limit,
+            page: 1,
+            search: query,
+            categories,
+          },
         },
-      },
-      () => setRequiredLogin(true)
-    );
+        () => setRequiredLogin(true)
+      );
 
-    const outcome = getFetchOutcome(searchResponse);
+      const outcome = getFetchOutcome(searchResponse);
 
-    if (outcome === 'success') {
-      setOptions(transformFn((searchResponse as AxiosResponse).data));
-    } else if ((searchResponse as AxiosError).response?.status === 404) {
-      setOptions([]);
-    }
+      if (outcome === 'success') {
+        setOptions(transformFn((searchResponse as AxiosResponse).data));
+      } else if ((searchResponse as AxiosError).response?.status === 404) {
+        setOptions([]);
+      }
 
-    setApiLoading?.(false);
-  };
+      setApiLoading?.(false);
+    },
+    [setApiLoading, setRequiredLogin, transformFn, setOptions]
+  );
+
+  const debouncedSearchByName = useMemo(
+    () => debounce(handleSearchByName, 100),
+    [handleSearchByName]
+  );
+
+  // Esegue il cancel solo quando il componente si smonta o quando debouncedSearchByName cambia
+  // eslint-disable-next-line arrow-body-style
+  useEffect(() => {
+    return () => {
+      debouncedSearchByName.cancel();
+    };
+  }, [debouncedSearchByName]);
 
   const handleSearchByTaxCode = async (
     addUser: boolean,
@@ -413,27 +432,25 @@ export default function AsyncAutocompleteContainer({
     setApiLoading?.(false);
   };
 
-  const searchByInstitutionType = async (value: string, institutionType?: string) => {
-    switch (institutionType) {
-      case 'AS':
-        void debounce(handleSearchByName, 100)(value, {
-          endpoint: 'ONBOARDING_GET_INSURANCE_COMPANIES_FROM_BUSINESSNAME',
-        });
-        break;
-      case 'SA':
-        void debounce(handleSearchByName, 100)(value, {
-          endpoint: 'ONBOARDING_GET_SA_PARTIES_NAME',
-        });
-        break;
-      default:
-        void debounce(handleSearchByName, 100)(
-          value,
-          endpoint,
-          ENV.MAX_INSTITUTIONS_FETCH,
-          filterCategories
-        );
-    }
-  };
+  const searchByInstitutionType = useCallback(
+    (value: string, institutionType?: string) => {
+      switch (institutionType) {
+        case 'AS':
+          void debouncedSearchByName(value, {
+            endpoint: 'ONBOARDING_GET_INSURANCE_COMPANIES_FROM_BUSINESSNAME',
+          });
+          break;
+        case 'SA':
+          void debouncedSearchByName(value, {
+            endpoint: 'ONBOARDING_GET_SA_PARTIES_NAME',
+          });
+          break;
+        default:
+          void debouncedSearchByName(value, endpoint, ENV.MAX_INSTITUTIONS_FETCH, filterCategories);
+      }
+    },
+    [debouncedSearchByName, endpoint, filterCategories]
+  );
   const removeSpecialCharacters = (input: string): string => {
     const specialCharacters = `[$%&'()§#!£{}*+/:;<>@=?^|~]`;
 
