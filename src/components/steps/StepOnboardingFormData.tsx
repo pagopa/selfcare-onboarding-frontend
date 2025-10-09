@@ -36,7 +36,7 @@ import UpdateGeotaxonomy from '../onboardingFormData/taxonomy/UpdateGeotaxonomy'
 import GeoTaxonomySection from '../onboardingFormData/taxonomy/GeoTaxonomySection';
 import { useHistoryState } from '../useHistoryState';
 import { VatNumberErrorModal } from '../onboardingFormData/VatNumberErrorModal';
-import { canInvoice, PRODUCT_IDS, requiredError } from '../../utils/constants';
+import { PRODUCT_IDS, requiredError } from '../../utils/constants';
 import Heading from '../onboardingFormData/Heading';
 import { validateFields } from '../../utils/validateFields';
 import { handleGeotaxonomies } from '../../utils/handleGeotaxonomies';
@@ -44,6 +44,7 @@ import { ENV } from '../../utils/env';
 import { InstitutionLocationData } from '../../model/InstitutionLocationData';
 import { formatCity } from '../../utils/formatting-utils';
 import IbanSection from '../onboardingFormData/IbanSection';
+import { useOnboardingControllers } from '../../hooks/useOnboardingControllers';
 
 export type StepBillingDataHistoryState = {
   externalInstitutionId: string;
@@ -95,7 +96,6 @@ export default function StepOnboardingFormData({
 }: Props) {
   const { t } = useTranslation();
   const { setRequiredLogin } = useContext(UserContext);
-
   const [openVatNumberErrorModal, setOpenVatNumberErrorModal] = useState<boolean>(false);
   const [vatVerificationGenericError, setVatVerificationGenericError] = useState<boolean>(false);
   const [isVatRegistrated, setIsVatRegistrated] = useState<boolean>(false);
@@ -122,32 +122,20 @@ export default function StepOnboardingFormData({
       isTaxCodeEquals2PIVA:
         !!initialFormData.vatNumber && initialFormData.taxCode === initialFormData.vatNumber,
     });
+
+  const controllers = useOnboardingControllers({
+    subProductId,
+    institutionType,
+    productId,
+    origin,
+    onboardingFormData,
+    isCityEditable,
+    isVatRegistrated,
+  });
+
   const requestIdRef = useRef<string>();
   const [filterCategories, setFilterCategories] = useState<string>();
   const institutionAvoidGeotax = ['PT', 'SA', 'AS'].includes(institutionType);
-
-  const isPremium = !!subProductId;
-  const isPaymentServiceProvider = institutionType === 'PSP';
-  const isPdndPrivate = institutionType === 'PRV' && productId === PRODUCT_IDS.INTEROP;
-  const isPrivateMerchant =
-    (institutionType === 'PRV' || institutionType === 'PRV_PF') &&
-    productId === PRODUCT_IDS.IDPAY_MERCHANT;
-  const isInformationCompany =
-    origin !== 'IPA' &&
-    institutionType !== 'PRV' &&
-    institutionType !== 'PRV_PF' &&
-    (institutionType === 'GSP' || institutionType === 'SCP') &&
-    (productId === PRODUCT_IDS.IO ||
-      productId === PRODUCT_IDS.IO_SIGN ||
-      productId === PRODUCT_IDS.PAGOPA ||
-      productId === PRODUCT_IDS.INTEROP);
-  const isProdFideiussioni = productId?.startsWith(PRODUCT_IDS.FD) ?? false;
-  const isInvoiceable = canInvoice(institutionType, productId);
-  const isForeignInsurance = onboardingFormData?.registerType?.includes('Elenco II');
-  const isDisabled =
-    isPremium ||
-    (origin === 'IPA' && institutionType !== 'PA' && !isPaymentServiceProvider) ||
-    institutionType === 'PA';
   const [originId4Premium, setOriginId4Premium] = useState<string>();
   const [dpoData, setDpoData] = useState<DataProtectionOfficerDto>();
   const [countries, setCountries] = useState<Array<InstitutionLocationData>>();
@@ -210,7 +198,7 @@ export default function StepOnboardingFormData({
   }, []);
 
   useEffect(() => {
-    if (!isPremium) {
+    if (!controllers.isPremium) {
       void getPreviousGeotaxononomies();
     } else {
       setPreviousGeotaxononomies(initialFormData.geographicTaxonomies);
@@ -226,14 +214,14 @@ export default function StepOnboardingFormData({
   }, [dpoData]);
 
   useEffect(() => {
-    if (isPremium) {
+    if (controllers.isPremium) {
       setDpoData({
         address: formik.values.address,
         email: formik.values.email,
         pec: formik.values.pec,
       });
     }
-  }, [isPremium]);
+  }, [controllers.isPremium]);
 
   const handlePremiumBillingData = async () => {
     // eslint-disable-next-line functional/immutable-data
@@ -320,15 +308,15 @@ export default function StepOnboardingFormData({
         institutionType,
         isVatRegistrated,
         vatVerificationGenericError,
-        isPaymentServiceProvider,
-        isInvoiceable,
+        controllers.isPaymentServiceProvider,
+        controllers.isInvoiceable,
         uoSelected,
-        isInformationCompany,
+        controllers.isInformationCompany,
         institutionAvoidGeotax,
-        isPremium,
+        controllers.isPremium,
         invalidTaxCodeInvoicing,
-        isPdndPrivate,
-        isPrivateMerchant,
+        controllers.isPdndPrivate,
+        controllers.isPrivateMerchant,
         recipientCodeStatus,
         productId
       )
@@ -354,11 +342,11 @@ export default function StepOnboardingFormData({
     formik.values,
     invalidTaxCodeInvoicing,
     recipientCodeStatus,
-    isPremium,
+    controllers.isPremium,
   ]);
 
   useEffect(() => {
-    if (isPremium) {
+    if (controllers.isPremium) {
       void handlePremiumBillingData();
     }
   }, [originId4Premium, formik.values.recipientCode]);
@@ -479,7 +467,7 @@ export default function StepOnboardingFormData({
       formik.values.taxCode === formik.values.vatNumber &&
       formik.values.taxCode &&
       formik.values.taxCode.length > 0 &&
-      !isPrivateMerchant
+      !controllers.isPrivateMerchant
     ) {
       setStepHistoryState({
         ...stepHistoryState,
@@ -495,7 +483,7 @@ export default function StepOnboardingFormData({
 
   useEffect(() => {
     if (
-      isProdFideiussioni &&
+      controllers.isProdFideiussioni &&
       ((formik.values.vatNumber && formik.values.vatNumber.length === 11) ||
         (stepHistoryState.isTaxCodeEquals2PIVA &&
           formik.values.taxCode &&
@@ -508,7 +496,7 @@ export default function StepOnboardingFormData({
   useEffect(() => {
     if (
       (institutionType === 'PA' || aooSelected || uoSelected) &&
-      !isPremium &&
+      !controllers.isPremium &&
       formik.values.recipientCode &&
       formik.values.recipientCode.length >= 6
     ) {
@@ -532,7 +520,7 @@ export default function StepOnboardingFormData({
     field: keyof OnboardingFormData,
     label: string,
     color: string,
-    fontWeight: string | number = isDisabled ? 'fontWeightRegular' : 'fontWeightMedium'
+    fontWeight: string | number = controllers.isDisabled ? 'fontWeightRegular' : 'fontWeightMedium'
   ) => {
     const isError = !!formik.errors[field] && formik.errors[field] !== requiredError;
     return {
@@ -583,30 +571,22 @@ export default function StepOnboardingFormData({
 
         <PersonalAndBillingDataSection
           productId={productId}
-          origin={origin}
           institutionType={institutionType}
           onboardingFormData={onboardingFormData}
           baseTextFieldProps={baseTextFieldProps}
           stepHistoryState={stepHistoryState}
           setStepHistoryState={setStepHistoryState}
           formik={formik}
-          isDisabled={isDisabled}
-          isPremium={isPremium}
-          isInformationCompany={isInformationCompany}
-          isForeignInsurance={isForeignInsurance}
           institutionAvoidGeotax={institutionAvoidGeotax}
           retrievedIstat={retrievedIstat}
-          isCityEditable={isCityEditable}
-          isInvoiceable={isInvoiceable}
-          isPdndPrivate={isPdndPrivate}
-          isPrivateMerchant={isPrivateMerchant}
+          controllers={controllers}
           setInvalidTaxCodeInvoicing={setInvalidTaxCodeInvoicing}
           recipientCodeStatus={recipientCodeStatus}
           getCountriesFromGeotaxonomies={getCountriesFromGeotaxonomies}
           countries={countries}
           setCountries={setCountries}
         />
-        {isPrivateMerchant && (
+        {controllers.isPrivateMerchant && (
           <IbanSection baseTextFieldProps={baseTextFieldProps} formik={formik} />
         )}
         {!institutionAvoidGeotax && subProductId !== PRODUCT_IDS.DASHBOARD_PSP && (
@@ -620,7 +600,7 @@ export default function StepOnboardingFormData({
             />
           </Grid>
         )}
-        {isPaymentServiceProvider && (
+        {controllers.isPaymentServiceProvider && (
           <Grid item xs={12} display="flex" justifyContent={'center'}>
             <DpoSection baseTextFieldProps={baseTextFieldProps} dpoData={formik.values} />
           </Grid>
