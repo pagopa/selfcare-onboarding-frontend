@@ -132,6 +132,7 @@ export default function PartyAdvancedSelect({
       institutionType !== 'GSP' &&
       institutionType !== 'SCP' &&
       institutionType !== 'PRV' &&
+      institutionType !== 'SCEC' &&
       [PRODUCT_IDS.INTEROP, PRODUCT_IDS.IO_SIGN, PRODUCT_IDS.SEND_DEV, PRODUCT_IDS.SEND].includes(
         product?.id ?? ''
       )) ||
