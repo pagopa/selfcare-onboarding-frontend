@@ -7,6 +7,9 @@ import { InstitutionLocationData } from '../model/InstitutionLocationData';
 import { formatCity } from '../utils/formatting-utils';
 import { AooData } from '../model/AooData';
 import { UoData } from '../model/UoModel';
+import { mockedCountries } from '../lib/__mocks__/mockApiRequests';
+import { CountryResource } from '../model/CountryResource';
+import { ENV } from '../utils/env';
 
 export const getCountriesFromGeotaxonomies = async (
   query: string,
@@ -106,6 +109,28 @@ export const getLocationFromIstatCode = async (
         city: formatCity(result.desc),
       };
       setInstitutionLocationData(institutionLocation);
+    }
+  }
+};
+
+export const getNationalCountries = async (
+  setNationalCountries: Dispatch<SetStateAction<Array<CountryResource> | undefined>>
+) => {
+  if (process.env.REACT_APP_MOCK_API === 'true') {
+    const countriesWithoutIta = mockedCountries.filter(
+      (cm: CountryResource) => cm.alpha_2 !== 'IT'
+    );
+    setNationalCountries(countriesWithoutIta);
+  } else {
+    try {
+      const response = await fetch(ENV.JSON_URL.COUNTRIES);
+      const nationalCountriesResponse = await response.json();
+      const countriesWithoutIta = nationalCountriesResponse.filter(
+        (cm: CountryResource) => cm.alpha_2 !== 'IT'
+      );
+      setNationalCountries(countriesWithoutIta);
+    } catch (reason) {
+      console.error(reason);
     }
   }
 };

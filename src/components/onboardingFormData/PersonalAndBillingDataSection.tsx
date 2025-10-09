@@ -11,7 +11,6 @@ import {
   StepperStepComponentProps,
 } from '../../../types';
 import { OnboardingControllers } from '../../hooks/useOnboardingControllers';
-import { mockedCountries } from '../../lib/__mocks__/mockApiRequests';
 import { UserContext } from '../../lib/context';
 import { AssistanceContacts } from '../../model/AssistanceContacts';
 import { CountryResource } from '../../model/CountryResource';
@@ -21,10 +20,10 @@ import { verifyTaxCodeInvoicing } from '../../services/billingDataServices';
 import {
   getCountriesFromGeotaxonomies,
   getLocationFromIstatCode,
+  getNationalCountries,
 } from '../../services/geoTaxonomyServices';
 import { getUoInfoFromRecipientCode } from '../../services/institutionServices';
 import { PRODUCT_IDS, requiredError } from '../../utils/constants';
-import { ENV } from '../../utils/env';
 import { StepBillingDataHistoryState } from '../steps/StepOnboardingFormData';
 import NumberDecimalFormat from './NumberDecimalFormat';
 
@@ -259,26 +258,6 @@ export default function PersonalAndBillingDataSection({
         },
       },
     };
-  };
-
-  const getNationalCountries = async (_query: string) => {
-    if (process.env.REACT_APP_MOCK_API === 'true') {
-      const countriesWithoutIta = mockedCountries.filter(
-        (cm: CountryResource) => cm.alpha_2 !== 'IT'
-      );
-      setNationalCountries(countriesWithoutIta);
-    } else {
-      try {
-        const response = await fetch(ENV.JSON_URL.COUNTRIES);
-        const nationalCountriesResponse = await response.json();
-        const countriesWithoutIta = nationalCountriesResponse.filter(
-          (cm: CountryResource) => cm.alpha_2 !== 'IT'
-        );
-        setNationalCountries(countriesWithoutIta);
-      } catch (reason) {
-        console.error(reason);
-      }
-    }
   };
 
   return (
@@ -532,7 +511,7 @@ export default function PersonalAndBillingDataSection({
                   const value = e.target.value;
                   setInput(value);
                   if (value.length >= 3) {
-                    void getNationalCountries(value);
+                    void getNationalCountries(setNationalCountries);
                   } else {
                     setNationalCountries(undefined);
                   }
