@@ -1,54 +1,54 @@
 /* eslint-disable sonarjs/cognitive-complexity */
-import React, { useEffect, useState, useContext, useRef, useMemo } from 'react';
-import { useHistory } from 'react-router-dom';
 import { Container } from '@mui/material';
-import { AxiosError, AxiosResponse } from 'axios';
-import SessionModal from '@pagopa/selfcare-common-frontend/lib/components/SessionModal';
-import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
-import { useTranslation, Trans } from 'react-i18next';
-import { uniqueId } from 'lodash';
 import { IllusCompleted, IllusError } from '@pagopa/mui-italia';
 import { EndingPage } from '@pagopa/selfcare-common-frontend/lib';
-import { withLogin } from '../../components/withLogin';
+import SessionModal from '@pagopa/selfcare-common-frontend/lib/components/SessionModal';
+import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
+import { AxiosError, AxiosResponse } from 'axios';
+import { uniqueId } from 'lodash';
+import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
+import { useHistory } from 'react-router-dom';
 import {
   InstitutionType,
+  Problem,
   Product,
+  RequestOutcomeMessage,
   RequestOutcomeOptions,
   StepperStep,
   UserOnCreate,
-  Problem,
-  RequestOutcomeMessage,
 } from '../../../types';
-import { StepSearchParty } from '../../components/steps/StepSearchParty';
-import { StepAddManager } from '../../components/steps/StepAddManager';
 import { LoadingOverlay } from '../../components/LoadingOverlay';
 import { MessageNoAction } from '../../components/MessageNoAction';
-import { fetchWithLogs } from '../../lib/api-utils';
-import { getFetchOutcome } from '../../lib/error-utils';
-import { ENV } from '../../utils/env';
-import { HeaderContext, UserContext } from '../../lib/context';
-import { billingData2billingDataRequest } from '../../model/BillingData';
-import { pspData2pspDataRequest } from '../../model/PspData';
-import NoProductPage from '../NoProductPage';
-import { onboardedInstitutionInfo2geographicTaxonomy } from '../../model/GeographicTaxonomies';
-import { OnboardingFormData } from '../../model/OnboardingFormData';
+import { StepAddManager } from '../../components/steps/StepAddManager';
+import StepInstitutionType from '../../components/steps/StepInstitutionType';
 import StepOnboardingData from '../../components/steps/StepOnboardingData';
 import StepOnboardingFormData from '../../components/steps/StepOnboardingFormData';
-import { registerUnloadEvent, unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
-import StepInstitutionType from '../../components/steps/StepInstitutionType';
-import UserNotAllowedPage from '../UserNotAllowedPage';
-import { AdditionalData, AdditionalInformations } from '../../model/AdditionalInformations';
-import AlreadyOnboarded from '../AlreadyOnboarded';
+import { StepSearchParty } from '../../components/steps/StepSearchParty';
+import { withLogin } from '../../components/withLogin';
+import { fetchWithLogs } from '../../lib/api-utils';
+import { HeaderContext, UserContext } from '../../lib/context';
+import { getFetchOutcome } from '../../lib/error-utils';
 import { AdditionalGpuInformations } from '../../model/AdditionalGpuInformations';
+import { AdditionalInformations } from '../../model/AdditionalInformations';
 import { AggregateInstitution } from '../../model/AggregateInstitution';
-import { selected2OnboardingData } from '../../utils/selected2OnboardingData';
+import { billingData2billingDataRequest } from '../../model/BillingData';
+import { onboardedInstitutionInfo2geographicTaxonomy } from '../../model/GeographicTaxonomies';
+import { OnboardingFormData } from '../../model/OnboardingFormData';
+import { pspData2pspDataRequest } from '../../model/PspData';
 import config from '../../utils/config.json';
 import { PRODUCT_IDS } from '../../utils/constants';
-import { genericError, StepVerifyOnboarding } from './components/StepVerifyOnboarding';
+import { ENV } from '../../utils/env';
+import { registerUnloadEvent, unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
+import AlreadyOnboarded from '../AlreadyOnboarded';
+import NoProductPage from '../NoProductPage';
+import UserNotAllowedPage from '../UserNotAllowedPage';
 import { StepAddAdmin } from './components/StepAddAdmin';
+import { StepAdditionalGpuInformations } from './components/StepAdditionalGpuInformations';
 import { StepAdditionalInformations } from './components/StepAdditionalInformations';
 import { StepUploadAggregates } from './components/StepUploadAggregates';
-import { StepAdditionalGpuInformations } from './components/StepAdditionalGpuInformations';
+import { genericError, StepVerifyOnboarding } from './components/StepVerifyOnboarding';
+import { createForwardFunctions } from './components/forwards/forwardFunctions';
 
 export type ValidateErrorType = 'conflictError';
 
@@ -92,29 +92,59 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
   const [origin, setOrigin] = useState<string>();
   const [pricingPlan, setPricingPlan] = useState<string>();
   const [filterCategoriesResponse, setFilterCategoriesResponse] = useState<any>();
-
   const { setOnExit } = useContext(HeaderContext);
   const { setRequiredLogin } = useContext(UserContext);
   const requestIdRef = useRef<string>();
   const { t } = useTranslation();
   const [onExitAction, setOnExitAction] = useState<(() => void) | undefined>();
-
   const productAvoidStep = [PRODUCT_IDS.SEND, PRODUCT_IDS.IDPAY].includes(
     selectedProduct?.id ?? ''
   );
-
   const fromDashboard =
     window.location.search.indexOf(`partyExternalId=${externalInstitutionId}`) > -1;
-
   const subunitTypeByQuery =
-    new URLSearchParams(window.location.hash.substr(1)).get('subunitType') ?? '';
+    new URLSearchParams(window.location.hash.substring(1)).get('subunitType') ?? '';
   const subunitCodeByQuery =
-    new URLSearchParams(window.location.hash.substr(1)).get('subunitCode') ?? '';
-
+    new URLSearchParams(window.location.hash.substring(1)).get('subunitCode') ?? '';
   const isTechPartner = institutionType === 'PT';
-
   const institutionTypeByUrl = new URLSearchParams(window.location.search).get('institutionType');
   const desiredOriginRef = useRef<string | undefined>();
+
+  const back = () => {
+    setActiveStep(activeStep - 1);
+  };
+  const forward = () => {
+    setActiveStep(activeStep + 1);
+  };
+
+  const {
+    forwardWithData,
+    forwardWithInstitutionType,
+    forwardWithDataAndInstitution,
+    forwardWithBillingData,
+    forwardWithAdditionalGSPInfo,
+    forwardWithAdditionalGPUInfo,
+    forwardWithOnboardingData,
+  } = createForwardFunctions({
+    requestIdRef,
+    productId,
+    institutionType,
+    onboardingFormData,
+    setInstitutionType,
+    setOnboardingFormData,
+    setActiveStep,
+    setOrigin,
+    forward,
+    formData,
+    setFormData,
+    desiredOriginRef,
+    activeStep,
+    origin,
+    setExternalInstitutionId,
+    externalInstitutionId,
+    setAdditionalInformations,
+    setAdditionalGPUInformations,
+  });
 
   useEffect(() => {
     if (institutionTypeByUrl === 'PT' && productId === PRODUCT_IDS.PAGOPA) {
@@ -237,16 +267,26 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
   }, []);
 
   const selectFilterCategories = () => {
-    if (productId === PRODUCT_IDS.SEND) {
-      return filterCategoriesResponse?.product['prod-pn']?.ipa.PA;
-    } else if (productId === PRODUCT_IDS.IDPAY_MERCHANT) {
-      return filterCategoriesResponse?.product['prod-idpay-merchant']?.merchantDetails?.atecoCodes;
-    } else if (productId === PRODUCT_IDS.INTEROP && institutionType === 'SCEC') {
-      return filterCategoriesResponse?.product['prod-interop']?.ipa.SCEC;
-    } else if (institutionType === 'GSP') {
-      return filterCategoriesResponse?.product.default.ipa.GSP;
-    } else {
-      return filterCategoriesResponse?.product.default.ipa.PA;
+    if (!filterCategoriesResponse?.product) {
+      return undefined;
+    }
+
+    switch (productId) {
+      case PRODUCT_IDS.SEND:
+        return filterCategoriesResponse.product['prod-pn']?.ipa.PA;
+
+      case PRODUCT_IDS.IDPAY_MERCHANT:
+        return filterCategoriesResponse.product['prod-idpay-merchant']?.merchantDetails?.atecoCodes;
+
+      case PRODUCT_IDS.INTEROP:
+        if (institutionType === 'SCEC') {
+          return filterCategoriesResponse.product['prod-interop']?.ipa.SCEC;
+        }
+        return filterCategoriesResponse.product.default?.ipa.PA;
+
+      default:
+        const defaultIpa = filterCategoriesResponse.product.default?.ipa;
+        return institutionType === 'GSP' ? defaultIpa?.GSP : defaultIpa?.PA;
     }
   };
 
@@ -328,123 +368,6 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     } else {
       setFilterCategoriesResponse(config);
     }
-  };
-
-  const back = () => {
-    setActiveStep(activeStep - 1);
-  };
-
-  const forward = () => {
-    setActiveStep(activeStep + 1);
-  };
-
-  const forwardWithData = (newFormData: Partial<FormData>) => {
-    if (formData) {
-      setFormData({ ...formData, ...newFormData });
-    } else {
-      setFormData(newFormData);
-    }
-    forward();
-  };
-
-  const forwardWithDataAndInstitution = (
-    onboardingData: OnboardingFormData,
-    institutionType: InstitutionType
-  ) => {
-    if (
-      onboardingData.taxCode === '' &&
-      onboardingData.originId === undefined &&
-      institutionType === 'GSP'
-    ) {
-      // eslint-disable-next-line functional/immutable-data
-      desiredOriginRef.current = 'SELC';
-      setOrigin('SELC');
-      setActiveStep(activeStep + 3);
-    } else {
-      setOnboardingFormData(onboardingData);
-      setExternalInstitutionId(onboardingData.externalId ?? '');
-      const originToSet = onboardingData.origin || origin;
-
-      if (originToSet) {
-        // eslint-disable-next-line functional/immutable-data
-        desiredOriginRef.current = originToSet;
-      }
-
-      setOrigin(originToSet);
-      forwardWithData(onboardingData as Partial<FormData>);
-      trackEvent('ONBOARDING_PARTY_SELECTION', {
-        party_id: onboardingData?.externalId,
-        request_id: requestIdRef.current,
-        product_id: productId,
-      });
-      setInstitutionType(institutionType);
-    }
-  };
-
-  const forwardWithBillingData = (newOnboardingFormData: OnboardingFormData) => {
-    const trackingData = {
-      request_id: requestIdRef.current,
-      party_id: externalInstitutionId,
-      product_id: productId,
-      geographic_taxonomies: newOnboardingFormData.geographicTaxonomies,
-    };
-    trackEvent('ONBOARDING_BILLING_DATA', trackingData);
-    setOnboardingFormData(newOnboardingFormData);
-    switch (institutionType) {
-      case 'GSP':
-        if (productId === PRODUCT_IDS.PAGOPA) {
-          setActiveStep(activeStep + 2);
-        } else {
-          setActiveStep(activeStep + 3);
-        }
-        break;
-      case 'GPU':
-        setActiveStep(activeStep + 1);
-        break;
-      case 'PT':
-        setActiveStep(activeStep + 4);
-        break;
-      default:
-        setActiveStep(activeStep + 3);
-        break;
-    }
-  };
-
-  const forwardWithAdditionalGSPInfo = (newAdditionalInformations: {
-    [key: string]: AdditionalData;
-  }) => {
-    setAdditionalInformations({
-      agentOfPublicService: newAdditionalInformations.isConcessionaireOfPublicService?.choice,
-      agentOfPublicServiceNote:
-        newAdditionalInformations.isConcessionaireOfPublicService?.textFieldValue,
-      belongRegulatedMarket: newAdditionalInformations.fromBelongsRegulatedMarket?.choice,
-      regulatedMarketNote: newAdditionalInformations.fromBelongsRegulatedMarket?.textFieldValue,
-      establishedByRegulatoryProvision:
-        newAdditionalInformations.isEstabilishedRegulatoryProvision?.choice,
-      establishedByRegulatoryProvisionNote:
-        newAdditionalInformations.isEstabilishedRegulatoryProvision?.textFieldValue,
-      ipa: newAdditionalInformations.isFromIPA?.choice,
-      ipaCode: newAdditionalInformations.isFromIPA?.textFieldValue,
-      otherNote: newAdditionalInformations.optionalPartyInformations?.textFieldValue ?? '',
-    });
-    forward();
-  };
-
-  const forwardWithAdditionalGPUInfo = (
-    newAdditionalGpuInformations: AdditionalGpuInformations
-  ) => {
-    setAdditionalGPUInformations({
-      businessRegisterNumber: newAdditionalGpuInformations?.businessRegisterNumber,
-      legalRegisterNumber: newAdditionalGpuInformations?.legalRegisterNumber,
-      legalRegisterName: newAdditionalGpuInformations.legalRegisterName,
-      longTermPayments: newAdditionalGpuInformations.longTermPayments,
-      manager: newAdditionalGpuInformations.manager,
-      managerAuthorized: newAdditionalGpuInformations.managerAuthorized,
-      managerEligible: newAdditionalGpuInformations.managerEligible,
-      managerProsecution: newAdditionalGpuInformations.managerProsecution,
-      institutionCourtMeasures: newAdditionalGpuInformations.institutionCourtMeasures,
-    });
-    setActiveStep(activeStep + 2);
   };
 
   const outcomeContent: RequestOutcomeOptions = {
@@ -693,71 +616,6 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
         product_id: productId,
       });
     });
-  };
-
-  const forwardWithOnboardingData = (
-    onboardingFormData?: OnboardingFormData,
-    institutionType?: InstitutionType,
-    _id?: string
-  ) => {
-    if (onboardingFormData) {
-      setOnboardingFormData(onboardingFormData);
-    }
-    setInstitutionType(institutionType);
-    forward();
-  };
-
-  const forwardWithInstitutionType = (newInstitutionType: InstitutionType) => {
-    const partyExternalIdByQuery = new URLSearchParams(window.location.search).get(
-      'partyExternalId'
-    );
-    trackEvent('ONBOARDING_PARTY_TYPE_SELECTION', {
-      request_id: requestIdRef.current,
-      party_id: partyExternalIdByQuery ?? '',
-      product_id: productId,
-    });
-    setInstitutionType(newInstitutionType);
-
-    if (newInstitutionType === 'PRV' && productId === PRODUCT_IDS.PAGOPA) {
-      selected2OnboardingData(null, undefined, newInstitutionType, productId);
-      setOnboardingFormData(
-        selected2OnboardingData(null, undefined, newInstitutionType, productId)
-      );
-      setActiveStep(4);
-    } else {
-      forward();
-    }
-
-    if (
-      newInstitutionType !== 'GSP' &&
-      newInstitutionType !== 'PA' &&
-      newInstitutionType !== 'SA' &&
-      newInstitutionType !== 'AS' &&
-      newInstitutionType !== 'SCP' &&
-      newInstitutionType !== 'PRV' &&
-      newInstitutionType !== 'SCEC'
-    ) {
-      if (newInstitutionType !== institutionType) {
-        setOnboardingFormData({
-          businessName: '',
-          registeredOffice: '',
-          zipCode: '',
-          digitalAddress: '',
-          taxCode: '',
-          vatNumber: '',
-          recipientCode: '',
-          geographicTaxonomies: [],
-        });
-      } else {
-        setOnboardingFormData(onboardingFormData);
-      }
-      setActiveStep(4);
-    }
-    if (newInstitutionType && newInstitutionType === 'PA') {
-      setOrigin('IPA');
-    } else {
-      setOrigin(undefined);
-    }
   };
 
   const steps: Array<StepperStep> = [

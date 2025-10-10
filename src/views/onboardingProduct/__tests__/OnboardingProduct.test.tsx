@@ -31,8 +31,6 @@ import { createStore } from '../../../redux/store';
 import { Provider } from 'react-redux';
 
 jest.setTimeout(40000);
-
-jest.mock('../../../lib/api-utils');
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   useHistory: () => ({
