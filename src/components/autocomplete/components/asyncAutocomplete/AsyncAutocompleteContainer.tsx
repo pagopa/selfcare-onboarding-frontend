@@ -1,6 +1,5 @@
 import { Grid, Theme, Typography } from '@mui/material';
 import { Box } from '@mui/system';
-import { AxiosError, AxiosResponse } from 'axios';
 import debounce from 'lodash/debounce';
 import {
   Dispatch,
@@ -20,12 +19,18 @@ import {
   Product,
 } from '../../../../../types';
 import OnboardingPartyIcon from '../../../../assets/onboarding_party_icon.svg';
-import { fetchWithLogs } from '../../../../lib/api-utils';
 import { UserContext } from '../../../../lib/context';
-import { getFetchOutcome } from '../../../../lib/error-utils';
 import { AooData } from '../../../../model/AooData';
 import { SelectionsState } from '../../../../model/Selection';
 import { UoData } from '../../../../model/UoModel';
+import {
+  contractingInsuranceFromTaxId,
+  fetchInstitutionByTaxCode,
+  fetchInstitutionsByName,
+  handleSearchByAooCode,
+  handleSearchByReaCode,
+  handleSearchByUoCode,
+} from '../../../../services/autocompleteServices';
 import { buildUrlLogo, noMandatoryIpaProducts, PRODUCT_IDS } from '../../../../utils/constants';
 import { ENV } from '../../../../utils/env';
 import AsyncAutocompleteResultsBusinessName from './components/AsyncAutocompleteResultsBusinessName';
@@ -150,31 +155,20 @@ export default function AsyncAutocompleteContainer({
   const handleSearchByName = useCallback(
     async (query: string, endpoint: Endpoint, limit?: number, categories?: string) => {
       setApiLoading?.(true);
-      const searchResponse = await fetchWithLogs(
+
+      await fetchInstitutionsByName(
+        query,
         endpoint,
-        {
-          method: 'GET',
-          params: {
-            limit,
-            page: 1,
-            search: query,
-            categories,
-          },
-        },
-        () => setRequiredLogin(true)
+        setOptions,
+        transformFn,
+        setRequiredLogin,
+        limit,
+        categories
       );
-
-      const outcome = getFetchOutcome(searchResponse);
-
-      if (outcome === 'success') {
-        setOptions(transformFn((searchResponse as AxiosResponse).data));
-      } else if ((searchResponse as AxiosError).response?.status === 404) {
-        setOptions([]);
-      }
 
       setApiLoading?.(false);
     },
-    [setApiLoading, setRequiredLogin, transformFn, setOptions]
+    [setApiLoading, setOptions, transformFn, setRequiredLogin]
   );
 
   const debouncedSearchByName = useMemo(
@@ -190,247 +184,41 @@ export default function AsyncAutocompleteContainer({
     };
   }, [debouncedSearchByName]);
 
-  const handleSearchByTaxCode = async (
-    addUser: boolean,
-    endpoint: ApiEndpointKey,
-    params: any,
-    query: string
-    // eslint-disable-next-line sonarjs/cognitive-complexity
-  ) => {
-    setApiLoading?.(true);
-    const updatedParams = {
-      ...params,
-      taxCode: addUser ? query : undefined,
-      categories:
-        (product?.id === PRODUCT_IDS.INTEROP || product?.id === PRODUCT_IDS.IDPAY_MERCHANT) &&
-        (institutionType === 'SCP' || institutionType === 'PRV')
-          ? undefined
-          : filterCategories,
-    };
+  const handleSearchByTaxCode = useCallback(
+    async (addUser: boolean, endpoint: ApiEndpointKey, params: any, query: string) => {
+      setApiLoading?.(true);
 
-    const searchResponse = await fetchWithLogs(
-      { endpoint, endpointParams: addUser ? undefined : { id: query } },
-      {
-        method: 'GET',
-        params: updatedParams,
-      },
-      () => setRequiredLogin(true)
-    );
+      await fetchInstitutionByTaxCode(
+        addUser,
+        endpoint,
+        params,
+        query,
+        product?.id,
+        institutionType,
+        filterCategories,
+        disabledStatusCompany,
+        setCfResult,
+        setMerchantSearchResult,
+        setIsPresentInAtecoWhiteList,
+        setDisabled,
+        setRequiredLogin
+      );
 
-    const outcome = getFetchOutcome(searchResponse);
-
-    if (outcome === 'success') {
-      const response = (searchResponse as AxiosResponse).data;
-      setCfResult(response);
-
-      if (product?.id === PRODUCT_IDS.IDPAY_MERCHANT) {
-        setMerchantSearchResult?.(response);
-        if (disabledStatusCompany) {
-          setDisabled(true);
-        } else if (filterCategories && response?.atecoCodes && Array.isArray(response.atecoCodes)) {
-          const whitelistCodes = filterCategories.split(',');
-          const hasMatchingCode = response.atecoCodes.some((code: string) =>
-            whitelistCodes.includes(code)
-          );
-          setIsPresentInAtecoWhiteList?.(hasMatchingCode);
-          setDisabled(!hasMatchingCode);
-        } else {
-          setIsPresentInAtecoWhiteList?.(false);
-          setDisabled(true);
-        }
-      }
-    } else if ((searchResponse as AxiosError).response?.status === 404) {
-      setCfResult(undefined);
-      if (product?.id === PRODUCT_IDS.IDPAY_MERCHANT) {
-        setIsPresentInAtecoWhiteList?.(false);
-        setMerchantSearchResult?.(undefined);
-      }
-    }
-
-    setApiLoading?.(false);
-  };
-
-  const handleSearchByReaCode = async (
-    addUser: boolean,
-    endpoint: ApiEndpointKey,
-    params: any,
-    query: string
-    // eslint-disable-next-line sonarjs/cognitive-complexity
-  ) => {
-    setApiLoading?.(true);
-
-    const reaPattern = /^[A-Za-z]{2}-\d{6}$/;
-    if (!reaPattern.test(query)) {
       setApiLoading?.(false);
-      setCfResult(undefined);
-      setIsPresentInAtecoWhiteList?.(false);
-      return;
-    }
-
-    const updatedParams = addUser
-      ? params
-      : {
-          rea: query,
-        };
-
-    const searchResponse = await fetchWithLogs(
-      {
-        endpoint,
-      },
-      {
-        method: 'GET',
-        params: updatedParams,
-      },
-      () => setRequiredLogin(true)
-    );
-
-    const outcome = getFetchOutcome(searchResponse);
-
-    if (outcome === 'success') {
-      const response = (searchResponse as AxiosResponse).data;
-      setCfResult(response);
-
-      if (product?.id === PRODUCT_IDS.IDPAY_MERCHANT) {
-        setMerchantSearchResult?.(response);
-        if (disabledStatusCompany) {
-          setDisabled(true);
-        } else if (filterCategories && response.atecoCodes && Array.isArray(response.atecoCodes)) {
-          const whitelistCodes = filterCategories.split(',');
-          const hasMatchingCode = response.atecoCodes.some((code: string) =>
-            whitelistCodes.includes(code)
-          );
-          setIsPresentInAtecoWhiteList?.(hasMatchingCode);
-          setDisabled(!hasMatchingCode);
-        } else {
-          setIsPresentInAtecoWhiteList?.(false);
-          setDisabled(true);
-        }
-      }
-    } else if ((searchResponse as AxiosError).response?.status === 404) {
-      setCfResult(undefined);
-      if (product?.id === PRODUCT_IDS.IDPAY_MERCHANT) {
-        setMerchantSearchResult?.(undefined);
-        setIsPresentInAtecoWhiteList?.(false);
-      }
-    }
-
-    setApiLoading?.(false);
-  };
-
-  const handleSearchByAooCode = async (
-    addUser: boolean,
-    endpoint: ApiEndpointKey,
-    params: any,
-    query: string
-  ) => {
-    setApiLoading?.(true);
-
-    const updatedParams = addUser
-      ? params
-      : {
-          origin: 'IPA',
-          categories: filterCategories,
-        };
-
-    const searchResponse = await fetchWithLogs(
-      { endpoint, endpointParams: addUser ? undefined : { codiceUniAoo: query } },
-      {
-        method: 'GET',
-        params: updatedParams,
-      },
-      () => setRequiredLogin(true)
-    );
-
-    const outcome = getFetchOutcome(searchResponse);
-
-    if (outcome === 'success') {
-      const response = addUser
-        ? ((searchResponse as AxiosResponse).data[0] ?? (searchResponse as AxiosResponse).data)
-        : (searchResponse as AxiosResponse).data;
-      setAooResult(response);
-      setAooResultHistory(response);
-    } else if ((searchResponse as AxiosError).response?.status === 404) {
-      setAooResult(undefined);
-    }
-
-    setApiLoading?.(false);
-  };
-
-  const handleSearchByUoCode = async (
-    addUser: boolean,
-    endpoint: ApiEndpointKey,
-    params: any,
-    query: string
-  ) => {
-    setApiLoading?.(true);
-
-    const updatedParams = addUser
-      ? params
-      : {
-          origin: 'IPA',
-          categories: filterCategories,
-        };
-
-    const searchResponse = await fetchWithLogs(
-      { endpoint, endpointParams: addUser ? undefined : { codiceUniUo: query } },
-      {
-        method: 'GET',
-        params: updatedParams,
-      },
-      () => setRequiredLogin(true)
-    );
-
-    const outcome = getFetchOutcome(searchResponse);
-
-    if (outcome === 'success') {
-      const response = addUser
-        ? ((searchResponse as AxiosResponse).data[0] ?? (searchResponse as AxiosResponse).data)
-        : (searchResponse as AxiosResponse).data;
-      setUoResult(response);
-      setUoResultHistory(response);
-    } else if ((searchResponse as AxiosError).response?.status === 404) {
-      setUoResult(undefined);
-    }
-
-    setApiLoading?.(false);
-  };
-
-  const contractingInsuranceFromTaxId = async (
-    addUser: boolean,
-    endpoint: ApiEndpointKey,
-    params: any,
-    query: string
-  ) => {
-    setApiLoading?.(true);
-
-    const searchResponse = await fetchWithLogs(
-      {
-        endpoint,
-        endpointParams: addUser
-          ? undefined
-          : institutionType === 'SA' || institutionType === 'AS'
-            ? { taxId: query }
-            : { code: query },
-      },
-      {
-        method: 'GET',
-        params: addUser ? params : undefined,
-      },
-      () => setRequiredLogin(true)
-    );
-
-    const outcome = getFetchOutcome(searchResponse);
-    if (outcome === 'success') {
-      const response = addUser
-        ? ((searchResponse as AxiosResponse).data[0] ?? (searchResponse as AxiosResponse).data)
-        : (searchResponse as AxiosResponse).data;
-      setCfResult(response);
-    } else if ((searchResponse as AxiosError).response?.status === 404) {
-      setCfResult(undefined);
-    }
-
-    setApiLoading?.(false);
-  };
+    },
+    [
+      setApiLoading,
+      product?.id,
+      institutionType,
+      filterCategories,
+      disabledStatusCompany,
+      setCfResult,
+      setMerchantSearchResult,
+      setIsPresentInAtecoWhiteList,
+      setDisabled,
+      setRequiredLogin,
+    ]
+  );
 
   const searchByInstitutionType = useCallback(
     (value: string, institutionType?: string) => {
@@ -523,7 +311,16 @@ export default function AsyncAutocompleteContainer({
             ? 'ONBOARDING_GET_SA_PARTY_FROM_FC'
             : 'ONBOARDING_GET_INSURANCE_COMPANIES_FROM_IVASSCODE';
 
-        return contractingInsuranceFromTaxId(addUser, endpoint, params, value);
+        return contractingInsuranceFromTaxId(
+          addUser,
+          endpoint,
+          params,
+          value,
+          institutionType,
+          setApiLoading,
+          setCfResult,
+          setRequiredLogin
+        );
       } else {
         const endpoint = getSearchEndpoint(addUser, institutionType, product, selections);
         return handleSearchByTaxCode(addUser, endpoint, params, value);
@@ -532,19 +329,53 @@ export default function AsyncAutocompleteContainer({
 
     if (selections.aooCode && !selections.uoCode && length === 7) {
       const endpoint = addUser ? 'ONBOARDING_GET_INSTITUTIONS' : 'ONBOARDING_GET_AOO_CODE_INFO';
-      return handleSearchByAooCode(addUser, endpoint, params, value);
+      return handleSearchByAooCode(
+        addUser,
+        endpoint,
+        params,
+        value,
+        setApiLoading,
+        setAooResult,
+        setAooResultHistory,
+        filterCategories,
+        setRequiredLogin
+      );
     }
 
     if (selections.uoCode && !selections.aooCode && length === 6) {
       const endpoint = addUser ? 'ONBOARDING_GET_INSTITUTIONS' : 'ONBOARDING_GET_UO_CODE_INFO';
-      return handleSearchByUoCode(addUser, endpoint, params, value);
+      return handleSearchByUoCode(
+        addUser,
+        endpoint,
+        params,
+        value,
+        setApiLoading,
+        setUoResult,
+        setUoResultHistory,
+        filterCategories,
+        setRequiredLogin
+      );
     }
 
     if (selections.reaCode && length > 1) {
       const endpoint = addUser
         ? 'ONBOARDING_GET_INSTITUTIONS'
         : 'ONBOARDING_GET_VISURA_INFOCAMERE_BY_REA';
-      return handleSearchByReaCode(addUser, endpoint, params, value);
+      return handleSearchByReaCode(
+        addUser,
+        endpoint,
+        params,
+        value,
+        setApiLoading,
+        setCfResult,
+        setIsPresentInAtecoWhiteList,
+        setDisabled,
+        setRequiredLogin,
+        product,
+        filterCategories,
+        disabledStatusCompany,
+        setMerchantSearchResult
+      );
     }
 
     return null;
