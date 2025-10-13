@@ -14,6 +14,7 @@ import { OnboardingStepActions } from '../../../components/OnboardingStepActions
 import { OnboardedParty } from '../../../model/OnboardedParty';
 import AddUserHeading from '../AddUserHeading';
 import { selected2OnboardingData } from '../../../utils/selected2OnboardingData';
+import { SelectionsState } from '../../../model/Selection';
 
 type Props = {
   institutionType?: InstitutionType;
@@ -22,12 +23,10 @@ type Props = {
 
 function StepSearchOnboardedParty({ institutionType, selectedProduct, forward, back }: Props) {
   const { t } = useTranslation();
-
   const [selected, setSelected, _setSelectedHistory] = useHistoryState<PartyData | null>(
     'selected_step1',
     null
   );
-
   const [aooResult, setAooResult, _setAooResultHistory] = useHistoryState<AooData | undefined>(
     'aooSelected_step1',
     undefined
@@ -38,6 +37,15 @@ function StepSearchOnboardedParty({ institutionType, selectedProduct, forward, b
   );
 
   const [disabled, setDisabled] = useState<boolean>(false);
+  const [selections, setSelections] = useState<SelectionsState>({
+    businessName: false,
+    aooCode: false,
+    uoCode: false,
+    reaCode: false,
+    taxCode: true,
+    personalTaxCode: false,
+    ivassCode: false,
+  });
 
   return (
     <Grid container item>
@@ -132,10 +140,6 @@ function StepSearchOnboardedParty({ institutionType, selectedProduct, forward, b
             externalInstitutionId=""
             isSearchFieldSelected={true}
             transformFn={(data: { items: Array<OnboardedParty> }) =>
-              /* removed transformation into lower case in order to send data to BE as obtained from registry
-                  // eslint-disable-next-line functional/immutable-data
-                  data.items.forEach((i) => (i.description = i.description.toLowerCase()));
-                  */
               data.items
             }
             selected={selected as any}
@@ -147,16 +151,8 @@ function StepSearchOnboardedParty({ institutionType, selectedProduct, forward, b
             setDisabled={setDisabled}
             setIsSearchFieldSelected={() => {}}
             selectedProduct={selectedProduct}
-            selections={{
-              businessName: false,
-              aooCode: false,
-              uoCode: false,
-              reaCode: false,
-              taxCode: false,
-              personalTaxCode: false,
-              ivassCode: false,
-            }}
-            setSelections={() => {}}
+            selections={selections}
+            setSelections={setSelections}
             addUser={window.location.pathname.includes('/user')}
           />
         </Grid>
