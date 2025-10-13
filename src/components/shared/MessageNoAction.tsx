@@ -1,6 +1,6 @@
 import { Box, Typography, useTheme } from '@mui/material';
 import React from 'react';
-import { RequestOutcomeMessage } from '../../types';
+import { RequestOutcomeMessage } from '../../../types';
 
 export function MessageNoAction({ img, title, description, ImgComponent }: RequestOutcomeMessage) {
   const theme = useTheme();

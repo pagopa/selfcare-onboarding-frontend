@@ -4,7 +4,7 @@ import { styled } from '@mui/material/styles';
 import { useTranslation, Trans } from 'react-i18next';
 import { SetStateAction } from 'react';
 import { Product } from '../../../../types';
-import { OnboardingStepActions } from '../../../components/OnboardingStepActions';
+import { OnboardingStepActions } from '../../../components/registrationSteps/OnboardingStepActions';
 import { ENV } from '../../../utils/env';
 
 type Props = {

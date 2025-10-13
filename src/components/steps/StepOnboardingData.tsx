@@ -11,8 +11,8 @@ import { HeaderContext, UserContext } from '../../lib/context';
 import { submit } from '../../services/onboardingServices';
 import { ENV } from '../../utils/env';
 import { unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
-import { LoadingOverlay } from '../LoadingOverlay';
-import { MessageNoAction } from '../MessageNoAction';
+import { LoadingOverlay } from '../modals/LoadingOverlay';
+import { MessageNoAction } from '../shared/MessageNoAction';
 
 type Props = StepperStepComponentProps & {
   productId: string;

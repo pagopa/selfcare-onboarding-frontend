@@ -6,9 +6,9 @@ import DownloadIcon from '@mui/icons-material/Download';
 import { SessionModal } from '@pagopa/selfcare-common-frontend/lib';
 import { useState } from 'react';
 import { storageTokenOps } from '@pagopa/selfcare-common-frontend/lib/utils/storage';
-import { StepperStepComponentProps } from '../../types';
-import { getRequestJwt } from '../utils/getRequestJwt';
-import { ENV } from '../utils/env';
+import { StepperStepComponentProps } from '../../../types';
+import { getRequestJwt } from '../../utils/getRequestJwt';
+import { ENV } from '../../utils/env';
 
 export function ConfirmRegistrationStep0({ forward }: StepperStepComponentProps) {
   const { t } = useTranslation();

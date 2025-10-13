@@ -8,7 +8,7 @@ import { getFetchOutcome } from '../../../lib/error-utils';
 import { unregisterUnloadEvent } from '../../../utils/unloadEvent-utils';
 import { buildUrlLogo } from '../../../utils/constants';
 import { genericError } from '../../onboardingProduct/components/StepVerifyOnboarding';
-import { MessageNoAction } from '../../../components/MessageNoAction';
+import { MessageNoAction } from '../../../components/shared/MessageNoAction';
 
 type Props = StepperStepComponentProps & {
   requestId: string;

@@ -1,7 +1,7 @@
 import { Grid, Typography } from '@mui/material';
 import { Trans } from 'react-i18next';
 import { useTranslation } from 'react-i18next';
-import { RolesInformations } from '../../components/RolesInformations';
+import { RolesInformations } from '../../components/shared/RolesInformations';
 import { InstitutionType } from '../../../types';
 
 type Props = {

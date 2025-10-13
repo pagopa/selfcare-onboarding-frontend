@@ -16,10 +16,10 @@ import { ENV } from '../../../utils/env';
 import { getFetchOutcome } from '../../../lib/error-utils';
 import { HeaderContext, UserContext } from '../../../lib/context';
 import { unregisterUnloadEvent } from '../../../utils/unloadEvent-utils';
-import { LoadingOverlay } from '../../../components/LoadingOverlay';
-import { MessageNoAction } from '../../../components/MessageNoAction';
-import UserNotAllowedPage from '../../UserNotAllowedPage';
-import AlreadyOnboarded from '../../AlreadyOnboarded';
+import { LoadingOverlay } from '../../../components/modals/LoadingOverlay';
+import { MessageNoAction } from '../../../components/shared/MessageNoAction';
+import UserNotAllowedPage from '../../../components/layout/UserNotAllowedPage';
+import AlreadyOnboarded from '../../../components/layout/AlreadyOnboarded';
 import { OnboardingFormData } from '../../../model/OnboardingFormData';
 import { PRODUCT_IDS } from '../../../utils/constants';
 

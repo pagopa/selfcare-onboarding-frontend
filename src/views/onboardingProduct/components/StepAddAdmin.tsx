@@ -5,14 +5,14 @@ import { omit, uniqueId } from 'lodash';
 import { ChangeEvent, useContext, useEffect, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { StepperStepComponentProps, UserOnCreate } from '../../../../types';
-import { ConfirmOnboardingModal } from '../../../components/ConfirmOnboardingRequest';
-import { OnboardingStepActions } from '../../../components/OnboardingStepActions';
-import { PlatformUserForm, validateUser } from '../../../components/PlatformUserForm';
-import { useHistoryState } from '../../../components/useHistoryState';
+import { ConfirmOnboardingModal } from '../../../components/modals/ConfirmOnboardingRequest';
+import { OnboardingStepActions } from '../../../components/registrationSteps/OnboardingStepActions';
+import { PlatformUserForm, validateUser } from '../../../components/forms/PlatformUserForm';
+import { useHistoryState } from '../../../hooks/useHistoryState';
 import { UserContext } from '../../../lib/context';
 import { objectIsEmpty } from '../../../lib/object-utils';
-import { userValidate } from '../../../utils/api/userValidate';
-import { RolesInformations } from '../../../components/RolesInformations';
+import { userValidate } from '../../../services/validationServices';
+import { RolesInformations } from '../../../components/shared/RolesInformations';
 
 // Could be an ES6 Set but it's too bothersome for now
 export type UsersObject = { [key: string]: UserOnCreate };

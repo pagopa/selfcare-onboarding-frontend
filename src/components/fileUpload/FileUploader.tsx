@@ -1,7 +1,7 @@
 import { Grid, Typography, Theme, Button } from '@mui/material';
 import { Accept, DropEvent, FileRejection, useDropzone } from 'react-dropzone';
 import { Box } from '@mui/system';
-import { ReactComponent as CloudUpload } from '../assets/cloud-upload.svg';
+import { ReactComponent as CloudUpload } from '../../assets/cloud-upload.svg';
 import { FileUploadedPreview } from './FileUploadedPreview';
 
 type FileUploaderOption = {

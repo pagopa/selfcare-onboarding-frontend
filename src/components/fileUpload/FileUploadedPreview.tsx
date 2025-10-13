@@ -3,7 +3,7 @@ import { Box } from '@mui/system';
 import { Grid, LinearProgress, Theme, Tooltip, Typography } from '@mui/material';
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 import { useTranslation } from 'react-i18next';
-import { ReactComponent as ClipFileUploaded } from '../assets/clip_file_uploaded.svg';
+import { ReactComponent as ClipFileUploaded } from '../../assets/clip_file_uploaded.svg';
 
 type FileUploadedPreviewParams = {
   files: Array<File>;

@@ -10,8 +10,8 @@ import {
 } from '@mui/material';
 import { useTranslation, Trans } from 'react-i18next';
 import { useEffect, useState } from 'react';
-import { OnboardingStepActions } from '../../../components/OnboardingStepActions';
-import { RadioWithTextField } from '../../../components/RadioWithTextField';
+import { OnboardingStepActions } from '../../../components/registrationSteps/OnboardingStepActions';
+import { RadioWithTextField } from '../../../components/forms/RadioWithTextField';
 import { StepperStepComponentProps } from '../../../../types';
 
 type Props = StepperStepComponentProps & {

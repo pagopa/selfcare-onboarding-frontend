@@ -16,8 +16,8 @@ import {
   Product,
   StepperStepComponentProps,
 } from '../../../types';
-import { OnboardingStepActions } from '../OnboardingStepActions';
-import { useHistoryState } from '../useHistoryState';
+import { OnboardingStepActions } from '../registrationSteps/OnboardingStepActions';
+import { useHistoryState } from '../../hooks/useHistoryState';
 import {
   description4InstitutionType,
   institutionType4Product,

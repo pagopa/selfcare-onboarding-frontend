@@ -18,8 +18,8 @@ import {
   StepperStep,
   UserOnCreate,
 } from '../../../types';
-import { LoadingOverlay } from '../../components/LoadingOverlay';
-import { MessageNoAction } from '../../components/MessageNoAction';
+import { LoadingOverlay } from '../../components/modals/LoadingOverlay';
+import { MessageNoAction } from '../../components/shared/MessageNoAction';
 import { StepAddManager } from '../../components/steps/StepAddManager';
 import StepInstitutionType from '../../components/steps/StepInstitutionType';
 import StepOnboardingData from '../../components/steps/StepOnboardingData';
@@ -41,9 +41,9 @@ import config from '../../utils/config.json';
 import { PRODUCT_IDS } from '../../utils/constants';
 import { ENV } from '../../utils/env';
 import { registerUnloadEvent, unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
-import AlreadyOnboarded from '../AlreadyOnboarded';
-import NoProductPage from '../NoProductPage';
-import UserNotAllowedPage from '../UserNotAllowedPage';
+import AlreadyOnboarded from '../../components/layout/AlreadyOnboarded';
+import NoProductPage from '../../components/layout/NoProductPage';
+import UserNotAllowedPage from '../../components/layout/UserNotAllowedPage';
 import { StepAddAdmin } from './components/StepAddAdmin';
 import { StepAdditionalGpuInformations } from './components/StepAdditionalGpuInformations';
 import { StepAdditionalInformations } from './components/StepAdditionalInformations';

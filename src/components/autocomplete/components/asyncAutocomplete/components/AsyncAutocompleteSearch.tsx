@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 import { Dispatch, SetStateAction, useEffect, useMemo } from 'react';
 import { IPACatalogParty, PartyData } from '../../../../../../types';
-import { useHistoryState } from '../../../../useHistoryState';
+import { useHistoryState } from '../../../../../hooks/useHistoryState';
 import { UoData } from '../../../../../model/UoModel';
 import { StepBillingDataHistoryState } from '../../../../steps/StepOnboardingFormData';
 import { AooData } from '../../../../../model/AooData';

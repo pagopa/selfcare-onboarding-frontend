@@ -10,11 +10,11 @@ import { UserContext } from '../../lib/context';
 import { objectIsEmpty } from '../../lib/object-utils';
 import { OnboardingFormData } from '../../model/OnboardingFormData';
 import { searchUserId } from '../../services/managerServices';
-import { userValidate } from '../../utils/api/userValidate';
-import { OnboardingStepActions } from '../OnboardingStepActions';
-import { PlatformUserForm, validateUser } from '../PlatformUserForm';
-import { RolesInformations } from '../RolesInformations';
-import { useHistoryState } from '../useHistoryState';
+import { userValidate } from '../../services/validationServices';
+import { OnboardingStepActions } from '../registrationSteps/OnboardingStepActions';
+import { PlatformUserForm, validateUser } from '../forms/PlatformUserForm';
+import { RolesInformations } from '../shared/RolesInformations';
+import { useHistoryState } from '../../hooks/useHistoryState';
 
 // Could be an ES6 Set but it's too bothersome for now
 export type UsersObject = { [key: string]: UserOnCreate };

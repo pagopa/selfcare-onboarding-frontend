@@ -4,11 +4,11 @@ import { EndingPage } from '@pagopa/selfcare-common-frontend/lib';
 import { Trans } from 'react-i18next';
 import { useHistory } from 'react-router';
 import { useTranslation } from 'react-i18next';
-import { RolesInformations } from '../components/RolesInformations';
-import { ROUTES, addUserFlowProducts } from '../utils/constants';
-import { ENV } from '../utils/env';
-import { InstitutionType, Product } from '../../types';
-import { OnboardingFormData } from '../model/OnboardingFormData';
+import { RolesInformations } from '../shared/RolesInformations';
+import { ROUTES, addUserFlowProducts } from '../../utils/constants';
+import { ENV } from '../../utils/env';
+import { InstitutionType, Product } from '../../../types';
+import { OnboardingFormData } from '../../model/OnboardingFormData';
 
 type Props = {
   onboardingFormData?: OnboardingFormData;
