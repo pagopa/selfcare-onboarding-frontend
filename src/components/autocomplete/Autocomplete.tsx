@@ -1,5 +1,5 @@
 import { Grid, Paper, Typography } from '@mui/material';
-import React, { Dispatch, SetStateAction, /* useEffect, */ useState } from 'react';
+import React, { Dispatch, SetStateAction, useState } from 'react';
 import { theme } from '@pagopa/mui-italia';
 import { useTranslation } from 'react-i18next';
 import { Endpoint, InstitutionType, PartyData, Product } from '../../../types';
