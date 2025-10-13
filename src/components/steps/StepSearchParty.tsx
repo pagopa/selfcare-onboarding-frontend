@@ -2,7 +2,6 @@ import { Alert, FormControlLabel, Grid, Link, Typography, useTheme } from '@mui/
 import Checkbox from '@mui/material/Checkbox';
 import { Box } from '@mui/system';
 import { SessionModal } from '@pagopa/selfcare-common-frontend/lib';
-import { AxiosError, AxiosResponse } from 'axios';
 import {
   Dispatch,
   ReactElement,
@@ -14,20 +13,24 @@ import {
 } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { InstitutionType, PartyData, Product, StepperStepComponentProps } from '../../../types';
-import { fetchWithLogs } from '../../lib/api-utils';
 import { UserContext } from '../../lib/context';
-import { getFetchOutcome } from '../../lib/error-utils';
 import { AooData } from '../../model/AooData';
+import { SelectionsState } from '../../model/Selection';
 import { UoData } from '../../model/UoModel';
+import {
+  getECDataByCF,
+  handleSearchByAooCode,
+  handleSearchByUoCode,
+  handleSearchExternalId,
+} from '../../services/institutionServices';
 import { noMandatoryIpaProducts, PRODUCT_IDS } from '../../utils/constants';
 import { ENV } from '../../utils/env';
 import { selected2OnboardingData } from '../../utils/selected2OnboardingData';
+import Loading4Api from '../Loading4Api';
 import { LoadingOverlay } from '../LoadingOverlay';
 import { OnboardingStepActions } from '../OnboardingStepActions';
 import { Autocomplete } from '../autocomplete/Autocomplete';
 import { useHistoryState } from '../useHistoryState';
-import Loading4Api from '../Loading4Api';
-import { SelectionsState } from '../../model/Selection';
 
 type Props = {
   subTitle: string | ReactElement;
@@ -40,28 +43,6 @@ type Props = {
   selectFilterCategories: () => any;
   setInstitutionType: Dispatch<SetStateAction<InstitutionType | undefined>>;
 } & StepperStepComponentProps;
-
-const handleSearchExternalId = async (
-  externalInstitutionId: string,
-  onRedirectToLogin: () => void
-): Promise<PartyData | null> => {
-  const searchResponse = await fetchWithLogs(
-    {
-      endpoint: 'ONBOARDING_GET_PARTY',
-      endpointParams: { externalInstitutionId },
-    },
-    { method: 'GET' },
-    onRedirectToLogin
-  );
-
-  const outcome = getFetchOutcome(searchResponse);
-
-  if (outcome === 'success') {
-    return (searchResponse as AxiosResponse).data;
-  }
-
-  return null;
-};
 
 // eslint-disable-next-line sonarjs/cognitive-complexity, complexity
 export function StepSearchParty({
@@ -107,6 +88,7 @@ export function StepSearchParty({
   const [isPresentInAtecoWhiteList, setIsPresentInAtecoWhiteList] = useState<boolean>(
     product?.id === PRODUCT_IDS.IDPAY_MERCHANT ? true : false
   );
+  const addUser = window.location.pathname.includes('/user');
 
   const disabledStatusCompany = useMemo(
     () =>
@@ -127,95 +109,43 @@ export function StepSearchParty({
     ivassCode: false,
   });
 
-  const getECDataByCF = async (query: string) => {
-    setApiLoading(true);
-    const searchResponse = await fetchWithLogs(
-      { endpoint: 'ONBOARDING_GET_PARTY_FROM_CF', endpointParams: { id: query } },
-      {
-        method: 'GET',
-      },
-      () => setRequiredLogin(true)
-    );
-
-    const outcome = getFetchOutcome(searchResponse);
-
-    if (outcome === 'success') {
-      setEcData((searchResponse as AxiosResponse).data);
-    } else if ((searchResponse as AxiosError).response?.status === 404) {
-      setEcData(null);
-    }
-    setApiLoading(false);
-  };
-
-  const handleSearchByAooCode = async (query: string) => {
-    setApiLoading(true);
-    const searchResponse = await fetchWithLogs(
-      { endpoint: 'ONBOARDING_GET_AOO_CODE_INFO', endpointParams: { codiceUniAoo: query } },
-      {
-        method: 'GET',
-        params: {
-          ...(product?.id === PRODUCT_IDS.SEND && {
-            categories: filterCategories,
-            origin: 'IPA',
-          }),
-        },
-      },
-      () => setRequiredLogin(true)
-    );
-
-    const outcome = getFetchOutcome(searchResponse);
-
-    if (outcome === 'success') {
-      setAooResult((searchResponse as AxiosResponse).data);
-      setAooResultHistory((searchResponse as AxiosResponse).data);
-    } else if ((searchResponse as AxiosError).response?.status === 404) {
-      setAooResult(undefined);
-    }
-    setApiLoading(false);
-  };
-
-  const handleSearchByUoCode = async (query: string) => {
-    setApiLoading(true);
-    const searchResponse = await fetchWithLogs(
-      { endpoint: 'ONBOARDING_GET_UO_CODE_INFO', endpointParams: { codiceUniUo: query } },
-      {
-        method: 'GET',
-        params: {
-          ...(product?.id === PRODUCT_IDS.SEND && {
-            categories: filterCategories,
-            origin: 'IPA',
-          }),
-        },
-      },
-      () => setRequiredLogin(true)
-    );
-
-    const outcome = getFetchOutcome(searchResponse);
-
-    if (outcome === 'success') {
-      setUoResult((searchResponse as AxiosResponse).data);
-      setUoResultHistory((searchResponse as AxiosResponse).data);
-    } else if ((searchResponse as AxiosError).response?.status === 404) {
-      setUoResult(undefined);
-    }
-    setApiLoading(false);
-  };
-
   useEffect(() => {
     if (isEnabledProduct2AooUo) {
       if (subunitTypeByQuery === 'UO') {
-        void handleSearchByUoCode(subunitCodeByQuery);
+        void handleSearchByUoCode(
+          subunitCodeByQuery,
+          setUoResult,
+          setUoResultHistory,
+          setRequiredLogin,
+          setApiLoading,
+          false,
+          'ONBOARDING_GET_UO_CODE_INFO',
+          {},
+          filterCategories,
+          product?.id
+        );
       } else if (subunitTypeByQuery === 'AOO') {
-        void handleSearchByAooCode(subunitCodeByQuery);
+        void handleSearchByAooCode(
+          subunitCodeByQuery,
+          setAooResult,
+          setAooResultHistory,
+          setRequiredLogin,
+          setApiLoading,
+          false,
+          'ONBOARDING_GET_AOO_CODE_INFO',
+          {},
+          filterCategories,
+          product?.id
+        );
       }
     }
   }, [isEnabledProduct2AooUo]);
 
   useEffect(() => {
     if (aooResult) {
-      void getECDataByCF(aooResult?.codiceFiscaleEnte);
+      void getECDataByCF(aooResult?.codiceFiscaleEnte, setApiLoading, setEcData, setRequiredLogin);
     } else if (uoResult) {
-      void getECDataByCF(uoResult?.codiceFiscaleEnte);
+      void getECDataByCF(uoResult?.codiceFiscaleEnte, setApiLoading, setEcData, setRequiredLogin);
     }
   }, [aooResult, uoResult]);
 
@@ -529,6 +459,7 @@ export function StepSearchParty({
               disabledStatusCompany={disabledStatusCompany}
               selections={selections}
               setSelections={setSelections}
+              addUser={addUser}
             />
           </Grid>
           {ENV.AGGREGATOR.SHOW_AGGREGATOR &&

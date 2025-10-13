@@ -37,6 +37,7 @@ type AutocompleteProps = {
   disabledStatusCompany?: boolean;
   selections: SelectionsState;
   setSelections: Dispatch<SetStateAction<SelectionsState>>;
+  addUser: boolean;
 };
 
 export function Autocomplete({
@@ -65,6 +66,7 @@ export function Autocomplete({
   disabledStatusCompany,
   selections,
   setSelections,
+  addUser = window.location.pathname.includes('/user'),
 }: AutocompleteProps) {
   const { t } = useTranslation();
   const [options, setOptions] = useState<Array<InstitutionResource>>([]);
@@ -91,8 +93,6 @@ export function Autocomplete({
     undefined
   )[2];
   const setUoResultHistory = useHistoryState<UoData | undefined>('uoSelected_step1', undefined)[2];
-
-  const addUser = window.location.pathname.includes('/user');
 
   useEffect(() => {
     if (addUser) {

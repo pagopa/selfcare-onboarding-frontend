@@ -64,6 +64,28 @@ const CustomNumberField = styled(TextField)({
   },
 });
 
+const autocompletePaperStyle = {
+  paper: {
+    sx: {
+      '&::-webkit-scrollbar': {
+        width: 4,
+      },
+      '&::-webkit-scrollbar-track': {
+        boxShadow: `inset 10px 10px  #E6E9F2`,
+        marginY: '3px',
+      },
+      '&::-webkit-scrollbar-thumb': {
+        backgroundColor: '#0073E6',
+        borderRadius: '16px',
+      },
+      overflowY: 'auto',
+      maxHeight: '200px',
+      boxShadow:
+        '0px 6px 30px 5px rgba(0, 43, 85, 0.10), 0px 16px 24px 2px rgba(0, 43, 85, 0.05), 0px 8px 10px -5px rgba(0, 43, 85, 0.10)',
+    },
+  },
+};
+
 type Props = StepperStepComponentProps & {
   institutionType: InstitutionType;
   baseTextFieldProps: any;
@@ -440,27 +462,7 @@ export default function PersonalAndBillingDataSection({
                     overflow: 'visible',
                   },
                 }}
-                componentsProps={{
-                  paper: {
-                    sx: {
-                      '&::-webkit-scrollbar': {
-                        width: 4,
-                      },
-                      '&::-webkit-scrollbar-track': {
-                        boxShadow: `inset 10px 10px  #E6E9F2`,
-                        marginY: '3px',
-                      },
-                      '&::-webkit-scrollbar-thumb': {
-                        backgroundColor: '#0073E6',
-                        borderRadius: '16px',
-                      },
-                      overflowY: 'auto',
-                      maxHeight: '200px',
-                      boxShadow:
-                        '0px 6px 30px 5px rgba(0, 43, 85, 0.10), 0px 16px 24px 2px rgba(0, 43, 85, 0.05), 0px 8px 10px -5px rgba(0, 43, 85, 0.10)',
-                    },
-                  },
-                }}
+                componentsProps={autocompletePaperStyle}
                 renderOption={(props, option: InstitutionLocationData) => (
                   <MenuItem id={option.code} {...props} sx={{ height: '44px' }}>
                     {option?.city}
@@ -537,27 +539,7 @@ export default function PersonalAndBillingDataSection({
                     overflow: 'visible',
                   },
                 }}
-                componentsProps={{
-                  paper: {
-                    sx: {
-                      '&::-webkit-scrollbar': {
-                        width: 4,
-                      },
-                      '&::-webkit-scrollbar-track': {
-                        boxShadow: `inset 10px 10px  #E6E9F2`,
-                        marginY: '3px',
-                      },
-                      '&::-webkit-scrollbar-thumb': {
-                        backgroundColor: '#0073E6',
-                        borderRadius: '16px',
-                      },
-                      overflowY: 'auto',
-                      maxHeight: '200px',
-                      boxShadow:
-                        '0px 6px 30px 5px rgba(0, 43, 85, 0.10), 0px 16px 24px 2px rgba(0, 43, 85, 0.05), 0px 8px 10px -5px rgba(0, 43, 85, 0.10)',
-                    },
-                  },
-                }}
+                componentsProps={autocompletePaperStyle}
                 renderOption={(props, option) => (
                   <MenuItem id={option.country_code} {...props} sx={{ height: '44px' }}>
                     {option.name}
