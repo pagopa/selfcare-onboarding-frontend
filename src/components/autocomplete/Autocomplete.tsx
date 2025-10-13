@@ -66,7 +66,7 @@ export function Autocomplete({
   disabledStatusCompany,
   selections,
   setSelections,
-  addUser = window.location.pathname.includes('add-user'),
+  addUser = window.location.pathname.includes('/user'),
 }: AutocompleteProps) {
   const { t } = useTranslation();
   const [options, setOptions] = useState<Array<InstitutionResource>>([]);
