@@ -29,6 +29,7 @@ export interface OnboardingControllers {
   isContractingAuthority: boolean;
   isInsuranceCompany: boolean;
   isAooUo: boolean;
+  isTechPartner?: boolean;
 }
 
 /**
@@ -83,6 +84,7 @@ export const useOnboardingControllers = (
     const isContractingAuthority = institutionType === 'SA';
     const isInsuranceCompany = institutionType === 'AS';
     const isAooUo = !!(onboardingFormData?.uoUniqueCode ?? onboardingFormData?.aooUniqueCode);
+    const isTechPartner = institutionType === 'PT';
 
     return {
       isPremium,
@@ -100,6 +102,7 @@ export const useOnboardingControllers = (
       isContractingAuthority,
       isInsuranceCompany,
       isAooUo,
+      isTechPartner
     };
   }, [
     subProductId,

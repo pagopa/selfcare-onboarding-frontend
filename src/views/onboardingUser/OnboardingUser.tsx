@@ -1,12 +1,11 @@
 import Container from '@mui/material/Container';
-import { useLocation, useHistory } from 'react-router-dom';
-import { useContext, useEffect, useMemo, useState } from 'react';
-import { EndingPage, SessionModal } from '@pagopa/selfcare-common-frontend/lib';
 import { IllusCompleted, IllusError } from '@pagopa/mui-italia';
+import { EndingPage, SessionModal } from '@pagopa/selfcare-common-frontend/lib';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
-import { Trans, useTranslation } from 'react-i18next';
 import { uniqueId } from 'lodash';
-import { withLogin } from '../../components/withLogin';
+import { useContext, useEffect, useMemo, useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
+import { useHistory, useLocation } from 'react-router-dom';
 import {
   InstitutionType,
   PartyData,
@@ -15,21 +14,23 @@ import {
   StepperStep,
   UserOnCreate,
 } from '../../../types';
-import { StepAddAdmin } from '../onboardingProduct/components/StepAddAdmin';
+import { LoadingOverlay } from '../../components/LoadingOverlay';
+import { MessageNoAction } from '../../components/MessageNoAction';
 import { StepAddManager } from '../../components/steps/StepAddManager';
+import { withLogin } from '../../components/withLogin';
+import { useOnboardingControllers } from '../../hooks/useOnboardingControllers';
 import { fetchWithLogs } from '../../lib/api-utils';
+import { HeaderContext, UserContext } from '../../lib/context';
 import { getFetchOutcome } from '../../lib/error-utils';
 import { OnboardingFormData } from '../../model/OnboardingFormData';
-import { HeaderContext, UserContext } from '../../lib/context';
-import { ENV } from '../../utils/env';
-import { MessageNoAction } from '../../components/MessageNoAction';
-import { unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
-import { selected2OnboardingData } from '../../utils/selected2OnboardingData';
-import { LoadingOverlay } from '../../components/LoadingOverlay';
 import { ProductResource } from '../../model/ProductResource';
 import { PRODUCT_IDS } from '../../utils/constants';
-import { StepSelectProduct } from './components/StepSelectProduct';
+import { ENV } from '../../utils/env';
+import { selected2OnboardingData } from '../../utils/selected2OnboardingData';
+import { unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
+import { StepAddAdmin } from '../onboardingProduct/components/StepAddAdmin';
 import StepSearchOnboardedParty from './components/StepSearchOnboardedParty';
+import { StepSelectProduct } from './components/StepSelectProduct';
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
 function OnboardingUserComponent() {
@@ -37,7 +38,6 @@ function OnboardingUserComponent() {
   const location = useLocation();
   const history = useHistory();
   const requestId = uniqueId();
-
   const [loading, setLoading] = useState<boolean>(true);
   const [activeStep, setActiveStep] = useState<number>(0);
   const [outcome, setOutcome] = useState<RequestOutcomeMessage | null>();
@@ -48,11 +48,14 @@ function OnboardingUserComponent() {
   const [onboardingFormData, setOnboardingFormData] = useState<OnboardingFormData>();
   const [onExitAction, setOnExitAction] = useState<(() => void) | undefined>();
   const [openExitModal, setOpenExitModal] = useState(false);
-
   const { setOnExit } = useContext(HeaderContext);
   const { setRequiredLogin } = useContext(UserContext);
-
-  const isTechPartner = institutionType === 'PT';
+  const controllers = useOnboardingControllers({
+    institutionType,
+    productId: selectedProduct?.id,
+    origin,
+    onboardingFormData
+  });
 
   const forwardWithData = (newFormData: Partial<FormData>) => {
     if (formData) {
@@ -229,7 +232,7 @@ function OnboardingUserComponent() {
           onboardingFormData,
           selectedParty,
           institutionType,
-          isTechPartner,
+          isTechPartner: controllers.isTechPartner,
           forward: (newFormData: Partial<FormData>) => {
             trackEvent('ONBOARDING_ADD_MANAGER', {
               request_id: requestId,
@@ -248,7 +251,7 @@ function OnboardingUserComponent() {
           externalInstitutionId: selectedParty?.externalId ?? '',
           addUserFlow: true,
           product: selectedProduct,
-          legal: isTechPartner ? undefined : (formData as any)?.users[0],
+          legal: controllers.isTechPartner ? undefined : (formData as any)?.users[0],
           partyName: selectedParty?.codiceUniAoo
             ? selectedParty.denominazioneAoo
             : selectedParty?.codiceUniUo
@@ -256,7 +259,7 @@ function OnboardingUserComponent() {
               : selectedParty?.businessName
                 ? selectedParty.businessName
                 : (selectedParty?.description ?? ''),
-          isTechPartner,
+          isTechPartner: controllers.isTechPartner,
           forward: (newFormData: Partial<FormData>) => {
             const users = ((newFormData as any).users as Array<UserOnCreate>).map((u) => ({
               ...u,
