@@ -1,27 +1,20 @@
 import { Grid, Typography } from '@mui/material';
 import SessionModal from '@pagopa/selfcare-common-frontend/lib/components/SessionModal';
+import useErrorDispatcher from '@pagopa/selfcare-common-frontend/lib/hooks/useErrorDispatcher';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
 import { uniqueId } from 'lodash';
 import { useContext, useEffect, useRef, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
-import { AxiosResponse } from 'axios';
-import useErrorDispatcher from '@pagopa/selfcare-common-frontend/lib/hooks/useErrorDispatcher';
-import {
-  InstitutionType,
-  Product,
-  StepperStepComponentProps,
-  UserOnCreate,
-} from '../../../types';
+import { InstitutionType, Product, StepperStepComponentProps, UserOnCreate } from '../../../types';
 import { UserContext } from '../../lib/context';
 import { objectIsEmpty } from '../../lib/object-utils';
+import { OnboardingFormData } from '../../model/OnboardingFormData';
+import { searchUserId } from '../../services/managerServices';
 import { userValidate } from '../../utils/api/userValidate';
 import { OnboardingStepActions } from '../OnboardingStepActions';
 import { PlatformUserForm, validateUser } from '../PlatformUserForm';
-import { useHistoryState } from '../useHistoryState';
 import { RolesInformations } from '../RolesInformations';
-import { fetchWithLogs } from '../../lib/api-utils';
-import { OnboardingFormData } from '../../model/OnboardingFormData';
-import { getFetchOutcome } from '../../lib/error-utils';
+import { useHistoryState } from '../useHistoryState';
 
 // Could be an ES6 Set but it's too bothersome for now
 export type UsersObject = { [key: string]: UserOnCreate };
@@ -58,7 +51,6 @@ export function StepAddManager({
   const [isGenericError, setIsGenericError] = useState<boolean>(false);
   const [isChangedManager, setIsChangedManager] = useState<boolean>(false);
   const addError = useErrorDispatcher();
-  const requestId = uniqueId();
   const requestIdRef = useRef<string>();
   const { t } = useTranslation();
   const premiumFlow = !!subProduct;
@@ -83,101 +75,6 @@ export function StepAddManager({
     setPeopleErrors({
       [userId]: errors,
     });
-  };
-
-  const searchUserId = async (taxCode: string) => {
-    setLoading(true);
-
-    const request = await fetchWithLogs(
-      {
-        endpoint: 'ONBOARDING_SEARCH_USER',
-      },
-      {
-        method: 'POST',
-        data: {
-          taxCode,
-        },
-      },
-      () => setRequiredLogin(true)
-    );
-
-    const result = getFetchOutcome(request);
-    const response = (request as AxiosResponse).data;
-    if (result === 'success') {
-      if (response) {
-        void checkManager(response.id);
-      }
-    } else {
-      addError({
-        id: 'SEARCH_USER_ERROR',
-        blocking: false,
-        error: response as Error,
-        techDescription: `An error occurred while searching the user with the taxCode ${taxCode}`,
-        toNotify: true,
-      });
-      validateUserData(
-        people['manager-initial'],
-        'manager-initial',
-        externalInstitutionId,
-        subProduct
-      );
-    }
-    setLoading(false);
-  };
-
-  const checkManager = async (userId: string) => {
-    setLoading(true);
-    const request = await fetchWithLogs(
-      {
-        endpoint: 'ONBOARDING_CHECK_MANAGER',
-      },
-      {
-        method: 'POST',
-        data: {
-          institutionType,
-          origin: selectedParty?.origin,
-          originId: selectedParty?.originId,
-          productId: product?.id,
-          subunitCode: onboardingFormData?.aooUniqueCode ?? onboardingFormData?.uoUniqueCode,
-          taxCode: selectedParty?.taxCode ?? onboardingFormData?.taxCode,
-          userId,
-        },
-      },
-      () => setRequiredLogin(true)
-    );
-
-    const result = getFetchOutcome(request);
-    const response = (request as AxiosResponse).data.result;
-
-    if (result === 'success') {
-      setIsChangedManager(!response);
-      if (!response) {
-        trackEvent('CHANGE_LEGAL_REPRESENTATIVE', {
-          request_id: requestId,
-          party_id: externalInstitutionId,
-          product_id: product?.id,
-          from: 'onboarding',
-        });
-      }
-      if (response) {
-        validateUserData(people['manager-initial'], 'manager-initial', externalInstitutionId, subProduct);
-      }
-    } else {
-      addError({
-        id: 'CHECK_MANAGER_ERROR',
-        blocking: false,
-        error: response as Error,
-        techDescription: 'Failed to check manager status',
-        toNotify: true,
-      });
-      validateUserData(
-        people['manager-initial'],
-        'manager-initial',
-        externalInstitutionId,
-        subProduct
-      );
-    }
-    setLoading(false);
   };
 
   const validateUserData = (
@@ -282,7 +179,21 @@ export function StepAddManager({
           forward={{
             action: () => {
               if (addUserFlow) {
-                void searchUserId(people['manager-initial'].taxCode);
+                void searchUserId(
+                  people['manager-initial'].taxCode,
+                  setLoading,
+                  setRequiredLogin,
+                  addError,
+                  validateUserData,
+                  people,
+                  externalInstitutionId,
+                  subProduct,
+                  setIsChangedManager,
+                  institutionType,
+                  selectedParty,
+                  onboardingFormData,
+                  product
+                );
               } else {
                 validateUserData(
                   people['manager-initial'],

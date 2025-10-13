@@ -1,4 +1,4 @@
-import { AxiosResponse } from 'axios';
+import { AxiosError, AxiosResponse } from 'axios';
 import { Dispatch, SetStateAction } from 'react';
 import { fetchWithLogs } from '../lib/api-utils';
 import { getFetchOutcome } from '../lib/error-utils';
@@ -132,5 +132,56 @@ export const getNationalCountries = async (
     } catch (reason) {
       console.error(reason);
     }
+  }
+};
+
+export const handleSearch = async (
+  query: string,
+  index: number,
+  setRequiredLogin: Dispatch<SetStateAction<boolean>>,
+  optionsSelected: Array<GeographicTaxonomy>,
+  setOptions: Dispatch<SetStateAction<Array<GeographicTaxonomy>>>,
+  findError: (index: number) => void,
+  deleteError: (index: number) => void,
+  setIsAddNewAutocompleteEnabled: Dispatch<SetStateAction<boolean>>
+) => {
+  const searchGeotaxonomy = await fetchWithLogs(
+    {
+      endpoint: 'ONBOARDING_GET_GEOTAXONOMY',
+    },
+    {
+      method: 'GET',
+      params: { description: query },
+    },
+    () => setRequiredLogin(true)
+  );
+  const outcome = getFetchOutcome(searchGeotaxonomy);
+
+  if (outcome === 'success') {
+    // eslint-disable-next-line functional/no-let
+    let data = (searchGeotaxonomy as AxiosResponse).data;
+
+    data = data.map((value: GeographicTaxonomy) => ({
+      ...value,
+      label: value.desc,
+    }));
+
+    const dataFiltered = data.filter(
+      (data: any) => !optionsSelected.find((os) => os?.code === data?.code)
+    );
+
+    const matchesWithTyped = dataFiltered.filter((o: GeographicTaxonomy) =>
+      o.desc.toLocaleLowerCase().includes(query.toLocaleLowerCase())
+    );
+    setOptions(matchesWithTyped);
+
+    if (matchesWithTyped.length > 0) {
+      deleteError(index);
+    } else {
+      findError(index);
+      setIsAddNewAutocompleteEnabled(false);
+    }
+  } else if ((searchGeotaxonomy as AxiosError).response?.status === 404) {
+    setOptions([]);
   }
 };

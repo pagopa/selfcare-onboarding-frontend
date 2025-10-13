@@ -1,25 +1,23 @@
 /* eslint-disable functional/no-let */
-import { useContext, useEffect, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import debounce from 'lodash/debounce';
-import { Autocomplete } from '@mui/material';
-import {
-  RadioGroup,
-  Radio,
-  FormControlLabel,
-  Paper,
-  Grid,
-  Typography,
-  Box,
-  TextField,
-} from '@mui/material';
 import { AddOutlined, RemoveCircleOutlineOutlined } from '@mui/icons-material';
+import {
+  Autocomplete,
+  Box,
+  FormControlLabel,
+  Grid,
+  Paper,
+  Radio,
+  RadioGroup,
+  TextField,
+  Typography,
+} from '@mui/material';
 import { ButtonNaked } from '@pagopa/mui-italia';
-import { AxiosError, AxiosResponse } from 'axios';
-import { fetchWithLogs } from '../../../lib/api-utils';
-import { getFetchOutcome } from '../../../lib/error-utils';
+import debounce from 'lodash/debounce';
+import { useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { UserContext } from '../../../lib/context';
 import { GeographicTaxonomy, nationalValue } from '../../../model/GeographicTaxonomies';
+import { handleSearch } from '../../../services/geoTaxonomyServices';
 import { useHistoryState } from '../../useHistoryState';
 
 type Props = {
@@ -190,57 +188,60 @@ export default function GeoTaxonomySection({
     }
   };
 
+  const debouncedSearch = useMemo(
+    () =>
+      debounce(
+        (
+          value: string,
+          index: number,
+          setRequiredLogin: any,
+          optionsSelected: Array<GeographicTaxonomy>,
+          setOptions: any,
+          findError: any,
+          deleteError: any,
+          setIsAddNewAutocompleteEnabled: any
+        ) => {
+          void handleSearch(
+            value,
+            index,
+            setRequiredLogin,
+            optionsSelected,
+            setOptions,
+            findError,
+            deleteError,
+            setIsAddNewAutocompleteEnabled
+          );
+        },
+        100
+      ),
+    []
+  );
+
   const handleSearchInput = (event: any, index: number) => {
     const value = event.target.value;
     setInput(value);
     if (value.length >= 3) {
-      void debounce(handleSearch, 100)(value, index);
+      void debouncedSearch(
+        value,
+        index,
+        setRequiredLogin,
+        optionsSelected,
+        setOptions,
+        findError,
+        deleteError,
+        setIsAddNewAutocompleteEnabled
+      );
     } else {
       setOptions([]);
     }
   };
 
-  const handleSearch = async (query: string, index: number) => {
-    const searchGeotaxonomy = await fetchWithLogs(
-      {
-        endpoint: 'ONBOARDING_GET_GEOTAXONOMY',
-      },
-      {
-        method: 'GET',
-        params: { description: query },
-      },
-      () => setRequiredLogin(true)
-    );
-    const outcome = getFetchOutcome(searchGeotaxonomy);
-
-    if (outcome === 'success') {
-      // eslint-disable-next-line functional/no-let
-      let data = (searchGeotaxonomy as AxiosResponse).data;
-
-      data = data.map((value: GeographicTaxonomy) => ({
-        ...value,
-        label: value.desc,
-      }));
-
-      const dataFiltered = data.filter(
-        (data: any) => !optionsSelected.find((os) => os?.code === data?.code)
-      );
-
-      const matchesWithTyped = dataFiltered.filter((o: GeographicTaxonomy) =>
-        o.desc.toLocaleLowerCase().includes(query.toLocaleLowerCase())
-      );
-      setOptions(matchesWithTyped);
-
-      if (matchesWithTyped.length > 0) {
-        deleteError(index);
-      } else {
-        findError(index);
-        setIsAddNewAutocompleteEnabled(false);
-      }
-    } else if ((searchGeotaxonomy as AxiosError).response?.status === 404) {
-      setOptions([]);
-    }
-  };
+  // eslint-disable-next-line arrow-body-style
+  useEffect(() => {
+    return () => {
+      debouncedSearch.cancel();
+    };
+  }, [debouncedSearch]);
 
   const formatApostrophe = (str: string) =>
     str.replace(
@@ -367,9 +368,14 @@ export default function GeoTaxonomySection({
                     }}
                     onChange={(event: any, value: any) => handleChange(event, value, i)}
                     value={geoTaxFormat(geotaxonomiesHistory[i] ?? val, 'value')}
-                    renderOption={(props, option) => (
-                      <li {...props}>{geoTaxFormat(option, 'desc')}</li>
-                    )}
+                    renderOption={(props, option) => {
+                      const { key, ...otherProps } = props;
+                      return (
+                        <li key={key} {...otherProps}>
+                          {geoTaxFormat(option, 'desc')}
+                        </li>
+                      );
+                    }}
                     renderInput={(params) => (
                       <TextField
                         onChange={(e) => handleSearchInput(e, i)}

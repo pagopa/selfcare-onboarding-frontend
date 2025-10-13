@@ -1,21 +1,18 @@
-import { AxiosError, AxiosResponse } from 'axios';
-import { useContext, useEffect, useState } from 'react';
-import { useTranslation, Trans } from 'react-i18next';
-import { EndingPage } from '@pagopa/selfcare-common-frontend/lib';
 import { IllusError } from '@pagopa/mui-italia';
+import { EndingPage } from '@pagopa/selfcare-common-frontend/lib';
+import { useContext, useEffect, useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import {
-  InstitutionOnboardingInfoResource,
   InstitutionType,
   RequestOutcomeMessage,
-  StepperStepComponentProps,
+  StepperStepComponentProps
 } from '../../../types';
-import { MessageNoAction } from '../MessageNoAction';
 import { HeaderContext, UserContext } from '../../lib/context';
-import { LoadingOverlay } from '../LoadingOverlay';
-import { fetchWithLogs } from '../../lib/api-utils';
-import { getFetchOutcome } from '../../lib/error-utils';
-import { unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
+import { submit } from '../../services/onboardingServices';
 import { ENV } from '../../utils/env';
+import { unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
+import { LoadingOverlay } from '../LoadingOverlay';
+import { MessageNoAction } from '../MessageNoAction';
 
 type Props = StepperStepComponentProps & {
   productId: string;
@@ -63,62 +60,18 @@ function StepOnboardingData({
   const { setOnExit } = useContext(HeaderContext);
   const { setRequiredLogin } = useContext(UserContext);
 
-  const submit = async (institutionId?: string) => {
-    setLoading(true);
-
-    const onboardingData = await fetchWithLogs(
-      {
-        endpoint: 'ONBOARDING_GET_ONBOARDING_DATA',
-      },
-      {
-        method: 'GET',
-        params: {
-          institutionId,
-          productId,
-        },
-      },
-      () => setRequiredLogin(true)
-    );
-
-    const restOutcomeData = getFetchOutcome(onboardingData);
-    if (restOutcomeData === 'success') {
-      const result = (onboardingData as AxiosResponse).data as InstitutionOnboardingInfoResource;
-      const billingData = {
-        ...result.institution.billingData,
-        geographicTaxonomies: result.geographicTaxonomies,
-      };
-
-      forward(
-        result.institution.origin,
-        result.institution.originId,
-        billingData,
-        result.institution.institutionType ?? institutionType,
-        result.institution.id,
-        result.institution.assistanceContacts,
-        result.institution.companyInformations,
-        result.institution?.city
-          ?.charAt(0)
-          .toUpperCase()
-          .concat(result.institution?.city.substring(1).toLowerCase().trim()),
-        result.institution?.county,
-        result.institution.country,
-        result.institution?.paymentServiceProvider,
-        result.institution?.dataProtectionOfficer
-      );
-    } else if (
-      (onboardingData as AxiosError<any>).response?.status === 404 ||
-      (onboardingData as AxiosError<any>).response?.status === 400
-    ) {
-      forward(undefined, institutionType, undefined);
-    } else {
-      setOutcome(genericError);
-    }
-    setLoading(false);
-  };
-
   useEffect(() => {
     if (subProductFlow) {
-      void submit(partyId);
+      void submit(
+        setLoading,
+        setRequiredLogin,
+        productId,
+        forward,
+        institutionType,
+        setOutcome,
+        genericError,
+        partyId
+      );
     } else {
       forward(undefined, institutionType, undefined);
       setLoading(false);

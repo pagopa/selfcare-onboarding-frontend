@@ -30,7 +30,7 @@ import {
   handleSearchByAooCode,
   handleSearchByReaCode,
   handleSearchByUoCode,
-} from '../../../../services/autocompleteServices';
+} from '../../../../services/institutionServices';
 import { buildUrlLogo, noMandatoryIpaProducts, PRODUCT_IDS } from '../../../../utils/constants';
 import { ENV } from '../../../../utils/env';
 import AsyncAutocompleteResultsBusinessName from './components/AsyncAutocompleteResultsBusinessName';
@@ -330,30 +330,30 @@ export default function AsyncAutocompleteContainer({
     if (selections.aooCode && !selections.uoCode && length === 7) {
       const endpoint = addUser ? 'ONBOARDING_GET_INSTITUTIONS' : 'ONBOARDING_GET_AOO_CODE_INFO';
       return handleSearchByAooCode(
+        value,
+        setAooResult,
+        setAooResultHistory,
+        setRequiredLogin,
+        setApiLoading,
         addUser,
         endpoint,
         params,
-        value,
-        setApiLoading,
-        setAooResult,
-        setAooResultHistory,
-        filterCategories,
-        setRequiredLogin
+        filterCategories
       );
     }
 
     if (selections.uoCode && !selections.aooCode && length === 6) {
       const endpoint = addUser ? 'ONBOARDING_GET_INSTITUTIONS' : 'ONBOARDING_GET_UO_CODE_INFO';
       return handleSearchByUoCode(
+        value,
+        setUoResult,
+        setUoResultHistory,
+        setRequiredLogin,
+        setApiLoading,
         addUser,
         endpoint,
         params,
-        value,
-        setApiLoading,
-        setUoResult,
-        setUoResultHistory,
-        filterCategories,
-        setRequiredLogin
+        filterCategories
       );
     }
 

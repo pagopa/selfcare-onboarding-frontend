@@ -157,6 +157,7 @@ function StepSearchOnboardedParty({ institutionType, selectedProduct, forward, b
               ivassCode: false,
             }}
             setSelections={() => {}}
+            addUser={window.location.pathname.includes('/user')}
           />
         </Grid>
         <Grid item xs={12} mt={2} mb={5}>
