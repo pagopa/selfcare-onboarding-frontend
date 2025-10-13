@@ -22,7 +22,7 @@ type Props = StepperStepComponentProps & {
   legal?: UserOnCreate;
   externalInstitutionId: string;
   partyName: string;
-  isTechPartner: boolean;
+  isTechPartner: boolean | undefined;
   addUserFlow: boolean;
   isAggregator?: boolean;
 };

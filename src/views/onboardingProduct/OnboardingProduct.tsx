@@ -26,6 +26,7 @@ import StepOnboardingData from '../../components/steps/StepOnboardingData';
 import StepOnboardingFormData from '../../components/steps/StepOnboardingFormData';
 import { StepSearchParty } from '../../components/steps/StepSearchParty';
 import { withLogin } from '../../components/withLogin';
+import { useOnboardingControllers } from '../../hooks/useOnboardingControllers';
 import { fetchWithLogs } from '../../lib/api-utils';
 import { HeaderContext, UserContext } from '../../lib/context';
 import { getFetchOutcome } from '../../lib/error-utils';
@@ -106,9 +107,14 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     new URLSearchParams(window.location.hash.substring(1)).get('subunitType') ?? '';
   const subunitCodeByQuery =
     new URLSearchParams(window.location.hash.substring(1)).get('subunitCode') ?? '';
-  const isTechPartner = institutionType === 'PT';
   const institutionTypeByUrl = new URLSearchParams(window.location.search).get('institutionType');
   const desiredOriginRef = useRef<string | undefined>();
+  const controllers = useOnboardingControllers({
+    institutionType,
+    productId,
+    origin,
+    onboardingFormData,
+  });
 
   const back = () => {
     setActiveStep(activeStep - 1);
@@ -154,7 +160,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
 
   const alreadyOnboarded: RequestOutcomeMessage = {
     title: '',
-    description: isTechPartner
+    description: controllers.isTechPartner
       ? [
           <React.Fragment key="0">
             <EndingPage
@@ -609,7 +615,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
 
     const usersWithoutLegal = users.slice(0, 0).concat(users.slice(0 + 1));
 
-    onboardingSubmit(isTechPartner ? usersWithoutLegal : users, aggregates).catch(() => {
+    onboardingSubmit(controllers.isTechPartner ? usersWithoutLegal : users, aggregates).catch(() => {
       trackEvent('ONBOARDING_ADD_DELEGATE', {
         request_id: requestIdRef.current,
         party_id: externalInstitutionId,
@@ -770,7 +776,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           externalInstitutionId,
           addUserFlow: false,
           product: selectedProduct,
-          isTechPartner,
+          isTechPartner: controllers.isTechPartner,
           forward: (newFormData: Partial<FormData>) => {
             trackEvent('ONBOARDING_ADD_MANAGER', {
               request_id: requestIdRef.current,
@@ -808,13 +814,13 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           externalInstitutionId,
           addUserFlow: false,
           product: selectedProduct,
-          legal: isTechPartner ? undefined : (formData as any)?.users[0],
+          legal: controllers.isTechPartner ? undefined : (formData as any)?.users[0],
           partyName:
             onboardingFormData?.uoName ??
             onboardingFormData?.aooName ??
             onboardingFormData?.businessName ??
             '',
-          isTechPartner,
+          isTechPartner: controllers.isTechPartner,
           isAggregator: onboardingFormData?.isAggregator,
           forward: (newFormData: Partial<FormData>) => {
             const userData = { ...formData, ...newFormData };
@@ -826,7 +832,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
             }
           },
           back: () => {
-            if (isTechPartner) {
+            if (controllers.isTechPartner) {
               setActiveStep(activeStep - 4);
             } else {
               setActiveStep(activeStep - 1);
