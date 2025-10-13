@@ -7,8 +7,8 @@ import {
   RequestOutcomeMessage,
   StepperStepComponentProps,
 } from '../../../../types';
-import { FileUploader } from '../../../components/FileUploader';
-import { OnboardingStepActions } from '../../../components/OnboardingStepActions';
+import { FileUploader } from '../../../components/fileUpload/FileUploader';
+import { OnboardingStepActions } from '../../../components/registrationSteps/OnboardingStepActions';
 import { fetchWithLogs } from '../../../lib/api-utils';
 import { UserContext } from '../../../lib/context';
 import { getFetchOutcome } from '../../../lib/error-utils';

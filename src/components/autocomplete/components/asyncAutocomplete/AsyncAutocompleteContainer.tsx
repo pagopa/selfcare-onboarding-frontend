@@ -172,7 +172,7 @@ export default function AsyncAutocompleteContainer({
   );
 
   const debouncedSearchByName = useMemo(
-    () => debounce(handleSearchByName, 100),
+    () => debounce(handleSearchByName, 300),
     [handleSearchByName]
   );
 

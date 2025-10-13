@@ -1,5 +1,5 @@
 import { InstitutionType, RoutesObject } from '../../types';
-import NoProductPage from '../views/NoProductPage';
+import NoProductPage from '../components/layout/NoProductPage';
 import OnboardingPremium from '../views/onboardingPremium/OnboardingPremium';
 import OnboardingProduct from '../views/onboardingProduct/OnboardingProduct';
 import CancelRequest from '../views/onboardingRequest/cancel/CancelRequest';

@@ -8,8 +8,8 @@ import { roleLabels } from '@pagopa/selfcare-common-frontend/lib/utils/constants
 import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
 import { uniqueId } from 'lodash';
 import { Product, SelfcareParty, StepperStepComponentProps } from '../../../../types';
-import { OnboardingStepActions } from '../../../components/OnboardingStepActions';
-import { useHistoryState } from '../../../components/useHistoryState';
+import { OnboardingStepActions } from '../../../components/registrationSteps/OnboardingStepActions';
+import { useHistoryState } from '../../../hooks/useHistoryState';
 import PartySelectionSearchInput from './PartySelectionSearchInput';
 
 type Props = {

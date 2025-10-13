@@ -12,21 +12,21 @@ import {
   OnboardingRequestData,
   RequestOutcomeComplete,
 } from '../../../../types';
-import { ConfirmRegistrationStep0 } from '../../../components/ConfirmRegistrationStep0';
-import { ConfirmRegistrationStep1 } from '../../../components/ConfirmRegistrationStep1';
-import { useHistoryState } from '../../../components/useHistoryState';
+import { ConfirmRegistrationStep0 } from '../../../components/registrationSteps/ConfirmRegistrationStep0';
+import { ConfirmRegistrationStep1 } from '../../../components/registrationSteps/ConfirmRegistrationStep1';
+import { useHistoryState } from '../../../hooks/useHistoryState';
 import { redirectToLogin } from '../../../utils/unloadEvent-utils';
 import { fetchWithLogs } from '../../../lib/api-utils';
 import { getFetchOutcome } from '../../../lib/error-utils';
 import { ENV } from '../../../utils/env';
-import { MessageNoAction } from '../../../components/MessageNoAction';
+import { MessageNoAction } from '../../../components/shared/MessageNoAction';
 import { HeaderContext, UserContext } from '../../../lib/context';
 import { verifyRequest } from '../../../services/tokenServices';
 import NotFoundPage from '../status/NotFoundPage';
 import ExpiredRequestPage from '../status/ExpiredPage';
 import AlreadyCompletedRequest from '../status/AlreadyCompletedPage';
 import AlreadyRejectedRequest from '../status/AlreadyRejectedPage';
-import { LoadingOverlay } from '../../../components/LoadingOverlay';
+import { LoadingOverlay } from '../../../components/modals/LoadingOverlay';
 import { getRequestJwt } from '../../../utils/getRequestJwt';
 import CompleteRequestSuccessPage from './pages/CompleteRequestSuccessPage';
 import { CompleteRequestFailPage } from './pages/CompleteRequestFailPage';

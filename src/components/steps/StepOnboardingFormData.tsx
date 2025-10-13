@@ -31,8 +31,8 @@ import { PRODUCT_IDS, requiredError } from '../../utils/constants';
 import { ENV } from '../../utils/env';
 import { handleGeotaxonomies } from '../../utils/handleGeotaxonomies';
 import { validateFields } from '../../utils/validateFields';
-import { MessageNoAction } from '../MessageNoAction';
-import { OnboardingStepActions } from '../OnboardingStepActions';
+import { MessageNoAction } from '../shared/MessageNoAction';
+import { OnboardingStepActions } from '../registrationSteps/OnboardingStepActions';
 import DpoSection from '../onboardingFormData/DpoSection';
 import Heading from '../onboardingFormData/Heading';
 import IbanSection from '../onboardingFormData/IbanSection';
@@ -40,7 +40,7 @@ import PersonalAndBillingDataSection from '../onboardingFormData/PersonalAndBill
 import { VatNumberErrorModal } from '../onboardingFormData/VatNumberErrorModal';
 import GeoTaxonomySection from '../onboardingFormData/taxonomy/GeoTaxonomySection';
 import UpdateGeotaxonomy from '../onboardingFormData/taxonomy/UpdateGeotaxonomy';
-import { useHistoryState } from '../useHistoryState';
+import { useHistoryState } from '../../hooks/useHistoryState';
 
 export type StepBillingDataHistoryState = {
   externalInstitutionId: string;

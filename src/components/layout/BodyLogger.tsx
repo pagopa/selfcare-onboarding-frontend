@@ -4,11 +4,11 @@ import { Box } from '@mui/system';
 import { Footer, Header } from '@pagopa/selfcare-common-frontend/lib';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
 import i18n from '@pagopa/selfcare-common-frontend/lib/locale/locale-utils';
-import { logAction } from '../lib/action-log';
-import { ENV } from '../utils/env';
-import { PRODUCT_IDS, ROUTES } from '../utils/constants';
+import { logAction } from '../../lib/action-log';
+import { ENV } from '../../utils/env';
+import { PRODUCT_IDS, ROUTES } from '../../utils/constants';
+import { HeaderContext, UserContext } from './../../lib/context';
 import { Main } from './Main';
-import { HeaderContext, UserContext } from './../lib/context';
 
 export function BodyLogger() {
   const { user } = useContext(UserContext);

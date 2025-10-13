@@ -6,7 +6,7 @@ import { Endpoint, InstitutionType, PartyData, Product } from '../../../types';
 import { AooData } from '../../model/AooData';
 import { InstitutionResource } from '../../model/InstitutionResource';
 import { UoData } from '../../model/UoModel';
-import { useHistoryState } from '../useHistoryState';
+import { useHistoryState } from '../../hooks/useHistoryState';
 import { SelectionEnum, SelectionsState } from '../../model/Selection';
 import AsyncAutocompleteContainer from './components/asyncAutocomplete/AsyncAutocompleteContainer';
 import PartyAdvancedSelect from './components/partyAdvancedSearchType/PartyAdvancedSelect';

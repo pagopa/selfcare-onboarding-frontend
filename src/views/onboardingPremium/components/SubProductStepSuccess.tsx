@@ -1,7 +1,7 @@
 import { IllusCompleted } from '@pagopa/mui-italia';
 import { EndingPage } from '@pagopa/selfcare-common-frontend/lib';
 import { Trans } from 'react-i18next';
-import { MessageNoAction } from '../../../components/MessageNoAction';
+import { MessageNoAction } from '../../../components/shared/MessageNoAction';
 import { ENV } from '../../../utils/env';
 import { Product } from '../../../../types';
 

@@ -2,7 +2,7 @@ import { Link } from '@mui/material';
 import { useTranslation, Trans } from 'react-i18next';
 import { IllusError } from '@pagopa/mui-italia';
 import { EndingPage } from '@pagopa/selfcare-common-frontend/lib';
-import { ENV } from '../utils/env';
+import { ENV } from '../../utils/env';
 
 type Props = {
   partyName?: string;

@@ -3,10 +3,10 @@ import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyt
 import { useTranslation } from 'react-i18next';
 import { uniqueId } from 'lodash';
 import { productId2ProductTitle } from '@pagopa/selfcare-common-frontend/lib/utils/productId2ProductTitle';
-import { MessageNoAction } from '../../../components/MessageNoAction';
+import { MessageNoAction } from '../../../components/shared/MessageNoAction';
 import { OnboardingRequestData, RequestOutcomeComplete } from '../../../../types';
 import { fetchWithLogs } from '../../../lib/api-utils';
-import { LoadingOverlay } from '../../../components/LoadingOverlay';
+import { LoadingOverlay } from '../../../components/modals/LoadingOverlay';
 import { HeaderContext, UserContext } from '../../../lib/context';
 import { verifyRequest } from '../../../services/tokenServices';
 import { redirectToLogin } from '../../../utils/unloadEvent-utils';

@@ -10,11 +10,11 @@ import {
   UserOnCreate,
 } from '../../../../types';
 import { HeaderContext, UserContext } from '../../../lib/context';
-import { MessageNoAction } from '../../../components/MessageNoAction';
+import { MessageNoAction } from '../../../components/shared/MessageNoAction';
 import { unregisterUnloadEvent } from '../../../utils/unloadEvent-utils';
 import { OnboardingFormData } from '../../../model/OnboardingFormData';
 import { ENV } from '../../../utils/env';
-import AlreadyOnboarded from '../../AlreadyOnboarded';
+import AlreadyOnboarded from '../../../components/layout/AlreadyOnboarded';
 import { subProductSubmitFetch } from './SubProductSubmitFetch';
 
 type Props = StepperStepComponentProps & {

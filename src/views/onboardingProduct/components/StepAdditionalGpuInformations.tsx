@@ -13,7 +13,7 @@ import {
 } from '@mui/material';
 import { useTranslation, Trans } from 'react-i18next';
 import { useState } from 'react';
-import { OnboardingStepActions } from '../../../components/OnboardingStepActions';
+import { OnboardingStepActions } from '../../../components/registrationSteps/OnboardingStepActions';
 import { StepperStepComponentProps } from '../../../../types';
 import {
   AdditionalGpuInformations,

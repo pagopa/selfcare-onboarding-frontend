@@ -1,7 +1,7 @@
 import { Box } from '@mui/material';
 import { Redirect, Route, Switch } from 'react-router-dom';
 import { useLocation } from 'react-router';
-import { ROUTES } from '../utils/constants';
+import { ROUTES } from '../../utils/constants';
 
 export function Main() {
   const location = useLocation();

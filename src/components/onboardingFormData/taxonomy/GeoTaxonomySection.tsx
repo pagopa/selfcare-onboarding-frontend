@@ -18,7 +18,7 @@ import { useTranslation } from 'react-i18next';
 import { UserContext } from '../../../lib/context';
 import { GeographicTaxonomy, nationalValue } from '../../../model/GeographicTaxonomies';
 import { handleSearch } from '../../../services/geoTaxonomyServices';
-import { useHistoryState } from '../../useHistoryState';
+import { useHistoryState } from '../../../hooks/useHistoryState';
 
 type Props = {
   retrievedTaxonomies: Array<GeographicTaxonomy>;
@@ -212,7 +212,7 @@ export default function GeoTaxonomySection({
             setIsAddNewAutocompleteEnabled
           );
         },
-        100
+        300
       ),
     []
   );

@@ -26,11 +26,11 @@ import {
 import { noMandatoryIpaProducts, PRODUCT_IDS } from '../../utils/constants';
 import { ENV } from '../../utils/env';
 import { selected2OnboardingData } from '../../utils/selected2OnboardingData';
-import Loading4Api from '../Loading4Api';
-import { LoadingOverlay } from '../LoadingOverlay';
-import { OnboardingStepActions } from '../OnboardingStepActions';
+import Loading4Api from '../modals/Loading4Api';
+import { LoadingOverlay } from '../modals/LoadingOverlay';
+import { OnboardingStepActions } from '../registrationSteps/OnboardingStepActions';
 import { Autocomplete } from '../autocomplete/Autocomplete';
-import { useHistoryState } from '../useHistoryState';
+import { useHistoryState } from '../../hooks/useHistoryState';
 
 type Props = {
   subTitle: string | ReactElement;

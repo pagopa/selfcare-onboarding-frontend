@@ -4,8 +4,8 @@ import { IllusUploadFile } from '@pagopa/mui-italia';
 import SessionModal from '@pagopa/selfcare-common-frontend/lib/components/SessionModal';
 import { useState } from 'react';
 import { useTranslation, Trans } from 'react-i18next';
-import { StepperStepComponentProps } from '../../types';
-import { FileUploader } from './FileUploader';
+import { StepperStepComponentProps } from '../../../types';
+import { FileUploader } from '../fileUpload/FileUploader';
 
 export function ConfirmRegistrationStep1(
   addUserFlow: boolean,

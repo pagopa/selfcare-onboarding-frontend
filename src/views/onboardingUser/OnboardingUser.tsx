@@ -14,8 +14,8 @@ import {
   StepperStep,
   UserOnCreate,
 } from '../../../types';
-import { LoadingOverlay } from '../../components/LoadingOverlay';
-import { MessageNoAction } from '../../components/MessageNoAction';
+import { LoadingOverlay } from '../../components/modals/LoadingOverlay';
+import { MessageNoAction } from '../../components/shared/MessageNoAction';
 import { StepAddManager } from '../../components/steps/StepAddManager';
 import { withLogin } from '../../components/withLogin';
 import { useOnboardingControllers } from '../../hooks/useOnboardingControllers';

@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import NoProductPage from '../NoProductPage';
+import NoProductPage from '../../components/layout/NoProductPage';
 import './../../locale';
 import i18n from '@pagopa/selfcare-common-frontend/lib/locale/locale-utils';
 

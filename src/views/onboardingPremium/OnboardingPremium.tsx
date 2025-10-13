@@ -18,7 +18,7 @@ import {
   PaymentServiceProviderDto,
 } from '../../../types';
 import { OnboardingFormData } from '../../model/OnboardingFormData';
-import { LoadingOverlay } from '../../components/LoadingOverlay';
+import { LoadingOverlay } from '../../components/modals/LoadingOverlay';
 import { ENV } from '../../utils/env';
 import { HeaderContext, UserContext } from '../../lib/context';
 import { StepAddManager, UsersObject } from '../../components/steps/StepAddManager';
@@ -26,8 +26,8 @@ import StepOnboardingData from '../../components/steps/StepOnboardingData';
 import StepOnboardingFormData from '../../components/steps/StepOnboardingFormData';
 import { CompanyInformations } from '../../model/CompanyInformations';
 import { registerUnloadEvent, unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
-import { useHistoryState } from '../../components/useHistoryState';
-import { ConfirmOnboardingModal } from '../../components/ConfirmOnboardingRequest';
+import { useHistoryState } from '../../hooks/useHistoryState';
+import { ConfirmOnboardingModal } from '../../components/modals/ConfirmOnboardingRequest';
 import { fetchWithLogs } from '../../lib/api-utils';
 import config from '../../utils/config.json';
 import { getFetchOutcome } from '../../lib/error-utils';

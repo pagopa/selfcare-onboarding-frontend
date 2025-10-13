@@ -8,8 +8,8 @@ import { verifySurnameMatchWithTaxCode } from '@pagopa/selfcare-common-frontend/
 import { verifyChecksumMatchWithTaxCode } from '@pagopa/selfcare-common-frontend/lib/utils/verifyChecksumMatchWithTaxCode';
 import { emailRegexp } from '@pagopa/selfcare-common-frontend/lib/utils/constants';
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
-import { UserOnCreate, PartyRole } from '../../types';
-import { UsersError, UsersObject } from './steps/StepAddManager';
+import { UserOnCreate, PartyRole } from '../../../types';
+import { UsersError, UsersObject } from '../steps/StepAddManager';
 
 type PlatformUserFormProps = {
   prefix: keyof UsersObject;
