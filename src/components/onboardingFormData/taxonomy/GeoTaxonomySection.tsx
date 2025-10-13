@@ -212,7 +212,7 @@ export default function GeoTaxonomySection({
             setIsAddNewAutocompleteEnabled
           );
         },
-        100
+        300
       ),
     []
   );

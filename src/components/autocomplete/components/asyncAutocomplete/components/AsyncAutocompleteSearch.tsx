@@ -138,6 +138,7 @@ export default function AsyncAutocompleteSearch({
           '& input#Parties': { display: selected && 'none !important' },
         }}
         onChange={handleChange}
+        onPaste={handleChange}
         value={!selected ? input : valueSelected}
         label={label}
         variant={!selected ? 'outlined' : 'standard'}
