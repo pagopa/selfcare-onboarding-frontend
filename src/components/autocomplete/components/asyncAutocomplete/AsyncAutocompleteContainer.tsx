@@ -2,6 +2,7 @@ import { Grid, Theme, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import debounce from 'lodash/debounce';
 import {
+  ChangeEvent,
   Dispatch,
   SetStateAction,
   useCallback,
@@ -31,7 +32,7 @@ import {
   handleSearchByReaCode,
   handleSearchByUoCode,
 } from '../../../../services/institutionServices';
-import { buildUrlLogo, noMandatoryIpaProducts, PRODUCT_IDS } from '../../../../utils/constants';
+import { buildUrlLogo, /* noMandatoryIpaProducts, */ PRODUCT_IDS } from '../../../../utils/constants';
 import { ENV } from '../../../../utils/env';
 import AsyncAutocompleteResultsBusinessName from './components/AsyncAutocompleteResultsBusinessName';
 import AsyncAutocompleteResultsCode from './components/AsyncAutocompleteResultsCode';
@@ -124,24 +125,7 @@ export default function AsyncAutocompleteContainer({
 
   const showBusinessNameElement = input !== undefined && input.length >= 3;
 
-  const disabledButton =
-    institutionType === 'GSP' && noMandatoryIpaProducts(product?.id)
-      ? selections.businessName
-        ? input.length <= 3
-        : selections.taxCode
-          ? input.length < 11
-          : selections.aooCode
-            ? !!aooResult
-            : !!uoResult
-      : !selected;
-
-  useEffect(() => {
-    if (input) {
-      setDisabled(disabledButton);
-    } else {
-      setDisabled(!selected);
-    }
-  }, [input, selected]);
+  useEffect(() => setDisabled(!selected), [selected]);
 
   useEffect(() => {
     if (selected) {
@@ -173,7 +157,7 @@ export default function AsyncAutocompleteContainer({
       (selections.aooCode && input.length === 7) ||
       (selections.uoCode && input.length === 6) ||
       (selections.reaCode && input.length > 1)
-    // eslint-disable-next-line sonarjs/no-duplicated-branches
+      // eslint-disable-next-line sonarjs/no-duplicated-branches
     ) {
       void executeSearch(input, selections, params, addUser, institutionType, product);
     }
@@ -246,26 +230,22 @@ export default function AsyncAutocompleteContainer({
       setRequiredLogin,
     ]
   );
-
-  const searchByInstitutionType = useCallback(
-    (value: string, institutionType?: string) => {
-      switch (institutionType) {
-        case 'AS':
-          void debouncedSearchByName(value, {
-            endpoint: 'ONBOARDING_GET_INSURANCE_COMPANIES_FROM_BUSINESSNAME',
-          });
-          break;
-        case 'SA':
-          void debouncedSearchByName(value, {
-            endpoint: 'ONBOARDING_GET_SA_PARTIES_NAME',
-          });
-          break;
-        default:
-          void debouncedSearchByName(value, endpoint, ENV.MAX_INSTITUTIONS_FETCH, filterCategories);
-      }
-    },
-    [debouncedSearchByName, endpoint, filterCategories]
-  );
+  const searchByBusinessName = (value: string, institutionType?: string) => {
+    switch (institutionType) {
+      case 'AS':
+        void debouncedSearchByName(value, {
+          endpoint: 'ONBOARDING_GET_INSURANCE_COMPANIES_FROM_BUSINESSNAME',
+        });
+        break;
+      case 'SA':
+        void debouncedSearchByName(value, {
+          endpoint: 'ONBOARDING_GET_SA_PARTIES_NAME',
+        });
+        break;
+      default:
+        void debouncedSearchByName(value, endpoint, ENV.MAX_INSTITUTIONS_FETCH, filterCategories);
+    }
+  };
   const removeSpecialCharacters = (input: string): string => {
     const specialCharacters = `[$%&'()§#!£{}*+/:;<>@=?^|~]`;
 
@@ -320,15 +300,13 @@ export default function AsyncAutocompleteContainer({
     product: any
     // eslint-disable-next-line sonarjs/cognitive-complexity
   ) => {
-    const { length } = value;
-
-    if (length >= 3 && selections.businessName && !selections.taxCode) {
-      return searchByInstitutionType(value, institutionType);
+    if (value.length >= 3 && selections.businessName && !selections.taxCode) {
+      return searchByBusinessName(value, institutionType);
     }
 
-    const isValidTaxCode = selections.taxCode && length === 11;
-    const isValidIvassCode = selections.ivassCode && length === 5;
-    const isValidPersonalTaxCode = selections.personalTaxCode && length === 16;
+    const isValidTaxCode = selections.taxCode && value.length === 11;
+    const isValidIvassCode = selections.ivassCode && value.length === 5;
+    const isValidPersonalTaxCode = selections.personalTaxCode && value.length === 16;
 
     if (isValidTaxCode || isValidIvassCode || isValidPersonalTaxCode) {
       if (institutionType === 'SA' || institutionType === 'AS') {
@@ -354,7 +332,7 @@ export default function AsyncAutocompleteContainer({
       }
     }
 
-    if (selections.aooCode && !selections.uoCode && length === 7) {
+    if (selections.aooCode && !selections.uoCode && value.length === 7) {
       const endpoint = addUser ? 'ONBOARDING_GET_INSTITUTIONS' : 'ONBOARDING_GET_AOO_CODE_INFO';
       return handleSearchByAooCode(
         value,
@@ -369,7 +347,7 @@ export default function AsyncAutocompleteContainer({
       );
     }
 
-    if (selections.uoCode && !selections.aooCode && length === 6) {
+    if (selections.uoCode && !selections.aooCode && value.length === 6) {
       const endpoint = addUser ? 'ONBOARDING_GET_INSTITUTIONS' : 'ONBOARDING_GET_UO_CODE_INFO';
       return handleSearchByUoCode(
         value,
@@ -384,7 +362,7 @@ export default function AsyncAutocompleteContainer({
       );
     }
 
-    if (selections.reaCode && length > 1) {
+    if (selections.reaCode && value.length > 1) {
       const endpoint = addUser
         ? 'ONBOARDING_GET_INSTITUTIONS'
         : 'ONBOARDING_GET_VISURA_INFOCAMERE_BY_REA';
@@ -408,8 +386,8 @@ export default function AsyncAutocompleteContainer({
     return null;
   };
 
-  const handleChange = (event: any) => {
-    const typedInput = event.target.value as string;
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const typedInput = event.target.value;
     const cleanValue = removeSpecialCharacters(typedInput);
 
     const params = {
