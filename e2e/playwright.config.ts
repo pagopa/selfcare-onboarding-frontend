@@ -16,7 +16,7 @@ export default defineConfig({
   globalSetup: path.resolve(__dirname, './utils/global.setup.ts'),
   globalTeardown: path.resolve(__dirname, './utils/global.teardown.ts'),
   workers: 1,
-  timeout: process.env.CI ? 120000 : 90000,
+  timeout: process.env.CI ? 90000 : 60000,
   testDir: './tests',
   forbidOnly: !!process.env.CI,
   fullyParallel: false,
@@ -33,6 +33,7 @@ export default defineConfig({
       name: 'chromium',
       use: {
         ...devices['Desktop Chrome'],
+        headless: process.env.CI ? true : false,
         launchOptions: {
           slowMo: 500,
         },  
