@@ -180,7 +180,7 @@ export function StepAddManager({
             action: () => {
               if (addUserFlow) {
                 void searchUserId(
-                  people['manager-initial'].taxCode,
+                  people['manager-initial'].taxCode ?? '',
                   setLoading,
                   setRequiredLogin,
                   addError,

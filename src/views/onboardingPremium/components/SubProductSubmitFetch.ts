@@ -51,8 +51,8 @@ export const subProductSubmitFetch = async ({
       data: {
         users: users.map((u) => ({
           ...u,
-          taxCode: u.taxCode.toUpperCase(),
-          email: u.email.toLowerCase(),
+          taxCode: u.taxCode?.toUpperCase(),
+          email: u.email?.toLowerCase(),
         })),
         billingData: billingData2billingDataRequest(billingData as OnboardingFormData),
         pspData:

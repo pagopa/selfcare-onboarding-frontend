@@ -6,7 +6,7 @@ import { Router } from 'react-router-dom';
 import { createMemoryHistory } from 'history';
 import i18n from '@pagopa/selfcare-common-frontend/lib/locale/locale-utils';
 import { Provider } from 'react-redux';
-import { User } from '../../types';
+import { User } from '@pagopa/selfcare-common-frontend/lib/model/User';
 import {
   mockPartyRegistry,
   mockedANACParties,

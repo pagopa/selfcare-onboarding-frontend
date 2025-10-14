@@ -263,8 +263,8 @@ function OnboardingUserComponent() {
           forward: (newFormData: Partial<FormData>) => {
             const users = ((newFormData as any).users as Array<UserOnCreate>).map((u) => ({
               ...u,
-              taxCode: u?.taxCode.toUpperCase(),
-              email: u?.email.toLowerCase(),
+              taxCode: u?.taxCode?.toUpperCase(),
+              email: u?.email?.toLowerCase(),
             }));
 
             setFormData({ ...formData, ...newFormData });

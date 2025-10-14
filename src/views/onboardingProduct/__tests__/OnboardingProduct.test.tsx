@@ -1,7 +1,8 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { useState } from 'react';
 import '@testing-library/jest-dom';
-import { InstitutionType, User } from '../../../../types';
+import { User } from '@pagopa/selfcare-common-frontend/lib/model/User';
+import { InstitutionType } from '../../../../types';
 import { HeaderContext, UserContext } from '../../../lib/context';
 import { ENV } from '../../../utils/env';
 import OnboardingProduct from '../OnboardingProduct';

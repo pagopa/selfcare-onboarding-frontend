@@ -1,5 +1,5 @@
+import { User } from '@pagopa/selfcare-common-frontend/lib/model/User';
 import { createContext } from 'react';
-import { User } from '../../types';
 
 type UserContextType = {
   user: User | null;
