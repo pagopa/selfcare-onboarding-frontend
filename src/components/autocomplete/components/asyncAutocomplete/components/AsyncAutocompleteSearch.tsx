@@ -2,7 +2,7 @@ import { IconButton, TextField, Theme, Tooltip, Typography, Box } from '@mui/mat
 import { styled } from '@mui/system';
 import { useTranslation } from 'react-i18next';
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
-import { Dispatch, SetStateAction, useEffect, useMemo } from 'react';
+import { ChangeEvent, Dispatch, SetStateAction, useEffect, useMemo } from 'react';
 import { IPACatalogParty, PartyData } from '../../../../../../types';
 import { useHistoryState } from '../../../../../hooks/useHistoryState';
 import { UoData } from '../../../../../model/UoModel';
@@ -37,7 +37,7 @@ type Props = {
   input: string;
   isSearchFieldSelected: boolean;
   selections: SelectionsState;
-  handleChange: (event: any) => void;
+  handleChange: (e: ChangeEvent<HTMLInputElement>) => void;
   setCfResult: React.Dispatch<React.SetStateAction<PartyData | undefined>>;
   setAooResult: React.Dispatch<React.SetStateAction<AooData | undefined>>;
   setUoResult: React.Dispatch<React.SetStateAction<UoData | undefined>>;
@@ -137,8 +137,7 @@ export default function AsyncAutocompleteSearch({
           ml: selected ? '12px' : 4,
           '& input#Parties': { display: selected && 'none !important' },
         }}
-        onChange={handleChange}
-        onPaste={handleChange}
+        onChange={(e: ChangeEvent<HTMLInputElement>) => handleChange(e)}
         value={!selected ? input : valueSelected}
         label={label}
         variant={!selected ? 'outlined' : 'standard'}
