@@ -1,16 +1,17 @@
-import { SvgIconTypeMap } from '@mui/material/SvgIcon';
 import { DefaultComponentProps } from '@mui/material/OverridableComponent';
+import { SvgIconTypeMap } from '@mui/material/SvgIcon';
+import { User } from '@pagopa/selfcare-common-frontend/lib/model/User';
+import { UserRole } from '@pagopa/selfcare-common-frontend/lib/utils/constants';
 import { AxiosRequestConfig } from 'axios';
 import { FunctionComponent, SVGProps } from 'react';
-import { UserRole } from '@pagopa/selfcare-common-frontend/lib/utils/constants';
-import { API } from './src/utils/constants';
-import { OnboardingFormData } from './src/model/OnboardingFormData';
+import { AooData } from './src/model/AooData';
 import { AssistanceContacts } from './src/model/AssistanceContacts';
 import { CompanyInformations } from './src/model/CompanyInformations';
 import { GeographicTaxonomy } from './src/model/GeographicTaxonomies';
+import { OnboardingFormData } from './src/model/OnboardingFormData';
 import { PDNDBusinessResource } from './src/model/PDNDBusinessResource';
-import { AooData } from './src/model/AooData';
 import { UoData } from './src/model/UoModel';
+import { API } from './src/utils/constants';
 
 /*
  * Fetch data and router related types
@@ -96,21 +97,9 @@ export type PartyRole = 'MANAGER' | 'DELEGATE' | 'SUB_DELEGATE' | 'OPERATOR';
 export type UserProductRole = 'ADMIN' | 'LIMITED';
 export type ProductStatus = 'ACTIVE' | 'INACTIVE' | 'PHASE_OUT' | 'TESTING';
 
-export type UserOnCreate = {
-  name: string;
-  surname: string;
-  taxCode: string; // This should not be optional, it is temporarily because of the "from" below
+export interface UserOnCreate extends User {
   from?: string; // This is temporary, part of the API shared with self-care
-  email: string;
-  role: PartyRole;
-};
-
-export type User = {
-  uid: string;
-  taxCode: string;
-  name: string;
-  surname: string;
-  email: string;
+  role?: PartyRole;
 };
 
 export type AlertDialogActions = {

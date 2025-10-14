@@ -609,8 +609,8 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     const data = userData ?? formData;
     const users = ((data as any).users as Array<UserOnCreate>).map((u) => ({
       ...u,
-      taxCode: u?.taxCode.toUpperCase(),
-      email: u?.email.toLowerCase(),
+      taxCode: u?.taxCode?.toUpperCase(),
+      email: u?.email?.toLowerCase(),
     }));
 
     const usersWithoutLegal = users.slice(0, 0).concat(users.slice(0 + 1));
