@@ -45,7 +45,7 @@ async function globalSetup() {
       });
 
       console.log(`GLOBAL SETUP: ℹ️ Starting from selfcare...`);
-      await page.goto('http://dev.selfcare.pagopa.it/onboarding', { timeout: 60000 });
+      await page.goto('https://dev.selfcare.pagopa.it', { timeout: 60000 });
 
       console.log(`GLOBAL SETUP: ℹ️ Clicking 'Entra con SPID'...`);
       const spidButton = page.getByRole('button', { name: 'Entra con SPID' });
