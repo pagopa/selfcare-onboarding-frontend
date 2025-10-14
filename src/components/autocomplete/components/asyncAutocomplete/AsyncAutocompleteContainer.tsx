@@ -32,7 +32,10 @@ import {
   handleSearchByReaCode,
   handleSearchByUoCode,
 } from '../../../../services/institutionServices';
-import { buildUrlLogo, /* noMandatoryIpaProducts, */ PRODUCT_IDS } from '../../../../utils/constants';
+import {
+  buildUrlLogo,
+  /* noMandatoryIpaProducts, */ PRODUCT_IDS,
+} from '../../../../utils/constants';
 import { ENV } from '../../../../utils/env';
 import AsyncAutocompleteResultsBusinessName from './components/AsyncAutocompleteResultsBusinessName';
 import AsyncAutocompleteResultsCode from './components/AsyncAutocompleteResultsCode';
@@ -124,6 +127,15 @@ export default function AsyncAutocompleteContainer({
     optionLabel !== undefined ? (o) => o[optionLabel] : (o) => o.label ?? o;
 
   const showBusinessNameElement = input !== undefined && input.length >= 3;
+  const canSearchByBusinessName =
+    input.length >= 3 && selections.businessName && !selections.taxCode;
+  const canSearch4Others =
+    (selections.taxCode && input.length === 11) ||
+    (selections.ivassCode && input.length === 5) ||
+    (selections.personalTaxCode && input.length === 16) ||
+    (selections.aooCode && input.length === 7) ||
+    (selections.uoCode && input.length === 6) ||
+    (selections.reaCode && input.length > 1);
 
   useEffect(() => setDisabled(!selected), [selected]);
 
@@ -136,7 +148,6 @@ export default function AsyncAutocompleteContainer({
     }
   }, [selected]);
 
-  // eslint-disable-next-line complexity, sonarjs/cognitive-complexity
   useEffect(() => {
     if (!input || input.length === 0 || selected) {
       return;
@@ -148,17 +159,7 @@ export default function AsyncAutocompleteContainer({
       subunitCode: selections.aooCode || selections.uoCode ? input : undefined,
     };
 
-    if (input.length >= 3 && selections.businessName && !selections.taxCode) {
-      void executeSearch(input, selections, params, addUser, institutionType, product);
-    } else if (
-      (selections.taxCode && input.length === 11) ||
-      (selections.ivassCode && input.length === 5) ||
-      (selections.personalTaxCode && input.length === 16) ||
-      (selections.aooCode && input.length === 7) ||
-      (selections.uoCode && input.length === 6) ||
-      (selections.reaCode && input.length > 1)
-      // eslint-disable-next-line sonarjs/no-duplicated-branches
-    ) {
+    if (canSearchByBusinessName || canSearch4Others) {
       void executeSearch(input, selections, params, addUser, institutionType, product);
     }
   }, [input]);
