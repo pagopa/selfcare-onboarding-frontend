@@ -24,7 +24,9 @@ export const stepInstitutionType = async (page: Page, institutionType: string) =
 export const stepSelectParty = async (page: Page, aggregator?: boolean, party?: string) => {
   await page.click('#Parties');
   await page.fill('#Parties', party ? party : 'Senato della Repubblica');
-  await page.click('.MuiBox-root:nth-child(1) > .MuiBox-root > .MuiBox-root');
+  setTimeout(async () => {
+    await page.click('.MuiBox-root:nth-child(1) > .MuiBox-root > .MuiBox-root');
+  }, 1000);
   partyName = (await page.locator('div[aria-label] p.MuiTypography-root').innerText()) as string;
   console.log('Nome del party', partyName);
   if (aggregator) {
@@ -252,6 +254,10 @@ export const stepFormData = async (
 
   await page.getByRole('button', { name: 'Continua' }).waitFor({ timeout: 500 });
   await page.getByRole('button', { name: 'Continua' }).click();
+
+  if (await page.getByText('Stai modificando l’area geografica del tuo ente').isVisible()) {
+    await page.getByRole('button', { name: 'Continua' }).click();
+  }
 };
 
 export const stepAdditionalInformation = async (page: Page) => {
@@ -306,11 +312,33 @@ export const stepAddManager = async (page: Page) => {
 };
 
 export const stepAddAdmin = async (page: Page, aggregator?: boolean, institutionType?: string) => {
-  await page.getByLabel('Aggiungi me come Amministratore').click();
-  await page.getByRole('textbox', { name: 'Email Istituzionale' }).click();
-  await page.fill('#delegate-initial-email', 'a.sartori@test.it', {
-    timeout: 500,
-  });
+  if (process.env.REACT_APP_ENV === 'LOCAL_DEV' || process.env.NODE_ENV === 'test') {
+    await page.getByRole('textbox', { name: 'Nome' }).click();
+    await page.fill('#delegate-initial-name', 'Mattia', {
+      timeout: 1000,
+    });
+
+    await page.getByRole('textbox', { name: 'Cognome' }).click();
+    await page.fill('#delegate-initial-surname', 'Sisti', {
+      timeout: 1000,
+    });
+    await page.getByRole('textbox', { name: 'Codice Fiscale' }).click();
+    await page.fill('#delegate-initial-taxCode', 'SSTMTT76C23F205T', {
+      timeout: 1000,
+    });
+    await page.getByRole('textbox', { name: 'Email Istituzionale' }).click();
+    await page.fill('#delegate-initial-email', 'm.sisti@test.it', {
+      timeout: 1000,
+    });
+  } else {
+    await page.getByLabel('Aggiungi me come Amministratore').click();
+
+    await page.getByRole('textbox', { name: 'Email Istituzionale' }).click();
+    await page.fill('#delegate-initial-email', 'cleopatra@test.it', {
+      timeout: 500,
+    });
+  }
+
   await page.click('[aria-label="Continua"]');
   if (!aggregator && institutionType !== 'PT') {
     await page.getByRole('button', { name: 'Conferma' }).click();
