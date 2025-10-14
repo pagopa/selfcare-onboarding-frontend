@@ -126,6 +126,25 @@ export default function AsyncAutocompleteSearch({
     return t('asyncAutocomplete.searchLabel');
   }, [selected, selections.reaCode, selections.aooCode, selections.uoCode, t]);
 
+  const handlePaste = (event: React.ClipboardEvent<HTMLInputElement>) => {
+    const pastedText = event.clipboardData.getData('text');
+    const cleanValue = pastedText
+      .split('')
+      .map((char) => {
+        const specialCharacters = `[$%&'()§#!£{}*+/:;<>@=?^|~]`;
+        return specialCharacters.includes(char) ? '' : char;
+      })
+      .join('')
+      .replace(/''|""|--|__|,,|\.\./g, (match) => match[0]);
+
+    setInput(cleanValue);
+    setSelected(null);
+
+    handleChange({
+      target: { value: cleanValue },
+    });
+  };
+
   return (
     <Tooltip arrow title={selected?.description?.length > 20 ? selected?.description : ''}>
       <CustomTextField
@@ -138,7 +157,7 @@ export default function AsyncAutocompleteSearch({
           '& input#Parties': { display: selected && 'none !important' },
         }}
         onChange={handleChange}
-        onPaste={handleChange}
+        onPaste={handlePaste}
         value={!selected ? input : valueSelected}
         label={label}
         variant={!selected ? 'outlined' : 'standard'}

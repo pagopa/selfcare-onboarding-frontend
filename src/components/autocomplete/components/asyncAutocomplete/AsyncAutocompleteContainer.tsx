@@ -152,6 +152,33 @@ export default function AsyncAutocompleteContainer({
     }
   }, [selected]);
 
+  // eslint-disable-next-line complexity, sonarjs/cognitive-complexity
+  useEffect(() => {
+    if (!input || input.length === 0 || selected) {
+      return;
+    }
+
+    const params = {
+      productId: selectedProduct?.id,
+      taxCode: selections.taxCode || selections.personalTaxCode ? input : undefined,
+      subunitCode: selections.aooCode || selections.uoCode ? input : undefined,
+    };
+
+    if (input.length >= 3 && selections.businessName && !selections.taxCode) {
+      void executeSearch(input, selections, params, addUser, institutionType, product);
+    } else if (
+      (selections.taxCode && input.length === 11) ||
+      (selections.ivassCode && input.length === 5) ||
+      (selections.personalTaxCode && input.length === 16) ||
+      (selections.aooCode && input.length === 7) ||
+      (selections.uoCode && input.length === 6) ||
+      (selections.reaCode && input.length > 1)
+    // eslint-disable-next-line sonarjs/no-duplicated-branches
+    ) {
+      void executeSearch(input, selections, params, addUser, institutionType, product);
+    }
+  }, [input]);
+
   const handleSearchByName = useCallback(
     async (query: string, endpoint: Endpoint, limit?: number, categories?: string) => {
       setApiLoading?.(true);
@@ -172,7 +199,7 @@ export default function AsyncAutocompleteContainer({
   );
 
   const debouncedSearchByName = useMemo(
-    () => debounce(handleSearchByName, 300),
+    () => debounce(handleSearchByName, 100),
     [handleSearchByName]
   );
 
@@ -396,10 +423,6 @@ export default function AsyncAutocompleteContainer({
 
     if (cleanValue !== '') {
       void executeSearch(cleanValue, selections, params, addUser, institutionType, product);
-    }
-
-    if (selected) {
-      setInput(getOptionLabel(selected));
     }
   };
 
