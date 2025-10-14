@@ -5,7 +5,10 @@ import { Page, expect } from '@playwright/test';
 // eslint-disable-next-line functional/no-let
 let partyName: string = '';
 
-export const BASE_URL_ONBOARDING = 'http://dev.selfcare.pagopa.it/onboarding';
+export const BASE_URL_ONBOARDING =
+  process.env.REACT_APP_ENV === 'LOCAL_DEV' || process.env.NODE_ENV === 'test'
+    ? 'http://localhost:3000/onboarding'
+    : 'http://dev.selfcare.pagopa.it/onboarding';
 
 export const FILE_MOCK_CSV_AGGREGATOR = {
   IO: '../src/lib/__mocks__/mockedFileAggregator.csv',

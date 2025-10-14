@@ -8,6 +8,7 @@
     "@types/node": "^22.13.13"
   },
   "scripts": {
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "test:e2e:local": "playwright test"
   }
 }
