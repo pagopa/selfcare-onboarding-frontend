@@ -1,6 +1,6 @@
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { useState } from 'react';
-import { User } from '../../../../types';
+import { User } from '@pagopa/selfcare-common-frontend/lib/model/User';
 import { HeaderContext, UserContext } from '../../../lib/context';
 import { ENV } from '../../../utils/env';
 import OnboardingPremium from '../OnboardingPremium';
