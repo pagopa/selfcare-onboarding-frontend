@@ -350,28 +350,25 @@ export const stepAddAdmin = async (
     await page.click('[aria-label="Continua"]');
   }
 
-  if (institutionType === 'PT') {
-    await expect(page.getByText('Richiesta di registrazione inviata')).toBeInViewport({
-      timeout: 10000,
-    });
-  }
-
   if (institutionType !== 'PT') {
     await page.getByRole('button', { name: 'Conferma' }).waitFor({
       state: 'visible',
       timeout: 2000,
     });
 
-    await page.waitForSelector('button:has-text("Conferma"):not([disabled])', {
-      timeout: 2000,
-    });
-
     await page.getByRole('button', { name: 'Conferma' }).click();
   }
 
-  if (!aggregator && institutionType !== 'PT') {
+  if (!aggregator) {
     await expect(page.getByText('Richiesta di adesione inviata')).toBeInViewport({
-      timeout: 10000,
+      timeout: 2000,
+    });
+  // eslint-disable-next-line sonarjs/no-identical-conditions
+  }
+  
+  if (institutionType === 'PT') {
+    await expect(page.getByText('Richiesta di registrazione inviata')).toBeInViewport({
+      timeout: 1000,
     });
   }
 };
@@ -435,7 +432,7 @@ export const stepUploadAggregatorCsv = async (page: Page, title: string, fileCsv
   await continueButton.click();
 
   await expect(page.getByText('Richiesta di adesione inviata')).toBeInViewport({
-    timeout: 15000,
+    timeout: 2000,
   });
 };
 
