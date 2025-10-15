@@ -1,10 +1,12 @@
-import { AxiosResponse, AxiosError } from 'axios';
+import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
+import { AxiosError, AxiosResponse } from 'axios';
 import { Dispatch, SetStateAction } from 'react';
-import { InstitutionOnboardingInfoResource, InstitutionType } from '../../types';
+import { InstitutionOnboardingInfoResource, InstitutionType, RequestOutcomeMessage } from '../../types';
 import { fetchWithLogs } from '../lib/api-utils';
 import { getFetchOutcome } from '../lib/error-utils';
+import { PRODUCT_IDS } from '../utils/constants';
 
-export const submit = async (
+export const getOnboardingData = async (
   setLoading: Dispatch<SetStateAction<boolean>>,
   setRequiredLogin: Dispatch<SetStateAction<boolean>>,
   productId: string,
@@ -64,4 +66,73 @@ export const submit = async (
     setOutcome(genericError);
   }
   setLoading(false);
+};
+
+export const verifyOnboarding = async (
+  setLoading: Dispatch<SetStateAction<boolean>>,
+  setRequiredLogin: Dispatch<SetStateAction<boolean>>,
+  productId: string,
+  selectedProduct: any,
+  setOutcome: Dispatch<SetStateAction<any>>,
+  alreadyOnboarded: any,
+  onboardingFormData: any,
+  requestIdRef: any,
+  forward: (...args: any) => void,
+  institutionType: InstitutionType | undefined,
+  genericError: any,
+  externalInstitutionId: string | undefined,
+  notAllowedErrorNoParty: RequestOutcomeMessage
+) => {
+  setLoading(true);
+
+  const onboardingStatus = await fetchWithLogs(
+    {
+      endpoint: 'VERIFY_ONBOARDING',
+    },
+    {
+      method: 'HEAD',
+      params: {
+        taxCode: onboardingFormData?.taxCode,
+        productId,
+        subunitCode: onboardingFormData?.uoUniqueCode ?? onboardingFormData?.aooUniqueCode,
+        origin: onboardingFormData?.origin,
+        originId: onboardingFormData?.originId,
+        institutionType:
+          productId === PRODUCT_IDS.IDPAY_MERCHANT && institutionType === 'PRV_PF'
+            ? 'PRV_PF'
+            : undefined,
+      },
+    },
+    () => setRequiredLogin(true)
+  );
+
+  setLoading(false);
+
+  // Check the outcome
+  const restOutcome = getFetchOutcome(onboardingStatus);
+  if (restOutcome === 'success') {
+    trackEvent('ONBOARDING_PRODUCT_ALREADY_SUBSCRIBED', {
+      request_id: requestIdRef.current,
+      party_id: onboardingFormData?.externalId,
+      product_id: selectedProduct?.id,
+    });
+    setOutcome(alreadyOnboarded);
+  } else {
+    if (
+      (onboardingStatus as AxiosError<any>).response?.status === 404 ||
+      (onboardingStatus as AxiosError<any>).response?.status === 400
+    ) {
+      setOutcome(null);
+      forward();
+    } else if ((onboardingStatus as AxiosError<any>).response?.status === 403) {
+      trackEvent('ONBOARDING_NOT_ALLOWED_ERROR', {
+        request_id: requestIdRef.current,
+        party_id: externalInstitutionId,
+        product_id: productId,
+      });
+      setOutcome(notAllowedErrorNoParty);
+    } else {
+      setOutcome(genericError);
+    }
+  }
 };
