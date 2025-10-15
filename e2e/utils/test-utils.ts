@@ -311,7 +311,11 @@ export const stepAddManager = async (page: Page) => {
   await page.click('[aria-label="Continua"]');
 };
 
-export const stepAddAdmin = async (page: Page, aggregator?: boolean, institutionType?: InstitutionType) => {
+export const stepAddAdmin = async (
+  page: Page,
+  aggregator?: boolean,
+  institutionType?: InstitutionType
+) => {
   if (isLocalMode) {
     await page.click('#delegate-initial-name');
     await page.fill('#delegate-initial-name', 'Mattia', {
@@ -338,6 +342,11 @@ export const stepAddAdmin = async (page: Page, aggregator?: boolean, institution
     await page.fill('#delegate-initial-email', 'cleopatra@test.it', {
       timeout: 500,
     });
+
+    await page.waitForSelector('[aria-label="Continua"]:not([disabled])', {
+      timeout: 2000,
+    });
+
     await page.click('[aria-label="Continua"]');
   }
 
@@ -348,6 +357,15 @@ export const stepAddAdmin = async (page: Page, aggregator?: boolean, institution
   }
 
   if (institutionType !== 'PT') {
+    await page.getByRole('button', { name: 'Conferma' }).waitFor({
+      state: 'visible',
+      timeout: 2000,
+    });
+
+    await page.waitForSelector('button:has-text("Conferma"):not([disabled])', {
+      timeout: 2000,
+    });
+
     await page.getByRole('button', { name: 'Conferma' }).click();
   }
 
