@@ -79,7 +79,8 @@
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.0.0",
     "eslint-plugin-sonarjs": "^0.25.1",
-    "prettier": "^3.5.3"
+    "prettier": "^3.5.3",
+    "start-server-and-test": "^2.1.2"
   },
   "resolutions": {
     "body-parser": "^1.20.3",

@@ -1,14 +1,14 @@
 import { Page, expect } from '@playwright/test';
+import { InstitutionType } from '../../types';
+import { isLocalMode } from './global.setup';
 
 // eslint-disable-next-line functional/no-let
 // let copiedText: string;
 // eslint-disable-next-line functional/no-let
-let partyName: string = '';
 
-export const BASE_URL_ONBOARDING =
-  process.env.REACT_APP_ENV === 'LOCAL_DEV' || process.env.NODE_ENV === 'test'
-    ? 'http://localhost:3000/onboarding'
-    : 'http://dev.selfcare.pagopa.it/onboarding';
+export const BASE_URL_ONBOARDING = isLocalMode
+  ? 'http://localhost:3000/onboarding'
+  : 'http://dev.selfcare.pagopa.it/onboarding';
 
 export const FILE_MOCK_CSV_AGGREGATOR = {
   IO: '../src/lib/__mocks__/mockedFileAggregator.csv',
@@ -16,7 +16,9 @@ export const FILE_MOCK_CSV_AGGREGATOR = {
 };
 
 export const stepInstitutionType = async (page: Page, institutionType: string) => {
-  await page.getByRole('radio', { name: institutionType }).click();
+  setTimeout(async () => {
+    await page.getByRole('radio', { name: institutionType }).click();
+  }, 1000);
   await page.getByRole('button', { name: 'Continua' }).waitFor({ timeout: 1000 });
   await page.getByRole('button', { name: 'Continua' }).click();
 };
@@ -27,8 +29,6 @@ export const stepSelectParty = async (page: Page, aggregator?: boolean, party?: 
   setTimeout(async () => {
     await page.click('.MuiBox-root:nth-child(1) > .MuiBox-root > .MuiBox-root');
   }, 1000);
-  partyName = (await page.locator('div[aria-label] p.MuiTypography-root').innerText()) as string;
-  console.log('Nome del party', partyName);
   if (aggregator) {
     await page.click('[name="aggregator-party"]');
     await page.click('[aria-label="Continua"]');
@@ -311,9 +311,9 @@ export const stepAddManager = async (page: Page) => {
   await page.click('[aria-label="Continua"]');
 };
 
-export const stepAddAdmin = async (page: Page, aggregator?: boolean, institutionType?: string) => {
-  if (process.env.REACT_APP_ENV === 'LOCAL_DEV' || process.env.NODE_ENV === 'test') {
-    await page.getByRole('textbox', { name: 'Nome' }).click();
+export const stepAddAdmin = async (page: Page, aggregator?: boolean, institutionType?: InstitutionType) => {
+  if (isLocalMode) {
+    await page.click('#delegate-initial-name');
     await page.fill('#delegate-initial-name', 'Mattia', {
       timeout: 1000,
     });
@@ -330,6 +330,7 @@ export const stepAddAdmin = async (page: Page, aggregator?: boolean, institution
     await page.fill('#delegate-initial-email', 'm.sisti@test.it', {
       timeout: 1000,
     });
+    await page.click('[aria-label="Continua"]');
   } else {
     await page.getByLabel('Aggiungi me come Amministratore').click();
 
@@ -337,11 +338,20 @@ export const stepAddAdmin = async (page: Page, aggregator?: boolean, institution
     await page.fill('#delegate-initial-email', 'cleopatra@test.it', {
       timeout: 500,
     });
+    await page.click('[aria-label="Continua"]');
   }
 
-  await page.click('[aria-label="Continua"]');
-  if (!aggregator && institutionType !== 'PT') {
+  if (institutionType === 'PT') {
+    await expect(page.getByText('Richiesta di registrazione inviata')).toBeInViewport({
+      timeout: 10000,
+    });
+  }
+
+  if (institutionType !== 'PT') {
     await page.getByRole('button', { name: 'Conferma' }).click();
+  }
+
+  if (!aggregator && institutionType !== 'PT') {
     await expect(page.getByText('Richiesta di adesione inviata')).toBeInViewport({
       timeout: 10000,
     });

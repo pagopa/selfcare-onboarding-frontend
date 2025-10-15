@@ -1,8 +1,10 @@
 import path from 'path';
 import { chromium } from '@playwright/test';
 
+export const isLocalMode =
+  process.env.REACT_APP_ENV === 'LOCAL_DEV' || process.env.NODE_ENV === 'test';
+
 async function globalSetup() {
-  const isLocalMode = process.env.REACT_APP_ENV === 'LOCAL_DEV' || process.env.NODE_ENV === 'test';
   console.log(`GLOBAL SETUP: Starting in ${isLocalMode ? 'LOCAL/TEST' : 'DEV'} mode`);
 
   const browser = await chromium.launch({
