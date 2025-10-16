@@ -8,7 +8,7 @@ import {
   StepperStepComponentProps
 } from '../../../types';
 import { HeaderContext, UserContext } from '../../lib/context';
-import { submit } from '../../services/onboardingServices';
+import { getOnboardingData } from '../../services/onboardingServices';
 import { ENV } from '../../utils/env';
 import { unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
 import { LoadingOverlay } from '../modals/LoadingOverlay';
@@ -62,7 +62,7 @@ function StepOnboardingData({
 
   useEffect(() => {
     if (subProductFlow) {
-      void submit(
+      void getOnboardingData(
         setLoading,
         setRequiredLogin,
         productId,

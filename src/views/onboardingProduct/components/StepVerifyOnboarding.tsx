@@ -1,27 +1,23 @@
-import { AxiosError } from 'axios';
-import { useEffect, useState, useContext, useRef } from 'react';
-import { Trans, useTranslation } from 'react-i18next';
 import { IllusError } from '@pagopa/mui-italia';
-import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
-import { uniqueId } from 'lodash';
 import { EndingPage } from '@pagopa/selfcare-common-frontend/lib';
+import { uniqueId } from 'lodash';
+import { useContext, useEffect, useRef, useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import {
   InstitutionType,
   Product,
   RequestOutcomeMessage,
   StepperStepComponentProps,
 } from '../../../../types';
-import { fetchWithLogs } from '../../../lib/api-utils';
-import { ENV } from '../../../utils/env';
-import { getFetchOutcome } from '../../../lib/error-utils';
-import { HeaderContext, UserContext } from '../../../lib/context';
-import { unregisterUnloadEvent } from '../../../utils/unloadEvent-utils';
+import AlreadyOnboarded from '../../../components/layout/AlreadyOnboarded';
+import UserNotAllowedPage from '../../../components/layout/UserNotAllowedPage';
 import { LoadingOverlay } from '../../../components/modals/LoadingOverlay';
 import { MessageNoAction } from '../../../components/shared/MessageNoAction';
-import UserNotAllowedPage from '../../../components/layout/UserNotAllowedPage';
-import AlreadyOnboarded from '../../../components/layout/AlreadyOnboarded';
+import { HeaderContext, UserContext } from '../../../lib/context';
 import { OnboardingFormData } from '../../../model/OnboardingFormData';
-import { PRODUCT_IDS } from '../../../utils/constants';
+import { verifyOnboarding } from '../../../services/onboardingServices';
+import { ENV } from '../../../utils/env';
+import { unregisterUnloadEvent } from '../../../utils/unloadEvent-utils';
 
 type Props = StepperStepComponentProps & {
   externalInstitutionId: string;
@@ -102,68 +98,23 @@ export function StepVerifyOnboarding({
     );
   }, [productId]);
 
-  const submit = async () => {
-    setLoading(true);
-
-    const onboardingStatus = await fetchWithLogs(
-      {
-        endpoint: 'VERIFY_ONBOARDING',
-      },
-      {
-        method: 'HEAD',
-        params: {
-          taxCode: onboardingFormData?.taxCode,
-          productId,
-          subunitCode: onboardingFormData?.uoUniqueCode ?? onboardingFormData?.aooUniqueCode,
-          origin: onboardingFormData?.origin,
-          originId: onboardingFormData?.originId,
-          institutionType:
-            productId === PRODUCT_IDS.IDPAY_MERCHANT && institutionType === 'PRV_PF'
-              ? 'PRV_PF'
-              : undefined,
-        },
-      },
-      () => setRequiredLogin(true)
-    );
-
-    setLoading(false);
-
-    // Check the outcome
-    const restOutcome = getFetchOutcome(onboardingStatus);
-    if (restOutcome === 'success') {
-      trackEvent('ONBOARDING_PRODUCT_ALREADY_SUBSCRIBED', {
-        request_id: requestIdRef.current,
-        party_id: onboardingFormData?.externalId,
-        product_id: selectedProduct?.id,
-      });
-      setOutcome(alreadyOnboarded);
-    } else {
-      if (
-        (onboardingStatus as AxiosError<any>).response?.status === 404 ||
-        (onboardingStatus as AxiosError<any>).response?.status === 400
-      ) {
-        setOutcome(null);
-        onForwardAction();
-      } else if ((onboardingStatus as AxiosError<any>).response?.status === 403) {
-        trackEvent('ONBOARDING_NOT_ALLOWED_ERROR', {
-          request_id: requestIdRef.current,
-          party_id: externalInstitutionId,
-          product_id: productId,
-        });
-        setOutcome(notAllowedErrorNoParty);
-      } else {
-        setOutcome(genericError);
-      }
-    }
-  };
-
   useEffect(() => {
-    void submit();
+    void verifyOnboarding(
+      setLoading,
+      setRequiredLogin,
+      productId,
+      selectedProduct,
+      setOutcome,
+      alreadyOnboarded,
+      onboardingFormData,
+      requestIdRef,
+      forward,
+      institutionType,
+      genericError,
+      externalInstitutionId,
+      notAllowedErrorNoParty
+    );
   }, []);
-
-  const onForwardAction = () => {
-    forward();
-  };
 
   if (outcome) {
     unregisterUnloadEvent(setOnExit);

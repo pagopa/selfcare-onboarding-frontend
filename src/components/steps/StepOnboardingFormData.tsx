@@ -1,3 +1,4 @@
+/* eslint-disable functional/immutable-data */
 import { Alert, Box, Grid, Link, TextField } from '@mui/material';
 import { styled } from '@mui/system';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
@@ -101,6 +102,12 @@ export default function StepOnboardingFormData({
   const [retrievedIstat, setRetrievedIstat] = useState<string>();
   const [invalidTaxCodeInvoicing, setInvalidTaxCodeInvoicing] = useState<boolean>(false);
   const [recipientCodeStatus, setRecipientCodeStatus] = useState<string>();
+  const requestIdRef = useRef<string>();
+  const [filterCategories, setFilterCategories] = useState<string>();
+  const institutionAvoidGeotax = ['PT', 'SA', 'AS'].includes(institutionType);
+  const [originId4Premium, setOriginId4Premium] = useState<string>();
+  const [dpoData, setDpoData] = useState<DataProtectionOfficerDto>();
+  const [countries, setCountries] = useState<Array<InstitutionLocationData>>();
   const [geotaxonomy, updateGeotaxonomy] = useReducer(
     (prev: { add: boolean; edit: boolean }, next: { add: boolean; edit: boolean }) => ({
       ...prev,
@@ -129,13 +136,6 @@ export default function StepOnboardingFormData({
     isVatRegistrated,
   });
 
-  const requestIdRef = useRef<string>();
-  const [filterCategories, setFilterCategories] = useState<string>();
-  const institutionAvoidGeotax = ['PT', 'SA', 'AS'].includes(institutionType);
-  const [originId4Premium, setOriginId4Premium] = useState<string>();
-  const [dpoData, setDpoData] = useState<DataProtectionOfficerDto>();
-  const [countries, setCountries] = useState<Array<InstitutionLocationData>>();
-
   useEffect(() => {
     if (externalInstitutionId !== stepHistoryState.externalInstitutionId) {
       setStepHistoryState({
@@ -147,17 +147,32 @@ export default function StepOnboardingFormData({
   }, []);
 
   useEffect(() => {
-    if (!controllers.isPremium) {
-      void getPreviousGeotaxononomies(
-        externalInstitutionId,
-        aooSelected,
-        uoSelected,
-        setPreviousGeotaxononomies,
-        setRequiredLogin
-      );
-    } else {
-      setPreviousGeotaxononomies(initialFormData.geographicTaxonomies);
-    }
+    const loadGeotaxonomies = async () => {
+      if (!externalInstitutionId || externalInstitutionId === '') {
+        console.warn('StepOnboardingFormData: externalInstitutionId not set, using fallback');
+        setPreviousGeotaxononomies(initialFormData.geographicTaxonomies || []);
+        return;
+      }
+
+      if (!controllers.isPremium) {
+        try {
+          await getPreviousGeotaxononomies(
+            externalInstitutionId,
+            aooSelected,
+            uoSelected,
+            setPreviousGeotaxononomies,
+            setRequiredLogin
+          );
+        } catch (error) {
+          console.error('Failed to load geotaxonomies:', error);
+          setPreviousGeotaxononomies([]);
+        }
+      } else {
+        setPreviousGeotaxononomies(initialFormData.geographicTaxonomies);
+      }
+    };
+
+    void loadGeotaxonomies();
   }, []);
 
   useEffect(() => {
@@ -390,8 +405,19 @@ export default function StepOnboardingFormData({
   }, [formik.values.recipientCode]);
 
   useEffect(() => {
-    if (formik.values.city && origin !== 'IPA') {
-      void getCountriesFromGeotaxonomies(formik.values.city, setCountries, setRequiredLogin);
+    if (typeof formik.values.city !== 'undefined' && origin !== 'IPA') {
+      const loadCountries = async () => {
+        try {
+          void getCountriesFromGeotaxonomies(
+            formik.values.city ?? '',
+            setCountries,
+            setRequiredLogin
+          );
+        } catch (error) {
+          console.error('Failed to load countries:', error);
+        }
+      };
+      void loadCountries();
     }
   }, []);
 
