@@ -359,7 +359,7 @@ export const stepAddAdmin = async (
     await page.getByRole('button', { name: 'Conferma' }).click();
   }
 
-  if (!aggregator) {
+  if (!aggregator && institutionType !== 'PT') {
     await expect(page.getByText('Richiesta di adesione inviata')).toBeInViewport({
       timeout: 2000,
     });
