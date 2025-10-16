@@ -5,8 +5,11 @@ import { Dispatch, SetStateAction } from 'react';
 import {
   InstitutionOnboardingInfoResource,
   InstitutionType,
+  PartyData,
   Product,
   RequestOutcomeMessage,
+  RequestOutcomeOptions,
+  UserOnCreate,
 } from '../../types';
 import { fetchWithLogs } from '../lib/api-utils';
 import { getFetchOutcome } from '../lib/error-utils';
@@ -257,4 +260,58 @@ export const getFilterCategories = async (
   } else {
     setFilterCategoriesResponse(config);
   }
+};
+
+export const addUserRequest = async (
+  users: Array<UserOnCreate>,
+  setLoading: Dispatch<SetStateAction<boolean>>,
+  selectedProduct: Product | undefined,
+  onboardingFormData: OnboardingFormData | undefined,
+  selectedParty: PartyData | undefined,
+  institutionType: InstitutionType | undefined,
+  setRequiredLogin: Dispatch<SetStateAction<boolean>>,
+  setOutcome: Dispatch<SetStateAction<any>>,
+  outcomeContent: RequestOutcomeOptions,
+  requestId: string | undefined
+) => {
+  setLoading(true);
+
+  const addUserResponse = await fetchWithLogs(
+    { endpoint: 'ONBOARDING_NEW_USER' },
+    {
+      method: 'POST',
+      data: {
+        productId: selectedProduct?.id,
+        institutionType: onboardingFormData?.institutionType ?? institutionType,
+        origin:
+          (onboardingFormData?.institutionType ?? institutionType) === 'SA'
+            ? 'ANAC'
+            : ['PSP', 'GPU', 'PT', 'PRV'].includes(
+                  (onboardingFormData?.institutionType ?? institutionType) as InstitutionType
+                ) && selectedProduct?.id !== PRODUCT_IDS.INTEROP
+              ? 'SELC'
+              : onboardingFormData?.origin,
+        originId: onboardingFormData?.originId ?? onboardingFormData?.taxCode,
+        subunitCode: selectedParty?.codiceUniUo
+          ? selectedParty.codiceUniUo
+          : selectedParty?.codiceUniAoo,
+        taxCode: onboardingFormData?.taxCode,
+        users,
+      },
+    },
+    () => setRequiredLogin(true)
+  );
+
+  setLoading(false);
+
+  const outcome = getFetchOutcome(addUserResponse);
+
+  setOutcome(outcomeContent[outcome as keyof RequestOutcomeOptions]);
+
+  trackEvent(outcome === 'success' ? 'ONBOARDING_USER_SUCCESS' : 'ONBOARDING_USER_ERROR', {
+    request_id: requestId,
+    party_id: selectedParty?.externalId,
+    product_id: selectedProduct?.id,
+    from: 'onboarding',
+  });
 };
