@@ -1,44 +1,40 @@
-import { useEffect, useState, useContext, useRef, useMemo } from 'react';
-import { useHistory } from 'react-router-dom';
 import { Container } from '@mui/material';
 import SessionModal from '@pagopa/selfcare-common-frontend/lib/components/SessionModal';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
 import { uniqueId } from 'lodash';
+import { useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import { useParams } from 'react-router';
-import { useTranslation, Trans } from 'react-i18next';
-import { AxiosResponse } from 'axios';
-import { withLogin } from '../../components/withLogin';
+import { useHistory } from 'react-router-dom';
 import {
-  InstitutionType,
-  SelfcareParty,
-  Product,
-  /* StepperStep, */ UserOnCreate,
-  StepperStep,
   DataProtectionOfficerDto,
+  InstitutionType,
   PaymentServiceProviderDto,
+  Product,
+  SelfcareParty,
+  StepperStep,
+  UserOnCreate,
 } from '../../../types';
-import { OnboardingFormData } from '../../model/OnboardingFormData';
+import { ConfirmOnboardingModal } from '../../components/modals/ConfirmOnboardingRequest';
 import { LoadingOverlay } from '../../components/modals/LoadingOverlay';
-import { ENV } from '../../utils/env';
-import { HeaderContext, UserContext } from '../../lib/context';
 import { StepAddManager, UsersObject } from '../../components/steps/StepAddManager';
 import StepOnboardingData from '../../components/steps/StepOnboardingData';
 import StepOnboardingFormData from '../../components/steps/StepOnboardingFormData';
-import { CompanyInformations } from '../../model/CompanyInformations';
-import { registerUnloadEvent, unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
+import { withLogin } from '../../components/withLogin';
 import { useHistoryState } from '../../hooks/useHistoryState';
-import { ConfirmOnboardingModal } from '../../components/modals/ConfirmOnboardingRequest';
-import { fetchWithLogs } from '../../lib/api-utils';
-import config from '../../utils/config.json';
-import { getFetchOutcome } from '../../lib/error-utils';
+import { HeaderContext, UserContext } from '../../lib/context';
+import { CompanyInformations } from '../../model/CompanyInformations';
+import { OnboardingFormData } from '../../model/OnboardingFormData';
 import { PRODUCT_IDS } from '../../utils/constants';
-import SubProductStepVerifyInputs from './components/SubProductStepVerifyInputs';
+import { ENV } from '../../utils/env';
+import { registerUnloadEvent, unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
+import { getPricingPlan } from '../../services/subProductServices';
+import { SubProductStepSelectUserParty } from './components/SubProductStepSelectUserParty';
 import SubProductStepSubmit from './components/SubProductStepSubmit';
 import SubProductStepSuccess from './components/SubProductStepSuccess';
-import { SubProductStepSelectUserParty } from './components/SubProductStepSelectUserParty';
-// import SubProductStepSelectPricingPlan from './components/subProductStepPricingPlan/SubProductStepSelectPricingPlan';
-import SubProductStepUserUnrelated from './components/SubProductStepUserUnrelated';
+import SubProductStepVerifyInputs from './components/SubProductStepVerifyInputs';
 import { SubProductStepNoParties } from './components/SubProductStepNoParties';
+import SubProductStepUserUnrelated from './components/SubProductStepUserUnrelated';
 
 type OnboardingPremiumUrlParams = {
   productId: string;
@@ -99,7 +95,7 @@ function OnboardingPremiumComponent() {
   }, [productId, subProductId]);
 
   useEffect(() => {
-    void getPricingPlan();
+    void getPricingPlan(setRequiredLogin, setPricingPlanCategory);
   }, []);
 
   const chooseFromMyParties = useRef(true);
@@ -214,27 +210,6 @@ function OnboardingPremiumComponent() {
     });
     setOpenConfirmationModal(false);
     forward();
-  };
-
-  const getPricingPlan = async () => {
-    const configJsinResponse = await fetchWithLogs(
-      {
-        endpoint: 'CONFIG_JSON_CDN_URL',
-      },
-      {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-      },
-      () => setRequiredLogin(true)
-    );
-
-    const restOutcome = getFetchOutcome(configJsinResponse);
-    if (restOutcome === 'success') {
-      const response = (configJsinResponse as AxiosResponse).data;
-      setPricingPlanCategory(response);
-    } else {
-      setPricingPlanCategory(config);
-    }
   };
 
   const steps: Array<StepperStep> = [
@@ -381,7 +356,7 @@ function OnboardingPremiumComponent() {
           institutionType: institutionType as InstitutionType,
           pricingPlan: pricingPlanCategory.product[subProductId]?.consumptionPlan.pricingPlan,
           origin,
-          originId: origin === 'SELC' ? billingData?.taxCode ?? '' : originId,
+          originId: origin === 'SELC' ? (billingData?.taxCode ?? '') : originId,
           setLoading,
           forward,
           back,
@@ -389,7 +364,7 @@ function OnboardingPremiumComponent() {
     },
     {
       label: 'Success',
-      Component: () => SubProductStepSuccess({product: subProduct as Product}), 
+      Component: () => SubProductStepSuccess({ product: subProduct as Product }),
     },
   ];
 

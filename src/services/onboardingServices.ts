@@ -1,7 +1,13 @@
+/* eslint-disable complexity */
 import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
 import { AxiosError, AxiosResponse } from 'axios';
 import { Dispatch, SetStateAction } from 'react';
-import { InstitutionOnboardingInfoResource, InstitutionType, RequestOutcomeMessage } from '../../types';
+import {
+  InstitutionOnboardingInfoResource,
+  InstitutionType,
+  Product,
+  RequestOutcomeMessage,
+} from '../../types';
 import { fetchWithLogs } from '../lib/api-utils';
 import { getFetchOutcome } from '../lib/error-utils';
 import { PRODUCT_IDS } from '../utils/constants';
@@ -134,5 +140,40 @@ export const verifyOnboarding = async (
     } else {
       setOutcome(genericError);
     }
+  }
+};
+
+export const checkProduct = async (
+  productId: string,
+  setProduct: (product: Product | undefined) => void,
+  setRequiredLogin: (required: boolean) => void,
+  options?: {
+    onError?: (error: AxiosError) => void;
+    onNotFound?: () => void;
+    onPhaseOut?: (product: Product) => void;
+  }
+) => {
+  const onboardingProducts = await fetchWithLogs(
+    { endpoint: 'ONBOARDING_VERIFY_PRODUCT', endpointParams: { productId } },
+    { method: 'GET' },
+    () => setRequiredLogin(true)
+  );
+
+  const result = getFetchOutcome(onboardingProducts);
+
+  if (result === 'success') {
+    const product = (onboardingProducts as AxiosResponse).data;
+    setProduct(product);
+
+    if (product?.status === 'PHASE_OUT' && options?.onPhaseOut) {
+      options.onPhaseOut(product);
+    }
+  } else if ((onboardingProducts as AxiosError).response?.status === 404) {
+    options?.onNotFound?.();
+    setProduct(undefined);
+  } else {
+    console.error('Unexpected response', (onboardingProducts as AxiosError).response);
+    options?.onError?.(onboardingProducts as AxiosError);
+    setProduct(undefined);
   }
 };

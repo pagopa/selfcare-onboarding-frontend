@@ -1,14 +1,12 @@
-import { AxiosError, AxiosResponse } from 'axios';
-import { Dispatch, SetStateAction, useContext, useEffect, useState } from 'react';
 import { trackAppError } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
-import { SelfcareParty, Product, StepperStepComponentProps } from '../../../../types';
-import { HeaderContext, UserContext } from '../../../lib/context';
-import { fetchWithLogs } from '../../../lib/api-utils';
-import { getFetchOutcome } from '../../../lib/error-utils';
-import { unregisterUnloadEvent } from '../../../utils/unloadEvent-utils';
-import { buildUrlLogo } from '../../../utils/constants';
-import { genericError } from '../../onboardingProduct/components/StepVerifyOnboarding';
+import { Dispatch, SetStateAction, useContext, useEffect, useState } from 'react';
+import { Product, SelfcareParty, StepperStepComponentProps } from '../../../../types';
 import { MessageNoAction } from '../../../components/shared/MessageNoAction';
+import { HeaderContext, UserContext } from '../../../lib/context';
+import { checkProduct } from '../../../services/onboardingServices';
+import { handleSearchUserParties } from '../../../services/subProductServices';
+import { unregisterUnloadEvent } from '../../../utils/unloadEvent-utils';
+import { genericError } from '../../onboardingProduct/components/StepVerifyOnboarding';
 
 type Props = StepperStepComponentProps & {
   requestId: string;
@@ -16,65 +14,6 @@ type Props = StepperStepComponentProps & {
   subProductId: string;
   setLoading: (loading: boolean) => void;
   setActiveStep: Dispatch<SetStateAction<number>>;
-};
-
-const checkProduct = async (
-  id: string,
-  setter: (product: Product | undefined) => void,
-  setRequiredLogin: (required: boolean) => void,
-  setError: Dispatch<SetStateAction<boolean>>
-) => {
-  const onboardingProducts = await fetchWithLogs(
-    { endpoint: 'ONBOARDING_VERIFY_PRODUCT', endpointParams: { productId: id } },
-    { method: 'GET' },
-    () => setRequiredLogin(true)
-  );
-  const result = getFetchOutcome(onboardingProducts);
-
-  if (result === 'success') {
-    const product = (onboardingProducts as AxiosResponse).data;
-    setter(product);
-  } else if ((onboardingProducts as AxiosError).response?.status === 404) {
-    setter(undefined);
-  } else {
-    setError(true);
-    console.error('Unexpected response', (onboardingProducts as AxiosError).response);
-    setter(undefined);
-  }
-};
-
-const handleSearchUserParties = async (
-  setParties: (parties: Array<SelfcareParty>) => void,
-  setRequiredLogin: (required: boolean) => void,
-  _productId: string,
-  subProductId: string
-) => {
-
-  const searchResponsePremium = await fetchWithLogs(
-    { endpoint: 'ONBOARDING_GET_USER_PARTIES' },
-    {
-      method: 'GET',
-      params: {
-        productId: subProductId,
-      },
-    },
-    () => setRequiredLogin(true)
-  );
-  
-  const partiesWithPremiumProduct = (searchResponsePremium as AxiosResponse).data;
-
-  const outcome = getFetchOutcome(searchResponsePremium);
-
-  if (outcome === 'success') {
-    setParties(
-      partiesWithPremiumProduct.map((p: any) => ({
-        ...p,
-        urlLogo: buildUrlLogo(p.id),
-      }))
-    );
-  } else {
-    setParties([]);
-  }
 };
 
 function SubProductStepVerifyInputs({
@@ -96,8 +35,12 @@ function SubProductStepVerifyInputs({
   const submit = () => {
     setLoading(true);
     Promise.all([
-      checkProduct(productId, setSelectedProduct, setRequiredLogin, setError),
-      checkProduct(subProductId, setSelectedSubProduct, setRequiredLogin, setError),
+      checkProduct(productId, setSelectedProduct, setRequiredLogin, {
+        onError: () => setError(true),
+      }),
+      checkProduct(subProductId, setSelectedSubProduct, setRequiredLogin, {
+        onError: () => setError(true),
+      }),
       handleSearchUserParties(setParties, setRequiredLogin, productId, subProductId),
     ])
       .catch((reason) => {
@@ -114,7 +57,7 @@ function SubProductStepVerifyInputs({
   };
 
   useEffect(() => {
-      submit();
+    submit();
   }, [productId, subProductId]);
 
   useEffect(() => {

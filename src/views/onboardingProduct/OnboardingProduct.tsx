@@ -11,13 +11,15 @@ import { Trans, useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
 import {
   InstitutionType,
-  Problem,
   Product,
   RequestOutcomeMessage,
   RequestOutcomeOptions,
   StepperStep,
-  UserOnCreate,
+  UserOnCreate
 } from '../../../types';
+import AlreadyOnboarded from '../../components/layout/AlreadyOnboarded';
+import NoProductPage from '../../components/layout/NoProductPage';
+import UserNotAllowedPage from '../../components/layout/UserNotAllowedPage';
 import { LoadingOverlay } from '../../components/modals/LoadingOverlay';
 import { MessageNoAction } from '../../components/shared/MessageNoAction';
 import { StepAddManager } from '../../components/steps/StepAddManager';
@@ -33,17 +35,13 @@ import { getFetchOutcome } from '../../lib/error-utils';
 import { AdditionalGpuInformations } from '../../model/AdditionalGpuInformations';
 import { AdditionalInformations } from '../../model/AdditionalInformations';
 import { AggregateInstitution } from '../../model/AggregateInstitution';
-import { billingData2billingDataRequest } from '../../model/BillingData';
-import { onboardedInstitutionInfo2geographicTaxonomy } from '../../model/GeographicTaxonomies';
 import { OnboardingFormData } from '../../model/OnboardingFormData';
-import { pspData2pspDataRequest } from '../../model/PspData';
+import { checkProduct } from '../../services/onboardingServices';
+import { postOnboardingSubmit } from '../../services/onboardingSubmitServices';
 import config from '../../utils/config.json';
 import { PRODUCT_IDS } from '../../utils/constants';
 import { ENV } from '../../utils/env';
 import { registerUnloadEvent, unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
-import AlreadyOnboarded from '../../components/layout/AlreadyOnboarded';
-import NoProductPage from '../../components/layout/NoProductPage';
-import UserNotAllowedPage from '../../components/layout/UserNotAllowedPage';
 import { StepAddAdmin } from './components/StepAddAdmin';
 import { StepAdditionalGpuInformations } from './components/StepAdditionalGpuInformations';
 import { StepAdditionalInformations } from './components/StepAdditionalInformations';
@@ -214,9 +212,15 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
   useEffect(() => {
     // eslint-disable-next-line functional/immutable-data
     requestIdRef.current = uniqueId(`onboarding-${externalInstitutionId}-${productId}-`);
-    void checkProductId().finally(() => {
+
+    void checkProduct(productId, setSelectedProduct, setRequiredLogin, {
+      onNotFound: () => unregisterUnloadEvent(setOnExit),
+      onError: () => unregisterUnloadEvent(setOnExit),
+      onPhaseOut: () => setOutcome(prodPhaseOutErrorPage),
+    }).finally(() => {
       setLoading(false);
     });
+
     setPricingPlan(new URLSearchParams(window.location.search).get('pricingPlan') ?? undefined);
   }, [productId]);
 
@@ -293,30 +297,6 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
       default:
         const defaultIpa = filterCategoriesResponse.product.default?.ipa;
         return institutionType === 'GSP' ? defaultIpa?.GSP : defaultIpa?.PA;
-    }
-  };
-
-  const checkProductId = async () => {
-    const onboardingProducts = await fetchWithLogs(
-      { endpoint: 'ONBOARDING_VERIFY_PRODUCT', endpointParams: { productId } },
-      { method: 'GET' },
-      () => setRequiredLogin(true)
-    );
-    const result = getFetchOutcome(onboardingProducts);
-    if (result === 'success') {
-      const product = (onboardingProducts as AxiosResponse).data;
-      setSelectedProduct(product);
-    } else if ((onboardingProducts as AxiosError).response?.status === 404) {
-      unregisterUnloadEvent(setOnExit);
-      setSelectedProduct(null);
-    } else {
-      console.error('Unexpected response', (onboardingProducts as AxiosError).response);
-      unregisterUnloadEvent(setOnExit);
-      setSelectedProduct(null);
-    }
-
-    if ((onboardingProducts as AxiosResponse).data?.status === 'PHASE_OUT') {
-      setOutcome(prodPhaseOutErrorPage);
     }
   };
 
@@ -456,152 +436,6 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     ],
   };
 
-  // eslint-disable-next-line complexity
-  const onboardingSubmit = async (
-    users: Array<UserOnCreate>,
-    aggregates?: Array<AggregateInstitution>
-  ) => {
-    setLoading(true);
-    console.log('institutionType', institutionType);
-    console.log('origin', origin);
-    const postLegalsResponse = await fetchWithLogs(
-      { endpoint: 'ONBOARDING_POST_LEGALS' },
-      {
-        method: 'POST',
-        data: {
-          billingData: billingData2billingDataRequest(onboardingFormData as OnboardingFormData),
-          atecoCodes: onboardingFormData?.atecoCodes,
-          additionalInformations:
-            institutionType === 'GSP' && selectedProduct?.id === PRODUCT_IDS.PAGOPA
-              ? {
-                  agentOfPublicService: additionalInformations?.agentOfPublicService,
-                  agentOfPublicServiceNote: additionalInformations?.agentOfPublicServiceNote,
-                  belongRegulatedMarket: additionalInformations?.belongRegulatedMarket,
-                  regulatedMarketNote: additionalInformations?.regulatedMarketNote,
-                  establishedByRegulatoryProvision:
-                    additionalInformations?.establishedByRegulatoryProvision,
-                  establishedByRegulatoryProvisionNote:
-                    additionalInformations?.establishedByRegulatoryProvisionNote,
-                  ipa: additionalInformations?.ipa,
-                  ipaCode: additionalInformations?.ipaCode,
-                  otherNote: additionalInformations?.otherNote,
-                }
-              : undefined,
-          payment:
-            (institutionType === 'PRV' || institutionType === 'PRV_PF') &&
-            selectedProduct?.id === PRODUCT_IDS.IDPAY_MERCHANT
-              ? {
-                  holder: onboardingFormData?.holder,
-                  iban: onboardingFormData?.iban,
-                }
-              : undefined,
-          gpuData:
-            institutionType === 'GPU' &&
-            (selectedProduct?.id === PRODUCT_IDS.PAGOPA ||
-              selectedProduct?.id === PRODUCT_IDS.INTEROP ||
-              selectedProduct?.id === PRODUCT_IDS.IO_SIGN ||
-              selectedProduct?.id === PRODUCT_IDS.IO)
-              ? additionalGPUInformations
-              : undefined,
-          pspData:
-            institutionType === 'PSP'
-              ? pspData2pspDataRequest(onboardingFormData as OnboardingFormData)
-              : undefined,
-          companyInformations:
-            onboardingFormData?.businessRegisterPlace ||
-            onboardingFormData?.rea ||
-            onboardingFormData?.shareCapital
-              ? {
-                  businessRegisterPlace: onboardingFormData?.businessRegisterPlace,
-                  rea: onboardingFormData?.rea,
-                  shareCapital: onboardingFormData?.shareCapital,
-                }
-              : undefined,
-          institutionType,
-          originId: onboardingFormData?.originId ?? onboardingFormData?.taxCode,
-          geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY
-            ? onboardingFormData?.geographicTaxonomies?.map((gt) =>
-                onboardedInstitutionInfo2geographicTaxonomy(gt)
-              )
-            : [],
-          institutionLocationData: {
-            country:
-              institutionType === 'SCP' && productId === PRODUCT_IDS.INTEROP
-                ? 'IT'
-                : onboardingFormData?.country,
-            county: onboardingFormData?.county,
-            city: onboardingFormData?.city,
-          },
-          origin:
-            institutionType === 'SA'
-              ? 'ANAC'
-              : institutionType === 'PSP' ||
-                  institutionType === 'GPU' ||
-                  institutionType === 'PT' ||
-                  ((institutionType === 'PRV' || institutionType === 'PRV_PF') &&
-                    productId !== PRODUCT_IDS.INTEROP &&
-                    productId !== PRODUCT_IDS.IDPAY_MERCHANT)
-                ? 'SELC'
-                : origin,
-          istatCode: origin !== 'IPA' ? onboardingFormData?.istatCode : undefined,
-          users,
-          pricingPlan,
-          assistanceContacts:
-            productId === PRODUCT_IDS.IO_SIGN
-              ? { supportEmail: onboardingFormData?.supportEmail }
-              : undefined,
-          productId,
-          subunitCode: onboardingFormData?.uoUniqueCode ?? onboardingFormData?.aooUniqueCode,
-          subunitType: onboardingFormData?.uoUniqueCode
-            ? 'UO'
-            : onboardingFormData?.aooUniqueCode
-              ? 'AOO'
-              : undefined,
-          taxCode: onboardingFormData?.taxCode,
-          isAggregator: onboardingFormData?.isAggregator
-            ? onboardingFormData?.isAggregator
-            : undefined,
-          aggregates,
-        },
-      },
-      () => setRequiredLogin(true)
-    );
-
-    setLoading(false);
-
-    // Check the outcome
-    const outcome = getFetchOutcome(postLegalsResponse);
-
-    if (outcome === 'success') {
-      trackEvent('ONBOARDING_SEND_SUCCESS', {
-        request_id: requestIdRef.current,
-        party_id: externalInstitutionId,
-        product_id: productId,
-      });
-      setOutcome(outcomeContent[outcome]);
-    } else {
-      const event =
-        (postLegalsResponse as AxiosError<Problem>).response?.status === 409
-          ? 'ONBOARDING_SEND_CONFLICT_ERROR_FAILURE'
-          : 'ONBOARDING_SEND_FAILURE';
-      trackEvent(event, {
-        request_id: requestIdRef.current,
-        party_id: externalInstitutionId,
-        product_id: productId,
-      });
-      if ((postLegalsResponse as AxiosError<Problem>).response?.status === 403) {
-        trackEvent('ONBOARDING_NOT_ALLOWED_ERROR', {
-          request_id: requestIdRef.current,
-          party_id: externalInstitutionId,
-          product_id: productId,
-        });
-        setOutcome(notAllowedError);
-      } else {
-        setOutcome(outcomeContent[outcome]);
-      }
-    }
-  };
-
   const onSubmit = (
     userData?: Partial<FormData> | undefined,
     aggregates?: Array<AggregateInstitution>
@@ -615,7 +449,25 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
 
     const usersWithoutLegal = users.slice(0, 0).concat(users.slice(0 + 1));
 
-    onboardingSubmit(controllers.isTechPartner ? usersWithoutLegal : users, aggregates).catch(() => {
+    postOnboardingSubmit(
+      setLoading,
+      setRequiredLogin,
+      productId,
+      selectedProduct,
+      setOutcome,
+      onboardingFormData,
+      requestIdRef,
+      externalInstitutionId,
+      additionalInformations,
+      additionalGPUInformations,
+      institutionType,
+      origin,
+      outcomeContent,
+      notAllowedError,
+      pricingPlan,
+      controllers.isTechPartner ? usersWithoutLegal : users,
+      aggregates
+    ).catch(() => {
       trackEvent('ONBOARDING_ADD_DELEGATE', {
         request_id: requestIdRef.current,
         party_id: externalInstitutionId,

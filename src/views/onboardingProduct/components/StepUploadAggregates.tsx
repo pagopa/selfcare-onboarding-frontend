@@ -1,5 +1,4 @@
 import { Alert, AlertTitle, Grid, Typography, useTheme } from '@mui/material';
-import { AxiosResponse } from 'axios';
 import { useContext, useEffect, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import {
@@ -9,13 +8,9 @@ import {
 } from '../../../../types';
 import { FileUploader } from '../../../components/fileUpload/FileUploader';
 import { OnboardingStepActions } from '../../../components/registrationSteps/OnboardingStepActions';
-import { fetchWithLogs } from '../../../lib/api-utils';
 import { UserContext } from '../../../lib/context';
-import { getFetchOutcome } from '../../../lib/error-utils';
-import { AggregateInstitution } from '../../../model/AggregateInstitution';
 import { RowError } from '../../../model/RowError';
-import { ENV } from '../../../utils/env';
-import { genericError } from './StepVerifyOnboarding';
+import { getExampleAggregatesCsv, verifyAggregates } from '../../../services/aggregatesServices';
 
 type Props = {
   loading: boolean;
@@ -99,82 +94,6 @@ export function StepUploadAggregates({
 
     setErrorCsv(downloadUrl);
     setUploadedFiles([]);
-  };
-
-  const verifyAggregates = async (file: File) => {
-    setLoading(true);
-
-    const formData = new FormData();
-    formData.append('aggregates', file);
-
-    const verifyAggregates = await fetchWithLogs(
-      {
-        endpoint: 'ONBOARDING_VERIFY_AGGREGATES',
-      },
-      {
-        method: 'POST',
-        params: {
-          institutionType,
-          productId,
-        },
-        data: formData,
-        headers: { 'Content-Type': 'multipart/form-data' },
-      },
-      () => setRequiredLogin(true)
-    );
-
-    const result = getFetchOutcome(verifyAggregates);
-
-    if (result === 'success') {
-      const errors = (verifyAggregates as AxiosResponse).data.errors as Array<RowError>;
-      const aggregatesList = (verifyAggregates as AxiosResponse).data
-        .aggregates as Array<AggregateInstitution>;
-      parseJson2Csv(errors);
-
-      if (errors.length === 0) {
-        setDisabled(false);
-        forward(undefined, aggregatesList);
-      } else {
-        setDisabled(true);
-        setFoundErrors(errors);
-        setLoading(false);
-      }
-    } else {
-      setOutcome(genericError);
-      setLoading(false);
-    }
-  };
-
-  const getExampleAggregatesCsv = async () => {
-    try {
-      const response = await fetch(
-        `${ENV.BASE_PATH_CDN_URL}/resources/aggregates/${productId}_enti_aggregatori_template_esempio.csv`,
-        {
-          method: 'GET',
-          headers: { 'Content-Type': 'text/csv' },
-        }
-      );
-
-      if (!response.ok) {
-        console.error(`Response status: ${response.status}`);
-      }
-
-      const csvText = await response.text();
-
-      const blob = new Blob([csvText], { type: 'text/csv' });
-      const downloadUrl = window.URL.createObjectURL(blob);
-
-      const a = document.createElement('a');
-      // eslint-disable-next-line functional/immutable-data
-      a.href = downloadUrl;
-      // eslint-disable-next-line functional/immutable-data
-      a.download = `${partyName}_${productName}_aggregati_esempio.csv`.replace(/ /g, '_');
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-    } catch (error: any) {
-      console.error(error.message);
-    }
   };
 
   return (
@@ -284,7 +203,7 @@ export function StepUploadAggregates({
                 components={{
                   1: (
                     <a
-                      onClick={getExampleAggregatesCsv}
+                      onClick={() => getExampleAggregatesCsv(productId, productName, partyName)}
                       style={{
                         cursor: 'pointer',
                         textDecoration: 'underline',
@@ -305,7 +224,19 @@ export function StepUploadAggregates({
         back={{ label: t('stepUploadAggregates.back'), action: back, disabled: false }}
         forward={{
           label: t('stepUploadAggregates.forward'),
-          action: () => verifyAggregates(uploadedFile[0]),
+          action: () =>
+            verifyAggregates(
+              uploadedFile[0],
+              setLoading,
+              institutionType,
+              productId,
+              setRequiredLogin,
+              parseJson2Csv,
+              setDisabled,
+              forward,
+              setFoundErrors,
+              setOutcome
+            ),
           disabled,
         }}
       />

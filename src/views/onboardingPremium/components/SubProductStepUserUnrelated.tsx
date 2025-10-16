@@ -1,17 +1,14 @@
+import { Box, Button, Grid, Typography } from '@mui/material';
 import { IllusError } from '@pagopa/mui-italia';
-import { Grid, Box, Typography, Button } from '@mui/material';
-import { useContext, useEffect } from 'react';
-import { resolvePathVariables } from '@pagopa/selfcare-common-frontend/lib/utils/routes-utils';
-import { Trans, useTranslation } from 'react-i18next';
-import { AxiosError, AxiosResponse } from 'axios';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
+import { resolvePathVariables } from '@pagopa/selfcare-common-frontend/lib/utils/routes-utils';
+import { useContext, useEffect } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
-import { ROUTES } from '../../../utils/constants';
-import { fetchWithLogs } from '../../../lib/api-utils';
+import { Product } from '../../../../types';
 import { UserContext } from '../../../lib/context';
-import { getFetchOutcome } from '../../../lib/error-utils';
-import { ENV } from '../../../utils/env';
-import { Problem, Product, SelfcareParty } from '../../../../types';
+import { onExitPremiumFlow } from '../../../services/subProductServices';
+import { ROUTES } from '../../../utils/constants';
 
 type Props = {
   product?: Product;
@@ -27,27 +24,6 @@ export default function SubProductStepUserUnrelated({ product, subProduct, produ
   useEffect(() => {
     trackEvent('ONBOARDING_PREMIUM_JOIN_NOT_ALLOWED');
   }, []);
-
-  const onExitPremiumFlow = async () => {
-    const searchResponse = await fetchWithLogs(
-      { endpoint: 'ONBOARDING_GET_USER_PARTIES' },
-      { method: 'GET' },
-      () => setRequiredLogin(true)
-    );
-    const outcome = getFetchOutcome(searchResponse);
-    const response = (searchResponse as AxiosResponse).data as Array<SelfcareParty>;
-    if (outcome === 'success' && response.length > 0) {
-      window.location.assign(ENV.URL_FE.DASHBOARD);
-    } else if (outcome === 'success' && response.length === 0) {
-      window.location.assign('https://www.pagopa.it/it/prodotti-e-servizi/app-io');
-    } else {
-      const errorBody = (searchResponse as AxiosError<Problem>).response?.data;
-      trackEvent('ONBOARDING_REDIRECT_TO_ONBOARDING_FAILURE', {
-        product_id: productId,
-        reason: errorBody?.detail,
-      });
-    }
-  };
 
   const onButtonGoTo = () => {
     history.push(resolvePathVariables(ROUTES.ONBOARDING_PRODUCT.PATH, { productId }));
@@ -92,7 +68,7 @@ export default function SubProductStepUserUnrelated({ product, subProduct, produ
             <Button
               variant="outlined"
               sx={{ alignSelf: 'center', mr: 2 }}
-              onClick={onExitPremiumFlow}
+              onClick={() => onExitPremiumFlow(setRequiredLogin, productId)}
             >
               {t('onboardingSubProduct.subProductStepUserUnrelated.backHomeLabelBtn')}
             </Button>
