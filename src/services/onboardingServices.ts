@@ -11,6 +11,132 @@ import {
 import { fetchWithLogs } from '../lib/api-utils';
 import { getFetchOutcome } from '../lib/error-utils';
 import { PRODUCT_IDS } from '../utils/constants';
+import { OnboardingFormData } from '../model/OnboardingFormData';
+import { genericError } from '../views/onboardingProduct/components/StepVerifyOnboarding';
+import config from '../utils/config.json';
+
+const fetchVerifyOnboarding = async (
+  params: {
+    taxCode: string;
+    productId: string;
+    subunitCode?: string;
+    origin?: string;
+    originId?: string;
+    institutionType?: string;
+  },
+  setRequiredLogin: Dispatch<SetStateAction<boolean>>
+) => {
+  const response = await fetchWithLogs(
+    { endpoint: 'VERIFY_ONBOARDING' },
+    {
+      method: 'HEAD',
+      params,
+    },
+    () => setRequiredLogin(true)
+  );
+
+  const outcome = getFetchOutcome(response);
+
+  return { response, outcome };
+};
+
+export const insertedPartyVerifyOnboarding = async (
+  onboardingFormData: OnboardingFormData,
+  setRequiredLogin: Dispatch<SetStateAction<boolean>>,
+  productId: string,
+  institutionType: InstitutionType | undefined,
+  alreadyOnboarded: any,
+  setOutcome: Dispatch<SetStateAction<any>>,
+  notAllowedError: RequestOutcomeMessage
+) => {
+  const { response, outcome } = await fetchVerifyOnboarding(
+    {
+      taxCode: onboardingFormData.taxCode ?? '',
+      productId,
+      subunitCode: onboardingFormData.uoUniqueCode ?? onboardingFormData.aooUniqueCode,
+      origin: institutionType === 'AS' ? 'IVASS' : undefined,
+      originId: onboardingFormData?.originId ?? undefined,
+    },
+    setRequiredLogin
+  );
+
+  if (outcome === 'success') {
+    setOutcome(alreadyOnboarded);
+  } else {
+    if (
+      (response as AxiosError<any>).response?.status === 404 ||
+      (response as AxiosError<any>).response?.status === 400
+    ) {
+      setOutcome(null);
+    } else if ((response as AxiosError<any>).response?.status === 403) {
+      setOutcome(notAllowedError);
+    } else {
+      setOutcome(genericError);
+    }
+  }
+};
+
+// Seconda funzione - logica per verifyOnboarding generico
+export const verifyOnboarding = async (
+  setLoading: Dispatch<SetStateAction<boolean>>,
+  setRequiredLogin: Dispatch<SetStateAction<boolean>>,
+  productId: string,
+  selectedProduct: any,
+  setOutcome: Dispatch<SetStateAction<any>>,
+  alreadyOnboarded: any,
+  onboardingFormData: any,
+  requestIdRef: any,
+  forward: (...args: any) => void,
+  institutionType: InstitutionType | undefined,
+  genericError: any,
+  externalInstitutionId: string | undefined,
+  notAllowedErrorNoParty: RequestOutcomeMessage
+) => {
+  setLoading(true);
+
+  const { response, outcome } = await fetchVerifyOnboarding(
+    {
+      taxCode: onboardingFormData?.taxCode,
+      productId,
+      subunitCode: onboardingFormData?.uoUniqueCode ?? onboardingFormData?.aooUniqueCode,
+      origin: onboardingFormData?.origin,
+      originId: onboardingFormData?.originId,
+      institutionType:
+        productId === PRODUCT_IDS.IDPAY_MERCHANT && institutionType === 'PRV_PF'
+          ? 'PRV_PF'
+          : undefined,
+    },
+    setRequiredLogin
+  );
+
+  setLoading(false);
+
+  if (outcome === 'success') {
+    trackEvent('ONBOARDING_PRODUCT_ALREADY_SUBSCRIBED', {
+      request_id: requestIdRef.current,
+      party_id: onboardingFormData?.externalId,
+      product_id: selectedProduct?.id,
+    });
+    setOutcome(alreadyOnboarded);
+  } else {
+    if (
+      (response as AxiosError<any>).response?.status === 404 ||
+      (response as AxiosError<any>).response?.status === 400
+    ) {
+      setOutcome(null);
+      forward();
+    } else if ((response as AxiosError<any>).response?.status === 403) {
+      trackEvent('ONBOARDING_NOT_ALLOWED_ERROR', {
+        request_id: requestIdRef.current,
+        party_id: externalInstitutionId,
+        product_id: productId,
+      });
+      setOutcome(notAllowedErrorNoParty);
+    } else {
+      setOutcome(genericError);
+    }
+  }
+};
 
 export const getOnboardingData = async (
   setLoading: Dispatch<SetStateAction<boolean>>,
@@ -74,75 +200,6 @@ export const getOnboardingData = async (
   setLoading(false);
 };
 
-export const verifyOnboarding = async (
-  setLoading: Dispatch<SetStateAction<boolean>>,
-  setRequiredLogin: Dispatch<SetStateAction<boolean>>,
-  productId: string,
-  selectedProduct: any,
-  setOutcome: Dispatch<SetStateAction<any>>,
-  alreadyOnboarded: any,
-  onboardingFormData: any,
-  requestIdRef: any,
-  forward: (...args: any) => void,
-  institutionType: InstitutionType | undefined,
-  genericError: any,
-  externalInstitutionId: string | undefined,
-  notAllowedErrorNoParty: RequestOutcomeMessage
-) => {
-  setLoading(true);
-
-  const onboardingStatus = await fetchWithLogs(
-    {
-      endpoint: 'VERIFY_ONBOARDING',
-    },
-    {
-      method: 'HEAD',
-      params: {
-        taxCode: onboardingFormData?.taxCode,
-        productId,
-        subunitCode: onboardingFormData?.uoUniqueCode ?? onboardingFormData?.aooUniqueCode,
-        origin: onboardingFormData?.origin,
-        originId: onboardingFormData?.originId,
-        institutionType:
-          productId === PRODUCT_IDS.IDPAY_MERCHANT && institutionType === 'PRV_PF'
-            ? 'PRV_PF'
-            : undefined,
-      },
-    },
-    () => setRequiredLogin(true)
-  );
-
-  setLoading(false);
-
-  // Check the outcome
-  const restOutcome = getFetchOutcome(onboardingStatus);
-  if (restOutcome === 'success') {
-    trackEvent('ONBOARDING_PRODUCT_ALREADY_SUBSCRIBED', {
-      request_id: requestIdRef.current,
-      party_id: onboardingFormData?.externalId,
-      product_id: selectedProduct?.id,
-    });
-    setOutcome(alreadyOnboarded);
-  } else {
-    if (
-      (onboardingStatus as AxiosError<any>).response?.status === 404 ||
-      (onboardingStatus as AxiosError<any>).response?.status === 400
-    ) {
-      setOutcome(null);
-      forward();
-    } else if ((onboardingStatus as AxiosError<any>).response?.status === 403) {
-      trackEvent('ONBOARDING_NOT_ALLOWED_ERROR', {
-        request_id: requestIdRef.current,
-        party_id: externalInstitutionId,
-        product_id: productId,
-      });
-      setOutcome(notAllowedErrorNoParty);
-    } else {
-      setOutcome(genericError);
-    }
-  }
-};
-
 export const checkProduct = async (
   productId: string,
   setProduct: (product: Product | undefined) => void,
@@ -175,5 +232,29 @@ export const checkProduct = async (
     console.error('Unexpected response', (onboardingProducts as AxiosError).response);
     options?.onError?.(onboardingProducts as AxiosError);
     setProduct(undefined);
+  }
+};
+
+export const getFilterCategories = async (
+  setRequiredLogin: Dispatch<SetStateAction<boolean>>,
+  setFilterCategoriesResponse: Dispatch<SetStateAction<any>>
+) => {
+  const categories = await fetchWithLogs(
+    {
+      endpoint: 'CONFIG_JSON_CDN_URL',
+    },
+    {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    },
+    () => setRequiredLogin(true)
+  );
+
+  const restOutcome = getFetchOutcome(categories);
+  if (restOutcome === 'success') {
+    const response = (categories as AxiosResponse).data;
+    setFilterCategoriesResponse(response);
+  } else {
+    setFilterCategoriesResponse(config);
   }
 };

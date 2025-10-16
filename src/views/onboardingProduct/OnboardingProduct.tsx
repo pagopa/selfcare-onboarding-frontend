@@ -4,7 +4,6 @@ import { IllusCompleted, IllusError } from '@pagopa/mui-italia';
 import { EndingPage } from '@pagopa/selfcare-common-frontend/lib';
 import SessionModal from '@pagopa/selfcare-common-frontend/lib/components/SessionModal';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
-import { AxiosError, AxiosResponse } from 'axios';
 import { uniqueId } from 'lodash';
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
@@ -15,7 +14,7 @@ import {
   RequestOutcomeMessage,
   RequestOutcomeOptions,
   StepperStep,
-  UserOnCreate
+  UserOnCreate,
 } from '../../../types';
 import AlreadyOnboarded from '../../components/layout/AlreadyOnboarded';
 import NoProductPage from '../../components/layout/NoProductPage';
@@ -29,16 +28,17 @@ import StepOnboardingFormData from '../../components/steps/StepOnboardingFormDat
 import { StepSearchParty } from '../../components/steps/StepSearchParty';
 import { withLogin } from '../../components/withLogin';
 import { useOnboardingControllers } from '../../hooks/useOnboardingControllers';
-import { fetchWithLogs } from '../../lib/api-utils';
 import { HeaderContext, UserContext } from '../../lib/context';
-import { getFetchOutcome } from '../../lib/error-utils';
 import { AdditionalGpuInformations } from '../../model/AdditionalGpuInformations';
 import { AdditionalInformations } from '../../model/AdditionalInformations';
 import { AggregateInstitution } from '../../model/AggregateInstitution';
 import { OnboardingFormData } from '../../model/OnboardingFormData';
-import { checkProduct } from '../../services/onboardingServices';
+import {
+  checkProduct,
+  getFilterCategories,
+  insertedPartyVerifyOnboarding,
+} from '../../services/onboardingServices';
 import { postOnboardingSubmit } from '../../services/onboardingSubmitServices';
-import config from '../../utils/config.json';
 import { PRODUCT_IDS } from '../../utils/constants';
 import { ENV } from '../../utils/env';
 import { registerUnloadEvent, unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
@@ -268,12 +268,20 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
       if (onboardingFormData.taxCode) {
         setExternalInstitutionId(onboardingFormData.taxCode);
       }
-      void insertedPartyVerifyOnboarding(onboardingFormData);
+      void insertedPartyVerifyOnboarding(
+        onboardingFormData,
+        setRequiredLogin,
+        productId,
+        institutionType,
+        alreadyOnboarded,
+        setOutcome,
+        genericError
+      );
     }
   }, [onboardingFormData]);
 
   useEffect(() => {
-    void getFilterCategories();
+    void getFilterCategories(setRequiredLogin, setFilterCategoriesResponse);
   }, []);
 
   const selectFilterCategories = () => {
@@ -297,62 +305,6 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
       default:
         const defaultIpa = filterCategoriesResponse.product.default?.ipa;
         return institutionType === 'GSP' ? defaultIpa?.GSP : defaultIpa?.PA;
-    }
-  };
-
-  const insertedPartyVerifyOnboarding = async (onboardingFormData: OnboardingFormData) => {
-    const onboardingStatus = await fetchWithLogs(
-      {
-        endpoint: 'VERIFY_ONBOARDING',
-      },
-      {
-        method: 'HEAD',
-        params: {
-          taxCode: onboardingFormData.taxCode,
-          productId,
-          subunitCode: onboardingFormData.uoUniqueCode ?? onboardingFormData.aooUniqueCode,
-          origin: institutionType === 'AS' ? 'IVASS' : undefined,
-          originId: onboardingFormData?.originId ?? undefined,
-        },
-      },
-      () => setRequiredLogin(true)
-    );
-    const restOutcome = getFetchOutcome(onboardingStatus);
-
-    if (restOutcome === 'success') {
-      setOutcome(alreadyOnboarded);
-    } else {
-      if (
-        (onboardingStatus as AxiosError<any>).response?.status === 404 ||
-        (onboardingStatus as AxiosError<any>).response?.status === 400
-      ) {
-        setOutcome(null);
-      } else if ((onboardingStatus as AxiosError<any>).response?.status === 403) {
-        setOutcome(notAllowedError);
-      } else {
-        setOutcome(genericError);
-      }
-    }
-  };
-
-  const getFilterCategories = async () => {
-    const categories = await fetchWithLogs(
-      {
-        endpoint: 'CONFIG_JSON_CDN_URL',
-      },
-      {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-      },
-      () => setRequiredLogin(true)
-    );
-
-    const restOutcome = getFetchOutcome(categories);
-    if (restOutcome === 'success') {
-      const response = (categories as AxiosResponse).data;
-      setFilterCategoriesResponse(response);
-    } else {
-      setFilterCategoriesResponse(config);
     }
   };
 
