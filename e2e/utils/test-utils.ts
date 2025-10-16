@@ -350,7 +350,7 @@ export const stepAddAdmin = async (
     await page.click('[aria-label="Continua"]');
   }
 
-  if (institutionType !== 'PT') {
+  if (institutionType !== 'PT' && !aggregator) {
     await page.getByRole('button', { name: 'Conferma' }).waitFor({
       state: 'visible',
       timeout: 2000,
@@ -358,12 +358,15 @@ export const stepAddAdmin = async (
 
     await page.getByRole('button', { name: 'Conferma' }).click();
   }
+  
+  if (aggregator) {
+    return;
+  }
 
   if (!aggregator && institutionType !== 'PT') {
     await expect(page.getByText('Richiesta di adesione inviata')).toBeInViewport({
       timeout: 2000,
     });
-  // eslint-disable-next-line sonarjs/no-identical-conditions
   }
   
   if (institutionType === 'PT') {
