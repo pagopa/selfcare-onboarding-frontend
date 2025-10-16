@@ -292,3 +292,9 @@ export type OnboardingRequestData = {
   status: string;
   expiringDate: string;
 };
+export type FileErrorAttempt = {
+  fileName: string;
+  fileSize: number;
+  fileLastModifyDate: number;
+  errorCount: number;
+};

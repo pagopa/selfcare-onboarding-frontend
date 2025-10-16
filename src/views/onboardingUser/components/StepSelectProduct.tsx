@@ -11,21 +11,19 @@ import {
 } from '@mui/material';
 import { theme } from '@pagopa/mui-italia';
 import { useContext, useEffect, useState } from 'react';
-import { AxiosResponse } from 'axios';
 import { useTranslation } from 'react-i18next';
-import { fetchWithLogs } from '../../../lib/api-utils';
-import { UserContext } from '../../../lib/context';
-import { getFetchOutcome } from '../../../lib/error-utils';
-import { ProductResource } from '../../../model/ProductResource';
-import { OnboardingStepActions } from '../../../components/registrationSteps/OnboardingStepActions';
 import {
   InstitutionType,
   RequestOutcomeMessage,
   StepperStepComponentProps,
 } from '../../../../types';
+import { OnboardingStepActions } from '../../../components/registrationSteps/OnboardingStepActions';
+import { UserContext } from '../../../lib/context';
+import { ProductResource } from '../../../model/ProductResource';
+import { getAllowedAddUserProducts } from '../../../services/onboardingServices';
 import { ENV } from '../../../utils/env';
-import AddUserHeading from '../AddUserHeading';
 import { genericError } from '../../onboardingProduct/components/StepVerifyOnboarding';
+import AddUserHeading from '../AddUserHeading';
 
 type Props = {
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
@@ -39,35 +37,18 @@ export function StepSelectProduct({ forward, setLoading, setOutcome, institution
   const [products, setProducts] = useState<Array<ProductResource>>();
   const [selectedProduct, setSelectedProduct] = useState<ProductResource>();
 
-  const getProducts = async () => {
-    setLoading(true);
-    const getProductsRequest = await fetchWithLogs(
-      {
-        endpoint: 'ONBOARDING_GET_ALLOWED_ADD_USER_PRODUCTS',
-      },
-      {
-        method: 'GET',
-      },
-      () => setRequiredLogin(true)
-    );
-    const outcome = getFetchOutcome(getProductsRequest);
-
-    if (outcome === 'success') {
-      const retrievedProducts = (getProductsRequest as AxiosResponse)
-        .data as Array<ProductResource>;
-      setProducts(retrievedProducts);
-    } else {
-      setOutcome(genericError);
-    }
-    setLoading(false);
-  };
-
   const onBackAction = () => {
     window.location.assign(ENV.URL_FE.DASHBOARD);
   };
 
   useEffect(() => {
-    void getProducts();
+    void getAllowedAddUserProducts(
+      setLoading,
+      setProducts,
+      setRequiredLogin,
+      setOutcome,
+      genericError
+    );
   }, []);
 
   return (

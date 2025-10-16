@@ -17,6 +17,7 @@ import { PRODUCT_IDS } from '../utils/constants';
 import { OnboardingFormData } from '../model/OnboardingFormData';
 import { genericError } from '../views/onboardingProduct/components/StepVerifyOnboarding';
 import config from '../utils/config.json';
+import { ProductResource } from '../model/ProductResource';
 
 const fetchVerifyOnboarding = async (
   params: {
@@ -314,4 +315,32 @@ export const addUserRequest = async (
     product_id: selectedProduct?.id,
     from: 'onboarding',
   });
+};
+
+export const getAllowedAddUserProducts = async (
+  setLoading: Dispatch<SetStateAction<boolean>>,
+  setProducts: Dispatch<SetStateAction<any>>,
+  setRequiredLogin: Dispatch<SetStateAction<boolean>>,
+  setOutcome: Dispatch<SetStateAction<any>>,
+  genericError: any
+) => {
+  setLoading(true);
+  const getProductsRequest = await fetchWithLogs(
+    {
+      endpoint: 'ONBOARDING_GET_ALLOWED_ADD_USER_PRODUCTS',
+    },
+    {
+      method: 'GET',
+    },
+    () => setRequiredLogin(true)
+  );
+  const outcome = getFetchOutcome(getProductsRequest);
+
+  if (outcome === 'success') {
+    const retrievedProducts = (getProductsRequest as AxiosResponse).data as Array<ProductResource>;
+    setProducts(retrievedProducts);
+  } else {
+    setOutcome(genericError);
+  }
+  setLoading(false);
 };
