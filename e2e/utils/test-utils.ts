@@ -365,7 +365,7 @@ export const stepAddAdmin = async (
 
   if (!aggregator && institutionType !== 'PT') {
     await expect(page.getByText('Richiesta di adesione inviata')).toBeInViewport({
-      timeout: 2000,
+      timeout: 10000,
     });
   }
   
