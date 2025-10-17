@@ -39,6 +39,7 @@ export const ENV = {
     ONBOARDING_V2: env.get('REACT_APP_URL_API_ONBOARDING_V2').required().asString(),
     PARTY_REGISTRY_PROXY: env.get('REACT_APP_URL_API_PARTY_REGISTRY_PROXY').required().asString(),
     GEOTAXONOMY: env.get('REACT_APP_URL_GEOTAXONOMY').required().asString(),
+    APIM: env.get('REACT_APP_URL_API_APIM').required().asString(),
   },
 
   MAX_INSTITUTIONS_FETCH: env.get('REACT_APP_MAX_INSTITUTIONS_FETCH').required().asIntPositive(),

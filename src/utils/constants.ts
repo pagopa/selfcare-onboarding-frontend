@@ -171,6 +171,9 @@ export const API = {
   ONBOARDING_GET_VISURA_INFOCAMERE_BY_REA: {
     URL: ENV.URL_API.PARTY_REGISTRY_PROXY + '/visura-infocamere-pdnd/institutions',
   },
+  ONBOARDING_GET_ONBOARDING_ID_BY_TAXCODE: {
+    URL: ENV.URL_API.APIM + '/v1/onboarding/institutionOnboardings/{{taxId}} ',
+  },
 };
 
 export const USER_ROLE_LABEL = {
@@ -264,7 +267,7 @@ export const institutionType4Product = (productId: string | undefined) => {
           it.labelKey === 'sa' ||
           (ENV.SCP_INFOCAMERE.SHOW && it.labelKey === 'scp') ||
           it.labelKey === 'as' ||
-          (ENV.PRV.SHOW && it.labelKey === 'prv') 
+          (ENV.PRV.SHOW && it.labelKey === 'prv')
       );
     case PRODUCT_IDS.SEND:
       return institutionTypes.filter((it) => it.labelKey === 'pa');
