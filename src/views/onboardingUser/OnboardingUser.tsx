@@ -19,12 +19,10 @@ import { MessageNoAction } from '../../components/shared/MessageNoAction';
 import { StepAddManager } from '../../components/steps/StepAddManager';
 import { withLogin } from '../../components/withLogin';
 import { useOnboardingControllers } from '../../hooks/useOnboardingControllers';
-import { fetchWithLogs } from '../../lib/api-utils';
 import { HeaderContext, UserContext } from '../../lib/context';
-import { getFetchOutcome } from '../../lib/error-utils';
 import { OnboardingFormData } from '../../model/OnboardingFormData';
 import { ProductResource } from '../../model/ProductResource';
-import { PRODUCT_IDS } from '../../utils/constants';
+import { addUserRequest } from '../../services/onboardingServices';
 import { ENV } from '../../utils/env';
 import { selected2OnboardingData } from '../../utils/selected2OnboardingData';
 import { unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
@@ -54,7 +52,7 @@ function OnboardingUserComponent() {
     institutionType,
     productId: selectedProduct?.id,
     origin,
-    onboardingFormData
+    onboardingFormData,
   });
 
   const forwardWithData = (newFormData: Partial<FormData>) => {
@@ -107,49 +105,6 @@ function OnboardingUserComponent() {
   const onBackAction = () => {
     setSelectedProduct(undefined);
     back();
-  };
-
-  const addUserRequest = async (users: Array<UserOnCreate>) => {
-    setLoading(true);
-
-    const addUserResponse = await fetchWithLogs(
-      { endpoint: 'ONBOARDING_NEW_USER' },
-      {
-        method: 'POST',
-        data: {
-          productId: selectedProduct?.id,
-          institutionType: onboardingFormData?.institutionType ?? institutionType,
-          origin:
-            (onboardingFormData?.institutionType ?? institutionType) === 'SA'
-              ? 'ANAC'
-              : ['PSP', 'GPU', 'PT', 'PRV'].includes(
-                    (onboardingFormData?.institutionType ?? institutionType) as InstitutionType
-                  ) && selectedProduct?.id !== PRODUCT_IDS.INTEROP
-                ? 'SELC'
-                : onboardingFormData?.origin,
-          originId: onboardingFormData?.originId ?? onboardingFormData?.taxCode,
-          subunitCode: selectedParty?.codiceUniUo
-            ? selectedParty.codiceUniUo
-            : selectedParty?.codiceUniAoo,
-          taxCode: onboardingFormData?.taxCode,
-          users,
-        },
-      },
-      () => setRequiredLogin(true)
-    );
-
-    setLoading(false);
-
-    const outcome = getFetchOutcome(addUserResponse);
-
-    setOutcome(outcomeContent[outcome]);
-
-    trackEvent(outcome === 'success' ? 'ONBOARDING_USER_SUCCESS' : 'ONBOARDING_USER_ERROR', {
-      request_id: requestId,
-      party_id: selectedParty?.externalId,
-      product_id: selectedProduct?.id,
-      from: 'onboarding',
-    });
   };
 
   const outcomeContent: RequestOutcomeOptions = {
@@ -273,7 +228,18 @@ function OnboardingUserComponent() {
               party_id: selectedParty?.externalId,
               product_id: selectedProduct?.id,
             });
-            addUserRequest(users).catch(() => {
+            addUserRequest(
+              users,
+              setLoading,
+              selectedProduct,
+              onboardingFormData,
+              selectedParty,
+              institutionType,
+              setRequiredLogin,
+              setOutcome,
+              outcomeContent,
+              requestId
+            ).catch(() => {
               trackEvent('ONBOARDING_ADD_NEW_USER', {
                 request_id: requestId,
                 party_id: selectedParty?.externalId,

@@ -3,16 +3,12 @@ import { Grid, Typography, useTheme } from '@mui/material';
 import Button from '@mui/material/Button';
 import { Box } from '@mui/system';
 import SessionModal from '@pagopa/selfcare-common-frontend/lib/components/SessionModal';
-import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
-import { AxiosError, AxiosResponse } from 'axios';
 import { useContext, useEffect, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
-import { Problem, Product, SelfcareParty, StepperStepComponentProps } from '../../../../../types';
-import { fetchWithLogs } from '../../../../lib/api-utils';
+import { Product, StepperStepComponentProps } from '../../../../../types';
 import { UserContext } from '../../../../lib/context';
-import { getFetchOutcome } from '../../../../lib/error-utils';
-import { ENV } from '../../../../utils/env';
 import { PlansPrices } from '../../../../model/PlansPrices';
+import { onExitPremiumFlow } from '../../../../services/subProductServices';
 import HeaderPlanCard from './components/HeaderPlanCard';
 import FooterCarnet from './components/carnetPlanComponent/FooterCarnet';
 import FooterConsumptionCard from './components/consumptionPlanComponent/FooterConsumptionCard';
@@ -47,30 +43,6 @@ export default function SubProductStepSelectPricingPlan({
     setOpenExitModal(true);
   };
   const handleClose = () => {
-    setOpenExitModal(false);
-  };
-
-  const onExitPremiumFlow = async () => {
-    trackEvent('PREMIUM_USER EXIT');
-    const searchResponse = await fetchWithLogs(
-      { endpoint: 'ONBOARDING_GET_USER_PARTIES' },
-      { method: 'GET' },
-      () => setRequiredLogin(true)
-    );
-    const outcome = getFetchOutcome(searchResponse);
-    const response = (searchResponse as AxiosResponse).data as Array<SelfcareParty>;
-
-    if (outcome === 'success' && response.length > 0) {
-      window.location.assign(ENV.URL_FE.DASHBOARD);
-    } else if (outcome === 'success' && response.length === 0) {
-      window.location.assign('https://www.pagopa.it/it/prodotti-e-servizi/app-io');
-    } else {
-      const errorBody = (searchResponse as AxiosError<Problem>).response?.data;
-      trackEvent('ONBOARDING_REDIRECT_TO_ONBOARDING_FAILURE', {
-        product_id: product?.id,
-        reason: errorBody?.detail,
-      });
-    }
     setOpenExitModal(false);
   };
 
@@ -304,7 +276,7 @@ export default function SubProductStepSelectPricingPlan({
           onCloseLabel={t(
             'onboardingSubProduct.subProductStepSelectPricingPlan.pricingPlanExitModal.confirmBtnLabel'
           )}
-          onConfirm={onExitPremiumFlow}
+          onConfirm={() => onExitPremiumFlow(setRequiredLogin, product?.id)}
           handleClose={handleClose}
         />
       </Box>

@@ -1,67 +1,33 @@
 /* eslint-disable sonarjs/cognitive-complexity */
-import { useState, useContext, useEffect } from 'react';
-import { AxiosError } from 'axios';
 import SessionModal from '@pagopa/selfcare-common-frontend/lib/components/SessionModal';
-import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
-import { useTranslation, Trans } from 'react-i18next';
-import { uniqueId } from 'lodash';
 import { productId2ProductTitle } from '@pagopa/selfcare-common-frontend/lib/utils/productId2ProductTitle';
+import { useContext, useEffect, useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import {
-  StepperStep,
-  Problem,
+  FileErrorAttempt,
   OnboardingRequestData,
+  Problem,
   RequestOutcomeComplete,
+  StepperStep,
 } from '../../../../types';
+import { LoadingOverlay } from '../../../components/modals/LoadingOverlay';
 import { ConfirmRegistrationStep0 } from '../../../components/registrationSteps/ConfirmRegistrationStep0';
 import { ConfirmRegistrationStep1 } from '../../../components/registrationSteps/ConfirmRegistrationStep1';
-import { useHistoryState } from '../../../hooks/useHistoryState';
-import { redirectToLogin } from '../../../utils/unloadEvent-utils';
-import { fetchWithLogs } from '../../../lib/api-utils';
-import { getFetchOutcome } from '../../../lib/error-utils';
-import { ENV } from '../../../utils/env';
 import { MessageNoAction } from '../../../components/shared/MessageNoAction';
+import { useHistoryState } from '../../../hooks/useHistoryState';
 import { HeaderContext, UserContext } from '../../../lib/context';
+import { onboardingContractUpload } from '../../../services/requestStatusServices';
 import { verifyRequest } from '../../../services/tokenServices';
-import NotFoundPage from '../status/NotFoundPage';
-import ExpiredRequestPage from '../status/ExpiredPage';
+import { customErrors } from '../../../utils/constants';
+import { getRequestJwt } from '../../../utils/getRequestJwt';
 import AlreadyCompletedRequest from '../status/AlreadyCompletedPage';
 import AlreadyRejectedRequest from '../status/AlreadyRejectedPage';
-import { LoadingOverlay } from '../../../components/modals/LoadingOverlay';
-import { getRequestJwt } from '../../../utils/getRequestJwt';
-import CompleteRequestSuccessPage from './pages/CompleteRequestSuccessPage';
+import ExpiredRequestPage from '../status/ExpiredPage';
+import NotFoundPage from '../status/NotFoundPage';
 import { CompleteRequestFailPage } from './pages/CompleteRequestFailPage';
+import CompleteRequestSuccessPage from './pages/CompleteRequestSuccessPage';
 
-type FileErrorAttempt = {
-  fileName: string;
-  fileSize: number;
-  fileLastModifyDate: number;
-  errorCount: number;
-};
-
-const errors = {
-  INVALID_DOCUMENT: {
-    title: 'title',
-    message: 'message',
-  },
-  INVALID_SIGN: {
-    title: 'title',
-    message: 'message',
-  },
-  GENERIC: {
-    title: 'title',
-    message: 'message',
-  },
-  INVALID_SIGN_FORMAT: {
-    title: 'title',
-    message: 'message',
-  },
-  ALREADY_ONBOARDED: {
-    title: 'title',
-    message: 'message',
-  },
-};
-
-const error2errorCode: { [key in keyof typeof errors]: Array<string> } = {
+const error2errorCode: { [key in keyof typeof customErrors]: Array<string> } = {
   INVALID_DOCUMENT: ['002-1000', '002-1001', '002-1002'],
   INVALID_SIGN: ['002-1004', '002-1005', '002-1006', '002-1007'],
   INVALID_SIGN_FORMAT: ['002-1003', '002-1008'],
@@ -69,7 +35,7 @@ const error2errorCode: { [key in keyof typeof errors]: Array<string> } = {
   GENERIC: [],
 };
 
-const transcodeErrorCode = (data: Problem): keyof typeof errors => {
+const transcodeErrorCode = (data: Problem): keyof typeof customErrors => {
   if (data.errors?.findIndex((e) => error2errorCode.INVALID_DOCUMENT.includes(e.code)) > -1) {
     return 'INVALID_DOCUMENT';
   } else if (data.errors?.findIndex((e) => error2errorCode.INVALID_SIGN.includes(e.code)) > -1) {
@@ -100,7 +66,7 @@ export default function CompleteRequestComponent() {
   const [outcomeContentState, setOutcomeContentState] = useState<RequestOutcomeComplete | null>(
     !token ? 'notFound' : null
   );
-  const [errorCode, setErrorCode] = useState<keyof typeof errors>('GENERIC');
+  const [errorCode, setErrorCode] = useState<keyof typeof customErrors>('GENERIC');
   const [open, setOpen] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [lastFileErrorAttempt, setLastFileErrorAttempt] = useState<FileErrorAttempt>();
@@ -150,78 +116,6 @@ export default function CompleteRequestComponent() {
     setOutcomeContentState('toBeCompleted');
   };
 
-  const submit = async (file: File) => {
-    const requestId = uniqueId('upload-contract-');
-    trackEvent('ONBOARDING_CONTRACT_UPLOAD', { request_id: requestId, party_id: token });
-
-    setLoading(true);
-    const formData = new FormData();
-    formData.append('contract', file);
-
-    const uploadDocument = await fetchWithLogs(
-      {
-        endpoint: addUserFlow ? 'USER_COMPLETE_REGISTRATION' : 'ONBOARDING_COMPLETE_REGISTRATION',
-        endpointParams: { token },
-      },
-      { method: 'POST', data: formData, headers: { 'Content-Type': 'multipart/form-data' } },
-      redirectToLogin
-    );
-
-    setLoading(false);
-
-    const outcome = getFetchOutcome(uploadDocument);
-
-    if (outcome === 'success') {
-      trackEvent(addUserFlow ? 'ONBOARDING_USER_COMPLETED' : 'ONBOARDING_SUCCESS', {
-        request_id: requestId,
-        party_id: token,
-        product_id: requestData?.productId,
-        form: addUserFlow ? 'onboarding/dashboard' : undefined
-      });
-      setOutcomeContentState(outcome);
-    }
-
-    if (outcome === 'error') {
-      if (
-        lastFileErrorAttempt &&
-        lastFileErrorAttempt.fileName === file.name &&
-        lastFileErrorAttempt.fileSize === file.size &&
-        lastFileErrorAttempt.fileLastModifyDate === file.lastModified
-      ) {
-        const errorCount = lastFileErrorAttempt.errorCount + 1;
-        setLastFileErrorAttempt({
-          ...lastFileErrorAttempt,
-          errorCount,
-        });
-        if (errorCount > ENV.UPLOAD_CONTRACT_MAX_LOOP_ERROR) {
-          setOpen(false);
-          setOutcomeContentState('error');
-        }
-      } else {
-        setLastFileErrorAttempt({
-          fileName: file.name,
-          fileSize: file.size,
-          fileLastModifyDate: file.lastModified,
-          errorCount: 1,
-        });
-      }
-      if (
-        (uploadDocument as AxiosError<Problem>).response?.status === 400 &&
-        (uploadDocument as AxiosError<Problem>).response?.data
-      ) {
-        setOpen(true);
-        trackEvent('ONBOARDING_CONTRACT_FAILURE', { request_id: requestId, party_id: token });
-        setErrorCode(
-          transcodeErrorCode((uploadDocument as AxiosError<Problem>).response?.data as Problem)
-        );
-      } else {
-        setOpen(true);
-        trackEvent('ONBOARDING_FAILURE', { request_id: requestId, party_id: token });
-        setErrorCode('GENERIC');
-      }
-    }
-  };
-
   const handleErrorModalClose = () => {
     setOpen(false);
   };
@@ -249,7 +143,21 @@ export default function CompleteRequestComponent() {
       Component: () =>
         ConfirmRegistrationStep1(
           addUserFlow,
-          { forward: submit },
+          {
+            forward: () => onboardingContractUpload(
+              uploadedFiles[0],
+              setLoading,
+              token,
+              requestData,
+              addUserFlow,
+              setOutcomeContentState,
+              lastFileErrorAttempt,
+              setLastFileErrorAttempt,
+              setOpen,
+              setErrorCode,
+              transcodeErrorCode
+            ),
+          },
           { loading },
           { uploadedFiles, setUploadedFiles: setUploadedFilesAndWriteHistory }
         ),

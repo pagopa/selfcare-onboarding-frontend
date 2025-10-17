@@ -35,7 +35,6 @@ const mockedHistoryPush = jest.fn();
 const originalFetch = global.fetch;
 let fetchWithLogsSpy: jest.SpyInstance;
 
-jest.mock('../../../lib/api-utils');
 jest.mock('react-router-dom', () => ({
   useHistory: () => ({
     push: mockedHistoryPush,
@@ -185,12 +184,12 @@ const executeStepSelectInstitution = async (partyName: string) => {
   const continueButton = screen.getByText('Continua');
   expect(continueButton).toBeDisabled();
 
-  await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(4));
+  await waitFor(() => expect(fetchWithLogsSpy).toHaveBeenCalledTimes(4));
   const party = screen.getByText(partyName);
 
   expect(party).toBeTruthy();
 
-  expect(fetchWithLogsSpy).toBeCalledTimes(4);
+  expect(fetchWithLogsSpy).toHaveBeenCalledTimes(4);
 
   fireEvent.click(party);
 

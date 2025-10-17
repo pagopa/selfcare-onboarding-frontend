@@ -1,23 +1,19 @@
-import { useEffect, useState, useContext } from 'react';
-import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
-import { useTranslation } from 'react-i18next';
-import { uniqueId } from 'lodash';
 import { productId2ProductTitle } from '@pagopa/selfcare-common-frontend/lib/utils/productId2ProductTitle';
-import { MessageNoAction } from '../../../components/shared/MessageNoAction';
+import { useContext, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { OnboardingRequestData, RequestOutcomeComplete } from '../../../../types';
-import { fetchWithLogs } from '../../../lib/api-utils';
 import { LoadingOverlay } from '../../../components/modals/LoadingOverlay';
+import { MessageNoAction } from '../../../components/shared/MessageNoAction';
 import { HeaderContext, UserContext } from '../../../lib/context';
+import { deleteRequest } from '../../../services/requestStatusServices';
 import { verifyRequest } from '../../../services/tokenServices';
-import { redirectToLogin } from '../../../utils/unloadEvent-utils';
-import NotFoundPage from '../status/NotFoundPage';
+import { getRequestJwt } from '../../../utils/getRequestJwt';
 import AlreadyCompletedRequest from '../status/AlreadyCompletedPage';
 import AlreadyRejectedRequest from '../status/AlreadyRejectedPage';
 import ExpiredRequestPage from '../status/ExpiredPage';
-import { getRequestJwt } from '../../../utils/getRequestJwt';
-import { getFetchOutcome } from '../../../lib/error-utils';
-import CancelRequestSuccessPage from './pages/CancelRequestSuccessPage';
+import NotFoundPage from '../status/NotFoundPage';
 import CancelRequestPage from './pages/CancelRequestPage';
+import CancelRequestSuccessPage from './pages/CancelRequestSuccessPage';
 
 export default function CancelRequestComponent() {
   const { t } = useTranslation();
@@ -54,35 +50,7 @@ export default function CancelRequestComponent() {
     }).finally(() => setLoading(false));
   }, []);
 
-  const deleteRequest = () => {
-    const requestId = uniqueId('contract-reject-');
-    async function asyncSendDeleteRequest() {
-      // Send DELETE request
-      const deleteOnboardingResponse = await fetchWithLogs(
-        { endpoint: 'ONBOARDING_COMPLETE_REGISTRATION', endpointParams: { token } },
-        { method: 'DELETE' },
-        redirectToLogin
-      );
-
-      const response = getFetchOutcome(deleteOnboardingResponse);
-
-      if (response === 'success') {
-        trackEvent('ONBOARDING_CANCEL_SUCCESS', { request_id: requestId, party_id: token });
-        setOutcomeContentState(response);
-      } else {
-        trackEvent('ONBOARDING_CANCEL_FAILURE', { request_id: requestId, party_id: token });
-        setOutcomeContentState(response);
-      }
-      setLoading(false);
-    }
-
-    if (!token) {
-      setLoading(false);
-      setOutcomeContentState('notFound');
-    } else {
-      void asyncSendDeleteRequest();
-    }
-  };
+  
 
   const outcomeContent = {
     success: {
@@ -105,7 +73,7 @@ export default function CancelRequestComponent() {
       title: '',
       description: [
         <>
-          <CancelRequestPage deleteRequest={deleteRequest} />
+          <CancelRequestPage deleteRequest={deleteRequest(token, setOutcomeContentState, setLoading)} />
         </>,
       ],
     },

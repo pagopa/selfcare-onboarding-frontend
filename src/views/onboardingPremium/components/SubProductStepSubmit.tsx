@@ -15,7 +15,7 @@ import { unregisterUnloadEvent } from '../../../utils/unloadEvent-utils';
 import { OnboardingFormData } from '../../../model/OnboardingFormData';
 import { ENV } from '../../../utils/env';
 import AlreadyOnboarded from '../../../components/layout/AlreadyOnboarded';
-import { subProductSubmitFetch } from './SubProductSubmitFetch';
+import { postSubProductOnboardingSubmit } from '../../../services/onboardingSubmitServices';
 
 type Props = StepperStepComponentProps & {
   requestId: string;
@@ -80,13 +80,12 @@ function SubProductStepSubmit({
   useEffect(() => {
     if (!error) {
       setLoading(true);
-      subProductSubmitFetch({
+      postSubProductOnboardingSubmit(
         externalInstitutionId,
         subProduct,
         users,
         billingData,
         institutionType,
-        pricingPlan,
         setRequiredLogin,
         requestId,
         product,
@@ -95,7 +94,8 @@ function SubProductStepSubmit({
         origin,
         originId,
         setConflictError,
-      })
+        pricingPlan
+      )
         .catch((_reason: any) => {
           setError(true);
           /*

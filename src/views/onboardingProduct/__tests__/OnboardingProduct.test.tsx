@@ -686,7 +686,9 @@ test('Test: Error retrieving onboarding info', async () => {
 test('Test: Invalid productId', async () => {
   renderComponent('error');
   await waitFor(() => expect(fetchWithLogsSpy).toHaveBeenCalledTimes(2));
-  await waitFor(() => screen.getByText('Impossibile individuare il prodotto desiderato'));
+  await waitFor(() => {
+    expect(screen.getByText('Impossibile individuare il prodotto desiderato')).toBeInTheDocument();
+  });
 });
 
 test('Test: Exiting during flow with unload event', async () => {

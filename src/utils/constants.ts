@@ -328,3 +328,26 @@ export const description4InstitutionType = (institutionType: {
 
 export const buildUrlLogo = (partyId: string) =>
   `${ENV.URL_INSTITUTION_LOGO.PREFIX}${partyId}${ENV.URL_INSTITUTION_LOGO.SUFFIX}`;
+
+export const customErrors = {
+  INVALID_DOCUMENT: {
+    title: 'title',
+    message: 'message',
+  },
+  INVALID_SIGN: {
+    title: 'title',
+    message: 'message',
+  },
+  GENERIC: {
+    title: 'title',
+    message: 'message',
+  },
+  INVALID_SIGN_FORMAT: {
+    title: 'title',
+    message: 'message',
+  },
+  ALREADY_ONBOARDED: {
+    title: 'title',
+    message: 'message',
+  },
+};
