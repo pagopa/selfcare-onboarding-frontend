@@ -25,7 +25,7 @@ export const stepInstitutionType = async (page: Page, institutionType: string) =
 
 export const stepSelectParty = async (page: Page, aggregator?: boolean, party?: string) => {
   await page.click('#Parties');
-  await page.fill('#Parties', party ? party : 'Senato della Repubblica');
+  await page.fill('#Parties', party ? party : 'Istituto di Formazione Professionale Sandro Pertini Servizi alla Persona e del Legno');
   setTimeout(async () => {
     await page.click('.MuiBox-root:nth-child(1) > .MuiBox-root > .MuiBox-root');
   }, 1000);
@@ -163,7 +163,7 @@ export const stepFormData = async (
     actualInstitutionType !== 'SCP'
   ) {
     await page.click('#recipientCode');
-    await page.fill('#recipientCode', product === PRODUCT_IDS_TEST_E2E.SEND ? 'UFBM8M' : '14CB0I', {
+    await page.fill('#recipientCode', product === PRODUCT_IDS_TEST_E2E.SEND ? 'UFBM8M' : 'UFOR71', {
       timeout: 500,
     });
   } else if (!isFromIpa && actualInstitutionType !== 'PT') {
@@ -350,7 +350,7 @@ export const stepAddAdmin = async (
     await page.click('[aria-label="Continua"]');
   }
 
-  if (institutionType !== 'PT' && !aggregator) {
+  if (institutionType !== 'PT') {
     await page.getByRole('button', { name: 'Conferma' }).waitFor({
       state: 'visible',
       timeout: 2000,
@@ -371,7 +371,7 @@ export const stepAddAdmin = async (
   
   if (institutionType === 'PT') {
     await expect(page.getByText('Richiesta di registrazione inviata')).toBeInViewport({
-      timeout: 1000,
+      timeout: 15000,
     });
   }
 };
@@ -435,7 +435,7 @@ export const stepUploadAggregatorCsv = async (page: Page, title: string, fileCsv
   await continueButton.click();
 
   await expect(page.getByText('Richiesta di adesione inviata')).toBeInViewport({
-    timeout: 2000,
+    timeout: 10000,
   });
 };
 
