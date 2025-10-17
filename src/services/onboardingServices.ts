@@ -206,7 +206,7 @@ export const getOnboardingData = async (
 
 export const checkProduct = async (
   productId: string,
-  setProduct: (product: Product | undefined) => void,
+  setProduct: (product: Product | undefined | null) => void,
   setRequiredLogin: (required: boolean) => void,
   options?: {
     onError?: (error: AxiosError) => void;
@@ -231,11 +231,11 @@ export const checkProduct = async (
     }
   } else if ((onboardingProducts as AxiosError).response?.status === 404) {
     options?.onNotFound?.();
-    setProduct(undefined);
+    setProduct(null);
   } else {
     console.error('Unexpected response', (onboardingProducts as AxiosError).response);
     options?.onError?.(onboardingProducts as AxiosError);
-    setProduct(undefined);
+    setProduct(null);
   }
 };
 

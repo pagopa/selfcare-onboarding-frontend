@@ -1755,7 +1755,7 @@ export async function mockFetch(
         resolve({ data: selectedProduct, status: 200, statusText: '200' } as AxiosResponse)
       );
     } else {
-      return genericError;
+      return notFoundError;
     }
   }
 
