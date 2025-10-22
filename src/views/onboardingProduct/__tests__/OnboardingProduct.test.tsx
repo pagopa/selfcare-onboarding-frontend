@@ -72,14 +72,24 @@ beforeEach(() => {
 });
 
 const filterByCategory4Test = (institutionType?: string, productId?: string) => {
-  if (productId === PRODUCT_IDS.SEND) {
-    return mockedCategories.product['prod-pn'].ipa.PA;
-  } else if (productId === PRODUCT_IDS.IDPAY_MERCHANT) {
-    return mockedCategories.product['prod-idpay-merchant']?.merchantDetails?.atecoCodes;
-  } else if (institutionType === 'GSP') {
-    return mockedCategories.product.default.ipa.GSP;
-  } else {
-    return mockedCategories.product.default.ipa.PA;
+  switch (productId) {
+    case PRODUCT_IDS.SEND:
+      return mockedCategories.product['prod-pn']?.ipa.PA;
+
+    case PRODUCT_IDS.IDPAY_MERCHANT:
+      return mockedCategories.product['prod-idpay-merchant']?.merchantDetails?.atecoCodes;
+
+    case PRODUCT_IDS.INTEROP:
+      if (institutionType === 'SCEC') {
+        return mockedCategories.product['prod-interop']?.ipa.SCEC;
+      } else if (institutionType === 'PA') {
+        return mockedCategories.product['prod-interop']?.ipa.PA;
+      } else {
+        return mockedCategories.product.default?.ipa.PA;
+      }
+    default:
+      const defaultIpa = mockedCategories.product.default?.ipa;
+      return institutionType === 'GSP' ? defaultIpa?.GSP : defaultIpa?.PA;
   }
 };
 
@@ -846,7 +856,7 @@ const executeStepSearchParty = async (
 
   screen.getByText('Cerca il tuo ente');
 
-  await waitFor(() => expect(fetchWithLogsSpy).toHaveBeenCalledTimes(2));
+  await waitFor(() => expect(fetchWithLogsSpy).toHaveBeenCalledTimes( productId === PRODUCT_IDS.IDPAY_MERCHANT ? 1 : 2));
   const inputPartyName = document.getElementById('Parties') as HTMLElement;
 
   const withoutIpaLink = document.getElementById('no_ipa') as HTMLElement;

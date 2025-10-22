@@ -281,7 +281,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
   }, [onboardingFormData]);
 
   useEffect(() => {
-    void getFilterCategories(setRequiredLogin, setFilterCategoriesResponse);
+    void getFilterCategories(productId, setRequiredLogin, setFilterCategoriesResponse);
   }, []);
 
   const selectFilterCategories = () => {
@@ -299,9 +299,11 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
       case PRODUCT_IDS.INTEROP:
         if (institutionType === 'SCEC') {
           return filterCategoriesResponse.product['prod-interop']?.ipa.SCEC;
+        } else if (institutionType === 'PA') {
+          return filterCategoriesResponse.product['prod-interop']?.ipa.PA;
+        } else {
+          return filterCategoriesResponse.product.default?.ipa.PA;
         }
-        return filterCategoriesResponse.product.default?.ipa.PA;
-
       default:
         const defaultIpa = filterCategoriesResponse.product.default?.ipa;
         return institutionType === 'GSP' ? defaultIpa?.GSP : defaultIpa?.PA;

@@ -1,23 +1,24 @@
 import { UserRole } from '@pagopa/selfcare-common-frontend/lib/utils/constants';
 import { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 import {
+  ANACParty,
   Endpoint,
   InstitutionOnboardingInfoResource,
-  StationResource,
-  Product,
-  UserOnCreate,
+  InstitutionType,
   InsuranceCompaniesResource,
   OnboardingRequestData,
-  InstitutionType,
+  Product,
   SelfcareParty,
-  ANACParty,
+  StationResource,
+  UserOnCreate,
 } from '../../../types';
 import { BillingDataDto } from '../../model/BillingData';
-import { GeographicTaxonomyResource, nationalValue } from '../../model/GeographicTaxonomies';
-import { UoData } from '../../model/UoModel';
-import { addUserFlowProducts } from '../../utils/constants';
 import { CountryResource } from '../../model/CountryResource';
+import { GeographicTaxonomyResource, nationalValue } from '../../model/GeographicTaxonomies';
 import { PDNDBusinessResource } from '../../model/PDNDBusinessResource';
+import { UoData } from '../../model/UoModel';
+import config from '../../utils/config.json';
+import { addUserFlowProducts } from '../../utils/constants';
 import { AooData } from './../../model/AooData';
 import { OnboardedParty } from './../../model/OnboardedParty';
 
@@ -519,13 +520,13 @@ export const mockedGeoTaxonomy: Array<GeographicTaxonomyResource> = [
     country_abbreviation: 'IT',
   },
   {
-  country: "100",
-  enabled: true,
-  code: "04",
-  desc: "TRENTINO-ALTO ADIGE/SÜDTIROL - REGIONE",
-  region_id: "04",
-  country_abbreviation: "IT"
-}
+    country: '100',
+    enabled: true,
+    code: '04',
+    desc: 'TRENTINO-ALTO ADIGE/SÜDTIROL - REGIONE',
+    region_id: '04',
+    country_abbreviation: 'IT',
+  },
 ];
 
 export const mockedGeotaxonomies: Array<GeographicTaxonomyResource> = [
@@ -1283,31 +1284,7 @@ const mockRecipientCodeValidation = [
   { code: '2A3B4C', value: 'DENIED_NO_BILLING' },
 ];
 
-export const mockedCategories = {
-  product: {
-    'prod-pn': {
-      ipa: {
-        PA: 'A1,A2,A3,A4,A5,A6,A7,A8,A9',
-      },
-    },
-    'prod-io-premium': {
-      consumptionPlan: {
-        pricingPlan: 'C0',
-      },
-    },
-    'prod-idpay-merchant': {
-      merchantDetails: {
-        atecoCodes: '47.43.00,95.11.00,47.12.10,47.21.01,46.43.30',
-      },
-    },
-    default: {
-      ipa: {
-        GSP: 'B1,B2',
-        PA: 'C1,C2,C3,C4,C5,C6,C7,C8,C9C,C10,C11,C12,C13,C14,C15,C16,C17,C18,C19,C20,C21,C22,C23,C24,C25,C26,C27,C28,C29,C30',
-      },
-    },
-  },
-};
+export const mockedCategories = config;
 
 export const mockedPdndVisuraInfomacere: Array<PDNDBusinessResource> = [
   {
@@ -1324,7 +1301,7 @@ export const mockedPdndVisuraInfomacere: Array<PDNDBusinessResource> = [
     zipCode: '20121',
     address: 'Via Giuseppe Verdi, 15',
     digitalAddress: 'rossi.costruzioni@pec.it',
-    atecoCodes: ['47.43.00'],
+    atecoCodes: ['47.12.10'],
     nRea: 'MI-123456',
   },
   {
@@ -1409,7 +1386,7 @@ export const mockedPdndVisuraInfomacere: Array<PDNDBusinessResource> = [
     zipCode: '20900',
     address: 'Via Lecco, 25',
     digitalAddress: 'pedemonata@costruzioni.pec.it',
-    atecoCodes: ['46.43.30'],
+    atecoCodes: ['47.12.10'],
     nRea: 'MB-678910',
   },
   {
@@ -1430,22 +1407,22 @@ export const mockedPdndVisuraInfomacere: Array<PDNDBusinessResource> = [
     nRea: 'BG-299990',
   },
   {
-    businessTaxId: "FRSMRA70D30G786G",
-    businessName: "FORVIAGGI DI FORASTIERO MARIO",
-    cciaa: "MT",
-    nRea: "203594",
-    vatNumber: "01366490777",
-    legalForm: "IMPRESA INDIVIDUALE",
-    city: "SAN GIORGIO LUCANO",
-    county: "MT",
-    zipCode: "75027",
-    address: "VIA CONFALONIERI, 3",
-    digitalAddress: "M.FORASTIERO@PEC.LIBERO.IT",
+    businessTaxId: 'FRSMRA70D30G786G',
+    businessName: 'FORVIAGGI DI FORASTIERO MARIO',
+    cciaa: 'MT',
+    nRea: '203594',
+    vatNumber: '01366490777',
+    legalForm: 'IMPRESA INDIVIDUALE',
+    city: 'SAN GIORGIO LUCANO',
+    county: 'MT',
+    zipCode: '75027',
+    address: 'VIA CONFALONIERI, 3',
+    digitalAddress: 'M.FORASTIERO@PEC.LIBERO.IT',
     atecoCodes: [],
-    disabledStateInstitution: "I",
-    descriptionStateInstitution: "Impresa INATTIVA",
-    statusCompanyRI: "CANCELLATA",
-  }
+    disabledStateInstitution: 'I',
+    descriptionStateInstitution: 'Impresa INATTIVA',
+    statusCompanyRI: 'CANCELLATA',
+  },
 ];
 
 const noContent: Promise<AxiosResponse> = new Promise((resolve) =>
@@ -1525,7 +1502,7 @@ export async function mockFetch(
 ): Promise<AxiosResponse | AxiosError> {
   if (endpoint === 'CONFIG_JSON_CDN_URL') {
     return new Promise((resolve) =>
-      resolve({ data: mockedCategories, status: 200, statusText: '200' } as AxiosResponse)
+      resolve({ data: config, status: 200, statusText: '200' } as AxiosResponse)
     );
   }
 
