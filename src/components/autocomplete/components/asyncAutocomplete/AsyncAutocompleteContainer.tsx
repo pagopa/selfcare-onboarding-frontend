@@ -119,13 +119,10 @@ export default function AsyncAutocompleteContainer({
   const [partyLogo, setPartyLogo] = useState<string>(
     selected ? buildUrlLogo(selected.id) : OnboardingPartyIcon
   );
-
   const getOptionKey: (option: any) => string =
     optionKey !== undefined ? (o) => o[optionKey] : (o) => o.label ?? o;
-
   const getOptionLabel: (option: any) => string =
     optionLabel !== undefined ? (o) => o[optionLabel] : (o) => o.label ?? o;
-
   const showBusinessNameElement = input !== undefined && input.length >= 3;
   const canSearchByBusinessName =
     input.length >= 3 && selections.businessName && !selections.taxCode;
@@ -391,18 +388,8 @@ export default function AsyncAutocompleteContainer({
     const typedInput = event.target.value;
     const cleanValue = removeSpecialCharacters(typedInput);
 
-    const params = {
-      productId: selectedProduct?.id,
-      taxCode: selections.taxCode || selections.personalTaxCode ? cleanValue : undefined,
-      subunitCode: selections.aooCode || selections.uoCode ? cleanValue : undefined,
-    };
-
     setInput(cleanValue);
     setSelected(null);
-
-    if (cleanValue !== '') {
-      void executeSearch(cleanValue, selections, params, addUser, institutionType, product);
-    }
   };
 
   return (

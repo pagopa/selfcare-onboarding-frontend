@@ -5,7 +5,7 @@ import { EndingPage } from '@pagopa/selfcare-common-frontend/lib';
 import SessionModal from '@pagopa/selfcare-common-frontend/lib/components/SessionModal';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
 import { uniqueId } from 'lodash';
-import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
 import {
@@ -284,7 +284,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     void getFilterCategories(productId, setRequiredLogin, setFilterCategoriesResponse);
   }, []);
 
-  const selectFilterCategories = () => {
+  const selectFilterCategories = useCallback(() => {
     if (!filterCategoriesResponse?.product) {
       return undefined;
     }
@@ -308,7 +308,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
         const defaultIpa = filterCategoriesResponse.product.default?.ipa;
         return institutionType === 'GSP' ? defaultIpa?.GSP : defaultIpa?.PA;
     }
-  };
+  }, [filterCategoriesResponse, productId, institutionType]);
 
   const outcomeContent: RequestOutcomeOptions = {
     success: {
