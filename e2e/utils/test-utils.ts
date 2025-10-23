@@ -350,7 +350,7 @@ export const stepAddAdmin = async (
     await page.click('[aria-label="Continua"]');
   }
 
-  if (institutionType !== 'PT') {
+  if (institutionType !== 'PT' && !aggregator) {
     await page.getByRole('button', { name: 'Conferma' }).waitFor({
       state: 'visible',
       timeout: 2000,

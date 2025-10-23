@@ -240,9 +240,16 @@ export const checkProduct = async (
 };
 
 export const getFilterCategories = async (
+  productId: string | undefined,
   setRequiredLogin: Dispatch<SetStateAction<boolean>>,
   setFilterCategoriesResponse: Dispatch<SetStateAction<any>>
 ) => {
+  if (productId === PRODUCT_IDS.IDPAY_MERCHANT) {
+    setFilterCategoriesResponse(config);
+    console.log('Using local config for IDPAY_MERCHANT:', config);
+    return;
+  }
+
   const categories = await fetchWithLogs(
     {
       endpoint: 'CONFIG_JSON_CDN_URL',
