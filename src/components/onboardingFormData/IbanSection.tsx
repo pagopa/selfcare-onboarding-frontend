@@ -1,5 +1,5 @@
 import { Paper, Grid, Typography, FormHelperText } from '@mui/material';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import { theme } from '@pagopa/mui-italia';
 import { CustomTextField } from '../steps/StepOnboardingFormData';
 
@@ -10,12 +10,7 @@ type Props = {
 export default function IbanSection({ baseTextFieldProps, formik }: Props) {
   const { t } = useTranslation();
 
-  const ibanTextFieldProps = (
-    field: string,
-    label: string,
-    maxWidth: number,
-    color: string
-  ) => {
+  const ibanTextFieldProps = (field: string, label: string, maxWidth: number, color: string) => {
     const baseProps = baseTextFieldProps(field, label, maxWidth, color);
 
     return {
@@ -64,37 +59,49 @@ export default function IbanSection({ baseTextFieldProps, formik }: Props) {
             {t('onboardingFormData.ibanSection.title')}
           </Typography>
         </Grid>
+        <Grid item xs={12} display="flex" pt={1}>
+          <Typography component="div" variant="caption">
+            <Trans
+              i18nKey="onboardingFormData.ibanSection.description"
+              compomnents={{ 1: <strong /> }}
+            >
+              {
+                'Per far sì che il bonifico vada a buon fine, assicurati che <strong> l’IBAN coincida con quanto riportato sugli estremi del tuo conto. <strong />'
+              }
+            </Trans>
+          </Typography>
+        </Grid>
         <Grid item xs={12} pt={3}>
-            <CustomTextField
-              {...baseTextFieldProps(
-                'holder',
-                t('onboardingFormData.ibanSection.holder'),
-                600,
-                theme.palette.text.primary
-              )}
-            />
+          <CustomTextField
+            {...baseTextFieldProps(
+              'holder',
+              t('onboardingFormData.ibanSection.holder'),
+              600,
+              theme.palette.text.primary
+            )}
+          />
         </Grid>
         <Grid item xs={12} pt={2}>
-            <CustomTextField
-              {...ibanTextFieldProps(
-                'iban',
-                t('onboardingFormData.ibanSection.iban'),
-                600,
-                theme.palette.text.primary
-              )}
-            />
-            <CharacterCounter field="iban" />
+          <CustomTextField
+            {...ibanTextFieldProps(
+              'iban',
+              t('onboardingFormData.ibanSection.iban'),
+              600,
+              theme.palette.text.primary
+            )}
+          />
+          <CharacterCounter field="iban" />
         </Grid>
         <Grid item xs={12} pt={2}>
-            <CustomTextField
-              {...ibanTextFieldProps(
-                'confirmIban',
-                t('onboardingFormData.ibanSection.confirmIban'),
-                600,
-                theme.palette.text.primary
-              )}
-            />
-            <CharacterCounter field="confirmIban" />
+          <CustomTextField
+            {...ibanTextFieldProps(
+              'confirmIban',
+              t('onboardingFormData.ibanSection.confirmIban'),
+              600,
+              theme.palette.text.primary
+            )}
+          />
+          <CharacterCounter field="confirmIban" />
         </Grid>
       </Grid>
     </Paper>
