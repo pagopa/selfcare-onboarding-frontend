@@ -1,21 +1,21 @@
-import { trackEvent } from "@pagopa/selfcare-common-frontend/lib/services/analyticsService";
-import { AxiosError } from "axios";
-import { Dispatch, SetStateAction } from "react";
-import { InstitutionType, Problem, ProblemUserValidate, UserOnCreate } from "../../types";
-import { StepBillingDataHistoryState } from "../components/steps/StepOnboardingFormData";
-import { fetchWithLogs } from "../lib/api-utils";
-import { getFetchOutcome } from "../lib/error-utils";
+import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
+import { AxiosError } from 'axios';
+import { Dispatch, SetStateAction } from 'react';
+import { InstitutionType, Problem, ProblemUserValidate, UserOnCreate } from '../../types';
+import { StepBillingDataHistoryState } from '../components/steps/StepOnboardingFormData';
+import { fetchWithLogs } from '../lib/api-utils';
+import { getFetchOutcome, getResponseStatus } from '../lib/error-utils';
 
 export const verifyVatNumber = async (
-    institutionType: InstitutionType,
-    externalInstitutionId: string,
-    formik: any,
-    stepHistoryState: StepBillingDataHistoryState,
-    setVatVerificationGenericError: Dispatch<SetStateAction<boolean>>,
-    setIsVatRegistrated: Dispatch<SetStateAction<boolean>>,
-    setOpenVatNumberErrorModal: Dispatch<SetStateAction<boolean>>,
-    setRequiredLogin: Dispatch<SetStateAction<boolean>>,
-    productId: string | undefined,
+  institutionType: InstitutionType,
+  externalInstitutionId: string,
+  formik: any,
+  stepHistoryState: StepBillingDataHistoryState,
+  setVatVerificationGenericError: Dispatch<SetStateAction<boolean>>,
+  setIsVatRegistrated: Dispatch<SetStateAction<boolean>>,
+  setOpenVatNumberErrorModal: Dispatch<SetStateAction<boolean>>,
+  setRequiredLogin: Dispatch<SetStateAction<boolean>>,
+  productId: string | undefined
 ) => {
   const onboardingStatus = await fetchWithLogs(
     {
@@ -40,12 +40,15 @@ export const verifyVatNumber = async (
   if (restOutcome === 'success') {
     setVatVerificationGenericError(false);
     setIsVatRegistrated(true);
-  } else if ((onboardingStatus as AxiosError).response?.status === 404) {
-    setIsVatRegistrated(false);
-    setVatVerificationGenericError(false);
   } else {
-    setOpenVatNumberErrorModal(true);
-    setVatVerificationGenericError(true);
+    const responseStatus = getResponseStatus(onboardingStatus as AxiosError, 'VAT_VERIFICATION');
+
+    if (responseStatus === 404) {
+      setIsVatRegistrated(false);
+      setVatVerificationGenericError(false);
+      setOpenVatNumberErrorModal(true);
+      setVatVerificationGenericError(true);
+    }
   }
 };
 
@@ -79,11 +82,12 @@ export const userValidate = async (
   const result = getFetchOutcome(resultValidation);
   const errorBody = (resultValidation as AxiosError<ProblemUserValidate>).response?.data;
 
-  if (
-    result === 'error' &&
-    (resultValidation as AxiosError<Problem>).response?.status === 409 &&
-    errorBody
-  ) {
+  const responseStatus = getResponseStatus(
+    resultValidation as AxiosError<Problem>,
+    'USER_VALIDATION'
+  );
+
+  if (result === 'error' && responseStatus === 409 && errorBody) {
     trackEvent(`${eventName}_CONFLICT_ERROR`, {
       party_id: partyId,
       reason: errorBody.detail,

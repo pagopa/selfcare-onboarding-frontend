@@ -12,22 +12,19 @@ export const sleep = async (ms: number) => await new Promise((resolve) => setTim
 
 // axios interceptor to always recuse the http status in error responses
 axios.interceptors.response.use(
-
   (response) => response,
 
   (error: AxiosError) => {
-
-    const isNetworkError = !error.response && (
-      error.code === 'ECONNABORTED' ||
-      error.code === 'ERR_NETWORK' ||
-      error.code === 'ERR_CANCELED' ||
-      error.message?.includes('Network Error') ||
-      error.message?.includes('timeout') ||
-      error.message?.includes('CORS')
-    );
+    const isNetworkError =
+      !error.response &&
+      (error.code === 'ECONNABORTED' ||
+        error.code === 'ERR_NETWORK' ||
+        error.code === 'ERR_CANCELED' ||
+        error.message?.includes('Network Error') ||
+        error.message?.includes('timeout') ||
+        error.message?.includes('CORS'));
 
     if (isNetworkError) {
-      // Network error: status not available
       console.warn('⚠️ NETWORK_ERROR: Status code unavailable (not FE fault)', {
         errorCode: error.code,
         errorMessage: error.message,
@@ -35,7 +32,6 @@ axios.interceptors.response.use(
         method: error.config?.method,
       });
     } else if (error.response) {
-      // HTTP error: status MUST be available
       if (error.response.status === undefined || error.response.status === null) {
         console.error('❌ CRITICAL: HTTP error without status code (FE configuration issue)', {
           error,
@@ -57,7 +53,6 @@ axios.interceptors.response.use(
     return Promise.reject(error);
   }
 );
-
 
 function prepareRequest(
   { endpoint, endpointParams }: Endpoint,
@@ -110,9 +105,10 @@ async function performRequests(
     return responses as unknown as Array<AxiosResponse>;
   } catch (error) {
     logError(error);
+    const axiosError = error as AxiosError;
     if (
       notValidTokenHttpStatus != null &&
-      (error as AxiosError).response?.status === notValidTokenHttpStatus
+      axiosError.response?.status === notValidTokenHttpStatus
     ) {
       onRedirectToLogin();
       window.setTimeout(() => window.location.assign(ENV.URL_FE.LOGOUT), 2000);

@@ -10,7 +10,7 @@ import {
   Problem,
 } from '../../types';
 import { fetchWithLogs } from '../lib/api-utils';
-import { getFetchOutcome } from '../lib/error-utils';
+import { getFetchOutcome, getResponseStatus } from '../lib/error-utils';
 import { AdditionalGpuInformations } from '../model/AdditionalGpuInformations';
 import { AdditionalInformations } from '../model/AdditionalInformations';
 import { AggregateInstitution } from '../model/AggregateInstitution';
@@ -173,15 +173,7 @@ export const postOnboardingSubmit = async (
     });
     setOutcome(outcomeContent[outcome as keyof RequestOutcomeOptions]);
   } else {
-    const responseStatus = (response as AxiosError<Problem>).response?.status;
-
-    if (!responseStatus) {
-      console.warn('ONBOARDING_SUBMIT: Response status is undefined or null', {
-        response,
-        outcome,
-        hasResponse: !!(response as AxiosError<Problem>).response,
-      });
-    }
+    const responseStatus = getResponseStatus(response as AxiosError<Problem>, 'ONBOARDING_SUBMIT');
 
     const event =
       responseStatus === 409 ? 'ONBOARDING_SEND_CONFLICT_ERROR_FAILURE' : 'ONBOARDING_SEND_FAILURE';
@@ -276,12 +268,17 @@ export const postSubProductOnboardingSubmit = async (
     });
     forward();
   } else {
+    const responseStatus = getResponseStatus(
+      response as AxiosError<Problem>,
+      'SUBPRODUCT_ONBOARDING'
+    );
+
     const event =
-      (response as AxiosError<Problem>).response?.status === 409
+      responseStatus === 409
         ? 'ONBOARDING_PREMIUM_SEND_CONFLICT_ERROR_FAILURE'
         : 'ONBOARDING_PREMIUM_SEND_FAILURE';
 
-    setConflictError((response as AxiosError<Problem>).response?.status === 409);
+    setConflictError(responseStatus === 409);
 
     trackEvent(event, {
       party_id: externalInstitutionId,

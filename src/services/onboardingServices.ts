@@ -12,7 +12,7 @@ import {
   UserOnCreate,
 } from '../../types';
 import { fetchWithLogs } from '../lib/api-utils';
-import { getFetchOutcome } from '../lib/error-utils';
+import { getFetchOutcome, getResponseStatus } from '../lib/error-utils';
 import { PRODUCT_IDS } from '../utils/constants';
 import { OnboardingFormData } from '../model/OnboardingFormData';
 import { genericError } from '../views/onboardingProduct/components/StepVerifyOnboarding';
@@ -67,12 +67,11 @@ export const insertedPartyVerifyOnboarding = async (
   if (outcome === 'success') {
     setOutcome(alreadyOnboarded);
   } else {
-    if (
-      (response as AxiosError<any>).response?.status === 404 ||
-      (response as AxiosError<any>).response?.status === 400
-    ) {
+    const responseStatus = getResponseStatus(response as AxiosError, 'VERIFY_ONBOARDING');
+
+    if (responseStatus === 404 || responseStatus === 400) {
       setOutcome(null);
-    } else if ((response as AxiosError<any>).response?.status === 403) {
+    } else if (responseStatus === 403) {
       setOutcome(notAllowedError);
     } else {
       setOutcome(genericError);
@@ -123,13 +122,12 @@ export const verifyOnboarding = async (
     });
     setOutcome(alreadyOnboarded);
   } else {
-    if (
-      (response as AxiosError<any>).response?.status === 404 ||
-      (response as AxiosError<any>).response?.status === 400
-    ) {
+    const responseStatus = getResponseStatus(response as AxiosError, 'VERIFY_ONBOARDING');
+
+    if (responseStatus === 404 || responseStatus === 400) {
       setOutcome(null);
       forward();
-    } else if ((response as AxiosError<any>).response?.status === 403) {
+    } else if (responseStatus === 403) {
       trackEvent('ONBOARDING_NOT_ALLOWED_ERROR', {
         request_id: requestIdRef.current,
         party_id: externalInstitutionId,
@@ -193,13 +191,14 @@ export const getOnboardingData = async (
       result.institution?.paymentServiceProvider,
       result.institution?.dataProtectionOfficer
     );
-  } else if (
-    (onboardingData as AxiosError<any>).response?.status === 404 ||
-    (onboardingData as AxiosError<any>).response?.status === 400
-  ) {
-    forward(undefined, institutionType, undefined);
   } else {
-    setOutcome(genericError);
+    const responseStatus = getResponseStatus(onboardingData as AxiosError, 'GET_ONBOARDING_DATA');
+
+    if (responseStatus === 404 || responseStatus === 400) {
+      forward(undefined, institutionType, undefined);
+    } else {
+      setOutcome(genericError);
+    }
   }
   setLoading(false);
 };
@@ -229,13 +228,17 @@ export const checkProduct = async (
     if (product?.status === 'PHASE_OUT' && options?.onPhaseOut) {
       options.onPhaseOut(product);
     }
-  } else if ((onboardingProducts as AxiosError).response?.status === 404) {
-    options?.onNotFound?.();
-    setProduct(null);
   } else {
-    console.error('Unexpected response', (onboardingProducts as AxiosError).response);
-    options?.onError?.(onboardingProducts as AxiosError);
-    setProduct(null);
+    const responseStatus = getResponseStatus(onboardingProducts as AxiosError, 'CHECK_PRODUCT');
+
+    if (responseStatus === 404) {
+      options?.onNotFound?.();
+      setProduct(null);
+    } else {
+      console.error('Unexpected response', (onboardingProducts as AxiosError).response);
+      options?.onError?.(onboardingProducts as AxiosError);
+      setProduct(null);
+    }
   }
 };
 

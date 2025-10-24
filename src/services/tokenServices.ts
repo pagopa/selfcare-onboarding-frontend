@@ -4,7 +4,7 @@ import React from 'react';
 import { fetchWithLogs } from '../lib/api-utils';
 import { OnboardingRequestData, Problem, RequestOutcomeComplete } from '../../types';
 import { redirectToLogin } from '../utils/unloadEvent-utils';
-import { getFetchOutcome } from '../lib/error-utils';
+import { getFetchOutcome, getResponseStatus } from '../lib/error-utils';
 
 type Props = {
   onboardingId?: string;
@@ -63,7 +63,9 @@ export const verifyRequest = async ({
     }
     setRequestData(requestData);
   } else {
-    trackEvent(getMixPanelEvent((fetchJwt as AxiosError<Problem>).response?.status), {
+    const responseStatus = getResponseStatus(fetchJwt as AxiosError<Problem>, 'TOKEN_VALIDATION');
+
+    trackEvent(getMixPanelEvent(responseStatus), {
       party_id: onboardingId,
     });
     setOutcomeContentState('notFound');

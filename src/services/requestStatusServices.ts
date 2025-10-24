@@ -4,7 +4,7 @@ import { uniqueId } from 'lodash';
 import { Dispatch, SetStateAction } from 'react';
 import { FileErrorAttempt, Problem, RequestOutcomeComplete } from '../../types';
 import { fetchWithLogs } from '../lib/api-utils';
-import { getFetchOutcome } from '../lib/error-utils';
+import { getFetchOutcome, getResponseStatus } from '../lib/error-utils';
 import { customErrors } from '../utils/constants';
 import { ENV } from '../utils/env';
 import { redirectToLogin } from '../utils/unloadEvent-utils';
@@ -95,6 +95,8 @@ export const onboardingContractUpload = async (
   }
 
   if (outcome === 'error') {
+    const responseStatus = getResponseStatus(uploadDocument as AxiosError<Problem>, 'CONTRACT_UPLOAD');
+
     if (
       lastFileErrorAttempt &&
       lastFileErrorAttempt.fileName === file.name &&
@@ -119,7 +121,7 @@ export const onboardingContractUpload = async (
       });
     }
     if (
-      (uploadDocument as AxiosError<Problem>).response?.status === 400 &&
+      responseStatus === 400 &&
       (uploadDocument as AxiosError<Problem>).response?.data
     ) {
       setOpen(true);

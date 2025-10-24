@@ -1,7 +1,7 @@
 import { AxiosError, AxiosResponse } from 'axios';
 import { Dispatch, SetStateAction } from 'react';
 import { fetchWithLogs } from '../lib/api-utils';
-import { getFetchOutcome } from '../lib/error-utils';
+import { getFetchOutcome, getResponseStatus } from '../lib/error-utils';
 import { GeographicTaxonomy, GeographicTaxonomyResource } from '../model/GeographicTaxonomies';
 import { InstitutionLocationData } from '../model/InstitutionLocationData';
 import { formatCity } from '../utils/formatting-utils';
@@ -181,7 +181,11 @@ export const handleSearch = async (
       findError(index);
       setIsAddNewAutocompleteEnabled(false);
     }
-  } else if ((searchGeotaxonomy as AxiosError).response?.status === 404) {
-    setOptions([]);
+  } else {
+    const responseStatus = getResponseStatus(searchGeotaxonomy as AxiosError, 'GEOTAXONOMY_SEARCH');
+
+    if (responseStatus === 404) {
+      setOptions([]);
+    }
   }
 };

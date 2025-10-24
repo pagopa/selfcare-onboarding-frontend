@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction } from 'react';
 import { AxiosError, AxiosResponse } from 'axios';
 import { fetchWithLogs } from '../lib/api-utils';
-import { getFetchOutcome } from '../lib/error-utils';
+import { getFetchOutcome, getResponseStatus } from '../lib/error-utils';
 import { Endpoint, ApiEndpointKey, PartyData, Product, InstitutionType } from '../../types';
 import { AooData } from '../model/AooData';
 import { UoData } from '../model/UoModel';
@@ -89,8 +89,12 @@ export const fetchInstitutionsByName = async (
 
   if (outcome === 'success') {
     setOptions(transformFn((searchResponse as AxiosResponse).data));
-  } else if ((searchResponse as AxiosError).response?.status === 404) {
-    setOptions([]);
+  } else {
+    const responseStatus = getResponseStatus(searchResponse as AxiosError, 'INSTITUTION_SEARCH');
+
+    if (responseStatus === 404) {
+      setOptions([]);
+    }
   }
 };
 
@@ -154,12 +158,16 @@ export const fetchInstitutionByTaxCode = async (
         setDisabled(true);
       }
     }
-  } else if ((searchResponse as AxiosError).response?.status === 404) {
-    setCfResult(undefined);
+  } else {
+    const responseStatus = getResponseStatus(searchResponse as AxiosError, 'INSTITUTION_SEARCH');
 
-    if (productId === 'prod-idpay-merchant') {
-      setIsPresentInAtecoWhiteList?.(false);
-      setMerchantSearchResult?.(undefined);
+    if (responseStatus === 404) {
+      setCfResult(undefined);
+
+      if (productId === 'prod-idpay-merchant') {
+        setIsPresentInAtecoWhiteList?.(false);
+        setMerchantSearchResult?.(undefined);
+      }
     }
   }
 };
@@ -229,15 +237,19 @@ export const handleSearchByReaCode = async (
         setDisabled(true);
       }
     }
-  } else if ((searchResponse as AxiosError).response?.status === 404) {
-    setCfResult(undefined);
-    if (product?.id === PRODUCT_IDS.IDPAY_MERCHANT) {
-      setMerchantSearchResult?.(undefined);
-      setIsPresentInAtecoWhiteList?.(false);
-    }
-  }
+  } else {
+    const responseStatus = getResponseStatus(searchResponse as AxiosError, 'INSTITUTION_SEARCH');
 
-  setApiLoading?.(false);
+    if (responseStatus === 404) {
+      setCfResult(undefined);
+      if (product?.id === PRODUCT_IDS.IDPAY_MERCHANT) {
+        setMerchantSearchResult?.(undefined);
+        setIsPresentInAtecoWhiteList?.(false);
+      }
+    }
+
+    setApiLoading?.(false);
+  }
 };
 
 export const handleSearchByAooCode = async (
@@ -251,6 +263,7 @@ export const handleSearchByAooCode = async (
   params: any = {},
   filterCategories?: string,
   productId?: string
+  // eslint-disable-next-line sonarjs/cognitive-complexity
 ) => {
   setApiLoading?.(true);
 
@@ -294,11 +307,15 @@ export const handleSearchByAooCode = async (
       : (searchResponse as AxiosResponse).data;
     setAooResult(response);
     setAooResultHistory(response);
-  } else if ((searchResponse as AxiosError).response?.status === 404) {
-    setAooResult(undefined);
-  }
+  } else {
+    const responseStatus = getResponseStatus(searchResponse as AxiosError, 'INSTITUTION_SEARCH');
 
-  setApiLoading?.(false);
+    if (responseStatus === 404) {
+      setAooResult(undefined);
+    }
+
+    setApiLoading?.(false);
+  }
 };
 
 export const handleSearchByUoCode = async (
@@ -312,6 +329,7 @@ export const handleSearchByUoCode = async (
   params: any = {},
   filterCategories?: string,
   productId?: string
+  // eslint-disable-next-line sonarjs/cognitive-complexity
 ) => {
   setApiLoading?.(true);
 
@@ -353,11 +371,15 @@ export const handleSearchByUoCode = async (
       : (searchResponse as AxiosResponse).data;
     setUoResult(response);
     setUoResultHistory(response);
-  } else if ((searchResponse as AxiosError).response?.status === 404) {
-    setUoResult(undefined);
-  }
+  } else {
+    const responseStatus = getResponseStatus(searchResponse as AxiosError, 'INSTITUTION_SEARCH');
 
-  setApiLoading?.(false);
+    if (responseStatus === 404) {
+      setUoResult(undefined);
+    }
+
+    setApiLoading?.(false);
+  }
 };
 
 export const contractingInsuranceFromTaxId = async (
@@ -394,11 +416,15 @@ export const contractingInsuranceFromTaxId = async (
       ? ((searchResponse as AxiosResponse).data[0] ?? (searchResponse as AxiosResponse).data)
       : (searchResponse as AxiosResponse).data;
     setCfResult(response);
-  } else if ((searchResponse as AxiosError).response?.status === 404) {
-    setCfResult(undefined);
-  }
+  } else {
+    const responseStatus = getResponseStatus(searchResponse as AxiosError, 'INSTITUTION_SEARCH');
 
-  setApiLoading?.(false);
+    if (responseStatus === 404) {
+      setCfResult(undefined);
+    }
+
+    setApiLoading?.(false);
+  }
 };
 
 export const handleSearchExternalId = async (
@@ -442,8 +468,12 @@ export const getECDataByCF = async (
 
   if (outcome === 'success') {
     setEcData((searchResponse as AxiosResponse).data);
-  } else if ((searchResponse as AxiosError).response?.status === 404) {
-    setEcData(null);
+  } else {
+    const responseStatus = getResponseStatus(searchResponse as AxiosError, 'INSTITUTION_SEARCH');
+
+    if (responseStatus === 404) {
+      setEcData(null);
+    }
+    setApiLoading(false);
   }
-  setApiLoading(false);
 };
