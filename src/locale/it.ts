@@ -788,6 +788,7 @@ export default {
     },
     ibanSection: {
       title: 'INSERISCI IBAN PER RICEVERE I RIMBORSI',
+      subTitle: 'Per far sì che il bonifico vada a buon fine, assicurati che <1> l’IBAN coincida con quanto riportato sugli estremi del tuo conto. </1>',
       holder: 'Intestatario',
       iban: 'IBAN',
       confirmIban: 'Conferma IBAN',

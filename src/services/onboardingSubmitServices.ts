@@ -1,18 +1,25 @@
-import { trackEvent } from "@pagopa/selfcare-common-frontend/lib/services/analyticsService";
-import { AxiosError } from "axios";
-import { Dispatch, SetStateAction, MutableRefObject } from "react";
-import { Product, InstitutionType, RequestOutcomeOptions, RequestOutcomeMessage, UserOnCreate, Problem } from "../../types";
-import { fetchWithLogs } from "../lib/api-utils";
-import { getFetchOutcome } from "../lib/error-utils";
-import { AdditionalGpuInformations } from "../model/AdditionalGpuInformations";
-import { AdditionalInformations } from "../model/AdditionalInformations";
-import { AggregateInstitution } from "../model/AggregateInstitution";
-import { billingData2billingDataRequest } from "../model/BillingData";
-import { onboardedInstitutionInfo2geographicTaxonomy } from "../model/GeographicTaxonomies";
-import { OnboardingFormData } from "../model/OnboardingFormData";
-import { pspData2pspDataRequest } from "../model/PspData";
-import { PRODUCT_IDS } from "../utils/constants";
-import { ENV } from "../utils/env";
+import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
+import { AxiosError } from 'axios';
+import { Dispatch, SetStateAction, MutableRefObject } from 'react';
+import {
+  Product,
+  InstitutionType,
+  RequestOutcomeOptions,
+  RequestOutcomeMessage,
+  UserOnCreate,
+  Problem,
+} from '../../types';
+import { fetchWithLogs } from '../lib/api-utils';
+import { getFetchOutcome } from '../lib/error-utils';
+import { AdditionalGpuInformations } from '../model/AdditionalGpuInformations';
+import { AdditionalInformations } from '../model/AdditionalInformations';
+import { AggregateInstitution } from '../model/AggregateInstitution';
+import { billingData2billingDataRequest } from '../model/BillingData';
+import { onboardedInstitutionInfo2geographicTaxonomy } from '../model/GeographicTaxonomies';
+import { OnboardingFormData } from '../model/OnboardingFormData';
+import { pspData2pspDataRequest } from '../model/PspData';
+import { PRODUCT_IDS } from '../utils/constants';
+import { ENV } from '../utils/env';
 
 // Funzione base che esegue la chiamata POST
 const postOnboardingLegals = async (
@@ -29,7 +36,7 @@ const postOnboardingLegals = async (
   );
 
   const outcome = getFetchOutcome(response);
-  
+
   return { response, outcome };
 };
 
@@ -53,7 +60,7 @@ export const postOnboardingSubmit = async (
   pricingPlan: string | undefined,
   users: Array<UserOnCreate>,
   aggregates?: Array<AggregateInstitution>
-// eslint-disable-next-line sonarjs/cognitive-complexity
+  // eslint-disable-next-line sonarjs/cognitive-complexity
 ) => {
   setLoading(true);
   console.log('institutionType', institutionType);
@@ -150,9 +157,7 @@ export const postOnboardingSubmit = async (
           ? 'AOO'
           : undefined,
       taxCode: onboardingFormData?.taxCode,
-      isAggregator: onboardingFormData?.isAggregator
-        ? onboardingFormData?.isAggregator
-        : undefined,
+      isAggregator: onboardingFormData?.isAggregator ? onboardingFormData?.isAggregator : undefined,
       aggregates,
     },
     setRequiredLogin
@@ -168,16 +173,26 @@ export const postOnboardingSubmit = async (
     });
     setOutcome(outcomeContent[outcome as keyof RequestOutcomeOptions]);
   } else {
+    const responseStatus = (response as AxiosError<Problem>).response?.status;
+
+    if (!responseStatus) {
+      console.warn('ONBOARDING_SUBMIT: Response status is undefined or null', {
+        response,
+        outcome,
+        hasResponse: !!(response as AxiosError<Problem>).response,
+      });
+    }
+
     const event =
-      (response as AxiosError<Problem>).response?.status === 409
-        ? 'ONBOARDING_SEND_CONFLICT_ERROR_FAILURE'
-        : 'ONBOARDING_SEND_FAILURE';
+      responseStatus === 409 ? 'ONBOARDING_SEND_CONFLICT_ERROR_FAILURE' : 'ONBOARDING_SEND_FAILURE';
+
     trackEvent(event, {
       request_id: requestIdRef.current,
       party_id: externalInstitutionId,
       product_id: productId,
     });
-    if ((response as AxiosError<Problem>).response?.status === 403) {
+
+    if (responseStatus === 403) {
       trackEvent('ONBOARDING_NOT_ALLOWED_ERROR', {
         request_id: requestIdRef.current,
         party_id: externalInstitutionId,
@@ -185,7 +200,9 @@ export const postOnboardingSubmit = async (
       });
       setOutcome(notAllowedError);
     } else {
-      setOutcome(outcomeContent[outcome as keyof RequestOutcomeOptions]);
+      const outcomeToShow =
+        outcomeContent[outcome as keyof RequestOutcomeOptions] || outcomeContent.error;
+      setOutcome(outcomeToShow);
     }
   }
 };
