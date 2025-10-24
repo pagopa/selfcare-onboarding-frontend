@@ -26,9 +26,9 @@ export const handleSearchByTaxCode = async (
     () => setRequiredLogin(true)
   );
 
-  const outcome = getFetchOutcome(searchResponse);
+  const responseOutcome = getFetchOutcome(searchResponse);
 
-  if (outcome === 'success') {
+  if (responseOutcome === 'success') {
     setRetrievedIstat((searchResponse as AxiosResponse).data.istatCode);
     setOriginId4Premium((searchResponse as AxiosResponse).data.originId);
   }
@@ -49,9 +49,9 @@ export const getUoInfoFromRecipientCode = async (
     () => setRequiredLogin(true)
   );
 
-  const outcome = getFetchOutcome(searchResponse);
+  const responseOutcome = getFetchOutcome(searchResponse);
 
-  if (outcome === 'success') {
+  if (responseOutcome === 'success') {
     formik.setFieldValue(
       'taxCodeInvoicing',
       (searchResponse as AxiosResponse).data?.codiceFiscaleSfe
@@ -85,9 +85,9 @@ export const fetchInstitutionsByName = async (
     () => setRequiredLogin(true)
   );
 
-  const outcome = getFetchOutcome(searchResponse);
+  const responseOutcome = getFetchOutcome(searchResponse);
 
-  if (outcome === 'success') {
+  if (responseOutcome === 'success') {
     setOptions(transformFn((searchResponse as AxiosResponse).data));
   } else {
     const responseStatus = getResponseStatus(searchResponse as AxiosError, 'INSTITUTION_SEARCH');
@@ -133,9 +133,9 @@ export const fetchInstitutionByTaxCode = async (
     () => setRequiredLogin(true)
   );
 
-  const outcome = getFetchOutcome(searchResponse);
+  const responseOutcome = getFetchOutcome(searchResponse);
 
-  if (outcome === 'success') {
+  if (responseOutcome === 'success') {
     const response = (searchResponse as AxiosResponse).data;
     setCfResult(response);
 
@@ -215,9 +215,9 @@ export const handleSearchByReaCode = async (
     () => setRequiredLogin(true)
   );
 
-  const outcome = getFetchOutcome(searchResponse);
+  const responseOutcome = getFetchOutcome(searchResponse);
 
-  if (outcome === 'success') {
+  if (responseOutcome === 'success') {
     const response = (searchResponse as AxiosResponse).data;
     setCfResult(response);
 
@@ -299,9 +299,9 @@ export const handleSearchByAooCode = async (
     () => setRequiredLogin(true)
   );
 
-  const outcome = getFetchOutcome(searchResponse);
+  const responseOutcome = getFetchOutcome(searchResponse);
 
-  if (outcome === 'success') {
+  if (responseOutcome === 'success') {
     const response = addUser
       ? ((searchResponse as AxiosResponse).data[0] ?? (searchResponse as AxiosResponse).data)
       : (searchResponse as AxiosResponse).data;
@@ -363,9 +363,9 @@ export const handleSearchByUoCode = async (
     () => setRequiredLogin(true)
   );
 
-  const outcome = getFetchOutcome(searchResponse);
+  const responseOutcome = getFetchOutcome(searchResponse);
 
-  if (outcome === 'success') {
+  if (responseOutcome === 'success') {
     const response = addUser
       ? ((searchResponse as AxiosResponse).data[0] ?? (searchResponse as AxiosResponse).data)
       : (searchResponse as AxiosResponse).data;
@@ -410,8 +410,8 @@ export const contractingInsuranceFromTaxId = async (
     () => setRequiredLogin(true)
   );
 
-  const outcome = getFetchOutcome(searchResponse);
-  if (outcome === 'success') {
+  const responseOutcome = getFetchOutcome(searchResponse);
+  if (responseOutcome === 'success') {
     const response = addUser
       ? ((searchResponse as AxiosResponse).data[0] ?? (searchResponse as AxiosResponse).data)
       : (searchResponse as AxiosResponse).data;
@@ -440,9 +440,9 @@ export const handleSearchExternalId = async (
     onRedirectToLogin
   );
 
-  const outcome = getFetchOutcome(searchResponse);
+  const responseOutcome = getFetchOutcome(searchResponse);
 
-  if (outcome === 'success') {
+  if (responseOutcome === 'success') {
     return (searchResponse as AxiosResponse).data;
   }
 
@@ -464,9 +464,9 @@ export const getECDataByCF = async (
     () => setRequiredLogin(true)
   );
 
-  const outcome = getFetchOutcome(searchResponse);
+  const responseOutcome = getFetchOutcome(searchResponse);
 
-  if (outcome === 'success') {
+  if (responseOutcome === 'success') {
     setEcData((searchResponse as AxiosResponse).data);
   } else {
     const responseStatus = getResponseStatus(searchResponse as AxiosError, 'INSTITUTION_SEARCH');

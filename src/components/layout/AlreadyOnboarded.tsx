@@ -9,6 +9,7 @@ import { ROUTES, addUserFlowProducts } from '../../utils/constants';
 import { ENV } from '../../utils/env';
 import { InstitutionType, Product } from '../../../types';
 import { OnboardingFormData } from '../../model/OnboardingFormData';
+import { useOnboardingControllers } from '../../hooks/useOnboardingControllers';
 
 type Props = {
   onboardingFormData?: OnboardingFormData;
@@ -23,12 +24,28 @@ export default function AlreadyOnboarded({
 }: Props) {
   const { t } = useTranslation();
   const history = useHistory();
-
+  const controllers = useOnboardingControllers({ onboardingFormData, institutionType });
   const isEnabledProduct2AddUser = !!(
     selectedProduct?.id && addUserFlowProducts(selectedProduct.id)
   );
 
-  return (
+  return controllers.isTechPartner ? (
+    <EndingPage
+      minHeight="52vh"
+      variantTitle="h4"
+      variantDescription="body1"
+      icon={<IllusError size={60} />}
+      title={<Trans i18nKey="stepVerifyOnboarding.ptAlreadyOnboarded.title" />}
+      description={
+        <Trans i18nKey="stepVerifyOnboarding.ptAlreadyOnboarded.description">
+          Per operare su un prodotto, chiedi a un Amministratore di <br /> aggiungerti nella sezione
+          Utenti.
+        </Trans>
+      }
+      buttonLabel={<Trans i18nKey="stepVerifyOnboarding.ptAlreadyOnboarded.backAction" />}
+      onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+    />
+  ) : (
     <EndingPage
       minHeight="52vh"
       variantTitle={'h4'}

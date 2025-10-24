@@ -26,9 +26,9 @@ export const getCountriesFromGeotaxonomies = async (
     },
     () => setRequiredLogin(true)
   );
-  const outcome = getFetchOutcome(searchGeotaxonomy);
+  const responseOutcome = getFetchOutcome(searchGeotaxonomy);
 
-  if (outcome === 'success') {
+  if (responseOutcome === 'success') {
     const geographicTaxonomies = (searchGeotaxonomy as AxiosResponse).data;
 
     const mappedResponse = geographicTaxonomies.map((gt: GeographicTaxonomyResource) => ({
@@ -97,9 +97,9 @@ export const getLocationFromIstatCode = async (
     { method: 'GET' },
     () => setRequiredLogin(true)
   );
-  const outcome = getFetchOutcome(getLocation);
+  const responseOutcome = getFetchOutcome(getLocation);
 
-  if (outcome === 'success') {
+  if (responseOutcome === 'success') {
     const result = (getLocation as AxiosResponse).data;
     if (result) {
       const institutionLocation = {
@@ -155,9 +155,9 @@ export const handleSearch = async (
     },
     () => setRequiredLogin(true)
   );
-  const outcome = getFetchOutcome(searchGeotaxonomy);
+  const responseOutcome = getFetchOutcome(searchGeotaxonomy);
 
-  if (outcome === 'success') {
+  if (responseOutcome === 'success') {
     // eslint-disable-next-line functional/no-let
     let data = (searchGeotaxonomy as AxiosResponse).data;
 

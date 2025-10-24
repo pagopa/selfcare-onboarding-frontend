@@ -26,9 +26,9 @@ export const verifyRecipientCodeIsValid = async (
     () => setRequiredLogin(true)
   );
 
-  const outcome = getFetchOutcome(getRecipientCodeValidation);
+  const responseOutcome = getFetchOutcome(getRecipientCodeValidation);
 
-  if (outcome === 'success') {
+  if (responseOutcome === 'success') {
     const result = (getRecipientCodeValidation as AxiosResponse).data;
     if (uoSelected && result && result === 'DENIED_NO_BILLING') {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
@@ -59,9 +59,9 @@ export const verifyTaxCodeInvoicing = async (
     () => setRequiredLogin(true)
   );
 
-  const outcome = getFetchOutcome(getUoList);
+  const responseOutcome = getFetchOutcome(getUoList);
 
-  if (outcome === 'success') {
+  if (responseOutcome === 'success') {
     const uoList = (getUoList as AxiosResponse).data.items;
     const match = uoList.find((uo: any) => uo.codiceFiscaleEnte === formik.values.taxCode);
     if (match) {

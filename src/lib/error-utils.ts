@@ -10,7 +10,7 @@ export function getFetchOutcome(resp: AxiosResponse | AxiosError) {
 }
 
 export function getResponseStatus(error: AxiosError, context?: string): number | undefined {
-  const status = error.response?.status;
+  const status = Number(error.response?.status);
 
   const isNetworkError =
     !error.response &&

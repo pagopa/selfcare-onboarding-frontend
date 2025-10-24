@@ -82,19 +82,19 @@ export const onboardingContractUpload = async (
 
   setLoading(false);
 
-  const outcome = getFetchOutcome(uploadDocument);
+  const responseOutcome = getFetchOutcome(uploadDocument);
 
-  if (outcome === 'success') {
+  if (responseOutcome === 'success') {
     trackEvent(addUserFlow ? 'ONBOARDING_USER_COMPLETED' : 'ONBOARDING_SUCCESS', {
       request_id: requestId,
       party_id: token,
       product_id: requestData?.productId,
       form: addUserFlow ? 'onboarding/dashboard' : undefined,
     });
-    setOutcomeContentState(outcome);
+    setOutcomeContentState(responseOutcome);
   }
 
-  if (outcome === 'error') {
+  if (responseOutcome === 'error') {
     const responseStatus = getResponseStatus(uploadDocument as AxiosError<Problem>, 'CONTRACT_UPLOAD');
 
     if (

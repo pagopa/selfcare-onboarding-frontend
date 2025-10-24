@@ -5,7 +5,7 @@ import { EndingPage } from '@pagopa/selfcare-common-frontend/lib';
 import SessionModal from '@pagopa/selfcare-common-frontend/lib/components/SessionModal';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
 import { uniqueId } from 'lodash';
-import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
 import {
@@ -16,11 +16,10 @@ import {
   StepperStep,
   UserOnCreate,
 } from '../../../types';
-import AlreadyOnboarded from '../../components/layout/AlreadyOnboarded';
 import NoProductPage from '../../components/layout/NoProductPage';
 import UserNotAllowedPage from '../../components/layout/UserNotAllowedPage';
 import { LoadingOverlay } from '../../components/modals/LoadingOverlay';
-import { MessageNoAction } from '../../components/shared/MessageNoAction';
+// import { MessageNoAction } from '../../components/shared/MessageNoAction';
 import { StepAddManager } from '../../components/steps/StepAddManager';
 import StepInstitutionType from '../../components/steps/StepInstitutionType';
 import StepOnboardingData from '../../components/steps/StepOnboardingData';
@@ -33,11 +32,7 @@ import { AdditionalGpuInformations } from '../../model/AdditionalGpuInformations
 import { AdditionalInformations } from '../../model/AdditionalInformations';
 import { AggregateInstitution } from '../../model/AggregateInstitution';
 import { OnboardingFormData } from '../../model/OnboardingFormData';
-import {
-  checkProduct,
-  getFilterCategories,
-  insertedPartyVerifyOnboarding,
-} from '../../services/onboardingServices';
+import { checkProduct, getFilterCategories } from '../../services/onboardingServices';
 import { postOnboardingSubmit } from '../../services/onboardingSubmitServices';
 import { PRODUCT_IDS } from '../../utils/constants';
 import { ENV } from '../../utils/env';
@@ -46,7 +41,7 @@ import { StepAddAdmin } from './components/StepAddAdmin';
 import { StepAdditionalGpuInformations } from './components/StepAdditionalGpuInformations';
 import { StepAdditionalInformations } from './components/StepAdditionalInformations';
 import { StepUploadAggregates } from './components/StepUploadAggregates';
-import { genericError, StepVerifyOnboarding } from './components/StepVerifyOnboarding';
+import StepVerifyOnboarding from './components/StepVerifyOnboarding';
 import { createForwardFunctions } from './components/forwards/forwardFunctions';
 
 export type ValidateErrorType = 'conflictError';
@@ -156,39 +151,6 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     }
   }, [institutionTypeByUrl]);
 
-  const alreadyOnboarded: RequestOutcomeMessage = {
-    title: '',
-    description: controllers.isTechPartner
-      ? [
-          <React.Fragment key="0">
-            <EndingPage
-              minHeight="52vh"
-              variantTitle="h4"
-              variantDescription="body1"
-              icon={<IllusError size={60} />}
-              title={<Trans i18nKey="stepVerifyOnboarding.ptAlreadyOnboarded.title" />}
-              description={
-                <Trans i18nKey="stepVerifyOnboarding.ptAlreadyOnboarded.description">
-                  Per operare su un prodotto, chiedi a un Amministratore di <br /> aggiungerti nella
-                  sezione Utenti.
-                </Trans>
-              }
-              buttonLabel={<Trans i18nKey="stepVerifyOnboarding.ptAlreadyOnboarded.backAction" />}
-              onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
-            />
-          </React.Fragment>,
-        ]
-      : [
-          <React.Fragment key="0">
-            <AlreadyOnboarded
-              onboardingFormData={onboardingFormData}
-              selectedProduct={selectedProduct}
-              institutionType={institutionType}
-            />
-          </React.Fragment>,
-        ],
-  };
-
   useEffect(() => {
     if (
       selectedProduct &&
@@ -262,23 +224,6 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
       setActiveStep(1); // Vai direttamente allo step di ricerca
     }
   }, [selectedProduct]);
-
-  useEffect(() => {
-    if (onboardingFormData && onboardingFormData?.businessName !== '' && institutionType !== 'PA') {
-      if (onboardingFormData.taxCode) {
-        setExternalInstitutionId(onboardingFormData.taxCode);
-      }
-      void insertedPartyVerifyOnboarding(
-        onboardingFormData,
-        setRequiredLogin,
-        productId,
-        institutionType,
-        alreadyOnboarded,
-        setOutcome,
-        genericError
-      );
-    }
-  }, [onboardingFormData]);
 
   useEffect(() => {
     void getFilterCategories(productId, setRequiredLogin, setFilterCategoriesResponse);
@@ -678,8 +623,6 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
 
   return selectedProduct === null ? (
     <NoProductPage />
-  ) : outcome ? (
-    <MessageNoAction {...outcome} />
   ) : pricingPlan && pricingPlan !== 'FA' ? (
     <EndingPage
       minHeight="52vh"

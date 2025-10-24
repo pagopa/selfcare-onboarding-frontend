@@ -53,7 +53,9 @@ export const selected2OnboardingData = (
       (productId === PRODUCT_IDS.INTEROP || productId === PRODUCT_IDS.IDPAY_MERCHANT)) ||
     institutionType === 'SCP'
       ? 'PDND_INFOCAMERE'
-      : selectedParty?.origin,
+      : institutionType === 'AS'
+        ? 'IVASS'
+        : selectedParty?.origin,
   rea:
     selectedParty?.cciaa && selectedParty?.nRea
       ? process.env.REACT_APP_MOCK_API === 'true'

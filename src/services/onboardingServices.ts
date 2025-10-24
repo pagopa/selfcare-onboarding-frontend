@@ -5,6 +5,7 @@ import { Dispatch, SetStateAction } from 'react';
 import {
   InstitutionOnboardingInfoResource,
   InstitutionType,
+  OutcomeType,
   PartyData,
   Product,
   RequestOutcomeMessage,
@@ -85,15 +86,12 @@ export const verifyOnboarding = async (
   setRequiredLogin: Dispatch<SetStateAction<boolean>>,
   productId: string,
   selectedProduct: any,
-  setOutcome: Dispatch<SetStateAction<any>>,
-  alreadyOnboarded: any,
+  setOutcomeType: Dispatch<SetStateAction<OutcomeType>>,
   onboardingFormData: any,
   requestIdRef: any,
   forward: (...args: any) => void,
   institutionType: InstitutionType | undefined,
-  genericError: any,
-  externalInstitutionId: string | undefined,
-  notAllowedErrorNoParty: RequestOutcomeMessage
+  externalInstitutionId: string | undefined
 ) => {
   setLoading(true);
 
@@ -120,12 +118,12 @@ export const verifyOnboarding = async (
       party_id: onboardingFormData?.externalId,
       product_id: selectedProduct?.id,
     });
-    setOutcome(alreadyOnboarded);
+    setOutcomeType('ALREADY_ONBOARDED');
   } else {
     const responseStatus = getResponseStatus(response as AxiosError, 'VERIFY_ONBOARDING');
 
-    if (responseStatus === 404 || responseStatus === 400) {
-      setOutcome(null);
+    if (responseStatus === 404) {
+      setOutcomeType(null);
       forward();
     } else if (responseStatus === 403) {
       trackEvent('ONBOARDING_NOT_ALLOWED_ERROR', {
@@ -133,21 +131,19 @@ export const verifyOnboarding = async (
         party_id: externalInstitutionId,
         product_id: productId,
       });
-      setOutcome(notAllowedErrorNoParty);
+      setOutcomeType('NOT_ALLOWED');
     } else {
-      setOutcome(genericError);
+      setOutcomeType('GENERIC_ERROR');
     }
   }
 };
-
 export const getOnboardingData = async (
   setLoading: Dispatch<SetStateAction<boolean>>,
   setRequiredLogin: Dispatch<SetStateAction<boolean>>,
   productId: string,
   forward: (...args: any) => void,
   institutionType: InstitutionType | undefined,
-  setOutcome: Dispatch<SetStateAction<any>>,
-  genericError: any,
+  setOutcomeType: Dispatch<SetStateAction<OutcomeType>>,
   partyId?: string
 ) => {
   setLoading(true);
@@ -193,11 +189,11 @@ export const getOnboardingData = async (
     );
   } else {
     const responseStatus = getResponseStatus(onboardingData as AxiosError, 'GET_ONBOARDING_DATA');
-
     if (responseStatus === 404 || responseStatus === 400) {
+      setOutcomeType(null);
       forward(undefined, institutionType, undefined);
     } else {
-      setOutcome(genericError);
+      setOutcomeType('GENERIC_ERROR');
     }
   }
   setLoading(false);

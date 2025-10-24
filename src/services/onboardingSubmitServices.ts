@@ -35,9 +35,9 @@ const postOnboardingLegals = async (
     () => setRequiredLogin(true)
   );
 
-  const outcome = getFetchOutcome(response);
+  const responseOutcome = getFetchOutcome(response);
 
-  return { response, outcome };
+  return { response, responseOutcome };
 };
 
 // Prima funzione con logica specifica per onboarding standard
@@ -66,7 +66,7 @@ export const postOnboardingSubmit = async (
   console.log('institutionType', institutionType);
   console.log('origin', origin);
 
-  const { response, outcome } = await postOnboardingLegals(
+  const { response, responseOutcome } = await postOnboardingLegals(
     {
       billingData: billingData2billingDataRequest(onboardingFormData as OnboardingFormData),
       atecoCodes: onboardingFormData?.atecoCodes,
@@ -165,13 +165,13 @@ export const postOnboardingSubmit = async (
 
   setLoading(false);
 
-  if (outcome === 'success') {
+  if (responseOutcome === 'success') {
     trackEvent('ONBOARDING_SEND_SUCCESS', {
       request_id: requestIdRef.current,
       party_id: externalInstitutionId,
       product_id: productId,
     });
-    setOutcome(outcomeContent[outcome as keyof RequestOutcomeOptions]);
+    setOutcome(outcomeContent[responseOutcome as keyof RequestOutcomeOptions]);
   } else {
     const responseStatus = getResponseStatus(response as AxiosError<Problem>, 'ONBOARDING_SUBMIT');
 
@@ -193,7 +193,7 @@ export const postOnboardingSubmit = async (
       setOutcome(notAllowedError);
     } else {
       const outcomeToShow =
-        outcomeContent[outcome as keyof RequestOutcomeOptions] || outcomeContent.error;
+        outcomeContent[responseOutcome as keyof RequestOutcomeOptions] || outcomeContent.error;
       setOutcome(outcomeToShow);
     }
   }
@@ -216,7 +216,7 @@ export const postSubProductOnboardingSubmit = async (
   setConflictError: Dispatch<SetStateAction<boolean>>,
   pricingPlan?: string
 ) => {
-  const { response, outcome } = await postOnboardingLegals(
+  const { response, responseOutcome } = await postOnboardingLegals(
     {
       users: users.map((u) => ({
         ...u,
@@ -258,7 +258,7 @@ export const postSubProductOnboardingSubmit = async (
     setRequiredLogin
   );
 
-  if (outcome === 'success') {
+  if (responseOutcome === 'success') {
     trackEvent('ONBOARDING_PREMIUM_SEND_SUCCESS', {
       request_id: requestId,
       party_id: externalInstitutionId,

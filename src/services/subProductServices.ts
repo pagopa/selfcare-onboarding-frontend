@@ -33,10 +33,10 @@ const fetchUserParties = async (
     () => setRequiredLogin(true)
   );
 
-  const outcome = getFetchOutcome(searchResponse);
+  const responseOutcome = getFetchOutcome(searchResponse);
   const parties = (searchResponse as AxiosResponse).data as Array<SelfcareParty>;
 
-  if (outcome === 'success') {
+  if (responseOutcome === 'success') {
     options?.onSuccess?.(parties);
 
     if (parties.length > 0) {

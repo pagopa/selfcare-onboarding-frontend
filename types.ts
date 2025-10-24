@@ -298,3 +298,5 @@ export type FileErrorAttempt = {
   fileLastModifyDate: number;
   errorCount: number;
 };
+
+export type OutcomeType = 'NOT_ALLOWED' | 'ALREADY_ONBOARDED' | 'GENERIC_ERROR' | null;

@@ -944,6 +944,7 @@ export default function PersonalAndBillingDataSection({
                 InputProps={{
                   inputComponent: NumberDecimalFormat,
                 }}
+                helperText={t('onboardingFormData.billingDataSection.informationCompanies.shareCapitalHelper')}
               />
             </Grid>
           </>
