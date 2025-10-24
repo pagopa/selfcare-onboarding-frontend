@@ -743,6 +743,7 @@ export default {
         shareCapital: 'Capitale sociale (facoltativo)',
         requiredCommercialRegisterNumber: 'Luogo di iscrizione al Registro delle Imprese',
         requiredShareCapital: 'Capitale sociale',
+        shareCapitalHelper: 'Da compilare solo per le società di capitali',
       },
       assistanceContact: {
         supportEmail: 'Indirizzo email visibile ai cittadini',
