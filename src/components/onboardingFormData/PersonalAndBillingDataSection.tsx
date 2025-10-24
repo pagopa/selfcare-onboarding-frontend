@@ -944,6 +944,13 @@ export default function PersonalAndBillingDataSection({
                 InputProps={{
                   inputComponent: NumberDecimalFormat,
                 }}
+                helperText={
+                  productId === PRODUCT_IDS.IDPAY_MERCHANT
+                    ? t(
+                        'onboardingFormData.billingDataSection.informationCompanies.shareCapitalHelper'
+                      )
+                    : undefined
+                }
               />
             </Grid>
           </>
