@@ -363,7 +363,7 @@ export default function PersonalAndBillingDataSection({
                 controllers.isContractingAuthority ||
                 controllers.isInsuranceCompany ||
                 (controllers.isInformationCompany && onboardingFormData?.businessName) ||
-                (institutionType === 'PRV' && productId !== PRODUCT_IDS.PAGOPA)
+                ((institutionType === 'PRV' || institutionType === 'PRV_PF') && productId !== PRODUCT_IDS.PAGOPA)
               }
             />
           </Grid>
@@ -594,7 +594,7 @@ export default function PersonalAndBillingDataSection({
               controllers.isContractingAuthority ||
               controllers.isInsuranceCompany ||
               (controllers.isInformationCompany && onboardingFormData?.digitalAddress) ||
-              (institutionType === 'PRV' && productId !== PRODUCT_IDS.PAGOPA)
+              ((institutionType === 'PRV' || institutionType === 'PRV_PF') && productId !== PRODUCT_IDS.PAGOPA)
             }
           />
         </Grid>
@@ -619,7 +619,7 @@ export default function PersonalAndBillingDataSection({
                 controllers.isContractingAuthority ||
                 controllers.isInsuranceCompany ||
                 (controllers.isInformationCompany && onboardingFormData?.taxCode) ||
-                (institutionType === 'PRV' && productId !== PRODUCT_IDS.PAGOPA)
+                ((  institutionType === 'PRV' || institutionType === 'PRV_PF') && productId !== PRODUCT_IDS.PAGOPA)
               }
               inputProps={{
                 maxLength: 11,

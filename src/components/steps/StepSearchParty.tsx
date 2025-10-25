@@ -483,7 +483,8 @@ export function StepSearchParty({
         {institutionType !== 'SA' &&
           institutionType !== 'AS' &&
           institutionType !== 'SCP' &&
-          institutionType !== 'PRV' && (
+          institutionType !== 'PRV' &&
+          institutionType !== 'PRV_PF' && (
             <Grid container item justifyContent="center">
               <Grid item xs={6}>
                 <Box
