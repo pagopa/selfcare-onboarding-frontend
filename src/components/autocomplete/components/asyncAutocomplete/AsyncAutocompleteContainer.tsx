@@ -161,6 +161,13 @@ export default function AsyncAutocompleteContainer({
     }
   }, [input]);
 
+  useEffect(() => {
+    if (!input || (input.length === 0 && product?.id === PRODUCT_IDS.IDPAY_MERCHANT)) {
+      setIsPresentInAtecoWhiteList?.(true);
+      setDisabled(true);
+    }
+  }, [input]);
+
   const handleSearchByName = useCallback(
     async (query: string, endpoint: Endpoint, limit?: number, categories?: string) => {
       setApiLoading?.(true);
@@ -255,30 +262,12 @@ export default function AsyncAutocompleteContainer({
   };
 
   const formatReaCode = (input: string): string => {
-    // eslint-disable-next-line functional/no-let
-    let cleaned = input.replace(/[^A-Za-z0-9-]/g, '');
-
-    cleaned = cleaned.replace(/-/g, '');
-
-    const letters = cleaned
-      .substring(0, 2)
+    const letters = input
       .replace(/[^A-Za-z]/g, '')
+      .slice(0, 2)
       .toUpperCase();
-
-    const numbers = cleaned
-      .substring(letters.length)
-      .replace(/[^0-9]/g, '')
-      .substring(0, 6);
-
-    if (letters.length === 0) {
-      return letters;
-    } else if (letters.length < 2) {
-      return letters;
-    } else if (numbers.length === 0) {
-      return letters;
-    } else {
-      return letters + '-' + numbers;
-    }
+    const numbers = input.replace(/[^0-9]/g, '').slice(0, 6);
+    return letters.length < 2 || !numbers ? letters : `${letters}-${numbers}`;
   };
 
   const getSearchEndpoint = (
@@ -456,6 +445,8 @@ export default function AsyncAutocompleteContainer({
           setAooResult={setAooResult}
           setUoResult={setUoResult}
           setMerchantSearchResult={setMerchantSearchResult}
+          setIsPresentInAtecoWhiteList={setIsPresentInAtecoWhiteList}
+          setDisabled={setDisabled}
           externalInstitutionId={externalInstitutionId}
           addUser={addUser}
         />
