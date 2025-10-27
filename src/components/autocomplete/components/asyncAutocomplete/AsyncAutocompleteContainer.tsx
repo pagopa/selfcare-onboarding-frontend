@@ -132,7 +132,7 @@ export default function AsyncAutocompleteContainer({
     (selections.personalTaxCode && input.length === 16) ||
     (selections.aooCode && input.length === 7) ||
     (selections.uoCode && input.length === 6) ||
-    (selections.reaCode && input.length > 1);
+    (selections.reaCode && input.length >= 4);
 
   useEffect(() => setDisabled(!selected), [selected]);
 
@@ -254,6 +254,33 @@ export default function AsyncAutocompleteContainer({
       .replace(/''|""|--|__|,,|\.\./g, (match) => match[0]);
   };
 
+  const formatReaCode = (input: string): string => {
+    // eslint-disable-next-line functional/no-let
+    let cleaned = input.replace(/[^A-Za-z0-9-]/g, '');
+
+    cleaned = cleaned.replace(/-/g, '');
+
+    const letters = cleaned
+      .substring(0, 2)
+      .replace(/[^A-Za-z]/g, '')
+      .toUpperCase();
+
+    const numbers = cleaned
+      .substring(letters.length)
+      .replace(/[^0-9]/g, '')
+      .substring(0, 6);
+
+    if (letters.length === 0) {
+      return letters;
+    } else if (letters.length < 2) {
+      return letters;
+    } else if (numbers.length === 0) {
+      return letters;
+    } else {
+      return letters + '-' + numbers;
+    }
+  };
+
   const getSearchEndpoint = (
     addUser: boolean,
     institutionType: string | undefined,
@@ -360,7 +387,7 @@ export default function AsyncAutocompleteContainer({
       );
     }
 
-    if (selections.reaCode && value.length > 1) {
+    if (selections.reaCode && value.length >= 4) {
       const endpoint = addUser
         ? 'ONBOARDING_GET_INSTITUTIONS'
         : 'ONBOARDING_GET_VISURA_INFOCAMERE_BY_REA';
@@ -386,7 +413,10 @@ export default function AsyncAutocompleteContainer({
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const typedInput = event.target.value;
-    const cleanValue = removeSpecialCharacters(typedInput);
+
+    const cleanValue = selections.reaCode
+      ? formatReaCode(typedInput)
+      : removeSpecialCharacters(typedInput);
 
     setInput(cleanValue);
     setSelected(null);
