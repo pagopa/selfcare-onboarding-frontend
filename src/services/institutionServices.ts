@@ -217,7 +217,7 @@ export const handleSearchByReaCode = async (
       setMerchantSearchResult?.(response);
       if (disabledStatusCompany) {
         setDisabled(true);
-      } else if (filterCategories && response.atecoCodes && Array.isArray(response.atecoCodes)) {
+      } else if (filterCategories && response?.atecoCodes && Array.isArray(response.atecoCodes)) {
         const whitelistCodes = filterCategories.split(',');
         const hasMatchingCode = response.atecoCodes.some((code: string) =>
           whitelistCodes.includes(code)
