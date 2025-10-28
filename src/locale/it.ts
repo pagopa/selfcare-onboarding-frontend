@@ -741,7 +741,7 @@ export default {
         requiredRea: 'REA',
         rea: 'REA (facoltativo)',
         shareCapital: 'Capitale sociale (facoltativo)',
-        requiredCommercialRegisterNumber: 'Luogo di iscrizione al Registro delle Imprese',
+        requiredCommercialRegisterNumber: 'Luogo di iscrizione al Registro delle Imprese (obbligatorio)',
         requiredShareCapital: 'Capitale sociale',
         shareCapitalHelper: 'Da compilare solo per le società di capitali',
       },
