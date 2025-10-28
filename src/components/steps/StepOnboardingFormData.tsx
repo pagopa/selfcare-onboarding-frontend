@@ -405,25 +405,30 @@ export default function StepOnboardingFormData({
   }, [formik.values.recipientCode]);
 
   useEffect(() => {
-    if (typeof formik.values.city !== 'undefined' && origin !== 'IPA') {
-      const loadCountries = async () => {
+    if (formik.values.city && !formik.values.country && origin !== 'IPA') {
+      const loadCountryForCity = async () => {
         try {
-          void getCountriesFromGeotaxonomies(
+          await getCountriesFromGeotaxonomies(
             formik.values.city ?? '',
             setCountries,
             setRequiredLogin
           );
         } catch (error) {
-          console.error('Failed to load countries:', error);
+          console.error('Failed to load country for city:', error);
         }
       };
-      void loadCountries();
+      void loadCountryForCity();
     }
-  }, []);
+  }, [formik.values.city]);
 
   useEffect(() => {
-    if (countries && countries.length > 0 && origin !== 'IPA' && !formik.values.istatCode) {
-      void formik.setFieldValue('istatCode', countries[0].istat_code);
+    if (countries && countries.length > 0 && origin !== 'IPA') {
+      if (!formik.values.istatCode) {
+        void formik.setFieldValue('istatCode', countries[0].istat_code);
+      }
+      if (!formik.values.country) {
+        void formik.setFieldValue('country', countries[0].country);
+      }
     }
   }, [countries]);
 
