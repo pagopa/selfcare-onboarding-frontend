@@ -23,7 +23,9 @@ CONFIG.URL_FE.LOGIN = `${ENV.URL_FE.LOGIN}`;
 // eslint-disable-next-line functional/immutable-data
 CONFIG.URL_FE.LOGOUT = ENV.URL_FE.LOGOUT;
 // eslint-disable-next-line functional/immutable-data
-CONFIG.URL_FE.ASSISTANCE = ENV.URL_FE.ASSISTANCE;
+CONFIG.URL_FE.ASSISTANCE = window.location.pathname?.includes('prod-idpay-merchant')
+  ? `${ENV.URL_FE.ASSISTANCE}?productId=prod-idpay-merchant`
+  : ENV.URL_FE.ASSISTANCE;
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 root.render(
