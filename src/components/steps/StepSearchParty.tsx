@@ -220,7 +220,9 @@ export function StepSearchParty({
   const onForwardAction = () => {
     const dataParty = aooResult || uoResult ? ({ ...selected, ...ecData } as PartyData) : selected;
     const actualInstitutionType =
-      product?.id === PRODUCT_IDS.IDPAY_MERCHANT && selections.personalTaxCode
+      product?.id === PRODUCT_IDS.IDPAY_MERCHANT &&
+      (selections.personalTaxCode ||
+        (selections.reaCode && dataParty?.businessTaxId && dataParty.businessTaxId.length > 11))
         ? 'PRV_PF'
         : institutionType;
     setSelectedHistory(selected);
