@@ -69,7 +69,7 @@ type Props = {
   setDisabled: Dispatch<SetStateAction<boolean>>;
   addUser: boolean;
   selectedProduct?: Product;
-  filterCategories?: string;
+  filterCategories?: string | { atecoCodes: string; allowedInstitutions: string };
   setIsPresentInAtecoWhiteList?: Dispatch<SetStateAction<boolean>>;
   setMerchantSearchResult?: Dispatch<SetStateAction<PartyData | undefined>>;
   setApiLoading?: Dispatch<SetStateAction<boolean>>;
@@ -248,7 +248,7 @@ export default function AsyncAutocompleteContainer({
         });
         break;
       default:
-        void debouncedSearchByName(value, endpoint, ENV.MAX_INSTITUTIONS_FETCH, filterCategories);
+        void debouncedSearchByName(value, endpoint, ENV.MAX_INSTITUTIONS_FETCH, filterCategories as string);
     }
   };
   const removeSpecialCharacters = (input: string): string => {
@@ -357,7 +357,7 @@ export default function AsyncAutocompleteContainer({
         addUser,
         endpoint,
         params,
-        filterCategories
+        filterCategories as string
       );
     }
 
@@ -372,7 +372,7 @@ export default function AsyncAutocompleteContainer({
         addUser,
         endpoint,
         params,
-        filterCategories
+        filterCategories as string
       );
     }
 
