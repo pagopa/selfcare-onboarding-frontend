@@ -21,28 +21,23 @@ const validateIdpayMerchantInstitution = (
   const allowedInstitutions =
     config.product['prod-idpay-merchant']?.merchantDetails?.allowedInstitution.split(',') || [];
 
-  // Priorità 1: Se è disabilitato per status, blocca SEMPRE (nessun override possibile)
   if (disabledStatusCompany) {
     setDisabled(true);
     setIsPresentInAtecoWhiteList?.(false);
   }
-  // Priorità 2: Verifica se il CF è in whitelist
   else if (
     response?.businessTaxId &&
     allowedInstitutions.length > 0 &&
     allowedInstitutions.includes(response.businessTaxId)
   ) {
-    console.log('Institution allowed by CF whitelist');
     setIsPresentInAtecoWhiteList?.(true);
     setDisabled(false);
   }
-  // Priorità 3: Verifica ATECO whitelist
   else if (
     (filterCategories as { atecoCodes: string; allowedInstitutions: string })?.atecoCodes &&
     response?.atecoCodes &&
     Array.isArray(response.atecoCodes)
   ) {
-    // Validazione whitelist ATECO
     const whitelistCodes =
       (filterCategories as { atecoCodes: string; allowedInstitutions: string })?.atecoCodes.split(
         ','
@@ -53,7 +48,6 @@ const validateIdpayMerchantInstitution = (
     setIsPresentInAtecoWhiteList?.(hasMatchingCode);
     setDisabled(!hasMatchingCode);
   }
-  // Priorità 4: Nessuna condizione soddisfatta, blocca
   else {
     setIsPresentInAtecoWhiteList?.(false);
     setDisabled(true);
@@ -188,9 +182,7 @@ export const fetchInstitutionByTaxCode = async (
     const response = (searchResponse as AxiosResponse).data;
     setCfResult(response);
 
-    // Logica specifica per IDPAY_MERCHANT
     if (productId === 'prod-idpay-merchant') {
-      console.log('filterCategories', filterCategories);
       validateIdpayMerchantInstitution(
         response,
         disabledStatusCompany,
@@ -299,7 +291,6 @@ export const handleSearchByAooCode = async (
   if (addUser) {
     updatedParams = params;
   } else {
-    // Se productId è specificato, usa logica condizionale (per StepSearchParty)
     if (productId !== undefined) {
       updatedParams =
         productId === PRODUCT_IDS.SEND
@@ -309,7 +300,6 @@ export const handleSearchByAooCode = async (
             }
           : {};
     } else {
-      // Logica default per retrocompatibilità (per AsyncAutocompleteContainer)
       updatedParams = {
         origin: 'IPA',
         categories: filterCategories,

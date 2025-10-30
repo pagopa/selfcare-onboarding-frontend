@@ -246,7 +246,6 @@ export const getFilterCategories = async (
 ) => {
   if (productId === PRODUCT_IDS.IDPAY_MERCHANT) {
     setFilterCategoriesResponse(config);
-    console.log('Using local config for IDPAY_MERCHANT:', config);
     return;
   }
 

@@ -69,7 +69,7 @@ type Props = {
   setDisabled: Dispatch<SetStateAction<boolean>>;
   addUser: boolean;
   selectedProduct?: Product;
-  filterCategories?: string | { atecoCodes: string; allowedInstitutions: string } | undefined;
+  filterCategories?: string | { atecoCodes: string; allowedInstitutions: string };
   setIsPresentInAtecoWhiteList?: Dispatch<SetStateAction<boolean>>;
   setMerchantSearchResult?: Dispatch<SetStateAction<PartyData | undefined>>;
   setApiLoading?: Dispatch<SetStateAction<boolean>>;
