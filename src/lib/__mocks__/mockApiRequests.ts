@@ -768,7 +768,7 @@ const mockedOnboardingData: Array<InstitutionOnboardingInfoResource> = [
         digitalAddress: 'comune.milano@pec.it',
         taxCode: '33445673222',
         vatNumber: '33445673221',
-        recipientCode: 'M5UXCR1',
+        // recipientCode: 'M5UXCR1',
         geographicTaxonomies: [
           {
             code: '058091',

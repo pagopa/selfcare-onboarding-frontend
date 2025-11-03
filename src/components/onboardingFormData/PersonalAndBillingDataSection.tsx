@@ -780,7 +780,7 @@ export default function PersonalAndBillingDataSection({
                 </Typography>
               </Box>
             )}
-            {controllers.isInvoiceable && (
+            {controllers.isInvoiceable && productId !== PRODUCT_IDS.IO && (
               <Grid item xs={12} mt={3}>
                 <CustomTextFieldNotched
                   paddingValue={institutionType === 'PA' || controllers.isAooUo ? '8px' : '0'}
