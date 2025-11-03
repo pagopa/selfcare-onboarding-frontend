@@ -160,7 +160,8 @@ export const stepFormData = async (
     isFromIpa &&
     product !== PRODUCT_IDS_TEST_E2E.INTEROP &&
     product !== PRODUCT_IDS_TEST_E2E.IDPAY_MERCHANT &&
-    actualInstitutionType !== 'SCP'
+    actualInstitutionType !== 'SCP' &&
+    product !== PRODUCT_IDS_TEST_E2E.IO
   ) {
     await page.click('#recipientCode');
     await page.fill('#recipientCode', product === PRODUCT_IDS_TEST_E2E.SEND ? 'UFBM8M' : 'UFOR71', {

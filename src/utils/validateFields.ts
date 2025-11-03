@@ -155,9 +155,10 @@ const validateRecipientCode = (
   recipientCode: string | undefined,
   isInvoiceable: boolean,
   recipientCodeStatus: string | undefined,
-  t: TFunction
+  t: TFunction,
+  productId: string | undefined
 ) => {
-  if (!isInvoiceable) {
+  if (!isInvoiceable || productId === PRODUCT_IDS.IO) {
     return undefined;
   }
 
@@ -303,7 +304,8 @@ export const validateFields = (
       values.recipientCode,
       isInvoiceable,
       recipientCodeStatus,
-      t
+      t,
+      productId
     ),
     geographicTaxonomies: validateGeographicTaxonomies(values, isPremium, institutionAvoidGeotax),
     supportEmail:

@@ -497,20 +497,21 @@ export const billingData2billingDataRequest = (
           : '87654321098'
       : undefined,
 
-    recipientCode: isPrivateMerchant
-      ? undefined
-      : errorOnSubmit
-        ? 'A2B3C4'
-        : institutionType === 'PSP'
-          ? 'A1B2C3'
-          : (from === 'IPA' ||
-                institutionType === 'GSP' ||
-                (from === 'NO_IPA' && institutionType === 'GPU')) &&
-              typeOfSearch !== 'aooCode'
-            ? typeOfSearch === 'taxCode'
-              ? 'A3B4C5'
-              : 'A1B2C3'
-            : undefined,
+    recipientCode:
+      isPrivateMerchant || productId === PRODUCT_IDS.IO
+        ? undefined
+        : errorOnSubmit
+          ? 'A2B3C4'
+          : institutionType === 'PSP'
+            ? 'A1B2C3'
+            : (from === 'IPA' ||
+                  institutionType === 'GSP' ||
+                  (from === 'NO_IPA' && institutionType === 'GPU')) &&
+                typeOfSearch !== 'aooCode'
+              ? typeOfSearch === 'taxCode'
+                ? 'A3B4C5'
+                : 'A1B2C3'
+              : undefined,
     legalForm:
       isPrivateMerchant && typeOfSearch === 'personalTaxCode'
         ? mockedPdndVisuraInfomacere[5].legalForm
@@ -536,7 +537,10 @@ export const verifySubmit = async (
   const isPrivateMerchant =
     (institutionType === 'PRV' || institutionType === 'PRV_PF') &&
     productId === PRODUCT_IDS.IDPAY_MERCHANT;
-  const SfeAvailable = (uo || institutionType === 'PA') && canInvoice(institutionType, productId);
+  const SfeAvailable =
+    (uo || institutionType === 'PA') &&
+    canInvoice(institutionType, productId) &&
+    productId !== PRODUCT_IDS.IO;
 
   // eslint-disable-next-line functional/immutable-data
   const lastCall = fetchWithLogsSpy.mock.calls.pop();
@@ -817,9 +821,9 @@ const billingData2billingDataRequestIoPremium = () => ({
   digitalAddress: 'comune.milano@pec.it',
   zipCode: '20021',
   taxCode: '33445673222',
-  taxCodeInvoicing: '87654321098',
+  // taxCodeInvoicing: '87654321098',
   vatNumber: undefined,
-  recipientCode: 'A1B2C3',
+  // recipientCode: 'A1B2C3',
 });
 
 const billingData2billingDataRequestPspDashboard = () => ({
@@ -1299,6 +1303,7 @@ export const fillUserBillingDataForm = async (
 
   if (
     !isPrivateMerchant &&
+    productId !== PRODUCT_IDS.IO &&
     ((institutionType === 'PA' && !isAoo) || institutionType === 'GSP' || institutionType === 'PSP')
   ) {
     fireEvent.change(document.getElementById(recipientCode) as HTMLElement, {

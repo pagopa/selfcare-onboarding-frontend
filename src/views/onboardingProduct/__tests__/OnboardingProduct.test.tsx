@@ -1187,7 +1187,7 @@ const executeStepBillingData = async (
           ? '998877665544'
           : '87654321098';
 
-    if (isInvoicable) {
+    if (isInvoicable && productId !== PRODUCT_IDS.IO) {
       fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
         target: { value: recipientCodeInput },
       });
