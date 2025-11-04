@@ -741,8 +741,9 @@ export default {
         requiredRea: 'REA',
         rea: 'REA (facoltativo)',
         shareCapital: 'Capitale sociale (facoltativo)',
-        requiredCommercialRegisterNumber: 'Luogo di iscrizione al Registro delle Imprese',
+        requiredCommercialRegisterNumber: 'Luogo di iscrizione al Registro delle Imprese (obbligatorio)',
         requiredShareCapital: 'Capitale sociale',
+        shareCapitalHelper: 'Da compilare solo per le società di capitali',
       },
       assistanceContact: {
         supportEmail: 'Indirizzo email visibile ai cittadini',
@@ -788,6 +789,7 @@ export default {
     },
     ibanSection: {
       title: 'INSERISCI IBAN PER RICEVERE I RIMBORSI',
+      subTitle: 'Per far sì che il bonifico vada a buon fine, assicurati che <1> l’IBAN coincida con quanto riportato sugli estremi del tuo conto. </1>',
       holder: 'Intestatario',
       iban: 'IBAN',
       confirmIban: 'Conferma IBAN',

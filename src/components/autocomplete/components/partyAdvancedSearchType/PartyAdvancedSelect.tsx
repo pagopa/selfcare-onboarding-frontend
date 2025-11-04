@@ -25,8 +25,11 @@ type Props = {
   institutionType?: InstitutionType;
   addUser: boolean;
   selectedProduct?: Product;
+  setIsPresentInAtecoWhiteList?: Dispatch<SetStateAction<boolean>>;
+  setMerchantSearchResult?: Dispatch<SetStateAction<any>>;
 };
 
+// eslint-disable-next-line complexity
 export default function PartyAdvancedSelect({
   selections,
   setSelected,
@@ -43,6 +46,8 @@ export default function PartyAdvancedSelect({
   institutionType,
   addUser,
   selectedProduct,
+  setIsPresentInAtecoWhiteList,
+  setMerchantSearchResult,
 }: Props) {
   const { t } = useTranslation();
 
@@ -60,13 +65,15 @@ export default function PartyAdvancedSelect({
     setUoResult(undefined);
     setUoResultHistory(undefined);
     setAooResultHistory(undefined);
+    setIsPresentInAtecoWhiteList?.(true);
+    setMerchantSearchResult?.(undefined);
   };
 
   useEffect(() => {
     if (
       addUser ||
       ((product?.id === PRODUCT_IDS.INTEROP || product?.id === PRODUCT_IDS.IDPAY_MERCHANT) &&
-        (institutionType === 'SCP' || institutionType === 'PRV'))
+        (institutionType === 'SCP' || institutionType === 'PRV' || institutionType === 'PRV_PF'))
     ) {
       onSelectValue(SelectionEnum.taxCode);
       // setTypeOfSearch(SelectionEnum.taxCode);
@@ -84,20 +91,25 @@ export default function PartyAdvancedSelect({
       setTypeOfSearch(selectedKey);
       setInput('');
       setSelected(null);
+      setIsPresentInAtecoWhiteList?.(true);
+      setMerchantSearchResult?.(undefined);
     }
   }, [selections]);
 
   const menuItems = [
-    !addUser && institutionType !== 'SCP' && institutionType !== 'PRV' && (
-      <MenuItem
-        key="businessName"
-        id="businessName"
-        data-testid="businessName"
-        value={SelectionEnum.businessName}
-      >
-        {t('partyAdvancedSelect.businessName')}
-      </MenuItem>
-    ),
+    !addUser &&
+      institutionType !== 'SCP' &&
+      institutionType !== 'PRV' &&
+      institutionType !== 'PRV_PF' && (
+        <MenuItem
+          key="businessName"
+          id="businessName"
+          data-testid="businessName"
+          value={SelectionEnum.businessName}
+        >
+          {t('partyAdvancedSelect.businessName')}
+        </MenuItem>
+      ),
     institutionType === 'AS' ? (
       <MenuItem
         key="ivassCode"
@@ -112,7 +124,7 @@ export default function PartyAdvancedSelect({
         {t('partyAdvancedSelect.taxCode')}
       </MenuItem>
     ),
-    institutionType === 'PRV' &&
+    (institutionType === 'PRV' || institutionType === 'PRV_PF') &&
       product?.id === PRODUCT_IDS.IDPAY_MERCHANT && [
         <MenuItem key="reaCode" id="reaCode" data-testid="reaCode" value={SelectionEnum.reaCode}>
           {t('partyAdvancedSelect.reaCode')}
@@ -132,6 +144,7 @@ export default function PartyAdvancedSelect({
       institutionType !== 'GSP' &&
       institutionType !== 'SCP' &&
       institutionType !== 'PRV' &&
+      institutionType !== 'PRV_PF' &&
       institutionType !== 'SCEC' &&
       [PRODUCT_IDS.INTEROP, PRODUCT_IDS.IO_SIGN, PRODUCT_IDS.SEND_DEV, PRODUCT_IDS.SEND].includes(
         product?.id ?? ''

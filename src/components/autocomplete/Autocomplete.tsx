@@ -131,6 +131,8 @@ export function Autocomplete({
               product={product}
               institutionType={institutionType}
               selectedProduct={selectedProduct}
+              setIsPresentInAtecoWhiteList={setIsPresentInAtecoWhiteList}
+              setMerchantSearchResult={setMerchantSearchResult}
             />
           </Grid>
         )}

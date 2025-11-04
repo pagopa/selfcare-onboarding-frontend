@@ -10,6 +10,55 @@ import { logAction, logError } from './action-log';
 // Utility to wait some time
 export const sleep = async (ms: number) => await new Promise((resolve) => setTimeout(resolve, ms));
 
+// axios interceptor to always recuse the http status in error responses
+axios.interceptors.response.use(
+
+  (response) => response,
+
+  (error: AxiosError) => {
+
+    const isNetworkError = !error.response && (
+      error.code === 'ECONNABORTED' ||
+      error.code === 'ERR_NETWORK' ||
+      error.code === 'ERR_CANCELED' ||
+      error.message?.includes('Network Error') ||
+      error.message?.includes('timeout') ||
+      error.message?.includes('CORS')
+    );
+
+    if (isNetworkError) {
+      // Network error: status not available
+      console.warn('⚠️ NETWORK_ERROR: Status code unavailable (not FE fault)', {
+        errorCode: error.code,
+        errorMessage: error.message,
+        url: error.config?.url,
+        method: error.config?.method,
+      });
+    } else if (error.response) {
+      // HTTP error: status MUST be available
+      if (error.response.status === undefined || error.response.status === null) {
+        console.error('❌ CRITICAL: HTTP error without status code (FE configuration issue)', {
+          error,
+          url: error.config?.url,
+          method: error.config?.method,
+          hasResponse: !!error.response,
+          responseData: error.response?.data,
+        });
+      }
+    } else {
+      console.error('❌ UNKNOWN_ERROR: Error without response and without network error code', {
+        error,
+        errorCode: error.code,
+        errorMessage: error.message,
+        url: error.config?.url,
+      });
+    }
+
+    return Promise.reject(error);
+  }
+);
+
+
 function prepareRequest(
   { endpoint, endpointParams }: Endpoint,
   { method, params, data, headers }: AxiosRequestConfig
