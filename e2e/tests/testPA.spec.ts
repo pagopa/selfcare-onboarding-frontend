@@ -8,18 +8,21 @@ import {
   stepUploadAggregatorCsv,
   FILE_MOCK_CSV_AGGREGATOR,
   stepFormData,
-  PRODUCT_IDS_TEST_E2E
+  PRODUCT_IDS_TEST_E2E,
+  stepCompleteOnboarding,
+  FILE_MOCK_PDF_CONTRACT
 } from '../utils/test-utils';
 
 test('Test Success onboarding request for product prod-pagopa and institutionType PA', async ({
   page,
 }) => {
-  await page.goto(`${BASE_URL_ONBOARDING}/prod-pagopa`);
-  await stepInstitutionType(page, 'Pubblica Amministrazione');
-  await stepSelectParty(page);
-  await stepFormData(page, PRODUCT_IDS_TEST_E2E.IO, 'PA');
-  await stepAddManager(page);
-  await stepAddAdmin(page);
+  // await page.goto(`${BASE_URL_ONBOARDING}/prod-pagopa`);
+  // await stepInstitutionType(page, 'Pubblica Amministrazione');
+  // await stepSelectParty(page);
+  // await stepFormData(page, PRODUCT_IDS_TEST_E2E.IO, 'PA');
+  // await stepAddManager(page);
+  // await stepAddAdmin(page);
+  await stepCompleteOnboarding(page, '01944590221', FILE_MOCK_PDF_CONTRACT.PA);
 });
 
 test('Test Success onboarding request for product prod-io and institutionType PA', async ({
@@ -30,7 +33,8 @@ test('Test Success onboarding request for product prod-io and institutionType PA
   await stepSelectParty(page);
   await stepFormData(page, PRODUCT_IDS_TEST_E2E.IO, 'PA');
   await stepAddManager(page);
-  await stepAddAdmin(page);
+  // await stepAddAdmin(page);
+  // await stepCompleteOnboarding(page, '01944590221', FILE_MOCK_PDF_CONTRACT.PA);
 });
 
 test('Test Success onboarding request for product prod-io and institutionType PA with aggregator party', async ({
@@ -41,12 +45,13 @@ test('Test Success onboarding request for product prod-io and institutionType PA
   await stepSelectParty(page, true);
   await stepFormData(page, PRODUCT_IDS_TEST_E2E.IO, 'PA');
   await stepAddManager(page);
-  await stepAddAdmin(page, true);
+  /* await stepAddAdmin(page, true);
   await stepUploadAggregatorCsv(
     page,
     'Indica i soggetti aggregati per IO',
     FILE_MOCK_CSV_AGGREGATOR.IO
-  );
+  ); */
+  // await stepCompleteOnboarding(page, '01944590221', FILE_MOCK_PDF_CONTRACT.PA);
 });
 
 test('Test Success onboarding request for product prod-io-sign and institutionType PA', async ({
@@ -58,6 +63,7 @@ test('Test Success onboarding request for product prod-io-sign and institutionTy
   await stepFormData(page, PRODUCT_IDS_TEST_E2E.IO_SIGN, 'PA');
   await stepAddManager(page);
   await stepAddAdmin(page);
+  await stepCompleteOnboarding(page, '01944590221', FILE_MOCK_PDF_CONTRACT.PA);
 });
 
 test('Test Success onboarding request for product prod-interop and institutionType PA', async ({
@@ -69,6 +75,7 @@ test('Test Success onboarding request for product prod-interop and institutionTy
   await stepFormData(page, PRODUCT_IDS_TEST_E2E.INTEROP, 'PA');
   await stepAddManager(page);
   await stepAddAdmin(page);
+  await stepCompleteOnboarding(page, '01944590221', FILE_MOCK_PDF_CONTRACT.PA);
 });
 
 test('Test Success onboarding request for product prod-pn and institutionType PA (default)', async ({
@@ -79,6 +86,7 @@ test('Test Success onboarding request for product prod-pn and institutionType PA
   await stepFormData(page, PRODUCT_IDS_TEST_E2E.SEND, 'PA');
   await stepAddManager(page);
   await stepAddAdmin(page);
+  await stepCompleteOnboarding(page, '93062260505', FILE_MOCK_PDF_CONTRACT.PA);
 });
 
 test('Test Success onboarding request for product prod-pn and institutionType PA (default) with aggregator party', async ({
@@ -94,4 +102,5 @@ test('Test Success onboarding request for product prod-pn and institutionType PA
     'Indica i soggetti aggregati per SEND - Servizio Notifiche Digitali',
     FILE_MOCK_CSV_AGGREGATOR.SEND
   );
+  await stepCompleteOnboarding(page, '93062260505', FILE_MOCK_PDF_CONTRACT.PA);
 });

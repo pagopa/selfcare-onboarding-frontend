@@ -1,44 +1,50 @@
-/* eslint-disable functional/no-let */
-// e2e/utils/api-utils.ts
 import { Page } from '@playwright/test';
-
-const isLocalMode = process.env.REACT_APP_ENV === 'LOCAL_DEV' || process.env.NODE_ENV === 'test';
+import { isLocalMode } from './global.setup';
 
 export const getOnboardingIdByTaxCode = async (page: Page, taxCode: string): Promise<string> => {
-  const apiUrl = process.env.BASE_API_URL;
 
-  if (!apiUrl) {
-    return '';
-  }
-
+  // eslint-disable-next-line functional/no-let
   let token: string;
 
   if (isLocalMode) {
+    console.log('⚠️ Local mode detected');
     token =
-      'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Imp3dF84Njo3NDoxZTozNTphZTphNjpkODo0YjpkYzplOTpmYzo4ZTphMDozNTo2ODpiNSJ9.eyJlbWFpbCI6ImZ1cmlvdml0YWxlQG1hcnRpbm8uaXQiLCJmYW1pbHlfbmFtZSI6IlNhcnRvcmkiLCJmaXNjYWxfbnVtYmVyIjoiU1JUTkxNMDlUMDZHNjM1UyIsIm5hbWUiOiJBbnNlbG1vIiwiZnJvbV9hYSI6ZmFsc2UsInVpZCI6IjUwOTZlNGM2LTI1YTEtNDVkNS05YmRmLTJmYjk3NGE3YzFjOCIsImxldmVsIjoiTDIiLCJpYXQiOjE2NzQ4MTQxODAsImF1ZCI6ImFwaS5kZXYuc2VsZmNhcmUucGFnb3BhLml0IiwiaXNzIjoiU1BJRCIsImp0aSI6IjAxR1FTQjhLSDNCSks4QkFTRDE4MlZKSDhEIn0.JOfxEC3o8Wor0l430Fq68mWVl4h-NUpFlFuSf6Xgxmu-wqeQyUjRKIfl3M9J0H_8ihxyNMEu5u3PqqQBubGx1mjy24uEsoRPFdLQxlGnpMAM-15SFv8ShDWvMaTSz8hO6vCRJxUtNQgX7SplIG7ZlBBSt7ihwioW1CsKWFISuG0tHwe797NWwaMJlRnzW3R7BIrsGU1eJeue2QqYUnKXZIwYQh21E3EssCNFrusATEuJT_opGaTMzSHpUZxI6cCG2pOE8Cmm0Z75Q2HAM2eoi1_Mx8llZvuk1oVhgDGsACpNRb9Vyxt6jAPUEh3DlkGpLqS8AUD1vRQydzNifiSb4A';
+      'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJmaXNjYWxfbnVtYmVyIjoiU1NUTVRUNzZDMjNGMjA1VCIsIm5hbWUiOiJNYXR0aWEiLCJmYW1pbHlfbmFtZSI6IlNpc3RpIiwidWlkIjoiZWUwYmY2ZGEtODE4Ni00YjZkLWJkMjgtYWE4ZTNhOGRiZDc2Iiwic3BpZF9sZXZlbCI6Imh0dHBzOi8vd3d3LnNwaWQuZ292Lml0L1NwaWRMMiIsImlzcyI6IlNQSUQiLCJhdWQiOiJhcGkuZGV2LnNlbGZjYXJlLnBhZ29wYS5pdCIsImlhdCI6MTc2MjI0NjIzNywiZXhwIjoxNzYyMjc4NjM3LCJqdGkiOiIxOWM0NDdkNS04Nzc1LTRhMGUtYjdhNy1iMDFlYWFiZDc1ZDEifQ.ITL8SlGUPPQY2Hy_eKnXz94vnmtB4-BGR5fJeDsvhNqsqg_7-Ic6rBZ2ozGdGAy5xKo2SiG0MAKbKCe6QBYV_fHXJdgtbYiM1TId7M0DXjuQZ1p4LCxbszMU09hgn0KCkgzJOaYfTjxfSRY6pAgWANZ9AQEAwNLrjYvKG0EFgGZQUNptgNoaXDYsa5cu5XJY5-MmHb_bw2zI4LMyHNV9fh9MmWFRZgf7X9Sr6t_CpPwYirdiKQFxaUB5vmJqxwbyx8h3IALWHMykQ73SGociU0BzhqOcEvyhQx3chDKf-IDiJwNxvi5eVjAEFgm5OhLVPTc4Qh8J1dUbqxa0iLXEaQ';
   } else {
     token = (await page.evaluate(() => localStorage.getItem('token'))) || '';
+    console.log('✅ Token from localStorage');
   }
 
-  if (!token) {
+  const apiUrl = 'https://api.dev.selfcare.pagopa.it/onboarding';
+
+  if (!apiUrl) {
+    console.error('❌ apiUrl not set!');
     return '';
   }
 
+  const fullUrl = `${apiUrl}/v2/institutions/onboardings?taxCode=${taxCode}&status=PENDING`;
+
   try {
-    const response = await page.request.get(`${apiUrl}/v2/institutions`, {
+    const response = await fetch(fullUrl, {
       headers: { Authorization: `Bearer ${token}` },
-      params: { taxCode },
     });
 
-    console.log(response.status);
-
     if (!response.ok) {
+      const errorText = await response.text();
+      console.error('❌ Error response:', errorText);
       return '';
     }
 
     const data = await response.json();
-    return data.onboardingId || '';
+
+    if (Array.isArray(data) && data.length > 0) {
+      return data[0].id;
+    }
+
+    console.error('❌ No data in array');
+    return '';
   } catch (error) {
+    console.error('❌ Fetch error:', error);
     return '';
   }
 };

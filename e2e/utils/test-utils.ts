@@ -1,6 +1,7 @@
 import { Page, expect } from '@playwright/test';
 import { InstitutionType } from '../../types';
 import { isLocalMode } from './global.setup';
+import { getOnboardingIdByTaxCode } from './api-utils';
 
 // eslint-disable-next-line functional/no-let
 // let copiedText: string;
@@ -15,6 +16,10 @@ export const FILE_MOCK_CSV_AGGREGATOR = {
   SEND: '../src/lib/__mocks__/mockedFileAggregatorSend.csv',
 };
 
+export const FILE_MOCK_PDF_CONTRACT = {
+  PA: './utils/mocks/mockedContract.pdf',
+};
+
 export const stepInstitutionType = async (page: Page, institutionType: string) => {
   setTimeout(async () => {
     await page.getByRole('radio', { name: institutionType }).click();
@@ -25,7 +30,12 @@ export const stepInstitutionType = async (page: Page, institutionType: string) =
 
 export const stepSelectParty = async (page: Page, aggregator?: boolean, party?: string) => {
   await page.click('#Parties');
-  await page.fill('#Parties', party ? party : 'Istituto di Formazione Professionale Sandro Pertini Servizi alla Persona e del Legno');
+  await page.fill(
+    '#Parties',
+    party
+      ? party
+      : 'Istituto di Formazione Professionale Sandro Pertini Servizi alla Persona e del Legno'
+  );
   setTimeout(async () => {
     await page.click('.MuiBox-root:nth-child(1) > .MuiBox-root > .MuiBox-root');
   }, 1000);
@@ -56,44 +66,6 @@ export const stepSelectPartyByCF = async (
 
   await page.click('[aria-label="Continua"]');
 };
-
-/* export const stepFormDataWithIpaResearch4SDICode = async (
-  page: Page,
-  context: any,
-  product: string
-) => {
-  await page.getByLabel('La Partita IVA coincide con il Codice Fiscale').click();
-  if (product !== PRODUCT_IDS_TEST_E2E.INTEROP) {
-    page.on('dialog', async (dialog) => {
-      console.log(`Dialogo rilevato: ${dialog.message()}`);
-      await dialog.accept();
-    });
-
-    // Opening a new page for IPA sources
-    const newPagePromise = context.waitForEvent('page');
-    await page.evaluate(() => {
-      window.open(
-        'https://indicepa.gov.it/ipa-portale/consultazione/indirizzo-sede/ricerca-ente',
-        '_blank'
-      );
-    });
-    const newPage = await newPagePromise;
-    await newPage.waitForLoadState();
-
-    await researchOnIpa(newPage, partyName);
-    await page.waitForTimeout(500);
-    await page.click('#recipientCode');
-    await page.fill('#recipientCode', copiedText, { timeout: 500 });
-  }
-  if (product === PRODUCT_IDS_TEST_E2E.IO_SIGN) {
-    await page.click('#supportEmail');
-    await page.fill('#supportEmail', 'test@test.it', { timeout: 500 });
-  }
-  await page.getByRole('radio', { name: 'Nazionale' }).waitFor({ timeout: 500 });
-  await page.getByRole('radio', { name: 'Nazionale' }).click();
-  await page.getByRole('button', { name: 'Continua' }).waitFor({ timeout: 500 });
-  await page.getByRole('button', { name: 'Continua' }).click();
-}; */
 
 // eslint-disable-next-line complexity
 export const stepFormData = async (
@@ -350,7 +322,7 @@ export const stepAddAdmin = async (
     await page.click('[aria-label="Continua"]');
   }
 
-  if (institutionType !== 'PT' && !aggregator) {
+  if (institutionType !== 'PT') {
     await page.getByRole('button', { name: 'Conferma' }).waitFor({
       state: 'visible',
       timeout: 2000,
@@ -358,7 +330,7 @@ export const stepAddAdmin = async (
 
     await page.getByRole('button', { name: 'Conferma' }).click();
   }
-  
+
   if (aggregator) {
     return;
   }
@@ -368,43 +340,13 @@ export const stepAddAdmin = async (
       timeout: 15000,
     });
   }
-  
+
   if (institutionType === 'PT') {
     await expect(page.getByText('Richiesta di registrazione inviata')).toBeInViewport({
       timeout: 15000,
     });
   }
 };
-
-/* Function that search and find the first row of the IPA table that contains uniqueCode and
-export const copyUniqueCodeIfSFEIsPresent = async (page: Page) => {
-  const tbody = page.locator('tbody').first();
-  const rows = await tbody.locator('tr').all();
-
-  for (const row of rows) {
-    const cellaCodiceUnivoco = row.locator('td:nth-child(2) div');
-    const cellSfe = row.locator('td:nth-child(4)');
-
-    const codiceUnivocoText = (await cellaCodiceUnivoco.innerText()).trim();
-    const cellSfeText = (await cellSfe.innerText()).trim();
-
-    if (codiceUnivocoText !== '' && cellSfeText !== '') {
-      // save in the costant the value of the unique code
-      const uniqueCodeSelector = `xpath=//table/tbody/tr[${Number(rows.indexOf(row)) + 1}]/td[2]`;
-      const textToCopy = await page.locator(uniqueCodeSelector).innerText();
-      console.log(
-        'Trovata riga con codice univoco e altro valore nella quarta cella. Testo della quarta cella:',
-        textToCopy
-      );
-      // eslint-disable-next-line functional/immutable-data
-      copiedText = textToCopy;
-      // afer we've saved the value in the global "copiedText" we're going to close the page
-      await page.close();
-    }
-  }
-  console.log('Nessuna riga trovata con contenuto sia nella seconda che nella quarta cella.');
-  return '';
-}; */
 
 export const stepUploadAggregatorCsv = async (page: Page, title: string, fileCsv: string) => {
   await expect(page.getByText(title)).toBeInViewport();
@@ -439,24 +381,51 @@ export const stepUploadAggregatorCsv = async (page: Page, title: string, fileCsv
   });
 };
 
-/* Function that copy the recipient code from table of IPA
-export const researchOnIpa = async (newPage: Page, partyName: string) => {
-  await newPage.setViewportSize({ width: 1920, height: 953 });
-  newPage.on('popup', async (popup) => {
-    console.log('Pop-up rilevato!');
-    await popup.close();
-  });
-  newPage.on('dialog', async (dialog) => {
-    console.log(`Dialogo rilevato: ${dialog.message()}`);
-    await dialog.accept();
-  });
-  await newPage.click('#denominazione');
-  await newPage.fill('#denominazione', partyName, { timeout: 1000 });
-  await newPage.click('#bottoneRicerca', { timeout: 1000 });
-  await newPage.getByRole('img', { name: 'Elenco Unità Organizzative' }).waitFor({ timeout: 1000 });
-  await newPage.getByRole('img', { name: 'Elenco Unità Organizzative' }).click();
-  await copyUniqueCodeIfSFEIsPresent(newPage);
-}; */
+export const stepCompleteOnboarding = async (page: Page, taxCode: string, filePdf: string) => {
+  console.log('🔄 Fetching onboardingId...');
+
+  const onboardingId = await getOnboardingIdByTaxCode(page, taxCode);
+
+  if (onboardingId.length > 0) {
+    console.log('✅ OnboardingId retrieved, navigating to confirm page...');
+    await page.goto(`${BASE_URL_ONBOARDING}/confirm?jwt=${onboardingId}`, {
+      timeout: 20000,
+    });
+    console.log('✅ Navigato a pagina di conferma');
+
+    await page.click('[data-testid="DownloadIcon"]', { timeout: 2000 });
+
+    setTimeout(async () => {
+      await page.click('[data-testid="ArrowForwardIcon"]', { timeout: 2000 });
+    }, 2000);
+
+    await page.waitForSelector('#file-uploader', {
+      state: 'attached',
+      timeout: 10000,
+    });
+
+    await page.waitForTimeout(500);
+
+    const fileInput = page.locator('#file-uploader');
+    await expect(fileInput).toBeAttached();
+
+    try {
+      await page.setInputFiles('#file-uploader', filePdf);
+    } catch (error) {
+      console.error('Errore durante il caricamento del file:', error);
+    }
+
+    await page.waitForTimeout(1000);
+
+    await page.getByRole('button', { name: 'Continua' }).click();
+
+    await expect(page.getByText('Adesione completata!')).toBeInViewport({
+      timeout: 10000,
+    });
+  } else {
+    console.error('❌ OnboardingId non trovato, impossibile procedere');
+  }
+};
 
 export const PRODUCT_IDS_TEST_E2E = {
   PAGOPA: 'prod-pagopa',
@@ -474,3 +443,90 @@ export const PRODUCT_IDS_TEST_E2E = {
   CGN: 'prod-cgn',
   IDPAY_MERCHANT: 'prod-idpay-merchant',
 };
+
+/* export const stepFormDataWithIpaResearch4SDICode = async (
+  page: Page,
+  context: any,
+  product: string
+) => {
+  await page.getByLabel('La Partita IVA coincide con il Codice Fiscale').click();
+  if (product !== PRODUCT_IDS_TEST_E2E.INTEROP) {
+    page.on('dialog', async (dialog) => {
+      console.log(`Dialogo rilevato: ${dialog.message()}`);
+      await dialog.accept();
+    });
+
+    // Opening a new page for IPA sources
+    const newPagePromise = context.waitForEvent('page');
+    await page.evaluate(() => {
+      window.open(
+        'https://indicepa.gov.it/ipa-portale/consultazione/indirizzo-sede/ricerca-ente',
+        '_blank'
+      );
+    });
+    const newPage = await newPagePromise;
+    await newPage.waitForLoadState();
+
+    await researchOnIpa(newPage, partyName);
+    await page.waitForTimeout(500);
+    await page.click('#recipientCode');
+    await page.fill('#recipientCode', copiedText, { timeout: 500 });
+  }
+  if (product === PRODUCT_IDS_TEST_E2E.IO_SIGN) {
+    await page.click('#supportEmail');
+    await page.fill('#supportEmail', 'test@test.it', { timeout: 500 });
+  }
+  await page.getByRole('radio', { name: 'Nazionale' }).waitFor({ timeout: 500 });
+  await page.getByRole('radio', { name: 'Nazionale' }).click();
+  await page.getByRole('button', { name: 'Continua' }).waitFor({ timeout: 500 });
+  await page.getByRole('button', { name: 'Continua' }).click();
+}; 
+
+Function that search and find the first row of the IPA table that contains uniqueCode and
+export const copyUniqueCodeIfSFEIsPresent = async (page: Page) => {
+  const tbody = page.locator('tbody').first();
+  const rows = await tbody.locator('tr').all();
+
+  for (const row of rows) {
+    const cellaCodiceUnivoco = row.locator('td:nth-child(2) div');
+    const cellSfe = row.locator('td:nth-child(4)');
+
+    const codiceUnivocoText = (await cellaCodiceUnivoco.innerText()).trim();
+    const cellSfeText = (await cellSfe.innerText()).trim();
+
+    if (codiceUnivocoText !== '' && cellSfeText !== '') {
+      // save in the costant the value of the unique code
+      const uniqueCodeSelector = `xpath=//table/tbody/tr[${Number(rows.indexOf(row)) + 1}]/td[2]`;
+      const textToCopy = await page.locator(uniqueCodeSelector).innerText();
+      console.log(
+        'Trovata riga con codice univoco e altro valore nella quarta cella. Testo della quarta cella:',
+        textToCopy
+      );
+      // eslint-disable-next-line functional/immutable-data
+      copiedText = textToCopy;
+      // afer we've saved the value in the global "copiedText" we're going to close the page
+      await page.close();
+    }
+  }
+  console.log('Nessuna riga trovata con contenuto sia nella seconda che nella quarta cella.');
+  return '';
+}; 
+
+Function that copy the recipient code from table of IPA
+export const researchOnIpa = async (newPage: Page, partyName: string) => {
+  await newPage.setViewportSize({ width: 1920, height: 953 });
+  newPage.on('popup', async (popup) => {
+    console.log('Pop-up rilevato!');
+    await popup.close();
+  });
+  newPage.on('dialog', async (dialog) => {
+    console.log(`Dialogo rilevato: ${dialog.message()}`);
+    await dialog.accept();
+  });
+  await newPage.click('#denominazione');
+  await newPage.fill('#denominazione', partyName, { timeout: 1000 });
+  await newPage.click('#bottoneRicerca', { timeout: 1000 });
+  await newPage.getByRole('img', { name: 'Elenco Unità Organizzative' }).waitFor({ timeout: 1000 });
+  await newPage.getByRole('img', { name: 'Elenco Unità Organizzative' }).click();
+  await copyUniqueCodeIfSFEIsPresent(newPage);
+}; */
