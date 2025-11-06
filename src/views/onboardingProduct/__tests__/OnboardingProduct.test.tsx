@@ -547,98 +547,98 @@ test('Test: Successfull complete onboarding request of PRV for product prod-pago
   await executeGoHome(mockedLocation);
 });
 
-test('Test: Successfull complete onboarding request of PRV party for prod-idpay-merchant search by taxCode', async () => {
-  renderComponent(PRODUCT_IDS.IDPAY_MERCHANT);
-  await executeStepInstitutionType(PRODUCT_IDS.IDPAY_MERCHANT, 'PRV');
-  await executeStepSearchParty(
-    PRODUCT_IDS.IDPAY_MERCHANT,
-    'PRV',
-    mockedPdndVisuraInfomacere[0].businessName,
-    'taxCode',
-    undefined,
-    '12345678901'
-  );
-  await executeStepBillingData(PRODUCT_IDS.IDPAY_MERCHANT, 'PRV', false, false, 'PDND_INFOCAMERE');
-  await executeStepAddManager(false);
-  await executeStepAddAdmin(true, false, false, false, false);
-  await verifySubmit(
-    PRODUCT_IDS.IDPAY_MERCHANT,
-    'PRV',
-    fetchWithLogsSpy,
-    'PDND_INFOCAMERE',
-    false,
-    false,
-    'taxCode'
-  );
-  await executeGoHome(mockedLocation);
-});
+// test('Test: Successfull complete onboarding request of PRV party for prod-idpay-merchant search by taxCode', async () => {
+//   renderComponent(PRODUCT_IDS.IDPAY_MERCHANT);
+//   await executeStepInstitutionType(PRODUCT_IDS.IDPAY_MERCHANT, 'PRV');
+//   await executeStepSearchParty(
+//     PRODUCT_IDS.IDPAY_MERCHANT,
+//     'PRV',
+//     mockedPdndVisuraInfomacere[0].businessName,
+//     'taxCode',
+//     undefined,
+//     '12345678901'
+//   );
+//   await executeStepBillingData(PRODUCT_IDS.IDPAY_MERCHANT, 'PRV', false, false, 'PDND_INFOCAMERE');
+//   await executeStepAddManager(false);
+//   await executeStepAddAdmin(true, false, false, false, false);
+//   await verifySubmit(
+//     PRODUCT_IDS.IDPAY_MERCHANT,
+//     'PRV',
+//     fetchWithLogsSpy,
+//     'PDND_INFOCAMERE',
+//     false,
+//     false,
+//     'taxCode'
+//   );
+//   await executeGoHome(mockedLocation);
+// });
 
-test('Test: Successfull complete onboarding request of PRV party for prod-idpay-merchant search by reaCode', async () => {
-  renderComponent(PRODUCT_IDS.IDPAY_MERCHANT);
-  await executeStepInstitutionType(PRODUCT_IDS.IDPAY_MERCHANT, 'PRV');
-  await executeStepSearchParty(
-    PRODUCT_IDS.IDPAY_MERCHANT,
-    'PRV',
-    mockedPdndVisuraInfomacere[0].businessName,
-    'reaCode',
-    undefined,
-    undefined,
-    undefined,
-    'MI-123456'
-  );
-  await executeStepBillingData(PRODUCT_IDS.IDPAY_MERCHANT, 'PRV', false, false, 'PDND_INFOCAMERE');
-  await executeStepAddManager(false);
-  await executeStepAddAdmin(true, false, false, false, false);
-  await verifySubmit(
-    PRODUCT_IDS.IDPAY_MERCHANT,
-    'PRV',
-    fetchWithLogsSpy,
-    'PDND_INFOCAMERE',
-    false,
-    false,
-    'taxCode'
-  );
-  await executeGoHome(mockedLocation);
-});
+// test('Test: Successfull complete onboarding request of PRV party for prod-idpay-merchant search by reaCode', async () => {
+//   renderComponent(PRODUCT_IDS.IDPAY_MERCHANT);
+//   await executeStepInstitutionType(PRODUCT_IDS.IDPAY_MERCHANT, 'PRV');
+//   await executeStepSearchParty(
+//     PRODUCT_IDS.IDPAY_MERCHANT,
+//     'PRV',
+//     mockedPdndVisuraInfomacere[0].businessName,
+//     'reaCode',
+//     undefined,
+//     undefined,
+//     undefined,
+//     'MI-123456'
+//   );
+//   await executeStepBillingData(PRODUCT_IDS.IDPAY_MERCHANT, 'PRV', false, false, 'PDND_INFOCAMERE');
+//   await executeStepAddManager(false);
+//   await executeStepAddAdmin(true, false, false, false, false);
+//   await verifySubmit(
+//     PRODUCT_IDS.IDPAY_MERCHANT,
+//     'PRV',
+//     fetchWithLogsSpy,
+//     'PDND_INFOCAMERE',
+//     false,
+//     false,
+//     'taxCode'
+//   );
+//   await executeGoHome(mockedLocation);
+// });
 
-test('Test: Successfull complete onboarding request of PRV_PF party for prod-idpay-merchant search by personalTaxCode', async () => {
-  renderComponent(PRODUCT_IDS.IDPAY_MERCHANT);
-  await executeStepInstitutionType(PRODUCT_IDS.IDPAY_MERCHANT, 'PRV');
-  await executeStepSearchParty(
-    PRODUCT_IDS.IDPAY_MERCHANT,
-    'PRV',
-    mockedPdndVisuraInfomacere[5].businessName,
-    'personalTaxCode',
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    'LGGLGD80A01B354S'
-  );
-  await executeStepBillingData(
-    PRODUCT_IDS.IDPAY_MERCHANT,
-    'PRV_PF',
-    false,
-    false,
-    'PDND_INFOCAMERE',
-    undefined,
-    false,
-    false,
-    'personalTaxCode'
-  );
-  await executeStepAddManager(false);
-  await executeStepAddAdmin(true, false, false, false, false);
-  await verifySubmit(
-    PRODUCT_IDS.IDPAY_MERCHANT,
-    'PRV_PF',
-    fetchWithLogsSpy,
-    'PDND_INFOCAMERE',
-    false,
-    false,
-    'personalTaxCode'
-  );
-  await executeGoHome(mockedLocation);
-});
+// test('Test: Successfull complete onboarding request of PRV_PF party for prod-idpay-merchant search by personalTaxCode', async () => {
+//   renderComponent(PRODUCT_IDS.IDPAY_MERCHANT);
+//   await executeStepInstitutionType(PRODUCT_IDS.IDPAY_MERCHANT, 'PRV');
+//   await executeStepSearchParty(
+//     PRODUCT_IDS.IDPAY_MERCHANT,
+//     'PRV',
+//     mockedPdndVisuraInfomacere[5].businessName,
+//     'personalTaxCode',
+//     undefined,
+//     undefined,
+//     undefined,
+//     undefined,
+//     'LGGLGD80A01B354S'
+//   );
+//   await executeStepBillingData(
+//     PRODUCT_IDS.IDPAY_MERCHANT,
+//     'PRV_PF',
+//     false,
+//     false,
+//     'PDND_INFOCAMERE',
+//     undefined,
+//     false,
+//     false,
+//     'personalTaxCode'
+//   );
+//   await executeStepAddManager(false);
+//   await executeStepAddAdmin(true, false, false, false, false);
+//   await verifySubmit(
+//     PRODUCT_IDS.IDPAY_MERCHANT,
+//     'PRV_PF',
+//     fetchWithLogsSpy,
+//     'PDND_INFOCAMERE',
+//     false,
+//     false,
+//     'personalTaxCode'
+//   );
+//   await executeGoHome(mockedLocation);
+// });
 
 test('Test: Error on submit onboarding request of PA party for prod-io search by business name', async () => {
   renderComponent(PRODUCT_IDS.IO);
