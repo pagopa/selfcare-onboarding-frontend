@@ -86,7 +86,6 @@ export const renderComponentWithProviders = (
   );
 };
 
-// AGGIUNGI productId ai parametri e passalo a fillUserForm
 export const checkCertifiedUserValidation = async (
   prefix: string,
   addUserFlow: boolean,
@@ -122,7 +121,6 @@ const checkAlreadyExistentValues = async (
   expectedDuplicateEmailMessages: number | undefined,
   productId?: string
 ) => {
-  // Per IDPAY_MERCHANT, il controllo di unicità è disabilitato
   const shouldSkipDuplicateCheck = productId === PRODUCT_IDS.IDPAY_MERCHANT;
 
   if (existentTaxCode) {
@@ -136,7 +134,6 @@ const checkAlreadyExistentValues = async (
       );
       expect(duplicateTaxCodeErrors.length).toBe(expectedDuplicateTaxCodeMessages);
     } else {
-      // Per IDPAY_MERCHANT, verifica che NON ci siano errori di duplicato
       const duplicateTaxCodeErrors = screen.queryAllByText(
         'Il codice fiscale inserito è già presente'
       );
