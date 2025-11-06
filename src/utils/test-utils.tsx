@@ -86,12 +86,23 @@ export const renderComponentWithProviders = (
   );
 };
 
+// AGGIUNGI productId ai parametri e passalo a fillUserForm
 export const checkCertifiedUserValidation = async (
   prefix: string,
   addUserFlow: boolean,
-  onlyAdmin: boolean
+  onlyAdmin: boolean,
+  productId?: string
 ) => {
-  await fillUserForm(prefix, 'FRRMRA80A01F205X', 'b@c.BB', addUserFlow, onlyAdmin);
+  await fillUserForm(
+    prefix,
+    'FRRMRA80A01F205X',
+    'b@c.BB',
+    addUserFlow,
+    onlyAdmin,
+    undefined,
+    undefined,
+    productId
+  );
   await waitFor(() => screen.getByText('Nome non corretto o diverso dal Codice Fiscale'));
   screen.getByText('Cognome non corretto o diverso dal Codice Fiscale');
 };
@@ -108,24 +119,47 @@ const checkAlreadyExistentValues = async (
   existentTaxCode: string | undefined,
   expectedDuplicateTaxCodeMessages: number | undefined,
   existentEmail: string | undefined,
-  expectedDuplicateEmailMessages: number | undefined
+  expectedDuplicateEmailMessages: number | undefined,
+  productId?: string
 ) => {
+  // Per IDPAY_MERCHANT, il controllo di unicità è disabilitato
+  const shouldSkipDuplicateCheck = productId === PRODUCT_IDS.IDPAY_MERCHANT;
+
   if (existentTaxCode) {
     await fillTextFieldAndCheckButton(prefix, 'name', 'NAME');
     await fillTextFieldAndCheckButton(prefix, 'surname', 'SURNAME');
     await fillTextFieldAndCheckButton(prefix, 'taxCode', existentTaxCode);
-    const duplicateTaxCodeErrors = screen.queryAllByText(
-      'Il codice fiscale inserito è già presente'
-    );
-    expect(duplicateTaxCodeErrors.length).toBe(expectedDuplicateTaxCodeMessages);
+
+    if (!shouldSkipDuplicateCheck) {
+      const duplicateTaxCodeErrors = screen.queryAllByText(
+        'Il codice fiscale inserito è già presente'
+      );
+      expect(duplicateTaxCodeErrors.length).toBe(expectedDuplicateTaxCodeMessages);
+    } else {
+      // Per IDPAY_MERCHANT, verifica che NON ci siano errori di duplicato
+      const duplicateTaxCodeErrors = screen.queryAllByText(
+        'Il codice fiscale inserito è già presente'
+      );
+      expect(duplicateTaxCodeErrors.length).toBe(0);
+    }
   }
   await fillTextFieldAndCheckButton(prefix, 'taxCode', '');
 
   if (existentEmail) {
     await fillTextFieldAndCheckButton(prefix, 'email', existentEmail);
 
-    const duplicateEmailErrors = screen.queryAllByText("L'indirizzo email inserito è già presente");
-    expect(duplicateEmailErrors.length).toBe(expectedDuplicateEmailMessages);
+    if (!shouldSkipDuplicateCheck) {
+      const duplicateEmailErrors = screen.queryAllByText(
+        "L'indirizzo email inserito è già presente"
+      );
+      expect(duplicateEmailErrors.length).toBe(expectedDuplicateEmailMessages);
+    } else {
+      // Per IDPAY_MERCHANT, verifica che NON ci siano errori di duplicato
+      const duplicateEmailErrors = screen.queryAllByText(
+        "L'indirizzo email inserito è già presente"
+      );
+      expect(duplicateEmailErrors.length).toBe(0);
+    }
   }
   await fillTextFieldAndCheckButton(prefix, 'email', '');
   await fillTextFieldAndCheckButton(prefix, 'name', '');
@@ -139,10 +173,18 @@ export const fillUserForm = async (
   addUserFlow: boolean,
   onlyAdmin: boolean,
   name?: string,
-  surname?: string
+  surname?: string,
+  productId?: string
 ) => {
   if (prefix === 'delegate-initial' && !addUserFlow && !onlyAdmin) {
-    await checkAlreadyExistentValues('delegate-initial', 'SRNNMA80A01A794F', 1, 'b@b.BB', 1);
+    await checkAlreadyExistentValues(
+      'delegate-initial',
+      'SRNNMA80A01A794F',
+      1,
+      'b@b.BB',
+      1,
+      productId
+    );
   }
 
   await fillTextFieldAndCheckButton(prefix, 'name', name ? name : 'NAME');
@@ -167,7 +209,8 @@ export const executeStepAddManager = async (
   addUserFlow: boolean,
   isPremium?: boolean,
   expectedSuccessfulSubmit?: boolean,
-  fetchWithLogsSpy?: jest.SpyInstance
+  fetchWithLogsSpy?: jest.SpyInstance,
+  productId?: string
 ) => {
   console.log('Testing step add manager..');
 
@@ -178,9 +221,18 @@ export const executeStepAddManager = async (
   const continueButton = screen.getByLabelText('Continua');
   expect(continueButton).toBeDisabled();
 
-  await checkCertifiedUserValidation('manager-initial', addUserFlow, false);
+  await checkCertifiedUserValidation('manager-initial', addUserFlow, false, productId);
 
-  await fillUserForm('manager-initial', 'SRNNMA80A01A794F', 'b@b.BB', addUserFlow, false);
+  await fillUserForm(
+    'manager-initial',
+    'SRNNMA80A01A794F',
+    'b@b.BB',
+    addUserFlow,
+    false,
+    undefined,
+    undefined,
+    productId
+  );
 
   fireEvent.click(continueButton);
 
@@ -270,7 +322,8 @@ export const executeStepAddAdmin = async (
   isTechPartner: boolean = false,
   isAggregator: boolean = false,
   addUserFlow: boolean,
-  onlyAdmin: boolean
+  onlyAdmin: boolean,
+  productId?: string
 ) => {
   console.log('Testing step add admin..');
   console.log('ADD USER FLOW', addUserFlow);
@@ -295,7 +348,7 @@ export const executeStepAddAdmin = async (
 
   await checkLoggedUserAsAdminCheckbox(continueButton, addDelegateButton);
 
-  await checkCertifiedUserValidation('delegate-initial', addUserFlow, onlyAdmin);
+  await checkCertifiedUserValidation('delegate-initial', addUserFlow, onlyAdmin, productId);
 
   await fillUserForm(
     'delegate-initial',
@@ -304,7 +357,8 @@ export const executeStepAddAdmin = async (
     addUserFlow,
     onlyAdmin,
     'LUCA',
-    'ROSSI'
+    'ROSSI',
+    productId
   );
 
   expect(continueButton).toBeEnabled();
