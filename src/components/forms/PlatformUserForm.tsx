@@ -10,6 +10,7 @@ import { emailRegexp } from '@pagopa/selfcare-common-frontend/lib/utils/constant
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 import { UserOnCreate, PartyRole } from '../../../types';
 import { UsersError, UsersObject } from '../steps/StepAddManager';
+import { PRODUCT_IDS } from '../../utils/constants';
 
 type PlatformUserFormProps = {
   prefix: keyof UsersObject;
@@ -25,6 +26,7 @@ type PlatformUserFormProps = {
   buildRemoveDelegateForm?: (idToRemove: string) => (_: React.SyntheticEvent) => void;
   delegateId?: string;
   addUserFlow: boolean;
+  productId?: string;
 };
 
 type Field = {
@@ -71,6 +73,15 @@ const fields: Array<Field> = [
   },
 ];
 
+const getFields = (productId?: string, addUserFlow?: boolean): Array<Field> => {
+  if (productId === PRODUCT_IDS.IDPAY_MERCHANT || addUserFlow) {
+    return fields.map((field) =>
+      field.id === 'taxCode' || field.id === 'email' ? { ...field, unique: false } : field
+    );
+  }
+  return fields;
+};
+
 type ValidationErrorCode =
   | `${keyof UserOnCreate}-regexp`
   | `${keyof UserOnCreate}-unique`
@@ -88,11 +99,13 @@ export function validateUser(
   user: UserOnCreate,
   users: UsersObject,
   addUserFlow: boolean,
+  productId?: string,
   isAuthUser?: boolean
 ): boolean {
+  const fieldsToValidate = getFields(productId, addUserFlow);
   return (
-    fields.filter(({ id }) => !user[id]).map(({ id }) => id).length === 0 && // mandatory fields
-    validateNoMandatory(userTempId, user, addUserFlow, users, isAuthUser).length === 0
+    fieldsToValidate.filter(({ id }) => !user[id]).map(({ id }) => id).length === 0 && // mandatory fields
+    validateNoMandatory(userTempId, user, addUserFlow, productId, users, isAuthUser).length === 0
   );
 }
 
@@ -101,16 +114,18 @@ function validateNoMandatory(
   userTempId: keyof UsersObject,
   user: UserOnCreate,
   addUserFlow: boolean,
+  productId: string | undefined,
   users?: UsersObject,
   isAuthUser?: boolean
 ): Array<ValidationErrorCode> {
+  const fieldsToValidate = getFields(productId, addUserFlow);
   const usersArray = users
     ? Object.entries(users)
         .filter((u) => u[0] !== userTempId)
         .map((u) => u[1])
     : [];
   return (
-    fields
+    fieldsToValidate
       // eslint-disable-next-line complexity
       .map(({ id, regexp, unique, caseSensitive }) =>
         regexp &&
@@ -124,9 +139,7 @@ function validateNoMandatory(
             ? `${id}-regexp`
             : unique &&
                 usersArray &&
-                usersArray.findIndex(
-                  (u) => !addUserFlow && stringEquals(u[id], user[id], caseSensitive)
-                ) > -1
+                usersArray.findIndex((u) => stringEquals(u[id], user[id], caseSensitive)) > -1
               ? `${id}-unique`
               : id === 'name' &&
                   user.name &&
@@ -166,6 +179,7 @@ export function PlatformUserForm({
   buildRemoveDelegateForm,
   delegateId,
   addUserFlow,
+  productId,
 }: PlatformUserFormProps) {
   const { t } = useTranslation();
 
@@ -181,7 +195,7 @@ export function PlatformUserForm({
   };
 
   const errors: Array<ValidationErrorCode> = people[prefix]
-    ? validateNoMandatory(prefix, people[prefix], addUserFlow, allPeople, isAuthUser)
+    ? validateNoMandatory(prefix, people[prefix], addUserFlow, productId, allPeople, isAuthUser)
     : [];
 
   const externalErrors: { [errorsUserData: string]: Array<string> } | undefined =
@@ -243,7 +257,7 @@ export function PlatformUserForm({
         </Grid>
       )}
       <Grid container spacing={2} mb="-16px">
-        {fields.map(
+        {getFields(productId).map(
           ({
             id,
             type = 'text',
