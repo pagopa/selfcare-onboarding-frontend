@@ -10,6 +10,7 @@ import { emailRegexp } from '@pagopa/selfcare-common-frontend/lib/utils/constant
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 import { UserOnCreate, PartyRole } from '../../../types';
 import { UsersError, UsersObject } from '../steps/StepAddManager';
+import { PRODUCT_IDS } from '../../utils/constants';
 
 type PlatformUserFormProps = {
   prefix: keyof UsersObject;
@@ -25,6 +26,7 @@ type PlatformUserFormProps = {
   buildRemoveDelegateForm?: (idToRemove: string) => (_: React.SyntheticEvent) => void;
   delegateId?: string;
   addUserFlow: boolean;
+  productId?: string;
 };
 
 type Field = {
@@ -88,11 +90,12 @@ export function validateUser(
   user: UserOnCreate,
   users: UsersObject,
   addUserFlow: boolean,
+  productId?: string,
   isAuthUser?: boolean
 ): boolean {
   return (
     fields.filter(({ id }) => !user[id]).map(({ id }) => id).length === 0 && // mandatory fields
-    validateNoMandatory(userTempId, user, addUserFlow, users, isAuthUser).length === 0
+    validateNoMandatory(userTempId, user, addUserFlow, productId, users, isAuthUser).length === 0
   );
 }
 
@@ -101,6 +104,7 @@ function validateNoMandatory(
   userTempId: keyof UsersObject,
   user: UserOnCreate,
   addUserFlow: boolean,
+  productId: string | undefined,
   users?: UsersObject,
   isAuthUser?: boolean
 ): Array<ValidationErrorCode> {
@@ -125,7 +129,9 @@ function validateNoMandatory(
             : unique &&
                 usersArray &&
                 usersArray.findIndex(
-                  (u) => !addUserFlow && stringEquals(u[id], user[id], caseSensitive)
+                  (u) =>
+                    (!addUserFlow || productId !== PRODUCT_IDS.IDPAY_MERCHANT) &&
+                    stringEquals(u[id], user[id], caseSensitive)
                 ) > -1
               ? `${id}-unique`
               : id === 'name' &&
@@ -166,6 +172,7 @@ export function PlatformUserForm({
   buildRemoveDelegateForm,
   delegateId,
   addUserFlow,
+  productId,
 }: PlatformUserFormProps) {
   const { t } = useTranslation();
 
@@ -181,7 +188,7 @@ export function PlatformUserForm({
   };
 
   const errors: Array<ValidationErrorCode> = people[prefix]
-    ? validateNoMandatory(prefix, people[prefix], addUserFlow, allPeople, isAuthUser)
+    ? validateNoMandatory(prefix, people[prefix], addUserFlow, productId, allPeople, isAuthUser)
     : [];
 
   const externalErrors: { [errorsUserData: string]: Array<string> } | undefined =
