@@ -560,7 +560,7 @@ test('Test: Successfull complete onboarding request of PRV party for prod-idpay-
   );
   await executeStepBillingData(PRODUCT_IDS.IDPAY_MERCHANT, 'PRV', false, false, 'PDND_INFOCAMERE');
   await executeStepAddManager(false);
-  await executeStepAddAdmin(true, false, false, false, false);
+  await executeStepAddAdmin(true, false, false, false, false, PRODUCT_IDS.IDPAY_MERCHANT);
   await verifySubmit(
     PRODUCT_IDS.IDPAY_MERCHANT,
     'PRV',
@@ -588,7 +588,7 @@ test('Test: Successfull complete onboarding request of PRV party for prod-idpay-
   );
   await executeStepBillingData(PRODUCT_IDS.IDPAY_MERCHANT, 'PRV', false, false, 'PDND_INFOCAMERE');
   await executeStepAddManager(false);
-  await executeStepAddAdmin(true, false, false, false, false);
+  await executeStepAddAdmin(true, false, false, false, false, PRODUCT_IDS.IDPAY_MERCHANT);
   await verifySubmit(
     PRODUCT_IDS.IDPAY_MERCHANT,
     'PRV',
@@ -627,7 +627,7 @@ test('Test: Successfull complete onboarding request of PRV_PF party for prod-idp
     'personalTaxCode'
   );
   await executeStepAddManager(false);
-  await executeStepAddAdmin(true, false, false, false, false);
+  await executeStepAddAdmin(true, false, false, false, false, PRODUCT_IDS.IDPAY_MERCHANT);
   await verifySubmit(
     PRODUCT_IDS.IDPAY_MERCHANT,
     'PRV_PF',

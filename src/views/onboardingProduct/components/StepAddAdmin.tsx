@@ -174,7 +174,8 @@ export function StepAddAdmin({
     Object.keys(people)
       .filter((prefix) => 'manager-initial' !== prefix)
       .some(
-        (prefix) => !validateUser(prefix, people[prefix], allPeople, addUserFlow, product?.id, isAuthUser)
+        (prefix) =>
+          !validateUser(prefix, people[prefix], allPeople, addUserFlow, product?.id, isAuthUser)
       ) ||
     Object.keys(people).length === 3;
 
@@ -323,7 +324,14 @@ export function StepAddAdmin({
               .filter((prefix) => 'manager-initial' !== prefix)
               .some(
                 (prefix) =>
-                  !validateUser(prefix, people[prefix], allPeople, addUserFlow, product?.id, isAuthUser)
+                  !validateUser(
+                    prefix,
+                    people[prefix],
+                    allPeople,
+                    addUserFlow,
+                    product?.id,
+                    isAuthUser
+                  )
               ),
         }}
       />

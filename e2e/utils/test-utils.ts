@@ -248,12 +248,12 @@ export const stepFormData = async (
 
   if (shouldShowNazionale) {
     if (isFromIpa) {
-      await page.getByRole('radio', { name: 'Nazionale' }).waitFor({ timeout: 500 });
+      await page.getByRole('radio', { name: 'Nazionale' }).waitFor({ timeout: 5000 });
     }
     await page.getByRole('radio', { name: 'Nazionale' }).click();
   }
 
-  await page.getByRole('button', { name: 'Continua' }).waitFor({ timeout: 500 });
+  await page.getByRole('button', { name: 'Continua' }).waitFor({ timeout: 5000 });
   await page.getByRole('button', { name: 'Continua' }).click();
 
   if (await page.getByText('Stai modificando l’area geografica del tuo ente').isVisible()) {
