@@ -857,7 +857,7 @@ const executeStepSearchParty = async (
   screen.getByText('Cerca il tuo ente');
 
   await waitFor(() =>
-    expect(fetchWithLogsSpy).toHaveBeenCalledTimes(productId === PRODUCT_IDS.IDPAY_MERCHANT ? 1 : 2)
+    expect(fetchWithLogsSpy).toHaveBeenCalledTimes(2)
   );
   const inputPartyName = document.getElementById('Parties') as HTMLElement;
 
