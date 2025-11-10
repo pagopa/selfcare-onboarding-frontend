@@ -248,7 +248,12 @@ export default function AsyncAutocompleteContainer({
         });
         break;
       default:
-        void debouncedSearchByName(value, endpoint, ENV.MAX_INSTITUTIONS_FETCH, filterCategories as string);
+        void debouncedSearchByName(
+          value,
+          endpoint,
+          ENV.MAX_INSTITUTIONS_FETCH,
+          filterCategories as string
+        );
     }
   };
   const removeSpecialCharacters = (input: string): string => {

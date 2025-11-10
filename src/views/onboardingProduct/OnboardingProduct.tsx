@@ -32,10 +32,7 @@ import { AdditionalGpuInformations } from '../../model/AdditionalGpuInformations
 import { AdditionalInformations } from '../../model/AdditionalInformations';
 import { AggregateInstitution } from '../../model/AggregateInstitution';
 import { OnboardingFormData } from '../../model/OnboardingFormData';
-import {
-  checkProduct,
-  getFilterCategories,
-} from '../../services/onboardingServices';
+import { checkProduct, getFilterCategories } from '../../services/onboardingServices';
 import { postOnboardingSubmit } from '../../services/onboardingSubmitServices';
 import { PRODUCT_IDS } from '../../utils/constants';
 import { ENV } from '../../utils/env';
@@ -89,6 +86,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
   const [origin, setOrigin] = useState<string>();
   const [pricingPlan, setPricingPlan] = useState<string>();
   const [filterCategoriesResponse, setFilterCategoriesResponse] = useState<any>();
+  const [categoriesLoaded, setCategoriesLoaded] = useState(false);
   const { setOnExit } = useContext(HeaderContext);
   const { setRequiredLogin } = useContext(UserContext);
   const requestIdRef = useRef<string>();
@@ -229,7 +227,9 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
   }, [selectedProduct]);
 
   useEffect(() => {
-    void getFilterCategories(productId, setRequiredLogin, setFilterCategoriesResponse);
+    void getFilterCategories(setRequiredLogin, setFilterCategoriesResponse).finally(() => {
+      setCategoriesLoaded(true);
+    });
   }, []);
 
   const selectFilterCategories = useCallback(() => {
@@ -662,7 +662,9 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
         onConfirmLabel={t('onboarding.sessionModal.onConfirmLabel')}
         onCloseLabel={t('onboarding.sessionModal.onCloseLabel')}
       />
-      {loading && <LoadingOverlay loadingText={t('onboarding.loading.loadingText')} />}
+      {(loading || !categoriesLoaded) && (
+        <LoadingOverlay loadingText={t('onboarding.loading.loadingText')} />
+      )}
     </Container>
   );
 }
