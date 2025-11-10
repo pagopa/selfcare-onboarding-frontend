@@ -957,7 +957,9 @@ const executeStepSearchParty = async (
         fireEvent.change(inputPartyName, { target: { value: 'RSSLCU80A01F205N' } });
 
         expect(
-          screen.getByText('Il codice ATECO inserito non è ammesso per l’adesione al portale')
+          screen.getByText(
+            'L’ente indicato non può aderire perché il suo codice ATECO non rientra tra quelli ammessi.'
+          )
         ).toBeInTheDocument();
 
         fireEvent.change(inputPartyName, { target: { value: 'FRSMRA70D30G786G' } });
