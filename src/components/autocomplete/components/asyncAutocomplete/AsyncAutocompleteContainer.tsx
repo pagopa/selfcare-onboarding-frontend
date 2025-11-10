@@ -37,7 +37,6 @@ import {
   /* noMandatoryIpaProducts, */ PRODUCT_IDS,
 } from '../../../../utils/constants';
 import { ENV } from '../../../../utils/env';
-import Loading4Api from '../../../modals/Loading4Api';
 import AsyncAutocompleteResultsBusinessName from './components/AsyncAutocompleteResultsBusinessName';
 import AsyncAutocompleteResultsCode from './components/AsyncAutocompleteResultsCode';
 import AsyncAutocompleteSearch from './components/AsyncAutocompleteSearch';
@@ -416,10 +415,6 @@ export default function AsyncAutocompleteContainer({
     setInput(cleanValue);
     setSelected(null);
   };
-
-  if (!filterCategories) {
-    return <Loading4Api open={true} />;
-  }
 
   return (
     <>
