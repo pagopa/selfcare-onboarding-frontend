@@ -229,7 +229,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
   }, [selectedProduct]);
 
   useEffect(() => {
-    void getFilterCategories(productId, setRequiredLogin, setFilterCategoriesResponse);
+    void getFilterCategories(setRequiredLogin, setFilterCategoriesResponse);
   }, []);
 
   const selectFilterCategories = useCallback(() => {

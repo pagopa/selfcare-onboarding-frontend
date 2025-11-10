@@ -37,6 +37,7 @@ import {
   /* noMandatoryIpaProducts, */ PRODUCT_IDS,
 } from '../../../../utils/constants';
 import { ENV } from '../../../../utils/env';
+import Loading4Api from '../../../modals/Loading4Api';
 import AsyncAutocompleteResultsBusinessName from './components/AsyncAutocompleteResultsBusinessName';
 import AsyncAutocompleteResultsCode from './components/AsyncAutocompleteResultsCode';
 import AsyncAutocompleteSearch from './components/AsyncAutocompleteSearch';
@@ -248,7 +249,12 @@ export default function AsyncAutocompleteContainer({
         });
         break;
       default:
-        void debouncedSearchByName(value, endpoint, ENV.MAX_INSTITUTIONS_FETCH, filterCategories as string);
+        void debouncedSearchByName(
+          value,
+          endpoint,
+          ENV.MAX_INSTITUTIONS_FETCH,
+          filterCategories as string
+        );
     }
   };
   const removeSpecialCharacters = (input: string): string => {
@@ -410,6 +416,10 @@ export default function AsyncAutocompleteContainer({
     setInput(cleanValue);
     setSelected(null);
   };
+
+  if (!filterCategories) {
+    return <Loading4Api open={true} />;
+  }
 
   return (
     <>
