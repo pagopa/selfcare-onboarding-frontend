@@ -165,6 +165,7 @@ export function StepAddManager({
             setPeople={setPeople}
             readOnly={readOnly}
             addUserFlow={addUserFlow}
+            productId={product?.id}
           />
         </Grid>
       </Grid>

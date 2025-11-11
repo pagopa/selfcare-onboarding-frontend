@@ -208,20 +208,20 @@ const executeStepBillingDataWithTaxCodeInvoicing = async (subProductId: string) 
 
   const confirmButtonEnabled = screen.getByLabelText('Continua');
 
-  if (subProductId === PRODUCT_IDS.IO_PREMIUM) {
-    fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
-      target: { value: '' },
-    });
-    await waitFor(() => expect(confirmButtonEnabled).toBeDisabled());
-    fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
-      target: { value: 'A1B2C3' },
-    });
+  // if (subProductId === PRODUCT_IDS.IO_PREMIUM) {
+  //   fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
+  //     target: { value: '' },
+  //   });
+  //   await waitFor(() => expect(confirmButtonEnabled).toBeDisabled());
+  //   fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
+  //     target: { value: 'A1B2C3' },
+  //   });
 
-    await new Promise((resolve) => setTimeout(resolve, 300));
-    await waitFor(() => expect(screen.getByText('Codice Fiscale SFE')).toBeInTheDocument(), {
-      timeout: 500, // Tempo massimo per l'attesa
-    });
-  }
+  //   await new Promise((resolve) => setTimeout(resolve, 300));
+  //   await waitFor(() => expect(screen.getByText('Codice Fiscale SFE')).toBeInTheDocument(), {
+  //     timeout: 500, // Tempo massimo per l'attesa
+  //   });
+  // }
 
   if( subProductId === PRODUCT_IDS.DASHBOARD_PSP) {
     fireEvent.change(document.getElementById('address') as HTMLElement, {

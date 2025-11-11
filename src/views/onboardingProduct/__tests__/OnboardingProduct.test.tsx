@@ -560,7 +560,7 @@ test('Test: Successfull complete onboarding request of PRV party for prod-idpay-
   );
   await executeStepBillingData(PRODUCT_IDS.IDPAY_MERCHANT, 'PRV', false, false, 'PDND_INFOCAMERE');
   await executeStepAddManager(false);
-  await executeStepAddAdmin(true, false, false, false, false);
+  await executeStepAddAdmin(true, false, false, false, false, PRODUCT_IDS.IDPAY_MERCHANT);
   await verifySubmit(
     PRODUCT_IDS.IDPAY_MERCHANT,
     'PRV',
@@ -588,7 +588,7 @@ test('Test: Successfull complete onboarding request of PRV party for prod-idpay-
   );
   await executeStepBillingData(PRODUCT_IDS.IDPAY_MERCHANT, 'PRV', false, false, 'PDND_INFOCAMERE');
   await executeStepAddManager(false);
-  await executeStepAddAdmin(true, false, false, false, false);
+  await executeStepAddAdmin(true, false, false, false, false, PRODUCT_IDS.IDPAY_MERCHANT);
   await verifySubmit(
     PRODUCT_IDS.IDPAY_MERCHANT,
     'PRV',
@@ -627,7 +627,7 @@ test('Test: Successfull complete onboarding request of PRV_PF party for prod-idp
     'personalTaxCode'
   );
   await executeStepAddManager(false);
-  await executeStepAddAdmin(true, false, false, false, false);
+  await executeStepAddAdmin(true, false, false, false, false, PRODUCT_IDS.IDPAY_MERCHANT);
   await verifySubmit(
     PRODUCT_IDS.IDPAY_MERCHANT,
     'PRV_PF',
@@ -856,9 +856,7 @@ const executeStepSearchParty = async (
 
   screen.getByText('Cerca il tuo ente');
 
-  await waitFor(() =>
-    expect(fetchWithLogsSpy).toHaveBeenCalledTimes(productId === PRODUCT_IDS.IDPAY_MERCHANT ? 1 : 2)
-  );
+  await waitFor(() => expect(fetchWithLogsSpy).toHaveBeenCalledTimes(2));
   const inputPartyName = document.getElementById('Parties') as HTMLElement;
 
   const withoutIpaLink = document.getElementById('no_ipa') as HTMLElement;
@@ -959,7 +957,9 @@ const executeStepSearchParty = async (
         fireEvent.change(inputPartyName, { target: { value: 'RSSLCU80A01F205N' } });
 
         expect(
-          screen.getByText('Il codice ATECO inserito non è ammesso per l’adesione al portale')
+          screen.getByText(
+            'L’ente indicato non può aderire perché il suo codice ATECO non rientra tra quelli ammessi.'
+          )
         ).toBeInTheDocument();
 
         fireEvent.change(inputPartyName, { target: { value: 'FRSMRA70D30G786G' } });
@@ -1079,7 +1079,7 @@ const executeStepSearchParty = async (
       // expect(fetchWithLogsSpy).toHaveBeenCalledTimes(3);
 
       expect(fetchWithLogsSpy).toHaveBeenNthCalledWith(
-        productId === PRODUCT_IDS.IDPAY_MERCHANT ? 2 : 3,
+        3,
         {
           endpoint: endpoint,
           endpointParams: endpointParams,
@@ -1187,7 +1187,7 @@ const executeStepBillingData = async (
           ? '998877665544'
           : '87654321098';
 
-    if (isInvoicable) {
+    if (isInvoicable && productId !== PRODUCT_IDS.IO) {
       fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
         target: { value: recipientCodeInput },
       });

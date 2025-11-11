@@ -285,7 +285,7 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
 
     expect(pec).toBeInTheDocument();
 
-    if (isInvoiceable) {
+    if (isInvoiceable && productId !== PRODUCT_IDS.IO) {
       expect(sdiCode).toBeInTheDocument();
       fireEvent.change(document.getElementById('recipientCode') as HTMLInputElement, {
         target: { value: 'A1B2C3' },

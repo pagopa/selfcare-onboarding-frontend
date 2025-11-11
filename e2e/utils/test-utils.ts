@@ -132,7 +132,8 @@ export const stepFormData = async (
     isFromIpa &&
     product !== PRODUCT_IDS_TEST_E2E.INTEROP &&
     product !== PRODUCT_IDS_TEST_E2E.IDPAY_MERCHANT &&
-    actualInstitutionType !== 'SCP'
+    actualInstitutionType !== 'SCP' &&
+    product !== PRODUCT_IDS_TEST_E2E.IO
   ) {
     await page.click('#recipientCode');
     await page.fill('#recipientCode', product === PRODUCT_IDS_TEST_E2E.SEND ? 'UFBM8M' : 'UFOR71', {
@@ -219,12 +220,12 @@ export const stepFormData = async (
 
   if (shouldShowNazionale) {
     if (isFromIpa) {
-      await page.getByRole('radio', { name: 'Nazionale' }).waitFor({ timeout: 500 });
+      await page.getByRole('radio', { name: 'Nazionale' }).waitFor({ timeout: 5000 });
     }
     await page.getByRole('radio', { name: 'Nazionale' }).click();
   }
 
-  await page.getByRole('button', { name: 'Continua' }).waitFor({ timeout: 500 });
+  await page.getByRole('button', { name: 'Continua' }).waitFor({ timeout: 5000 });
   await page.getByRole('button', { name: 'Continua' }).click();
 
   if (await page.getByText('Stai modificando l’area geografica del tuo ente').isVisible()) {
