@@ -2,6 +2,7 @@ import { Page, expect } from '@playwright/test';
 import { InstitutionType } from '../../types';
 import { isLocalMode } from './global.setup';
 import { getOnboardingIdByTaxCode } from './api-utils';
+import { trackOnboardingId } from './onboarding-tracker';
 
 // eslint-disable-next-line functional/no-let
 // let copiedText: string;
@@ -389,6 +390,10 @@ export const stepCompleteOnboarding = async (page: Page, taxCode: string, filePd
 
   if (onboardingId.length > 0) {
     console.log('✅ OnboardingId retrieved, navigating to confirm page...');
+
+    // Track the onboarding ID for cleanup
+    await trackOnboardingId(onboardingId);
+
     await page.goto(`${BASE_URL_ONBOARDING}/confirm?jwt=${onboardingId}`, {
       timeout: 20000,
     });

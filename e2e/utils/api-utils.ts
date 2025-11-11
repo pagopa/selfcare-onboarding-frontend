@@ -48,3 +48,32 @@ export const getOnboardingIdByTaxCode = async (page: Page, taxCode: string): Pro
     return '';
   }
 };
+
+export const deleteOnboardingById = async (
+  page: Page,
+  onboardingId: string
+): Promise<boolean> => {
+
+  const apiUrl ='https://api.dev.selfcare.pagopa.it/external/internal/v1';
+  
+  const fullUrl = `${apiUrl}/onboarding/${onboardingId}`;
+
+  try {
+    const response = await page.request.delete(fullUrl, {
+      headers: {
+        'Ocp-Apim-Subscription-Key': '' // TODO. take the value form env variable
+      },
+    });
+
+    if (response.ok()) {
+      console.log(`✅ Successfully deleted onboarding: ${onboardingId}`);
+      return true;
+    } else {
+      console.error(`❌ Failed to delete onboarding ${onboardingId}: ${response.status()}`);
+      return false;
+    }
+  } catch (error) {
+    console.error(`❌ Error deleting onboarding ${onboardingId}:`, error);
+    return false;
+  }
+};
