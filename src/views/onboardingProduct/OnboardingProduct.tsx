@@ -249,6 +249,8 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           return filterCategoriesResponse.product['prod-interop']?.ipa.SCEC;
         } else if (institutionType === 'PA') {
           return filterCategoriesResponse.product['prod-interop']?.ipa.PA;
+        } else if (institutionType === 'GSP') {
+          return filterCategoriesResponse.product.default?.ipa.GSP;
         } else {
           return filterCategoriesResponse.product.default?.ipa.PA;
         }
