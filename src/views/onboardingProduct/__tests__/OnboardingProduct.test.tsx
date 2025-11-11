@@ -84,6 +84,8 @@ const filterByCategory4Test = (institutionType?: string, productId?: string) => 
         return mockedCategories.product['prod-interop']?.ipa.SCEC;
       } else if (institutionType === 'PA') {
         return mockedCategories.product['prod-interop']?.ipa.PA;
+      } else if (institutionType === 'GSP') {
+        return mockedCategories.product.default?.ipa.GSP;
       } else {
         return mockedCategories.product.default?.ipa.PA;
       }
