@@ -227,10 +227,10 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
   }, [selectedProduct]);
 
   useEffect(() => {
-    void getFilterCategories(setRequiredLogin, setFilterCategoriesResponse).finally(() => {
+    void getFilterCategories(productId, setRequiredLogin, setFilterCategoriesResponse).finally(() => {
       setCategoriesLoaded(true);
     });
-  }, []);
+  }, [productId]);
 
   const selectFilterCategories = useCallback(() => {
     if (!filterCategoriesResponse?.product) {
@@ -242,7 +242,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
         return filterCategoriesResponse.product['prod-pn']?.ipa.PA;
 
       case PRODUCT_IDS.IDPAY_MERCHANT:
-        return filterCategoriesResponse.product['prod-idpay-merchant']?.merchantDetails;
+        return filterCategoriesResponse.product['prod-idpay-merchant']?.merchantDetails?.atecoCodes;
 
       case PRODUCT_IDS.INTEROP:
         if (institutionType === 'SCEC') {
