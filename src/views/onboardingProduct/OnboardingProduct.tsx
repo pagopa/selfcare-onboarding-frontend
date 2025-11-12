@@ -240,7 +240,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
         return filterCategoriesResponse.product['prod-pn']?.ipa.PA;
 
       case PRODUCT_IDS.IDPAY_MERCHANT:
-        return filterCategoriesResponse.product['prod-idpay-merchant']?.merchantDetails?.atecoCodes;
+        return filterCategoriesResponse.product['prod-idpay-merchant']?.merchantDetails;
 
       case PRODUCT_IDS.INTEROP:
         if (institutionType === 'SCEC') {
