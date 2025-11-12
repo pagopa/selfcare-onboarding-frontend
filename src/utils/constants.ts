@@ -118,7 +118,7 @@ export const API = {
     URL: ENV.URL_API.PARTY_REGISTRY_PROXY + '/geotaxonomies',
   },
   ONBOARDING_GET_PREVIOUS_GEOTAXONOMIES: {
-    URL: ENV.URL_API.ONBOARDING + '/institutions/geographicTaxonomies',
+    URL: ENV.URL_API.ONBOARDING + '/institutions/geographic-taxonomies',
   },
   ONBOARDING_GET_LOCATION_BY_ISTAT_CODE: {
     URL: ENV.URL_API.PARTY_REGISTRY_PROXY + '/geotaxonomies/{{geoTaxId}}',

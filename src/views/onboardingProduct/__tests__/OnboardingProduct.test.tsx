@@ -84,6 +84,8 @@ const filterByCategory4Test = (institutionType?: string, productId?: string) => 
         return mockedCategories.product['prod-interop']?.ipa.SCEC;
       } else if (institutionType === 'PA') {
         return mockedCategories.product['prod-interop']?.ipa.PA;
+      } else if (institutionType === 'GSP') {
+        return mockedCategories.product.default?.ipa.GSP;
       } else {
         return mockedCategories.product.default?.ipa.PA;
       }
@@ -856,7 +858,9 @@ const executeStepSearchParty = async (
 
   screen.getByText('Cerca il tuo ente');
 
-  await waitFor(() => expect(fetchWithLogsSpy).toHaveBeenCalledTimes(2));
+  await waitFor(() =>
+    expect(fetchWithLogsSpy).toHaveBeenCalledTimes(productId === PRODUCT_IDS.IDPAY_MERCHANT ? 1 : 2)
+  );
   const inputPartyName = document.getElementById('Parties') as HTMLElement;
 
   const withoutIpaLink = document.getElementById('no_ipa') as HTMLElement;
@@ -1079,7 +1083,7 @@ const executeStepSearchParty = async (
       // expect(fetchWithLogsSpy).toHaveBeenCalledTimes(3);
 
       expect(fetchWithLogsSpy).toHaveBeenNthCalledWith(
-        3,
+        productId === PRODUCT_IDS.IDPAY_MERCHANT ? 2 : 3,
         {
           endpoint: endpoint,
           endpointParams: endpointParams,
