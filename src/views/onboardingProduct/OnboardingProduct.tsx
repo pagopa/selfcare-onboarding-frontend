@@ -86,7 +86,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
   const [origin, setOrigin] = useState<string>();
   const [pricingPlan, setPricingPlan] = useState<string>();
   const [filterCategoriesResponse, setFilterCategoriesResponse] = useState<any>();
-  const [categoriesLoaded, setCategoriesLoaded] = useState(false);
+  // const [categoriesLoaded, setCategoriesLoaded] = useState(false);
   const { setOnExit } = useContext(HeaderContext);
   const { setRequiredLogin } = useContext(UserContext);
   const requestIdRef = useRef<string>();
@@ -227,10 +227,8 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
   }, [selectedProduct]);
 
   useEffect(() => {
-    void getFilterCategories(setRequiredLogin, setFilterCategoriesResponse).finally(() => {
-      setCategoriesLoaded(true);
-    });
-  }, []);
+    void getFilterCategories(productId, setRequiredLogin, setFilterCategoriesResponse);
+  }, [productId]);
 
   const selectFilterCategories = useCallback(() => {
     if (!filterCategoriesResponse?.product) {
@@ -242,7 +240,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
         return filterCategoriesResponse.product['prod-pn']?.ipa.PA;
 
       case PRODUCT_IDS.IDPAY_MERCHANT:
-        return filterCategoriesResponse.product['prod-idpay-merchant']?.merchantDetails;
+        return filterCategoriesResponse.product['prod-idpay-merchant']?.merchantDetails?.atecoCodes;
 
       case PRODUCT_IDS.INTEROP:
         if (institutionType === 'SCEC') {
@@ -664,7 +662,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
         onConfirmLabel={t('onboarding.sessionModal.onConfirmLabel')}
         onCloseLabel={t('onboarding.sessionModal.onCloseLabel')}
       />
-      {(loading || !categoriesLoaded) && (
+      {loading /* || !categoriesLoaded */ && (
         <LoadingOverlay loadingText={t('onboarding.loading.loadingText')} />
       )}
     </Container>
