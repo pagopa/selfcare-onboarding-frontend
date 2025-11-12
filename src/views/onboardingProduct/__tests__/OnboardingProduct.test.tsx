@@ -549,7 +549,7 @@ test('Test: Successfull complete onboarding request of PRV for product prod-pago
   await executeGoHome(mockedLocation);
 });
 
-/* test('Test: Successfull complete onboarding request of PRV party for prod-idpay-merchant search by taxCode', async () => {
+test('Test: Successfull complete onboarding request of PRV party for prod-idpay-merchant search by taxCode', async () => {
   renderComponent(PRODUCT_IDS.IDPAY_MERCHANT);
   await executeStepInstitutionType(PRODUCT_IDS.IDPAY_MERCHANT, 'PRV');
   await executeStepSearchParty(
@@ -640,7 +640,7 @@ test('Test: Successfull complete onboarding request of PRV_PF party for prod-idp
     'personalTaxCode'
   );
   await executeGoHome(mockedLocation);
-}); */
+});
 
 test('Test: Error on submit onboarding request of PA party for prod-io search by business name', async () => {
   renderComponent(PRODUCT_IDS.IO);
