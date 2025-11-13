@@ -42,7 +42,7 @@ type Props = {
   setAooResult: React.Dispatch<React.SetStateAction<AooData | undefined>>;
   setUoResult: React.Dispatch<React.SetStateAction<UoData | undefined>>;
   setMerchantSearchResult?: Dispatch<SetStateAction<PartyData | undefined>>;
-  setIsPresentInAtecoWhiteList: Dispatch<SetStateAction<boolean>> | undefined;
+  setIsPresentInAtecoWhiteList?: (value: boolean) => void;
   setDisabled: Dispatch<SetStateAction<boolean>>;
   externalInstitutionId: string;
   addUser: boolean;
