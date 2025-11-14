@@ -1,6 +1,6 @@
 /* eslint-disable complexity */
 import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
-import { AxiosError, AxiosResponse } from 'axios';
+import axios, { AxiosError, AxiosResponse } from 'axios';
 import { Dispatch, SetStateAction } from 'react';
 import {
   InstitutionOnboardingInfoResource,
@@ -16,8 +16,8 @@ import { getFetchOutcome } from '../lib/error-utils';
 import { PRODUCT_IDS } from '../utils/constants';
 import { OnboardingFormData } from '../model/OnboardingFormData';
 import { genericError } from '../views/onboardingProduct/components/StepVerifyOnboarding';
-import config from '../utils/config.json';
 import { ProductResource } from '../model/ProductResource';
+import { ENV } from '../utils/env';
 
 const fetchVerifyOnboarding = async (
   params: {
@@ -240,32 +240,24 @@ export const checkProduct = async (
 };
 
 export const getFilterCategories = async (
-  productId: string | undefined,
-  setRequiredLogin: Dispatch<SetStateAction<boolean>>,
+  _setRequiredLogin: Dispatch<SetStateAction<boolean>>,
   setFilterCategoriesResponse: Dispatch<SetStateAction<any>>
-) => {
-  if (productId === PRODUCT_IDS.IDPAY_MERCHANT) {
-    setFilterCategoriesResponse(config);
-    return;
-  }
+): Promise<boolean> => {
+  try {
+    const cdnUrl = `${ENV.BASE_PATH_CDN_URL}/assets/config.json`;
+    // Direct axios call to CDN without Authorization header to avoid CORS issues
+    const response = await axios.get(cdnUrl);
 
-  const categories = await fetchWithLogs(
-    {
-      endpoint: 'CONFIG_JSON_CDN_URL',
-    },
-    {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
-    },
-    () => setRequiredLogin(true)
-  );
-
-  const restOutcome = getFetchOutcome(categories);
-  if (restOutcome === 'success') {
-    const response = (categories as AxiosResponse).data;
-    setFilterCategoriesResponse(response);
-  } else {
-    setFilterCategoriesResponse(config);
+    if (response.status === 200 && response.data) {
+      setFilterCategoriesResponse(response.data);
+      return true;
+    } else {
+      console.error('Unexpected response status:', response.status);
+      return false;
+    }
+  } catch (error) {
+    console.error('Error fetching filter categories:', error);
+    return false;
   }
 };
 

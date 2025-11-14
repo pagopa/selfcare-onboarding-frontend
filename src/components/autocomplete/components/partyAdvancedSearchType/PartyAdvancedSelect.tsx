@@ -25,7 +25,7 @@ type Props = {
   institutionType?: InstitutionType;
   addUser: boolean;
   selectedProduct?: Product;
-  setIsPresentInAtecoWhiteList?: Dispatch<SetStateAction<boolean>>;
+  setIsPresentInAtecoWhiteList?: (value: boolean) => void;
   setMerchantSearchResult?: Dispatch<SetStateAction<any>>;
 };
 
@@ -91,6 +91,7 @@ export default function PartyAdvancedSelect({
       setTypeOfSearch(selectedKey);
       setInput('');
       setSelected(null);
+      setCfResult(undefined);
       setIsPresentInAtecoWhiteList?.(true);
       setMerchantSearchResult?.(undefined);
     }

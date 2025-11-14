@@ -70,7 +70,7 @@ type Props = {
   addUser: boolean;
   selectedProduct?: Product;
   filterCategories?: string | { atecoCodes: string; allowedInstitutions: string };
-  setIsPresentInAtecoWhiteList?: Dispatch<SetStateAction<boolean>>;
+  setIsPresentInAtecoWhiteList: (value: boolean) => void | undefined;
   setMerchantSearchResult?: Dispatch<SetStateAction<PartyData | undefined>>;
   setApiLoading?: Dispatch<SetStateAction<boolean>>;
   apiLoading?: boolean;
@@ -146,6 +146,12 @@ export default function AsyncAutocompleteContainer({
   }, [selected]);
 
   useEffect(() => {
+    if (product?.id === PRODUCT_IDS.IDPAY_MERCHANT && !selected) {
+      setMerchantSearchResult?.(undefined);
+      setIsPresentInAtecoWhiteList?.(false);
+      setCfResult(undefined);
+    }
+
     if (!input || input.length === 0 || selected) {
       return;
     }
@@ -163,6 +169,7 @@ export default function AsyncAutocompleteContainer({
 
   useEffect(() => {
     if (!input || (input.length === 0 && product?.id === PRODUCT_IDS.IDPAY_MERCHANT)) {
+      setMerchantSearchResult?.(undefined);
       setIsPresentInAtecoWhiteList?.(true);
       setDisabled(true);
     }
@@ -411,6 +418,12 @@ export default function AsyncAutocompleteContainer({
     const cleanValue = selections.reaCode
       ? formatReaCode(typedInput)
       : removeSpecialCharacters(typedInput);
+
+    if (product?.id === PRODUCT_IDS.IDPAY_MERCHANT) {
+      setMerchantSearchResult?.(undefined);
+      setIsPresentInAtecoWhiteList?.(false);
+      setCfResult(undefined);
+    }
 
     setInput(cleanValue);
     setSelected(null);
