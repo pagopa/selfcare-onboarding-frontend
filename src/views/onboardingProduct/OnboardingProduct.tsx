@@ -233,7 +233,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
       setCategoriesLoaded(true);
     };
     void loadFilterCategories();
-  }, []);
+  }, [productId]);
 
   const selectFilterCategories = useCallback(() => {
     if (!filterCategoriesResponse?.product) {
