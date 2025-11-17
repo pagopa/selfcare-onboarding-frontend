@@ -32,7 +32,7 @@ type AutocompleteProps = {
   apiLoading?: boolean;
   selectedProduct?: Product;
   filterCategories?: string;
-  setIsPresentInAtecoWhiteList?: Dispatch<SetStateAction<boolean>>;
+  setIsPresentInAtecoWhiteList: (value: boolean) => void | undefined; 
   setMerchantSearchResult?: Dispatch<SetStateAction<any>>;
   disabledStatusCompany?: boolean;
   selections: SelectionsState;

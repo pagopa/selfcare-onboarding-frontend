@@ -13,13 +13,20 @@ const validateIdpayMerchantInstitution = (
   disabledStatusCompany: boolean | undefined,
   filterCategories: string | { atecoCodes: string; allowedInstitutions: string } | undefined,
   setDisabled: Dispatch<SetStateAction<boolean>>,
-  setIsPresentInAtecoWhiteList: Dispatch<SetStateAction<boolean>> | undefined,
+  setIsPresentInAtecoWhiteList: (value: boolean) => void,
   setMerchantSearchResult: Dispatch<SetStateAction<PartyData | undefined>> | undefined,
 ) => {
   setMerchantSearchResult?.(response);
 
-  const allowedInstitutions =
-    config.product['prod-idpay-merchant']?.merchantDetails?.allowedInstitution.split(',') || [];
+  const merchantDetails = (filterCategories as { atecoCodes: string; allowedInstitutions: string }) ||
+    config.product['prod-idpay-merchant']?.merchantDetails;
+
+  const allowedInstitutionsStr = merchantDetails?.allowedInstitutions ||
+    config.product['prod-idpay-merchant']?.merchantDetails?.allowedInstitution || '';
+
+  const allowedInstitutions = allowedInstitutionsStr
+    ? allowedInstitutionsStr.split(',').filter(Boolean)
+    : [];
 
   if (disabledStatusCompany) {
     setDisabled(true);
@@ -34,14 +41,11 @@ const validateIdpayMerchantInstitution = (
     setDisabled(false);
   }
   else if (
-    (filterCategories as { atecoCodes: string; allowedInstitutions: string })?.atecoCodes &&
+    merchantDetails?.atecoCodes &&
     response?.atecoCodes &&
     Array.isArray(response.atecoCodes)
   ) {
-    const whitelistCodes =
-      (filterCategories as { atecoCodes: string; allowedInstitutions: string })?.atecoCodes.split(
-        ','
-      ) || [];
+    const whitelistCodes = merchantDetails.atecoCodes.split(',').filter(Boolean);
     const hasMatchingCode = response.atecoCodes.some((code: string) =>
       whitelistCodes.includes(code)
     );
@@ -152,7 +156,7 @@ export const fetchInstitutionByTaxCode = async (
   disabledStatusCompany: boolean | undefined,
   setCfResult: Dispatch<SetStateAction<PartyData | undefined>>,
   setMerchantSearchResult: Dispatch<SetStateAction<PartyData | undefined>> | undefined,
-  setIsPresentInAtecoWhiteList: Dispatch<SetStateAction<boolean>> | undefined,
+  setIsPresentInAtecoWhiteList: (value: boolean) => void | undefined,
   setDisabled: Dispatch<SetStateAction<boolean>>,
   setRequiredLogin: Dispatch<SetStateAction<boolean>>
   // eslint-disable-next-line sonarjs/cognitive-complexity
@@ -209,7 +213,7 @@ export const handleSearchByReaCode = async (
   query: string,
   setApiLoading: Dispatch<SetStateAction<boolean>> | undefined,
   setCfResult: Dispatch<SetStateAction<PartyData | undefined>>,
-  setIsPresentInAtecoWhiteList: Dispatch<SetStateAction<boolean>> | undefined,
+  setIsPresentInAtecoWhiteList: (value: boolean) => void,
   setDisabled: Dispatch<SetStateAction<boolean>>,
   setRequiredLogin: Dispatch<SetStateAction<boolean>>,
   product: Product | undefined,

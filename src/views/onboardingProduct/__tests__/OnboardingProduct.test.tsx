@@ -30,6 +30,7 @@ import {
 } from '../../../utils/test-utils';
 import { createStore } from '../../../redux/store';
 import { Provider } from 'react-redux';
+import axios from 'axios';
 
 jest.setTimeout(40000);
 jest.mock('react-router-dom', () => ({
@@ -40,6 +41,9 @@ jest.mock('react-router-dom', () => ({
     push: mockedHistoryPush,
   }),
 }));
+
+jest.mock('axios');
+const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 let fetchWithLogsSpy: jest.SpyInstance;
 let aggregatesCsv: File;
@@ -69,6 +73,12 @@ beforeEach(() => {
   fetchWithLogsSpy = jest.spyOn(require('../../../lib/api-utils'), 'fetchWithLogs');
   Object.assign(mockedLocation, initialLocation);
   aggregatesCsv = new File(['csv data'], 'aggregates.csv', { type: 'multipart/form-data' });
+
+  // Mock axios.get for CDN config.json call
+  mockedAxios.get.mockResolvedValue({
+    status: 200,
+    data: mockedCategories,
+  });
 });
 
 const filterByCategory4Test = (institutionType?: string, productId?: string) => {
@@ -84,6 +94,8 @@ const filterByCategory4Test = (institutionType?: string, productId?: string) => 
         return mockedCategories.product['prod-interop']?.ipa.SCEC;
       } else if (institutionType === 'PA') {
         return mockedCategories.product['prod-interop']?.ipa.PA;
+      } else if (institutionType === 'GSP') {
+        return mockedCategories.product.default?.ipa.GSP;
       } else {
         return mockedCategories.product.default?.ipa.PA;
       }
@@ -695,7 +707,7 @@ test('Test: Error retrieving onboarding info', async () => {
 
 test('Test: Invalid productId', async () => {
   renderComponent('error');
-  await waitFor(() => expect(fetchWithLogsSpy).toHaveBeenCalledTimes(2));
+  await waitFor(() => expect(fetchWithLogsSpy).toHaveBeenCalledTimes(1));
   await waitFor(() => {
     expect(screen.getByText('Impossibile individuare il prodotto desiderato')).toBeInTheDocument();
   });
@@ -856,7 +868,9 @@ const executeStepSearchParty = async (
 
   screen.getByText('Cerca il tuo ente');
 
-  await waitFor(() => expect(fetchWithLogsSpy).toHaveBeenCalledTimes(2));
+  await waitFor(() =>
+    expect(fetchWithLogsSpy).toHaveBeenCalledTimes(1)
+  );
   const inputPartyName = document.getElementById('Parties') as HTMLElement;
 
   const withoutIpaLink = document.getElementById('no_ipa') as HTMLElement;
@@ -889,9 +903,9 @@ const executeStepSearchParty = async (
 
       const partyNameSelection = await waitFor(() => screen.getByText(partyName));
 
-      expect(fetchWithLogsSpy).toHaveBeenCalledTimes(3);
+      expect(fetchWithLogsSpy).toHaveBeenCalledTimes(2);
       expect(fetchWithLogsSpy).toHaveBeenNthCalledWith(
-        3,
+        2,
         {
           endpoint:
             institutionType === 'SA'
@@ -1078,8 +1092,7 @@ const executeStepSearchParty = async (
 
       // expect(fetchWithLogsSpy).toHaveBeenCalledTimes(3);
 
-      expect(fetchWithLogsSpy).toHaveBeenNthCalledWith(
-        3,
+      expect(fetchWithLogsSpy).toHaveBeenNthCalledWith(2,
         {
           endpoint: endpoint,
           endpointParams: endpointParams,
