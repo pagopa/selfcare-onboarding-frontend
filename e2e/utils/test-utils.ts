@@ -22,14 +22,18 @@ export const FILE_MOCK_PDF_CONTRACT = {
 };
 
 export const stepInstitutionType = async (page: Page, institutionType: string) => {
-  setTimeout(async () => {
-    await page.getByRole('radio', { name: institutionType }).click();
-  }, 1000);
+  await page.waitForTimeout(1000);
+  await page.getByRole('radio', { name: institutionType }).click();
   await page.getByRole('button', { name: 'Continua' }).waitFor({ timeout: 1000 });
   await page.getByRole('button', { name: 'Continua' }).click();
 };
 
-export const stepSelectParty = async (page: Page, aggregator?: boolean, party?: string) => {
+export const stepSelectParty = async (
+  page: Page,
+  aggregator?: boolean,
+  party?: string,
+  productId?: string
+) => {
   await page.click('#Parties');
   await page.fill(
     '#Parties',
@@ -37,9 +41,18 @@ export const stepSelectParty = async (page: Page, aggregator?: boolean, party?: 
       ? party
       : 'Istituto di Formazione Professionale Sandro Pertini Servizi alla Persona e del Legno'
   );
-  setTimeout(async () => {
-    await page.click('.MuiBox-root:nth-child(1) > .MuiBox-root > .MuiBox-root');
-  }, 1000);
+
+  await page.waitForTimeout(1000);
+  await page.waitForSelector(
+    `.MuiBox-root:nth-child(${productId === PRODUCT_IDS_TEST_E2E.SEND ? 2 : 1}) > .MuiBox-root > .MuiBox-root`,
+    {
+      state: 'visible',
+      timeout: 5000,
+    }
+  );
+  await page.click(
+    `.MuiBox-root:nth-child(${productId === PRODUCT_IDS_TEST_E2E.SEND ? 2 : 1}) > .MuiBox-root > .MuiBox-root`
+  );
   if (aggregator) {
     await page.click('[name="aggregator-party"]');
     await page.click('[aria-label="Continua"]');
@@ -47,6 +60,8 @@ export const stepSelectParty = async (page: Page, aggregator?: boolean, party?: 
   } else {
     await page.click('[aria-label="Continua"]');
   }
+
+  await page.waitForLoadState('networkidle', { timeout: 10000 });
 };
 
 export const stepSelectPartyByCF = async (
@@ -62,17 +77,26 @@ export const stepSelectPartyByCF = async (
     await page.waitForSelector(businessTaxIdSelector, { state: 'visible', timeout: 10000 });
     await page.click(`${businessTaxIdSelector} [role="button"]`);
   } else {
+    // Wait for autocomplete results to appear
+    await page.waitForTimeout(1000);
+    await page.waitForSelector('.MuiBox-root:nth-child(1) > .MuiBox-root > .MuiBox-root', {
+      state: 'visible',
+      timeout: 5000,
+    });
     await page.click('.MuiBox-root:nth-child(1) > .MuiBox-root > .MuiBox-root');
   }
 
   await page.click('[aria-label="Continua"]');
+
+  await page.waitForLoadState('networkidle', { timeout: 10000 });
 };
 
 // eslint-disable-next-line complexity
 export const stepFormData = async (
   page: Page,
   productOrInstitutionType: string,
-  institutionType?: string
+  institutionType?: string,
+  isAggregator?: boolean
   // eslint-disable-next-line sonarjs/cognitive-complexity
 ) => {
   const isFromIpa = institutionType !== undefined;
@@ -120,12 +144,7 @@ export const stepFormData = async (
     await page.click('#city-select-option-0');
   }
 
-  if (
-    isFromIpa &&
-    product !== PRODUCT_IDS_TEST_E2E.PAGOPA &&
-    institutionType !== 'PRV' &&
-    institutionType !== 'GPU'
-  ) {
+  if (isFromIpa && institutionType !== 'PRV' && institutionType !== 'GPU') {
     await page.getByLabel('La Partita IVA coincide con il Codice Fiscale').click();
   }
 
@@ -137,10 +156,14 @@ export const stepFormData = async (
     product !== PRODUCT_IDS_TEST_E2E.IO
   ) {
     await page.click('#recipientCode');
-    await page.fill('#recipientCode', product === PRODUCT_IDS_TEST_E2E.SEND ? 'UFBM8M' : 'UFOR71', {
-      timeout: 500,
-    });
-  } else if (!isFromIpa && actualInstitutionType !== 'PT') {
+    await page.fill(
+      '#recipientCode',
+      product === PRODUCT_IDS_TEST_E2E.SEND ? (isAggregator ? 'UFL4DM' : 'UFBM8M') : 'UFOR71',
+      {
+        timeout: 2000,
+      }
+    );
+  } else if (!isFromIpa && actualInstitutionType !== 'PT' && product !== PRODUCT_IDS_TEST_E2E.IO) {
     await page.click('#recipientCode');
     await page.fill('#recipientCode', 'A1B2C3');
 
@@ -401,9 +424,8 @@ export const stepCompleteOnboarding = async (page: Page, taxCode: string, filePd
 
     await page.click('[data-testid="DownloadIcon"]', { timeout: 2000 });
 
-    setTimeout(async () => {
-      await page.click('[data-testid="ArrowForwardIcon"]', { timeout: 2000 });
-    }, 2000);
+    await page.waitForTimeout(2000);
+    await page.click('[data-testid="ArrowForwardIcon"]', { timeout: 2000 });
 
     await page.waitForSelector('#file-uploader', {
       state: 'attached',

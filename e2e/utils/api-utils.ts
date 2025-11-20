@@ -9,7 +9,7 @@ export const getOnboardingIdByTaxCode = async (page: Page, taxCode: string): Pro
   if (isLocalMode) {
     console.log('⚠️ Local mode detected');
     token =
-      'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJmaXNjYWxfbnVtYmVyIjoiU1NUTVRUNzZDMjNGMjA1VCIsIm5hbWUiOiJNYXR0aWEiLCJmYW1pbHlfbmFtZSI6IlNpc3RpIiwidWlkIjoiZWUwYmY2ZGEtODE4Ni00YjZkLWJkMjgtYWE4ZTNhOGRiZDc2Iiwic3BpZF9sZXZlbCI6Imh0dHBzOi8vd3d3LnNwaWQuZ292Lml0L1NwaWRMMiIsImlzcyI6IlNQSUQiLCJhdWQiOiJhcGkuZGV2LnNlbGZjYXJlLnBhZ29wYS5pdCIsImlhdCI6MTc2MjI0NjIzNywiZXhwIjoxNzYyMjc4NjM3LCJqdGkiOiIxOWM0NDdkNS04Nzc1LTRhMGUtYjdhNy1iMDFlYWFiZDc1ZDEifQ.ITL8SlGUPPQY2Hy_eKnXz94vnmtB4-BGR5fJeDsvhNqsqg_7-Ic6rBZ2ozGdGAy5xKo2SiG0MAKbKCe6QBYV_fHXJdgtbYiM1TId7M0DXjuQZ1p4LCxbszMU09hgn0KCkgzJOaYfTjxfSRY6pAgWANZ9AQEAwNLrjYvKG0EFgGZQUNptgNoaXDYsa5cu5XJY5-MmHb_bw2zI4LMyHNV9fh9MmWFRZgf7X9Sr6t_CpPwYirdiKQFxaUB5vmJqxwbyx8h3IALWHMykQ73SGociU0BzhqOcEvyhQx3chDKf-IDiJwNxvi5eVjAEFgm5OhLVPTc4Qh8J1dUbqxa0iLXEaQ';
+      'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJmaXNjYWxfbnVtYmVyIjoiU1JUTkxNMDlUMDZHNjM1UyIsIm5hbWUiOiJBbnNlbG1vIiwiZmFtaWx5X25hbWUiOiJTYXJ0b3JpIiwidWlkIjoiNTA5NmU0YzYtMjVhMS00NWQ1LTliZGYtMmZiOTc0YTdjMWM4Iiwic3BpZF9sZXZlbCI6Imh0dHBzOi8vd3d3LnNwaWQuZ292Lml0L1NwaWRMMiIsImlzcyI6IlNQSUQiLCJhdWQiOiJhcGkuZGV2LnNlbGZjYXJlLnBhZ29wYS5pdCIsImlhdCI6MTc2MzU0NDQ1NCwiZXhwIjoxNzYzNTc2ODU0LCJqdGkiOiIyZWMzOGY1OS0xMzNiLTQxNjEtYTE5Yi05NmE4YzQwYjMzZjMifQ.YhWZ4GzXCmRXLfW_P8oW20Hv82eZf7GDLkpGQ9i7TXVOXKuBKq11AeYwY2WR1eFz8QlvwY7nECbhH0yzlQxfvicWTD9ovUtemT1bQOLn1YBbIUn41Hy4WXBB7UeRYRoN8yLcxd0DLduee8b_d_fRBtMxJ0nL3MUKgNjoN_MwbTDaLGnim2e4WclgvqYSeL1m0Y6_BWEciDAWCcYR1sDh_JemI36FBI1zKYoL4kDgTSu3efQi7ucwRN_dLF9OaBjOUuTsRVHXccdrm1Fzcio7SXFlS_clGlPZW3YXGfj5RP-ODlmH6qZP8dmmsRGWChsQwWB9orE1f2ECWEmpqcAL3Q';
   } else {
     token = (await page.evaluate(() => localStorage.getItem('token'))) || '';
     console.log('✅ Token from localStorage');
@@ -61,7 +61,7 @@ export const deleteOnboardingById = async (
   try {
     const response = await page.request.delete(fullUrl, {
       headers: {
-        'Ocp-Apim-Subscription-Key': '' // TODO. take the value form env variable
+        'Ocp-Apim-Subscription-Key': process.env.APIM_SUBSCRIPTION_KEY || ''
       },
     });
 

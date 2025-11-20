@@ -16,12 +16,12 @@ import {
 test('Test Success onboarding request for product prod-pagopa and institutionType PA', async ({
   page,
 }) => {
-  // await page.goto(`${BASE_URL_ONBOARDING}/prod-pagopa`);
-  // await stepInstitutionType(page, 'Pubblica Amministrazione');
-  // await stepSelectParty(page);
-  // await stepFormData(page, PRODUCT_IDS_TEST_E2E.IO, 'PA');
-  // await stepAddManager(page);
-  // await stepAddAdmin(page);
+  await page.goto(`${BASE_URL_ONBOARDING}/prod-pagopa`);
+  await stepInstitutionType(page, 'Pubblica Amministrazione');
+  await stepSelectParty(page);
+  await stepFormData(page, PRODUCT_IDS_TEST_E2E.PAGOPA, 'PA');
+  await stepAddManager(page);
+  await stepAddAdmin(page);
   await stepCompleteOnboarding(page, '01944590221', FILE_MOCK_PDF_CONTRACT.PA);
 });
 
@@ -33,8 +33,8 @@ test('Test Success onboarding request for product prod-io and institutionType PA
   await stepSelectParty(page);
   await stepFormData(page, PRODUCT_IDS_TEST_E2E.IO, 'PA');
   await stepAddManager(page);
-  // await stepAddAdmin(page);
-  // await stepCompleteOnboarding(page, '01944590221', FILE_MOCK_PDF_CONTRACT.PA);
+  await stepAddAdmin(page);
+  await stepCompleteOnboarding(page, '01944590221', FILE_MOCK_PDF_CONTRACT.PA);
 });
 
 test('Test Success onboarding request for product prod-io and institutionType PA with aggregator party', async ({
@@ -45,13 +45,13 @@ test('Test Success onboarding request for product prod-io and institutionType PA
   await stepSelectParty(page, true);
   await stepFormData(page, PRODUCT_IDS_TEST_E2E.IO, 'PA');
   await stepAddManager(page);
-  /* await stepAddAdmin(page, true);
+  await stepAddAdmin(page, true);
   await stepUploadAggregatorCsv(
     page,
     'Indica i soggetti aggregati per IO',
     FILE_MOCK_CSV_AGGREGATOR.IO
-  ); */
-  // await stepCompleteOnboarding(page, '01944590221', FILE_MOCK_PDF_CONTRACT.PA);
+  );
+  await stepCompleteOnboarding(page, '01944590221', FILE_MOCK_PDF_CONTRACT.PA);
 });
 
 test('Test Success onboarding request for product prod-io-sign and institutionType PA', async ({
@@ -93,8 +93,8 @@ test('Test Success onboarding request for product prod-pn and institutionType PA
   page,
 }) => {
   await page.goto(`${BASE_URL_ONBOARDING}/prod-pn`);
-  await stepSelectParty(page, true, 'Fondazione Toscana Gabriele');
-  await stepFormData(page, PRODUCT_IDS_TEST_E2E.SEND, 'PA');
+  await stepSelectParty(page, true, 'Fondazione Toscana Gabriele', PRODUCT_IDS_TEST_E2E.SEND);
+  await stepFormData(page, PRODUCT_IDS_TEST_E2E.SEND, 'PA', true);
   await stepAddManager(page);
   await stepAddAdmin(page, true);
   await stepUploadAggregatorCsv(
