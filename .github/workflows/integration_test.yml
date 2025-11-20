@@ -8,7 +8,7 @@ permissions:
 on:
   workflow_dispatch:
   pull_request:
-      types: [opened, edited, synchronize, reopened, ready_for_review]
+    types: [opened, edited, synchronize, reopened, ready_for_review]
 
 jobs:
   execute_integration_test:
@@ -21,12 +21,12 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
-          node-version-file: ".node-version"
+          node-version-file: '.node-version'
           cache: 'yarn'
           cache-dependency-path: 'yarn.lock'
 
       - name: Azure Login
-        uses: azure/login@a65d910e8af852a8061c627c456678983e180302
+        uses: azure/login@cb79c773a3cfa27f31f25eb3f677781210c9ce3d # v1.6.1
         with:
           client-id: ${{ secrets.ARM_CLIENT_ID }}
           tenant-id: ${{ vars.ARM_TENANT_ID }}
