@@ -44,14 +44,14 @@ export const stepSelectParty = async (
 
   await page.waitForTimeout(1000);
   await page.waitForSelector(
-    `.MuiBox-root:nth-child(${productId === PRODUCT_IDS_TEST_E2E.SEND ? 2 : 1}) > .MuiBox-root > .MuiBox-root`,
+    `.MuiBox-root:nth-child(${productId === PRODUCT_IDS_TEST_E2E.SEND || (productId === PRODUCT_IDS_TEST_E2E.IO && aggregator) ? 2 : 1}) > .MuiBox-root > .MuiBox-root`,
     {
       state: 'visible',
       timeout: 5000,
     }
   );
   await page.click(
-    `.MuiBox-root:nth-child(${productId === PRODUCT_IDS_TEST_E2E.SEND ? 2 : 1}) > .MuiBox-root > .MuiBox-root`
+    `.MuiBox-root:nth-child(${productId === PRODUCT_IDS_TEST_E2E.SEND || (productId === PRODUCT_IDS_TEST_E2E.IO && aggregator) ? 2 : 1}) > .MuiBox-root > .MuiBox-root`
   );
   if (aggregator) {
     await page.click('[name="aggregator-party"]');
