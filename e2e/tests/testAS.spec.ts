@@ -7,6 +7,8 @@ import {
   stepAddManager,
   stepAddAdmin,
   PRODUCT_IDS_TEST_E2E,
+  stepCompleteOnboarding,
+  FILE_MOCK_PDF_CONTRACT,
 } from '../utils/test-utils';
 
 test('Test Success onboarding request for product prod-interop and institutionType AS ', async ({
@@ -18,4 +20,10 @@ test('Test Success onboarding request for product prod-interop and institutionTy
   await stepFormData(page, PRODUCT_IDS_TEST_E2E.INTEROP, 'AS');
   await stepAddManager(page);
   await stepAddAdmin(page);
+  await stepCompleteOnboarding(
+    page,
+    '03014640274',
+    FILE_MOCK_PDF_CONTRACT.PA,
+    PRODUCT_IDS_TEST_E2E.INTEROP
+  );
 });

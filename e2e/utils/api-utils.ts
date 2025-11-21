@@ -1,15 +1,18 @@
 import { Page } from '@playwright/test';
 import { isLocalMode } from './global.setup';
 
-export const getOnboardingIdByTaxCode = async (page: Page, taxCode: string): Promise<string> => {
-
+export const getOnboardingIdByTaxCode = async (
+  page: Page,
+  taxCode: string,
+  productId: string
+): Promise<string> => {
   // eslint-disable-next-line functional/no-let
   let token: string;
 
   if (isLocalMode) {
     console.log('⚠️ Local mode detected');
     token =
-      'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJmaXNjYWxfbnVtYmVyIjoiU1JUTkxNMDlUMDZHNjM1UyIsIm5hbWUiOiJBbnNlbG1vIiwiZmFtaWx5X25hbWUiOiJTYXJ0b3JpIiwidWlkIjoiNTA5NmU0YzYtMjVhMS00NWQ1LTliZGYtMmZiOTc0YTdjMWM4Iiwic3BpZF9sZXZlbCI6Imh0dHBzOi8vd3d3LnNwaWQuZ292Lml0L1NwaWRMMiIsImlzcyI6IlNQSUQiLCJhdWQiOiJhcGkuZGV2LnNlbGZjYXJlLnBhZ29wYS5pdCIsImlhdCI6MTc2MzU0NDQ1NCwiZXhwIjoxNzYzNTc2ODU0LCJqdGkiOiIyZWMzOGY1OS0xMzNiLTQxNjEtYTE5Yi05NmE4YzQwYjMzZjMifQ.YhWZ4GzXCmRXLfW_P8oW20Hv82eZf7GDLkpGQ9i7TXVOXKuBKq11AeYwY2WR1eFz8QlvwY7nECbhH0yzlQxfvicWTD9ovUtemT1bQOLn1YBbIUn41Hy4WXBB7UeRYRoN8yLcxd0DLduee8b_d_fRBtMxJ0nL3MUKgNjoN_MwbTDaLGnim2e4WclgvqYSeL1m0Y6_BWEciDAWCcYR1sDh_JemI36FBI1zKYoL4kDgTSu3efQi7ucwRN_dLF9OaBjOUuTsRVHXccdrm1Fzcio7SXFlS_clGlPZW3YXGfj5RP-ODlmH6qZP8dmmsRGWChsQwWB9orE1f2ECWEmpqcAL3Q';
+      'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJmaXNjYWxfbnVtYmVyIjoiU1NUTVRUNzZDMjNGMjA1VCIsIm5hbWUiOiJNYXR0aWEiLCJmYW1pbHlfbmFtZSI6IlNpc3RpIiwidWlkIjoiZWUwYmY2ZGEtODE4Ni00YjZkLWJkMjgtYWE4ZTNhOGRiZDc2Iiwic3BpZF9sZXZlbCI6Imh0dHBzOi8vd3d3LnNwaWQuZ292Lml0L1NwaWRMMiIsImlzcyI6IlNQSUQiLCJhdWQiOiJhcGkuZGV2LnNlbGZjYXJlLnBhZ29wYS5pdCIsImlhdCI6MTc2MzcxNDY1NywiZXhwIjoxNzYzNzQ3MDU3LCJqdGkiOiI1ODRlZjUwNS02MTczLTRlZWEtODI4MS05NjI1MGIzOGM5MzkifQ.taPHeSQa-x--5n5eiDf5H4R08y0jja3fAaiRjs7ls8BbFizVMOBpfZBPw4IfJAUw-vaUjuIbctR2jU2yf13TV5F3STZ9HVxzN9HFgapMpPBq0nUwB3cih3H4jgpkL1wwTkm53H2XnbjGSgdEHhn4c_k54wqiIKPlPu5HY2TR9y_4Aa7bUDzcVfM7uWPupC-PflEIDwN61brhOWwZkPQdzQXpsKjOsEL2h4bT9vVifHEi5EtUUhszA1mnL10O6QEjrtpHTBvnBE7yzWxa7zl9EegdlYvcmZ8NpNebW0z6GTp37w1ae5yKL3w21fQKEDPvPIu0BgYbNaNQL9IKqw6awQ';
   } else {
     token = (await page.evaluate(() => localStorage.getItem('token'))) || '';
     console.log('✅ Token from localStorage');
@@ -24,29 +27,52 @@ export const getOnboardingIdByTaxCode = async (page: Page, taxCode: string): Pro
 
   const fullUrl = `${apiUrl}/v2/institutions/onboardings?taxCode=${taxCode}&status=PENDING`;
 
-  try {
-    const response = await fetch(fullUrl, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+  const fetchOnboarding = async (): Promise<string> => {
+    try {
+      const response = await fetch(fullUrl, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('❌ Error response:', errorText);
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('❌ Error response:', errorText);
+        return '';
+      }
+
+      const data = await response.json();
+
+      if (Array.isArray(data) && data.length > 0) {
+        const matchingOnboarding = data.find((onb: any) => onb.productId === productId);
+
+        if (matchingOnboarding) {
+          console.log(`✅ Found onboarding for product ${productId}: ${matchingOnboarding.id}`);
+          return matchingOnboarding.id;
+        }
+
+        const foundProducts = data.map((onb: any) => onb.productId).join(', ');
+        console.warn(
+          `⚠️ Found ${data.length} onboarding(s), but none matching productId ${productId}. Found: [${foundProducts}]`
+        );
+        return '';
+      }
+
+      console.error('❌ No data in array');
+      return '';
+    } catch (error) {
+      console.error('❌ Fetch error:', error);
       return '';
     }
+  };
 
-    const data = await response.json();
+  const result = await fetchOnboarding();
 
-    if (Array.isArray(data) && data.length > 0) {
-      return data[0].id;
-    }
-
-    console.error('❌ No data in array');
-    return '';
-  } catch (error) {
-    console.error('❌ Fetch error:', error);
-    return '';
+  if (!result) {
+    console.log('⏳ Retrying once after 2 seconds...');
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    return await fetchOnboarding();
   }
+
+  return result;
 };
 
 export const deleteOnboardingById = async (

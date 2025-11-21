@@ -62,6 +62,8 @@ export const stepSelectParty = async (
   }
 
   await page.waitForLoadState('networkidle', { timeout: 10000 });
+
+  await page.waitForTimeout(1000);
 };
 
 export const stepSelectPartyByCF = async (
@@ -102,6 +104,11 @@ export const stepFormData = async (
   const isFromIpa = institutionType !== undefined;
   const product = isFromIpa ? productOrInstitutionType : '';
   const actualInstitutionType = isFromIpa ? institutionType : productOrInstitutionType;
+
+  await page
+    .getByRole('textbox', { name: 'Indirizzo e numero civico della sede legale' })
+    .isVisible();
+
   if (
     !isFromIpa ||
     (product === PRODUCT_IDS_TEST_E2E.PAGOPA &&
@@ -406,10 +413,15 @@ export const stepUploadAggregatorCsv = async (page: Page, title: string, fileCsv
   });
 };
 
-export const stepCompleteOnboarding = async (page: Page, taxCode: string, filePdf: string) => {
+export const stepCompleteOnboarding = async (
+  page: Page,
+  taxCode: string,
+  filePdf: string,
+  productId: string
+) => {
   console.log('🔄 Fetching onboardingId...');
 
-  const onboardingId = await getOnboardingIdByTaxCode(page, taxCode);
+  const onboardingId = await getOnboardingIdByTaxCode(page, taxCode, productId);
 
   if (onboardingId.length > 0) {
     console.log('✅ OnboardingId retrieved, navigating to confirm page...');
