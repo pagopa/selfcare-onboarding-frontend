@@ -8,11 +8,17 @@ interface OnboardingTracker {
   timestamp: string;
 }
 
-/**
- * Adds an onboarding ID to the tracking file
- */
+const isValidOnboardingId = (onboardingId: string): boolean =>
+  /^[a-zA-Z0-9_-]+$/.test(onboardingId) && onboardingId.length > 0 && onboardingId.length < 256;
+
 export const trackOnboardingId = async (onboardingId: string): Promise<void> => {
   try {
+    // Validate onboarding ID to prevent injection
+    if (!isValidOnboardingId(onboardingId)) {
+      console.error('❌ Invalid onboarding ID format:', onboardingId);
+      return;
+    }
+
     // eslint-disable-next-line functional/no-let
     let tracker: OnboardingTracker = {
       onboardingIds: [],
@@ -45,9 +51,7 @@ export const trackOnboardingId = async (onboardingId: string): Promise<void> => 
   }
 };
 
-/**
- * Retrieves all tracked onboarding IDs
- */
+// Retrieves all tracked onboarding IDs
 export const getTrackedOnboardingIds = async (): Promise<Array<string>> => {
   try {
     const fileContent = await fs.readFile(TRACKING_FILE, 'utf-8');
@@ -59,9 +63,7 @@ export const getTrackedOnboardingIds = async (): Promise<Array<string>> => {
   }
 };
 
-/**
- * Clears the tracking file
- */
+// Clears the tracking file
 export const clearTrackedOnboardingIds = async (): Promise<void> => {
   try {
     await fs.unlink(TRACKING_FILE);
