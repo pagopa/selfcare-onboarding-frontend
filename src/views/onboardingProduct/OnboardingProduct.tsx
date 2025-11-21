@@ -87,6 +87,9 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
   const [pricingPlan, setPricingPlan] = useState<string>();
   const [filterCategoriesResponse, setFilterCategoriesResponse] = useState<any>();
   const [categoriesLoaded, setCategoriesLoaded] = useState(false);
+  const [pendingForward, setPendingForward] = useState<{
+    data: Partial<FormData>;
+  } | null>(null);
   const { setOnExit } = useContext(HeaderContext);
   const { setRequiredLogin } = useContext(UserContext);
   const requestIdRef = useRef<string>();
@@ -144,7 +147,24 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     externalInstitutionId,
     setAdditionalInformations,
     setAdditionalGPUInformations,
+    setPendingForward,
   });
+
+  useEffect(() => {
+    if (pendingForward && onboardingFormData && externalInstitutionId && institutionType) {
+      const { data } = pendingForward;
+      setPendingForward(null);
+
+      setFormData((prevFormData) => {
+        if (prevFormData) {
+          return { ...prevFormData, ...data };
+        }
+        return data;
+      });
+
+      setActiveStep((prevStep) => prevStep + 1);
+    }
+  }, [pendingForward, onboardingFormData, externalInstitutionId, institutionType]);
 
   useEffect(() => {
     if (institutionTypeByUrl === 'PT' && productId === PRODUCT_IDS.PAGOPA) {

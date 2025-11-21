@@ -62,8 +62,6 @@ export const stepSelectParty = async (
   }
 
   await page.waitForLoadState('networkidle', { timeout: 10000 });
-
-  await page.waitForTimeout(1000);
 };
 
 export const stepSelectPartyByCF = async (
@@ -104,11 +102,6 @@ export const stepFormData = async (
   const isFromIpa = institutionType !== undefined;
   const product = isFromIpa ? productOrInstitutionType : '';
   const actualInstitutionType = isFromIpa ? institutionType : productOrInstitutionType;
-
-  await page
-    .getByRole('textbox', { name: 'Indirizzo e numero civico della sede legale' })
-    .isVisible();
-
   if (
     !isFromIpa ||
     (product === PRODUCT_IDS_TEST_E2E.PAGOPA &&
@@ -126,10 +119,7 @@ export const stepFormData = async (
     await page.click('#taxCodeEquals2VatNumber');
   }
 
-  if (
-    (product === PRODUCT_IDS_TEST_E2E.PAGOPA && actualInstitutionType === 'GSP') ||
-    (product === PRODUCT_IDS_TEST_E2E.INTEROP && actualInstitutionType === 'PRV')
-  ) {
+  if (product === PRODUCT_IDS_TEST_E2E.INTEROP && actualInstitutionType === 'PRV') {
     await page.click('#taxCodeEquals2VatNumber');
   }
 
