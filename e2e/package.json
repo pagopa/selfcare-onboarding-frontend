@@ -5,9 +5,11 @@
   "license": "MIT",
   "devDependencies": {
     "@playwright/test": "^1.51.1",
-    "@types/node": "^22.13.13"
+    "@types/node": "^22.13.13",
+    "tsx": "^4.20.6"
   },
   "scripts": {
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "cleanup": "tsx scripts/cleanup-onboardings.ts"
   }
 }

@@ -26,6 +26,7 @@ interface ForwardFunctionsParams {
   externalInstitutionId: string;
   setAdditionalInformations: Dispatch<SetStateAction<AdditionalInformations | undefined>>;
   setAdditionalGPUInformations: Dispatch<SetStateAction<AdditionalGpuInformations | undefined>>;
+  setPendingForward: Dispatch<SetStateAction<{ data: Partial<FormData> } | null>>;
 }
 
 export const createForwardFunctions = (params: ForwardFunctionsParams) => {
@@ -48,6 +49,7 @@ export const createForwardFunctions = (params: ForwardFunctionsParams) => {
     externalInstitutionId,
     setAdditionalInformations,
     setAdditionalGPUInformations,
+    setPendingForward,
   } = params;
 
   const forwardWithData = (newFormData: Partial<FormData>) => {
@@ -126,6 +128,7 @@ export const createForwardFunctions = (params: ForwardFunctionsParams) => {
       setOrigin('SELC');
       setActiveStep(activeStep + 3);
     } else {
+      setInstitutionType(institutionTypeParam);
       setOnboardingFormData(onboardingData);
       setExternalInstitutionId(onboardingData?.externalId ?? '');
       const originToSet = onboardingData?.origin || origin;
@@ -136,13 +139,15 @@ export const createForwardFunctions = (params: ForwardFunctionsParams) => {
       }
 
       setOrigin(originToSet);
-      forwardWithData(onboardingData as Partial<FormData>);
       trackEvent('ONBOARDING_PARTY_SELECTION', {
         party_id: onboardingData?.externalId,
         request_id: requestIdRef.current,
         product_id: productId,
       });
-      setInstitutionType(institutionTypeParam);
+
+      setPendingForward({
+        data: onboardingData as Partial<FormData>,
+      });
     }
   };
 

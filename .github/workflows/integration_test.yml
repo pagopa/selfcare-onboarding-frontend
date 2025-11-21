@@ -1,17 +1,19 @@
 name: Playwright Integration Tests
 
 permissions:
+  id-token: write
   contents: read
   actions: write
 
 on:
   workflow_dispatch:
   pull_request:
-      types: [opened, edited, synchronize, reopened, ready_for_review]
+    types: [opened, edited, synchronize, reopened, ready_for_review]
 
 jobs:
   execute_integration_test:
     runs-on: ubuntu-24.04
+    environment: dev-ci
 
     steps:
       - name: Checkout code
@@ -20,9 +22,30 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
-          node-version-file: ".node-version"
+          node-version-file: '.node-version'
           cache: 'yarn'
           cache-dependency-path: 'yarn.lock'
+
+      - name: Azure Login
+        uses: azure/login@cb79c773a3cfa27f31f25eb3f677781210c9ce3d # v1.6.1
+        with:
+          client-id: ${{ secrets.ARM_CLIENT_ID }}
+          tenant-id: ${{ vars.ARM_TENANT_ID }}
+          subscription-id: ${{ vars.ARM_SUBSCRIPTION_ID }}
+
+      - name: Get APIM Key from Key Vault (DEV)
+        id: get-apim-key
+        run: |
+          APIM_KEY=$(az keyvault secret show \
+            --vault-name selc-d-kv \
+            --name external-interceptor-apim-internal \
+            --query value -o tsv)
+          echo "::add-mask::$APIM_KEY"
+          echo "APIM_KEY=$APIM_KEY" >> $GITHUB_OUTPUT
+
+      - name: Azure Logout
+        if: always()
+        run: az logout
 
       - name: Install Yarn
         run: npm install -g yarn
@@ -46,5 +69,28 @@ jobs:
         run: yarn build
 
       - name: Run Playwright tests
-        #working-directory: ./e2e
+        id: run_tests
+        continue-on-error: true
+        env:
+          CI: true
+          REACT_APP_ENV: development
+          APIM_SUBSCRIPTION_KEY: ${{ steps.get-apim-key.outputs.APIM_KEY }}
+          REACT_APP_URL_API_APIM: ${{ secrets.REACT_APP_URL_API_APIM }}
         run: yarn test:e2e
+
+      - name: Cleanup onboardings
+        if: always()
+        env:
+          CI: true
+          REACT_APP_ENV: development
+          APIM_SUBSCRIPTION_KEY: ${{ steps.get-apim-key.outputs.APIM_KEY }}
+          REACT_APP_URL_API_APIM: ${{ secrets.REACT_APP_URL_API_APIM }}
+        run: |
+          cd e2e
+          yarn cleanup || echo "⚠️ Cleanup failed, but continuing..."
+
+      - name: Check test results
+        if: steps.run_tests.outcome == 'failure'
+        run: |
+          echo "❌ E2E tests failed"
+          exit 1
