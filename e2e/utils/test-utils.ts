@@ -12,6 +12,10 @@ export const BASE_URL_ONBOARDING = isLocalMode
   ? 'http://localhost:3000/onboarding'
   : 'http://dev.selfcare.pagopa.it/onboarding';
 
+export const BASE_URL_ONBOARDING_TO_APPROVE = isLocalMode
+  ? 'http://localhost:3000/dashboard/admin/onboarding'
+  : 'http://dev.selfcare.pagopa.it/dashboard/admin/onboarding';
+
 export const FILE_MOCK_CSV_AGGREGATOR = {
   IO: '../src/lib/__mocks__/mockedFileAggregator.csv',
   SEND: '../src/lib/__mocks__/mockedFileAggregatorSend.csv',
@@ -19,6 +23,23 @@ export const FILE_MOCK_CSV_AGGREGATOR = {
 
 export const FILE_MOCK_PDF_CONTRACT = {
   PA: './utils/mocks/mockedContract.pdf',
+};
+
+export const PRODUCT_IDS_TEST_E2E = {
+  PAGOPA: 'prod-pagopa',
+  IO: 'prod-io',
+  SEND: 'prod-pn',
+  SEND_DEV: 'prod-pn-dev',
+  INTEROP: 'prod-interop',
+  IDPAY: 'prod-idpay',
+  IO_SIGN: 'prod-io-sign',
+  FD: 'prod-fd',
+  FD_GARANTITO: 'prod-fd-garantito',
+  DASHBOARD_PSP: 'prod-dashboard-psp',
+  IO_PREMIUM: 'prod-io-premium',
+  CIBAN: 'prod-ciban',
+  CGN: 'prod-cgn',
+  IDPAY_MERCHANT: 'prod-idpay-merchant',
 };
 
 export const stepInstitutionType = async (page: Page, institutionType: string) => {
@@ -383,11 +404,7 @@ export const stepUploadAggregatorCsv = async (page: Page, title: string, fileCsv
   const fileInput = page.locator('#file-uploader');
   await expect(fileInput).toBeAttached();
 
-  try {
-    await page.setInputFiles('#file-uploader', fileCsv);
-  } catch (error) {
-    console.error('Errore durante il caricamento del file:', error);
-  }
+  await page.setInputFiles('#file-uploader', fileCsv);
 
   await page.waitForTimeout(1000);
 
@@ -403,26 +420,51 @@ export const stepUploadAggregatorCsv = async (page: Page, title: string, fileCsv
   });
 };
 
+export const redirectToApprove = async (page: Page, onboardingId: string) => {
+  await page.goto(`${BASE_URL_ONBOARDING_TO_APPROVE}/${onboardingId}`, {
+    timeout: 20000,
+  });
+
+  await expect(
+    page.getByText('Controlla le informazioni inserite dall’ente e approva o rifiuta la richiesta.')
+  ).toBeInViewport({
+    timeout: 10000,
+  });
+
+  await page.getByRole('button', { name: 'Approva' }).click();
+
+  await expect(page.getByText('Adesione approvata')).toBeInViewport({
+    timeout: 10000,
+  });
+};
+
 export const stepCompleteOnboarding = async (
   page: Page,
   taxCode: string,
   filePdf: string,
-  productId: string
+  productId: string,
+  institutionType?: InstitutionType
 ) => {
-  console.log('🔄 Fetching onboardingId...');
-
   const onboardingId = await getOnboardingIdByTaxCode(page, taxCode, productId);
 
   if (onboardingId.length > 0) {
-    console.log('✅ OnboardingId retrieved, navigating to confirm page...');
-
-    // Track the onboarding ID for cleanup
     await trackOnboardingId(onboardingId);
+
+    if (
+      productId === PRODUCT_IDS_TEST_E2E.PAGOPA &&
+      (institutionType === 'PRV' ||
+        institutionType === 'GPU' ||
+        institutionType === 'PSP' ||
+        institutionType === 'PT')
+    ) {
+      await redirectToApprove(page, onboardingId);
+      // Wait a bit after approval before navigating to confirm page
+      await page.waitForTimeout(2000);
+    }
 
     await page.goto(`${BASE_URL_ONBOARDING}/confirm?jwt=${onboardingId}`, {
       timeout: 20000,
     });
-    console.log('✅ Navigato a pagina di conferma');
 
     await page.click('[data-testid="DownloadIcon"]', { timeout: 2000 });
 
@@ -439,11 +481,7 @@ export const stepCompleteOnboarding = async (
     const fileInput = page.locator('#file-uploader');
     await expect(fileInput).toBeAttached();
 
-    try {
-      await page.setInputFiles('#file-uploader', filePdf);
-    } catch (error) {
-      console.error('Errore durante il caricamento del file:', error);
-    }
+    await page.setInputFiles('#file-uploader', filePdf);
 
     await page.waitForTimeout(1000);
 
@@ -452,26 +490,7 @@ export const stepCompleteOnboarding = async (
     await expect(page.getByText('Adesione completata!')).toBeInViewport({
       timeout: 10000,
     });
-  } else {
-    console.error('❌ OnboardingId non trovato, impossibile procedere');
   }
-};
-
-export const PRODUCT_IDS_TEST_E2E = {
-  PAGOPA: 'prod-pagopa',
-  IO: 'prod-io',
-  SEND: 'prod-pn',
-  SEND_DEV: 'prod-pn-dev',
-  INTEROP: 'prod-interop',
-  IDPAY: 'prod-idpay',
-  IO_SIGN: 'prod-io-sign',
-  FD: 'prod-fd',
-  FD_GARANTITO: 'prod-fd-garantito',
-  DASHBOARD_PSP: 'prod-dashboard-psp',
-  IO_PREMIUM: 'prod-io-premium',
-  CIBAN: 'prod-ciban',
-  CGN: 'prod-cgn',
-  IDPAY_MERCHANT: 'prod-idpay-merchant',
 };
 
 /* export const stepFormDataWithIpaResearch4SDICode = async (

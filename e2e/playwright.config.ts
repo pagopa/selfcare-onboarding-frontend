@@ -16,7 +16,7 @@ export default defineConfig({
   globalSetup: path.resolve(__dirname, './utils/global.setup.ts'),
   globalTeardown: path.resolve(__dirname, './utils/global.teardown.ts'),
   workers: process.env.CI ? 1 : 3,
-  timeout: process.env.CI ? 90000 : 75000,
+  timeout: process.env.CI ? 90000 : 120000,
   testDir: './tests',
   forbidOnly: !!process.env.CI,
   fullyParallel: false,

@@ -6,7 +6,9 @@ import {
   stepFormData,
   BASE_URL_ONBOARDING,
   stepAdditionalGPUInformation,
-  PRODUCT_IDS_TEST_E2E
+  PRODUCT_IDS_TEST_E2E,
+  FILE_MOCK_PDF_CONTRACT,
+  stepCompleteOnboarding,
 } from '../utils/test-utils';
 
 test('Test Success onboarding request for product prod-pagopa and institutionType GPU', async ({
@@ -18,4 +20,11 @@ test('Test Success onboarding request for product prod-pagopa and institutionTyp
   await stepAdditionalGPUInformation(page);
   await stepAddManager(page);
   await stepAddAdmin(page);
+  await stepCompleteOnboarding(
+    page,
+    '10293847565',
+    FILE_MOCK_PDF_CONTRACT.PA,
+    PRODUCT_IDS_TEST_E2E.PAGOPA,
+    'GPU'
+  );
 });
