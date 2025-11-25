@@ -18,6 +18,7 @@ import { OnboardingFormData } from '../model/OnboardingFormData';
 import { genericError } from '../views/onboardingProduct/components/StepVerifyOnboarding';
 import { ProductResource } from '../model/ProductResource';
 import { ENV } from '../utils/env';
+import config from '../utils/config.json';
 
 const fetchVerifyOnboarding = async (
   params: {
@@ -253,10 +254,12 @@ export const getFilterCategories = async (
       return true;
     } else {
       console.error('Unexpected response status:', response.status);
+      setFilterCategoriesResponse(config);
       return false;
     }
   } catch (error) {
     console.error('Error fetching filter categories:', error);
+    setFilterCategoriesResponse(config);
     return false;
   }
 };

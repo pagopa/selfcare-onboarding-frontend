@@ -10,21 +10,13 @@ export const getOnboardingIdByTaxCode = async (
   let token: string;
 
   if (isLocalMode) {
-    console.log('⚠️ Local mode detected');
     token =
-      'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJmaXNjYWxfbnVtYmVyIjoiU1NUTVRUNzZDMjNGMjA1VCIsIm5hbWUiOiJNYXR0aWEiLCJmYW1pbHlfbmFtZSI6IlNpc3RpIiwidWlkIjoiZWUwYmY2ZGEtODE4Ni00YjZkLWJkMjgtYWE4ZTNhOGRiZDc2Iiwic3BpZF9sZXZlbCI6Imh0dHBzOi8vd3d3LnNwaWQuZ292Lml0L1NwaWRMMiIsImlzcyI6IlNQSUQiLCJhdWQiOiJhcGkuZGV2LnNlbGZjYXJlLnBhZ29wYS5pdCIsImlhdCI6MTc2MzcxNDY1NywiZXhwIjoxNzYzNzQ3MDU3LCJqdGkiOiI1ODRlZjUwNS02MTczLTRlZWEtODI4MS05NjI1MGIzOGM5MzkifQ.taPHeSQa-x--5n5eiDf5H4R08y0jja3fAaiRjs7ls8BbFizVMOBpfZBPw4IfJAUw-vaUjuIbctR2jU2yf13TV5F3STZ9HVxzN9HFgapMpPBq0nUwB3cih3H4jgpkL1wwTkm53H2XnbjGSgdEHhn4c_k54wqiIKPlPu5HY2TR9y_4Aa7bUDzcVfM7uWPupC-PflEIDwN61brhOWwZkPQdzQXpsKjOsEL2h4bT9vVifHEi5EtUUhszA1mnL10O6QEjrtpHTBvnBE7yzWxa7zl9EegdlYvcmZ8NpNebW0z6GTp37w1ae5yKL3w21fQKEDPvPIu0BgYbNaNQL9IKqw6awQ';
+      'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJmaXNjYWxfbnVtYmVyIjoiU1JUTkxNMDlUMDZHNjM1UyIsIm5hbWUiOiJBbnNlbG1vIiwiZmFtaWx5X25hbWUiOiJTYXJ0b3JpIiwidWlkIjoiNTA5NmU0YzYtMjVhMS00NWQ1LTliZGYtMmZiOTc0YTdjMWM4Iiwic3BpZF9sZXZlbCI6Imh0dHBzOi8vd3d3LnNwaWQuZ292Lml0L1NwaWRMMiIsImlzcyI6IlNQSUQiLCJhdWQiOiJhcGkuZGV2LnNlbGZjYXJlLnBhZ29wYS5pdCIsImlhdCI6MTc2NDAwNTY4NywiZXhwIjoxNzY0MDM4MDg3LCJqdGkiOiI3MmFjNTgwYi05OWJmLTRkNTUtYmIyZC0wM2RlY2JkZTJmZTYifQ.tWredKjYhh3JP0VQqi3Dt-u7kz0mhSgHLAtz45pQk1CP0q5gJRVBSG2GqHP56nJEIJ5h8Oo8gDT3NcFhwCQZKUfjJBXX86dDG1UzyLRTwtG5wUa6v26vbACa2HNfS6lkcS5PFq1OYTurmc3D5PoFqEhtzKRNMQDAJFUN3S12BE3a0PlxwLZJvIOdXvoss9iSIiQMvb4chmyyhtC38iHi32VDcGowfZi304tJlYafJxCJiGWcaoR5dIPaTNp0MzCULMuvZPhlo0A821q_Je5aa01_uts-m2y2ZIbYDPKSiu6bQLq4tE0hxl9vEesuKZ8qDrLwqQIHOOnl9HpF1wQVeQ';
   } else {
     token = (await page.evaluate(() => localStorage.getItem('token'))) || '';
-    console.log('✅ Token from localStorage');
   }
 
   const apiUrl = 'https://api.dev.selfcare.pagopa.it/onboarding';
-
-  if (!apiUrl) {
-    console.error('❌ apiUrl not set!');
-    return '';
-  }
-
   const fullUrl = `${apiUrl}/v2/institutions/onboardings?taxCode=${taxCode}&status=PENDING`;
 
   const fetchOnboarding = async (): Promise<string> => {
@@ -35,7 +27,7 @@ export const getOnboardingIdByTaxCode = async (
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('❌ Error response:', errorText);
+        console.error('Error response:', errorText);
         return '';
       }
 
@@ -45,21 +37,15 @@ export const getOnboardingIdByTaxCode = async (
         const matchingOnboarding = data.find((onb: any) => onb.productId === productId);
 
         if (matchingOnboarding) {
-          console.log(`✅ Found onboarding for product ${productId}: ${matchingOnboarding.id}`);
           return matchingOnboarding.id;
         }
 
-        const foundProducts = data.map((onb: any) => onb.productId).join(', ');
-        console.warn(
-          `⚠️ Found ${data.length} onboarding(s), but none matching productId ${productId}. Found: [${foundProducts}]`
-        );
         return '';
       }
 
-      console.error('❌ No data in array');
       return '';
     } catch (error) {
-      console.error('❌ Fetch error:', error);
+      console.error('Fetch error:', error);
       return '';
     }
   };
@@ -67,7 +53,6 @@ export const getOnboardingIdByTaxCode = async (
   const result = await fetchOnboarding();
 
   if (!result) {
-    console.log('⏳ Retrying once after 2 seconds...');
     await new Promise((resolve) => setTimeout(resolve, 2000));
     return await fetchOnboarding();
   }
@@ -75,31 +60,26 @@ export const getOnboardingIdByTaxCode = async (
   return result;
 };
 
-export const deleteOnboardingById = async (
-  page: Page,
-  onboardingId: string
-): Promise<boolean> => {
+export const deleteOnboardingById = async (page: Page, onboardingId: string): Promise<boolean> => {
+  const apiUrl = 'https://api.dev.selfcare.pagopa.it/external/internal/v1';
 
-  const apiUrl ='https://api.dev.selfcare.pagopa.it/external/internal/v1';
-  
   const fullUrl = `${apiUrl}/onboarding/${onboardingId}`;
 
   try {
     const response = await page.request.delete(fullUrl, {
       headers: {
-        'Ocp-Apim-Subscription-Key': process.env.APIM_SUBSCRIPTION_KEY || ''
+        'Ocp-Apim-Subscription-Key': process.env.APIM_SUBSCRIPTION_KEY || '',
       },
     });
 
     if (response.ok()) {
-      console.log(`✅ Successfully deleted onboarding: ${onboardingId}`);
       return true;
     } else {
-      console.error(`❌ Failed to delete onboarding ${onboardingId}: ${response.status()}`);
+      console.error(`Failed to delete onboarding ${onboardingId}: ${response.status()}`);
       return false;
     }
   } catch (error) {
-    console.error(`❌ Error deleting onboarding ${onboardingId}:`, error);
+    console.error(`Error deleting onboarding ${onboardingId}:`, error);
     return false;
   }
 };

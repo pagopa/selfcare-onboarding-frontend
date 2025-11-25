@@ -5,6 +5,9 @@ import {
   stepAddAdmin,
   BASE_URL_ONBOARDING,
   stepFormData,
+  stepCompleteOnboarding,
+  FILE_MOCK_PDF_CONTRACT,
+  PRODUCT_IDS_TEST_E2E,
 } from '../utils/test-utils';
 
 test('Test Success onboarding request for product prod-pagopa and institutionType PSP', async ({
@@ -15,4 +18,11 @@ test('Test Success onboarding request for product prod-pagopa and institutionTyp
   await stepFormData(page, 'PSP');
   await stepAddManager(page);
   await stepAddAdmin(page);
+  await stepCompleteOnboarding(
+    page,
+    '10293847565',
+    FILE_MOCK_PDF_CONTRACT.PA,
+    PRODUCT_IDS_TEST_E2E.PAGOPA,
+    'PSP'
+  );
 });

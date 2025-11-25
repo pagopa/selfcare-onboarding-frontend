@@ -7,6 +7,8 @@ import {
   stepAddManager,
   stepAddAdmin,
   stepSelectParty,
+  FILE_MOCK_PDF_CONTRACT,
+  stepCompleteOnboarding,
 } from '../utils/test-utils';
 
 test('Test Success onboarding request for product prod-interop and institutionType SCEC', async ({
@@ -14,8 +16,14 @@ test('Test Success onboarding request for product prod-interop and institutionTy
 }) => {
   await page.goto(`${BASE_URL_ONBOARDING}/prod-interop`);
   await stepInstitutionType(page, 'Società in conto economico consolidato');
-  await stepSelectParty(page, undefined, 'Comune di Genoni');
+  await stepSelectParty(page, undefined, 'Trentino Riscossioni Spa');
   await stepFormData(page, PRODUCT_IDS_TEST_E2E.INTEROP, 'SCEC');
   await stepAddManager(page);
   await stepAddAdmin(page);
+  await stepCompleteOnboarding(
+    page,
+    '02002380224',
+    FILE_MOCK_PDF_CONTRACT.PA,
+    PRODUCT_IDS_TEST_E2E.INTEROP
+  );
 });

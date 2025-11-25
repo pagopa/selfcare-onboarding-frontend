@@ -2,23 +2,21 @@ import { chromium } from '@playwright/test';
 import { getTrackedOnboardingIds, clearTrackedOnboardingIds } from '../utils/onboarding-tracker';
 import { deleteOnboardingById } from '../utils/api-utils';
 async function cleanupOnboardings() {
-  console.log('🧹 Starting onboarding cleanup process...');
+  console.log('Starting onboarding cleanup process...');
 
-  // Check for required environment variables
   if (!process.env.APIM_SUBSCRIPTION_KEY) {
-    console.error('❌ APIM_SUBSCRIPTION_KEY environment variable is required');
+    console.error('APIM_SUBSCRIPTION_KEY environment variable is required');
     process.exit(1);
   }
 
-  // Get tracked onboarding IDs
   const onboardingIds = await getTrackedOnboardingIds();
 
   if (onboardingIds.length === 0) {
-    console.log('ℹ️ No onboarding IDs to clean up');
+    console.log('No onboarding IDs to clean up');
     return;
   }
 
-  console.log(`📋 Found ${onboardingIds.length} onboarding(s) to clean up:`);
+  console.log(`Found ${onboardingIds.length} onboarding(s) to clean up:`);
   onboardingIds.forEach((id, index) => {
     console.log(`   ${index + 1}. ${id}`);
   });
@@ -33,9 +31,8 @@ async function cleanupOnboardings() {
   // eslint-disable-next-line functional/no-let
   let failureCount = 0;
 
-  // Delete each onboarding
   for (const onboardingId of onboardingIds) {
-    console.log(`\n🗑️  Attempting to delete onboarding: ${onboardingId}`);
+    console.log(`\nAttempting to delete onboarding: ${onboardingId}`);
 
     const success = await deleteOnboardingById(page, onboardingId);
 
@@ -51,32 +48,29 @@ async function cleanupOnboardings() {
   // Close browser
   await browser.close();
 
-  // Clear the tracking file
   await clearTrackedOnboardingIds();
 
-  // Print summary
   console.log('\n' + '='.repeat(50));
-  console.log('📊 Cleanup Summary:');
-  console.log(`   ✅ Successfully deleted: ${successCount}`);
-  console.log(`   ❌ Failed to delete: ${failureCount}`);
-  console.log(`   📝 Total processed: ${onboardingIds.length}`);
+  console.log('Cleanup Summary:');
+  console.log(`   Successfully deleted: ${successCount}`);
+  console.log(`   Failed to delete: ${failureCount}`);
+  console.log(`   Total processed: ${onboardingIds.length}`);
   console.log('='.repeat(50));
 
   if (failureCount > 0) {
-    console.error('\n⚠️ Some onboardings could not be deleted');
+    console.error('\nSome onboardings could not be deleted');
     process.exit(1);
   } else {
-    console.log('\n✅ All onboardings cleaned up successfully');
+    console.log('\nAll onboardings cleaned up successfully');
   }
 }
 
-// Run the cleanup
 cleanupOnboardings()
   .then(() => {
-    console.log('✅ Cleanup process completed');
+    console.log('Cleanup process completed');
     process.exit(0);
   })
   .catch((error) => {
-    console.error('❌ Cleanup process failed:', error);
+    console.error('Cleanup process failed:', error);
     process.exit(1);
   });

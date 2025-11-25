@@ -7,6 +7,8 @@ import {
   stepFormData,
   BASE_URL_ONBOARDING,
   PRODUCT_IDS_TEST_E2E,
+  stepCompleteOnboarding,
+  FILE_MOCK_PDF_CONTRACT,
 } from '../utils/test-utils';
 
 test('Test Success onboarding request for product prod-idpay-merchant and institutionType PRV', async ({
@@ -18,6 +20,12 @@ test('Test Success onboarding request for product prod-idpay-merchant and instit
   await stepFormData(page, PRODUCT_IDS_TEST_E2E.IDPAY_MERCHANT, 'PRV');
   await stepAddManager(page);
   await stepAddAdmin(page);
+  await stepCompleteOnboarding(
+    page,
+    '13614770967',
+    FILE_MOCK_PDF_CONTRACT.PA,
+    PRODUCT_IDS_TEST_E2E.IDPAY_MERCHANT
+  );
 });
 
 test('Test Success onboarding request for product prod-interop and institutionType PRV', async ({
@@ -29,6 +37,12 @@ test('Test Success onboarding request for product prod-interop and institutionTy
   await stepFormData(page, PRODUCT_IDS_TEST_E2E.INTEROP, 'PRV');
   await stepAddManager(page);
   await stepAddAdmin(page);
+  await stepCompleteOnboarding(
+    page,
+    '13614770967',
+    FILE_MOCK_PDF_CONTRACT.PA,
+    PRODUCT_IDS_TEST_E2E.INTEROP
+  );
 });
 
 test('Test Success onboarding request for product prod-pagopa and institutionType PRV', async ({
@@ -39,5 +53,11 @@ test('Test Success onboarding request for product prod-pagopa and institutionTyp
   await stepFormData(page, PRODUCT_IDS_TEST_E2E.PAGOPA, 'PRV');
   await stepAddManager(page);
   await stepAddAdmin(page);
+  await stepCompleteOnboarding(
+    page,
+    '13614770967',
+    FILE_MOCK_PDF_CONTRACT.PA,
+    PRODUCT_IDS_TEST_E2E.PAGOPA,
+    'PRV'
+  );
 });
-
