@@ -39,7 +39,7 @@ test('Test Success onboarding request for product prod-interop and institutionTy
   await stepAddAdmin(page);
   await stepCompleteOnboarding(
     page,
-    '13614770967',
+    '03907690923',
     FILE_MOCK_PDF_CONTRACT.PA,
     PRODUCT_IDS_TEST_E2E.INTEROP
   );
@@ -55,7 +55,7 @@ test('Test Success onboarding request for product prod-pagopa and institutionTyp
   await stepAddAdmin(page);
   await stepCompleteOnboarding(
     page,
-    '13614770967',
+    '19734628500',
     FILE_MOCK_PDF_CONTRACT.PA,
     PRODUCT_IDS_TEST_E2E.PAGOPA,
     'PRV'

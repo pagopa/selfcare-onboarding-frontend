@@ -18,7 +18,7 @@ test('Test Success onboarding request for product prod-pagopa and institutionTyp
   await stepAddAdmin(page, undefined, 'PT');
   await stepCompleteOnboarding(
     page,
-    '10293847565',
+    '19734628500',
     FILE_MOCK_PDF_CONTRACT.PA,
     PRODUCT_IDS_TEST_E2E.PAGOPA,
     'PT'
