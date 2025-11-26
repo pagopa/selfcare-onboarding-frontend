@@ -1,3 +1,4 @@
+/* eslint-disable functional/no-let */
 import { Page, expect } from '@playwright/test';
 import { InstitutionType } from '../../types';
 import { isLocalMode } from './global.setup';
@@ -17,8 +18,8 @@ export const BASE_URL_ONBOARDING_TO_APPROVE = isLocalMode
   : 'http://dev.selfcare.pagopa.it/dashboard/admin/onboarding';
 
 export const FILE_MOCK_CSV_AGGREGATOR = {
-  IO: '../src/lib/__mocks__/mockedFileAggregator.csv',
-  SEND: '../src/lib/__mocks__/mockedFileAggregatorSend.csv',
+  IO: './src/lib/__mocks__/mockedFileAggregator.csv',
+  SEND: './src/lib/__mocks__/mockedFileAggregatorSend.csv',
 };
 
 export const FILE_MOCK_PDF_CONTRACT = {
@@ -135,7 +136,7 @@ export const stepFormData = async (
     await page.fill('#digitalAddress', 'test@test.it');
 
     await page.click('#taxCode');
-    await page.fill('#taxCode', '10293847565');
+    await page.fill('#taxCode', '19734628500');
 
     await page.click('#taxCodeEquals2VatNumber');
   }
@@ -365,6 +366,10 @@ export const stepAddAdmin = async (
     await page.click('[aria-label="Continua"]');
   }
 
+  if (aggregator) {
+    return;
+  }
+
   if (institutionType !== 'PT') {
     await page.getByRole('button', { name: 'Conferma' }).waitFor({
       state: 'visible',
@@ -372,10 +377,6 @@ export const stepAddAdmin = async (
     });
 
     await page.getByRole('button', { name: 'Conferma' }).click();
-  }
-
-  if (aggregator) {
-    return;
   }
 
   if (!aggregator && institutionType !== 'PT') {
@@ -443,27 +444,36 @@ export const stepCompleteOnboarding = async (
   taxCode: string,
   filePdf: string,
   productId: string,
-  institutionType?: InstitutionType
+  institutionType?: InstitutionType,
+  notOnIpa?: boolean
 ) => {
-  const onboardingId = await getOnboardingIdByTaxCode(page, taxCode, productId);
+  const requiresApproval =
+    productId === PRODUCT_IDS_TEST_E2E.PAGOPA &&
+    (institutionType === 'PRV' ||
+      institutionType === 'GPU' ||
+      institutionType === 'PSP' ||
+      institutionType === 'PT');
+
+  let onboardingId = await getOnboardingIdByTaxCode(
+    page,
+    taxCode,
+    productId,
+    requiresApproval || notOnIpa ? 'TOBEVALIDATED' : 'PENDING'
+  );
 
   if (onboardingId.length > 0) {
     await trackOnboardingId(onboardingId);
 
-    if (
-      productId === PRODUCT_IDS_TEST_E2E.PAGOPA &&
-      (institutionType === 'PRV' ||
-        institutionType === 'GPU' ||
-        institutionType === 'PSP' ||
-        institutionType === 'PT')
-    ) {
+    if (requiresApproval || notOnIpa) {
       await redirectToApprove(page, onboardingId);
       // Wait a bit after approval before navigating to confirm page
       await page.waitForTimeout(2000);
+
+      onboardingId = await getOnboardingIdByTaxCode(page, taxCode, productId, 'PENDING');
     }
 
     await page.goto(`${BASE_URL_ONBOARDING}/confirm?jwt=${onboardingId}`, {
-      timeout: 20000,
+      timeout: 10000,
     });
 
     await page.click('[data-testid="DownloadIcon"]', { timeout: 2000 });
