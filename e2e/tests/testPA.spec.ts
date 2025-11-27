@@ -11,6 +11,7 @@ import {
   PRODUCT_IDS_TEST_E2E,
   stepCompleteOnboarding,
   FILE_MOCK_PDF_CONTRACT,
+  stepSelectPartyByCF,
 } from '../utils/test-utils';
 
 test('Test Success onboarding request for product prod-pagopa and institutionType PA', async ({
@@ -35,13 +36,13 @@ test('Test Success onboarding request for product prod-io and institutionType PA
 }) => {
   await page.goto(`${BASE_URL_ONBOARDING}/prod-io`);
   await stepInstitutionType(page, 'Pubblica Amministrazione');
-  await stepSelectParty(page);
+  await stepSelectPartyByCF(page, '93022940618');
   await stepFormData(page, PRODUCT_IDS_TEST_E2E.IO, 'PA');
   await stepAddManager(page);
   await stepAddAdmin(page);
   await stepCompleteOnboarding(
     page,
-    '01944590221',
+    '93022940618',
     FILE_MOCK_PDF_CONTRACT.PA,
     PRODUCT_IDS_TEST_E2E.IO
   );
@@ -52,7 +53,7 @@ test('Test Success onboarding request for product prod-io and institutionType PA
 }) => {
   await page.goto(`${BASE_URL_ONBOARDING}/prod-io`);
   await stepInstitutionType(page, 'Pubblica Amministrazione');
-  await stepSelectParty(page, true, undefined, PRODUCT_IDS_TEST_E2E.IO);
+  await stepSelectPartyByCF(page, '94155940631', undefined, true);
   await stepFormData(page, PRODUCT_IDS_TEST_E2E.IO, 'PA');
   await stepAddManager(page);
   await stepAddAdmin(page, true);
@@ -63,7 +64,7 @@ test('Test Success onboarding request for product prod-io and institutionType PA
   );
   await stepCompleteOnboarding(
     page,
-    '80001110487',
+    '94155940631',
     FILE_MOCK_PDF_CONTRACT.PA,
     PRODUCT_IDS_TEST_E2E.IO
   );
@@ -74,13 +75,13 @@ test('Test Success onboarding request for product prod-io-sign and institutionTy
 }) => {
   await page.goto(`${BASE_URL_ONBOARDING}/prod-io-sign`);
   await stepInstitutionType(page, 'Pubblica Amministrazione');
-  await stepSelectParty(page);
+  await stepSelectPartyByCF(page, '93022940618');
   await stepFormData(page, PRODUCT_IDS_TEST_E2E.IO_SIGN, 'PA');
   await stepAddManager(page);
   await stepAddAdmin(page);
   await stepCompleteOnboarding(
     page,
-    '01944590221',
+    '93022940618',
     FILE_MOCK_PDF_CONTRACT.PA,
     PRODUCT_IDS_TEST_E2E.IO_SIGN
   );
@@ -91,13 +92,13 @@ test('Test Success onboarding request for product prod-interop and institutionTy
 }) => {
   await page.goto(`${BASE_URL_ONBOARDING}/prod-interop`);
   await stepInstitutionType(page, 'Pubblica Amministrazione');
-  await stepSelectParty(page);
+  await stepSelectPartyByCF(page, '93022940618');
   await stepFormData(page, PRODUCT_IDS_TEST_E2E.INTEROP, 'PA');
   await stepAddManager(page);
   await stepAddAdmin(page);
   await stepCompleteOnboarding(
     page,
-    '01944590221',
+    '93022940618',
     FILE_MOCK_PDF_CONTRACT.PA,
     PRODUCT_IDS_TEST_E2E.INTEROP
   );
@@ -123,7 +124,7 @@ test('Test Success onboarding request for product prod-pn and institutionType PA
   page,
 }) => {
   await page.goto(`${BASE_URL_ONBOARDING}/prod-pn`);
-  await stepSelectParty(page, true, 'Fondazione Toscana Gabriele', PRODUCT_IDS_TEST_E2E.SEND);
+  await stepSelectPartyByCF(page, '91199120378', undefined, true);
   await stepFormData(page, PRODUCT_IDS_TEST_E2E.SEND, 'PA', true);
   await stepAddManager(page);
   await stepAddAdmin(page, true);

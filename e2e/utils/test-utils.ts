@@ -1,4 +1,5 @@
 /* eslint-disable functional/no-let */
+import path from 'path';
 import { Page, expect } from '@playwright/test';
 import { InstitutionType } from '../../types';
 import { isLocalMode } from './global.setup';
@@ -18,12 +19,12 @@ export const BASE_URL_ONBOARDING_TO_APPROVE = isLocalMode
   : 'http://dev.selfcare.pagopa.it/dashboard/admin/onboarding';
 
 export const FILE_MOCK_CSV_AGGREGATOR = {
-  IO: './src/lib/__mocks__/mockedFileAggregator.csv',
-  SEND: './src/lib/__mocks__/mockedFileAggregatorSend.csv',
+  IO: path.join(__dirname, '..', '..', 'src', 'lib', '__mocks__', 'mockedFileAggregator.csv'),
+  SEND: path.join(__dirname, '..', '..', 'src', 'lib', '__mocks__', 'mockedFileAggregatorSend.csv'),
 };
 
 export const FILE_MOCK_PDF_CONTRACT = {
-  PA: './utils/mocks/mockedContract.pdf',
+  PA: path.join(__dirname, 'mocks', 'mockedContract.pdf'),
 };
 
 export const PRODUCT_IDS_TEST_E2E = {
@@ -41,6 +42,13 @@ export const PRODUCT_IDS_TEST_E2E = {
   CIBAN: 'prod-ciban',
   CGN: 'prod-cgn',
   IDPAY_MERCHANT: 'prod-idpay-merchant',
+};
+
+export const TAX_CODES_BY_INSTITUTION_TYPE = {
+  PRV: '19734628500',
+  GPU: '10203040506',
+  PSP: '11223344556',
+  PT: '99887766554',
 };
 
 export const stepInstitutionType = async (page: Page, institutionType: string) => {
@@ -89,8 +97,11 @@ export const stepSelectParty = async (
 export const stepSelectPartyByCF = async (
   page: Page,
   cfParty: string,
-  isPrivateMerchant?: boolean
+  isPrivateMerchant?: boolean,
+  isAggregator?: boolean
 ) => {
+  await page.getByTestId('party-type-select').click();
+  await page.click('[data-testid="taxCode"]');
   await page.click('#Parties');
   await page.fill('#Parties', cfParty, { timeout: 5000 });
 
@@ -108,8 +119,13 @@ export const stepSelectPartyByCF = async (
     await page.click('.MuiBox-root:nth-child(1) > .MuiBox-root > .MuiBox-root');
   }
 
-  await page.click('[aria-label="Continua"]');
-
+  if (isAggregator) {
+    await page.click('[name="aggregator-party"]');
+    await page.click('[aria-label="Continua"]');
+    await page.getByRole('button', { name: 'Continua' }).click();
+  } else {
+    await page.click('[aria-label="Continua"]');
+  }
   await page.waitForLoadState('networkidle', { timeout: 10000 });
 };
 
@@ -118,7 +134,8 @@ export const stepFormData = async (
   page: Page,
   productOrInstitutionType: string,
   institutionType?: string,
-  isAggregator?: boolean
+  isAggregator?: boolean,
+  taxCode?: string
   // eslint-disable-next-line sonarjs/cognitive-complexity
 ) => {
   const isFromIpa = institutionType !== undefined;
@@ -136,7 +153,11 @@ export const stepFormData = async (
     await page.fill('#digitalAddress', 'test@test.it');
 
     await page.click('#taxCode');
-    await page.fill('#taxCode', '19734628500');
+    await page.fill(
+      '#taxCode',
+      taxCode ||
+        (!isFromIpa ? '11779933554' : institutionType === 'PRV' ? '19734628500' : '10203040506')
+    );
 
     await page.click('#taxCodeEquals2VatNumber');
   }
@@ -177,7 +198,13 @@ export const stepFormData = async (
     await page.click('#recipientCode');
     await page.fill(
       '#recipientCode',
-      product === PRODUCT_IDS_TEST_E2E.SEND ? (isAggregator ? 'UFL4DM' : 'UFBM8M') : 'UFOR71',
+      product === PRODUCT_IDS_TEST_E2E.SEND
+        ? isAggregator
+          ? 'UFL4DM'
+          : 'UFBM8M'
+        : product === PRODUCT_IDS_TEST_E2E.IO_SIGN
+          ? 'UF0IGB'
+          : 'UFOR71',
       {
         timeout: 2000,
       }
@@ -462,44 +489,48 @@ export const stepCompleteOnboarding = async (
   );
 
   if (onboardingId.length > 0) {
-    await trackOnboardingId(onboardingId);
-
     if (requiresApproval || notOnIpa) {
       await redirectToApprove(page, onboardingId);
-      // Wait a bit after approval before navigating to confirm page
-      await page.waitForTimeout(2000);
 
-      onboardingId = await getOnboardingIdByTaxCode(page, taxCode, productId, 'PENDING');
+      if (institutionType !== 'PT') {
+        await page.waitForTimeout(2000);
+
+        onboardingId = await getOnboardingIdByTaxCode(page, taxCode, productId, 'PENDING');
+      }
     }
 
-    await page.goto(`${BASE_URL_ONBOARDING}/confirm?jwt=${onboardingId}`, {
-      timeout: 10000,
-    });
+    if (institutionType !== 'PT') {
+      await page.goto(`${BASE_URL_ONBOARDING}/confirm?jwt=${onboardingId}`, {
+        timeout: 10000,
+      });
 
-    await page.click('[data-testid="DownloadIcon"]', { timeout: 2000 });
+      await page.click('[data-testid="DownloadIcon"]', { timeout: 2000 });
 
-    await page.waitForTimeout(2000);
-    await page.click('[data-testid="ArrowForwardIcon"]', { timeout: 2000 });
+      await page.waitForTimeout(2000);
+      await page.click('[data-testid="ArrowForwardIcon"]', { timeout: 2000 });
 
-    await page.waitForSelector('#file-uploader', {
-      state: 'attached',
-      timeout: 10000,
-    });
+      await page.waitForSelector('#file-uploader', {
+        state: 'attached',
+        timeout: 10000,
+      });
 
-    await page.waitForTimeout(500);
+      await page.waitForTimeout(500);
 
-    const fileInput = page.locator('#file-uploader');
-    await expect(fileInput).toBeAttached();
+      const fileInput = page.locator('#file-uploader');
+      await expect(fileInput).toBeAttached();
 
-    await page.setInputFiles('#file-uploader', filePdf);
+      await page.setInputFiles('#file-uploader', filePdf);
 
-    await page.waitForTimeout(1000);
+      await page.waitForTimeout(1000);
 
-    await page.getByRole('button', { name: 'Continua' }).click();
+      await page.getByRole('button', { name: 'Continua' }).click();
 
-    await expect(page.getByText('Adesione completata!')).toBeInViewport({
-      timeout: 10000,
-    });
+      await expect(page.getByText('Adesione completata!')).toBeInViewport({
+        timeout: 10000,
+      });
+    }
+
+    await trackOnboardingId(onboardingId);
   }
 };
 

@@ -7,6 +7,7 @@ import {
   FILE_MOCK_PDF_CONTRACT,
   PRODUCT_IDS_TEST_E2E,
   stepCompleteOnboarding,
+  TAX_CODES_BY_INSTITUTION_TYPE,
 } from '../utils/test-utils';
 
 test('Test Success onboarding request for product prod-pagopa and institutionType PT', async ({
@@ -14,11 +15,11 @@ test('Test Success onboarding request for product prod-pagopa and institutionTyp
 }) => {
   await page.goto(`${BASE_URL_ONBOARDING}/prod-pagopa`);
   await stepInstitutionType(page, 'Partner tecnologico');
-  await stepFormData(page, 'PT');
+  await stepFormData(page, 'PT', undefined, undefined, TAX_CODES_BY_INSTITUTION_TYPE.PT);
   await stepAddAdmin(page, undefined, 'PT');
   await stepCompleteOnboarding(
     page,
-    '19734628500',
+    TAX_CODES_BY_INSTITUTION_TYPE.PT,
     FILE_MOCK_PDF_CONTRACT.PA,
     PRODUCT_IDS_TEST_E2E.PAGOPA,
     'PT'

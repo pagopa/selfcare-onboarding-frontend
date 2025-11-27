@@ -40,13 +40,13 @@ test('Test Success onboarding request for product prod-pagopa and institutionTyp
   await page.goto(`${BASE_URL_ONBOARDING}/prod-pagopa`);
   await stepInstitutionType(page, 'Gestore di servizi pubblici');
   await page.click('#no_ipa');
-  await stepFormData(page, 'GSP');
+  await stepFormData(page, 'GSP', undefined);
   await stepAdditionalInformation(page);
   await stepAddManager(page);
   await stepAddAdmin(page);
   await stepCompleteOnboarding(
     page,
-    '19734628500',
+    '11779933554',
     FILE_MOCK_PDF_CONTRACT.PA,
     PRODUCT_IDS_TEST_E2E.PAGOPA,
     undefined,
