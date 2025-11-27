@@ -9,6 +9,7 @@ import {
   PRODUCT_IDS_TEST_E2E,
   stepCompleteOnboarding,
   FILE_MOCK_PDF_CONTRACT,
+  TAX_CODES_BY_INSTITUTION_TYPE,
 } from '../utils/test-utils';
 
 test('Test Success onboarding request for product prod-idpay-merchant and institutionType PRV', async ({
@@ -50,12 +51,18 @@ test('Test Success onboarding request for product prod-pagopa and institutionTyp
 }) => {
   await page.goto(`${BASE_URL_ONBOARDING}/prod-pagopa`);
   await stepInstitutionType(page, 'Altro');
-  await stepFormData(page, PRODUCT_IDS_TEST_E2E.PAGOPA, 'PRV');
+  await stepFormData(
+    page,
+    PRODUCT_IDS_TEST_E2E.PAGOPA,
+    'PRV',
+    undefined,
+    TAX_CODES_BY_INSTITUTION_TYPE.PRV
+  );
   await stepAddManager(page);
   await stepAddAdmin(page);
   await stepCompleteOnboarding(
     page,
-    '19734628500',
+    TAX_CODES_BY_INSTITUTION_TYPE.PRV,
     FILE_MOCK_PDF_CONTRACT.PA,
     PRODUCT_IDS_TEST_E2E.PAGOPA,
     'PRV'
