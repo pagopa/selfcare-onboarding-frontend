@@ -25,7 +25,6 @@ type PlatformUserFormProps = {
   isExtraDelegate?: boolean;
   buildRemoveDelegateForm?: (idToRemove: string) => (_: React.SyntheticEvent) => void;
   delegateId?: string;
-  addUserFlow: boolean;
   productId?: string;
 };
 
@@ -73,8 +72,8 @@ const fields: Array<Field> = [
   },
 ];
 
-const getFields = (productId?: string, addUserFlow?: boolean): Array<Field> => {
-  if (productId === PRODUCT_IDS.IDPAY_MERCHANT || addUserFlow) {
+const getFields = (productId?: string): Array<Field> => {
+  if (productId === PRODUCT_IDS.IDPAY_MERCHANT) {
     return fields.map((field) =>
       field.id === 'taxCode' || field.id === 'email' ? { ...field, unique: false } : field
     );
@@ -98,14 +97,13 @@ export function validateUser(
   userTempId: keyof UsersObject,
   user: UserOnCreate,
   users: UsersObject,
-  addUserFlow: boolean,
   productId?: string,
   isAuthUser?: boolean
 ): boolean {
-  const fieldsToValidate = getFields(productId, addUserFlow);
+  const fieldsToValidate = getFields(productId);
   return (
     fieldsToValidate.filter(({ id }) => !user[id]).map(({ id }) => id).length === 0 && // mandatory fields
-    validateNoMandatory(userTempId, user, addUserFlow, productId, users, isAuthUser).length === 0
+    validateNoMandatory(userTempId, user, productId, users, isAuthUser).length === 0
   );
 }
 
@@ -113,12 +111,11 @@ export function validateUser(
 function validateNoMandatory(
   userTempId: keyof UsersObject,
   user: UserOnCreate,
-  addUserFlow: boolean,
   productId: string | undefined,
   users?: UsersObject,
   isAuthUser?: boolean
 ): Array<ValidationErrorCode> {
-  const fieldsToValidate = getFields(productId, addUserFlow);
+  const fieldsToValidate = getFields(productId);
   const usersArray = users
     ? Object.entries(users)
         .filter((u) => u[0] !== userTempId)
@@ -178,7 +175,6 @@ export function PlatformUserForm({
   isExtraDelegate,
   buildRemoveDelegateForm,
   delegateId,
-  addUserFlow,
   productId,
 }: PlatformUserFormProps) {
   const { t } = useTranslation();
@@ -195,7 +191,7 @@ export function PlatformUserForm({
   };
 
   const errors: Array<ValidationErrorCode> = people[prefix]
-    ? validateNoMandatory(prefix, people[prefix], addUserFlow, productId, allPeople, isAuthUser)
+    ? validateNoMandatory(prefix, people[prefix], productId, allPeople, isAuthUser)
     : [];
 
   const externalErrors: { [errorsUserData: string]: Array<string> } | undefined =
