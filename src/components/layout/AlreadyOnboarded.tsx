@@ -1,28 +1,23 @@
-import { Grid, Link } from '@mui/material';
+import { Grid } from '@mui/material';
 import { IllusError } from '@pagopa/mui-italia';
 import { EndingPage } from '@pagopa/selfcare-common-frontend/lib';
-import { Trans } from 'react-i18next';
-import { useHistory } from 'react-router';
-import { useTranslation } from 'react-i18next';
-import { RolesInformations } from '../shared/RolesInformations';
-import { ROUTES, addUserFlowProducts } from '../../utils/constants';
-import { ENV } from '../../utils/env';
+import { Trans, useTranslation } from 'react-i18next';
 import { InstitutionType, Product } from '../../../types';
-import { OnboardingFormData } from '../../model/OnboardingFormData';
+import { ENV } from '../../utils/env';
+import { RolesInformations } from '../shared/RolesInformations';
+import { addUserFlowProducts } from '../../utils/constants';
 
 type Props = {
-  onboardingFormData?: OnboardingFormData;
   selectedProduct?: Product | null;
   institutionType?: InstitutionType;
 };
 
 export default function AlreadyOnboarded({
-  onboardingFormData,
   selectedProduct,
   institutionType,
 }: Props) {
   const { t } = useTranslation();
-  const history = useHistory();
+  /* const history = useHistory(); */
 
   const isEnabledProduct2AddUser = !!(
     selectedProduct?.id && addUserFlowProducts(selectedProduct.id)
@@ -55,8 +50,8 @@ export default function AlreadyOnboarded({
           </Grid>
         </Grid>
       }
-      isParagraphPresent={isEnabledProduct2AddUser}
-      paragraph={
+       isParagraphPresent={isEnabledProduct2AddUser}
+      /* paragraph={
         isEnabledProduct2AddUser && (
           <Trans
             i18nKey="stepVerifyOnboarding.alreadyOnboarded.addNewAdmin"
@@ -84,7 +79,7 @@ export default function AlreadyOnboarded({
             }
           </Trans>
         )
-      }
+      } */
       buttonLabel={<Trans i18nKey="stepVerifyOnboarding.alreadyOnboarded.backHome" />}
       onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
     />

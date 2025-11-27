@@ -109,7 +109,7 @@ const executeStepSearchOnboardedParty = async (
 
   screen.getByText(/Aggiungi un nuovo amministratore/i);
 
-  await waitFor(() => expect(fetchWithLogsSpy).toBeCalledTimes(1));
+  await waitFor(() => expect(fetchWithLogsSpy).toHaveBeenCalledTimes(1));
   const inputPartyName = document.getElementById('Parties') as HTMLElement;
 
   const selectWrapper = document.getElementById('party-type-select');
@@ -129,7 +129,7 @@ const executeStepSearchOnboardedParty = async (
     screen.getByText(typeOfSearch === 'taxCode' ? /onboardedparty1/i : partyName)
   );
 
-  expect(fetchWithLogsSpy).toBeCalledTimes(2);
+  expect(fetchWithLogsSpy).toHaveBeenCalledTimes(2);
 
   expect(fetchWithLogsSpy).toHaveBeenCalledWith(
     { endpoint: 'ONBOARDING_GET_INSTITUTIONS' },
