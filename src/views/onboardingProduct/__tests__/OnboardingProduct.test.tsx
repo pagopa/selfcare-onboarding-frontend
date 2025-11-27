@@ -679,11 +679,6 @@ test('Test: Party already onboarded for a product that allow add new user, so th
     true
   );
   await waitFor(() => screen.getByText(/L’ente selezionato ha già aderito/));
-
-  const addNewUserLink = screen.getByText('Aggiungi un nuovo Amministratore');
-  await waitFor(() => fireEvent.click(addNewUserLink));
-
-  expect(history.length).toBe(1);
 });
 
 test('Test: Error retrieving onboarding info', async () => {

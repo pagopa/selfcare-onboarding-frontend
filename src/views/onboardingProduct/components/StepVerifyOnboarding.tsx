@@ -84,7 +84,7 @@ export function StepVerifyOnboarding({
       <>
         <AlreadyOnboarded
           institutionType={institutionType}
-          onboardingFormData={onboardingFormData}
+          // onboardingFormData={onboardingFormData}
           selectedProduct={selectedProduct}
         />
       </>,
