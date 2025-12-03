@@ -13,12 +13,12 @@ import {
 } from '../../types';
 import { fetchWithLogs } from '../lib/api-utils';
 import { getFetchOutcome } from '../lib/error-utils';
-import { PRODUCT_IDS } from '../utils/constants';
+import { InstitutionOrigins } from '../model/InstitutionOrigins';
 import { OnboardingFormData } from '../model/OnboardingFormData';
-import { genericError } from '../views/onboardingProduct/components/StepVerifyOnboarding';
 import { ProductResource } from '../model/ProductResource';
+import { PRODUCT_IDS } from '../utils/constants';
 import { ENV } from '../utils/env';
-import config from '../utils/config.json';
+import { genericError } from '../views/onboardingProduct/components/StepVerifyOnboarding';
 
 const fetchVerifyOnboarding = async (
   params: {
@@ -124,13 +124,11 @@ export const verifyOnboarding = async (
     });
     setOutcome(alreadyOnboarded);
   } else {
-    if (
-      (response as AxiosError<any>).response?.status === 404 ||
-      (response as AxiosError<any>).response?.status === 400
-    ) {
+    const status = (response as AxiosError<any>).response?.status;
+    if (status === 404 || status === 400) {
       setOutcome(null);
       forward();
-    } else if ((response as AxiosError<any>).response?.status === 403) {
+    } else if (status === 403) {
       trackEvent('ONBOARDING_NOT_ALLOWED_ERROR', {
         request_id: requestIdRef.current,
         party_id: externalInstitutionId,
@@ -241,8 +239,9 @@ export const checkProduct = async (
 };
 
 export const getFilterCategories = async (
-  _setRequiredLogin: Dispatch<SetStateAction<boolean>>,
-  setFilterCategoriesResponse: Dispatch<SetStateAction<any>>
+  setOutcome: Dispatch<SetStateAction<RequestOutcomeMessage | null | undefined>>,
+  setFilterCategoriesResponse: Dispatch<SetStateAction<any>>,
+  genericError: any
 ): Promise<boolean> => {
   try {
     const cdnUrl = `${ENV.BASE_PATH_CDN_URL}/assets/config.json`;
@@ -254,12 +253,12 @@ export const getFilterCategories = async (
       return true;
     } else {
       console.error('Unexpected response status:', response.status);
-      setFilterCategoriesResponse(config);
+      setOutcome(genericError);
       return false;
     }
   } catch (error) {
     console.error('Error fetching filter categories:', error);
-    setFilterCategoriesResponse(config);
+    setOutcome(genericError);
     return false;
   }
 };
@@ -340,6 +339,71 @@ export const getAllowedAddUserProducts = async (
   if (outcome === 'success') {
     const retrievedProducts = (getProductsRequest as AxiosResponse).data as Array<ProductResource>;
     setProducts(retrievedProducts);
+  } else {
+    setOutcome(genericError);
+  }
+  setLoading(false);
+};
+
+export const getInstiutionTypesByProduct = async (
+  setLoading: Dispatch<SetStateAction<boolean>>,
+  productId: string | undefined,
+  setRetrivedInstituionType: Dispatch<SetStateAction<InstitutionOrigins | undefined>>,
+  setRequiredLogin: Dispatch<SetStateAction<boolean>>,
+  setOutcome: Dispatch<SetStateAction<any>>,
+  genericError: any
+) => {
+  setLoading(true);
+  const getInstitutionTypesRequest = await fetchWithLogs(
+    {
+      endpoint: 'ONBOARDING_GET_INSTITUTION_TYPE_BY_PRODUCT',
+    },
+    {
+      method: 'GET',
+      params: {
+        productId,
+      },
+    },
+    () => setRequiredLogin(true)
+  );
+  const outcome = getFetchOutcome(getInstitutionTypesRequest);
+  if (outcome === 'success') {
+    const responseData = (getInstitutionTypesRequest as AxiosResponse).data;
+
+    if (!responseData?.origins || responseData.origins.length === 0) {
+      setOutcome(genericError);
+      setLoading(false);
+      return;
+    }
+
+    const filterGspResponse = responseData.origins.filter(
+      (item: any) => item.institutionType === 'GSP'
+    );
+
+    if (filterGspResponse && filterGspResponse.length >= 2) {
+      const gspWithMultiOrigins = {
+        institutionType: filterGspResponse[0].institutionType,
+        origin: [filterGspResponse[0].origin, filterGspResponse[1].origin],
+        labelKey: 'gsp',
+      };
+
+      const nonGspOrigins = responseData.origins.filter(
+        (item: any) => item.institutionType !== 'GSP'
+      );
+
+      const updatedInstitutionOrigins = [
+        nonGspOrigins[0],
+        gspWithMultiOrigins,
+        ...nonGspOrigins.slice(1),
+      ];
+
+      setRetrivedInstituionType({
+        ...responseData,
+        origins: updatedInstitutionOrigins,
+      });
+    } else {
+      setRetrivedInstituionType(responseData);
+    }
   } else {
     setOutcome(genericError);
   }

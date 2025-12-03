@@ -114,6 +114,64 @@ const createPartyEntityInfoCamere = (
   digitalAddress,
 });
 
+export const mockInstitutionTypeByProductId = (productId: string | undefined) => {
+  switch (productId) {
+    case 'prod-interop':
+      return {
+        origins: [
+          { institutionType: 'PA', origin: 'IPA', labelKey: 'pa' },
+          { institutionType: 'GSP', origin: 'IPA', labelKey: 'gsp' },
+          { institutionType: 'GSP', origin: 'SELC', labelKey: 'gsp' },
+          { institutionType: 'SCEC', origin: 'SELC', labelKey: 'scec' },
+          { institutionType: 'SA', origin: 'ANAC', labelKey: 'sa' },
+          { institutionType: 'SCP', origin: 'INFOCAMERE', labelKey: 'scp' },
+          { institutionType: 'AS', origin: 'IVASS', labelKey: 'as' },
+          { institutionType: 'PRV', origin: 'SELC', labelKey: 'prv' },
+        ],
+      };
+    case 'prod-pn':
+    case 'prod-idpay':
+      return {
+        origins: [{ institutionType: 'PA', origin: 'IPA', labelKey: 'pa' }],
+      };
+    case 'prod-io':
+      return {
+        origins: [
+          { institutionType: 'PA', origin: 'IPA', labelKey: 'pa' },
+          { institutionType: 'GSP', origin: 'IPA', labelKey: 'gsp' },
+          { institutionType: 'GSP', origin: 'SELC', labelKey: 'gsp' },
+          { institutionType: 'PT', origin: 'SELC', labelKey: 'pt' },
+        ],
+      };
+    case 'prod-pagopa':
+      return {
+        origins: [
+          { institutionType: 'PA', origin: 'IPA', labelKey: 'pa' },
+          { institutionType: 'GSP', origin: 'IPA', labelKey: 'gsp' },
+          { institutionType: 'GSP', origin: 'SELC', labelKey: 'gsp' },
+          { institutionType: 'GPU', origin: 'SELC', labelKey: 'gpu' },
+          { institutionType: 'PSP', origin: 'SELC', labelKey: 'psp' },
+          { institutionType: 'PT', origin: 'SELC', labelKey: 'pt' },
+          { institutionType: 'PRV', origin: 'SELC', labelKey: 'oth' },
+        ],
+      };
+    case 'prod-io-sign':
+      return {
+        origins: [
+          { institutionType: 'PA', origin: 'IPA', labelKey: 'pa' },
+          { institutionType: 'GSP', origin: 'IPA', labelKey: 'gsp' },
+          { institutionType: 'GSP', origin: 'SELC', labelKey: 'gsp' },
+        ],
+      };
+    case 'prod-idpay-merchant':
+      return {
+        origins: [{ institutionType: 'PRV', origin: 'SELC', labelKey: 'prv' }],
+      };
+    default:
+      return undefined;
+  }
+};
+
 export const mockPartyRegistry = {
   items: [
     createPartyRegistryEntity(
@@ -1958,6 +2016,17 @@ export async function mockFetch(
     return new Promise((resolve) =>
       resolve({
         data: retrivedInstitutionByRea,
+        status: 200,
+        statusText: '200',
+      } as AxiosResponse)
+    );
+  }
+
+  if (endpoint === 'ONBOARDING_GET_INSTITUTION_TYPE_BY_PRODUCT') {
+    const retrivedInstitutionsType = mockInstitutionTypeByProductId(params.productId);
+    return new Promise((resolve) =>
+      resolve({
+        data: retrivedInstitutionsType,
         status: 200,
         statusText: '200',
       } as AxiosResponse)

@@ -1,3 +1,5 @@
+/* eslint-disable functional/immutable-data */
+/* eslint-disable functional/no-let */
 import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
 import { Dispatch, MutableRefObject, SetStateAction } from 'react';
 import { InstitutionType } from '../../../../../types';
@@ -19,7 +21,7 @@ interface ForwardFunctionsParams {
   forward: () => void;
   formData: Partial<FormData> | undefined;
   setFormData: Dispatch<SetStateAction<Partial<FormData> | undefined>>;
-  desiredOriginRef: MutableRefObject<string | undefined>;
+  desiredOriginRef: MutableRefObject<string | Array<string> | undefined>;
   activeStep: number;
   origin: string | undefined;
   setExternalInstitutionId: Dispatch<SetStateAction<string>>;
@@ -107,11 +109,6 @@ export const createForwardFunctions = (params: ForwardFunctionsParams) => {
       }
       setActiveStep(4);
     }
-    if (newInstitutionType && newInstitutionType === 'PA') {
-      setOrigin('IPA');
-    } else {
-      setOrigin(undefined);
-    }
   };
 
   const forwardWithDataAndInstitution = (
@@ -123,18 +120,31 @@ export const createForwardFunctions = (params: ForwardFunctionsParams) => {
       onboardingData?.originId === undefined &&
       institutionTypeParam === 'GSP'
     ) {
-      // eslint-disable-next-line functional/immutable-data
       desiredOriginRef.current = 'SELC';
       setOrigin('SELC');
+      setOnboardingFormData({
+        businessName: '',
+        registeredOffice: '',
+        zipCode: '',
+        digitalAddress: '',
+        taxCode: '',
+        vatNumber: '',
+        recipientCode: '',
+        geographicTaxonomies: [],
+      });
+      setExternalInstitutionId('');
       setActiveStep(activeStep + 3);
     } else {
       setInstitutionType(institutionTypeParam);
       setOnboardingFormData(onboardingData);
       setExternalInstitutionId(onboardingData?.externalId ?? '');
-      const originToSet = onboardingData?.origin || origin;
+
+      const originToSet =
+        institutionTypeParam === 'GSP' && onboardingData?.originId
+          ? 'IPA'
+          : onboardingData?.origin || origin;
 
       if (originToSet) {
-        // eslint-disable-next-line functional/immutable-data
         desiredOriginRef.current = originToSet;
       }
 

@@ -128,17 +128,7 @@ export const postOnboardingSubmit = async (
         county: onboardingFormData?.county,
         city: onboardingFormData?.city,
       },
-      origin:
-        institutionType === 'SA'
-          ? 'ANAC'
-          : institutionType === 'PSP' ||
-              institutionType === 'GPU' ||
-              institutionType === 'PT' ||
-              ((institutionType === 'PRV' || institutionType === 'PRV_PF') &&
-                productId !== PRODUCT_IDS.INTEROP &&
-                productId !== PRODUCT_IDS.IDPAY_MERCHANT)
-            ? 'SELC'
-            : origin,
+      origin,
       istatCode: origin !== 'IPA' ? onboardingFormData?.istatCode : undefined,
       users,
       pricingPlan,

@@ -64,6 +64,7 @@ export function StepVerifyOnboarding({
   const { setOnExit } = useContext(HeaderContext);
   const { setRequiredLogin } = useContext(UserContext);
   const requestIdRef = useRef<string>();
+  // const forwardCalledRef = useRef(false);
   const { t } = useTranslation();
 
   const notAllowedErrorNoParty: RequestOutcomeMessage = {
