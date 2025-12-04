@@ -119,9 +119,10 @@ const checkAlreadyExistentValues = async (
   expectedDuplicateTaxCodeMessages: number | undefined,
   existentEmail: string | undefined,
   expectedDuplicateEmailMessages: number | undefined,
-  productId?: string
+  productId?: string,
+  addUserFlow?: boolean
 ) => {
-  const shouldSkipDuplicateCheck = productId === PRODUCT_IDS.IDPAY_MERCHANT;
+  const shouldSkipDuplicateCheck = productId === PRODUCT_IDS.IDPAY_MERCHANT || addUserFlow;
 
   if (existentTaxCode) {
     await fillTextFieldAndCheckButton(prefix, 'name', 'NAME');
@@ -180,7 +181,8 @@ export const fillUserForm = async (
       1,
       'b@b.BB',
       1,
-      productId
+      productId,
+      addUserFlow
     );
   }
 
