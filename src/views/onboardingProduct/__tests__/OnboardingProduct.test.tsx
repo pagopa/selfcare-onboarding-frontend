@@ -87,7 +87,7 @@ const filterByCategory4Test = (institutionType?: string, productId?: string) => 
       return mockedCategories.product['prod-pn']?.ipa.PA;
 
     case PRODUCT_IDS.IDPAY_MERCHANT:
-      return mockedCategories.product['prod-idpay-merchant']?.merchantDetails?.atecoCodes;
+      return mockedCategories.product['prod-idpay-merchant']?.merchantDetails;
 
     case PRODUCT_IDS.INTEROP:
       if (institutionType === 'SCEC') {
@@ -702,7 +702,7 @@ test('Test: Error retrieving onboarding info', async () => {
 
 test('Test: Invalid productId', async () => {
   renderComponent('error');
-  await waitFor(() => expect(fetchWithLogsSpy).toHaveBeenCalledTimes(1));
+  await waitFor(() => expect(fetchWithLogsSpy).toHaveBeenCalledTimes(2));
   await waitFor(() => {
     expect(screen.getByText('Impossibile individuare il prodotto desiderato')).toBeInTheDocument();
   });
@@ -839,7 +839,6 @@ const executeStepInstitutionType = async (productSelected: string, institutionTy
     if (productSelected === PRODUCT_IDS.IDPAY_MERCHANT) {
       await waitFor(() => screen.getByText('Cerca il tuo ente'), { timeout: 5000 });
     } else {
-      // Per SEND e IDPAY
       fillInstitutionTypeCheckbox('pa');
     }
   }
@@ -863,9 +862,7 @@ const executeStepSearchParty = async (
 
   screen.getByText('Cerca il tuo ente');
 
-  await waitFor(() =>
-    expect(fetchWithLogsSpy).toHaveBeenCalledTimes(1)
-  );
+  await waitFor(() => expect(fetchWithLogsSpy).toHaveBeenCalledTimes(3));
   const inputPartyName = document.getElementById('Parties') as HTMLElement;
 
   const withoutIpaLink = document.getElementById('no_ipa') as HTMLElement;
@@ -898,9 +895,9 @@ const executeStepSearchParty = async (
 
       const partyNameSelection = await waitFor(() => screen.getByText(partyName));
 
-      expect(fetchWithLogsSpy).toHaveBeenCalledTimes(2);
+      expect(fetchWithLogsSpy).toHaveBeenCalledTimes(4);
       expect(fetchWithLogsSpy).toHaveBeenNthCalledWith(
-        2,
+        4,
         {
           endpoint:
             institutionType === 'SA'
@@ -1085,9 +1082,8 @@ const executeStepSearchParty = async (
                 categories: filterByCategory4Test(institutionType, productId),
               };
 
-      // expect(fetchWithLogsSpy).toHaveBeenCalledTimes(3);
-
-      expect(fetchWithLogsSpy).toHaveBeenNthCalledWith(2,
+      expect(fetchWithLogsSpy).toHaveBeenNthCalledWith(
+        4,
         {
           endpoint: endpoint,
           endpointParams: endpointParams,

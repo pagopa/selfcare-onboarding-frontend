@@ -13,6 +13,7 @@ import {
 } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { InstitutionType, PartyData, Product, StepperStepComponentProps } from '../../../types';
+import { useHistoryState } from '../../hooks/useHistoryState';
 import { UserContext } from '../../lib/context';
 import { AooData } from '../../model/AooData';
 import { SelectionsState } from '../../model/Selection';
@@ -26,11 +27,10 @@ import {
 import { noMandatoryIpaProducts, PRODUCT_IDS } from '../../utils/constants';
 import { ENV } from '../../utils/env';
 import { selected2OnboardingData } from '../../utils/selected2OnboardingData';
+import { Autocomplete } from '../autocomplete/Autocomplete';
 import Loading4Api from '../modals/Loading4Api';
 import { LoadingOverlay } from '../modals/LoadingOverlay';
 import { OnboardingStepActions } from '../registrationSteps/OnboardingStepActions';
-import { Autocomplete } from '../autocomplete/Autocomplete';
-import { useHistoryState } from '../../hooks/useHistoryState';
 
 type Props = {
   subTitle: string | ReactElement;

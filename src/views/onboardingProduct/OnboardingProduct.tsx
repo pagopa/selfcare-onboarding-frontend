@@ -41,7 +41,7 @@ import { StepAddAdmin } from './components/StepAddAdmin';
 import { StepAdditionalGpuInformations } from './components/StepAdditionalGpuInformations';
 import { StepAdditionalInformations } from './components/StepAdditionalInformations';
 import { StepUploadAggregates } from './components/StepUploadAggregates';
-import { /* genericError, */ StepVerifyOnboarding } from './components/StepVerifyOnboarding';
+import { genericError, StepVerifyOnboarding } from './components/StepVerifyOnboarding';
 import { createForwardFunctions } from './components/forwards/forwardFunctions';
 
 export type ValidateErrorType = 'conflictError';
@@ -95,7 +95,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
   const requestIdRef = useRef<string>();
   const { t } = useTranslation();
   const [onExitAction, setOnExitAction] = useState<(() => void) | undefined>();
-  const productAvoidStep = [PRODUCT_IDS.SEND, PRODUCT_IDS.IDPAY].includes(
+  const productAvoidStep = [PRODUCT_IDS.SEND, PRODUCT_IDS.IDPAY, PRODUCT_IDS.IDPAY_MERCHANT].includes(
     selectedProduct?.id ?? ''
   );
   const fromDashboard =
@@ -117,6 +117,9 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     setActiveStep(activeStep - 1);
   };
   const forward = () => {
+    if (outcome && activeStep <= 2) {
+      setOutcome(null);
+    }
     setActiveStep(activeStep + 1);
   };
 
@@ -151,20 +154,30 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
   });
 
   useEffect(() => {
-    if (pendingForward && onboardingFormData && externalInstitutionId && institutionType) {
-      const { data } = pendingForward;
+    if (pendingForward && externalInstitutionId && institutionType) {
+      try {
+        const { data } = pendingForward;
+
+        setFormData((prevFormData) => {
+          if (prevFormData) {
+            return { ...prevFormData, ...data };
+          }
+          return data;
+        });
+      } catch (error) {
+        console.error('[OnboardingProduct] ERROR setting formData:', error);
+        setPendingForward(null);
+        setOutcome(genericError);
+      }
+    }
+  }, [pendingForward, externalInstitutionId, institutionType]);
+
+  useEffect(() => {
+    if (pendingForward && formData) {
       setPendingForward(null);
-
-      setFormData((prevFormData) => {
-        if (prevFormData) {
-          return { ...prevFormData, ...data };
-        }
-        return data;
-      });
-
       setActiveStep((prevStep) => prevStep + 1);
     }
-  }, [pendingForward, onboardingFormData, externalInstitutionId, institutionType]);
+  }, [formData, pendingForward]);
 
   useEffect(() => {
     if (institutionTypeByUrl === 'PT' && productId === PRODUCT_IDS.PAGOPA) {
@@ -208,48 +221,9 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
   }, [productId]);
 
   useEffect(() => {
-    if (!institutionType) {
-      return;
-    }
-
-    if (desiredOriginRef.current) {
-      return;
-    }
-
-    const shouldPreserveOrigin =
-      (institutionType === 'PRV_PF' && productId === PRODUCT_IDS.IDPAY_MERCHANT) ||
-      (institutionType === 'PRV' &&
-        (productId === PRODUCT_IDS.IDPAY_MERCHANT || productId === PRODUCT_IDS.INTEROP)) ||
-      institutionType === 'SCP';
-
-    if (
-      institutionType &&
-      (institutionType === 'PSP' || institutionType !== 'PA') &&
-      !shouldPreserveOrigin
-    ) {
-      setOrigin(undefined);
-    }
-  }, [institutionType, productId]);
-
-  // avoid step 1 if selectedProduct is 'prod-pn' or 'prod-idpay'
-  useEffect(() => {
-    if (productAvoidStep) {
-      setInstitutionType('PA');
-      setOrigin('IPA');
-      setActiveStep(1); // Vai direttamente allo step di ricerca
-    }
-
-    if (selectedProduct?.id === PRODUCT_IDS.IDPAY_MERCHANT) {
-      setInstitutionType('PRV');
-      setOrigin(undefined);
-      setActiveStep(1); // Vai direttamente allo step di ricerca
-    }
-  }, [selectedProduct]);
-
-  useEffect(() => {
     const loadFilterCategories = async () => {
       setCategoriesLoaded(false);
-      await getFilterCategories(setRequiredLogin, setFilterCategoriesResponse);
+      await getFilterCategories(setOutcome, setFilterCategoriesResponse, genericError);
       setCategoriesLoaded(true);
     };
     void loadFilterCategories();
@@ -411,11 +385,19 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           institutionType: institutionType as InstitutionType,
           fromDashboard,
           selectedProduct,
+          productId,
+          setOrigin,
           forward: forwardWithInstitutionType,
           back: () => {
             setOnExitAction(() => () => history.goBack());
             setOpenExitModal(true);
           },
+          productAvoidStep,
+          loading,
+          setLoading,
+          setRequiredLogin,
+          setOutcome,
+          genericError,
         }),
     },
     {
