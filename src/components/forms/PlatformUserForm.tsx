@@ -26,6 +26,7 @@ type PlatformUserFormProps = {
   buildRemoveDelegateForm?: (idToRemove: string) => (_: React.SyntheticEvent) => void;
   delegateId?: string;
   productId?: string;
+  addUserFlow?: boolean;
 };
 
 type Field = {
@@ -44,7 +45,7 @@ type Field = {
 
 type TextTransform = 'uppercase' | 'lowercase';
 
-const fields: Array<Field> = [
+const fields = (productId?: string, addUserFlow?: boolean): Array<Field> => [
   { id: 'name', unique: false, conflictMessageKey: 'conflict' },
   { id: 'surname', unique: false, conflictMessageKey: 'conflict' },
   {
@@ -54,9 +55,10 @@ const fields: Array<Field> = [
       '^[A-Za-z]{6}[0-9lmnpqrstuvLMNPQRSTUV]{2}[abcdehlmprstABCDEHLMPRST]{1}[0-9lmnpqrstuvLMNPQRSTUV]{2}[A-Za-z]{1}[0-9lmnpqrstuvLMNPQRSTUV]{3}[A-Za-z]{1}$'
     ),
     regexpMessageKey: 'invalid',
-    unique: true,
+    unique: productId === PRODUCT_IDS.IDPAY_MERCHANT || addUserFlow ? false : true,
     caseSensitive: false,
-    uniqueMessageKey: 'duplicate',
+    uniqueMessageKey:
+      productId === PRODUCT_IDS.IDPAY_MERCHANT || addUserFlow ? undefined : 'duplicate',
     textTransform: 'uppercase',
   },
   {
@@ -65,21 +67,14 @@ const fields: Array<Field> = [
     regexp: emailRegexp,
     regexpMessageKey: 'invalid',
     hasDescription: true,
-    unique: true,
+    unique: productId === PRODUCT_IDS.IDPAY_MERCHANT || addUserFlow ? false : true,
     caseSensitive: false,
-    uniqueMessageKey: 'duplicate',
+    uniqueMessageKey:
+      productId === PRODUCT_IDS.IDPAY_MERCHANT || addUserFlow ? undefined : 'duplicate',
+    conflictMessageKey: 'conflict',
     textTransform: 'lowercase',
   },
 ];
-
-const getFields = (productId?: string): Array<Field> => {
-  if (productId === PRODUCT_IDS.IDPAY_MERCHANT) {
-    return fields.map((field) =>
-      field.id === 'taxCode' || field.id === 'email' ? { ...field, unique: false } : field
-    );
-  }
-  return fields;
-};
 
 type ValidationErrorCode =
   | `${keyof UserOnCreate}-regexp`
@@ -98,13 +93,21 @@ export function validateUser(
   user: UserOnCreate,
   users: UsersObject,
   productId?: string,
-  isAuthUser?: boolean
+  isAuthUser?: boolean,
+  addUserFlow?: boolean
 ): boolean {
-  const fieldsToValidate = getFields(productId);
-  return (
-    fieldsToValidate.filter(({ id }) => !user[id]).map(({ id }) => id).length === 0 && // mandatory fields
-    validateNoMandatory(userTempId, user, productId, users, isAuthUser).length === 0
+  const fieldsToValidate = fields(productId, addUserFlow);
+  const missingFields = fieldsToValidate.filter(({ id }) => !user[id]).map(({ id }) => id);
+  const validationErrors = validateNoMandatory(
+    userTempId,
+    user,
+    productId,
+    users,
+    isAuthUser,
+    addUserFlow
   );
+
+  return missingFields.length === 0 && validationErrors.length === 0;
 }
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
@@ -113,43 +116,79 @@ function validateNoMandatory(
   user: UserOnCreate,
   productId: string | undefined,
   users?: UsersObject,
-  isAuthUser?: boolean
+  isAuthUser?: boolean,
+  addUserFlow?: boolean
 ): Array<ValidationErrorCode> {
-  const fieldsToValidate = getFields(productId);
+  const fieldsToValidate = fields(productId, addUserFlow);
   const usersArray = users
     ? Object.entries(users)
         .filter((u) => u[0] !== userTempId)
         .map((u) => u[1])
     : [];
+  const isSamePerson = (u1: UserOnCreate, u2: UserOnCreate): boolean =>
+    stringEquals(u1.name, u2.name, false) &&
+    stringEquals(u1.surname, u2.surname, false) &&
+    stringEquals(u1.taxCode, u2.taxCode, false);
+
   return (
     fieldsToValidate
       // eslint-disable-next-line complexity
-      .map(({ id, regexp, unique, caseSensitive }) =>
-        regexp &&
-        user[id] &&
-        user.taxCode &&
-        user &&
-        (!regexp.test(user[id] as string) || verifyChecksumMatchWithTaxCode(user.taxCode)) &&
-        id === 'taxCode'
-          ? `${id}-regexp`
-          : regexp && user[id] && !regexp.test(user[id] as string) && id === 'email'
-            ? `${id}-regexp`
-            : unique &&
-                usersArray &&
-                usersArray.findIndex((u) => stringEquals(u[id], user[id], caseSensitive)) > -1
-              ? `${id}-unique`
-              : id === 'name' &&
-                  user.name &&
-                  verifyNameMatchWithTaxCode(user.name, user.taxCode) &&
-                  !isAuthUser
-                ? `${id}-conflict`
-                : id === 'surname' &&
-                    user.surname &&
-                    verifySurnameMatchWithTaxCode(user.surname, user.taxCode) &&
-                    !isAuthUser
-                  ? `${id}-conflict`
-                  : undefined
-      )
+      .map(({ id, regexp, unique, caseSensitive }) => {
+        if (
+          regexp &&
+          user[id] &&
+          user.taxCode &&
+          user &&
+          (!regexp.test(user[id] as string) || verifyChecksumMatchWithTaxCode(user.taxCode)) &&
+          id === 'taxCode'
+        ) {
+          return `${id}-regexp`;
+        }
+        if (regexp && user[id] && !regexp.test(user[id] as string) && id === 'email') {
+          return `${id}-regexp`;
+        }
+        if (
+          id === 'email' &&
+          (productId === PRODUCT_IDS.IDPAY_MERCHANT || addUserFlow) &&
+          user.email &&
+          emailRegexp.test(user.email)
+        ) {
+          const samePerson = usersArray.find(
+            (u) =>
+              isSamePerson(u, user) &&
+              u.email &&
+              emailRegexp.test(u.email) &&
+              !stringEquals(u.email, user.email, false)
+          );
+          if (samePerson) {
+            return `${id}-conflict`;
+          }
+        }
+        if (
+          unique === true &&
+          usersArray &&
+          usersArray.findIndex((u) => stringEquals(u[id], user[id], caseSensitive)) > -1
+        ) {
+          return `${id}-unique`;
+        }
+        if (
+          id === 'name' &&
+          user.name &&
+          verifyNameMatchWithTaxCode(user.name, user.taxCode) &&
+          !isAuthUser
+        ) {
+          return `${id}-conflict`;
+        }
+        if (
+          id === 'surname' &&
+          user.surname &&
+          verifySurnameMatchWithTaxCode(user.surname, user.taxCode) &&
+          !isAuthUser
+        ) {
+          return `${id}-conflict`;
+        }
+        return undefined;
+      })
       .filter((x) => x)
       .map((x) => x as ValidationErrorCode)
   );
@@ -176,6 +215,7 @@ export function PlatformUserForm({
   buildRemoveDelegateForm,
   delegateId,
   productId,
+  addUserFlow,
 }: PlatformUserFormProps) {
   const { t } = useTranslation();
 
@@ -191,7 +231,7 @@ export function PlatformUserForm({
   };
 
   const errors: Array<ValidationErrorCode> = people[prefix]
-    ? validateNoMandatory(prefix, people[prefix], productId, allPeople, isAuthUser)
+    ? validateNoMandatory(prefix, people[prefix], productId, allPeople, isAuthUser, addUserFlow)
     : [];
 
   const externalErrors: { [errorsUserData: string]: Array<string> } | undefined =
@@ -253,7 +293,7 @@ export function PlatformUserForm({
         </Grid>
       )}
       <Grid container spacing={2} mb="-16px">
-        {getFields(productId).map(
+        {fields(productId, addUserFlow).map(
           ({
             id,
             type = 'text',
