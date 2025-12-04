@@ -95,7 +95,7 @@ export default function StepInstitutionType({
     forward(selectedValue);
   };
 
-  if (loading || !retrivedInstitutionType) {
+  if (loading) {
     return <LoadingOverlay loadingText={t('onboardingStep1.loadingOverlayText')} />;
   }
 
