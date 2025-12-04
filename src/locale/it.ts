@@ -332,6 +332,7 @@ export default {
         errors: {
           invalid: "L'indirizzo email non è valido",
           duplicate: "L'indirizzo email inserito è già presente",
+          conflict: "L'indirizzo email inserito non corrisponde al precedente",
         },
         description: 'Inserisci l’indirizzo email istituzionale utilizzato per l’ente',
       },

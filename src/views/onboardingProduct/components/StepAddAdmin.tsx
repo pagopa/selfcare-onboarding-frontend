@@ -175,7 +175,7 @@ export function StepAddAdmin({
       .filter((prefix) => 'manager-initial' !== prefix)
       .some(
         (prefix) =>
-          !validateUser(prefix, people[prefix], allPeople, product?.id, isAuthUser)
+          !validateUser(prefix, people[prefix], allPeople, product?.id, isAuthUser, addUserFlow)
       ) ||
     Object.keys(people).length === 3;
 
@@ -263,6 +263,7 @@ export function StepAddAdmin({
             readOnlyFields={isAuthUser ? ['name', 'surname', 'taxCode'] : []}
             isAuthUser={isAuthUser}
             productId={product?.id}
+            addUserFlow={addUserFlow}
           />
         </Grid>
         {delegateFormIds.map((id) => (
@@ -278,6 +279,7 @@ export function StepAddAdmin({
               delegateId={id}
               buildRemoveDelegateForm={buildRemoveDelegateForm}
               productId={product?.id}
+              addUserFlow={addUserFlow}
             />
           </Grid>
         ))}
@@ -327,7 +329,8 @@ export function StepAddAdmin({
                     people[prefix],
                     allPeople,
                     product?.id,
-                    isAuthUser
+                    isAuthUser,
+                    addUserFlow
                   )
               ),
         }}

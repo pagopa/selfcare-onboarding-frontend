@@ -42,6 +42,7 @@ type Props = {
   subunitCodeByQuery: string;
   selectFilterCategories: () => any;
   setInstitutionType: Dispatch<SetStateAction<InstitutionType | undefined>>;
+  addUser: boolean;
 } & StepperStepComponentProps;
 
 // eslint-disable-next-line sonarjs/cognitive-complexity, complexity
@@ -57,6 +58,7 @@ export function StepSearchParty({
   subunitCodeByQuery,
   selectFilterCategories,
   setInstitutionType,
+  addUser,
 }: Props) {
   const theme = useTheme();
   const { t } = useTranslation();
@@ -127,8 +129,6 @@ export function StepSearchParty({
       sessionStorage.setItem('isPresentInAtecoWhiteList', JSON.stringify(value));
     }
   };
-
-  const addUser = window.location.pathname.includes('/user');
 
   const disabledStatusCompany = useMemo(
     () =>
