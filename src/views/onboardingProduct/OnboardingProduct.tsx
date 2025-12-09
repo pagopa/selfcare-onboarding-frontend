@@ -112,6 +112,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     origin,
     onboardingFormData,
   });
+  const addUser = window.location.pathname.includes('/user');
 
   const back = () => {
     setActiveStep(activeStep - 1);
@@ -443,6 +444,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           selectFilterCategories,
           setInstitutionType,
           forward: forwardWithDataAndInstitution,
+          addUser
         }),
     },
     {
@@ -553,7 +555,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
       Component: () =>
         StepAddManager({
           externalInstitutionId,
-          addUserFlow: false,
+          addUserFlow: addUser,
           product: selectedProduct,
           isTechPartner: controllers.isTechPartner,
           forward: (newFormData: Partial<FormData>) => {
@@ -591,7 +593,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
       Component: () =>
         StepAddAdmin({
           externalInstitutionId,
-          addUserFlow: false,
+          addUserFlow: addUser,
           product: selectedProduct,
           legal: controllers.isTechPartner ? undefined : (formData as any)?.users[0],
           partyName:

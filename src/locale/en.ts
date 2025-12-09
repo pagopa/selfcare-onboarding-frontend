@@ -331,6 +331,7 @@ export default {
         errors: {
           invalid: 'The email address is not valid',
           duplicate: 'The entered email address is already present',
+          conflict: 'The email address you entered does not match the previous one',
         },
         description: 'Enter the institutional email address used for the institution',
       },
