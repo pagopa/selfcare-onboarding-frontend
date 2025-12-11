@@ -152,7 +152,8 @@ export default {
         'Inserisci uno dei dati richiesti per cercare su InfoCamere l’ente <3/> per cui vuoi richiedere l’adesione a <5>{{productName}}.</5>',
       merchantAtecoValid:
         'Se fai parte di una catena di negozi, l’adesione deve essere fatta dalla società capogruppo.',
-      merchantAtecoNotValid: 'Il codice ATECO inserito non è ammesso per l’adesione al portale',
+      merchantAtecoNotValid:
+        'L’ente indicato non può aderire perché il suo codice ATECO non rientra tra quelli ammessi.',
       merchantCompanyStatusDisabled:
         'La tua società non può aderire al portale perché risulta cessata o in liquidazione',
       asyncAutocomplete: {
@@ -331,6 +332,7 @@ export default {
         errors: {
           invalid: "L'indirizzo email non è valido",
           duplicate: "L'indirizzo email inserito è già presente",
+          conflict: "L'indirizzo email inserito non corrisponde al precedente",
         },
         description: 'Inserisci l’indirizzo email istituzionale utilizzato per l’ente',
       },
@@ -741,7 +743,8 @@ export default {
         requiredRea: 'REA',
         rea: 'REA (facoltativo)',
         shareCapital: 'Capitale sociale (facoltativo)',
-        requiredCommercialRegisterNumber: 'Luogo di iscrizione al Registro delle Imprese',
+        requiredCommercialRegisterNumber:
+          'Luogo di iscrizione al Registro delle Imprese (obbligatorio)',
         requiredShareCapital: 'Capitale sociale',
         shareCapitalHelper: 'Da compilare solo per le società di capitali',
       },
@@ -789,7 +792,8 @@ export default {
     },
     ibanSection: {
       title: 'INSERISCI IBAN PER RICEVERE I RIMBORSI',
-      subTitle: 'Per far sì che il bonifico vada a buon fine, assicurati che <1> l’IBAN coincida con quanto riportato sugli estremi del tuo conto. </1>',
+      subTitle:
+        'Per far sì che il bonifico vada a buon fine, assicurati che <1> l’IBAN coincida con quanto riportato sugli estremi del tuo conto. </1>',
       holder: 'Intestatario',
       iban: 'IBAN',
       confirmIban: 'Conferma IBAN',

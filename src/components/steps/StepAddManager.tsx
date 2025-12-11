@@ -164,7 +164,7 @@ export function StepAddManager({
             allPeople={people}
             setPeople={setPeople}
             readOnly={readOnly}
-            addUserFlow={addUserFlow}
+            productId={product?.id}
           />
         </Grid>
       </Grid>
@@ -206,7 +206,7 @@ export function StepAddManager({
             label: t('stepAddManager.continue'),
             disabled:
               objectIsEmpty(people) ||
-              !validateUser('manager-initial', people['manager-initial'], people, addUserFlow),
+              !validateUser('manager-initial', people['manager-initial'], people),
           }}
         />
       </Grid>

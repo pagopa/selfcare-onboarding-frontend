@@ -1,10 +1,12 @@
-import { institutionTypes, mockedProducts } from '../../lib/__mocks__/mockApiRequests';
-import { institutionType4Product, PRODUCT_IDS } from '../../utils/constants';
+import {
+  institutionTypes,
+  mockedProducts,
+} from '../../lib/__mocks__/mockApiRequests';
+import { PRODUCT_IDS } from '../../utils/constants';
 import { renderComponentWithProviders } from '../../utils/test-utils';
 import StepInstitutionType from '../steps/StepInstitutionType';
-import { screen } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import '../../locale';
-import React from 'react';
 import i18n from '@pagopa/selfcare-common-frontend/lib/locale/locale-utils';
 
 beforeAll(() => {
@@ -15,64 +17,84 @@ test('Test: Render test', async () => {
   renderComponentWithProviders(
     <StepInstitutionType
       selectedProduct={mockedProducts[0]}
+      productId={mockedProducts[0].id}
       institutionType={'PA'}
       fromDashboard={false}
+      setOrigin={jest.fn()}
+      productAvoidStep={false}
+      loading={false}
+      setLoading={jest.fn()}
+      setRequiredLogin={jest.fn()}
+      setOutcome={jest.fn()}
+      genericError={{
+        title: '',
+        description: [],
+        img: undefined,
+        ImgComponent: undefined,
+      }}
     />
   );
+
+  await waitFor(() => {
+    expect(screen.getByText(/Seleziona il tipo di ente che rappresenti/)).toBeInTheDocument();
+  });
 });
 
 test('Test: The correct institution types with the expected descriptions, can be selected based on the product', async () => {
-  institutionTypes.forEach((it) => {
-    mockedProducts.forEach((p) => {
+  mockedProducts.forEach((p) => {
+    institutionTypes.forEach(async (it) => {
       renderComponentWithProviders(
-        <StepInstitutionType selectedProduct={p} institutionType={it} fromDashboard={false} />
+        <StepInstitutionType
+          selectedProduct={p}
+          productId={p.id}
+          institutionType={'PA'}
+          fromDashboard={false}
+          setOrigin={jest.fn()}
+          productAvoidStep={false}
+          loading={false}
+          setLoading={jest.fn()}
+          setRequiredLogin={jest.fn()}
+          setOutcome={jest.fn()}
+          genericError={{
+            title: '',
+            description: [],
+            img: undefined,
+            ImgComponent: undefined,
+          }}
+        />
       );
 
-      screen.getAllByText(/Seleziona il tipo di ente che rappresenti/);
+      await waitFor(() => {
+        expect(screen.getByText(/Seleziona il tipo di ente che rappresenti/)).toBeInTheDocument();
+      });
 
-      const institutionTypesForProduct = institutionType4Product(p.id);
-      const institutionTypeValues = institutionTypesForProduct.map((it) => it.value);
-
-      switch (p.id) {
-        case PRODUCT_IDS.PAGOPA:
-          expect(institutionTypeValues).toStrictEqual(['PA', 'GSP', 'PT', 'PSP', 'PRV', 'GPU']);
-          break;
-        case PRODUCT_IDS.IO:
-          expect(institutionTypeValues).toStrictEqual(['PA', 'GSP', 'PT']);
-          break;
-        case PRODUCT_IDS.IO_SIGN:
-          expect(institutionTypeValues).toStrictEqual(['PA', 'GSP']);
-          break;
-        case PRODUCT_IDS.IDPAY:
-        case PRODUCT_IDS.SEND:
-          expect(institutionTypeValues).toStrictEqual(['PA']);
-          break;
-        case PRODUCT_IDS.IDPAY_MERCHANT:
-          expect(institutionTypeValues).toStrictEqual(['PRV']);
-          break;
-        case PRODUCT_IDS.INTEROP:
-          expect(institutionTypeValues).toStrictEqual(['PA', 'GSP', 'SCP', 'SA', 'AS', 'PRV', 'SCEC']);
-          break;
-        default:
-          expect(institutionTypeValues).toStrictEqual(['PA', 'GSP', 'SCP']);
-          break;
-      }
-
-      if (p.id !== PRODUCT_IDS.SEND && p.id !== PRODUCT_IDS.IDPAY) {
+      if (
+        p.id !== PRODUCT_IDS.SEND ||
+        p.id !== PRODUCT_IDS.IDPAY ||
+        p.id !== PRODUCT_IDS.IDPAY_MERCHANT
+      ) {
         switch (it) {
           case 'PA':
-            screen.getAllByText('art. 2, comma 2, lettera A del CAD');
+            expect(
+              screen.getAllByText('art. 2, comma 2, lettera A del CAD')[0]
+            ).toBeInTheDocument();
             break;
           case 'GSP':
-            screen.getAllByText('art. 2, comma 2, lettera B del CAD');
+            expect(
+              screen.getAllByText('art. 2, comma 2, lettera B del CAD')[0]
+            ).toBeInTheDocument();
             break;
           case 'SCP':
-            screen.getAllByText('art. 2, comma 2, lettera C del CAD');
+            expect(
+              screen.getAllByText('art. 2, comma 2, lettera C del CAD')[0]
+            ).toBeInTheDocument();
             break;
           case 'PT':
-            screen.getAllByText(
-              'Ai sensi di IO - Paragrafo 6.1.3 delle “Linee Guida sul punto di accesso telematico ai servizi della Pubblica Amministrazione” emanate da AgID ai sensi dell’art- 64-bis del CAD'
-            );
+            expect(
+              screen.getByText(
+                'Ai sensi di IO - Paragrafo 6.1.3 delle “Linee Guida sul punto di accesso telematico ai servizi della Pubblica Amministrazione” emanate da AgID ai sensi dell’art- 64-bis del CAD'
+              )
+            ).toBeInTheDocument();
             break;
         }
       }

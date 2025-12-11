@@ -6,6 +6,57 @@ import { Endpoint, ApiEndpointKey, PartyData, Product, InstitutionType } from '.
 import { AooData } from '../model/AooData';
 import { UoData } from '../model/UoModel';
 import { PRODUCT_IDS } from '../utils/constants';
+import config from '../utils/config.json';
+
+const validateIdpayMerchantInstitution = (
+  response: PartyData,
+  disabledStatusCompany: boolean | undefined,
+  filterCategories: string | { atecoCodes: string; allowedInstitutions: string } | undefined,
+  setDisabled: Dispatch<SetStateAction<boolean>>,
+  setIsPresentInAtecoWhiteList: (value: boolean) => void,
+  setMerchantSearchResult: Dispatch<SetStateAction<PartyData | undefined>> | undefined,
+) => {
+  setMerchantSearchResult?.(response);
+
+  const merchantDetails = (filterCategories as { atecoCodes: string; allowedInstitutions: string }) ||
+    config.product['prod-idpay-merchant']?.merchantDetails;
+
+  const allowedInstitutionsStr = merchantDetails?.allowedInstitutions ||
+    config.product['prod-idpay-merchant']?.merchantDetails?.allowedInstitution || '';
+
+  const allowedInstitutions = allowedInstitutionsStr
+    ? allowedInstitutionsStr.split(',').filter(Boolean)
+    : [];
+
+  if (disabledStatusCompany) {
+    setDisabled(true);
+    setIsPresentInAtecoWhiteList?.(false);
+  }
+  else if (
+    response?.businessTaxId &&
+    allowedInstitutions.length > 0 &&
+    allowedInstitutions.includes(response.businessTaxId)
+  ) {
+    setIsPresentInAtecoWhiteList?.(true);
+    setDisabled(false);
+  }
+  else if (
+    merchantDetails?.atecoCodes &&
+    response?.atecoCodes &&
+    Array.isArray(response.atecoCodes)
+  ) {
+    const whitelistCodes = merchantDetails.atecoCodes.split(',').filter(Boolean);
+    const hasMatchingCode = response.atecoCodes.some((code: string) =>
+      whitelistCodes.includes(code)
+    );
+    setIsPresentInAtecoWhiteList?.(hasMatchingCode);
+    setDisabled(!hasMatchingCode);
+  }
+  else {
+    setIsPresentInAtecoWhiteList?.(false);
+    setDisabled(true);
+  }
+};
 
 export const handleSearchByTaxCode = async (
   query: string,
@@ -101,11 +152,11 @@ export const fetchInstitutionByTaxCode = async (
   query: string,
   productId: string | undefined,
   institutionType: string | undefined,
-  filterCategories: string | undefined,
+  filterCategories: { atecoCodes: string; allowedInstitutions: string } | string | undefined,
   disabledStatusCompany: boolean | undefined,
   setCfResult: Dispatch<SetStateAction<PartyData | undefined>>,
   setMerchantSearchResult: Dispatch<SetStateAction<PartyData | undefined>> | undefined,
-  setIsPresentInAtecoWhiteList: Dispatch<SetStateAction<boolean>> | undefined,
+  setIsPresentInAtecoWhiteList: (value: boolean) => void | undefined,
   setDisabled: Dispatch<SetStateAction<boolean>>,
   setRequiredLogin: Dispatch<SetStateAction<boolean>>
   // eslint-disable-next-line sonarjs/cognitive-complexity
@@ -117,7 +168,7 @@ export const fetchInstitutionByTaxCode = async (
       (productId === 'prod-interop' || productId === 'prod-idpay-merchant') &&
       (institutionType === 'SCP' || institutionType === 'PRV')
         ? undefined
-        : filterCategories,
+        : (filterCategories as string),
   };
 
   const searchResponse = await fetchWithLogs(
@@ -135,24 +186,15 @@ export const fetchInstitutionByTaxCode = async (
     const response = (searchResponse as AxiosResponse).data;
     setCfResult(response);
 
-    // Logica specifica per IDPAY_MERCHANT
     if (productId === 'prod-idpay-merchant') {
-      setMerchantSearchResult?.(response);
-
-      if (disabledStatusCompany) {
-        setDisabled(true);
-      } else if (filterCategories && response?.atecoCodes && Array.isArray(response.atecoCodes)) {
-        // Validazione whitelist ATECO
-        const whitelistCodes = filterCategories.split(',');
-        const hasMatchingCode = response.atecoCodes.some((code: string) =>
-          whitelistCodes.includes(code)
-        );
-        setIsPresentInAtecoWhiteList?.(hasMatchingCode);
-        setDisabled(!hasMatchingCode);
-      } else {
-        setIsPresentInAtecoWhiteList?.(false);
-        setDisabled(true);
-      }
+      validateIdpayMerchantInstitution(
+        response,
+        disabledStatusCompany,
+        filterCategories,
+        setDisabled,
+        setIsPresentInAtecoWhiteList,
+        setMerchantSearchResult
+      );
     }
   } else if ((searchResponse as AxiosError).response?.status === 404) {
     setCfResult(undefined);
@@ -171,11 +213,11 @@ export const handleSearchByReaCode = async (
   query: string,
   setApiLoading: Dispatch<SetStateAction<boolean>> | undefined,
   setCfResult: Dispatch<SetStateAction<PartyData | undefined>>,
-  setIsPresentInAtecoWhiteList: Dispatch<SetStateAction<boolean>> | undefined,
+  setIsPresentInAtecoWhiteList: (value: boolean) => void,
   setDisabled: Dispatch<SetStateAction<boolean>>,
   setRequiredLogin: Dispatch<SetStateAction<boolean>>,
   product: Product | undefined,
-  filterCategories: string | undefined,
+  filterCategories: string | { atecoCodes: string; allowedInstitutions: string } | undefined,
   disabledStatusCompany: boolean | undefined,
   setMerchantSearchResult: Dispatch<SetStateAction<PartyData | undefined>> | undefined
   // eslint-disable-next-line sonarjs/cognitive-complexity
@@ -214,20 +256,14 @@ export const handleSearchByReaCode = async (
     setCfResult(response);
 
     if (product?.id === PRODUCT_IDS.IDPAY_MERCHANT) {
-      setMerchantSearchResult?.(response);
-      if (disabledStatusCompany) {
-        setDisabled(true);
-      } else if (filterCategories && response.atecoCodes && Array.isArray(response.atecoCodes)) {
-        const whitelistCodes = filterCategories.split(',');
-        const hasMatchingCode = response.atecoCodes.some((code: string) =>
-          whitelistCodes.includes(code)
-        );
-        setIsPresentInAtecoWhiteList?.(hasMatchingCode);
-        setDisabled(!hasMatchingCode);
-      } else {
-        setIsPresentInAtecoWhiteList?.(false);
-        setDisabled(true);
-      }
+      validateIdpayMerchantInstitution(
+        response,
+        disabledStatusCompany,
+        filterCategories,
+        setDisabled,
+        setIsPresentInAtecoWhiteList,
+        setMerchantSearchResult
+      );
     }
   } else if ((searchResponse as AxiosError).response?.status === 404) {
     setCfResult(undefined);
@@ -259,7 +295,6 @@ export const handleSearchByAooCode = async (
   if (addUser) {
     updatedParams = params;
   } else {
-    // Se productId è specificato, usa logica condizionale (per StepSearchParty)
     if (productId !== undefined) {
       updatedParams =
         productId === PRODUCT_IDS.SEND
@@ -269,7 +304,6 @@ export const handleSearchByAooCode = async (
             }
           : {};
     } else {
-      // Logica default per retrocompatibilità (per AsyncAutocompleteContainer)
       updatedParams = {
         origin: 'IPA',
         categories: filterCategories,

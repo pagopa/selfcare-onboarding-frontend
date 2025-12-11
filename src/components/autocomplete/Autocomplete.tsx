@@ -32,7 +32,7 @@ type AutocompleteProps = {
   apiLoading?: boolean;
   selectedProduct?: Product;
   filterCategories?: string;
-  setIsPresentInAtecoWhiteList?: Dispatch<SetStateAction<boolean>>;
+  setIsPresentInAtecoWhiteList: (value: boolean) => void | undefined; 
   setMerchantSearchResult?: Dispatch<SetStateAction<any>>;
   disabledStatusCompany?: boolean;
   selections: SelectionsState;
@@ -66,7 +66,7 @@ export function Autocomplete({
   disabledStatusCompany,
   selections,
   setSelections,
-  addUser = window.location.pathname.includes('/user'),
+  addUser
 }: AutocompleteProps) {
   const { t } = useTranslation();
   const [options, setOptions] = useState<Array<InstitutionResource>>([]);

@@ -118,7 +118,7 @@ export const API = {
     URL: ENV.URL_API.PARTY_REGISTRY_PROXY + '/geotaxonomies',
   },
   ONBOARDING_GET_PREVIOUS_GEOTAXONOMIES: {
-    URL: ENV.URL_API.ONBOARDING + '/institutions/geographicTaxonomies',
+    URL: ENV.URL_API.ONBOARDING + '/institutions/geographic-taxonomies',
   },
   ONBOARDING_GET_LOCATION_BY_ISTAT_CODE: {
     URL: ENV.URL_API.PARTY_REGISTRY_PROXY + '/geotaxonomies/{{geoTaxId}}',
@@ -149,6 +149,9 @@ export const API = {
   },
   ONBOARDING_GET_PRODUCTS: {
     URL: ENV.URL_API.ONBOARDING + '/products',
+  },
+  ONBOARDING_GET_INSTITUTION_TYPE_BY_PRODUCT: {
+    URL: ENV.URL_API.ONBOARDING_V2 + '/v2/product',
   },
   ONBOARDING_GET_ALLOWED_ADD_USER_PRODUCTS: {
     URL: ENV.URL_API.ONBOARDING_V2 + '/v1/products/admin',
@@ -252,58 +255,8 @@ export const institutionTypes: Array<{ labelKey: string; value: InstitutionType 
   { labelKey: 'scec', value: 'SCEC' },
 ];
 
-// eslint-disable-next-line sonarjs/cognitive-complexity
-export const institutionType4Product = (productId: string | undefined) => {
-  switch (productId) {
-    case PRODUCT_IDS.INTEROP:
-      return institutionTypes.filter(
-        (it) =>
-          it.labelKey === 'pa' ||
-          it.labelKey === 'gsp' ||
-          it.labelKey === 'scec' ||
-          it.labelKey === 'sa' ||
-          (ENV.SCP_INFOCAMERE.SHOW && it.labelKey === 'scp') ||
-          it.labelKey === 'as' ||
-          (ENV.PRV.SHOW && it.labelKey === 'prv') 
-      );
-    case PRODUCT_IDS.SEND:
-      return institutionTypes.filter((it) => it.labelKey === 'pa');
-    case PRODUCT_IDS.IDPAY:
-      return institutionTypes.filter((it) => it.labelKey === 'pa');
-    case PRODUCT_IDS.IO:
-      return institutionTypes.filter(
-        (it) =>
-          it.labelKey === 'pa' ||
-          it.labelKey === 'gsp' ||
-          (ENV.PT.SHOW_PT ? it.labelKey === 'pt' : '')
-      );
-    case PRODUCT_IDS.PAGOPA:
-      // Temporary re-enabled psp radiobutton for prod-pagopa only for dev environment.
-      return institutionTypes.filter(
-        (it) =>
-          it.labelKey === 'pa' ||
-          it.labelKey === 'gsp' ||
-          (ENV.GPU.SHOW && it.labelKey === 'gpu') ||
-          (ENV.ENV !== 'PROD' && it.labelKey === 'psp') ||
-          (ENV.PT.SHOW_PT ? it.labelKey === 'pt' : '') ||
-          (ENV.PURE_PRV.SHOW ? it.labelKey === 'oth' : '')
-      );
-    case PRODUCT_IDS.IO_SIGN:
-      return institutionTypes.filter((it) => it.labelKey === 'pa' || it.labelKey === 'gsp');
-    case PRODUCT_IDS.IDPAY_MERCHANT:
-      return institutionTypes.filter((it) => it.labelKey === 'prv');
-    default:
-      return institutionTypes.filter(
-        (it) => it.labelKey === 'pa' || it.labelKey === 'gsp' || it.labelKey === 'scp'
-      );
-  }
-};
-
-export const description4InstitutionType = (institutionType: {
-  labelKey: string;
-  value: InstitutionType;
-}) => {
-  switch (institutionType.value) {
+export const description4InstitutionType = (labelKey: string, value: InstitutionType) => {
+  switch (value) {
     case 'PT':
       return 'stepInstitutionType.institutionTypes.pt.description';
     case 'PA':
@@ -318,9 +271,7 @@ export const description4InstitutionType = (institutionType: {
     case 'SA':
     case 'AS':
     case 'PRV':
-      return institutionType.labelKey === 'oth'
-        ? 'stepInstitutionType.institutionTypes.oth.description'
-        : '';
+      return labelKey === 'oth' ? 'stepInstitutionType.institutionTypes.oth.description' : '';
     default:
       return '';
   }

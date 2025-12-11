@@ -363,7 +363,8 @@ export default function PersonalAndBillingDataSection({
                 controllers.isContractingAuthority ||
                 controllers.isInsuranceCompany ||
                 (controllers.isInformationCompany && onboardingFormData?.businessName) ||
-                ((institutionType === 'PRV' || institutionType === 'PRV_PF') && productId !== PRODUCT_IDS.PAGOPA)
+                ((institutionType === 'PRV' || institutionType === 'PRV_PF') &&
+                  productId !== PRODUCT_IDS.PAGOPA)
               }
             />
           </Grid>
@@ -594,7 +595,8 @@ export default function PersonalAndBillingDataSection({
               controllers.isContractingAuthority ||
               controllers.isInsuranceCompany ||
               (controllers.isInformationCompany && onboardingFormData?.digitalAddress) ||
-              ((institutionType === 'PRV' || institutionType === 'PRV_PF') && productId !== PRODUCT_IDS.PAGOPA)
+              ((institutionType === 'PRV' || institutionType === 'PRV_PF') &&
+                productId !== PRODUCT_IDS.PAGOPA)
             }
           />
         </Grid>
@@ -619,7 +621,8 @@ export default function PersonalAndBillingDataSection({
                 controllers.isContractingAuthority ||
                 controllers.isInsuranceCompany ||
                 (controllers.isInformationCompany && onboardingFormData?.taxCode) ||
-                ((  institutionType === 'PRV' || institutionType === 'PRV_PF') && productId !== PRODUCT_IDS.PAGOPA)
+                ((institutionType === 'PRV' || institutionType === 'PRV_PF') &&
+                  productId !== PRODUCT_IDS.PAGOPA)
               }
               inputProps={{
                 maxLength: 11,
@@ -777,7 +780,7 @@ export default function PersonalAndBillingDataSection({
                 </Typography>
               </Box>
             )}
-            {controllers.isInvoiceable && (
+            {controllers.isInvoiceable && productId !== PRODUCT_IDS.IO && (
               <Grid item xs={12} mt={3}>
                 <CustomTextFieldNotched
                   paddingValue={institutionType === 'PA' || controllers.isAooUo ? '8px' : '0'}

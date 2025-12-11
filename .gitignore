@@ -60,3 +60,6 @@ yarn-error.log
 # Local .terraform directories
 **/.terraform/*
 .DS_Store
+
+# E2E test tracking files
+e2e/onboarding-ids.json

@@ -8,53 +8,96 @@ import {
   Typography,
   useTheme,
 } from '@mui/material';
-import React, { useRef } from 'react';
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
+import { isArray } from 'lodash';
 import {
   IPACatalogParty,
   InstitutionType,
   Product,
+  RequestOutcomeMessage,
   StepperStepComponentProps,
 } from '../../../types';
 import { OnboardingStepActions } from '../registrationSteps/OnboardingStepActions';
 import { useHistoryState } from '../../hooks/useHistoryState';
-import {
-  description4InstitutionType,
-  institutionType4Product,
-} from '../../utils/constants';
+import { description4InstitutionType } from '../../utils/constants';
+import { LoadingOverlay } from '../modals/LoadingOverlay';
+import { getInstiutionTypesByProduct } from '../../services/onboardingServices';
+import { InstitutionOrigins } from '../../model/InstitutionOrigins';
 
 type Props = StepperStepComponentProps & {
   institutionType: InstitutionType;
   fromDashboard: boolean;
   selectedProduct?: Product | null;
+  productId?: string;
+  setOrigin: Dispatch<SetStateAction<string | undefined>>;
+  productAvoidStep: boolean;
+  loading: boolean;
+  setLoading: Dispatch<SetStateAction<boolean>>;
+  setRequiredLogin: Dispatch<SetStateAction<boolean>>;
+  setOutcome: Dispatch<SetStateAction<RequestOutcomeMessage | null | undefined>>;
+  genericError: RequestOutcomeMessage;
 };
 
 export default function StepInstitutionType({
-  back,
-  forward,
   institutionType,
   fromDashboard,
   selectedProduct,
+  productId,
+  forward,
+  back,
+  setOrigin,
+  productAvoidStep,
+  loading,
+  setLoading,
+  setRequiredLogin,
+  setOutcome,
+  genericError,
 }: Props) {
-  const [selectedValue, setSelectedValue] = React.useState<InstitutionType>(institutionType);
+  const [selectedValue, setSelectedValue] = useState<InstitutionType>(institutionType);
   const setSelectedHistory = useHistoryState<IPACatalogParty | null>('selected_step1', null)[2];
-
   const selectedValueRef = useRef<InstitutionType>(selectedValue);
-
+  const [retrivedInstitutionType, setRetrivedInstituionType] = useState<InstitutionOrigins>();
   const { t } = useTranslation();
-
   const theme = useTheme();
 
-  const handleChange = (value: InstitutionType) => {
+  useEffect(() => {
+    void getInstiutionTypesByProduct(
+      setLoading,
+      productId,
+      setRetrivedInstituionType,
+      setRequiredLogin,
+      setOutcome,
+      genericError
+    );
+  }, [productId]);
+
+  useEffect(() => {
+    if (retrivedInstitutionType && productAvoidStep) {
+      const firstInstitution = retrivedInstitutionType.origins[0];
+      if (firstInstitution) {
+        handleChange(firstInstitution.institutionType, firstInstitution.origin);
+        forward(firstInstitution.institutionType);
+      }
+    }
+  }, [retrivedInstitutionType, productAvoidStep, selectedProduct?.id]);
+
+  const handleChange = (value: InstitutionType, origin: string | Array<string>) => {
     if (value !== selectedValueRef.current) {
       setSelectedHistory(null);
     }
     setSelectedValue(value);
+    const finalOrigin = isArray(origin) ? origin[0] : origin;
+    setOrigin(finalOrigin);
   };
 
   const onForwardAction = () => {
     forward(selectedValue);
   };
+
+  if (loading) {
+    return <LoadingOverlay loadingText={t('onboardingStep1.loadingOverlayText')} />;
+  }
 
   return (
     <Grid container display="flex" justifyContent="center" alignItems="center">
@@ -84,12 +127,12 @@ export default function StepInstitutionType({
           <Grid item xs={12} p={3}>
             <FormControl>
               <RadioGroup name="radio-buttons-group" defaultValue={institutionType}>
-                {institutionType4Product(selectedProduct?.id).map((ot) => (
+                {retrivedInstitutionType?.origins.map((ot) => (
                   <FormControlLabel
                     sx={{ p: '8px' }}
                     key={ot.labelKey}
-                    onChange={() => handleChange(ot.value)}
-                    value={ot.value}
+                    onChange={() => handleChange(ot.institutionType, ot.origin)}
+                    value={ot.institutionType}
                     control={
                       <Radio
                         id={ot.labelKey}
@@ -113,7 +156,7 @@ export default function StepInstitutionType({
                             color: '#5C6F82',
                           }}
                         >
-                          {t(description4InstitutionType(ot))}
+                          {t(description4InstitutionType(ot.labelKey, ot.institutionType))}
                         </Typography>
                       </>
                     }

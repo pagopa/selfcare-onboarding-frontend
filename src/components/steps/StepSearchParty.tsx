@@ -13,6 +13,7 @@ import {
 } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { InstitutionType, PartyData, Product, StepperStepComponentProps } from '../../../types';
+import { useHistoryState } from '../../hooks/useHistoryState';
 import { UserContext } from '../../lib/context';
 import { AooData } from '../../model/AooData';
 import { SelectionsState } from '../../model/Selection';
@@ -26,11 +27,10 @@ import {
 import { noMandatoryIpaProducts, PRODUCT_IDS } from '../../utils/constants';
 import { ENV } from '../../utils/env';
 import { selected2OnboardingData } from '../../utils/selected2OnboardingData';
+import { Autocomplete } from '../autocomplete/Autocomplete';
 import Loading4Api from '../modals/Loading4Api';
 import { LoadingOverlay } from '../modals/LoadingOverlay';
 import { OnboardingStepActions } from '../registrationSteps/OnboardingStepActions';
-import { Autocomplete } from '../autocomplete/Autocomplete';
-import { useHistoryState } from '../../hooks/useHistoryState';
 
 type Props = {
   subTitle: string | ReactElement;
@@ -42,6 +42,7 @@ type Props = {
   subunitCodeByQuery: string;
   selectFilterCategories: () => any;
   setInstitutionType: Dispatch<SetStateAction<InstitutionType | undefined>>;
+  addUser: boolean;
 } & StepperStepComponentProps;
 
 // eslint-disable-next-line sonarjs/cognitive-complexity, complexity
@@ -57,6 +58,7 @@ export function StepSearchParty({
   subunitCodeByQuery,
   selectFilterCategories,
   setInstitutionType,
+  addUser,
 }: Props) {
   const theme = useTheme();
   const { t } = useTranslation();
@@ -81,14 +83,52 @@ export function StepSearchParty({
     'uoSelected_step1',
     undefined
   );
-  const [merchantSearchResult, setMerchantSearchResult] = useState<any>();
+
+  const [merchantSearchResult, setMerchantSearchResultState] = useState<any>(() => {
+    if (product?.id === PRODUCT_IDS.IDPAY_MERCHANT) {
+      try {
+        const stored = sessionStorage.getItem('merchantSearchResult');
+        return stored ? JSON.parse(stored) : undefined;
+      } catch {
+        return undefined;
+      }
+    }
+    return undefined;
+  });
+
+  const setMerchantSearchResult = (value: any) => {
+    setMerchantSearchResultState(value);
+    if (product?.id === PRODUCT_IDS.IDPAY_MERCHANT) {
+      if (value === undefined) {
+        sessionStorage.removeItem('merchantSearchResult');
+      } else {
+        sessionStorage.setItem('merchantSearchResult', JSON.stringify(value));
+      }
+    }
+  };
+
   const [ecData, setEcData] = useState<PartyData | null>(null);
   const [filterCategories, setFilterCategories] = useState<string>();
   const isEnabledProduct2AooUo = product?.id === PRODUCT_IDS.SEND;
-  const [isPresentInAtecoWhiteList, setIsPresentInAtecoWhiteList] = useState<boolean>(
-    product?.id === PRODUCT_IDS.IDPAY_MERCHANT ? true : false
-  );
-  const addUser = window.location.pathname.includes('/user');
+
+  const [isPresentInAtecoWhiteList, setIsPresentInAtecoWhiteListState] = useState<boolean>(() => {
+    if (product?.id === PRODUCT_IDS.IDPAY_MERCHANT) {
+      try {
+        const stored = sessionStorage.getItem('isPresentInAtecoWhiteList');
+        return stored !== null ? JSON.parse(stored) : true;
+      } catch {
+        return true;
+      }
+    }
+    return false;
+  });
+
+  const setIsPresentInAtecoWhiteList = (value: boolean) => {
+    setIsPresentInAtecoWhiteListState(value);
+    if (product?.id === PRODUCT_IDS.IDPAY_MERCHANT) {
+      sessionStorage.setItem('isPresentInAtecoWhiteList', JSON.stringify(value));
+    }
+  };
 
   const disabledStatusCompany = useMemo(
     () =>
@@ -220,7 +260,9 @@ export function StepSearchParty({
   const onForwardAction = () => {
     const dataParty = aooResult || uoResult ? ({ ...selected, ...ecData } as PartyData) : selected;
     const actualInstitutionType =
-      product?.id === PRODUCT_IDS.IDPAY_MERCHANT && selections.personalTaxCode
+      product?.id === PRODUCT_IDS.IDPAY_MERCHANT &&
+      (selections.personalTaxCode ||
+        (selections.reaCode && dataParty?.businessTaxId && dataParty.businessTaxId.length > 11))
         ? 'PRV_PF'
         : institutionType;
     setSelectedHistory(selected);
@@ -235,13 +277,47 @@ export function StepSearchParty({
       setInstitutionType(actualInstitutionType);
     }
 
+    if (product?.id === PRODUCT_IDS.IDPAY_MERCHANT) {
+      sessionStorage.removeItem('merchantSearchResult');
+      sessionStorage.removeItem('isPresentInAtecoWhiteList');
+    }
+
     forward(onboardingData, actualInstitutionType);
   };
 
   const onBackAction = () => {
+    if (product?.id === PRODUCT_IDS.IDPAY_MERCHANT) {
+      sessionStorage.removeItem('merchantSearchResult');
+      sessionStorage.removeItem('isPresentInAtecoWhiteList');
+    }
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     back!();
   };
+
+  useEffect(
+    () => () => {
+      if (product?.id === PRODUCT_IDS.IDPAY_MERCHANT) {
+        const shouldClean = !sessionStorage.getItem('onboarding_forward');
+        if (shouldClean) {
+          sessionStorage.removeItem('merchantSearchResult');
+          sessionStorage.removeItem('isPresentInAtecoWhiteList');
+        }
+      }
+    },
+    [product?.id]
+  );
+
+  useEffect(() => {
+    if (product?.id === PRODUCT_IDS.IDPAY_MERCHANT) {
+      const storedMerchant = sessionStorage.getItem('merchantSearchResult');
+
+      if (selected && !storedMerchant && merchantSearchResult) {
+        setMerchantSearchResult(undefined);
+        setIsPresentInAtecoWhiteList(true);
+        setDisabled(true);
+      }
+    }
+  }, [selected, product?.id]);
 
   const canAggregateProductList = ENV.AGGREGATOR.ELIGIBLE_PRODUCTS.split(',');
 

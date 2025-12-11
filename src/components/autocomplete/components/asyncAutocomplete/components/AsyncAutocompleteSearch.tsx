@@ -42,6 +42,8 @@ type Props = {
   setAooResult: React.Dispatch<React.SetStateAction<AooData | undefined>>;
   setUoResult: React.Dispatch<React.SetStateAction<UoData | undefined>>;
   setMerchantSearchResult?: Dispatch<SetStateAction<PartyData | undefined>>;
+  setIsPresentInAtecoWhiteList?: (value: boolean) => void;
+  setDisabled: Dispatch<SetStateAction<boolean>>;
   externalInstitutionId: string;
   addUser: boolean;
 };
@@ -60,6 +62,8 @@ export default function AsyncAutocompleteSearch({
   setAooResult,
   setUoResult,
   setMerchantSearchResult,
+  setIsPresentInAtecoWhiteList,
+  setDisabled,
   externalInstitutionId,
   addUser,
 }: Props) {
@@ -192,6 +196,8 @@ export default function AsyncAutocompleteSearch({
                 setAooResult(undefined);
                 setUoResult(undefined);
                 setMerchantSearchResult?.(undefined);
+                setIsPresentInAtecoWhiteList?.(true);
+                setDisabled?.(true);
                 setStepHistoryState({
                   ...stepHistoryState,
                   isTaxCodeEquals2PIVA: false,

@@ -6,7 +6,9 @@ import {
   stepSelectPartyByCF,
   stepFormData,
   BASE_URL_ONBOARDING,
-  PRODUCT_IDS_TEST_E2E
+  PRODUCT_IDS_TEST_E2E,
+  FILE_MOCK_PDF_CONTRACT,
+  stepCompleteOnboarding
 } from '../utils/test-utils';
 
 test('Test Success onboarding request for product prod-interop and institutionType SCP', async ({
@@ -18,4 +20,10 @@ test('Test Success onboarding request for product prod-interop and institutionTy
   await stepFormData(page, PRODUCT_IDS_TEST_E2E.INTEROP, 'SCP');
   await stepAddManager(page);
   await stepAddAdmin(page);
+  await stepCompleteOnboarding(
+    page,
+    '03907690923',
+    FILE_MOCK_PDF_CONTRACT.PA,
+    PRODUCT_IDS_TEST_E2E.INTEROP,
+  );
 });

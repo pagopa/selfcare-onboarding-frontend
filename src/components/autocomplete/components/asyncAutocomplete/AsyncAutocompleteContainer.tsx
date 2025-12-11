@@ -69,8 +69,8 @@ type Props = {
   setDisabled: Dispatch<SetStateAction<boolean>>;
   addUser: boolean;
   selectedProduct?: Product;
-  filterCategories?: string;
-  setIsPresentInAtecoWhiteList?: Dispatch<SetStateAction<boolean>>;
+  filterCategories?: string | { atecoCodes: string; allowedInstitutions: string };
+  setIsPresentInAtecoWhiteList: (value: boolean) => void | undefined;
   setMerchantSearchResult?: Dispatch<SetStateAction<PartyData | undefined>>;
   setApiLoading?: Dispatch<SetStateAction<boolean>>;
   apiLoading?: boolean;
@@ -132,7 +132,7 @@ export default function AsyncAutocompleteContainer({
     (selections.personalTaxCode && input.length === 16) ||
     (selections.aooCode && input.length === 7) ||
     (selections.uoCode && input.length === 6) ||
-    (selections.reaCode && input.length > 1);
+    (selections.reaCode && input.length >= 4);
 
   useEffect(() => setDisabled(!selected), [selected]);
 
@@ -146,6 +146,12 @@ export default function AsyncAutocompleteContainer({
   }, [selected]);
 
   useEffect(() => {
+    if (product?.id === PRODUCT_IDS.IDPAY_MERCHANT && !selected) {
+      setMerchantSearchResult?.(undefined);
+      setIsPresentInAtecoWhiteList?.(false);
+      setCfResult(undefined);
+    }
+
     if (!input || input.length === 0 || selected) {
       return;
     }
@@ -158,6 +164,14 @@ export default function AsyncAutocompleteContainer({
 
     if (canSearchByBusinessName || canSearch4Others) {
       void executeSearch(input, selections, params, addUser, institutionType, product);
+    }
+  }, [input]);
+
+  useEffect(() => {
+    if (!input || (input.length === 0 && product?.id === PRODUCT_IDS.IDPAY_MERCHANT)) {
+      setMerchantSearchResult?.(undefined);
+      setIsPresentInAtecoWhiteList?.(true);
+      setDisabled(true);
     }
   }, [input]);
 
@@ -241,7 +255,12 @@ export default function AsyncAutocompleteContainer({
         });
         break;
       default:
-        void debouncedSearchByName(value, endpoint, ENV.MAX_INSTITUTIONS_FETCH, filterCategories);
+        void debouncedSearchByName(
+          value,
+          endpoint,
+          ENV.MAX_INSTITUTIONS_FETCH,
+          filterCategories as string
+        );
     }
   };
   const removeSpecialCharacters = (input: string): string => {
@@ -252,6 +271,15 @@ export default function AsyncAutocompleteContainer({
       .map((char) => (specialCharacters.includes(char) ? '' : char))
       .join('')
       .replace(/''|""|--|__|,,|\.\./g, (match) => match[0]);
+  };
+
+  const formatReaCode = (input: string): string => {
+    const letters = input
+      .replace(/[^A-Za-z]/g, '')
+      .slice(0, 2)
+      .toUpperCase();
+    const numbers = input.replace(/[^0-9]/g, '').slice(0, 6);
+    return letters.length < 2 || !numbers ? letters : `${letters}-${numbers}`;
   };
 
   const getSearchEndpoint = (
@@ -341,7 +369,7 @@ export default function AsyncAutocompleteContainer({
         addUser,
         endpoint,
         params,
-        filterCategories
+        filterCategories as string
       );
     }
 
@@ -356,11 +384,11 @@ export default function AsyncAutocompleteContainer({
         addUser,
         endpoint,
         params,
-        filterCategories
+        filterCategories as string
       );
     }
 
-    if (selections.reaCode && value.length > 1) {
+    if (selections.reaCode && value.length >= 4) {
       const endpoint = addUser
         ? 'ONBOARDING_GET_INSTITUTIONS'
         : 'ONBOARDING_GET_VISURA_INFOCAMERE_BY_REA';
@@ -386,7 +414,16 @@ export default function AsyncAutocompleteContainer({
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const typedInput = event.target.value;
-    const cleanValue = removeSpecialCharacters(typedInput);
+
+    const cleanValue = selections.reaCode
+      ? formatReaCode(typedInput)
+      : removeSpecialCharacters(typedInput);
+
+    if (product?.id === PRODUCT_IDS.IDPAY_MERCHANT) {
+      setMerchantSearchResult?.(undefined);
+      setIsPresentInAtecoWhiteList?.(false);
+      setCfResult(undefined);
+    }
 
     setInput(cleanValue);
     setSelected(null);
@@ -426,6 +463,8 @@ export default function AsyncAutocompleteContainer({
           setAooResult={setAooResult}
           setUoResult={setUoResult}
           setMerchantSearchResult={setMerchantSearchResult}
+          setIsPresentInAtecoWhiteList={setIsPresentInAtecoWhiteList}
+          setDisabled={setDisabled}
           externalInstitutionId={externalInstitutionId}
           addUser={addUser}
         />

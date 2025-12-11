@@ -3,62 +3,65 @@ export default {
     noResultsLabel: 'No result',
     lessThen3CharacterLabel: 'Enter at least 3 characters',
     lessThen11CharacterLabel: 'Enter at least 11 characters',
-    searchLabel: 'Search for the institution',
-    aooLabel: 'Enter the univocal AOO (Homogeneous Organizational Area) code',
-    uoLabel: 'Enter the univocal UO (Homogeneous Organizational Area) code',
-    ariaLabel: `Seleziona la tipologia di ricerca dell'ente`,
+    searchLabel: 'Search for institution',
+    aooLabel: 'Enter the univocal AOO code',
+    uoLabel: 'Enter the univocal UO code',
+    ariaLabel: `Select the institution search type`,
     businessName: 'Company name',
-    taxcode: 'Company Fiscal Code',
+    taxcode: 'Company Tax Code',
     originId: 'IVASS code',
+    reaLabel: 'RM-123456',
   },
   partyAdvancedSelect: {
     advancedSearchLabel: 'Search by',
     businessName: 'Company name',
     ivassCode: 'IVASS code',
-    taxCode: 'Company Fiscal Code',
+    taxCode: 'Company Tax Code',
     aooCode: 'Univocal AOO code',
     uoCode: 'Univocal UO code',
+    reaCode: 'REA code',
+    personalTaxCode: 'Sole proprietorship Tax Code',
   },
   confirmOnboarding: {
     chooseOption: {
       download: {
         product: {
-          title: 'Download the standard contract',
-          description: `Per completare l’adesione, scarica l’accordo e fai apporre la firma digitale in <1 /><2>formato p7m</2> dal Legale Rappresentante dell’ente.`,
-          downloadContract: 'Download the contract',
+          title: 'Download the membership agreement',
+          description: `To complete the membership, download the agreement and have it digitally signed in <1 /><2>p7m format</2> by the institution's Legal Representative.`,
+          downloadContract: 'Download the agreement',
         },
         user: {
-          title: 'Download the additional module',
-          description: `Per completare l’adesione, scarica il Modulo di aggiunta e fai apporre la <1 />firma digitale in <2>formato p7m</2> dal Legale Rappresentante dell’ente.`,
-          downloadContract: 'Download the module',
+          title: 'Download the Addition Module',
+          description: `To complete the membership, download the Addition Module and have it <1 />digitally signed in <2>p7m format</2> by the institution's Legal Representative.`,
+          downloadContract: 'Download the Module',
         },
         disclaimer:
-          'Firmando l’accordo, il Legale Rappresentante dell’ente, accetta espressamente e specificamente anche le singole clausole indicate nel paragrafo “Clausole ai sensi degli artt. 1341 e 1342 c.c.”',
+          'By signing the agreement, the institution\'s Legal Representative expressly and specifically accepts the individual clauses indicated in the paragraph "Clauses pursuant to articles 1341 and 1342 of the Italian Civil Code"',
       },
       upload: {
         product: {
-          title: 'Upload the signed contract',
-          description: `Una volta firmato l’accordo, segui le istruzioni per inviarlo e completare <1 /> l’adesione al prodotto scelto. Ricorda di caricare l’accordo <3>entro 30 giorni.</3>`,
+          title: 'Upload the signed agreement',
+          description: `Once the agreement is signed, follow the instructions to send it and complete <1 /> the membership to the selected product. Remember to upload the agreement <3>within 30 days.</3>`,
         },
         user: {
-          title: 'Upload the signed module',
-          description: `Una volta firmato il Modulo, segui le istruzioni per inviarlo e completare <1 /> l’aggiunta di uno o più Amministratori.`,
+          title: 'Upload the signed Module',
+          description: `Once the Module is signed, follow the instructions to send it and complete <1 /> the addition of one or more Administrators.`,
         },
         goToUpload: 'Go to upload',
       },
     },
     upload: {
       product: {
-        title: 'Upload the standard contract',
-        description: `Carica l’accordo di adesione, firmato digitalmente in <1 />p7m dal Legale Rappresentante.`,
+        title: 'Upload the membership agreement',
+        description: `Upload the membership agreement, digitally signed in <1 />p7m by the Legal Representative.`,
         dropArea: {
-          title: 'Drag the signed standard contract here or',
+          title: 'Drag the signed Membership Agreement here or',
           link: 'upload the file',
         },
       },
       user: {
         title: 'Upload the module',
-        description: `Carica il Modulo di aggiunta, firmato digitalmente in <1 />p7m dal Legale Rappresentante.`,
+        description: `Upload the Addition Module, digitally signed in <1 />p7m by the Legal Representative.`,
         dropArea: {
           title: 'Drag the signed module here or',
           link: 'upload the file',
@@ -67,9 +70,9 @@ export default {
       },
       continue: 'Continue',
       error: {
-        title: 'Uploading unsuccessful',
+        title: 'Upload failed',
         description:
-          'Il caricamento del documento non è andato a buon fine. <1 />Carica un solo file in formato <3>p7m</3>.',
+          'The document upload was not successful. <1 />Upload only one file in <3>p7m</3> format.',
         close: 'Exit',
         retry: 'Upload again',
       },
@@ -80,15 +83,14 @@ export default {
     labelStatus: 'Ready for sending',
   },
   inlineSupportLink: {
-    assistanceLink: 'Contact support',
+    assistanceLink: 'contact support',
   },
   moreInformationOnRoles: 'More information about roles',
   onboardingStep0: {
-    title: 'Welcome to the Self-care portal',
-    description:
-      'In a few steps, your institution can register and manage all the PagoPA products.',
+    title: 'Welcome to the Self-care Portal',
+    description: 'In a few steps your institution can join and manage all PagoPA products.',
     privacyPolicyDescription: 'I have read and understood',
-    privacyPolicyLink: 'the Privacy policy and Service terms and conditions of use',
+    privacyPolicyLink: 'the Privacy Policy and Terms and Conditions of Use of the service',
     actionLabel: 'Continue',
   },
   stepVerifyOnboarding: {
@@ -96,27 +98,27 @@ export default {
     ptAlreadyOnboarded: {
       title: 'The Partner is already registered',
       description:
-        'Per operare su un prodotto, chiedi a un Amministratore di <1/> aggiungerti nella sezione Utenti.',
+        'To operate on a product, ask an Administrator to <1/> add you in the Users section.',
       backAction: 'Close',
     },
     alreadyOnboarded: {
-      title: 'The selected institution has already registered',
+      title: 'The selected institution has already joined',
       description:
-        'Per operare sul prodotto, chiedi a un Amministratore di <1/>aggiungerti nella sezione Utenti.',
+        'To operate on the product, ask an Administrator to <1/>add you in the Users section.',
       addNewAdmin:
-        'Gli attuali Amministratori non sono più disponibili e hai l’esigenza <1 />di gestire i prodotti? <3>Aggiungi un nuovo Amministratore</3>',
-      backHome: 'Go back to the home page',
+        'Are current Administrators no longer available and do you need <1 />to manage products? <3>Add a new Administrator</3>',
+      backHome: 'Back to home',
     },
     genericError: {
       title: 'Something went wrong',
-      description: `A causa di un errore del sistema non è possibile completare <br />la procedura. Ti chiediamo di riprovare più tardi.`,
-      backHome: 'Go back to the home page',
+      description: `Due to a system error, the procedure cannot be completed. <br />Please try again later.`,
+      backHome: 'Back to home',
     },
     userNotAllowedError: {
-      title: 'You cannot register for this product',
-      description: `Al momento, l'ente <1>{{partyName}}</1> non può aderire a <3>{{productTitle}}</3>. <5 /> Per maggiori dettagli contatta <7>l'assistenza</7>.`,
+      title: 'You cannot join this product',
+      description: `Currently, the institution <1>{{partyName}}</1> cannot join <3>{{productTitle}}</3>. <5 /> For more details contact <7>support</7>.`,
       noSelectedParty: 'indicated',
-      backToHome: 'Go back to the home page',
+      backToHome: 'Back to home',
     },
   },
   onboardingStep1: {
@@ -125,46 +127,53 @@ export default {
       bodyTitle: 'Search for your institution',
       codyTitleSelected: 'Confirm the selected institution',
       disclaimer: {
-        description: `Al momento possono aderire a SEND tramite Area Riservata solo le <1>Pubbliche <3 /> Amministrazioni Locali </1> presenti su IPA che trovi a <5>questo link</5>.`,
+        description: `Currently only <1>Local Public <3 /> Administrations </1> listed in the IPA that you can find at <5>this link</5> can join SEND through the Reserved Area.`,
       },
       bodyDescription:
-        'Inserisci uno dei dati richiesti e cerca dall’Indice della Pubblica <1/> Amministrazione (IPA) l’ente per cui vuoi richiedere l’adesione a <3/><4>{{productTitle}}</4>.',
-      aggregator: 'I am an aggregator',
+        'Enter one of the required data and search the Public Administration <1/> Index (IPA) for the institution for which you want to request membership to <3/><4>{{productTitle}}</4>.',
+      aggregator: 'I am an aggregator institution',
       aggregatorModal: {
-        title: 'Aggregator',
-        message: `Stai richiedendo l’adesione come ente aggregatore per <1>{{partyName}}</1>.<3 />Per completare l’adesione, dovrai indicare gli enti da aggregare.`,
-        back: 'Go back',
+        title: 'Aggregator institution',
+        message: `You are requesting membership as an aggregator institution for <1>{{partyName}}</1>.<3 />To complete the membership, you will need to indicate the institutions to be aggregated.`,
+        back: 'Back',
         forward: 'Continue',
       },
-      ipaDescription: `Non trovi il tuo ente nell'IPA? <1>In questa pagina</1> trovi maggiori <3/> informazioni sull'indice e su come accreditarsi `,
+      ipaDescription: `Can't find your institution in the IPA? <1>On this page</1> you can find more <3/> information about the index and how to register `,
       selectedInstitution:
-        'Prosegui con l’adesione a <1>{{productName}}</1> per l’ente selezionato',
-      gpsDescription: `Non trovi il tuo ente nell'IPA?<1 /><2>Inserisci manualmente i dati del tuo ente.</2>`,
+        'Continue with membership to <1>{{productName}}</1> for the selected institution',
+      gpsDescription: `Can't find your institution in the IPA?<1 /><2>Manually enter your institution's data.</2>`,
       saSubTitle:
-        'Se sei tra i gestori privati di piattaforma e-procurement e hai <1/> già ottenuto la <3> certificazione da AgID </3>, inserisci uno dei dati <1/> richiesti e cerca l’ente per cui vuoi richiedere l’adesione a <1/> <5>{{productName}}.</5>',
+        'If you are among the private e-procurement platform operators and have <1/> already obtained <3> certification from AgID </3>, enter one of the required <1/> data and search for the institution for which you want to request membership to <1/> <5>{{productName}}.</5>',
       asSubTitle:
-        'Se sei una società di assicurazione presente nell’Albo delle <1/>imprese IVASS, inserisci uno dei dati richiesti e cerca l’ente per <1/> cui vuoi richiedere l’adesione a <3>{{productName}}.</3>',
+        'If you are an insurance company listed in the IVASS <1/>company Register, enter one of the required data and search for the institution for <1/> which you want to request membership to <3>{{productName}}.</3>',
       scpSubtitle:
-        'Inserisci uno dei dati richiesti e cerca da InfoCamere l’ente <3/> per cui vuoi richiedere l’adesione a <5>Interoperabilità.</5>',
+        'Enter one of the required data and search InfoCamere for the institution <3/> for which you want to request membership to <5>{{productName}}.</5>',
+      merchantSubtitle:
+        'Enter one of the required data to search InfoCamere for the institution <3/> for which you want to request membership to <5>{{productName}}.</5>',
+      merchantAtecoValid:
+        'If you are part of a store chain, membership must be done by the parent company.',
+      merchantAtecoNotValid: 'The entered ATECO code is not allowed for membership to the portal',
+      merchantCompanyStatusDisabled:
+        'Your company cannot join the portal because it is ceased or in liquidation',
       asyncAutocomplete: {
         placeholder: 'Search',
       },
       onboardingStepActions: {
         confirmAction: 'Continue',
-        backAction: 'Go back',
+        backAction: 'Back',
       },
     },
   },
   stepUploadAggregates: {
-    title: `Indica i soggetti aggregati per {{productName}}`,
+    title: `Indicate the aggregated entities for {{productName}}`,
     subTitle:
-      'Scarica il file di esempio, compilalo seguendo le indicazioni e carica il documento per aggiungere/dichiarare gli enti da aggregare.',
+      'Download the example file, fill it in following the instructions and upload the document to add/declare the institutions to be aggregated.',
     findOutMore: 'Questions? Consult the manual',
     errors: {
       onCsv: {
         title: 'The file contains one or more errors',
         description:
-          '<1>Scarica il report</1> per verificare le informazioni e carica di nuovo il file.',
+          '<1>Download the report</1> to verify the information and upload the file again.',
       },
       invalidFormat: {
         title: 'The file format is invalid',
@@ -172,73 +181,114 @@ export default {
       },
     },
     dropArea: {
-      title: 'Drag the .csv file with the list of the aggregated institutions or',
+      title: 'Drag the .csv file with the list of aggregated institutions here or',
       button: 'upload the file',
     },
-    downloadExampleCsv: 'Do you not know how to prepare the file? <1>Download the example</1>',
-    back: 'Go back',
+    downloadExampleCsv: 'Don\'t know how to prepare the file? <1>Download the example</1>',
+    back: 'Back',
     forward: 'Continue',
   },
   stepAddManager: {
-    title: 'Indicate the Legal representative',
+    title: 'Indicate the Legal Representative',
     subTitle: {
       flow: {
-        base: `Inserisci i dati del Legale Rappresentante del tuo ente. <1/> Sarà responsabile della firma del contratto per <3>{{productTitle}}</3> <4/> e avrà il ruolo di Amministratore per questo prodotto nell'Area Riservata.`,
-        premium: `Inserisci i dati del Legale Rappresentante del tuo ente. <1/> La persona che indicherai sarà firmataria del contratto per <3/> <strong>Premium<strong/>.`,
-        addNewUser: `La persona indicata firmerà il Modulo di aggiunta per il nuovo Amministratore e lo <1 />autorizzerà ad operare sul prodotto <3>{{productTitle}}</3> per il tuo ente.`,
+        base: `Enter the Legal Representative's details of your institution. <1/> They will be responsible for signing the contract for <3>{{productTitle}}</3> <4/> and will have the role of Administrator for this product in the Reserved Area.`,
+        premium: `Enter the Legal Representative's details of your institution. <1/> The person you indicate will be the signatory of the contract for <3>{{subProductTitle}}<3/>.`,
+        addNewUser: `The indicated person will sign the Addition Module for the new Administrator and will <1 />authorize them to operate on the product <3>{{productTitle}}</3> for your institution.`,
       },
     },
     changedManager: {
-      title: 'You are adding a Legal representative',
+      title: 'You are adding a Legal Representative',
       message:
-        'I dati del Legale Rappresentante inseriti sono diversi da quelli indicati in <1 />precedenza. Vuoi continuare?',
+        'The Legal Representative data entered is different from that indicated <1 />previously. Do you want to continue?',
     },
-    back: 'Go back',
+    back: 'Back',
     continue: 'Continue',
   },
   stepAddDelegates: {
-    title: 'Indicate the administrator',
+    title: 'Indicate the Administrator',
     description: {
       flow: {
-        onboarding: `Puoi aggiungere da uno a tre Amministratori o suoi delegati. <1/> Saranno i responsabili della gestione di <3>{{productTitle}}</3> e presenti nel contratto di <4 />adesione come delegati dal Legale Rappresentante.`,
-        pt: 'You can add between one and three Administrators and their delegates.<1/> They will manage the users and products on behalf of the institutions.',
-        addNewUser: `Puoi aggiungere un Amministratore o un suo delegato. Puoi inserire anche la persona che <1 />hai già indicato come Legale Rappresentante. Se aggiungi una persona già presente con un <3 />ruolo diverso per questo prodotto, verrà inserita come Amministratore.`,
+        onboarding: `You can add from one to three Administrators or their delegates. <1/> They will be responsible for managing <3>{{productTitle}}</3> and will appear in the membership <4 />contract as delegates of the Legal Representative.`,
+        pt: 'You can add from one to three Administrators or their delegates.<1/> They will manage users and products on behalf of the institutions.',
+        addNewUser: `You can add an Administrator or their delegate. You can also enter the person you <1 />already indicated as Legal Representative. If you add a person already present with a <3 />different role for this product, they will be added as Administrator.`,
       },
     },
     addUserLabel: 'ADD ANOTHER ADMINISTRATOR',
-    addUserLink: 'Add another administrator',
-    backLabel: 'Go back',
+    addUserLink: 'Add another Administrator',
+    backLabel: 'Back',
     confirmLabel: 'Continue',
     formControl: {
-      label: 'Add me as an administrator',
+      label: 'Add me as Administrator',
+    },
+  },
+  additionalGpuDataPage: {
+    title: 'Enter additional details',
+    subTitle: 'Select from the options the one that describes your institution.',
+    firstBlock: {
+      yes: 'Yes',
+      no: 'No',
+      question: {
+        isPartyRegistered: 'Is the institution registered in a Register, Roll or List?',
+        subscribedTo: 'Registered in:',
+        isPartyProvidingAService: 'Does the institution provide a service aimed at citizens?',
+        gpuRequestAccessFor:
+          'For which public utility and/or general interest services does the institution request access?',
+        longTermPayments: 'Is the payment frequency continuous?',
+      },
+      placeholder: {
+        registerBoardList: 'Register/Roll/List',
+        answer: 'Answer',
+        numberOfSubscription: 'Registration number',
+      },
+      errors: {
+        requiredField: 'Required field',
+      },
+    },
+    secondBlock: {
+      title:
+        'The legal representative of the Requesting Institution declares and represents irrevocably:',
+      boxes: {
+        first: 'to have the power to act in the name and on behalf of the Requesting Institution;',
+        second:
+          'that the Institution, through its legal representative, the legal representative and its Directors are in possession of all the authorizations required by law for carrying out the activities subject to the request and underlying it;',
+        third:
+          'that this legal representative and the directors of the Requesting Institution are not in one of the circumstances indicated in articles 94 and 95 of Legislative Decree no. 36/2023;',
+        fourth:
+          'that no proceedings are pending against the same and the directors of the Requesting Institution for the application of one of the prevention measures referred to in art. 6 of Legislative Decree 159/2011 and that none of the impeditive causes provided for by art. 67 of Legislative Decree 159/2011 exist;',
+        fifth:
+          'that the Requesting Institution is not the recipient of judicial measures, nor involved in pending proceedings that involve the application of administrative sanctions referred to in Legislative Decree of 8 June 2001, no. 231.',
+      },
+      legalBlockFooterInfo:
+        'The declarations in this document are issued pursuant to art. 46 of Presidential Decree 28.12.2000 no. 445. In case of false declarations, applicable sanctions, including criminal ones, apply, including the cases provided for and punished under Presidential Decree 28.12.2000 no. 445.',
     },
   },
   additionalDataPage: {
     title: 'Enter additional details',
     subTitle:
-      'Scegli l’opzione che descrive il tuo ente. Se nessuna è appropriata, seleziona “Altro” e <1 /> inserisci maggiori dettagli.',
+      'Choose the option that describes your institution. If none is appropriate, select "Other" and <1 /> enter more details.',
     formQuestions: {
       textFields: {
         labels: {
           note: 'Notes',
-          ipa: 'Enter the IPA (Public Administration Index) code of reference',
+          ipa: 'Enter the reference IPA code',
         },
         errors: {
-          isEstabilishedRegulatoryProvision: 'You did not enter a note',
-          fromBelongsRegulatedMarket: 'You did not enter a note',
-          isFromIPA: 'Enter the IPA (Public Administration Index) code of reference',
-          isConcessionaireOfPublicService: 'You did not enter a note',
-          optionalPartyInformations: 'Mandatory field',
+          isEstabilishedRegulatoryProvision: 'You have not entered any notes',
+          fromBelongsRegulatedMarket: 'You have not entered any notes',
+          isFromIPA: 'Enter the reference IPA code',
+          isConcessionaireOfPublicService: 'You have not entered any notes',
+          optionalPartyInformations: 'Required field',
         },
       },
       estabilishedRegulatoryProvision:
-        'L’ente è una società costituita ex lege da un provvedimento normativo',
+        'The institution is a company established by law by a regulatory provision',
       belongsRegulatedMarket:
-        'L’ente appartiene ad un mercato regolamentato (es. energia, gas, acqua, <1 />trasporti, servizi postali ecc…)',
-      registratedOnIPA: 'The institution is recorded in the IPA',
+        'The institution belongs to a regulated market (e.g. energy, gas, water, <1 />transport, postal services, etc...)',
+      registratedOnIPA: 'The institution is registered on IPA',
       concessionaireOfPublicService: 'The institution is a concessionaire of a public service',
       other: 'Other',
-      optionalPartyInformations: 'Write information about your institution here',
+      optionalPartyInformations: 'Write here information about your institution',
     },
     options: {
       yes: 'Yes',
@@ -248,8 +298,8 @@ export default {
     allowedCharacters: 'Maximum 300 characters',
   },
   addUser: {
-    title: `Aggiungi un nuovo <1 /> Amministratore`,
-    subTitle: `Indica per quale prodotto vuoi aggiungere un nuovo<1 />Amministratore`,
+    title: `Add a new <1 /> Administrator`,
+    subTitle: `Indicate for which product you want to add a new<1 />Administrator`,
     stepSelectProduct: {
       title: 'SELECT THE PRODUCT',
     },
@@ -260,27 +310,28 @@ export default {
       name: {
         label: 'Name',
         errors: {
-          conflict: 'Incorrect or different than the fiscal code',
+          conflict: 'Name incorrect or different from Tax Code',
         },
       },
       surname: {
         label: 'Surname',
         errors: {
-          conflict: 'Incorrect or different than the fiscal code',
+          conflict: 'Surname incorrect or different from Tax Code',
         },
       },
       taxCode: {
-        label: 'Tax code',
+        label: 'Tax Code',
         errors: {
-          invalid: 'The entered fiscal code is not valid',
-          duplicate: 'The entered fiscal code was already entered',
+          invalid: 'The entered Tax Code is not valid',
+          duplicate: 'The entered tax code is already present',
         },
       },
       email: {
         label: 'Institutional email',
         errors: {
           invalid: 'The email address is not valid',
-          duplicate: 'The entered email address was already entered',
+          duplicate: 'The entered email address is already present',
+          conflict: 'The email address you entered does not match the previous one',
         },
         description: 'Enter the institutional email address used for the institution',
       },
@@ -293,67 +344,67 @@ export default {
     },
     steps: {
       step0: {
-        label: 'Upload the registration document',
+        label: 'Upload the Membership Deed',
       },
       step1: {
-        label: 'Upload the registration document',
+        label: 'Upload the Membership Deed',
       },
     },
     request: {
       notFound: {
-        title: 'The page you entered is not available',
+        title: 'The page you were looking for is not available',
         description:
-          'Al momento non è possibile procedere. Riprova tra qualche <1 />minuto, o contatta l’assistenza',
+          'At the moment it is not possible to proceed. Try again in a few <1 />minutes, or contact support',
         contactAssistanceButton: 'Contact support',
       },
       expired: {
         product: {
-          title: 'The registration request has expired',
-          description: `Sono trascorsi oltre 30 giorni dalla richiesta di adesione. Se <2 />desideri ancora aderire al prodotto {{productTitle}}, invia <4 />una nuova richiesta.`,
+          title: 'The membership request has expired',
+          description: `More than 30 days have passed since the membership request. If <2 />you still wish to join the product {{productTitle}}, send <4 />a new request.`,
         },
         user: {
           title: 'The request has expired',
-          description: `Sono trascorsi oltre 30 giorni dalla richiesta di aggiunta di <2 />un Amministratore. Per procedere, invia una nuova <2 /> richiesta.`,
+          description: `More than 30 days have passed since the request to add <2 />an Administrator. To proceed, send a new <2 /> request.`,
         },
-        backHome: 'Go back to the home page',
+        backHome: 'Back to home',
       },
       alreadyCompleted: {
         product: {
-          title: 'Your registration request has been accepted',
+          title: 'The membership request has been accepted',
         },
         user: {
-          title: 'Your request has been accepted',
+          title: 'The request has already been accepted',
         },
-        description: `Per gestire il prodotto, accedi tramite SPID o CIE`,
-        logIn: 'Login',
+        description: `To manage the product, log in via SPID or CIE`,
+        logIn: 'Log in',
       },
       alreadyRejected: {
         product: {
-          title: 'Your registration request has been canceled',
-          description: `La richiesta di adesione non è andata a buon fine. Se <2 />desideri ancora aderire al prodotto {{productTitle}}, invia <4 />una nuova richiesta.`,
+          title: 'The membership request has been cancelled',
+          description: `The membership request was not successful. If <2 />you still wish to join the product {{productTitle}}, send <4 />a new request.`,
         },
         user: {
           title: 'The request is no longer valid',
-          description: `Il tuo ente ha annullato la richiesta. Per aggiungere un <2 />nuovo Amministratore, inviane una nuova.`,
+          description: `Your institution has cancelled the request. To add a <2 />new Administrator, send a new one.`,
         },
-        backHome: 'Go back to the home page',
+        backHome: 'Back to home',
       },
     },
     outcomeContent: {
       success: {
         product: {
-          title: 'Registration completed!',
-          description: `Comunicheremo l'avvenuta adesione all'indirizzo PEC <1/> primario dell'ente. Da questo momento è possibile <3 />accedere all'Area Riservata.`,
+          title: 'Membership completed!',
+          description: `We will communicate the successful membership to the institution's primary <1/> PEC address. From this moment it is possible to <3 />access the Reserved Area.`,
         },
         user: {
           title: 'Request completed',
-          description: `Da questo momento gli Amministratori indicati possono <1 />accedere all’Area Riservata.`,
+          description: `From this moment the indicated Administrators can <1 />access the Reserved Area.`,
         },
-        backHome: 'Go back to the home page',
+        backHome: 'Back to home',
       },
       error: {
-        title: 'Uploading unsuccessful',
-        description: 'The document was not uploaded successfully.',
+        title: 'Upload failed',
+        description: 'The document upload was not successful.',
         backToUpload: 'Upload again',
       },
     },
@@ -362,88 +413,88 @@ export default {
         title: 'Check the document',
         product: {
           message:
-            'The uploaded document is not the registration document. Check that it is correct and upload it again.',
+            'The uploaded document does not correspond to the Membership Deed. Verify that it is correct and upload it again.',
         },
         user: {
           message:
-            'Il documento caricato non corrisponde al modulo che hai ricevuto via email. Verifica che sia corretto e caricalo di nuovo.',
+            'The uploaded document does not correspond to the form you received via email. Verify that it is correct and upload it again.',
         },
       },
       INVALID_SIGN: {
         title: 'Check the document',
         product: {
           message:
-            'La Firma Digitale non è riconducibile al Legale Rappresentante indicato in fase di adesione. Verifica la corrispondenza e carica di nuovo il documento.',
+            'The Digital Signature cannot be attributed to the Legal Representative indicated during membership. Verify the correspondence and upload the document again.',
         },
         user: {
           message:
-            'La Firma Digitale non è riconducibile al Legale Rappresentante indicato in fase di richiesta. Verifica la corrispondenza e carica di nuovo il documento.',
+            'The Digital Signature cannot be attributed to the Legal Representative indicated during the request. Verify the correspondence and upload the document again.',
         },
       },
       ALREADY_ONBOARDED: {
-        title: `L’ente selezionato ha già aderito`,
+        title: `The selected institution has already joined`,
         message:
-          'Per operare sul prodotto, chiedi a un Amministratore di <1 />aggiungerti nella sezione Utenti.',
+          'To operate on the product, ask an Administrator to <1 />add you in the Users section.',
       },
       GENERIC: {
-        title: 'Uploading unsuccessful',
+        title: 'Upload failed',
         message:
-          'Il caricamento del documento non è andato a buon fine. Torna indietro e caricalo di nuovo.',
+          'The document upload was not successful. Go back and upload it again.',
       },
       INVALID_SIGN_FORMAT: {
-        title: 'Uploading unsuccessful',
+        title: 'Upload failed',
         message:
-          'Il caricamento del documento non è andato a buon fine. <1 />Carica un solo file in formato <3>p7m</3>.',
+          'The document upload was not successful. <1 />Upload only one file in <3>p7m</3> format.',
       },
     },
   },
   noProductPage: {
     title: 'Sorry, something went wrong.',
-    description: 'It is impossible to locate the desired product',
+    description: 'Unable to identify the desired product',
   },
   onboarding: {
     success: {
       flow: {
         product: {
-          title: 'Registration request sent',
+          title: 'Membership request sent',
           publicAdministration: {
-            description: `Invieremo un’email all’indirizzo PEC primario dell’ente. <1 /> Al suo interno, ci sono le istruzioni per completare <3 />l’adesione.`,
+            description: `We will send an email to the institution's primary PEC address. <1 /> Inside, there are instructions to complete <3 />the membership.`,
           },
           notPublicAdministration: {
-            description: `Invieremo un’email all’indirizzo PEC indicato. <1 /> Al suo interno, ci sono le istruzioni per completare <3 />l’adesione.`,
+            description: `We will send an email to the indicated PEC address. <1 /> Inside, there are instructions to complete <3 />the membership.`,
           },
         },
         techPartner: {
           title: 'Registration request sent',
-          description: `Invieremo un’email con l’esito della richiesta all’indirizzo <1 />PEC indicato.`,
+          description: `We will send an email with the outcome of the request to the <1 />indicated PEC address.`,
         },
         user: {
-          title: 'You sent the request',
-          description: `Invieremo un’email all’indirizzo PEC primario dell’ente. <1 /> Al suo interno, ci sono le istruzioni per completare <3 />l’operazione.`,
+          title: 'You have sent the request',
+          description: `We will send an email to the institution's primary PEC address. <1 /> Inside, there are instructions to complete <3 />the operation.`,
         },
       },
     },
     error: {
       title: 'Something went wrong.',
-      description: `A causa di un errore del sistema non è possibile completare <1 />la procedura. Ti chiediamo di riprovare più tardi.`,
+      description: `Due to a system error it is not possible to complete <1 />the procedure. Please try again later.`,
     },
-    backHome: 'Go back to the home page',
+    backHome: 'Back to home',
     sessionModal: {
       title: 'Do you really want to exit?',
-      message: 'If you exit, your request for registration will be lost.',
+      message: 'If you exit, the membership request will be lost.',
       onConfirmLabel: 'Exit',
       onCloseLabel: 'Cancel',
     },
     confirmationModal: {
-      title: 'Confirm the request to send?',
+      title: 'Do you confirm the request to send?',
       description: {
         flow: {
-          base: 'You are sending a request to register for the product <1>{{productName}}</1> for the institution <3>{{institutionName}}</3>. <5 /> The standard contract will be sent to the institutional PEC of the institution and be signed by the Legal representative. Make sure you are authorized as an employee who can make the request.',
-          addNewUser: `Stai aggiungendo un nuovo Amministratore per l’ente <1>{{institutionName}}</1>. <3 />L’ente riceverà un modulo alla PEC istituzionale e dovrà essere firmato dal Legale Rappresentante che hai indicato. <3 />Assicurati di essere autorizzato dall’ente a effettuare questa richiesta.`,
+          base: 'You are sending a membership request to the product <1>{{productName}}</1> for the institution <3>{{institutionName}}</3>. <5 /> The membership agreement will arrive at the institution\'s institutional PEC and must be signed by the Legal Representative. Make sure you are authorized as an employee to make this request.',
+          addNewUser: `You are adding a new Administrator for the institution <1>{{institutionName}}</1>. <3 />The institution will receive a form at the institutional PEC and it must be signed by the Legal Representative you indicated. <3 />Make sure you are authorized by the institution to make this request.`,
         },
       },
       confirm: 'Confirm',
-      back: 'Go back',
+      back: 'Back',
     },
     loading: {
       loadingText: 'We are verifying your data',
@@ -451,104 +502,112 @@ export default {
     phaseOutError: {
       title: 'Something went wrong',
       description:
-        'Non puoi aderire al prodotto scelto poiché a breve non sarà <1 /> più disponibile.',
-      backAction: 'Go back to the home page',
+        'You cannot join the selected product as it will soon <1 /> no longer be available.',
+      backAction: 'Back to home',
     },
   },
   onboardingSubProduct: {
     alreadyOnboardedError: {
-      title: 'Enrollment already completed',
+      title: 'Subscription already done',
       message:
-        'The institution that you selected already enrolled for the <1 /><strong>Premium</strong> offer.',
+        'The institution you selected has already subscribed to the <1 /><strong>Premium</strong> offer.',
       closeButton: 'Close',
     },
     subProductStepSelectPricingPlan: {
-      discountLabelData: '25% discount until June 30, 2023 ',
+      discountLabelData: '25% discount Until June 30, 2023 ',
       title: 'Switch to IO Premium and improve <1/> message performance',
       firstCheckLabel: 'Reduce collection times',
       secondCheckLabel: 'Improve collection performance',
-      thirdCheckLabel: 'Reduce outstanding amounts',
-      infoSectionLabel: `Se il tuo ente ha già aderito ad IO, scegli qual è il piano che più soddisfa le sue esigenze. <1/> Il piano a carnet è attivabile una sola volta. Una volta terminato il numero di messaggi del piano a  <3/> carnet, si attiverà automaticamente il piano a consumo. `,
-      btnRejectLabel: 'I am not interested',
+      thirdCheckLabel: 'Reduce bad debts',
+      infoSectionLabel: `If your institution has already joined IO, choose which plan best meets its needs. <1/> The carnet plan can be activated only once. Once the number of messages in the <3/> carnet plan is finished, the consumption plan will be automatically activated. `,
+      btnRejectLabel: 'Not interested',
       pricingPlanExitModal: {
-        title: 'Are you not interested in the Premium offers?',
+        title: 'Do you want to give up Premium offers?',
         subtitle: 'If you exit, you will continue with access to the Reserved Area.',
         closeBtnLabel: 'Exit',
-        confirmBtnLabel: 'Return to the Premium offers',
+        confirmBtnLabel: 'Back to Premium offers',
       },
       headerPlanCard: {
         from: 'From',
-        to: 'To',
+        to: 'to',
         beyond: 'Beyond',
-        mess: '/ mess',
+        mess: '/ msg',
       },
       carnetPlan: {
-        caption: 'CARNET PLAN - ONE TIME PAYMENT',
+        caption: 'CARNET PLAN - ONE-TIME',
         discountBoxLabel: '25% discount',
-        title: 'Chose between the {{carnetCount}} different carnets available based on your needs',
-        showMore: 'Discover more',
+        title: 'Choose from the {{carnetCount}} different carnets designed for your every need',
+        showMore: 'Learn more',
         showLess: 'Show less',
         description:
-          'Una volta selezionato il carnet non potrà essere modificato per via della sottoscrizione del contratto.',
+          'Once the carnet is selected it cannot be changed due to contract subscription.',
         carnetLabelsDiscount: {
-          c1: 'Save € 55',
-          c2: 'Save € 543.75',
-          c3: 'Save € 2,687.50',
-          c4: 'Save € 5,312.50',
-          c5: 'Save € 13,125',
-          c6: 'Save € 25,625',
-          c7: 'Save € 50,000',
+          c1: 'Save €55',
+          c2: 'Save €543.75',
+          c3: 'Save €2,687.50',
+          c4: 'Save €5,312.50',
+          c5: 'Save €13,125',
+          c6: 'Save €25,625',
+          c7: 'Save €50,000',
         },
         btnActionLabel: 'Activate the plan',
       },
       consumptionPlan: {
-        caption: 'PAY AS YOU GO PLAN',
+        caption: 'CONSUMPTION PLAN',
         discountBoxLabel: '25% discount',
-        title: 'Chose to pay only for the messages <1/> you actually send',
-        showMore: 'Discover more',
+        title: 'Choose to pay only for the actual <1/> messages you send',
+        showMore: 'Learn more',
         showLess: 'Show less',
         description:
-          'Attivando il piano a consumo, non sarà più possibile attivare il piano carnet.',
+          'By activating the consumption plan, it will no longer be possible to activate the carnet plan.',
         rangeLabelsDiscount: '25% discount',
         btnActionLabel: 'Activate the plan',
       },
     },
     subProductStepUserUnrelated: {
-      title: 'You cannot register for {{selectedProduct}} Premium',
+      title: 'You cannot join {{selectedProduct}}',
       description:
-        'Il tuo ente non ha aderito ad <strong>{{selectedProduct}}</strong>, o non hai un ruolo per <3/>gestire il prodotto. <5/> Chiedi ad un Amministratore di <1/>aggiungerti nella sezione <7/>Utenti, oppure richiedi l’adesione ad <strong>{{selectedProduct}}</strong> per il tuo ente.',
-      backHomeLabelBtn: 'Go back to the home page',
-      goToBtnLabel: 'Go to registration',
+        'Your institution has not joined <strong>{{selectedProduct}}</strong>, or you do not have a role to <3/>manage the product. <5/> Ask an Administrator to <1/>add you in the <7/>Users section, or request membership to <strong>{{selectedProduct}}</strong> for your institution.',
+      backHomeLabelBtn: 'Back to home',
+      goToBtnLabel: 'Go to membership',
     },
     selectUserPartyStep: {
       title: 'Select your institution',
       subTitle:
-        'Select the institution for which you are requesting registration <1 />to the <3>Premium offer</3>',
-      searchLabel: 'Search for the institution',
+        'Select the institution for which you are requesting the subscription <1 />to the offer <3>{{productName}}</3>',
+      searchLabel: 'Search institution',
       notFoundResults: 'No result',
       IPAsubTitle:
-        'Select the institution <1/> for which you want to request registration to {{baseProduct}} Premium from the Public Administration Index (IPA)',
-      helperLink: 'Did you not find your institution? <1>Discover why</1>',
+        'Select from the Public Administration Index (IPA) the institution <1/> for which you want to request membership to {{baseProduct}} Premium',
+      helperLink: 'Can\'t find your institution? <1>Find out why</1>',
       confirmButton: 'Continue',
+    },
+    noPartyStep: {
+      title: 'None of your institutions can <1/> join',
+      subTitle:
+        'If you don\'t see any institutions available in the list, the institution searched for might <1/> have already joined <3>{{productName}}</3>',
+      notPartyAvailable: 'No institution available',
+      helperLink: 'Has your institution joined but is not available? <1>Find out why</1>',
+      backButton: 'Back',
     },
     genericError: {
       title: 'Something went wrong',
       subTitle:
-        'A causa di un errore del sistema non è possibile completare<0 /> la procedura. Ti chiediamo di riprovare più tardi.',
-      homeButton: 'Go back to the home page',
+        'Due to a system error it is not possible to complete<0 /> the procedure. Please try again later.',
+      homeButton: 'Back to home',
     },
     successfulAdhesion: {
-      title: 'The registration request was <1/>sent successfully',
+      title: 'The membership request has been <1/>successfully sent',
       message:
-        'You will receive a PEC at the institutional address of the institution.<1 />It will contain the instructions for completing <3 /> enrollment in the <strong>Premium</strong> offer.',
+        'You will receive a PEC at the institution\'s institutional address.<1 />Inside you will find the instructions to complete the <3 /> subscription to the offer <strong>{{title}}</strong>.',
       closeButton: 'Close',
     },
     billingData: {
-      subTitle: `Conferma, modifica o inserisci i dati richiesti, assicurandoti che siano corretti.<1 /> Verranno usati anche per richiedere l’adesione ad altri prodotti e in caso di fatturazione.`,
+      subTitle: `Confirm, modify or enter the required data, making sure they are correct.<1 /> They will also be used to request membership to other products and in case of invoicing.`,
     },
     exitModal: {
       title: 'Do you really want to exit?',
-      message: 'If you exit, your request for registration will be lost.',
+      message: 'If you exit, the membership request will be lost.',
       backButton: 'Exit',
       cancelButton: 'Cancel',
     },
@@ -559,39 +618,42 @@ export default {
   invalidPricingPlan: {
     title: 'Something went wrong',
     description:
-      'Non riusciamo a trovare la pagina che stai cercando. <1 />Assicurati che l’indirizzo sia corretto o torna alla home.',
-    backButton: 'Go back to the home page',
+      'We cannot find the page you are looking for. <1 />Make sure the address is correct or go back to home.',
+    backButton: 'Back to home',
   },
   stepInstitutionType: {
-    title: 'Select the type of institution that you <1/> represent',
-    subtitle: 'Indicate the type of institution that will register for <1>{{productName}}</1>',
+    title: 'Select the type of institution you <1/> represent',
+    subtitle: 'Indicate the type of institution that will join <1>{{productName}}</1>',
     institutionTypes: {
       pa: {
         title: 'Public Administration',
-        description: 'art. 2, para. 2, letter A of CAD (Digital Administration Code)',
+        description: 'art. 2, paragraph 2, letter A of the CAD',
       },
       gsp: {
-        title: 'Public Service Provider',
-        description: 'art. 2, para. 2, letter B of CAD (Digital Administration Code)',
+        title: 'Public service manager',
+        description: 'art. 2, paragraph 2, letter B of the CAD',
+      },
+      scec: {
+        title: 'Consolidated economic account company',
       },
       gpu: {
-        title: 'Manager of public utility and/or general interest',
-        description: 'Creditor institutions adhering on a voluntary basis',
+        title: 'Public utility and/or general interest manager',
+        description: 'Creditor institutions joining voluntarily',
       },
       scp: {
-        title: 'State-owned companies',
-        description: 'art. 2, para. 2, letter C of CAD (Digital Administration Code)',
+        title: 'Publicly controlled company',
+        description: 'art. 2, paragraph 2, letter C of the CAD',
       },
       pt: {
-        title: 'Technological partner',
+        title: 'Technology partner',
         description:
-          'Ai sensi di IO - Paragrafo 6.1.3 delle “Linee Guida sul punto di accesso telematico ai servizi della Pubblica Amministrazione” emanate da AgID ai sensi dell’art- 64-bis del CAD',
+          'Pursuant to IO - Paragraph 6.1.3 of the "Guidelines on the telematic access point to Public Administration services" issued by AgID pursuant to art. 64-bis of the CAD',
       },
       psp: {
         title: 'Payment Service Providers',
       },
       sa: {
-        title: 'Private e-procurement platform operator',
+        title: 'Private e-procurement platform manager',
       },
       as: {
         title: 'Insurance company',
@@ -601,90 +663,94 @@ export default {
       },
       oth: {
         title: 'Other',
-        description: 'Creditors who registered optionally',
+        description: 'Creditor institutions joining voluntarily',
       },
     },
-    backLabel: 'Go back',
+    backLabel: 'Back',
     confirmLabel: 'Continue',
   },
   onboardingFormData: {
     title: 'Enter the institution data',
     pspAndProdPagoPATitle: 'Enter the data',
-    backLabel: 'Go back',
+    backLabel: 'Back',
     confirmLabel: 'Continue',
     closeBtnLabel: 'Close',
     billingDataPt: {
       title: 'Enter the data',
       subTitle:
-        'Inserisci le informazioni richieste e assicurati che siano corrette.<1 /> Serviranno a registrarti come Partner tecnologico per il<3 /> prodotto <5>{{nameProduct}}</5>.',
+        'Enter the required information and make sure it is correct.<1 /> It will be used to register you as a Technology Partner for the<3 /> product <5>{{nameProduct}}</5>.',
     },
+    pspDashboardWarning:
+      'To update the present data, contact the <1>Support</1> service',
     billingDataSection: {
-      invalidFiscalCode: 'The fiscal code is not valid',
-      invalidTaxCodeInvoicing: 'The fiscal code is not related to your institution',
-      invalidZipCode: 'The zip code is not valid',
-      invalidVatNumber: 'The VAT no. is not valid',
+      invalidFiscalCode: 'The Tax Code is not valid',
+      invalidTaxCodeInvoicing: 'The entered Tax Code is not related to your institution',
+      invalidZipCode: 'The ZIP code is not valid',
+      invalidVatNumber: 'The VAT number is not valid',
       invalidEmail: 'The email address is not valid',
-      invalidReaField: 'The REA (Economic and Administrative Index) field is not valid',
+      invalidReaField: 'The REA field is not valid',
       invalidMailSupport: 'The email address is not valid',
       invalidShareCapitalField: 'The share capital field is not valid',
+      recipientCodeMustBe6Chars: 'The code must be at least 6 characters',
       invalidRecipientCodeNoAssociation: 'The entered code is not associated with your institution',
       invalidRecipientCodeNoBilling:
-        'Il codice inserito è associato al codice fiscale di un ente che non ha il servizio di fatturazione attivo',
-      vatNumberAlreadyRegistered: 'The VAT no. you entered was already registered.',
-      vatNumberVerificationErrorTitle: 'The check was not successful',
+        'The entered code is associated with the tax code of an institution that does not have the invoicing service active',
+      vatNumberAlreadyRegistered: 'The VAT number you entered has already been registered.',
+      vatNumberVerificationErrorTitle: 'Verification failed',
       vatNumberVerificationErrorDescription:
-        'Non è stato possibile verificare la P.IVA al momento. Riprova più tardi.',
+        'It was not possible to verify the VAT number at this time. Please try again later.',
       centralPartyLabel: 'Central institution',
       businessName: 'Company name',
       aooName: 'AOO name',
       uoName: 'UO name',
-      aooUniqueCode: 'Univocal AOO code',
-      uoUniqueCode: 'Univocal UO code',
-      fullLegalAddress: 'Street address of the registered office',
+      aooUniqueCode: 'Univocal AOO Code',
+      uoUniqueCode: 'Univocal UO Code',
+      fullLegalAddress: 'Registered office address and civic number',
       zipCode: 'ZIP CODE',
       city: 'City',
       noResult: 'No result',
       county: 'Province',
       country: 'Country',
       digitalAddress: 'PEC address',
-      taxCodeEquals2PIVAdescription: 'The VAT no. is the same as the fiscal code',
-      partyWithoutVatNumber: 'My institution does not have a VAT no.',
-      partyWIthoutVatNumberSubtitle: `Indica solo il Codice Fiscale se il tuo ente non agisce nell'esercizio d'impresa,
-      arte o professione <1 />(cfr. art. 21, comma 2, lett. f, DPR n. 633/1972)`,
-      vatNumberGroup: 'The VAT no. is for the group',
-      taxCode: 'Tax code',
-      taxCodeCentralParty: 'Central institution fiscal code',
-      vatNumber: 'VAT no.',
-      taxCodeInvoicing: 'SFE fiscal code',
+      taxCodeEquals2PIVAdescription: 'The VAT number matches the Tax Code',
+      partyWithoutVatNumber: 'My institution does not have a VAT number',
+      partyWIthoutVatNumberSubtitle: `Indicate only the Tax Code if your institution does not operate in the exercise of business,
+      art or profession <1 />(cf. art. 21, paragraph 2, lett. f, Presidential Decree no. 633/1972)`,
+      vatNumberGroup: 'The VAT number is for the group',
+      taxCode: 'Tax Code',
+      taxCodeCentralParty: 'Central institution Tax Code',
+      vatNumber: 'VAT number',
+      taxCodeInvoicing: 'SFE Tax Code',
       originId: 'IVASS code',
       sdiCode: 'SDI code',
       sdiCodePaAooUo: 'Univocal or SDI code',
       sdiCodePaAooUoDescription:
-        'È il codice univoco necessario per ricevere le fatture elettroniche. Può essere del tuo ente o della sua Unità Organizzativa di riferimento.',
-      recipientCodeDescription: 'The code required for receiving electronic invoices',
-      gspDescription: 'I am the operator of at least one public service: Gas, Energy, Telco.',
+        'It is the univocal code necessary to receive electronic invoices. It can be from your institution or its reference Organizational Unit.',
+      recipientCodeDescription: 'It is the code necessary to receive electronic invoices',
+      gspDescription: 'I am the operator of at least one of the public services: Gas, Energy, Telco.',
       pspDataSection: {
-        commercialRegisterNumber: 'Business Register Registration no.',
-        invalidCommercialRegisterNumber: 'The Business Register Registration no. is not valid',
-        registrationInRegister: 'Registration with the register',
+        commercialRegisterNumber: 'Business Register registration number',
+        invalidCommercialRegisterNumber: 'The Business Register registration number is not valid',
+        registrationInRegister: 'Register registration',
         registerNumber: 'Register number',
-        invalidregisterNumber: 'The register number is not valid',
+        invalidregisterNumber: 'The Register number is not valid',
         abiCode: 'ABI code',
         invalidabiCode: 'The ABI code is not valid',
       },
       informationCompanies: {
-        commercialRegisterNumber: 'Location of registration with the business register (optional)',
+        commercialRegisterNumber: 'Business Register registration location (optional)',
         requiredRea: 'REA',
         rea: 'REA (optional)',
         shareCapital: 'Share capital (optional)',
-        requiredCommercialRegisterNumber: 'Location of registration with the business register',
+        requiredCommercialRegisterNumber: 'Business Register registration location (required)',
         requiredShareCapital: 'Share capital',
+        shareCapitalHelper: 'To be filled in only for corporations',
       },
       assistanceContact: {
         supportEmail: 'Email address visible to citizens',
         supportEmailOptional: 'Email address visible to citizens (optional)',
         supportEmailDescriprion:
-          'È il contatto che i cittadini visualizzano per richiedere assistenza all’ente',
+          'It is the contact that citizens see to request assistance from the institution',
       },
     },
     taxonomySection: {
@@ -692,68 +758,79 @@ export default {
       nationalLabel: 'National',
       localLabel: 'Local',
       infoLabel:
-        'Seleziona il territorio in cui opera il tuo ente. Se locale, puoi scegliere una o più aree di competenza. Se l’ente ha già aderito ad altri prodotti PagoPA, troverai l’area già impostata.',
+        'Select the territory in which your institution operates. If local, you can choose one or more areas of competence. If the institution has already joined other PagoPA products, you will find the area already set.',
       localSection: {
         addButtonLabel: 'Add area',
-        inputLabel: 'City, Province or Region',
+        inputLabel: 'Municipality, Province or Region',
       },
       error: {
-        notMatchedArea: 'Select a city from the list',
+        notMatchedArea: 'Choose a location from the list',
       },
       modal: {
         addModal: {
           title: 'You are adding other areas for your institution',
-          description: `Le aree geografiche verrano aggiunte a tutti i prodotti PagoPA a cui l’ente ha già aderito. Vuoi continuare?`,
+          description: `The geographical areas will be added to all PagoPA products to which the institution has already joined. Do you want to continue?`,
           confirmButton: 'Continue',
-          backButton: 'Go back',
+          backButton: 'Back',
         },
         modifyModal: {
-          title: 'You are changing the geographical area for your institution',
+          title: 'You are changing the geographical area of your institution',
           description:
-            'La modifica verrà applicata a tutti i prodotti PagoPA a cui l’ente ha già aderito. Vuoi continuare?',
+            'The change will be applied to all PagoPA products to which the institution has already joined. Do you want to continue?',
           confirmButton: 'Continue',
-          backButton: 'Go back',
+          backButton: 'Back',
         },
       },
     },
     dpoDataSection: {
-      dpoTitle: 'CONTACT THE DATA PROTECTION OFFICER',
+      dpoTitle: 'DATA PROTECTION OFFICER CONTACTS',
       dpoAddress: 'Address',
       dpoPecAddress: 'PEC address',
       dpoEmailAddress: 'Email address',
+    },
+    ibanSection: {
+      title: 'ENTER IBAN TO RECEIVE REFUNDS',
+      subTitle: 'To ensure the bank transfer is successful, make sure <1> the IBAN matches what is shown on your account details. </1>',
+      holder: 'Account holder',
+      iban: 'IBAN',
+      confirmIban: 'Confirm IBAN',
+      error: {
+        invalidIban: 'Enter a valid IBAN',
+        ibanNotMatch: 'The IBAN does not match',
+      },
     },
   },
   rejectRegistration: {
     outcomeContent: {
       success: {
-        title: 'Registration request deleted',
+        title: 'Membership request deleted',
         description:
-          'Nella home dell’Area Riservata puoi vedere i prodotti<1 />disponibili e richiedere l’adesione per il tuo ente.',
-        backActionLabel: 'Go back to the home page',
+          'On the Reserved Area home you can see the available<1 />products and request membership for your institution.',
+        backActionLabel: 'Back to home',
       },
       error: {
         title: 'Something went wrong.',
         description:
-          'A causa di un errore del sistema non è possibile completare la procedura. <1 /> Ti chiediamo di riprovare più tardi.',
-        backActionLabel: 'Go back to the home page',
+          'Due to a system error, the procedure cannot be completed. <1 /> Please try again later.',
+        backActionLabel: 'Back to home',
       },
       verify: {
         loadingText: 'We are verifying your data',
       },
       delete: {
-        loadingText: 'We are canceling your registration',
+        loadingText: 'We are deleting your registration',
       },
       jwtNotValid: {
-        title: 'The registration request is no longer <1 /> valid',
-        subtitle: 'This request was accepted, deleted or has expired.',
-        backActionLabel: 'Go back to the home page',
+        title: 'Membership request no longer <1 /> valid',
+        subtitle: 'This request has been accepted, cancelled or has expired.',
+        backActionLabel: 'Back to home',
       },
     },
     confirmCancellatione: {
-      title: 'Do you want to delete the registration request <1 />?',
-      subtitle: 'If you delete it, all the entered data will be lost. ',
-      confirmActionLabel: 'Delete the request',
-      backActionLabel: 'Go back to the home page',
+      title: 'Do you want to delete the <1 /> membership request?',
+      subtitle: 'If you delete it, all entered data will be lost. ',
+      confirmActionLabel: 'Delete request',
+      backActionLabel: 'Back to home',
     },
   },
   app: {

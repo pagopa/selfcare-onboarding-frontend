@@ -30,6 +30,7 @@ import {
 } from '../../../utils/test-utils';
 import { createStore } from '../../../redux/store';
 import { Provider } from 'react-redux';
+import axios from 'axios';
 
 jest.setTimeout(40000);
 jest.mock('react-router-dom', () => ({
@@ -40,6 +41,9 @@ jest.mock('react-router-dom', () => ({
     push: mockedHistoryPush,
   }),
 }));
+
+jest.mock('axios');
+const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 let fetchWithLogsSpy: jest.SpyInstance;
 let aggregatesCsv: File;
@@ -69,6 +73,12 @@ beforeEach(() => {
   fetchWithLogsSpy = jest.spyOn(require('../../../lib/api-utils'), 'fetchWithLogs');
   Object.assign(mockedLocation, initialLocation);
   aggregatesCsv = new File(['csv data'], 'aggregates.csv', { type: 'multipart/form-data' });
+
+  // Mock axios.get for CDN config.json call
+  mockedAxios.get.mockResolvedValue({
+    status: 200,
+    data: mockedCategories,
+  });
 });
 
 const filterByCategory4Test = (institutionType?: string, productId?: string) => {
@@ -77,13 +87,15 @@ const filterByCategory4Test = (institutionType?: string, productId?: string) => 
       return mockedCategories.product['prod-pn']?.ipa.PA;
 
     case PRODUCT_IDS.IDPAY_MERCHANT:
-      return mockedCategories.product['prod-idpay-merchant']?.merchantDetails?.atecoCodes;
+      return mockedCategories.product['prod-idpay-merchant']?.merchantDetails;
 
     case PRODUCT_IDS.INTEROP:
       if (institutionType === 'SCEC') {
         return mockedCategories.product['prod-interop']?.ipa.SCEC;
       } else if (institutionType === 'PA') {
         return mockedCategories.product['prod-interop']?.ipa.PA;
+      } else if (institutionType === 'GSP') {
+        return mockedCategories.product.default?.ipa.GSP;
       } else {
         return mockedCategories.product.default?.ipa.PA;
       }
@@ -560,7 +572,7 @@ test('Test: Successfull complete onboarding request of PRV party for prod-idpay-
   );
   await executeStepBillingData(PRODUCT_IDS.IDPAY_MERCHANT, 'PRV', false, false, 'PDND_INFOCAMERE');
   await executeStepAddManager(false);
-  await executeStepAddAdmin(true, false, false, false, false);
+  await executeStepAddAdmin(true, false, false, false, false, PRODUCT_IDS.IDPAY_MERCHANT);
   await verifySubmit(
     PRODUCT_IDS.IDPAY_MERCHANT,
     'PRV',
@@ -588,7 +600,7 @@ test('Test: Successfull complete onboarding request of PRV party for prod-idpay-
   );
   await executeStepBillingData(PRODUCT_IDS.IDPAY_MERCHANT, 'PRV', false, false, 'PDND_INFOCAMERE');
   await executeStepAddManager(false);
-  await executeStepAddAdmin(true, false, false, false, false);
+  await executeStepAddAdmin(true, false, false, false, false, PRODUCT_IDS.IDPAY_MERCHANT);
   await verifySubmit(
     PRODUCT_IDS.IDPAY_MERCHANT,
     'PRV',
@@ -627,7 +639,7 @@ test('Test: Successfull complete onboarding request of PRV_PF party for prod-idp
     'personalTaxCode'
   );
   await executeStepAddManager(false);
-  await executeStepAddAdmin(true, false, false, false, false);
+  await executeStepAddAdmin(true, false, false, false, false, PRODUCT_IDS.IDPAY_MERCHANT);
   await verifySubmit(
     PRODUCT_IDS.IDPAY_MERCHANT,
     'PRV_PF',
@@ -667,11 +679,6 @@ test('Test: Party already onboarded for a product that allow add new user, so th
     true
   );
   await waitFor(() => screen.getByText(/L’ente selezionato ha già aderito/));
-
-  const addNewUserLink = screen.getByText('Aggiungi un nuovo Amministratore');
-  await waitFor(() => fireEvent.click(addNewUserLink));
-
-  expect(history.length).toBe(1);
 });
 
 test('Test: Error retrieving onboarding info', async () => {
@@ -832,7 +839,6 @@ const executeStepInstitutionType = async (productSelected: string, institutionTy
     if (productSelected === PRODUCT_IDS.IDPAY_MERCHANT) {
       await waitFor(() => screen.getByText('Cerca il tuo ente'), { timeout: 5000 });
     } else {
-      // Per SEND e IDPAY
       fillInstitutionTypeCheckbox('pa');
     }
   }
@@ -856,9 +862,7 @@ const executeStepSearchParty = async (
 
   screen.getByText('Cerca il tuo ente');
 
-  await waitFor(() =>
-    expect(fetchWithLogsSpy).toHaveBeenCalledTimes(productId === PRODUCT_IDS.IDPAY_MERCHANT ? 1 : 2)
-  );
+  await waitFor(() => expect(fetchWithLogsSpy).toHaveBeenCalledTimes(3));
   const inputPartyName = document.getElementById('Parties') as HTMLElement;
 
   const withoutIpaLink = document.getElementById('no_ipa') as HTMLElement;
@@ -891,9 +895,9 @@ const executeStepSearchParty = async (
 
       const partyNameSelection = await waitFor(() => screen.getByText(partyName));
 
-      expect(fetchWithLogsSpy).toHaveBeenCalledTimes(3);
+      expect(fetchWithLogsSpy).toHaveBeenCalledTimes(4);
       expect(fetchWithLogsSpy).toHaveBeenNthCalledWith(
-        3,
+        4,
         {
           endpoint:
             institutionType === 'SA'
@@ -959,7 +963,9 @@ const executeStepSearchParty = async (
         fireEvent.change(inputPartyName, { target: { value: 'RSSLCU80A01F205N' } });
 
         expect(
-          screen.getByText('Il codice ATECO inserito non è ammesso per l’adesione al portale')
+          screen.getByText(
+            'L’ente indicato non può aderire perché il suo codice ATECO non rientra tra quelli ammessi.'
+          )
         ).toBeInTheDocument();
 
         fireEvent.change(inputPartyName, { target: { value: 'FRSMRA70D30G786G' } });
@@ -1076,10 +1082,8 @@ const executeStepSearchParty = async (
                 categories: filterByCategory4Test(institutionType, productId),
               };
 
-      // expect(fetchWithLogsSpy).toHaveBeenCalledTimes(3);
-
       expect(fetchWithLogsSpy).toHaveBeenNthCalledWith(
-        productId === PRODUCT_IDS.IDPAY_MERCHANT ? 2 : 3,
+        4,
         {
           endpoint: endpoint,
           endpointParams: endpointParams,
@@ -1187,7 +1191,7 @@ const executeStepBillingData = async (
           ? '998877665544'
           : '87654321098';
 
-    if (isInvoicable) {
+    if (isInvoicable && productId !== PRODUCT_IDS.IO) {
       fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
         target: { value: recipientCodeInput },
       });

@@ -1,6 +1,10 @@
+/* eslint-disable functional/no-let */
+import path from 'path';
 import { Page, expect } from '@playwright/test';
 import { InstitutionType } from '../../types';
 import { isLocalMode } from './global.setup';
+import { getOnboardingIdByTaxCode } from './api-utils';
+import { trackOnboardingId } from './onboarding-tracker';
 
 // eslint-disable-next-line functional/no-let
 // let copiedText: string;
@@ -10,25 +14,75 @@ export const BASE_URL_ONBOARDING = isLocalMode
   ? 'http://localhost:3000/onboarding'
   : 'http://dev.selfcare.pagopa.it/onboarding';
 
+export const BASE_URL_ONBOARDING_TO_APPROVE = isLocalMode
+  ? 'http://localhost:3000/dashboard/admin/onboarding'
+  : 'http://dev.selfcare.pagopa.it/dashboard/admin/onboarding';
+
 export const FILE_MOCK_CSV_AGGREGATOR = {
-  IO: '../src/lib/__mocks__/mockedFileAggregator.csv',
-  SEND: '../src/lib/__mocks__/mockedFileAggregatorSend.csv',
+  IO: path.join(__dirname, '..', '..', 'src', 'lib', '__mocks__', 'mockedFileAggregator.csv'),
+  SEND: path.join(__dirname, '..', '..', 'src', 'lib', '__mocks__', 'mockedFileAggregatorSend.csv'),
+};
+
+export const FILE_MOCK_PDF_CONTRACT = {
+  PA: path.join(__dirname, 'mocks', 'mockedContract.pdf'),
+};
+
+export const PRODUCT_IDS_TEST_E2E = {
+  PAGOPA: 'prod-pagopa',
+  IO: 'prod-io',
+  SEND: 'prod-pn',
+  SEND_DEV: 'prod-pn-dev',
+  INTEROP: 'prod-interop',
+  IDPAY: 'prod-idpay',
+  IO_SIGN: 'prod-io-sign',
+  FD: 'prod-fd',
+  FD_GARANTITO: 'prod-fd-garantito',
+  DASHBOARD_PSP: 'prod-dashboard-psp',
+  IO_PREMIUM: 'prod-io-premium',
+  CIBAN: 'prod-ciban',
+  CGN: 'prod-cgn',
+  IDPAY_MERCHANT: 'prod-idpay-merchant',
+};
+
+export const TAX_CODES_BY_INSTITUTION_TYPE = {
+  PRV: '19734628500',
+  GPU: '10203040506',
+  PSP: '11223344556',
+  PT: '99887766554',
 };
 
 export const stepInstitutionType = async (page: Page, institutionType: string) => {
-  setTimeout(async () => {
-    await page.getByRole('radio', { name: institutionType }).click();
-  }, 1000);
+  await page.waitForTimeout(1000);
+  await page.getByRole('radio', { name: institutionType }).click();
   await page.getByRole('button', { name: 'Continua' }).waitFor({ timeout: 1000 });
   await page.getByRole('button', { name: 'Continua' }).click();
 };
 
-export const stepSelectParty = async (page: Page, aggregator?: boolean, party?: string) => {
+export const stepSelectParty = async (
+  page: Page,
+  aggregator?: boolean,
+  party?: string,
+  productId?: string
+) => {
   await page.click('#Parties');
-  await page.fill('#Parties', party ? party : 'Istituto di Formazione Professionale Sandro Pertini Servizi alla Persona e del Legno');
-  setTimeout(async () => {
-    await page.click('.MuiBox-root:nth-child(1) > .MuiBox-root > .MuiBox-root');
-  }, 1000);
+  await page.fill(
+    '#Parties',
+    party
+      ? party
+      : 'Istituto di Formazione Professionale Sandro Pertini Servizi alla Persona e del Legno'
+  );
+
+  await page.waitForTimeout(1000);
+  await page.waitForSelector(
+    `.MuiBox-root:nth-child(${productId === PRODUCT_IDS_TEST_E2E.SEND || (productId === PRODUCT_IDS_TEST_E2E.IO && aggregator) ? 2 : 1}) > .MuiBox-root > .MuiBox-root`,
+    {
+      state: 'visible',
+      timeout: 5000,
+    }
+  );
+  await page.click(
+    `.MuiBox-root:nth-child(${productId === PRODUCT_IDS_TEST_E2E.SEND || (productId === PRODUCT_IDS_TEST_E2E.IO && aggregator) ? 2 : 1}) > .MuiBox-root > .MuiBox-root`
+  );
   if (aggregator) {
     await page.click('[name="aggregator-party"]');
     await page.click('[aria-label="Continua"]');
@@ -36,13 +90,18 @@ export const stepSelectParty = async (page: Page, aggregator?: boolean, party?: 
   } else {
     await page.click('[aria-label="Continua"]');
   }
+
+  await page.waitForLoadState('networkidle', { timeout: 10000 });
 };
 
 export const stepSelectPartyByCF = async (
   page: Page,
   cfParty: string,
-  isPrivateMerchant?: boolean
+  isPrivateMerchant?: boolean,
+  isAggregator?: boolean
 ) => {
+  await page.getByTestId('party-type-select').click();
+  await page.click('[data-testid="taxCode"]');
   await page.click('#Parties');
   await page.fill('#Parties', cfParty, { timeout: 5000 });
 
@@ -51,55 +110,32 @@ export const stepSelectPartyByCF = async (
     await page.waitForSelector(businessTaxIdSelector, { state: 'visible', timeout: 10000 });
     await page.click(`${businessTaxIdSelector} [role="button"]`);
   } else {
+    // Wait for autocomplete results to appear
+    await page.waitForTimeout(1000);
+    await page.waitForSelector('.MuiBox-root:nth-child(1) > .MuiBox-root > .MuiBox-root', {
+      state: 'visible',
+      timeout: 5000,
+    });
     await page.click('.MuiBox-root:nth-child(1) > .MuiBox-root > .MuiBox-root');
   }
 
-  await page.click('[aria-label="Continua"]');
+  if (isAggregator) {
+    await page.click('[name="aggregator-party"]');
+    await page.click('[aria-label="Continua"]');
+    await page.getByRole('button', { name: 'Continua' }).click();
+  } else {
+    await page.click('[aria-label="Continua"]');
+  }
+  await page.waitForLoadState('networkidle', { timeout: 10000 });
 };
-
-/* export const stepFormDataWithIpaResearch4SDICode = async (
-  page: Page,
-  context: any,
-  product: string
-) => {
-  await page.getByLabel('La Partita IVA coincide con il Codice Fiscale').click();
-  if (product !== PRODUCT_IDS_TEST_E2E.INTEROP) {
-    page.on('dialog', async (dialog) => {
-      console.log(`Dialogo rilevato: ${dialog.message()}`);
-      await dialog.accept();
-    });
-
-    // Opening a new page for IPA sources
-    const newPagePromise = context.waitForEvent('page');
-    await page.evaluate(() => {
-      window.open(
-        'https://indicepa.gov.it/ipa-portale/consultazione/indirizzo-sede/ricerca-ente',
-        '_blank'
-      );
-    });
-    const newPage = await newPagePromise;
-    await newPage.waitForLoadState();
-
-    await researchOnIpa(newPage, partyName);
-    await page.waitForTimeout(500);
-    await page.click('#recipientCode');
-    await page.fill('#recipientCode', copiedText, { timeout: 500 });
-  }
-  if (product === PRODUCT_IDS_TEST_E2E.IO_SIGN) {
-    await page.click('#supportEmail');
-    await page.fill('#supportEmail', 'test@test.it', { timeout: 500 });
-  }
-  await page.getByRole('radio', { name: 'Nazionale' }).waitFor({ timeout: 500 });
-  await page.getByRole('radio', { name: 'Nazionale' }).click();
-  await page.getByRole('button', { name: 'Continua' }).waitFor({ timeout: 500 });
-  await page.getByRole('button', { name: 'Continua' }).click();
-}; */
 
 // eslint-disable-next-line complexity
 export const stepFormData = async (
   page: Page,
   productOrInstitutionType: string,
-  institutionType?: string
+  institutionType?: string,
+  isAggregator?: boolean,
+  taxCode?: string
   // eslint-disable-next-line sonarjs/cognitive-complexity
 ) => {
   const isFromIpa = institutionType !== undefined;
@@ -117,15 +153,16 @@ export const stepFormData = async (
     await page.fill('#digitalAddress', 'test@test.it');
 
     await page.click('#taxCode');
-    await page.fill('#taxCode', '10293847565');
+    await page.fill(
+      '#taxCode',
+      taxCode ||
+        (!isFromIpa ? '11779933554' : institutionType === 'PRV' ? '19734628500' : '10203040506')
+    );
 
     await page.click('#taxCodeEquals2VatNumber');
   }
 
-  if (
-    (product === PRODUCT_IDS_TEST_E2E.PAGOPA && actualInstitutionType === 'GSP') ||
-    (product === PRODUCT_IDS_TEST_E2E.INTEROP && actualInstitutionType === 'PRV')
-  ) {
+  if (product === PRODUCT_IDS_TEST_E2E.INTEROP && actualInstitutionType === 'PRV') {
     await page.click('#taxCodeEquals2VatNumber');
   }
 
@@ -147,12 +184,7 @@ export const stepFormData = async (
     await page.click('#city-select-option-0');
   }
 
-  if (
-    isFromIpa &&
-    product !== PRODUCT_IDS_TEST_E2E.PAGOPA &&
-    institutionType !== 'PRV' &&
-    institutionType !== 'GPU'
-  ) {
+  if (isFromIpa && institutionType !== 'PRV' && institutionType !== 'GPU') {
     await page.getByLabel('La Partita IVA coincide con il Codice Fiscale').click();
   }
 
@@ -160,13 +192,24 @@ export const stepFormData = async (
     isFromIpa &&
     product !== PRODUCT_IDS_TEST_E2E.INTEROP &&
     product !== PRODUCT_IDS_TEST_E2E.IDPAY_MERCHANT &&
-    actualInstitutionType !== 'SCP'
+    actualInstitutionType !== 'SCP' &&
+    product !== PRODUCT_IDS_TEST_E2E.IO
   ) {
     await page.click('#recipientCode');
-    await page.fill('#recipientCode', product === PRODUCT_IDS_TEST_E2E.SEND ? 'UFBM8M' : 'UFOR71', {
-      timeout: 500,
-    });
-  } else if (!isFromIpa && actualInstitutionType !== 'PT') {
+    await page.fill(
+      '#recipientCode',
+      product === PRODUCT_IDS_TEST_E2E.SEND
+        ? isAggregator
+          ? 'UFL4DM'
+          : 'UFBM8M'
+        : product === PRODUCT_IDS_TEST_E2E.IO_SIGN
+          ? 'UF0IGB'
+          : 'UFOR71',
+      {
+        timeout: 2000,
+      }
+    );
+  } else if (!isFromIpa && actualInstitutionType !== 'PT' && product !== PRODUCT_IDS_TEST_E2E.IO) {
     await page.click('#recipientCode');
     await page.fill('#recipientCode', 'A1B2C3');
 
@@ -247,12 +290,12 @@ export const stepFormData = async (
 
   if (shouldShowNazionale) {
     if (isFromIpa) {
-      await page.getByRole('radio', { name: 'Nazionale' }).waitFor({ timeout: 500 });
+      await page.getByRole('radio', { name: 'Nazionale' }).waitFor({ timeout: 5000 });
     }
     await page.getByRole('radio', { name: 'Nazionale' }).click();
   }
 
-  await page.getByRole('button', { name: 'Continua' }).waitFor({ timeout: 500 });
+  await page.getByRole('button', { name: 'Continua' }).waitFor({ timeout: 5000 });
   await page.getByRole('button', { name: 'Continua' }).click();
 
   if (await page.getByText('Stai modificando l’area geografica del tuo ente').isVisible()) {
@@ -350,7 +393,11 @@ export const stepAddAdmin = async (
     await page.click('[aria-label="Continua"]');
   }
 
-  if (institutionType !== 'PT' && !aggregator) {
+  if (aggregator) {
+    return;
+  }
+
+  if (institutionType !== 'PT') {
     await page.getByRole('button', { name: 'Conferma' }).waitFor({
       state: 'visible',
       timeout: 2000,
@@ -358,17 +405,13 @@ export const stepAddAdmin = async (
 
     await page.getByRole('button', { name: 'Conferma' }).click();
   }
-  
-  if (aggregator) {
-    return;
-  }
 
   if (!aggregator && institutionType !== 'PT') {
     await expect(page.getByText('Richiesta di adesione inviata')).toBeInViewport({
       timeout: 15000,
     });
   }
-  
+
   if (institutionType === 'PT') {
     await expect(page.getByText('Richiesta di registrazione inviata')).toBeInViewport({
       timeout: 15000,
@@ -376,7 +419,160 @@ export const stepAddAdmin = async (
   }
 };
 
-/* Function that search and find the first row of the IPA table that contains uniqueCode and
+export const stepUploadAggregatorCsv = async (page: Page, title: string, fileCsv: string) => {
+  await expect(page.getByText(title)).toBeInViewport();
+
+  await page.waitForSelector('#file-uploader', {
+    state: 'attached',
+    timeout: 10000,
+  });
+
+  await page.waitForTimeout(500);
+
+  const fileInput = page.locator('#file-uploader');
+  await expect(fileInput).toBeAttached();
+
+  await page.setInputFiles('#file-uploader', fileCsv);
+
+  await page.waitForTimeout(1000);
+
+  const continueButton = page.locator('[aria-label="Continua"]');
+  await continueButton.waitFor({ state: 'visible' });
+
+  await expect(continueButton).toBeEnabled();
+
+  await continueButton.click();
+
+  await expect(page.getByText('Richiesta di adesione inviata')).toBeInViewport({
+    timeout: 10000,
+  });
+};
+
+export const redirectToApprove = async (page: Page, onboardingId: string) => {
+  await page.goto(`${BASE_URL_ONBOARDING_TO_APPROVE}/${onboardingId}`, {
+    timeout: 20000,
+  });
+
+  await expect(
+    page.getByText('Controlla le informazioni inserite dall’ente e approva o rifiuta la richiesta.')
+  ).toBeInViewport({
+    timeout: 10000,
+  });
+
+  await page.getByRole('button', { name: 'Approva' }).click();
+
+  await expect(page.getByText('Adesione approvata')).toBeInViewport({
+    timeout: 10000,
+  });
+};
+
+export const stepCompleteOnboarding = async (
+  page: Page,
+  taxCode: string,
+  filePdf: string,
+  productId: string,
+  institutionType?: InstitutionType,
+  notOnIpa?: boolean
+) => {
+  const requiresApproval =
+    productId === PRODUCT_IDS_TEST_E2E.PAGOPA &&
+    (institutionType === 'PRV' ||
+      institutionType === 'GPU' ||
+      institutionType === 'PSP' ||
+      institutionType === 'PT');
+
+  let onboardingId = await getOnboardingIdByTaxCode(
+    page,
+    taxCode,
+    productId,
+    requiresApproval || notOnIpa ? 'TOBEVALIDATED' : 'PENDING'
+  );
+
+  if (onboardingId.length > 0) {
+    if (requiresApproval || notOnIpa) {
+      await redirectToApprove(page, onboardingId);
+
+      if (institutionType !== 'PT') {
+        await page.waitForTimeout(2000);
+
+        onboardingId = await getOnboardingIdByTaxCode(page, taxCode, productId, 'PENDING');
+      }
+    }
+
+    if (institutionType !== 'PT') {
+      await page.goto(`${BASE_URL_ONBOARDING}/confirm?jwt=${onboardingId}`, {
+        timeout: 10000,
+      });
+
+      await page.click('[data-testid="DownloadIcon"]', { timeout: 2000 });
+
+      await page.waitForTimeout(2000);
+      await page.click('[data-testid="ArrowForwardIcon"]', { timeout: 2000 });
+
+      await page.waitForSelector('#file-uploader', {
+        state: 'attached',
+        timeout: 10000,
+      });
+
+      await page.waitForTimeout(500);
+
+      const fileInput = page.locator('#file-uploader');
+      await expect(fileInput).toBeAttached();
+
+      await page.setInputFiles('#file-uploader', filePdf);
+
+      await page.waitForTimeout(1000);
+
+      await page.getByRole('button', { name: 'Continua' }).click();
+
+      await expect(page.getByText('Adesione completata!')).toBeInViewport({
+        timeout: 10000,
+      });
+    }
+
+    await trackOnboardingId(onboardingId);
+  }
+};
+
+/* export const stepFormDataWithIpaResearch4SDICode = async (
+  page: Page,
+  context: any,
+  product: string
+) => {
+  await page.getByLabel('La Partita IVA coincide con il Codice Fiscale').click();
+  if (product !== PRODUCT_IDS_TEST_E2E.INTEROP) {
+    page.on('dialog', async (dialog) => {
+      console.log(`Dialogo rilevato: ${dialog.message()}`);
+      await dialog.accept();
+    });
+
+    // Opening a new page for IPA sources
+    const newPagePromise = context.waitForEvent('page');
+    await page.evaluate(() => {
+      window.open(
+        'https://indicepa.gov.it/ipa-portale/consultazione/indirizzo-sede/ricerca-ente',
+        '_blank'
+      );
+    });
+    const newPage = await newPagePromise;
+    await newPage.waitForLoadState();
+
+    await researchOnIpa(newPage, partyName);
+    await page.waitForTimeout(500);
+    await page.click('#recipientCode');
+    await page.fill('#recipientCode', copiedText, { timeout: 500 });
+  }
+  if (product === PRODUCT_IDS_TEST_E2E.IO_SIGN) {
+    await page.click('#supportEmail');
+    await page.fill('#supportEmail', 'test@test.it', { timeout: 500 });
+  }
+  await page.getByRole('radio', { name: 'Nazionale' }).waitFor({ timeout: 500 });
+  await page.getByRole('radio', { name: 'Nazionale' }).click();
+  await page.getByRole('button', { name: 'Continua' }).waitFor({ timeout: 500 });
+  await page.getByRole('button', { name: 'Continua' }).click();
+}; 
+
+Function that search and find the first row of the IPA table that contains uniqueCode and
 export const copyUniqueCodeIfSFEIsPresent = async (page: Page) => {
   const tbody = page.locator('tbody').first();
   const rows = await tbody.locator('tr').all();
@@ -404,42 +600,9 @@ export const copyUniqueCodeIfSFEIsPresent = async (page: Page) => {
   }
   console.log('Nessuna riga trovata con contenuto sia nella seconda che nella quarta cella.');
   return '';
-}; */
+}; 
 
-export const stepUploadAggregatorCsv = async (page: Page, title: string, fileCsv: string) => {
-  await expect(page.getByText(title)).toBeInViewport();
-
-  await page.waitForSelector('#file-uploader', {
-    state: 'attached',
-    timeout: 10000,
-  });
-
-  await page.waitForTimeout(500);
-
-  const fileInput = page.locator('#file-uploader');
-  await expect(fileInput).toBeAttached();
-
-  try {
-    await page.setInputFiles('#file-uploader', fileCsv);
-  } catch (error) {
-    console.error('Errore durante il caricamento del file:', error);
-  }
-
-  await page.waitForTimeout(1000);
-
-  const continueButton = page.locator('[aria-label="Continua"]');
-  await continueButton.waitFor({ state: 'visible' });
-
-  await expect(continueButton).toBeEnabled();
-
-  await continueButton.click();
-
-  await expect(page.getByText('Richiesta di adesione inviata')).toBeInViewport({
-    timeout: 10000,
-  });
-};
-
-/* Function that copy the recipient code from table of IPA
+Function that copy the recipient code from table of IPA
 export const researchOnIpa = async (newPage: Page, partyName: string) => {
   await newPage.setViewportSize({ width: 1920, height: 953 });
   newPage.on('popup', async (popup) => {
@@ -457,20 +620,3 @@ export const researchOnIpa = async (newPage: Page, partyName: string) => {
   await newPage.getByRole('img', { name: 'Elenco Unità Organizzative' }).click();
   await copyUniqueCodeIfSFEIsPresent(newPage);
 }; */
-
-export const PRODUCT_IDS_TEST_E2E = {
-  PAGOPA: 'prod-pagopa',
-  IO: 'prod-io',
-  SEND: 'prod-pn',
-  SEND_DEV: 'prod-pn-dev',
-  INTEROP: 'prod-interop',
-  IDPAY: 'prod-idpay',
-  IO_SIGN: 'prod-io-sign',
-  FD: 'prod-fd',
-  FD_GARANTITO: 'prod-fd-garantito',
-  DASHBOARD_PSP: 'prod-dashboard-psp',
-  IO_PREMIUM: 'prod-io-premium',
-  CIBAN: 'prod-ciban',
-  CGN: 'prod-cgn',
-  IDPAY_MERCHANT: 'prod-idpay-merchant',
-};
