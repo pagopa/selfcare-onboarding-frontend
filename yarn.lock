@@ -2219,10 +2219,10 @@
   resolved "https://registry.yarnpkg.com/@opentelemetry/semantic-conventions/-/semantic-conventions-1.37.0.tgz#aa2b4fa0b910b66a050c5ddfcac1d262e91a321a"
   integrity sha512-JD6DerIKdJGmRp4jQyX5FlrQjA4tjOw1cvfsPAZXfOOEErMUHjPcPSICS+6WnM0nB0efSFARh0KAZss+bvExOA==
 
-"@pagopa/mui-italia@^1.7.2":
-  version "1.7.2"
-  resolved "https://registry.yarnpkg.com/@pagopa/mui-italia/-/mui-italia-1.7.2.tgz#54b5872fd63cde9d4c8b17d25e90f0805651baca"
-  integrity sha512-6hBf/+xmoRhb4mZWDX5AYY/TSvis/jYFKdn4HbFKizNHIBFeKhNx9O3Qw72xkH5YyWWwNj+ULz2siTO7In1SYA==
+"@pagopa/mui-italia@^1.7.2", "@pagopa/mui-italia@^1.8.0":
+  version "1.8.0"
+  resolved "https://registry.yarnpkg.com/@pagopa/mui-italia/-/mui-italia-1.8.0.tgz#801067a2ecb4fda16a0a7e21bd1e748deb30f840"
+  integrity sha512-CFK5mAn81jvMENi2yvfny//TEe91qbizfnYmZCYNRrOI4EGXCDGpMtQodVoEtyjSWQGkljkp0X5YchMP2bSJLA==
   dependencies:
     "@fontsource/dm-mono" "^4.5.10"
     "@fontsource/titillium-web" "^4.5.9"
