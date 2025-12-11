@@ -16,6 +16,10 @@ jest.mock('react-router-dom', () => ({
   }),
 }));
 
+jest.mock('react-router', () => ({
+  useParams: () => ({}),
+}));
+
 jest.mock('@pagopa/selfcare-common-frontend/lib/services/assistanceService', () => ({
   buildAssistanceURI: jest.fn(),
 }));
