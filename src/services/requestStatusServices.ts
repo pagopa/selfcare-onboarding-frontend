@@ -49,7 +49,7 @@ export const deleteRequest =
 export const onboardingContractUpload = async (
   file: File,
   setLoading: Dispatch<SetStateAction<boolean>>,
-  token: string | undefined,
+  onboardingId: string | undefined,
   requestData: any,
   addUserFlow: boolean,
   setOutcomeContentState: Dispatch<SetStateAction<RequestOutcomeComplete | null>>,
@@ -65,7 +65,7 @@ export const onboardingContractUpload = async (
   // eslint-disable-next-line sonarjs/cognitive-complexity
 ) => {
   const requestId = uniqueId('upload-contract-');
-  trackEvent('ONBOARDING_CONTRACT_UPLOAD', { request_id: requestId, party_id: token });
+  trackEvent('ONBOARDING_CONTRACT_UPLOAD', { request_id: requestId, party_id: onboardingId });
 
   setLoading(true);
   const formData = new FormData();
@@ -74,7 +74,7 @@ export const onboardingContractUpload = async (
   const uploadDocument = await fetchWithLogs(
     {
       endpoint: addUserFlow ? 'USER_COMPLETE_REGISTRATION' : 'ONBOARDING_COMPLETE_REGISTRATION',
-      endpointParams: { token },
+      endpointParams: { onboardingId },
     },
     { method: 'POST', data: formData, headers: { 'Content-Type': 'multipart/form-data' } },
     redirectToLogin
@@ -87,7 +87,7 @@ export const onboardingContractUpload = async (
   if (outcome === 'success') {
     trackEvent(addUserFlow ? 'ONBOARDING_USER_COMPLETED' : 'ONBOARDING_SUCCESS', {
       request_id: requestId,
-      party_id: token,
+      party_id: onboardingId,
       product_id: requestData?.productId,
       form: addUserFlow ? 'onboarding/dashboard' : undefined,
     });
@@ -123,13 +123,13 @@ export const onboardingContractUpload = async (
       (uploadDocument as AxiosError<Problem>).response?.data
     ) {
       setOpen(true);
-      trackEvent('ONBOARDING_CONTRACT_FAILURE', { request_id: requestId, party_id: token });
+      trackEvent('ONBOARDING_CONTRACT_FAILURE', { request_id: requestId, party_id: onboardingId });
       setErrorCode(
         transcodeErrorCode((uploadDocument as AxiosError<Problem>).response?.data as Problem)
       );
     } else {
       setOpen(true);
-      trackEvent('ONBOARDING_FAILURE', { request_id: requestId, party_id: token });
+      trackEvent('ONBOARDING_FAILURE', { request_id: requestId, party_id: onboardingId });
       setErrorCode('GENERIC');
     }
   }

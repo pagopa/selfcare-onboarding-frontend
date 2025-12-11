@@ -3,6 +3,7 @@ import SessionModal from '@pagopa/selfcare-common-frontend/lib/components/Sessio
 import { productId2ProductTitle } from '@pagopa/selfcare-common-frontend/lib/utils/productId2ProductTitle';
 import { useContext, useEffect, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
+import { useParams } from 'react-router';
 import {
   FileErrorAttempt,
   OnboardingRequestData,
@@ -57,14 +58,14 @@ export default function CompleteRequestComponent() {
   const { t } = useTranslation();
   const { setSubHeaderVisible, setOnExit, setEnableLogin } = useContext(HeaderContext);
   const { setRequiredLogin } = useContext(UserContext);
-
-  const token = getRequestJwt();
+  const { onboardingId: onboardingIdFromPath } = useParams<{ onboardingId?: string }>();
+  const onboardingId = onboardingIdFromPath || getRequestJwt();
   const [activeStep, setActiveStep, setActiveStepHistory] = useHistoryState(
     'complete_registration_step',
     0
   );
   const [outcomeContentState, setOutcomeContentState] = useState<RequestOutcomeComplete | null>(
-    !token ? 'notFound' : null
+    !onboardingId ? 'notFound' : null
   );
   const [errorCode, setErrorCode] = useState<keyof typeof customErrors>('GENERIC');
   const [open, setOpen] = useState<boolean>(false);
@@ -75,9 +76,9 @@ export default function CompleteRequestComponent() {
     []
   );
   const [requestData, setRequestData] = useState<OnboardingRequestData>();
-
   const addUserFlow = new URLSearchParams(window.location.search).get('add-user') === 'true';
-  const translationKeyValue = addUserFlow ? 'user' : 'product';
+  const attachments = new URLSearchParams(window.location.search).get('attachments') === 'true';
+  const translationKeyValue = addUserFlow ? 'user' : attachments ? 'attachments' : 'product';
 
   useEffect(() => {
     setSubHeaderVisible(true);
@@ -92,7 +93,7 @@ export default function CompleteRequestComponent() {
   useEffect(() => {
     setLoading(true);
     verifyRequest({
-      onboardingId: token,
+      onboardingId,
       setRequiredLogin,
       setOutcomeContentState,
       setRequestData,
@@ -136,7 +137,7 @@ export default function CompleteRequestComponent() {
   const steps: Array<StepperStep> = [
     {
       label: t('completeRegistration.steps.step0.label'),
-      Component: () => ConfirmRegistrationStep0({ forward }),
+      Component: () => ConfirmRegistrationStep0({ onboardingId, translationKeyValue, forward }),
     },
     {
       label: t('completeRegistration.steps.step1.label'),
@@ -144,19 +145,20 @@ export default function CompleteRequestComponent() {
         ConfirmRegistrationStep1(
           addUserFlow,
           {
-            forward: () => onboardingContractUpload(
-              uploadedFiles[0],
-              setLoading,
-              token,
-              requestData,
-              addUserFlow,
-              setOutcomeContentState,
-              lastFileErrorAttempt,
-              setLastFileErrorAttempt,
-              setOpen,
-              setErrorCode,
-              transcodeErrorCode
-            ),
+            forward: () =>
+              onboardingContractUpload(
+                uploadedFiles[0],
+                setLoading,
+                onboardingId,
+                requestData,
+                addUserFlow,
+                setOutcomeContentState,
+                lastFileErrorAttempt,
+                setLastFileErrorAttempt,
+                setOpen,
+                setErrorCode,
+                transcodeErrorCode
+              ),
           },
           { loading },
           { uploadedFiles, setUploadedFiles: setUploadedFilesAndWriteHistory }

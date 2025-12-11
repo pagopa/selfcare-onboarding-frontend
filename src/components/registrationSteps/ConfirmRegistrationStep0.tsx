@@ -6,21 +6,17 @@ import DownloadIcon from '@mui/icons-material/Download';
 import { SessionModal } from '@pagopa/selfcare-common-frontend/lib';
 import { useState } from 'react';
 import { storageTokenOps } from '@pagopa/selfcare-common-frontend/lib/utils/storage';
-import { StepperStepComponentProps } from '../../../types';
-import { getRequestJwt } from '../../utils/getRequestJwt';
 import { ENV } from '../../utils/env';
 
-export function ConfirmRegistrationStep0({ forward }: StepperStepComponentProps) {
+type Props = {
+  onboardingId: string | undefined;
+  translationKeyValue: string;
+  forward: () => void;
+};
+export function ConfirmRegistrationStep0({ onboardingId, translationKeyValue, forward }: Props) {
   const { t } = useTranslation();
   const theme = useTheme();
-
   const [openModal, setOpenModal] = useState<boolean>(false);
-
-  const token = getRequestJwt();
-
-  const addUserFlow = new URLSearchParams(window.location.search).get('add-user') === 'true';
-
-  const translationKeyValue = addUserFlow ? 'user' : 'product';
 
   const onForwardAction = () => {
     forward();
@@ -52,7 +48,7 @@ export function ConfirmRegistrationStep0({ forward }: StepperStepComponentProps)
 
   const getContract = () => {
     const sessionToken = storageTokenOps.read();
-    fetch(ENV.URL_API.ONBOARDING_V2 + `/v2/tokens/${token}/contract`, {
+    fetch(ENV.URL_API.ONBOARDING_V2 + `/v2/tokens/${onboardingId}/contract`, {
       headers: {
         accept: '*/*',
         'accept-language': 'it-IT,it;q=0.9,en-US;q=0.8,en;q=0.7',
@@ -123,7 +119,9 @@ export function ConfirmRegistrationStep0({ forward }: StepperStepComponentProps)
                   >
                     {translationKeyValue === 'user'
                       ? `Per completare l’adesione, scarica il Modulo di aggiunta e fai apporre la <1 />firma digitale in <2>formato p7m</2> dal Legale Rappresentante dell’ente.`
-                      : `Per completare l’adesione, scarica l’accordo e fai apporre la firma digitale in <1 /><2>formato p7m</2> dal Legale Rappresentante dell’ente.`}
+                      : translationKeyValue === 'attachments'
+                        ? `Per adeguarti alla nuova normativa, scarica l’addendum e provvedi alla  <1 />firma digitale <2>formato p7m</2>.`
+                        : `Per completare l’adesione, scarica l’accordo e fai apporre la firma digitale in <1 /><2>formato p7m</2> dal Legale Rappresentante dell’ente.`}
                   </Trans>
                 </Typography>
               </Grid>
@@ -180,7 +178,9 @@ export function ConfirmRegistrationStep0({ forward }: StepperStepComponentProps)
                   >
                     {translationKeyValue === 'user'
                       ? `Una volta firmato il Modulo, segui le istruzioni per inviarlo e completare <1 /> l’aggiunta di uno o più Amministratori.`
-                      : `Una volta firmato l’accordo, segui le istruzioni per inviarlo e completare <1 /> l’adesione al prodotto scelto. Ricorda di caricare l’accordo <3>entro 30 giorni.</3>`}
+                      : translationKeyValue === 'attachments'
+                        ? `Una volta firmato digitalmente il documento, caricalo per completare la <1 />sottoscrizione.`
+                        : `Una volta firmato l’accordo, segui le istruzioni per inviarlo e completare <1 /> l’adesione al prodotto scelto. Ricorda di caricare l’accordo <3>entro 30 giorni.</3>`}
                   </Trans>
                 </Typography>
               </Grid>
