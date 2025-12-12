@@ -30,6 +30,11 @@ export default {
           description: `Per completare l’adesione, scarica l’accordo e fai apporre la firma digitale in <1 /><2>formato p7m</2> dal Legale Rappresentante dell’ente.`,
           downloadContract: 'Scarica l’accordo',
         },
+        attachments: {
+          title: 'Scarica l’addendum',
+          description: 'Per adeguarti alla nuova normativa, scarica l’addendum e provvedi alla  <1 />firma digitale <2>formato p7m</2>.',
+          downloadContract: 'Scarica il documento',
+        },
         user: {
           title: 'Scarica il Modulo di aggiunta',
           description: `Per completare l’adesione, scarica il Modulo di aggiunta e fai apporre la <1 />firma digitale in <2>formato p7m</2> dal Legale Rappresentante dell’ente.`,
@@ -42,6 +47,10 @@ export default {
         product: {
           title: 'Carica l’accordo firmato',
           description: `Una volta firmato l’accordo, segui le istruzioni per inviarlo e completare <1 /> l’adesione al prodotto scelto. Ricorda di caricare l’accordo <3>entro 30 giorni.</3>`,
+        },
+        attachments: {
+          title: 'Carica l’addendum firmato',
+          description: `Una volta firmato digitalmente il documento, caricalo per completare la <1 />sottoscrizione.`,
         },
         user: {
           title: 'Carica il Modulo firmato',

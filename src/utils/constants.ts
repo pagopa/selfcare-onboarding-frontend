@@ -32,6 +32,11 @@ export const ROUTES: RoutesObject = {
     LABEL: 'Cancel onboarding request',
     COMPONENT: CancelRequest,
   },
+  REGISTRATION_ATTACHMENTS: {
+    PATH: `${BASE_ROUTE}/:onboardingId/attachments`,
+    LABEL: 'Upload onboarding attachments',
+    COMPONENT: CompleteRequest,
+  },
   ONBOARDING_FILE_DOWNLOAD: {
     PATH: `${BASE_ROUTE}/:onboardingId/products/:productId/aggregates`,
     LABEL: 'Csv file download',
