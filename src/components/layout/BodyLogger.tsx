@@ -27,6 +27,13 @@ export function BodyLogger() {
           PRODUCT_IDS.IO_PREMIUM
         )
       );
+    } else if(location.pathname === '/onboarding/prod-dashboard-psp') {
+      history.push(
+        ROUTES.ONBOARDING_PREMIUM.PATH.replace(':productId', PRODUCT_IDS.PAGOPA).replace(
+          ':subProductId',
+          PRODUCT_IDS.DASHBOARD_PSP
+        )
+      );
     }
   }, []);
 
