@@ -74,7 +74,7 @@ export const onboardingContractUpload = async (
   const uploadDocument = await fetchWithLogs(
     {
       endpoint: addUserFlow ? 'USER_COMPLETE_REGISTRATION' : 'ONBOARDING_COMPLETE_REGISTRATION',
-      endpointParams: { onboardingId },
+      endpointParams: { token: onboardingId },
     },
     { method: 'POST', data: formData, headers: { 'Content-Type': 'multipart/form-data' } },
     redirectToLogin
