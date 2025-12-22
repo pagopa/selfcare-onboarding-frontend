@@ -28,6 +28,11 @@ build
 local
 dist
 
+# API Codegen generated files
+openApi/generated-*
+src/api/generated/
+.tmp-codegen
+
 # Local python packages
 .python_packages/
 

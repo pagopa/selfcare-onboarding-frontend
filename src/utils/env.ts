@@ -41,6 +41,10 @@ export const ENV = {
     GEOTAXONOMY: env.get('REACT_APP_URL_GEOTAXONOMY').required().asString(),
   },
 
+  API_TIMEOUT_MS: {
+    ONBOARDING: env.get('REACT_APP_API_ONBOARDING_TIMEOUT_MS').required().asInt(),
+  },
+
   MAX_INSTITUTIONS_FETCH: env.get('REACT_APP_MAX_INSTITUTIONS_FETCH').required().asIntPositive(),
 
   UPLOAD_CONTRACT_MAX_LOOP_ERROR: env
