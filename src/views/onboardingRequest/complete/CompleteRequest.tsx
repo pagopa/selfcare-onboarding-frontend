@@ -18,7 +18,7 @@ import { MessageNoAction } from '../../../components/shared/MessageNoAction';
 import { useHistoryState } from '../../../hooks/useHistoryState';
 import { HeaderContext, UserContext } from '../../../lib/context';
 import { onboardingContractUpload } from '../../../services/requestStatusServices';
-import { verifyRequest } from '../../../services/tokenServices';
+import { getOnboardingAttatchments, verifyRequest } from '../../../services/tokenServices';
 import { customErrors } from '../../../utils/constants';
 import { getRequestJwt } from '../../../utils/getRequestJwt';
 import AlreadyCompletedRequest from '../status/AlreadyCompletedPage';
@@ -70,6 +70,7 @@ export default function CompleteRequestComponent() {
   const [errorCode, setErrorCode] = useState<keyof typeof customErrors>('GENERIC');
   const [open, setOpen] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
+  const [onboardingAttachments, setOnboardingAttachments] = useState<Array<string>>([]);
   const [lastFileErrorAttempt, setLastFileErrorAttempt] = useState<FileErrorAttempt>();
   const [uploadedFiles, setUploadedFiles, setUploadedFilesHistory] = useHistoryState<Array<File>>(
     'uploaded_files',
@@ -79,6 +80,14 @@ export default function CompleteRequestComponent() {
   const addUserFlow = new URLSearchParams(window.location.search).get('add-user') === 'true';
   const attachments = new URLSearchParams(window.location.search).get('attachments') === 'true';
   const translationKeyValue = addUserFlow ? 'user' : attachments ? 'attachments' : 'product';
+  const getAttachments = async () => {
+    await getOnboardingAttatchments(
+      onboardingId as string,
+      setOnboardingAttachments,
+      setLoading,
+      setOutcomeContentState
+    );
+  };
 
   useEffect(() => {
     setSubHeaderVisible(true);
@@ -99,6 +108,16 @@ export default function CompleteRequestComponent() {
       setRequestData,
     }).finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    if (attachments && onboardingId) {
+      void getAttachments();
+    }
+  }, [attachments, onboardingId]);
+
+  useEffect(() => {
+    console.log('onboardingAttachments:', onboardingAttachments);
+  }, [onboardingAttachments]);
 
   const setUploadedFilesAndWriteHistory = (files: Array<File>) => {
     setUploadedFilesHistory(files);

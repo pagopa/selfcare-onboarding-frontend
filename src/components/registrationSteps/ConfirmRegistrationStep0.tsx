@@ -17,7 +17,6 @@ export function ConfirmRegistrationStep0({ onboardingId, translationKeyValue, fo
   const { t } = useTranslation();
   const theme = useTheme();
   const [openModal, setOpenModal] = useState<boolean>(false);
-
   const onForwardAction = () => {
     forward();
   };
