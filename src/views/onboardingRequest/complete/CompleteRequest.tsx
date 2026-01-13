@@ -101,12 +101,17 @@ export default function CompleteRequestComponent() {
 
   useEffect(() => {
     setLoading(true);
-    verifyRequest({
-      onboardingId,
-      setRequiredLogin,
-      setOutcomeContentState,
-      setRequestData,
-    }).finally(() => setLoading(false));
+    if (attachments) {
+      setOutcomeContentState('toBeCompleted');
+      setLoading(false);
+    } else {
+      verifyRequest({
+        onboardingId,
+        setRequiredLogin,
+        setOutcomeContentState,
+        setRequestData,
+      }).finally(() => setLoading(false));
+    }
   }, []);
 
   useEffect(() => {
