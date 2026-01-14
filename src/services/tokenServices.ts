@@ -90,9 +90,9 @@ export const getOnboardingAttatchments = async (
 
   const outcome = getFetchOutcome(getOnboarding);
   if (outcome === 'success') {
-    setAttachments((getOnboarding as AxiosResponse).data);
+    setAttachments((getOnboarding as AxiosResponse).data.attachments[0]);
   } else {
-    setOutcomeContentState('notFound');
+    setOutcomeContentState('error');
   }
   setLoading(false);
 };

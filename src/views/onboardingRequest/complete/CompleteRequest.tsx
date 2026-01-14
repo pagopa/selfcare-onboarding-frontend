@@ -71,7 +71,7 @@ export default function CompleteRequestComponent() {
   const [errorCode, setErrorCode] = useState<keyof typeof customErrors>('GENERIC');
   const [open, setOpen] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
-  const [onboardingAttachments, setOnboardingAttachments] = useState<Array<string>>([]);
+  const [_onboardingAttachments, setOnboardingAttachments] = useState<Array<string>>([]);
   const [lastFileErrorAttempt, setLastFileErrorAttempt] = useState<FileErrorAttempt>();
   const [uploadedFiles, setUploadedFiles, setUploadedFilesHistory] = useHistoryState<Array<File>>(
     'uploaded_files',
@@ -82,15 +82,12 @@ export default function CompleteRequestComponent() {
   const attachments = window.location.pathname.includes('/attachments');
   const translationKeyValue = addUserFlow ? 'user' : attachments ? 'attachments' : 'product';
 
-  console.log('🔧 URL search params:', window.location.search);
-  console.log('🔧 attachments value:', attachments);
-  console.log('🔧 translationKeyValue:', translationKeyValue);
   const getAttachments = async () => {
     await getOnboardingAttatchments(
       onboardingId as string,
       setOnboardingAttachments,
       setLoading,
-      () => {} // Non vogliamo che getAttachments modifichi l'outcomeContentState per il flusso DORA
+      setOutcomeContentState
     );
   };
 
@@ -105,14 +102,11 @@ export default function CompleteRequestComponent() {
   }, []);
 
   useEffect(() => {
-    console.log('🔍 useEffect triggered - attachments:', attachments, 'onboardingId:', onboardingId);
     setLoading(true);
     if (attachments && onboardingId) {
-      console.log('✅ Flusso DORA - Setting toBeCompleted');
       setOutcomeContentState('toBeCompleted');
       void getAttachments().finally(() => setLoading(false));
     } else {
-      console.log('❌ Flusso normale - Calling verifyRequest');
       verifyRequest({
         onboardingId,
         setRequiredLogin,
@@ -122,13 +116,6 @@ export default function CompleteRequestComponent() {
     }
   }, [attachments, onboardingId]);
 
-  useEffect(() => {
-    console.log('📎 onboardingAttachments:', onboardingAttachments);
-  }, [onboardingAttachments]);
-
-  useEffect(() => {
-    console.log('🎯 outcomeContentState changed to:', outcomeContentState);
-  }, [outcomeContentState]);
 
   const setUploadedFilesAndWriteHistory = (files: Array<File>) => {
     setUploadedFilesHistory(files);
