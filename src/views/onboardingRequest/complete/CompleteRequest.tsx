@@ -60,6 +60,7 @@ export default function CompleteRequestComponent() {
   const { setRequiredLogin } = useContext(UserContext);
   const { onboardingId: onboardingIdFromPath } = useParams<{ onboardingId?: string }>();
   const onboardingId = onboardingIdFromPath || getRequestJwt();
+
   const [activeStep, setActiveStep, setActiveStepHistory] = useHistoryState(
     'complete_registration_step',
     0
@@ -78,7 +79,7 @@ export default function CompleteRequestComponent() {
   );
   const [requestData, setRequestData] = useState<OnboardingRequestData>();
   const addUserFlow = new URLSearchParams(window.location.search).get('add-user') === 'true';
-  const attachments = new URLSearchParams(window.location.search).get('attachments') === 'true';
+  const attachments = window.location.pathname.includes('/attachments');
   const translationKeyValue = addUserFlow ? 'user' : attachments ? 'attachments' : 'product';
 
   console.log('🔧 URL search params:', window.location.search);
