@@ -80,12 +80,16 @@ export default function CompleteRequestComponent() {
   const addUserFlow = new URLSearchParams(window.location.search).get('add-user') === 'true';
   const attachments = new URLSearchParams(window.location.search).get('attachments') === 'true';
   const translationKeyValue = addUserFlow ? 'user' : attachments ? 'attachments' : 'product';
+
+  console.log('🔧 URL search params:', window.location.search);
+  console.log('🔧 attachments value:', attachments);
+  console.log('🔧 translationKeyValue:', translationKeyValue);
   const getAttachments = async () => {
     await getOnboardingAttatchments(
       onboardingId as string,
       setOnboardingAttachments,
       setLoading,
-      setOutcomeContentState
+      () => {} // Non vogliamo che getAttachments modifichi l'outcomeContentState per il flusso DORA
     );
   };
 
@@ -100,11 +104,14 @@ export default function CompleteRequestComponent() {
   }, []);
 
   useEffect(() => {
+    console.log('🔍 useEffect triggered - attachments:', attachments, 'onboardingId:', onboardingId);
     setLoading(true);
-    if (attachments) {
+    if (attachments && onboardingId) {
+      console.log('✅ Flusso DORA - Setting toBeCompleted');
       setOutcomeContentState('toBeCompleted');
-      setLoading(false);
+      void getAttachments().finally(() => setLoading(false));
     } else {
+      console.log('❌ Flusso normale - Calling verifyRequest');
       verifyRequest({
         onboardingId,
         setRequiredLogin,
@@ -112,17 +119,15 @@ export default function CompleteRequestComponent() {
         setRequestData,
       }).finally(() => setLoading(false));
     }
-  }, []);
-
-  useEffect(() => {
-    if (attachments && onboardingId) {
-      void getAttachments();
-    }
   }, [attachments, onboardingId]);
 
   useEffect(() => {
-    console.log('onboardingAttachments:', onboardingAttachments);
+    console.log('📎 onboardingAttachments:', onboardingAttachments);
   }, [onboardingAttachments]);
+
+  useEffect(() => {
+    console.log('🎯 outcomeContentState changed to:', outcomeContentState);
+  }, [outcomeContentState]);
 
   const setUploadedFilesAndWriteHistory = (files: Array<File>) => {
     setUploadedFilesHistory(files);
