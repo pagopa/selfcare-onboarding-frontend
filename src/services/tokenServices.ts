@@ -110,10 +110,10 @@ export const downloadAttatchments = async (
     const getDocument = await fetchWithLogs(
       {
         endpoint: 'ONBOARDING_GET_ATTACHMENT',
+        endpointParams: { onboardingId, filename: fileName },
       },
       {
         method: 'GET',
-        params: { onboardingId, filename: fileName },
         responseType: 'blob',
       },
       redirectToLogin
