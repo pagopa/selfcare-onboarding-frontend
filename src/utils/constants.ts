@@ -99,6 +99,9 @@ export const API = {
   USER_COMPLETE_REGISTRATION: {
     URL: ENV.URL_API.ONBOARDING_V2 + '/v2/tokens/{{token}}/complete-onboarding-users',
   },
+  ONBOARDING_GET_ATTACHMENTS: {
+    URL: ENV.URL_API.ONBOARDING_V2 + '/v2/tokens/{{onboardingId}}',
+  },
 
   // institutions present on self care db
   ONBOARDING_GET_USER_PARTIES: {

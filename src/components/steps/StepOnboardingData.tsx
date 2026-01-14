@@ -21,7 +21,7 @@ type Props = StepperStepComponentProps & {
   subProductFlow?: boolean;
 };
 
-const genericError: RequestOutcomeMessage = {
+export const genericError: RequestOutcomeMessage = {
   title: '',
   description: [
     <>
