@@ -71,7 +71,7 @@ export default function CompleteRequestComponent() {
   const [errorCode, setErrorCode] = useState<keyof typeof customErrors>('GENERIC');
   const [open, setOpen] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
-  const [_onboardingAttachments, setOnboardingAttachments] = useState<Array<string>>([]);
+  const [onboardingAttachments, setOnboardingAttachments] = useState<string>();
   const [lastFileErrorAttempt, setLastFileErrorAttempt] = useState<FileErrorAttempt>();
   const [uploadedFiles, setUploadedFiles, setUploadedFilesHistory] = useHistoryState<Array<File>>(
     'uploaded_files',
@@ -116,7 +116,6 @@ export default function CompleteRequestComponent() {
     }
   }, [attachments, onboardingId]);
 
-
   const setUploadedFilesAndWriteHistory = (files: Array<File>) => {
     setUploadedFilesHistory(files);
     setUploadedFiles(files);
@@ -154,7 +153,15 @@ export default function CompleteRequestComponent() {
   const steps: Array<StepperStep> = [
     {
       label: t('completeRegistration.steps.step0.label'),
-      Component: () => ConfirmRegistrationStep0({ onboardingId, translationKeyValue, forward }),
+      Component: () =>
+        ConfirmRegistrationStep0({
+          onboardingId,
+          fileName: onboardingAttachments,
+          translationKeyValue,
+          setLoading,
+          setOutcomeContentState,
+          forward,
+        }),
     },
     {
       label: t('completeRegistration.steps.step1.label'),

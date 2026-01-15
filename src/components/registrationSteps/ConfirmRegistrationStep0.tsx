@@ -7,13 +7,26 @@ import { SessionModal } from '@pagopa/selfcare-common-frontend/lib';
 import { useState } from 'react';
 import { storageTokenOps } from '@pagopa/selfcare-common-frontend/lib/utils/storage';
 import { ENV } from '../../utils/env';
+import { fileFromReader } from '../../utils/formatting-utils';
+import { downloadAttatchments } from '../../services/tokenServices';
+import { RequestOutcomeComplete } from '../../../types';
 
 type Props = {
   onboardingId: string | undefined;
+  fileName?: string;
   translationKeyValue: string;
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  setOutcomeContentState: React.Dispatch<React.SetStateAction<RequestOutcomeComplete | null>>;
   forward: () => void;
 };
-export function ConfirmRegistrationStep0({ onboardingId, translationKeyValue, forward }: Props) {
+export function ConfirmRegistrationStep0({
+  onboardingId,
+  fileName,
+  translationKeyValue,
+  setLoading,
+  setOutcomeContentState,
+  forward,
+}: Props) {
   const { t } = useTranslation();
   const theme = useTheme();
   const [openModal, setOpenModal] = useState<boolean>(false);
@@ -21,31 +34,7 @@ export function ConfirmRegistrationStep0({ onboardingId, translationKeyValue, fo
     forward();
   };
 
-  const fileFromReader = async (
-    reader: ReadableStreamDefaultReader<Uint8Array> | undefined
-  ): Promise<string> => {
-    const stream = new ReadableStream({
-      start(controller) {
-        return pump();
-        function pump(): Promise<any> | undefined {
-          return reader?.read().then(({ done, value }) => {
-            if (done) {
-              controller.close();
-              return;
-            }
-            controller.enqueue(value);
-            return pump();
-          });
-        }
-      },
-    });
-    const response = new Response(stream);
-
-    const blob = await response.blob();
-    return URL.createObjectURL(blob);
-  };
-
-  const getContract = () => {
+  const getContract = (onboardingId: string) => {
     const sessionToken = storageTokenOps.read();
     fetch(ENV.URL_API.ONBOARDING_V2 + `/v2/tokens/${onboardingId}/contract`, {
       headers: {
@@ -81,6 +70,22 @@ export function ConfirmRegistrationStep0({ onboardingId, translationKeyValue, fo
       .catch(() => {
         setOpenModal(true);
       });
+  };
+
+  const onClickDownload = (onboardingId: string | undefined) => {
+    if (onboardingId) {
+      if (translationKeyValue === 'attachments') {
+        return downloadAttatchments(
+          onboardingId,
+          fileName,
+          setOpenModal,
+          setLoading,
+          setOutcomeContentState
+        );
+      } else {
+        return getContract(onboardingId);
+      }
+    }
   };
 
   return (
@@ -125,7 +130,7 @@ export function ConfirmRegistrationStep0({ onboardingId, translationKeyValue, fo
                 </Typography>
               </Grid>
               <Grid item py={4}>
-                <Button fullWidth color="primary" variant="contained" onClick={getContract}>
+                <Button fullWidth color="primary" variant="contained" onClick={() => onClickDownload(onboardingId)}>
                   {t(
                     `confirmOnboarding.chooseOption.download.${translationKeyValue}.downloadContract`
                   )}
