@@ -126,22 +126,21 @@ export const downloadAttatchments = async (
     if (outcome === 'success') {
       const response = (getDocument as AxiosResponse).data;
 
-      const reader = response.stream().getReader();
-      fileFromReader(reader)
-        .then((url) => {
-          const link = document.createElement('a');
-          // eslint-disable-next-line functional/immutable-data
-          link.href = url;
-          // eslint-disable-next-line functional/immutable-data
-          link.download = fileName;
-          document.body.appendChild(link);
-          link.click();
-          setLoading(false);
-        })
-        .catch(() => {
-          setOpenModal(true);
-          setLoading(false);
-        });
+      try {
+        const reader = response.stream().getReader();
+        const url = await fileFromReader(reader);
+        const link = document.createElement('a');
+        // eslint-disable-next-line functional/immutable-data
+        link.href = url;
+        // eslint-disable-next-line functional/immutable-data
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        setLoading(false);
+      } catch (error) {
+        setOpenModal(true);
+        setLoading(false);
+      }
     } else {
       setOutcomeContentState('error');
       setLoading(false);
