@@ -103,7 +103,7 @@ export const API = {
     URL: ENV.URL_API.ONBOARDING_V2 + '/v2/tokens/{{onboardingId}}',
   },
   ONBOARDING_GET_ATTACHMENT: {
-    URL: ENV.URL_API.ONBOARDING_V2 + '/v2/tokens/{onboardingId}/attachment?name={filename}',
+    URL: ENV.URL_API.ONBOARDING_V2 + '/v2/tokens/{{onboardingId}}/attachment?name={filename}',
   },
 
   // institutions present on self care db
