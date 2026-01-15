@@ -18,7 +18,11 @@ import { MessageNoAction } from '../../../components/shared/MessageNoAction';
 import { useHistoryState } from '../../../hooks/useHistoryState';
 import { HeaderContext, UserContext } from '../../../lib/context';
 import { onboardingContractUpload } from '../../../services/requestStatusServices';
-import { getOnboardingAttatchments, verifyRequest } from '../../../services/tokenServices';
+import {
+  getOnboardingAttatchments,
+  uploadAttachment,
+  verifyRequest,
+} from '../../../services/tokenServices';
 import { customErrors } from '../../../utils/constants';
 import { getRequestJwt } from '../../../utils/getRequestJwt';
 import AlreadyCompletedRequest from '../status/AlreadyCompletedPage';
@@ -150,6 +154,37 @@ export default function CompleteRequestComponent() {
     setUploadedFiles([]);
   };
 
+  const uploadContract = () => {
+    if (attachments) {
+      return uploadAttachment(
+        onboardingId as string,
+        onboardingAttachments,
+        uploadedFiles[0],
+        setLoading,
+        setOutcomeContentState,
+        lastFileErrorAttempt,
+        setLastFileErrorAttempt,
+        setOpen,
+        setErrorCode,
+        transcodeErrorCode
+      );
+    } else {
+      return onboardingContractUpload(
+        uploadedFiles[0],
+        setLoading,
+        onboardingId,
+        requestData,
+        addUserFlow,
+        setOutcomeContentState,
+        lastFileErrorAttempt,
+        setLastFileErrorAttempt,
+        setOpen,
+        setErrorCode,
+        transcodeErrorCode
+      );
+    }
+  };
+
   const steps: Array<StepperStep> = [
     {
       label: t('completeRegistration.steps.step0.label'),
@@ -169,20 +204,7 @@ export default function CompleteRequestComponent() {
         ConfirmRegistrationStep1(
           addUserFlow,
           {
-            forward: () =>
-              onboardingContractUpload(
-                uploadedFiles[0],
-                setLoading,
-                onboardingId,
-                requestData,
-                addUserFlow,
-                setOutcomeContentState,
-                lastFileErrorAttempt,
-                setLastFileErrorAttempt,
-                setOpen,
-                setErrorCode,
-                transcodeErrorCode
-              ),
+            forward: () => uploadContract(),
           },
           { loading },
           { uploadedFiles, setUploadedFiles: setUploadedFilesAndWriteHistory }
