@@ -23,6 +23,7 @@ import {
   uploadAttachment,
   verifyRequest,
 } from '../../../services/tokenServices';
+import { genericError } from '../../../components/steps/StepOnboardingData';
 import { customErrors } from '../../../utils/constants';
 import { getRequestJwt } from '../../../utils/getRequestJwt';
 import AlreadyCompletedRequest from '../status/AlreadyCompletedPage';
@@ -108,8 +109,7 @@ export default function CompleteRequestComponent() {
   useEffect(() => {
     setLoading(true);
     if (attachments && onboardingId) {
-      setOutcomeContentState('toBeCompleted');
-      void getAttachments().finally(() => setLoading(false));
+      void getAttachments();
     } else {
       verifyRequest({
         onboardingId,
@@ -276,6 +276,7 @@ export default function CompleteRequestComponent() {
         </>,
       ],
     },
+    genericError,
   };
 
   return loading ? (

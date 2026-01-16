@@ -6,6 +6,7 @@ import { fetchWithLogs } from '../lib/api-utils';
 import { FileErrorAttempt, OnboardingRequestData, Problem, RequestOutcomeComplete } from '../../types';
 import { redirectToLogin } from '../utils/unloadEvent-utils';
 import { getFetchOutcome } from '../lib/error-utils';
+import { fileFromReader } from '../utils/formatting-utils';
 import { customErrors } from '../utils/constants';
 import { ENV } from '../utils/env';
 
@@ -78,7 +79,7 @@ export const getOnboardingAttatchments = async (
   setAttachments: Dispatch<SetStateAction<any>>,
   setLoading: Dispatch<SetStateAction<boolean>>,
   setOutcomeContentState: Dispatch<SetStateAction<RequestOutcomeComplete | null>>
-) => {
+): Promise<any> => {
   setLoading(true);
   const getOnboarding = await fetchWithLogs(
     {
@@ -93,9 +94,61 @@ export const getOnboardingAttatchments = async (
 
   const outcome = getFetchOutcome(getOnboarding);
   if (outcome === 'success') {
-    setAttachments((getOnboarding as AxiosResponse).data.attachments[0]);
+    const attachments = (getOnboarding as AxiosResponse).data.attachments;
+    if (attachments && attachments.length > 0) {
+      setAttachments(attachments[0]);
+      setOutcomeContentState('toBeCompleted');
+    } else {
+      setOutcomeContentState('genericError');
+    }
   } else {
-    setOutcomeContentState('error');
+    setOutcomeContentState('genericError');
+  }
+  setLoading(false);
+};
+
+export const downloadAttatchments = async (
+  onboardingId: string,
+  fileName: string | undefined,
+  setOpenModal: Dispatch<SetStateAction<boolean>>,
+  setLoading: Dispatch<SetStateAction<boolean>>,
+  setOutcomeContentState: Dispatch<SetStateAction<RequestOutcomeComplete | null>>
+) => {
+  setLoading(true);
+  if (fileName) {
+    const getDocument = await fetchWithLogs(
+      {
+        endpoint: 'ONBOARDING_GET_ATTACHMENT',
+        endpointParams: { onboardingId, filename: fileName },
+      },
+      {
+        method: 'GET',
+        responseType: 'blob',
+      },
+      redirectToLogin
+    );
+
+    const outcome = getFetchOutcome(getDocument);
+    if (outcome === 'success') {
+      const response = (getDocument as AxiosResponse).data;
+
+      const reader = response.stream().getReader();
+      fileFromReader(reader)
+        .then((url) => {
+          const link = document.createElement('a');
+          // eslint-disable-next-line functional/immutable-data
+          link.href = url;
+          // eslint-disable-next-line functional/immutable-data
+          link.download = fileName;
+          document.body.appendChild(link);
+          link.click();
+        })
+        .catch(() => {
+          setOpenModal(true);
+        });
+    } else {
+      setOutcomeContentState('error');
+    }
   }
   setLoading(false);
 };
@@ -158,6 +211,7 @@ export const uploadAttachment = async (
         lastFileErrorAttempt.fileSize === file.size &&
         lastFileErrorAttempt.fileLastModifyDate === file.lastModified
       ) {
+        // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
         const errorCount = lastFileErrorAttempt.errorCount + 1;
         setLastFileErrorAttempt({
           ...lastFileErrorAttempt,
