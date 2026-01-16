@@ -6,7 +6,6 @@ import { fetchWithLogs } from '../lib/api-utils';
 import { FileErrorAttempt, OnboardingRequestData, Problem, RequestOutcomeComplete } from '../../types';
 import { redirectToLogin } from '../utils/unloadEvent-utils';
 import { getFetchOutcome } from '../lib/error-utils';
-import { fileFromReader } from '../utils/formatting-utils';
 import { customErrors } from '../utils/constants';
 import { ENV } from '../utils/env';
 
@@ -99,55 +98,6 @@ export const getOnboardingAttatchments = async (
     setOutcomeContentState('error');
   }
   setLoading(false);
-};
-
-export const downloadAttatchments = async (
-  onboardingId: string,
-  fileName: string | undefined,
-  setOpenModal: Dispatch<SetStateAction<boolean>>,
-  setLoading: Dispatch<SetStateAction<boolean>>,
-  setOutcomeContentState: Dispatch<SetStateAction<RequestOutcomeComplete | null>>
-) => {
-  setLoading(true);
-  if (fileName) {
-    const getDocument = await fetchWithLogs(
-      {
-        endpoint: 'ONBOARDING_GET_ATTACHMENT',
-        endpointParams: { onboardingId, filename: fileName },
-      },
-      {
-        method: 'GET',
-        responseType: 'blob',
-      },
-      redirectToLogin
-    );
-
-    const outcome = getFetchOutcome(getDocument);
-    if (outcome === 'success') {
-      const response = (getDocument as AxiosResponse).data;
-
-      try {
-        const reader = response.stream().getReader();
-        const url = await fileFromReader(reader);
-        const link = document.createElement('a');
-        // eslint-disable-next-line functional/immutable-data
-        link.href = url;
-        // eslint-disable-next-line functional/immutable-data
-        link.download = fileName;
-        document.body.appendChild(link);
-        link.click();
-        setLoading(false);
-      } catch (error) {
-        setOpenModal(true);
-        setLoading(false);
-      }
-    } else {
-      setOutcomeContentState('error');
-      setLoading(false);
-    }
-  } else {
-    setLoading(false);
-  }
 };
 
 export const uploadAttachment = async (

@@ -194,7 +194,6 @@ export default function CompleteRequestComponent() {
           fileName: onboardingAttachments,
           translationKeyValue,
           setLoading,
-          setOutcomeContentState,
           forward,
         }),
     },
