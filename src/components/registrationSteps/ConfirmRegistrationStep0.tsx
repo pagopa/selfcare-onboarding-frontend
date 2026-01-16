@@ -30,12 +30,13 @@ export function ConfirmRegistrationStep0({
     forward();
   };
 
-  const getContract = (onboardingId: string, path?: string, documentName?: string) => {
+  const getContract = (onboardingId: string, documentName?: string) => {
     setLoading(true);
     const sessionToken = storageTokenOps.read();
-    const url = path
-      ? ENV.URL_API.ONBOARDING_V2 + `/v2/tokens/${onboardingId}/${path}`
-      : ENV.URL_API.ONBOARDING_V2 + `/v2/tokens/${onboardingId}/contract`;
+    const url =
+      translationKeyValue === 'attachments'
+        ? ENV.URL_API.ONBOARDING_V2 + `/v2/tokens/${onboardingId}/attachment?name=${documentName}`
+        : ENV.URL_API.ONBOARDING_V2 + `/v2/tokens/${onboardingId}/contract`;
 
     fetch(url, {
       headers: {
@@ -51,7 +52,8 @@ export function ConfirmRegistrationStep0({
         const matchedIndex = contentDisposition?.indexOf('=') as number;
         const fileNameFromHeader =
           contentDisposition?.substring(matchedIndex + 1) ?? 'Accordo_di_adesione.pdf';
-        const finalFileName = documentName ?? fileNameFromHeader;
+        const finalFileName =
+          translationKeyValue === 'attachments' ? `${documentName}.pdf` : fileNameFromHeader;
         return response.blob().then((blob) => {
           const reader = blob.stream().getReader();
           fileFromReader(reader)
@@ -80,7 +82,7 @@ export function ConfirmRegistrationStep0({
   const onClickDownload = (onboardingId: string | undefined) => {
     if (onboardingId) {
       if (translationKeyValue === 'attachments' && fileName) {
-        return getContract(onboardingId, `attachment?name=${fileName}`, fileName);
+        return getContract(onboardingId, fileName);
       } else {
         return getContract(onboardingId);
       }
@@ -129,7 +131,12 @@ export function ConfirmRegistrationStep0({
                 </Typography>
               </Grid>
               <Grid item py={4}>
-                <Button fullWidth color="primary" variant="contained" onClick={() => onClickDownload(onboardingId)}>
+                <Button
+                  fullWidth
+                  color="primary"
+                  variant="contained"
+                  onClick={() => onClickDownload(onboardingId)}
+                >
                   {t(
                     `confirmOnboarding.chooseOption.download.${translationKeyValue}.downloadContract`
                   )}
