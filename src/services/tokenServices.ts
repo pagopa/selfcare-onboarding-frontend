@@ -1,11 +1,13 @@
 import { AxiosError, AxiosResponse } from 'axios';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
 import React, { Dispatch, SetStateAction } from 'react';
+import { uniqueId } from 'lodash';
 import { fetchWithLogs } from '../lib/api-utils';
-import { OnboardingRequestData, Problem, RequestOutcomeComplete } from '../../types';
+import { FileErrorAttempt, OnboardingRequestData, Problem, RequestOutcomeComplete } from '../../types';
 import { redirectToLogin } from '../utils/unloadEvent-utils';
 import { getFetchOutcome } from '../lib/error-utils';
-import { fileFromReader } from '../utils/formatting-utils';
+import { customErrors } from '../utils/constants';
+import { ENV } from '../utils/env';
 
 type Props = {
   onboardingId?: string;
@@ -98,48 +100,103 @@ export const getOnboardingAttatchments = async (
   setLoading(false);
 };
 
-export const downloadAttatchments = async (
+export const uploadAttachment = async (
   onboardingId: string,
   fileName: string | undefined,
-  setOpenModal: Dispatch<SetStateAction<boolean>>,
+  file: File,
   setLoading: Dispatch<SetStateAction<boolean>>,
-  setOutcomeContentState: Dispatch<SetStateAction<RequestOutcomeComplete | null>>
+  setOutcomeContentState: Dispatch<SetStateAction<RequestOutcomeComplete | null>>,
+  lastFileErrorAttempt: FileErrorAttempt | undefined,
+  setLastFileErrorAttempt: Dispatch<SetStateAction<FileErrorAttempt | undefined>>,
+  setOpen: Dispatch<SetStateAction<boolean>>,
+  setErrorCode: Dispatch<
+    SetStateAction<
+      'GENERIC' | 'INVALID_DOCUMENT' | 'INVALID_SIGN' | 'INVALID_SIGN_FORMAT' | 'ALREADY_ONBOARDED'
+    >
+  >,
+  transcodeErrorCode: (data: Problem) => keyof typeof customErrors
+  // eslint-disable-next-line sonarjs/cognitive-complexity
 ) => {
+  const requestId = uniqueId('upload-attachment-');
+  trackEvent('ONBOARDING_ATTACHMENT_UPLOAD', { request_id: requestId, party_id: onboardingId });
+
   setLoading(true);
+
   if (fileName) {
-    const getDocument = await fetchWithLogs(
+    const formData = new FormData();
+    formData.append('attachment', file);
+
+    const uploadDocument = await fetchWithLogs(
       {
         endpoint: 'ONBOARDING_GET_ATTACHMENT',
         endpointParams: { onboardingId, filename: fileName },
       },
       {
-        method: 'GET',
-        responseType: 'blob',
+        method: 'POST',
+        data: formData,
+        headers: { 'Content-Type': 'multipart/form-data' },
       },
       redirectToLogin
     );
 
-    const outcome = getFetchOutcome(getDocument);
-    if (outcome === 'success') {
-      const response = (getDocument as AxiosResponse).data;
+    setLoading(false);
 
-      const reader = response.stream().getReader();
-      fileFromReader(reader)
-        .then((url) => {
-          const link = document.createElement('a');
-          // eslint-disable-next-line functional/immutable-data
-          link.href = url;
-          // eslint-disable-next-line functional/immutable-data
-          link.download = fileName;
-          document.body.appendChild(link);
-          link.click();
-        })
-        .catch(() => {
-          setOpenModal(true);
-        });
-    } else {
-      setOutcomeContentState('error');
+    const outcome = getFetchOutcome(uploadDocument);
+
+    if (outcome === 'success') {
+      trackEvent('ONBOARDING_ATTACHMENT_SUCCESS', {
+        request_id: requestId,
+        party_id: onboardingId,
+      });
+      setOutcomeContentState('success');
     }
+
+    if (outcome === 'error') {
+      if (
+        lastFileErrorAttempt &&
+        lastFileErrorAttempt.fileName === file.name &&
+        lastFileErrorAttempt.fileSize === file.size &&
+        lastFileErrorAttempt.fileLastModifyDate === file.lastModified
+      ) {
+        const errorCount = lastFileErrorAttempt.errorCount + 1;
+        setLastFileErrorAttempt({
+          ...lastFileErrorAttempt,
+          errorCount,
+        });
+        if (errorCount > ENV.UPLOAD_CONTRACT_MAX_LOOP_ERROR) {
+          setOpen(false);
+          setOutcomeContentState('error');
+        }
+      } else {
+        setLastFileErrorAttempt({
+          fileName: file.name,
+          fileSize: file.size,
+          fileLastModifyDate: file.lastModified,
+          errorCount: 1,
+        });
+      }
+      if (
+        (uploadDocument as AxiosError<Problem>).response?.status === 400 &&
+        (uploadDocument as AxiosError<Problem>).response?.data
+      ) {
+        setOpen(true);
+        trackEvent('ONBOARDING_ATTACHMENT_FAILURE', {
+          request_id: requestId,
+          party_id: onboardingId,
+        });
+        setErrorCode(
+          transcodeErrorCode((uploadDocument as AxiosError<Problem>).response?.data as Problem)
+        );
+      } else {
+        setOpen(true);
+        trackEvent('ONBOARDING_ATTACHMENT_FAILURE', {
+          request_id: requestId,
+          party_id: onboardingId,
+        });
+        setErrorCode('GENERIC');
+      }
+    }
+  } else {
+    setLoading(false);
   }
-  setLoading(false);
 };
