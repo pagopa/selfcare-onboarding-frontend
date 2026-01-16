@@ -18,12 +18,7 @@ import { MessageNoAction } from '../../../components/shared/MessageNoAction';
 import { useHistoryState } from '../../../hooks/useHistoryState';
 import { HeaderContext, UserContext } from '../../../lib/context';
 import { onboardingContractUpload } from '../../../services/requestStatusServices';
-import {
-  getOnboardingAttatchments,
-  uploadAttachment,
-  verifyRequest,
-} from '../../../services/tokenServices';
-import { genericError } from '../../../components/steps/StepOnboardingData';
+import { verifyRequest } from '../../../services/tokenServices';
 import { customErrors } from '../../../utils/constants';
 import { getRequestJwt } from '../../../utils/getRequestJwt';
 import AlreadyCompletedRequest from '../status/AlreadyCompletedPage';
@@ -76,7 +71,6 @@ export default function CompleteRequestComponent() {
   const [errorCode, setErrorCode] = useState<keyof typeof customErrors>('GENERIC');
   const [open, setOpen] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
-  const [onboardingAttachments, setOnboardingAttachments] = useState<string>();
   const [lastFileErrorAttempt, setLastFileErrorAttempt] = useState<FileErrorAttempt>();
   const [uploadedFiles, setUploadedFiles, setUploadedFilesHistory] = useHistoryState<Array<File>>(
     'uploaded_files',
@@ -86,15 +80,6 @@ export default function CompleteRequestComponent() {
   const addUserFlow = new URLSearchParams(window.location.search).get('add-user') === 'true';
   const attachments = window.location.pathname.includes('/attachments');
   const translationKeyValue = addUserFlow ? 'user' : attachments ? 'attachments' : 'product';
-
-  const getAttachments = async () => {
-    await getOnboardingAttatchments(
-      onboardingId as string,
-      setOnboardingAttachments,
-      setLoading,
-      setOutcomeContentState
-    );
-  };
 
   useEffect(() => {
     setSubHeaderVisible(true);
@@ -107,9 +92,8 @@ export default function CompleteRequestComponent() {
   }, []);
 
   useEffect(() => {
-    setLoading(true);
     if (attachments && onboardingId) {
-      void getAttachments();
+      setOutcomeContentState('toBeCompleted');
     } else {
       verifyRequest({
         onboardingId,
@@ -118,7 +102,7 @@ export default function CompleteRequestComponent() {
         setRequestData,
       }).finally(() => setLoading(false));
     }
-  }, [attachments, onboardingId]);
+  }, [/* attachments, */ onboardingId]);
 
   const setUploadedFilesAndWriteHistory = (files: Array<File>) => {
     setUploadedFilesHistory(files);
@@ -154,36 +138,21 @@ export default function CompleteRequestComponent() {
     setUploadedFiles([]);
   };
 
-  const uploadContract = () => {
-    if (attachments) {
-      return uploadAttachment(
-        onboardingId as string,
-        onboardingAttachments,
-        uploadedFiles[0],
-        setLoading,
-        setOutcomeContentState,
-        lastFileErrorAttempt,
-        setLastFileErrorAttempt,
-        setOpen,
-        setErrorCode,
-        transcodeErrorCode
-      );
-    } else {
-      return onboardingContractUpload(
-        uploadedFiles[0],
-        setLoading,
-        onboardingId,
-        requestData,
-        addUserFlow,
-        setOutcomeContentState,
-        lastFileErrorAttempt,
-        setLastFileErrorAttempt,
-        setOpen,
-        setErrorCode,
-        transcodeErrorCode
-      );
-    }
-  };
+  const uploadContract = () =>
+    onboardingContractUpload(
+      uploadedFiles[0],
+      setLoading,
+      onboardingId,
+      requestData,
+      addUserFlow,
+      setOutcomeContentState,
+      lastFileErrorAttempt,
+      setLastFileErrorAttempt,
+      setOpen,
+      setErrorCode,
+      transcodeErrorCode,
+      attachments ? 'Addendum' : undefined
+    );
 
   const steps: Array<StepperStep> = [
     {
@@ -191,7 +160,7 @@ export default function CompleteRequestComponent() {
       Component: () =>
         ConfirmRegistrationStep0({
           onboardingId,
-          fileName: onboardingAttachments,
+          fileName: 'Addendum',
           translationKeyValue,
           setLoading,
           forward,
@@ -276,7 +245,6 @@ export default function CompleteRequestComponent() {
         </>,
       ],
     },
-    genericError,
   };
 
   return loading ? (

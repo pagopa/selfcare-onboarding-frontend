@@ -61,20 +61,34 @@ export const onboardingContractUpload = async (
       'GENERIC' | 'INVALID_DOCUMENT' | 'INVALID_SIGN' | 'INVALID_SIGN_FORMAT' | 'ALREADY_ONBOARDED'
     >
   >,
-  transcodeErrorCode: (data: Problem) => keyof typeof customErrors
+  transcodeErrorCode: (data: Problem) => keyof typeof customErrors,
+  attachmentName?: string
   // eslint-disable-next-line sonarjs/cognitive-complexity
 ) => {
-  const requestId = uniqueId('upload-contract-');
-  trackEvent('ONBOARDING_CONTRACT_UPLOAD', { request_id: requestId, party_id: onboardingId });
+  const isAttachment = !!attachmentName;
+  const requestId = uniqueId(isAttachment ? 'upload-attachment-' : 'upload-contract-');
+  trackEvent(isAttachment ? 'ONBOARDING_ATTACHMENT_UPLOAD' : 'ONBOARDING_CONTRACT_UPLOAD', {
+    request_id: requestId,
+    party_id: onboardingId,
+  });
 
   setLoading(true);
   const formData = new FormData();
-  formData.append('contract', file);
+  formData.append(isAttachment ? 'attachment' : 'contract', file);
+
+  const getEndpoint = () => {
+    if (isAttachment) {
+      return 'ONBOARDING_GET_POST_ATTACHMENT';
+    }
+    return addUserFlow ? 'USER_COMPLETE_REGISTRATION' : 'ONBOARDING_COMPLETE_REGISTRATION';
+  };
 
   const uploadDocument = await fetchWithLogs(
     {
-      endpoint: addUserFlow ? 'USER_COMPLETE_REGISTRATION' : 'ONBOARDING_COMPLETE_REGISTRATION',
-      endpointParams: { token: onboardingId },
+      endpoint: getEndpoint(),
+      endpointParams: isAttachment
+        ? { onboardingId, filename: attachmentName }
+        : { token: onboardingId },
     },
     { method: 'POST', data: formData, headers: { 'Content-Type': 'multipart/form-data' } },
     redirectToLogin
@@ -85,7 +99,16 @@ export const onboardingContractUpload = async (
   const outcome = getFetchOutcome(uploadDocument);
 
   if (outcome === 'success') {
-    trackEvent(addUserFlow ? 'ONBOARDING_USER_COMPLETED' : 'ONBOARDING_SUCCESS', {
+    const getSuccessEvent = () => {
+      if (isAttachment) {
+        return 'ONBOARDING_ATTACHMENT_SUCCESS';
+      } else if (addUserFlow) {
+        return 'ONBOARDING_USER_COMPLETED';
+      } else {
+        return 'ONBOARDING_SUCCESS';
+      }
+    };
+    trackEvent(getSuccessEvent(), {
       request_id: requestId,
       party_id: onboardingId,
       product_id: requestData?.productId,
@@ -123,13 +146,19 @@ export const onboardingContractUpload = async (
       (uploadDocument as AxiosError<Problem>).response?.data
     ) {
       setOpen(true);
-      trackEvent('ONBOARDING_CONTRACT_FAILURE', { request_id: requestId, party_id: onboardingId });
+      trackEvent(isAttachment ? 'ONBOARDING_ATTACHMENT_FAILURE' : 'ONBOARDING_CONTRACT_FAILURE', {
+        request_id: requestId,
+        party_id: onboardingId,
+      });
       setErrorCode(
         transcodeErrorCode((uploadDocument as AxiosError<Problem>).response?.data as Problem)
       );
     } else {
       setOpen(true);
-      trackEvent('ONBOARDING_FAILURE', { request_id: requestId, party_id: onboardingId });
+      trackEvent(isAttachment ? 'ONBOARDING_ATTACHMENT_FAILURE' : 'ONBOARDING_FAILURE', {
+        request_id: requestId,
+        party_id: onboardingId,
+      });
       setErrorCode('GENERIC');
     }
   }
