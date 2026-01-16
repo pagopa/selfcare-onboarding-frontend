@@ -32,7 +32,8 @@ export default {
         },
         attachments: {
           title: 'Scarica l’addendum',
-          description: 'Per adeguarti alla nuova normativa, scarica l’addendum e provvedi alla  <1 />firma digitale <2>formato p7m</2>.',
+          description:
+            'Per adeguarti alla nuova normativa, scarica l’addendum e provvedi alla  <1 />firma digitale <2>formato p7m</2>.',
           downloadContract: 'Scarica il documento',
         },
         user: {
@@ -76,6 +77,15 @@ export default {
           link: 'carica il file',
         },
         continue: 'Continua',
+      },
+      attachments: {
+        title: 'Carica il documento',
+        description:
+          'Carica l’addendum firmato digitalmente in p7m',
+        dropArea: {
+          title: 'Trascina qui il documento firmato oppure',
+          link: 'selezionalo dal tuo computer',
+        },
       },
       continue: 'Continua',
       error: {
@@ -409,6 +419,11 @@ export default {
         user: {
           title: 'Richiesta completata',
           description: `Da questo momento gli Amministratori indicati possono <1 />accedere all’Area Riservata.`,
+        },
+        attachments: {
+          title: 'Caricamento completato',
+          description: 'Hai sottoscritto correttamente al nuovo addendum DORA.',
+          link: 'Vai alla sezione documenti',
         },
         backHome: 'Torna alla home',
       },

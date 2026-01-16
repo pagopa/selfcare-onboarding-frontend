@@ -171,6 +171,7 @@ export default function CompleteRequestComponent() {
       Component: () =>
         ConfirmRegistrationStep1(
           addUserFlow,
+          translationKeyValue,
           {
             forward: () => uploadContract(),
           },
@@ -233,7 +234,11 @@ export default function CompleteRequestComponent() {
       title: '',
       description: [
         <>
-          <CompleteRequestSuccessPage addUserFlow={addUserFlow} />
+          <CompleteRequestSuccessPage
+            addUserFlow={addUserFlow}
+            translationKeyValue={translationKeyValue}
+            onboardingId={onboardingId}
+          />
         </>,
       ],
     },
