@@ -102,6 +102,9 @@ export const API = {
   ONBOARDING_GET_POST_ATTACHMENT: {
     URL: ENV.URL_API.ONBOARDING_V2 + '/v2/tokens/{{onboardingId}}/attachment?name={{filename}}',
   },
+  ONBOARDING_GET_INFO: {
+    URL: ENV.URL_API.ONBOARDING_V2 + '/v2/tokens/{{onboardingId}}',
+  },
 
   // institutions present on self care db
   ONBOARDING_GET_USER_PARTIES: {

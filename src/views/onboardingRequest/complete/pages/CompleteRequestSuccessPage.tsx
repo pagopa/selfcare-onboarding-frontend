@@ -7,13 +7,13 @@ import { ENV } from '../../../../utils/env';
 type Props = {
   addUserFlow: boolean;
   translationKeyValue: string;
-  onboardingId?: string;
+  institutionId?: string;
 };
 
 export default function CompleteRequestSuccessPage({
   addUserFlow,
   translationKeyValue,
-  onboardingId,
+  institutionId,
 }: Props) {
   const { t } = useTranslation();
 
@@ -50,14 +50,14 @@ export default function CompleteRequestSuccessPage({
         buttonLabel={t('completeRegistration.outcomeContent.success.backHome')}
         onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
       />
-      {translationKeyValue === 'attachments' && onboardingId && (
+      {translationKeyValue === 'attachments' && institutionId && (
         <Typography align="center">
           <Link
             component="button"
             variant='sidenav'
             underline='none'
             onClick={() =>
-              window.location.assign(`${ENV.URL_FE.DASHBOARD}/${onboardingId}/documents`)
+              window.location.assign(`${ENV.URL_FE.DASHBOARD}/${institutionId}/documents`)
             }
           >
             {t('completeRegistration.outcomeContent.success.attachments.link')}

@@ -1,6 +1,6 @@
 import { AxiosError, AxiosResponse } from 'axios';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
-import React from 'react';
+import React, { Dispatch, SetStateAction } from 'react';
 import { fetchWithLogs } from '../lib/api-utils';
 import { OnboardingRequestData, Problem, RequestOutcomeComplete } from '../../types';
 import { redirectToLogin } from '../utils/unloadEvent-utils';
@@ -68,4 +68,32 @@ export const verifyRequest = async ({
     });
     setOutcomeContentState('notFound');
   }
+};
+
+export const getOnboardingInfo = async (
+  onboardingId: string,
+  setInstitutionId: Dispatch<SetStateAction<any>>,
+  setLoading: Dispatch<SetStateAction<boolean>>,
+  setOutcomeContentState: Dispatch<SetStateAction<RequestOutcomeComplete | null>>
+) => {
+  setLoading(true);
+  const getOnboarding = await fetchWithLogs(
+    {
+      endpoint: 'ONBOARDING_GET_INFO',
+      endpointParams: { onboardingId },
+    },
+    {
+      method: 'GET',
+    },
+    redirectToLogin
+  );
+
+  const outcome = getFetchOutcome(getOnboarding);
+  if (outcome === 'success') {
+    setInstitutionId((getOnboarding as AxiosResponse).data.institutionInfo.id);
+    setOutcomeContentState('success');
+  } else {
+    setOutcomeContentState('error');
+  }
+  setLoading(false);
 };
