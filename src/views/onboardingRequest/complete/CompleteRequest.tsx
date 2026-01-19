@@ -18,7 +18,7 @@ import { MessageNoAction } from '../../../components/shared/MessageNoAction';
 import { useHistoryState } from '../../../hooks/useHistoryState';
 import { HeaderContext, UserContext } from '../../../lib/context';
 import { onboardingContractUpload } from '../../../services/requestStatusServices';
-import { verifyRequest } from '../../../services/tokenServices';
+import { getOnboardingInfo, verifyRequest } from '../../../services/tokenServices';
 import { customErrors } from '../../../utils/constants';
 import { getRequestJwt } from '../../../utils/getRequestJwt';
 import AlreadyCompletedRequest from '../status/AlreadyCompletedPage';
@@ -77,6 +77,8 @@ export default function CompleteRequestComponent() {
     []
   );
   const [requestData, setRequestData] = useState<OnboardingRequestData>();
+  const [institutionId, setInstitutionId] = useState<string>();
+  const [attachmentUploadSuccess, setAttachmentUploadSuccess] = useState<boolean>(false);
   const addUserFlow = new URLSearchParams(window.location.search).get('add-user') === 'true';
   const attachments = window.location.pathname.includes('/attachments');
   const translationKeyValue = addUserFlow ? 'user' : attachments ? 'attachments' : 'product';
@@ -103,6 +105,17 @@ export default function CompleteRequestComponent() {
       }).finally(() => setLoading(false));
     }
   }, [/* attachments, */ onboardingId]);
+
+  useEffect(() => {
+    if (attachmentUploadSuccess && onboardingId) {
+      void getOnboardingInfo(
+        onboardingId,
+        setInstitutionId,
+        setLoading,
+        setOutcomeContentState
+      );
+    }
+  }, [attachmentUploadSuccess]);
 
   const setUploadedFilesAndWriteHistory = (files: Array<File>) => {
     setUploadedFilesHistory(files);
@@ -151,7 +164,8 @@ export default function CompleteRequestComponent() {
       setOpen,
       setErrorCode,
       transcodeErrorCode,
-      attachments ? 'Addendum' : undefined
+      attachments ? 'Addendum' : undefined,
+      () => setAttachmentUploadSuccess(true)
     );
 
   const steps: Array<StepperStep> = [
@@ -237,7 +251,7 @@ export default function CompleteRequestComponent() {
           <CompleteRequestSuccessPage
             addUserFlow={addUserFlow}
             translationKeyValue={translationKeyValue}
-            onboardingId={onboardingId}
+            institutionId={institutionId}
           />
         </>,
       ],

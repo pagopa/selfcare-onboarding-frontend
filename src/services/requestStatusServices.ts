@@ -62,7 +62,8 @@ export const onboardingContractUpload = async (
     >
   >,
   transcodeErrorCode: (data: Problem) => keyof typeof customErrors,
-  attachmentName?: string
+  attachmentName?: string,
+  onAttachmentSuccess?: () => void
   // eslint-disable-next-line sonarjs/cognitive-complexity
 ) => {
   const isAttachment = !!attachmentName;
@@ -114,7 +115,11 @@ export const onboardingContractUpload = async (
       product_id: requestData?.productId,
       form: addUserFlow ? 'onboarding/dashboard' : undefined,
     });
-    setOutcomeContentState(outcome);
+    if (isAttachment && onAttachmentSuccess) {
+      onAttachmentSuccess();
+    } else {
+      setOutcomeContentState(outcome);
+    }
   }
 
   if (outcome === 'error') {
