@@ -1,13 +1,20 @@
 import { IllusCompleted } from '@pagopa/mui-italia';
 import { Trans, useTranslation } from 'react-i18next';
 import { EndingPage } from '@pagopa/selfcare-common-frontend/lib';
+import { Typography, Link } from '@mui/material';
 import { ENV } from '../../../../utils/env';
 
 type Props = {
   addUserFlow: boolean;
+  translationKeyValue: string;
+  onboardingId?: string;
 };
 
-export default function CompleteRequestSuccessPage({ addUserFlow }: Props) {
+export default function CompleteRequestSuccessPage({
+  addUserFlow,
+  translationKeyValue,
+  onboardingId,
+}: Props) {
   const { t } = useTranslation();
 
   return (
@@ -20,14 +27,18 @@ export default function CompleteRequestSuccessPage({ addUserFlow }: Props) {
         title={
           addUserFlow
             ? t('completeRegistration.outcomeContent.success.user.title')
-            : t('completeRegistration.outcomeContent.success.product.title')
+            : translationKeyValue === 'attachments'
+              ? t('completeRegistration.outcomeContent.success.attachments.title')
+              : t('completeRegistration.outcomeContent.success.product.title')
         }
         description={
           <Trans
             i18nKey={
               addUserFlow
                 ? 'completeRegistration.outcomeContent.success.user.description'
-                : 'completeRegistration.outcomeContent.success.product.description'
+                : translationKeyValue === 'attachments'
+                  ? 'completeRegistration.outcomeContent.success.attachments.description'
+                  : 'completeRegistration.outcomeContent.success.product.description'
             }
             components={{ 1: <br />, 3: <br /> }}
           >
@@ -39,6 +50,20 @@ export default function CompleteRequestSuccessPage({ addUserFlow }: Props) {
         buttonLabel={t('completeRegistration.outcomeContent.success.backHome')}
         onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
       />
+      {translationKeyValue === 'attachments' && onboardingId && (
+        <Typography align="center">
+          <Link
+            component="button"
+            variant='sidenav'
+            underline='none'
+            onClick={() =>
+              window.location.assign(`${ENV.URL_FE.DASHBOARD}/${onboardingId}/documents`)
+            }
+          >
+            {t('completeRegistration.outcomeContent.success.attachments.link')}
+          </Link>
+        </Typography>
+      )}
     </>
   );
 }

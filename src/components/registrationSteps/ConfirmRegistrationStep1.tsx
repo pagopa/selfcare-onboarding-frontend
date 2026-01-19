@@ -9,6 +9,7 @@ import { FileUploader } from '../fileUpload/FileUploader';
 
 export function ConfirmRegistrationStep1(
   addUserFlow: boolean,
+  translationKeyValue: string,
   { forward }: StepperStepComponentProps,
   { loading }: any,
   { uploadedFiles, setUploadedFiles }: any
@@ -49,7 +50,9 @@ export function ConfirmRegistrationStep1(
         <Typography color={theme.palette.text.primary} align="center" variant="h4">
           {addUserFlow
             ? t('confirmOnboarding.upload.user.title')
-            : t('confirmOnboarding.upload.product.title')}
+            : translationKeyValue === 'attachments'
+              ? t('confirmOnboarding.upload.attachments.title')
+              : t('confirmOnboarding.upload.product.title')}
         </Typography>
       </Grid>
       <Grid item xs={11} pb={4}>
@@ -58,7 +61,9 @@ export function ConfirmRegistrationStep1(
             i18nKey={
               addUserFlow
                 ? 'confirmOnboarding.upload.user.description'
-                : 'confirmOnboarding.upload.product.description'
+                : translationKeyValue === 'attachments'
+                  ? 'confirmOnboarding.upload.attachments.description'
+                  : 'confirmOnboarding.upload.product.description'
             }
             components={{ 1: <br /> }}
           >
@@ -73,12 +78,16 @@ export function ConfirmRegistrationStep1(
           title={
             addUserFlow
               ? t('confirmOnboarding.upload.user.dropArea.title')
-              : t('confirmOnboarding.upload.product.dropArea.title')
+              : translationKeyValue === 'attachments'
+                ? t('confirmOnboarding.upload.attachments.dropArea.title')
+                : t('confirmOnboarding.upload.product.dropArea.title')
           }
           descriptionLink={
             addUserFlow
               ? t('confirmOnboarding.upload.user.dropArea.link')
-              : t('confirmOnboarding.upload.product.dropArea.link')
+              : translationKeyValue === 'attachments'
+                ? t('confirmOnboarding.upload.attachments.dropArea.link')
+                : t('confirmOnboarding.upload.product.dropArea.link')
           }
           uploadedFiles={uploadedFiles}
           deleteUploadedFiles={deleteUploadedFiles}

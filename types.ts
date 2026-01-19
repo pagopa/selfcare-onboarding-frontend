@@ -100,7 +100,7 @@ export type ProductStatus = 'ACTIVE' | 'INACTIVE' | 'PHASE_OUT' | 'TESTING';
 export interface UserOnCreate extends User {
   from?: string; // This is temporary, part of the API shared with self-care
   role?: PartyRole;
-};
+}
 
 export type AlertDialogActions = {
   setDialogTitle: (t: string) => void;
@@ -253,7 +253,18 @@ export type InstitutionOnboardingInfoResource = {
   institution: InstitutionData;
 };
 
-export type InstitutionType = 'PA' | 'GSP' | 'SCP' | 'PT' | 'PSP' | 'SA' | 'AS' | 'PRV' | 'GPU' | 'SCEC' | 'PRV_PF';
+export type InstitutionType =
+  | 'PA'
+  | 'GSP'
+  | 'SCP'
+  | 'PT'
+  | 'PSP'
+  | 'SA'
+  | 'AS'
+  | 'PRV'
+  | 'GPU'
+  | 'SCEC'
+  | 'PRV_PF';
 
 export type ANACParty = {
   description: string;
