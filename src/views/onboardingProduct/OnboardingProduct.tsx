@@ -183,6 +183,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
   useEffect(() => {
     if (institutionTypeByUrl === 'PT' && productId === PRODUCT_IDS.PAGOPA) {
       forwardWithInstitutionType('PT');
+      setOrigin('SELC');
     }
   }, [institutionTypeByUrl]);
 
