@@ -95,9 +95,11 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
   const requestIdRef = useRef<string>();
   const { t } = useTranslation();
   const [onExitAction, setOnExitAction] = useState<(() => void) | undefined>();
-  const productAvoidStep = [PRODUCT_IDS.SEND, PRODUCT_IDS.IDPAY, PRODUCT_IDS.IDPAY_MERCHANT].includes(
-    selectedProduct?.id ?? ''
-  );
+  const productAvoidStep = [
+    PRODUCT_IDS.SEND,
+    PRODUCT_IDS.IDPAY,
+    PRODUCT_IDS.IDPAY_MERCHANT,
+  ].includes(selectedProduct?.id ?? '');
   const fromDashboard =
     window.location.search.indexOf(`partyExternalId=${externalInstitutionId}`) > -1;
   const subunitTypeByQuery =
@@ -427,7 +429,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           selectFilterCategories,
           setInstitutionType,
           forward: forwardWithDataAndInstitution,
-          addUser
+          addUser,
         }),
     },
     {
