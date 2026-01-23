@@ -6,6 +6,15 @@ import { Endpoint, ApiEndpointKey, PartyData, Product, InstitutionType } from '.
 import { AooData } from '../model/AooData';
 import { UoData } from '../model/UoModel';
 import { PRODUCT_IDS } from '../utils/constants';
+import {
+  isContractingAuthority,
+  isIdpayMerchantProduct,
+  isInsuranceCompany,
+  isInteropOrIdpayMerchantProduct,
+  isInteropProduct,
+  isPublicServiceCompany,
+  shouldSkipCategoriesFilter,
+} from '../utils/institutionTypeUtils';
 import config from '../utils/config.json';
 
 const validateIdpayMerchantInstitution = (
@@ -14,15 +23,18 @@ const validateIdpayMerchantInstitution = (
   filterCategories: string | { atecoCodes: string; allowedInstitutions: string } | undefined,
   setDisabled: Dispatch<SetStateAction<boolean>>,
   setIsPresentInAtecoWhiteList: (value: boolean) => void,
-  setMerchantSearchResult: Dispatch<SetStateAction<PartyData | undefined>> | undefined,
+  setMerchantSearchResult: Dispatch<SetStateAction<PartyData | undefined>> | undefined
 ) => {
   setMerchantSearchResult?.(response);
 
-  const merchantDetails = (filterCategories as { atecoCodes: string; allowedInstitutions: string }) ||
+  const merchantDetails =
+    (filterCategories as { atecoCodes: string; allowedInstitutions: string }) ||
     config.product['prod-idpay-merchant']?.merchantDetails;
 
-  const allowedInstitutionsStr = merchantDetails?.allowedInstitutions ||
-    config.product['prod-idpay-merchant']?.merchantDetails?.allowedInstitution || '';
+  const allowedInstitutionsStr =
+    merchantDetails?.allowedInstitutions ||
+    config.product['prod-idpay-merchant']?.merchantDetails?.allowedInstitution ||
+    '';
 
   const allowedInstitutions = allowedInstitutionsStr
     ? allowedInstitutionsStr.split(',').filter(Boolean)
@@ -31,16 +43,14 @@ const validateIdpayMerchantInstitution = (
   if (disabledStatusCompany) {
     setDisabled(true);
     setIsPresentInAtecoWhiteList?.(false);
-  }
-  else if (
+  } else if (
     response?.businessTaxId &&
     allowedInstitutions.length > 0 &&
     allowedInstitutions.includes(response.businessTaxId)
   ) {
     setIsPresentInAtecoWhiteList?.(true);
     setDisabled(false);
-  }
-  else if (
+  } else if (
     merchantDetails?.atecoCodes &&
     response?.atecoCodes &&
     Array.isArray(response.atecoCodes)
@@ -51,8 +61,7 @@ const validateIdpayMerchantInstitution = (
     );
     setIsPresentInAtecoWhiteList?.(hasMatchingCode);
     setDisabled(!hasMatchingCode);
-  }
-  else {
+  } else {
     setIsPresentInAtecoWhiteList?.(false);
     setDisabled(true);
   }
@@ -145,6 +154,38 @@ export const fetchInstitutionsByName = async (
   }
 };
 
+const fetchInstitutionByTaxCodeOnInfocamere = async (
+  productId: string | undefined,
+  query: string,
+  filterCategories: { atecoCodes: string; allowedInstitutions: string } | string | undefined,
+  setCfResult: Dispatch<SetStateAction<PartyData | undefined>>,
+  setRequiredLogin: Dispatch<SetStateAction<boolean>>
+) => {
+  const scpResearchParams = {
+    categories: isInteropOrIdpayMerchantProduct(productId)
+      ? undefined
+      : (filterCategories as string),
+  };
+
+  const searchResponse = await fetchWithLogs(
+    { endpoint: 'ONBOARDING_GET_PARTY_BY_CF_FROM_INFOCAMERE', endpointParams: { id: query } },
+    {
+      method: 'GET',
+      params: scpResearchParams,
+    },
+    () => setRequiredLogin(true)
+  );
+
+  const outcome = getFetchOutcome(searchResponse);
+
+  if (outcome === 'success') {
+    const response = (searchResponse as AxiosResponse).data;
+    setCfResult(response);
+  } else {
+    setCfResult(undefined);
+  }
+};
+
 export const fetchInstitutionByTaxCode = async (
   addUser: boolean,
   endpoint: ApiEndpointKey,
@@ -164,11 +205,9 @@ export const fetchInstitutionByTaxCode = async (
   const updatedParams = {
     ...params,
     taxCode: addUser ? query : undefined,
-    categories:
-      (productId === 'prod-interop' || productId === 'prod-idpay-merchant') &&
-      (institutionType === 'SCP' || institutionType === 'PRV')
-        ? undefined
-        : (filterCategories as string),
+    categories: shouldSkipCategoriesFilter(institutionType as InstitutionType, productId)
+      ? undefined
+      : (filterCategories as string),
   };
 
   const searchResponse = await fetchWithLogs(
@@ -186,7 +225,7 @@ export const fetchInstitutionByTaxCode = async (
     const response = (searchResponse as AxiosResponse).data;
     setCfResult(response);
 
-    if (productId === 'prod-idpay-merchant') {
+    if (isIdpayMerchantProduct(productId)) {
       validateIdpayMerchantInstitution(
         response,
         disabledStatusCompany,
@@ -199,9 +238,19 @@ export const fetchInstitutionByTaxCode = async (
   } else if ((searchResponse as AxiosError).response?.status === 404) {
     setCfResult(undefined);
 
-    if (productId === 'prod-idpay-merchant') {
+    if (isIdpayMerchantProduct(productId)) {
       setIsPresentInAtecoWhiteList?.(false);
       setMerchantSearchResult?.(undefined);
+    }
+
+    if (isPublicServiceCompany(institutionType as InstitutionType) && isInteropProduct(productId)) {
+      await fetchInstitutionByTaxCodeOnInfocamere(
+        productId,
+        query,
+        filterCategories,
+        setCfResult,
+        setRequiredLogin
+      );
     }
   }
 };
@@ -255,7 +304,7 @@ export const handleSearchByReaCode = async (
     const response = (searchResponse as AxiosResponse).data;
     setCfResult(response);
 
-    if (product?.id === PRODUCT_IDS.IDPAY_MERCHANT) {
+    if (isIdpayMerchantProduct(product?.id)) {
       validateIdpayMerchantInstitution(
         response,
         disabledStatusCompany,
@@ -267,7 +316,7 @@ export const handleSearchByReaCode = async (
     }
   } else if ((searchResponse as AxiosError).response?.status === 404) {
     setCfResult(undefined);
-    if (product?.id === PRODUCT_IDS.IDPAY_MERCHANT) {
+    if (isIdpayMerchantProduct(product?.id)) {
       setMerchantSearchResult?.(undefined);
       setIsPresentInAtecoWhiteList?.(false);
     }
@@ -411,7 +460,7 @@ export const contractingInsuranceFromTaxId = async (
       endpoint,
       endpointParams: addUser
         ? undefined
-        : institutionType === 'SA' || institutionType === 'AS'
+        : isContractingAuthority(institutionType) || isInsuranceCompany(institutionType)
           ? { taxId: query }
           : { code: query },
     },

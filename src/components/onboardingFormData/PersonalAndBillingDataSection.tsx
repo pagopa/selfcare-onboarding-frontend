@@ -23,7 +23,27 @@ import {
   getNationalCountries,
 } from '../../services/geoTaxonomyServices';
 import { getUoInfoFromRecipientCode } from '../../services/institutionServices';
-import { PRODUCT_IDS, requiredError } from '../../utils/constants';
+import { requiredError } from '../../utils/constants';
+import {
+  isPrivateOrPersonInstitution,
+  isPrivateInstitution,
+  isPagoPaProduct,
+  isPublicServiceCompany,
+  isGpuInstitution,
+  isInteropProduct,
+  isIdpayMerchantProduct,
+  isPublicAdministration,
+  isIoSignProduct,
+  isFideiussioniProduct,
+  isIoProduct,
+  isFideiussioniGuaranteeProduct,
+  isContractingAuthority,
+  isInsuranceCompany,
+  isInformationCompany,
+  isPrivateMerchantInstitution,
+  isPaymentServiceProvider,
+  isPdndPrivate,
+} from '../../utils/institutionTypeUtils';
 import { StepBillingDataHistoryState } from '../steps/StepOnboardingFormData';
 import NumberDecimalFormat from './NumberDecimalFormat';
 
@@ -148,7 +168,7 @@ export default function PersonalAndBillingDataSection({
   }, [formik.values.shareCapital]);
 
   useEffect(() => {
-    if (assistanceContacts?.supportEmail && productId === PRODUCT_IDS.IO_SIGN) {
+    if (assistanceContacts?.supportEmail && isIoSignProduct(productId)) {
       formik.setFieldValue('supportEmail', assistanceContacts.supportEmail);
     }
   }, [assistanceContacts]);
@@ -353,18 +373,18 @@ export default function PersonalAndBillingDataSection({
                 t('onboardingFormData.billingDataSection.businessName'),
                 600,
                 controllers.isDisabled ||
-                  controllers.isContractingAuthority ||
-                  controllers.isInsuranceCompany
+                  isContractingAuthority(institutionType) ||
+                  isInsuranceCompany(institutionType)
                   ? theme.palette.text.disabled
                   : theme.palette.text.primary
               )}
               disabled={
                 controllers.isDisabled ||
-                controllers.isContractingAuthority ||
-                controllers.isInsuranceCompany ||
-                (controllers.isInformationCompany && onboardingFormData?.businessName) ||
-                ((institutionType === 'PRV' || institutionType === 'PRV_PF') &&
-                  productId !== PRODUCT_IDS.PAGOPA)
+                isContractingAuthority(institutionType) ||
+                isInsuranceCompany(institutionType) ||
+                (isInformationCompany(formik.values.origin, institutionType, productId) &&
+                  onboardingFormData?.businessName) ||
+                (isPrivateOrPersonInstitution(institutionType) && !isPagoPaProduct(productId))
               }
             />
           </Grid>
@@ -377,12 +397,16 @@ export default function PersonalAndBillingDataSection({
                 'registeredOffice',
                 t('onboardingFormData.billingDataSection.fullLegalAddress'),
                 600,
-                !controllers.isAooUo && controllers.isDisabled && !controllers.isInsuranceCompany
+                !controllers.isAooUo &&
+                  controllers.isDisabled &&
+                  !isInsuranceCompany(institutionType)
                   ? theme.palette.text.disabled
                   : theme.palette.text.primary
               )}
               disabled={
-                !controllers.isAooUo && controllers.isDisabled && !controllers.isInsuranceCompany
+                !controllers.isAooUo &&
+                controllers.isDisabled &&
+                !isInsuranceCompany(institutionType)
               }
             />
           </Grid>
@@ -395,12 +419,16 @@ export default function PersonalAndBillingDataSection({
                   t('onboardingFormData.billingDataSection.zipCode'),
                   600,
                   16,
-                  !controllers.isAooUo && controllers.isDisabled && !controllers.isInsuranceCompany
+                  !controllers.isAooUo &&
+                    controllers.isDisabled &&
+                    !isInsuranceCompany(institutionType)
                     ? theme.palette.text.disabled
                     : theme.palette.text.primary
                 )}
                 disabled={
-                  !controllers.isAooUo && controllers.isDisabled && !controllers.isInsuranceCompany
+                  !controllers.isAooUo &&
+                  controllers.isDisabled &&
+                  !isInsuranceCompany(institutionType)
                 }
               />
             </Grid>
@@ -408,7 +436,7 @@ export default function PersonalAndBillingDataSection({
         </Grid>
         <Grid container spacing={2} pl={3} pt={3}>
           <Grid item xs={7}>
-            {controllers.isInsuranceCompany && controllers.isForeignInsurance ? (
+            {isInsuranceCompany(institutionType) && controllers.isForeignInsurance ? (
               <CustomTextField
                 {...baseTextFieldProps(
                   'city',
@@ -507,7 +535,7 @@ export default function PersonalAndBillingDataSection({
             )}
           </Grid>
           <Grid item xs={5}>
-            {controllers.isInsuranceCompany && controllers.isForeignInsurance ? (
+            {isInsuranceCompany(institutionType) && controllers.isForeignInsurance ? (
               <Autocomplete
                 id="country-select"
                 onInput={(e: React.ChangeEvent<HTMLInputElement>) => {
@@ -585,22 +613,22 @@ export default function PersonalAndBillingDataSection({
               t('onboardingFormData.billingDataSection.digitalAddress'),
               600,
               controllers.isDisabled ||
-                controllers.isContractingAuthority ||
-                controllers.isInsuranceCompany
+                isContractingAuthority(institutionType) ||
+                isInsuranceCompany(institutionType)
                 ? theme.palette.text.disabled
                 : theme.palette.text.primary
             )}
             disabled={
               controllers.isDisabled ||
-              controllers.isContractingAuthority ||
-              controllers.isInsuranceCompany ||
-              (controllers.isInformationCompany && onboardingFormData?.digitalAddress) ||
-              ((institutionType === 'PRV' || institutionType === 'PRV_PF') &&
-                productId !== PRODUCT_IDS.PAGOPA)
+              isContractingAuthority(institutionType) ||
+              isInsuranceCompany(institutionType) ||
+              (isInformationCompany(formik.values.origin, institutionType, productId) &&
+                onboardingFormData?.digitalAddress) ||
+              (isPrivateOrPersonInstitution(institutionType) && !isPagoPaProduct(productId))
             }
           />
         </Grid>
-        {(!controllers.isInsuranceCompany ||
+        {(!isInsuranceCompany(institutionType) ||
           (onboardingFormData?.taxCode && onboardingFormData?.taxCode !== '')) && (
           <Grid item xs={12}>
             <CustomTextField
@@ -611,18 +639,18 @@ export default function PersonalAndBillingDataSection({
                   : t('onboardingFormData.billingDataSection.taxCode'),
                 600,
                 controllers.isDisabled ||
-                  controllers.isContractingAuthority ||
-                  controllers.isInsuranceCompany
+                  isContractingAuthority(institutionType) ||
+                  isInsuranceCompany(institutionType)
                   ? theme.palette.text.disabled
                   : theme.palette.text.primary
               )}
               disabled={
                 controllers.isDisabled ||
-                controllers.isContractingAuthority ||
-                controllers.isInsuranceCompany ||
-                (controllers.isInformationCompany && onboardingFormData?.taxCode) ||
-                ((institutionType === 'PRV' || institutionType === 'PRV_PF') &&
-                  productId !== PRODUCT_IDS.PAGOPA)
+                isContractingAuthority(institutionType) ||
+                isInsuranceCompany(institutionType) ||
+                (isInformationCompany(formik.values.origin, institutionType, productId) &&
+                  onboardingFormData?.taxCode) ||
+                (isPrivateOrPersonInstitution(institutionType) && !isPagoPaProduct(productId))
               }
               inputProps={{
                 maxLength: 11,
@@ -654,15 +682,15 @@ export default function PersonalAndBillingDataSection({
             mb={
               !formik.values.hasVatnumber &&
               controllers.isInvoiceable &&
-              controllers.isInsuranceCompany
+              isInsuranceCompany(institutionType)
                 ? -3
                 : 0
             }
           >
             {formik.values.hasVatnumber &&
-              (!controllers.isInsuranceCompany ||
+              (!isInsuranceCompany(institutionType) ||
                 (onboardingFormData?.taxCode && onboardingFormData?.taxCode !== '')) &&
-              !controllers.isPrivateMerchant && (
+              !isPrivateMerchantInstitution(institutionType) && (
                 <Grid item>
                   <Box display="flex" alignItems="center">
                     <Checkbox
@@ -687,9 +715,9 @@ export default function PersonalAndBillingDataSection({
                   </Box>
                 </Grid>
               )}
-            {productId !== PRODUCT_IDS.FD &&
-              productId !== PRODUCT_IDS.FD_GARANTITO &&
-              !controllers.isPrivateMerchant && (
+            {!isFideiussioniProduct(productId) &&
+              !isFideiussioniGuaranteeProduct(productId) &&
+              !isPrivateMerchantInstitution(institutionType) && (
                 <Grid item>
                   <Box
                     display="flex"
@@ -747,7 +775,7 @@ export default function PersonalAndBillingDataSection({
                 disabled={
                   stepHistoryState.isTaxCodeEquals2PIVA ||
                   controllers.isPremium ||
-                  controllers.isPrivateMerchant
+                  isPrivateMerchantInstitution(institutionType)
                 }
                 onClick={() => setShrinkVatNumber(true)}
                 onBlur={() => setShrinkVatNumber(false)}
@@ -759,7 +787,7 @@ export default function PersonalAndBillingDataSection({
                 }}
               />
             )}
-            {controllers.isPaymentServiceProvider && formik.values.hasVatnumber && (
+            {isPaymentServiceProvider(institutionType) && formik.values.hasVatnumber && (
               <Box display="flex" alignItems="center" mt="2px">
                 {/* Checkbox la aprtita IVA è di gruppo */}
                 <Checkbox
@@ -780,13 +808,15 @@ export default function PersonalAndBillingDataSection({
                 </Typography>
               </Box>
             )}
-            {controllers.isInvoiceable && productId !== PRODUCT_IDS.IO && (
+            {controllers.isInvoiceable && !isIoProduct(productId) && (
               <Grid item xs={12} mt={3}>
                 <CustomTextFieldNotched
-                  paddingValue={institutionType === 'PA' || controllers.isAooUo ? '8px' : '0'}
+                  paddingValue={
+                    isPublicAdministration(institutionType) || controllers.isAooUo ? '8px' : '0'
+                  }
                   {...baseTextFieldProps(
                     'recipientCode',
-                    institutionType === 'PA' || controllers.isAooUo
+                    isPublicAdministration(institutionType) || controllers.isAooUo
                       ? t('onboardingFormData.billingDataSection.sdiCodePaAooUo')
                       : t('onboardingFormData.billingDataSection.sdiCode'),
                     600,
@@ -827,13 +857,13 @@ export default function PersonalAndBillingDataSection({
                     color: theme.palette.text.secondary,
                   }}
                 >
-                  {institutionType === 'PA' || controllers.isAooUo
+                  {isPublicAdministration(institutionType) || controllers.isAooUo
                     ? t('onboardingFormData.billingDataSection.sdiCodePaAooUoDescription')
                     : t('onboardingFormData.billingDataSection.recipientCodeDescription')}
                 </Typography>
               </Grid>
             )}
-            {(onboardingFormData?.uoUniqueCode || institutionType === 'PA') &&
+            {(onboardingFormData?.uoUniqueCode || isPublicAdministration(institutionType)) &&
               controllers.isInvoiceable &&
               taxCodeInvoicingVisible && (
                 <Grid item xs={12} mt={3}>
@@ -866,7 +896,7 @@ export default function PersonalAndBillingDataSection({
               )}
           </Typography>
         </Grid>
-        {controllers.isInsuranceCompany && (
+        {isInsuranceCompany(institutionType) && (
           <Grid item xs={12} marginTop={controllers.isForeignInsurance ? -3 : 0}>
             <CustomTextField
               {...baseTextFieldProps(
@@ -880,25 +910,25 @@ export default function PersonalAndBillingDataSection({
             />
           </Grid>
         )}
-        {(controllers.isInformationCompany ||
-          controllers.isContractingAuthority ||
-          ((productId === PRODUCT_IDS.INTEROP ||
-            productId === PRODUCT_IDS.PAGOPA ||
-            productId === PRODUCT_IDS.IDPAY_MERCHANT) &&
-            (institutionType === 'SCP' ||
-              institutionType === 'PRV' ||
-              institutionType === 'PRV_PF' ||
-              institutionType === 'GPU'))) && (
+        {(isInformationCompany(formik.values.origin, institutionType, productId) ||
+          isContractingAuthority(institutionType) ||
+          ((isInteropProduct(productId) ||
+            isPagoPaProduct(productId) ||
+            isIdpayMerchantProduct(productId)) &&
+            (isPublicServiceCompany(institutionType) ||
+              isPrivateInstitution(institutionType) ||
+              isPrivateOrPersonInstitution(institutionType) ||
+              isGpuInstitution(institutionType)))) && (
           <>
             <Grid item xs={12}>
               {/* Luogo di iscrizione al Registro delle Imprese facoltativo per institution Type !== 'PA' e 'PSP */}
               <CustomTextFieldNotched
-                paddingValue={controllers.isContractingAuthority ? '20px' : '24px'}
+                paddingValue={isContractingAuthority(institutionType) ? '20px' : '24px'}
                 {...baseTextFieldProps(
                   'businessRegisterPlace',
-                  controllers.isContractingAuthority ||
-                    controllers.isPdndPrivate ||
-                    controllers.isPrivateMerchant
+                  isContractingAuthority(institutionType) ||
+                    isPdndPrivate(institutionType, productId) ||
+                    isPrivateMerchantInstitution(institutionType)
                     ? t(
                         'onboardingFormData.billingDataSection.informationCompanies.requiredCommercialRegisterNumber'
                       )
@@ -915,7 +945,7 @@ export default function PersonalAndBillingDataSection({
                 placeholder={'RM-123456'}
                 {...baseTextFieldProps(
                   'rea',
-                  institutionType === 'PRV' && productId === PRODUCT_IDS.PAGOPA
+                  isPrivateInstitution(institutionType) && isPagoPaProduct(productId)
                     ? t('onboardingFormData.billingDataSection.informationCompanies.rea')
                     : t('onboardingFormData.billingDataSection.informationCompanies.requiredRea'),
                   600,
@@ -929,7 +959,8 @@ export default function PersonalAndBillingDataSection({
                 name={'shareCapital'}
                 {...baseTextFieldProps(
                   'shareCapital',
-                  controllers.isContractingAuthority || controllers.isPdndPrivate
+                  isContractingAuthority(institutionType) ||
+                    isPdndPrivate(institutionType, productId)
                     ? t(
                         'onboardingFormData.billingDataSection.informationCompanies.requiredShareCapital'
                       )
@@ -948,7 +979,7 @@ export default function PersonalAndBillingDataSection({
                   inputComponent: NumberDecimalFormat,
                 }}
                 helperText={
-                  productId === PRODUCT_IDS.IDPAY_MERCHANT
+                  isIdpayMerchantProduct(productId)
                     ? t(
                         'onboardingFormData.billingDataSection.informationCompanies.shareCapitalHelper'
                       )
@@ -958,7 +989,7 @@ export default function PersonalAndBillingDataSection({
             </Grid>
           </>
         )}
-        {controllers.isPaymentServiceProvider && (
+        {isPaymentServiceProvider(institutionType) && (
           <>
             <Grid item xs={12}>
               {/* n. Iscrizione al Registro delle Imprese */}
@@ -1032,7 +1063,7 @@ export default function PersonalAndBillingDataSection({
           </>
         )}
         {/* indirizzo mail di supporto */}
-        {!institutionAvoidGeotax && productId === PRODUCT_IDS.IO_SIGN && (
+        {!institutionAvoidGeotax && isIoSignProduct(productId) && (
           <Grid item xs={12}>
             <CustomTextFieldNotched
               paddingValue={'14px'}

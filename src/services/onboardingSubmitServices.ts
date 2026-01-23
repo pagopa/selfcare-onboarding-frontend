@@ -18,8 +18,19 @@ import { billingData2billingDataRequest } from '../model/BillingData';
 import { onboardedInstitutionInfo2geographicTaxonomy } from '../model/GeographicTaxonomies';
 import { OnboardingFormData } from '../model/OnboardingFormData';
 import { pspData2pspDataRequest } from '../model/PspData';
-import { PRODUCT_IDS } from '../utils/constants';
 import { ENV } from '../utils/env';
+import {
+  isGlobalServiceProvider,
+  isPagoPaProduct,
+  isPrivateMerchantInstitution,
+  isGpuInstitution,
+  isInteropProduct,
+  isIoSignProduct,
+  isIoProduct,
+  isPaymentServiceProvider,
+  isPublicServiceCompany,
+  isPublicAdministration,
+} from '../utils/institutionTypeUtils';
 
 // Funzione base che esegue la chiamata POST
 const postOnboardingLegals = async (
@@ -68,7 +79,7 @@ export const postOnboardingSubmit = async (
       billingData: billingData2billingDataRequest(onboardingFormData as OnboardingFormData),
       atecoCodes: onboardingFormData?.atecoCodes,
       additionalInformations:
-        institutionType === 'GSP' && selectedProduct?.id === PRODUCT_IDS.PAGOPA
+        isGlobalServiceProvider(institutionType) && isPagoPaProduct(selectedProduct?.id)
           ? {
               agentOfPublicService: additionalInformations?.agentOfPublicService,
               agentOfPublicServiceNote: additionalInformations?.agentOfPublicServiceNote,
@@ -83,26 +94,23 @@ export const postOnboardingSubmit = async (
               otherNote: additionalInformations?.otherNote,
             }
           : undefined,
-      payment:
-        (institutionType === 'PRV' || institutionType === 'PRV_PF') &&
-        selectedProduct?.id === PRODUCT_IDS.IDPAY_MERCHANT
-          ? {
-              holder: onboardingFormData?.holder,
-              iban: onboardingFormData?.iban,
-            }
-          : undefined,
+      payment: isPrivateMerchantInstitution(institutionType, selectedProduct?.id)
+        ? {
+            holder: onboardingFormData?.holder,
+            iban: onboardingFormData?.iban,
+          }
+        : undefined,
       gpuData:
-        institutionType === 'GPU' &&
-        (selectedProduct?.id === PRODUCT_IDS.PAGOPA ||
-          selectedProduct?.id === PRODUCT_IDS.INTEROP ||
-          selectedProduct?.id === PRODUCT_IDS.IO_SIGN ||
-          selectedProduct?.id === PRODUCT_IDS.IO)
+        isGpuInstitution(institutionType) &&
+        (isPagoPaProduct(selectedProduct?.id) ||
+          isInteropProduct(selectedProduct?.id) ||
+          isIoSignProduct(selectedProduct?.id) ||
+          isIoProduct(selectedProduct?.id))
           ? additionalGPUInformations
           : undefined,
-      pspData:
-        institutionType === 'PSP'
-          ? pspData2pspDataRequest(onboardingFormData as OnboardingFormData)
-          : undefined,
+      pspData: isPaymentServiceProvider(institutionType)
+        ? pspData2pspDataRequest(onboardingFormData as OnboardingFormData)
+        : undefined,
       companyInformations:
         onboardingFormData?.businessRegisterPlace ||
         onboardingFormData?.rea ||
@@ -122,7 +130,7 @@ export const postOnboardingSubmit = async (
         : [],
       institutionLocationData: {
         country:
-          institutionType === 'SCP' && productId === PRODUCT_IDS.INTEROP
+          isPublicServiceCompany(institutionType) && isInteropProduct(productId)
             ? 'IT'
             : onboardingFormData?.country,
         county: onboardingFormData?.county,
@@ -132,10 +140,9 @@ export const postOnboardingSubmit = async (
       istatCode: origin !== 'IPA' ? onboardingFormData?.istatCode : undefined,
       users,
       pricingPlan,
-      assistanceContacts:
-        productId === PRODUCT_IDS.IO_SIGN
-          ? { supportEmail: onboardingFormData?.supportEmail }
-          : undefined,
+      assistanceContacts: isIoSignProduct(productId)
+        ? { supportEmail: onboardingFormData?.supportEmail }
+        : undefined,
       productId,
       subunitCode: onboardingFormData?.uoUniqueCode ?? onboardingFormData?.aooUniqueCode,
       subunitType: onboardingFormData?.uoUniqueCode
@@ -219,10 +226,9 @@ export const postSubProductOnboardingSubmit = async (
         email: u.email?.toLowerCase(),
       })),
       billingData: billingData2billingDataRequest(billingData as OnboardingFormData),
-      pspData:
-        institutionType === 'PSP'
-          ? pspData2pspDataRequest(billingData as OnboardingFormData)
-          : undefined,
+      pspData: isPaymentServiceProvider(institutionType)
+        ? pspData2pspDataRequest(billingData as OnboardingFormData)
+        : undefined,
       institutionType,
       pricingPlan,
       origin,
@@ -232,14 +238,13 @@ export const postSubProductOnboardingSubmit = async (
             onboardedInstitutionInfo2geographicTaxonomy(gt)
           )
         : [],
-      companyInformations:
-        institutionType !== 'PA'
-          ? {
-              businessRegisterPlace: billingData?.businessRegisterPlace,
-              rea: billingData?.rea,
-              shareCapital: billingData?.shareCapital,
-            }
-          : undefined,
+      companyInformations: !isPublicAdministration(institutionType)
+        ? {
+            businessRegisterPlace: billingData?.businessRegisterPlace,
+            rea: billingData?.rea,
+            shareCapital: billingData?.shareCapital,
+          }
+        : undefined,
       institutionLocationData: {
         city: billingData?.city,
         country: billingData?.country,

@@ -15,6 +15,22 @@ import { PRODUCT_IDS } from '../../../utils/constants';
 import { renderComponentWithProviders } from '../../../utils/test-utils';
 import PersonalAndBillingDataSection from '../PersonalAndBillingDataSection';
 
+import {
+  isInsuranceCompany,
+  isPaymentServiceProvider,
+  isPublicAdministration,
+  isContractingAuthority,
+  isTechPartner,
+  isIdpayMerchantProduct,
+  isPrivateOrPersonInstitution,
+  isInteropProduct,
+  isPrivateMerchantInstitution,
+  isGlobalServiceProvider,
+  isPublicServiceCompany,
+  isIoProduct,
+  isIoSignProduct,
+} from '../../../utils/institutionTypeUtils';
+
 jest.mock('formik', () => ({
   useFormik: jest.fn(),
 }));
@@ -126,31 +142,23 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
 
         const institutionAvoidGeotax = ['PT', 'SA', 'AS'].includes(institutionType);
 
-        const isInsuranceCompany = institutionType === 'AS';
         const isForeignInsurance = onboardingFormData?.registerType?.includes('Elenco II');
         const isPremium = !!product.parentId;
-        const isPaymentServiceProvider = institutionType === 'PSP';
         const isDisabled =
           isPremium ||
-          (origin === 'IPA' && institutionType !== 'PA' && !isPaymentServiceProvider) ||
-          institutionType === 'PA';
+          (origin === 'IPA' &&
+            !isPublicAdministration(institutionType) &&
+            !isPaymentServiceProvider(institutionType)) ||
+          isPublicAdministration(institutionType);
         const isInvoiceable =
-          institutionType !== 'SA' &&
-          institutionType !== 'PT' &&
-          institutionType !== 'AS' &&
-          productId !== PRODUCT_IDS.INTEROP;
+          !isContractingAuthority(institutionType) &&
+          !isTechPartner(institutionType) &&
+          !isInsuranceCompany(institutionType) &&
+          !isInteropProduct(productId);
         const isInformationCompany =
-          (institutionType === 'GSP' || institutionType === 'SCP') &&
-          (productId === PRODUCT_IDS.IO ||
-            productId === PRODUCT_IDS.IO_SIGN ||
-            productId === PRODUCT_IDS.INTEROP);
-        const isPrivateParty = productId === PRODUCT_IDS.INTEROP && institutionType === 'PRV';
-        const isPdndPrivate = productId === PRODUCT_IDS.INTEROP && institutionType === 'PRV';
-        const isPrivateMerchant =
-          productId === PRODUCT_IDS.IDPAY_MERCHANT &&
-          (institutionType === 'PRV' || institutionType === 'PRV_PF');
+          (isGlobalServiceProvider(institutionType) || isPublicServiceCompany(institutionType)) &&
+          (isIoProduct(productId) || isIoSignProduct(productId) || isInteropProduct(productId));
         const isFromIPA = origin === 'IPA';
-        const isContractingAuthority = institutionType === 'SA';
         const isAooUo = !!(onboardingFormData?.uoUniqueCode ?? onboardingFormData?.aooUniqueCode);
 
         conditionsMap[`${productId}-${institutionType}`] = {
@@ -159,16 +167,19 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
           isInformationCompany,
           isForeignInsurance,
           institutionAvoidGeotax,
-          isInsuranceCompany,
-          isPrivateParty,
-          isPrivateMerchant,
+          isInsuranceCompany: isInsuranceCompany(institutionType),
+          isPrivateParty:
+            isInteropProduct(productId) && isPrivateMerchantInstitution(institutionType),
+          isPrivateMerchantInstitution:
+            isIdpayMerchantProduct(productId) && isPrivateOrPersonInstitution(institutionType),
         };
 
         const mockControllers = {
           isPremium,
-          isPaymentServiceProvider,
-          isPdndPrivate,
-          isPrivateMerchant,
+          isPaymentServiceProvider: isPaymentServiceProvider(institutionType),
+          isPdndPrivate:
+            isInteropProduct(productId) && isPrivateMerchantInstitution(institutionType),
+          isPrivateMerchantInstitution: isPrivateMerchantInstitution(institutionType),
           isInformationCompany,
           isInvoiceable,
           isForeignInsurance,
@@ -177,8 +188,8 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
           isCityEditable: undefined,
           isVatRegistrated: undefined,
           isFromIPA,
-          isContractingAuthority,
-          isInsuranceCompany,
+          isContractingAuthority: isContractingAuthority(institutionType),
+          isInsuranceCompany: isInsuranceCompany(institutionType),
           isAooUo,
         };
 
@@ -214,7 +225,7 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
       isForeignInsurance,
       institutionAvoidGeotax,
       isPrivateParty,
-      isPrivateMerchant,
+      isPrivateMerchantInstitution,
     } = conditionsMap[key];
 
     const centralParty = screen.queryByText('Ente centrale');
@@ -285,7 +296,7 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
 
     expect(pec).toBeInTheDocument();
 
-    if (isInvoiceable && productId !== PRODUCT_IDS.IO) {
+    if (isInvoiceable && !isIoProduct(productId)) {
       expect(sdiCode).toBeInTheDocument();
       fireEvent.change(document.getElementById('recipientCode') as HTMLInputElement, {
         target: { value: 'A1B2C3' },
@@ -321,7 +332,7 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
       expect(shareCapital).not.toBeInTheDocument();
     }
 
-    if (isPrivateMerchant) {
+    if (isPrivateMerchantInstitution) {
       expect(iban).toBeInTheDocument();
       expect(confirmIban).toBeInTheDocument();
       expect(holder).toBeInTheDocument();
@@ -331,7 +342,7 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
       expect(holder).not.toBeInTheDocument();
     }
 
-    if (!institutionAvoidGeotax && productId === PRODUCT_IDS.IO_SIGN) {
+    if (!institutionAvoidGeotax && isIoSignProduct(productId)) {
       expect(visibleCitizenMail).toBeInTheDocument();
     }
 

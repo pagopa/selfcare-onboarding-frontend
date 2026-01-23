@@ -18,6 +18,7 @@ import {
 import { createStore } from '../../../redux/store';
 import { Provider } from 'react-redux';
 import { PRODUCT_IDS } from '../../../utils/constants';
+import { isPagoPaInsights } from '../../../utils/institutionTypeUtils';
 
 jest.setTimeout(20000);
 
@@ -223,7 +224,7 @@ const executeStepBillingDataWithTaxCodeInvoicing = async (subProductId: string) 
   //   });
   // }
 
-  if( subProductId === PRODUCT_IDS.DASHBOARD_PSP) {
+  if (isPagoPaInsights(subProductId)) {
     fireEvent.change(document.getElementById('address') as HTMLElement, {
       target: { value: 'Via Manzoni 12' },
     });

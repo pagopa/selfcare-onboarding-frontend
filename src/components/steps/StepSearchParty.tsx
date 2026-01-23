@@ -31,6 +31,16 @@ import { Autocomplete } from '../autocomplete/Autocomplete';
 import Loading4Api from '../modals/Loading4Api';
 import { LoadingOverlay } from '../modals/LoadingOverlay';
 import { OnboardingStepActions } from '../registrationSteps/OnboardingStepActions';
+import {
+  isContractingAuthority,
+  isGlobalServiceProvider,
+  isInsuranceCompany,
+  isInteropProduct,
+  isPrivateInstitution,
+  isPrivatePersonInstitution,
+  isPublicAdministration,
+  isPublicServiceCompany,
+} from '../../utils/institutionTypeUtils';
 
 type Props = {
   subTitle: string | ReactElement;
@@ -369,7 +379,7 @@ export function StepSearchParty({
                 >
                   {`Prosegui con l’adesione a <strong>{{productName}}</strong> per l’ente selezionato`}
                 </Trans>
-              ) : institutionType === 'SA' ? (
+              ) : isContractingAuthority(institutionType) ? (
                 <Trans
                   i18nKey="onboardingStep1.onboarding.saSubTitle"
                   values={{
@@ -394,7 +404,7 @@ export function StepSearchParty({
                   <5>{{ productName }}</5>
                 `}
                 </Trans>
-              ) : institutionType === 'AS' ? (
+              ) : isInsuranceCompany(institutionType) ? (
                 <Trans
                   i18nKey="onboardingStep1.onboarding.asSubTitle"
                   values={{ productName: product?.title }}
@@ -404,8 +414,8 @@ export function StepSearchParty({
                   inserisci uno dei dati richiesti e cerca l’ente per
                   <1 /> cui vuoi richiedere l’adesione a <3>{{ productName }}.</3>`}
                 </Trans>
-              ) : institutionType === 'SCP' ||
-                (institutionType === 'PRV' && product?.id === 'prod-interop') ? (
+              ) : isPublicServiceCompany(institutionType) ||
+                (isPrivateInstitution(institutionType) && isInteropProduct(product?.id)) ? (
                 <Trans
                   i18nKey="onboardingStep1.onboarding.scpSubtitle"
                   components={{ 3: <br />, 5: <strong /> }}
@@ -490,7 +500,7 @@ export function StepSearchParty({
             </Grid>
           )}
 
-          {product?.id === PRODUCT_IDS.INTEROP && institutionType === 'GSP' && (
+          {isInteropProduct(product?.id) && isGlobalServiceProvider(institutionType) && (
             <Grid container item justifyContent="center">
               <Grid item xs={9}>
                 <Box display="flex" justifyContent="center" mb={5}>
@@ -539,7 +549,7 @@ export function StepSearchParty({
             />
           </Grid>
           {ENV.AGGREGATOR.SHOW_AGGREGATOR &&
-            institutionType === 'PA' &&
+            isPublicAdministration(institutionType) &&
             canAggregateProductList.includes(product?.id ?? '') && (
               <Grid item mt={3}>
                 <FormControlLabel
@@ -556,11 +566,11 @@ export function StepSearchParty({
               </Grid>
             )}
         </Grid>
-        {institutionType !== 'SA' &&
-          institutionType !== 'AS' &&
-          institutionType !== 'SCP' &&
-          institutionType !== 'PRV' &&
-          institutionType !== 'PRV_PF' && (
+        {!isContractingAuthority(institutionType) &&
+          !isInsuranceCompany(institutionType) &&
+          !isPublicServiceCompany(institutionType) &&
+          !isPrivateInstitution(institutionType) &&
+          !isPrivatePersonInstitution(institutionType) && (
             <Grid container item justifyContent="center">
               <Grid item xs={6}>
                 <Box
@@ -577,7 +587,8 @@ export function StepSearchParty({
                     variant="body1"
                     color={theme.palette.text.secondary}
                   >
-                    {institutionType === 'GSP' && noMandatoryIpaProducts(product?.id) ? (
+                    {isGlobalServiceProvider(institutionType) &&
+                    noMandatoryIpaProducts(product?.id) ? (
                       <Trans
                         i18nKey="onboardingStep1.onboarding.gpsDescription"
                         components={{
