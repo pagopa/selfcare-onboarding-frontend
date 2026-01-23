@@ -202,7 +202,6 @@ export const fetchInstitutionByTaxCode = async (
   setRequiredLogin: Dispatch<SetStateAction<boolean>>
   // eslint-disable-next-line sonarjs/cognitive-complexity
 ) => {
-  console.log("endpoint", endpoint);
   const updatedParams = {
     ...params,
     taxCode: addUser ? query : undefined,
@@ -222,8 +221,6 @@ export const fetchInstitutionByTaxCode = async (
 
   const outcome = getFetchOutcome(searchResponse);
 
-  console.log('fetchInstitutionByTaxCode outcome', outcome);
-
   if (outcome === 'success') {
     const response = (searchResponse as AxiosResponse).data;
     setCfResult(response);
@@ -239,7 +236,6 @@ export const fetchInstitutionByTaxCode = async (
       );
     }
   } else if ((searchResponse as AxiosError).response?.status === 404) {
-    console.log('fetchInstitutionByTaxCode 404');
     setCfResult(undefined);
 
     if (isIdpayMerchantProduct(productId)) {
@@ -248,7 +244,6 @@ export const fetchInstitutionByTaxCode = async (
     }
 
     if (isPublicServiceCompany(institutionType as InstitutionType) && isInteropProduct(productId)) {
-      console.log('faccio la chiamata ad infocamere');
       await fetchInstitutionByTaxCodeOnInfocamere(
         productId,
         query,
