@@ -28,7 +28,7 @@ import {
 } from '../../services/geoTaxonomyServices';
 import { handleSearchByTaxCode } from '../../services/institutionServices';
 import { verifyVatNumber } from '../../services/validationServices';
-import { PRODUCT_IDS, requiredError } from '../../utils/constants';
+import { requiredError } from '../../utils/constants';
 import { ENV } from '../../utils/env';
 import { handleGeotaxonomies } from '../../utils/handleGeotaxonomies';
 import { validateFields } from '../../utils/validateFields';
@@ -42,6 +42,7 @@ import { VatNumberErrorModal } from '../onboardingFormData/VatNumberErrorModal';
 import GeoTaxonomySection from '../onboardingFormData/taxonomy/GeoTaxonomySection';
 import UpdateGeotaxonomy from '../onboardingFormData/taxonomy/UpdateGeotaxonomy';
 import { useHistoryState } from '../../hooks/useHistoryState';
+import { isFideiussioniProduct, isInformationCompany, isPagoPaInsights, isPaymentServiceProvider, isPdndPrivate, isPrivateMerchantInstitution, isPublicAdministration } from '../../utils/institutionTypeUtils';
 
 export type StepBillingDataHistoryState = {
   externalInstitutionId: string;
@@ -206,7 +207,7 @@ export default function StepOnboardingFormData({
       subproduct_id: subProductId,
     });
 
-    if (institutionType === 'PA' && initialFormData.taxCode) {
+    if (isPublicAdministration(institutionType) && initialFormData.taxCode) {
       try {
         await handleSearchByTaxCode(
           initialFormData.taxCode,
@@ -291,15 +292,15 @@ export default function StepOnboardingFormData({
         institutionType,
         isVatRegistrated,
         vatVerificationGenericError,
-        controllers.isPaymentServiceProvider,
+        isPaymentServiceProvider(institutionType),
         controllers.isInvoiceable,
         uoSelected,
-        controllers.isInformationCompany,
+        isInformationCompany(origin, institutionType, productId),
         institutionAvoidGeotax,
         controllers.isPremium,
         invalidTaxCodeInvoicing,
-        controllers.isPdndPrivate,
-        controllers.isPrivateMerchant,
+        isPdndPrivate(institutionType, productId),
+        isPrivateMerchantInstitution(institutionType, productId),
         recipientCodeStatus,
         productId
       )
@@ -350,7 +351,7 @@ export default function StepOnboardingFormData({
       formik.values.taxCode === formik.values.vatNumber &&
       formik.values.taxCode &&
       formik.values.taxCode.length > 0 &&
-      !controllers.isPrivateMerchant
+      !isPrivateMerchantInstitution(institutionType)
     ) {
       setStepHistoryState({
         ...stepHistoryState,
@@ -366,7 +367,7 @@ export default function StepOnboardingFormData({
 
   useEffect(() => {
     if (
-      controllers.isProdFideiussioni &&
+      isFideiussioniProduct(productId) &&
       ((formik.values.vatNumber && formik.values.vatNumber.length === 11) ||
         (stepHistoryState.isTaxCodeEquals2PIVA &&
           formik.values.taxCode &&
@@ -388,7 +389,7 @@ export default function StepOnboardingFormData({
 
   useEffect(() => {
     if (
-      (institutionType === 'PA' || aooSelected || uoSelected) &&
+      (isPublicAdministration(institutionType) || aooSelected || uoSelected) &&
       !controllers.isPremium &&
       formik.values.recipientCode &&
       formik.values.recipientCode.length >= 6
@@ -470,7 +471,7 @@ export default function StepOnboardingFormData({
     <Box display="flex" justifyContent="center">
       <Grid container item xs={8} display="flex" justifyContent="center">
         <Heading subtitle={subtitle} />
-        {subProductId === PRODUCT_IDS.DASHBOARD_PSP && (
+        {isPagoPaInsights(subProductId) && (
           <Grid item xs={12} display="flex" justifyContent="center" mb={5}>
             <Alert severity="warning" variant="standard" sx={{ width: '65%' }}>
               <Trans
@@ -501,10 +502,10 @@ export default function StepOnboardingFormData({
           countries={countries}
           setCountries={setCountries}
         />
-        {controllers.isPrivateMerchant && (
+        {isPrivateMerchantInstitution(institutionType, productId) && (
           <IbanSection baseTextFieldProps={baseTextFieldProps} formik={formik} />
         )}
-        {!institutionAvoidGeotax && subProductId !== PRODUCT_IDS.DASHBOARD_PSP && (
+        {!institutionAvoidGeotax && !isPagoPaInsights(subProductId) && (
           <Grid item xs={12} display="flex" justifyContent={'center'}>
             <GeoTaxonomySection
               retrievedTaxonomies={previousGeotaxononomies}
@@ -515,7 +516,7 @@ export default function StepOnboardingFormData({
             />
           </Grid>
         )}
-        {controllers.isPaymentServiceProvider && (
+        {isPaymentServiceProvider(institutionType) && (
           <Grid item xs={12} display="flex" justifyContent={'center'}>
             <DpoSection baseTextFieldProps={baseTextFieldProps} dpoData={formik.values} />
           </Grid>

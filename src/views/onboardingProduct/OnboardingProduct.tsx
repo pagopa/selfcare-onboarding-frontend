@@ -26,7 +26,6 @@ import StepOnboardingData from '../../components/steps/StepOnboardingData';
 import StepOnboardingFormData from '../../components/steps/StepOnboardingFormData';
 import { StepSearchParty } from '../../components/steps/StepSearchParty';
 import { withLogin } from '../../components/withLogin';
-import { useOnboardingControllers } from '../../hooks/useOnboardingControllers';
 import { HeaderContext, UserContext } from '../../lib/context';
 import { AdditionalGpuInformations } from '../../model/AdditionalGpuInformations';
 import { AdditionalInformations } from '../../model/AdditionalInformations';
@@ -36,6 +35,19 @@ import { checkProduct, getFilterCategories } from '../../services/onboardingServ
 import { postOnboardingSubmit } from '../../services/onboardingSubmitServices';
 import { PRODUCT_IDS } from '../../utils/constants';
 import { ENV } from '../../utils/env';
+import {
+  isTechPartner,
+  isPagoPaProduct,
+  isSendProduct,
+  isPaymentServiceProvider,
+  isPublicAdministration,
+  isContractingAuthority,
+  isGlobalServiceProvider,
+  isConsolidatedEconomicAccountCompany,
+  isPagoPaInsights,
+  isPrivateInstitution,
+  isPrivatePersonInstitution,
+} from '../../utils/institutionTypeUtils';
 import { registerUnloadEvent, unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
 import { StepAddAdmin } from './components/StepAddAdmin';
 import { StepAdditionalGpuInformations } from './components/StepAdditionalGpuInformations';
@@ -108,12 +120,6 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     new URLSearchParams(window.location.hash.substring(1)).get('subunitCode') ?? '';
   const institutionTypeByUrl = new URLSearchParams(window.location.search).get('institutionType');
   const desiredOriginRef = useRef<string | undefined>();
-  const controllers = useOnboardingControllers({
-    institutionType,
-    productId,
-    origin,
-    onboardingFormData,
-  });
   const addUser = window.location.pathname.includes('/user');
 
   const back = () => {
@@ -183,7 +189,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
   }, [formData, pendingForward]);
 
   useEffect(() => {
-    if (institutionTypeByUrl === 'PT' && productId === PRODUCT_IDS.PAGOPA) {
+    if (isTechPartner(institutionTypeByUrl as InstitutionType) && isPagoPaProduct(productId)) {
       forwardWithInstitutionType('PT');
       setOrigin('SELC');
     }
@@ -192,7 +198,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
   useEffect(() => {
     if (
       selectedProduct &&
-      selectedProduct?.id !== PRODUCT_IDS.SEND &&
+      !isSendProduct(selectedProduct?.id) &&
       (subunitTypeByQuery || subunitCodeByQuery)
     ) {
       window.location.assign(ENV.URL_FE.DASHBOARD);
@@ -246,18 +252,18 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
         return filterCategoriesResponse.product['prod-idpay-merchant']?.merchantDetails;
 
       case PRODUCT_IDS.INTEROP:
-        if (institutionType === 'SCEC') {
+        if (isConsolidatedEconomicAccountCompany(institutionType)) {
           return filterCategoriesResponse.product['prod-interop']?.ipa.SCEC;
-        } else if (institutionType === 'PA') {
+        } else if (isPublicAdministration(institutionType)) {
           return filterCategoriesResponse.product['prod-interop']?.ipa.PA;
-        } else if (institutionType === 'GSP') {
+        } else if (isGlobalServiceProvider(institutionType)) {
           return filterCategoriesResponse.product.default?.ipa.GSP;
         } else {
           return filterCategoriesResponse.product.default?.ipa.PA;
         }
       default:
         const defaultIpa = filterCategoriesResponse.product.default?.ipa;
-        return institutionType === 'GSP' ? defaultIpa?.GSP : defaultIpa?.PA;
+        return isGlobalServiceProvider(institutionType) ? defaultIpa?.GSP : defaultIpa?.PA;
     }
   }, [filterCategoriesResponse, productId, institutionType]);
 
@@ -270,19 +276,19 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
             minHeight="52vh"
             icon={<IllusCompleted size={60} />}
             title={
-              institutionType === 'PT'
+              isTechPartner(institutionType)
                 ? t('onboarding.success.flow.techPartner.title')
                 : t('onboarding.success.flow.product.title')
             }
             description={
-              institutionType === 'PT' ? (
+              isTechPartner(institutionType) ? (
                 <Trans
                   i18nKey="onboarding.success.flow.techPartner.description"
                   components={{ 1: <br /> }}
                 >
-                  {`Invieremo un’email con l’esito della richiesta all’indirizzo <1 />PEC indicato.`}
+                  {`Invieremo un'email con l'esito della richiesta all'indirizzo <1 />PEC indicato.`}
                 </Trans>
-              ) : institutionType === 'PA' ? (
+              ) : isPublicAdministration(institutionType) ? (
                 <Trans
                   i18nKey="onboarding.success.flow.product.publicAdministration.description"
                   components={{ 1: <br />, 3: <br /> }}
@@ -370,7 +376,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
       outcomeContent,
       notAllowedError,
       pricingPlan,
-      controllers.isTechPartner ? usersWithoutLegal : users,
+      isTechPartner(institutionType) ? usersWithoutLegal : users,
       aggregates
     ).catch(() => {
       trackEvent('ONBOARDING_ADD_DELEGATE', {
@@ -476,20 +482,19 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           origin,
           originId: onboardingFormData?.originId,
           institutionType: institutionType as InstitutionType,
-          subtitle:
-            institutionType !== 'PT' ? (
-              <Trans i18nKey="onboardingSubProduct.billingData.subTitle" components={{ 1: <br /> }}>
-                {`Conferma, modifica o inserisci i dati richiesti, assicurandoti che siano corretti. <1 />Verranno usati anche per richiedere l’adesione ad altri prodotti e in caso di fatturazione.`}
-              </Trans>
-            ) : (
-              <Trans
-                i18nKey="onboardingSubProduct.billingDataPt.subTitle"
-                values={{ nameProduct: selectedProduct?.title }}
-                components={{ 1: <br />, 3: <br />, 5: <strong /> }}
-              >
-                {`Inserisci le informazioni richieste e assicurati che siano corrette.<1 /> Serviranno a registrarti come Partner tecnologico per il<3/> prodotto <5>{{nameProduct}}</5>.`}
-              </Trans>
-            ),
+          subtitle: !isTechPartner(institutionType) ? (
+            <Trans i18nKey="onboardingSubProduct.billingData.subTitle" components={{ 1: <br /> }}>
+              {`Conferma, modifica o inserisci i dati richiesti, assicurandoti che siano corretti. <1 />Verranno usati anche per richiedere l’adesione ad altri prodotti e in caso di fatturazione.`}
+            </Trans>
+          ) : (
+            <Trans
+              i18nKey="onboardingSubProduct.billingDataPt.subTitle"
+              values={{ nameProduct: selectedProduct?.title }}
+              components={{ 1: <br />, 3: <br />, 5: <strong /> }}
+            >
+              {`Inserisci le informazioni richieste e assicurati che siano corrette.<1 /> Serviranno a registrarti come Partner tecnologico per il<3/> prodotto <5>{{nameProduct}}</5>.`}
+            </Trans>
+          ),
           selectFilterCategories,
           forward: forwardWithBillingData,
           back: () => {
@@ -499,15 +504,15 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
               setOnExitAction(() => () => history.goBack());
               setOpenExitModal(true);
             } else if (
-              institutionType === 'PSP' ||
-              (institutionType !== 'PA' &&
-                institutionType !== 'SA' &&
-                institutionType !== 'GSP' &&
-                institutionType !== 'PRV' &&
-                institutionType !== 'PRV_PF')
+              isPaymentServiceProvider(institutionType) ||
+              (!isPublicAdministration(institutionType) &&
+                !isContractingAuthority(institutionType) &&
+                !isGlobalServiceProvider(institutionType) &&
+                !isPrivateInstitution(institutionType) &&
+                !isPrivatePersonInstitution(institutionType))
             ) {
               setActiveStep(0);
-            } else if (fromDashboard && productId === PRODUCT_IDS.DASHBOARD_PSP) {
+            } else if (fromDashboard && isPagoPaInsights(productId)) {
               window.location.assign(`${ENV.URL_FE.DASHBOARD}/${externalInstitutionId}`);
             } else {
               setActiveStep(1);
@@ -542,7 +547,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           externalInstitutionId,
           addUserFlow: addUser,
           product: selectedProduct,
-          isTechPartner: controllers.isTechPartner,
+          isTechPartner: isTechPartner(institutionType),
           forward: (newFormData: Partial<FormData>) => {
             trackEvent('ONBOARDING_ADD_MANAGER', {
               request_id: requestIdRef.current,
@@ -554,7 +559,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           back: () => {
             switch (institutionType) {
               case 'GSP':
-                if (origin === 'IPA' && selectedProduct?.id === PRODUCT_IDS.PAGOPA) {
+                if (origin === 'IPA' && isPagoPaProduct(selectedProduct?.id)) {
                   setActiveStep(activeStep - 1);
                 } else {
                   setActiveStep(activeStep - 3);
@@ -580,13 +585,13 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           externalInstitutionId,
           addUserFlow: addUser,
           product: selectedProduct,
-          legal: controllers.isTechPartner ? undefined : (formData as any)?.users[0],
+          legal: isTechPartner(institutionType) ? undefined : (formData as any)?.users[0],
           partyName:
             onboardingFormData?.uoName ??
             onboardingFormData?.aooName ??
             onboardingFormData?.businessName ??
             '',
-          isTechPartner: controllers.isTechPartner,
+          isTechPartner: isTechPartner(institutionType),
           isAggregator: onboardingFormData?.isAggregator,
           forward: (newFormData: Partial<FormData>) => {
             const userData = { ...formData, ...newFormData };
@@ -598,7 +603,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
             }
           },
           back: () => {
-            if (controllers.isTechPartner) {
+            if (isTechPartner(institutionType)) {
               setActiveStep(activeStep - 4);
             } else {
               setActiveStep(activeStep - 1);

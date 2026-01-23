@@ -21,9 +21,28 @@ import {
 } from '../lib/__mocks__/mockApiRequests';
 import { nationalValue } from '../model/GeographicTaxonomies';
 import { store } from '../redux/store';
+import { InstitutionType } from '../../types';
 import { HeaderContext, UserContext } from './../lib/context';
 import { ENV } from './env';
 import { canInvoice, PRODUCT_IDS } from './constants';
+import {
+  isContractingAuthority,
+  isGlobalServiceProvider,
+  isGpuInstitution,
+  isIdpayMerchantProduct,
+  isInsuranceCompany,
+  isInteropProduct,
+  isIoProduct,
+  isIoSignProduct,
+  isPagoPaProduct,
+  isPaymentServiceProvider,
+  isPrivateInstitution,
+  isPrivateMerchantInstitution,
+  isPrivateOrPersonInstitution,
+  isPublicAdministration,
+  isPublicServiceCompany,
+  isTechPartner,
+} from './institutionTypeUtils';
 
 export type Source =
   | 'IPA'
@@ -122,7 +141,7 @@ const checkAlreadyExistentValues = async (
   productId?: string,
   addUserFlow?: boolean
 ) => {
-  const shouldSkipDuplicateCheck = productId === PRODUCT_IDS.IDPAY_MERCHANT || addUserFlow;
+  const shouldSkipDuplicateCheck = isIdpayMerchantProduct(productId) || addUserFlow;
 
   if (existentTaxCode) {
     await fillTextFieldAndCheckButton(prefix, 'name', 'NAME');
@@ -402,8 +421,8 @@ export const billingData2billingDataRequest = (
   // eslint-disable-next-line sonarjs/cognitive-complexity
 ) => {
   const isPrivateMerchant =
-    (institutionType === 'PRV' || institutionType === 'PRV_PF') &&
-    productId === PRODUCT_IDS.IDPAY_MERCHANT;
+    isPrivateOrPersonInstitution(institutionType as InstitutionType) &&
+    isIdpayMerchantProduct(productId);
 
   return {
     businessName: errorOnSubmit
@@ -551,15 +570,15 @@ export const billingData2billingDataRequest = (
       : undefined,
 
     recipientCode:
-      isPrivateMerchant || productId === PRODUCT_IDS.IO
+      isPrivateMerchant || isIoProduct(productId)
         ? undefined
         : errorOnSubmit
           ? 'A2B3C4'
-          : institutionType === 'PSP'
+          : isPaymentServiceProvider(institutionType as InstitutionType)
             ? 'A1B2C3'
             : (from === 'IPA' ||
-                  institutionType === 'GSP' ||
-                  (from === 'NO_IPA' && institutionType === 'GPU')) &&
+                  isGlobalServiceProvider(institutionType as InstitutionType) ||
+                  (from === 'NO_IPA' && isGpuInstitution(institutionType as InstitutionType))) &&
                 typeOfSearch !== 'aooCode'
               ? typeOfSearch === 'taxCode'
                 ? 'A3B4C5'
@@ -587,13 +606,14 @@ export const verifySubmit = async (
   isAggregator?: boolean
   // eslint-disable-next-line sonarjs/cognitive-complexity
 ) => {
-  const isPrivateMerchant =
-    (institutionType === 'PRV' || institutionType === 'PRV_PF') &&
-    productId === PRODUCT_IDS.IDPAY_MERCHANT;
+  const isPrivateMerchant = isPrivateMerchantInstitution(
+    institutionType as InstitutionType,
+    productId
+  );
   const SfeAvailable =
-    (uo || institutionType === 'PA') &&
+    (uo || isPublicAdministration(institutionType as InstitutionType)) &&
     canInvoice(institutionType, productId) &&
-    productId !== PRODUCT_IDS.IO;
+    !isIoProduct(productId);
 
   // eslint-disable-next-line functional/immutable-data
   const lastCall = fetchWithLogsSpy.mock.calls.pop();
@@ -632,14 +652,16 @@ export const verifySubmit = async (
                   : from === 'ANAC'
                     ? 'ANAC'
                     : from === 'SELC' ||
-                        (from === 'NO_IPA' && institutionType === 'PSP') ||
-                        institutionType === 'PSP' ||
-                        institutionType === 'GPU' ||
-                        institutionType === 'PT' ||
-                        (institutionType === 'PRV' &&
-                          productId !== PRODUCT_IDS.INTEROP &&
-                          productId !== PRODUCT_IDS.IDPAY_MERCHANT) ||
-                        (institutionType === 'GSP' && from === 'NO_IPA')
+                        (from === 'NO_IPA' &&
+                          isPaymentServiceProvider(institutionType as InstitutionType)) ||
+                        isPaymentServiceProvider(institutionType as InstitutionType) ||
+                        isGpuInstitution(institutionType as InstitutionType) ||
+                        isTechPartner(institutionType as InstitutionType) ||
+                        (isPrivateInstitution(institutionType as InstitutionType) &&
+                          !isInteropProduct(productId) &&
+                          !isIdpayMerchantProduct(productId)) ||
+                        (isGlobalServiceProvider(institutionType as InstitutionType) &&
+                          from === 'NO_IPA')
                       ? 'SELC'
                       : undefined,
         originId: errorOnSubmit
@@ -670,17 +692,18 @@ export const verifySubmit = async (
                             ? mockedAoos[0].codiceUniAoo
                             : typeOfSearch === 'uoCode'
                               ? mockedUos[0].codiceUniUo
-                              : (institutionType === 'PT' ||
-                                    institutionType === 'GPU' ||
-                                    institutionType === 'GSP') &&
-                                  productId === PRODUCT_IDS.PAGOPA
+                              : (isTechPartner(institutionType as InstitutionType) ||
+                                    isGpuInstitution(institutionType as InstitutionType) ||
+                                    isGlobalServiceProvider(institutionType as InstitutionType)) &&
+                                  isPagoPaProduct(productId)
                                 ? '991'
-                                : productId === PRODUCT_IDS.PAGOPA && institutionType === 'PRV'
+                                : isPagoPaProduct(productId) &&
+                                    isPrivateInstitution(institutionType as InstitutionType)
                                   ? mockPartyRegistry.items[0].taxCode
-                                  : institutionType === 'GPU' &&
-                                      (productId === PRODUCT_IDS.INTEROP ||
-                                        productId === PRODUCT_IDS.IO_SIGN ||
-                                        productId === PRODUCT_IDS.IO)
+                                  : isGpuInstitution(institutionType as InstitutionType) &&
+                                      (isInteropProduct(productId) ||
+                                        isIoSignProduct(productId) ||
+                                        isIoProduct(productId))
                                     ? undefined
                                     : '991',
         istatCode: from !== 'IPA' ? mockedGeoTaxonomy[1].istat_code : undefined,
@@ -712,7 +735,7 @@ export const verifySubmit = async (
                               ? mockedUos[0].codiceFiscaleEnte
                               : mockPartyRegistry.items[0].taxCode,
         additionalInformations:
-          productId === PRODUCT_IDS.PAGOPA && institutionType === 'GSP'
+          isPagoPaProduct(productId) && isGlobalServiceProvider(institutionType as InstitutionType)
             ? {
                 agentOfPublicService: false,
                 agentOfPublicServiceNote: '',
@@ -725,16 +748,14 @@ export const verifySubmit = async (
                 regulatedMarketNote: '',
               }
             : undefined,
-        payment:
-          (institutionType === 'PRV' || institutionType === 'PRV_PF') &&
-          productId === PRODUCT_IDS.IDPAY_MERCHANT
-            ? {
-                holder: 'holder',
-                iban: 'IT60X0542811101000000123456',
-              }
-            : undefined,
+        payment: isPrivateMerchant
+          ? {
+              holder: 'holder',
+              iban: 'IT60X0542811101000000123456',
+            }
+          : undefined,
         gpuData:
-          institutionType === 'GPU' && productId === PRODUCT_IDS.PAGOPA
+          isGpuInstitution(institutionType as InstitutionType) && isPagoPaProduct(productId)
             ? {
                 businessRegisterNumber: 'Comunale 12',
                 legalRegisterNumber: '250301',
@@ -751,22 +772,26 @@ export const verifySubmit = async (
           ((from === 'ANAC' ||
             from === 'INFOCAMERE' ||
             from === 'PDND_INFOCAMERE' ||
-            ((institutionType === 'GSP' || institutionType === 'GPU') && from !== 'IPA')) &&
-            institutionType !== 'PT') ||
-          (institutionType === 'PRV' && productId === PRODUCT_IDS.PAGOPA) ||
+            ((isGlobalServiceProvider(institutionType as InstitutionType) ||
+              isGpuInstitution(institutionType as InstitutionType)) &&
+              from !== 'IPA')) &&
+            !isTechPartner(institutionType as InstitutionType)) ||
+          (isPrivateInstitution(institutionType as InstitutionType) &&
+            isPagoPaProduct(productId)) ||
           isPrivateMerchant
             ? {
                 businessRegisterPlace:
                   from === 'ANAC' ||
-                  ((institutionType === 'PRV' || institutionType === 'PRV_PF') &&
-                    (productId === PRODUCT_IDS.PAGOPA ||
-                      productId === PRODUCT_IDS.INTEROP ||
-                      productId === PRODUCT_IDS.IDPAY_MERCHANT))
+                  (isPrivateOrPersonInstitution(institutionType as InstitutionType) &&
+                    (isPagoPaProduct(productId) ||
+                      isInteropProduct(productId) ||
+                      isIdpayMerchantProduct(productId)))
                     ? '01234567891'
                     : undefined,
                 shareCapital:
                   from === 'ANAC' ||
-                  (institutionType === 'PRV' && productId === PRODUCT_IDS.INTEROP)
+                  (isPrivateInstitution(institutionType as InstitutionType) &&
+                    isInteropProduct(productId))
                     ? 332323
                     : undefined,
                 rea:
@@ -779,26 +804,26 @@ export const verifySubmit = async (
                             '-',
                             mockedPartiesFromInfoCamere[0].nRea
                           )
-                    : institutionType === 'PRV' && productId === PRODUCT_IDS.PAGOPA
+                    : isPrivateInstitution(institutionType as InstitutionType) &&
+                        isPagoPaProduct(productId)
                       ? undefined
                       : 'MO-123456',
               }
             : undefined,
-        pspData:
-          institutionType === 'PSP'
-            ? {
-                abiCode: '23321',
-                businessRegisterNumber: '12344555667',
-                dpoData: {
-                  address: 'Via milano 5',
-                  email: 'dpomail@mailtest.com',
-                  pec: 'dpopec@mailtest.com',
-                },
-                legalRegisterName: '123',
-                legalRegisterNumber: '24',
-                vatNumberGroup: true,
-              }
-            : undefined,
+        pspData: isPaymentServiceProvider(institutionType as InstitutionType)
+          ? {
+              abiCode: '23321',
+              businessRegisterNumber: '12344555667',
+              dpoData: {
+                address: 'Via milano 5',
+                email: 'dpomail@mailtest.com',
+                pec: 'dpopec@mailtest.com',
+              },
+              legalRegisterName: '123',
+              legalRegisterNumber: '24',
+              vatNumberGroup: true,
+            }
+          : undefined,
         users: [
           {
             email: 'b@b.bb',
@@ -814,7 +839,9 @@ export const verifySubmit = async (
             surname: 'ROSSI',
             taxCode: 'RSSLCU80A01F205N',
           },
-        ].filter((u) => (institutionType === 'PT' ? u.role !== 'MANAGER' : u)),
+        ].filter((u) =>
+          isTechPartner(institutionType as InstitutionType) ? u.role !== 'MANAGER' : u
+        ),
         pricingPlan: 'FA',
         geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY
           ? [{ code: nationalValue, desc: 'ITALIA' }]
@@ -825,15 +852,17 @@ export const verifySubmit = async (
               county: undefined,
               country: 'ES',
             }
-          : (institutionType === 'SCP' ||
-                (institutionType === 'PRV' && productId === PRODUCT_IDS.INTEROP)) &&
+          : (isPublicServiceCompany(institutionType as InstitutionType) ||
+                (isPrivateInstitution(institutionType as InstitutionType) &&
+                  isInteropProduct(productId))) &&
               (from === 'INFOCAMERE' || from === 'PDND_INFOCAMERE')
             ? {
                 city: mockedPartiesFromInfoCamere[0].city,
                 county: mockedPartiesFromInfoCamere[0].county,
                 country:
-                  (institutionType === 'SCP' && productId === PRODUCT_IDS.INTEROP) ||
-                  institutionType === 'PRV'
+                  (isPublicServiceCompany(institutionType as InstitutionType) &&
+                    isInteropProduct(productId)) ||
+                  isPrivateInstitution(institutionType as InstitutionType)
                     ? 'IT'
                     : undefined,
               }
@@ -843,10 +872,10 @@ export const verifySubmit = async (
                 country: 'IT',
               },
         assistanceContacts:
-          productId === PRODUCT_IDS.IO_SIGN &&
+          isIoSignProduct(productId) &&
           typeOfSearch !== 'aooCode' &&
-          institutionType !== 'PT' &&
-          institutionType !== 'GPU' &&
+          !isTechPartner(institutionType as InstitutionType) &&
+          !isGpuInstitution(institutionType as InstitutionType) &&
           (from === 'IPA' || from === 'NO_IPA')
             ? { supportEmail: 'a@a.it' }
             : undefined,
@@ -1067,11 +1096,15 @@ export const fillUserBillingDataForm = async (
   typeOfSearch?: Search
   // eslint-disable-next-line sonarjs/cognitive-complexity
 ) => {
-  const isPrivateMerchant =
-    (institutionType === 'PRV' || institutionType === 'PRV_PF') &&
-    productId === PRODUCT_IDS.IDPAY_MERCHANT;
+  const isPrivateMerchant = isPrivateMerchantInstitution(
+    institutionType as InstitutionType,
+    productId
+  );
   if (from !== 'IPA' && from !== 'INFOCAMERE' && from !== 'PDND_INFOCAMERE' && !isPrivateMerchant) {
-    if (institutionType !== 'SA' && institutionType !== 'AS') {
+    if (
+      !isContractingAuthority(institutionType as InstitutionType) &&
+      !isInsuranceCompany(institutionType as InstitutionType)
+    ) {
       fireEvent.change(document.getElementById(businessNameInput) as HTMLElement, {
         target: { value: 'businessNameInput' },
       });
@@ -1117,13 +1150,17 @@ export const fillUserBillingDataForm = async (
       });
     }
 
-    if (institutionType !== 'PT' && institutionType !== 'AS' && institutionType !== 'PSP') {
+    if (
+      !isTechPartner(institutionType as InstitutionType) &&
+      !isInsuranceCompany(institutionType as InstitutionType) &&
+      !isPaymentServiceProvider(institutionType as InstitutionType)
+    ) {
       fireEvent.change(document.getElementById(rea ?? '') as HTMLInputElement, {
         target: { value: 'MO-123456' },
       });
     }
   } else {
-    if (institutionType === 'PRV' && productId === PRODUCT_IDS.PAGOPA) {
+    if (isPrivateInstitution(institutionType as InstitutionType) && isPagoPaProduct(productId)) {
       // Logica esistente per PAGOPA + PRV
       fireEvent.change(document.getElementById(businessNameInput) as HTMLElement, {
         target: { value: mockPartyRegistry.items[0].description },
@@ -1210,7 +1247,8 @@ export const fillUserBillingDataForm = async (
         target: { value: 'IT60X0542811101000000123456' },
       });
     } else if (
-      (institutionType === 'SCP' || institutionType === 'PRV') &&
+      (isPublicServiceCompany(institutionType as InstitutionType) ||
+        isPrivateInstitution(institutionType as InstitutionType)) &&
       (from === 'INFOCAMERE' || from === 'PDND_INFOCAMERE')
     ) {
       fireEvent.change(document.getElementById(businessNameInput) as HTMLElement, {
@@ -1246,7 +1284,7 @@ export const fillUserBillingDataForm = async (
         },
       });
 
-      if (institutionType === 'PRV' && productId === PRODUCT_IDS.INTEROP) {
+      if (isPrivateInstitution(institutionType as InstitutionType) && isInteropProduct(productId)) {
         fireEvent.change(document.getElementById('businessRegisterPlace') as HTMLElement, {
           target: { value: '01234567891' },
         });
@@ -1285,7 +1323,7 @@ export const fillUserBillingDataForm = async (
   const abiCode = document.getElementById('abiCode') as HTMLElement;
   const dpoDataSection = document.getElementById('dpo-data-section') as HTMLElement;
 
-  if (institutionType === 'PSP' && !isPrivateMerchant) {
+  if (isPaymentServiceProvider(institutionType as InstitutionType) && !isPrivateMerchant) {
     expect(dpoDataSection).toBeInTheDocument();
     expect(vatNumberGroup).toBeInTheDocument();
     fireEvent.click(vatNumberGroup);
@@ -1356,14 +1394,16 @@ export const fillUserBillingDataForm = async (
 
   if (
     !isPrivateMerchant &&
-    productId !== PRODUCT_IDS.IO &&
-    ((institutionType === 'PA' && !isAoo) || institutionType === 'GSP' || institutionType === 'PSP')
+    !isIoProduct(productId) &&
+    ((isPublicAdministration(institutionType as InstitutionType) && !isAoo) ||
+      isGlobalServiceProvider(institutionType as InstitutionType) ||
+      isPaymentServiceProvider(institutionType as InstitutionType))
   ) {
     fireEvent.change(document.getElementById(recipientCode) as HTMLElement, {
       target: { value: 'A1B2C3D' },
     });
 
-    if (supportEmail && productId === PRODUCT_IDS.IO_SIGN) {
+    if (supportEmail && isIoSignProduct(productId)) {
       fireEvent.change(document.getElementById(supportEmail) as HTMLInputElement, {
         target: { value: 'a@a.it' },
       });
@@ -1387,20 +1427,22 @@ export const checkCorrectBodyBillingData = (
   haveTaxCode?: boolean
   // eslint-disable-next-line sonarjs/cognitive-complexity
 ) => {
-  const isPrivateMerchant =
-    (institutionType === 'PRV' || institutionType === 'PRV_PF') &&
-    productId === PRODUCT_IDS.IDPAY_MERCHANT;
+  const isPrivateMerchant = isPrivateMerchantInstitution(
+    institutionType as InstitutionType,
+    productId
+  );
 
   expect((document.getElementById('businessName') as HTMLInputElement).value).toBe(
-    institutionType === 'SA'
+    isContractingAuthority(institutionType as InstitutionType)
       ? mockedANACParties[0].description
-      : institutionType === 'AS'
+      : isInsuranceCompany(institutionType as InstitutionType)
         ? haveTaxCode
           ? isForeignInsurance
             ? mockedInsuranceResource.items[0].description
             : mockedInsuranceResource.items[2].description
           : mockedInsuranceResource.items[4].description
-        : institutionType === 'SCP' || (institutionType === 'PRV' && !isPrivateMerchant)
+        : isPublicServiceCompany(institutionType as InstitutionType) ||
+            (isPrivateInstitution(institutionType as InstitutionType) && !isPrivateMerchant)
           ? mockedPartiesFromInfoCamere[0].businessName
           : isPrivateMerchant
             ? 'Rossi Costruzioni S.r.l.'
@@ -1408,15 +1450,16 @@ export const checkCorrectBodyBillingData = (
   );
 
   expect((document.getElementById('digitalAddress') as HTMLInputElement).value).toBe(
-    institutionType === 'SA'
+    isContractingAuthority(institutionType as InstitutionType)
       ? mockedANACParties[0].digitalAddress
-      : institutionType === 'AS'
+      : isInsuranceCompany(institutionType as InstitutionType)
         ? haveTaxCode
           ? isForeignInsurance
             ? mockedInsuranceResource.items[0].digitalAddress
             : mockedInsuranceResource.items[2].digitalAddress
           : mockedInsuranceResource.items[4].digitalAddress
-        : institutionType === 'SCP' || (institutionType === 'PRV' && !isPrivateMerchant)
+        : isPublicServiceCompany(institutionType as InstitutionType) ||
+            (isPrivateInstitution(institutionType as InstitutionType) && !isPrivateMerchant)
           ? mockedPartiesFromInfoCamere[0].digitalAddress
           : isPrivateMerchant
             ? 'rossi.costruzioni@pec.it'
@@ -1425,13 +1468,14 @@ export const checkCorrectBodyBillingData = (
 
   if (haveTaxCode) {
     expect((document.getElementById('taxCode') as HTMLInputElement).value).toBe(
-      institutionType === 'SA'
+      isContractingAuthority(institutionType as InstitutionType)
         ? mockedANACParties[0].taxCode
-        : institutionType === 'AS'
+        : isInsuranceCompany(institutionType as InstitutionType)
           ? isForeignInsurance
             ? mockedInsuranceResource.items[0].taxCode
             : mockedInsuranceResource.items[2].taxCode
-          : institutionType === 'SCP' || (institutionType === 'PRV' && !isPrivateMerchant)
+          : isPublicServiceCompany(institutionType as InstitutionType) ||
+              (isPrivateInstitution(institutionType as InstitutionType) && !isPrivateMerchant)
             ? mockedPartiesFromInfoCamere[0].businessTaxId
             : isPrivateMerchant
               ? '12345678901'
@@ -1444,7 +1488,8 @@ export const checkCorrectBodyBillingData = (
     expect((document.getElementById('country-select') as HTMLInputElement).value).toBe('Spagna');
   } else {
     expect((document.getElementById('zipCode') as HTMLInputElement).value).toBe(
-      institutionType === 'SCP' || (institutionType === 'PRV' && !isPrivateMerchant)
+      isPublicServiceCompany(institutionType as InstitutionType) ||
+        (isPrivateInstitution(institutionType as InstitutionType) && !isPrivateMerchant)
         ? mockedPartiesFromInfoCamere[0].zipCode
         : isPrivateMerchant
           ? '09010'
@@ -1458,7 +1503,8 @@ export const checkCorrectBodyBillingData = (
     }
 
     expect((document.getElementById('city-select') as HTMLInputElement).value).toBe(
-      institutionType === 'SCP' || (institutionType === 'PRV' && !isPrivateMerchant)
+      isPublicServiceCompany(institutionType as InstitutionType) ||
+        (isPrivateInstitution(institutionType as InstitutionType) && !isPrivateMerchant)
         ? mockedPartiesFromInfoCamere[0].city
         : isPrivateMerchant
           ? 'Milano'
@@ -1466,7 +1512,8 @@ export const checkCorrectBodyBillingData = (
     );
 
     expect((document.getElementById('county') as HTMLInputElement).value).toBe(
-      institutionType === 'SCP' || (institutionType === 'PRV' && !isPrivateMerchant)
+      isPublicServiceCompany(institutionType as InstitutionType) ||
+        (isPrivateInstitution(institutionType as InstitutionType) && !isPrivateMerchant)
         ? mockedPartiesFromInfoCamere[0].county
         : isPrivateMerchant
           ? 'MO'
@@ -1476,7 +1523,9 @@ export const checkCorrectBodyBillingData = (
 
   if (
     !isPrivateMerchant &&
-    (institutionType === 'PA' || institutionType === 'GSP' || institutionType === 'PSP')
+    (isPublicAdministration(institutionType as InstitutionType) ||
+      isGlobalServiceProvider(institutionType as InstitutionType) ||
+      isPaymentServiceProvider(institutionType as InstitutionType))
   ) {
     expect((document.getElementById('recipientCode') as HTMLInputElement).value).toBe(
       expectedRecipientCode
@@ -1490,8 +1539,8 @@ export const checkCorrectBodyBillingData = (
   }
 
   if (
-    institutionType === 'SA' ||
-    (institutionType === 'PRV' && productId === PRODUCT_IDS.INTEROP)
+    isContractingAuthority(institutionType as InstitutionType) ||
+    (isPrivateInstitution(institutionType as InstitutionType) && isInteropProduct(productId))
   ) {
     fireEvent.change(document.getElementById('businessRegisterPlace') as HTMLElement, {
       target: { value: '01234567891' },
@@ -1500,8 +1549,8 @@ export const checkCorrectBodyBillingData = (
     expect((document.getElementById('rea') as HTMLInputElement).value).toBe('MO-123456');
 
     if (
-      institutionType === 'SA' ||
-      (institutionType === 'PRV' && productId === PRODUCT_IDS.INTEROP)
+      isContractingAuthority(institutionType as InstitutionType) ||
+      (isPrivateInstitution(institutionType as InstitutionType) && isInteropProduct(productId))
     ) {
       fireEvent.change(document.getElementById('shareCapital') as HTMLElement, {
         target: { value: '€ 332.323' },
@@ -1510,7 +1559,8 @@ export const checkCorrectBodyBillingData = (
   }
 
   expect((document.getElementById('registeredOffice') as HTMLInputElement).value).toBe(
-    institutionType === 'SCP' || institutionType === 'PRV'
+    isPublicServiceCompany(institutionType as InstitutionType) ||
+      isPrivateInstitution(institutionType as InstitutionType)
       ? mockedPartiesFromInfoCamere[0].address
       : expectedRegisteredOfficeInput
   );

@@ -7,6 +7,16 @@ import CompleteRequest from '../views/onboardingRequest/complete/CompleteRequest
 import DownloadCsvFile from '../views/onboardingRequest/download/DownloadCsvFile';
 import OnboardingUser from '../views/onboardingUser/OnboardingUser';
 import { ENV } from './env';
+import {
+  isContractingAuthority,
+  isIdpayMerchantProduct,
+  isIdPayProduct,
+  isInsuranceCompany,
+  isInteropProduct,
+  isIoProduct,
+  isIoSignProduct,
+  isTechPartner,
+} from './institutionTypeUtils';
 
 const IS_DEVELOP = process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test';
 
@@ -230,17 +240,17 @@ export const onlyCharacters = new RegExp(/^[A-Za-z\s]*$/);
 export const fiscalCodeRegexp = /^[A-Z]{6}[0-9]{2}[A-Z][0-9]{2}[A-Z][0-9A-Z]{3}[A-Z0-9]$/;
 
 export const canInvoice = (institutionType?: string, productId?: string) =>
-  institutionType !== 'SA' &&
-  institutionType !== 'PT' &&
-  institutionType !== 'AS' &&
-  productId !== PRODUCT_IDS.INTEROP &&
-  productId !== PRODUCT_IDS.IDPAY_MERCHANT;
+  !isContractingAuthority(institutionType as InstitutionType) &&
+  !isTechPartner(institutionType as InstitutionType) &&
+  !isInsuranceCompany(institutionType as InstitutionType) &&
+  !isInteropProduct(productId) &&
+  !isIdpayMerchantProduct(productId);
 
 export const noMandatoryIpaProducts = (productId?: string) =>
-  productId !== PRODUCT_IDS.INTEROP &&
-  productId !== PRODUCT_IDS.IO &&
-  productId !== PRODUCT_IDS.IO_SIGN &&
-  productId !== PRODUCT_IDS.IDPAY &&
+  !isInteropProduct(productId) &&
+  !isIoProduct(productId) &&
+  !isIoSignProduct(productId) &&
+  !isIdPayProduct(productId) &&
   !productId?.includes(PRODUCT_IDS.SEND);
 
 export const addUserFlowProducts = (productId: string) =>

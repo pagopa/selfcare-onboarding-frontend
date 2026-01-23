@@ -2,8 +2,20 @@
 import path from 'path';
 import { Page, expect } from '@playwright/test';
 import { InstitutionType } from '../../types';
-import { isLocalMode } from './global.setup';
+
+import {
+  isContractingAuthority,
+  isGlobalServiceProvider,
+  isGpuInstitution,
+  isInsuranceCompany,
+  isPaymentServiceProvider,
+  isPrivateInstitution,
+  isPrivateMerchantInstitution,
+  isPublicServiceCompany,
+  isTechPartner,
+} from '../../src/utils/institutionTypeUtils';
 import { getOnboardingIdByTaxCode } from './api-utils';
+import { isLocalMode } from './global.setup';
 import { trackOnboardingId } from './onboarding-tracker';
 
 // eslint-disable-next-line functional/no-let
@@ -51,6 +63,33 @@ export const TAX_CODES_BY_INSTITUTION_TYPE = {
   PT: '99887766554',
 };
 
+export const isInteropProductE2E = (productId?: string): boolean =>
+  productId === PRODUCT_IDS_TEST_E2E.INTEROP;
+
+export const isIdpayMerchantProductE2E = (productId?: string): boolean =>
+  productId === PRODUCT_IDS_TEST_E2E.IDPAY_MERCHANT;
+
+export const isInteropOrIdpayMerchantProductE2E = (productId?: string): boolean =>
+  productId === PRODUCT_IDS_TEST_E2E.INTEROP || productId === PRODUCT_IDS_TEST_E2E.IDPAY_MERCHANT;
+
+export const isPagoPaProductE2E = (productId?: string): boolean =>
+  productId === PRODUCT_IDS_TEST_E2E.PAGOPA;
+
+export const isIoProductE2E = (productId?: string): boolean =>
+  productId === PRODUCT_IDS_TEST_E2E.IO;
+
+export const isIoSignProductE2E = (productId?: string): boolean =>
+  productId === PRODUCT_IDS_TEST_E2E.IO_SIGN;
+
+export const isSendProductE2E = (productId?: string): boolean =>
+  productId === PRODUCT_IDS_TEST_E2E.SEND;
+
+export const isPagoPaInsightsE2E = (productId?: string): boolean =>
+  productId === PRODUCT_IDS_TEST_E2E.DASHBOARD_PSP;
+
+export const isFideiussioniProductE2E = (productId?: string): boolean =>
+  productId?.startsWith(PRODUCT_IDS_TEST_E2E.FD) ?? false;
+
 export const stepInstitutionType = async (page: Page, institutionType: string) => {
   await page.waitForTimeout(1000);
   await page.getByRole('radio', { name: institutionType }).click();
@@ -74,14 +113,14 @@ export const stepSelectParty = async (
 
   await page.waitForTimeout(1000);
   await page.waitForSelector(
-    `.MuiBox-root:nth-child(${productId === PRODUCT_IDS_TEST_E2E.SEND || (productId === PRODUCT_IDS_TEST_E2E.IO && aggregator) ? 2 : 1}) > .MuiBox-root > .MuiBox-root`,
+    `.MuiBox-root:nth-child(${isSendProductE2E(productId) || (isIoProductE2E(productId) && aggregator) ? 2 : 1}) > .MuiBox-root > .MuiBox-root`,
     {
       state: 'visible',
       timeout: 5000,
     }
   );
   await page.click(
-    `.MuiBox-root:nth-child(${productId === PRODUCT_IDS_TEST_E2E.SEND || (productId === PRODUCT_IDS_TEST_E2E.IO && aggregator) ? 2 : 1}) > .MuiBox-root > .MuiBox-root`
+    `.MuiBox-root:nth-child(${isSendProductE2E(productId) || (isIoProductE2E(productId) && aggregator) ? 2 : 1}) > .MuiBox-root > .MuiBox-root`
   );
   if (aggregator) {
     await page.click('[name="aggregator-party"]');
@@ -97,7 +136,7 @@ export const stepSelectParty = async (
 export const stepSelectPartyByCF = async (
   page: Page,
   cfParty: string,
-  isPrivateMerchant?: boolean,
+  isPrivateMerchantInstitution?: boolean,
   isAggregator?: boolean
 ) => {
   await page.getByTestId('party-type-select').click();
@@ -105,7 +144,7 @@ export const stepSelectPartyByCF = async (
   await page.click('#Parties');
   await page.fill('#Parties', cfParty, { timeout: 5000 });
 
-  if (isPrivateMerchant) {
+  if (isPrivateMerchantInstitution) {
     const businessTaxIdSelector = `[businesstaxid="${cfParty}"]`;
     await page.waitForSelector(businessTaxIdSelector, { state: 'visible', timeout: 10000 });
     await page.click(`${businessTaxIdSelector} [role="button"]`);
@@ -143,8 +182,9 @@ export const stepFormData = async (
   const actualInstitutionType = isFromIpa ? institutionType : productOrInstitutionType;
   if (
     !isFromIpa ||
-    (product === PRODUCT_IDS_TEST_E2E.PAGOPA &&
-      (institutionType === 'PRV' || institutionType === 'GPU'))
+    (isPagoPaProductE2E(product) &&
+      (isPrivateInstitution(institutionType as InstitutionType) ||
+        isGpuInstitution(institutionType as InstitutionType)))
   ) {
     await page.click('#businessName');
     await page.fill('#businessName', 'test');
@@ -156,22 +196,31 @@ export const stepFormData = async (
     await page.fill(
       '#taxCode',
       taxCode ||
-        (!isFromIpa ? '11779933554' : institutionType === 'PRV' ? '19734628500' : '10203040506')
+        (!isFromIpa
+          ? '11779933554'
+          : isPrivateInstitution(institutionType as InstitutionType)
+            ? '19734628500'
+            : '10203040506')
     );
 
     await page.click('#taxCodeEquals2VatNumber');
   }
 
-  if (product === PRODUCT_IDS_TEST_E2E.INTEROP && actualInstitutionType === 'PRV') {
+  if (
+    isInteropProductE2E(product) &&
+    isPrivateInstitution(actualInstitutionType as InstitutionType)
+  ) {
     await page.click('#taxCodeEquals2VatNumber');
   }
 
   if (
-    (product === PRODUCT_IDS_TEST_E2E.INTEROP &&
-      (actualInstitutionType === 'SA' || actualInstitutionType === 'AS')) ||
+    (isInteropProductE2E(product) &&
+      (isContractingAuthority(actualInstitutionType as InstitutionType) ||
+        isInsuranceCompany(actualInstitutionType as InstitutionType))) ||
     !isFromIpa ||
-    (product === PRODUCT_IDS_TEST_E2E.PAGOPA &&
-      (institutionType === 'PRV' || institutionType === 'GPU'))
+    (isPagoPaProductE2E(product) &&
+      (isPrivateInstitution(institutionType as InstitutionType) ||
+        isGpuInstitution(institutionType as InstitutionType)))
   ) {
     await page.click('#registeredOffice');
     await page.fill('#registeredOffice', isFromIpa ? 'Via test 1' : 'via test 1');
@@ -184,58 +233,69 @@ export const stepFormData = async (
     await page.click('#city-select-option-0');
   }
 
-  if (isFromIpa && institutionType !== 'PRV' && institutionType !== 'GPU') {
+  if (
+    isFromIpa &&
+    !isPrivateInstitution(institutionType as InstitutionType) &&
+    !isGpuInstitution(institutionType as InstitutionType)
+  ) {
     await page.getByLabel('La Partita IVA coincide con il Codice Fiscale').click();
   }
 
   if (
     isFromIpa &&
-    product !== PRODUCT_IDS_TEST_E2E.INTEROP &&
-    product !== PRODUCT_IDS_TEST_E2E.IDPAY_MERCHANT &&
-    actualInstitutionType !== 'SCP' &&
-    product !== PRODUCT_IDS_TEST_E2E.IO
+    !isInteropProductE2E(product) &&
+    !isPrivateMerchantInstitution(actualInstitutionType as InstitutionType) &&
+    !isPublicServiceCompany(actualInstitutionType as InstitutionType) &&
+    !isIoProductE2E(product)
   ) {
     await page.click('#recipientCode');
     await page.fill(
       '#recipientCode',
-      product === PRODUCT_IDS_TEST_E2E.SEND
+      isSendProductE2E(product)
         ? isAggregator
           ? 'UFL4DM'
           : 'UFBM8M'
-        : product === PRODUCT_IDS_TEST_E2E.IO_SIGN
+        : isIoSignProductE2E(product)
           ? 'UF0IGB'
           : 'UFOR71',
       {
         timeout: 2000,
       }
     );
-  } else if (!isFromIpa && actualInstitutionType !== 'PT' && product !== PRODUCT_IDS_TEST_E2E.IO) {
+  } else if (
+    !isFromIpa &&
+    !isTechPartner(actualInstitutionType as InstitutionType) &&
+    !isIoProductE2E(product)
+  ) {
     await page.click('#recipientCode');
     await page.fill('#recipientCode', 'A1B2C3');
 
-    if (actualInstitutionType === 'GSP' || actualInstitutionType === 'SCP') {
+    if (
+      isGlobalServiceProvider(actualInstitutionType as InstitutionType) ||
+      isPublicServiceCompany(actualInstitutionType as InstitutionType)
+    ) {
       await page.click('#recipientCode');
       await page.fill('#recipientCode', 'A1B2C3');
     }
   }
 
-  if (isFromIpa && product === PRODUCT_IDS_TEST_E2E.IO_SIGN) {
+  if (isFromIpa && isIoSignProductE2E(product)) {
     await page.click('#supportEmail');
     await page.fill('#supportEmail', 'test@test.it', { timeout: 500 });
   }
 
   if (
-    actualInstitutionType === 'AS' ||
-    actualInstitutionType === 'GPU' ||
-    (actualInstitutionType === 'GSP' && !isFromIpa)
+    isInsuranceCompany(actualInstitutionType as InstitutionType) ||
+    isGpuInstitution(actualInstitutionType as InstitutionType) ||
+    (isGlobalServiceProvider(actualInstitutionType as InstitutionType) && !isFromIpa)
   ) {
     await page.click('#rea');
     await page.fill('#rea', 'RM-123456');
   }
 
   if (
-    actualInstitutionType === 'AS' ||
-    (product === PRODUCT_IDS_TEST_E2E.INTEROP && actualInstitutionType === 'PRV')
+    isInsuranceCompany(actualInstitutionType as InstitutionType) ||
+    (isInteropProductE2E(product) && isPrivateInstitution(actualInstitutionType as InstitutionType))
   ) {
     await page.click('#businessRegisterPlace');
     await page.fill('#businessRegisterPlace', 'Comune di Milano');
@@ -244,7 +304,7 @@ export const stepFormData = async (
     await page.fill('#shareCapital', '€ 1.5000');
   }
 
-  if (!isFromIpa && actualInstitutionType === 'PSP') {
+  if (!isFromIpa && isPaymentServiceProvider(actualInstitutionType as InstitutionType)) {
     await page.click('#commercialRegisterNumber');
     await page.fill('#commercialRegisterNumber', '19191919191');
 
@@ -267,7 +327,10 @@ export const stepFormData = async (
     await page.fill('#email', 'test@test.it');
   }
 
-  if (actualInstitutionType === 'PRV' && product === PRODUCT_IDS_TEST_E2E.IDPAY_MERCHANT) {
+  if (
+    isPrivateInstitution(actualInstitutionType as InstitutionType) &&
+    isIdpayMerchantProductE2E(product)
+  ) {
     await page.click('#businessRegisterPlace');
     await page.fill('#businessRegisterPlace', 'Tecnologie Innovative S.p.A.');
 
@@ -282,12 +345,12 @@ export const stepFormData = async (
   }
 
   const shouldShowNazionale = isFromIpa
-    ? actualInstitutionType !== 'SCP' &&
-      actualInstitutionType !== 'SA' &&
-      actualInstitutionType !== 'AS' &&
-      (actualInstitutionType !== 'PRV' || product !== PRODUCT_IDS_TEST_E2E.INTEROP)
-    : actualInstitutionType !== 'PT';
-
+    ? !isPublicServiceCompany(actualInstitutionType as InstitutionType) &&
+      !isContractingAuthority(actualInstitutionType as InstitutionType) &&
+      !isInsuranceCompany(actualInstitutionType as InstitutionType) &&
+      (!isPrivateInstitution(actualInstitutionType as InstitutionType) ||
+        !isInteropProductE2E(product))
+    : !isTechPartner(actualInstitutionType as InstitutionType);
   if (shouldShowNazionale) {
     if (isFromIpa) {
       await page.getByRole('radio', { name: 'Nazionale' }).waitFor({ timeout: 5000 });
@@ -397,7 +460,7 @@ export const stepAddAdmin = async (
     return;
   }
 
-  if (institutionType !== 'PT') {
+  if (!isTechPartner(institutionType)) {
     await page.getByRole('button', { name: 'Conferma' }).waitFor({
       state: 'visible',
       timeout: 2000,
@@ -406,13 +469,13 @@ export const stepAddAdmin = async (
     await page.getByRole('button', { name: 'Conferma' }).click();
   }
 
-  if (!aggregator && institutionType !== 'PT') {
+  if (!aggregator && !isTechPartner(institutionType)) {
     await expect(page.getByText('Richiesta di adesione inviata')).toBeInViewport({
       timeout: 15000,
     });
   }
 
-  if (institutionType === 'PT') {
+  if (isTechPartner(institutionType)) {
     await expect(page.getByText('Richiesta di registrazione inviata')).toBeInViewport({
       timeout: 15000,
     });
@@ -475,11 +538,11 @@ export const stepCompleteOnboarding = async (
   notOnIpa?: boolean
 ) => {
   const requiresApproval =
-    productId === PRODUCT_IDS_TEST_E2E.PAGOPA &&
-    (institutionType === 'PRV' ||
-      institutionType === 'GPU' ||
-      institutionType === 'PSP' ||
-      institutionType === 'PT');
+    isPagoPaProductE2E(productId) &&
+    (isPrivateInstitution(institutionType as InstitutionType) ||
+      isGpuInstitution(institutionType as InstitutionType) ||
+      isPaymentServiceProvider(institutionType as InstitutionType) ||
+      isTechPartner(institutionType as InstitutionType));
 
   let onboardingId = await getOnboardingIdByTaxCode(
     page,
@@ -492,14 +555,14 @@ export const stepCompleteOnboarding = async (
     if (requiresApproval || notOnIpa) {
       await redirectToApprove(page, onboardingId);
 
-      if (institutionType !== 'PT') {
+      if (!isTechPartner(institutionType)) {
         await page.waitForTimeout(2000);
 
         onboardingId = await getOnboardingIdByTaxCode(page, taxCode, productId, 'PENDING');
       }
     }
 
-    if (institutionType !== 'PT') {
+    if (!isTechPartner(institutionType)) {
       await page.goto(`${BASE_URL_ONBOARDING}/confirm?jwt=${onboardingId}`, {
         timeout: 10000,
       });
@@ -562,7 +625,7 @@ export const stepCompleteOnboarding = async (
     await page.click('#recipientCode');
     await page.fill('#recipientCode', copiedText, { timeout: 500 });
   }
-  if (product === PRODUCT_IDS_TEST_E2E.IO_SIGN) {
+  if (isIoSignProductE2E(product)) {
     await page.click('#supportEmail');
     await page.fill('#supportEmail', 'test@test.it', { timeout: 500 });
   }

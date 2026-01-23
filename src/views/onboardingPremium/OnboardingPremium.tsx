@@ -29,6 +29,7 @@ import { PRODUCT_IDS } from '../../utils/constants';
 import { ENV } from '../../utils/env';
 import { registerUnloadEvent, unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
 import { getPricingPlan } from '../../services/subProductServices';
+import { isPagoPaInsights } from '../../utils/institutionTypeUtils';
 import { SubProductStepSelectUserParty } from './components/SubProductStepSelectUserParty';
 import SubProductStepSubmit from './components/SubProductStepSubmit';
 import SubProductStepSuccess from './components/SubProductStepSuccess';
@@ -333,7 +334,7 @@ function OnboardingPremiumComponent() {
               );
               setOpenExitModal(true);
             } else {
-              if (subProductId === PRODUCT_IDS.DASHBOARD_PSP) {
+              if (isPagoPaInsights(subProductId)) {
                 setActiveStep(activeStep - 2);
               } else {
                 back();
