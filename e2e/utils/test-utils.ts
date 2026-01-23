@@ -1,19 +1,7 @@
 /* eslint-disable functional/no-let */
 import path from 'path';
 import { Page, expect } from '@playwright/test';
-import { InstitutionType } from '../../types';
 
-import {
-  isContractingAuthority,
-  isGlobalServiceProvider,
-  isGpuInstitution,
-  isInsuranceCompany,
-  isPaymentServiceProvider,
-  isPrivateInstitution,
-  isPrivateMerchantInstitution,
-  isPublicServiceCompany,
-  isTechPartner,
-} from '../../src/utils/institutionTypeUtils';
 import { getOnboardingIdByTaxCode } from './api-utils';
 import { isLocalMode } from './global.setup';
 import { trackOnboardingId } from './onboarding-tracker';
@@ -63,6 +51,19 @@ export const TAX_CODES_BY_INSTITUTION_TYPE = {
   PT: '99887766554',
 };
 
+export type InstitutionType =
+  | 'PA'
+  | 'GSP'
+  | 'SCP'
+  | 'PT'
+  | 'PSP'
+  | 'SA'
+  | 'AS'
+  | 'PRV'
+  | 'PRV_PF'
+  | 'GPU'
+  | 'SCEC';
+
 export const isInteropProductE2E = (productId?: string): boolean =>
   productId === PRODUCT_IDS_TEST_E2E.INTEROP;
 
@@ -86,9 +87,45 @@ export const isSendProductE2E = (productId?: string): boolean =>
 
 export const isPagoPaInsightsE2E = (productId?: string): boolean =>
   productId === PRODUCT_IDS_TEST_E2E.DASHBOARD_PSP;
-
 export const isFideiussioniProductE2E = (productId?: string): boolean =>
   productId?.startsWith(PRODUCT_IDS_TEST_E2E.FD) ?? false;
+
+export const isPrivateInstitutionE2E = (institutionType?: InstitutionType): boolean =>
+  institutionType === 'PRV';
+
+export const isPrivatePersonInstitutionE2E = (institutionType?: InstitutionType): boolean =>
+  institutionType === 'PRV_PF';
+
+export const isPrivateOrPersonInstitutionE2E = (institutionType?: InstitutionType): boolean =>
+  institutionType === 'PRV' || institutionType === 'PRV_PF';
+
+export const isPublicServiceCompanyE2E = (institutionType?: InstitutionType): boolean =>
+  institutionType === 'SCP';
+
+export const isPublicAdministrationE2E = (institutionType?: InstitutionType): boolean =>
+  institutionType === 'PA';
+
+export const isPaymentServiceProviderE2E = (institutionType?: InstitutionType): boolean =>
+  institutionType === 'PSP';
+
+export const isContractingAuthorityE2E = (institutionType?: InstitutionType): boolean =>
+  institutionType === 'SA';
+
+export const isInsuranceCompanyE2E = (institutionType?: InstitutionType): boolean =>
+  institutionType === 'AS';
+
+export const isGlobalServiceProviderE2E = (institutionType?: InstitutionType): boolean =>
+  institutionType === 'GSP';
+
+export const isTechPartner = (institutionType?: InstitutionType): boolean =>
+  institutionType === 'PT';
+
+export const isGpuInstitutionE2E = (institutionType?: InstitutionType): boolean =>
+  institutionType === 'GPU';
+
+export const isConsolidatedEconomicAccountCompanyE2E = (
+  institutionType?: InstitutionType
+): boolean => institutionType === 'SCEC';
 
 export const stepInstitutionType = async (page: Page, institutionType: string) => {
   await page.waitForTimeout(1000);
@@ -183,8 +220,8 @@ export const stepFormData = async (
   if (
     !isFromIpa ||
     (isPagoPaProductE2E(product) &&
-      (isPrivateInstitution(institutionType as InstitutionType) ||
-        isGpuInstitution(institutionType as InstitutionType)))
+      (isPrivateInstitutionE2E(institutionType as InstitutionType) ||
+        isGpuInstitutionE2E(institutionType as InstitutionType)))
   ) {
     await page.click('#businessName');
     await page.fill('#businessName', 'test');
@@ -198,7 +235,7 @@ export const stepFormData = async (
       taxCode ||
         (!isFromIpa
           ? '11779933554'
-          : isPrivateInstitution(institutionType as InstitutionType)
+          : isPrivateInstitutionE2E(institutionType as InstitutionType)
             ? '19734628500'
             : '10203040506')
     );
@@ -208,19 +245,19 @@ export const stepFormData = async (
 
   if (
     isInteropProductE2E(product) &&
-    isPrivateInstitution(actualInstitutionType as InstitutionType)
+    isPrivateInstitutionE2E(actualInstitutionType as InstitutionType)
   ) {
     await page.click('#taxCodeEquals2VatNumber');
   }
 
   if (
     (isInteropProductE2E(product) &&
-      (isContractingAuthority(actualInstitutionType as InstitutionType) ||
-        isInsuranceCompany(actualInstitutionType as InstitutionType))) ||
+      (isContractingAuthorityE2E(actualInstitutionType as InstitutionType) ||
+        isInsuranceCompanyE2E(actualInstitutionType as InstitutionType))) ||
     !isFromIpa ||
     (isPagoPaProductE2E(product) &&
-      (isPrivateInstitution(institutionType as InstitutionType) ||
-        isGpuInstitution(institutionType as InstitutionType)))
+      (isPrivateInstitutionE2E(institutionType as InstitutionType) ||
+        isGpuInstitutionE2E(institutionType as InstitutionType)))
   ) {
     await page.click('#registeredOffice');
     await page.fill('#registeredOffice', isFromIpa ? 'Via test 1' : 'via test 1');
@@ -235,8 +272,8 @@ export const stepFormData = async (
 
   if (
     isFromIpa &&
-    !isPrivateInstitution(institutionType as InstitutionType) &&
-    !isGpuInstitution(institutionType as InstitutionType)
+    !isPrivateInstitutionE2E(institutionType as InstitutionType) &&
+    !isGpuInstitutionE2E(institutionType as InstitutionType)
   ) {
     await page.getByLabel('La Partita IVA coincide con il Codice Fiscale').click();
   }
@@ -244,8 +281,8 @@ export const stepFormData = async (
   if (
     isFromIpa &&
     !isInteropProductE2E(product) &&
-    !isPrivateMerchantInstitution(actualInstitutionType as InstitutionType) &&
-    !isPublicServiceCompany(actualInstitutionType as InstitutionType) &&
+    !isPrivateInstitutionE2E(actualInstitutionType as InstitutionType) &&
+    !isPublicServiceCompanyE2E(actualInstitutionType as InstitutionType) &&
     !isIoProductE2E(product)
   ) {
     await page.click('#recipientCode');
@@ -271,8 +308,8 @@ export const stepFormData = async (
     await page.fill('#recipientCode', 'A1B2C3');
 
     if (
-      isGlobalServiceProvider(actualInstitutionType as InstitutionType) ||
-      isPublicServiceCompany(actualInstitutionType as InstitutionType)
+      isGlobalServiceProviderE2E(actualInstitutionType as InstitutionType) ||
+      isPublicServiceCompanyE2E(actualInstitutionType as InstitutionType)
     ) {
       await page.click('#recipientCode');
       await page.fill('#recipientCode', 'A1B2C3');
@@ -285,17 +322,18 @@ export const stepFormData = async (
   }
 
   if (
-    isInsuranceCompany(actualInstitutionType as InstitutionType) ||
-    isGpuInstitution(actualInstitutionType as InstitutionType) ||
-    (isGlobalServiceProvider(actualInstitutionType as InstitutionType) && !isFromIpa)
+    isInsuranceCompanyE2E(actualInstitutionType as InstitutionType) ||
+    isGpuInstitutionE2E(actualInstitutionType as InstitutionType) ||
+    (isGlobalServiceProviderE2E(actualInstitutionType as InstitutionType) && !isFromIpa)
   ) {
     await page.click('#rea');
     await page.fill('#rea', 'RM-123456');
   }
 
   if (
-    isInsuranceCompany(actualInstitutionType as InstitutionType) ||
-    (isInteropProductE2E(product) && isPrivateInstitution(actualInstitutionType as InstitutionType))
+    isInsuranceCompanyE2E(actualInstitutionType as InstitutionType) ||
+    (isInteropProductE2E(product) &&
+      isPrivateInstitutionE2E(actualInstitutionType as InstitutionType))
   ) {
     await page.click('#businessRegisterPlace');
     await page.fill('#businessRegisterPlace', 'Comune di Milano');
@@ -304,7 +342,7 @@ export const stepFormData = async (
     await page.fill('#shareCapital', '€ 1.5000');
   }
 
-  if (!isFromIpa && isPaymentServiceProvider(actualInstitutionType as InstitutionType)) {
+  if (!isFromIpa && isPaymentServiceProviderE2E(actualInstitutionType as InstitutionType)) {
     await page.click('#commercialRegisterNumber');
     await page.fill('#commercialRegisterNumber', '19191919191');
 
@@ -328,7 +366,7 @@ export const stepFormData = async (
   }
 
   if (
-    isPrivateInstitution(actualInstitutionType as InstitutionType) &&
+    isPrivateInstitutionE2E(actualInstitutionType as InstitutionType) &&
     isIdpayMerchantProductE2E(product)
   ) {
     await page.click('#businessRegisterPlace');
@@ -345,10 +383,10 @@ export const stepFormData = async (
   }
 
   const shouldShowNazionale = isFromIpa
-    ? !isPublicServiceCompany(actualInstitutionType as InstitutionType) &&
-      !isContractingAuthority(actualInstitutionType as InstitutionType) &&
-      !isInsuranceCompany(actualInstitutionType as InstitutionType) &&
-      (!isPrivateInstitution(actualInstitutionType as InstitutionType) ||
+    ? !isPublicServiceCompanyE2E(actualInstitutionType as InstitutionType) &&
+      !isContractingAuthorityE2E(actualInstitutionType as InstitutionType) &&
+      !isInsuranceCompanyE2E(actualInstitutionType as InstitutionType) &&
+      (!isPrivateInstitutionE2E(actualInstitutionType as InstitutionType) ||
         !isInteropProductE2E(product))
     : !isTechPartner(actualInstitutionType as InstitutionType);
   if (shouldShowNazionale) {
@@ -539,9 +577,9 @@ export const stepCompleteOnboarding = async (
 ) => {
   const requiresApproval =
     isPagoPaProductE2E(productId) &&
-    (isPrivateInstitution(institutionType as InstitutionType) ||
-      isGpuInstitution(institutionType as InstitutionType) ||
-      isPaymentServiceProvider(institutionType as InstitutionType) ||
+    (isPrivateInstitutionE2E(institutionType as InstitutionType) ||
+      isGpuInstitutionE2E(institutionType as InstitutionType) ||
+      isPaymentServiceProviderE2E(institutionType as InstitutionType) ||
       isTechPartner(institutionType as InstitutionType));
 
   let onboardingId = await getOnboardingIdByTaxCode(
