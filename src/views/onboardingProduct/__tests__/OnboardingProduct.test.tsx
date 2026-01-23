@@ -31,6 +31,20 @@ import {
 import { createStore } from '../../../redux/store';
 import { Provider } from 'react-redux';
 import axios from 'axios';
+import {
+  isConsolidatedEconomicAccountCompany,
+  isContractingAuthority,
+  isGlobalServiceProvider,
+  isIdpayMerchantProduct,
+  isInsuranceCompany,
+  isInteropProduct,
+  isIoProduct,
+  isPrivateInstitution,
+  isPrivateMerchantInstitution,
+  isPrivatePersonInstitution,
+  isPublicAdministration,
+  isPublicServiceCompany,
+} from '../../../utils/institutionTypeUtils';
 
 jest.setTimeout(40000);
 jest.mock('react-router-dom', () => ({
@@ -90,18 +104,20 @@ const filterByCategory4Test = (institutionType?: string, productId?: string) => 
       return mockedCategories.product['prod-idpay-merchant']?.merchantDetails;
 
     case PRODUCT_IDS.INTEROP:
-      if (institutionType === 'SCEC') {
+      if (isConsolidatedEconomicAccountCompany(institutionType as InstitutionType)) {
         return mockedCategories.product['prod-interop']?.ipa.SCEC;
-      } else if (institutionType === 'PA') {
+      } else if (isPublicAdministration(institutionType as InstitutionType)) {
         return mockedCategories.product['prod-interop']?.ipa.PA;
-      } else if (institutionType === 'GSP') {
+      } else if (isGlobalServiceProvider(institutionType as InstitutionType)) {
         return mockedCategories.product.default?.ipa.GSP;
       } else {
         return mockedCategories.product.default?.ipa.PA;
       }
     default:
       const defaultIpa = mockedCategories.product.default?.ipa;
-      return institutionType === 'GSP' ? defaultIpa?.GSP : defaultIpa?.PA;
+      return isGlobalServiceProvider(institutionType as InstitutionType)
+        ? defaultIpa?.GSP
+        : defaultIpa?.PA;
   }
 };
 
@@ -486,7 +502,7 @@ test('Test: Successfull complete onboarding request of italian AS without tax co
   await executeGoHome(mockedLocation);
 });
 
-test('Test: Successfull complete onboarding request of SCP for product prod-interop search from infocamere with tax code', async () => {
+test('Test: Successfull complete onboarding request of SCP for product prod-interop search with tax code', async () => {
   await completeOnboardingPdndInfocamereRequest('SCP');
 });
 
@@ -866,7 +882,10 @@ const executeStepSearchParty = async (
   const inputPartyName = document.getElementById('Parties') as HTMLElement;
 
   const withoutIpaLink = document.getElementById('no_ipa') as HTMLElement;
-  if (productId === PRODUCT_IDS.PAGOPA && institutionType === 'GSP') {
+  if (
+    productId === PRODUCT_IDS.PAGOPA &&
+    isGlobalServiceProvider(institutionType as InstitutionType)
+  ) {
     expect(withoutIpaLink).toBeInTheDocument();
     if (withoutIpa) {
       fireEvent.click(withoutIpaLink);
@@ -899,22 +918,23 @@ const executeStepSearchParty = async (
       expect(fetchWithLogsSpy).toHaveBeenNthCalledWith(
         4,
         {
-          endpoint:
-            institutionType === 'SA'
-              ? 'ONBOARDING_GET_SA_PARTIES_NAME'
-              : institutionType === 'AS'
-                ? 'ONBOARDING_GET_INSURANCE_COMPANIES_FROM_BUSINESSNAME'
-                : 'ONBOARDING_GET_SEARCH_PARTIES',
+          endpoint: isContractingAuthority(institutionType as InstitutionType)
+            ? 'ONBOARDING_GET_SA_PARTIES_NAME'
+            : isInsuranceCompany(institutionType as InstitutionType)
+              ? 'ONBOARDING_GET_INSURANCE_COMPANIES_FROM_BUSINESSNAME'
+              : 'ONBOARDING_GET_SEARCH_PARTIES',
         },
         {
           method: 'GET',
           params: {
             limit:
-              institutionType === 'SA' || institutionType === 'AS'
+              isContractingAuthority(institutionType as InstitutionType) ||
+              isInsuranceCompany(institutionType as InstitutionType)
                 ? undefined
                 : ENV.MAX_INSTITUTIONS_FETCH,
             categories:
-              institutionType === 'SA' || institutionType === 'AS'
+              isContractingAuthority(institutionType as InstitutionType) ||
+              isInsuranceCompany(institutionType as InstitutionType)
                 ? undefined
                 : filterByCategory4Test(institutionType.toUpperCase(), productId),
             page: 1,
@@ -1027,12 +1047,12 @@ const executeStepSearchParty = async (
 
       const endpoint =
         typeOfSearch === 'taxCode' || typeOfSearch === 'personalTaxCode'
-          ? institutionType === 'SA'
+          ? isContractingAuthority(institutionType as InstitutionType)
             ? 'ONBOARDING_GET_SA_PARTY_FROM_FC'
-            : institutionType === 'SCP' ||
-                (institutionType === 'PRV' && productId !== PRODUCT_IDS.IDPAY_MERCHANT)
+            : isPrivateInstitution(institutionType as InstitutionType) &&
+                !isIdpayMerchantProduct(productId)
               ? 'ONBOARDING_GET_PARTY_BY_CF_FROM_INFOCAMERE'
-              : productId === PRODUCT_IDS.IDPAY_MERCHANT
+              : isIdpayMerchantProduct(productId)
                 ? 'ONBOARDING_GET_VISURA_INFOCAMERE_BY_CF'
                 : 'ONBOARDING_GET_PARTY_FROM_CF'
           : typeOfSearch === 'aooCode'
@@ -1045,11 +1065,11 @@ const executeStepSearchParty = async (
 
       const endpointParams =
         typeOfSearch === 'taxCode'
-          ? institutionType === 'SA'
+          ? isContractingAuthority(institutionType as InstitutionType)
             ? { taxId: taxCode }
             : { id: taxCode }
           : typeOfSearch === 'personalTaxCode'
-            ? institutionType === 'SA'
+            ? isContractingAuthority(institutionType as InstitutionType)
               ? { taxId: personalTaxCode }
               : { id: personalTaxCode }
             : typeOfSearch === 'aooCode'
@@ -1066,14 +1086,16 @@ const executeStepSearchParty = async (
           : typeOfSearch === 'taxCode' ||
               typeOfSearch === 'ivassCode' ||
               typeOfSearch === 'personalTaxCode'
-            ? institutionType === 'SA' || institutionType === 'AS'
+            ? isContractingAuthority(institutionType as InstitutionType) ||
+              isInsuranceCompany(institutionType as InstitutionType)
               ? undefined
               : {
                   productId: undefined,
                   subunitCode: undefined,
                   taxCode: undefined,
                   categories:
-                    institutionType === 'SCP' || institutionType === 'PRV'
+                    isPublicServiceCompany(institutionType as InstitutionType) ||
+                    isPrivateInstitution(institutionType as InstitutionType)
                       ? undefined
                       : filterByCategory4Test(institutionType, productId),
                 }
@@ -1137,10 +1159,6 @@ const executeStepBillingData = async (
 ) => {
   console.log('Testing step billing data..');
   await waitFor(() => screen.getByText('Inserisci i dati dell’ente'));
-
-  const isPrivateMerchant =
-    (institutionType === 'PRV' || institutionType === 'PRV_PF') &&
-    productId === PRODUCT_IDS.IDPAY_MERCHANT;
   const isInvoicable = canInvoice(institutionType.toUpperCase(), productId);
 
   await fillUserBillingDataForm(
@@ -1170,7 +1188,7 @@ const executeStepBillingData = async (
 
   const confirmButton = screen.getByRole('button', { name: 'Continua' });
 
-  if (isPrivateMerchant) {
+  if (isPrivateMerchantInstitution(institutionType as InstitutionType, productId)) {
     expect(document.getElementById('recipientCode')).not.toBeInTheDocument();
     expect(document.getElementById('taxCodeInvoicing')).not.toBeInTheDocument();
     expect(document.getElementById('supportEmail')).not.toBeInTheDocument();
@@ -1191,12 +1209,12 @@ const executeStepBillingData = async (
           ? '998877665544'
           : '87654321098';
 
-    if (isInvoicable && productId !== PRODUCT_IDS.IO) {
+    if (isInvoicable && !isIoProduct(productId)) {
       fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
         target: { value: recipientCodeInput },
       });
 
-      if (isUo || institutionType === 'PA') {
+      if (isUo || isPublicAdministration(institutionType as InstitutionType)) {
         await waitFor(() =>
           expect(document.getElementById('taxCodeInvoicing')).toHaveValue(taxCodeInvoicingInput)
         );
