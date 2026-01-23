@@ -86,7 +86,7 @@ test('Test Success onboarding request for product prod-io and institutionType GS
   await stepAddAdmin(page);
   await stepCompleteOnboarding(
     page,
-    '01944590221',
+    '80001080532',
     FILE_MOCK_PDF_CONTRACT.PA,
     PRODUCT_IDS_TEST_E2E.IO
   );

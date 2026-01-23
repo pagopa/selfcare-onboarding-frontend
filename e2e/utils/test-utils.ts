@@ -300,20 +300,16 @@ export const stepFormData = async (
       }
     );
   } else if (
-    !isFromIpa &&
-    !isTechPartner(actualInstitutionType as InstitutionType) &&
-    !isIoProductE2E(product)
+    (!isFromIpa &&
+      !isTechPartner(actualInstitutionType as InstitutionType) &&
+      !isIoProductE2E(product)) ||
+    isGlobalServiceProviderE2E(actualInstitutionType as InstitutionType) ||
+    isPublicServiceCompanyE2E(actualInstitutionType as InstitutionType) ||
+    (isPagoPaProductE2E(product) &&
+      isPrivateInstitutionE2E(actualInstitutionType as InstitutionType))
   ) {
     await page.click('#recipientCode');
     await page.fill('#recipientCode', 'A1B2C3');
-
-    if (
-      isGlobalServiceProviderE2E(actualInstitutionType as InstitutionType) ||
-      isPublicServiceCompanyE2E(actualInstitutionType as InstitutionType)
-    ) {
-      await page.click('#recipientCode');
-      await page.fill('#recipientCode', 'A1B2C3');
-    }
   }
 
   if (isFromIpa && isIoSignProductE2E(product)) {
