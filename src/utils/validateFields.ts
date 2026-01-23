@@ -15,6 +15,7 @@ import {
   PRODUCT_IDS,
 } from './constants';
 import { ENV } from './env';
+import { isContractingAuthority, isInsuranceCompany } from './institutionTypeUtils';
 
 const ITALIAN_IBAN_REGEX = /^IT[0-9]{2}[A-Z][0-9]{10}[A-Z0-9]{12}$/;
 const IBAN_LENGTH = 27;
@@ -47,7 +48,7 @@ const validateTaxCode = (
   institutionType: InstitutionType,
   t: TFunction
 ) => {
-  if (!taxCode && institutionType !== 'AS') {
+  if (!taxCode && !isInsuranceCompany(institutionType)) {
     return requiredError;
   }
   if (taxCode && !fiscalAndVatCodeRegexp.test(taxCode)) {
@@ -88,14 +89,22 @@ const validateCountry = (values: Partial<OnboardingFormData>, institutionType: I
   if (!values.country && values.isForeignInsurance) {
     return requiredError;
   }
-  if (institutionType === 'AS' && values?.country && !onlyCharacters.test(values.country)) {
+  if (
+    isInsuranceCompany(institutionType) &&
+    values?.country &&
+    !onlyCharacters.test(values.country)
+  ) {
     return true;
   }
   return undefined;
 };
 
-const validateIban = (iban: string | undefined, isPrivateMerchant: boolean, t: TFunction) => {
-  if (isPrivateMerchant && !iban) {
+const validateIban = (
+  iban: string | undefined,
+  isPrivateMerchantInstitution: boolean,
+  t: TFunction
+) => {
+  if (isPrivateMerchantInstitution && !iban) {
     return requiredError;
   }
   if (iban?.length === IBAN_LENGTH && !ITALIAN_IBAN_REGEX.test(iban)) {
@@ -107,15 +116,15 @@ const validateIban = (iban: string | undefined, isPrivateMerchant: boolean, t: T
 const validateConfirmIban = (
   confirmIban: string | undefined,
   originalIban: string | undefined,
-  isPrivateMerchant: boolean,
+  isPrivateMerchantInstitution: boolean,
   t: TFunction
 ) => {
-  if (isPrivateMerchant && !confirmIban) {
+  if (isPrivateMerchantInstitution && !confirmIban) {
     return requiredError;
   }
 
   if (
-    isPrivateMerchant &&
+    isPrivateMerchantInstitution &&
     confirmIban &&
     confirmIban.length > 0 &&
     confirmIban.length < IBAN_LENGTH
@@ -222,12 +231,14 @@ export const validateFields = (
   isPremium: boolean,
   invalidTaxCodeInvoicing: boolean,
   isPdndPrivate: boolean,
-  isPrivateMerchant: boolean,
+  isPrivateMerchantInstitution: boolean,
   recipientCodeStatus?: string,
   productId?: string
 ) => {
-  const isRequiredForInfoCompany = isInformationCompany || isPdndPrivate || isPrivateMerchant;
-  const isRequiredForSaOrPrivate = institutionType === 'SA' || isPdndPrivate || isPrivateMerchant;
+  const isRequiredForInfoCompany =
+    isInformationCompany || isPdndPrivate || isPrivateMerchantInstitution;
+  const isRequiredForSaOrPrivate =
+    isContractingAuthority(institutionType) || isPdndPrivate || isPrivateMerchantInstitution;
   const validationRules = {
     businessName: validateConditionalRequired(values.businessName, true),
     registeredOffice: validateConditionalRequired(values.registeredOffice, true),
@@ -235,13 +246,18 @@ export const validateFields = (
     taxCode: validateTaxCode(values.taxCode, institutionType, t),
     vatNumber: validateVatNumber(values, isVatRegistrated, vatVerificationGenericError, t),
     city: validateCity(values),
-    county: validateConditionalRequired(values.county, institutionType !== 'AS'),
+    county: validateConditionalRequired(values.county, !isInsuranceCompany(institutionType)),
     country: validateCountry(values, institutionType),
     digitalAddress: validateEmail(values.digitalAddress, t),
-    originId: validateConditionalRequired(values.originId, institutionType === 'AS'),
-    holder: validateConditionalRequired(values.holder, isPrivateMerchant),
-    iban: validateIban(values.iban, isPrivateMerchant, t),
-    confirmIban: validateConfirmIban(values.confirmIban, values.iban, isPrivateMerchant, t),
+    originId: validateConditionalRequired(values.originId, isInsuranceCompany(institutionType)),
+    holder: validateConditionalRequired(values.holder, isPrivateMerchantInstitution),
+    iban: validateIban(values.iban, isPrivateMerchantInstitution, t),
+    confirmIban: validateConfirmIban(
+      values.confirmIban,
+      values.iban,
+      isPrivateMerchantInstitution,
+      t
+    ),
     businessRegisterPlace: validateConditionalRequired(
       values.businessRegisterPlace,
       isRequiredForSaOrPrivate
@@ -255,7 +271,7 @@ export const validateFields = (
             t('onboardingFormData.billingDataSection.invalidReaField')
           ),
     shareCapital:
-      (institutionType === 'SA' || isPdndPrivate) && !values.shareCapital
+      (isContractingAuthority(institutionType) || isPdndPrivate) && !values.shareCapital
         ? requiredError
         : validateFieldWithPattern(
             values.shareCapital,

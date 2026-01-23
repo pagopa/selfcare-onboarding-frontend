@@ -8,6 +8,16 @@ import { AdditionalData, AdditionalInformations } from '../../../../model/Additi
 import { OnboardingFormData } from '../../../../model/OnboardingFormData';
 import { PRODUCT_IDS } from '../../../../utils/constants';
 import { selected2OnboardingData } from '../../../../utils/selected2OnboardingData';
+import {
+  isConsolidatedEconomicAccountCompany,
+  isContractingAuthority,
+  isGlobalServiceProvider,
+  isInsuranceCompany,
+  isPagoPaProduct,
+  isPrivateInstitution,
+  isPublicAdministration,
+  isPublicServiceCompany,
+} from '../../../../utils/institutionTypeUtils';
 
 interface ForwardFunctionsParams {
   requestIdRef: MutableRefObject<string | undefined>;
@@ -74,7 +84,10 @@ export const createForwardFunctions = (params: ForwardFunctionsParams) => {
     });
     setInstitutionType(newInstitutionType);
 
-    if (newInstitutionType === 'PRV' && productId === PRODUCT_IDS.PAGOPA) {
+    if (
+      isPrivateInstitution(newInstitutionType as InstitutionType) &&
+      isPagoPaProduct(productId)
+    ) {
       selected2OnboardingData(null, undefined, newInstitutionType, productId);
       setOnboardingFormData(
         selected2OnboardingData(null, undefined, newInstitutionType, productId)
@@ -85,13 +98,13 @@ export const createForwardFunctions = (params: ForwardFunctionsParams) => {
     }
 
     if (
-      newInstitutionType !== 'GSP' &&
-      newInstitutionType !== 'PA' &&
-      newInstitutionType !== 'SA' &&
-      newInstitutionType !== 'AS' &&
-      newInstitutionType !== 'SCP' &&
-      newInstitutionType !== 'PRV' &&
-      newInstitutionType !== 'SCEC'
+      !isGlobalServiceProvider(newInstitutionType) &&
+      !isPublicAdministration(newInstitutionType) &&
+      !isContractingAuthority(newInstitutionType) &&
+      !isInsuranceCompany(newInstitutionType as InstitutionType) &&
+      !isPublicServiceCompany(newInstitutionType) &&
+      !isPrivateInstitution(newInstitutionType) &&
+      !isConsolidatedEconomicAccountCompany(newInstitutionType)
     ) {
       if (newInstitutionType !== institutionType) {
         setOnboardingFormData({
