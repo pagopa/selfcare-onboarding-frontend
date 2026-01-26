@@ -58,7 +58,7 @@ export const verifyRequest = async ({
           setOutcomeContentState('toBeCompleted');
           break;
       }
-    } else {
+    } else if (isExpiredRequest && requestData.status !== 'TOBEVALIDATED') {
       setOutcomeContentState('expired');
     }
     setRequestData(requestData);
