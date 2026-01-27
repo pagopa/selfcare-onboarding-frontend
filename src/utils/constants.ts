@@ -110,7 +110,7 @@ export const API = {
     URL: ENV.URL_API.ONBOARDING_V2 + '/v2/tokens/{{token}}/complete-onboarding-users',
   },
   ONBOARDING_GET_POST_ATTACHMENT: {
-    URL: ENV.URL_API.ONBOARDING_V2 + '/v2/tokens/{{onboardingId}}/attachment?name={{filename}}',
+    URL: ENV.URL_API.ONBOARDING_V2 + '/v2/tokens/{{onboardingId}}/template-attachment?name={{filename}}',
   },
   ONBOARDING_GET_INFO: {
     URL: ENV.URL_API.ONBOARDING_V2 + '/v2/tokens/{{onboardingId}}',

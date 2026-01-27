@@ -35,7 +35,7 @@ export function ConfirmRegistrationStep0({
     const sessionToken = storageTokenOps.read();
     const url =
       translationKeyValue === 'attachments'
-        ? ENV.URL_API.ONBOARDING_V2 + `/v2/tokens/${onboardingId}/attachment?name=${documentName}`
+        ? ENV.URL_API.ONBOARDING_V2 + `/v2/tokens/${onboardingId}/template-attachment?name=${documentName}`
         : ENV.URL_API.ONBOARDING_V2 + `/v2/tokens/${onboardingId}/contract`;
 
     fetch(url, {
