@@ -109,7 +109,13 @@ export const API = {
   USER_COMPLETE_REGISTRATION: {
     URL: ENV.URL_API.ONBOARDING_V2 + '/v2/tokens/{{token}}/complete-onboarding-users',
   },
-  ONBOARDING_GET_POST_ATTACHMENT: {
+  ONBOARDING_GET_TEMPLATE_ATTACHMENT: {
+    URL: ENV.URL_API.ONBOARDING_V2 + '/v2/tokens/{{onboardingId}}/template-attachment?name={{filename}}',
+  },
+  ONBOARDING_GET_ATTACHMENT: {
+    URL: ENV.URL_API.ONBOARDING_V2 + '/v2/tokens/{{onboardingId}}/attachment?name={{filename}}',
+  },
+  ONBOARDING_POST_ATTACHMENT: {
     URL: ENV.URL_API.ONBOARDING_V2 + '/v2/tokens/{{onboardingId}}/attachment?name={{filename}}',
   },
   ONBOARDING_GET_INFO: {

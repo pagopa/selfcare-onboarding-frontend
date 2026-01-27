@@ -79,7 +79,7 @@ export const onboardingContractUpload = async (
 
   const getEndpoint = () => {
     if (isAttachment) {
-      return 'ONBOARDING_GET_POST_ATTACHMENT';
+      return 'ONBOARDING_POST_ATTACHMENT';
     }
     return addUserFlow ? 'USER_COMPLETE_REGISTRATION' : 'ONBOARDING_COMPLETE_REGISTRATION';
   };
