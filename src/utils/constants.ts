@@ -112,6 +112,9 @@ export const API = {
   ONBOARDING_GET_TEMPLATE_ATTACHMENT: {
     URL: ENV.URL_API.ONBOARDING_V2 + '/v2/tokens/{{onboardingId}}/template-attachment?name={{filename}}',
   },
+  ONBOARDING_GET_ATTACHMENT: {
+    URL: ENV.URL_API.ONBOARDING_V2 + '/v2/tokens/{{onboardingId}}/attachment?name={{filename}}',
+  },
   ONBOARDING_POST_ATTACHMENT: {
     URL: ENV.URL_API.ONBOARDING_V2 + '/v2/tokens/{{onboardingId}}/attachment?name={{filename}}',
   },
