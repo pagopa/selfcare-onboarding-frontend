@@ -454,9 +454,10 @@ export const stepAddManager = async (page: Page) => {
 export const stepAddAdmin = async (
   page: Page,
   aggregator?: boolean,
-  institutionType?: InstitutionType
+  institutionType?: InstitutionType,
+  isAddApplicantEmail?: boolean
 ) => {
-  if (isLocalMode) {
+  if (isLocalMode || isAddApplicantEmail) {
     await page.click('#delegate-initial-name');
     await page.fill('#delegate-initial-name', 'Mattia', {
       timeout: 1000,

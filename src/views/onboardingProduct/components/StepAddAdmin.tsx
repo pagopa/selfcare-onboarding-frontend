@@ -25,6 +25,7 @@ type Props = StepperStepComponentProps & {
   isTechPartner: boolean | undefined;
   addUserFlow: boolean;
   isAggregator?: boolean;
+  isAddApplicationEmail?: boolean;
 };
 
 export function StepAddAdmin({
@@ -37,6 +38,7 @@ export function StepAddAdmin({
   isTechPartner,
   addUserFlow,
   isAggregator,
+  isAddApplicationEmail,
 }: Props) {
   const { user, setRequiredLogin } = useContext(UserContext);
   const [_loading, setLoading] = useState(true);
@@ -67,7 +69,7 @@ export function StepAddAdmin({
     if (index === userIds.length) {
       if (Object.keys(peopleErrors).length === 0) {
         // TODO hide modal for PT until copy is changed. Remove if case isTechPartner after copy is changed
-        if (isTechPartner) {
+        if (isTechPartner || isAddApplicationEmail || isAggregator) {
           onForwardAction();
         } else {
           setOpenConfirmationModal(true);
@@ -335,7 +337,6 @@ export function StepAddAdmin({
               ),
         }}
       />
-
       <ConfirmOnboardingModal
         open={openConfirmationModal}
         addUser={addUserFlow}

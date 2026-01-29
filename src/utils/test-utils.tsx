@@ -317,7 +317,8 @@ const checkBackForwardNavigation = async (previousStepTitle: string, actualStepT
 
 const checkLoggedUserAsAdminCheckbox = async (
   confirmButton: HTMLElement,
-  addDelegateButton: HTMLElement | null
+  addDelegateButton: HTMLElement | null,
+  keepChecked: boolean = false
 ) => {
   clickAdminCheckBoxAndTestValues(
     confirmButton,
@@ -332,7 +333,9 @@ const checkLoggedUserAsAdminCheckbox = async (
     expect(addDelegateButton).toBeEnabled();
   }
 
-  clickAdminCheckBoxAndTestValues(confirmButton, addDelegateButton, '', '', '');
+  if (!keepChecked) {
+    clickAdminCheckBoxAndTestValues(confirmButton, addDelegateButton, '', '', '');
+  }
 };
 
 export const executeStepAddAdmin = async (
@@ -341,6 +344,7 @@ export const executeStepAddAdmin = async (
   isAggregator: boolean = false,
   addUserFlow: boolean,
   onlyAdmin: boolean,
+  isAddApplicantEmail: boolean,
   productId?: string
 ) => {
   console.log('Testing step add admin..');
@@ -364,20 +368,25 @@ export const executeStepAddAdmin = async (
   }
   const continueButton = screen.getByLabelText('Continua');
 
-  await checkLoggedUserAsAdminCheckbox(continueButton, addDelegateButton);
+  // Keep checkbox checked when isAddApplicantEmail=false (logged user must be in users to skip ApplicantEmail step)
+  const shouldKeepChecked = !isAddApplicantEmail;
+  await checkLoggedUserAsAdminCheckbox(continueButton, addDelegateButton, shouldKeepChecked);
 
-  await checkCertifiedUserValidation('delegate-initial', addUserFlow, onlyAdmin, productId);
+  // Fill other delegate data when NOT keeping checkbox checked
+  if (!shouldKeepChecked) {
+    await checkCertifiedUserValidation('delegate-initial', addUserFlow, onlyAdmin, productId);
 
-  await fillUserForm(
-    'delegate-initial',
-    'RSSLCU80A01F205N',
-    'a@a.AA',
-    addUserFlow,
-    onlyAdmin,
-    'LUCA',
-    'ROSSI',
-    productId
-  );
+    await fillUserForm(
+      'delegate-initial',
+      'RSSLCU80A01F205N',
+      'a@a.AA',
+      addUserFlow,
+      onlyAdmin,
+      'LUCA',
+      'ROSSI',
+      productId
+    );
+  }
 
   expect(continueButton).toBeEnabled();
   if (!addUserFlow) {
@@ -386,27 +395,56 @@ export const executeStepAddAdmin = async (
 
   fireEvent.click(continueButton);
 
-  if (!isTechPartner) {
-    await waitFor(() => screen.getByText('Confermi la richiesta di invio?'));
-    const confirmButton = screen.getByRole('button', { name: 'Conferma' });
-    await waitFor(() => fireEvent.click(confirmButton));
+  if (!isAddApplicantEmail) {
+    if (!isTechPartner && !isAggregator) {
+      await waitFor(() => screen.getByText('Confermi la richiesta di invio?'));
+      const confirmButton = screen.getByRole('button', { name: 'Conferma' });
+      await waitFor(() => fireEvent.click(confirmButton));
 
-    await waitFor(() => fireEvent.click(confirmButton));
-  }
+      await waitFor(() => fireEvent.click(confirmButton));
+    }
 
-  if (!isAggregator) {
-    await waitFor(() =>
-      screen.getByText(
-        isTechPartner && expectedSuccessfulSubmit
-          ? 'Richiesta di registrazione inviata'
-          : expectedSuccessfulSubmit
-            ? addUserFlow
-              ? 'Hai inviato la richiesta'
-              : 'Richiesta di adesione inviata'
-            : 'Qualcosa è andato storto.'
-      )
-    );
+    if (!isAggregator) {
+      await waitFor(() =>
+        screen.getByText(
+          isTechPartner && expectedSuccessfulSubmit
+            ? 'Richiesta di registrazione inviata'
+            : expectedSuccessfulSubmit
+              ? addUserFlow
+                ? 'Hai inviato la richiesta'
+                : 'Richiesta di adesione inviata'
+              : 'Qualcosa è andato storto.'
+        )
+      );
+    }
   }
+};
+
+export const executeStepAddApplicantEmailForm = async () => {
+  await waitFor(() => screen.getByText('Indica la tua email'));
+
+  const name = screen.getByTestId('name-applicant-test') as HTMLInputElement;
+  const surname = screen.getByTestId('surname-applicant-test') as HTMLInputElement;
+  const email = screen.getByTestId('email-applicant-test') as HTMLInputElement;
+
+  await waitFor(() => {
+    expect(name.value).toBe('loggedName');
+    expect(surname.value).toBe('loggedSurname');
+  });
+
+  fireEvent.change(email, { target: { value: 'INVALIDEMAIL' } });
+
+  expect(document.getElementById('email-applicant-helper-text')).toBeInTheDocument();
+  fireEvent.change(email, { target: { value: 'a@a.aa' } });
+
+  const continueButton = screen.getByLabelText('Continua');
+  fireEvent.click(continueButton);
+
+  await waitFor(() => screen.getByText('Confermi la richiesta di invio?'));
+  const confirmButton = screen.getByRole('button', { name: 'Conferma' });
+  await waitFor(() => fireEvent.click(confirmButton));
+
+  await waitFor(() => fireEvent.click(confirmButton));
 };
 
 export const billingData2billingDataRequest = (
@@ -603,7 +641,8 @@ export const verifySubmit = async (
   typeOfSearch: Search = 'businessName',
   isForeignInsurance?: boolean | undefined,
   haveTaxCode: boolean = true,
-  isAggregator?: boolean
+  isAggregator?: boolean,
+  isAddApplicantEmail?: boolean
   // eslint-disable-next-line sonarjs/cognitive-complexity
 ) => {
   const isPrivateMerchant = isPrivateMerchantInstitution(
@@ -832,13 +871,23 @@ export const verifySubmit = async (
             surname: 'SURNAME',
             taxCode: 'SRNNMA80A01A794F',
           },
-          {
-            email: 'a@a.aa',
-            name: 'LUCA',
-            role: 'DELEGATE',
-            surname: 'ROSSI',
-            taxCode: 'RSSLCU80A01F205N',
-          },
+          // Use logged user data when checkbox stays checked (isAddApplicantEmail=false)
+          !isAddApplicantEmail
+            ? {
+                email: 'a@a.aa',
+                name: 'loggedName',
+                role: 'DELEGATE',
+                surname: 'loggedSurname',
+                taxCode: 'LGGLGD80A01B354S',
+                uid: '0',
+              }
+            : {
+                email: 'a@a.aa',
+                name: 'LUCA',
+                role: 'DELEGATE',
+                surname: 'ROSSI',
+                taxCode: 'RSSLCU80A01F205N',
+              },
         ].filter((u) =>
           isTechPartner(institutionType as InstitutionType) ? u.role !== 'MANAGER' : u
         ),
@@ -889,6 +938,13 @@ export const verifySubmit = async (
               : undefined,
         isAggregator,
         aggregates: isAggregator ? [] : undefined,
+        userRequester: isAddApplicantEmail
+          ? {
+              name: 'loggedName',
+              surname: 'loggedSurname',
+              email: 'a@a.aa',
+            }
+          : undefined,
       },
     },
     expect.any(Function),

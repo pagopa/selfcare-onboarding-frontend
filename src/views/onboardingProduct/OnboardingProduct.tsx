@@ -36,25 +36,22 @@ import { postOnboardingSubmit } from '../../services/onboardingSubmitServices';
 import { PRODUCT_IDS } from '../../utils/constants';
 import { ENV } from '../../utils/env';
 import {
-  isTechPartner,
-  isPagoPaProduct,
-  isSendProduct,
-  isPaymentServiceProvider,
-  isPublicAdministration,
-  isContractingAuthority,
-  isGlobalServiceProvider,
   isConsolidatedEconomicAccountCompany,
-  isPagoPaInsights,
-  isPrivateInstitution,
-  isPrivatePersonInstitution,
+  isGlobalServiceProvider,
+  isPagoPaProduct,
+  isPublicAdministration,
+  isSendProduct,
+  isTechPartner,
 } from '../../utils/institutionTypeUtils';
 import { registerUnloadEvent, unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
+import { createBackFunctions } from './components/backwards/backFunctions';
+import { createForwardFunctions } from './components/forwards/forwardFunctions';
 import { StepAddAdmin } from './components/StepAddAdmin';
+import StepAddApplicantEmail from './components/StepAddApplicantEmail';
 import { StepAdditionalGpuInformations } from './components/StepAdditionalGpuInformations';
 import { StepAdditionalInformations } from './components/StepAdditionalInformations';
 import { StepUploadAggregates } from './components/StepUploadAggregates';
 import { genericError, StepVerifyOnboarding } from './components/StepVerifyOnboarding';
-import { createForwardFunctions } from './components/forwards/forwardFunctions';
 
 export type ValidateErrorType = 'conflictError';
 
@@ -102,6 +99,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
   const [pendingForward, setPendingForward] = useState<{
     data: Partial<FormData>;
   } | null>(null);
+  const [aggregatesData, setAggregatesData] = useState<Array<AggregateInstitution>>();
   const { setOnExit } = useContext(HeaderContext);
   const { setRequiredLogin } = useContext(UserContext);
   const requestIdRef = useRef<string>();
@@ -121,6 +119,129 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
   const institutionTypeByUrl = new URLSearchParams(window.location.search).get('institutionType');
   const desiredOriginRef = useRef<string | undefined>();
   const addUser = window.location.pathname.includes('/user');
+  const { user } = useContext(UserContext);
+
+  const outcomeContent: RequestOutcomeOptions = {
+    success: {
+      title: '',
+      description: [
+        <>
+          <EndingPage
+            minHeight="52vh"
+            icon={<IllusCompleted size={60} />}
+            title={
+              isTechPartner(institutionType)
+                ? t('onboarding.success.flow.techPartner.title')
+                : t('onboarding.success.flow.product.title')
+            }
+            description={
+              isTechPartner(institutionType) ? (
+                <Trans
+                  i18nKey="onboarding.success.flow.techPartner.description"
+                  components={{ 1: <br /> }}
+                >
+                  {`Invieremo un'email con l'esito della richiesta all'indirizzo <1 />PEC indicato.`}
+                </Trans>
+              ) : isPublicAdministration(institutionType) ? (
+                <Trans
+                  i18nKey="onboarding.success.flow.product.publicAdministration.description"
+                  components={{ 1: <br />, 3: <br /> }}
+                >
+                  {`Invieremo un'email all'indirizzo PEC primario dell'ente. <1 /> Al suo interno, ci sono le istruzioni per completare <3 />l'adesione.`}
+                </Trans>
+              ) : (
+                <Trans
+                  i18nKey="onboarding.success.flow.product.notPublicAdministration.description"
+                  components={{ 1: <br />, 3: <br /> }}
+                >
+                  {`Invieremo un'email all'indirizzo PEC indicato. <1 /> Al suo interno, ci sono le istruzioni per completare <3 />l'adesione.`}
+                </Trans>
+              )
+            }
+            variantTitle={'h4'}
+            variantDescription={'body1'}
+            buttonLabel={t('onboarding.backHome')}
+            onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+          />
+        </>,
+      ],
+    },
+    error: {
+      title: '',
+      description: [
+        <>
+          <EndingPage
+            minHeight="52vh"
+            icon={<IllusError size={60} />}
+            variantTitle={'h4'}
+            variantDescription={'body1'}
+            title={t('onboarding.error.title')}
+            description={
+              <Trans i18nKey="onboarding.error.description" components={{ 1: <br /> }}>
+                {`A causa di un errore del sistema non è possibile completare <1 />la procedura. Ti chiediamo di riprovare più tardi.`}
+              </Trans>
+            }
+            buttonLabel={t('onboarding.backHome')}
+            onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
+          />
+        </>,
+      ],
+    },
+  };
+
+  const notAllowedError: RequestOutcomeMessage = {
+    title: '',
+    description: [
+      <>
+        <UserNotAllowedPage
+          partyName={onboardingFormData?.businessName}
+          productTitle={selectedProduct?.title}
+        />
+      </>,
+    ],
+  };
+
+  const onSubmit = (
+    userData?: Partial<FormData> | undefined,
+    aggregates?: Array<AggregateInstitution>,
+    updatedOnboardingFormData?: OnboardingFormData
+  ) => {
+    const data = userData ?? formData;
+    const users = ((data as any).users as Array<UserOnCreate>)?.map((u) => ({
+      ...u,
+      taxCode: u?.taxCode?.toUpperCase(),
+      email: u?.email?.toLowerCase(),
+    }));
+
+    const usersWithoutLegal = users?.slice(0, 0).concat(users.slice(0 + 1));
+
+    postOnboardingSubmit(
+      setLoading,
+      setRequiredLogin,
+      productId,
+      selectedProduct,
+      setOutcome,
+      updatedOnboardingFormData ?? onboardingFormData,
+      requestIdRef,
+      externalInstitutionId,
+      additionalInformations,
+      additionalGPUInformations,
+      institutionType,
+      origin,
+      outcomeContent,
+      notAllowedError,
+      pricingPlan,
+      isTechPartner(institutionType) ? usersWithoutLegal : users,
+      user,
+      aggregates
+    ).catch(() => {
+      trackEvent('ONBOARDING_ADD_DELEGATE', {
+        request_id: requestIdRef.current,
+        party_id: externalInstitutionId,
+        product_id: productId,
+      });
+    });
+  };
 
   const back = () => {
     setActiveStep(activeStep - 1);
@@ -133,13 +254,16 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
   };
 
   const {
-    forwardWithData,
     forwardWithInstitutionType,
     forwardWithDataAndInstitution,
     forwardWithBillingData,
     forwardWithAdditionalGSPInfo,
     forwardWithAdditionalGPUInfo,
     forwardWithOnboardingData,
+    forwardFromManager,
+    forwardFromAdmin,
+    forwardFromAggregator,
+    forwardFromApplicantEmail,
   } = createForwardFunctions({
     requestIdRef,
     productId,
@@ -160,6 +284,33 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     setAdditionalInformations,
     setAdditionalGPUInformations,
     setPendingForward,
+    user,
+    onSubmit,
+    aggregatesData,
+    setAggregatesData,
+  });
+
+  const {
+    handleOpenExitModal,
+    backFromBillingData,
+    backFromManager,
+    backFromAdmin,
+    backFromApplicantEmail,
+  } = createBackFunctions({
+    activeStep,
+    setActiveStep,
+    setOpenExitModal,
+    setOnExitAction,
+    history,
+    fromDashboard,
+    productAvoidStep,
+    subunitTypeByQuery,
+    institutionType,
+    selectedProduct,
+    origin,
+    productId,
+    externalInstitutionId,
+    onboardingFormData,
   });
 
   useEffect(() => {
@@ -267,126 +418,6 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     }
   }, [filterCategoriesResponse, productId, institutionType]);
 
-  const outcomeContent: RequestOutcomeOptions = {
-    success: {
-      title: '',
-      description: [
-        <>
-          <EndingPage
-            minHeight="52vh"
-            icon={<IllusCompleted size={60} />}
-            title={
-              isTechPartner(institutionType)
-                ? t('onboarding.success.flow.techPartner.title')
-                : t('onboarding.success.flow.product.title')
-            }
-            description={
-              isTechPartner(institutionType) ? (
-                <Trans
-                  i18nKey="onboarding.success.flow.techPartner.description"
-                  components={{ 1: <br /> }}
-                >
-                  {`Invieremo un'email con l'esito della richiesta all'indirizzo <1 />PEC indicato.`}
-                </Trans>
-              ) : isPublicAdministration(institutionType) ? (
-                <Trans
-                  i18nKey="onboarding.success.flow.product.publicAdministration.description"
-                  components={{ 1: <br />, 3: <br /> }}
-                >
-                  {`Invieremo un’email all’indirizzo PEC primario dell’ente. <1 /> Al suo interno, ci sono le istruzioni per completare <3 />l’adesione.`}
-                </Trans>
-              ) : (
-                <Trans
-                  i18nKey="onboarding.success.flow.product.notPublicAdministration.description"
-                  components={{ 1: <br />, 3: <br /> }}
-                >
-                  {`Invieremo un’email all’indirizzo PEC indicato. <1 /> Al suo interno, ci sono le istruzioni per completare <3 />l’adesione.`}
-                </Trans>
-              )
-            }
-            variantTitle={'h4'}
-            variantDescription={'body1'}
-            buttonLabel={t('onboarding.backHome')}
-            onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
-          />
-        </>,
-      ],
-    },
-    error: {
-      title: '',
-      description: [
-        <>
-          <EndingPage
-            minHeight="52vh"
-            icon={<IllusError size={60} />}
-            variantTitle={'h4'}
-            variantDescription={'body1'}
-            title={t('onboarding.error.title')}
-            description={
-              <Trans i18nKey="onboarding.error.description" components={{ 1: <br /> }}>
-                {`A causa di un errore del sistema non è possibile completare <1 />la procedura. Ti chiediamo di riprovare più tardi.`}
-              </Trans>
-            }
-            buttonLabel={t('onboarding.backHome')}
-            onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
-          />
-        </>,
-      ],
-    },
-  };
-
-  const notAllowedError: RequestOutcomeMessage = {
-    title: '',
-    description: [
-      <>
-        <UserNotAllowedPage
-          partyName={onboardingFormData?.businessName}
-          productTitle={selectedProduct?.title}
-        />
-      </>,
-    ],
-  };
-
-  const onSubmit = (
-    userData?: Partial<FormData> | undefined,
-    aggregates?: Array<AggregateInstitution>
-  ) => {
-    const data = userData ?? formData;
-    const users = ((data as any).users as Array<UserOnCreate>).map((u) => ({
-      ...u,
-      taxCode: u?.taxCode?.toUpperCase(),
-      email: u?.email?.toLowerCase(),
-    }));
-
-    const usersWithoutLegal = users.slice(0, 0).concat(users.slice(0 + 1));
-
-    postOnboardingSubmit(
-      setLoading,
-      setRequiredLogin,
-      productId,
-      selectedProduct,
-      setOutcome,
-      onboardingFormData,
-      requestIdRef,
-      externalInstitutionId,
-      additionalInformations,
-      additionalGPUInformations,
-      institutionType,
-      origin,
-      outcomeContent,
-      notAllowedError,
-      pricingPlan,
-      isTechPartner(institutionType) ? usersWithoutLegal : users,
-      aggregates
-    ).catch(() => {
-      trackEvent('ONBOARDING_ADD_DELEGATE', {
-        request_id: requestIdRef.current,
-        party_id: externalInstitutionId,
-        product_id: productId,
-      });
-    });
-  };
-
   const steps: Array<StepperStep> = [
     {
       label: 'Select institution type',
@@ -398,10 +429,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           productId,
           setOrigin,
           forward: forwardWithInstitutionType,
-          back: () => {
-            setOnExitAction(() => () => history.goBack());
-            setOpenExitModal(true);
-          },
+          back: handleOpenExitModal,
           productAvoidStep,
           loading,
           setLoading,
@@ -497,27 +525,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           ),
           selectFilterCategories,
           forward: forwardWithBillingData,
-          back: () => {
-            if (fromDashboard && !productAvoidStep) {
-              setActiveStep(0);
-            } else if ((fromDashboard || subunitTypeByQuery) && productAvoidStep) {
-              setOnExitAction(() => () => history.goBack());
-              setOpenExitModal(true);
-            } else if (
-              isPaymentServiceProvider(institutionType) ||
-              (!isPublicAdministration(institutionType) &&
-                !isContractingAuthority(institutionType) &&
-                !isGlobalServiceProvider(institutionType) &&
-                !isPrivateInstitution(institutionType) &&
-                !isPrivatePersonInstitution(institutionType))
-            ) {
-              setActiveStep(0);
-            } else if (fromDashboard && isPagoPaInsights(productId)) {
-              window.location.assign(`${ENV.URL_FE.DASHBOARD}/${externalInstitutionId}`);
-            } else {
-              setActiveStep(1);
-            }
-          },
+          back: backFromBillingData,
         }),
     },
     {
@@ -548,34 +556,8 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           addUserFlow: addUser,
           product: selectedProduct,
           isTechPartner: isTechPartner(institutionType),
-          forward: (newFormData: Partial<FormData>) => {
-            trackEvent('ONBOARDING_ADD_MANAGER', {
-              request_id: requestIdRef.current,
-              party_id: externalInstitutionId,
-              product_id: productId,
-            });
-            forwardWithData(newFormData);
-          },
-          back: () => {
-            switch (institutionType) {
-              case 'GSP':
-                if (origin === 'IPA' && isPagoPaProduct(selectedProduct?.id)) {
-                  setActiveStep(activeStep - 1);
-                } else {
-                  setActiveStep(activeStep - 3);
-                }
-                break;
-              case 'GPU':
-                setActiveStep(activeStep - 2);
-                break;
-              case 'PT':
-                setActiveStep(activeStep - 4);
-                break;
-              default:
-                setActiveStep(activeStep - 3);
-                break;
-            }
-          },
+          forward: forwardFromManager,
+          back: backFromManager,
         }),
     },
     {
@@ -593,22 +575,11 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
             '',
           isTechPartner: isTechPartner(institutionType),
           isAggregator: onboardingFormData?.isAggregator,
-          forward: (newFormData: Partial<FormData>) => {
-            const userData = { ...formData, ...newFormData };
-            setFormData(userData);
-            if (onboardingFormData?.isAggregator) {
-              forward();
-            } else {
-              onSubmit(userData);
-            }
-          },
-          back: () => {
-            if (isTechPartner(institutionType)) {
-              setActiveStep(activeStep - 4);
-            } else {
-              setActiveStep(activeStep - 1);
-            }
-          },
+          isAddApplicationEmail: (formData as any)?.users?.every(
+            (u: UserOnCreate) => u.taxCode !== user?.taxCode
+          ),
+          forward: forwardFromAdmin,
+          back: backFromAdmin,
         }),
     },
     {
@@ -622,8 +593,24 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           loading,
           setLoading,
           setOutcome,
-          forward: onSubmit,
+          forward: forwardFromAggregator,
           back,
+        }),
+    },
+    {
+      label: "Step add applicant's email",
+      Component: () =>
+        StepAddApplicantEmail({
+          forward: forwardFromApplicantEmail,
+          back: backFromApplicantEmail,
+          user,
+          addUser,
+          partyName:
+            onboardingFormData?.uoName ??
+            onboardingFormData?.aooName ??
+            onboardingFormData?.businessName ??
+            '',
+          productName: selectedProduct?.title,
         }),
     },
   ];
