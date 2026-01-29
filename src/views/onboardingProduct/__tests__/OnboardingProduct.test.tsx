@@ -20,6 +20,7 @@ import {
   checkCorrectBodyBillingData,
   executeGoHome,
   executeStepAddAdmin,
+  executeStepAddApplicantEmailForm,
   executeStepAddManager,
   fillInstitutionTypeCheckbox,
   fillUserBillingDataForm,
@@ -167,8 +168,21 @@ test('Test: Successfull complete onboarding request of PA party for prod-io sear
   await executeStepSearchParty(PRODUCT_IDS.IO, 'PA', 'AGENCY X', 'businessName');
   await executeStepBillingData(PRODUCT_IDS.IO, 'PA', false, false, 'IPA', 'AGENCY X');
   await executeStepAddManager(false);
-  await executeStepAddAdmin(true, false, false, false, false);
-  await verifySubmit(PRODUCT_IDS.IO, 'PA', fetchWithLogsSpy, 'IPA', false, false, 'businessName');
+  await executeStepAddAdmin(true, false, false, false, false, true);
+  await executeStepAddApplicantEmailForm();
+  await verifySubmit(
+    PRODUCT_IDS.IO,
+    'PA',
+    fetchWithLogsSpy,
+    'IPA',
+    false,
+    false,
+    'businessName',
+    undefined,
+    undefined,
+    undefined,
+    true
+  );
   await executeGoHome(mockedLocation);
 });
 
@@ -185,7 +199,7 @@ test('Test: Successfull complete onboarding request of PA party for prod-io sear
   );
   await executeStepBillingData(PRODUCT_IDS.IO, 'PA', false, false, 'IPA', 'Comune di Milano');
   await executeStepAddManager(false);
-  await executeStepAddAdmin(true, false, false, false, false);
+  await executeStepAddAdmin(true, false, false, false, false, false);
   await verifySubmit(PRODUCT_IDS.IO, 'PA', fetchWithLogsSpy, 'IPA', false, false, 'taxCode');
   await executeGoHome(mockedLocation);
 });
@@ -209,7 +223,7 @@ test('Test: Successfull complete onboarding request of AOO party for product pro
     'denominazione aoo test 1'
   );
   await executeStepAddManager(false);
-  await executeStepAddAdmin(true, false, false, false, false);
+  await executeStepAddAdmin(true, false, false, false, false, false);
   await verifySubmit(PRODUCT_IDS.INTEROP, 'PA', fetchWithLogsSpy, 'IPA', false, false, 'aooCode');
   await executeGoHome(mockedLocation);
 });
@@ -233,7 +247,7 @@ test('Test: Successfull complete onboarding request of UO party for product prod
     'denominazione uo test 1'
   );
   await executeStepAddManager(false);
-  await executeStepAddAdmin(true, false, false, false, false);
+  await executeStepAddAdmin(true, false, false, false, false, false);
   await verifySubmit(PRODUCT_IDS.IO_SIGN, 'PA', fetchWithLogsSpy, 'IPA', true, false, 'uoCode');
   await executeGoHome(mockedLocation);
 });
@@ -257,7 +271,7 @@ test('Test: Successfull complete onboarding request of GSP party searching from 
   await executeStepBillingData(PRODUCT_IDS.PAGOPA, 'GSP', false, false, 'IPA', 'AGENCY X');
   await executeStepAdditionalInfo('IPA');
   await executeStepAddManager(false);
-  await executeStepAddAdmin(true, false, false, false, false);
+  await executeStepAddAdmin(true, false, false, false, false, false);
   await verifySubmit(PRODUCT_IDS.PAGOPA, 'GSP', fetchWithLogsSpy, 'IPA');
   await executeGoHome(mockedLocation);
 });
@@ -282,7 +296,7 @@ test('Test: Successfull complete onboarding request of GSP party without searchi
   await executeStepBillingData(PRODUCT_IDS.PAGOPA, 'GSP', false, false, 'NO_IPA', 'AGENCY X');
   await executeStepAdditionalInfo('NO_IPA');
   await executeStepAddManager(false);
-  await executeStepAddAdmin(true, false, false, false, false);
+  await executeStepAddAdmin(true, false, false, false, false, false);
   await verifySubmit(PRODUCT_IDS.PAGOPA, 'GSP', fetchWithLogsSpy, 'NO_IPA');
   await executeGoHome(mockedLocation);
 });
@@ -301,7 +315,7 @@ test('Test: Successfull complete onboarding request of GPU for product prod-pago
   );
   await executeStepAdditionalGpuInformations();
   await executeStepAddManager(false);
-  await executeStepAddAdmin(true, false, false, false, false);
+  await executeStepAddAdmin(true, false, false, false, false, false);
   await verifySubmit(PRODUCT_IDS.PAGOPA, 'GPU', fetchWithLogsSpy, 'NO_IPA');
   await executeGoHome(mockedLocation);
 });
@@ -310,7 +324,7 @@ test('Test: Successfull complete onboarding request of PT for product prod-pagop
   renderComponent(PRODUCT_IDS.PAGOPA);
   await executeStepInstitutionType(PRODUCT_IDS.PAGOPA, 'PT');
   await executeStepBillingData(PRODUCT_IDS.PAGOPA, 'PT', false, false, 'NO_IPA');
-  await executeStepAddAdmin(true, true, false, false, true);
+  await executeStepAddAdmin(true, true, false, false, true, false);
   await verifySubmit(PRODUCT_IDS.PAGOPA, 'PT', fetchWithLogsSpy, 'NO_IPA');
   await executeGoHome(mockedLocation);
 });
@@ -320,7 +334,7 @@ test('Test: Successfull complete onboarding request of PSP for product prod-pago
   await executeStepInstitutionType(PRODUCT_IDS.PAGOPA, 'PSP');
   await executeStepBillingData(PRODUCT_IDS.PAGOPA, 'PSP', false, false, 'NO_IPA');
   await executeStepAddManager(false);
-  await executeStepAddAdmin(true, false, false, false, false);
+  await executeStepAddAdmin(true, false, false, false, false, false);
   await verifySubmit(PRODUCT_IDS.PAGOPA, 'PSP', fetchWithLogsSpy, 'NO_IPA');
   await executeGoHome(mockedLocation);
 });
@@ -343,7 +357,7 @@ test('Test: Successfull complete onboarding request of SA for product prod-inter
   );
   await executeStepBillingData(PRODUCT_IDS.INTEROP, 'SA', false, false, 'ANAC', 'descriptionAnac1');
   await executeStepAddManager(false);
-  await executeStepAddAdmin(true, false, false, false, false);
+  await executeStepAddAdmin(true, false, false, false, false, false);
   await verifySubmit(
     PRODUCT_IDS.INTEROP,
     'SA',
@@ -374,7 +388,7 @@ test('Test: Successfull complete onboarding request of SA for product prod-inter
   );
   await executeStepBillingData(PRODUCT_IDS.INTEROP, 'SA', false, false, 'ANAC', 'descriptionAnac1');
   await executeStepAddManager(false);
-  await executeStepAddAdmin(true, false, false, false, false);
+  await executeStepAddAdmin(true, false, false, false, false, false);
   await verifySubmit(PRODUCT_IDS.INTEROP, 'SA', fetchWithLogsSpy, 'ANAC', false, false, 'taxCode');
   await executeGoHome(mockedLocation);
 });
@@ -405,7 +419,7 @@ test('Test: Successfull complete onboarding request of foreign AS for product pr
     true
   );
   await executeStepAddManager(false);
-  await executeStepAddAdmin(true, false, false, false, false);
+  await executeStepAddAdmin(true, false, false, false, false, false);
   await verifySubmit(
     PRODUCT_IDS.INTEROP,
     'AS',
@@ -446,7 +460,7 @@ test('Test: Successfull complete onboarding request of italian AS for product pr
     false
   );
   await executeStepAddManager(false);
-  await executeStepAddAdmin(true, false, false, false, false);
+  await executeStepAddAdmin(true, false, false, false, false, false);
   await verifySubmit(
     PRODUCT_IDS.INTEROP,
     'AS',
@@ -487,7 +501,7 @@ test('Test: Successfull complete onboarding request of italian AS without tax co
     false
   );
   await executeStepAddManager(false);
-  await executeStepAddAdmin(true, false, false, false, false);
+  await executeStepAddAdmin(true, false, false, false, false, false);
   await verifySubmit(
     PRODUCT_IDS.INTEROP,
     'AS',
@@ -529,7 +543,7 @@ test('Test: Successfull complete onboarding request of PA aggregator party for p
   );
   await executeStepBillingData(PRODUCT_IDS.IO, 'PA', false, false, 'IPA', 'AGENCY X');
   await executeStepAddManager(false);
-  await executeStepAddAdmin(true, false, true, false, false);
+  await executeStepAddAdmin(true, false, true, false, false, false);
   await executeStepUploadAggregates();
   await verifySubmit(
     PRODUCT_IDS.IO,
@@ -541,7 +555,8 @@ test('Test: Successfull complete onboarding request of PA aggregator party for p
     'businessName',
     undefined,
     true,
-    true
+    true,
+    false
   );
   await executeGoHome(mockedLocation);
 });
@@ -559,7 +574,7 @@ test('Test: Successfull complete onboarding request of PRV for product prod-pago
     false
   );
   await executeStepAddManager(false);
-  await executeStepAddAdmin(true, false, false, false, false);
+  await executeStepAddAdmin(true, false, false, false, false, false);
   await verifySubmit(
     PRODUCT_IDS.PAGOPA,
     'PRV',
@@ -588,7 +603,7 @@ test('Test: Successfull complete onboarding request of PRV party for prod-idpay-
   );
   await executeStepBillingData(PRODUCT_IDS.IDPAY_MERCHANT, 'PRV', false, false, 'PDND_INFOCAMERE');
   await executeStepAddManager(false);
-  await executeStepAddAdmin(true, false, false, false, false, PRODUCT_IDS.IDPAY_MERCHANT);
+  await executeStepAddAdmin(true, false, false, false, false, false, PRODUCT_IDS.IDPAY_MERCHANT);
   await verifySubmit(
     PRODUCT_IDS.IDPAY_MERCHANT,
     'PRV',
@@ -616,7 +631,7 @@ test('Test: Successfull complete onboarding request of PRV party for prod-idpay-
   );
   await executeStepBillingData(PRODUCT_IDS.IDPAY_MERCHANT, 'PRV', false, false, 'PDND_INFOCAMERE');
   await executeStepAddManager(false);
-  await executeStepAddAdmin(true, false, false, false, false, PRODUCT_IDS.IDPAY_MERCHANT);
+  await executeStepAddAdmin(true, false, false, false, false, false, PRODUCT_IDS.IDPAY_MERCHANT);
   await verifySubmit(
     PRODUCT_IDS.IDPAY_MERCHANT,
     'PRV',
@@ -655,7 +670,7 @@ test('Test: Successfull complete onboarding request of PRV_PF party for prod-idp
     'personalTaxCode'
   );
   await executeStepAddManager(false);
-  await executeStepAddAdmin(true, false, false, false, false, PRODUCT_IDS.IDPAY_MERCHANT);
+  await executeStepAddAdmin(true, false, false, false, false, false, PRODUCT_IDS.IDPAY_MERCHANT);
   await verifySubmit(
     PRODUCT_IDS.IDPAY_MERCHANT,
     'PRV_PF',
@@ -674,7 +689,7 @@ test('Test: Error on submit onboarding request of PA party for prod-io search by
   await executeStepSearchParty(PRODUCT_IDS.IO, 'PA', 'AGENCY ERROR', 'businessName');
   await executeStepBillingData(PRODUCT_IDS.IO, 'PA', false, false, 'IPA', 'AGENCY ERROR');
   await executeStepAddManager(false);
-  await executeStepAddAdmin(false, false, false, false, false);
+  await executeStepAddAdmin(false, false, false, false, false, false);
   await verifySubmit(PRODUCT_IDS.IO, 'PA', fetchWithLogsSpy, 'IPA', false, true);
   await executeGoHome(mockedLocation);
 });
@@ -818,7 +833,7 @@ const completeOnboardingPdndInfocamereRequest = async (institutionType: Institut
     false
   );
   await executeStepAddManager(false);
-  await executeStepAddAdmin(true, false, false, false, false);
+  await executeStepAddAdmin(true, false, false, false, false, false);
   await verifySubmit(
     PRODUCT_IDS.INTEROP,
     institutionType,

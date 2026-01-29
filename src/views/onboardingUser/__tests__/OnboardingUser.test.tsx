@@ -154,13 +154,13 @@ const executeStepSearchOnboardedParty = async (
 test('Test: Successfull added new user for a party who has already onboarded to the PagoPA platform product', async () => {
   renderComponent(PRODUCT_IDS.PAGOPA, true);
   await executeStepAddManager(true);
-  await executeStepAddAdmin(true, false, false, true, false);
+  await executeStepAddAdmin(true, false, false, true, false, false);
 });
 
 test('Test: NOT successfull added new user for a party who has already onboarded to the IO product', async () => {   
   renderComponent(PRODUCT_IDS.IO, true);
   await executeStepAddManager(true);
-  await executeStepAddAdmin(false, false , false, true, false);
+  await executeStepAddAdmin(false, false , false, true, false, false);
 });
 
 // TODO

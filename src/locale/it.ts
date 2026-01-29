@@ -80,8 +80,7 @@ export default {
       },
       attachments: {
         title: 'Carica il documento',
-        description:
-          'Carica l’addendum firmato digitalmente in p7m',
+        description: 'Carica l’addendum firmato digitalmente in p7m',
         dropArea: {
           title: 'Trascina qui il documento firmato oppure',
           link: 'selezionalo dal tuo computer',
@@ -241,6 +240,16 @@ export default {
     formControl: {
       label: 'Aggiungi me come Amministratore',
     },
+  },
+  stepAddApplicantEmail: {
+    title: 'Indica la tua email',
+    description:
+      'Inserisci la tua email per ricevere una conferma quando la tua richiesta sarà stata elaborata <1/> con successo',
+    applicantName: 'Nome',
+    applicantSurname: 'Cognome',
+    applicantEmail: 'Email',
+    backLabel: 'Indietro',
+    confirmLabel: 'Continua',
   },
   additionalGpuDataPage: {
     title: 'Inserisci ulteriori dettagli',

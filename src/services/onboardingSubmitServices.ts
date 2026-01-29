@@ -1,6 +1,7 @@
 import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
 import { AxiosError } from 'axios';
 import { Dispatch, SetStateAction, MutableRefObject } from 'react';
+import { User } from '@pagopa/selfcare-common-frontend/lib/model/User';
 import {
   Product,
   InstitutionType,
@@ -70,6 +71,7 @@ export const postOnboardingSubmit = async (
   notAllowedError: RequestOutcomeMessage,
   pricingPlan: string | undefined,
   users: Array<UserOnCreate>,
+  loggedUser: User | null,
   aggregates?: Array<AggregateInstitution>
   // eslint-disable-next-line sonarjs/cognitive-complexity
 ) => {
@@ -153,6 +155,11 @@ export const postOnboardingSubmit = async (
       taxCode: onboardingFormData?.taxCode,
       isAggregator: onboardingFormData?.isAggregator ? onboardingFormData?.isAggregator : undefined,
       aggregates,
+      userRequestData: users.every((u) => u?.taxCode !== loggedUser?.taxCode) ?  {
+        name: onboardingFormData?.userRequester?.name,
+        surname: onboardingFormData?.userRequester?.surname,
+        email: onboardingFormData?.userRequester?.email,
+      } : undefined
     },
     setRequiredLogin
   );
