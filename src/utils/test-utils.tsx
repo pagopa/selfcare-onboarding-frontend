@@ -938,7 +938,7 @@ export const verifySubmit = async (
               : undefined,
         isAggregator,
         aggregates: isAggregator ? [] : undefined,
-        userRequestData: isAddApplicantEmail
+        userRequester: isAddApplicantEmail
           ? {
               name: 'loggedName',
               surname: 'loggedSurname',

@@ -69,7 +69,7 @@ export function StepAddAdmin({
     if (index === userIds.length) {
       if (Object.keys(peopleErrors).length === 0) {
         // TODO hide modal for PT until copy is changed. Remove if case isTechPartner after copy is changed
-        if (isTechPartner || isAddApplicationEmail) {
+        if (isTechPartner || isAddApplicationEmail || isAggregator) {
           onForwardAction();
         } else {
           setOpenConfirmationModal(true);

@@ -155,7 +155,7 @@ export const postOnboardingSubmit = async (
       taxCode: onboardingFormData?.taxCode,
       isAggregator: onboardingFormData?.isAggregator ? onboardingFormData?.isAggregator : undefined,
       aggregates,
-      userRequestData: users.every((u) => u?.taxCode !== loggedUser?.taxCode) ?  {
+      userRequester: users.every((u) => u?.taxCode !== loggedUser?.taxCode) ?  {
         name: onboardingFormData?.userRequester?.name,
         surname: onboardingFormData?.userRequester?.surname,
         email: onboardingFormData?.userRequester?.email,
