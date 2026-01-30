@@ -135,8 +135,6 @@ export default function StepOnboardingFormData({
         !!initialFormData.vatNumber && initialFormData.taxCode === initialFormData.vatNumber,
     });
 
-  console.log('onboardingFormData', onboardingFormData);
-
   const controllers = useOnboardingControllers({
     subProductId,
     institutionType,
