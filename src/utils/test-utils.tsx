@@ -959,9 +959,9 @@ const billingData2billingDataRequestIoPremium = () => ({
   digitalAddress: 'comune.milano@pec.it',
   zipCode: '20021',
   taxCode: '33445673222',
-  // taxCodeInvoicing: '87654321098',
+  taxCodeInvoicing: undefined,
   vatNumber: undefined,
-  // recipientCode: 'A1B2C3',
+  recipientCode: undefined,
 });
 
 const billingData2billingDataRequestPspDashboard = () => ({
@@ -1010,7 +1010,7 @@ export const verifySubmitPostLegalsIoPremium = async (
           pspData: undefined,
           institutionLocationData: {
             city: 'Milano',
-            country: undefined,
+            country: 'IT',
             county: 'MI',
           },
           institutionType: 'PA',
@@ -1083,7 +1083,7 @@ export const verifySubmitPostLegalsPspDashBoard = async (
         geographicTaxonomies: [],
         institutionLocationData: {
           city: 'Milano',
-          country: {},
+          country: "IT",
           county: 'MI',
         },
         productId: PRODUCT_IDS.DASHBOARD_PSP,
