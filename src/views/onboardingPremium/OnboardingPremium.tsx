@@ -36,6 +36,7 @@ import SubProductStepSuccess from './components/SubProductStepSuccess';
 import SubProductStepVerifyInputs from './components/SubProductStepVerifyInputs';
 import { SubProductStepNoParties } from './components/SubProductStepNoParties';
 import SubProductStepUserUnrelated from './components/SubProductStepUserUnrelated';
+import { createSubProductForwardFunctions } from './components/forwards/forwardFunctions';
 
 type OnboardingPremiumUrlParams = {
   productId: string;
@@ -105,97 +106,38 @@ function OnboardingPremiumComponent() {
     setActiveStep(activeStep - 1);
   };
 
-  const forward = (i: number = 1) => {
-    setActiveStep(activeStep + i);
-  };
-
-  const forwardWithInputs = (
-    newProduct: Product,
-    newSubProduct: Product,
-    newParties: Array<SelfcareParty>
-  ) => {
-    setProduct(newProduct);
-    setSubProduct(newSubProduct);
-    setParties(newParties);
-    setActiveStep(activeStep + 1);
-  };
-
-  const forwardWithBillingData = (newBillingData: OnboardingFormData) => {
-    setBillingData(newBillingData);
-    forward();
-  };
-
-  const forwardWithManagerData = (formData: any) => {
-    setManager(formData.users[0]);
-    setUsers(formData.users);
-    setOpenConfirmationModal(true);
-  };
-
-  const forwardWithInstitution = (party: SelfcareParty, isUserParty: boolean) => {
-    setSelectedParty(party);
-    const event = isUserParty
-      ? 'ONBOARDING_PREMIUM_ASSOCIATED_PARTY_SELECTION'
-      : 'ONBOARDING_PREMIUM_PARTY_SELECTION';
-    trackEvent(event, {
-      party_id: party.id,
-      request_id: requestIdRef.current,
-      product_id: productId,
-      subproduct_id: subProductId,
-    });
-    // eslint-disable-next-line functional/immutable-data
-    chooseFromMyParties.current = isUserParty;
-    forward(isUserParty ? 3 : 2);
-  };
-
-  const forwardWithOnboardingData = (
-    origin: string,
-    originId: string,
-    billingData?: OnboardingFormData,
-    institutionType?: InstitutionType,
-    partyId?: string,
-    companyInformations?: CompanyInformations,
-    country?: string,
-    city?: string,
-    county?: string,
-    pspData?: PaymentServiceProviderDto,
-    dpoData?: DataProtectionOfficerDto
-  ) => {
-    setStepAddManagerHistoryState({});
-
-    if (billingData) {
-      setBillingData({
-        ...billingData,
-        city,
-        country,
-        county,
-      });
-    }
-    if (companyInformations) {
-      setCompanyInformations(companyInformations);
-    }
-
-    if (!city) {
-      setIsCityEditable(true);
-    }
-
-    if (city) {
-      setIsCityEditable(false);
-    }
-
-    if (pspData) {
-      setPspData(pspData);
-    }
-
-    if (dpoData) {
-      setDpoData(dpoData);
-    }
-
-    setOrigin(origin);
-    setOriginId(originId);
-    setInstitutionType(institutionType);
-    setPartyId(partyId);
-    forward();
-  };
+  const {
+    forward,
+    forwardWithInputs,
+    forwardWithBillingData,
+    forwardWithManagerData,
+    forwardWithInstitution,
+    forwardWithOnboardingData,
+  } = createSubProductForwardFunctions({
+    requestIdRef,
+    productId,
+    subProductId,
+    activeStep,
+    setActiveStep,
+    setProduct,
+    setSubProduct,
+    setParties,
+    setSelectedParty,
+    setBillingData,
+    setInstitutionType,
+    setPartyId,
+    setOrigin,
+    setOriginId,
+    setManager,
+    setUsers,
+    setCompanyInformations,
+    setIsCityEditable,
+    setPspData,
+    setDpoData,
+    setOpenConfirmationModal,
+    setStepAddManagerHistoryState,
+    chooseFromMyParties,
+  });
   // const forwardWitSelectedPricingPlan = () => {
   //   setActiveStep(parties.length === 0 ? 3 : 2);
   //   window.scrollTo(0, 0);

@@ -188,14 +188,13 @@ export const getOnboardingData = async (
       billingData,
       result.institution.institutionType ?? institutionType,
       result.institution.id,
-      result.institution.assistanceContacts,
       result.institution.companyInformations,
+      result.institution.country,
       result.institution?.city
         ?.charAt(0)
         .toUpperCase()
         .concat(result.institution?.city.substring(1).toLowerCase().trim()),
       result.institution?.county,
-      result.institution.country,
       result.institution?.paymentServiceProvider,
       result.institution?.dataProtectionOfficer
     );

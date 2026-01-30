@@ -130,9 +130,8 @@ export function ConfirmRegistrationStep0({
                   </Trans>
                 </Typography>
               </Grid>
-              <Grid item py={4}>
+              <Grid item py={4} xs={12}>
                 <Button
-                  fullWidth
                   color="primary"
                   variant="contained"
                   onClick={() => onClickDownload(onboardingId)}
@@ -143,7 +142,7 @@ export function ConfirmRegistrationStep0({
                   <DownloadIcon fontSize="small" sx={{ marginLeft: 1 }} />
                 </Button>
               </Grid>
-              <Grid item py={1}>
+              <Grid item py={1} xs={12}>
                 <Typography
                   sx={{
                     fontSize: '12px',
