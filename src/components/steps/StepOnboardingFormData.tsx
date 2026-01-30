@@ -42,7 +42,15 @@ import { VatNumberErrorModal } from '../onboardingFormData/VatNumberErrorModal';
 import GeoTaxonomySection from '../onboardingFormData/taxonomy/GeoTaxonomySection';
 import UpdateGeotaxonomy from '../onboardingFormData/taxonomy/UpdateGeotaxonomy';
 import { useHistoryState } from '../../hooks/useHistoryState';
-import { isFideiussioniProduct, isInformationCompany, isPagoPaInsights, isPaymentServiceProvider, isPdndPrivate, isPrivateMerchantInstitution, isPublicAdministration } from '../../utils/institutionTypeUtils';
+import {
+  isFideiussioniProduct,
+  isInformationCompany,
+  isPagoPaInsights,
+  isPaymentServiceProvider,
+  isPdndPrivate,
+  isPrivateMerchantInstitution,
+  isPublicAdministration,
+} from '../../utils/institutionTypeUtils';
 
 export type StepBillingDataHistoryState = {
   externalInstitutionId: string;
@@ -126,6 +134,8 @@ export default function StepOnboardingFormData({
       isTaxCodeEquals2PIVA:
         !!initialFormData.vatNumber && initialFormData.taxCode === initialFormData.vatNumber,
     });
+
+  console.log('onboardingFormData', onboardingFormData);
 
   const controllers = useOnboardingControllers({
     subProductId,
