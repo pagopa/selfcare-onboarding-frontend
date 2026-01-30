@@ -33,7 +33,7 @@ export default {
         attachments: {
           title: 'Scarica l’addendum',
           description:
-            'Per adeguarti alla nuova normativa, scarica l’addendum e provvedi alla  <1 />firma digitale <2>formato p7m</2>.',
+            'Scarica l’addendum e provvedi alla firma digitale in <2>formato p7m</2>.',
           downloadContract: 'Scarica il documento',
         },
         user: {
@@ -41,6 +41,7 @@ export default {
           description: `Per completare l’adesione, scarica il Modulo di aggiunta e fai apporre la <1 />firma digitale in <2>formato p7m</2> dal Legale Rappresentante dell’ente.`,
           downloadContract: 'Scarica il Modulo',
         },
+        disclaimerAttachments: 'Puoi far firmare l’accordo dal Legale Rappresentante o procuratore.',
         disclaimer:
           'Firmando l’accordo, il Legale Rappresentante dell’ente, accetta espressamente e specificamente anche le singole clausole indicate nel paragrafo “Clausole ai sensi degli artt. 1341 e 1342 c.c.”',
       },

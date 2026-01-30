@@ -35,8 +35,8 @@ export function ConfirmRegistrationStep0({
     const sessionToken = storageTokenOps.read();
     const url =
       translationKeyValue === 'attachments'
-        ? ENV.URL_API.ONBOARDING_V2 + `/v2/tokens/${onboardingId}/template-attachment?name=${documentName}`
-        : ENV.URL_API.ONBOARDING_V2 + `/v2/tokens/${onboardingId}/contract`;
+        ? `${ENV.URL_API.ONBOARDING_V2}/v2/tokens/${onboardingId}/template-attachment?name=${documentName}`
+        : `${ENV.URL_API.ONBOARDING_V2}/v2/tokens/${onboardingId}/contract`;
 
     fetch(url, {
       headers: {
@@ -151,7 +151,9 @@ export function ConfirmRegistrationStep0({
                     textAlign: 'center',
                   }}
                 >
-                  {t('confirmOnboarding.chooseOption.download.disclaimer')}
+                  {translationKeyValue === 'attachments'
+                    ? t('confirmOnboarding.chooseOption.download.disclaimerAttachments')
+                    : t('confirmOnboarding.chooseOption.download.disclaimer')}
                 </Typography>
               </Grid>
             </Grid>
