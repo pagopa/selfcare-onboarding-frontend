@@ -1593,15 +1593,22 @@ export async function mockFetch(
     } as AxiosResponse);
   }
 
+  // if (endpoint === 'ONBOARDING_GET_PARTY_FROM_CF') {
+  //   if (endpointParams?.id === '00112233445') {
+  //     return notFoundError;
+  //   } else {
+  //     const matchedParty = mockedParties.find((p) => p.taxCode === endpointParams.id);
+  //     return new Promise((resolve) => {
+  //       resolve({ data: matchedParty, status: 200, statusText: '200' } as AxiosResponse);
+  //     });
+  //   }
+  // }
+
   if (endpoint === 'ONBOARDING_GET_PARTY_FROM_CF') {
-    if (endpointParams?.id === '00112233445') {
-      return notFoundError;
-    } else {
-      const matchedParty = mockedParties.find((p) => p.taxCode === endpointParams.id);
-      return new Promise((resolve) => {
-        resolve({ data: matchedParty, status: 200, statusText: '200' } as AxiosResponse);
-      });
-    }
+    const matchedParty = mockedParties.find((p) => p.taxCode === endpointParams.id);
+    return new Promise((resolve) =>
+      resolve({ data: matchedParty, status: 200, statusText: '200' } as AxiosResponse)
+    );
   }
 
   if (endpoint === 'ONBOARDING_GET_PARTY_BY_CF_FROM_INFOCAMERE') {

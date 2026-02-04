@@ -10,9 +10,9 @@ import {
   isContractingAuthority,
   isIdpayMerchantProduct,
   isInsuranceCompany,
-  isInteropOrIdpayMerchantProduct,
+  /* isInteropOrIdpayMerchantProduct,
   isInteropProduct,
-  isPublicServiceCompany,
+  isPublicServiceCompany, */
   shouldSkipCategoriesFilter,
 } from '../utils/institutionTypeUtils';
 import config from '../utils/config.json';
@@ -154,7 +154,7 @@ export const fetchInstitutionsByName = async (
   }
 };
 
-const fetchInstitutionByTaxCodeOnInfocamere = async (
+/* const fetchInstitutionByTaxCodeOnInfocamere = async (
   productId: string | undefined,
   query: string,
   filterCategories: { atecoCodes: string; allowedInstitutions: string } | string | undefined,
@@ -184,7 +184,7 @@ const fetchInstitutionByTaxCodeOnInfocamere = async (
   } else {
     setCfResult(undefined);
   }
-};
+}; */
 
 export const fetchInstitutionByTaxCode = async (
   addUser: boolean,
@@ -243,6 +243,9 @@ export const fetchInstitutionByTaxCode = async (
       setMerchantSearchResult?.(undefined);
     }
 
+    /* 
+    Disabled Fallback API call on INFOCAMERE for PDND SCPs
+    
     if (isPublicServiceCompany(institutionType as InstitutionType) && isInteropProduct(productId)) {
       await fetchInstitutionByTaxCodeOnInfocamere(
         productId,
@@ -251,7 +254,7 @@ export const fetchInstitutionByTaxCode = async (
         setCfResult,
         setRequiredLogin
       );
-    }
+    } */
   }
 };
 

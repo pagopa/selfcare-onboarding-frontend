@@ -35,10 +35,12 @@ import {
 import { buildUrlLogo } from '../../../../utils/constants';
 import { ENV } from '../../../../utils/env';
 import {
-  isIdpayMerchantProduct,
   isContractingAuthority,
+  isIdpayMerchantProduct,
   isInsuranceCompany,
+  isInteropProduct,
   isPrivateInstitution,
+  isPublicServiceCompany,
 } from '../../../../utils/institutionTypeUtils';
 import AsyncAutocompleteResultsBusinessName from './components/AsyncAutocompleteResultsBusinessName';
 import AsyncAutocompleteResultsCode from './components/AsyncAutocompleteResultsCode';
@@ -302,7 +304,15 @@ export default function AsyncAutocompleteContainer({
       return 'ONBOARDING_GET_INSURANCE_COMPANIES_FROM_IVASSCODE';
     }
 
-    if (isPrivateInstitution(institutionType as InstitutionType) && !isIdpayMerchantProduct(product?.id)) {
+    /* if (isPrivateInstitution(institutionType as InstitutionType) && !isIdpayMerchantProduct(product?.id)) {
+      return 'ONBOARDING_GET_PARTY_BY_CF_FROM_INFOCAMERE';
+    } */
+
+    if (
+      (isPrivateInstitution(institutionType as InstitutionType) ||
+        isPublicServiceCompany(institutionType as InstitutionType)) &&
+      isInteropProduct(product?.id)
+    ) {
       return 'ONBOARDING_GET_PARTY_BY_CF_FROM_INFOCAMERE';
     }
 
