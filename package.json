@@ -23,15 +23,15 @@
     "web-vitals": "^5.1.0"
   },
   "scripts": {
-    "start": "craco start",
-    "build": "craco build",
-    "test": "craco test -i",
-    "test:coverage": "craco test -i --coverage",
+    "start": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
     "test:e2e": "cd e2e && set VITE_ENV=development && yarn playwright test --reporter=list",
     "test:e2e:local": "cd e2e && dotenv -e ../.env.development.local -- yarn playwright test --reporter=list",
     "test:e2e:local:full": "dotenv -e .env.development.local -- start-server-and-test start http://localhost:3000 test:e2e:local",
     "test:e2e:cleanup": "cd e2e && yarn cleanup",
-    "eject": "craco eject",
     "lint-autofix": "eslint . -c .eslintrc.js --ext .ts,.tsx --fix",
     "lint": "eslint . -c .eslintrc.js --ext .ts,.tsx ",
     "prettify": "prettier --write \"./**/*.{ts,tsx}\""
