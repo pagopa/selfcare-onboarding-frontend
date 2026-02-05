@@ -36,31 +36,11 @@
     "lint": "eslint . -c .eslintrc.js --ext .ts,.tsx ",
     "prettify": "prettier --write \"./**/*.{ts,tsx}\""
   },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "ie 11",
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  },
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
-    "@types/jest": "^30.0.0",
     "@types/lodash": "^4.17.16",
     "@types/react": "^18.2.22",
     "@types/react-dom": "^18.3.1",
@@ -93,29 +73,5 @@
     "nth-check": ">=2.0.1",
     "form-data": "^4.0.4",
     "@types/react": "18.3.16"
-  },
-  "jest": {
-    "restoreMocks": true,
-    "clearMocks": true,
-    "resetMocks": true,
-    "transform": {
-      "node_modules/crypto-random-string/index.js": "babel-jest"
-    },
-    "transformIgnorePatterns": [
-      "node_modules/(?!crypto-random-string/.*)",
-      "/node_modules/(?!(axios)/)"
-    ],
-    "coveragePathIgnorePatterns": [
-      "src/index.tsx",
-      "src/reportWebVitals.ts",
-      "src/utils/constants.ts",
-      "src/consentAndAnalyticsConfiguration.ts",
-      "src/model",
-      "src/views/onboardingPremium/components/subProductStepPricingPlan/*"
-    ],
-    "moduleNameMapper": {
-      "^.+\\.(css|less|scss)$": "babel-jest",
-      "^axios$": "<rootDir>/node_modules/axios/dist/node/axios.cjs"
-    }
   }
 }
