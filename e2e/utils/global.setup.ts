@@ -2,7 +2,7 @@ import path from 'path';
 import { chromium } from '@playwright/test';
 
 export const isLocalMode =
-  process.env.REACT_APP_ENV === 'LOCAL_DEV' || process.env.NODE_ENV === 'test';
+  process.env.VITE_ENV === 'LOCAL_DEV' || process.env.NODE_ENV === 'test';
 
 async function globalSetup() {
   console.log(`GLOBAL SETUP: Starting in ${isLocalMode ? 'LOCAL/TEST' : 'DEV'} mode`);
