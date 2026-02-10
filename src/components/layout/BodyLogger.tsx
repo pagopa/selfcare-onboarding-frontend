@@ -1,12 +1,12 @@
-import { useContext, useEffect, useState } from 'react';
-import { useHistory, useLocation } from 'react-router-dom';
 import { Box } from '@mui/system';
 import { Footer, Header } from '@pagopa/selfcare-common-frontend/lib';
-import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
 import i18n from '@pagopa/selfcare-common-frontend/lib/locale/locale-utils';
+import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
+import { useContext, useEffect, useState } from 'react';
+import { useHistory, useLocation } from 'react-router-dom';
 import { logAction } from '../../lib/action-log';
-import { ENV } from '../../utils/env';
 import { PRODUCT_IDS, ROUTES } from '../../utils/constants';
+import { ENV } from '../../utils/env';
 import { HeaderContext, UserContext } from './../../lib/context';
 import { Main } from './Main';
 

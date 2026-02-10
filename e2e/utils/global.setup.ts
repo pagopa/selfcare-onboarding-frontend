@@ -1,8 +1,7 @@
 import path from 'path';
 import { chromium } from '@playwright/test';
 
-export const isLocalMode =
-  process.env.VITE_ENV === 'LOCAL_DEV' || process.env.NODE_ENV === 'test';
+export const isLocalMode = process.env.VITE_ENV === 'LOCAL_DEV' || process.env.NODE_ENV === 'test';
 
 async function globalSetup() {
   console.log(`GLOBAL SETUP: Starting in ${isLocalMode ? 'LOCAL/TEST' : 'DEV'} mode`);
@@ -39,7 +38,7 @@ async function globalSetup() {
       await page.waitForURL('**/uat.oneid.pagopa.it/**', { timeout: 30000 });
       console.log(`GLOBAL SETUP: ✅ Reached OneID`);
 
-      await page.getByTestId('idp-button-https://validator.dev.oneid.pagopa.it/demo').click();
+      await page.click('[data-testid="idp-button-https://idp.uat.oneid.pagopa.it"]');
 
       await page.waitForFunction(() => document.querySelector('#username') !== null, {
         timeout: 30000,
@@ -65,21 +64,9 @@ async function globalSetup() {
         submitButton.click(),
       ]);
 
-      await page.waitForLoadState('networkidle', { timeout: 15000 });
+      await page.click('.mdc-button--unelevated > .mdc-button__ripple');
 
-      try {
-        await Promise.all([
-          page
-            .waitForURL(
-              (url) => url.toString().includes('dashboard') || url.toString().includes('selfcare'),
-              { timeout: 15000 }
-            )
-            .catch(() => {}),
-          page.getByRole('button', { name: 'Conferma' }).click(),
-        ]);
-      } catch (e) {
-        // Confirm button optional
-      }
+      await page.waitForLoadState('networkidle', { timeout: 15000 });
 
       await page.waitForURL('**/dashboard/**', {
         timeout: 60000,

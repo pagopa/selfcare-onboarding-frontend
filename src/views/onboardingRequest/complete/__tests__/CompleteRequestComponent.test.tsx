@@ -1,34 +1,34 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import CompleteRequestComponent from '../CompleteRequest';
-import '../../../../locale';
-import React from 'react';
-import { ENV } from '../../../../utils/env';
 import { buildAssistanceURI } from '@pagopa/selfcare-common-frontend/lib/services/assistanceService';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import i18n from '@pagopa/selfcare-common-frontend/lib/locale/locale-utils';
+import { afterAll, beforeAll, beforeEach, expect, test, vi } from 'vitest';
+import '../../../../locale';
+import { ENV } from '../../../../utils/env';
+import CompleteRequestComponent from '../CompleteRequest';
+;
 
-jest.setTimeout(40000);
+vi.setConfig({ testTimeout: 40000 });
 
-jest.mock('react-router-dom', () => ({
+vi.mock('react-router-dom', () => ({
   useHistory: () => ({
     location: mockedLocation,
-    replace: jest.fn(),
+    replace: vi.fn(),
   }),
 }));
 
-jest.mock('react-router', () => ({
+vi.mock('react-router', () => ({
   useParams: () => ({}),
 }));
 
-jest.mock('@pagopa/selfcare-common-frontend/lib/services/assistanceService', () => ({
-  buildAssistanceURI: jest.fn(),
+vi.mock('@pagopa/selfcare-common-frontend/lib/services/assistanceService', () => ({
+  buildAssistanceURI: vi.fn(),
 }));
 
 let mockedContract: File;
 
 const oldWindowLocation = global.window.location;
 const mockedLocation = {
-  assign: jest.fn(),
+  assign: vi.fn(),
   pathname: '',
   origin: 'MOCKED_ORIGIN',
   search: '',
@@ -36,7 +36,6 @@ const mockedLocation = {
 };
 
 beforeAll(() => {
-  i18n.changeLanguage('it');
   Object.defineProperty(window, 'location', { value: mockedLocation });
 });
 

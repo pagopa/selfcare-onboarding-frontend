@@ -1,30 +1,30 @@
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { useState } from 'react';
+;
 import { User } from '@pagopa/selfcare-common-frontend/lib/model/User';
-import { HeaderContext, UserContext } from '../../../lib/context';
-import { ENV } from '../../../utils/env';
-import OnboardingPremium from '../OnboardingPremium';
-import '../../../locale';
-import { Route, Router, Switch } from 'react-router';
-import { createMemoryHistory } from 'history';
-import React from 'react';
-import i18n from '@pagopa/selfcare-common-frontend/lib/locale/locale-utils';
 import '@testing-library/jest-dom';
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { createMemoryHistory } from 'history';
+import { useState } from 'react';
+import { Provider } from 'react-redux';
+import { Route, Router, Switch } from 'react-router';
+import { afterAll, afterEach, beforeAll, beforeEach, expect, MockInstance, test, vi } from 'vitest';
+import { HeaderContext, UserContext } from '../../../lib/context';
+import '../../../locale';
+import { createStore } from '../../../redux/store';
+import { PRODUCT_IDS } from '../../../utils/constants';
+import { ENV } from '../../../utils/env';
+import { isPagoPaInsights } from '../../../utils/institutionTypeUtils';
 import {
   executeStepAddManager,
   verifySubmitPostLegalsIoPremium,
   verifySubmitPostLegalsPspDashBoard,
 } from '../../../utils/test-utils';
-import { createStore } from '../../../redux/store';
-import { Provider } from 'react-redux';
-import { PRODUCT_IDS } from '../../../utils/constants';
-import { isPagoPaInsights } from '../../../utils/institutionTypeUtils';
+import OnboardingPremium from '../OnboardingPremium';
 
-jest.setTimeout(20000);
+vi.setConfig({ testTimeout: 20000 });
 
 const oldWindowLocation = global.window.location;
 const initialLocation = {
-  assign: jest.fn(),
+  assign: vi.fn(),
   pathname: '/:productId/:subProductId',
   origin: 'MOCKED_ORIGIN',
   hash: '',
@@ -32,11 +32,11 @@ const initialLocation = {
 };
 
 const mockedLocation = Object.assign({}, initialLocation);
-const mockedHistoryPush = jest.fn();
+const mockedHistoryPush = vi.fn();
 const originalFetch = global.fetch;
-let fetchWithLogsSpy: jest.SpyInstance;
+let fetchWithLogsSpy: MockInstance;
 
-jest.mock('react-router-dom', () => ({
+vi.mock('react-router-dom', () => ({
   useHistory: () => ({
     push: mockedHistoryPush,
     location: mockedLocation,
@@ -44,13 +44,16 @@ jest.mock('react-router-dom', () => ({
   }),
 }));
 
-beforeEach(() => {
-  fetchWithLogsSpy = jest.spyOn(require('../../../lib/api-utils'), 'fetchWithLogs');
+beforeEach(async () => {
+  const apiUtils = await import('../../../lib/api-utils');
+  if (fetchWithLogsSpy) {
+    fetchWithLogsSpy.mockRestore();
+  }
+  fetchWithLogsSpy = vi.spyOn(apiUtils, 'fetchWithLogs');
   Object.assign(mockedLocation, initialLocation);
 });
 
 beforeAll(() => {
-  i18n.changeLanguage('it');
   Object.defineProperty(window, 'location', { value: mockedLocation });
 });
 
@@ -114,7 +117,7 @@ const renderComponent = (
 };
 
 const stepBillingDataTitle = 'Inserisci i dati dell’ente';
-const stepAddManagerTitle = 'Indica il Legale Rappresentante';
+// const stepAddManagerTitle = 'Indica il Legale Rappresentante';
 
 test('Test: Bad productId and subProductId for prod-io-premium', async () => {
   renderComponent(PRODUCT_IDS.IO, PRODUCT_IDS.IO);
