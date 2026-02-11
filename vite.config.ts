@@ -9,9 +9,7 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [
       react(),
-      svgr({
-        exportAsDefault: false,
-      }),
+      svgr(),
       createHtmlPlugin({
         inject: {
           data: {
