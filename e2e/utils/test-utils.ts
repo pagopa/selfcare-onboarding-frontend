@@ -303,7 +303,6 @@ export const stepFormData = async (
     (!isFromIpa &&
       !isTechPartner(actualInstitutionType as InstitutionType) &&
       !isIoProductE2E(product)) ||
-    isGlobalServiceProviderE2E(actualInstitutionType as InstitutionType) ||
     isPublicServiceCompanyE2E(actualInstitutionType as InstitutionType) ||
     (isPagoPaProductE2E(product) &&
       isPrivateInstitutionE2E(actualInstitutionType as InstitutionType))
@@ -382,13 +381,10 @@ export const stepFormData = async (
     ? !isPublicServiceCompanyE2E(actualInstitutionType as InstitutionType) &&
       !isContractingAuthorityE2E(actualInstitutionType as InstitutionType) &&
       !isInsuranceCompanyE2E(actualInstitutionType as InstitutionType) &&
-      (!isPrivateInstitutionE2E(actualInstitutionType as InstitutionType) ||
-        !isInteropProductE2E(product))
+      (isPrivateInstitutionE2E(actualInstitutionType as InstitutionType) ||
+        isInteropProductE2E(product))
     : !isTechPartner(actualInstitutionType as InstitutionType);
   if (shouldShowNazionale) {
-    if (isFromIpa) {
-      await page.getByRole('radio', { name: 'Nazionale' }).waitFor({ timeout: 5000 });
-    }
     await page.getByRole('radio', { name: 'Nazionale' }).click();
   }
 
