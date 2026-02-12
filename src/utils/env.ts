@@ -1,4 +1,6 @@
-import * as env from 'env-var';
+import { from } from 'env-var';
+
+const env = from(import.meta.env as unknown as Record<string, string>);
 
 const PUBLIC_URL_INNER: string | undefined = env.get('PUBLIC_URL').asString();
 
