@@ -18,51 +18,29 @@
     "react-dom": "^18.3.1",
     "react-dropzone": "^14.3.8",
     "react-number-format": "^5.4.4",
-    "react-scripts": "5.0.1",
     "react-select-event": "^5.5.1",
     "typescript": "^5.9.2",
     "web-vitals": "^5.1.0"
   },
   "scripts": {
-    "start": "craco start",
-    "build": "craco build",
-    "test": "craco test -i",
-    "test:coverage": "craco test -i --coverage",
-    "test:e2e": "cd e2e && set REACT_APP_ENV=development && yarn playwright test --reporter=list",
+    "start": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "cd e2e && set VITE_ENV=development && yarn playwright test --reporter=list",
     "test:e2e:local": "cd e2e && dotenv -e ../.env.development.local -- yarn playwright test --reporter=list",
     "test:e2e:local:full": "dotenv -e .env.development.local -- start-server-and-test start http://localhost:3000 test:e2e:local",
     "test:e2e:cleanup": "cd e2e && yarn cleanup",
-    "eject": "craco eject",
     "lint-autofix": "eslint . -c .eslintrc.js --ext .ts,.tsx --fix",
     "lint": "eslint . -c .eslintrc.js --ext .ts,.tsx ",
     "prettify": "prettier --write \"./**/*.{ts,tsx}\""
   },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "ie 11",
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  },
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
-    "@craco/craco": "^7.0.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
-    "@types/jest": "^30.0.0",
     "@types/lodash": "^4.17.16",
     "@types/react": "^18.2.22",
     "@types/react-dom": "^18.3.1",
@@ -71,6 +49,9 @@
     "@types/redux-logger": "^3.0.13",
     "@typescript-eslint/eslint-plugin": "^5.0.0",
     "@typescript-eslint/parser": "^5.0.0",
+    "@vitejs/plugin-react": "^5.1.3",
+    "@vitest/coverage-v8": "^4.0.18",
+    "baseline-browser-mapping": "^2.9.19",
     "cross-env": "^10.1.0",
     "dotenv-cli": "^10.0.0",
     "eslint": "7.32.0",
@@ -80,8 +61,13 @@
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-sonarjs": "^0.25.1",
+    "jsdom": "^28.0.0",
     "prettier": "^3.5.3",
-    "start-server-and-test": "^2.1.2"
+    "start-server-and-test": "^2.1.2",
+    "vite": "7.0.0",
+    "vite-plugin-html": "^3.2.2",
+    "vite-plugin-svgr": "^4.5.0",
+    "vitest": "^4.0.18"
   },
   "resolutions": {
     "body-parser": "^1.20.3",
@@ -89,29 +75,5 @@
     "nth-check": ">=2.0.1",
     "form-data": "^4.0.4",
     "@types/react": "18.3.16"
-  },
-  "jest": {
-    "restoreMocks": true,
-    "clearMocks": true,
-    "resetMocks": true,
-    "transform": {
-      "node_modules/crypto-random-string/index.js": "babel-jest"
-    },
-    "transformIgnorePatterns": [
-      "node_modules/(?!crypto-random-string/.*)",
-      "/node_modules/(?!(axios)/)"
-    ],
-    "coveragePathIgnorePatterns": [
-      "src/index.tsx",
-      "src/reportWebVitals.ts",
-      "src/utils/constants.ts",
-      "src/consentAndAnalyticsConfiguration.ts",
-      "src/model",
-      "src/views/onboardingPremium/components/subProductStepPricingPlan/*"
-    ],
-    "moduleNameMapper": {
-      "^.+\\.(css|less|scss)$": "babel-jest",
-      "^axios$": "<rootDir>/node_modules/axios/dist/node/axios.cjs"
-    }
   }
 }

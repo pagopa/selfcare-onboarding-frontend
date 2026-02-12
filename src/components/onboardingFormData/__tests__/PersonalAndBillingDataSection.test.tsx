@@ -1,14 +1,14 @@
-import i18n from '@pagopa/selfcare-common-frontend/lib/locale/locale-utils';
 import '@testing-library/jest-dom';
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { useFormik } from 'formik';
+import { expect, Mock, test, vi } from 'vitest';
 import {
   institutionTypes,
-  mockPartyRegistry,
   mockedAoos,
   mockedPartiesFromInfoCamere,
   mockedProducts,
   mockedUos,
+  mockPartyRegistry,
 } from '../../../lib/__mocks__/mockApiRequests';
 import { OnboardingFormData } from '../../../model/OnboardingFormData';
 import { PRODUCT_IDS } from '../../../utils/constants';
@@ -16,42 +16,38 @@ import { renderComponentWithProviders } from '../../../utils/test-utils';
 import PersonalAndBillingDataSection from '../PersonalAndBillingDataSection';
 
 import {
-  isInsuranceCompany,
-  isPaymentServiceProvider,
-  isPublicAdministration,
   isContractingAuthority,
-  isTechPartner,
-  isIdpayMerchantProduct,
-  isPrivateOrPersonInstitution,
-  isInteropProduct,
-  isPrivateMerchantInstitution,
   isGlobalServiceProvider,
-  isPublicServiceCompany,
+  isIdpayMerchantProduct,
+  isInsuranceCompany,
+  isInteropProduct,
   isIoProduct,
   isIoSignProduct,
+  isPaymentServiceProvider,
+  isPrivateMerchantInstitution,
+  isPrivateOrPersonInstitution,
+  isPublicAdministration,
+  isPublicServiceCompany,
+  isTechPartner,
 } from '../../../utils/institutionTypeUtils';
 
-jest.mock('formik', () => ({
-  useFormik: jest.fn(),
+vi.mock('formik', () => ({
+  useFormik: vi.fn(),
 }));
 
-jest.mock('../../../services/geoTaxonomyServices', () => ({
-  getCountriesFromGeotaxonomies: jest.fn(),
-  getLocationFromIstatCode: jest.fn(),
-  getNationalCountries: jest.fn(),
+vi.mock('../../../services/geoTaxonomyServices', () => ({
+  getCountriesFromGeotaxonomies: vi.fn(),
+  getLocationFromIstatCode: vi.fn(),
+  getNationalCountries: vi.fn(),
 }));
 
-jest.mock('../../../services/institutionServices', () => ({
-  getUoInfoFromRecipientCode: jest.fn(),
+vi.mock('../../../services/institutionServices', () => ({
+  getUoInfoFromRecipientCode: vi.fn(),
 }));
 
-jest.mock('../../../services/billingDataServices', () => ({
-  verifyTaxCodeInvoicing: jest.fn(),
+vi.mock('../../../services/billingDataServices', () => ({
+  verifyTaxCodeInvoicing: vi.fn(),
 }));
-
-beforeAll(() => {
-  i18n.changeLanguage('it');
-});
 
 const mockFormik = {
   initialValues: {
@@ -65,11 +61,11 @@ const mockFormik = {
     geographicTaxonomies: [],
   },
   validateOnMount: true,
-  validate: jest.fn(),
-  onSubmit: jest.fn(),
+  validate: vi.fn(),
+  onSubmit: vi.fn(),
 };
 
-(useFormik as jest.Mock).mockReturnValue(mockFormik);
+(useFormik as Mock).mockReturnValue(mockFormik);
 
 const formik: any = {
   values: {
@@ -79,10 +75,10 @@ const formik: any = {
   errors: {
     zipCode: 'Invalid zip code',
   },
-  setFieldValue: jest.fn(),
-  setErrors: jest.fn(),
-  setTouched: jest.fn(),
-  handleChange: jest.fn(),
+  setFieldValue: vi.fn(),
+  setErrors: vi.fn(),
+  setTouched: vi.fn(),
+  handleChange: vi.fn(),
 };
 
 const mockBaseTextFieldProps = (
@@ -132,10 +128,13 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
         switch (productId) {
           case PRODUCT_IDS.SEND:
             onboardingFormData = mockedAoos[0];
+            break;
           case PRODUCT_IDS.IO_SIGN:
             onboardingFormData = mockedUos[0];
+            break;
           case PRODUCT_IDS.INTEROP:
             onboardingFormData = mockedPartiesFromInfoCamere;
+            break;
           default:
             onboardingFormData = mockPartyRegistry.items[0];
         }
@@ -202,14 +201,14 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
               externalInstitutionId: '',
               isTaxCodeEquals2PIVA: false,
             }}
-            setStepHistoryState={jest.fn()}
+            setStepHistoryState={vi.fn()}
             formik={formik}
             institutionAvoidGeotax={institutionAvoidGeotax}
             onboardingFormData={onboardingFormData}
             controllers={mockControllers}
-            setInvalidTaxCodeInvoicing={jest.fn()}
+            setInvalidTaxCodeInvoicing={vi.fn()}
             countries={undefined}
-            setCountries={jest.fn()}
+            setCountries={vi.fn()}
           />
         );
 

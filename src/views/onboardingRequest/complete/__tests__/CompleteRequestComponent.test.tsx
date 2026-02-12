@@ -1,34 +1,28 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import CompleteRequestComponent from '../CompleteRequest';
-import '../../../../locale';
-import React from 'react';
-import { ENV } from '../../../../utils/env';
-import { buildAssistanceURI } from '@pagopa/selfcare-common-frontend/lib/services/assistanceService';
 import userEvent from '@testing-library/user-event';
-import i18n from '@pagopa/selfcare-common-frontend/lib/locale/locale-utils';
+import { afterAll, beforeAll, beforeEach, expect, test, vi } from 'vitest';
+import '../../../../locale';
+import { ENV } from '../../../../utils/env';
+import CompleteRequestComponent from '../CompleteRequest';
 
-jest.setTimeout(40000);
+vi.setConfig({ testTimeout: 40000 });
 
-jest.mock('react-router-dom', () => ({
+vi.mock('react-router-dom', () => ({
   useHistory: () => ({
     location: mockedLocation,
-    replace: jest.fn(),
+    replace: vi.fn(),
   }),
 }));
 
-jest.mock('react-router', () => ({
+vi.mock('react-router', () => ({
   useParams: () => ({}),
-}));
-
-jest.mock('@pagopa/selfcare-common-frontend/lib/services/assistanceService', () => ({
-  buildAssistanceURI: jest.fn(),
 }));
 
 let mockedContract: File;
 
 const oldWindowLocation = global.window.location;
 const mockedLocation = {
-  assign: jest.fn(),
+  assign: vi.fn(),
   pathname: '',
   origin: 'MOCKED_ORIGIN',
   search: '',
@@ -36,12 +30,12 @@ const mockedLocation = {
 };
 
 beforeAll(() => {
-  i18n.changeLanguage('it');
   Object.defineProperty(window, 'location', { value: mockedLocation });
 });
 
 beforeEach(() => {
   mockedContract = new File(['pdf'], 'contract.pdf', { type: 'multipart/form-data' });
+  mockedLocation.assign.mockClear();
 });
 
 afterAll(() => {
@@ -54,11 +48,11 @@ test('Test: The jwt is not present and the onboarding request is not retrieved, 
 
   await waitFor(() => screen.getByText('La pagina che cercavi non è disponibile'));
   const assistanceButton = screen.getByRole('button', {
-    name: 'Contatta l’assistenza',
+    name: 'Contatta l\u2019assistenza',
   });
 
   fireEvent.click(assistanceButton);
-  waitFor(() => expect(buildAssistanceURI).toHaveBeenCalledWith(ENV.ASSISTANCE.EMAIL));
+  await waitFor(() => expect(mockedLocation.assign).toHaveBeenCalledWith(ENV.URL_FE.ASSISTANCE));
 });
 
 test('Test: The jwt is non-existent and the onboarding request is not retrieved, so the error page is showed', async () => {
@@ -66,10 +60,10 @@ test('Test: The jwt is non-existent and the onboarding request is not retrieved,
   render(<CompleteRequestComponent />);
 
   await waitFor(() => screen.getByText('La pagina che cercavi non è disponibile'));
-  const assistanceButton = screen.getByText('Contatta l’assistenza');
+  const assistanceButton = screen.getByText('Contatta l\u2019assistenza');
 
   fireEvent.click(assistanceButton);
-  waitFor(() => expect(buildAssistanceURI).toHaveBeenCalledWith(ENV.ASSISTANCE.EMAIL));
+  await waitFor(() => expect(mockedLocation.assign).toHaveBeenCalledWith(ENV.URL_FE.ASSISTANCE));
 });
 
 test('Test: The jwt exist and the request is correct retrieved, but it is already approved', async () => {
@@ -80,7 +74,14 @@ test('Test: The jwt exist and the request is correct retrieved, but it is alread
   const login = screen.getByText('Accedi');
 
   fireEvent.click(login);
-  waitFor(() => expect(buildAssistanceURI).toHaveBeenCalledWith(`${ENV.URL_FE.LOGIN}/login?onSuccess=`));
+  const expectedOnSuccess = encodeURIComponent(
+    mockedLocation.pathname + mockedLocation.search
+  );
+  await waitFor(() =>
+    expect(mockedLocation.assign).toHaveBeenCalledWith(
+      `${ENV.URL_FE.LOGIN}/login?onSuccess=${expectedOnSuccess}`
+    )
+  );
 });
 
 test('Test: The jwt exist but is expired', async () => {
@@ -91,15 +92,17 @@ test('Test: The jwt exist but is expired', async () => {
   const login = screen.getByText('Torna alla home');
 
   fireEvent.click(login);
-  waitFor(() => expect(buildAssistanceURI).toHaveBeenCalledWith(ENV.URL_FE.LANDING));
+  await waitFor(() =>
+    expect(mockedLocation.assign).toHaveBeenCalledWith(ENV.URL_FE.LANDING)
+  );
 });
 
 test('Test: The jwt exist and the request is correctly retrieved and waiting for upload/download contract, starting the upload flow', async () => {
   mockedLocation.search = 'jwt=pendingRequest';
   render(<CompleteRequestComponent />);
 
-  await waitFor(() => screen.getByText('Carica l’accordo firmato'));
-  await waitFor(() => screen.getByText('Scarica l’accordo di adesione'));
+  await waitFor(() => screen.getByText('Carica l\u2019accordo firmato'));
+  await waitFor(() => screen.getByText('Scarica l\u2019accordo di adesione'));
 
   const uploadContract = await waitFor(() =>
     screen.getByRole('button', {

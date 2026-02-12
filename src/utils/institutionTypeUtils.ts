@@ -154,4 +154,4 @@ export const isInformationCompany = (
 // Environment Checks
 // ============================================
 
-export const isMockEnvironment = (): boolean => process.env.REACT_APP_MOCK_API === 'true';
+export const isMockEnvironment = (): boolean => process.env.VITE_MOCK_API === 'true';

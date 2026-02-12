@@ -1,30 +1,31 @@
 /* eslint-disable complexity */
-import { render, waitFor, screen, fireEvent } from '@testing-library/react';
-import { userEvent } from '@testing-library/user-event';
-import React, { useState } from 'react';
-import { Router } from 'react-router-dom';
-import { createMemoryHistory } from 'history';
-import i18n from '@pagopa/selfcare-common-frontend/lib/locale/locale-utils';
-import { Provider } from 'react-redux';
+import i18n from 'i18next';
 import { User } from '@pagopa/selfcare-common-frontend/lib/model/User';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { userEvent } from '@testing-library/user-event';
+import { createMemoryHistory } from 'history';
+import React, { useState } from 'react';
+import { Provider } from 'react-redux';
+import { Router } from 'react-router-dom';
+import { MockInstance } from 'vitest';
+import { InstitutionType } from '../../types';
 import {
-  mockPartyRegistry,
   mockedANACParties,
-  mockedPartiesFromInfoCamere,
+  mockedAoos,
+  mockedGeoTaxonomy,
   mockedInsuranceResource,
   mockedParties,
-  mockedAoos,
-  mockedUos,
-  mockedPspOnboardingData,
-  mockedGeoTaxonomy,
+  mockedPartiesFromInfoCamere,
   mockedPdndVisuraInfomacere,
+  mockedPspOnboardingData,
+  mockedUos,
+  mockPartyRegistry,
 } from '../lib/__mocks__/mockApiRequests';
 import { nationalValue } from '../model/GeographicTaxonomies';
 import { store } from '../redux/store';
-import { InstitutionType } from '../../types';
 import { HeaderContext, UserContext } from './../lib/context';
-import { ENV } from './env';
 import { canInvoice, PRODUCT_IDS } from './constants';
+import { ENV } from './env';
 import {
   isContractingAuthority,
   isGlobalServiceProvider,
@@ -43,6 +44,7 @@ import {
   isPublicServiceCompany,
   isTechPartner,
 } from './institutionTypeUtils';
+;
 
 export type Source =
   | 'IPA'
@@ -227,7 +229,7 @@ export const executeStepAddManager = async (
   addUserFlow: boolean,
   isPremium?: boolean,
   expectedSuccessfulSubmit?: boolean,
-  fetchWithLogsSpy?: jest.SpyInstance,
+  fetchWithLogsSpy?: MockInstance,
   productId?: string
 ) => {
   console.log('Testing step add manager..');
@@ -634,7 +636,7 @@ export const billingData2billingDataRequest = (
 export const verifySubmit = async (
   productId: string = PRODUCT_IDS.IO,
   institutionType: string,
-  fetchWithLogsSpy: jest.SpyInstance<any, any, any>,
+  fetchWithLogsSpy: MockInstance,
   from?: Source,
   uo: boolean = false,
   errorOnSubmit: boolean = false,
@@ -970,13 +972,13 @@ const billingData2billingDataRequestPspDashboard = () => ({
   digitalAddress: 'info@bpm.it',
   zipCode: '20121',
   taxCode: '98765432101',
-  vatNumber: '98765432101',
+  vatNumber: undefined,
   taxCodeInvoicing: undefined,
   recipientCode: 'Z9X8Y1',
   legalForm: undefined,
 });
 export const verifySubmitPostLegalsIoPremium = async (
-  fetchWithLogsSpy: jest.SpyInstance<any, any, any>
+  fetchWithLogsSpy: MockInstance
 ) => {
   await waitFor(() => {
     const postLegalsCalls = fetchWithLogsSpy.mock.calls.filter(
@@ -1033,7 +1035,7 @@ export const verifySubmitPostLegalsIoPremium = async (
 };
 
 export const verifySubmitPostLegalsPspDashBoard = async (
-  fetchWithLogsSpy: jest.SpyInstance<any, any, any>
+  fetchWithLogsSpy: MockInstance
 ) => {
   const postLegalsCalls = fetchWithLogsSpy.mock.calls.filter(
     (call) => call[0]?.endpoint === 'ONBOARDING_POST_LEGALS'

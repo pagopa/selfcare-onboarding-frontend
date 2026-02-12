@@ -1,10 +1,9 @@
-// eslint-disable-next-line spaced-comment
-/// <reference types="react-scripts" />
+/// <reference types="vite/client" />
 declare namespace NodeJS {
   interface ProcessEnv {
-    NODE_ENV: 'development' | 'uat' | 'production';
+    NODE_ENV: 'development' | 'uat' | 'production' | 'test';
 
-    REACT_APP_MOCK_API: string;
+    VITE_MOCK_API: string;
   }
 }
 interface Window {

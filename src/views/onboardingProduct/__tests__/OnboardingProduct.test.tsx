@@ -1,21 +1,35 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { useState } from 'react';
-import '@testing-library/jest-dom';
 import { User } from '@pagopa/selfcare-common-frontend/lib/model/User';
-import { InstitutionType } from '../../../../types';
-import { HeaderContext, UserContext } from '../../../lib/context';
-import { ENV } from '../../../utils/env';
-import OnboardingProduct from '../OnboardingProduct';
-import '../../../locale';
-import { canInvoice, PRODUCT_IDS } from '../../../utils/constants';
-import { createMemoryHistory } from 'history';
-import { Router } from 'react-router-dom';
+import '@testing-library/jest-dom';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import axios from 'axios';
+import { createMemoryHistory } from 'history';
+import { useState } from 'react';
+import { Provider } from 'react-redux';
+import { Router } from 'react-router-dom';
+import { afterAll, beforeAll, beforeEach, expect, Mocked, MockInstance, test, vi } from 'vitest';
+import { InstitutionType } from '../../../../types';
 import {
   mockedCategories,
   mockedPdndVisuraInfomacere,
 } from '../../../lib/__mocks__/mockApiRequests';
-import i18n from '@pagopa/selfcare-common-frontend/lib/locale/locale-utils';
+import { HeaderContext, UserContext } from '../../../lib/context';
+import '../../../locale';
+import { createStore } from '../../../redux/store';
+import { canInvoice, PRODUCT_IDS } from '../../../utils/constants';
+import { ENV } from '../../../utils/env';
+import {
+  isConsolidatedEconomicAccountCompany,
+  isContractingAuthority,
+  isGlobalServiceProvider,
+  isIdpayMerchantProduct,
+  isInsuranceCompany,
+  isIoProduct,
+  isPrivateInstitution,
+  isPrivateMerchantInstitution,
+  isPublicAdministration,
+  isPublicServiceCompany,
+} from '../../../utils/institutionTypeUtils';
 import {
   checkCorrectBodyBillingData,
   executeGoHome,
@@ -29,27 +43,10 @@ import {
   Source,
   verifySubmit,
 } from '../../../utils/test-utils';
-import { createStore } from '../../../redux/store';
-import { Provider } from 'react-redux';
-import axios from 'axios';
-import {
-  isConsolidatedEconomicAccountCompany,
-  isContractingAuthority,
-  isGlobalServiceProvider,
-  isIdpayMerchantProduct,
-  isInsuranceCompany,
-  isInteropProduct,
-  isIoProduct,
-  isPrivateInstitution,
-  isPrivateMerchantInstitution,
-  isPrivatePersonInstitution,
-  isPublicAdministration,
-  isPublicServiceCompany,
-} from '../../../utils/institutionTypeUtils';
-
-jest.setTimeout(40000);
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
+import OnboardingProduct from '../OnboardingProduct';
+vi.setConfig({ testTimeout: 40000 });
+vi.mock('react-router-dom', async () => ({
+  ...(await vi.importActual('react-router-dom')),
   useHistory: () => ({
     location: mockedLocation,
     replace: (nextLocation: any) => Object.assign(mockedLocation, nextLocation),
@@ -57,15 +54,15 @@ jest.mock('react-router-dom', () => ({
   }),
 }));
 
-jest.mock('axios');
-const mockedAxios = axios as jest.Mocked<typeof axios>;
+vi.mock('axios');
+const mockedAxios = axios as Mocked<typeof axios>;
 
-let fetchWithLogsSpy: jest.SpyInstance;
+let fetchWithLogsSpy: MockInstance;
 let aggregatesCsv: File;
 
 const oldWindowLocation = global.window.location;
 const initialLocation = {
-  assign: jest.fn(),
+  assign: vi.fn(),
   pathname: '',
   origin: 'MOCKED_ORIGIN',
   search: '?pricingPlan=FA',
@@ -73,10 +70,9 @@ const initialLocation = {
   state: undefined,
 };
 const mockedLocation = Object.assign({}, initialLocation);
-const mockedHistoryPush = jest.fn();
+const mockedHistoryPush = vi.fn();
 
 beforeAll(() => {
-  i18n.changeLanguage('it');
   Object.defineProperty(window, 'location', { value: mockedLocation });
 });
 
@@ -84,8 +80,12 @@ afterAll(() => {
   Object.defineProperty(window, 'location', { value: oldWindowLocation });
 });
 
-beforeEach(() => {
-  fetchWithLogsSpy = jest.spyOn(require('../../../lib/api-utils'), 'fetchWithLogs');
+beforeEach(async () => {
+  const apiUtils = await import('../../../lib/api-utils');
+  if (fetchWithLogsSpy) {
+    fetchWithLogsSpy.mockRestore();
+  }
+  fetchWithLogsSpy = vi.spyOn(apiUtils, 'fetchWithLogs');
   Object.assign(mockedLocation, initialLocation);
   aggregatesCsv = new File(['csv data'], 'aggregates.csv', { type: 'multipart/form-data' });
 
@@ -885,7 +885,7 @@ const executeStepSearchParty = async (
   ivassCode?: string,
   reaCode?: string,
   personalTaxCode?: string,
-  expectedError: boolean = false,
+  _expectedError: boolean = false,
   withoutIpa: boolean = false,
   isAggregator: boolean = false
 ) => {
@@ -1146,7 +1146,7 @@ const executeStepSearchParty = async (
 
       break;
     default:
-      return '';
+      break;
   }
 
   const confirmButton = screen.getByRole('button', { name: 'Continua' });
