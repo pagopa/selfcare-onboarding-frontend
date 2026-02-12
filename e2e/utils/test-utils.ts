@@ -301,7 +301,7 @@ export const stepFormData = async (
     );
   } else if (
     (!isFromIpa &&
-      !isTechPartner(actualInstitutionType as InstitutionType) &&
+      !isTechPartner(actualInstitutionType as InstitutionType)||
       !isIoProductE2E(product)) ||
     isPublicServiceCompanyE2E(actualInstitutionType as InstitutionType) ||
     (isPagoPaProductE2E(product) &&
@@ -378,10 +378,10 @@ export const stepFormData = async (
   }
 
   const shouldShowNazionale = isFromIpa
-    ? !isPublicServiceCompanyE2E(actualInstitutionType as InstitutionType) &&
-      !isContractingAuthorityE2E(actualInstitutionType as InstitutionType) &&
-      !isInsuranceCompanyE2E(actualInstitutionType as InstitutionType) &&
-      (isPrivateInstitutionE2E(actualInstitutionType as InstitutionType) ||
+    ? (!isPublicServiceCompanyE2E(actualInstitutionType as InstitutionType) &&
+        !isContractingAuthorityE2E(actualInstitutionType as InstitutionType) &&
+        !isInsuranceCompanyE2E(actualInstitutionType as InstitutionType)) ||
+      (isPrivateInstitutionE2E(actualInstitutionType as InstitutionType) &&
         isInteropProductE2E(product))
     : !isTechPartner(actualInstitutionType as InstitutionType);
   if (shouldShowNazionale) {
