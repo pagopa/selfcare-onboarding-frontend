@@ -192,7 +192,7 @@ export const createForwardFunctions = (params: ForwardFunctionsParams) => {
     setOnboardingFormData(newOnboardingFormData);
     switch (institutionType) {
       case 'GSP':
-        if (productId === PRODUCT_IDS.PAGOPA) {
+        if (productId === PRODUCT_IDS.PAGOPA && (newOnboardingFormData?.origin || origin) === 'IPA') {
           setActiveStep(activeStep + 2);
         } else {
           setActiveStep(activeStep + 3);

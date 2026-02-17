@@ -294,7 +294,7 @@ test('Test: Successfull complete onboarding request of GSP party without searchi
     false
   );
   await executeStepBillingData(PRODUCT_IDS.PAGOPA, 'GSP', false, false, 'NO_IPA', 'AGENCY X');
-  await executeStepAdditionalInfo('NO_IPA');
+  // await executeStepAdditionalInfo('NO_IPA');
   await executeStepAddManager(false);
   await executeStepAddAdmin(true, false, false, false, false, false);
   await verifySubmit(PRODUCT_IDS.PAGOPA, 'GSP', fetchWithLogsSpy, 'NO_IPA');
