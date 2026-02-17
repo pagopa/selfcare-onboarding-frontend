@@ -81,7 +81,9 @@ export const postOnboardingSubmit = async (
       billingData: billingData2billingDataRequest(onboardingFormData as OnboardingFormData),
       atecoCodes: onboardingFormData?.atecoCodes,
       additionalInformations:
-        isGlobalServiceProvider(institutionType) && isPagoPaProduct(selectedProduct?.id)
+        isGlobalServiceProvider(institutionType) &&
+        isPagoPaProduct(selectedProduct?.id) &&
+        origin === 'IPA'
           ? {
               agentOfPublicService: additionalInformations?.agentOfPublicService,
               agentOfPublicServiceNote: additionalInformations?.agentOfPublicServiceNote,
@@ -155,11 +157,13 @@ export const postOnboardingSubmit = async (
       taxCode: onboardingFormData?.taxCode,
       isAggregator: onboardingFormData?.isAggregator ? onboardingFormData?.isAggregator : undefined,
       aggregates,
-      userRequester: users.every((u) => u?.taxCode !== loggedUser?.taxCode) ?  {
-        name: onboardingFormData?.userRequester?.name,
-        surname: onboardingFormData?.userRequester?.surname,
-        email: onboardingFormData?.userRequester?.email,
-      } : undefined
+      userRequester: users.every((u) => u?.taxCode !== loggedUser?.taxCode)
+        ? {
+            name: onboardingFormData?.userRequester?.name,
+            surname: onboardingFormData?.userRequester?.surname,
+            email: onboardingFormData?.userRequester?.email,
+          }
+        : undefined,
     },
     setRequiredLogin
   );
