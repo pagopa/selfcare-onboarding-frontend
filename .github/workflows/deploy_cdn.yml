@@ -6,23 +6,22 @@ on:
       - main
       - releases/*
     paths:
-      - "!.github/**"
-      - "!.devops/**"
-      - "!infra/**"
-      - "!.pre-commit-config.yaml"
-      - "!.terraform-version"
-      - "!CODEOWNERS"
+      - '!.github/**'
+      - '!.devops/**'
+      - '!infra/**'
+      - '!.pre-commit-config.yaml'
+      - '!.terraform-version'
+      - '!CODEOWNERS'
 
   workflow_dispatch:
     inputs:
       env:
         type: choice
         description: Environment
-        options: 
-        - dev
-        - uat
-        - prod
-
+        options:
+          - dev
+          - uat
+          - prod
 
 jobs:
   release_and_deploy:
@@ -32,11 +31,11 @@ jobs:
     with:
       environment: ${{ inputs.env != null && inputs.env || (startsWith(github.ref_name, 'releases/') && 'uat') || 'dev' }}
       file_environment: ${{ format('fe_{0}.env', (inputs.env != null && inputs.env || (startsWith(github.ref_name, 'releases/') && 'uat') || 'dev')) }}
-      storage_account_name: "weuarcheckoutst01"
+      storage_account_name: weuarcheckoutst01
       profile_name: weu-ar-checkout-afd-01
       endpoint_name: weu-ar-checkout-fde-01
       resource_group_name: checkout-fe-rg
-      blob_container_name: "$web"
+      blob_container_name: $web
       base_path: onboarding
 
   promote_release:
