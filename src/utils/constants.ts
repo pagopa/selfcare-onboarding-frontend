@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/restrict-plus-operands */
 import { InstitutionType, RoutesObject } from '../../types';
 import NoProductPage from '../components/layout/NoProductPage';
 import OnboardingPremium from '../views/onboardingPremium/OnboardingPremium';
