@@ -16,7 +16,7 @@ export const ENV = {
   BASE_PATH_CDN_URL: import.meta.env.VITE_URL_CDN,
 
   ASSISTANCE: {
-    ENABLE: import.meta.env.VITE_ENABLE_ASSISTANCE,
+    ENABLE: import.meta.env.VITE_ENABLE_ASSISTANCE === 'true',
     EMAIL: import.meta.env.VITE_PAGOPA_HELP_EMAIL
   },
 
@@ -42,43 +42,43 @@ export const ENV = {
   UPLOAD_CONTRACT_MAX_LOOP_ERROR: import.meta.env.VITE_UPLOAD_CONTRACT_MAX_LOOP_ERROR,
 
   ANALYTCS: {
-    ENABLE: import.meta.env.VITE_ANALYTICS_ENABLE,
-    MOCK: import.meta.env.VITE_ANALYTICS_MOCK,
-    DEBUG: import.meta.env.VITE_ANALYTICS_DEBUG,
+    ENABLE: import.meta.env.VITE_ANALYTICS_ENABLE === 'true',
+    MOCK: import.meta.env.VITE_ANALYTICS_MOCK === 'true',
+    DEBUG: import.meta.env.VITE_ANALYTICS_DEBUG === 'true',
     TOKEN: import.meta.env.VITE_MIXPANEL_TOKEN,
     API_HOST: import.meta.env.VITE_MIXPANEL_API_HOST
   },
 
   GEOTAXONOMY: {
-    SHOW_GEOTAXONOMY: import.meta.env.VITE_ENABLE_GEOTAXONOMY,
+    SHOW_GEOTAXONOMY: import.meta.env.VITE_ENABLE_GEOTAXONOMY === 'true',
   },
 
   AOO_UO: {
-    SHOW_AOO_UO: import.meta.env.VITE_ENABLE_AOO_UO,
+    SHOW_AOO_UO: import.meta.env.VITE_ENABLE_AOO_UO === 'true',
   },
 
   PT: {
-    SHOW_PT: import.meta.env.VITE_ENABLE_PT,
+    SHOW_PT: import.meta.env.VITE_ENABLE_PT === 'true',
   },
 
   AGGREGATOR: {
-    SHOW_AGGREGATOR: import.meta.env.VITE_ENABLE_AGGREGATOR,
+    SHOW_AGGREGATOR: import.meta.env.VITE_ENABLE_AGGREGATOR === 'true',
     ELIGIBLE_PRODUCTS: import.meta.env.VITE_AGGREGATOR_ELIGIBLE_PRODUCTS
   },
 
   SCP_INFOCAMERE: {
-    SHOW: import.meta.env.VITE_ENABLE_SCP_INFOCAMERE
+    SHOW: import.meta.env.VITE_ENABLE_SCP_INFOCAMERE === 'true'
   },
 
   PRV: {
-    SHOW: import.meta.env.VITE_ENABLE_PRV
+    SHOW: import.meta.env.VITE_ENABLE_PRV === 'true'
   },
 
   PURE_PRV: {
-    SHOW: import.meta.env.VITE_ENABLE_PURE_PRV
+    SHOW: import.meta.env.VITE_ENABLE_PURE_PRV === 'true'
   },
 
   GPU: {
-    SHOW: import.meta.env.VITE_ENABLE_GPU
+    SHOW: import.meta.env.VITE_ENABLE_GPU === 'true'
   },
 };
