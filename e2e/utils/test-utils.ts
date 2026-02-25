@@ -300,11 +300,10 @@ export const stepFormData = async (
       }
     );
   } else if (
-    (!isFromIpa &&
-      !isTechPartner(actualInstitutionType as InstitutionType)||
-      !isIoProductE2E(product)) ||
-    isPublicServiceCompanyE2E(actualInstitutionType as InstitutionType) ||
-    (isPagoPaProductE2E(product) &&
+    (!isFromIpa && !isTechPartner(actualInstitutionType as InstitutionType)) ||
+    (isFromIpa && isPublicServiceCompanyE2E(actualInstitutionType as InstitutionType)) ||
+    (isFromIpa &&
+      isPagoPaProductE2E(product) &&
       isPrivateInstitutionE2E(actualInstitutionType as InstitutionType))
   ) {
     await page.click('#recipientCode');
