@@ -34,6 +34,8 @@ const StepAddApplicantEmail = ({ forward, back, user, addUser, partyName, produc
   const isEmailValid =
     userRequester.email.length === 0 ? false : emailRegexp.test(userRequester.email);
 
+  const isPecEmail = isEmailValid && /(@pec\.|\.pec\.)/i.test(userRequester.email);
+
   const onForwardAction = () => {
     setOpenConfirmationModal(true);
   };
@@ -119,11 +121,13 @@ const StepAddApplicantEmail = ({ forward, back, user, addUser, partyName, produc
                 inputProps={{
                   'data-testid': 'email-applicant-test',
                 }}
-                error={!isEmailValid && userRequester.email.length > 0}
+                error={(!isEmailValid || isPecEmail) && userRequester.email.length > 0}
                 helperText={
                   !isEmailValid && userRequester.email.length > 0
                     ? t('onboardingFormData.billingDataSection.invalidEmail')
-                    : ''
+                    : isPecEmail
+                      ? t('platformUserForm.fields.email.errors.invalidPec')
+                      : ''
                 }
                 onChange={(e) => handleEmailChange(e)}
                 disabled={false}
@@ -139,7 +143,7 @@ const StepAddApplicantEmail = ({ forward, back, user, addUser, partyName, produc
                 forward={{
                   action: onForwardAction,
                   label: t('onboardingFormData.confirmLabel'),
-                  disabled: !isEmailValid,
+                  disabled: !isEmailValid || isPecEmail,
                 }}
               />
             </Grid>

@@ -360,10 +360,11 @@ export default {
         label: 'Email istituzionale',
         errors: {
           invalid: "L'indirizzo email non è valido",
+          invalidPec: "Indirizzo PEC non accettato. Inserisci l’indirizzo email istituzionale utilizzato per l’ente",
           duplicate: "L'indirizzo email inserito è già presente",
           conflict: "L'indirizzo email inserito non corrisponde al precedente",
         },
-        description: 'Inserisci l’indirizzo email istituzionale utilizzato per l’ente',
+        description: 'Inserisci l’indirizzo email istituzionale utilizzato per l’ente. Non sono ammessi gli indirizzi PEC',
       },
     },
   },
