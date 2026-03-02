@@ -206,6 +206,8 @@ const validateGeographicTaxonomies = (
   return shouldValidate && hasInvalidTaxonomies ? requiredError : undefined;
 };
 
+export const isPecEmail = (email: string): boolean => /(@pec\.|\.pec\.)/i.test(email);
+
 const validateConditionalRequired = (value: string | undefined, condition: boolean) =>
   condition && !value ? requiredError : undefined;
 

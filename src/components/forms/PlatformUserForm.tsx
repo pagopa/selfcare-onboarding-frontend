@@ -11,6 +11,7 @@ import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 import { UserOnCreate, PartyRole } from '../../../types';
 import { UsersError, UsersObject } from '../steps/StepAddManager';
 import { PRODUCT_IDS } from '../../utils/constants';
+import { isPecEmail } from '../../utils/validateFields';
 
 type PlatformUserFormProps = {
   prefix: keyof UsersObject;
@@ -150,7 +151,7 @@ function validateNoMandatory(
         if (regexp && user[id] && !regexp.test(user[id] as string) && id === 'email') {
           return `${id}-regexp`;
         }
-        if (id === 'email' && user[id] && regexp && regexp.test(user[id] as string) && /(@pec\.|\.pec\.)/i.test(user[id] as string)) {
+        if (id === 'email' && user[id] && regexp && regexp.test(user[id] as string) && isPecEmail(user[id] as string)) {
           return `${id}-invalidPec`;
         }
         if (
