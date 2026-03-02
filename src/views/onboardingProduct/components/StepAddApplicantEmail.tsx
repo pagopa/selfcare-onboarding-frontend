@@ -8,6 +8,7 @@ import { StepperStepComponentProps } from '../../../../types';
 import { ConfirmOnboardingModal } from '../../../components/modals/ConfirmOnboardingRequest';
 import { OnboardingStepActions } from '../../../components/registrationSteps/OnboardingStepActions';
 import { UserRequester } from '../../../model/OnboardingFormData';
+import { isPecEmail } from '../../../utils/validateFields';
 
 type Props = {
   forward: (userRequester: UserRequester) => void;
@@ -33,6 +34,8 @@ const StepAddApplicantEmail = ({ forward, back, user, addUser, partyName, produc
 
   const isEmailValid =
     userRequester.email.length === 0 ? false : emailRegexp.test(userRequester.email);
+
+  const isPec = isEmailValid && isPecEmail(userRequester.email);
 
   const onForwardAction = () => {
     setOpenConfirmationModal(true);
@@ -119,11 +122,13 @@ const StepAddApplicantEmail = ({ forward, back, user, addUser, partyName, produc
                 inputProps={{
                   'data-testid': 'email-applicant-test',
                 }}
-                error={!isEmailValid && userRequester.email.length > 0}
+                error={(!isEmailValid || isPec) && userRequester.email.length > 0}
                 helperText={
                   !isEmailValid && userRequester.email.length > 0
                     ? t('onboardingFormData.billingDataSection.invalidEmail')
-                    : ''
+                    : isPec
+                      ? t('platformUserForm.fields.email.errors.invalidPec')
+                      : ''
                 }
                 onChange={(e) => handleEmailChange(e)}
                 disabled={false}
@@ -139,7 +144,7 @@ const StepAddApplicantEmail = ({ forward, back, user, addUser, partyName, produc
                 forward={{
                   action: onForwardAction,
                   label: t('onboardingFormData.confirmLabel'),
-                  disabled: !isEmailValid,
+                  disabled: !isEmailValid || isPec,
                 }}
               />
             </Grid>

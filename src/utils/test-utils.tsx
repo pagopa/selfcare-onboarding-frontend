@@ -222,6 +222,9 @@ export const fillUserForm = async (
   await fillTextFieldAndCheckButton(prefix, 'email', 'INVALIDEMAIL');
   expect(document.getElementById(`${prefix}-email-helper-text`)).toBeInTheDocument();
   await fillTextFieldAndCheckButton(prefix, 'email', '');
+  await fillTextFieldAndCheckButton(prefix, 'email', 'user@pec.it');
+  expect(document.getElementById(`${prefix}-email-helper-text`)).toBeInTheDocument();
+  await fillTextFieldAndCheckButton(prefix, 'email', '');
   await fillTextFieldAndCheckButton(prefix, 'email', email);
 };
 
@@ -435,6 +438,9 @@ export const executeStepAddApplicantEmailForm = async () => {
   });
 
   fireEvent.change(email, { target: { value: 'INVALIDEMAIL' } });
+
+  expect(document.getElementById('email-applicant-helper-text')).toBeInTheDocument();
+  fireEvent.change(email, { target: { value: 'user@pec.it' } });
 
   expect(document.getElementById('email-applicant-helper-text')).toBeInTheDocument();
   fireEvent.change(email, { target: { value: 'a@a.aa' } });
