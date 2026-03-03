@@ -6,6 +6,7 @@ import { InstitutionType, Product } from '../../../types';
 import { ENV } from '../../utils/env';
 import { RolesInformations } from '../shared/RolesInformations';
 import { addUserFlowProducts } from '../../utils/constants';
+import { isTechPartner } from '../../utils/institutionTypeUtils';
 
 type Props = {
   selectedProduct?: Product | null;
@@ -44,7 +45,7 @@ export default function AlreadyOnboarded({
           </Grid>
           <Grid item>
             <RolesInformations
-              isTechPartner={institutionType === 'PT'}
+              isTechPartner={isTechPartner(institutionType)}
               linkLabel={t('moreInformationOnRoles')}
             />
           </Grid>

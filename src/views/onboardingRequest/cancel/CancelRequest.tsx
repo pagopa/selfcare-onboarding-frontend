@@ -7,6 +7,7 @@ import { MessageNoAction } from '../../../components/shared/MessageNoAction';
 import { HeaderContext, UserContext } from '../../../lib/context';
 import { deleteRequest } from '../../../services/requestStatusServices';
 import { verifyRequest } from '../../../services/tokenServices';
+import { genericError } from '../../../components/steps/StepOnboardingData';
 import { getRequestJwt } from '../../../utils/getRequestJwt';
 import AlreadyCompletedRequest from '../status/AlreadyCompletedPage';
 import AlreadyRejectedRequest from '../status/AlreadyRejectedPage';
@@ -115,6 +116,7 @@ export default function CancelRequestComponent() {
         </>,
       ],
     },
+    genericError,
   };
 
   return loading ? (

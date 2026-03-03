@@ -1,6 +1,7 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { useState } from 'react';
 import '@testing-library/jest-dom';
+import { vi, MockInstance, beforeEach, expect, test } from 'vitest';
 import { User } from '@pagopa/selfcare-common-frontend/lib/model/User';
 import { HeaderContext, UserContext } from '../../../lib/context';
 import { ENV } from '../../../utils/env';
@@ -8,7 +9,7 @@ import '../../../locale';
 import { MemoryRouter } from 'react-router-dom';
 import OnboardingUser from '../OnboardingUser';
 import { mockPartyRegistry, mockedProducts } from '../../../lib/__mocks__/mockApiRequests';
-import i18n from '@pagopa/selfcare-common-frontend/lib/locale/locale-utils';
+;
 import { executeStepAddAdmin, executeStepAddManager } from '../../../utils/test-utils';
 import { createStore } from '../../../redux/store';
 import { Provider } from 'react-redux';
@@ -16,16 +17,13 @@ import { PRODUCT_IDS } from '../../../utils/constants';
 
 type Search = 'taxCode' | 'aooCode' | 'uoCode' | 'ivassCode';
 
-jest.setTimeout(40000);
+vi.setConfig({ testTimeout: 40000 });
 
-let fetchWithLogsSpy: jest.SpyInstance;
+let fetchWithLogsSpy: MockInstance;
 
-beforeEach(() => {
-  fetchWithLogsSpy = jest.spyOn(require('../../../lib/api-utils'), 'fetchWithLogs');
-});
-
-beforeAll(() => {
-  i18n.changeLanguage('it');
+beforeEach(async () => {
+  const apiUtils = await import('../../../lib/api-utils');
+  fetchWithLogsSpy = vi.spyOn(apiUtils, 'fetchWithLogs');
 });
 
 const renderComponent = (
@@ -154,13 +152,13 @@ const executeStepSearchOnboardedParty = async (
 test('Test: Successfull added new user for a party who has already onboarded to the PagoPA platform product', async () => {
   renderComponent(PRODUCT_IDS.PAGOPA, true);
   await executeStepAddManager(true);
-  await executeStepAddAdmin(true, false, false, true, false);
+  await executeStepAddAdmin(true, false, false, true, false, false);
 });
 
 test('Test: NOT successfull added new user for a party who has already onboarded to the IO product', async () => {   
   renderComponent(PRODUCT_IDS.IO, true);
   await executeStepAddManager(true);
-  await executeStepAddAdmin(false, false , false, true, false);
+  await executeStepAddAdmin(false, false , false, true, false, false);
 });
 
 // TODO

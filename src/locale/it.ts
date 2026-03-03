@@ -32,7 +32,8 @@ export default {
         },
         attachments: {
           title: 'Scarica l’addendum',
-          description: 'Per adeguarti alla nuova normativa, scarica l’addendum e provvedi alla  <1 />firma digitale <2>formato p7m</2>.',
+          description:
+            'Scarica l’addendum e provvedi alla firma digitale in <2>formato p7m</2>.',
           downloadContract: 'Scarica il documento',
         },
         user: {
@@ -40,6 +41,7 @@ export default {
           description: `Per completare l’adesione, scarica il Modulo di aggiunta e fai apporre la <1 />firma digitale in <2>formato p7m</2> dal Legale Rappresentante dell’ente.`,
           downloadContract: 'Scarica il Modulo',
         },
+        disclaimerAttachments: 'Puoi far firmare l’accordo dal Legale Rappresentante o procuratore.',
         disclaimer:
           'Firmando l’accordo, il Legale Rappresentante dell’ente, accetta espressamente e specificamente anche le singole clausole indicate nel paragrafo “Clausole ai sensi degli artt. 1341 e 1342 c.c.”',
       },
@@ -76,6 +78,14 @@ export default {
           link: 'carica il file',
         },
         continue: 'Continua',
+      },
+      attachments: {
+        title: 'Carica il documento',
+        description: 'Carica l’addendum firmato digitalmente in p7m',
+        dropArea: {
+          title: 'Trascina qui il documento firmato oppure',
+          link: 'selezionalo dal tuo computer',
+        },
       },
       continue: 'Continua',
       error: {
@@ -232,6 +242,16 @@ export default {
       label: 'Aggiungi me come Amministratore',
     },
   },
+  stepAddApplicantEmail: {
+    title: 'Indica la tua email',
+    description:
+      'Inserisci la tua email per ricevere una conferma quando la tua richiesta sarà stata elaborata <1/> con successo',
+    applicantName: 'Nome',
+    applicantSurname: 'Cognome',
+    applicantEmail: 'Email',
+    backLabel: 'Indietro',
+    confirmLabel: 'Continua',
+  },
   additionalGpuDataPage: {
     title: 'Inserisci ulteriori dettagli',
     subTitle: 'Seleziona tra le opzioni quella che descrive il tuo ente.',
@@ -340,10 +360,11 @@ export default {
         label: 'Email istituzionale',
         errors: {
           invalid: "L'indirizzo email non è valido",
+          invalidPec: "Indirizzo PEC non accettato. Inserisci l’indirizzo email istituzionale utilizzato per l’ente",
           duplicate: "L'indirizzo email inserito è già presente",
           conflict: "L'indirizzo email inserito non corrisponde al precedente",
         },
-        description: 'Inserisci l’indirizzo email istituzionale utilizzato per l’ente',
+        description: 'Inserisci l’indirizzo email istituzionale utilizzato per l’ente. Non sono ammessi gli indirizzi PEC',
       },
     },
   },
@@ -409,6 +430,11 @@ export default {
         user: {
           title: 'Richiesta completata',
           description: `Da questo momento gli Amministratori indicati possono <1 />accedere all’Area Riservata.`,
+        },
+        attachments: {
+          title: 'Caricamento completato',
+          description: 'Hai sottoscritto correttamente al nuovo addendum DORA.',
+          link: 'Vai alla sezione documenti',
         },
         backHome: 'Torna alla home',
       },

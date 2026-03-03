@@ -3,6 +3,7 @@ import { Trans } from 'react-i18next';
 import { useTranslation } from 'react-i18next';
 import { RolesInformations } from '../../components/shared/RolesInformations';
 import { InstitutionType } from '../../../types';
+import { isTechPartner } from '../../utils/institutionTypeUtils';
 
 type Props = {
   institutionType?: InstitutionType;
@@ -29,7 +30,7 @@ function AddUserHeading({ institutionType }: Props) {
       </Grid>
       <Grid item mb={3}>
         <RolesInformations
-          isTechPartner={institutionType === 'PT'}
+          isTechPartner={isTechPartner(institutionType)}
           linkLabel={t('moreInformationOnRoles')}
         />
       </Grid>

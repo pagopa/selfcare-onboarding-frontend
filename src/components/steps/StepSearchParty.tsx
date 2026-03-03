@@ -24,8 +24,20 @@ import {
   handleSearchByUoCode,
   handleSearchExternalId,
 } from '../../services/institutionServices';
-import { noMandatoryIpaProducts, PRODUCT_IDS } from '../../utils/constants';
+import { noMandatoryIpaProducts } from '../../utils/constants';
 import { ENV } from '../../utils/env';
+import {
+  isContractingAuthority,
+  isGlobalServiceProvider,
+  isIdpayMerchantProduct,
+  isInsuranceCompany,
+  isInteropProduct,
+  isPrivateInstitution,
+  isPrivatePersonInstitution,
+  isPublicAdministration,
+  isPublicServiceCompany,
+  isSendProduct,
+} from '../../utils/institutionTypeUtils';
 import { selected2OnboardingData } from '../../utils/selected2OnboardingData';
 import { Autocomplete } from '../autocomplete/Autocomplete';
 import Loading4Api from '../modals/Loading4Api';
@@ -85,7 +97,7 @@ export function StepSearchParty({
   );
 
   const [merchantSearchResult, setMerchantSearchResultState] = useState<any>(() => {
-    if (product?.id === PRODUCT_IDS.IDPAY_MERCHANT) {
+    if (isIdpayMerchantProduct(product?.id)) {
       try {
         const stored = sessionStorage.getItem('merchantSearchResult');
         return stored ? JSON.parse(stored) : undefined;
@@ -98,7 +110,7 @@ export function StepSearchParty({
 
   const setMerchantSearchResult = (value: any) => {
     setMerchantSearchResultState(value);
-    if (product?.id === PRODUCT_IDS.IDPAY_MERCHANT) {
+    if (isIdpayMerchantProduct(product?.id)) {
       if (value === undefined) {
         sessionStorage.removeItem('merchantSearchResult');
       } else {
@@ -108,11 +120,10 @@ export function StepSearchParty({
   };
 
   const [ecData, setEcData] = useState<PartyData | null>(null);
-  const [filterCategories, setFilterCategories] = useState<string>();
-  const isEnabledProduct2AooUo = product?.id === PRODUCT_IDS.SEND;
+  const [filterCategories, setFilterCategories] = useState<string>();;
 
   const [isPresentInAtecoWhiteList, setIsPresentInAtecoWhiteListState] = useState<boolean>(() => {
-    if (product?.id === PRODUCT_IDS.IDPAY_MERCHANT) {
+    if (isIdpayMerchantProduct(product?.id)) {
       try {
         const stored = sessionStorage.getItem('isPresentInAtecoWhiteList');
         return stored !== null ? JSON.parse(stored) : true;
@@ -125,7 +136,7 @@ export function StepSearchParty({
 
   const setIsPresentInAtecoWhiteList = (value: boolean) => {
     setIsPresentInAtecoWhiteListState(value);
-    if (product?.id === PRODUCT_IDS.IDPAY_MERCHANT) {
+    if (isIdpayMerchantProduct(product?.id)) {
       sessionStorage.setItem('isPresentInAtecoWhiteList', JSON.stringify(value));
     }
   };
@@ -150,7 +161,7 @@ export function StepSearchParty({
   });
 
   useEffect(() => {
-    if (isEnabledProduct2AooUo) {
+    if (isSendProduct(product?.id)) {
       if (subunitTypeByQuery === 'UO') {
         void handleSearchByUoCode(
           subunitCodeByQuery,
@@ -179,7 +190,7 @@ export function StepSearchParty({
         );
       }
     }
-  }, [isEnabledProduct2AooUo]);
+  }, [isSendProduct(product?.id)]);
 
   useEffect(() => {
     if (aooResult) {
@@ -217,7 +228,7 @@ export function StepSearchParty({
       selected &&
       partyExternalIdByQuery &&
       ((subunitCodeByQuery === '' && subunitTypeByQuery === '') ||
-        ((aooResult || uoResult) && isEnabledProduct2AooUo))
+        ((aooResult || uoResult) && isSendProduct(product?.id)))
     ) {
       onForwardAction();
     }
@@ -236,7 +247,7 @@ export function StepSearchParty({
   }, [selectFilterCategories]);
 
   useEffect(() => {
-    if (product?.id === PRODUCT_IDS.IDPAY_MERCHANT) {
+    if (isIdpayMerchantProduct(product?.id)) {
       if (merchantSearchResult) {
         if (disabledStatusCompany) {
           setDisabled(true);
@@ -260,7 +271,7 @@ export function StepSearchParty({
   const onForwardAction = () => {
     const dataParty = aooResult || uoResult ? ({ ...selected, ...ecData } as PartyData) : selected;
     const actualInstitutionType =
-      product?.id === PRODUCT_IDS.IDPAY_MERCHANT &&
+      isIdpayMerchantProduct(product?.id) &&
       (selections.personalTaxCode ||
         (selections.reaCode && dataParty?.businessTaxId && dataParty.businessTaxId.length > 11))
         ? 'PRV_PF'
@@ -277,7 +288,7 @@ export function StepSearchParty({
       setInstitutionType(actualInstitutionType);
     }
 
-    if (product?.id === PRODUCT_IDS.IDPAY_MERCHANT) {
+    if (isIdpayMerchantProduct(product?.id)) {
       sessionStorage.removeItem('merchantSearchResult');
       sessionStorage.removeItem('isPresentInAtecoWhiteList');
     }
@@ -286,7 +297,7 @@ export function StepSearchParty({
   };
 
   const onBackAction = () => {
-    if (product?.id === PRODUCT_IDS.IDPAY_MERCHANT) {
+    if (isIdpayMerchantProduct(product?.id)) {
       sessionStorage.removeItem('merchantSearchResult');
       sessionStorage.removeItem('isPresentInAtecoWhiteList');
     }
@@ -296,7 +307,7 @@ export function StepSearchParty({
 
   useEffect(
     () => () => {
-      if (product?.id === PRODUCT_IDS.IDPAY_MERCHANT) {
+      if (isIdpayMerchantProduct(product?.id)) {
         const shouldClean = !sessionStorage.getItem('onboarding_forward');
         if (shouldClean) {
           sessionStorage.removeItem('merchantSearchResult');
@@ -308,7 +319,7 @@ export function StepSearchParty({
   );
 
   useEffect(() => {
-    if (product?.id === PRODUCT_IDS.IDPAY_MERCHANT) {
+    if (isIdpayMerchantProduct(product?.id)) {
       const storedMerchant = sessionStorage.getItem('merchantSearchResult');
 
       if (selected && !storedMerchant && merchantSearchResult) {
@@ -369,7 +380,7 @@ export function StepSearchParty({
                 >
                   {`Prosegui con l’adesione a <strong>{{productName}}</strong> per l’ente selezionato`}
                 </Trans>
-              ) : institutionType === 'SA' ? (
+              ) : isContractingAuthority(institutionType) ? (
                 <Trans
                   i18nKey="onboardingStep1.onboarding.saSubTitle"
                   values={{
@@ -394,7 +405,7 @@ export function StepSearchParty({
                   <5>{{ productName }}</5>
                 `}
                 </Trans>
-              ) : institutionType === 'AS' ? (
+              ) : isInsuranceCompany(institutionType) ? (
                 <Trans
                   i18nKey="onboardingStep1.onboarding.asSubTitle"
                   values={{ productName: product?.title }}
@@ -404,8 +415,8 @@ export function StepSearchParty({
                   inserisci uno dei dati richiesti e cerca l’ente per
                   <1 /> cui vuoi richiedere l’adesione a <3>{{ productName }}.</3>`}
                 </Trans>
-              ) : institutionType === 'SCP' ||
-                (institutionType === 'PRV' && product?.id === 'prod-interop') ? (
+              ) : isPublicServiceCompany(institutionType) ||
+                (isPrivateInstitution(institutionType) && isInteropProduct(product?.id)) ? (
                 <Trans
                   i18nKey="onboardingStep1.onboarding.scpSubtitle"
                   components={{ 3: <br />, 5: <strong /> }}
@@ -414,7 +425,7 @@ export function StepSearchParty({
                   {`Inserisci uno dei dati richiesti e cerca da Infocamere l’ente <br />
                   per cui vuoi richiedere l’adesione a <strong>{{ productName }}.</strong>`}
                 </Trans>
-              ) : product?.id === 'prod-idpay-merchant' ? (
+              ) : isIdpayMerchantProduct(product?.id) ? (
                 <Trans
                   i18nKey="onboardingStep1.onboarding.merchantSubtitle"
                   components={{ 3: <br />, 5: <strong /> }}
@@ -431,7 +442,7 @@ export function StepSearchParty({
         </Grid>
 
         <Grid container item sx={{ alignItems: 'center', flexDirection: 'column' }} mt={4} mb={4}>
-          {product?.id === PRODUCT_IDS.SEND && (
+          {isSendProduct(product?.id) && (
             <Grid container item justifyContent="center">
               <Grid item display="flex" justifyContent="center" mb={5}>
                 <Alert
@@ -464,7 +475,7 @@ export function StepSearchParty({
             </Grid>
           )}
 
-          {product?.id === PRODUCT_IDS.IDPAY_MERCHANT && (
+          {isIdpayMerchantProduct(product?.id) && (
             <Grid container item justifyContent="center">
               <Grid item xs={8}>
                 <Box display="flex" justifyContent="center" mb={5}>
@@ -490,7 +501,7 @@ export function StepSearchParty({
             </Grid>
           )}
 
-          {product?.id === PRODUCT_IDS.INTEROP && institutionType === 'GSP' && (
+          {isInteropProduct(product?.id) && isGlobalServiceProvider(institutionType) && (
             <Grid container item justifyContent="center">
               <Grid item xs={9}>
                 <Box display="flex" justifyContent="center" mb={5}>
@@ -539,7 +550,7 @@ export function StepSearchParty({
             />
           </Grid>
           {ENV.AGGREGATOR.SHOW_AGGREGATOR &&
-            institutionType === 'PA' &&
+            isPublicAdministration(institutionType) &&
             canAggregateProductList.includes(product?.id ?? '') && (
               <Grid item mt={3}>
                 <FormControlLabel
@@ -556,11 +567,11 @@ export function StepSearchParty({
               </Grid>
             )}
         </Grid>
-        {institutionType !== 'SA' &&
-          institutionType !== 'AS' &&
-          institutionType !== 'SCP' &&
-          institutionType !== 'PRV' &&
-          institutionType !== 'PRV_PF' && (
+        {!isContractingAuthority(institutionType) &&
+          !isInsuranceCompany(institutionType) &&
+          !isPublicServiceCompany(institutionType) &&
+          !isPrivateInstitution(institutionType) &&
+          !isPrivatePersonInstitution(institutionType) && (
             <Grid container item justifyContent="center">
               <Grid item xs={6}>
                 <Box
@@ -577,7 +588,8 @@ export function StepSearchParty({
                     variant="body1"
                     color={theme.palette.text.secondary}
                   >
-                    {institutionType === 'GSP' && noMandatoryIpaProducts(product?.id) ? (
+                    {isGlobalServiceProvider(institutionType) &&
+                    noMandatoryIpaProducts(product?.id) ? (
                       <Trans
                         i18nKey="onboardingStep1.onboarding.gpsDescription"
                         components={{
@@ -625,7 +637,7 @@ export function StepSearchParty({
         <Grid item mt={2}>
           <OnboardingStepActions
             back={
-              !productAvoidStep && product?.id !== PRODUCT_IDS.IDPAY_MERCHANT
+              !productAvoidStep && isIdpayMerchantProduct(product?.id)
                 ? {
                     action: onBackAction,
                     label: t('stepInstitutionType.backLabel'),
