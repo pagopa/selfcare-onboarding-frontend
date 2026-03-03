@@ -57,7 +57,7 @@ jobs:
     name: 'Promote prerelase release'
     if: ${{ inputs.env == 'prod' }}
     runs-on: ubuntu-22.04
-    needs: [release_and_deploy]
+    needs: [release_and_deploy_cdn]
     steps:
       - uses: pagopa/selfcare-commons/github-actions-template/promote-release@main
         with:
