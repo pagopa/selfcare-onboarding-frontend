@@ -108,14 +108,6 @@ export function StepUploadAggregates({
           <Typography variant="body1" mt={1}>
             {t('stepUploadAggregates.subTitle')}
           </Typography>
-
-          {/* 
-          TODO Temporary commented because is not yet available the 
-          <RolesInformations
-            isTechPartner={institutionType === 'PT'}
-            linkLabel={t('stepUploadAggregates.findOutMore')}
-            documentationLink={'.'} 
-          /> */}
         </Grid>
       </Grid>
       {(invalidFile || foundErrors) && (

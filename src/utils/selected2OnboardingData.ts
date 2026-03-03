@@ -1,14 +1,53 @@
 import { InstitutionType, PartyData } from '../../types';
 import { OnboardingFormData } from '../model/OnboardingFormData';
-import { PRODUCT_IDS } from './constants';
+import {
+  shouldUseBusinessTaxIdAsOriginId,
+  shouldUsePdndInfocamereFallback,
+  shouldIncludeLegalForm,
+  isMockEnvironment,
+} from './institutionTypeUtils';
 
-// eslint-disable-next-line complexity
+const getOriginId = (
+  selectedParty: PartyData | null,
+  institutionType?: InstitutionType,
+  productId?: string
+): string | undefined => {
+  if (shouldUseBusinessTaxIdAsOriginId(institutionType, productId)) {
+    return selectedParty?.businessTaxId;
+  }
+  return selectedParty?.codiceUniUo ?? selectedParty?.codiceUniAoo ?? selectedParty?.originId;
+};
+
+const getOrigin = (
+  selectedParty: PartyData | null,
+  institutionType?: InstitutionType,
+  productId?: string
+): string | undefined => {
+  if (shouldUsePdndInfocamereFallback(institutionType, productId)) {
+    return selectedParty?.origin ?? 'PDND_INFOCAMERE';
+  }
+  return selectedParty?.origin;
+};
+
+const getRea = (selectedParty: PartyData | null): string | undefined => {
+  const hasCameraCommerceData = selectedParty?.cciaa && selectedParty?.nRea;
+
+  if (!hasCameraCommerceData) {
+    return undefined;
+  }
+
+  if (isMockEnvironment()) {
+    return selectedParty?.nRea;
+  }
+
+  return `${selectedParty?.cciaa}-${selectedParty?.nRea}`;
+};
+
 export const selected2OnboardingData = (
   selectedParty: PartyData | null,
   isAggregator?: boolean,
   institutionType?: InstitutionType,
   productId?: string
-  // eslint-disable-next-line sonarjs/cognitive-complexity
 ): OnboardingFormData => ({
   businessName:
     selectedParty?.description ??
@@ -17,11 +56,9 @@ export const selected2OnboardingData = (
     '',
   aooName: selectedParty?.denominazioneAoo,
   atecoCodes: selectedParty?.atecoCodes,
-  legalForm:
-    (institutionType === 'PRV' || institutionType === 'PRV_PF') &&
-    productId === PRODUCT_IDS.IDPAY_MERCHANT
-      ? selectedParty?.legalForm
-      : undefined,
+  legalForm: shouldIncludeLegalForm(institutionType, productId)
+    ? selectedParty?.legalForm
+    : undefined,
   uoName: selectedParty?.descrizioneUo,
   aooUniqueCode: selectedParty?.codiceUniAoo,
   uoUniqueCode: selectedParty?.codiceUniUo,
@@ -42,24 +79,9 @@ export const selected2OnboardingData = (
   zipCode: selectedParty?.CAP ?? selectedParty?.zipCode,
   geographicTaxonomies: [],
   originIdEc: selectedParty?.originId,
-  originId:
-    (institutionType === 'PRV' &&
-      (productId === PRODUCT_IDS.INTEROP || productId === PRODUCT_IDS.IDPAY_MERCHANT)) ||
-    institutionType === 'SCP'
-      ? selectedParty?.businessTaxId
-      : (selectedParty?.codiceUniUo ?? selectedParty?.codiceUniAoo ?? selectedParty?.originId),
-  origin:
-    ((institutionType === 'PRV' || institutionType === 'PRV_PF') &&
-      (productId === PRODUCT_IDS.INTEROP || productId === PRODUCT_IDS.IDPAY_MERCHANT)) ||
-    institutionType === 'SCP'
-      ? 'PDND_INFOCAMERE'
-      : selectedParty?.origin,
-  rea:
-    selectedParty?.cciaa && selectedParty?.nRea
-      ? process.env.REACT_APP_MOCK_API === 'true'
-        ? selectedParty?.nRea
-        : `${selectedParty?.cciaa}-${selectedParty?.nRea}`
-      : undefined,
+  originId: getOriginId(selectedParty, institutionType, productId),
+  origin: getOrigin(selectedParty, institutionType, productId),
+  rea: getRea(selectedParty),
   city: selectedParty?.city,
   county: selectedParty?.county,
   isAggregator,
