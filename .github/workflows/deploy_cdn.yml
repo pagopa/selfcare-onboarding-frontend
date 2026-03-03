@@ -24,9 +24,10 @@ on:
           - prod
 
 jobs:
-  release_and_deploy:
-    uses: pagopa/selfcare-commons/.github/workflows/call_release_cdn_vite.yml@main
+  release_and_deploy_dev_frontdoor:
+    uses: pagopa/selfcare-commons/.github/workflows/call_release_cdn_vite_frontdoor.yml@main
     name: "Release [${{ inputs.env != null && inputs.env || (startsWith(github.ref_name, 'releases/') && 'uat') || 'dev' }}]"
+    if: ${{ inputs.env == 'dev'}}
     secrets: inherit
     with:
       environment: ${{ inputs.env != null && inputs.env || (startsWith(github.ref_name, 'releases/') && 'uat') || 'dev' }}
@@ -36,6 +37,20 @@ jobs:
       endpoint_name: weu-ar-checkout-fde-01
       resource_group_name: checkout-fe-rg
       blob_container_name: $web
+
+  release_and_deploy_cdn:
+    uses: pagopa/selfcare-commons/.github/workflows/call_release_cdn_vite_cdn.yml@main
+    name: "Release [${{ inputs.env != null && inputs.env || (startsWith(github.ref_name, 'releases/') && 'uat') || 'dev' }}]"
+    if: ${{ inputs.env == 'uat' || inputs.env == 'prod'}}
+    secrets: inherit
+    with:
+      environment: ${{ inputs.env != null && inputs.env || (startsWith(github.ref_name, 'releases/') && 'uat') || 'dev' }}
+      file_environment: ${{ format('fe_{0}.env', (inputs.env != null && inputs.env || (startsWith(github.ref_name, 'releases/') && 'uat') || 'dev')) }}
+      storage_account_name: 'checkoutsa'
+      profile_name: checkout-cdn-profile
+      endpoint_name: checkout-cdn-endpoint
+      resource_group_name: checkout-fe-rg
+      blob_container_name: '$web'
       base_path: onboarding
 
   promote_release:
