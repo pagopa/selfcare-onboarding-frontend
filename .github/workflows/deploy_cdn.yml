@@ -37,6 +37,7 @@ jobs:
       endpoint_name: weu-ar-checkout-fde-01
       resource_group_name: checkout-fe-rg
       blob_container_name: $web
+      base_path: onboarding
 
   release_and_deploy_cdn:
     uses: pagopa/selfcare-commons/.github/workflows/call_release_cdn_vite_cdn.yml@main
