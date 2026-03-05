@@ -23,7 +23,6 @@ test('Test Success onboarding request for product prod-pagopa and institutionTyp
     'Azienda Territoriale per L’Edilizia Residenziale Pubblica della Provincia di Viterbo',
   );
   await stepFormData(page, PRODUCT_IDS_TEST_E2E.PAGOPA, 'GSP');
-  await stepAdditionalInformation(page);
   await stepAddManager(page);
   await stepAddAdmin(page);
   await stepCompleteOnboarding(
@@ -86,7 +85,7 @@ test('Test Success onboarding request for product prod-io and institutionType GS
   await stepAddAdmin(page);
   await stepCompleteOnboarding(
     page,
-    '01944590221',
+    '80001080532',
     FILE_MOCK_PDF_CONTRACT.PA,
     PRODUCT_IDS_TEST_E2E.IO
   );

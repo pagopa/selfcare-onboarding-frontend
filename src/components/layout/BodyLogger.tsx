@@ -1,12 +1,12 @@
-import { useContext, useEffect, useState } from 'react';
-import { useHistory, useLocation } from 'react-router-dom';
 import { Box } from '@mui/system';
 import { Footer, Header } from '@pagopa/selfcare-common-frontend/lib';
-import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
 import i18n from '@pagopa/selfcare-common-frontend/lib/locale/locale-utils';
+import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
+import { useContext, useEffect, useState } from 'react';
+import { useHistory, useLocation } from 'react-router-dom';
 import { logAction } from '../../lib/action-log';
-import { ENV } from '../../utils/env';
 import { PRODUCT_IDS, ROUTES } from '../../utils/constants';
+import { ENV } from '../../utils/env';
 import { HeaderContext, UserContext } from './../../lib/context';
 import { Main } from './Main';
 
@@ -25,6 +25,13 @@ export function BodyLogger() {
         ROUTES.ONBOARDING_PREMIUM.PATH.replace(':productId', PRODUCT_IDS.IO).replace(
           ':subProductId',
           PRODUCT_IDS.IO_PREMIUM
+        )
+      );
+    } else if(location.pathname === '/onboarding/prod-dashboard-psp') {
+      history.push(
+        ROUTES.ONBOARDING_PREMIUM.PATH.replace(':productId', PRODUCT_IDS.PAGOPA).replace(
+          ':subProductId',
+          PRODUCT_IDS.DASHBOARD_PSP
         )
       );
     }

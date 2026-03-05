@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import { beforeEach, expect, test, vi } from 'vitest';
 import App from '../App';
 import { ROUTES } from '../utils/constants';
 import { createMemoryHistory } from 'history';
@@ -7,18 +8,18 @@ import './../locale';
 import { createStore } from '../redux/store';
 import { Provider } from 'react-redux';
 
-jest.mock('../views/onboardingProduct/OnboardingProduct', () => () => 'OnboardingProduct');
-jest.mock(
-  '../views/onboardingRequest/cancel/CancelRequest',
-  () => () => 'Cancel onboarding request'
-);
-jest.mock(
-  '../views/onboardingRequest/complete/CompleteRequest',
-  () => () => 'Complete onboarding request'
-);
+vi.mock('../views/onboardingProduct/OnboardingProduct', () => ({
+  default: () => 'OnboardingProduct',
+}));
+vi.mock('../views/onboardingRequest/cancel/CancelRequest', () => ({
+  default: () => 'Cancel onboarding request',
+}));
+vi.mock('../views/onboardingRequest/complete/CompleteRequest', () => ({
+  default: () => 'Complete onboarding request',
+}));
 
-let history;
-let store;
+let history: any;
+let store: any;
 
 beforeEach(() => {
   history = createMemoryHistory();
@@ -27,7 +28,7 @@ beforeEach(() => {
 
 test('test not served path', () => {
   history.push('/some/bad/route');
-  jest.spyOn(history, 'push');
+  vi.spyOn(history, 'push');
 
   render(
     <Router history={history}>
@@ -42,7 +43,7 @@ test('test not served path', () => {
 
 test('test OnBoarding', () => {
   history.push('/onboarding/PRODUCTID');
-  jest.spyOn(history, 'push');
+  vi.spyOn(history, 'push');
   render(
     <Router history={history}>
       <Provider store={store}>
@@ -56,7 +57,7 @@ test('test OnBoarding', () => {
 
 test('test Reject OnBoarding', () => {
   history.push('/onboarding/cancel');
-  jest.spyOn(history, 'push');
+  vi.spyOn(history, 'push');
 
   render(
     <Router history={history}>
@@ -71,7 +72,7 @@ test('test Reject OnBoarding', () => {
 
 test('test Confirm OnBoarding', () => {
   history.push('/onboarding/confirm');
-  jest.spyOn(history, 'push');
+  vi.spyOn(history, 'push');
 
   render(
     <Router history={history}>
@@ -84,6 +85,6 @@ test('test Confirm OnBoarding', () => {
   checkRedirect(history, false);
 });
 
-function checkRedirect(history, expected: boolean) {
+function checkRedirect(history: any, expected: boolean) {
   expect(history.push.mock.calls.length).toBe(expected ? 1 : 0);
 }

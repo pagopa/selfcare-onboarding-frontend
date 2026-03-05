@@ -18,7 +18,7 @@ import { MessageNoAction } from '../../../components/shared/MessageNoAction';
 import { useHistoryState } from '../../../hooks/useHistoryState';
 import { HeaderContext, UserContext } from '../../../lib/context';
 import { onboardingContractUpload } from '../../../services/requestStatusServices';
-import { verifyRequest } from '../../../services/tokenServices';
+import { getOnboardingInfo, verifyRequest } from '../../../services/tokenServices';
 import { customErrors } from '../../../utils/constants';
 import { getRequestJwt } from '../../../utils/getRequestJwt';
 import AlreadyCompletedRequest from '../status/AlreadyCompletedPage';
@@ -60,6 +60,7 @@ export default function CompleteRequestComponent() {
   const { setRequiredLogin } = useContext(UserContext);
   const { onboardingId: onboardingIdFromPath } = useParams<{ onboardingId?: string }>();
   const onboardingId = onboardingIdFromPath || getRequestJwt();
+
   const [activeStep, setActiveStep, setActiveStepHistory] = useHistoryState(
     'complete_registration_step',
     0
@@ -76,8 +77,10 @@ export default function CompleteRequestComponent() {
     []
   );
   const [requestData, setRequestData] = useState<OnboardingRequestData>();
+  const [institutionId, setInstitutionId] = useState<string>();
+  const [attachmentUploadSuccess, setAttachmentUploadSuccess] = useState<boolean>(false);
   const addUserFlow = new URLSearchParams(window.location.search).get('add-user') === 'true';
-  const attachments = new URLSearchParams(window.location.search).get('attachments') === 'true';
+  const attachments = window.location.pathname.includes('/attachments');
   const translationKeyValue = addUserFlow ? 'user' : attachments ? 'attachments' : 'product';
 
   useEffect(() => {
@@ -91,14 +94,28 @@ export default function CompleteRequestComponent() {
   }, []);
 
   useEffect(() => {
-    setLoading(true);
-    verifyRequest({
-      onboardingId,
-      setRequiredLogin,
-      setOutcomeContentState,
-      setRequestData,
-    }).finally(() => setLoading(false));
-  }, []);
+    if (attachments && onboardingId) {
+      setOutcomeContentState('toBeCompleted');
+    } else {
+      verifyRequest({
+        onboardingId,
+        setRequiredLogin,
+        setOutcomeContentState,
+        setRequestData,
+      }).finally(() => setLoading(false));
+    }
+  }, [/* attachments, */ onboardingId]);
+
+  useEffect(() => {
+    if (attachmentUploadSuccess && onboardingId) {
+      void getOnboardingInfo(
+        onboardingId,
+        setInstitutionId,
+        setLoading,
+        setOutcomeContentState
+      );
+    }
+  }, [attachmentUploadSuccess]);
 
   const setUploadedFilesAndWriteHistory = (files: Array<File>) => {
     setUploadedFilesHistory(files);
@@ -134,31 +151,43 @@ export default function CompleteRequestComponent() {
     setUploadedFiles([]);
   };
 
+  const uploadContract = () =>
+    onboardingContractUpload(
+      uploadedFiles[0],
+      setLoading,
+      onboardingId,
+      requestData,
+      addUserFlow,
+      setOutcomeContentState,
+      lastFileErrorAttempt,
+      setLastFileErrorAttempt,
+      setOpen,
+      setErrorCode,
+      transcodeErrorCode,
+      attachments ? 'Addendum' : undefined,
+      () => setAttachmentUploadSuccess(true)
+    );
+
   const steps: Array<StepperStep> = [
     {
       label: t('completeRegistration.steps.step0.label'),
-      Component: () => ConfirmRegistrationStep0({ onboardingId, translationKeyValue, forward }),
+      Component: () =>
+        ConfirmRegistrationStep0({
+          onboardingId,
+          fileName: 'Addendum',
+          translationKeyValue,
+          setLoading,
+          forward,
+        }),
     },
     {
       label: t('completeRegistration.steps.step1.label'),
       Component: () =>
         ConfirmRegistrationStep1(
           addUserFlow,
+          translationKeyValue,
           {
-            forward: () =>
-              onboardingContractUpload(
-                uploadedFiles[0],
-                setLoading,
-                onboardingId,
-                requestData,
-                addUserFlow,
-                setOutcomeContentState,
-                lastFileErrorAttempt,
-                setLastFileErrorAttempt,
-                setOpen,
-                setErrorCode,
-                transcodeErrorCode
-              ),
+            forward: () => uploadContract(),
           },
           { loading },
           { uploadedFiles, setUploadedFiles: setUploadedFilesAndWriteHistory }
@@ -219,7 +248,11 @@ export default function CompleteRequestComponent() {
       title: '',
       description: [
         <>
-          <CompleteRequestSuccessPage addUserFlow={addUserFlow} />
+          <CompleteRequestSuccessPage
+            addUserFlow={addUserFlow}
+            translationKeyValue={translationKeyValue}
+            institutionId={institutionId}
+          />
         </>,
       ],
     },
