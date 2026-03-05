@@ -10,6 +10,7 @@
   },
   "scripts": {
     "test:e2e": "playwright test",
-    "cleanup": "tsx scripts/cleanup-onboardings.ts"
+    "cleanup": "tsx scripts/cleanup-onboardings.ts",
+    "cleanup:cf": "tsx scripts/cleanup-by-cf-and-status.ts"
   }
 }
