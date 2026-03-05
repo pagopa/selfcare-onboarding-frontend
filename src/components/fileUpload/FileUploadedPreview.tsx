@@ -2,6 +2,7 @@
 import { Box } from '@mui/system';
 import { Grid, LinearProgress, Theme, Tooltip, Typography } from '@mui/material';
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
+import { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import ClipFileUploaded from '../../assets/clip_file_uploaded.svg?react';
 
@@ -19,7 +20,7 @@ export function FileUploadedPreview({
   theme,
   loading,
   isAggregatesUpload,
-}: FileUploadedPreviewParams): JSX.Element {
+}: FileUploadedPreviewParams): ReactElement {
   const { t } = useTranslation();
 
   return (

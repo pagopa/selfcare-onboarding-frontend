@@ -33,7 +33,7 @@ export default function PartySelectionSearchInput({
   label,
   iconColor = '#475A6D',
 }: Props) {
-  const inputRef = React.useRef<HTMLInputElement>();
+  const inputRef = React.useRef<HTMLInputElement>(null);
 
   const focusTextInput = () => {
     if (inputRef.current) {

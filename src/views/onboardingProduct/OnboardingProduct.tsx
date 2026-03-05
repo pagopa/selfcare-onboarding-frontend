@@ -102,7 +102,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
   const [aggregatesData, setAggregatesData] = useState<Array<AggregateInstitution>>();
   const { setOnExit } = useContext(HeaderContext);
   const { setRequiredLogin } = useContext(UserContext);
-  const requestIdRef = useRef<string>();
+  const requestIdRef = useRef<string | undefined>(undefined);
   const { t } = useTranslation();
   const [onExitAction, setOnExitAction] = useState<(() => void) | undefined>();
   const productAvoidStep = [
@@ -117,7 +117,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
   const subunitCodeByQuery =
     new URLSearchParams(window.location.hash.substring(1)).get('subunitCode') ?? '';
   const institutionTypeByUrl = new URLSearchParams(window.location.search).get('institutionType');
-  const desiredOriginRef = useRef<string | undefined>();
+  const desiredOriginRef = useRef<string | undefined>(undefined);
   const addUser = window.location.pathname.includes('/user');
   const { user } = useContext(UserContext);
 
