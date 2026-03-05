@@ -32,6 +32,12 @@ async function globalSetup() {
     } else {
       await page.goto('https://dev.selfcare.pagopa.it', { timeout: 60000 });
 
+      try {
+        await page.getByRole('button', { name: 'Accetta tutti' }).click({ timeout: 5000 });
+      } catch {
+        // cookie banner not present, continue
+      }
+
       const spidButton = page.getByRole('button', { name: 'Entra con SPID' });
       await spidButton.click({ timeout: 10000 });
 
