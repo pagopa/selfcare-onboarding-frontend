@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/restrict-plus-operands */
 import { InstitutionType, RoutesObject } from '../../types';
 import NoProductPage from '../components/layout/NoProductPage';
 import OnboardingPremium from '../views/onboardingPremium/OnboardingPremium';
@@ -7,6 +8,16 @@ import CompleteRequest from '../views/onboardingRequest/complete/CompleteRequest
 import DownloadCsvFile from '../views/onboardingRequest/download/DownloadCsvFile';
 import OnboardingUser from '../views/onboardingUser/OnboardingUser';
 import { ENV } from './env';
+import {
+  isContractingAuthority,
+  isIdpayMerchantProduct,
+  isIdPayProduct,
+  isInsuranceCompany,
+  isInteropProduct,
+  isIoProduct,
+  isIoSignProduct,
+  isTechPartner,
+} from './institutionTypeUtils';
 
 const IS_DEVELOP = process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test';
 
@@ -98,6 +109,18 @@ export const API = {
   },
   USER_COMPLETE_REGISTRATION: {
     URL: ENV.URL_API.ONBOARDING_V2 + '/v2/tokens/{{token}}/complete-onboarding-users',
+  },
+  ONBOARDING_GET_TEMPLATE_ATTACHMENT: {
+    URL: ENV.URL_API.ONBOARDING_V2 + '/v2/tokens/{{onboardingId}}/template-attachment?name={{filename}}',
+  },
+  ONBOARDING_GET_ATTACHMENT: {
+    URL: ENV.URL_API.ONBOARDING_V2 + '/v2/tokens/{{onboardingId}}/attachment?name={{filename}}',
+  },
+  ONBOARDING_POST_ATTACHMENT: {
+    URL: ENV.URL_API.ONBOARDING_V2 + '/v2/tokens/{{onboardingId}}/attachment?name={{filename}}',
+  },
+  ONBOARDING_GET_INFO: {
+    URL: ENV.URL_API.ONBOARDING_V2 + '/v2/tokens/{{onboardingId}}',
   },
 
   // institutions present on self care db
@@ -224,17 +247,17 @@ export const onlyCharacters = new RegExp(/^[A-Za-z\s]*$/);
 export const fiscalCodeRegexp = /^[A-Z]{6}[0-9]{2}[A-Z][0-9]{2}[A-Z][0-9A-Z]{3}[A-Z0-9]$/;
 
 export const canInvoice = (institutionType?: string, productId?: string) =>
-  institutionType !== 'SA' &&
-  institutionType !== 'PT' &&
-  institutionType !== 'AS' &&
-  productId !== PRODUCT_IDS.INTEROP &&
-  productId !== PRODUCT_IDS.IDPAY_MERCHANT;
+  !isContractingAuthority(institutionType as InstitutionType) &&
+  !isTechPartner(institutionType as InstitutionType) &&
+  !isInsuranceCompany(institutionType as InstitutionType) &&
+  !isInteropProduct(productId) &&
+  !isIdpayMerchantProduct(productId);
 
 export const noMandatoryIpaProducts = (productId?: string) =>
-  productId !== PRODUCT_IDS.INTEROP &&
-  productId !== PRODUCT_IDS.IO &&
-  productId !== PRODUCT_IDS.IO_SIGN &&
-  productId !== PRODUCT_IDS.IDPAY &&
+  !isInteropProduct(productId) &&
+  !isIoProduct(productId) &&
+  !isIoSignProduct(productId) &&
+  !isIdPayProduct(productId) &&
   !productId?.includes(PRODUCT_IDS.SEND);
 
 export const addUserFlowProducts = (productId: string) =>

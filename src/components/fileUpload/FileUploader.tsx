@@ -1,7 +1,7 @@
-import { Grid, Typography, Theme, Button } from '@mui/material';
+import { Grid, Typography, Theme, Link } from '@mui/material';
 import { Accept, DropEvent, FileRejection, useDropzone } from 'react-dropzone';
 import { Box } from '@mui/system';
-import { ReactComponent as CloudUpload } from '../../assets/cloud-upload.svg';
+import CloudUpload from '../../assets/cloud-upload.svg?react';
 import { FileUploadedPreview } from './FileUploadedPreview';
 
 type FileUploaderOption = {
@@ -89,18 +89,9 @@ export function FileUploader({
               >
                 {title}
               </Typography>
-              <Button
-                variant="outlined"
-                size="small"
-                sx={{
-                  marginTop: 1,
-                  background: theme.palette.primary.main,
-                  color: theme.palette.primary.contrastText,
-                }}
-                onClick={(dropzoneRootProps as any).onClick}
-              >
+              <Link component="button" variant="body2" onClick={(dropzoneRootProps as any).onClick}>
                 {descriptionLink}
-              </Button>
+              </Link>
             </Grid>
           </Box>
         </Box>

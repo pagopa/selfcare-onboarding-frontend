@@ -4,6 +4,7 @@ import { storageTokenOps } from '@pagopa/selfcare-common-frontend/lib/utils/stor
 import { Endpoint, RequestConfig } from '../../types';
 import { API } from '../utils/constants';
 import { ENV } from '../utils/env';
+import { isMockEnvironment } from '../utils/institutionTypeUtils';
 import { mockFetch } from './__mocks__/mockApiRequests';
 import { logAction, logError } from './action-log';
 
@@ -138,7 +139,7 @@ export async function fetchWithLogs(
   onRedirectToLogin: () => void
 ) {
   /* istanbul ignore if */
-  if (process.env.REACT_APP_MOCK_API === 'true') {
+  if (isMockEnvironment()) {
     return mockFetch({ endpoint, endpointParams }, { method, params, data, headers });
   }
 

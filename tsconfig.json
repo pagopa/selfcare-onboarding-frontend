@@ -9,7 +9,7 @@
     "noImplicitAny": true,
     "noUnusedLocals": true,
     "noImplicitReturns": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
@@ -21,8 +21,9 @@
     "strictFunctionTypes": true,
     "isolatedModules": true,
     "noFallthroughCasesInSwitch": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "types": ["vite/client", "vitest/globals", "vite-plugin-svgr/client"]
   },
-  "include": ["src/**/*", "e2e/**/*"],
+  "include": ["src/**/*", "vite.config.ts", "vitest.config.ts"],
   "exclude": ["__mocks__", "dist", "node_modules", "**/__tests__/*", "Dangerfile.ts"]
 }

@@ -1,17 +1,13 @@
-import { fireEvent, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { nationalValue } from '../../../../model/GeographicTaxonomies';
+import { fireEvent, screen, waitFor } from '@testing-library/react';
+import { afterEach, expect, test, vi } from 'vitest';
+import { mockedGeoTaxonomy } from '../../../../lib/__mocks__/mockApiRequests';
 import { renderComponentWithProviders } from '../../../../utils/test-utils';
 import GeoTaxonomySection from '../GeoTaxonomySection';
-import { mockedGeoTaxonomy } from '../../../../lib/__mocks__/mockApiRequests';
-import { fetchWithLogs } from '../../../../lib/api-utils';
-import i18n from '@pagopa/selfcare-common-frontend/lib/locale/locale-utils';
 
 const originalFetch = global.fetch;
 
-beforeAll(() => {
-  i18n.changeLanguage('it');
-});
+
 
 afterEach(() => {
   global.fetch = originalFetch;
@@ -48,7 +44,7 @@ test('should render GeoTaxonomySection with empty retrievedTaxonomies', async ()
   renderComponentWithProviders(
     <GeoTaxonomySection
       retrievedTaxonomies={[]}
-      setGeographicTaxonomies={jest.fn()}
+      setGeographicTaxonomies={vi.fn()}
       formik={undefined}
     />
   );
@@ -58,14 +54,14 @@ test('should render GeoTaxonomySection with empty retrievedTaxonomies', async ()
 });
 
 test('should render GeoTaxonomySection with mocked retrievedTaxonomies and click on local radio button for changing the value of autocomplete', async () => {
-  global.fetch = jest.fn().mockResolvedValueOnce({
+  global.fetch = vi.fn().mockResolvedValueOnce({
     json: () => Promise.resolve(mockedGeoTaxonomy),
   });
 
   renderComponentWithProviders(
     <GeoTaxonomySection
       retrievedTaxonomies={mockedGeoTaxonomy}
-      setGeographicTaxonomies={jest.fn()}
+      setGeographicTaxonomies={vi.fn()}
       formik={undefined}
     />
   );
@@ -110,7 +106,7 @@ test('should render GeoTaxonomySection with mocked retrievedTaxonomies and click
   renderComponentWithProviders(
     <GeoTaxonomySection
       retrievedTaxonomies={mockedGeoTaxonomy}
-      setGeographicTaxonomies={jest.fn()}
+      setGeographicTaxonomies={vi.fn()}
       formik={undefined}
     />
   );
@@ -128,7 +124,7 @@ test('should render GeoTaxonomySection with mocked retrievedTaxonomies and code 
   renderComponentWithProviders(
     <GeoTaxonomySection
       retrievedTaxonomies={mockedNonNationalGeoTaxonomy}
-      setGeographicTaxonomies={jest.fn()}
+      setGeographicTaxonomies={vi.fn()}
       formik={undefined}
     />
   );

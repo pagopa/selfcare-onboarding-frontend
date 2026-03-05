@@ -32,11 +32,14 @@ import {
   handleSearchByReaCode,
   handleSearchByUoCode,
 } from '../../../../services/institutionServices';
-import {
-  buildUrlLogo,
-  /* noMandatoryIpaProducts, */ PRODUCT_IDS,
-} from '../../../../utils/constants';
+import { buildUrlLogo } from '../../../../utils/constants';
 import { ENV } from '../../../../utils/env';
+import {
+  isIdpayMerchantProduct,
+  isContractingAuthority,
+  isInsuranceCompany,
+  isPrivateInstitution,
+} from '../../../../utils/institutionTypeUtils';
 import AsyncAutocompleteResultsBusinessName from './components/AsyncAutocompleteResultsBusinessName';
 import AsyncAutocompleteResultsCode from './components/AsyncAutocompleteResultsCode';
 import AsyncAutocompleteSearch from './components/AsyncAutocompleteSearch';
@@ -146,7 +149,7 @@ export default function AsyncAutocompleteContainer({
   }, [selected]);
 
   useEffect(() => {
-    if (product?.id === PRODUCT_IDS.IDPAY_MERCHANT && !selected) {
+    if (isIdpayMerchantProduct(product?.id) && !selected) {
       setMerchantSearchResult?.(undefined);
       setIsPresentInAtecoWhiteList?.(false);
       setCfResult(undefined);
@@ -168,7 +171,7 @@ export default function AsyncAutocompleteContainer({
   }, [input]);
 
   useEffect(() => {
-    if (!input || (input.length === 0 && product?.id === PRODUCT_IDS.IDPAY_MERCHANT)) {
+    if (!input || (input.length === 0 && isIdpayMerchantProduct(product?.id))) {
       setMerchantSearchResult?.(undefined);
       setIsPresentInAtecoWhiteList?.(true);
       setDisabled(true);
@@ -292,24 +295,18 @@ export default function AsyncAutocompleteContainer({
       return 'ONBOARDING_GET_INSTITUTIONS';
     }
 
-    if (institutionType === 'SA') {
+    if (isContractingAuthority(institutionType as InstitutionType)) {
       return 'ONBOARDING_GET_SA_PARTY_FROM_FC';
     }
-    if (institutionType === 'AS') {
+    if (isInsuranceCompany(institutionType as InstitutionType)) {
       return 'ONBOARDING_GET_INSURANCE_COMPANIES_FROM_IVASSCODE';
     }
 
-    if (
-      product?.id === PRODUCT_IDS.INTEROP &&
-      (institutionType === 'SCP' || institutionType === 'PRV')
-    ) {
+    if (isPrivateInstitution(institutionType as InstitutionType) && !isIdpayMerchantProduct(product?.id)) {
       return 'ONBOARDING_GET_PARTY_BY_CF_FROM_INFOCAMERE';
     }
 
-    if (
-      product?.id === PRODUCT_IDS.IDPAY_MERCHANT &&
-      (selections.taxCode || selections.personalTaxCode)
-    ) {
+    if (isIdpayMerchantProduct(product?.id) && (selections.taxCode || selections.personalTaxCode)) {
       return 'ONBOARDING_GET_VISURA_INFOCAMERE_BY_CF';
     }
 
@@ -335,10 +332,13 @@ export default function AsyncAutocompleteContainer({
     const isValidPersonalTaxCode = selections.personalTaxCode && value.length === 16;
 
     if (isValidTaxCode || isValidIvassCode || isValidPersonalTaxCode) {
-      if (institutionType === 'SA' || institutionType === 'AS') {
+      if (
+        isContractingAuthority(institutionType as InstitutionType) ||
+        isInsuranceCompany(institutionType as InstitutionType)
+      ) {
         const endpoint = addUser
           ? 'ONBOARDING_GET_INSTITUTIONS'
-          : institutionType === 'SA'
+          : isContractingAuthority(institutionType as InstitutionType)
             ? 'ONBOARDING_GET_SA_PARTY_FROM_FC'
             : 'ONBOARDING_GET_INSURANCE_COMPANIES_FROM_IVASSCODE';
 
@@ -347,7 +347,7 @@ export default function AsyncAutocompleteContainer({
           endpoint,
           params,
           value,
-          institutionType,
+          institutionType as InstitutionType,
           setApiLoading,
           setCfResult,
           setRequiredLogin
@@ -419,7 +419,7 @@ export default function AsyncAutocompleteContainer({
       ? formatReaCode(typedInput)
       : removeSpecialCharacters(typedInput);
 
-    if (product?.id === PRODUCT_IDS.IDPAY_MERCHANT) {
+    if (isIdpayMerchantProduct(product?.id)) {
       setMerchantSearchResult?.(undefined);
       setIsPresentInAtecoWhiteList?.(false);
       setCfResult(undefined);
