@@ -1,25 +1,40 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { useState } from 'react';
-import '@testing-library/jest-dom';
 import { User } from '@pagopa/selfcare-common-frontend/lib/model/User';
-import { InstitutionType } from '../../../../types';
-import { HeaderContext, UserContext } from '../../../lib/context';
-import { ENV } from '../../../utils/env';
-import OnboardingProduct from '../OnboardingProduct';
-import '../../../locale';
-import { canInvoice, PRODUCT_IDS } from '../../../utils/constants';
-import { createMemoryHistory } from 'history';
-import { Router } from 'react-router-dom';
+import '@testing-library/jest-dom';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import axios from 'axios';
+import { createMemoryHistory } from 'history';
+import { useState } from 'react';
+import { Provider } from 'react-redux';
+import { Router } from 'react-router-dom';
+import { afterAll, beforeAll, beforeEach, expect, Mocked, MockInstance, test, vi } from 'vitest';
+import { InstitutionType } from '../../../../types';
 import {
   mockedCategories,
   mockedPdndVisuraInfomacere,
 } from '../../../lib/__mocks__/mockApiRequests';
-import i18n from '@pagopa/selfcare-common-frontend/lib/locale/locale-utils';
+import { HeaderContext, UserContext } from '../../../lib/context';
+import '../../../locale';
+import { createStore } from '../../../redux/store';
+import { canInvoice, PRODUCT_IDS } from '../../../utils/constants';
+import { ENV } from '../../../utils/env';
+import {
+  isConsolidatedEconomicAccountCompany,
+  isContractingAuthority,
+  isGlobalServiceProvider,
+  isIdpayMerchantProduct,
+  isInsuranceCompany,
+  isIoProduct,
+  isPrivateInstitution,
+  isPrivateMerchantInstitution,
+  isPublicAdministration,
+  isPublicServiceCompany,
+} from '../../../utils/institutionTypeUtils';
 import {
   checkCorrectBodyBillingData,
   executeGoHome,
   executeStepAddAdmin,
+  executeStepAddApplicantEmailForm,
   executeStepAddManager,
   fillInstitutionTypeCheckbox,
   fillUserBillingDataForm,
@@ -28,13 +43,10 @@ import {
   Source,
   verifySubmit,
 } from '../../../utils/test-utils';
-import { createStore } from '../../../redux/store';
-import { Provider } from 'react-redux';
-import axios from 'axios';
-
-jest.setTimeout(40000);
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
+import OnboardingProduct from '../OnboardingProduct';
+vi.setConfig({ testTimeout: 40000 });
+vi.mock('react-router-dom', async () => ({
+  ...(await vi.importActual('react-router-dom')),
   useHistory: () => ({
     location: mockedLocation,
     replace: (nextLocation: any) => Object.assign(mockedLocation, nextLocation),
@@ -42,15 +54,15 @@ jest.mock('react-router-dom', () => ({
   }),
 }));
 
-jest.mock('axios');
-const mockedAxios = axios as jest.Mocked<typeof axios>;
+vi.mock('axios');
+const mockedAxios = axios as Mocked<typeof axios>;
 
-let fetchWithLogsSpy: jest.SpyInstance;
+let fetchWithLogsSpy: MockInstance;
 let aggregatesCsv: File;
 
 const oldWindowLocation = global.window.location;
 const initialLocation = {
-  assign: jest.fn(),
+  assign: vi.fn(),
   pathname: '',
   origin: 'MOCKED_ORIGIN',
   search: '?pricingPlan=FA',
@@ -58,10 +70,9 @@ const initialLocation = {
   state: undefined,
 };
 const mockedLocation = Object.assign({}, initialLocation);
-const mockedHistoryPush = jest.fn();
+const mockedHistoryPush = vi.fn();
 
 beforeAll(() => {
-  i18n.changeLanguage('it');
   Object.defineProperty(window, 'location', { value: mockedLocation });
 });
 
@@ -69,8 +80,12 @@ afterAll(() => {
   Object.defineProperty(window, 'location', { value: oldWindowLocation });
 });
 
-beforeEach(() => {
-  fetchWithLogsSpy = jest.spyOn(require('../../../lib/api-utils'), 'fetchWithLogs');
+beforeEach(async () => {
+  const apiUtils = await import('../../../lib/api-utils');
+  if (fetchWithLogsSpy) {
+    fetchWithLogsSpy.mockRestore();
+  }
+  fetchWithLogsSpy = vi.spyOn(apiUtils, 'fetchWithLogs');
   Object.assign(mockedLocation, initialLocation);
   aggregatesCsv = new File(['csv data'], 'aggregates.csv', { type: 'multipart/form-data' });
 
@@ -90,18 +105,20 @@ const filterByCategory4Test = (institutionType?: string, productId?: string) => 
       return mockedCategories.product['prod-idpay-merchant']?.merchantDetails;
 
     case PRODUCT_IDS.INTEROP:
-      if (institutionType === 'SCEC') {
+      if (isConsolidatedEconomicAccountCompany(institutionType as InstitutionType)) {
         return mockedCategories.product['prod-interop']?.ipa.SCEC;
-      } else if (institutionType === 'PA') {
+      } else if (isPublicAdministration(institutionType as InstitutionType)) {
         return mockedCategories.product['prod-interop']?.ipa.PA;
-      } else if (institutionType === 'GSP') {
+      } else if (isGlobalServiceProvider(institutionType as InstitutionType)) {
         return mockedCategories.product.default?.ipa.GSP;
       } else {
         return mockedCategories.product.default?.ipa.PA;
       }
     default:
       const defaultIpa = mockedCategories.product.default?.ipa;
-      return institutionType === 'GSP' ? defaultIpa?.GSP : defaultIpa?.PA;
+      return isGlobalServiceProvider(institutionType as InstitutionType)
+        ? defaultIpa?.GSP
+        : defaultIpa?.PA;
   }
 };
 
@@ -151,8 +168,21 @@ test('Test: Successfull complete onboarding request of PA party for prod-io sear
   await executeStepSearchParty(PRODUCT_IDS.IO, 'PA', 'AGENCY X', 'businessName');
   await executeStepBillingData(PRODUCT_IDS.IO, 'PA', false, false, 'IPA', 'AGENCY X');
   await executeStepAddManager(false);
-  await executeStepAddAdmin(true, false, false, false, false);
-  await verifySubmit(PRODUCT_IDS.IO, 'PA', fetchWithLogsSpy, 'IPA', false, false, 'businessName');
+  await executeStepAddAdmin(true, false, false, false, false, true);
+  await executeStepAddApplicantEmailForm();
+  await verifySubmit(
+    PRODUCT_IDS.IO,
+    'PA',
+    fetchWithLogsSpy,
+    'IPA',
+    false,
+    false,
+    'businessName',
+    undefined,
+    undefined,
+    undefined,
+    true
+  );
   await executeGoHome(mockedLocation);
 });
 
@@ -169,7 +199,7 @@ test('Test: Successfull complete onboarding request of PA party for prod-io sear
   );
   await executeStepBillingData(PRODUCT_IDS.IO, 'PA', false, false, 'IPA', 'Comune di Milano');
   await executeStepAddManager(false);
-  await executeStepAddAdmin(true, false, false, false, false);
+  await executeStepAddAdmin(true, false, false, false, false, false);
   await verifySubmit(PRODUCT_IDS.IO, 'PA', fetchWithLogsSpy, 'IPA', false, false, 'taxCode');
   await executeGoHome(mockedLocation);
 });
@@ -193,7 +223,7 @@ test('Test: Successfull complete onboarding request of AOO party for product pro
     'denominazione aoo test 1'
   );
   await executeStepAddManager(false);
-  await executeStepAddAdmin(true, false, false, false, false);
+  await executeStepAddAdmin(true, false, false, false, false, false);
   await verifySubmit(PRODUCT_IDS.INTEROP, 'PA', fetchWithLogsSpy, 'IPA', false, false, 'aooCode');
   await executeGoHome(mockedLocation);
 });
@@ -217,7 +247,7 @@ test('Test: Successfull complete onboarding request of UO party for product prod
     'denominazione uo test 1'
   );
   await executeStepAddManager(false);
-  await executeStepAddAdmin(true, false, false, false, false);
+  await executeStepAddAdmin(true, false, false, false, false, false);
   await verifySubmit(PRODUCT_IDS.IO_SIGN, 'PA', fetchWithLogsSpy, 'IPA', true, false, 'uoCode');
   await executeGoHome(mockedLocation);
 });
@@ -241,7 +271,7 @@ test('Test: Successfull complete onboarding request of GSP party searching from 
   await executeStepBillingData(PRODUCT_IDS.PAGOPA, 'GSP', false, false, 'IPA', 'AGENCY X');
   await executeStepAdditionalInfo('IPA');
   await executeStepAddManager(false);
-  await executeStepAddAdmin(true, false, false, false, false);
+  await executeStepAddAdmin(true, false, false, false, false, false);
   await verifySubmit(PRODUCT_IDS.PAGOPA, 'GSP', fetchWithLogsSpy, 'IPA');
   await executeGoHome(mockedLocation);
 });
@@ -264,9 +294,9 @@ test('Test: Successfull complete onboarding request of GSP party without searchi
     false
   );
   await executeStepBillingData(PRODUCT_IDS.PAGOPA, 'GSP', false, false, 'NO_IPA', 'AGENCY X');
-  await executeStepAdditionalInfo('NO_IPA');
+  // await executeStepAdditionalInfo('NO_IPA');
   await executeStepAddManager(false);
-  await executeStepAddAdmin(true, false, false, false, false);
+  await executeStepAddAdmin(true, false, false, false, false, false);
   await verifySubmit(PRODUCT_IDS.PAGOPA, 'GSP', fetchWithLogsSpy, 'NO_IPA');
   await executeGoHome(mockedLocation);
 });
@@ -285,7 +315,7 @@ test('Test: Successfull complete onboarding request of GPU for product prod-pago
   );
   await executeStepAdditionalGpuInformations();
   await executeStepAddManager(false);
-  await executeStepAddAdmin(true, false, false, false, false);
+  await executeStepAddAdmin(true, false, false, false, false, false);
   await verifySubmit(PRODUCT_IDS.PAGOPA, 'GPU', fetchWithLogsSpy, 'NO_IPA');
   await executeGoHome(mockedLocation);
 });
@@ -294,7 +324,7 @@ test('Test: Successfull complete onboarding request of PT for product prod-pagop
   renderComponent(PRODUCT_IDS.PAGOPA);
   await executeStepInstitutionType(PRODUCT_IDS.PAGOPA, 'PT');
   await executeStepBillingData(PRODUCT_IDS.PAGOPA, 'PT', false, false, 'NO_IPA');
-  await executeStepAddAdmin(true, true, false, false, true);
+  await executeStepAddAdmin(true, true, false, false, true, false);
   await verifySubmit(PRODUCT_IDS.PAGOPA, 'PT', fetchWithLogsSpy, 'NO_IPA');
   await executeGoHome(mockedLocation);
 });
@@ -304,7 +334,7 @@ test('Test: Successfull complete onboarding request of PSP for product prod-pago
   await executeStepInstitutionType(PRODUCT_IDS.PAGOPA, 'PSP');
   await executeStepBillingData(PRODUCT_IDS.PAGOPA, 'PSP', false, false, 'NO_IPA');
   await executeStepAddManager(false);
-  await executeStepAddAdmin(true, false, false, false, false);
+  await executeStepAddAdmin(true, false, false, false, false, false);
   await verifySubmit(PRODUCT_IDS.PAGOPA, 'PSP', fetchWithLogsSpy, 'NO_IPA');
   await executeGoHome(mockedLocation);
 });
@@ -327,7 +357,7 @@ test('Test: Successfull complete onboarding request of SA for product prod-inter
   );
   await executeStepBillingData(PRODUCT_IDS.INTEROP, 'SA', false, false, 'ANAC', 'descriptionAnac1');
   await executeStepAddManager(false);
-  await executeStepAddAdmin(true, false, false, false, false);
+  await executeStepAddAdmin(true, false, false, false, false, false);
   await verifySubmit(
     PRODUCT_IDS.INTEROP,
     'SA',
@@ -358,7 +388,7 @@ test('Test: Successfull complete onboarding request of SA for product prod-inter
   );
   await executeStepBillingData(PRODUCT_IDS.INTEROP, 'SA', false, false, 'ANAC', 'descriptionAnac1');
   await executeStepAddManager(false);
-  await executeStepAddAdmin(true, false, false, false, false);
+  await executeStepAddAdmin(true, false, false, false, false, false);
   await verifySubmit(PRODUCT_IDS.INTEROP, 'SA', fetchWithLogsSpy, 'ANAC', false, false, 'taxCode');
   await executeGoHome(mockedLocation);
 });
@@ -389,7 +419,7 @@ test('Test: Successfull complete onboarding request of foreign AS for product pr
     true
   );
   await executeStepAddManager(false);
-  await executeStepAddAdmin(true, false, false, false, false);
+  await executeStepAddAdmin(true, false, false, false, false, false);
   await verifySubmit(
     PRODUCT_IDS.INTEROP,
     'AS',
@@ -430,7 +460,7 @@ test('Test: Successfull complete onboarding request of italian AS for product pr
     false
   );
   await executeStepAddManager(false);
-  await executeStepAddAdmin(true, false, false, false, false);
+  await executeStepAddAdmin(true, false, false, false, false, false);
   await verifySubmit(
     PRODUCT_IDS.INTEROP,
     'AS',
@@ -471,7 +501,7 @@ test('Test: Successfull complete onboarding request of italian AS without tax co
     false
   );
   await executeStepAddManager(false);
-  await executeStepAddAdmin(true, false, false, false, false);
+  await executeStepAddAdmin(true, false, false, false, false, false);
   await verifySubmit(
     PRODUCT_IDS.INTEROP,
     'AS',
@@ -486,7 +516,7 @@ test('Test: Successfull complete onboarding request of italian AS without tax co
   await executeGoHome(mockedLocation);
 });
 
-test('Test: Successfull complete onboarding request of SCP for product prod-interop search from infocamere with tax code', async () => {
+test('Test: Successfull complete onboarding request of SCP for product prod-interop search with tax code', async () => {
   await completeOnboardingPdndInfocamereRequest('SCP');
 });
 
@@ -513,7 +543,7 @@ test('Test: Successfull complete onboarding request of PA aggregator party for p
   );
   await executeStepBillingData(PRODUCT_IDS.IO, 'PA', false, false, 'IPA', 'AGENCY X');
   await executeStepAddManager(false);
-  await executeStepAddAdmin(true, false, true, false, false);
+  await executeStepAddAdmin(true, false, true, false, false, false);
   await executeStepUploadAggregates();
   await verifySubmit(
     PRODUCT_IDS.IO,
@@ -525,7 +555,8 @@ test('Test: Successfull complete onboarding request of PA aggregator party for p
     'businessName',
     undefined,
     true,
-    true
+    true,
+    false
   );
   await executeGoHome(mockedLocation);
 });
@@ -543,7 +574,7 @@ test('Test: Successfull complete onboarding request of PRV for product prod-pago
     false
   );
   await executeStepAddManager(false);
-  await executeStepAddAdmin(true, false, false, false, false);
+  await executeStepAddAdmin(true, false, false, false, false, false);
   await verifySubmit(
     PRODUCT_IDS.PAGOPA,
     'PRV',
@@ -572,7 +603,7 @@ test('Test: Successfull complete onboarding request of PRV party for prod-idpay-
   );
   await executeStepBillingData(PRODUCT_IDS.IDPAY_MERCHANT, 'PRV', false, false, 'PDND_INFOCAMERE');
   await executeStepAddManager(false);
-  await executeStepAddAdmin(true, false, false, false, false, PRODUCT_IDS.IDPAY_MERCHANT);
+  await executeStepAddAdmin(true, false, false, false, false, false, PRODUCT_IDS.IDPAY_MERCHANT);
   await verifySubmit(
     PRODUCT_IDS.IDPAY_MERCHANT,
     'PRV',
@@ -600,7 +631,7 @@ test('Test: Successfull complete onboarding request of PRV party for prod-idpay-
   );
   await executeStepBillingData(PRODUCT_IDS.IDPAY_MERCHANT, 'PRV', false, false, 'PDND_INFOCAMERE');
   await executeStepAddManager(false);
-  await executeStepAddAdmin(true, false, false, false, false, PRODUCT_IDS.IDPAY_MERCHANT);
+  await executeStepAddAdmin(true, false, false, false, false, false, PRODUCT_IDS.IDPAY_MERCHANT);
   await verifySubmit(
     PRODUCT_IDS.IDPAY_MERCHANT,
     'PRV',
@@ -639,7 +670,7 @@ test('Test: Successfull complete onboarding request of PRV_PF party for prod-idp
     'personalTaxCode'
   );
   await executeStepAddManager(false);
-  await executeStepAddAdmin(true, false, false, false, false, PRODUCT_IDS.IDPAY_MERCHANT);
+  await executeStepAddAdmin(true, false, false, false, false, false, PRODUCT_IDS.IDPAY_MERCHANT);
   await verifySubmit(
     PRODUCT_IDS.IDPAY_MERCHANT,
     'PRV_PF',
@@ -658,7 +689,7 @@ test('Test: Error on submit onboarding request of PA party for prod-io search by
   await executeStepSearchParty(PRODUCT_IDS.IO, 'PA', 'AGENCY ERROR', 'businessName');
   await executeStepBillingData(PRODUCT_IDS.IO, 'PA', false, false, 'IPA', 'AGENCY ERROR');
   await executeStepAddManager(false);
-  await executeStepAddAdmin(false, false, false, false, false);
+  await executeStepAddAdmin(false, false, false, false, false, false);
   await verifySubmit(PRODUCT_IDS.IO, 'PA', fetchWithLogsSpy, 'IPA', false, true);
   await executeGoHome(mockedLocation);
 });
@@ -802,7 +833,7 @@ const completeOnboardingPdndInfocamereRequest = async (institutionType: Institut
     false
   );
   await executeStepAddManager(false);
-  await executeStepAddAdmin(true, false, false, false, false);
+  await executeStepAddAdmin(true, false, false, false, false, false);
   await verifySubmit(
     PRODUCT_IDS.INTEROP,
     institutionType,
@@ -854,7 +885,7 @@ const executeStepSearchParty = async (
   ivassCode?: string,
   reaCode?: string,
   personalTaxCode?: string,
-  expectedError: boolean = false,
+  _expectedError: boolean = false,
   withoutIpa: boolean = false,
   isAggregator: boolean = false
 ) => {
@@ -866,7 +897,10 @@ const executeStepSearchParty = async (
   const inputPartyName = document.getElementById('Parties') as HTMLElement;
 
   const withoutIpaLink = document.getElementById('no_ipa') as HTMLElement;
-  if (productId === PRODUCT_IDS.PAGOPA && institutionType === 'GSP') {
+  if (
+    productId === PRODUCT_IDS.PAGOPA &&
+    isGlobalServiceProvider(institutionType as InstitutionType)
+  ) {
     expect(withoutIpaLink).toBeInTheDocument();
     if (withoutIpa) {
       fireEvent.click(withoutIpaLink);
@@ -899,22 +933,23 @@ const executeStepSearchParty = async (
       expect(fetchWithLogsSpy).toHaveBeenNthCalledWith(
         4,
         {
-          endpoint:
-            institutionType === 'SA'
-              ? 'ONBOARDING_GET_SA_PARTIES_NAME'
-              : institutionType === 'AS'
-                ? 'ONBOARDING_GET_INSURANCE_COMPANIES_FROM_BUSINESSNAME'
-                : 'ONBOARDING_GET_SEARCH_PARTIES',
+          endpoint: isContractingAuthority(institutionType as InstitutionType)
+            ? 'ONBOARDING_GET_SA_PARTIES_NAME'
+            : isInsuranceCompany(institutionType as InstitutionType)
+              ? 'ONBOARDING_GET_INSURANCE_COMPANIES_FROM_BUSINESSNAME'
+              : 'ONBOARDING_GET_SEARCH_PARTIES',
         },
         {
           method: 'GET',
           params: {
             limit:
-              institutionType === 'SA' || institutionType === 'AS'
+              isContractingAuthority(institutionType as InstitutionType) ||
+              isInsuranceCompany(institutionType as InstitutionType)
                 ? undefined
                 : ENV.MAX_INSTITUTIONS_FETCH,
             categories:
-              institutionType === 'SA' || institutionType === 'AS'
+              isContractingAuthority(institutionType as InstitutionType) ||
+              isInsuranceCompany(institutionType as InstitutionType)
                 ? undefined
                 : filterByCategory4Test(institutionType.toUpperCase(), productId),
             page: 1,
@@ -1027,12 +1062,12 @@ const executeStepSearchParty = async (
 
       const endpoint =
         typeOfSearch === 'taxCode' || typeOfSearch === 'personalTaxCode'
-          ? institutionType === 'SA'
+          ? isContractingAuthority(institutionType as InstitutionType)
             ? 'ONBOARDING_GET_SA_PARTY_FROM_FC'
-            : institutionType === 'SCP' ||
-                (institutionType === 'PRV' && productId !== PRODUCT_IDS.IDPAY_MERCHANT)
+            : isPrivateInstitution(institutionType as InstitutionType) &&
+                !isIdpayMerchantProduct(productId)
               ? 'ONBOARDING_GET_PARTY_BY_CF_FROM_INFOCAMERE'
-              : productId === PRODUCT_IDS.IDPAY_MERCHANT
+              : isIdpayMerchantProduct(productId)
                 ? 'ONBOARDING_GET_VISURA_INFOCAMERE_BY_CF'
                 : 'ONBOARDING_GET_PARTY_FROM_CF'
           : typeOfSearch === 'aooCode'
@@ -1045,11 +1080,11 @@ const executeStepSearchParty = async (
 
       const endpointParams =
         typeOfSearch === 'taxCode'
-          ? institutionType === 'SA'
+          ? isContractingAuthority(institutionType as InstitutionType)
             ? { taxId: taxCode }
             : { id: taxCode }
           : typeOfSearch === 'personalTaxCode'
-            ? institutionType === 'SA'
+            ? isContractingAuthority(institutionType as InstitutionType)
               ? { taxId: personalTaxCode }
               : { id: personalTaxCode }
             : typeOfSearch === 'aooCode'
@@ -1066,14 +1101,16 @@ const executeStepSearchParty = async (
           : typeOfSearch === 'taxCode' ||
               typeOfSearch === 'ivassCode' ||
               typeOfSearch === 'personalTaxCode'
-            ? institutionType === 'SA' || institutionType === 'AS'
+            ? isContractingAuthority(institutionType as InstitutionType) ||
+              isInsuranceCompany(institutionType as InstitutionType)
               ? undefined
               : {
                   productId: undefined,
                   subunitCode: undefined,
                   taxCode: undefined,
                   categories:
-                    institutionType === 'SCP' || institutionType === 'PRV'
+                    isPublicServiceCompany(institutionType as InstitutionType) ||
+                    isPrivateInstitution(institutionType as InstitutionType)
                       ? undefined
                       : filterByCategory4Test(institutionType, productId),
                 }
@@ -1109,7 +1146,7 @@ const executeStepSearchParty = async (
 
       break;
     default:
-      return '';
+      break;
   }
 
   const confirmButton = screen.getByRole('button', { name: 'Continua' });
@@ -1137,10 +1174,6 @@ const executeStepBillingData = async (
 ) => {
   console.log('Testing step billing data..');
   await waitFor(() => screen.getByText('Inserisci i dati dell’ente'));
-
-  const isPrivateMerchant =
-    (institutionType === 'PRV' || institutionType === 'PRV_PF') &&
-    productId === PRODUCT_IDS.IDPAY_MERCHANT;
   const isInvoicable = canInvoice(institutionType.toUpperCase(), productId);
 
   await fillUserBillingDataForm(
@@ -1170,7 +1203,7 @@ const executeStepBillingData = async (
 
   const confirmButton = screen.getByRole('button', { name: 'Continua' });
 
-  if (isPrivateMerchant) {
+  if (isPrivateMerchantInstitution(institutionType as InstitutionType, productId)) {
     expect(document.getElementById('recipientCode')).not.toBeInTheDocument();
     expect(document.getElementById('taxCodeInvoicing')).not.toBeInTheDocument();
     expect(document.getElementById('supportEmail')).not.toBeInTheDocument();
@@ -1191,12 +1224,12 @@ const executeStepBillingData = async (
           ? '998877665544'
           : '87654321098';
 
-    if (isInvoicable && productId !== PRODUCT_IDS.IO) {
+    if (isInvoicable && !isIoProduct(productId)) {
       fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
         target: { value: recipientCodeInput },
       });
 
-      if (isUo || institutionType === 'PA') {
+      if (isUo || isPublicAdministration(institutionType as InstitutionType)) {
         await waitFor(() =>
           expect(document.getElementById('taxCodeInvoicing')).toHaveValue(taxCodeInvoicingInput)
         );

@@ -11,6 +11,7 @@ import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 import { UserOnCreate, PartyRole } from '../../../types';
 import { UsersError, UsersObject } from '../steps/StepAddManager';
 import { PRODUCT_IDS } from '../../utils/constants';
+import { isPecEmail } from '../../utils/validateFields';
 
 type PlatformUserFormProps = {
   prefix: keyof UsersObject;
@@ -35,6 +36,7 @@ type Field = {
   width?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
   regexp?: RegExp;
   regexpMessageKey?: string;
+  invalidPecMessageKey?: string;
   conflictMessageKey?: string;
   hasDescription?: boolean;
   unique: boolean;
@@ -66,6 +68,7 @@ const fields = (productId?: string, addUserFlow?: boolean): Array<Field> => [
     width: 12,
     regexp: emailRegexp,
     regexpMessageKey: 'invalid',
+    invalidPecMessageKey: 'invalidPec',
     hasDescription: true,
     unique: productId === PRODUCT_IDS.IDPAY_MERCHANT || addUserFlow ? false : true,
     caseSensitive: false,
@@ -79,7 +82,8 @@ const fields = (productId?: string, addUserFlow?: boolean): Array<Field> => [
 type ValidationErrorCode =
   | `${keyof UserOnCreate}-regexp`
   | `${keyof UserOnCreate}-unique`
-  | `${keyof UserOnCreate}-conflict`;
+  | `${keyof UserOnCreate}-conflict`
+  | `${keyof UserOnCreate}-invalidPec`;
 
 function stringEquals(str1?: string, str2?: string, caseSensitive?: boolean) {
   return (
@@ -146,6 +150,9 @@ function validateNoMandatory(
         }
         if (regexp && user[id] && !regexp.test(user[id] as string) && id === 'email') {
           return `${id}-regexp`;
+        }
+        if (id === 'email' && user[id] && regexp && regexp.test(user[id] as string) && isPecEmail(user[id] as string)) {
+          return `${id}-invalidPec`;
         }
         if (
           id === 'email' &&
@@ -248,16 +255,19 @@ export function PlatformUserForm({
     regexpMessageKey?: string,
     uniqueMessageKey?: string,
     conflictMessageKey?: string,
+    invalidPecMessageKey?: string,
     hasDescription?: boolean
   ): string =>
     isError
       ? error.indexOf('regexp') > -1
         ? transcodeFormErrorKey(field, regexpMessageKey, t)
-        : error.indexOf('unique') > -1
-          ? transcodeFormErrorKey(field, uniqueMessageKey, t)
-          : error.indexOf('conflict') > -1
-            ? transcodeFormErrorKey(field, conflictMessageKey, t)
-            : t('platformUserForm.helperText')
+        : error.indexOf('invalidPec') > -1
+          ? transcodeFormErrorKey(field, invalidPecMessageKey, t)
+          : error.indexOf('unique') > -1
+            ? transcodeFormErrorKey(field, uniqueMessageKey, t)
+            : error.indexOf('conflict') > -1
+              ? transcodeFormErrorKey(field, conflictMessageKey, t)
+              : t('platformUserForm.helperText')
       : hasDescription
         ? t(`platformUserForm.fields.${field}.description`)
         : '';
@@ -301,6 +311,7 @@ export function PlatformUserForm({
             regexpMessageKey,
             uniqueMessageKey,
             conflictMessageKey,
+            invalidPecMessageKey,
             hasDescription,
             textTransform,
           }) => {
@@ -336,6 +347,7 @@ export function PlatformUserForm({
                     regexpMessageKey,
                     uniqueMessageKey,
                     conflictMessageKey,
+                    invalidPecMessageKey,
                     hasDescription
                   )}
                   disabled={readOnly || readOnlyFields.indexOf(id) > -1}

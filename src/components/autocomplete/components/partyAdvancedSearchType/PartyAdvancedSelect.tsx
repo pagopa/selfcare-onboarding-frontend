@@ -8,6 +8,17 @@ import { SelectionEnum, SelectionsState } from '../../../../model/Selection';
 import { UoData } from '../../../../model/UoModel';
 import { PRODUCT_IDS } from '../../../../utils/constants';
 import { ENV } from '../../../../utils/env';
+import {
+  isConsolidatedEconomicAccountCompany,
+  isContractingAuthority,
+  isGlobalServiceProvider,
+  isIdpayMerchantProduct,
+  isInsuranceCompany,
+  isPrivateInstitution,
+  isPrivateOrPersonInstitution,
+  isPrivatePersonInstitution,
+  isPublicServiceCompany,
+} from '../../../../utils/institutionTypeUtils';
 
 type Props = {
   selections?: SelectionsState;
@@ -70,16 +81,17 @@ export default function PartyAdvancedSelect({
   };
 
   useEffect(() => {
+    // Set taxCode as default when businessName is not available as an option
+    // (for SCP, PRV, PRV_PF institution types, businessName is never shown in menuItems)
     if (
       addUser ||
-      ((product?.id === PRODUCT_IDS.INTEROP || product?.id === PRODUCT_IDS.IDPAY_MERCHANT) &&
-        (institutionType === 'SCP' || institutionType === 'PRV' || institutionType === 'PRV_PF'))
+      isPublicServiceCompany(institutionType) ||
+      isPrivateInstitution(institutionType) ||
+      isPrivatePersonInstitution(institutionType)
     ) {
       onSelectValue(SelectionEnum.taxCode);
-      // setTypeOfSearch(SelectionEnum.taxCode);
     } else {
       onSelectValue(SelectionEnum.businessName);
-      // setTypeOfSearch(SelectionEnum.businessName);
     }
   }, []);
 
@@ -99,9 +111,9 @@ export default function PartyAdvancedSelect({
 
   const menuItems = [
     !addUser &&
-      institutionType !== 'SCP' &&
-      institutionType !== 'PRV' &&
-      institutionType !== 'PRV_PF' && (
+      !isPublicServiceCompany(institutionType) &&
+      !isPrivateInstitution(institutionType) &&
+      !isPrivatePersonInstitution(institutionType) && (
         <MenuItem
           key="businessName"
           id="businessName"
@@ -111,7 +123,7 @@ export default function PartyAdvancedSelect({
           {t('partyAdvancedSelect.businessName')}
         </MenuItem>
       ),
-    institutionType === 'AS' ? (
+    isInsuranceCompany(institutionType) ? (
       <MenuItem
         key="ivassCode"
         id="ivassCode"
@@ -125,8 +137,8 @@ export default function PartyAdvancedSelect({
         {t('partyAdvancedSelect.taxCode')}
       </MenuItem>
     ),
-    (institutionType === 'PRV' || institutionType === 'PRV_PF') &&
-      product?.id === PRODUCT_IDS.IDPAY_MERCHANT && [
+    isPrivateOrPersonInstitution(institutionType) &&
+      isIdpayMerchantProduct(product?.id) && [
         <MenuItem key="reaCode" id="reaCode" data-testid="reaCode" value={SelectionEnum.reaCode}>
           {t('partyAdvancedSelect.reaCode')}
         </MenuItem>,
@@ -140,13 +152,13 @@ export default function PartyAdvancedSelect({
         </MenuItem>,
       ],
     ((ENV.AOO_UO.SHOW_AOO_UO &&
-      institutionType !== 'SA' &&
-      institutionType !== 'AS' &&
-      institutionType !== 'GSP' &&
-      institutionType !== 'SCP' &&
-      institutionType !== 'PRV' &&
-      institutionType !== 'PRV_PF' &&
-      institutionType !== 'SCEC' &&
+      !isContractingAuthority(institutionType) &&
+      !isInsuranceCompany(institutionType) &&
+      !isGlobalServiceProvider(institutionType) &&
+      !isPublicServiceCompany(institutionType) &&
+      !isPrivateInstitution(institutionType) &&
+      !isPrivatePersonInstitution(institutionType) &&
+      !isConsolidatedEconomicAccountCompany(institutionType) &&
       [PRODUCT_IDS.INTEROP, PRODUCT_IDS.IO_SIGN, PRODUCT_IDS.SEND_DEV, PRODUCT_IDS.SEND].includes(
         product?.id ?? ''
       )) ||
