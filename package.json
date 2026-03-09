@@ -64,7 +64,7 @@
     "eslint-plugin-sonarjs": "^0.25.1",
     "jsdom": "^28.0.0",
     "prettier": "^3.5.3",
-    "start-server-and-test": "^2.1.2",
+    "start-server-and-test": "^2.1.5",
     "vite": "7.0.0",
     "vite-plugin-html": "^3.2.2",
     "vite-plugin-svgr": "^4.5.0",
