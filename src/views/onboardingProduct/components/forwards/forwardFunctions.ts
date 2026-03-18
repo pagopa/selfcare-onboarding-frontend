@@ -193,9 +193,9 @@ export const createForwardFunctions = (params: ForwardFunctionsParams) => {
     switch (institutionType) {
       case 'GSP':
         if (productId === PRODUCT_IDS.PAGOPA && (newOnboardingFormData?.origin || origin) === 'IPA') {
-          setActiveStep(activeStep + 2);
-        } else {
           setActiveStep(activeStep + 3);
+        } else {
+          setActiveStep(activeStep + 2);
         }
         break;
       case 'GPU':

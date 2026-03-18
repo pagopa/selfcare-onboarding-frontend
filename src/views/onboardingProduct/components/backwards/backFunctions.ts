@@ -81,9 +81,9 @@ export const createBackFunctions = (params: BackFunctionsParams) => {
     switch (institutionType) {
       case 'GSP':
         if (origin === 'IPA' && isPagoPaProduct(selectedProduct?.id)) {
-          setActiveStep(activeStep - 1);
-        } else {
           setActiveStep(activeStep - 3);
+        } else {
+          setActiveStep(activeStep - 1);
         }
         break;
       case 'GPU':
