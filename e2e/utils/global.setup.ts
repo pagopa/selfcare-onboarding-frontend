@@ -33,7 +33,7 @@ async function globalSetup() {
       await page.goto('https://dev.selfcare.pagopa.it', { timeout: 60000 });
 
       const spidButton = page.getByRole('button', { name: 'Entra con SPID' });
-      await spidButton.click({ timeout: 10000 });
+      await spidButton.click({ timeout: 20000 });
 
       await page.waitForURL('**/uat.oneid.pagopa.it/**', { timeout: 30000 });
       console.log(`GLOBAL SETUP: ✅ Reached OneID`);
