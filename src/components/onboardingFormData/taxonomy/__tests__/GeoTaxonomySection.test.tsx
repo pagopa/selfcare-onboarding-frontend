@@ -1,15 +1,26 @@
 import '@testing-library/jest-dom';
 import { fireEvent, screen, waitFor } from '@testing-library/react';
-import { afterEach, expect, test, vi } from 'vitest';
+import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 import { mockedGeoTaxonomy } from '../../../../lib/__mocks__/mockApiRequests';
 import { renderComponentWithProviders } from '../../../../utils/test-utils';
 import GeoTaxonomySection from '../GeoTaxonomySection';
 
+vi.mock('lodash/debounce', () => ({
+  default: (fn: any) => {
+    const immediate = (...args: any[]) => fn(...args);
+    immediate.cancel = vi.fn();
+    return immediate;
+  },
+}));
+
 const originalFetch = global.fetch;
 
-
+beforeEach(() => {
+  vi.stubEnv('VITE_MOCK_API', 'true');
+});
 
 afterEach(() => {
+  vi.unstubAllEnvs();
   global.fetch = originalFetch;
 });
 
@@ -49,15 +60,11 @@ test('should render GeoTaxonomySection with empty retrievedTaxonomies', async ()
     />
   );
 
-  const chooseNationalArea = await screen.findByText('INDICA L’AREA GEOGRAFICA');
+  const chooseNationalArea = await screen.findByText('INDICA L\u2019AREA GEOGRAFICA');
   expect(chooseNationalArea).toBeInTheDocument();
 });
 
 test('should render GeoTaxonomySection with mocked retrievedTaxonomies and click on local radio button for changing the value of autocomplete', async () => {
-  global.fetch = vi.fn().mockResolvedValueOnce({
-    json: () => Promise.resolve(mockedGeoTaxonomy),
-  });
-
   renderComponentWithProviders(
     <GeoTaxonomySection
       retrievedTaxonomies={mockedGeoTaxonomy}
@@ -71,35 +78,38 @@ test('should render GeoTaxonomySection with mocked retrievedTaxonomies and click
   expect(radioLocal).toHaveProperty('checked', true);
 
   const selectArea = screen.getAllByLabelText('Comune, Provincia o Regione') as HTMLSelectElement[];
-  const clearButton = screen.getByLabelText('Clear');
   const addButton = screen.getByText('Aggiungi area');
 
-  const selectAndVerifyArea = (inputValue: string, expectedText: string, expectedValue: string) => {
-    fireEvent.click(selectArea[0]);
-    fireEvent.change(selectArea[0], { target: { value: inputValue } });
-    fireEvent.click(screen.getByText(expectedText));
-    expect(selectArea[0].value).toBe(expectedValue);
-  };
+  fireEvent.click(selectArea[0]);
+  fireEvent.change(selectArea[0], { target: { value: 'Mil' } });
+  await waitFor(() => expect(screen.getByText('Milano (MI) comune')).toBeInTheDocument());
+  fireEvent.click(screen.getByText('Milano (MI) comune'));
+  expect(selectArea[0].value).toBe('Milano (MI)');
 
-  await waitFor(() => {
-    selectAndVerifyArea('Mil', 'Milano (MI) comune', 'Milano (MI)');
-    fireEvent.click(clearButton);
-    fireEvent.click(addButton);
-  });
+  fireEvent.click(screen.getByLabelText('Clear'));
+  fireEvent.click(addButton);
 
-  await waitFor(() => {
-    selectAndVerifyArea('Mil', 'Milano e provincia', 'Milano e provincia');
-    fireEvent.click(clearButton);
-  });
+  fireEvent.click(selectArea[0]);
+  fireEvent.change(selectArea[0], { target: { value: 'Mil' } });
+  await waitFor(() => expect(screen.getByText('Milano e provincia')).toBeInTheDocument());
+  fireEvent.click(screen.getByText('Milano e provincia'));
+  expect(selectArea[0].value).toBe('Milano e provincia');
 
-  await waitFor(() => {
-    selectAndVerifyArea('Emilia', 'Emilia - Romagna', 'Emilia - Romagna');
-    fireEvent.click(clearButton);
-  });
+  fireEvent.click(screen.getByLabelText('Clear'));
 
-  await waitFor(() => {
-    selectAndVerifyArea("l'A", "l'Aquila (AQ) comune", "l'Aquila (AQ)");
-  });
+  fireEvent.click(selectArea[0]);
+  fireEvent.change(selectArea[0], { target: { value: 'Emilia' } });
+  await waitFor(() => expect(screen.getByText('Emilia - Romagna')).toBeInTheDocument());
+  fireEvent.click(screen.getByText('Emilia - Romagna'));
+  expect(selectArea[0].value).toBe('Emilia - Romagna');
+
+  fireEvent.click(screen.getByLabelText('Clear'));
+
+  fireEvent.click(selectArea[0]);
+  fireEvent.change(selectArea[0], { target: { value: "l'A" } });
+  await waitFor(() => expect(screen.getByText("l'Aquila (AQ) comune")).toBeInTheDocument());
+  fireEvent.click(screen.getByText("l'Aquila (AQ) comune"));
+  expect(selectArea[0].value).toBe("l'Aquila (AQ)");
 });
 
 test('should render GeoTaxonomySection with mocked retrievedTaxonomies and click on national radio button', async () => {

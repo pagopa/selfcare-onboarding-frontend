@@ -9,7 +9,7 @@ import {
   stepFormData,
   PRODUCT_IDS_TEST_E2E,
   FILE_MOCK_PDF_CONTRACT,
-  stepCompleteOnboarding
+  stepCompleteOnboarding,
 } from '../utils/test-utils';
 
 test('Test Success onboarding request for product prod-pagopa and institutionType GSP', async ({
