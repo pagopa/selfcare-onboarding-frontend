@@ -83,7 +83,7 @@ export const postOnboardingSubmit = async (
       additionalInformations:
         isGlobalServiceProvider(institutionType) &&
         isPagoPaProduct(selectedProduct?.id) &&
-        origin === 'IPA'
+        origin !== 'IPA'
           ? {
               agentOfPublicService: additionalInformations?.agentOfPublicService,
               agentOfPublicServiceNote: additionalInformations?.agentOfPublicServiceNote,
