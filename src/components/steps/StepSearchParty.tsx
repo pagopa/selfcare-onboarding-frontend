@@ -207,6 +207,7 @@ export function StepSearchParty({
       handleSearchExternalId(partyExternalIdByQuery, () => setRequiredLogin(true))
         .then((ipaParty) => {
           if (ipaParty) {
+            setSelected(ipaParty);
             // eslint-disable-next-line functional/immutable-data
             autoSearchFound.current = true;
           }
