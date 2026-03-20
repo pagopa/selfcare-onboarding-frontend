@@ -22,7 +22,7 @@ export default defineConfig(({ mode }) => {
     ],
     base: '/onboarding/',
     resolve: {
-      dedupe: ['react', 'react-dom', 'react/jsx-runtime'],
+      dedupe: ['react', 'react-dom', 'react/jsx-runtime', 'react-redux'],
     },
     server: {
       port: 3000,
