@@ -42,7 +42,7 @@ export default function GeoTaxonomySection({
   const [input, setInput] = useState<string>('');
   const [error, setError] = useState<any>({});
 
-  const localState = useRef<Array<GeographicTaxonomy>>();
+  const localState = useRef<Array<GeographicTaxonomy> | undefined>(undefined);
   const [geotaxonomiesHistory, setGeotaxonomiesHistory, setGeotaxonomiesHistoryState] =
     useHistoryState<Array<GeographicTaxonomy>>('geotaxonomies', []);
 

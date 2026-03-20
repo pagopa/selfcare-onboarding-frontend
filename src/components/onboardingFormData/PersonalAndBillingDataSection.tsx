@@ -656,7 +656,7 @@ export default function PersonalAndBillingDataSection({
                 maxLength: 11,
               }}
               value={formik.values.taxCode || ''}
-              onChange={(e) => {
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 const value = e.target.value.replace(/\D/g, '');
                 if (value.length <= 11) {
                   formik.setFieldValue('taxCode', value);
@@ -825,7 +825,7 @@ export default function PersonalAndBillingDataSection({
                   inputProps={{
                     maxLength: 7,
                     style: { textTransform: 'uppercase' },
-                    onInput: (event) => {
+                    onInput: (event: React.FormEvent<HTMLInputElement>) => {
                       const input = event.target as HTMLInputElement;
                       const cleanedValue = input.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
                       // eslint-disable-next-line functional/immutable-data
@@ -874,7 +874,7 @@ export default function PersonalAndBillingDataSection({
                       600,
                       theme.palette.text.primary
                     )}
-                    onChange={(e) => {
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                       formik.setFieldValue('taxCodeInvoicing', e.target.value);
                       if (e.target.value.length === 11) {
                         void verifyTaxCodeInvoicing(

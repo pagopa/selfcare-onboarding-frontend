@@ -4,7 +4,7 @@ import { styled } from '@mui/system';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
 import { useFormik } from 'formik';
 import { uniqueId } from 'lodash';
-import { useContext, useEffect, useReducer, useRef, useState } from 'react';
+import { ReactElement, useContext, useEffect, useReducer, useRef, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import {
   DataProtectionOfficerDto,
@@ -66,7 +66,7 @@ export const CustomTextField = styled(TextField)({
 type Props = StepperStepComponentProps & {
   initialFormData: OnboardingFormData;
   institutionType: InstitutionType;
-  subtitle: string | JSX.Element;
+  subtitle: string | ReactElement;
   externalInstitutionId: string;
   origin?: string;
   originId?: string;
@@ -111,7 +111,7 @@ export default function StepOnboardingFormData({
   const [retrievedIstat, setRetrievedIstat] = useState<string>();
   const [invalidTaxCodeInvoicing, setInvalidTaxCodeInvoicing] = useState<boolean>(false);
   const [recipientCodeStatus, setRecipientCodeStatus] = useState<string>();
-  const requestIdRef = useRef<string>();
+  const requestIdRef = useRef<string | undefined>(undefined);
   const [filterCategories, setFilterCategories] = useState<string>();
   const institutionAvoidGeotax = ['PT', 'SA', 'AS'].includes(institutionType);
   const [originId4Premium, setOriginId4Premium] = useState<string>();

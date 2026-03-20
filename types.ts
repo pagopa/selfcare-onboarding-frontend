@@ -3,7 +3,7 @@ import { SvgIconTypeMap } from '@mui/material/SvgIcon';
 import { User } from '@pagopa/selfcare-common-frontend/lib/model/User';
 import { UserRole } from '@pagopa/selfcare-common-frontend/lib/utils/constants';
 import { AxiosRequestConfig } from 'axios';
-import { FunctionComponent, SVGProps } from 'react';
+import { FunctionComponent, ReactElement, SVGProps } from 'react';
 import { AooData } from './src/model/AooData';
 import { AssistanceContacts } from './src/model/AssistanceContacts';
 import { CompanyInformations } from './src/model/CompanyInformations';
@@ -52,11 +52,11 @@ export type RequestOutcomeComplete =
 
 export type RequestOutcomeMessage = {
   title: string;
-  description: Array<JSX.Element>;
+  description: Array<ReactElement>;
   img?: Image;
   ImgComponent?:
     | FunctionComponent<SVGProps<SVGSVGElement>>
-    | ((props: DefaultComponentProps<SvgIconTypeMap>) => JSX.Element);
+    | ((props: DefaultComponentProps<SvgIconTypeMap>) => ReactElement);
 };
 export type RequestOutcomeOptions = { [key in RequestOutcome]: RequestOutcomeMessage };
 export type RequestOutcomeOptionsJwt = { [key in RequestOutcomeComplete]: RequestOutcomeMessage };

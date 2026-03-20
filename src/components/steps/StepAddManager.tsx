@@ -51,7 +51,7 @@ export function StepAddManager({
   const [isGenericError, setIsGenericError] = useState<boolean>(false);
   const [isChangedManager, setIsChangedManager] = useState<boolean>(false);
   const addError = useErrorDispatcher();
-  const requestIdRef = useRef<string>();
+  const requestIdRef = useRef<string | undefined>(undefined);
   const { t } = useTranslation();
   const premiumFlow = !!subProduct;
 

@@ -93,7 +93,7 @@ export const renderComponentWithProviders = (
             LOGOUT
           </button>
           <Router history={history as any}>
-            {React.createElement(component.type, { ...component.props, productId })}
+            {React.createElement(component.type, { ...(component.props as Record<string, unknown>), productId })}
           </Router>
         </UserContext.Provider>
       </HeaderContext.Provider>

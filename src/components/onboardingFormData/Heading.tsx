@@ -1,8 +1,9 @@
 import { Grid, Typography } from '@mui/material';
+import { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 
 type Props = {
-  subtitle: string | JSX.Element;
+  subtitle: string | ReactElement;
 };
 
 export default function Heading({
