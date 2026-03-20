@@ -301,7 +301,6 @@ export const stepFormData = async (
     );
   } else if (
     (!isFromIpa && !isTechPartner(actualInstitutionType as InstitutionType)) ||
-    (isFromIpa && isPublicServiceCompanyE2E(actualInstitutionType as InstitutionType)) ||
     (isFromIpa &&
       isPagoPaProductE2E(product) &&
       isPrivateInstitutionE2E(actualInstitutionType as InstitutionType))
@@ -377,8 +376,7 @@ export const stepFormData = async (
   }
 
   const shouldShowNazionale = isFromIpa
-    ? (!isPublicServiceCompanyE2E(actualInstitutionType as InstitutionType) &&
-        !isContractingAuthorityE2E(actualInstitutionType as InstitutionType) &&
+    ? (!isContractingAuthorityE2E(actualInstitutionType as InstitutionType) &&
         !isInsuranceCompanyE2E(actualInstitutionType as InstitutionType)) ||
       (isPrivateInstitutionE2E(actualInstitutionType as InstitutionType) &&
         isInteropProductE2E(product))

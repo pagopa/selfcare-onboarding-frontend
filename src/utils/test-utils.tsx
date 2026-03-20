@@ -782,15 +782,15 @@ export const verifySubmit = async (
                               ? mockedUos[0].codiceFiscaleEnte
                               : mockPartyRegistry.items[0].taxCode,
         additionalInformations:
-          isPagoPaProduct(productId) && isGlobalServiceProvider(institutionType as InstitutionType) && from === 'IPA'
+          isPagoPaProduct(productId) && isGlobalServiceProvider(institutionType as InstitutionType) && from !== 'IPA'
             ? {
                 agentOfPublicService: false,
                 agentOfPublicServiceNote: '',
                 belongRegulatedMarket: false,
                 establishedByRegulatoryProvision: false,
                 establishedByRegulatoryProvisionNote: '',
-                ipa: from === 'IPA' ? true : false,
-                ipaCode: from === 'IPA' ? '991' : '',
+                ipa: false,
+                ipaCode: '',
                 otherNote: 'optionalPartyInformations-note',
                 regulatedMarketNote: '',
               }

@@ -32,8 +32,14 @@ async function globalSetup() {
     } else {
       await page.goto('https://dev.selfcare.pagopa.it', { timeout: 60000 });
 
+      try {
+        await page.getByRole('button', { name: 'Accetta tutti' }).click({ timeout: 5000 });
+      } catch {
+        // cookie banner not present, continue
+      }
+
       const spidButton = page.getByRole('button', { name: 'Entra con SPID' });
-      await spidButton.click({ timeout: 10000 });
+      await spidButton.click({ timeout: 20000 });
 
       await page.waitForURL('**/uat.oneid.pagopa.it/**', { timeout: 30000 });
       console.log(`GLOBAL SETUP: ✅ Reached OneID`);

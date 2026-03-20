@@ -9,7 +9,7 @@ import {
   stepFormData,
   PRODUCT_IDS_TEST_E2E,
   FILE_MOCK_PDF_CONTRACT,
-  stepCompleteOnboarding
+  stepCompleteOnboarding,
 } from '../utils/test-utils';
 
 test('Test Success onboarding request for product prod-pagopa and institutionType GSP', async ({
@@ -20,9 +20,10 @@ test('Test Success onboarding request for product prod-pagopa and institutionTyp
   await stepSelectParty(
     page,
     undefined,
-    'Azienda Territoriale per L’Edilizia Residenziale Pubblica della Provincia di Viterbo',
+    'Azienda Territoriale per L’Edilizia Residenziale Pubblica della Provincia di Viterbo'
   );
   await stepFormData(page, PRODUCT_IDS_TEST_E2E.PAGOPA, 'GSP');
+  await stepAdditionalInformation(page);
   await stepAddManager(page);
   await stepAddAdmin(page);
   await stepCompleteOnboarding(
@@ -40,7 +41,6 @@ test('Test Success onboarding request for product prod-pagopa and institutionTyp
   await stepInstitutionType(page, 'Gestore di servizi pubblici');
   await page.click('#no_ipa');
   await stepFormData(page, 'GSP', undefined);
-  await stepAdditionalInformation(page);
   await stepAddManager(page);
   await stepAddAdmin(page);
   await stepCompleteOnboarding(
