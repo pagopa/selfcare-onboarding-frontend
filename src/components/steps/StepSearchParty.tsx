@@ -9,6 +9,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
@@ -77,6 +78,7 @@ export function StepSearchParty({
   const { setRequiredLogin } = useContext(UserContext);
 
   const partyExternalIdByQuery = new URLSearchParams(window.location.search).get('partyExternalId');
+  const autoSearchFound = useRef(false);
   const [isSearchFieldSelected, setIsSearchFieldSelected] = useState<boolean>(true);
   const [loading, setLoading] = useState(!!partyExternalIdByQuery);
   const [apiLoading, setApiLoading] = useState(false);
@@ -120,7 +122,7 @@ export function StepSearchParty({
   };
 
   const [ecData, setEcData] = useState<PartyData | null>(null);
-  const [filterCategories, setFilterCategories] = useState<string>();;
+  const [filterCategories, setFilterCategories] = useState<string>();
 
   const [isPresentInAtecoWhiteList, setIsPresentInAtecoWhiteListState] = useState<boolean>(() => {
     if (isIdpayMerchantProduct(product?.id)) {
@@ -206,14 +208,11 @@ export function StepSearchParty({
         .then((ipaParty) => {
           if (ipaParty) {
             setSelected(ipaParty);
-          } else {
             // eslint-disable-next-line functional/immutable-data
-            window.location.search = '';
+            autoSearchFound.current = true;
           }
         })
         .catch((reason) => {
-          // eslint-disable-next-line functional/immutable-data
-          window.location.search = '';
           console.error(reason);
         })
         .finally(() => {
@@ -227,6 +226,7 @@ export function StepSearchParty({
     if (
       selected &&
       partyExternalIdByQuery &&
+      autoSearchFound.current &&
       ((subunitCodeByQuery === '' && subunitTypeByQuery === '') ||
         ((aooResult || uoResult) && isSendProduct(product?.id)))
     ) {

@@ -42,7 +42,11 @@ interface ForwardFunctionsParams {
   setAdditionalGPUInformations: Dispatch<SetStateAction<AdditionalGpuInformations | undefined>>;
   setPendingForward: Dispatch<SetStateAction<{ data: Partial<FormData> } | null>>;
   user: User | null;
-  onSubmit: (userData?: Partial<FormData>, aggregates?: Array<AggregateInstitution>, updatedOnboardingFormData?: OnboardingFormData) => void;
+  onSubmit: (
+    userData?: Partial<FormData>,
+    aggregates?: Array<AggregateInstitution>,
+    updatedOnboardingFormData?: OnboardingFormData
+  ) => void;
   aggregatesData: Array<AggregateInstitution> | undefined;
   setAggregatesData: Dispatch<SetStateAction<Array<AggregateInstitution> | undefined>>;
 }
@@ -192,7 +196,11 @@ export const createForwardFunctions = (params: ForwardFunctionsParams) => {
     setOnboardingFormData(newOnboardingFormData);
     switch (institutionType) {
       case 'GSP':
-        if (productId === PRODUCT_IDS.PAGOPA && (newOnboardingFormData?.origin || origin) === 'IPA') {
+        if (
+          (productId === PRODUCT_IDS.PAGOPA &&
+            (newOnboardingFormData?.origin || origin) === 'IPA') ||
+          (newOnboardingFormData?.origin || origin) === 'IPA'
+        ) {
           setActiveStep(activeStep + 3);
         } else {
           setActiveStep(activeStep + 2);
