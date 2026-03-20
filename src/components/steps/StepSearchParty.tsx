@@ -207,7 +207,7 @@ export function StepSearchParty({
       handleSearchExternalId(partyExternalIdByQuery, () => setRequiredLogin(true))
         .then((ipaParty) => {
           if (ipaParty) {
-            setSelected(ipaParty);
+            // setSelected(ipaParty);
             // eslint-disable-next-line functional/immutable-data
             autoSearchFound.current = true;
           }
@@ -222,17 +222,17 @@ export function StepSearchParty({
   }, []);
 
   // callback of previous useEffect
-  useEffect(() => {
-    if (
-      selected &&
-      partyExternalIdByQuery &&
-      autoSearchFound.current &&
-      ((subunitCodeByQuery === '' && subunitTypeByQuery === '') ||
-        ((aooResult || uoResult) && isSendProduct(product?.id)))
-    ) {
-      onForwardAction();
-    }
-  }, [selected, aooResult, uoResult]);
+  // useEffect(() => {
+  //   if (
+  //     selected &&
+  //     partyExternalIdByQuery &&
+  //     autoSearchFound.current &&
+  //     ((subunitCodeByQuery === '' && subunitTypeByQuery === '') ||
+  //       ((aooResult || uoResult) && isSendProduct(product?.id)))
+  //   ) {
+  //     onForwardAction();
+  //   }
+  // }, [selected, aooResult, uoResult]);
 
   useEffect(() => {
     if (isSearchFieldSelected || selected) {
