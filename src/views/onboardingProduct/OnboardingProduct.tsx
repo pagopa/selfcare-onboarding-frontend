@@ -110,8 +110,10 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     PRODUCT_IDS.IDPAY,
     PRODUCT_IDS.IDPAY_MERCHANT,
   ].includes(selectedProduct?.id ?? '');
+  const partyExternalIdFromUrl = new URLSearchParams(window.location.search).get('partyExternalId');
   const fromDashboard =
-    window.location.search.indexOf(`partyExternalId=${externalInstitutionId}`) > -1;
+    !!partyExternalIdFromUrl &&
+    (!externalInstitutionId || partyExternalIdFromUrl === externalInstitutionId);
   const subunitTypeByQuery =
     new URLSearchParams(window.location.hash.substring(1)).get('subunitType') ?? '';
   const subunitCodeByQuery =
