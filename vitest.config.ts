@@ -20,8 +20,6 @@ export default defineConfig({
         inline: ['@pagopa/selfcare-common-frontend', '@pagopa/mui-italia'],
       },
     },
-    pool: 'forks',
-    isolate: false,
     coverage: {
       provider: 'v8',
       exclude: [
