@@ -1,7 +1,8 @@
 /* eslint-disable sonarjs/cognitive-complexity */
-import { Box } from '@mui/system';
-import { Grid, LinearProgress, Theme, Tooltip, Typography } from '@mui/material';
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
+import { Grid, IconButton, LinearProgress, Theme, Tooltip, Typography } from '@mui/material';
+import { Box } from '@mui/system';
+import { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import ClipFileUploaded from '../../assets/clip_file_uploaded.svg?react';
 
@@ -80,7 +81,7 @@ export function FileUploadedPreview({
                 alignItems: 'center',
                 borderRadius: '10px',
                 border: isAggregatesUpload ? 'none' : `1px solid ${theme.palette.primary.main}`,
-                width: isAggregatesUpload ? '664px' : '440px',
+                width: isAggregatesUpload ? '664px' : '100%',
                 height: isAggregatesUpload ? '46px' : '66px',
                 paddingRight: '20px',
                 paddingLeft: '10px',
@@ -105,16 +106,16 @@ export function FileUploadedPreview({
                 alignItems="center"
                 justifyContent="start"
               >
-                <Box display="flex" flexDirection="row">
+                <Box display="flex" flexDirection="row" minWidth={0} overflow="hidden">
                   <Tooltip title={file.name} placement="top" arrow={true}>
                     <Typography
                       sx={{
                         color: theme.palette.primary.main,
                         fontStyle: 'normal',
                         fontWeight: 'fontWeightRegular',
-                        overflow: isAggregatesUpload ? 'visible' : 'hidden',
+                        overflow: 'hidden',
                         whiteSpace: 'nowrap',
-                        textOverflow: isAggregatesUpload ? '-moz-initial' : 'ellipsis',
+                        textOverflow: 'ellipsis',
                         width: '100%',
                         fontSize: '14px',
                       }}
@@ -141,14 +142,16 @@ export function FileUploadedPreview({
                 </Box>
               </Grid>
               <Grid item xs={1} display="flex" justifyContent="flex-end">
-                <ClearOutlinedIcon
+                <IconButton
                   onClick={deleteUploadedFiles}
                   sx={{
                     color: theme.palette.text.primary,
                     fontSize: '24px',
                     cursor: 'pointer',
                   }}
-                />
+                >
+                  <ClearOutlinedIcon />
+                </IconButton>
               </Grid>
             </Grid>
           </Box>

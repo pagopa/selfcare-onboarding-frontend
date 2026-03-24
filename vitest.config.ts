@@ -15,6 +15,11 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./src/setupTests.ts'],
     exclude: ['**/node_modules/**', '**/e2e/**'],
+    server: {
+      deps: {
+        inline: ['@pagopa/selfcare-common-frontend', '@pagopa/mui-italia'],
+      },
+    },
     coverage: {
       provider: 'v8',
       exclude: [
