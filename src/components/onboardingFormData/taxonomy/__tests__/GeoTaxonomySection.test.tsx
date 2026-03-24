@@ -13,6 +13,11 @@ vi.mock('lodash/debounce', () => ({
   },
 }));
 
+vi.mock(
+  '../../../services/geoTaxonomyServices',
+  async () => await vi.importActual('../../../services/geoTaxonomyServices')
+);
+
 const originalFetch = global.fetch;
 
 beforeEach(() => {
