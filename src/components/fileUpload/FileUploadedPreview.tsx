@@ -149,8 +149,9 @@ export function FileUploadedPreview({
                     fontSize: '24px',
                     cursor: 'pointer',
                   }}
+                  aria-label={t('fileUploadPreview.cleanIcon')}
                 >
-                  <ClearOutlinedIcon />
+                  <ClearOutlinedIcon/>
                 </IconButton>
               </Grid>
             </Grid>

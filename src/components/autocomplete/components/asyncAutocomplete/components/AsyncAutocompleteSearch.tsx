@@ -207,7 +207,7 @@ export default function AsyncAutocompleteSearch({
                   isTaxCodeEquals2PIVA: false,
                 });
               }}
-              aria-label="clearIcon"
+              aria-label={t('asyncAutocomplete.clearIconAriaLabel')}
             >
               <ClearOutlinedIcon
                 sx={{

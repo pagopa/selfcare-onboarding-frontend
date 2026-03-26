@@ -7,6 +7,7 @@ export default {
     aooLabel: 'Inserisci il codice univoco AOO',
     uoLabel: 'Inserisci il codice univoco UO',
     ariaLabel: `Seleziona la tipologia di ricerca dell'ente`,
+    clearIconAriaLabel: 'Deseleziona ente',
     businessName: 'Ragione Sociale',
     taxcode: 'Codice Fiscale ente',
     originId: 'Codice IVASS',
@@ -100,6 +101,7 @@ export default {
   fileUploadPreview: {
     loadingStatus: 'Caricamento...',
     labelStatus: 'Pronto per l’invio',
+    cleanIcon: 'Cancella il file caricato'
   },
   inlineSupportLink: {
     assistanceLink: "contatta l'assistenza",
@@ -241,6 +243,7 @@ export default {
     formControl: {
       label: 'Aggiungi me come Amministratore',
     },
+    removeUser: 'Rimuovi Amministratore aggiuntivo',
   },
   stepAddApplicantEmail: {
     title: 'Indica la tua email',

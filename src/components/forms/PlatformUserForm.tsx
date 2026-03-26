@@ -296,6 +296,7 @@ export function PlatformUserForm({
               color="primary"
               onClick={buildRemoveDelegateForm(delegateId)}
               sx={{ p: '8px', display: 'flex', marginTop: 'auto' }}
+              aria-label={t('stepAddDelegates.removeUser')}
             >
               <ClearOutlinedIcon />
             </IconButton>
