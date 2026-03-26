@@ -333,6 +333,9 @@ export function PlatformUserForm({
                     '& .MuiOutlinedInput-root.MuiInputBase-root': {
                       fontWeight: 'fontWeightMedium',
                     },
+                    '& .MuiInputLabel-root.Mui-disabled': {
+                      color: 'text.secondary',
+                    },
                   }}
                   inputProps={{
                     style: {

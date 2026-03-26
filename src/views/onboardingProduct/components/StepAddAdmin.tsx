@@ -298,6 +298,12 @@ export function StepAddAdmin({
                 textDecoration: 'none',
                 cursor: peopleCondition ? 'default' : 'pointer',
                 opacity: peopleCondition ? 0.5 : 1,
+                '&:focus-visible': {
+                  outline: '2px solid',
+                  outlineColor: 'primary.main',
+                  outlineOffset: '2px',
+                  borderRadius: '4px',
+                },
               }}
             >
               <Box display={'flex'} alignItems={'center'}>
