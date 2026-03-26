@@ -243,6 +243,7 @@ export default {
     formControl: {
       label: 'Aggiungi me come Amministratore',
     },
+    removeUser: 'Rimuovi Amministratore aggiuntivo',
   },
   stepAddApplicantEmail: {
     title: 'Indica la tua email',
