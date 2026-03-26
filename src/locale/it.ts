@@ -101,6 +101,7 @@ export default {
   fileUploadPreview: {
     loadingStatus: 'Caricamento...',
     labelStatus: 'Pronto per l’invio',
+    cleanIcon: 'Cancella il file caricato'
   },
   inlineSupportLink: {
     assistanceLink: "contatta l'assistenza",
