@@ -7,6 +7,7 @@ export default {
     aooLabel: 'Inserisci il codice univoco AOO',
     uoLabel: 'Inserisci il codice univoco UO',
     ariaLabel: `Seleziona la tipologia di ricerca dell'ente`,
+    clearIconAriaLabel: 'Deseleziona ente',
     businessName: 'Ragione Sociale',
     taxcode: 'Codice Fiscale ente',
     originId: 'Codice IVASS',
