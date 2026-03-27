@@ -43,6 +43,7 @@ export function FileUploader({
     <Grid
       {...dropzoneRootProps}
       onClick={() => {}}
+      tabIndex={-1}
       container
       direction="row"
       justifyItems="center"
