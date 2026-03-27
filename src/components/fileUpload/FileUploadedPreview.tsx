@@ -105,10 +105,12 @@ export function FileUploadedPreview({
                 flexDirection="row"
                 alignItems="center"
                 justifyContent="start"
+                aria-label={file.name}
               >
                 <Box display="flex" flexDirection="row" minWidth={0} overflow="hidden">
                   <Tooltip title={file.name} placement="top" arrow={true}>
                     <Typography
+                      aria-hidden="true"
                       sx={{
                         color: theme.palette.primary.main,
                         fontStyle: 'normal',
