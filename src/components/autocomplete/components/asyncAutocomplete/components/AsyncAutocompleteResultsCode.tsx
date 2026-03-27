@@ -93,7 +93,7 @@ export default function AsyncAutocompleteResultsCode({
                   ? uoResult?.denominazioneEnte || uoResult.parentDescription
                   : ''
             }
-            image={' '}
+            image={''}
             action={() => {
               const partySelected = party[0] ?? party;
               setSelected(partySelected);

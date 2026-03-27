@@ -60,7 +60,7 @@ export default function AsyncAutocompleteResultsBusinessName({
           >
             <PartyAccountItemButton
               partyName={getOptionLabel(option)}
-              image={' '}
+              image={''}
               action={() => {
                 setSelected(option);
                 setOptions([]);
