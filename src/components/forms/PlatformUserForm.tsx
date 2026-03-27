@@ -275,7 +275,7 @@ export function PlatformUserForm({
   return (
     <Paper
       elevation={8}
-      sx={{ borderRadius: '16px', p: 4, width: '704px' }}
+      sx={{ borderRadius: '16px', p: 4, maxWidth: '704px', width: '100%' }}
       role="add-delegate-form"
     >
       {isExtraDelegate && delegateId && buildRemoveDelegateForm && (
@@ -336,6 +336,9 @@ export function PlatformUserForm({
                     '& .MuiInputLabel-root.Mui-disabled': {
                       color: 'text.secondary',
                     },
+                    /* error label and helper text: minimum 4.5:1 contrast ratio on white (WCAG 1.4.3) */
+                    '& .MuiFormLabel-root.Mui-error': { color: '#C5281C' },
+                    '& .MuiFormHelperText-root.Mui-error': { color: '#C5281C' },
                   }}
                   inputProps={{
                     style: {
@@ -355,6 +358,13 @@ export function PlatformUserForm({
                     hasDescription
                   )}
                   disabled={readOnly || readOnlyFields.indexOf(id) > -1}
+                  InputLabelProps={{
+                    sx: {
+                      /* allow long labels to wrap instead of being clipped at zoom 400% (WCAG 1.4.10) */
+                      whiteSpace: 'normal',
+                      overflow: 'visible',
+                    },
+                  }}
                 />
               </Grid>
             );

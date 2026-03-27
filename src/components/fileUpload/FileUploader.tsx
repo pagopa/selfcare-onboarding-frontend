@@ -49,6 +49,22 @@ export function FileUploader({
       alignItems="center"
       justifyContent="center"
     >
+      <label
+        htmlFor="file-uploader"
+        style={{
+          position: 'absolute',
+          width: '1px',
+          height: '1px',
+          padding: 0,
+          margin: '-1px',
+          overflow: 'hidden',
+          clip: 'rect(0,0,0,0)',
+          whiteSpace: 'nowrap',
+          borderWidth: 0,
+        }}
+      >
+        {title}
+      </label>
       <input id="file-uploader" {...getInputProps()} />
 
       {uploadedFiles && uploadedFiles.length > 0 ? (

@@ -299,11 +299,18 @@ export default function PersonalAndBillingDataSection({
           borderRadius: '4px',
         },
       },
+      InputLabelProps: {
+        sx: {
+          /* allow long labels to wrap instead of being clipped at zoom 400% (WCAG 1.4.10) */
+          whiteSpace: 'normal',
+          overflow: 'visible',
+        },
+      },
     };
   };
 
   return (
-    <Paper elevation={8} sx={{ borderRadius: theme.spacing(2), p: 4, width: '704px' }}>
+    <Paper elevation={8} sx={{ borderRadius: theme.spacing(2), p: 4, maxWidth: '704px', width: '100%' }}>
       <Grid item container spacing={3}>
         {controllers.isAooUo && (
           <Box px={4} pt={2} width="100%">

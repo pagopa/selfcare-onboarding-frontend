@@ -470,6 +470,13 @@ export default function StepOnboardingFormData({
           borderRadius: '4px',
         },
       },
+      InputLabelProps: {
+        sx: {
+          /* allow long labels to wrap instead of being clipped at zoom 400% (WCAG 1.4.10) */
+          whiteSpace: 'normal',
+          overflow: 'visible',
+        },
+      },
     };
   };
 
