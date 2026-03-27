@@ -62,6 +62,10 @@ const CustomTextFieldNotched = styled(TextField)<CustomTextFieldNochedProps>(
     '.MuiInputLabel-asterisk': {
       display: 'none',
     },
+    '& .MuiInputLabel-root': {
+      whiteSpace: 'normal',
+      overflow: 'visible',
+    },
     '& .MuiOutlinedInput-notchedOutline legend': {
       paddingRight: '0',
     },
@@ -514,7 +518,6 @@ export default function PersonalAndBillingDataSection({
                           ? formik.values.city
                           : params.inputProps.value,
                     }}
-                    id="city-field"
                     label={t('onboardingFormData.billingDataSection.city')}
                     InputLabelProps={{
                       shrink: (formik.values.city && formik.values.city !== '') || shrinkCity,

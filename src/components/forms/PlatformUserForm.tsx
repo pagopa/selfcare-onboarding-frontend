@@ -276,7 +276,7 @@ export function PlatformUserForm({
     <Paper
       elevation={8}
       sx={{ borderRadius: '16px', p: 4, maxWidth: '704px', width: '100%' }}
-      role="add-delegate-form"
+      role="group"
     >
       {isExtraDelegate && delegateId && buildRemoveDelegateForm && (
         <Grid container xs={12} pb={3} alignItems="center" width="100%">

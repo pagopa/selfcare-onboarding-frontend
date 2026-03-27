@@ -1635,7 +1635,7 @@ export const searchUserFormFromRemoveBtn = (removeButton: HTMLElement): any => {
     return null;
   } else {
     const parent = removeButton.parentElement as HTMLElement;
-    if (parent.getAttribute('role') === 'add-delegate-form') {
+    if (parent.getAttribute('role') === 'group') {
       return parent;
     } else {
       return searchUserFormFromRemoveBtn(parent);

@@ -43,6 +43,7 @@ export function FileUploader({
     <Grid
       {...dropzoneRootProps}
       onClick={() => {}}
+      tabIndex={-1}
       container
       direction="row"
       justifyItems="center"
@@ -51,6 +52,7 @@ export function FileUploader({
     >
       <label
         htmlFor="file-uploader"
+        aria-hidden={uploadedFiles.length > 0}
         style={{
           position: 'absolute',
           width: '1px',

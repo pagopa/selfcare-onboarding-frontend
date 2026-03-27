@@ -557,8 +557,8 @@ export function StepSearchParty({
                   control={
                     <Checkbox
                       name="aggregator-party"
-                      role="checkbox"
                       size="small"
+                      checked={isAggregator}
                       onChange={() => setIsAggregator(!isAggregator)}
                     />
                   }
