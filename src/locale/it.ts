@@ -12,6 +12,7 @@ export default {
     taxcode: 'Codice Fiscale ente',
     originId: 'Codice IVASS',
     reaLabel: 'RM-123456',
+    searchResultsLabel: 'Enti trovati',
   },
   partyAdvancedSelect: {
     advancedSearchLabel: 'Cerca per',

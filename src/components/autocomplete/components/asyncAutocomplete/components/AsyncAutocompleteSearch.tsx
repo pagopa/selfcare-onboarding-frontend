@@ -27,6 +27,13 @@ const CustomTextField = styled(TextField)({
   '.MuiInput-underline:before': {
     borderBottom: 'none',
   },
+  /* outlined border color: minimum 3:1 contrast ratio against white (WCAG 1.4.11) */
+  '& .MuiOutlinedInput-notchedOutline': {
+    borderColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  '&:hover .MuiOutlinedInput-notchedOutline': {
+    borderColor: 'rgba(0, 0, 0, 0.87)',
+  },
 });
 
 type Props = {

@@ -1,4 +1,5 @@
 import { Box, styled } from '@mui/system';
+import { useTranslation } from 'react-i18next';
 import { PartyAccountItemButton } from '@pagopa/mui-italia/dist/components/PartyAccountItemButton';
 import { PartyData } from '../../../../../../types';
 import { SelectionsState } from '../../../../../model/Selection';
@@ -47,6 +48,7 @@ export default function AsyncAutocompleteResultsCode({
   aooResult,
   selections,
 }: Props) {
+  const { t } = useTranslation();
   const party =
     selections?.taxCode ||
     selections?.ivassCode ||
@@ -67,13 +69,14 @@ export default function AsyncAutocompleteResultsCode({
     party[0]?.description;
 
   return (
-    <CustomBox my={2} {...cfResult} width="90%" maxHeight="200px" overflow="auto">
+    <CustomBox my={2} width="90%" maxHeight="200px" overflow="auto" role="list" aria-label={t('asyncAutocomplete.searchResultsLabel')}>
       {!apiLoading && (
         <Box
           sx={{ textTransform: 'capitalize' }}
           py={1}
           key={`${cfResult?.id}`}
           display="flex"
+          role="listitem"
           onKeyDownCapture={(e) => {
             if (e.key === 'Enter' || e.key === ' ') {
               setSelected(party);
