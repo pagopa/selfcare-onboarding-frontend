@@ -15,9 +15,11 @@ export function MessageNoAction({ img, title, description, ImgComponent }: Reque
           ) : null}
         </i>
       </Box>
-      <Typography variant={'h4'} sx={{ color: theme.palette.text.primary, marginBottom: 1 }}>
-        {title}
-      </Typography>
+      {title && (
+        <Typography variant={'h4'} sx={{ color: theme.palette.text.primary, marginBottom: 1 }}>
+          {title}
+        </Typography>
+      )}
       {/*
         <p dangerouslySetInnerHTML={{ __html: title }}></p> */}
       {description &&
