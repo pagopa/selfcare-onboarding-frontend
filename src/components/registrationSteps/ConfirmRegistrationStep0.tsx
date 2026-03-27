@@ -91,11 +91,12 @@ export function ConfirmRegistrationStep0({
 
   return (
     <>
-      <Grid container alignContent="center" flexDirection="column">
+      <Grid container alignContent="center" flexDirection="column" sx={{ width: '100%' }}>
         <Card
           sx={{
             marginBottom: 4,
-            width: '627px',
+            maxWidth: '627px',
+            width: '100%',
             borderRadius: theme.spacing(2),
             boxShadow:
               '0px 8px 10px -5px rgba(0, 43, 85, 0.1), 0px 16px 24px 2px rgba(0, 43, 85, 0.05), 0px 6px 30px 5px rgba(0, 43, 85, 0.1)',
@@ -160,7 +161,8 @@ export function ConfirmRegistrationStep0({
         </Card>
         <Card
           sx={{
-            width: '627px',
+            maxWidth: '627px',
+            width: '100%',
             borderRadius: theme.spacing(2),
             boxShadow:
               '0px 8px 10px -5px rgba(0, 43, 85, 0.1), 0px 16px 24px 2px rgba(0, 43, 85, 0.05), 0px 6px 30px 5px rgba(0, 43, 85, 0.1)',
