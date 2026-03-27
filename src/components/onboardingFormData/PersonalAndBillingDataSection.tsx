@@ -514,7 +514,6 @@ export default function PersonalAndBillingDataSection({
                           ? formik.values.city
                           : params.inputProps.value,
                     }}
-                    id="city-field"
                     label={t('onboardingFormData.billingDataSection.city')}
                     InputLabelProps={{
                       shrink: (formik.values.city && formik.values.city !== '') || shrinkCity,
