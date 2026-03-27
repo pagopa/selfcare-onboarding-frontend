@@ -62,6 +62,10 @@ const CustomTextFieldNotched = styled(TextField)<CustomTextFieldNochedProps>(
     '.MuiInputLabel-asterisk': {
       display: 'none',
     },
+    '& .MuiInputLabel-root': {
+      whiteSpace: 'normal',
+      overflow: 'visible',
+    },
     '& .MuiOutlinedInput-notchedOutline legend': {
       paddingRight: '0',
     },
