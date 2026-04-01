@@ -617,7 +617,7 @@ export function StepSearchParty({
                             <Link
                               sx={{
                                 textDecoration: 'underline',
-                                color: theme.palette.primary.main,
+                                color: theme.palette.primary.dark,
                                 cursor: 'pointer',
                               }}
                               href="https://indicepa.gov.it/ipa-portale/servizi-enti/accreditamento-ente"
