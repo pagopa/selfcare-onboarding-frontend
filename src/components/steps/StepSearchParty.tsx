@@ -616,7 +616,7 @@ export function StepSearchParty({
                           1: (
                             <Link
                               sx={{
-                                textDecoration: 'none',
+                                textDecoration: 'underline',
                                 color: theme.palette.primary.main,
                                 cursor: 'pointer',
                               }}
