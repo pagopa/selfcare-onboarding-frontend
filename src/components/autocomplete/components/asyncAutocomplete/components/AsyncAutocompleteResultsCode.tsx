@@ -69,7 +69,7 @@ export default function AsyncAutocompleteResultsCode({
     party[0]?.description;
 
   return (
-    <CustomBox my={2} width="90%" maxHeight="200px" overflow="auto" role="list" aria-label={t('asyncAutocomplete.searchResultsLabel')}>
+    <CustomBox my={2} width="90%" maxHeight="200px" overflow="auto" role="list" aria-live="polite" aria-label={t('asyncAutocomplete.searchResultsLabel')}>
       {!apiLoading && (
         <Box
           sx={{ textTransform: 'capitalize' }}
