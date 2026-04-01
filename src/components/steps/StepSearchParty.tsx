@@ -554,12 +554,14 @@ export function StepSearchParty({
             canAggregateProductList.includes(product?.id ?? '') && (
               <Grid item mt={3}>
                 <FormControlLabel
+                  htmlFor="aggregator-party"
                   control={
                     <Checkbox
                       name="aggregator-party"
                       size="small"
                       checked={isAggregator}
                       onChange={() => setIsAggregator(!isAggregator)}
+                      inputProps={{ id: 'aggregator-party' }}
                     />
                   }
                   label={t('onboardingStep1.onboarding.aggregator')}
