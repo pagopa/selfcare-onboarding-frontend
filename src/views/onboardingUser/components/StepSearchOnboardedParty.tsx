@@ -124,7 +124,7 @@ function StepSearchOnboardedParty({ institutionType, selectedProduct, forward, b
               </Box>
             </Box>
             {selectedProduct && (
-              <IconButton onClick={back} aria-label="clearIcon">
+              <IconButton onClick={back} aria-label={t('asyncAutocomplete.clearIconAriaLabel')}>
                 <ClearOutlinedIcon
                   sx={{
                     color: theme.palette.text.primary,
