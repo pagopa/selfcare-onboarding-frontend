@@ -501,6 +501,7 @@ export default function PersonalAndBillingDataSection({
                   style: {
                     overflow: 'visible',
                   },
+                  'aria-live': 'polite',
                 }}
                 componentsProps={autocompletePaperStyle}
                 renderOption={(props, option: InstitutionLocationData) => (
