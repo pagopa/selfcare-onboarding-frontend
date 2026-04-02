@@ -307,8 +307,8 @@ export function StepAddAdmin({
               }}
             >
               <Box display={'flex'} alignItems={'center'}>
-                <Add fontSize="small" color="primary" sx={{ mr: 1 }} />
-                <Typography color="primary" sx={{ fontWeight: 'fontWeightBold', fontSize: '18px' }}>
+                <Add fontSize="small" sx={{ mr: 1, color: 'primary.dark' }} />
+                <Typography sx={{ fontWeight: 'fontWeightBold', fontSize: '18px', color: 'primary.dark' }}>
                   {t('stepAddDelegates.addUserLink')}
                 </Typography>
               </Box>

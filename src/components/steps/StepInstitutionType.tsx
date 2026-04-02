@@ -137,18 +137,21 @@ export default function StepInstitutionType({
                       <Radio
                         id={ot.labelKey}
                         inputProps={{
-                          'aria-label': t(
-                            `stepInstitutionType.institutionTypes.${ot.labelKey}.title`
-                          ),
+                          'aria-labelledby': `${ot.labelKey}-title`,
+                          'aria-describedby': `${ot.labelKey}-description`,
                         }}
                       />
                     }
                     label={
                       <>
-                        <Typography sx={{ fontWeight: 600, fontSize: '18px', color: '#17324D' }}>
+                        <Typography
+                          id={`${ot.labelKey}-title`}
+                          sx={{ fontWeight: 600, fontSize: '18px', color: '#17324D' }}
+                        >
                           {t(`stepInstitutionType.institutionTypes.${ot.labelKey}.title`)}
                         </Typography>
                         <Typography
+                          id={`${ot.labelKey}-description`}
                           variant="subtitle2"
                           sx={{
                             fontWeight: 400,

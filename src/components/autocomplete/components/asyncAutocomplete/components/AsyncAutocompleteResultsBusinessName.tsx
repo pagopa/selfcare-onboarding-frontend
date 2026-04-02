@@ -43,7 +43,7 @@ export default function AsyncAutocompleteResultsBusinessName({
 }: Props) {
   const { t } = useTranslation();
   return (
-    <CustomBox my={2} width="90%" maxHeight="200px" overflow="auto" role="list" aria-label={t('asyncAutocomplete.searchResultsLabel')}>
+    <CustomBox my={2} width="90%" maxHeight="200px" overflow="auto" role="list" aria-live="polite" aria-label={t('asyncAutocomplete.searchResultsLabel')}>
       {!apiLoading &&
         options.map((option) => (
           <Box
