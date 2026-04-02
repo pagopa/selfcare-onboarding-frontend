@@ -13,7 +13,7 @@ export function RolesInformations({ isTechPartner, linkLabel, documentationLink 
       component="button"
       color="primary"
       startIcon={<MenuBookIcon />}
-      sx={{ fontWeight: 'fontWeightBold', fontSize: 'fontSize' }}
+      sx={{ fontWeight: 'fontWeightBold', fontSize: 'fontSize', color: 'primary.dark' }}
       onClick={() => {
         const docLink =
           documentationLink ?? isTechPartner
