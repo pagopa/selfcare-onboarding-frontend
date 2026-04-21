@@ -622,7 +622,8 @@ export const billingData2billingDataRequest = (
           ? 'A2B3C4'
           : isPaymentServiceProvider(institutionType as InstitutionType)
             ? 'A1B2C3'
-            : (from === 'IPA' ||
+            : canInvoice(institutionType, productId) &&
+                (from === 'IPA' ||
                   isGlobalServiceProvider(institutionType as InstitutionType) ||
                   (from === 'NO_IPA' && isGpuInstitution(institutionType as InstitutionType))) &&
                 typeOfSearch !== 'aooCode'
