@@ -24,6 +24,7 @@ import {
   isGlobalServiceProvider,
   isIdpayMerchantProduct,
   isInsuranceCompany,
+  isInteropProduct,
   isIoProduct,
   isPrivateInstitution,
   isPrivateMerchantInstitution,
@@ -1063,8 +1064,10 @@ const executeStepSearchParty = async (
         typeOfSearch === 'taxCode' || typeOfSearch === 'personalTaxCode'
           ? isContractingAuthority(institutionType as InstitutionType)
             ? 'ONBOARDING_GET_SA_PARTY_FROM_FC'
-            : isPrivateInstitution(institutionType as InstitutionType) &&
-                !isIdpayMerchantProduct(productId)
+            : (isPrivateInstitution(institutionType as InstitutionType) &&
+                  !isIdpayMerchantProduct(productId)) ||
+                (isInteropProduct(productId) &&
+                  isPublicServiceCompany(institutionType as InstitutionType))
               ? 'ONBOARDING_GET_PARTY_BY_CF_FROM_INFOCAMERE'
               : isIdpayMerchantProduct(productId)
                 ? 'ONBOARDING_GET_VISURA_INFOCAMERE_BY_CF'
