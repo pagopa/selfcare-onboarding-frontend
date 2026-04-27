@@ -22,6 +22,12 @@ on:
           - dev
           - uat
           - prod
+      domain:
+        type: choice
+        description: Domain
+        options:
+          - ar
+          - pnpg
 
 jobs:
   release_and_deploy:
