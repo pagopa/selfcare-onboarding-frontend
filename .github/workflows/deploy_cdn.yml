@@ -22,6 +22,12 @@ on:
           - dev
           - uat
           - prod
+      domain:
+        type: choice
+        description: Domain
+        options:
+          - ar
+          - pnpg
 
 jobs:
   release_and_deploy:
@@ -32,8 +38,8 @@ jobs:
       environment: ${{ (github.event_name == 'workflow_dispatch' && inputs.env) || (startsWith(github.ref_name, 'releases/') && 'uat') || 'dev' }}
       file_environment: ${{ format('fe_{0}.env', (github.event_name == 'workflow_dispatch' && inputs.env) || (startsWith(github.ref_name, 'releases/') && 'uat') || 'dev') }}
       storage_account_name: weuarcheckoutst01
-      profile_name: weu-ar-checkout-afd-01
-      endpoint_name: weu-ar-checkout-fde-01
+      profile_name: 'weu-${{ github.domain }}-checkout-afd-01'
+      endpoint_name: 'weu-${{ github.domain }}-checkout-fde-01'
       resource_group_name: checkout-fe-rg
       blob_container_name: $web
       base_path: onboarding
