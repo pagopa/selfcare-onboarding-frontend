@@ -72,7 +72,8 @@ export const postOnboardingSubmit = async (
   pricingPlan: string | undefined,
   users: Array<UserOnCreate>,
   loggedUser: User | null,
-  aggregates?: Array<AggregateInstitution>
+  aggregates?: Array<AggregateInstitution>,
+  onSuccess?: () => void
   // eslint-disable-next-line sonarjs/cognitive-complexity
 ) => {
   setLoading(true);
@@ -177,6 +178,7 @@ export const postOnboardingSubmit = async (
       product_id: productId,
     });
     setOutcome(outcomeContent[outcome as keyof RequestOutcomeOptions]);
+    onSuccess?.();
   } else {
     const responseStatus = (response as AxiosError<Problem>).response?.status;
 
