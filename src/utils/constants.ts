@@ -265,7 +265,8 @@ export const addUserFlowProducts = (productId: string) =>
   productId === PRODUCT_IDS.SEND ||
   productId === PRODUCT_IDS.IO ||
   productId === PRODUCT_IDS.IO_SIGN ||
-  productId === PRODUCT_IDS.PAGOPA;
+  productId === PRODUCT_IDS.PAGOPA ||
+  productId === PRODUCT_IDS.IDPAY_MERCHANT;
 
 export const institutionTypes: Array<{ labelKey: string; value: InstitutionType }> = [
   { labelKey: 'pa', value: 'PA' },

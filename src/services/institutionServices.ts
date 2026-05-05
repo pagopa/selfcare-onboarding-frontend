@@ -225,7 +225,7 @@ export const fetchInstitutionByTaxCode = async (
     const response = (searchResponse as AxiosResponse).data;
     setCfResult(response);
 
-    if (isIdpayMerchantProduct(productId)) {
+    if (addUser || isIdpayMerchantProduct(productId)) {
       validateIdpayMerchantInstitution(
         response,
         disabledStatusCompany,

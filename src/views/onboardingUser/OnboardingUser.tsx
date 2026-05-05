@@ -159,6 +159,8 @@ function OnboardingUserComponent() {
           setLoading,
           setOutcome,
           institutionType,
+          selectedProduct,
+          setSelectedProduct,
         }),
     },
     {
