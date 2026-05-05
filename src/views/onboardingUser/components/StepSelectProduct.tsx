@@ -31,12 +31,16 @@ type Props = {
   setOutcome: React.Dispatch<React.SetStateAction<RequestOutcomeMessage | null | undefined>>;
 } & StepperStepComponentProps;
 
-export function StepSelectProduct({ forward, setLoading, setOutcome, institutionType }: Props) {
+export function StepSelectProduct({
+  forward,
+  setLoading,
+  setOutcome,
+  institutionType,
+}: Props) {
   const { setRequiredLogin } = useContext(UserContext);
   const { t } = useTranslation();
   const [products, setProducts] = useState<Array<ProductResource>>();
   const [selectedProduct, setSelectedProduct] = useState<ProductResource>();
-
   const onBackAction = () => {
     window.location.assign(ENV.URL_FE.DASHBOARD);
   };

@@ -1110,7 +1110,7 @@ const mockedOnboardedParties: Array<OnboardedParty> = [
     taxCode: '00000000000',
   },
   {
-    id: '1',
+    id: '2',
     description: 'onboardedParty2',
     institutionType: 'PA',
     origin: 'IPA',
@@ -1118,6 +1118,34 @@ const mockedOnboardedParties: Array<OnboardedParty> = [
     productId: 'prod-io',
     taxCode: '00000000000',
     subunitCode: 'AAA111',
+  },
+  {
+    id: '3',
+    description: 'onboardedParty3',
+    institutionType: 'PRV_PF',
+    origin: 'PDND_INFOCAMERE',
+    originId: 'sdsdee',
+    productId: 'prod-idpay-merchant',
+    taxCode: 'RSSLCU80A01F205N',
+  },
+  {
+    id: '4',
+    description: 'onboardedParty4',
+    institutionType: 'PRV_PF',
+    origin: 'PDND_INFOCAMERE',
+    originId: 'sdsdee',
+    productId: 'prod-idpay-merchant',
+    taxCode: '12345678901',
+  },
+  {
+    id: '5',
+    description: 'onboardedPartyAoo',
+    institutionType: 'PA',
+    origin: 'IPA',
+    originId: 'sdsdee4',
+    productId: 'prod-io-sign',
+    taxCode: '92078570527',
+    subunitCode: 'A356E00',
   },
 ];
 
@@ -1208,6 +1236,7 @@ export const institutionTypes: Array<InstitutionType> = [
   'SA',
   'PSP',
   'PRV',
+  'PRV_PF'
 ];
 
 export const mockedInsuranceResource: InsuranceCompaniesResource = {
@@ -1938,7 +1967,9 @@ export async function mockFetch(
   }
 
   if (endpoint === 'ONBOARDING_GET_INSTITUTIONS') {
-    const retrievedParty = mockedOnboardedParties.find((p) => p.taxCode === params.taxCode);
+    const retrievedParty = params.subunitCode
+      ? mockedOnboardedParties.find((p) => p.subunitCode === params.subunitCode)
+      : mockedOnboardedParties.find((p) => (p.taxCode)  === params.taxCode);
 
     return new Promise((resolve) =>
       resolve({

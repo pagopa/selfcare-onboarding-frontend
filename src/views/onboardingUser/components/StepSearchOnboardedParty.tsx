@@ -21,7 +21,7 @@ type Props = {
   selectedProduct?: ProductResource;
 } & StepperStepComponentProps;
 
-function StepSearchOnboardedParty({ institutionType, selectedProduct, forward, back }: Props) {
+const StepSearchOnboardedParty = ({ institutionType, selectedProduct, forward, back }: Props) => {
   const { t } = useTranslation();
   const [selected, setSelected, _setSelectedHistory] = useHistoryState<PartyData | null>(
     'selected_step1',
@@ -139,9 +139,7 @@ function StepSearchOnboardedParty({ institutionType, selectedProduct, forward, b
             endpoint={{ endpoint: 'ONBOARDING_GET_INSTITUTIONS' }}
             externalInstitutionId=""
             isSearchFieldSelected={true}
-            transformFn={(data: { items: Array<OnboardedParty> }) =>
-              data.items
-            }
+            transformFn={(data: { items: Array<OnboardedParty> }) => data.items}
             selected={selected as any}
             setSelected={setSelected}
             aooResult={aooResult}
@@ -179,6 +177,6 @@ function StepSearchOnboardedParty({ institutionType, selectedProduct, forward, b
       </Grid>
     </Grid>
   );
-}
+};
 
 export default withLogin(StepSearchOnboardedParty);

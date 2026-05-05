@@ -311,7 +311,10 @@ export default function AsyncAutocompleteContainer({
       return 'ONBOARDING_GET_PARTY_BY_CF_FROM_INFOCAMERE';
     }
 
-    if (isIdpayMerchantProduct(product?.id) && (selections.taxCode || selections.personalTaxCode)) {
+    if (
+      (addUser || isIdpayMerchantProduct(product?.id)) &&
+      (selections.taxCode || selections.personalTaxCode)
+    ) {
       return 'ONBOARDING_GET_VISURA_INFOCAMERE_BY_CF';
     }
 
@@ -493,7 +496,14 @@ export default function AsyncAutocompleteContainer({
                 getOptionKey={getOptionKey}
               />
             ) : input.length >= 1 && input.length < 3 ? (
-              <Box role="status" aria-live="polite" display="flex" sx={{ jusifyContent: 'start' }} width="100%" mx={4}>
+              <Box
+                role="status"
+                aria-live="polite"
+                display="flex"
+                sx={{ jusifyContent: 'start' }}
+                width="100%"
+                mx={4}
+              >
                 <Typography py={3} sx={{ fontSize: '18px', fontWeight: 'fontWeightBold' }}>
                   {t('asyncAutocomplete.lessThen3CharacterLabel')}
                 </Typography>
@@ -502,7 +512,14 @@ export default function AsyncAutocompleteContainer({
               input.length >= 3 &&
               options.length === 0 &&
               !selected && (
-                <Box role="status" aria-live="polite" display="flex" sx={{ jusifyContent: 'start' }} width="100%" mx={4}>
+                <Box
+                  role="status"
+                  aria-live="polite"
+                  display="flex"
+                  sx={{ jusifyContent: 'start' }}
+                  width="100%"
+                  mx={4}
+                >
                   <Typography py={3} sx={{ fontSize: '18px', fontWeight: 'fontWeightBold' }}>
                     {t('asyncAutocomplete.noResultsLabel')}
                   </Typography>
@@ -539,7 +556,14 @@ export default function AsyncAutocompleteContainer({
               options.length === 0 &&
               (!cfResult || !aooResult || !uoResult) &&
               !selected && (
-                <Box role="status" aria-live="polite" display="flex" sx={{ jusifyContent: 'start' }} width="100%" mx={4}>
+                <Box
+                  role="status"
+                  aria-live="polite"
+                  display="flex"
+                  sx={{ jusifyContent: 'start' }}
+                  width="100%"
+                  mx={4}
+                >
                   <Typography py={3} sx={{ fontSize: '18px', fontWeight: 'fontWeightBold' }}>
                     {t('asyncAutocomplete.noResultsLabel')}
                   </Typography>
