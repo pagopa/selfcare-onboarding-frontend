@@ -1,6 +1,6 @@
 import { Box, styled } from '@mui/system';
+import { PartyAccountItemButton } from '@pagopa/mui-italia/components/PartyAccountItemButton';
 import { useTranslation } from 'react-i18next';
-import { PartyAccountItemButton } from '@pagopa/mui-italia/dist/components/PartyAccountItemButton';
 import { PartyData } from '../../../../../../types';
 import { SelectionsState } from '../../../../../model/Selection';
 
