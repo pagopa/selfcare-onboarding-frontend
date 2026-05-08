@@ -1254,10 +1254,10 @@
   resolved "https://registry.yarnpkg.com/@opentelemetry/semantic-conventions/-/semantic-conventions-1.39.0.tgz#f653b2752171411feb40310b8a8953d7e5c543b7"
   integrity sha512-R5R9tb2AXs2IRLNKLBJDynhkfmx7mX0vi8NkhZb3gUkPWHn6HXk5J8iQ/dql0U3ApfWym4kXXmBDRGO+oeOfjg==
 
-"@pagopa/mui-italia@^1.8.0":
-  version "1.11.0"
-  resolved "https://registry.yarnpkg.com/@pagopa/mui-italia/-/mui-italia-1.11.0.tgz#4f6b2bdd1f5689b0e59490905bf523dc33700702"
-  integrity sha512-x9FA+2c994UMO7Y7g6ZdvpwoY+frVJPk6CPDSgFvhkzPcNafRW8PNUWn2JEQ1+5meU3rp5XvxziZoCeoRUw/HA==
+"@pagopa/mui-italia@^2.4.1":
+  version "2.4.1"
+  resolved "https://registry.yarnpkg.com/@pagopa/mui-italia/-/mui-italia-2.4.1.tgz#39d0663a85d9c2d55d5312b98757e9d8da002e1a"
+  integrity sha512-IqT7d6AWzN0xtUTRAEb/u9QGOni2Bkb0BTPPMcdZW/1j8mb9DtMk1imE+pG2XZQfV0zKp0v80L1pnAjkguF4ag==
   dependencies:
     "@fontsource/dm-mono" "^4.5.10"
     "@fontsource/titillium-web" "^4.5.9"
@@ -1265,21 +1265,10 @@
     fp-ts "^2.12.3"
     io-ts "^2.2.18"
 
-"@pagopa/mui-italia@^2.3.0":
-  version "2.3.1"
-  resolved "https://registry.yarnpkg.com/@pagopa/mui-italia/-/mui-italia-2.3.1.tgz#9a956291365f092bb3617071de189ef820ca1e7c"
-  integrity sha512-FCedMyLVHEtHZdh+GiW/P3lHnRKGMJmWkEd1J5vc+Q9Pvfj+uJw++MChTLY174ynaLT29EQjN82nax6mQjYDFQ==
-  dependencies:
-    "@fontsource/dm-mono" "^4.5.10"
-    "@fontsource/titillium-web" "^4.5.9"
-    clsx "^1.2.1"
-    fp-ts "^2.12.3"
-    io-ts "^2.2.18"
-
-"@pagopa/selfcare-common-frontend@^1.34.103":
-  version "1.34.103"
-  resolved "https://registry.yarnpkg.com/@pagopa/selfcare-common-frontend/-/selfcare-common-frontend-1.34.103.tgz#bf8f0b104d40f1d0ce528ce404e70bae09df4945"
-  integrity sha512-XdQ6a9+zBmHNQeTLbALblI3VR+4keLk88e09D3HmLPWTyugFru249PXzjOVpwJmB55a6IVBZKD+zUZDylr0GHw==
+"@pagopa/selfcare-common-frontend@^1.34.108":
+  version "1.34.108"
+  resolved "https://registry.yarnpkg.com/@pagopa/selfcare-common-frontend/-/selfcare-common-frontend-1.34.108.tgz#0ea60d379d26f442bd6d1f716088505825b91447"
+  integrity sha512-34TXfL06mERgiDE9Qb2yTO6Tn1Gi3M1xtlhhemLw7Ns+dYvI4znjMMsSq0urqVTr6S8stRP/HnDpUgooAcQOEQ==
   dependencies:
     "@emotion/react" "^11.11.1"
     "@emotion/styled" "^11.11.0"
@@ -1289,7 +1278,7 @@
     "@mui/material" "^5.14.1"
     "@mui/system" "^5.14.1"
     "@mui/utils" "^7.3.9"
-    "@pagopa/mui-italia" "^2.3.0"
+    "@pagopa/mui-italia" "^2.4.1"
     "@pagopa/ts-commons" "^13.1.2"
     "@reduxjs/toolkit" "^2.9.0"
     async "3.2.4"
