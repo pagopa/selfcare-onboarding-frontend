@@ -47,6 +47,9 @@
             var a = document.createElement('script');
             a.type = 'text/javascript';
             a.src = g;
+            a.addEventListener('load', function () {
+              window.QSI && window.QSI.API && window.QSI.API.unload();
+            });
             document.body && document.body.appendChild(a);
           };
           this.start = function () {
