@@ -238,7 +238,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
       user,
       aggregates,
       () => {
-        triggerQualtricsIntercept({
+        void triggerQualtricsIntercept({
           institutionDescription: onboardingFormData?.businessName ?? '',
           productId,
           institutionType: institutionType ?? '',
