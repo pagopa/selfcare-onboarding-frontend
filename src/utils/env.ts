@@ -87,4 +87,10 @@ export const ENV = {
     SCRIPT_URL: import.meta.env.VITE_QUALTRICS_SCRIPT_URL as string,
     SITE_ID: import.meta.env.VITE_QUALTRICS_SITE_ID as string,
   },
+
+  QUALTRICS_APPROVAL: {
+    ENABLE: import.meta.env.VITE_QUALTRICS_APPROVAL_ENABLE === 'true',
+    SCRIPT_URL: import.meta.env.VITE_QUALTRICS_APPROVAL_SCRIPT_URL as string,
+    SITE_ID: import.meta.env.VITE_QUALTRICS_APPROVAL_SITE_ID as string,
+  },
 };
