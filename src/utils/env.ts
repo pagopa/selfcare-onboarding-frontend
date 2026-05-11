@@ -9,7 +9,7 @@ export const ENV = {
 
   JSON_URL: {
     PLAN_PRICES: import.meta.env.VITE_PLANS_PRICES,
-    COUNTRIES: import.meta.env.VITE_COUNTRY_DATA
+    COUNTRIES: import.meta.env.VITE_COUNTRY_DATA,
   },
 
   EXAMPLE_CSV: import.meta.env.VITE_AGGREGATES_EXAMPLE_CSV,
@@ -17,7 +17,7 @@ export const ENV = {
 
   ASSISTANCE: {
     ENABLE: import.meta.env.VITE_ENABLE_ASSISTANCE === 'true',
-    EMAIL: import.meta.env.VITE_PAGOPA_HELP_EMAIL
+    EMAIL: import.meta.env.VITE_PAGOPA_HELP_EMAIL,
   },
 
   URL_DOCUMENTATION: 'https://docs.pagopa.it/area-riservata/',
@@ -46,7 +46,7 @@ export const ENV = {
     MOCK: import.meta.env.VITE_ANALYTICS_MOCK === 'true',
     DEBUG: import.meta.env.VITE_ANALYTICS_DEBUG === 'true',
     TOKEN: import.meta.env.VITE_MIXPANEL_TOKEN,
-    API_HOST: import.meta.env.VITE_MIXPANEL_API_HOST
+    API_HOST: import.meta.env.VITE_MIXPANEL_API_HOST,
   },
 
   GEOTAXONOMY: {
@@ -63,22 +63,28 @@ export const ENV = {
 
   AGGREGATOR: {
     SHOW_AGGREGATOR: import.meta.env.VITE_ENABLE_AGGREGATOR === 'true',
-    ELIGIBLE_PRODUCTS: import.meta.env.VITE_AGGREGATOR_ELIGIBLE_PRODUCTS
+    ELIGIBLE_PRODUCTS: import.meta.env.VITE_AGGREGATOR_ELIGIBLE_PRODUCTS,
   },
 
   SCP_INFOCAMERE: {
-    SHOW: import.meta.env.VITE_ENABLE_SCP_INFOCAMERE === 'true'
+    SHOW: import.meta.env.VITE_ENABLE_SCP_INFOCAMERE === 'true',
   },
 
   PRV: {
-    SHOW: import.meta.env.VITE_ENABLE_PRV === 'true'
+    SHOW: import.meta.env.VITE_ENABLE_PRV === 'true',
   },
 
   PURE_PRV: {
-    SHOW: import.meta.env.VITE_ENABLE_PURE_PRV === 'true'
+    SHOW: import.meta.env.VITE_ENABLE_PURE_PRV === 'true',
   },
 
   GPU: {
-    SHOW: import.meta.env.VITE_ENABLE_GPU === 'true'
+    SHOW: import.meta.env.VITE_ENABLE_GPU === 'true',
+  },
+
+  QUALTRICS: {
+    ENABLE: import.meta.env.VITE_QUALTRICS_ENABLE === 'true',
+    SCRIPT_URL: import.meta.env.VITE_QUALTRICS_SCRIPT_URL as string,
+    SITE_ID: import.meta.env.VITE_QUALTRICS_SITE_ID as string,
   },
 };
