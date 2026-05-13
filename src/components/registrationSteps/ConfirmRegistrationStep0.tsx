@@ -6,7 +6,7 @@ import DownloadIcon from '@mui/icons-material/Download';
 import { SessionModal } from '@pagopa/selfcare-common-frontend/lib';
 import { useState } from 'react';
 import { storageTokenOps } from '@pagopa/selfcare-common-frontend/lib/utils/storage';
-import { ENV } from '../../utils/env';
+import { API } from '../../utils/constants';
 import { fileFromReader } from '../../utils/formatting-utils';
 
 type Props = {
@@ -35,8 +35,9 @@ export function ConfirmRegistrationStep0({
     const sessionToken = storageTokenOps.read();
     const url =
       translationKeyValue === 'attachments'
-        ? `${ENV.URL_API.ONBOARDING_V2}/v2/tokens/${onboardingId}/template-attachment?attachmentName=${documentName}`
-        : `${ENV.URL_API.ONBOARDING_V2}/v2/tokens/${onboardingId}/contract`;
+        ? API.ONBOARDING_GET_TEMPLATE_ATTACHMENT.URL.replace('{{onboardingId}}', onboardingId)
+            .replace('{{filename}}', documentName ?? '')
+        : API.ONBOARDING_GET_CONTRACT.URL.replace('{{onboardingId}}', onboardingId);
 
     fetch(url, {
       headers: {
