@@ -34,8 +34,7 @@ export default {
         },
         attachments: {
           title: 'Scarica l’addendum',
-          description:
-            'Scarica l’addendum e provvedi alla firma digitale in <2>formato p7m</2>.',
+          description: 'Scarica l’addendum e provvedi alla firma digitale in <2>formato p7m</2>.',
           downloadContract: 'Scarica il documento',
         },
         user: {
@@ -43,7 +42,8 @@ export default {
           description: `Per completare l’adesione, scarica il Modulo di aggiunta e fai apporre la <1 />firma digitale in <2>formato p7m</2> dal Legale Rappresentante dell’ente.`,
           downloadContract: 'Scarica il Modulo',
         },
-        disclaimerAttachments: 'Puoi far firmare l’accordo dal Legale Rappresentante o procuratore.',
+        disclaimerAttachments:
+          'Puoi far firmare l’accordo dal Legale Rappresentante o procuratore.',
         disclaimer:
           'Firmando l’accordo, il Legale Rappresentante dell’ente, accetta espressamente e specificamente anche le singole clausole indicate nel paragrafo “Clausole ai sensi degli artt. 1341 e 1342 c.c.”',
       },
@@ -102,7 +102,7 @@ export default {
   fileUploadPreview: {
     loadingStatus: 'Caricamento...',
     labelStatus: 'Pronto per l’invio',
-    cleanIcon: 'Cancella il file caricato'
+    cleanIcon: 'Cancella il file caricato',
   },
   inlineSupportLink: {
     assistanceLink: "contatta l'assistenza",
@@ -364,11 +364,13 @@ export default {
         label: 'Email istituzionale',
         errors: {
           invalid: "L'indirizzo email non è valido",
-          invalidPec: "Indirizzo PEC non accettato. Inserisci l’indirizzo email istituzionale utilizzato per l’ente",
+          invalidPec:
+            'Indirizzo PEC non accettato. Inserisci l’indirizzo email istituzionale utilizzato per l’ente',
           duplicate: "L'indirizzo email inserito è già presente",
           conflict: "L'indirizzo email inserito non corrisponde al precedente",
         },
-        description: 'Inserisci l’indirizzo email istituzionale utilizzato per l’ente. Non sono ammessi gli indirizzi PEC',
+        description:
+          'Inserisci l’indirizzo email istituzionale utilizzato per l’ente. Non sono ammessi gli indirizzi PEC',
       },
     },
   },
@@ -701,10 +703,16 @@ export default {
       prv: {
         title: 'Privati',
       },
+      prv_ced: {
+        title: 'Società Privata',
+      },
       oth: {
         title: 'Altro',
         description: 'Enti creditori aderenti in via facoltativa',
       },
+    },
+    infoAlert: {
+      ced: 'PagoPA S.p.A. mette a disposizione la piattaforma per la gestione delle adesioni. Non partecipa alla Convenzione e non è responsabile della sua esecuzione.',
     },
     backLabel: 'Indietro',
     confirmLabel: 'Continua',

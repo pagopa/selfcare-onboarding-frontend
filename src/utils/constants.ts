@@ -231,6 +231,7 @@ export const PRODUCT_IDS = {
   CIBAN: 'prod-ciban',
   CGN: 'prod-cgn',
   IDPAY_MERCHANT: 'prod-idpay-merchant',
+  CED: 'prod-ced'
 };
 
 export const requiredError = 'Required';
@@ -277,6 +278,7 @@ export const institutionTypes: Array<{ labelKey: string; value: InstitutionType 
   { labelKey: 'sa', value: 'SA' },
   { labelKey: 'as', value: 'AS' },
   { labelKey: 'prv', value: 'PRV' },
+  { labelKey: 'prv_ced', value: 'PRV' },
   /* both are private entities but for two different products:
     prv -> "Enti Privati" (prod-interop), oth -> "Altro" (prod-pagopa) */
   { labelKey: 'oth', value: 'PRV' },

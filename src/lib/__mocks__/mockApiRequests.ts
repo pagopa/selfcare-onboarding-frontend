@@ -1225,6 +1225,11 @@ export const mockedProducts: Array<Product> = [
     title: 'PARI',
     status: statusActive,
   },
+  {
+    id: 'prod-ced',
+    title: 'Carta Europea della Disabilità',
+    status: statusActive,
+  },
 ];
 
 export const institutionTypes: Array<InstitutionType> = [

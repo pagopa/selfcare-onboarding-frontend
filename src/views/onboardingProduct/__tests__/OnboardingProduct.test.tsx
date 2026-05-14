@@ -61,7 +61,7 @@ const mockedAxios = axios as Mocked<typeof axios>;
 let fetchWithLogsSpy: MockInstance;
 let aggregatesCsv: File;
 
-const oldWindowLocation = global.window.location;
+const oldWindowLocation = window.location;
 const initialLocation = {
   assign: vi.fn(),
   pathname: '',
