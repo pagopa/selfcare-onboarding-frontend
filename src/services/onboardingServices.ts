@@ -16,14 +16,15 @@ import { getFetchOutcome } from '../lib/error-utils';
 import { InstitutionOrigins } from '../model/InstitutionOrigins';
 import { OnboardingFormData } from '../model/OnboardingFormData';
 import { ProductResource } from '../model/ProductResource';
+import { PRODUCT_IDS } from '../utils/constants';
 import { ENV } from '../utils/env';
 import {
-  isInsuranceCompany,
-  isIdpayMerchantProduct,
-  isPrivatePersonInstitution,
   isContractingAuthority,
-  isInteropProduct,
   isGlobalServiceProvider,
+  isIdpayMerchantProduct,
+  isInsuranceCompany,
+  isInteropProduct,
+  isPrivatePersonInstitution,
 } from '../utils/institutionTypeUtils';
 import { genericError } from '../views/onboardingProduct/components/StepVerifyOnboarding';
 
@@ -408,6 +409,19 @@ export const getInstiutionTypesByProduct = async (
         ...responseData,
         origins: updatedInstitutionOrigins,
       });
+    } else if (productId === PRODUCT_IDS.CED) {
+      const institutionsResponseCed = {
+        institutionType: responseData.origins[1]?.institutionType,
+        origin: responseData.origins[1]?.origin,
+        labelKey: 'prv_ced',
+      };
+
+      const updatedResponse = {
+        ...responseData,
+        origins: [responseData.origins[0], institutionsResponseCed],
+      };
+
+      setRetrivedInstituionType(updatedResponse);
     } else {
       setRetrivedInstituionType(responseData);
     }

@@ -1,4 +1,5 @@
 import {
+  Alert,
   FormControl,
   FormControlLabel,
   Grid,
@@ -118,6 +119,11 @@ export default function StepInstitutionType({
             {`Indica il tipo di ente che aderirà a <1>{{productName}}</1>`}
           </Trans>
         </Typography>
+      </Grid>
+      <Grid item xs={12} display="flex" justifyContent="center">
+        <Alert severity="info" sx={{ mb: 4, width: '70%' }}>
+          {t('stepInstitutionType.infoAlert.ced')}
+        </Alert>
       </Grid>
       <Paper
         elevation={8}
