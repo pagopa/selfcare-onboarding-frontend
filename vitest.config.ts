@@ -30,6 +30,7 @@ export default defineConfig({
         'src/model',
         'src/views/onboardingPremium/components/subProductStepPricingPlan/*',
         'e2e/**',
+        'src/locale/**',
       ],
     },
   },

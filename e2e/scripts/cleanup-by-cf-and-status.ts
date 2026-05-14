@@ -1,10 +1,13 @@
+/// <reference types="node" />
 import { chromium, Page } from '@playwright/test';
 import { deleteOnboardingById } from '../utils/api-utils';
 
 const API_BASE_URL = 'https://api.dev.selfcare.pagopa.it/onboarding';
 
 const BEARER_TOKEN =
-  'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Imp3dF84Njo3NDoxZTozNTphZTphNjpkODo0YjpkYzplOTpmYzo4ZTphMDozNTo2ODpiNSJ9.eyJlbWFpbCI6ImZ1cmlvdml0YWxlQG1hcnRpbm8uaXQiLCJmYW1pbHlfbmFtZSI6IlNhcnRvcmkiLCJmaXNjYWxfbnVtYmVyIjoiU1JUTkxNMDlUMDZHNjM1UyIsIm5hbWUiOiJBbnNlbG1vIiwiZnJvbV9hYSI6ZmFsc2UsInVpZCI6IjUwOTZlNGM2LTI1YTEtNDVkNS05YmRmLTJmYjk3NGE3YzFjOCIsImxldmVsIjoiTDIiLCJpYXQiOjE2NzQ4MTQxODAsImF1ZCI6ImFwaS5kZXYuc2VsZmNhcmUucGFnb3BhLml0IiwiaXNzIjoiU1BJRCIsImp0aSI6IjAxR1FTQjhLSDNCSks4QkFTRDE4MlZKSDhEIn0.JOfxEC3o8Wor0l430Fq68mWVl4h-NUpFlFuSf6Xgxmu-wqeQyUjRKIfl3M9J0H_8ihxyNMEu5u3PqqQBubGx1mjy24uEsoRPFdLQxlGnpMAM-15SFv8ShDWvMaTSz8hO6vCRJxUtNQgX7SplIG7ZlBBSt7ihwioW1CsKWFISuG0tHwe797NWwaMJlRnzW3R7BIrsGU1eJeue2QqYUnKXZIwYQh21E3EssCNFrusATEuJT_opGaTMzSHpUZxI6cCG2pOE8Cmm0Z75Q2HAM2eoi1_Mx8llZvuk1oVhgDGsACpNRb9Vyxt6jAPUEh3DlkGpLqS8AUD1vRQydzNifiSb4A';
+  'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJmaXNjYWxfbnVtYmVyIjoiU1NUTVRUNzZDMjNGMjA1VCIsIm5hbWUiOiJNYXR0aWEiLCJmYW1pbHlfbmFtZSI6IlNpc3RpIiwidWlkIjoiZWUwYmY2ZGEtODE4Ni00YjZkLWJkMjgtYWE4ZTNhOGRiZDc2Iiwic3BpZF9sZXZlbCI6Imh0dHBzOi8vd3d3LnNwaWQuZ292Lml0L1NwaWRMMiIsImlzcyI6IlNQSUQiLCJhdWQiOiJhcGkuZGV2LnNlbGZjYXJlLnBhZ29wYS5pdCIsImlhdCI6MTc3ODc1MDgyNSwiZXhwIjoxNzc4NzgzMjI1LCJqdGkiOiJiMWU5MzZjOS03ZmExLTRjZjktYmZjNy1hODI1MzIxZDkwYzkifQ.HwGbiKkszL7gfPNzRYx7jZBmYBEGkr9tZTafwy7BeTL-CBmhVEPbDXAoApW1590O4PvrYmNONCIehKVyhmw2KSmqu7aYykew0Nt9l9eRekxbUOR9c-XrTxdFpUjjyJmEmJEszX5mdjnln7GWqeI6gBOxGKwMzrwHNiZ3yvAQpZyeJUh4O77zP1iHI3Lwjh8xgGrL10sHs2wPkk4MfO1LLi89jEAhNgY_jzCIH1mXz9exvIG769j7bG5CUvnwBKXH0mBaNcys1NncGgBPV0hi6BjuwDXgq9BRdPz78h0k60S41MC1EJmNK0LNkBYndTrX1CnHEEdwrepheyYCg_HeEw';
+
+const STATUSES_TO_CLEAN = ['COMPLETED', 'TOBEVALIDATED'];
 
 const TAX_CODES = [
   // PA
@@ -38,12 +41,13 @@ interface OnboardingEntry {
   productId: string;
 }
 
-async function getCompletedOnboardingIds(
+async function getOnboardingIdsByStatus(
   page: Page,
   taxCode: string,
-  bearerToken: string
+  bearerToken: string,
+  status: string
 ): Promise<string[]> {
-  const url = `${API_BASE_URL}/v2/institutions/onboardings?taxCode=${taxCode}&status=COMPLETED`;
+  const url = `${API_BASE_URL}/v2/institutions/onboardings?taxCode=${taxCode}&status=${status}`;
 
   try {
     const response = await page.request.get(url, {
@@ -51,7 +55,7 @@ async function getCompletedOnboardingIds(
     });
 
     if (!response.ok()) {
-      console.error(`  [${taxCode}] GET failed with status ${response.status()}`);
+      console.error(`  [${taxCode}][${status}] GET failed with status ${response.status()}`);
       return [];
     }
 
@@ -63,13 +67,13 @@ async function getCompletedOnboardingIds(
 
     return data.map((onb) => onb.id).filter(Boolean);
   } catch (error) {
-    console.error(`  [${taxCode}] Fetch error:`, error);
+    console.error(`  [${taxCode}][${status}] Fetch error:`, error);
     return [];
   }
 }
 
 async function cleanupByCfAndStatus() {
-  console.log('Starting cleanup by CF and status=COMPLETED...\n');
+  console.log(`Starting cleanup by CF and statuses: ${STATUSES_TO_CLEAN.join(', ')}...\n`);
 
   if (!process.env.APIM_SUBSCRIPTION_KEY) {
     console.error('Error: APIM_SUBSCRIPTION_KEY environment variable is required');
@@ -80,13 +84,19 @@ async function cleanupByCfAndStatus() {
   const context = await browser.newContext();
   const page = await context.newPage();
 
-  console.log(`Fetching COMPLETED onboardings for ${TAX_CODES.length} tax codes...`);
+  console.log(`Fetching onboardings for ${TAX_CODES.length} tax codes...`);
 
   const allOnboardingIds: string[] = [];
 
   for (const taxCode of TAX_CODES) {
     process.stdout.write(`  [${taxCode}] ...`);
-    const ids = await getCompletedOnboardingIds(page, taxCode, BEARER_TOKEN);
+    const ids = (
+      await Promise.all(
+        STATUSES_TO_CLEAN.map((status) =>
+          getOnboardingIdsByStatus(page, taxCode, BEARER_TOKEN, status)
+        )
+      )
+    ).flat();
     if (ids.length > 0) {
       console.log(`found ${ids.length} onboarding(s): ${ids.join(', ')}`);
       allOnboardingIds.push(...ids);
@@ -96,7 +106,7 @@ async function cleanupByCfAndStatus() {
   }
 
   if (allOnboardingIds.length === 0) {
-    console.log('\nNo COMPLETED onboardings found. Nothing to delete.');
+    console.log('\nNo onboardings found. Nothing to delete.');
     await browser.close();
     return;
   }
