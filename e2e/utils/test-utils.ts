@@ -12,11 +12,11 @@ import { trackOnboardingId } from './onboarding-tracker';
 
 export const BASE_URL_ONBOARDING = isLocalMode
   ? 'http://localhost:3000/onboarding'
-  : 'http://dev.selfcare.pagopa.it/onboarding';
+  : 'https://dev.selfcare.pagopa.it/onboarding';
 
 export const BASE_URL_ONBOARDING_TO_APPROVE = isLocalMode
   ? 'http://localhost:3000/dashboard/admin/onboarding'
-  : 'http://dev.selfcare.pagopa.it/dashboard/admin/onboarding';
+  : 'https://dev.selfcare.pagopa.it/dashboard/admin/onboarding';
 
 export const FILE_MOCK_CSV_AGGREGATOR = {
   IO: path.join(__dirname, '..', '..', 'src', 'lib', '__mocks__', 'mockedFileAggregator.csv'),
