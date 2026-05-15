@@ -1,17 +1,16 @@
-/* eslint-disable sonarjs/cognitive-complexity */
-import { Grid, Paper, TextField, Typography, IconButton } from '@mui/material';
-import React from 'react';
-import { useTranslation } from 'react-i18next';
-import { TFunction } from 'i18next';
+import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
+import { Grid, IconButton, TextField, Typography } from '@mui/material';
+import { emailRegexp } from '@pagopa/selfcare-common-frontend/lib/utils/constants';
+import { verifyChecksumMatchWithTaxCode } from '@pagopa/selfcare-common-frontend/lib/utils/verifyChecksumMatchWithTaxCode';
 import { verifyNameMatchWithTaxCode } from '@pagopa/selfcare-common-frontend/lib/utils/verifyNameMatchWithTaxCode';
 import { verifySurnameMatchWithTaxCode } from '@pagopa/selfcare-common-frontend/lib/utils/verifySurnameMatchWithTaxCode';
-import { verifyChecksumMatchWithTaxCode } from '@pagopa/selfcare-common-frontend/lib/utils/verifyChecksumMatchWithTaxCode';
-import { emailRegexp } from '@pagopa/selfcare-common-frontend/lib/utils/constants';
-import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
-import { UserOnCreate, PartyRole } from '../../../types';
-import { UsersError, UsersObject } from '../steps/StepAddManager';
+import { TFunction } from 'i18next';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { PartyRole, UserOnCreate } from '../../../types';
 import { PRODUCT_IDS } from '../../utils/constants';
 import { isPecEmail } from '../../utils/validateFields';
+import { UsersError, UsersObject } from '../steps/StepAddManager';
 
 type PlatformUserFormProps = {
   prefix: keyof UsersObject;
@@ -47,61 +46,182 @@ type Field = {
 
 type TextTransform = 'uppercase' | 'lowercase';
 
-const fields = (productId?: string, addUserFlow?: boolean): Array<Field> => [
-  { id: 'name', unique: false, conflictMessageKey: 'conflict' },
-  { id: 'surname', unique: false, conflictMessageKey: 'conflict' },
-  {
-    id: 'taxCode',
-    width: 12,
-    regexp: new RegExp(
-      '^[A-Za-z]{6}[0-9lmnpqrstuvLMNPQRSTUV]{2}[abcdehlmprstABCDEHLMPRST]{1}[0-9lmnpqrstuvLMNPQRSTUV]{2}[A-Za-z]{1}[0-9lmnpqrstuvLMNPQRSTUV]{3}[A-Za-z]{1}$'
-    ),
-    regexpMessageKey: 'invalid',
-    unique: productId === PRODUCT_IDS.IDPAY_MERCHANT || addUserFlow ? false : true,
-    caseSensitive: false,
-    uniqueMessageKey:
-      productId === PRODUCT_IDS.IDPAY_MERCHANT || addUserFlow ? undefined : 'duplicate',
-    textTransform: 'uppercase',
-  },
-  {
-    id: 'email',
-    width: 12,
-    regexp: emailRegexp,
-    regexpMessageKey: 'invalid',
-    invalidPecMessageKey: 'invalidPec',
-    hasDescription: true,
-    unique: productId === PRODUCT_IDS.IDPAY_MERCHANT || addUserFlow ? false : true,
-    caseSensitive: false,
-    uniqueMessageKey:
-      productId === PRODUCT_IDS.IDPAY_MERCHANT || addUserFlow ? undefined : 'duplicate',
-    conflictMessageKey: 'conflict',
-    textTransform: 'lowercase',
-  },
-];
-
 type ValidationErrorCode =
   | `${keyof UserOnCreate}-regexp`
   | `${keyof UserOnCreate}-unique`
   | `${keyof UserOnCreate}-conflict`
   | `${keyof UserOnCreate}-invalidPec`;
 
-function stringEquals(str1?: string, str2?: string, caseSensitive?: boolean) {
-  return (
-    (!str1 && !str2) ||
-    (!caseSensitive ? str1?.toUpperCase() === str2?.toUpperCase() : str1 === str2)
-  );
-}
+const TAX_CODE_REGEXP = new RegExp(
+  '^[A-Za-z]{6}[0-9lmnpqrstuvLMNPQRSTUV]{2}[abcdehlmprstABCDEHLMPRST]{1}[0-9lmnpqrstuvLMNPQRSTUV]{2}[A-Za-z]{1}[0-9lmnpqrstuvLMNPQRSTUV]{3}[A-Za-z]{1}$'
+);
 
-export function validateUser(
+const allowsDuplicates = (productId?: string, addUserFlow?: boolean): boolean =>
+  productId === PRODUCT_IDS.IDPAY_MERCHANT || productId === PRODUCT_IDS.CED || !!addUserFlow;
+
+const stringEquals = (str1?: string, str2?: string, caseSensitive?: boolean): boolean =>
+  ((!str1 && !str2) ||
+    (!caseSensitive ? str1?.toUpperCase() === str2?.toUpperCase() : str1 === str2)) as boolean;
+
+const isSamePerson = (u1: UserOnCreate, u2: UserOnCreate): boolean =>
+  stringEquals(u1.name, u2.name, false) &&
+  stringEquals(u1.surname, u2.surname, false) &&
+  stringEquals(u1.taxCode, u2.taxCode, false);
+
+const fields = (productId?: string, addUserFlow?: boolean): Array<Field> => {
+  const duplicatesAllowed = allowsDuplicates(productId, addUserFlow);
+  return [
+    { id: 'name', unique: false, conflictMessageKey: 'conflict' },
+    { id: 'surname', unique: false, conflictMessageKey: 'conflict' },
+    {
+      id: 'taxCode',
+      width: 12,
+      regexp: TAX_CODE_REGEXP,
+      regexpMessageKey: 'invalid',
+      unique: !duplicatesAllowed,
+      caseSensitive: false,
+      uniqueMessageKey: duplicatesAllowed ? undefined : 'duplicate',
+      textTransform: 'uppercase',
+    },
+    {
+      id: 'email',
+      width: 12,
+      regexp: emailRegexp,
+      regexpMessageKey: 'invalid',
+      invalidPecMessageKey: 'invalidPec',
+      hasDescription: true,
+      unique: !duplicatesAllowed,
+      caseSensitive: false,
+      uniqueMessageKey: duplicatesAllowed ? undefined : 'duplicate',
+      conflictMessageKey: 'conflict',
+      textTransform: 'lowercase',
+    },
+  ];
+};
+
+const validateTaxCodeField = (value: string): ValidationErrorCode | undefined => {
+  if (!TAX_CODE_REGEXP.test(value) || verifyChecksumMatchWithTaxCode(value)) {
+    return 'taxCode-regexp';
+  }
+  return undefined;
+};
+
+const validateEmailField = (
+  value: string,
+  user: UserOnCreate,
+  usersArray: Array<UserOnCreate>,
+  duplicatesAllowed: boolean
+): ValidationErrorCode | undefined => {
+  if (!emailRegexp.test(value)) {
+    return 'email-regexp';
+  }
+  if (isPecEmail(value)) {
+    return 'email-invalidPec';
+  }
+  if (
+    duplicatesAllowed &&
+    usersArray.some(
+      (u) =>
+        isSamePerson(u, user) &&
+        u.email &&
+        emailRegexp.test(u.email) &&
+        !stringEquals(u.email, value, false)
+    )
+  ) {
+    return 'email-conflict';
+  }
+  return undefined;
+};
+
+const getFieldSpecificError = (
+  id: keyof UserOnCreate,
+  value: string,
+  user: UserOnCreate,
+  usersArray: Array<UserOnCreate>,
+  duplicatesAllowed: boolean
+): ValidationErrorCode | undefined => {
+  if (id === 'taxCode') {
+    return validateTaxCodeField(value);
+  }
+  if (id === 'email') {
+    return validateEmailField(value, user, usersArray, duplicatesAllowed);
+  }
+  return undefined;
+};
+
+const validateField = (
+  field: Field,
+  user: UserOnCreate,
+  usersArray: Array<UserOnCreate>,
+  isAuthUser: boolean | undefined,
+  duplicatesAllowed: boolean
+): ValidationErrorCode | undefined => {
+  const { id, unique, caseSensitive } = field;
+  const value = user[id] as string | undefined;
+
+  const fieldSpecificError = value
+    ? getFieldSpecificError(id, value, user, usersArray, duplicatesAllowed)
+    : undefined;
+  if (fieldSpecificError) {
+    return fieldSpecificError;
+  }
+
+  if (unique && usersArray.some((u) => stringEquals(u[id], value, caseSensitive))) {
+    return `${id}-unique`;
+  }
+
+  if (
+    id === 'name' &&
+    user.name &&
+    verifyNameMatchWithTaxCode(user.name, user.taxCode) &&
+    !isAuthUser
+  ) {
+    return 'name-conflict';
+  }
+
+  if (
+    id === 'surname' &&
+    user.surname &&
+    verifySurnameMatchWithTaxCode(user.surname, user.taxCode) &&
+    !isAuthUser
+  ) {
+    return 'surname-conflict';
+  }
+
+  return undefined;
+};
+
+const validateNoMandatory = (
+  userTempId: keyof UsersObject,
+  user: UserOnCreate,
+  productId: string | undefined,
+  users?: UsersObject,
+  isAuthUser?: boolean,
+  addUserFlow?: boolean
+): Array<ValidationErrorCode> => {
+  const fieldsToValidate = fields(productId, addUserFlow);
+  const duplicatesAllowed = allowsDuplicates(productId, addUserFlow);
+  const usersArray = users
+    ? Object.entries(users)
+        .filter(([id]) => id !== userTempId)
+        .map(([, u]) => u)
+    : [];
+
+  return fieldsToValidate
+    .map((field) => validateField(field, user, usersArray, isAuthUser, duplicatesAllowed))
+    .filter((x): x is ValidationErrorCode => x !== undefined);
+};
+
+export const validateUser = (
   userTempId: keyof UsersObject,
   user: UserOnCreate,
   users: UsersObject,
   productId?: string,
   isAuthUser?: boolean,
   addUserFlow?: boolean
-): boolean {
+): boolean => {
   const fieldsToValidate = fields(productId, addUserFlow);
-  const missingFields = fieldsToValidate.filter(({ id }) => !user[id]).map(({ id }) => id);
+  const missingFields = fieldsToValidate.filter(({ id }) => !user[id]);
   const validationErrors = validateNoMandatory(
     userTempId,
     user,
@@ -110,96 +230,8 @@ export function validateUser(
     isAuthUser,
     addUserFlow
   );
-
   return missingFields.length === 0 && validationErrors.length === 0;
-}
-
-// eslint-disable-next-line sonarjs/cognitive-complexity
-function validateNoMandatory(
-  userTempId: keyof UsersObject,
-  user: UserOnCreate,
-  productId: string | undefined,
-  users?: UsersObject,
-  isAuthUser?: boolean,
-  addUserFlow?: boolean
-): Array<ValidationErrorCode> {
-  const fieldsToValidate = fields(productId, addUserFlow);
-  const usersArray = users
-    ? Object.entries(users)
-        .filter((u) => u[0] !== userTempId)
-        .map((u) => u[1])
-    : [];
-  const isSamePerson = (u1: UserOnCreate, u2: UserOnCreate): boolean =>
-    stringEquals(u1.name, u2.name, false) &&
-    stringEquals(u1.surname, u2.surname, false) &&
-    stringEquals(u1.taxCode, u2.taxCode, false);
-
-  return (
-    fieldsToValidate
-      // eslint-disable-next-line complexity
-      .map(({ id, regexp, unique, caseSensitive }) => {
-        if (
-          regexp &&
-          user[id] &&
-          user.taxCode &&
-          user &&
-          (!regexp.test(user[id] as string) || verifyChecksumMatchWithTaxCode(user.taxCode)) &&
-          id === 'taxCode'
-        ) {
-          return `${id}-regexp`;
-        }
-        if (regexp && user[id] && !regexp.test(user[id] as string) && id === 'email') {
-          return `${id}-regexp`;
-        }
-        if (id === 'email' && user[id] && regexp && regexp.test(user[id] as string) && isPecEmail(user[id] as string)) {
-          return `${id}-invalidPec`;
-        }
-        if (
-          id === 'email' &&
-          (productId === PRODUCT_IDS.IDPAY_MERCHANT || addUserFlow) &&
-          user.email &&
-          emailRegexp.test(user.email)
-        ) {
-          const samePerson = usersArray.find(
-            (u) =>
-              isSamePerson(u, user) &&
-              u.email &&
-              emailRegexp.test(u.email) &&
-              !stringEquals(u.email, user.email, false)
-          );
-          if (samePerson) {
-            return `${id}-conflict`;
-          }
-        }
-        if (
-          unique === true &&
-          usersArray &&
-          usersArray.findIndex((u) => stringEquals(u[id], user[id], caseSensitive)) > -1
-        ) {
-          return `${id}-unique`;
-        }
-        if (
-          id === 'name' &&
-          user.name &&
-          verifyNameMatchWithTaxCode(user.name, user.taxCode) &&
-          !isAuthUser
-        ) {
-          return `${id}-conflict`;
-        }
-        if (
-          id === 'surname' &&
-          user.surname &&
-          verifySurnameMatchWithTaxCode(user.surname, user.taxCode) &&
-          !isAuthUser
-        ) {
-          return `${id}-conflict`;
-        }
-        return undefined;
-      })
-      .filter((x) => x)
-      .map((x) => x as ValidationErrorCode)
-  );
-}
+};
 
 const transcodeFormErrorKey = (
   idField: string,
@@ -207,8 +239,38 @@ const transcodeFormErrorKey = (
   t: TFunction<'translation', undefined>
 ) => (errorKey ? t(`platformUserForm.fields.${idField}.errors.${errorKey}`) : '');
 
-/* eslint-disable sonarjs/cognitive-complexity */
-export function PlatformUserForm({
+const transcodeHelperText = (
+  isError: boolean,
+  error: Array<string>,
+  field: string,
+  messageKeys: {
+    regexp?: string;
+    unique?: string;
+    conflict?: string;
+    invalidPec?: string;
+    description?: boolean;
+  },
+  t: TFunction<'translation', undefined>
+): string => {
+  if (!isError) {
+    return messageKeys.description ? t(`platformUserForm.fields.${field}.description`) : '';
+  }
+  if (error.includes('regexp')) {
+    return transcodeFormErrorKey(field, messageKeys.regexp, t);
+  }
+  if (error.includes('invalidPec')) {
+    return transcodeFormErrorKey(field, messageKeys.invalidPec, t);
+  }
+  if (error.includes('unique')) {
+    return transcodeFormErrorKey(field, messageKeys.unique, t);
+  }
+  if (error.includes('conflict')) {
+    return transcodeFormErrorKey(field, messageKeys.conflict, t);
+  }
+  return t('platformUserForm.helperText');
+};
+
+export const PlatformUserForm = ({
   prefix,
   role,
   people,
@@ -223,7 +285,7 @@ export function PlatformUserForm({
   delegateId,
   productId,
   addUserFlow,
-}: PlatformUserFormProps) {
+}: PlatformUserFormProps) => {
   const { t } = useTranslation();
 
   const buildSetPerson = (key: string) => (e: any) => {
@@ -248,36 +310,8 @@ export function PlatformUserForm({
     (externalErrors && externalErrors[id]) ??
     errors.filter((e) => e.startsWith(prefixErrorCode)).map((e) => e.replace(prefixErrorCode, ''));
 
-  const transcodeHelperText = (
-    isError: boolean,
-    error: Array<string>,
-    field: string,
-    regexpMessageKey?: string,
-    uniqueMessageKey?: string,
-    conflictMessageKey?: string,
-    invalidPecMessageKey?: string,
-    hasDescription?: boolean
-  ): string =>
-    isError
-      ? error.indexOf('regexp') > -1
-        ? transcodeFormErrorKey(field, regexpMessageKey, t)
-        : error.indexOf('invalidPec') > -1
-          ? transcodeFormErrorKey(field, invalidPecMessageKey, t)
-          : error.indexOf('unique') > -1
-            ? transcodeFormErrorKey(field, uniqueMessageKey, t)
-            : error.indexOf('conflict') > -1
-              ? transcodeFormErrorKey(field, conflictMessageKey, t)
-              : t('platformUserForm.helperText')
-      : hasDescription
-        ? t(`platformUserForm.fields.${field}.description`)
-        : '';
-
   return (
-    <Paper
-      elevation={8}
-      sx={{ borderRadius: '16px', p: 4, maxWidth: '704px', width: '100%' }}
-      role="group"
-    >
+    <>
       {isExtraDelegate && delegateId && buildRemoveDelegateForm && (
         <Grid container xs={12} pb={3} alignItems="center" width="100%">
           <Grid item xs={6}>
@@ -341,9 +375,7 @@ export function PlatformUserForm({
                     '& .MuiFormHelperText-root.Mui-error': { color: '#C5281C' },
                   }}
                   inputProps={{
-                    style: {
-                      textTransform,
-                    },
+                    style: { textTransform },
                     'data-testid': `${prefix}-${id}`,
                   }}
                   error={isError}
@@ -351,11 +383,14 @@ export function PlatformUserForm({
                     isError,
                     error,
                     id,
-                    regexpMessageKey,
-                    uniqueMessageKey,
-                    conflictMessageKey,
-                    invalidPecMessageKey,
-                    hasDescription
+                    {
+                      regexp: regexpMessageKey,
+                      unique: uniqueMessageKey,
+                      conflict: conflictMessageKey,
+                      invalidPec: invalidPecMessageKey,
+                      description: hasDescription,
+                    },
+                    t
                   )}
                   disabled={readOnly || readOnlyFields.indexOf(id) > -1}
                   InputLabelProps={{
@@ -371,6 +406,6 @@ export function PlatformUserForm({
           }
         )}
       </Grid>
-    </Paper>
+    </>
   );
-}
+};

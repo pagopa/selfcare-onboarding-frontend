@@ -1,18 +1,28 @@
 import Add from '@mui/icons-material/Add';
-import { Box, Checkbox, FormControlLabel, Grid, Link, Typography, useTheme } from '@mui/material';
+import {
+  Box,
+  FormControlLabel,
+  Grid,
+  Link,
+  Paper,
+  Switch,
+  Typography,
+  useTheme,
+} from '@mui/material';
 import SessionModal from '@pagopa/selfcare-common-frontend/lib/components/SessionModal';
 import { omit, uniqueId } from 'lodash';
-import { ChangeEvent, useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { StepperStepComponentProps, UserOnCreate } from '../../../../types';
+import { PlatformUserForm, validateUser } from '../../../components/forms/PlatformUserForm';
 import { ConfirmOnboardingModal } from '../../../components/modals/ConfirmOnboardingRequest';
 import { OnboardingStepActions } from '../../../components/registrationSteps/OnboardingStepActions';
-import { PlatformUserForm, validateUser } from '../../../components/forms/PlatformUserForm';
+import { RolesInformations } from '../../../components/shared/RolesInformations';
+import { handleAuthUser } from '../../../components/steps/StepAddManager';
 import { useHistoryState } from '../../../hooks/useHistoryState';
 import { UserContext } from '../../../lib/context';
 import { objectIsEmpty } from '../../../lib/object-utils';
 import { userValidate } from '../../../services/validationServices';
-import { RolesInformations } from '../../../components/shared/RolesInformations';
 
 // Could be an ES6 Set but it's too bothersome for now
 export type UsersObject = { [key: string]: UserOnCreate };
@@ -44,7 +54,7 @@ export function StepAddAdmin({
   const [_loading, setLoading] = useState(true);
   const [peopleErrors, setPeopleErrors] = useState<UsersError>({});
   const [genericError, setGenericError] = useState<boolean>(false);
-  const [isAuthUser, setIsAuthUser, setIsAuthUserHistory] = useHistoryState('isAuthUser', false);
+  const [isAuthUserAdmin, setIsAuthUserAdmin, setIsAuthUserAdminHistory] = useHistoryState('isAuthUserAdmin', false);
   const [people, setPeople, setPeopleHistory] = useHistoryState<UsersObject>('people_step3', {});
   const [delegateFormIds, setDelegateFormIds, setDelegateFormIdsHistory] = useHistoryState<
     Array<string>
@@ -53,14 +63,14 @@ export function StepAddAdmin({
   const { t } = useTranslation();
 
   useEffect(() => {
-    if (isAuthUser) {
+    if (isAuthUserAdmin) {
       setPeopleErrors(
         Object.fromEntries(
           Object.entries(peopleErrors).filter(([key]) => key !== 'delegate-initial')
         )
       );
     }
-  }, [isAuthUser]);
+  }, [isAuthUserAdmin]);
 
   const allPeople = legal ? ({ ...people, ['manager-initial']: legal } as UsersObject) : people;
 
@@ -79,7 +89,7 @@ export function StepAddAdmin({
       setLoading(false);
     }
     const userId = userIds[index];
-    if (!isAuthUser) {
+    if (!isAuthUserAdmin) {
       validateUserData(people[userId], externalInstitutionId, userId, index, peopleErrors);
     } else {
       // TODO hide modal for PT until copy is changed. Remove if case isTechPartner after copy is changed
@@ -150,24 +160,9 @@ export function StepAddAdmin({
   };
 
   const savePageState = () => {
-    setIsAuthUserHistory(isAuthUser);
+    setIsAuthUserAdminHistory(isAuthUserAdmin);
     setPeopleHistory(people);
     setDelegateFormIdsHistory(delegateFormIds);
-  };
-
-  const handleAuthUser = (_: ChangeEvent, value: boolean) => {
-    if (value) {
-      setPeople({
-        ...people,
-        ['delegate-initial']: Object.assign({}, user, { email: undefined }),
-      });
-    } else {
-      setPeople({
-        ...people,
-        ['delegate-initial']: Object.assign({}, null, { email: undefined }),
-      });
-    }
-    setIsAuthUser(value);
   };
 
   const theme = useTheme();
@@ -177,7 +172,7 @@ export function StepAddAdmin({
       .filter((prefix) => 'manager-initial' !== prefix)
       .some(
         (prefix) =>
-          !validateUser(prefix, people[prefix], allPeople, product?.id, isAuthUser, addUserFlow)
+          !validateUser(prefix, people[prefix], allPeople, product?.id, isAuthUserAdmin, addUserFlow)
       ) ||
     Object.keys(people).length === 3;
 
@@ -239,81 +234,111 @@ export function StepAddAdmin({
       </Grid>
 
       <Grid container item justifyContent="center" mt={3}>
-        <Grid item xs={4} display="flex" justifyContent="center">
-          <FormControlLabel
-            control={<Checkbox checked={isAuthUser} onChange={handleAuthUser} />}
-            label={
-              <Typography variant="body1">{t('stepAddDelegates.formControl.label')}</Typography>
-            }
-            sx={{
-              alignSelf: 'center',
-              '.MuiSvgIcon-root': { color: theme.palette.primary.main },
-            }}
-          />
-        </Grid>
-      </Grid>
-
-      <Grid container item justifyContent="center" mt={3}>
-        <Grid item xs={8} display="flex" justifyContent={'center'}>
-          <PlatformUserForm
-            prefix={'delegate-initial'}
-            role="DELEGATE"
-            people={people}
-            peopleErrors={peopleErrors}
-            allPeople={allPeople}
-            setPeople={setPeople}
-            readOnlyFields={isAuthUser ? ['name', 'surname', 'taxCode'] : []}
-            isAuthUser={isAuthUser}
-            productId={product?.id}
-            addUserFlow={addUserFlow}
-          />
-        </Grid>
-        {delegateFormIds.map((id) => (
-          <Grid item xs={8} mt={4} display="flex" justifyContent={'center'} key={id}>
-            <PlatformUserForm
-              prefix={id}
-              role="DELEGATE"
-              people={people}
-              peopleErrors={peopleErrors}
-              allPeople={allPeople}
-              setPeople={setPeople}
-              isExtraDelegate={true}
-              delegateId={id}
-              buildRemoveDelegateForm={buildRemoveDelegateForm}
-              productId={product?.id}
-              addUserFlow={addUserFlow}
-            />
+        <Paper
+          elevation={8}
+          sx={{ borderRadius: '16px', p: 4, maxWidth: '704px', width: '100%' }}
+          role="group"
+        >
+          <Grid container item justifyContent="center">
+            <Grid item xs={12} display="flex" justifyContent="start">
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={isAuthUserAdmin}
+                    defaultChecked={false}
+                    onChange={(event) =>
+                      handleAuthUser(
+                        event,
+                        !isAuthUserAdmin,
+                        people,
+                        setPeople,
+                        setIsAuthUserAdmin,
+                        user,
+                        'delegate'
+                      )
+                    }
+                    sx={{ margin: 1 }}
+                  />
+                }
+                label={
+                  <Typography variant="body1">{t('stepAddDelegates.formControl.label')}</Typography>
+                }
+                sx={{
+                  alignSelf: 'center',
+                  '.MuiSvgIcon-root': { color: theme.palette.primary.main },
+                }}
+              />
+            </Grid>
           </Grid>
-        ))}
-      </Grid>
 
-      <Grid container item my={addUserFlow ? 0 : 4} display="flex" justifyContent="center">
-        <Grid item xs={6} sx={{ display: addUserFlow ? 'none' : 'flex', justifyContent: 'center' }}>
-          {Object.keys(people).length !== 3 && (
-            <Link
-              component="button"
-              disabled={peopleCondition}
-              onClick={addDelegateForm}
-              sx={{
-                textDecoration: 'none',
-                cursor: peopleCondition ? 'default' : 'pointer',
-                opacity: peopleCondition ? 0.5 : 1,
-                '&:focus-visible': {
-                  outline: '2px solid',
-                  outlineColor: 'primary.main',
-                  outlineOffset: '2px',
-                  borderRadius: '4px',
-                },
-              }}
-            >
-              <Box display={'flex'} alignItems={'center'}>
-                <Add fontSize="small" sx={{ mr: 1, color: 'primary.dark' }} />
-                <Typography sx={{ fontWeight: 'fontWeightBold', fontSize: '18px', color: 'primary.dark' }}>
-                  {t('stepAddDelegates.addUserLink')}
-                </Typography>
-              </Box>
-            </Link>
-          )}
+          <Grid container item justifyContent="center" mt={3}>
+            <Grid item xs={12} display="flex" justifyContent={'center'}>
+              <PlatformUserForm
+                prefix={'delegate-initial'}
+                role="DELEGATE"
+                people={people}
+                peopleErrors={peopleErrors}
+                allPeople={allPeople}
+                setPeople={setPeople}
+                readOnlyFields={isAuthUserAdmin ? ['name', 'surname', 'taxCode'] : []}
+                isAuthUser={isAuthUserAdmin}
+                productId={product?.id}
+                addUserFlow={addUserFlow}
+              />
+            </Grid>
+            {delegateFormIds.map((id) => (
+              <Grid item xs={12} mt={4} display="flex" justifyContent={'center'} key={id}>
+                <PlatformUserForm
+                  prefix={id}
+                  role="DELEGATE"
+                  people={people}
+                  peopleErrors={peopleErrors}
+                  allPeople={allPeople}
+                  setPeople={setPeople}
+                  isExtraDelegate={true}
+                  delegateId={id}
+                  buildRemoveDelegateForm={buildRemoveDelegateForm}
+                  productId={product?.id}
+                  addUserFlow={addUserFlow}
+                />
+              </Grid>
+            ))}
+          </Grid>
+        </Paper>
+        <Grid container item my={addUserFlow ? 0 : 4} display="flex" justifyContent="center">
+          <Grid
+            item
+            xs={12}
+            sx={{ display: addUserFlow ? 'none' : 'flex', justifyContent: 'center' }}
+          >
+            {Object.keys(people).length !== 3 && (
+              <Link
+                component="button"
+                disabled={peopleCondition}
+                onClick={addDelegateForm}
+                sx={{
+                  textDecoration: 'none',
+                  cursor: peopleCondition ? 'default' : 'pointer',
+                  opacity: peopleCondition ? 0.5 : 1,
+                  '&:focus-visible': {
+                    outline: '2px solid',
+                    outlineColor: 'primary.main',
+                    outlineOffset: '2px',
+                    borderRadius: '4px',
+                  },
+                }}
+              >
+                <Box display={'flex'} alignItems={'center'}>
+                  <Add fontSize="small" sx={{ mr: 1, color: 'primary.dark' }} />
+                  <Typography
+                    sx={{ fontWeight: 'fontWeightBold', fontSize: '18px', color: 'primary.dark' }}
+                  >
+                    {t('stepAddDelegates.addUserLink')}
+                  </Typography>
+                </Box>
+              </Link>
+            )}
+          </Grid>
         </Grid>
       </Grid>
 
@@ -337,7 +362,7 @@ export function StepAddAdmin({
                     people[prefix],
                     allPeople,
                     product?.id,
-                    isAuthUser,
+                    isAuthUserAdmin,
                     addUserFlow
                   )
               ),
