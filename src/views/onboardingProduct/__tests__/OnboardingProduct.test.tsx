@@ -683,6 +683,58 @@ test('Test: Successfull complete onboarding request of PRV_PF party for prod-idp
   await executeGoHome(mockedLocation);
 });
 
+test('Test: Successfull complete onboarding request of PA party for prod-ced search by business name', async () => {
+  renderComponent(PRODUCT_IDS.CED);
+  await executeStepInstitutionType(PRODUCT_IDS.CED, 'PA');
+  await executeStepSearchParty(PRODUCT_IDS.CED, 'PA', 'AGENCY X', 'businessName');
+  await executeStepBillingData(PRODUCT_IDS.CED, 'PA', false, false, 'IPA', 'AGENCY X');
+  await executeStepAddManager(false, undefined, undefined, undefined, PRODUCT_IDS.CED);
+  await executeStepAddAdmin(true, false, false, false, false, false, PRODUCT_IDS.CED);
+  await verifySubmit(
+    PRODUCT_IDS.CED,
+    'PA',
+    fetchWithLogsSpy,
+    'IPA',
+    false,
+    false,
+    'businessName',
+    undefined,
+    undefined,
+    undefined,
+    false
+  );
+  await executeGoHome(mockedLocation);
+});
+
+test('Test: Successfull complete onboarding request of PRV for product prod-ced skipping step search party', async () => {
+  renderComponent(PRODUCT_IDS.CED);
+  await executeStepInstitutionType(PRODUCT_IDS.CED, 'PRV');
+  await executeStepBillingData(
+    PRODUCT_IDS.CED,
+    'PRV',
+    false,
+    false,
+    undefined,
+    'Mocked private 1',
+    false
+  );
+  await executeStepAddManager(false, undefined, undefined, undefined, PRODUCT_IDS.CED);
+  await executeStepAddAdmin(true, false, false, false, false, false);
+  await verifySubmit(
+    PRODUCT_IDS.CED,
+    'PRV',
+    fetchWithLogsSpy,
+    undefined,
+    false,
+    false,
+    undefined,
+    false,
+    undefined,
+    undefined
+  );
+  await executeGoHome(mockedLocation);
+});
+
 test('Test: Error on submit onboarding request of PA party for prod-io search by business name', async () => {
   renderComponent(PRODUCT_IDS.IO);
   await executeStepInstitutionType(PRODUCT_IDS.IO, 'PA');
@@ -807,29 +859,6 @@ test('Test: RecipientCode input client validation', async () => {
   expect(recipientCodeInput.value).toBe('AB123CD');
 });
 
-test('Test: Successfull complete onboarding request of PA party for prod-ced search by business name', async () => {
-  renderComponent(PRODUCT_IDS.CED);
-  await executeStepInstitutionType(PRODUCT_IDS.CED, 'PA');
-  await executeStepSearchParty(PRODUCT_IDS.CED, 'PA', 'AGENCY X', 'businessName');
-  await executeStepBillingData(PRODUCT_IDS.CED, 'PA', false, false, 'IPA', 'AGENCY X');
-  await executeStepAddManager(false, undefined, undefined, undefined, PRODUCT_IDS.CED);
-  await executeStepAddAdmin(true, false, false, false, false, false, PRODUCT_IDS.CED);
-  await verifySubmit(
-    PRODUCT_IDS.CED,
-    'PA',
-    fetchWithLogsSpy,
-    'IPA',
-    false,
-    false,
-    'businessName',
-    undefined,
-    undefined,
-    undefined,
-    false
-  );
-  await executeGoHome(mockedLocation);
-});
-
 const completeOnboardingPdndInfocamereRequest = async (institutionType: InstitutionType) => {
   renderComponent(PRODUCT_IDS.INTEROP);
   await executeStepInstitutionType(PRODUCT_IDS.INTEROP, institutionType);
@@ -881,7 +910,7 @@ const executeStepInstitutionType = async (productSelected: string, institutionTy
     screen.getByText(/Indica il tipo di ente che aderirà a/);
 
     await waitFor(() => {
-      fillInstitutionTypeCheckbox(institutionType);
+      fillInstitutionTypeCheckbox(institutionType, productSelected);
 
       const confirmButtonEnabled = screen.getByText('Continua');
 

@@ -10,6 +10,7 @@ import {
   mockPartyRegistry,
 } from '../../lib/__mocks__/mockApiRequests';
 import {
+  isCedProduct,
   isContractingAuthority,
   isGlobalServiceProvider,
   isGpuInstitution,
@@ -80,6 +81,9 @@ export const resolveOriginId = (
     return typeOfSearch === 'personalTaxCode'
       ? mockedPdndVisuraInfomacere[5].businessTaxId
       : mockedPdndVisuraInfomacere[0].businessTaxId;
+  }
+  if (isCedProduct(productId) && isPrivateInstitution(institutionType as InstitutionType)) {
+    return mockPartyRegistry.items[0].taxCode;
   }
   if (from === 'NO_IPA') {
     return mockPartyRegistry.items[0].taxCode;

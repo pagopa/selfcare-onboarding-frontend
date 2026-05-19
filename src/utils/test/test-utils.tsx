@@ -54,6 +54,7 @@ import {
   type BillingFieldIds,
   type BillingFormContext,
   clickTaxCodeEqualsVatNumberIfApplicable,
+  fillCedPrivateScenario,
   fillInfocamereScenario,
   fillNoIpaScenario,
   fillPagoPaPrivateScenario,
@@ -885,9 +886,11 @@ export const executeGoHome = async (mockedLocation: any) => {
   await waitFor(() => expect(mockedLocation.assign).toHaveBeenCalledWith(ENV.URL_FE.LANDING));
 };
 
-export const fillInstitutionTypeCheckbox = (element: string) => {
+export const fillInstitutionTypeCheckbox = (element: string, productId?: string) => {
   const label = screen.getByText(
-    i18n.t(`stepInstitutionType.institutionTypes.${element.toLowerCase()}.title`)
+    productId === PRODUCT_IDS.CED
+      ? i18n.t(`stepInstitutionType.institutionTypes.${element.toLowerCase()}_ced.title`)
+      : i18n.t(`stepInstitutionType.institutionTypes.${element.toLowerCase()}.title`)
   );
   const parentLabel = label.closest('label');
   const radioButtonCheckedIcon = parentLabel?.querySelector(
@@ -970,6 +973,8 @@ export const fillUserBillingDataForm = async (
     await fillPagoPaPrivateScenario(ids, ctx);
   } else if (isPrivateMerchant) {
     await fillPrivateMerchantScenario(ids, ctx);
+  } else if (isCedProduct(productId) && isPrivateInstitution(institutionType as InstitutionType)) {
+    await fillCedPrivateScenario(ids, ctx);
   } else if (
     (isPublicServiceCompany(institutionType as InstitutionType) ||
       isPrivateInstitution(institutionType as InstitutionType)) &&
@@ -979,7 +984,7 @@ export const fillUserBillingDataForm = async (
   }
 
   // --- Fill/verify shared fields ---
-  clickTaxCodeEqualsVatNumberIfApplicable(isPrivateMerchant, isFromIpaOrInfocamere);
+  clickTaxCodeEqualsVatNumberIfApplicable(isPrivateMerchant, isFromIpaOrInfocamere, productId);
   fillVatNumberField(vatNumber, isPrivateMerchant, from, isForeignInsurance);
 
   if (isPaymentServiceProvider(institutionType as InstitutionType) && !isPrivateMerchant) {

@@ -160,6 +160,33 @@ export const fillPagoPaPrivateScenario = async (ids: BillingFieldIds, ctx: Billi
   });
 };
 
+// Scenario: CED product + private institution
+export const fillCedPrivateScenario = async (ids: BillingFieldIds, ctx: BillingFormContext) => {
+  fireEvent.change(document.getElementById(ids.businessName) as HTMLElement, {
+    target: { value: mockPartyRegistry.items[0].description },
+  });
+  fireEvent.change(document.getElementById(ids.mailPEC) as HTMLElement, {
+    target: { value: mockPartyRegistry.items[0].digitalAddress },
+  });
+  fireEvent.change(document.getElementById(ids.zipCode) as HTMLElement, {
+    target: { value: mockPartyRegistry.items[0].zipCode },
+  });
+
+  await fillCityAutocomplete(
+    (ctx.isForeignInsurance ? ids.country : ids.city) as string,
+    'Mil',
+    'Milano'
+  );
+  expect(document.getElementById(ids.county ?? '') as HTMLElement).toHaveValue('MI');
+
+  fireEvent.change(document.getElementById('registeredOffice') as HTMLInputElement, {
+    target: { value: mockPartyRegistry.items[0].address },
+  });
+  fireEvent.change(document.getElementById(ids.taxCode) as HTMLElement, {
+    target: { value: mockPartyRegistry.items[0].taxCode },
+  });
+};
+
 // Scenario: private merchant (IDPAY product)
 export const fillPrivateMerchantScenario = async (
   ids: BillingFieldIds,
@@ -332,9 +359,10 @@ export const verifyPspFieldsAbsent = () => {
 
 export const clickTaxCodeEqualsVatNumberIfApplicable = (
   isPrivateMerchant: boolean,
-  isFromIpaOrInfocamere: boolean
+  isFromIpaOrInfocamere: boolean,
+  productId?: string
 ) => {
-  if (!isPrivateMerchant && isFromIpaOrInfocamere) {
+  if ((!isPrivateMerchant && isFromIpaOrInfocamere) || (productId && isCedProduct(productId))) {
     const taxCodeEquals2PIVA = document.getElementById('taxCodeEquals2VatNumber') as HTMLElement;
     if (taxCodeEquals2PIVA) {
       fireEvent.click(taxCodeEquals2PIVA);
