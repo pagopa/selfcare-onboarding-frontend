@@ -417,7 +417,7 @@ export const executeStepSearchParty = async (
   await waitFor(() => fireEvent.click(confirmButton));
 
   if (isAggregator) {
-    await waitFor(() => screen.getByText(/Stai richiedendo l'adesione come ente aggregatore per /));
+    await waitFor(() => screen.getByText(/Stai richiedendo l’adesione come ente aggregatore per /));
     const continueButtonModal = screen.getAllByText('Continua')[1];
     fireEvent.click(continueButtonModal);
   }

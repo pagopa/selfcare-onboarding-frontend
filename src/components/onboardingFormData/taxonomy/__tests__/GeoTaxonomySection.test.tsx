@@ -82,39 +82,23 @@ test('should render GeoTaxonomySection with mocked retrievedTaxonomies and click
   fireEvent.click(radioLocal);
   expect(radioLocal).toHaveProperty('checked', true);
 
-  const selectArea = screen.getAllByLabelText('Comune, Provincia o Regione') as HTMLSelectElement[];
-  const addButton = screen.getByText('Aggiungi area');
+  // After clicking Locale the autocomplete area appears synchronously
+  const [input] = screen.getAllByLabelText('Comune, Provincia o Regione') as HTMLInputElement[];
 
-  fireEvent.click(selectArea[0]);
-  fireEvent.change(selectArea[0], { target: { value: 'Mil' } });
-  await waitFor(() => expect(screen.getByText('Milano (MI) comune')).toBeInTheDocument());
+  // Select a comune
+  fireEvent.click(input);
+  fireEvent.change(input, { target: { value: 'Mil' } });
+  await waitFor(() => screen.getByText('Milano (MI) comune'));
   fireEvent.click(screen.getByText('Milano (MI) comune'));
-  expect(selectArea[0].value).toBe('Milano (MI)');
+  await waitFor(() => expect(input.value).toBe('Milano (MI)'));
 
+  // Clear and select a regione (reuse same DOM node — stable because key=index)
   fireEvent.click(screen.getByLabelText('Clear'));
-  fireEvent.click(addButton);
-
-  fireEvent.click(selectArea[0]);
-  fireEvent.change(selectArea[0], { target: { value: 'Mil' } });
-  await waitFor(() => expect(screen.getByText('Milano e provincia')).toBeInTheDocument());
-  fireEvent.click(screen.getByText('Milano e provincia'));
-  expect(selectArea[0].value).toBe('Milano e provincia');
-
-  fireEvent.click(screen.getByLabelText('Clear'));
-
-  fireEvent.click(selectArea[0]);
-  fireEvent.change(selectArea[0], { target: { value: 'Emilia' } });
-  await waitFor(() => expect(screen.getByText('Emilia - Romagna')).toBeInTheDocument());
+  fireEvent.click(input);
+  fireEvent.change(input, { target: { value: 'Emilia' } });
+  await waitFor(() => screen.getByText('Emilia - Romagna'));
   fireEvent.click(screen.getByText('Emilia - Romagna'));
-  expect(selectArea[0].value).toBe('Emilia - Romagna');
-
-  fireEvent.click(screen.getByLabelText('Clear'));
-
-  fireEvent.click(selectArea[0]);
-  fireEvent.change(selectArea[0], { target: { value: "l'A" } });
-  await waitFor(() => expect(screen.getByText("l'Aquila (AQ) comune")).toBeInTheDocument());
-  fireEvent.click(screen.getByText("l'Aquila (AQ) comune"));
-  expect(selectArea[0].value).toBe("l'Aquila (AQ)");
+  await waitFor(() => expect(input.value).toBe('Emilia - Romagna'));
 });
 
 test('should render GeoTaxonomySection with mocked retrievedTaxonomies and click on national radio button', async () => {

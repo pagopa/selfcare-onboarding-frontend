@@ -46,7 +46,7 @@ test('Test: Party already onboarded for a product that allow add new user, so th
     undefined,
     true
   );
-  await waitFor(() => screen.getByText(/L'ente selezionato ha già aderito/));
+  await waitFor(() => screen.getByText(/L’ente selezionato ha già aderito/));
 });
 
 test('Test: Error retrieving onboarding info', async () => {
