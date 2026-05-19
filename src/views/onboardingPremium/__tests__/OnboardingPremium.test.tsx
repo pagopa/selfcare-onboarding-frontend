@@ -17,7 +17,7 @@ import {
   executeStepAddManager,
   verifySubmitPostLegalsIoPremium,
   verifySubmitPostLegalsPspDashBoard,
-} from '../../../utils/test-utils';
+} from '../../../utils/test/test-utils';
 import OnboardingPremium from '../OnboardingPremium';
 
 vi.setConfig({ testTimeout: 20000 });

@@ -167,6 +167,13 @@ export const mockInstitutionTypeByProductId = (productId: string | undefined) =>
       return {
         origins: [{ institutionType: 'PRV', origin: 'SELC', labelKey: 'prv' }],
       };
+    case 'prod-ced':
+      return {
+        origins: [
+          { institutionType: 'PA', origin: 'IPA', labelKey: 'pa' },
+          { institutionType: 'PRV', origin: 'SELC', labelKey: 'prv_ced' },
+        ],
+      };
     default:
       return undefined;
   }
@@ -1241,7 +1248,7 @@ export const institutionTypes: Array<InstitutionType> = [
   'SA',
   'PSP',
   'PRV',
-  'PRV_PF'
+  'PRV_PF',
 ];
 
 export const mockedInsuranceResource: InsuranceCompaniesResource = {
@@ -1974,7 +1981,7 @@ export async function mockFetch(
   if (endpoint === 'ONBOARDING_GET_INSTITUTIONS') {
     const retrievedParty = params.subunitCode
       ? mockedOnboardedParties.find((p) => p.subunitCode === params.subunitCode)
-      : mockedOnboardedParties.find((p) => (p.taxCode)  === params.taxCode);
+      : mockedOnboardedParties.find((p) => p.taxCode === params.taxCode);
 
     return new Promise((resolve) =>
       resolve({

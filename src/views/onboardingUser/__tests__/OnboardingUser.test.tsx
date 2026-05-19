@@ -9,7 +9,7 @@ import '../../../locale';
 import { MemoryRouter } from 'react-router-dom';
 import OnboardingUser from '../OnboardingUser';
 import { mockPartyRegistry, mockedProducts } from '../../../lib/__mocks__/mockApiRequests';
-import { executeStepAddAdmin, executeStepAddManager } from '../../../utils/test-utils';
+import { executeStepAddAdmin, executeStepAddManager } from '../../../utils/test/test-utils';
 import { createStore } from '../../../redux/store';
 import { Provider } from 'react-redux';
 import { PRODUCT_IDS } from '../../../utils/constants';

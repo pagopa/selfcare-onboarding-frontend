@@ -2,7 +2,7 @@ import '@testing-library/jest-dom';
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 import { mockedGeoTaxonomy } from '../../../../lib/__mocks__/mockApiRequests';
-import { renderComponentWithProviders } from '../../../../utils/test-utils';
+import { renderComponentWithProviders } from '../../../../utils/test/test-utils';
 import GeoTaxonomySection from '../GeoTaxonomySection';
 
 vi.mock('lodash/debounce', () => ({

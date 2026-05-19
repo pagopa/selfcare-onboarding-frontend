@@ -12,7 +12,7 @@ import {
 } from '../../../lib/__mocks__/mockApiRequests';
 import { OnboardingFormData } from '../../../model/OnboardingFormData';
 import { PRODUCT_IDS } from '../../../utils/constants';
-import { renderComponentWithProviders } from '../../../utils/test-utils';
+import { renderComponentWithProviders } from '../../../utils/test/test-utils';
 import PersonalAndBillingDataSection from '../PersonalAndBillingDataSection';
 
 import {
@@ -300,22 +300,23 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
       fireEvent.change(document.getElementById('recipientCode') as HTMLInputElement, {
         target: { value: 'A1B2C3' },
       });
-      await waitFor(() => expect(taxCodeSfe as HTMLInputElement).toBeInTheDocument());
+      await waitFor(() => screen.queryByText('Codice Fiscale SFE'));
 
-      fireEvent.change(document.getElementById('recipientCode') as HTMLInputElement, {
-        target: { value: 'AABBC1' },
+      await waitFor(() => {
+        fireEvent.change(document.getElementById('recipientCode') as HTMLInputElement, {
+          target: { value: 'AABBC1' },
+        });
+        expect(screen.queryByText('Codice Fiscale SFE')).not.toBeInTheDocument();
       });
-      await waitFor(() => expect(taxCodeSfe as HTMLInputElement).not.toBeInTheDocument());
-
       fireEvent.change(document.getElementById('recipientCode') as HTMLInputElement, {
         target: { value: '2A3B4C' },
       });
-      await waitFor(() => expect(taxCodeSfe as HTMLInputElement).not.toBeInTheDocument());
+      await waitFor(() => expect(screen.queryByText('Codice Fiscale SFE')).not.toBeInTheDocument());
 
       fireEvent.change(document.getElementById('recipientCode') as HTMLInputElement, {
         target: { value: '' },
       });
-      await waitFor(() => expect(taxCodeSfe as HTMLInputElement).not.toBeInTheDocument());
+      await waitFor(() => expect(screen.queryByText('Codice Fiscale SFE')).not.toBeInTheDocument());
     } else {
       expect(sdiCode).not.toBeInTheDocument();
       expect(taxCodeSfe).not.toBeInTheDocument();

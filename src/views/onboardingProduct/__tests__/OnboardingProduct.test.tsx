@@ -43,7 +43,7 @@ import {
   Search,
   Source,
   verifySubmit,
-} from '../../../utils/test-utils';
+} from '../../../utils/test/test-utils';
 import OnboardingProduct from '../OnboardingProduct';
 vi.setConfig({ testTimeout: 40000 });
 vi.mock('react-router-dom', async () => ({
@@ -805,6 +805,29 @@ test('Test: RecipientCode input client validation', async () => {
 
   fireEvent.input(recipientCodeInput, { target: { value: 'AB123CD' } });
   expect(recipientCodeInput.value).toBe('AB123CD');
+});
+
+test('Test: Successfull complete onboarding request of PA party for prod-ced search by business name', async () => {
+  renderComponent(PRODUCT_IDS.CED);
+  await executeStepInstitutionType(PRODUCT_IDS.CED, 'PA');
+  await executeStepSearchParty(PRODUCT_IDS.CED, 'PA', 'AGENCY X', 'businessName');
+  await executeStepBillingData(PRODUCT_IDS.CED, 'PA', false, false, 'IPA', 'AGENCY X');
+  await executeStepAddManager(false, undefined, undefined, undefined, PRODUCT_IDS.CED);
+  await executeStepAddAdmin(true, false, false, false, false, false, PRODUCT_IDS.CED);
+  await verifySubmit(
+    PRODUCT_IDS.CED,
+    'PA',
+    fetchWithLogsSpy,
+    'IPA',
+    false,
+    false,
+    'businessName',
+    undefined,
+    undefined,
+    undefined,
+    false
+  );
+  await executeGoHome(mockedLocation);
 });
 
 const completeOnboardingPdndInfocamereRequest = async (institutionType: InstitutionType) => {
