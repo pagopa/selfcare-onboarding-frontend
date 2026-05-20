@@ -83,7 +83,10 @@ export function StepAddManager({
   const [peopleErrors, setPeopleErrors] = useState<UsersError>({});
   const [isGenericError, setIsGenericError] = useState<boolean>(false);
   const [isChangedManager, setIsChangedManager] = useState<boolean>(false);
-  const [isAuthUserManager, setIsAuthUserManager, setIsAuthUserManagerHistory] = useHistoryState('isAuthUserManager', false);
+  const [isAuthUserManager, setIsAuthUserManager, setIsAuthUserManagerHistory] = useHistoryState(
+    'isAuthUserManager',
+    false
+  );
   const addError = useErrorDispatcher();
   const requestIdRef = useRef<string>();
   const { t } = useTranslation();
@@ -223,10 +226,14 @@ export function StepAddManager({
                       )
                     }
                     sx={{ margin: 1 }}
+                    data-testid="authUserSwitch-test"
+                    aria-labelledby="authUserSwitch-label"
                   />
                 }
                 label={
-                  <Typography variant="body1">{t('stepAddDelegates.formControl.label')}</Typography>
+                  <Typography variant="body1" id="authUserSwitch-label">
+                    {t('stepAddDelegates.formControl.label')}
+                  </Typography>
                 }
                 sx={{
                   alignSelf: 'center',

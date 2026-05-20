@@ -1,23 +1,17 @@
 import { User } from '@pagopa/selfcare-common-frontend/lib/model/User';
-import '@testing-library/jest-dom';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import axios from 'axios';
 import { createMemoryHistory } from 'history';
 import { useState } from 'react';
 import { Provider } from 'react-redux';
 import { Router } from 'react-router-dom';
-import { afterAll, beforeAll, beforeEach, expect, Mocked, MockInstance, test, vi } from 'vitest';
+import { expect, MockInstance } from 'vitest';
 import { InstitutionType } from '../../../../types';
-import {
-  mockedCategories,
-  mockedPdndVisuraInfomacere,
-} from '../../../lib/__mocks__/mockApiRequests';
-import { HeaderContext, UserContext } from '../../../lib/context';
-import '../../../locale';
-import { createStore } from '../../../redux/store';
-import { canInvoice, PRODUCT_IDS } from '../../../utils/constants';
-import { ENV } from '../../../utils/env';
+import { mockedCategories } from '../../../../lib/__mocks__/mockApiRequests';
+import { HeaderContext, UserContext } from '../../../../lib/context';
+import { createStore } from '../../../../redux/store';
+import { canInvoice, PRODUCT_IDS } from '../../../../utils/constants';
+import { ENV } from '../../../../utils/env';
 import {
   isConsolidatedEconomicAccountCompany,
   isContractingAuthority,
@@ -30,100 +24,20 @@ import {
   isPrivateMerchantInstitution,
   isPublicAdministration,
   isPublicServiceCompany,
-} from '../../../utils/institutionTypeUtils';
+} from '../../../../utils/institutionTypeUtils';
 import {
   checkCorrectBodyBillingData,
-  executeGoHome,
-  executeStepAddAdmin,
-  executeStepAddApplicantEmailForm,
-  executeStepAddManager,
   fillInstitutionTypeCheckbox,
   fillUserBillingDataForm,
-  performLogout,
   Search,
   Source,
-  verifySubmit,
-} from '../../../utils/test-utils';
-import OnboardingProduct from '../OnboardingProduct';
-vi.setConfig({ testTimeout: 40000 });
-vi.mock('react-router-dom', async () => ({
-  ...(await vi.importActual('react-router-dom')),
-  useHistory: () => ({
-    location: mockedLocation,
-    replace: (nextLocation: any) => Object.assign(mockedLocation, nextLocation),
-    push: mockedHistoryPush,
-  }),
-}));
+} from '../../../../utils/test/test-utils';
+import OnboardingProduct from '../../OnboardingProduct';
 
-vi.mock('axios');
-const mockedAxios = axios as Mocked<typeof axios>;
-
-let fetchWithLogsSpy: MockInstance;
-let aggregatesCsv: File;
-
-const oldWindowLocation = window.location;
-const initialLocation = {
-  assign: vi.fn(),
-  pathname: '',
-  origin: 'MOCKED_ORIGIN',
-  search: '?pricingPlan=FA',
-  hash: '',
-  state: undefined,
-};
-const mockedLocation = Object.assign({}, initialLocation);
-const mockedHistoryPush = vi.fn();
-
-beforeAll(() => {
-  Object.defineProperty(window, 'location', { value: mockedLocation });
-});
-
-afterAll(() => {
-  Object.defineProperty(window, 'location', { value: oldWindowLocation });
-});
-
-beforeEach(async () => {
-  const apiUtils = await import('../../../lib/api-utils');
-  if (fetchWithLogsSpy) {
-    fetchWithLogsSpy.mockRestore();
-  }
-  fetchWithLogsSpy = vi.spyOn(apiUtils, 'fetchWithLogs');
-  Object.assign(mockedLocation, initialLocation);
-  aggregatesCsv = new File(['csv data'], 'aggregates.csv', { type: 'multipart/form-data' });
-
-  // Mock axios.get for CDN config.json call
-  mockedAxios.get.mockResolvedValue({
-    status: 200,
-    data: mockedCategories,
-  });
-});
-
-const filterByCategory4Test = (institutionType?: string, productId?: string) => {
-  switch (productId) {
-    case PRODUCT_IDS.SEND:
-      return mockedCategories.product['prod-pn']?.ipa.PA;
-
-    case PRODUCT_IDS.IDPAY_MERCHANT:
-      return mockedCategories.product['prod-idpay-merchant']?.merchantDetails;
-
-    case PRODUCT_IDS.INTEROP:
-      if (isConsolidatedEconomicAccountCompany(institutionType as InstitutionType)) {
-        return mockedCategories.product['prod-interop']?.ipa.SCEC;
-      } else if (isPublicAdministration(institutionType as InstitutionType)) {
-        return mockedCategories.product['prod-interop']?.ipa.PA;
-      } else if (isGlobalServiceProvider(institutionType as InstitutionType)) {
-        return mockedCategories.product.default?.ipa.GSP;
-      } else {
-        return mockedCategories.product.default?.ipa.PA;
-      }
-    default:
-      const defaultIpa = mockedCategories.product.default?.ipa;
-      return isGlobalServiceProvider(institutionType as InstitutionType)
-        ? defaultIpa?.GSP
-        : defaultIpa?.PA;
-  }
-};
-
-const renderComponent = (productId: string, injectedStore?: ReturnType<typeof createStore>) => {
+export const renderComponent = (
+  productId: string,
+  injectedStore?: ReturnType<typeof createStore>
+) => {
   const Component = () => {
     const [user, setUser] = useState<User | null>(null);
     const [subHeaderVisible, setSubHeaderVisible] = useState<boolean>(false);
@@ -163,691 +77,36 @@ const renderComponent = (productId: string, injectedStore?: ReturnType<typeof cr
   return { history };
 };
 
-test('Test: Successfull complete onboarding request of PA party for prod-io search by business name', async () => {
-  renderComponent(PRODUCT_IDS.IO);
-  await executeStepInstitutionType(PRODUCT_IDS.IO, 'PA');
-  await executeStepSearchParty(PRODUCT_IDS.IO, 'PA', 'AGENCY X', 'businessName');
-  await executeStepBillingData(PRODUCT_IDS.IO, 'PA', false, false, 'IPA', 'AGENCY X');
-  await executeStepAddManager(false);
-  await executeStepAddAdmin(true, false, false, false, false, true);
-  await executeStepAddApplicantEmailForm();
-  await verifySubmit(
-    PRODUCT_IDS.IO,
-    'PA',
-    fetchWithLogsSpy,
-    'IPA',
-    false,
-    false,
-    'businessName',
-    undefined,
-    undefined,
-    undefined,
-    true
-  );
-  await executeGoHome(mockedLocation);
-});
+export const filterByCategory4Test = (institutionType?: string, productId?: string) => {
+  switch (productId) {
+    case PRODUCT_IDS.SEND:
+      return mockedCategories.product['prod-pn']?.ipa.PA;
 
-test('Test: Successfull complete onboarding request of PA party for prod-io search by tax code', async () => {
-  renderComponent(PRODUCT_IDS.IO);
-  await executeStepInstitutionType(PRODUCT_IDS.IO, 'PA');
-  await executeStepSearchParty(
-    PRODUCT_IDS.IO,
-    'PA',
-    'Comune Di Milano',
-    'taxCode',
-    undefined,
-    '33445673222'
-  );
-  await executeStepBillingData(PRODUCT_IDS.IO, 'PA', false, false, 'IPA', 'Comune di Milano');
-  await executeStepAddManager(false);
-  await executeStepAddAdmin(true, false, false, false, false, false);
-  await verifySubmit(PRODUCT_IDS.IO, 'PA', fetchWithLogsSpy, 'IPA', false, false, 'taxCode');
-  await executeGoHome(mockedLocation);
-});
+    case PRODUCT_IDS.IDPAY_MERCHANT:
+      return mockedCategories.product['prod-idpay-merchant']?.merchantDetails;
 
-test('Test: Successfull complete onboarding request of AOO party for product prod-interop', async () => {
-  renderComponent(PRODUCT_IDS.INTEROP);
-  await executeStepInstitutionType(PRODUCT_IDS.INTEROP, 'PA');
-  await executeStepSearchParty(
-    PRODUCT_IDS.INTEROP,
-    'PA',
-    'denominazione aoo test 1',
-    'aooCode',
-    'A356E00'
-  );
-  await executeStepBillingData(
-    PRODUCT_IDS.INTEROP,
-    'PA',
-    true,
-    false,
-    'IPA',
-    'denominazione aoo test 1'
-  );
-  await executeStepAddManager(false);
-  await executeStepAddAdmin(true, false, false, false, false, false);
-  await verifySubmit(PRODUCT_IDS.INTEROP, 'PA', fetchWithLogsSpy, 'IPA', false, false, 'aooCode');
-  await executeGoHome(mockedLocation);
-});
-
-test('Test: Successfull complete onboarding request of UO party for product prod-io-sign', async () => {
-  renderComponent(PRODUCT_IDS.IO_SIGN);
-  await executeStepInstitutionType(PRODUCT_IDS.IO_SIGN, 'PA');
-  await executeStepSearchParty(
-    PRODUCT_IDS.IO_SIGN,
-    'PA',
-    'denominazione uo test 1',
-    'uoCode',
-    'A1B2C3'
-  );
-  await executeStepBillingData(
-    PRODUCT_IDS.IO_SIGN,
-    'PA',
-    false,
-    true,
-    'IPA',
-    'denominazione uo test 1'
-  );
-  await executeStepAddManager(false);
-  await executeStepAddAdmin(true, false, false, false, false, false);
-  await verifySubmit(PRODUCT_IDS.IO_SIGN, 'PA', fetchWithLogsSpy, 'IPA', true, false, 'uoCode');
-  await executeGoHome(mockedLocation);
-});
-
-test('Test: Successfull complete onboarding request of GSP party searching from IPA source for product prod-pagopa', async () => {
-  renderComponent(PRODUCT_IDS.PAGOPA);
-  await executeStepInstitutionType(PRODUCT_IDS.PAGOPA, 'GSP');
-  await executeStepSearchParty(
-    PRODUCT_IDS.PAGOPA,
-    'GSP',
-    'AGENCY X',
-    'businessName',
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    false,
-    false
-  );
-  await executeStepBillingData(PRODUCT_IDS.PAGOPA, 'GSP', false, false, 'IPA', 'AGENCY X');
-  await executeStepAddManager(false);
-  await executeStepAddAdmin(true, false, false, false, false, false);
-  await verifySubmit(PRODUCT_IDS.PAGOPA, 'GSP', fetchWithLogsSpy, 'IPA');
-  await executeGoHome(mockedLocation);
-});
-
-test('Test: Successfull complete onboarding request of GSP party without searching on IPA source for product prod-pagopa', async () => {
-  renderComponent(PRODUCT_IDS.PAGOPA);
-  await executeStepInstitutionType(PRODUCT_IDS.PAGOPA, 'GSP');
-  await executeStepSearchParty(
-    PRODUCT_IDS.PAGOPA,
-    'GSP',
-    'AGENCY X',
-    'businessName',
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    false,
-    true,
-    false
-  );
-  await executeStepBillingData(PRODUCT_IDS.PAGOPA, 'GSP', false, false, 'NO_IPA', 'AGENCY X');
-  await executeStepAdditionalInfo('NO_IPA');
-  await executeStepAddManager(false);
-  await executeStepAddAdmin(true, false, false, false, false, false);
-  await verifySubmit(PRODUCT_IDS.PAGOPA, 'GSP', fetchWithLogsSpy, 'NO_IPA');
-  await executeGoHome(mockedLocation);
-});
-
-test('Test: Successfull complete onboarding request of GPU for product prod-pagopa', async () => {
-  renderComponent(PRODUCT_IDS.PAGOPA);
-  await executeStepInstitutionType(PRODUCT_IDS.PAGOPA, 'GPU');
-  await executeStepBillingData(
-    PRODUCT_IDS.PAGOPA,
-    'GPU',
-    false,
-    false,
-    'NO_IPA',
-    'Mocked GPU name',
-    false
-  );
-  await executeStepAdditionalGpuInformations();
-  await executeStepAddManager(false);
-  await executeStepAddAdmin(true, false, false, false, false, false);
-  await verifySubmit(PRODUCT_IDS.PAGOPA, 'GPU', fetchWithLogsSpy, 'NO_IPA');
-  await executeGoHome(mockedLocation);
-});
-
-test('Test: Successfull complete onboarding request of PT for product prod-pagopa', async () => {
-  renderComponent(PRODUCT_IDS.PAGOPA);
-  await executeStepInstitutionType(PRODUCT_IDS.PAGOPA, 'PT');
-  await executeStepBillingData(PRODUCT_IDS.PAGOPA, 'PT', false, false, 'NO_IPA');
-  await executeStepAddAdmin(true, true, false, false, true, false);
-  await verifySubmit(PRODUCT_IDS.PAGOPA, 'PT', fetchWithLogsSpy, 'NO_IPA');
-  await executeGoHome(mockedLocation);
-});
-
-test('Test: Successfull complete onboarding request of PSP for product prod-pagopa', async () => {
-  renderComponent(PRODUCT_IDS.PAGOPA);
-  await executeStepInstitutionType(PRODUCT_IDS.PAGOPA, 'PSP');
-  await executeStepBillingData(PRODUCT_IDS.PAGOPA, 'PSP', false, false, 'NO_IPA');
-  await executeStepAddManager(false);
-  await executeStepAddAdmin(true, false, false, false, false, false);
-  await verifySubmit(PRODUCT_IDS.PAGOPA, 'PSP', fetchWithLogsSpy, 'NO_IPA');
-  await executeGoHome(mockedLocation);
-});
-
-test('Test: Successfull complete onboarding request of SA for product prod-interop search by business name', async () => {
-  renderComponent(PRODUCT_IDS.INTEROP);
-  await executeStepInstitutionType(PRODUCT_IDS.INTEROP, 'SA');
-  await executeStepSearchParty(
-    PRODUCT_IDS.INTEROP,
-    'SA',
-    'descriptionAnac1',
-    'businessName',
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    false,
-    true
-  );
-  await executeStepBillingData(PRODUCT_IDS.INTEROP, 'SA', false, false, 'ANAC', 'descriptionAnac1');
-  await executeStepAddManager(false);
-  await executeStepAddAdmin(true, false, false, false, false, false);
-  await verifySubmit(
-    PRODUCT_IDS.INTEROP,
-    'SA',
-    fetchWithLogsSpy,
-    'ANAC',
-    false,
-    false,
-    'businessName'
-  );
-  await executeGoHome(mockedLocation);
-});
-
-test('Test: Successfull complete onboarding request of SA for product prod-interop search by tax code', async () => {
-  renderComponent(PRODUCT_IDS.INTEROP);
-  await executeStepInstitutionType(PRODUCT_IDS.INTEROP, 'SA');
-  await executeStepSearchParty(
-    PRODUCT_IDS.INTEROP,
-    'SA',
-    'descriptionAnac1',
-    'taxCode',
-    undefined,
-    '12345678911',
-    undefined,
-    undefined,
-    undefined,
-    false,
-    true
-  );
-  await executeStepBillingData(PRODUCT_IDS.INTEROP, 'SA', false, false, 'ANAC', 'descriptionAnac1');
-  await executeStepAddManager(false);
-  await executeStepAddAdmin(true, false, false, false, false, false);
-  await verifySubmit(PRODUCT_IDS.INTEROP, 'SA', fetchWithLogsSpy, 'ANAC', false, false, 'taxCode');
-  await executeGoHome(mockedLocation);
-});
-
-test('Test: Successfull complete onboarding request of foreign AS for product prod-interop search by business name', async () => {
-  renderComponent(PRODUCT_IDS.INTEROP);
-  await executeStepInstitutionType(PRODUCT_IDS.INTEROP, 'AS');
-  await executeStepSearchParty(
-    PRODUCT_IDS.INTEROP,
-    'AS',
-    'mocked foreign insurance company 1',
-    'businessName',
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    false,
-    true
-  );
-  await executeStepBillingData(
-    PRODUCT_IDS.INTEROP,
-    'AS',
-    false,
-    false,
-    'IVASS',
-    'mocked foreign insurance company 1',
-    true
-  );
-  await executeStepAddManager(false);
-  await executeStepAddAdmin(true, false, false, false, false, false);
-  await verifySubmit(
-    PRODUCT_IDS.INTEROP,
-    'AS',
-    fetchWithLogsSpy,
-    'IVASS',
-    false,
-    false,
-    'businessName',
-    true
-  );
-  await executeGoHome(mockedLocation);
-});
-
-test('Test: Successfull complete onboarding request of italian AS for product prod-interop search by ivass code', async () => {
-  renderComponent(PRODUCT_IDS.INTEROP);
-  await executeStepInstitutionType(PRODUCT_IDS.INTEROP, 'AS');
-  await executeStepSearchParty(
-    PRODUCT_IDS.INTEROP,
-    'AS',
-    'mocked italian insurance company 1',
-    'ivassCode',
-    undefined,
-    undefined,
-    '232DC',
-    undefined,
-    undefined,
-    false,
-    undefined,
-    false
-  );
-  await executeStepBillingData(
-    PRODUCT_IDS.INTEROP,
-    'AS',
-    false,
-    false,
-    'IVASS',
-    'mocked italian insurance company 1',
-    false
-  );
-  await executeStepAddManager(false);
-  await executeStepAddAdmin(true, false, false, false, false, false);
-  await verifySubmit(
-    PRODUCT_IDS.INTEROP,
-    'AS',
-    fetchWithLogsSpy,
-    'IVASS',
-    false,
-    false,
-    'taxCode',
-    false
-  );
-  await executeGoHome(mockedLocation);
-});
-
-test('Test: Successfull complete onboarding request of italian AS without tax code for product prod-interop search by ivass code', async () => {
-  renderComponent(PRODUCT_IDS.INTEROP);
-  await executeStepInstitutionType(PRODUCT_IDS.INTEROP, 'AS');
-  await executeStepSearchParty(
-    PRODUCT_IDS.INTEROP,
-    'AS',
-    'mocked italian insurance company without taxcode',
-    'ivassCode',
-    undefined,
-    undefined,
-    '4431B',
-    undefined,
-    undefined,
-    false,
-    true
-  );
-  await executeStepBillingData(
-    PRODUCT_IDS.INTEROP,
-    'AS',
-    false,
-    false,
-    'IVASS',
-    'mocked italian insurance company without taxcode',
-    false,
-    false
-  );
-  await executeStepAddManager(false);
-  await executeStepAddAdmin(true, false, false, false, false, false);
-  await verifySubmit(
-    PRODUCT_IDS.INTEROP,
-    'AS',
-    fetchWithLogsSpy,
-    'IVASS',
-    false,
-    false,
-    'taxCode',
-    false,
-    false
-  );
-  await executeGoHome(mockedLocation);
-});
-
-test('Test: Successfull complete onboarding request of SCP for product prod-interop search with tax code', async () => {
-  await completeOnboardingPdndInfocamereRequest('SCP');
-});
-
-test('Test: Successfull complete onboarding request of PRV for product prod-interop search from infocamere with tax code', async () => {
-  await completeOnboardingPdndInfocamereRequest('PRV');
-});
-
-test('Test: Successfull complete onboarding request of PA aggregator party for prod-io search by business name', async () => {
-  renderComponent(PRODUCT_IDS.IO);
-  await executeStepInstitutionType(PRODUCT_IDS.IO, 'PA');
-  await executeStepSearchParty(
-    PRODUCT_IDS.IO,
-    'PA',
-    'AGENCY X',
-    'businessName',
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    false,
-    false,
-    true
-  );
-  await executeStepBillingData(PRODUCT_IDS.IO, 'PA', false, false, 'IPA', 'AGENCY X');
-  await executeStepAddManager(false);
-  await executeStepAddAdmin(true, false, true, false, false, false);
-  await executeStepUploadAggregates();
-  await verifySubmit(
-    PRODUCT_IDS.IO,
-    'PA',
-    fetchWithLogsSpy,
-    'IPA',
-    false,
-    false,
-    'businessName',
-    undefined,
-    true,
-    true,
-    false
-  );
-  await executeGoHome(mockedLocation);
-});
-
-test('Test: Successfull complete onboarding request of PRV for product prod-pagopa skipping step search party', async () => {
-  renderComponent(PRODUCT_IDS.PAGOPA);
-  await executeStepInstitutionType(PRODUCT_IDS.PAGOPA, 'oth');
-  await executeStepBillingData(
-    PRODUCT_IDS.PAGOPA,
-    'PRV',
-    false,
-    false,
-    undefined,
-    'Mocked private 1',
-    false
-  );
-  await executeStepAddManager(false);
-  await executeStepAddAdmin(true, false, false, false, false, false);
-  await verifySubmit(
-    PRODUCT_IDS.PAGOPA,
-    'PRV',
-    fetchWithLogsSpy,
-    undefined,
-    false,
-    false,
-    undefined,
-    false,
-    undefined,
-    undefined
-  );
-  await executeGoHome(mockedLocation);
-});
-
-test('Test: Successfull complete onboarding request of PRV party for prod-idpay-merchant search by taxCode', async () => {
-  renderComponent(PRODUCT_IDS.IDPAY_MERCHANT);
-  await executeStepInstitutionType(PRODUCT_IDS.IDPAY_MERCHANT, 'PRV');
-  await executeStepSearchParty(
-    PRODUCT_IDS.IDPAY_MERCHANT,
-    'PRV',
-    mockedPdndVisuraInfomacere[0].businessName,
-    'taxCode',
-    undefined,
-    '12345678901'
-  );
-  await executeStepBillingData(PRODUCT_IDS.IDPAY_MERCHANT, 'PRV', false, false, 'PDND_INFOCAMERE');
-  await executeStepAddManager(false);
-  await executeStepAddAdmin(true, false, false, false, false, false, PRODUCT_IDS.IDPAY_MERCHANT);
-  await verifySubmit(
-    PRODUCT_IDS.IDPAY_MERCHANT,
-    'PRV',
-    fetchWithLogsSpy,
-    'PDND_INFOCAMERE',
-    false,
-    false,
-    'taxCode'
-  );
-  await executeGoHome(mockedLocation);
-});
-
-test('Test: Successfull complete onboarding request of PRV party for prod-idpay-merchant search by reaCode', async () => {
-  renderComponent(PRODUCT_IDS.IDPAY_MERCHANT);
-  await executeStepInstitutionType(PRODUCT_IDS.IDPAY_MERCHANT, 'PRV');
-  await executeStepSearchParty(
-    PRODUCT_IDS.IDPAY_MERCHANT,
-    'PRV',
-    mockedPdndVisuraInfomacere[0].businessName,
-    'reaCode',
-    undefined,
-    undefined,
-    undefined,
-    'MI-123456'
-  );
-  await executeStepBillingData(PRODUCT_IDS.IDPAY_MERCHANT, 'PRV', false, false, 'PDND_INFOCAMERE');
-  await executeStepAddManager(false);
-  await executeStepAddAdmin(true, false, false, false, false, false, PRODUCT_IDS.IDPAY_MERCHANT);
-  await verifySubmit(
-    PRODUCT_IDS.IDPAY_MERCHANT,
-    'PRV',
-    fetchWithLogsSpy,
-    'PDND_INFOCAMERE',
-    false,
-    false,
-    'taxCode'
-  );
-  await executeGoHome(mockedLocation);
-});
-
-test('Test: Successfull complete onboarding request of PRV_PF party for prod-idpay-merchant search by personalTaxCode', async () => {
-  renderComponent(PRODUCT_IDS.IDPAY_MERCHANT);
-  await executeStepInstitutionType(PRODUCT_IDS.IDPAY_MERCHANT, 'PRV');
-  await executeStepSearchParty(
-    PRODUCT_IDS.IDPAY_MERCHANT,
-    'PRV',
-    mockedPdndVisuraInfomacere[5].businessName,
-    'personalTaxCode',
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    'LGGLGD80A01B354S'
-  );
-  await executeStepBillingData(
-    PRODUCT_IDS.IDPAY_MERCHANT,
-    'PRV_PF',
-    false,
-    false,
-    'PDND_INFOCAMERE',
-    undefined,
-    false,
-    false,
-    'personalTaxCode'
-  );
-  await executeStepAddManager(false);
-  await executeStepAddAdmin(true, false, false, false, false, false, PRODUCT_IDS.IDPAY_MERCHANT);
-  await verifySubmit(
-    PRODUCT_IDS.IDPAY_MERCHANT,
-    'PRV_PF',
-    fetchWithLogsSpy,
-    'PDND_INFOCAMERE',
-    false,
-    false,
-    'personalTaxCode'
-  );
-  await executeGoHome(mockedLocation);
-});
-
-test('Test: Error on submit onboarding request of PA party for prod-io search by business name', async () => {
-  renderComponent(PRODUCT_IDS.IO);
-  await executeStepInstitutionType(PRODUCT_IDS.IO, 'PA');
-  await executeStepSearchParty(PRODUCT_IDS.IO, 'PA', 'AGENCY ERROR', 'businessName');
-  await executeStepBillingData(PRODUCT_IDS.IO, 'PA', false, false, 'IPA', 'AGENCY ERROR');
-  await executeStepAddManager(false);
-  await executeStepAddAdmin(false, false, false, false, false, false);
-  await verifySubmit(PRODUCT_IDS.IO, 'PA', fetchWithLogsSpy, 'IPA', false, true);
-  await executeGoHome(mockedLocation);
-});
-
-test('Test: Party already onboarded for a product that allow add new user, so the link is available', async () => {
-  renderComponent(PRODUCT_IDS.PAGOPA);
-  await executeStepInstitutionType(PRODUCT_IDS.PAGOPA, 'PA');
-  await executeStepSearchParty(
-    PRODUCT_IDS.PAGOPA,
-    'PA',
-    'AGENCY ONBOARDED',
-    'businessName',
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    true
-  );
-  await waitFor(() => screen.getByText(/L’ente selezionato ha già aderito/));
-});
-
-test('Test: Error retrieving onboarding info', async () => {
-  renderComponent(PRODUCT_IDS.PAGOPA);
-  await executeStepInstitutionType(PRODUCT_IDS.PAGOPA, 'PA');
-  await executeStepSearchParty(
-    PRODUCT_IDS.PAGOPA,
-    'PA',
-    'AGENCY INFO ERROR',
-    'businessName',
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    true
-  );
-  await waitFor(() => screen.getByText('Qualcosa è andato storto'));
-  await executeGoHome(mockedLocation);
-});
-
-test('Test: Invalid productId', async () => {
-  renderComponent('error');
-  await waitFor(() => expect(fetchWithLogsSpy).toHaveBeenCalledTimes(2));
-  await waitFor(() => {
-    expect(screen.getByText('Impossibile individuare il prodotto desiderato')).toBeInTheDocument();
-  });
-});
-
-test('Test: Exiting during flow with unload event', async () => {
-  renderComponent(PRODUCT_IDS.PAGOPA);
-  await executeStepInstitutionType(PRODUCT_IDS.PAGOPA, 'PA');
-  await executeStepSearchParty(PRODUCT_IDS.PAGOPA, 'PA', 'AGENCY X', 'businessName');
-  const event = new Event('beforeunload');
-  window.dispatchEvent(event);
-  await waitFor(
-    () =>
-      (event.returnValue as unknown as string) ===
-      "Warning!\n\nNavigating away from this page will delete your text if you haven't already saved it."
-  );
-});
-
-test('Test: Exiting during flow with logout', async () => {
-  renderComponent(PRODUCT_IDS.IO);
-  await executeStepInstitutionType(PRODUCT_IDS.IO, 'PA');
-
-  await executeStepSearchParty(PRODUCT_IDS.IO, 'PA', 'AGENCY X', 'businessName');
-
-  expect(screen.queryByText('Vuoi davvero uscire?')).toBeNull();
-
-  const logoutButton = screen.getByText('LOGOUT');
-  await performLogout(logoutButton);
-
-  await performLogout(logoutButton);
-  fireEvent.click(screen.getByRole('button', { name: 'Annulla' }));
-  await waitFor(() => expect(screen.queryByText('Vuoi davvero uscire?')).toBeNull());
-
-  await performLogout(logoutButton);
-  fireEvent.click(screen.getByRole('button', { name: 'Esci' }));
-  await waitFor(() => expect(mockedLocation.assign).toHaveBeenCalledWith(ENV.URL_FE.LOGOUT));
-});
-
-test('Test: Search trying to type invalid characters', async () => {
-  renderComponent(PRODUCT_IDS.PAGOPA);
-  await executeStepInstitutionType(PRODUCT_IDS.PAGOPA, 'PA');
-  const inputPartyName = document.getElementById('Parties') as HTMLElement;
-
-  expect(inputPartyName).toBeTruthy();
-  fireEvent.change(inputPartyName, { target: { value: 'AGENCY X ())!/!/££!' } });
-
-  await waitFor(() => screen.getByText('AGENCY X'));
-});
-
-test('Test: RecipientCode input client validation', async () => {
-  renderComponent(PRODUCT_IDS.PAGOPA);
-  await executeStepInstitutionType(PRODUCT_IDS.PAGOPA, 'PA');
-  await executeStepSearchParty(PRODUCT_IDS.PAGOPA, 'PA', 'AGENCY X', 'businessName');
-  const confirmButtonEnabled = await waitFor(() =>
-    screen.getByRole('button', { name: 'Continua' })
-  );
-  fireEvent.click(confirmButtonEnabled);
-
-  const recipientCodeInput = document.getElementById('recipientCode') as HTMLInputElement;
-
-  fireEvent.input(recipientCodeInput, { target: { value: 'abc123!@#' } });
-  expect(recipientCodeInput.value).toBe('ABC123');
-
-  fireEvent.input(recipientCodeInput, { target: { value: '!@#$%^&*' } });
-  expect(recipientCodeInput.value).toBe('');
-
-  fireEvent.input(recipientCodeInput, { target: { value: 'ab@c1#2' } });
-  expect(recipientCodeInput.value).toBe('ABC12');
-
-  fireEvent.input(recipientCodeInput, { target: { value: 'AB123CD' } });
-  expect(recipientCodeInput.value).toBe('AB123CD');
-});
-
-const completeOnboardingPdndInfocamereRequest = async (institutionType: InstitutionType) => {
-  renderComponent(PRODUCT_IDS.INTEROP);
-  await executeStepInstitutionType(PRODUCT_IDS.INTEROP, institutionType);
-  await executeStepSearchParty(
-    PRODUCT_IDS.INTEROP,
-    institutionType,
-    'Mocked business 1',
-    'taxCode',
-    undefined,
-    '00112233445',
-    undefined,
-    undefined,
-    undefined,
-    false,
-    true
-  );
-  await executeStepBillingData(
-    PRODUCT_IDS.INTEROP,
-    institutionType,
-    false,
-    false,
-    'PDND_INFOCAMERE',
-    'Mocked business 1',
-    false
-  );
-  await executeStepAddManager(false);
-  await executeStepAddAdmin(true, false, false, false, false, false);
-  await verifySubmit(
-    PRODUCT_IDS.INTEROP,
-    institutionType,
-    fetchWithLogsSpy,
-    'PDND_INFOCAMERE',
-    false,
-    false,
-    'taxCode',
-    false
-  );
-  await executeGoHome(mockedLocation);
+    case PRODUCT_IDS.INTEROP:
+      if (isConsolidatedEconomicAccountCompany(institutionType as InstitutionType)) {
+        return mockedCategories.product['prod-interop']?.ipa.SCEC;
+      } else if (isPublicAdministration(institutionType as InstitutionType)) {
+        return mockedCategories.product['prod-interop']?.ipa.PA;
+      } else if (isGlobalServiceProvider(institutionType as InstitutionType)) {
+        return mockedCategories.product.default?.ipa.GSP;
+      } else {
+        return mockedCategories.product.default?.ipa.PA;
+      }
+    default:
+      const defaultIpa = mockedCategories.product.default?.ipa;
+      return isGlobalServiceProvider(institutionType as InstitutionType)
+        ? defaultIpa?.GSP
+        : defaultIpa?.PA;
+  }
 };
 
-const executeStepInstitutionType = async (productSelected: string, institutionType: string) => {
+export const executeStepInstitutionType = async (
+  productSelected: string,
+  institutionType: string
+) => {
   if (
     productSelected !== PRODUCT_IDS.SEND &&
     productSelected !== PRODUCT_IDS.IDPAY &&
@@ -858,7 +117,7 @@ const executeStepInstitutionType = async (productSelected: string, institutionTy
     screen.getByText(/Indica il tipo di ente che aderirà a/);
 
     await waitFor(() => {
-      fillInstitutionTypeCheckbox(institutionType);
+      fillInstitutionTypeCheckbox(institutionType, productSelected);
 
       const confirmButtonEnabled = screen.getByText('Continua');
 
@@ -875,11 +134,12 @@ const executeStepInstitutionType = async (productSelected: string, institutionTy
   }
 };
 
-const executeStepSearchParty = async (
+export const executeStepSearchParty = async (
   productId: string,
   institutionType: string,
   partyName: string,
   typeOfSearch: Search,
+  fetchWithLogsSpy: MockInstance,
   subUnitCode?: string,
   taxCode?: string,
   ivassCode?: string,
@@ -1163,7 +423,7 @@ const executeStepSearchParty = async (
   }
 };
 
-const executeStepBillingData = async (
+export const executeStepBillingData = async (
   productId: string,
   institutionType: string,
   isAoo: boolean = false,
@@ -1336,7 +596,7 @@ const executeStepBillingData = async (
   fireEvent.click(confirmButton);
 };
 
-const executeStepAdditionalInfo = async (from: 'IPA' | 'NO_IPA' = 'IPA') => {
+export const executeStepAdditionalInfo = async (from: 'IPA' | 'NO_IPA' = 'IPA') => {
   console.log('Testing step additional informations..');
 
   await waitFor(() =>
@@ -1399,7 +659,6 @@ const executeStepAdditionalInfo = async (from: 'IPA' | 'NO_IPA' = 'IPA') => {
     expect(isFromIPAYesInput).not.toBeChecked();
     expect(isFromIPANoInput).toBeChecked();
 
-    // Test click su isFromIPA solo se non è disabilitato
     fireEvent.click(isFromIPAYesInput);
     expect(isFromIPAYesInput).toBeChecked();
     fireEvent.click(isFromIPANoInput);
@@ -1473,7 +732,7 @@ const executeStepAdditionalInfo = async (from: 'IPA' | 'NO_IPA' = 'IPA') => {
   fireEvent.click(continueButton);
 };
 
-const executeStepAdditionalGpuInformations = async () => {
+export const executeStepAdditionalGpuInformations = async () => {
   console.log('Testing step additional gpu informations...');
 
   await waitFor(() =>
@@ -1514,7 +773,6 @@ const executeStepAdditionalGpuInformations = async () => {
   fireEvent.click(isPartyProvidingAServiceTrue);
   fireEvent.click(longTermPaymentsTrue);
 
-  // Change di tutti i vari checkbox
   fireEvent.click(manager);
   fireEvent.click(managerAuthorized);
   fireEvent.click(managerEligible);
@@ -1529,14 +787,11 @@ const executeStepAdditionalGpuInformations = async () => {
 
   expect(continueButton).not.toBeDisabled();
 
-  // Casistica di controllo validazione campi
   fireEvent.click(continueButton);
 
-  // Pulizia validazione campi
   fireEvent.click(isPartyRegisteredFalse);
   fireEvent.click(isPartyProvidingAServiceFalse);
 
-  // Riabilitazione campi di testo per effetturare il change
   fireEvent.click(isPartyRegisteredTrue);
   fireEvent.click(isPartyProvidingAServiceTrue);
 
@@ -1571,7 +826,7 @@ const executeStepAdditionalGpuInformations = async () => {
   fireEvent.click(continueButton);
 };
 
-const executeStepUploadAggregates = async () => {
+export const executeStepUploadAggregates = async (aggregatesCsv: File) => {
   console.log('Testing step upload aggregates..');
 
   await waitFor(() => screen.getByText('Indica i soggetti aggregati per IO'));

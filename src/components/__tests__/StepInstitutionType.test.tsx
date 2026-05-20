@@ -2,7 +2,7 @@ import { cleanup, screen, waitFor } from '@testing-library/react';import { expec
 import { mockedProducts } from '../../lib/__mocks__/mockApiRequests';
 import '../../locale';
 import { PRODUCT_IDS } from '../../utils/constants';
-import { renderComponentWithProviders } from '../../utils/test-utils';
+import { renderComponentWithProviders } from '../../utils/test/test-utils';
 import StepInstitutionType from '../steps/StepInstitutionType';
 ;
 
