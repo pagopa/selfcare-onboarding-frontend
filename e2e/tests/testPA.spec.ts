@@ -140,3 +140,21 @@ test('Test Success onboarding request for product prod-pn and institutionType PA
     PRODUCT_IDS_TEST_E2E.SEND
   );
 });
+
+test('Test Success onboarding request for product prod-ced and institutionType PA', async ({
+  page,
+}) => {
+  await page.goto(`${BASE_URL_ONBOARDING}/prod-ced`);
+  await stepInstitutionType(page, 'Pubblica Amministrazione');
+  await stepSelectPartyByCF(page, '97187780826');
+  await stepFormData(page, PRODUCT_IDS_TEST_E2E.CED, 'PA');
+  await stepAddManager(page);
+  await stepAddAdmin(page, true);
+  await stepCompleteOnboarding(
+    page,
+    '97187780826',
+    FILE_MOCK_PDF_CONTRACT.PA,
+    PRODUCT_IDS_TEST_E2E.CED
+  );
+});
+
