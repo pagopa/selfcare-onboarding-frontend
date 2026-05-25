@@ -238,7 +238,7 @@ export function StepAddManager({
                 sx={{
                   alignSelf: 'center',
                   '.MuiSvgIcon-root': { color: theme.palette.primary.main },
-                  padding: 2,
+                  padding: 1,
                 }}
               />
             </Grid>

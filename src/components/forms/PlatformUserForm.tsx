@@ -311,7 +311,7 @@ export const PlatformUserForm = ({
     errors.filter((e) => e.startsWith(prefixErrorCode)).map((e) => e.replace(prefixErrorCode, ''));
 
   return (
-    <>
+    <Grid container xs={12} spacing={2} mb={3}>
       {isExtraDelegate && delegateId && buildRemoveDelegateForm && (
         <Grid container xs={12} pb={3} alignItems="center" width="100%">
           <Grid item xs={6}>
@@ -337,7 +337,7 @@ export const PlatformUserForm = ({
           </Grid>
         </Grid>
       )}
-      <Grid container spacing={2} mb="-16px">
+      <Grid container xs={12} spacing={2} mb="-16px">
         {fields(productId, addUserFlow).map(
           ({
             id,
@@ -406,6 +406,6 @@ export const PlatformUserForm = ({
           }
         )}
       </Grid>
-    </>
+    </Grid>
   );
 };
