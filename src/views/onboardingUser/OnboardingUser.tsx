@@ -18,7 +18,6 @@ import { LoadingOverlay } from '../../components/modals/LoadingOverlay';
 import { MessageNoAction } from '../../components/shared/MessageNoAction';
 import { StepAddManager } from '../../components/steps/StepAddManager';
 import { withLogin } from '../../components/withLogin';
-import { useOnboardingControllers } from '../../hooks/useOnboardingControllers';
 import { HeaderContext, UserContext } from '../../lib/context';
 import { OnboardingFormData } from '../../model/OnboardingFormData';
 import { ProductResource } from '../../model/ProductResource';
@@ -27,6 +26,7 @@ import { ENV } from '../../utils/env';
 import { selected2OnboardingData } from '../../utils/selected2OnboardingData';
 import { unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
 import { StepAddAdmin } from '../onboardingProduct/components/StepAddAdmin';
+import { isTechPartner } from '../../utils/institutionTypeUtils';
 import StepSearchOnboardedParty from './components/StepSearchOnboardedParty';
 import { StepSelectProduct } from './components/StepSelectProduct';
 
@@ -48,12 +48,6 @@ function OnboardingUserComponent() {
   const [openExitModal, setOpenExitModal] = useState(false);
   const { setOnExit } = useContext(HeaderContext);
   const { setRequiredLogin } = useContext(UserContext);
-  const controllers = useOnboardingControllers({
-    institutionType,
-    productId: selectedProduct?.id,
-    origin,
-    onboardingFormData,
-  });
 
   const forwardWithData = (newFormData: Partial<FormData>) => {
     if (formData) {
@@ -187,7 +181,7 @@ function OnboardingUserComponent() {
           onboardingFormData,
           selectedParty,
           institutionType,
-          isTechPartner: controllers.isTechPartner,
+          isTechPartner: isTechPartner(institutionType),
           forward: (newFormData: Partial<FormData>) => {
             trackEvent('ONBOARDING_ADD_MANAGER', {
               request_id: requestId,
@@ -206,7 +200,7 @@ function OnboardingUserComponent() {
           externalInstitutionId: selectedParty?.externalId ?? '',
           addUserFlow: true,
           product: selectedProduct,
-          legal: controllers.isTechPartner ? undefined : (formData as any)?.users[0],
+          legal: isTechPartner(institutionType) ? undefined : (formData as any)?.users[0],
           partyName: selectedParty?.codiceUniAoo
             ? selectedParty.denominazioneAoo
             : selectedParty?.codiceUniUo
@@ -214,7 +208,7 @@ function OnboardingUserComponent() {
               : selectedParty?.businessName
                 ? selectedParty.businessName
                 : (selectedParty?.description ?? ''),
-          isTechPartner: controllers.isTechPartner,
+          isTechPartner: isTechPartner(institutionType),
           forward: (newFormData: Partial<FormData>) => {
             const users = ((newFormData as any).users as Array<UserOnCreate>).map((u) => ({
               ...u,

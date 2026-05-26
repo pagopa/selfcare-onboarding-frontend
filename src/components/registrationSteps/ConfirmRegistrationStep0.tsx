@@ -6,49 +6,40 @@ import DownloadIcon from '@mui/icons-material/Download';
 import { SessionModal } from '@pagopa/selfcare-common-frontend/lib';
 import { useState } from 'react';
 import { storageTokenOps } from '@pagopa/selfcare-common-frontend/lib/utils/storage';
-import { ENV } from '../../utils/env';
+import { API } from '../../utils/constants';
+import { fileFromReader } from '../../utils/formatting-utils';
 
 type Props = {
   onboardingId: string | undefined;
+  fileName?: string;
   translationKeyValue: string;
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
   forward: () => void;
 };
-export function ConfirmRegistrationStep0({ onboardingId, translationKeyValue, forward }: Props) {
+export function ConfirmRegistrationStep0({
+  onboardingId,
+  fileName,
+  translationKeyValue,
+  setLoading,
+  forward,
+}: Props) {
   const { t } = useTranslation();
   const theme = useTheme();
   const [openModal, setOpenModal] = useState<boolean>(false);
-
   const onForwardAction = () => {
     forward();
   };
 
-  const fileFromReader = async (
-    reader: ReadableStreamDefaultReader<Uint8Array> | undefined
-  ): Promise<string> => {
-    const stream = new ReadableStream({
-      start(controller) {
-        return pump();
-        function pump(): Promise<any> | undefined {
-          return reader?.read().then(({ done, value }) => {
-            if (done) {
-              controller.close();
-              return;
-            }
-            controller.enqueue(value);
-            return pump();
-          });
-        }
-      },
-    });
-    const response = new Response(stream);
-
-    const blob = await response.blob();
-    return URL.createObjectURL(blob);
-  };
-
-  const getContract = () => {
+  const getContract = (onboardingId: string, documentName?: string) => {
+    setLoading(true);
     const sessionToken = storageTokenOps.read();
-    fetch(ENV.URL_API.ONBOARDING_V2 + `/v2/tokens/${onboardingId}/contract`, {
+    const url =
+      translationKeyValue === 'attachments'
+        ? API.ONBOARDING_GET_TEMPLATE_ATTACHMENT.URL.replace('{{onboardingId}}', onboardingId)
+            .replace('{{filename}}', documentName ?? '')
+        : API.ONBOARDING_GET_CONTRACT.URL.replace('{{onboardingId}}', onboardingId);
+
+    fetch(url, {
       headers: {
         accept: '*/*',
         'accept-language': 'it-IT,it;q=0.9,en-US;q=0.8,en;q=0.7',
@@ -60,8 +51,10 @@ export function ConfirmRegistrationStep0({ onboardingId, translationKeyValue, fo
       .then((response) => {
         const contentDisposition = response.headers.get('content-disposition');
         const matchedIndex = contentDisposition?.indexOf('=') as number;
-        const fileName =
+        const fileNameFromHeader =
           contentDisposition?.substring(matchedIndex + 1) ?? 'Accordo_di_adesione.pdf';
+        const finalFileName =
+          translationKeyValue === 'attachments' ? `${documentName}.pdf` : fileNameFromHeader;
         return response.blob().then((blob) => {
           const reader = blob.stream().getReader();
           fileFromReader(reader)
@@ -70,27 +63,41 @@ export function ConfirmRegistrationStep0({ onboardingId, translationKeyValue, fo
               // eslint-disable-next-line functional/immutable-data
               link.href = url;
               // eslint-disable-next-line functional/immutable-data
-              link.download = fileName;
+              link.download = finalFileName;
               document.body.appendChild(link);
               link.click();
+              setLoading(false);
             })
             .catch(() => {
               setOpenModal(true);
+              setLoading(false);
             });
         });
       })
       .catch(() => {
         setOpenModal(true);
+        setLoading(false);
       });
+  };
+
+  const onClickDownload = (onboardingId: string | undefined) => {
+    if (onboardingId) {
+      if (translationKeyValue === 'attachments' && fileName) {
+        return getContract(onboardingId, fileName);
+      } else {
+        return getContract(onboardingId);
+      }
+    }
   };
 
   return (
     <>
-      <Grid container alignContent="center" flexDirection="column">
+      <Grid container alignContent="center" flexDirection="column" sx={{ width: '100%' }}>
         <Card
           sx={{
             marginBottom: 4,
-            width: '627px',
+            maxWidth: '627px',
+            width: '100%',
             borderRadius: theme.spacing(2),
             boxShadow:
               '0px 8px 10px -5px rgba(0, 43, 85, 0.1), 0px 16px 24px 2px rgba(0, 43, 85, 0.05), 0px 6px 30px 5px rgba(0, 43, 85, 0.1)',
@@ -125,15 +132,19 @@ export function ConfirmRegistrationStep0({ onboardingId, translationKeyValue, fo
                   </Trans>
                 </Typography>
               </Grid>
-              <Grid item py={4}>
-                <Button fullWidth color="primary" variant="contained" onClick={getContract}>
+              <Grid item py={4} xs={12}>
+                <Button
+                  color="primary"
+                  variant="contained"
+                  onClick={() => onClickDownload(onboardingId)}
+                >
                   {t(
                     `confirmOnboarding.chooseOption.download.${translationKeyValue}.downloadContract`
                   )}
                   <DownloadIcon fontSize="small" sx={{ marginLeft: 1 }} />
                 </Button>
               </Grid>
-              <Grid item py={1}>
+              <Grid item py={1} xs={12}>
                 <Typography
                   sx={{
                     fontSize: '12px',
@@ -141,7 +152,9 @@ export function ConfirmRegistrationStep0({ onboardingId, translationKeyValue, fo
                     textAlign: 'center',
                   }}
                 >
-                  {t('confirmOnboarding.chooseOption.download.disclaimer')}
+                  {translationKeyValue === 'attachments'
+                    ? t('confirmOnboarding.chooseOption.download.disclaimerAttachments')
+                    : t('confirmOnboarding.chooseOption.download.disclaimer')}
                 </Typography>
               </Grid>
             </Grid>
@@ -149,7 +162,8 @@ export function ConfirmRegistrationStep0({ onboardingId, translationKeyValue, fo
         </Card>
         <Card
           sx={{
-            width: '627px',
+            maxWidth: '627px',
+            width: '100%',
             borderRadius: theme.spacing(2),
             boxShadow:
               '0px 8px 10px -5px rgba(0, 43, 85, 0.1), 0px 16px 24px 2px rgba(0, 43, 85, 0.05), 0px 6px 30px 5px rgba(0, 43, 85, 0.1)',

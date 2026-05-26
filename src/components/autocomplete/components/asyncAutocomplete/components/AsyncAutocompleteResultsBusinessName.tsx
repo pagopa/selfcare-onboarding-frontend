@@ -1,5 +1,6 @@
 import { Box, styled } from '@mui/system';
-import { PartyAccountItemButton } from '@pagopa/mui-italia/dist/components/PartyAccountItemButton';
+import { PartyAccountItemButton } from '@pagopa/mui-italia/components/PartyAccountItemButton';
+import { useTranslation } from 'react-i18next';
 
 const CustomBox = styled(Box)({
   /* width */
@@ -40,14 +41,16 @@ export default function AsyncAutocompleteResultsBusinessName({
   getOptionLabel,
   getOptionKey,
 }: Props) {
+  const { t } = useTranslation();
   return (
-    <CustomBox my={2} width="90%" maxHeight="200px" overflow="auto">
+    <CustomBox my={2} width="90%" maxHeight="200px" overflow="auto" role="list" aria-live="polite" aria-label={t('asyncAutocomplete.searchResultsLabel')}>
       {!apiLoading &&
         options.map((option) => (
           <Box
             py={1}
             key={getOptionKey(option)}
             display="flex"
+            role="listitem"
             onKeyDownCapture={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
                 setSelected(option);
@@ -57,7 +60,7 @@ export default function AsyncAutocompleteResultsBusinessName({
           >
             <PartyAccountItemButton
               partyName={getOptionLabel(option)}
-              image={' '}
+              image={''}
               action={() => {
                 setSelected(option);
                 setOptions([]);

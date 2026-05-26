@@ -1,7 +1,8 @@
 import { useMemo } from 'react';
 import { InstitutionType } from '../../types';
 import { OnboardingFormData } from '../model/OnboardingFormData';
-import { canInvoice, PRODUCT_IDS } from '../utils/constants';
+import { canInvoice } from '../utils/constants';
+import { isPaymentServiceProvider, isPublicAdministration } from '../utils/institutionTypeUtils';
 
 interface OnboardingControllersParams {
   subProductId?: string;
@@ -15,21 +16,13 @@ interface OnboardingControllersParams {
 
 export interface OnboardingControllers {
   isPremium: boolean;
-  isPaymentServiceProvider: boolean;
-  isPdndPrivate: boolean;
-  isPrivateMerchant: boolean;
-  isInformationCompany: boolean;
   isInvoiceable: boolean;
   isForeignInsurance: boolean;
-  isProdFideiussioni: boolean;
   isDisabled: boolean;
   isCityEditable?: boolean;
   isVatRegistrated?: boolean;
   isFromIPA: boolean;
-  isContractingAuthority: boolean;
-  isInsuranceCompany: boolean;
   isAooUo: boolean;
-  isTechPartner?: boolean;
 }
 
 /**
@@ -52,57 +45,28 @@ export const useOnboardingControllers = (
 
   return useMemo(() => {
     const isPremium = !!subProductId;
-    const isPaymentServiceProvider = institutionType === 'PSP';
-    const isPdndPrivate = institutionType === 'PRV' && productId === PRODUCT_IDS.INTEROP;
-
-    const isPrivateMerchant =
-      (institutionType === 'PRV' || institutionType === 'PRV_PF') &&
-      productId === PRODUCT_IDS.IDPAY_MERCHANT;
-
-    const isInformationCompany =
-      origin !== 'IPA' &&
-      institutionType !== 'PRV' &&
-      institutionType !== 'PRV_PF' &&
-      (institutionType === 'GSP' || institutionType === 'SCP') &&
-      (productId === PRODUCT_IDS.IO ||
-        productId === PRODUCT_IDS.IO_SIGN ||
-        productId === PRODUCT_IDS.PAGOPA ||
-        productId === PRODUCT_IDS.INTEROP);
-
-    const isProdFideiussioni = productId?.startsWith(PRODUCT_IDS.FD) ?? false;
-
     const isInvoiceable = canInvoice(institutionType, productId);
-
     const isForeignInsurance = onboardingFormData?.registerType?.includes('Elenco II') ?? false;
 
     const isDisabled =
       isPremium ||
-      (origin === 'IPA' && institutionType !== 'PA' && !isPaymentServiceProvider) ||
-      institutionType === 'PA';
+      (origin === 'IPA' &&
+        !isPublicAdministration(institutionType) &&
+        !isPaymentServiceProvider(institutionType)) ||
+      isPublicAdministration(institutionType);
 
     const isFromIPA = origin === 'IPA';
-    const isContractingAuthority = institutionType === 'SA';
-    const isInsuranceCompany = institutionType === 'AS';
     const isAooUo = !!(onboardingFormData?.uoUniqueCode ?? onboardingFormData?.aooUniqueCode);
-    const isTechPartner = institutionType === 'PT';
 
     return {
       isPremium,
-      isPaymentServiceProvider,
-      isPdndPrivate,
-      isPrivateMerchant,
-      isInformationCompany,
       isInvoiceable,
       isForeignInsurance,
-      isProdFideiussioni,
       isDisabled,
       isCityEditable,
       isVatRegistrated,
       isFromIPA,
-      isContractingAuthority,
-      isInsuranceCompany,
       isAooUo,
-      isTechPartner
     };
   }, [
     subProductId,

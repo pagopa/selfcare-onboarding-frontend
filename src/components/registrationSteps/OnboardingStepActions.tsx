@@ -1,4 +1,4 @@
-import { Button, Grid } from '@mui/material';
+import { Button, Grid, useTheme } from '@mui/material';
 
 type ActionStep = {
   action?: () => void;
@@ -13,12 +13,18 @@ type ActionStepsProps = {
 };
 
 export function OnboardingStepActions({ forward, back, addUserFlow }: ActionStepsProps) {
+  const theme = useTheme();
   return (
     <Grid container justifyContent="center" spacing={2} mt={addUserFlow ? 2 : 0}>
       {back && (
         <Grid item>
           <Button
-            sx={{ width: '100%' }}
+            sx={{
+              width: '100%',
+              color: theme.palette.primary.dark,
+              borderColor: theme.palette.primary.dark,
+              '&:hover': { borderColor: theme.palette.primary.dark },
+            }}
             variant="outlined"
             onClick={back.action}
             disabled={back.disabled}

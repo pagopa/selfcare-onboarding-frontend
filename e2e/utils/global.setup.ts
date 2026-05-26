@@ -1,8 +1,8 @@
+/// <reference types="node" />
 import path from 'path';
 import { chromium } from '@playwright/test';
 
-export const isLocalMode =
-  process.env.REACT_APP_ENV === 'LOCAL_DEV' || process.env.NODE_ENV === 'test';
+export const isLocalMode = process.env.VITE_ENV === 'LOCAL_DEV' || process.env.NODE_ENV === 'test';
 
 async function globalSetup() {
   console.log(`GLOBAL SETUP: Starting in ${isLocalMode ? 'LOCAL/TEST' : 'DEV'} mode`);
@@ -33,26 +33,32 @@ async function globalSetup() {
     } else {
       await page.goto('https://dev.selfcare.pagopa.it', { timeout: 60000 });
 
+      try {
+        await page.getByRole('button', { name: 'Accetta tutti' }).click({ timeout: 5000 });
+      } catch {
+        // cookie banner not present, continue
+      }
+
       const spidButton = page.getByRole('button', { name: 'Entra con SPID' });
-      await spidButton.click({ timeout: 10000 });
+      await spidButton.click({ timeout: 20000 });
 
       await page.waitForURL('**/uat.oneid.pagopa.it/**', { timeout: 30000 });
       console.log(`GLOBAL SETUP: ✅ Reached OneID`);
 
-      await page.getByTestId('idp-button-https://validator.dev.oneid.pagopa.it/demo').click();
+      await page.click('[data-testid="idp-button-https://idp.uat.oneid.pagopa.it"]');
 
       await page.waitForFunction(() => document.querySelector('#username') !== null, {
         timeout: 30000,
       });
 
       await page.waitForSelector('#username', { state: 'visible', timeout: 10000 });
-      await page.locator('#username').fill('cleopatra');
+      await page.locator('#username').fill('s.palpatine');
 
       await page.waitForSelector('input[name="password"], input[type="password"]', {
         state: 'visible',
         timeout: 5000,
       });
-      await page.locator('input[name="password"], input[type="password"]').fill('password123');
+      await page.locator('input[name="password"], input[type="password"]').fill('test');
 
       const submitButton = page
         .locator(
@@ -65,21 +71,9 @@ async function globalSetup() {
         submitButton.click(),
       ]);
 
-      await page.waitForLoadState('networkidle', { timeout: 15000 });
+      await page.click('.mdc-button--unelevated > .mdc-button__ripple');
 
-      try {
-        await Promise.all([
-          page
-            .waitForURL(
-              (url) => url.toString().includes('dashboard') || url.toString().includes('selfcare'),
-              { timeout: 15000 }
-            )
-            .catch(() => {}),
-          page.getByRole('button', { name: 'Conferma' }).click(),
-        ]);
-      } catch (e) {
-        // Confirm button optional
-      }
+      await page.waitForLoadState('networkidle', { timeout: 15000 });
 
       await page.waitForURL('**/dashboard/**', {
         timeout: 60000,

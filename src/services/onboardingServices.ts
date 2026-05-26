@@ -18,6 +18,14 @@ import { OnboardingFormData } from '../model/OnboardingFormData';
 import { ProductResource } from '../model/ProductResource';
 import { PRODUCT_IDS } from '../utils/constants';
 import { ENV } from '../utils/env';
+import {
+  isContractingAuthority,
+  isGlobalServiceProvider,
+  isIdpayMerchantProduct,
+  isInsuranceCompany,
+  isInteropProduct,
+  isPrivatePersonInstitution,
+} from '../utils/institutionTypeUtils';
 import { genericError } from '../views/onboardingProduct/components/StepVerifyOnboarding';
 
 const fetchVerifyOnboarding = async (
@@ -59,7 +67,7 @@ export const insertedPartyVerifyOnboarding = async (
       taxCode: onboardingFormData.taxCode ?? '',
       productId,
       subunitCode: onboardingFormData.uoUniqueCode ?? onboardingFormData.aooUniqueCode,
-      origin: institutionType === 'AS' ? 'IVASS' : undefined,
+      origin: isInsuranceCompany(institutionType) ? 'IVASS' : undefined,
       originId: onboardingFormData?.originId ?? undefined,
     },
     setRequiredLogin
@@ -107,8 +115,8 @@ export const verifyOnboarding = async (
       origin: onboardingFormData?.origin,
       originId: onboardingFormData?.originId,
       institutionType:
-        productId === PRODUCT_IDS.IDPAY_MERCHANT && institutionType === 'PRV_PF'
-          ? 'PRV_PF'
+        isIdpayMerchantProduct(productId) && isPrivatePersonInstitution(institutionType)
+          ? institutionType
           : undefined,
     },
     setRequiredLogin
@@ -181,14 +189,13 @@ export const getOnboardingData = async (
       billingData,
       result.institution.institutionType ?? institutionType,
       result.institution.id,
-      result.institution.assistanceContacts,
       result.institution.companyInformations,
+      result.institution.country,
       result.institution?.city
         ?.charAt(0)
         .toUpperCase()
         .concat(result.institution?.city.substring(1).toLowerCase().trim()),
       result.institution?.county,
-      result.institution.country,
       result.institution?.paymentServiceProvider,
       result.institution?.dataProtectionOfficer
     );
@@ -284,14 +291,15 @@ export const addUserRequest = async (
       data: {
         productId: selectedProduct?.id,
         institutionType: onboardingFormData?.institutionType ?? institutionType,
-        origin:
-          (onboardingFormData?.institutionType ?? institutionType) === 'SA'
-            ? 'ANAC'
-            : ['PSP', 'GPU', 'PT', 'PRV'].includes(
-                  (onboardingFormData?.institutionType ?? institutionType) as InstitutionType
-                ) && selectedProduct?.id !== PRODUCT_IDS.INTEROP
-              ? 'SELC'
-              : onboardingFormData?.origin,
+        origin: isContractingAuthority(
+          (onboardingFormData?.institutionType ?? institutionType) as InstitutionType
+        )
+          ? 'ANAC'
+          : ['PSP', 'GPU', 'PT', 'PRV'].includes(
+                (onboardingFormData?.institutionType ?? institutionType) as InstitutionType
+              ) && !isInteropProduct(selectedProduct?.id)
+            ? 'SELC'
+            : onboardingFormData?.origin,
         originId: onboardingFormData?.originId ?? onboardingFormData?.taxCode,
         subunitCode: selectedParty?.codiceUniUo
           ? selectedParty.codiceUniUo
@@ -376,8 +384,8 @@ export const getInstiutionTypesByProduct = async (
       return;
     }
 
-    const filterGspResponse = responseData.origins.filter(
-      (item: any) => item.institutionType === 'GSP'
+    const filterGspResponse = responseData.origins.filter((item: any) =>
+      isGlobalServiceProvider(item.institutionType)
     );
 
     if (filterGspResponse && filterGspResponse.length >= 2) {
@@ -388,7 +396,7 @@ export const getInstiutionTypesByProduct = async (
       };
 
       const nonGspOrigins = responseData.origins.filter(
-        (item: any) => item.institutionType !== 'GSP'
+        (item: any) => !isGlobalServiceProvider(item.institutionType)
       );
 
       const updatedInstitutionOrigins = [
@@ -401,6 +409,19 @@ export const getInstiutionTypesByProduct = async (
         ...responseData,
         origins: updatedInstitutionOrigins,
       });
+    } else if (productId === PRODUCT_IDS.CED) {
+      const institutionsResponseCed = {
+        institutionType: responseData.origins[1]?.institutionType,
+        origin: responseData.origins[1]?.origin,
+        labelKey: 'prv_ced',
+      };
+
+      const updatedResponse = {
+        ...responseData,
+        origins: [responseData.origins[0], institutionsResponseCed],
+      };
+
+      setRetrivedInstituionType(updatedResponse);
     } else {
       setRetrivedInstituionType(responseData);
     }

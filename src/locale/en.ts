@@ -11,6 +11,7 @@ export default {
     taxcode: 'Company Tax Code',
     originId: 'IVASS code',
     reaLabel: 'RM-123456',
+    searchResultsLabel: 'Institutions found',
   },
   partyAdvancedSelect: {
     advancedSearchLabel: 'Search by',

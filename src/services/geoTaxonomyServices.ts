@@ -10,6 +10,7 @@ import { UoData } from '../model/UoModel';
 import { mockedCountries } from '../lib/__mocks__/mockApiRequests';
 import { CountryResource } from '../model/CountryResource';
 import { ENV } from '../utils/env';
+import { isMockEnvironment } from '../utils/institutionTypeUtils';
 
 export const getCountriesFromGeotaxonomies = async (
   query: string,
@@ -116,7 +117,7 @@ export const getLocationFromIstatCode = async (
 export const getNationalCountries = async (
   setNationalCountries: Dispatch<SetStateAction<Array<CountryResource> | undefined>>
 ) => {
-  if (process.env.REACT_APP_MOCK_API === 'true') {
+  if (isMockEnvironment()) {
     const countriesWithoutIta = mockedCountries.filter(
       (cm: CountryResource) => cm.alpha_2 !== 'IT'
     );

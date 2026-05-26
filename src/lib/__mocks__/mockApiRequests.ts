@@ -167,6 +167,13 @@ export const mockInstitutionTypeByProductId = (productId: string | undefined) =>
       return {
         origins: [{ institutionType: 'PRV', origin: 'SELC', labelKey: 'prv' }],
       };
+    case 'prod-ced':
+      return {
+        origins: [
+          { institutionType: 'PA', origin: 'IPA', labelKey: 'pa' },
+          { institutionType: 'PRV', origin: 'SELC', labelKey: 'prv_ced' },
+        ],
+      };
     default:
       return undefined;
   }
@@ -1110,7 +1117,7 @@ const mockedOnboardedParties: Array<OnboardedParty> = [
     taxCode: '00000000000',
   },
   {
-    id: '1',
+    id: '2',
     description: 'onboardedParty2',
     institutionType: 'PA',
     origin: 'IPA',
@@ -1118,6 +1125,34 @@ const mockedOnboardedParties: Array<OnboardedParty> = [
     productId: 'prod-io',
     taxCode: '00000000000',
     subunitCode: 'AAA111',
+  },
+  {
+    id: '3',
+    description: 'onboardedParty3',
+    institutionType: 'PRV_PF',
+    origin: 'PDND_INFOCAMERE',
+    originId: 'sdsdee',
+    productId: 'prod-idpay-merchant',
+    taxCode: 'RSSLCU80A01F205N',
+  },
+  {
+    id: '4',
+    description: 'onboardedParty4',
+    institutionType: 'PRV_PF',
+    origin: 'PDND_INFOCAMERE',
+    originId: 'sdsdee',
+    productId: 'prod-idpay-merchant',
+    taxCode: '12345678901',
+  },
+  {
+    id: '5',
+    description: 'onboardedPartyAoo',
+    institutionType: 'PA',
+    origin: 'IPA',
+    originId: 'sdsdee4',
+    productId: 'prod-io-sign',
+    taxCode: '92078570527',
+    subunitCode: 'A356E00',
   },
 ];
 
@@ -1197,6 +1232,11 @@ export const mockedProducts: Array<Product> = [
     title: 'PARI',
     status: statusActive,
   },
+  {
+    id: 'prod-ced',
+    title: 'Carta Europea della Disabilità',
+    status: statusActive,
+  },
 ];
 
 export const institutionTypes: Array<InstitutionType> = [
@@ -1208,6 +1248,7 @@ export const institutionTypes: Array<InstitutionType> = [
   'SA',
   'PSP',
   'PRV',
+  'PRV_PF',
 ];
 
 export const mockedInsuranceResource: InsuranceCompaniesResource = {
@@ -1594,11 +1635,14 @@ export async function mockFetch(
   }
 
   if (endpoint === 'ONBOARDING_GET_PARTY_FROM_CF') {
-    const matchedParty = mockedParties.find((p) => p.taxCode === endpointParams.id);
-
-    return new Promise((resolve) =>
-      resolve({ data: matchedParty, status: 200, statusText: '200' } as AxiosResponse)
-    );
+    if (endpointParams?.id === '00112233445') {
+      return notFoundError;
+    } else {
+      const matchedParty = mockedParties.find((p) => p.taxCode === endpointParams.id);
+      return new Promise((resolve) => {
+        resolve({ data: matchedParty, status: 200, statusText: '200' } as AxiosResponse);
+      });
+    }
   }
 
   if (endpoint === 'ONBOARDING_GET_PARTY_BY_CF_FROM_INFOCAMERE') {
@@ -1935,7 +1979,9 @@ export async function mockFetch(
   }
 
   if (endpoint === 'ONBOARDING_GET_INSTITUTIONS') {
-    const retrievedParty = mockedOnboardedParties.find((p) => p.taxCode === params.taxCode);
+    const retrievedParty = params.subunitCode
+      ? mockedOnboardedParties.find((p) => p.subunitCode === params.subunitCode)
+      : mockedOnboardedParties.find((p) => p.taxCode === params.taxCode);
 
     return new Promise((resolve) =>
       resolve({

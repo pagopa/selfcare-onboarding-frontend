@@ -73,18 +73,18 @@ jobs:
         continue-on-error: true
         env:
           CI: true
-          REACT_APP_ENV: development
+          VITE_ENV: development
           APIM_SUBSCRIPTION_KEY: ${{ steps.get-apim-key.outputs.APIM_KEY }}
-          REACT_APP_URL_API_APIM: ${{ secrets.REACT_APP_URL_API_APIM }}
+          VITE_URL_API_APIM: ${{ secrets.VITE_URL_API_APIM }}
         run: yarn test:e2e
 
       - name: Cleanup onboardings
         if: always()
         env:
           CI: true
-          REACT_APP_ENV: development
+          VITE_ENV: development
           APIM_SUBSCRIPTION_KEY: ${{ steps.get-apim-key.outputs.APIM_KEY }}
-          REACT_APP_URL_API_APIM: ${{ secrets.REACT_APP_URL_API_APIM }}
+          VITE_URL_API_APIM: ${{ secrets.VITE_URL_API_APIM }}
         run: |
           cd e2e
           yarn cleanup || echo "⚠️ Cleanup failed, but continuing..."

@@ -3,9 +3,30 @@
 // expect(element).toHaveTextContent(/react/i)
 // learn more: https://github.com/testing-library/jest-dom
 import '@testing-library/jest-dom';
-import '../src/locale';
+import { vi } from 'vitest';
+import i18n from 'i18next';
+import { initReactI18next } from 'react-i18next';
+import it from './locale/it';
+import en from './locale/en';
+import de from './locale/de';
+import fr from './locale/fr';
+import sl from './locale/sl';
+
+void i18n.use(initReactI18next).init({
+    resources: {
+        it: { translation: it },
+        en: { translation: en },
+        de: { translation: de },
+        fr: { translation: fr },
+        sl: { translation: sl },
+    },
+    lng: 'it',
+    fallbackLng: 'it',
+    initImmediate: false,
+    interpolation: { escapeValue: false },
+});
 
 beforeEach(() => {
-    jest.spyOn(console, 'error').mockImplementation(() => { });
-    jest.spyOn(console, 'warn').mockImplementation(() => { });
+    vi.spyOn(console, 'error').mockImplementation(() => { });
+    vi.spyOn(console, 'warn').mockImplementation(() => { });
 });

@@ -1,7 +1,7 @@
-import { Grid, Typography, Theme, Button } from '@mui/material';
+import { Grid, Typography, Theme, Link } from '@mui/material';
 import { Accept, DropEvent, FileRejection, useDropzone } from 'react-dropzone';
 import { Box } from '@mui/system';
-import { ReactComponent as CloudUpload } from '../../assets/cloud-upload.svg';
+import CloudUpload from '../../assets/cloud-upload.svg?react';
 import { FileUploadedPreview } from './FileUploadedPreview';
 
 type FileUploaderOption = {
@@ -43,12 +43,30 @@ export function FileUploader({
     <Grid
       {...dropzoneRootProps}
       onClick={() => {}}
+      tabIndex={-1}
       container
       direction="row"
       justifyItems="center"
       alignItems="center"
       justifyContent="center"
     >
+      <label
+        htmlFor="file-uploader"
+        aria-hidden={uploadedFiles.length > 0}
+        style={{
+          position: 'absolute',
+          width: '1px',
+          height: '1px',
+          padding: 0,
+          margin: '-1px',
+          overflow: 'hidden',
+          clip: 'rect(0,0,0,0)',
+          whiteSpace: 'nowrap',
+          borderWidth: 0,
+        }}
+      >
+        {title}
+      </label>
       <input id="file-uploader" {...getInputProps()} />
 
       {uploadedFiles && uploadedFiles.length > 0 ? (
@@ -89,18 +107,9 @@ export function FileUploader({
               >
                 {title}
               </Typography>
-              <Button
-                variant="outlined"
-                size="small"
-                sx={{
-                  marginTop: 1,
-                  background: theme.palette.primary.main,
-                  color: theme.palette.primary.contrastText,
-                }}
-                onClick={(dropzoneRootProps as any).onClick}
-              >
+              <Link component="button" variant="body2" onClick={(dropzoneRootProps as any).onClick}>
                 {descriptionLink}
-              </Button>
+              </Link>
             </Grid>
           </Box>
         </Box>

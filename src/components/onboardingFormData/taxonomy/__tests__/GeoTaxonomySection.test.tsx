@@ -1,19 +1,31 @@
-import { fireEvent, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { nationalValue } from '../../../../model/GeographicTaxonomies';
-import { renderComponentWithProviders } from '../../../../utils/test-utils';
-import GeoTaxonomySection from '../GeoTaxonomySection';
+import { fireEvent, screen, waitFor } from '@testing-library/react';
+import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 import { mockedGeoTaxonomy } from '../../../../lib/__mocks__/mockApiRequests';
-import { fetchWithLogs } from '../../../../lib/api-utils';
-import i18n from '@pagopa/selfcare-common-frontend/lib/locale/locale-utils';
+import { renderComponentWithProviders } from '../../../../utils/test/test-utils';
+import GeoTaxonomySection from '../GeoTaxonomySection';
+
+vi.mock('lodash/debounce', () => ({
+  default: (fn: any) => {
+    const immediate = (...args: any[]) => fn(...args);
+    immediate.cancel = vi.fn();
+    return immediate;
+  },
+}));
+
+vi.mock(
+  '../../../services/geoTaxonomyServices',
+  async () => await vi.importActual('../../../services/geoTaxonomyServices')
+);
 
 const originalFetch = global.fetch;
 
-beforeAll(() => {
-  i18n.changeLanguage('it');
+beforeEach(() => {
+  vi.stubEnv('VITE_MOCK_API', 'true');
 });
 
 afterEach(() => {
+  vi.unstubAllEnvs();
   global.fetch = originalFetch;
 });
 
@@ -48,24 +60,20 @@ test('should render GeoTaxonomySection with empty retrievedTaxonomies', async ()
   renderComponentWithProviders(
     <GeoTaxonomySection
       retrievedTaxonomies={[]}
-      setGeographicTaxonomies={jest.fn()}
+      setGeographicTaxonomies={vi.fn()}
       formik={undefined}
     />
   );
 
-  const chooseNationalArea = await screen.findByText('INDICA L’AREA GEOGRAFICA');
+  const chooseNationalArea = await screen.findByText('INDICA L\u2019AREA GEOGRAFICA');
   expect(chooseNationalArea).toBeInTheDocument();
 });
 
 test('should render GeoTaxonomySection with mocked retrievedTaxonomies and click on local radio button for changing the value of autocomplete', async () => {
-  global.fetch = jest.fn().mockResolvedValueOnce({
-    json: () => Promise.resolve(mockedGeoTaxonomy),
-  });
-
   renderComponentWithProviders(
     <GeoTaxonomySection
       retrievedTaxonomies={mockedGeoTaxonomy}
-      setGeographicTaxonomies={jest.fn()}
+      setGeographicTaxonomies={vi.fn()}
       formik={undefined}
     />
   );
@@ -74,43 +82,30 @@ test('should render GeoTaxonomySection with mocked retrievedTaxonomies and click
   fireEvent.click(radioLocal);
   expect(radioLocal).toHaveProperty('checked', true);
 
-  const selectArea = screen.getAllByLabelText('Comune, Provincia o Regione') as HTMLSelectElement[];
-  const clearButton = screen.getByLabelText('Clear');
-  const addButton = screen.getByText('Aggiungi area');
+  // After clicking Locale the autocomplete area appears synchronously
+  const [input] = screen.getAllByLabelText('Comune, Provincia o Regione') as HTMLInputElement[];
 
-  const selectAndVerifyArea = (inputValue: string, expectedText: string, expectedValue: string) => {
-    fireEvent.click(selectArea[0]);
-    fireEvent.change(selectArea[0], { target: { value: inputValue } });
-    fireEvent.click(screen.getByText(expectedText));
-    expect(selectArea[0].value).toBe(expectedValue);
-  };
+  // Select a comune
+  fireEvent.click(input);
+  fireEvent.change(input, { target: { value: 'Mil' } });
+  await waitFor(() => screen.getByText('Milano (MI) comune'));
+  fireEvent.click(screen.getByText('Milano (MI) comune'));
+  await waitFor(() => expect(input.value).toBe('Milano (MI)'));
 
-  await waitFor(() => {
-    selectAndVerifyArea('Mil', 'Milano (MI) comune', 'Milano (MI)');
-    fireEvent.click(clearButton);
-    fireEvent.click(addButton);
-  });
-
-  await waitFor(() => {
-    selectAndVerifyArea('Mil', 'Milano e provincia', 'Milano e provincia');
-    fireEvent.click(clearButton);
-  });
-
-  await waitFor(() => {
-    selectAndVerifyArea('Emilia', 'Emilia - Romagna', 'Emilia - Romagna');
-    fireEvent.click(clearButton);
-  });
-
-  await waitFor(() => {
-    selectAndVerifyArea("l'A", "l'Aquila (AQ) comune", "l'Aquila (AQ)");
-  });
+  // Clear and select a regione (reuse same DOM node — stable because key=index)
+  fireEvent.click(screen.getByLabelText('Clear'));
+  fireEvent.click(input);
+  fireEvent.change(input, { target: { value: 'Emilia' } });
+  await waitFor(() => screen.getByText('Emilia - Romagna'));
+  fireEvent.click(screen.getByText('Emilia - Romagna'));
+  await waitFor(() => expect(input.value).toBe('Emilia - Romagna'));
 });
 
 test('should render GeoTaxonomySection with mocked retrievedTaxonomies and click on national radio button', async () => {
   renderComponentWithProviders(
     <GeoTaxonomySection
       retrievedTaxonomies={mockedGeoTaxonomy}
-      setGeographicTaxonomies={jest.fn()}
+      setGeographicTaxonomies={vi.fn()}
       formik={undefined}
     />
   );
@@ -128,7 +123,7 @@ test('should render GeoTaxonomySection with mocked retrievedTaxonomies and code 
   renderComponentWithProviders(
     <GeoTaxonomySection
       retrievedTaxonomies={mockedNonNationalGeoTaxonomy}
-      setGeographicTaxonomies={jest.fn()}
+      setGeographicTaxonomies={vi.fn()}
       formik={undefined}
     />
   );

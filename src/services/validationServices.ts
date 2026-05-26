@@ -1,21 +1,22 @@
-import { trackEvent } from "@pagopa/selfcare-common-frontend/lib/services/analyticsService";
-import { AxiosError } from "axios";
-import { Dispatch, SetStateAction } from "react";
-import { InstitutionType, Problem, ProblemUserValidate, UserOnCreate } from "../../types";
-import { StepBillingDataHistoryState } from "../components/steps/StepOnboardingFormData";
-import { fetchWithLogs } from "../lib/api-utils";
-import { getFetchOutcome } from "../lib/error-utils";
+import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
+import { AxiosError } from 'axios';
+import { Dispatch, SetStateAction } from 'react';
+import { InstitutionType, Problem, ProblemUserValidate, UserOnCreate } from '../../types';
+import { StepBillingDataHistoryState } from '../components/steps/StepOnboardingFormData';
+import { fetchWithLogs } from '../lib/api-utils';
+import { getFetchOutcome } from '../lib/error-utils';
+import { isPublicAdministration } from '../utils/institutionTypeUtils';
 
 export const verifyVatNumber = async (
-    institutionType: InstitutionType,
-    externalInstitutionId: string,
-    formik: any,
-    stepHistoryState: StepBillingDataHistoryState,
-    setVatVerificationGenericError: Dispatch<SetStateAction<boolean>>,
-    setIsVatRegistrated: Dispatch<SetStateAction<boolean>>,
-    setOpenVatNumberErrorModal: Dispatch<SetStateAction<boolean>>,
-    setRequiredLogin: Dispatch<SetStateAction<boolean>>,
-    productId: string | undefined,
+  institutionType: InstitutionType,
+  externalInstitutionId: string,
+  formik: any,
+  stepHistoryState: StepBillingDataHistoryState,
+  setVatVerificationGenericError: Dispatch<SetStateAction<boolean>>,
+  setIsVatRegistrated: Dispatch<SetStateAction<boolean>>,
+  setOpenVatNumberErrorModal: Dispatch<SetStateAction<boolean>>,
+  setRequiredLogin: Dispatch<SetStateAction<boolean>>,
+  productId: string | undefined
 ) => {
   const onboardingStatus = await fetchWithLogs(
     {
@@ -24,7 +25,9 @@ export const verifyVatNumber = async (
     {
       method: 'HEAD',
       params: {
-        taxCode: institutionType === 'PA' ? externalInstitutionId : formik.values?.taxCode,
+        taxCode: isPublicAdministration(institutionType)
+          ? externalInstitutionId
+          : formik.values?.taxCode,
         productId,
         verifyType: 'EXTERNAL',
         vatNumber: stepHistoryState.isTaxCodeEquals2PIVA

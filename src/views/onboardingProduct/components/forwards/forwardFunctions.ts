@@ -1,13 +1,26 @@
 /* eslint-disable functional/immutable-data */
 /* eslint-disable functional/no-let */
 import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
+import { User } from '@pagopa/selfcare-common-frontend/lib/model/User';
 import { Dispatch, MutableRefObject, SetStateAction } from 'react';
-import { InstitutionType } from '../../../../../types';
+import { InstitutionType, UserOnCreate } from '../../../../../types';
 import { AdditionalGpuInformations } from '../../../../model/AdditionalGpuInformations';
 import { AdditionalData, AdditionalInformations } from '../../../../model/AdditionalInformations';
-import { OnboardingFormData } from '../../../../model/OnboardingFormData';
+import { OnboardingFormData, UserRequester } from '../../../../model/OnboardingFormData';
+import { AggregateInstitution } from '../../../../model/AggregateInstitution';
 import { PRODUCT_IDS } from '../../../../utils/constants';
 import { selected2OnboardingData } from '../../../../utils/selected2OnboardingData';
+import {
+  isCedProduct,
+  isConsolidatedEconomicAccountCompany,
+  isContractingAuthority,
+  isGlobalServiceProvider,
+  isInsuranceCompany,
+  isPagoPaProduct,
+  isPrivateInstitution,
+  isPublicAdministration,
+  isPublicServiceCompany,
+} from '../../../../utils/institutionTypeUtils';
 
 interface ForwardFunctionsParams {
   requestIdRef: MutableRefObject<string | undefined>;
@@ -29,6 +42,14 @@ interface ForwardFunctionsParams {
   setAdditionalInformations: Dispatch<SetStateAction<AdditionalInformations | undefined>>;
   setAdditionalGPUInformations: Dispatch<SetStateAction<AdditionalGpuInformations | undefined>>;
   setPendingForward: Dispatch<SetStateAction<{ data: Partial<FormData> } | null>>;
+  user: User | null;
+  onSubmit: (
+    userData?: Partial<FormData>,
+    aggregates?: Array<AggregateInstitution>,
+    updatedOnboardingFormData?: OnboardingFormData
+  ) => void;
+  aggregatesData: Array<AggregateInstitution> | undefined;
+  setAggregatesData: Dispatch<SetStateAction<Array<AggregateInstitution> | undefined>>;
 }
 
 export const createForwardFunctions = (params: ForwardFunctionsParams) => {
@@ -52,6 +73,10 @@ export const createForwardFunctions = (params: ForwardFunctionsParams) => {
     setAdditionalInformations,
     setAdditionalGPUInformations,
     setPendingForward,
+    user,
+    onSubmit,
+    aggregatesData,
+    setAggregatesData,
   } = params;
 
   const forwardWithData = (newFormData: Partial<FormData>) => {
@@ -74,7 +99,10 @@ export const createForwardFunctions = (params: ForwardFunctionsParams) => {
     });
     setInstitutionType(newInstitutionType);
 
-    if (newInstitutionType === 'PRV' && productId === PRODUCT_IDS.PAGOPA) {
+    if (
+      isPrivateInstitution(newInstitutionType as InstitutionType) &&
+      (isPagoPaProduct(productId) || isCedProduct(productId))
+    ) {
       selected2OnboardingData(null, undefined, newInstitutionType, productId);
       setOnboardingFormData(
         selected2OnboardingData(null, undefined, newInstitutionType, productId)
@@ -85,13 +113,13 @@ export const createForwardFunctions = (params: ForwardFunctionsParams) => {
     }
 
     if (
-      newInstitutionType !== 'GSP' &&
-      newInstitutionType !== 'PA' &&
-      newInstitutionType !== 'SA' &&
-      newInstitutionType !== 'AS' &&
-      newInstitutionType !== 'SCP' &&
-      newInstitutionType !== 'PRV' &&
-      newInstitutionType !== 'SCEC'
+      !isGlobalServiceProvider(newInstitutionType) &&
+      !isPublicAdministration(newInstitutionType) &&
+      !isContractingAuthority(newInstitutionType) &&
+      !isInsuranceCompany(newInstitutionType as InstitutionType) &&
+      !isPublicServiceCompany(newInstitutionType) &&
+      !isPrivateInstitution(newInstitutionType) &&
+      !isConsolidatedEconomicAccountCompany(newInstitutionType)
     ) {
       if (newInstitutionType !== institutionType) {
         setOnboardingFormData({
@@ -172,10 +200,14 @@ export const createForwardFunctions = (params: ForwardFunctionsParams) => {
     setOnboardingFormData(newOnboardingFormData);
     switch (institutionType) {
       case 'GSP':
-        if (productId === PRODUCT_IDS.PAGOPA) {
-          setActiveStep(activeStep + 2);
-        } else {
+        if (
+          (productId === PRODUCT_IDS.PAGOPA &&
+            (newOnboardingFormData?.origin || origin) === 'IPA') ||
+          (newOnboardingFormData?.origin || origin) === 'IPA'
+        ) {
           setActiveStep(activeStep + 3);
+        } else {
+          setActiveStep(activeStep + 2);
         }
         break;
       case 'GPU':
@@ -239,6 +271,45 @@ export const createForwardFunctions = (params: ForwardFunctionsParams) => {
     forward();
   };
 
+  const forwardFromManager = (newFormData: Partial<FormData>) => {
+    trackEvent('ONBOARDING_ADD_MANAGER', {
+      request_id: requestIdRef.current,
+      party_id: externalInstitutionId,
+      product_id: productId,
+    });
+    forwardWithData(newFormData);
+  };
+
+  const forwardFromAdmin = (newFormData: Partial<FormData> | undefined) => {
+    const userData = { ...formData, ...newFormData };
+    setFormData(userData);
+    if (onboardingFormData?.isAggregator) {
+      forward();
+    } else if ((userData as any)?.users?.every((u: UserOnCreate) => u?.taxCode !== user?.taxCode)) {
+      setActiveStep(activeStep + 2);
+    } else {
+      onSubmit(userData);
+    }
+  };
+
+  const forwardFromAggregator = (_: any, aggregates?: Array<AggregateInstitution>) => {
+    if ((formData as any)?.users?.every((u: UserOnCreate) => u.taxCode !== user?.taxCode)) {
+      setAggregatesData(aggregates);
+      forward();
+    } else {
+      onSubmit(undefined, aggregates);
+    }
+  };
+
+  const forwardFromApplicantEmail = (userRequester: UserRequester) => {
+    const updatedOnboardingFormData = {
+      ...onboardingFormData,
+      userRequester,
+    } as OnboardingFormData;
+    setOnboardingFormData(updatedOnboardingFormData);
+    onSubmit(undefined, aggregatesData, updatedOnboardingFormData);
+  };
+
   return {
     forwardWithData,
     forwardWithInstitutionType,
@@ -247,5 +318,9 @@ export const createForwardFunctions = (params: ForwardFunctionsParams) => {
     forwardWithAdditionalGSPInfo,
     forwardWithAdditionalGPUInfo,
     forwardWithOnboardingData,
+    forwardFromManager,
+    forwardFromAggregator,
+    forwardFromAdmin,
+    forwardFromApplicantEmail,
   };
 };

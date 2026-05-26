@@ -28,17 +28,18 @@ CONFIG.URL_FE.ASSISTANCE = window.location.pathname?.includes(PRODUCT_IDS.IDPAY_
   : ENV.URL_FE.ASSISTANCE;
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
+const AppTree = (
+  <Provider store={store}>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </ThemeProvider>
+  </Provider>
+);
 root.render(
-  <React.StrictMode>
-    <Provider store={store}>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      </ThemeProvider>
-    </Provider>
-  </React.StrictMode>
+  import.meta.env.DEV ? AppTree : <React.StrictMode>{AppTree}</React.StrictMode>
 );
 
 // If you want to start measuring performance in your app, pass a function

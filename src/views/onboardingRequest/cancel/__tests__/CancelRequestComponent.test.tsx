@@ -1,27 +1,23 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { ENV } from '../../../../utils/env';
-import CancelRequestPage from '../pages/CancelRequestPage';
+import { MockInstance, afterAll, beforeAll, beforeEach, expect, test, vi } from 'vitest';
 import '../../../../locale';
-import { buildAssistanceURI } from '@pagopa/selfcare-common-frontend/lib/services/assistanceService';
+import { ENV } from '../../../../utils/env';
 import CancelRequestComponent from '../CancelRequest';
-import i18n from '@pagopa/selfcare-common-frontend/lib/locale/locale-utils';
-import React from 'react';
+import CancelRequestPage from '../pages/CancelRequestPage';
 
-jest.mock('../../../../lib/api-utils');
+vi.mock('../../../../lib/api-utils');
 
-let fetchWithLogsSpy: jest.SpyInstance;
+let fetchWithLogsSpy: MockInstance;
 
-beforeAll(() => {
-  i18n.changeLanguage('it');
-});
-
-beforeEach(() => {
-  fetchWithLogsSpy = jest.spyOn(require('../../../../lib/api-utils'), 'fetchWithLogs');
+beforeEach(async () => {
+  const apiUtils = await import('../../../../lib/api-utils');
+  fetchWithLogsSpy = vi.spyOn(apiUtils, 'fetchWithLogs');
+  mockedLocation.assign.mockClear();
 });
 
 const oldWindowLocation = global.window.location;
 const mockedLocation = {
-  assign: jest.fn(),
+  assign: vi.fn(),
   pathname: '',
   origin: 'MOCKED_ORIGIN',
   search: '',
@@ -35,15 +31,11 @@ afterAll(() => {
   Object.defineProperty(window, 'location', { value: oldWindowLocation });
 });
 
-jest.mock('react-router-dom', () => ({
+vi.mock('react-router-dom', () => ({
   useHistory: () => ({
     location: mockedLocation,
-    replace: jest.fn(),
+    replace: vi.fn(),
   }),
-}));
-
-jest.mock('@pagopa/selfcare-common-frontend/lib/services/assistanceService', () => ({
-  buildAssistanceURI: jest.fn(),
 }));
 
 test("Test: The onboarding request can't be cancel because is not found (jwt queryparam is empty)", async () => {
@@ -52,21 +44,21 @@ test("Test: The onboarding request can't be cancel because is not found (jwt que
   render(<CancelRequestComponent />);
   await waitFor(() => screen.getByText('La pagina che cercavi non è disponibile'));
   const assistanceButton = screen.getByRole('button', {
-    name: 'Contatta l’assistenza',
+    name: 'Contatta l\u2019assistenza',
   });
 
   fireEvent.click(assistanceButton);
-  waitFor(() => expect(buildAssistanceURI).toHaveBeenCalledWith(ENV.ASSISTANCE.EMAIL));
+  await waitFor(() => expect(mockedLocation.assign).toHaveBeenCalledWith(ENV.URL_FE.ASSISTANCE));
 });
 
 test("Test: The onboarding request can't be cancel because is not found (not found the request jwt)", async () => {
   mockedLocation.search = 'jwt=wrongJwt';
   render(<CancelRequestComponent />);
   await waitFor(() => screen.getByText('La pagina che cercavi non è disponibile'));
-  const assistanceButton = screen.getByText('Contatta l’assistenza');
+  const assistanceButton = screen.getByText('Contatta l\u2019assistenza');
 
   fireEvent.click(assistanceButton);
-  waitFor(() => expect(buildAssistanceURI).toHaveBeenCalledWith(ENV.ASSISTANCE.EMAIL));
+  await waitFor(() => expect(mockedLocation.assign).toHaveBeenCalledWith(ENV.URL_FE.ASSISTANCE));
 });
 
 test("Test: The onboarding request can't be cancel because is already approved", async () => {
@@ -77,7 +69,14 @@ test("Test: The onboarding request can't be cancel because is already approved",
   const login = screen.getByText('Accedi');
 
   fireEvent.click(login);
-  waitFor(() => expect(buildAssistanceURI).toHaveBeenCalledWith(`${ENV.URL_FE.LOGIN}/login?onSuccess=`));
+  const expectedOnSuccess = encodeURIComponent(
+    mockedLocation.pathname + mockedLocation.search
+  );
+  await waitFor(() =>
+    expect(mockedLocation.assign).toHaveBeenCalledWith(
+      `${ENV.URL_FE.LOGIN}/login?onSuccess=${expectedOnSuccess}`
+    )
+  );
 });
 
 test("Test: The onboarding request can't be cancel because is expired", async () => {
@@ -88,7 +87,9 @@ test("Test: The onboarding request can't be cancel because is expired", async ()
   const login = screen.getByText('Torna alla home');
 
   fireEvent.click(login);
-  waitFor(() => expect(buildAssistanceURI).toHaveBeenCalledWith(ENV.URL_FE.LANDING));
+  await waitFor(() =>
+    expect(mockedLocation.assign).toHaveBeenCalledWith(ENV.URL_FE.LANDING)
+  );
 });
 
 test('Test: The jwt exist and the request is correctly retrieved, cancel onboarding request flow is started and correcly deleted', async () => {

@@ -1,5 +1,11 @@
 import { GeographicTaxonomy } from './GeographicTaxonomies';
 
+export type UserRequester = {
+  name: string;
+  surname: string;
+  email: string;
+};
+
 export type OnboardingFormData = {
   businessName: string;
   registeredOffice: string;
@@ -47,4 +53,5 @@ export type OnboardingFormData = {
   iban?: string;
   confirmIban?: string;
   holder?: string;
+  userRequester?: UserRequester;
 };
