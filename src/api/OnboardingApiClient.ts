@@ -5,13 +5,11 @@ import {
   extractResponse,
 } from '@pagopa/selfcare-common-frontend/lib/utils/api-utils';
 import { storageTokenOps } from '@pagopa/selfcare-common-frontend/lib/utils/storage';
-import { AxiosResponse } from 'axios';
-import { InstitutionType } from '../../types';
-import { fetchWithLogs } from '../lib/api-utils';
 import { store } from '../redux/store';
 import { ENV } from '../utils/env';
 import { WithDefaultsT, createClient } from './generated/onboarding/client';
-import { VerifyAggregatesResponse } from './generated/onboarding/VerifyAggregatesResponse';
+import { OnboardingRequestResource } from './generated/onboarding/OnboardingRequestResource';
+import { OnboardingVerify } from './generated/onboarding/OnboardingVerify';
 
 const withBearerAuth: WithDefaultsT<'bearerAuth'> = (wrappedOperation) => (params: any) => {
   const token = storageTokenOps.read();
@@ -22,7 +20,7 @@ const withBearerAuth: WithDefaultsT<'bearerAuth'> = (wrappedOperation) => (param
 };
 
 const apiClient = createClient({
-  baseUrl: ENV.URL_API.ONBOARDING,
+  baseUrl: ENV.URL_API.ONBOARDING_V2,
   basePath: '',
   fetchApi: buildFetchApi(),
   withDefaults: withBearerAuth,
@@ -42,30 +40,12 @@ const onRedirectToLogin = () =>
   );
 
 export const OnboardingApi = {
-  verifyAggregatesCsv: async (
-    aggregates: File,
-    productId: string,
-    institutionType?: InstitutionType
-  ): Promise<VerifyAggregatesResponse> => {
-    const formData = new FormData();
-    formData.append('aggregates', aggregates);
-
-    const response = await fetchWithLogs(
-      { endpoint: 'ONBOARDING_VERIFY_AGGREGATES' },
-      {
-        method: 'POST',
-        data: formData,
-        params: {
-          productId,
-          institutionType,
-        },
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      },
-      onRedirectToLogin
-    );
-
-    return extractResponse((response as AxiosResponse).data, 200, onRedirectToLogin);
+  retrieveOnboardingRequest: async (onboardingId: string): Promise<OnboardingRequestResource> => {
+    const result = await apiClient.retrieveOnboardingRequestUsingGET({ onboardingId });
+    return extractResponse(result, 200, onRedirectToLogin);
   },
+  verifyOnboarding: async (onboardingId: string): Promise<OnboardingVerify> => {
+  const result = await apiClient.verifyOnboardingUsingPOST({ onboardingId });
+  return extractResponse(result, 200, onRedirectToLogin);
+},
 };
