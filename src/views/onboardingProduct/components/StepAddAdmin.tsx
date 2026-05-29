@@ -50,7 +50,7 @@ export function StepAddAdmin({
   isAggregator,
   isAddApplicationEmail,
 }: Props) {
-  const { user, setRequiredLogin } = useContext(UserContext);
+  const { user } = useContext(UserContext);
   const [_loading, setLoading] = useState(true);
   const [peopleErrors, setPeopleErrors] = useState<UsersError>({});
   const [genericError, setGenericError] = useState<boolean>(false);
@@ -127,7 +127,6 @@ export function StepAddAdmin({
       prefix,
       () => validateUsers(index + 1, peopleErrors),
       (userId, errors) => onUserValidateError(userId, errors, index, peopleErrors),
-      () => setRequiredLogin(true),
       () => {},
       'ONBOARDING_ADD_DELEGATE'
     ).catch((reason) => reason);

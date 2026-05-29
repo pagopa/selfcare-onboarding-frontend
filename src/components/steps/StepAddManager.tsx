@@ -136,7 +136,6 @@ export function StepAddManager({
       prefix,
       onForwardAction,
       onUserValidateError,
-      () => setRequiredLogin(true),
       setLoading,
       subProduct ? 'ONBOARDING_PREMIUM_ADD_MANAGER' : 'ONBOARDING_ADD_MANAGER'
     ).catch((reason) => reason);

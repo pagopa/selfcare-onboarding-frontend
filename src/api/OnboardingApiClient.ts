@@ -45,7 +45,11 @@ export const OnboardingApi = {
     return extractResponse(result, 200, onRedirectToLogin);
   },
   verifyOnboarding: async (onboardingId: string): Promise<OnboardingVerify> => {
-  const result = await apiClient.verifyOnboardingUsingPOST({ onboardingId });
-  return extractResponse(result, 200, onRedirectToLogin);
-},
+    const result = await apiClient.verifyOnboardingUsingPOST({ onboardingId });
+    return extractResponse(result, 200, onRedirectToLogin);
+  },
+  userValidate: async (name: string, surname: string, taxCode: string): Promise<void> => {
+    const result = await apiClient.validateUsingPOST({ body: { name, surname, taxCode } });
+    return extractResponse(result, 204, onRedirectToLogin);
+  },
 };
