@@ -6219,9 +6219,7 @@ vite@7.0.0:
     fsevents "~2.3.3"
 
 vitest@^4.0.18:
-  version "4.0.18"
-  resolved "https://registry.yarnpkg.com/vitest/-/vitest-4.0.18.tgz#56f966353eca0b50f4df7540cd4350ca6d454a05"
-  integrity sha512-hOQuK7h0FGKgBAas7v0mSAsnvrIgAvWmRFjmzpJ7SwFHH3g1k2u37JtYwOwmEKhK6ZO3v9ggDBBm0La1LCK4uQ==
+  version "4.1.0"
   dependencies:
     "@vitest/expect" "4.0.18"
     "@vitest/mocker" "4.0.18"
