@@ -43,6 +43,6 @@ export const PartyRegistryProxyApi = {
     const result = await apiClient.retrieveGeoTaxonomiesByDescriptionUsingGET({
       description: query,
     });
-    return extractResponse(result, 200, onRedirectToLogin);
+    return extractResponse(result, 200, onRedirectToLogin, 401, 403, undefined);
   },
 };
