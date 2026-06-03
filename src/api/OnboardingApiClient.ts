@@ -52,4 +52,8 @@ export const OnboardingApi = {
     const result = await apiClient.validateUsingPOST({ body: { name, surname, taxCode } });
     return extractResponse(result, 204, onRedirectToLogin);
   },
+  verifyRecipientCode: async (originId: string, recipientCode: string): Promise<string> => {
+    const result = await apiClient.checkRecipientCodeUsingGET({ originId, recipientCode });
+    return extractResponse(result, 200, onRedirectToLogin);
+  },
 };

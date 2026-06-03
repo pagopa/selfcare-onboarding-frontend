@@ -3,40 +3,25 @@ import { Dispatch, SetStateAction } from 'react';
 import { fetchWithLogs } from '../lib/api-utils';
 import { getFetchOutcome } from '../lib/error-utils';
 import { UoData } from '../model/UoModel';
+import { OnboardingApi } from '../api/OnboardingApiClient';
 
 export const verifyRecipientCodeIsValid = async (
   recipientCode: string,
   uoSelected: UoData | undefined,
   formik: any,
   setRecipientCodeStatus: Dispatch<SetStateAction<string | undefined>>,
-  setRequiredLogin: Dispatch<SetStateAction<boolean>>,
   originId?: string
 ) => {
-  const getRecipientCodeValidation = await fetchWithLogs(
-    {
-      endpoint: 'ONBOARDING_RECIPIENT_CODE_VALIDATION',
-    },
-    {
-      method: 'GET',
-      params: {
-        recipientCode,
-        originId,
-      },
-    },
-    () => setRequiredLogin(true)
-  );
+  try {
+    const response = await OnboardingApi.verifyRecipientCode(originId ?? '', recipientCode);
 
-  const outcome = getFetchOutcome(getRecipientCodeValidation);
-
-  if (outcome === 'success') {
-    const result = (getRecipientCodeValidation as AxiosResponse).data;
-    if (uoSelected && result && result === 'DENIED_NO_BILLING') {
+    if (uoSelected && response === 'DENIED_NO_BILLING') {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       formik.setFieldValue('recipientCode', undefined);
     }
-    setRecipientCodeStatus(result);
-  } else {
-    setRecipientCodeStatus('DENIED_NO_ASSOCIATION');
+    setRecipientCodeStatus(response);
+  } catch (error) {
+    setRecipientCodeStatus('error');
   }
 };
 
