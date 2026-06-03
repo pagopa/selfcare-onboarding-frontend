@@ -68,4 +68,8 @@ export const OnboardingApi = {
     const result = await apiClient.searchUserId({ body });
     return extractResponse(result, 200, onRedirectToLogin, 401, 403, undefined);
   },
+  deleteOnboardingRequest: async (OnboardingId: string): Promise<void> => {
+    const result = await apiClient.deleteUsingDELETE({ onboardingId: OnboardingId });
+    return extractResponse(result, 204, onRedirectToLogin, 401, 403, undefined);
+  },
 };
