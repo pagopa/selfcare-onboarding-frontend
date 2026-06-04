@@ -45,4 +45,8 @@ export const PartyRegistryProxyApi = {
     });
     return extractResponse(result, 200, onRedirectToLogin, 401, 403, undefined);
   },
+  getLocationByCode: async (geotaxId: string): Promise<GeographicTaxonomyResource> => {
+    const result = await apiClient.retrieveGeoTaxonomiesByCodeUsingGET({ geotaxId });
+    return extractResponse(result, 200, onRedirectToLogin, 401, 403, undefined);
+  },
 };

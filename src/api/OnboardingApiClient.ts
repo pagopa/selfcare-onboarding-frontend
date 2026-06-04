@@ -15,6 +15,7 @@ import { OnboardingRequestResource } from './generated/onboarding/OnboardingRequ
 import { OnboardingVerify } from './generated/onboarding/OnboardingVerify';
 import { UserId } from './generated/onboarding/UserId';
 import { UserTaxCodeDto } from './generated/onboarding/UserTaxCodeDto';
+import { GeographicTaxonomyResource } from './generated/onboarding/GeographicTaxonomyResource';
 
 const withBearerAuth: WithDefaultsT<'bearerAuth'> = (wrappedOperation) => (params: any) => {
   const token = storageTokenOps.read();
@@ -75,6 +76,16 @@ export const OnboardingApi = {
   },
   getInstitutions: async (productId?: string): Promise<InstitutionResourceArray> => {
     const result = await apiClient.getInstitutionsUsingGET({ productId });
+    return extractResponse(result, 200, onRedirectToLogin, 401, 403, undefined);
+  },
+  getPreviousGeotaxonomy: async (
+    taxCode: string,
+    subunitCode?: string
+  ): Promise<GeographicTaxonomyResource> => {
+    const result = await apiClient.getGeographicTaxonomiesByTaxCodeAndSubunitCodeUsingGET({
+      taxCode,
+      subunitCode,
+    });
     return extractResponse(result, 200, onRedirectToLogin, 401, 403, undefined);
   },
 };
