@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction } from 'react';
 import { AxiosError, AxiosResponse } from 'axios';
 import { fetchWithLogs } from '../lib/api-utils';
-import { getFetchOutcome } from '../lib/error-utils';
+import { getErrorStatus, getFetchOutcome } from '../lib/error-utils';
 import { Endpoint, ApiEndpointKey, PartyData, Product, InstitutionType } from '../../types';
 import { AooData } from '../model/AooData';
 import { UoData } from '../model/UoModel';
@@ -16,6 +16,15 @@ import {
   shouldSkipCategoriesFilter,
 } from '../utils/institutionTypeUtils';
 import config from '../utils/config.json';
+import { PartyRegistryProxyApi } from '../api/PartyRegistryProxyApiClient';
+
+// NOTE: the following 6 functions accept `endpoint` as a runtime parameter
+// (one of 12 possible endpoint strings). Codegen requires statically-typed
+// method calls, so a dispatcher pattern would be needed. Deferred to the
+// final cleanup round together with the other spec patches.
+// Functions affected: fetchInstitutionsByName, fetchInstitutionByTaxCode,
+// handleSearchByReaCode, handleSearchByAooCode, handleSearchByUoCode,
+// contractingInsuranceFromTaxId.
 
 const validateIdpayMerchantInstitution = (
   response: PartyData,
@@ -70,55 +79,35 @@ const validateIdpayMerchantInstitution = (
 export const handleSearchByTaxCode = async (
   query: string,
   filterCategories: string | undefined,
-  setRequiredLogin: Dispatch<SetStateAction<boolean>>,
   setRetrievedIstat: Dispatch<SetStateAction<string | undefined>>,
   setOriginId4Premium: Dispatch<SetStateAction<string | undefined>>
 ) => {
-  const searchResponse = await fetchWithLogs(
-    { endpoint: 'ONBOARDING_GET_PARTY_FROM_CF', endpointParams: { id: query } },
-    {
-      method: 'GET',
-      params: {
-        origin: 'IPA',
-        categories: filterCategories,
-      },
-    },
-    () => setRequiredLogin(true)
-  );
+  try {
+    const searchResponse = await PartyRegistryProxyApi.findInstitution(
+      query,
+      'IPA',
+      filterCategories
+    );
 
-  const outcome = getFetchOutcome(searchResponse);
-
-  if (outcome === 'success') {
-    setRetrievedIstat((searchResponse as AxiosResponse).data.istatCode);
-    setOriginId4Premium((searchResponse as AxiosResponse).data.originId);
+    setRetrievedIstat(searchResponse.istatCode);
+    setOriginId4Premium(searchResponse.originId);
+  } catch (error) {
+    console.error(error);
   }
 };
 
 export const getUoInfoFromRecipientCode = async (
   recipientCode: string,
   setDisableTaxCodeInvoicing: Dispatch<SetStateAction<boolean>>,
-  setRequiredLogin: Dispatch<SetStateAction<boolean>>,
   formik: any
 ) => {
-  const searchResponse = await fetchWithLogs(
-    { endpoint: 'ONBOARDING_GET_UO_CODE_INFO', endpointParams: { codiceUniUo: recipientCode } },
-    {
-      method: 'GET',
-      params: undefined,
-    },
-    () => setRequiredLogin(true)
-  );
-
-  const outcome = getFetchOutcome(searchResponse);
-
-  if (outcome === 'success') {
-    formik.setFieldValue(
-      'taxCodeInvoicing',
-      (searchResponse as AxiosResponse).data?.codiceFiscaleSfe
-    );
+  try {
+    const searchResponse = await PartyRegistryProxyApi.getUoInfo(recipientCode);
+    formik.setFieldValue('taxCodeInvoicing', (searchResponse as any).codiceFiscaleSfe);
     setDisableTaxCodeInvoicing(true);
-  } else {
+  } catch (error) {
     setDisableTaxCodeInvoicing(false);
+    console.error(error);
   }
 };
 
@@ -485,48 +474,31 @@ export const contractingInsuranceFromTaxId = async (
 };
 
 export const handleSearchExternalId = async (
-  externalInstitutionId: string,
-  onRedirectToLogin: () => void
+  externalInstitutionId: string
 ): Promise<PartyData | null> => {
-  const searchResponse = await fetchWithLogs(
-    {
-      endpoint: 'ONBOARDING_GET_PARTY',
-      endpointParams: { externalInstitutionId },
-    },
-    { method: 'GET' },
-    onRedirectToLogin
-  );
-
-  const outcome = getFetchOutcome(searchResponse);
-
-  if (outcome === 'success') {
-    return (searchResponse as AxiosResponse).data;
+  try {
+    const data = await PartyRegistryProxyApi.findInstitution(externalInstitutionId);
+    return data as PartyData;
+  } catch {
+    return null;
   }
-
-  return null;
 };
 
 export const getECDataByCF = async (
   query: string,
   setApiLoading: Dispatch<SetStateAction<boolean>>,
-  setEcData: Dispatch<SetStateAction<PartyData | null>>,
-  setRequiredLogin: Dispatch<SetStateAction<boolean>>
+  setEcData: Dispatch<SetStateAction<PartyData | null>>
 ) => {
   setApiLoading(true);
-  const searchResponse = await fetchWithLogs(
-    { endpoint: 'ONBOARDING_GET_PARTY_FROM_CF', endpointParams: { id: query } },
-    {
-      method: 'GET',
-    },
-    () => setRequiredLogin(true)
-  );
-
-  const outcome = getFetchOutcome(searchResponse);
-
-  if (outcome === 'success') {
-    setEcData((searchResponse as AxiosResponse).data);
-  } else if ((searchResponse as AxiosError).response?.status === 404) {
-    setEcData(null);
+  try {
+    const data = await PartyRegistryProxyApi.findInstitution(query);
+    setEcData(data as PartyData);
+  } catch (error) {
+    if (getErrorStatus(error) === 404) {
+      setEcData(null);
+    }
+    // Preserve legacy: other errors don't change state
+  } finally {
+    setApiLoading(false);
   }
-  setApiLoading(false);
 };

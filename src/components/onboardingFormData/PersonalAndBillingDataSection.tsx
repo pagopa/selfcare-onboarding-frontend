@@ -303,7 +303,6 @@ export default function PersonalAndBillingDataSection({
       void getUoInfoFromRecipientCode(
         formik.values.recipientCode,
         setDisableTaxCodeInvoicing,
-        setRequiredLogin,
         formik
       );
       setTaxCodeInvoicingVisible(true);

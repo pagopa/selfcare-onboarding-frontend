@@ -9,6 +9,8 @@ import { store } from '../redux/store';
 import { ENV } from '../utils/env';
 import { createClient, WithDefaultsT } from './generated/party-registry-proxy/client';
 import { GeographicTaxonomyResource } from './generated/party-registry-proxy/GeographicTaxonomyResource';
+import { InstitutionResource } from './generated/party-registry-proxy/InstitutionResource';
+import { UOResource } from './generated/party-registry-proxy/UOResource';
 
 const withBearerAuth: WithDefaultsT<'bearerAuth'> = (wrappedOperation) => (params: any) => {
   const token = storageTokenOps.read();
@@ -47,6 +49,19 @@ export const PartyRegistryProxyApi = {
   },
   getLocationByCode: async (geotaxId: string): Promise<GeographicTaxonomyResource> => {
     const result = await apiClient.retrieveGeoTaxonomiesByCodeUsingGET({ geotaxId });
+    return extractResponse(result, 200, onRedirectToLogin, 401, 403, undefined);
+  },
+  findInstitution: async (
+    id: string,
+    origin?: string,
+    categories?: string
+  ): Promise<InstitutionResource> => {
+    const result = await apiClient.findInstitutionUsingGET({ id, origin, categories });
+    return extractResponse(result, 200, onRedirectToLogin, 401, 403, undefined);
+  },
+
+  getUoInfo: async (codiceUniUo: string): Promise<UOResource> => {
+    const result = await apiClient.findByUnicodeUsingGET_1({ codiceUniAoo: codiceUniUo });
     return extractResponse(result, 200, onRedirectToLogin, 401, 403, undefined);
   },
 };

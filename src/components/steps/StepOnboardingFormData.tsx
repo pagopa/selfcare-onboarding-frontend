@@ -220,7 +220,6 @@ export default function StepOnboardingFormData({
         await handleSearchByTaxCode(
           initialFormData.taxCode,
           filterCategories,
-          setRequiredLogin,
           setRetrievedIstat,
           setOriginId4Premium
         );

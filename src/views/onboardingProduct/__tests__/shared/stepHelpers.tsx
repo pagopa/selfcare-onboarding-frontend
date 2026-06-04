@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { Provider } from 'react-redux';
 import { Router } from 'react-router-dom';
 import { expect, MockInstance } from 'vitest';
-import { InstitutionType } from '../../../../types';
+import { InstitutionType } from '../../../../../types';
 import { mockedCategories } from '../../../../lib/__mocks__/mockApiRequests';
 import { HeaderContext, UserContext } from '../../../../lib/context';
 import { createStore } from '../../../../redux/store';
