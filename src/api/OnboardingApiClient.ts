@@ -7,13 +7,14 @@ import {
 import { storageTokenOps } from '@pagopa/selfcare-common-frontend/lib/utils/storage';
 import { store } from '../redux/store';
 import { ENV } from '../utils/env';
+import { CheckManagerDto } from './generated/onboarding/CheckManagerDto';
 import { CheckManagerResponse } from './generated/onboarding/CheckManagerResponse';
 import { WithDefaultsT, createClient } from './generated/onboarding/client';
+import { InstitutionResourceArray } from './generated/onboarding/InstitutionResourceArray';
 import { OnboardingRequestResource } from './generated/onboarding/OnboardingRequestResource';
 import { OnboardingVerify } from './generated/onboarding/OnboardingVerify';
-import { CheckManagerDto } from './generated/onboarding/CheckManagerDto';
-import { UserTaxCodeDto } from './generated/onboarding/UserTaxCodeDto';
 import { UserId } from './generated/onboarding/UserId';
+import { UserTaxCodeDto } from './generated/onboarding/UserTaxCodeDto';
 
 const withBearerAuth: WithDefaultsT<'bearerAuth'> = (wrappedOperation) => (params: any) => {
   const token = storageTokenOps.read();
@@ -71,5 +72,9 @@ export const OnboardingApi = {
   deleteOnboardingRequest: async (OnboardingId: string): Promise<void> => {
     const result = await apiClient.deleteUsingDELETE({ onboardingId: OnboardingId });
     return extractResponse(result, 204, onRedirectToLogin, 401, 403, undefined);
+  },
+  getInstitutions: async (productId?: string): Promise<InstitutionResourceArray> => {
+    const result = await apiClient.getInstitutionsUsingGET({ productId });
+    return extractResponse(result, 200, onRedirectToLogin, 401, 403, undefined);
   },
 };

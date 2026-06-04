@@ -3,10 +3,9 @@ import { Grid, Typography, useTheme } from '@mui/material';
 import Button from '@mui/material/Button';
 import { Box } from '@mui/system';
 import SessionModal from '@pagopa/selfcare-common-frontend/lib/components/SessionModal';
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { Product, StepperStepComponentProps } from '../../../../../types';
-import { UserContext } from '../../../../lib/context';
 import { PlansPrices } from '../../../../model/PlansPrices';
 import { onExitPremiumFlow } from '../../../../services/subProductServices';
 import HeaderPlanCard from './components/HeaderPlanCard';
@@ -15,7 +14,9 @@ import FooterConsumptionCard from './components/consumptionPlanComponent/FooterC
 
 type Props = StepperStepComponentProps & {
   product?: Product;
-  setAvailablePricingPlanIds: React.Dispatch<React.SetStateAction<Array<string> | undefined>> | undefined;
+  setAvailablePricingPlanIds:
+    | React.Dispatch<React.SetStateAction<Array<string> | undefined>>
+    | undefined;
 };
 
 export default function SubProductStepSelectPricingPlan({
@@ -25,7 +26,6 @@ export default function SubProductStepSelectPricingPlan({
 }: Props) {
   const { t } = useTranslation();
   const theme = useTheme();
-  const { setRequiredLogin } = useContext(UserContext);
 
   const [openExitModal, setOpenExitModal] = useState<boolean>(false);
   const [plansPrices, _setPlansPrices] = useState<PlansPrices>();
@@ -35,7 +35,7 @@ export default function SubProductStepSelectPricingPlan({
       const pricingPlanIds = plansPrices?.carnetPlans
         .map((p) => p.pricingPlan)
         .concat(plansPrices.consumptionPlan.pricingPlan);
-        setAvailablePricingPlanIds(pricingPlanIds);
+      setAvailablePricingPlanIds(pricingPlanIds);
     }
   }, [plansPrices]);
 
@@ -178,8 +178,8 @@ export default function SubProductStepSelectPricingPlan({
             <Grid item xs={7}>
               <Typography fontSize={'fontSize'} color="white" textAlign={'center'}>
                 <Trans i18nKey="onboardingSubProduct.subProductStepSelectPricingPlan.infoSectionLabel">
-                  Se il tuo ente ha già aderito ad IO, scegli qual è il piano che più soddisfa
-                  le sue esigenze. <br /> Il piano a carnet è attivabile una sola volta. Una volta
+                  Se il tuo ente ha già aderito ad IO, scegli qual è il piano che più soddisfa le
+                  sue esigenze. <br /> Il piano a carnet è attivabile una sola volta. Una volta
                   terminato il numero di messaggi del piano a <br /> carnet, si attiverà
                   automaticamente il piano a consumo.
                 </Trans>
@@ -276,7 +276,7 @@ export default function SubProductStepSelectPricingPlan({
           onCloseLabel={t(
             'onboardingSubProduct.subProductStepSelectPricingPlan.pricingPlanExitModal.confirmBtnLabel'
           )}
-          onConfirm={() => onExitPremiumFlow(setRequiredLogin, product?.id)}
+          onConfirm={() => onExitPremiumFlow(product?.id)}
           handleClose={handleClose}
         />
       </Box>

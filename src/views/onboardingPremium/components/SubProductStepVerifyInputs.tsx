@@ -2,12 +2,12 @@ import { trackAppError } from '@pagopa/selfcare-common-frontend/lib/services/ana
 import { Dispatch, SetStateAction, useContext, useEffect, useState } from 'react';
 import { Product, SelfcareParty, StepperStepComponentProps } from '../../../../types';
 import NoProductPage from '../../../components/layout/NoProductPage';
+import { MessageNoAction } from '../../../components/shared/MessageNoAction';
 import { HeaderContext, UserContext } from '../../../lib/context';
 import { checkProduct } from '../../../services/onboardingServices';
 import { handleSearchUserParties } from '../../../services/subProductServices';
 import { unregisterUnloadEvent } from '../../../utils/unloadEvent-utils';
 import { genericError } from '../../onboardingProduct/components/StepVerifyOnboarding';
-import { MessageNoAction } from '../../../components/shared/MessageNoAction';
 
 type Props = StepperStepComponentProps & {
   requestId: string;
@@ -43,7 +43,7 @@ function SubProductStepVerifyInputs({
         onNotFound: () => setError(true),
         onError: () => setError(true),
       }),
-      handleSearchUserParties(setParties, setRequiredLogin, productId, subProductId),
+      handleSearchUserParties(setParties, productId, subProductId),
     ])
       .catch((reason) => {
         trackAppError({
