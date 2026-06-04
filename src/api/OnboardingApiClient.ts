@@ -5,17 +5,22 @@ import {
   extractResponse,
 } from '@pagopa/selfcare-common-frontend/lib/utils/api-utils';
 import { storageTokenOps } from '@pagopa/selfcare-common-frontend/lib/utils/storage';
+import { InstitutionOnboardingInfoResource } from '../../types';
+import { ProductResource } from '../model/ProductResource';
 import { store } from '../redux/store';
 import { ENV } from '../utils/env';
 import { CheckManagerDto } from './generated/onboarding/CheckManagerDto';
 import { CheckManagerResponse } from './generated/onboarding/CheckManagerResponse';
 import { WithDefaultsT, createClient } from './generated/onboarding/client';
+import { GeographicTaxonomyResource } from './generated/onboarding/GeographicTaxonomyResource';
 import { InstitutionResourceArray } from './generated/onboarding/InstitutionResourceArray';
 import { OnboardingRequestResource } from './generated/onboarding/OnboardingRequestResource';
+import { OnboardingUserDto } from './generated/onboarding/OnboardingUserDto';
 import { OnboardingVerify } from './generated/onboarding/OnboardingVerify';
+import { OriginResponse } from './generated/onboarding/OriginResponse';
+import { ProductResourceArray } from './generated/onboarding/ProductResourceArray';
 import { UserId } from './generated/onboarding/UserId';
 import { UserTaxCodeDto } from './generated/onboarding/UserTaxCodeDto';
-import { GeographicTaxonomyResource } from './generated/onboarding/GeographicTaxonomyResource';
 
 const withBearerAuth: WithDefaultsT<'bearerAuth'> = (wrappedOperation) => (params: any) => {
   const token = storageTokenOps.read();
@@ -86,6 +91,32 @@ export const OnboardingApi = {
       taxCode,
       subunitCode,
     });
+    return extractResponse(result, 200, onRedirectToLogin, 401, 403, undefined);
+  },
+  getOnboardingData: async (
+    institutionId: string,
+    productId: string
+  ): Promise<InstitutionOnboardingInfoResource> => {
+    const result = await apiClient.getInstitutionOnboardingInfoUsingGET({
+      institutionId,
+      productId,
+    });
+    return extractResponse(result, 200, onRedirectToLogin, 401, 403, undefined);
+  },
+  getProduct: async (id: string, institutionType?: string): Promise<ProductResource> => {
+    const result = await apiClient.getProductUsingGET({ id, institutionType });
+    return extractResponse(result, 200, onRedirectToLogin, 401, 403, undefined);
+  },
+  onboardingUsers: async (body: OnboardingUserDto): Promise<void> => {
+    const result = await apiClient.onboardingUsers({ body });
+    return extractResponse(result, 201, onRedirectToLogin, 401, 403, undefined);
+  },
+  getProductsAdmin: async (): Promise<ProductResourceArray> => {
+    const result = await apiClient.getProductsAdmin({});
+    return extractResponse(result, 200, onRedirectToLogin, 401, 403, undefined);
+  },
+  getOrigins: async (productId: string): Promise<OriginResponse> => {
+    const result = await apiClient.getOrigins({ productId });
     return extractResponse(result, 200, onRedirectToLogin, 401, 403, undefined);
   },
 };

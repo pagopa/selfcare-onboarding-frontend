@@ -1,9 +1,8 @@
 /* eslint-disable complexity */
 import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
-import axios, { AxiosError, AxiosResponse } from 'axios';
+import axios, { AxiosError } from 'axios';
 import { Dispatch, SetStateAction } from 'react';
 import {
-  InstitutionOnboardingInfoResource,
   InstitutionType,
   PartyData,
   Product,
@@ -11,8 +10,10 @@ import {
   RequestOutcomeOptions,
   UserOnCreate,
 } from '../../types';
+import { OnboardingUserDto } from '../api/generated/onboarding/OnboardingUserDto';
+import { OnboardingApi } from '../api/OnboardingApiClient';
 import { fetchWithLogs } from '../lib/api-utils';
-import { getFetchOutcome } from '../lib/error-utils';
+import { getErrorStatus, getFetchOutcome } from '../lib/error-utils';
 import { InstitutionOrigins } from '../model/InstitutionOrigins';
 import { OnboardingFormData } from '../model/OnboardingFormData';
 import { ProductResource } from '../model/ProductResource';
@@ -27,6 +28,11 @@ import {
   isPrivatePersonInstitution,
 } from '../utils/institutionTypeUtils';
 import { genericError } from '../views/onboardingProduct/components/StepVerifyOnboarding';
+
+// NOTE: fetchVerifyOnboarding stays on fetchWithLogs because the endpoint is
+// HEAD /institutions/onboarding (verifyOnboardingUsingHEAD), and the codegen
+// tool @pagopa/openapi-codegen-ts v14 does not support HEAD methods.
+// Same limitation as verifyVatNumber in validationServices.ts.
 
 const fetchVerifyOnboarding = async (
   params: {
@@ -151,7 +157,6 @@ export const verifyOnboarding = async (
 
 export const getOnboardingData = async (
   setLoading: Dispatch<SetStateAction<boolean>>,
-  setRequiredLogin: Dispatch<SetStateAction<boolean>>,
   productId: string,
   forward: (...args: any) => void,
   institutionType: InstitutionType | undefined,
@@ -160,29 +165,12 @@ export const getOnboardingData = async (
   partyId?: string
 ) => {
   setLoading(true);
-
-  const onboardingData = await fetchWithLogs(
-    {
-      endpoint: 'ONBOARDING_GET_ONBOARDING_DATA',
-    },
-    {
-      method: 'GET',
-      params: {
-        institutionId: partyId,
-        productId,
-      },
-    },
-    () => setRequiredLogin(true)
-  );
-
-  const restOutcomeData = getFetchOutcome(onboardingData);
-  if (restOutcomeData === 'success') {
-    const result = (onboardingData as AxiosResponse).data as InstitutionOnboardingInfoResource;
+  try {
+    const result = await OnboardingApi.getOnboardingData(partyId ?? '', productId);
     const billingData = {
       ...result.institution.billingData,
       geographicTaxonomies: result.geographicTaxonomies,
     };
-
     forward(
       result.institution.origin,
       result.institution.originId,
@@ -199,49 +187,44 @@ export const getOnboardingData = async (
       result.institution?.paymentServiceProvider,
       result.institution?.dataProtectionOfficer
     );
-  } else if (
-    (onboardingData as AxiosError<any>).response?.status === 404 ||
-    (onboardingData as AxiosError<any>).response?.status === 400
-  ) {
-    forward(undefined, institutionType, undefined);
-  } else {
-    setOutcome(genericError);
+  } catch (error) {
+    const status = getErrorStatus(error);
+    if (status === 404 || status === 400) {
+      forward(undefined, institutionType, undefined);
+    } else {
+      setOutcome(genericError);
+    }
+  } finally {
+    setLoading(false);
   }
-  setLoading(false);
 };
 
 export const checkProduct = async (
   productId: string,
   setProduct: (product: Product | undefined | null) => void,
-  setRequiredLogin: (required: boolean) => void,
   options?: {
     onError?: (error: AxiosError) => void;
     onNotFound?: () => void;
     onPhaseOut?: (product: Product) => void;
   }
 ) => {
-  const onboardingProducts = await fetchWithLogs(
-    { endpoint: 'ONBOARDING_VERIFY_PRODUCT', endpointParams: { productId } },
-    { method: 'GET' },
-    () => setRequiredLogin(true)
-  );
-
-  const result = getFetchOutcome(onboardingProducts);
-
-  if (result === 'success') {
-    const product = (onboardingProducts as AxiosResponse).data;
+  try {
+    const product = await OnboardingApi.getProduct(productId, undefined);
     setProduct(product);
 
     if (product?.status === 'PHASE_OUT' && options?.onPhaseOut) {
       options.onPhaseOut(product);
     }
-  } else if ((onboardingProducts as AxiosError).response?.status === 404) {
-    options?.onNotFound?.();
-    setProduct(null);
-  } else {
-    console.error('Unexpected response', (onboardingProducts as AxiosError).response);
-    options?.onError?.(onboardingProducts as AxiosError);
-    setProduct(null);
+  } catch (error) {
+    const status = getErrorStatus(error);
+    if (status === 404) {
+      options?.onNotFound?.();
+      setProduct(null);
+    } else {
+      console.error('Unexpected response', error);
+      options?.onError?.(error as AxiosError);
+      setProduct(null);
+    }
   }
 };
 
@@ -277,46 +260,38 @@ export const addUserRequest = async (
   onboardingFormData: OnboardingFormData | undefined,
   selectedParty: PartyData | undefined,
   institutionType: InstitutionType | undefined,
-  setRequiredLogin: Dispatch<SetStateAction<boolean>>,
   setOutcome: Dispatch<SetStateAction<any>>,
   outcomeContent: RequestOutcomeOptions,
   requestId: string | undefined
 ) => {
   setLoading(true);
-
-  const addUserResponse = await fetchWithLogs(
-    { endpoint: 'ONBOARDING_NEW_USER' },
-    {
-      method: 'POST',
-      data: {
-        productId: selectedProduct?.id,
-        institutionType: onboardingFormData?.institutionType ?? institutionType,
-        origin: isContractingAuthority(
-          (onboardingFormData?.institutionType ?? institutionType) as InstitutionType
-        )
-          ? 'ANAC'
-          : ['PSP', 'GPU', 'PT', 'PRV'].includes(
-                (onboardingFormData?.institutionType ?? institutionType) as InstitutionType
-              ) && !isInteropProduct(selectedProduct?.id)
-            ? 'SELC'
-            : onboardingFormData?.origin,
-        originId: onboardingFormData?.originId ?? onboardingFormData?.taxCode,
-        subunitCode: selectedParty?.codiceUniUo
-          ? selectedParty.codiceUniUo
-          : selectedParty?.codiceUniAoo,
-        taxCode: onboardingFormData?.taxCode,
-        users,
-      },
-    },
-    () => setRequiredLogin(true)
-  );
-
-  setLoading(false);
-
-  const outcome = getFetchOutcome(addUserResponse);
+  // eslint-disable-next-line functional/no-let
+  let outcome: 'success' | 'error' = 'success';
+  try {
+    await OnboardingApi.onboardingUsers({
+      productId: selectedProduct?.id,
+      institutionType: onboardingFormData?.institutionType ?? institutionType,
+      origin: isContractingAuthority(
+        (onboardingFormData?.institutionType ?? institutionType) as InstitutionType
+      )
+        ? 'ANAC'
+        : ['PSP', 'GPU', 'PT', 'PRV'].includes(
+              (onboardingFormData?.institutionType ?? institutionType) as InstitutionType
+            ) && !isInteropProduct(selectedProduct?.id)
+          ? 'SELC'
+          : onboardingFormData?.origin,
+      originId: onboardingFormData?.originId ?? onboardingFormData?.taxCode,
+      subunitCode: selectedParty?.codiceUniUo ?? selectedParty?.codiceUniAoo,
+      taxCode: onboardingFormData?.taxCode,
+      users,
+    } as OnboardingUserDto);
+  } catch {
+    outcome = 'error';
+  } finally {
+    setLoading(false);
+  }
 
   setOutcome(outcomeContent[outcome as keyof RequestOutcomeOptions]);
-
   trackEvent(outcome === 'success' ? 'ONBOARDING_USER_SUCCESS' : 'ONBOARDING_USER_ERROR', {
     request_id: requestId,
     party_id: selectedParty?.externalId,
@@ -328,59 +303,33 @@ export const addUserRequest = async (
 export const getAllowedAddUserProducts = async (
   setLoading: Dispatch<SetStateAction<boolean>>,
   setProducts: Dispatch<SetStateAction<any>>,
-  setRequiredLogin: Dispatch<SetStateAction<boolean>>,
   setOutcome: Dispatch<SetStateAction<any>>,
   genericError: any
 ) => {
   setLoading(true);
-  const getProductsRequest = await fetchWithLogs(
-    {
-      endpoint: 'ONBOARDING_GET_ALLOWED_ADD_USER_PRODUCTS',
-    },
-    {
-      method: 'GET',
-    },
-    () => setRequiredLogin(true)
-  );
-  const outcome = getFetchOutcome(getProductsRequest);
-
-  if (outcome === 'success') {
-    const retrievedProducts = (getProductsRequest as AxiosResponse).data as Array<ProductResource>;
-    setProducts(retrievedProducts);
-  } else {
+  try {
+    const retrievedProducts = await OnboardingApi.getProductsAdmin();
+    setProducts(retrievedProducts as Array<ProductResource>);
+  } catch {
     setOutcome(genericError);
+  } finally {
+    setLoading(false);
   }
-  setLoading(false);
 };
 
 export const getInstiutionTypesByProduct = async (
   setLoading: Dispatch<SetStateAction<boolean>>,
   productId: string | undefined,
   setRetrivedInstituionType: Dispatch<SetStateAction<InstitutionOrigins | undefined>>,
-  setRequiredLogin: Dispatch<SetStateAction<boolean>>,
   setOutcome: Dispatch<SetStateAction<any>>,
   genericError: any
 ) => {
   setLoading(true);
-  const getInstitutionTypesRequest = await fetchWithLogs(
-    {
-      endpoint: 'ONBOARDING_GET_INSTITUTION_TYPE_BY_PRODUCT',
-    },
-    {
-      method: 'GET',
-      params: {
-        productId,
-      },
-    },
-    () => setRequiredLogin(true)
-  );
-  const outcome = getFetchOutcome(getInstitutionTypesRequest);
-  if (outcome === 'success') {
-    const responseData = (getInstitutionTypesRequest as AxiosResponse).data;
+  try {
+    const responseData = await OnboardingApi.getOrigins(productId ?? '');
 
     if (!responseData?.origins || responseData.origins.length === 0) {
       setOutcome(genericError);
-      setLoading(false);
       return;
     }
 
@@ -394,39 +343,34 @@ export const getInstiutionTypesByProduct = async (
         origin: [filterGspResponse[0].origin, filterGspResponse[1].origin],
         labelKey: 'gsp',
       };
-
       const nonGspOrigins = responseData.origins.filter(
         (item: any) => !isGlobalServiceProvider(item.institutionType)
       );
-
       const updatedInstitutionOrigins = [
         nonGspOrigins[0],
         gspWithMultiOrigins,
         ...nonGspOrigins.slice(1),
       ];
-
       setRetrivedInstituionType({
         ...responseData,
         origins: updatedInstitutionOrigins,
-      });
+      } as InstitutionOrigins);
     } else if (productId === PRODUCT_IDS.CED) {
       const institutionsResponseCed = {
         institutionType: responseData.origins[1]?.institutionType,
         origin: responseData.origins[1]?.origin,
         labelKey: 'prv_ced',
       };
-
-      const updatedResponse = {
+      setRetrivedInstituionType({
         ...responseData,
         origins: [responseData.origins[0], institutionsResponseCed],
-      };
-
-      setRetrivedInstituionType(updatedResponse);
+      } as InstitutionOrigins);
     } else {
-      setRetrivedInstituionType(responseData);
+      setRetrivedInstituionType(responseData as InstitutionOrigins);
     }
-  } else {
+  } catch {
     setOutcome(genericError);
+  } finally {
+    setLoading(false);
   }
-  setLoading(false);
 };

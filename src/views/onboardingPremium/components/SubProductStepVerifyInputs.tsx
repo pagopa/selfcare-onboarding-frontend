@@ -3,7 +3,7 @@ import { Dispatch, SetStateAction, useContext, useEffect, useState } from 'react
 import { Product, SelfcareParty, StepperStepComponentProps } from '../../../../types';
 import NoProductPage from '../../../components/layout/NoProductPage';
 import { MessageNoAction } from '../../../components/shared/MessageNoAction';
-import { HeaderContext, UserContext } from '../../../lib/context';
+import { HeaderContext } from '../../../lib/context';
 import { checkProduct } from '../../../services/onboardingServices';
 import { handleSearchUserParties } from '../../../services/subProductServices';
 import { unregisterUnloadEvent } from '../../../utils/unloadEvent-utils';
@@ -27,7 +27,6 @@ function SubProductStepVerifyInputs({
 }: Props) {
   const [error, setError] = useState<boolean>(false);
   const { setOnExit } = useContext(HeaderContext);
-  const { setRequiredLogin } = useContext(UserContext);
   const [selectedSubProduct, setSelectedSubProduct] = useState<Product | undefined | null>();
   const [selectedProduct, setSelectedProduct] = useState<Product | null>();
   const [parties, setParties] = useState<Array<SelfcareParty>>();
@@ -35,11 +34,11 @@ function SubProductStepVerifyInputs({
   const submit = () => {
     setLoading(true);
     Promise.all([
-      checkProduct(productId, setSelectedProduct, setRequiredLogin, {
+      checkProduct(productId, setSelectedProduct, {
         onNotFound: () => setError(true),
         onError: () => setError(true),
       }),
-      checkProduct(subProductId, setSelectedSubProduct, setRequiredLogin, {
+      checkProduct(subProductId, setSelectedSubProduct, {
         onNotFound: () => setError(true),
         onError: () => setError(true),
       }),
