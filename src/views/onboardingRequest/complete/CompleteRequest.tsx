@@ -20,9 +20,9 @@ import { HeaderContext, UserContext } from '../../../lib/context';
 import { onboardingContractUpload } from '../../../services/requestStatusServices';
 import { getOnboardingInfo, verifyRequest } from '../../../services/tokenServices';
 import { customErrors } from '../../../utils/constants';
-import { ENV } from '../../../utils/env';
+// import { ENV } from '../../../utils/env';
 import { getRequestJwt } from '../../../utils/getRequestJwt';
-import { triggerQualtricsIntercept } from '../../../utils/qualtricsUtils';
+// import { triggerQualtricsIntercept } from '../../../utils/qualtricsUtils';
 import AlreadyCompletedRequest from '../status/AlreadyCompletedPage';
 import AlreadyRejectedRequest from '../status/AlreadyRejectedPage';
 import ExpiredRequestPage from '../status/ExpiredPage';
@@ -108,7 +108,7 @@ export default function CompleteRequestComponent() {
     }
   }, [/* attachments, */ onboardingId]);
 
-  useEffect(() => {
+/*   useEffect(() => {
     if (outcomeContentState === 'success' && ENV.QUALTRICS_APPROVAL.ENABLE && !addUserFlow && !attachments) {
       void triggerQualtricsIntercept(
         { productId: requestData?.productId ?? '' },
@@ -118,7 +118,7 @@ export default function CompleteRequestComponent() {
         }
       );
     }
-  }, [outcomeContentState]);
+  }, [outcomeContentState]); */
 
   useEffect(() => {
     if (attachmentUploadSuccess && onboardingId) {

@@ -1,5 +1,5 @@
 /* eslint-disable functional/immutable-data */
-declare global {
+/* declare global {
   interface Window {
     QSI?: {
       API: {
@@ -11,7 +11,7 @@ declare global {
   }
 }
 
-import { ENV } from './env';
+import { ENV } from './env'; */
 
 type QualtricsData = {
   institutionDescription?: string;
@@ -19,7 +19,15 @@ type QualtricsData = {
   institutionType?: string;
 };
 
-type QualtricsConfig = {
+export const redirectToQualtricsSurvey = (data: QualtricsData): void => {
+  const surveyUrl = new URL('https://pagopa.qualtrics.com/jfe/form/SV_8pjZJ9AyxFrwBtI');
+  surveyUrl.searchParams.set('institutionDescription', data.institutionDescription ?? '');
+  surveyUrl.searchParams.set('productId', data.productId);
+  surveyUrl.searchParams.set('institutionType', data.institutionType ?? '');
+  window.open(surveyUrl.toString(), '_blank');
+};
+
+/* type QualtricsConfig = {
   scriptUrl: string;
   siteId: string;
 };
@@ -56,4 +64,4 @@ export const triggerQualtricsIntercept = async (
   window.QSI.API.unload();
   window.QSI.API.load();
   window.QSI.API.run();
-};
+}; */
