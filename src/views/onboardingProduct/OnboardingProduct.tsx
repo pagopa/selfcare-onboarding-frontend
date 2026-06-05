@@ -43,7 +43,7 @@ import {
   isSendProduct,
   isTechPartner,
 } from '../../utils/institutionTypeUtils';
-import { triggerQualtricsIntercept } from '../../utils/qualtricsUtils';
+import { redirectToQualtricsSurvey } from '../../utils/qualtricsUtils';
 import { registerUnloadEvent, unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
 import { createBackFunctions } from './components/backwards/backFunctions';
 import { createForwardFunctions } from './components/forwards/forwardFunctions';
@@ -238,7 +238,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
       user,
       aggregates,
       () => {
-        void triggerQualtricsIntercept({
+        void redirectToQualtricsSurvey({
           institutionDescription: onboardingFormData?.businessName ?? '',
           productId,
           institutionType: institutionType ?? '',
