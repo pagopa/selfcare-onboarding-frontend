@@ -50,7 +50,7 @@ it('test verifyRecipientCodeIsValid handles error', async () => {
 
   await verifyRecipientCodeIsValid('A1B2C3', uoSelected, formik, setRecipientCodeStatus, 'orig-1');
 
-  expect(setRecipientCodeStatus).toHaveBeenCalledWith('error');
+  expect(setRecipientCodeStatus).toHaveBeenCalledWith('DENIED_NO_ASSOCIATION');
 });
 
 it('test verifyRecipientCodeIsValid uses empty string when originId is undefined', async () => {

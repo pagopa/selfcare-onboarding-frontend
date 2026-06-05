@@ -21,7 +21,7 @@ export const verifyRecipientCodeIsValid = async (
     }
     setRecipientCodeStatus(response);
   } catch (error) {
-    setRecipientCodeStatus('error');
+    setRecipientCodeStatus('DENIED_NO_ASSOCIATION');
   }
 };
 
