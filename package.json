@@ -29,6 +29,8 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "test": "vitest run",
+    "generate": "yarn run generate:api-onboarding && yarn run generate:api-party-registry-proxy",
+    "prebuild": "yarn run generate",
     "test:coverage": "vitest run --coverage",
     "test:e2e": "cd e2e && set VITE_ENV=development && yarn playwright test --reporter=list",
     "test:e2e:local": "cd e2e && dotenv -e ../.env.development.local -- yarn playwright test --reporter=list",
