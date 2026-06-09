@@ -1337,10 +1337,10 @@
     write-yaml-file "^4.1.3"
     yargs "^15.0.1"
 
-"@pagopa/selfcare-common-frontend@^1.34.108":
-  version "1.34.108"
-  resolved "https://registry.yarnpkg.com/@pagopa/selfcare-common-frontend/-/selfcare-common-frontend-1.34.108.tgz#0ea60d379d26f442bd6d1f716088505825b91447"
-  integrity sha512-34TXfL06mERgiDE9Qb2yTO6Tn1Gi3M1xtlhhemLw7Ns+dYvI4znjMMsSq0urqVTr6S8stRP/HnDpUgooAcQOEQ==
+"@pagopa/selfcare-common-frontend@^1.36.0":
+  version "1.36.0"
+  resolved "https://registry.yarnpkg.com/@pagopa/selfcare-common-frontend/-/selfcare-common-frontend-1.36.0.tgz#3a0efb2bee1ba1fa1b2f04889819c7b517add1c6"
+  integrity sha512-rSmVmy2mFnKumjagqhk9T3EY60H+7yzNt+EYVFDEtuSXUcqCil10A8bABaPIEkBdMQdrDRgy34nXqFGBKy83TA==
   dependencies:
     "@emotion/react" "^11.11.1"
     "@emotion/styled" "^11.11.0"
