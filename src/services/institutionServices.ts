@@ -99,15 +99,28 @@ export const handleSearchByTaxCode = async (
 export const getUoInfoFromRecipientCode = async (
   recipientCode: string,
   setDisableTaxCodeInvoicing: Dispatch<SetStateAction<boolean>>,
+  setRequiredLogin: Dispatch<SetStateAction<boolean>>,
   formik: any
 ) => {
-  try {
-    const searchResponse = await PartyRegistryProxyApi.getUoInfo(recipientCode);
-    formik.setFieldValue('taxCodeInvoicing', (searchResponse as any).codiceFiscaleSfe);
+  const searchResponse = await fetchWithLogs(
+    { endpoint: 'ONBOARDING_GET_UO_CODE_INFO', endpointParams: { codiceUniUo: recipientCode } },
+    {
+      method: 'GET',
+      params: undefined,
+    },
+    () => setRequiredLogin(true)
+  );
+
+  const outcome = getFetchOutcome(searchResponse);
+
+  if (outcome === 'success') {
+    formik.setFieldValue(
+      'taxCodeInvoicing',
+      (searchResponse as AxiosResponse).data?.codiceFiscaleSfe
+    );
     setDisableTaxCodeInvoicing(true);
-  } catch (error) {
+  } else {
     setDisableTaxCodeInvoicing(false);
-    console.error(error);
   }
 };
 
