@@ -24,7 +24,6 @@ vi.mock('@pagopa/selfcare-common-frontend/lib/services/analyticsService', () => 
 }));
 
 const setLoading = vi.fn();
-const setRequiredLogin = vi.fn();
 const setOutcome = vi.fn();
 const setProduct = vi.fn();
 const setProducts = vi.fn();

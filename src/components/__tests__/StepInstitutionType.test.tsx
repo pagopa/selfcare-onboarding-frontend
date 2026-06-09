@@ -19,7 +19,6 @@ vi.mock('../../lib/api-utils');
       productAvoidStep={false}
       loading={false}
       setLoading={vi.fn()}
-      setRequiredLogin={vi.fn()}
       setOutcome={vi.fn()}
       genericError={{
         title: '',
@@ -55,7 +54,6 @@ test('Test: The correct institution types with the expected descriptions, can be
         productAvoidStep={false}
         loading={false}
         setLoading={vi.fn()}
-        setRequiredLogin={vi.fn()}
         setOutcome={vi.fn()}
         genericError={{
           title: '',

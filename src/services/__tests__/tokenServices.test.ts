@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { beforeEach, expect, it, vi } from 'vitest';
 import { OnboardingApi } from '../../api/OnboardingApiClient';
 import { getOnboardingInfo, verifyRequest } from '../tokenServices';
 
