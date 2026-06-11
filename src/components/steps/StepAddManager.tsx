@@ -243,20 +243,18 @@ export function StepAddManager({
               />
             </Grid>
           )}
-          <Grid item xs={12} display="flex" justifyContent="center">
-            <PlatformUserForm
-              prefix="manager-initial"
-              role="MANAGER"
-              people={people}
-              peopleErrors={peopleErrors}
-              allPeople={people}
-              setPeople={setPeople}
-              readOnly={readOnly}
-              readOnlyFields={isAuthUserManager ? ['name', 'surname', 'taxCode'] : []}
-              isAuthUser={isAuthUserManager}
-              productId={product?.id}
-            />
-          </Grid>
+          <PlatformUserForm
+            prefix="manager-initial"
+            role="MANAGER"
+            people={people}
+            peopleErrors={peopleErrors}
+            allPeople={people}
+            setPeople={setPeople}
+            readOnly={readOnly}
+            readOnlyFields={isAuthUserManager ? ['name', 'surname', 'taxCode'] : []}
+            isAuthUser={isAuthUserManager}
+            productId={product?.id}
+          />
         </Paper>
       </Grid>
 
