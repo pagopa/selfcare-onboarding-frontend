@@ -243,7 +243,6 @@ export function StepAddManager({
               />
             </Grid>
           )}
-          <Grid item xs={12} display="flex" justifyContent="center">
             <PlatformUserForm
               prefix="manager-initial"
               role="MANAGER"
@@ -256,7 +255,6 @@ export function StepAddManager({
               isAuthUser={isAuthUserManager}
               productId={product?.id}
             />
-          </Grid>
         </Paper>
       </Grid>
 
