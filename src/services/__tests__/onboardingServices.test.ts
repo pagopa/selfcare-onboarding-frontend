@@ -7,6 +7,7 @@ import {
   getAllowedAddUserProducts,
   getInstiutionTypesByProduct,
 } from '../onboardingServices';
+import { InstitutionType } from '../../../types';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
 
 vi.mock('../../api/OnboardingApiClient', () => ({
@@ -61,7 +62,7 @@ it('test getOnboardingData success calls forward with mapped fields', async () =
     setLoading,
     'prod-1',
     forward,
-    undefined,
+    'PA' as InstitutionType,
     setOutcome,
     genericError,
     'party-1'
@@ -80,7 +81,7 @@ it('test getOnboardingData on 404 calls forward with undefined', async () => {
     setLoading,
     'prod-1',
     forward,
-    'PA' as any,
+    'PA' as InstitutionType,
     setOutcome,
     genericError,
     'party-1'
@@ -98,7 +99,7 @@ it('test getOnboardingData on generic error sets genericError outcome', async ()
     setLoading,
     'prod-1',
     forward,
-    undefined,
+    'PA' as InstitutionType,
     setOutcome,
     genericError,
     'party-1'
