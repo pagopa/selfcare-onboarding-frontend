@@ -159,7 +159,7 @@ export const getOnboardingData = async (
   setLoading: Dispatch<SetStateAction<boolean>>,
   productId: string,
   forward: (...args: any) => void,
-  institutionType: InstitutionType | undefined,
+  institutionType: InstitutionType,
   setOutcome: Dispatch<SetStateAction<any>>,
   genericError: any,
   partyId?: string
@@ -190,7 +190,7 @@ export const getOnboardingData = async (
   } catch (error) {
     const status = getErrorStatus(error);
     if (status === 404 || status === 400) {
-      forward(undefined, institutionType, undefined);
+      forward(undefined, undefined, undefined, institutionType);
     } else {
       setOutcome(genericError);
     }

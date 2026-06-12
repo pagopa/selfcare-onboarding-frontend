@@ -25,17 +25,17 @@ import { useHistoryState } from '../../hooks/useHistoryState';
 import { HeaderContext, UserContext } from '../../lib/context';
 import { CompanyInformations } from '../../model/CompanyInformations';
 import { OnboardingFormData } from '../../model/OnboardingFormData';
+import { getPricingPlan } from '../../services/subProductServices';
 import { PRODUCT_IDS } from '../../utils/constants';
 import { ENV } from '../../utils/env';
-import { registerUnloadEvent, unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
-import { getPricingPlan } from '../../services/subProductServices';
 import { isPagoPaInsights } from '../../utils/institutionTypeUtils';
+import { registerUnloadEvent, unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
+import { SubProductStepNoParties } from './components/SubProductStepNoParties';
 import { SubProductStepSelectUserParty } from './components/SubProductStepSelectUserParty';
 import SubProductStepSubmit from './components/SubProductStepSubmit';
 import SubProductStepSuccess from './components/SubProductStepSuccess';
-import SubProductStepVerifyInputs from './components/SubProductStepVerifyInputs';
-import { SubProductStepNoParties } from './components/SubProductStepNoParties';
 import SubProductStepUserUnrelated from './components/SubProductStepUserUnrelated';
+import SubProductStepVerifyInputs from './components/SubProductStepVerifyInputs';
 import { createSubProductForwardFunctions } from './components/forwards/forwardFunctions';
 
 type OnboardingPremiumUrlParams = {
@@ -207,9 +207,10 @@ function OnboardingPremiumComponent() {
       label: 'Get Onboarding Data',
       Component: () =>
         StepOnboardingData({
+          forward: forwardWithOnboardingData,
           productId,
           partyId: selectedParty?.id,
-          forward: forwardWithOnboardingData,
+          institutionType: institutionType as InstitutionType,
           subProductFlow: true,
         }),
     },

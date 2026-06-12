@@ -13,7 +13,7 @@ import { MessageNoAction } from '../shared/MessageNoAction';
 type Props = StepperStepComponentProps & {
   productId: string;
   partyId?: string;
-  institutionType?: InstitutionType;
+  institutionType: InstitutionType;
   subProductFlow?: boolean;
 };
 
@@ -61,7 +61,7 @@ function StepOnboardingData({
         setLoading,
         productId,
         forward,
-        institutionType,
+        institutionType as InstitutionType,
         setOutcome,
         genericError,
         partyId
