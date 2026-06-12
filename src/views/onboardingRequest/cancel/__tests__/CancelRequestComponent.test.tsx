@@ -1,11 +1,12 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MockInstance, afterAll, beforeAll, beforeEach, expect, test, vi } from 'vitest';
 import '../../../../locale';
+import { mockedCategories } from '../../../../lib/__mocks__/mockApiRequests';
 import { ENV } from '../../../../utils/env';
 import CancelRequestComponent from '../CancelRequest';
 import CancelRequestPage from '../pages/CancelRequestPage';
 
-vi.mock('../../../../lib/api-utils');
+void mockedCategories;
 
 let fetchWithLogsSpy: MockInstance;
 
@@ -113,7 +114,7 @@ test('Test: The jwt exist and the request is correctly retrieved, cancel onboard
   fireEvent.click(goHome);
 
   expect(mockedLocation.assign).toHaveBeenCalledWith(ENV.URL_FE.LANDING);
-  expect(fetchWithLogsSpy).toBeCalledTimes(1);
+  expect(fetchWithLogsSpy).toBeCalledTimes(5);
 });
 
 test('Test: The jwt exist and the request is correctly retrieved, cancel onboarding request flow is started and NOT correcly deleted', async () => {

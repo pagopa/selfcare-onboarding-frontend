@@ -11,6 +11,7 @@ import en from './locale/en';
 import de from './locale/de';
 import fr from './locale/fr';
 import sl from './locale/sl';
+import '@testing-library/jest-dom/vitest';
 
 void i18n.use(initReactI18next).init({
     resources: {
@@ -25,6 +26,9 @@ void i18n.use(initReactI18next).init({
     initImmediate: false,
     interpolation: { escapeValue: false },
 });
+
+vi.mock('./api/OnboardingApiClient');
+vi.mock('./api/PartyRegistryProxyApiClient');
 
 beforeEach(() => {
     vi.spyOn(console, 'error').mockImplementation(() => { });

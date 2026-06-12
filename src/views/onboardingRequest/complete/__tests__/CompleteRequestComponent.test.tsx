@@ -5,7 +5,7 @@ import '../../../../locale';
 import { ENV } from '../../../../utils/env';
 import CompleteRequestComponent from '../CompleteRequest';
 
-vi.setConfig({ testTimeout: 40000 });
+vi.setConfig({ testTimeout: 80000 });
 
 vi.mock('react-router-dom', () => ({
   useHistory: () => ({

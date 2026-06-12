@@ -35,7 +35,6 @@ type Props = StepperStepComponentProps & {
   productAvoidStep: boolean;
   loading: boolean;
   setLoading: Dispatch<SetStateAction<boolean>>;
-  setRequiredLogin: Dispatch<SetStateAction<boolean>>;
   setOutcome: Dispatch<SetStateAction<RequestOutcomeMessage | null | undefined>>;
   genericError: RequestOutcomeMessage;
 };
@@ -51,7 +50,6 @@ export default function StepInstitutionType({
   productAvoidStep,
   loading,
   setLoading,
-  setRequiredLogin,
   setOutcome,
   genericError,
 }: Props) {
@@ -67,7 +65,6 @@ export default function StepInstitutionType({
       setLoading,
       productId,
       setRetrivedInstituionType,
-      setRequiredLogin,
       setOutcome,
       genericError
     );

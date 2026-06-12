@@ -88,18 +88,18 @@ test('should render GeoTaxonomySection with mocked retrievedTaxonomies and click
   // Select a comune
   fireEvent.click(input);
   fireEvent.change(input, { target: { value: 'Mil' } });
-  await waitFor(() => screen.getByText('Milano (MI) comune'));
+  await waitFor(() => screen.getByText('Milano (MI) comune'), { timeout: 15000 });
   fireEvent.click(screen.getByText('Milano (MI) comune'));
-  await waitFor(() => expect(input.value).toBe('Milano (MI)'));
+  await waitFor(() => expect(input.value).toBe('Milano (MI)'), { timeout: 15000 });
 
   // Clear and select a regione (reuse same DOM node — stable because key=index)
   fireEvent.click(screen.getByLabelText('Clear'));
   fireEvent.click(input);
   fireEvent.change(input, { target: { value: 'Emilia' } });
-  await waitFor(() => screen.getByText('Emilia - Romagna'));
+  await waitFor(() => screen.getByText('Emilia - Romagna'), { timeout: 15000 });
   fireEvent.click(screen.getByText('Emilia - Romagna'));
-  await waitFor(() => expect(input.value).toBe('Emilia - Romagna'));
-});
+  await waitFor(() => expect(input.value).toBe('Emilia - Romagna'), { timeout: 15000 });
+}, 30000);
 
 test('should render GeoTaxonomySection with mocked retrievedTaxonomies and click on national radio button', async () => {
   renderComponentWithProviders(

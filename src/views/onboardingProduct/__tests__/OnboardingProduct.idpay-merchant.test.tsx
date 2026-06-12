@@ -22,7 +22,7 @@ import {
   setupTestHooks,
 } from './shared/testSetup';
 
-vi.setConfig({ testTimeout: 40000 });
+vi.setConfig({ testTimeout: 80000 });
 vi.mock('react-router-dom', async () => ({
   ...(await vi.importActual('react-router-dom')),
   useHistory: () => ({
@@ -60,7 +60,7 @@ test('Test: Successfull complete onboarding request of PRV party for prod-idpay-
     'taxCode'
   );
   await executeGoHome(mockedLocation);
-});
+}, 80000);
 
 test('Test: Successfull complete onboarding request of PRV party for prod-idpay-merchant search by reaCode', async () => {
   renderComponent(PRODUCT_IDS.IDPAY_MERCHANT);

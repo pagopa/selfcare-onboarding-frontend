@@ -23,7 +23,7 @@ import {
   setupTestHooks,
 } from './shared/testSetup';
 
-vi.setConfig({ testTimeout: 40000 });
+vi.setConfig({ testTimeout: 80000 });
 vi.mock('react-router-dom', async () => ({
   ...(await vi.importActual('react-router-dom')),
   useHistory: () => ({

@@ -10,7 +10,7 @@ import {
   alpha,
 } from '@mui/material';
 import { theme } from '@pagopa/mui-italia';
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   InstitutionType,
@@ -18,7 +18,6 @@ import {
   StepperStepComponentProps,
 } from '../../../../types';
 import { OnboardingStepActions } from '../../../components/registrationSteps/OnboardingStepActions';
-import { UserContext } from '../../../lib/context';
 import { ProductResource } from '../../../model/ProductResource';
 import { getAllowedAddUserProducts } from '../../../services/onboardingServices';
 import { ENV } from '../../../utils/env';
@@ -37,7 +36,6 @@ export function StepSelectProduct({
   setOutcome,
   institutionType,
 }: Props) {
-  const { setRequiredLogin } = useContext(UserContext);
   const { t } = useTranslation();
   const [products, setProducts] = useState<Array<ProductResource>>();
   const [selectedProduct, setSelectedProduct] = useState<ProductResource>();
@@ -49,7 +47,6 @@ export function StepSelectProduct({
     void getAllowedAddUserProducts(
       setLoading,
       setProducts,
-      setRequiredLogin,
       setOutcome,
       genericError
     );

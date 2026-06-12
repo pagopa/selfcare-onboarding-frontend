@@ -6,11 +6,11 @@ import { Trans, useTranslation } from 'react-i18next';
 import { useParams } from 'react-router';
 import {
   FileErrorAttempt,
-  OnboardingRequestData,
   Problem,
   RequestOutcomeComplete,
   StepperStep,
 } from '../../../../types';
+import { OnboardingVerify } from '../../../api/generated/onboarding/OnboardingVerify';
 import { LoadingOverlay } from '../../../components/modals/LoadingOverlay';
 import { ConfirmRegistrationStep0 } from '../../../components/registrationSteps/ConfirmRegistrationStep0';
 import { ConfirmRegistrationStep1 } from '../../../components/registrationSteps/ConfirmRegistrationStep1';
@@ -78,7 +78,7 @@ export default function CompleteRequestComponent() {
     'uploaded_files',
     []
   );
-  const [requestData, setRequestData] = useState<OnboardingRequestData>();
+  const [requestData, setRequestData] = useState<OnboardingVerify>();
   const [institutionId, setInstitutionId] = useState<string>();
   const [attachmentUploadSuccess, setAttachmentUploadSuccess] = useState<boolean>(false);
   const addUserFlow = new URLSearchParams(window.location.search).get('add-user') === 'true';

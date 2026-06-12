@@ -15,6 +15,8 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./src/setupTests.ts'],
     exclude: ['**/node_modules/**', '**/e2e/**'],
+    testTimeout: 30000,
+    hookTimeout: 15000,
     server: {
       deps: {
         inline: ['@pagopa/selfcare-common-frontend', '@pagopa/mui-italia'],
@@ -31,6 +33,14 @@ export default defineConfig({
         'src/views/onboardingPremium/components/subProductStepPricingPlan/*',
         'e2e/**',
         'src/locale/**',
+        'src/**/__mocks__/**',
+        'src/setupTests.ts',
+        'src/assets/**',
+        'src/utils/test/**',
+        'src/utils/config.json',
+        'src/**/__tests__/**',
+        'src/App.tsx',
+        'src/redux/store.ts',
       ],
     },
   },

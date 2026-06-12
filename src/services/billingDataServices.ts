@@ -13,15 +13,10 @@ export const verifyRecipientCodeIsValid = async (
   originId?: string
 ) => {
   const getRecipientCodeValidation = await fetchWithLogs(
-    {
-      endpoint: 'ONBOARDING_RECIPIENT_CODE_VALIDATION',
-    },
+    { endpoint: 'ONBOARDING_RECIPIENT_CODE_VALIDATION' },
     {
       method: 'GET',
-      params: {
-        recipientCode,
-        originId,
-      },
+      params: { recipientCode, originId },
     },
     () => setRequiredLogin(true)
   );
@@ -31,7 +26,6 @@ export const verifyRecipientCodeIsValid = async (
   if (outcome === 'success') {
     const result = (getRecipientCodeValidation as AxiosResponse).data;
     if (uoSelected && result && result === 'DENIED_NO_BILLING') {
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
       formik.setFieldValue('recipientCode', undefined);
     }
     setRecipientCodeStatus(result);

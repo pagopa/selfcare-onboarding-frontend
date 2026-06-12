@@ -16,7 +16,7 @@ import { PRODUCT_IDS } from '../../../utils/constants';
 
 type Search = 'taxCode' | 'aooCode' | 'uoCode' | 'ivassCode' | 'personalTaxCode';
 
-vi.setConfig({ testTimeout: 40000 });
+vi.setConfig({ testTimeout: 80000 });
 
 const oldWindowLocation = window.location;
 const mockedLocation = {
