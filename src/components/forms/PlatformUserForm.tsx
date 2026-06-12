@@ -1,5 +1,5 @@
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
-import { Grid, IconButton, TextField, Typography } from '@mui/material';
+import { Box, Grid, IconButton, TextField, Typography } from '@mui/material';
 import { emailRegexp } from '@pagopa/selfcare-common-frontend/lib/utils/constants';
 import { verifyChecksumMatchWithTaxCode } from '@pagopa/selfcare-common-frontend/lib/utils/verifyChecksumMatchWithTaxCode';
 import { verifyNameMatchWithTaxCode } from '@pagopa/selfcare-common-frontend/lib/utils/verifyNameMatchWithTaxCode';
@@ -311,7 +311,7 @@ export const PlatformUserForm = ({
     errors.filter((e) => e.startsWith(prefixErrorCode)).map((e) => e.replace(prefixErrorCode, ''));
 
   return (
-    <Grid container xs={12}>
+    <Box>
       {isExtraDelegate && delegateId && buildRemoveDelegateForm && (
         <Grid container xs={12} pb={3} alignItems="center" width="100%">
           <Grid item xs={6}>
@@ -406,6 +406,6 @@ export const PlatformUserForm = ({
           }
         )}
       </Grid>
-    </Grid>
+    </Box>
   );
 };
