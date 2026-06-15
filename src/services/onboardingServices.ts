@@ -159,7 +159,7 @@ export const getOnboardingData = async (
   setLoading: Dispatch<SetStateAction<boolean>>,
   productId: string,
   forward: (...args: any) => void,
-  institutionType: InstitutionType,
+  institutionType: InstitutionType | undefined,
   setOutcome: Dispatch<SetStateAction<any>>,
   genericError: any,
   partyId?: string
