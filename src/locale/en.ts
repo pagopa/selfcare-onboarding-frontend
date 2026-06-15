@@ -203,6 +203,9 @@ export default {
       message:
         'The Legal Representative data entered is different from that indicated <1 />previously. Do you want to continue?',
     },
+    formControl: {
+      label: 'Add me as Legal Representative',
+    },
     back: 'Back',
     continue: 'Continue',
   },

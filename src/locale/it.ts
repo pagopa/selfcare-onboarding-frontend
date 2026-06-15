@@ -225,6 +225,9 @@ export default {
       message:
         'I dati del Legale Rappresentante inseriti sono diversi da quelli indicati in <1 />precedenza. Vuoi continuare?',
     },
+    formControl: {
+      label: 'Aggiungi me come Legale Rappresentante',
+    },
     back: 'Indietro',
     continue: 'Continua',
   },

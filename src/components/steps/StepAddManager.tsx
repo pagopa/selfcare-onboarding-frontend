@@ -232,7 +232,7 @@ export function StepAddManager({
                 }
                 label={
                   <Typography variant="body1" id="authUserSwitch-label">
-                    {t('stepAddDelegates.formControl.label')}
+                    {t('stepAddManager.formControl.label')}
                   </Typography>
                 }
                 sx={{
