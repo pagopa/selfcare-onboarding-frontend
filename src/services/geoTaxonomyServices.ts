@@ -1,7 +1,7 @@
-import { AxiosError, AxiosResponse } from 'axios';
 import { Dispatch, SetStateAction } from 'react';
-import { fetchWithLogs } from '../lib/api-utils';
-import { getFetchOutcome } from '../lib/error-utils';
+import { OnboardingApi } from '../api/OnboardingApiClient';
+import { PartyRegistryProxyApi } from '../api/PartyRegistryProxyApiClient';
+import { getErrorStatus } from '../lib/error-utils';
 import { GeographicTaxonomy, GeographicTaxonomyResource } from '../model/GeographicTaxonomies';
 import { InstitutionLocationData } from '../model/InstitutionLocationData';
 import { formatCity } from '../utils/formatting-utils';
@@ -15,24 +15,14 @@ import { isMockEnvironment } from '../utils/institutionTypeUtils';
 export const getCountriesFromGeotaxonomies = async (
   query: string,
   setCountries: Dispatch<SetStateAction<Array<InstitutionLocationData> | undefined>>,
-  setRequiredLogin: Dispatch<SetStateAction<boolean>>
+  _setRequiredLogin: Dispatch<SetStateAction<boolean>>
 ) => {
-  const searchGeotaxonomy = await fetchWithLogs(
-    {
-      endpoint: 'ONBOARDING_GET_GEOTAXONOMY',
-    },
-    {
-      method: 'GET',
-      params: { description: query },
-    },
-    () => setRequiredLogin(true)
-  );
-  const outcome = getFetchOutcome(searchGeotaxonomy);
+  try {
+    const geographicTaxonomies = (await PartyRegistryProxyApi.getTaxonomiesByQuery(
+      query
+    )) as Array<GeographicTaxonomyResource>;
 
-  if (outcome === 'success') {
-    const geographicTaxonomies = (searchGeotaxonomy as AxiosResponse).data;
-
-    const mappedResponse = geographicTaxonomies.map((gt: GeographicTaxonomyResource) => ({
+    const mappedResponse = geographicTaxonomies.map((gt) => ({
       code: gt.code,
       country: gt.country_abbreviation,
       county: gt.province_abbreviation,
@@ -48,6 +38,8 @@ export const getCountriesFromGeotaxonomies = async (
       }));
 
     setCountries(onlyCountries);
+  } catch (error) {
+    console.error(error);
   }
 };
 
@@ -56,61 +48,39 @@ export const getPreviousGeotaxononomies = async (
   aooSelected: AooData | undefined,
   uoSelected: UoData | undefined,
   setPreviousGeotaxononomies: Dispatch<SetStateAction<Array<GeographicTaxonomy>>>,
-  setRequiredLogin: Dispatch<SetStateAction<boolean>>
+  _setRequiredLogin: Dispatch<SetStateAction<boolean>>
 ) => {
-  const onboardingData = await fetchWithLogs(
-    {
-      endpoint: 'ONBOARDING_GET_PREVIOUS_GEOTAXONOMIES',
-    },
-    {
-      method: 'GET',
-      params: {
-        taxCode: externalInstitutionId,
-        ...(aooSelected
-          ? { subunitCode: aooSelected?.codiceUniAoo }
-          : uoSelected && { subunitCode: uoSelected?.codiceUniUo }),
-      },
-    },
-    () => setRequiredLogin(true)
-  );
-
-  const restOutcomeData = getFetchOutcome(onboardingData);
-  if (restOutcomeData === 'success') {
-    const result = (onboardingData as AxiosResponse).data;
+  try {
+    const subunitCode = aooSelected?.codiceUniAoo ?? uoSelected?.codiceUniUo;
+    const result = await OnboardingApi.getPreviousGeotaxonomy(externalInstitutionId, subunitCode);
     if (result) {
-      setPreviousGeotaxononomies(result);
+      setPreviousGeotaxononomies(result as unknown as Array<GeographicTaxonomy>);
     }
+  } catch (error) {
+    console.error(error);
   }
 };
 
 export const getLocationFromIstatCode = async (
   setInstitutionLocationData: Dispatch<SetStateAction<InstitutionLocationData | undefined>>,
-  setRequiredLogin: Dispatch<SetStateAction<boolean>>,
+  _setRequiredLogin: Dispatch<SetStateAction<boolean>>,
   istatCode?: string
 ) => {
-  const getLocation = await fetchWithLogs(
-    {
-      endpoint: 'ONBOARDING_GET_LOCATION_BY_ISTAT_CODE',
-      endpointParams: {
-        geoTaxId: istatCode,
-      },
-    },
-    { method: 'GET' },
-    () => setRequiredLogin(true)
-  );
-  const outcome = getFetchOutcome(getLocation);
-
-  if (outcome === 'success') {
-    const result = (getLocation as AxiosResponse).data;
+  if (!istatCode) {
+    return;
+  }
+  try {
+    const result = await PartyRegistryProxyApi.getLocationByCode(istatCode);
     if (result) {
-      const institutionLocation = {
+      setInstitutionLocationData({
         code: result.code,
         country: result.country_abbreviation,
         county: result.province_abbreviation,
-        city: formatCity(result.desc),
-      };
-      setInstitutionLocationData(institutionLocation);
+        city: formatCity(result.desc ?? ''),
+      });
     }
+  } catch (error) {
+    console.error(error);
   }
 };
 
@@ -139,39 +109,23 @@ export const getNationalCountries = async (
 export const handleSearch = async (
   query: string,
   index: number,
-  setRequiredLogin: Dispatch<SetStateAction<boolean>>,
+  _setRequiredLogin: Dispatch<SetStateAction<boolean>>,
   optionsSelected: Array<GeographicTaxonomy>,
   setOptions: Dispatch<SetStateAction<Array<GeographicTaxonomy>>>,
   findError: (index: number) => void,
   deleteError: (index: number) => void,
   setIsAddNewAutocompleteEnabled: Dispatch<SetStateAction<boolean>>
 ) => {
-  const searchGeotaxonomy = await fetchWithLogs(
-    {
-      endpoint: 'ONBOARDING_GET_GEOTAXONOMY',
-    },
-    {
-      method: 'GET',
-      params: { description: query },
-    },
-    () => setRequiredLogin(true)
-  );
-  const outcome = getFetchOutcome(searchGeotaxonomy);
+  try {
+    const data = (await PartyRegistryProxyApi.getTaxonomiesByQuery(query)) as Array<
+      GeographicTaxonomy & { label?: string }
+    >;
 
-  if (outcome === 'success') {
-    // eslint-disable-next-line functional/no-let
-    let data = (searchGeotaxonomy as AxiosResponse).data;
-
-    data = data.map((value: GeographicTaxonomy) => ({
-      ...value,
-      label: value.desc,
-    }));
-
-    const dataFiltered = data.filter(
-      (data: any) => !optionsSelected.find((os) => os?.code === data?.code)
+    const withLabel = data.map((value) => ({ ...value, label: value.desc }));
+    const dataFiltered = withLabel.filter(
+      (d) => !optionsSelected.find((os) => os?.code === d?.code)
     );
-
-    const matchesWithTyped = dataFiltered.filter((o: GeographicTaxonomy) =>
+    const matchesWithTyped = dataFiltered.filter((o) =>
       o.desc.toLocaleLowerCase().includes(query.toLocaleLowerCase())
     );
     setOptions(matchesWithTyped);
@@ -182,7 +136,9 @@ export const handleSearch = async (
       findError(index);
       setIsAddNewAutocompleteEnabled(false);
     }
-  } else if ((searchGeotaxonomy as AxiosError).response?.status === 404) {
-    setOptions([]);
+  } catch (error) {
+    if (getErrorStatus(error) === 404) {
+      setOptions([]);
+    }
   }
 };

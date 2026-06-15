@@ -380,7 +380,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     // eslint-disable-next-line functional/immutable-data
     requestIdRef.current = uniqueId(`onboarding-${externalInstitutionId}-${productId}-`);
 
-    void checkProduct(productId, setSelectedProduct, setRequiredLogin, {
+    void checkProduct(productId, setSelectedProduct, {
       onNotFound: () => unregisterUnloadEvent(setOnExit),
       onError: () => unregisterUnloadEvent(setOnExit),
       onPhaseOut: () => setOutcome(prodPhaseOutErrorPage),
@@ -443,7 +443,6 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           productAvoidStep,
           loading,
           setLoading,
-          setRequiredLogin,
           setOutcome,
           genericError,
         }),

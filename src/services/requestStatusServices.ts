@@ -3,11 +3,18 @@ import { AxiosError } from 'axios';
 import { uniqueId } from 'lodash';
 import { Dispatch, SetStateAction } from 'react';
 import { FileErrorAttempt, Problem, RequestOutcomeComplete } from '../../types';
+import { OnboardingApi } from '../api/OnboardingApiClient';
 import { fetchWithLogs } from '../lib/api-utils';
 import { getFetchOutcome } from '../lib/error-utils';
 import { customErrors } from '../utils/constants';
 import { ENV } from '../utils/env';
 import { redirectToLogin } from '../utils/unloadEvent-utils';
+
+// NOTE: only deleteRequest has been migrated to codegen. The other services
+// stay on fetchWithLogs because all 3 upload endpoints
+// (contract, user-complete, attachment) share the same OpenAPI spec bug:
+// the multipart body is not declared, so the codegen does not generate
+// the File parameter. Same issue as verifyAggregatesCsv.
 
 export const deleteRequest =
   (
@@ -18,23 +25,16 @@ export const deleteRequest =
   () => {
     const requestId = uniqueId('contract-reject-');
     async function asyncSendDeleteRequest() {
-      // Send DELETE request
-      const deleteOnboardingResponse = await fetchWithLogs(
-        { endpoint: 'ONBOARDING_COMPLETE_REGISTRATION', endpointParams: { token } },
-        { method: 'DELETE' },
-        redirectToLogin
-      );
-
-      const response = getFetchOutcome(deleteOnboardingResponse);
-
-      if (response === 'success') {
+      try {
+        await OnboardingApi.deleteOnboardingRequest(token as string);
         trackEvent('ONBOARDING_CANCEL_SUCCESS', { request_id: requestId, party_id: token });
-        setOutcomeContentState(response);
-      } else {
+        setOutcomeContentState('success');
+      } catch {
         trackEvent('ONBOARDING_CANCEL_FAILURE', { request_id: requestId, party_id: token });
-        setOutcomeContentState(response);
+        setOutcomeContentState('error');
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     }
 
     if (!token) {

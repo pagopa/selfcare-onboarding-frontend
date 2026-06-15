@@ -2,11 +2,10 @@ import { Box, Button, Grid, Typography } from '@mui/material';
 import { IllusError } from '@pagopa/mui-italia';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
 import { resolvePathVariables } from '@pagopa/selfcare-common-frontend/lib/utils/routes-utils';
-import { useContext, useEffect } from 'react';
+import { useEffect } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
 import { Product } from '../../../../types';
-import { UserContext } from '../../../lib/context';
 import { onExitPremiumFlow } from '../../../services/subProductServices';
 import { ROUTES } from '../../../utils/constants';
 
@@ -18,7 +17,6 @@ type Props = {
 
 export default function SubProductStepUserUnrelated({ product, subProduct, productId }: Props) {
   const history = useHistory();
-  const { setRequiredLogin } = useContext(UserContext);
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -68,7 +66,7 @@ export default function SubProductStepUserUnrelated({ product, subProduct, produ
             <Button
               variant="outlined"
               sx={{ alignSelf: 'center', mr: 2 }}
-              onClick={() => onExitPremiumFlow(setRequiredLogin, productId)}
+              onClick={() => onExitPremiumFlow(productId)}
             >
               {t('onboardingSubProduct.subProductStepUserUnrelated.backHomeLabelBtn')}
             </Button>

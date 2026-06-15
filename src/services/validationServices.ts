@@ -1,10 +1,11 @@
 import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
 import { AxiosError } from 'axios';
 import { Dispatch, SetStateAction } from 'react';
-import { InstitutionType, Problem, ProblemUserValidate, UserOnCreate } from '../../types';
+import { InstitutionType, ProblemUserValidate, UserOnCreate } from '../../types';
+import { OnboardingApi } from '../api/OnboardingApiClient';
 import { StepBillingDataHistoryState } from '../components/steps/StepOnboardingFormData';
 import { fetchWithLogs } from '../lib/api-utils';
-import { getFetchOutcome } from '../lib/error-utils';
+import { getErrorStatus, getFetchOutcome, HttpError } from '../lib/error-utils';
 import { isPublicAdministration } from '../utils/institutionTypeUtils';
 
 export const verifyVatNumber = async (
@@ -58,45 +59,30 @@ export const userValidate = async (
   userId: string,
   onForwardAction: () => void,
   onValidationError: (userId: string, errors: { [fieldName: string]: Array<string> }) => void,
-  onRedirectToLogin: () => void,
   setLoading: (loading: boolean) => void,
   eventName: string
 ) => {
   setLoading(true);
 
-  const resultValidation = await fetchWithLogs(
-    {
-      endpoint: 'ONBOARDING_USER_VALIDATION',
-    },
-    {
-      method: 'POST',
-      data: {
-        name: user.name,
-        surname: user.surname,
-        taxCode: user.taxCode,
-      },
-    },
-    onRedirectToLogin
-  );
-
-  const result = getFetchOutcome(resultValidation);
-  const errorBody = (resultValidation as AxiosError<ProblemUserValidate>).response?.data;
-
-  if (
-    result === 'error' &&
-    (resultValidation as AxiosError<Problem>).response?.status === 409 &&
-    errorBody
-  ) {
-    trackEvent(`${eventName}_CONFLICT_ERROR`, {
-      party_id: partyId,
-      reason: errorBody.detail,
-    });
-    onValidationError(
-      userId,
-      Object.fromEntries(errorBody?.invalidParams?.map((e: any) => [e.name, ['conflict']]) ?? [])
-    );
-  } else {
+  try {
+    await OnboardingApi.userValidate(user.name ?? '', user.surname ?? '', user.taxCode ?? '');
     onForwardAction();
+  } catch (error) {
+    const status = getErrorStatus(error);
+    if (status === 409 && (error as HttpError).httpBody) {
+      const errorBody = (error as HttpError).httpBody as ProblemUserValidate;
+      trackEvent(`${eventName}_CONFLICT_ERROR`, {
+        party_id: partyId,
+        reason: errorBody.detail,
+      });
+      onValidationError(
+        userId,
+        Object.fromEntries(errorBody?.invalidParams?.map((e: any) => [e.name, ['conflict']]) ?? [])
+      );
+    } else {
+      onForwardAction();
+    }
+  } finally {
+    setLoading(false);
   }
-  setLoading(false);
 };

@@ -196,15 +196,15 @@ export function StepSearchParty({
 
   useEffect(() => {
     if (aooResult) {
-      void getECDataByCF(aooResult?.codiceFiscaleEnte, setApiLoading, setEcData, setRequiredLogin);
+      void getECDataByCF(aooResult?.codiceFiscaleEnte, setApiLoading, setEcData);
     } else if (uoResult) {
-      void getECDataByCF(uoResult?.codiceFiscaleEnte, setApiLoading, setEcData, setRequiredLogin);
+      void getECDataByCF(uoResult?.codiceFiscaleEnte, setApiLoading, setEcData);
     }
   }, [aooResult, uoResult]);
 
   useEffect(() => {
     if (partyExternalIdByQuery) {
-      handleSearchExternalId(partyExternalIdByQuery, () => setRequiredLogin(true))
+      handleSearchExternalId(partyExternalIdByQuery)
         .then((ipaParty) => {
           if (ipaParty) {
             // setSelected(ipaParty);

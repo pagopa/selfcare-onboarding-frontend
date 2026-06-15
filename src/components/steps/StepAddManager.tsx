@@ -16,6 +16,7 @@ import {
 } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { InstitutionType, Product, StepperStepComponentProps, UserOnCreate } from '../../../types';
+import { InstitutionTypeEnum } from '../../api/generated/onboarding/CompanyOnboardingDto';
 import { useHistoryState } from '../../hooks/useHistoryState';
 import { UserContext } from '../../lib/context';
 import { objectIsEmpty } from '../../lib/object-utils';
@@ -77,7 +78,7 @@ export function StepAddManager({
   selectedParty,
   institutionType,
 }: Props) {
-  const { user, setRequiredLogin } = useContext(UserContext);
+  const { user } = useContext(UserContext);
   const [_loading, setLoading] = useState(true);
   const [people, setPeople, setPeopleHistory] = useHistoryState<UsersObject>('people_step2', {});
   const [peopleErrors, setPeopleErrors] = useState<UsersError>({});
@@ -136,7 +137,6 @@ export function StepAddManager({
       prefix,
       onForwardAction,
       onUserValidateError,
-      () => setRequiredLogin(true),
       setLoading,
       subProduct ? 'ONBOARDING_PREMIUM_ADD_MANAGER' : 'ONBOARDING_ADD_MANAGER'
     ).catch((reason) => reason);
@@ -271,14 +271,13 @@ export function StepAddManager({
                 void searchUserId(
                   people['manager-initial'].taxCode ?? '',
                   setLoading,
-                  setRequiredLogin,
                   addError,
                   validateUserData,
                   people,
                   externalInstitutionId,
                   subProduct,
                   setIsChangedManager,
-                  institutionType,
+                  institutionType as InstitutionTypeEnum,
                   selectedParty,
                   onboardingFormData,
                   product
