@@ -77,7 +77,7 @@
     "prettier": "^3.5.3",
     "regex-replace": "^2.3.1",
     "rimraf": "^6.1.2",
-    "start-server-and-test": "^2.1.2",
+    "start-server-and-test": "^2.1.5",
     "vite": "7.3.5",
     "vite-plugin-html": "^3.2.2",
     "vite-plugin-svgr": "^4.5.0",
