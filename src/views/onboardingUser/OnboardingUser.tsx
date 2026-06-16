@@ -18,15 +18,15 @@ import { LoadingOverlay } from '../../components/modals/LoadingOverlay';
 import { MessageNoAction } from '../../components/shared/MessageNoAction';
 import { StepAddManager } from '../../components/steps/StepAddManager';
 import { withLogin } from '../../components/withLogin';
-import { HeaderContext, UserContext } from '../../lib/context';
+import { HeaderContext } from '../../lib/context';
 import { OnboardingFormData } from '../../model/OnboardingFormData';
 import { ProductResource } from '../../model/ProductResource';
 import { addUserRequest } from '../../services/onboardingServices';
 import { ENV } from '../../utils/env';
+import { isTechPartner } from '../../utils/institutionTypeUtils';
 import { selected2OnboardingData } from '../../utils/selected2OnboardingData';
 import { unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
 import { StepAddAdmin } from '../onboardingProduct/components/StepAddAdmin';
-import { isTechPartner } from '../../utils/institutionTypeUtils';
 import StepSearchOnboardedParty from './components/StepSearchOnboardedParty';
 import { StepSelectProduct } from './components/StepSelectProduct';
 
@@ -47,7 +47,6 @@ function OnboardingUserComponent() {
   const [onExitAction, setOnExitAction] = useState<(() => void) | undefined>();
   const [openExitModal, setOpenExitModal] = useState(false);
   const { setOnExit } = useContext(HeaderContext);
-  const { setRequiredLogin } = useContext(UserContext);
 
   const forwardWithData = (newFormData: Partial<FormData>) => {
     if (formData) {
@@ -229,7 +228,6 @@ function OnboardingUserComponent() {
               onboardingFormData,
               selectedParty,
               institutionType,
-              setRequiredLogin,
               setOutcome,
               outcomeContent,
               requestId

@@ -1,3 +1,4 @@
+/// <reference types="node" />
 import path from 'path';
 import { chromium } from '@playwright/test';
 
@@ -51,13 +52,13 @@ async function globalSetup() {
       });
 
       await page.waitForSelector('#username', { state: 'visible', timeout: 10000 });
-      await page.locator('#username').fill('cleopatra');
+      await page.locator('#username').fill('s.palpatine');
 
       await page.waitForSelector('input[name="password"], input[type="password"]', {
         state: 'visible',
         timeout: 5000,
       });
-      await page.locator('input[name="password"], input[type="password"]').fill('password123');
+      await page.locator('input[name="password"], input[type="password"]').fill('test');
 
       const submitButton = page
         .locator(

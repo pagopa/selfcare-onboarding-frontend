@@ -2,12 +2,12 @@ import { trackAppError } from '@pagopa/selfcare-common-frontend/lib/services/ana
 import { Dispatch, SetStateAction, useContext, useEffect, useState } from 'react';
 import { Product, SelfcareParty, StepperStepComponentProps } from '../../../../types';
 import NoProductPage from '../../../components/layout/NoProductPage';
-import { HeaderContext, UserContext } from '../../../lib/context';
+import { MessageNoAction } from '../../../components/shared/MessageNoAction';
+import { HeaderContext } from '../../../lib/context';
 import { checkProduct } from '../../../services/onboardingServices';
 import { handleSearchUserParties } from '../../../services/subProductServices';
 import { unregisterUnloadEvent } from '../../../utils/unloadEvent-utils';
 import { genericError } from '../../onboardingProduct/components/StepVerifyOnboarding';
-import { MessageNoAction } from '../../../components/shared/MessageNoAction';
 
 type Props = StepperStepComponentProps & {
   requestId: string;
@@ -27,7 +27,6 @@ function SubProductStepVerifyInputs({
 }: Props) {
   const [error, setError] = useState<boolean>(false);
   const { setOnExit } = useContext(HeaderContext);
-  const { setRequiredLogin } = useContext(UserContext);
   const [selectedSubProduct, setSelectedSubProduct] = useState<Product | undefined | null>();
   const [selectedProduct, setSelectedProduct] = useState<Product | null>();
   const [parties, setParties] = useState<Array<SelfcareParty>>();
@@ -35,15 +34,15 @@ function SubProductStepVerifyInputs({
   const submit = () => {
     setLoading(true);
     Promise.all([
-      checkProduct(productId, setSelectedProduct, setRequiredLogin, {
+      checkProduct(productId, setSelectedProduct, {
         onNotFound: () => setError(true),
         onError: () => setError(true),
       }),
-      checkProduct(subProductId, setSelectedSubProduct, setRequiredLogin, {
+      checkProduct(subProductId, setSelectedSubProduct, {
         onNotFound: () => setError(true),
         onError: () => setError(true),
       }),
-      handleSearchUserParties(setParties, setRequiredLogin, productId, subProductId),
+      handleSearchUserParties(setParties, productId, subProductId),
     ])
       .catch((reason) => {
         trackAppError({

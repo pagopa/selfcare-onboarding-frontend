@@ -6,11 +6,11 @@ import { Trans, useTranslation } from 'react-i18next';
 import { useParams } from 'react-router';
 import {
   FileErrorAttempt,
-  OnboardingRequestData,
   Problem,
   RequestOutcomeComplete,
   StepperStep,
 } from '../../../../types';
+import { OnboardingVerify } from '../../../api/generated/onboarding/OnboardingVerify';
 import { LoadingOverlay } from '../../../components/modals/LoadingOverlay';
 import { ConfirmRegistrationStep0 } from '../../../components/registrationSteps/ConfirmRegistrationStep0';
 import { ConfirmRegistrationStep1 } from '../../../components/registrationSteps/ConfirmRegistrationStep1';
@@ -20,7 +20,9 @@ import { HeaderContext, UserContext } from '../../../lib/context';
 import { onboardingContractUpload } from '../../../services/requestStatusServices';
 import { getOnboardingInfo, verifyRequest } from '../../../services/tokenServices';
 import { customErrors } from '../../../utils/constants';
+import { ENV } from '../../../utils/env';
 import { getRequestJwt } from '../../../utils/getRequestJwt';
+import { triggerQualtricsIntercept } from '../../../utils/qualtricsUtils';
 import AlreadyCompletedRequest from '../status/AlreadyCompletedPage';
 import AlreadyRejectedRequest from '../status/AlreadyRejectedPage';
 import ExpiredRequestPage from '../status/ExpiredPage';
@@ -76,7 +78,7 @@ export default function CompleteRequestComponent() {
     'uploaded_files',
     []
   );
-  const [requestData, setRequestData] = useState<OnboardingRequestData>();
+  const [requestData, setRequestData] = useState<OnboardingVerify>();
   const [institutionId, setInstitutionId] = useState<string>();
   const [attachmentUploadSuccess, setAttachmentUploadSuccess] = useState<boolean>(false);
   const addUserFlow = new URLSearchParams(window.location.search).get('add-user') === 'true';
@@ -105,6 +107,18 @@ export default function CompleteRequestComponent() {
       }).finally(() => setLoading(false));
     }
   }, [/* attachments, */ onboardingId]);
+
+  useEffect(() => {
+    if (outcomeContentState === 'success' && ENV.QUALTRICS_APPROVAL.ENABLE && !addUserFlow && !attachments) {
+      void triggerQualtricsIntercept(
+        { productId: requestData?.productId ?? '' },
+        {
+          scriptUrl: ENV.QUALTRICS_APPROVAL.SCRIPT_URL,
+          siteId: ENV.QUALTRICS_APPROVAL.SITE_ID,
+        }
+      );
+    }
+  }, [outcomeContentState]);
 
   useEffect(() => {
     if (attachmentUploadSuccess && onboardingId) {

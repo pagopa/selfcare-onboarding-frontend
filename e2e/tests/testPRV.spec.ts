@@ -17,7 +17,7 @@ test('Test Success onboarding request for product prod-idpay-merchant and instit
 }) => {
   test.setTimeout(180000);
   await page.goto(`${BASE_URL_ONBOARDING}/prod-idpay-merchant`);
-  await stepSelectPartyByCF(page, '13614770967', true);
+  await stepSelectPartyByCF(page, '13614770967');
   await stepFormData(page, PRODUCT_IDS_TEST_E2E.IDPAY_MERCHANT, 'PRV');
   await stepAddManager(page);
   await stepAddAdmin(page);
@@ -66,5 +66,29 @@ test('Test Success onboarding request for product prod-pagopa and institutionTyp
     FILE_MOCK_PDF_CONTRACT.PA,
     PRODUCT_IDS_TEST_E2E.PAGOPA,
     'PRV'
+  );
+});
+
+test('Test Success onboarding request for product prod-ced and institutionType PRV', async ({
+  page,
+}) => {
+  await page.goto(`${BASE_URL_ONBOARDING}/prod-ced`);
+  await stepInstitutionType(page, 'Società Privata');
+  await stepFormData(
+    page,
+    PRODUCT_IDS_TEST_E2E.CED,
+    'PRV',
+    undefined,
+    TAX_CODES_BY_INSTITUTION_TYPE.PRV
+  );
+  await stepAddManager(page);
+  await stepAddAdmin(page);
+  await stepCompleteOnboarding(
+    page,
+    TAX_CODES_BY_INSTITUTION_TYPE.PRV,
+    FILE_MOCK_PDF_CONTRACT.PA,
+    PRODUCT_IDS_TEST_E2E.CED,
+    'PRV',
+    true
   );
 });

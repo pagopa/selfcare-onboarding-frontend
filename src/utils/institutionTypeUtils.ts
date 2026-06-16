@@ -71,6 +71,8 @@ export const isFideiussioniProduct = (productId?: string): boolean =>
 export const isFideiussioniGuaranteeProduct = (productId?: string): boolean =>
   productId === PRODUCT_IDS.FD_GARANTITO;
 
+export const isCedProduct = (productId?: string): boolean => productId === PRODUCT_IDS.CED;
+
 // ============================================
 // Combined Business Logic Checks
 // ============================================

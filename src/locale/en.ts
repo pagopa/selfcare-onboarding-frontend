@@ -11,6 +11,7 @@ export default {
     taxcode: 'Company Tax Code',
     originId: 'IVASS code',
     reaLabel: 'RM-123456',
+    searchResultsLabel: 'Institutions found',
   },
   partyAdvancedSelect: {
     advancedSearchLabel: 'Search by',
@@ -201,6 +202,9 @@ export default {
       title: 'You are adding a Legal Representative',
       message:
         'The Legal Representative data entered is different from that indicated <1 />previously. Do you want to continue?',
+    },
+    formControl: {
+      label: 'Add me as Legal Representative',
     },
     back: 'Back',
     continue: 'Continue',

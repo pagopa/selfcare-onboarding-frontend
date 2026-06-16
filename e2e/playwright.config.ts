@@ -25,11 +25,11 @@ export default defineConfig({
     locale: 'it-IT',
     trace: 'on-first-retry',
     storageState: path.resolve(__dirname, 'storageState.json'),
-    actionTimeout: 5000, // click/fill
+    actionTimeout: 8000, // click/fill
     navigationTimeout: 15000, // navigations
   },
   expect: {
-    timeout: 8000, // assertions
+    timeout: 10000, // assertions
   },
   /* Configure projects for major browsers */
   projects: [

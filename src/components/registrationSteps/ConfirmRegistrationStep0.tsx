@@ -6,7 +6,7 @@ import DownloadIcon from '@mui/icons-material/Download';
 import { SessionModal } from '@pagopa/selfcare-common-frontend/lib';
 import { useState } from 'react';
 import { storageTokenOps } from '@pagopa/selfcare-common-frontend/lib/utils/storage';
-import { ENV } from '../../utils/env';
+import { API } from '../../utils/constants';
 import { fileFromReader } from '../../utils/formatting-utils';
 
 type Props = {
@@ -35,8 +35,9 @@ export function ConfirmRegistrationStep0({
     const sessionToken = storageTokenOps.read();
     const url =
       translationKeyValue === 'attachments'
-        ? `${ENV.URL_API.ONBOARDING_V2}/v2/tokens/${onboardingId}/template-attachment?name=${documentName}`
-        : `${ENV.URL_API.ONBOARDING_V2}/v2/tokens/${onboardingId}/contract`;
+        ? API.ONBOARDING_GET_TEMPLATE_ATTACHMENT.URL.replace('{{onboardingId}}', onboardingId)
+            .replace('{{filename}}', documentName ?? '')
+        : API.ONBOARDING_GET_CONTRACT.URL.replace('{{onboardingId}}', onboardingId);
 
     fetch(url, {
       headers: {
@@ -91,11 +92,12 @@ export function ConfirmRegistrationStep0({
 
   return (
     <>
-      <Grid container alignContent="center" flexDirection="column">
+      <Grid container alignContent="center" flexDirection="column" sx={{ width: '100%' }}>
         <Card
           sx={{
             marginBottom: 4,
-            width: '627px',
+            maxWidth: '627px',
+            width: '100%',
             borderRadius: theme.spacing(2),
             boxShadow:
               '0px 8px 10px -5px rgba(0, 43, 85, 0.1), 0px 16px 24px 2px rgba(0, 43, 85, 0.05), 0px 6px 30px 5px rgba(0, 43, 85, 0.1)',
@@ -160,7 +162,8 @@ export function ConfirmRegistrationStep0({
         </Card>
         <Card
           sx={{
-            width: '627px',
+            maxWidth: '627px',
+            width: '100%',
             borderRadius: theme.spacing(2),
             boxShadow:
               '0px 8px 10px -5px rgba(0, 43, 85, 0.1), 0px 16px 24px 2px rgba(0, 43, 85, 0.05), 0px 6px 30px 5px rgba(0, 43, 85, 0.1)',

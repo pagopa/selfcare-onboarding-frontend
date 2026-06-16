@@ -10,7 +10,7 @@ import {
   alpha,
 } from '@mui/material';
 import { theme } from '@pagopa/mui-italia';
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   InstitutionType,
@@ -18,7 +18,6 @@ import {
   StepperStepComponentProps,
 } from '../../../../types';
 import { OnboardingStepActions } from '../../../components/registrationSteps/OnboardingStepActions';
-import { UserContext } from '../../../lib/context';
 import { ProductResource } from '../../../model/ProductResource';
 import { getAllowedAddUserProducts } from '../../../services/onboardingServices';
 import { ENV } from '../../../utils/env';
@@ -31,12 +30,15 @@ type Props = {
   setOutcome: React.Dispatch<React.SetStateAction<RequestOutcomeMessage | null | undefined>>;
 } & StepperStepComponentProps;
 
-export function StepSelectProduct({ forward, setLoading, setOutcome, institutionType }: Props) {
-  const { setRequiredLogin } = useContext(UserContext);
+export function StepSelectProduct({
+  forward,
+  setLoading,
+  setOutcome,
+  institutionType,
+}: Props) {
   const { t } = useTranslation();
   const [products, setProducts] = useState<Array<ProductResource>>();
   const [selectedProduct, setSelectedProduct] = useState<ProductResource>();
-
   const onBackAction = () => {
     window.location.assign(ENV.URL_FE.DASHBOARD);
   };
@@ -45,7 +47,6 @@ export function StepSelectProduct({ forward, setLoading, setOutcome, institution
     void getAllowedAddUserProducts(
       setLoading,
       setProducts,
-      setRequiredLogin,
       setOutcome,
       genericError
     );

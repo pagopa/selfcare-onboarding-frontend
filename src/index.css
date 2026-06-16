@@ -1,3 +1,7 @@
 #onetrust-consent-sdk {
   font-family: 'Titillium Web', sans-serif !important;
 }
+
+.MuiButton-root {
+  white-space: normal !important;
+}

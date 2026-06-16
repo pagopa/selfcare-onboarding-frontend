@@ -11,6 +11,7 @@ import { AggregateInstitution } from '../../../../model/AggregateInstitution';
 import { PRODUCT_IDS } from '../../../../utils/constants';
 import { selected2OnboardingData } from '../../../../utils/selected2OnboardingData';
 import {
+  isCedProduct,
   isConsolidatedEconomicAccountCompany,
   isContractingAuthority,
   isGlobalServiceProvider,
@@ -98,7 +99,10 @@ export const createForwardFunctions = (params: ForwardFunctionsParams) => {
     });
     setInstitutionType(newInstitutionType);
 
-    if (isPrivateInstitution(newInstitutionType as InstitutionType) && isPagoPaProduct(productId)) {
+    if (
+      isPrivateInstitution(newInstitutionType as InstitutionType) &&
+      (isPagoPaProduct(productId) || isCedProduct(productId))
+    ) {
       selected2OnboardingData(null, undefined, newInstitutionType, productId);
       setOnboardingFormData(
         selected2OnboardingData(null, undefined, newInstitutionType, productId)

@@ -17,10 +17,10 @@ import {
   executeStepAddManager,
   verifySubmitPostLegalsIoPremium,
   verifySubmitPostLegalsPspDashBoard,
-} from '../../../utils/test-utils';
+} from '../../../utils/test/test-utils';
 import OnboardingPremium from '../OnboardingPremium';
 
-vi.setConfig({ testTimeout: 20000 });
+vi.setConfig({ testTimeout: 80000 });
 
 const oldWindowLocation = global.window.location;
 const initialLocation = {

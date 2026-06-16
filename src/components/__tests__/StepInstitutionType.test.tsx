@@ -1,15 +1,14 @@
-import { cleanup, screen, waitFor } from '@testing-library/react';
-import { expect, test, vi } from 'vitest';
+import { cleanup, screen, waitFor } from '@testing-library/react';import { expect, test, vi } from 'vitest';
 import { mockedProducts } from '../../lib/__mocks__/mockApiRequests';
 import '../../locale';
 import { PRODUCT_IDS } from '../../utils/constants';
-import { renderComponentWithProviders } from '../../utils/test-utils';
+import { renderComponentWithProviders } from '../../utils/test/test-utils';
 import StepInstitutionType from '../steps/StepInstitutionType';
 ;
 
 vi.mock('../../lib/api-utils');
 
-test('Test: Render test', async () => {
+  test('Test: Render test', async () => {
   renderComponentWithProviders(
     <StepInstitutionType
       selectedProduct={mockedProducts[0]}
@@ -20,7 +19,6 @@ test('Test: Render test', async () => {
       productAvoidStep={false}
       loading={false}
       setLoading={vi.fn()}
-      setRequiredLogin={vi.fn()}
       setOutcome={vi.fn()}
       genericError={{
         title: '',
@@ -31,9 +29,8 @@ test('Test: Render test', async () => {
     />
   );
 
-  await waitFor(() => {
-    expect(screen.getByText(/Seleziona il tipo di ente che rappresenti/)).toBeInTheDocument();
-  });
+  await waitFor(() => screen.getByText(/Seleziona il tipo di ente che rappresenti/));
+
 });
 
 test('Test: The correct institution types with the expected descriptions, can be selected based on the product', async () => {
@@ -57,7 +54,6 @@ test('Test: The correct institution types with the expected descriptions, can be
         productAvoidStep={false}
         loading={false}
         setLoading={vi.fn()}
-        setRequiredLogin={vi.fn()}
         setOutcome={vi.fn()}
         genericError={{
           title: '',

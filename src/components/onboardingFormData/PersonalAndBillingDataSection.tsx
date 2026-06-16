@@ -43,6 +43,7 @@ import {
   isPrivateMerchantInstitution,
   isPaymentServiceProvider,
   isPdndPrivate,
+  isCedProduct,
 } from '../../utils/institutionTypeUtils';
 import { StepBillingDataHistoryState } from '../steps/StepOnboardingFormData';
 import NumberDecimalFormat from './NumberDecimalFormat';
@@ -61,6 +62,10 @@ const CustomTextFieldNotched = styled(TextField)<CustomTextFieldNochedProps>(
   ({ paddingValue }) => ({
     '.MuiInputLabel-asterisk': {
       display: 'none',
+    },
+    '& .MuiInputLabel-root': {
+      whiteSpace: 'normal',
+      overflow: 'visible',
     },
     '& .MuiOutlinedInput-notchedOutline legend': {
       paddingRight: '0',
@@ -154,6 +159,56 @@ export default function PersonalAndBillingDataSection({
   const [taxCodeInvoicingVisible, setTaxCodeInvoicingVisible] = useState<boolean>(false);
   const [assistanceContacts, setAssistanceContacts] = useState<AssistanceContacts>();
   const [pspData, setPspData] = useState<PaymentServiceProviderDto>();
+
+  const isInfoCompany = isInformationCompany(formik.values.origin, institutionType, productId);
+
+  const fieldColor = (disabled: boolean) =>
+    disabled ? theme.palette.text.disabled : theme.palette.text.primary;
+
+  const isFieldLockedForPrivate =
+    isPrivateOrPersonInstitution(institutionType) &&
+    !isPagoPaProduct(productId) &&
+    !isCedProduct(productId);
+
+  const isBusinessNameDisabled =
+    controllers.isDisabled ||
+    isContractingAuthority(institutionType) ||
+    isInsuranceCompany(institutionType) ||
+    (isInfoCompany && !!onboardingFormData?.businessName) ||
+    isFieldLockedForPrivate;
+
+  const isDigitalAddressDisabled =
+    controllers.isDisabled ||
+    isContractingAuthority(institutionType) ||
+    isInsuranceCompany(institutionType) ||
+    (isInfoCompany && !!onboardingFormData?.digitalAddress) ||
+    isFieldLockedForPrivate;
+
+  const isTaxCodeFieldDisabled =
+    controllers.isDisabled ||
+    isContractingAuthority(institutionType) ||
+    isInsuranceCompany(institutionType) ||
+    (isInfoCompany && !!onboardingFormData?.taxCode) ||
+    isFieldLockedForPrivate;
+
+  const isAddressDisabled =
+    !controllers.isAooUo && controllers.isDisabled && !isInsuranceCompany(institutionType);
+
+  const showTaxCodeField =
+    !isInsuranceCompany(institutionType) ||
+    (!!onboardingFormData?.taxCode && onboardingFormData.taxCode !== '');
+
+  const showCommercialRegisterSection =
+    isInfoCompany ||
+    isContractingAuthority(institutionType) ||
+    ((isInteropProduct(productId) ||
+      isPagoPaProduct(productId) ||
+      isIdpayMerchantProduct(productId) ||
+      isCedProduct(productId)) &&
+      (isPublicServiceCompany(institutionType) ||
+        isPrivateInstitution(institutionType) ||
+        isPrivateOrPersonInstitution(institutionType) ||
+        isGpuInstitution(institutionType)));
 
   useEffect(() => {
     const shareCapitalIsNan = isNaN(formik.values.shareCapital);
@@ -272,9 +327,7 @@ export default function PersonalAndBillingDataSection({
     label: string,
     fontWeight: string | number = 'fontWeightMedium',
     fontSize: number = 18,
-    color: string = controllers.isDisabled
-      ? theme.palette.text.disabled
-      : theme.palette.text.primary
+    color: string = fieldColor(controllers.isDisabled)
   ) => {
     const isError = !!formik.errors[field] && formik.errors[field] !== requiredError;
     return {
@@ -299,11 +352,21 @@ export default function PersonalAndBillingDataSection({
           borderRadius: '4px',
         },
       },
+      InputLabelProps: {
+        sx: {
+          /* allow long labels to wrap instead of being clipped at zoom 400% (WCAG 1.4.10) */
+          whiteSpace: 'normal',
+          overflow: 'visible',
+        },
+      },
     };
   };
 
   return (
-    <Paper elevation={8} sx={{ borderRadius: theme.spacing(2), p: 4, width: '704px' }}>
+    <Paper
+      elevation={8}
+      sx={{ borderRadius: theme.spacing(2), p: 4, maxWidth: '704px', width: '100%' }}
+    >
       <Grid item container spacing={3}>
         {controllers.isAooUo && (
           <Box px={4} pt={2} width="100%">
@@ -323,7 +386,7 @@ export default function PersonalAndBillingDataSection({
                   'uoName',
                   t('onboardingFormData.billingDataSection.uoName'),
                   600,
-                  controllers.isDisabled ? theme.palette.text.disabled : theme.palette.text.primary
+                  fieldColor(controllers.isDisabled)
                 )}
                 disabled={controllers.isDisabled}
               />
@@ -334,7 +397,7 @@ export default function PersonalAndBillingDataSection({
                   'uoUniqueCode',
                   t('onboardingFormData.billingDataSection.uoUniqueCode'),
                   600,
-                  controllers.isDisabled ? theme.palette.text.disabled : theme.palette.text.primary
+                  fieldColor(controllers.isDisabled)
                 )}
                 disabled={controllers.isDisabled}
               />
@@ -348,7 +411,7 @@ export default function PersonalAndBillingDataSection({
                   'aooName',
                   t('onboardingFormData.billingDataSection.aooName'),
                   600,
-                  controllers.isDisabled ? theme.palette.text.disabled : theme.palette.text.primary
+                  fieldColor(controllers.isDisabled)
                 )}
                 disabled={controllers.isDisabled}
               />
@@ -359,7 +422,7 @@ export default function PersonalAndBillingDataSection({
                   'aooUniqueCode',
                   t('onboardingFormData.billingDataSection.aooUniqueCode'),
                   600,
-                  controllers.isDisabled ? theme.palette.text.disabled : theme.palette.text.primary
+                  fieldColor(controllers.isDisabled)
                 )}
                 disabled={controllers.isDisabled}
               />
@@ -372,20 +435,9 @@ export default function PersonalAndBillingDataSection({
                 'businessName',
                 t('onboardingFormData.billingDataSection.businessName'),
                 600,
-                controllers.isDisabled ||
-                  isContractingAuthority(institutionType) ||
-                  isInsuranceCompany(institutionType)
-                  ? theme.palette.text.disabled
-                  : theme.palette.text.primary
+                fieldColor(isBusinessNameDisabled)
               )}
-              disabled={
-                controllers.isDisabled ||
-                isContractingAuthority(institutionType) ||
-                isInsuranceCompany(institutionType) ||
-                (isInformationCompany(formik.values.origin, institutionType, productId) &&
-                  onboardingFormData?.businessName) ||
-                (isPrivateOrPersonInstitution(institutionType) && !isPagoPaProduct(productId))
-              }
+              disabled={isBusinessNameDisabled}
             />
           </Grid>
         )}
@@ -397,17 +449,9 @@ export default function PersonalAndBillingDataSection({
                 'registeredOffice',
                 t('onboardingFormData.billingDataSection.fullLegalAddress'),
                 600,
-                !controllers.isAooUo &&
-                  controllers.isDisabled &&
-                  !isInsuranceCompany(institutionType)
-                  ? theme.palette.text.disabled
-                  : theme.palette.text.primary
+                fieldColor(isAddressDisabled)
               )}
-              disabled={
-                !controllers.isAooUo &&
-                controllers.isDisabled &&
-                !isInsuranceCompany(institutionType)
-              }
+              disabled={isAddressDisabled}
             />
           </Grid>
           {!controllers.isForeignInsurance && (
@@ -419,17 +463,9 @@ export default function PersonalAndBillingDataSection({
                   t('onboardingFormData.billingDataSection.zipCode'),
                   600,
                   16,
-                  !controllers.isAooUo &&
-                    controllers.isDisabled &&
-                    !isInsuranceCompany(institutionType)
-                    ? theme.palette.text.disabled
-                    : theme.palette.text.primary
+                  fieldColor(isAddressDisabled)
                 )}
-                disabled={
-                  !controllers.isAooUo &&
-                  controllers.isDisabled &&
-                  !isInsuranceCompany(institutionType)
-                }
+                disabled={isAddressDisabled}
               />
             </Grid>
           )}
@@ -442,7 +478,7 @@ export default function PersonalAndBillingDataSection({
                   'city',
                   t('onboardingFormData.billingDataSection.city'),
                   600,
-                  controllers.isDisabled ? theme.palette.text.disabled : theme.palette.text.primary
+                  fieldColor(controllers.isDisabled)
                 )}
                 disabled={controllers.isDisabled}
               />
@@ -490,6 +526,7 @@ export default function PersonalAndBillingDataSection({
                   style: {
                     overflow: 'visible',
                   },
+                  'aria-live': 'polite',
                 }}
                 componentsProps={autocompletePaperStyle}
                 renderOption={(props, option: InstitutionLocationData) => (
@@ -507,7 +544,6 @@ export default function PersonalAndBillingDataSection({
                           ? formik.values.city
                           : params.inputProps.value,
                     }}
-                    id="city-field"
                     label={t('onboardingFormData.billingDataSection.city')}
                     InputLabelProps={{
                       shrink: (formik.values.city && formik.values.city !== '') || shrinkCity,
@@ -612,24 +648,12 @@ export default function PersonalAndBillingDataSection({
               'digitalAddress',
               t('onboardingFormData.billingDataSection.digitalAddress'),
               600,
-              controllers.isDisabled ||
-                isContractingAuthority(institutionType) ||
-                isInsuranceCompany(institutionType)
-                ? theme.palette.text.disabled
-                : theme.palette.text.primary
+              fieldColor(isDigitalAddressDisabled)
             )}
-            disabled={
-              controllers.isDisabled ||
-              isContractingAuthority(institutionType) ||
-              isInsuranceCompany(institutionType) ||
-              (isInformationCompany(formik.values.origin, institutionType, productId) &&
-                onboardingFormData?.digitalAddress) ||
-              (isPrivateOrPersonInstitution(institutionType) && !isPagoPaProduct(productId))
-            }
+            disabled={isDigitalAddressDisabled}
           />
         </Grid>
-        {(!isInsuranceCompany(institutionType) ||
-          (onboardingFormData?.taxCode && onboardingFormData?.taxCode !== '')) && (
+        {showTaxCodeField && (
           <Grid item xs={12}>
             <CustomTextField
               {...baseTextFieldProps(
@@ -638,20 +662,9 @@ export default function PersonalAndBillingDataSection({
                   ? t('onboardingFormData.billingDataSection.taxCodeCentralParty')
                   : t('onboardingFormData.billingDataSection.taxCode'),
                 600,
-                controllers.isDisabled ||
-                  isContractingAuthority(institutionType) ||
-                  isInsuranceCompany(institutionType)
-                  ? theme.palette.text.disabled
-                  : theme.palette.text.primary
+                fieldColor(isTaxCodeFieldDisabled)
               )}
-              disabled={
-                controllers.isDisabled ||
-                isContractingAuthority(institutionType) ||
-                isInsuranceCompany(institutionType) ||
-                (isInformationCompany(formik.values.origin, institutionType, productId) &&
-                  onboardingFormData?.taxCode) ||
-                (isPrivateOrPersonInstitution(institutionType) && !isPagoPaProduct(productId))
-              }
+              disabled={isTaxCodeFieldDisabled}
               inputProps={{
                 maxLength: 11,
               }}
@@ -910,15 +923,7 @@ export default function PersonalAndBillingDataSection({
             />
           </Grid>
         )}
-        {(isInformationCompany(formik.values.origin, institutionType, productId) ||
-          isContractingAuthority(institutionType) ||
-          ((isInteropProduct(productId) ||
-            isPagoPaProduct(productId) ||
-            isIdpayMerchantProduct(productId)) &&
-            (isPublicServiceCompany(institutionType) ||
-              isPrivateInstitution(institutionType) ||
-              isPrivateOrPersonInstitution(institutionType) ||
-              isGpuInstitution(institutionType)))) && (
+        {showCommercialRegisterSection && (
           <>
             <Grid item xs={12}>
               {/* Luogo di iscrizione al Registro delle Imprese facoltativo per institution Type !== 'PA' e 'PSP */}
@@ -1063,31 +1068,37 @@ export default function PersonalAndBillingDataSection({
           </>
         )}
         {/* indirizzo mail di supporto */}
-        {!institutionAvoidGeotax && isIoSignProduct(productId) && (
-          <Grid item xs={12}>
-            <CustomTextFieldNotched
-              paddingValue={'14px'}
-              {...baseTextFieldProps(
-                'supportEmail',
-                t('onboardingFormData.billingDataSection.assistanceContact.supportEmail'),
-                600,
-                theme.palette.text.primary
-              )}
-              disabled={controllers.isDisabled && !!assistanceContacts?.supportEmail}
-            />
-            {/* descrizione indirizzo mail di supporto */}
-            <Typography
-              component={'span'}
-              sx={{
-                fontSize: '12px!important',
-                fontWeight: 'fontWeightMedium',
-                color: theme.palette.text.secondary,
-              }}
-            >
-              {t('onboardingFormData.billingDataSection.assistanceContact.supportEmailDescriprion')}
-            </Typography>
-          </Grid>
-        )}
+        {!institutionAvoidGeotax &&
+          (isIoSignProduct(productId) ||
+            (isCedProduct(productId) && isPrivateInstitution(institutionType))) && (
+            <Grid item xs={12}>
+              <CustomTextFieldNotched
+                paddingValue={'14px'}
+                {...baseTextFieldProps(
+                  'supportEmail',
+                  t(
+                    `onboardingFormData.billingDataSection.assistanceContact.${isCedProduct(productId) ? 'supportEmailOptional' : 'supportEmail'}`
+                  ),
+                  600,
+                  theme.palette.text.primary
+                )}
+                disabled={controllers.isDisabled && !!assistanceContacts?.supportEmail}
+              />
+              {/* descrizione indirizzo mail di supporto */}
+              <Typography
+                component={'span'}
+                sx={{
+                  fontSize: '12px!important',
+                  fontWeight: 'fontWeightMedium',
+                  color: theme.palette.text.secondary,
+                }}
+              >
+                {t(
+                  'onboardingFormData.billingDataSection.assistanceContact.supportEmailDescriprion'
+                )}
+              </Typography>
+            </Grid>
+          )}
       </Grid>
     </Paper>
   );

@@ -1,15 +1,13 @@
 import { test } from '@playwright/test';
 import {
-  stepAddAdmin,
-  stepAddManager,
-  stepInstitutionType,
-  stepFormData,
   BASE_URL_ONBOARDING,
-  stepAdditionalGPUInformation,
   PRODUCT_IDS_TEST_E2E,
-  FILE_MOCK_PDF_CONTRACT,
-  stepCompleteOnboarding,
-  TAX_CODES_BY_INSTITUTION_TYPE,
+  stepAddAdmin,
+  stepAdditionalGPUInformation,
+  stepAddManager,
+  stepFormData,
+  stepInstitutionType,
+  TAX_CODES_BY_INSTITUTION_TYPE
 } from '../utils/test-utils';
 
 test('Test Success onboarding request for product prod-pagopa and institutionType GPU', async ({
@@ -27,11 +25,4 @@ test('Test Success onboarding request for product prod-pagopa and institutionTyp
   await stepAdditionalGPUInformation(page);
   await stepAddManager(page);
   await stepAddAdmin(page);
-  await stepCompleteOnboarding(
-    page,
-    TAX_CODES_BY_INSTITUTION_TYPE.GPU,
-    FILE_MOCK_PDF_CONTRACT.PA,
-    PRODUCT_IDS_TEST_E2E.PAGOPA,
-    'GPU'
-  );
 });

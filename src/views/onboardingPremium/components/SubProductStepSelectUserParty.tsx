@@ -1,12 +1,12 @@
-import { Grid, Link, Typography, useTheme, Paper } from '@mui/material';
-import { Box } from '@mui/system';
-import { useEffect, useRef, useState } from 'react';
+import { Grid, Link, Paper, Typography, useTheme } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { useTranslation, Trans } from 'react-i18next';
-import { PartyAccountItemButton } from '@pagopa/mui-italia/dist/components/PartyAccountItemButton';
-import { roleLabels } from '@pagopa/selfcare-common-frontend/lib/utils/constants';
+import { Box } from '@mui/system';
+import { PartyAccountItemButton } from '@pagopa/mui-italia/components/PartyAccountItemButton';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
+import { roleLabels } from '@pagopa/selfcare-common-frontend/lib/utils/constants';
 import { uniqueId } from 'lodash';
+import { useEffect, useRef, useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import { Product, SelfcareParty, StepperStepComponentProps } from '../../../../types';
 import { OnboardingStepActions } from '../../../components/registrationSteps/OnboardingStepActions';
 import { useHistoryState } from '../../../hooks/useHistoryState';

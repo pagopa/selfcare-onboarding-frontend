@@ -137,20 +137,22 @@ export default function PartyAdvancedSelect({
         {t('partyAdvancedSelect.taxCode')}
       </MenuItem>
     ),
-    isPrivateOrPersonInstitution(institutionType) &&
-      isIdpayMerchantProduct(product?.id) && [
-        <MenuItem key="reaCode" id="reaCode" data-testid="reaCode" value={SelectionEnum.reaCode}>
-          {t('partyAdvancedSelect.reaCode')}
-        </MenuItem>,
-        <MenuItem
-          key="personalTaxCode"
-          id="personalTaxCode"
-          data-testid="personalTaxCode"
-          value={SelectionEnum.personalTaxCode}
-        >
-          {t('partyAdvancedSelect.personalTaxCode')}
-        </MenuItem>,
-      ],
+    isPrivateOrPersonInstitution(institutionType) && isIdpayMerchantProduct(product?.id) && (
+      <MenuItem key="reaCode" id="reaCode" data-testid="reaCode" value={SelectionEnum.reaCode}>
+        {t('partyAdvancedSelect.reaCode')}
+      </MenuItem>
+    ),
+    ((addUser && selectedProduct?.id === PRODUCT_IDS.IDPAY_MERCHANT) ||
+      (isPrivateOrPersonInstitution(institutionType) && isIdpayMerchantProduct(product?.id))) && (
+      <MenuItem
+        key="personalTaxCode"
+        id="personalTaxCode"
+        data-testid="personalTaxCode"
+        value={SelectionEnum.personalTaxCode}
+      >
+        {t('partyAdvancedSelect.personalTaxCode')}
+      </MenuItem>
+    ),
     ((ENV.AOO_UO.SHOW_AOO_UO &&
       !isContractingAuthority(institutionType) &&
       !isInsuranceCompany(institutionType) &&

@@ -1,22 +1,19 @@
 import { AppError } from '@pagopa/selfcare-common-frontend/lib/model/AppError';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
-import { AxiosResponse } from 'axios';
 import { uniqueId } from 'lodash';
 import { Dispatch, SetStateAction } from 'react';
-import { InstitutionType } from '../../types';
+import { OnboardingApi } from '../api/OnboardingApiClient';
+import { InstitutionTypeEnum } from '../api/generated/onboarding/CheckManagerDto';
 import { UsersObject } from '../components/steps/StepAddManager';
-import { fetchWithLogs } from '../lib/api-utils';
-import { getFetchOutcome } from '../lib/error-utils';
 import { OnboardingFormData } from '../model/OnboardingFormData';
 
 export const checkManager = async (
   userId: string,
   setLoading: Dispatch<SetStateAction<boolean>>,
   setIsChangedManager: Dispatch<SetStateAction<boolean>>,
-  institutionType: InstitutionType | undefined,
+  institutionType: InstitutionTypeEnum | undefined,
   selectedParty: any,
   onboardingFormData: OnboardingFormData | undefined,
-  setRequiredLogin: Dispatch<SetStateAction<boolean>>,
   addError: (error: AppError) => void,
   validateUserData: (
     userData: any,
@@ -31,31 +28,19 @@ export const checkManager = async (
   requestId: string
 ) => {
   setLoading(true);
-  const request = await fetchWithLogs(
-    {
-      endpoint: 'ONBOARDING_CHECK_MANAGER',
-    },
-    {
-      method: 'POST',
-      data: {
-        institutionType,
-        origin: selectedParty?.origin,
-        originId: selectedParty?.originId,
-        productId: product?.id,
-        subunitCode: onboardingFormData?.aooUniqueCode ?? onboardingFormData?.uoUniqueCode,
-        taxCode: selectedParty?.taxCode ?? onboardingFormData?.taxCode,
-        userId,
-      },
-    },
-    () => setRequiredLogin(true)
-  );
+  try {
+    const { result } = await OnboardingApi.checkManager({
+      productId: product?.id,
+      userId,
+      institutionType,
+      origin: selectedParty?.origin,
+      originId: selectedParty?.originId,
+      subunitCode: onboardingFormData?.aooUniqueCode ?? onboardingFormData?.uoUniqueCode,
+      taxCode: selectedParty?.taxCode ?? onboardingFormData?.taxCode,
+    });
 
-  const result = getFetchOutcome(request);
-  const response = (request as AxiosResponse).data.result;
-
-  if (result === 'success') {
-    setIsChangedManager(!response);
-    if (!response) {
+    setIsChangedManager(!result);
+    if (!result) {
       trackEvent('CHANGE_LEGAL_REPRESENTATIVE', {
         request_id: requestId,
         party_id: externalInstitutionId,
@@ -63,7 +48,7 @@ export const checkManager = async (
         from: 'onboarding',
       });
     }
-    if (response) {
+    if (result) {
       validateUserData(
         people['manager-initial'],
         'manager-initial',
@@ -71,11 +56,11 @@ export const checkManager = async (
         subProduct
       );
     }
-  } else {
+  } catch (error) {
     addError({
       id: 'CHECK_MANAGER_ERROR',
       blocking: false,
-      error: response as Error,
+      error: error as Error,
       techDescription: 'Failed to check manager status',
       toNotify: true,
     });
@@ -85,14 +70,14 @@ export const checkManager = async (
       externalInstitutionId,
       subProduct
     );
+  } finally {
+    setLoading(false);
   }
-  setLoading(false);
 };
 
 export const searchUserId = async (
   taxCode: string,
   setLoading: Dispatch<SetStateAction<boolean>>,
-  setRequiredLogin: Dispatch<SetStateAction<boolean>>,
   addError: (error: AppError) => void,
   validateUserData: (
     userData: any,
@@ -104,29 +89,17 @@ export const searchUserId = async (
   externalInstitutionId: string,
   subProduct: any,
   setIsChangedManager: Dispatch<SetStateAction<boolean>>,
-  institutionType: InstitutionType | undefined,
+  institutionType: InstitutionTypeEnum | undefined,
   selectedParty: any,
   onboardingFormData: OnboardingFormData | undefined,
-  product: any,
+  product: any
 ) => {
   setLoading(true);
-  const requestId = uniqueId();
-  const request = await fetchWithLogs(
-    {
-      endpoint: 'ONBOARDING_SEARCH_USER',
-    },
-    {
-      method: 'POST',
-      data: {
-        taxCode,
-      },
-    },
-    () => setRequiredLogin(true)
-  );
 
-  const result = getFetchOutcome(request);
-  const response = (request as AxiosResponse).data;
-  if (result === 'success') {
+  try {
+    const requestId = uniqueId();
+    const response = await OnboardingApi.searchUserId({ taxCode });
+
     if (response) {
       void checkManager(
         response.id,
@@ -135,7 +108,6 @@ export const searchUserId = async (
         institutionType,
         selectedParty,
         onboardingFormData,
-        setRequiredLogin,
         addError,
         validateUserData,
         people,
@@ -145,11 +117,11 @@ export const searchUserId = async (
         requestId
       );
     }
-  } else {
+  } catch (error) {
     addError({
       id: 'SEARCH_USER_ERROR',
       blocking: false,
-      error: response as Error,
+      error: error as Error,
       techDescription: `An error occurred while searching the user with the taxCode ${taxCode}`,
       toNotify: true,
     });
@@ -159,6 +131,7 @@ export const searchUserId = async (
       externalInstitutionId,
       subProduct
     );
+  } finally {
+    setLoading(false);
   }
-  setLoading(false);
 };

@@ -1,16 +1,14 @@
-import { AxiosError, AxiosResponse } from 'axios';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
 import React, { Dispatch, SetStateAction } from 'react';
-import { fetchWithLogs } from '../lib/api-utils';
-import { OnboardingRequestData, Problem, RequestOutcomeComplete } from '../../types';
-import { redirectToLogin } from '../utils/unloadEvent-utils';
-import { getFetchOutcome } from '../lib/error-utils';
-
+import { RequestOutcomeComplete } from '../../types';
+import { OnboardingApi } from '../api/OnboardingApiClient';
+import { OnboardingVerify } from '../api/generated/onboarding/OnboardingVerify';
+import { getErrorStatus } from '../lib/error-utils';
 type Props = {
   onboardingId?: string;
   setRequiredLogin: (value: React.SetStateAction<boolean>) => void;
   setOutcomeContentState: React.Dispatch<React.SetStateAction<RequestOutcomeComplete | null>>;
-  setRequestData: React.Dispatch<React.SetStateAction<OnboardingRequestData | undefined>>;
+  setRequestData: React.Dispatch<React.SetStateAction<OnboardingVerify | undefined>>;
 };
 
 const getMixPanelEvent = (errorStatus: number | undefined) => {
@@ -31,19 +29,11 @@ export const verifyRequest = async ({
     return setOutcomeContentState('notFound');
   }
 
-  const fetchJwt = await fetchWithLogs(
-    { endpoint: 'ONBOARDING_TOKEN_VALIDATION', endpointParams: { onboardingId } },
-    { method: 'POST', headers: { 'Content-Type': 'application/json' } },
-    redirectToLogin
-  );
-
-  const result = getFetchOutcome(fetchJwt);
-
-  if (result === 'success') {
-    const requestData = (fetchJwt as AxiosResponse).data as OnboardingRequestData;
+  try {
+    const requestData = await OnboardingApi.verifyOnboarding(onboardingId);
 
     const isExpiredRequest = requestData?.expiringDate
-      ? new Date(requestData?.expiringDate) <= new Date()
+      ? new Date(requestData.expiringDate) <= new Date()
       : false;
 
     if (!isExpiredRequest) {
@@ -58,14 +48,13 @@ export const verifyRequest = async ({
           setOutcomeContentState('toBeCompleted');
           break;
       }
-    } else if (isExpiredRequest && requestData.status !== 'TOBEVALIDATED') {
+    } else if (requestData.status !== 'TOBEVALIDATED') {
       setOutcomeContentState('expired');
     }
-    setRequestData(requestData);
-  } else {
-    trackEvent(getMixPanelEvent((fetchJwt as AxiosError<Problem>).response?.status), {
-      party_id: onboardingId,
-    });
+    setRequestData(requestData as OnboardingVerify);
+  } catch (error) {
+    const status = getErrorStatus(error);
+    trackEvent(getMixPanelEvent(status), { party_id: onboardingId });
     setOutcomeContentState('notFound');
   }
 };
@@ -76,24 +65,14 @@ export const getOnboardingInfo = async (
   setLoading: Dispatch<SetStateAction<boolean>>,
   setOutcomeContentState: Dispatch<SetStateAction<RequestOutcomeComplete | null>>
 ) => {
-  setLoading(true);
-  const getOnboarding = await fetchWithLogs(
-    {
-      endpoint: 'ONBOARDING_GET_INFO',
-      endpointParams: { onboardingId },
-    },
-    {
-      method: 'GET',
-    },
-    redirectToLogin
-  );
-
-  const outcome = getFetchOutcome(getOnboarding);
-  if (outcome === 'success') {
-    setInstitutionId((getOnboarding as AxiosResponse).data.institutionInfo.id);
+  try {
+    setLoading(true);
+    const data = await OnboardingApi.retrieveOnboardingRequest(onboardingId);
+    setInstitutionId(data.institutionInfo?.id ?? undefined);
     setOutcomeContentState('success');
-  } else {
+  } catch (error) {
     setOutcomeContentState('error');
+  } finally {
+    setLoading(false);
   }
-  setLoading(false);
 };

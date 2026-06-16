@@ -2,12 +2,8 @@ import { IllusError } from '@pagopa/mui-italia';
 import { EndingPage } from '@pagopa/selfcare-common-frontend/lib';
 import { useContext, useEffect, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
-import {
-  InstitutionType,
-  RequestOutcomeMessage,
-  StepperStepComponentProps
-} from '../../../types';
-import { HeaderContext, UserContext } from '../../lib/context';
+import { InstitutionType, RequestOutcomeMessage, StepperStepComponentProps } from '../../../types';
+import { HeaderContext } from '../../lib/context';
 import { getOnboardingData } from '../../services/onboardingServices';
 import { ENV } from '../../utils/env';
 import { unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
@@ -58,13 +54,11 @@ function StepOnboardingData({
   const [loading, setLoading] = useState(true);
   const [outcome, setOutcome] = useState<RequestOutcomeMessage | null>();
   const { setOnExit } = useContext(HeaderContext);
-  const { setRequiredLogin } = useContext(UserContext);
 
   useEffect(() => {
     if (subProductFlow) {
       void getOnboardingData(
         setLoading,
-        setRequiredLogin,
         productId,
         forward,
         institutionType,

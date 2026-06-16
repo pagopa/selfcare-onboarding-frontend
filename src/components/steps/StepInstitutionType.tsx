@@ -1,4 +1,5 @@
 import {
+  Alert,
   FormControl,
   FormControlLabel,
   Grid,
@@ -34,7 +35,6 @@ type Props = StepperStepComponentProps & {
   productAvoidStep: boolean;
   loading: boolean;
   setLoading: Dispatch<SetStateAction<boolean>>;
-  setRequiredLogin: Dispatch<SetStateAction<boolean>>;
   setOutcome: Dispatch<SetStateAction<RequestOutcomeMessage | null | undefined>>;
   genericError: RequestOutcomeMessage;
 };
@@ -50,7 +50,6 @@ export default function StepInstitutionType({
   productAvoidStep,
   loading,
   setLoading,
-  setRequiredLogin,
   setOutcome,
   genericError,
 }: Props) {
@@ -66,7 +65,6 @@ export default function StepInstitutionType({
       setLoading,
       productId,
       setRetrivedInstituionType,
-      setRequiredLogin,
       setOutcome,
       genericError
     );
@@ -119,6 +117,11 @@ export default function StepInstitutionType({
           </Trans>
         </Typography>
       </Grid>
+      <Grid item xs={12} display="flex" justifyContent="center">
+        <Alert severity="info" sx={{ mb: 4, width: '70%' }}>
+          {t('stepInstitutionType.infoAlert.ced')}
+        </Alert>
+      </Grid>
       <Paper
         elevation={8}
         sx={{ borderRadius: theme.spacing(2), p: 1, width: '580px', height: '100%' }}
@@ -137,18 +140,21 @@ export default function StepInstitutionType({
                       <Radio
                         id={ot.labelKey}
                         inputProps={{
-                          'aria-label': t(
-                            `stepInstitutionType.institutionTypes.${ot.labelKey}.title`
-                          ),
+                          'aria-labelledby': `${ot.labelKey}-title`,
+                          'aria-describedby': `${ot.labelKey}-description`,
                         }}
                       />
                     }
                     label={
                       <>
-                        <Typography sx={{ fontWeight: 600, fontSize: '18px', color: '#17324D' }}>
+                        <Typography
+                          id={`${ot.labelKey}-title`}
+                          sx={{ fontWeight: 600, fontSize: '18px', color: '#17324D' }}
+                        >
                           {t(`stepInstitutionType.institutionTypes.${ot.labelKey}.title`)}
                         </Typography>
                         <Typography
+                          id={`${ot.labelKey}-description`}
                           variant="subtitle2"
                           sx={{
                             fontWeight: 400,

@@ -1,13 +1,14 @@
 import { productId2ProductTitle } from '@pagopa/selfcare-common-frontend/lib/utils/productId2ProductTitle';
 import { useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { OnboardingRequestData, RequestOutcomeComplete } from '../../../../types';
+import { RequestOutcomeComplete } from '../../../../types';
+import { OnboardingVerify } from '../../../api/generated/onboarding/OnboardingVerify';
 import { LoadingOverlay } from '../../../components/modals/LoadingOverlay';
 import { MessageNoAction } from '../../../components/shared/MessageNoAction';
+import { genericError } from '../../../components/steps/StepOnboardingData';
 import { HeaderContext, UserContext } from '../../../lib/context';
 import { deleteRequest } from '../../../services/requestStatusServices';
 import { verifyRequest } from '../../../services/tokenServices';
-import { genericError } from '../../../components/steps/StepOnboardingData';
 import { getRequestJwt } from '../../../utils/getRequestJwt';
 import AlreadyCompletedRequest from '../status/AlreadyCompletedPage';
 import AlreadyRejectedRequest from '../status/AlreadyRejectedPage';
@@ -26,7 +27,7 @@ export default function CancelRequestComponent() {
     !token ? 'notFound' : null
   );
   const [loading, setLoading] = useState(false);
-  const [requestData, setRequestData] = useState<OnboardingRequestData | undefined>();
+  const [requestData, setRequestData] = useState<OnboardingVerify>();
 
   const addUserFlow = new URLSearchParams(window.location.search).get('add-user') === 'true';
   const translationKeyValue = addUserFlow ? 'user' : 'product';

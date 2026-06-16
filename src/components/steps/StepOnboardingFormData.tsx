@@ -16,6 +16,7 @@ import {
 import { useOnboardingControllers } from '../../hooks/useOnboardingControllers';
 import { UserContext } from '../../lib/context';
 
+import { useHistoryState } from '../../hooks/useHistoryState';
 import { AooData } from '../../model/AooData';
 import { GeographicTaxonomy } from '../../model/GeographicTaxonomies';
 import { InstitutionLocationData } from '../../model/InstitutionLocationData';
@@ -31,17 +32,6 @@ import { verifyVatNumber } from '../../services/validationServices';
 import { requiredError } from '../../utils/constants';
 import { ENV } from '../../utils/env';
 import { handleGeotaxonomies } from '../../utils/handleGeotaxonomies';
-import { validateFields } from '../../utils/validateFields';
-import { MessageNoAction } from '../shared/MessageNoAction';
-import { OnboardingStepActions } from '../registrationSteps/OnboardingStepActions';
-import DpoSection from '../onboardingFormData/DpoSection';
-import Heading from '../onboardingFormData/Heading';
-import IbanSection from '../onboardingFormData/IbanSection';
-import PersonalAndBillingDataSection from '../onboardingFormData/PersonalAndBillingDataSection';
-import { VatNumberErrorModal } from '../onboardingFormData/VatNumberErrorModal';
-import GeoTaxonomySection from '../onboardingFormData/taxonomy/GeoTaxonomySection';
-import UpdateGeotaxonomy from '../onboardingFormData/taxonomy/UpdateGeotaxonomy';
-import { useHistoryState } from '../../hooks/useHistoryState';
 import {
   isFideiussioniProduct,
   isInformationCompany,
@@ -51,6 +41,16 @@ import {
   isPrivateMerchantInstitution,
   isPublicAdministration,
 } from '../../utils/institutionTypeUtils';
+import { validateFields } from '../../utils/validateFields';
+import DpoSection from '../onboardingFormData/DpoSection';
+import Heading from '../onboardingFormData/Heading';
+import IbanSection from '../onboardingFormData/IbanSection';
+import PersonalAndBillingDataSection from '../onboardingFormData/PersonalAndBillingDataSection';
+import { VatNumberErrorModal } from '../onboardingFormData/VatNumberErrorModal';
+import GeoTaxonomySection from '../onboardingFormData/taxonomy/GeoTaxonomySection';
+import UpdateGeotaxonomy from '../onboardingFormData/taxonomy/UpdateGeotaxonomy';
+import { OnboardingStepActions } from '../registrationSteps/OnboardingStepActions';
+import { MessageNoAction } from '../shared/MessageNoAction';
 
 export type StepBillingDataHistoryState = {
   externalInstitutionId: string;
@@ -220,7 +220,6 @@ export default function StepOnboardingFormData({
         await handleSearchByTaxCode(
           initialFormData.taxCode,
           filterCategories,
-          setRequiredLogin,
           setRetrievedIstat,
           setOriginId4Premium
         );
@@ -468,6 +467,13 @@ export default function StepOnboardingFormData({
           textAlign: 'start' as const,
           paddingLeft: '16px',
           borderRadius: '4px',
+        },
+      },
+      InputLabelProps: {
+        sx: {
+          /* allow long labels to wrap instead of being clipped at zoom 400% (WCAG 1.4.10) */
+          whiteSpace: 'normal',
+          overflow: 'visible',
         },
       },
     };

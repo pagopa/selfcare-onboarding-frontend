@@ -43,6 +43,7 @@ import {
   isSendProduct,
   isTechPartner,
 } from '../../utils/institutionTypeUtils';
+import { triggerQualtricsIntercept } from '../../utils/qualtricsUtils';
 import { registerUnloadEvent, unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
 import { createBackFunctions } from './components/backwards/backFunctions';
 import { createForwardFunctions } from './components/forwards/forwardFunctions';
@@ -235,7 +236,14 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
       pricingPlan,
       isTechPartner(institutionType) ? usersWithoutLegal : users,
       user,
-      aggregates
+      aggregates,
+      () => {
+        void triggerQualtricsIntercept({
+          institutionDescription: onboardingFormData?.businessName ?? '',
+          productId,
+          institutionType: institutionType ?? '',
+        });
+      }
     ).catch(() => {
       trackEvent('ONBOARDING_ADD_DELEGATE', {
         request_id: requestIdRef.current,
@@ -372,7 +380,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     // eslint-disable-next-line functional/immutable-data
     requestIdRef.current = uniqueId(`onboarding-${externalInstitutionId}-${productId}-`);
 
-    void checkProduct(productId, setSelectedProduct, setRequiredLogin, {
+    void checkProduct(productId, setSelectedProduct, {
       onNotFound: () => unregisterUnloadEvent(setOnExit),
       onError: () => unregisterUnloadEvent(setOnExit),
       onPhaseOut: () => setOutcome(prodPhaseOutErrorPage),
@@ -435,7 +443,6 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           productAvoidStep,
           loading,
           setLoading,
-          setRequiredLogin,
           setOutcome,
           genericError,
         }),

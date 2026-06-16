@@ -9,6 +9,7 @@ import DownloadCsvFile from '../views/onboardingRequest/download/DownloadCsvFile
 import OnboardingUser from '../views/onboardingUser/OnboardingUser';
 import { ENV } from './env';
 import {
+  isCedProduct,
   isContractingAuthority,
   isIdpayMerchantProduct,
   isIdPayProduct,
@@ -111,13 +112,17 @@ export const API = {
     URL: ENV.URL_API.ONBOARDING_V2 + '/v2/tokens/{{token}}/complete-onboarding-users',
   },
   ONBOARDING_GET_TEMPLATE_ATTACHMENT: {
-    URL: ENV.URL_API.ONBOARDING_V2 + '/v2/tokens/{{onboardingId}}/template-attachment?name={{filename}}',
+    URL:
+      ENV.URL_API.ONBOARDING_V2 +
+      '/v2/tokens/{{onboardingId}}/template-attachment?attachmentName={{filename}}',
   },
   ONBOARDING_GET_ATTACHMENT: {
     URL: ENV.URL_API.ONBOARDING_V2 + '/v2/tokens/{{onboardingId}}/attachment?name={{filename}}',
   },
   ONBOARDING_POST_ATTACHMENT: {
-    URL: ENV.URL_API.ONBOARDING_V2 + '/v2/tokens/{{onboardingId}}/attachment?name={{filename}}',
+    URL:
+      ENV.URL_API.ONBOARDING_V2 +
+      '/v2/tokens/{{onboardingId}}/attachment?attachmentName={{filename}}',
   },
   ONBOARDING_GET_INFO: {
     URL: ENV.URL_API.ONBOARDING_V2 + '/v2/tokens/{{onboardingId}}',
@@ -231,6 +236,7 @@ export const PRODUCT_IDS = {
   CIBAN: 'prod-ciban',
   CGN: 'prod-cgn',
   IDPAY_MERCHANT: 'prod-idpay-merchant',
+  CED: 'prod-ced',
 };
 
 export const requiredError = 'Required';
@@ -251,7 +257,8 @@ export const canInvoice = (institutionType?: string, productId?: string) =>
   !isTechPartner(institutionType as InstitutionType) &&
   !isInsuranceCompany(institutionType as InstitutionType) &&
   !isInteropProduct(productId) &&
-  !isIdpayMerchantProduct(productId);
+  !isIdpayMerchantProduct(productId) &&
+  !isCedProduct(productId);
 
 export const noMandatoryIpaProducts = (productId?: string) =>
   !isInteropProduct(productId) &&
@@ -265,7 +272,8 @@ export const addUserFlowProducts = (productId: string) =>
   productId === PRODUCT_IDS.SEND ||
   productId === PRODUCT_IDS.IO ||
   productId === PRODUCT_IDS.IO_SIGN ||
-  productId === PRODUCT_IDS.PAGOPA;
+  productId === PRODUCT_IDS.PAGOPA ||
+  productId === PRODUCT_IDS.IDPAY_MERCHANT;
 
 export const institutionTypes: Array<{ labelKey: string; value: InstitutionType }> = [
   { labelKey: 'pa', value: 'PA' },
@@ -276,6 +284,7 @@ export const institutionTypes: Array<{ labelKey: string; value: InstitutionType 
   { labelKey: 'sa', value: 'SA' },
   { labelKey: 'as', value: 'AS' },
   { labelKey: 'prv', value: 'PRV' },
+  { labelKey: 'prv_ced', value: 'PRV' },
   /* both are private entities but for two different products:
     prv -> "Enti Privati" (prod-interop), oth -> "Altro" (prod-pagopa) */
   { labelKey: 'oth', value: 'PRV' },

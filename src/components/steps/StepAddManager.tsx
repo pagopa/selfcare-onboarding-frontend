@@ -1,24 +1,58 @@
-import { Grid, Typography } from '@mui/material';
+import { FormControlLabel, Grid, Paper, Switch, Typography } from '@mui/material';
+import { theme } from '@pagopa/mui-italia';
 import SessionModal from '@pagopa/selfcare-common-frontend/lib/components/SessionModal';
 import useErrorDispatcher from '@pagopa/selfcare-common-frontend/lib/hooks/useErrorDispatcher';
+import { User } from '@pagopa/selfcare-common-frontend/lib/model/User';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
 import { uniqueId } from 'lodash';
-import { useContext, useEffect, useRef, useState } from 'react';
+import {
+  ChangeEvent,
+  Dispatch,
+  SetStateAction,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { InstitutionType, Product, StepperStepComponentProps, UserOnCreate } from '../../../types';
+import { InstitutionTypeEnum } from '../../api/generated/onboarding/CompanyOnboardingDto';
+import { useHistoryState } from '../../hooks/useHistoryState';
 import { UserContext } from '../../lib/context';
 import { objectIsEmpty } from '../../lib/object-utils';
 import { OnboardingFormData } from '../../model/OnboardingFormData';
 import { searchUserId } from '../../services/managerServices';
 import { userValidate } from '../../services/validationServices';
-import { OnboardingStepActions } from '../registrationSteps/OnboardingStepActions';
+import { isCedProduct } from '../../utils/institutionTypeUtils';
 import { PlatformUserForm, validateUser } from '../forms/PlatformUserForm';
+import { OnboardingStepActions } from '../registrationSteps/OnboardingStepActions';
 import { RolesInformations } from '../shared/RolesInformations';
-import { useHistoryState } from '../../hooks/useHistoryState';
 
 // Could be an ES6 Set but it's too bothersome for now
 export type UsersObject = { [key: string]: UserOnCreate };
 export type UsersError = { [key: string]: { [userField: string]: Array<string> } };
+export const handleAuthUser = (
+  _: ChangeEvent,
+  value: boolean,
+  people: UsersObject,
+  setPeople: Dispatch<SetStateAction<UsersObject>>,
+  setIsAuthUser: Dispatch<SetStateAction<boolean>>,
+  user: User | null,
+  userType: string
+) => {
+  if (value) {
+    setPeople({
+      ...people,
+      [`${userType}-initial`]: Object.assign({}, user, { email: undefined }),
+    });
+  } else {
+    setPeople({
+      ...people,
+      [`${userType}-initial`]: Object.assign({}, null, { email: undefined }),
+    });
+  }
+  setIsAuthUser(value);
+};
 
 type Props = StepperStepComponentProps & {
   externalInstitutionId: string;
@@ -44,16 +78,30 @@ export function StepAddManager({
   selectedParty,
   institutionType,
 }: Props) {
-  const { setRequiredLogin } = useContext(UserContext);
+  const { user } = useContext(UserContext);
   const [_loading, setLoading] = useState(true);
   const [people, setPeople, setPeopleHistory] = useHistoryState<UsersObject>('people_step2', {});
-  const [peopleErrors, setPeopleErrors] = useState<UsersError>();
+  const [peopleErrors, setPeopleErrors] = useState<UsersError>({});
   const [isGenericError, setIsGenericError] = useState<boolean>(false);
   const [isChangedManager, setIsChangedManager] = useState<boolean>(false);
+  const [isAuthUserManager, setIsAuthUserManager, setIsAuthUserManagerHistory] = useHistoryState(
+    'isAuthUserManager',
+    false
+  );
   const addError = useErrorDispatcher();
   const requestIdRef = useRef<string>();
   const { t } = useTranslation();
   const premiumFlow = !!subProduct;
+
+  useEffect(() => {
+    if (isAuthUserManager) {
+      setPeopleErrors(
+        Object.fromEntries(
+          Object.entries(peopleErrors).filter(([key]) => key !== 'manager-initial')
+        )
+      );
+    }
+  }, [isAuthUserManager]);
 
   useEffect(() => {
     if (premiumFlow) {
@@ -89,7 +137,6 @@ export function StepAddManager({
       prefix,
       onForwardAction,
       onUserValidateError,
-      () => setRequiredLogin(true),
       setLoading,
       subProduct ? 'ONBOARDING_PREMIUM_ADD_MANAGER' : 'ONBOARDING_ADD_MANAGER'
     ).catch((reason) => reason);
@@ -107,6 +154,7 @@ export function StepAddManager({
   };
 
   const savePageState = () => {
+    setIsAuthUserManagerHistory(isAuthUserManager);
     setPeopleHistory(people);
   };
 
@@ -115,7 +163,7 @@ export function StepAddManager({
   };
 
   return (
-    <Grid container direction="column">
+    <Grid container display="flex" flexDirection="column" justifyContent="center">
       <Grid container item justifyContent="center">
         <Grid item xs={12}>
           <Typography variant="h3" component="h2" align="center" sx={{ lineHeight: '1.2' }}>
@@ -154,8 +202,47 @@ export function StepAddManager({
         </Grid>
       </Grid>
 
-      <Grid container item display="flex" justifyContent="center" mt={3}>
-        <Grid item xs={8} display="flex" justifyContent="center">
+      <Grid container item justifyContent="center" mt={3}>
+        <Paper
+          elevation={8}
+          sx={{ borderRadius: '16px', p: 4, maxWidth: '704px', width: '100%' }}
+          role="group"
+        >
+          {isCedProduct(product?.id) && (
+            <Grid item xs={12} display="flex" justifyContent="start">
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={isAuthUserManager}
+                    onChange={(event) =>
+                      handleAuthUser(
+                        event,
+                        !isAuthUserManager,
+                        people,
+                        setPeople,
+                        setIsAuthUserManager,
+                        user,
+                        'manager'
+                      )
+                    }
+                    sx={{ margin: 1 }}
+                    data-testid="authUserSwitch-test"
+                    aria-labelledby="authUserSwitch-label"
+                  />
+                }
+                label={
+                  <Typography variant="body1" id="authUserSwitch-label">
+                    {t('stepAddManager.formControl.label')}
+                  </Typography>
+                }
+                sx={{
+                  alignSelf: 'center',
+                  '.MuiSvgIcon-root': { color: theme.palette.primary.main },
+                  padding: 1,
+                }}
+              />
+            </Grid>
+          )}
           <PlatformUserForm
             prefix="manager-initial"
             role="MANAGER"
@@ -164,9 +251,11 @@ export function StepAddManager({
             allPeople={people}
             setPeople={setPeople}
             readOnly={readOnly}
+            readOnlyFields={isAuthUserManager ? ['name', 'surname', 'taxCode'] : []}
+            isAuthUser={isAuthUserManager}
             productId={product?.id}
           />
-        </Grid>
+        </Paper>
       </Grid>
 
       <Grid item mb={10} mt={2}>
@@ -182,14 +271,13 @@ export function StepAddManager({
                 void searchUserId(
                   people['manager-initial'].taxCode ?? '',
                   setLoading,
-                  setRequiredLogin,
                   addError,
                   validateUserData,
                   people,
                   externalInstitutionId,
                   subProduct,
                   setIsChangedManager,
-                  institutionType,
+                  institutionType as InstitutionTypeEnum,
                   selectedParty,
                   onboardingFormData,
                   product

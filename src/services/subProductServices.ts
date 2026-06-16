@@ -1,21 +1,21 @@
 import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
-import { AxiosError, AxiosResponse } from 'axios';
+import { AxiosResponse } from 'axios';
 import { Dispatch, SetStateAction } from 'react';
 import { Problem, SelfcareParty } from '../../types';
+import { OnboardingApi } from '../api/OnboardingApiClient';
 import { fetchWithLogs } from '../lib/api-utils';
-import { getFetchOutcome } from '../lib/error-utils';
+import { getFetchOutcome, HttpError } from '../lib/error-utils';
 import config from '../utils/config.json';
 import { buildUrlLogo } from '../utils/constants';
 import { ENV } from '../utils/env';
 
 const fetchUserParties = async (
-  setRequiredLogin: (required: boolean) => void,
   options?: {
     params?: { productId: string };
     onSuccess?: (parties: Array<SelfcareParty>) => void;
     onSuccessWithParties?: (parties: Array<SelfcareParty>) => void;
     onSuccessEmpty?: () => void;
-    onError?: (error: AxiosError<Problem>) => void;
+    onError?: (error: unknown) => void;
     trackingProductId?: string;
     trackEventOnStart?: string;
   }
@@ -24,19 +24,10 @@ const fetchUserParties = async (
     trackEvent(options.trackEventOnStart);
   }
 
-  const searchResponse = await fetchWithLogs(
-    { endpoint: 'ONBOARDING_GET_USER_PARTIES' },
-    {
-      method: 'GET',
-      ...(options?.params && { params: options.params }),
-    },
-    () => setRequiredLogin(true)
-  );
-
-  const outcome = getFetchOutcome(searchResponse);
-  const parties = (searchResponse as AxiosResponse).data as Array<SelfcareParty>;
-
-  if (outcome === 'success') {
+  try {
+    const parties = (await OnboardingApi.getInstitutions(
+      options?.params?.productId
+    )) as Array<SelfcareParty>;
     options?.onSuccess?.(parties);
 
     if (parties.length > 0) {
@@ -44,11 +35,10 @@ const fetchUserParties = async (
     } else {
       options?.onSuccessEmpty?.();
     }
-  } else {
-    const errorBody = (searchResponse as AxiosError<Problem>).response?.data;
-    options?.onError?.(searchResponse as AxiosError<Problem>);
-
+  } catch (error) {
+    options?.onError?.(error);
     if (options?.trackingProductId) {
+      const errorBody = (error as HttpError)?.httpBody as Problem | undefined;
       trackEvent('ONBOARDING_REDIRECT_TO_ONBOARDING_FAILURE', {
         product_id: options.trackingProductId,
         reason: errorBody?.detail,
@@ -58,10 +48,9 @@ const fetchUserParties = async (
 };
 
 export const onExitPremiumFlow = async (
-  setRequiredLogin: Dispatch<SetStateAction<boolean>>,
   productId: string | undefined
 ) => {
-  await fetchUserParties(setRequiredLogin, {
+  await fetchUserParties({
     trackEventOnStart: 'PREMIUM_USER EXIT',
     trackingProductId: productId,
     onSuccessWithParties: () => {
@@ -73,18 +62,15 @@ export const onExitPremiumFlow = async (
   });
 };
 
+// NOTE: getPricingPlan stays on fetchWithLogs because CONFIG_JSON_CDN_URL is a
+// CDN file fetch, not a backend API call - no codegen client applies.
 export const getPricingPlan = async (
   setRequiredLogin: Dispatch<SetStateAction<boolean>>,
   setPricingPlanCategory: Dispatch<SetStateAction<any>>
 ) => {
   const configJsinResponse = await fetchWithLogs(
-    {
-      endpoint: 'CONFIG_JSON_CDN_URL',
-    },
-    {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
-    },
+    { endpoint: 'CONFIG_JSON_CDN_URL' },
+    { method: 'GET', headers: { 'Content-Type': 'application/json' } },
     () => setRequiredLogin(true)
   );
 
@@ -99,11 +85,10 @@ export const getPricingPlan = async (
 
 export const handleSearchUserParties = async (
   setParties: (parties: Array<SelfcareParty>) => void,
-  setRequiredLogin: (required: boolean) => void,
   _productId: string,
   subProductId: string
 ) => {
-  await fetchUserParties(setRequiredLogin, {
+  await fetchUserParties({
     params: { productId: subProductId },
     onSuccess: (parties) => {
       setParties(
