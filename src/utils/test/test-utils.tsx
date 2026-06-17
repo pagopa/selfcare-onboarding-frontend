@@ -891,7 +891,7 @@ export const fillInstitutionTypeCheckbox = (element: string, productId?: string)
   const labelKey =
     productId === PRODUCT_IDS.CED && lowerElement === 'prv'
       ? 'prv_ced'
-      : lowerElement === 'pa'
+      : productId === PRODUCT_IDS.CED && lowerElement === 'pa'
         ? 'pa_ced'
         : lowerElement;
   const label = screen.getByText(i18n.t(`stepInstitutionType.institutionTypes.${labelKey}.title`));
