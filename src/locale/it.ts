@@ -674,6 +674,9 @@ export default {
         title: 'Pubblica Amministrazione',
         description: 'art. 2, comma 2, lettera A del CAD',
       },
+      pa_ced: {
+        title: 'Soggetti pubblici'
+      },
       gsp: {
         title: 'Gestore di servizi pubblici',
         description: 'art. 2, comma 2, lettera B del CAD',
@@ -707,7 +710,7 @@ export default {
         title: 'Privati',
       },
       prv_ced: {
-        title: 'Società Privata',
+        title: 'Soggetti privati',
       },
       oth: {
         title: 'Altro',

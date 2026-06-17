@@ -277,6 +277,7 @@ export const addUserFlowProducts = (productId: string) =>
 
 export const institutionTypes: Array<{ labelKey: string; value: InstitutionType }> = [
   { labelKey: 'pa', value: 'PA' },
+  { labelKey: 'pa_ced', value: 'PA' },
   { labelKey: 'gsp', value: 'GSP' },
   { labelKey: 'scp', value: 'SCP' },
   { labelKey: 'pt', value: 'PT' },
@@ -297,7 +298,7 @@ export const description4InstitutionType = (labelKey: string, value: Institution
     case 'PT':
       return 'stepInstitutionType.institutionTypes.pt.description';
     case 'PA':
-      return 'stepInstitutionType.institutionTypes.pa.description';
+      return labelKey === 'pa_ced' ? '' : 'stepInstitutionType.institutionTypes.pa.description';
     case 'GSP':
       return 'stepInstitutionType.institutionTypes.gsp.description';
     case 'SCP':

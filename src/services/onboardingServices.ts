@@ -17,7 +17,6 @@ import { getErrorStatus, getFetchOutcome } from '../lib/error-utils';
 import { InstitutionOrigins } from '../model/InstitutionOrigins';
 import { OnboardingFormData } from '../model/OnboardingFormData';
 import { ProductResource } from '../model/ProductResource';
-import { PRODUCT_IDS } from '../utils/constants';
 import { ENV } from '../utils/env';
 import {
   isContractingAuthority,
@@ -354,16 +353,6 @@ export const getInstiutionTypesByProduct = async (
       setRetrivedInstituionType({
         ...responseData,
         origins: updatedInstitutionOrigins,
-      } as InstitutionOrigins);
-    } else if (productId === PRODUCT_IDS.CED) {
-      const institutionsResponseCed = {
-        institutionType: responseData.origins[1]?.institutionType,
-        origin: responseData.origins[1]?.origin,
-        labelKey: 'prv_ced',
-      };
-      setRetrivedInstituionType({
-        ...responseData,
-        origins: [responseData.origins[0], institutionsResponseCed],
       } as InstitutionOrigins);
     } else {
       setRetrivedInstituionType(responseData as InstitutionOrigins);
