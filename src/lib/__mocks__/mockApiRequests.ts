@@ -170,7 +170,7 @@ export const mockInstitutionTypeByProductId = (productId: string | undefined) =>
     case 'prod-ced':
       return {
         origins: [
-          { institutionType: 'PA', origin: 'IPA', labelKey: 'pa' },
+          { institutionType: 'PA', origin: 'IPA', labelKey: 'pa_ced' },
           { institutionType: 'PRV', origin: 'SELC', labelKey: 'prv_ced' },
         ],
       };

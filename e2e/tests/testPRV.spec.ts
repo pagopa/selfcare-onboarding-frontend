@@ -73,7 +73,7 @@ test('Test Success onboarding request for product prod-ced and institutionType P
   page,
 }) => {
   await page.goto(`${BASE_URL_ONBOARDING}/prod-ced`);
-  await stepInstitutionType(page, 'Società Privata');
+  await stepInstitutionType(page, 'Soggetti privati');
   await stepFormData(
     page,
     PRODUCT_IDS_TEST_E2E.CED,

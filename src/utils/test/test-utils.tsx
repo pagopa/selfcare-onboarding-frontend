@@ -889,10 +889,12 @@ export const executeGoHome = async (mockedLocation: any) => {
 export const fillInstitutionTypeCheckbox = (element: string, productId?: string) => {
   const lowerElement = element.toLowerCase();
   const labelKey =
-    productId === PRODUCT_IDS.CED && lowerElement === 'prv' ? 'prv_ced' : lowerElement;
-  const label = screen.getByText(
-    i18n.t(`stepInstitutionType.institutionTypes.${labelKey}.title`)
-  );
+    productId === PRODUCT_IDS.CED && lowerElement === 'prv'
+      ? 'prv_ced'
+      : lowerElement === 'pa'
+        ? 'pa_ced'
+        : lowerElement;
+  const label = screen.getByText(i18n.t(`stepInstitutionType.institutionTypes.${labelKey}.title`));
   const parentLabel = label.closest('label');
   const radioButtonCheckedIcon = parentLabel?.querySelector(
     '[data-testid="RadioButtonCheckedIcon"]'

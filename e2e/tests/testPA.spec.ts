@@ -145,7 +145,7 @@ test('Test Success onboarding request for product prod-ced and institutionType P
   page,
 }) => {
   await page.goto(`${BASE_URL_ONBOARDING}/prod-ced`);
-  await stepInstitutionType(page, 'Pubblica Amministrazione');
+  await stepInstitutionType(page, 'Soggetti pubblici');
   await stepSelectPartyByCF(page, '97187780826');
   await stepFormData(page, PRODUCT_IDS_TEST_E2E.CED, 'PA');
   await stepAddManager(page);
