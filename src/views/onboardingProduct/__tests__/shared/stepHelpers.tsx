@@ -423,6 +423,12 @@ export const executeStepSearchParty = async (
   }
 };
 
+export const executeStepContractsSummary = async () => {
+  await waitFor(() => screen.getByText('Prepara i documenti'));
+  const confirmButton = screen.getByRole('button', { name: 'Continua' });
+  await waitFor(() => fireEvent.click(confirmButton));
+};
+
 export const executeStepBillingData = async (
   productId: string,
   institutionType: string,

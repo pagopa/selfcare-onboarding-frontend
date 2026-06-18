@@ -187,6 +187,11 @@ export default {
       },
     },
   },
+  StepContractsSummary: {
+    title: 'Prepara i documenti',
+    subTitle:
+      'Prima di iniziare, assicurati di avere i documenti elencati qui sotto per completare l’adesione. Se non li hai, raccoglili e riprova più tardi.',
+  },
   stepUploadAggregates: {
     title: `Indica i soggetti aggregati per {{productName}}`,
     subTitle:
@@ -675,7 +680,7 @@ export default {
         description: 'art. 2, comma 2, lettera A del CAD',
       },
       pa_ced: {
-        title: 'Soggetti pubblici'
+        title: 'Soggetti pubblici',
       },
       gsp: {
         title: 'Gestore di servizi pubblici',
