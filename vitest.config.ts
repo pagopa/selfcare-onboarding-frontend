@@ -22,6 +22,14 @@ export default defineConfig({
         inline: ['@pagopa/selfcare-common-frontend', '@pagopa/mui-italia'],
       },
     },
+    deps: {
+      optimizer: {
+        web: {
+          enabled: true,
+          include: ['@mui/material', '@mui/icons-material', '@pagopa/mui-italia'],
+        },
+      },
+    },
     coverage: {
       provider: 'v8',
       exclude: [
