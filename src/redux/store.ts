@@ -3,8 +3,7 @@ import logger from 'redux-logger';
 import { appStateReducer } from '@pagopa/selfcare-common-frontend/lib/redux/slices/appStateSlice';
 import { userReducer } from '@pagopa/selfcare-common-frontend/lib/redux/slices/userSlice';
 
-const LOG_REDUX_ACTIONS =
-  process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test';
+const LOG_REDUX_ACTIONS = process.env.NODE_ENV === 'development';
 
 const additionalMiddlewares = [LOG_REDUX_ACTIONS ? logger : undefined];
 

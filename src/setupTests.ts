@@ -24,6 +24,7 @@ void i18n.use(initReactI18next).init({
     lng: 'it',
     fallbackLng: 'it',
     initImmediate: false,
+    showSupportNotice: false,
     interpolation: { escapeValue: false },
 });
 
