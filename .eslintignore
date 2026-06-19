@@ -8,3 +8,4 @@ Dangerfile.ts
 src/reportWebVitals.ts
 index.d.ts
 src/api/generated/**
+openApi/**
