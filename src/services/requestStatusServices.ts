@@ -1,20 +1,11 @@
 import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
-import { AxiosError } from 'axios';
 import { uniqueId } from 'lodash';
 import { Dispatch, SetStateAction } from 'react';
 import { FileErrorAttempt, Problem, RequestOutcomeComplete } from '../../types';
 import { OnboardingApi } from '../api/OnboardingApiClient';
-import { fetchWithLogs } from '../lib/api-utils';
-import { getFetchOutcome } from '../lib/error-utils';
+import { getErrorStatus, HttpError } from '../lib/error-utils';
 import { customErrors } from '../utils/constants';
 import { ENV } from '../utils/env';
-import { redirectToLogin } from '../utils/unloadEvent-utils';
-
-// NOTE: only deleteRequest has been migrated to codegen. The other services
-// stay on fetchWithLogs because all 3 upload endpoints
-// (contract, user-complete, attachment) share the same OpenAPI spec bug:
-// the multipart body is not declared, so the codegen does not generate
-// the File parameter. Same issue as verifyAggregatesCsv.
 
 export const deleteRequest =
   (
@@ -74,32 +65,18 @@ export const onboardingContractUpload = async (
   });
 
   setLoading(true);
-  const formData = new FormData();
-  formData.append(isAttachment ? 'attachment' : 'contract', file);
 
-  const getEndpoint = () => {
+  try {
     if (isAttachment) {
-      return 'ONBOARDING_POST_ATTACHMENT';
+      await OnboardingApi.uploadAttachment(onboardingId as string, attachmentName as string, file);
+    } else if (addUserFlow) {
+      await OnboardingApi.completeUsersOnboardingContract(onboardingId as string, file);
+    } else {
+      await OnboardingApi.completeOnboardingContract(onboardingId as string, file);
     }
-    return addUserFlow ? 'USER_COMPLETE_REGISTRATION' : 'ONBOARDING_COMPLETE_REGISTRATION';
-  };
 
-  const uploadDocument = await fetchWithLogs(
-    {
-      endpoint: getEndpoint(),
-      endpointParams: isAttachment
-        ? { onboardingId, filename: attachmentName }
-        : { token: onboardingId },
-    },
-    { method: 'POST', data: formData, headers: { 'Content-Type': 'multipart/form-data' } },
-    redirectToLogin
-  );
+    setLoading(false);
 
-  setLoading(false);
-
-  const outcome = getFetchOutcome(uploadDocument);
-
-  if (outcome === 'success') {
     const getSuccessEvent = () => {
       if (isAttachment) {
         return 'ONBOARDING_ATTACHMENT_SUCCESS';
@@ -118,11 +95,11 @@ export const onboardingContractUpload = async (
     if (isAttachment && onAttachmentSuccess) {
       onAttachmentSuccess();
     } else {
-      setOutcomeContentState(outcome);
+      setOutcomeContentState('success');
     }
-  }
+  } catch (error) {
+    setLoading(false);
 
-  if (outcome === 'error') {
     if (
       lastFileErrorAttempt &&
       lastFileErrorAttempt.fileName === file.name &&
@@ -146,18 +123,15 @@ export const onboardingContractUpload = async (
         errorCount: 1,
       });
     }
-    if (
-      (uploadDocument as AxiosError<Problem>).response?.status === 400 &&
-      (uploadDocument as AxiosError<Problem>).response?.data
-    ) {
+
+    const errorBody = (error as HttpError).httpBody as Problem | undefined;
+    if (getErrorStatus(error) === 400 && errorBody) {
       setOpen(true);
       trackEvent(isAttachment ? 'ONBOARDING_ATTACHMENT_FAILURE' : 'ONBOARDING_CONTRACT_FAILURE', {
         request_id: requestId,
         party_id: onboardingId,
       });
-      setErrorCode(
-        transcodeErrorCode((uploadDocument as AxiosError<Problem>).response?.data as Problem)
-      );
+      setErrorCode(transcodeErrorCode(errorBody));
     } else {
       setOpen(true);
       trackEvent(isAttachment ? 'ONBOARDING_ATTACHMENT_FAILURE' : 'ONBOARDING_FAILURE', {

@@ -233,7 +233,6 @@ export default function StepOnboardingFormData({
             uoSelected,
             formik,
             setRecipientCodeStatus,
-            setRequiredLogin,
             originId4Premium
           );
         }
@@ -406,7 +405,6 @@ export default function StepOnboardingFormData({
         uoSelected,
         formik,
         setRecipientCodeStatus,
-        setRequiredLogin,
         onboardingFormData?.originIdEc
       );
     }

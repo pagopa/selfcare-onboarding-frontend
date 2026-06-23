@@ -9,7 +9,7 @@ import {
   StepperStepComponentProps,
   UserOnCreate,
 } from '../../../../types';
-import { HeaderContext, UserContext } from '../../../lib/context';
+import { HeaderContext } from '../../../lib/context';
 import { MessageNoAction } from '../../../components/shared/MessageNoAction';
 import { unregisterUnloadEvent } from '../../../utils/unloadEvent-utils';
 import { OnboardingFormData } from '../../../model/OnboardingFormData';
@@ -75,7 +75,6 @@ function SubProductStepSubmit({
   const [error, setError] = useState<boolean>(false);
   const [conflictError, setConflictError] = useState<boolean>(false);
   const { setOnExit } = useContext(HeaderContext);
-  const { setRequiredLogin } = useContext(UserContext);
 
   useEffect(() => {
     if (!error) {
@@ -86,7 +85,6 @@ function SubProductStepSubmit({
         users,
         billingData,
         institutionType,
-        setRequiredLogin,
         requestId,
         product,
         setError,

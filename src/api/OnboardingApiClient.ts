@@ -17,6 +17,7 @@ import { WithDefaultsT, createClient } from './generated/onboarding/client';
 import { GeographicTaxonomyResource } from './generated/onboarding/GeographicTaxonomyResource';
 import { InstitutionResourceArray } from './generated/onboarding/InstitutionResourceArray';
 import { OnboardingRequestResource } from './generated/onboarding/OnboardingRequestResource';
+import { OnboardingProductDto } from './generated/onboarding/OnboardingProductDto';
 import { OnboardingUserDto } from './generated/onboarding/OnboardingUserDto';
 import { OnboardingVerify } from './generated/onboarding/OnboardingVerify';
 import { OriginResponse } from './generated/onboarding/OriginResponse';
@@ -173,8 +174,8 @@ export const OnboardingApi = {
         params: { institutionId, productId },
       });
     }
-    const result = await apiClient.getInstitutionOnboardingInfoUsingGET({
-      institutionId,
+    const result = await apiClient.getInstitutionOnboardingInfoUsingGET_1({
+      externalInstitutionId: institutionId,
       productId,
     });
     return extractResponse(result, 200, onRedirectToLogin, 401, 403, undefined);
@@ -215,5 +216,63 @@ export const OnboardingApi = {
     }
     const result = await apiClient.getOrigins({ productId });
     return extractResponse(result, 200, onRedirectToLogin, 401, 403, undefined);
+  },
+  completeOnboardingContract: async (onboardingId: string, contract: File): Promise<void> => {
+    /* istanbul ignore if */
+    if (isMockEnvironment()) {
+      const formData = new FormData();
+      formData.append('contract', contract);
+      return mockApiCall('ONBOARDING_COMPLETE_REGISTRATION', {
+        endpointParams: { token: onboardingId },
+        data: formData,
+        method: 'POST',
+      });
+    }
+    const result = await apiClient.completeUsingPOST({ onboardingId, contract });
+    return extractResponse(result, 204, onRedirectToLogin, 401, 403, undefined);
+  },
+  completeUsersOnboardingContract: async (onboardingId: string, contract: File): Promise<void> => {
+    /* istanbul ignore if */
+    if (isMockEnvironment()) {
+      const formData = new FormData();
+      formData.append('contract', contract);
+      return mockApiCall('USER_COMPLETE_REGISTRATION', {
+        endpointParams: { token: onboardingId },
+        data: formData,
+        method: 'POST',
+      });
+    }
+    const result = await apiClient.completeOnboardingUsersUsingPOST({ onboardingId, contract });
+    return extractResponse(result, 204, onRedirectToLogin, 401, 403, undefined);
+  },
+  uploadAttachment: async (
+    onboardingId: string,
+    attachmentName: string,
+    attachment: File
+  ): Promise<void> => {
+    /* istanbul ignore if */
+    if (isMockEnvironment()) {
+      const formData = new FormData();
+      formData.append('attachment', attachment);
+      return mockApiCall('ONBOARDING_POST_ATTACHMENT', {
+        endpointParams: { onboardingId, filename: attachmentName },
+        data: formData,
+        method: 'POST',
+      });
+    }
+    const result = await apiClient.uploadAttachmentUsingPOST({
+      onboardingId,
+      attachmentName,
+      attachment,
+    });
+    return extractResponse(result, 204, onRedirectToLogin, 401, 403, undefined);
+  },
+  onboardingInstitution: async (body: OnboardingProductDto): Promise<void> => {
+    /* istanbul ignore if */
+    if (isMockEnvironment()) {
+      return mockApiCall('ONBOARDING_POST_LEGALS', { data: body, method: 'POST' });
+    }
+    const result = await apiClient.institutionOnboarding({ body });
+    return extractResponse(result, 201, onRedirectToLogin, 401, 403, undefined);
   },
 };

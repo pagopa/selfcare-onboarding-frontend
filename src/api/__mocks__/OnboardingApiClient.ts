@@ -78,4 +78,34 @@ export const OnboardingApi = {
             params: { productId },
         })
     ),
+    completeOnboardingContract: vi.fn((onboardingId: string, contract: File) => {
+        const formData = new FormData();
+        formData.append('contract', contract);
+        return callViaFetchWithLogs('ONBOARDING_COMPLETE_REGISTRATION', {
+            endpointParams: { token: onboardingId },
+            data: formData,
+            method: 'POST',
+        });
+    }),
+    completeUsersOnboardingContract: vi.fn((onboardingId: string, contract: File) => {
+        const formData = new FormData();
+        formData.append('contract', contract);
+        return callViaFetchWithLogs('USER_COMPLETE_REGISTRATION', {
+            endpointParams: { token: onboardingId },
+            data: formData,
+            method: 'POST',
+        });
+    }),
+    uploadAttachment: vi.fn((onboardingId: string, attachmentName: string, attachment: File) => {
+        const formData = new FormData();
+        formData.append('attachment', attachment);
+        return callViaFetchWithLogs('ONBOARDING_POST_ATTACHMENT', {
+            endpointParams: { onboardingId, filename: attachmentName },
+            data: formData,
+            method: 'POST',
+        });
+    }),
+    onboardingInstitution: vi.fn((body: any) =>
+        callViaFetchWithLogs('ONBOARDING_POST_LEGALS', { data: body, method: 'POST' })
+    ),
 };

@@ -13,6 +13,7 @@ import { createClient, WithDefaultsT } from './generated/party-registry-proxy/cl
 import { GeographicTaxonomyResource } from './generated/party-registry-proxy/GeographicTaxonomyResource';
 import { InstitutionResource } from './generated/party-registry-proxy/InstitutionResource';
 import { UOResource } from './generated/party-registry-proxy/UOResource';
+import { UOsResource } from './generated/party-registry-proxy/UOsResource';
 
 const withBearerAuth: WithDefaultsT<'bearerAuth'> = (wrappedOperation) => (params: any) => {
   const token = storageTokenOps.read();
@@ -106,6 +107,15 @@ export const PartyRegistryProxyApi = {
       return mockApiCall('ONBOARDING_GET_UO_CODE_INFO', { endpointParams: { codiceUniUo } });
     }
     const result = await apiClient.findByUnicodeUsingGET_1({ codiceUniAoo: codiceUniUo });
+    return extractResponse(result, 200, onRedirectToLogin, 401, 403, undefined);
+  },
+
+  getUoList: async (taxCodeInvoicing: string): Promise<UOsResource> => {
+    /* istanbul ignore if */
+    if (isMockEnvironment()) {
+      return mockApiCall('ONBOARDING_GET_UO_LIST', { params: { taxCodeInvoicing } });
+    }
+    const result = await apiClient.findAllUsingGET_1({ taxCodeInvoicing });
     return extractResponse(result, 200, onRedirectToLogin, 401, 403, undefined);
   },
 };

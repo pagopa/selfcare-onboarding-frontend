@@ -6,7 +6,6 @@ import {
   handleSearchExternalId,
   getECDataByCF,
 } from '../institutionServices';
-import { fetchWithLogs } from '../../lib/api-utils';
 
 vi.mock('../../api/PartyRegistryProxyApiClient', () => ({
   PartyRegistryProxyApi: {
@@ -25,7 +24,6 @@ const setDisableTaxCodeInvoicing = vi.fn();
 const setApiLoading = vi.fn();
 const setEcData = vi.fn();
 const setFieldValue = vi.fn();
-const setRequiredLogin = vi.fn();
 const formik = { setFieldValue } as any;
 
 beforeEach(() => {
@@ -55,24 +53,21 @@ it('test handleSearchByTaxCode on error does nothing', async () => {
 });
 
 it('test getUoInfoFromRecipientCode success sets formik and disables field', async () => {
-  vi.mocked(fetchWithLogs).mockResolvedValue({
-    status: 200,
-    data: { codiceFiscaleSfe: '998877665544' },
+  vi.mocked(PartyRegistryProxyApi.getUoInfo).mockResolvedValue({
+    codiceFiscaleSfe: '998877665544',
   } as any);
 
-  await getUoInfoFromRecipientCode('A1B2C3', setDisableTaxCodeInvoicing, setRequiredLogin, formik);
+  await getUoInfoFromRecipientCode('A1B2C3', setDisableTaxCodeInvoicing, formik);
 
+  expect(PartyRegistryProxyApi.getUoInfo).toHaveBeenCalledWith('A1B2C3');
   expect(setFieldValue).toHaveBeenCalledWith('taxCodeInvoicing', '998877665544');
   expect(setDisableTaxCodeInvoicing).toHaveBeenCalledWith(true);
 });
 
 it('test getUoInfoFromRecipientCode on error disables field=false', async () => {
-  vi.mocked(fetchWithLogs).mockResolvedValue({
-    isAxiosError: true,
-    response: { status: 500 },
-  } as any);
+  vi.mocked(PartyRegistryProxyApi.getUoInfo).mockRejectedValue(new Error('HTTP 500'));
 
-  await getUoInfoFromRecipientCode('UO1', setDisableTaxCodeInvoicing, setRequiredLogin, formik);
+  await getUoInfoFromRecipientCode('UO1', setDisableTaxCodeInvoicing, formik);
 
   expect(setDisableTaxCodeInvoicing).toHaveBeenCalledWith(false);
   expect(setFieldValue).not.toHaveBeenCalled();

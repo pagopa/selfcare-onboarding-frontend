@@ -38,4 +38,7 @@ export const PartyRegistryProxyApi = {
     getUoInfo: vi.fn((codiceUniUo: string) =>
         callViaFetchWithLogs('ONBOARDING_GET_UO_CODE_INFO', { endpointParams: { codiceUniUo } })
     ),
+    getUoList: vi.fn((taxCodeInvoicing: string) =>
+        callViaFetchWithLogs('ONBOARDING_GET_UO_LIST', { params: { taxCodeInvoicing } })
+    ),
 };
