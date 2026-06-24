@@ -54,7 +54,10 @@ export function StepAddAdmin({
   const [_loading, setLoading] = useState(true);
   const [peopleErrors, setPeopleErrors] = useState<UsersError>({});
   const [genericError, setGenericError] = useState<boolean>(false);
-  const [isAuthUserAdmin, setIsAuthUserAdmin, setIsAuthUserAdminHistory] = useHistoryState('isAuthUserAdmin', false);
+  const [isAuthUserAdmin, setIsAuthUserAdmin, setIsAuthUserAdminHistory] = useHistoryState(
+    'isAuthUserAdmin',
+    false
+  );
   const [people, setPeople, setPeopleHistory] = useHistoryState<UsersObject>('people_step3', {});
   const [delegateFormIds, setDelegateFormIds, setDelegateFormIdsHistory] = useHistoryState<
     Array<string>
@@ -171,7 +174,14 @@ export function StepAddAdmin({
       .filter((prefix) => 'manager-initial' !== prefix)
       .some(
         (prefix) =>
-          !validateUser(prefix, people[prefix], allPeople, product?.id, isAuthUserAdmin, addUserFlow)
+          !validateUser(
+            prefix,
+            people[prefix],
+            allPeople,
+            product?.id,
+            prefix === 'delegate-initial' && isAuthUserAdmin,
+            addUserFlow
+          )
       ) ||
     Object.keys(people).length === 3;
 
@@ -361,7 +371,7 @@ export function StepAddAdmin({
                     people[prefix],
                     allPeople,
                     product?.id,
-                    isAuthUserAdmin,
+                    prefix === 'delegate-initial' && isAuthUserAdmin,
                     addUserFlow
                   )
               ),
