@@ -39,6 +39,7 @@ test('Test Success onboarding request for product prod-pagopa and institutionTyp
   await page.goto(`${BASE_URL_ONBOARDING}/prod-pagopa`);
   await stepInstitutionType(page, 'Gestore di servizi pubblici');
   await page.click('#no_ipa');
+  await page.getByRole('button', { name: 'Continua' }).click();
   await stepFormData(page, 'GSP', undefined);
   await stepAdditionalInformation(page);
   await stepAddManager(page);

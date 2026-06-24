@@ -1,6 +1,6 @@
 /* eslint-disable functional/immutable-data */
-import { Dispatch, SetStateAction } from 'react';
 import { History } from 'history';
+import { Dispatch, SetStateAction } from 'react';
 import { InstitutionType, Product } from '../../../../../types';
 import { OnboardingFormData } from '../../../../model/OnboardingFormData';
 import { ENV } from '../../../../utils/env';
@@ -13,7 +13,7 @@ import {
   isPrivateInstitution,
   isPrivatePersonInstitution,
   isPublicAdministration,
-  isTechPartner,
+  isTechPartner
 } from '../../../../utils/institutionTypeUtils';
 
 interface BackFunctionsParams {
@@ -72,6 +72,8 @@ export const createBackFunctions = (params: BackFunctionsParams) => {
       setActiveStep(0);
     } else if (fromDashboard && isPagoPaInsights(productId)) {
       window.location.assign(`${ENV.URL_FE.DASHBOARD}/${externalInstitutionId}`);
+    } else if (isGlobalServiceProvider(institutionType) && origin !== 'IPA' && isPagoPaProduct(selectedProduct?.id)) {
+      setActiveStep(2);
     } else {
       setActiveStep(1);
     }

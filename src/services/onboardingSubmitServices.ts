@@ -77,6 +77,9 @@ export const postOnboardingSubmit = async (
   // eslint-disable-next-line sonarjs/cognitive-complexity
 ) => {
   setLoading(true);
+  console.log('postOnboardingSubmit', {
+    onboardingFormData,
+  });
   const { response, outcome } = await postOnboardingLegals(
     {
       billingData: billingData2billingDataRequest(onboardingFormData as OnboardingFormData),
