@@ -123,4 +123,7 @@ export const OnboardingApi = {
             method: 'POST',
         });
     }),
+    verifyOnboardingExternal: vi.fn((params: any) =>
+        callViaFetchWithLogs('VERIFY_ONBOARDING', { params, method: 'HEAD' })
+    ),
 };

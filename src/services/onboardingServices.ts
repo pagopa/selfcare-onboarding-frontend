@@ -12,8 +12,7 @@ import {
 } from '../../types';
 import { OnboardingUserDto } from '../api/generated/onboarding/OnboardingUserDto';
 import { OnboardingApi } from '../api/OnboardingApiClient';
-import { fetchWithLogs } from '../lib/api-utils';
-import { getErrorStatus, getFetchOutcome } from '../lib/error-utils';
+import { getErrorStatus } from '../lib/error-utils';
 import { InstitutionOrigins } from '../model/InstitutionOrigins';
 import { OnboardingFormData } from '../model/OnboardingFormData';
 import { ProductResource } from '../model/ProductResource';
@@ -33,60 +32,45 @@ import { genericError } from '../views/onboardingProduct/components/StepVerifyOn
 // tool @pagopa/openapi-codegen-ts v14 does not support HEAD methods.
 // Same limitation as verifyVatNumber in validationServices.ts.
 
-const fetchVerifyOnboarding = async (
-  params: {
-    taxCode: string;
-    productId: string;
-    subunitCode?: string;
-    origin?: string;
-    originId?: string;
-    institutionType?: string;
-  },
-  setRequiredLogin: Dispatch<SetStateAction<boolean>>
-) => {
-  const response = await fetchWithLogs(
-    { endpoint: 'VERIFY_ONBOARDING' },
-    {
-      method: 'HEAD',
-      params,
-    },
-    () => setRequiredLogin(true)
-  );
-
-  const outcome = getFetchOutcome(response);
-
-  return { response, outcome };
+const fetchVerifyOnboarding = async (params: {
+  taxCode: string;
+  productId: string;
+  subunitCode?: string;
+  origin?: string;
+  originId?: string;
+  institutionType?: string;
+}) => {
+  try {
+    await OnboardingApi.verifyOnboardingExternal(params);
+    return { outcome: 'success' as const, status: undefined as number | undefined };
+  } catch (error) {
+    return { outcome: 'error' as const, status: getErrorStatus(error) };
+  }
 };
 
 export const insertedPartyVerifyOnboarding = async (
   onboardingFormData: OnboardingFormData,
-  setRequiredLogin: Dispatch<SetStateAction<boolean>>,
+  _setRequiredLogin: Dispatch<SetStateAction<boolean>>,
   productId: string,
   institutionType: InstitutionType | undefined,
   alreadyOnboarded: any,
   setOutcome: Dispatch<SetStateAction<any>>,
   notAllowedError: RequestOutcomeMessage
 ) => {
-  const { response, outcome } = await fetchVerifyOnboarding(
-    {
-      taxCode: onboardingFormData.taxCode ?? '',
-      productId,
-      subunitCode: onboardingFormData.uoUniqueCode ?? onboardingFormData.aooUniqueCode,
-      origin: isInsuranceCompany(institutionType) ? 'IVASS' : undefined,
-      originId: onboardingFormData?.originId ?? undefined,
-    },
-    setRequiredLogin
-  );
+  const { outcome, status } = await fetchVerifyOnboarding({
+    taxCode: onboardingFormData.taxCode ?? '',
+    productId,
+    subunitCode: onboardingFormData.uoUniqueCode ?? onboardingFormData.aooUniqueCode,
+    origin: isInsuranceCompany(institutionType) ? 'IVASS' : undefined,
+    originId: onboardingFormData?.originId ?? undefined,
+  });
 
   if (outcome === 'success') {
     setOutcome(alreadyOnboarded);
   } else {
-    if (
-      (response as AxiosError<any>).response?.status === 404 ||
-      (response as AxiosError<any>).response?.status === 400
-    ) {
+    if (status === 404 || status === 400) {
       setOutcome(null);
-    } else if ((response as AxiosError<any>).response?.status === 403) {
+    } else if (status === 403) {
       setOutcome(notAllowedError);
     } else {
       setOutcome(genericError);
@@ -97,7 +81,7 @@ export const insertedPartyVerifyOnboarding = async (
 // Seconda funzione - logica per verifyOnboarding generico
 export const verifyOnboarding = async (
   setLoading: Dispatch<SetStateAction<boolean>>,
-  setRequiredLogin: Dispatch<SetStateAction<boolean>>,
+  _setRequiredLogin: Dispatch<SetStateAction<boolean>>,
   productId: string,
   selectedProduct: any,
   setOutcome: Dispatch<SetStateAction<any>>,
@@ -112,20 +96,17 @@ export const verifyOnboarding = async (
 ) => {
   setLoading(true);
 
-  const { response, outcome } = await fetchVerifyOnboarding(
-    {
-      taxCode: onboardingFormData?.taxCode,
-      productId,
-      subunitCode: onboardingFormData?.uoUniqueCode ?? onboardingFormData?.aooUniqueCode,
-      origin: onboardingFormData?.origin,
-      originId: onboardingFormData?.originId,
-      institutionType:
-        isIdpayMerchantProduct(productId) && isPrivatePersonInstitution(institutionType)
-          ? institutionType
-          : undefined,
-    },
-    setRequiredLogin
-  );
+  const { outcome, status } = await fetchVerifyOnboarding({
+    taxCode: onboardingFormData?.taxCode,
+    productId,
+    subunitCode: onboardingFormData?.uoUniqueCode ?? onboardingFormData?.aooUniqueCode,
+    origin: onboardingFormData?.origin,
+    originId: onboardingFormData?.originId,
+    institutionType:
+      isIdpayMerchantProduct(productId) && isPrivatePersonInstitution(institutionType)
+        ? institutionType
+        : undefined,
+  });
 
   setLoading(false);
 
@@ -137,7 +118,6 @@ export const verifyOnboarding = async (
     });
     setOutcome(alreadyOnboarded);
   } else {
-    const status = (response as AxiosError<any>).response?.status;
     if (status === 404 || status === 400) {
       setOutcome(null);
       forward();

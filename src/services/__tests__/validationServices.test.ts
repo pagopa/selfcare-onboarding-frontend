@@ -1,11 +1,12 @@
 import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { OnboardingApi } from '../../api/OnboardingApiClient';
-import { userValidate } from '../validationServices';
+import { userValidate, verifyVatNumber } from '../validationServices';
 
 vi.mock('../../api/OnboardingApiClient', () => ({
   OnboardingApi: {
     userValidate: vi.fn(),
+    verifyOnboardingExternal: vi.fn(),
   },
 }));
 
@@ -128,6 +129,62 @@ describe('validationServices', () => {
 
       expect(setLoading).toHaveBeenNthCalledWith(1, true);
       expect(setLoading).toHaveBeenLastCalledWith(false);
+    });
+  });
+
+  describe('verifyVatNumber', () => {
+    const setVatVerificationGenericError = vi.fn();
+    const setIsVatRegistrated = vi.fn();
+    const setOpenVatNumberErrorModal = vi.fn();
+    const setRequiredLogin = vi.fn();
+    const formik = {
+      values: { taxCode: 'RSSMRA80A01H501Z', vatNumber: '12345678901' },
+    } as any;
+    const stepHistoryState = { isTaxCodeEquals2PIVA: false } as any;
+
+    const callVerify = () =>
+      verifyVatNumber(
+        'GSP' as any,
+        'ext-1',
+        formik,
+        stepHistoryState,
+        setVatVerificationGenericError,
+        setIsVatRegistrated,
+        setOpenVatNumberErrorModal,
+        setRequiredLogin,
+        'prod-1'
+      );
+
+    it('segna come registrato quando la HEAD risponde 204', async () => {
+      vi.mocked(OnboardingApi.verifyOnboardingExternal).mockResolvedValue(undefined);
+
+      await callVerify();
+
+      expect(setIsVatRegistrated).toHaveBeenCalledWith(true);
+      expect(setVatVerificationGenericError).toHaveBeenCalledWith(false);
+    });
+
+    it('segna come non registrato sul 404', async () => {
+      vi.mocked(OnboardingApi.verifyOnboardingExternal).mockRejectedValue(
+        Object.assign(new Error('nf'), { httpStatus: 404 })
+      );
+
+      await callVerify();
+
+      expect(setIsVatRegistrated).toHaveBeenCalledWith(false);
+      expect(setVatVerificationGenericError).toHaveBeenCalledWith(false);
+      expect(setOpenVatNumberErrorModal).not.toHaveBeenCalled();
+    });
+
+    it('apre il modale di errore su errore generico', async () => {
+      vi.mocked(OnboardingApi.verifyOnboardingExternal).mockRejectedValue(
+        Object.assign(new Error('boom'), { httpStatus: 500 })
+      );
+
+      await callVerify();
+
+      expect(setOpenVatNumberErrorModal).toHaveBeenCalledWith(true);
+      expect(setVatVerificationGenericError).toHaveBeenCalledWith(true);
     });
   });
 });

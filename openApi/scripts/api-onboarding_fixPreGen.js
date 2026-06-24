@@ -1,4 +1,5 @@
 const regexReplace = require('regex-replace');
+const fs = require('fs');
 
 const FILE = 'openApi/generated-onboarding/onboarding-swagger20.json';
 const opts = { fileContentsOnly: true };
@@ -42,6 +43,17 @@ async function fixPreGen() {
     '"Problem":{"description":"Generic problem response","type":"object","properties":{"detail":{"type":"string"},"status":{"type":"integer","format":"int32"},"errors":{"type":"array","items":{"type":"object","properties":{"code":{"type":"string"},"detail":{"type":"string"}}}}}}',
     FILE,
     opts
+  );
+
+  // Patch: @pagopa/openapi-codegen-ts v14 skips HEAD operations entirely. The
+  // HEAD /v1/institutions/onboarding (verifyOnboardingUsingHEAD) is the only
+  // HEAD endpoint the FE uses (verifyVatNumber + verifyOnboarding). We rename
+  // it to "get" so the client + typed params are generated; the real HTTP
+  // method is restored to "head" in api-onboarding_fixPostGen.js.
+  const doc = fs.readFileSync(FILE, 'utf8');
+  fs.writeFileSync(
+    FILE,
+    doc.replace(/("\/v1\/institutions\/onboarding":\s*\{\s*)"head":/, '$1"get":')
   );
 }
 

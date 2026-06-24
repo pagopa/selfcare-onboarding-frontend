@@ -312,4 +312,28 @@ export const OnboardingApi = {
     });
     return extractResponse(result, 200, onRedirectToLogin, 401, 403, undefined);
   },
+  // HEAD /v1/institutions/onboarding (verifyOnboardingUsingHEAD). The codegen
+  // tool skips HEAD, so the spec is patched HEAD->GET (fixPreGen) and the real
+  // method restored to HEAD (fixPostGen). Success is 204 (already onboarded),
+  // 404 means not onboarded.
+  verifyOnboardingExternal: async (params: {
+    taxCode?: string;
+    subunitCode?: string;
+    productId?: string;
+    origin?: string;
+    originId?: string;
+    vatNumber?: string;
+    institutionType?: string;
+    verifyType?: string;
+  }): Promise<void> => {
+    /* istanbul ignore if */
+    if (isMockEnvironment()) {
+      return mockApiCall('VERIFY_ONBOARDING', { params, method: 'HEAD' });
+    }
+    const result = await apiClient.verifyOnboardingUsingHEAD({
+      ...params,
+      productId: params.productId ?? '',
+    });
+    return extractResponse(result, 204, onRedirectToLogin, 401, 403, undefined);
+  },
 };

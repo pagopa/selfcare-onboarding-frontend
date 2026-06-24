@@ -167,38 +167,6 @@ export const fetchInstitutionsByName = async (
   }
 };
 
-/* const fetchInstitutionByTaxCodeOnInfocamere = async (
-  productId: string | undefined,
-  query: string,
-  filterCategories: { atecoCodes: string; allowedInstitutions: string } | string | undefined,
-  setCfResult: Dispatch<SetStateAction<PartyData | undefined>>,
-  setRequiredLogin: Dispatch<SetStateAction<boolean>>
-) => {
-  const scpResearchParams = {
-    categories: isInteropOrIdpayMerchantProduct(productId)
-      ? undefined
-      : (filterCategories as string),
-  };
-
-  const searchResponse = await fetchWithLogs(
-    { endpoint: 'ONBOARDING_GET_PARTY_BY_CF_FROM_INFOCAMERE', endpointParams: { id: query } },
-    {
-      method: 'GET',
-      params: scpResearchParams,
-    },
-    () => setRequiredLogin(true)
-  );
-
-  const outcome = getFetchOutcome(searchResponse);
-
-  if (outcome === 'success') {
-    const response = (searchResponse as AxiosResponse).data;
-    setCfResult(response);
-  } else {
-    setCfResult(undefined);
-  }
-}; */
-
 export const fetchInstitutionByTaxCode = async (
   addUser: boolean,
   endpoint: ApiEndpointKey,
