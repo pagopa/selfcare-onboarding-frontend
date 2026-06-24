@@ -53,6 +53,7 @@ import { StepAdditionalGpuInformations } from './components/StepAdditionalGpuInf
 import { StepAdditionalInformations } from './components/StepAdditionalInformations';
 import { StepUploadAggregates } from './components/StepUploadAggregates';
 import { genericError, StepVerifyOnboarding } from './components/StepVerifyOnboarding';
+import StepContractsSummary from './components/StepContractsSummary';
 
 export type ValidateErrorType = 'conflictError';
 
@@ -263,6 +264,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
 
   const {
     forwardWithInstitutionType,
+    forwardGspNoIpa,
     forwardWithDataAndInstitution,
     forwardWithBillingData,
     forwardWithAdditionalGSPInfo,
@@ -343,7 +345,9 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
   useEffect(() => {
     if (pendingForward && formData) {
       setPendingForward(null);
-      setActiveStep((prevStep) => prevStep + 1);
+      // Skip the GSP-no-IPA-only StepContractsSummary (step 2): the standard
+      // party-selection flow goes from "Search party" (1) to "Verify onboarding" (3).
+      setActiveStep((prevStep) => prevStep + 2);
     }
   }, [formData, pendingForward]);
 
@@ -471,6 +475,14 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           setInstitutionType,
           forward: forwardWithDataAndInstitution,
           addUser,
+        }),
+    },
+    {
+      label: 'Gpu contracts summary',
+      Component: () =>
+        StepContractsSummary({
+          forward: forwardGspNoIpa,
+          back,
         }),
     },
     {

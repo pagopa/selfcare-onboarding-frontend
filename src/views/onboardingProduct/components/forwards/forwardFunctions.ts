@@ -107,7 +107,7 @@ export const createForwardFunctions = (params: ForwardFunctionsParams) => {
       setOnboardingFormData(
         selected2OnboardingData(null, undefined, newInstitutionType, productId)
       );
-      setActiveStep(4);
+      setActiveStep(5);
     } else {
       forward();
     }
@@ -135,8 +135,25 @@ export const createForwardFunctions = (params: ForwardFunctionsParams) => {
       } else {
         setOnboardingFormData(onboardingFormData);
       }
-      setActiveStep(4);
+      setActiveStep(5);
     }
+  };
+
+  const forwardGspNoIpa = () => {
+    desiredOriginRef.current = 'SELC';
+    setOrigin('SELC');
+    setOnboardingFormData({
+      businessName: '',
+      registeredOffice: '',
+      zipCode: '',
+      digitalAddress: '',
+      taxCode: '',
+      vatNumber: '',
+      recipientCode: '',
+      geographicTaxonomies: [],
+    });
+    setExternalInstitutionId('');
+    setActiveStep(activeStep + 3);
   };
 
   const forwardWithDataAndInstitution = (
@@ -148,20 +165,7 @@ export const createForwardFunctions = (params: ForwardFunctionsParams) => {
       onboardingData?.originId === undefined &&
       institutionTypeParam === 'GSP'
     ) {
-      desiredOriginRef.current = 'SELC';
-      setOrigin('SELC');
-      setOnboardingFormData({
-        businessName: '',
-        registeredOffice: '',
-        zipCode: '',
-        digitalAddress: '',
-        taxCode: '',
-        vatNumber: '',
-        recipientCode: '',
-        geographicTaxonomies: [],
-      });
-      setExternalInstitutionId('');
-      setActiveStep(activeStep + 3);
+      setActiveStep(activeStep + 1);
     } else {
       setInstitutionType(institutionTypeParam);
       setOnboardingFormData(onboardingData);
@@ -313,6 +317,7 @@ export const createForwardFunctions = (params: ForwardFunctionsParams) => {
   return {
     forwardWithData,
     forwardWithInstitutionType,
+    forwardGspNoIpa,
     forwardWithDataAndInstitution,
     forwardWithBillingData,
     forwardWithAdditionalGSPInfo,

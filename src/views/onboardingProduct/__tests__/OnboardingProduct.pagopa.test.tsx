@@ -12,6 +12,7 @@ import {
   executeStepAdditionalGpuInformations,
   executeStepAdditionalInfo,
   executeStepBillingData,
+  executeStepContractsSummary,
   executeStepInstitutionType,
   executeStepSearchParty,
   renderComponent,
@@ -78,6 +79,7 @@ test('Test: Successfull complete onboarding request of GSP party without searchi
     true,
     false
   );
+  await executeStepContractsSummary();
   await executeStepBillingData(PRODUCT_IDS.PAGOPA, 'GSP', false, false, 'NO_IPA', 'AGENCY X');
   await executeStepAdditionalInfo('NO_IPA');
   await executeStepAddManager(false);
