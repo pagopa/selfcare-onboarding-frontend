@@ -60,7 +60,6 @@ const subProductArgs = () =>
     'IPA',
     'origin-id-1',
     setConflictError,
-    'C0',
   ] as const;
 
 beforeEach(() => {

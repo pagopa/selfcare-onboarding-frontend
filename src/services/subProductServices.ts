@@ -1,11 +1,7 @@
 import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
-import { AxiosResponse } from 'axios';
-import { Dispatch, SetStateAction } from 'react';
 import { Problem, SelfcareParty } from '../../types';
 import { OnboardingApi } from '../api/OnboardingApiClient';
-import { fetchWithLogs } from '../lib/api-utils';
-import { getFetchOutcome, HttpError } from '../lib/error-utils';
-import config from '../utils/config.json';
+import { HttpError } from '../lib/error-utils';
 import { buildUrlLogo } from '../utils/constants';
 import { ENV } from '../utils/env';
 
@@ -60,27 +56,6 @@ export const onExitPremiumFlow = async (
       window.location.assign('https://www.pagopa.it/it/prodotti-e-servizi/app-io');
     },
   });
-};
-
-// NOTE: getPricingPlan stays on fetchWithLogs because CONFIG_JSON_CDN_URL is a
-// CDN file fetch, not a backend API call - no codegen client applies.
-export const getPricingPlan = async (
-  setRequiredLogin: Dispatch<SetStateAction<boolean>>,
-  setPricingPlanCategory: Dispatch<SetStateAction<any>>
-) => {
-  const configJsinResponse = await fetchWithLogs(
-    { endpoint: 'CONFIG_JSON_CDN_URL' },
-    { method: 'GET', headers: { 'Content-Type': 'application/json' } },
-    () => setRequiredLogin(true)
-  );
-
-  const restOutcome = getFetchOutcome(configJsinResponse);
-  if (restOutcome === 'success') {
-    const response = (configJsinResponse as AxiosResponse).data;
-    setPricingPlanCategory(response);
-  } else {
-    setPricingPlanCategory(config);
-  }
 };
 
 export const handleSearchUserParties = async (

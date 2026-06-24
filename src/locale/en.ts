@@ -517,57 +517,6 @@ export default {
         'The institution you selected has already subscribed to the <1 /><strong>Premium</strong> offer.',
       closeButton: 'Close',
     },
-    subProductStepSelectPricingPlan: {
-      discountLabelData: '25% discount Until June 30, 2023 ',
-      title: 'Switch to IO Premium and improve <1/> message performance',
-      firstCheckLabel: 'Reduce collection times',
-      secondCheckLabel: 'Improve collection performance',
-      thirdCheckLabel: 'Reduce bad debts',
-      infoSectionLabel: `If your institution has already joined IO, choose which plan best meets its needs. <1/> The carnet plan can be activated only once. Once the number of messages in the <3/> carnet plan is finished, the consumption plan will be automatically activated. `,
-      btnRejectLabel: 'Not interested',
-      pricingPlanExitModal: {
-        title: 'Do you want to give up Premium offers?',
-        subtitle: 'If you exit, you will continue with access to the Reserved Area.',
-        closeBtnLabel: 'Exit',
-        confirmBtnLabel: 'Back to Premium offers',
-      },
-      headerPlanCard: {
-        from: 'From',
-        to: 'to',
-        beyond: 'Beyond',
-        mess: '/ msg',
-      },
-      carnetPlan: {
-        caption: 'CARNET PLAN - ONE-TIME',
-        discountBoxLabel: '25% discount',
-        title: 'Choose from the {{carnetCount}} different carnets designed for your every need',
-        showMore: 'Learn more',
-        showLess: 'Show less',
-        description:
-          'Once the carnet is selected it cannot be changed due to contract subscription.',
-        carnetLabelsDiscount: {
-          c1: 'Save €55',
-          c2: 'Save €543.75',
-          c3: 'Save €2,687.50',
-          c4: 'Save €5,312.50',
-          c5: 'Save €13,125',
-          c6: 'Save €25,625',
-          c7: 'Save €50,000',
-        },
-        btnActionLabel: 'Activate the plan',
-      },
-      consumptionPlan: {
-        caption: 'CONSUMPTION PLAN',
-        discountBoxLabel: '25% discount',
-        title: 'Choose to pay only for the actual <1/> messages you send',
-        showMore: 'Learn more',
-        showLess: 'Show less',
-        description:
-          'By activating the consumption plan, it will no longer be possible to activate the carnet plan.',
-        rangeLabelsDiscount: '25% discount',
-        btnActionLabel: 'Activate the plan',
-      },
-    },
     subProductStepUserUnrelated: {
       title: 'You cannot join {{selectedProduct}}',
       description:

@@ -25,7 +25,6 @@ type Props = StepperStepComponentProps & {
   users: Array<UserOnCreate>;
   billingData: OnboardingFormData;
   institutionType: InstitutionType;
-  pricingPlan?: string;
   origin: string;
   originId: string;
   setLoading: (loading: boolean) => void;
@@ -68,7 +67,6 @@ function SubProductStepSubmit({
   billingData,
   setLoading,
   institutionType,
-  pricingPlan,
   origin,
   originId,
 }: Props) {
@@ -91,8 +89,7 @@ function SubProductStepSubmit({
         forward,
         origin,
         originId,
-        setConflictError,
-        pricingPlan
+        setConflictError
       )
         .catch((_reason: any) => {
           setError(true);

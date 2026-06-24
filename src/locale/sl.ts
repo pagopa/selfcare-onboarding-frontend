@@ -462,57 +462,6 @@ export default {
         'Organizacija, ki ste jo izbrali, je že naročena na ponudbo <1 /><strong>Premium</strong>.',
       closeButton: 'Zapri',
     },
-    subProductStepSelectPricingPlan: {
-      discountLabelData: '25 % popust Do 30. Junija 2023 ',
-      title: 'Nadgradite na IO Premium in izboljšajte <1/> učinkovitost sporočil',
-      firstCheckLabel: 'Skrajšajte čas prejema plačil',
-      secondCheckLabel: 'Izboljšana učinkovitost izterjav',
-      thirdCheckLabel: 'Zmanjšajte neplačane terjatve',
-      infoSectionLabel: `Se il tuo ente ha già aderito ad IO, scegli qual è il piano che più soddisfa le sue esigenze. <1/> Il piano a carnet è attivabile una sola volta. Una volta terminato il numero di messaggi del piano a  <3/> carnet, si attiverà automaticamente il piano a consumo. `,
-      btnRejectLabel: 'Ne zanima me',
-      pricingPlanExitModal: {
-        title: 'Se želite odpovedati ponudbam Premium?',
-        subtitle: 'Če izstopite, boste nadaljevali z dostopom do varnega območja.',
-        closeBtnLabel: 'Izhod',
-        confirmBtnLabel: 'Nazaj na ponudbe Premium',
-      },
-      headerPlanCard: {
-        from: 'Od',
-        to: 'do',
-        beyond: 'Čez',
-        mess: '/ sporočilo',
-      },
-      carnetPlan: {
-        caption: 'NAČRT PO ZVEZKU – ENKRATNI',
-        discountBoxLabel: '25-% popust',
-        title: 'Izbirajte med {{carnetCount}} različnimi zvezki, zasnovanimi za vse vaše potrebe',
-        showMore: 'Izvedite več',
-        showLess: 'Prikaži manj',
-        description:
-          'Una volta selezionato il carnet non potrà essere modificato per via della sottoscrizione del contratto.',
-        carnetLabelsDiscount: {
-          c1: 'Prihranite 55 EUR',
-          c2: 'Prihranite 543,75 EUR',
-          c3: 'Prihranite 2.687,50 EUR',
-          c4: 'Prihranite 5.312,50 EUR',
-          c5: 'Prihranite 13.125 EUR',
-          c6: 'Prihranite 25.625 EUR',
-          c7: 'Prihranite 50.000 EUR',
-        },
-        btnActionLabel: 'Aktivirajte načrt',
-      },
-      consumptionPlan: {
-        caption: 'NAČRT PORABE',
-        discountBoxLabel: '25-% popust',
-        title: 'Izberite plačilo samo za dejanska <1/> sporočila, ki jih pošljete',
-        showMore: 'Izvedite več',
-        showLess: 'Prikaži manj',
-        description:
-          'Attivando il piano a consumo, non sarà più possibile attivare il piano carnet.',
-        rangeLabelsDiscount: '25-% popust',
-        btnActionLabel: 'Aktivirajte načrt',
-      },
-    },
     subProductStepUserUnrelated: {
       title: 'Ne morete se naročiti na {{selectedProduct}} Premium',
       description:

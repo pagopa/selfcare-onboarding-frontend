@@ -465,59 +465,6 @@ export default {
         'Die von dir gewählte Körperschaft hat das <1 /><strong>Premium</strong>-Angebot bereits abonniert.',
       closeButton: 'Beenden',
     },
-    subProductStepSelectPricingPlan: {
-      discountLabelData: '25% Skonto bis zum 30. Juni 2023 ',
-      title: 'Upgrade auf IO Premium und verbessere die <1/> Nachrichtenleistung',
-      firstCheckLabel: 'Du verkürzt die Einnahmezeiten',
-      secondCheckLabel: 'Du verbesserst die Einnahmeleistungen',
-      thirdCheckLabel: 'Du reduziert Außenstände',
-      infoSectionLabel: `Se il tuo ente ha già aderito ad IO, scegli qual è il piano che più soddisfa le sue esigenze. <1/> Il piano a carnet è attivabile una sola volta. Una volta terminato il numero di messaggi del piano a  <3/> carnet, si attiverà automaticamente il piano a consumo. `,
-      btnRejectLabel: 'Bin nicht interessiert',
-      pricingPlanExitModal: {
-        title: 'Möchtest du auf die Premium Angebote verzichten?',
-        subtitle: 'Wenn du beendest, hast du Zugang zum reservierten Bereich.',
-        closeBtnLabel: 'Beenden',
-        confirmBtnLabel: 'Zurück zu den Premium Angeboten',
-      },
-      headerPlanCard: {
-        from: 'Von',
-        to: 'bis',
-        beyond: 'über',
-        mess: '/ Nachrichten',
-      },
-      carnetPlan: {
-        caption: 'CARNET-PLAN - PAUSCHAL',
-        discountBoxLabel: '25% Skonto',
-        title:
-          'Wähle unter den {{carnetCount}} verschiedenen und genau auf deine Bedürfnisse zugeschnitten Carnets',
-        showMore: 'Mehr hierzu',
-        showLess: 'Weniger anzeigen',
-        description:
-          'Una volta selezionato il carnet non potrà essere modificato per via della sottoscrizione del contratto.',
-        carnetLabelsDiscount: {
-          c1: 'Spare 55 €',
-          c2: 'Spare 543,75 €',
-          c3: 'Spare 2.687,50 €',
-          c4: 'Spare 5.312,50 €',
-          c5: 'Spare 13.125 €',
-          c6: 'Spare 25.625 €',
-          c7: 'Spare 50.000 €',
-        },
-        btnActionLabel: 'Aktiviere den Plan',
-      },
-      consumptionPlan: {
-        caption: 'BEDARFSPLAN',
-        discountBoxLabel: '25% Skonto',
-        title:
-          'Entscheide dich dafür, nur für die tatsächlich gesendeten Nachrichten <1/> zu zahlen',
-        showMore: 'Mehr hierzu',
-        showLess: 'Weniger anzeigen',
-        description:
-          'Attivando il piano a consumo, non sarà più possibile attivare il piano carnet.',
-        rangeLabelsDiscount: '25% Skonto',
-        btnActionLabel: 'Aktiviere den Plan',
-      },
-    },
     subProductStepUserUnrelated: {
       title: 'Du kannst {{selectedProduct}} Premium nicht beitreten',
       description:

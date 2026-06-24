@@ -221,8 +221,7 @@ export const postSubProductOnboardingSubmit = async (
   forward: () => void,
   origin: string,
   originId: string,
-  setConflictError: Dispatch<SetStateAction<boolean>>,
-  pricingPlan?: string
+  setConflictError: Dispatch<SetStateAction<boolean>>
 ) => {
   const { outcome, status, detail } = await postOnboardingLegals(
     {
@@ -236,7 +235,6 @@ export const postSubProductOnboardingSubmit = async (
         ? pspData2pspDataRequest(billingData as OnboardingFormData)
         : undefined,
       institutionType,
-      pricingPlan,
       origin,
       originId,
       geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY
@@ -269,7 +267,6 @@ export const postSubProductOnboardingSubmit = async (
       party_id: externalInstitutionId,
       product_id: product?.id,
       subproduct_id: subProduct?.id,
-      selected_plan: pricingPlan === 'C0' ? 'consumo' : 'carnet',
     });
     forward();
   } else {

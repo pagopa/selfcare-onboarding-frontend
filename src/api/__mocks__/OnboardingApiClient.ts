@@ -6,7 +6,10 @@ const callViaFetchWithLogs = async (
     options: { endpointParams?: any; params?: any; data?: any; method?: string } = {}
 ) => {
     const r = await fetchWithLogs(
-        { endpoint: endpoint as any, endpointParams: options.endpointParams ?? {} },
+        {
+            endpoint: endpoint as any,
+            ...(options.endpointParams !== undefined ? { endpointParams: options.endpointParams } : {}),
+        },
         { params: options.params, data: options.data, method: options.method ?? 'GET' } as any,
         () => undefined
     );

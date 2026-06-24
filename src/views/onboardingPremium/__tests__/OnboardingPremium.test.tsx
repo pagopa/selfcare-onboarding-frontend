@@ -122,7 +122,7 @@ const stepBillingDataTitle = 'Inserisci i dati dell’ente';
 test('Test: Bad productId and subProductId for prod-io-premium', async () => {
   renderComponent(PRODUCT_IDS.IO, PRODUCT_IDS.IO);
   await waitFor(() => {
-    expect(fetchWithLogsSpy).toHaveBeenCalledTimes(4);
+    expect(fetchWithLogsSpy).toHaveBeenCalledTimes(3);
     screen.findByText('Qualcosa è andato storto');
   });
 });
@@ -130,7 +130,7 @@ test('Test: Bad productId and subProductId for prod-io-premium', async () => {
 test('Test: Bad productId and subProductId for prod-dashboard-psp', async () => {
   renderComponent(PRODUCT_IDS.PAGOPA, PRODUCT_IDS.PAGOPA);
   await waitFor(() => {
-    expect(fetchWithLogsSpy).toHaveBeenCalledTimes(4);
+    expect(fetchWithLogsSpy).toHaveBeenCalledTimes(3);
     screen.findByText('Qualcosa è andato storto');
   });
 });
@@ -188,12 +188,12 @@ const executeStepSelectInstitution = async (partyName: string) => {
   const continueButton = screen.getByText('Continua');
   expect(continueButton).toBeDisabled();
 
-  await waitFor(() => expect(fetchWithLogsSpy).toHaveBeenCalledTimes(4));
+  await waitFor(() => expect(fetchWithLogsSpy).toHaveBeenCalledTimes(3));
   const party = screen.getByText(partyName);
 
   expect(party).toBeTruthy();
 
-  expect(fetchWithLogsSpy).toHaveBeenCalledTimes(4);
+  expect(fetchWithLogsSpy).toHaveBeenCalledTimes(3);
 
   fireEvent.click(party);
 

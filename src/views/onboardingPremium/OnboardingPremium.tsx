@@ -22,11 +22,9 @@ import StepOnboardingData from '../../components/steps/StepOnboardingData';
 import StepOnboardingFormData from '../../components/steps/StepOnboardingFormData';
 import { withLogin } from '../../components/withLogin';
 import { useHistoryState } from '../../hooks/useHistoryState';
-import { HeaderContext, UserContext } from '../../lib/context';
+import { HeaderContext } from '../../lib/context';
 import { CompanyInformations } from '../../model/CompanyInformations';
 import { OnboardingFormData } from '../../model/OnboardingFormData';
-import { getPricingPlan } from '../../services/subProductServices';
-import { PRODUCT_IDS } from '../../utils/constants';
 import { ENV } from '../../utils/env';
 import { isPagoPaInsights } from '../../utils/institutionTypeUtils';
 import { registerUnloadEvent, unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
@@ -49,7 +47,6 @@ function OnboardingPremiumComponent() {
   const { subProductId, productId } = useParams<OnboardingPremiumUrlParams>();
   const [loading, setLoading] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
-  const { setRequiredLogin } = useContext(UserContext);
   const [subProduct, setSubProduct] = useState<Product>();
   const [product, setProduct] = useState<Product>();
   const [parties, setParties] = useState<Array<SelfcareParty>>([]);
@@ -63,7 +60,6 @@ function OnboardingPremiumComponent() {
   const [billingData, setBillingData] = useState<OnboardingFormData>();
   const [institutionType, setInstitutionType] = useState<InstitutionType>();
   const [partyId, setPartyId] = useState<string>();
-  const [pricingPlanCategory, setPricingPlanCategory] = useState<any>();
 
   const setStepAddManagerHistoryState = useHistoryState<UsersObject>('people_step2', {})[2];
 
@@ -95,10 +91,6 @@ function OnboardingPremiumComponent() {
       `onboarding-${externalInstitutionId}-${productId}-${subProductId}-`
     );
   }, [productId, subProductId]);
-
-  useEffect(() => {
-    void getPricingPlan(setRequiredLogin, setPricingPlanCategory);
-  }, []);
 
   const chooseFromMyParties = useRef(true);
 
@@ -138,18 +130,9 @@ function OnboardingPremiumComponent() {
     setStepAddManagerHistoryState,
     chooseFromMyParties,
   });
-  // const forwardWitSelectedPricingPlan = () => {
-  //   setActiveStep(parties.length === 0 ? 3 : 2);
-  //   window.scrollTo(0, 0);
-  // };
-
   const handleOnConfirmModal = () => {
     trackEvent('ONBOARDING_PREMIUM_UX_CONVERSION', {
       party_id: partyId,
-      selected_plan:
-        pricingPlanCategory.product[PRODUCT_IDS.IO_PREMIUM]?.consumptionPlan.pricingPlan === 'C0'
-          ? 'consumo'
-          : 'carnet',
     });
     setOpenConfirmationModal(false);
     forward();
@@ -168,16 +151,6 @@ function OnboardingPremiumComponent() {
           forward: forwardWithInputs,
         }),
     },
-    // PRICING PLAN HAS BEEN DEACTIVATED
-    // {
-    //   label: 'Select Pricing Plan',
-    //   Component: () =>
-    //     SubProductStepSelectPricingPlan({
-    //       setAvailablePricingPlanIds: undefined,
-    //       forward: forwardWitSelectedPricingPlan,
-    //       product,
-    //     }),
-    // },
     {
       label: 'Select Institution related',
       Component: () =>
@@ -298,7 +271,6 @@ function OnboardingPremiumComponent() {
           users,
           billingData: billingData as OnboardingFormData,
           institutionType: institutionType as InstitutionType,
-          pricingPlan: pricingPlanCategory.product[subProductId]?.consumptionPlan.pricingPlan,
           origin,
           originId: origin === 'SELC' ? (billingData?.taxCode ?? '') : originId,
           setLoading,

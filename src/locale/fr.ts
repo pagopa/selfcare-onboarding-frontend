@@ -463,58 +463,6 @@ export default {
         'L’organisme que vous avez sélectionné a déjà souscrit à l’offre <1 /><strong>Premium</strong>.',
       closeButton: 'Fermer',
     },
-    subProductStepSelectPricingPlan: {
-      discountLabelData: '25 % de réduction jusqu’au 30 juin 2023 ',
-      title: 'Passez à IO Premium et améliorez les <1/> performances des messages',
-      firstCheckLabel: 'Réduisez les temps d’encaissement',
-      secondCheckLabel: 'Améliorez les performances de recouvrement',
-      thirdCheckLabel: 'Réduisez les créances impayées',
-      infoSectionLabel: `Se il tuo ente ha già aderito ad IO, scegli qual è il piano che più soddisfa le sue esigenze. <1/> Il piano a carnet è attivabile una sola volta. Una volta terminato il numero di messaggi del piano a  <3/> carnet, si attiverà automaticamente il piano a consumo. `,
-      btnRejectLabel: 'Je ne suis pas intéressé',
-      pricingPlanExitModal: {
-        title: 'Souhaitez-vous renoncer aux offres Premium ?',
-        subtitle: 'Si vous sortez, vous accéderez à l’Espace Réservé.',
-        closeBtnLabel: 'Sortir',
-        confirmBtnLabel: 'Revenir aux offres Premium',
-      },
-      headerPlanCard: {
-        from: 'De',
-        to: 'à',
-        beyond: 'Au-delà',
-        mess: '/ mess',
-      },
-      carnetPlan: {
-        caption: 'PLAN À CARNETS - UNIQUE',
-        discountBoxLabel: '25 % de réduction',
-        title:
-          'Choisissez parmi les {{carnetCount}} différents carnets conçus pour répondre à tous vos besoins',
-        showMore: 'En savoir plus',
-        showLess: 'Voir moins',
-        description:
-          'Una volta selezionato il carnet non potrà essere modificato per via della sottoscrizione del contratto.',
-        carnetLabelsDiscount: {
-          c1: 'Économisez 55 €',
-          c2: 'Économisez 543,75 €',
-          c3: 'Économisez 2 687,50 €',
-          c4: 'Économisez 5 312,50 €',
-          c5: 'Économisez 13 125 €',
-          c6: 'Économisez 25 625 €',
-          c7: 'Économisez 50 000 €',
-        },
-        btnActionLabel: 'Activer le plan',
-      },
-      consumptionPlan: {
-        caption: 'PLAN À LA CONSOMMATION',
-        discountBoxLabel: '25 % de réduction',
-        title: 'Choisissez de ne payer que pour les messages <1/> que vous envoyez.',
-        showMore: 'En savoir plus',
-        showLess: 'Voir moins',
-        description:
-          'Attivando il piano a consumo, non sarà più possibile attivare il piano carnet.',
-        rangeLabelsDiscount: '25 % de réduction',
-        btnActionLabel: 'Activer le plan',
-      },
-    },
     subProductStepUserUnrelated: {
       title: 'Vous ne pouvez pas adhérer à {{selectedProduct}} Premium',
       description:
