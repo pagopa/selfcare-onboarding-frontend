@@ -108,4 +108,16 @@ export const OnboardingApi = {
     onboardingInstitution: vi.fn((body: any) =>
         callViaFetchWithLogs('ONBOARDING_POST_LEGALS', { data: body, method: 'POST' })
     ),
+    getInstitutionsByFilters: vi.fn((params: any) =>
+        callViaFetchWithLogs('ONBOARDING_GET_INSTITUTIONS', { params })
+    ),
+    verifyAggregatesCsv: vi.fn((aggregates: File, productId: string, institutionType?: string) => {
+        const formData = new FormData();
+        formData.append('aggregates', aggregates);
+        return callViaFetchWithLogs('ONBOARDING_VERIFY_AGGREGATES', {
+            params: { institutionType, productId },
+            data: formData,
+            method: 'POST',
+        });
+    }),
 };

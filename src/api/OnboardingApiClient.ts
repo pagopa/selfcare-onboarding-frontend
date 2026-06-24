@@ -24,6 +24,7 @@ import { OriginResponse } from './generated/onboarding/OriginResponse';
 import { ProductResourceArray } from './generated/onboarding/ProductResourceArray';
 import { UserId } from './generated/onboarding/UserId';
 import { UserTaxCodeDto } from './generated/onboarding/UserTaxCodeDto';
+import { VerifyAggregatesResponse } from './generated/onboarding/VerifyAggregatesResponse';
 
 const withBearerAuth: WithDefaultsT<'bearerAuth'> = (wrappedOperation) => (params: any) => {
   const token = storageTokenOps.read();
@@ -274,5 +275,41 @@ export const OnboardingApi = {
     }
     const result = await apiClient.institutionOnboarding({ body });
     return extractResponse(result, 201, onRedirectToLogin, 401, 403, undefined);
+  },
+  getInstitutionsByFilters: async (params: {
+    productId: string;
+    taxCode?: string;
+    origin?: string;
+    originId?: string;
+    subunitCode?: string;
+  }): Promise<InstitutionResourceArray> => {
+    /* istanbul ignore if */
+    if (isMockEnvironment()) {
+      return mockApiCall('ONBOARDING_GET_INSTITUTIONS', { params });
+    }
+    const result = await apiClient.v2GetInstitutionByFilters(params);
+    return extractResponse(result, 200, onRedirectToLogin, 401, 403, undefined);
+  },
+  verifyAggregatesCsv: async (
+    aggregates: File,
+    productId: string,
+    institutionType?: string
+  ): Promise<VerifyAggregatesResponse> => {
+    /* istanbul ignore if */
+    if (isMockEnvironment()) {
+      const formData = new FormData();
+      formData.append('aggregates', aggregates);
+      return mockApiCall('ONBOARDING_VERIFY_AGGREGATES', {
+        params: { institutionType, productId },
+        data: formData,
+        method: 'POST',
+      });
+    }
+    const result = await apiClient.verifyAggregatesCsvUsingPOST({
+      aggregates,
+      productId,
+      institutionType,
+    });
+    return extractResponse(result, 200, onRedirectToLogin, 401, 403, undefined);
   },
 };

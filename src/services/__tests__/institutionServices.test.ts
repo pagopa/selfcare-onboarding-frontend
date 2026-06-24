@@ -1,16 +1,38 @@
 import { it, expect, vi, beforeEach } from 'vitest';
 import { PartyRegistryProxyApi } from '../../api/PartyRegistryProxyApiClient';
+import { OnboardingApi } from '../../api/OnboardingApiClient';
 import {
   handleSearchByTaxCode,
   getUoInfoFromRecipientCode,
   handleSearchExternalId,
   getECDataByCF,
+  fetchInstitutionsByName,
+  handleSearchByAooCode,
+  handleSearchByUoCode,
+  contractingInsuranceFromTaxId,
+  fetchInstitutionByTaxCode,
+  handleSearchByReaCode,
 } from '../institutionServices';
 
 vi.mock('../../api/PartyRegistryProxyApiClient', () => ({
   PartyRegistryProxyApi: {
     findInstitution: vi.fn(),
     getUoInfo: vi.fn(),
+    searchInstitutions: vi.fn(),
+    searchSaParties: vi.fn(),
+    searchInsuranceCompanies: vi.fn(),
+    getAooInfo: vi.fn(),
+    getSaPartyByTaxId: vi.fn(),
+    getInsuranceByTaxId: vi.fn(),
+    getInfocamereByTaxCode: vi.fn(),
+    getVisuraByTaxCode: vi.fn(),
+    getVisuraByRea: vi.fn(),
+  },
+}));
+
+vi.mock('../../api/OnboardingApiClient', () => ({
+  OnboardingApi: {
+    getInstitutionsByFilters: vi.fn(),
   },
 }));
 
@@ -24,6 +46,14 @@ const setDisableTaxCodeInvoicing = vi.fn();
 const setApiLoading = vi.fn();
 const setEcData = vi.fn();
 const setFieldValue = vi.fn();
+const setOptions = vi.fn();
+const setAooResult = vi.fn();
+const setAooResultHistory = vi.fn();
+const setUoResult = vi.fn();
+const setUoResultHistory = vi.fn();
+const setCfResult = vi.fn();
+const setDisabled = vi.fn();
+const setRequiredLogin = vi.fn();
 const formik = { setFieldValue } as any;
 
 beforeEach(() => {
@@ -115,4 +145,199 @@ it('test getECDataByCF on other error does not change ecData', async () => {
 
   expect(setEcData).not.toHaveBeenCalled();
   expect(setApiLoading).toHaveBeenLastCalledWith(false);
+});
+
+it('test fetchInstitutionsByName dispatches to searchInstitutions and maps options', async () => {
+  vi.mocked(PartyRegistryProxyApi.searchInstitutions).mockResolvedValue({
+    count: 1,
+    items: [{ id: 'i1', description: 'Ente 1' }],
+  } as any);
+
+  await fetchInstitutionsByName(
+    'Ente',
+    { endpoint: 'ONBOARDING_GET_SEARCH_PARTIES' },
+    setOptions,
+    (d: any) => d.items,
+    setRequiredLogin,
+    10,
+    undefined
+  );
+
+  expect(PartyRegistryProxyApi.searchInstitutions).toHaveBeenCalledWith({
+    limit: 10,
+    page: 1,
+    search: 'Ente',
+    categories: undefined,
+  });
+  expect(setOptions).toHaveBeenCalledWith([{ id: 'i1', description: 'Ente 1' }]);
+});
+
+it('test fetchInstitutionsByName on 404 sets empty options', async () => {
+  vi.mocked(PartyRegistryProxyApi.searchInstitutions).mockRejectedValue(
+    Object.assign(new Error('nf'), { httpStatus: 404 })
+  );
+
+  await fetchInstitutionsByName(
+    'Ente',
+    { endpoint: 'ONBOARDING_GET_SEARCH_PARTIES' },
+    setOptions,
+    (d: any) => d.items,
+    setRequiredLogin
+  );
+
+  expect(setOptions).toHaveBeenCalledWith([]);
+});
+
+it('test handleSearchByAooCode dispatches to getAooInfo and sets result', async () => {
+  vi.mocked(PartyRegistryProxyApi.getAooInfo).mockResolvedValue({
+    codiceUniAoo: 'AOO12345',
+    cap: '20100',
+  } as any);
+
+  await handleSearchByAooCode('AOO1234', setAooResult, setAooResultHistory, setRequiredLogin);
+
+  expect(PartyRegistryProxyApi.getAooInfo).toHaveBeenCalledWith('AOO1234', undefined);
+  expect(setAooResult).toHaveBeenCalledWith({ codiceUniAoo: 'AOO12345', cap: '20100' });
+  expect(setAooResultHistory).toHaveBeenCalledWith({ codiceUniAoo: 'AOO12345', cap: '20100' });
+});
+
+it('test handleSearchByUoCode dispatches to getUoInfo and sets result', async () => {
+  vi.mocked(PartyRegistryProxyApi.getUoInfo).mockResolvedValue({
+    codiceUniUo: 'UO123',
+    cap: '20100',
+  } as any);
+
+  await handleSearchByUoCode('UO123', setUoResult, setUoResultHistory, setRequiredLogin);
+
+  expect(PartyRegistryProxyApi.getUoInfo).toHaveBeenCalledWith('UO123');
+  expect(setUoResult).toHaveBeenCalledWith({ codiceUniUo: 'UO123', cap: '20100' });
+});
+
+it('test handleSearchByUoCode on 404 resets result', async () => {
+  vi.mocked(PartyRegistryProxyApi.getUoInfo).mockRejectedValue(
+    Object.assign(new Error('nf'), { httpStatus: 404 })
+  );
+
+  await handleSearchByUoCode('UO123', setUoResult, setUoResultHistory, setRequiredLogin);
+
+  expect(setUoResult).toHaveBeenCalledWith(undefined);
+});
+
+it('test contractingInsuranceFromTaxId dispatches insurance by taxId', async () => {
+  vi.mocked(PartyRegistryProxyApi.getInsuranceByTaxId).mockResolvedValue({
+    id: 'ins1',
+    taxCode: '12345678901',
+  } as any);
+
+  await contractingInsuranceFromTaxId(
+    false,
+    'ONBOARDING_GET_INSURANCE_COMPANIES_FROM_IVASSCODE',
+    {},
+    '12345678901',
+    'AS' as any,
+    setApiLoading,
+    setCfResult,
+    setRequiredLogin
+  );
+
+  expect(PartyRegistryProxyApi.getInsuranceByTaxId).toHaveBeenCalledWith('12345678901');
+  expect(setCfResult).toHaveBeenCalledWith({ id: 'ins1', taxCode: '12345678901' });
+});
+
+it('test contractingInsuranceFromTaxId addUser dispatches to getInstitutionsByFilters', async () => {
+  vi.mocked(OnboardingApi.getInstitutionsByFilters).mockResolvedValue([
+    { id: 'p1', description: 'P1' },
+  ] as any);
+
+  await contractingInsuranceFromTaxId(
+    true,
+    'ONBOARDING_GET_INSTITUTIONS',
+    { productId: 'prod-1', taxCode: '12345678901' },
+    '12345678901',
+    'SA' as any,
+    setApiLoading,
+    setCfResult,
+    setRequiredLogin
+  );
+
+  expect(OnboardingApi.getInstitutionsByFilters).toHaveBeenCalledWith({
+    productId: 'prod-1',
+    taxCode: '12345678901',
+  });
+  expect(setCfResult).toHaveBeenCalledWith({ id: 'p1', description: 'P1' });
+});
+
+it('test fetchInstitutionByTaxCode dispatches to infocamere and sets cfResult', async () => {
+  vi.mocked(PartyRegistryProxyApi.getInfocamereByTaxCode).mockResolvedValue({
+    businessTaxId: '12345678901',
+    atecoCodes: ['62.01'],
+  } as any);
+
+  await fetchInstitutionByTaxCode(
+    false,
+    'ONBOARDING_GET_PARTY_BY_CF_FROM_INFOCAMERE',
+    {},
+    '12345678901',
+    'prod-1',
+    'PT' as any,
+    undefined,
+    undefined,
+    setCfResult,
+    undefined,
+    () => undefined,
+    setDisabled,
+    setRequiredLogin
+  );
+
+  expect(PartyRegistryProxyApi.getInfocamereByTaxCode).toHaveBeenCalledWith('12345678901');
+  expect(setCfResult).toHaveBeenCalledWith({
+    businessTaxId: '12345678901',
+    atecoCodes: ['62.01'],
+  });
+});
+
+it('test handleSearchByReaCode dispatches to getVisuraByRea', async () => {
+  vi.mocked(PartyRegistryProxyApi.getVisuraByRea).mockResolvedValue({
+    businessTaxId: '999',
+  } as any);
+
+  await handleSearchByReaCode(
+    false,
+    'ONBOARDING_GET_VISURA_INFOCAMERE_BY_REA',
+    {},
+    'AB-123456',
+    setApiLoading,
+    setCfResult,
+    () => undefined,
+    setDisabled,
+    setRequiredLogin,
+    { id: 'prod-1' } as any,
+    undefined,
+    undefined,
+    undefined
+  );
+
+  expect(PartyRegistryProxyApi.getVisuraByRea).toHaveBeenCalledWith('AB-123456');
+  expect(setCfResult).toHaveBeenCalledWith({ businessTaxId: '999' });
+});
+
+it('test handleSearchByReaCode invalid rea pattern resets without calling api', async () => {
+  await handleSearchByReaCode(
+    false,
+    'ONBOARDING_GET_VISURA_INFOCAMERE_BY_REA',
+    {},
+    'not-a-rea',
+    setApiLoading,
+    setCfResult,
+    () => undefined,
+    setDisabled,
+    setRequiredLogin,
+    { id: 'prod-1' } as any,
+    undefined,
+    undefined,
+    undefined
+  );
+
+  expect(PartyRegistryProxyApi.getVisuraByRea).not.toHaveBeenCalled();
+  expect(setCfResult).toHaveBeenCalledWith(undefined);
 });

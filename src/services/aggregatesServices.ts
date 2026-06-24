@@ -1,8 +1,6 @@
-import { AxiosResponse } from 'axios';
 import { Dispatch, SetStateAction } from 'react';
 import { InstitutionType, RequestOutcomeMessage } from '../../types';
-import { fetchWithLogs } from '../lib/api-utils';
-import { getFetchOutcome } from '../lib/error-utils';
+import { OnboardingApi } from '../api/OnboardingApiClient';
 import { AggregateInstitution } from '../model/AggregateInstitution';
 import { RowError } from '../model/RowError';
 import { genericError } from '../views/onboardingProduct/components/StepVerifyOnboarding';
@@ -13,7 +11,7 @@ export const verifyAggregates = async (
   setLoading: Dispatch<SetStateAction<boolean>>,
   institutionType: InstitutionType | undefined,
   productId: string | undefined,
-  setRequiredLogin: Dispatch<SetStateAction<boolean>>,
+  _setRequiredLogin: Dispatch<SetStateAction<boolean>>,
   parseJson2Csv: (errorJson: Array<RowError>) => void,
   setDisabled: Dispatch<SetStateAction<boolean>>,
   forward: any,
@@ -22,31 +20,10 @@ export const verifyAggregates = async (
 ) => {
   setLoading(true);
 
-  const formData = new FormData();
-  formData.append('aggregates', file);
-
-  const verifyAggregates = await fetchWithLogs(
-    {
-      endpoint: 'ONBOARDING_VERIFY_AGGREGATES',
-    },
-    {
-      method: 'POST',
-      params: {
-        institutionType,
-        productId,
-      },
-      data: formData,
-      headers: { 'Content-Type': 'multipart/form-data' },
-    },
-    () => setRequiredLogin(true)
-  );
-
-  const result = getFetchOutcome(verifyAggregates);
-
-  if (result === 'success') {
-    const errors = (verifyAggregates as AxiosResponse).data.errors as Array<RowError>;
-    const aggregatesList = (verifyAggregates as AxiosResponse).data
-      .aggregates as Array<AggregateInstitution>;
+  try {
+    const data = await OnboardingApi.verifyAggregatesCsv(file, productId ?? '', institutionType);
+    const errors = (data.errors ?? []) as unknown as Array<RowError>;
+    const aggregatesList = (data.aggregates ?? []) as unknown as Array<AggregateInstitution>;
     parseJson2Csv(errors);
 
     if (errors.length === 0) {
@@ -57,7 +34,7 @@ export const verifyAggregates = async (
       setFoundErrors(errors);
       setLoading(false);
     }
-  } else {
+  } catch (_error) {
     setOutcome(genericError);
     setLoading(false);
   }

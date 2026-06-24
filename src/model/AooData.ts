@@ -8,7 +8,7 @@ export type AooData = {
   id?: string;
   mail1: string;
   origin: string;
-  CAP: string;
+  cap: string;
   codiceCatastaleComune: string;
   codiceComuneISTAT: string;
   cognomeResponsabile: string;

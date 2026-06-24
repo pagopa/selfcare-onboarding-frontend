@@ -152,10 +152,10 @@ export const resolveZipCode = (p: BillingResolverParams): string | undefined => 
     return mockedParties[0].zipCode;
   }
   if (p.typeOfSearch === 'aooCode') {
-    return mockedAoos[0].CAP;
+    return mockedAoos[0].cap;
   }
   if (p.typeOfSearch === 'uoCode') {
-    return mockedUos[0].CAP;
+    return mockedUos[0].cap;
   }
   return mockPartyRegistry.items[0].zipCode;
 };

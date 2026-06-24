@@ -1,7 +1,5 @@
 import { Dispatch, SetStateAction } from 'react';
-import { AxiosError, AxiosResponse } from 'axios';
-import { fetchWithLogs } from '../lib/api-utils';
-import { getErrorStatus, getFetchOutcome } from '../lib/error-utils';
+import { getErrorStatus } from '../lib/error-utils';
 import { Endpoint, ApiEndpointKey, PartyData, Product, InstitutionType } from '../../types';
 import { AooData } from '../model/AooData';
 import { UoData } from '../model/UoModel';
@@ -17,14 +15,49 @@ import {
 } from '../utils/institutionTypeUtils';
 import config from '../utils/config.json';
 import { PartyRegistryProxyApi } from '../api/PartyRegistryProxyApiClient';
+import { OnboardingApi } from '../api/OnboardingApiClient';
 
-// NOTE: the following 6 functions accept `endpoint` as a runtime parameter
-// (one of 12 possible endpoint strings). Codegen requires statically-typed
-// method calls, so a dispatcher pattern would be needed. Deferred to the
-// final cleanup round together with the other spec patches.
-// Functions affected: fetchInstitutionsByName, fetchInstitutionByTaxCode,
-// handleSearchByReaCode, handleSearchByAooCode, handleSearchByUoCode,
-// contractingInsuranceFromTaxId.
+// Dispatcher: the search functions receive `endpoint` as a runtime ApiEndpointKey.
+// Codegen needs statically-typed method calls, so we map each supported endpoint
+// to its typed wrapper here and return the decoded body (throwing on error, like
+// extractResponse). The infocamere/visura (PDND) endpoints rely on fields the
+// OpenAPI schema under-declares (atecoCodes, vatNumber, legalForm, nRea, ...),
+// added back via the api-party-registry-proxy_fixPreGen.js patch.
+const dispatchInstitutionSearch = (
+  endpoint: ApiEndpointKey,
+  endpointParams: Record<string, any> | undefined,
+  queryParams: Record<string, any>
+): Promise<any> => {
+  const ep = endpointParams ?? {};
+  switch (endpoint) {
+    case 'ONBOARDING_GET_SEARCH_PARTIES':
+      return PartyRegistryProxyApi.searchInstitutions(queryParams);
+    case 'ONBOARDING_GET_SA_PARTIES_NAME':
+      return PartyRegistryProxyApi.searchSaParties(queryParams);
+    case 'ONBOARDING_GET_INSURANCE_COMPANIES_FROM_BUSINESSNAME':
+      return PartyRegistryProxyApi.searchInsuranceCompanies(queryParams);
+    case 'ONBOARDING_GET_AOO_CODE_INFO':
+      return PartyRegistryProxyApi.getAooInfo(ep.codiceUniAoo, queryParams.categories);
+    case 'ONBOARDING_GET_UO_CODE_INFO':
+      return PartyRegistryProxyApi.getUoInfo(ep.codiceUniUo);
+    case 'ONBOARDING_GET_SA_PARTY_FROM_FC':
+      return PartyRegistryProxyApi.getSaPartyByTaxId(ep.taxId);
+    case 'ONBOARDING_GET_INSURANCE_COMPANIES_FROM_IVASSCODE':
+      return PartyRegistryProxyApi.getInsuranceByTaxId(ep.taxId);
+    case 'ONBOARDING_GET_PARTY_FROM_CF':
+      return PartyRegistryProxyApi.findInstitution(ep.id, queryParams.origin, queryParams.categories);
+    case 'ONBOARDING_GET_PARTY_BY_CF_FROM_INFOCAMERE':
+      return PartyRegistryProxyApi.getInfocamereByTaxCode(ep.id);
+    case 'ONBOARDING_GET_VISURA_INFOCAMERE_BY_CF':
+      return PartyRegistryProxyApi.getVisuraByTaxCode(ep.id);
+    case 'ONBOARDING_GET_VISURA_INFOCAMERE_BY_REA':
+      return PartyRegistryProxyApi.getVisuraByRea(queryParams.rea);
+    case 'ONBOARDING_GET_INSTITUTIONS':
+      return OnboardingApi.getInstitutionsByFilters(queryParams as { productId: string });
+    default:
+      return Promise.reject(new Error(`Unsupported institution search endpoint: ${endpoint}`));
+  }
+};
 
 const validateIdpayMerchantInstitution = (
   response: PartyData,
@@ -115,30 +148,22 @@ export const fetchInstitutionsByName = async (
   endpoint: Endpoint,
   setOptions: Dispatch<SetStateAction<Array<any>>>,
   transformFn: any,
-  setRequiredLogin: Dispatch<SetStateAction<boolean>>,
+  _setRequiredLogin: Dispatch<SetStateAction<boolean>>,
   limit?: number,
   categories?: string
 ) => {
-  const searchResponse = await fetchWithLogs(
-    endpoint,
-    {
-      method: 'GET',
-      params: {
-        limit,
-        page: 1,
-        search: query,
-        categories,
-      },
-    },
-    () => setRequiredLogin(true)
-  );
-
-  const outcome = getFetchOutcome(searchResponse);
-
-  if (outcome === 'success') {
-    setOptions(transformFn((searchResponse as AxiosResponse).data));
-  } else if ((searchResponse as AxiosError).response?.status === 404) {
-    setOptions([]);
+  try {
+    const data = await dispatchInstitutionSearch(endpoint.endpoint, endpoint.endpointParams, {
+      limit,
+      page: 1,
+      search: query,
+      categories,
+    });
+    setOptions(transformFn(data));
+  } catch (error) {
+    if (getErrorStatus(error) === 404) {
+      setOptions([]);
+    }
   }
 };
 
@@ -187,7 +212,7 @@ export const fetchInstitutionByTaxCode = async (
   setMerchantSearchResult: Dispatch<SetStateAction<PartyData | undefined>> | undefined,
   setIsPresentInAtecoWhiteList: (value: boolean) => void | undefined,
   setDisabled: Dispatch<SetStateAction<boolean>>,
-  setRequiredLogin: Dispatch<SetStateAction<boolean>>
+  _setRequiredLogin: Dispatch<SetStateAction<boolean>>
   // eslint-disable-next-line sonarjs/cognitive-complexity
 ) => {
   const updatedParams = {
@@ -198,19 +223,12 @@ export const fetchInstitutionByTaxCode = async (
       : (filterCategories as string),
   };
 
-  const searchResponse = await fetchWithLogs(
-    { endpoint, endpointParams: addUser ? undefined : { id: query } },
-    {
-      method: 'GET',
-      params: updatedParams,
-    },
-    () => setRequiredLogin(true)
-  );
-
-  const outcome = getFetchOutcome(searchResponse);
-
-  if (outcome === 'success') {
-    const response = (searchResponse as AxiosResponse).data;
+  try {
+    const response = await dispatchInstitutionSearch(
+      endpoint,
+      addUser ? undefined : { id: query },
+      updatedParams
+    );
     setCfResult(response);
 
     if (addUser || isIdpayMerchantProduct(productId)) {
@@ -223,23 +241,15 @@ export const fetchInstitutionByTaxCode = async (
         setMerchantSearchResult
       );
     }
-  } else if ((searchResponse as AxiosError).response?.status === 404) {
-    setCfResult(undefined);
+  } catch (error) {
+    if (getErrorStatus(error) === 404) {
+      setCfResult(undefined);
 
-    if (isIdpayMerchantProduct(productId)) {
-      setIsPresentInAtecoWhiteList?.(false);
-      setMerchantSearchResult?.(undefined);
+      if (isIdpayMerchantProduct(productId)) {
+        setIsPresentInAtecoWhiteList?.(false);
+        setMerchantSearchResult?.(undefined);
+      }
     }
-
-    /* if (isPublicServiceCompany(institutionType as InstitutionType) && isInteropProduct(productId)) {
-      await fetchInstitutionByTaxCodeOnInfocamere(
-        productId,
-        query,
-        filterCategories,
-        setCfResult,
-        setRequiredLogin
-      );
-    } */
   }
 };
 
@@ -252,7 +262,7 @@ export const handleSearchByReaCode = async (
   setCfResult: Dispatch<SetStateAction<PartyData | undefined>>,
   setIsPresentInAtecoWhiteList: (value: boolean) => void,
   setDisabled: Dispatch<SetStateAction<boolean>>,
-  setRequiredLogin: Dispatch<SetStateAction<boolean>>,
+  _setRequiredLogin: Dispatch<SetStateAction<boolean>>,
   product: Product | undefined,
   filterCategories: string | { atecoCodes: string; allowedInstitutions: string } | undefined,
   disabledStatusCompany: boolean | undefined,
@@ -275,21 +285,8 @@ export const handleSearchByReaCode = async (
         rea: query,
       };
 
-  const searchResponse = await fetchWithLogs(
-    {
-      endpoint,
-    },
-    {
-      method: 'GET',
-      params: updatedParams,
-    },
-    () => setRequiredLogin(true)
-  );
-
-  const outcome = getFetchOutcome(searchResponse);
-
-  if (outcome === 'success') {
-    const response = (searchResponse as AxiosResponse).data;
+  try {
+    const response = await dispatchInstitutionSearch(endpoint, undefined, updatedParams);
     setCfResult(response);
 
     if (isIdpayMerchantProduct(product?.id)) {
@@ -302,11 +299,13 @@ export const handleSearchByReaCode = async (
         setMerchantSearchResult
       );
     }
-  } else if ((searchResponse as AxiosError).response?.status === 404) {
-    setCfResult(undefined);
-    if (isIdpayMerchantProduct(product?.id)) {
-      setMerchantSearchResult?.(undefined);
-      setIsPresentInAtecoWhiteList?.(false);
+  } catch (error) {
+    if (getErrorStatus(error) === 404) {
+      setCfResult(undefined);
+      if (isIdpayMerchantProduct(product?.id)) {
+        setMerchantSearchResult?.(undefined);
+        setIsPresentInAtecoWhiteList?.(false);
+      }
     }
   }
 
@@ -317,7 +316,7 @@ export const handleSearchByAooCode = async (
   query: string,
   setAooResult: Dispatch<SetStateAction<AooData | undefined>>,
   setAooResultHistory: (t: AooData | undefined) => void,
-  setRequiredLogin: Dispatch<SetStateAction<boolean>>,
+  _setRequiredLogin: Dispatch<SetStateAction<boolean>>,
   setApiLoading?: Dispatch<SetStateAction<boolean>>,
   addUser: boolean = false,
   endpoint: ApiEndpointKey = 'ONBOARDING_GET_AOO_CODE_INFO',
@@ -348,25 +347,19 @@ export const handleSearchByAooCode = async (
     }
   }
 
-  const searchResponse = await fetchWithLogs(
-    { endpoint, endpointParams: addUser ? undefined : { codiceUniAoo: query } },
-    {
-      method: 'GET',
-      params: updatedParams,
-    },
-    () => setRequiredLogin(true)
-  );
-
-  const outcome = getFetchOutcome(searchResponse);
-
-  if (outcome === 'success') {
-    const response = addUser
-      ? ((searchResponse as AxiosResponse).data[0] ?? (searchResponse as AxiosResponse).data)
-      : (searchResponse as AxiosResponse).data;
+  try {
+    const data = await dispatchInstitutionSearch(
+      endpoint,
+      addUser ? undefined : { codiceUniAoo: query },
+      updatedParams
+    );
+    const response = addUser ? (data?.[0] ?? data) : data;
     setAooResult(response);
     setAooResultHistory(response);
-  } else if ((searchResponse as AxiosError).response?.status === 404) {
-    setAooResult(undefined);
+  } catch (error) {
+    if (getErrorStatus(error) === 404) {
+      setAooResult(undefined);
+    }
   }
 
   setApiLoading?.(false);
@@ -376,7 +369,7 @@ export const handleSearchByUoCode = async (
   query: string,
   setUoResult: Dispatch<SetStateAction<UoData | undefined>>,
   setUoResultHistory: (t: UoData | undefined) => void,
-  setRequiredLogin: Dispatch<SetStateAction<boolean>>,
+  _setRequiredLogin: Dispatch<SetStateAction<boolean>>,
   setApiLoading?: Dispatch<SetStateAction<boolean>>,
   addUser: boolean = false,
   endpoint: ApiEndpointKey = 'ONBOARDING_GET_UO_CODE_INFO',
@@ -407,25 +400,19 @@ export const handleSearchByUoCode = async (
     }
   }
 
-  const searchResponse = await fetchWithLogs(
-    { endpoint, endpointParams: addUser ? undefined : { codiceUniUo: query } },
-    {
-      method: 'GET',
-      params: updatedParams,
-    },
-    () => setRequiredLogin(true)
-  );
-
-  const outcome = getFetchOutcome(searchResponse);
-
-  if (outcome === 'success') {
-    const response = addUser
-      ? ((searchResponse as AxiosResponse).data[0] ?? (searchResponse as AxiosResponse).data)
-      : (searchResponse as AxiosResponse).data;
+  try {
+    const data = await dispatchInstitutionSearch(
+      endpoint,
+      addUser ? undefined : { codiceUniUo: query },
+      updatedParams
+    );
+    const response = addUser ? (data?.[0] ?? data) : data;
     setUoResult(response);
     setUoResultHistory(response);
-  } else if ((searchResponse as AxiosError).response?.status === 404) {
-    setUoResult(undefined);
+  } catch (error) {
+    if (getErrorStatus(error) === 404) {
+      setUoResult(undefined);
+    }
   }
 
   setApiLoading?.(false);
@@ -439,34 +426,24 @@ export const contractingInsuranceFromTaxId = async (
   institutionType: InstitutionType | undefined,
   setApiLoading: Dispatch<SetStateAction<boolean>> | undefined,
   setCfResult: Dispatch<SetStateAction<PartyData | undefined>>,
-  setRequiredLogin: Dispatch<SetStateAction<boolean>>
+  _setRequiredLogin: Dispatch<SetStateAction<boolean>>
 ) => {
   setApiLoading?.(true);
 
-  const searchResponse = await fetchWithLogs(
-    {
-      endpoint,
-      endpointParams: addUser
-        ? undefined
-        : isContractingAuthority(institutionType) || isInsuranceCompany(institutionType)
-          ? { taxId: query }
-          : { code: query },
-    },
-    {
-      method: 'GET',
-      params: addUser ? params : undefined,
-    },
-    () => setRequiredLogin(true)
-  );
+  const endpointParams = addUser
+    ? undefined
+    : isContractingAuthority(institutionType) || isInsuranceCompany(institutionType)
+      ? { taxId: query }
+      : { code: query };
 
-  const outcome = getFetchOutcome(searchResponse);
-  if (outcome === 'success') {
-    const response = addUser
-      ? ((searchResponse as AxiosResponse).data[0] ?? (searchResponse as AxiosResponse).data)
-      : (searchResponse as AxiosResponse).data;
+  try {
+    const data = await dispatchInstitutionSearch(endpoint, endpointParams, addUser ? params : {});
+    const response = addUser ? (data?.[0] ?? data) : data;
     setCfResult(response);
-  } else if ((searchResponse as AxiosError).response?.status === 404) {
-    setCfResult(undefined);
+  } catch (error) {
+    if (getErrorStatus(error) === 404) {
+      setCfResult(undefined);
+    }
   }
 
   setApiLoading?.(false);
