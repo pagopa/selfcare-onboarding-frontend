@@ -51,7 +51,7 @@ const onRedirectToLogin = () =>
   );
 
 /* istanbul ignore next */
-const mockApiCall = async (
+const fetchWithLogsCall = async (
   endpoint: string,
   options: { endpointParams?: any; params?: any; data?: any; method?: string } = {}
 ): Promise<any> => {
@@ -75,7 +75,7 @@ export const PartyRegistryProxyApi = {
   getTaxonomiesByQuery: async (query: string): Promise<Array<GeographicTaxonomyResource>> => {
     /* istanbul ignore if */
     if (isMockEnvironment()) {
-      return mockApiCall('ONBOARDING_GET_GEOTAXONOMY', { params: { description: query } });
+      return fetchWithLogsCall('ONBOARDING_GET_GEOTAXONOMY', { params: { description: query } });
     }
     const result = await apiClient.retrieveGeoTaxonomiesByDescriptionUsingGET({
       description: query,
@@ -85,7 +85,7 @@ export const PartyRegistryProxyApi = {
   getLocationByCode: async (geotaxId: string): Promise<GeographicTaxonomyResource> => {
     /* istanbul ignore if */
     if (isMockEnvironment()) {
-      return mockApiCall('ONBOARDING_GET_LOCATION_BY_ISTAT_CODE', {
+      return fetchWithLogsCall('ONBOARDING_GET_LOCATION_BY_ISTAT_CODE', {
         endpointParams: { geoTaxId: geotaxId },
       });
     }
@@ -99,7 +99,7 @@ export const PartyRegistryProxyApi = {
   ): Promise<InstitutionResource> => {
     /* istanbul ignore if */
     if (isMockEnvironment()) {
-      return mockApiCall('ONBOARDING_GET_PARTY_FROM_CF', {
+      return fetchWithLogsCall('ONBOARDING_GET_PARTY_FROM_CF', {
         endpointParams: { id },
         params: { origin, categories },
       });
@@ -111,7 +111,7 @@ export const PartyRegistryProxyApi = {
   getUoInfo: async (codiceUniUo: string): Promise<UOResource> => {
     /* istanbul ignore if */
     if (isMockEnvironment()) {
-      return mockApiCall('ONBOARDING_GET_UO_CODE_INFO', { endpointParams: { codiceUniUo } });
+      return fetchWithLogsCall('ONBOARDING_GET_UO_CODE_INFO', { endpointParams: { codiceUniUo } });
     }
     const result = await apiClient.findByUnicodeUsingGET_1({ codiceUniAoo: codiceUniUo });
     return extractResponse(result, 200, onRedirectToLogin, 401, 403, undefined);
@@ -120,7 +120,7 @@ export const PartyRegistryProxyApi = {
   getUoList: async (taxCodeInvoicing: string): Promise<UOsResource> => {
     /* istanbul ignore if */
     if (isMockEnvironment()) {
-      return mockApiCall('ONBOARDING_GET_UO_LIST', { params: { taxCodeInvoicing } });
+      return fetchWithLogsCall('ONBOARDING_GET_UO_LIST', { params: { taxCodeInvoicing } });
     }
     const result = await apiClient.findAllUsingGET_1({ taxCodeInvoicing });
     return extractResponse(result, 200, onRedirectToLogin, 401, 403, undefined);
@@ -134,7 +134,7 @@ export const PartyRegistryProxyApi = {
   }): Promise<InstitutionsResource> => {
     /* istanbul ignore if */
     if (isMockEnvironment()) {
-      return mockApiCall('ONBOARDING_GET_SEARCH_PARTIES', { params });
+      return fetchWithLogsCall('ONBOARDING_GET_SEARCH_PARTIES', { params });
     }
     const result = await apiClient.searchUsingGET(params);
     return extractResponse(result, 200, onRedirectToLogin, 401, 403, undefined);
@@ -147,7 +147,7 @@ export const PartyRegistryProxyApi = {
   }): Promise<StationsResource> => {
     /* istanbul ignore if */
     if (isMockEnvironment()) {
-      return mockApiCall('ONBOARDING_GET_SA_PARTIES_NAME', { params });
+      return fetchWithLogsCall('ONBOARDING_GET_SA_PARTIES_NAME', { params });
     }
     const result = await apiClient.searchUsingGET_2(params);
     return extractResponse(result, 200, onRedirectToLogin, 401, 403, undefined);
@@ -160,7 +160,7 @@ export const PartyRegistryProxyApi = {
   }): Promise<InsuranceCompaniesResource> => {
     /* istanbul ignore if */
     if (isMockEnvironment()) {
-      return mockApiCall('ONBOARDING_GET_INSURANCE_COMPANIES_FROM_BUSINESSNAME', { params });
+      return fetchWithLogsCall('ONBOARDING_GET_INSURANCE_COMPANIES_FROM_BUSINESSNAME', { params });
     }
     const result = await apiClient.searchUsingGET_1(params);
     return extractResponse(result, 200, onRedirectToLogin, 401, 403, undefined);
@@ -169,7 +169,7 @@ export const PartyRegistryProxyApi = {
   getAooInfo: async (codiceUniAoo: string, categories?: string): Promise<AOOResource> => {
     /* istanbul ignore if */
     if (isMockEnvironment()) {
-      return mockApiCall('ONBOARDING_GET_AOO_CODE_INFO', { endpointParams: { codiceUniAoo } });
+      return fetchWithLogsCall('ONBOARDING_GET_AOO_CODE_INFO', { endpointParams: { codiceUniAoo } });
     }
     const result = await apiClient.findByUnicodeUsingGET({ codiceUniAoo, categories });
     return extractResponse(result, 200, onRedirectToLogin, 401, 403, undefined);
@@ -178,7 +178,7 @@ export const PartyRegistryProxyApi = {
   getSaPartyByTaxId: async (taxId: string): Promise<StationResource> => {
     /* istanbul ignore if */
     if (isMockEnvironment()) {
-      return mockApiCall('ONBOARDING_GET_SA_PARTY_FROM_FC', { endpointParams: { taxId } });
+      return fetchWithLogsCall('ONBOARDING_GET_SA_PARTY_FROM_FC', { endpointParams: { taxId } });
     }
     const result = await apiClient.searchByTaxCodeUsingGET_1({ taxId });
     return extractResponse(result, 200, onRedirectToLogin, 401, 403, undefined);
@@ -187,7 +187,7 @@ export const PartyRegistryProxyApi = {
   getInsuranceByTaxId: async (taxId: string): Promise<InsuranceCompanyResource> => {
     /* istanbul ignore if */
     if (isMockEnvironment()) {
-      return mockApiCall('ONBOARDING_GET_INSURANCE_COMPANIES_FROM_IVASSCODE', {
+      return fetchWithLogsCall('ONBOARDING_GET_INSURANCE_COMPANIES_FROM_IVASSCODE', {
         endpointParams: { taxId },
       });
     }
@@ -198,7 +198,7 @@ export const PartyRegistryProxyApi = {
   getInfocamereByTaxCode: async (taxCode: string): Promise<PDNDBusinessResource> => {
     /* istanbul ignore if */
     if (isMockEnvironment()) {
-      return mockApiCall('ONBOARDING_GET_PARTY_BY_CF_FROM_INFOCAMERE', {
+      return fetchWithLogsCall('ONBOARDING_GET_PARTY_BY_CF_FROM_INFOCAMERE', {
         endpointParams: { id: taxCode },
       });
     }
@@ -209,7 +209,7 @@ export const PartyRegistryProxyApi = {
   getVisuraByTaxCode: async (taxCode: string): Promise<PDNDBusinessResource> => {
     /* istanbul ignore if */
     if (isMockEnvironment()) {
-      return mockApiCall('ONBOARDING_GET_VISURA_INFOCAMERE_BY_CF', {
+      return fetchWithLogsCall('ONBOARDING_GET_VISURA_INFOCAMERE_BY_CF', {
         endpointParams: { id: taxCode },
       });
     }
@@ -220,7 +220,7 @@ export const PartyRegistryProxyApi = {
   getVisuraByRea: async (rea: string): Promise<PDNDBusinessResource> => {
     /* istanbul ignore if */
     if (isMockEnvironment()) {
-      return mockApiCall('ONBOARDING_GET_VISURA_INFOCAMERE_BY_REA', { params: { rea } });
+      return fetchWithLogsCall('ONBOARDING_GET_VISURA_INFOCAMERE_BY_REA', { params: { rea } });
     }
     const result = await apiClient.institutionsPdndByReaGET({ rea });
     return extractResponse(result, 200, onRedirectToLogin, 401, 403, undefined);

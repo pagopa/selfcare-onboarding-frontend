@@ -55,7 +55,11 @@ const onRedirectToLogin = () =>
   );
 
 /* istanbul ignore next */
-const mockApiCall = async (
+// Generic wrapper around fetchWithLogs/axios. Despite the (legacy) usage inside
+// isMockEnvironment branches, it is NOT mock-specific: fetchWithLogs itself routes
+// mock vs real, so this works against the real backend too. Used for endpoints the
+// openapi-codegen-ts client cannot handle (e.g. HEAD) and for the mock branches.
+const fetchWithLogsCall = async (
   endpoint: string,
   options: { endpointParams?: any; params?: any; data?: any; method?: string } = {}
 ): Promise<any> => {
@@ -80,7 +84,7 @@ export const OnboardingApi = {
   retrieveOnboardingRequest: async (onboardingId: string): Promise<OnboardingRequestResource> => {
     /* istanbul ignore if */
     if (isMockEnvironment()) {
-      return mockApiCall('ONBOARDING_GET_INFO', { endpointParams: { onboardingId } });
+      return fetchWithLogsCall('ONBOARDING_GET_INFO', { endpointParams: { onboardingId } });
     }
     const result = await apiClient.retrieveOnboardingRequestUsingGET({ onboardingId });
     return extractResponse(result, 200, onRedirectToLogin, 401, 403, undefined);
@@ -88,7 +92,7 @@ export const OnboardingApi = {
   verifyOnboarding: async (onboardingId: string): Promise<OnboardingVerify> => {
     /* istanbul ignore if */
     if (isMockEnvironment()) {
-      return mockApiCall('ONBOARDING_TOKEN_VALIDATION', { endpointParams: { onboardingId } });
+      return fetchWithLogsCall('ONBOARDING_TOKEN_VALIDATION', { endpointParams: { onboardingId } });
     }
     const result = await apiClient.verifyOnboardingUsingPOST({ onboardingId });
     return extractResponse(result, 200, onRedirectToLogin, 401, 403, undefined);
@@ -96,7 +100,7 @@ export const OnboardingApi = {
   userValidate: async (name: string, surname: string, taxCode: string): Promise<void> => {
     /* istanbul ignore if */
     if (isMockEnvironment()) {
-      return mockApiCall('ONBOARDING_USER_VALIDATION', {
+      return fetchWithLogsCall('ONBOARDING_USER_VALIDATION', {
         data: { name, surname, taxCode },
         method: 'POST',
       });
@@ -107,7 +111,7 @@ export const OnboardingApi = {
   verifyRecipientCode: async (originId: string, recipientCode: string): Promise<string> => {
     /* istanbul ignore if */
     if (isMockEnvironment()) {
-      return mockApiCall('ONBOARDING_RECIPIENT_CODE_VALIDATION', {
+      return fetchWithLogsCall('ONBOARDING_RECIPIENT_CODE_VALIDATION', {
         params: { recipientCode, originId },
       });
     }
@@ -117,7 +121,7 @@ export const OnboardingApi = {
   checkManager: async (body: CheckManagerDto): Promise<CheckManagerResponse> => {
     /* istanbul ignore if */
     if (isMockEnvironment()) {
-      return mockApiCall('ONBOARDING_CHECK_MANAGER', { data: body, method: 'POST' });
+      return fetchWithLogsCall('ONBOARDING_CHECK_MANAGER', { data: body, method: 'POST' });
     }
     const result = await apiClient.checkManager({ body });
     return extractResponse(result, 200, onRedirectToLogin, 401, 403, undefined);
@@ -125,7 +129,7 @@ export const OnboardingApi = {
   searchUserId: async (body: UserTaxCodeDto): Promise<UserId> => {
     /* istanbul ignore if */
     if (isMockEnvironment()) {
-      return mockApiCall('ONBOARDING_SEARCH_USER', { data: body, method: 'POST' });
+      return fetchWithLogsCall('ONBOARDING_SEARCH_USER', { data: body, method: 'POST' });
     }
     const result = await apiClient.searchUserId({ body });
     return extractResponse(result, 200, onRedirectToLogin, 401, 403, undefined);
@@ -133,7 +137,7 @@ export const OnboardingApi = {
   deleteOnboardingRequest: async (OnboardingId: string): Promise<void> => {
     /* istanbul ignore if */
     if (isMockEnvironment()) {
-      return mockApiCall('ONBOARDING_COMPLETE_REGISTRATION', {
+      return fetchWithLogsCall('ONBOARDING_COMPLETE_REGISTRATION', {
         endpointParams: { token: OnboardingId },
         method: 'DELETE',
       });
@@ -144,7 +148,7 @@ export const OnboardingApi = {
   getInstitutions: async (productId?: string): Promise<InstitutionResourceArray> => {
     /* istanbul ignore if */
     if (isMockEnvironment()) {
-      return mockApiCall('ONBOARDING_GET_USER_PARTIES', { params: { productId } });
+      return fetchWithLogsCall('ONBOARDING_GET_USER_PARTIES', { params: { productId } });
     }
     const result = await apiClient.getInstitutionsUsingGET({ productId });
     return extractResponse(result, 200, onRedirectToLogin, 401, 403, undefined);
@@ -155,7 +159,7 @@ export const OnboardingApi = {
   ): Promise<GeographicTaxonomyResource> => {
     /* istanbul ignore if */
     if (isMockEnvironment()) {
-      return mockApiCall('ONBOARDING_GET_PREVIOUS_GEOTAXONOMIES', {
+      return fetchWithLogsCall('ONBOARDING_GET_PREVIOUS_GEOTAXONOMIES', {
         params: { taxCode, subunitCode },
       });
     }
@@ -171,7 +175,7 @@ export const OnboardingApi = {
   ): Promise<InstitutionOnboardingInfoResource> => {
     /* istanbul ignore if */
     if (isMockEnvironment()) {
-      return mockApiCall('ONBOARDING_GET_ONBOARDING_DATA', {
+      return fetchWithLogsCall('ONBOARDING_GET_ONBOARDING_DATA', {
         params: { institutionId, productId },
       });
     }
@@ -184,7 +188,7 @@ export const OnboardingApi = {
   getProduct: async (id: string, institutionType?: string): Promise<ProductResource> => {
     /* istanbul ignore if */
     if (isMockEnvironment()) {
-      return mockApiCall('ONBOARDING_VERIFY_PRODUCT', {
+      return fetchWithLogsCall('ONBOARDING_VERIFY_PRODUCT', {
         endpointParams: { productId: id },
         params: { institutionType },
       });
@@ -195,7 +199,7 @@ export const OnboardingApi = {
   onboardingUsers: async (body: OnboardingUserDto): Promise<void> => {
     /* istanbul ignore if */
     if (isMockEnvironment()) {
-      return mockApiCall('ONBOARDING_NEW_USER', { data: body, method: 'POST' });
+      return fetchWithLogsCall('ONBOARDING_NEW_USER', { data: body, method: 'POST' });
     }
     const result = await apiClient.onboardingUsers({ body });
     return extractResponse(result, 201, onRedirectToLogin, 401, 403, undefined);
@@ -203,7 +207,7 @@ export const OnboardingApi = {
   getProductsAdmin: async (): Promise<ProductResourceArray> => {
     /* istanbul ignore if */
     if (isMockEnvironment()) {
-      return mockApiCall('ONBOARDING_GET_ALLOWED_ADD_USER_PRODUCTS', {});
+      return fetchWithLogsCall('ONBOARDING_GET_ALLOWED_ADD_USER_PRODUCTS', {});
     }
     const result = await apiClient.getProductsAdmin({});
     return extractResponse(result, 200, onRedirectToLogin, 401, 403, undefined);
@@ -211,7 +215,7 @@ export const OnboardingApi = {
   getOrigins: async (productId: string): Promise<OriginResponse> => {
     /* istanbul ignore if */
     if (isMockEnvironment()) {
-      return mockApiCall('ONBOARDING_GET_INSTITUTION_TYPE_BY_PRODUCT', {
+      return fetchWithLogsCall('ONBOARDING_GET_INSTITUTION_TYPE_BY_PRODUCT', {
         params: { productId },
       });
     }
@@ -223,7 +227,7 @@ export const OnboardingApi = {
     if (isMockEnvironment()) {
       const formData = new FormData();
       formData.append('contract', contract);
-      return mockApiCall('ONBOARDING_COMPLETE_REGISTRATION', {
+      return fetchWithLogsCall('ONBOARDING_COMPLETE_REGISTRATION', {
         endpointParams: { token: onboardingId },
         data: formData,
         method: 'POST',
@@ -237,7 +241,7 @@ export const OnboardingApi = {
     if (isMockEnvironment()) {
       const formData = new FormData();
       formData.append('contract', contract);
-      return mockApiCall('USER_COMPLETE_REGISTRATION', {
+      return fetchWithLogsCall('USER_COMPLETE_REGISTRATION', {
         endpointParams: { token: onboardingId },
         data: formData,
         method: 'POST',
@@ -255,7 +259,7 @@ export const OnboardingApi = {
     if (isMockEnvironment()) {
       const formData = new FormData();
       formData.append('attachment', attachment);
-      return mockApiCall('ONBOARDING_POST_ATTACHMENT', {
+      return fetchWithLogsCall('ONBOARDING_POST_ATTACHMENT', {
         endpointParams: { onboardingId, filename: attachmentName },
         data: formData,
         method: 'POST',
@@ -271,7 +275,7 @@ export const OnboardingApi = {
   onboardingInstitution: async (body: OnboardingProductDto): Promise<void> => {
     /* istanbul ignore if */
     if (isMockEnvironment()) {
-      return mockApiCall('ONBOARDING_POST_LEGALS', { data: body, method: 'POST' });
+      return fetchWithLogsCall('ONBOARDING_POST_LEGALS', { data: body, method: 'POST' });
     }
     const result = await apiClient.institutionOnboarding({ body });
     return extractResponse(result, 201, onRedirectToLogin, 401, 403, undefined);
@@ -285,7 +289,7 @@ export const OnboardingApi = {
   }): Promise<InstitutionResourceArray> => {
     /* istanbul ignore if */
     if (isMockEnvironment()) {
-      return mockApiCall('ONBOARDING_GET_INSTITUTIONS', { params });
+      return fetchWithLogsCall('ONBOARDING_GET_INSTITUTIONS', { params });
     }
     const result = await apiClient.v2GetInstitutionByFilters(params);
     return extractResponse(result, 200, onRedirectToLogin, 401, 403, undefined);
@@ -299,7 +303,7 @@ export const OnboardingApi = {
     if (isMockEnvironment()) {
       const formData = new FormData();
       formData.append('aggregates', aggregates);
-      return mockApiCall('ONBOARDING_VERIFY_AGGREGATES', {
+      return fetchWithLogsCall('ONBOARDING_VERIFY_AGGREGATES', {
         params: { institutionType, productId },
         data: formData,
         method: 'POST',
@@ -312,10 +316,14 @@ export const OnboardingApi = {
     });
     return extractResponse(result, 200, onRedirectToLogin, 401, 403, undefined);
   },
-  // HEAD /v1/institutions/onboarding (verifyOnboardingUsingHEAD). The codegen
-  // tool skips HEAD, so the spec is patched HEAD->GET (fixPreGen) and the real
-  // method restored to HEAD (fixPostGen). Success is 204 (already onboarded),
-  // 404 means not onboarded.
+  // HEAD /v1/institutions/onboarding (verifyOnboardingUsingHEAD). Success is 204
+  // (already onboarded), 404 means not onboarded.
+  // NOTE: this endpoint cannot go through the openapi-codegen-ts client: ts-commons'
+  // createFetchRequestForApi treats only GET/DELETE as body-less and attaches a body
+  // to any other method, which breaks HEAD (the request rejects with no httpStatus,
+  // so the 404 "not onboarded" case is wrongly handled as a generic error). We route
+  // it through fetchWithLogs/axios, which handles HEAD in both mock and real envs and
+  // rejects with an httpStatus-bearing error that callers inspect via getErrorStatus.
   verifyOnboardingExternal: async (params: {
     taxCode?: string;
     subunitCode?: string;
@@ -325,15 +333,5 @@ export const OnboardingApi = {
     vatNumber?: string;
     institutionType?: string;
     verifyType?: string;
-  }): Promise<void> => {
-    /* istanbul ignore if */
-    if (isMockEnvironment()) {
-      return mockApiCall('VERIFY_ONBOARDING', { params, method: 'HEAD' });
-    }
-    const result = await apiClient.verifyOnboardingUsingHEAD({
-      ...params,
-      productId: params.productId ?? '',
-    });
-    return extractResponse(result, 204, onRedirectToLogin, 401, 403, undefined);
-  },
+  }): Promise<void> => fetchWithLogsCall('VERIFY_ONBOARDING', { params, method: 'HEAD' }),
 };
