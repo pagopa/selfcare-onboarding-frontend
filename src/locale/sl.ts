@@ -517,55 +517,6 @@ export default {
       message: 'Izbrana organizacija je že naročena na ponudbo <1 /><strong>Premium</strong>.',
       closeButton: 'Zapri'
     },
-    subProductStepSelectPricingPlan: {
-      discountLabelData: '25% popust Do 30. junija 2023',
-      title: 'Nadgradite na IO Premium in izboljšajte <1/> delovanje sporočil',
-      firstCheckLabel: 'Skrajšajte čas prejema plačil',
-      secondCheckLabel: 'Izboljšana učinkovitost izterjav',
-      thirdCheckLabel: 'Zmanjšajte neplačane terjatve',
-      infoSectionLabel: 'Če je vaša organizacija že naročena na IO, izberite načrt, ki najbolje ustreza njenin potrebam. <1/> Načrt po zvezku je aktivirajte samo enkrat. Ko se konča število sporočil v načrtu <3/> po zvezku, se samodejno aktivira načrt porabe.',
-      btnRejectLabel: 'Ne zanima me',
-      pricingPlanExitModal: {
-        title: 'Se želite odpovedati ponudbam Premium?',
-        subtitle: 'Če izstopite, boste nadaljevali z dostopom do varnega območja.',
-        closeBtnLabel: 'Izhod',
-        confirmBtnLabel: 'Nazaj na ponudbe Premium'
-      },
-      headerPlanCard: {
-        from: 'Od',
-        to: 'do',
-        beyond: 'Čez',
-        mess: '/ sporočilo'
-      },
-      carnetPlan: {
-        caption: 'NAČRT PO ZVEZKU – ENKRATNI',
-        discountBoxLabel: '25% popust',
-        title: 'Izbirajte med {{carnetCount}} različnimi zvezki, zasnovanimi za vse vaše potrebe',
-        showMore: 'Izvedite več',
-        showLess: 'Prikaži manj',
-        description: 'Ko enkrat izberete zvezek, ga ne morete spremeniti zaradi podpisa pogodbe.',
-        carnetLabelsDiscount: {
-          c1: 'Prihranite 55 EUR',
-          c2: 'Prihranite 543,75 EUR',
-          c3: 'Prihranite 2.687,50 EUR',
-          c4: 'Prihranite 5.312,50 EUR',
-          c5: 'Prihranite 13.125 EUR',
-          c6: 'Prihranite 25.625 EUR',
-          c7: 'Prihranite 50.000 EUR'
-        },
-        btnActionLabel: 'Aktivirajte načrt'
-      },
-      consumptionPlan: {
-        caption: 'NAČRT PORABE',
-        discountBoxLabel: '25% popust',
-        title: 'Izberite plačilo samo za dejanska <1/> sporočila, ki jih pošljete',
-        showMore: 'Izvedite več',
-        showLess: 'Prikaži manj',
-        description: 'Ko aktivirate načrt porabe, ne boste več mogli aktivirati načrta po zvezku.',
-        rangeLabelsDiscount: '25% popust',
-        btnActionLabel: 'Aktivirajte načrt'
-      }
-    },
     subProductStepUserUnrelated: {
       title: 'Ne morete se naročiti na {{selectedProduct}}',
       description: 'Vaša organizacija se ni naročila na <strong>{{selectedProduct}}</strong>, ali nimate vloge za upravljanje produkta. <5/> Prosite skrbnika, da vas <1/>doda v razdelku <7/>Uporabniki, ali zahtevajte naročnino na <strong>{{selectedProduct}}</strong> za vašo organizacijo.',

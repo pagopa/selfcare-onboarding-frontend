@@ -103,7 +103,6 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
   } | null>(null);
   const [aggregatesData, setAggregatesData] = useState<Array<AggregateInstitution>>();
   const { setOnExit } = useContext(HeaderContext);
-  const { setRequiredLogin } = useContext(UserContext);
   const requestIdRef = useRef<string>();
   const { t } = useTranslation();
   const [onExitAction, setOnExitAction] = useState<(() => void) | undefined>();
@@ -221,7 +220,6 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
 
     postOnboardingSubmit(
       setLoading,
-      setRequiredLogin,
       productId,
       selectedProduct,
       setOutcome,

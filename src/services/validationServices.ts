@@ -1,11 +1,9 @@
 import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
-import { AxiosError } from 'axios';
 import { Dispatch, SetStateAction } from 'react';
 import { InstitutionType, ProblemUserValidate, UserOnCreate } from '../../types';
 import { OnboardingApi } from '../api/OnboardingApiClient';
 import { StepBillingDataHistoryState } from '../components/steps/StepOnboardingFormData';
-import { fetchWithLogs } from '../lib/api-utils';
-import { getErrorStatus, getFetchOutcome, HttpError } from '../lib/error-utils';
+import { getErrorStatus, HttpError } from '../lib/error-utils';
 import { isPublicAdministration } from '../utils/institutionTypeUtils';
 
 export const verifyVatNumber = async (
@@ -16,40 +14,30 @@ export const verifyVatNumber = async (
   setVatVerificationGenericError: Dispatch<SetStateAction<boolean>>,
   setIsVatRegistrated: Dispatch<SetStateAction<boolean>>,
   setOpenVatNumberErrorModal: Dispatch<SetStateAction<boolean>>,
-  setRequiredLogin: Dispatch<SetStateAction<boolean>>,
+  _setRequiredLogin: Dispatch<SetStateAction<boolean>>,
   productId: string | undefined
 ) => {
-  const onboardingStatus = await fetchWithLogs(
-    {
-      endpoint: 'VERIFY_ONBOARDING',
-    },
-    {
-      method: 'HEAD',
-      params: {
-        taxCode: isPublicAdministration(institutionType)
-          ? externalInstitutionId
-          : formik.values?.taxCode,
-        productId,
-        verifyType: 'EXTERNAL',
-        vatNumber: stepHistoryState.isTaxCodeEquals2PIVA
-          ? formik.values.taxCode
-          : formik.values.vatNumber,
-      },
-    },
-    () => setRequiredLogin(true)
-  );
-
-  const restOutcome = getFetchOutcome(onboardingStatus);
-
-  if (restOutcome === 'success') {
+  try {
+    await OnboardingApi.verifyOnboardingExternal({
+      taxCode: isPublicAdministration(institutionType)
+        ? externalInstitutionId
+        : formik.values?.taxCode,
+      productId,
+      verifyType: 'EXTERNAL',
+      vatNumber: stepHistoryState.isTaxCodeEquals2PIVA
+        ? formik.values.taxCode
+        : formik.values.vatNumber,
+    });
     setVatVerificationGenericError(false);
     setIsVatRegistrated(true);
-  } else if ((onboardingStatus as AxiosError).response?.status === 404) {
-    setIsVatRegistrated(false);
-    setVatVerificationGenericError(false);
-  } else {
-    setOpenVatNumberErrorModal(true);
-    setVatVerificationGenericError(true);
+  } catch (error) {
+    if (getErrorStatus(error) === 404) {
+      setIsVatRegistrated(false);
+      setVatVerificationGenericError(false);
+    } else {
+      setOpenVatNumberErrorModal(true);
+      setVatVerificationGenericError(true);
+    }
   }
 };
 

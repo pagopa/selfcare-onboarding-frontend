@@ -1,5 +1,4 @@
 import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
-import { AxiosError } from 'axios';
 import { Dispatch, SetStateAction, MutableRefObject } from 'react';
 import { User } from '@pagopa/selfcare-common-frontend/lib/model/User';
 import {
@@ -10,8 +9,8 @@ import {
   UserOnCreate,
   Problem,
 } from '../../types';
-import { fetchWithLogs } from '../lib/api-utils';
-import { getFetchOutcome } from '../lib/error-utils';
+import { OnboardingApi } from '../api/OnboardingApiClient';
+import { getErrorStatus, HttpError } from '../lib/error-utils';
 import { AdditionalGpuInformations } from '../model/AdditionalGpuInformations';
 import { AdditionalInformations } from '../model/AdditionalInformations';
 import { AggregateInstitution } from '../model/AggregateInstitution';
@@ -33,30 +32,30 @@ import {
   isPublicAdministration,
 } from '../utils/institutionTypeUtils';
 
-// Funzione base che esegue la chiamata POST
-const postOnboardingLegals = async (
-  data: any,
-  setRequiredLogin: Dispatch<SetStateAction<boolean>>
-) => {
-  const response = await fetchWithLogs(
-    { endpoint: 'ONBOARDING_POST_LEGALS' },
-    {
-      method: 'POST',
-      data,
-    },
-    () => setRequiredLogin(true)
-  );
-
-  const outcome = getFetchOutcome(response);
-
-  return { response, outcome };
+// Funzione base che esegue la chiamata POST. Normalizza l'esito in
+// { outcome, status, detail } poiché i caller hanno bisogno dello status
+// (409/403) e del detail del Problem per il tracking.
+const postOnboardingLegals = async (data: any) => {
+  try {
+    await OnboardingApi.onboardingInstitution(data);
+    return {
+      outcome: 'success' as const,
+      status: undefined as number | undefined,
+      detail: undefined as string | undefined,
+    };
+  } catch (error) {
+    return {
+      outcome: 'error' as const,
+      status: getErrorStatus(error),
+      detail: ((error as HttpError).httpBody as Problem | undefined)?.detail,
+    };
+  }
 };
 
 // Prima funzione con logica specifica per onboarding standard
 // eslint-disable-next-line complexity
 export const postOnboardingSubmit = async (
   setLoading: Dispatch<SetStateAction<boolean>>,
-  setRequiredLogin: Dispatch<SetStateAction<boolean>>,
   productId: string,
   selectedProduct: Product | null | undefined,
   setOutcome: Dispatch<SetStateAction<any>>,
@@ -77,10 +76,7 @@ export const postOnboardingSubmit = async (
   // eslint-disable-next-line sonarjs/cognitive-complexity
 ) => {
   setLoading(true);
-  console.log('postOnboardingSubmit', {
-    onboardingFormData,
-  });
-  const { response, outcome } = await postOnboardingLegals(
+  const { outcome, status } = await postOnboardingLegals(
     {
       billingData: billingData2billingDataRequest(onboardingFormData as OnboardingFormData),
       atecoCodes: onboardingFormData?.atecoCodes,
@@ -168,8 +164,7 @@ export const postOnboardingSubmit = async (
             email: onboardingFormData?.userRequester?.email,
           }
         : undefined,
-    },
-    setRequiredLogin
+    }
   );
 
   setLoading(false);
@@ -183,14 +178,10 @@ export const postOnboardingSubmit = async (
     setOutcome(outcomeContent[outcome as keyof RequestOutcomeOptions]);
     onSuccess?.();
   } else {
-    const responseStatus = (response as AxiosError<Problem>).response?.status;
+    const responseStatus = status;
 
     if (!responseStatus) {
-      console.warn('ONBOARDING_SUBMIT: Response status is undefined or null', {
-        response,
-        outcome,
-        hasResponse: !!(response as AxiosError<Problem>).response,
-      });
+      console.warn('ONBOARDING_SUBMIT: Response status is undefined or null', { outcome });
     }
 
     const event =
@@ -224,17 +215,15 @@ export const postSubProductOnboardingSubmit = async (
   users: Array<UserOnCreate>,
   billingData: OnboardingFormData,
   institutionType: InstitutionType,
-  setRequiredLogin: Dispatch<SetStateAction<boolean>>,
   requestId: string,
   product: Product,
   setError: Dispatch<SetStateAction<boolean>>,
   forward: () => void,
   origin: string,
   originId: string,
-  setConflictError: Dispatch<SetStateAction<boolean>>,
-  pricingPlan?: string
+  setConflictError: Dispatch<SetStateAction<boolean>>
 ) => {
-  const { response, outcome } = await postOnboardingLegals(
+  const { outcome, status, detail } = await postOnboardingLegals(
     {
       users: users.map((u) => ({
         ...u,
@@ -246,7 +235,6 @@ export const postSubProductOnboardingSubmit = async (
         ? pspData2pspDataRequest(billingData as OnboardingFormData)
         : undefined,
       institutionType,
-      pricingPlan,
       origin,
       originId,
       geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY
@@ -270,8 +258,7 @@ export const postSubProductOnboardingSubmit = async (
       subunitCode: undefined,
       subunitType: undefined,
       taxCode: billingData?.taxCode,
-    },
-    setRequiredLogin
+    }
   );
 
   if (outcome === 'success') {
@@ -280,23 +267,22 @@ export const postSubProductOnboardingSubmit = async (
       party_id: externalInstitutionId,
       product_id: product?.id,
       subproduct_id: subProduct?.id,
-      selected_plan: pricingPlan === 'C0' ? 'consumo' : 'carnet',
     });
     forward();
   } else {
     const event =
-      (response as AxiosError<Problem>).response?.status === 409
+      status === 409
         ? 'ONBOARDING_PREMIUM_SEND_CONFLICT_ERROR_FAILURE'
         : 'ONBOARDING_PREMIUM_SEND_FAILURE';
 
-    setConflictError((response as AxiosError<Problem>).response?.status === 409);
+    setConflictError(status === 409);
 
     trackEvent(event, {
       party_id: externalInstitutionId,
       request_id: requestId,
       product_id: product?.id,
       subproduct_id: subProduct?.id,
-      reason: (response as AxiosError<Problem>).response?.data?.detail,
+      reason: detail,
     });
     setError(true);
   }

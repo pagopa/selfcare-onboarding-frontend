@@ -357,29 +357,26 @@ export const executeStepSearchParty = async (
                   ? undefined
                   : { taxId: ivassCode };
 
+      // The by-code / by-taxId codegen endpoints (AOO/UO/infocamere/visura-by-cf,
+      // stations and insurance by taxId) are path-only: the query params the
+      // legacy flow used to send (origin, categories, ...) are not part of their
+      // OpenAPI schema, so the migrated dispatcher no longer sends them. Only
+      // PARTY_FROM_CF (findInstitution) and visura-by-REA still carry query params.
       const updatedParams =
-        typeOfSearch === 'reaCode'
+        endpoint === 'ONBOARDING_GET_VISURA_INFOCAMERE_BY_REA'
           ? { rea: reaCode }
-          : typeOfSearch === 'taxCode' ||
-              typeOfSearch === 'ivassCode' ||
-              typeOfSearch === 'personalTaxCode'
-            ? isContractingAuthority(institutionType as InstitutionType) ||
-              isInsuranceCompany(institutionType as InstitutionType)
-              ? undefined
-              : {
-                  productId: undefined,
-                  subunitCode: undefined,
-                  taxCode: undefined,
-                  categories:
-                    isPublicServiceCompany(institutionType as InstitutionType) ||
-                    isPrivateInstitution(institutionType as InstitutionType)
-                      ? undefined
-                      : filterByCategory4Test(institutionType, productId),
-                }
-            : {
-                origin: 'IPA',
-                categories: filterByCategory4Test(institutionType, productId),
-              };
+          : endpoint === 'ONBOARDING_GET_PARTY_FROM_CF'
+            ? {
+                productId: undefined,
+                subunitCode: undefined,
+                taxCode: undefined,
+                categories:
+                  isPublicServiceCompany(institutionType as InstitutionType) ||
+                  isPrivateInstitution(institutionType as InstitutionType)
+                    ? undefined
+                    : filterByCategory4Test(institutionType, productId),
+              }
+            : undefined;
 
       expect(fetchWithLogsSpy).toHaveBeenNthCalledWith(
         4,

@@ -76,7 +76,7 @@ export const selected2OnboardingData = (
     '',
   vatNumber: selectedParty?.vatNumber ?? '',
   taxCodeInvoicing: selectedParty?.codiceFiscaleSfe,
-  zipCode: selectedParty?.CAP ?? selectedParty?.zipCode,
+  zipCode: selectedParty?.cap ?? selectedParty?.zipCode,
   geographicTaxonomies: [],
   originIdEc: selectedParty?.originId,
   originId: getOriginId(selectedParty, institutionType, productId),

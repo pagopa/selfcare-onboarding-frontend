@@ -790,7 +790,6 @@ export const verifySubmitPostLegalsIoPremium = async (fetchWithLogsSpy: MockInst
             county: 'MI',
           },
           institutionType: 'PA',
-          pricingPlan: 'C0',
           origin: 'IPA',
           originId: '1',
           geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY
@@ -862,7 +861,6 @@ export const verifySubmitPostLegalsPspDashBoard = async (fetchWithLogsSpy: MockI
         },
         productId: PRODUCT_IDS.DASHBOARD_PSP,
         taxCode: mockedPspOnboardingData[1].institution.billingData.taxCode,
-        pricingPlan: undefined,
         subunitCode: undefined,
         subunitType: undefined,
       },

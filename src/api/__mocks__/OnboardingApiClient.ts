@@ -6,7 +6,10 @@ const callViaFetchWithLogs = async (
     options: { endpointParams?: any; params?: any; data?: any; method?: string } = {}
 ) => {
     const r = await fetchWithLogs(
-        { endpoint: endpoint as any, endpointParams: options.endpointParams ?? {} },
+        {
+            endpoint: endpoint as any,
+            ...(options.endpointParams !== undefined ? { endpointParams: options.endpointParams } : {}),
+        },
         { params: options.params, data: options.data, method: options.method ?? 'GET' } as any,
         () => undefined
     );
@@ -77,5 +80,50 @@ export const OnboardingApi = {
         callViaFetchWithLogs('ONBOARDING_GET_INSTITUTION_TYPE_BY_PRODUCT', {
             params: { productId },
         })
+    ),
+    completeOnboardingContract: vi.fn((onboardingId: string, contract: File) => {
+        const formData = new FormData();
+        formData.append('contract', contract);
+        return callViaFetchWithLogs('ONBOARDING_COMPLETE_REGISTRATION', {
+            endpointParams: { token: onboardingId },
+            data: formData,
+            method: 'POST',
+        });
+    }),
+    completeUsersOnboardingContract: vi.fn((onboardingId: string, contract: File) => {
+        const formData = new FormData();
+        formData.append('contract', contract);
+        return callViaFetchWithLogs('USER_COMPLETE_REGISTRATION', {
+            endpointParams: { token: onboardingId },
+            data: formData,
+            method: 'POST',
+        });
+    }),
+    uploadAttachment: vi.fn((onboardingId: string, attachmentName: string, attachment: File) => {
+        const formData = new FormData();
+        formData.append('attachment', attachment);
+        return callViaFetchWithLogs('ONBOARDING_POST_ATTACHMENT', {
+            endpointParams: { onboardingId, filename: attachmentName },
+            data: formData,
+            method: 'POST',
+        });
+    }),
+    onboardingInstitution: vi.fn((body: any) =>
+        callViaFetchWithLogs('ONBOARDING_POST_LEGALS', { data: body, method: 'POST' })
+    ),
+    getInstitutionsByFilters: vi.fn((params: any) =>
+        callViaFetchWithLogs('ONBOARDING_GET_INSTITUTIONS', { params })
+    ),
+    verifyAggregatesCsv: vi.fn((aggregates: File, productId: string, institutionType?: string) => {
+        const formData = new FormData();
+        formData.append('aggregates', aggregates);
+        return callViaFetchWithLogs('ONBOARDING_VERIFY_AGGREGATES', {
+            params: { institutionType, productId },
+            data: formData,
+            method: 'POST',
+        });
+    }),
+    verifyOnboardingExternal: vi.fn((params: any) =>
+        callViaFetchWithLogs('VERIFY_ONBOARDING', { params, method: 'HEAD' })
     ),
 };

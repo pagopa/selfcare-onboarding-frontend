@@ -563,57 +563,6 @@ export default {
         "L'ente che hai selezionato ha già sottoscritto l'offerta <1 /><strong>Premium</strong>.",
       closeButton: 'Chiudi',
     },
-    subProductStepSelectPricingPlan: {
-      discountLabelData: '25% di sconto Fino al 30 giugno 2023 ',
-      title: 'Passa a IO Premium e migliora le <1/> performance dei messaggi',
-      firstCheckLabel: 'Riduci i tempi di incasso',
-      secondCheckLabel: 'Migliori le performance di riscossione',
-      thirdCheckLabel: 'Riduci i crediti insoluti',
-      infoSectionLabel: `Se il tuo ente ha già aderito ad IO, scegli qual è il piano che più soddisfa le sue esigenze. <1/> Il piano a carnet è attivabile una sola volta. Una volta terminato il numero di messaggi del piano a  <3/> carnet, si attiverà automaticamente il piano a consumo. `,
-      btnRejectLabel: 'Non mi interessa',
-      pricingPlanExitModal: {
-        title: 'Vuoi rinunciare alle offerte Premium?',
-        subtitle: 'Se esci, proseguirai con l’accesso all’Area Riservata.',
-        closeBtnLabel: 'Esci',
-        confirmBtnLabel: 'Torna alle offerte Premium',
-      },
-      headerPlanCard: {
-        from: 'Da',
-        to: 'a',
-        beyond: 'Oltre',
-        mess: '/ mess',
-      },
-      carnetPlan: {
-        caption: 'PIANO A CARNET - UNA TANTUM',
-        discountBoxLabel: '25% di sconto',
-        title: 'Scegli tra i {{carnetCount}} carnet differenti pensati per ogni tua esigenza',
-        showMore: 'Scopri di più',
-        showLess: 'Mostra meno',
-        description:
-          'Una volta selezionato il carnet non potrà essere modificato per via della sottoscrizione del contratto.',
-        carnetLabelsDiscount: {
-          c1: 'Risparmia 55 €',
-          c2: 'Risparmia 543,75 €',
-          c3: 'Risparmia 2.687,50 €',
-          c4: 'Risparmia 5.312,50 €',
-          c5: 'Risparmia 13.125 €',
-          c6: 'Risparmia 25.625 €',
-          c7: 'Risparmia 50.000 €',
-        },
-        btnActionLabel: 'Attiva il piano',
-      },
-      consumptionPlan: {
-        caption: 'PIANO A CONSUMO',
-        discountBoxLabel: '25% di sconto',
-        title: 'Scegli di pagare solo i messaggi <1/> effettivi che invii',
-        showMore: 'Scopri di più',
-        showLess: 'Mostra meno',
-        description:
-          'Attivando il piano a consumo, non sarà più possibile attivare il piano carnet.',
-        rangeLabelsDiscount: '25% di sconto',
-        btnActionLabel: 'Attiva il piano',
-      },
-    },
     subProductStepUserUnrelated: {
       title: 'Non puoi aderire a {{selectedProduct}}',
       description:
