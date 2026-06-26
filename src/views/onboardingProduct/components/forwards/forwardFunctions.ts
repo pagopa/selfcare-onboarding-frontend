@@ -21,6 +21,7 @@ import {
   isPublicAdministration,
   isPublicServiceCompany,
 } from '../../../../utils/institutionTypeUtils';
+import { ENV } from '../../../../utils/env';
 
 interface ForwardFunctionsParams {
   requestIdRef: MutableRefObject<string | undefined>;
@@ -165,7 +166,11 @@ export const createForwardFunctions = (params: ForwardFunctionsParams) => {
       onboardingData?.originId === undefined &&
       institutionTypeParam === 'GSP'
     ) {
-      setActiveStep(activeStep + 1);
+      if (ENV.GSP.NO_IPA) {
+        setActiveStep(activeStep + 1);
+      } else {
+        forwardGspNoIpa();
+      }
     } else {
       setInstitutionType(institutionTypeParam);
       setOnboardingFormData(onboardingData);

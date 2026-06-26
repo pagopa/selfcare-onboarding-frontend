@@ -56,6 +56,7 @@ export const createBackFunctions = (params: BackFunctionsParams) => {
     setOpenExitModal(true);
   };
 
+  // eslint-disable-next-line complexity
   const backFromBillingData = () => {
     if (fromDashboard && !productAvoidStep) {
       setActiveStep(0);
@@ -72,7 +73,12 @@ export const createBackFunctions = (params: BackFunctionsParams) => {
       setActiveStep(0);
     } else if (fromDashboard && isPagoPaInsights(productId)) {
       window.location.assign(`${ENV.URL_FE.DASHBOARD}/${externalInstitutionId}`);
-    } else if (isGlobalServiceProvider(institutionType) && origin !== 'IPA' && isPagoPaProduct(selectedProduct?.id)) {
+    } else if (
+      isGlobalServiceProvider(institutionType) &&
+      origin !== 'IPA' &&
+      isPagoPaProduct(selectedProduct?.id) &&
+      ENV.GSP.NO_IPA
+    ) {
       setActiveStep(2);
     } else {
       setActiveStep(1);
