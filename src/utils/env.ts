@@ -82,6 +82,10 @@ export const ENV = {
     SHOW: import.meta.env.VITE_ENABLE_GPU === 'true',
   },
 
+  GSP: {
+    NO_IPA: import.meta.env.VITE_ENABLE_GPS_NO_IPA === 'true',
+  },
+
   QUALTRICS: {
     ENABLE: import.meta.env.VITE_QUALTRICS_ENABLE === 'true',
     SCRIPT_URL: import.meta.env.VITE_QUALTRICS_SCRIPT_URL as string,
