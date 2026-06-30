@@ -4,12 +4,7 @@ import { productId2ProductTitle } from '@pagopa/selfcare-common-frontend/lib/uti
 import { useContext, useEffect, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { useParams } from 'react-router';
-import {
-  FileErrorAttempt,
-  Problem,
-  RequestOutcomeComplete,
-  StepperStep,
-} from '../../../../types';
+import { FileErrorAttempt, Problem, RequestOutcomeComplete, StepperStep } from '../../../../types';
 import { OnboardingVerify } from '../../../api/generated/onboarding/OnboardingVerify';
 import { LoadingOverlay } from '../../../components/modals/LoadingOverlay';
 import { ConfirmRegistrationStep0 } from '../../../components/registrationSteps/ConfirmRegistrationStep0';
@@ -106,10 +101,15 @@ export default function CompleteRequestComponent() {
         setRequestData,
       }).finally(() => setLoading(false));
     }
-  }, [/* attachments, */ onboardingId]);
+  }, [onboardingId]);
 
   useEffect(() => {
-    if (outcomeContentState === 'success' && ENV.QUALTRICS_APPROVAL.ENABLE && !addUserFlow && !attachments) {
+    if (
+      outcomeContentState === 'success' &&
+      ENV.QUALTRICS_APPROVAL.ENABLE &&
+      !addUserFlow &&
+      !attachments
+    ) {
       void triggerQualtricsIntercept(
         { productId: requestData?.productId ?? '' },
         {
@@ -122,12 +122,7 @@ export default function CompleteRequestComponent() {
 
   useEffect(() => {
     if (attachmentUploadSuccess && onboardingId) {
-      void getOnboardingInfo(
-        onboardingId,
-        setInstitutionId,
-        setLoading,
-        setOutcomeContentState
-      );
+      void getOnboardingInfo(onboardingId, setInstitutionId, setLoading, setOutcomeContentState);
     }
   }, [attachmentUploadSuccess]);
 
@@ -266,6 +261,7 @@ export default function CompleteRequestComponent() {
             addUserFlow={addUserFlow}
             translationKeyValue={translationKeyValue}
             institutionId={institutionId}
+            productId={requestData?.productId}
           />
         </>,
       ],
