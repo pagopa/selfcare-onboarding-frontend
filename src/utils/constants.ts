@@ -5,6 +5,7 @@ import OnboardingPremium from '../views/onboardingPremium/OnboardingPremium';
 import OnboardingProduct from '../views/onboardingProduct/OnboardingProduct';
 import CancelRequest from '../views/onboardingRequest/cancel/CancelRequest';
 import CompleteRequest from '../views/onboardingRequest/complete/CompleteRequest';
+import OnboardingUploadDocuments from '../views/onboardingRequest/complete/OnboardingUploadDocuments';
 import DownloadCsvFile from '../views/onboardingRequest/download/DownloadCsvFile';
 import OnboardingUser from '../views/onboardingUser/OnboardingUser';
 import { ENV } from './env';
@@ -37,7 +38,7 @@ export const ROUTES: RoutesObject = {
   REGISTRATION_FINALIZE_COMPLETE: {
     PATH: `${BASE_ROUTE}/confirm`,
     LABEL: 'Complete onboarding request',
-    COMPONENT: CompleteRequest,
+    COMPONENT: OnboardingUploadDocuments,
   },
   REGISTRATION_FINALIZE_REJECT: {
     PATH: `${BASE_ROUTE}/cancel`,

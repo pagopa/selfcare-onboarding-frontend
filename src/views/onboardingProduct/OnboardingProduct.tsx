@@ -53,7 +53,7 @@ import { StepAdditionalGpuInformations } from './components/StepAdditionalGpuInf
 import { StepAdditionalInformations } from './components/StepAdditionalInformations';
 import { StepUploadAggregates } from './components/StepUploadAggregates';
 import { genericError, StepVerifyOnboarding } from './components/StepVerifyOnboarding';
-import StepContractsSummary from './components/StepContractsSummary';
+import StepContractsSummary from './components/contracts/StepContractsSummary';
 
 export type ValidateErrorType = 'conflictError';
 

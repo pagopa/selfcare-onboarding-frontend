@@ -104,6 +104,35 @@ export default {
     labelStatus: 'Pronto per l’invio',
     cleanIcon: 'Cancella il file caricato',
   },
+  upladDocuments: {
+    title: 'Inserisci i documenti',
+    subtitle: 'Carica qui i documenti necessari per completare la tua adesione.',
+    uploader: {
+      first: {
+        name: 'Natura giuridica',
+        cardTitle: 'Documentazione sulla natura giuridica',
+        cardDescription:
+          'Carica l’atto costitutivo, lo statuto o altro documento che attesti la natura giuridica del tuo ente.',
+      },
+      second: {
+        name: 'Visura',
+        cardDescription:
+          'Carica una visura aggiornata o un documento equivalente che contenga i dati identificativi del tuo ente.',
+      },
+      third: {
+        name: 'Gestione del servizio pubblico',
+        cardTitle: 'Documentazione sulla gestione del servizio pubblico',
+        cardDescription:
+          'Carica i documenti che attestano che il tuo ente gestisce un servizio pubblico, ad esempio convenzioni, affidamenti o delibere.',
+        documentTitle: 'Titolo del documento',
+        addDocument: 'Aggiungi un altro documento'
+      },
+      drag: 'Trascina qui il documento',
+      upload: 'carica il file',
+      helper: 'Il file deve essere in formato PDF e la dimensione non deve superare [TBD].',
+      delete: 'Rimuovi il file caricato',
+    },
+  },
   inlineSupportLink: {
     assistanceLink: "contatta l'assistenza",
   },

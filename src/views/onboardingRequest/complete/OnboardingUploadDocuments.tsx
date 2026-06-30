@@ -4,29 +4,26 @@ import { productId2ProductTitle } from '@pagopa/selfcare-common-frontend/lib/uti
 import { useContext, useEffect, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { useParams } from 'react-router';
-import {
-  FileErrorAttempt,
-  Problem,
-  RequestOutcomeComplete,
-  StepperStep,
-} from '../../../../types';
+import { Problem, RequestOutcomeComplete, StepperStep } from '../../../../types';
+import { OnboardingApi } from '../../../api/OnboardingApiClient';
 import { OnboardingVerify } from '../../../api/generated/onboarding/OnboardingVerify';
 import { LoadingOverlay } from '../../../components/modals/LoadingOverlay';
-import { ConfirmRegistrationStep0 } from '../../../components/registrationSteps/ConfirmRegistrationStep0';
-import { ConfirmRegistrationStep1 } from '../../../components/registrationSteps/ConfirmRegistrationStep1';
 import { MessageNoAction } from '../../../components/shared/MessageNoAction';
 import { useHistoryState } from '../../../hooks/useHistoryState';
 import { HeaderContext, UserContext } from '../../../lib/context';
-import { onboardingContractUpload } from '../../../services/requestStatusServices';
-import { getOnboardingInfo, verifyRequest } from '../../../services/tokenServices';
+import { getErrorStatus, HttpError } from '../../../lib/error-utils';
+import { verifyRequest } from '../../../services/tokenServices';
 import { customErrors } from '../../../utils/constants';
-import { ENV } from '../../../utils/env';
 import { getRequestJwt } from '../../../utils/getRequestJwt';
-import { triggerQualtricsIntercept } from '../../../utils/qualtricsUtils';
 import AlreadyCompletedRequest from '../status/AlreadyCompletedPage';
 import AlreadyRejectedRequest from '../status/AlreadyRejectedPage';
 import ExpiredRequestPage from '../status/ExpiredPage';
 import NotFoundPage from '../status/NotFoundPage';
+import {
+  buildInitialDocuments,
+  StepUploadDocuments,
+  UploadedDocument,
+} from './components/StepUploadDocuments';
 import { CompleteRequestFailPage } from './pages/CompleteRequestFailPage';
 import CompleteRequestSuccessPage from './pages/CompleteRequestSuccessPage';
 
@@ -55,8 +52,7 @@ const transcodeErrorCode = (data: Problem): keyof typeof customErrors => {
   return 'GENERIC';
 };
 
-// eslint-disable-next-line sonarjs/cognitive-complexity
-export default function CompleteRequestComponent() {
+export default function OnboardingUploadDocuments() {
   const { t } = useTranslation();
   const { setSubHeaderVisible, setOnExit, setEnableLogin } = useContext(HeaderContext);
   const { setRequiredLogin } = useContext(UserContext);
@@ -64,7 +60,7 @@ export default function CompleteRequestComponent() {
   const onboardingId = onboardingIdFromPath || getRequestJwt();
 
   const [activeStep, setActiveStep, setActiveStepHistory] = useHistoryState(
-    'complete_registration_step',
+    'upload_documents_step',
     0
   );
   const [outcomeContentState, setOutcomeContentState] = useState<RequestOutcomeComplete | null>(
@@ -73,17 +69,12 @@ export default function CompleteRequestComponent() {
   const [errorCode, setErrorCode] = useState<keyof typeof customErrors>('GENERIC');
   const [open, setOpen] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
-  const [lastFileErrorAttempt, setLastFileErrorAttempt] = useState<FileErrorAttempt>();
-  const [uploadedFiles, setUploadedFiles, setUploadedFilesHistory] = useHistoryState<Array<File>>(
-    'uploaded_files',
-    []
-  );
   const [requestData, setRequestData] = useState<OnboardingVerify>();
-  const [institutionId, setInstitutionId] = useState<string>();
-  const [attachmentUploadSuccess, setAttachmentUploadSuccess] = useState<boolean>(false);
-  const addUserFlow = new URLSearchParams(window.location.search).get('add-user') === 'true';
-  const attachments = window.location.pathname.includes('/attachments');
-  const translationKeyValue = addUserFlow ? 'user' : attachments ? 'attachments' : 'product';
+  const [documents, setDocuments, setDocumentsHistory] = useHistoryState<Array<UploadedDocument>>(
+    'uploaded_documents',
+    buildInitialDocuments(t)
+  );
+  const translationKeyValue = 'product';
 
   useEffect(() => {
     setSubHeaderVisible(true);
@@ -96,120 +87,86 @@ export default function CompleteRequestComponent() {
   }, []);
 
   useEffect(() => {
-    if (attachments && onboardingId) {
-      setOutcomeContentState('toBeCompleted');
-    } else {
-      verifyRequest({
-        onboardingId,
-        setRequiredLogin,
-        setOutcomeContentState,
-        setRequestData,
-      }).finally(() => setLoading(false));
-    }
-  }, [/* attachments, */ onboardingId]);
+    verifyRequest({
+      onboardingId,
+      setRequiredLogin,
+      setOutcomeContentState,
+      setRequestData,
+    }).finally(() => setLoading(false));
+  }, [onboardingId]);
 
-  useEffect(() => {
-    if (outcomeContentState === 'success' && ENV.QUALTRICS_APPROVAL.ENABLE && !addUserFlow && !attachments) {
-      void triggerQualtricsIntercept(
-        { productId: requestData?.productId ?? '' },
-        {
-          scriptUrl: ENV.QUALTRICS_APPROVAL.SCRIPT_URL,
-          siteId: ENV.QUALTRICS_APPROVAL.SITE_ID,
-        }
-      );
-    }
-  }, [outcomeContentState]);
-
-  useEffect(() => {
-    if (attachmentUploadSuccess && onboardingId) {
-      void getOnboardingInfo(
-        onboardingId,
-        setInstitutionId,
-        setLoading,
-        setOutcomeContentState
-      );
-    }
-  }, [attachmentUploadSuccess]);
-
-  const setUploadedFilesAndWriteHistory = (files: Array<File>) => {
-    setUploadedFilesHistory(files);
-    setUploadedFiles(files);
-  };
-
-  const forward = () => {
-    setActiveStepHistory(activeStep + 1);
-    setUploadedFilesHistory(uploadedFiles);
-    setActiveStep(activeStep + 1);
-  };
+  const setDocumentsAndWriteHistory = (
+    update: Array<UploadedDocument> | ((prev: Array<UploadedDocument>) => Array<UploadedDocument>)
+  ) =>
+    setDocuments((prev) => {
+      const next = typeof update === 'function' ? update(prev) : update;
+      setDocumentsHistory(next);
+      return next;
+    });
 
   const back = () => {
     setOpen(false);
-    setUploadedFiles([]);
-    setOutcomeContentState('toBeCompleted');
+    setActiveStep(0);
   };
 
-  const handleErrorModalClose = () => {
-    setOpen(false);
-  };
+  const handleErrorModalClose = () => setOpen(false);
 
   const handleErrorModalExit = () => {
     setActiveStepHistory(0);
-    setUploadedFilesHistory([]);
     setActiveStep(0);
-    setUploadedFiles([]);
     setOpen(false);
   };
 
-  const handleErrorModalConfirm = () => {
-    setOpen(false);
-    setUploadedFiles([]);
-  };
+  const handleErrorModalConfirm = () => setOpen(false);
 
-  const uploadContract = () =>
-    onboardingContractUpload(
-      uploadedFiles[0],
-      setLoading,
-      onboardingId,
-      requestData,
-      addUserFlow,
-      setOutcomeContentState,
-      lastFileErrorAttempt,
-      setLastFileErrorAttempt,
-      setOpen,
-      setErrorCode,
-      transcodeErrorCode,
-      attachments ? 'Addendum' : undefined,
-      () => setAttachmentUploadSuccess(true)
-    );
+  const uploadDocuments = async () => {
+    setLoading(true);
+    try {
+      // Each document is uploaded as a named attachment; the user-typed title (when present)
+      // is used as the attachment name so multiple "servizio pubblico" docs don't collide
+      for (const doc of documents) {
+        if (doc.file) {
+          // eslint-disable-next-line no-await-in-loop
+          await OnboardingApi.uploadAttachment(
+            onboardingId as string,
+            doc.title.trim() || doc.name,
+            doc.file
+          );
+        }
+      }
+      setLoading(false);
+      setOutcomeContentState('success');
+    } catch (error) {
+      setLoading(false);
+      const errorBody = (error as HttpError).httpBody as Problem | undefined;
+      if (getErrorStatus(error) === 400 && errorBody) {
+        setErrorCode(transcodeErrorCode(errorBody));
+      } else {
+        setErrorCode('GENERIC');
+      }
+      setOpen(true);
+    }
+  };
 
   const steps: Array<StepperStep> = [
     {
-      label: t('completeRegistration.steps.step0.label'),
-      Component: () => 
-        ConfirmRegistrationStep0({
-          onboardingId,
-          fileName: 'Addendum',
-          translationKeyValue,
-          setLoading,
-          forward,
-        }),
-    },
-    {
-      label: t('completeRegistration.steps.step1.label'),
+      label: t('upladDocuments.title'),
       Component: () =>
-        ConfirmRegistrationStep1(
-          addUserFlow,
-          translationKeyValue,
-          {
-            forward: () => uploadContract(),
+        StepUploadDocuments({
+          documents,
+          setDocuments: setDocumentsAndWriteHistory,
+          loading,
+          forward: () => void uploadDocuments(),
+          back,
+          onDropRejected: () => {
+            setErrorCode('INVALID_SIGN_FORMAT');
+            setOpen(true);
           },
-          { loading },
-          { uploadedFiles, setUploadedFiles: setUploadedFilesAndWriteHistory }
-        ),
+        }),
     },
   ];
 
-  const Step = steps[activeStep].Component;
+  const Step = steps[activeStep]?.Component ?? steps[0].Component;
 
   const outcomeContent = {
     toBeCompleted: {
@@ -263,9 +220,8 @@ export default function CompleteRequestComponent() {
       description: [
         <>
           <CompleteRequestSuccessPage
-            addUserFlow={addUserFlow}
+            addUserFlow={false}
             translationKeyValue={translationKeyValue}
-            institutionId={institutionId}
           />
         </>,
       ],
@@ -302,8 +258,6 @@ export default function CompleteRequestComponent() {
             </Trans>
           ) : errorCode === 'GENERIC' ? (
             t(`completeRegistration.errors.${errorCode}.message`)
-          ) : addUserFlow ? (
-            t(`completeRegistration.errors.${errorCode}.user.message`)
           ) : (
             t(`completeRegistration.errors.${errorCode}.product.message`)
           )
