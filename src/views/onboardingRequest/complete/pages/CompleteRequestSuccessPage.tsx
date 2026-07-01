@@ -3,17 +3,20 @@ import { Trans, useTranslation } from 'react-i18next';
 import { EndingPage } from '@pagopa/selfcare-common-frontend/lib';
 import { Typography, Link } from '@mui/material';
 import { ENV } from '../../../../utils/env';
+import { isCedProduct } from '../../../../utils/institutionTypeUtils';
 
 type Props = {
   addUserFlow: boolean;
   translationKeyValue: string;
   institutionId?: string;
+  productId?: string;
 };
 
 export default function CompleteRequestSuccessPage({
   addUserFlow,
   translationKeyValue,
   institutionId,
+  productId,
 }: Props) {
   const { t } = useTranslation();
 
@@ -29,7 +32,9 @@ export default function CompleteRequestSuccessPage({
             ? t('completeRegistration.outcomeContent.success.user.title')
             : translationKeyValue === 'attachments'
               ? t('completeRegistration.outcomeContent.success.attachments.title')
-              : t('completeRegistration.outcomeContent.success.product.title')
+              : isCedProduct(productId)
+                ? t('completeRegistration.outcomeContent.success.product.titleCed')
+                : t('completeRegistration.outcomeContent.success.product.title')
         }
         description={
           <Trans
@@ -38,7 +43,9 @@ export default function CompleteRequestSuccessPage({
                 ? 'completeRegistration.outcomeContent.success.user.description'
                 : translationKeyValue === 'attachments'
                   ? 'completeRegistration.outcomeContent.success.attachments.description'
-                  : 'completeRegistration.outcomeContent.success.product.description'
+                  : isCedProduct(productId)
+                    ? t('completeRegistration.outcomeContent.success.product.descriptionCed')
+                    : 'completeRegistration.outcomeContent.success.product.description'
             }
             components={{ 1: <br />, 3: <br /> }}
           >
@@ -54,8 +61,8 @@ export default function CompleteRequestSuccessPage({
         <Typography align="center">
           <Link
             component="button"
-            variant='sidenav'
-            underline='none'
+            variant="sidenav"
+            underline="none"
             onClick={() =>
               window.location.assign(`${ENV.URL_FE.DASHBOARD}/${institutionId}/documents`)
             }
