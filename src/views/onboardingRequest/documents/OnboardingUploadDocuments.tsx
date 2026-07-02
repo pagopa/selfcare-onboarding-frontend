@@ -4,38 +4,34 @@ import { productId2ProductTitle } from '@pagopa/selfcare-common-frontend/lib/uti
 import { useContext, useEffect, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { useParams } from 'react-router';
-import { Problem, RequestOutcomeComplete, StepperStep } from '../../../../types';
-import { OnboardingApi } from '../../../api/OnboardingApiClient';
+import { RequestOutcomeComplete } from '../../../../types';
 import { OnboardingVerify } from '../../../api/generated/onboarding/OnboardingVerify';
 import { LoadingOverlay } from '../../../components/modals/LoadingOverlay';
 import { MessageNoAction } from '../../../components/shared/MessageNoAction';
 import { useHistoryState } from '../../../hooks/useHistoryState';
 import { HeaderContext, UserContext } from '../../../lib/context';
-import { getErrorStatus, HttpError } from '../../../lib/error-utils';
+import { ContractSummaryDocument, UploadedDocument } from '../../../model/Documents';
 import { verifyRequest } from '../../../services/tokenServices';
 import { customErrors } from '../../../utils/constants';
 import { getRequestJwt } from '../../../utils/getRequestJwt';
+import { CompleteRequestFailPage } from '../complete/pages/CompleteRequestFailPage';
+import CompleteRequestSuccessPage from '../complete/pages/CompleteRequestSuccessPage';
 import AlreadyCompletedRequest from '../status/AlreadyCompletedPage';
 import AlreadyRejectedRequest from '../status/AlreadyRejectedPage';
 import ExpiredRequestPage from '../status/ExpiredPage';
 import NotFoundPage from '../status/NotFoundPage';
-import {
-  buildInitialDocuments,
-  StepUploadDocuments,
-  UploadedDocument,
-} from './components/StepUploadDocuments';
-import { CompleteRequestFailPage } from './pages/CompleteRequestFailPage';
-import CompleteRequestSuccessPage from './pages/CompleteRequestSuccessPage';
+import StepUploadDocuments, { buildInitialDocuments } from './StepUploadDocuments';
+import UploadedContractsSummary from './UploadedContractsSummary';
 
-const error2errorCode: { [key in keyof typeof customErrors]: Array<string> } = {
+/* const error2errorCode: { [key in keyof typeof customErrors]: Array<string> } = {
   INVALID_DOCUMENT: ['002-1000', '002-1001', '002-1002'],
   INVALID_SIGN: ['002-1004', '002-1005', '002-1006', '002-1007'],
   INVALID_SIGN_FORMAT: ['002-1003', '002-1008'],
   ALREADY_ONBOARDED: ['002-1009'],
   GENERIC: [],
-};
+}; */
 
-const transcodeErrorCode = (data: Problem): keyof typeof customErrors => {
+/* const transcodeErrorCode = (data: Problem): keyof typeof customErrors => {
   if (data.errors?.findIndex((e) => error2errorCode.INVALID_DOCUMENT.includes(e.code)) > -1) {
     return 'INVALID_DOCUMENT';
   } else if (data.errors?.findIndex((e) => error2errorCode.INVALID_SIGN.includes(e.code)) > -1) {
@@ -50,7 +46,7 @@ const transcodeErrorCode = (data: Problem): keyof typeof customErrors => {
     return 'ALREADY_ONBOARDED';
   }
   return 'GENERIC';
-};
+}; */
 
 export default function OnboardingUploadDocuments() {
   const { t } = useTranslation();
@@ -70,11 +66,12 @@ export default function OnboardingUploadDocuments() {
   const [open, setOpen] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [requestData, setRequestData] = useState<OnboardingVerify>();
-  const [documents, setDocuments, setDocumentsHistory] = useHistoryState<Array<UploadedDocument>>(
-    'uploaded_documents',
-    buildInitialDocuments(t)
-  );
+  const [documents, setDocuments] = useState<Array<UploadedDocument>>(buildInitialDocuments(t));
   const translationKeyValue = 'product';
+  const naturaGiuridica = documents.find((d) => d.group === 'naturaGiuridica');
+  const visura = documents.find((d) => d.group === 'visura');
+  const servizioPubblico = documents.filter((d) => d.group === 'servizioPubblico');
+  const contractSummary: ContractSummaryDocument = [naturaGiuridica, visura, servizioPubblico];
 
   useEffect(() => {
     setSubHeaderVisible(true);
@@ -95,20 +92,6 @@ export default function OnboardingUploadDocuments() {
     }).finally(() => setLoading(false));
   }, [onboardingId]);
 
-  const setDocumentsAndWriteHistory = (
-    update: Array<UploadedDocument> | ((prev: Array<UploadedDocument>) => Array<UploadedDocument>)
-  ) =>
-    setDocuments((prev) => {
-      const next = typeof update === 'function' ? update(prev) : update;
-      setDocumentsHistory(next);
-      return next;
-    });
-
-  const back = () => {
-    setOpen(false);
-    setActiveStep(0);
-  };
-
   const handleErrorModalClose = () => setOpen(false);
 
   const handleErrorModalExit = () => {
@@ -119,7 +102,7 @@ export default function OnboardingUploadDocuments() {
 
   const handleErrorModalConfirm = () => setOpen(false);
 
-  const uploadDocuments = async () => {
+  /* const uploadDocuments = async () => {
     setLoading(true);
     try {
       // Each document is uploaded as a named attachment; the user-typed title (when present)
@@ -146,36 +129,34 @@ export default function OnboardingUploadDocuments() {
       }
       setOpen(true);
     }
-  };
+  }; */
 
-  const steps: Array<StepperStep> = [
-    {
-      label: t('upladDocuments.title'),
-      Component: () =>
-        StepUploadDocuments({
-          documents,
-          setDocuments: setDocumentsAndWriteHistory,
-          loading,
-          forward: () => void uploadDocuments(),
-          back,
-          onDropRejected: () => {
-            setErrorCode('INVALID_SIGN_FORMAT');
-            setOpen(true);
-          },
-        }),
-    },
+  const steps: Array<React.ReactNode> = [
+    <StepUploadDocuments
+      key="upload"
+      naturaGiuridica={naturaGiuridica}
+      visura={visura}
+      servizioPubblico={servizioPubblico}
+      setDocuments={setDocuments}
+      loading={loading}
+      forward={() => setActiveStep(1)}
+      onDropRejected={() => {
+        setErrorCode('INVALID_SIGN_FORMAT');
+        setOpen(true);
+      }}
+    />,
+    <UploadedContractsSummary
+      key="summary"
+      contractSummary={contractSummary}
+      forward={() => console.log('submit')}
+      back={() => setActiveStep(0)}
+    />,
   ];
-
-  const Step = steps[activeStep]?.Component ?? steps[0].Component;
 
   const outcomeContent = {
     toBeCompleted: {
       title: '',
-      description: [
-        <>
-          <Step />
-        </>,
-      ],
+      description: [<>{steps[activeStep]}</>],
     },
     alreadyRejected: {
       title: '',
@@ -230,7 +211,7 @@ export default function OnboardingUploadDocuments() {
       title: '',
       description: [
         <>
-          <CompleteRequestFailPage back={back} />
+          <CompleteRequestFailPage back={handleErrorModalExit} />
         </>,
       ],
     },

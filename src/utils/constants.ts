@@ -5,7 +5,7 @@ import OnboardingPremium from '../views/onboardingPremium/OnboardingPremium';
 import OnboardingProduct from '../views/onboardingProduct/OnboardingProduct';
 import CancelRequest from '../views/onboardingRequest/cancel/CancelRequest';
 import CompleteRequest from '../views/onboardingRequest/complete/CompleteRequest';
-import OnboardingUploadDocuments from '../views/onboardingRequest/complete/OnboardingUploadDocuments';
+import OnboardingUploadDocuments from '../views/onboardingRequest/documents/OnboardingUploadDocuments';
 import DownloadCsvFile from '../views/onboardingRequest/download/DownloadCsvFile';
 import OnboardingUser from '../views/onboardingUser/OnboardingUser';
 import { ENV } from './env';

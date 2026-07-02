@@ -125,12 +125,30 @@ export default {
         cardDescription:
           'Carica i documenti che attestano che il tuo ente gestisce un servizio pubblico, ad esempio convenzioni, affidamenti o delibere.',
         documentTitle: 'Titolo del documento',
-        addDocument: 'Aggiungi un altro documento'
+        addDocument: 'Aggiungi un altro documento',
       },
       drag: 'Trascina qui il documento',
       upload: 'carica il file',
       helper: 'Il file deve essere in formato PDF e la dimensione non deve superare [TBD].',
       delete: 'Rimuovi il file caricato',
+    },
+    contractSummary: {
+      title: 'Riepilogo documenti caricati',
+      subtitle: 'Controlla che i documenti caricati siano corretti prima di procedere',
+      firstDocument: {
+        title: 'Documentazione attestante la natura giuridica',
+        subtitle: 'Statuto in formato PDF',
+      },
+      secondDocument: {
+        title: 'Visura camerale',
+        subtitle: 'Visura in formato PDF',
+      },
+      thirdDocument: {
+        title: 'Attestazione di gestione del servizio pubblico',
+        subtitle: 'Statuto o visura in formato PDF',
+      },
+      formard: 'Continua',
+      back: 'Indietro',
     },
   },
   inlineSupportLink: {

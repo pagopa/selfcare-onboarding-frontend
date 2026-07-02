@@ -1,19 +1,15 @@
-import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
-import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
 import {
   Box,
   Button,
-  CircularProgress,
   Grid,
-  IconButton,
   LinearProgress,
-  Tooltip,
   Typography,
   useTheme
 } from '@mui/material';
 import { Accept, useDropzone } from 'react-dropzone';
 import { useTranslation } from 'react-i18next';
+import UploadedDocument from './UploadedDocument';
 
 type DocumentUploaderProps = {
   file?: File;
@@ -50,43 +46,38 @@ export const DocumentUploader = ({
   });
 
   if (file) {
-    return (
+    return loading ? (
       <Box
         sx={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 1,
-          px: 2,
-          py: 1.5,
-          borderRadius: theme.spacing(1),
-          border: `1px solid ${theme.palette.divider}`,
-          backgroundColor: theme.palette.background.paper,
+          boxShadow:
+            '0px 8px 10px -5px rgba(0, 43, 85, 0.1), 0px 16px 24px 2px rgba(0, 43, 85, 0.05), 0px 6px 30px 5px rgba(0, 43, 85, 0.1)',
+          borderRadius: '16px',
+          p: 1,
         }}
       >
-        <InsertDriveFileOutlinedIcon color="primary" />
-        <Box flex={1} minWidth={0}>
-          <Tooltip title={file.name} placement="top" arrow>
-            <Typography
-              variant="body2"
-              sx={{ overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}
-            >
-              {file.name}
-            </Typography>
-          </Tooltip>
-          {loading && <LinearProgress sx={{ mt: 0.5 }} />}
-        </Box>
-        {loading ? (
-          <CircularProgress size={20} />
-        ) : (
-          <IconButton
-            size="small"
-            onClick={onDelete}
-            aria-label={t('upladDocuments.uploader.delete')}
+        <Box sx={{ borderRadius: '10px', border: `1px solid ${theme.palette.primary.main}` }}>
+          <Grid
+            container
+            justifyContent="space-evenly"
+            alignItems="center"
+            width="390px"
+            height="90px"
           >
-            <ClearOutlinedIcon fontSize="small" />
-          </IconButton>
-        )}
+            <Grid item xs={6}>
+              <Typography align="center" variant="body1">
+                {t('fileUploadPreview.loadingStatus')}
+              </Typography>
+            </Grid>
+            <Grid item xs={10}>
+              <Box sx={{ width: '100%' }}>
+                <LinearProgress />
+              </Box>
+            </Grid>
+          </Grid>
+        </Box>
       </Box>
+    ) : (
+      <UploadedDocument file={file} onDelete={onDelete} />
     );
   }
 
