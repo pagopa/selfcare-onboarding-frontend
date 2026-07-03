@@ -1,36 +1,29 @@
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import CloseIcon from '@mui/icons-material/Close';
-import {
-  Box,
-  Grid,
-  IconButton,
-  Link,
-  Paper,
-  TextField,
-  Typography,
-  useTheme,
-} from '@mui/material';
+import { Box, Grid, IconButton, Link, Paper, TextField, Typography, useTheme } from '@mui/material';
 import { uniqueId } from 'lodash';
-import { Dispatch } from 'react';
+import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import { OnboardingStepActions } from '../../../../components/registrationSteps/OnboardingStepActions';
-import { UploadedDocument } from '../../../../model/Documents';
+import { RequiredDocument, UploadedDocument } from '../../../../model/Documents';
 
 type Props = {
-  servizioPubblico: Array<UploadedDocument>;
-  canSubmitServizio: boolean;
+  requiredDocument: RequiredDocument;
+  documents: Array<UploadedDocument>;
+  canSubmit: boolean;
   handleNext: () => void;
   handleBack: () => void;
   updateDocument: (id: string, updates: Partial<UploadedDocument>) => void;
   removeDocument: (id: string) => void;
   renderUploader: (doc: UploadedDocument) => JSX.Element;
-  setDocuments: Dispatch<React.SetStateAction<Array<UploadedDocument>>>;
+  setDocuments: Dispatch<SetStateAction<Array<UploadedDocument>>>;
   loading: boolean;
 };
 
 const MultiDocumentCard = ({
-  servizioPubblico,
-  canSubmitServizio,
+  requiredDocument,
+  documents,
+  canSubmit,
   handleNext,
   handleBack,
   updateDocument,
@@ -42,21 +35,25 @@ const MultiDocumentCard = ({
   const theme = useTheme();
   const { t } = useTranslation();
 
-  const addPublicService = () =>
+  const max = requiredDocument.maxDocumentsRequired ?? 1;
+  const canAddMore = documents.length < max;
+
+  const addDocument = () =>
     setDocuments((prev) => [
       ...prev,
       {
-        id: uniqueId('servizio-pubblico-'),
-        group: 'servizioPubblico',
-        name: t('upladDocuments.uploader.third.name'),
+        id: uniqueId(`${requiredDocument.id}-`),
+        documentCode: requiredDocument.id,
+        name: requiredDocument.name,
         title: '',
+        documentType: 'REQUIRED',
       },
     ]);
 
   return (
     <Box display="flex" justifyContent="center" alignItems="center">
       <Grid container direction="column" alignItems="center" mt={1} width="100%">
-        {servizioPubblico.map((doc, index) => (
+        {documents.map((doc, index) => (
           <Paper
             key={doc.id}
             elevation={8}
@@ -75,10 +72,14 @@ const MultiDocumentCard = ({
                   sx={{ fontWeight: 'fontWeightBold' }}
                   mb={1}
                 >
-                  {t('upladDocuments.uploader.third.cardTitle').toUpperCase()}
+                  {t(`upladDocuments.uploader.${requiredDocument.labelKey}.cardTitle`, {
+                    defaultValue: requiredDocument.name,
+                  })}
                 </Typography>
                 <Typography sx={{ fontWeight: 400 }} variant="body2">
-                  {t('upladDocuments.uploader.third.cardDescription')}
+                  {t(`upladDocuments.uploader.${requiredDocument.labelKey}.cardDescription`, {
+                    defaultValue: '',
+                  })}
                 </Typography>
               </Box>
             ) : (
@@ -103,17 +104,19 @@ const MultiDocumentCard = ({
           </Paper>
         ))}
 
-        <Box mt={1} display="flex" justifyContent="center">
-          <Link
-            component="button"
-            variant="body2"
-            onClick={addPublicService}
-            sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
-          >
-            <AddOutlinedIcon fontSize="small" />
-            {t('upladDocuments.uploader.third.addDocument')}
-          </Link>
-        </Box>
+        {canAddMore && (
+          <Box mt={1} display="flex" justifyContent="center">
+            <Link
+              component="button"
+              variant="body2"
+              onClick={addDocument}
+              sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
+            >
+              <AddOutlinedIcon fontSize="small" />
+              {t('upladDocuments.uploader.third.addDocument')}
+            </Link>
+          </Box>
+        )}
 
         <Grid item xs={12} mt={3}>
           <OnboardingStepActions
@@ -125,7 +128,7 @@ const MultiDocumentCard = ({
             forward={{
               action: handleNext,
               label: t('onboardingFormData.confirmLabel'),
-              disabled: !canSubmitServizio || loading,
+              disabled: !canSubmit || loading,
             }}
           />
         </Grid>

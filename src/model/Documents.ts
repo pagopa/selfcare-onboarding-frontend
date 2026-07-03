@@ -1,7 +1,7 @@
 export type DocumentGroup = 'naturaGiuridica' | 'visura' | 'servizioPubblico';
 export type UploadedDocument = {
   id: string;
-  group: DocumentGroup;
+  group?: DocumentGroup;
   name: string;
   title: string;
   file?: File;
@@ -27,4 +27,8 @@ export type RequiredDocument = {
     origin?: Array<string>;
   };
   storageOrigin: 'USER' | 'SYSTEM';
+};
+
+export type RequiredDocumentsEnabled = {
+  requiredDocumentsEnabled: boolean;
 };

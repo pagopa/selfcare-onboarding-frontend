@@ -7,7 +7,7 @@ import {
 import { storageTokenOps } from '@pagopa/selfcare-common-frontend/lib/utils/storage';
 import { InstitutionOnboardingInfoResource } from '../../types';
 import { fetchWithLogs } from '../lib/api-utils';
-import { RequiredDocument } from '../model/Documents';
+import { RequiredDocument, RequiredDocumentsEnabled } from '../model/Documents';
 import { ProductResource } from '../model/ProductResource';
 import { store } from '../redux/store';
 import { ENV } from '../utils/env';
@@ -339,7 +339,7 @@ export const OnboardingApi = {
     productId: string,
     institutionType: string,
     origin: string
-  ): Promise<boolean> => {
+  ): Promise<RequiredDocumentsEnabled> => {
     const data = await fetchWithLogsCall('REQUIRED_DOCUMENTS_ENABLED', {
       endpointParams: { productId },
       params: { institutionType, origin },

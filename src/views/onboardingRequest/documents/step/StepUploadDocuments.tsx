@@ -1,40 +1,13 @@
 import { Box, Grid, Step, StepLabel, Stepper, Typography } from '@mui/material';
-import { TFunction } from 'i18next';
-import { uniqueId } from 'lodash';
 import { Dispatch, SetStateAction, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { UploadedDocument } from '../../../model/Documents';
-import { DocumentCard } from './components/DocumentCard';
-import { DocumentUploader } from './components/DocumentUploader';
-import MultiDocumentCard from './components/MultiDocumentCard';
-
-const PDF_ACCEPT = { 'application/pdf': ['.pdf'] };
-
-export const buildInitialDocuments = (t: TFunction): Array<UploadedDocument> => [
-  {
-    id: uniqueId('natura-giuridica-'),
-    group: 'naturaGiuridica',
-    name: t('upladDocuments.uploader.first.name'),
-    title: '',
-  },
-  {
-    id: uniqueId('visura-'),
-    group: 'visura',
-    name: t('upladDocuments.uploader.second.name'),
-    title: '',
-  },
-  {
-    id: uniqueId('servizio-pubblico-'),
-    group: 'servizioPubblico',
-    name: t('upladDocuments.uploader.third.name'),
-    title: '',
-  },
-];
-
+import { RequiredDocument, UploadedDocument } from '../../../../model/Documents';
+import { DocumentCard } from '../components/DocumentCard';
+import { DocumentUploader } from '../components/DocumentUploader';
+import MultiDocumentCard from '../components/MultiDocumentCard';
 type Props = {
-  naturaGiuridica: UploadedDocument | undefined;
-  visura: UploadedDocument | undefined;
-  servizioPubblico: Array<UploadedDocument>;
+  requiredDocuments: Array<RequiredDocument>;
+  documents: Array<UploadedDocument>;
   setDocuments: Dispatch<SetStateAction<Array<UploadedDocument>>>;
   loading: boolean;
   forward: () => void;
@@ -42,9 +15,8 @@ type Props = {
 };
 
 const StepUploadDocuments = ({
-  naturaGiuridica,
-  visura,
-  servizioPubblico,
+  requiredDocuments,
+  documents,
   setDocuments,
   loading,
   forward,
@@ -53,6 +25,8 @@ const StepUploadDocuments = ({
   const { t } = useTranslation();
 
   const [activeStep, setActiveStep] = useState(0);
+  const PDF_ACCEPT = { 'application/pdf': ['.pdf'] };
+
   const handleNext = () => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
   };
@@ -67,9 +41,10 @@ const StepUploadDocuments = ({
   const removeDocument = (id: string) =>
     setDocuments((prev) => prev.filter((doc) => doc.id !== id));
 
-  const canSubmitServizio = servizioPubblico.every(
-    (doc) => !!doc.file && doc.title.trim().length > 0
-  );
+  const label = (labelKey: string, suffix: string, fallback: string) =>
+    t(`upladDocuments.uploader.${labelKey}.${suffix}`, { defaultValue: fallback });
+
+  const stepLabels = requiredDocuments.map((rd) => label(rd.labelKey, 'name', rd.name));
 
   const renderUploader = (doc: UploadedDocument) => (
     <DocumentUploader
@@ -84,50 +59,49 @@ const StepUploadDocuments = ({
     />
   );
 
-  const stepLabels = [
-    t('upladDocuments.uploader.first.name'),
-    t('upladDocuments.uploader.second.name'),
-    t('upladDocuments.uploader.third.name'),
-  ];
+  const steps: Array<React.ReactNode> = requiredDocuments.map((rd, index) => {
+    const docsForStep = documents.filter((d) => d.id === rd.id);
+    const isLast = index === requiredDocuments.length - 1;
+    const goForward = isLast ? forward : handleNext;
+    const max = rd.maxDocumentsRequired ?? 1;
 
-  const steps: Array<React.ReactNode> = [
-    <DocumentCard
-      key="naturaGiuridica"
-      title={t('upladDocuments.uploader.first.name')}
-      description={t('upladDocuments.uploader.first.cardDescription')}
-      helper={t('upladDocuments.uploader.helper')}
-      canSubmit={!!naturaGiuridica?.file}
-      forward={handleNext}
-      back={handleBack}
-      loading={loading}
-    >
-      {naturaGiuridica && renderUploader(naturaGiuridica)}
-    </DocumentCard>,
-    <DocumentCard
-      key="visura"
-      title={t('upladDocuments.uploader.second.name')}
-      description={t('upladDocuments.uploader.second.cardDescription')}
-      helper={t('upladDocuments.uploader.helper')}
-      canSubmit={!!visura?.file}
-      forward={handleNext}
-      back={handleBack}
-      loading={loading}
-    >
-      {visura && renderUploader(visura)}
-    </DocumentCard>,
-    <MultiDocumentCard
-      key="servizioPubblico"
-      servizioPubblico={servizioPubblico}
-      canSubmitServizio={canSubmitServizio}
-      handleNext={forward}
-      handleBack={handleBack}
-      updateDocument={updateDocument}
-      removeDocument={removeDocument}
-      renderUploader={renderUploader}
-      setDocuments={setDocuments}
-      loading={loading}
-    />,
-  ];
+    if (max > 1) {
+      return (
+        <MultiDocumentCard
+          key={rd.id}
+          requiredDocument={rd}
+          documents={docsForStep}
+          canSubmit={
+            docsForStep.length > 0 &&
+            docsForStep.every((d) => !!d.file && d.title.trim().length > 0)
+          }
+          handleNext={goForward}
+          handleBack={handleBack}
+          updateDocument={updateDocument}
+          removeDocument={removeDocument}
+          renderUploader={renderUploader}
+          setDocuments={setDocuments}
+          loading={loading}
+        />
+      );
+    }
+
+    const doc = docsForStep[0];
+    return (
+      <DocumentCard
+        key={rd.id}
+        title={label(rd.labelKey, 'cardTitle', rd.name)}
+        description={label(rd.labelKey, 'cardDescription', '')}
+        helper={t('upladDocuments.uploader.helper')}
+        canSubmit={!!doc?.file}
+        forward={goForward}
+        back={handleBack}
+        loading={loading}
+      >
+        {doc && renderUploader(doc)}
+      </DocumentCard>
+    );
+  });
 
   return (
     <Box display="flex" justifyContent="center" alignItems="center" width="100%">
