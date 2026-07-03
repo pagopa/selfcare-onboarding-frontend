@@ -14,6 +14,7 @@ import {
 } from '../../../types';
 import { BillingDataDto } from '../../model/BillingData';
 import { CountryResource } from '../../model/CountryResource';
+import { RequiredDocument } from '../../model/Documents';
 import { GeographicTaxonomyResource, nationalValue } from '../../model/GeographicTaxonomies';
 import { PDNDBusinessResource } from '../../model/PDNDBusinessResource';
 import { UoData } from '../../model/UoModel';
@@ -1524,6 +1525,36 @@ export const mockedPdndVisuraInfomacere: Array<PDNDBusinessResource> = [
   },
 ];
 
+export const mockedRequiredDocuments: Array<RequiredDocument> = [
+  {
+    id: 'statuto',
+    name: 'Statuto Ente',
+    labelKey: 'statuto',
+    required: true,
+    mimeType: 'application/pdf',
+    maxDocumentsRequired: 1,
+    storageOrigin: 'USER',
+  },
+  {
+    id: 'visura-camerale',
+    name: 'Visura Camerale',
+    labelKey: 'visura',
+    required: true,
+    mimeType: 'application/pdf',
+    maxDocumentsRequired: 1,
+    storageOrigin: 'USER',
+  },
+  {
+    id: 'attestazione-gsp',
+    name: 'Attestazione di gestione del servizio pubblico',
+    labelKey: 'attestazione-gsp',
+    required: true,
+    mimeType: 'application/pdf',
+    maxDocumentsRequired: 3,
+    storageOrigin: 'USER',
+  },
+];
+
 const noContent: Promise<AxiosResponse> = new Promise((resolve) =>
   resolve({
     status: 204,
@@ -2073,6 +2104,26 @@ export async function mockFetch(
     return new Promise((resolve) =>
       resolve({
         data: retrivedInstitutionsType,
+        status: 200,
+        statusText: '200',
+      } as AxiosResponse)
+    );
+  }
+
+  if (endpoint === 'REQUIRED_DOCUMENTS_ENABLED') {
+    return new Promise((resolve) =>
+      resolve({
+        data: { requiredDocumentsEnabled: true },
+        status: 200,
+        statusText: '200',
+      } as AxiosResponse)
+    );
+  }
+
+  if (endpoint === 'GET_REQUIRED_DOCUMENTS') {
+    return new Promise((resolve) =>
+      resolve({
+        data: mockedRequiredDocuments,
         status: 200,
         statusText: '200',
       } as AxiosResponse)

@@ -208,6 +208,12 @@ export const API = {
   ONBOARDING_GET_VISURA_INFOCAMERE_BY_REA: {
     URL: ENV.URL_API.PARTY_REGISTRY_PROXY + '/visura-infocamere-pdnd/institutions',
   },
+  REQUIRED_DOCUMENTS_ENABLED: {
+    URL: ENV.URL_API.ONBOARDING_V2 + '/v2/product/{{productId}}/required-documents/enabled',
+  },
+  GET_REQUIRED_DOCUMENTS: {
+    URL: ENV.URL_API.ONBOARDING_V2 + '/product/{{productId}}/required-documents',
+  },
 };
 
 export const USER_ROLE_LABEL = {

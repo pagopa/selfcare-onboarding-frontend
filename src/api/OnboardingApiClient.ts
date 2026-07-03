@@ -7,6 +7,7 @@ import {
 import { storageTokenOps } from '@pagopa/selfcare-common-frontend/lib/utils/storage';
 import { InstitutionOnboardingInfoResource } from '../../types';
 import { fetchWithLogs } from '../lib/api-utils';
+import { RequiredDocument } from '../model/Documents';
 import { ProductResource } from '../model/ProductResource';
 import { store } from '../redux/store';
 import { ENV } from '../utils/env';
@@ -16,8 +17,8 @@ import { CheckManagerResponse } from './generated/onboarding/CheckManagerRespons
 import { WithDefaultsT, createClient } from './generated/onboarding/client';
 import { GeographicTaxonomyResource } from './generated/onboarding/GeographicTaxonomyResource';
 import { InstitutionResourceArray } from './generated/onboarding/InstitutionResourceArray';
-import { OnboardingRequestResource } from './generated/onboarding/OnboardingRequestResource';
 import { OnboardingProductDto } from './generated/onboarding/OnboardingProductDto';
+import { OnboardingRequestResource } from './generated/onboarding/OnboardingRequestResource';
 import { OnboardingUserDto } from './generated/onboarding/OnboardingUserDto';
 import { OnboardingVerify } from './generated/onboarding/OnboardingVerify';
 import { OriginResponse } from './generated/onboarding/OriginResponse';
@@ -334,4 +335,25 @@ export const OnboardingApi = {
     institutionType?: string;
     verifyType?: string;
   }): Promise<void> => fetchWithLogsCall('VERIFY_ONBOARDING', { params, method: 'HEAD' }),
+  getRequiredDocumentsEnabled: async (
+    productId: string,
+    institutionType: string,
+    origin: string
+  ): Promise<boolean> => {
+    const data = await fetchWithLogsCall('REQUIRED_DOCUMENTS_ENABLED', {
+      endpointParams: { productId },
+      params: { institutionType, origin },
+    });
+    return data?.requiredDocumentsEnabled ?? false;
+  },
+
+  getRequiredDocuments: async (
+    productId: string,
+    institutionType: string,
+    origin: string
+  ): Promise<Array<RequiredDocument>> =>
+    fetchWithLogsCall('GET_REQUIRED_DOCUMENTS', {
+      endpointParams: { productId },
+      params: { institutionType, origin },
+    }),
 };
