@@ -486,7 +486,9 @@ export default {
       success: {
         product: {
           title: 'Adesione completata!',
+          titleCed: 'Accordo caricato correttamente',
           description: `Comunicheremo l'avvenuta adesione all'indirizzo PEC <1/> primario dell'ente. Da questo momento è possibile <3 />accedere all'Area Riservata.`,
+          descriptionCed: 'Invieremo una conferma all’indirizzo PEC primario dell’ente <1/> non appena l’approvazione sarà completata. Da quel <1/> momento, sarà possibile accedere alla Piattaforma. <1/> L’operazione potrebbe richiedere alcuni giorni. '
         },
         user: {
           title: 'Richiesta completata',

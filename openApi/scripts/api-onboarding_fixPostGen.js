@@ -17,3 +17,15 @@ regexReplace(
   'src/api/generated/onboarding/client.ts',
   { fileContentsOnly: true }
 );
+
+// The spec declares getInstitutionOnboardingInfoUsingGET at the path
+// "/v1/institutions/onboarding/" (trailing slash). Spring Boot 3 disabled
+// trailing-slash matching by default, so that request no longer hits the
+// controller and returns 400 "No static resource ...". Strip the trailing
+// slash from the generated URL so it matches "/v1/institutions/onboarding".
+regexReplace(
+  /\/v1\/institutions\/onboarding\/`/,
+  '/v1/institutions/onboarding`',
+  'src/api/generated/onboarding/client.ts',
+  { fileContentsOnly: true }
+);

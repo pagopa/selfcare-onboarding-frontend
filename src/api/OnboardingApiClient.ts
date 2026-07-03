@@ -180,8 +180,8 @@ export const OnboardingApi = {
         params: { institutionId, productId },
       });
     }
-    const result = await apiClient.getInstitutionOnboardingInfoUsingGET_1({
-      externalInstitutionId: institutionId,
+    const result = await apiClient.getInstitutionOnboardingInfoUsingGET({
+      institutionId,
       productId,
     });
     return extractResponse(result, 200, onRedirectToLogin, 401, 403, undefined);
