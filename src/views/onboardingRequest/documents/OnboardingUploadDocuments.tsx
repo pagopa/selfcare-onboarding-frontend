@@ -8,16 +8,17 @@ import { Trans, useTranslation } from 'react-i18next';
 import { useParams } from 'react-router';
 import { RequestOutcomeComplete } from '../../../../types';
 import { OnboardingVerify } from '../../../api/generated/onboarding/OnboardingVerify';
+import { ConfirmOnboardingModal } from '../../../components/modals/ConfirmOnboardingRequest';
 import { LoadingOverlay } from '../../../components/modals/LoadingOverlay';
 import { MessageNoAction } from '../../../components/shared/MessageNoAction';
 import { useHistoryState } from '../../../hooks/useHistoryState';
 import { HeaderContext, UserContext } from '../../../lib/context';
+import { RequiredDocument, UploadedDocument } from '../../../model/Documents';
 import {
-  ContractSummaryDocument,
-  RequiredDocument,
-  UploadedDocument,
-} from '../../../model/Documents';
-import { fetchRequiredDocuments, requiredDocumentsFlow } from '../../../services/documentServices';
+  fetchRequiredDocuments,
+  requiredDocumentsFlow,
+  submitDocuments,
+} from '../../../services/documentServices';
 import { verifyRequest } from '../../../services/tokenServices';
 import { customErrors } from '../../../utils/constants';
 import { getRequestJwt } from '../../../utils/getRequestJwt';
@@ -47,14 +48,11 @@ export default function OnboardingUploadDocuments() {
   );
   const [errorCode, setErrorCode] = useState<keyof typeof customErrors>('GENERIC');
   const [open, setOpen] = useState<boolean>(false);
+  const [openConfirmationModal, setOpenConfirmationModal] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [requestData, setRequestData] = useState<OnboardingVerify>();
   const [documents, setDocuments] = useState<Array<UploadedDocument>>([]);
   const translationKeyValue = 'product';
-  const naturaGiuridica = documents.find((d) => d.group === 'naturaGiuridica');
-  const visura = documents.find((d) => d.group === 'visura');
-  const servizioPubblico = documents.filter((d) => d.group === 'servizioPubblico');
-  const contractSummary: ContractSummaryDocument = [naturaGiuridica, visura, servizioPubblico];
   const [requiredDocumentsEnabled, setRequiredDocumentsEnabled] = useState<boolean>();
   const [requiredDocuments, setRequiredDocuments] = useState<Array<RequiredDocument>>([]);
   const addError = useErrorDispatcher();
@@ -107,13 +105,15 @@ export default function OnboardingUploadDocuments() {
   }, [requiredDocumentsEnabled, requestData?.productId]);
 
   useEffect(() => {
-    const retrivedDocuments = requiredDocuments.map((rd) => ({
-      id: uniqueId(`${rd.id}-`),
-      documentCode: rd.id,
-      name: rd.name,
-      title: '',
-      documentType: 'REQUIRED',
-    }));
+    const retrivedDocuments = requiredDocuments.map(
+      (rd): UploadedDocument => ({
+        id: uniqueId(`${rd.id}-`),
+        documentCode: rd.id,
+        name: rd.name,
+        title: '',
+        documentType: 'REQUIRED',
+      })
+    );
     setDocuments(retrivedDocuments);
   }, [requiredDocuments]);
 
@@ -126,6 +126,19 @@ export default function OnboardingUploadDocuments() {
   };
 
   const handleErrorModalConfirm = () => setOpen(false);
+
+  const handleConfirmSubmit = () => {
+    setOpenConfirmationModal(false);
+    void submitDocuments(
+      onboardingId as string,
+      requiredDocuments,
+      documents,
+      addError,
+      setLoading,
+      () => setOutcomeContentState('success'),
+      () => setOpen(true)
+    );
+  };
 
   const steps: Array<React.ReactNode> = [
     <StepUploadDocuments
@@ -142,8 +155,9 @@ export default function OnboardingUploadDocuments() {
     />,
     <UploadedContractsSummary
       key="summary"
-      contractSummary={contractSummary}
-      forward={() => console.log('submit')}
+      requiredDocuments={requiredDocuments}
+      documents={documents}
+      forward={() => setOpenConfirmationModal(true)}
       back={() => setActiveStep(0)}
     />,
   ];
@@ -250,6 +264,12 @@ export default function OnboardingUploadDocuments() {
         }
         onConfirmLabel={t('completeRegistration.sessionModal.onConfirmLabel')}
         onCloseLabel={t('completeRegistration.sessionModal.onCloseLabel')}
+      />
+      <ConfirmOnboardingModal
+        open={openConfirmationModal}
+        productName={productId2ProductTitle(requestData?.productId ?? '')}
+        onConfirm={handleConfirmSubmit}
+        handleClose={() => setOpenConfirmationModal(false)}
       />
     </>
   ) : (

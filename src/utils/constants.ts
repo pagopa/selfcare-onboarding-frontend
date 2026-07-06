@@ -212,7 +212,13 @@ export const API = {
     URL: ENV.URL_API.ONBOARDING_V2 + '/v2/product/{{productId}}/required-documents/enabled',
   },
   GET_REQUIRED_DOCUMENTS: {
-    URL: ENV.URL_API.ONBOARDING_V2 + '/product/{{productId}}/required-documents',
+    URL: ENV.URL_API.ONBOARDING_V2 + '/v2/product/{{productId}}/required-documents',
+  },
+  GET_ATTACHMENT_STATUS: {
+    URL: ENV.URL_API.ONBOARDING_V2 + '/v2/tokens/{{onboardingId}}/attachment/status?name={{name}}',
+  },
+  TRIGGER_ONBOARDING: {
+    URL: ENV.URL_API.ONBOARDING_V2 + '/v2/institutions/{{onboardingId}}',
   },
 };
 

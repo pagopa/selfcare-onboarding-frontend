@@ -2130,6 +2130,20 @@ export async function mockFetch(
     );
   }
 
+  if (endpoint === 'ONBOARDING_POST_ATTACHMENT') {
+    return noContent;
+  }
+
+  if (endpoint === 'GET_ATTACHMENT_STATUS') {
+    return new Promise((resolve) =>
+      resolve({ data: '', status: 200, statusText: '200' } as AxiosResponse)
+    );
+  }
+
+  if (endpoint === 'TRIGGER_ONBOARDING') {
+    return noContent;
+  }
+
   const msg = `NOT MOCKED REQUEST! {endpoint: ${endpoint}, endpointParams: ${JSON.stringify(
     endpointParams
   )}, params: ${JSON.stringify(params)}}`;

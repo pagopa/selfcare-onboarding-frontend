@@ -1,7 +1,7 @@
 import { AppError } from '@pagopa/selfcare-common-frontend/lib/model/AppError';
 import { Dispatch, SetStateAction } from 'react';
 import { OnboardingApi } from '../api/OnboardingApiClient';
-import { RequiredDocument } from '../model/Documents';
+import { RequiredDocument, UploadedDocument } from '../model/Documents';
 
 export const requiredDocumentsFlow = async (
   productId: string,
@@ -52,3 +52,47 @@ export const fetchRequiredDocuments = async (
   }
 };
 
+export const submitDocuments = async (
+  onboardingId: string,
+  requiredDocuments: Array<RequiredDocument>,
+  documents: Array<UploadedDocument>,
+  addError: (error: AppError) => void,
+  setLoading: Dispatch<SetStateAction<boolean>>,
+  onSuccess: () => void,
+  onError: () => void
+): Promise<void> => {
+  setLoading(true);
+  try {
+    for (const rd of requiredDocuments) {
+      const docs = documents.filter((d) => d.documentCode === rd.id);
+      const isMulti = (rd.maxDocumentsRequired ?? 1) > 1;
+      for (const [i, doc] of docs.entries()) {
+        if (!doc.file) {
+          continue;
+        }
+        const attachmentName = isMulti ? `${rd.id}-${i + 1}` : rd.id;
+        // eslint-disable-next-line no-await-in-loop
+        await OnboardingApi.uploadAttachment(
+          onboardingId,
+          attachmentName,
+          doc.file,
+          rd.id, // attachmentId (= documentCode)
+          doc.title || undefined // attachmentDescription (facoltativo)
+        );
+      }
+    }
+    await OnboardingApi.triggerOnboarding(onboardingId); // PUT idempotente
+    setLoading(false);
+    onSuccess();
+  } catch (error) {
+    setLoading(false);
+    addError({
+      id: 'SUBMIT_DOCUMENTS_ERROR',
+      blocking: false,
+      error: error as Error,
+      techDescription: 'Failed to upload documents / trigger onboarding',
+      toNotify: true,
+    });
+    onError();
+  }
+};

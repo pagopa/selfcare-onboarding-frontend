@@ -107,48 +107,59 @@ export default {
   upladDocuments: {
     title: 'Inserisci i documenti',
     subtitle: 'Carica qui i documenti necessari per completare la tua adesione.',
+    alert: {
+      required: {
+        title: 'Carica il file per proseguire.',
+        description: 'È un documento obbligatorio per l’adesione.',
+      },
+      // TODO copy da confermare con UX
+      fileTooLarge: {
+        title: 'Il file è troppo grande.',
+        description: 'Carica un documento in formato PDF di dimensione massima 1MB.',
+      },
+    },
     uploader: {
-      first: {
+      documentTitle: 'Titolo del documento',
+      addDocument: 'Aggiungi un altro documento',
+      drag: 'Trascina qui il documento',
+      upload: 'carica il file',
+      helper: 'Il file deve essere in formato PDF e la dimensione non deve superare 1MB',
+      delete: 'Rimuovi il file caricato',
+      statuto: {
         name: 'Natura giuridica',
         cardTitle: 'Documentazione sulla natura giuridica',
         cardDescription:
           'Carica l’atto costitutivo, lo statuto o altro documento che attesti la natura giuridica del tuo ente.',
       },
-      second: {
+      visura: {
         name: 'Visura',
         cardDescription:
           'Carica una visura aggiornata o un documento equivalente che contenga i dati identificativi del tuo ente.',
       },
-      third: {
+      'attestazione-gsp': {
         name: 'Gestione del servizio pubblico',
         cardTitle: 'Documentazione sulla gestione del servizio pubblico',
         cardDescription:
           'Carica i documenti che attestano che il tuo ente gestisce un servizio pubblico, ad esempio convenzioni, affidamenti o delibere.',
-        documentTitle: 'Titolo del documento',
-        addDocument: 'Aggiungi un altro documento',
       },
-      drag: 'Trascina qui il documento',
-      upload: 'carica il file',
-      helper: 'Il file deve essere in formato PDF e la dimensione non deve superare [TBD].',
-      delete: 'Rimuovi il file caricato',
     },
     contractSummary: {
       title: 'Riepilogo documenti caricati',
       subtitle: 'Controlla che i documenti caricati siano corretti prima di procedere',
-      firstDocument: {
+      formard: 'Continua',
+      back: 'Indietro',
+      statuto: {
         title: 'Documentazione attestante la natura giuridica',
         subtitle: 'Statuto in formato PDF',
       },
-      secondDocument: {
+      visura: {
         title: 'Visura camerale',
         subtitle: 'Visura in formato PDF',
       },
-      thirdDocument: {
+      'attestazione-gsp': {
         title: 'Attestazione di gestione del servizio pubblico',
         subtitle: 'Statuto o visura in formato PDF',
       },
-      formard: 'Continua',
-      back: 'Indietro',
     },
   },
   inlineSupportLink: {

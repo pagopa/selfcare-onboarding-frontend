@@ -1,16 +1,17 @@
 import { Box, Grid, Typography } from '@mui/material';
 import { useTranslation } from 'react-i18next';
-import { OnboardingStepActions } from '../../../components/registrationSteps/OnboardingStepActions';
-import { ContractSummaryDocument } from '../../../model/Documents';
-import ContractSummaryCard from './components/ContractSummaryCard';
+import { OnboardingStepActions } from '../../../../components/registrationSteps/OnboardingStepActions';
+import { RequiredDocument, UploadedDocument } from '../../../../model/Documents';
+import ContractSummaryCard from '../components/ContractSummaryCard';
 
 type Props = {
-  contractSummary: ContractSummaryDocument;
+  requiredDocuments: Array<RequiredDocument>;
+  documents: Array<UploadedDocument>;
   forward: () => void;
   back: () => void;
 };
 
-const UploadedContractsSummary = ({ contractSummary, forward, back }: Props) => {
+const UploadedContractsSummary = ({ requiredDocuments, documents, forward, back }: Props) => {
   const { t } = useTranslation();
 
   return (
@@ -34,15 +35,19 @@ const UploadedContractsSummary = ({ contractSummary, forward, back }: Props) => 
           </Typography>
         </Grid>
         <Grid item xs={12} mt={1}>
-          <Grid item xs={12} width="100%">
-            <ContractSummaryCard document={contractSummary[0]} tkey="firstDocument" />
-          </Grid>
-          <Grid item xs={12} width="100%">
-            <ContractSummaryCard document={contractSummary[1]} tkey="secondDocument" />
-          </Grid>
-          <Grid item xs={12} width="100%">
-            <ContractSummaryCard document={contractSummary[2]} tkey="thirdDocument" />
-          </Grid>
+          {requiredDocuments.map((rd) => {
+            const docsForRd = documents.filter((d) => d.documentCode === rd.id);
+            const max = rd.maxDocumentsRequired ?? 1;
+            return (
+              <Grid item xs={12} width="100%" key={rd.id}>
+                <ContractSummaryCard
+                  document={max > 1 ? docsForRd : docsForRd[0]}
+                  labelKey={rd.labelKey}
+                  name={rd.name}
+                />
+              </Grid>
+            );
+          })}
         </Grid>
         <Grid item xs={12} mt={1}>
           <Grid item xs={12} mt={1}>

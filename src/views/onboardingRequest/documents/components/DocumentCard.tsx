@@ -10,7 +10,6 @@ type DocumentCardProps = {
   forward: () => void;
   back: () => void;
   loading: boolean;
-  canSubmit: boolean;
   helper?: string;
 };
 
@@ -22,7 +21,6 @@ export const DocumentCard = ({
   forward,
   back,
   loading,
-  canSubmit,
 }: DocumentCardProps) => {
   const theme = useTheme();
   const { t } = useTranslation();
@@ -81,7 +79,7 @@ export const DocumentCard = ({
             forward={{
               action: forward,
               label: t('onboardingFormData.confirmLabel'),
-              disabled: !canSubmit || loading,
+              disabled: loading,
             }}
           />
         </Grid>

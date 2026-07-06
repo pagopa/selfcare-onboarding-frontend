@@ -1,20 +1,16 @@
-export type DocumentGroup = 'naturaGiuridica' | 'visura' | 'servizioPubblico';
 export type UploadedDocument = {
   id: string;
-  group?: DocumentGroup;
+  documentCode: string;
   name: string;
   title: string;
   file?: File;
+  documentType?: DocumentType;
+  documentOrigin?: string;
 };
-
-export type ContractSummaryDocument = [
-  naturaGiuridica: UploadedDocument | undefined,
-  visura: UploadedDocument | undefined,
-  servizioPubblico: Array<UploadedDocument>,
-];
 
 export type DocumentType = 'REQUIRED' | 'GENERIC';
 
+// Mirrors RequiredDocumentModel in the BFF swagger (onboarding-api-docs.json).
 export type RequiredDocument = {
   id: string;
   name: string;
@@ -22,10 +18,6 @@ export type RequiredDocument = {
   required: boolean;
   mimeType: string;
   maxDocumentsRequired?: number;
-  filter?: {
-    institutionType?: Array<string>;
-    origin?: Array<string>;
-  };
   storageOrigin: 'USER' | 'SYSTEM';
 };
 

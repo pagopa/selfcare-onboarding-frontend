@@ -7,10 +7,11 @@ import UploadedDocumentComponent from './UploadedDocument';
 
 type Props = {
   document: UploadedDocument | Array<UploadedDocument> | undefined;
-  tkey: string;
+  labelKey: string;
+  name: string;
 };
 
-const ContractSummaryCard = ({ document, tkey }: Props) => {
+const ContractSummaryCard = ({ document, labelKey, name }: Props) => {
   const { t } = useTranslation();
   return (
     <Paper
@@ -37,10 +38,12 @@ const ContractSummaryCard = ({ document, tkey }: Props) => {
             sx={{ fontWeight: 'fontWeightBold' }}
             mb={1}
           >
-            {t(`upladDocuments.contractSummary.${tkey}.title`).toUpperCase()}
+            {t(`upladDocuments.contractSummary.${labelKey}.title`, {
+              defaultValue: name,
+            }).toUpperCase()}
           </Typography>
           <Typography sx={{ fontWeight: 400 }} variant="body2" mb={3}>
-            {t(`upladDocuments.contractSummary.${tkey}.subtitle`)}
+            {t(`upladDocuments.contractSummary.${labelKey}.subtitle`)}
           </Typography>
         </Grid>
         {!isArray(document) ? (

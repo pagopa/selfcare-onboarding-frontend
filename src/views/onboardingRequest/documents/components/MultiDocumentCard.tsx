@@ -2,7 +2,7 @@ import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import CloseIcon from '@mui/icons-material/Close';
 import { Box, Grid, IconButton, Link, Paper, TextField, Typography, useTheme } from '@mui/material';
 import { uniqueId } from 'lodash';
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, ReactNode, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import { OnboardingStepActions } from '../../../../components/registrationSteps/OnboardingStepActions';
 import { RequiredDocument, UploadedDocument } from '../../../../model/Documents';
@@ -10,7 +10,6 @@ import { RequiredDocument, UploadedDocument } from '../../../../model/Documents'
 type Props = {
   requiredDocument: RequiredDocument;
   documents: Array<UploadedDocument>;
-  canSubmit: boolean;
   handleNext: () => void;
   handleBack: () => void;
   updateDocument: (id: string, updates: Partial<UploadedDocument>) => void;
@@ -18,12 +17,12 @@ type Props = {
   renderUploader: (doc: UploadedDocument) => JSX.Element;
   setDocuments: Dispatch<SetStateAction<Array<UploadedDocument>>>;
   loading: boolean;
+  alert?: ReactNode;
 };
 
 const MultiDocumentCard = ({
   requiredDocument,
   documents,
-  canSubmit,
   handleNext,
   handleBack,
   updateDocument,
@@ -31,6 +30,7 @@ const MultiDocumentCard = ({
   renderUploader,
   setDocuments,
   loading,
+  alert,
 }: Props) => {
   const theme = useTheme();
   const { t } = useTranslation();
@@ -65,7 +65,7 @@ const MultiDocumentCard = ({
             }}
           >
             {index === 0 ? (
-              <Box mb={3}>
+              <Box mb={3} width="100%" textAlign="left">
                 <Typography
                   component="div"
                   variant="caption"
@@ -74,7 +74,7 @@ const MultiDocumentCard = ({
                 >
                   {t(`upladDocuments.uploader.${requiredDocument.labelKey}.cardTitle`, {
                     defaultValue: requiredDocument.name,
-                  })}
+                  }).toUpperCase()}
                 </Typography>
                 <Typography sx={{ fontWeight: 400 }} variant="body2">
                   {t(`upladDocuments.uploader.${requiredDocument.labelKey}.cardDescription`, {
@@ -95,11 +95,12 @@ const MultiDocumentCard = ({
             <TextField
               fullWidth
               size="small"
-              label={t('upladDocuments.uploader.third.documentTitle')}
+              label={t('upladDocuments.uploader.documentTitle')}
               value={doc.title}
               onChange={(e) => updateDocument(doc.id, { title: e.target.value })}
               sx={{ mb: 2 }}
             />
+            {index === 0 && alert}
             {renderUploader(doc)}
           </Paper>
         ))}
@@ -113,7 +114,7 @@ const MultiDocumentCard = ({
               sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
             >
               <AddOutlinedIcon fontSize="small" />
-              {t('upladDocuments.uploader.third.addDocument')}
+              {t('upladDocuments.uploader.addDocument')}
             </Link>
           </Box>
         )}
@@ -128,7 +129,7 @@ const MultiDocumentCard = ({
             forward={{
               action: handleNext,
               label: t('onboardingFormData.confirmLabel'),
-              disabled: !canSubmit || loading,
+              disabled: loading,
             }}
           />
         </Grid>
