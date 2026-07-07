@@ -116,6 +116,13 @@ export const searchUserId = async (
         subProduct,
         requestId
       );
+    } else {
+      validateUserData(
+        people['manager-initial'],
+        'manager-initial',
+        externalInstitutionId,
+        subProduct
+      );
     }
   } catch (error) {
     addError({
