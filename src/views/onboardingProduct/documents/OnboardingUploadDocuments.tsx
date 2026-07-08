@@ -22,13 +22,13 @@ import {
 import { verifyRequest } from '../../../services/tokenServices';
 import { customErrors } from '../../../utils/constants';
 import { getRequestJwt } from '../../../utils/getRequestJwt';
-import CompleteRequest from '../complete/CompleteRequest';
-import { CompleteRequestFailPage } from '../complete/pages/CompleteRequestFailPage';
-import CompleteRequestSuccessPage from '../complete/pages/CompleteRequestSuccessPage';
-import AlreadyCompletedRequest from '../status/AlreadyCompletedPage';
-import AlreadyRejectedRequest from '../status/AlreadyRejectedPage';
-import ExpiredRequestPage from '../status/ExpiredPage';
-import NotFoundPage from '../status/NotFoundPage';
+import CompleteRequest from '../../onboardingRequest/complete/CompleteRequest';
+import { CompleteRequestFailPage } from '../../onboardingRequest/complete/pages/CompleteRequestFailPage';
+import CompleteRequestSuccessPage from '../../onboardingRequest/complete/pages/CompleteRequestSuccessPage';
+import AlreadyCompletedRequest from '../../onboardingRequest/status/AlreadyCompletedPage';
+import AlreadyRejectedRequest from '../../onboardingRequest/status/AlreadyRejectedPage';
+import ExpiredRequestPage from '../../onboardingRequest/status/ExpiredPage';
+import NotFoundPage from '../../onboardingRequest/status/NotFoundPage';
 import StepUploadDocuments from './step/StepUploadDocuments';
 import UploadedContractsSummary from './step/UploadedContractsSummary';
 

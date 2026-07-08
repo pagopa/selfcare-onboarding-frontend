@@ -72,7 +72,10 @@ export const postOnboardingSubmit = async (
   users: Array<UserOnCreate>,
   loggedUser: User | null,
   aggregates?: Array<AggregateInstitution>,
-  onSuccess?: () => void
+  onSuccess?: () => void,
+  // GSP non-IPA: when provided, on success drives the in-flow document upload instead of the
+  // standard "check your email" outcome (the onboarding is created in REQUESTING first).
+  onRequiredDocuments?: () => void
   // eslint-disable-next-line sonarjs/cognitive-complexity
 ) => {
   setLoading(true);
@@ -175,7 +178,11 @@ export const postOnboardingSubmit = async (
       party_id: externalInstitutionId,
       product_id: productId,
     });
-    setOutcome(outcomeContent[outcome as keyof RequestOutcomeOptions]);
+    if (onRequiredDocuments) {
+      onRequiredDocuments();
+    } else {
+      setOutcome(outcomeContent[outcome as keyof RequestOutcomeOptions]);
+    }
     onSuccess?.();
   } else {
     const responseStatus = status;

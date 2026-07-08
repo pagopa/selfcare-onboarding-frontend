@@ -5,7 +5,6 @@ import OnboardingPremium from '../views/onboardingPremium/OnboardingPremium';
 import OnboardingProduct from '../views/onboardingProduct/OnboardingProduct';
 import CancelRequest from '../views/onboardingRequest/cancel/CancelRequest';
 import CompleteRequest from '../views/onboardingRequest/complete/CompleteRequest';
-import OnboardingUploadDocuments from '../views/onboardingRequest/documents/OnboardingUploadDocuments';
 import DownloadCsvFile from '../views/onboardingRequest/download/DownloadCsvFile';
 import OnboardingUser from '../views/onboardingUser/OnboardingUser';
 import { ENV } from './env';
@@ -38,7 +37,7 @@ export const ROUTES: RoutesObject = {
   REGISTRATION_FINALIZE_COMPLETE: {
     PATH: `${BASE_ROUTE}/confirm`,
     LABEL: 'Complete onboarding request',
-    COMPONENT: OnboardingUploadDocuments,
+    COMPONENT: CompleteRequest,
   },
   REGISTRATION_FINALIZE_REJECT: {
     PATH: `${BASE_ROUTE}/cancel`,
@@ -219,6 +218,9 @@ export const API = {
   },
   TRIGGER_ONBOARDING: {
     URL: ENV.URL_API.ONBOARDING_V2 + '/v2/institutions/{{onboardingId}}',
+  },
+  ONBOARDING_GET_ONBOARDINGS: {
+    URL: ENV.URL_API.ONBOARDING_V2 + '/v2/institutions/onboardings',
   },
 };
 

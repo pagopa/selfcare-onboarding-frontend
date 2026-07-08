@@ -21,6 +21,7 @@ import { GeographicTaxonomyResource } from './generated/onboarding/GeographicTax
 import { InstitutionResourceArray } from './generated/onboarding/InstitutionResourceArray';
 import { OnboardingProductDto } from './generated/onboarding/OnboardingProductDto';
 import { OnboardingRequestResource } from './generated/onboarding/OnboardingRequestResource';
+import { OnboardingResult } from './generated/onboarding/OnboardingResult';
 import { OnboardingUserDto } from './generated/onboarding/OnboardingUserDto';
 import { OnboardingVerify } from './generated/onboarding/OnboardingVerify';
 import { OriginResponse } from './generated/onboarding/OriginResponse';
@@ -361,4 +362,11 @@ export const OnboardingApi = {
   //   const result = await apiClient.triggerOnboardingRequest({ onboardingId });
   //   return extractResponse(result, 204, onRedirectToLogin, 401, 403, undefined);
   triggerOnboarding: async (_onboardingId: string): Promise<void> => undefined,
+  // GET /v2/institutions/onboardings?taxCode&status → OnboardingResult[] (id = onboardingId)
+  // TEMPORARY DEV MOCK — backend not ready. Restore when available:
+  //   const result = await apiClient.getOnboardingInfo({ taxCode, status });
+  //   return extractResponse(result, 200, onRedirectToLogin, 401, 403, undefined);
+  getOnboardings: async (_taxCode: string, status?: string): Promise<Array<OnboardingResult>> => [
+    { id: 'mock-onboarding-id', status: status ?? 'REQUESTING', productId: 'prod-pagopa' },
+  ],
 };

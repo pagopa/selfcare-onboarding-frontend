@@ -45,6 +45,8 @@ import {
 } from '../../utils/institutionTypeUtils';
 import { triggerQualtricsIntercept } from '../../utils/qualtricsUtils';
 import { registerUnloadEvent, unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
+import { OnboardingApi } from '../../api/OnboardingApiClient';
+import UploadDocumentsFlow from './documents/UploadDocumentsFlow';
 import { createBackFunctions } from './components/backwards/backFunctions';
 import { createForwardFunctions } from './components/forwards/forwardFunctions';
 import { StepAddAdmin } from './components/StepAddAdmin';
@@ -86,6 +88,12 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
   const [formData, setFormData] = useState<Partial<FormData>>();
   const [externalInstitutionId, setExternalInstitutionId] = useState<string>('');
   const [outcome, setOutcome] = useState<RequestOutcomeMessage | null>();
+  const [uploadDocumentsContext, setUploadDocumentsContext] = useState<{
+    onboardingId: string;
+    productId: string;
+    institutionType: string;
+    origin: string;
+  } | null>(null);
   const history = useHistory();
   const [openExitModal, setOpenExitModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>();
@@ -204,6 +212,29 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     ],
   };
 
+  // GSP non-IPA + pagoPA: after creating the onboarding request, enter the in-flow document
+  // upload instead of the standard "check your email" outcome.
+  const isRequiredDocumentsFlow =
+    isGlobalServiceProvider(institutionType) && origin !== 'IPA' && isPagoPaProduct(productId);
+
+  const enterRequiredDocumentsFlow = () => {
+    void OnboardingApi.getOnboardings(onboardingFormData?.taxCode ?? '', 'REQUESTING')
+      .then((onboardings) => {
+        const onboardingId = onboardings.find((o) => o.productId === productId)?.id;
+        if (onboardingId && institutionType && origin) {
+          setUploadDocumentsContext({
+            onboardingId,
+            productId,
+            institutionType: institutionType as string,
+            origin,
+          });
+        } else {
+          setOutcome(outcomeContent.success);
+        }
+      })
+      .catch(() => setOutcome(outcomeContent.success));
+  };
+
   const onSubmit = (
     userData?: Partial<FormData> | undefined,
     aggregates?: Array<AggregateInstitution>,
@@ -242,7 +273,8 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           productId,
           institutionType: institutionType ?? '',
         });
-      }
+      },
+      isRequiredDocumentsFlow ? enterRequiredDocumentsFlow : undefined
     ).catch(() => {
       trackEvent('ONBOARDING_ADD_DELEGATE', {
         request_id: requestIdRef.current,
@@ -597,6 +629,9 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           isAddApplicationEmail: (formData as any)?.users?.every(
             (u: UserOnCreate) => u.taxCode !== user?.taxCode
           ),
+          // GSP non-IPA: skip the pre-submit confirmation modal — it moves to the end of the
+          // document upload flow instead.
+          isRequiredDocumentsFlow,
           forward: forwardFromAdmin,
           back: backFromAdmin,
         }),
@@ -649,6 +684,14 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
 
   return selectedProduct === null ? (
     <NoProductPage />
+  ) : uploadDocumentsContext ? (
+    <UploadDocumentsFlow
+      {...uploadDocumentsContext}
+      onSuccess={() => {
+        setUploadDocumentsContext(null);
+        setOutcome(outcomeContent.success);
+      }}
+    />
   ) : outcome && activeStep > 2 ? (
     <MessageNoAction {...outcome} />
   ) : pricingPlan && pricingPlan !== 'FA' ? (
