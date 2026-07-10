@@ -24,6 +24,21 @@ type QualtricsConfig = {
   siteId: string;
 };
 
+// OneTrust cookie category the Qualtrics survey belongs to (Performance/Analytics),
+// same group used to gate Mixpanel analytics in @pagopa/selfcare-common-frontend.
+const QUALTRICS_COOKIE_GROUP = 'C0002';
+
+/**
+ * Returns true only if the user has granted consent for the given OneTrust cookie
+ * group. Consent is read from the `OptanonConsent` cookie, where an accepted group
+ * is encoded as `<group>:1` (URL-encoded as `<group>%3A1`).
+ */
+export const hasCookieConsent = (group: string = QUALTRICS_COOKIE_GROUP): boolean => {
+  const optanonConsent =
+    document.cookie.split('; ').find((row) => row.startsWith('OptanonConsent=')) ?? '';
+  return optanonConsent.includes(`${group}%3A1`);
+};
+
 const loadQualtricsScript = (config: QualtricsConfig): Promise<void> =>
   new Promise((resolve) => {
     const container = document.createElement('div');
@@ -41,6 +56,11 @@ export const triggerQualtricsIntercept = async (
   data: QualtricsData,
   config: QualtricsConfig = { scriptUrl: ENV.QUALTRICS.SCRIPT_URL, siteId: ENV.QUALTRICS.SITE_ID }
 ): Promise<void> => {
+  // The survey may only be shown if the user has accepted the related cookies.
+  if (!hasCookieConsent()) {
+    return;
+  }
+
   (window as any).institutionDescription = data.institutionDescription ?? '';
   (window as any).productId = data.productId;
   (window as any).institutionType = data.institutionType ?? '';
