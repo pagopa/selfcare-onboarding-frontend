@@ -1,4 +1,5 @@
 import '@testing-library/jest-dom';
+import { screen, waitFor } from '@testing-library/react';
 import { test, vi } from 'vitest';
 import '../../../locale';
 import { PRODUCT_IDS } from '../../../utils/constants';
@@ -83,9 +84,10 @@ test('Test: Successfull complete onboarding request of GSP party without searchi
   await executeStepBillingData(PRODUCT_IDS.PAGOPA, 'GSP', false, false, 'NO_IPA', 'AGENCY X');
   await executeStepAdditionalInfo('NO_IPA');
   await executeStepAddManager(false);
-  await executeStepAddAdmin(true, false, false, false, false, false);
+  await executeStepAddAdmin(true, false, false, false, false, false, undefined, true);
   await verifySubmit(PRODUCT_IDS.PAGOPA, 'GSP', fetchWithLogsSpy, 'NO_IPA');
-  await executeGoHome(mockedLocation);
+  // GSP non-IPA lands on the required documents upload flow instead of the outcome page
+  await waitFor(() => screen.getByText('Inserisci i documenti'));
 });
 
 test('Test: Successfull complete onboarding request of GPU for product prod-pagopa', async () => {
