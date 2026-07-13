@@ -59,6 +59,13 @@ import StepContractsSummary from './components/contracts/StepContractsSummary';
 
 export type ValidateErrorType = 'conflictError';
 
+type UploadDocumentsContext = {
+  onboardingId: string;
+  productId: string;
+  institutionType: string;
+  origin: string;
+} | null;
+
 export const prodPhaseOutErrorPage: RequestOutcomeMessage = {
   title: '',
   description: [
@@ -88,12 +95,8 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
   const [formData, setFormData] = useState<Partial<FormData>>();
   const [externalInstitutionId, setExternalInstitutionId] = useState<string>('');
   const [outcome, setOutcome] = useState<RequestOutcomeMessage | null>();
-  const [uploadDocumentsContext, setUploadDocumentsContext] = useState<{
-    onboardingId: string;
-    productId: string;
-    institutionType: string;
-    origin: string;
-  } | null>(null);
+  const [uploadDocumentsContext, setUploadDocumentsContext] = useState<UploadDocumentsContext>(null);
+  const createdOnboardingRef = useRef<UploadDocumentsContext>(null);
   const history = useHistory();
   const [openExitModal, setOpenExitModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>();
@@ -212,8 +215,6 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     ],
   };
 
-  // GSP non-IPA + pagoPA: after creating the onboarding request, enter the in-flow document
-  // upload instead of the standard "check your email" outcome.
   const isRequiredDocumentsFlow =
     isGlobalServiceProvider(institutionType) && origin !== 'IPA' && isPagoPaProduct(productId);
 
@@ -222,12 +223,14 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
       .then((onboardings) => {
         const onboardingId = onboardings.find((o) => o.productId === productId)?.id;
         if (onboardingId && institutionType && origin) {
-          setUploadDocumentsContext({
+          // eslint-disable-next-line functional/immutable-data
+          createdOnboardingRef.current = {
             onboardingId,
             productId,
             institutionType: institutionType as string,
             origin,
-          });
+          };
+          setUploadDocumentsContext(createdOnboardingRef.current);
         } else {
           setOutcome(outcomeContent.success);
         }
@@ -240,6 +243,10 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     aggregates?: Array<AggregateInstitution>,
     updatedOnboardingFormData?: OnboardingFormData
   ) => {
+    if (createdOnboardingRef.current) {
+      setUploadDocumentsContext(createdOnboardingRef.current);
+      return;
+    }
     const data = userData ?? formData;
     const users = ((data as any).users as Array<UserOnCreate>)?.map((u) => ({
       ...u,
@@ -688,6 +695,8 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     <UploadDocumentsFlow
       {...uploadDocumentsContext}
       onSuccess={() => {
+        // eslint-disable-next-line functional/immutable-data
+        createdOnboardingRef.current = null;
         setUploadDocumentsContext(null);
         setOutcome(outcomeContent.success);
       }}
