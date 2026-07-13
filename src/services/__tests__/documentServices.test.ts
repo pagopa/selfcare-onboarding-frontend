@@ -93,7 +93,7 @@ it('test submitDocuments uploads each file then triggers onboarding and calls on
 
   expect(OnboardingApi.uploadAttachment).toHaveBeenCalledWith(
     'onb-1',
-    'statuto',
+    'statuto.pdf',
     file,
     'statuto',
     undefined
