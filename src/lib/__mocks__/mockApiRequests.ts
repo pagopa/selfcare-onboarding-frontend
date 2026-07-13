@@ -2144,6 +2144,22 @@ export async function mockFetch(
     return noContent;
   }
 
+  if (endpoint === 'ONBOARDING_GET_ONBOARDINGS') {
+    return new Promise((resolve) =>
+      resolve({
+        data: [
+          {
+            id: 'mock-onboarding-id',
+            status: (params as any)?.status ?? 'REQUESTING',
+            productId: 'prod-pagopa',
+          },
+        ],
+        status: 200,
+        statusText: '200',
+      } as AxiosResponse)
+    );
+  }
+
   const msg = `NOT MOCKED REQUEST! {endpoint: ${endpoint}, endpointParams: ${JSON.stringify(
     endpointParams
   )}, params: ${JSON.stringify(params)}}`;

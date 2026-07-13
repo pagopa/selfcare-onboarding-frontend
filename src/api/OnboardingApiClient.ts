@@ -12,8 +12,6 @@ import { ProductResource } from '../model/ProductResource';
 import { store } from '../redux/store';
 import { ENV } from '../utils/env';
 import { isMockEnvironment } from '../utils/institutionTypeUtils';
-// TEMPORARY DEV MOCK for required-documents (backend not ready). See mocks/requiredDocuments.ts.
-import { mockRequiredDocuments } from './mocks/requiredDocuments';
 import { CheckManagerDto } from './generated/onboarding/CheckManagerDto';
 import { CheckManagerResponse } from './generated/onboarding/CheckManagerResponse';
 import { WithDefaultsT, createClient } from './generated/onboarding/client';
@@ -254,24 +252,38 @@ export const OnboardingApi = {
     const result = await apiClient.completeOnboardingUsersUsingPOST({ onboardingId, contract });
     return extractResponse(result, 204, onRedirectToLogin, 401, 403, undefined);
   },
-  // POST /v2/tokens/{onboardingId}/attachment?attachmentName={attachmentName}
-  // TEMPORARY DEV MOCK — backend not ready. NOTE: this endpoint is also used by the legacy
-  // attachments flow (requestStatusServices), so while mocked that upload is a no-op too.
-  // Restore when backend ready:
-  //   const formData = new FormData();
-  //   formData.append('attachment', attachment);
-  //   if (attachmentId) formData.append('attachmentId', attachmentId);
-  //   if (attachmentDescription) formData.append('attachmentDescription', attachmentDescription);
-  //   return fetchWithLogsCall('ONBOARDING_POST_ATTACHMENT', {
-  //     endpointParams: { onboardingId, filename: attachmentName }, data: formData, method: 'POST',
-  //   });
   uploadAttachment: async (
-    _onboardingId: string,
-    _attachmentName: string,
-    _attachment: File,
-    _attachmentId?: string,
-    _attachmentDescription?: string
-  ): Promise<void> => undefined,
+    onboardingId: string,
+    attachmentName: string,
+    attachment: File,
+    attachmentId?: string,
+    attachmentDescription?: string
+  ): Promise<void> => {
+    /* istanbul ignore if */
+    if (isMockEnvironment()) {
+      const formData = new FormData();
+      formData.append('attachment', attachment);
+      if (attachmentId) {
+        formData.append('attachmentId', attachmentId);
+      }
+      if (attachmentDescription) {
+        formData.append('attachmentDescription', attachmentDescription);
+      }
+      return fetchWithLogsCall('ONBOARDING_POST_ATTACHMENT', {
+        endpointParams: { onboardingId, filename: attachmentName },
+        data: formData,
+        method: 'POST',
+      });
+    }
+    const result = await apiClient.uploadAttachmentUsingPOST({
+      onboardingId,
+      attachmentName,
+      attachment,
+      attachmentId,
+      attachmentDescription,
+    });
+    return extractResponse(result, 204, onRedirectToLogin, 401, 403, undefined);
+  },
   onboardingInstitution: async (body: OnboardingProductDto): Promise<void> => {
     /* istanbul ignore if */
     if (isMockEnvironment()) {
@@ -334,39 +346,69 @@ export const OnboardingApi = {
     institutionType?: string;
     verifyType?: string;
   }): Promise<void> => fetchWithLogsCall('VERIFY_ONBOARDING', { params, method: 'HEAD' }),
-  // GET /v2/product/{productId}/required-documents/enabled
-  // TEMPORARY DEV MOCK — backend not ready. Restore when available:
-  //   const result = await apiClient.isRequiredDocumentsEnabled({ productId, institutionType, origin });
-  //   return extractResponse(result, 200, onRedirectToLogin, 401, 403, undefined);
   getRequiredDocumentsEnabled: async (
-    _productId: string,
-    _institutionType: string,
-    _origin: string
-  ): Promise<RequiredDocumentsEnabled> => ({ requiredDocumentsEnabled: true }),
-  // GET /v2/product/{productId}/required-documents
-  // TEMPORARY DEV MOCK — backend not ready. Restore when available:
-  //   const result = await apiClient.getRequiredDocuments({ productId, institutionType, origin });
-  //   return extractResponse(result, 200, onRedirectToLogin, 401, 403, undefined);
+    productId: string,
+    institutionType: string,
+    origin: string
+  ): Promise<RequiredDocumentsEnabled> => {
+    /* istanbul ignore if */
+    if (isMockEnvironment()) {
+      return fetchWithLogsCall('REQUIRED_DOCUMENTS_ENABLED', {
+        endpointParams: { productId },
+        params: { institutionType, origin },
+      });
+    }
+    const result = await apiClient.isRequiredDocumentsEnabled({
+      productId,
+      institutionType,
+      origin,
+    });
+    const response = await extractResponse(result, 200, onRedirectToLogin, 401, 403, undefined);
+    return response as RequiredDocumentsEnabled;
+  },
   getRequiredDocuments: async (
-    _productId: string,
-    _institutionType: string,
-    _origin: string
-  ): Promise<Array<RequiredDocument>> => mockRequiredDocuments,
-  // GET /v2/tokens/{onboardingId}/attachment/status
-  // TEMPORARY DEV MOCK — backend not ready. Restore when available:
-  //   const result = await apiClient.getAttachmentStatusUsingGET({ onboardingId, name });
-  //   return extractResponse(result, 200, onRedirectToLogin, 401, 403, undefined);
-  getAttachmentStatus: async (_onboardingId: string, _name: string): Promise<void> => undefined,
-  // PUT /v2/institutions/{onboardingId}
-  // TEMPORARY DEV MOCK — backend not ready. Restore when available:
-  //   const result = await apiClient.triggerOnboardingRequest({ onboardingId });
-  //   return extractResponse(result, 204, onRedirectToLogin, 401, 403, undefined);
-  triggerOnboarding: async (_onboardingId: string): Promise<void> => undefined,
-  // GET /v2/institutions/onboardings?taxCode&status → OnboardingResult[] (id = onboardingId)
-  // TEMPORARY DEV MOCK — backend not ready. Restore when available:
-  //   const result = await apiClient.getOnboardingInfo({ taxCode, status });
-  //   return extractResponse(result, 200, onRedirectToLogin, 401, 403, undefined);
-  getOnboardings: async (_taxCode: string, status?: string): Promise<Array<OnboardingResult>> => [
-    { id: 'mock-onboarding-id', status: status ?? 'REQUESTING', productId: 'prod-pagopa' },
-  ],
+    productId: string,
+    institutionType: string,
+    origin: string
+  ): Promise<Array<RequiredDocument>> => {
+    /* istanbul ignore if */
+    if (isMockEnvironment()) {
+      return fetchWithLogsCall('GET_REQUIRED_DOCUMENTS', {
+        endpointParams: { productId },
+        params: { institutionType, origin },
+      });
+    }
+    const result = await apiClient.getRequiredDocuments({ productId, institutionType, origin });
+    const response = await extractResponse(result, 200, onRedirectToLogin, 401, 403, undefined);
+    return response as Array<RequiredDocument>;
+  },
+  getAttachmentStatus: async (onboardingId: string, name: string): Promise<void> => {
+    /* istanbul ignore if */
+    if (isMockEnvironment()) {
+      return fetchWithLogsCall('GET_ATTACHMENT_STATUS', {
+        endpointParams: { onboardingId, name },
+      });
+    }
+    const result = await apiClient.getAttachmentStatusUsingGET({ onboardingId, name });
+    return extractResponse(result, 200, onRedirectToLogin, 401, 403, undefined);
+  },
+  triggerOnboarding: async (onboardingId: string): Promise<void> => {
+    /* istanbul ignore if */
+    if (isMockEnvironment()) {
+      return fetchWithLogsCall('TRIGGER_ONBOARDING', {
+        endpointParams: { onboardingId },
+        method: 'PUT',
+      });
+    }
+    const result = await apiClient.triggerOnboardingRequest({ onboardingId });
+    return extractResponse(result, 204, onRedirectToLogin, 401, 403, undefined);
+  },
+  getOnboardings: async (taxCode: string, status: string): Promise<Array<OnboardingResult>> => {
+    /* istanbul ignore if */
+    if (isMockEnvironment()) {
+      return fetchWithLogsCall('ONBOARDING_GET_ONBOARDINGS', { params: { taxCode, status } });
+    }
+    const result = await apiClient.getOnboardingInfo({ taxCode, status });
+    return extractResponse(result, 200, onRedirectToLogin, 401, 403, undefined);
+  },
 };
