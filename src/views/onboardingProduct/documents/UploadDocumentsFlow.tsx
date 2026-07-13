@@ -16,21 +16,17 @@ type Props = {
   productId: string;
   institutionType: string;
   origin: string;
-  // On successful upload + trigger, the parent shows the standard "richiesta inviata" outcome.
   onSuccess: () => void;
+  back: () => void;
 };
 
-/**
- * In-flow document upload for GSP non-IPA: rendered right after the onboarding request
- * is created (not via the email /confirm link). Receives the already-known context, so
- * it does NOT verify a token — it just fetches required documents and drives upload + trigger.
- */
 const UploadDocumentsFlow = ({
   onboardingId,
   productId,
   institutionType,
   origin,
   onSuccess,
+  back,
 }: Props) => {
   const { t } = useTranslation();
   const addError = useErrorDispatcher();
@@ -90,6 +86,7 @@ const UploadDocumentsFlow = ({
           setDocuments={setDocuments}
           loading={loading}
           forward={() => setActiveStep(1)}
+          back={back}
         />
       ) : (
         <UploadedContractsSummary

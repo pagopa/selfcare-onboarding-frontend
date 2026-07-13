@@ -691,6 +691,10 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
         setUploadDocumentsContext(null);
         setOutcome(outcomeContent.success);
       }}
+      back={() => {
+        setUploadDocumentsContext(null);
+        setActiveStep(steps.findIndex((step) => step.label === 'Insert admins data'));
+      }}
     />
   ) : outcome && activeStep > 2 ? (
     <MessageNoAction {...outcome} />

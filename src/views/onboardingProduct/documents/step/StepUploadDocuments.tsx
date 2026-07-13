@@ -15,6 +15,7 @@ type Props = {
   setDocuments: Dispatch<SetStateAction<Array<UploadedDocument>>>;
   loading: boolean;
   forward: () => void;
+  back?: () => void;
   onDropRejected?: () => void;
 };
 
@@ -24,6 +25,7 @@ const StepUploadDocuments = ({
   setDocuments,
   loading,
   forward,
+  back,
   onDropRejected,
 }: Props) => {
   const { t } = useTranslation();
@@ -40,6 +42,10 @@ const StepUploadDocuments = ({
   };
 
   const handleBack = () => {
+    if (activeStep === 0) {
+      back?.();
+      return;
+    }
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
   };
 

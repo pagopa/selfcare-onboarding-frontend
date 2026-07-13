@@ -5,10 +5,15 @@ import UploadDocumentsFlow from '../UploadDocumentsFlow';
 
 // Stub children/services to drive the orchestration without the full upload UI.
 vi.mock('../step/StepUploadDocuments', () => ({
-  default: ({ forward }: any) => (
-    <button type="button" onClick={forward}>
-      go-to-summary
-    </button>
+  default: ({ forward, back }: any) => (
+    <>
+      <button type="button" onClick={forward}>
+        go-to-summary
+      </button>
+      <button type="button" onClick={back}>
+        back-to-admin
+      </button>
+    </>
   ),
 }));
 
@@ -48,6 +53,7 @@ it('test UploadDocumentsFlow reaches summary, confirms, submits and calls onSucc
       institutionType="GSP"
       origin="SELC"
       onSuccess={onSuccess}
+      back={vi.fn()}
     />
   );
 
@@ -56,4 +62,23 @@ it('test UploadDocumentsFlow reaches summary, confirms, submits and calls onSucc
   fireEvent.click(screen.getByText('confirm-submit'));
 
   expect(onSuccess).toHaveBeenCalled();
+});
+
+it('test UploadDocumentsFlow back from the first document step goes back to the admin step', () => {
+  const back = vi.fn();
+
+  renderComponentWithProviders(
+    <UploadDocumentsFlow
+      onboardingId="onb-1"
+      productId="prod-pagopa"
+      institutionType="GSP"
+      origin="SELC"
+      onSuccess={vi.fn()}
+      back={back}
+    />
+  );
+
+  fireEvent.click(screen.getByText('back-to-admin'));
+
+  expect(back).toHaveBeenCalled();
 });
