@@ -180,7 +180,7 @@ export default function CompleteRequestComponent() {
   const steps: Array<StepperStep> = [
     {
       label: t('completeRegistration.steps.step0.label'),
-      Component: () =>
+      Component: () => 
         ConfirmRegistrationStep0({
           onboardingId,
           fileName: 'Addendum',

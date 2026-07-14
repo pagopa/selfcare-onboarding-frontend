@@ -378,7 +378,10 @@ export const executeStepAddAdmin = async (
   addUserFlow: boolean,
   onlyAdmin: boolean,
   isAddApplicantEmail: boolean,
-  productId?: string
+  productId?: string,
+  // GSP non-IPA: the confirmation modal and the outcome page are replaced by the
+  // required documents upload flow.
+  isRequiredDocumentsFlow: boolean = false
 ) => {
   console.log('Testing step add admin..');
   console.log('ADD USER FLOW', addUserFlow);
@@ -434,7 +437,7 @@ export const executeStepAddAdmin = async (
   fireEvent.click(continueButton);
 
   if (!isAddApplicantEmail) {
-    if (!isTechPartner && !isAggregator) {
+    if (!isTechPartner && !isAggregator && !isRequiredDocumentsFlow) {
       await waitFor(() => screen.getByText('Confermi la richiesta di invio?'));
       const confirmButton = screen.getByRole('button', { name: 'Conferma' });
       await waitFor(() => fireEvent.click(confirmButton));
@@ -442,7 +445,7 @@ export const executeStepAddAdmin = async (
       await waitFor(() => fireEvent.click(confirmButton));
     }
 
-    if (!isAggregator) {
+    if (!isAggregator && !isRequiredDocumentsFlow) {
       await waitFor(() =>
         screen.getByText(
           isTechPartner && expectedSuccessfulSubmit

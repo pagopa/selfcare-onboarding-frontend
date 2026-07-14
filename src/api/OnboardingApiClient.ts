@@ -7,6 +7,7 @@ import {
 import { storageTokenOps } from '@pagopa/selfcare-common-frontend/lib/utils/storage';
 import { InstitutionOnboardingInfoResource } from '../../types';
 import { fetchWithLogs } from '../lib/api-utils';
+import { RequiredDocument, RequiredDocumentsEnabled } from '../model/Documents';
 import { ProductResource } from '../model/ProductResource';
 import { store } from '../redux/store';
 import { ENV } from '../utils/env';
@@ -16,8 +17,9 @@ import { CheckManagerResponse } from './generated/onboarding/CheckManagerRespons
 import { WithDefaultsT, createClient } from './generated/onboarding/client';
 import { GeographicTaxonomyResource } from './generated/onboarding/GeographicTaxonomyResource';
 import { InstitutionResourceArray } from './generated/onboarding/InstitutionResourceArray';
-import { OnboardingRequestResource } from './generated/onboarding/OnboardingRequestResource';
 import { OnboardingProductDto } from './generated/onboarding/OnboardingProductDto';
+import { OnboardingRequestResource } from './generated/onboarding/OnboardingRequestResource';
+import { OnboardingResult } from './generated/onboarding/OnboardingResult';
 import { OnboardingUserDto } from './generated/onboarding/OnboardingUserDto';
 import { OnboardingVerify } from './generated/onboarding/OnboardingVerify';
 import { OriginResponse } from './generated/onboarding/OriginResponse';
@@ -253,12 +255,20 @@ export const OnboardingApi = {
   uploadAttachment: async (
     onboardingId: string,
     attachmentName: string,
-    attachment: File
+    attachment: File,
+    attachmentId?: string,
+    attachmentDescription?: string
   ): Promise<void> => {
     /* istanbul ignore if */
     if (isMockEnvironment()) {
       const formData = new FormData();
       formData.append('attachment', attachment);
+      if (attachmentId) {
+        formData.append('attachmentId', attachmentId);
+      }
+      if (attachmentDescription) {
+        formData.append('attachmentDescription', attachmentDescription);
+      }
       return fetchWithLogsCall('ONBOARDING_POST_ATTACHMENT', {
         endpointParams: { onboardingId, filename: attachmentName },
         data: formData,
@@ -269,6 +279,8 @@ export const OnboardingApi = {
       onboardingId,
       attachmentName,
       attachment,
+      attachmentId,
+      attachmentDescription,
     });
     return extractResponse(result, 204, onRedirectToLogin, 401, 403, undefined);
   },
@@ -334,4 +346,69 @@ export const OnboardingApi = {
     institutionType?: string;
     verifyType?: string;
   }): Promise<void> => fetchWithLogsCall('VERIFY_ONBOARDING', { params, method: 'HEAD' }),
+  getRequiredDocumentsEnabled: async (
+    productId: string,
+    institutionType: string,
+    origin: string
+  ): Promise<RequiredDocumentsEnabled> => {
+    /* istanbul ignore if */
+    if (isMockEnvironment()) {
+      return fetchWithLogsCall('REQUIRED_DOCUMENTS_ENABLED', {
+        endpointParams: { productId },
+        params: { institutionType, origin },
+      });
+    }
+    const result = await apiClient.isRequiredDocumentsEnabled({
+      productId,
+      institutionType,
+      origin,
+    });
+    const response = await extractResponse(result, 200, onRedirectToLogin, 401, 403, undefined);
+    return response as RequiredDocumentsEnabled;
+  },
+  getRequiredDocuments: async (
+    productId: string,
+    institutionType: string,
+    origin: string
+  ): Promise<Array<RequiredDocument>> => {
+    /* istanbul ignore if */
+    if (isMockEnvironment()) {
+      return fetchWithLogsCall('GET_REQUIRED_DOCUMENTS', {
+        endpointParams: { productId },
+        params: { institutionType, origin },
+      });
+    }
+    const result = await apiClient.getRequiredDocuments({ productId, institutionType, origin });
+    const response = await extractResponse(result, 200, onRedirectToLogin, 401, 403, undefined);
+    return response as Array<RequiredDocument>;
+  },
+  getAttachmentStatus: async (onboardingId: string, name: string): Promise<void> => {
+    /* istanbul ignore if */
+    if (isMockEnvironment()) {
+      return fetchWithLogsCall('GET_ATTACHMENT_STATUS', {
+        endpointParams: { onboardingId, name },
+      });
+    }
+    const result = await apiClient.getAttachmentStatusUsingGET({ onboardingId, name });
+    return extractResponse(result, 200, onRedirectToLogin, 401, 403, undefined);
+  },
+  triggerOnboarding: async (onboardingId: string): Promise<void> => {
+    /* istanbul ignore if */
+    if (isMockEnvironment()) {
+      return fetchWithLogsCall('TRIGGER_ONBOARDING', {
+        endpointParams: { onboardingId },
+        method: 'PUT',
+      });
+    }
+    const result = await apiClient.triggerOnboardingRequest({ onboardingId });
+    return extractResponse(result, 204, onRedirectToLogin, 401, 403, undefined);
+  },
+  getOnboardings: async (taxCode: string, status: string): Promise<Array<OnboardingResult>> => {
+    /* istanbul ignore if */
+    if (isMockEnvironment()) {
+      return fetchWithLogsCall('ONBOARDING_GET_ONBOARDINGS', { params: { taxCode, status } });
+    }
+    const result = await apiClient.getOnboardingInfo({ taxCode, status });
+    return extractResponse(result, 200, onRedirectToLogin, 401, 403, undefined);
+  },
 };

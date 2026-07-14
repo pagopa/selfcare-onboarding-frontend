@@ -79,6 +79,16 @@ it('test postOnboardingSubmit success tracks success and forwards', async () => 
   expect(setLoading).toHaveBeenLastCalledWith(false);
 });
 
+it('test postOnboardingSubmit success with onRequiredDocuments enters the document flow instead of the outcome', async () => {
+  vi.mocked(OnboardingApi.onboardingInstitution).mockResolvedValue(undefined);
+  const onRequiredDocuments = vi.fn();
+
+  await postOnboardingSubmit(...submitArgs(), onRequiredDocuments);
+
+  expect(onRequiredDocuments).toHaveBeenCalled();
+  expect(setOutcome).not.toHaveBeenCalled();
+});
+
 it('test postOnboardingSubmit 409 tracks conflict failure', async () => {
   vi.mocked(OnboardingApi.onboardingInstitution).mockRejectedValue(
     Object.assign(new Error('conflict'), { httpStatus: 409 })

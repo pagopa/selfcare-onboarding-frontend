@@ -2,7 +2,7 @@ import { Box, Grid, Paper, Typography } from '@mui/material';
 import { theme } from '@pagopa/mui-italia';
 import { useTranslation } from 'react-i18next';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
-import { OnboardingStepActions } from '../../../components/registrationSteps/OnboardingStepActions';
+import { OnboardingStepActions } from '../../../../components/registrationSteps/OnboardingStepActions';
 
 type Props = {
   forward: () => void;

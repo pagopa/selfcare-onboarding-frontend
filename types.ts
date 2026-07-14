@@ -73,6 +73,7 @@ export type StepperStepComponentProps = {
 
 export type StepperStep = {
   label: string;
+  subLabel?: string;
   Component: React.FunctionComponent<StepperStepComponentProps>;
 };
 

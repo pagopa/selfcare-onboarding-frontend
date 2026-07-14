@@ -29,3 +29,31 @@ regexReplace(
   'src/api/generated/onboarding/client.ts',
   { fileContentsOnly: true }
 );
+
+// Fix the multipart body generator for uploadAttachmentUsingPOST. gen-api-models
+// mishandles a multipart body that mixes a binary field (attachment) with plain
+// string fields (attachmentId, attachmentDescription): it emits the undefined
+// identifier `attachmentId_.uri` instead of assembling a FormData. Replace it
+// with a proper FormData, matching how the tool handles single-file endpoints.
+regexReplace(
+  /body:\s*\(\{\s*\["attachmentId"\]:\s*attachmentId,\s*\["attachmentDescription"\]:\s*attachmentDescription\s*\}\)\s*=>\s*attachmentId_\.uri,/,
+  `body: ({
+      ["attachment"]: attachment,
+      ["attachmentId"]: attachmentId,
+      ["attachmentDescription"]: attachmentDescription
+    }) => {
+      if (typeof window === "undefined")
+        throw new Error(
+          "File upload is only support inside a browser runtime envoronment"
+        );
+      const formData = new FormData();
+      formData.append("attachment", attachment);
+      if (attachmentId !== undefined)
+        formData.append("attachmentId", attachmentId);
+      if (attachmentDescription !== undefined)
+        formData.append("attachmentDescription", attachmentDescription);
+      return formData;
+    },`,
+  'src/api/generated/onboarding/client.ts',
+  { fileContentsOnly: true }
+);

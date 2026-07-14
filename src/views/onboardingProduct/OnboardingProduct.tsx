@@ -45,6 +45,8 @@ import {
 } from '../../utils/institutionTypeUtils';
 import { triggerQualtricsIntercept } from '../../utils/qualtricsUtils';
 import { registerUnloadEvent, unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
+import { OnboardingApi } from '../../api/OnboardingApiClient';
+import UploadDocumentsFlow from './documents/UploadDocumentsFlow';
 import { createBackFunctions } from './components/backwards/backFunctions';
 import { createForwardFunctions } from './components/forwards/forwardFunctions';
 import { StepAddAdmin } from './components/StepAddAdmin';
@@ -53,9 +55,16 @@ import { StepAdditionalGpuInformations } from './components/StepAdditionalGpuInf
 import { StepAdditionalInformations } from './components/StepAdditionalInformations';
 import { StepUploadAggregates } from './components/StepUploadAggregates';
 import { genericError, StepVerifyOnboarding } from './components/StepVerifyOnboarding';
-import StepContractsSummary from './components/StepContractsSummary';
+import StepContractsSummary from './components/contracts/StepContractsSummary';
 
 export type ValidateErrorType = 'conflictError';
+
+type UploadDocumentsContext = {
+  onboardingId: string;
+  productId: string;
+  institutionType: string;
+  origin: string;
+} | null;
 
 export const prodPhaseOutErrorPage: RequestOutcomeMessage = {
   title: '',
@@ -86,6 +95,8 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
   const [formData, setFormData] = useState<Partial<FormData>>();
   const [externalInstitutionId, setExternalInstitutionId] = useState<string>('');
   const [outcome, setOutcome] = useState<RequestOutcomeMessage | null>();
+  const [uploadDocumentsContext, setUploadDocumentsContext] = useState<UploadDocumentsContext>(null);
+  const createdOnboardingRef = useRef<UploadDocumentsContext>(null);
   const history = useHistory();
   const [openExitModal, setOpenExitModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>();
@@ -204,11 +215,38 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     ],
   };
 
+  const isRequiredDocumentsFlow =
+    isGlobalServiceProvider(institutionType) && origin !== 'IPA' && isPagoPaProduct(productId);
+
+  const enterRequiredDocumentsFlow = () => {
+    void OnboardingApi.getOnboardings(onboardingFormData?.taxCode ?? '', 'REQUESTING')
+      .then((onboardings) => {
+        const onboardingId = onboardings.find((o) => o.productId === productId)?.id;
+        if (onboardingId && institutionType && origin) {
+          // eslint-disable-next-line functional/immutable-data
+          createdOnboardingRef.current = {
+            onboardingId,
+            productId,
+            institutionType: institutionType as string,
+            origin,
+          };
+          setUploadDocumentsContext(createdOnboardingRef.current);
+        } else {
+          setOutcome(outcomeContent.success);
+        }
+      })
+      .catch(() => setOutcome(outcomeContent.success));
+  };
+
   const onSubmit = (
     userData?: Partial<FormData> | undefined,
     aggregates?: Array<AggregateInstitution>,
     updatedOnboardingFormData?: OnboardingFormData
   ) => {
+    if (createdOnboardingRef.current) {
+      setUploadDocumentsContext(createdOnboardingRef.current);
+      return;
+    }
     const data = userData ?? formData;
     const users = ((data as any).users as Array<UserOnCreate>)?.map((u) => ({
       ...u,
@@ -242,7 +280,8 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           productId,
           institutionType: institutionType ?? '',
         });
-      }
+      },
+      isRequiredDocumentsFlow ? enterRequiredDocumentsFlow : undefined
     ).catch(() => {
       trackEvent('ONBOARDING_ADD_DELEGATE', {
         request_id: requestIdRef.current,
@@ -597,6 +636,9 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           isAddApplicationEmail: (formData as any)?.users?.every(
             (u: UserOnCreate) => u.taxCode !== user?.taxCode
           ),
+          // GSP non-IPA: skip the pre-submit confirmation modal — it moves to the end of the
+          // document upload flow instead.
+          isRequiredDocumentsFlow,
           forward: forwardFromAdmin,
           back: backFromAdmin,
         }),
@@ -649,6 +691,20 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
 
   return selectedProduct === null ? (
     <NoProductPage />
+  ) : uploadDocumentsContext ? (
+    <UploadDocumentsFlow
+      {...uploadDocumentsContext}
+      onSuccess={() => {
+        // eslint-disable-next-line functional/immutable-data
+        createdOnboardingRef.current = null;
+        setUploadDocumentsContext(null);
+        setOutcome(outcomeContent.success);
+      }}
+      back={() => {
+        setUploadDocumentsContext(null);
+        setActiveStep(steps.findIndex((step) => step.label === 'Insert admins data'));
+      }}
+    />
   ) : outcome && activeStep > 2 ? (
     <MessageNoAction {...outcome} />
   ) : pricingPlan && pricingPlan !== 'FA' ? (

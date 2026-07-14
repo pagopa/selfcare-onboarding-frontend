@@ -99,6 +99,27 @@ export const OnboardingApi = {
             method: 'POST',
         });
     }),
+    getOnboardings: vi.fn((taxCode: string, status: string) =>
+        callViaFetchWithLogs('ONBOARDING_GET_ONBOARDINGS', { params: { taxCode, status } })
+    ),
+    getRequiredDocumentsEnabled: vi.fn((productId: string, institutionType: string, origin: string) =>
+        callViaFetchWithLogs('REQUIRED_DOCUMENTS_ENABLED', {
+            endpointParams: { productId },
+            params: { institutionType, origin },
+        })
+    ),
+    getRequiredDocuments: vi.fn((productId: string, institutionType: string, origin: string) =>
+        callViaFetchWithLogs('GET_REQUIRED_DOCUMENTS', {
+            endpointParams: { productId },
+            params: { institutionType, origin },
+        })
+    ),
+    triggerOnboarding: vi.fn((onboardingId: string) =>
+        callViaFetchWithLogs('TRIGGER_ONBOARDING', {
+            endpointParams: { onboardingId },
+            method: 'PUT',
+        })
+    ),
     uploadAttachment: vi.fn((onboardingId: string, attachmentName: string, attachment: File) => {
         const formData = new FormData();
         formData.append('attachment', attachment);

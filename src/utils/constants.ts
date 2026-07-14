@@ -207,6 +207,21 @@ export const API = {
   ONBOARDING_GET_VISURA_INFOCAMERE_BY_REA: {
     URL: ENV.URL_API.PARTY_REGISTRY_PROXY + '/visura-infocamere-pdnd/institutions',
   },
+  REQUIRED_DOCUMENTS_ENABLED: {
+    URL: ENV.URL_API.ONBOARDING_V2 + '/v2/product/{{productId}}/required-documents/enabled',
+  },
+  GET_REQUIRED_DOCUMENTS: {
+    URL: ENV.URL_API.ONBOARDING_V2 + '/v2/product/{{productId}}/required-documents',
+  },
+  GET_ATTACHMENT_STATUS: {
+    URL: ENV.URL_API.ONBOARDING_V2 + '/v2/tokens/{{onboardingId}}/attachment/status?name={{name}}',
+  },
+  TRIGGER_ONBOARDING: {
+    URL: ENV.URL_API.ONBOARDING_V2 + '/v2/institutions/{{onboardingId}}',
+  },
+  ONBOARDING_GET_ONBOARDINGS: {
+    URL: ENV.URL_API.ONBOARDING_V2 + '/v2/institutions/onboardings',
+  },
 };
 
 export const USER_ROLE_LABEL = {
