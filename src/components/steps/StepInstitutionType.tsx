@@ -25,6 +25,7 @@ import { description4InstitutionType } from '../../utils/constants';
 import { LoadingOverlay } from '../modals/LoadingOverlay';
 import { getInstiutionTypesByProduct } from '../../services/onboardingServices';
 import { InstitutionOrigins } from '../../model/InstitutionOrigins';
+import { isCedProduct } from '../../utils/institutionTypeUtils';
 
 type Props = StepperStepComponentProps & {
   institutionType: InstitutionType;
@@ -117,11 +118,13 @@ export default function StepInstitutionType({
           </Trans>
         </Typography>
       </Grid>
-      <Grid item xs={12} display="flex" justifyContent="center">
-        <Alert severity="info" sx={{ mb: 4, width: '70%' }}>
-          {t('stepInstitutionType.infoAlert.ced')}
-        </Alert>
-      </Grid>
+      {isCedProduct(selectedProduct?.id) && (
+        <Grid item xs={12} display="flex" justifyContent="center">
+          <Alert severity="info" sx={{ mb: 4, width: '70%' }}>
+            {t('stepInstitutionType.infoAlert.ced')}
+          </Alert>
+        </Grid>
+      )}
       <Paper
         elevation={8}
         sx={{ borderRadius: theme.spacing(2), p: 1, width: '580px', height: '100%' }}
