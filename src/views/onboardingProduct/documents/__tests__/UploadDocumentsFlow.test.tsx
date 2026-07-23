@@ -35,7 +35,7 @@ vi.mock('../../../../components/modals/ConfirmOnboardingRequest', () => ({
 }));
 
 vi.mock('../../../../services/documentServices', () => ({
-  fetchRequiredDocuments: vi.fn(),
+  fetchRequiredDocuments: vi.fn(() => Promise.resolve()),
   submitDocuments: vi.fn((_id, _rd, _docs, _err, _load, onSuccess) => onSuccess()),
 }));
 
@@ -43,7 +43,7 @@ beforeEach(() => {
   vi.clearAllMocks();
 });
 
-it('test UploadDocumentsFlow reaches summary, confirms, submits and calls onSuccess', () => {
+it('test UploadDocumentsFlow reaches summary, confirms, submits and calls onSuccess', async () => {
   const onSuccess = vi.fn();
 
   renderComponentWithProviders(
@@ -57,14 +57,15 @@ it('test UploadDocumentsFlow reaches summary, confirms, submits and calls onSucc
     />
   );
 
-  fireEvent.click(screen.getByText('go-to-summary'));
+  // The required documents are fetched behind a loading overlay, so the step mounts asynchronously.
+  fireEvent.click(await screen.findByText('go-to-summary'));
   fireEvent.click(screen.getByText('open-confirm'));
   fireEvent.click(screen.getByText('confirm-submit'));
 
   expect(onSuccess).toHaveBeenCalled();
 });
 
-it('test UploadDocumentsFlow back from the first document step goes back to the admin step', () => {
+it('test UploadDocumentsFlow back from the first document step goes back to the admin step', async () => {
   const back = vi.fn();
 
   renderComponentWithProviders(
@@ -78,7 +79,7 @@ it('test UploadDocumentsFlow back from the first document step goes back to the 
     />
   );
 
-  fireEvent.click(screen.getByText('back-to-admin'));
+  fireEvent.click(await screen.findByText('back-to-admin'));
 
   expect(back).toHaveBeenCalled();
 });

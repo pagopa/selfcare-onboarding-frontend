@@ -88,14 +88,15 @@ export const prodPhaseOutErrorPage: RequestOutcomeMessage = {
   ],
 };
 
-// eslint-disable-next-line sonarjs/cognitive-complexity
+// eslint-disable-next-line sonarjs/cognitive-complexity, complexity
 function OnboardingProductComponent({ productId }: { productId: string }) {
   const [loading, setLoading] = useState(true);
   const [activeStep, setActiveStep] = useState(0);
   const [formData, setFormData] = useState<Partial<FormData>>();
   const [externalInstitutionId, setExternalInstitutionId] = useState<string>('');
   const [outcome, setOutcome] = useState<RequestOutcomeMessage | null>();
-  const [uploadDocumentsContext, setUploadDocumentsContext] = useState<UploadDocumentsContext>(null);
+  const [uploadDocumentsContext, setUploadDocumentsContext] =
+    useState<UploadDocumentsContext>(null);
   const createdOnboardingRef = useRef<UploadDocumentsContext>(null);
   const history = useHistory();
   const [openExitModal, setOpenExitModal] = useState(false);
@@ -216,11 +217,15 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
   };
 
   const isRequiredDocumentsFlow =
-    isGlobalServiceProvider(institutionType) && origin !== 'IPA' && isPagoPaProduct(productId);
+    isGlobalServiceProvider(institutionType) &&
+    origin !== 'IPA' &&
+    isPagoPaProduct(productId) &&
+    ENV.GSP.NO_IPA;
 
   const enterRequiredDocumentsFlow = () => {
     void OnboardingApi.getOnboardings(onboardingFormData?.taxCode ?? '', 'REQUESTING')
       .then((onboardings) => {
+        setLoading(true);
         const onboardingId = onboardings.find((o) => o.productId === productId)?.id;
         if (onboardingId && institutionType && origin) {
           // eslint-disable-next-line functional/immutable-data
@@ -235,7 +240,8 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           setOutcome(outcomeContent.success);
         }
       })
-      .catch(() => setOutcome(outcomeContent.success));
+      .catch(() => setOutcome(outcomeContent.error))
+      .finally(() => setLoading(false));
   };
 
   const onSubmit = (
@@ -360,6 +366,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     productId,
     externalInstitutionId,
     onboardingFormData,
+    isRequiredDocumentsFlow,
   });
 
   useEffect(() => {
@@ -699,6 +706,11 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
         createdOnboardingRef.current = null;
         setUploadDocumentsContext(null);
         setOutcome(outcomeContent.success);
+        void triggerQualtricsIntercept({
+          institutionDescription: onboardingFormData?.businessName ?? '',
+          productId,
+          institutionType: institutionType ?? '',
+        });
       }}
       back={() => {
         setUploadDocumentsContext(null);

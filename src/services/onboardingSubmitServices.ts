@@ -79,96 +79,94 @@ export const postOnboardingSubmit = async (
   // eslint-disable-next-line sonarjs/cognitive-complexity
 ) => {
   setLoading(true);
-  const { outcome, status } = await postOnboardingLegals(
-    {
-      billingData: billingData2billingDataRequest(onboardingFormData as OnboardingFormData),
-      atecoCodes: onboardingFormData?.atecoCodes,
-      additionalInformations:
-        isGlobalServiceProvider(institutionType) &&
-        isPagoPaProduct(selectedProduct?.id) &&
-        origin !== 'IPA'
-          ? {
-              agentOfPublicService: additionalInformations?.agentOfPublicService,
-              agentOfPublicServiceNote: additionalInformations?.agentOfPublicServiceNote,
-              belongRegulatedMarket: additionalInformations?.belongRegulatedMarket,
-              regulatedMarketNote: additionalInformations?.regulatedMarketNote,
-              establishedByRegulatoryProvision:
-                additionalInformations?.establishedByRegulatoryProvision,
-              establishedByRegulatoryProvisionNote:
-                additionalInformations?.establishedByRegulatoryProvisionNote,
-              ipa: additionalInformations?.ipa,
-              ipaCode: additionalInformations?.ipaCode,
-              otherNote: additionalInformations?.otherNote,
-            }
-          : undefined,
-      payment: isPrivateMerchantInstitution(institutionType, selectedProduct?.id)
+  const { outcome, status } = await postOnboardingLegals({
+    billingData: billingData2billingDataRequest(onboardingFormData as OnboardingFormData),
+    atecoCodes: onboardingFormData?.atecoCodes,
+    additionalInformations:
+      isGlobalServiceProvider(institutionType) &&
+      isPagoPaProduct(selectedProduct?.id) &&
+      origin !== 'IPA'
         ? {
-            holder: onboardingFormData?.holder,
-            iban: onboardingFormData?.iban,
+            agentOfPublicService: additionalInformations?.agentOfPublicService,
+            agentOfPublicServiceNote: additionalInformations?.agentOfPublicServiceNote,
+            belongRegulatedMarket: additionalInformations?.belongRegulatedMarket,
+            regulatedMarketNote: additionalInformations?.regulatedMarketNote,
+            establishedByRegulatoryProvision:
+              additionalInformations?.establishedByRegulatoryProvision,
+            establishedByRegulatoryProvisionNote:
+              additionalInformations?.establishedByRegulatoryProvisionNote,
+            ipa: additionalInformations?.ipa,
+            ipaCode: additionalInformations?.ipaCode,
+            otherNote: additionalInformations?.otherNote,
           }
         : undefined,
-      gpuData:
-        isGpuInstitution(institutionType) &&
-        (isPagoPaProduct(selectedProduct?.id) ||
-          isInteropProduct(selectedProduct?.id) ||
-          isIoSignProduct(selectedProduct?.id) ||
-          isIoProduct(selectedProduct?.id))
-          ? additionalGPUInformations
-          : undefined,
-      pspData: isPaymentServiceProvider(institutionType)
-        ? pspData2pspDataRequest(onboardingFormData as OnboardingFormData)
+    payment: isPrivateMerchantInstitution(institutionType, selectedProduct?.id)
+      ? {
+          holder: onboardingFormData?.holder,
+          iban: onboardingFormData?.iban,
+        }
+      : undefined,
+    gpuData:
+      isGpuInstitution(institutionType) &&
+      (isPagoPaProduct(selectedProduct?.id) ||
+        isInteropProduct(selectedProduct?.id) ||
+        isIoSignProduct(selectedProduct?.id) ||
+        isIoProduct(selectedProduct?.id))
+        ? additionalGPUInformations
         : undefined,
-      companyInformations:
-        onboardingFormData?.businessRegisterPlace ||
-        onboardingFormData?.rea ||
-        onboardingFormData?.shareCapital
-          ? {
-              businessRegisterPlace: onboardingFormData?.businessRegisterPlace,
-              rea: onboardingFormData?.rea,
-              shareCapital: onboardingFormData?.shareCapital,
-            }
-          : undefined,
-      institutionType,
-      originId: onboardingFormData?.originId ?? onboardingFormData?.taxCode,
-      geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY
-        ? onboardingFormData?.geographicTaxonomies?.map((gt: any) =>
-            onboardedInstitutionInfo2geographicTaxonomy(gt)
-          )
-        : [],
-      institutionLocationData: {
-        country:
-          isPublicServiceCompany(institutionType) && isInteropProduct(productId)
-            ? 'IT'
-            : onboardingFormData?.country,
-        county: onboardingFormData?.county,
-        city: onboardingFormData?.city,
-      },
-      origin,
-      istatCode: origin !== 'IPA' ? onboardingFormData?.istatCode : undefined,
-      users,
-      pricingPlan,
-      assistanceContacts: isIoSignProduct(productId)
-        ? { supportEmail: onboardingFormData?.supportEmail }
-        : undefined,
-      productId,
-      subunitCode: onboardingFormData?.uoUniqueCode ?? onboardingFormData?.aooUniqueCode,
-      subunitType: onboardingFormData?.uoUniqueCode
-        ? 'UO'
-        : onboardingFormData?.aooUniqueCode
-          ? 'AOO'
-          : undefined,
-      taxCode: onboardingFormData?.taxCode,
-      isAggregator: onboardingFormData?.isAggregator ? onboardingFormData?.isAggregator : undefined,
-      aggregates,
-      userRequester: users.every((u) => u?.taxCode !== loggedUser?.taxCode)
+    pspData: isPaymentServiceProvider(institutionType)
+      ? pspData2pspDataRequest(onboardingFormData as OnboardingFormData)
+      : undefined,
+    companyInformations:
+      onboardingFormData?.businessRegisterPlace ||
+      onboardingFormData?.rea ||
+      onboardingFormData?.shareCapital
         ? {
-            name: onboardingFormData?.userRequester?.name,
-            surname: onboardingFormData?.userRequester?.surname,
-            email: onboardingFormData?.userRequester?.email,
+            businessRegisterPlace: onboardingFormData?.businessRegisterPlace,
+            rea: onboardingFormData?.rea,
+            shareCapital: onboardingFormData?.shareCapital,
           }
         : undefined,
-    }
-  );
+    institutionType,
+    originId: onboardingFormData?.originId ?? onboardingFormData?.taxCode,
+    geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY
+      ? onboardingFormData?.geographicTaxonomies?.map((gt: any) =>
+          onboardedInstitutionInfo2geographicTaxonomy(gt)
+        )
+      : [],
+    institutionLocationData: {
+      country:
+        isPublicServiceCompany(institutionType) && isInteropProduct(productId)
+          ? 'IT'
+          : onboardingFormData?.country,
+      county: onboardingFormData?.county,
+      city: onboardingFormData?.city,
+    },
+    origin,
+    istatCode: origin !== 'IPA' ? onboardingFormData?.istatCode : undefined,
+    users,
+    pricingPlan,
+    assistanceContacts: isIoSignProduct(productId)
+      ? { supportEmail: onboardingFormData?.supportEmail }
+      : undefined,
+    productId,
+    subunitCode: onboardingFormData?.uoUniqueCode ?? onboardingFormData?.aooUniqueCode,
+    subunitType: onboardingFormData?.uoUniqueCode
+      ? 'UO'
+      : onboardingFormData?.aooUniqueCode
+        ? 'AOO'
+        : undefined,
+    taxCode: onboardingFormData?.taxCode,
+    isAggregator: onboardingFormData?.isAggregator ? onboardingFormData?.isAggregator : undefined,
+    aggregates,
+    userRequester: users.every((u) => u?.taxCode !== loggedUser?.taxCode)
+      ? {
+          name: onboardingFormData?.userRequester?.name,
+          surname: onboardingFormData?.userRequester?.surname,
+          email: onboardingFormData?.userRequester?.email,
+        }
+      : undefined,
+  });
 
   setLoading(false);
 
@@ -182,8 +180,8 @@ export const postOnboardingSubmit = async (
       onRequiredDocuments();
     } else {
       setOutcome(outcomeContent[outcome as keyof RequestOutcomeOptions]);
+      onSuccess?.();
     }
-    onSuccess?.();
   } else {
     const responseStatus = status;
 
@@ -230,43 +228,41 @@ export const postSubProductOnboardingSubmit = async (
   originId: string,
   setConflictError: Dispatch<SetStateAction<boolean>>
 ) => {
-  const { outcome, status, detail } = await postOnboardingLegals(
-    {
-      users: users.map((u) => ({
-        ...u,
-        taxCode: u.taxCode?.toUpperCase(),
-        email: u.email?.toLowerCase(),
-      })),
-      billingData: billingData2billingDataRequest(billingData as OnboardingFormData),
-      pspData: isPaymentServiceProvider(institutionType)
-        ? pspData2pspDataRequest(billingData as OnboardingFormData)
-        : undefined,
-      institutionType,
-      origin,
-      originId,
-      geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY
-        ? billingData.geographicTaxonomies?.map((gt) =>
-            onboardedInstitutionInfo2geographicTaxonomy(gt)
-          )
-        : [],
-      companyInformations: !isPublicAdministration(institutionType)
-        ? {
-            businessRegisterPlace: billingData?.businessRegisterPlace,
-            rea: billingData?.rea,
-            shareCapital: billingData?.shareCapital,
-          }
-        : undefined,
-      institutionLocationData: {
-        city: billingData?.city,
-        country: billingData?.country,
-        county: billingData?.county,
-      },
-      productId: subProduct.id,
-      subunitCode: undefined,
-      subunitType: undefined,
-      taxCode: billingData?.taxCode,
-    }
-  );
+  const { outcome, status, detail } = await postOnboardingLegals({
+    users: users.map((u) => ({
+      ...u,
+      taxCode: u.taxCode?.toUpperCase(),
+      email: u.email?.toLowerCase(),
+    })),
+    billingData: billingData2billingDataRequest(billingData as OnboardingFormData),
+    pspData: isPaymentServiceProvider(institutionType)
+      ? pspData2pspDataRequest(billingData as OnboardingFormData)
+      : undefined,
+    institutionType,
+    origin,
+    originId,
+    geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY
+      ? billingData.geographicTaxonomies?.map((gt) =>
+          onboardedInstitutionInfo2geographicTaxonomy(gt)
+        )
+      : [],
+    companyInformations: !isPublicAdministration(institutionType)
+      ? {
+          businessRegisterPlace: billingData?.businessRegisterPlace,
+          rea: billingData?.rea,
+          shareCapital: billingData?.shareCapital,
+        }
+      : undefined,
+    institutionLocationData: {
+      city: billingData?.city,
+      country: billingData?.country,
+      county: billingData?.county,
+    },
+    productId: subProduct.id,
+    subunitCode: undefined,
+    subunitType: undefined,
+    taxCode: billingData?.taxCode,
+  });
 
   if (outcome === 'success') {
     trackEvent('ONBOARDING_PREMIUM_SEND_SUCCESS', {

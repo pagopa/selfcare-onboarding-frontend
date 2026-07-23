@@ -13,7 +13,7 @@ import {
   isPrivateInstitution,
   isPrivatePersonInstitution,
   isPublicAdministration,
-  isTechPartner
+  isTechPartner,
 } from '../../../../utils/institutionTypeUtils';
 
 interface BackFunctionsParams {
@@ -31,6 +31,7 @@ interface BackFunctionsParams {
   productId: string;
   externalInstitutionId: string;
   onboardingFormData: OnboardingFormData | undefined;
+  isRequiredDocumentsFlow?: boolean;
 }
 
 export const createBackFunctions = (params: BackFunctionsParams) => {
@@ -49,6 +50,7 @@ export const createBackFunctions = (params: BackFunctionsParams) => {
     productId,
     externalInstitutionId,
     onboardingFormData,
+    isRequiredDocumentsFlow,
   } = params;
 
   const handleOpenExitModal = () => {
@@ -73,12 +75,7 @@ export const createBackFunctions = (params: BackFunctionsParams) => {
       setActiveStep(0);
     } else if (fromDashboard && isPagoPaInsights(productId)) {
       window.location.assign(`${ENV.URL_FE.DASHBOARD}/${externalInstitutionId}`);
-    } else if (
-      isGlobalServiceProvider(institutionType) &&
-      origin !== 'IPA' &&
-      isPagoPaProduct(selectedProduct?.id) &&
-      ENV.GSP.NO_IPA
-    ) {
+    } else if (isRequiredDocumentsFlow) {
       setActiveStep(2);
     } else {
       setActiveStep(1);

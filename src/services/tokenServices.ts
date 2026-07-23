@@ -2,6 +2,7 @@ import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyt
 import React, { Dispatch, SetStateAction } from 'react';
 import { RequestOutcomeComplete } from '../../types';
 import { OnboardingApi } from '../api/OnboardingApiClient';
+import { InstitutionInfo } from '../api/generated/onboarding/InstitutionInfo';
 import { OnboardingVerify } from '../api/generated/onboarding/OnboardingVerify';
 import { getErrorStatus } from '../lib/error-utils';
 type Props = {
@@ -56,6 +57,20 @@ export const verifyRequest = async ({
     const status = getErrorStatus(error);
     trackEvent(getMixPanelEvent(status), { party_id: onboardingId });
     setOutcomeContentState('notFound');
+  }
+};
+
+// Retrieves the institution data (business name, institution type) tied to an onboarding request.
+// Best effort: it only feeds the Qualtrics survey, so a failure must never block the caller's flow.
+export const getOnboardingInstitutionInfo = async (
+  onboardingId: string,
+  setInstitutionInfo: Dispatch<SetStateAction<InstitutionInfo | undefined>>
+) => {
+  try {
+    const data = await OnboardingApi.retrieveOnboardingRequest(onboardingId);
+    setInstitutionInfo(data.institutionInfo);
+  } catch (_) {
+    setInstitutionInfo(undefined);
   }
 };
 
