@@ -7,6 +7,7 @@ import { useContext, useEffect, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { useParams } from 'react-router';
 import { RequestOutcomeComplete } from '../../../../types';
+import { InstitutionInfo } from '../../../api/generated/onboarding/InstitutionInfo';
 import { OnboardingVerify } from '../../../api/generated/onboarding/OnboardingVerify';
 import { ConfirmOnboardingModal } from '../../../components/modals/ConfirmOnboardingRequest';
 import { LoadingOverlay } from '../../../components/modals/LoadingOverlay';
@@ -19,9 +20,10 @@ import {
   requiredDocumentsFlow,
   submitDocuments,
 } from '../../../services/documentServices';
-import { verifyRequest } from '../../../services/tokenServices';
+import { getOnboardingInstitutionInfo, verifyRequest } from '../../../services/tokenServices';
 import { customErrors } from '../../../utils/constants';
 import { getRequestJwt } from '../../../utils/getRequestJwt';
+import { triggerQualtricsIntercept } from '../../../utils/qualtricsUtils';
 import CompleteRequest from '../../onboardingRequest/complete/CompleteRequest';
 import { CompleteRequestFailPage } from '../../onboardingRequest/complete/pages/CompleteRequestFailPage';
 import CompleteRequestSuccessPage from '../../onboardingRequest/complete/pages/CompleteRequestSuccessPage';
@@ -49,8 +51,9 @@ export default function OnboardingUploadDocuments() {
   const [errorCode, setErrorCode] = useState<keyof typeof customErrors>('GENERIC');
   const [open, setOpen] = useState<boolean>(false);
   const [openConfirmationModal, setOpenConfirmationModal] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(!!onboardingId);
   const [requestData, setRequestData] = useState<OnboardingVerify>();
+  const [institutionInfo, setInstitutionInfo] = useState<InstitutionInfo>();
   const [documents, setDocuments] = useState<Array<UploadedDocument>>([]);
   const translationKeyValue = 'product';
   const [requiredDocumentsEnabled, setRequiredDocumentsEnabled] = useState<boolean>();
@@ -77,6 +80,13 @@ export default function OnboardingUploadDocuments() {
   }, [onboardingId]);
 
   useEffect(() => {
+    if (!onboardingId) {
+      return;
+    }
+    void getOnboardingInstitutionInfo(onboardingId, setInstitutionInfo);
+  }, [onboardingId]);
+
+  useEffect(() => {
     if (!requestData?.productId) {
       return;
     }
@@ -95,13 +105,14 @@ export default function OnboardingUploadDocuments() {
       return;
     }
 
+    setLoading(true);
     void fetchRequiredDocuments(
       requestData?.productId,
       'GSP',
       'SELC',
       addError,
       setRequiredDocuments
-    );
+    ).finally(() => setLoading(false));
   }, [requiredDocumentsEnabled, requestData?.productId]);
 
   useEffect(() => {
@@ -135,7 +146,14 @@ export default function OnboardingUploadDocuments() {
       documents,
       addError,
       setLoading,
-      () => setOutcomeContentState('success'),
+      () => {
+        setOutcomeContentState('success');
+        void triggerQualtricsIntercept({
+          institutionDescription: institutionInfo?.name ?? '',
+          productId: requestData?.productId ?? '',
+          institutionType: institutionInfo?.institutionType ?? '',
+        });
+      },
       () => setOpen(true)
     );
   };

@@ -67,7 +67,7 @@ export default function CompleteRequestComponent() {
   );
   const [errorCode, setErrorCode] = useState<keyof typeof customErrors>('GENERIC');
   const [open, setOpen] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(!!onboardingId);
   const [lastFileErrorAttempt, setLastFileErrorAttempt] = useState<FileErrorAttempt>();
   const [uploadedFiles, setUploadedFiles, setUploadedFilesHistory] = useHistoryState<Array<File>>(
     'uploaded_files',
@@ -93,6 +93,7 @@ export default function CompleteRequestComponent() {
   useEffect(() => {
     if (attachments && onboardingId) {
       setOutcomeContentState('toBeCompleted');
+      setLoading(false);
     } else {
       verifyRequest({
         onboardingId,

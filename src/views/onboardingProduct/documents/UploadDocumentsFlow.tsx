@@ -39,7 +39,14 @@ const UploadDocumentsFlow = ({
   const [error, setError] = useState(false);
 
   useEffect(() => {
-    void fetchRequiredDocuments(productId, institutionType, origin, addError, setRequiredDocuments);
+    setLoading(true);
+    void fetchRequiredDocuments(
+      productId,
+      institutionType,
+      origin,
+      addError,
+      setRequiredDocuments
+    ).finally(() => setLoading(false));
   }, [productId, institutionType, origin]);
 
   useEffect(() => {

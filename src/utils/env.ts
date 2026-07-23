@@ -83,7 +83,7 @@ export const ENV = {
   },
 
   GSP: {
-    NO_IPA: import.meta.env.VITE_ENABLE_GPS_NO_IPA === 'true',
+    NO_IPA: import.meta.env.VITE_GPS_NO_IPA_FLAG === 'true',
   },
 
   QUALTRICS: {
