@@ -31,7 +31,11 @@ const keepOnPage = (e: BeforeUnloadEvent) => {
   return message;
 };
 
-export const redirectToLogin = () => {
+export const buildLoginUrl = () => {
   const onSuccessEncoded = encodeURIComponent(location.pathname + location.search);
-  window.location.assign(`${ENV.URL_FE.LOGIN}/login?onSuccess=${onSuccessEncoded}`);
+  return `${ENV.URL_FE.LOGIN}/login?onSuccess=${onSuccessEncoded}`;
+};
+
+export const redirectToLogin = () => {
+  window.location.assign(buildLoginUrl());
 };

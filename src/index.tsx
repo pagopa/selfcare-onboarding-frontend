@@ -2,24 +2,25 @@ import '@pagopa/selfcare-common-frontend/lib/common-polyfill';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 // import '@pagopa/selfcare-common-frontend/lib/index.css';
-import { BrowserRouter } from 'react-router-dom';
-import { CONFIG } from '@pagopa/selfcare-common-frontend/lib/config/env';
 import { CssBaseline, ThemeProvider } from '@mui/material';
 import { theme } from '@pagopa/mui-italia';
+import { CONFIG } from '@pagopa/selfcare-common-frontend/lib/config/env';
 import { Provider } from 'react-redux';
+import { BrowserRouter } from 'react-router-dom';
 import App from './App';
+import './consentAndAnalyticsConfiguration';
+import './index.css';
+import './locale';
+import { store } from './redux/store';
 import reportWebVitals from './reportWebVitals';
 import { MOCK_USER, PRODUCT_IDS } from './utils/constants';
 import { ENV } from './utils/env';
-import './consentAndAnalyticsConfiguration.ts';
-import './locale';
-import './index.css';
-import { store } from './redux/store';
+import { buildLoginUrl } from './utils/unloadEvent-utils';
 
 // eslint-disable-next-line functional/immutable-data
 CONFIG.MOCKS.MOCK_USER = MOCK_USER;
 // eslint-disable-next-line functional/immutable-data
-CONFIG.URL_FE.LOGIN = `${ENV.URL_FE.LOGIN}`;
+CONFIG.URL_FE.LOGIN = buildLoginUrl();
 // eslint-disable-next-line functional/immutable-data
 CONFIG.URL_FE.LOGOUT = ENV.URL_FE.LOGOUT;
 // eslint-disable-next-line functional/immutable-data
