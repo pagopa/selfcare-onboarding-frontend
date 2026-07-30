@@ -44,7 +44,7 @@ export default function CompleteRequestSuccessPage({
                 : translationKeyValue === 'attachments'
                   ? 'completeRegistration.outcomeContent.success.attachments.description'
                   : isCedProduct(productId)
-                    ? t('completeRegistration.outcomeContent.success.product.descriptionCed')
+                    ? 'completeRegistration.outcomeContent.success.product.descriptionCed'
                     : 'completeRegistration.outcomeContent.success.product.description'
             }
             components={{ 1: <br />, 3: <br /> }}

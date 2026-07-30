@@ -283,6 +283,31 @@ test('Test: Successfull complete onboarding request of italian AS without tax co
   await executeGoHome(mockedLocation);
 });
 
+test('Test: Successfull complete onboarding request of SCEC party for product prod-interop', async () => {
+  renderComponent(PRODUCT_IDS.INTEROP);
+  await executeStepInstitutionType(PRODUCT_IDS.INTEROP, 'SCEC');
+  await executeStepSearchParty(
+    PRODUCT_IDS.INTEROP,
+    'SCEC',
+    'AGENCY X',
+    'businessName',
+    fetchWithLogsSpy
+  );
+  await executeStepBillingData(PRODUCT_IDS.INTEROP, 'SCEC', false, false, 'IPA', 'AGENCY X');
+  await executeStepAddManager(false);
+  await executeStepAddAdmin(true, false, false, false, false, false);
+  await verifySubmit(
+    PRODUCT_IDS.INTEROP,
+    'SCEC',
+    fetchWithLogsSpy,
+    'IPA',
+    false,
+    false,
+    'businessName'
+  );
+  await executeGoHome(mockedLocation);
+});
+
 test('Test: Successfull complete onboarding request of SCP for product prod-interop search with tax code', async () => {
   await completeOnboardingPdndInfocamereRequest('SCP');
 });

@@ -93,3 +93,58 @@ test('Test: The correct institution types with the expected descriptions, can be
     }
   }
 });
+
+test('Test: The disclaimer on the role of PagoPA is displayed only for prod-ced', async () => {
+  const cedDisclaimer =
+    'PagoPA S.p.A. mette a disposizione la piattaforma per la gestione delle adesioni. Non partecipa alla Convenzione e non \u00E8 responsabile della sua esecuzione.';
+  const cedProduct = mockedProducts.find((p) => p.id === PRODUCT_IDS.CED);
+  const pagoPaProduct = mockedProducts.find((p) => p.id === PRODUCT_IDS.PAGOPA);
+
+  renderComponentWithProviders(
+    <StepInstitutionType
+      selectedProduct={cedProduct}
+      productId={cedProduct?.id}
+      institutionType={'PA'}
+      fromDashboard={false}
+      setOrigin={vi.fn()}
+      productAvoidStep={false}
+      loading={false}
+      setLoading={vi.fn()}
+      setOutcome={vi.fn()}
+      genericError={{
+        title: '',
+        description: [],
+        img: undefined,
+        ImgComponent: undefined,
+      }}
+    />,
+    cedProduct?.id
+  );
+
+  await waitFor(() => expect(screen.getByText(cedDisclaimer)).toBeInTheDocument());
+
+  cleanup();
+  renderComponentWithProviders(
+    <StepInstitutionType
+      selectedProduct={pagoPaProduct}
+      productId={pagoPaProduct?.id}
+      institutionType={'PA'}
+      fromDashboard={false}
+      setOrigin={vi.fn()}
+      productAvoidStep={false}
+      loading={false}
+      setLoading={vi.fn()}
+      setOutcome={vi.fn()}
+      genericError={{
+        title: '',
+        description: [],
+        img: undefined,
+        ImgComponent: undefined,
+      }}
+    />,
+    pagoPaProduct?.id
+  );
+
+  await waitFor(() => screen.getByText(/Seleziona il tipo di ente che rappresenti/));
+  expect(screen.queryByText(cedDisclaimer)).not.toBeInTheDocument();
+});

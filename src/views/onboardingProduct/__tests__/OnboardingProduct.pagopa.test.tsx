@@ -1,6 +1,7 @@
 import '@testing-library/jest-dom';
-import { screen, waitFor } from '@testing-library/react';
-import { test, vi } from 'vitest';
+import { fireEvent, screen, waitFor } from '@testing-library/react';
+import { expect, test, vi } from 'vitest';
+import * as apiUtils from '../../../lib/api-utils';
 import '../../../locale';
 import { PRODUCT_IDS } from '../../../utils/constants';
 import {
@@ -16,6 +17,7 @@ import {
   executeStepContractsSummary,
   executeStepInstitutionType,
   executeStepSearchParty,
+  executeStepUploadRequiredDocuments,
   renderComponent,
 } from './shared/stepHelpers';
 import {
@@ -37,6 +39,42 @@ vi.mock('react-router-dom', async () => ({
 vi.mock('axios');
 
 setupTestHooks();
+
+const actualFetchWithLogs = apiUtils.fetchWithLogs;
+
+const respondWith = (endpoint: string, response: unknown) =>
+  fetchWithLogsSpy.mockImplementation((path: any, config: any, onRedirectToLogin: any) =>
+    path?.endpoint === endpoint
+      ? Promise.resolve(response as any)
+      : actualFetchWithLogs(path, config, onRedirectToLogin)
+  );
+
+const callsTo = (endpoint: string) =>
+  fetchWithLogsSpy.mock.calls.filter((call: any) => call[0]?.endpoint === endpoint);
+
+const completeGspNoIpaUntilAdminStep = async () => {
+  renderComponent(PRODUCT_IDS.PAGOPA);
+  await executeStepInstitutionType(PRODUCT_IDS.PAGOPA, 'GSP');
+  await executeStepSearchParty(
+    PRODUCT_IDS.PAGOPA,
+    'GSP',
+    'AGENCY X',
+    'businessName',
+    fetchWithLogsSpy,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    false,
+    true,
+    false
+  );
+  await executeStepContractsSummary();
+  await executeStepBillingData(PRODUCT_IDS.PAGOPA, 'GSP', false, false, 'NO_IPA', 'AGENCY X');
+  await executeStepAdditionalInfo('NO_IPA');
+  await executeStepAddManager(false);
+};
 
 test('Test: Successfull complete onboarding request of GSP party searching from IPA source for product prod-pagopa', async () => {
   renderComponent(PRODUCT_IDS.PAGOPA);
@@ -63,31 +101,62 @@ test('Test: Successfull complete onboarding request of GSP party searching from 
 });
 
 test('Test: Successfull complete onboarding request of GSP party without searching on IPA source for product prod-pagopa', async () => {
-  renderComponent(PRODUCT_IDS.PAGOPA);
-  await executeStepInstitutionType(PRODUCT_IDS.PAGOPA, 'GSP');
-  await executeStepSearchParty(
-    PRODUCT_IDS.PAGOPA,
-    'GSP',
-    'AGENCY X',
-    'businessName',
-    fetchWithLogsSpy,
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    false,
-    true,
-    false
-  );
-  await executeStepContractsSummary();
-  await executeStepBillingData(PRODUCT_IDS.PAGOPA, 'GSP', false, false, 'NO_IPA', 'AGENCY X');
-  await executeStepAdditionalInfo('NO_IPA');
-  await executeStepAddManager(false);
+  await completeGspNoIpaUntilAdminStep();
   await executeStepAddAdmin(true, false, false, false, false, false, undefined, true);
   await verifySubmit(PRODUCT_IDS.PAGOPA, 'GSP', fetchWithLogsSpy, 'NO_IPA');
-  // GSP non-IPA lands on the required documents upload flow instead of the outcome page
+
   await waitFor(() => screen.getByText('Inserisci i documenti'));
+
+  const postLegalsBefore = callsTo('ONBOARDING_POST_LEGALS').length;
+  fireEvent.click(screen.getByRole('button', { name: 'Indietro' }));
+  await waitFor(() => screen.getByText("Indica l'Amministratore"));
+  fireEvent.click(screen.getByLabelText('Continua'));
+  await waitFor(() => screen.getByText('Inserisci i documenti'));
+  expect(callsTo('ONBOARDING_POST_LEGALS')).toHaveLength(postLegalsBefore);
+
+  await executeStepUploadRequiredDocuments(fetchWithLogsSpy);
+  await executeGoHome(mockedLocation);
+});
+
+test('Test: GSP party without searching on IPA source skips the documents flow when the created onboarding is not found', async () => {
+  await completeGspNoIpaUntilAdminStep();
+
+  respondWith('ONBOARDING_GET_ONBOARDINGS', { data: [], status: 200, statusText: '200' });
+  await executeStepAddAdmin(true, false, false, false, false, false, undefined, true);
+
+  await waitFor(() => screen.getByText('Richiesta di adesione inviata'));
+  expect(screen.queryByText('Inserisci i documenti')).not.toBeInTheDocument();
+  await executeGoHome(mockedLocation);
+});
+
+test('Test: GSP party without searching on IPA source shows the error page when the created onboarding cannot be retrieved', async () => {
+  await completeGspNoIpaUntilAdminStep();
+
+  respondWith('ONBOARDING_GET_ONBOARDINGS', {
+    isAxiosError: true,
+    response: { data: '', status: 500 },
+  });
+  await executeStepAddAdmin(true, false, false, false, false, false, undefined, true);
+
+  await waitFor(() => screen.getByText('Qualcosa è andato storto.'));
+  expect(screen.queryByText('Inserisci i documenti')).not.toBeInTheDocument();
+});
+
+test('Test: Successfull complete onboarding request of PA party for product prod-pagopa', async () => {
+  renderComponent(PRODUCT_IDS.PAGOPA);
+  await executeStepInstitutionType(PRODUCT_IDS.PAGOPA, 'PA');
+  await executeStepSearchParty(
+    PRODUCT_IDS.PAGOPA,
+    'PA',
+    'AGENCY X',
+    'businessName',
+    fetchWithLogsSpy
+  );
+  await executeStepBillingData(PRODUCT_IDS.PAGOPA, 'PA', false, false, 'IPA', 'AGENCY X');
+  await executeStepAddManager(false);
+  await executeStepAddAdmin(true, false, false, false, false, false);
+  await verifySubmit(PRODUCT_IDS.PAGOPA, 'PA', fetchWithLogsSpy, 'IPA');
+  await executeGoHome(mockedLocation);
 });
 
 test('Test: Successfull complete onboarding request of GPU for product prod-pagopa', async () => {

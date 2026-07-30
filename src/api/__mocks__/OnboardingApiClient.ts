@@ -120,9 +120,21 @@ export const OnboardingApi = {
             method: 'PUT',
         })
     ),
-    uploadAttachment: vi.fn((onboardingId: string, attachmentName: string, attachment: File) => {
+    uploadAttachment: vi.fn((
+        onboardingId: string,
+        attachmentName: string,
+        attachment: File,
+        attachmentId?: string,
+        attachmentDescription?: string
+    ) => {
         const formData = new FormData();
         formData.append('attachment', attachment);
+        if (attachmentId) {
+            formData.append('attachmentId', attachmentId);
+        }
+        if (attachmentDescription) {
+            formData.append('attachmentDescription', attachmentDescription);
+        }
         return callViaFetchWithLogs('ONBOARDING_POST_ATTACHMENT', {
             endpointParams: { onboardingId, filename: attachmentName },
             data: formData,

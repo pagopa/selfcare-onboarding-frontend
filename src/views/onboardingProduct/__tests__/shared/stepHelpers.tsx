@@ -126,11 +126,7 @@ export const executeStepInstitutionType = async (
       fireEvent.click(confirmButtonEnabled);
     });
   } else {
-    if (productSelected === PRODUCT_IDS.IDPAY_MERCHANT) {
-      await waitFor(() => screen.getByText('Cerca il tuo ente'), { timeout: 5000 });
-    } else {
-      fillInstitutionTypeCheckbox('pa');
-    }
+    await waitFor(() => screen.getByText('Cerca il tuo ente'), { timeout: 5000 });
   }
 };
 
@@ -172,7 +168,12 @@ export const executeStepSearchParty = async (
 
   const aggregatorCheckbox = screen.queryByLabelText('Sono un ente aggregatore') as HTMLElement;
 
-  if (productId === PRODUCT_IDS.IO) {
+  const canAggregate =
+    ENV.AGGREGATOR.SHOW_AGGREGATOR &&
+    isPublicAdministration(institutionType as InstitutionType) &&
+    ENV.AGGREGATOR.ELIGIBLE_PRODUCTS.split(',').includes(productId);
+
+  if (canAggregate) {
     expect(aggregatorCheckbox).toBeInTheDocument();
     expect(aggregatorCheckbox).not.toBeChecked();
     if (isAggregator) {
@@ -852,4 +853,56 @@ export const executeStepUploadAggregates = async (aggregatesCsv: File) => {
   expect(csvWithErrors).not.toBeInTheDocument();
   expect(invalidFormatFile).not.toBeInTheDocument();
   await waitFor(() => screen.getByText('Richiesta di adesione inviata'));
+};
+
+const uploadRequiredDocument = async (fileName: string) => {
+  const uploader = document.querySelectorAll<HTMLInputElement>('input[type="file"]')[0];
+  await userEvent.upload(
+    uploader,
+    new File([new Uint8Array(1024)], fileName, { type: 'application/pdf' })
+  );
+  await screen.findByText(fileName);
+};
+
+const forwardFromDocumentStep = () =>
+  fireEvent.click(screen.getByRole('button', { name: 'Continua' }));
+
+export const executeStepUploadRequiredDocuments = async (fetchWithLogsSpy: MockInstance) => {
+  console.log('Testing step upload required documents..');
+
+  await waitFor(() => screen.getByText('Inserisci i documenti'));
+
+  await screen.findByText('DOCUMENTAZIONE SULLA NATURA GIURIDICA');
+  await uploadRequiredDocument('statuto.pdf');
+  forwardFromDocumentStep();
+
+  await screen.findByText('VISURA CAMERALE');
+  await uploadRequiredDocument('visura.pdf');
+  forwardFromDocumentStep();
+
+  await screen.findByText('DOCUMENTAZIONE SULLA GESTIONE DEL SERVIZIO PUBBLICO');
+  fireEvent.change(screen.getByLabelText('Titolo del documento'), {
+    target: { value: 'Convenzione 2024' },
+  });
+  await uploadRequiredDocument('attestazione.pdf');
+  forwardFromDocumentStep();
+
+  await screen.findByText('Riepilogo documenti caricati');
+  forwardFromDocumentStep();
+  fireEvent.click(await screen.findByRole('button', { name: 'Conferma' }));
+
+  await waitFor(() => screen.getByText('Richiesta di adesione inviata'));
+
+  expect(
+    fetchWithLogsSpy.mock.calls
+      .filter((call: any) => call[0]?.endpoint === 'ONBOARDING_POST_ATTACHMENT')
+      .map((call: any) => call[0].endpointParams)
+  ).toEqual([
+    { onboardingId: 'mock-onboarding-id', filename: 'statuto.pdf' },
+    { onboardingId: 'mock-onboarding-id', filename: 'visura-camerale.pdf' },
+    { onboardingId: 'mock-onboarding-id', filename: 'attestazione-gsp.pdf' },
+  ]);
+  expect(
+    fetchWithLogsSpy.mock.calls.filter((call: any) => call[0]?.endpoint === 'TRIGGER_ONBOARDING')
+  ).toHaveLength(1);
 };
