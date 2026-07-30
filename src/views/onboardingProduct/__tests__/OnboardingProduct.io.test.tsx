@@ -82,6 +82,17 @@ test('Test: Successfull complete onboarding request of PA party for prod-io sear
   await executeGoHome(mockedLocation);
 });
 
+test('Test: Successfull complete onboarding request of GSP party for prod-io search by business name', async () => {
+  renderComponent(PRODUCT_IDS.IO);
+  await executeStepInstitutionType(PRODUCT_IDS.IO, 'GSP');
+  await executeStepSearchParty(PRODUCT_IDS.IO, 'GSP', 'AGENCY X', 'businessName', fetchWithLogsSpy);
+  await executeStepBillingData(PRODUCT_IDS.IO, 'GSP', false, false, 'IPA', 'AGENCY X');
+  await executeStepAddManager(false);
+  await executeStepAddAdmin(true, false, false, false, false, false);
+  await verifySubmit(PRODUCT_IDS.IO, 'GSP', fetchWithLogsSpy, 'IPA');
+  await executeGoHome(mockedLocation);
+});
+
 test('Test: Successfull complete onboarding request of PA aggregator party for prod-io search by business name', async () => {
   renderComponent(PRODUCT_IDS.IO);
   await executeStepInstitutionType(PRODUCT_IDS.IO, 'PA');

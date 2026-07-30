@@ -58,3 +58,28 @@ test('Test: Successfull complete onboarding request of UO party for product prod
   await verifySubmit(PRODUCT_IDS.IO_SIGN, 'PA', fetchWithLogsSpy, 'IPA', true, false, 'uoCode');
   await executeGoHome(mockedLocation);
 });
+
+test('Test: Successfull complete onboarding request of GSP party for product prod-io-sign', async () => {
+  renderComponent(PRODUCT_IDS.IO_SIGN);
+  await executeStepInstitutionType(PRODUCT_IDS.IO_SIGN, 'GSP');
+  await executeStepSearchParty(
+    PRODUCT_IDS.IO_SIGN,
+    'GSP',
+    'AGENCY X',
+    'businessName',
+    fetchWithLogsSpy
+  );
+  await executeStepBillingData(PRODUCT_IDS.IO_SIGN, 'GSP', false, false, 'IPA', 'AGENCY X');
+  await executeStepAddManager(false);
+  await executeStepAddAdmin(true, false, false, false, false, false);
+  await verifySubmit(
+    PRODUCT_IDS.IO_SIGN,
+    'GSP',
+    fetchWithLogsSpy,
+    'IPA',
+    false,
+    false,
+    'businessName'
+  );
+  await executeGoHome(mockedLocation);
+});

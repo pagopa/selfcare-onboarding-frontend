@@ -92,6 +92,7 @@ export function StepAddAdmin({
       }
       setPeopleErrors(peopleErrors);
       setLoading(false);
+      return;
     }
     const userId = userIds[index];
     if (!isAuthUserAdmin) {
