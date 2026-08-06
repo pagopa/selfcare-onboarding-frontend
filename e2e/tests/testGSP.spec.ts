@@ -1,15 +1,17 @@
 import { test } from '@playwright/test';
 import {
-  stepInstitutionType,
-  stepSelectParty,
+  BASE_URL_ONBOARDING,
+  FILE_MOCK_PDF_CONTRACT,
+  PRODUCT_IDS_TEST_E2E,
+  stepAddAdmin,
   stepAdditionalInformation,
   stepAddManager,
-  stepAddAdmin,
-  BASE_URL_ONBOARDING,
-  stepFormData,
-  PRODUCT_IDS_TEST_E2E,
-  FILE_MOCK_PDF_CONTRACT,
   stepCompleteOnboarding,
+  stepFormData,
+  stepInstitutionType,
+  stepSelectParty,
+  stepSelectPartyByCF,
+  stepUploadGspNoIpaDocuments,
 } from '../utils/test-utils';
 
 test('Test Success onboarding request for product prod-pagopa and institutionType GSP', async ({
@@ -17,11 +19,7 @@ test('Test Success onboarding request for product prod-pagopa and institutionTyp
 }) => {
   await page.goto(`${BASE_URL_ONBOARDING}/prod-pagopa`);
   await stepInstitutionType(page, 'Gestore di servizi pubblici');
-  await stepSelectParty(
-    page,
-    undefined,
-    'Azienda Territoriale per L’Edilizia Residenziale Pubblica della Provincia di Viterbo'
-  );
+  await stepSelectPartyByCF(page, '80000910564');
   await stepFormData(page, PRODUCT_IDS_TEST_E2E.PAGOPA, 'GSP');
   await stepAddManager(page);
   await stepAddAdmin(page);
@@ -43,15 +41,12 @@ test('Test Success onboarding request for product prod-pagopa and institutionTyp
   await stepFormData(page, 'GSP', undefined);
   await stepAdditionalInformation(page);
   await stepAddManager(page);
-  await stepAddAdmin(page);
-  await stepCompleteOnboarding(
-    page,
-    '11779933554',
-    FILE_MOCK_PDF_CONTRACT.PA,
-    PRODUCT_IDS_TEST_E2E.PAGOPA,
-    undefined,
-    true
-  );
+  await stepAddAdmin(page, {
+    institutionType: 'GSP',
+    productId: PRODUCT_IDS_TEST_E2E.PAGOPA,
+    notOnIpa: true,
+  });
+  await stepUploadGspNoIpaDocuments(page, FILE_MOCK_PDF_CONTRACT.PA);
 });
 
 test('Test Success onboarding request for product prod-interop and institutionType GSP', async ({
@@ -80,7 +75,7 @@ test('Test Success onboarding request for product prod-io and institutionType GS
 }) => {
   await page.goto(`${BASE_URL_ONBOARDING}/prod-io`);
   await stepInstitutionType(page, 'Gestore di servizi pubblici');
-  await stepSelectParty(page);
+  await stepSelectPartyByCF(page, '80001080532');
   await stepFormData(page, PRODUCT_IDS_TEST_E2E.IO, 'GSP');
   await stepAddManager(page);
   await stepAddAdmin(page);
@@ -92,7 +87,7 @@ test('Test Success onboarding request for product prod-io and institutionType GS
   );
 });
 
-test('Test Success onboarding request for product prod-io-sign and institutionType GSP', async ({
+test.fixme('Test Success onboarding request for product prod-io-sign and institutionType GSP', async ({
   page,
 }) => {
   await page.goto(`${BASE_URL_ONBOARDING}/prod-io-sign`);

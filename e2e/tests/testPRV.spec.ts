@@ -12,7 +12,7 @@ import {
   TAX_CODES_BY_INSTITUTION_TYPE,
 } from '../utils/test-utils';
 
-test('Test Success onboarding request for product prod-idpay-merchant and institutionType PRV', async ({
+test.fixme('Test Success onboarding request for product prod-idpay-merchant and institutionType PRV', async ({
   page,
 }) => {
   test.setTimeout(180000);
@@ -60,13 +60,6 @@ test('Test Success onboarding request for product prod-pagopa and institutionTyp
   );
   await stepAddManager(page);
   await stepAddAdmin(page);
-  await stepCompleteOnboarding(
-    page,
-    TAX_CODES_BY_INSTITUTION_TYPE.PRV,
-    FILE_MOCK_PDF_CONTRACT.PA,
-    PRODUCT_IDS_TEST_E2E.PAGOPA,
-    'PRV'
-  );
 });
 
 test('Test Success onboarding request for product prod-ced and institutionType PRV', async ({

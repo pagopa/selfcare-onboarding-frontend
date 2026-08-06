@@ -78,16 +78,8 @@ jobs:
           VITE_URL_API_APIM: ${{ secrets.VITE_URL_API_APIM }}
         run: yarn test:e2e
 
-      - name: Cleanup onboardings
-        if: always()
-        env:
-          CI: true
-          VITE_ENV: development
-          APIM_SUBSCRIPTION_KEY: ${{ steps.get-apim-key.outputs.APIM_KEY }}
-          VITE_URL_API_APIM: ${{ secrets.VITE_URL_API_APIM }}
-        run: |
-          cd e2e
-          yarn cleanup || echo "⚠️ Cleanup failed, but continuing..."
+      # Leftover onboardings are handled by the Playwright global setup before the run, not after:
+      # a run that crashes halfway still leaves the environment usable for the next one.
 
       - name: Check test results
         if: steps.run_tests.outcome == 'failure'

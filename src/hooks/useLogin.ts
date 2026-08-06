@@ -22,9 +22,9 @@ export const useLogin = () => {
     if (MOCK_USER) {
       setUser({
         uid: '0',
-        taxCode: 'LGGLGD80A01B354S',
-        name: 'loggedName',
-        surname: 'loggedSurname',
+        taxCode: 'SSTMTT76C23F205T',
+        name: 'Mattia',
+        surname: 'Sisti',
         email: 'loggedEmail@aa.aa',
       });
       storageTokenOps.write(testToken);

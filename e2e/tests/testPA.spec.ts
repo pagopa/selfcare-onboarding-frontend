@@ -56,7 +56,7 @@ test('Test Success onboarding request for product prod-io and institutionType PA
   await stepSelectPartyByCF(page, '94155940631', undefined, true);
   await stepFormData(page, PRODUCT_IDS_TEST_E2E.IO, 'PA');
   await stepAddManager(page);
-  await stepAddAdmin(page, true);
+  await stepAddAdmin(page, { aggregator: true });
   await stepUploadAggregatorCsv(
     page,
     'Indica i soggetti aggregati per IO',
@@ -127,7 +127,7 @@ test('Test Success onboarding request for product prod-pn and institutionType PA
   await stepSelectPartyByCF(page, '91199120378', undefined, true);
   await stepFormData(page, PRODUCT_IDS_TEST_E2E.SEND, 'PA', true);
   await stepAddManager(page);
-  await stepAddAdmin(page, true);
+  await stepAddAdmin(page, { aggregator: true });
   await stepUploadAggregatorCsv(
     page,
     'Indica i soggetti aggregati per SEND - Servizio Notifiche Digitali',
@@ -148,8 +148,8 @@ test('Test Success onboarding request for product prod-ced and institutionType P
   await stepInstitutionType(page, 'Soggetti pubblici');
   await stepSelectPartyByCF(page, '97187780826');
   await stepFormData(page, PRODUCT_IDS_TEST_E2E.CED, 'PA');
-  await stepAddManager(page);
-  await stepAddAdmin(page, true);
+  await stepAddManager(page, PRODUCT_IDS_TEST_E2E.CED);
+  await stepAddAdmin(page);
   await stepCompleteOnboarding(
     page,
     '97187780826',
@@ -157,4 +157,3 @@ test('Test Success onboarding request for product prod-ced and institutionType P
     PRODUCT_IDS_TEST_E2E.CED
   );
 });
-

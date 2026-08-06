@@ -16,6 +16,7 @@ import { getErrorStatus } from '../lib/error-utils';
 import { InstitutionOrigins } from '../model/InstitutionOrigins';
 import { OnboardingFormData } from '../model/OnboardingFormData';
 import { ProductResource } from '../model/ProductResource';
+import config from '../utils/config.json';
 import { ENV } from '../utils/env';
 import {
   isContractingAuthority,
@@ -23,6 +24,7 @@ import {
   isIdpayMerchantProduct,
   isInsuranceCompany,
   isInteropProduct,
+  isMockEnvironment,
   isPrivatePersonInstitution,
 } from '../utils/institutionTypeUtils';
 import { genericError } from '../views/onboardingProduct/components/StepVerifyOnboarding';
@@ -212,6 +214,11 @@ export const getFilterCategories = async (
   setFilterCategoriesResponse: Dispatch<SetStateAction<any>>,
   genericError: any
 ): Promise<boolean> => {
+  // In mock mode there is no CDN to hit: use the bundled copy the mocks already serve.
+  if (isMockEnvironment()) {
+    setFilterCategoriesResponse(config);
+    return true;
+  }
   try {
     const cdnUrl = `${ENV.BASE_PATH_CDN_URL}/assets/config.json`;
     // Direct axios call to CDN without Authorization header to avoid CORS issues

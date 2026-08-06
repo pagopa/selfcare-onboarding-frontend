@@ -1,8 +1,46 @@
 /// <reference types="node" />
 import path from 'path';
-import { chromium } from '@playwright/test';
+import { BrowserContext, chromium, Page } from '@playwright/test';
 
-export const isLocalMode = process.env.VITE_ENV === 'LOCAL_DEV' || process.env.NODE_ENV === 'test';
+import { isLocalMode, resetTestOnboardings } from './api-utils';
+
+/**
+ * Refuses the OneTrust banner instead of accepting it, and checks it took.
+ *
+ * Refusing keeps the Qualtrics satisfaction survey away: it belongs to cookie group C0002, which
+ * triggerQualtricsIntercept checks before running. Accepting means the survey pops up over the
+ * success page partway through the suite.
+ *
+ * The banner has to be actively dismissed, not just left alone: while it is up OneTrust covers the
+ * page with `.onetrust-pc-dark-filter`, which swallows every click the tests make.
+ */
+const refuseCookies = async (page: Page, context: BrowserContext) => {
+  // "Rifiuta tutti" carries no id on this banner, only the OneTrust class
+  const refuseButton = page.locator('.ot-pc-refuse-all-handler, #onetrust-reject-all-handler');
+
+  try {
+    await refuseButton.first().click({ timeout: 8000 });
+    await page.waitForTimeout(1000);
+  } catch {
+    console.log('GLOBAL SETUP: i️ No cookie banner to refuse');
+  }
+
+  const consent = (await context.cookies()).find((cookie) => cookie.name === 'OptanonConsent');
+
+  if (!consent) {
+    console.error(
+      'GLOBAL SETUP: ⚠️ no OptanonConsent cookie - the banner will reappear during the tests and ' +
+        'its overlay will swallow clicks'
+    );
+  } else if (decodeURIComponent(consent.value).includes('C0002:1')) {
+    console.error(
+      'GLOBAL SETUP: ⚠️ analytics cookies accepted - the Qualtrics survey will pop up over the ' +
+        'success pages'
+    );
+  } else {
+    console.log('GLOBAL SETUP: ✅ Cookies refused (C0002 denied, Qualtrics survey off)');
+  }
+};
 
 async function globalSetup() {
   console.log(`GLOBAL SETUP: Starting in ${isLocalMode ? 'LOCAL/TEST' : 'DEV'} mode`);
@@ -26,18 +64,11 @@ async function globalSetup() {
       await page.goto('http://localhost:3000/onboarding', { timeout: 60000 });
       await page.waitForTimeout(2000);
 
-      const cookieButton = page.getByRole('button', { name: 'Accetta tutti' });
-      await cookieButton.click();
+      await refuseCookies(page, context);
 
       console.log(`GLOBAL SETUP: ✅ Mock login completed`);
     } else {
       await page.goto('https://dev.selfcare.pagopa.it', { timeout: 60000 });
-
-      try {
-        await page.getByRole('button', { name: 'Accetta tutti' }).click({ timeout: 5000 });
-      } catch {
-        // cookie banner not present, continue
-      }
 
       const spidButton = page.getByRole('button', { name: 'Entra con SPID' });
       await spidButton.click({ timeout: 20000 });
@@ -81,6 +112,16 @@ async function globalSetup() {
       });
 
       console.log(`GLOBAL SETUP: ✅ SPID login completed`);
+
+      // Only now: before the login the root redirects to OneID, so the click races the redirect
+      await refuseCookies(page, context);
+
+      const token = await page.evaluate(() => localStorage.getItem('token'));
+      if (token) {
+        await resetTestOnboardings(page, token);
+      } else {
+        console.error('GLOBAL SETUP: ⚠️ no token in localStorage, reset skipped');
+      }
     }
 
     await context.storageState({ path: path.resolve(__dirname, '../storageState.json') });
