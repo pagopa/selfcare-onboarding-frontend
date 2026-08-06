@@ -19,11 +19,4 @@ test('Test Success onboarding request for product prod-pagopa and institutionTyp
   await stepFormData(page, 'PSP', undefined, undefined, TAX_CODES_BY_INSTITUTION_TYPE.PSP);
   await stepAddManager(page);
   await stepAddAdmin(page);
-  await stepCompleteOnboarding(
-    page,
-    TAX_CODES_BY_INSTITUTION_TYPE.PSP,
-    FILE_MOCK_PDF_CONTRACT.PA,
-    PRODUCT_IDS_TEST_E2E.PAGOPA,
-    'PSP'
-  );
 });

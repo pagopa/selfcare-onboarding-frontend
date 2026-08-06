@@ -5,3 +5,7 @@ node_modules/
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+# holds a live SPID session token
+/storageState.json
+/onboarding-baseline.json

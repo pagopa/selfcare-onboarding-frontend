@@ -1,13 +1,18 @@
-import { it, expect, vi, beforeEach } from 'vitest';
+import { it, expect, vi, beforeEach, afterEach, type Mocked } from 'vitest';
+import axios from 'axios';
 import { OnboardingApi } from '../../api/OnboardingApiClient';
 import {
   getOnboardingData,
   checkProduct,
   addUserRequest,
   getAllowedAddUserProducts,
+  getFilterCategories,
   getInstiutionTypesByProduct,
 } from '../onboardingServices';
+import config from '../../utils/config.json';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
+
+vi.mock('axios');
 
 vi.mock('../../api/OnboardingApiClient', () => ({
   OnboardingApi: {
@@ -36,8 +41,15 @@ const outcomeContent = {
   error: { code: 'error' },
 } as any;
 
+const mockedAxios = axios as Mocked<typeof axios>;
+const setFilterCategories = vi.fn();
+
 beforeEach(() => {
   vi.clearAllMocks();
+});
+
+afterEach(() => {
+  vi.unstubAllEnvs();
 });
 
 // ---------- getOnboardingData ----------
@@ -243,5 +255,29 @@ it('test getInstiutionTypesByProduct on error sets genericError', async () => {
     setOutcome,
     genericError
   );
+  expect(setOutcome).toHaveBeenCalledWith(genericError);
+});
+
+// ---------- getFilterCategories ----------
+
+it('test getFilterCategories in mock mode uses the bundled config without calling the CDN', async () => {
+  vi.stubEnv('VITE_MOCK_API', 'true');
+
+  await getFilterCategories(setOutcome, setFilterCategories, genericError);
+
+  expect(mockedAxios.get).not.toHaveBeenCalled();
+  expect(setFilterCategories).toHaveBeenCalledWith(config);
+  expect(setOutcome).not.toHaveBeenCalled();
+});
+
+it('test getFilterCategories fails closed when the CDN config is unreachable', async () => {
+  // Without the categories the IPA search runs unfiltered, letting institutions of the wrong
+  // category start an onboarding: the flow must be blocked, not silently widened.
+  vi.stubEnv('VITE_MOCK_API', 'false');
+  mockedAxios.get.mockRejectedValue(new Error('404'));
+
+  await getFilterCategories(setOutcome, setFilterCategories, genericError);
+
+  expect(setFilterCategories).not.toHaveBeenCalled();
   expect(setOutcome).toHaveBeenCalledWith(genericError);
 });

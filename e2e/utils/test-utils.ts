@@ -2,9 +2,7 @@
 import path from 'path';
 import { Page, expect } from '@playwright/test';
 
-import { getOnboardingIdByTaxCode } from './api-utils';
-import { isLocalMode } from './global.setup';
-import { trackOnboardingId } from './onboarding-tracker';
+import { getOnboardingIdByTaxCode, isLocalMode } from './api-utils';
 
 // eslint-disable-next-line functional/no-let
 // let copiedText: string;
@@ -131,6 +129,14 @@ export const isGpuInstitutionE2E = (institutionType?: InstitutionType): boolean 
 export const isConsolidatedEconomicAccountCompanyE2E = (
   institutionType?: InstitutionType
 ): boolean => institutionType === 'SCEC';
+
+// Mirrors isRequiredDocumentsFlow in OnboardingProduct: prod-pagopa + GSP, but only for a party
+// that is not on IPA.
+export const isUploadDocumentsGSP_NO_IPA_flow = (
+  productId?: string,
+  institutionType?: InstitutionType,
+  notOnIpa?: boolean
+): boolean => !!notOnIpa && productId === PRODUCT_IDS_TEST_E2E.PAGOPA && institutionType === 'GSP';
 
 export const stepInstitutionType = async (page: Page, institutionType: string) => {
   await page.waitForTimeout(1000);
@@ -280,7 +286,10 @@ export const stepFormData = async (
     !isPrivateInstitutionE2E(institutionType as InstitutionType) &&
     !isGpuInstitutionE2E(institutionType as InstitutionType)
   ) {
-    await page.getByLabel('La Partita IVA coincide con il Codice Fiscale').click();
+    // The form no longer exposes this checkbox through that accessible name - it now sits next to
+    // a separate "Partita IVA" field and a "senza partita IVA" one. The id is what the rest of
+    // this file already uses, and it survived the redesign.
+    await page.click('#taxCodeEquals2VatNumber');
   }
 
   if (
@@ -320,9 +329,15 @@ export const stepFormData = async (
     await page.fill('#supportEmail', 'test@test.it', { timeout: 500 });
   }
 
+  // SCP on interop now asks for REA and share capital too, like AS does
+  const isPublicServiceCompanyOnInterop =
+    isPublicServiceCompanyE2E(actualInstitutionType as InstitutionType) &&
+    isInteropProductE2E(product);
+
   if (
     isInsuranceCompanyE2E(actualInstitutionType as InstitutionType) ||
     isGpuInstitutionE2E(actualInstitutionType as InstitutionType) ||
+    isPublicServiceCompanyOnInterop ||
     (isGlobalServiceProviderE2E(actualInstitutionType as InstitutionType) && !isFromIpa)
   ) {
     await page.click('#rea');
@@ -331,6 +346,7 @@ export const stepFormData = async (
 
   if (
     isInsuranceCompanyE2E(actualInstitutionType as InstitutionType) ||
+    isPublicServiceCompanyOnInterop ||
     (isInteropProductE2E(product) &&
       isPrivateInstitutionE2E(actualInstitutionType as InstitutionType))
   ) {
@@ -394,7 +410,13 @@ export const stepFormData = async (
   await page.getByRole('button', { name: 'Continua' }).waitFor({ timeout: 5000 });
   await page.getByRole('button', { name: 'Continua' }).click();
 
-  if (await page.getByText('Stai modificando l’area geografica del tuo ente').isVisible()) {
+  // isVisible() does not wait, so it used to miss the dialog whenever it rendered a beat late
+  const geoDialog = page.getByText('Stai modificando l’area geografica del tuo ente');
+  const geoDialogShown = await geoDialog
+    .waitFor({ state: 'visible', timeout: 3000 })
+    .then(() => true)
+    .catch(() => false);
+  if (geoDialogShown) {
     await page.getByRole('button', { name: 'Continua' }).click();
   }
 };
@@ -430,9 +452,14 @@ export const stepAdditionalGPUInformation = async (page: Page) => {
   await page.getByRole('button', { name: 'Continua' }).click();
 };
 
+/** Email used whenever a step toggles "Aggiungi me come ..." and fills the logged user in. */
+const AUTH_USER_EMAIL = 'cleopatra@test.it';
+
 export const stepAddManager = async (page: Page, product?: string) => {
   if (isCedProductE2E(product)) {
-    await page.getByLabel('Aggiungi me come Amministratore').click();
+    // getByLabel matches both the Switch's span and its inner checkbox - the testid is the only
+    // unambiguous handle.
+    await page.getByTestId('authUserSwitch-test').click();
   } else {
     await page.click('#manager-initial-name');
     await page.fill('#manager-initial-name', 'Sigmund', {
@@ -448,19 +475,34 @@ export const stepAddManager = async (page: Page, product?: string) => {
     });
   }
   await page.getByRole('textbox', { name: 'Email Istituzionale' }).click();
-  await page.fill('#manager-initial-email', 's.freud@test.it', {
-    timeout: 1000,
-  });
+  // On CED both switches put the logged user in both roles, and the same person with two different
+  // emails is an 'email-conflict' (allowsDuplicates in PlatformUserForm), so the manager has to
+  // reuse the address stepAddAdmin fills in.
+  await page.fill(
+    '#manager-initial-email',
+    isCedProductE2E(product) ? AUTH_USER_EMAIL : 's.freud@test.it',
+    { timeout: 1000 }
+  );
   await page.click('[aria-label="Continua"]');
 };
 
-export const stepAddAdmin = async (
-  page: Page,
-  aggregator?: boolean,
-  institutionType?: InstitutionType,
-  isAddApplicantEmail?: boolean
-) => {
-  if (isLocalMode || isAddApplicantEmail) {
+type StepAddAdminOptions = {
+  aggregator?: boolean;
+  institutionType?: InstitutionType;
+  isAddApplicantEmail?: boolean;
+  productId?: string;
+  /** The party was entered through the "no IPA" link instead of being picked from the registry. */
+  notOnIpa?: boolean;
+};
+
+export const stepAddAdmin = async (page: Page, options: StepAddAdminOptions = {}) => {
+  const { aggregator, institutionType, isAddApplicantEmail, productId, notOnIpa } = options;
+
+  // Whether the admin is somebody other than the logged user. It drives which form we fill here
+  // and, further down, whether the app asks for confirmation before submitting.
+  const isDelegateOtherThanLoggedUser = isLocalMode || isAddApplicantEmail;
+
+  if (isDelegateOtherThanLoggedUser) {
     await page.click('#delegate-initial-name');
     await page.fill('#delegate-initial-name', 'Mattia', {
       timeout: 1000,
@@ -483,7 +525,7 @@ export const stepAddAdmin = async (
     await page.getByLabel('Aggiungi me come Amministratore').click();
 
     await page.getByRole('textbox', { name: 'Email Istituzionale' }).click();
-    await page.fill('#delegate-initial-email', 'cleopatra@test.it', {
+    await page.fill('#delegate-initial-email', AUTH_USER_EMAIL, {
       timeout: 500,
     });
 
@@ -498,12 +540,17 @@ export const stepAddAdmin = async (
     return;
   }
 
-  if (!isTechPartner(institutionType)) {
-    await page.getByRole('button', { name: 'Conferma' }).waitFor({
-      state: 'visible',
-      timeout: 2000,
-    });
+  // GSP non-IPA: the app skips the confirmation modal here (isRequiredDocumentsFlow in
+  // StepAddAdmin) and hands over to the document upload flow. Both the "Conferma" and the
+  // "Richiesta di adesione inviata" assertion belong to stepUploadGspNoIpaDocuments, which
+  // asserts the handover on its first line.
+  if (isUploadDocumentsGSP_NO_IPA_flow(productId, institutionType, notOnIpa)) {
+    return;
+  }
 
+  // Every other flow goes through the "Confermi la richiesta di invio?" modal, which StepAddAdmin
+  // skips for tech partners and for isAddApplicationEmail.
+  if (!isDelegateOtherThanLoggedUser && !isTechPartner(institutionType)) {
     await page.getByRole('button', { name: 'Conferma' }).click();
   }
 
@@ -582,34 +629,37 @@ export const stepCompleteOnboarding = async (
       isPaymentServiceProviderE2E(institutionType as InstitutionType) ||
       isTechPartner(institutionType as InstitutionType)); */
 
-  let onboardingId = await getOnboardingIdByTaxCode(
+  const onboardingId = await getOnboardingIdByTaxCode(
     page,
     taxCode,
     productId,
     /* requiresApproval || notOnIpa ? 'TOBEVALIDATED' : */ 'PENDING'
   );
 
-  if (onboardingId.length > 0) {
-    /* if (requiresApproval || notOnIpa) {
-      await redirectToApprove(page, onboardingId);
+  // getOnboardingIdByTaxCode throws with the reason if it cannot find it. This used to be
+  // `if (onboardingId.length > 0)`, which turned "not found" into a silent pass.
 
-      if (!isTechPartner(institutionType)) {
-        await page.waitForTimeout(2000);
+  /* if (requiresApproval || notOnIpa) {
+    await redirectToApprove(page, onboardingId);
 
-        onboardingId = await getOnboardingIdByTaxCode(page, taxCode, productId, 'PENDING');
-      }
-    } */
-
-    if (!isTechPartner(institutionType) && !notOnIpa) {
-      await page.goto(`${BASE_URL_ONBOARDING}/confirm?jwt=${onboardingId}`, {
-        timeout: 10000,
-      });
-
-      await page.click('[data-testid="DownloadIcon"]', { timeout: 2000 });
-
+    if (!isTechPartner(institutionType)) {
       await page.waitForTimeout(2000);
-      await page.click('[data-testid="ArrowForwardIcon"]', { timeout: 2000 });
 
+      onboardingId = await getOnboardingIdByTaxCode(page, taxCode, productId, 'PENDING');
+    }
+  } */
+
+  if (!isTechPartner(institutionType) && !notOnIpa) {
+    await page.goto(`${BASE_URL_ONBOARDING}/confirm?jwt=${onboardingId}`, {
+      timeout: 10000,
+    });
+
+    await page.click('[data-testid="DownloadIcon"]', { timeout: 2000 });
+
+    await page.waitForTimeout(2000);
+    await page.click('[data-testid="ArrowForwardIcon"]', { timeout: 2000 });
+
+    const uploadContract = async () => {
       await page.waitForSelector('#file-uploader', {
         state: 'attached',
         timeout: 10000,
@@ -617,106 +667,80 @@ export const stepCompleteOnboarding = async (
 
       await page.waitForTimeout(500);
 
-      const fileInput = page.locator('#file-uploader');
-      await expect(fileInput).toBeAttached();
-
       await page.setInputFiles('#file-uploader', filePdf);
 
       await page.waitForTimeout(1000);
 
       await page.getByRole('button', { name: 'Continua' }).click();
+    };
 
-      await expect(page.getByText('Adesione completata!')).toBeInViewport({
-        timeout: 10000,
-      });
+    // CED gets its own wording on the outcome page: outcomeContent.success.product.titleCed
+    const successTitle = page.getByText(
+      isCedProductE2E(productId) ? 'Accordo caricato correttamente' : 'Adesione completata!'
+    );
+    // "Carica di nuovo" is the button on the upload failure page (CompleteRequestFailPage): it
+    // clears the uploaded file and puts the uploader back, so the upload can be retried in place.
+    const uploadAgain = page.getByRole('button', { name: 'Carica di nuovo' });
+
+    await uploadContract();
+
+    // Waiting on either outcome instead of on success alone, so a failed upload is caught as soon
+    // as its page renders rather than after the success assertion has timed out.
+    await successTitle.or(uploadAgain).first().waitFor({ state: 'visible', timeout: 20000 });
+
+    if (await uploadAgain.isVisible()) {
+      await uploadAgain.click();
+      await uploadContract();
     }
 
-    await trackOnboardingId(onboardingId);
+    await expect(successTitle).toBeInViewport({
+      timeout: 20000,
+    });
   }
 };
-/* export const stepFormDataWithIpaResearch4SDICode = async (
-  page: Page,
-  context: any,
-  product: string
-) => {
-  await page.getByLabel('La Partita IVA coincide con il Codice Fiscale').click();
-  if (product !== PRODUCT_IDS_TEST_E2E.INTEROP) {
-    page.on('dialog', async (dialog) => {
-      console.log(`Dialogo rilevato: ${dialog.message()}`);
-      await dialog.accept();
-    });
 
-    // Opening a new page for IPA sources
-    const newPagePromise = context.waitForEvent('page');
-    await page.evaluate(() => {
-      window.open(
-        'https://indicepa.gov.it/ipa-portale/consultazione/indirizzo-sede/ricerca-ente',
-        '_blank'
-      );
-    });
-    const newPage = await newPagePromise;
-    await newPage.waitForLoadState();
+// The uploader is a react-dropzone box: the visible "carica il file" is a button that opens the
+// native picker, and the file goes to its hidden input - same as the contract upload in
+// stepCompleteOnboarding, which is why the file is set on the input while it is only attached.
+const uploadRequiredDocument = async (page: Page, filePdf: string) => {
+  const fileInput = page.locator('input[type="file"]');
+  await fileInput.waitFor({ state: 'attached', timeout: 10000 });
 
-    await researchOnIpa(newPage, partyName);
-    await page.waitForTimeout(500);
-    await page.click('#recipientCode');
-    await page.fill('#recipientCode', copiedText, { timeout: 500 });
-  }
-  if (isIoSignProductE2E(product)) {
-    await page.click('#supportEmail');
-    await page.fill('#supportEmail', 'test@test.it', { timeout: 500 });
-  }
-  await page.getByRole('radio', { name: 'Nazionale' }).waitFor({ timeout: 500 });
-  await page.getByRole('radio', { name: 'Nazionale' }).click();
-  await page.getByRole('button', { name: 'Continua' }).waitFor({ timeout: 500 });
+  await page.waitForTimeout(500);
+
+  await fileInput.setInputFiles(filePdf);
+
+  await page.waitForTimeout(1000);
+
   await page.getByRole('button', { name: 'Continua' }).click();
-}; 
+};
 
-Function that search and find the first row of the IPA table that contains uniqueCode and
-export const copyUniqueCodeIfSFEIsPresent = async (page: Page) => {
-  const tbody = page.locator('tbody').first();
-  const rows = await tbody.locator('tr').all();
-
-  for (const row of rows) {
-    const cellaCodiceUnivoco = row.locator('td:nth-child(2) div');
-    const cellSfe = row.locator('td:nth-child(4)');
-
-    const codiceUnivocoText = (await cellaCodiceUnivoco.innerText()).trim();
-    const cellSfeText = (await cellSfe.innerText()).trim();
-
-    if (codiceUnivocoText !== '' && cellSfeText !== '') {
-      // save in the costant the value of the unique code
-      const uniqueCodeSelector = `xpath=//table/tbody/tr[${Number(rows.indexOf(row)) + 1}]/td[2]`;
-      const textToCopy = await page.locator(uniqueCodeSelector).innerText();
-      console.log(
-        'Trovata riga con codice univoco e altro valore nella quarta cella. Testo della quarta cella:',
-        textToCopy
-      );
-      // eslint-disable-next-line functional/immutable-data
-      copiedText = textToCopy;
-      // afer we've saved the value in the global "copiedText" we're going to close the page
-      await page.close();
-    }
-  }
-  console.log('Nessuna riga trovata con contenuto sia nella seconda che nella quarta cella.');
-  return '';
-}; 
-
-Function that copy the recipient code from table of IPA
-export const researchOnIpa = async (newPage: Page, partyName: string) => {
-  await newPage.setViewportSize({ width: 1920, height: 953 });
-  newPage.on('popup', async (popup) => {
-    console.log('Pop-up rilevato!');
-    await popup.close();
+export const stepUploadGspNoIpaDocuments = async (page: Page, filePdf: string) => {
+  await expect(page.getByText('Inserisci i documenti')).toBeInViewport({
+    timeout: 10000,
   });
-  newPage.on('dialog', async (dialog) => {
-    console.log(`Dialogo rilevato: ${dialog.message()}`);
-    await dialog.accept();
+
+  // Natura giuridica
+  await uploadRequiredDocument(page, filePdf);
+
+  // Visura
+  await uploadRequiredDocument(page, filePdf);
+
+  // Attestazione GSP: this one accepts more than one document, so it also asks for a title
+  await page.getByRole('textbox', { name: 'Titolo del documento' }).fill('test');
+  await uploadRequiredDocument(page, filePdf);
+
+  // toBeVisible, not toBeInViewport: after the three uploads the page is scrolled past this title,
+  // so it is rendered but outside the viewport.
+  await expect(page.getByText('Riepilogo documenti caricati')).toBeVisible({
+    timeout: 10000,
   });
-  await newPage.click('#denominazione');
-  await newPage.fill('#denominazione', partyName, { timeout: 1000 });
-  await newPage.click('#bottoneRicerca', { timeout: 1000 });
-  await newPage.getByRole('img', { name: 'Elenco Unità Organizzative' }).waitFor({ timeout: 1000 });
-  await newPage.getByRole('img', { name: 'Elenco Unità Organizzative' }).click();
-  await copyUniqueCodeIfSFEIsPresent(newPage);
-}; */
+
+  await page.getByRole('button', { name: 'Continua' }).click();
+  await page.getByRole('button', { name: 'Conferma' }).click();
+  
+
+  await expect(page.getByText('Richiesta di adesione inviata')).toBeInViewport({
+    timeout: 15000,
+  });
+};

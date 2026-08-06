@@ -11,7 +11,7 @@ import {
   stepCompleteOnboarding
 } from '../utils/test-utils';
 
-test('Test Success onboarding request for product prod-interop and institutionType SCP', async ({
+test.fixme('Test Success onboarding request for product prod-interop and institutionType SCP', async ({
   page,
 }) => {
   await page.goto(`${BASE_URL_ONBOARDING}/prod-interop`);

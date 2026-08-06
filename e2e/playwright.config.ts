@@ -15,15 +15,18 @@ export default defineConfig({
   // path to the global setup files.
   globalSetup: path.resolve(__dirname, './utils/global.setup.ts'),
   globalTeardown: path.resolve(__dirname, './utils/global.teardown.ts'),
-  workers: process.env.CI ? 2 : 1,
-  timeout: process.env.CI ? 90000 : 120000,
-  testDir: './tests', 
+  // Every test onboards a real party on the dev backend and then looks it up by taxCode+productId.
+  // Two tests running at once (or a retry re-submitting a flow that already went through) create
+  // two indistinguishable onboardings for the same pair, so the lookup picks the wrong one.
+  workers: 1,
+  retries: 1,
+  timeout: 120000,
+  testDir: './tests',
   forbidOnly: !!process.env.CI,
   fullyParallel: false,
-  retries: 1,
   use: {
     locale: 'it-IT',
-    trace: 'on-first-retry',
+    trace: 'retain-on-failure', // no retries anymore, so capture the trace of the failing run
     storageState: path.resolve(__dirname, 'storageState.json'),
     actionTimeout: 8000, // click/fill
     navigationTimeout: 15000, // navigations

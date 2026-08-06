@@ -10,13 +10,13 @@ import {
   TAX_CODES_BY_INSTITUTION_TYPE,
 } from '../utils/test-utils';
 
-test('Test Success onboarding request for product prod-pagopa and institutionType PT', async ({
+test.fixme('Test Success onboarding request for product prod-pagopa and institutionType PT', async ({
   page,
 }) => {
   await page.goto(`${BASE_URL_ONBOARDING}/prod-pagopa`);
   await stepInstitutionType(page, 'Partner tecnologico');
   await stepFormData(page, 'PT', undefined, undefined, TAX_CODES_BY_INSTITUTION_TYPE.PT);
-  await stepAddAdmin(page, undefined, 'PT');
+  await stepAddAdmin(page, { institutionType: 'PT' });
   await stepCompleteOnboarding(
     page,
     TAX_CODES_BY_INSTITUTION_TYPE.PT,

@@ -301,9 +301,6 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     setActiveStep(activeStep - 1);
   };
   const forward = () => {
-    if (outcome && activeStep <= 2) {
-      setOutcome(null);
-    }
     setActiveStep(activeStep + 1);
   };
 
@@ -717,7 +714,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
         setActiveStep(steps.findIndex((step) => step.label === 'Insert admins data'));
       }}
     />
-  ) : outcome && activeStep > 2 ? (
+  ) : outcome ? (
     <MessageNoAction {...outcome} />
   ) : pricingPlan && pricingPlan !== 'FA' ? (
     <EndingPage
