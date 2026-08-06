@@ -356,9 +356,9 @@ const checkLoggedUserAsAdminCheckbox = async (
     confirmButton,
     addDelegateButton,
     prefix,
-    'loggedName',
-    'loggedSurname',
-    'LGGLGD80A01B354S'
+    'Mattia',
+    'Sisti',
+    'SSTMTT76C23F205T'
   );
 
   await fillTextFieldAndCheckButton(`${prefix}-initial`, 'email', 'a@a.aa');
@@ -469,8 +469,8 @@ export const executeStepAddApplicantEmailForm = async () => {
   const email = screen.getByTestId('email-applicant-test') as HTMLInputElement;
 
   await waitFor(() => {
-    expect(name.value).toBe('loggedName');
-    expect(surname.value).toBe('loggedSurname');
+    expect(name.value).toBe('Mattia');
+    expect(surname.value).toBe('Sisti');
   });
 
   fireEvent.change(email, { target: { value: 'INVALIDEMAIL' } });
@@ -662,10 +662,10 @@ export const verifySubmit = async (
           isCedProduct(productId)
             ? {
                 email: 'a@a.aa',
-                name: 'loggedName',
+                name: 'Mattia',
                 role: 'MANAGER',
-                surname: 'loggedSurname',
-                taxCode: 'LGGLGD80A01B354S',
+                surname: 'Sisti',
+                taxCode: 'SSTMTT76C23F205T',
                 uid: '0',
               }
             : {
@@ -679,10 +679,10 @@ export const verifySubmit = async (
           !isAddApplicantEmail
             ? {
                 email: 'a@a.aa',
-                name: 'loggedName',
+                name: 'Mattia',
                 role: 'DELEGATE',
-                surname: 'loggedSurname',
-                taxCode: 'LGGLGD80A01B354S',
+                surname: 'Sisti',
+                taxCode: 'SSTMTT76C23F205T',
                 uid: '0',
               }
             : {
@@ -724,7 +724,7 @@ export const verifySubmit = async (
         isAggregator,
         aggregates: isAggregator ? [] : undefined,
         userRequester: isAddApplicantEmail
-          ? { name: 'loggedName', surname: 'loggedSurname', email: 'a@a.aa' }
+          ? { name: 'Mattia', surname: 'Sisti', email: 'a@a.aa' }
           : undefined,
       },
     },
