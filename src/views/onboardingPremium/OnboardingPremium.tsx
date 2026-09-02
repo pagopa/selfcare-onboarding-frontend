@@ -183,7 +183,10 @@ function OnboardingPremiumComponent() {
           forward: forwardWithOnboardingData,
           productId,
           partyId: selectedParty?.id,
-          institutionType: institutionType as InstitutionType,
+          // Premium has no institution-type step: the value comes from the onboarding-data
+          // response. Fall back to the type carried by the selected party so the submit is
+          // never sent without institutionType when that response omits it or 404s.
+          institutionType: (institutionType ?? selectedParty?.institutionType) as InstitutionType,
           subProductFlow: true,
         }),
     },

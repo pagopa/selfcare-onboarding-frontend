@@ -189,6 +189,7 @@ export type SelfcareParty = {
   description: string;
   userRole: UserRole;
   urlLogo?: string;
+  institutionType?: InstitutionType;
 };
 
 export type Party = {
@@ -222,7 +223,8 @@ export type OnboardedParty = {
 export type InstitutionData = {
   id: string;
   billingData: OnboardingFormData;
-  institutionType: InstitutionType;
+  // Optional in the swagger (InstitutionData): the backend does not always return it.
+  institutionType?: InstitutionType;
   origin: string;
   originId: string;
   paymentServiceProvider?: PaymentServiceProviderDto;
