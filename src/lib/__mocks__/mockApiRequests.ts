@@ -357,6 +357,12 @@ const mockedBaseParties: Array<SelfcareParty> = [
     description: 'Comune di Udine',
     userRole: 'ADMIN',
   },
+  {
+    id: '31415',
+    description: 'Comune di Lodi',
+    userRole: 'ADMIN',
+    institutionType: 'PA',
+  },
 ];
 
 const mockedBasePspParties: Array<SelfcareParty> = [
@@ -1846,6 +1852,22 @@ export async function mockFetch(
           );
         case '775644':
           return genericError;
+        case '31415':
+          // Onboarding data without institutionType: the premium flow must fall back to the
+          // type carried by the selected party instead of submitting without it.
+          return new Promise((resolve) =>
+            resolve({
+              data: {
+                ...mockedOnboardingData[0],
+                institution: {
+                  ...mockedOnboardingData[0].institution,
+                  institutionType: undefined,
+                },
+              },
+              status: 200,
+              statusText: '200',
+            } as AxiosResponse)
+          );
         default:
           return new Promise((resolve) =>
             resolve({
