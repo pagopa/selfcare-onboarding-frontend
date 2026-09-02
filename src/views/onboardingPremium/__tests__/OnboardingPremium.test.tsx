@@ -161,6 +161,23 @@ test('Test: Successfully complete onboarding request for prod-dashboard-psp', as
   await verifySubmitPostLegalsPspDashBoard(fetchWithLogsSpy);
 });
 
+test('Test: institutionType falls back to the selected party when onboarding data omits it', async () => {
+  renderComponent(PRODUCT_IDS.IO, PRODUCT_IDS.IO_PREMIUM);
+  await executeStepSelectInstitution('Comune di Lodi');
+  await executeStepBillingDataWithTaxCodeInvoicing(PRODUCT_IDS.IO_PREMIUM);
+  await executeStepAddManager(false, true, true, fetchWithLogsSpy);
+  await executeClickCloseButton(true);
+
+  await waitFor(() => {
+    const postLegalsCalls = fetchWithLogsSpy.mock.calls.filter(
+      (call) => call[0]?.endpoint === 'ONBOARDING_POST_LEGALS'
+    );
+    expect(postLegalsCalls.length).toBeGreaterThan(0);
+    const lastCall = postLegalsCalls[postLegalsCalls.length - 1];
+    expect(lastCall[1].data.institutionType).toBe('PA');
+  });
+});
+
 test('Test: Complete onboarding request with error on submit', async () => {
   renderComponent(PRODUCT_IDS.IO, PRODUCT_IDS.IO_PREMIUM);
   await executeStepSelectInstitution('Comune di Udine');
