@@ -55,7 +55,6 @@ export const selected2OnboardingData = (
     selectedParty?.denominazioneEnte ??
     '',
   aooName: selectedParty?.denominazioneAoo,
-  atecoCodes: selectedParty?.atecoCodes,
   legalForm: shouldIncludeLegalForm(institutionType, productId)
     ? selectedParty?.legalForm
     : undefined,

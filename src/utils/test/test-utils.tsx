@@ -10,7 +10,6 @@ import { InstitutionType } from '../../../types';
 import {
   mockedAoos,
   mockedGeoTaxonomy,
-  mockedPdndVisuraInfomacere,
   mockedPspOnboardingData,
   mockedUos,
 } from '../../lib/__mocks__/mockApiRequests';
@@ -583,12 +582,6 @@ export const verifySubmit = async (
           haveTaxCode,
           productId
         ),
-        atecoCodes:
-          isPrivateMerchant && typeOfSearch === 'personalTaxCode'
-            ? mockedPdndVisuraInfomacere[5].atecoCodes
-            : isPrivateMerchant && typeOfSearch === 'taxCode'
-              ? mockedPdndVisuraInfomacere[0].atecoCodes
-              : undefined,
         institutionType,
         productId,
         origin: resolveOrigin(from, institutionType, productId),

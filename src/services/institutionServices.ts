@@ -21,7 +21,7 @@ import { OnboardingApi } from '../api/OnboardingApiClient';
 // Codegen needs statically-typed method calls, so we map each supported endpoint
 // to its typed wrapper here and return the decoded body (throwing on error, like
 // extractResponse). The infocamere/visura (PDND) endpoints rely on fields the
-// OpenAPI schema under-declares (atecoCodes, vatNumber, legalForm, nRea, ...),
+// OpenAPI schema under-declares (vatNumber, legalForm, nRea, ...),
 // added back via the api-party-registry-proxy_fixPreGen.js patch.
 const dispatchInstitutionSearch = (
   endpoint: ApiEndpointKey,
@@ -62,15 +62,14 @@ const dispatchInstitutionSearch = (
 const validateIdpayMerchantInstitution = (
   response: PartyData,
   disabledStatusCompany: boolean | undefined,
-  filterCategories: string | { atecoCodes: string; allowedInstitutions: string } | undefined,
+  filterCategories: string | { allowedInstitutions: string } | undefined,
   setDisabled: Dispatch<SetStateAction<boolean>>,
-  setIsPresentInAtecoWhiteList: (value: boolean) => void,
   setMerchantSearchResult: Dispatch<SetStateAction<PartyData | undefined>> | undefined
 ) => {
   setMerchantSearchResult?.(response);
 
   const merchantDetails =
-    (filterCategories as { atecoCodes: string; allowedInstitutions: string }) ||
+    (filterCategories as { allowedInstitutions: string }) ||
     config.product['prod-idpay-merchant']?.merchantDetails;
 
   const allowedInstitutionsStr =
@@ -82,30 +81,19 @@ const validateIdpayMerchantInstitution = (
     ? allowedInstitutionsStr.split(',').filter(Boolean)
     : [];
 
+  // The ATECO whitelist that used to gate the merchant onboarding has been removed:
+  // the only blocking condition left is the company status. `allowedInstitutions` is
+  // kept because it is configured separately, but it no longer changes the outcome.
   if (disabledStatusCompany) {
     setDisabled(true);
-    setIsPresentInAtecoWhiteList?.(false);
   } else if (
     response?.businessTaxId &&
     allowedInstitutions.length > 0 &&
     allowedInstitutions.includes(response.businessTaxId)
   ) {
-    setIsPresentInAtecoWhiteList?.(true);
     setDisabled(false);
-  } else if (
-    merchantDetails?.atecoCodes &&
-    response?.atecoCodes &&
-    Array.isArray(response.atecoCodes)
-  ) {
-    const whitelistCodes = merchantDetails.atecoCodes.split(',').filter(Boolean);
-    const hasMatchingCode = response.atecoCodes.some((code: string) =>
-      whitelistCodes.includes(code)
-    );
-    setIsPresentInAtecoWhiteList?.(hasMatchingCode);
-    setDisabled(!hasMatchingCode);
   } else {
-    setIsPresentInAtecoWhiteList?.(false);
-    setDisabled(true);
+    setDisabled(false);
   }
 };
 
@@ -174,11 +162,10 @@ export const fetchInstitutionByTaxCode = async (
   query: string,
   productId: string | undefined,
   institutionType: string | undefined,
-  filterCategories: { atecoCodes: string; allowedInstitutions: string } | string | undefined,
+  filterCategories: { allowedInstitutions: string } | string | undefined,
   disabledStatusCompany: boolean | undefined,
   setCfResult: Dispatch<SetStateAction<PartyData | undefined>>,
   setMerchantSearchResult: Dispatch<SetStateAction<PartyData | undefined>> | undefined,
-  setIsPresentInAtecoWhiteList: (value: boolean) => void | undefined,
   setDisabled: Dispatch<SetStateAction<boolean>>,
   _setRequiredLogin: Dispatch<SetStateAction<boolean>>
   // eslint-disable-next-line sonarjs/cognitive-complexity
@@ -205,7 +192,6 @@ export const fetchInstitutionByTaxCode = async (
         disabledStatusCompany,
         filterCategories,
         setDisabled,
-        setIsPresentInAtecoWhiteList,
         setMerchantSearchResult
       );
     }
@@ -214,7 +200,6 @@ export const fetchInstitutionByTaxCode = async (
       setCfResult(undefined);
 
       if (isIdpayMerchantProduct(productId)) {
-        setIsPresentInAtecoWhiteList?.(false);
         setMerchantSearchResult?.(undefined);
       }
     }
@@ -228,11 +213,10 @@ export const handleSearchByReaCode = async (
   query: string,
   setApiLoading: Dispatch<SetStateAction<boolean>> | undefined,
   setCfResult: Dispatch<SetStateAction<PartyData | undefined>>,
-  setIsPresentInAtecoWhiteList: (value: boolean) => void,
   setDisabled: Dispatch<SetStateAction<boolean>>,
   _setRequiredLogin: Dispatch<SetStateAction<boolean>>,
   product: Product | undefined,
-  filterCategories: string | { atecoCodes: string; allowedInstitutions: string } | undefined,
+  filterCategories: string | { allowedInstitutions: string } | undefined,
   disabledStatusCompany: boolean | undefined,
   setMerchantSearchResult: Dispatch<SetStateAction<PartyData | undefined>> | undefined
   // eslint-disable-next-line sonarjs/cognitive-complexity
@@ -243,7 +227,6 @@ export const handleSearchByReaCode = async (
   if (!reaPattern.test(query)) {
     setApiLoading?.(false);
     setCfResult(undefined);
-    setIsPresentInAtecoWhiteList?.(false);
     return;
   }
 
@@ -263,7 +246,6 @@ export const handleSearchByReaCode = async (
         disabledStatusCompany,
         filterCategories,
         setDisabled,
-        setIsPresentInAtecoWhiteList,
         setMerchantSearchResult
       );
     }
@@ -272,7 +254,6 @@ export const handleSearchByReaCode = async (
       setCfResult(undefined);
       if (isIdpayMerchantProduct(product?.id)) {
         setMerchantSearchResult?.(undefined);
-        setIsPresentInAtecoWhiteList?.(false);
       }
     }
   }

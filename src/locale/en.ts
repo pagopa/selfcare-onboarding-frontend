@@ -160,8 +160,6 @@ export default {
       asSubTitle: 'If you are an insurance company listed in the IVASS <1/>company Register, enter one of the required data and search for the institution for <1/> which you want to request membership to <3>{{productName}}.</3>',
       scpSubtitle: 'Enter one of the required data and search InfoCamere for the institution <3/> for which you want to request membership to <5>{{productName}}.</5>',
       merchantSubtitle: 'Enter one of the required data to search InfoCamere for the institution <3/> for which you want to request membership to <5>{{productName}}.</5>',
-      merchantAtecoValid: 'If you are part of a store chain, membership must be done by the parent company.',
-      merchantAtecoNotValid: 'The entered ATECO code is not allowed for membership to the portal',
       merchantCompanyStatusDisabled: 'Your company cannot join the portal because it is ceased or in liquidation',
       asyncAutocomplete: {
         placeholder: 'Search'

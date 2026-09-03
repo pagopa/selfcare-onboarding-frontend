@@ -73,8 +73,7 @@ type Props = {
   setDisabled: Dispatch<SetStateAction<boolean>>;
   addUser: boolean;
   selectedProduct?: Product;
-  filterCategories?: string | { atecoCodes: string; allowedInstitutions: string };
-  setIsPresentInAtecoWhiteList: (value: boolean) => void | undefined;
+  filterCategories?: string | { allowedInstitutions: string };
   setMerchantSearchResult?: Dispatch<SetStateAction<PartyData | undefined>>;
   setApiLoading?: Dispatch<SetStateAction<boolean>>;
   apiLoading?: boolean;
@@ -112,7 +111,6 @@ export default function AsyncAutocompleteContainer({
   addUser,
   selectedProduct,
   filterCategories,
-  setIsPresentInAtecoWhiteList,
   setMerchantSearchResult,
   setApiLoading,
   apiLoading,
@@ -152,7 +150,6 @@ export default function AsyncAutocompleteContainer({
   useEffect(() => {
     if (isIdpayMerchantProduct(product?.id) && !selected) {
       setMerchantSearchResult?.(undefined);
-      setIsPresentInAtecoWhiteList?.(false);
       setCfResult(undefined);
     }
 
@@ -174,7 +171,6 @@ export default function AsyncAutocompleteContainer({
   useEffect(() => {
     if (!input || (input.length === 0 && isIdpayMerchantProduct(product?.id))) {
       setMerchantSearchResult?.(undefined);
-      setIsPresentInAtecoWhiteList?.(true);
       setDisabled(true);
     }
   }, [input]);
@@ -226,7 +222,6 @@ export default function AsyncAutocompleteContainer({
         disabledStatusCompany,
         setCfResult,
         setMerchantSearchResult,
-        setIsPresentInAtecoWhiteList,
         setDisabled,
         setRequiredLogin
       );
@@ -241,7 +236,6 @@ export default function AsyncAutocompleteContainer({
       disabledStatusCompany,
       setCfResult,
       setMerchantSearchResult,
-      setIsPresentInAtecoWhiteList,
       setDisabled,
       setRequiredLogin,
     ]
@@ -407,7 +401,6 @@ export default function AsyncAutocompleteContainer({
         value,
         setApiLoading,
         setCfResult,
-        setIsPresentInAtecoWhiteList,
         setDisabled,
         setRequiredLogin,
         product,
@@ -429,7 +422,6 @@ export default function AsyncAutocompleteContainer({
 
     if (isIdpayMerchantProduct(product?.id)) {
       setMerchantSearchResult?.(undefined);
-      setIsPresentInAtecoWhiteList?.(false);
       setCfResult(undefined);
     }
 
@@ -471,7 +463,6 @@ export default function AsyncAutocompleteContainer({
           setAooResult={setAooResult}
           setUoResult={setUoResult}
           setMerchantSearchResult={setMerchantSearchResult}
-          setIsPresentInAtecoWhiteList={setIsPresentInAtecoWhiteList}
           setDisabled={setDisabled}
           externalInstitutionId={externalInstitutionId}
           addUser={addUser}

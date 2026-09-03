@@ -160,8 +160,6 @@ export default {
       asSubTitle: 'Če ste zavarovalnica, navedena v registru zavarovalnic IVASS, vnesite enega od zahtevanih podatkov in poiščite organizacijo, za katero <1/> želite zahtevati naročnino na <3>{{productName}}.</3>',
       scpSubtitle: 'Vnesite enega od zahtevanih podatkov in poiščite v InfoCamere organizacijo <3/> za katero želite zahtevati naročnino na <5>{{productName}}.</5>',
       merchantSubtitle: 'Vnesite enega od zahtevanih podatkov za iskanje na InfoCamere organizacije <3/> za katero želite zahtevati naročnino na <5>{{productName}}.</5>',
-      merchantAtecoValid: 'Če ste del trgovske verige, mora naročnino izvršiti matična družba.',
-      merchantAtecoNotValid: 'Navedena organizacija se ne more naročiti, ker njena koda ATECO ne spada med dovoljene.',
       merchantCompanyStatusDisabled: 'Vaša družba ne more dostopati do portala, ker je v likvidaciji ali ustavljenih dejavnostih',
       asyncAutocomplete: {
         placeholder: 'Iskanje'

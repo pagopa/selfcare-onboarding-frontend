@@ -81,7 +81,6 @@ export const postOnboardingSubmit = async (
   setLoading(true);
   const { outcome, status } = await postOnboardingLegals({
     billingData: billingData2billingDataRequest(onboardingFormData as OnboardingFormData),
-    atecoCodes: onboardingFormData?.atecoCodes,
     additionalInformations:
       isGlobalServiceProvider(institutionType) &&
       isPagoPaProduct(selectedProduct?.id) &&

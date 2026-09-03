@@ -36,7 +36,6 @@ type Props = {
   institutionType?: InstitutionType;
   addUser: boolean;
   selectedProduct?: Product;
-  setIsPresentInAtecoWhiteList?: (value: boolean) => void;
   setMerchantSearchResult?: Dispatch<SetStateAction<any>>;
 };
 
@@ -57,7 +56,6 @@ export default function PartyAdvancedSelect({
   institutionType,
   addUser,
   selectedProduct,
-  setIsPresentInAtecoWhiteList,
   setMerchantSearchResult,
 }: Props) {
   const { t } = useTranslation();
@@ -76,7 +74,6 @@ export default function PartyAdvancedSelect({
     setUoResult(undefined);
     setUoResultHistory(undefined);
     setAooResultHistory(undefined);
-    setIsPresentInAtecoWhiteList?.(true);
     setMerchantSearchResult?.(undefined);
   };
 
@@ -104,7 +101,6 @@ export default function PartyAdvancedSelect({
       setInput('');
       setSelected(null);
       setCfResult(undefined);
-      setIsPresentInAtecoWhiteList?.(true);
       setMerchantSearchResult?.(undefined);
     }
   }, [selections]);

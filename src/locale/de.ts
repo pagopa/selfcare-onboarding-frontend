@@ -188,10 +188,6 @@ export default {
         'Geben Sie einen der erforderlichen Daten ein und suchen Sie bei InfoCamere nach der Körperschaft, für die Sie <5>Interoperabilität</5> anmelden möchten.',
       merchantSubtitle:
         'Geben Sie einen der erforderlichen Daten ein, um die Körperschaft bei InfoCamere zu suchen, für die Sie <5>{{productName}}</5> anmelden möchten.',
-      merchantAtecoValid:
-        'Wenn Sie Teil einer Filialenkette sind, muss die Anmeldung durch die Muttergesellschaft erfolgen.',
-      merchantAtecoNotValid:
-        'Die angegebene Körperschaft kann nicht beitreten, da ihr ATECO-Code nicht zu den zulässigen gehört.',
       merchantCompanyStatusDisabled:
         'Ihr Unternehmen kann nicht zum Portal beitreten, da es als geschlossen oder in Liquidation eingetragen ist.',
       asyncAutocomplete: {
