@@ -165,9 +165,14 @@ const validateRecipientCode = (
   isInvoiceable: boolean,
   recipientCodeStatus: string | undefined,
   t: TFunction,
-  productId: string | undefined
+  productId: string | undefined,
+  subProductId: string | undefined
 ) => {
-  if (!isInvoiceable || productId === PRODUCT_IDS.IO) {
+  // prod-io hides the SDI code, but its premium sub-product shows it as an editable field,
+  // so the base-product exemption must not apply to the prod-io-premium flow.
+  const isSdiCodeHidden = productId === PRODUCT_IDS.IO && subProductId !== PRODUCT_IDS.IO_PREMIUM;
+
+  if (!isInvoiceable || isSdiCodeHidden) {
     return undefined;
   }
 
@@ -235,7 +240,8 @@ export const validateFields = (
   isPdndPrivate: boolean,
   isPrivateMerchantInstitution: boolean,
   recipientCodeStatus?: string,
-  productId?: string
+  productId?: string,
+  subProductId?: string
 ) => {
   const isRequiredForInfoCompany =
     isInformationCompany || isPdndPrivate || isPrivateMerchantInstitution;
@@ -323,7 +329,8 @@ export const validateFields = (
       isInvoiceable,
       recipientCodeStatus,
       t,
-      productId
+      productId,
+      subProductId
     ),
     geographicTaxonomies: validateGeographicTaxonomies(values, isPremium, institutionAvoidGeotax),
     supportEmail:
