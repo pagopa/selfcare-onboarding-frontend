@@ -202,7 +202,13 @@ export default function StepOnboardingFormData({
     }
   }, [controllers.isPremium]);
 
-  const handlePremiumBillingData = async () => {
+  // Premium: track the step and resolve the IPA origin id once. The SDI code is editable in the
+  // prod-io-premium flow, so this must not be tied to recipientCode or it fires on every keystroke.
+  useEffect(() => {
+    if (!controllers.isPremium) {
+      return;
+    }
+
     // eslint-disable-next-line functional/immutable-data
     requestIdRef.current = uniqueId(
       `onboarding-step-manager-${externalInstitutionId}-${productId}-${subProductId}`
@@ -216,31 +222,14 @@ export default function StepOnboardingFormData({
     });
 
     if (isPublicAdministration(institutionType) && initialFormData.taxCode) {
-      try {
-        await handleSearchByTaxCode(
-          initialFormData.taxCode,
-          filterCategories,
-          setRetrievedIstat,
-          setOriginId4Premium
-        );
-        if (
-          originId4Premium &&
-          formik.values.recipientCode &&
-          formik.values.recipientCode.length >= 6
-        ) {
-          await verifyRecipientCodeIsValid(
-            formik.values.recipientCode,
-            uoSelected,
-            formik,
-            setRecipientCodeStatus,
-            originId4Premium
-          );
-        }
-      } catch (error) {
-        console.error('Error during premium billing data processing:', error);
-      }
+      void handleSearchByTaxCode(
+        initialFormData.taxCode,
+        filterCategories,
+        setRetrievedIstat,
+        setOriginId4Premium
+      );
     }
-  };
+  }, [controllers.isPremium]);
 
   useEffect(() => {
     if (selectFilterCategories) {
@@ -308,7 +297,8 @@ export default function StepOnboardingFormData({
         isPdndPrivate(institutionType, productId),
         isPrivateMerchantInstitution(institutionType, productId),
         recipientCodeStatus,
-        productId
+        productId,
+        subProductId
       )
     );
 
@@ -336,8 +326,19 @@ export default function StepOnboardingFormData({
   ]);
 
   useEffect(() => {
-    if (controllers.isPremium) {
-      void handlePremiumBillingData();
+    if (
+      controllers.isPremium &&
+      originId4Premium &&
+      formik.values.recipientCode &&
+      formik.values.recipientCode.length >= 6
+    ) {
+      void verifyRecipientCodeIsValid(
+        formik.values.recipientCode,
+        uoSelected,
+        formik,
+        setRecipientCodeStatus,
+        originId4Premium
+      );
     }
   }, [originId4Premium, formik.values.recipientCode]);
 
@@ -500,6 +501,7 @@ export default function StepOnboardingFormData({
 
         <PersonalAndBillingDataSection
           productId={productId}
+          subProductId={subProductId}
           institutionType={institutionType}
           onboardingFormData={onboardingFormData}
           baseTextFieldProps={baseTextFieldProps}

@@ -6,8 +6,20 @@ import { createMemoryHistory } from 'history';
 import { useState } from 'react';
 import { Provider } from 'react-redux';
 import { Route, Router, Switch } from 'react-router';
-import { afterAll, afterEach, beforeAll, beforeEach, expect, MockInstance, test, vi } from 'vitest';
+import axios from 'axios';
+import {
+  afterAll,
+  afterEach,
+  beforeAll,
+  beforeEach,
+  expect,
+  type Mocked,
+  MockInstance,
+  test,
+  vi,
+} from 'vitest';
 import { HeaderContext, UserContext } from '../../../lib/context';
+import { mockedCategories } from '../../../lib/__mocks__/mockApiRequests';
 import '../../../locale';
 import { createStore } from '../../../redux/store';
 import { PRODUCT_IDS } from '../../../utils/constants';
@@ -44,6 +56,11 @@ vi.mock('react-router-dom', () => ({
   }),
 }));
 
+// getFilterCategories reads config.json straight from the CDN with axios: without this mock
+// the premium flow would issue a real network request and the loading overlay would race.
+vi.mock('axios');
+const mockedAxios = axios as Mocked<typeof axios>;
+
 beforeEach(async () => {
   const apiUtils = await import('../../../lib/api-utils');
   if (fetchWithLogsSpy) {
@@ -51,6 +68,7 @@ beforeEach(async () => {
   }
   fetchWithLogsSpy = vi.spyOn(apiUtils, 'fetchWithLogs');
   Object.assign(mockedLocation, initialLocation);
+  mockedAxios.get.mockResolvedValue({ status: 200, data: mockedCategories });
 });
 
 beforeAll(() => {
@@ -229,20 +247,14 @@ const executeStepBillingDataWithTaxCodeInvoicing = async (subProductId: string) 
 
   const confirmButtonEnabled = screen.getByLabelText('Continua');
 
-  // if (subProductId === PRODUCT_IDS.IO_PREMIUM) {
-  //   fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
-  //     target: { value: '' },
-  //   });
-  //   await waitFor(() => expect(confirmButtonEnabled).toBeDisabled());
-  //   fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
-  //     target: { value: 'A1B2C3' },
-  //   });
-
-  //   await new Promise((resolve) => setTimeout(resolve, 300));
-  //   await waitFor(() => expect(screen.getByText('Codice Fiscale SFE')).toBeInTheDocument(), {
-  //     timeout: 500, // Tempo massimo per l'attesa
-  //   });
-  // }
+  if (subProductId === PRODUCT_IDS.IO_PREMIUM) {
+    // The SDI code is editable and required in the premium flow, so the step stays blocked
+    // until a valid one is entered.
+    await waitFor(() => expect(confirmButtonEnabled).toBeDisabled());
+    fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
+      target: { value: 'A1B2C3' },
+    });
+  }
 
   if (isPagoPaInsights(subProductId)) {
     fireEvent.change(document.getElementById('address') as HTMLElement, {
