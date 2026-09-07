@@ -11,6 +11,7 @@ import {
   InstitutionType,
   PaymentServiceProviderDto,
   Product,
+  RequestOutcomeMessage,
   SelfcareParty,
   StepperStep,
   UserOnCreate,
@@ -18,13 +19,15 @@ import {
 import { ConfirmOnboardingModal } from '../../components/modals/ConfirmOnboardingRequest';
 import { LoadingOverlay } from '../../components/modals/LoadingOverlay';
 import { StepAddManager, UsersObject } from '../../components/steps/StepAddManager';
-import StepOnboardingData from '../../components/steps/StepOnboardingData';
+import StepOnboardingData, { genericError } from '../../components/steps/StepOnboardingData';
 import StepOnboardingFormData from '../../components/steps/StepOnboardingFormData';
 import { withLogin } from '../../components/withLogin';
 import { useHistoryState } from '../../hooks/useHistoryState';
 import { HeaderContext } from '../../lib/context';
+import { MessageNoAction } from '../../components/shared/MessageNoAction';
 import { CompanyInformations } from '../../model/CompanyInformations';
 import { OnboardingFormData } from '../../model/OnboardingFormData';
+import { getFilterCategories } from '../../services/onboardingServices';
 import { ENV } from '../../utils/env';
 import { isPagoPaInsights } from '../../utils/institutionTypeUtils';
 import { registerUnloadEvent, unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
@@ -51,6 +54,7 @@ function OnboardingPremiumComponent() {
   const [product, setProduct] = useState<Product>();
   const [parties, setParties] = useState<Array<SelfcareParty>>([]);
   const [selectedParty, setSelectedParty] = useState<SelfcareParty>();
+  const [outcome, setOutcome] = useState<RequestOutcomeMessage | null>();
 
   const [externalInstitutionId, _setExternalInstitutionId] = useState<string>('');
   const [origin, setOrigin] = useState<string>('');
@@ -74,6 +78,8 @@ function OnboardingPremiumComponent() {
   const [isCityEditable, setIsCityEditable] = useState(false);
   const [dpoData, setDpoData] = useState<DataProtectionOfficerDto>();
   const [pspData, setPspData] = useState<PaymentServiceProviderDto>();
+  const [pricingPlanLoaded, setPricingPlanLoaded] = useState(false);
+  const [filterCategoriesResponse, setFilterCategoriesResponse] = useState<any>();
 
   useEffect(() => {
     registerUnloadEvent(setOnExit, setOpenExitModal, setOnExitAction);
@@ -91,6 +97,15 @@ function OnboardingPremiumComponent() {
       `onboarding-${externalInstitutionId}-${productId}-${subProductId}-`
     );
   }, [productId, subProductId]);
+
+  useEffect(() => {
+    const loadFilterCategories = async () => {
+      setPricingPlanLoaded(false);
+      await getFilterCategories(setOutcome, setFilterCategoriesResponse, genericError);
+      setPricingPlanLoaded(true);
+    };
+    void loadFilterCategories();
+  }, []);
 
   const chooseFromMyParties = useRef(true);
 
@@ -276,6 +291,10 @@ function OnboardingPremiumComponent() {
           institutionType: institutionType as InstitutionType,
           origin,
           originId: origin === 'SELC' ? (billingData?.taxCode ?? '') : originId,
+          // The consumption plan is configured per sub-product on the CDN config: sub-products
+          // without a consumptionPlan node (e.g. prod-dashboard-psp) must submit no pricingPlan.
+          pricingPlan:
+            filterCategoriesResponse?.product?.[subProductId]?.consumptionPlan?.pricingPlan,
           setLoading,
           forward,
           back,
@@ -296,7 +315,7 @@ function OnboardingPremiumComponent() {
 
   return (
     <Container sx={{ px: '0px !important', maxWidth: '100% !important' }}>
-      <Step />
+      {outcome ? <MessageNoAction {...outcome} /> : <Step />}
       <SessionModal
         handleClose={handleCloseExitModal}
         handleExit={handleCloseExitModal}
@@ -319,7 +338,9 @@ function OnboardingPremiumComponent() {
         onConfirm={handleOnConfirmModal}
         productName={subProduct?.title}
       />
-      {loading && <LoadingOverlay loadingText={t('onboardingSubProduct.loading.loadingText')} />}
+      {(loading || !pricingPlanLoaded) && (
+        <LoadingOverlay loadingText={t('onboardingSubProduct.loading.loadingText')} />
+      )}
     </Container>
   );
 }
