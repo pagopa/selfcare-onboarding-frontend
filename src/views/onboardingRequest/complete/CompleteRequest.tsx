@@ -33,7 +33,7 @@ const error2errorCode: { [key in keyof typeof customErrors]: Array<string> } = {
   GENERIC: [],
 };
 
-const transcodeErrorCode = (data: Problem): keyof typeof customErrors => {
+export const transcodeErrorCode = (data: Problem): keyof typeof customErrors => {
   if (data.errors?.findIndex((e) => error2errorCode.INVALID_DOCUMENT.includes(e.code)) > -1) {
     return 'INVALID_DOCUMENT';
   } else if (data.errors?.findIndex((e) => error2errorCode.INVALID_SIGN.includes(e.code)) > -1) {
