@@ -740,9 +740,10 @@ const billingData2billingDataRequestIoPremium = () => ({
   digitalAddress: 'comune.milano@pec.it',
   zipCode: '20021',
   taxCode: '33445673222',
-  taxCodeInvoicing: undefined,
+  // An ACCEPTED SDI code resolves the UO and prefills the invoicing tax code.
+  taxCodeInvoicing: '87654321098',
   vatNumber: undefined,
-  recipientCode: undefined,
+  recipientCode: 'A1B2C3',
 });
 
 const billingData2billingDataRequestPspDashboard = () => ({
@@ -795,6 +796,7 @@ export const verifySubmitPostLegalsIoPremium = async (fetchWithLogsSpy: MockInst
           institutionType: 'PA',
           origin: 'IPA',
           originId: '1',
+          pricingPlan: 'C0',
           geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY
             ? [{ code: nationalValue, desc: 'ITALIA' }]
             : [],

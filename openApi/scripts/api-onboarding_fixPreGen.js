@@ -4,6 +4,15 @@ const fs = require('fs');
 const FILE = 'openApi/generated-onboarding/onboarding-swagger20.json';
 const opts = { fileContentsOnly: true };
 
+// Upload operations whose 400 payload the frontend needs to read: the signed
+// accordo di adesione, the add-user module and the addendum/attachments.
+// See the Problem patch below.
+const PROBLEM_BODY_OPERATIONS = [
+  'completeUsingPOST',
+  'completeOnboardingUsersUsingPOST',
+  'uploadAttachmentUsingPOST',
+];
+
 async function fixPreGen() {
   await regexReplace(
     /("format": *"uri",[\s]*"type": "string")/gi,
@@ -45,15 +54,41 @@ async function fixPreGen() {
     opts
   );
 
+  const doc = fs.readFileSync(FILE, 'utf8');
+
+  // Patch: the 400 responses of the upload endpoints declare the problem
+  // payload as an *inline* object ("Generic problem response") instead of
+  // $ref-ing the Problem definition, and gen-api-models decodes inline object
+  // schemas as t.undefined. The body would therefore be dropped and
+  // onboardingContractUpload would never get a Problem to hand to
+  // transcodeErrorCode, so every upload failure (invalid document, invalid
+  // signature, wrong signature format, already onboarded) would fall back to
+  // the GENERIC error. Point those responses at the named Problem definition.
+  const spec = JSON.parse(doc);
+  Object.values(spec.paths).forEach((path) =>
+    Object.values(path).forEach((operation) => {
+      if (
+        operation &&
+        PROBLEM_BODY_OPERATIONS.includes(operation.operationId) &&
+        operation.responses &&
+        operation.responses['400']
+      ) {
+        operation.responses['400'].schema = { $ref: '#/definitions/Problem' };
+      }
+    })
+  );
+
   // Patch: @pagopa/openapi-codegen-ts v14 skips HEAD operations entirely. The
   // HEAD /v1/institutions/onboarding (verifyOnboardingUsingHEAD) is the only
   // HEAD endpoint the FE uses (verifyVatNumber + verifyOnboarding). We rename
   // it to "get" so the client + typed params are generated; the real HTTP
   // method is restored to "head" in api-onboarding_fixPostGen.js.
-  const doc = fs.readFileSync(FILE, 'utf8');
   fs.writeFileSync(
     FILE,
-    doc.replace(/("\/v1\/institutions\/onboarding":\s*\{\s*)"head":/, '$1"get":')
+    JSON.stringify(spec, null, 2).replace(
+      /("\/v1\/institutions\/onboarding":\s*\{\s*)"head":/,
+      '$1"get":'
+    )
   );
 }
 
