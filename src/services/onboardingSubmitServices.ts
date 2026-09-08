@@ -225,6 +225,7 @@ export const postSubProductOnboardingSubmit = async (
   forward: () => void,
   origin: string,
   originId: string,
+  pricingPlan: string | undefined,
   setConflictError: Dispatch<SetStateAction<boolean>>
 ) => {
   const { outcome, status, detail } = await postOnboardingLegals({
@@ -240,6 +241,7 @@ export const postSubProductOnboardingSubmit = async (
     institutionType,
     origin,
     originId,
+    pricingPlan,
     geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY
       ? billingData.geographicTaxonomies?.map((gt) =>
           onboardedInstitutionInfo2geographicTaxonomy(gt)

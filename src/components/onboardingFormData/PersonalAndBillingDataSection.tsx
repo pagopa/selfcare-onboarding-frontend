@@ -23,7 +23,7 @@ import {
   getNationalCountries,
 } from '../../services/geoTaxonomyServices';
 import { getUoInfoFromRecipientCode } from '../../services/institutionServices';
-import { requiredError } from '../../utils/constants';
+import { PRODUCT_IDS, requiredError } from '../../utils/constants';
 import {
   isPrivateOrPersonInstitution,
   isPrivateInstitution,
@@ -121,6 +121,7 @@ type Props = StepperStepComponentProps & {
   institutionAvoidGeotax: boolean;
   retrievedIstat?: string;
   productId?: string;
+  subProductId?: string;
   controllers: OnboardingControllers;
   setInvalidTaxCodeInvoicing: React.Dispatch<React.SetStateAction<boolean>>;
   recipientCodeStatus?: string;
@@ -139,6 +140,7 @@ export default function PersonalAndBillingDataSection({
   institutionAvoidGeotax,
   retrievedIstat,
   productId,
+  subProductId,
   controllers,
   setInvalidTaxCodeInvoicing,
   recipientCodeStatus,
@@ -820,7 +822,7 @@ export default function PersonalAndBillingDataSection({
                 </Typography>
               </Box>
             )}
-            {controllers.isInvoiceable && !isIoProduct(productId) && (
+            {controllers.isInvoiceable && (!isIoProduct(productId) || subProductId === PRODUCT_IDS.IO_PREMIUM) && (
               <Grid item xs={12} mt={3}>
                 <CustomTextFieldNotched
                   paddingValue={
@@ -845,7 +847,7 @@ export default function PersonalAndBillingDataSection({
                     },
                   }}
                   disabled={
-                    controllers.isPremium &&
+                    (controllers.isPremium && subProductId !== PRODUCT_IDS.IO_PREMIUM) &&
                     formik.values.recipientCode.length >= 6 &&
                     formik.initialValues.recipientCode.length >= 6 &&
                     !formik.errors.recipientCode

@@ -59,6 +59,7 @@ const subProductArgs = () =>
     forward,
     'IPA',
     'origin-id-1',
+    'C0',
     setConflictError,
   ] as const;
 
