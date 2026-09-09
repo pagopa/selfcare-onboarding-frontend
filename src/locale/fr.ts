@@ -732,17 +732,6 @@ export default {
       dpoPecAddress: 'Adresse PEC',
       dpoEmailAddress: 'Adresse e-mail'
     },
-    ibanSection: {
-      title: "SAISIR L'IBAN POUR RECEVOIR LES REMBOURSEMENTS",
-      subTitle: "Pour que le virement aboutisse, assurez-vous que <1> l'IBAN correspond à ce qui est indiqué sur les coordonnées de votre compte. </1>",
-      holder: 'Titulaire',
-      iban: 'IBAN',
-      confirmIban: "Confirmer l'IBAN",
-      error: {
-        invalidIban: 'Saisissez un IBAN valide',
-        ibanNotMatch: "L'IBAN ne correspond pas"
-      }
-    }
   },
   rejectRegistration: {
     outcomeContent: {

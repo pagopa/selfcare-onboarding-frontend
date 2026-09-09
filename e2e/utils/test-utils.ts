@@ -386,15 +386,6 @@ export const stepFormData = async (
   ) {
     await page.click('#businessRegisterPlace');
     await page.fill('#businessRegisterPlace', 'Tecnologie Innovative S.p.A.');
-
-    await page.click('#holder');
-    await page.fill('#holder', 'Mario Rossi');
-
-    await page.click('#iban');
-    await page.fill('#iban', 'IT60X0542811101000000123456');
-
-    await page.click('#confirmIban');
-    await page.fill('#confirmIban', 'IT60X0542811101000000123456');
   }
 
   const shouldShowNazionale = isFromIpa

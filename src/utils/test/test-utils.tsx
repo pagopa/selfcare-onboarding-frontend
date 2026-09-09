@@ -613,9 +613,6 @@ export const verifySubmit = async (
                 regulatedMarketNote: '',
               }
             : undefined,
-        payment: isPrivateMerchant
-          ? { holder: 'holder', iban: 'IT60X0542811101000000123456' }
-          : undefined,
         gpuData:
           isGpuInstitution(institutionType as InstitutionType) && isPagoPaProduct(productId)
             ? {
@@ -911,9 +908,6 @@ export const fillUserBillingDataForm = async (
   taxCodeInput: string,
   vatNumber: string,
   recipientCode: string,
-  holder?: string,
-  iban?: string,
-  confirmIban?: string,
   supportEmail?: string,
   rea?: string,
   city?: string,
@@ -939,9 +933,6 @@ export const fillUserBillingDataForm = async (
     taxCode: taxCodeInput,
     vatNumber,
     recipientCode,
-    holder,
-    iban,
-    confirmIban,
     supportEmail,
     rea,
     city,

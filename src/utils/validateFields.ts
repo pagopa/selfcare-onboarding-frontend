@@ -17,9 +17,6 @@ import {
 import { ENV } from './env';
 import { isContractingAuthority, isInsuranceCompany } from './institutionTypeUtils';
 
-const ITALIAN_IBAN_REGEX = /^IT[0-9]{2}[A-Z][0-9]{10}[A-Z0-9]{12}$/;
-const IBAN_LENGTH = 27;
-
 const validateEmail = (email: string | undefined, t: TFunction) => {
   if (!email) {
     return requiredError;
@@ -96,51 +93,6 @@ const validateCountry = (values: Partial<OnboardingFormData>, institutionType: I
   ) {
     return true;
   }
-  return undefined;
-};
-
-const validateIban = (
-  iban: string | undefined,
-  isPrivateMerchantInstitution: boolean,
-  t: TFunction
-) => {
-  if (isPrivateMerchantInstitution && !iban) {
-    return requiredError;
-  }
-  if (iban?.length === IBAN_LENGTH && !ITALIAN_IBAN_REGEX.test(iban)) {
-    return t('onboardingFormData.ibanSection.error.invalidIban');
-  }
-  return undefined;
-};
-
-const validateConfirmIban = (
-  confirmIban: string | undefined,
-  originalIban: string | undefined,
-  isPrivateMerchantInstitution: boolean,
-  t: TFunction
-) => {
-  if (isPrivateMerchantInstitution && !confirmIban) {
-    return requiredError;
-  }
-
-  if (
-    isPrivateMerchantInstitution &&
-    confirmIban &&
-    confirmIban.length > 0 &&
-    confirmIban.length < IBAN_LENGTH
-  ) {
-    return requiredError;
-  }
-
-  if (confirmIban?.length === IBAN_LENGTH) {
-    if (!ITALIAN_IBAN_REGEX.test(confirmIban)) {
-      return t('onboardingFormData.ibanSection.error.invalidIban');
-    }
-    if (originalIban !== confirmIban) {
-      return t('onboardingFormData.ibanSection.error.ibanNotMatch');
-    }
-  }
-
   return undefined;
 };
 
@@ -258,14 +210,6 @@ export const validateFields = (
     country: validateCountry(values, institutionType),
     digitalAddress: validateEmail(values.digitalAddress, t),
     originId: validateConditionalRequired(values.originId, isInsuranceCompany(institutionType)),
-    holder: validateConditionalRequired(values.holder, isPrivateMerchantInstitution),
-    iban: validateIban(values.iban, isPrivateMerchantInstitution, t),
-    confirmIban: validateConfirmIban(
-      values.confirmIban,
-      values.iban,
-      isPrivateMerchantInstitution,
-      t
-    ),
     businessRegisterPlace: validateConditionalRequired(
       values.businessRegisterPlace,
       isRequiredForSaOrPrivate

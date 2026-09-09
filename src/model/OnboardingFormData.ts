@@ -49,8 +49,5 @@ export type OnboardingFormData = {
   originIdEc?: string;
   institutionType?: string;
   certified?: boolean;
-  iban?: string;
-  confirmIban?: string;
-  holder?: string;
   userRequester?: UserRequester;
 };

@@ -46,9 +46,6 @@ export type BillingFieldIds = {
   taxCode: string;
   vatNumber: string;
   recipientCode: string;
-  holder?: string;
-  iban?: string;
-  confirmIban?: string;
   supportEmail?: string;
   rea?: string;
   city?: string;
@@ -225,15 +222,6 @@ export const fillPrivateMerchantScenario = async (
   });
   fireEvent.change(document.getElementById(ids.rea ?? '') as HTMLInputElement, {
     target: { value: visura.nRea },
-  });
-  fireEvent.change(document.getElementById(ids.holder ?? '') as HTMLInputElement, {
-    target: { value: 'holder' },
-  });
-  fireEvent.change(document.getElementById(ids.iban ?? '') as HTMLInputElement, {
-    target: { value: 'IT60X0542811101000000123456' },
-  });
-  fireEvent.change(document.getElementById(ids.confirmIban ?? '') as HTMLInputElement, {
-    target: { value: 'IT60X0542811101000000123456' },
   });
 };
 

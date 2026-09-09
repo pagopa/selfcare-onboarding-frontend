@@ -18,14 +18,12 @@ import PersonalAndBillingDataSection from '../PersonalAndBillingDataSection';
 import {
   isContractingAuthority,
   isGlobalServiceProvider,
-  isIdpayMerchantProduct,
   isInsuranceCompany,
   isInteropProduct,
   isIoProduct,
   isIoSignProduct,
   isPaymentServiceProvider,
   isPrivateMerchantInstitution,
-  isPrivateOrPersonInstitution,
   isPublicAdministration,
   isPublicServiceCompany,
   isTechPartner,
@@ -169,8 +167,6 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
           isInsuranceCompany: isInsuranceCompany(institutionType),
           isPrivateParty:
             isInteropProduct(productId) && isPrivateMerchantInstitution(institutionType),
-          isPrivateMerchantInstitution:
-            isIdpayMerchantProduct(productId) && isPrivateOrPersonInstitution(institutionType),
         };
 
         const mockControllers = {
@@ -224,7 +220,6 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
       isForeignInsurance,
       institutionAvoidGeotax,
       isPrivateParty,
-      isPrivateMerchantInstitution,
     } = conditionsMap[key];
 
     const centralParty = screen.queryByText('Ente centrale');
@@ -250,9 +245,6 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
     const rea = screen.queryByText('REA');
     const sdiCode = screen.queryByText('Codice univoco o SDI') as HTMLInputElement;
     const taxCodeSfe = screen.queryByText('Codice Fiscale SFE') as HTMLInputElement;
-    const iban = screen.queryByText('IBAN');
-    const confirmIban = screen.queryByText('Conferma IBAN');
-    const holder = screen.queryByText('Intestatario');
     const shareCapital = screen.queryByText('Capitale sociale (facoltativo)');
     const visibleCitizenMail = screen.queryByText('Indirizzo email visibile ai cittadini');
 
@@ -330,16 +322,6 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
       expect(commercialRegisterNumber).not.toBeInTheDocument();
       expect(rea).not.toBeInTheDocument();
       expect(shareCapital).not.toBeInTheDocument();
-    }
-
-    if (isPrivateMerchantInstitution) {
-      expect(iban).toBeInTheDocument();
-      expect(confirmIban).toBeInTheDocument();
-      expect(holder).toBeInTheDocument();
-    } else {
-      expect(iban).not.toBeInTheDocument();
-      expect(confirmIban).not.toBeInTheDocument();
-      expect(holder).not.toBeInTheDocument();
     }
 
     if (!institutionAvoidGeotax && isIoSignProduct(productId)) {

@@ -831,18 +831,6 @@ export default {
       dpoPecAddress: 'PEC-Adresse',
       dpoEmailAddress: 'E-Mail-Adresse',
     },
-    ibanSection: {
-      title: 'INSERISCI IBAN PER RICEVERE I RIMBORSI',
-      subTitle:
-        'Um sicherzustellen, dass die Überweisung erfolgreich ist, stellen Sie sicher, dass <1>die IBAN mit den in Ihren Kontoangaben angegebenen Informationen übereinstimmt.</1>',
-      holder: 'Intestatario',
-      iban: 'IBAN',
-      confirmIban: 'Conferma IBAN',
-      error: {
-        invalidIban: 'Geben Sie eine gültige IBAN ein.',
-        ibanNotMatch: 'Die IBAN stimmt nicht überein.',
-      },
-    },
   },
   rejectRegistration: {
     outcomeContent: {
