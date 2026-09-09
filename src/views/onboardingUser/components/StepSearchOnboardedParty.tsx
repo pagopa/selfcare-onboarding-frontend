@@ -152,7 +152,6 @@ const StepSearchOnboardedParty = ({ institutionType, selectedProduct, forward, b
             selections={selections}
             setSelections={setSelections}
             addUser={window.location.pathname.includes('/user')}
-            setIsPresentInAtecoWhiteList={() => {}}
           />
         </Grid>
         <Grid item xs={12} mt={2} mb={5}>

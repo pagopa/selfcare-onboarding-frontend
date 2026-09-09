@@ -124,25 +124,6 @@ export function StepSearchParty({
   const [ecData, setEcData] = useState<PartyData | null>(null);
   const [filterCategories, setFilterCategories] = useState<string>();
 
-  const [isPresentInAtecoWhiteList, setIsPresentInAtecoWhiteListState] = useState<boolean>(() => {
-    if (isIdpayMerchantProduct(product?.id)) {
-      try {
-        const stored = sessionStorage.getItem('isPresentInAtecoWhiteList');
-        return stored !== null ? JSON.parse(stored) : true;
-      } catch {
-        return true;
-      }
-    }
-    return false;
-  });
-
-  const setIsPresentInAtecoWhiteList = (value: boolean) => {
-    setIsPresentInAtecoWhiteListState(value);
-    if (isIdpayMerchantProduct(product?.id)) {
-      sessionStorage.setItem('isPresentInAtecoWhiteList', JSON.stringify(value));
-    }
-  };
-
   const disabledStatusCompany = useMemo(
     () =>
       merchantSearchResult?.statusCompanyRI !== undefined ||
@@ -247,26 +228,12 @@ export function StepSearchParty({
   }, [selectFilterCategories]);
 
   useEffect(() => {
-    if (isIdpayMerchantProduct(product?.id)) {
-      if (merchantSearchResult) {
-        if (disabledStatusCompany) {
-          setDisabled(true);
-        } else {
-          setDisabled(!(selected && isPresentInAtecoWhiteList));
-        }
-      } else {
-        setDisabled(!selected);
-      }
+    if (isIdpayMerchantProduct(product?.id) && merchantSearchResult && disabledStatusCompany) {
+      setDisabled(true);
     } else {
       setDisabled(!selected);
     }
-  }, [
-    selected,
-    isPresentInAtecoWhiteList,
-    merchantSearchResult,
-    product?.id,
-    disabledStatusCompany,
-  ]);
+  }, [selected, merchantSearchResult, product?.id, disabledStatusCompany]);
 
   const onForwardAction = () => {
     const dataParty = aooResult || uoResult ? ({ ...selected, ...ecData } as PartyData) : selected;
@@ -290,7 +257,6 @@ export function StepSearchParty({
 
     if (isIdpayMerchantProduct(product?.id)) {
       sessionStorage.removeItem('merchantSearchResult');
-      sessionStorage.removeItem('isPresentInAtecoWhiteList');
     }
 
     forward(onboardingData, actualInstitutionType);
@@ -299,7 +265,6 @@ export function StepSearchParty({
   const onBackAction = () => {
     if (isIdpayMerchantProduct(product?.id)) {
       sessionStorage.removeItem('merchantSearchResult');
-      sessionStorage.removeItem('isPresentInAtecoWhiteList');
     }
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     back!();
@@ -311,7 +276,6 @@ export function StepSearchParty({
         const shouldClean = !sessionStorage.getItem('onboarding_forward');
         if (shouldClean) {
           sessionStorage.removeItem('merchantSearchResult');
-          sessionStorage.removeItem('isPresentInAtecoWhiteList');
         }
       }
     },
@@ -324,29 +288,12 @@ export function StepSearchParty({
 
       if (selected && !storedMerchant && merchantSearchResult) {
         setMerchantSearchResult(undefined);
-        setIsPresentInAtecoWhiteList(true);
         setDisabled(true);
       }
     }
   }, [selected, product?.id]);
 
   const canAggregateProductList = ENV.AGGREGATOR.ELIGIBLE_PRODUCTS.split(',');
-
-  const alertMerchantAtecoNotValid = () => (
-    <Alert severity="error" sx={{ width: '100%' }}>
-      <Typography sx={{ fontSize: '16px', a: { color: theme.palette.text.primary } }}>
-        {t('onboardingStep1.onboarding.merchantAtecoNotValid')}
-      </Typography>
-    </Alert>
-  );
-
-  const alertMerchantAtecoValid = () => (
-    <Alert severity="info" sx={{ width: '100%' }}>
-      <Typography sx={{ fontSize: '16px', a: { color: theme.palette.text.primary } }}>
-        {t('onboardingStep1.onboarding.merchantAtecoValid')}
-      </Typography>
-    </Alert>
-  );
 
   return loading ? (
     <LoadingOverlay loadingText={t('onboardingStep1.loadingOverlayText')} />
@@ -475,27 +422,15 @@ export function StepSearchParty({
             </Grid>
           )}
 
-          {isIdpayMerchantProduct(product?.id) && (
+          {isIdpayMerchantProduct(product?.id) && merchantSearchResult && disabledStatusCompany && (
             <Grid container item justifyContent="center">
               <Grid item xs={8}>
                 <Box display="flex" justifyContent="center" mb={5}>
-                  {merchantSearchResult ? (
-                    disabledStatusCompany ? (
-                      <Alert severity="error" sx={{ width: '100%' }}>
-                        <Typography
-                          sx={{ fontSize: '16px', a: { color: theme.palette.text.primary } }}
-                        >
-                          {t('onboardingStep1.onboarding.merchantCompanyStatusDisabled')}
-                        </Typography>
-                      </Alert>
-                    ) : isPresentInAtecoWhiteList ? (
-                      alertMerchantAtecoValid()
-                    ) : (
-                      alertMerchantAtecoNotValid()
-                    )
-                  ) : (
-                    alertMerchantAtecoValid()
-                  )}
+                  <Alert severity="error" sx={{ width: '100%' }}>
+                    <Typography sx={{ fontSize: '16px', a: { color: theme.palette.text.primary } }}>
+                      {t('onboardingStep1.onboarding.merchantCompanyStatusDisabled')}
+                    </Typography>
+                  </Alert>
                 </Box>
               </Grid>
             </Grid>
@@ -541,7 +476,6 @@ export function StepSearchParty({
               externalInstitutionId={externalInstitutionId}
               institutionType={institutionType}
               filterCategories={filterCategories}
-              setIsPresentInAtecoWhiteList={setIsPresentInAtecoWhiteList}
               setMerchantSearchResult={setMerchantSearchResult}
               disabledStatusCompany={disabledStatusCompany}
               selections={selections}

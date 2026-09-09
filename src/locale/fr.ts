@@ -160,8 +160,6 @@ export default {
       asSubTitle: 'Se sei una società di assicurazione presente nell’Albo delle <1/>imprese IVASS, inserisci uno dei dati richiesti e cerca l’ente per<3/> cui vuoi richiedere l’adesione a <5>Interoperabilità.</5>',
       scpSubtitle: 'Inserisci uno dei dati richiesti e cerca da InfoCamere l’ente <3/> per cui vuoi richiedere l’adesione a <5>Interoperabilità.</5>',
       merchantSubtitle: "Saisissez l'une des données requises pour rechercher sur InfoCamere l'organisme <3/> pour lequel vous demandez l'adhésion à <5>{{productName}}.</5>",
-      merchantAtecoValid: "Si vous faites partie d'une chaîne de magasins, l'adhésion doit être faite par la société mère.",
-      merchantAtecoNotValid: "L'organisme indiqué ne peut pas adhérer car son code ATECO ne figure pas parmi ceux autorisés.",
       merchantCompanyStatusDisabled: 'Votre organisme ne peut pas adhérer au portail car il est liquidé ou en cours de liquidation',
       asyncAutocomplete: {
         placeholder: 'Chercher'
