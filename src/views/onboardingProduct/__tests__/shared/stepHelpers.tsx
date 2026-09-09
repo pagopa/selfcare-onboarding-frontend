@@ -246,23 +246,9 @@ export const executeStepSearchParty = async (
                 : subUnitCode;
 
       if (typeOfSearch === personalTaxCode) {
-        expect(
-          screen.getByText(
-            'Se fai parte di una catena di negozi, l’adesione deve essere fatta dalla società capogruppo.'
-          )
-        ).toBeInTheDocument();
-
         fireEvent.change(inputPartyName, { target: { value: valueToSet } });
 
         expect(screen.getByRole('button', { name: 'Continua' })).toBeEnabled();
-
-        fireEvent.change(inputPartyName, { target: { value: 'RSSLCU80A01F205N' } });
-
-        expect(
-          screen.getByText(
-            'L’ente indicato non può aderire perché il suo codice ATECO non rientra tra quelli ammessi.'
-          )
-        ).toBeInTheDocument();
 
         fireEvent.change(inputPartyName, { target: { value: 'FRSMRA70D30G786G' } });
 

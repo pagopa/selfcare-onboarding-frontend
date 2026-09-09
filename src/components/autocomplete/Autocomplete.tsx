@@ -32,7 +32,6 @@ type AutocompleteProps = {
   apiLoading?: boolean;
   selectedProduct?: Product;
   filterCategories?: string;
-  setIsPresentInAtecoWhiteList: (value: boolean) => void | undefined; 
   setMerchantSearchResult?: Dispatch<SetStateAction<any>>;
   disabledStatusCompany?: boolean;
   selections: SelectionsState;
@@ -61,7 +60,6 @@ export function Autocomplete({
   apiLoading,
   selectedProduct,
   filterCategories,
-  setIsPresentInAtecoWhiteList,
   setMerchantSearchResult,
   disabledStatusCompany,
   selections,
@@ -131,7 +129,6 @@ export function Autocomplete({
               product={product}
               institutionType={institutionType}
               selectedProduct={selectedProduct}
-              setIsPresentInAtecoWhiteList={setIsPresentInAtecoWhiteList}
               setMerchantSearchResult={setMerchantSearchResult}
             />
           </Grid>
@@ -165,7 +162,6 @@ export function Autocomplete({
           addUser={addUser}
           selectedProduct={selectedProduct}
           filterCategories={filterCategories}
-          setIsPresentInAtecoWhiteList={setIsPresentInAtecoWhiteList}
           setMerchantSearchResult={setMerchantSearchResult}
           setApiLoading={setApiLoading}
           apiLoading={apiLoading}
