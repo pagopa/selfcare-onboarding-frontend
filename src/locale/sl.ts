@@ -732,17 +732,6 @@ export default {
       dpoPecAddress: 'Naslov PEC',
       dpoEmailAddress: 'E-naslov'
     },
-    ibanSection: {
-      title: 'VNESITE IBAN ZA PREJEMANJE POVRAČIL',
-      subTitle: 'Da bo nalog za nakazilo uspešen, se prepričajte, da <1>se IBAN ujema z navedenimi podatki vašega računa.</1>',
-      holder: 'Imetnik',
-      iban: 'IBAN',
-      confirmIban: 'Potrdite IBAN',
-      error: {
-        invalidIban: 'Vnesite veljaven IBAN',
-        ibanNotMatch: 'IBAN se ne ujema'
-      }
-    }
   },
   rejectRegistration: {
     outcomeContent: {

@@ -732,17 +732,6 @@ export default {
       dpoPecAddress: 'PEC address',
       dpoEmailAddress: 'Email address'
     },
-    ibanSection: {
-      title: 'ENTER IBAN TO RECEIVE REFUNDS',
-      subTitle: 'To ensure the bank transfer is successful, make sure <1> the IBAN matches what is shown on your account details. </1>',
-      holder: 'Account holder',
-      iban: 'IBAN',
-      confirmIban: 'Confirm IBAN',
-      error: {
-        invalidIban: 'Enter a valid IBAN',
-        ibanNotMatch: 'The IBAN does not match'
-      }
-    }
   },
   rejectRegistration: {
     outcomeContent: {

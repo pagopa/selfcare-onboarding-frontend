@@ -44,7 +44,6 @@ import {
 import { validateFields } from '../../utils/validateFields';
 import DpoSection from '../onboardingFormData/DpoSection';
 import Heading from '../onboardingFormData/Heading';
-import IbanSection from '../onboardingFormData/IbanSection';
 import PersonalAndBillingDataSection from '../onboardingFormData/PersonalAndBillingDataSection';
 import { VatNumberErrorModal } from '../onboardingFormData/VatNumberErrorModal';
 import GeoTaxonomySection from '../onboardingFormData/taxonomy/GeoTaxonomySection';
@@ -516,9 +515,6 @@ export default function StepOnboardingFormData({
           countries={countries}
           setCountries={setCountries}
         />
-        {isPrivateMerchantInstitution(institutionType, productId) && (
-          <IbanSection baseTextFieldProps={baseTextFieldProps} formik={formik} />
-        )}
         {!institutionAvoidGeotax && !isPagoPaInsights(subProductId) && (
           <Grid item xs={12} display="flex" justifyContent={'center'}>
             <GeoTaxonomySection

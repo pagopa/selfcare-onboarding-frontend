@@ -22,7 +22,6 @@ import { ENV } from '../utils/env';
 import {
   isGlobalServiceProvider,
   isPagoPaProduct,
-  isPrivateMerchantInstitution,
   isGpuInstitution,
   isInteropProduct,
   isIoSignProduct,
@@ -99,12 +98,6 @@ export const postOnboardingSubmit = async (
             otherNote: additionalInformations?.otherNote,
           }
         : undefined,
-    payment: isPrivateMerchantInstitution(institutionType, selectedProduct?.id)
-      ? {
-          holder: onboardingFormData?.holder,
-          iban: onboardingFormData?.iban,
-        }
-      : undefined,
     gpuData:
       isGpuInstitution(institutionType) &&
       (isPagoPaProduct(selectedProduct?.id) ||
