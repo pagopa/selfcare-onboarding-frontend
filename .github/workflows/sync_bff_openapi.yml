@@ -1,8 +1,8 @@
 name: Sync BFF OpenAPI
 
 # Dispatched by pagopa/selfcare (trigger_onboarding_frontend_openapi_sync.yml) when a BFF swagger
-# changes on main; can also be run manually. Updates only the openApi/*.json sources and opens a PR:
-# API clients are NOT regenerated.
+# changes on main; can also be run manually. Updates only the openApi/*.json sources and opens a PR
+# reporting the possibly breaking changes found by Optic (the build regenerates the API clients).
 on:
   workflow_dispatch:
     inputs:
@@ -48,6 +48,7 @@ jobs:
           sha=$(gh api "repos/pagopa/selfcare/commits/$SOURCE_REF" --jq .sha)
           labels=()
           : > "$RUNNER_TEMP/updated.md"
+          : > "$RUNNER_TEMP/changed.tsv"
           for spec in ${SPECS//,/ }; do
             case "$spec" in
               onboarding)
@@ -64,13 +65,15 @@ jobs:
                 echo "::error::Unknown spec '$spec' (allowed: onboarding, proxy)"
                 exit 1 ;;
             esac
+            cp "$dest" "$RUNNER_TEMP/$spec-old.json"
             gh api -H "Accept: application/vnd.github.raw" "repos/pagopa/selfcare/contents/$src?ref=$sha" > "$dest"
             jq empty "$dest"
             if git diff --quiet -- "$dest"; then
               echo "$label: already up to date"
             else
               labels+=("$label")
-              echo "- **$label**: [\`$src\`](https://github.com/pagopa/selfcare/blob/$sha/$src) → \`$dest\` (regenerate with \`$generate\`)" >> "$RUNNER_TEMP/updated.md"
+              printf '%s\t%s\t%s\n' "$spec" "$label" "$dest" >> "$RUNNER_TEMP/changed.tsv"
+              echo "- **$label**: [\`$src\`](https://github.com/pagopa/selfcare/blob/$sha/$src) → \`$dest\` (regenerate locally with \`$generate\`)" >> "$RUNNER_TEMP/updated.md"
             fi
           done
           if [ ${#labels[@]} -eq 0 ]; then
@@ -80,6 +83,38 @@ jobs:
           joined=$(printf '%s, ' "${labels[@]}")
           echo "labels=${joined%, }" >> "$GITHUB_OUTPUT"
           echo "sha=$sha" >> "$GITHUB_OUTPUT"
+
+      - name: Setup Node.js
+        if: steps.download.outputs.labels != ''
+        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b # v4.0.3
+        with:
+          node-version-file: ".node-version"
+
+      # Same Optic setup used by pagopa/selfcare (call_update_docs_and_notification.yml).
+      # The report is best effort: if Optic fails, the PR is opened anyway.
+      - name: Install Optic
+        if: steps.download.outputs.labels != ''
+        continue-on-error: true
+        run: |
+          mkdir -p "$RUNNER_TEMP/optic-install"
+          cd "$RUNNER_TEMP/optic-install"
+          npm init -y
+          npm pkg set overrides.ajv="8.17.1"
+          npm install @useoptic/optic@1.0.9
+
+      - name: Detect breaking changes with Optic
+        if: steps.download.outputs.labels != ''
+        continue-on-error: true
+        run: |
+          set -uo pipefail
+          optic="$RUNNER_TEMP/optic-install/node_modules/.bin/optic"
+          while IFS=$'\t' read -r spec label dest; do
+            echo "::group::Optic diff - $label"
+            "$optic" diff "$RUNNER_TEMP/$spec-old.json" "$dest" --check | tee "$RUNNER_TEMP/$spec-diff.txt"
+            echo "::endgroup::"
+            "$optic" diff "$RUNNER_TEMP/$spec-old.json" "$dest" --json > "$RUNNER_TEMP/$spec-diff.json"
+            node .github/scripts/optic-breaking-summary.js "$label" "$RUNNER_TEMP/$spec-diff.json" "$RUNNER_TEMP/$spec-diff.txt" >> "$RUNNER_TEMP/breaking.md"
+          done < "$RUNNER_TEMP/changed.tsv"
 
       # With GITHUB_TOKEN, "Allow GitHub Actions to create and approve pull requests" must be enabled
       - name: Open pull request
@@ -92,6 +127,7 @@ jobs:
           set -euo pipefail
           branch="chore/sync-bff-openapi-${SHA::7}"
           title="chore: update BFF OpenAPI sources ($LABELS)"
+          run_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
           {
             echo "#### List of Changes"
             echo
@@ -99,9 +135,19 @@ jobs:
             echo
             cat "$RUNNER_TEMP/updated.md"
             echo
+            echo "#### OpenAPI diff (Optic)"
+            echo
+            if [ -s "$RUNNER_TEMP/breaking.md" ]; then
+              cat "$RUNNER_TEMP/breaking.md"
+            else
+              echo "Optic report not available."
+              echo
+            fi
+            echo "Full report in the [workflow run]($run_url)."
+            echo
             echo "#### Motivation and Context"
             echo
-            echo "The BFF swaggers changed on \`pagopa/selfcare\`. API clients are **not** regenerated: run the commands above on this branch and adapt the code before merging if needed."
+            echo "The BFF swaggers changed on \`pagopa/selfcare\`. The build regenerates the API clients from these files (\`yarn build\` runs \`yarn generate\`): if the CI fails, adapt the API wrappers in \`src/api/\` on this branch before merging."
           } > "$RUNNER_TEMP/pr_body.md"
 
           git config user.name "github-actions[bot]"
