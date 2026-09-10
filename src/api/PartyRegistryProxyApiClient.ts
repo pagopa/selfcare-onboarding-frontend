@@ -113,7 +113,7 @@ export const PartyRegistryProxyApi = {
     if (isMockEnvironment()) {
       return fetchWithLogsCall('ONBOARDING_GET_UO_CODE_INFO', { endpointParams: { codiceUniUo } });
     }
-    const result = await apiClient.findByUnicodeUsingGET_1({ codiceUniAoo: codiceUniUo });
+    const result = await apiClient.findUoByUnicodeUsingGET({ codiceUniUo });
     return extractResponse(result, 200, onRedirectToLogin, 401, 403, undefined);
   },
 
@@ -122,7 +122,7 @@ export const PartyRegistryProxyApi = {
     if (isMockEnvironment()) {
       return fetchWithLogsCall('ONBOARDING_GET_UO_LIST', { params: { taxCodeInvoicing } });
     }
-    const result = await apiClient.findAllUsingGET_1({ taxCodeInvoicing });
+    const result = await apiClient.findUosUsingGET({ taxCodeInvoicing });
     return extractResponse(result, 200, onRedirectToLogin, 401, 403, undefined);
   },
 
@@ -136,7 +136,7 @@ export const PartyRegistryProxyApi = {
     if (isMockEnvironment()) {
       return fetchWithLogsCall('ONBOARDING_GET_SEARCH_PARTIES', { params });
     }
-    const result = await apiClient.searchUsingGET(params);
+    const result = await apiClient.searchInstitutionsUsingGET(params);
     return extractResponse(result, 200, onRedirectToLogin, 401, 403, undefined);
   },
 
@@ -149,7 +149,7 @@ export const PartyRegistryProxyApi = {
     if (isMockEnvironment()) {
       return fetchWithLogsCall('ONBOARDING_GET_SA_PARTIES_NAME', { params });
     }
-    const result = await apiClient.searchUsingGET_2(params);
+    const result = await apiClient.searchStationsUsingGET(params);
     return extractResponse(result, 200, onRedirectToLogin, 401, 403, undefined);
   },
 
@@ -162,7 +162,7 @@ export const PartyRegistryProxyApi = {
     if (isMockEnvironment()) {
       return fetchWithLogsCall('ONBOARDING_GET_INSURANCE_COMPANIES_FROM_BUSINESSNAME', { params });
     }
-    const result = await apiClient.searchUsingGET_1(params);
+    const result = await apiClient.searchInsuranceByIvassCode(params);
     return extractResponse(result, 200, onRedirectToLogin, 401, 403, undefined);
   },
 
@@ -171,7 +171,7 @@ export const PartyRegistryProxyApi = {
     if (isMockEnvironment()) {
       return fetchWithLogsCall('ONBOARDING_GET_AOO_CODE_INFO', { endpointParams: { codiceUniAoo } });
     }
-    const result = await apiClient.findByUnicodeUsingGET({ codiceUniAoo, categories });
+    const result = await apiClient.findAOOByUnicodeUsingGET({ codiceUniAoo, categories: categories?.split(',') });
     return extractResponse(result, 200, onRedirectToLogin, 401, 403, undefined);
   },
 
@@ -180,7 +180,7 @@ export const PartyRegistryProxyApi = {
     if (isMockEnvironment()) {
       return fetchWithLogsCall('ONBOARDING_GET_SA_PARTY_FROM_FC', { endpointParams: { taxId } });
     }
-    const result = await apiClient.searchByTaxCodeUsingGET_1({ taxId });
+    const result = await apiClient.searchStationByTaxCodeUsingGET({ taxId });
     return extractResponse(result, 200, onRedirectToLogin, 401, 403, undefined);
   },
 
@@ -191,7 +191,7 @@ export const PartyRegistryProxyApi = {
         endpointParams: { taxId },
       });
     }
-    const result = await apiClient.searchByTaxCodeUsingGET({ taxId });
+    const result = await apiClient.searchInsurancesUsingGET({ originId: taxId });
     return extractResponse(result, 200, onRedirectToLogin, 401, 403, undefined);
   },
 
