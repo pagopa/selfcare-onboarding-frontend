@@ -1,0 +1,119 @@
+name: Sync BFF OpenAPI
+
+# Dispatched by pagopa/selfcare (trigger_onboarding_frontend_openapi_sync.yml) when a BFF swagger
+# changes on main; can also be run manually. Updates only the openApi/*.json sources and opens a PR:
+# API clients are NOT regenerated.
+on:
+  workflow_dispatch:
+    inputs:
+      specs:
+        description: "Comma-separated swaggers to sync (onboarding, proxy)"
+        type: string
+        required: true
+        default: "onboarding,proxy"
+      source_ref:
+        description: "pagopa/selfcare commit SHA or branch to read the swaggers from"
+        type: string
+        required: true
+        default: "main"
+
+concurrency:
+  group: sync-bff-openapi
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    name: "Update OpenAPI sources and open PR"
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Check-out code
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+        with:
+          # With a PAT the PR triggers the Code Review workflow (events created by GITHUB_TOKEN don't)
+          token: ${{ secrets.GH_PAT_VARIABLES || secrets.GITHUB_TOKEN }}
+
+      - name: Download updated swaggers
+        id: download
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SPECS: ${{ inputs.specs }}
+          SOURCE_REF: ${{ inputs.source_ref }}
+        run: |
+          set -euo pipefail
+          [[ "$SOURCE_REF" =~ ^[A-Za-z0-9._/-]+$ ]] || { echo "::error::Invalid source_ref '$SOURCE_REF'"; exit 1; }
+          sha=$(gh api "repos/pagopa/selfcare/commits/$SOURCE_REF" --jq .sha)
+          labels=()
+          : > "$RUNNER_TEMP/updated.md"
+          for spec in ${SPECS//,/ }; do
+            case "$spec" in
+              onboarding)
+                label="Onboarding BFF"
+                generate="yarn generate:api-onboarding"
+                src="apps/onboarding-bff/app/src/main/resources/swagger/api-docs.json"
+                dest="openApi/onboarding-api-docs.json" ;;
+              proxy)
+                label="Party Registry Proxy"
+                generate="yarn generate:api-party-registry-proxy"
+                src="apps/registry-proxy/app/src/main/resources/swagger/api-docs.json"
+                dest="openApi/party-registry-proxy-api-docs.json" ;;
+              *)
+                echo "::error::Unknown spec '$spec' (allowed: onboarding, proxy)"
+                exit 1 ;;
+            esac
+            gh api -H "Accept: application/vnd.github.raw" "repos/pagopa/selfcare/contents/$src?ref=$sha" > "$dest"
+            jq empty "$dest"
+            if git diff --quiet -- "$dest"; then
+              echo "$label: already up to date"
+            else
+              labels+=("$label")
+              echo "- **$label**: [\`$src\`](https://github.com/pagopa/selfcare/blob/$sha/$src) → \`$dest\` (regenerate with \`$generate\`)" >> "$RUNNER_TEMP/updated.md"
+            fi
+          done
+          if [ ${#labels[@]} -eq 0 ]; then
+            echo "No swagger changed, nothing to do"
+            exit 0
+          fi
+          joined=$(printf '%s, ' "${labels[@]}")
+          echo "labels=${joined%, }" >> "$GITHUB_OUTPUT"
+          echo "sha=$sha" >> "$GITHUB_OUTPUT"
+
+      # With GITHUB_TOKEN, "Allow GitHub Actions to create and approve pull requests" must be enabled
+      - name: Open pull request
+        if: steps.download.outputs.labels != ''
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT_VARIABLES || secrets.GITHUB_TOKEN }}
+          LABELS: ${{ steps.download.outputs.labels }}
+          SHA: ${{ steps.download.outputs.sha }}
+        run: |
+          set -euo pipefail
+          branch="chore/sync-bff-openapi-${SHA::7}"
+          title="chore: update BFF OpenAPI sources ($LABELS)"
+          {
+            echo "#### List of Changes"
+            echo
+            echo "Automated update of the OpenAPI sources from [pagopa/selfcare@${SHA::7}](https://github.com/pagopa/selfcare/commit/$SHA):"
+            echo
+            cat "$RUNNER_TEMP/updated.md"
+            echo
+            echo "#### Motivation and Context"
+            echo
+            echo "The BFF swaggers changed on \`pagopa/selfcare\`. API clients are **not** regenerated: run the commands above on this branch and adapt the code before merging if needed."
+          } > "$RUNNER_TEMP/pr_body.md"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -c "$branch"
+          git add openApi/onboarding-api-docs.json openApi/party-registry-proxy-api-docs.json
+          git commit -m "$title" -m "Source: pagopa/selfcare@$SHA"
+          git push --force origin "$branch"
+
+          pr=$(gh pr list --head "$branch" --state open --json number --jq '.[0].number // empty')
+          if [ -n "$pr" ]; then
+            gh pr edit "$pr" --title "$title" --body-file "$RUNNER_TEMP/pr_body.md"
+          else
+            gh pr create --base "$GITHUB_REF_NAME" --head "$branch" --title "$title" --body-file "$RUNNER_TEMP/pr_body.md"
+          fi
