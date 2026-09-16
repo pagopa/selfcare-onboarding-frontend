@@ -288,7 +288,10 @@ it('test fetchInstitutionByTaxCode dispatches to infocamere and sets cfResult', 
     setRequiredLogin
   );
 
-  expect(PartyRegistryProxyApi.getInfocamereByTaxCode).toHaveBeenCalledWith('12345678901');
+  expect(PartyRegistryProxyApi.getInfocamereByTaxCode).toHaveBeenCalledWith(
+    '12345678901',
+    'prod-1'
+  );
   expect(setCfResult).toHaveBeenCalledWith({
     businessTaxId: '12345678901',
     atecoCodes: ['62.01'],
@@ -315,7 +318,7 @@ it('test handleSearchByReaCode dispatches to getVisuraByRea', async () => {
     undefined
   );
 
-  expect(PartyRegistryProxyApi.getVisuraByRea).toHaveBeenCalledWith('AB-123456');
+  expect(PartyRegistryProxyApi.getVisuraByRea).toHaveBeenCalledWith('AB-123456', 'prod-1');
   expect(setCfResult).toHaveBeenCalledWith({ businessTaxId: '999' });
 });
 

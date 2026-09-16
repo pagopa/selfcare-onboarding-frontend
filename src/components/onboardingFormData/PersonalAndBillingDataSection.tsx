@@ -933,7 +933,7 @@ export default function PersonalAndBillingDataSection({
                   'businessRegisterPlace',
                   isContractingAuthority(institutionType) ||
                     isPdndPrivate(institutionType, productId) ||
-                    isPrivateMerchantInstitution(institutionType)
+                    isPrivateMerchantInstitution(institutionType, productId)
                     ? t(
                         'onboardingFormData.billingDataSection.informationCompanies.requiredCommercialRegisterNumber'
                       )
