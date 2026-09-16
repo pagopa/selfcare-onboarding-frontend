@@ -26,7 +26,8 @@ import { OnboardingApi } from '../api/OnboardingApiClient';
 const dispatchInstitutionSearch = (
   endpoint: ApiEndpointKey,
   endpointParams: Record<string, any> | undefined,
-  queryParams: Record<string, any>
+  queryParams: Record<string, any>,
+  productId?: string
 ): Promise<any> => {
   const ep = endpointParams ?? {};
   switch (endpoint) {
@@ -47,11 +48,11 @@ const dispatchInstitutionSearch = (
     case 'ONBOARDING_GET_PARTY_FROM_CF':
       return PartyRegistryProxyApi.findInstitution(ep.id, queryParams.origin, queryParams.categories);
     case 'ONBOARDING_GET_PARTY_BY_CF_FROM_INFOCAMERE':
-      return PartyRegistryProxyApi.getInfocamereByTaxCode(ep.id);
+      return PartyRegistryProxyApi.getInfocamereByTaxCode(ep.id, productId);
     case 'ONBOARDING_GET_VISURA_INFOCAMERE_BY_CF':
-      return PartyRegistryProxyApi.getVisuraByTaxCode(ep.id);
+      return PartyRegistryProxyApi.getVisuraByTaxCode(ep.id, productId);
     case 'ONBOARDING_GET_VISURA_INFOCAMERE_BY_REA':
-      return PartyRegistryProxyApi.getVisuraByRea(queryParams.rea);
+      return PartyRegistryProxyApi.getVisuraByRea(queryParams.rea, productId);
     case 'ONBOARDING_GET_INSTITUTIONS':
       return OnboardingApi.getInstitutionsByFilters(queryParams as { productId: string });
     default:
@@ -182,7 +183,8 @@ export const fetchInstitutionByTaxCode = async (
     const response = await dispatchInstitutionSearch(
       endpoint,
       addUser ? undefined : { id: query },
-      updatedParams
+      updatedParams,
+      productId
     );
     setCfResult(response);
 
@@ -237,7 +239,12 @@ export const handleSearchByReaCode = async (
       };
 
   try {
-    const response = await dispatchInstitutionSearch(endpoint, undefined, updatedParams);
+    const response = await dispatchInstitutionSearch(
+      endpoint,
+      undefined,
+      updatedParams,
+      product?.id
+    );
     setCfResult(response);
 
     if (isIdpayMerchantProduct(product?.id)) {

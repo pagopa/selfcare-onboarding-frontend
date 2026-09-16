@@ -202,10 +202,10 @@ export const API = {
     URL: ENV.URL_API.ONBOARDING_V2 + '/v2/institutions/onboarding/aggregation/verification',
   },
   ONBOARDING_GET_VISURA_INFOCAMERE_BY_CF: {
-    URL: ENV.URL_API.PARTY_REGISTRY_PROXY + '/visura-infocamere-pdnd/institutions/{{id}}',
+    URL: ENV.URL_API.PARTY_REGISTRY_PROXY + '/infocamere-pdnd/institution/{{id}}',
   },
   ONBOARDING_GET_VISURA_INFOCAMERE_BY_REA: {
-    URL: ENV.URL_API.PARTY_REGISTRY_PROXY + '/visura-infocamere-pdnd/institutions',
+    URL: ENV.URL_API.PARTY_REGISTRY_PROXY + '/infocamere-pdnd/institutions/rea/{{rea}}',
   },
   REQUIRED_DOCUMENTS_ENABLED: {
     URL: ENV.URL_API.ONBOARDING_V2 + '/v2/product/{{productId}}/required-documents/enabled',
