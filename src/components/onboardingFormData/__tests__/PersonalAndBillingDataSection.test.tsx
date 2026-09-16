@@ -112,6 +112,41 @@ const mockBaseTextFieldProps = (
   };
 };
 
+test('Test: PRV + prod-idpay-merchant shows the required businessRegisterPlace label', () => {
+  renderComponentWithProviders(
+    <PersonalAndBillingDataSection
+      productId={PRODUCT_IDS.IDPAY_MERCHANT}
+      institutionType={'PRV'}
+      baseTextFieldProps={mockBaseTextFieldProps}
+      stepHistoryState={{ externalInstitutionId: '', isTaxCodeEquals2PIVA: false }}
+      setStepHistoryState={vi.fn()}
+      formik={formik}
+      institutionAvoidGeotax={false}
+      controllers={
+        {
+          isPremium: false,
+          isDisabled: false,
+          isInvoiceable: false,
+          isForeignInsurance: false,
+          isFromIPA: false,
+          isAooUo: false,
+        } as any
+      }
+      setInvalidTaxCodeInvoicing={vi.fn()}
+      countries={undefined}
+      setCountries={vi.fn()}
+    />,
+    PRODUCT_IDS.IDPAY_MERCHANT
+  );
+
+  expect(
+    screen.getByLabelText(/Luogo di iscrizione al Registro delle Imprese \(obbligatorio\)/)
+  ).toBeInTheDocument();
+  expect(
+    screen.queryByLabelText(/Luogo di iscrizione al Registro delle Imprese \(facoltativo\)/)
+  ).not.toBeInTheDocument();
+});
+
 test('Test: Rendered PersonalAndBillingDataSection component with all possible business cases', () => {
   let componentRendered = false;
   const conditionsMap = {} as any;
