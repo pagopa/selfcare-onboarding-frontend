@@ -135,7 +135,8 @@ test('Test: PRV + prod-idpay-merchant shows the required businessRegisterPlace l
       setInvalidTaxCodeInvoicing={vi.fn()}
       countries={undefined}
       setCountries={vi.fn()}
-    />
+    />,
+    PRODUCT_IDS.IDPAY_MERCHANT
   );
 
   expect(
