@@ -169,9 +169,14 @@ export const PartyRegistryProxyApi = {
   getAooInfo: async (codiceUniAoo: string, categories?: string): Promise<AOOResource> => {
     /* istanbul ignore if */
     if (isMockEnvironment()) {
-      return fetchWithLogsCall('ONBOARDING_GET_AOO_CODE_INFO', { endpointParams: { codiceUniAoo } });
+      return fetchWithLogsCall('ONBOARDING_GET_AOO_CODE_INFO', {
+        endpointParams: { codiceUniAoo },
+      });
     }
-    const result = await apiClient.findAOOByUnicodeUsingGET({ codiceUniAoo, categories: categories?.split(',') });
+    const result = await apiClient.findAOOByUnicodeUsingGET({
+      codiceUniAoo,
+      categories: categories?.split(','),
+    });
     return extractResponse(result, 200, onRedirectToLogin, 401, 403, undefined);
   },
 
@@ -195,34 +200,40 @@ export const PartyRegistryProxyApi = {
     return extractResponse(result, 200, onRedirectToLogin, 401, 403, undefined);
   },
 
-  getInfocamereByTaxCode: async (taxCode: string): Promise<PDNDBusinessResource> => {
+  getInfocamereByTaxCode: async (
+    taxCode: string,
+    productId?: string
+  ): Promise<PDNDBusinessResource> => {
     /* istanbul ignore if */
     if (isMockEnvironment()) {
       return fetchWithLogsCall('ONBOARDING_GET_PARTY_BY_CF_FROM_INFOCAMERE', {
         endpointParams: { id: taxCode },
       });
     }
-    const result = await apiClient.institutionPdndByTaxCodeUsingGET({ taxCode });
+    const result = await apiClient.institutionPdndByTaxCodeUsingGET({ taxCode, productId });
     return extractResponse(result, 200, onRedirectToLogin, 401, 403, undefined);
   },
 
-  getVisuraByTaxCode: async (taxCode: string): Promise<PDNDBusinessResource> => {
+  getVisuraByTaxCode: async (
+    taxCode: string,
+    productId?: string
+  ): Promise<PDNDBusinessResource> => {
     /* istanbul ignore if */
     if (isMockEnvironment()) {
       return fetchWithLogsCall('ONBOARDING_GET_VISURA_INFOCAMERE_BY_CF', {
         endpointParams: { id: taxCode },
       });
     }
-    const result = await apiClient.institutionVisuraPdndByTaxCodeUsingGET({ taxCode });
+    const result = await apiClient.institutionPdndByTaxCodeUsingGET({ taxCode, productId });
     return extractResponse(result, 200, onRedirectToLogin, 401, 403, undefined);
   },
 
-  getVisuraByRea: async (rea: string): Promise<PDNDBusinessResource> => {
+  getVisuraByRea: async (rea: string, productId?: string): Promise<PDNDBusinessResource> => {
     /* istanbul ignore if */
     if (isMockEnvironment()) {
       return fetchWithLogsCall('ONBOARDING_GET_VISURA_INFOCAMERE_BY_REA', { params: { rea } });
     }
-    const result = await apiClient.institutionsPdndByReaGET({ rea });
+    const result = await apiClient.institutionsPdndByReaGET({ rea, productId });
     return extractResponse(result, 200, onRedirectToLogin, 401, 403, undefined);
   },
 };
