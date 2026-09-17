@@ -1,4 +1,3 @@
-import '@pagopa/selfcare-common-frontend/lib/common-polyfill';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 // import '@pagopa/selfcare-common-frontend/lib/index.css';
