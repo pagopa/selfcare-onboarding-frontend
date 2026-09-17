@@ -59,13 +59,18 @@ export default function AsyncAutocompleteResultsCode({
         ? aooResult
         : selections?.uoCode
           ? uoResult
-          : '';
+          : undefined;
+
+  // The result for the current search type may not be there yet (or was cleared)
+  if (!party) {
+    return null;
+  }
 
   const partyName =
-    party?.description ??
-    party?.businessName ??
-    party?.denominazioneAoo ??
-    party?.descrizioneUo ??
+    party.description ??
+    party.businessName ??
+    party.denominazioneAoo ??
+    party.descrizioneUo ??
     party[0]?.description;
 
   return (
