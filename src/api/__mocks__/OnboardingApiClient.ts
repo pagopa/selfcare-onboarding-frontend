@@ -147,6 +147,9 @@ export const OnboardingApi = {
     getInstitutionsByFilters: vi.fn((params: any) =>
         callViaFetchWithLogs('ONBOARDING_GET_INSTITUTIONS', { params })
     ),
+    searchInstitutionsIpa: vi.fn((params: any) =>
+        callViaFetchWithLogs('ONBOARDING_GET_SEARCH_PARTIES', { params })
+    ),
     verifyAggregatesCsv: vi.fn((aggregates: File, productId: string, institutionType?: string) => {
         const formData = new FormData();
         formData.append('aggregates', aggregates);
