@@ -17,6 +17,7 @@ import { CheckManagerResponse } from './generated/onboarding/CheckManagerRespons
 import { WithDefaultsT, createClient } from './generated/onboarding/client';
 import { GeographicTaxonomyResource } from './generated/onboarding/GeographicTaxonomyResource';
 import { InstitutionResourceArray } from './generated/onboarding/InstitutionResourceArray';
+import { IpaInstitutionsSearchResource } from './generated/onboarding/IpaInstitutionsSearchResource';
 import { OnboardingProductDto } from './generated/onboarding/OnboardingProductDto';
 import { OnboardingRequestResource } from './generated/onboarding/OnboardingRequestResource';
 import { OnboardingResult } from './generated/onboarding/OnboardingResult';
@@ -409,6 +410,20 @@ export const OnboardingApi = {
       return fetchWithLogsCall('ONBOARDING_GET_ONBOARDINGS', { params: { taxCode, status } });
     }
     const result = await apiClient.getOnboardingInfo({ taxCode, status });
+    return extractResponse(result, 200, onRedirectToLogin, 401, 403, undefined);
+  },
+
+  searchInstitutionsIpa: async (params: {
+    search?: string;
+    category?: string;
+    page?: number;
+    pageSize?: number;
+  }): Promise<IpaInstitutionsSearchResource> => {
+    /* istanbul ignore if */
+    if (isMockEnvironment()) {
+      return fetchWithLogsCall('ONBOARDING_GET_SEARCH_PARTIES', { params });
+    }
+    const result = await apiClient.searchIpaInstitutionsUsingGET(params);
     return extractResponse(result, 200, onRedirectToLogin, 401, 403, undefined);
   },
 };

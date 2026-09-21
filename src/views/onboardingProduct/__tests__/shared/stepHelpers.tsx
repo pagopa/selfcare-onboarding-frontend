@@ -202,20 +202,16 @@ export const executeStepSearchParty = async (
         },
         {
           method: 'GET',
-          params: {
-            limit:
-              isContractingAuthority(institutionType as InstitutionType) ||
-              isInsuranceCompany(institutionType as InstitutionType)
-                ? undefined
-                : ENV.MAX_INSTITUTIONS_FETCH,
-            categories:
-              isContractingAuthority(institutionType as InstitutionType) ||
-              isInsuranceCompany(institutionType as InstitutionType)
-                ? undefined
-                : filterByCategory4Test(institutionType.toUpperCase(), productId),
-            page: 1,
-            search: 'XXX',
-          },
+          params:
+            isContractingAuthority(institutionType as InstitutionType) ||
+            isInsuranceCompany(institutionType as InstitutionType)
+              ? { limit: undefined, categories: undefined, page: 1, search: 'XXX' }
+              : {
+                  search: 'XXX',
+                  category: filterByCategory4Test(institutionType.toUpperCase(), productId),
+                  page: 0,
+                  pageSize: ENV.MAX_INSTITUTIONS_FETCH,
+                },
         },
         expect.any(Function)
       );
