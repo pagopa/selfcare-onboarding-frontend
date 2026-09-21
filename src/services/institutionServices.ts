@@ -32,7 +32,12 @@ const dispatchInstitutionSearch = (
   const ep = endpointParams ?? {};
   switch (endpoint) {
     case 'ONBOARDING_GET_SEARCH_PARTIES':
-      return PartyRegistryProxyApi.searchInstitutions(queryParams);
+      return OnboardingApi.searchInstitutionsIpa({
+        search: queryParams.search,
+        category: queryParams.categories,
+        page: (queryParams.page ?? 1) - 1,
+        pageSize: queryParams.limit,
+      });
     case 'ONBOARDING_GET_SA_PARTIES_NAME':
       return PartyRegistryProxyApi.searchSaParties(queryParams);
     case 'ONBOARDING_GET_INSURANCE_COMPANIES_FROM_BUSINESSNAME':
@@ -46,7 +51,11 @@ const dispatchInstitutionSearch = (
     case 'ONBOARDING_GET_INSURANCE_COMPANIES_FROM_IVASSCODE':
       return PartyRegistryProxyApi.getInsuranceByTaxId(ep.taxId);
     case 'ONBOARDING_GET_PARTY_FROM_CF':
-      return PartyRegistryProxyApi.findInstitution(ep.id, queryParams.origin, queryParams.categories);
+      return PartyRegistryProxyApi.findInstitution(
+        ep.id,
+        queryParams.origin,
+        queryParams.categories
+      );
     case 'ONBOARDING_GET_PARTY_BY_CF_FROM_INFOCAMERE':
       return PartyRegistryProxyApi.getInfocamereByTaxCode(ep.id, productId);
     case 'ONBOARDING_GET_VISURA_INFOCAMERE_BY_CF':

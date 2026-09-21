@@ -18,7 +18,6 @@ vi.mock('../../api/PartyRegistryProxyApiClient', () => ({
   PartyRegistryProxyApi: {
     findInstitution: vi.fn(),
     getUoInfo: vi.fn(),
-    searchInstitutions: vi.fn(),
     searchSaParties: vi.fn(),
     searchInsuranceCompanies: vi.fn(),
     getAooInfo: vi.fn(),
@@ -33,6 +32,7 @@ vi.mock('../../api/PartyRegistryProxyApiClient', () => ({
 vi.mock('../../api/OnboardingApiClient', () => ({
   OnboardingApi: {
     getInstitutionsByFilters: vi.fn(),
+    searchInstitutionsIpa: vi.fn(),
   },
 }));
 
@@ -147,8 +147,8 @@ it('test getECDataByCF on other error does not change ecData', async () => {
   expect(setApiLoading).toHaveBeenLastCalledWith(false);
 });
 
-it('test fetchInstitutionsByName dispatches to searchInstitutions and maps options', async () => {
-  vi.mocked(PartyRegistryProxyApi.searchInstitutions).mockResolvedValue({
+it('test fetchInstitutionsByName dispatches to searchInstitutionsIpa and maps options', async () => {
+  vi.mocked(OnboardingApi.searchInstitutionsIpa).mockResolvedValue({
     count: 1,
     items: [{ id: 'i1', description: 'Ente 1' }],
   } as any);
@@ -163,17 +163,17 @@ it('test fetchInstitutionsByName dispatches to searchInstitutions and maps optio
     undefined
   );
 
-  expect(PartyRegistryProxyApi.searchInstitutions).toHaveBeenCalledWith({
-    limit: 10,
-    page: 1,
+  expect(OnboardingApi.searchInstitutionsIpa).toHaveBeenCalledWith({
     search: 'Ente',
-    categories: undefined,
+    category: undefined,
+    page: 0,
+    pageSize: 10,
   });
   expect(setOptions).toHaveBeenCalledWith([{ id: 'i1', description: 'Ente 1' }]);
 });
 
 it('test fetchInstitutionsByName on 404 sets empty options', async () => {
-  vi.mocked(PartyRegistryProxyApi.searchInstitutions).mockRejectedValue(
+  vi.mocked(OnboardingApi.searchInstitutionsIpa).mockRejectedValue(
     Object.assign(new Error('nf'), { httpStatus: 404 })
   );
 
