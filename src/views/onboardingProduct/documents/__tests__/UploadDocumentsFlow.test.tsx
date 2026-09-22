@@ -26,11 +26,14 @@ vi.mock('../step/UploadedContractsSummary', () => ({
 }));
 
 vi.mock('../../../../components/modals/ConfirmOnboardingRequest', () => ({
-  ConfirmOnboardingModal: ({ open, onConfirm }: any) =>
+  ConfirmOnboardingModal: ({ open, onConfirm, partyName }: any) =>
     open ? (
-      <button type="button" onClick={onConfirm}>
-        confirm-submit
-      </button>
+      <>
+        <span>{`party-${partyName}`}</span>
+        <button type="button" onClick={onConfirm}>
+          confirm-submit
+        </button>
+      </>
     ) : null,
 }));
 
@@ -52,6 +55,7 @@ it('test UploadDocumentsFlow reaches summary, confirms, submits and calls onSucc
       productId="prod-pagopa"
       institutionType="GSP"
       origin="SELC"
+      partyName="test gsp no ipa"
       onSuccess={onSuccess}
       back={vi.fn()}
     />
@@ -60,6 +64,7 @@ it('test UploadDocumentsFlow reaches summary, confirms, submits and calls onSucc
   // The required documents are fetched behind a loading overlay, so the step mounts asynchronously.
   fireEvent.click(await screen.findByText('go-to-summary'));
   fireEvent.click(screen.getByText('open-confirm'));
+  expect(screen.getByText('party-test gsp no ipa')).toBeInTheDocument();
   fireEvent.click(screen.getByText('confirm-submit'));
 
   expect(onSuccess).toHaveBeenCalled();
