@@ -51,9 +51,9 @@ const dispatchInstitutionSearch = (
     case 'ONBOARDING_GET_INSURANCE_COMPANIES_FROM_IVASSCODE':
       return PartyRegistryProxyApi.getInsuranceByTaxId(ep.taxId);
     case 'ONBOARDING_GET_PARTY_FROM_CF':
-      return PartyRegistryProxyApi.findInstitution(
-        ep.id,
-        queryParams.origin,
+      // addUser=false passes the tax code as endpointParams.id, addUser=true via queryParams.taxCode
+      return OnboardingApi.searchInstitutionIpaByTaxCode(
+        ep.id ?? queryParams.taxCode,
         queryParams.categories
       );
     case 'ONBOARDING_GET_PARTY_BY_CF_FROM_INFOCAMERE':
