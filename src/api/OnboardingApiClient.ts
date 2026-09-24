@@ -28,6 +28,7 @@ import { ProductResourceArray } from './generated/onboarding/ProductResourceArra
 import { UserId } from './generated/onboarding/UserId';
 import { UserTaxCodeDto } from './generated/onboarding/UserTaxCodeDto';
 import { VerifyAggregatesResponse } from './generated/onboarding/VerifyAggregatesResponse';
+import { IpaInstitutionResource } from './generated/onboarding/IpaInstitutionResource';
 
 const withBearerAuth: WithDefaultsT<'bearerAuth'> = (wrappedOperation) => (params: any) => {
   const token = storageTokenOps.read();
@@ -424,6 +425,21 @@ export const OnboardingApi = {
       return fetchWithLogsCall('ONBOARDING_GET_SEARCH_PARTIES', { params });
     }
     const result = await apiClient.searchIpaInstitutionsUsingGET(params);
+    return extractResponse(result, 200, onRedirectToLogin, 401, 403, undefined);
+  },
+
+  searchInstitutionIpaByTaxCode: async (
+    taxCode: string,
+    category?: string
+  ): Promise<IpaInstitutionResource> => {
+    /* istanbul ignore if */
+    if (isMockEnvironment()) {
+      return fetchWithLogsCall('ONBOARDING_GET_PARTY_FROM_CF', {
+        endpointParams: { id: taxCode },
+        params: { category },
+      });
+    }
+    const result = await apiClient.findIpaInstitutionByTaxCodeUsingGET({ taxCode, category });
     return extractResponse(result, 200, onRedirectToLogin, 401, 403, undefined);
   },
 };
