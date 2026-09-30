@@ -155,6 +155,7 @@ export default function PersonalAndBillingDataSection({
   const [shrinkCity, setShrinkCity] = useState<boolean>(false);
   const [institutionLocationData, setInstitutionLocationData] = useState<InstitutionLocationData>();
   const [isCitySelected, setIsCitySelected] = useState<boolean>(false);
+  const [isLocationMissing, setIsLocationMissing] = useState<boolean>(false);
   const [nationalCountries, setNationalCountries] = useState<Array<CountryResource>>();
   const [input, setInput] = useState<string>();
   const [disableTaxCodeInvoicing, setDisableTaxCodeInvoicing] = useState<boolean>(false);
@@ -277,9 +278,21 @@ export default function PersonalAndBillingDataSection({
   useEffect(() => {
     if (!controllers.isPremium && (controllers.isFromIPA || controllers.isAooUo)) {
       const istatCode = onboardingFormData?.istatCode ?? retrievedIstat;
-      void getLocationFromIstatCode(setInstitutionLocationData, setRequiredLogin, istatCode);
+      void getLocationFromIstatCode(
+        setInstitutionLocationData,
+        setRequiredLogin,
+        istatCode,
+        setIsLocationMissing
+      );
     }
   }, [controllers.isPremium, controllers.isFromIPA, controllers.isAooUo]);
+
+  // The location lookup failed: city and county become editable, the country of an IPA party is always IT
+  useEffect(() => {
+    if (isLocationMissing && !formik.values.country) {
+      formik.setFieldValue('country', 'IT');
+    }
+  }, [isLocationMissing]);
 
   useEffect(() => {
     if (controllers.isForeignInsurance) {
@@ -522,7 +535,10 @@ export default function PersonalAndBillingDataSection({
                 noOptionsText={t('onboardingFormData.billingDataSection.noResult')}
                 clearOnBlur={true}
                 forcePopupIcon={!(controllers.isFromIPA || !controllers.isCityEditable)}
-                disabled={controllers.isPremium || controllers.isFromIPA || controllers.isAooUo}
+                disabled={
+                  !isLocationMissing &&
+                  (controllers.isPremium || controllers.isFromIPA || controllers.isAooUo)
+                }
                 ListboxProps={{
                   style: {
                     overflow: 'visible',
@@ -555,9 +571,7 @@ export default function PersonalAndBillingDataSection({
                         fontSize: 'fontSize',
                         fontWeight: 'fontWeightMedium',
                         textTransform: 'capitalize',
-                        color: controllers.isDisabled
-                          ? theme.palette.text.disabled
-                          : theme.palette.text.primary,
+                        color: fieldColor(controllers.isDisabled && !isLocationMissing),
                       },
                       '& .MuiInputBase-root': {
                         height: '56px',
@@ -565,7 +579,7 @@ export default function PersonalAndBillingDataSection({
                     }}
                     onClick={() => setShrinkCity(true)}
                     onBlur={() => setShrinkCity(false)}
-                    disabled={controllers.isDisabled}
+                    disabled={controllers.isDisabled && !isLocationMissing}
                   />
                 )}
               />
@@ -636,9 +650,9 @@ export default function PersonalAndBillingDataSection({
                   'county',
                   t('onboardingFormData.billingDataSection.county'),
                   600,
-                  theme.palette.text.disabled
+                  fieldColor(!isLocationMissing)
                 )}
-                disabled={true}
+                disabled={!isLocationMissing}
               />
             )}
           </Grid>

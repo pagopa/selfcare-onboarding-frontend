@@ -64,7 +64,8 @@ export const getPreviousGeotaxononomies = async (
 export const getLocationFromIstatCode = async (
   setInstitutionLocationData: Dispatch<SetStateAction<InstitutionLocationData | undefined>>,
   _setRequiredLogin: Dispatch<SetStateAction<boolean>>,
-  istatCode?: string
+  istatCode?: string,
+  setIsLocationMissing?: Dispatch<SetStateAction<boolean>>
 ) => {
   if (!istatCode) {
     return;
@@ -79,8 +80,10 @@ export const getLocationFromIstatCode = async (
         city: formatCity(result.desc ?? ''),
       });
     }
+    setIsLocationMissing?.(!result?.desc || !result?.province_abbreviation);
   } catch (error) {
     console.error(error);
+    setIsLocationMissing?.(true);
   }
 };
 

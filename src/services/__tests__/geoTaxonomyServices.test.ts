@@ -105,6 +105,58 @@ it('test getLocationFromIstatCode maps result fields', async () => {
   );
 });
 
+it('test getLocationFromIstatCode flags the location as missing on error', async () => {
+  vi.mocked(PartyRegistryProxyApi.getLocationByCode).mockRejectedValue(new Error('not found'));
+  const setIsLocationMissing = vi.fn();
+
+  await getLocationFromIstatCode(
+    setInstitutionLocationData,
+    setRequiredLogin,
+    '12345',
+    setIsLocationMissing
+  );
+
+  expect(setInstitutionLocationData).not.toHaveBeenCalled();
+  expect(setIsLocationMissing).toHaveBeenCalledWith(true);
+});
+
+it('test getLocationFromIstatCode flags the location as missing without province', async () => {
+  vi.mocked(PartyRegistryProxyApi.getLocationByCode).mockResolvedValue({
+    code: 'c1',
+    country_abbreviation: 'IT',
+    desc: 'ARBUS',
+  } as any);
+  const setIsLocationMissing = vi.fn();
+
+  await getLocationFromIstatCode(
+    setInstitutionLocationData,
+    setRequiredLogin,
+    '12345',
+    setIsLocationMissing
+  );
+
+  expect(setIsLocationMissing).toHaveBeenCalledWith(true);
+});
+
+it('test getLocationFromIstatCode does not flag a complete location as missing', async () => {
+  vi.mocked(PartyRegistryProxyApi.getLocationByCode).mockResolvedValue({
+    code: 'c1',
+    country_abbreviation: 'IT',
+    province_abbreviation: 'MI',
+    desc: 'MILANO',
+  } as any);
+  const setIsLocationMissing = vi.fn();
+
+  await getLocationFromIstatCode(
+    setInstitutionLocationData,
+    setRequiredLogin,
+    '12345',
+    setIsLocationMissing
+  );
+
+  expect(setIsLocationMissing).toHaveBeenCalledWith(false);
+});
+
 it('test getLocationFromIstatCode skips when istatCode missing', async () => {
   await getLocationFromIstatCode(setInstitutionLocationData, setRequiredLogin, undefined);
   expect(PartyRegistryProxyApi.getLocationByCode).not.toHaveBeenCalled();

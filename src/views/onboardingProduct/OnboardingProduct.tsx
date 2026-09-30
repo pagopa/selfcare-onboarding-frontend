@@ -288,7 +288,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
       aggregates,
       () => {
         void triggerQualtricsIntercept({
-          institutionDescription: onboardingFormData?.businessName ?? '',
+          institutionDescription: partyName,
           productId,
           institutionType: institutionType ?? '',
         });
@@ -706,7 +706,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
         setUploadDocumentsContext(null);
         setOutcome(outcomeContent.success);
         void triggerQualtricsIntercept({
-          institutionDescription: onboardingFormData?.businessName ?? '',
+          institutionDescription: partyName,
           productId,
           institutionType: institutionType ?? '',
         });

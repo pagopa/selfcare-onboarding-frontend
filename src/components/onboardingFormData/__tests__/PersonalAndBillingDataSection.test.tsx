@@ -13,6 +13,7 @@ import {
 import { OnboardingFormData } from '../../../model/OnboardingFormData';
 import { PRODUCT_IDS } from '../../../utils/constants';
 import { renderComponentWithProviders } from '../../../utils/test/test-utils';
+import { getLocationFromIstatCode } from '../../../services/geoTaxonomyServices';
 import PersonalAndBillingDataSection from '../PersonalAndBillingDataSection';
 
 import {
@@ -377,4 +378,55 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
       expect(shareCapital).toBeInTheDocument();
     }
   });
+});
+
+test.each([
+  ['editable when the location lookup fails', true],
+  ['locked when the location lookup succeeds', false],
+])('Test: IPA party city and county are %s', async (_label, isLocationMissing) => {
+  (getLocationFromIstatCode as Mock).mockImplementation(
+    async (_setLocation, _setRequiredLogin, _istatCode, setIsLocationMissing) =>
+      setIsLocationMissing(isLocationMissing)
+  );
+
+  renderComponentWithProviders(
+    <PersonalAndBillingDataSection
+      productId={PRODUCT_IDS.INTEROP}
+      institutionType={'PA'}
+      baseTextFieldProps={mockBaseTextFieldProps}
+      stepHistoryState={{ externalInstitutionId: '', isTaxCodeEquals2PIVA: false }}
+      setStepHistoryState={vi.fn()}
+      formik={formik}
+      onboardingFormData={{ istatCode: '111111' } as OnboardingFormData}
+      institutionAvoidGeotax={false}
+      controllers={
+        {
+          isPremium: false,
+          isDisabled: true,
+          isInvoiceable: false,
+          isForeignInsurance: false,
+          isFromIPA: true,
+          isAooUo: false,
+        } as any
+      }
+      setInvalidTaxCodeInvoicing={vi.fn()}
+      countries={undefined}
+      setCountries={vi.fn()}
+    />,
+    PRODUCT_IDS.INTEROP
+  );
+
+  const city = document.getElementById('city-select') as HTMLInputElement;
+  const county = document.getElementById('county') as HTMLInputElement;
+
+  await waitFor(() => expect(getLocationFromIstatCode).toHaveBeenCalled());
+
+  if (isLocationMissing) {
+    await waitFor(() => expect(county).toBeEnabled());
+    expect(city).toBeEnabled();
+    expect(formik.setFieldValue).toHaveBeenCalledWith('country', 'IT');
+  } else {
+    expect(county).toBeDisabled();
+    expect(city).toBeDisabled();
+  }
 });
