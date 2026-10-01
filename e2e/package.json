@@ -5,8 +5,11 @@
   "license": "MIT",
   "devDependencies": {
     "@playwright/test": "^1.51.1",
-    "@types/node": "^22.13.13",
+    "@types/node": "^24",
     "tsx": "^4.20.6"
+  },
+  "engines": {
+    "node": ">=24"
   },
   "scripts": {
     "test:e2e": "playwright test",
