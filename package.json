@@ -10,7 +10,7 @@
     "@mui/material": "^5.8.2",
     "@pagopa/mui-italia": "^2.5.0",
     "@pagopa/selfcare-common-frontend": "^2.5.0",
-    "axios": "1.18.0",
+    "axios": "1.20.0",
     "debounce": "^3.0.0",
     "formik": "^2.4.6",
     "fp-ts": "^2.16.11",
