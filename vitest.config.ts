@@ -24,9 +24,19 @@ export default defineConfig({
     },
     deps: {
       optimizer: {
-        web: {
+        client: {
           enabled: true,
-          include: ['@mui/material', '@mui/icons-material', '@pagopa/mui-italia'],
+          include: [
+            'react',
+            'react-dom',
+            'react-dom/client',
+            'react/jsx-runtime',
+            'react/jsx-dev-runtime',
+            '@emotion/react',
+            '@emotion/styled',
+            '@mui/material',
+            '@mui/icons-material',
+          ],
         },
       },
     },
