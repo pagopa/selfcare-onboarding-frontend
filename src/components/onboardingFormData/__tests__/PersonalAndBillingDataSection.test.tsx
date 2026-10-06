@@ -147,11 +147,11 @@ test('Test: PRV + prod-idpay-merchant shows the required businessRegisterPlace l
   ).not.toBeInTheDocument();
 });
 
-test('Test: Rendered PersonalAndBillingDataSection component with all possible business cases', () => {
+test('Test: Rendered PersonalAndBillingDataSection component with all possible business cases', async () => {
   let componentRendered = false;
   const conditionsMap = {} as any;
   let onboardingFormData: any;
-  let productId: string;
+  let productId!: string;
 
   mockedProducts.forEach((product) => {
     institutionTypes.forEach((institutionType) => {
@@ -248,7 +248,7 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
     });
   });
 
-  Object.keys(conditionsMap).forEach(async (key) => {
+  for (const key of Object.keys(conditionsMap)) {
     const {
       isInvoiceable,
       isInformationCompany,
@@ -376,5 +376,5 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
       expect(rea).toBeInTheDocument();
       expect(shareCapital).toBeInTheDocument();
     }
-  });
+  }
 });
