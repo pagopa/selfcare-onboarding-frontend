@@ -151,7 +151,7 @@ test('Test: Rendered PersonalAndBillingDataSection component with all possible b
   let componentRendered = false;
   const conditionsMap = {} as any;
   let onboardingFormData: any;
-  let productId: string;
+  let productId!: string;
 
   mockedProducts.forEach((product) => {
     institutionTypes.forEach((institutionType) => {
