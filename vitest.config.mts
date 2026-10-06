@@ -17,6 +17,8 @@ export default defineConfig({
     exclude: ['**/node_modules/**', '**/e2e/**'],
     testTimeout: 30000,
     hookTimeout: 15000,
+    // jsdom + MUI suites are CPU-heavy: one worker per core starves them and makes the long onboarding flows time out
+    maxWorkers: '50%',
     server: {
       deps: {
         inline: ['@pagopa/selfcare-common-frontend', '@pagopa/mui-italia'],
