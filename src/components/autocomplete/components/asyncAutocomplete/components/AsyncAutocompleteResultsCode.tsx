@@ -38,7 +38,7 @@ type Props = {
   selections?: SelectionsState;
 };
 
-// eslint-disable-next-line sonarjs/cognitive-complexity
+// eslint-disable-next-line complexity
 export default function AsyncAutocompleteResultsCode({
   setSelected,
   apiLoading,

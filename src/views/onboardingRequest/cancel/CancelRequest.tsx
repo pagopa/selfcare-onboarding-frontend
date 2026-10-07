@@ -44,7 +44,7 @@ export default function CancelRequestComponent() {
 
   useEffect(() => {
     setLoading(true);
-    verifyRequest({
+    void verifyRequest({
       onboardingId: token,
       setRequiredLogin,
       setOutcomeContentState,
