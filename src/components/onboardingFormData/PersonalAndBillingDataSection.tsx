@@ -1,10 +1,7 @@
-import { Grid, MenuItem, Paper, TextField, Typography } from '@mui/material';
-import Autocomplete from '@mui/material/Autocomplete';
-import Checkbox from '@mui/material/Checkbox';
-import { Box, styled } from '@mui/system';
+import { Grid, Paper } from '@mui/material';
 import { theme } from '@pagopa/mui-italia';
-import { Dispatch, SetStateAction, useContext, useEffect, useState } from 'react';
-import { Trans, useTranslation } from 'react-i18next';
+import { useContext, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   InstitutionType,
   PaymentServiceProviderDto,
@@ -13,103 +10,17 @@ import {
 import { OnboardingControllers } from '../../hooks/useOnboardingControllers';
 import { UserContext } from '../../lib/context';
 import { AssistanceContacts } from '../../model/AssistanceContacts';
-import { CountryResource } from '../../model/CountryResource';
 import { InstitutionLocationData } from '../../model/InstitutionLocationData';
 import { OnboardingFormData } from '../../model/OnboardingFormData';
-import { verifyTaxCodeInvoicing } from '../../services/billingDataServices';
-import {
-  getCountriesFromGeotaxonomies,
-  getLocationFromIstatCode,
-  getNationalCountries,
-} from '../../services/geoTaxonomyServices';
+import { getLocationFromIstatCode } from '../../services/geoTaxonomyServices';
 import { getUoInfoFromRecipientCode } from '../../services/institutionServices';
-import { PRODUCT_IDS, requiredError } from '../../utils/constants';
-import {
-  isPrivateOrPersonInstitution,
-  isPrivateInstitution,
-  isPagoPaProduct,
-  isPublicServiceCompany,
-  isGpuInstitution,
-  isInteropProduct,
-  isIdpayMerchantProduct,
-  isPublicAdministration,
-  isIoSignProduct,
-  isFideiussioniProduct,
-  isIoProduct,
-  isFideiussioniGuaranteeProduct,
-  isContractingAuthority,
-  isInsuranceCompany,
-  isInformationCompany,
-  isPrivateMerchantInstitution,
-  isPaymentServiceProvider,
-  isPdndPrivate,
-  isCedProduct,
-} from '../../utils/institutionTypeUtils';
+import { isInformationCompany, isIoSignProduct } from '../../utils/institutionTypeUtils';
 import { StepBillingDataHistoryState } from '../steps/StepOnboardingFormData';
-import NumberDecimalFormat from './NumberDecimalFormat';
-
-interface CustomTextFieldNochedProps {
-  paddingValue?: string;
-}
-
-const CustomTextField = styled(TextField)({
-  '.MuiInputLabel-asterisk': {
-    display: 'none',
-  },
-});
-
-const CustomTextFieldNotched = styled(TextField)<CustomTextFieldNochedProps>(
-  ({ paddingValue }) => ({
-    '.MuiInputLabel-asterisk': {
-      display: 'none',
-    },
-    '& .MuiInputLabel-root': {
-      whiteSpace: 'normal',
-      overflow: 'visible',
-    },
-    '& .MuiOutlinedInput-notchedOutline legend': {
-      paddingRight: '0',
-    },
-    '&.Mui-focused .MuiOutlinedInput-notchedOutline legend': {
-      paddingRight: paddingValue ?? '0',
-    },
-    '& .MuiInputLabel-shrink + .MuiInputBase-root .MuiOutlinedInput-notchedOutline legend': {
-      paddingRight: paddingValue ?? '0',
-    },
-  })
-);
-
-const CustomNumberField = styled(TextField)({
-  'input::-webkit-inner-spin-button': {
-    WebkitAppearance: 'none',
-    margin: 0,
-  },
-  '.MuiInputLabel-asterisk': {
-    display: 'none',
-  },
-});
-
-const autocompletePaperStyle = {
-  paper: {
-    sx: {
-      '&::-webkit-scrollbar': {
-        width: 4,
-      },
-      '&::-webkit-scrollbar-track': {
-        boxShadow: `inset 10px 10px  #E6E9F2`,
-        marginY: '3px',
-      },
-      '&::-webkit-scrollbar-thumb': {
-        backgroundColor: '#0073E6',
-        borderRadius: '16px',
-      },
-      overflowY: 'auto',
-      maxHeight: '200px',
-      boxShadow:
-        '0px 6px 30px 5px rgba(0, 43, 85, 0.10), 0px 16px 24px 2px rgba(0, 43, 85, 0.05), 0px 8px 10px -5px rgba(0, 43, 85, 0.10)',
-    },
-  },
-};
+import CommercialRegisterData from './components/CommercialRegisterData';
+import InvoiceData from './components/InvoiceData';
+import PartyGeneralData from './components/PartyGeneralData';
+import VatNumberData from './components/VatNumberData';
+import SupportEmailData from './components/SupportEmailData';
 
 type Props = StepperStepComponentProps & {
   institutionType: InstitutionType;
@@ -125,8 +36,6 @@ type Props = StepperStepComponentProps & {
   controllers: OnboardingControllers;
   setInvalidTaxCodeInvoicing: React.Dispatch<React.SetStateAction<boolean>>;
   recipientCodeStatus?: string;
-  countries: Array<InstitutionLocationData> | undefined;
-  setCountries: Dispatch<SetStateAction<Array<InstitutionLocationData> | undefined>>;
 };
 
 // eslint-disable-next-line sonarjs/cognitive-complexity, complexity
@@ -144,73 +53,19 @@ export default function PersonalAndBillingDataSection({
   controllers,
   setInvalidTaxCodeInvoicing,
   recipientCodeStatus,
-  countries,
-  setCountries,
 }: Props) {
   const { t } = useTranslation();
   const { setRequiredLogin } = useContext(UserContext);
 
   const [shrinkRea, setShrinkRea] = useState<boolean>(false);
-  const [shrinkVatNumber, setShrinkVatNumber] = useState<boolean>(false);
-  const [shrinkCity, setShrinkCity] = useState<boolean>(false);
   const [institutionLocationData, setInstitutionLocationData] = useState<InstitutionLocationData>();
-  const [isCitySelected, setIsCitySelected] = useState<boolean>(false);
-  const [nationalCountries, setNationalCountries] = useState<Array<CountryResource>>();
-  const [input, setInput] = useState<string>();
+
   const [disableTaxCodeInvoicing, setDisableTaxCodeInvoicing] = useState<boolean>(false);
   const [taxCodeInvoicingVisible, setTaxCodeInvoicingVisible] = useState<boolean>(false);
   const [assistanceContacts, setAssistanceContacts] = useState<AssistanceContacts>();
   const [pspData, setPspData] = useState<PaymentServiceProviderDto>();
 
   const isInfoCompany = isInformationCompany(formik.values.origin, institutionType, productId);
-
-  const fieldColor = (disabled: boolean) =>
-    disabled ? theme.palette.text.disabled : theme.palette.text.primary;
-
-  const isFieldLockedForPrivate =
-    isPrivateOrPersonInstitution(institutionType) &&
-    !isPagoPaProduct(productId) &&
-    !isCedProduct(productId);
-
-  const isBusinessNameDisabled =
-    controllers.isDisabled ||
-    isContractingAuthority(institutionType) ||
-    isInsuranceCompany(institutionType) ||
-    (isInfoCompany && !!onboardingFormData?.businessName) ||
-    isFieldLockedForPrivate;
-
-  const isDigitalAddressDisabled =
-    controllers.isDisabled ||
-    isContractingAuthority(institutionType) ||
-    isInsuranceCompany(institutionType) ||
-    (isInfoCompany && !!onboardingFormData?.digitalAddress) ||
-    isFieldLockedForPrivate;
-
-  const isTaxCodeFieldDisabled =
-    controllers.isDisabled ||
-    isContractingAuthority(institutionType) ||
-    isInsuranceCompany(institutionType) ||
-    (isInfoCompany && !!onboardingFormData?.taxCode) ||
-    isFieldLockedForPrivate;
-
-  const isAddressDisabled =
-    !controllers.isAooUo && controllers.isDisabled && !isInsuranceCompany(institutionType);
-
-  const showTaxCodeField =
-    !isInsuranceCompany(institutionType) ||
-    (!!onboardingFormData?.taxCode && onboardingFormData.taxCode !== '');
-
-  const showCommercialRegisterSection =
-    isInfoCompany ||
-    isContractingAuthority(institutionType) ||
-    ((isInteropProduct(productId) ||
-      isPagoPaProduct(productId) ||
-      isIdpayMerchantProduct(productId) ||
-      isCedProduct(productId)) &&
-      (isPublicServiceCompany(institutionType) ||
-        isPrivateInstitution(institutionType) ||
-        isPrivateOrPersonInstitution(institutionType) ||
-        isGpuInstitution(institutionType)));
 
   useEffect(() => {
     const shareCapitalIsNan = isNaN(formik.values.shareCapital);
@@ -323,782 +178,67 @@ export default function PersonalAndBillingDataSection({
     }
   }, [stepHistoryState.isTaxCodeEquals2PIVA]);
 
-  const baseNumericFieldProps = (
-    field: keyof OnboardingFormData,
-    label: string,
-    fontWeight: string | number = 'fontWeightMedium',
-    fontSize: number = 18,
-    color: string = fieldColor(controllers.isDisabled)
-  ) => {
-    const isError = !!formik.errors[field] && formik.errors[field] !== requiredError;
-    return {
-      id: field,
-      type: 'tel',
-      value: formik.values[field],
-      label,
-      error: isError,
-      helperText: isError ? formik.errors[field] : undefined,
-      required: true,
-      variant: 'outlined' as const,
-      onChange: formik.handleChange,
-      sx: { width: '100%' },
-      InputProps: {
-        style: {
-          fontSize,
-          fontWeight,
-          lineHeight: '24px',
-          color,
-          textAlign: 'start' as const,
-          paddingLeft: '16px',
-          borderRadius: '4px',
-        },
-      },
-      InputLabelProps: {
-        sx: {
-          /* allow long labels to wrap instead of being clipped at zoom 400% (WCAG 1.4.10) */
-          whiteSpace: 'normal',
-          overflow: 'visible',
-        },
-      },
-    };
-  };
-
   return (
     <Paper
       elevation={8}
       sx={{ borderRadius: theme.spacing(2), p: 4, maxWidth: '704px', width: '100%' }}
     >
       <Grid item container spacing={3}>
-        {controllers.isAooUo && (
-          <Box px={4} pt={2} width="100%">
-            <Typography sx={{ fontSize: 'fontSize' }}>
-              {t('onboardingFormData.billingDataSection.centralPartyLabel')}
-            </Typography>
-            <Typography sx={{ fontWeight: 'fontWeightMedium', fontSize: 'fontSize' }}>
-              {onboardingFormData?.businessName}
-            </Typography>
-          </Box>
-        )}
-        {onboardingFormData?.uoUniqueCode ? (
-          <>
-            <Grid item xs={8}>
-              <CustomTextField
-                {...baseTextFieldProps(
-                  'uoName',
-                  t('onboardingFormData.billingDataSection.uoName'),
-                  600,
-                  fieldColor(controllers.isDisabled)
-                )}
-                disabled={controllers.isDisabled}
-              />
-            </Grid>
-            <Grid item xs={4}>
-              <CustomTextField
-                {...baseTextFieldProps(
-                  'uoUniqueCode',
-                  t('onboardingFormData.billingDataSection.uoUniqueCode'),
-                  600,
-                  fieldColor(controllers.isDisabled)
-                )}
-                disabled={controllers.isDisabled}
-              />
-            </Grid>
-          </>
-        ) : onboardingFormData?.aooUniqueCode ? (
-          <>
-            <Grid item xs={8}>
-              <CustomTextField
-                {...baseTextFieldProps(
-                  'aooName',
-                  t('onboardingFormData.billingDataSection.aooName'),
-                  600,
-                  fieldColor(controllers.isDisabled)
-                )}
-                disabled={controllers.isDisabled}
-              />
-            </Grid>
-            <Grid item xs={4}>
-              <CustomTextField
-                {...baseTextFieldProps(
-                  'aooUniqueCode',
-                  t('onboardingFormData.billingDataSection.aooUniqueCode'),
-                  600,
-                  fieldColor(controllers.isDisabled)
-                )}
-                disabled={controllers.isDisabled}
-              />
-            </Grid>
-          </>
-        ) : (
-          <Grid item xs={12}>
-            <CustomTextField
-              {...baseTextFieldProps(
-                'businessName',
-                t('onboardingFormData.billingDataSection.businessName'),
-                600,
-                fieldColor(isBusinessNameDisabled)
-              )}
-              disabled={isBusinessNameDisabled}
-            />
-          </Grid>
-        )}
-        <Grid container spacing={2} pl={3} pt={3}>
-          <Grid item xs={controllers.isForeignInsurance ? 12 : 7}>
-            <CustomTextFieldNotched
-              paddingValue="20px"
-              {...baseTextFieldProps(
-                'registeredOffice',
-                t('onboardingFormData.billingDataSection.fullLegalAddress'),
-                600,
-                fieldColor(isAddressDisabled)
-              )}
-              disabled={isAddressDisabled}
-            />
-          </Grid>
-          {!controllers.isForeignInsurance && (
-            <Grid item xs={5}>
-              <CustomNumberField
-                inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
-                {...baseNumericFieldProps(
-                  'zipCode',
-                  t('onboardingFormData.billingDataSection.zipCode'),
-                  600,
-                  16,
-                  fieldColor(isAddressDisabled)
-                )}
-                disabled={isAddressDisabled}
-              />
-            </Grid>
-          )}
-        </Grid>
-        <Grid container spacing={2} pl={3} pt={3}>
-          <Grid item xs={7}>
-            {isInsuranceCompany(institutionType) && controllers.isForeignInsurance ? (
-              <CustomTextField
-                {...baseTextFieldProps(
-                  'city',
-                  t('onboardingFormData.billingDataSection.city'),
-                  600,
-                  fieldColor(controllers.isDisabled)
-                )}
-                disabled={controllers.isDisabled}
-              />
-            ) : (
-              <Autocomplete
-                data-testid="city-autocomplete"
-                id="city-select"
-                onInput={(e: React.ChangeEvent<HTMLInputElement>) => {
-                  const value = e.target.value;
-                  formik.setFieldValue('city', value);
-                  if (value.length >= 3) {
-                    void getCountriesFromGeotaxonomies(value, setCountries, setRequiredLogin);
-                  } else {
-                    setCountries(undefined);
-                  }
-                }}
-                inputValue={formik.values.city || ''}
-                onChange={(_e: any, selected: any) => {
-                  formik.setFieldValue('city', selected?.city || '');
-                  formik.setFieldValue('county', selected?.city || '');
-                  formik.setFieldValue(
-                    'istatCode',
-                    !controllers.isFromIPA ? selected?.istat_code : undefined
-                  );
-                  if (selected) {
-                    setInstitutionLocationData(selected);
-                    setIsCitySelected(true);
-                  } else {
-                    setIsCitySelected(false);
-                  }
-                }}
-                onBlur={() => {
-                  if (!isCitySelected) {
-                    setCountries(undefined);
-                    setInstitutionLocationData(undefined);
-                  }
-                }}
-                getOptionLabel={(o) => o.city}
-                options={countries ?? []}
-                noOptionsText={t('onboardingFormData.billingDataSection.noResult')}
-                clearOnBlur={true}
-                forcePopupIcon={!(controllers.isFromIPA || !controllers.isCityEditable)}
-                disabled={controllers.isPremium || controllers.isFromIPA || controllers.isAooUo}
-                ListboxProps={{
-                  style: {
-                    overflow: 'visible',
-                  },
-                  'aria-live': 'polite',
-                }}
-                componentsProps={autocompletePaperStyle}
-                renderOption={(props, option: InstitutionLocationData) => (
-                  <MenuItem id={option.code} {...props} sx={{ height: '44px' }}>
-                    {option?.city}
-                  </MenuItem>
-                )}
-                renderInput={(params: any) => (
-                  <TextField
-                    {...params}
-                    inputProps={{
-                      ...params.inputProps,
-                      value:
-                        !controllers.isCityEditable || controllers.isFromIPA || controllers.isAooUo
-                          ? formik.values.city
-                          : params.inputProps.value,
-                    }}
-                    label={t('onboardingFormData.billingDataSection.city')}
-                    InputLabelProps={{
-                      shrink: (formik.values.city && formik.values.city !== '') || shrinkCity,
-                    }}
-                    sx={{
-                      '& .MuiOutlinedInput-input.MuiInputBase-input': {
-                        marginLeft: '15px',
-                        fontSize: 'fontSize',
-                        fontWeight: 'fontWeightMedium',
-                        textTransform: 'capitalize',
-                        color: controllers.isDisabled
-                          ? theme.palette.text.disabled
-                          : theme.palette.text.primary,
-                      },
-                      '& .MuiInputBase-root': {
-                        height: '56px',
-                      },
-                    }}
-                    onClick={() => setShrinkCity(true)}
-                    onBlur={() => setShrinkCity(false)}
-                    disabled={controllers.isDisabled}
-                  />
-                )}
-              />
-            )}
-          </Grid>
-          <Grid item xs={5}>
-            {isInsuranceCompany(institutionType) && controllers.isForeignInsurance ? (
-              <Autocomplete
-                id="country-select"
-                onInput={(e: React.ChangeEvent<HTMLInputElement>) => {
-                  const value = e.target.value;
-                  setInput(value);
-                  if (value.length >= 3) {
-                    void getNationalCountries(setNationalCountries);
-                  } else {
-                    setNationalCountries(undefined);
-                  }
-                }}
-                inputValue={formik.values.extendedCountry ?? input}
-                onChange={(_e: any, selected: any) => {
-                  if (selected) {
-                    formik.setFieldValue('country', selected.alpha_2);
-                    formik.setFieldValue('extendedCountry', selected.name);
-                    setInstitutionLocationData({ ...selected, country: selected.alpha_2 });
-                  } else {
-                    formik.setFieldValue('country', undefined);
-                    formik.setFieldValue('extendedCountry', undefined);
-                    setInstitutionLocationData({ ...selected, country: undefined });
-                  }
-                }}
-                getOptionLabel={(o) => o.name}
-                options={nationalCountries ?? []}
-                noOptionsText={t('onboardingFormData.billingDataSection.noResult')}
-                clearOnBlur={true}
-                ListboxProps={{
-                  style: {
-                    overflow: 'visible',
-                  },
-                }}
-                componentsProps={autocompletePaperStyle}
-                renderOption={(props, option) => (
-                  <MenuItem id={option.country_code} {...props} sx={{ height: '44px' }}>
-                    {option.name}
-                  </MenuItem>
-                )}
-                renderInput={(params: any) => (
-                  <TextField
-                    {...params}
-                    inputProps={{
-                      ...params.inputProps,
-                      value: params.inputProps.value,
-                    }}
-                    label={t('onboardingFormData.billingDataSection.country')}
-                    sx={{
-                      '& .MuiOutlinedInput-input.MuiInputBase-input': {
-                        marginLeft: '15px',
-                        fontWeight: 'fontWeightMedium',
-                        textTransform: 'capitalize',
-                        color: theme.palette.text.primary,
-                      },
-                    }}
-                  />
-                )}
-              />
-            ) : (
-              <CustomTextField
-                {...baseTextFieldProps(
-                  'county',
-                  t('onboardingFormData.billingDataSection.county'),
-                  600,
-                  theme.palette.text.disabled
-                )}
-                disabled={true}
-              />
-            )}
-          </Grid>
-        </Grid>
-        <Grid item xs={12}>
-          <CustomTextField
-            {...baseTextFieldProps(
-              'digitalAddress',
-              t('onboardingFormData.billingDataSection.digitalAddress'),
-              600,
-              fieldColor(isDigitalAddressDisabled)
-            )}
-            disabled={isDigitalAddressDisabled}
-          />
-        </Grid>
-        {showTaxCodeField && (
-          <Grid item xs={12}>
-            <CustomTextField
-              {...baseTextFieldProps(
-                'taxCode',
-                controllers.isAooUo
-                  ? t('onboardingFormData.billingDataSection.taxCodeCentralParty')
-                  : t('onboardingFormData.billingDataSection.taxCode'),
-                600,
-                fieldColor(isTaxCodeFieldDisabled)
-              )}
-              disabled={isTaxCodeFieldDisabled}
-              inputProps={{
-                maxLength: 11,
-              }}
-              value={formik.values.taxCode || ''}
-              onChange={(e) => {
-                const value = e.target.value.replace(/\D/g, '');
-                if (value.length <= 11) {
-                  formik.setFieldValue('taxCode', value);
-                }
-              }}
-            />
-          </Grid>
-        )}
-
-        {!controllers.isForeignInsurance && (
-          <Grid
-            container
-            item
-            spacing={3}
-            xs={12}
-            pl={3}
-            pt={
-              !controllers.isForeignInsurance ||
-              (formik.values.hasVatnumber && onboardingFormData?.taxCode !== '')
-                ? 3
-                : 0
-            }
-            mb={
-              !formik.values.hasVatnumber &&
-              controllers.isInvoiceable &&
-              isInsuranceCompany(institutionType)
-                ? -3
-                : 0
-            }
-          >
-            {formik.values.hasVatnumber &&
-              (!isInsuranceCompany(institutionType) ||
-                (onboardingFormData?.taxCode && onboardingFormData?.taxCode !== '')) &&
-              !isPrivateMerchantInstitution(institutionType) && (
-                <Grid item>
-                  <Box display="flex" alignItems="center">
-                    <Checkbox
-                      id="taxCodeEquals2VatNumber"
-                      checked={stepHistoryState.isTaxCodeEquals2PIVA}
-                      disabled={controllers.isPremium || formik.values.taxCode.length !== 11}
-                      inputProps={{
-                        'aria-label': t(
-                          'onboardingFormData.billingDataSection.taxCodeEquals2PIVAdescription'
-                        ),
-                      }}
-                      onChange={(e) => {
-                        setStepHistoryState({
-                          ...stepHistoryState,
-                          isTaxCodeEquals2PIVA: e.target.checked,
-                        });
-                      }}
-                    />
-                    <Typography component={'span'}>
-                      {t('onboardingFormData.billingDataSection.taxCodeEquals2PIVAdescription')}
-                    </Typography>
-                  </Box>
-                </Grid>
-              )}
-            {!isFideiussioniProduct(productId) &&
-              !isFideiussioniGuaranteeProduct(productId) &&
-              !isPrivateMerchantInstitution(institutionType) && (
-                <Grid item>
-                  <Box
-                    display="flex"
-                    alignItems="center"
-                    marginBottom={!formik.values.hasVatnumber && controllers.isInvoiceable ? -2 : 0}
-                  >
-                    <Checkbox
-                      id="party_without_vatnumber"
-                      inputProps={{
-                        'aria-label': t(
-                          'onboardingFormData.billingDataSection.partyWithoutVatNumber'
-                        ),
-                      }}
-                      onChange={(e) => {
-                        formik.setFieldValue('hasVatnumber', !e.target.checked);
-                        setStepHistoryState({
-                          ...stepHistoryState,
-                          isTaxCodeEquals2PIVA: false,
-                        });
-                      }}
-                    />
-                    <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                      <Typography component={'span'}>
-                        {t('onboardingFormData.billingDataSection.partyWithoutVatNumber')}
-                      </Typography>
-                      <Typography variant={'caption'} sx={{ fontWeight: '400', color: '#5C6F82' }}>
-                        <Trans
-                          i18nKey="onboardingFormData.billingDataSection.partyWIthoutVatNumberSubtitle"
-                          components={{ 1: <br /> }}
-                        >
-                          {`Indica solo il Codice Fiscale se il tuo ente non agisce nell'esercizio d'impresa,
-                arte o professione <1 />(cfr. art. 21, comma 2, lett. f, DPR n. 633/1972)`}
-                        </Trans>
-                      </Typography>
-                    </Box>
-                  </Box>
-                </Grid>
-              )}
-          </Grid>
-        )}
-
-        <Grid item xs={12}>
-          <Typography component={'span'}>
-            {formik.values.hasVatnumber && !controllers.isForeignInsurance && (
-              <CustomTextField
-                {...baseTextFieldProps(
-                  'vatNumber',
-                  t('onboardingFormData.billingDataSection.vatNumber'),
-                  600,
-                  stepHistoryState.isTaxCodeEquals2PIVA || controllers.isPremium
-                    ? theme.palette.text.disabled
-                    : theme.palette.text.primary
-                )}
-                value={formik.values.vatNumber}
-                disabled={
-                  stepHistoryState.isTaxCodeEquals2PIVA ||
-                  controllers.isPremium ||
-                  isPrivateMerchantInstitution(institutionType)
-                }
-                onClick={() => setShrinkVatNumber(true)}
-                onBlur={() => setShrinkVatNumber(false)}
-                InputLabelProps={{
-                  shrink:
-                    shrinkVatNumber ||
-                    stepHistoryState.isTaxCodeEquals2PIVA ||
-                    formik.values.vatNumber,
-                }}
-              />
-            )}
-            {isPaymentServiceProvider(institutionType) && formik.values.hasVatnumber && (
-              <Box display="flex" alignItems="center" mt="2px">
-                {/* Checkbox la aprtita IVA è di gruppo */}
-                <Checkbox
-                  id={'vatNumberGroup'}
-                  name="vatNumberGroup"
-                  inputProps={{
-                    'aria-label': t('onboardingFormData.billingDataSection.vatNumberGroup'),
-                  }}
-                  checked={formik.values.vatNumberGroup}
-                  onChange={(_, checked: boolean) =>
-                    formik.setFieldValue('vatNumberGroup', checked, true)
-                  }
-                  value={formik.values.vatNumberGroup}
-                  disabled={controllers.isPremium && !!pspData?.vatNumberGroup}
-                />
-                <Typography component={'span'}>
-                  {t('onboardingFormData.billingDataSection.vatNumberGroup')}
-                </Typography>
-              </Box>
-            )}
-            {controllers.isInvoiceable && (!isIoProduct(productId) || subProductId === PRODUCT_IDS.IO_PREMIUM) && (
-              <Grid item xs={12} mt={3}>
-                <CustomTextFieldNotched
-                  paddingValue={
-                    isPublicAdministration(institutionType) || controllers.isAooUo ? '8px' : '0'
-                  }
-                  {...baseTextFieldProps(
-                    'recipientCode',
-                    isPublicAdministration(institutionType) || controllers.isAooUo
-                      ? t('onboardingFormData.billingDataSection.sdiCodePaAooUo')
-                      : t('onboardingFormData.billingDataSection.sdiCode'),
-                    600,
-                    theme.palette.text.primary
-                  )}
-                  inputProps={{
-                    maxLength: 7,
-                    style: { textTransform: 'uppercase' },
-                    onInput: (event) => {
-                      const input = event.target as HTMLInputElement;
-                      const cleanedValue = input.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
-                      // eslint-disable-next-line functional/immutable-data
-                      input.value = cleanedValue;
-                    },
-                  }}
-                  disabled={
-                    (controllers.isPremium && subProductId !== PRODUCT_IDS.IO_PREMIUM) &&
-                    formik.values.recipientCode.length >= 6 &&
-                    formik.initialValues.recipientCode.length >= 6 &&
-                    !formik.errors.recipientCode
-                  }
-                  helperText={
-                    formik.errors.recipientCode === 'Required'
-                      ? undefined
-                      : formik.errors.recipientCode
-                  }
-                  error={
-                    formik.errors.recipientCode === 'Required'
-                      ? false
-                      : !!formik.errors.recipientCode
-                  }
-                />
-                <Typography
-                  component={'span'}
-                  sx={{
-                    fontSize: '12px!important',
-                    fontWeight: 'fontWeightMedium',
-                    color: theme.palette.text.secondary,
-                  }}
-                >
-                  {isPublicAdministration(institutionType) || controllers.isAooUo
-                    ? t('onboardingFormData.billingDataSection.sdiCodePaAooUoDescription')
-                    : t('onboardingFormData.billingDataSection.recipientCodeDescription')}
-                </Typography>
-              </Grid>
-            )}
-            {(onboardingFormData?.uoUniqueCode || isPublicAdministration(institutionType)) &&
-              controllers.isInvoiceable &&
-              taxCodeInvoicingVisible && (
-                <Grid item xs={12} mt={3}>
-                  <CustomTextField
-                    {...baseTextFieldProps(
-                      'taxCodeInvoicing',
-                      t('onboardingFormData.billingDataSection.taxCodeInvoicing'),
-                      600,
-                      theme.palette.text.primary
-                    )}
-                    onChange={(e) => {
-                      formik.setFieldValue('taxCodeInvoicing', e.target.value);
-                      if (e.target.value.length === 11) {
-                        void verifyTaxCodeInvoicing(
-                          e.target.value,
-                          formik,
-                          setInvalidTaxCodeInvoicing
-                        );
-                      } else {
-                        setInvalidTaxCodeInvoicing(false);
-                      }
-                    }}
-                    inputProps={{
-                      maxLength: 11,
-                    }}
-                    disabled={disableTaxCodeInvoicing}
-                  />
-                </Grid>
-              )}
-          </Typography>
-        </Grid>
-        {isInsuranceCompany(institutionType) && (
-          <Grid item xs={12} marginTop={controllers.isForeignInsurance ? -3 : 0}>
-            <CustomTextField
-              {...baseTextFieldProps(
-                'originId',
-                t('onboardingFormData.billingDataSection.originId'),
-                600,
-                theme.palette.text.disabled
-              )}
-              value={formik.values.originId}
-              disabled={true}
-            />
-          </Grid>
-        )}
-        {showCommercialRegisterSection && (
-          <>
-            <Grid item xs={12}>
-              {/* Luogo di iscrizione al Registro delle Imprese facoltativo per institution Type !== 'PA' e 'PSP */}
-              <CustomTextFieldNotched
-                paddingValue={isContractingAuthority(institutionType) ? '20px' : '24px'}
-                {...baseTextFieldProps(
-                  'businessRegisterPlace',
-                  isContractingAuthority(institutionType) ||
-                    isPdndPrivate(institutionType, productId) ||
-                    isPrivateMerchantInstitution(institutionType, productId)
-                    ? t(
-                        'onboardingFormData.billingDataSection.informationCompanies.requiredCommercialRegisterNumber'
-                      )
-                    : t(
-                        'onboardingFormData.billingDataSection.informationCompanies.commercialRegisterNumber'
-                      ),
-                  600,
-                  theme.palette.text.primary
-                )}
-              />
-            </Grid>
-            <Grid item xs={6}>
-              <CustomTextField
-                placeholder={'RM-123456'}
-                {...baseTextFieldProps(
-                  'rea',
-                  isPrivateInstitution(institutionType) && isPagoPaProduct(productId)
-                    ? t('onboardingFormData.billingDataSection.informationCompanies.rea')
-                    : t('onboardingFormData.billingDataSection.informationCompanies.requiredRea'),
-                  600,
-                  theme.palette.text.primary
-                )}
-              />
-            </Grid>
-            <Grid item xs={6}>
-              {/* capitale sociale facoltativo per institution Type !== 'PA' e 'PSP */}
-              <CustomTextField
-                name={'shareCapital'}
-                {...baseTextFieldProps(
-                  'shareCapital',
-                  isContractingAuthority(institutionType) ||
-                    isPdndPrivate(institutionType, productId)
-                    ? t(
-                        'onboardingFormData.billingDataSection.informationCompanies.requiredShareCapital'
-                      )
-                    : t('onboardingFormData.billingDataSection.informationCompanies.shareCapital'),
-                  600,
-                  theme.palette.text.primary
-                )}
-                onClick={() => setShrinkRea(true)}
-                onBlur={() => {
-                  if (!formik.values.shareCapital) {
-                    setShrinkRea(false);
-                  }
-                }}
-                InputLabelProps={{ shrink: shrinkRea }}
-                InputProps={{
-                  inputComponent: NumberDecimalFormat,
-                }}
-                helperText={
-                  isIdpayMerchantProduct(productId)
-                    ? t(
-                        'onboardingFormData.billingDataSection.informationCompanies.shareCapitalHelper'
-                      )
-                    : undefined
-                }
-              />
-            </Grid>
-          </>
-        )}
-        {isPaymentServiceProvider(institutionType) && (
-          <>
-            <Grid item xs={12}>
-              {/* n. Iscrizione al Registro delle Imprese */}
-              <CustomTextField
-                inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
-                {...baseTextFieldProps(
-                  'commercialRegisterNumber',
-                  t(
-                    'onboardingFormData.billingDataSection.pspDataSection.commercialRegisterNumber'
-                  ),
-                  600,
-                  theme.palette.text.primary
-                )}
-                disabled={
-                  controllers.isDisabled &&
-                  !!pspData?.businessRegisterNumber &&
-                  !formik.errors.commercialRegisterNumber
-                }
-              />
-            </Grid>
-            <Grid item xs={12}>
-              {/* Iscrizione all’Albo */}
-              <CustomTextField
-                {...baseTextFieldProps(
-                  'registrationInRegister',
-                  t('onboardingFormData.billingDataSection.pspDataSection.registrationInRegister'),
-                  600,
-                  theme.palette.text.primary
-                )}
-                disabled={
-                  controllers.isDisabled &&
-                  !!pspData?.legalRegisterName &&
-                  formik.values.legalRegisterNumber !== 'N/A'
-                }
-              />
-            </Grid>
-            <Grid item xs={6}>
-              {/* Numero dell’Albo */}
-              <CustomTextField
-                inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
-                {...baseTextFieldProps(
-                  'registerNumber',
-                  t('onboardingFormData.billingDataSection.pspDataSection.registerNumber'),
-                  600,
-                  theme.palette.text.primary
-                )}
-                disabled={
-                  controllers.isDisabled &&
-                  !!pspData?.legalRegisterNumber &&
-                  !formik.errors.legalRegisterNumber &&
-                  formik.values.legalRegisterNumber !== 'N/A'
-                }
-              />
-            </Grid>
-            <Grid item xs={6}>
-              {/* ABI code */}
-              <CustomTextField
-                {...baseTextFieldProps(
-                  'abiCode',
-                  t('onboardingFormData.billingDataSection.pspDataSection.abiCode'),
-                  600,
-                  theme.palette.text.primary
-                )}
-                value={formik.values.abiCode}
-                InputLabelProps={{
-                  shrink: formik.values.abiCode?.length > 0,
-                }}
-                disabled={controllers.isDisabled && !!pspData?.abiCode && !formik.errors.abiCode}
-              />
-            </Grid>
-          </>
-        )}
-        {/* indirizzo mail di supporto */}
-        {!institutionAvoidGeotax &&
-          (isIoSignProduct(productId) ||
-            (isCedProduct(productId) && isPrivateInstitution(institutionType))) && (
-            <Grid item xs={12}>
-              <CustomTextFieldNotched
-                paddingValue={'14px'}
-                {...baseTextFieldProps(
-                  'supportEmail',
-                  t(
-                    `onboardingFormData.billingDataSection.assistanceContact.${isCedProduct(productId) ? 'supportEmailOptional' : 'supportEmail'}`
-                  ),
-                  600,
-                  theme.palette.text.primary
-                )}
-                disabled={controllers.isDisabled && !!assistanceContacts?.supportEmail}
-              />
-              {/* descrizione indirizzo mail di supporto */}
-              <Typography
-                component={'span'}
-                sx={{
-                  fontSize: '12px!important',
-                  fontWeight: 'fontWeightMedium',
-                  color: theme.palette.text.secondary,
-                }}
-              >
-                {t(
-                  'onboardingFormData.billingDataSection.assistanceContact.supportEmailDescriprion'
-                )}
-              </Typography>
-            </Grid>
-          )}
+        <PartyGeneralData
+          controllers={controllers}
+          origin={formik.values.origin}
+          onboardingFormData={onboardingFormData}
+          baseTextFieldProps={baseTextFieldProps}
+          institutionType={institutionType}
+          isInfoCompany={isInfoCompany}
+          formik={formik}
+          productId={productId}
+          setInstitutionLocationData={setInstitutionLocationData}
+          setRequiredLogin={setRequiredLogin}
+        />
+        <VatNumberData
+          controllers={controllers}
+          formik={formik}
+          onboardingFormData={onboardingFormData}
+          institutionType={institutionType}
+          productId={productId}
+          stepHistoryState={stepHistoryState}
+          setStepHistoryState={setStepHistoryState}
+          baseTextFieldProps={baseTextFieldProps}
+          t={t}
+          pspData={pspData}
+        />
+        <InvoiceData
+          controllers={controllers}
+          productId={productId}
+          subProductId={subProductId}
+          institutionType={institutionType}
+          onboardingFormData={onboardingFormData}
+          taxCodeInvoicingVisible={taxCodeInvoicingVisible}
+          disableTaxCodeInvoicing={disableTaxCodeInvoicing}
+          formik={formik}
+          baseTextFieldProps={baseTextFieldProps}
+          setInvalidTaxCodeInvoicing={setInvalidTaxCodeInvoicing}
+        />
+        <CommercialRegisterData
+        isInfoCompany={isInfoCompany}
+          institutionType={institutionType}
+          productId={productId}
+          baseTextFieldProps={baseTextFieldProps}
+          formik={formik}
+          setShrinkRea={setShrinkRea}
+          shrinkRea={shrinkRea}
+          controllers={controllers}
+          pspData={pspData}
+        />
+        <SupportEmailData
+          institutionType={institutionType}
+          productId={productId}
+          baseTextFieldProps={baseTextFieldProps}
+          controllers={controllers}
+          assistanceContacts={assistanceContacts}
+          institutionAvoidGeotax={institutionAvoidGeotax}
+        />
       </Grid>
     </Paper>
   );

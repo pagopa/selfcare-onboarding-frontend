@@ -1,37 +1,13 @@
 import '@testing-library/jest-dom';
-import { fireEvent, screen, waitFor } from '@testing-library/react';
-import { useFormik } from 'formik';
-import { expect, Mock, test, vi } from 'vitest';
-import {
-  institutionTypes,
-  mockedAoos,
-  mockedPartiesFromInfoCamere,
-  mockedProducts,
-  mockedUos,
-  mockPartyRegistry,
-} from '../../../lib/__mocks__/mockApiRequests';
+import { screen } from '@testing-library/react';
+import { beforeEach, expect, test, vi } from 'vitest';
+import { InstitutionType } from '../../../../types';
 import { OnboardingFormData } from '../../../model/OnboardingFormData';
+import { getLocationFromIstatCode } from '../../../services/geoTaxonomyServices';
+import { getUoInfoFromRecipientCode } from '../../../services/institutionServices';
 import { PRODUCT_IDS } from '../../../utils/constants';
 import { renderComponentWithProviders } from '../../../utils/test/test-utils';
 import PersonalAndBillingDataSection from '../PersonalAndBillingDataSection';
-
-import {
-  isContractingAuthority,
-  isGlobalServiceProvider,
-  isInsuranceCompany,
-  isInteropProduct,
-  isIoProduct,
-  isIoSignProduct,
-  isPaymentServiceProvider,
-  isPrivateMerchantInstitution,
-  isPublicAdministration,
-  isPublicServiceCompany,
-  isTechPartner,
-} from '../../../utils/institutionTypeUtils';
-
-vi.mock('formik', () => ({
-  useFormik: vi.fn(),
-}));
 
 vi.mock('../../../services/geoTaxonomyServices', () => ({
   getCountriesFromGeotaxonomies: vi.fn(),
@@ -47,334 +23,294 @@ vi.mock('../../../services/billingDataServices', () => ({
   verifyTaxCodeInvoicing: vi.fn(),
 }));
 
-const mockFormik = {
-  initialValues: {
-    businessName: '',
-    registeredOffice: '',
-    zipCode: '',
-    digitalAddress: '',
-    taxCode: '',
-    vatNumber: '',
-    recipientCode: '',
-    geographicTaxonomies: [],
-  },
-  validateOnMount: true,
-  validate: vi.fn(),
-  onSubmit: vi.fn(),
-};
-
-(useFormik as Mock).mockReturnValue(mockFormik);
-
-const formik: any = {
+const buildFormik = (values: Record<string, unknown> = {}): any => ({
   values: {
     businessName: '',
     zipCode: '12345',
+    taxCode: '',
+    vatNumber: '',
+    recipientCode: '',
+    hasVatnumber: true,
+    ...values,
   },
-  errors: {
-    zipCode: 'Invalid zip code',
-  },
+  initialValues: { recipientCode: '' },
+  errors: {},
   setFieldValue: vi.fn(),
-  setErrors: vi.fn(),
-  setTouched: vi.fn(),
   handleChange: vi.fn(),
-};
+});
 
 const mockBaseTextFieldProps = (
   field: keyof OnboardingFormData,
   label: string,
   fontWeight: number = 400,
-  fontSize: number = 16
-) => {
-  const isError = formik.errors && formik.errors[field] && formik.errors[field] !== 'Required';
-
-  return {
-    id: field,
-    type: 'text',
-    value: formik.values[field] || '',
-    label,
-    error: isError || false,
-    helperText: isError ? formik.errors[field] : undefined,
-    required: true,
-    variant: 'outlined',
-    onChange: formik.handleChange,
-    sx: { width: '100%' },
-    InputProps: {
-      style: {
-        fontSize,
-        fontWeight,
-        lineHeight: '24px',
-        color: '#5C6F82',
-        textAlign: 'start',
-        paddingLeft: '16px',
-        borderRadius: '4px',
-      },
-    },
-  };
-};
-
-test('Test: PRV + prod-idpay-merchant shows the required businessRegisterPlace label', () => {
-  renderComponentWithProviders(
-    <PersonalAndBillingDataSection
-      productId={PRODUCT_IDS.IDPAY_MERCHANT}
-      institutionType={'PRV'}
-      baseTextFieldProps={mockBaseTextFieldProps}
-      stepHistoryState={{ externalInstitutionId: '', isTaxCodeEquals2PIVA: false }}
-      setStepHistoryState={vi.fn()}
-      formik={formik}
-      institutionAvoidGeotax={false}
-      controllers={
-        {
-          isPremium: false,
-          isDisabled: false,
-          isInvoiceable: false,
-          isForeignInsurance: false,
-          isFromIPA: false,
-          isAooUo: false,
-        } as any
-      }
-      setInvalidTaxCodeInvoicing={vi.fn()}
-      countries={undefined}
-      setCountries={vi.fn()}
-    />,
-    PRODUCT_IDS.IDPAY_MERCHANT
-  );
-
-  expect(
-    screen.getByLabelText(/Luogo di iscrizione al Registro delle Imprese \(obbligatorio\)/)
-  ).toBeInTheDocument();
-  expect(
-    screen.queryByLabelText(/Luogo di iscrizione al Registro delle Imprese \(facoltativo\)/)
-  ).not.toBeInTheDocument();
+  fontSize: number | string = 16
+) => ({
+  id: field,
+  type: 'text',
+  label,
+  error: false,
+  required: true,
+  variant: 'outlined',
+  sx: { width: '100%' },
+  InputProps: { style: { fontSize, fontWeight } },
 });
 
-test('Test: Rendered PersonalAndBillingDataSection component with all possible business cases', async () => {
-  let componentRendered = false;
-  const conditionsMap = {} as any;
-  let onboardingFormData: any;
-  let productId!: string;
+const defaultControllers = {
+  isPremium: false,
+  isDisabled: false,
+  isInvoiceable: true,
+  isForeignInsurance: false,
+  isFromIPA: false,
+  isAooUo: false,
+  isCityEditable: true,
+};
 
-  mockedProducts.forEach((product) => {
-    institutionTypes.forEach((institutionType) => {
-      if (!componentRendered) {
-        productId = product.id;
+const renderComponent = ({
+  formik = buildFormik(),
+  institutionType = 'PA',
+  productId = PRODUCT_IDS.SEND,
+  controllers = {},
+  onboardingFormData,
+  retrievedIstat,
+  recipientCodeStatus,
+  isTaxCodeEquals2PIVA = false,
+  institutionAvoidGeotax = false,
+}: {
+  formik?: any;
+  institutionType?: InstitutionType;
+  productId?: string;
+  controllers?: Record<string, unknown>;
+  onboardingFormData?: any;
+  retrievedIstat?: string;
+  recipientCodeStatus?: string;
+  isTaxCodeEquals2PIVA?: boolean;
+  institutionAvoidGeotax?: boolean;
+} = {}) => {
+  renderComponentWithProviders(
+    <PersonalAndBillingDataSection
+      institutionType={institutionType}
+      baseTextFieldProps={mockBaseTextFieldProps}
+      stepHistoryState={{ externalInstitutionId: '', isTaxCodeEquals2PIVA }}
+      setStepHistoryState={vi.fn()}
+      formik={formik}
+      onboardingFormData={onboardingFormData}
+      institutionAvoidGeotax={institutionAvoidGeotax}
+      retrievedIstat={retrievedIstat}
+      controllers={{ ...defaultControllers, ...controllers } as any}
+      setInvalidTaxCodeInvoicing={vi.fn()}
+      recipientCodeStatus={recipientCodeStatus}
+    />,
+    productId
+  );
+  return formik;
+};
 
-        switch (productId) {
-          case PRODUCT_IDS.SEND:
-            onboardingFormData = mockedAoos[0];
-            break;
-          case PRODUCT_IDS.IO_SIGN:
-            onboardingFormData = mockedUos[0];
-            break;
-          case PRODUCT_IDS.INTEROP:
-            onboardingFormData = mockedPartiesFromInfoCamere;
-            break;
-          default:
-            onboardingFormData = mockPartyRegistry.items[0];
-        }
+beforeEach(() => {
+  vi.clearAllMocks();
+});
 
-        const institutionAvoidGeotax = ['PT', 'SA', 'AS'].includes(institutionType);
+test('Test: renders all the sections of a PA party', () => {
+  renderComponent();
 
-        const isForeignInsurance = onboardingFormData?.registerType?.includes('Elenco II');
-        const isPremium = !!product.parentId;
-        const isDisabled =
-          isPremium ||
-          (origin === 'IPA' &&
-            !isPublicAdministration(institutionType) &&
-            !isPaymentServiceProvider(institutionType)) ||
-          isPublicAdministration(institutionType);
-        const isInvoiceable =
-          !isContractingAuthority(institutionType) &&
-          !isTechPartner(institutionType) &&
-          !isInsuranceCompany(institutionType) &&
-          !isInteropProduct(productId);
-        const isInformationCompany =
-          (isGlobalServiceProvider(institutionType) || isPublicServiceCompany(institutionType)) &&
-          (isIoProduct(productId) || isIoSignProduct(productId) || isInteropProduct(productId));
-        const isFromIPA = origin === 'IPA';
-        const isAooUo = !!(onboardingFormData?.uoUniqueCode ?? onboardingFormData?.aooUniqueCode);
+  // PartyGeneralData
+  expect(screen.getByText('Ragione sociale')).toBeInTheDocument();
+  expect(screen.getByText('Indirizzo PEC')).toBeInTheDocument();
+  // VatNumberData
+  expect(document.getElementById('party_without_vatnumber')).toBeInTheDocument();
+  expect(screen.getByText('Partita IVA')).toBeInTheDocument();
+  // InvoiceData
+  expect(screen.getByText('Codice univoco o SDI')).toBeInTheDocument();
+  // CommercialRegisterData and SupportEmailData are not shown for PA + SEND
+  expect(screen.queryByText(/Luogo di iscrizione al Registro delle Imprese/)).not.toBeInTheDocument();
+  expect(screen.queryByText('Indirizzo email visibile ai cittadini')).not.toBeInTheDocument();
+});
 
-        conditionsMap[`${productId}-${institutionType}`] = {
-          isPremium,
-          isInvoiceable,
-          isInformationCompany,
-          isForeignInsurance,
-          institutionAvoidGeotax,
-          isInsuranceCompany: isInsuranceCompany(institutionType),
-          isPrivateParty:
-            isInteropProduct(productId) && isPrivateMerchantInstitution(institutionType),
-        };
+test('Test: renders the commercial register section and the support email for SA + prod-io-sign', () => {
+  renderComponent({ institutionType: 'SA', productId: PRODUCT_IDS.IO_SIGN });
 
-        const mockControllers = {
-          isPremium,
-          isPaymentServiceProvider: isPaymentServiceProvider(institutionType),
-          isPdndPrivate:
-            isInteropProduct(productId) && isPrivateMerchantInstitution(institutionType),
-          isPrivateMerchantInstitution: isPrivateMerchantInstitution(institutionType),
-          isInformationCompany,
-          isInvoiceable,
-          isForeignInsurance,
-          isProdFideiussioni: false,
-          isDisabled,
-          isCityEditable: undefined,
-          isVatRegistrated: undefined,
-          isFromIPA,
-          isContractingAuthority: isContractingAuthority(institutionType),
-          isInsuranceCompany: isInsuranceCompany(institutionType),
-          isAooUo,
-        };
+  expect(
+    screen.getByText('Luogo di iscrizione al Registro delle Imprese (obbligatorio)')
+  ).toBeInTheDocument();
+  expect(screen.getByText('REA')).toBeInTheDocument();
+  expect(screen.getByText('Capitale sociale')).toBeInTheDocument();
+  expect(screen.getByText('Indirizzo email visibile ai cittadini')).toBeInTheDocument();
+});
 
-        renderComponentWithProviders(
-          <PersonalAndBillingDataSection
-            productId={productId}
-            institutionType={institutionType}
-            baseTextFieldProps={mockBaseTextFieldProps}
-            stepHistoryState={{
-              externalInstitutionId: '',
-              isTaxCodeEquals2PIVA: false,
-            }}
-            setStepHistoryState={vi.fn()}
-            formik={formik}
-            institutionAvoidGeotax={institutionAvoidGeotax}
-            onboardingFormData={onboardingFormData}
-            controllers={mockControllers}
-            setInvalidTaxCodeInvoicing={vi.fn()}
-            countries={undefined}
-            setCountries={vi.fn()}
-          />
-        );
+test('Test: GSP + prod-io-sign information company renders the optional commercial register section', () => {
+  renderComponent({ institutionType: 'GSP', productId: PRODUCT_IDS.IO_SIGN });
 
-        componentRendered = true;
-      }
-    });
+  expect(
+    screen.getByText('Luogo di iscrizione al Registro delle Imprese (facoltativo)')
+  ).toBeInTheDocument();
+  expect(screen.getByText('REA')).toBeInTheDocument();
+  expect(screen.getByText('Capitale sociale (facoltativo)')).toBeInTheDocument();
+});
+
+test('Test: institutionAvoidGeotax hides the support email', () => {
+  renderComponent({ productId: PRODUCT_IDS.IO_SIGN, institutionAvoidGeotax: true });
+
+  expect(screen.queryByText('Indirizzo email visibile ai cittadini')).not.toBeInTheDocument();
+});
+
+test('Test: renders the PSP sections', () => {
+  renderComponent({ institutionType: 'PSP', productId: PRODUCT_IDS.PAGOPA });
+
+  expect(screen.getByText('n. Iscrizione al Registro delle Imprese')).toBeInTheDocument();
+  expect(screen.getByText('Codice ABI')).toBeInTheDocument();
+  expect(screen.getByText('La Partita IVA è di gruppo')).toBeInTheDocument();
+});
+
+test('Test: renders the central party for AOO and clears the recipient code', () => {
+  const formik = renderComponent({
+    controllers: { isAooUo: true },
+    onboardingFormData: { aooUniqueCode: 'A1B2C3', businessName: 'Ente centrale srl' },
   });
 
-  for (const key of Object.keys(conditionsMap)) {
-    const {
-      isInvoiceable,
-      isInformationCompany,
-      isForeignInsurance,
-      institutionAvoidGeotax,
-      isPrivateParty,
-    } = conditionsMap[key];
+  expect(screen.getByText('Ente centrale')).toBeInTheDocument();
+  expect(screen.getByText('Denominazione AOO')).toBeInTheDocument();
+  expect(formik.setFieldValue).toHaveBeenCalledWith('recipientCode', undefined);
+});
 
-    const centralParty = screen.queryByText('Ente centrale');
-    const aooDenomination = screen.queryByText('Denominazione AOO');
-    const aooUniqueCode = screen.queryByText('Codice Univoco AOO');
-    const uoDenomination = screen.queryByText('Denominazione UO');
-    const uoUniqueCode = screen.queryByText('Denominazione UO');
+test('Test: a NaN share capital is reset', () => {
+  const formik = renderComponent({ formik: buildFormik({ shareCapital: NaN }) });
 
-    const businessName = screen.queryByText('Ragione sociale');
-    const fullLegalAddress = screen.queryByText('Indirizzo e numero civico della sede legale');
-    const zipCode = screen.getByText('CAP');
-    const city = document.getElementById(
-      isForeignInsurance ? 'city' : 'city-select'
-    ) as HTMLInputElement;
-    const county = screen.getByText('Provincia');
-    const country = screen.queryByText('Nazione');
-    const pec = screen.getByText('Indirizzo PEC');
-    const taxCode = screen.queryByText('Codice Fiscale');
-    const taxCodeEc = screen.queryByText('Codice Fiscale ente centrale');
-    const commercialRegisterNumber = screen.queryByText(
-      'Luogo di iscrizione al Registro delle Imprese (facoltativo)'
-    );
-    const rea = screen.queryByText('REA');
-    const sdiCode = screen.queryByText('Codice univoco o SDI') as HTMLInputElement;
-    const taxCodeSfe = screen.queryByText('Codice Fiscale SFE') as HTMLInputElement;
-    const shareCapital = screen.queryByText('Capitale sociale (facoltativo)');
-    const visibleCitizenMail = screen.queryByText('Indirizzo email visibile ai cittadini');
+  expect(formik.setFieldValue).toHaveBeenCalledWith('shareCapital', undefined);
+});
 
-    if (onboardingFormData?.aooUniqueCode) {
-      expect(businessName).not.toBeInTheDocument();
-      expect(centralParty).toBeInTheDocument();
-      expect(aooDenomination).toBeInTheDocument();
-      expect(aooUniqueCode).toBeInTheDocument();
-      expect(taxCode).not.toBeInTheDocument();
-      expect(taxCodeEc).toBeInTheDocument();
-    } else if (onboardingFormData?.uoUniqueCode) {
-      expect(businessName).not.toBeInTheDocument();
-      expect(centralParty).toBeInTheDocument();
-      expect(uoDenomination).toBeInTheDocument();
-      expect(uoUniqueCode).toBeInTheDocument();
-      expect(taxCode).not.toBeInTheDocument();
-      expect(taxCodeEc).toBeInTheDocument();
-    } else {
-      expect(centralParty).not.toBeInTheDocument();
-      expect(aooDenomination).not.toBeInTheDocument();
-      expect(aooUniqueCode).not.toBeInTheDocument();
-      expect(uoDenomination).not.toBeInTheDocument();
-      expect(uoUniqueCode).not.toBeInTheDocument();
-      expect(businessName).toBeInTheDocument();
-      expect(taxCode).toBeInTheDocument();
-      expect(taxCodeEc).not.toBeInTheDocument();
-    }
-    expect(fullLegalAddress).toBeInTheDocument();
+test('Test: tax code equals vat number copies the tax code into the vat number', () => {
+  const formik = renderComponent({
+    formik: buildFormik({ taxCode: '12345678901' }),
+    isTaxCodeEquals2PIVA: true,
+  });
 
-    expect(city).toBeInTheDocument();
-    if (isForeignInsurance) {
-      expect(zipCode).not.toBeInTheDocument();
-      expect(county).not.toBeInTheDocument();
-      expect(country).toBeInTheDocument();
-    } else {
-      expect(zipCode).toBeInTheDocument();
-      expect(county).toBeInTheDocument();
-      expect(country).not.toBeInTheDocument();
-    }
+  expect(formik.setFieldValue).toHaveBeenCalledWith('vatNumber', '12345678901');
+});
 
-    expect(pec).toBeInTheDocument();
+test('Test: tax code not equal to vat number clears the vat number', () => {
+  const formik = renderComponent({ formik: buildFormik({ taxCode: '12345678901' }) });
 
-    if (isInvoiceable && !isIoProduct(productId)) {
-      expect(sdiCode).toBeInTheDocument();
-      fireEvent.change(document.getElementById('recipientCode') as HTMLInputElement, {
-        target: { value: 'A1B2C3' },
-      });
-      await waitFor(() => screen.queryByText('Codice Fiscale SFE'));
+  expect(formik.setFieldValue).toHaveBeenCalledWith('vatNumber', '');
+});
 
-      await waitFor(() => {
-        fireEvent.change(document.getElementById('recipientCode') as HTMLInputElement, {
-          target: { value: 'AABBC1' },
-        });
-        expect(screen.queryByText('Codice Fiscale SFE')).not.toBeInTheDocument();
-      });
-      fireEvent.change(document.getElementById('recipientCode') as HTMLInputElement, {
-        target: { value: '2A3B4C' },
-      });
-      await waitFor(() => expect(screen.queryByText('Codice Fiscale SFE')).not.toBeInTheDocument());
+test('Test: foreign insurance resets the address fields', () => {
+  const formik = renderComponent({
+    institutionType: 'AS',
+    controllers: { isForeignInsurance: true },
+    onboardingFormData: { taxCode: '12345678901' },
+  });
 
-      fireEvent.change(document.getElementById('recipientCode') as HTMLInputElement, {
-        target: { value: '' },
-      });
-      await waitFor(() => expect(screen.queryByText('Codice Fiscale SFE')).not.toBeInTheDocument());
-    } else {
-      expect(sdiCode).not.toBeInTheDocument();
-      expect(taxCodeSfe).not.toBeInTheDocument();
-    }
+  expect(formik.setFieldValue).toHaveBeenCalledWith('isForeignInsurance', true);
+  ['zipCode', 'city', 'county', 'country'].forEach((field) =>
+    expect(formik.setFieldValue).toHaveBeenCalledWith(field, undefined)
+  );
+});
 
-    if (isInformationCompany) {
-      expect(commercialRegisterNumber).toBeInTheDocument();
-      expect(rea).toBeInTheDocument();
-      expect(shareCapital).toBeInTheDocument();
-    } else {
-      expect(commercialRegisterNumber).not.toBeInTheDocument();
-      expect(rea).not.toBeInTheDocument();
-      expect(shareCapital).not.toBeInTheDocument();
-    }
+test('Test: non foreign insurance sets hasVatnumber', () => {
+  const formik = renderComponent();
 
-    if (!institutionAvoidGeotax && isIoSignProduct(productId)) {
-      expect(visibleCitizenMail).toBeInTheDocument();
-    }
+  expect(formik.setFieldValue).toHaveBeenCalledWith('isForeignInsurance', false);
+  expect(formik.setFieldValue).toHaveBeenCalledWith('hasVatnumber', true);
+});
 
-    const isTaxCodeEquals2PIVA = document.getElementById('taxCodeEquals2VatNumber');
-    expect(isTaxCodeEquals2PIVA).toBeFalsy();
-    const hasVatNumber = document.getElementById('party_without_vatnumber');
-    expect(hasVatNumber).toBeTruthy();
+test('Test: party from IPA retrieves the location from the onboarding istat code', () => {
+  renderComponent({
+    controllers: { isFromIPA: true },
+    onboardingFormData: { istatCode: '058091' },
+    retrievedIstat: '999999',
+  });
 
-    if (isPrivateParty) {
-      expect(businessName).toBeDisabled();
-      expect(pec).toBeDisabled();
-      expect(taxCode).toBeDisabled();
-      expect(commercialRegisterNumber).toBeInTheDocument();
-      expect(rea).toBeInTheDocument();
-      expect(shareCapital).toBeInTheDocument();
-    }
-  }
+  expect(getLocationFromIstatCode).toHaveBeenCalledWith(
+    expect.any(Function),
+    expect.any(Function),
+    '058091'
+  );
+});
+
+test('Test: AOO/UO falls back to the retrieved istat code', () => {
+  renderComponent({ controllers: { isAooUo: true }, retrievedIstat: '999999' });
+
+  expect(getLocationFromIstatCode).toHaveBeenCalledWith(
+    expect.any(Function),
+    expect.any(Function),
+    '999999'
+  );
+});
+
+test('Test: party neither from IPA nor AOO/UO does not retrieve the location', () => {
+  renderComponent();
+
+  expect(getLocationFromIstatCode).not.toHaveBeenCalled();
+});
+
+test('Test: premium does not retrieve the location', () => {
+  renderComponent({ controllers: { isPremium: true, isFromIPA: true } });
+
+  expect(getLocationFromIstatCode).not.toHaveBeenCalled();
+});
+
+test('Test: accepted recipient code with at least 6 chars retrieves the UO info and shows the tax code SFE', () => {
+  renderComponent({
+    formik: buildFormik({ recipientCode: 'ABC123' }),
+    recipientCodeStatus: 'ACCEPTED',
+  });
+
+  expect(getUoInfoFromRecipientCode).toHaveBeenCalledWith(
+    'ABC123',
+    expect.any(Function),
+    expect.anything()
+  );
+  expect(screen.getByText('Codice Fiscale SFE')).toBeInTheDocument();
+});
+
+test('Test: recipient code not accepted resets the tax code SFE', () => {
+  const formik = renderComponent({
+    formik: buildFormik({ recipientCode: 'ABC123' }),
+    recipientCodeStatus: 'DENIED_NO_BILLING',
+  });
+
+  expect(getUoInfoFromRecipientCode).not.toHaveBeenCalled();
+  expect(formik.setFieldValue).toHaveBeenCalledWith('taxCodeInovoicing', undefined);
+  expect(screen.queryByText('Codice Fiscale SFE')).not.toBeInTheDocument();
+});
+
+test('Test: premium copies the PSP data into the form', () => {
+  const formik = renderComponent({
+    formik: buildFormik({
+      businessRegisterNumber: '123',
+      legalRegisterName: 'N/A',
+      legalRegisterNumber: '99',
+      vatNumberGroup: true,
+      abiCode: '12345',
+    }),
+    institutionType: 'PSP',
+    productId: PRODUCT_IDS.PAGOPA,
+    controllers: { isPremium: true },
+  });
+
+  expect(formik.setFieldValue).toHaveBeenCalledWith('commercialRegisterNumber', '123');
+  expect(formik.setFieldValue).toHaveBeenCalledWith('registrationInRegister', '');
+  expect(formik.setFieldValue).toHaveBeenCalledWith('registerNumber', '99');
+  expect(formik.setFieldValue).toHaveBeenCalledWith('abiCode', '12345');
+  expect(formik.setFieldValue).toHaveBeenCalledWith('vatNumberGroup', true);
+});
+
+test('Test: premium keeps the location already in the form', () => {
+  const formik = renderComponent({
+    formik: buildFormik({ country: 'IT', county: 'RM', city: 'Roma' }),
+    controllers: { isPremium: true },
+  });
+
+  expect(formik.setFieldValue).toHaveBeenCalledWith('country', 'IT');
+  expect(formik.setFieldValue).toHaveBeenCalledWith('county', 'RM');
+  expect(formik.setFieldValue).toHaveBeenCalledWith('city', 'Roma');
+});
+
+test('Test: premium prod-io-sign keeps the support email', () => {
+  const formik = renderComponent({
+    formik: buildFormik({ supportEmail: 'help@test.it' }),
+    productId: PRODUCT_IDS.IO_SIGN,
+    controllers: { isPremium: true },
+  });
+
+  expect(formik.setFieldValue).toHaveBeenCalledWith('supportEmail', 'help@test.it');
 });
