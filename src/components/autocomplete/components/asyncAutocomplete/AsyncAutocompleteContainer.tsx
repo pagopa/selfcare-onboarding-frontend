@@ -315,7 +315,6 @@ export default function AsyncAutocompleteContainer({
     return 'ONBOARDING_GET_PARTY_FROM_CF';
   };
 
-  // eslint-disable-next-line complexity
   const executeSearch = (
     value: string,
     selections: any,
@@ -323,7 +322,7 @@ export default function AsyncAutocompleteContainer({
     addUser: boolean,
     institutionType: string | undefined,
     product: any
-    // eslint-disable-next-line sonarjs/cognitive-complexity
+    // eslint-disable-next-line complexity, sonarjs/cognitive-complexity
   ) => {
     if (value.length >= 3 && selections.businessName && !selections.taxCode) {
       return searchByBusinessName(value, institutionType);

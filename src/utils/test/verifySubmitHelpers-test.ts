@@ -62,7 +62,6 @@ export const resolveOrigin = (
   return isSelc ? 'SELC' : undefined;
 };
 
-// eslint-disable-next-line complexity
 export const resolveOriginId = (
   from: Source,
   institutionType: string,
@@ -72,7 +71,7 @@ export const resolveOriginId = (
   errorOnSubmit: boolean,
   haveTaxCode: boolean,
   isForeignInsurance: boolean
-  // eslint-disable-next-line sonarjs/cognitive-complexity
+  // eslint-disable-next-line complexity, sonarjs/cognitive-complexity
 ): string | undefined => {
   if (errorOnSubmit) {
     return mockPartyRegistry.items[1].originId;

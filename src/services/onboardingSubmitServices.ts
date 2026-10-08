@@ -52,7 +52,6 @@ const postOnboardingLegals = async (data: any) => {
 };
 
 // Prima funzione con logica specifica per onboarding standard
-// eslint-disable-next-line complexity
 export const postOnboardingSubmit = async (
   setLoading: Dispatch<SetStateAction<boolean>>,
   productId: string,
@@ -75,7 +74,7 @@ export const postOnboardingSubmit = async (
   // GSP non-IPA: when provided, on success drives the in-flow document upload instead of the
   // standard "check your email" outcome (the onboarding is created in REQUESTING first).
   onRequiredDocuments?: () => void
-  // eslint-disable-next-line sonarjs/cognitive-complexity
+  // eslint-disable-next-line complexity, sonarjs/cognitive-complexity
 ) => {
   setLoading(true);
   const { outcome, status } = await postOnboardingLegals({

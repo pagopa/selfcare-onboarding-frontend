@@ -71,7 +71,7 @@ export default function OnboardingUploadDocuments() {
   }, []);
 
   useEffect(() => {
-    verifyRequest({
+    void verifyRequest({
       onboardingId,
       setRequiredLogin,
       setOutcomeContentState,
