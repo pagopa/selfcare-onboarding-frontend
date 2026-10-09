@@ -1,21 +1,33 @@
 import { emailRegexp } from '@pagopa/selfcare-common-frontend/lib/utils/constants';
 import { TFunction } from 'i18next';
-import { OnboardingFormData } from '../model/OnboardingFormData';
 import { InstitutionType } from '../../types';
+import { OnboardingControllers } from '../hooks/useOnboardingControllers';
+import { OnboardingFormData } from '../model/OnboardingFormData';
 import { UoData } from '../model/UoModel';
 import {
-  requiredError,
-  fiveCharactersAllowed,
-  fiscalAndVatCodeRegexp,
-  onlyCharacters,
   commercialRegisterNumberRegexp,
-  numericField,
-  reaValidation,
   currencyField,
+  fiscalAndVatCodeRegexp,
+  fiveCharactersAllowed,
+  numericField,
+  onlyCharacters,
   PRODUCT_IDS,
+  reaValidation,
+  requiredError,
 } from './constants';
 import { ENV } from './env';
-import { isContractingAuthority, isInsuranceCompany } from './institutionTypeUtils';
+import {
+  isCedProduct,
+  isContractingAuthority,
+  isGpuInstitution,
+  isIdpayMerchantProduct,
+  isInsuranceCompany,
+  isInteropProduct,
+  isPagoPaProduct,
+  isPrivateInstitution,
+  isPrivateOrPersonInstitution,
+  isPublicServiceCompany,
+} from './institutionTypeUtils';
 
 const validateEmail = (email: string | undefined, t: TFunction) => {
   if (!email) {
@@ -287,3 +299,75 @@ export const validateFields = (
 
   return Object.entries(validationRules).filter(([_key, value]) => value);
 };
+
+export const isBusinessNameDisabled = (
+  controllers: OnboardingControllers,
+  institutionType: InstitutionType,
+  isInfoCompany: boolean,
+  onboardingFormData?: OnboardingFormData,
+  isFieldLockedForPrivate?: boolean
+) =>
+  controllers.isDisabled ||
+  isContractingAuthority(institutionType) ||
+  isInsuranceCompany(institutionType) ||
+  (isInfoCompany && !!onboardingFormData?.businessName) ||
+  isFieldLockedForPrivate;
+
+export const isDigitalAddressDisabled = (
+  controllers: OnboardingControllers,
+  institutionType: InstitutionType,
+  isInfoCompany: boolean,
+  onboardingFormData?: OnboardingFormData,
+  isFieldLockedForPrivate?: boolean
+) =>
+  controllers.isDisabled ||
+  isContractingAuthority(institutionType) ||
+  isInsuranceCompany(institutionType) ||
+  (isInfoCompany && !!onboardingFormData?.digitalAddress) ||
+  isFieldLockedForPrivate;
+
+export const isTaxCodeFieldDisabled = (
+  controllers: OnboardingControllers,
+  institutionType: InstitutionType,
+  isInfoCompany: boolean,
+  onboardingFormData?: OnboardingFormData,
+  isFieldLockedForPrivate?: boolean
+) =>
+  controllers.isDisabled ||
+  isContractingAuthority(institutionType) ||
+  isInsuranceCompany(institutionType) ||
+  (isInfoCompany && !!onboardingFormData?.taxCode) ||
+  isFieldLockedForPrivate;
+
+export const isAddressDisabled = (
+  controllers: OnboardingControllers,
+  institutionType: InstitutionType
+) => !controllers.isAooUo && controllers.isDisabled && !isInsuranceCompany(institutionType);
+
+export const showTaxCodeField = (
+  institutionType: InstitutionType,
+  onboardingFormData?: OnboardingFormData
+) =>
+  !isInsuranceCompany(institutionType) ||
+  (!!onboardingFormData?.taxCode && onboardingFormData.taxCode !== '');
+
+export const isFieldLockedForPrivate = (institutionType: InstitutionType, productId?: string) =>
+  isPrivateOrPersonInstitution(institutionType) &&
+  !isPagoPaProduct(productId) &&
+  !isCedProduct(productId);
+
+export const showCommercialRegisterSection = (
+  isInfoCompany: boolean,
+  institutionType: InstitutionType,
+  productId?: string
+) =>
+  isInfoCompany ||
+  isContractingAuthority(institutionType) ||
+  ((isInteropProduct(productId) ||
+    isPagoPaProduct(productId) ||
+    isIdpayMerchantProduct(productId) ||
+    isCedProduct(productId)) &&
+    (isPublicServiceCompany(institutionType) ||
+      isPrivateInstitution(institutionType) ||
+      isPrivateOrPersonInstitution(institutionType) ||
+      isGpuInstitution(institutionType)));
