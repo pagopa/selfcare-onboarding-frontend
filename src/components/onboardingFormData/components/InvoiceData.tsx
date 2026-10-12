@@ -7,8 +7,7 @@ import { InstitutionType } from '../../../../types';
 import { OnboardingControllers } from '../../../hooks/useOnboardingControllers';
 import { verifyTaxCodeInvoicing } from '../../../services/billingDataServices';
 import { isInsuranceCompany, isIoProduct, isPublicAdministration } from '../../../utils/institutionTypeUtils';
-import { CustomTextFieldNotched } from '../../../utils/style-utils';
-import { CustomTextField } from '../../steps/StepOnboardingFormData';
+import { CustomTextField, CustomTextFieldNotched } from '../../../utils/style-utils';
 
 type Props = {
   controllers: OnboardingControllers;
