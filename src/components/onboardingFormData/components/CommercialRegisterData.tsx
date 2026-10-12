@@ -12,8 +12,7 @@ import {
   isPrivateInstitution,
   isPrivateMerchantInstitution,
 } from '../../../utils/institutionTypeUtils';
-import { CustomTextFieldNotched } from '../../../utils/style-utils';
-import { CustomTextField } from '../../steps/StepOnboardingFormData';
+import { CustomTextField, CustomTextFieldNotched } from '../../../utils/style-utils';
 import NumberDecimalFormat from '../NumberDecimalFormat';
 import { OnboardingControllers } from '../../../hooks/useOnboardingControllers';
 import { showCommercialRegisterSection } from '../../../utils/validateFields';
