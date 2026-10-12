@@ -17,6 +17,7 @@ import { isInsuranceCompany } from '../../../utils/institutionTypeUtils';
 import {
   autocompletePaperStyle,
   CustomNumberField,
+  CustomTextField,
   CustomTextFieldNotched,
   fieldColor,
 } from '../../../utils/style-utils';
@@ -28,7 +29,6 @@ import {
   isTaxCodeFieldDisabled,
   showTaxCodeField,
 } from '../../../utils/validateFields';
-import { CustomTextField } from '../../steps/StepOnboardingFormData';
 
 type Props = {
   controllers: OnboardingControllers;
