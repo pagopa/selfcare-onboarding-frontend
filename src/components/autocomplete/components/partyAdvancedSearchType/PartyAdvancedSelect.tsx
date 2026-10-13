@@ -63,11 +63,12 @@ export default function PartyAdvancedSelect({
   const [typeOfSearch, setTypeOfSearch] = useState('businessName');
 
   const handleTypeSearchChange = (event: SelectChangeEvent) => {
-    handleSelectionChange(event.target.value as SelectionEnum);
+    onSelectValue(event.target.value as SelectionEnum);
     setIsSearchFieldSelected(true);
   };
   const onSelectValue = (selectedOption: SelectionEnum) => {
     handleSelectionChange(selectedOption);
+    setInput('');
     setOptions([]);
     setCfResult(undefined);
     setAooResult(undefined);

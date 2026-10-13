@@ -222,6 +222,12 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     isPagoPaProduct(productId) &&
     ENV.GSP.NO_IPA;
 
+  const partyName =
+    onboardingFormData?.uoName ??
+    onboardingFormData?.aooName ??
+    onboardingFormData?.businessName ??
+    '';
+
   const enterRequiredDocumentsFlow = () => {
     void OnboardingApi.getOnboardings(onboardingFormData?.taxCode ?? '', 'REQUESTING')
       .then((onboardings) => {
@@ -630,11 +636,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           addUserFlow: addUser,
           product: selectedProduct,
           legal: isTechPartner(institutionType) ? undefined : (formData as any)?.users[0],
-          partyName:
-            onboardingFormData?.uoName ??
-            onboardingFormData?.aooName ??
-            onboardingFormData?.businessName ??
-            '',
+          partyName,
           isTechPartner: isTechPartner(institutionType),
           isAggregator: onboardingFormData?.isAggregator,
           isAddApplicationEmail: (formData as any)?.users?.every(
@@ -670,12 +672,11 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           back: backFromApplicantEmail,
           user,
           addUser,
-          partyName:
-            onboardingFormData?.uoName ??
-            onboardingFormData?.aooName ??
-            onboardingFormData?.businessName ??
-            '',
+          partyName,
           productName: selectedProduct?.title,
+          // GSP non-IPA: skip the pre-submit confirmation modal — it moves to the end of the
+          // document upload flow instead.
+          isRequiredDocumentsFlow,
         }),
     },
   ];
@@ -698,6 +699,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
   ) : uploadDocumentsContext ? (
     <UploadDocumentsFlow
       {...uploadDocumentsContext}
+      partyName={partyName}
       onSuccess={() => {
         // eslint-disable-next-line functional/immutable-data
         createdOnboardingRef.current = null;

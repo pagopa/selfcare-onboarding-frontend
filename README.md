@@ -4,8 +4,8 @@
 
 ## Prerequisites
 
-- `Node.js 20` (see `.nvmrc`)
-- `yarn 3`
+- `Node.js 24` (see `.nvmrc`)
+- `yarn 1` (classic)
 
 ## Frontend local development
 
