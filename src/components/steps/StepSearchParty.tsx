@@ -1,49 +1,26 @@
-import { Alert, FormControlLabel, Grid, Link, Typography, useTheme } from '@mui/material';
+import { FormControlLabel, Grid, Typography, useTheme } from '@mui/material';
 import Checkbox from '@mui/material/Checkbox';
-import { Box } from '@mui/system';
 import { SessionModal } from '@pagopa/selfcare-common-frontend/lib';
-import {
-  Dispatch,
-  ReactElement,
-  SetStateAction,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { Dispatch, ReactElement, SetStateAction, useEffect, useRef, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { InstitutionType, PartyData, Product, StepperStepComponentProps } from '../../../types';
 import { useHistoryState } from '../../hooks/useHistoryState';
-import { UserContext } from '../../lib/context';
-import { AooData } from '../../model/AooData';
+import { useMerchantSearchResult } from '../../hooks/useMerchantSearchResult';
+import { useSubunitSearch } from '../../hooks/useSubunitSearch';
 import { SelectionsState } from '../../model/Selection';
-import { UoData } from '../../model/UoModel';
-import {
-  getECDataByCF,
-  handleSearchByAooCode,
-  handleSearchByUoCode,
-  handleSearchExternalId,
-} from '../../services/institutionServices';
-import { noMandatoryIpaProducts } from '../../utils/constants';
+import { handleSearchExternalId } from '../../services/institutionServices';
 import { ENV } from '../../utils/env';
-import {
-  isContractingAuthority,
-  isGlobalServiceProvider,
-  isIdpayMerchantProduct,
-  isInsuranceCompany,
-  isInteropProduct,
-  isPrivateInstitution,
-  isPrivatePersonInstitution,
-  isPublicAdministration,
-  isPublicServiceCompany,
-  isSendProduct,
-} from '../../utils/institutionTypeUtils';
+import { isIdpayMerchantProduct, isPublicAdministration } from '../../utils/institutionTypeUtils';
 import { selected2OnboardingData } from '../../utils/selected2OnboardingData';
+import IdPayMerchantAlert from '../alerts/IdPayMerchantAlert';
+import InteropGspAlert from '../alerts/InteropGspAlert';
+import SendAlert from '../alerts/SendAlert';
 import { Autocomplete } from '../autocomplete/Autocomplete';
+import SearchPartyLinks from '../links/SearchPartyLinks';
 import Loading4Api from '../modals/Loading4Api';
 import { LoadingOverlay } from '../modals/LoadingOverlay';
 import { OnboardingStepActions } from '../registrationSteps/OnboardingStepActions';
+import SearchPartySubtitle from '../SearchPartySubtitle';
 
 type Props = {
   subTitle: string | ReactElement;
@@ -75,8 +52,6 @@ export function StepSearchParty({
 }: Props) {
   const theme = useTheme();
   const { t } = useTranslation();
-  const { setRequiredLogin } = useContext(UserContext);
-
   const partyExternalIdByQuery = new URLSearchParams(window.location.search).get('partyExternalId');
   const autoSearchFound = useRef(false);
   const [isSearchFieldSelected, setIsSearchFieldSelected] = useState<boolean>(true);
@@ -89,49 +64,7 @@ export function StepSearchParty({
   const [disabled, setDisabled] = useState<boolean>(false);
   const [isAggregator, setIsAggregator] = useState<boolean>(false);
   const [open, setOpen] = useState<boolean>(false);
-  const [aooResult, setAooResult, setAooResultHistory] = useHistoryState<AooData | undefined>(
-    'aooSelected_step1',
-    undefined
-  );
-  const [uoResult, setUoResult, setUoResultHistory] = useHistoryState<UoData | undefined>(
-    'uoSelected_step1',
-    undefined
-  );
-
-  const [merchantSearchResult, setMerchantSearchResultState] = useState<any>(() => {
-    if (isIdpayMerchantProduct(product?.id)) {
-      try {
-        const stored = sessionStorage.getItem('merchantSearchResult');
-        return stored ? JSON.parse(stored) : undefined;
-      } catch {
-        return undefined;
-      }
-    }
-    return undefined;
-  });
-
-  const setMerchantSearchResult = (value: any) => {
-    setMerchantSearchResultState(value);
-    if (isIdpayMerchantProduct(product?.id)) {
-      if (value === undefined) {
-        sessionStorage.removeItem('merchantSearchResult');
-      } else {
-        sessionStorage.setItem('merchantSearchResult', JSON.stringify(value));
-      }
-    }
-  };
-
-  const [ecData, setEcData] = useState<PartyData | null>(null);
   const [filterCategories, setFilterCategories] = useState<string>();
-
-  const disabledStatusCompany = useMemo(
-    () =>
-      merchantSearchResult?.statusCompanyRI !== undefined ||
-      merchantSearchResult?.disabledStateInstitution !== undefined ||
-      merchantSearchResult?.descriptionStateInstitution !== undefined ||
-      merchantSearchResult?.statusCompanyRD !== undefined,
-    [merchantSearchResult]
-  );
 
   const [selections, setSelections] = useState<SelectionsState>({
     businessName: true,
@@ -143,45 +76,20 @@ export function StepSearchParty({
     ivassCode: false,
   });
 
-  useEffect(() => {
-    if (isSendProduct(product?.id)) {
-      if (subunitTypeByQuery === 'UO') {
-        void handleSearchByUoCode(
-          subunitCodeByQuery,
-          setUoResult,
-          setUoResultHistory,
-          setRequiredLogin,
-          setApiLoading,
-          false,
-          'ONBOARDING_GET_UO_CODE_INFO',
-          {},
-          filterCategories,
-          product?.id
-        );
-      } else if (subunitTypeByQuery === 'AOO') {
-        void handleSearchByAooCode(
-          subunitCodeByQuery,
-          setAooResult,
-          setAooResultHistory,
-          setRequiredLogin,
-          setApiLoading,
-          false,
-          'ONBOARDING_GET_AOO_CODE_INFO',
-          {},
-          filterCategories,
-          product?.id
-        );
-      }
-    }
-  }, [isSendProduct(product?.id)]);
+  const {
+    merchantSearchResult,
+    setMerchantSearchResult,
+    disabledStatusCompany,
+    clearMerchantStorage,
+  } = useMerchantSearchResult(setDisabled, product?.id, selected);
 
-  useEffect(() => {
-    if (aooResult) {
-      void getECDataByCF(aooResult?.codiceFiscaleEnte, setApiLoading, setEcData);
-    } else if (uoResult) {
-      void getECDataByCF(uoResult?.codiceFiscaleEnte, setApiLoading, setEcData);
-    }
-  }, [aooResult, uoResult]);
+  const { aooResult, setAooResult, uoResult, setUoResult, ecData } = useSubunitSearch({
+    productId: product?.id,
+    subunitTypeByQuery,
+    subunitCodeByQuery,
+    filterCategories,
+    setApiLoading,
+  });
 
   useEffect(() => {
     if (partyExternalIdByQuery) {
@@ -201,19 +109,6 @@ export function StepSearchParty({
         });
     }
   }, []);
-
-  // callback of previous useEffect
-  // useEffect(() => {
-  //   if (
-  //     selected &&
-  //     partyExternalIdByQuery &&
-  //     autoSearchFound.current &&
-  //     ((subunitCodeByQuery === '' && subunitTypeByQuery === '') ||
-  //       ((aooResult || uoResult) && isSendProduct(product?.id)))
-  //   ) {
-  //     onForwardAction();
-  //   }
-  // }, [selected, aooResult, uoResult]);
 
   useEffect(() => {
     if (isSearchFieldSelected || selected) {
@@ -255,43 +150,16 @@ export function StepSearchParty({
       setInstitutionType(actualInstitutionType);
     }
 
-    if (isIdpayMerchantProduct(product?.id)) {
-      sessionStorage.removeItem('merchantSearchResult');
-    }
+    clearMerchantStorage();
 
     forward(onboardingData, actualInstitutionType);
   };
 
   const onBackAction = () => {
-    if (isIdpayMerchantProduct(product?.id)) {
-      sessionStorage.removeItem('merchantSearchResult');
-    }
+    clearMerchantStorage();
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     back!();
   };
-
-  useEffect(
-    () => () => {
-      if (isIdpayMerchantProduct(product?.id)) {
-        const shouldClean = !sessionStorage.getItem('onboarding_forward');
-        if (shouldClean) {
-          sessionStorage.removeItem('merchantSearchResult');
-        }
-      }
-    },
-    [product?.id]
-  );
-
-  useEffect(() => {
-    if (isIdpayMerchantProduct(product?.id)) {
-      const storedMerchant = sessionStorage.getItem('merchantSearchResult');
-
-      if (selected && !storedMerchant && merchantSearchResult) {
-        setMerchantSearchResult(undefined);
-        setDisabled(true);
-      }
-    }
-  }, [selected, product?.id]);
 
   const canAggregateProductList = ENV.AGGREGATOR.ELIGIBLE_PRODUCTS.split(',');
 
@@ -316,145 +184,21 @@ export function StepSearchParty({
           </Grid>
         </Grid>
 
-        <Grid container item justifyContent="center" mt={1}>
-          <Grid item xs={12}>
-            <Typography variant="body1" align="center" color={theme.palette.text.primary}>
-              {selected ? (
-                <Trans
-                  i18nKey="onboardingStep1.onboarding.selectedInstitution"
-                  values={{ productName: product?.title }}
-                  components={{ 1: <strong /> }}
-                >
-                  {`Prosegui con l’adesione a <strong>{{productName}}</strong> per l’ente selezionato`}
-                </Trans>
-              ) : isContractingAuthority(institutionType) ? (
-                <Trans
-                  i18nKey="onboardingStep1.onboarding.saSubTitle"
-                  values={{
-                    productName: product?.title,
-                  }}
-                  components={{ 1: <br />, 3: <Link />, 5: <strong /> }}
-                >
-                  {`Se sei tra i gestori privati di piattaforma e-procurement e hai <1 /> già
-                  ottenuto la <3> ${(
-                    <Link
-                      sx={{
-                        color: theme.palette.text.primary,
-                        textDecorationColor: theme.palette.text.primary,
-                      }}
-                      href="https://www.agid.gov.it/it/piattaforme/procurement/certificazione-componenti-piattaforme"
-                      target="_blank"
-                    >
-                      certificazione da AgID
-                    </Link>
-                  )} <3 />, inserisci uno dei dati <1 />
-                  richiesti e cerca l’ente per cui vuoi richiedere l’adesione a <1 />
-                  <5>{{ productName }}</5>
-                `}
-                </Trans>
-              ) : isInsuranceCompany(institutionType) ? (
-                <Trans
-                  i18nKey="onboardingStep1.onboarding.asSubTitle"
-                  values={{ productName: product?.title }}
-                  components={{ 1: <br />, 3: <strong /> }}
-                >
-                  {`Se sei una società di assicurazione presente nell’Albo delle <1 /> imprese IVASS,
-                  inserisci uno dei dati richiesti e cerca l’ente per
-                  <1 /> cui vuoi richiedere l’adesione a <3>{{ productName }}.</3>`}
-                </Trans>
-              ) : isPublicServiceCompany(institutionType) ||
-                (isPrivateInstitution(institutionType) && isInteropProduct(product?.id)) ? (
-                <Trans
-                  i18nKey="onboardingStep1.onboarding.scpSubtitle"
-                  components={{ 3: <br />, 5: <strong /> }}
-                  values={{ productName: product?.title }}
-                >
-                  {`Inserisci uno dei dati richiesti e cerca da Infocamere l’ente <br />
-                  per cui vuoi richiedere l’adesione a <strong>{{ productName }}.</strong>`}
-                </Trans>
-              ) : isIdpayMerchantProduct(product?.id) ? (
-                <Trans
-                  i18nKey="onboardingStep1.onboarding.merchantSubtitle"
-                  components={{ 3: <br />, 5: <strong /> }}
-                  values={{ productName: product?.title }}
-                >
-                  {`Inserisci uno dei dati richiesti per cercare su InfoCamere l’ente <br />
-                  per cui vuoi richiedere l’adesione a <strong>{{ productName }}.</strong>`}
-                </Trans>
-              ) : (
-                subTitle
-              )}
-            </Typography>
-          </Grid>
-        </Grid>
+        <SearchPartySubtitle
+          selected={selected}
+          product={product}
+          institutionType={institutionType}
+          subTitle={subTitle}
+        />
 
         <Grid container item sx={{ alignItems: 'center', flexDirection: 'column' }} mt={4} mb={4}>
-          {isSendProduct(product?.id) && (
-            <Grid container item justifyContent="center">
-              <Grid item display="flex" justifyContent="center" mb={5}>
-                <Alert
-                  severity="info"
-                  sx={{
-                    width: '100%',
-                    paddingRight: '56px !important',
-                  }}
-                >
-                  <Typography sx={{ fontSize: '16px', a: { color: theme.palette.text.primary } }}>
-                    <Trans
-                      i18nKey={'onboardingStep1.onboarding.disclaimer.description'}
-                      components={{
-                        1: <strong />,
-                        3: <br />,
-                        5: (
-                          <a
-                            href="https://docs.pagopa.it/area-riservata/area-riservata/come-aderire"
-                            target="_blank"
-                            rel="noreferrer"
-                          />
-                        ),
-                      }}
-                    >
-                      {`Al momento possono aderire a SEND tramite Area Riservata solo le <1>Pubbliche <3>Amministrazioni Locali </1> presenti su IPA che trovi a <5>questo link</5>.`}
-                    </Trans>
-                  </Typography>
-                </Alert>
-              </Grid>
-            </Grid>
-          )}
-
-          {isIdpayMerchantProduct(product?.id) && merchantSearchResult && disabledStatusCompany && (
-            <Grid container item justifyContent="center">
-              <Grid item xs={8}>
-                <Box display="flex" justifyContent="center" mb={5}>
-                  <Alert severity="error" sx={{ width: '100%' }}>
-                    <Typography sx={{ fontSize: '16px', a: { color: theme.palette.text.primary } }}>
-                      {t('onboardingStep1.onboarding.merchantCompanyStatusDisabled')}
-                    </Typography>
-                  </Alert>
-                </Box>
-              </Grid>
-            </Grid>
-          )}
-
-          {isInteropProduct(product?.id) && isGlobalServiceProvider(institutionType) && (
-            <Grid container item justifyContent="center">
-              <Grid item xs={9}>
-                <Box display="flex" justifyContent="center" mb={5}>
-                  <Alert severity="info" sx={{ width: '100%' }}>
-                    <Typography sx={{ fontSize: '16px', a: { color: theme.palette.text.primary } }}>
-                      Al momento i Gestori di Pubblico Servizio possono aderire solo se presenti in
-                      IPA, come indicato nelle{' '}
-                      <a href="https://trasparenza.agid.gov.it/moduli/downloadFile.php?file=oggetto_allegati/213481832030O__O20211210_LG+Infrastruttura+Interoperabilit%26%23224%3B+PDND_v1_allegato+1.pdf">
-                        {' '}
-                        linee guida AGID
-                      </a>{' '}
-                    </Typography>
-                  </Alert>
-                </Box>
-              </Grid>
-            </Grid>
-          )}
-
+          <SendAlert product={product} />
+          <IdPayMerchantAlert
+            product={product}
+            merchantSearchResult={merchantSearchResult}
+            disabledStatusCompany={disabledStatusCompany}
+          />
+          <InteropGspAlert product={product} institutionType={institutionType} />
           <Grid item xs={8} md={6} lg={5}>
             <Autocomplete
               selected={selected}
@@ -503,73 +247,11 @@ export function StepSearchParty({
               </Grid>
             )}
         </Grid>
-        {!isContractingAuthority(institutionType) &&
-          !isInsuranceCompany(institutionType) &&
-          !isPublicServiceCompany(institutionType) &&
-          !isPrivateInstitution(institutionType) &&
-          !isPrivatePersonInstitution(institutionType) && (
-            <Grid container item justifyContent="center">
-              <Grid item xs={6}>
-                <Box
-                  sx={{
-                    fontSize: '14px',
-                    lineHeight: '24px',
-                    textAlign: 'center',
-                  }}
-                >
-                  <Typography
-                    sx={{
-                      textAlign: 'center',
-                    }}
-                    variant="body1"
-                    color={theme.palette.text.secondary}
-                  >
-                    {isGlobalServiceProvider(institutionType) &&
-                    noMandatoryIpaProducts(product?.id) ? (
-                      <Trans
-                        i18nKey="onboardingStep1.onboarding.gpsDescription"
-                        components={{
-                          1: <br />,
-                          2: (
-                            <Link
-                              id="no_ipa"
-                              sx={{
-                                textDecoration: 'underline',
-                                color: theme.palette.primary.main,
-                                cursor: 'pointer',
-                              }}
-                              onClick={onForwardAction}
-                            />
-                          ),
-                        }}
-                      >
-                        {`Non trovi il tuo ente nell'IPA?<1 /><2>Inserisci manualmente i dati del tuo ente.</2>`}
-                      </Trans>
-                    ) : (
-                      <Trans
-                        i18nKey="onboardingStep1.onboarding.ipaDescription"
-                        components={{
-                          1: (
-                            <Link
-                              sx={{
-                                textDecoration: 'underline',
-                                color: theme.palette.primary.dark,
-                                cursor: 'pointer',
-                              }}
-                              href="https://indicepa.gov.it/ipa-portale/servizi-enti/accreditamento-ente"
-                            />
-                          ),
-                          3: <br />,
-                        }}
-                      >
-                        {`Non trovi il tuo ente nell'IPA? <1>In questa pagina</1> trovi maggiori <3/> informazioni sull'indice e su come accreditarsi `}
-                      </Trans>
-                    )}
-                  </Typography>
-                </Box>
-              </Grid>
-            </Grid>
-          )}
+        <SearchPartyLinks
+          institutionType={institutionType}
+          product={product}
+          onForwardAction={onForwardAction}
+        />
         <Grid item mt={2}>
           <OnboardingStepActions
             back={

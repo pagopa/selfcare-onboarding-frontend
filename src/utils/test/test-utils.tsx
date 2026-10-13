@@ -529,7 +529,6 @@ export const billingData2billingDataRequest = (
   };
 };
 
-// eslint-disable-next-line complexity
 export const verifySubmit = async (
   productId: string = PRODUCT_IDS.IO,
   institutionType: string,
@@ -542,7 +541,7 @@ export const verifySubmit = async (
   haveTaxCode: boolean = true,
   isAggregator?: boolean,
   isAddApplicantEmail?: boolean
-  // eslint-disable-next-line sonarjs/cognitive-complexity
+  // eslint-disable-next-line complexity, sonarjs/cognitive-complexity
 ) => {
   const isPrivateMerchant = isPrivateMerchantInstitution(
     institutionType as InstitutionType,
@@ -1007,6 +1006,7 @@ export const checkCorrectBodyBillingData = (
   expectedCounty: string = '',
   isForeignInsurance?: boolean,
   haveTaxCode?: boolean
+  // eslint-disable-next-line complexity
 ) => {
   const isPrivateMerchant = isPrivateMerchantInstitution(
     institutionType as InstitutionType,

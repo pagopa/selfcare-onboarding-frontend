@@ -95,7 +95,7 @@ export default function CompleteRequestComponent() {
       setOutcomeContentState('toBeCompleted');
       setLoading(false);
     } else {
-      verifyRequest({
+      void verifyRequest({
         onboardingId,
         setRequiredLogin,
         setOutcomeContentState,

@@ -2,7 +2,7 @@ import { useContext, useEffect } from 'react';
 import { useLogin } from '../hooks/useLogin';
 import { UserContext } from '../lib/context';
 
-// eslint-disable-next-line @typescript-eslint/ban-types
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 type LoginProps = {};
 
 export function withLogin<T extends LoginProps>(WrappedComponent: React.ComponentType<T>) {

@@ -48,6 +48,7 @@ export const selected2OnboardingData = (
   isAggregator?: boolean,
   institutionType?: InstitutionType,
   productId?: string
+  // eslint-disable-next-line complexity
 ): OnboardingFormData => ({
   businessName:
     selectedParty?.description ??
