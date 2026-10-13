@@ -50,7 +50,7 @@ export default {
       upload: {
         product: {
           title: 'Carica l’accordo firmato',
-          description: `Una volta firmato l’accordo, segui le istruzioni per inviarlo e completare <1 /> l’adesione al prodotto scelto. Ricorda di caricare l’accordo <3>entro 30 giorni.</3>`,
+          description: `Una volta firmato l’accordo, segui le istruzioni per inviarlo e completare <1 /> l’adesione al prodotto scelto. Ricorda di caricare l’accordo <3>entro 90 giorni.</3>`,
         },
         attachments: {
           title: 'Carica l’addendum firmato',
