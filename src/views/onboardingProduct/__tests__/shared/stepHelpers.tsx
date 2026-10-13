@@ -202,20 +202,16 @@ export const executeStepSearchParty = async (
         },
         {
           method: 'GET',
-          params: {
-            limit:
-              isContractingAuthority(institutionType as InstitutionType) ||
-              isInsuranceCompany(institutionType as InstitutionType)
-                ? undefined
-                : ENV.MAX_INSTITUTIONS_FETCH,
-            categories:
-              isContractingAuthority(institutionType as InstitutionType) ||
-              isInsuranceCompany(institutionType as InstitutionType)
-                ? undefined
-                : filterByCategory4Test(institutionType.toUpperCase(), productId),
-            page: 1,
-            search: 'XXX',
-          },
+          params:
+            isContractingAuthority(institutionType as InstitutionType) ||
+            isInsuranceCompany(institutionType as InstitutionType)
+              ? { limit: undefined, categories: undefined, page: 1, search: 'XXX' }
+              : {
+                  search: 'XXX',
+                  category: filterByCategory4Test(institutionType.toUpperCase(), productId),
+                  page: 0,
+                  pageSize: ENV.MAX_INSTITUTIONS_FETCH,
+                },
         },
         expect.any(Function)
       );
@@ -348,16 +344,16 @@ export const executeStepSearchParty = async (
       // stations and insurance by taxId) are path-only: the query params the
       // legacy flow used to send (origin, categories, ...) are not part of their
       // OpenAPI schema, so the migrated dispatcher no longer sends them. Only
-      // PARTY_FROM_CF (findInstitution) and visura-by-REA still carry query params.
+      // PARTY_FROM_CF (searchInstitutionIpaByTaxCode) and visura-by-REA still carry query
+      // params. PARTY_FROM_CF now hits the IPA-only BFF endpoint, whose OpenAPI schema
+      // declares a single `category` query param: origin and the legacy `categories`
+      // spelling are gone.
       const updatedParams =
         endpoint === 'ONBOARDING_GET_VISURA_INFOCAMERE_BY_REA'
           ? { rea: reaCode }
           : endpoint === 'ONBOARDING_GET_PARTY_FROM_CF'
             ? {
-                productId: undefined,
-                subunitCode: undefined,
-                taxCode: undefined,
-                categories:
+                category:
                   isPublicServiceCompany(institutionType as InstitutionType) ||
                   isPrivateInstitution(institutionType as InstitutionType)
                     ? undefined

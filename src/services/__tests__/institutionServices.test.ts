@@ -18,7 +18,6 @@ vi.mock('../../api/PartyRegistryProxyApiClient', () => ({
   PartyRegistryProxyApi: {
     findInstitution: vi.fn(),
     getUoInfo: vi.fn(),
-    searchInstitutions: vi.fn(),
     searchSaParties: vi.fn(),
     searchInsuranceCompanies: vi.fn(),
     getAooInfo: vi.fn(),
@@ -33,6 +32,8 @@ vi.mock('../../api/PartyRegistryProxyApiClient', () => ({
 vi.mock('../../api/OnboardingApiClient', () => ({
   OnboardingApi: {
     getInstitutionsByFilters: vi.fn(),
+    searchInstitutionsIpa: vi.fn(),
+    searchInstitutionIpaByTaxCode: vi.fn(),
   },
 }));
 
@@ -147,8 +148,8 @@ it('test getECDataByCF on other error does not change ecData', async () => {
   expect(setApiLoading).toHaveBeenLastCalledWith(false);
 });
 
-it('test fetchInstitutionsByName dispatches to searchInstitutions and maps options', async () => {
-  vi.mocked(PartyRegistryProxyApi.searchInstitutions).mockResolvedValue({
+it('test fetchInstitutionsByName dispatches to searchInstitutionsIpa and maps options', async () => {
+  vi.mocked(OnboardingApi.searchInstitutionsIpa).mockResolvedValue({
     count: 1,
     items: [{ id: 'i1', description: 'Ente 1' }],
   } as any);
@@ -163,17 +164,17 @@ it('test fetchInstitutionsByName dispatches to searchInstitutions and maps optio
     undefined
   );
 
-  expect(PartyRegistryProxyApi.searchInstitutions).toHaveBeenCalledWith({
-    limit: 10,
-    page: 1,
+  expect(OnboardingApi.searchInstitutionsIpa).toHaveBeenCalledWith({
     search: 'Ente',
-    categories: undefined,
+    category: undefined,
+    page: 0,
+    pageSize: 10,
   });
   expect(setOptions).toHaveBeenCalledWith([{ id: 'i1', description: 'Ente 1' }]);
 });
 
 it('test fetchInstitutionsByName on 404 sets empty options', async () => {
-  vi.mocked(PartyRegistryProxyApi.searchInstitutions).mockRejectedValue(
+  vi.mocked(OnboardingApi.searchInstitutionsIpa).mockRejectedValue(
     Object.assign(new Error('nf'), { httpStatus: 404 })
   );
 
@@ -265,6 +266,85 @@ it('test contractingInsuranceFromTaxId addUser dispatches to getInstitutionsByFi
     taxCode: '12345678901',
   });
   expect(setCfResult).toHaveBeenCalledWith({ id: 'p1', description: 'P1' });
+});
+
+it('test fetchInstitutionByTaxCode dispatches to searchInstitutionIpaByTaxCode and sets cfResult', async () => {
+  vi.mocked(OnboardingApi.searchInstitutionIpaByTaxCode).mockResolvedValue({
+    id: 'ipa1',
+    description: 'Comune di Test',
+  } as any);
+
+  await fetchInstitutionByTaxCode(
+    false,
+    'ONBOARDING_GET_PARTY_FROM_CF',
+    {},
+    '12345678901',
+    'prod-1',
+    'PA' as any,
+    'cat-x',
+    undefined,
+    setCfResult,
+    undefined,
+    setDisabled,
+    setRequiredLogin
+  );
+
+  expect(OnboardingApi.searchInstitutionIpaByTaxCode).toHaveBeenCalledWith(
+    '12345678901',
+    'cat-x'
+  );
+  expect(setCfResult).toHaveBeenCalledWith({ id: 'ipa1', description: 'Comune di Test' });
+});
+
+it('test fetchInstitutionByTaxCode addUser dispatches to searchInstitutionIpaByTaxCode', async () => {
+  vi.mocked(OnboardingApi.searchInstitutionIpaByTaxCode).mockResolvedValue({
+    id: 'ipa1',
+    description: 'Comune di Test',
+  } as any);
+
+  await fetchInstitutionByTaxCode(
+    true,
+    'ONBOARDING_GET_PARTY_FROM_CF',
+    {},
+    '12345678901',
+    'prod-1',
+    'PA' as any,
+    'cat-x',
+    undefined,
+    setCfResult,
+    undefined,
+    setDisabled,
+    setRequiredLogin
+  );
+
+  expect(OnboardingApi.searchInstitutionIpaByTaxCode).toHaveBeenCalledWith(
+    '12345678901',
+    'cat-x'
+  );
+  expect(setCfResult).toHaveBeenCalledWith({ id: 'ipa1', description: 'Comune di Test' });
+});
+
+it('test fetchInstitutionByTaxCode on 404 clears cfResult', async () => {
+  vi.mocked(OnboardingApi.searchInstitutionIpaByTaxCode).mockRejectedValue(
+    Object.assign(new Error('nf'), { httpStatus: 404 })
+  );
+
+  await fetchInstitutionByTaxCode(
+    false,
+    'ONBOARDING_GET_PARTY_FROM_CF',
+    {},
+    '00112233445',
+    'prod-1',
+    'PA' as any,
+    'cat-x',
+    undefined,
+    setCfResult,
+    undefined,
+    setDisabled,
+    setRequiredLogin
+  );
+
+  expect(setCfResult).toHaveBeenCalledWith(undefined);
 });
 
 it('test fetchInstitutionByTaxCode dispatches to infocamere and sets cfResult', async () => {

@@ -19,13 +19,11 @@ import { UserContext } from '../../lib/context';
 import { useHistoryState } from '../../hooks/useHistoryState';
 import { AooData } from '../../model/AooData';
 import { GeographicTaxonomy } from '../../model/GeographicTaxonomies';
-import { InstitutionLocationData } from '../../model/InstitutionLocationData';
 import { OnboardingFormData } from '../../model/OnboardingFormData';
 import { UoData } from '../../model/UoModel';
 import { verifyRecipientCodeIsValid } from '../../services/billingDataServices';
 import {
-  getCountriesFromGeotaxonomies,
-  getPreviousGeotaxononomies,
+  getPreviousGeotaxononomies
 } from '../../services/geoTaxonomyServices';
 import { handleSearchByTaxCode } from '../../services/institutionServices';
 import { verifyVatNumber } from '../../services/validationServices';
@@ -46,8 +44,8 @@ import DpoSection from '../onboardingFormData/DpoSection';
 import Heading from '../onboardingFormData/Heading';
 import PersonalAndBillingDataSection from '../onboardingFormData/PersonalAndBillingDataSection';
 import { VatNumberErrorModal } from '../onboardingFormData/VatNumberErrorModal';
-import GeoTaxonomySection from '../onboardingFormData/taxonomy/GeoTaxonomySection';
-import UpdateGeotaxonomy from '../onboardingFormData/taxonomy/UpdateGeotaxonomy';
+import GeoTaxonomySection from '../onboardingFormData/components/GeoTaxonomySection';
+import UpdateGeotaxonomy from '../onboardingFormData/components/UpdateGeotaxonomy';
 import { OnboardingStepActions } from '../registrationSteps/OnboardingStepActions';
 import { MessageNoAction } from '../shared/MessageNoAction';
 
@@ -115,7 +113,6 @@ export default function StepOnboardingFormData({
   const institutionAvoidGeotax = ['PT', 'SA', 'AS'].includes(institutionType);
   const [originId4Premium, setOriginId4Premium] = useState<string>();
   const [dpoData, setDpoData] = useState<DataProtectionOfficerDto>();
-  const [countries, setCountries] = useState<Array<InstitutionLocationData>>();
   const [geotaxonomy, updateGeotaxonomy] = useReducer(
     (prev: { add: boolean; edit: boolean }, next: { add: boolean; edit: boolean }) => ({
       ...prev,
@@ -410,34 +407,6 @@ export default function StepOnboardingFormData({
     }
   }, [formik.values.recipientCode]);
 
-  useEffect(() => {
-    if (formik.values.city && !formik.values.country && origin !== 'IPA') {
-      const loadCountryForCity = async () => {
-        try {
-          await getCountriesFromGeotaxonomies(
-            formik.values.city ?? '',
-            setCountries,
-            setRequiredLogin
-          );
-        } catch (error) {
-          console.error('Failed to load country for city:', error);
-        }
-      };
-      void loadCountryForCity();
-    }
-  }, [formik.values.city]);
-
-  useEffect(() => {
-    if (countries && countries.length > 0 && origin !== 'IPA') {
-      if (!formik.values.istatCode) {
-        void formik.setFieldValue('istatCode', countries[0].istat_code);
-      }
-      if (!formik.values.country) {
-        void formik.setFieldValue('country', countries[0].country);
-      }
-    }
-  }, [countries]);
-
   const baseTextFieldProps = (
     field: keyof OnboardingFormData,
     label: string,
@@ -512,8 +481,6 @@ export default function StepOnboardingFormData({
           controllers={controllers}
           setInvalidTaxCodeInvoicing={setInvalidTaxCodeInvoicing}
           recipientCodeStatus={recipientCodeStatus}
-          countries={countries}
-          setCountries={setCountries}
         />
         {!institutionAvoidGeotax && !isPagoPaInsights(subProductId) && (
           <Grid item xs={12} display="flex" justifyContent={'center'}>

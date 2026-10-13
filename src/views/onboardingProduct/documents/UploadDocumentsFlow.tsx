@@ -16,6 +16,7 @@ type Props = {
   productId: string;
   institutionType: string;
   origin: string;
+  partyName?: string;
   onSuccess: () => void;
   back: () => void;
 };
@@ -25,6 +26,7 @@ const UploadDocumentsFlow = ({
   productId,
   institutionType,
   origin,
+  partyName,
   onSuccess,
   back,
 }: Props) => {
@@ -106,6 +108,7 @@ const UploadDocumentsFlow = ({
       <ConfirmOnboardingModal
         open={openConfirmationModal}
         productName={productId2ProductTitle(productId)}
+        partyName={partyName}
         onConfirm={handleConfirmSubmit}
         handleClose={() => setOpenConfirmationModal(false)}
       />

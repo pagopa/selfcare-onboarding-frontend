@@ -17,9 +17,18 @@ type Props = {
   addUser: boolean;
   partyName: string | undefined;
   productName: string | undefined;
+  isRequiredDocumentsFlow?: boolean;
 } & StepperStepComponentProps;
 
-const StepAddApplicantEmail = ({ forward, back, user, addUser, partyName, productName }: Props) => {
+const StepAddApplicantEmail = ({
+  forward,
+  back,
+  user,
+  addUser,
+  partyName,
+  productName,
+  isRequiredDocumentsFlow,
+}: Props) => {
   const { t } = useTranslation();
   const [openConfirmationModal, setOpenConfirmationModal] = useState(false);
   const [userRequester, setUserRequester] = useState<UserRequester>({
@@ -38,7 +47,11 @@ const StepAddApplicantEmail = ({ forward, back, user, addUser, partyName, produc
   const isPec = isEmailValid && isPecEmail(userRequester.email);
 
   const onForwardAction = () => {
-    setOpenConfirmationModal(true);
+    if (isRequiredDocumentsFlow) {
+      forward(userRequester);
+    } else {
+      setOpenConfirmationModal(true);
+    }
   };
 
   return (
