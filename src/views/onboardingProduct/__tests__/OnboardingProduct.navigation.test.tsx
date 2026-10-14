@@ -247,6 +247,37 @@ describe('Back navigation by institution type', () => {
     await executeBack(SEARCH_PARTY_TITLE);
   });
 
+  test('A9: GSP without IPA (NO_IPA flag off) – search party skips to billing data through the onboarding data pass-through; back returns to search party', async () => {
+    const originalNoIpa = ENV.GSP.NO_IPA;
+    Object.assign(ENV.GSP, { NO_IPA: false });
+    try {
+      renderComponent(PRODUCT_IDS.PAGOPA);
+      await executeStepInstitutionType(PRODUCT_IDS.PAGOPA, 'GSP');
+      await executeStepSearchParty(
+        PRODUCT_IDS.PAGOPA,
+        'GSP',
+        'AGENCY X',
+        'businessName',
+        fetchWithLogsSpy,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        false,
+        true
+      );
+
+      await waitFor(() => screen.getByText(BILLING_TITLE));
+      expect(screen.queryByText(CONTRACTS_SUMMARY_TITLE)).not.toBeInTheDocument();
+      expect(document.getElementById('businessName')).toHaveValue('');
+
+      await executeBack(SEARCH_PARTY_TITLE);
+    } finally {
+      Object.assign(ENV.GSP, { NO_IPA: originalNoIpa });
+    }
+  });
+
   test('A10: PT – admins → billing data → institution type', async () => {
     renderComponent(PRODUCT_IDS.PAGOPA);
     await executeStepInstitutionType(PRODUCT_IDS.PAGOPA, 'PT');
