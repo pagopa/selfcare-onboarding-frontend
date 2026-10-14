@@ -27,7 +27,9 @@ export type FlowContext = {
   partyName: string;
 };
 
-const PRODUCTS_AVOIDING_INSTITUTION_TYPE_STEP: ReadonlyArray<string> = [
+// Lazily built: utils/constants imports the onboarding views, so PRODUCT_IDS may not be
+// initialized yet when this module is evaluated.
+const productsAvoidingInstitutionTypeStep = (): ReadonlyArray<string> => [
   PRODUCT_IDS.SEND,
   PRODUCT_IDS.IDPAY,
   PRODUCT_IDS.IDPAY_MERCHANT,
@@ -57,7 +59,7 @@ export const buildFlowContext = ({
     fromDashboard:
       !!partyExternalIdFromUrl &&
       (!externalInstitutionId || partyExternalIdFromUrl === externalInstitutionId),
-    productAvoidStep: PRODUCTS_AVOIDING_INSTITUTION_TYPE_STEP.includes(selectedProductId ?? ''),
+    productAvoidStep: productsAvoidingInstitutionTypeStep().includes(selectedProductId ?? ''),
     subunitTypeByQuery: hashParams.get('subunitType') ?? '',
     subunitCodeByQuery: hashParams.get('subunitCode') ?? '',
     institutionTypeByUrl: searchParams.get('institutionType'),
