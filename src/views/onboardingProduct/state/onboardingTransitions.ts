@@ -1,12 +1,16 @@
 import { InstitutionType } from '../../../../types';
+import { ENV } from '../../../utils/env';
 import {
   isCedProduct,
   isConsolidatedEconomicAccountCompany,
   isContractingAuthority,
   isGlobalServiceProvider,
   isInsuranceCompany,
+  isPagoPaInsights,
   isPagoPaProduct,
+  isPaymentServiceProvider,
   isPrivateInstitution,
+  isPrivatePersonInstitution,
   isPublicAdministration,
   isPublicServiceCompany,
 } from '../../../utils/institutionTypeUtils';
@@ -176,3 +180,57 @@ export const afterAggregates = ({
   isApplicantEmailRequired ? goTo('applicantEmail') : submit();
 
 export const afterApplicantEmail = (): Transition => submit();
+
+// ---------------------------------------------------------------------------------------------
+// Back transitions: selection and data steps
+// ---------------------------------------------------------------------------------------------
+
+export const backFromInstitutionType = (): Transition => openExitModal();
+
+export const backFromSearchParty = (): Transition => goTo('institutionType');
+
+export const backFromContractsSummary = (): Transition => goTo('searchParty');
+
+const hasPartySearch = (institutionType: InstitutionType | undefined): boolean =>
+  isPublicAdministration(institutionType) ||
+  isContractingAuthority(institutionType) ||
+  isGlobalServiceProvider(institutionType) ||
+  isPrivateInstitution(institutionType) ||
+  isPrivatePersonInstitution(institutionType);
+
+export const backFromBillingData = ({
+  fromDashboard,
+  productAvoidStep,
+  subunitTypeByQuery,
+  institutionType,
+  productId,
+  externalInstitutionId,
+  isRequiredDocumentsFlow,
+}: Pick<
+  TransitionContext,
+  | 'fromDashboard'
+  | 'productAvoidStep'
+  | 'subunitTypeByQuery'
+  | 'institutionType'
+  | 'productId'
+  | 'externalInstitutionId'
+  | 'isRequiredDocumentsFlow'
+>): Transition => {
+  if (fromDashboard && !productAvoidStep) {
+    return goTo('institutionType');
+  }
+  if ((fromDashboard || subunitTypeByQuery) && productAvoidStep) {
+    return openExitModal();
+  }
+  if (isPaymentServiceProvider(institutionType) || !hasPartySearch(institutionType)) {
+    return goTo('institutionType');
+  }
+  if (fromDashboard && isPagoPaInsights(productId)) {
+    return redirect(`${ENV.URL_FE.DASHBOARD}/${externalInstitutionId}`);
+  }
+  return isRequiredDocumentsFlow ? goTo('contractsSummary') : goTo('searchParty');
+};
+
+export const backFromAdditionalGpuInfo = (): Transition => goTo('billingData');
+
+export const backFromAdditionalInfo = (): Transition => goTo('billingData');
