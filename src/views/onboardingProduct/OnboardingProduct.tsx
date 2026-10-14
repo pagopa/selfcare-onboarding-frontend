@@ -33,11 +33,8 @@ import { AggregateInstitution } from '../../model/AggregateInstitution';
 import { OnboardingFormData } from '../../model/OnboardingFormData';
 import { checkProduct, getFilterCategories } from '../../services/onboardingServices';
 import { postOnboardingSubmit } from '../../services/onboardingSubmitServices';
-import { PRODUCT_IDS } from '../../utils/constants';
 import { ENV } from '../../utils/env';
 import {
-  isConsolidatedEconomicAccountCompany,
-  isGlobalServiceProvider,
   isPagoPaProduct,
   isPublicAdministration,
   isSendProduct,
@@ -56,6 +53,9 @@ import { StepAdditionalInformations } from './components/StepAdditionalInformati
 import { StepUploadAggregates } from './components/StepUploadAggregates';
 import { genericError, StepVerifyOnboarding } from './components/StepVerifyOnboarding';
 import StepContractsSummary from './components/contracts/StepContractsSummary';
+import { buildFlowContext } from './state/flowContext';
+import { normalizeUsers } from './state/normalizeUsers';
+import { selectFilterCategories as selectFilterCategoriesFor } from './state/selectFilterCategories';
 
 export type ValidateErrorType = 'conflictError';
 
@@ -118,22 +118,26 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
   const requestIdRef = useRef<string>();
   const { t } = useTranslation();
   const [onExitAction, setOnExitAction] = useState<(() => void) | undefined>();
-  const productAvoidStep = [
-    PRODUCT_IDS.SEND,
-    PRODUCT_IDS.IDPAY,
-    PRODUCT_IDS.IDPAY_MERCHANT,
-  ].includes(selectedProduct?.id ?? '');
-  const partyExternalIdFromUrl = new URLSearchParams(window.location.search).get('partyExternalId');
-  const fromDashboard =
-    !!partyExternalIdFromUrl &&
-    (!externalInstitutionId || partyExternalIdFromUrl === externalInstitutionId);
-  const subunitTypeByQuery =
-    new URLSearchParams(window.location.hash.substring(1)).get('subunitType') ?? '';
-  const subunitCodeByQuery =
-    new URLSearchParams(window.location.hash.substring(1)).get('subunitCode') ?? '';
-  const institutionTypeByUrl = new URLSearchParams(window.location.search).get('institutionType');
+  const {
+    fromDashboard,
+    productAvoidStep,
+    subunitTypeByQuery,
+    subunitCodeByQuery,
+    institutionTypeByUrl,
+    addUser,
+    isRequiredDocumentsFlow,
+    partyName,
+  } = buildFlowContext({
+    location: window.location,
+    productId,
+    selectedProductId: selectedProduct?.id,
+    institutionType,
+    origin,
+    externalInstitutionId,
+    onboardingFormData,
+    gspNoIpaEnabled: ENV.GSP.NO_IPA,
+  });
   const desiredOriginRef = useRef<string | undefined>();
-  const addUser = window.location.pathname.includes('/user');
   const { user } = useContext(UserContext);
 
   const outcomeContent: RequestOutcomeOptions = {
@@ -216,18 +220,6 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     ],
   };
 
-  const isRequiredDocumentsFlow =
-    isGlobalServiceProvider(institutionType) &&
-    origin !== 'IPA' &&
-    isPagoPaProduct(productId) &&
-    ENV.GSP.NO_IPA;
-
-  const partyName =
-    onboardingFormData?.uoName ??
-    onboardingFormData?.aooName ??
-    onboardingFormData?.businessName ??
-    '';
-
   const enterRequiredDocumentsFlow = () => {
     void OnboardingApi.getOnboardings(onboardingFormData?.taxCode ?? '', 'REQUESTING')
       .then((onboardings) => {
@@ -260,13 +252,11 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
       return;
     }
     const data = userData ?? formData;
-    const users = ((data as any).users as Array<UserOnCreate>)?.map((u) => ({
-      ...u,
-      taxCode: u?.taxCode?.toUpperCase(),
-      email: u?.email?.toLowerCase(),
-    }));
-
-    const usersWithoutLegal = users?.slice(0, 0).concat(users.slice(0 + 1));
+    // same unchecked contract as before: postOnboardingSubmit expects the users list to be set
+    const users = normalizeUsers(
+      (data as any).users as Array<UserOnCreate>,
+      institutionType
+    ) as Array<UserOnCreate>;
 
     postOnboardingSubmit(
       setLoading,
@@ -283,7 +273,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
       outcomeContent,
       notAllowedError,
       pricingPlan,
-      isTechPartner(institutionType) ? usersWithoutLegal : users,
+      users,
       user,
       aggregates,
       () => {
@@ -452,33 +442,10 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     void loadFilterCategories();
   }, [productId]);
 
-  const selectFilterCategories = useCallback(() => {
-    if (!filterCategoriesResponse?.product) {
-      return undefined;
-    }
-
-    switch (productId) {
-      case PRODUCT_IDS.SEND:
-        return filterCategoriesResponse.product['prod-pn']?.ipa.PA;
-
-      case PRODUCT_IDS.IDPAY_MERCHANT:
-        return filterCategoriesResponse.product['prod-idpay-merchant']?.merchantDetails;
-
-      case PRODUCT_IDS.INTEROP:
-        if (isConsolidatedEconomicAccountCompany(institutionType)) {
-          return filterCategoriesResponse.product['prod-interop']?.ipa.SCEC;
-        } else if (isPublicAdministration(institutionType)) {
-          return filterCategoriesResponse.product['prod-interop']?.ipa.PA;
-        } else if (isGlobalServiceProvider(institutionType)) {
-          return filterCategoriesResponse.product.default?.ipa.GSP;
-        } else {
-          return filterCategoriesResponse.product.default?.ipa.PA;
-        }
-      default:
-        const defaultIpa = filterCategoriesResponse.product.default?.ipa;
-        return isGlobalServiceProvider(institutionType) ? defaultIpa?.GSP : defaultIpa?.PA;
-    }
-  }, [filterCategoriesResponse, productId, institutionType]);
+  const selectFilterCategories = useCallback(
+    () => selectFilterCategoriesFor(filterCategoriesResponse, productId, institutionType),
+    [filterCategoriesResponse, productId, institutionType]
+  );
 
   const steps: Array<StepperStep> = [
     {
