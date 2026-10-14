@@ -1,94 +1,95 @@
 /* eslint-disable functional/immutable-data */
-/* eslint-disable functional/no-let */
 import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
-import { User } from '@pagopa/selfcare-common-frontend/lib/model/User';
-import { Dispatch, MutableRefObject, SetStateAction } from 'react';
-import { InstitutionType, UserOnCreate } from '../../../../../types';
+import { Dispatch, MutableRefObject } from 'react';
+import { InstitutionType } from '../../../../../types';
 import { AdditionalGpuInformations } from '../../../../model/AdditionalGpuInformations';
 import { AdditionalData, AdditionalInformations } from '../../../../model/AdditionalInformations';
-import { OnboardingFormData, UserRequester } from '../../../../model/OnboardingFormData';
 import { AggregateInstitution } from '../../../../model/AggregateInstitution';
-import { PRODUCT_IDS } from '../../../../utils/constants';
-import { selected2OnboardingData } from '../../../../utils/selected2OnboardingData';
+import { OnboardingFormData, UserRequester } from '../../../../model/OnboardingFormData';
 import {
-  isCedProduct,
-  isConsolidatedEconomicAccountCompany,
-  isContractingAuthority,
-  isGlobalServiceProvider,
-  isInsuranceCompany,
-  isPagoPaProduct,
-  isPrivateInstitution,
-  isPublicAdministration,
-  isPublicServiceCompany,
-} from '../../../../utils/institutionTypeUtils';
-import { ENV } from '../../../../utils/env';
+  OnboardingProductAction,
+  OnboardingProductState,
+  usersOf,
+} from '../../state/onboardingProductReducer';
+import {
+  afterAdmins,
+  afterAggregates,
+  isGspWithoutIpa,
+  requiresApplicantEmail,
+} from '../../state/onboardingTransitions';
 
-interface ForwardFunctionsParams {
-  requestIdRef: MutableRefObject<string | undefined>;
+export type ForwardFunctionsContext = {
   productId: string;
-  institutionType: InstitutionType | undefined;
-  onboardingFormData: OnboardingFormData | undefined;
-  setInstitutionType: Dispatch<SetStateAction<InstitutionType | undefined>>;
-  setOnboardingFormData: Dispatch<SetStateAction<OnboardingFormData | undefined>>;
-  setActiveStep: Dispatch<SetStateAction<number>>;
-  setOrigin: Dispatch<SetStateAction<string | undefined>>;
-  forward: () => void;
-  formData: Partial<FormData> | undefined;
-  setFormData: Dispatch<SetStateAction<Partial<FormData> | undefined>>;
+  loggedUserTaxCode?: string;
+  /** Mirrors ENV.GSP.NO_IPA. */
+  gspNoIpaEnabled: boolean;
+};
+
+export type ForwardFunctionsEffects = {
+  requestIdRef: MutableRefObject<string | undefined>;
   desiredOriginRef: MutableRefObject<string | Array<string> | undefined>;
-  activeStep: number;
-  origin: string | undefined;
-  setExternalInstitutionId: Dispatch<SetStateAction<string>>;
-  externalInstitutionId: string;
-  setAdditionalInformations: Dispatch<SetStateAction<AdditionalInformations | undefined>>;
-  setAdditionalGPUInformations: Dispatch<SetStateAction<AdditionalGpuInformations | undefined>>;
-  setPendingForward: Dispatch<SetStateAction<{ data: Partial<FormData> } | null>>;
-  user: User | null;
   onSubmit: (
     userData?: Partial<FormData>,
     aggregates?: Array<AggregateInstitution>,
     updatedOnboardingFormData?: OnboardingFormData
   ) => void;
-  aggregatesData: Array<AggregateInstitution> | undefined;
-  setAggregatesData: Dispatch<SetStateAction<Array<AggregateInstitution> | undefined>>;
-  setLoading: Dispatch<SetStateAction<boolean>>;
-}
+};
 
-export const createForwardFunctions = (params: ForwardFunctionsParams) => {
-  const {
-    requestIdRef,
-    productId,
-    institutionType,
-    onboardingFormData,
-    setInstitutionType,
-    setOnboardingFormData,
-    setActiveStep,
-    setOrigin,
-    forward,
-    formData,
-    setFormData,
-    desiredOriginRef,
-    activeStep,
-    origin,
-    setExternalInstitutionId,
-    externalInstitutionId,
-    setAdditionalInformations,
-    setAdditionalGPUInformations,
-    setPendingForward,
-    user,
-    onSubmit,
-    aggregatesData,
-    setAggregatesData,
-    setLoading,
-  } = params;
+export type ForwardFunctionsParams = {
+  state: OnboardingProductState;
+  dispatch: Dispatch<OnboardingProductAction>;
+  ctx: ForwardFunctionsContext;
+  effects: ForwardFunctionsEffects;
+};
+
+export const toAdditionalInformations = (newAdditionalInformations: {
+  [key: string]: AdditionalData;
+}): AdditionalInformations => ({
+  agentOfPublicService: newAdditionalInformations.isConcessionaireOfPublicService?.choice,
+  agentOfPublicServiceNote:
+    newAdditionalInformations.isConcessionaireOfPublicService?.textFieldValue,
+  belongRegulatedMarket: newAdditionalInformations.fromBelongsRegulatedMarket?.choice,
+  regulatedMarketNote: newAdditionalInformations.fromBelongsRegulatedMarket?.textFieldValue,
+  establishedByRegulatoryProvision:
+    newAdditionalInformations.isEstabilishedRegulatoryProvision?.choice,
+  establishedByRegulatoryProvisionNote:
+    newAdditionalInformations.isEstabilishedRegulatoryProvision?.textFieldValue,
+  ipa: newAdditionalInformations.isFromIPA?.choice,
+  ipaCode: newAdditionalInformations.isFromIPA?.textFieldValue,
+  otherNote: newAdditionalInformations.optionalPartyInformations?.textFieldValue ?? '',
+});
+
+export const toAdditionalGpuInformations = (
+  newAdditionalGpuInformations: AdditionalGpuInformations
+): AdditionalGpuInformations => ({
+  businessRegisterNumber: newAdditionalGpuInformations?.businessRegisterNumber,
+  legalRegisterNumber: newAdditionalGpuInformations?.legalRegisterNumber,
+  legalRegisterName: newAdditionalGpuInformations.legalRegisterName,
+  longTermPayments: newAdditionalGpuInformations.longTermPayments,
+  manager: newAdditionalGpuInformations.manager,
+  managerAuthorized: newAdditionalGpuInformations.managerAuthorized,
+  managerEligible: newAdditionalGpuInformations.managerEligible,
+  managerProsecution: newAdditionalGpuInformations.managerProsecution,
+  institutionCourtMeasures: newAdditionalGpuInformations.institutionCourtMeasures,
+});
+
+/**
+ * Handlers of the forward actions of each step: they track the analytics events, dispatch the
+ * reducer action that records the data and moves to the next step, and submit the onboarding
+ * when the transition says so.
+ */
+export const createForwardFunctions = ({
+  state,
+  dispatch,
+  ctx,
+  effects,
+}: ForwardFunctionsParams) => {
+  const { formData, onboardingFormData, externalInstitutionId, origin, aggregatesData } = state;
+  const { productId, loggedUserTaxCode, gspNoIpaEnabled } = ctx;
+  const { requestIdRef, desiredOriginRef, onSubmit } = effects;
 
   const forwardWithData = (newFormData: Partial<FormData>) => {
-    if (formData) {
-      setFormData({ ...formData, ...newFormData });
-    } else {
-      setFormData(newFormData);
-    }
-    forward();
+    dispatch({ type: 'USERS_SUBMITTED', from: 'manager', formData: newFormData });
   };
 
   const forwardWithInstitutionType = (newInstitutionType: InstitutionType) => {
@@ -100,174 +101,74 @@ export const createForwardFunctions = (params: ForwardFunctionsParams) => {
       party_id: partyExternalIdByQuery ?? '',
       product_id: productId,
     });
-    setInstitutionType(newInstitutionType);
-
-    if (
-      isPrivateInstitution(newInstitutionType as InstitutionType) &&
-      (isPagoPaProduct(productId) || isCedProduct(productId))
-    ) {
-      selected2OnboardingData(null, undefined, newInstitutionType, productId);
-      setOnboardingFormData(
-        selected2OnboardingData(null, undefined, newInstitutionType, productId)
-      );
-      setActiveStep(5);
-    } else {
-      forward();
-    }
-
-    if (
-      !isGlobalServiceProvider(newInstitutionType) &&
-      !isPublicAdministration(newInstitutionType) &&
-      !isContractingAuthority(newInstitutionType) &&
-      !isInsuranceCompany(newInstitutionType as InstitutionType) &&
-      !isPublicServiceCompany(newInstitutionType) &&
-      !isPrivateInstitution(newInstitutionType) &&
-      !isConsolidatedEconomicAccountCompany(newInstitutionType)
-    ) {
-      if (newInstitutionType !== institutionType) {
-        setOnboardingFormData({
-          businessName: '',
-          registeredOffice: '',
-          zipCode: '',
-          digitalAddress: '',
-          taxCode: '',
-          vatNumber: '',
-          recipientCode: '',
-          geographicTaxonomies: [],
-        });
-      } else {
-        setOnboardingFormData(onboardingFormData);
-      }
-      setActiveStep(5);
-    }
+    dispatch({ type: 'INSTITUTION_TYPE_SELECTED', institutionType: newInstitutionType, productId });
   };
 
   const forwardGspNoIpa = () => {
     desiredOriginRef.current = 'SELC';
-    setOrigin('SELC');
-    setOnboardingFormData({
-      businessName: '',
-      registeredOffice: '',
-      zipCode: '',
-      digitalAddress: '',
-      taxCode: '',
-      vatNumber: '',
-      recipientCode: '',
-      geographicTaxonomies: [],
-    });
-    setExternalInstitutionId('');
-    setActiveStep(activeStep + 3);
+    dispatch({ type: 'GSP_NO_IPA_SELECTED', from: state.activeStep });
   };
 
   const forwardWithDataAndInstitution = (
     onboardingData: OnboardingFormData,
     institutionTypeParam: InstitutionType
   ) => {
-    if (
-      onboardingData?.taxCode === '' &&
-      onboardingData?.originId === undefined &&
-      institutionTypeParam === 'GSP'
-    ) {
-      if (ENV.GSP.NO_IPA) {
-        setActiveStep(activeStep + 1);
-      } else {
-        forwardGspNoIpa();
+    if (isGspWithoutIpa(onboardingData, institutionTypeParam)) {
+      if (!gspNoIpaEnabled) {
+        desiredOriginRef.current = 'SELC';
       }
     } else {
-      setInstitutionType(institutionTypeParam);
-      setOnboardingFormData(onboardingData);
-      setExternalInstitutionId(onboardingData?.externalId ?? '');
-
       const originToSet =
         institutionTypeParam === 'GSP' && onboardingData?.originId
           ? 'IPA'
           : onboardingData?.origin || origin;
-
       if (originToSet) {
         desiredOriginRef.current = originToSet;
       }
-
-      setOrigin(originToSet);
       trackEvent('ONBOARDING_PARTY_SELECTION', {
         party_id: onboardingData?.externalId,
         request_id: requestIdRef.current,
         product_id: productId,
       });
-
-      setPendingForward({
-        data: onboardingData as Partial<FormData>,
-      });
     }
+    dispatch({
+      type: 'PARTY_SELECTED',
+      party: onboardingData,
+      institutionType: institutionTypeParam,
+      gspNoIpaEnabled,
+    });
+  };
+
+  const forwardFromVerifyOnboarding = () => {
+    dispatch({ type: 'GO_TO_STEP', step: 'onboardingData' });
   };
 
   const forwardWithBillingData = (newOnboardingFormData: OnboardingFormData) => {
-    const trackingData = {
+    trackEvent('ONBOARDING_BILLING_DATA', {
       request_id: requestIdRef.current,
       party_id: externalInstitutionId,
       product_id: productId,
       geographic_taxonomies: newOnboardingFormData.geographicTaxonomies,
-    };
-    trackEvent('ONBOARDING_BILLING_DATA', trackingData);
-    setOnboardingFormData(newOnboardingFormData);
-    switch (institutionType) {
-      case 'GSP':
-        if (
-          (productId === PRODUCT_IDS.PAGOPA &&
-            (newOnboardingFormData?.origin || origin) === 'IPA') ||
-          (newOnboardingFormData?.origin || origin) === 'IPA'
-        ) {
-          setActiveStep(activeStep + 3);
-        } else {
-          setActiveStep(activeStep + 2);
-        }
-        break;
-      case 'GPU':
-        setActiveStep(activeStep + 1);
-        break;
-      case 'PT':
-        setActiveStep(activeStep + 4);
-        break;
-      default:
-        setActiveStep(activeStep + 3);
-        break;
-    }
+    });
+    dispatch({ type: 'BILLING_DATA_SUBMITTED', onboardingFormData: newOnboardingFormData });
   };
 
   const forwardWithAdditionalGSPInfo = (newAdditionalInformations: {
     [key: string]: AdditionalData;
   }) => {
-    setAdditionalInformations({
-      agentOfPublicService: newAdditionalInformations.isConcessionaireOfPublicService?.choice,
-      agentOfPublicServiceNote:
-        newAdditionalInformations.isConcessionaireOfPublicService?.textFieldValue,
-      belongRegulatedMarket: newAdditionalInformations.fromBelongsRegulatedMarket?.choice,
-      regulatedMarketNote: newAdditionalInformations.fromBelongsRegulatedMarket?.textFieldValue,
-      establishedByRegulatoryProvision:
-        newAdditionalInformations.isEstabilishedRegulatoryProvision?.choice,
-      establishedByRegulatoryProvisionNote:
-        newAdditionalInformations.isEstabilishedRegulatoryProvision?.textFieldValue,
-      ipa: newAdditionalInformations.isFromIPA?.choice,
-      ipaCode: newAdditionalInformations.isFromIPA?.textFieldValue,
-      otherNote: newAdditionalInformations.optionalPartyInformations?.textFieldValue ?? '',
+    dispatch({
+      type: 'ADDITIONAL_INFO_SUBMITTED',
+      additionalInformations: toAdditionalInformations(newAdditionalInformations),
     });
-    forward();
   };
 
   const forwardWithAdditionalGPUInfo = (
     newAdditionalGpuInformations: AdditionalGpuInformations
   ) => {
-    setAdditionalGPUInformations({
-      businessRegisterNumber: newAdditionalGpuInformations?.businessRegisterNumber,
-      legalRegisterNumber: newAdditionalGpuInformations?.legalRegisterNumber,
-      legalRegisterName: newAdditionalGpuInformations.legalRegisterName,
-      longTermPayments: newAdditionalGpuInformations.longTermPayments,
-      manager: newAdditionalGpuInformations.manager,
-      managerAuthorized: newAdditionalGpuInformations.managerAuthorized,
-      managerEligible: newAdditionalGpuInformations.managerEligible,
-      managerProsecution: newAdditionalGpuInformations.managerProsecution,
-      institutionCourtMeasures: newAdditionalGpuInformations.institutionCourtMeasures,
+    dispatch({
+      type: 'ADDITIONAL_GPU_INFO_SUBMITTED',
+      additionalGPUInformations: toAdditionalGpuInformations(newAdditionalGpuInformations),
     });
-    setActiveStep(activeStep + 2);
   };
 
   const forwardWithOnboardingData = (
@@ -275,11 +176,11 @@ export const createForwardFunctions = (params: ForwardFunctionsParams) => {
     institutionTypeParam?: InstitutionType,
     _id?: string
   ) => {
-    if (onboardingFormDataParam) {
-      setOnboardingFormData(onboardingFormDataParam);
-    }
-    setInstitutionType(institutionTypeParam);
-    forward();
+    dispatch({
+      type: 'ONBOARDING_DATA_LOADED',
+      onboardingFormData: onboardingFormDataParam,
+      institutionType: institutionTypeParam,
+    });
   };
 
   const forwardFromManager = (newFormData: Partial<FormData>) => {
@@ -293,24 +194,25 @@ export const createForwardFunctions = (params: ForwardFunctionsParams) => {
 
   const forwardFromAdmin = (newFormData: Partial<FormData> | undefined) => {
     const userData = { ...formData, ...newFormData };
-    setFormData(userData);
-    if (onboardingFormData?.isAggregator) {
-      forward();
-    } else if ((userData as any)?.users?.every((u: UserOnCreate) => u?.taxCode !== user?.taxCode)) {
-      setActiveStep(activeStep + 2);
-    } else {
+    dispatch({ type: 'USERS_SUBMITTED', from: 'admins', formData: newFormData, loggedUserTaxCode });
+    const transition = afterAdmins({
+      isAggregator: !!onboardingFormData?.isAggregator,
+      isApplicantEmailRequired: requiresApplicantEmail(usersOf(userData), loggedUserTaxCode),
+    });
+    if (transition.kind === 'submit') {
       onSubmit(userData);
     }
   };
 
   const forwardFromAggregator = (_: any, aggregates?: Array<AggregateInstitution>) => {
-    if ((formData as any)?.users?.every((u: UserOnCreate) => u.taxCode !== user?.taxCode)) {
-      setAggregatesData(aggregates);
-      // verifyAggregates leaves the loading on: release it since no submit happens here
-      setLoading(false);
-      forward();
-    } else {
+    const transition = afterAggregates({
+      isApplicantEmailRequired: requiresApplicantEmail(usersOf(formData), loggedUserTaxCode),
+    });
+    if (transition.kind === 'submit') {
       onSubmit(undefined, aggregates);
+    } else {
+      // verifyAggregates leaves the loading on: the reducer releases it since no submit happens
+      dispatch({ type: 'AGGREGATES_SUBMITTED', aggregates, loggedUserTaxCode });
     }
   };
 
@@ -319,7 +221,7 @@ export const createForwardFunctions = (params: ForwardFunctionsParams) => {
       ...onboardingFormData,
       userRequester,
     } as OnboardingFormData;
-    setOnboardingFormData(updatedOnboardingFormData);
+    dispatch({ type: 'APPLICANT_EMAIL_SUBMITTED', userRequester });
     onSubmit(undefined, aggregatesData, updatedOnboardingFormData);
   };
 
@@ -328,6 +230,7 @@ export const createForwardFunctions = (params: ForwardFunctionsParams) => {
     forwardWithInstitutionType,
     forwardGspNoIpa,
     forwardWithDataAndInstitution,
+    forwardFromVerifyOnboarding,
     forwardWithBillingData,
     forwardWithAdditionalGSPInfo,
     forwardWithAdditionalGPUInfo,
