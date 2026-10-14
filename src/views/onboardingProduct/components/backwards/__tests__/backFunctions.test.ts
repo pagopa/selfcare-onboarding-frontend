@@ -211,3 +211,91 @@ it('test backFromApplicantEmail skips the aggregates step for a non aggregator',
 
   expect(dispatch).toHaveBeenCalledWith(goToStep('admins'));
 });
+
+it.each([
+  ['backFromSearchParty', 'institutionType'],
+  ['backFromContractsSummary', 'searchParty'],
+  ['backFromAdditionalGpuInfo', 'billingData'],
+  ['backFromAdditionalInfo', 'billingData'],
+  ['backFromAggregates', 'admins'],
+] as const)('test %s goes back to %s', (handler, step) => {
+  const backFunctions = buildBackFunctions({ institutionType: 'PA' });
+
+  backFunctions[handler]();
+
+  expect(backFunctions.dispatch).toHaveBeenCalledTimes(1);
+  expect(backFunctions.dispatch).toHaveBeenCalledWith(goToStep(step));
+});
+
+it('test handleOpenExitModal does not go back in history until the exit is confirmed', () => {
+  const { handleOpenExitModal, goBack } = buildBackFunctions();
+
+  handleOpenExitModal();
+
+  expect(goBack).not.toHaveBeenCalled();
+});
+
+it.each([['PRV'], ['PRV_PF'], ['SA'], ['GSP']] as Array<[InstitutionType]>)(
+  'test backFromBillingData goes back to the search step for %s',
+  (institutionType) => {
+    const { backFromBillingData, dispatch } = buildBackFunctions({ institutionType });
+
+    backFromBillingData();
+
+    expect(dispatch).toHaveBeenCalledWith(goToStep('searchParty'));
+  }
+);
+
+it.each([['GPU'], ['PT'], ['SCP'], ['SCEC']] as Array<[InstitutionType]>)(
+  'test backFromBillingData goes to the first step for %s, which has no search step',
+  (institutionType) => {
+    const { backFromBillingData, dispatch } = buildBackFunctions({ institutionType });
+
+    backFromBillingData();
+
+    expect(dispatch).toHaveBeenCalledWith(goToStep('institutionType'));
+  }
+);
+
+it('test backFromBillingData never redirects to the dashboard for pagoPA Insights (shadowed branch)', () => {
+  const originalLocation = window.location;
+  const assign = vi.fn();
+  Object.defineProperty(window, 'location', {
+    value: { ...originalLocation, assign },
+    configurable: true,
+  });
+  try {
+    const { backFromBillingData, dispatch } = buildBackFunctions({
+      fromDashboard: true,
+      institutionType: 'PA',
+      productId: PRODUCT_IDS.DASHBOARD_PSP,
+    });
+
+    backFromBillingData();
+
+    expect(assign).not.toHaveBeenCalled();
+    expect(dispatch).toHaveBeenCalledWith(goToStep('institutionType'));
+  } finally {
+    Object.defineProperty(window, 'location', { value: originalLocation, configurable: true });
+  }
+});
+
+it('test backFromManager goes back to the additional info for a GSP from IPA outside prod-pagopa', () => {
+  const { backFromManager, dispatch } = buildBackFunctions({
+    institutionType: 'GSP',
+    origin: 'IPA',
+    productId: PRODUCT_IDS.IO,
+  });
+
+  backFromManager();
+
+  expect(dispatch).toHaveBeenCalledWith(goToStep('additionalInfo'));
+});
+
+it('test backFromApplicantEmail goes back to the admins when the onboarding data are missing', () => {
+  const { backFromApplicantEmail, dispatch } = buildBackFunctions();
+
+  backFromApplicantEmail();
+
+  expect(dispatch).toHaveBeenCalledWith(goToStep('admins'));
+});
