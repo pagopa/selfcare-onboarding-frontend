@@ -1,10 +1,16 @@
 import '@testing-library/jest-dom';
 import { fireEvent, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { describe, expect, test, vi } from 'vitest';
 import '../../../locale';
 import { PRODUCT_IDS } from '../../../utils/constants';
 import { ENV } from '../../../utils/env';
-import { executeStepAddManager } from '../../../utils/test/test-utils';
+import {
+  executeStepAddAdmin,
+  executeStepAddApplicantEmailForm,
+  executeStepAddManager,
+  verifySubmit,
+} from '../../../utils/test/test-utils';
 import { phaseOutProductResponse, respondWith } from './shared/apiOverrides';
 import {
   executeBack,
@@ -42,6 +48,8 @@ const ADDITIONAL_INFO_TITLE =
   'Scegli l’opzione che descrive il tuo ente. Se nessuna è appropriata, seleziona “Altro” e inserisci maggiori dettagli.';
 const MANAGER_TITLE = 'Indica il Legale Rappresentante';
 const ADMIN_TITLE = "Indica l'Amministratore";
+const AGGREGATES_IO_TITLE = 'Indica i soggetti aggregati per IO';
+const APPLICANT_EMAIL_TITLE = 'Indica la tua email';
 
 const mockedHistoryGoBack = vi.fn();
 
@@ -87,6 +95,16 @@ const clickContinue = async () => {
   const continueButton = screen.getByRole('button', { name: 'Continua' });
   await waitFor(() => expect(continueButton).toBeEnabled());
   fireEvent.click(continueButton);
+};
+
+// Unlike executeStepUploadAggregates, it does not expect the onboarding to be submitted afterwards.
+const uploadAggregatesAndContinue = async () => {
+  await waitFor(() => screen.getByText(AGGREGATES_IO_TITLE));
+  await userEvent.upload(
+    document.getElementById('file-uploader') as HTMLElement,
+    new File(['csv data'], 'aggregates.csv', { type: 'multipart/form-data' })
+  );
+  await clickContinue();
 };
 
 describe('Outcome pages', () => {
@@ -286,5 +304,90 @@ describe('Back navigation by institution type', () => {
 
     await executeBack(BILLING_TITLE);
     await executeBack(INSTITUTION_TYPE_TITLE);
+  });
+});
+
+describe('Applicant email step (logged user not among the users)', () => {
+  test('A11: admins → applicant email → back to admins → forward again → submit with userRequester', async () => {
+    renderComponent(PRODUCT_IDS.IO);
+    await executeStepInstitutionType(PRODUCT_IDS.IO, 'PA');
+    await executeStepSearchParty(
+      PRODUCT_IDS.IO,
+      'PA',
+      'AGENCY X',
+      'businessName',
+      fetchWithLogsSpy
+    );
+    await executeStepBillingData(PRODUCT_IDS.IO, 'PA', false, false, 'IPA', 'AGENCY X');
+    await executeStepAddManager(false);
+    await executeStepAddAdmin(true, false, false, false, false, true);
+    await waitFor(() => screen.getByText(APPLICANT_EMAIL_TITLE));
+
+    await executeBack(ADMIN_TITLE);
+    // the admin form keeps the data entered before going forward
+    await clickContinue();
+
+    await executeStepAddApplicantEmailForm();
+    await verifySubmit(
+      PRODUCT_IDS.IO,
+      'PA',
+      fetchWithLogsSpy,
+      'IPA',
+      false,
+      false,
+      'businessName',
+      undefined,
+      undefined,
+      undefined,
+      true
+    );
+  });
+
+  test('A12: aggregator – admins → aggregates → applicant email → back to aggregates → submit with aggregates and userRequester', async () => {
+    renderComponent(PRODUCT_IDS.IO);
+    await executeStepInstitutionType(PRODUCT_IDS.IO, 'PA');
+    await executeStepSearchParty(
+      PRODUCT_IDS.IO,
+      'PA',
+      'AGENCY X',
+      'businessName',
+      fetchWithLogsSpy,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      false,
+      false,
+      true
+    );
+    await executeStepBillingData(PRODUCT_IDS.IO, 'PA', false, false, 'IPA', 'AGENCY X');
+    await executeStepAddManager(false);
+    await executeStepAddAdmin(true, false, true, false, false, true);
+
+    await uploadAggregatesAndContinue();
+    await waitFor(() => screen.getByText(APPLICANT_EMAIL_TITLE));
+    // the loading started by the aggregates verification must not cover the applicant email form
+    await waitFor(() =>
+      expect(screen.queryByText('Stiamo verificando i tuoi dati')).not.toBeInTheDocument()
+    );
+
+    await executeBack(AGGREGATES_IO_TITLE);
+    await uploadAggregatesAndContinue();
+
+    await executeStepAddApplicantEmailForm();
+    await verifySubmit(
+      PRODUCT_IDS.IO,
+      'PA',
+      fetchWithLogsSpy,
+      'IPA',
+      false,
+      false,
+      'businessName',
+      undefined,
+      true,
+      true,
+      true
+    );
   });
 });
