@@ -7,8 +7,12 @@ import { OnboardingFormData } from '../../../model/OnboardingFormData';
 import { selected2OnboardingData } from '../../../utils/selected2OnboardingData';
 import { OnboardingStepName } from './onboardingSteps';
 import {
+  afterAdditionalGpuInfo,
+  afterAdditionalInfo,
+  afterBillingData,
   afterGspNoIpa,
   afterInstitutionType,
+  afterOnboardingData,
   afterPartySelection,
   goTo,
   isGspWithoutIpa,
@@ -89,7 +93,18 @@ export type OnboardingProductAction =
       institutionType: InstitutionType;
       gspNoIpaEnabled: boolean;
     }
-  | { type: 'GSP_NO_IPA_SELECTED'; from: OnboardingStepName };
+  | { type: 'GSP_NO_IPA_SELECTED'; from: OnboardingStepName }
+  | {
+      type: 'ONBOARDING_DATA_LOADED';
+      onboardingFormData?: OnboardingFormData;
+      institutionType?: InstitutionType;
+    }
+  | { type: 'BILLING_DATA_SUBMITTED'; onboardingFormData: OnboardingFormData }
+  | { type: 'ADDITIONAL_INFO_SUBMITTED'; additionalInformations: AdditionalInformations }
+  | {
+      type: 'ADDITIONAL_GPU_INFO_SUBMITTED';
+      additionalGPUInformations: AdditionalGpuInformations;
+    };
 
 const selectInstitutionType = (
   state: OnboardingProductState,
@@ -173,6 +188,33 @@ export const onboardingProductReducer = (
       return selectParty(state, action.party, action.institutionType, action.gspNoIpaEnabled);
     case 'GSP_NO_IPA_SELECTED':
       return selectGspNoIpa(state, action.from);
+    case 'ONBOARDING_DATA_LOADED':
+      return applyTransition(
+        {
+          ...state,
+          onboardingFormData: action.onboardingFormData ?? state.onboardingFormData,
+          institutionType: action.institutionType,
+        },
+        afterOnboardingData()
+      );
+    case 'BILLING_DATA_SUBMITTED':
+      return applyTransition(
+        { ...state, onboardingFormData: action.onboardingFormData },
+        afterBillingData({
+          institutionType: state.institutionType,
+          origin: action.onboardingFormData?.origin || state.origin,
+        })
+      );
+    case 'ADDITIONAL_INFO_SUBMITTED':
+      return applyTransition(
+        { ...state, additionalInformations: action.additionalInformations },
+        afterAdditionalInfo()
+      );
+    case 'ADDITIONAL_GPU_INFO_SUBMITTED':
+      return applyTransition(
+        { ...state, additionalGPUInformations: action.additionalGPUInformations },
+        afterAdditionalGpuInfo()
+      );
     default:
       return state;
   }
