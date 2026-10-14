@@ -114,3 +114,24 @@ describe('Entry points from URL', () => {
     await executeBack('Seleziona il tipo di ente che rappresenti');
   });
 });
+
+describe('Exit modal', () => {
+  test('A5: back from the institution type step opens the exit modal; cancel closes it, exit goes back in history', async () => {
+    mockedLocation.search = `?pricingPlan=FA&partyExternalId=${AGENCY_X_EXTERNAL_ID}`;
+
+    renderComponent(PRODUCT_IDS.IO);
+    await waitFor(() => screen.getByText('Seleziona il tipo di ente che rappresenti'));
+
+    fireEvent.click(screen.getByRole('button', { name: 'Indietro' }));
+    await waitFor(() => screen.getByText('Vuoi davvero uscire?'));
+    fireEvent.click(screen.getByRole('button', { name: 'Annulla' }));
+    await waitFor(() => expect(screen.queryByText('Vuoi davvero uscire?')).not.toBeInTheDocument());
+    expect(mockedHistoryGoBack).not.toHaveBeenCalled();
+    screen.getByText('Seleziona il tipo di ente che rappresenti');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Indietro' }));
+    await waitFor(() => screen.getByText('Vuoi davvero uscire?'));
+    fireEvent.click(screen.getByRole('button', { name: 'Esci' }));
+    expect(mockedHistoryGoBack).toHaveBeenCalledTimes(1);
+  });
+});
