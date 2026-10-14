@@ -345,3 +345,10 @@ Tutte le suite esistenti `OnboardingProduct.*.test.tsx` e `documents/__tests__` 
 ## Note
 - Nessuna stringa UI nuova → nessuna modifica ai locale.
 - Le suite d'integrazione sono CPU-heavy: gli scenari A sono brevi; la copertura combinatoria sta nei test puri B.
+
+## Stato
+- US-1 … US-8 completate e integrate in `feat/SELC-9345` con merge `--no-ff`.
+- Validazione finale: `tsc` e `lint` verdi; `src/views/onboardingProduct` 26 file / 395 test (baseline 17 / 86).
+- Copertura dei nuovi moduli: 98,29% stmts / 97,94% branch.
+- `OnboardingProduct.tsx`: da 762 a 587 righe, nessun `eslint-disable` di complessità.
+- Da fare manualmente: push dei branch e apertura delle PR (storie e PR finale verso `main`).
