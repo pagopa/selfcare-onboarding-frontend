@@ -78,6 +78,8 @@ Oltre al template, la sezione *List of Changes* contiene il **changelog completo
 5. Side effect invariati: `trackEvent`, `triggerQualtricsIntercept`, `register/unregisterUnloadEvent`,
    reset `history.location.state`, redirect subunit → dashboard, auto-forward PT da URL,
    `createdOnboardingRef` (no doppio submit tornando indietro dall'upload documenti).
+6. **Aggregati → email richiedente**: `forwardFromAggregator` rilascia il loading prima di avanzare
+   (fix US-1); la transizione `afterAggregates` del reducer deve mantenere `loading=false`.
 
 ## Design (sintesi)
 - `src/views/onboardingProduct/state/`
@@ -128,6 +130,9 @@ Sottotask
 - ST-1.6 Scenari back per tipo ente: A6 PA, A7 GPU, A8 GSP no-IPA (`NO_IPA=true`), A10 PT.
 - ST-1.7 Scenario GSP no-IPA con `NO_IPA=false`: A9 (ricerca → billing tramite pass-through).
 - ST-1.8 Scenari email richiedente e aggregatore: A11, A12 (incluso payload di submit).
+- ST-1.8-fix Bug emerso da A12 (fix approvata, commit separato): dopo una verifica aggregati riuscita
+  `verifyAggregates` lasciava `loading=true` e il `LoadingOverlay` copriva lo step email richiedente.
+  `forwardFromAggregator` ora chiama `setLoading(false)` prima di avanzare (solo nel ramo senza submit).
 - ST-1.9 Scenario cambio tipo ente: A14 (reset vs mantenimento `onboardingFormData`).
 - ST-1.10 Lint + test dell'intera suite di navigazione, push e PR `feat/US-1` → `main` (descrizione, task con commit, test e comandi con esito).
 - ST-1.11 Dopo il merge: merge di `main` in `feat/SELC-9345` e push.
