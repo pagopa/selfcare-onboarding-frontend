@@ -1,6 +1,6 @@
 /* eslint-disable sonarjs/cognitive-complexity */
 import { Container } from '@mui/material';
-import { IllusCompleted, IllusError } from '@pagopa/mui-italia';
+import { IllusError } from '@pagopa/mui-italia';
 import { EndingPage } from '@pagopa/selfcare-common-frontend/lib';
 import SessionModal from '@pagopa/selfcare-common-frontend/lib/components/SessionModal';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
@@ -8,15 +8,8 @@ import { uniqueId } from 'lodash';
 import { useCallback, useContext, useEffect, useMemo } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
-import {
-  InstitutionType,
-  RequestOutcomeMessage,
-  RequestOutcomeOptions,
-  StepperStep,
-  UserOnCreate,
-} from '../../../types';
+import { InstitutionType, RequestOutcomeMessage, StepperStep, UserOnCreate } from '../../../types';
 import NoProductPage from '../../components/layout/NoProductPage';
-import UserNotAllowedPage from '../../components/layout/UserNotAllowedPage';
 import { LoadingOverlay } from '../../components/modals/LoadingOverlay';
 import { MessageNoAction } from '../../components/shared/MessageNoAction';
 import { StepAddManager } from '../../components/steps/StepAddManager';
@@ -31,12 +24,7 @@ import { OnboardingFormData } from '../../model/OnboardingFormData';
 import { checkProduct, getFilterCategories } from '../../services/onboardingServices';
 import { postOnboardingSubmit } from '../../services/onboardingSubmitServices';
 import { ENV } from '../../utils/env';
-import {
-  isPagoPaProduct,
-  isPublicAdministration,
-  isSendProduct,
-  isTechPartner,
-} from '../../utils/institutionTypeUtils';
+import { isPagoPaProduct, isSendProduct, isTechPartner } from '../../utils/institutionTypeUtils';
 import { triggerQualtricsIntercept } from '../../utils/qualtricsUtils';
 import { registerUnloadEvent, unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
 import { OnboardingApi } from '../../api/OnboardingApiClient';
@@ -54,6 +42,7 @@ import { buildFlowContext } from './state/flowContext';
 import { normalizeUsers } from './state/normalizeUsers';
 import { OnboardingStepName } from './state/onboardingSteps';
 import { selectFilterCategories as selectFilterCategoriesFor } from './state/selectFilterCategories';
+import { buildNotAllowedError, buildOutcomeContent } from './outcomes/onboardingProductOutcomes';
 import { useOnboardingProductWizard } from './useOnboardingProductWizard';
 
 export type ValidateErrorType = 'conflictError';
@@ -139,85 +128,12 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
   });
   const { user } = useContext(UserContext);
 
-  const outcomeContent: RequestOutcomeOptions = {
-    success: {
-      title: '',
-      description: [
-        <>
-          <EndingPage
-            minHeight="52vh"
-            icon={<IllusCompleted size={60} />}
-            title={
-              isTechPartner(institutionType)
-                ? t('onboarding.success.flow.techPartner.title')
-                : t('onboarding.success.flow.product.title')
-            }
-            description={
-              isTechPartner(institutionType) ? (
-                <Trans
-                  i18nKey="onboarding.success.flow.techPartner.description"
-                  components={{ 1: <br /> }}
-                >
-                  {`Invieremo un'email con l'esito della richiesta all'indirizzo <1 />PEC indicato.`}
-                </Trans>
-              ) : isPublicAdministration(institutionType) ? (
-                <Trans
-                  i18nKey="onboarding.success.flow.product.publicAdministration.description"
-                  components={{ 1: <br />, 3: <br /> }}
-                >
-                  {`Invieremo un'email all'indirizzo PEC primario dell'ente. <1 /> Al suo interno, ci sono le istruzioni per completare <3 />l'adesione.`}
-                </Trans>
-              ) : (
-                <Trans
-                  i18nKey="onboarding.success.flow.product.notPublicAdministration.description"
-                  components={{ 1: <br />, 3: <br /> }}
-                >
-                  {`Invieremo un'email all'indirizzo PEC indicato. <1 /> Al suo interno, ci sono le istruzioni per completare <3 />l'adesione.`}
-                </Trans>
-              )
-            }
-            variantTitle={'h4'}
-            variantDescription={'body1'}
-            buttonLabel={t('onboarding.backHome')}
-            onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
-          />
-        </>,
-      ],
-    },
-    error: {
-      title: '',
-      description: [
-        <>
-          <EndingPage
-            minHeight="52vh"
-            icon={<IllusError size={60} />}
-            variantTitle={'h4'}
-            variantDescription={'body1'}
-            title={t('onboarding.error.title')}
-            description={
-              <Trans i18nKey="onboarding.error.description" components={{ 1: <br /> }}>
-                {`A causa di un errore del sistema non è possibile completare <1 />la procedura. Ti chiediamo di riprovare più tardi.`}
-              </Trans>
-            }
-            buttonLabel={t('onboarding.backHome')}
-            onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
-          />
-        </>,
-      ],
-    },
-  };
+  const outcomeContent = buildOutcomeContent(institutionType, t);
 
-  const notAllowedError: RequestOutcomeMessage = {
-    title: '',
-    description: [
-      <>
-        <UserNotAllowedPage
-          partyName={onboardingFormData?.businessName}
-          productTitle={selectedProduct?.title}
-        />
-      </>,
-    ],
-  };
+  const notAllowedError = buildNotAllowedError(
+    onboardingFormData?.businessName,
+    selectedProduct?.title
+  );
 
   const enterRequiredDocumentsFlow = () => {
     void OnboardingApi.getOnboardings(onboardingFormData?.taxCode ?? '', 'REQUESTING')
