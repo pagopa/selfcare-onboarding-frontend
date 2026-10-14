@@ -227,6 +227,7 @@ export const backFromBillingData = ({
     return goTo('institutionType');
   }
   if (fromDashboard && isPagoPaInsights(productId)) {
+    // Shadowed by the two fromDashboard branches above: kept to mirror backFunctions 1:1.
     return redirect(`${ENV.URL_FE.DASHBOARD}/${externalInstitutionId}`);
   }
   return isRequiredDocumentsFlow ? goTo('contractsSummary') : goTo('searchParty');

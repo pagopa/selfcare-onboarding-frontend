@@ -14,12 +14,25 @@ import {
   afterOnboardingData,
   afterPartySelection,
   afterVerifyOnboarding,
+  backFromAdditionalGpuInfo,
+  backFromAdditionalInfo,
+  backFromAdmins,
+  backFromAggregates,
+  backFromApplicantEmail,
+  backFromBillingData,
+  backFromContractsSummary,
+  backFromInstitutionType,
+  backFromManager,
+  backFromSearchParty,
+  backFromUploadDocuments,
   goTo,
+  openExitModal,
   requiresApplicantEmail,
   SelectedParty,
   stay,
   submit,
   Transition,
+  TransitionContext,
 } from '../onboardingTransitions';
 
 /** Asserts the named target is the same step the legacy `activeStep + offset` navigation reached. */
@@ -230,5 +243,162 @@ describe('forward transitions', () => {
     ])('%s', (_label, users, loggedTaxCode, expected) => {
       expect(requiresApplicantEmail(users, loggedTaxCode)).toBe(expected);
     });
+  });
+});
+
+describe('back transitions', () => {
+  test('backFromInstitutionType opens the exit modal', () => {
+    expect(backFromInstitutionType()).toEqual(openExitModal());
+  });
+
+  test('backFromSearchParty goes to the institution type step', () => {
+    expect(backFromSearchParty()).toEqual(goTo('institutionType'));
+  });
+
+  test.each<[string, () => Transition, OnboardingStepName, number]>([
+    ['backFromContractsSummary', backFromContractsSummary, 'contractsSummary', -1],
+    ['backFromAdditionalGpuInfo', backFromAdditionalGpuInfo, 'additionalGpuInfo', -1],
+    ['backFromAdditionalInfo', backFromAdditionalInfo, 'additionalInfo', -2],
+    ['backFromAggregates', backFromAggregates, 'aggregates', -1],
+  ])('%s matches the legacy offset from %s', (_name, transition, from, offset) => {
+    expectLegacyTarget(transition(), from, offset);
+  });
+
+  test('backFromUploadDocuments goes back to the admins step', () => {
+    expect(backFromUploadDocuments()).toEqual(goTo('admins'));
+  });
+
+  describe('backFromBillingData', () => {
+    type BillingCtx = Parameters<typeof backFromBillingData>[0];
+    const base: BillingCtx = {
+      fromDashboard: false,
+      productAvoidStep: false,
+      subunitTypeByQuery: '',
+      institutionType: 'PA',
+      productId: 'prod-io',
+      externalInstitutionId: 'ext-1',
+      isRequiredDocumentsFlow: false,
+    };
+
+    test.each<[string, Partial<BillingCtx>, Transition]>([
+      ['from dashboard', { fromDashboard: true }, goTo('institutionType')],
+      [
+        'from dashboard with the institution type step skipped',
+        { fromDashboard: true, productAvoidStep: true },
+        openExitModal(),
+      ],
+      [
+        'subunit with the institution type step skipped',
+        { subunitTypeByQuery: 'UO', productAvoidStep: true },
+        openExitModal(),
+      ],
+      ['subunit without skipping the step', { subunitTypeByQuery: 'UO' }, goTo('searchParty')],
+      [
+        'pagoPA insights from dashboard (redirect branch shadowed)',
+        { fromDashboard: true, productId: 'prod-dashboard-psp', institutionType: 'PSP' },
+        goTo('institutionType'),
+      ],
+      [
+        'pagoPA insights not from dashboard',
+        { productId: 'prod-dashboard-psp' },
+        goTo('searchParty'),
+      ],
+      [
+        'required documents flow',
+        { institutionType: 'GSP', isRequiredDocumentsFlow: true },
+        goTo('contractsSummary'),
+      ],
+      [
+        'PSP in the required documents flow',
+        { institutionType: 'PSP', isRequiredDocumentsFlow: true },
+        goTo('institutionType'),
+      ],
+      ['no institution type', { institutionType: undefined }, goTo('institutionType')],
+    ])('%s', (_label, overrides, expected) => {
+      expect(backFromBillingData({ ...base, ...overrides })).toEqual(expected);
+    });
+
+    test.each<[InstitutionType, OnboardingStepName]>([
+      ['PA', 'searchParty'],
+      ['SA', 'searchParty'],
+      ['GSP', 'searchParty'],
+      ['PRV', 'searchParty'],
+      ['PRV_PF', 'searchParty'],
+      ['PSP', 'institutionType'],
+      ['PT', 'institutionType'],
+      ['GPU', 'institutionType'],
+      ['AS', 'institutionType'],
+      ['SCP', 'institutionType'],
+      ['SCEC', 'institutionType'],
+    ])('%s goes back to %s', (institutionType, expected) => {
+      expect(backFromBillingData({ ...base, institutionType })).toEqual(goTo(expected));
+    });
+  });
+
+  describe('backFromManager', () => {
+    test.each<
+      [InstitutionType | undefined, string | undefined, string, OnboardingStepName, number]
+    >([
+      ['GSP', 'IPA', 'prod-pagopa', 'billingData', -3],
+      ['GSP', 'IPA', 'prod-io', 'additionalInfo', -1],
+      ['GSP', 'SELC', 'prod-pagopa', 'additionalInfo', -1],
+      ['GPU', 'SELC', 'prod-pagopa', 'additionalGpuInfo', -2],
+      ['PT', 'SELC', 'prod-pagopa', 'onboardingData', -4],
+      ['PA', 'IPA', 'prod-io', 'billingData', -3],
+      ['PSP', undefined, 'prod-pagopa', 'billingData', -3],
+      [undefined, undefined, 'prod-io', 'billingData', -3],
+    ])(
+      '%s with origin %s on %s goes back to %s',
+      (institutionType, origin, selectedProductId, expected, offset) => {
+        const transition = backFromManager({ institutionType, origin, selectedProductId });
+        expect(transition).toEqual(goTo(expected));
+        expectLegacyTarget(transition, 'manager', offset);
+      }
+    );
+  });
+
+  describe('backFromAdmins', () => {
+    test.each<[InstitutionType | undefined, OnboardingStepName, number]>([
+      ['PT', 'billingData', -4],
+      ['PA', 'manager', -1],
+      ['GSP', 'manager', -1],
+      [undefined, 'manager', -1],
+    ])('%s goes back to %s', (institutionType, expected, offset) => {
+      const transition = backFromAdmins({ institutionType });
+      expect(transition).toEqual(goTo(expected));
+      expectLegacyTarget(transition, 'admins', offset);
+    });
+  });
+
+  describe('backFromApplicantEmail', () => {
+    test.each<[boolean, OnboardingStepName, number]>([
+      [true, 'aggregates', -1],
+      [false, 'admins', -2],
+    ])('aggregator %s goes back to %s', (isAggregator, expected, offset) => {
+      const transition = backFromApplicantEmail({ isAggregator });
+      expect(transition).toEqual(goTo(expected));
+      expectLegacyTarget(transition, 'applicantEmail', offset);
+    });
+  });
+
+  test('every transition accepts the full context', () => {
+    const ctx: TransitionContext = {
+      productId: 'prod-io',
+      selectedProductId: 'prod-io',
+      institutionType: 'PA',
+      origin: 'IPA',
+      externalInstitutionId: 'ext-1',
+      fromDashboard: false,
+      productAvoidStep: false,
+      subunitTypeByQuery: '',
+      isRequiredDocumentsFlow: false,
+      isAggregator: false,
+      isApplicantEmailRequired: false,
+      gspNoIpaEnabled: false,
+    };
+    expect(backFromBillingData(ctx)).toEqual(goTo('searchParty'));
+    expect(backFromManager(ctx)).toEqual(goTo('billingData'));
+    expect(afterBillingData(ctx)).toEqual(goTo('manager'));
+    expect(afterAdmins(ctx)).toEqual(submit());
   });
 });
