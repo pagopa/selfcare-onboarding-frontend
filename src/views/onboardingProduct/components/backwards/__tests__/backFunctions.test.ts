@@ -2,9 +2,9 @@ import { expect, it, vi } from 'vitest';
 import { InstitutionType } from '../../../../../../types';
 import { OnboardingFormData } from '../../../../../model/OnboardingFormData';
 import { PRODUCT_IDS } from '../../../../../utils/constants';
+import { createInitialState } from '../../../state/onboardingProductReducer';
+import { OnboardingStepName } from '../../../state/onboardingSteps';
 import { createBackFunctions } from '../backFunctions';
-
-const ACTIVE_STEP = 6;
 
 type Overrides = {
   fromDashboard?: boolean;
@@ -18,52 +18,56 @@ type Overrides = {
 };
 
 const buildBackFunctions = (overrides: Overrides = {}) => {
-  const setActiveStep = vi.fn();
-  const setOpenExitModal = vi.fn();
-  const setOnExitAction = vi.fn();
+  const dispatch = vi.fn();
   const goBack = vi.fn();
+  const productId = overrides.productId ?? PRODUCT_IDS.PAGOPA;
 
   const backFunctions = createBackFunctions({
-    activeStep: ACTIVE_STEP,
-    setActiveStep,
-    setOpenExitModal,
-    setOnExitAction,
-    history: { goBack } as any,
-    fromDashboard: overrides.fromDashboard ?? false,
-    productAvoidStep: overrides.productAvoidStep ?? false,
-    subunitTypeByQuery: overrides.subunitTypeByQuery ?? '',
-    institutionType: overrides.institutionType,
-    selectedProduct: { id: overrides.productId ?? PRODUCT_IDS.PAGOPA } as any,
-    origin: overrides.origin,
-    productId: overrides.productId ?? PRODUCT_IDS.PAGOPA,
-    externalInstitutionId: 'institution-id',
-    onboardingFormData: overrides.onboardingFormData,
-    isRequiredDocumentsFlow: overrides.isRequiredDocumentsFlow,
+    state: createInitialState({
+      institutionType: overrides.institutionType,
+      origin: overrides.origin,
+      selectedProduct: { id: productId } as any,
+      externalInstitutionId: 'institution-id',
+      onboardingFormData: overrides.onboardingFormData,
+    }),
+    dispatch,
+    ctx: {
+      productId,
+      fromDashboard: overrides.fromDashboard ?? false,
+      productAvoidStep: overrides.productAvoidStep ?? false,
+      subunitTypeByQuery: overrides.subunitTypeByQuery ?? '',
+      isRequiredDocumentsFlow: overrides.isRequiredDocumentsFlow,
+    },
+    effects: { history: { goBack } },
   });
 
-  return { ...backFunctions, setActiveStep, setOpenExitModal, setOnExitAction, goBack };
+  return { ...backFunctions, dispatch, goBack };
 };
 
+const goToStep = (step: OnboardingStepName) => ({ type: 'GO_TO_STEP', step });
+
 it('test handleOpenExitModal opens the modal with an exit action going back in history', () => {
-  const { handleOpenExitModal, setOpenExitModal, setOnExitAction, goBack } = buildBackFunctions();
+  const { handleOpenExitModal, dispatch, goBack } = buildBackFunctions();
 
   handleOpenExitModal();
 
-  expect(setOpenExitModal).toHaveBeenCalledWith(true);
-  const exitAction = setOnExitAction.mock.calls[0][0]();
-  exitAction();
+  expect(dispatch).toHaveBeenCalledWith({
+    type: 'OPEN_EXIT_MODAL',
+    onExitAction: expect.any(Function),
+  });
+  dispatch.mock.calls[0][0].onExitAction();
   expect(goBack).toHaveBeenCalled();
 });
 
 it('test backFromBillingData goes to the first step when coming from the dashboard', () => {
-  const { backFromBillingData, setActiveStep } = buildBackFunctions({
+  const { backFromBillingData, dispatch } = buildBackFunctions({
     fromDashboard: true,
     institutionType: 'PA',
   });
 
   backFromBillingData();
 
-  expect(setActiveStep).toHaveBeenCalledWith(0);
+  expect(dispatch).toHaveBeenCalledWith(goToStep('institutionType'));
 });
 
 it('test backFromBillingData asks to confirm the exit when the product step is skipped', () => {
@@ -75,8 +79,8 @@ it('test backFromBillingData asks to confirm the exit when the product step is s
 
   fromDashboard.backFromBillingData();
 
-  expect(fromDashboard.setOpenExitModal).toHaveBeenCalledWith(true);
-  expect(fromDashboard.setActiveStep).not.toHaveBeenCalled();
+  expect(fromDashboard.dispatch).toHaveBeenCalledTimes(1);
+  expect(fromDashboard.dispatch.mock.calls[0][0].type).toBe('OPEN_EXIT_MODAL');
 
   const fromSubunit = buildBackFunctions({
     productAvoidStep: true,
@@ -86,46 +90,46 @@ it('test backFromBillingData asks to confirm the exit when the product step is s
 
   fromSubunit.backFromBillingData();
 
-  expect(fromSubunit.setOpenExitModal).toHaveBeenCalledWith(true);
+  expect(fromSubunit.dispatch.mock.calls[0][0].type).toBe('OPEN_EXIT_MODAL');
 });
 
 it('test backFromBillingData goes to the first step for a payment service provider', () => {
-  const { backFromBillingData, setActiveStep } = buildBackFunctions({ institutionType: 'PSP' });
+  const { backFromBillingData, dispatch } = buildBackFunctions({ institutionType: 'PSP' });
 
   backFromBillingData();
 
-  expect(setActiveStep).toHaveBeenCalledWith(0);
+  expect(dispatch).toHaveBeenCalledWith(goToStep('institutionType'));
 });
 
 it('test backFromBillingData goes to the first step for an institution type without a search step', () => {
-  const { backFromBillingData, setActiveStep } = buildBackFunctions({ institutionType: 'AS' });
+  const { backFromBillingData, dispatch } = buildBackFunctions({ institutionType: 'AS' });
 
   backFromBillingData();
 
-  expect(setActiveStep).toHaveBeenCalledWith(0);
+  expect(dispatch).toHaveBeenCalledWith(goToStep('institutionType'));
 });
 
 it('test backFromBillingData goes back to the contracts summary in the required documents flow', () => {
-  const { backFromBillingData, setActiveStep } = buildBackFunctions({
+  const { backFromBillingData, dispatch } = buildBackFunctions({
     institutionType: 'GSP',
     isRequiredDocumentsFlow: true,
   });
 
   backFromBillingData();
 
-  expect(setActiveStep).toHaveBeenCalledWith(2);
+  expect(dispatch).toHaveBeenCalledWith(goToStep('contractsSummary'));
 });
 
 it('test backFromBillingData goes back to the search step by default', () => {
-  const { backFromBillingData, setActiveStep } = buildBackFunctions({ institutionType: 'PA' });
+  const { backFromBillingData, dispatch } = buildBackFunctions({ institutionType: 'PA' });
 
   backFromBillingData();
 
-  expect(setActiveStep).toHaveBeenCalledWith(1);
+  expect(dispatch).toHaveBeenCalledWith(goToStep('searchParty'));
 });
 
 it('test backFromManager skips the additional steps for a GSP from IPA on prod-pagopa', () => {
-  const { backFromManager, setActiveStep } = buildBackFunctions({
+  const { backFromManager, dispatch } = buildBackFunctions({
     institutionType: 'GSP',
     origin: 'IPA',
     productId: PRODUCT_IDS.PAGOPA,
@@ -133,11 +137,11 @@ it('test backFromManager skips the additional steps for a GSP from IPA on prod-p
 
   backFromManager();
 
-  expect(setActiveStep).toHaveBeenCalledWith(ACTIVE_STEP - 3);
+  expect(dispatch).toHaveBeenCalledWith(goToStep('billingData'));
 });
 
-it('test backFromManager goes back one step for a GSP outside IPA', () => {
-  const { backFromManager, setActiveStep } = buildBackFunctions({
+it('test backFromManager goes back to the additional info for a GSP outside IPA', () => {
+  const { backFromManager, dispatch } = buildBackFunctions({
     institutionType: 'GSP',
     origin: 'SELC',
     productId: PRODUCT_IDS.PAGOPA,
@@ -145,65 +149,153 @@ it('test backFromManager goes back one step for a GSP outside IPA', () => {
 
   backFromManager();
 
-  expect(setActiveStep).toHaveBeenCalledWith(ACTIVE_STEP - 1);
+  expect(dispatch).toHaveBeenCalledWith(goToStep('additionalInfo'));
 });
 
-it('test backFromManager goes back two steps for a GPU', () => {
-  const { backFromManager, setActiveStep } = buildBackFunctions({ institutionType: 'GPU' });
+it('test backFromManager goes back to the additional GPU info for a GPU', () => {
+  const { backFromManager, dispatch } = buildBackFunctions({ institutionType: 'GPU' });
 
   backFromManager();
 
-  expect(setActiveStep).toHaveBeenCalledWith(ACTIVE_STEP - 2);
+  expect(dispatch).toHaveBeenCalledWith(goToStep('additionalGpuInfo'));
 });
 
-it('test backFromManager goes back four steps for a tech partner', () => {
-  const { backFromManager, setActiveStep } = buildBackFunctions({ institutionType: 'PT' });
+it('test backFromManager goes back to the onboarding data for a tech partner', () => {
+  const { backFromManager, dispatch } = buildBackFunctions({ institutionType: 'PT' });
 
   backFromManager();
 
-  expect(setActiveStep).toHaveBeenCalledWith(ACTIVE_STEP - 4);
+  expect(dispatch).toHaveBeenCalledWith(goToStep('onboardingData'));
 });
 
-it('test backFromManager goes back three steps for the other institution types', () => {
-  const { backFromManager, setActiveStep } = buildBackFunctions({ institutionType: 'PA' });
+it('test backFromManager goes back to the billing data for the other institution types', () => {
+  const { backFromManager, dispatch } = buildBackFunctions({ institutionType: 'PA' });
 
   backFromManager();
 
-  expect(setActiveStep).toHaveBeenCalledWith(ACTIVE_STEP - 3);
+  expect(dispatch).toHaveBeenCalledWith(goToStep('billingData'));
 });
 
 it('test backFromAdmin skips the manager step for a tech partner', () => {
-  const { backFromAdmin, setActiveStep } = buildBackFunctions({ institutionType: 'PT' });
+  const { backFromAdmin, dispatch } = buildBackFunctions({ institutionType: 'PT' });
 
   backFromAdmin();
 
-  expect(setActiveStep).toHaveBeenCalledWith(ACTIVE_STEP - 4);
+  expect(dispatch).toHaveBeenCalledWith(goToStep('billingData'));
 });
 
-it('test backFromAdmin goes back one step for the other institution types', () => {
-  const { backFromAdmin, setActiveStep } = buildBackFunctions({ institutionType: 'PA' });
+it('test backFromAdmin goes back to the manager for the other institution types', () => {
+  const { backFromAdmin, dispatch } = buildBackFunctions({ institutionType: 'PA' });
 
   backFromAdmin();
 
-  expect(setActiveStep).toHaveBeenCalledWith(ACTIVE_STEP - 1);
+  expect(dispatch).toHaveBeenCalledWith(goToStep('manager'));
 });
 
 it('test backFromApplicantEmail goes back to the aggregates step for an aggregator', () => {
-  const { backFromApplicantEmail, setActiveStep } = buildBackFunctions({
+  const { backFromApplicantEmail, dispatch } = buildBackFunctions({
     onboardingFormData: { isAggregator: true } as OnboardingFormData,
   });
 
   backFromApplicantEmail();
 
-  expect(setActiveStep).toHaveBeenCalledWith(ACTIVE_STEP - 1);
+  expect(dispatch).toHaveBeenCalledWith(goToStep('aggregates'));
 });
 
 it('test backFromApplicantEmail skips the aggregates step for a non aggregator', () => {
-  const { backFromApplicantEmail, setActiveStep } = buildBackFunctions({
+  const { backFromApplicantEmail, dispatch } = buildBackFunctions({
     onboardingFormData: { isAggregator: false } as OnboardingFormData,
   });
 
   backFromApplicantEmail();
 
-  expect(setActiveStep).toHaveBeenCalledWith(ACTIVE_STEP - 2);
+  expect(dispatch).toHaveBeenCalledWith(goToStep('admins'));
+});
+
+it.each([
+  ['backFromSearchParty', 'institutionType'],
+  ['backFromContractsSummary', 'searchParty'],
+  ['backFromAdditionalGpuInfo', 'billingData'],
+  ['backFromAdditionalInfo', 'billingData'],
+  ['backFromAggregates', 'admins'],
+] as const)('test %s goes back to %s', (handler, step) => {
+  const backFunctions = buildBackFunctions({ institutionType: 'PA' });
+
+  backFunctions[handler]();
+
+  expect(backFunctions.dispatch).toHaveBeenCalledTimes(1);
+  expect(backFunctions.dispatch).toHaveBeenCalledWith(goToStep(step));
+});
+
+it('test handleOpenExitModal does not go back in history until the exit is confirmed', () => {
+  const { handleOpenExitModal, goBack } = buildBackFunctions();
+
+  handleOpenExitModal();
+
+  expect(goBack).not.toHaveBeenCalled();
+});
+
+it.each([['PRV'], ['PRV_PF'], ['SA'], ['GSP']] as Array<[InstitutionType]>)(
+  'test backFromBillingData goes back to the search step for %s',
+  (institutionType) => {
+    const { backFromBillingData, dispatch } = buildBackFunctions({ institutionType });
+
+    backFromBillingData();
+
+    expect(dispatch).toHaveBeenCalledWith(goToStep('searchParty'));
+  }
+);
+
+it.each([['GPU'], ['PT'], ['SCP'], ['SCEC']] as Array<[InstitutionType]>)(
+  'test backFromBillingData goes to the first step for %s, which has no search step',
+  (institutionType) => {
+    const { backFromBillingData, dispatch } = buildBackFunctions({ institutionType });
+
+    backFromBillingData();
+
+    expect(dispatch).toHaveBeenCalledWith(goToStep('institutionType'));
+  }
+);
+
+it('test backFromBillingData never redirects to the dashboard for pagoPA Insights (shadowed branch)', () => {
+  const originalLocation = window.location;
+  const assign = vi.fn();
+  Object.defineProperty(window, 'location', {
+    value: { ...originalLocation, assign },
+    configurable: true,
+  });
+  try {
+    const { backFromBillingData, dispatch } = buildBackFunctions({
+      fromDashboard: true,
+      institutionType: 'PA',
+      productId: PRODUCT_IDS.DASHBOARD_PSP,
+    });
+
+    backFromBillingData();
+
+    expect(assign).not.toHaveBeenCalled();
+    expect(dispatch).toHaveBeenCalledWith(goToStep('institutionType'));
+  } finally {
+    Object.defineProperty(window, 'location', { value: originalLocation, configurable: true });
+  }
+});
+
+it('test backFromManager goes back to the additional info for a GSP from IPA outside prod-pagopa', () => {
+  const { backFromManager, dispatch } = buildBackFunctions({
+    institutionType: 'GSP',
+    origin: 'IPA',
+    productId: PRODUCT_IDS.IO,
+  });
+
+  backFromManager();
+
+  expect(dispatch).toHaveBeenCalledWith(goToStep('additionalInfo'));
+});
+
+it('test backFromApplicantEmail goes back to the admins when the onboarding data are missing', () => {
+  const { backFromApplicantEmail, dispatch } = buildBackFunctions();
+
+  backFromApplicantEmail();
+
+  expect(dispatch).toHaveBeenCalledWith(goToStep('admins'));
 });

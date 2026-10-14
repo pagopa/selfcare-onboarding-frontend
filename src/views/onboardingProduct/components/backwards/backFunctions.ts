@@ -1,129 +1,117 @@
-/* eslint-disable functional/immutable-data */
 import { History } from 'history';
-import { Dispatch, SetStateAction } from 'react';
-import { InstitutionType, Product } from '../../../../../types';
-import { OnboardingFormData } from '../../../../model/OnboardingFormData';
-import { ENV } from '../../../../utils/env';
+import { Dispatch } from 'react';
 import {
-  isContractingAuthority,
-  isGlobalServiceProvider,
-  isPagoPaInsights,
-  isPagoPaProduct,
-  isPaymentServiceProvider,
-  isPrivateInstitution,
-  isPrivatePersonInstitution,
-  isPublicAdministration,
-  isTechPartner,
-} from '../../../../utils/institutionTypeUtils';
+  OnboardingProductAction,
+  OnboardingProductState,
+} from '../../state/onboardingProductReducer';
+import {
+  backFromAdditionalGpuInfo as backFromAdditionalGpuInfoTransition,
+  backFromAdditionalInfo as backFromAdditionalInfoTransition,
+  backFromAdmins,
+  backFromAggregates as backFromAggregatesTransition,
+  backFromApplicantEmail as backFromApplicantEmailTransition,
+  backFromBillingData as backFromBillingDataTransition,
+  backFromContractsSummary as backFromContractsSummaryTransition,
+  backFromManager as backFromManagerTransition,
+  backFromSearchParty as backFromSearchPartyTransition,
+  Transition,
+} from '../../state/onboardingTransitions';
 
-interface BackFunctionsParams {
-  activeStep: number;
-  setActiveStep: Dispatch<SetStateAction<number>>;
-  setOpenExitModal: Dispatch<SetStateAction<boolean>>;
-  setOnExitAction: Dispatch<SetStateAction<(() => void) | undefined>>;
-  history: History;
+export type BackFunctionsContext = {
+  productId: string;
   fromDashboard: boolean;
   productAvoidStep: boolean;
   subunitTypeByQuery: string;
-  institutionType: InstitutionType | undefined;
-  selectedProduct: Product | null | undefined;
-  origin: string | undefined;
-  productId: string;
-  externalInstitutionId: string;
-  onboardingFormData: OnboardingFormData | undefined;
   isRequiredDocumentsFlow?: boolean;
-}
+};
 
-export const createBackFunctions = (params: BackFunctionsParams) => {
+export type BackFunctionsEffects = {
+  history: Pick<History, 'goBack'>;
+};
+
+export type BackFunctionsParams = {
+  state: OnboardingProductState;
+  dispatch: Dispatch<OnboardingProductAction>;
+  ctx: BackFunctionsContext;
+  effects: BackFunctionsEffects;
+};
+
+/** Handlers of the back action of each step, driven by the back transitions. */
+export const createBackFunctions = ({ state, dispatch, ctx, effects }: BackFunctionsParams) => {
+  const { institutionType, origin, externalInstitutionId, selectedProduct, onboardingFormData } =
+    state;
   const {
-    activeStep,
-    setActiveStep,
-    setOpenExitModal,
-    setOnExitAction,
-    history,
+    productId,
     fromDashboard,
     productAvoidStep,
     subunitTypeByQuery,
-    institutionType,
-    selectedProduct,
-    origin,
-    productId,
-    externalInstitutionId,
-    onboardingFormData,
     isRequiredDocumentsFlow,
-  } = params;
+  } = ctx;
+  const { history } = effects;
 
   const handleOpenExitModal = () => {
-    setOnExitAction(() => () => history.goBack());
-    setOpenExitModal(true);
+    dispatch({ type: 'OPEN_EXIT_MODAL', onExitAction: () => history.goBack() });
   };
 
-  // eslint-disable-next-line complexity
-  const backFromBillingData = () => {
-    if (fromDashboard && !productAvoidStep) {
-      setActiveStep(0);
-    } else if ((fromDashboard || subunitTypeByQuery) && productAvoidStep) {
-      handleOpenExitModal();
-    } else if (
-      isPaymentServiceProvider(institutionType) ||
-      (!isPublicAdministration(institutionType) &&
-        !isContractingAuthority(institutionType) &&
-        !isGlobalServiceProvider(institutionType) &&
-        !isPrivateInstitution(institutionType) &&
-        !isPrivatePersonInstitution(institutionType))
-    ) {
-      setActiveStep(0);
-    } else if (fromDashboard && isPagoPaInsights(productId)) {
-      window.location.assign(`${ENV.URL_FE.DASHBOARD}/${externalInstitutionId}`);
-    } else if (isRequiredDocumentsFlow) {
-      setActiveStep(2);
-    } else {
-      setActiveStep(1);
-    }
-  };
-
-  const backFromManager = () => {
-    switch (institutionType) {
-      case 'GSP':
-        if (origin === 'IPA' && isPagoPaProduct(selectedProduct?.id)) {
-          setActiveStep(activeStep - 3);
-        } else {
-          setActiveStep(activeStep - 1);
-        }
+  const run = (transition: Transition) => {
+    switch (transition.kind) {
+      case 'goTo':
+        dispatch({ type: 'GO_TO_STEP', step: transition.step });
         break;
-      case 'GPU':
-        setActiveStep(activeStep - 2);
+      case 'openExitModal':
+        handleOpenExitModal();
         break;
-      case 'PT':
-        setActiveStep(activeStep - 4);
+      case 'redirect':
+        window.location.assign(transition.url);
         break;
       default:
-        setActiveStep(activeStep - 3);
         break;
     }
   };
 
-  const backFromAdmin = () => {
-    if (isTechPartner(institutionType)) {
-      setActiveStep(activeStep - 4);
-    } else {
-      setActiveStep(activeStep - 1);
-    }
-  };
+  const backFromSearchParty = () => run(backFromSearchPartyTransition());
 
-  const backFromApplicantEmail = () => {
-    if (onboardingFormData?.isAggregator) {
-      setActiveStep(activeStep - 1);
-    } else {
-      setActiveStep(activeStep - 2);
-    }
-  };
+  const backFromContractsSummary = () => run(backFromContractsSummaryTransition());
+
+  const backFromBillingData = () =>
+    run(
+      backFromBillingDataTransition({
+        fromDashboard,
+        productAvoidStep,
+        subunitTypeByQuery,
+        institutionType,
+        productId,
+        externalInstitutionId,
+        isRequiredDocumentsFlow: !!isRequiredDocumentsFlow,
+      })
+    );
+
+  const backFromAdditionalGpuInfo = () => run(backFromAdditionalGpuInfoTransition());
+
+  const backFromAdditionalInfo = () => run(backFromAdditionalInfoTransition());
+
+  const backFromManager = () =>
+    run(
+      backFromManagerTransition({ institutionType, origin, selectedProductId: selectedProduct?.id })
+    );
+
+  const backFromAdmin = () => run(backFromAdmins({ institutionType }));
+
+  const backFromAggregates = () => run(backFromAggregatesTransition());
+
+  const backFromApplicantEmail = () =>
+    run(backFromApplicantEmailTransition({ isAggregator: !!onboardingFormData?.isAggregator }));
 
   return {
     handleOpenExitModal,
+    backFromSearchParty,
+    backFromContractsSummary,
     backFromBillingData,
+    backFromAdditionalGpuInfo,
+    backFromAdditionalInfo,
     backFromManager,
     backFromAdmin,
+    backFromAggregates,
     backFromApplicantEmail,
   };
 };
