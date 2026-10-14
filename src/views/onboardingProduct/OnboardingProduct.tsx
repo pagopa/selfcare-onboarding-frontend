@@ -5,7 +5,7 @@ import { EndingPage } from '@pagopa/selfcare-common-frontend/lib';
 import SessionModal from '@pagopa/selfcare-common-frontend/lib/components/SessionModal';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
 import { uniqueId } from 'lodash';
-import { SetStateAction, useCallback, useContext, useEffect, useMemo } from 'react';
+import { useCallback, useContext, useEffect, useMemo } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
 import {
@@ -52,8 +52,7 @@ import { genericError, StepVerifyOnboarding } from './components/StepVerifyOnboa
 import StepContractsSummary from './components/contracts/StepContractsSummary';
 import { buildFlowContext } from './state/flowContext';
 import { normalizeUsers } from './state/normalizeUsers';
-import { resolveSetStateAction } from './state/onboardingProductReducer';
-import { stepIndex, stepName } from './state/onboardingSteps';
+import { stepIndex } from './state/onboardingSteps';
 import { selectFilterCategories as selectFilterCategoriesFor } from './state/selectFilterCategories';
 import { useOnboardingProductWizard } from './useOnboardingProductWizard';
 
@@ -116,12 +115,6 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     onExitAction,
   } = state;
   const activeStep = stepIndex(state.activeStep);
-  const setActiveStep = (value: SetStateAction<number>) => {
-    const step = stepName(resolveSetStateAction(value, activeStep));
-    if (step) {
-      dispatch({ type: 'GO_TO_STEP', step });
-    }
-  };
   const history = useHistory();
   const { setOnExit } = useContext(HeaderContext);
   const { t } = useTranslation();
@@ -299,9 +292,6 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     });
   };
 
-  const back = () => {
-    setActiveStep(activeStep - 1);
-  };
   const {
     forwardWithInstitutionType,
     forwardGspNoIpa,
@@ -324,26 +314,26 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
 
   const {
     handleOpenExitModal,
+    backFromSearchParty,
+    backFromContractsSummary,
     backFromBillingData,
+    backFromAdditionalGpuInfo,
+    backFromAdditionalInfo,
     backFromManager,
     backFromAdmin,
+    backFromAggregates,
     backFromApplicantEmail,
   } = createBackFunctions({
-    activeStep,
-    setActiveStep,
-    setOpenExitModal,
-    setOnExitAction,
-    history,
-    fromDashboard,
-    productAvoidStep,
-    subunitTypeByQuery,
-    institutionType,
-    selectedProduct,
-    origin,
-    productId,
-    externalInstitutionId,
-    onboardingFormData,
-    isRequiredDocumentsFlow,
+    state,
+    dispatch,
+    ctx: {
+      productId,
+      fromDashboard,
+      productAvoidStep,
+      subunitTypeByQuery,
+      isRequiredDocumentsFlow,
+    },
+    effects: { history },
   });
 
   useEffect(() => {
@@ -441,9 +431,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           institutionType,
           productAvoidStep,
           product: selectedProduct,
-          back: () => {
-            setActiveStep(0);
-          },
+          back: backFromSearchParty,
           subunitTypeByQuery,
           subunitCodeByQuery,
           selectFilterCategories,
@@ -457,7 +445,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
       Component: () =>
         StepContractsSummary({
           forward: forwardGspNoIpa,
-          back,
+          back: backFromContractsSummary,
         }),
     },
     {
@@ -527,7 +515,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
       Component: () =>
         StepAdditionalGpuInformations({
           forward: forwardWithAdditionalGPUInfo,
-          back: () => setActiveStep(activeStep - 1),
+          back: backFromAdditionalGpuInfo,
           originId: onboardingFormData?.originId,
           origin,
         }),
@@ -537,7 +525,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
       Component: () =>
         StepAdditionalInformations({
           forward: forwardWithAdditionalGSPInfo,
-          back: () => setActiveStep(activeStep - 2),
+          back: backFromAdditionalInfo,
           originId: onboardingFormData?.originId,
           origin,
         }),
@@ -587,7 +575,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           setLoading,
           setOutcome,
           forward: forwardFromAggregator,
-          back,
+          back: backFromAggregates,
         }),
     },
     {
