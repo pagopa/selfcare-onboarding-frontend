@@ -1,4 +1,3 @@
-/* eslint-disable functional/immutable-data */
 import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
 import { Dispatch, MutableRefObject } from 'react';
 import { InstitutionType } from '../../../../../types';
@@ -27,7 +26,6 @@ export type ForwardFunctionsContext = {
 
 export type ForwardFunctionsEffects = {
   requestIdRef: MutableRefObject<string | undefined>;
-  desiredOriginRef: MutableRefObject<string | Array<string> | undefined>;
   onSubmit: (
     userData?: Partial<FormData>,
     aggregates?: Array<AggregateInstitution>,
@@ -84,9 +82,9 @@ export const createForwardFunctions = ({
   ctx,
   effects,
 }: ForwardFunctionsParams) => {
-  const { formData, onboardingFormData, externalInstitutionId, origin, aggregatesData } = state;
+  const { formData, onboardingFormData, externalInstitutionId, aggregatesData } = state;
   const { productId, loggedUserTaxCode, gspNoIpaEnabled } = ctx;
-  const { requestIdRef, desiredOriginRef, onSubmit } = effects;
+  const { requestIdRef, onSubmit } = effects;
 
   const forwardWithData = (newFormData: Partial<FormData>) => {
     dispatch({ type: 'USERS_SUBMITTED', from: 'manager', formData: newFormData });
@@ -105,7 +103,6 @@ export const createForwardFunctions = ({
   };
 
   const forwardGspNoIpa = () => {
-    desiredOriginRef.current = 'SELC';
     dispatch({ type: 'GSP_NO_IPA_SELECTED', from: state.activeStep });
   };
 
@@ -113,18 +110,7 @@ export const createForwardFunctions = ({
     onboardingData: OnboardingFormData,
     institutionTypeParam: InstitutionType
   ) => {
-    if (isGspWithoutIpa(onboardingData, institutionTypeParam)) {
-      if (!gspNoIpaEnabled) {
-        desiredOriginRef.current = 'SELC';
-      }
-    } else {
-      const originToSet =
-        institutionTypeParam === 'GSP' && onboardingData?.originId
-          ? 'IPA'
-          : onboardingData?.origin || origin;
-      if (originToSet) {
-        desiredOriginRef.current = originToSet;
-      }
+    if (!isGspWithoutIpa(onboardingData, institutionTypeParam)) {
       trackEvent('ONBOARDING_PARTY_SELECTION', {
         party_id: onboardingData?.externalId,
         request_id: requestIdRef.current,

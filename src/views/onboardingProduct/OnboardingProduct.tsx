@@ -5,7 +5,7 @@ import { EndingPage } from '@pagopa/selfcare-common-frontend/lib';
 import SessionModal from '@pagopa/selfcare-common-frontend/lib/components/SessionModal';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
 import { uniqueId } from 'lodash';
-import { SetStateAction, useCallback, useContext, useEffect, useMemo, useRef } from 'react';
+import { SetStateAction, useCallback, useContext, useEffect, useMemo } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
 import {
@@ -144,7 +144,6 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     onboardingFormData,
     gspNoIpaEnabled: ENV.GSP.NO_IPA,
   });
-  const desiredOriginRef = useRef<string | undefined>();
   const { user } = useContext(UserContext);
 
   const outcomeContent: RequestOutcomeOptions = {
@@ -320,7 +319,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     state,
     dispatch,
     ctx: { productId, loggedUserTaxCode: user?.taxCode, gspNoIpaEnabled: ENV.GSP.NO_IPA },
-    effects: { requestIdRef, desiredOriginRef, onSubmit },
+    effects: { requestIdRef, onSubmit },
   });
 
   const {
