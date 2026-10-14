@@ -13,6 +13,7 @@ import {
   isPrivatePersonInstitution,
   isPublicAdministration,
   isPublicServiceCompany,
+  isTechPartner,
 } from '../../../utils/institutionTypeUtils';
 import { OnboardingStepName } from './onboardingSteps';
 
@@ -234,3 +235,44 @@ export const backFromBillingData = ({
 export const backFromAdditionalGpuInfo = (): Transition => goTo('billingData');
 
 export const backFromAdditionalInfo = (): Transition => goTo('billingData');
+
+// ---------------------------------------------------------------------------------------------
+// Back transitions: users steps
+// ---------------------------------------------------------------------------------------------
+
+/**
+ * Tech partners never reach the manager step (billing forwards them to the admins); the PT branch
+ * keeps the historical `activeStep - 4` target, i.e. the onboardingData step.
+ */
+export const backFromManager = ({
+  institutionType,
+  origin,
+  selectedProductId,
+}: Pick<TransitionContext, 'institutionType' | 'origin' | 'selectedProductId'>): Transition => {
+  switch (institutionType) {
+    case 'GSP':
+      return origin === 'IPA' && isPagoPaProduct(selectedProductId)
+        ? goTo('billingData')
+        : goTo('additionalInfo');
+    case 'GPU':
+      return goTo('additionalGpuInfo');
+    case 'PT':
+      return goTo('onboardingData');
+    default:
+      return goTo('billingData');
+  }
+};
+
+export const backFromAdmins = ({
+  institutionType,
+}: Pick<TransitionContext, 'institutionType'>): Transition =>
+  isTechPartner(institutionType) ? goTo('billingData') : goTo('manager');
+
+export const backFromAggregates = (): Transition => goTo('admins');
+
+export const backFromApplicantEmail = ({
+  isAggregator,
+}: Pick<TransitionContext, 'isAggregator'>): Transition =>
+  isAggregator ? goTo('aggregates') : goTo('admins');
+
+export const backFromUploadDocuments = (): Transition => goTo('admins');
