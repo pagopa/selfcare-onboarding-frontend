@@ -1,4 +1,3 @@
-/* eslint-disable sonarjs/cognitive-complexity */
 import { Container } from '@mui/material';
 import { IllusError } from '@pagopa/mui-italia';
 import { EndingPage } from '@pagopa/selfcare-common-frontend/lib';
@@ -69,7 +68,6 @@ export const prodPhaseOutErrorPage: RequestOutcomeMessage = {
   ],
 };
 
-// eslint-disable-next-line sonarjs/cognitive-complexity, complexity
 function OnboardingProductComponent({ productId }: { productId: string }) {
   const {
     state,
