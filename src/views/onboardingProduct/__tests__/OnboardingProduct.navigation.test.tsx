@@ -391,3 +391,25 @@ describe('Applicant email step (logged user not among the users)', () => {
     );
   });
 });
+
+describe('Institution type change', () => {
+  test('A14: billing data are kept when the same type outside the party-search list is selected again and reset when it changes', async () => {
+    renderComponent(PRODUCT_IDS.PAGOPA);
+    await executeStepInstitutionType(PRODUCT_IDS.PAGOPA, 'PSP');
+    await executeStepBillingData(PRODUCT_IDS.PAGOPA, 'PSP', false, false, 'NO_IPA');
+    await waitFor(() => screen.getByText(MANAGER_TITLE));
+
+    await executeBack(BILLING_TITLE);
+    await executeBack(INSTITUTION_TYPE_TITLE);
+
+    await executeStepInstitutionType(PRODUCT_IDS.PAGOPA, 'PSP');
+    await waitFor(() => screen.getByText(BILLING_TITLE));
+    expect(document.getElementById('businessName')).not.toHaveValue('');
+
+    await executeBack(INSTITUTION_TYPE_TITLE);
+
+    await executeStepInstitutionType(PRODUCT_IDS.PAGOPA, 'PT');
+    await waitFor(() => screen.getByText(BILLING_TITLE));
+    expect(document.getElementById('businessName')).toHaveValue('');
+  });
+});
