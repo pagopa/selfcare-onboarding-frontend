@@ -52,7 +52,7 @@ import { genericError, StepVerifyOnboarding } from './components/StepVerifyOnboa
 import StepContractsSummary from './components/contracts/StepContractsSummary';
 import { buildFlowContext } from './state/flowContext';
 import { normalizeUsers } from './state/normalizeUsers';
-import { stepIndex } from './state/onboardingSteps';
+import { OnboardingStepName } from './state/onboardingSteps';
 import { selectFilterCategories as selectFilterCategoriesFor } from './state/selectFilterCategories';
 import { useOnboardingProductWizard } from './useOnboardingProductWizard';
 
@@ -114,7 +114,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     categoriesLoaded,
     onExitAction,
   } = state;
-  const activeStep = stepIndex(state.activeStep);
+  const { activeStep } = state;
   const history = useHistory();
   const { setOnExit } = useContext(HeaderContext);
   const { t } = useTranslation();
@@ -395,8 +395,8 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     [filterCategoriesResponse, productId, institutionType]
   );
 
-  const steps: Array<StepperStep> = [
-    {
+  const steps: Record<OnboardingStepName, StepperStep> = {
+    institutionType: {
       label: 'Select institution type',
       Component: () =>
         StepInstitutionType({
@@ -414,7 +414,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           genericError,
         }),
     },
-    {
+    searchParty: {
       label: 'Search and select party',
       Component: () =>
         StepSearchParty({
@@ -440,7 +440,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           addUser,
         }),
     },
-    {
+    contractsSummary: {
       label: 'Gpu contracts summary',
       Component: () =>
         StepContractsSummary({
@@ -448,7 +448,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           back: backFromContractsSummary,
         }),
     },
-    {
+    verifyOnboarding: {
       label: 'Verify onboarding',
       Component: () =>
         StepVerifyOnboarding({
@@ -461,7 +461,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           institutionType,
         }),
     },
-    {
+    onboardingData: {
       label: 'Get onboarding data',
       Component: () =>
         StepOnboardingData({
@@ -470,7 +470,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           forward: forwardWithOnboardingData,
         }),
     },
-    {
+    billingData: {
       label: 'Insert billing data',
       Component: () =>
         StepOnboardingFormData({
@@ -510,7 +510,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           back: backFromBillingData,
         }),
     },
-    {
+    additionalGpuInfo: {
       label: 'Insert additional GPU data info',
       Component: () =>
         StepAdditionalGpuInformations({
@@ -520,7 +520,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           origin,
         }),
     },
-    {
+    additionalInfo: {
       label: 'Insert additional info',
       Component: () =>
         StepAdditionalInformations({
@@ -530,7 +530,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           origin,
         }),
     },
-    {
+    manager: {
       label: 'Insert manager data',
       Component: () =>
         StepAddManager({
@@ -542,7 +542,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           back: backFromManager,
         }),
     },
-    {
+    admins: {
       label: 'Insert admins data',
       Component: () =>
         StepAddAdmin({
@@ -563,7 +563,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           back: backFromAdmin,
         }),
     },
-    {
+    aggregates: {
       label: 'Upload aggregate list',
       Component: () =>
         StepUploadAggregates({
@@ -578,7 +578,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           back: backFromAggregates,
         }),
     },
-    {
+    applicantEmail: {
       label: "Step add applicant's email",
       Component: () =>
         StepAddApplicantEmail({
@@ -593,7 +593,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           isRequiredDocumentsFlow,
         }),
     },
-  ];
+  };
 
   const Step = useMemo(() => steps[activeStep].Component, [activeStep, selectedProduct]);
 
