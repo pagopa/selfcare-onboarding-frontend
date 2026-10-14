@@ -3,20 +3,24 @@ import { InstitutionType, Product, RequestOutcomeMessage } from '../../../../typ
 import { AdditionalGpuInformations } from '../../../model/AdditionalGpuInformations';
 import { AdditionalInformations } from '../../../model/AdditionalInformations';
 import { AggregateInstitution } from '../../../model/AggregateInstitution';
-import { OnboardingFormData } from '../../../model/OnboardingFormData';
+import { OnboardingFormData, UserRequester } from '../../../model/OnboardingFormData';
 import { selected2OnboardingData } from '../../../utils/selected2OnboardingData';
 import { OnboardingStepName } from './onboardingSteps';
 import {
   afterAdditionalGpuInfo,
   afterAdditionalInfo,
+  afterAdmins,
+  afterAggregates,
   afterBillingData,
   afterGspNoIpa,
   afterInstitutionType,
+  afterManager,
   afterOnboardingData,
   afterPartySelection,
   goTo,
   isGspWithoutIpa,
   isPrivateWithoutPartySearch,
+  requiresApplicantEmail,
   skipsPartySearch,
   Transition,
 } from './onboardingTransitions';
@@ -104,7 +108,20 @@ export type OnboardingProductAction =
   | {
       type: 'ADDITIONAL_GPU_INFO_SUBMITTED';
       additionalGPUInformations: AdditionalGpuInformations;
-    };
+    }
+  | {
+      type: 'USERS_SUBMITTED';
+      from: 'manager' | 'admins';
+      formData?: Partial<FormData>;
+      loggedUserTaxCode?: string;
+    }
+  | {
+      type: 'AGGREGATES_SUBMITTED';
+      aggregates?: Array<AggregateInstitution>;
+      loggedUserTaxCode?: string;
+    }
+  | { type: 'APPLICANT_EMAIL_SUBMITTED'; userRequester: UserRequester }
+  | { type: 'GO_TO_STEP'; step: OnboardingStepName };
 
 const selectInstitutionType = (
   state: OnboardingProductState,
@@ -177,6 +194,28 @@ const selectParty = (
   );
 };
 
+export const usersOf = (
+  formData: Partial<FormData> | undefined
+): Array<{ taxCode?: string }> | undefined => (formData as any)?.users;
+
+/** Manager and admins steps: merge the users into the form data and move on. */
+const submitUsers = (
+  state: OnboardingProductState,
+  from: 'manager' | 'admins',
+  newFormData: Partial<FormData> | undefined,
+  loggedUserTaxCode: string | undefined
+): OnboardingProductState => {
+  const formData = { ...state.formData, ...newFormData };
+  const transition =
+    from === 'manager'
+      ? afterManager()
+      : afterAdmins({
+          isAggregator: !!state.onboardingFormData?.isAggregator,
+          isApplicantEmailRequired: requiresApplicantEmail(usersOf(formData), loggedUserTaxCode),
+        });
+  return applyTransition({ ...state, formData }, transition);
+};
+
 export const onboardingProductReducer = (
   state: OnboardingProductState,
   action: OnboardingProductAction
@@ -215,6 +254,26 @@ export const onboardingProductReducer = (
         { ...state, additionalGPUInformations: action.additionalGPUInformations },
         afterAdditionalGpuInfo()
       );
+    case 'USERS_SUBMITTED':
+      return submitUsers(state, action.from, action.formData, action.loggedUserTaxCode);
+    case 'AGGREGATES_SUBMITTED':
+      // Without the applicant email step the onboarding is submitted: nothing changes here.
+      return requiresApplicantEmail(usersOf(state.formData), action.loggedUserTaxCode)
+        ? applyTransition(
+            { ...state, aggregatesData: action.aggregates, loading: false },
+            afterAggregates({ isApplicantEmailRequired: true })
+          )
+        : state;
+    case 'APPLICANT_EMAIL_SUBMITTED':
+      return {
+        ...state,
+        onboardingFormData: {
+          ...state.onboardingFormData,
+          userRequester: action.userRequester,
+        } as OnboardingFormData,
+      };
+    case 'GO_TO_STEP':
+      return applyTransition(state, goTo(action.step));
     default:
       return state;
   }
