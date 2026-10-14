@@ -17,6 +17,7 @@ import {
   afterManager,
   afterOnboardingData,
   afterPartySelection,
+  backFromUploadDocuments,
   goTo,
   isGspWithoutIpa,
   isPrivateWithoutPartySearch,
@@ -121,7 +122,27 @@ export type OnboardingProductAction =
       loggedUserTaxCode?: string;
     }
   | { type: 'APPLICANT_EMAIL_SUBMITTED'; userRequester: UserRequester }
-  | { type: 'GO_TO_STEP'; step: OnboardingStepName };
+  | { type: 'GO_TO_STEP'; step: OnboardingStepName }
+  | OnboardingProductUiAction;
+
+/** Actions mirroring plain setters (value or updater) and UI toggles. */
+export type OnboardingProductUiAction =
+  | { type: 'SET_LOADING'; loading: SetStateAction<boolean> }
+  | { type: 'SET_OUTCOME'; outcome: SetStateAction<RequestOutcomeMessage | null | undefined> }
+  | { type: 'PRODUCT_LOADED'; product: SetStateAction<Product | null | undefined> }
+  | { type: 'PRICING_PLAN_LOADED'; pricingPlan?: string }
+  | { type: 'SET_INSTITUTION_TYPE'; institutionType: SetStateAction<InstitutionType | undefined> }
+  | { type: 'SET_ORIGIN'; origin: SetStateAction<string | undefined> }
+  | { type: 'CATEGORIES_LOADING' }
+  | { type: 'FILTER_CATEGORIES_RECEIVED'; response: SetStateAction<any> }
+  | { type: 'CATEGORIES_LOADED' }
+  | { type: 'SET_EXIT_MODAL_OPEN'; open: SetStateAction<boolean> }
+  | { type: 'SET_EXIT_ACTION'; onExitAction: SetStateAction<(() => void) | undefined> }
+  | { type: 'OPEN_EXIT_MODAL'; onExitAction: () => void }
+  | { type: 'CLOSE_EXIT_MODAL' }
+  | { type: 'OPEN_UPLOAD_DOCUMENTS'; context: UploadDocumentsContext }
+  | { type: 'UPLOAD_DOCUMENTS_BACK' }
+  | { type: 'UPLOAD_DOCUMENTS_COMPLETED'; outcome: RequestOutcomeMessage };
 
 const selectInstitutionType = (
   state: OnboardingProductState,
@@ -216,6 +237,63 @@ const submitUsers = (
   return applyTransition({ ...state, formData }, transition);
 };
 
+const uiReducer = (
+  state: OnboardingProductState,
+  action: OnboardingProductUiAction
+): OnboardingProductState => {
+  switch (action.type) {
+    case 'SET_LOADING':
+      return { ...state, loading: resolveSetStateAction(action.loading, state.loading) };
+    case 'SET_OUTCOME':
+      return { ...state, outcome: resolveSetStateAction(action.outcome, state.outcome) };
+    case 'PRODUCT_LOADED':
+      return {
+        ...state,
+        selectedProduct: resolveSetStateAction(action.product, state.selectedProduct),
+      };
+    case 'PRICING_PLAN_LOADED':
+      return { ...state, pricingPlan: action.pricingPlan };
+    case 'SET_INSTITUTION_TYPE':
+      return {
+        ...state,
+        institutionType: resolveSetStateAction(action.institutionType, state.institutionType),
+      };
+    case 'SET_ORIGIN':
+      return { ...state, origin: resolveSetStateAction(action.origin, state.origin) };
+    case 'CATEGORIES_LOADING':
+      return { ...state, categoriesLoaded: false };
+    case 'FILTER_CATEGORIES_RECEIVED':
+      return {
+        ...state,
+        filterCategoriesResponse: resolveSetStateAction(
+          action.response,
+          state.filterCategoriesResponse
+        ),
+      };
+    case 'CATEGORIES_LOADED':
+      return { ...state, categoriesLoaded: true };
+    case 'SET_EXIT_MODAL_OPEN':
+      return { ...state, openExitModal: resolveSetStateAction(action.open, state.openExitModal) };
+    case 'SET_EXIT_ACTION':
+      return {
+        ...state,
+        onExitAction: resolveSetStateAction(action.onExitAction, state.onExitAction),
+      };
+    case 'OPEN_EXIT_MODAL':
+      return { ...state, openExitModal: true, onExitAction: action.onExitAction };
+    case 'CLOSE_EXIT_MODAL':
+      return { ...state, openExitModal: false, onExitAction: undefined };
+    case 'OPEN_UPLOAD_DOCUMENTS':
+      return { ...state, uploadDocumentsContext: action.context };
+    case 'UPLOAD_DOCUMENTS_BACK':
+      return applyTransition({ ...state, uploadDocumentsContext: null }, backFromUploadDocuments());
+    case 'UPLOAD_DOCUMENTS_COMPLETED':
+      return { ...state, uploadDocumentsContext: null, outcome: action.outcome };
+    default:
+      return state;
+  }
+};
+
 export const onboardingProductReducer = (
   state: OnboardingProductState,
   action: OnboardingProductAction
@@ -275,6 +353,6 @@ export const onboardingProductReducer = (
     case 'GO_TO_STEP':
       return applyTransition(state, goTo(action.step));
     default:
-      return state;
+      return uiReducer(state, action);
   }
 };
