@@ -132,3 +132,47 @@ export const afterPartySelection = (
 export const afterVerifyOnboarding = (): Transition => goTo('onboardingData');
 
 export const afterOnboardingData = (): Transition => goTo('billingData');
+
+// ---------------------------------------------------------------------------------------------
+// Forward transitions: data and users
+// ---------------------------------------------------------------------------------------------
+
+/** `origin` must be the effective one: the submitted billing origin, falling back to the current. */
+export const afterBillingData = ({
+  institutionType,
+  origin,
+}: Pick<TransitionContext, 'institutionType' | 'origin'>): Transition => {
+  switch (institutionType) {
+    case 'GSP':
+      return origin === 'IPA' ? goTo('manager') : goTo('additionalInfo');
+    case 'GPU':
+      return goTo('additionalGpuInfo');
+    case 'PT':
+      return goTo('admins');
+    default:
+      return goTo('manager');
+  }
+};
+
+export const afterAdditionalInfo = (): Transition => goTo('manager');
+
+export const afterAdditionalGpuInfo = (): Transition => goTo('manager');
+
+export const afterManager = (): Transition => goTo('admins');
+
+export const afterAdmins = ({
+  isAggregator,
+  isApplicantEmailRequired,
+}: Pick<TransitionContext, 'isAggregator' | 'isApplicantEmailRequired'>): Transition => {
+  if (isAggregator) {
+    return goTo('aggregates');
+  }
+  return isApplicantEmailRequired ? goTo('applicantEmail') : submit();
+};
+
+export const afterAggregates = ({
+  isApplicantEmailRequired,
+}: Pick<TransitionContext, 'isApplicantEmailRequired'>): Transition =>
+  isApplicantEmailRequired ? goTo('applicantEmail') : submit();
+
+export const afterApplicantEmail = (): Transition => submit();
