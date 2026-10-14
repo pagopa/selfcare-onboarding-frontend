@@ -257,6 +257,8 @@ Sottotask
 - ST-6.4 Aggiornare `backFunctions.test.ts` (stessi scenari, nuova firma).
 - ST-6.5 Nuovo `forwardFunctions.test.ts`: payload `trackEvent`, chiamate a `onSubmit` e `dispatch`.
 - ST-6.6 Adeguare `OnboardingProduct.tsx` alla nuova firma (tramite l'hook) per mantenerlo compilabile e verde.
+  *Esito*: nessun commit dedicato. Poiché forward/back inviano azioni del reducer, il componente è
+  passato allo stato dell'hook già in ST-6.1/ST-6.3, per mantenere verde ogni commit.
 - ST-6.7 tsc + lint + test di `onboardingProduct` sul branch, push e PR `feat/US-6` → `feat/SELC-9345` (descrizione, task con commit, test e comandi con esito).
 
 ---
@@ -274,11 +276,14 @@ Criteri di accettazione
 
 Sottotask
 - ST-7.0 Creare `feat/US-7` da `feat/SELC-9345` aggiornato (con US-2 e US-6).
-- ST-7.1 Sostituire gli `useState` con lo stato dell'hook.
+- ~~ST-7.1 Sostituire gli `useState` con lo stato dell'hook.~~ Anticipato in US-6 (ST-6.1).
 - ST-7.2 Mappa degli step per nome e selezione dello step corrente (memo invariato).
-- ST-7.3 Rimuovere `pendingForward` e i 2 effect relativi (sostituiti da `PARTY_SELECTED`).
-- ST-7.4 Rimuovere `desiredOriginRef` dal componente.
-- ST-7.5 Back di `UploadDocumentsFlow` tramite `GO_TO_STEP('admins')`; `onSuccess` tramite azioni.
+- ~~ST-7.3 Rimuovere `pendingForward` e i 2 effect relativi (sostituiti da `PARTY_SELECTED`).~~ Anticipato in US-6 (ST-6.1).
+- ~~ST-7.4 Rimuovere `desiredOriginRef` dal componente.~~ Anticipato in US-6 (ST-6.2).
+- ~~ST-7.5 Back di `UploadDocumentsFlow` tramite `GO_TO_STEP('admins')`; `onSuccess` tramite azioni.~~
+  Anticipato in US-6 (ST-6.1, con `UPLOAD_DOCUMENTS_BACK` / `UPLOAD_DOCUMENTS_COMPLETED`).
+- ST-7.5b Estrarre dal componente le pagine di esito (`outcomeContent`, `notAllowedError`) in un
+  modulo dedicato, per ridurne dimensione e complessità.
 - ST-7.6 Rimuovere gli `eslint-disable` di complessità, se non più necessari.
 - ST-7.7 Eseguire tutte le suite `OnboardingProduct.*.test.tsx` e `documents/__tests__`.
 - ST-7.8 tsc + lint sul branch, push e PR `feat/US-7` → `feat/SELC-9345` (descrizione, task con commit, test e comandi con esito).
