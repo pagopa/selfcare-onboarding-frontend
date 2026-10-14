@@ -1,6 +1,5 @@
-/* eslint-disable sonarjs/cognitive-complexity */
 import { Container } from '@mui/material';
-import { IllusCompleted, IllusError } from '@pagopa/mui-italia';
+import { IllusError } from '@pagopa/mui-italia';
 import { EndingPage } from '@pagopa/selfcare-common-frontend/lib';
 import SessionModal from '@pagopa/selfcare-common-frontend/lib/components/SessionModal';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
@@ -8,15 +7,8 @@ import { uniqueId } from 'lodash';
 import { useCallback, useContext, useEffect, useMemo } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
-import {
-  InstitutionType,
-  RequestOutcomeMessage,
-  RequestOutcomeOptions,
-  StepperStep,
-  UserOnCreate,
-} from '../../../types';
+import { InstitutionType, RequestOutcomeMessage, StepperStep, UserOnCreate } from '../../../types';
 import NoProductPage from '../../components/layout/NoProductPage';
-import UserNotAllowedPage from '../../components/layout/UserNotAllowedPage';
 import { LoadingOverlay } from '../../components/modals/LoadingOverlay';
 import { MessageNoAction } from '../../components/shared/MessageNoAction';
 import { StepAddManager } from '../../components/steps/StepAddManager';
@@ -31,12 +23,7 @@ import { OnboardingFormData } from '../../model/OnboardingFormData';
 import { checkProduct, getFilterCategories } from '../../services/onboardingServices';
 import { postOnboardingSubmit } from '../../services/onboardingSubmitServices';
 import { ENV } from '../../utils/env';
-import {
-  isPagoPaProduct,
-  isPublicAdministration,
-  isSendProduct,
-  isTechPartner,
-} from '../../utils/institutionTypeUtils';
+import { isPagoPaProduct, isSendProduct, isTechPartner } from '../../utils/institutionTypeUtils';
 import { triggerQualtricsIntercept } from '../../utils/qualtricsUtils';
 import { registerUnloadEvent, unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
 import { OnboardingApi } from '../../api/OnboardingApiClient';
@@ -52,8 +39,9 @@ import { genericError, StepVerifyOnboarding } from './components/StepVerifyOnboa
 import StepContractsSummary from './components/contracts/StepContractsSummary';
 import { buildFlowContext } from './state/flowContext';
 import { normalizeUsers } from './state/normalizeUsers';
-import { stepIndex } from './state/onboardingSteps';
+import { OnboardingStepName } from './state/onboardingSteps';
 import { selectFilterCategories as selectFilterCategoriesFor } from './state/selectFilterCategories';
+import { buildNotAllowedError, buildOutcomeContent } from './outcomes/onboardingProductOutcomes';
 import { useOnboardingProductWizard } from './useOnboardingProductWizard';
 
 export type ValidateErrorType = 'conflictError';
@@ -80,7 +68,6 @@ export const prodPhaseOutErrorPage: RequestOutcomeMessage = {
   ],
 };
 
-// eslint-disable-next-line sonarjs/cognitive-complexity, complexity
 function OnboardingProductComponent({ productId }: { productId: string }) {
   const {
     state,
@@ -114,7 +101,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     categoriesLoaded,
     onExitAction,
   } = state;
-  const activeStep = stepIndex(state.activeStep);
+  const { activeStep } = state;
   const history = useHistory();
   const { setOnExit } = useContext(HeaderContext);
   const { t } = useTranslation();
@@ -139,85 +126,12 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
   });
   const { user } = useContext(UserContext);
 
-  const outcomeContent: RequestOutcomeOptions = {
-    success: {
-      title: '',
-      description: [
-        <>
-          <EndingPage
-            minHeight="52vh"
-            icon={<IllusCompleted size={60} />}
-            title={
-              isTechPartner(institutionType)
-                ? t('onboarding.success.flow.techPartner.title')
-                : t('onboarding.success.flow.product.title')
-            }
-            description={
-              isTechPartner(institutionType) ? (
-                <Trans
-                  i18nKey="onboarding.success.flow.techPartner.description"
-                  components={{ 1: <br /> }}
-                >
-                  {`Invieremo un'email con l'esito della richiesta all'indirizzo <1 />PEC indicato.`}
-                </Trans>
-              ) : isPublicAdministration(institutionType) ? (
-                <Trans
-                  i18nKey="onboarding.success.flow.product.publicAdministration.description"
-                  components={{ 1: <br />, 3: <br /> }}
-                >
-                  {`Invieremo un'email all'indirizzo PEC primario dell'ente. <1 /> Al suo interno, ci sono le istruzioni per completare <3 />l'adesione.`}
-                </Trans>
-              ) : (
-                <Trans
-                  i18nKey="onboarding.success.flow.product.notPublicAdministration.description"
-                  components={{ 1: <br />, 3: <br /> }}
-                >
-                  {`Invieremo un'email all'indirizzo PEC indicato. <1 /> Al suo interno, ci sono le istruzioni per completare <3 />l'adesione.`}
-                </Trans>
-              )
-            }
-            variantTitle={'h4'}
-            variantDescription={'body1'}
-            buttonLabel={t('onboarding.backHome')}
-            onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
-          />
-        </>,
-      ],
-    },
-    error: {
-      title: '',
-      description: [
-        <>
-          <EndingPage
-            minHeight="52vh"
-            icon={<IllusError size={60} />}
-            variantTitle={'h4'}
-            variantDescription={'body1'}
-            title={t('onboarding.error.title')}
-            description={
-              <Trans i18nKey="onboarding.error.description" components={{ 1: <br /> }}>
-                {`A causa di un errore del sistema non è possibile completare <1 />la procedura. Ti chiediamo di riprovare più tardi.`}
-              </Trans>
-            }
-            buttonLabel={t('onboarding.backHome')}
-            onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
-          />
-        </>,
-      ],
-    },
-  };
+  const outcomeContent = buildOutcomeContent(institutionType, t);
 
-  const notAllowedError: RequestOutcomeMessage = {
-    title: '',
-    description: [
-      <>
-        <UserNotAllowedPage
-          partyName={onboardingFormData?.businessName}
-          productTitle={selectedProduct?.title}
-        />
-      </>,
-    ],
-  };
+  const notAllowedError = buildNotAllowedError(
+    onboardingFormData?.businessName,
+    selectedProduct?.title
+  );
 
   const enterRequiredDocumentsFlow = () => {
     void OnboardingApi.getOnboardings(onboardingFormData?.taxCode ?? '', 'REQUESTING')
@@ -395,8 +309,8 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     [filterCategoriesResponse, productId, institutionType]
   );
 
-  const steps: Array<StepperStep> = [
-    {
+  const steps: Record<OnboardingStepName, StepperStep> = {
+    institutionType: {
       label: 'Select institution type',
       Component: () =>
         StepInstitutionType({
@@ -414,7 +328,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           genericError,
         }),
     },
-    {
+    searchParty: {
       label: 'Search and select party',
       Component: () =>
         StepSearchParty({
@@ -440,7 +354,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           addUser,
         }),
     },
-    {
+    contractsSummary: {
       label: 'Gpu contracts summary',
       Component: () =>
         StepContractsSummary({
@@ -448,7 +362,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           back: backFromContractsSummary,
         }),
     },
-    {
+    verifyOnboarding: {
       label: 'Verify onboarding',
       Component: () =>
         StepVerifyOnboarding({
@@ -461,7 +375,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           institutionType,
         }),
     },
-    {
+    onboardingData: {
       label: 'Get onboarding data',
       Component: () =>
         StepOnboardingData({
@@ -470,7 +384,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           forward: forwardWithOnboardingData,
         }),
     },
-    {
+    billingData: {
       label: 'Insert billing data',
       Component: () =>
         StepOnboardingFormData({
@@ -510,7 +424,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           back: backFromBillingData,
         }),
     },
-    {
+    additionalGpuInfo: {
       label: 'Insert additional GPU data info',
       Component: () =>
         StepAdditionalGpuInformations({
@@ -520,7 +434,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           origin,
         }),
     },
-    {
+    additionalInfo: {
       label: 'Insert additional info',
       Component: () =>
         StepAdditionalInformations({
@@ -530,7 +444,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           origin,
         }),
     },
-    {
+    manager: {
       label: 'Insert manager data',
       Component: () =>
         StepAddManager({
@@ -542,7 +456,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           back: backFromManager,
         }),
     },
-    {
+    admins: {
       label: 'Insert admins data',
       Component: () =>
         StepAddAdmin({
@@ -563,7 +477,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           back: backFromAdmin,
         }),
     },
-    {
+    aggregates: {
       label: 'Upload aggregate list',
       Component: () =>
         StepUploadAggregates({
@@ -578,7 +492,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           back: backFromAggregates,
         }),
     },
-    {
+    applicantEmail: {
       label: "Step add applicant's email",
       Component: () =>
         StepAddApplicantEmail({
@@ -593,7 +507,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           isRequiredDocumentsFlow,
         }),
     },
-  ];
+  };
 
   const Step = useMemo(() => steps[activeStep].Component, [activeStep, selectedProduct]);
 
