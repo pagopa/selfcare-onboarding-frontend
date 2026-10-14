@@ -346,6 +346,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     onSubmit,
     aggregatesData,
     setAggregatesData,
+    setLoading,
   });
 
   const {

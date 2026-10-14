@@ -51,6 +51,7 @@ interface ForwardFunctionsParams {
   ) => void;
   aggregatesData: Array<AggregateInstitution> | undefined;
   setAggregatesData: Dispatch<SetStateAction<Array<AggregateInstitution> | undefined>>;
+  setLoading: Dispatch<SetStateAction<boolean>>;
 }
 
 export const createForwardFunctions = (params: ForwardFunctionsParams) => {
@@ -78,6 +79,7 @@ export const createForwardFunctions = (params: ForwardFunctionsParams) => {
     onSubmit,
     aggregatesData,
     setAggregatesData,
+    setLoading,
   } = params;
 
   const forwardWithData = (newFormData: Partial<FormData>) => {
@@ -304,6 +306,8 @@ export const createForwardFunctions = (params: ForwardFunctionsParams) => {
   const forwardFromAggregator = (_: any, aggregates?: Array<AggregateInstitution>) => {
     if ((formData as any)?.users?.every((u: UserOnCreate) => u.taxCode !== user?.taxCode)) {
       setAggregatesData(aggregates);
+      // verifyAggregates leaves the loading on: release it since no submit happens here
+      setLoading(false);
       forward();
     } else {
       onSubmit(undefined, aggregates);
