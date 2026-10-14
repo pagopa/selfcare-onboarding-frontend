@@ -444,3 +444,116 @@ describe('UI actions', () => {
     expect(reduce(state, { type: 'UNKNOWN' } as unknown as OnboardingProductAction)).toBe(state);
   });
 });
+
+describe('guards and immutability', () => {
+  test('PARTY_SELECTED without externalId records the party but stays on the search', () => {
+    const party = billing({ externalId: undefined });
+    const state = reduce(createInitialState({ activeStep: 'searchParty' }), {
+      type: 'PARTY_SELECTED',
+      party,
+      institutionType: 'PA',
+      gspNoIpaEnabled: false,
+    });
+    expect(state).toMatchObject({
+      activeStep: 'searchParty',
+      onboardingFormData: party,
+      externalInstitutionId: '',
+      institutionType: 'PA',
+    });
+    expect(state.formData).toBeUndefined();
+  });
+
+  test('PARTY_SELECTED without externalId moves on, without merging, when users were collected', () => {
+    const formData = { users: [] } as unknown as Partial<FormData>;
+    const state = reduce(createInitialState({ activeStep: 'searchParty', formData }), {
+      type: 'PARTY_SELECTED',
+      party: billing({ externalId: undefined }),
+      institutionType: 'PA',
+      gspNoIpaEnabled: false,
+    });
+    expect(state.activeStep).toBe('verifyOnboarding');
+    expect(state.formData).toBe(formData);
+  });
+
+  const deepFreeze = <T>(value: T): T => {
+    if (value && typeof value === 'object' && !Object.isFrozen(value)) {
+      Object.freeze(value);
+      Object.values(value).forEach(deepFreeze);
+    }
+    return value;
+  };
+
+  const populated = (): OnboardingProductState =>
+    createInitialState({
+      activeStep: 'admins',
+      institutionType: 'PSP',
+      origin: 'IPA',
+      externalInstitutionId: 'ext-1',
+      onboardingFormData: billing({ isAggregator: false, geographicTaxonomies: [] }),
+      formData: { users: [{ taxCode: 'X' }] } as unknown as Partial<FormData>,
+      aggregatesData: [],
+    });
+
+  const allActions: Array<OnboardingProductAction> = [
+    { type: 'INSTITUTION_TYPE_SELECTED', institutionType: 'PT', productId: 'prod-pagopa' },
+    { type: 'INSTITUTION_TYPE_SELECTED', institutionType: 'PRV', productId: 'prod-pagopa' },
+    {
+      type: 'PARTY_SELECTED',
+      party: billing({ externalId: 'ext-2' }),
+      institutionType: 'PA',
+      gspNoIpaEnabled: false,
+    },
+    {
+      type: 'PARTY_SELECTED',
+      party: billing({ taxCode: '' }),
+      institutionType: 'GSP',
+      gspNoIpaEnabled: false,
+    },
+    { type: 'GSP_NO_IPA_SELECTED', from: 'searchParty' },
+    { type: 'ONBOARDING_DATA_LOADED', onboardingFormData: billing(), institutionType: 'PA' },
+    { type: 'BILLING_DATA_SUBMITTED', onboardingFormData: billing() },
+    { type: 'ADDITIONAL_INFO_SUBMITTED', additionalInformations: {} as any },
+    { type: 'ADDITIONAL_GPU_INFO_SUBMITTED', additionalGPUInformations: {} as any },
+    { type: 'USERS_SUBMITTED', from: 'manager', formData: { users: [] } as any },
+    { type: 'USERS_SUBMITTED', from: 'admins', formData: { users: [] } as any },
+    { type: 'AGGREGATES_SUBMITTED', aggregates: [], loggedUserTaxCode: LOGGED },
+    {
+      type: 'APPLICANT_EMAIL_SUBMITTED',
+      userRequester: { name: 'a', surname: 'b', email: 'c' },
+    },
+    { type: 'GO_TO_STEP', step: 'manager' },
+    { type: 'SET_LOADING', loading: (prev) => !prev },
+    { type: 'SET_OUTCOME', outcome },
+    { type: 'PRODUCT_LOADED', product: null },
+    { type: 'PRICING_PLAN_LOADED', pricingPlan: 'FA' },
+    { type: 'SET_INSTITUTION_TYPE', institutionType: 'PA' },
+    { type: 'SET_ORIGIN', origin: 'SELC' },
+    { type: 'CATEGORIES_LOADING' },
+    { type: 'FILTER_CATEGORIES_RECEIVED', response: {} },
+    { type: 'CATEGORIES_LOADED' },
+    { type: 'SET_EXIT_MODAL_OPEN', open: true },
+    { type: 'SET_EXIT_ACTION', onExitAction: undefined },
+    { type: 'OPEN_EXIT_MODAL', onExitAction: () => undefined },
+    { type: 'CLOSE_EXIT_MODAL' },
+    {
+      type: 'OPEN_UPLOAD_DOCUMENTS',
+      context: { onboardingId: 'o', productId: 'p', institutionType: 'GSP', origin: 'SELC' },
+    },
+    { type: 'UPLOAD_DOCUMENTS_BACK' },
+    { type: 'UPLOAD_DOCUMENTS_COMPLETED', outcome },
+  ];
+
+  test.each(allActions.map((action) => [action.type, action] as const))(
+    '%s does not mutate the previous state',
+    (_type, action) => {
+      const previous = deepFreeze(populated());
+      const snapshot = JSON.parse(JSON.stringify(previous));
+      expect(() => reduce(previous, action)).not.toThrow();
+      expect(JSON.parse(JSON.stringify(previous))).toEqual(snapshot);
+    }
+  );
+
+  test('every action type is covered by the immutability check', () => {
+    expect(new Set(allActions.map((a) => a.type)).size).toBe(27);
+  });
+});
