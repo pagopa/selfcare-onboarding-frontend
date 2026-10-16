@@ -1,23 +1,14 @@
-/* eslint-disable sonarjs/cognitive-complexity */
 import { Container } from '@mui/material';
-import { IllusCompleted, IllusError } from '@pagopa/mui-italia';
+import { IllusError } from '@pagopa/mui-italia';
 import { EndingPage } from '@pagopa/selfcare-common-frontend/lib';
 import SessionModal from '@pagopa/selfcare-common-frontend/lib/components/SessionModal';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
 import { uniqueId } from 'lodash';
-import { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useContext, useEffect, useMemo } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
-import {
-  InstitutionType,
-  Product,
-  RequestOutcomeMessage,
-  RequestOutcomeOptions,
-  StepperStep,
-  UserOnCreate,
-} from '../../../types';
+import { InstitutionType, RequestOutcomeMessage, StepperStep, UserOnCreate } from '../../../types';
 import NoProductPage from '../../components/layout/NoProductPage';
-import UserNotAllowedPage from '../../components/layout/UserNotAllowedPage';
 import { LoadingOverlay } from '../../components/modals/LoadingOverlay';
 import { MessageNoAction } from '../../components/shared/MessageNoAction';
 import { StepAddManager } from '../../components/steps/StepAddManager';
@@ -27,22 +18,12 @@ import StepOnboardingFormData from '../../components/steps/StepOnboardingFormDat
 import { StepSearchParty } from '../../components/steps/StepSearchParty';
 import { withLogin } from '../../components/withLogin';
 import { HeaderContext, UserContext } from '../../lib/context';
-import { AdditionalGpuInformations } from '../../model/AdditionalGpuInformations';
-import { AdditionalInformations } from '../../model/AdditionalInformations';
 import { AggregateInstitution } from '../../model/AggregateInstitution';
 import { OnboardingFormData } from '../../model/OnboardingFormData';
 import { checkProduct, getFilterCategories } from '../../services/onboardingServices';
 import { postOnboardingSubmit } from '../../services/onboardingSubmitServices';
-import { PRODUCT_IDS } from '../../utils/constants';
 import { ENV } from '../../utils/env';
-import {
-  isConsolidatedEconomicAccountCompany,
-  isGlobalServiceProvider,
-  isPagoPaProduct,
-  isPublicAdministration,
-  isSendProduct,
-  isTechPartner,
-} from '../../utils/institutionTypeUtils';
+import { isPagoPaProduct, isSendProduct, isTechPartner } from '../../utils/institutionTypeUtils';
 import { triggerQualtricsIntercept } from '../../utils/qualtricsUtils';
 import { registerUnloadEvent, unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
 import { OnboardingApi } from '../../api/OnboardingApiClient';
@@ -56,15 +37,14 @@ import { StepAdditionalInformations } from './components/StepAdditionalInformati
 import { StepUploadAggregates } from './components/StepUploadAggregates';
 import { genericError, StepVerifyOnboarding } from './components/StepVerifyOnboarding';
 import StepContractsSummary from './components/contracts/StepContractsSummary';
+import { buildFlowContext } from './state/flowContext';
+import { normalizeUsers } from './state/normalizeUsers';
+import { OnboardingStepName } from './state/onboardingSteps';
+import { selectFilterCategories as selectFilterCategoriesFor } from './state/selectFilterCategories';
+import { buildNotAllowedError, buildOutcomeContent } from './outcomes/onboardingProductOutcomes';
+import { useOnboardingProductWizard } from './useOnboardingProductWizard';
 
 export type ValidateErrorType = 'conflictError';
-
-type UploadDocumentsContext = {
-  onboardingId: string;
-  productId: string;
-  institutionType: string;
-  origin: string;
-} | null;
 
 export const prodPhaseOutErrorPage: RequestOutcomeMessage = {
   title: '',
@@ -88,145 +68,70 @@ export const prodPhaseOutErrorPage: RequestOutcomeMessage = {
   ],
 };
 
-// eslint-disable-next-line sonarjs/cognitive-complexity, complexity
 function OnboardingProductComponent({ productId }: { productId: string }) {
-  const [loading, setLoading] = useState(true);
-  const [activeStep, setActiveStep] = useState(0);
-  const [formData, setFormData] = useState<Partial<FormData>>();
-  const [externalInstitutionId, setExternalInstitutionId] = useState<string>('');
-  const [outcome, setOutcome] = useState<RequestOutcomeMessage | null>();
-  const [uploadDocumentsContext, setUploadDocumentsContext] =
-    useState<UploadDocumentsContext>(null);
-  const createdOnboardingRef = useRef<UploadDocumentsContext>(null);
+  const {
+    state,
+    dispatch,
+    requestIdRef,
+    createdOnboardingRef,
+    setLoading,
+    setOutcome,
+    setOpenExitModal,
+    setOnExitAction,
+    setSelectedProduct,
+    setInstitutionType,
+    setOrigin,
+    setFilterCategoriesResponse,
+  } = useOnboardingProductWizard();
+  const {
+    loading,
+    formData,
+    externalInstitutionId,
+    outcome,
+    uploadDocumentsContext,
+    openExitModal,
+    selectedProduct,
+    onboardingFormData,
+    additionalInformations,
+    additionalGPUInformations,
+    institutionType,
+    origin,
+    pricingPlan,
+    filterCategoriesResponse,
+    categoriesLoaded,
+    onExitAction,
+  } = state;
+  const { activeStep } = state;
   const history = useHistory();
-  const [openExitModal, setOpenExitModal] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>();
-  const [onboardingFormData, setOnboardingFormData] = useState<OnboardingFormData>();
-  const [additionalInformations, setAdditionalInformations] = useState<AdditionalInformations>();
-  const [additionalGPUInformations, setAdditionalGPUInformations] =
-    useState<AdditionalGpuInformations>();
-  const [institutionType, setInstitutionType] = useState<InstitutionType>();
-  const [origin, setOrigin] = useState<string>();
-  const [pricingPlan, setPricingPlan] = useState<string>();
-  const [filterCategoriesResponse, setFilterCategoriesResponse] = useState<any>();
-  const [categoriesLoaded, setCategoriesLoaded] = useState(false);
-  const [pendingForward, setPendingForward] = useState<{
-    data: Partial<FormData>;
-  } | null>(null);
-  const [aggregatesData, setAggregatesData] = useState<Array<AggregateInstitution>>();
   const { setOnExit } = useContext(HeaderContext);
-  const requestIdRef = useRef<string>();
   const { t } = useTranslation();
-  const [onExitAction, setOnExitAction] = useState<(() => void) | undefined>();
-  const productAvoidStep = [
-    PRODUCT_IDS.SEND,
-    PRODUCT_IDS.IDPAY,
-    PRODUCT_IDS.IDPAY_MERCHANT,
-  ].includes(selectedProduct?.id ?? '');
-  const partyExternalIdFromUrl = new URLSearchParams(window.location.search).get('partyExternalId');
-  const fromDashboard =
-    !!partyExternalIdFromUrl &&
-    (!externalInstitutionId || partyExternalIdFromUrl === externalInstitutionId);
-  const subunitTypeByQuery =
-    new URLSearchParams(window.location.hash.substring(1)).get('subunitType') ?? '';
-  const subunitCodeByQuery =
-    new URLSearchParams(window.location.hash.substring(1)).get('subunitCode') ?? '';
-  const institutionTypeByUrl = new URLSearchParams(window.location.search).get('institutionType');
-  const desiredOriginRef = useRef<string | undefined>();
-  const addUser = window.location.pathname.includes('/user');
+  const {
+    fromDashboard,
+    productAvoidStep,
+    subunitTypeByQuery,
+    subunitCodeByQuery,
+    institutionTypeByUrl,
+    addUser,
+    isRequiredDocumentsFlow,
+    partyName,
+  } = buildFlowContext({
+    location: window.location,
+    productId,
+    selectedProductId: selectedProduct?.id,
+    institutionType,
+    origin,
+    externalInstitutionId,
+    onboardingFormData,
+    gspNoIpaEnabled: ENV.GSP.NO_IPA,
+  });
   const { user } = useContext(UserContext);
 
-  const outcomeContent: RequestOutcomeOptions = {
-    success: {
-      title: '',
-      description: [
-        <>
-          <EndingPage
-            minHeight="52vh"
-            icon={<IllusCompleted size={60} />}
-            title={
-              isTechPartner(institutionType)
-                ? t('onboarding.success.flow.techPartner.title')
-                : t('onboarding.success.flow.product.title')
-            }
-            description={
-              isTechPartner(institutionType) ? (
-                <Trans
-                  i18nKey="onboarding.success.flow.techPartner.description"
-                  components={{ 1: <br /> }}
-                >
-                  {`Invieremo un'email con l'esito della richiesta all'indirizzo <1 />PEC indicato.`}
-                </Trans>
-              ) : isPublicAdministration(institutionType) ? (
-                <Trans
-                  i18nKey="onboarding.success.flow.product.publicAdministration.description"
-                  components={{ 1: <br />, 3: <br /> }}
-                >
-                  {`Invieremo un'email all'indirizzo PEC primario dell'ente. <1 /> Al suo interno, ci sono le istruzioni per completare <3 />l'adesione.`}
-                </Trans>
-              ) : (
-                <Trans
-                  i18nKey="onboarding.success.flow.product.notPublicAdministration.description"
-                  components={{ 1: <br />, 3: <br /> }}
-                >
-                  {`Invieremo un'email all'indirizzo PEC indicato. <1 /> Al suo interno, ci sono le istruzioni per completare <3 />l'adesione.`}
-                </Trans>
-              )
-            }
-            variantTitle={'h4'}
-            variantDescription={'body1'}
-            buttonLabel={t('onboarding.backHome')}
-            onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
-          />
-        </>,
-      ],
-    },
-    error: {
-      title: '',
-      description: [
-        <>
-          <EndingPage
-            minHeight="52vh"
-            icon={<IllusError size={60} />}
-            variantTitle={'h4'}
-            variantDescription={'body1'}
-            title={t('onboarding.error.title')}
-            description={
-              <Trans i18nKey="onboarding.error.description" components={{ 1: <br /> }}>
-                {`A causa di un errore del sistema non è possibile completare <1 />la procedura. Ti chiediamo di riprovare più tardi.`}
-              </Trans>
-            }
-            buttonLabel={t('onboarding.backHome')}
-            onButtonClick={() => window.location.assign(ENV.URL_FE.LANDING)}
-          />
-        </>,
-      ],
-    },
-  };
+  const outcomeContent = buildOutcomeContent(institutionType, t);
 
-  const notAllowedError: RequestOutcomeMessage = {
-    title: '',
-    description: [
-      <>
-        <UserNotAllowedPage
-          partyName={onboardingFormData?.businessName}
-          productTitle={selectedProduct?.title}
-        />
-      </>,
-    ],
-  };
-
-  const isRequiredDocumentsFlow =
-    isGlobalServiceProvider(institutionType) &&
-    origin !== 'IPA' &&
-    isPagoPaProduct(productId) &&
-    ENV.GSP.NO_IPA;
-
-  const partyName =
-    onboardingFormData?.uoName ??
-    onboardingFormData?.aooName ??
-    onboardingFormData?.businessName ??
-    '';
+  const notAllowedError = buildNotAllowedError(
+    onboardingFormData?.businessName,
+    selectedProduct?.title
+  );
 
   const enterRequiredDocumentsFlow = () => {
     void OnboardingApi.getOnboardings(onboardingFormData?.taxCode ?? '', 'REQUESTING')
@@ -241,7 +146,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
             institutionType: institutionType as string,
             origin,
           };
-          setUploadDocumentsContext(createdOnboardingRef.current);
+          dispatch({ type: 'OPEN_UPLOAD_DOCUMENTS', context: createdOnboardingRef.current });
         } else {
           setOutcome(outcomeContent.success);
         }
@@ -256,17 +161,15 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     updatedOnboardingFormData?: OnboardingFormData
   ) => {
     if (createdOnboardingRef.current) {
-      setUploadDocumentsContext(createdOnboardingRef.current);
+      dispatch({ type: 'OPEN_UPLOAD_DOCUMENTS', context: createdOnboardingRef.current });
       return;
     }
     const data = userData ?? formData;
-    const users = ((data as any).users as Array<UserOnCreate>)?.map((u) => ({
-      ...u,
-      taxCode: u?.taxCode?.toUpperCase(),
-      email: u?.email?.toLowerCase(),
-    }));
-
-    const usersWithoutLegal = users?.slice(0, 0).concat(users.slice(0 + 1));
+    // same unchecked contract as before: postOnboardingSubmit expects the users list to be set
+    const users = normalizeUsers(
+      (data as any).users as Array<UserOnCreate>,
+      institutionType
+    ) as Array<UserOnCreate>;
 
     postOnboardingSubmit(
       setLoading,
@@ -283,7 +186,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
       outcomeContent,
       notAllowedError,
       pricingPlan,
-      isTechPartner(institutionType) ? usersWithoutLegal : users,
+      users,
       user,
       aggregates,
       () => {
@@ -303,17 +206,11 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     });
   };
 
-  const back = () => {
-    setActiveStep(activeStep - 1);
-  };
-  const forward = () => {
-    setActiveStep(activeStep + 1);
-  };
-
   const {
     forwardWithInstitutionType,
     forwardGspNoIpa,
     forwardWithDataAndInstitution,
+    forwardFromVerifyOnboarding,
     forwardWithBillingData,
     forwardWithAdditionalGSPInfo,
     forwardWithAdditionalGPUInfo,
@@ -323,82 +220,35 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     forwardFromAggregator,
     forwardFromApplicantEmail,
   } = createForwardFunctions({
-    requestIdRef,
-    productId,
-    institutionType,
-    onboardingFormData,
-    setInstitutionType,
-    setOnboardingFormData,
-    setActiveStep,
-    setOrigin,
-    forward,
-    formData,
-    setFormData,
-    desiredOriginRef,
-    activeStep,
-    origin,
-    setExternalInstitutionId,
-    externalInstitutionId,
-    setAdditionalInformations,
-    setAdditionalGPUInformations,
-    setPendingForward,
-    user,
-    onSubmit,
-    aggregatesData,
-    setAggregatesData,
+    state,
+    dispatch,
+    ctx: { productId, loggedUserTaxCode: user?.taxCode, gspNoIpaEnabled: ENV.GSP.NO_IPA },
+    effects: { requestIdRef, onSubmit },
   });
 
   const {
     handleOpenExitModal,
+    backFromSearchParty,
+    backFromContractsSummary,
     backFromBillingData,
+    backFromAdditionalGpuInfo,
+    backFromAdditionalInfo,
     backFromManager,
     backFromAdmin,
+    backFromAggregates,
     backFromApplicantEmail,
   } = createBackFunctions({
-    activeStep,
-    setActiveStep,
-    setOpenExitModal,
-    setOnExitAction,
-    history,
-    fromDashboard,
-    productAvoidStep,
-    subunitTypeByQuery,
-    institutionType,
-    selectedProduct,
-    origin,
-    productId,
-    externalInstitutionId,
-    onboardingFormData,
-    isRequiredDocumentsFlow,
+    state,
+    dispatch,
+    ctx: {
+      productId,
+      fromDashboard,
+      productAvoidStep,
+      subunitTypeByQuery,
+      isRequiredDocumentsFlow,
+    },
+    effects: { history },
   });
-
-  useEffect(() => {
-    if (pendingForward && externalInstitutionId && institutionType) {
-      try {
-        const { data } = pendingForward;
-
-        setFormData((prevFormData) => {
-          if (prevFormData) {
-            return { ...prevFormData, ...data };
-          }
-          return data;
-        });
-      } catch (error) {
-        console.error('[OnboardingProduct] ERROR setting formData:', error);
-        setPendingForward(null);
-        setOutcome(genericError);
-      }
-    }
-  }, [pendingForward, externalInstitutionId, institutionType]);
-
-  useEffect(() => {
-    if (pendingForward && formData) {
-      setPendingForward(null);
-      // Skip the GSP-no-IPA-only StepContractsSummary (step 2): the standard
-      // party-selection flow goes from "Search party" (1) to "Verify onboarding" (3).
-      setActiveStep((prevStep) => prevStep + 2);
-    }
-  }, [formData, pendingForward]);
 
   useEffect(() => {
     if (isTechPartner(institutionTypeByUrl as InstitutionType) && isPagoPaProduct(productId)) {
@@ -439,48 +289,28 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
       setLoading(false);
     });
 
-    setPricingPlan(new URLSearchParams(window.location.search).get('pricingPlan') ?? undefined);
+    dispatch({
+      type: 'PRICING_PLAN_LOADED',
+      pricingPlan: new URLSearchParams(window.location.search).get('pricingPlan') ?? undefined,
+    });
   }, [productId]);
 
   useEffect(() => {
     const loadFilterCategories = async () => {
-      setCategoriesLoaded(false);
+      dispatch({ type: 'CATEGORIES_LOADING' });
       await getFilterCategories(setOutcome, setFilterCategoriesResponse, genericError);
-      setCategoriesLoaded(true);
+      dispatch({ type: 'CATEGORIES_LOADED' });
     };
     void loadFilterCategories();
   }, [productId]);
 
-  const selectFilterCategories = useCallback(() => {
-    if (!filterCategoriesResponse?.product) {
-      return undefined;
-    }
+  const selectFilterCategories = useCallback(
+    () => selectFilterCategoriesFor(filterCategoriesResponse, productId, institutionType),
+    [filterCategoriesResponse, productId, institutionType]
+  );
 
-    switch (productId) {
-      case PRODUCT_IDS.SEND:
-        return filterCategoriesResponse.product['prod-pn']?.ipa.PA;
-
-      case PRODUCT_IDS.IDPAY_MERCHANT:
-        return filterCategoriesResponse.product['prod-idpay-merchant']?.merchantDetails;
-
-      case PRODUCT_IDS.INTEROP:
-        if (isConsolidatedEconomicAccountCompany(institutionType)) {
-          return filterCategoriesResponse.product['prod-interop']?.ipa.SCEC;
-        } else if (isPublicAdministration(institutionType)) {
-          return filterCategoriesResponse.product['prod-interop']?.ipa.PA;
-        } else if (isGlobalServiceProvider(institutionType)) {
-          return filterCategoriesResponse.product.default?.ipa.GSP;
-        } else {
-          return filterCategoriesResponse.product.default?.ipa.PA;
-        }
-      default:
-        const defaultIpa = filterCategoriesResponse.product.default?.ipa;
-        return isGlobalServiceProvider(institutionType) ? defaultIpa?.GSP : defaultIpa?.PA;
-    }
-  }, [filterCategoriesResponse, productId, institutionType]);
-
-  const steps: Array<StepperStep> = [
-    {
+  const steps: Record<OnboardingStepName, StepperStep> = {
+    institutionType: {
       label: 'Select institution type',
       Component: () =>
         StepInstitutionType({
@@ -498,7 +328,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           genericError,
         }),
     },
-    {
+    searchParty: {
       label: 'Search and select party',
       Component: () =>
         StepSearchParty({
@@ -515,9 +345,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           institutionType,
           productAvoidStep,
           product: selectedProduct,
-          back: () => {
-            setActiveStep(0);
-          },
+          back: backFromSearchParty,
           subunitTypeByQuery,
           subunitCodeByQuery,
           selectFilterCategories,
@@ -526,20 +354,20 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           addUser,
         }),
     },
-    {
+    contractsSummary: {
       label: 'Gpu contracts summary',
       Component: () =>
         StepContractsSummary({
           forward: forwardGspNoIpa,
-          back,
+          back: backFromContractsSummary,
         }),
     },
-    {
+    verifyOnboarding: {
       label: 'Verify onboarding',
       Component: () =>
         StepVerifyOnboarding({
           product: selectedProduct,
-          forward,
+          forward: forwardFromVerifyOnboarding,
           externalInstitutionId,
           productId,
           selectedProduct,
@@ -547,7 +375,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           institutionType,
         }),
     },
-    {
+    onboardingData: {
       label: 'Get onboarding data',
       Component: () =>
         StepOnboardingData({
@@ -556,7 +384,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           forward: forwardWithOnboardingData,
         }),
     },
-    {
+    billingData: {
       label: 'Insert billing data',
       Component: () =>
         StepOnboardingFormData({
@@ -596,27 +424,27 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           back: backFromBillingData,
         }),
     },
-    {
+    additionalGpuInfo: {
       label: 'Insert additional GPU data info',
       Component: () =>
         StepAdditionalGpuInformations({
           forward: forwardWithAdditionalGPUInfo,
-          back: () => setActiveStep(activeStep - 1),
+          back: backFromAdditionalGpuInfo,
           originId: onboardingFormData?.originId,
           origin,
         }),
     },
-    {
+    additionalInfo: {
       label: 'Insert additional info',
       Component: () =>
         StepAdditionalInformations({
           forward: forwardWithAdditionalGSPInfo,
-          back: () => setActiveStep(activeStep - 2),
+          back: backFromAdditionalInfo,
           originId: onboardingFormData?.originId,
           origin,
         }),
     },
-    {
+    manager: {
       label: 'Insert manager data',
       Component: () =>
         StepAddManager({
@@ -628,7 +456,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           back: backFromManager,
         }),
     },
-    {
+    admins: {
       label: 'Insert admins data',
       Component: () =>
         StepAddAdmin({
@@ -649,7 +477,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           back: backFromAdmin,
         }),
     },
-    {
+    aggregates: {
       label: 'Upload aggregate list',
       Component: () =>
         StepUploadAggregates({
@@ -661,10 +489,10 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           setLoading,
           setOutcome,
           forward: forwardFromAggregator,
-          back,
+          back: backFromAggregates,
         }),
     },
-    {
+    applicantEmail: {
       label: "Step add applicant's email",
       Component: () =>
         StepAddApplicantEmail({
@@ -679,7 +507,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           isRequiredDocumentsFlow,
         }),
     },
-  ];
+  };
 
   const Step = useMemo(() => steps[activeStep].Component, [activeStep, selectedProduct]);
 
@@ -690,8 +518,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
   }, [outcome]);
 
   const handleCloseExitModal = () => {
-    setOpenExitModal(false);
-    setOnExitAction(undefined);
+    dispatch({ type: 'CLOSE_EXIT_MODAL' });
   };
 
   return selectedProduct === null ? (
@@ -703,8 +530,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
       onSuccess={() => {
         // eslint-disable-next-line functional/immutable-data
         createdOnboardingRef.current = null;
-        setUploadDocumentsContext(null);
-        setOutcome(outcomeContent.success);
+        dispatch({ type: 'UPLOAD_DOCUMENTS_COMPLETED', outcome: outcomeContent.success });
         void triggerQualtricsIntercept({
           institutionDescription: onboardingFormData?.businessName ?? '',
           productId,
@@ -712,8 +538,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
         });
       }}
       back={() => {
-        setUploadDocumentsContext(null);
-        setActiveStep(steps.findIndex((step) => step.label === 'Insert admins data'));
+        dispatch({ type: 'UPLOAD_DOCUMENTS_BACK' });
       }}
     />
   ) : outcome ? (

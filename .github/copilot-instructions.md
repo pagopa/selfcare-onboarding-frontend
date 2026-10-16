@@ -25,6 +25,19 @@ SelfCare onboarding flow (PagoPA): React 18 + TypeScript SPA built with Vite, MU
 - Routes are declared in `ROUTES` (`src/utils/constants.ts`) as `{ PATH, EXACT, COMPONENT }` and rendered by `src/components/layout/Main.tsx` (React Router v5 `Switch`). Flows: `ONBOARDING_PRODUCT`, `ONBOARDING_PREMIUM`, `ONBOARDING_USER`, `ONBOARDING_REQUEST`.
 - Each flow is a sequence of steps; shared steps live in `src/components/steps` (`StepInstitutionType`, `StepSearchParty`, `StepOnboardingFormData`, `StepAddManager`, `StepOnboardingData`). Flow state is carried through history state (`useHistoryState`) and `UserContext` (`src/lib/context.ts`).
 - Product IDs are in `PRODUCT_IDS`; institution-type logic is in `src/utils/institutionTypeUtils.ts`.
+- `ONBOARDING_PRODUCT` wizard state lives in a single reducer, not in `useState`:
+  - `src/views/onboardingProduct/state/`:
+    - `onboardingSteps.ts`: named steps (`OnboardingStepName`);
+    - `onboardingTransitions.ts`: pure `(ctx) => Transition` functions (`goTo`, `openExitModal`, `redirect`, `submit`);
+    - `onboardingProductReducer.ts`: state and actions;
+    - pure derivations: `flowContext`, `selectFilterCategories`, `normalizeUsers`.
+  - `useOnboardingProductWizard` exposes `state`, `dispatch`, refs and `SetStateAction`-compatible setters for services.
+  - `components/forwards|backwards/*Functions.ts` take `{ state, dispatch, ctx, effects }` and only dispatch actions or run transitions.
+  - To change navigation:
+    - edit or add a transition and its test in `state/__tests__/onboardingTransitions.test.ts`;
+    - never navigate by step index;
+    - keep the current-step memo on `[activeStep, selectedProduct]`.
+  - Characterization tests in `__tests__/OnboardingProduct.navigation.test.tsx` lock the end-to-end behavior.
 
 ## Environment and mocks
 

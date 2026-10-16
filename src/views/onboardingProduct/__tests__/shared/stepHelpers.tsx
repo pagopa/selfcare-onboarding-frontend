@@ -403,6 +403,17 @@ export const executeStepSearchParty = async (
   }
 };
 
+/**
+ * Clicks the "Indietro" button of the current step and waits for the step identified by
+ * `expectedTitle` (text or regex) to be rendered.
+ */
+export const executeBack = async (expectedTitle: string | RegExp) => {
+  const backButton = screen.getByRole('button', { name: 'Indietro' });
+  expect(backButton).toBeEnabled();
+  fireEvent.click(backButton);
+  await waitFor(() => screen.getByText(expectedTitle));
+};
+
 export const executeStepContractsSummary = async () => {
   await waitFor(() => screen.getByText('Prepara i documenti'));
   const confirmButton = screen.getByRole('button', { name: 'Continua' });
