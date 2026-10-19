@@ -25,6 +25,7 @@ on:
       domain:
         type: choice
         description: Domain
+        default: ar
         options:
           - ar
 
