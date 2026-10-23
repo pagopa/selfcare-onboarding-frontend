@@ -174,3 +174,5 @@ export const ApiClientMocked = {
     callViaFetchWithLogs('VERIFY_ONBOARDING', { params, method: 'HEAD' })
   ),
 };
+
+export const OnboardingApi = ApiClientMocked;
