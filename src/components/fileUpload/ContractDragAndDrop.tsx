@@ -1,9 +1,8 @@
-import { Box, LinearProgress, Stack, Typography, useMediaQuery } from '@mui/material';
-import { alpha, useTheme } from '@mui/material/styles';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CloseIcon from '@mui/icons-material/Close';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+import { Box, LinearProgress, Stack, Typography } from '@mui/material';
 import { MIButton, MIIconButton, MIPaper } from '@pagopa/mui-italia';
 import { Accept, useDropzone } from 'react-dropzone';
 import { useTranslation } from 'react-i18next';
@@ -21,7 +20,6 @@ type Props = {
   error?: boolean;
   required?: boolean;
   maxSizeLabel?: string;
-  disposition?: DragAndDropDisposition;
   onFileSelected: (file: File) => void;
   onFileRemoved: () => void;
   onFileRejected: () => void;
@@ -104,15 +102,11 @@ export function ContractDragAndDrop({
   error,
   required,
   maxSizeLabel,
-  disposition,
   onFileSelected,
   onFileRemoved,
   onFileRejected,
 }: Props) {
   const { t } = useTranslation();
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const isVertical = (disposition ?? (isMobile ? 'Vertical' : 'Horizontal')) === 'Vertical';
 
   const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
     accept,
@@ -152,21 +146,24 @@ export function ContractDragAndDrop({
 
   return (
     <Stack sx={{ width: '100%' }}>
-      <Box {...getRootProps()} data-testid="dnd-dropzone" sx={{ width: '100%' }}>
+      <Box
+        {...getRootProps()}
+        data-testid="dnd-dropzone"
+        sx={{ width: '100%', alignItems: 'center', display: 'flex' }}
+      >
         <MIPaper
           variant="outlined"
           padding={24}
           sx={{
             width: '100%',
             display: 'flex',
-            flexDirection: isVertical ? 'column' : 'row',
+            flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
             gap: 2,
             borderStyle: 'dashed',
             borderColor: isError ? 'error.main' : 'primary.main',
-            backgroundColor:
-              status === 'DragOver' ? alpha(theme.palette.primary.main, 0.08) : 'background.paper',
+            backgroundColor: isError ? '#FF000014' : '#0B3EE314',
           }}
         >
           <input {...getInputProps()} />
@@ -175,9 +172,12 @@ export function ContractDragAndDrop({
           ) : (
             <CloudUploadIcon color="primary" sx={{ fontSize: 40 }} />
           )}
-          <Box sx={{ flexGrow: 1, minWidth: 0, textAlign: isVertical ? 'center' : 'left' }}>
+          <Box sx={{ flexGrow: 1, minWidth: 0, textAlign: 'center' }}>
             <Typography variant="body1" fontWeight={600}>
               {getLabel()}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              {t('contractUpdate.upload.dragAndDrop.subtitle')}
             </Typography>
             {maxSizeLabel && (
               <Typography variant="caption" color="text.secondary">
@@ -186,7 +186,7 @@ export function ContractDragAndDrop({
             )}
           </Box>
           <MIButton
-            variant="outlined"
+            variant="contained"
             size="small"
             // The upload request cannot be aborted, so the cancel action is shown but disabled
             disabled={isProcessing}

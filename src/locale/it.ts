@@ -118,6 +118,7 @@ export default {
       description: 'Carica l’accordo di adesione firmato digitalmente in p7m dal Legale Rappresentante.',
       dragAndDrop: {
         title: 'Trascina qui il documento firmato oppure',
+        subtitle: 'Dimensione massima 300 x 300px Formato .jpg o .png',
         dragOver: 'Rilascia qui per caricare',
         failed: 'Caricamento fallito',
         upload: 'Carica il file',
