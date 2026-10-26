@@ -96,6 +96,41 @@ export default {
       }
     }
   },
+  contractUpdate: {
+    exit: 'Quitter',
+    download: {
+      title: 'Télécharger le document à signer',
+      description: "Pour compléter la demande, téléchargez l'accord et demandez au Représentant Légal de l'organisme de le signer numériquement en <2>format p7m</2>.",
+      downloadContract: 'Télécharger le document',
+      disclaimer: `En signant l'accord, le Représentant Légal de l'organisme accepte expressément et spécifiquement également les clauses individuelles indiquées dans le paragraphe "Clauses au sens des art. 1341 et 1342 c.c."`
+    },
+    chooseUpload: {
+      title: 'Télécharger le document signé',
+      description: "Suivez les instructions pour envoyer le document et compléter la demande pour le produit {{productTitle}}. N'oubliez pas de télécharger le document <3>dans les 90 jours.</3>",
+      goToUpload: 'Aller au téléchargement'
+    },
+    upload: {
+      title: 'Télécharger le document signé',
+      description: "Téléchargez l'accord d'adhésion signé numériquement en p7m par le Représentant Légal.",
+      dragAndDrop: {
+        title: 'Glisser/Déposer ici le document signé ou bien',
+        dragOver: 'Déposez ici pour télécharger',
+        failed: 'Échec du téléchargement',
+        upload: 'Charger le fichier',
+        retry: 'Réessayer',
+        cancel: 'Annuler',
+        remove: 'Supprimer le fichier'
+      },
+      requiredField: '*Champ obligatoire',
+      back: 'Retour',
+      continue: 'Continuer'
+    },
+    success: {
+      title: 'Vous avez complété la demande',
+      description: "Nous communiquerons le résultat à l'adresse PEC principale de l'organisme.",
+      backHome: "Retour à l'accueil"
+    }
+  },
   fileUploadPreview: {
     loadingStatus: 'Téléchargement...',
     labelStatus: 'Prêt à envoyer',

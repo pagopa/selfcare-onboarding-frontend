@@ -96,6 +96,41 @@ export default {
       }
     }
   },
+  contractUpdate: {
+    exit: 'Exit',
+    download: {
+      title: 'Download the document to sign',
+      description: "To complete the request, download the agreement and have it digitally signed in <2>p7m format</2> by the institution's Legal Representative.",
+      downloadContract: 'Download the document',
+      disclaimer: `By signing the agreement, the institution's Legal Representative expressly and specifically accepts the individual clauses indicated in the paragraph "Clauses pursuant to articles 1341 and 1342 of the Italian Civil Code"`
+    },
+    chooseUpload: {
+      title: 'Upload the signed document',
+      description: 'Follow the instructions to send the document and complete the request for the product {{productTitle}}. Remember to upload the document <3>within 90 days.</3>',
+      goToUpload: 'Go to upload'
+    },
+    upload: {
+      title: 'Upload the signed document',
+      description: 'Upload the membership agreement digitally signed in p7m by the Legal Representative.',
+      dragAndDrop: {
+        title: 'Drag the signed document here or',
+        dragOver: 'Drop here to upload',
+        failed: 'Upload failed',
+        upload: 'Upload the file',
+        retry: 'Retry',
+        cancel: 'Cancel',
+        remove: 'Remove the file'
+      },
+      requiredField: '*Required field',
+      back: 'Back',
+      continue: 'Continue'
+    },
+    success: {
+      title: 'You have completed the request',
+      description: "We will communicate the outcome to the institution's primary PEC address.",
+      backHome: 'Back to home'
+    }
+  },
   fileUploadPreview: {
     loadingStatus: 'Uploading...',
     labelStatus: 'Ready for sending',

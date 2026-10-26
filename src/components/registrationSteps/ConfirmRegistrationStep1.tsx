@@ -6,13 +6,21 @@ import { useState } from 'react';
 import { useTranslation, Trans } from 'react-i18next';
 import { StepperStepComponentProps } from '../../../types';
 import { FileUploader } from '../fileUpload/FileUploader';
+import { ContractUpdateUploadStep } from './contractUpdate/ContractUpdateUploadStep';
+
+const isContractUpdateFlow = (
+  contractUpdate: boolean,
+  addUserFlow: boolean,
+  translationKeyValue: string
+) => contractUpdate && !addUserFlow && translationKeyValue === 'product';
 
 export function ConfirmRegistrationStep1(
   addUserFlow: boolean,
   translationKeyValue: string,
-  { forward }: StepperStepComponentProps,
+  { forward, back }: StepperStepComponentProps,
   { loading }: any,
-  { uploadedFiles, setUploadedFiles }: any
+  { uploadedFiles, setUploadedFiles }: any,
+  contractUpdate = false
 ) {
   const { t } = useTranslation();
   const theme = useTheme();
@@ -38,6 +46,18 @@ export function ConfirmRegistrationStep1(
   const deleteUploadedFiles = (): void => {
     setUploadedFiles([]);
   };
+
+  if (isContractUpdateFlow(contractUpdate, addUserFlow, translationKeyValue)) {
+    return (
+      <ContractUpdateUploadStep
+        loading={loading}
+        uploadedFiles={uploadedFiles}
+        onFilesChange={setUploadedFiles}
+        onContinue={onSubmit}
+        onBack={back}
+      />
+    );
+  }
 
   return (
     <Grid container display="flex" justifyContent="center" alignItems="center">

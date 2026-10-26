@@ -77,6 +77,8 @@ export default function CompleteRequestComponent() {
   const [institutionId, setInstitutionId] = useState<string>();
   const [attachmentUploadSuccess, setAttachmentUploadSuccess] = useState<boolean>(false);
   const addUserFlow = new URLSearchParams(window.location.search).get('add-user') === 'true';
+  const contractUpdate =
+    new URLSearchParams(window.location.search).get('contract-update') === 'true';
   const attachments = window.location.pathname.includes('/attachments');
   const translationKeyValue = addUserFlow ? 'user' : attachments ? 'attachments' : 'product';
 
@@ -181,11 +183,13 @@ export default function CompleteRequestComponent() {
   const steps: Array<StepperStep> = [
     {
       label: t('completeRegistration.steps.step0.label'),
-      Component: () => 
+      Component: () =>
         ConfirmRegistrationStep0({
           onboardingId,
           fileName: 'Addendum',
           translationKeyValue,
+          productTitle: productId2ProductTitle(requestData?.productId ?? ''),
+          contractUpdate,
           setLoading,
           forward,
         }),
@@ -198,9 +202,14 @@ export default function CompleteRequestComponent() {
           translationKeyValue,
           {
             forward: () => uploadContract(),
+            back: () => {
+              setActiveStepHistory(0);
+              setActiveStep(0);
+            },
           },
           { loading },
-          { uploadedFiles, setUploadedFiles: setUploadedFilesAndWriteHistory }
+          { uploadedFiles, setUploadedFiles: setUploadedFilesAndWriteHistory },
+          contractUpdate
         ),
     },
   ];
@@ -263,6 +272,7 @@ export default function CompleteRequestComponent() {
             translationKeyValue={translationKeyValue}
             institutionId={institutionId}
             productId={requestData?.productId}
+            contractUpdate={contractUpdate}
           />
         </>,
       ],

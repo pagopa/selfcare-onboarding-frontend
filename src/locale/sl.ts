@@ -96,6 +96,41 @@ export default {
       }
     }
   },
+  contractUpdate: {
+    exit: 'Izhod',
+    download: {
+      title: 'Prenesite dokument za podpis',
+      description: 'Za dokončanje zahteve prenesite pogodbo in pridobite digitalni podpis v <2>obliki p7m</2> od pravnega zastopnika organizacije.',
+      downloadContract: 'Prenesite dokument',
+      disclaimer: 'Z podpisom pogodbe pravni zastopnik organizacije izrecno in posebej sprejme tudi posamezne klavzule navedene v odstavku "Klavzule v skladu z 1341. in 1342. členom c.c."'
+    },
+    chooseUpload: {
+      title: 'Naložite podpisan dokument',
+      description: 'Sledite navodilom za pošiljanje dokumenta in dokončanje zahteve za produkt {{productTitle}}. Ne pozabite naložiti dokumenta <3>v 90 dneh.</3>',
+      goToUpload: 'Pojdite na nalaganje'
+    },
+    upload: {
+      title: 'Naložite podpisan dokument',
+      description: 'Naložite pogodbo o pristopu, ki jo je pravni zastopnik digitalno podpisal v p7m.',
+      dragAndDrop: {
+        title: 'Povlecite podpisan dokument sem ali',
+        dragOver: 'Spustite tukaj za nalaganje',
+        failed: 'Nalaganje ni uspelo',
+        upload: 'Naložite datoteko',
+        retry: 'Poskusi znova',
+        cancel: 'Prekliči',
+        remove: 'Odstrani datoteko'
+      },
+      requiredField: '*Obvezno polje',
+      back: 'Nazaj',
+      continue: 'Nadaljuj'
+    },
+    success: {
+      title: 'Zahtevo ste dokončali',
+      description: 'Izid bomo sporočili na primarni naslov PEC organizacije.',
+      backHome: 'Nazaj na domačo stran'
+    }
+  },
   fileUploadPreview: {
     loadingStatus: 'Nalaganje ...',
     labelStatus: 'Pripravljeno za pošiljanje',

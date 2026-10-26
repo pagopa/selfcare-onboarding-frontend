@@ -99,6 +99,42 @@ export default {
       },
     },
   },
+  contractUpdate: {
+    exit: 'Esci',
+    download: {
+      title: 'Scarica il documento da firmare',
+      description: `Per completare la richiesta, scarica l’accordo e fai apporre la firma digitale in <2>formato p7m</2> dal Legale Rappresentante dell’ente.`,
+      downloadContract: 'Scarica il documento',
+      disclaimer:
+        'Firmando l’accordo, il Legale Rappresentante dell’ente accetta espressamente e specificamente anche le singole clausole indicate nel paragrafo “Clausole ai sensi degli artt. 1341 e 1342 c.c.”',
+    },
+    chooseUpload: {
+      title: 'Carica il documento firmato',
+      description: `Segui le istruzioni per inviare il documento e completare la richiesta per il prodotto {{productTitle}}. Ricorda di caricare il documento <3>entro 90 giorni.</3>`,
+      goToUpload: 'Vai al caricamento',
+    },
+    upload: {
+      title: 'Carica il documento firmato',
+      description: 'Carica l’accordo di adesione firmato digitalmente in p7m dal Legale Rappresentante.',
+      dragAndDrop: {
+        title: 'Trascina qui il documento firmato oppure',
+        dragOver: 'Rilascia qui per caricare',
+        failed: 'Caricamento fallito',
+        upload: 'Carica il file',
+        retry: 'Riprova',
+        cancel: 'Annulla',
+        remove: 'Rimuovi il file',
+      },
+      requiredField: '*Campo obbligatorio',
+      back: 'Indietro',
+      continue: 'Continua',
+    },
+    success: {
+      title: 'Hai completato la richiesta',
+      description: 'Comunicheremo l’esito all’indirizzo PEC primario dell’ente.',
+      backHome: 'Torna alla home',
+    },
+  },
   fileUploadPreview: {
     loadingStatus: 'Caricamento...',
     labelStatus: 'Pronto per l’invio',

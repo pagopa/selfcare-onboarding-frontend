@@ -107,6 +107,44 @@ export default {
       },
     },
   },
+  contractUpdate: {
+    exit: 'Beenden',
+    download: {
+      title: 'Dokument zur Unterzeichnung herunterladen',
+      description:
+        'Um die Anfrage abzuschließen, laden Sie die Vereinbarung herunter und lassen Sie diese vom Rechtsvertreter der Körperschaft digital im <2>p7m-Format</2> unterzeichnen.',
+      downloadContract: 'Dokument herunterladen',
+      disclaimer:
+        'Mit der Unterzeichnung der Vereinbarung akzeptiert der Rechtsvertreter der Körperschaft ausdrücklich und spezifisch auch die einzelnen Klauseln, die im Abschnitt "Klauseln gemäß Art. 1341 und 1342 BGB" angegeben sind.',
+    },
+    chooseUpload: {
+      title: 'Unterzeichnetes Dokument hochladen',
+      description:
+        'Folgen Sie den Anweisungen, um das Dokument einzureichen und die Anfrage für das Produkt {{productTitle}} abzuschließen. Denken Sie daran, das Dokument <3>innerhalb von 90 Tagen</3> hochzuladen.',
+      goToUpload: 'Zum Laden',
+    },
+    upload: {
+      title: 'Unterzeichnetes Dokument hochladen',
+      description: 'Laden Sie die vom Rechtsvertreter digital in p7m unterzeichnete Beitrittsvereinbarung hoch.',
+      dragAndDrop: {
+        title: 'Ziehen Sie das unterzeichnete Dokument hierher oder',
+        dragOver: 'Zum Hochladen hier ablegen',
+        failed: 'Hochladen fehlgeschlagen',
+        upload: 'Datei hochladen',
+        retry: 'Erneut versuchen',
+        cancel: 'Abbrechen',
+        remove: 'Datei entfernen',
+      },
+      requiredField: '*Pflichtfeld',
+      back: 'Zurück',
+      continue: 'Weiter',
+    },
+    success: {
+      title: 'Sie haben die Anfrage abgeschlossen',
+      description: 'Wir teilen das Ergebnis an die primäre PEC-Adresse der Körperschaft mit.',
+      backHome: 'Zurück zur Homepage',
+    },
+  },
   fileUploadPreview: {
     loadingStatus: 'Laden läuft...',
     labelStatus: 'Versandbereit',
