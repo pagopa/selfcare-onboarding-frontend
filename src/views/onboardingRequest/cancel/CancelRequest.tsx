@@ -117,6 +117,14 @@ export default function CancelRequestComponent() {
         </>,
       ],
     },
+    notAllowed: {
+      title: '',
+      description: [
+        <>
+          <NotFoundPage />
+        </>,
+      ],
+    },
     genericError,
   };
 

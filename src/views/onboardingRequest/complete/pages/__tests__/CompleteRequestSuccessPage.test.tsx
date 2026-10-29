@@ -23,3 +23,13 @@ it('test CompleteRequestSuccessPage shows the standard wording for the other pro
   expect(screen.getByText('Adesione completata!')).toBeInTheDocument();
   expect(document.body.textContent).toContain("Comunicheremo l'avvenuta adesione");
 });
+
+it('test CompleteRequestSuccessPage shows the contract update wording when enabled', () => {
+  renderComponentWithProviders(
+    <CompleteRequestSuccessPage addUserFlow={false} translationKeyValue="product" contractUpdate />,
+    PRODUCT_IDS.PAGOPA
+  );
+
+  expect(screen.getByText('Hai completato la richiesta')).toBeInTheDocument();
+  expect(document.body.textContent).toContain('Comunicheremo l’esito');
+});

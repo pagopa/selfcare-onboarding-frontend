@@ -4,12 +4,14 @@ import { EndingPage } from '@pagopa/selfcare-common-frontend/lib';
 import { Typography, Link } from '@mui/material';
 import { ENV } from '../../../../utils/env';
 import { isCedProduct } from '../../../../utils/institutionTypeUtils';
+import { ContractUpdateSuccess } from '../../../../components/registrationSteps/contractUpdate/ContractUpdateSuccess';
 
 type Props = {
   addUserFlow: boolean;
   translationKeyValue: string;
   institutionId?: string;
   productId?: string;
+  contractUpdate?: boolean;
 };
 
 export default function CompleteRequestSuccessPage({
@@ -17,8 +19,18 @@ export default function CompleteRequestSuccessPage({
   translationKeyValue,
   institutionId,
   productId,
+  contractUpdate,
 }: Props) {
   const { t } = useTranslation();
+
+  if (
+    contractUpdate &&
+    !addUserFlow &&
+    translationKeyValue === 'product' &&
+    !isCedProduct(productId)
+  ) {
+    return <ContractUpdateSuccess />;
+  }
 
   return (
     <>

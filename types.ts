@@ -48,7 +48,9 @@ export type RequestOutcomeComplete =
   | 'alreadyCompleted'
   | 'alreadyRejected'
   | 'expired'
-  | 'notFound';
+  | 'notFound'
+  | 'notAllowed'
+  | 'genericError';
 
 export type RequestOutcomeMessage = {
   title: string;

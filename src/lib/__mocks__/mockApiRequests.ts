@@ -2026,6 +2026,10 @@ export async function mockFetch(
             statusText: '200',
           } as AxiosResponse)
         );
+      case 'genericError':
+        return genericError;
+      case 'notAllowed':
+        return notAllowedError;
       default:
         return notFoundError;
     }
