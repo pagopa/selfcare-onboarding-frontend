@@ -1,4 +1,3 @@
-/* eslint-disable sonarjs/cognitive-complexity */
 import { useErrorDispatcher } from '@pagopa/selfcare-common-frontend';
 import SessionModal from '@pagopa/selfcare-common-frontend/lib/components/SessionModal';
 import { productId2ProductTitle } from '@pagopa/selfcare-common-frontend/lib/utils/productId2ProductTitle';

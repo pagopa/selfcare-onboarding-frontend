@@ -50,7 +50,6 @@ export const genericError: RequestOutcomeMessage = {
   ],
 };
 
-// eslint-disable-next-line sonarjs/cognitive-complexity
 export function StepVerifyOnboarding({
   forward,
   externalInstitutionId,
