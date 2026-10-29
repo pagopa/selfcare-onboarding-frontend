@@ -129,6 +129,37 @@ export default {
       title: 'You have completed the request',
       description: "We will communicate the outcome to the institution's primary PEC address.",
       backHome: 'Back to home'
+    },
+    error: {
+      generic: {
+        title: 'The page you were looking for is not available',
+        description:
+          'It is not possible to proceed at the moment. Try again in a few minutes, or contact support'
+      },
+      expired: {
+        title: 'The request is no longer valid',
+        description:
+          'More than 90 days have passed. If you still want to add the missing documentation, submit a new request.'
+      },
+      cancelled: {
+        title: 'The request has been cancelled',
+        description:
+          'The request was not successful. If you want to add the missing documentation for the product {{productTitle}}, submit a new request.'
+      },
+      notAllowed: {
+        title: 'You do not have permission to complete this request',
+        description:
+          'Ask whoever made the request or the administrators/legal representatives listed in the contract (or entered during onboarding) to complete the operation'
+      },
+      alreadyCompleted: {
+        title: 'You have already submitted this document',
+        description: 'To manage the product, log in with SPID or CIE'
+      },
+      copyErrorCode: 'Copy error code',
+      exit: 'Exit',
+      contactAssistance: 'Contact support',
+      login: 'Log in',
+      goToDocuments: 'Go to documents'
     }
   },
   fileUploadPreview: {

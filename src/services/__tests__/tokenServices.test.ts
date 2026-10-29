@@ -133,3 +133,38 @@ it('test verifyRequest with outcome notFound', async () => {
 
   expect(setOutcomeContentState).toHaveBeenCalledWith('notFound');
 });
+
+it.each([
+  [403, 'notAllowed'],
+  [500, 'genericError'],
+  [404, 'notFound'],
+])('test verifyRequest with detailedErrors maps status %i to %s', async (httpStatus, outcome) => {
+  vi.mocked(OnboardingApi.verifyOnboarding).mockRejectedValue(
+    Object.assign(new Error('fail'), { httpStatus })
+  );
+
+  await verifyRequest({
+    onboardingId: 'onb-1',
+    setOutcomeContentState,
+    setRequestData,
+    setRequiredLogin,
+    detailedErrors: true,
+  });
+
+  expect(setOutcomeContentState).toHaveBeenCalledWith(outcome);
+});
+
+it('test verifyRequest without detailedErrors keeps notFound for server errors', async () => {
+  vi.mocked(OnboardingApi.verifyOnboarding).mockRejectedValue(
+    Object.assign(new Error('fail'), { httpStatus: 500 })
+  );
+
+  await verifyRequest({
+    onboardingId: 'onb-1',
+    setOutcomeContentState,
+    setRequestData,
+    setRequiredLogin,
+  });
+
+  expect(setOutcomeContentState).toHaveBeenCalledWith('notFound');
+});

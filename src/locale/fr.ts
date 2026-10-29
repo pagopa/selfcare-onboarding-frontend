@@ -129,6 +129,37 @@ export default {
       title: 'Vous avez complété la demande',
       description: "Nous communiquerons le résultat à l'adresse PEC principale de l'organisme.",
       backHome: "Retour à l'accueil"
+    },
+    error: {
+      generic: {
+        title: "La page que vous cherchiez n'est pas disponible",
+        description:
+          "Il n'est pas possible de continuer pour le moment. Réessayez dans quelques minutes ou contactez l'assistance"
+      },
+      expired: {
+        title: "La demande n'est plus valide",
+        description:
+          "Plus de 90 jours se sont écoulés. Si vous souhaitez toujours ajouter la documentation manquante, envoyez une nouvelle demande."
+      },
+      cancelled: {
+        title: 'La demande a été annulée',
+        description:
+          "La demande n'a pas abouti. Si vous souhaitez ajouter la documentation manquante pour le produit {{productTitle}}, envoyez une nouvelle demande."
+      },
+      notAllowed: {
+        title: "Vous n'avez pas les autorisations pour finaliser cette demande",
+        description:
+          "Demandez à la personne qui a fait la demande ou aux administrateurs/représentants légaux indiqués dans le contrat (ou saisis lors de l'adhésion) de finaliser l'opération"
+      },
+      alreadyCompleted: {
+        title: 'Vous avez déjà envoyé ce document',
+        description: 'Pour gérer le produit, connectez-vous avec SPID ou CIE'
+      },
+      copyErrorCode: "Copier le code d'erreur",
+      exit: 'Quitter',
+      contactAssistance: "Contacter l'assistance",
+      login: 'Se connecter',
+      goToDocuments: 'Aller aux documents'
     }
   },
   fileUploadPreview: {

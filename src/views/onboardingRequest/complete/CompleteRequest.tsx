@@ -1,7 +1,7 @@
 /* eslint-disable sonarjs/cognitive-complexity */
 import SessionModal from '@pagopa/selfcare-common-frontend/lib/components/SessionModal';
 import { productId2ProductTitle } from '@pagopa/selfcare-common-frontend/lib/utils/productId2ProductTitle';
-import { useContext, useEffect, useState } from 'react';
+import { ComponentProps, useContext, useEffect, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { useParams } from 'react-router';
 import { FileErrorAttempt, Problem, RequestOutcomeComplete, StepperStep } from '../../../../types';
@@ -9,6 +9,7 @@ import { OnboardingVerify } from '../../../api/generated/onboarding/OnboardingVe
 import { LoadingOverlay } from '../../../components/modals/LoadingOverlay';
 import { ConfirmRegistrationStep0 } from '../../../components/registrationSteps/ConfirmRegistrationStep0';
 import { ConfirmRegistrationStep1 } from '../../../components/registrationSteps/ConfirmRegistrationStep1';
+import { ContractUpdateErrorPage } from '../../../components/registrationSteps/contractUpdate/ContractUpdateErrorPage';
 import { MessageNoAction } from '../../../components/shared/MessageNoAction';
 import { useHistoryState } from '../../../hooks/useHistoryState';
 import { HeaderContext, UserContext } from '../../../lib/context';
@@ -33,6 +34,24 @@ const error2errorCode: { [key in keyof typeof customErrors]: Array<string> } = {
   GENERIC: [],
 };
 
+// In the contractUpdate flow the outcomes are rendered as full pages instead of modals
+const contractUpdateErrors: Partial<
+  Record<RequestOutcomeComplete, ComponentProps<typeof ContractUpdateErrorPage>>
+> = {
+  notFound: { variant: 'generic', errorDescription: '404' },
+  genericError: { variant: 'generic', errorDescription: '500' },
+  notAllowed: { variant: 'notAllowed' },
+  error: { variant: 'generic', errorDescription: '500' },
+  expired: { variant: 'expired', errorDescription: 'REQUEST_EXPIRED' },
+  alreadyCompleted: { variant: 'alreadyCompleted' },
+  alreadyRejected: { variant: 'cancelled' },
+};
+
+const getContractUpdateError = (
+  contractUpdate: boolean,
+  outcome: RequestOutcomeComplete | null
+) => (contractUpdate ? contractUpdateErrors[outcome ?? 'error'] : undefined);
+
 export const transcodeErrorCode = (data: Problem): keyof typeof customErrors => {
   if (data.errors?.findIndex((e) => error2errorCode.INVALID_DOCUMENT.includes(e.code)) > -1) {
     return 'INVALID_DOCUMENT';
@@ -50,7 +69,7 @@ export const transcodeErrorCode = (data: Problem): keyof typeof customErrors => 
   return 'GENERIC';
 };
 
-// eslint-disable-next-line sonarjs/cognitive-complexity
+// eslint-disable-next-line sonarjs/cognitive-complexity, complexity
 export default function CompleteRequestComponent() {
   const { t } = useTranslation();
   const { setSubHeaderVisible, setOnExit, setEnableLogin } = useContext(HeaderContext);
@@ -102,6 +121,7 @@ export default function CompleteRequestComponent() {
         setRequiredLogin,
         setOutcomeContentState,
         setRequestData,
+        detailedErrors: contractUpdate,
       }).finally(() => setLoading(false));
     }
   }, [onboardingId]);
@@ -216,6 +236,15 @@ export default function CompleteRequestComponent() {
 
   const Step = steps[activeStep].Component;
 
+  const notFoundContent = {
+    title: '',
+    description: [
+      <>
+        <NotFoundPage />
+      </>,
+    ],
+  };
+
   const outcomeContent = {
     toBeCompleted: {
       title: '',
@@ -255,14 +284,9 @@ export default function CompleteRequestComponent() {
         </>,
       ],
     },
-    notFound: {
-      title: '',
-      description: [
-        <>
-          <NotFoundPage />
-        </>,
-      ],
-    },
+    notFound: notFoundContent,
+    notAllowed: notFoundContent,
+    genericError: notFoundContent,
     success: {
       title: '',
       description: [
@@ -287,8 +311,16 @@ export default function CompleteRequestComponent() {
     },
   };
 
+  const contractUpdateError = getContractUpdateError(contractUpdate, outcomeContentState);
+
   return loading ? (
     <LoadingOverlay loadingText={t('onboarding.loading.loadingText')} />
+  ) : contractUpdateError ? (
+    <ContractUpdateErrorPage
+      {...contractUpdateError}
+      institutionId={institutionId}
+      productTitle={productId2ProductTitle(requestData?.productId ?? '')}
+    />
   ) : outcomeContentState && outcomeContentState !== 'error' ? (
     <>
       <MessageNoAction {...outcomeContent[outcomeContentState]} />

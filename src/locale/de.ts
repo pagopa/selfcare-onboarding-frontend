@@ -144,6 +144,37 @@ export default {
       description: 'Wir teilen das Ergebnis an die primäre PEC-Adresse der Körperschaft mit.',
       backHome: 'Zurück zur Homepage',
     },
+    error: {
+      generic: {
+        title: 'Die gesuchte Seite ist nicht verfügbar',
+        description:
+          'Im Moment ist es nicht möglich fortzufahren. Versuchen Sie es in einigen Minuten erneut oder kontaktieren Sie den Support',
+      },
+      expired: {
+        title: 'Die Anfrage ist nicht mehr gültig',
+        description:
+          'Es sind mehr als 90 Tage vergangen. Wenn Sie die fehlenden Unterlagen weiterhin hinzufügen möchten, senden Sie eine neue Anfrage.',
+      },
+      cancelled: {
+        title: 'Die Anfrage wurde storniert',
+        description:
+          'Die Anfrage war nicht erfolgreich. Wenn Sie die fehlenden Unterlagen für das Produkt {{productTitle}} hinzufügen möchten, senden Sie eine neue Anfrage.',
+      },
+      notAllowed: {
+        title: 'Sie haben keine Berechtigung, diese Anfrage abzuschließen',
+        description:
+          'Bitten Sie die Person, die die Anfrage gestellt hat, oder die im Vertrag angegebenen (oder beim Beitritt eingetragenen) Administratoren/gesetzlichen Vertreter, den Vorgang abzuschließen',
+      },
+      alreadyCompleted: {
+        title: 'Sie haben dieses Dokument bereits gesendet',
+        description: 'Um das Produkt zu verwalten, melden Sie sich mit SPID oder CIE an',
+      },
+      copyErrorCode: 'Fehlercode kopieren',
+      exit: 'Beenden',
+      contactAssistance: 'Support kontaktieren',
+      login: 'Anmelden',
+      goToDocuments: 'Zu den Dokumenten',
+    },
   },
   fileUploadPreview: {
     loadingStatus: 'Laden läuft...',

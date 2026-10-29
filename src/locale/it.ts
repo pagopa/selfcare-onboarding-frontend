@@ -135,6 +135,37 @@ export default {
       description: 'Comunicheremo l’esito all’indirizzo PEC primario dell’ente.',
       backHome: 'Torna alla home',
     },
+    error: {
+      generic: {
+        title: 'La pagina che cercavi non è disponibile',
+        description:
+          'Al momento non è possibile procedere. Riprova tra qualche minuto, o contatta l’assistenza',
+      },
+      expired: {
+        title: 'La richiesta non è più valida',
+        description:
+          'Sono trascorsi oltre 90 giorni. Se desideri ancora aggiungere la documentazione mancante, invia una nuova richiesta.',
+      },
+      cancelled: {
+        title: 'La richiesta è stata annullata',
+        description:
+          'La richiesta non è andata a buon fine. Se desideri aggiungere la documentazione mancante per il prodotto {{productTitle}}, invia una nuova richiesta.',
+      },
+      notAllowed: {
+        title: 'Non hai permessi per completare questa richiesta',
+        description:
+          'Chiedi a chi ha fatto la richiesta o agli amministratori/LR presenti nel contratto (o inseriti in fase di adesione) di completare l’operazione',
+      },
+      alreadyCompleted: {
+        title: 'Hai già inviato questo documento',
+        description: 'Per gestire il prodotto, accedi tramite SPID o CIE',
+      },
+      copyErrorCode: 'Copia il codice errore',
+      exit: 'Esci',
+      contactAssistance: 'Contatta l’assistenza',
+      login: 'Accedi',
+      goToDocuments: 'Vai ai documenti',
+    },
   },
   fileUploadPreview: {
     loadingStatus: 'Caricamento...',

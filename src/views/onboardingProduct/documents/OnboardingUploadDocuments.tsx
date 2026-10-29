@@ -258,7 +258,13 @@ export default function OnboardingUploadDocuments() {
     <LoadingOverlay loadingText={t('onboarding.loading.loadingText')} />
   ) : outcomeContentState && outcomeContentState !== 'error' ? (
     <>
-      <MessageNoAction {...outcomeContent[outcomeContentState]} />
+      <MessageNoAction
+        {...outcomeContent[
+          outcomeContentState === 'notAllowed' || outcomeContentState === 'genericError'
+            ? 'notFound'
+            : outcomeContentState
+        ]}
+      />
       <SessionModal
         handleClose={handleErrorModalClose}
         handleExit={handleErrorModalExit}

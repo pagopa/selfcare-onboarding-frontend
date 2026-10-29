@@ -10,6 +10,9 @@ type Props = {
   setRequiredLogin: (value: React.SetStateAction<boolean>) => void;
   setOutcomeContentState: React.Dispatch<React.SetStateAction<RequestOutcomeComplete | null>>;
   setRequestData: React.Dispatch<React.SetStateAction<OnboardingVerify | undefined>>;
+  // Distinguishes permission (403) and server (5xx) errors from "not found";
+  // a 401 is handled upstream as an expired session (redirect to login)
+  detailedErrors?: boolean;
 };
 
 const getMixPanelEvent = (errorStatus: number | undefined) => {
@@ -25,6 +28,7 @@ export const verifyRequest = async ({
   onboardingId,
   setOutcomeContentState,
   setRequestData,
+  detailedErrors,
 }: Props) => {
   if (!onboardingId) {
     return setOutcomeContentState('notFound');
@@ -56,7 +60,13 @@ export const verifyRequest = async ({
   } catch (error) {
     const status = getErrorStatus(error);
     trackEvent(getMixPanelEvent(status), { party_id: onboardingId });
-    setOutcomeContentState('notFound');
+    if (detailedErrors && status === 403) {
+      setOutcomeContentState('notAllowed');
+    } else if (detailedErrors && status !== undefined && status >= 500) {
+      setOutcomeContentState('genericError');
+    } else {
+      setOutcomeContentState('notFound');
+    }
   }
 };
 

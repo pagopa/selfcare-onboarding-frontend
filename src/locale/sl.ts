@@ -129,6 +129,37 @@ export default {
       title: 'Zahtevo ste dokončali',
       description: 'Izid bomo sporočili na primarni naslov PEC organizacije.',
       backHome: 'Nazaj na domačo stran'
+    },
+    error: {
+      generic: {
+        title: 'Stran, ki jo iščete, ni na voljo',
+        description:
+          'Trenutno ni mogoče nadaljevati. Poskusite znova čez nekaj minut ali se obrnite na podporo'
+      },
+      expired: {
+        title: 'Zahteva ni več veljavna',
+        description:
+          'Minilo je več kot 90 dni. Če še vedno želite dodati manjkajočo dokumentacijo, pošljite novo zahtevo.'
+      },
+      cancelled: {
+        title: 'Zahteva je bila preklicana',
+        description:
+          'Zahteva ni bila uspešna. Če želite dodati manjkajočo dokumentacijo za izdelek {{productTitle}}, pošljite novo zahtevo.'
+      },
+      notAllowed: {
+        title: 'Nimate dovoljenj za dokončanje te zahteve',
+        description:
+          'Prosite osebo, ki je oddala zahtevo, ali skrbnike/zakonite zastopnike, navedene v pogodbi (ali vnesene ob pristopu), da dokončajo postopek'
+      },
+      alreadyCompleted: {
+        title: 'Ta dokument ste že poslali',
+        description: 'Za upravljanje izdelka se prijavite s SPID ali CIE'
+      },
+      copyErrorCode: 'Kopiraj kodo napake',
+      exit: 'Izhod',
+      contactAssistance: 'Obrni se na podporo',
+      login: 'Prijava',
+      goToDocuments: 'Pojdi na dokumente'
     }
   },
   fileUploadPreview: {
