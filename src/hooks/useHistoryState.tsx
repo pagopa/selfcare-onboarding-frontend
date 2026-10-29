@@ -4,11 +4,11 @@ import { logAction } from '../lib/action-log';
 
 export function useHistoryState<T>(
   key: string,
-  initialValue?: T
+  initialValue: T
 ): [T, Dispatch<SetStateAction<T>>, (t: T) => void] {
   const history = useHistory();
   const [rawState, rawSetState] = useState<T>(() => {
-    const value = (history.location.state as any)?.[key];
+    const value = (history.location.state as Partial<Record<string, T>> | undefined)?.[key];
     return value ?? initialValue;
   });
   function setHistory(value: T) {
@@ -16,7 +16,7 @@ export function useHistoryState<T>(
     history.replace({
       ...history.location,
       state: {
-        ...(history.location.state as any),
+        ...(history.location.state as Record<string, unknown> | undefined),
         [key]: value,
       },
     });

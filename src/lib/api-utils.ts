@@ -1,4 +1,4 @@
-import axios, { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
+import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 import isEmpty from 'lodash/isEmpty';
 import { storageTokenOps } from '@pagopa/selfcare-common-frontend/lib/utils/storage';
 import { Endpoint, RequestConfig } from '../../types';
@@ -13,19 +13,17 @@ export const sleep = async (ms: number) => await new Promise((resolve) => setTim
 
 // axios interceptor to always recuse the http status in error responses
 axios.interceptors.response.use(
-
   (response) => response,
 
   (error: AxiosError) => {
-
-    const isNetworkError = !error.response && (
-      error.code === 'ECONNABORTED' ||
-      error.code === 'ERR_NETWORK' ||
-      error.code === 'ERR_CANCELED' ||
-      error.message?.includes('Network Error') ||
-      error.message?.includes('timeout') ||
-      error.message?.includes('CORS')
-    );
+    const isNetworkError =
+      !error.response &&
+      (error.code === 'ECONNABORTED' ||
+        error.code === 'ERR_NETWORK' ||
+        error.code === 'ERR_CANCELED' ||
+        error.message?.includes('Network Error') ||
+        error.message?.includes('timeout') ||
+        error.message?.includes('CORS'));
 
     if (isNetworkError) {
       // Network error: status not available
@@ -59,7 +57,6 @@ axios.interceptors.response.use(
   }
 );
 
-
 function prepareRequest(
   { endpoint, endpointParams }: Endpoint,
   { method, params, data, headers }: AxiosRequestConfig
@@ -68,16 +65,13 @@ function prepareRequest(
     throw new Error(`WARNING! The endpoint ${endpoint} does not exist in constants.ts`);
   }
 
-  // eslint-disable-next-line functional/no-let
-  let url = API[endpoint].URL;
-
   // Replace dynamic parts of the URL by substitution
-  if (!isEmpty(endpointParams)) {
-    url = Object.keys(endpointParams).reduce(
-      (acc, key) => acc.replace(`{{${key}}}`, endpointParams[key]),
-      url
-    );
-  }
+  const url = isEmpty(endpointParams)
+    ? API[endpoint].URL
+    : Object.keys(endpointParams).reduce(
+        (acc, key) => acc.replace(`{{${key}}}`, endpointParams[key]),
+        API[endpoint].URL
+      );
 
   // Log action with updated variables, in case the call is mocked
   logAction('Prepare request', {
@@ -101,14 +95,14 @@ function prepareRequest(
 }
 
 async function performRequests(
-  requests: Array<() => Promise<AxiosInstance>>,
+  requests: Array<() => Promise<AxiosResponse>>,
   onRedirectToLogin: () => void,
   notValidTokenHttpStatus: number | null = 401
 ): Promise<Array<AxiosResponse> | Array<AxiosError>> {
   try {
     const responses = await axios.all(requests.map((r) => r()));
     logAction('Log response', responses);
-    return responses as unknown as Array<AxiosResponse>;
+    return responses;
   } catch (error) {
     logError(error);
     if (
@@ -126,11 +120,8 @@ export async function fetchAllWithLogs(
   reqsConfig: Array<RequestConfig>,
   onRedirectToLogin: () => void
 ) {
-  const requests = await Promise.all(
-    // eslint-disable-next-line @typescript-eslint/await-thenable
-    reqsConfig.map(async ({ path, config }) => await prepareRequest(path, config))
-  );
-  return await performRequests(requests as any, onRedirectToLogin);
+  const requests = reqsConfig.map(({ path, config }) => prepareRequest(path, config));
+  return await performRequests(requests, onRedirectToLogin);
 }
 
 export async function fetchWithLogs(
@@ -144,11 +135,7 @@ export async function fetchWithLogs(
   }
 
   // Prepare the request
-  // eslint-disable-next-line @typescript-eslint/await-thenable
-  const request = await prepareRequest(
-    { endpoint, endpointParams },
-    { method, params, data, headers }
-  );
-  const responses = await performRequests([request as any], onRedirectToLogin);
+  const request = prepareRequest({ endpoint, endpointParams }, { method, params, data, headers });
+  const responses = await performRequests([request], onRedirectToLogin);
   return responses[0];
 }
