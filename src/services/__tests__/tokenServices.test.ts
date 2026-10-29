@@ -44,7 +44,7 @@ it('test getOnboardingInfo failure', async () => {
   expect(setOutcomeContentState).toHaveBeenCalledWith('error');
 });
 
-it("test verifyRequest with outcome notFound", async () => {
+it('test verifyRequest with outcome notFound', async () => {
   await verifyRequest({
     onboardingId: undefined,
     setOutcomeContentState,
@@ -167,4 +167,43 @@ it('test verifyRequest without detailedErrors keeps notFound for server errors',
   });
 
   expect(setOutcomeContentState).toHaveBeenCalledWith('notFound');
+});
+
+it.each([
+  [
+    'nested JSON detail as received',
+    {
+      httpStatus: 400,
+      httpBody: {
+        title: 'Bad Request',
+        status: 400,
+        detail:
+          '{"detail":"Original document information not found","instance":null,"status":400,"title":"002-1008","type":null}',
+      },
+    },
+    '{"detail":"Original document information not found","instance":null,"status":400,"title":"002-1008","type":null}',
+  ],
+  [
+    'title without detail',
+    { httpStatus: 503, httpBody: { title: 'Service Unavailable' } },
+    'Service Unavailable',
+  ],
+  ['status with empty body', { httpStatus: 404, httpBody: '' }, '404'],
+  ['error message without response', { message: 'Network Error' }, 'Network Error'],
+])('test verifyRequest passes the backend error detail (%s)', async (_, errorProps, expected) => {
+  vi.mocked(OnboardingApi.verifyOnboarding).mockRejectedValue(
+    Object.assign(new Error('fail'), errorProps)
+  );
+  const setErrorDescription = vi.fn();
+
+  await verifyRequest({
+    onboardingId: 'onb-1',
+    setOutcomeContentState,
+    setRequestData,
+    setRequiredLogin,
+    detailedErrors: true,
+    setErrorDescription,
+  });
+
+  expect(setErrorDescription).toHaveBeenCalledWith(expected);
 });

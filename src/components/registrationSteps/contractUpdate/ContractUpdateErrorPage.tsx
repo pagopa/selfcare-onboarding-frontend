@@ -8,11 +8,7 @@ import { ENV } from '../../../utils/env';
 import { ContractUpdateLayout } from './ContractUpdateLayout';
 
 export type ContractUpdateErrorVariant =
-  | 'generic'
-  | 'expired'
-  | 'alreadyCompleted'
-  | 'cancelled'
-  | 'notAllowed';
+  'generic' | 'expired' | 'alreadyCompleted' | 'cancelled' | 'notAllowed';
 
 type Props = {
   variant: ContractUpdateErrorVariant;
@@ -37,7 +33,7 @@ export function ContractUpdateErrorPage({
     ? `${ENV.URL_FE.DASHBOARD}/${institutionId}`
     : ENV.URL_FE.DASHBOARD;
 
-  const showErrorDescription = SHOW_ERROR_DESCRIPTION.includes(variant) && !!errorDescription;
+  const showErrorDescription = SHOW_ERROR_DESCRIPTION.includes(variant);
 
   return (
     <ContractUpdateLayout>
@@ -68,7 +64,7 @@ export function ContractUpdateErrorPage({
               <MIIconButton
                 size="small"
                 aria-label={t('contractUpdate.error.copyErrorCode')}
-                onClick={() => void navigator.clipboard?.writeText(errorDescription)}
+                onClick={() => void navigator.clipboard?.writeText(errorDescription ?? '')}
               >
                 <ContentCopyIcon fontSize="small" color="primary" />
               </MIIconButton>

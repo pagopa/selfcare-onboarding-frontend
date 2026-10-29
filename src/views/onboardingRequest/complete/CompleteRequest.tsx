@@ -38,10 +38,11 @@ const error2errorCode: { [key in keyof typeof customErrors]: Array<string> } = {
 const contractUpdateErrors: Partial<
   Record<RequestOutcomeComplete, ComponentProps<typeof ContractUpdateErrorPage>>
 > = {
-  notFound: { variant: 'generic', errorDescription: '404' },
-  genericError: { variant: 'generic', errorDescription: '500' },
+  notFound: { variant: 'generic' },
+  genericError: { variant: 'generic' },
   notAllowed: { variant: 'notAllowed' },
-  error: { variant: 'generic', errorDescription: '500' },
+  error: { variant: 'generic' },
+  // The expiration is computed client-side from a successful response: there is no API error
   expired: { variant: 'expired', errorDescription: 'REQUEST_EXPIRED' },
   alreadyCompleted: { variant: 'alreadyCompleted' },
   alreadyRejected: { variant: 'cancelled' },
@@ -93,6 +94,7 @@ export default function CompleteRequestComponent() {
     []
   );
   const [requestData, setRequestData] = useState<OnboardingVerify>();
+  const [errorDescription, setErrorDescription] = useState<string>();
   const [institutionId, setInstitutionId] = useState<string>();
   const [attachmentUploadSuccess, setAttachmentUploadSuccess] = useState<boolean>(false);
   const addUserFlow = new URLSearchParams(window.location.search).get('add-user') === 'true';
@@ -122,6 +124,7 @@ export default function CompleteRequestComponent() {
         setOutcomeContentState,
         setRequestData,
         detailedErrors: contractUpdate,
+        setErrorDescription: contractUpdate ? setErrorDescription : undefined,
       }).finally(() => setLoading(false));
     }
   }, [onboardingId]);
@@ -318,6 +321,7 @@ export default function CompleteRequestComponent() {
   ) : contractUpdateError ? (
     <ContractUpdateErrorPage
       {...contractUpdateError}
+      errorDescription={contractUpdateError.errorDescription ?? errorDescription}
       institutionId={institutionId}
       productTitle={productId2ProductTitle(requestData?.productId ?? '')}
     />

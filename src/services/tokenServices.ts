@@ -4,7 +4,7 @@ import { RequestOutcomeComplete } from '../../types';
 import { OnboardingApi } from '../api/OnboardingApiClient';
 import { InstitutionInfo } from '../api/generated/onboarding/InstitutionInfo';
 import { OnboardingVerify } from '../api/generated/onboarding/OnboardingVerify';
-import { getErrorStatus } from '../lib/error-utils';
+import { getErrorDescription, getErrorStatus } from '../lib/error-utils';
 type Props = {
   onboardingId?: string;
   setRequiredLogin: (value: React.SetStateAction<boolean>) => void;
@@ -13,6 +13,8 @@ type Props = {
   // Distinguishes permission (403) and server (5xx) errors from "not found";
   // a 401 is handled upstream as an expired session (redirect to login)
   detailedErrors?: boolean;
+  // Receives the error description built from the API error response
+  setErrorDescription?: (description: string | undefined) => void;
 };
 
 const getMixPanelEvent = (errorStatus: number | undefined) => {
@@ -29,6 +31,7 @@ export const verifyRequest = async ({
   setOutcomeContentState,
   setRequestData,
   detailedErrors,
+  setErrorDescription,
 }: Props) => {
   if (!onboardingId) {
     return setOutcomeContentState('notFound');
@@ -60,6 +63,7 @@ export const verifyRequest = async ({
   } catch (error) {
     const status = getErrorStatus(error);
     trackEvent(getMixPanelEvent(status), { party_id: onboardingId });
+    setErrorDescription?.(getErrorDescription(error));
     if (detailedErrors && status === 403) {
       setOutcomeContentState('notAllowed');
     } else if (detailedErrors && status !== undefined && status >= 500) {
