@@ -6,11 +6,12 @@ import { CustomTextFieldNotched } from "../../../utils/style-utils";
 import { InstitutionType } from "../../../../types";
 import { OnboardingControllers } from "../../../hooks/useOnboardingControllers";
 import { AssistanceContacts } from "../../../model/AssistanceContacts";
+import { BaseTextFieldPropsFn } from "../../steps/StepOnboardingFormData";
 
 type Props = {
     institutionType: InstitutionType;
     productId?: string;
-    baseTextFieldProps: any;
+    baseTextFieldProps: BaseTextFieldPropsFn;
     controllers: OnboardingControllers;
     assistanceContacts: AssistanceContacts | undefined;
     institutionAvoidGeotax: boolean;

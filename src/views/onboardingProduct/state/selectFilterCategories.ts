@@ -1,4 +1,9 @@
 import { InstitutionType } from '../../../../types';
+import {
+  FilterCategories,
+  FilterCategoriesResponse,
+  IpaCategories,
+} from '../../../model/FilterCategoriesResponse';
 import { PRODUCT_IDS } from '../../../utils/constants';
 import {
   isConsolidatedEconomicAccountCompany,
@@ -11,37 +16,38 @@ import {
  * Returns undefined while the categories response is not available.
  */
 export const selectFilterCategories = (
-  filterCategoriesResponse: any,
+  filterCategoriesResponse: FilterCategoriesResponse | null | undefined,
   productId: string,
   institutionType?: InstitutionType
-) => {
+): FilterCategories => {
   if (!filterCategoriesResponse?.product) {
     return undefined;
   }
 
   const products = filterCategoriesResponse.product;
+  const ipa = (productKey: string): IpaCategories => products[productKey]?.ipa ?? {};
 
   switch (productId) {
     case PRODUCT_IDS.SEND:
-      return products['prod-pn']?.ipa.PA;
+      return ipa('prod-pn').PA;
 
     case PRODUCT_IDS.IDPAY_MERCHANT:
       return products['prod-idpay-merchant']?.merchantDetails;
 
     case PRODUCT_IDS.INTEROP:
       if (isConsolidatedEconomicAccountCompany(institutionType)) {
-        return products['prod-interop']?.ipa.SCEC;
+        return ipa('prod-interop').SCEC;
       } else if (isPublicAdministration(institutionType)) {
-        return products['prod-interop']?.ipa.PA;
+        return ipa('prod-interop').PA;
       } else if (isGlobalServiceProvider(institutionType)) {
-        return products.default?.ipa.GSP;
+        return ipa('default').GSP;
       } else {
-        return products.default?.ipa.PA;
+        return ipa('default').PA;
       }
 
     default: {
-      const defaultIpa = products.default?.ipa;
-      return isGlobalServiceProvider(institutionType) ? defaultIpa?.GSP : defaultIpa?.PA;
+      const defaultIpa = ipa('default');
+      return isGlobalServiceProvider(institutionType) ? defaultIpa.GSP : defaultIpa.PA;
     }
   }
 };

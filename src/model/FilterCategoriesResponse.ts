@@ -15,3 +15,6 @@ export type ProductFilterConfig = {
 export type FilterCategoriesResponse = {
   product?: Partial<Record<string, ProductFilterConfig>>;
 };
+
+// IPA categories for the party search, or the merchant details for prod-idpay-merchant.
+export type FilterCategories = string | MerchantDetails | undefined;
