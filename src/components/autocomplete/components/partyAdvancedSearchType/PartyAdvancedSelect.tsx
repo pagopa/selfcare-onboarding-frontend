@@ -4,6 +4,8 @@ import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { InstitutionType, PartyData, Product } from '../../../../../types';
 import { AooData } from '../../../../model/AooData';
+import { AutocompleteOption } from '../../../../model/AutocompleteOption';
+import { PDNDBusinessResource } from '../../../../model/PDNDBusinessResource';
 import { SelectionEnum, SelectionsState } from '../../../../model/Selection';
 import { UoData } from '../../../../model/UoModel';
 import { PRODUCT_IDS } from '../../../../utils/constants';
@@ -22,9 +24,9 @@ import {
 
 type Props = {
   selections?: SelectionsState;
-  setSelected: React.Dispatch<React.SetStateAction<any>>;
+  setSelected: React.Dispatch<React.SetStateAction<PartyData | null>>;
   handleSelectionChange: (newSelection: SelectionEnum) => void;
-  setOptions: React.Dispatch<React.SetStateAction<Array<any>>>;
+  setOptions: React.Dispatch<React.SetStateAction<ReadonlyArray<AutocompleteOption>>>;
   setInput: React.Dispatch<React.SetStateAction<string>>;
   setIsSearchFieldSelected: React.Dispatch<React.SetStateAction<boolean>>;
   setCfResult: React.Dispatch<React.SetStateAction<PartyData | undefined>>;
@@ -36,7 +38,7 @@ type Props = {
   institutionType?: InstitutionType;
   addUser: boolean;
   selectedProduct?: Product;
-  setMerchantSearchResult?: Dispatch<SetStateAction<any>>;
+  setMerchantSearchResult?: (value?: PDNDBusinessResource) => void;
 };
 
 // eslint-disable-next-line complexity

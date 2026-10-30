@@ -199,7 +199,7 @@ export function StepSearchParty({
               setApiLoading={setApiLoading}
               apiLoading={apiLoading}
               endpoint={{ endpoint: 'ONBOARDING_GET_SEARCH_PARTIES' }}
-              transformFn={(data: IpaInstitutionsSearchResource) => data.items}
+              transformFn={(data: IpaInstitutionsSearchResource) => data.items ?? []}
               optionKey="id"
               optionLabel="description"
               isSearchFieldSelected={isSearchFieldSelected}

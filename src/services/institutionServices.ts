@@ -19,6 +19,7 @@ import {
 import config from '../utils/config.json';
 import { PartyRegistryProxyApi } from '../api/PartyRegistryProxyApiClient';
 import { OnboardingApi } from '../api/OnboardingApiClient';
+import { PDNDBusinessResource } from '../model/PDNDBusinessResource';
 
 // Dispatcher: the search functions receive `endpoint` as a runtime ApiEndpointKey.
 // Codegen needs statically-typed method calls, so we map each supported endpoint
@@ -92,7 +93,7 @@ const validateIdpayMerchantInstitution = (
   disabledStatusCompany: boolean | undefined,
   filterCategories: FilterCategories,
   setDisabled: Dispatch<SetStateAction<boolean>>,
-  setMerchantSearchResult: Dispatch<SetStateAction<PartyData | undefined>> | undefined
+  setMerchantSearchResult: ((value?: PDNDBusinessResource) => void) | undefined
 ) => {
   setMerchantSearchResult?.(response);
 
@@ -162,8 +163,8 @@ export const getUoInfoFromRecipientCode = async (
 export const fetchInstitutionsByName = async <T, D>(
   query: string,
   endpoint: Endpoint,
-  setOptions: Dispatch<SetStateAction<Array<T>>>,
-  transformFn: (data: D) => Array<T>,
+  setOptions: Dispatch<SetStateAction<ReadonlyArray<T>>>,
+  transformFn: (data: D) => ReadonlyArray<T>,
   _setRequiredLogin: Dispatch<SetStateAction<boolean>>,
   limit?: number,
   categories?: string
@@ -193,7 +194,7 @@ export const fetchInstitutionByTaxCode = async (
   filterCategories: FilterCategories,
   disabledStatusCompany: boolean | undefined,
   setCfResult: Dispatch<SetStateAction<PartyData | undefined>>,
-  setMerchantSearchResult: Dispatch<SetStateAction<PartyData | undefined>> | undefined,
+  setMerchantSearchResult: ((value?: PDNDBusinessResource) => void) | undefined,
   setDisabled: Dispatch<SetStateAction<boolean>>,
   _setRequiredLogin: Dispatch<SetStateAction<boolean>>
 ) => {
@@ -246,7 +247,7 @@ export const handleSearchByReaCode = async (
   product: Product | undefined,
   filterCategories: FilterCategories,
   disabledStatusCompany: boolean | undefined,
-  setMerchantSearchResult: Dispatch<SetStateAction<PartyData | undefined>> | undefined
+  setMerchantSearchResult: ((value?: PDNDBusinessResource) => void) | undefined
 ) => {
   setApiLoading?.(true);
 
