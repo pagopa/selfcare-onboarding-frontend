@@ -60,7 +60,6 @@ export const submitDocuments = async (
   setLoading: Dispatch<SetStateAction<boolean>>,
   onSuccess: () => void,
   onError: () => void
-  // eslint-disable-next-line sonarjs/cognitive-complexity
 ): Promise<void> => {
   setLoading(true);
   try {
@@ -76,7 +75,6 @@ export const submitDocuments = async (
             ? `${rd.id}.pdf`
             : `${rd.id}-${i + 1}.pdf`
           : `${rd.id}.pdf`;
-        // eslint-disable-next-line no-await-in-loop
         await OnboardingApi.uploadAttachment(
           onboardingId,
           attachmentName,

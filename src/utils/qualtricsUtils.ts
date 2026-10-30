@@ -1,6 +1,9 @@
 /* eslint-disable functional/immutable-data */
 declare global {
   interface Window {
+    institutionDescription?: string;
+    productId?: string;
+    institutionType?: string;
     QSI?: {
       API: {
         unload: () => void;
@@ -61,9 +64,9 @@ export const triggerQualtricsIntercept = async (
     return;
   }
 
-  (window as any).institutionDescription = data.institutionDescription ?? '';
-  (window as any).productId = data.productId;
-  (window as any).institutionType = data.institutionType ?? '';
+  window.institutionDescription = data.institutionDescription ?? '';
+  window.productId = data.productId;
+  window.institutionType = data.institutionType ?? '';
 
   if (!window.QSI?.API) {
     await loadQualtricsScript(config);

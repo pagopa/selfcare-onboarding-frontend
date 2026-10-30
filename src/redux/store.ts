@@ -5,7 +5,7 @@ import { userReducer } from '@pagopa/selfcare-common-frontend/lib/redux/slices/u
 
 const LOG_REDUX_ACTIONS = process.env.NODE_ENV === 'development';
 
-const additionalMiddlewares = [LOG_REDUX_ACTIONS ? logger : undefined];
+const additionalMiddlewares = LOG_REDUX_ACTIONS ? [logger] : [];
 
 export const createStore = () =>
   configureStore({
@@ -13,11 +13,8 @@ export const createStore = () =>
       user: userReducer,
       appState: appStateReducer,
     },
-    middleware: (getDefaultMiddleware: any) =>
-      additionalMiddlewares.reduce(
-        (array, middleware) => (middleware ? array.concat(middleware) : array),
-        getDefaultMiddleware({ serializableCheck: false })
-      ),
+    middleware: (getDefaultMiddleware) =>
+      getDefaultMiddleware({ serializableCheck: false }).concat(additionalMiddlewares),
   });
 
 export const store = createStore();

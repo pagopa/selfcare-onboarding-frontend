@@ -2,9 +2,12 @@ import '@testing-library/jest-dom';
 import { fireEvent, screen } from '@testing-library/react';
 import { beforeEach, expect, test, vi } from 'vitest';
 import { InstitutionType } from '../../../../../types';
+import { OnboardingControllers } from '../../../../hooks/useOnboardingControllers';
 import { OnboardingFormData } from '../../../../model/OnboardingFormData';
+import { BaseTextFieldPropsFn } from '../../../steps/StepOnboardingFormData';
 import { verifyTaxCodeInvoicing } from '../../../../services/billingDataServices';
 import { PRODUCT_IDS } from '../../../../utils/constants';
+import { asFormikProps, createFormikMock } from '../../../../utils/test/formikMock';
 import { renderComponentWithProviders } from '../../../../utils/test/test-utils';
 import InvoiceData from '../InvoiceData';
 
@@ -12,30 +15,18 @@ vi.mock('../../../../services/billingDataServices', () => ({
   verifyTaxCodeInvoicing: vi.fn(),
 }));
 
-const formik: any = {
-  values: {
-    recipientCode: '',
-    originId: 'IVASS1',
-  },
-  initialValues: {
-    recipientCode: '',
-  },
-  errors: {},
-  setFieldValue: vi.fn(),
-  handleChange: vi.fn(),
-};
-
 let lastTypedValue = '';
-formik.handleChange = vi.fn((e: any) => {
-  lastTypedValue = e.target.value;
-});
+const formik = createFormikMock(
+  { recipientCode: '', originId: 'IVASS1' },
+  {
+    initialValues: { recipientCode: '' },
+    handleChange: vi.fn((e: React.ChangeEvent<HTMLInputElement>) => {
+      lastTypedValue = e.target.value;
+    }),
+  }
+);
 
-const mockBaseTextFieldProps = (
-  field: keyof OnboardingFormData,
-  label: string,
-  fontWeight: number = 400,
-  fontSize: number | string = 16
-) => ({
+const mockBaseTextFieldProps: BaseTextFieldPropsFn = (field, label, fontWeight = 400, color) => ({
   id: field,
   type: 'text',
   value: formik.values[field] || '',
@@ -46,11 +37,11 @@ const mockBaseTextFieldProps = (
   onChange: formik.handleChange,
   sx: { width: '100%' },
   InputProps: {
-    style: { fontSize, fontWeight },
+    style: { fontWeight, color },
   },
 });
 
-const defaultControllers = {
+const defaultControllers: OnboardingControllers = {
   isPremium: false,
   isDisabled: false,
   isInvoiceable: true,
@@ -71,21 +62,21 @@ const renderComponent = ({
   institutionType?: InstitutionType;
   productId?: string;
   subProductId?: string;
-  controllers?: Record<string, unknown>;
-  onboardingFormData?: any;
+  controllers?: Partial<OnboardingControllers>;
+  onboardingFormData?: Partial<OnboardingFormData>;
   taxCodeInvoicingVisible?: boolean;
   disableTaxCodeInvoicing?: boolean;
 } = {}) => {
   const setInvalidTaxCodeInvoicing = vi.fn();
   renderComponentWithProviders(
     <InvoiceData
-      controllers={{ ...defaultControllers, ...controllers } as any}
+      controllers={{ ...defaultControllers, ...controllers }}
       subProductId={subProductId}
       institutionType={institutionType}
-      onboardingFormData={onboardingFormData}
+      onboardingFormData={onboardingFormData as OnboardingFormData | undefined}
       taxCodeInvoicingVisible={taxCodeInvoicingVisible}
       disableTaxCodeInvoicing={disableTaxCodeInvoicing}
-      formik={formik}
+      formik={asFormikProps(formik)}
       baseTextFieldProps={mockBaseTextFieldProps}
       setInvalidTaxCodeInvoicing={setInvalidTaxCodeInvoicing}
     />,

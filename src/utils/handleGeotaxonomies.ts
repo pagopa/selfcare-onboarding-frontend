@@ -6,7 +6,7 @@ import { ENV } from './env';
 export const handleGeotaxonomies = (
   previousGeotaxononomies: Array<GeographicTaxonomy>,
   institutionAvoidGeotax: boolean,
-  formik: any,
+  formik: { values: { geographicTaxonomies: Array<GeographicTaxonomy> } },
   updateGeotaxonomy: React.Dispatch<{
     add: boolean;
     edit: boolean;
@@ -21,10 +21,10 @@ export const handleGeotaxonomies = (
   ) {
     const changedNational2Local =
       previousGeotaxononomies.some((rv) => rv?.code === nationalValue) &&
-      !formik.values.geographicTaxonomies.some((gv: any) => gv?.code === nationalValue);
+      !formik.values.geographicTaxonomies.some((gv) => gv?.code === nationalValue);
     const changedToLocal2National =
       !previousGeotaxononomies.some((rv) => rv?.code === nationalValue) &&
-      formik.values.geographicTaxonomies.some((gv: any) => gv?.code === nationalValue);
+      formik.values.geographicTaxonomies.some((gv) => gv?.code === nationalValue);
 
     if (changedNational2Local || changedToLocal2National) {
       updateGeotaxonomy({ add: false, edit: true });
@@ -40,9 +40,7 @@ export const handleGeotaxonomies = (
         array1 = formik.values.geographicTaxonomies;
       }
       const arrayDifferences = array1.filter((elementarray1) =>
-        array2.some((elementArray2: any) => elementarray1?.code === elementArray2?.code)
-          ? false
-          : true
+        array2.some((elementArray2) => elementarray1?.code === elementArray2?.code) ? false : true
       );
       if (deltaLength === 0) {
         if (arrayDifferences.length > 0) {

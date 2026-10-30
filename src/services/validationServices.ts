@@ -1,5 +1,7 @@
+import { FormikProps } from 'formik';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
 import { Dispatch, SetStateAction } from 'react';
+import { OnboardingFormData } from '../model/OnboardingFormData';
 import { InstitutionType, ProblemUserValidate, UserOnCreate } from '../../types';
 import { OnboardingApi } from '../api/OnboardingApiClient';
 import { StepBillingDataHistoryState } from '../components/steps/StepOnboardingFormData';
@@ -9,7 +11,7 @@ import { isPublicAdministration } from '../utils/institutionTypeUtils';
 export const verifyVatNumber = async (
   institutionType: InstitutionType,
   externalInstitutionId: string,
-  formik: any,
+  formik: FormikProps<OnboardingFormData>,
   stepHistoryState: StepBillingDataHistoryState,
   setVatVerificationGenericError: Dispatch<SetStateAction<boolean>>,
   setIsVatRegistrated: Dispatch<SetStateAction<boolean>>,
@@ -65,7 +67,7 @@ export const userValidate = async (
       });
       onValidationError(
         userId,
-        Object.fromEntries(errorBody?.invalidParams?.map((e: any) => [e.name, ['conflict']]) ?? [])
+        Object.fromEntries(errorBody?.invalidParams?.map((e) => [e.name, ['conflict']]) ?? [])
       );
     } else {
       onForwardAction();

@@ -1,8 +1,11 @@
 import { Dispatch, SetStateAction } from 'react';
+import { FormikHelpers } from 'formik';
 import { getErrorStatus } from '../lib/error-utils';
 import { Endpoint, ApiEndpointKey, PartyData, Product, InstitutionType } from '../../types';
 import { AooData } from '../model/AooData';
 import { UoData } from '../model/UoModel';
+import { FilterCategories, MerchantDetails } from '../model/FilterCategoriesResponse';
+import { OnboardingFormData } from '../model/OnboardingFormData';
 import { PRODUCT_IDS } from '../utils/constants';
 import {
   isContractingAuthority,
@@ -16,6 +19,7 @@ import {
 import config from '../utils/config.json';
 import { PartyRegistryProxyApi } from '../api/PartyRegistryProxyApiClient';
 import { OnboardingApi } from '../api/OnboardingApiClient';
+import { PDNDBusinessResource } from '../model/PDNDBusinessResource';
 
 // Dispatcher: the search functions receive `endpoint` as a runtime ApiEndpointKey.
 // Codegen needs statically-typed method calls, so we map each supported endpoint
@@ -23,12 +27,23 @@ import { OnboardingApi } from '../api/OnboardingApiClient';
 // extractResponse). The infocamere/visura (PDND) endpoints rely on fields the
 // OpenAPI schema under-declares (vatNumber, legalForm, nRea, ...),
 // added back via the api-party-registry-proxy_fixPreGen.js patch.
+export type InstitutionSearchParams = {
+  search?: string;
+  categories?: string;
+  page?: number;
+  limit?: number;
+  taxCode?: string;
+  rea?: string;
+  origin?: string;
+  productId?: string;
+};
+
 const dispatchInstitutionSearch = (
   endpoint: ApiEndpointKey,
-  endpointParams: Record<string, any> | undefined,
-  queryParams: Record<string, any>,
+  endpointParams: Record<string, string> | undefined,
+  queryParams: InstitutionSearchParams,
   productId?: string
-): Promise<any> => {
+): Promise<unknown> => {
   const ep = endpointParams ?? {};
   switch (endpoint) {
     case 'ONBOARDING_GET_SEARCH_PARTIES':
@@ -53,7 +68,7 @@ const dispatchInstitutionSearch = (
     case 'ONBOARDING_GET_PARTY_FROM_CF':
       // addUser=false passes the tax code as endpointParams.id, addUser=true via queryParams.taxCode
       return OnboardingApi.searchInstitutionIpaByTaxCode(
-        ep.id ?? queryParams.taxCode,
+        ep.id ?? queryParams.taxCode ?? '',
         queryParams.categories
       );
     case 'ONBOARDING_GET_PARTY_BY_CF_FROM_INFOCAMERE':
@@ -61,7 +76,7 @@ const dispatchInstitutionSearch = (
     case 'ONBOARDING_GET_VISURA_INFOCAMERE_BY_CF':
       return PartyRegistryProxyApi.getVisuraByTaxCode(ep.id, productId);
     case 'ONBOARDING_GET_VISURA_INFOCAMERE_BY_REA':
-      return PartyRegistryProxyApi.getVisuraByRea(queryParams.rea, productId);
+      return PartyRegistryProxyApi.getVisuraByRea(queryParams.rea ?? '', productId);
     case 'ONBOARDING_GET_INSTITUTIONS':
       return OnboardingApi.getInstitutionsByFilters(queryParams as { productId: string });
     default:
@@ -69,17 +84,21 @@ const dispatchInstitutionSearch = (
   }
 };
 
+// With addUser the endpoints return a list: keep the first element (or the body if it is not one).
+const pickSearchResult = <T>(data: unknown, addUser: boolean): T =>
+  (addUser ? ((data as Array<T> | undefined)?.[0] ?? data) : data) as T;
+
 const validateIdpayMerchantInstitution = (
   response: PartyData,
   disabledStatusCompany: boolean | undefined,
-  filterCategories: string | { allowedInstitutions: string } | undefined,
+  filterCategories: FilterCategories,
   setDisabled: Dispatch<SetStateAction<boolean>>,
-  setMerchantSearchResult: Dispatch<SetStateAction<PartyData | undefined>> | undefined
+  setMerchantSearchResult: ((value?: PDNDBusinessResource) => void) | undefined
 ) => {
   setMerchantSearchResult?.(response);
 
-  const merchantDetails =
-    (filterCategories as { allowedInstitutions: string }) ||
+  const merchantDetails: MerchantDetails | undefined =
+    (filterCategories as MerchantDetails | undefined) ||
     config.product['prod-idpay-merchant']?.merchantDetails;
 
   const allowedInstitutionsStr =
@@ -130,22 +149,22 @@ export const handleSearchByTaxCode = async (
 export const getUoInfoFromRecipientCode = async (
   recipientCode: string,
   setDisableTaxCodeInvoicing: Dispatch<SetStateAction<boolean>>,
-  formik: any
+  formik: Pick<FormikHelpers<OnboardingFormData>, 'setFieldValue'>
 ) => {
   try {
     const searchResponse = await PartyRegistryProxyApi.getUoInfo(recipientCode);
-    formik.setFieldValue('taxCodeInvoicing', searchResponse.codiceFiscaleSfe);
+    void formik.setFieldValue('taxCodeInvoicing', searchResponse.codiceFiscaleSfe);
     setDisableTaxCodeInvoicing(true);
   } catch (_error) {
     setDisableTaxCodeInvoicing(false);
   }
 };
 
-export const fetchInstitutionsByName = async (
+export const fetchInstitutionsByName = async <T, D>(
   query: string,
   endpoint: Endpoint,
-  setOptions: Dispatch<SetStateAction<Array<any>>>,
-  transformFn: any,
+  setOptions: Dispatch<SetStateAction<ReadonlyArray<T>>>,
+  transformFn: (data: D) => ReadonlyArray<T>,
   _setRequiredLogin: Dispatch<SetStateAction<boolean>>,
   limit?: number,
   categories?: string
@@ -157,7 +176,7 @@ export const fetchInstitutionsByName = async (
       search: query,
       categories,
     });
-    setOptions(transformFn(data));
+    setOptions(transformFn(data as D));
   } catch (error) {
     if (getErrorStatus(error) === 404) {
       setOptions([]);
@@ -168,17 +187,16 @@ export const fetchInstitutionsByName = async (
 export const fetchInstitutionByTaxCode = async (
   addUser: boolean,
   endpoint: ApiEndpointKey,
-  params: any,
+  params: InstitutionSearchParams,
   query: string,
   productId: string | undefined,
   institutionType: string | undefined,
-  filterCategories: { allowedInstitutions: string } | string | undefined,
+  filterCategories: FilterCategories,
   disabledStatusCompany: boolean | undefined,
   setCfResult: Dispatch<SetStateAction<PartyData | undefined>>,
-  setMerchantSearchResult: Dispatch<SetStateAction<PartyData | undefined>> | undefined,
+  setMerchantSearchResult: ((value?: PDNDBusinessResource) => void) | undefined,
   setDisabled: Dispatch<SetStateAction<boolean>>,
   _setRequiredLogin: Dispatch<SetStateAction<boolean>>
-  // eslint-disable-next-line sonarjs/cognitive-complexity
 ) => {
   const updatedParams = {
     ...params,
@@ -189,12 +207,12 @@ export const fetchInstitutionByTaxCode = async (
   };
 
   try {
-    const response = await dispatchInstitutionSearch(
+    const response = (await dispatchInstitutionSearch(
       endpoint,
       addUser ? undefined : { id: query },
       updatedParams,
       productId
-    );
+    )) as PartyData;
     setCfResult(response);
 
     if (addUser || isIdpayMerchantProduct(productId)) {
@@ -220,17 +238,16 @@ export const fetchInstitutionByTaxCode = async (
 export const handleSearchByReaCode = async (
   addUser: boolean,
   endpoint: ApiEndpointKey,
-  params: any,
+  params: InstitutionSearchParams,
   query: string,
   setApiLoading: Dispatch<SetStateAction<boolean>> | undefined,
   setCfResult: Dispatch<SetStateAction<PartyData | undefined>>,
   setDisabled: Dispatch<SetStateAction<boolean>>,
   _setRequiredLogin: Dispatch<SetStateAction<boolean>>,
   product: Product | undefined,
-  filterCategories: string | { allowedInstitutions: string } | undefined,
+  filterCategories: FilterCategories,
   disabledStatusCompany: boolean | undefined,
-  setMerchantSearchResult: Dispatch<SetStateAction<PartyData | undefined>> | undefined
-  // eslint-disable-next-line sonarjs/cognitive-complexity
+  setMerchantSearchResult: ((value?: PDNDBusinessResource) => void) | undefined
 ) => {
   setApiLoading?.(true);
 
@@ -248,12 +265,12 @@ export const handleSearchByReaCode = async (
       };
 
   try {
-    const response = await dispatchInstitutionSearch(
+    const response = (await dispatchInstitutionSearch(
       endpoint,
       undefined,
       updatedParams,
       product?.id
-    );
+    )) as PartyData;
     setCfResult(response);
 
     if (isIdpayMerchantProduct(product?.id)) {
@@ -277,6 +294,16 @@ export const handleSearchByReaCode = async (
   setApiLoading?.(false);
 };
 
+const buildSubunitSearchParams = (
+  filterCategories: string | undefined,
+  productId: string | undefined
+): InstitutionSearchParams => {
+  if (productId === undefined) {
+    return { origin: 'IPA', categories: filterCategories };
+  }
+  return productId === PRODUCT_IDS.SEND ? { categories: filterCategories, origin: 'IPA' } : {};
+};
+
 export const handleSearchByAooCode = async (
   query: string,
   setAooResult: Dispatch<SetStateAction<AooData | undefined>>,
@@ -285,32 +312,13 @@ export const handleSearchByAooCode = async (
   setApiLoading?: Dispatch<SetStateAction<boolean>>,
   addUser: boolean = false,
   endpoint: ApiEndpointKey = 'ONBOARDING_GET_AOO_CODE_INFO',
-  params: any = {},
+  params: InstitutionSearchParams = {},
   filterCategories?: string,
   productId?: string
 ) => {
   setApiLoading?.(true);
 
-  // eslint-disable-next-line functional/no-let
-  let updatedParams;
-  if (addUser) {
-    updatedParams = params;
-  } else {
-    if (productId !== undefined) {
-      updatedParams =
-        productId === PRODUCT_IDS.SEND
-          ? {
-              categories: filterCategories,
-              origin: 'IPA',
-            }
-          : {};
-    } else {
-      updatedParams = {
-        origin: 'IPA',
-        categories: filterCategories,
-      };
-    }
-  }
+  const updatedParams = addUser ? params : buildSubunitSearchParams(filterCategories, productId);
 
   try {
     const data = await dispatchInstitutionSearch(
@@ -318,7 +326,7 @@ export const handleSearchByAooCode = async (
       addUser ? undefined : { codiceUniAoo: query },
       updatedParams
     );
-    const response = addUser ? (data?.[0] ?? data) : data;
+    const response = pickSearchResult<AooData>(data, addUser);
     setAooResult(response);
     setAooResultHistory(response);
   } catch (error) {
@@ -338,32 +346,13 @@ export const handleSearchByUoCode = async (
   setApiLoading?: Dispatch<SetStateAction<boolean>>,
   addUser: boolean = false,
   endpoint: ApiEndpointKey = 'ONBOARDING_GET_UO_CODE_INFO',
-  params: any = {},
+  params: InstitutionSearchParams = {},
   filterCategories?: string,
   productId?: string
 ) => {
   setApiLoading?.(true);
 
-  // eslint-disable-next-line functional/no-let
-  let updatedParams;
-  if (addUser) {
-    updatedParams = params;
-  } else {
-    if (productId !== undefined) {
-      updatedParams =
-        productId === PRODUCT_IDS.SEND
-          ? {
-              categories: filterCategories,
-              origin: 'IPA',
-            }
-          : {};
-    } else {
-      updatedParams = {
-        origin: 'IPA',
-        categories: filterCategories,
-      };
-    }
-  }
+  const updatedParams = addUser ? params : buildSubunitSearchParams(filterCategories, productId);
 
   try {
     const data = await dispatchInstitutionSearch(
@@ -371,7 +360,7 @@ export const handleSearchByUoCode = async (
       addUser ? undefined : { codiceUniUo: query },
       updatedParams
     );
-    const response = addUser ? (data?.[0] ?? data) : data;
+    const response = pickSearchResult<UoData>(data, addUser);
     setUoResult(response);
     setUoResultHistory(response);
   } catch (error) {
@@ -386,7 +375,7 @@ export const handleSearchByUoCode = async (
 export const contractingInsuranceFromTaxId = async (
   addUser: boolean,
   endpoint: ApiEndpointKey,
-  params: any,
+  params: InstitutionSearchParams,
   query: string,
   institutionType: InstitutionType | undefined,
   setApiLoading: Dispatch<SetStateAction<boolean>> | undefined,
@@ -395,7 +384,7 @@ export const contractingInsuranceFromTaxId = async (
 ) => {
   setApiLoading?.(true);
 
-  const endpointParams = addUser
+  const endpointParams: Record<string, string> | undefined = addUser
     ? undefined
     : isContractingAuthority(institutionType) || isInsuranceCompany(institutionType)
       ? { taxId: query }
@@ -403,7 +392,7 @@ export const contractingInsuranceFromTaxId = async (
 
   try {
     const data = await dispatchInstitutionSearch(endpoint, endpointParams, addUser ? params : {});
-    const response = addUser ? (data?.[0] ?? data) : data;
+    const response = pickSearchResult<PartyData>(data, addUser);
     setCfResult(response);
   } catch (error) {
     if (getErrorStatus(error) === 404) {

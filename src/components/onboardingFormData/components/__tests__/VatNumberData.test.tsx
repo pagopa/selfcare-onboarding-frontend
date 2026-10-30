@@ -2,30 +2,23 @@ import '@testing-library/jest-dom';
 import { fireEvent, screen } from '@testing-library/react';
 import { t } from 'i18next';
 import { beforeEach, expect, test, vi } from 'vitest';
-import { InstitutionType } from '../../../../../types';
+import { InstitutionType, PaymentServiceProviderDto } from '../../../../../types';
+import { OnboardingControllers } from '../../../../hooks/useOnboardingControllers';
 import { OnboardingFormData } from '../../../../model/OnboardingFormData';
+import { BaseTextFieldPropsFn } from '../../../steps/StepOnboardingFormData';
 import { PRODUCT_IDS } from '../../../../utils/constants';
+import { asFormikProps, createFormikMock } from '../../../../utils/test/formikMock';
 import { renderComponentWithProviders } from '../../../../utils/test/test-utils';
 import VatNumberData from '../VatNumberData';
 
-const formik: any = {
-  values: {
-    hasVatnumber: true,
-    taxCode: '12345678901',
-    vatNumber: '',
-    vatNumberGroup: false,
-  },
-  errors: {},
-  setFieldValue: vi.fn(),
-  handleChange: vi.fn(),
-};
+const formik = createFormikMock({
+  hasVatnumber: true,
+  taxCode: '12345678901',
+  vatNumber: '',
+  vatNumberGroup: false,
+});
 
-const mockBaseTextFieldProps = (
-  field: keyof OnboardingFormData,
-  label: string,
-  fontWeight: number = 400,
-  fontSize: number | string = 16
-) => ({
+const mockBaseTextFieldProps: BaseTextFieldPropsFn = (field, label, fontWeight = 400, color) => ({
   id: field,
   type: 'text',
   value: formik.values[field] || '',
@@ -36,11 +29,11 @@ const mockBaseTextFieldProps = (
   onChange: formik.handleChange,
   sx: { width: '100%' },
   InputProps: {
-    style: { fontSize, fontWeight },
+    style: { fontWeight, color },
   },
 });
 
-const defaultControllers = {
+const defaultControllers: OnboardingControllers = {
   isPremium: false,
   isDisabled: false,
   isInvoiceable: true,
@@ -59,23 +52,23 @@ const renderComponent = ({
 }: {
   institutionType?: InstitutionType;
   productId?: string;
-  controllers?: Record<string, unknown>;
-  onboardingFormData?: any;
+  controllers?: Partial<OnboardingControllers>;
+  onboardingFormData?: Partial<OnboardingFormData>;
   isTaxCodeEquals2PIVA?: boolean;
-  pspData?: any;
+  pspData?: PaymentServiceProviderDto;
 } = {}) => {
   const setStepHistoryState = vi.fn();
   const stepHistoryState = { externalInstitutionId: '', isTaxCodeEquals2PIVA };
   renderComponentWithProviders(
     <VatNumberData
-      controllers={{ ...defaultControllers, ...controllers } as any}
-      formik={formik}
-      onboardingFormData={onboardingFormData}
+      controllers={{ ...defaultControllers, ...controllers }}
+      formik={asFormikProps(formik)}
+      onboardingFormData={onboardingFormData as OnboardingFormData | undefined}
       institutionType={institutionType}
       stepHistoryState={stepHistoryState}
       setStepHistoryState={setStepHistoryState}
       baseTextFieldProps={mockBaseTextFieldProps}
-      t={t as any}
+      t={(key: string) => t(key)}
       pspData={pspData}
     />,
     productId
@@ -212,7 +205,13 @@ test('Test: PSP group vat number checkbox is disabled when premium with an alrea
   renderComponent({
     institutionType: 'PSP',
     controllers: { isPremium: true },
-    pspData: { vatNumberGroup: true },
+    pspData: {
+      businessRegisterNumber: '',
+      legalRegisterName: '',
+      legalRegisterNumber: '',
+      abiCode: '',
+      vatNumberGroup: true,
+    },
   });
 
   expect(document.getElementById('vatNumberGroup')).toBeDisabled();

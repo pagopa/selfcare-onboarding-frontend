@@ -1,7 +1,9 @@
+import { FormikProps } from 'formik';
 import { Grid } from '@mui/material';
 import { theme } from '@pagopa/mui-italia';
 import { t } from 'i18next';
 import { Dispatch, SetStateAction } from 'react';
+import { OnboardingFormData } from '../../../model/OnboardingFormData';
 import { InstitutionType, PaymentServiceProviderDto } from '../../../../types';
 import {
   isContractingAuthority,
@@ -16,13 +18,14 @@ import { CustomTextField, CustomTextFieldNotched } from '../../../utils/style-ut
 import NumberDecimalFormat from '../NumberDecimalFormat';
 import { OnboardingControllers } from '../../../hooks/useOnboardingControllers';
 import { showCommercialRegisterSection } from '../../../utils/validateFields';
+import { BaseTextFieldPropsFn } from '../../steps/StepOnboardingFormData';
 
 type Props = {
   isInfoCompany: boolean;
   institutionType: InstitutionType;
   productId?: string;
-  baseTextFieldProps: any;
-  formik: any;
+  baseTextFieldProps: BaseTextFieldPropsFn;
+  formik: FormikProps<OnboardingFormData>;
   setShrinkRea: Dispatch<SetStateAction<boolean>>;
   shrinkRea: boolean;
   controllers: OnboardingControllers;
@@ -145,7 +148,7 @@ const CommercialRegisterData = ({
             disabled={
               controllers.isDisabled &&
               !!pspData?.legalRegisterName &&
-              formik.values.legalRegisterNumber !== 'N/A'
+              pspData.legalRegisterName !== 'N/A'
             }
           />
         </Grid>
@@ -162,8 +165,8 @@ const CommercialRegisterData = ({
             disabled={
               controllers.isDisabled &&
               !!pspData?.legalRegisterNumber &&
-              !formik.errors.legalRegisterNumber &&
-              formik.values.legalRegisterNumber !== 'N/A'
+              !formik.errors.registerNumber &&
+              pspData.legalRegisterNumber !== 'N/A'
             }
           />
         </Grid>
@@ -178,7 +181,7 @@ const CommercialRegisterData = ({
             )}
             value={formik.values.abiCode}
             InputLabelProps={{
-              shrink: formik.values.abiCode?.length > 0,
+              shrink: (formik.values.abiCode?.length ?? 0) > 0,
             }}
             disabled={controllers.isDisabled && !!pspData?.abiCode && !formik.errors.abiCode}
           />

@@ -1,10 +1,9 @@
-/* eslint-disable functional/immutable-data */
-import { Alert, Box, Grid, Link, TextField } from '@mui/material';
+import { Alert, Box, Grid, Link, TextField, TextFieldProps } from '@mui/material';
 import { styled } from '@mui/system';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
 import { useFormik } from 'formik';
 import { uniqueId } from 'lodash';
-import { useContext, useEffect, useReducer, useRef, useState } from 'react';
+import { useContext, useEffect, useReducer, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import {
   DataProtectionOfficerDto,
@@ -18,13 +17,12 @@ import { UserContext } from '../../lib/context';
 
 import { useHistoryState } from '../../hooks/useHistoryState';
 import { AooData } from '../../model/AooData';
+import { FilterCategories } from '../../model/FilterCategoriesResponse';
 import { GeographicTaxonomy } from '../../model/GeographicTaxonomies';
-import { OnboardingFormData } from '../../model/OnboardingFormData';
+import { OnboardingFormData, OnboardingFormDataStringField } from '../../model/OnboardingFormData';
 import { UoData } from '../../model/UoModel';
 import { verifyRecipientCodeIsValid } from '../../services/billingDataServices';
-import {
-  getPreviousGeotaxononomies
-} from '../../services/geoTaxonomyServices';
+import { getPreviousGeotaxononomies } from '../../services/geoTaxonomyServices';
 import { handleSearchByTaxCode } from '../../services/institutionServices';
 import { verifyVatNumber } from '../../services/validationServices';
 import { requiredError } from '../../utils/constants';
@@ -48,6 +46,13 @@ import GeoTaxonomySection from '../onboardingFormData/components/GeoTaxonomySect
 import UpdateGeotaxonomy from '../onboardingFormData/components/UpdateGeotaxonomy';
 import { OnboardingStepActions } from '../registrationSteps/OnboardingStepActions';
 import { MessageNoAction } from '../shared/MessageNoAction';
+
+export type BaseTextFieldPropsFn = (
+  field: OnboardingFormDataStringField,
+  label: string,
+  fontWeight?: string | number,
+  color?: string
+) => TextFieldProps;
 
 export type StepBillingDataHistoryState = {
   externalInstitutionId: string;
@@ -75,10 +80,9 @@ type Props = StepperStepComponentProps & {
   aooSelected?: AooData;
   uoSelected?: UoData;
   isCityEditable?: boolean;
-  selectFilterCategories?: () => any;
+  selectFilterCategories?: () => FilterCategories;
 };
 
-// eslint-disable-next-line complexity
 export default function StepOnboardingFormData({
   initialFormData,
   back,
@@ -108,8 +112,7 @@ export default function StepOnboardingFormData({
   const [retrievedIstat, setRetrievedIstat] = useState<string>();
   const [invalidTaxCodeInvoicing, setInvalidTaxCodeInvoicing] = useState<boolean>(false);
   const [recipientCodeStatus, setRecipientCodeStatus] = useState<string>();
-  const requestIdRef = useRef<string>();
-  const [filterCategories, setFilterCategories] = useState<string>();
+  const [filterCategories, setFilterCategories] = useState<FilterCategories>();
   const institutionAvoidGeotax = ['PT', 'SA', 'AS'].includes(institutionType);
   const [originId4Premium, setOriginId4Premium] = useState<string>();
   const [dpoData, setDpoData] = useState<DataProtectionOfficerDto>();
@@ -205,13 +208,12 @@ export default function StepOnboardingFormData({
       return;
     }
 
-    // eslint-disable-next-line functional/immutable-data
-    requestIdRef.current = uniqueId(
+    const requestId = uniqueId(
       `onboarding-step-manager-${externalInstitutionId}-${productId}-${subProductId}`
     );
 
     trackEvent('ONBOARDING_PREMIUM_BILLING_DATA', {
-      request_id: requestIdRef?.current,
+      request_id: requestId,
       party_id: externalInstitutionId,
       product_id: productId,
       subproduct_id: subProductId,
@@ -220,7 +222,7 @@ export default function StepOnboardingFormData({
     if (isPublicAdministration(institutionType) && initialFormData.taxCode) {
       void handleSearchByTaxCode(
         initialFormData.taxCode,
-        filterCategories,
+        typeof filterCategories === 'string' ? filterCategories : undefined,
         setRetrievedIstat,
         setOriginId4Premium
       );
@@ -255,7 +257,6 @@ export default function StepOnboardingFormData({
 
   const onBackAction = () => {
     saveHistoryState();
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     back!();
     setGeotaxonomiesHistory([]);
     setGeotaxonomiesHistoryState([]);
@@ -340,11 +341,9 @@ export default function StepOnboardingFormData({
 
   useEffect(() => {
     if (formik.values.hasVatnumber) {
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      formik.setFieldValue('vatNumber', formik.initialValues.vatNumber);
+      void formik.setFieldValue('vatNumber', formik.initialValues.vatNumber);
     } else {
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      formik.setFieldValue('vatNumber', undefined);
+      void formik.setFieldValue('vatNumber', undefined);
     }
   }, [formik.values.hasVatnumber]);
 
@@ -407,11 +406,11 @@ export default function StepOnboardingFormData({
     }
   }, [formik.values.recipientCode]);
 
-  const baseTextFieldProps = (
-    field: keyof OnboardingFormData,
-    label: string,
-    color: string,
-    fontWeight: string | number = controllers.isDisabled ? 'fontWeightRegular' : 'fontWeightMedium'
+  const baseTextFieldProps: BaseTextFieldPropsFn = (
+    field,
+    label,
+    fontWeight = controllers.isDisabled ? 'fontWeightRegular' : 'fontWeightMedium',
+    color
   ) => {
     const isError = !!formik.errors[field] && formik.errors[field] !== requiredError;
     return {

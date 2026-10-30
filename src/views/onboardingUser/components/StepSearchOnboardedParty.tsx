@@ -140,7 +140,7 @@ const StepSearchOnboardedParty = ({ institutionType, selectedProduct, forward, b
             externalInstitutionId=""
             isSearchFieldSelected={true}
             transformFn={(data: { items: Array<OnboardedParty> }) => data.items}
-            selected={selected as any}
+            selected={selected}
             setSelected={setSelected}
             aooResult={aooResult}
             uoResult={uoResult}

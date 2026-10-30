@@ -1,3 +1,4 @@
+import { PaymentServiceProviderDto } from '../../types';
 import { DpoData } from './DpoData';
 import { OnboardingFormData } from './OnboardingFormData';
 
@@ -28,3 +29,16 @@ export const pspData2pspDataRequest = (billingData: OnboardingFormData): PspData
   legalRegisterName: billingData.registrationInRegister ?? '',
   vatNumberGroup: billingData.vatNumberGroup ?? false,
 });
+
+export const pspDataDto2OnboardingFormData = (
+  pspData?: PaymentServiceProviderDto
+): Partial<OnboardingFormData> =>
+  pspData
+    ? {
+        commercialRegisterNumber: pspData.businessRegisterNumber,
+        registrationInRegister: pspData.legalRegisterName,
+        registerNumber: pspData.legalRegisterNumber,
+        abiCode: pspData.abiCode,
+        vatNumberGroup: pspData.vatNumberGroup,
+      }
+    : {};
