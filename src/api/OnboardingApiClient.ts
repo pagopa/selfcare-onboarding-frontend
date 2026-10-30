@@ -73,7 +73,7 @@ export const OnboardingApi = {
     const result = isMockEnvironment()
       ? await ApiClientMocked.verifyOnboarding(onboardingId)
       : await realApiClient.verifyOnboardingUsingPOST({ onboardingId });
-    return extractResponse(result, 200, onRedirectToLogin, 401, 403, undefined);
+    return extractResponse(result, 200, onRedirectToLogin, 401, 403, null);
   },
   userValidate: async (name: string, surname: string, taxCode: string): Promise<void> => {
     const result = isMockEnvironment()

@@ -1,7 +1,7 @@
 /* eslint-disable sonarjs/cognitive-complexity */
 import SessionModal from '@pagopa/selfcare-common-frontend/lib/components/SessionModal';
 import { productId2ProductTitle } from '@pagopa/selfcare-common-frontend/lib/utils/productId2ProductTitle';
-import { useContext, useEffect, useState } from 'react';
+import { ComponentProps, useContext, useEffect, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { useParams } from 'react-router';
 import { FileErrorAttempt, Problem, RequestOutcomeComplete, StepperStep } from '../../../../types';
@@ -9,6 +9,7 @@ import { OnboardingVerify } from '../../../api/generated/onboarding/OnboardingVe
 import { LoadingOverlay } from '../../../components/modals/LoadingOverlay';
 import { ConfirmRegistrationStep0 } from '../../../components/registrationSteps/ConfirmRegistrationStep0';
 import { ConfirmRegistrationStep1 } from '../../../components/registrationSteps/ConfirmRegistrationStep1';
+import { ContractUpdateErrorPage } from '../../../components/registrationSteps/contractUpdate/ContractUpdateErrorPage';
 import { MessageNoAction } from '../../../components/shared/MessageNoAction';
 import { useHistoryState } from '../../../hooks/useHistoryState';
 import { HeaderContext, UserContext } from '../../../lib/context';
@@ -32,6 +33,25 @@ const error2errorCode: { [key in keyof typeof customErrors]: Array<string> } = {
   ALREADY_ONBOARDED: ['002-1009'],
   GENERIC: [],
 };
+
+// In the contractUpdate flow the outcomes are rendered as full pages instead of modals
+const contractUpdateErrors: Partial<
+  Record<RequestOutcomeComplete, ComponentProps<typeof ContractUpdateErrorPage>>
+> = {
+  notFound: { variant: 'generic' },
+  genericError: { variant: 'generic' },
+  notAllowed: { variant: 'notAllowed' },
+  error: { variant: 'generic' },
+  // The expiration is computed client-side from a successful response: there is no API error
+  expired: { variant: 'expired', errorDescription: 'REQUEST_EXPIRED' },
+  alreadyCompleted: { variant: 'alreadyCompleted' },
+  alreadyRejected: { variant: 'cancelled' },
+};
+
+const getContractUpdateError = (
+  contractUpdate: boolean,
+  outcome: RequestOutcomeComplete | null
+) => (contractUpdate ? contractUpdateErrors[outcome ?? 'error'] : undefined);
 
 export const transcodeErrorCode = (data: Problem): keyof typeof customErrors => {
   if (data.errors?.findIndex((e) => error2errorCode.INVALID_DOCUMENT.includes(e.code)) > -1) {
@@ -73,9 +93,12 @@ export default function CompleteRequestComponent() {
     []
   );
   const [requestData, setRequestData] = useState<OnboardingVerify>();
+  const [errorDescription, setErrorDescription] = useState<string>();
   const [institutionId, setInstitutionId] = useState<string>();
   const [attachmentUploadSuccess, setAttachmentUploadSuccess] = useState<boolean>(false);
   const addUserFlow = new URLSearchParams(window.location.search).get('add-user') === 'true';
+  const contractUpdate =
+    new URLSearchParams(window.location.search).get('contract-update') === 'true';
   const attachments = window.location.pathname.includes('/attachments');
   const translationKeyValue = addUserFlow ? 'user' : attachments ? 'attachments' : 'product';
 
@@ -99,6 +122,8 @@ export default function CompleteRequestComponent() {
         setRequiredLogin,
         setOutcomeContentState,
         setRequestData,
+        detailedErrors: contractUpdate,
+        setErrorDescription: contractUpdate ? setErrorDescription : undefined,
       }).finally(() => setLoading(false));
     }
   }, [onboardingId]);
@@ -185,6 +210,8 @@ export default function CompleteRequestComponent() {
           onboardingId,
           fileName: 'Addendum',
           translationKeyValue,
+          productTitle: productId2ProductTitle(requestData?.productId ?? ''),
+          contractUpdate,
           setLoading,
           forward,
         }),
@@ -197,14 +224,28 @@ export default function CompleteRequestComponent() {
           translationKeyValue,
           {
             forward: () => uploadContract(),
+            back: () => {
+              setActiveStepHistory(0);
+              setActiveStep(0);
+            },
           },
           { loading },
-          { uploadedFiles, setUploadedFiles: setUploadedFilesAndWriteHistory }
+          { uploadedFiles, setUploadedFiles: setUploadedFilesAndWriteHistory },
+          contractUpdate
         ),
     },
   ];
 
   const Step = steps[activeStep].Component;
+
+  const notFoundContent = {
+    title: '',
+    description: [
+      <>
+        <NotFoundPage />
+      </>,
+    ],
+  };
 
   const outcomeContent = {
     toBeCompleted: {
@@ -245,14 +286,9 @@ export default function CompleteRequestComponent() {
         </>,
       ],
     },
-    notFound: {
-      title: '',
-      description: [
-        <>
-          <NotFoundPage />
-        </>,
-      ],
-    },
+    notFound: notFoundContent,
+    notAllowed: notFoundContent,
+    genericError: notFoundContent,
     success: {
       title: '',
       description: [
@@ -262,6 +298,7 @@ export default function CompleteRequestComponent() {
             translationKeyValue={translationKeyValue}
             institutionId={institutionId}
             productId={requestData?.productId}
+            contractUpdate={contractUpdate}
           />
         </>,
       ],
@@ -276,8 +313,17 @@ export default function CompleteRequestComponent() {
     },
   };
 
+  const contractUpdateError = getContractUpdateError(contractUpdate, outcomeContentState);
+
   return loading ? (
     <LoadingOverlay loadingText={t('onboarding.loading.loadingText')} />
+  ) : contractUpdateError ? (
+    <ContractUpdateErrorPage
+      {...contractUpdateError}
+      errorDescription={contractUpdateError.errorDescription ?? errorDescription}
+      institutionId={institutionId}
+      productTitle={productId2ProductTitle(requestData?.productId ?? '')}
+    />
   ) : outcomeContentState && outcomeContentState !== 'error' ? (
     <>
       <MessageNoAction {...outcomeContent[outcomeContentState]} />

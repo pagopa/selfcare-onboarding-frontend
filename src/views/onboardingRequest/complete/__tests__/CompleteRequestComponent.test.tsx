@@ -121,3 +121,26 @@ test('Test: The jwt exist and the request is correctly retrieved and waiting for
 
   userEvent.upload(upload, mockedContract);
 });
+
+test('Test: contract update flow uses the new drag and drop and upload page', async () => {
+  mockedLocation.search = 'jwt=pendingRequest&contract-update=true';
+  render(<CompleteRequestComponent />);
+
+  await waitFor(() => screen.getByText('Scarica il documento da firmare'));
+  fireEvent.click(screen.getByRole('button', { name: /Vai al caricamento/ }));
+
+  await waitFor(() => screen.getByRole('button', { name: 'Carica il file' }));
+  screen.getByText('Trascina qui il documento firmato oppure');
+
+  fireEvent.click(screen.getByRole('button', { name: 'Continua' }));
+  await waitFor(() => screen.getByTestId('ErrorOutlineIcon'));
+  screen.getByText('*Campo obbligatorio');
+
+  const upload = document.querySelector('input[type="file"]') as HTMLInputElement;
+  await userEvent.upload(upload, mockedContract);
+
+  await waitFor(() => screen.getByText(mockedContract.name));
+  expect(screen.queryByText('*Campo obbligatorio')).toBeNull();
+  screen.getByRole('button', { name: 'Rimuovi il file' });
+  screen.getByRole('button', { name: /Indietro/ });
+});

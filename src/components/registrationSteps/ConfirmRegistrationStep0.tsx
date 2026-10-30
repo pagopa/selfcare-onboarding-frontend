@@ -8,11 +8,14 @@ import { useState } from 'react';
 import { storageTokenOps } from '@pagopa/selfcare-common-frontend/lib/utils/storage';
 import { API } from '../../utils/constants';
 import { fileFromReader } from '../../utils/formatting-utils';
+import { ContractUpdateDownloadStep } from './contractUpdate/ContractUpdateDownloadStep';
 
 type Props = {
   onboardingId: string | undefined;
   fileName?: string;
   translationKeyValue: string;
+  productTitle?: string;
+  contractUpdate?: boolean;
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
   forward: () => void;
 };
@@ -20,6 +23,8 @@ export function ConfirmRegistrationStep0({
   onboardingId,
   fileName,
   translationKeyValue,
+  productTitle,
+  contractUpdate,
   setLoading,
   forward,
 }: Props) {
@@ -35,8 +40,10 @@ export function ConfirmRegistrationStep0({
     const sessionToken = storageTokenOps.read();
     const url =
       translationKeyValue === 'attachments'
-        ? API.ONBOARDING_GET_TEMPLATE_ATTACHMENT.URL.replace('{{onboardingId}}', onboardingId)
-            .replace('{{filename}}', documentName ?? '')
+        ? API.ONBOARDING_GET_TEMPLATE_ATTACHMENT.URL.replace(
+            '{{onboardingId}}',
+            onboardingId
+          ).replace('{{filename}}', documentName ?? '')
         : API.ONBOARDING_GET_CONTRACT.URL.replace('{{onboardingId}}', onboardingId);
 
     fetch(url, {
@@ -89,6 +96,34 @@ export function ConfirmRegistrationStep0({
       }
     }
   };
+
+  const errorModal = (
+    <SessionModal
+      open={openModal}
+      title={t('stepVerifyOnboarding.genericError.title')}
+      message={
+        <Trans i18nKey={'stepVerifyOnboarding.genericError.description'} components={{ 1: <br /> }}>
+          {`A causa di un errore del sistema non è possibile completare la procedura.
+        <1/>
+        Ti chiediamo di riprovare più tardi.`}
+        </Trans>
+      }
+      handleClose={() => setOpenModal(false)}
+    />
+  );
+
+  if (contractUpdate && translationKeyValue === 'product') {
+    return (
+      <>
+        <ContractUpdateDownloadStep
+          productTitle={productTitle}
+          onDownload={() => onClickDownload(onboardingId)}
+          onGoToUpload={onForwardAction}
+        />
+        {errorModal}
+      </>
+    );
+  }
 
   return (
     <>
@@ -208,21 +243,7 @@ export function ConfirmRegistrationStep0({
           </CardContent>
         </Card>
       </Grid>
-      <SessionModal
-        open={openModal}
-        title={t('stepVerifyOnboarding.genericError.title')}
-        message={
-          <Trans
-            i18nKey={'stepVerifyOnboarding.genericError.description'}
-            components={{ 1: <br /> }}
-          >
-            {`A causa di un errore del sistema non è possibile completare la procedura.
-        <1/>
-        Ti chiediamo di riprovare più tardi.`}
-          </Trans>
-        }
-        handleClose={() => setOpenModal(false)}
-      />
+      {errorModal}
     </>
   );
 }

@@ -99,6 +99,74 @@ export default {
       },
     },
   },
+  contractUpdate: {
+    exit: 'Esci',
+    download: {
+      title: 'Scarica il documento da firmare',
+      description: `Per completare la richiesta, scarica l’accordo e fai apporre la firma digitale in <2>formato p7m</2> dal Legale Rappresentante dell’ente.`,
+      downloadContract: 'Scarica il documento',
+      disclaimer:
+        'Firmando l’accordo, il Legale Rappresentante dell’ente accetta espressamente e specificamente anche le singole clausole indicate nel paragrafo “Clausole ai sensi degli artt. 1341 e 1342 c.c.”',
+    },
+    chooseUpload: {
+      title: 'Carica il documento firmato',
+      description: `Segui le istruzioni per inviare il documento e completare la richiesta per il prodotto {{productTitle}}. Ricorda di caricare il documento <3>entro 90 giorni.</3>`,
+      goToUpload: 'Vai al caricamento',
+    },
+    upload: {
+      title: 'Carica il documento firmato',
+      description: 'Carica l’accordo di adesione firmato digitalmente in p7m dal Legale Rappresentante.',
+      dragAndDrop: {
+        title: 'Trascina qui il documento firmato oppure',
+        subtitle: 'Dimensione massima 300 x 300px Formato .jpg o .png',
+        dragOver: 'Rilascia qui per caricare',
+        failed: 'Caricamento fallito',
+        upload: 'Carica il file',
+        retry: 'Riprova',
+        cancel: 'Annulla',
+        remove: 'Rimuovi il file',
+      },
+      requiredField: '*Campo obbligatorio',
+      back: 'Indietro',
+      continue: 'Continua',
+    },
+    success: {
+      title: 'Hai completato la richiesta',
+      description: 'Comunicheremo l’esito all’indirizzo PEC primario dell’ente.',
+      backHome: 'Torna alla home',
+    },
+    error: {
+      generic: {
+        title: 'La pagina che cercavi non è disponibile',
+        description:
+          'Al momento non è possibile procedere. Riprova tra qualche minuto, o contatta l’assistenza',
+      },
+      expired: {
+        title: 'La richiesta non è più valida',
+        description:
+          'Sono trascorsi oltre 90 giorni. Se desideri ancora aggiungere la documentazione mancante, invia una nuova richiesta.',
+      },
+      cancelled: {
+        title: 'La richiesta è stata annullata',
+        description:
+          'La richiesta non è andata a buon fine. Se desideri aggiungere la documentazione mancante per il prodotto {{productTitle}}, invia una nuova richiesta.',
+      },
+      notAllowed: {
+        title: 'Non hai permessi per completare questa richiesta',
+        description:
+          'Chiedi a chi ha fatto la richiesta o agli amministratori/LR presenti nel contratto (o inseriti in fase di adesione) di completare l’operazione',
+      },
+      alreadyCompleted: {
+        title: 'Hai già inviato questo documento',
+        description: 'Per gestire il prodotto, accedi tramite SPID o CIE',
+      },
+      copyErrorCode: 'Copia il codice errore',
+      exit: 'Esci',
+      contactAssistance: 'Contatta l’assistenza',
+      login: 'Accedi',
+      goToDocuments: 'Vai ai documenti',
+    },
+  },
   fileUploadPreview: {
     loadingStatus: 'Caricamento...',
     labelStatus: 'Pronto per l’invio',

@@ -107,6 +107,75 @@ export default {
       },
     },
   },
+  contractUpdate: {
+    exit: 'Beenden',
+    download: {
+      title: 'Dokument zur Unterzeichnung herunterladen',
+      description:
+        'Um die Anfrage abzuschließen, laden Sie die Vereinbarung herunter und lassen Sie diese vom Rechtsvertreter der Körperschaft digital im <2>p7m-Format</2> unterzeichnen.',
+      downloadContract: 'Dokument herunterladen',
+      disclaimer:
+        'Mit der Unterzeichnung der Vereinbarung akzeptiert der Rechtsvertreter der Körperschaft ausdrücklich und spezifisch auch die einzelnen Klauseln, die im Abschnitt "Klauseln gemäß Art. 1341 und 1342 BGB" angegeben sind.',
+    },
+    chooseUpload: {
+      title: 'Unterzeichnetes Dokument hochladen',
+      description:
+        'Folgen Sie den Anweisungen, um das Dokument einzureichen und die Anfrage für das Produkt {{productTitle}} abzuschließen. Denken Sie daran, das Dokument <3>innerhalb von 90 Tagen</3> hochzuladen.',
+      goToUpload: 'Zum Laden',
+    },
+    upload: {
+      title: 'Unterzeichnetes Dokument hochladen',
+      description: 'Laden Sie die vom Rechtsvertreter digital in p7m unterzeichnete Beitrittsvereinbarung hoch.',
+      dragAndDrop: {
+        title: 'Ziehen Sie das unterzeichnete Dokument hierher oder',
+        dragOver: 'Zum Hochladen hier ablegen',
+        failed: 'Hochladen fehlgeschlagen',
+        upload: 'Datei hochladen',
+        retry: 'Erneut versuchen',
+        cancel: 'Abbrechen',
+        remove: 'Datei entfernen',
+      },
+      requiredField: '*Pflichtfeld',
+      back: 'Zurück',
+      continue: 'Weiter',
+    },
+    success: {
+      title: 'Sie haben die Anfrage abgeschlossen',
+      description: 'Wir teilen das Ergebnis an die primäre PEC-Adresse der Körperschaft mit.',
+      backHome: 'Zurück zur Homepage',
+    },
+    error: {
+      generic: {
+        title: 'Die gesuchte Seite ist nicht verfügbar',
+        description:
+          'Im Moment ist es nicht möglich fortzufahren. Versuchen Sie es in einigen Minuten erneut oder kontaktieren Sie den Support',
+      },
+      expired: {
+        title: 'Die Anfrage ist nicht mehr gültig',
+        description:
+          'Es sind mehr als 90 Tage vergangen. Wenn Sie die fehlenden Unterlagen weiterhin hinzufügen möchten, senden Sie eine neue Anfrage.',
+      },
+      cancelled: {
+        title: 'Die Anfrage wurde storniert',
+        description:
+          'Die Anfrage war nicht erfolgreich. Wenn Sie die fehlenden Unterlagen für das Produkt {{productTitle}} hinzufügen möchten, senden Sie eine neue Anfrage.',
+      },
+      notAllowed: {
+        title: 'Sie haben keine Berechtigung, diese Anfrage abzuschließen',
+        description:
+          'Bitten Sie die Person, die die Anfrage gestellt hat, oder die im Vertrag angegebenen (oder beim Beitritt eingetragenen) Administratoren/gesetzlichen Vertreter, den Vorgang abzuschließen',
+      },
+      alreadyCompleted: {
+        title: 'Sie haben dieses Dokument bereits gesendet',
+        description: 'Um das Produkt zu verwalten, melden Sie sich mit SPID oder CIE an',
+      },
+      copyErrorCode: 'Fehlercode kopieren',
+      exit: 'Beenden',
+      contactAssistance: 'Support kontaktieren',
+      login: 'Anmelden',
+      goToDocuments: 'Zu den Dokumenten',
+    },
+  },
   fileUploadPreview: {
     loadingStatus: 'Laden läuft...',
     labelStatus: 'Versandbereit',
