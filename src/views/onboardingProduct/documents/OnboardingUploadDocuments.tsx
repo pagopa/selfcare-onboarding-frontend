@@ -1,6 +1,7 @@
 import { useErrorDispatcher } from '@pagopa/selfcare-common-frontend';
 import SessionModal from '@pagopa/selfcare-common-frontend/lib/components/SessionModal';
 import { productId2ProductTitle } from '@pagopa/selfcare-common-frontend/lib/utils/productId2ProductTitle';
+import { TFunction } from 'i18next';
 import { uniqueId } from 'lodash';
 import { useContext, useEffect, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
@@ -33,6 +34,25 @@ import NotFoundPage from '../../onboardingRequest/status/NotFoundPage';
 import StepUploadDocuments from './step/StepUploadDocuments';
 import UploadedContractsSummary from './step/UploadedContractsSummary';
 
+type ErrorCode = keyof typeof customErrors;
+
+const renderErrorModalMessage = (errorCode: ErrorCode, t: TFunction) => {
+  if (errorCode === 'INVALID_SIGN_FORMAT') {
+    return (
+      <Trans i18nKey={`completeRegistration.errors.${errorCode}.message`}>
+        {'Il caricamento del documento non è andato a buon fine.'}
+        <br />
+        {'Carica un solo file in formato '}
+        <strong>{'p7m'}</strong>
+        {'.'}
+      </Trans>
+    );
+  }
+  return errorCode === 'GENERIC'
+    ? t(`completeRegistration.errors.${errorCode}.message`)
+    : t(`completeRegistration.errors.${errorCode}.product.message`);
+};
+
 export default function OnboardingUploadDocuments() {
   const { t } = useTranslation();
   const { setSubHeaderVisible, setOnExit, setEnableLogin } = useContext(HeaderContext);
@@ -47,7 +67,7 @@ export default function OnboardingUploadDocuments() {
   const [outcomeContentState, setOutcomeContentState] = useState<RequestOutcomeComplete | null>(
     !onboardingId ? 'notFound' : null
   );
-  const [errorCode, setErrorCode] = useState<keyof typeof customErrors>('GENERIC');
+  const [errorCode, setErrorCode] = useState<ErrorCode>('GENERIC');
   const [open, setOpen] = useState<boolean>(false);
   const [openConfirmationModal, setOpenConfirmationModal] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(!!onboardingId);
@@ -270,21 +290,7 @@ export default function OnboardingUploadDocuments() {
         onConfirm={handleErrorModalConfirm}
         open={open}
         title={t(`completeRegistration.errors.${errorCode}.title`)}
-        message={
-          errorCode === 'INVALID_SIGN_FORMAT' ? (
-            <Trans i18nKey={`completeRegistration.errors.${errorCode}.message`}>
-              {'Il caricamento del documento non è andato a buon fine.'}
-              <br />
-              {'Carica un solo file in formato '}
-              <strong>{'p7m'}</strong>
-              {'.'}
-            </Trans>
-          ) : errorCode === 'GENERIC' ? (
-            t(`completeRegistration.errors.${errorCode}.message`)
-          ) : (
-            t(`completeRegistration.errors.${errorCode}.product.message`)
-          )
-        }
+        message={renderErrorModalMessage(errorCode, t)}
         onConfirmLabel={t('completeRegistration.sessionModal.onConfirmLabel')}
         onCloseLabel={t('completeRegistration.sessionModal.onCloseLabel')}
       />
