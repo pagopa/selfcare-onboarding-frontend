@@ -26,6 +26,7 @@ import { useHistoryState } from '../../hooks/useHistoryState';
 import { HeaderContext } from '../../lib/context';
 import { MessageNoAction } from '../../components/shared/MessageNoAction';
 import { CompanyInformations } from '../../model/CompanyInformations';
+import { FilterCategoriesResponse } from '../../model/FilterCategoriesResponse';
 import { OnboardingFormData } from '../../model/OnboardingFormData';
 import { getFilterCategories } from '../../services/onboardingServices';
 import { ENV } from '../../utils/env';
@@ -44,7 +45,6 @@ type OnboardingPremiumUrlParams = {
   subProductId: string;
 };
 
-// eslint-disable-next-line sonarjs/cognitive-complexity
 function OnboardingPremiumComponent() {
   const { t } = useTranslation();
   const { subProductId, productId } = useParams<OnboardingPremiumUrlParams>();
@@ -79,7 +79,8 @@ function OnboardingPremiumComponent() {
   const [dpoData, setDpoData] = useState<DataProtectionOfficerDto>();
   const [pspData, setPspData] = useState<PaymentServiceProviderDto>();
   const [pricingPlanLoaded, setPricingPlanLoaded] = useState(false);
-  const [filterCategoriesResponse, setFilterCategoriesResponse] = useState<any>();
+  const [filterCategoriesResponse, setFilterCategoriesResponse] =
+    useState<FilterCategoriesResponse>();
 
   useEffect(() => {
     registerUnloadEvent(setOnExit, setOpenExitModal, setOnExitAction);

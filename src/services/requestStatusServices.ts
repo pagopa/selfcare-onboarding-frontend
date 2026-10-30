@@ -3,6 +3,7 @@ import { uniqueId } from 'lodash';
 import { Dispatch, SetStateAction } from 'react';
 import { FileErrorAttempt, Problem, RequestOutcomeComplete } from '../../types';
 import { OnboardingApi } from '../api/OnboardingApiClient';
+import { OnboardingVerify } from '../api/generated/onboarding/OnboardingVerify';
 import { getErrorStatus, HttpError } from '../lib/error-utils';
 import { customErrors } from '../utils/constants';
 import { ENV } from '../utils/env';
@@ -36,12 +37,11 @@ export const deleteRequest =
     }
   };
 
-// eslint-disable-next-line sonarjs/cognitive-complexity
 export const onboardingContractUpload = async (
   file: File,
   setLoading: Dispatch<SetStateAction<boolean>>,
   onboardingId: string | undefined,
-  requestData: any,
+  requestData: Pick<OnboardingVerify, 'productId'> | undefined,
   addUserFlow: boolean,
   setOutcomeContentState: Dispatch<SetStateAction<RequestOutcomeComplete | null>>,
   lastFileErrorAttempt: FileErrorAttempt | undefined,

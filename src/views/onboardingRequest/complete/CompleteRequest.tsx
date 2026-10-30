@@ -50,7 +50,6 @@ export const transcodeErrorCode = (data: Problem): keyof typeof customErrors => 
   return 'GENERIC';
 };
 
-// eslint-disable-next-line sonarjs/cognitive-complexity
 export default function CompleteRequestComponent() {
   const { t } = useTranslation();
   const { setSubHeaderVisible, setOnExit, setEnableLogin } = useContext(HeaderContext);
@@ -181,7 +180,7 @@ export default function CompleteRequestComponent() {
   const steps: Array<StepperStep> = [
     {
       label: t('completeRegistration.steps.step0.label'),
-      Component: () => 
+      Component: () =>
         ConfirmRegistrationStep0({
           onboardingId,
           fileName: 'Addendum',
