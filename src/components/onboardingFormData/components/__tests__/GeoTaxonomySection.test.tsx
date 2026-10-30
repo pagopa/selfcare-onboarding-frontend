@@ -1,16 +1,15 @@
 import '@testing-library/jest-dom';
 import { fireEvent, screen, waitFor } from '@testing-library/react';
+import { FormikProps } from 'formik';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
+import { OnboardingFormData } from '../../../../model/OnboardingFormData';
 import { mockedGeoTaxonomy } from '../../../../lib/__mocks__/mockApiRequests';
 import { renderComponentWithProviders } from '../../../../utils/test/test-utils';
 import GeoTaxonomySection from '../GeoTaxonomySection';
 
 vi.mock('lodash/debounce', () => ({
-  default: (fn: any) => {
-    const immediate = (...args: any[]) => fn(...args);
-    immediate.cancel = vi.fn();
-    return immediate;
-  },
+  default: (fn: (...args: Array<unknown>) => unknown) =>
+    Object.assign((...args: Array<unknown>) => fn(...args), { cancel: vi.fn() }),
 }));
 
 vi.mock(
@@ -19,6 +18,10 @@ vi.mock(
 );
 
 const originalFetch = global.fetch;
+
+const mockFormik = {
+  values: { geographicTaxonomies: [] },
+} as unknown as FormikProps<OnboardingFormData>;
 
 beforeEach(() => {
   vi.stubEnv('VITE_MOCK_API', 'true');
@@ -61,7 +64,7 @@ test('should render GeoTaxonomySection with empty retrievedTaxonomies', async ()
     <GeoTaxonomySection
       retrievedTaxonomies={[]}
       setGeographicTaxonomies={vi.fn()}
-      formik={undefined}
+      formik={mockFormik}
     />
   );
 
@@ -74,7 +77,7 @@ test('should render GeoTaxonomySection with mocked retrievedTaxonomies and click
     <GeoTaxonomySection
       retrievedTaxonomies={mockedGeoTaxonomy}
       setGeographicTaxonomies={vi.fn()}
-      formik={undefined}
+      formik={mockFormik}
     />
   );
 
@@ -106,7 +109,7 @@ test('should render GeoTaxonomySection with mocked retrievedTaxonomies and click
     <GeoTaxonomySection
       retrievedTaxonomies={mockedGeoTaxonomy}
       setGeographicTaxonomies={vi.fn()}
-      formik={undefined}
+      formik={mockFormik}
     />
   );
 
@@ -124,7 +127,7 @@ test('should render GeoTaxonomySection with mocked retrievedTaxonomies and code 
     <GeoTaxonomySection
       retrievedTaxonomies={mockedNonNationalGeoTaxonomy}
       setGeographicTaxonomies={vi.fn()}
-      formik={undefined}
+      formik={mockFormik}
     />
   );
 });
