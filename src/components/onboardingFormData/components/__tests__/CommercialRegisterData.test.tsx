@@ -215,6 +215,19 @@ test('Test: PSP fields are disabled when the data come from the registry', () =>
   expect(document.getElementById('abiCode')).toBeDisabled();
 });
 
+test('Test: PSP register fields stay enabled when the registry returns N/A', () => {
+  // The form field is normalized to '' while pspData keeps the raw registry value
+  formik.values = { abiCode: '12345', registerNumber: '' };
+  renderComponent({
+    institutionType: 'PSP',
+    controllers: { isDisabled: true },
+    pspData: { ...registryPspData, legalRegisterName: 'N/A', legalRegisterNumber: 'N/A' },
+  });
+
+  expect(document.getElementById('registrationInRegister')).toBeEnabled();
+  expect(document.getElementById('registerNumber')).toBeEnabled();
+});
+
 test('Test: PSP fields stay enabled when the registry data have a validation error', () => {
   formik.values = { abiCode: '12345', registerNumber: '99' };
   formik.errors = {

@@ -28,6 +28,7 @@ import { MessageNoAction } from '../../components/shared/MessageNoAction';
 import { CompanyInformations } from '../../model/CompanyInformations';
 import { FilterCategoriesResponse } from '../../model/FilterCategoriesResponse';
 import { OnboardingFormData } from '../../model/OnboardingFormData';
+import { pspDataDto2OnboardingFormData } from '../../model/PspData';
 import { getFilterCategories } from '../../services/onboardingServices';
 import { ENV } from '../../utils/env';
 import { isPagoPaInsights } from '../../utils/institutionTypeUtils';
@@ -230,7 +231,7 @@ function OnboardingPremiumComponent() {
               country: '',
             }),
             ...companyInformations,
-            ...pspData,
+            ...pspDataDto2OnboardingFormData(pspData),
             ...dpoData,
           },
           institutionType: institutionType as InstitutionType,

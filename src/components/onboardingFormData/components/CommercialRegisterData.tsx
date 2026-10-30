@@ -148,7 +148,7 @@ const CommercialRegisterData = ({
             disabled={
               controllers.isDisabled &&
               !!pspData?.legalRegisterName &&
-              formik.values.registerNumber !== 'N/A'
+              pspData.legalRegisterNumber !== 'N/A'
             }
           />
         </Grid>
@@ -166,7 +166,7 @@ const CommercialRegisterData = ({
               controllers.isDisabled &&
               !!pspData?.legalRegisterNumber &&
               !formik.errors.registerNumber &&
-              formik.values.registerNumber !== 'N/A'
+              pspData.legalRegisterNumber !== 'N/A'
             }
           />
         </Grid>
