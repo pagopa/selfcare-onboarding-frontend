@@ -148,7 +148,7 @@ const CommercialRegisterData = ({
             disabled={
               controllers.isDisabled &&
               !!pspData?.legalRegisterName &&
-              pspData.legalRegisterNumber !== 'N/A'
+              pspData.legalRegisterName !== 'N/A'
             }
           />
         </Grid>
