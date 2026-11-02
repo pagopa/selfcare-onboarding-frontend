@@ -5,17 +5,15 @@ import { HttpError } from '../lib/error-utils';
 import { buildUrlLogo } from '../utils/constants';
 import { ENV } from '../utils/env';
 
-const fetchUserParties = async (
-  options?: {
-    params?: { productId: string };
-    onSuccess?: (parties: Array<SelfcareParty>) => void;
-    onSuccessWithParties?: (parties: Array<SelfcareParty>) => void;
-    onSuccessEmpty?: () => void;
-    onError?: (error: unknown) => void;
-    trackingProductId?: string;
-    trackEventOnStart?: string;
-  }
-) => {
+const fetchUserParties = async (options?: {
+  params?: { productId: string };
+  onSuccess?: (parties: Array<SelfcareParty>) => void;
+  onSuccessWithParties?: (parties: Array<SelfcareParty>) => void;
+  onSuccessEmpty?: () => void;
+  onError?: (error: unknown) => void;
+  trackingProductId?: string;
+  trackEventOnStart?: string;
+}) => {
   if (options?.trackEventOnStart) {
     trackEvent(options.trackEventOnStart);
   }
@@ -43,9 +41,7 @@ const fetchUserParties = async (
   }
 };
 
-export const onExitPremiumFlow = async (
-  productId: string | undefined
-) => {
+export const onExitPremiumFlow = async (productId: string | undefined) => {
   await fetchUserParties({
     trackEventOnStart: 'PREMIUM_USER EXIT',
     trackingProductId: productId,
@@ -67,7 +63,7 @@ export const handleSearchUserParties = async (
     params: { productId: subProductId },
     onSuccess: (parties) => {
       setParties(
-        parties.map((p: any) => ({
+        parties.map((p) => ({
           ...p,
           urlLogo: buildUrlLogo(p.id),
         }))
