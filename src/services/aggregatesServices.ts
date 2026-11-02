@@ -14,7 +14,7 @@ export const verifyAggregates = async (
   _setRequiredLogin: Dispatch<SetStateAction<boolean>>,
   parseJson2Csv: (errorJson: Array<RowError>) => void,
   setDisabled: Dispatch<SetStateAction<boolean>>,
-  forward: any,
+  forward: (_: undefined, aggregates: Array<AggregateInstitution>) => void,
   setFoundErrors: Dispatch<SetStateAction<Array<RowError> | undefined>>,
   setOutcome: Dispatch<SetStateAction<RequestOutcomeMessage | null | undefined>>
 ) => {
@@ -70,7 +70,7 @@ export const getExampleAggregatesCsv = async (
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
-  } catch (error: any) {
-    console.error(error.message);
+  } catch (error) {
+    console.error((error as Error).message);
   }
 };

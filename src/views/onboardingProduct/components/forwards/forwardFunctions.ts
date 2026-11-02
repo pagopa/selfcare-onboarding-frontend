@@ -190,7 +190,7 @@ export const createForwardFunctions = ({
     }
   };
 
-  const forwardFromAggregator = (_: any, aggregates?: Array<AggregateInstitution>) => {
+  const forwardFromAggregator = (_: unknown, aggregates?: Array<AggregateInstitution>) => {
     const transition = afterAggregates({
       isApplicantEmailRequired: requiresApplicantEmail(usersOf(formData), loggedUserTaxCode),
     });
