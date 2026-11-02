@@ -1,25 +1,17 @@
 import '@testing-library/jest-dom';
 import { fireEvent, screen } from '@testing-library/react';
 import { beforeEach, expect, test, vi } from 'vitest';
-import { InstitutionType } from '../../../../../types';
-import { OnboardingFormData } from '../../../../model/OnboardingFormData';
+import { InstitutionType, PaymentServiceProviderDto } from '../../../../../types';
+import { OnboardingControllers } from '../../../../hooks/useOnboardingControllers';
+import { BaseTextFieldPropsFn } from '../../../steps/StepOnboardingFormData';
 import { PRODUCT_IDS } from '../../../../utils/constants';
+import { asFormikProps, createFormikMock } from '../../../../utils/test/formikMock';
 import { renderComponentWithProviders } from '../../../../utils/test/test-utils';
 import CommercialRegisterData from '../CommercialRegisterData';
 
-const formik: any = {
-  values: {},
-  errors: {},
-  setFieldValue: vi.fn(),
-  handleChange: vi.fn(),
-};
+const formik = createFormikMock();
 
-const mockBaseTextFieldProps = (
-  field: keyof OnboardingFormData,
-  label: string,
-  fontWeight: number = 400,
-  fontSize: number | string = 16
-) => ({
+const mockBaseTextFieldProps: BaseTextFieldPropsFn = (field, label, fontWeight = 400, color) => ({
   id: field,
   type: 'text',
   value: formik.values[field] || '',
@@ -30,11 +22,19 @@ const mockBaseTextFieldProps = (
   onChange: formik.handleChange,
   sx: { width: '100%' },
   InputProps: {
-    style: { fontSize, fontWeight },
+    style: { fontWeight, color },
   },
 });
 
-const defaultControllers = {
+const registryPspData: PaymentServiceProviderDto = {
+  businessRegisterNumber: '123',
+  legalRegisterName: 'Albo',
+  legalRegisterNumber: '99',
+  abiCode: '12345',
+  vatNumberGroup: false,
+};
+
+const defaultControllers: OnboardingControllers = {
   isPremium: false,
   isDisabled: false,
   isInvoiceable: true,
@@ -53,8 +53,8 @@ const renderComponent = ({
 }: {
   institutionType?: InstitutionType;
   productId?: string;
-  controllers?: Record<string, unknown>;
-  pspData?: any;
+  controllers?: Partial<OnboardingControllers>;
+  pspData?: PaymentServiceProviderDto;
   shrinkRea?: boolean;
   isInfoCompany?: boolean;
 } = {}) => {
@@ -64,10 +64,10 @@ const renderComponent = ({
       isInfoCompany={isInfoCompany}
       institutionType={institutionType}
       baseTextFieldProps={mockBaseTextFieldProps}
-      formik={formik}
+      formik={asFormikProps(formik)}
       setShrinkRea={setShrinkRea}
       shrinkRea={shrinkRea}
-      controllers={{ ...defaultControllers, ...controllers } as any}
+      controllers={{ ...defaultControllers, ...controllers }}
       pspData={pspData}
     />,
     productId
@@ -163,7 +163,7 @@ test('Test: share capital blur without a value unshrinks the label', () => {
 });
 
 test('Test: share capital blur with a value keeps the label shrunk', () => {
-  formik.values.shareCapital = 10000;
+  formik.values.shareCapital = '10000';
   const { setShrinkRea } = renderComponent({ institutionType: 'SA', shrinkRea: true });
 
   fireEvent.blur(document.getElementById('shareCapital') as HTMLInputElement);
@@ -202,16 +202,11 @@ test('Test: PSP fields are enabled when there is no PSP data', () => {
 });
 
 test('Test: PSP fields are disabled when the data come from the registry', () => {
-  formik.values = { abiCode: '12345', legalRegisterNumber: '99' };
+  formik.values = { abiCode: '12345', registerNumber: '99' };
   renderComponent({
     institutionType: 'PSP',
     controllers: { isDisabled: true },
-    pspData: {
-      businessRegisterNumber: '123',
-      legalRegisterName: 'Albo',
-      legalRegisterNumber: '99',
-      abiCode: '12345',
-    },
+    pspData: registryPspData,
   });
 
   expect(document.getElementById('commercialRegisterNumber')).toBeDisabled();
@@ -220,22 +215,30 @@ test('Test: PSP fields are disabled when the data come from the registry', () =>
   expect(document.getElementById('abiCode')).toBeDisabled();
 });
 
+test('Test: PSP register fields stay enabled when the registry returns N/A', () => {
+  // The form field is normalized to '' while pspData keeps the raw registry value
+  formik.values = { abiCode: '12345', registerNumber: '' };
+  renderComponent({
+    institutionType: 'PSP',
+    controllers: { isDisabled: true },
+    pspData: { ...registryPspData, legalRegisterName: 'N/A', legalRegisterNumber: 'N/A' },
+  });
+
+  expect(document.getElementById('registrationInRegister')).toBeEnabled();
+  expect(document.getElementById('registerNumber')).toBeEnabled();
+});
+
 test('Test: PSP fields stay enabled when the registry data have a validation error', () => {
-  formik.values = { abiCode: '12345', legalRegisterNumber: '99' };
+  formik.values = { abiCode: '12345', registerNumber: '99' };
   formik.errors = {
     commercialRegisterNumber: 'Invalid',
-    legalRegisterNumber: 'Invalid',
+    registerNumber: 'Invalid',
     abiCode: 'Invalid',
   };
   renderComponent({
     institutionType: 'PSP',
     controllers: { isDisabled: true },
-    pspData: {
-      businessRegisterNumber: '123',
-      legalRegisterName: 'Albo',
-      legalRegisterNumber: '99',
-      abiCode: '12345',
-    },
+    pspData: registryPspData,
   });
 
   expect(document.getElementById('commercialRegisterNumber')).toBeEnabled();

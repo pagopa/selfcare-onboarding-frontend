@@ -1,7 +1,14 @@
+import { FormikErrors, FormikHandlers } from 'formik';
 import { OnboardingControllers } from '../hooks/useOnboardingControllers';
-import { OnboardingFormData } from '../model/OnboardingFormData';
+import { OnboardingFormData, OnboardingFormDataStringField } from '../model/OnboardingFormData';
 import { requiredError } from './constants';
 import { fieldColor } from './style-utils';
+
+type NumericFieldFormik = {
+  values: Partial<OnboardingFormData>;
+  errors: FormikErrors<OnboardingFormData>;
+  handleChange: FormikHandlers['handleChange'];
+};
 
 export const formatCity = (city: string): string =>
   city
@@ -15,7 +22,7 @@ export const fileFromReader = async (
   const stream = new ReadableStream({
     start(controller) {
       return pump();
-      function pump(): Promise<any> | undefined {
+      function pump(): Promise<void> | undefined {
         return reader?.read().then(({ done, value }) => {
           if (done) {
             controller.close();
@@ -34,12 +41,12 @@ export const fileFromReader = async (
 };
 
 export const baseNumericFieldProps = (
-  field: keyof OnboardingFormData,
+  field: OnboardingFormDataStringField,
   label: string,
   fontWeight: string | number = 'fontWeightMedium',
   fontSize: number = 18,
   controllers: OnboardingControllers,
-  formik: any
+  formik: NumericFieldFormik
 ) => {
   const isError = !!formik.errors[field] && formik.errors[field] !== requiredError;
   return {

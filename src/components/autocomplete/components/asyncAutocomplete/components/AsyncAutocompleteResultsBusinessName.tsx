@@ -1,6 +1,8 @@
 import { Box, styled } from '@mui/system';
 import { PartyAccountItemButton } from '@pagopa/mui-italia/components/PartyAccountItemButton';
 import { useTranslation } from 'react-i18next';
+import { PartyData } from '../../../../../../types';
+import { AutocompleteOption } from '../../../../../model/AutocompleteOption';
 
 const CustomBox = styled(Box)({
   /* width */
@@ -25,12 +27,12 @@ const CustomBox = styled(Box)({
 });
 
 type Props = {
-  setSelected: React.Dispatch<React.SetStateAction<any>>;
-  options: Array<any>;
-  setOptions: React.Dispatch<React.SetStateAction<any>>;
+  setSelected: React.Dispatch<React.SetStateAction<PartyData | null>>;
+  options: ReadonlyArray<AutocompleteOption>;
+  setOptions: React.Dispatch<React.SetStateAction<ReadonlyArray<AutocompleteOption>>>;
   apiLoading?: boolean;
-  getOptionLabel: (option: any) => string;
-  getOptionKey: (option: any) => string;
+  getOptionLabel: (option: AutocompleteOption) => string;
+  getOptionKey: (option: AutocompleteOption) => string;
 };
 
 export default function AsyncAutocompleteResultsBusinessName({
@@ -42,8 +44,21 @@ export default function AsyncAutocompleteResultsBusinessName({
   getOptionKey,
 }: Props) {
   const { t } = useTranslation();
+  // The selected search result is carried as the selected party for the following steps
+  const selectOption = (option: AutocompleteOption) => {
+    setSelected(option as PartyData);
+    setOptions([]);
+  };
   return (
-    <CustomBox my={2} width="90%" maxHeight="200px" overflow="auto" role="list" aria-live="polite" aria-label={t('asyncAutocomplete.searchResultsLabel')}>
+    <CustomBox
+      my={2}
+      width="90%"
+      maxHeight="200px"
+      overflow="auto"
+      role="list"
+      aria-live="polite"
+      aria-label={t('asyncAutocomplete.searchResultsLabel')}
+    >
       {!apiLoading &&
         options.map((option) => (
           <Box
@@ -53,18 +68,14 @@ export default function AsyncAutocompleteResultsBusinessName({
             role="listitem"
             onKeyDownCapture={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
-                setSelected(option);
-                setOptions([]);
+                selectOption(option);
               }
             }}
           >
             <PartyAccountItemButton
               partyName={getOptionLabel(option)}
               image={''}
-              action={() => {
-                setSelected(option);
-                setOptions([]);
-              }}
+              action={() => selectOption(option)}
               maxCharactersNumberMultiLine={20}
             />
           </Box>

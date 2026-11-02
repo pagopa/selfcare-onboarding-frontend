@@ -202,7 +202,6 @@ export const resolveTaxCode = (p: BillingResolverParams): string | undefined => 
   return '12345678911';
 };
 
-// eslint-disable-next-line sonarjs/cognitive-complexity
 export const resolveVatNumber = (p: BillingResolverParams): string | undefined => {
   if (p.errorOnSubmit) {
     return mockPartyRegistry.items[1].taxCode;

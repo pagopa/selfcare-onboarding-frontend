@@ -1,10 +1,13 @@
-﻿import '@testing-library/jest-dom';
+import '@testing-library/jest-dom';
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { beforeEach, expect, test, vi } from 'vitest';
 import { InstitutionType } from '../../../../../types';
+import { OnboardingControllers } from '../../../../hooks/useOnboardingControllers';
 import { OnboardingFormData } from '../../../../model/OnboardingFormData';
+import { BaseTextFieldPropsFn } from '../../../steps/StepOnboardingFormData';
 import { getCountriesFromGeotaxonomies } from '../../../../services/geoTaxonomyServices';
 import { PRODUCT_IDS } from '../../../../utils/constants';
+import { asFormikProps, createFormikMock } from '../../../../utils/test/formikMock';
 import { renderComponentWithProviders } from '../../../../utils/test/test-utils';
 import PartyGeneralData from '../PartyGeneralData';
 
@@ -14,24 +17,14 @@ vi.mock('../../../../services/geoTaxonomyServices', () => ({
   getNationalCountries: vi.fn(),
 }));
 
-const formik: any = {
-  values: {
-    businessName: '',
-    zipCode: '12345',
-    taxCode: '',
-    city: '',
-  },
-  errors: {},
-  setFieldValue: vi.fn(),
-  handleChange: vi.fn(),
-};
+const formik = createFormikMock({
+  businessName: '',
+  zipCode: '12345',
+  taxCode: '',
+  city: '',
+});
 
-const mockBaseTextFieldProps = (
-  field: keyof OnboardingFormData,
-  label: string,
-  fontWeight: number = 400,
-  fontSize: number = 16
-) => ({
+const mockBaseTextFieldProps: BaseTextFieldPropsFn = (field, label, fontWeight = 400, color) => ({
   id: field,
   type: 'text',
   value: formik.values[field] || '',
@@ -42,11 +35,11 @@ const mockBaseTextFieldProps = (
   onChange: formik.handleChange,
   sx: { width: '100%' },
   InputProps: {
-    style: { fontSize, fontWeight },
+    style: { fontWeight, color },
   },
 });
 
-const defaultControllers = {
+const defaultControllers: OnboardingControllers = {
   isPremium: false,
   isDisabled: false,
   isInvoiceable: true,
@@ -65,21 +58,21 @@ const renderComponent = ({
 }: {
   institutionType?: InstitutionType;
   productId?: string;
-  controllers?: Record<string, unknown>;
-  onboardingFormData?: any;
+  controllers?: Partial<OnboardingControllers>;
+  onboardingFormData?: Partial<OnboardingFormData>;
   isInfoCompany?: boolean;
   origin?: string;
 } = {}) => {
   const setInstitutionLocationData = vi.fn();
   renderComponentWithProviders(
     <PartyGeneralData
-      controllers={{ ...defaultControllers, ...controllers } as any}
+      controllers={{ ...defaultControllers, ...controllers }}
       origin={formik.values.origin}
-      onboardingFormData={onboardingFormData}
+      onboardingFormData={onboardingFormData as OnboardingFormData | undefined}
       baseTextFieldProps={mockBaseTextFieldProps}
       institutionType={institutionType}
       isInfoCompany={isInfoCompany}
-      formik={formik}
+      formik={asFormikProps(formik)}
       setInstitutionLocationData={setInstitutionLocationData}
       setRequiredLogin={vi.fn()}
     />,
@@ -283,7 +276,7 @@ test('Test: no country lookup when the city is empty', () => {
 
 test('Test: found countries fill istatCode and country when missing', async () => {
   vi.mocked(getCountriesFromGeotaxonomies).mockImplementation(async (_city, setCountries) => {
-    (setCountries as any)([{ istat_code: '058091', country: 'IT' }]);
+    setCountries([{ istat_code: '058091', country: 'IT', city: 'Roma' }]);
   });
   formik.values = { ...formik.values, city: 'Roma', country: undefined, istatCode: undefined };
   renderComponent();

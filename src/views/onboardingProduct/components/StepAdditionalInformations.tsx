@@ -11,8 +11,10 @@ import {
 import { useTranslation, Trans } from 'react-i18next';
 import { useEffect, useState } from 'react';
 import { OnboardingStepActions } from '../../../components/registrationSteps/OnboardingStepActions';
-import { RadioWithTextField } from '../../../components/forms/RadioWithTextField';
+import { RadioField, RadioWithTextField } from '../../../components/forms/RadioWithTextField';
 import { StepperStepComponentProps } from '../../../../types';
+
+type AdditionalInformationField = RadioField | 'optionalPartyInformations';
 
 type Props = StepperStepComponentProps & {
   originId?: string;
@@ -22,7 +24,9 @@ export function StepAdditionalInformations({ forward, back, originId, origin }: 
   const { t } = useTranslation();
   const theme = useTheme();
 
-  const [radioValues, setRadioValues] = useState({
+  const [radioValues, setRadioValues] = useState<
+    Record<AdditionalInformationField, boolean | undefined>
+  >({
     isEstabilishedRegulatoryProvision: undefined,
     fromBelongsRegulatedMarket: undefined,
     isFromIPA: undefined,
@@ -57,7 +61,7 @@ export function StepAdditionalInformations({ forward, back, originId, origin }: 
     );
   }, [radioValues, errors, additionalData.optionalPartyInformations?.choice]);
 
-  const handleRadioChange = (field: any, value: any) => {
+  const handleRadioChange = (field: AdditionalInformationField, value: boolean) => {
     setRadioValues((prevValues) => ({
       ...prevValues,
       [field]: value,
@@ -99,7 +103,6 @@ export function StepAdditionalInformations({ forward, back, originId, origin }: 
     }));
   };
 
-  // eslint-disable-next-line sonarjs/cognitive-complexity
   const validateTextField = () => {
     const newErrors = Object.keys(radioValues).reduce((acc, field) => {
       switch (field) {
@@ -264,7 +267,7 @@ export function StepAdditionalInformations({ forward, back, originId, origin }: 
             label={t('additionalDataPage.formQuestions.optionalPartyInformations')}
             fullWidth
             sx={{ color: theme.palette.text.secondary }}
-            onChange={(e: any) => {
+            onChange={(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
               handleTextFieldChange(
                 true,
                 'optionalPartyInformations',

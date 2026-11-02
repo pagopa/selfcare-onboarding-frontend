@@ -1,24 +1,27 @@
+import { FormikProps } from 'formik';
 import { Grid, Typography } from '@mui/material';
 import { theme } from '@pagopa/mui-italia';
 import { PRODUCT_IDS } from '@pagopa/selfcare-common-frontend/lib/utils/constants';
 import { t } from 'i18next';
 import { Dispatch, SetStateAction } from 'react';
+import { OnboardingFormData } from '../../../model/OnboardingFormData';
 import { InstitutionType } from '../../../../types';
 import { OnboardingControllers } from '../../../hooks/useOnboardingControllers';
 import { verifyTaxCodeInvoicing } from '../../../services/billingDataServices';
 import { isInsuranceCompany, isIoProduct, isPublicAdministration } from '../../../utils/institutionTypeUtils';
 import { CustomTextField, CustomTextFieldNotched } from '../../../utils/style-utils';
+import { BaseTextFieldPropsFn } from '../../steps/StepOnboardingFormData';
 
 type Props = {
   controllers: OnboardingControllers;
   productId?: string;
   subProductId?: string;
   institutionType: InstitutionType;
-  onboardingFormData: any;
+  onboardingFormData?: OnboardingFormData;
   taxCodeInvoicingVisible: boolean;
   disableTaxCodeInvoicing: boolean;
-  formik: any;
-  baseTextFieldProps: any;
+  formik: FormikProps<OnboardingFormData>;
+  baseTextFieldProps: BaseTextFieldPropsFn;
   setInvalidTaxCodeInvoicing: Dispatch<SetStateAction<boolean>>;
 };
 
@@ -66,8 +69,8 @@ const InvoiceData = ({
                 disabled={
                   controllers.isPremium &&
                   subProductId !== PRODUCT_IDS.IO_PREMIUM &&
-                  formik.values.recipientCode.length >= 6 &&
-                  formik.initialValues.recipientCode.length >= 6 &&
+                  (formik.values.recipientCode?.length ?? 0) >= 6 &&
+                  (formik.initialValues.recipientCode?.length ?? 0) >= 6 &&
                   !formik.errors.recipientCode
                 }
                 helperText={
@@ -105,7 +108,7 @@ const InvoiceData = ({
                   theme.palette.text.primary
                 )}
                 onChange={(e) => {
-                  formik.setFieldValue('taxCodeInvoicing', e.target.value);
+                  void formik.setFieldValue('taxCodeInvoicing', e.target.value);
                   if (e.target.value.length === 11) {
                     void verifyTaxCodeInvoicing(e.target.value, formik, setInvalidTaxCodeInvoicing);
                   } else {

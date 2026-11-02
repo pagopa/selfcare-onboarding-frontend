@@ -21,7 +21,7 @@ export function withLogin<T extends LoginProps>(WrappedComponent: React.Componen
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
         asyncAttemptSilentLogin();
       }
-    }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    }, []);
 
     return <WrappedComponent {...(props as T)} />;
   };

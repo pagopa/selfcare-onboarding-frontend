@@ -1,4 +1,6 @@
+import { FormikProps } from 'formik';
 import { Dispatch, SetStateAction } from 'react';
+import { OnboardingFormData } from '../model/OnboardingFormData';
 import { OnboardingApi } from '../api/OnboardingApiClient';
 import { PartyRegistryProxyApi } from '../api/PartyRegistryProxyApiClient';
 import { UoData } from '../model/UoModel';
@@ -6,14 +8,14 @@ import { UoData } from '../model/UoModel';
 export const verifyRecipientCodeIsValid = async (
   recipientCode: string,
   uoSelected: UoData | undefined,
-  formik: any,
+  formik: FormikProps<OnboardingFormData>,
   setRecipientCodeStatus: Dispatch<SetStateAction<string | undefined>>,
   originId?: string
 ) => {
   try {
     const result = await OnboardingApi.verifyRecipientCode(originId ?? '', recipientCode);
     if (uoSelected && result && result === 'DENIED_NO_BILLING') {
-      formik.setFieldValue('recipientCode', undefined);
+      void formik.setFieldValue('recipientCode', undefined);
     }
     setRecipientCodeStatus(result);
   } catch (_error) {
@@ -23,7 +25,7 @@ export const verifyRecipientCodeIsValid = async (
 
 export const verifyTaxCodeInvoicing = async (
   taxCodeInvoicing: string,
-  formik: any,
+  formik: FormikProps<OnboardingFormData>,
   setInvalidTaxCodeInvoicing: Dispatch<SetStateAction<boolean>>
 ) => {
   try {

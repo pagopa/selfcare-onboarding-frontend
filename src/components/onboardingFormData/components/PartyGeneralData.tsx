@@ -1,9 +1,11 @@
+import { FormikProps } from 'formik';
 import { Autocomplete, Grid, MenuItem, TextField, Typography } from '@mui/material';
 
 import { Box } from '@mui/system';
 import { theme } from '@pagopa/mui-italia';
 import { t } from 'i18next';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { OnboardingFormData } from '../../../model/OnboardingFormData';
 import { InstitutionType } from '../../../../types';
 import { OnboardingControllers } from '../../../hooks/useOnboardingControllers';
 import { CountryResource } from '../../../model/CountryResource';
@@ -21,6 +23,7 @@ import {
   CustomTextFieldNotched,
   fieldColor,
 } from '../../../utils/style-utils';
+import { BaseTextFieldPropsFn } from '../../steps/StepOnboardingFormData';
 import {
   isAddressDisabled,
   isBusinessNameDisabled,
@@ -33,11 +36,11 @@ import {
 type Props = {
   controllers: OnboardingControllers;
   origin?: string;
-  onboardingFormData: any;
-  baseTextFieldProps: any;
+  onboardingFormData?: OnboardingFormData;
+  baseTextFieldProps: BaseTextFieldPropsFn;
   institutionType: InstitutionType;
   isInfoCompany: boolean;
-  formik: any;
+  formik: FormikProps<OnboardingFormData>;
   productId?: string;
   setInstitutionLocationData: Dispatch<SetStateAction<InstitutionLocationData | undefined>>;
   setRequiredLogin: Dispatch<SetStateAction<boolean>>;
@@ -227,7 +230,7 @@ const PartyGeneralData = ({
               id="city-select"
               onInput={(e: React.ChangeEvent<HTMLInputElement>) => {
                 const value = e.target.value;
-                formik.setFieldValue('city', value);
+                void formik.setFieldValue('city', value);
                 if (value.length >= 3) {
                   void getCountriesFromGeotaxonomies(value, setCountries, setRequiredLogin);
                 } else {
@@ -235,10 +238,10 @@ const PartyGeneralData = ({
                 }
               }}
               inputValue={formik.values.city || ''}
-              onChange={(_e: any, selected: any) => {
-                formik.setFieldValue('city', selected?.city || '');
-                formik.setFieldValue('county', selected?.city || '');
-                formik.setFieldValue(
+              onChange={(_e, selected) => {
+                void formik.setFieldValue('city', selected?.city || '');
+                void formik.setFieldValue('county', selected?.city || '');
+                void formik.setFieldValue(
                   'istatCode',
                   !controllers.isFromIPA ? selected?.istat_code : undefined
                 );
@@ -273,7 +276,7 @@ const PartyGeneralData = ({
                   {option?.city}
                 </MenuItem>
               )}
-              renderInput={(params: any) => (
+              renderInput={(params) => (
                 <TextField
                   {...params}
                   inputProps={{
@@ -323,15 +326,16 @@ const PartyGeneralData = ({
                 }
               }}
               inputValue={formik.values.extendedCountry ?? input}
-              onChange={(_e: any, selected: any) => {
+              onChange={(_e, selected) => {
+                // No city here: the location effect in PersonalAndBillingDataSection stays idle
                 if (selected) {
-                  formik.setFieldValue('country', selected.alpha_2);
-                  formik.setFieldValue('extendedCountry', selected.name);
-                  setInstitutionLocationData({ ...selected, country: selected.alpha_2 });
+                  void formik.setFieldValue('country', selected.alpha_2);
+                  void formik.setFieldValue('extendedCountry', selected.name);
+                  setInstitutionLocationData({ city: '', country: selected.alpha_2 });
                 } else {
-                  formik.setFieldValue('country', undefined);
-                  formik.setFieldValue('extendedCountry', undefined);
-                  setInstitutionLocationData({ ...selected, country: undefined });
+                  void formik.setFieldValue('country', undefined);
+                  void formik.setFieldValue('extendedCountry', undefined);
+                  setInstitutionLocationData({ city: '', country: undefined });
                 }
               }}
               getOptionLabel={(o) => o.name}
@@ -349,7 +353,7 @@ const PartyGeneralData = ({
                   {option.name}
                 </MenuItem>
               )}
-              renderInput={(params: any) => (
+              renderInput={(params) => (
                 <TextField
                   {...params}
                   inputProps={{
@@ -443,7 +447,7 @@ const PartyGeneralData = ({
             onChange={(e) => {
               const value = e.target.value.replace(/\D/g, '');
               if (value.length <= 11) {
-                formik.setFieldValue('taxCode', value);
+                void formik.setFieldValue('taxCode', value);
               }
             }}
           />

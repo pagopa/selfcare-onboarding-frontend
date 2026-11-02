@@ -22,6 +22,9 @@ import {
 import OnboardingPartyIcon from '../../../../assets/onboarding_party_icon.svg';
 import { UserContext } from '../../../../lib/context';
 import { AooData } from '../../../../model/AooData';
+import { AutocompleteOption } from '../../../../model/AutocompleteOption';
+import { FilterCategories } from '../../../../model/FilterCategoriesResponse';
+import { PDNDBusinessResource } from '../../../../model/PDNDBusinessResource';
 import { SelectionsState } from '../../../../model/Selection';
 import { UoData } from '../../../../model/UoModel';
 import {
@@ -31,12 +34,13 @@ import {
   handleSearchByAooCode,
   handleSearchByReaCode,
   handleSearchByUoCode,
+  InstitutionSearchParams,
 } from '../../../../services/institutionServices';
 import { buildUrlLogo } from '../../../../utils/constants';
 import { ENV } from '../../../../utils/env';
 import {
-  isIdpayMerchantProduct,
   isContractingAuthority,
+  isIdpayMerchantProduct,
   isInsuranceCompany,
   isPrivateInstitution,
   isPublicServiceCompany,
@@ -51,13 +55,13 @@ type Props = {
   optionLabel?: string;
   input: string;
   endpoint: Endpoint;
-  setOptions: React.Dispatch<React.SetStateAction<Array<any>>>;
-  transformFn: any;
+  setOptions: Dispatch<SetStateAction<ReadonlyArray<AutocompleteOption>>>;
+  transformFn: (data: never) => ReadonlyArray<AutocompleteOption>;
   setInput: React.Dispatch<React.SetStateAction<string>>;
-  setSelected: React.Dispatch<React.SetStateAction<any>>;
-  selected: any;
+  setSelected: React.Dispatch<React.SetStateAction<PartyData | null>>;
+  selected: PartyData | null;
   theme: Theme;
-  options: Array<any>;
+  options: ReadonlyArray<AutocompleteOption>;
   isSearchFieldSelected: boolean;
   setCfResult: React.Dispatch<React.SetStateAction<PartyData | undefined>>;
   cfResult?: PartyData;
@@ -73,8 +77,8 @@ type Props = {
   setDisabled: Dispatch<SetStateAction<boolean>>;
   addUser: boolean;
   selectedProduct?: Product;
-  filterCategories?: string | { allowedInstitutions: string };
-  setMerchantSearchResult?: Dispatch<SetStateAction<PartyData | undefined>>;
+  filterCategories?: FilterCategories;
+  setMerchantSearchResult?: (value?: PDNDBusinessResource) => void;
   setApiLoading?: Dispatch<SetStateAction<boolean>>;
   apiLoading?: boolean;
   disabledStatusCompany?: boolean;
@@ -121,10 +125,14 @@ export default function AsyncAutocompleteContainer({
   const [partyLogo, setPartyLogo] = useState<string>(
     selected ? buildUrlLogo(selected.id) : OnboardingPartyIcon
   );
-  const getOptionKey: (option: any) => string =
-    optionKey !== undefined ? (o) => o[optionKey] : (o) => o.label ?? o;
-  const getOptionLabel: (option: any) => string =
-    optionLabel !== undefined ? (o) => o[optionLabel] : (o) => o.label ?? o;
+  const getOptionKey: (option: unknown) => string =
+    optionKey !== undefined
+      ? (o) => String((o as Record<string, unknown>)[optionKey] ?? '')
+      : (o) => String((o as { label?: unknown } | null)?.label ?? o);
+  const getOptionLabel: (option: unknown) => string =
+    optionLabel !== undefined
+      ? (o) => String((o as Record<string, unknown>)[optionLabel] ?? '')
+      : (o) => String((o as { label?: unknown } | null)?.label ?? o);
   const showBusinessNameElement = input !== undefined && input.length >= 3;
   const canSearchByBusinessName =
     input.length >= 3 && selections.businessName && !selections.taxCode;
@@ -208,7 +216,12 @@ export default function AsyncAutocompleteContainer({
   }, [debouncedSearchByName]);
 
   const handleSearchByTaxCode = useCallback(
-    async (addUser: boolean, endpoint: ApiEndpointKey, params: any, query: string) => {
+    async (
+      addUser: boolean,
+      endpoint: ApiEndpointKey,
+      params: InstitutionSearchParams,
+      query: string
+    ) => {
       setApiLoading?.(true);
 
       await fetchInstitutionByTaxCode(
@@ -283,8 +296,8 @@ export default function AsyncAutocompleteContainer({
   const getSearchEndpoint = (
     addUser: boolean,
     institutionType: string | undefined,
-    product: any,
-    selections: any
+    product: Product | null | undefined,
+    selections: SelectionsState
   ): ApiEndpointKey => {
     if (addUser) {
       return 'ONBOARDING_GET_INSTITUTIONS';
@@ -317,11 +330,11 @@ export default function AsyncAutocompleteContainer({
 
   const executeSearch = (
     value: string,
-    selections: any,
-    params: any,
+    selections: SelectionsState,
+    params: InstitutionSearchParams,
     addUser: boolean,
     institutionType: string | undefined,
-    product: any
+    product: Product | null | undefined
     // eslint-disable-next-line complexity, sonarjs/cognitive-complexity
   ) => {
     if (value.length >= 3 && selections.businessName && !selections.taxCode) {
@@ -402,7 +415,7 @@ export default function AsyncAutocompleteContainer({
         setCfResult,
         setDisabled,
         setRequiredLogin,
-        product,
+        product ?? undefined,
         filterCategories,
         disabledStatusCompany,
         setMerchantSearchResult

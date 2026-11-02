@@ -15,16 +15,18 @@ import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOut
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+export type RadioField =
+  | 'isEstabilishedRegulatoryProvision'
+  | 'fromBelongsRegulatedMarket'
+  | 'isFromIPA'
+  | 'isConcessionaireOfPublicService';
+
 type Props = {
   title: React.ReactNode;
   label: string;
-  field:
-    | 'isEstabilishedRegulatoryProvision'
-    | 'fromBelongsRegulatedMarket'
-    | 'isFromIPA'
-    | 'isConcessionaireOfPublicService';
+  field: RadioField;
   errorText: string;
-  onRadioChange: (field: any, value: any) => void;
+  onRadioChange: (field: RadioField, value: boolean) => void;
   onTextFieldChange: (open: boolean, field: string, value: string, choice: boolean) => void;
   isIPA?: boolean;
   additionalData: {
@@ -32,7 +34,6 @@ type Props = {
   };
 };
 
-// eslint-disable-next-line sonarjs/cognitive-complexity
 export function RadioWithTextField({
   title,
   label,
@@ -155,7 +156,7 @@ export function RadioWithTextField({
                 marginBottom: fieldIsFromIPA ? 3 : 0,
               }}
               inputProps={{ maxLength: fieldIsFromIPA ? 16 : 300 }}
-              onChange={(e: any) => {
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 onTextFieldChange(true, field, e.target.value, additionalData[field]?.choice);
               }}
               value={additionalData[field].textFieldValue}

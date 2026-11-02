@@ -1,3 +1,4 @@
+import { FormikProps } from 'formik';
 /* eslint-disable functional/no-let */
 import { AddOutlined, RemoveCircleOutlineOutlined } from '@mui/icons-material';
 import {
@@ -15,16 +16,29 @@ import { ButtonNaked } from '@pagopa/mui-italia';
 import debounce from 'lodash/debounce';
 import { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { OnboardingFormData } from '../../../model/OnboardingFormData';
 import { UserContext } from '../../../lib/context';
-import { GeographicTaxonomy, nationalValue } from '../../../model/GeographicTaxonomies';
+import {
+  GeographicTaxonomy,
+  GeographicTaxonomyResource,
+  nationalValue,
+} from '../../../model/GeographicTaxonomies';
 import { handleSearch } from '../../../services/geoTaxonomyServices';
 import { useHistoryState } from '../../../hooks/useHistoryState';
 
 type Props = {
   retrievedTaxonomies: Array<GeographicTaxonomy>;
   setGeographicTaxonomies: React.Dispatch<React.SetStateAction<Array<GeographicTaxonomy>>>;
-  formik: any;
+  formik: FormikProps<OnboardingFormData>;
 };
+
+// Search results also carry the province abbreviation shown next to municipalities.
+type GeographicTaxonomyOption = GeographicTaxonomy &
+  Pick<GeographicTaxonomyResource, 'province_abbreviation'>;
+
+const isTaxonomyOption = (
+  option: GeographicTaxonomyOption | string | null | undefined
+): option is GeographicTaxonomyOption => typeof option === 'object' && !!option?.desc;
 
 export default function GeoTaxonomySection({
   retrievedTaxonomies,
@@ -40,7 +54,7 @@ export default function GeoTaxonomySection({
   const [options, setOptions] = useState<Array<GeographicTaxonomy>>([]);
   const [isAddNewAutocompleteEnabled, setIsAddNewAutocompleteEnabled] = useState<boolean>(false);
   const [input, setInput] = useState<string>('');
-  const [error, setError] = useState<any>({});
+  const [error, setError] = useState<Record<number, boolean>>({});
 
   const localState = useRef<Array<GeographicTaxonomy>>();
   const [geotaxonomiesHistory, setGeotaxonomiesHistory, setGeotaxonomiesHistoryState] =
@@ -57,7 +71,7 @@ export default function GeoTaxonomySection({
   };
 
   const findError = (index: number) => {
-    setError((currError: any) => ({ ...currError, [index]: true }));
+    setError((currError) => ({ ...currError, [index]: true }));
   };
 
   const isGeotaxHistoryNational = geotaxonomiesHistory[0]?.code === nationalValue;
@@ -164,11 +178,12 @@ export default function GeoTaxonomySection({
     }
   };
 
-  const handleChange = (_event: any, value: any, index: number) => {
+  const handleChange = (value: GeographicTaxonomyOption | string | null, index: number) => {
     const newValues = optionsSelected;
 
+    // freeSolo/clear values (string or null) are stored as-is, as before typing
     // eslint-disable-next-line functional/immutable-data
-    newValues[index] = value;
+    newValues[index] = value as GeographicTaxonomy;
     setOptionsSelected(newValues.slice());
     if (newValues[index]?.desc) {
       setIsAddNewAutocompleteEnabled(true);
@@ -180,7 +195,7 @@ export default function GeoTaxonomySection({
       deleteError(index);
       setIsAddNewAutocompleteEnabled(false);
     }
-    if (formik?.values.geographicTaxonomies.length > 0) {
+    if (formik.values.geographicTaxonomies.length > 0) {
       setGeotaxonomiesHistory(formik.values.geographicTaxonomies);
       setGeotaxonomiesHistoryState(formik.values.geographicTaxonomies);
       // eslint-disable-next-line functional/immutable-data
@@ -190,34 +205,16 @@ export default function GeoTaxonomySection({
 
   const debouncedSearch = useMemo(
     () =>
-      debounce(
-        (
-          value: string,
-          index: number,
-          setRequiredLogin: any,
-          optionsSelected: Array<GeographicTaxonomy>,
-          setOptions: any,
-          findError: any,
-          deleteError: any,
-          setIsAddNewAutocompleteEnabled: any
-        ) => {
-          void handleSearch(
-            value,
-            index,
-            setRequiredLogin,
-            optionsSelected,
-            setOptions,
-            findError,
-            deleteError,
-            setIsAddNewAutocompleteEnabled
-          );
-        },
-        300
-      ),
+      debounce((...args: Parameters<typeof handleSearch>) => {
+        void handleSearch(...args);
+      }, 300),
     []
   );
 
-  const handleSearchInput = (event: any, index: number) => {
+  const handleSearchInput = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    index: number
+  ) => {
     const value = event.target.value;
     setInput(value);
     if (value.length >= 3) {
@@ -249,9 +246,12 @@ export default function GeoTaxonomySection({
       (_match, p1, p2) => `${p1.toLocaleLowerCase()}'${p2.toLocaleUpperCase()}`
     );
 
-  // eslint-disable-next-line sonarjs/cognitive-complexity
-  const geoTaxFormat = (option: any, type: 'desc' | 'value') => {
-    if (!option?.desc) {
+   
+  const geoTaxFormat = (
+    option: GeographicTaxonomyOption | string | null | undefined,
+    type: 'desc' | 'value'
+  ) => {
+    if (!isTaxonomyOption(option)) {
       return '';
     }
 
@@ -285,7 +285,7 @@ export default function GeoTaxonomySection({
     } else if (option.desc.includes('COMUNE') && type === 'desc') {
       return `${finalDesc} (${option.province_abbreviation?.toUpperCase()}) comune`;
     } else if (option.desc.includes('COMUNE') && type === 'value') {
-      return `${finalDesc} (${(option.province_abbreviation ? option.province_abbreviation : (formik.values.county ?? '')).toUpperCase()})`;
+      return `${finalDesc} (${(option.province_abbreviation || formik.values.county || '').toUpperCase()})`;
     } else if (option.desc.includes('REGIONE')) {
       return finalDesc;
     } else {
@@ -366,7 +366,7 @@ export default function GeoTaxonomySection({
                       width: '100%',
                       pr: '0px !important',
                     }}
-                    onChange={(event: any, value: any) => handleChange(event, value, i)}
+                    onChange={(_event, value) => handleChange(value, i)}
                     value={geoTaxFormat(geotaxonomiesHistory[i] ?? val, 'value')}
                     renderOption={(props, option) => {
                       const { key, ...otherProps } = props;

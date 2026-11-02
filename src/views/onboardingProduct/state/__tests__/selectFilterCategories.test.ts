@@ -1,22 +1,28 @@
 import { describe, expect, test } from 'vitest';
 import { InstitutionType } from '../../../../../types';
+import {
+  FilterCategories,
+  FilterCategoriesResponse,
+} from '../../../../model/FilterCategoriesResponse';
 import { PRODUCT_IDS } from '../../../../utils/constants';
 import { selectFilterCategories } from '../selectFilterCategories';
 
-const response = {
+const merchantDetails = { allowedInstitutions: 'merchant-details' };
+
+const response: FilterCategoriesResponse = {
   product: {
     default: { ipa: { PA: 'default-PA', GSP: 'default-GSP' } },
     'prod-pn': { ipa: { PA: 'pn-PA' } },
     'prod-interop': { ipa: { PA: 'interop-PA', SCEC: 'interop-SCEC' } },
-    'prod-idpay-merchant': { merchantDetails: 'merchant-details' },
+    'prod-idpay-merchant': { merchantDetails },
   },
 };
 
 describe('selectFilterCategories', () => {
-  test.each<[string, InstitutionType | undefined, string]>([
+  test.each<[string, InstitutionType | undefined, FilterCategories]>([
     [PRODUCT_IDS.SEND, 'PA', 'pn-PA'],
     [PRODUCT_IDS.SEND, 'GSP', 'pn-PA'],
-    [PRODUCT_IDS.IDPAY_MERCHANT, 'PRV', 'merchant-details'],
+    [PRODUCT_IDS.IDPAY_MERCHANT, 'PRV', merchantDetails],
     [PRODUCT_IDS.INTEROP, 'SCEC', 'interop-SCEC'],
     [PRODUCT_IDS.INTEROP, 'PA', 'interop-PA'],
     [PRODUCT_IDS.INTEROP, 'GSP', 'default-GSP'],

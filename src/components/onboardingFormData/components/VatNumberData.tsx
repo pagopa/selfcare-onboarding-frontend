@@ -1,7 +1,9 @@
+import { FormikProps } from 'formik';
 import { Box, Checkbox, Grid, Typography } from '@mui/material';
 import { theme } from '@pagopa/mui-italia';
 import { Dispatch, useState } from 'react';
 import { Trans } from 'react-i18next';
+import { OnboardingFormData } from '../../../model/OnboardingFormData';
 import { InstitutionType, PaymentServiceProviderDto } from '../../../../types';
 import { OnboardingControllers } from '../../../hooks/useOnboardingControllers';
 import {
@@ -12,17 +14,17 @@ import {
   isPrivateMerchantInstitution,
 } from '../../../utils/institutionTypeUtils';
 import { CustomTextField } from '../../../utils/style-utils';
-import { StepBillingDataHistoryState } from '../../steps/StepOnboardingFormData';
+import { BaseTextFieldPropsFn, StepBillingDataHistoryState } from '../../steps/StepOnboardingFormData';
 
 type Props = {
   controllers: OnboardingControllers;
-  formik: any;
-  onboardingFormData?: any;
+  formik: FormikProps<OnboardingFormData>;
+  onboardingFormData?: OnboardingFormData;
   institutionType: InstitutionType;
   productId?: string;
   stepHistoryState: StepBillingDataHistoryState;
   setStepHistoryState: Dispatch<React.SetStateAction<StepBillingDataHistoryState>>;
-  baseTextFieldProps?: any;
+  baseTextFieldProps: BaseTextFieldPropsFn;
   t: (key: string) => string;
   pspData: PaymentServiceProviderDto | undefined;
 };
@@ -74,7 +76,7 @@ const VatNumberData = ({
                   <Checkbox
                     id="taxCodeEquals2VatNumber"
                     checked={stepHistoryState.isTaxCodeEquals2PIVA}
-                    disabled={controllers.isPremium || formik.values.taxCode.length !== 11}
+                    disabled={controllers.isPremium || formik.values.taxCode?.length !== 11}
                     inputProps={{
                       'aria-label': t(
                         'onboardingFormData.billingDataSection.taxCodeEquals2PIVAdescription'
@@ -110,7 +112,7 @@ const VatNumberData = ({
                       ),
                     }}
                     onChange={(e) => {
-                      formik.setFieldValue('hasVatnumber', !e.target.checked);
+                      void formik.setFieldValue('hasVatnumber', !e.target.checked);
                       setStepHistoryState({
                         ...stepHistoryState,
                         isTaxCodeEquals2PIVA: false,
@@ -157,10 +159,11 @@ const VatNumberData = ({
               onClick={() => setShrinkVatNumber(true)}
               onBlur={() => setShrinkVatNumber(false)}
               InputLabelProps={{
-                shrink:
+                shrink: Boolean(
                   shrinkVatNumber ||
-                  stepHistoryState.isTaxCodeEquals2PIVA ||
-                  formik.values.vatNumber,
+                    stepHistoryState.isTaxCodeEquals2PIVA ||
+                    formik.values.vatNumber
+                ),
               }}
             />
           )}
@@ -175,7 +178,7 @@ const VatNumberData = ({
                 }}
                 checked={formik.values.vatNumberGroup}
                 onChange={(_, checked: boolean) =>
-                  formik.setFieldValue('vatNumberGroup', checked, true)
+                  void formik.setFieldValue('vatNumberGroup', checked, true)
                 }
                 value={formik.values.vatNumberGroup}
                 disabled={controllers.isPremium && !!pspData?.vatNumberGroup}

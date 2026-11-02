@@ -66,7 +66,6 @@ export const useMerchantSearchResult = (
       setMerchantSearchResult(undefined);
       setDisabled(true);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selected, isMerchant]);
 
   return {

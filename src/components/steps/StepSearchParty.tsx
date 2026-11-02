@@ -1,12 +1,14 @@
 import { FormControlLabel, Grid, Typography, useTheme } from '@mui/material';
 import Checkbox from '@mui/material/Checkbox';
 import { SessionModal } from '@pagopa/selfcare-common-frontend/lib';
-import { Dispatch, ReactElement, SetStateAction, useEffect, useRef, useState } from 'react';
+import { Dispatch, ReactElement, SetStateAction, useEffect, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { InstitutionType, PartyData, Product, StepperStepComponentProps } from '../../../types';
+import { IpaInstitutionsSearchResource } from '../../api/generated/onboarding/IpaInstitutionsSearchResource';
 import { useHistoryState } from '../../hooks/useHistoryState';
 import { useMerchantSearchResult } from '../../hooks/useMerchantSearchResult';
 import { useSubunitSearch } from '../../hooks/useSubunitSearch';
+import { FilterCategories } from '../../model/FilterCategoriesResponse';
 import { SelectionsState } from '../../model/Selection';
 import { handleSearchExternalId } from '../../services/institutionServices';
 import { ENV } from '../../utils/env';
@@ -30,12 +32,11 @@ type Props = {
   externalInstitutionId: string;
   subunitTypeByQuery: string;
   subunitCodeByQuery: string;
-  selectFilterCategories: () => any;
+  selectFilterCategories: () => FilterCategories;
   setInstitutionType: Dispatch<SetStateAction<InstitutionType | undefined>>;
   addUser: boolean;
 } & StepperStepComponentProps;
 
-// eslint-disable-next-line sonarjs/cognitive-complexity, complexity
 export function StepSearchParty({
   subTitle,
   forward,
@@ -53,7 +54,6 @@ export function StepSearchParty({
   const theme = useTheme();
   const { t } = useTranslation();
   const partyExternalIdByQuery = new URLSearchParams(window.location.search).get('partyExternalId');
-  const autoSearchFound = useRef(false);
   const [isSearchFieldSelected, setIsSearchFieldSelected] = useState<boolean>(true);
   const [loading, setLoading] = useState(!!partyExternalIdByQuery);
   const [apiLoading, setApiLoading] = useState(false);
@@ -64,7 +64,7 @@ export function StepSearchParty({
   const [disabled, setDisabled] = useState<boolean>(false);
   const [isAggregator, setIsAggregator] = useState<boolean>(false);
   const [open, setOpen] = useState<boolean>(false);
-  const [filterCategories, setFilterCategories] = useState<string>();
+  const [filterCategories, setFilterCategories] = useState<FilterCategories>();
 
   const [selections, setSelections] = useState<SelectionsState>({
     businessName: true,
@@ -87,20 +87,13 @@ export function StepSearchParty({
     productId: product?.id,
     subunitTypeByQuery,
     subunitCodeByQuery,
-    filterCategories,
+    filterCategories: typeof filterCategories === 'string' ? filterCategories : undefined,
     setApiLoading,
   });
 
   useEffect(() => {
     if (partyExternalIdByQuery) {
       handleSearchExternalId(partyExternalIdByQuery)
-        .then((ipaParty) => {
-          if (ipaParty) {
-            // setSelected(ipaParty);
-            // eslint-disable-next-line functional/immutable-data
-            autoSearchFound.current = true;
-          }
-        })
         .catch((reason) => {
           console.error(reason);
         })
@@ -157,7 +150,6 @@ export function StepSearchParty({
 
   const onBackAction = () => {
     clearMerchantStorage();
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     back!();
   };
 
@@ -207,7 +199,7 @@ export function StepSearchParty({
               setApiLoading={setApiLoading}
               apiLoading={apiLoading}
               endpoint={{ endpoint: 'ONBOARDING_GET_SEARCH_PARTIES' }}
-              transformFn={(data: { items: any }) => data.items}
+              transformFn={(data: IpaInstitutionsSearchResource) => data.items ?? []}
               optionKey="id"
               optionLabel="description"
               isSearchFieldSelected={isSearchFieldSelected}

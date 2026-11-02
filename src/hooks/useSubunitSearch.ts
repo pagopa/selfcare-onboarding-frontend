@@ -70,7 +70,6 @@ export const useSubunitSearch = ({
         productId
       );
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSend]);
 
   useEffect(() => {
@@ -79,7 +78,6 @@ export const useSubunitSearch = ({
     } else if (uoResult) {
       void getECDataByCF(uoResult.codiceFiscaleEnte, setApiLoading, setEcData);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [aooResult, uoResult]);
 
   return { aooResult, setAooResult, uoResult, setUoResult, ecData };

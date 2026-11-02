@@ -30,16 +30,28 @@ import { StepAddAdmin } from '../onboardingProduct/components/StepAddAdmin';
 import StepSearchOnboardedParty from './components/StepSearchOnboardedParty';
 import { StepSelectProduct } from './components/StepSelectProduct';
 
-// eslint-disable-next-line sonarjs/cognitive-complexity
+type UsersFormData = { users: Array<UserOnCreate> };
+
+type OnboardingUserLocationState =
+  | {
+      data?: {
+        party?: PartyData;
+        product?: ProductResource;
+        institutionType?: InstitutionType;
+      };
+    }
+  | null
+  | undefined;
+
 function OnboardingUserComponent() {
   const { t } = useTranslation();
-  const location = useLocation();
+  const location = useLocation<OnboardingUserLocationState>();
   const history = useHistory();
   const requestId = uniqueId();
   const [loading, setLoading] = useState<boolean>(true);
   const [activeStep, setActiveStep] = useState<number>(0);
   const [outcome, setOutcome] = useState<RequestOutcomeMessage | null>();
-  const [formData, setFormData] = useState<Partial<FormData>>();
+  const [formData, setFormData] = useState<UsersFormData>();
   const [selectedParty, setSelectedParty] = useState<PartyData>();
   const [selectedProduct, setSelectedProduct] = useState<ProductResource>();
   const [institutionType, setInstitutionType] = useState<InstitutionType>();
@@ -48,7 +60,7 @@ function OnboardingUserComponent() {
   const [openExitModal, setOpenExitModal] = useState(false);
   const { setOnExit } = useContext(HeaderContext);
 
-  const forwardWithData = (newFormData: Partial<FormData>) => {
+  const forwardWithData = (newFormData: UsersFormData) => {
     if (formData) {
       setFormData({ ...formData, ...newFormData });
     } else {
@@ -57,13 +69,15 @@ function OnboardingUserComponent() {
     forward();
   };
 
+  const locationData = location.state?.data;
+
   useEffect(() => {
-    if ((location.state as any)?.data) {
-      setSelectedParty((location.state as any).data.party);
-      setSelectedProduct((location.state as any).data.product);
-      setInstitutionType((location.state as any).data.institutionType);
+    if (locationData) {
+      setSelectedParty(locationData.party);
+      setSelectedProduct(locationData.product);
+      setInstitutionType(locationData.institutionType);
     }
-  }, [(location.state as any)?.data]);
+  }, [locationData]);
 
   useEffect(() => {
     if (selectedParty) {
@@ -181,7 +195,7 @@ function OnboardingUserComponent() {
           selectedParty,
           institutionType,
           isTechPartner: isTechPartner(institutionType),
-          forward: (newFormData: Partial<FormData>) => {
+          forward: (newFormData: UsersFormData) => {
             trackEvent('ONBOARDING_ADD_MANAGER', {
               request_id: requestId,
               party_id: selectedParty?.externalId,
@@ -199,7 +213,7 @@ function OnboardingUserComponent() {
           externalInstitutionId: selectedParty?.externalId ?? '',
           addUserFlow: true,
           product: selectedProduct,
-          legal: isTechPartner(institutionType) ? undefined : (formData as any)?.users[0],
+          legal: isTechPartner(institutionType) ? undefined : formData?.users[0],
           partyName: selectedParty?.codiceUniAoo
             ? selectedParty.denominazioneAoo
             : selectedParty?.codiceUniUo
@@ -208,8 +222,8 @@ function OnboardingUserComponent() {
                 ? selectedParty.businessName
                 : (selectedParty?.description ?? ''),
           isTechPartner: isTechPartner(institutionType),
-          forward: (newFormData: Partial<FormData>) => {
-            const users = ((newFormData as any).users as Array<UserOnCreate>).map((u) => ({
+          forward: (newFormData: UsersFormData) => {
+            const users = newFormData.users.map((u) => ({
               ...u,
               taxCode: u?.taxCode?.toUpperCase(),
               email: u?.email?.toLowerCase(),

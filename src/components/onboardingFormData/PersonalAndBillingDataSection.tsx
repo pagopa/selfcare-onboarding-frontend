@@ -1,3 +1,4 @@
+import { FormikProps } from 'formik';
 import { Grid, Paper } from '@mui/material';
 import { theme } from '@pagopa/mui-italia';
 import { useContext, useEffect, useState } from 'react';
@@ -15,7 +16,7 @@ import { OnboardingFormData } from '../../model/OnboardingFormData';
 import { getLocationFromIstatCode } from '../../services/geoTaxonomyServices';
 import { getUoInfoFromRecipientCode } from '../../services/institutionServices';
 import { isInformationCompany, isIoSignProduct } from '../../utils/institutionTypeUtils';
-import { StepBillingDataHistoryState } from '../steps/StepOnboardingFormData';
+import { BaseTextFieldPropsFn, StepBillingDataHistoryState } from '../steps/StepOnboardingFormData';
 import CommercialRegisterData from './components/CommercialRegisterData';
 import InvoiceData from './components/InvoiceData';
 import PartyGeneralData from './components/PartyGeneralData';
@@ -24,10 +25,10 @@ import SupportEmailData from './components/SupportEmailData';
 
 type Props = StepperStepComponentProps & {
   institutionType: InstitutionType;
-  baseTextFieldProps: any;
+  baseTextFieldProps: BaseTextFieldPropsFn;
   stepHistoryState: StepBillingDataHistoryState;
   setStepHistoryState: React.Dispatch<React.SetStateAction<StepBillingDataHistoryState>>;
-  formik: any;
+  formik: FormikProps<OnboardingFormData>;
   onboardingFormData?: OnboardingFormData;
   institutionAvoidGeotax: boolean;
   retrievedIstat?: string;
@@ -38,7 +39,6 @@ type Props = StepperStepComponentProps & {
   recipientCodeStatus?: string;
 };
 
-// eslint-disable-next-line sonarjs/cognitive-complexity, complexity
 export default function PersonalAndBillingDataSection({
   institutionType,
   baseTextFieldProps,
@@ -68,9 +68,9 @@ export default function PersonalAndBillingDataSection({
   const isInfoCompany = isInformationCompany(formik.values.origin, institutionType, productId);
 
   useEffect(() => {
-    const shareCapitalIsNan = isNaN(formik.values.shareCapital);
+    const shareCapitalIsNan = isNaN(Number(formik.values.shareCapital));
     if (shareCapitalIsNan) {
-      formik.setFieldValue('shareCapital', undefined);
+      void formik.setFieldValue('shareCapital', undefined);
     }
     if (formik.values.shareCapital) {
       setShrinkRea(true);
@@ -81,31 +81,31 @@ export default function PersonalAndBillingDataSection({
 
   useEffect(() => {
     if (assistanceContacts?.supportEmail && isIoSignProduct(productId)) {
-      formik.setFieldValue('supportEmail', assistanceContacts.supportEmail);
+      void formik.setFieldValue('supportEmail', assistanceContacts.supportEmail);
     }
   }, [assistanceContacts]);
 
   useEffect(() => {
     if (pspData) {
-      formik.setFieldValue('commercialRegisterNumber', pspData.businessRegisterNumber);
-      formik.setFieldValue(
+      void formik.setFieldValue('commercialRegisterNumber', pspData.businessRegisterNumber);
+      void formik.setFieldValue(
         'registrationInRegister',
         pspData.legalRegisterName === 'N/A' ? '' : pspData.legalRegisterName
       );
-      formik.setFieldValue(
+      void formik.setFieldValue(
         'registerNumber',
         pspData.legalRegisterNumber === 'N/A' ? '' : pspData.legalRegisterNumber
       );
-      formik.setFieldValue('abiCode', pspData.abiCode);
-      formik.setFieldValue('vatNumberGroup', pspData.vatNumberGroup);
+      void formik.setFieldValue('abiCode', pspData.abiCode);
+      void formik.setFieldValue('vatNumberGroup', pspData.vatNumberGroup);
     }
   }, [pspData]);
 
   useEffect(() => {
     if (institutionLocationData?.city) {
-      formik.setFieldValue('country', institutionLocationData.country);
-      formik.setFieldValue('county', institutionLocationData.county);
-      formik.setFieldValue('city', institutionLocationData.city);
+      void formik.setFieldValue('country', institutionLocationData.country);
+      void formik.setFieldValue('county', institutionLocationData.county);
+      void formik.setFieldValue('city', institutionLocationData.city);
     }
   }, [institutionLocationData]);
 
@@ -115,16 +115,16 @@ export default function PersonalAndBillingDataSection({
         supportEmail: formik.values.supportEmail,
       });
       setPspData({
-        businessRegisterNumber: formik.values.businessRegisterNumber,
-        legalRegisterName: formik.values.legalRegisterName,
-        legalRegisterNumber: formik.values.legalRegisterNumber,
-        vatNumberGroup: formik.values.vatNumberGroup,
-        abiCode: formik.values.abiCode,
+        businessRegisterNumber: formik.values.commercialRegisterNumber ?? '',
+        legalRegisterName: formik.values.registrationInRegister ?? '',
+        legalRegisterNumber: formik.values.registerNumber ?? '',
+        vatNumberGroup: formik.values.vatNumberGroup ?? false,
+        abiCode: formik.values.abiCode ?? '',
       });
       setInstitutionLocationData({
-        country: formik.values.country,
-        county: formik.values.county,
-        city: formik.values.city,
+        country: formik.values.country ?? '',
+        county: formik.values.county ?? '',
+        city: formik.values.city ?? '',
       });
     }
   }, [controllers.isPremium]);
@@ -138,33 +138,34 @@ export default function PersonalAndBillingDataSection({
 
   useEffect(() => {
     if (controllers.isForeignInsurance) {
-      formik.setFieldValue('isForeignInsurance', true);
-      formik.setFieldValue('zipCode', undefined);
-      formik.setFieldValue('city', undefined);
-      formik.setFieldValue('county', undefined);
-      formik.setFieldValue('country', undefined);
+      void formik.setFieldValue('isForeignInsurance', true);
+      void formik.setFieldValue('zipCode', undefined);
+      void formik.setFieldValue('city', undefined);
+      void formik.setFieldValue('county', undefined);
+      void formik.setFieldValue('country', undefined);
     } else {
-      formik.setFieldValue('isForeignInsurance', false);
-      formik.setFieldValue('hasVatnumber', true);
+      void formik.setFieldValue('isForeignInsurance', false);
+      void formik.setFieldValue('hasVatnumber', true);
     }
   }, [controllers.isForeignInsurance]);
 
   useEffect(() => {
     if (onboardingFormData?.aooUniqueCode) {
-      formik.setFieldValue('recipientCode', undefined);
+      void formik.setFieldValue('recipientCode', undefined);
     }
   }, [onboardingFormData?.aooUniqueCode]);
 
   useEffect(() => {
-    if (formik.values.recipientCode?.length >= 6 && recipientCodeStatus === 'ACCEPTED') {
+    const recipientCode = formik.values.recipientCode;
+    if (recipientCode && recipientCode.length >= 6 && recipientCodeStatus === 'ACCEPTED') {
       void getUoInfoFromRecipientCode(
-        formik.values.recipientCode,
+        recipientCode,
         setDisableTaxCodeInvoicing,
         formik
       );
       setTaxCodeInvoicingVisible(true);
     } else {
-      formik.setFieldValue('taxCodeInovoicing', undefined);
+      void formik.setFieldValue('taxCodeInovoicing', undefined);
       setDisableTaxCodeInvoicing(false);
       setTaxCodeInvoicingVisible(false);
     }
@@ -172,9 +173,9 @@ export default function PersonalAndBillingDataSection({
 
   useEffect(() => {
     if (stepHistoryState.isTaxCodeEquals2PIVA) {
-      formik.setFieldValue('vatNumber', formik.values.taxCode);
+      void formik.setFieldValue('vatNumber', formik.values.taxCode);
     } else {
-      formik.setFieldValue('vatNumber', '');
+      void formik.setFieldValue('vatNumber', '');
     }
   }, [stepHistoryState.isTaxCodeEquals2PIVA]);
 
@@ -221,7 +222,7 @@ export default function PersonalAndBillingDataSection({
           setInvalidTaxCodeInvoicing={setInvalidTaxCodeInvoicing}
         />
         <CommercialRegisterData
-        isInfoCompany={isInfoCompany}
+          isInfoCompany={isInfoCompany}
           institutionType={institutionType}
           productId={productId}
           baseTextFieldProps={baseTextFieldProps}

@@ -2,11 +2,14 @@ import '@testing-library/jest-dom';
 import { screen } from '@testing-library/react';
 import { beforeEach, expect, test, vi } from 'vitest';
 import { InstitutionType } from '../../../../types';
+import { OnboardingControllers } from '../../../hooks/useOnboardingControllers';
 import { OnboardingFormData } from '../../../model/OnboardingFormData';
 import { getLocationFromIstatCode } from '../../../services/geoTaxonomyServices';
 import { getUoInfoFromRecipientCode } from '../../../services/institutionServices';
 import { PRODUCT_IDS } from '../../../utils/constants';
+import { asFormikProps, createFormikMock, FormikMock } from '../../../utils/test/formikMock';
 import { renderComponentWithProviders } from '../../../utils/test/test-utils';
+import { BaseTextFieldPropsFn } from '../../steps/StepOnboardingFormData';
 import PersonalAndBillingDataSection from '../PersonalAndBillingDataSection';
 
 vi.mock('../../../services/geoTaxonomyServices', () => ({
@@ -23,28 +26,21 @@ vi.mock('../../../services/billingDataServices', () => ({
   verifyTaxCodeInvoicing: vi.fn(),
 }));
 
-const buildFormik = (values: Record<string, unknown> = {}): any => ({
-  values: {
-    businessName: '',
-    zipCode: '12345',
-    taxCode: '',
-    vatNumber: '',
-    recipientCode: '',
-    hasVatnumber: true,
-    ...values,
-  },
-  initialValues: { recipientCode: '' },
-  errors: {},
-  setFieldValue: vi.fn(),
-  handleChange: vi.fn(),
-});
+const buildFormik = (values: Partial<OnboardingFormData> = {}): FormikMock =>
+  createFormikMock(
+    {
+      businessName: '',
+      zipCode: '12345',
+      taxCode: '',
+      vatNumber: '',
+      recipientCode: '',
+      hasVatnumber: true,
+      ...values,
+    },
+    { initialValues: { recipientCode: '' } }
+  );
 
-const mockBaseTextFieldProps = (
-  field: keyof OnboardingFormData,
-  label: string,
-  fontWeight: number = 400,
-  fontSize: number | string = 16
-) => ({
+const mockBaseTextFieldProps: BaseTextFieldPropsFn = (field, label, fontWeight = 400, color) => ({
   id: field,
   type: 'text',
   label,
@@ -52,10 +48,10 @@ const mockBaseTextFieldProps = (
   required: true,
   variant: 'outlined',
   sx: { width: '100%' },
-  InputProps: { style: { fontSize, fontWeight } },
+  InputProps: { style: { fontWeight, color } },
 });
 
-const defaultControllers = {
+const defaultControllers: OnboardingControllers = {
   isPremium: false,
   isDisabled: false,
   isInvoiceable: true,
@@ -76,11 +72,11 @@ const renderComponent = ({
   isTaxCodeEquals2PIVA = false,
   institutionAvoidGeotax = false,
 }: {
-  formik?: any;
+  formik?: FormikMock;
   institutionType?: InstitutionType;
   productId?: string;
-  controllers?: Record<string, unknown>;
-  onboardingFormData?: any;
+  controllers?: Partial<OnboardingControllers>;
+  onboardingFormData?: Partial<OnboardingFormData>;
   retrievedIstat?: string;
   recipientCodeStatus?: string;
   isTaxCodeEquals2PIVA?: boolean;
@@ -92,11 +88,11 @@ const renderComponent = ({
       baseTextFieldProps={mockBaseTextFieldProps}
       stepHistoryState={{ externalInstitutionId: '', isTaxCodeEquals2PIVA }}
       setStepHistoryState={vi.fn()}
-      formik={formik}
-      onboardingFormData={onboardingFormData}
+      formik={asFormikProps(formik)}
+      onboardingFormData={onboardingFormData as OnboardingFormData | undefined}
       institutionAvoidGeotax={institutionAvoidGeotax}
       retrievedIstat={retrievedIstat}
-      controllers={{ ...defaultControllers, ...controllers } as any}
+      controllers={{ ...defaultControllers, ...controllers }}
       setInvalidTaxCodeInvoicing={vi.fn()}
       recipientCodeStatus={recipientCodeStatus}
     />,
@@ -121,7 +117,9 @@ test('Test: renders all the sections of a PA party', () => {
   // InvoiceData
   expect(screen.getByText('Codice univoco o SDI')).toBeInTheDocument();
   // CommercialRegisterData and SupportEmailData are not shown for PA + SEND
-  expect(screen.queryByText(/Luogo di iscrizione al Registro delle Imprese/)).not.toBeInTheDocument();
+  expect(
+    screen.queryByText(/Luogo di iscrizione al Registro delle Imprese/)
+  ).not.toBeInTheDocument();
   expect(screen.queryByText('Indirizzo email visibile ai cittadini')).not.toBeInTheDocument();
 });
 
@@ -171,8 +169,8 @@ test('Test: renders the central party for AOO and clears the recipient code', ()
   expect(formik.setFieldValue).toHaveBeenCalledWith('recipientCode', undefined);
 });
 
-test('Test: a NaN share capital is reset', () => {
-  const formik = renderComponent({ formik: buildFormik({ shareCapital: NaN }) });
+test('Test: a non numeric share capital is reset', () => {
+  const formik = renderComponent({ formik: buildFormik({ shareCapital: 'abc' }) });
 
   expect(formik.setFieldValue).toHaveBeenCalledWith('shareCapital', undefined);
 });
@@ -276,9 +274,9 @@ test('Test: recipient code not accepted resets the tax code SFE', () => {
 test('Test: premium copies the PSP data into the form', () => {
   const formik = renderComponent({
     formik: buildFormik({
-      businessRegisterNumber: '123',
-      legalRegisterName: 'N/A',
-      legalRegisterNumber: '99',
+      commercialRegisterNumber: '123',
+      registrationInRegister: 'N/A',
+      registerNumber: '99',
       vatNumberGroup: true,
       abiCode: '12345',
     }),

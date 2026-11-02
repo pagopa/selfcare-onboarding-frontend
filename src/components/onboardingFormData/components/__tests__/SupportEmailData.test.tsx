@@ -2,23 +2,16 @@ import '@testing-library/jest-dom';
 import { screen } from '@testing-library/react';
 import { beforeEach, expect, test, vi } from 'vitest';
 import { InstitutionType } from '../../../../../types';
-import { OnboardingFormData } from '../../../../model/OnboardingFormData';
+import { OnboardingControllers } from '../../../../hooks/useOnboardingControllers';
+import { BaseTextFieldPropsFn } from '../../../steps/StepOnboardingFormData';
 import { PRODUCT_IDS } from '../../../../utils/constants';
+import { createFormikMock } from '../../../../utils/test/formikMock';
 import { renderComponentWithProviders } from '../../../../utils/test/test-utils';
 import SupportEmailData from '../SupportEmailData';
 
-const formik: any = {
-  values: {},
-  errors: {},
-  handleChange: vi.fn(),
-};
+const formik = createFormikMock();
 
-const mockBaseTextFieldProps = (
-  field: keyof OnboardingFormData,
-  label: string,
-  fontWeight: number = 400,
-  fontSize: number | string = 16
-) => ({
+const mockBaseTextFieldProps: BaseTextFieldPropsFn = (field, label, fontWeight = 400, color) => ({
   id: field,
   type: 'text',
   value: formik.values[field] || '',
@@ -29,11 +22,11 @@ const mockBaseTextFieldProps = (
   onChange: formik.handleChange,
   sx: { width: '100%' },
   InputProps: {
-    style: { fontSize, fontWeight },
+    style: { fontWeight, color },
   },
 });
 
-const defaultControllers = {
+const defaultControllers: OnboardingControllers = {
   isPremium: false,
   isDisabled: false,
   isInvoiceable: true,
@@ -51,7 +44,7 @@ const renderComponent = ({
 }: {
   institutionType?: InstitutionType;
   productId?: string;
-  controllers?: Record<string, unknown>;
+  controllers?: Partial<OnboardingControllers>;
   assistanceContacts?: { supportEmail?: string };
   institutionAvoidGeotax?: boolean;
 } = {}) =>
@@ -59,7 +52,7 @@ const renderComponent = ({
     <SupportEmailData
       institutionType={institutionType}
       baseTextFieldProps={mockBaseTextFieldProps}
-      controllers={{ ...defaultControllers, ...controllers } as any}
+      controllers={{ ...defaultControllers, ...controllers }}
       assistanceContacts={assistanceContacts}
       institutionAvoidGeotax={institutionAvoidGeotax}
     />,

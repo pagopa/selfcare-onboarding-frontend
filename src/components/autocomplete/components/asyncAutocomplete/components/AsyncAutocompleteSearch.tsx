@@ -1,14 +1,15 @@
-import { IconButton, TextField, Theme, Tooltip, Typography, Box } from '@mui/material';
-import { styled } from '@mui/system';
-import { useTranslation } from 'react-i18next';
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
+import { Box, IconButton, TextField, Theme, Tooltip, Typography } from '@mui/material';
+import { styled } from '@mui/system';
 import { ChangeEvent, Dispatch, SetStateAction, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { IPACatalogParty, PartyData } from '../../../../../../types';
 import { useHistoryState } from '../../../../../hooks/useHistoryState';
+import { AooData } from '../../../../../model/AooData';
+import { PDNDBusinessResource } from '../../../../../model/PDNDBusinessResource';
+import { SelectionsState } from '../../../../../model/Selection';
 import { UoData } from '../../../../../model/UoModel';
 import { StepBillingDataHistoryState } from '../../../../steps/StepOnboardingFormData';
-import { AooData } from '../../../../../model/AooData';
-import { SelectionsState } from '../../../../../model/Selection';
 
 const CustomTextField = styled(TextField)({
   justifyContent: 'center',
@@ -38,8 +39,8 @@ const CustomTextField = styled(TextField)({
 
 type Props = {
   theme: Theme;
-  selected: any;
-  setSelected: React.Dispatch<React.SetStateAction<any>>;
+  selected: PartyData | null;
+  setSelected: React.Dispatch<React.SetStateAction<PartyData | null>>;
   setInput: Dispatch<SetStateAction<string>>;
   input: string;
   isSearchFieldSelected: boolean;
@@ -48,7 +49,7 @@ type Props = {
   setCfResult: React.Dispatch<React.SetStateAction<PartyData | undefined>>;
   setAooResult: React.Dispatch<React.SetStateAction<AooData | undefined>>;
   setUoResult: React.Dispatch<React.SetStateAction<UoData | undefined>>;
-  setMerchantSearchResult?: Dispatch<SetStateAction<PartyData | undefined>>;
+  setMerchantSearchResult?: (value?: PDNDBusinessResource) => void;
   setDisabled: Dispatch<SetStateAction<boolean>>;
   externalInstitutionId: string;
   addUser: boolean;
@@ -136,7 +137,16 @@ export default function AsyncAutocompleteSearch({
   }, [selected, selections.reaCode, selections.aooCode, selections.uoCode, t]);
 
   return (
-    <Tooltip arrow title={selected?.description?.length > 20 ? selected?.description : ''}>
+    <Tooltip
+      arrow
+      title={
+        selected?.description?.length
+          ? selected?.description.length > 20
+            ? selected?.description
+            : ''
+          : ''
+      }
+    >
       <CustomTextField
         disabled={!isSearchFieldSelected}
         id="Parties"
@@ -195,7 +205,7 @@ export default function AsyncAutocompleteSearch({
               disabled={!isSearchFieldSelected}
               onClick={() => {
                 setInput('');
-                setSelected('');
+                setSelected(null);
                 setSelectedHistory(null);
                 setCfResult(undefined);
                 setAooResult(undefined);

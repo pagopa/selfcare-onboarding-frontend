@@ -5,17 +5,15 @@ import useErrorDispatcher from '@pagopa/selfcare-common-frontend/lib/hooks/useEr
 import { User } from '@pagopa/selfcare-common-frontend/lib/model/User';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
 import { uniqueId } from 'lodash';
-import {
-  ChangeEvent,
-  Dispatch,
-  SetStateAction,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import { ChangeEvent, Dispatch, SetStateAction, useContext, useEffect, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
-import { InstitutionType, Product, StepperStepComponentProps, UserOnCreate } from '../../../types';
+import {
+  InstitutionType,
+  PartyData,
+  Product,
+  StepperStepComponentProps,
+  UserOnCreate,
+} from '../../../types';
 import { InstitutionTypeEnum } from '../../api/generated/onboarding/CompanyOnboardingDto';
 import { useHistoryState } from '../../hooks/useHistoryState';
 import { UserContext } from '../../lib/context';
@@ -61,7 +59,7 @@ type Props = StepperStepComponentProps & {
   subProduct?: Product;
   isTechPartner?: boolean;
   onboardingFormData?: OnboardingFormData;
-  selectedParty?: any;
+  selectedParty?: PartyData;
   institutionType?: InstitutionType;
 };
 
@@ -89,7 +87,6 @@ export function StepAddManager({
     false
   );
   const addError = useErrorDispatcher();
-  const requestIdRef = useRef<string>();
   const { t } = useTranslation();
   const premiumFlow = !!subProduct;
 
@@ -105,13 +102,12 @@ export function StepAddManager({
 
   useEffect(() => {
     if (premiumFlow) {
-      // eslint-disable-next-line functional/immutable-data
-      requestIdRef.current = uniqueId(
+      const requestId = uniqueId(
         `onboarding-step-manager-${externalInstitutionId}-${product?.id}-${subProduct?.id}`
       );
 
       trackEvent('ONBOARDING_PREMIUM_ADD_MANAGER', {
-        request_id: requestIdRef?.current,
+        request_id: requestId,
         party_id: externalInstitutionId,
         product_id: product?.id,
         subproduct_id: subProduct?.id,
@@ -149,7 +145,6 @@ export function StepAddManager({
 
   const onBackAction = () => {
     savePageState();
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     back!();
   };
 

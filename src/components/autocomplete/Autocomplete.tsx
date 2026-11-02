@@ -1,21 +1,24 @@
 import { Grid, Paper, Typography } from '@mui/material';
-import React, { Dispatch, SetStateAction, useState } from 'react';
 import { theme } from '@pagopa/mui-italia';
+import React, { Dispatch, SetStateAction, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Endpoint, InstitutionType, PartyData, Product } from '../../../types';
-import { AooData } from '../../model/AooData';
-import { InstitutionResource } from '../../model/InstitutionResource';
-import { UoData } from '../../model/UoModel';
 import { useHistoryState } from '../../hooks/useHistoryState';
+import { AooData } from '../../model/AooData';
+import { AutocompleteOption } from '../../model/AutocompleteOption';
+import { FilterCategories } from '../../model/FilterCategoriesResponse';
+import { PDNDBusinessResource } from '../../model/PDNDBusinessResource';
 import { SelectionEnum, SelectionsState } from '../../model/Selection';
+import { UoData } from '../../model/UoModel';
 import AsyncAutocompleteContainer from './components/asyncAutocomplete/AsyncAutocompleteContainer';
 import PartyAdvancedSelect from './components/partyAdvancedSearchType/PartyAdvancedSelect';
 
 type AutocompleteProps = {
-  selected: any;
-  setSelected: React.Dispatch<React.SetStateAction<any>>;
+  selected: PartyData | null;
+  setSelected: React.Dispatch<React.SetStateAction<PartyData | null>>;
   endpoint: Endpoint;
-  transformFn: any;
+  // `never` lets each caller annotate the response type of its own search endpoint
+  transformFn: (data: never) => ReadonlyArray<AutocompleteOption>;
   optionKey?: string;
   optionLabel?: string;
   isSearchFieldSelected: boolean;
@@ -31,8 +34,8 @@ type AutocompleteProps = {
   setApiLoading?: Dispatch<SetStateAction<boolean>>;
   apiLoading?: boolean;
   selectedProduct?: Product;
-  filterCategories?: string;
-  setMerchantSearchResult?: Dispatch<SetStateAction<any>>;
+  filterCategories?: FilterCategories;
+  setMerchantSearchResult?: (value?: PDNDBusinessResource) => void;
   disabledStatusCompany?: boolean;
   selections: SelectionsState;
   setSelections: Dispatch<SetStateAction<SelectionsState>>;
@@ -64,10 +67,10 @@ export function Autocomplete({
   disabledStatusCompany,
   selections,
   setSelections,
-  addUser
+  addUser,
 }: AutocompleteProps) {
   const { t } = useTranslation();
-  const [options, setOptions] = useState<Array<InstitutionResource>>([]);
+  const [options, setOptions] = useState<ReadonlyArray<AutocompleteOption>>([]);
   const [cfResult, setCfResult] = useState<PartyData>();
 
   const selectOnly = (field: SelectionEnum) => {

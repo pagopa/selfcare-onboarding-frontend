@@ -1,10 +1,10 @@
 import { Grid, Typography, useTheme, Paper } from '@mui/material';
 import { useTranslation } from 'react-i18next';
-import { CustomTextField } from '../steps/StepOnboardingFormData';
+import { BaseTextFieldPropsFn, CustomTextField } from '../steps/StepOnboardingFormData';
 import { OnboardingFormData } from '../../model/OnboardingFormData';
 
 type Props = {
-  baseTextFieldProps: any;
+  baseTextFieldProps: BaseTextFieldPropsFn;
   dpoData: OnboardingFormData;
 };
 export default function DpoSection({ baseTextFieldProps, dpoData }: Props) {

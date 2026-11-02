@@ -51,3 +51,7 @@ export type OnboardingFormData = {
   certified?: boolean;
   userRequester?: UserRequester;
 };
+
+export type OnboardingFormDataStringField = {
+  [K in keyof OnboardingFormData]-?: NonNullable<OnboardingFormData[K]> extends string ? K : never;
+}[keyof OnboardingFormData];

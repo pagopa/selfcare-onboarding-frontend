@@ -70,7 +70,6 @@ export const transcodeErrorCode = (data: Problem): keyof typeof customErrors => 
   return 'GENERIC';
 };
 
-// eslint-disable-next-line sonarjs/cognitive-complexity, complexity
 export default function CompleteRequestComponent() {
   const { t } = useTranslation();
   const { setSubHeaderVisible, setOnExit, setEnableLogin } = useContext(HeaderContext);

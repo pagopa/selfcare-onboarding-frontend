@@ -55,8 +55,10 @@ export function StepAdditionalGpuInformations({ back, forward /* origin, originI
     isPartyProvidingAService: true,
   });
 
-  // eslint-disable-next-line sonarjs/cognitive-complexity
-  const handleAbleDisableAndCleanField = (fieldName: string, value: any) => {
+  const handleAbleDisableAndCleanField = (
+    fieldName: string,
+    value: string | boolean | undefined
+  ) => {
     switch (fieldName) {
       case 'isPartyRegistered':
       case 'isPartyProvidingAService':
