@@ -1,10 +1,11 @@
-/* eslint-disable complexity */
 import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
 import axios, { AxiosError } from 'axios';
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, MutableRefObject, SetStateAction } from 'react';
 import {
+  DataProtectionOfficerDto,
   InstitutionType,
   PartyData,
+  PaymentServiceProviderDto,
   Product,
   RequestOutcomeMessage,
   RequestOutcomeOptions,
@@ -13,6 +14,8 @@ import {
 import { OnboardingUserDto } from '../api/generated/onboarding/OnboardingUserDto';
 import { OnboardingApi } from '../api/OnboardingApiClient';
 import { getErrorStatus } from '../lib/error-utils';
+import { CompanyInformations } from '../model/CompanyInformations';
+import { FilterCategoriesResponse } from '../model/FilterCategoriesResponse';
 import { InstitutionOrigins } from '../model/InstitutionOrigins';
 import { OnboardingFormData } from '../model/OnboardingFormData';
 import { ProductResource } from '../model/ProductResource';
@@ -29,13 +32,30 @@ import {
 } from '../utils/institutionTypeUtils';
 import { genericError } from '../views/onboardingProduct/components/StepVerifyOnboarding';
 
+type SetOutcome = Dispatch<SetStateAction<RequestOutcomeMessage | null | undefined>>;
+
+// Arguments forwarded by StepOnboardingData to the premium flow (forwardWithOnboardingData)
+export type OnboardingDataForward = (
+  origin?: string,
+  originId?: string,
+  billingData?: OnboardingFormData,
+  institutionType?: InstitutionType,
+  partyId?: string,
+  companyInformations?: CompanyInformations,
+  country?: string,
+  city?: string,
+  county?: string,
+  pspData?: PaymentServiceProviderDto,
+  dpoData?: DataProtectionOfficerDto
+) => void;
+
 // NOTE: fetchVerifyOnboarding stays on fetchWithLogs because the endpoint is
 // HEAD /institutions/onboarding (verifyOnboardingUsingHEAD), and the codegen
 // tool @pagopa/openapi-codegen-ts v14 does not support HEAD methods.
 // Same limitation as verifyVatNumber in validationServices.ts.
 
 const fetchVerifyOnboarding = async (params: {
-  taxCode: string;
+  taxCode?: string;
   productId: string;
   subunitCode?: string;
   origin?: string;
@@ -55,8 +75,8 @@ export const insertedPartyVerifyOnboarding = async (
   _setRequiredLogin: Dispatch<SetStateAction<boolean>>,
   productId: string,
   institutionType: InstitutionType | undefined,
-  alreadyOnboarded: any,
-  setOutcome: Dispatch<SetStateAction<any>>,
+  alreadyOnboarded: RequestOutcomeMessage,
+  setOutcome: SetOutcome,
   notAllowedError: RequestOutcomeMessage
 ) => {
   const { outcome, status } = await fetchVerifyOnboarding({
@@ -85,14 +105,14 @@ export const verifyOnboarding = async (
   setLoading: Dispatch<SetStateAction<boolean>>,
   _setRequiredLogin: Dispatch<SetStateAction<boolean>>,
   productId: string,
-  selectedProduct: any,
-  setOutcome: Dispatch<SetStateAction<any>>,
-  alreadyOnboarded: any,
-  onboardingFormData: any,
-  requestIdRef: any,
-  forward: (...args: any) => void,
+  selectedProduct: Product | null | undefined,
+  setOutcome: SetOutcome,
+  alreadyOnboarded: RequestOutcomeMessage,
+  onboardingFormData: OnboardingFormData | undefined,
+  requestIdRef: MutableRefObject<string | undefined>,
+  forward: () => void,
   institutionType: InstitutionType | undefined,
-  genericError: any,
+  genericError: RequestOutcomeMessage,
   externalInstitutionId: string | undefined,
   notAllowedErrorNoParty: RequestOutcomeMessage
 ) => {
@@ -139,10 +159,10 @@ export const verifyOnboarding = async (
 export const getOnboardingData = async (
   setLoading: Dispatch<SetStateAction<boolean>>,
   productId: string,
-  forward: (...args: any) => void,
+  forward: OnboardingDataForward,
   institutionType: InstitutionType | undefined,
-  setOutcome: Dispatch<SetStateAction<any>>,
-  genericError: any,
+  setOutcome: SetOutcome,
+  genericError: RequestOutcomeMessage,
   partyId?: string
 ) => {
   setLoading(true);
@@ -210,9 +230,9 @@ export const checkProduct = async (
 };
 
 export const getFilterCategories = async (
-  setOutcome: Dispatch<SetStateAction<RequestOutcomeMessage | null | undefined>>,
-  setFilterCategoriesResponse: Dispatch<SetStateAction<any>>,
-  genericError: any
+  setOutcome: SetOutcome,
+  setFilterCategoriesResponse: (response: FilterCategoriesResponse) => void,
+  genericError: RequestOutcomeMessage
 ): Promise<boolean> => {
   // In mock mode there is no CDN to hit: use the bundled copy the mocks already serve.
   if (isMockEnvironment()) {
@@ -239,6 +259,34 @@ export const getFilterCategories = async (
   }
 };
 
+const SELC_ORIGIN_INSTITUTION_TYPES = ['PSP', 'GPU', 'PT', 'PRV'];
+
+const getAddUserOrigin = (
+  institutionType: string | undefined,
+  productId: string | undefined,
+  formDataOrigin: string | undefined
+) => {
+  if (isContractingAuthority(institutionType as InstitutionType)) {
+    return 'ANAC';
+  }
+  if (
+    SELC_ORIGIN_INSTITUTION_TYPES.includes(institutionType as InstitutionType) &&
+    !isInteropProduct(productId)
+  ) {
+    return 'SELC';
+  }
+  return formDataOrigin;
+};
+
+const postOnboardingUsers = async (body: OnboardingUserDto): Promise<'success' | 'error'> => {
+  try {
+    await OnboardingApi.onboardingUsers(body);
+    return 'success';
+  } catch {
+    return 'error';
+  }
+};
+
 export const addUserRequest = async (
   users: Array<UserOnCreate>,
   setLoading: Dispatch<SetStateAction<boolean>>,
@@ -246,38 +294,24 @@ export const addUserRequest = async (
   onboardingFormData: OnboardingFormData | undefined,
   selectedParty: PartyData | undefined,
   institutionType: InstitutionType | undefined,
-  setOutcome: Dispatch<SetStateAction<any>>,
+  setOutcome: SetOutcome,
   outcomeContent: RequestOutcomeOptions,
   requestId: string | undefined
 ) => {
   setLoading(true);
-  // eslint-disable-next-line functional/no-let
-  let outcome: 'success' | 'error' = 'success';
-  try {
-    await OnboardingApi.onboardingUsers({
-      productId: selectedProduct?.id,
-      institutionType: onboardingFormData?.institutionType ?? institutionType,
-      origin: isContractingAuthority(
-        (onboardingFormData?.institutionType ?? institutionType) as InstitutionType
-      )
-        ? 'ANAC'
-        : ['PSP', 'GPU', 'PT', 'PRV'].includes(
-              (onboardingFormData?.institutionType ?? institutionType) as InstitutionType
-            ) && !isInteropProduct(selectedProduct?.id)
-          ? 'SELC'
-          : onboardingFormData?.origin,
-      originId: onboardingFormData?.originId ?? onboardingFormData?.taxCode,
-      subunitCode: selectedParty?.codiceUniUo ?? selectedParty?.codiceUniAoo,
-      taxCode: onboardingFormData?.taxCode,
-      users,
-    } as OnboardingUserDto);
-  } catch {
-    outcome = 'error';
-  } finally {
-    setLoading(false);
-  }
+  const userInstitutionType = onboardingFormData?.institutionType ?? institutionType;
+  const outcome = await postOnboardingUsers({
+    productId: selectedProduct?.id,
+    institutionType: userInstitutionType,
+    origin: getAddUserOrigin(userInstitutionType, selectedProduct?.id, onboardingFormData?.origin),
+    originId: onboardingFormData?.originId ?? onboardingFormData?.taxCode,
+    subunitCode: selectedParty?.codiceUniUo ?? selectedParty?.codiceUniAoo,
+    taxCode: onboardingFormData?.taxCode,
+    users,
+  } as OnboardingUserDto);
+  setLoading(false);
 
-  setOutcome(outcomeContent[outcome as keyof RequestOutcomeOptions]);
+  setOutcome(outcomeContent[outcome]);
   trackEvent(outcome === 'success' ? 'ONBOARDING_USER_SUCCESS' : 'ONBOARDING_USER_ERROR', {
     request_id: requestId,
     party_id: selectedParty?.externalId,
@@ -288,9 +322,9 @@ export const addUserRequest = async (
 
 export const getAllowedAddUserProducts = async (
   setLoading: Dispatch<SetStateAction<boolean>>,
-  setProducts: Dispatch<SetStateAction<any>>,
-  setOutcome: Dispatch<SetStateAction<any>>,
-  genericError: any
+  setProducts: (products: Array<ProductResource>) => void,
+  setOutcome: SetOutcome,
+  genericError: RequestOutcomeMessage
 ) => {
   setLoading(true);
   try {
@@ -303,12 +337,15 @@ export const getAllowedAddUserProducts = async (
   }
 };
 
+const isGspOrigin = (item: { institutionType?: string }) =>
+  isGlobalServiceProvider(item.institutionType as InstitutionType);
+
 export const getInstiutionTypesByProduct = async (
   setLoading: Dispatch<SetStateAction<boolean>>,
   productId: string | undefined,
   setRetrivedInstituionType: Dispatch<SetStateAction<InstitutionOrigins | undefined>>,
-  setOutcome: Dispatch<SetStateAction<any>>,
-  genericError: any
+  setOutcome: SetOutcome,
+  genericError: RequestOutcomeMessage
 ) => {
   setLoading(true);
   try {
@@ -319,9 +356,7 @@ export const getInstiutionTypesByProduct = async (
       return;
     }
 
-    const filterGspResponse = responseData.origins.filter((item: any) =>
-      isGlobalServiceProvider(item.institutionType)
-    );
+    const filterGspResponse = responseData.origins.filter(isGspOrigin);
 
     if (filterGspResponse && filterGspResponse.length >= 2) {
       const gspWithMultiOrigins = {
@@ -329,9 +364,7 @@ export const getInstiutionTypesByProduct = async (
         origin: [filterGspResponse[0].origin, filterGspResponse[1].origin],
         labelKey: 'gsp',
       };
-      const nonGspOrigins = responseData.origins.filter(
-        (item: any) => !isGlobalServiceProvider(item.institutionType)
-      );
+      const nonGspOrigins = responseData.origins.filter((item) => !isGspOrigin(item));
       const updatedInstitutionOrigins = [
         nonGspOrigins[0],
         gspWithMultiOrigins,
