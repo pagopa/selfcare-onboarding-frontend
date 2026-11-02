@@ -3,6 +3,7 @@ import { InstitutionType, Product, RequestOutcomeMessage } from '../../../../typ
 import { AdditionalGpuInformations } from '../../../model/AdditionalGpuInformations';
 import { AdditionalInformations } from '../../../model/AdditionalInformations';
 import { AggregateInstitution } from '../../../model/AggregateInstitution';
+import { FilterCategoriesResponse } from '../../../model/FilterCategoriesResponse';
 import { OnboardingFormData, UserRequester } from '../../../model/OnboardingFormData';
 import { selected2OnboardingData } from '../../../utils/selected2OnboardingData';
 import { OnboardingStepName } from './onboardingSteps';
@@ -49,7 +50,7 @@ export type OnboardingProductState = {
   additionalInformations?: AdditionalInformations;
   additionalGPUInformations?: AdditionalGpuInformations;
   aggregatesData?: Array<AggregateInstitution>;
-  filterCategoriesResponse?: any;
+  filterCategoriesResponse?: FilterCategoriesResponse;
   categoriesLoaded: boolean;
   openExitModal: boolean;
   onExitAction?: () => void;
@@ -134,7 +135,10 @@ export type OnboardingProductUiAction =
   | { type: 'SET_INSTITUTION_TYPE'; institutionType: SetStateAction<InstitutionType | undefined> }
   | { type: 'SET_ORIGIN'; origin: SetStateAction<string | undefined> }
   | { type: 'CATEGORIES_LOADING' }
-  | { type: 'FILTER_CATEGORIES_RECEIVED'; response: SetStateAction<any> }
+  | {
+      type: 'FILTER_CATEGORIES_RECEIVED';
+      response: SetStateAction<FilterCategoriesResponse | undefined>;
+    }
   | { type: 'CATEGORIES_LOADED' }
   | { type: 'SET_EXIT_MODAL_OPEN'; open: SetStateAction<boolean> }
   | { type: 'SET_EXIT_ACTION'; onExitAction: SetStateAction<(() => void) | undefined> }
@@ -215,9 +219,11 @@ const selectParty = (
   );
 };
 
+type UsersFormData = { users?: Array<{ taxCode?: string }> };
+
 export const usersOf = (
   formData: Partial<FormData> | undefined
-): Array<{ taxCode?: string }> | undefined => (formData as any)?.users;
+): Array<{ taxCode?: string }> | undefined => (formData as UsersFormData | undefined)?.users;
 
 /** Manager and admins steps: merge the users into the form data and move on. */
 const submitUsers = (

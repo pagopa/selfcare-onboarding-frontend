@@ -1,5 +1,6 @@
 import { Dispatch, SetStateAction, useMemo, useReducer, useRef } from 'react';
 import { InstitutionType, Product, RequestOutcomeMessage } from '../../../types';
+import { FilterCategoriesResponse } from '../../model/FilterCategoriesResponse';
 import {
   createInitialState,
   onboardingProductReducer,
@@ -16,7 +17,7 @@ export type OnboardingProductSetters = {
   setSelectedProduct: Dispatch<SetStateAction<Product | null | undefined>>;
   setInstitutionType: Dispatch<SetStateAction<InstitutionType | undefined>>;
   setOrigin: Dispatch<SetStateAction<string | undefined>>;
-  setFilterCategoriesResponse: Dispatch<SetStateAction<any>>;
+  setFilterCategoriesResponse: Dispatch<SetStateAction<FilterCategoriesResponse | undefined>>;
 };
 
 /** Setters with the `useState` signature expected by services and steps, backed by the reducer. */
