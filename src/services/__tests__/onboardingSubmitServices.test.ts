@@ -137,3 +137,125 @@ it('test postSubProductOnboardingSubmit 409 sets conflict and tracks reason from
   );
   expect(setError).toHaveBeenCalledWith(true);
 });
+
+const payloadFormData = {
+  businessName: 'ACME',
+  taxCode: '00000000001',
+  originId: 'origin-1',
+  businessRegisterPlace: 'Roma',
+  country: 'FR',
+  county: 'RM',
+  city: 'Roma',
+  istatCode: '058091',
+  supportEmail: 'support@acme.it',
+  geographicTaxonomies: [],
+  userRequester: { name: 'Anna', surname: 'Bianchi', email: 'anna@acme.it' },
+} as any;
+
+const submitPayloadArgs = (
+  productId: string,
+  institutionType: string,
+  formData: any,
+  loggedUserTaxCode: string
+) => {
+  const args = [...submitArgs()] as Array<any>;
+  args[1] = productId;
+  args[2] = { id: productId };
+  args[4] = formData;
+  args[7] = { agentOfPublicService: true, ipa: false, otherNote: 'note', extra: 'dropped' };
+  args[8] = { businessRegisterNumber: 'BRN' };
+  args[9] = institutionType;
+  args[10] = 'ANAC';
+  args[15] = { uid: 'u1', taxCode: loggedUserTaxCode };
+  return args as unknown as Parameters<typeof postOnboardingSubmit>;
+};
+
+it('test postOnboardingSubmit builds the payload for a non-IPA io-sign subunit', async () => {
+  vi.mocked(OnboardingApi.onboardingInstitution).mockResolvedValue(undefined);
+
+  await postOnboardingSubmit(
+    ...submitPayloadArgs(
+      'prod-io-sign',
+      'PA',
+      { ...payloadFormData, uoUniqueCode: 'UO1', aooUniqueCode: 'AOO1', isAggregator: false },
+      'LOGGED00A01H501Z'
+    )
+  );
+
+  expect(OnboardingApi.onboardingInstitution).toHaveBeenCalledWith(
+    expect.objectContaining({
+      additionalInformations: undefined,
+      gpuData: undefined,
+      pspData: undefined,
+      companyInformations: {
+        businessRegisterPlace: 'Roma',
+        rea: undefined,
+        shareCapital: undefined,
+      },
+      institutionType: 'PA',
+      originId: 'origin-1',
+      geographicTaxonomies: [],
+      institutionLocationData: { country: 'FR', county: 'RM', city: 'Roma' },
+      origin: 'ANAC',
+      istatCode: '058091',
+      assistanceContacts: { supportEmail: 'support@acme.it' },
+      productId: 'prod-io-sign',
+      subunitCode: 'UO1',
+      subunitType: 'UO',
+      taxCode: '00000000001',
+      isAggregator: undefined,
+      userRequester: { name: 'Anna', surname: 'Bianchi', email: 'anna@acme.it' },
+    })
+  );
+});
+
+it('test postOnboardingSubmit builds the payload for GSP and GPU product specific data', async () => {
+  vi.mocked(OnboardingApi.onboardingInstitution).mockResolvedValue(undefined);
+
+  await postOnboardingSubmit(
+    ...submitPayloadArgs(
+      'prod-pagopa',
+      'GSP',
+      { ...payloadFormData, aooUniqueCode: 'AOO1', isAggregator: true },
+      'RSSMRA80A01H501Z'
+    )
+  );
+
+  const payload = vi.mocked(OnboardingApi.onboardingInstitution).mock.calls[0][0];
+  expect(payload.additionalInformations).toEqual({
+    agentOfPublicService: true,
+    agentOfPublicServiceNote: undefined,
+    belongRegulatedMarket: undefined,
+    regulatedMarketNote: undefined,
+    establishedByRegulatoryProvision: undefined,
+    establishedByRegulatoryProvisionNote: undefined,
+    ipa: false,
+    ipaCode: undefined,
+    otherNote: 'note',
+  });
+  expect(payload.gpuData).toBeUndefined();
+  expect(payload.assistanceContacts).toBeUndefined();
+  expect(payload.subunitCode).toBe('AOO1');
+  expect(payload.subunitType).toBe('AOO');
+  expect(payload.isAggregator).toBe(true);
+  expect(payload.userRequester).toBeUndefined();
+});
+
+it.each([
+  ['GPU', 'prod-interop', { businessRegisterNumber: 'BRN' }, 'FR'],
+  ['SCP', 'prod-interop', undefined, 'IT'],
+  ['SCP', 'prod-io', undefined, 'FR'],
+])(
+  'test postOnboardingSubmit for %s on %s sets gpuData and location country',
+  async (institutionType, productId, gpuData, country) => {
+    vi.mocked(OnboardingApi.onboardingInstitution).mockResolvedValue(undefined);
+
+    await postOnboardingSubmit(
+      ...submitPayloadArgs(productId, institutionType, payloadFormData, 'RSSMRA80A01H501Z')
+    );
+
+    const payload = vi.mocked(OnboardingApi.onboardingInstitution).mock.calls[0][0];
+    expect(payload.gpuData).toEqual(gpuData);
+    expect(payload.institutionLocationData?.country).toBe(country);
+  }
+);
