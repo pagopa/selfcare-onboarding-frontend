@@ -43,50 +43,50 @@ const getRea = (selectedParty: PartyData | null): string | undefined => {
   return `${selectedParty?.cciaa}-${selectedParty?.nRea}`;
 };
 
+const getBusinessName = (party: Partial<PartyData>): string =>
+  party.description ?? party.businessName ?? party.denominazioneEnte ?? '';
+
+const getDigitalAddress = (selectedParty: PartyData | null): string =>
+  selectedParty?.tipoMail1 === 'Pec' ? selectedParty.mail1 : (selectedParty?.digitalAddress ?? '');
+
+const getRegisteredOffice = (party: Partial<PartyData>): string =>
+  party.registeredOffice ?? party.indirizzo ?? party.address ?? '';
+
+const getTaxCode = (party: Partial<PartyData>): string =>
+  party.codiceFiscaleEnte ?? party.taxCode ?? party.businessTaxId ?? '';
+
 export const selected2OnboardingData = (
   selectedParty: PartyData | null,
   isAggregator?: boolean,
   institutionType?: InstitutionType,
   productId?: string
-  // eslint-disable-next-line complexity
-): OnboardingFormData => ({
-  businessName:
-    selectedParty?.description ??
-    selectedParty?.businessName ??
-    selectedParty?.denominazioneEnte ??
-    '',
-  aooName: selectedParty?.denominazioneAoo,
-  legalForm: shouldIncludeLegalForm(institutionType, productId)
-    ? selectedParty?.legalForm
-    : undefined,
-  uoName: selectedParty?.descrizioneUo,
-  aooUniqueCode: selectedParty?.codiceUniAoo,
-  uoUniqueCode: selectedParty?.codiceUniUo,
-  digitalAddress:
-    selectedParty?.tipoMail1 === 'Pec'
-      ? selectedParty?.mail1
-      : (selectedParty?.digitalAddress ?? ''),
-  recipientCode: selectedParty?.codiceUniAoo ?? selectedParty?.codiceUniUo,
-  registeredOffice:
-    selectedParty?.registeredOffice ?? selectedParty?.indirizzo ?? selectedParty?.address ?? '',
-  taxCode:
-    selectedParty?.codiceFiscaleEnte ??
-    selectedParty?.taxCode ??
-    selectedParty?.businessTaxId ??
-    '',
-  vatNumber: selectedParty?.vatNumber ?? '',
-  taxCodeInvoicing: selectedParty?.codiceFiscaleSfe,
-  zipCode: selectedParty?.cap ?? selectedParty?.zipCode,
-  geographicTaxonomies: [],
-  originIdEc: selectedParty?.originId,
-  originId: getOriginId(selectedParty, institutionType, productId),
-  origin: getOrigin(selectedParty, institutionType, productId),
-  rea: getRea(selectedParty),
-  city: selectedParty?.city,
-  county: selectedParty?.county,
-  isAggregator,
-  externalId: selectedParty?.businessTaxId ?? selectedParty?.id ?? '',
-  istatCode: selectedParty?.codiceComuneISTAT ?? selectedParty?.istatCode,
-  registerType: selectedParty?.registerType,
-  institutionType: selectedParty?.institutionType,
-});
+): OnboardingFormData => {
+  const party: Partial<PartyData> = selectedParty ?? {};
+  return {
+    businessName: getBusinessName(party),
+    aooName: party.denominazioneAoo,
+    legalForm: shouldIncludeLegalForm(institutionType, productId) ? party.legalForm : undefined,
+    uoName: party.descrizioneUo,
+    aooUniqueCode: party.codiceUniAoo,
+    uoUniqueCode: party.codiceUniUo,
+    digitalAddress: getDigitalAddress(selectedParty),
+    recipientCode: party.codiceUniAoo ?? party.codiceUniUo,
+    registeredOffice: getRegisteredOffice(party),
+    taxCode: getTaxCode(party),
+    vatNumber: party.vatNumber ?? '',
+    taxCodeInvoicing: party.codiceFiscaleSfe,
+    zipCode: party.cap ?? party.zipCode,
+    geographicTaxonomies: [],
+    originIdEc: party.originId,
+    originId: getOriginId(selectedParty, institutionType, productId),
+    origin: getOrigin(selectedParty, institutionType, productId),
+    rea: getRea(selectedParty),
+    city: party.city,
+    county: party.county,
+    isAggregator,
+    externalId: party.businessTaxId ?? party.id ?? '',
+    istatCode: party.codiceComuneISTAT ?? party.istatCode,
+    registerType: party.registerType,
+    institutionType: party.institutionType,
+  };
+};
