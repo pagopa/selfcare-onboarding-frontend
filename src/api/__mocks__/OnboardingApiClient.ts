@@ -1,28 +1,13 @@
+import { extractResponse } from '@pagopa/selfcare-common-frontend/lib/utils/api-utils';
 import { vi } from 'vitest';
-import { fetchWithLogs } from '../../lib/api-utils';
+import { ApiEndpointKey } from '../../../types';
+import { fetchMockedData, MockedCallOptions } from '../../lib/mocked-api-utils';
 
-const callViaFetchWithLogs = async (
-  endpoint: string,
-  options: { endpointParams?: any; params?: any; data?: any; method?: string } = {}
-) => {
-  const r = await fetchWithLogs(
-    {
-      endpoint: endpoint as any,
-      ...(options.endpointParams !== undefined ? { endpointParams: options.endpointParams } : {}),
-    },
-    { params: options.params, data: options.data, method: options.method ?? 'GET' } as any,
-    () => undefined
-  );
-  if ((r as any).isAxiosError) {
-    const error = new Error(`HTTP ${(r as any).response?.status}`);
-    // eslint-disable-next-line functional/immutable-data
-    (error as any).httpStatus = (r as any).response?.status;
-    // eslint-disable-next-line functional/immutable-data
-    (error as any).httpBody = (r as any).response?.data;
-    throw error;
-  }
-  return (r as any).data;
-};
+// OnboardingApi passes these results to extractResponse in place of the generated client response.
+type MockedClientResponse = Parameters<typeof extractResponse>[0];
+
+const callViaFetchWithLogs = (endpoint: ApiEndpointKey, options?: MockedCallOptions) =>
+  fetchMockedData<MockedClientResponse>(endpoint, options);
 
 export const ApiClientMocked = {
   retrieveOnboardingRequest: vi.fn((onboardingId: string) =>
@@ -31,7 +16,7 @@ export const ApiClientMocked = {
   verifyOnboarding: vi.fn((onboardingId: string) =>
     callViaFetchWithLogs('ONBOARDING_TOKEN_VALIDATION', { endpointParams: { onboardingId } })
   ),
-  userValidate: vi.fn((body: any) =>
+  userValidate: vi.fn((body: unknown) =>
     callViaFetchWithLogs('ONBOARDING_USER_VALIDATION', { data: body, method: 'POST' })
   ),
   verifyRecipientCode: vi.fn((originId: string, recipientCode: string) =>
@@ -39,10 +24,10 @@ export const ApiClientMocked = {
       params: { recipientCode, originId },
     })
   ),
-  checkManager: vi.fn((body: any) =>
+  checkManager: vi.fn((body: unknown) =>
     callViaFetchWithLogs('ONBOARDING_CHECK_MANAGER', { data: body, method: 'POST' })
   ),
-  searchUserId: vi.fn((body: any) =>
+  searchUserId: vi.fn((body: unknown) =>
     callViaFetchWithLogs('ONBOARDING_SEARCH_USER', { data: body, method: 'POST' })
   ),
   deleteOnboardingRequest: vi.fn((onboardingId: string) =>
@@ -70,7 +55,7 @@ export const ApiClientMocked = {
       params: { institutionType },
     })
   ),
-  onboardingUsers: vi.fn((body: any) =>
+  onboardingUsers: vi.fn((body: unknown) =>
     callViaFetchWithLogs('ONBOARDING_NEW_USER', { data: body, method: 'POST' })
   ),
   getProductsAdmin: vi.fn(() =>
@@ -146,13 +131,13 @@ export const ApiClientMocked = {
       });
     }
   ),
-  onboardingInstitution: vi.fn((body: any) =>
+  onboardingInstitution: vi.fn((body: unknown) =>
     callViaFetchWithLogs('ONBOARDING_POST_LEGALS', { data: body, method: 'POST' })
   ),
-  getInstitutionsByFilters: vi.fn((params: any) =>
+  getInstitutionsByFilters: vi.fn((params: MockedCallOptions['params']) =>
     callViaFetchWithLogs('ONBOARDING_GET_INSTITUTIONS', { params })
   ),
-  searchInstitutionsIpa: vi.fn((params: any) =>
+  searchInstitutionsIpa: vi.fn((params: MockedCallOptions['params']) =>
     callViaFetchWithLogs('ONBOARDING_GET_SEARCH_PARTIES', { params })
   ),
   searchInstitutionIpaByTaxCode: vi.fn((taxCode: string, category?: string) =>
@@ -170,8 +155,8 @@ export const ApiClientMocked = {
       method: 'POST',
     });
   }),
-  verifyOnboardingExternal: vi.fn((params: any) =>
-    callViaFetchWithLogs('VERIFY_ONBOARDING', { params, method: 'HEAD' })
+  verifyOnboardingExternal: vi.fn((params: MockedCallOptions['params']) =>
+    fetchMockedData<void>('VERIFY_ONBOARDING', { params, method: 'HEAD' })
   ),
 };
 
