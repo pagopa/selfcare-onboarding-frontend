@@ -32,6 +32,6 @@ Su `main` (5b3eaa2) `yarn lint` riporta 126 warning `no-explicit-any`. Ignorando
   `CompleteRequest`, `FileUploadedPreview`, form data components e helper di test.
 
 ## Stato
-- [ ] A – Autocomplete
+- [x] A – Autocomplete
 - [ ] B – Submit
 - [ ] C – API client e servizi
