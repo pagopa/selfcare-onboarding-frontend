@@ -36,6 +36,8 @@ export type InstitutionSearchParams = {
   rea?: string;
   origin?: string;
   productId?: string;
+  // Add-user AOO/UO search through ONBOARDING_GET_INSTITUTIONS
+  subunitCode?: string;
 };
 
 const dispatchInstitutionSearch = (
