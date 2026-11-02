@@ -2,6 +2,7 @@ import { UserRole } from '@pagopa/selfcare-common-frontend/lib/utils/constants';
 import { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 import {
   ANACParty,
+  ApiEndpointKey,
   Endpoint,
   InstitutionOnboardingInfoResource,
   InstitutionType,
@@ -1631,559 +1632,245 @@ const buildOnboardingUserValidation409 = (
     } as AxiosError)
   );
 
-// eslint-disable-next-line sonarjs/cognitive-complexity, complexity
+type MockRequest = {
+  endpointParams: Endpoint['endpointParams'];
+  params: AxiosRequestConfig['params'];
+  data: AxiosRequestConfig['data'];
+};
+
+type MockResult = Promise<AxiosResponse | AxiosError>;
+
+// Returning undefined means "not mocked": mockFetch then throws.
+type MockHandler = (request: MockRequest) => MockResult | undefined;
+
+type UserValidationBody = Partial<Pick<UserOnCreate, 'taxCode' | 'name' | 'surname'>>;
+type LegalsBody = { billingData: BillingDataDto; users: Array<UserOnCreate> };
+type NewUserBody = { productId?: string };
+
+const CERTIFIED_TAX_CODES = ['CRTCTF90B12C123K', 'CRTCTF91B12C123K', 'CRTCTF92B12C123K'];
+
+const ok = (data: unknown, status = 200, statusText = String(status)): Promise<AxiosResponse> =>
+  Promise.resolve({ data, status, statusText } as AxiosResponse);
+
+const verifyOnboarding: MockHandler = ({ params }) => {
+  switch (params.taxCode) {
+    case '99999999999':
+    case 'externalId4':
+      return genericError;
+    case '44444444444':
+      return notAllowedError;
+    case 'onboarded_externalId':
+    case '22222222222':
+      return noContent;
+    case '33333333333':
+    case 'externalId3': // Use case for test not base adhesion
+      return notFoundError;
+    // Use case for test already subscribed premium
+    case 'externalId2':
+      return params.productId === 'prod-io' || params.productId === 'prod-io-premium'
+        ? noContent
+        : notFoundError;
+    default:
+      // Use case for test already onboarded AOO and UO
+      return params.subunitCode === 'A356E01' || params.subunitCode === 'BRE23D'
+        ? noContent
+        : notFoundError;
+  }
+};
+
+const pspOnboardingDataIndex = new Map([
+  ['886755', 0],
+  ['54557', 1],
+]);
+
+const onboardingDataIndex = new Map([
+  ['43446', 0],
+  ['23231', 2],
+  ['5454679', 1],
+]);
+
+const getOnboardingData: MockHandler = ({ params }) => {
+  const pspIndex = pspOnboardingDataIndex.get(params.institutionId);
+  if (params.productId === 'prod-pagopa' && pspIndex !== undefined) {
+    return ok(mockedPspOnboardingData[pspIndex]);
+  }
+  if (params.institutionId === '775644') {
+    return genericError;
+  }
+  if (params.institutionId === '31415') {
+    // Onboarding data without institutionType: the premium flow must fall back to the
+    // type carried by the selected party instead of submitting without it.
+    return ok({
+      ...mockedOnboardingData[0],
+      institution: { ...mockedOnboardingData[0].institution, institutionType: undefined },
+    });
+  }
+  return ok(mockedOnboardingData[onboardingDataIndex.get(params.institutionId) ?? 3]);
+};
+
+const validateUser: MockHandler = ({ data }) => {
+  const user = data as UserValidationBody | undefined;
+  const isNameConflict = user?.name !== 'CERTIFIED_NAME';
+  const isSurnameConflict = user?.surname !== 'CERTIFIED_SURNAME';
+  if (
+    CERTIFIED_TAX_CODES.indexOf(user?.taxCode as string) > -1 &&
+    (isNameConflict || isSurnameConflict)
+  ) {
+    return buildOnboardingUserValidation409(isNameConflict, isSurnameConflict);
+  }
+  return user?.taxCode === 'CRTCTF93B12C124K' ? genericError : ok('');
+};
+
+const postLegals: MockHandler = ({ data }) => {
+  const { billingData, users } = data as LegalsBody;
+  switch (billingData.taxCode) {
+    case '44444444444':
+      return notAllowedError;
+    case '11111111111':
+    case '33445673211':
+      return genericError;
+    default: {
+      const certifiedUser = users.find((u) => u.taxCode === 'XXXXXX00A00X000X');
+      return certifiedUser &&
+        (certifiedUser.name !== 'CERTIFIED_NAME' || certifiedUser.surname !== 'CERTIFIED_SURNAME')
+        ? conflictError
+        : ok('', 201, 'Created');
+    }
+  }
+};
+
+const completeRegistration: MockHandler = ({ endpointParams }) => {
+  switch (endpointParams.token) {
+    case 'error':
+      return badRequestError;
+    case 'pendingRequest':
+      return noContent;
+    default:
+      return undefined;
+  }
+};
+
+const onboardingRequestDataIndex = new Map([
+  ['expired', 3],
+  ['alreadyApproved', 0],
+  ['alreadyRejected', 1],
+  ['pendingRequest', 2],
+  ['error', 2],
+]);
+
+const validateToken: MockHandler = ({ endpointParams }) => {
+  const index = onboardingRequestDataIndex.get(endpointParams.onboardingId);
+  if (index !== undefined) {
+    return ok(mockedOnboardingRequestData[index]);
+  }
+  switch (endpointParams.onboardingId) {
+    case 'genericError':
+      return genericError;
+    case 'notAllowed':
+      return notAllowedError;
+    default:
+      return notFoundError;
+  }
+};
+
+const mockHandlers: Partial<Record<ApiEndpointKey, MockHandler>> = {
+  CONFIG_JSON_CDN_URL: () => ok(config),
+  ONBOARDING_GET_SEARCH_PARTIES: () => ok(mockPartyRegistry),
+  ONBOARDING_GET_GEOTAXONOMY: () => ok(mockedGeoTaxonomy),
+  ONBOARDING_GET_PREVIOUS_GEOTAXONOMIES: () => ok(mockedGeoTaxonomy),
+  ONBOARDING_GET_LOCATION_BY_ISTAT_CODE: ({ endpointParams }) =>
+    ok(mockedGeotaxonomies.find((l) => endpointParams.geoTaxId === l.istat_code)),
+  ONBOARDING_GET_PARTY_FROM_CF: ({ endpointParams }) =>
+    endpointParams?.id === '00112233445'
+      ? notFoundError
+      : ok(mockedParties.find((p) => p.taxCode === endpointParams.id)),
+  ONBOARDING_GET_PARTY_BY_CF_FROM_INFOCAMERE: ({ endpointParams }) =>
+    ok(mockedPartiesFromInfoCamere.find((p) => p.businessTaxId === endpointParams.id)),
+  ONBOARDING_RECIPIENT_CODE_VALIDATION: ({ params }) => {
+    const accepted = mockRecipientCodeValidation.filter((r) => r.code === params.recipientCode);
+    return accepted.length > 0 ? ok(accepted[0]?.value) : notFoundError;
+  },
+  ONBOARDING_GET_AOO_CODE_INFO: ({ endpointParams }) =>
+    ok(mockedAoos.find((ao) => ao.codiceUniAoo === endpointParams.codiceUniAoo)),
+  ONBOARDING_GET_UO_CODE_INFO: ({ endpointParams }) =>
+    ok(mockedUos.find((uo) => uo.codiceUniUo === endpointParams.codiceUniUo)),
+  ONBOARDING_GET_UO_LIST: ({ params }) => {
+    const retrievedUos = mockedUos.filter((uo) => uo.codiceFiscaleSfe === params.taxCodeInvoicing);
+    return ok({ items: retrievedUos, count: retrievedUos.length });
+  },
+  VERIFY_ONBOARDING: verifyOnboarding,
+  ONBOARDING_GET_SA_PARTIES_NAME: () => ok(mockedStationResource),
+  ONBOARDING_GET_SA_PARTY_FROM_FC: ({ endpointParams }) =>
+    ok(mockedANACParties.find((p) => p.taxCode === endpointParams.taxId)),
+  ONBOARDING_GET_INSURANCE_COMPANIES_FROM_BUSINESSNAME: () => ok(mockedInsuranceResource),
+  ONBOARDING_GET_INSURANCE_COMPANIES_FROM_IVASSCODE: ({ endpointParams }) =>
+    ok(mockedInsuranceResource.items.find((i) => i.originId === endpointParams.taxId)),
+  ONBOARDING_GET_ONBOARDING_DATA: getOnboardingData,
+  ONBOARDING_VERIFY_PRODUCT: ({ endpointParams }) => {
+    const selectedProduct = mockedProducts.find((p) => p.id === endpointParams.productId);
+    return selectedProduct ? ok(selectedProduct) : notFoundError;
+  },
+  ONBOARDING_USER_VALIDATION: validateUser,
+  ONBOARDING_POST_LEGALS: postLegals,
+  ONBOARDING_NEW_USER: ({ data }) =>
+    (data as NewUserBody).productId === 'prod-io' ? badRequestError : ok({}),
+  ONBOARDING_GET_PARTY: ({ endpointParams }) => {
+    const fetched = mockPartyRegistry.items.find(
+      (p) => p.id === endpointParams.externalInstitutionId
+    );
+    return fetched ? ok(fetched) : notFoundError;
+  },
+  ONBOARDING_COMPLETE_REGISTRATION: completeRegistration,
+  USER_COMPLETE_REGISTRATION: completeRegistration,
+  ONBOARDING_GET_USER_PARTIES: ({ params }) =>
+    mockedBaseParties.length === 0 || mockedBasePspParties.length === 0
+      ? notFoundError
+      : ok(params.productId === 'prod-dashboard-psp' ? mockedBasePspParties : mockedBaseParties),
+  ONBOARDING_TOKEN_VALIDATION: validateToken,
+  ONBOARDING_GET_INSTITUTIONS: ({ params }) =>
+    ok(
+      params.subunitCode
+        ? mockedOnboardedParties.find((p) => p.subunitCode === params.subunitCode)
+        : mockedOnboardedParties.find((p) => p.taxCode === params.taxCode)
+    ),
+  ONBOARDING_GET_PRODUCTS: () => ok(mockedProducts),
+  ONBOARDING_GET_ALLOWED_ADD_USER_PRODUCTS: () =>
+    ok(mockedProducts.filter((p) => addUserFlowProducts(p.id))),
+  ONBOARDING_CHECK_MANAGER: () => ok({ result: true }),
+  ONBOARDING_SEARCH_USER: () => ok({ id: '71d1fc35-debf-4763-879e-19329e77ca83' }),
+  ONBOARDING_VERIFY_AGGREGATES: () =>
+    ok({
+      aggregates: [],
+      errors: mockPartyRegistry.items[0].taxCode === '00000000000' ? [] : ['error'],
+    }),
+  ONBOARDING_GET_VISURA_INFOCAMERE_BY_CF: ({ endpointParams }) =>
+    ok(mockedPdndVisuraInfomacere.find((p) => p.businessTaxId === endpointParams.id)),
+  ONBOARDING_GET_VISURA_INFOCAMERE_BY_REA: ({ params }) =>
+    ok(mockedPdndVisuraInfomacere.find((p) => p.nRea === params.rea)),
+  ONBOARDING_GET_INSTITUTION_TYPE_BY_PRODUCT: ({ params }) =>
+    ok(mockInstitutionTypeByProductId(params.productId)),
+  REQUIRED_DOCUMENTS_ENABLED: () => ok({ requiredDocumentsEnabled: true }),
+  GET_REQUIRED_DOCUMENTS: () => ok(mockedRequiredDocuments),
+  ONBOARDING_POST_ATTACHMENT: () => noContent,
+  GET_ATTACHMENT_STATUS: () => ok(''),
+  TRIGGER_ONBOARDING: () => noContent,
+  ONBOARDING_GET_ONBOARDINGS: ({ params }) =>
+    ok([
+      {
+        id: 'mock-onboarding-id',
+        status: params?.status ?? 'REQUESTING',
+        productId: 'prod-pagopa',
+      },
+    ]),
+};
+
 export async function mockFetch(
   { endpoint, endpointParams }: Endpoint,
   { params, data }: AxiosRequestConfig
 ): Promise<AxiosResponse | AxiosError> {
-  if (endpoint === 'CONFIG_JSON_CDN_URL') {
-    return new Promise((resolve) =>
-      resolve({ data: config, status: 200, statusText: '200' } as AxiosResponse)
-    );
-  }
-
-  if (endpoint === 'ONBOARDING_GET_SEARCH_PARTIES') {
-    return new Promise((resolve) =>
-      resolve({ data: mockPartyRegistry, status: 200, statusText: '200' } as AxiosResponse)
-    );
-  }
-
-  if (endpoint === 'ONBOARDING_GET_GEOTAXONOMY') {
-    return new Promise((resolve) =>
-      resolve({ data: mockedGeoTaxonomy, status: 200, statusText: '200' } as AxiosResponse)
-    );
-  }
-
-  if (endpoint === 'ONBOARDING_GET_PREVIOUS_GEOTAXONOMIES') {
-    return new Promise((resolve) =>
-      resolve({ data: mockedGeoTaxonomy, status: 200, statusText: '200' } as AxiosResponse)
-    );
-  }
-
-  if (endpoint === 'ONBOARDING_GET_LOCATION_BY_ISTAT_CODE') {
-    const retrievedLocalization = mockedGeotaxonomies.find(
-      (l) => endpointParams.geoTaxId === l.istat_code
-    );
-    return Promise.resolve({
-      data: retrievedLocalization,
-      status: 200,
-      statusText: '200',
-    } as AxiosResponse);
-  }
-
-  if (endpoint === 'ONBOARDING_GET_PARTY_FROM_CF') {
-    if (endpointParams?.id === '00112233445') {
-      return notFoundError;
-    } else {
-      const matchedParty = mockedParties.find((p) => p.taxCode === endpointParams.id);
-      return new Promise((resolve) => {
-        resolve({ data: matchedParty, status: 200, statusText: '200' } as AxiosResponse);
-      });
-    }
-  }
-
-  if (endpoint === 'ONBOARDING_GET_PARTY_BY_CF_FROM_INFOCAMERE') {
-    const matchedParty = mockedPartiesFromInfoCamere.find(
-      (p) => p.businessTaxId === endpointParams.id
-    );
-    return new Promise((resolve) =>
-      resolve({ data: matchedParty, status: 200, statusText: '200' } as AxiosResponse)
-    );
-  }
-
-  if (endpoint === 'ONBOARDING_RECIPIENT_CODE_VALIDATION') {
-    const mockAcceptedResponse = mockRecipientCodeValidation.filter(
-      (r) => r.code === params.recipientCode
-    );
-    if (mockAcceptedResponse.length > 0) {
-      return new Promise((resolve) => {
-        resolve({
-          data: mockAcceptedResponse[0]?.value,
-          status: 200,
-          statusText: '200',
-        } as AxiosResponse);
-      });
-    } else {
-      return notFoundError;
-    }
-  }
-
-  if (endpoint === 'ONBOARDING_GET_AOO_CODE_INFO') {
-    const retrievedAoo = mockedAoos.find((ao) => ao.codiceUniAoo === endpointParams.codiceUniAoo);
-    return new Promise((resolve) =>
-      resolve({ data: retrievedAoo, status: 200, statusText: '200' } as AxiosResponse)
-    );
-  }
-
-  if (endpoint === 'ONBOARDING_GET_UO_CODE_INFO') {
-    const retrievedUo = mockedUos.find((uo) => uo.codiceUniUo === endpointParams.codiceUniUo);
-    return new Promise((resolve) =>
-      resolve({ data: retrievedUo, status: 200, statusText: '200' } as AxiosResponse)
-    );
-  }
-
-  if (endpoint === 'ONBOARDING_GET_UO_LIST') {
-    const retrievedUos = mockedUos.filter((uo) => uo.codiceFiscaleSfe === params.taxCodeInvoicing);
-    return new Promise((resolve) =>
-      resolve({
-        data: { items: retrievedUos, count: retrievedUos.length },
-        status: 200,
-        statusText: '200',
-      } as AxiosResponse)
-    );
-  }
-
-  if (endpoint === 'VERIFY_ONBOARDING') {
-    switch (params.taxCode) {
-      case '99999999999':
-      case 'externalId4':
-        return genericError;
-      case '44444444444':
-        return notAllowedError;
-      case 'onboarded_externalId':
-      case '22222222222':
-        return noContent;
-      case '33333333333':
-        return notFoundError;
-      // Use case for test not base adhesion
-      case 'externalId3':
-        return notFoundError;
-      // Use case for test already subscribed premium
-      case 'externalId2':
-        if (params.productId === 'prod-io' || params.productId === 'prod-io-premium') {
-          return noContent;
-        } else {
-          return notFoundError;
-        }
-      default:
-        // Use case for test already onboarded AOO and UO
-        if (params.subunitCode === 'A356E01' || params.subunitCode === 'BRE23D') {
-          return noContent;
-        } else {
-          return notFoundError;
-        }
-    }
-  }
-
-  if (endpoint === 'ONBOARDING_GET_SA_PARTIES_NAME') {
-    return new Promise((resolve) =>
-      resolve({ data: mockedStationResource, status: 200, statusText: '200' } as AxiosResponse)
-    );
-  }
-
-  if (endpoint === 'ONBOARDING_GET_SA_PARTY_FROM_FC') {
-    const retrievedParty = mockedANACParties.find((p) => p.taxCode === endpointParams.taxId);
-    return new Promise((resolve) =>
-      resolve({ data: retrievedParty, status: 200, statusText: '200' } as AxiosResponse)
-    );
-  }
-
-  if (endpoint === 'ONBOARDING_GET_INSURANCE_COMPANIES_FROM_BUSINESSNAME') {
-    return new Promise((resolve) =>
-      resolve({ data: mockedInsuranceResource, status: 200, statusText: '200' } as AxiosResponse)
-    );
-  }
-
-  if (endpoint === 'ONBOARDING_GET_INSURANCE_COMPANIES_FROM_IVASSCODE') {
-    const matchedInstitution = mockedInsuranceResource.items.find(
-      (i) => i.originId === endpointParams.taxId
-    );
-    return new Promise((resolve) =>
-      resolve({ data: matchedInstitution, status: 200, statusText: '200' } as AxiosResponse)
-    );
-  }
-
-  if (endpoint === 'ONBOARDING_GET_ONBOARDING_DATA') {
-    if (
-      params.productId === 'prod-pagopa' &&
-      (params.institutionId === '886755' || params.institutionId === '54557')
-    ) {
-      switch (params.institutionId) {
-        case '886755':
-          return new Promise((resolve) =>
-            resolve({
-              data: mockedPspOnboardingData[0],
-              status: 200,
-              statusText: '200',
-            } as AxiosResponse)
-          );
-        case '54557':
-          return new Promise((resolve) =>
-            resolve({
-              data: mockedPspOnboardingData[1],
-              status: 200,
-              statusText: '200',
-            } as AxiosResponse)
-          );
-        default:
-          return new Promise((resolve) =>
-            resolve({
-              data: mockedPspOnboardingData[2],
-              status: 200,
-              statusText: '200',
-            } as AxiosResponse)
-          );
-      }
-    } else {
-      switch (params.institutionId) {
-        case '43446':
-          return new Promise((resolve) =>
-            resolve({
-              data: mockedOnboardingData[0],
-              status: 200,
-              statusText: '200',
-            } as AxiosResponse)
-          );
-        case '23231':
-          return new Promise((resolve) =>
-            resolve({
-              data: mockedOnboardingData[2],
-              status: 200,
-              statusText: '200',
-            } as AxiosResponse)
-          );
-        case '5454679':
-          return new Promise((resolve) =>
-            resolve({
-              data: mockedOnboardingData[1],
-              status: 200,
-              statusText: '200',
-            } as AxiosResponse)
-          );
-        case '775644':
-          return genericError;
-        case '31415':
-          // Onboarding data without institutionType: the premium flow must fall back to the
-          // type carried by the selected party instead of submitting without it.
-          return new Promise((resolve) =>
-            resolve({
-              data: {
-                ...mockedOnboardingData[0],
-                institution: {
-                  ...mockedOnboardingData[0].institution,
-                  institutionType: undefined,
-                },
-              },
-              status: 200,
-              statusText: '200',
-            } as AxiosResponse)
-          );
-        default:
-          return new Promise((resolve) =>
-            resolve({
-              data: mockedOnboardingData[3],
-              status: 200,
-              statusText: '200',
-            } as AxiosResponse)
-          );
-      }
-    }
-  }
-
-  if (endpoint === 'ONBOARDING_VERIFY_PRODUCT') {
-    const selectedProduct = mockedProducts.find((p) => p.id === endpointParams.productId);
-    if (selectedProduct) {
-      return new Promise((resolve) =>
-        resolve({ data: selectedProduct, status: 200, statusText: '200' } as AxiosResponse)
-      );
-    } else {
-      return notFoundError;
-    }
-  }
-
-  if (endpoint === 'ONBOARDING_USER_VALIDATION') {
-    if (
-      ['CRTCTF90B12C123K', 'CRTCTF91B12C123K', 'CRTCTF92B12C123K'].indexOf((data as any)?.taxCode) >
-        -1 &&
-      ((data as any)?.name !== 'CERTIFIED_NAME' || (data as any)?.surname !== 'CERTIFIED_SURNAME')
-    ) {
-      return buildOnboardingUserValidation409(
-        (data as any)?.name !== 'CERTIFIED_NAME',
-        (data as any)?.surname !== 'CERTIFIED_SURNAME'
-      );
-    } else if ((data as any)?.taxCode === 'CRTCTF93B12C124K') {
-      return genericError;
-    } else {
-      return new Promise((resolve) =>
-        resolve({ data: '', status: 200, statusText: '200' } as AxiosResponse)
-      );
-    }
-  }
-  if (endpoint === 'ONBOARDING_POST_LEGALS') {
-    switch (((data as any).billingData as BillingDataDto).taxCode) {
-      case '44444444444':
-        return notAllowedError;
-      case '11111111111':
-      case '33445673211':
-        return genericError;
-      default:
-        const certifiedUser: UserOnCreate | undefined = (
-          (data as any).users as Array<UserOnCreate>
-        ).find((u) => u.taxCode === 'XXXXXX00A00X000X');
-        if (
-          certifiedUser &&
-          (certifiedUser.name !== 'CERTIFIED_NAME' || certifiedUser.surname !== 'CERTIFIED_SURNAME')
-        ) {
-          return conflictError;
-        } else {
-          return new Promise((resolve) =>
-            resolve({ data: '', status: 201, statusText: 'Created' } as AxiosResponse)
-          );
-        }
-    }
-  }
-
-  if (endpoint === 'ONBOARDING_NEW_USER') {
-    switch ((data as any).productId) {
-      case 'prod-io':
-        return badRequestError;
-      default:
-        return new Promise((resolve) =>
-          resolve({ data: {}, status: 200, statusText: '200' } as AxiosResponse)
-        );
-    }
-  }
-
-  if (endpoint === 'ONBOARDING_GET_PARTY') {
-    const fetched = mockPartyRegistry.items.find(
-      (p) => p.id === endpointParams.externalInstitutionId
-    );
-
-    if (fetched) {
-      return new Promise((resolve) =>
-        resolve({ data: fetched, status: 200, statusText: '200' } as AxiosResponse)
-      );
-    } else {
-      return notFoundError;
-    }
-  }
-
-  if (endpoint === 'ONBOARDING_COMPLETE_REGISTRATION') {
-    switch (endpointParams.token) {
-      case 'error':
-        return badRequestError;
-      case 'pendingRequest':
-        return noContent;
-    }
-  }
-
-  if (endpoint === 'USER_COMPLETE_REGISTRATION') {
-    switch (endpointParams.token) {
-      case 'error':
-        return badRequestError;
-      case 'pendingRequest':
-        return noContent;
-    }
-  }
-
-  if (endpoint === 'ONBOARDING_GET_USER_PARTIES') {
-    if (mockedBaseParties.length === 0 || mockedBasePspParties.length === 0) {
-      return notFoundError;
-    } else {
-      return new Promise((resolve) =>
-        resolve({
-          data:
-            params.productId === 'prod-dashboard-psp' ? mockedBasePspParties : mockedBaseParties,
-          status: 200,
-          statusText: '200',
-        } as AxiosResponse)
-      );
-    }
-  }
-
-  if (endpoint === 'ONBOARDING_TOKEN_VALIDATION') {
-    switch (endpointParams.onboardingId) {
-      case 'expired':
-        return new Promise((resolve) =>
-          resolve({
-            data: mockedOnboardingRequestData[3],
-            status: 200,
-            statusText: '200',
-          } as AxiosResponse)
-        );
-      case 'alreadyApproved':
-        return new Promise((resolve) =>
-          resolve({
-            data: mockedOnboardingRequestData[0],
-            status: 200,
-            statusText: '200',
-          } as AxiosResponse)
-        );
-      case 'alreadyRejected':
-        return new Promise((resolve) =>
-          resolve({
-            data: mockedOnboardingRequestData[1],
-            status: 200,
-            statusText: '200',
-          } as AxiosResponse)
-        );
-      case 'pendingRequest':
-      case 'error':
-        return new Promise((resolve) =>
-          resolve({
-            data: mockedOnboardingRequestData[2],
-            status: 200,
-            statusText: '200',
-          } as AxiosResponse)
-        );
-      case 'genericError':
-        return genericError;
-      case 'notAllowed':
-        return notAllowedError;
-      default:
-        return notFoundError;
-    }
-  }
-
-  if (endpoint === 'ONBOARDING_GET_INSTITUTIONS') {
-    const retrievedParty = params.subunitCode
-      ? mockedOnboardedParties.find((p) => p.subunitCode === params.subunitCode)
-      : mockedOnboardedParties.find((p) => p.taxCode === params.taxCode);
-
-    return new Promise((resolve) =>
-      resolve({
-        data: retrievedParty,
-        status: 200,
-        statusText: '200',
-      } as AxiosResponse)
-    );
-  }
-
-  if (endpoint === 'ONBOARDING_GET_PRODUCTS') {
-    return new Promise((resolve) =>
-      resolve({ data: mockedProducts, status: 200, statusText: '200' } as AxiosResponse)
-    );
-  }
-
-  if (endpoint === 'ONBOARDING_GET_ALLOWED_ADD_USER_PRODUCTS') {
-    const allowedAddUserProduct = mockedProducts.filter((p) => addUserFlowProducts(p.id));
-    return new Promise((resolve) =>
-      resolve({ data: allowedAddUserProduct, status: 200, statusText: '200' } as AxiosResponse)
-    );
-  }
-
-  if (endpoint === 'ONBOARDING_CHECK_MANAGER') {
-    return new Promise((resolve) =>
-      resolve({ data: { result: true }, status: 200, statusText: '200' } as AxiosResponse)
-    );
-  }
-
-  if (endpoint === 'ONBOARDING_SEARCH_USER') {
-    return new Promise((resolve) =>
-      resolve({
-        data: { id: '71d1fc35-debf-4763-879e-19329e77ca83' },
-        status: 200,
-        statusText: '200',
-      } as AxiosResponse)
-    );
-  }
-
-  if (endpoint === 'ONBOARDING_VERIFY_AGGREGATES') {
-    switch (mockPartyRegistry.items[0].taxCode) {
-      case '00000000000':
-        return new Promise((resolve) =>
-          resolve({
-            data: { aggregates: [], errors: [] },
-            status: 200,
-            statusText: '200',
-          } as AxiosResponse)
-        );
-      default:
-        return new Promise((resolve) =>
-          resolve({
-            data: { aggregates: [], errors: ['error'] },
-            status: 200,
-            statusText: '200',
-          } as AxiosResponse)
-        );
-    }
-  }
-
-  if (endpoint === 'ONBOARDING_GET_VISURA_INFOCAMERE_BY_CF') {
-    const retrivedInstitutionByCF = mockedPdndVisuraInfomacere.find(
-      (p) => p.businessTaxId === endpointParams.id
-    );
-
-    return new Promise((resolve) =>
-      resolve({
-        data: retrivedInstitutionByCF,
-        status: 200,
-        statusText: '200',
-      } as AxiosResponse)
-    );
-  }
-
-  if (endpoint === 'ONBOARDING_GET_VISURA_INFOCAMERE_BY_REA') {
-    const retrivedInstitutionByRea = mockedPdndVisuraInfomacere.find((p) => p.nRea === params.rea);
-
-    return new Promise((resolve) =>
-      resolve({
-        data: retrivedInstitutionByRea,
-        status: 200,
-        statusText: '200',
-      } as AxiosResponse)
-    );
-  }
-
-  if (endpoint === 'ONBOARDING_GET_INSTITUTION_TYPE_BY_PRODUCT') {
-    const retrivedInstitutionsType = mockInstitutionTypeByProductId(params.productId);
-    return new Promise((resolve) =>
-      resolve({
-        data: retrivedInstitutionsType,
-        status: 200,
-        statusText: '200',
-      } as AxiosResponse)
-    );
-  }
-
-  if (endpoint === 'REQUIRED_DOCUMENTS_ENABLED') {
-    return new Promise((resolve) =>
-      resolve({
-        data: { requiredDocumentsEnabled: true },
-        status: 200,
-        statusText: '200',
-      } as AxiosResponse)
-    );
-  }
-
-  if (endpoint === 'GET_REQUIRED_DOCUMENTS') {
-    return new Promise((resolve) =>
-      resolve({
-        data: mockedRequiredDocuments,
-        status: 200,
-        statusText: '200',
-      } as AxiosResponse)
-    );
-  }
-
-  if (endpoint === 'ONBOARDING_POST_ATTACHMENT') {
-    return noContent;
-  }
-
-  if (endpoint === 'GET_ATTACHMENT_STATUS') {
-    return new Promise((resolve) =>
-      resolve({ data: '', status: 200, statusText: '200' } as AxiosResponse)
-    );
-  }
-
-  if (endpoint === 'TRIGGER_ONBOARDING') {
-    return noContent;
-  }
-
-  if (endpoint === 'ONBOARDING_GET_ONBOARDINGS') {
-    return new Promise((resolve) =>
-      resolve({
-        data: [
-          {
-            id: 'mock-onboarding-id',
-            status: (params as any)?.status ?? 'REQUESTING',
-            productId: 'prod-pagopa',
-          },
-        ],
-        status: 200,
-        statusText: '200',
-      } as AxiosResponse)
-    );
+  const response = mockHandlers[endpoint]?.({ endpointParams, params, data });
+  if (response) {
+    return response;
   }
 
   const msg = `NOT MOCKED REQUEST! {endpoint: ${endpoint}, endpointParams: ${JSON.stringify(
