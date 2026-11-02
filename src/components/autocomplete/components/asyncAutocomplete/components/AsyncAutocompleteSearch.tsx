@@ -55,7 +55,52 @@ type Props = {
   addUser: boolean;
 };
 
-// eslint-disable-next-line sonarjs/cognitive-complexity, complexity
+const truncatedText = {
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  display: '-webkit-box',
+  WebkitBoxOrient: 'vertical' as const,
+  width: '100%',
+  whiteSpace: 'normal' as const,
+};
+
+const getSelectedValue = (
+  selected: PartyData | null,
+  selections: SelectionsState,
+  addUser: boolean
+): string | undefined => {
+  if (!selected) {
+    return undefined;
+  }
+  const isPartySearch =
+    selections.businessName ||
+    selections.taxCode ||
+    selections.ivassCode ||
+    selections.personalTaxCode;
+  if (isPartySearch && selected.description) {
+    return selected.description;
+  }
+  if (selections.aooCode && selected.denominazioneAoo) {
+    return selected.denominazioneAoo;
+  }
+  if (selections.uoCode && selected.descrizioneUo) {
+    return selected.descrizioneUo;
+  }
+  if (addUser && (selections.aooCode || selections.uoCode) && selected.description) {
+    return selected.description;
+  }
+  return selected.businessName;
+};
+
+const getTooltipTitle = (selected: PartyData | null): string =>
+  selected?.description && selected.description.length > 20 ? selected.description : '';
+
+const isSubunit = (selected: PartyData, selections: SelectionsState): boolean =>
+  selections.aooCode ||
+  selections.uoCode ||
+  !!selected.denominazioneAoo ||
+  !!selected.descrizioneUo;
+
 export default function AsyncAutocompleteSearch({
   theme,
   selected,
@@ -81,41 +126,10 @@ export default function AsyncAutocompleteSearch({
       isTaxCodeEquals2PIVA: false,
     });
 
-  const truncatedText = {
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    display: '-webkit-box',
-    WebkitBoxOrient: 'vertical' as const,
-    width: '100%',
-    whiteSpace: 'normal' as const,
-  };
-
-  const valueSelected =
-    (selections.businessName ||
-      selections.taxCode ||
-      selections.ivassCode ||
-      selections.personalTaxCode) &&
-    selected?.description
-      ? selected.description
-      : selected && selections.aooCode && selected?.denominazioneAoo
-        ? selected?.denominazioneAoo
-        : selected && selections.uoCode && selected.descrizioneUo
-          ? selected?.descrizioneUo
-          : addUser &&
-              selected &&
-              (selections.aooCode || selections.uoCode) &&
-              selected?.description
-            ? selected.description
-            : selected?.businessName;
+  const valueSelected = getSelectedValue(selected, selections, addUser);
 
   useEffect(() => {
-    if (selected && selected?.denominazioneAoo) {
-      setInput(selected?.denominazioneAoo);
-    } else if (selected && selected?.descrizioneUo) {
-      setInput(selected?.descrizioneUo);
-    } else {
-      setInput(input);
-    }
+    setInput(selected?.denominazioneAoo || selected?.descrizioneUo || input);
   }, []);
 
   const label = useMemo(() => {
@@ -136,17 +150,27 @@ export default function AsyncAutocompleteSearch({
     return t('asyncAutocomplete.searchLabel');
   }, [selected, selections.reaCode, selections.aooCode, selections.uoCode, t]);
 
+  const handleClear = () => {
+    setInput('');
+    setSelected(null);
+    setSelectedHistory(null);
+    setCfResult(undefined);
+    setAooResult(undefined);
+    setUoResult(undefined);
+    setMerchantSearchResult?.(undefined);
+    setDisabled?.(true);
+    setStepHistoryState({
+      ...stepHistoryState,
+      isTaxCodeEquals2PIVA: false,
+    });
+    setStepHistoryStateHistory({
+      ...stepHistoryState,
+      isTaxCodeEquals2PIVA: false,
+    });
+  };
+
   return (
-    <Tooltip
-      arrow
-      title={
-        selected?.description?.length
-          ? selected?.description.length > 20
-            ? selected?.description
-            : ''
-          : ''
-      }
-    >
+    <Tooltip arrow title={getTooltipTitle(selected)}>
       <CustomTextField
         disabled={!isSearchFieldSelected}
         id="Parties"
@@ -182,17 +206,12 @@ export default function AsyncAutocompleteSearch({
               <Typography variant="body1" sx={{ fontWeight: 'fontWeightBold' }}>
                 {valueSelected}
               </Typography>
-              {(selections.aooCode ||
-                selections.uoCode ||
-                selected.denominazioneAoo ||
-                selected.descrizioneUo) && (
+              {isSubunit(selected, selections) && (
                 <Typography
                   variant="body1"
                   sx={{
-                    ...(selected && {
-                      ...truncatedText,
-                      WebkitLineClamp: 2,
-                    }),
+                    ...truncatedText,
+                    WebkitLineClamp: 2,
                   }}
                 >
                   {selected.denominazioneEnte ?? selected.parentDescription}
@@ -203,24 +222,7 @@ export default function AsyncAutocompleteSearch({
           endAdornment: selected && (
             <IconButton
               disabled={!isSearchFieldSelected}
-              onClick={() => {
-                setInput('');
-                setSelected(null);
-                setSelectedHistory(null);
-                setCfResult(undefined);
-                setAooResult(undefined);
-                setUoResult(undefined);
-                setMerchantSearchResult?.(undefined);
-                setDisabled?.(true);
-                setStepHistoryState({
-                  ...stepHistoryState,
-                  isTaxCodeEquals2PIVA: false,
-                });
-                setStepHistoryStateHistory({
-                  ...stepHistoryState,
-                  isTaxCodeEquals2PIVA: false,
-                });
-              }}
+              onClick={handleClear}
               aria-label={t('asyncAutocomplete.clearIconAriaLabel')}
             >
               <ClearOutlinedIcon
