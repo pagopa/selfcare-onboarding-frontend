@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { GeographicTaxonomy, nationalValue } from '../../model/GeographicTaxonomies';
 import { ENV } from '../env';
-import { handleGeotaxonomies } from '../handleGeotaxonomies';
+import { handleGeotaxonomies, resolveGeotaxonomyAction } from '../handleGeotaxonomies';
 
 const national: GeographicTaxonomy = { code: nationalValue, desc: 'ITALIA' };
 const milano: GeographicTaxonomy = { code: '015146', desc: 'MILANO - COMUNE' };
@@ -89,5 +89,20 @@ describe('handleGeotaxonomies', () => {
     const { updateGeotaxonomy, onForwardAction } = run(previous, current);
     expect(onForwardAction).toHaveBeenCalledTimes(1);
     expect(updateGeotaxonomy).not.toHaveBeenCalled();
+  });
+});
+
+describe('resolveGeotaxonomyAction', () => {
+  it.each([
+    ['national is kept', [national], [national], 'forward'],
+    ['the same locals are kept in another order', [milano, roma], [roma, milano], 'forward'],
+    ['national becomes local', [national], [milano], { add: false, edit: true }],
+    ['local becomes national', [milano], [national], { add: false, edit: true }],
+    ['a local is replaced', [milano], [roma], { add: false, edit: true }],
+    ['locals are only removed', [milano, roma], [roma], { add: false, edit: true }],
+    ['locals are only added', [milano], [milano, roma], { add: true, edit: false }],
+    ['locals are added and replaced', [milano], [roma, torino], { add: false, edit: true }],
+  ])('when %s', (_label, previous, current, expected) => {
+    expect(resolveGeotaxonomyAction(previous, current)).toEqual(expected);
   });
 });
