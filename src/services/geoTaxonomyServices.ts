@@ -1,5 +1,6 @@
 import { Dispatch, SetStateAction } from 'react';
 import { OnboardingApi } from '../api/OnboardingApiClient';
+import { GeographicTaxonomyResourceArray } from '../api/generated/onboarding/GeographicTaxonomyResourceArray';
 import { PartyRegistryProxyApi } from '../api/PartyRegistryProxyApiClient';
 import { getErrorStatus } from '../lib/error-utils';
 import { GeographicTaxonomy, GeographicTaxonomyResource } from '../model/GeographicTaxonomies';
@@ -43,6 +44,11 @@ export const getCountriesFromGeotaxonomies = async (
   }
 };
 
+export const toGeographicTaxonomies = (
+  resources: GeographicTaxonomyResourceArray
+): Array<GeographicTaxonomy> =>
+  resources.map((resource) => ({ code: resource.code ?? '', desc: resource.desc ?? '' }));
+
 export const getPreviousGeotaxononomies = async (
   externalInstitutionId: string,
   aooSelected: AooData | undefined,
@@ -54,7 +60,7 @@ export const getPreviousGeotaxononomies = async (
     const subunitCode = aooSelected?.codiceUniAoo ?? uoSelected?.codiceUniUo;
     const result = await OnboardingApi.getPreviousGeotaxonomy(externalInstitutionId, subunitCode);
     if (result) {
-      setPreviousGeotaxononomies(result as unknown as Array<GeographicTaxonomy>);
+      setPreviousGeotaxononomies(toGeographicTaxonomies(result));
     }
   } catch (error) {
     console.error(error);
