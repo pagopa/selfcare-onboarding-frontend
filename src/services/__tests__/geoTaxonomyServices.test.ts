@@ -6,6 +6,7 @@ import {
   getPreviousGeotaxononomies,
   getLocationFromIstatCode,
   handleSearch,
+  toGeographicTaxonomies,
 } from '../geoTaxonomyServices';
 
 vi.mock('../../api/OnboardingApiClient', () => ({
@@ -66,7 +67,9 @@ it('test getCountriesFromGeotaxonomies on error does nothing', async () => {
 });
 
 it('test getPreviousGeotaxononomies success', async () => {
-  vi.mocked(OnboardingApi.getPreviousGeotaxonomy).mockResolvedValue([{ code: '1' }] as any);
+  // the mocked BE also returns extra fields (e.g. istat_code): only code and desc are kept
+  const response = [{ code: '1', desc: 'MILANO', istat_code: '015146' }];
+  vi.mocked(OnboardingApi.getPreviousGeotaxonomy).mockResolvedValue(response);
   await getPreviousGeotaxononomies(
     'tax-1',
     undefined,
@@ -75,11 +78,18 @@ it('test getPreviousGeotaxononomies success', async () => {
     setRequiredLogin
   );
   expect(OnboardingApi.getPreviousGeotaxonomy).toHaveBeenCalledWith('tax-1', undefined);
-  expect(setPreviousGeotaxononomies).toHaveBeenCalled();
+  expect(setPreviousGeotaxononomies).toHaveBeenCalledWith([{ code: '1', desc: 'MILANO' }]);
+});
+
+it('test toGeographicTaxonomies defaults missing code and desc to empty strings', () => {
+  expect(toGeographicTaxonomies([{}, { code: 'ITA' }])).toEqual([
+    { code: '', desc: '' },
+    { code: 'ITA', desc: '' },
+  ]);
 });
 
 it('test getPreviousGeotaxononomies passes aoo subunitCode when aooSelected', async () => {
-  vi.mocked(OnboardingApi.getPreviousGeotaxonomy).mockResolvedValue([] as any);
+  vi.mocked(OnboardingApi.getPreviousGeotaxonomy).mockResolvedValue([]);
   await getPreviousGeotaxononomies(
     'tax-1',
     { codiceUniAoo: 'AOO1' } as any,

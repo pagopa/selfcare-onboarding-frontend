@@ -17,7 +17,7 @@ import { isMockEnvironment } from '../utils/institutionTypeUtils';
 import { CheckManagerDto } from './generated/onboarding/CheckManagerDto';
 import { CheckManagerResponse } from './generated/onboarding/CheckManagerResponse';
 import { WithDefaultsT, createClient } from './generated/onboarding/client';
-import { GeographicTaxonomyResource } from './generated/onboarding/GeographicTaxonomyResource';
+import { GeographicTaxonomyResourceArray } from './generated/onboarding/GeographicTaxonomyResourceArray';
 import { InstitutionResourceArray } from './generated/onboarding/InstitutionResourceArray';
 import { IpaInstitutionsSearchResource } from './generated/onboarding/IpaInstitutionsSearchResource';
 import { OnboardingProductDto } from './generated/onboarding/OnboardingProductDto';
@@ -114,7 +114,7 @@ export const OnboardingApi = {
   getPreviousGeotaxonomy: async (
     taxCode: string,
     subunitCode?: string
-  ): Promise<GeographicTaxonomyResource> => {
+  ): Promise<GeographicTaxonomyResourceArray> => {
     /* istanbul ignore if */
     const result = isMockEnvironment()
       ? await ApiClientMocked.getPreviousGeotaxonomies(taxCode, subunitCode)
