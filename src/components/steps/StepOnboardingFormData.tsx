@@ -278,25 +278,23 @@ export default function StepOnboardingFormData({
 
   const validate = (values: Partial<OnboardingFormData>) =>
     Object.fromEntries(
-      validateFields(
-        values,
-        t,
+      validateFields(values, t, {
         institutionType,
         isVatRegistrated,
         vatVerificationGenericError,
-        isPaymentServiceProvider(institutionType),
-        controllers.isInvoiceable,
+        isPaymentServiceProvider: isPaymentServiceProvider(institutionType),
+        isInvoiceable: controllers.isInvoiceable,
         uoSelected,
-        isInformationCompany(origin, institutionType, productId),
+        isInformationCompany: isInformationCompany(origin, institutionType, productId),
         institutionAvoidGeotax,
-        controllers.isPremium,
+        isPremium: controllers.isPremium,
         invalidTaxCodeInvoicing,
-        isPdndPrivate(institutionType, productId),
-        isPrivateMerchantInstitution(institutionType, productId),
+        isPdndPrivate: isPdndPrivate(institutionType, productId),
+        isPrivateMerchantInstitution: isPrivateMerchantInstitution(institutionType, productId),
         recipientCodeStatus,
         productId,
-        subProductId
-      )
+        subProductId,
+      })
     );
 
   const formik = useFormik<OnboardingFormData>({

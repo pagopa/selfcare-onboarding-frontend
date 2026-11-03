@@ -269,24 +269,44 @@ export const validatePspSection = (
   pec: isPaymentServiceProvider ? validateEmail(values.pec, t) : undefined,
 });
 
+export type ValidationContext = {
+  institutionType: InstitutionType;
+  isVatRegistrated: boolean;
+  vatVerificationGenericError: boolean;
+  isPaymentServiceProvider: boolean;
+  isInvoiceable: boolean;
+  uoSelected?: UoData;
+  isInformationCompany: boolean;
+  institutionAvoidGeotax: boolean;
+  isPremium: boolean;
+  invalidTaxCodeInvoicing: boolean;
+  isPdndPrivate: boolean;
+  isPrivateMerchantInstitution: boolean;
+  recipientCodeStatus?: string;
+  productId?: string;
+  subProductId?: string;
+};
+
 export const validateFields = (
   values: Partial<OnboardingFormData>,
   t: TFunction<'translation', undefined>,
-  institutionType: InstitutionType,
-  isVatRegistrated: boolean,
-  vatVerificationGenericError: boolean,
-  isPaymentServiceProvider: boolean,
-  isInvoiceable: boolean,
-  uoSelected: UoData | undefined,
-  isInformationCompany: boolean,
-  institutionAvoidGeotax: boolean,
-  isPremium: boolean,
-  invalidTaxCodeInvoicing: boolean,
-  isPdndPrivate: boolean,
-  isPrivateMerchantInstitution: boolean,
-  recipientCodeStatus?: string,
-  productId?: string,
-  subProductId?: string
+  {
+    institutionType,
+    isVatRegistrated,
+    vatVerificationGenericError,
+    isPaymentServiceProvider,
+    isInvoiceable,
+    uoSelected,
+    isInformationCompany,
+    institutionAvoidGeotax,
+    isPremium,
+    invalidTaxCodeInvoicing,
+    isPdndPrivate,
+    isPrivateMerchantInstitution,
+    recipientCodeStatus,
+    productId,
+    subProductId,
+  }: ValidationContext
 ) => {
   const isRequiredForInfoCompany =
     isInformationCompany || isPdndPrivate || isPrivateMerchantInstitution;

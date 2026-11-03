@@ -16,6 +16,8 @@ import {
   validateShareCapital,
   validateSupportEmail,
   validateTaxCodeInvoicing,
+  validateFields,
+  ValidationContext,
 } from '../validateFields';
 
 const controllers = (overrides: Partial<OnboardingControllers> = {}): OnboardingControllers => ({
@@ -157,6 +159,47 @@ describe('validateFields helpers', () => {
     test('hidden for PA even on enabled products', () => {
       expect(showCommercialRegisterSection(false, 'PA', PRODUCT_IDS.PAGOPA)).toBe(false);
     });
+  });
+});
+
+describe('validateFields', () => {
+  const context = (overrides: Partial<ValidationContext> = {}): ValidationContext => ({
+    institutionType: 'PA',
+    isVatRegistrated: false,
+    vatVerificationGenericError: false,
+    isPaymentServiceProvider: false,
+    isInvoiceable: false,
+    isInformationCompany: false,
+    institutionAvoidGeotax: true,
+    isPremium: false,
+    invalidTaxCodeInvoicing: false,
+    isPdndPrivate: false,
+    isPrivateMerchantInstitution: false,
+    ...overrides,
+  });
+
+  const errorsOf = (values: Partial<OnboardingFormData>, ctx: ValidationContext) =>
+    Object.fromEntries(validateFields(values, t, ctx));
+
+  test('returns only the fields in error', () => {
+    const errors = errorsOf({ businessName: 'Acme' }, context());
+
+    expect(errors.businessName).toBeUndefined();
+    expect(errors.registeredOffice).toBe(requiredError);
+    expect(errors.abiCode).toBeUndefined();
+  });
+
+  test('requires the PSP section for payment service providers', () => {
+    expect(errorsOf({}, context({ isPaymentServiceProvider: true })).abiCode).toBe(requiredError);
+  });
+
+  test('requires the support email for prod-io-sign unless geotaxonomies are avoided', () => {
+    const ioSign = { productId: PRODUCT_IDS.IO_SIGN };
+
+    expect(errorsOf({}, context({ ...ioSign, institutionAvoidGeotax: false })).supportEmail).toBe(
+      requiredError
+    );
+    expect(errorsOf({}, context(ioSign)).supportEmail).toBeUndefined();
   });
 });
 
