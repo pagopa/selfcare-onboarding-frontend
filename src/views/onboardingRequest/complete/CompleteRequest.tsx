@@ -1,8 +1,6 @@
-/* eslint-disable sonarjs/cognitive-complexity */
-import SessionModal from '@pagopa/selfcare-common-frontend/lib/components/SessionModal';
 import { productId2ProductTitle } from '@pagopa/selfcare-common-frontend/lib/utils/productId2ProductTitle';
 import { ComponentProps, useContext, useEffect, useState } from 'react';
-import { Trans, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router';
 import { FileErrorAttempt, Problem, RequestOutcomeComplete, StepperStep } from '../../../../types';
 import { OnboardingVerify } from '../../../api/generated/onboarding/OnboardingVerify';
@@ -10,7 +8,6 @@ import { LoadingOverlay } from '../../../components/modals/LoadingOverlay';
 import { ConfirmRegistrationStep0 } from '../../../components/registrationSteps/ConfirmRegistrationStep0';
 import { ConfirmRegistrationStep1 } from '../../../components/registrationSteps/ConfirmRegistrationStep1';
 import { ContractUpdateErrorPage } from '../../../components/registrationSteps/contractUpdate/ContractUpdateErrorPage';
-import { MessageNoAction } from '../../../components/shared/MessageNoAction';
 import { useHistoryState } from '../../../hooks/useHistoryState';
 import { HeaderContext, UserContext } from '../../../lib/context';
 import { onboardingContractUpload } from '../../../services/requestStatusServices';
@@ -19,12 +16,8 @@ import { customErrors } from '../../../utils/constants';
 import { ENV } from '../../../utils/env';
 import { getRequestJwt } from '../../../utils/getRequestJwt';
 import { triggerQualtricsIntercept } from '../../../utils/qualtricsUtils';
-import AlreadyCompletedRequest from '../status/AlreadyCompletedPage';
-import AlreadyRejectedRequest from '../status/AlreadyRejectedPage';
-import ExpiredRequestPage from '../status/ExpiredPage';
-import NotFoundPage from '../status/NotFoundPage';
-import { CompleteRequestFailPage } from './pages/CompleteRequestFailPage';
-import CompleteRequestSuccessPage from './pages/CompleteRequestSuccessPage';
+import { CompleteRequestOutcome } from './CompleteRequestOutcome';
+import { UploadErrorModal } from './UploadErrorModal';
 
 const error2errorCode: { [key in keyof typeof customErrors]: Array<string> } = {
   INVALID_DOCUMENT: ['002-1000', '002-1001', '002-1002'],
@@ -235,123 +228,47 @@ export default function CompleteRequestComponent() {
 
   const Step = steps[activeStep].Component;
 
-  const notFoundContent = {
-    title: '',
-    description: [
-      <>
-        <NotFoundPage />
-      </>,
-    ],
-  };
-
-  const outcomeContent = {
-    toBeCompleted: {
-      title: '',
-      description: [
-        <>
-          <Step />
-        </>,
-      ],
-    },
-    alreadyRejected: {
-      title: '',
-      description: [
-        <>
-          <AlreadyRejectedRequest
-            translationKeyValue={translationKeyValue}
-            productTitle={productId2ProductTitle(requestData?.productId ?? '')}
-          />
-        </>,
-      ],
-    },
-    alreadyCompleted: {
-      title: '',
-      description: [
-        <>
-          <AlreadyCompletedRequest translationKeyValue={translationKeyValue} />
-        </>,
-      ],
-    },
-    expired: {
-      title: '',
-      description: [
-        <>
-          <ExpiredRequestPage
-            translationKeyValue={translationKeyValue}
-            productTitle={productId2ProductTitle(requestData?.productId ?? '')}
-          />
-        </>,
-      ],
-    },
-    notFound: notFoundContent,
-    notAllowed: notFoundContent,
-    genericError: notFoundContent,
-    success: {
-      title: '',
-      description: [
-        <>
-          <CompleteRequestSuccessPage
-            addUserFlow={addUserFlow}
-            translationKeyValue={translationKeyValue}
-            institutionId={institutionId}
-            productId={requestData?.productId}
-            contractUpdate={contractUpdate}
-          />
-        </>,
-      ],
-    },
-    error: {
-      title: '',
-      description: [
-        <>
-          <CompleteRequestFailPage back={back} />
-        </>,
-      ],
-    },
-  };
-
+  const productTitle = productId2ProductTitle(requestData?.productId ?? '');
   const contractUpdateError = getContractUpdateError(contractUpdate, outcomeContentState);
 
-  return loading ? (
-    <LoadingOverlay loadingText={t('onboarding.loading.loadingText')} />
-  ) : contractUpdateError ? (
-    <ContractUpdateErrorPage
-      {...contractUpdateError}
-      errorDescription={contractUpdateError.errorDescription ?? errorDescription}
-      institutionId={institutionId}
-      productTitle={productId2ProductTitle(requestData?.productId ?? '')}
-    />
-  ) : outcomeContentState && outcomeContentState !== 'error' ? (
-    <>
-      <MessageNoAction {...outcomeContent[outcomeContentState]} />
-      <SessionModal
-        handleClose={handleErrorModalClose}
-        handleExit={handleErrorModalExit}
-        onConfirm={handleErrorModalConfirm}
-        open={open}
-        title={t(`completeRegistration.errors.${errorCode}.title`)}
-        message={
-          errorCode === 'INVALID_SIGN_FORMAT' ? (
-            <Trans i18nKey={`completeRegistration.errors.${errorCode}.message`}>
-              {'Il caricamento del documento non è andato a buon fine.'}
-              <br />
-              {'Carica un solo file in formato '}
-              <strong>{'p7m'}</strong>
-              {'.'}
-            </Trans>
-          ) : errorCode === 'GENERIC' ? (
-            t(`completeRegistration.errors.${errorCode}.message`)
-          ) : addUserFlow ? (
-            t(`completeRegistration.errors.${errorCode}.user.message`)
-          ) : (
-            t(`completeRegistration.errors.${errorCode}.product.message`)
-          )
-        }
-        onConfirmLabel={t('completeRegistration.sessionModal.onConfirmLabel')}
-        onCloseLabel={t('completeRegistration.sessionModal.onCloseLabel')}
+  if (loading) {
+    return <LoadingOverlay loadingText={t('onboarding.loading.loadingText')} />;
+  }
+  if (contractUpdateError) {
+    return (
+      <ContractUpdateErrorPage
+        {...contractUpdateError}
+        errorDescription={contractUpdateError.errorDescription ?? errorDescription}
+        institutionId={institutionId}
+        productTitle={productTitle}
       />
+    );
+  }
+
+  const outcome = outcomeContentState ?? 'error';
+  return (
+    <>
+      <CompleteRequestOutcome
+        outcome={outcome}
+        step={<Step />}
+        translationKeyValue={translationKeyValue}
+        productTitle={productTitle}
+        addUserFlow={addUserFlow}
+        contractUpdate={contractUpdate}
+        institutionId={institutionId}
+        productId={requestData?.productId}
+        back={back}
+      />
+      {outcome !== 'error' && (
+        <UploadErrorModal
+          open={open}
+          errorCode={errorCode}
+          addUserFlow={addUserFlow}
+          onClose={handleErrorModalClose}
+          onExit={handleErrorModalExit}
+          onConfirm={handleErrorModalConfirm}
+        />
+      )}
     </>
-  ) : (
-    <MessageNoAction {...outcomeContent.error} />
   );
 }
