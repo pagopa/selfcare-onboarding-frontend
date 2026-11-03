@@ -1,16 +1,15 @@
 import { FormikProps } from 'formik';
 import { Grid, Typography } from '@mui/material';
 import { theme } from '@pagopa/mui-italia';
-import { PRODUCT_IDS } from '@pagopa/selfcare-common-frontend/lib/utils/constants';
 import { t } from 'i18next';
 import { Dispatch, SetStateAction } from 'react';
 import { OnboardingFormData } from '../../../model/OnboardingFormData';
 import { InstitutionType } from '../../../../types';
 import { OnboardingControllers } from '../../../hooks/useOnboardingControllers';
 import { verifyTaxCodeInvoicing } from '../../../services/billingDataServices';
-import { isInsuranceCompany, isIoProduct, isPublicAdministration } from '../../../utils/institutionTypeUtils';
 import { CustomTextField, CustomTextFieldNotched } from '../../../utils/style-utils';
 import { BaseTextFieldPropsFn } from '../../steps/StepOnboardingFormData';
+import { getInvoiceLayout } from './invoiceDataLayout';
 
 type Props = {
   controllers: OnboardingControllers;
@@ -36,21 +35,28 @@ const InvoiceData = ({
   formik,
   baseTextFieldProps,
   setInvalidTaxCodeInvoicing,
-  // eslint-disable-next-line complexity
-}: Props) => (
-  <>
-    <Grid item xs={12}>
-      <Typography component={'span'}>
-        {controllers.isInvoiceable &&
-          (!isIoProduct(productId) || subProductId === PRODUCT_IDS.IO_PREMIUM) && (
+}: Props) => {
+  const layout = getInvoiceLayout({
+    controllers,
+    productId,
+    subProductId,
+    institutionType,
+    onboardingFormData,
+    taxCodeInvoicingVisible,
+    formik,
+  });
+
+  return (
+    <>
+      <Grid item xs={12}>
+        <Typography component={'span'}>
+          {layout.showRecipientCode && (
             <Grid item xs={12} mt={3}>
               <CustomTextFieldNotched
-                paddingValue={
-                  isPublicAdministration(institutionType) || controllers.isAooUo ? '8px' : '0'
-                }
+                paddingValue={layout.isPaOrAooUo ? '8px' : '0'}
                 {...baseTextFieldProps(
                   'recipientCode',
-                  isPublicAdministration(institutionType) || controllers.isAooUo
+                  layout.isPaOrAooUo
                     ? t('onboardingFormData.billingDataSection.sdiCodePaAooUo')
                     : t('onboardingFormData.billingDataSection.sdiCode'),
                   600,
@@ -66,21 +72,9 @@ const InvoiceData = ({
                     input.value = cleanedValue;
                   },
                 }}
-                disabled={
-                  controllers.isPremium &&
-                  subProductId !== PRODUCT_IDS.IO_PREMIUM &&
-                  (formik.values.recipientCode?.length ?? 0) >= 6 &&
-                  (formik.initialValues.recipientCode?.length ?? 0) >= 6 &&
-                  !formik.errors.recipientCode
-                }
-                helperText={
-                  formik.errors.recipientCode === 'Required'
-                    ? undefined
-                    : formik.errors.recipientCode
-                }
-                error={
-                  formik.errors.recipientCode === 'Required' ? false : !!formik.errors.recipientCode
-                }
+                disabled={layout.isRecipientCodeDisabled}
+                helperText={layout.recipientCodeError}
+                error={!!layout.recipientCodeError}
               />
               <Typography
                 component={'span'}
@@ -90,15 +84,13 @@ const InvoiceData = ({
                   color: theme.palette.text.secondary,
                 }}
               >
-                {isPublicAdministration(institutionType) || controllers.isAooUo
+                {layout.isPaOrAooUo
                   ? t('onboardingFormData.billingDataSection.sdiCodePaAooUoDescription')
                   : t('onboardingFormData.billingDataSection.recipientCodeDescription')}
               </Typography>
             </Grid>
           )}
-        {(onboardingFormData?.uoUniqueCode || isPublicAdministration(institutionType)) &&
-          controllers.isInvoiceable &&
-          taxCodeInvoicingVisible && (
+          {layout.showTaxCodeInvoicing && (
             <Grid item xs={12} mt={3}>
               <CustomTextField
                 {...baseTextFieldProps(
@@ -123,23 +115,24 @@ const InvoiceData = ({
             </Grid>
           )}
 
-        {isInsuranceCompany(institutionType) && (
-          <Grid item xs={12} marginTop={controllers.isForeignInsurance ? -3 : 0}>
-            <CustomTextField
-              {...baseTextFieldProps(
-                'originId',
-                t('onboardingFormData.billingDataSection.originId'),
-                600,
-                theme.palette.text.disabled
-              )}
-              value={formik.values.originId}
-              disabled={true}
-            />
-          </Grid>
-        )}
-      </Typography>
-    </Grid>
-  </>
-);
+          {layout.showOriginId && (
+            <Grid item xs={12} marginTop={layout.originIdMarginTop}>
+              <CustomTextField
+                {...baseTextFieldProps(
+                  'originId',
+                  t('onboardingFormData.billingDataSection.originId'),
+                  600,
+                  theme.palette.text.disabled
+                )}
+                value={formik.values.originId}
+                disabled={true}
+              />
+            </Grid>
+          )}
+        </Typography>
+      </Grid>
+    </>
+  );
+};
 
 export default InvoiceData;

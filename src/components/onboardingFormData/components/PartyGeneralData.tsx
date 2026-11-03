@@ -15,7 +15,6 @@ import {
   getNationalCountries,
 } from '../../../services/geoTaxonomyServices';
 import { baseNumericFieldProps } from '../../../utils/formatting-utils';
-import { isInsuranceCompany } from '../../../utils/institutionTypeUtils';
 import {
   autocompletePaperStyle,
   CustomNumberField,
@@ -24,14 +23,7 @@ import {
   fieldColor,
 } from '../../../utils/style-utils';
 import { BaseTextFieldPropsFn } from '../../steps/StepOnboardingFormData';
-import {
-  isAddressDisabled,
-  isBusinessNameDisabled,
-  isDigitalAddressDisabled,
-  isFieldLockedForPrivate,
-  isTaxCodeFieldDisabled,
-  showTaxCodeField,
-} from '../../../utils/validateFields';
+import { getPartyGeneralLayout } from './partyGeneralDataLayout';
 
 type Props = {
   controllers: OnboardingControllers;
@@ -57,13 +49,19 @@ const PartyGeneralData = ({
   productId,
   setInstitutionLocationData,
   setRequiredLogin,
-  // eslint-disable-next-line complexity
 }: Props) => {
   const [shrinkCity, setShrinkCity] = useState<boolean>(false);
   const [isCitySelected, setIsCitySelected] = useState<boolean>(false);
   const [nationalCountries, setNationalCountries] = useState<Array<CountryResource>>();
   const [input, setInput] = useState<string>();
   const [countries, setCountries] = useState<Array<InstitutionLocationData>>();
+  const layout = getPartyGeneralLayout({
+    controllers,
+    institutionType,
+    isInfoCompany,
+    onboardingFormData,
+    productId,
+  });
 
   useEffect(() => {
     if (countries && countries.length > 0 && origin !== 'IPA') {
@@ -105,13 +103,13 @@ const PartyGeneralData = ({
           </Typography>
         </Box>
       )}
-      {onboardingFormData?.uoUniqueCode ? (
+      {layout.subunitFields ? (
         <>
           <Grid item xs={8}>
             <CustomTextField
               {...baseTextFieldProps(
-                'uoName',
-                t('onboardingFormData.billingDataSection.uoName'),
+                layout.subunitFields.name.field,
+                t(layout.subunitFields.name.labelKey),
                 600,
                 fieldColor(controllers.isDisabled)
               )}
@@ -121,33 +119,8 @@ const PartyGeneralData = ({
           <Grid item xs={4}>
             <CustomTextField
               {...baseTextFieldProps(
-                'uoUniqueCode',
-                t('onboardingFormData.billingDataSection.uoUniqueCode'),
-                600,
-                fieldColor(controllers.isDisabled)
-              )}
-              disabled={controllers.isDisabled}
-            />
-          </Grid>
-        </>
-      ) : onboardingFormData?.aooUniqueCode ? (
-        <>
-          <Grid item xs={8}>
-            <CustomTextField
-              {...baseTextFieldProps(
-                'aooName',
-                t('onboardingFormData.billingDataSection.aooName'),
-                600,
-                fieldColor(controllers.isDisabled)
-              )}
-              disabled={controllers.isDisabled}
-            />
-          </Grid>
-          <Grid item xs={4}>
-            <CustomTextField
-              {...baseTextFieldProps(
-                'aooUniqueCode',
-                t('onboardingFormData.billingDataSection.aooUniqueCode'),
+                layout.subunitFields.code.field,
+                t(layout.subunitFields.code.labelKey),
                 600,
                 fieldColor(controllers.isDisabled)
               )}
@@ -162,23 +135,9 @@ const PartyGeneralData = ({
               'businessName',
               t('onboardingFormData.billingDataSection.businessName'),
               600,
-              fieldColor(
-                isBusinessNameDisabled(
-                  controllers,
-                  institutionType,
-                  isInfoCompany,
-                  onboardingFormData,
-                  isFieldLockedForPrivate(institutionType, productId)
-                ) ?? false
-              )
+              fieldColor(layout.isBusinessNameDisabled)
             )}
-            disabled={isBusinessNameDisabled(
-              controllers,
-              institutionType,
-              isInfoCompany,
-              onboardingFormData,
-              isFieldLockedForPrivate(institutionType, productId)
-            )}
+            disabled={layout.isBusinessNameDisabled}
           />
         </Grid>
       )}
@@ -190,9 +149,9 @@ const PartyGeneralData = ({
               'registeredOffice',
               t('onboardingFormData.billingDataSection.fullLegalAddress'),
               600,
-              fieldColor(isAddressDisabled(controllers, institutionType))
+              fieldColor(layout.isAddressDisabled)
             )}
-            disabled={isAddressDisabled(controllers, institutionType)}
+            disabled={layout.isAddressDisabled}
           />
         </Grid>
         {!controllers.isForeignInsurance && (
@@ -207,14 +166,14 @@ const PartyGeneralData = ({
                 controllers,
                 formik
               )}
-              disabled={isAddressDisabled(controllers, institutionType)}
+              disabled={layout.isAddressDisabled}
             />
           </Grid>
         )}
       </Grid>
       <Grid container spacing={2} pl={3} pt={3}>
         <Grid item xs={7}>
-          {isInsuranceCompany(institutionType) && controllers.isForeignInsurance ? (
+          {layout.isForeignInsuranceCompany ? (
             <CustomTextField
               {...baseTextFieldProps(
                 'city',
@@ -262,8 +221,8 @@ const PartyGeneralData = ({
               options={countries ?? []}
               noOptionsText={t('onboardingFormData.billingDataSection.noResult')}
               clearOnBlur={true}
-              forcePopupIcon={!(controllers.isFromIPA || !controllers.isCityEditable)}
-              disabled={controllers.isPremium || controllers.isFromIPA || controllers.isAooUo}
+              forcePopupIcon={layout.showCityPopupIcon}
+              disabled={layout.isCityAutocompleteDisabled}
               ListboxProps={{
                 style: {
                   overflow: 'visible',
@@ -281,10 +240,7 @@ const PartyGeneralData = ({
                   {...params}
                   inputProps={{
                     ...params.inputProps,
-                    value:
-                      !controllers.isCityEditable || controllers.isFromIPA || controllers.isAooUo
-                        ? formik.values.city
-                        : params.inputProps.value,
+                    value: layout.isCityLocked ? formik.values.city : params.inputProps.value,
                   }}
                   label={t('onboardingFormData.billingDataSection.city')}
                   InputLabelProps={{
@@ -313,7 +269,7 @@ const PartyGeneralData = ({
           )}
         </Grid>
         <Grid item xs={5}>
-          {isInsuranceCompany(institutionType) && controllers.isForeignInsurance ? (
+          {layout.isForeignInsuranceCompany ? (
             <Autocomplete
               id="country-select"
               onInput={(e: React.ChangeEvent<HTMLInputElement>) => {
@@ -391,28 +347,12 @@ const PartyGeneralData = ({
             'digitalAddress',
             t('onboardingFormData.billingDataSection.digitalAddress'),
             600,
-            fieldColor(
-              isDigitalAddressDisabled(
-                controllers,
-                institutionType,
-                isInfoCompany,
-                onboardingFormData,
-                isFieldLockedForPrivate(institutionType, productId)
-              ) ?? false
-            )
+            fieldColor(layout.isDigitalAddressDisabled)
           )}
-          disabled={
-            isDigitalAddressDisabled(
-              controllers,
-              institutionType,
-              isInfoCompany,
-              onboardingFormData,
-              isFieldLockedForPrivate(institutionType, productId)
-            ) ?? false
-          }
+          disabled={layout.isDigitalAddressDisabled}
         />
       </Grid>
-      {showTaxCodeField(institutionType, onboardingFormData) && (
+      {layout.showTaxCode && (
         <Grid item xs={12}>
           <CustomTextField
             {...baseTextFieldProps(
@@ -421,25 +361,9 @@ const PartyGeneralData = ({
                 ? t('onboardingFormData.billingDataSection.taxCodeCentralParty')
                 : t('onboardingFormData.billingDataSection.taxCode'),
               600,
-              fieldColor(
-                isTaxCodeFieldDisabled(
-                  controllers,
-                  institutionType,
-                  isInfoCompany,
-                  onboardingFormData,
-                  isFieldLockedForPrivate(institutionType, productId)
-                ) ?? false
-              )
+              fieldColor(layout.isTaxCodeDisabled)
             )}
-            disabled={
-              isTaxCodeFieldDisabled(
-                controllers,
-                institutionType,
-                isInfoCompany,
-                onboardingFormData,
-                isFieldLockedForPrivate(institutionType, productId)
-              ) ?? false
-            }
+            disabled={layout.isTaxCodeDisabled}
             inputProps={{
               maxLength: 11,
             }}

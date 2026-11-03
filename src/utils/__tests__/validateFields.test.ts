@@ -1,6 +1,7 @@
+import { t } from 'i18next';
 import { OnboardingControllers } from '../../hooks/useOnboardingControllers';
 import { OnboardingFormData } from '../../model/OnboardingFormData';
-import { PRODUCT_IDS } from '../constants';
+import { PRODUCT_IDS, requiredError } from '../constants';
 import {
   isAddressDisabled,
   isBusinessNameDisabled,
@@ -10,6 +11,13 @@ import {
   isTaxCodeFieldDisabled,
   showCommercialRegisterSection,
   showTaxCodeField,
+  validatePspSection,
+  validateRea,
+  validateShareCapital,
+  validateSupportEmail,
+  validateTaxCodeInvoicing,
+  validateFields,
+  ValidationContext,
 } from '../validateFields';
 
 const controllers = (overrides: Partial<OnboardingControllers> = {}): OnboardingControllers => ({
@@ -150,6 +158,146 @@ describe('validateFields helpers', () => {
 
     test('hidden for PA even on enabled products', () => {
       expect(showCommercialRegisterSection(false, 'PA', PRODUCT_IDS.PAGOPA)).toBe(false);
+    });
+  });
+});
+
+describe('validateFields', () => {
+  const context = (overrides: Partial<ValidationContext> = {}): ValidationContext => ({
+    institutionType: 'PA',
+    isVatRegistrated: false,
+    vatVerificationGenericError: false,
+    isPaymentServiceProvider: false,
+    isInvoiceable: false,
+    isInformationCompany: false,
+    institutionAvoidGeotax: true,
+    isPremium: false,
+    invalidTaxCodeInvoicing: false,
+    isPdndPrivate: false,
+    isPrivateMerchantInstitution: false,
+    ...overrides,
+  });
+
+  const errorsOf = (values: Partial<OnboardingFormData>, ctx: ValidationContext) =>
+    Object.fromEntries(validateFields(values, t, ctx));
+
+  test('returns only the fields in error', () => {
+    const errors = errorsOf({ businessName: 'Acme' }, context());
+
+    expect(errors.businessName).toBeUndefined();
+    expect(errors.registeredOffice).toBe(requiredError);
+    expect(errors.abiCode).toBeUndefined();
+  });
+
+  test('requires the PSP section for payment service providers', () => {
+    expect(errorsOf({}, context({ isPaymentServiceProvider: true })).abiCode).toBe(requiredError);
+  });
+
+  test('requires the support email for prod-io-sign unless geotaxonomies are avoided', () => {
+    const ioSign = { productId: PRODUCT_IDS.IO_SIGN };
+
+    expect(errorsOf({}, context({ ...ioSign, institutionAvoidGeotax: false })).supportEmail).toBe(
+      requiredError
+    );
+    expect(errorsOf({}, context(ioSign)).supportEmail).toBeUndefined();
+  });
+});
+
+describe('conditional validators', () => {
+  const msg = (key: string) => t(`onboardingFormData.billingDataSection.${key}`);
+
+  describe('validateRea', () => {
+    test.each([
+      [undefined, true, requiredError],
+      [undefined, false, undefined],
+      ['RM-123456', true, undefined],
+      ['1234', false, msg('invalidReaField')],
+    ])('rea %s (required: %s) -> %s', (rea, isRequired, expected) => {
+      expect(validateRea(rea, isRequired, t)).toBe(expected);
+    });
+  });
+
+  describe('validateShareCapital', () => {
+    test.each([
+      [undefined, true, requiredError],
+      [undefined, false, undefined],
+      ['1000,50', true, undefined],
+      ['abc', false, msg('invalidShareCapitalField')],
+    ])('share capital %s (required: %s) -> %s', (shareCapital, isRequired, expected) => {
+      expect(validateShareCapital(shareCapital, isRequired, t)).toBe(expected);
+    });
+  });
+
+  describe('validateTaxCodeInvoicing', () => {
+    test.each([
+      [undefined, true, false, requiredError],
+      ['invalid', true, false, requiredError],
+      ['12345678901', true, false, undefined],
+      ['12345678901', true, true, msg('invalidTaxCodeInvoicing')],
+      [undefined, false, true, msg('invalidTaxCodeInvoicing')],
+      [undefined, false, false, undefined],
+    ])(
+      'tax code %s (required: %s, invalid: %s) -> %s',
+      (taxCodeInvoicing, isRequired, isInvalid, expected) => {
+        expect(validateTaxCodeInvoicing(taxCodeInvoicing, isRequired, isInvalid, t)).toBe(
+          expected
+        );
+      }
+    );
+  });
+
+  describe('validateSupportEmail', () => {
+    test.each([
+      [undefined, true, requiredError],
+      [undefined, false, undefined],
+      ['support@acme.it', true, undefined],
+      ['not-an-email', false, msg('invalidMailSupport')],
+    ])('support email %s (required: %s) -> %s', (supportEmail, isRequired, expected) => {
+      expect(validateSupportEmail(supportEmail, isRequired, t)).toBe(expected);
+    });
+  });
+
+  describe('validatePspSection', () => {
+    test('no errors when the institution is not a PSP', () => {
+      expect(Object.values(validatePspSection({}, false, t)).every((e) => !e)).toBe(true);
+    });
+
+    test('every field is required for a PSP', () => {
+      expect(validatePspSection({}, true, t)).toEqual({
+        commercialRegisterNumber: requiredError,
+        registrationInRegister: requiredError,
+        address: requiredError,
+        registerNumber: requiredError,
+        abiCode: requiredError,
+        email: requiredError,
+        pec: requiredError,
+      });
+    });
+
+    test('reports format errors for a PSP', () => {
+      const errors = validatePspSection(
+        {
+          commercialRegisterNumber: '123',
+          registrationInRegister: 'Albo',
+          address: 'Via Roma 1',
+          registerNumber: 'abc',
+          abiCode: '12',
+          email: 'wrong',
+          pec: 'pec@acme.it',
+        },
+        true,
+        t
+      );
+
+      expect(errors).toEqual({
+        commercialRegisterNumber: msg('pspDataSection.invalidCommercialRegisterNumber'),
+        registrationInRegister: undefined,
+        address: undefined,
+        registerNumber: msg('pspDataSection.invalidregisterNumber'),
+        abiCode: msg('pspDataSection.invalidabiCode'),
+        email: msg('invalidEmail'),
+        pec: undefined,
+      });
     });
   });
 });
