@@ -33,5 +33,5 @@ Su `main` (5b3eaa2) `yarn lint` riporta 126 warning `no-explicit-any`. Ignorando
 
 ## Stato
 - [x] A – Autocomplete
-- [ ] B – Submit
-- [ ] C – API client e servizi
+- [x] B – Submit
+- [x] C – API client e servizi
