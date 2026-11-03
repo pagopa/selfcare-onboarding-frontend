@@ -41,7 +41,51 @@ type Props = {
   setMerchantSearchResult?: (value?: PDNDBusinessResource) => void;
 };
 
-// eslint-disable-next-line complexity
+// Built inside functions: constants.ts imports the views, so PRODUCT_IDS is not ready at load time
+const isSubunitProduct = (productId?: string): boolean =>
+  [PRODUCT_IDS.INTEROP, PRODUCT_IDS.IO_SIGN, PRODUCT_IDS.SEND_DEV, PRODUCT_IDS.SEND].includes(
+    productId ?? ''
+  );
+
+const hidesBusinessNameSearch = (addUser: boolean, institutionType?: InstitutionType): boolean =>
+  addUser ||
+  isPublicServiceCompany(institutionType) ||
+  isPrivateInstitution(institutionType) ||
+  isPrivatePersonInstitution(institutionType);
+
+const isMerchantPrivateParty = (institutionType?: InstitutionType, productId?: string): boolean =>
+  isPrivateOrPersonInstitution(institutionType) && isIdpayMerchantProduct(productId);
+
+const canSearchByPersonalTaxCode = (
+  addUser: boolean,
+  institutionType: InstitutionType | undefined,
+  productId: string | undefined,
+  selectedProductId: string | undefined
+): boolean =>
+  (addUser && selectedProductId === PRODUCT_IDS.IDPAY_MERCHANT) ||
+  isMerchantPrivateParty(institutionType, productId);
+
+const hasSubunits = (institutionType?: InstitutionType): boolean =>
+  ![
+    isContractingAuthority,
+    isInsuranceCompany,
+    isGlobalServiceProvider,
+    isPublicServiceCompany,
+    isPrivateInstitution,
+    isPrivatePersonInstitution,
+    isConsolidatedEconomicAccountCompany,
+  ].some((isType) => isType(institutionType));
+
+const canSearchBySubunit = (
+  addUser: boolean,
+  institutionType: InstitutionType | undefined,
+  productId: string | undefined,
+  selectedProductId: string | undefined
+): boolean =>
+  ENV.AOO_UO.SHOW_AOO_UO &&
+  ((hasSubunits(institutionType) && isSubunitProduct(productId)) ||
+    (addUser && isSubunitProduct(selectedProductId)));
+
 export default function PartyAdvancedSelect({
   selections,
   setSelected,
@@ -83,12 +127,7 @@ export default function PartyAdvancedSelect({
   useEffect(() => {
     // Set taxCode as default when businessName is not available as an option
     // (for SCP, PRV, PRV_PF institution types, businessName is never shown in menuItems)
-    if (
-      addUser ||
-      isPublicServiceCompany(institutionType) ||
-      isPrivateInstitution(institutionType) ||
-      isPrivatePersonInstitution(institutionType)
-    ) {
+    if (hidesBusinessNameSearch(addUser, institutionType)) {
       onSelectValue(SelectionEnum.taxCode);
     } else {
       onSelectValue(SelectionEnum.businessName);
@@ -109,19 +148,16 @@ export default function PartyAdvancedSelect({
   }, [selections]);
 
   const menuItems = [
-    !addUser &&
-      !isPublicServiceCompany(institutionType) &&
-      !isPrivateInstitution(institutionType) &&
-      !isPrivatePersonInstitution(institutionType) && (
-        <MenuItem
-          key="businessName"
-          id="businessName"
-          data-testid="businessName"
-          value={SelectionEnum.businessName}
-        >
-          {t('partyAdvancedSelect.businessName')}
-        </MenuItem>
-      ),
+    !hidesBusinessNameSearch(addUser, institutionType) && (
+      <MenuItem
+        key="businessName"
+        id="businessName"
+        data-testid="businessName"
+        value={SelectionEnum.businessName}
+      >
+        {t('partyAdvancedSelect.businessName')}
+      </MenuItem>
+    ),
     isInsuranceCompany(institutionType) ? (
       <MenuItem
         key="ivassCode"
@@ -136,13 +172,12 @@ export default function PartyAdvancedSelect({
         {t('partyAdvancedSelect.taxCode')}
       </MenuItem>
     ),
-    isPrivateOrPersonInstitution(institutionType) && isIdpayMerchantProduct(product?.id) && (
+    isMerchantPrivateParty(institutionType, product?.id) && (
       <MenuItem key="reaCode" id="reaCode" data-testid="reaCode" value={SelectionEnum.reaCode}>
         {t('partyAdvancedSelect.reaCode')}
       </MenuItem>
     ),
-    ((addUser && selectedProduct?.id === PRODUCT_IDS.IDPAY_MERCHANT) ||
-      (isPrivateOrPersonInstitution(institutionType) && isIdpayMerchantProduct(product?.id))) && (
+    canSearchByPersonalTaxCode(addUser, institutionType, product?.id, selectedProduct?.id) && (
       <MenuItem
         key="personalTaxCode"
         id="personalTaxCode"
@@ -152,22 +187,7 @@ export default function PartyAdvancedSelect({
         {t('partyAdvancedSelect.personalTaxCode')}
       </MenuItem>
     ),
-    ((ENV.AOO_UO.SHOW_AOO_UO &&
-      !isContractingAuthority(institutionType) &&
-      !isInsuranceCompany(institutionType) &&
-      !isGlobalServiceProvider(institutionType) &&
-      !isPublicServiceCompany(institutionType) &&
-      !isPrivateInstitution(institutionType) &&
-      !isPrivatePersonInstitution(institutionType) &&
-      !isConsolidatedEconomicAccountCompany(institutionType) &&
-      [PRODUCT_IDS.INTEROP, PRODUCT_IDS.IO_SIGN, PRODUCT_IDS.SEND_DEV, PRODUCT_IDS.SEND].includes(
-        product?.id ?? ''
-      )) ||
-      (addUser &&
-        ENV.AOO_UO.SHOW_AOO_UO &&
-        [PRODUCT_IDS.INTEROP, PRODUCT_IDS.IO_SIGN, PRODUCT_IDS.SEND_DEV, PRODUCT_IDS.SEND].includes(
-          selectedProduct?.id ?? ''
-        ))) && [
+    canSearchBySubunit(addUser, institutionType, product?.id, selectedProduct?.id) && [
       <MenuItem key="aooCode" id="aooCode" data-testid="aooCode" value={SelectionEnum.aooCode}>
         {t('partyAdvancedSelect.aooCode')}
       </MenuItem>,

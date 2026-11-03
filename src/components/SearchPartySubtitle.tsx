@@ -1,4 +1,3 @@
-/* eslint-disable sonarjs/cognitive-complexity */
 import { Grid, Link, Typography } from '@mui/material';
 import type { ReactElement } from 'react';
 import { theme } from '@pagopa/mui-italia';
@@ -94,22 +93,30 @@ const SearchPartySubtitle = ({
     </Trans>
   );
 
+  const subtitleContent = () => {
+    if (selected) {
+      return defaultSubTitleContent();
+    }
+    if (isContractingAuthority(institutionType)) {
+      return contractingAutorityContent();
+    }
+    if (isInsuranceCompany(institutionType)) {
+      return insuranceCompanyContent();
+    }
+    if (
+      isPublicServiceCompany(institutionType) ||
+      (isPrivateInstitution(institutionType) && isInteropProduct(product?.id))
+    ) {
+      return infocamereContent();
+    }
+    return isIdpayMerchantProduct(product?.id) ? idPayMerchantContent() : subTitle;
+  };
+
   return (
     <Grid container item justifyContent="center" mt={1}>
       <Grid item xs={12}>
         <Typography variant="body1" align="center" color={theme.palette.text.primary}>
-          {selected
-            ? defaultSubTitleContent()
-            : isContractingAuthority(institutionType)
-              ? contractingAutorityContent()
-              : isInsuranceCompany(institutionType)
-                ? insuranceCompanyContent()
-                : isPublicServiceCompany(institutionType) ||
-                    (isPrivateInstitution(institutionType) && isInteropProduct(product?.id))
-                  ? infocamereContent()
-                  : isIdpayMerchantProduct(product?.id)
-                    ? idPayMerchantContent()
-                    : subTitle}
+          {subtitleContent()}
         </Typography>
       </Grid>
     </Grid>

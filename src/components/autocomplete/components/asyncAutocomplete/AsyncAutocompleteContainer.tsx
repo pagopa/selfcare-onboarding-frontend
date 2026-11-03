@@ -1,4 +1,4 @@
-import { Grid, Theme, Typography } from '@mui/material';
+import { Grid, Theme } from '@mui/material';
 import { Box } from '@mui/system';
 import debounce from 'lodash/debounce';
 import {
@@ -48,6 +48,7 @@ import {
 import AsyncAutocompleteResultsBusinessName from './components/AsyncAutocompleteResultsBusinessName';
 import AsyncAutocompleteResultsCode from './components/AsyncAutocompleteResultsCode';
 import AsyncAutocompleteSearch from './components/AsyncAutocompleteSearch';
+import AsyncAutocompleteStatusMessage from './components/AsyncAutocompleteStatusMessage';
 
 type Props = {
   selections: SelectionsState;
@@ -84,8 +85,108 @@ type Props = {
   disabledStatusCompany?: boolean;
 };
 
-// TODO: handle cognitive-complexity
-// eslint-disable-next-line sonarjs/cognitive-complexity, complexity
+const removeSpecialCharacters = (input: string): string => {
+  const specialCharacters = `[$%&'()§#!£{}*+/:;<>@=?^|~]`;
+
+  return input
+    .split('')
+    .map((char) => (specialCharacters.includes(char) ? '' : char))
+    .join('')
+    .replace(/''|""|--|__|,,|\.\./g, (match) => match[0]);
+};
+
+const formatReaCode = (input: string): string => {
+  const letters = input
+    .replace(/[^A-Za-z]/g, '')
+    .slice(0, 2)
+    .toUpperCase();
+  const numbers = input.replace(/[^0-9]/g, '').slice(0, 6);
+  return letters.length < 2 || !numbers ? letters : `${letters}-${numbers}`;
+};
+
+const buildOptionGetter =
+  (key?: string) =>
+  (option: unknown): string =>
+    key !== undefined
+      ? String((option as Record<string, unknown>)[key] ?? '')
+      : String((option as { label?: unknown } | null)?.label ?? option);
+
+const isBusinessNameSearch = (selections: SelectionsState, value: string): boolean =>
+  value.length >= 3 && selections.businessName && !selections.taxCode;
+
+const isTaxIdSearch = (selections: SelectionsState, value: string): boolean =>
+  (selections.taxCode && value.length === 11) ||
+  (selections.ivassCode && value.length === 5) ||
+  (selections.personalTaxCode && value.length === 16);
+
+const isCodeSelection = (selections: SelectionsState): boolean =>
+  selections.taxCode ||
+  selections.aooCode ||
+  selections.uoCode ||
+  selections.ivassCode ||
+  selections.reaCode ||
+  selections.personalTaxCode;
+
+const getTaxIdSearchEndpoint = (
+  addUser: boolean,
+  institutionType: InstitutionType | undefined,
+  productId: string | undefined,
+  selections: SelectionsState
+): ApiEndpointKey => {
+  if (addUser) {
+    return 'ONBOARDING_GET_INSTITUTIONS';
+  }
+  if (isContractingAuthority(institutionType)) {
+    return 'ONBOARDING_GET_SA_PARTY_FROM_FC';
+  }
+  if (isInsuranceCompany(institutionType)) {
+    return 'ONBOARDING_GET_INSURANCE_COMPANIES_FROM_IVASSCODE';
+  }
+  if (isIdpayMerchantProduct(productId)) {
+    return selections.taxCode || selections.personalTaxCode
+      ? 'ONBOARDING_GET_VISURA_INFOCAMERE_BY_CF'
+      : 'ONBOARDING_GET_PARTY_FROM_CF';
+  }
+  if (isPrivateInstitution(institutionType) || isPublicServiceCompany(institutionType)) {
+    return 'ONBOARDING_GET_PARTY_BY_CF_FROM_INFOCAMERE';
+  }
+  return 'ONBOARDING_GET_PARTY_FROM_CF';
+};
+
+type ResultsStatus = 'results' | 'tooShort' | 'noResults' | undefined;
+
+const getBusinessNameResultsStatus = (
+  input: string,
+  optionsCount: number,
+  selected: PartyData | null
+): ResultsStatus => {
+  if (input.length >= 3 && optionsCount > 0) {
+    return 'results';
+  }
+  if (input.length >= 1 && input.length < 3) {
+    return 'tooShort';
+  }
+  return input.length >= 3 && optionsCount === 0 && !selected ? 'noResults' : undefined;
+};
+
+const getCodeResultsStatus = (
+  input: string,
+  optionsCount: number,
+  selected: PartyData | null,
+  selections: SelectionsState,
+  results: ReadonlyArray<PartyData | AooData | UoData | undefined>
+): ResultsStatus => {
+  if (selected) {
+    return undefined;
+  }
+  if (isCodeSelection(selections) && input.length >= 5 && results.some(Boolean)) {
+    return 'results';
+  }
+  return input.length >= 1 && optionsCount === 0 && !results.every(Boolean)
+    ? 'noResults'
+    : undefined;
+};
+
 export default function AsyncAutocompleteContainer({
   selections,
   optionKey,
@@ -125,34 +226,14 @@ export default function AsyncAutocompleteContainer({
   const [partyLogo, setPartyLogo] = useState<string>(
     selected ? buildUrlLogo(selected.id) : OnboardingPartyIcon
   );
-  const getOptionKey: (option: unknown) => string =
-    optionKey !== undefined
-      ? (o) => String((o as Record<string, unknown>)[optionKey] ?? '')
-      : (o) => String((o as { label?: unknown } | null)?.label ?? o);
-  const getOptionLabel: (option: unknown) => string =
-    optionLabel !== undefined
-      ? (o) => String((o as Record<string, unknown>)[optionLabel] ?? '')
-      : (o) => String((o as { label?: unknown } | null)?.label ?? o);
-  const showBusinessNameElement = input !== undefined && input.length >= 3;
-  const canSearchByBusinessName =
-    input.length >= 3 && selections.businessName && !selections.taxCode;
-  const canSearch4Others =
-    (selections.taxCode && input.length === 11) ||
-    (selections.ivassCode && input.length === 5) ||
-    (selections.personalTaxCode && input.length === 16) ||
-    (selections.aooCode && input.length === 7) ||
-    (selections.uoCode && input.length === 6) ||
-    (selections.reaCode && input.length >= 4);
+  const getOptionKey = buildOptionGetter(optionKey);
+  const getOptionLabel = buildOptionGetter(optionLabel);
+  const showBusinessNameElement = input.length >= 3;
 
   useEffect(() => setDisabled(!selected), [selected]);
 
   useEffect(() => {
-    if (selected) {
-      const logoUrl = buildUrlLogo(selected.id);
-      setPartyLogo(logoUrl);
-    } else {
-      setPartyLogo(OnboardingPartyIcon);
-    }
+    setPartyLogo(selected ? buildUrlLogo(selected.id) : OnboardingPartyIcon);
   }, [selected]);
 
   useEffect(() => {
@@ -161,23 +242,19 @@ export default function AsyncAutocompleteContainer({
       setCfResult(undefined);
     }
 
-    if (!input || input.length === 0 || selected) {
+    if (!input || selected) {
       return;
     }
 
-    const params = {
+    void executeSearch(input, {
       productId: selectedProduct?.id,
       taxCode: selections.taxCode || selections.personalTaxCode ? input : undefined,
       subunitCode: selections.aooCode || selections.uoCode ? input : undefined,
-    };
-
-    if (canSearchByBusinessName || canSearch4Others) {
-      void executeSearch(input, selections, params, addUser, institutionType, product);
-    }
+    });
   }, [input]);
 
   useEffect(() => {
-    if (!input || (input.length === 0 && isIdpayMerchantProduct(product?.id))) {
+    if (!input) {
       setMerchantSearchResult?.(undefined);
       setDisabled(true);
     }
@@ -207,13 +284,8 @@ export default function AsyncAutocompleteContainer({
     [handleSearchByName]
   );
 
-  // Esegue il cancel solo quando il componente si smonta o quando debouncedSearchByName cambia
-  // eslint-disable-next-line arrow-body-style
-  useEffect(() => {
-    return () => {
-      debouncedSearchByName.cancel();
-    };
-  }, [debouncedSearchByName]);
+  // Cancel the pending search only on unmount or when debouncedSearchByName changes
+  useEffect(() => () => debouncedSearchByName.cancel(), [debouncedSearchByName]);
 
   const handleSearchByTaxCode = useCallback(
     async (
@@ -253,7 +325,8 @@ export default function AsyncAutocompleteContainer({
       setRequiredLogin,
     ]
   );
-  const searchByBusinessName = (value: string, institutionType?: string) => {
+
+  const searchByBusinessName = (value: string) => {
     switch (institutionType) {
       case 'AS':
         void debouncedSearchByName(value, {
@@ -274,154 +347,83 @@ export default function AsyncAutocompleteContainer({
         );
     }
   };
-  const removeSpecialCharacters = (input: string): string => {
-    const specialCharacters = `[$%&'()§#!£{}*+/:;<>@=?^|~]`;
 
-    return input
-      .split('')
-      .map((char) => (specialCharacters.includes(char) ? '' : char))
-      .join('')
-      .replace(/''|""|--|__|,,|\.\./g, (match) => match[0]);
-  };
+  const searchByTaxId = (value: string, params: InstitutionSearchParams) => {
+    const taxIdEndpoint = getTaxIdSearchEndpoint(addUser, institutionType, product?.id, selections);
 
-  const formatReaCode = (input: string): string => {
-    const letters = input
-      .replace(/[^A-Za-z]/g, '')
-      .slice(0, 2)
-      .toUpperCase();
-    const numbers = input.replace(/[^0-9]/g, '').slice(0, 6);
-    return letters.length < 2 || !numbers ? letters : `${letters}-${numbers}`;
-  };
-
-  const getSearchEndpoint = (
-    addUser: boolean,
-    institutionType: string | undefined,
-    product: Product | null | undefined,
-    selections: SelectionsState
-  ): ApiEndpointKey => {
-    if (addUser) {
-      return 'ONBOARDING_GET_INSTITUTIONS';
-    }
-
-    if (isContractingAuthority(institutionType as InstitutionType)) {
-      return 'ONBOARDING_GET_SA_PARTY_FROM_FC';
-    }
-    if (isInsuranceCompany(institutionType as InstitutionType)) {
-      return 'ONBOARDING_GET_INSURANCE_COMPANIES_FROM_IVASSCODE';
-    }
-
-    if (
-      (isPrivateInstitution(institutionType as InstitutionType) ||
-        isPublicServiceCompany(institutionType as InstitutionType)) &&
-      !isIdpayMerchantProduct(product?.id)
-    ) {
-      return 'ONBOARDING_GET_PARTY_BY_CF_FROM_INFOCAMERE';
-    }
-
-    if (
-      (addUser || isIdpayMerchantProduct(product?.id)) &&
-      (selections.taxCode || selections.personalTaxCode)
-    ) {
-      return 'ONBOARDING_GET_VISURA_INFOCAMERE_BY_CF';
-    }
-
-    return 'ONBOARDING_GET_PARTY_FROM_CF';
-  };
-
-  const executeSearch = (
-    value: string,
-    selections: SelectionsState,
-    params: InstitutionSearchParams,
-    addUser: boolean,
-    institutionType: string | undefined,
-    product: Product | null | undefined
-    // eslint-disable-next-line complexity, sonarjs/cognitive-complexity
-  ) => {
-    if (value.length >= 3 && selections.businessName && !selections.taxCode) {
-      return searchByBusinessName(value, institutionType);
-    }
-
-    const isValidTaxCode = selections.taxCode && value.length === 11;
-    const isValidIvassCode = selections.ivassCode && value.length === 5;
-    const isValidPersonalTaxCode = selections.personalTaxCode && value.length === 16;
-
-    if (isValidTaxCode || isValidIvassCode || isValidPersonalTaxCode) {
-      if (
-        isContractingAuthority(institutionType as InstitutionType) ||
-        isInsuranceCompany(institutionType as InstitutionType)
-      ) {
-        const endpoint = addUser
-          ? 'ONBOARDING_GET_INSTITUTIONS'
-          : isContractingAuthority(institutionType as InstitutionType)
-            ? 'ONBOARDING_GET_SA_PARTY_FROM_FC'
-            : 'ONBOARDING_GET_INSURANCE_COMPANIES_FROM_IVASSCODE';
-
-        return contractingInsuranceFromTaxId(
-          addUser,
-          endpoint,
-          params,
-          value,
-          institutionType as InstitutionType,
-          setApiLoading,
-          setCfResult,
-          setRequiredLogin
-        );
-      } else {
-        const endpoint = getSearchEndpoint(addUser, institutionType, product, selections);
-        return handleSearchByTaxCode(addUser, endpoint, params, value);
-      }
-    }
-
-    if (selections.aooCode && !selections.uoCode && value.length === 7) {
-      const endpoint = addUser ? 'ONBOARDING_GET_INSTITUTIONS' : 'ONBOARDING_GET_AOO_CODE_INFO';
-      return handleSearchByAooCode(
-        value,
-        setAooResult,
-        setAooResultHistory,
-        setRequiredLogin,
-        setApiLoading,
+    if (isContractingAuthority(institutionType) || isInsuranceCompany(institutionType)) {
+      return contractingInsuranceFromTaxId(
         addUser,
-        endpoint,
-        params,
-        filterCategories as string
-      );
-    }
-
-    if (selections.uoCode && !selections.aooCode && value.length === 6) {
-      const endpoint = addUser ? 'ONBOARDING_GET_INSTITUTIONS' : 'ONBOARDING_GET_UO_CODE_INFO';
-      return handleSearchByUoCode(
-        value,
-        setUoResult,
-        setUoResultHistory,
-        setRequiredLogin,
-        setApiLoading,
-        addUser,
-        endpoint,
-        params,
-        filterCategories as string
-      );
-    }
-
-    if (selections.reaCode && value.length >= 4) {
-      const endpoint = addUser
-        ? 'ONBOARDING_GET_INSTITUTIONS'
-        : 'ONBOARDING_GET_VISURA_INFOCAMERE_BY_REA';
-      return handleSearchByReaCode(
-        addUser,
-        endpoint,
+        taxIdEndpoint,
         params,
         value,
+        institutionType,
         setApiLoading,
         setCfResult,
-        setDisabled,
-        setRequiredLogin,
-        product ?? undefined,
-        filterCategories,
-        disabledStatusCompany,
-        setMerchantSearchResult
+        setRequiredLogin
       );
     }
+    return handleSearchByTaxCode(addUser, taxIdEndpoint, params, value);
+  };
 
+  const searchByAooCode = (value: string, params: InstitutionSearchParams) =>
+    handleSearchByAooCode(
+      value,
+      setAooResult,
+      setAooResultHistory,
+      setRequiredLogin,
+      setApiLoading,
+      addUser,
+      addUser ? 'ONBOARDING_GET_INSTITUTIONS' : 'ONBOARDING_GET_AOO_CODE_INFO',
+      params,
+      filterCategories as string
+    );
+
+  const searchByUoCode = (value: string, params: InstitutionSearchParams) =>
+    handleSearchByUoCode(
+      value,
+      setUoResult,
+      setUoResultHistory,
+      setRequiredLogin,
+      setApiLoading,
+      addUser,
+      addUser ? 'ONBOARDING_GET_INSTITUTIONS' : 'ONBOARDING_GET_UO_CODE_INFO',
+      params,
+      filterCategories as string
+    );
+
+  const searchByReaCode = (value: string, params: InstitutionSearchParams) =>
+    handleSearchByReaCode(
+      addUser,
+      addUser ? 'ONBOARDING_GET_INSTITUTIONS' : 'ONBOARDING_GET_VISURA_INFOCAMERE_BY_REA',
+      params,
+      value,
+      setApiLoading,
+      setCfResult,
+      setDisabled,
+      setRequiredLogin,
+      product ?? undefined,
+      filterCategories,
+      disabledStatusCompany,
+      setMerchantSearchResult
+    );
+
+  const executeSearch = (value: string, params: InstitutionSearchParams) => {
+    if (isBusinessNameSearch(selections, value)) {
+      return searchByBusinessName(value);
+    }
+    if (isTaxIdSearch(selections, value)) {
+      return searchByTaxId(value, params);
+    }
+    if (selections.aooCode && !selections.uoCode && value.length === 7) {
+      return searchByAooCode(value, params);
+    }
+    if (selections.uoCode && !selections.aooCode && value.length === 6) {
+      return searchByUoCode(value, params);
+    }
+    if (selections.reaCode && value.length >= 4) {
+      return searchByReaCode(value, params);
+    }
     return null;
   };
 
@@ -441,6 +443,56 @@ export default function AsyncAutocompleteContainer({
     setSelected(null);
   };
 
+  const renderBusinessNameResults = () => {
+    switch (getBusinessNameResultsStatus(input, options.length, selected)) {
+      case 'results':
+        return (
+          <AsyncAutocompleteResultsBusinessName
+            setSelected={setSelected}
+            options={options}
+            setOptions={setOptions}
+            apiLoading={apiLoading}
+            getOptionLabel={getOptionLabel}
+            getOptionKey={getOptionKey}
+          />
+        );
+      case 'tooShort':
+        return (
+          <AsyncAutocompleteStatusMessage label={t('asyncAutocomplete.lessThen3CharacterLabel')} />
+        );
+      case 'noResults':
+        return <AsyncAutocompleteStatusMessage label={t('asyncAutocomplete.noResultsLabel')} />;
+      default:
+        return null;
+    }
+  };
+
+  const renderCodeResults = () => {
+    const status = getCodeResultsStatus(input, options.length, selected, selections, [
+      cfResult,
+      uoResult,
+      aooResult,
+    ]);
+    if (status === 'results') {
+      return (
+        <AsyncAutocompleteResultsCode
+          setSelected={setSelected}
+          cfResult={cfResult}
+          setCfResult={setCfResult}
+          apiLoading={apiLoading}
+          getOptionLabel={getOptionLabel}
+          getOptionKey={getOptionKey}
+          aooResult={aooResult}
+          uoResult={uoResult}
+          selections={selections}
+        />
+      );
+    }
+    return status === 'noResults' ? (
+      <AsyncAutocompleteStatusMessage label={t('asyncAutocomplete.noResultsLabel')} />
+    ) : null;
+  };
+
   return (
     <>
       <Grid
@@ -450,7 +502,7 @@ export default function AsyncAutocompleteContainer({
         justifyContent="center"
         width="100%"
         pt={selected ? 4 : 3}
-        pb={input?.length === 0 || selected ? 4 : 0}
+        pb={input.length === 0 || selected ? 4 : 0}
       >
         {selected && (
           <Box display="flex" alignItems="center">
@@ -485,96 +537,9 @@ export default function AsyncAutocompleteContainer({
         xs={12}
         display="flex"
         justifyContent="center"
-        sx={{ height: showBusinessNameElement && options?.length > 0 ? '232px' : undefined }}
+        sx={{ height: showBusinessNameElement && options.length > 0 ? '232px' : undefined }}
       >
-        {selections.businessName ? (
-          <>
-            {options && showBusinessNameElement && options.length > 0 ? (
-              <AsyncAutocompleteResultsBusinessName
-                setSelected={setSelected}
-                options={options}
-                setOptions={setOptions}
-                apiLoading={apiLoading}
-                getOptionLabel={getOptionLabel}
-                getOptionKey={getOptionKey}
-              />
-            ) : input.length >= 1 && input.length < 3 ? (
-              <Box
-                role="status"
-                aria-live="polite"
-                display="flex"
-                sx={{ jusifyContent: 'start' }}
-                width="100%"
-                mx={4}
-              >
-                <Typography py={3} sx={{ fontSize: '18px', fontWeight: 'fontWeightBold' }}>
-                  {t('asyncAutocomplete.lessThen3CharacterLabel')}
-                </Typography>
-              </Box>
-            ) : (
-              input.length >= 3 &&
-              options.length === 0 &&
-              !selected && (
-                <Box
-                  role="status"
-                  aria-live="polite"
-                  display="flex"
-                  sx={{ jusifyContent: 'start' }}
-                  width="100%"
-                  mx={4}
-                >
-                  <Typography py={3} sx={{ fontSize: '18px', fontWeight: 'fontWeightBold' }}>
-                    {t('asyncAutocomplete.noResultsLabel')}
-                  </Typography>
-                </Box>
-              )
-            )}
-          </>
-        ) : (
-          <>
-            {(selections.taxCode ||
-              selections.aooCode ||
-              selections.uoCode ||
-              selections.ivassCode ||
-              selections.reaCode ||
-              selections.personalTaxCode) &&
-            !selections.businessName &&
-            input !== undefined &&
-            input?.length >= 5 &&
-            !selected &&
-            (cfResult || uoResult || aooResult) ? (
-              <AsyncAutocompleteResultsCode
-                setSelected={setSelected}
-                cfResult={cfResult}
-                setCfResult={setCfResult}
-                apiLoading={apiLoading}
-                getOptionLabel={getOptionLabel}
-                getOptionKey={getOptionKey}
-                aooResult={aooResult}
-                uoResult={uoResult}
-                selections={selections}
-              />
-            ) : (
-              input.length >= 1 &&
-              options.length === 0 &&
-              (!cfResult || !aooResult || !uoResult) &&
-              !selected && (
-                <Box
-                  role="status"
-                  aria-live="polite"
-                  display="flex"
-                  sx={{ jusifyContent: 'start' }}
-                  width="100%"
-                  mx={4}
-                >
-                  <Typography py={3} sx={{ fontSize: '18px', fontWeight: 'fontWeightBold' }}>
-                    {t('asyncAutocomplete.noResultsLabel')}
-                  </Typography>
-                </Box>
-              )
-            )}
-          </>
-        )}
+        {selections.businessName ? renderBusinessNameResults() : renderCodeResults()}
       </Grid>
     </>
   );
