@@ -90,7 +90,7 @@ export const getOnboardingInstitutionInfo = async (
 
 export const getOnboardingInfo = async (
   onboardingId: string,
-  setInstitutionId: Dispatch<SetStateAction<any>>,
+  setInstitutionId: Dispatch<SetStateAction<string | undefined>>,
   setLoading: Dispatch<SetStateAction<boolean>>,
   setOutcomeContentState: Dispatch<SetStateAction<RequestOutcomeComplete | null>>
 ) => {
