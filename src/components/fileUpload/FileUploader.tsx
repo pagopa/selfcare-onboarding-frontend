@@ -1,5 +1,6 @@
 import { Grid, Typography, Theme, Link } from '@mui/material';
-import { Accept, DropEvent, FileRejection, useDropzone } from 'react-dropzone';
+import { MouseEvent } from 'react';
+import { Accept, DropEvent, DropzoneRootProps, FileRejection, useDropzone } from 'react-dropzone';
 import { Box } from '@mui/system';
 import CloudUpload from '../../assets/cloud-upload.svg?react';
 import { FileUploadedPreview } from './FileUploadedPreview';
@@ -8,7 +9,7 @@ type FileUploaderOption = {
   title: string;
   descriptionLink?: string;
   uploadedFiles: Array<File>;
-  deleteUploadedFiles?: (event: any | undefined) => void;
+  deleteUploadedFiles?: (event: MouseEvent<HTMLElement>) => void;
   onDropAccepted?: (t: Array<File>) => void;
   onDropRejected?: (fileRejections: Array<FileRejection>, event?: DropEvent) => void;
   maxFiles?: number;
@@ -38,7 +39,7 @@ export function FileUploader({
     accept: accept ? accept : undefined,
   });
 
-  const dropzoneRootProps = getRootProps({ className: 'dropzone' });
+  const dropzoneRootProps = getRootProps<DropzoneRootProps>({ className: 'dropzone' });
   return (
     <Grid
       {...dropzoneRootProps}
@@ -107,7 +108,7 @@ export function FileUploader({
               >
                 {title}
               </Typography>
-              <Link component="button" variant="body2" onClick={(dropzoneRootProps as any).onClick}>
+              <Link component="button" variant="body2" onClick={dropzoneRootProps.onClick}>
                 {descriptionLink}
               </Link>
             </Grid>
