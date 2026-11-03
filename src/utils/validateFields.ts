@@ -184,10 +184,91 @@ const validateFieldWithPattern = (
   value: string | undefined,
   pattern: RegExp,
   errorMessage: string
-) => (value && !pattern.test(value as string) ? errorMessage : undefined);
+) => (value && !pattern.test(value) ? errorMessage : undefined);
 
-/* eslint-disable sonarjs/cognitive-complexity */
-/* eslint-disable complexity */
+export const validateRea = (rea: string | undefined, isRequired: boolean, t: TFunction) =>
+  isRequired && !rea
+    ? requiredError
+    : validateFieldWithPattern(
+        rea,
+        reaValidation,
+        t('onboardingFormData.billingDataSection.invalidReaField')
+      );
+
+export const validateShareCapital = (
+  shareCapital: string | undefined,
+  isRequired: boolean,
+  t: TFunction
+) =>
+  isRequired && !shareCapital
+    ? requiredError
+    : validateFieldWithPattern(
+        shareCapital,
+        currencyField,
+        t('onboardingFormData.billingDataSection.invalidShareCapitalField')
+      );
+
+// A missing or malformed tax code for invoicing is reported as required, as the field is mandatory for UOs
+export const validateTaxCodeInvoicing = (
+  taxCodeInvoicing: string | undefined,
+  isRequired: boolean,
+  isInvalid: boolean,
+  t: TFunction
+) => {
+  if (isRequired && (!taxCodeInvoicing || !fiscalAndVatCodeRegexp.test(taxCodeInvoicing))) {
+    return requiredError;
+  }
+  return isInvalid ? t('onboardingFormData.billingDataSection.invalidTaxCodeInvoicing') : undefined;
+};
+
+export const validateSupportEmail = (
+  supportEmail: string | undefined,
+  isRequired: boolean,
+  t: TFunction
+) => {
+  if (isRequired && !supportEmail) {
+    return requiredError;
+  }
+  return supportEmail && !emailRegexp.test(supportEmail)
+    ? t('onboardingFormData.billingDataSection.invalidMailSupport')
+    : undefined;
+};
+
+export const validatePspSection = (
+  values: Partial<OnboardingFormData>,
+  isPaymentServiceProvider: boolean,
+  t: TFunction
+) => ({
+  commercialRegisterNumber: validatePspField(
+    values.commercialRegisterNumber,
+    isPaymentServiceProvider,
+    commercialRegisterNumberRegexp,
+    'onboardingFormData.billingDataSection.pspDataSection.invalidCommercialRegisterNumber',
+    t
+  ),
+  registrationInRegister: validateConditionalRequired(
+    values.registrationInRegister,
+    isPaymentServiceProvider
+  ),
+  address: validateConditionalRequired(values.address, isPaymentServiceProvider),
+  registerNumber: validatePspField(
+    values.registerNumber,
+    isPaymentServiceProvider,
+    numericField,
+    'onboardingFormData.billingDataSection.pspDataSection.invalidregisterNumber',
+    t
+  ),
+  abiCode: validatePspField(
+    values.abiCode,
+    isPaymentServiceProvider,
+    fiveCharactersAllowed,
+    'onboardingFormData.billingDataSection.pspDataSection.invalidabiCode',
+    t
+  ),
+  email: isPaymentServiceProvider ? validateEmail(values.email, t) : undefined,
+  pec: isPaymentServiceProvider ? validateEmail(values.pec, t) : undefined,
+});
+
 export const validateFields = (
   values: Partial<OnboardingFormData>,
   t: TFunction<'translation', undefined>,
@@ -226,60 +307,19 @@ export const validateFields = (
       values.businessRegisterPlace,
       isRequiredForSaOrPrivate
     ),
-    rea:
-      isRequiredForInfoCompany && !values.rea
-        ? requiredError
-        : validateFieldWithPattern(
-            values.rea,
-            reaValidation,
-            t('onboardingFormData.billingDataSection.invalidReaField')
-          ),
-    shareCapital:
-      (isContractingAuthority(institutionType) || isPdndPrivate) && !values.shareCapital
-        ? requiredError
-        : validateFieldWithPattern(
-            values.shareCapital,
-            currencyField,
-            t('onboardingFormData.billingDataSection.invalidShareCapitalField')
-          ),
-    commercialRegisterNumber: validatePspField(
-      values.commercialRegisterNumber,
-      isPaymentServiceProvider,
-      commercialRegisterNumberRegexp,
-      'onboardingFormData.billingDataSection.pspDataSection.invalidCommercialRegisterNumber',
+    rea: validateRea(values.rea, isRequiredForInfoCompany, t),
+    shareCapital: validateShareCapital(
+      values.shareCapital,
+      isContractingAuthority(institutionType) || isPdndPrivate,
       t
     ),
-    registrationInRegister: validateConditionalRequired(
-      values.registrationInRegister,
-      isPaymentServiceProvider
-    ),
-    address: validateConditionalRequired(values.address, isPaymentServiceProvider),
-    registerNumber: validatePspField(
-      values.registerNumber,
-      isPaymentServiceProvider,
-      numericField,
-      'onboardingFormData.billingDataSection.pspDataSection.invalidregisterNumber',
+    ...validatePspSection(values, isPaymentServiceProvider, t),
+    taxCodeInvoicing: validateTaxCodeInvoicing(
+      values.taxCodeInvoicing,
+      isInvoiceable && !!uoSelected,
+      invalidTaxCodeInvoicing,
       t
     ),
-    abiCode: validatePspField(
-      values.abiCode,
-      isPaymentServiceProvider,
-      fiveCharactersAllowed,
-      'onboardingFormData.billingDataSection.pspDataSection.invalidabiCode',
-      t
-    ),
-    email: isPaymentServiceProvider ? validateEmail(values.email, t) : undefined,
-    pec: isPaymentServiceProvider ? validateEmail(values.pec, t) : undefined,
-    taxCodeInvoicing:
-      isInvoiceable &&
-      uoSelected &&
-      (!values.taxCodeInvoicing ||
-        (values.taxCodeInvoicing && !fiscalAndVatCodeRegexp.test(values.taxCodeInvoicing)))
-        ? requiredError
-        : invalidTaxCodeInvoicing
-          ? t('onboardingFormData.billingDataSection.invalidTaxCodeInvoicing')
-          : undefined,
-
     recipientCode: validateRecipientCode(
       values.recipientCode,
       isInvoiceable,
@@ -289,12 +329,11 @@ export const validateFields = (
       subProductId
     ),
     geographicTaxonomies: validateGeographicTaxonomies(values, isPremium, institutionAvoidGeotax),
-    supportEmail:
-      !institutionAvoidGeotax && !values.supportEmail && productId === PRODUCT_IDS.IO_SIGN
-        ? requiredError
-        : !emailRegexp.test(values.supportEmail as string) && values.supportEmail
-          ? t('onboardingFormData.billingDataSection.invalidMailSupport')
-          : undefined,
+    supportEmail: validateSupportEmail(
+      values.supportEmail,
+      !institutionAvoidGeotax && productId === PRODUCT_IDS.IO_SIGN,
+      t
+    ),
   };
 
   return Object.entries(validationRules).filter(([_key, value]) => value);
