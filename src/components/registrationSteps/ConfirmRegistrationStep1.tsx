@@ -18,8 +18,11 @@ export function ConfirmRegistrationStep1(
   addUserFlow: boolean,
   translationKeyValue: string,
   { forward, back }: StepperStepComponentProps,
-  { loading }: any,
-  { uploadedFiles, setUploadedFiles }: any,
+  { loading }: { loading: boolean },
+  {
+    uploadedFiles,
+    setUploadedFiles,
+  }: { uploadedFiles: Array<File>; setUploadedFiles: (files: Array<File>) => void },
   contractUpdate = false
 ) {
   const { t } = useTranslation();
