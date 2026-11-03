@@ -1,5 +1,5 @@
 import { SetStateAction } from 'react';
-import { InstitutionType, Product, RequestOutcomeMessage } from '../../../../types';
+import { InstitutionType, Product, RequestOutcomeMessage, UserOnCreate } from '../../../../types';
 import { AdditionalGpuInformations } from '../../../model/AdditionalGpuInformations';
 import { AdditionalInformations } from '../../../model/AdditionalInformations';
 import { AggregateInstitution } from '../../../model/AggregateInstitution';
@@ -219,11 +219,11 @@ const selectParty = (
   );
 };
 
-type UsersFormData = { users?: Array<{ taxCode?: string }> };
+type UsersFormData = { users?: Array<UserOnCreate> };
 
-export const usersOf = (
-  formData: Partial<FormData> | undefined
-): Array<{ taxCode?: string }> | undefined => (formData as UsersFormData | undefined)?.users;
+export const usersOf = (formData: Partial<FormData> | undefined): Array<UserOnCreate> | undefined =>
+  // the form data is stored as Partial<FormData> (DOM type) but holds the users collected by the steps
+  (formData as UsersFormData | undefined)?.users;
 
 /** Manager and admins steps: merge the users into the form data and move on. */
 const submitUsers = (

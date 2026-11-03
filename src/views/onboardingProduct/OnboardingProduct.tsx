@@ -39,6 +39,7 @@ import { genericError, StepVerifyOnboarding } from './components/StepVerifyOnboa
 import StepContractsSummary from './components/contracts/StepContractsSummary';
 import { buildFlowContext } from './state/flowContext';
 import { normalizeUsers } from './state/normalizeUsers';
+import { usersOf } from './state/onboardingProductReducer';
 import { OnboardingStepName } from './state/onboardingSteps';
 import { selectFilterCategories as selectFilterCategoriesFor } from './state/selectFilterCategories';
 import { buildNotAllowedError, buildOutcomeContent } from './outcomes/onboardingProductOutcomes';
@@ -166,10 +167,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     }
     const data = userData ?? formData;
     // same unchecked contract as before: postOnboardingSubmit expects the users list to be set
-    const users = normalizeUsers(
-      (data as any).users as Array<UserOnCreate>,
-      institutionType
-    ) as Array<UserOnCreate>;
+    const users = normalizeUsers(usersOf(data), institutionType) as Array<UserOnCreate>;
 
     postOnboardingSubmit(
       setLoading,
@@ -463,13 +461,11 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           externalInstitutionId,
           addUserFlow: addUser,
           product: selectedProduct,
-          legal: isTechPartner(institutionType) ? undefined : (formData as any)?.users[0],
+          legal: isTechPartner(institutionType) ? undefined : usersOf(formData)?.[0],
           partyName,
           isTechPartner: isTechPartner(institutionType),
           isAggregator: onboardingFormData?.isAggregator,
-          isAddApplicationEmail: (formData as any)?.users?.every(
-            (u: UserOnCreate) => u.taxCode !== user?.taxCode
-          ),
+          isAddApplicationEmail: usersOf(formData)?.every((u) => u.taxCode !== user?.taxCode),
           // GSP non-IPA: skip the pre-submit confirmation modal — it moves to the end of the
           // document upload flow instead.
           isRequiredDocumentsFlow,
