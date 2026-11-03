@@ -48,10 +48,8 @@ const contractUpdateErrors: Partial<
   alreadyRejected: { variant: 'cancelled' },
 };
 
-const getContractUpdateError = (
-  contractUpdate: boolean,
-  outcome: RequestOutcomeComplete | null
-) => (contractUpdate ? contractUpdateErrors[outcome ?? 'error'] : undefined);
+const getContractUpdateError = (contractUpdate: boolean, outcome: RequestOutcomeComplete | null) =>
+  contractUpdate ? contractUpdateErrors[outcome ?? 'error'] : undefined;
 
 export const transcodeErrorCode = (data: Problem): keyof typeof customErrors => {
   if (data.errors?.findIndex((e) => error2errorCode.INVALID_DOCUMENT.includes(e.code)) > -1) {
@@ -186,21 +184,20 @@ export default function CompleteRequestComponent() {
   };
 
   const uploadContract = () =>
-    onboardingContractUpload(
-      uploadedFiles[0],
-      setLoading,
+    onboardingContractUpload(uploadedFiles[0], {
       onboardingId,
       requestData,
       addUserFlow,
-      setOutcomeContentState,
+      attachmentName: attachments ? 'Addendum' : undefined,
       lastFileErrorAttempt,
+      setLoading,
+      setOutcomeContentState,
       setLastFileErrorAttempt,
       setOpen,
       setErrorCode,
       transcodeErrorCode,
-      attachments ? 'Addendum' : undefined,
-      () => setAttachmentUploadSuccess(true)
-    );
+      onAttachmentSuccess: () => setAttachmentUploadSuccess(true),
+    });
 
   const steps: Array<StepperStep> = [
     {

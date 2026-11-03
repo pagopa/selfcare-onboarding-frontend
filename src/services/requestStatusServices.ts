@@ -37,108 +37,115 @@ export const deleteRequest =
     }
   };
 
-export const onboardingContractUpload = async (
-  file: File,
-  setLoading: Dispatch<SetStateAction<boolean>>,
-  onboardingId: string | undefined,
-  requestData: Pick<OnboardingVerify, 'productId'> | undefined,
-  addUserFlow: boolean,
-  setOutcomeContentState: Dispatch<SetStateAction<RequestOutcomeComplete | null>>,
-  lastFileErrorAttempt: FileErrorAttempt | undefined,
-  setLastFileErrorAttempt: Dispatch<SetStateAction<FileErrorAttempt | undefined>>,
-  setOpen: Dispatch<SetStateAction<boolean>>,
-  setErrorCode: Dispatch<
-    SetStateAction<
-      'GENERIC' | 'INVALID_DOCUMENT' | 'INVALID_SIGN' | 'INVALID_SIGN_FORMAT' | 'ALREADY_ONBOARDED'
-    >
-  >,
-  transcodeErrorCode: (data: Problem) => keyof typeof customErrors,
-  attachmentName?: string,
-  onAttachmentSuccess?: () => void
-  // eslint-disable-next-line sonarjs/cognitive-complexity
-) => {
-  const isAttachment = !!attachmentName;
+export type UploadContext = {
+  onboardingId: string | undefined;
+  requestData: Pick<OnboardingVerify, 'productId'> | undefined;
+  addUserFlow: boolean;
+  attachmentName?: string;
+  lastFileErrorAttempt: FileErrorAttempt | undefined;
+  setLoading: Dispatch<SetStateAction<boolean>>;
+  setOutcomeContentState: Dispatch<SetStateAction<RequestOutcomeComplete | null>>;
+  setLastFileErrorAttempt: Dispatch<SetStateAction<FileErrorAttempt | undefined>>;
+  setOpen: Dispatch<SetStateAction<boolean>>;
+  setErrorCode: Dispatch<SetStateAction<keyof typeof customErrors>>;
+  transcodeErrorCode: (data: Problem) => keyof typeof customErrors;
+  onAttachmentSuccess?: () => void;
+};
+
+const uploadByKind = (file: File, { onboardingId, addUserFlow, attachmentName }: UploadContext) => {
+  if (attachmentName) {
+    return OnboardingApi.uploadAttachment(onboardingId as string, attachmentName, file);
+  }
+  return addUserFlow
+    ? OnboardingApi.completeUsersOnboardingContract(onboardingId as string, file)
+    : OnboardingApi.completeOnboardingContract(onboardingId as string, file);
+};
+
+export const getSuccessEvent = (isAttachment: boolean, addUserFlow: boolean) => {
+  if (isAttachment) {
+    return 'ONBOARDING_ATTACHMENT_SUCCESS';
+  }
+  return addUserFlow ? 'ONBOARDING_USER_COMPLETED' : 'ONBOARDING_SUCCESS';
+};
+
+export const nextFileErrorAttempt = (
+  last: FileErrorAttempt | undefined,
+  file: File
+): { attempt: FileErrorAttempt; repeated: boolean } => {
+  const repeated =
+    !!last &&
+    last.fileName === file.name &&
+    last.fileSize === file.size &&
+    last.fileLastModifyDate === file.lastModified;
+
+  return repeated
+    ? { attempt: { ...last, errorCount: last.errorCount + 1 }, repeated }
+    : {
+        attempt: {
+          fileName: file.name,
+          fileSize: file.size,
+          fileLastModifyDate: file.lastModified,
+          errorCount: 1,
+        },
+        repeated,
+      };
+};
+
+const getFailureEvent = (isAttachment: boolean, isProblem: boolean) => {
+  if (isAttachment) {
+    return 'ONBOARDING_ATTACHMENT_FAILURE';
+  }
+  return isProblem ? 'ONBOARDING_CONTRACT_FAILURE' : 'ONBOARDING_FAILURE';
+};
+
+const handleUploadError = (error: unknown, file: File, requestId: string, ctx: UploadContext) => {
+  const isAttachment = !!ctx.attachmentName;
+  ctx.setLoading(false);
+
+  const { attempt, repeated } = nextFileErrorAttempt(ctx.lastFileErrorAttempt, file);
+  ctx.setLastFileErrorAttempt(attempt);
+  if (repeated && attempt.errorCount > ENV.UPLOAD_CONTRACT_MAX_LOOP_ERROR) {
+    ctx.setOpen(false);
+    ctx.setOutcomeContentState('error');
+  }
+
+  const errorBody = (error as HttpError).httpBody as Problem | undefined;
+  const problem = getErrorStatus(error) === 400 ? errorBody : undefined;
+  ctx.setOpen(true);
+  trackEvent(getFailureEvent(isAttachment, !!problem), {
+    request_id: requestId,
+    party_id: ctx.onboardingId,
+  });
+  ctx.setErrorCode(problem ? ctx.transcodeErrorCode(problem) : 'GENERIC');
+};
+
+export const onboardingContractUpload = async (file: File, ctx: UploadContext) => {
+  const isAttachment = !!ctx.attachmentName;
   const requestId = uniqueId(isAttachment ? 'upload-attachment-' : 'upload-contract-');
   trackEvent(isAttachment ? 'ONBOARDING_ATTACHMENT_UPLOAD' : 'ONBOARDING_CONTRACT_UPLOAD', {
     request_id: requestId,
-    party_id: onboardingId,
+    party_id: ctx.onboardingId,
   });
 
-  setLoading(true);
+  ctx.setLoading(true);
 
   try {
-    if (isAttachment) {
-      await OnboardingApi.uploadAttachment(onboardingId as string, attachmentName as string, file);
-    } else if (addUserFlow) {
-      await OnboardingApi.completeUsersOnboardingContract(onboardingId as string, file);
-    } else {
-      await OnboardingApi.completeOnboardingContract(onboardingId as string, file);
-    }
-
-    setLoading(false);
-
-    const getSuccessEvent = () => {
-      if (isAttachment) {
-        return 'ONBOARDING_ATTACHMENT_SUCCESS';
-      } else if (addUserFlow) {
-        return 'ONBOARDING_USER_COMPLETED';
-      } else {
-        return 'ONBOARDING_SUCCESS';
-      }
-    };
-    trackEvent(getSuccessEvent(), {
-      request_id: requestId,
-      party_id: onboardingId,
-      product_id: requestData?.productId,
-      form: addUserFlow ? 'onboarding/dashboard' : undefined,
-    });
-    if (isAttachment && onAttachmentSuccess) {
-      onAttachmentSuccess();
-    } else {
-      setOutcomeContentState('success');
-    }
+    await uploadByKind(file, ctx);
   } catch (error) {
-    setLoading(false);
+    handleUploadError(error, file, requestId, ctx);
+    return;
+  }
 
-    if (
-      lastFileErrorAttempt &&
-      lastFileErrorAttempt.fileName === file.name &&
-      lastFileErrorAttempt.fileSize === file.size &&
-      lastFileErrorAttempt.fileLastModifyDate === file.lastModified
-    ) {
-      const errorCount = lastFileErrorAttempt.errorCount + 1;
-      setLastFileErrorAttempt({
-        ...lastFileErrorAttempt,
-        errorCount,
-      });
-      if (errorCount > ENV.UPLOAD_CONTRACT_MAX_LOOP_ERROR) {
-        setOpen(false);
-        setOutcomeContentState('error');
-      }
-    } else {
-      setLastFileErrorAttempt({
-        fileName: file.name,
-        fileSize: file.size,
-        fileLastModifyDate: file.lastModified,
-        errorCount: 1,
-      });
-    }
-
-    const errorBody = (error as HttpError).httpBody as Problem | undefined;
-    if (getErrorStatus(error) === 400 && errorBody) {
-      setOpen(true);
-      trackEvent(isAttachment ? 'ONBOARDING_ATTACHMENT_FAILURE' : 'ONBOARDING_CONTRACT_FAILURE', {
-        request_id: requestId,
-        party_id: onboardingId,
-      });
-      setErrorCode(transcodeErrorCode(errorBody));
-    } else {
-      setOpen(true);
-      trackEvent(isAttachment ? 'ONBOARDING_ATTACHMENT_FAILURE' : 'ONBOARDING_FAILURE', {
-        request_id: requestId,
-        party_id: onboardingId,
-      });
-      setErrorCode('GENERIC');
-    }
+  ctx.setLoading(false);
+  trackEvent(getSuccessEvent(isAttachment, ctx.addUserFlow), {
+    request_id: requestId,
+    party_id: ctx.onboardingId,
+    product_id: ctx.requestData?.productId,
+    form: ctx.addUserFlow ? 'onboarding/dashboard' : undefined,
+  });
+  if (isAttachment && ctx.onAttachmentSuccess) {
+    ctx.onAttachmentSuccess();
+  } else {
+    ctx.setOutcomeContentState('success');
   }
 };
