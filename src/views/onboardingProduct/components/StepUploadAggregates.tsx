@@ -74,16 +74,17 @@ export function StepUploadAggregates({
       return;
     }
 
-    // eslint-disable-next-line functional/immutable-data
-    const orderedErrorJson = errorJson.sort((a, b) => a.row - b.row);
+    const orderedErrorJson = [...errorJson].sort((a, b) => (a.riga ?? 0) - (b.riga ?? 0));
 
-    const replacer = (_key: any, value: any) => (value === null ? '' : value);
+    const replacer = (_key: string, value: unknown) => (value === null ? '' : value);
     const header = Object.keys(orderedErrorJson[0]);
 
     const csv = [
       header.join(','),
-      ...orderedErrorJson.map((row: any) =>
-        header.map((fieldName) => JSON.stringify(row[fieldName], replacer)).join(',')
+      ...orderedErrorJson.map((row) =>
+        header
+          .map((fieldName) => JSON.stringify(row[fieldName as keyof RowError], replacer))
+          .join(',')
       ),
     ].join('\r\n');
 

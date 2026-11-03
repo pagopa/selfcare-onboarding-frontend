@@ -78,7 +78,7 @@ test('a valid csv is verified and forwarded with the aggregates', async () => {
   expect(OnboardingApi.verifyAggregatesCsv).toHaveBeenCalledWith(csv, 'prod-io', 'PA');
 });
 
-test('row errors show the report alert with a downloadable csv', async () => {
+test('row errors show the report alert with a downloadable csv sorted by row', async () => {
   vi.mocked(OnboardingApi.verifyAggregatesCsv).mockResolvedValue({
     errors: [
       { riga: 3, 'codice fiscale': 'CF3', errore: null },
@@ -105,7 +105,7 @@ test('row errors show the report alert with a downloadable csv', async () => {
     reader.onload = () => resolve(reader.result as string);
     reader.readAsText(blob);
   });
-  expect(text.split('\r\n')).toEqual(['riga,codice fiscale,errore', '3,"CF3",""', '2,"CF2","bad"']);
+  expect(text.split('\r\n')).toEqual(['riga,codice fiscale,errore', '2,"CF2","bad"', '3,"CF3",""']);
 });
 
 test('a failing verification sets the generic outcome', async () => {
