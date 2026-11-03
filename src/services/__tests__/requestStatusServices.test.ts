@@ -1,6 +1,7 @@
-import { it, expect, vi, beforeEach } from 'vitest';
+import { it, expect, vi, beforeEach, describe } from 'vitest';
 import { OnboardingApi } from '../../api/OnboardingApiClient';
 import { deleteRequest, onboardingContractUpload } from '../requestStatusServices';
+import { ENV } from '../../utils/env';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
 
 vi.mock('../../api/OnboardingApiClient', () => ({
@@ -104,9 +105,7 @@ it('test onboardingContractUpload attachment success calls onAttachmentSuccess',
   vi.mocked(OnboardingApi.uploadAttachment).mockResolvedValue(undefined);
   const onAttachmentSuccess = vi.fn();
 
-  await onboardingContractUpload(
-    ...uploadArgs({ attachmentName: 'doc.pdf', onAttachmentSuccess })
-  );
+  await onboardingContractUpload(...uploadArgs({ attachmentName: 'doc.pdf', onAttachmentSuccess }));
 
   expect(OnboardingApi.uploadAttachment).toHaveBeenCalledWith('onboarding-1', 'doc.pdf', file);
   expect(onAttachmentSuccess).toHaveBeenCalled();
@@ -139,4 +138,74 @@ it('test onboardingContractUpload generic error sets GENERIC', async () => {
   expect(transcodeErrorCode).not.toHaveBeenCalled();
   expect(setErrorCode).toHaveBeenCalledWith('GENERIC');
   expect(trackEvent).toHaveBeenCalledWith('ONBOARDING_FAILURE', expect.any(Object));
+});
+it('test onboardingContractUpload attachment and add-user flows pick the right api and events', async () => {
+  vi.mocked(OnboardingApi.completeUsersOnboardingContract).mockResolvedValue(undefined);
+
+  await onboardingContractUpload(...uploadArgs({ addUserFlow: true }));
+
+  expect(OnboardingApi.completeUsersOnboardingContract).toHaveBeenCalledWith('onboarding-1', file);
+  expect(trackEvent).toHaveBeenCalledWith(
+    'ONBOARDING_USER_COMPLETED',
+    expect.objectContaining({ form: 'onboarding/dashboard' })
+  );
+});
+
+it('test onboardingContractUpload attachment failure tracks the attachment failure event', async () => {
+  vi.mocked(OnboardingApi.uploadAttachment).mockRejectedValue(
+    Object.assign(new Error('boom'), { httpStatus: 500 })
+  );
+
+  await onboardingContractUpload(...uploadArgs({ attachmentName: 'doc.pdf' }));
+
+  expect(trackEvent).toHaveBeenCalledWith('ONBOARDING_ATTACHMENT_FAILURE', expect.any(Object));
+  expect(setErrorCode).toHaveBeenCalledWith('GENERIC');
+});
+
+describe('onboardingContractUpload repeated failures on the same file', () => {
+  const sameFileAttempt = (errorCount: number) => ({
+    fileName: file.name,
+    fileSize: file.size,
+    fileLastModifyDate: file.lastModified,
+    errorCount,
+  });
+
+  beforeEach(() => {
+    vi.mocked(OnboardingApi.completeOnboardingContract).mockRejectedValue(
+      Object.assign(new Error('boom'), { httpStatus: 500 })
+    );
+  });
+
+  it('first failure stores an attempt with errorCount 1', async () => {
+    await onboardingContractUpload(...uploadArgs());
+
+    expect(setLastFileErrorAttempt).toHaveBeenCalledWith(sameFileAttempt(1));
+    expect(setOutcomeContentState).not.toHaveBeenCalled();
+  });
+
+  it('a different file restarts the counter', async () => {
+    await onboardingContractUpload(
+      ...uploadArgs({ lastFileErrorAttempt: { ...sameFileAttempt(5), fileName: 'other.pdf' } })
+    );
+
+    expect(setLastFileErrorAttempt).toHaveBeenCalledWith(sameFileAttempt(1));
+    expect(setOutcomeContentState).not.toHaveBeenCalled();
+  });
+
+  it('the same file increments the counter without giving up below the limit', async () => {
+    await onboardingContractUpload(...uploadArgs({ lastFileErrorAttempt: sameFileAttempt(1) }));
+
+    expect(setLastFileErrorAttempt).toHaveBeenCalledWith(sameFileAttempt(2));
+    expect(setOutcomeContentState).not.toHaveBeenCalled();
+    expect(setOpen).toHaveBeenCalledWith(true);
+  });
+
+  it('the same file over the limit closes the modal and sets the error outcome', async () => {
+    await onboardingContractUpload(
+      ...uploadArgs({ lastFileErrorAttempt: sameFileAttempt(ENV.UPLOAD_CONTRACT_MAX_LOOP_ERROR) })
+    );
+
+    expect(setOpen).toHaveBeenNthCalledWith(1, false);
+    expect(setOutcomeContentState).toHaveBeenCalledWith('error');
+  });
 });
