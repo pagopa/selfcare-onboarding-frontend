@@ -6,6 +6,3 @@ declare namespace NodeJS {
     VITE_MOCK_API: string;
   }
 }
-interface Window {
-  Stripe: any;
-}
