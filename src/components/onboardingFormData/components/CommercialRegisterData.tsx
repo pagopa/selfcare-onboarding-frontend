@@ -10,6 +10,7 @@ import NumberDecimalFormat from '../NumberDecimalFormat';
 import { OnboardingControllers } from '../../../hooks/useOnboardingControllers';
 import { BaseTextFieldPropsFn } from '../../steps/StepOnboardingFormData';
 import { getCommercialRegisterLayout } from './commercialRegisterDataLayout';
+import PspRegisterFields from './PspRegisterFields';
 
 type Props = {
   isInfoCompany: boolean;
@@ -114,62 +115,11 @@ const CommercialRegisterData = ({
         </>
       )}
       {layout.showPspFields && (
-        <>
-          <Grid item xs={12}>
-            {/* n. Iscrizione al Registro delle Imprese */}
-            <CustomTextField
-              inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
-              {...baseTextFieldProps(
-                'commercialRegisterNumber',
-                t('onboardingFormData.billingDataSection.pspDataSection.commercialRegisterNumber'),
-                600,
-                theme.palette.text.primary
-              )}
-              disabled={layout.pspFieldsDisabled.commercialRegisterNumber}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            {/* Iscrizione all�Albo */}
-            <CustomTextField
-              {...baseTextFieldProps(
-                'registrationInRegister',
-                t('onboardingFormData.billingDataSection.pspDataSection.registrationInRegister'),
-                600,
-                theme.palette.text.primary
-              )}
-              disabled={layout.pspFieldsDisabled.registrationInRegister}
-            />
-          </Grid>
-          <Grid item xs={6}>
-            {/* Numero dell�Albo */}
-            <CustomTextField
-              inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
-              {...baseTextFieldProps(
-                'registerNumber',
-                t('onboardingFormData.billingDataSection.pspDataSection.registerNumber'),
-                600,
-                theme.palette.text.primary
-              )}
-              disabled={layout.pspFieldsDisabled.registerNumber}
-            />
-          </Grid>
-          <Grid item xs={6}>
-            {/* ABI code */}
-            <CustomTextField
-              {...baseTextFieldProps(
-                'abiCode',
-                t('onboardingFormData.billingDataSection.pspDataSection.abiCode'),
-                600,
-                theme.palette.text.primary
-              )}
-              value={formik.values.abiCode}
-              InputLabelProps={{
-                shrink: (formik.values.abiCode?.length ?? 0) > 0,
-              }}
-              disabled={layout.pspFieldsDisabled.abiCode}
-            />
-          </Grid>
-        </>
+        <PspRegisterFields
+          baseTextFieldProps={baseTextFieldProps}
+          formik={formik}
+          disabledFields={layout.pspFieldsDisabled}
+        />
       )}
     </>
   );

@@ -1,5 +1,5 @@
 import { FormikProps } from 'formik';
-import { Box, Checkbox, Grid, Typography } from '@mui/material';
+import { Grid, Typography } from '@mui/material';
 import { theme } from '@pagopa/mui-italia';
 import { Dispatch, useState } from 'react';
 import { Trans } from 'react-i18next';
@@ -11,6 +11,7 @@ import {
   BaseTextFieldPropsFn,
   StepBillingDataHistoryState,
 } from '../../steps/StepOnboardingFormData';
+import LabeledCheckbox from './LabeledCheckbox';
 import { getVatNumberLayout } from './vatNumberDataLayout';
 
 type Props = {
@@ -55,53 +56,34 @@ const VatNumberData = ({
         <Grid container item spacing={3} xs={12} pl={3} pt={3} mb={layout.checkboxesMarginBottom}>
           {layout.showTaxCodeEquals2PIVA && (
             <Grid item>
-              <Box display="flex" alignItems="center">
-                <Checkbox
-                  id="taxCodeEquals2VatNumber"
-                  checked={stepHistoryState.isTaxCodeEquals2PIVA}
-                  disabled={layout.isTaxCodeEquals2PIVADisabled}
-                  inputProps={{
-                    'aria-label': t(
-                      'onboardingFormData.billingDataSection.taxCodeEquals2PIVAdescription'
-                    ),
-                  }}
-                  onChange={(e) => {
-                    setStepHistoryState({
-                      ...stepHistoryState,
-                      isTaxCodeEquals2PIVA: e.target.checked,
-                    });
-                  }}
-                />
-                <Typography component={'span'}>
-                  {t('onboardingFormData.billingDataSection.taxCodeEquals2PIVAdescription')}
-                </Typography>
-              </Box>
+              <LabeledCheckbox
+                id="taxCodeEquals2VatNumber"
+                label={t('onboardingFormData.billingDataSection.taxCodeEquals2PIVAdescription')}
+                checked={stepHistoryState.isTaxCodeEquals2PIVA}
+                disabled={layout.isTaxCodeEquals2PIVADisabled}
+                onChange={(e) => {
+                  setStepHistoryState({
+                    ...stepHistoryState,
+                    isTaxCodeEquals2PIVA: e.target.checked,
+                  });
+                }}
+              />
             </Grid>
           )}
           {layout.showPartyWithoutVatNumber && (
             <Grid item>
-              <Box
-                display="flex"
-                alignItems="center"
-                marginBottom={layout.partyWithoutVatNumberMarginBottom}
-              >
-                <Checkbox
-                  id="party_without_vatnumber"
-                  inputProps={{
-                    'aria-label': t('onboardingFormData.billingDataSection.partyWithoutVatNumber'),
-                  }}
-                  onChange={(e) => {
-                    void formik.setFieldValue('hasVatnumber', !e.target.checked);
-                    setStepHistoryState({
-                      ...stepHistoryState,
-                      isTaxCodeEquals2PIVA: false,
-                    });
-                  }}
-                />
-                <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                  <Typography component={'span'}>
-                    {t('onboardingFormData.billingDataSection.partyWithoutVatNumber')}
-                  </Typography>
+              <LabeledCheckbox
+                id="party_without_vatnumber"
+                label={t('onboardingFormData.billingDataSection.partyWithoutVatNumber')}
+                containerProps={{ marginBottom: layout.partyWithoutVatNumberMarginBottom }}
+                onChange={(e) => {
+                  void formik.setFieldValue('hasVatnumber', !e.target.checked);
+                  setStepHistoryState({
+                    ...stepHistoryState,
+                    isTaxCodeEquals2PIVA: false,
+                  });
+                }}
+                description={
                   <Typography variant={'caption'} sx={{ fontWeight: '400', color: '#5C6F82' }}>
                     <Trans
                       i18nKey="onboardingFormData.billingDataSection.partyWIthoutVatNumberSubtitle"
@@ -111,8 +93,8 @@ const VatNumberData = ({
                 arte o professione <1 />(cfr. art. 21, comma 2, lett. f, DPR n. 633/1972)`}
                     </Trans>
                   </Typography>
-                </Box>
-              </Box>
+                }
+              />
             </Grid>
           )}
         </Grid>
@@ -141,25 +123,18 @@ const VatNumberData = ({
             />
           )}
           {layout.showVatNumberGroup && (
-            <Box display="flex" alignItems="center" mt="2px">
-              {/* Checkbox la aprtita IVA � di gruppo */}
-              <Checkbox
-                id={'vatNumberGroup'}
-                name="vatNumberGroup"
-                inputProps={{
-                  'aria-label': t('onboardingFormData.billingDataSection.vatNumberGroup'),
-                }}
-                checked={formik.values.vatNumberGroup}
-                onChange={(_, checked: boolean) =>
-                  void formik.setFieldValue('vatNumberGroup', checked, true)
-                }
-                value={formik.values.vatNumberGroup}
-                disabled={layout.isVatNumberGroupDisabled}
-              />
-              <Typography component={'span'}>
-                {t('onboardingFormData.billingDataSection.vatNumberGroup')}
-              </Typography>
-            </Box>
+            <LabeledCheckbox
+              id={'vatNumberGroup'}
+              name="vatNumberGroup"
+              label={t('onboardingFormData.billingDataSection.vatNumberGroup')}
+              containerProps={{ mt: '2px' }}
+              checked={formik.values.vatNumberGroup}
+              onChange={(_, checked: boolean) =>
+                void formik.setFieldValue('vatNumberGroup', checked, true)
+              }
+              value={formik.values.vatNumberGroup}
+              disabled={layout.isVatNumberGroupDisabled}
+            />
           )}
         </Typography>
       </Grid>
