@@ -1,3 +1,6 @@
+import type { FormikProps } from 'formik';
+import type { OnboardingFormData } from '../../model/OnboardingFormData';
+import { buildProduct } from '../../utils/test/builders';
 import { it, expect, vi, beforeEach } from 'vitest';
 import { PartyRegistryProxyApi } from '../../api/PartyRegistryProxyApiClient';
 import { OnboardingApi } from '../../api/OnboardingApiClient';
@@ -55,7 +58,9 @@ const setUoResultHistory = vi.fn();
 const setCfResult = vi.fn();
 const setDisabled = vi.fn();
 const setRequiredLogin = vi.fn();
-const formik = { setFieldValue } as any;
+// Partial Formik stub: only the members used by the service are provided
+const formik = { setFieldValue } as unknown as FormikProps<OnboardingFormData>;
+type SearchResponse = { items: ReadonlyArray<{ id: string; description: string }> };
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -65,7 +70,7 @@ it('test handleSearchByTaxCode success sets istat and originId', async () => {
   vi.mocked(PartyRegistryProxyApi.findInstitution).mockResolvedValue({
     istatCode: 'IST1',
     originId: 'OR1',
-  } as any);
+  });
 
   await handleSearchByTaxCode('tc1', 'cat-x', setRetrievedIstat, setOriginId4Premium);
 
@@ -86,7 +91,7 @@ it('test handleSearchByTaxCode on error does nothing', async () => {
 it('test getUoInfoFromRecipientCode success sets formik and disables field', async () => {
   vi.mocked(PartyRegistryProxyApi.getUoInfo).mockResolvedValue({
     codiceFiscaleSfe: '998877665544',
-  } as any);
+  });
 
   await getUoInfoFromRecipientCode('A1B2C3', setDisableTaxCodeInvoicing, formik);
 
@@ -105,7 +110,7 @@ it('test getUoInfoFromRecipientCode on error disables field=false', async () => 
 });
 
 it('test handleSearchExternalId success returns party data', async () => {
-  vi.mocked(PartyRegistryProxyApi.findInstitution).mockResolvedValue({ id: 'p1' } as any);
+  vi.mocked(PartyRegistryProxyApi.findInstitution).mockResolvedValue({ id: 'p1' });
 
   const result = await handleSearchExternalId('ext-1');
 
@@ -120,7 +125,7 @@ it('test handleSearchExternalId on error returns null', async () => {
 });
 
 it('test getECDataByCF success sets data and toggles loading', async () => {
-  vi.mocked(PartyRegistryProxyApi.findInstitution).mockResolvedValue({ id: 'p1' } as any);
+  vi.mocked(PartyRegistryProxyApi.findInstitution).mockResolvedValue({ id: 'p1' });
 
   await getECDataByCF('tc1', setApiLoading, setEcData);
 
@@ -152,13 +157,13 @@ it('test fetchInstitutionsByName dispatches to searchInstitutionsIpa and maps op
   vi.mocked(OnboardingApi.searchInstitutionsIpa).mockResolvedValue({
     count: 1,
     items: [{ id: 'i1', description: 'Ente 1' }],
-  } as any);
+  });
 
   await fetchInstitutionsByName(
     'Ente',
     { endpoint: 'ONBOARDING_GET_SEARCH_PARTIES' },
     setOptions,
-    (d: any) => d.items,
+    (d: SearchResponse) => d.items,
     setRequiredLogin,
     10,
     undefined
@@ -182,7 +187,7 @@ it('test fetchInstitutionsByName on 404 sets empty options', async () => {
     'Ente',
     { endpoint: 'ONBOARDING_GET_SEARCH_PARTIES' },
     setOptions,
-    (d: any) => d.items,
+    (d: SearchResponse) => d.items,
     setRequiredLogin
   );
 
@@ -193,7 +198,7 @@ it('test handleSearchByAooCode dispatches to getAooInfo and sets result', async 
   vi.mocked(PartyRegistryProxyApi.getAooInfo).mockResolvedValue({
     codiceUniAoo: 'AOO12345',
     cap: '20100',
-  } as any);
+  });
 
   await handleSearchByAooCode('AOO1234', setAooResult, setAooResultHistory, setRequiredLogin);
 
@@ -206,7 +211,7 @@ it('test handleSearchByUoCode dispatches to getUoInfo and sets result', async ()
   vi.mocked(PartyRegistryProxyApi.getUoInfo).mockResolvedValue({
     codiceUniUo: 'UO123',
     cap: '20100',
-  } as any);
+  });
 
   await handleSearchByUoCode('UO123', setUoResult, setUoResultHistory, setRequiredLogin);
 
@@ -228,14 +233,14 @@ it('test contractingInsuranceFromTaxId dispatches insurance by taxId', async () 
   vi.mocked(PartyRegistryProxyApi.getInsuranceByTaxId).mockResolvedValue({
     id: 'ins1',
     taxCode: '12345678901',
-  } as any);
+  });
 
   await contractingInsuranceFromTaxId(
     false,
     'ONBOARDING_GET_INSURANCE_COMPANIES_FROM_IVASSCODE',
     {},
     '12345678901',
-    'AS' as any,
+    'AS',
     setApiLoading,
     setCfResult,
     setRequiredLogin
@@ -248,14 +253,14 @@ it('test contractingInsuranceFromTaxId dispatches insurance by taxId', async () 
 it('test contractingInsuranceFromTaxId addUser dispatches to getInstitutionsByFilters', async () => {
   vi.mocked(OnboardingApi.getInstitutionsByFilters).mockResolvedValue([
     { id: 'p1', description: 'P1' },
-  ] as any);
+  ]);
 
   await contractingInsuranceFromTaxId(
     true,
     'ONBOARDING_GET_INSTITUTIONS',
     { productId: 'prod-1', taxCode: '12345678901' },
     '12345678901',
-    'SA' as any,
+    'SA',
     setApiLoading,
     setCfResult,
     setRequiredLogin
@@ -272,7 +277,7 @@ it('test fetchInstitutionByTaxCode dispatches to searchInstitutionIpaByTaxCode a
   vi.mocked(OnboardingApi.searchInstitutionIpaByTaxCode).mockResolvedValue({
     id: 'ipa1',
     description: 'Comune di Test',
-  } as any);
+  });
 
   await fetchInstitutionByTaxCode(
     false,
@@ -280,7 +285,7 @@ it('test fetchInstitutionByTaxCode dispatches to searchInstitutionIpaByTaxCode a
     {},
     '12345678901',
     'prod-1',
-    'PA' as any,
+    'PA',
     'cat-x',
     undefined,
     setCfResult,
@@ -289,10 +294,7 @@ it('test fetchInstitutionByTaxCode dispatches to searchInstitutionIpaByTaxCode a
     setRequiredLogin
   );
 
-  expect(OnboardingApi.searchInstitutionIpaByTaxCode).toHaveBeenCalledWith(
-    '12345678901',
-    'cat-x'
-  );
+  expect(OnboardingApi.searchInstitutionIpaByTaxCode).toHaveBeenCalledWith('12345678901', 'cat-x');
   expect(setCfResult).toHaveBeenCalledWith({ id: 'ipa1', description: 'Comune di Test' });
 });
 
@@ -300,7 +302,7 @@ it('test fetchInstitutionByTaxCode addUser dispatches to searchInstitutionIpaByT
   vi.mocked(OnboardingApi.searchInstitutionIpaByTaxCode).mockResolvedValue({
     id: 'ipa1',
     description: 'Comune di Test',
-  } as any);
+  });
 
   await fetchInstitutionByTaxCode(
     true,
@@ -308,7 +310,7 @@ it('test fetchInstitutionByTaxCode addUser dispatches to searchInstitutionIpaByT
     {},
     '12345678901',
     'prod-1',
-    'PA' as any,
+    'PA',
     'cat-x',
     undefined,
     setCfResult,
@@ -317,10 +319,7 @@ it('test fetchInstitutionByTaxCode addUser dispatches to searchInstitutionIpaByT
     setRequiredLogin
   );
 
-  expect(OnboardingApi.searchInstitutionIpaByTaxCode).toHaveBeenCalledWith(
-    '12345678901',
-    'cat-x'
-  );
+  expect(OnboardingApi.searchInstitutionIpaByTaxCode).toHaveBeenCalledWith('12345678901', 'cat-x');
   expect(setCfResult).toHaveBeenCalledWith({ id: 'ipa1', description: 'Comune di Test' });
 });
 
@@ -335,7 +334,7 @@ it('test fetchInstitutionByTaxCode on 404 clears cfResult', async () => {
     {},
     '00112233445',
     'prod-1',
-    'PA' as any,
+    'PA',
     'cat-x',
     undefined,
     setCfResult,
@@ -351,7 +350,7 @@ it('test fetchInstitutionByTaxCode dispatches to infocamere and sets cfResult', 
   vi.mocked(PartyRegistryProxyApi.getInfocamereByTaxCode).mockResolvedValue({
     businessTaxId: '12345678901',
     atecoCodes: ['62.01'],
-  } as any);
+  });
 
   await fetchInstitutionByTaxCode(
     false,
@@ -359,7 +358,7 @@ it('test fetchInstitutionByTaxCode dispatches to infocamere and sets cfResult', 
     {},
     '12345678901',
     'prod-1',
-    'PT' as any,
+    'PT',
     undefined,
     undefined,
     setCfResult,
@@ -381,7 +380,7 @@ it('test fetchInstitutionByTaxCode dispatches to infocamere and sets cfResult', 
 it('test handleSearchByReaCode dispatches to getVisuraByRea', async () => {
   vi.mocked(PartyRegistryProxyApi.getVisuraByRea).mockResolvedValue({
     businessTaxId: '999',
-  } as any);
+  });
 
   await handleSearchByReaCode(
     false,
@@ -392,7 +391,7 @@ it('test handleSearchByReaCode dispatches to getVisuraByRea', async () => {
     setCfResult,
     setDisabled,
     setRequiredLogin,
-    { id: 'prod-1' } as any,
+    buildProduct({ id: 'prod-1' }),
     undefined,
     undefined,
     undefined
@@ -412,7 +411,7 @@ it('test handleSearchByReaCode invalid rea pattern resets without calling api', 
     setCfResult,
     setDisabled,
     setRequiredLogin,
-    { id: 'prod-1' } as any,
+    buildProduct({ id: 'prod-1' }),
     undefined,
     undefined,
     undefined
