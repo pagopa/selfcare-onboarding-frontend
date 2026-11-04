@@ -7,6 +7,9 @@ export const isLocalMode = process.env.VITE_ENV === 'LOCAL_DEV' || process.env.N
 
 const ONBOARDING_API_URL = 'https://api.dev.selfcare.pagopa.it/onboarding';
 
+/** Fields of an item of `GET /v2/institutions/onboardings` read by the suite. */
+type OnboardingSummary = { id: string; productId?: string };
+
 /**
  * Statuses an onboarding can be left in by the suite. Only COMPLETED can be deleted through the
  * internal API, so the others are snapshotted instead of purged: see prepareOnboardingBaseline.
@@ -103,7 +106,10 @@ export const getOnboardingIdByTaxCode = async (
       // Skip anything that was already there before this run, or that an earlier test claimed:
       // what remains was created by the flow we have just walked through.
       const known = getKnownOnboardingIds();
-      const match = data.find((onb: any) => onb.productId === productId && !known.has(onb.id));
+      // The response is validated only as an array: the fields we read are declared in OnboardingSummary
+      const match = (data as Array<OnboardingSummary>).find(
+        (onb) => onb.productId === productId && !known.has(onb.id)
+      );
 
       if (!match) {
         lastFailure =
@@ -185,7 +191,9 @@ const listOnboardingIds = async (
   }
 
   const data = await response.json();
-  return Array.isArray(data) ? data.map((onb: any) => onb.id).filter(Boolean) : [];
+  return Array.isArray(data)
+    ? (data as Array<OnboardingSummary>).map((onb) => onb.id).filter(Boolean)
+    : [];
 };
 
 /**
