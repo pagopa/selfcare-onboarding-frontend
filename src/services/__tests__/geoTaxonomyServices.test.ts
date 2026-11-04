@@ -1,3 +1,4 @@
+import type { AooData } from '../../model/AooData';
 import { it, expect, vi, beforeEach } from 'vitest';
 import { OnboardingApi } from '../../api/OnboardingApiClient';
 import { PartyRegistryProxyApi } from '../../api/PartyRegistryProxyApiClient';
@@ -51,7 +52,7 @@ it('test getCountriesFromGeotaxonomies maps and filters - COMUNE entries', async
       desc: 'ROMA - PROVINCIA',
       istat_code: '2',
     },
-  ] as any);
+  ]);
 
   await getCountriesFromGeotaxonomies('Mil', setCountries, setRequiredLogin);
 
@@ -92,7 +93,7 @@ it('test getPreviousGeotaxononomies passes aoo subunitCode when aooSelected', as
   vi.mocked(OnboardingApi.getPreviousGeotaxonomy).mockResolvedValue([]);
   await getPreviousGeotaxononomies(
     'tax-1',
-    { codiceUniAoo: 'AOO1' } as any,
+    { codiceUniAoo: 'AOO1' } as AooData,
     undefined,
     setPreviousGeotaxononomies,
     setRequiredLogin
@@ -106,7 +107,7 @@ it('test getLocationFromIstatCode maps result fields', async () => {
     country_abbreviation: 'IT',
     province_abbreviation: 'MI',
     desc: 'MILANO',
-  } as any);
+  });
 
   await getLocationFromIstatCode(setInstitutionLocationData, setRequiredLogin, '12345');
 
@@ -123,7 +124,7 @@ it('test getLocationFromIstatCode skips when istatCode missing', async () => {
 it('test handleSearch sets options and clears error when matches found', async () => {
   vi.mocked(PartyRegistryProxyApi.getTaxonomiesByQuery).mockResolvedValue([
     { code: 'c1', desc: 'MILANO' },
-  ] as any);
+  ]);
 
   await handleSearch(
     'Mil',
