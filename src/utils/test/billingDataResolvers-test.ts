@@ -31,16 +31,52 @@ export type BillingResolverParams = {
   SfeAvailable?: boolean;
 };
 
-// eslint-disable-next-line sonarjs/cognitive-complexity
+type SearchTable<T> = Partial<Record<Search, () => T>>;
+
+/** Returns the value mapped to the search type, or the fallback when the search type is not mapped. */
+export const pickBySearch = <T>(
+  typeOfSearch: Search,
+  table: SearchTable<T>,
+  fallback: () => T
+): T => (table[typeOfSearch] ?? fallback)();
+
+export const isInfocamereSource = (from?: Source): boolean =>
+  from === 'INFOCAMERE' || from === 'PDND_INFOCAMERE';
+
+/** Visura selected by a private merchant, available only for the tax code searches. */
+export const privateMerchantVisura = (
+  p: Pick<BillingResolverParams, 'isPrivateMerchant' | 'typeOfSearch'>
+) =>
+  p.isPrivateMerchant
+    ? pickBySearch(
+        p.typeOfSearch,
+        {
+          personalTaxCode: () => mockedPdndVisuraInfomacere[5],
+          taxCode: () => mockedPdndVisuraInfomacere[0],
+        },
+        () => undefined
+      )
+    : undefined;
+
+type InsuranceParams = Pick<BillingResolverParams, 'haveTaxCode' | 'isForeignInsurance'>;
+
+export const insuranceResource = (p: InsuranceParams) => {
+  if (!p.haveTaxCode) {
+    return mockedInsuranceResource.items[4];
+  }
+  return p.isForeignInsurance ? mockedInsuranceResource.items[0] : mockedInsuranceResource.items[2];
+};
+
+export const insuranceTaxCode = (p: InsuranceParams): string | undefined =>
+  p.haveTaxCode ? (insuranceResource(p).taxCode ?? '') : insuranceResource(p).taxCode;
+
 export const resolveBusinessName = (p: BillingResolverParams): string => {
   if (p.errorOnSubmit) {
     return mockPartyRegistry.items[1].description;
   }
-  if (p.isPrivateMerchant && p.typeOfSearch === 'personalTaxCode') {
-    return mockedPdndVisuraInfomacere[5].businessName;
-  }
-  if (p.isPrivateMerchant && p.typeOfSearch === 'taxCode') {
-    return mockedPdndVisuraInfomacere[0].businessName;
+  const visura = privateMerchantVisura(p);
+  if (visura) {
+    return visura.businessName;
   }
   if (p.from === 'NO_IPA') {
     return 'businessNameInput';
@@ -48,28 +84,23 @@ export const resolveBusinessName = (p: BillingResolverParams): string => {
   if (p.from === 'ANAC') {
     return mockedANACParties[0].description;
   }
-  if (p.from === 'INFOCAMERE' || p.from === 'PDND_INFOCAMERE') {
+  if (isInfocamereSource(p.from)) {
     return p.typeOfSearch === 'personalTaxCode'
       ? mockedPdndVisuraInfomacere[5].businessName
       : mockedPartiesFromInfoCamere[0].businessName;
   }
   if (p.from === 'IVASS') {
-    return p.haveTaxCode
-      ? p.isForeignInsurance
-        ? mockedInsuranceResource.items[0].description
-        : mockedInsuranceResource.items[2].description
-      : mockedInsuranceResource.items[4].description;
+    return insuranceResource(p).description;
   }
-  if (p.typeOfSearch === 'taxCode') {
-    return mockedParties[0].description;
-  }
-  if (p.typeOfSearch === 'aooCode') {
-    return mockedAoos[0].denominazioneAoo;
-  }
-  if (p.typeOfSearch === 'uoCode') {
-    return mockedUos[0].descrizioneUo;
-  }
-  return mockPartyRegistry.items[0].description;
+  return pickBySearch(
+    p.typeOfSearch,
+    {
+      taxCode: () => mockedParties[0].description,
+      aooCode: () => mockedAoos[0].denominazioneAoo,
+      uoCode: () => mockedUos[0].descrizioneUo,
+    },
+    () => mockPartyRegistry.items[0].description
+  );
 };
 
 export const resolveRegisteredOffice = (p: BillingResolverParams): string => {
@@ -94,16 +125,13 @@ export const resolveRegisteredOffice = (p: BillingResolverParams): string => {
   return mockPartyRegistry.items[0].address;
 };
 
-// eslint-disable-next-line sonarjs/cognitive-complexity
 export const resolveDigitalAddress = (p: BillingResolverParams): string => {
   if (p.errorOnSubmit) {
     return mockPartyRegistry.items[1].digitalAddress;
   }
-  if (p.isPrivateMerchant && p.typeOfSearch === 'personalTaxCode') {
-    return mockedPdndVisuraInfomacere[5].digitalAddress;
-  }
-  if (p.isPrivateMerchant && p.typeOfSearch === 'taxCode') {
-    return mockedPdndVisuraInfomacere[0].digitalAddress;
+  const visura = privateMerchantVisura(p);
+  if (visura) {
+    return visura.digitalAddress;
   }
   if (p.from === 'NO_IPA') {
     return 'a@a.it';
@@ -111,28 +139,23 @@ export const resolveDigitalAddress = (p: BillingResolverParams): string => {
   if (p.from === 'ANAC') {
     return mockedANACParties[0].digitalAddress;
   }
-  if (p.from === 'INFOCAMERE' || p.from === 'PDND_INFOCAMERE') {
+  if (isInfocamereSource(p.from)) {
     return p.typeOfSearch === 'personalTaxCode'
       ? mockedPdndVisuraInfomacere[5].digitalAddress
       : mockedPartiesFromInfoCamere[0].digitalAddress;
   }
   if (p.from === 'IVASS') {
-    return p.haveTaxCode
-      ? p.isForeignInsurance
-        ? mockedInsuranceResource.items[0].digitalAddress
-        : mockedInsuranceResource.items[2].digitalAddress
-      : mockedInsuranceResource.items[4].digitalAddress;
+    return insuranceResource(p).digitalAddress;
   }
-  if (p.typeOfSearch === 'taxCode') {
-    return mockedParties[0].digitalAddress;
-  }
-  if (p.typeOfSearch === 'aooCode') {
-    return mockedAoos[0].mail1;
-  }
-  if (p.typeOfSearch === 'uoCode') {
-    return mockedUos[0].mail1;
-  }
-  return mockPartyRegistry.items[0].digitalAddress;
+  return pickBySearch(
+    p.typeOfSearch,
+    {
+      taxCode: () => mockedParties[0].digitalAddress,
+      aooCode: () => mockedAoos[0].mail1,
+      uoCode: () => mockedUos[0].mail1,
+    },
+    () => mockPartyRegistry.items[0].digitalAddress
+  );
 };
 
 export const resolveZipCode = (p: BillingResolverParams): string | undefined => {
@@ -160,28 +183,24 @@ export const resolveZipCode = (p: BillingResolverParams): string | undefined => 
   return mockPartyRegistry.items[0].zipCode;
 };
 
-// eslint-disable-next-line sonarjs/cognitive-complexity
 export const resolveTaxCode = (p: BillingResolverParams): string | undefined => {
   if (p.errorOnSubmit) {
     return mockPartyRegistry.items[1].taxCode;
   }
-  if (p.isPrivateMerchant && p.typeOfSearch === 'personalTaxCode') {
-    return mockedPdndVisuraInfomacere[5].businessTaxId;
-  }
-  if (p.isPrivateMerchant && p.typeOfSearch === 'taxCode') {
-    return mockedPdndVisuraInfomacere[0].businessTaxId;
+  const visura = privateMerchantVisura(p);
+  if (visura) {
+    return visura.businessTaxId;
   }
   if (p.from === 'IPA') {
-    if (p.typeOfSearch === 'taxCode') {
-      return mockedParties[0].taxCode;
-    }
-    if (p.typeOfSearch === 'aooCode') {
-      return mockedAoos[0].codiceFiscaleEnte;
-    }
-    if (p.typeOfSearch === 'uoCode') {
-      return mockedUos[0].codiceFiscaleEnte;
-    }
-    return mockPartyRegistry.items[0].taxCode;
+    return pickBySearch(
+      p.typeOfSearch,
+      {
+        taxCode: () => mockedParties[0].taxCode,
+        aooCode: () => mockedAoos[0].codiceFiscaleEnte,
+        uoCode: () => mockedUos[0].codiceFiscaleEnte,
+      },
+      () => mockPartyRegistry.items[0].taxCode
+    );
   }
   if (p.from === 'NO_IPA') {
     return '00000000000';
@@ -189,15 +208,11 @@ export const resolveTaxCode = (p: BillingResolverParams): string | undefined => 
   if (p.from === 'ANAC') {
     return mockedANACParties[0].taxCode;
   }
-  if (p.from === 'INFOCAMERE' || p.from === 'PDND_INFOCAMERE') {
+  if (isInfocamereSource(p.from)) {
     return mockedPartiesFromInfoCamere[0].businessTaxId;
   }
   if (p.from === 'IVASS') {
-    return p.haveTaxCode
-      ? p.isForeignInsurance
-        ? (mockedInsuranceResource.items[0].taxCode ?? '')
-        : (mockedInsuranceResource.items[2].taxCode ?? '')
-      : mockedInsuranceResource.items[4].taxCode;
+    return insuranceTaxCode(p);
   }
   return '12345678911';
 };
