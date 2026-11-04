@@ -1,6 +1,6 @@
 import { User } from '@pagopa/selfcare-common-frontend/lib/model/User';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { createMemoryHistory } from 'history';
+import { createMemoryHistory, type MemoryHistory } from 'history';
 import i18n from 'i18next';
 import React, { useState } from 'react';
 import { Provider } from 'react-redux';
@@ -82,7 +82,7 @@ export type { Search, Source };
 export const renderComponentWithProviders = (
   component: React.ReactElement,
   productId: string = PRODUCT_IDS.SEND,
-  injectedHistory?: ReturnType<typeof createMemoryHistory>
+  injectedHistory?: MemoryHistory
 ) => {
   const Component = () => {
     const [user, setUser] = useState<User | null>(null);
@@ -108,7 +108,7 @@ export const renderComponentWithProviders = (
           <button onClick={() => onExit?.(() => window.location.assign(ENV.URL_FE.LOGOUT))}>
             LOGOUT
           </button>
-          <Router history={history as any}>
+          <Router history={history}>
             {React.createElement(component.type, { ...component.props, productId })}
           </Router>
         </UserContext.Provider>
@@ -814,7 +814,7 @@ export const performLogout = async (logoutButton: HTMLElement) => {
   await waitFor(() => expect(screen.queryByText('Vuoi davvero uscire?')).not.toBeNull());
 };
 
-export const executeGoHome = async (mockedLocation: any) => {
+export const executeGoHome = async (mockedLocation: Pick<Location, 'assign'>) => {
   console.log('Go Home');
   const goHomeButton = screen.getByRole('button', {
     name: 'Torna alla home',
@@ -1034,7 +1034,7 @@ export const checkCorrectBodyBillingData = (
   );
 };
 
-export const searchUserFormFromRemoveBtn = (removeButton: HTMLElement): any => {
+export const searchUserFormFromRemoveBtn = (removeButton: HTMLElement): HTMLElement | null => {
   if (!removeButton) {
     return null;
   } else {
