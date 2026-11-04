@@ -1,5 +1,7 @@
 import { type MockInstance, vi } from 'vitest';
 import type { Party, Product, UserOnCreate } from '../../../types';
+import type { InstitutionInfo } from '../../api/generated/onboarding/InstitutionInfo';
+import type { OnboardingRequestResource } from '../../api/generated/onboarding/OnboardingRequestResource';
 import { type ProductResource, StatusEnum } from '../../api/generated/onboarding/ProductResource';
 import * as apiUtils from '../../lib/api-utils';
 
@@ -24,6 +26,27 @@ export const buildProductResource = (
   id: 'prod-io',
   title: 'App IO',
   status: StatusEnum.ACTIVE,
+  ...overrides,
+});
+
+export const buildInstitutionInfo = (
+  overrides: Partial<InstitutionInfo> = {}
+): InstitutionInfo => ({
+  address: 'Piazza della Scala, 2',
+  fiscalCode: '01199250158',
+  institutionType: 'PA',
+  mailAddress: 'protocollo@postacert.comune.milano.it',
+  name: 'Comune di Milano',
+  vatNumber: '01199250158',
+  zipCode: '20121',
+  ...overrides,
+});
+
+export const buildOnboardingRequestResource = (
+  overrides: Partial<OnboardingRequestResource> = {}
+): OnboardingRequestResource => ({
+  institutionInfo: buildInstitutionInfo(),
+  status: 'PENDING',
   ...overrides,
 });
 
