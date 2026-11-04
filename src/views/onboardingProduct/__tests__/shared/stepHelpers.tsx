@@ -24,6 +24,7 @@ import {
   Search,
   Source,
 } from '../../../../utils/test/test-utils';
+import type { FetchWithLogsSpy } from '../../../../utils/test/builders';
 import OnboardingProduct from '../../OnboardingProduct';
 import {
   expectedBusinessNameSearchEndpoint,
@@ -787,7 +788,7 @@ const uploadRequiredDocument = async (fileName: string) => {
 const forwardFromDocumentStep = () =>
   fireEvent.click(screen.getByRole('button', { name: 'Continua' }));
 
-export const executeStepUploadRequiredDocuments = async (fetchWithLogsSpy: MockInstance) => {
+export const executeStepUploadRequiredDocuments = async (fetchWithLogsSpy: FetchWithLogsSpy) => {
   console.log('Testing step upload required documents..');
 
   await waitFor(() => screen.getByText('Inserisci i documenti'));
@@ -815,14 +816,14 @@ export const executeStepUploadRequiredDocuments = async (fetchWithLogsSpy: MockI
 
   expect(
     fetchWithLogsSpy.mock.calls
-      .filter((call: any) => call[0]?.endpoint === 'ONBOARDING_POST_ATTACHMENT')
-      .map((call: any) => call[0].endpointParams)
+      .filter((call) => call[0]?.endpoint === 'ONBOARDING_POST_ATTACHMENT')
+      .map((call) => call[0].endpointParams)
   ).toEqual([
     { onboardingId: 'mock-onboarding-id', filename: 'statuto.pdf' },
     { onboardingId: 'mock-onboarding-id', filename: 'visura-camerale.pdf' },
     { onboardingId: 'mock-onboarding-id', filename: 'attestazione-gsp.pdf' },
   ]);
   expect(
-    fetchWithLogsSpy.mock.calls.filter((call: any) => call[0]?.endpoint === 'TRIGGER_ONBOARDING')
+    fetchWithLogsSpy.mock.calls.filter((call) => call[0]?.endpoint === 'TRIGGER_ONBOARDING')
   ).toHaveLength(1);
 };
