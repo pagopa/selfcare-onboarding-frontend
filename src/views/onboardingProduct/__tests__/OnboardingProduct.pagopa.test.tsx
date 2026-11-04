@@ -24,6 +24,7 @@ import {
   fetchWithLogsSpy,
   mockedHistoryPush,
   mockedLocation,
+  replaceMockedLocation,
   setupTestHooks,
 } from './shared/testSetup';
 
@@ -32,7 +33,7 @@ vi.mock('react-router-dom', async () => ({
   ...(await vi.importActual('react-router-dom')),
   useHistory: () => ({
     location: mockedLocation,
-    replace: (nextLocation: any) => Object.assign(mockedLocation, nextLocation),
+    replace: replaceMockedLocation,
     push: mockedHistoryPush,
   }),
 }));
@@ -43,14 +44,14 @@ setupTestHooks();
 const actualFetchWithLogs = apiUtils.fetchWithLogs;
 
 const respondWith = (endpoint: string, response: unknown) =>
-  fetchWithLogsSpy.mockImplementation((path: any, config: any, onRedirectToLogin: any) =>
+  fetchWithLogsSpy.mockImplementation((path, config, onRedirectToLogin) =>
     path?.endpoint === endpoint
-      ? Promise.resolve(response as any)
+      ? Promise.resolve(response as Awaited<ReturnType<typeof actualFetchWithLogs>>)
       : actualFetchWithLogs(path, config, onRedirectToLogin)
   );
 
 const callsTo = (endpoint: string) =>
-  fetchWithLogsSpy.mock.calls.filter((call: any) => call[0]?.endpoint === endpoint);
+  fetchWithLogsSpy.mock.calls.filter((call) => call[0]?.endpoint === endpoint);
 
 const completeGspNoIpaUntilAdminStep = async () => {
   renderComponent(PRODUCT_IDS.PAGOPA);
