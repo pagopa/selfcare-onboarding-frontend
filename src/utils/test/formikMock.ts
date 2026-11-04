@@ -23,5 +23,7 @@ export const createFormikMock = (
   ...overrides,
 });
 
+// The mock is passed through as is (tests assert that services receive this same object), so it is
+// widened to the full Formik bag instead of being copied into a complete FormikProps.
 export const asFormikProps = (mock: FormikMock) =>
   mock as unknown as FormikProps<OnboardingFormData>;
