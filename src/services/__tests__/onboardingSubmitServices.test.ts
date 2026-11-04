@@ -1,3 +1,9 @@
+import type { User } from '@pagopa/selfcare-common-frontend/lib/model/User';
+import type { InstitutionType, RequestOutcomeMessage, RequestOutcomeOptions } from '../../../types';
+import type { AdditionalGpuInformations } from '../../model/AdditionalGpuInformations';
+import type { AdditionalInformations } from '../../model/AdditionalInformations';
+import type { OnboardingFormData } from '../../model/OnboardingFormData';
+import { buildProduct, buildUser } from '../../utils/test/builders';
 import { it, expect, vi, beforeEach } from 'vitest';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
 import { OnboardingApi } from '../../api/OnboardingApiClient';
@@ -19,49 +25,57 @@ const setError = vi.fn();
 const setConflictError = vi.fn();
 const forward = vi.fn();
 
-const outcomeContent = { success: 'SUCCESS', error: 'ERROR' } as any;
-const notAllowedError = 'NOT_ALLOWED' as any;
-const onboardingFormData = { businessName: 'ACME', digitalAddress: 'a@b.it' } as any;
-const requestIdRef = { current: 'req-1' } as any;
+const successOutcome: RequestOutcomeMessage = { title: 'SUCCESS', description: [] };
+const errorOutcome: RequestOutcomeMessage = { title: 'ERROR', description: [] };
+const outcomeContent: RequestOutcomeOptions = { success: successOutcome, error: errorOutcome };
+const notAllowedError: RequestOutcomeMessage = { title: 'NOT_ALLOWED', description: [] };
+// Only the fields read by the submit payload are provided
+const onboardingFormData = {
+  businessName: 'ACME',
+  digitalAddress: 'a@b.it',
+} as OnboardingFormData;
+const requestIdRef = { current: 'req-1' };
 
-const submitArgs = (onSuccess?: () => void) =>
-  [
-    setLoading,
-    'prod-1',
-    { id: 'prod-1' } as any,
-    setOutcome,
-    onboardingFormData,
-    requestIdRef,
-    'ext-inst-1',
-    undefined,
-    undefined,
-    'PA' as any,
-    'IPA',
-    outcomeContent,
-    notAllowedError,
-    undefined,
-    [{ taxCode: 'RSSMRA80A01H501Z' }] as any,
-    null,
-    undefined,
-    onSuccess,
-  ] as const;
+const submitArgs = (
+  onSuccess?: () => void,
+  onRequiredDocuments?: () => void
+): Parameters<typeof postOnboardingSubmit> => [
+  setLoading,
+  'prod-1',
+  buildProduct({ id: 'prod-1' }),
+  setOutcome,
+  onboardingFormData,
+  requestIdRef,
+  'ext-inst-1',
+  undefined,
+  undefined,
+  'PA',
+  'IPA',
+  outcomeContent,
+  notAllowedError,
+  undefined,
+  [buildUser({ taxCode: 'RSSMRA80A01H501Z' })],
+  null,
+  undefined,
+  onSuccess,
+  onRequiredDocuments,
+];
 
-const subProductArgs = () =>
-  [
-    'ext-inst-1',
-    { id: 'subprod-1' } as any,
-    [{ taxCode: 'RSSMRA80A01H501Z' }] as any,
-    onboardingFormData,
-    'PA' as any,
-    'req-1',
-    { id: 'prod-1' } as any,
-    setError,
-    forward,
-    'IPA',
-    'origin-id-1',
-    'C0',
-    setConflictError,
-  ] as const;
+const subProductArgs = (): Parameters<typeof postSubProductOnboardingSubmit> => [
+  'ext-inst-1',
+  buildProduct({ id: 'subprod-1' }),
+  [buildUser({ taxCode: 'RSSMRA80A01H501Z' })],
+  onboardingFormData,
+  'PA',
+  'req-1',
+  buildProduct({ id: 'prod-1' }),
+  setError,
+  forward,
+  'IPA',
+  'origin-id-1',
+  'C0',
+  setConflictError,
+];
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -75,7 +89,7 @@ it('test postOnboardingSubmit success tracks success and forwards', async () => 
 
   expect(OnboardingApi.onboardingInstitution).toHaveBeenCalled();
   expect(trackEvent).toHaveBeenCalledWith('ONBOARDING_SEND_SUCCESS', expect.any(Object));
-  expect(setOutcome).toHaveBeenCalledWith('SUCCESS');
+  expect(setOutcome).toHaveBeenCalledWith(successOutcome);
   expect(onSuccess).toHaveBeenCalled();
   expect(setLoading).toHaveBeenLastCalledWith(false);
 });
@@ -84,7 +98,7 @@ it('test postOnboardingSubmit success with onRequiredDocuments enters the docume
   vi.mocked(OnboardingApi.onboardingInstitution).mockResolvedValue(undefined);
   const onRequiredDocuments = vi.fn();
 
-  await postOnboardingSubmit(...submitArgs(), onRequiredDocuments);
+  await postOnboardingSubmit(...submitArgs(undefined, onRequiredDocuments));
 
   expect(onRequiredDocuments).toHaveBeenCalled();
   expect(setOutcome).not.toHaveBeenCalled();
@@ -150,24 +164,29 @@ const payloadFormData = {
   supportEmail: 'support@acme.it',
   geographicTaxonomies: [],
   userRequester: { name: 'Anna', surname: 'Bianchi', email: 'anna@acme.it' },
-} as any;
+} satisfies Partial<OnboardingFormData>;
 
 const submitPayloadArgs = (
   productId: string,
-  institutionType: string,
-  formData: any,
+  institutionType: InstitutionType,
+  formData: Partial<OnboardingFormData>,
   loggedUserTaxCode: string
 ) => {
-  const args = [...submitArgs()] as Array<any>;
+  const args = submitArgs();
   args[1] = productId;
-  args[2] = { id: productId };
-  args[4] = formData;
-  args[7] = { agentOfPublicService: true, ipa: false, otherNote: 'note', extra: 'dropped' };
-  args[8] = { businessRegisterNumber: 'BRN' };
+  args[2] = buildProduct({ id: productId });
+  args[4] = formData as OnboardingFormData;
+  args[7] = {
+    agentOfPublicService: true,
+    ipa: false,
+    otherNote: 'note',
+    extra: 'dropped',
+  } as unknown as AdditionalInformations; // the unknown extra field must be dropped
+  args[8] = { businessRegisterNumber: 'BRN' } as AdditionalGpuInformations;
   args[9] = institutionType;
   args[10] = 'ANAC';
-  args[15] = { uid: 'u1', taxCode: loggedUserTaxCode };
-  return args as unknown as Parameters<typeof postOnboardingSubmit>;
+  args[15] = { uid: 'u1', taxCode: loggedUserTaxCode } as User;
+  return args;
 };
 
 it('test postOnboardingSubmit builds the payload for a non-IPA io-sign subunit', async () => {
@@ -245,7 +264,7 @@ it.each([
   ['GPU', 'prod-interop', { businessRegisterNumber: 'BRN' }, 'FR'],
   ['SCP', 'prod-interop', undefined, 'IT'],
   ['SCP', 'prod-io', undefined, 'FR'],
-])(
+] as Array<[InstitutionType, string, Record<string, string> | undefined, string]>)(
   'test postOnboardingSubmit for %s on %s sets gpuData and location country',
   async (institutionType, productId, gpuData, country) => {
     vi.mocked(OnboardingApi.onboardingInstitution).mockResolvedValue(undefined);

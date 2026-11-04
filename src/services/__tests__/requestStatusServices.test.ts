@@ -5,6 +5,7 @@ import {
   getSuccessEvent,
   nextFileErrorAttempt,
   onboardingContractUpload,
+  type UploadContext,
 } from '../requestStatusServices';
 import { ENV } from '../../utils/env';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
@@ -31,7 +32,9 @@ const transcodeErrorCode = vi.fn();
 
 const file = new File(['data'], 'contract.pdf', { type: 'application/pdf' });
 
-const uploadArgs = (overrides: Partial<Record<string, any>> = {}) =>
+const uploadArgs = (
+  overrides: Partial<UploadContext> & { file?: File } = {}
+): readonly [File, UploadContext] =>
   [
     overrides.file ?? file,
     {

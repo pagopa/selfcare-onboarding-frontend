@@ -1,5 +1,6 @@
 import { beforeEach, expect, it, vi } from 'vitest';
 import { OnboardingApi } from '../../api/OnboardingApiClient';
+import { buildInstitutionInfo, buildOnboardingRequestResource } from '../../utils/test/builders';
 import { getOnboardingInfo, verifyRequest } from '../tokenServices';
 
 vi.mock('../../api/OnboardingApiClient', () => ({
@@ -21,8 +22,10 @@ beforeEach(() => {
 
 it('test getOnboardingInfo success', async () => {
   vi.mocked(OnboardingApi.retrieveOnboardingRequest).mockResolvedValue({
-    institutionInfo: { id: 'inst-123' },
-  } as any);
+    ...buildOnboardingRequestResource({
+      institutionInfo: buildInstitutionInfo({ id: 'inst-123' }),
+    }),
+  });
 
   await getOnboardingInfo('onb-1', setInstitutionId, setLoading, setOutcomeContentState);
 
@@ -59,7 +62,7 @@ it('test verifyRequest with outcome alreadyCompleted', async () => {
   vi.mocked(OnboardingApi.verifyOnboarding).mockResolvedValue({
     status: 'COMPLETED',
     expiringDate: new Date(Date.now() + 86_400_000),
-  } as any);
+  });
 
   await verifyRequest({
     onboardingId: 'onb-1',
@@ -76,7 +79,7 @@ it('test verifyRequest with outcome alreadyRejected', async () => {
   vi.mocked(OnboardingApi.verifyOnboarding).mockResolvedValue({
     status: 'REJECTED',
     expiringDate: new Date(Date.now() + 86_400_000),
-  } as any);
+  });
 
   await verifyRequest({
     onboardingId: 'onb-1',
@@ -92,7 +95,7 @@ it('test verifyRequest with outcome toBeCompleted', async () => {
   vi.mocked(OnboardingApi.verifyOnboarding).mockResolvedValue({
     status: 'PENDING',
     expiringDate: new Date(Date.now() + 86_400_000),
-  } as any);
+  });
 
   await verifyRequest({
     onboardingId: 'onb-1',
@@ -108,7 +111,7 @@ it('test verifyRequest with outcome expired', async () => {
   vi.mocked(OnboardingApi.verifyOnboarding).mockResolvedValue({
     status: 'PENDING',
     expiringDate: new Date(Date.now() - 86_400_000),
-  } as any);
+  });
 
   await verifyRequest({
     onboardingId: 'onb-1',

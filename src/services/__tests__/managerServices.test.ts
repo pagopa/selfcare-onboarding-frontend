@@ -1,3 +1,6 @@
+import { InstitutionTypeEnum } from '../../api/generated/onboarding/CheckManagerDto';
+import type { OnboardingFormData } from '../../model/OnboardingFormData';
+import { buildUser } from '../../utils/test/builders';
 import { it, expect, vi, beforeEach } from 'vitest';
 import { OnboardingApi } from '../../api/OnboardingApiClient';
 import { checkManager, searchUserId } from '../managerServices';
@@ -18,24 +21,29 @@ const setLoading = vi.fn();
 const setIsChangedManager = vi.fn();
 const addError = vi.fn();
 const validateUserData = vi.fn();
-const people = { 'manager-initial': { name: 'Mario' } } as any;
+const people = { 'manager-initial': buildUser({ name: 'Mario' }) };
 const product = { id: 'prod-1' };
 const subProduct = undefined;
 const selectedParty = { origin: 'IPA', originId: 'or1', taxCode: 'TC1' };
-const onboardingFormData = { aooUniqueCode: undefined, uoUniqueCode: undefined } as any;
+const onboardingFormData: OnboardingFormData = {
+  businessName: 'ACME',
+  registeredOffice: 'Via Roma 1',
+  digitalAddress: 'a@b.it',
+  geographicTaxonomies: [],
+};
 
 beforeEach(() => {
   vi.clearAllMocks();
 });
 
 it('test checkManager unchanged manager tracks event', async () => {
-  vi.mocked(OnboardingApi.checkManager).mockResolvedValue({ result: false } as any);
+  vi.mocked(OnboardingApi.checkManager).mockResolvedValue({ result: false });
 
   await checkManager(
     'u1',
     setLoading,
     setIsChangedManager,
-    'PA' as any,
+    InstitutionTypeEnum.PA,
     selectedParty,
     onboardingFormData,
     addError,
@@ -53,13 +61,13 @@ it('test checkManager unchanged manager tracks event', async () => {
 });
 
 it('test checkManager changed manager validates user', async () => {
-  vi.mocked(OnboardingApi.checkManager).mockResolvedValue({ result: true } as any);
+  vi.mocked(OnboardingApi.checkManager).mockResolvedValue({ result: true });
 
   await checkManager(
     'u1',
     setLoading,
     setIsChangedManager,
-    'PA' as any,
+    InstitutionTypeEnum.PA,
     selectedParty,
     onboardingFormData,
     addError,
@@ -83,7 +91,7 @@ it('test checkManager on error adds error and validates user', async () => {
     'u1',
     setLoading,
     setIsChangedManager,
-    'PA' as any,
+    InstitutionTypeEnum.PA,
     selectedParty,
     onboardingFormData,
     addError,
@@ -100,8 +108,8 @@ it('test checkManager on error adds error and validates user', async () => {
 });
 
 it('test searchUserId success triggers checkManager', async () => {
-  vi.mocked(OnboardingApi.searchUserId).mockResolvedValue({ id: 'user-found' } as any);
-  vi.mocked(OnboardingApi.checkManager).mockResolvedValue({ result: true } as any);
+  vi.mocked(OnboardingApi.searchUserId).mockResolvedValue({ id: 'user-found' });
+  vi.mocked(OnboardingApi.checkManager).mockResolvedValue({ result: true });
 
   await searchUserId(
     'TC1',
@@ -112,7 +120,7 @@ it('test searchUserId success triggers checkManager', async () => {
     'ext-1',
     subProduct,
     setIsChangedManager,
-    'PA' as any,
+    InstitutionTypeEnum.PA,
     selectedParty,
     onboardingFormData,
     product
@@ -134,7 +142,7 @@ it('test searchUserId on error adds error and validates user', async () => {
     'ext-1',
     subProduct,
     setIsChangedManager,
-    'PA' as any,
+    InstitutionTypeEnum.PA,
     selectedParty,
     onboardingFormData,
     product

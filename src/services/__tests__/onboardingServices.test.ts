@@ -9,6 +9,18 @@ import {
   getFilterCategories,
   getInstiutionTypesByProduct,
 } from '../onboardingServices';
+import { InstitutionTypeEnum } from '../../api/generated/onboarding/InstitutionData';
+import {
+  InstitutionTypeEnum as OriginInstitutionTypeEnum,
+  OriginEnum,
+} from '../../api/generated/onboarding/OriginEntry';
+import {
+  buildParty,
+  buildProduct,
+  buildProductResource,
+  buildUser,
+} from '../../utils/test/builders';
+import type { PartyData, RequestOutcomeMessage, RequestOutcomeOptions } from '../../../types';
 import config from '../../utils/config.json';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
 
@@ -35,11 +47,14 @@ const setProducts = vi.fn();
 const setRetrivedInstituionType = vi.fn();
 const forward = vi.fn();
 
-const genericError = { code: 'generic' } as any;
-const outcomeContent = {
-  success: { code: 'success' },
-  error: { code: 'error' },
-} as any;
+const genericError: RequestOutcomeMessage = {
+  title: 'generic',
+  description: [],
+};
+const outcomeContent: RequestOutcomeOptions = {
+  success: { title: 'success', description: [] },
+  error: { title: 'error', description: [] },
+};
 
 const mockedAxios = axios as Mocked<typeof axios>;
 const setFilterCategories = vi.fn();
@@ -60,14 +75,25 @@ it('test getOnboardingData success calls forward with mapped fields', async () =
       id: 'inst-1',
       origin: 'IPA',
       originId: 'or1',
-      institutionType: 'PA',
+      institutionType: InstitutionTypeEnum.PA,
       country: 'IT',
       city: 'MILANO',
       county: 'MI',
-      billingData: { taxCode: 'tc1' },
+      billingData: {
+        businessName: 'Comune di Milano',
+        certified: true,
+        digitalAddress: 'a@b.it',
+        publicServices: false,
+        recipientCode: 'RC1',
+        registeredOffice: 'Via Roma 1',
+        taxCode: 'tc1',
+        vatNumber: '01199250158',
+        zipCode: '20121',
+        geographicTaxonomies: [],
+      },
     },
     geographicTaxonomies: [],
-  } as any);
+  });
 
   await getOnboardingData(
     setLoading,
@@ -88,15 +114,7 @@ it('test getOnboardingData on 404 calls forward with undefined', async () => {
   const err404 = Object.assign(new Error('nope'), { httpStatus: 404 });
   vi.mocked(OnboardingApi.getOnboardingData).mockRejectedValue(err404);
 
-  await getOnboardingData(
-    setLoading,
-    'prod-1',
-    forward,
-    'PA' as any,
-    setOutcome,
-    genericError,
-    'party-1'
-  );
+  await getOnboardingData(setLoading, 'prod-1', forward, 'PA', setOutcome, genericError, 'party-1');
 
   expect(forward).toHaveBeenCalledWith(undefined, undefined, undefined, 'PA');
   expect(setOutcome).not.toHaveBeenCalled();
@@ -123,16 +141,17 @@ it('test getOnboardingData on generic error sets genericError outcome', async ()
 // ---------- checkProduct ----------
 
 it('test checkProduct success sets product', async () => {
-  vi.mocked(OnboardingApi.getProduct).mockResolvedValue({ id: 'prod-1', status: 'ACTIVE' } as any);
+  vi.mocked(OnboardingApi.getProduct).mockResolvedValue(
+    buildProductResource({ id: 'prod-1', status: 'ACTIVE' })
+  );
   await checkProduct('prod-1', setProduct);
   expect(setProduct).toHaveBeenCalledWith(expect.objectContaining({ id: 'prod-1' }));
 });
 
 it('test checkProduct on PHASE_OUT triggers onPhaseOut', async () => {
-  vi.mocked(OnboardingApi.getProduct).mockResolvedValue({
-    id: 'prod-1',
-    status: 'PHASE_OUT',
-  } as any);
+  vi.mocked(OnboardingApi.getProduct).mockResolvedValue(
+    buildProductResource({ id: 'prod-1', status: 'PHASE_OUT' })
+  );
   const onPhaseOut = vi.fn();
   await checkProduct('prod-1', setProduct, { onPhaseOut });
   expect(onPhaseOut).toHaveBeenCalled();
@@ -153,12 +172,12 @@ it('test addUserRequest success sets success outcome and tracks event', async ()
   vi.mocked(OnboardingApi.onboardingUsers).mockResolvedValue(undefined);
 
   await addUserRequest(
-    [{ taxCode: 'tc1' }] as any,
+    [buildUser({ taxCode: 'tc1' })],
     setLoading,
-    { id: 'prod-1' } as any,
-    {} as any,
-    { externalId: 'ext-1' } as any,
-    'PA' as any,
+    buildProduct({ id: 'prod-1' }),
+    undefined,
+    buildParty({ externalId: 'ext-1' }) as PartyData,
+    'PA',
     setOutcome,
     outcomeContent,
     'req-1'
@@ -172,12 +191,12 @@ it('test addUserRequest failure sets error outcome and tracks failure event', as
   vi.mocked(OnboardingApi.onboardingUsers).mockRejectedValue(new Error('boom'));
 
   await addUserRequest(
-    [{ taxCode: 'tc1' }] as any,
+    [buildUser({ taxCode: 'tc1' })],
     setLoading,
-    { id: 'prod-1' } as any,
-    {} as any,
-    { externalId: 'ext-1' } as any,
-    'PA' as any,
+    buildProduct({ id: 'prod-1' }),
+    undefined,
+    buildParty({ externalId: 'ext-1' }) as PartyData,
+    'PA',
     setOutcome,
     outcomeContent,
     'req-1'
@@ -190,13 +209,8 @@ it('test addUserRequest failure sets error outcome and tracks failure event', as
 // ---------- getAllowedAddUserProducts ----------
 
 it('test getAllowedAddUserProducts success sets products', async () => {
-  vi.mocked(OnboardingApi.getProductsAdmin).mockResolvedValue([{ id: 'p1' }, { id: 'p2' }] as any);
-  await getAllowedAddUserProducts(
-    setLoading,
-    setProducts,
-    setOutcome,
-    genericError
-  );
+  vi.mocked(OnboardingApi.getProductsAdmin).mockResolvedValue([{ id: 'p1' }, { id: 'p2' }]);
+  await getAllowedAddUserProducts(setLoading, setProducts, setOutcome, genericError);
   expect(setProducts).toHaveBeenCalledWith(
     expect.arrayContaining([expect.objectContaining({ id: 'p1' })])
   );
@@ -204,12 +218,7 @@ it('test getAllowedAddUserProducts success sets products', async () => {
 
 it('test getAllowedAddUserProducts on error sets genericError outcome', async () => {
   vi.mocked(OnboardingApi.getProductsAdmin).mockRejectedValue(new Error('boom'));
-  await getAllowedAddUserProducts(
-    setLoading,
-    setProducts,
-    setOutcome,
-    genericError
-  );
+  await getAllowedAddUserProducts(setLoading, setProducts, setOutcome, genericError);
   expect(setOutcome).toHaveBeenCalledWith(genericError);
 });
 
@@ -217,8 +226,8 @@ it('test getAllowedAddUserProducts on error sets genericError outcome', async ()
 
 it('test getInstiutionTypesByProduct success sets retrieved data', async () => {
   vi.mocked(OnboardingApi.getOrigins).mockResolvedValue({
-    origins: [{ institutionType: 'PA', origin: 'IPA' }],
-  } as any);
+    origins: [{ institutionType: OriginInstitutionTypeEnum.PA, origin: OriginEnum.IPA }],
+  });
 
   await getInstiutionTypesByProduct(
     setLoading,
@@ -232,7 +241,7 @@ it('test getInstiutionTypesByProduct success sets retrieved data', async () => {
 });
 
 it('test getInstiutionTypesByProduct on empty origins sets genericError', async () => {
-  vi.mocked(OnboardingApi.getOrigins).mockResolvedValue({ origins: [] } as any);
+  vi.mocked(OnboardingApi.getOrigins).mockResolvedValue({ origins: [] });
 
   await getInstiutionTypesByProduct(
     setLoading,

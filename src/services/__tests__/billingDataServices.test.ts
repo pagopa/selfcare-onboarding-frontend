@@ -1,3 +1,6 @@
+import type { FormikProps } from 'formik';
+import type { OnboardingFormData } from '../../model/OnboardingFormData';
+import type { UoData } from '../../model/UoModel';
 import { it, expect, vi, beforeEach } from 'vitest';
 import { OnboardingApi } from '../../api/OnboardingApiClient';
 import { PartyRegistryProxyApi } from '../../api/PartyRegistryProxyApiClient';
@@ -18,8 +21,12 @@ vi.mock('../../api/PartyRegistryProxyApiClient', () => ({
 const setRecipientCodeStatus = vi.fn();
 const setInvalidTaxCodeInvoicing = vi.fn();
 const setFieldValue = vi.fn();
-const formik = { setFieldValue, values: { taxCode: 'ENTE123' } } as any;
-const uoSelected = { id: 'uo-1' } as any;
+// Partial Formik stub: only the members used by the service are provided
+const formik = {
+  setFieldValue,
+  values: { taxCode: 'ENTE123' },
+} as unknown as FormikProps<OnboardingFormData>;
+const uoSelected = { id: 'uo-1' } as UoData;
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -73,7 +80,7 @@ it('test verifyTaxCodeInvoicing valid when a UO matches the taxCode', async () =
   vi.mocked(PartyRegistryProxyApi.getUoList).mockResolvedValue({
     count: 1,
     items: [{ codiceFiscaleEnte: 'ENTE123' }],
-  } as any);
+  });
 
   await verifyTaxCodeInvoicing('9988776655', formik, setInvalidTaxCodeInvoicing);
 
@@ -85,7 +92,7 @@ it('test verifyTaxCodeInvoicing invalid when no UO matches the taxCode', async (
   vi.mocked(PartyRegistryProxyApi.getUoList).mockResolvedValue({
     count: 1,
     items: [{ codiceFiscaleEnte: 'OTHER999' }],
-  } as any);
+  });
 
   await verifyTaxCodeInvoicing('9988776655', formik, setInvalidTaxCodeInvoicing);
 

@@ -1,6 +1,8 @@
 import { type MockInstance, vi } from 'vitest';
 import type { Party, Product, UserOnCreate } from '../../../types';
-import { type ProductResource, StatusEnum } from '../../api/generated/onboarding/ProductResource';
+import type { InstitutionInfo } from '../../api/generated/onboarding/InstitutionInfo';
+import type { OnboardingRequestResource } from '../../api/generated/onboarding/OnboardingRequestResource';
+import type { ProductResource } from '../../model/ProductResource';
 import * as apiUtils from '../../lib/api-utils';
 
 /** Typed spy on `fetchWithLogs`, the single entry point of every onboarding API call. */
@@ -22,8 +24,32 @@ export const buildProductResource = (
   overrides: Partial<ProductResource> = {}
 ): ProductResource => ({
   id: 'prod-io',
+  parentId: '',
   title: 'App IO',
-  status: StatusEnum.ACTIVE,
+  logo: '',
+  logoBgColor: '',
+  status: 'ACTIVE',
+  ...overrides,
+});
+
+export const buildInstitutionInfo = (
+  overrides: Partial<InstitutionInfo> = {}
+): InstitutionInfo => ({
+  address: 'Piazza della Scala, 2',
+  fiscalCode: '01199250158',
+  institutionType: 'PA',
+  mailAddress: 'protocollo@postacert.comune.milano.it',
+  name: 'Comune di Milano',
+  vatNumber: '01199250158',
+  zipCode: '20121',
+  ...overrides,
+});
+
+export const buildOnboardingRequestResource = (
+  overrides: Partial<OnboardingRequestResource> = {}
+): OnboardingRequestResource => ({
+  institutionInfo: buildInstitutionInfo(),
+  status: 'PENDING',
   ...overrides,
 });
 

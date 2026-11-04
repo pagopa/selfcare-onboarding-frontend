@@ -27,12 +27,12 @@ it('test verifyAggregates success without errors forwards the aggregates', async
   vi.mocked(OnboardingApi.verifyAggregatesCsv).mockResolvedValue({
     aggregates: [{ taxCode: 't1' }],
     errors: [],
-  } as any);
+  });
 
   await verifyAggregates(
     file,
     setLoading,
-    'PA' as any,
+    'PA',
     'prod-1',
     setRequiredLogin,
     parseJson2Csv,
@@ -51,7 +51,7 @@ it('test verifyAggregates success with errors sets foundErrors', async () => {
   vi.mocked(OnboardingApi.verifyAggregatesCsv).mockResolvedValue({
     aggregates: [],
     errors: [{ riga: 1, 'codice fiscale': 'CF', errore: 'bad' }],
-  } as any);
+  });
 
   await verifyAggregates(
     file,
