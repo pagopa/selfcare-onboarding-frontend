@@ -1,6 +1,12 @@
-import { it, expect, vi, beforeEach } from 'vitest';
+import { it, expect, vi, beforeEach, describe } from 'vitest';
 import { OnboardingApi } from '../../api/OnboardingApiClient';
-import { deleteRequest, onboardingContractUpload } from '../requestStatusServices';
+import {
+  deleteRequest,
+  getSuccessEvent,
+  nextFileErrorAttempt,
+  onboardingContractUpload,
+} from '../requestStatusServices';
+import { ENV } from '../../utils/env';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
 
 vi.mock('../../api/OnboardingApiClient', () => ({
@@ -28,18 +34,20 @@ const file = new File(['data'], 'contract.pdf', { type: 'application/pdf' });
 const uploadArgs = (overrides: Partial<Record<string, any>> = {}) =>
   [
     overrides.file ?? file,
-    setLoading,
-    overrides.onboardingId ?? 'onboarding-1',
-    overrides.requestData ?? { productId: 'prod-1' },
-    overrides.addUserFlow ?? false,
-    setOutcomeContentState,
-    overrides.lastFileErrorAttempt,
-    setLastFileErrorAttempt,
-    setOpen,
-    setErrorCode,
-    transcodeErrorCode,
-    overrides.attachmentName,
-    overrides.onAttachmentSuccess,
+    {
+      setLoading,
+      onboardingId: overrides.onboardingId ?? 'onboarding-1',
+      requestData: overrides.requestData ?? { productId: 'prod-1' },
+      addUserFlow: overrides.addUserFlow ?? false,
+      setOutcomeContentState,
+      lastFileErrorAttempt: overrides.lastFileErrorAttempt,
+      setLastFileErrorAttempt,
+      setOpen,
+      setErrorCode,
+      transcodeErrorCode,
+      attachmentName: overrides.attachmentName,
+      onAttachmentSuccess: overrides.onAttachmentSuccess,
+    },
   ] as const;
 
 beforeEach(() => {
@@ -104,9 +112,7 @@ it('test onboardingContractUpload attachment success calls onAttachmentSuccess',
   vi.mocked(OnboardingApi.uploadAttachment).mockResolvedValue(undefined);
   const onAttachmentSuccess = vi.fn();
 
-  await onboardingContractUpload(
-    ...uploadArgs({ attachmentName: 'doc.pdf', onAttachmentSuccess })
-  );
+  await onboardingContractUpload(...uploadArgs({ attachmentName: 'doc.pdf', onAttachmentSuccess }));
 
   expect(OnboardingApi.uploadAttachment).toHaveBeenCalledWith('onboarding-1', 'doc.pdf', file);
   expect(onAttachmentSuccess).toHaveBeenCalled();
@@ -139,4 +145,119 @@ it('test onboardingContractUpload generic error sets GENERIC', async () => {
   expect(transcodeErrorCode).not.toHaveBeenCalled();
   expect(setErrorCode).toHaveBeenCalledWith('GENERIC');
   expect(trackEvent).toHaveBeenCalledWith('ONBOARDING_FAILURE', expect.any(Object));
+});
+it('test onboardingContractUpload attachment and add-user flows pick the right api and events', async () => {
+  vi.mocked(OnboardingApi.completeUsersOnboardingContract).mockResolvedValue(undefined);
+
+  await onboardingContractUpload(...uploadArgs({ addUserFlow: true }));
+
+  expect(OnboardingApi.completeUsersOnboardingContract).toHaveBeenCalledWith('onboarding-1', file);
+  expect(trackEvent).toHaveBeenCalledWith(
+    'ONBOARDING_USER_COMPLETED',
+    expect.objectContaining({ form: 'onboarding/dashboard' })
+  );
+});
+
+it('test onboardingContractUpload attachment failure tracks the attachment failure event', async () => {
+  vi.mocked(OnboardingApi.uploadAttachment).mockRejectedValue(
+    Object.assign(new Error('boom'), { httpStatus: 500 })
+  );
+
+  await onboardingContractUpload(...uploadArgs({ attachmentName: 'doc.pdf' }));
+
+  expect(trackEvent).toHaveBeenCalledWith('ONBOARDING_ATTACHMENT_FAILURE', expect.any(Object));
+  expect(setErrorCode).toHaveBeenCalledWith('GENERIC');
+});
+
+describe('onboardingContractUpload repeated failures on the same file', () => {
+  const sameFileAttempt = (errorCount: number) => ({
+    fileName: file.name,
+    fileSize: file.size,
+    fileLastModifyDate: file.lastModified,
+    errorCount,
+  });
+
+  beforeEach(() => {
+    vi.mocked(OnboardingApi.completeOnboardingContract).mockRejectedValue(
+      Object.assign(new Error('boom'), { httpStatus: 500 })
+    );
+  });
+
+  it('first failure stores an attempt with errorCount 1', async () => {
+    await onboardingContractUpload(...uploadArgs());
+
+    expect(setLastFileErrorAttempt).toHaveBeenCalledWith(sameFileAttempt(1));
+    expect(setOutcomeContentState).not.toHaveBeenCalled();
+  });
+
+  it('a different file restarts the counter', async () => {
+    await onboardingContractUpload(
+      ...uploadArgs({ lastFileErrorAttempt: { ...sameFileAttempt(5), fileName: 'other.pdf' } })
+    );
+
+    expect(setLastFileErrorAttempt).toHaveBeenCalledWith(sameFileAttempt(1));
+    expect(setOutcomeContentState).not.toHaveBeenCalled();
+  });
+
+  it('the same file increments the counter without giving up below the limit', async () => {
+    await onboardingContractUpload(...uploadArgs({ lastFileErrorAttempt: sameFileAttempt(1) }));
+
+    expect(setLastFileErrorAttempt).toHaveBeenCalledWith(sameFileAttempt(2));
+    expect(setOutcomeContentState).not.toHaveBeenCalled();
+    expect(setOpen).toHaveBeenCalledWith(true);
+  });
+
+  it('the same file over the limit closes the modal and sets the error outcome', async () => {
+    await onboardingContractUpload(
+      ...uploadArgs({ lastFileErrorAttempt: sameFileAttempt(ENV.UPLOAD_CONTRACT_MAX_LOOP_ERROR) })
+    );
+
+    expect(setOpen).toHaveBeenNthCalledWith(1, false);
+    expect(setOutcomeContentState).toHaveBeenCalledWith('error');
+  });
+});
+
+describe('getSuccessEvent', () => {
+  it.each([
+    [true, false, 'ONBOARDING_ATTACHMENT_SUCCESS'],
+    [true, true, 'ONBOARDING_ATTACHMENT_SUCCESS'],
+    [false, true, 'ONBOARDING_USER_COMPLETED'],
+    [false, false, 'ONBOARDING_SUCCESS'],
+  ])('isAttachment=%s addUserFlow=%s -> %s', (isAttachment, addUserFlow, expected) => {
+    expect(getSuccessEvent(isAttachment, addUserFlow)).toBe(expected);
+  });
+});
+
+describe('nextFileErrorAttempt', () => {
+  const attempt = (overrides = {}) => ({
+    fileName: file.name,
+    fileSize: file.size,
+    fileLastModifyDate: file.lastModified,
+    errorCount: 2,
+    ...overrides,
+  });
+
+  it('starts from 1 when there is no previous attempt', () => {
+    expect(nextFileErrorAttempt(undefined, file)).toEqual({
+      attempt: attempt({ errorCount: 1 }),
+      repeated: false,
+    });
+  });
+
+  it('increments the counter for the same file', () => {
+    expect(nextFileErrorAttempt(attempt(), file)).toEqual({
+      attempt: attempt({ errorCount: 3 }),
+      repeated: true,
+    });
+  });
+
+  it.each([{ fileName: 'x.pdf' }, { fileSize: 1 }, { fileLastModifyDate: 1 }])(
+    'restarts the counter when %o differs',
+    (difference) => {
+      expect(nextFileErrorAttempt(attempt(difference), file)).toEqual({
+        attempt: attempt({ errorCount: 1 }),
+        repeated: false,
+      });
+    }
+  );
 });
