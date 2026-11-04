@@ -7,23 +7,15 @@ import { Provider } from 'react-redux';
 import { Router } from 'react-router-dom';
 import { expect, MockInstance } from 'vitest';
 import { InstitutionType } from '../../../../../types';
-import { mockedCategories } from '../../../../lib/__mocks__/mockApiRequests';
 import { HeaderContext, UserContext } from '../../../../lib/context';
 import { createStore } from '../../../../redux/store';
 import { canInvoice, PRODUCT_IDS } from '../../../../utils/constants';
 import { ENV } from '../../../../utils/env';
 import {
-  isConsolidatedEconomicAccountCompany,
-  isContractingAuthority,
   isGlobalServiceProvider,
-  isIdpayMerchantProduct,
-  isInsuranceCompany,
-  isInteropProduct,
   isIoProduct,
-  isPrivateInstitution,
   isPrivateMerchantInstitution,
   isPublicAdministration,
-  isPublicServiceCompany,
 } from '../../../../utils/institutionTypeUtils';
 import {
   checkCorrectBodyBillingData,
@@ -33,6 +25,18 @@ import {
   Source,
 } from '../../../../utils/test/test-utils';
 import OnboardingProduct from '../../OnboardingProduct';
+import {
+  expectedBusinessNameSearchEndpoint,
+  expectedBusinessNameSearchParams,
+  expectedCodeSearchEndpoint,
+  expectedCodeSearchEndpointParams,
+  expectedCodeSearchQueryParams,
+  type SearchPartyCodes,
+  searchCodeValue,
+  searchResultLabel,
+} from './searchPartyExpectations';
+
+export { filterByCategory4Test } from './searchPartyExpectations';
 
 export const renderComponent = (
   productId: string,
@@ -77,32 +81,6 @@ export const renderComponent = (
   return { history };
 };
 
-export const filterByCategory4Test = (institutionType?: string, productId?: string) => {
-  switch (productId) {
-    case PRODUCT_IDS.SEND:
-      return mockedCategories.product['prod-pn']?.ipa.PA;
-
-    case PRODUCT_IDS.IDPAY_MERCHANT:
-      return mockedCategories.product['prod-idpay-merchant']?.merchantDetails;
-
-    case PRODUCT_IDS.INTEROP:
-      if (isConsolidatedEconomicAccountCompany(institutionType as InstitutionType)) {
-        return mockedCategories.product['prod-interop']?.ipa.SCEC;
-      } else if (isPublicAdministration(institutionType as InstitutionType)) {
-        return mockedCategories.product['prod-interop']?.ipa.PA;
-      } else if (isGlobalServiceProvider(institutionType as InstitutionType)) {
-        return mockedCategories.product.default?.ipa.GSP;
-      } else {
-        return mockedCategories.product.default?.ipa.PA;
-      }
-    default:
-      const defaultIpa = mockedCategories.product.default?.ipa;
-      return isGlobalServiceProvider(institutionType as InstitutionType)
-        ? defaultIpa?.GSP
-        : defaultIpa?.PA;
-  }
-};
-
 export const executeStepInstitutionType = async (
   productSelected: string,
   institutionType: string
@@ -130,6 +108,181 @@ export const executeStepInstitutionType = async (
   }
 };
 
+const checkWithoutIpaLink = (
+  productId: string,
+  institutionType: string,
+  withoutIpa: boolean
+): boolean => {
+  const withoutIpaLink = document.getElementById('no_ipa') as HTMLElement;
+  if (
+    productId !== PRODUCT_IDS.PAGOPA ||
+    !isGlobalServiceProvider(institutionType as InstitutionType)
+  ) {
+    expect(withoutIpaLink).not.toBeInTheDocument();
+    return false;
+  }
+  expect(withoutIpaLink).toBeInTheDocument();
+  if (withoutIpa) {
+    fireEvent.click(withoutIpaLink);
+  }
+  return withoutIpa;
+};
+
+const checkAggregatorCheckbox = (
+  productId: string,
+  institutionType: string,
+  isAggregator: boolean
+) => {
+  const aggregatorCheckbox = screen.queryByLabelText('Sono un ente aggregatore') as HTMLElement;
+  const canAggregate =
+    ENV.AGGREGATOR.SHOW_AGGREGATOR &&
+    isPublicAdministration(institutionType as InstitutionType) &&
+    ENV.AGGREGATOR.ELIGIBLE_PRODUCTS.split(',').includes(productId);
+
+  if (!canAggregate) {
+    expect(aggregatorCheckbox).not.toBeInTheDocument();
+    return;
+  }
+  expect(aggregatorCheckbox).toBeInTheDocument();
+  expect(aggregatorCheckbox).not.toBeChecked();
+  if (isAggregator) {
+    fireEvent.click(aggregatorCheckbox);
+    expect(aggregatorCheckbox).toBeChecked();
+  }
+};
+
+const searchByBusinessName = async (
+  productId: string,
+  institutionType: string,
+  partyName: string,
+  fetchWithLogsSpy: MockInstance,
+  inputPartyName: HTMLElement
+) => {
+  fireEvent.change(inputPartyName, { target: { value: 'XXX' } });
+
+  const partyNameSelection = await waitFor(() => screen.getByText(partyName));
+
+  expect(fetchWithLogsSpy).toHaveBeenCalledTimes(4);
+  expect(fetchWithLogsSpy).toHaveBeenNthCalledWith(
+    4,
+    { endpoint: expectedBusinessNameSearchEndpoint(institutionType) },
+    { method: 'GET', params: expectedBusinessNameSearchParams(institutionType, productId) },
+    expect.any(Function)
+  );
+  fireEvent.click(partyNameSelection);
+};
+
+const BONUS_ATECO_ERROR =
+  'Il codice ATECO al quale sei abilitato non corrisponde con quelli idonei al Bonus Elettrodomestici';
+const PARENT_COMPANY_HINT =
+  'se l’esercente fa parte di una catena è la società padre a dover aderire';
+
+/** Types a valid code, then an invalid one, and checks the error and the disabled button. */
+const checkInvalidCode = (
+  inputPartyName: HTMLElement,
+  validValue: string | undefined,
+  invalidValue: string,
+  expectedError: string
+) => {
+  fireEvent.change(inputPartyName, { target: { value: validValue } });
+  expect(screen.getByRole('button', { name: 'Continua' })).toBeEnabled();
+
+  fireEvent.change(inputPartyName, { target: { value: invalidValue } });
+  expect(screen.getByText(expectedError)).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: 'Continua' })).toBeDisabled();
+};
+
+// NB: these checks compare the search type with the typed code values, as the original helper
+// did: they are kept unchanged to preserve the current test behavior.
+const checkCodeValidations = (
+  productId: string,
+  typeOfSearch: Search,
+  codes: SearchPartyCodes,
+  valueToSet: string | undefined,
+  inputPartyName: HTMLElement
+) => {
+  if (typeOfSearch === codes.personalTaxCode) {
+    checkInvalidCode(
+      inputPartyName,
+      valueToSet,
+      'FRSMRA70D30G786G',
+      'La tua società non può aderire al portale perché risulta cessata o in liquidazione'
+    );
+  }
+
+  if (typeOfSearch === codes.reaCode) {
+    expect(screen.getByText(PARENT_COMPANY_HINT)).toBeInTheDocument();
+    checkInvalidCode(inputPartyName, valueToSet, 'RM-234567', BONUS_ATECO_ERROR);
+  }
+
+  if (typeOfSearch === codes.taxCode && productId === PRODUCT_IDS.IDPAY_MERCHANT) {
+    expect(screen.getByText(PARENT_COMPANY_HINT)).toBeInTheDocument();
+    checkInvalidCode(inputPartyName, valueToSet, '98765432109', BONUS_ATECO_ERROR);
+  }
+};
+
+const searchByCode = async (
+  productId: string,
+  institutionType: string,
+  partyName: string,
+  typeOfSearch: Search,
+  fetchWithLogsSpy: MockInstance,
+  codes: SearchPartyCodes,
+  inputPartyName: HTMLElement
+) => {
+  const selectWrapper = document.getElementById('party-type-select');
+  const input = selectWrapper?.firstChild as HTMLElement;
+  fireEvent.keyDown(input, { keyCode: 40 });
+
+  const option = document.getElementById(typeOfSearch) as HTMLElement;
+  fireEvent.click(option);
+
+  const valueToSet = searchCodeValue(typeOfSearch, codes);
+  checkCodeValidations(productId, typeOfSearch, codes, valueToSet, inputPartyName);
+
+  fireEvent.change(inputPartyName, { target: { value: valueToSet } });
+
+  const endpoint = expectedCodeSearchEndpoint(typeOfSearch, institutionType, productId);
+  expect(fetchWithLogsSpy).toHaveBeenNthCalledWith(
+    4,
+    {
+      endpoint,
+      endpointParams: expectedCodeSearchEndpointParams(typeOfSearch, institutionType, codes),
+    },
+    {
+      method: 'GET',
+      params: expectedCodeSearchQueryParams(endpoint, institutionType, productId, codes.reaCode),
+    },
+    expect.any(Function)
+  );
+
+  await waitFor(() => {
+    fireEvent.click(screen.getByText(searchResultLabel(typeOfSearch, partyName)));
+  });
+};
+
+const CODE_SEARCHES: ReadonlyArray<Search> = [
+  'taxCode',
+  'aooCode',
+  'uoCode',
+  'ivassCode',
+  'reaCode',
+  'personalTaxCode',
+];
+
+const confirmSearchParty = async (isAggregator: boolean) => {
+  const confirmButton = screen.getByRole('button', { name: 'Continua' });
+  expect(confirmButton).toBeEnabled();
+
+  await waitFor(() => fireEvent.click(confirmButton));
+
+  if (isAggregator) {
+    await waitFor(() => screen.getByText(/Stai richiedendo l’adesione come ente aggregatore per /));
+    const continueButtonModal = screen.getAllByText('Continua')[1];
+    fireEvent.click(continueButtonModal);
+  }
+};
+
 export const executeStepSearchParty = async (
   productId: string,
   institutionType: string,
@@ -152,255 +305,33 @@ export const executeStepSearchParty = async (
   await waitFor(() => expect(fetchWithLogsSpy).toHaveBeenCalledTimes(3));
   const inputPartyName = document.getElementById('Parties') as HTMLElement;
 
-  const withoutIpaLink = document.getElementById('no_ipa') as HTMLElement;
-  if (
-    productId === PRODUCT_IDS.PAGOPA &&
-    isGlobalServiceProvider(institutionType as InstitutionType)
-  ) {
-    expect(withoutIpaLink).toBeInTheDocument();
-    if (withoutIpa) {
-      fireEvent.click(withoutIpaLink);
-      return;
-    }
-  } else {
-    expect(withoutIpaLink).not.toBeInTheDocument();
+  if (checkWithoutIpaLink(productId, institutionType, withoutIpa)) {
+    return;
+  }
+  checkAggregatorCheckbox(productId, institutionType, isAggregator);
+
+  if (typeOfSearch === 'businessName') {
+    await searchByBusinessName(
+      productId,
+      institutionType,
+      partyName,
+      fetchWithLogsSpy,
+      inputPartyName
+    );
+  } else if (CODE_SEARCHES.includes(typeOfSearch)) {
+    const codes = { subUnitCode, taxCode, ivassCode, reaCode, personalTaxCode };
+    await searchByCode(
+      productId,
+      institutionType,
+      partyName,
+      typeOfSearch,
+      fetchWithLogsSpy,
+      codes,
+      inputPartyName
+    );
   }
 
-  const aggregatorCheckbox = screen.queryByLabelText('Sono un ente aggregatore') as HTMLElement;
-
-  const canAggregate =
-    ENV.AGGREGATOR.SHOW_AGGREGATOR &&
-    isPublicAdministration(institutionType as InstitutionType) &&
-    ENV.AGGREGATOR.ELIGIBLE_PRODUCTS.split(',').includes(productId);
-
-  if (canAggregate) {
-    expect(aggregatorCheckbox).toBeInTheDocument();
-    expect(aggregatorCheckbox).not.toBeChecked();
-    if (isAggregator) {
-      fireEvent.click(aggregatorCheckbox);
-      expect(aggregatorCheckbox).toBeChecked();
-    }
-  } else {
-    expect(aggregatorCheckbox).not.toBeInTheDocument();
-  }
-
-  switch (typeOfSearch) {
-    case 'businessName':
-      fireEvent.change(inputPartyName, { target: { value: 'XXX' } });
-
-      const partyNameSelection = await waitFor(() => screen.getByText(partyName));
-
-      expect(fetchWithLogsSpy).toHaveBeenCalledTimes(4);
-      expect(fetchWithLogsSpy).toHaveBeenNthCalledWith(
-        4,
-        {
-          endpoint: isContractingAuthority(institutionType as InstitutionType)
-            ? 'ONBOARDING_GET_SA_PARTIES_NAME'
-            : isInsuranceCompany(institutionType as InstitutionType)
-              ? 'ONBOARDING_GET_INSURANCE_COMPANIES_FROM_BUSINESSNAME'
-              : 'ONBOARDING_GET_SEARCH_PARTIES',
-        },
-        {
-          method: 'GET',
-          params:
-            isContractingAuthority(institutionType as InstitutionType) ||
-            isInsuranceCompany(institutionType as InstitutionType)
-              ? { limit: undefined, categories: undefined, page: 1, search: 'XXX' }
-              : {
-                  search: 'XXX',
-                  category: filterByCategory4Test(institutionType.toUpperCase(), productId),
-                  page: 0,
-                  pageSize: ENV.MAX_INSTITUTIONS_FETCH,
-                },
-        },
-        expect.any(Function)
-      );
-      fireEvent.click(partyNameSelection);
-      break;
-    case 'taxCode':
-    case 'aooCode':
-    case 'uoCode':
-    case 'ivassCode':
-    case 'reaCode':
-    case 'personalTaxCode':
-      const selectWrapper = document.getElementById('party-type-select');
-      const input = selectWrapper?.firstChild as HTMLElement;
-      fireEvent.keyDown(input, { keyCode: 40 });
-
-      const option = document.getElementById(typeOfSearch) as HTMLElement;
-      fireEvent.click(option);
-
-      const valueToSet =
-        typeOfSearch === 'taxCode'
-          ? taxCode
-          : typeOfSearch === 'ivassCode'
-            ? ivassCode
-            : typeOfSearch === 'reaCode'
-              ? reaCode
-              : typeOfSearch === 'personalTaxCode'
-                ? personalTaxCode
-                : subUnitCode;
-
-      if (typeOfSearch === personalTaxCode) {
-        fireEvent.change(inputPartyName, { target: { value: valueToSet } });
-
-        expect(screen.getByRole('button', { name: 'Continua' })).toBeEnabled();
-
-        fireEvent.change(inputPartyName, { target: { value: 'FRSMRA70D30G786G' } });
-
-        expect(
-          screen.getByText(
-            'La tua società non può aderire al portale perché risulta cessata o in liquidazione'
-          )
-        ).toBeInTheDocument();
-
-        expect(screen.getByRole('button', { name: 'Continua' })).toBeDisabled();
-      }
-
-      if (typeOfSearch === reaCode) {
-        expect(
-          screen.getByText(
-            'se l’esercente fa parte di una catena è la società padre a dover aderire'
-          )
-        ).toBeInTheDocument();
-
-        fireEvent.change(inputPartyName, { target: { value: valueToSet } });
-
-        expect(screen.getByRole('button', { name: 'Continua' })).toBeEnabled();
-
-        fireEvent.change(inputPartyName, { target: { value: 'RM-234567' } });
-
-        expect(
-          screen.getByText(
-            'Il codice ATECO al quale sei abilitato non corrisponde con quelli idonei al Bonus Elettrodomestici'
-          )
-        ).toBeInTheDocument();
-
-        expect(screen.getByRole('button', { name: 'Continua' })).toBeDisabled();
-      }
-
-      if (typeOfSearch === taxCode && productId === PRODUCT_IDS.IDPAY_MERCHANT) {
-        expect(
-          screen.getByText(
-            'se l’esercente fa parte di una catena è la società padre a dover aderire'
-          )
-        ).toBeInTheDocument();
-
-        fireEvent.change(inputPartyName, { target: { value: valueToSet } });
-
-        expect(screen.getByRole('button', { name: 'Continua' })).toBeEnabled();
-
-        fireEvent.change(inputPartyName, { target: { value: '98765432109' } });
-
-        expect(
-          screen.getByText(
-            'Il codice ATECO al quale sei abilitato non corrisponde con quelli idonei al Bonus Elettrodomestici'
-          )
-        ).toBeInTheDocument();
-
-        expect(screen.getByRole('button', { name: 'Continua' })).toBeDisabled();
-      }
-
-      fireEvent.change(inputPartyName, { target: { value: valueToSet } });
-
-      const endpoint =
-        typeOfSearch === 'taxCode' || typeOfSearch === 'personalTaxCode'
-          ? isContractingAuthority(institutionType as InstitutionType)
-            ? 'ONBOARDING_GET_SA_PARTY_FROM_FC'
-            : (isPrivateInstitution(institutionType as InstitutionType) &&
-                  !isIdpayMerchantProduct(productId)) ||
-                (isInteropProduct(productId) &&
-                  isPublicServiceCompany(institutionType as InstitutionType))
-              ? 'ONBOARDING_GET_PARTY_BY_CF_FROM_INFOCAMERE'
-              : isIdpayMerchantProduct(productId)
-                ? 'ONBOARDING_GET_VISURA_INFOCAMERE_BY_CF'
-                : 'ONBOARDING_GET_PARTY_FROM_CF'
-          : typeOfSearch === 'aooCode'
-            ? 'ONBOARDING_GET_AOO_CODE_INFO'
-            : typeOfSearch === 'uoCode'
-              ? 'ONBOARDING_GET_UO_CODE_INFO'
-              : typeOfSearch === 'reaCode'
-                ? 'ONBOARDING_GET_VISURA_INFOCAMERE_BY_REA'
-                : 'ONBOARDING_GET_INSURANCE_COMPANIES_FROM_IVASSCODE';
-
-      const endpointParams =
-        typeOfSearch === 'taxCode'
-          ? isContractingAuthority(institutionType as InstitutionType)
-            ? { taxId: taxCode }
-            : { id: taxCode }
-          : typeOfSearch === 'personalTaxCode'
-            ? isContractingAuthority(institutionType as InstitutionType)
-              ? { taxId: personalTaxCode }
-              : { id: personalTaxCode }
-            : typeOfSearch === 'aooCode'
-              ? { codiceUniAoo: subUnitCode }
-              : typeOfSearch === 'uoCode'
-                ? { codiceUniUo: subUnitCode }
-                : typeOfSearch === 'reaCode'
-                  ? undefined
-                  : { taxId: ivassCode };
-
-      // The by-code / by-taxId codegen endpoints (AOO/UO/infocamere/visura-by-cf,
-      // stations and insurance by taxId) are path-only: the query params the
-      // legacy flow used to send (origin, categories, ...) are not part of their
-      // OpenAPI schema, so the migrated dispatcher no longer sends them. Only
-      // PARTY_FROM_CF (searchInstitutionIpaByTaxCode) and visura-by-REA still carry query
-      // params. PARTY_FROM_CF now hits the IPA-only BFF endpoint, whose OpenAPI schema
-      // declares a single `category` query param: origin and the legacy `categories`
-      // spelling are gone.
-      const updatedParams =
-        endpoint === 'ONBOARDING_GET_VISURA_INFOCAMERE_BY_REA'
-          ? { rea: reaCode }
-          : endpoint === 'ONBOARDING_GET_PARTY_FROM_CF'
-            ? {
-                category:
-                  isPublicServiceCompany(institutionType as InstitutionType) ||
-                  isPrivateInstitution(institutionType as InstitutionType)
-                    ? undefined
-                    : filterByCategory4Test(institutionType, productId),
-              }
-            : undefined;
-
-      expect(fetchWithLogsSpy).toHaveBeenNthCalledWith(
-        4,
-        {
-          endpoint: endpoint,
-          endpointParams: endpointParams,
-        },
-        {
-          method: 'GET',
-          params: updatedParams,
-        },
-        expect.any(Function)
-      );
-
-      await waitFor(() => {
-        fireEvent.click(
-          screen.getByText(
-            typeOfSearch === 'taxCode' ||
-              typeOfSearch === 'reaCode' ||
-              typeOfSearch === 'personalTaxCode'
-              ? partyName.toLocaleLowerCase()
-              : partyName
-          )
-        );
-      });
-
-      break;
-    default:
-      break;
-  }
-
-  const confirmButton = screen.getByRole('button', { name: 'Continua' });
-  expect(confirmButton).toBeEnabled();
-
-  await waitFor(() => fireEvent.click(confirmButton));
-
-  if (isAggregator) {
-    await waitFor(() => screen.getByText(/Stai richiedendo l’adesione come ente aggregatore per /));
-    const continueButtonModal = screen.getAllByText('Continua')[1];
-    fireEvent.click(continueButtonModal);
-  }
+  await confirmSearchParty(isAggregator);
 };
 
 /**
