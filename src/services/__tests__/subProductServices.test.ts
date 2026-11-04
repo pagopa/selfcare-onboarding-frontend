@@ -17,15 +17,15 @@ const setParties = vi.fn();
 
 beforeEach(() => {
   vi.clearAllMocks();
-  const win = window as any;
-  delete win.location;
-  win.location = { assign: vi.fn() };
+  Object.defineProperty(window, 'location', {
+    value: { assign: vi.fn() },
+    writable: true,
+    configurable: true,
+  });
 });
 
 it('test onExitPremiumFlow redirects to dashboard when parties exist', async () => {
-  vi.mocked(OnboardingApi.getInstitutions).mockResolvedValue([
-    { id: '1', description: 'Party 1' },
-  ] as any);
+  vi.mocked(OnboardingApi.getInstitutions).mockResolvedValue([{ id: '1', description: 'Party 1' }]);
 
   await onExitPremiumFlow('prod-io');
 
@@ -34,7 +34,7 @@ it('test onExitPremiumFlow redirects to dashboard when parties exist', async () 
 });
 
 it('test onExitPremiumFlow redirects to PagoPA site when parties empty', async () => {
-  vi.mocked(OnboardingApi.getInstitutions).mockResolvedValue([] as any);
+  vi.mocked(OnboardingApi.getInstitutions).mockResolvedValue([]);
 
   await onExitPremiumFlow('prod-io');
 
@@ -62,7 +62,7 @@ it('test handleSearchUserParties maps parties with urlLogo on success', async ()
   vi.mocked(OnboardingApi.getInstitutions).mockResolvedValue([
     { id: 'p1', description: 'P 1' },
     { id: 'p2', description: 'P 2' },
-  ] as any);
+  ]);
 
   await handleSearchUserParties(setParties, 'prod', 'sub-prod');
 
