@@ -7,10 +7,7 @@ import { Provider } from 'react-redux';
 import { Router } from 'react-router-dom';
 import { MockInstance } from 'vitest';
 import { InstitutionType } from '../../../types';
-import {
-  mockedGeoTaxonomy,
-  mockedPspOnboardingData,
-} from '../../lib/__mocks__/mockApiRequests';
+import { mockedGeoTaxonomy, mockedPspOnboardingData } from '../../lib/__mocks__/mockApiRequests';
 import { HeaderContext, UserContext } from '../../lib/context';
 import { nationalValue } from '../../model/GeographicTaxonomies';
 import { store } from '../../redux/store';
@@ -941,6 +938,62 @@ export const fillUserBillingDataForm = async (
   );
 };
 
+const inputValue = (id: string) => (document.getElementById(id) as HTMLInputElement).value;
+
+type BillingLocationExpectations = {
+  zipCode: string;
+  vatNumber: string;
+  city: string;
+  county: string;
+};
+
+const checkBillingLocationFields = (
+  p: BillingBodyCheckParams,
+  expected: BillingLocationExpectations
+) => {
+  if (p.isForeignInsurance) {
+    expect(inputValue('city')).toBe('Valencia');
+    expect(inputValue('country-select')).toBe('Spagna');
+    return;
+  }
+  expect(inputValue('zipCode')).toBe(expectedBillingZipCode(p, expected.zipCode));
+  if (!p.isPrivateMerchant) {
+    expect(inputValue('vatNumber')).toBe(expected.vatNumber);
+  }
+  expect(inputValue('city-select')).toBe(expectedBillingCity(p, expected.city));
+  expect(inputValue('county')).toBe(expectedBillingCounty(p, expected.county));
+};
+
+const checkBillingRecipientCode = (p: BillingBodyCheckParams, expectedRecipientCode: string) => {
+  const institutionType = p.institutionType as InstitutionType;
+  const hasRecipientCode =
+    isPublicAdministration(institutionType) ||
+    isGlobalServiceProvider(institutionType) ||
+    isPaymentServiceProvider(institutionType);
+  if (!p.isPrivateMerchant && hasRecipientCode) {
+    expect(inputValue('recipientCode')).toBe(expectedRecipientCode);
+  }
+};
+
+const checkBillingCompanyRegisterFields = (p: BillingBodyCheckParams, productId: string) => {
+  const institutionType = p.institutionType as InstitutionType;
+  if (p.isPrivateMerchant) {
+    expect(inputValue('businessRegisterPlace')).toBe('01234567891');
+  }
+  if (
+    isContractingAuthority(institutionType) ||
+    (isPrivateInstitution(institutionType) && isInteropProduct(productId))
+  ) {
+    fireEvent.change(document.getElementById('businessRegisterPlace') as HTMLElement, {
+      target: { value: '01234567891' },
+    });
+    expect(inputValue('rea')).toBe('MO-123456');
+    fireEvent.change(document.getElementById('shareCapital') as HTMLElement, {
+      target: { value: '€ 332.323' },
+    });
+  }
+};
+
 export const checkCorrectBodyBillingData = (
   institutionType: string,
   productId: string,
@@ -955,83 +1008,28 @@ export const checkCorrectBodyBillingData = (
   expectedCounty: string = '',
   isForeignInsurance?: boolean,
   haveTaxCode?: boolean
-  // eslint-disable-next-line complexity
 ) => {
-  const isPrivateMerchant = isPrivateMerchantInstitution(
-    institutionType as InstitutionType,
-    productId
-  );
   const p: BillingBodyCheckParams = {
     institutionType,
-    isPrivateMerchant,
+    isPrivateMerchant: isPrivateMerchantInstitution(institutionType as InstitutionType, productId),
     haveTaxCode,
     isForeignInsurance,
   };
 
-  expect((document.getElementById('businessName') as HTMLInputElement).value).toBe(
-    expectedBillingBusinessName(p, expectedBusinessName)
-  );
-  expect((document.getElementById('digitalAddress') as HTMLInputElement).value).toBe(
-    expectedBillingDigitalAddress(p, expectedMailPEC)
-  );
-
+  expect(inputValue('businessName')).toBe(expectedBillingBusinessName(p, expectedBusinessName));
+  expect(inputValue('digitalAddress')).toBe(expectedBillingDigitalAddress(p, expectedMailPEC));
   if (haveTaxCode) {
-    expect((document.getElementById('taxCode') as HTMLInputElement).value).toBe(
-      expectedBillingTaxCode(p, expectedTaxCode)
-    );
+    expect(inputValue('taxCode')).toBe(expectedBillingTaxCode(p, expectedTaxCode));
   }
-
-  if (isForeignInsurance) {
-    expect((document.getElementById('city') as HTMLInputElement).value).toBe('Valencia');
-    expect((document.getElementById('country-select') as HTMLInputElement).value).toBe('Spagna');
-  } else {
-    expect((document.getElementById('zipCode') as HTMLInputElement).value).toBe(
-      expectedBillingZipCode(p, expectedZipCode)
-    );
-    if (!isPrivateMerchant) {
-      expect((document.getElementById('vatNumber') as HTMLInputElement).value).toBe(
-        expectedVatNumber
-      );
-    }
-    expect((document.getElementById('city-select') as HTMLInputElement).value).toBe(
-      expectedBillingCity(p, expectedCity)
-    );
-    expect((document.getElementById('county') as HTMLInputElement).value).toBe(
-      expectedBillingCounty(p, expectedCounty)
-    );
-  }
-
-  if (
-    !isPrivateMerchant &&
-    (isPublicAdministration(institutionType as InstitutionType) ||
-      isGlobalServiceProvider(institutionType as InstitutionType) ||
-      isPaymentServiceProvider(institutionType as InstitutionType))
-  ) {
-    expect((document.getElementById('recipientCode') as HTMLInputElement).value).toBe(
-      expectedRecipientCode
-    );
-  }
-
-  if (isPrivateMerchant) {
-    expect((document.getElementById('businessRegisterPlace') as HTMLInputElement).value).toBe(
-      '01234567891'
-    );
-  }
-
-  if (
-    isContractingAuthority(institutionType as InstitutionType) ||
-    (isPrivateInstitution(institutionType as InstitutionType) && isInteropProduct(productId))
-  ) {
-    fireEvent.change(document.getElementById('businessRegisterPlace') as HTMLElement, {
-      target: { value: '01234567891' },
-    });
-    expect((document.getElementById('rea') as HTMLInputElement).value).toBe('MO-123456');
-    fireEvent.change(document.getElementById('shareCapital') as HTMLElement, {
-      target: { value: '€ 332.323' },
-    });
-  }
-
-  expect((document.getElementById('registeredOffice') as HTMLInputElement).value).toBe(
+  checkBillingLocationFields(p, {
+    zipCode: expectedZipCode,
+    vatNumber: expectedVatNumber,
+    city: expectedCity,
+    county: expectedCounty,
+  });
+  checkBillingRecipientCode(p, expectedRecipientCode);
+  checkBillingCompanyRegisterFields(p, productId);
+  expect(inputValue('registeredOffice')).toBe(
     expectedBillingRegisteredOffice(p, expectedRegisteredOfficeInput)
   );
 };
