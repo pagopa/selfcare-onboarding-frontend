@@ -13,10 +13,12 @@ import { useEffect, useState } from 'react';
 import { OnboardingStepActions } from '../../../components/registrationSteps/OnboardingStepActions';
 import { RadioField, RadioWithTextField } from '../../../components/forms/RadioWithTextField';
 import { StepperStepComponentProps } from '../../../../types';
+import { AdditionalData } from '../../../model/AdditionalInformations';
 
 type AdditionalInformationField = RadioField | 'optionalPartyInformations';
 
 type Props = StepperStepComponentProps & {
+  forward: (additionalInformations: Record<string, AdditionalData>) => void;
   originId?: string;
   origin?: string;
 };
@@ -155,7 +157,9 @@ export function StepAdditionalInformations({ forward, back, originId, origin }: 
       setErrors({});
 
       const choices = Object.values(radioValues);
-      const additionalDataWithChoice = Object.keys(radioValues).reduce(
+      const additionalDataWithChoice = Object.keys(radioValues).reduce<
+        Record<string, AdditionalData>
+      >(
         (result, key, index) => ({
           ...result,
           [key]: { ...additionalData[key], choice: choices[index] },

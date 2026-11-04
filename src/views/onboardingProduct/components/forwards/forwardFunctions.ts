@@ -108,7 +108,7 @@ export const createForwardFunctions = ({
 
   const forwardWithDataAndInstitution = (
     onboardingData: OnboardingFormData,
-    institutionTypeParam: InstitutionType
+    institutionTypeParam?: InstitutionType
   ) => {
     if (!isGspWithoutIpa(onboardingData, institutionTypeParam)) {
       trackEvent('ONBOARDING_PARTY_SELECTION', {

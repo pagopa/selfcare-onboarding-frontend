@@ -307,8 +307,8 @@ export const postSubProductOnboardingSubmit = async (
   product: Product,
   setError: Dispatch<SetStateAction<boolean>>,
   forward: () => void,
-  origin: string,
-  originId: string,
+  origin: string | undefined,
+  originId: string | undefined,
   pricingPlan: string | undefined,
   setConflictError: Dispatch<SetStateAction<boolean>>
 ) => {

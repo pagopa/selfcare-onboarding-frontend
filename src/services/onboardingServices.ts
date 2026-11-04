@@ -288,7 +288,7 @@ const postOnboardingUsers = async (body: OnboardingUserDto): Promise<'success' |
 };
 
 export const addUserRequest = async (
-  users: Array<UserOnCreate>,
+  users: Array<Partial<UserOnCreate>>,
   setLoading: Dispatch<SetStateAction<boolean>>,
   selectedProduct: Product | undefined,
   onboardingFormData: OnboardingFormData | undefined,

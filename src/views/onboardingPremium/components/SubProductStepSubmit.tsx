@@ -18,6 +18,7 @@ import AlreadyOnboarded from '../../../components/layout/AlreadyOnboarded';
 import { postSubProductOnboardingSubmit } from '../../../services/onboardingSubmitServices';
 
 type Props = StepperStepComponentProps & {
+  forward: () => void;
   requestId: string;
   product: Product;
   subProduct: Product;
@@ -25,8 +26,8 @@ type Props = StepperStepComponentProps & {
   users: Array<UserOnCreate>;
   billingData: OnboardingFormData;
   institutionType: InstitutionType;
-  origin: string;
-  originId: string;
+  origin?: string;
+  originId?: string;
   setLoading: (loading: boolean) => void;
   pricingPlan?: string;
 };

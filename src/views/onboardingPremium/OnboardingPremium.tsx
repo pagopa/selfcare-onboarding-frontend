@@ -58,8 +58,8 @@ function OnboardingPremiumComponent() {
   const [outcome, setOutcome] = useState<RequestOutcomeMessage | null>();
 
   const [externalInstitutionId, _setExternalInstitutionId] = useState<string>('');
-  const [origin, setOrigin] = useState<string>('');
-  const [originId, setOriginId] = useState<string>('');
+  const [origin, setOrigin] = useState<string | undefined>('');
+  const [originId, setOriginId] = useState<string | undefined>('');
   const [_manager, setManager] = useState<UserOnCreate>();
   const [users, setUsers] = useState<Array<UserOnCreate>>([]);
   const [billingData, setBillingData] = useState<OnboardingFormData>();
@@ -176,7 +176,7 @@ function OnboardingPremiumComponent() {
           parties,
           subProductId,
           productId,
-          forward: (party?: SelfcareParty) => {
+          forward: (party?: SelfcareParty | null) => {
             if (party) {
               forwardWithInstitution(party, true);
             } else {
