@@ -18,6 +18,7 @@ type Props = {
   subProductId: string;
   product?: Product;
   productId: string;
+  forward: (party?: SelfcareParty | null) => void;
 } & StepperStepComponentProps;
 
 const CustomBox = styled(Box)({

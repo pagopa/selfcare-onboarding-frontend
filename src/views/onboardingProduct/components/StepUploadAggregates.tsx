@@ -9,6 +9,7 @@ import {
 import { FileUploader } from '../../../components/fileUpload/FileUploader';
 import { OnboardingStepActions } from '../../../components/registrationSteps/OnboardingStepActions';
 import { UserContext } from '../../../lib/context';
+import { AggregateInstitution } from '../../../model/AggregateInstitution';
 import { RowError } from '../../../model/RowError';
 import { getExampleAggregatesCsv, verifyAggregates } from '../../../services/aggregatesServices';
 
@@ -20,6 +21,7 @@ type Props = {
   productId?: string;
   partyName?: string;
   institutionType?: InstitutionType;
+  forward: (_: undefined, aggregates: Array<AggregateInstitution>) => void;
 } & StepperStepComponentProps;
 
 export function StepUploadAggregates({

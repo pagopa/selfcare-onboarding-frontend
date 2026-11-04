@@ -28,6 +28,7 @@ type Props = {
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
   institutionType?: InstitutionType;
   setOutcome: React.Dispatch<React.SetStateAction<RequestOutcomeMessage | null | undefined>>;
+  forward: (product: ProductResource) => void;
 } & StepperStepComponentProps;
 
 export function StepSelectProduct({

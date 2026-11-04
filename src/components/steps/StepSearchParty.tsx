@@ -9,6 +9,7 @@ import { useHistoryState } from '../../hooks/useHistoryState';
 import { useMerchantSearchResult } from '../../hooks/useMerchantSearchResult';
 import { useSubunitSearch } from '../../hooks/useSubunitSearch';
 import { FilterCategories } from '../../model/FilterCategoriesResponse';
+import { OnboardingFormData } from '../../model/OnboardingFormData';
 import { SelectionsState } from '../../model/Selection';
 import { handleSearchExternalId } from '../../services/institutionServices';
 import { ENV } from '../../utils/env';
@@ -35,6 +36,7 @@ type Props = {
   selectFilterCategories: () => FilterCategories;
   setInstitutionType: Dispatch<SetStateAction<InstitutionType | undefined>>;
   addUser: boolean;
+  forward: (onboardingData: OnboardingFormData, institutionType?: InstitutionType) => void;
 } & StepperStepComponentProps;
 
 export function StepSearchParty({
