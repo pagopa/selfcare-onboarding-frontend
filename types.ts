@@ -20,7 +20,7 @@ export type ApiEndpointKey = keyof typeof API;
 
 export type Endpoint = {
   endpoint: ApiEndpointKey;
-  endpointParams?: any;
+  endpointParams?: Record<string, string>;
 };
 
 export type RequestConfig = {
