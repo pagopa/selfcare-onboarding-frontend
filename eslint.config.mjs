@@ -27,7 +27,7 @@ export default defineConfig([
   ]),
   {
     linterOptions: {
-      reportUnusedDisableDirectives: 'warn',
+      reportUnusedDisableDirectives: 'error',
     },
   },
   {
@@ -85,7 +85,7 @@ export default defineConfig([
       // Enable if we want to enforce the return type for all the functions
       '@typescript-eslint/explicit-module-boundary-types': 'off',
       '@typescript-eslint/no-inferrable-types': 'off',
-      '@typescript-eslint/no-explicit-any': 'warn',
+      '@typescript-eslint/no-explicit-any': 'error',
       '@typescript-eslint/array-type': [
         'error',
         {
