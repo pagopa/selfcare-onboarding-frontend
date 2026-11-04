@@ -8,10 +8,8 @@ import { Router } from 'react-router-dom';
 import { MockInstance } from 'vitest';
 import { InstitutionType } from '../../../types';
 import {
-  mockedAoos,
   mockedGeoTaxonomy,
   mockedPspOnboardingData,
-  mockedUos,
 } from '../../lib/__mocks__/mockApiRequests';
 import { HeaderContext, UserContext } from '../../lib/context';
 import { nationalValue } from '../../model/GeographicTaxonomies';
@@ -22,11 +20,9 @@ import {
   isCedProduct,
   isContractingAuthority,
   isGlobalServiceProvider,
-  isGpuInstitution,
   isIdpayMerchantProduct,
   isInteropProduct,
   isIoProduct,
-  isIoSignProduct,
   isPagoPaProduct,
   isPaymentServiceProvider,
   isPrivateInstitution,
@@ -34,7 +30,6 @@ import {
   isPrivateOrPersonInstitution,
   isPublicAdministration,
   isPublicServiceCompany,
-  isTechPartner,
 } from '../institutionTypeUtils';
 import {
   type BillingResolverParams,
@@ -72,10 +67,17 @@ import {
   expectedBillingRegisteredOffice,
   expectedBillingTaxCode,
   expectedBillingZipCode,
+  resolveAdditionalInformations,
+  resolveAssistanceContacts,
   resolveCompanyInformations,
+  resolveGpuData,
   resolveInstitutionLocationData,
   resolveOrigin,
   resolveOriginId,
+  resolvePspData,
+  resolveSubmitUsers,
+  resolveSubunitCode,
+  resolveSubunitType,
   resolveVerifyTaxCode,
 } from './verifySubmitHelpers-test';
 export type { Search, Source };
@@ -529,6 +531,116 @@ export const billingData2billingDataRequest = (
   };
 };
 
+export type VerifySubmitParams = {
+  productId: string;
+  institutionType: string;
+  from?: Source;
+  uo: boolean;
+  errorOnSubmit: boolean;
+  typeOfSearch: Search;
+  isForeignInsurance?: boolean;
+  haveTaxCode: boolean;
+  isAggregator?: boolean;
+  isAddApplicantEmail?: boolean;
+};
+
+const isSfeAvailable = (uo: boolean, institutionType: string, productId: string): boolean =>
+  (uo || isPublicAdministration(institutionType as InstitutionType)) &&
+  canInvoice(institutionType, productId) &&
+  !isIoProduct(productId);
+
+const buildExpectedSubmitParties = (v: VerifySubmitParams) => {
+  const isPrivateMerchant = isPrivateMerchantInstitution(
+    v.institutionType as InstitutionType,
+    v.productId
+  );
+  const resolvedFrom = v.from ?? 'IPA';
+  const isForeignInsurance = v.isForeignInsurance ?? false;
+  const p: BillingResolverParams = {
+    errorOnSubmit: v.errorOnSubmit,
+    isPrivateMerchant,
+    typeOfSearch: v.typeOfSearch,
+    from: resolvedFrom,
+    haveTaxCode: v.haveTaxCode,
+    isForeignInsurance,
+    institutionType: v.institutionType,
+    productId: v.productId,
+  };
+  return {
+    origin: resolveOrigin(v.from, v.institutionType, v.productId),
+    originId: resolveOriginId(
+      resolvedFrom,
+      v.institutionType,
+      v.productId,
+      v.typeOfSearch,
+      isPrivateMerchant,
+      v.errorOnSubmit,
+      v.haveTaxCode,
+      isForeignInsurance
+    ),
+    istatCode: v.from !== 'IPA' ? mockedGeoTaxonomy[1].istat_code : undefined,
+    taxCode: resolveVerifyTaxCode(p),
+    companyInformations: resolveCompanyInformations({
+      from: resolvedFrom,
+      institutionType: v.institutionType,
+      productId: v.productId,
+      isPrivateMerchant,
+      typeOfSearch: v.typeOfSearch,
+    }),
+    institutionLocationData: resolveInstitutionLocationData({
+      from: resolvedFrom,
+      institutionType: v.institutionType,
+      productId: v.productId,
+      isForeignInsurance: v.isForeignInsurance,
+    }),
+  };
+};
+
+/** Expected arguments of the last ONBOARDING_POST_LEGALS call made through fetchWithLogs. */
+export const buildExpectedPostLegalsCall = (v: VerifySubmitParams) => [
+  { endpoint: 'ONBOARDING_POST_LEGALS' },
+  {
+    method: 'POST',
+    data: {
+      billingData: billingData2billingDataRequest(
+        v.institutionType,
+        isSfeAvailable(v.uo, v.institutionType, v.productId),
+        v.from,
+        v.errorOnSubmit,
+        v.typeOfSearch,
+        v.isForeignInsurance,
+        v.haveTaxCode,
+        v.productId
+      ),
+      institutionType: v.institutionType,
+      productId: v.productId,
+      ...buildExpectedSubmitParties(v),
+      additionalInformations: resolveAdditionalInformations(v.from, v.institutionType, v.productId),
+      gpuData: resolveGpuData(v.institutionType, v.productId),
+      pspData: resolvePspData(v.institutionType),
+      users: resolveSubmitUsers(v.institutionType, v.productId, v.isAddApplicantEmail),
+      pricingPlan: 'FA',
+      geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY
+        ? [{ code: nationalValue, desc: 'ITALIA' }]
+        : [],
+      assistanceContacts: resolveAssistanceContacts(
+        v.from,
+        v.institutionType,
+        v.productId,
+        v.typeOfSearch
+      ),
+      subunitType: resolveSubunitType(v.typeOfSearch),
+      subunitCode: resolveSubunitCode(v.typeOfSearch),
+      isAggregator: v.isAggregator,
+      aggregates: v.isAggregator ? [] : undefined,
+      userRequester: v.isAddApplicantEmail
+        ? { name: 'Mattia', surname: 'Sisti', email: 'a@a.aa' }
+        : undefined,
+    },
+  },
+  expect.any(Function),
+];
+
 export const verifySubmit = async (
   productId: string = PRODUCT_IDS.IO,
   institutionType: string,
@@ -541,186 +653,23 @@ export const verifySubmit = async (
   haveTaxCode: boolean = true,
   isAggregator?: boolean,
   isAddApplicantEmail?: boolean
-  // eslint-disable-next-line complexity, sonarjs/cognitive-complexity
 ) => {
-  const isPrivateMerchant = isPrivateMerchantInstitution(
-    institutionType as InstitutionType,
-    productId
-  );
-  const SfeAvailable =
-    (uo || isPublicAdministration(institutionType as InstitutionType)) &&
-    canInvoice(institutionType, productId) &&
-    !isIoProduct(productId);
-
-  const resolvedFrom = from ?? 'IPA';
-  const p: BillingResolverParams = {
-    errorOnSubmit,
-    isPrivateMerchant,
-    typeOfSearch,
-    from: resolvedFrom,
-    haveTaxCode,
-    isForeignInsurance: isForeignInsurance ?? false,
-    institutionType,
-    productId,
-  };
-
   // eslint-disable-next-line functional/immutable-data
   const lastCall = fetchWithLogsSpy.mock.calls.pop();
-  const expectedResponse = [
-    { endpoint: 'ONBOARDING_POST_LEGALS' },
-    {
-      method: 'POST',
-      data: {
-        billingData: billingData2billingDataRequest(
-          institutionType,
-          SfeAvailable,
-          from,
-          errorOnSubmit,
-          typeOfSearch,
-          isForeignInsurance,
-          haveTaxCode,
-          productId
-        ),
-        institutionType,
-        productId,
-        origin: resolveOrigin(from, institutionType, productId),
-        originId: resolveOriginId(
-          resolvedFrom,
-          institutionType,
-          productId,
-          typeOfSearch,
-          isPrivateMerchant,
-          errorOnSubmit,
-          haveTaxCode,
-          isForeignInsurance ?? false
-        ),
-        istatCode: from !== 'IPA' ? mockedGeoTaxonomy[1].istat_code : undefined,
-        taxCode: resolveVerifyTaxCode(p),
-        additionalInformations:
-          isPagoPaProduct(productId) &&
-          isGlobalServiceProvider(institutionType as InstitutionType) &&
-          from !== 'IPA'
-            ? {
-                agentOfPublicService: false,
-                agentOfPublicServiceNote: '',
-                belongRegulatedMarket: false,
-                establishedByRegulatoryProvision: false,
-                establishedByRegulatoryProvisionNote: '',
-                ipa: false,
-                ipaCode: '',
-                otherNote: 'optionalPartyInformations-note',
-                regulatedMarketNote: '',
-              }
-            : undefined,
-        gpuData:
-          isGpuInstitution(institutionType as InstitutionType) && isPagoPaProduct(productId)
-            ? {
-                businessRegisterNumber: 'Comunale 12',
-                legalRegisterNumber: '250301',
-                legalRegisterName: 'SkiPass',
-                longTermPayments: true,
-                manager: true,
-                managerAuthorized: true,
-                managerEligible: true,
-                managerProsecution: true,
-                institutionCourtMeasures: true,
-              }
-            : undefined,
-        companyInformations: resolveCompanyInformations({
-          from: resolvedFrom,
-          institutionType,
-          productId,
-          isPrivateMerchant,
-          typeOfSearch,
-        }),
-        pspData: isPaymentServiceProvider(institutionType as InstitutionType)
-          ? {
-              abiCode: '23321',
-              businessRegisterNumber: '12344555667',
-              dpoData: {
-                address: 'Via milano 5',
-                email: 'dpomail@mailtest.com',
-                pec: 'dpopec@mailtest.com',
-              },
-              legalRegisterName: '123',
-              legalRegisterNumber: '24',
-              vatNumberGroup: true,
-            }
-          : undefined,
-        users: [
-          isCedProduct(productId)
-            ? {
-                email: 'a@a.aa',
-                name: 'Mattia',
-                role: 'MANAGER',
-                surname: 'Sisti',
-                taxCode: 'SSTMTT76C23F205T',
-                uid: '0',
-              }
-            : {
-                email: 'b@b.bb',
-                name: 'NAME',
-                role: 'MANAGER',
-                surname: 'SURNAME',
-                taxCode: 'SRNNMA80A01A794F',
-              },
-          // Use logged user data when checkbox stays checked (isAddApplicantEmail=false)
-          !isAddApplicantEmail
-            ? {
-                email: 'a@a.aa',
-                name: 'Mattia',
-                role: 'DELEGATE',
-                surname: 'Sisti',
-                taxCode: 'SSTMTT76C23F205T',
-                uid: '0',
-              }
-            : {
-                email: 'a@a.aa',
-                name: 'LUCA',
-                role: 'DELEGATE',
-                surname: 'ROSSI',
-                taxCode: 'RSSLCU80A01F205N',
-              },
-        ].filter((u) =>
-          isTechPartner(institutionType as InstitutionType) ? u.role !== 'MANAGER' : u
-        ),
-        pricingPlan: 'FA',
-        geographicTaxonomies: ENV.GEOTAXONOMY.SHOW_GEOTAXONOMY
-          ? [{ code: nationalValue, desc: 'ITALIA' }]
-          : [],
-        institutionLocationData: resolveInstitutionLocationData({
-          from: resolvedFrom,
-          institutionType,
-          productId,
-          isForeignInsurance,
-        }),
-        assistanceContacts:
-          isIoSignProduct(productId) &&
-          typeOfSearch !== 'aooCode' &&
-          !isTechPartner(institutionType as InstitutionType) &&
-          !isGpuInstitution(institutionType as InstitutionType) &&
-          (from === 'IPA' || from === 'NO_IPA')
-            ? { supportEmail: 'a@a.it' }
-            : undefined,
-        subunitType:
-          typeOfSearch === 'aooCode' ? 'AOO' : typeOfSearch === 'uoCode' ? 'UO' : undefined,
-        subunitCode:
-          typeOfSearch === 'aooCode'
-            ? mockedAoos[0].codiceUniAoo
-            : typeOfSearch === 'uoCode'
-              ? mockedUos[0].codiceUniUo
-              : undefined,
-        isAggregator,
-        aggregates: isAggregator ? [] : undefined,
-        userRequester: isAddApplicantEmail
-          ? { name: 'Mattia', surname: 'Sisti', email: 'a@a.aa' }
-          : undefined,
-      },
-    },
-    expect.any(Function),
-  ];
-
-  expect(lastCall).toEqual(expectedResponse);
+  expect(lastCall).toEqual(
+    buildExpectedPostLegalsCall({
+      productId,
+      institutionType,
+      from,
+      uo,
+      errorOnSubmit,
+      typeOfSearch,
+      isForeignInsurance,
+      haveTaxCode,
+      isAggregator,
+      isAddApplicantEmail,
+    })
+  );
 };
 
 const billingData2billingDataRequestIoPremium = () => ({

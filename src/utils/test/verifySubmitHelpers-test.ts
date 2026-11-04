@@ -235,6 +235,130 @@ export const resolveCompanyInformations = (p: CompanyInfoParams) =>
       }
     : undefined;
 
+// --- Expected value helpers for verifySubmit (ONBOARDING_POST_LEGALS body) ---
+
+export const resolveAdditionalInformations = (
+  from: Source | undefined,
+  institutionType: string,
+  productId: string
+) =>
+  isPagoPaProduct(productId) &&
+  isGlobalServiceProvider(institutionType as InstitutionType) &&
+  from !== 'IPA'
+    ? {
+        agentOfPublicService: false,
+        agentOfPublicServiceNote: '',
+        belongRegulatedMarket: false,
+        establishedByRegulatoryProvision: false,
+        establishedByRegulatoryProvisionNote: '',
+        ipa: false,
+        ipaCode: '',
+        otherNote: 'optionalPartyInformations-note',
+        regulatedMarketNote: '',
+      }
+    : undefined;
+
+export const resolveGpuData = (institutionType: string, productId: string) =>
+  isGpuInstitution(institutionType as InstitutionType) && isPagoPaProduct(productId)
+    ? {
+        businessRegisterNumber: 'Comunale 12',
+        legalRegisterNumber: '250301',
+        legalRegisterName: 'SkiPass',
+        longTermPayments: true,
+        manager: true,
+        managerAuthorized: true,
+        managerEligible: true,
+        managerProsecution: true,
+        institutionCourtMeasures: true,
+      }
+    : undefined;
+
+export const resolvePspData = (institutionType: string) =>
+  isPaymentServiceProvider(institutionType as InstitutionType)
+    ? {
+        abiCode: '23321',
+        businessRegisterNumber: '12344555667',
+        dpoData: {
+          address: 'Via milano 5',
+          email: 'dpomail@mailtest.com',
+          pec: 'dpopec@mailtest.com',
+        },
+        legalRegisterName: '123',
+        legalRegisterNumber: '24',
+        vatNumberGroup: true,
+      }
+    : undefined;
+
+const LOGGED_USER = {
+  email: 'a@a.aa',
+  name: 'Mattia',
+  surname: 'Sisti',
+  taxCode: 'SSTMTT76C23F205T',
+  uid: '0',
+};
+
+const expectedManager = (productId: string) =>
+  isCedProduct(productId)
+    ? { ...LOGGED_USER, role: 'MANAGER' }
+    : {
+        email: 'b@b.bb',
+        name: 'NAME',
+        role: 'MANAGER',
+        surname: 'SURNAME',
+        taxCode: 'SRNNMA80A01A794F',
+      };
+
+// Logged user data is used when the applicant checkbox stays checked (isAddApplicantEmail=false)
+const expectedDelegate = (isAddApplicantEmail?: boolean) =>
+  isAddApplicantEmail
+    ? {
+        email: 'a@a.aa',
+        name: 'LUCA',
+        role: 'DELEGATE',
+        surname: 'ROSSI',
+        taxCode: 'RSSLCU80A01F205N',
+      }
+    : { ...LOGGED_USER, role: 'DELEGATE' };
+
+export const resolveSubmitUsers = (
+  institutionType: string,
+  productId: string,
+  isAddApplicantEmail?: boolean
+) => {
+  const users = [expectedManager(productId), expectedDelegate(isAddApplicantEmail)];
+  return isTechPartner(institutionType as InstitutionType)
+    ? users.filter((u) => u.role !== 'MANAGER')
+    : users;
+};
+
+export const resolveAssistanceContacts = (
+  from: Source | undefined,
+  institutionType: string,
+  productId: string,
+  typeOfSearch: Search
+) =>
+  isIoSignProduct(productId) &&
+  typeOfSearch !== 'aooCode' &&
+  !isTechPartner(institutionType as InstitutionType) &&
+  !isGpuInstitution(institutionType as InstitutionType) &&
+  (from === 'IPA' || from === 'NO_IPA')
+    ? { supportEmail: 'a@a.it' }
+    : undefined;
+
+export const resolveSubunitType = (typeOfSearch: Search): string | undefined =>
+  pickBySearch<string | undefined>(
+    typeOfSearch,
+    { aooCode: () => 'AOO', uoCode: () => 'UO' },
+    () => undefined
+  );
+
+export const resolveSubunitCode = (typeOfSearch: Search): string | undefined =>
+  pickBySearch<string | undefined>(
+    typeOfSearch,
+    { aooCode: () => mockedAoos[0].codiceUniAoo, uoCode: () => mockedUos[0].codiceUniUo },
+    () => undefined
+  );
+
 type LocationParams = {
   from: Source;
   institutionType: string;
