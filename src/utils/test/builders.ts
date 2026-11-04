@@ -2,7 +2,7 @@ import { type MockInstance, vi } from 'vitest';
 import type { Party, Product, UserOnCreate } from '../../../types';
 import type { InstitutionInfo } from '../../api/generated/onboarding/InstitutionInfo';
 import type { OnboardingRequestResource } from '../../api/generated/onboarding/OnboardingRequestResource';
-import { type ProductResource, StatusEnum } from '../../api/generated/onboarding/ProductResource';
+import type { ProductResource } from '../../model/ProductResource';
 import * as apiUtils from '../../lib/api-utils';
 
 /** Typed spy on `fetchWithLogs`, the single entry point of every onboarding API call. */
@@ -24,8 +24,11 @@ export const buildProductResource = (
   overrides: Partial<ProductResource> = {}
 ): ProductResource => ({
   id: 'prod-io',
+  parentId: '',
   title: 'App IO',
-  status: StatusEnum.ACTIVE,
+  logo: '',
+  logoBgColor: '',
+  status: 'ACTIVE',
   ...overrides,
 });
 
