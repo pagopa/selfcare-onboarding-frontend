@@ -86,7 +86,7 @@ export const createSubProductForwardFunctions = (params: SubProductForwardFuncti
     forward();
   };
 
-  const forwardWithManagerData = (formData: any) => {
+  const forwardWithManagerData = (formData: { users: Array<UserOnCreate> }) => {
     setManager(formData.users[0]);
     setUsers(formData.users);
     setOpenConfirmationModal(true);

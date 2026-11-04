@@ -5,7 +5,7 @@ import { verifyChecksumMatchWithTaxCode } from '@pagopa/selfcare-common-frontend
 import { verifyNameMatchWithTaxCode } from '@pagopa/selfcare-common-frontend/lib/utils/verifyNameMatchWithTaxCode';
 import { verifySurnameMatchWithTaxCode } from '@pagopa/selfcare-common-frontend/lib/utils/verifySurnameMatchWithTaxCode';
 import { TFunction } from 'i18next';
-import React from 'react';
+import React, { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { PartyRole, UserOnCreate } from '../../../types';
 import { PRODUCT_IDS } from '../../utils/constants';
@@ -288,16 +288,17 @@ export const PlatformUserForm = ({
 }: PlatformUserFormProps) => {
   const { t } = useTranslation();
 
-  const buildSetPerson = (key: string) => (e: any) => {
-    setPeople({
-      ...people,
-      [prefix]: {
-        ...people[prefix],
-        [key]: e.target.value,
-        role,
-      },
-    });
-  };
+  const buildSetPerson =
+    (key: string) => (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      setPeople({
+        ...people,
+        [prefix]: {
+          ...people[prefix],
+          [key]: e.target.value,
+          role,
+        },
+      });
+    };
 
   const errors: Array<ValidationErrorCode> = people[prefix]
     ? validateNoMandatory(prefix, people[prefix], productId, allPeople, isAuthUser, addUserFlow)

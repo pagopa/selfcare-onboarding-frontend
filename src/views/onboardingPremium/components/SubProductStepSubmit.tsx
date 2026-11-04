@@ -94,7 +94,7 @@ function SubProductStepSubmit({
         pricingPlan,
         setConflictError
       )
-        .catch((_reason: any) => {
+        .catch((_reason: unknown) => {
           setError(true);
           /*
           trackAppError({
