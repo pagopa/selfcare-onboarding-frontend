@@ -1,6 +1,10 @@
 import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { OnboardingApi } from '../../api/OnboardingApiClient';
+import type { FormikProps } from 'formik';
+import type { OnboardingFormData } from '../../model/OnboardingFormData';
+import type { StepBillingDataHistoryState } from '../../components/steps/StepOnboardingFormData';
+import { buildUser } from '../../utils/test/builders';
 import { userValidate, verifyVatNumber } from '../validationServices';
 
 vi.mock('../../api/OnboardingApiClient', () => ({
@@ -22,7 +26,7 @@ describe('validationServices', () => {
 
   const baseArgs = (overrides = {}) => ({
     partyId: 'party-1',
-    user: { name: 'Mario', surname: 'Rossi', taxCode: 'RSSMRA80A01H501Z' } as any,
+    user: buildUser({ name: 'Mario', surname: 'Rossi', taxCode: 'RSSMRA80A01H501Z' }),
     userId: 'user-1',
     onForwardAction,
     onValidationError,
@@ -139,12 +143,12 @@ describe('validationServices', () => {
     const setRequiredLogin = vi.fn();
     const formik = {
       values: { taxCode: 'RSSMRA80A01H501Z', vatNumber: '12345678901' },
-    } as any;
-    const stepHistoryState = { isTaxCodeEquals2PIVA: false } as any;
+    } as FormikProps<OnboardingFormData>;
+    const stepHistoryState = { isTaxCodeEquals2PIVA: false } as StepBillingDataHistoryState;
 
     const callVerify = () =>
       verifyVatNumber(
-        'GSP' as any,
+        'GSP',
         'ext-1',
         formik,
         stepHistoryState,
