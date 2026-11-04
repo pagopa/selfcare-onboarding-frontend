@@ -66,6 +66,7 @@ export const CustomTextField = styled(TextField)({
 });
 
 type Props = StepperStepComponentProps & {
+  forward: (formData: OnboardingFormData) => void;
   initialFormData: OnboardingFormData;
   institutionType: InstitutionType;
   subtitle: string | JSX.Element;

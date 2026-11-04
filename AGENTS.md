@@ -28,6 +28,8 @@ Without `yarn generate`, `tsc` and many tests fail with missing-module errors. R
 
 1. `yarn tsc --noEmit` passes.
 2. `yarn lint` passes with no new warnings.
+   - No `any` (`@typescript-eslint/no-explicit-any` is an error): type values honestly; use `as` only at boundaries, with a comment.
+   - Never add `eslint-disable` for `complexity` or `sonarjs/cognitive-complexity`, in production code or tests: extract helpers instead. Unused disable directives are errors.
 3. Relevant tests pass (run targeted files, not the full suite, unless needed); add or update tests for changed behavior.
 4. User-facing strings are added to **all** locale files in `src/locale` (`it`, `en`, `fr`, `de`, `sl`).
 

@@ -101,7 +101,6 @@ test('row errors show the report alert with a downloadable csv sorted by row', a
   const blob = vi.mocked(window.URL.createObjectURL).mock.calls[0][0] as Blob;
   const text = await new Promise<string>((resolve) => {
     const reader = new FileReader();
-    // eslint-disable-next-line functional/immutable-data
     reader.onload = () => resolve(reader.result as string);
     reader.readAsText(blob);
   });

@@ -96,7 +96,7 @@ export type OnboardingProductAction =
   | {
       type: 'PARTY_SELECTED';
       party: OnboardingFormData;
-      institutionType: InstitutionType;
+      institutionType?: InstitutionType;
       gspNoIpaEnabled: boolean;
     }
   | { type: 'GSP_NO_IPA_SELECTED'; from: OnboardingStepName }
@@ -188,7 +188,7 @@ const selectGspNoIpa = (
 const selectParty = (
   state: OnboardingProductState,
   party: OnboardingFormData,
-  institutionType: InstitutionType,
+  institutionType: InstitutionType | undefined,
   gspNoIpaEnabled: boolean
 ): OnboardingProductState => {
   if (isGspWithoutIpa(party, institutionType)) {

@@ -13,8 +13,7 @@ const REQUIRED_PROPERTY = /^\/schema(\/properties\/[^/]+)*\/required\/\d+$/;
 
 const [label, jsonFile, textFile] = process.argv.slice(2);
 const { operations } = JSON.parse(fs.readFileSync(jsonFile, 'utf8'));
-// eslint-disable-next-line no-control-regex
-const text = fs.readFileSync(textFile, 'utf8').replace(/\x1b\[[0-9;]*m/g, '');
+const text =  fs.readFileSync(textFile, 'utf8').replace(/\x1b\[[0-9;]*m/g, '');
 
 const summaryLine = (name) => (text.match(new RegExp(`${name}:.*`)) || [''])[0].trim();
 const field = (key) => key.replace(/^\/schema\/properties\//, '').replace(/\/properties\//g, '.');

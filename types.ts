@@ -20,7 +20,7 @@ export type ApiEndpointKey = keyof typeof API;
 
 export type Endpoint = {
   endpoint: ApiEndpointKey;
-  endpointParams?: any;
+  endpointParams?: Record<string, string>;
 };
 
 export type RequestConfig = {
@@ -35,7 +35,7 @@ export type RouteConfig = {
   LABEL: string;
   EXACT?: boolean;
   SUBROUTES?: RoutesObject;
-  COMPONENT?: React.FunctionComponent<any>;
+  COMPONENT?: React.FunctionComponent<{ productId: string }>;
 };
 
 export type Image = { src: string; alt: string };
@@ -68,9 +68,8 @@ export type RequestOutcomeOptionsJwt = { [key in RequestOutcomeComplete]: Reques
  */
 export type StepperStepComponentProps = {
   product?: Product | null;
-  forward?: any;
-  back?: any;
-  updateFormData?: React.Dispatch<React.SetStateAction<any>>;
+  forward?: (...args: Array<never>) => void;
+  back?: () => void;
 };
 
 export type StepperStep = {
@@ -104,13 +103,6 @@ export interface UserOnCreate extends User {
   from?: string; // This is temporary, part of the API shared with self-care
   role?: PartyRole;
 }
-
-export type AlertDialogActions = {
-  setDialogTitle: (t: string) => void;
-  setDialogDescription: (t: string) => void;
-  setShowDialog: (t: boolean) => void;
-  handleCloseDialog?: (t: any) => void;
-};
 
 export interface OnboardingInfo {
   person: PersonInfo;

@@ -29,6 +29,7 @@ export type UsersObject = { [key: string]: UserOnCreate };
 export type UsersError = { [key: string]: { [userField: string]: Array<string> } };
 
 type Props = StepperStepComponentProps & {
+  forward: (formData: { users: Array<UserOnCreate | undefined> }) => void;
   legal?: UserOnCreate;
   externalInstitutionId: string;
   partyName: string;

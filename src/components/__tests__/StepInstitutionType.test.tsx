@@ -16,6 +16,7 @@ vi.mock('../../lib/api-utils');
       institutionType={'PA'}
       fromDashboard={false}
       setOrigin={vi.fn()}
+      forward={vi.fn()}
       productAvoidStep={false}
       loading={false}
       setLoading={vi.fn()}
@@ -51,6 +52,7 @@ test('Test: The correct institution types with the expected descriptions, can be
         institutionType={'PA'}
         fromDashboard={false}
         setOrigin={vi.fn()}
+        forward={vi.fn()}
         productAvoidStep={false}
         loading={false}
         setLoading={vi.fn()}
@@ -107,6 +109,7 @@ test('Test: The disclaimer on the role of PagoPA is displayed only for prod-ced'
       institutionType={'PA'}
       fromDashboard={false}
       setOrigin={vi.fn()}
+      forward={vi.fn()}
       productAvoidStep={false}
       loading={false}
       setLoading={vi.fn()}
@@ -131,6 +134,7 @@ test('Test: The disclaimer on the role of PagoPA is displayed only for prod-ced'
       institutionType={'PA'}
       fromDashboard={false}
       setOrigin={vi.fn()}
+      forward={vi.fn()}
       productAvoidStep={false}
       loading={false}
       setLoading={vi.fn()}

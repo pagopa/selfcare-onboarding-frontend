@@ -12,6 +12,7 @@ import { AooData } from '../../../model/AooData';
 import { UoData } from '../../../model/UoModel';
 import { OnboardingStepActions } from '../../../components/registrationSteps/OnboardingStepActions';
 import { OnboardedParty } from '../../../model/OnboardedParty';
+import { OnboardingFormData } from '../../../model/OnboardingFormData';
 import AddUserHeading from '../AddUserHeading';
 import { selected2OnboardingData } from '../../../utils/selected2OnboardingData';
 import { SelectionsState } from '../../../model/Selection';
@@ -19,6 +20,7 @@ import { SelectionsState } from '../../../model/Selection';
 type Props = {
   institutionType?: InstitutionType;
   selectedProduct?: ProductResource;
+  forward: (party: OnboardingFormData) => void;
 } & StepperStepComponentProps;
 
 const StepSearchOnboardedParty = ({ institutionType, selectedProduct, forward, back }: Props) => {

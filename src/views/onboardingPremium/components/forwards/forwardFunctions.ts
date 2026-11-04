@@ -26,8 +26,8 @@ interface SubProductForwardFunctionsParams {
   setBillingData: Dispatch<SetStateAction<OnboardingFormData | undefined>>;
   setInstitutionType: Dispatch<SetStateAction<InstitutionType | undefined>>;
   setPartyId: Dispatch<SetStateAction<string | undefined>>;
-  setOrigin: Dispatch<SetStateAction<string>>;
-  setOriginId: Dispatch<SetStateAction<string>>;
+  setOrigin: Dispatch<SetStateAction<string | undefined>>;
+  setOriginId: Dispatch<SetStateAction<string | undefined>>;
   setManager: Dispatch<SetStateAction<UserOnCreate | undefined>>;
   setUsers: Dispatch<SetStateAction<Array<UserOnCreate>>>;
   setCompanyInformations: Dispatch<SetStateAction<CompanyInformations | undefined>>;
@@ -107,9 +107,10 @@ export const createSubProductForwardFunctions = (params: SubProductForwardFuncti
     forward(isUserParty ? 3 : 2);
   };
 
+  // origin/originId are undefined when getOnboardingData gets a 404/400
   const forwardWithOnboardingData = (
-    origin: string,
-    originId: string,
+    origin?: string,
+    originId?: string,
     billingData?: OnboardingFormData,
     institutionType?: InstitutionType,
     partyId?: string,

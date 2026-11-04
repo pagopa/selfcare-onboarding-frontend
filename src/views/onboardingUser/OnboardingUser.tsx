@@ -30,7 +30,8 @@ import { StepAddAdmin } from '../onboardingProduct/components/StepAddAdmin';
 import StepSearchOnboardedParty from './components/StepSearchOnboardedParty';
 import { StepSelectProduct } from './components/StepSelectProduct';
 
-type UsersFormData = { users: Array<UserOnCreate> };
+// users[0] is undefined when StepAddAdmin has no legal representative (tech partners)
+type UsersFormData = { users: Array<UserOnCreate | undefined> };
 
 type OnboardingUserLocationState =
   | {
@@ -104,8 +105,10 @@ function OnboardingUserComponent() {
     forward();
   };
 
-  const forwardWithInstitution = (partySelected: PartyData) => {
-    setSelectedParty(partySelected);
+  const forwardWithInstitution = (partySelected: OnboardingFormData) => {
+    // StepSearchOnboardedParty forwards already-mapped data; the shared fields
+    // (businessName, externalId, ...) are what selected2OnboardingData reads back.
+    setSelectedParty(partySelected as unknown as PartyData);
     forward();
   };
 

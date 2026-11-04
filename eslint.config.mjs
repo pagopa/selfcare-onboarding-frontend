@@ -15,7 +15,6 @@ export default defineConfig([
     'build/',
     'coverage/',
     'locales/locales.ts',
-    '**/__tests__/**',
     'e2e/',
     'definitions/*',
     'src/vite-env.d.ts',
@@ -27,11 +26,12 @@ export default defineConfig([
   ]),
   {
     linterOptions: {
-      reportUnusedDisableDirectives: 'warn',
+      reportUnusedDisableDirectives: 'error',
     },
   },
   {
     files: ['**/*.{ts,tsx}'],
+    ignores: ['**/__tests__/**'],
     extends: [
       js.configs.recommended,
       tseslint.configs.recommended,
@@ -85,7 +85,7 @@ export default defineConfig([
       // Enable if we want to enforce the return type for all the functions
       '@typescript-eslint/explicit-module-boundary-types': 'off',
       '@typescript-eslint/no-inferrable-types': 'off',
-      '@typescript-eslint/no-explicit-any': 'warn',
+      '@typescript-eslint/no-explicit-any': 'error',
       '@typescript-eslint/array-type': [
         'error',
         {
@@ -163,10 +163,18 @@ export default defineConfig([
       'react/react-in-jsx-scope': 'off',
     },
   },
+  // Tests are only checked for complexity: helpers must stay readable, other rules are not enforced
   {
-    files: ['**/*.test.{ts,tsx}'],
+    files: ['**/__tests__/**/*.{ts,tsx}'],
+    languageOptions: {
+      parser: tseslint.parser,
+    },
+    plugins: {
+      sonarjs,
+    },
     rules: {
-      '@typescript-eslint/no-non-null-assertion': 'off',
+      complexity: 'error',
+      'sonarjs/cognitive-complexity': 'error',
     },
   },
 ]);

@@ -4,7 +4,7 @@ import { useContext, useEffect, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { InstitutionType, RequestOutcomeMessage, StepperStepComponentProps } from '../../../types';
 import { HeaderContext } from '../../lib/context';
-import { getOnboardingData } from '../../services/onboardingServices';
+import { getOnboardingData, OnboardingDataForward } from '../../services/onboardingServices';
 import { ENV } from '../../utils/env';
 import { unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
 import { LoadingOverlay } from '../modals/LoadingOverlay';
@@ -14,8 +14,13 @@ type Props = StepperStepComponentProps & {
   productId: string;
   partyId?: string;
   institutionType?: InstitutionType;
-  subProductFlow?: boolean;
-};
+} & (
+    | { subProductFlow: true; forward: OnboardingDataForward }
+    | {
+        subProductFlow?: false;
+        forward: (formData: undefined, institutionType?: InstitutionType, id?: undefined) => void;
+      }
+  );
 
 export const genericError: RequestOutcomeMessage = {
   title: '',

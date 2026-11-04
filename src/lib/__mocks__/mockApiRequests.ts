@@ -1633,7 +1633,7 @@ const buildOnboardingUserValidation409 = (
   );
 
 type MockRequest = {
-  endpointParams: Endpoint['endpointParams'];
+  endpointParams: NonNullable<Endpoint['endpointParams']>;
   params: AxiosRequestConfig['params'];
   data: AxiosRequestConfig['data'];
 };
@@ -1781,7 +1781,7 @@ const mockHandlers: Partial<Record<ApiEndpointKey, MockHandler>> = {
   ONBOARDING_GET_LOCATION_BY_ISTAT_CODE: ({ endpointParams }) =>
     ok(mockedGeotaxonomies.find((l) => endpointParams.geoTaxId === l.istat_code)),
   ONBOARDING_GET_PARTY_FROM_CF: ({ endpointParams }) =>
-    endpointParams?.id === '00112233445'
+    endpointParams.id === '00112233445'
       ? notFoundError
       : ok(mockedParties.find((p) => p.taxCode === endpointParams.id)),
   ONBOARDING_GET_PARTY_BY_CF_FROM_INFOCAMERE: ({ endpointParams }) =>
@@ -1868,7 +1868,7 @@ export async function mockFetch(
   { endpoint, endpointParams }: Endpoint,
   { params, data }: AxiosRequestConfig
 ): Promise<AxiosResponse | AxiosError> {
-  const response = mockHandlers[endpoint]?.({ endpointParams, params, data });
+  const response = mockHandlers[endpoint]?.({ endpointParams: endpointParams ?? {}, params, data });
   if (response) {
     return response;
   }

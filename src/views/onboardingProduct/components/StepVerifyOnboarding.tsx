@@ -20,6 +20,7 @@ import { ENV } from '../../../utils/env';
 import { unregisterUnloadEvent } from '../../../utils/unloadEvent-utils';
 
 type Props = StepperStepComponentProps & {
+  forward: () => void;
   externalInstitutionId: string;
   productId: string;
   selectedProduct?: Product | null;

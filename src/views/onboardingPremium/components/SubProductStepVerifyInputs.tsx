@@ -10,6 +10,7 @@ import { unregisterUnloadEvent } from '../../../utils/unloadEvent-utils';
 import { genericError } from '../../onboardingProduct/components/StepVerifyOnboarding';
 
 type Props = StepperStepComponentProps & {
+  forward: (product: Product, subProduct: Product, parties: Array<SelfcareParty>) => void;
   requestId: string;
   productId: string;
   subProductId: string;

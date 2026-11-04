@@ -17,7 +17,7 @@ const isContractUpdateFlow = (
 export function ConfirmRegistrationStep1(
   addUserFlow: boolean,
   translationKeyValue: string,
-  { forward, back }: StepperStepComponentProps,
+  { forward, back }: StepperStepComponentProps & { forward: (file: File) => void },
   { loading }: { loading: boolean },
   {
     uploadedFiles,

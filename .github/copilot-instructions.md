@@ -49,6 +49,9 @@ SelfCare onboarding flow (PagoPA): React 18 + TypeScript SPA built with Vite, MU
 
 - Prettier: 100 cols, semicolons, single quotes, trailing commas `es5`.
 - ESLint flat config (`eslint.config.mjs`) includes sonarjs, functional and react-hooks rules; keep lint clean.
+  - `any` is forbidden (`no-explicit-any` is an error) and unused `eslint-disable` directives are errors.
+  - Tests in `__tests__` are linted only for `complexity` and `sonarjs/cognitive-complexity`.
+  - Never silence complexity rules with `eslint-disable`; split the code into helpers.
 - Functional components with hooks; Formik for forms; fp-ts/io-ts for decoding API responses.
 - Tests live in `__tests__` folders next to the code, using Vitest + React Testing Library; globals are enabled and setup is in `src/setupTests.ts`. Tests are CPU-heavy, so keep them deterministic and avoid unnecessary long flows.
 - Environment config is in `.env*` files and `src/utils/env.ts`; never commit secrets.

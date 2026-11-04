@@ -28,6 +28,7 @@ import { InstitutionOrigins } from '../../model/InstitutionOrigins';
 import { isCedProduct } from '../../utils/institutionTypeUtils';
 
 type Props = StepperStepComponentProps & {
+  forward: (institutionType: InstitutionType) => void;
   institutionType: InstitutionType;
   fromDashboard: boolean;
   selectedProduct?: Product | null;

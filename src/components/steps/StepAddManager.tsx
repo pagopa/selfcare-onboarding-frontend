@@ -53,6 +53,7 @@ export const handleAuthUser = (
 };
 
 type Props = StepperStepComponentProps & {
+  forward: (formData: { users: Array<UserOnCreate> }) => void;
   externalInstitutionId: string;
   addUserFlow: boolean;
   readOnly?: boolean;

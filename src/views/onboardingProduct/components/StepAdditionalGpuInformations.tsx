@@ -21,6 +21,7 @@ import {
 } from '../../../model/AdditionalGpuInformations';
 
 type Props = StepperStepComponentProps & {
+  forward: (additionalGpuInformations: AdditionalGpuInformations) => void;
   originId?: string;
   origin?: string;
 };
