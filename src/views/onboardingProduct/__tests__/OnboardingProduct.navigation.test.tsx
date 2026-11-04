@@ -26,6 +26,7 @@ import {
   fetchWithLogsSpy,
   mockedHistoryPush,
   mockedLocation,
+  replaceMockedLocation,
   setupTestHooks,
 } from './shared/testSetup';
 
@@ -57,7 +58,7 @@ vi.mock('react-router-dom', async () => ({
   ...(await vi.importActual('react-router-dom')),
   useHistory: () => ({
     location: mockedLocation,
-    replace: (nextLocation: any) => Object.assign(mockedLocation, nextLocation),
+    replace: replaceMockedLocation,
     push: mockedHistoryPush,
     goBack: mockedHistoryGoBack,
   }),
