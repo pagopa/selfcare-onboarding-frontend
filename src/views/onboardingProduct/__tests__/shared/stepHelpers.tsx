@@ -351,6 +351,109 @@ export const executeStepContractsSummary = async () => {
   await waitFor(() => fireEvent.click(confirmButton));
 };
 
+const billingInputsFor = (partyName?: string) => {
+  if (partyName === 'AGENCY ERROR') {
+    return { recipientCode: 'A2B3C4', taxCodeInvoicing: '75656445456' };
+  }
+  if (partyName === 'Comune di Milano') {
+    return { recipientCode: 'A3B4C5', taxCodeInvoicing: '998877665544' };
+  }
+  return { recipientCode: 'A1B2C3', taxCodeInvoicing: '87654321098' };
+};
+
+const checkPrivateMerchantBillingFields = () => {
+  expect(document.getElementById('recipientCode')).not.toBeInTheDocument();
+  expect(document.getElementById('taxCodeInvoicing')).not.toBeInTheDocument();
+  expect(document.getElementById('supportEmail')).not.toBeInTheDocument();
+
+  expect(document.getElementById('businessRegisterPlace')).toBeInTheDocument();
+  expect(document.getElementById('rea')).toBeInTheDocument();
+};
+
+const changeRecipientCode = (value: string) =>
+  fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
+    target: { value },
+  });
+
+const taxCodeInvoicingInput = () => document.getElementById('taxCodeInvoicing') as HTMLInputElement;
+
+/** Walks the recipient code validations (SDI lookup) and the tax code invoicing prefill. */
+const checkRecipientCodeValidations = async (
+  confirmButton: HTMLElement,
+  inputs: { recipientCode: string; taxCodeInvoicing: string }
+) => {
+  await waitFor(() =>
+    expect(document.getElementById('taxCodeInvoicing')).toHaveValue(inputs.taxCodeInvoicing)
+  );
+  await waitFor(() => expect(confirmButton).toBeEnabled());
+  changeRecipientCode('');
+  expect(taxCodeInvoicingInput()).not.toBeInTheDocument();
+
+  await waitFor(() => expect(confirmButton).toBeDisabled());
+
+  changeRecipientCode('AABBC');
+  await waitFor(() => screen.getByText('Il codice deve essere di minimo 6 caratteri'));
+
+  changeRecipientCode('AABBC1');
+  await waitFor(() => screen.getByText('Il codice inserito non è associato al tuo ente'));
+
+  expect(taxCodeInvoicingInput()).not.toBeInTheDocument();
+
+  changeRecipientCode('2A3B4C');
+
+  expect(taxCodeInvoicingInput()).not.toBeInTheDocument();
+
+  await waitFor(() =>
+    screen.getByText(
+      'Il codice inserito è associato al codice fiscale di un ente che non ha il servizio di fatturazione attivo'
+    )
+  );
+
+  changeRecipientCode('A1B2C31');
+
+  await waitFor(() => screen.getByText('Il codice inserito non è associato al tuo ente'));
+
+  await waitFor(() => expect(taxCodeInvoicingInput()).not.toBeInTheDocument());
+
+  changeRecipientCode(inputs.recipientCode);
+
+  await waitFor(() => expect(taxCodeInvoicingInput()).toBeInTheDocument());
+  expect(taxCodeInvoicingInput()).toBeDisabled();
+
+  fireEvent.change(taxCodeInvoicingInput(), {
+    target: { value: '87654321092' },
+  });
+  await waitFor(() => screen.getByText('Il Codice Fiscale inserito non è relativo al tuo ente'));
+
+  await waitFor(() => expect(confirmButton).toBeDisabled());
+
+  fireEvent.change(taxCodeInvoicingInput(), {
+    target: { value: inputs.taxCodeInvoicing },
+  });
+};
+
+type InvoicingFieldsParams = {
+  productId: string;
+  institutionType: string;
+  isUo: boolean;
+  partyName?: string;
+  confirmButton: HTMLElement;
+};
+
+const fillInvoicingFields = async (p: InvoicingFieldsParams) => {
+  const isInvoicable = canInvoice(p.institutionType.toUpperCase(), p.productId);
+  if (!isInvoicable || isIoProduct(p.productId)) {
+    expect(document.getElementById('taxCodeInvoicing')).not.toBeInTheDocument();
+    return;
+  }
+  const inputs = billingInputsFor(p.partyName);
+  changeRecipientCode(inputs.recipientCode);
+
+  if (p.isUo || isPublicAdministration(p.institutionType as InstitutionType)) {
+    await checkRecipientCodeValidations(p.confirmButton, inputs);
+  }
+};
+
 export const executeStepBillingData = async (
   productId: string,
   institutionType: string,
@@ -364,7 +467,6 @@ export const executeStepBillingData = async (
 ) => {
   console.log('Testing step billing data..');
   await waitFor(() => screen.getByText('Inserisci i dati dell’ente'));
-  const isInvoicable = canInvoice(institutionType.toUpperCase(), productId);
 
   await fillUserBillingDataForm(
     productId,
@@ -391,112 +493,9 @@ export const executeStepBillingData = async (
   const confirmButton = screen.getByRole('button', { name: 'Continua' });
 
   if (isPrivateMerchantInstitution(institutionType as InstitutionType, productId)) {
-    expect(document.getElementById('recipientCode')).not.toBeInTheDocument();
-    expect(document.getElementById('taxCodeInvoicing')).not.toBeInTheDocument();
-    expect(document.getElementById('supportEmail')).not.toBeInTheDocument();
-
-    expect(document.getElementById('businessRegisterPlace')).toBeInTheDocument();
-    expect(document.getElementById('rea')).toBeInTheDocument();
+    checkPrivateMerchantBillingFields();
   } else {
-    const recipientCodeInput =
-      partyName === 'AGENCY ERROR'
-        ? 'A2B3C4'
-        : partyName === 'Comune di Milano'
-          ? 'A3B4C5'
-          : 'A1B2C3';
-    const taxCodeInvoicingInput =
-      partyName === 'AGENCY ERROR'
-        ? '75656445456'
-        : partyName === 'Comune di Milano'
-          ? '998877665544'
-          : '87654321098';
-
-    if (isInvoicable && !isIoProduct(productId)) {
-      fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
-        target: { value: recipientCodeInput },
-      });
-
-      if (isUo || isPublicAdministration(institutionType as InstitutionType)) {
-        await waitFor(() =>
-          expect(document.getElementById('taxCodeInvoicing')).toHaveValue(taxCodeInvoicingInput)
-        );
-        await waitFor(() => expect(confirmButton).toBeEnabled());
-        fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
-          target: { value: '' },
-        });
-        expect(
-          document.getElementById('taxCodeInvoicing') as HTMLInputElement
-        ).not.toBeInTheDocument();
-
-        await waitFor(() => expect(confirmButton).toBeDisabled());
-
-        fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
-          target: { value: 'AABBC' },
-        });
-        await waitFor(() => screen.getByText('Il codice deve essere di minimo 6 caratteri'));
-
-        fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
-          target: { value: 'AABBC1' },
-        });
-        await waitFor(() => screen.getByText('Il codice inserito non è associato al tuo ente'));
-
-        expect(
-          document.getElementById('taxCodeInvoicing') as HTMLInputElement
-        ).not.toBeInTheDocument();
-
-        fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
-          target: { value: '2A3B4C' },
-        });
-
-        expect(
-          document.getElementById('taxCodeInvoicing') as HTMLInputElement
-        ).not.toBeInTheDocument();
-
-        await waitFor(() =>
-          screen.getByText(
-            'Il codice inserito è associato al codice fiscale di un ente che non ha il servizio di fatturazione attivo'
-          )
-        );
-
-        fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
-          target: { value: 'A1B2C31' },
-        });
-
-        await waitFor(() => screen.getByText('Il codice inserito non è associato al tuo ente'));
-
-        await waitFor(() =>
-          expect(
-            document.getElementById('taxCodeInvoicing') as HTMLInputElement
-          ).not.toBeInTheDocument()
-        );
-
-        fireEvent.change(document.getElementById('recipientCode') as HTMLElement, {
-          target: { value: recipientCodeInput },
-        });
-
-        await waitFor(() =>
-          expect(
-            document.getElementById('taxCodeInvoicing') as HTMLInputElement
-          ).toBeInTheDocument()
-        );
-        expect(document.getElementById('taxCodeInvoicing') as HTMLInputElement).toBeDisabled();
-
-        fireEvent.change(document.getElementById('taxCodeInvoicing') as HTMLInputElement, {
-          target: { value: '87654321092' },
-        });
-        await waitFor(() =>
-          screen.getByText('Il Codice Fiscale inserito non è relativo al tuo ente')
-        );
-
-        await waitFor(() => expect(confirmButton).toBeDisabled());
-
-        fireEvent.change(document.getElementById('taxCodeInvoicing') as HTMLInputElement, {
-          target: { value: taxCodeInvoicingInput },
-        });
-      }
-    } else {
-      expect(document.getElementById('taxCodeInvoicing')).not.toBeInTheDocument();
-    }
+    await fillInvoicingFields({ productId, institutionType, isUo, partyName, confirmButton });
 
     if (from !== 'IPA') {
       checkCorrectBodyBillingData(
