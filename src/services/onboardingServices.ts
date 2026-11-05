@@ -361,7 +361,7 @@ export const getInstiutionTypesByProduct = async (
 
     const filterTechPartnerResponse = responseData.origins.filter(isPTInstitution);
 
-    if (filterTechPartnerResponse && ENV.PT.SHOW) {
+    if (filterTechPartnerResponse && !ENV.PT.SHOW) {
       // eslint-disable-next-line functional/immutable-data
       responseData.origins = responseData.origins.filter((item) => !isPTInstitution(item));
     }
