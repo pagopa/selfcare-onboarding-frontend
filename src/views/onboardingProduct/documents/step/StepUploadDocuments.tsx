@@ -160,7 +160,8 @@ const StepUploadDocuments = ({
         direction="column"
         alignItems="center"
         mt={1}
-        width="70%"
+        width="100%"
+        maxWidth="760px"
       >
         <Grid item xs={12}>
           <Typography variant="h3" component="h1" align="center" sx={{ lineHeight: '1.2' }}>
@@ -173,7 +174,7 @@ const StepUploadDocuments = ({
           </Typography>
         </Grid>
 
-        <Grid item xs={12} width="70%" justifyContent="space-between" alignItems="center" mt={2}>
+        <Grid item xs={12} width="100%" justifyContent="space-between" alignItems="center" mt={2}>
           <Stepper activeStep={activeStep} alternativeLabel>
             {stepLabels.map((label) => (
               <Step key={label}>
@@ -183,7 +184,7 @@ const StepUploadDocuments = ({
           </Stepper>
         </Grid>
 
-        <Grid item xs={12} mt={1} width="70%">
+        <Grid item xs={12} mt={1} width="100%">
           {steps[activeStep]}
         </Grid>
       </Grid>

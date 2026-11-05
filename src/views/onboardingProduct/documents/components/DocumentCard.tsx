@@ -33,7 +33,8 @@ export const DocumentCard = ({
             borderRadius: theme.spacing(2),
             p: 4,
             my: 2,
-            width: '704px',
+            width: '100%',
+            maxWidth: '704px',
           }}
         >
           <Grid
