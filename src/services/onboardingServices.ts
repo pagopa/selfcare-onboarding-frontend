@@ -29,6 +29,7 @@ import {
   isInteropProduct,
   isMockEnvironment,
   isPrivatePersonInstitution,
+  isTechPartner,
 } from '../utils/institutionTypeUtils';
 import { genericError } from '../views/onboardingProduct/components/StepVerifyOnboarding';
 
@@ -339,6 +340,8 @@ export const getAllowedAddUserProducts = async (
 
 const isGspOrigin = (item: { institutionType?: string }) =>
   isGlobalServiceProvider(item.institutionType as InstitutionType);
+const isPTInstitution = (item: { institutionType?: string }) =>
+  isTechPartner(item.institutionType as InstitutionType);
 
 export const getInstiutionTypesByProduct = async (
   setLoading: Dispatch<SetStateAction<boolean>>,
@@ -354,6 +357,13 @@ export const getInstiutionTypesByProduct = async (
     if (!responseData?.origins || responseData.origins.length === 0) {
       setOutcome(genericError);
       return;
+    }
+
+    const filterTechPartnerResponse = responseData.origins.filter(isPTInstitution);
+
+    if (filterTechPartnerResponse && !ENV.PT.SHOW) {
+      // eslint-disable-next-line functional/immutable-data
+      responseData.origins = responseData.origins.filter((item) => !isPTInstitution(item));
     }
 
     const filterGspResponse = responseData.origins.filter(isGspOrigin);

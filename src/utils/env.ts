@@ -58,7 +58,7 @@ export const ENV = {
   },
 
   PT: {
-    SHOW_PT: import.meta.env.VITE_ENABLE_PT === 'true',
+    SHOW: import.meta.env.VITE_ENABLE_PT === 'true',
   },
 
   AGGREGATOR: {
