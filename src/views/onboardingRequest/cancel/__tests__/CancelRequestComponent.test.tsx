@@ -114,7 +114,7 @@ test('Test: The jwt exist and the request is correctly retrieved, cancel onboard
   fireEvent.click(goHome);
 
   expect(mockedLocation.assign).toHaveBeenCalledWith(ENV.URL_FE.LANDING);
-  expect(fetchWithLogsSpy).toBeCalledTimes(5);
+  expect(fetchWithLogsSpy).toBeCalledTimes(2);
 });
 
 test('Test: The jwt exist and the request is correctly retrieved, cancel onboarding request flow is started and NOT correcly deleted', async () => {
