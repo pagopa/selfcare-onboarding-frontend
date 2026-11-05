@@ -3,9 +3,26 @@ import userEvent from '@testing-library/user-event';
 import { afterAll, beforeAll, beforeEach, expect, test, vi } from 'vitest';
 import '../../../../locale';
 import { ENV } from '../../../../utils/env';
+import { triggerQualtricsIntercept } from '../../../../utils/qualtricsUtils';
+import {
+  buildInstitutionInfo,
+  buildOnboardingRequestResource,
+} from '../../../../utils/test/builders';
 import CompleteRequestComponent from '../CompleteRequest';
+// Imported after the component to avoid the constants.ts <-> views import cycle
+import { OnboardingApi } from '../../../../api/OnboardingApiClient';
 
 vi.setConfig({ testTimeout: 80000 });
+
+vi.mock('../../../../utils/qualtricsUtils', () => ({ triggerQualtricsIntercept: vi.fn() }));
+
+vi.mock('../../../../services/requestStatusServices', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../../../../services/requestStatusServices')>()),
+  onboardingContractUpload: vi.fn(
+    async (_file: File, ctx: { setOutcomeContentState: (outcome: 'success') => void }) =>
+      ctx.setOutcomeContentState('success')
+  ),
+}));
 
 vi.mock('react-router-dom', () => ({
   useHistory: () => ({
@@ -120,6 +137,33 @@ test('Test: The jwt exist and the request is correctly retrieved and waiting for
   const upload = document.getElementById('file-uploader') as HTMLElement;
 
   userEvent.upload(upload, mockedContract);
+});
+
+test('Test: after the contract upload the Qualtrics survey receives the institution type', async () => {
+  const qualtricsEnabled = ENV.QUALTRICS_APPROVAL.ENABLE;
+  ENV.QUALTRICS_APPROVAL.ENABLE = true;
+  vi.mocked(OnboardingApi.retrieveOnboardingRequest).mockResolvedValueOnce(
+    buildOnboardingRequestResource({
+      institutionInfo: buildInstitutionInfo({ institutionType: 'GSP' }),
+    })
+  );
+  mockedLocation.search = 'jwt=pendingRequest';
+  try {
+    render(<CompleteRequestComponent />);
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Vai al caricamento' }));
+    await userEvent.upload(document.getElementById('file-uploader') as HTMLElement, mockedContract);
+    fireEvent.click(screen.getByRole('button', { name: 'Continua' }));
+
+    await waitFor(() =>
+      expect(triggerQualtricsIntercept).toHaveBeenCalledWith(
+        expect.objectContaining({ institutionType: 'GSP' }),
+        expect.anything()
+      )
+    );
+  } finally {
+    ENV.QUALTRICS_APPROVAL.ENABLE = qualtricsEnabled;
+  }
 });
 
 test('Test: contract update flow uses the new drag and drop and upload page', async () => {
