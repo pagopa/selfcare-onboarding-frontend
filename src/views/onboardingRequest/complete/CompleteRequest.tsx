@@ -3,6 +3,7 @@ import { ComponentProps, useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router';
 import { FileErrorAttempt, Problem, RequestOutcomeComplete, StepperStep } from '../../../../types';
+import { InstitutionInfo } from '../../../api/generated/onboarding/InstitutionInfo';
 import { OnboardingVerify } from '../../../api/generated/onboarding/OnboardingVerify';
 import { LoadingOverlay } from '../../../components/modals/LoadingOverlay';
 import { ConfirmRegistrationStep0 } from '../../../components/registrationSteps/ConfirmRegistrationStep0';
@@ -11,7 +12,11 @@ import { ContractUpdateErrorPage } from '../../../components/registrationSteps/c
 import { useHistoryState } from '../../../hooks/useHistoryState';
 import { HeaderContext, UserContext } from '../../../lib/context';
 import { onboardingContractUpload } from '../../../services/requestStatusServices';
-import { getOnboardingInfo, verifyRequest } from '../../../services/tokenServices';
+import {
+  getOnboardingInfo,
+  getOnboardingInstitutionInfo,
+  verifyRequest,
+} from '../../../services/tokenServices';
 import { customErrors } from '../../../utils/constants';
 import { ENV } from '../../../utils/env';
 import { getRequestJwt } from '../../../utils/getRequestJwt';
@@ -86,11 +91,13 @@ export default function CompleteRequestComponent() {
   const [requestData, setRequestData] = useState<OnboardingVerify>();
   const [errorDescription, setErrorDescription] = useState<string>();
   const [institutionId, setInstitutionId] = useState<string>();
+  const [institutionInfo, setInstitutionInfo] = useState<InstitutionInfo>();
   const [attachmentUploadSuccess, setAttachmentUploadSuccess] = useState<boolean>(false);
   const addUserFlow = new URLSearchParams(window.location.search).get('add-user') === 'true';
   const contractUpdate =
     new URLSearchParams(window.location.search).get('contract-update') === 'true';
   const attachments = window.location.pathname.includes('/attachments');
+  const qualtricsEnabled = ENV.QUALTRICS_APPROVAL.ENABLE && !addUserFlow && !attachments;
   const translationKeyValue = addUserFlow ? 'user' : attachments ? 'attachments' : 'product';
 
   useEffect(() => {
@@ -120,14 +127,19 @@ export default function CompleteRequestComponent() {
   }, [onboardingId]);
 
   useEffect(() => {
-    if (
-      outcomeContentState === 'success' &&
-      ENV.QUALTRICS_APPROVAL.ENABLE &&
-      !addUserFlow &&
-      !attachments
-    ) {
+    if (onboardingId && qualtricsEnabled) {
+      void getOnboardingInstitutionInfo(onboardingId, setInstitutionInfo);
+    }
+  }, [onboardingId]);
+
+  useEffect(() => {
+    if (outcomeContentState === 'success' && qualtricsEnabled) {
       void triggerQualtricsIntercept(
-        { productId: requestData?.productId ?? '' },
+        {
+          productId: requestData?.productId ?? '',
+          institutionType: institutionInfo?.institutionType ?? '',
+          institutionDescription: institutionInfo?.name ?? '',
+        },
         {
           scriptUrl: ENV.QUALTRICS_APPROVAL.SCRIPT_URL,
           siteId: ENV.QUALTRICS_APPROVAL.SITE_ID,
