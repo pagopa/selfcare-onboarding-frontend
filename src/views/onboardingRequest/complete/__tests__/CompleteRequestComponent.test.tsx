@@ -11,6 +11,7 @@ import {
 import CompleteRequestComponent from '../CompleteRequest';
 // Imported after the component to avoid the constants.ts <-> views import cycle
 import { OnboardingApi } from '../../../../api/OnboardingApiClient';
+import { onboardingContractUpload } from '../../../../services/requestStatusServices';
 
 vi.setConfig({ testTimeout: 80000 });
 
@@ -187,4 +188,10 @@ test('Test: contract update flow uses the new drag and drop and upload page', as
   expect(screen.queryByText('*Campo obbligatorio')).toBeNull();
   screen.getByRole('button', { name: 'Rimuovi il file' });
   screen.getByRole('button', { name: /Indietro/ });
+
+  vi.mocked(onboardingContractUpload).mockClear();
+  fireEvent.click(screen.getByRole('button', { name: 'Continua' }));
+  // The contract update API is not available yet: the complete call must not be sent
+  expect(onboardingContractUpload).not.toHaveBeenCalled();
+  screen.getByText(mockedContract.name);
 });

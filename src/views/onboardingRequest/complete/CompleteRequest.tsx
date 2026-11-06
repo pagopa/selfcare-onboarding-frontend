@@ -188,8 +188,12 @@ export default function CompleteRequestComponent() {
     setUploadedFiles([]);
   };
 
-  const uploadContract = () =>
-    onboardingContractUpload(uploadedFiles[0], {
+  const uploadContract = () => {
+    // The contract update flow will be served by a dedicated API: until then nothing is sent
+    if (contractUpdate) {
+      return;
+    }
+    void onboardingContractUpload(uploadedFiles[0], {
       onboardingId,
       requestData,
       addUserFlow,
@@ -203,6 +207,7 @@ export default function CompleteRequestComponent() {
       transcodeErrorCode,
       onAttachmentSuccess: () => setAttachmentUploadSuccess(true),
     });
+  };
 
   const steps: Array<StepperStep> = [
     {
