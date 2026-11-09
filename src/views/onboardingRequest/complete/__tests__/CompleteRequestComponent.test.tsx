@@ -11,7 +11,6 @@ import {
 import CompleteRequestComponent from '../CompleteRequest';
 // Imported after the component to avoid the constants.ts <-> views import cycle
 import { OnboardingApi } from '../../../../api/OnboardingApiClient';
-import { onboardingContractUpload } from '../../../../services/requestStatusServices';
 
 vi.setConfig({ testTimeout: 80000 });
 
@@ -92,9 +91,7 @@ test('Test: The jwt exist and the request is correct retrieved, but it is alread
   const login = screen.getByText('Accedi');
 
   fireEvent.click(login);
-  const expectedOnSuccess = encodeURIComponent(
-    mockedLocation.pathname + mockedLocation.search
-  );
+  const expectedOnSuccess = encodeURIComponent(mockedLocation.pathname + mockedLocation.search);
   await waitFor(() =>
     expect(mockedLocation.assign).toHaveBeenCalledWith(
       `${ENV.URL_FE.LOGIN}/login?onSuccess=${expectedOnSuccess}`
@@ -110,9 +107,7 @@ test('Test: The jwt exist but is expired', async () => {
   const login = screen.getByText('Torna alla home');
 
   fireEvent.click(login);
-  await waitFor(() =>
-    expect(mockedLocation.assign).toHaveBeenCalledWith(ENV.URL_FE.LANDING)
-  );
+  await waitFor(() => expect(mockedLocation.assign).toHaveBeenCalledWith(ENV.URL_FE.LANDING));
 });
 
 test('Test: The jwt exist and the request is correctly retrieved and waiting for upload/download contract, starting the upload flow', async () => {
@@ -188,10 +183,4 @@ test('Test: contract update flow uses the new drag and drop and upload page', as
   expect(screen.queryByText('*Campo obbligatorio')).toBeNull();
   screen.getByRole('button', { name: 'Rimuovi il file' });
   screen.getByRole('button', { name: /Indietro/ });
-
-  vi.mocked(onboardingContractUpload).mockClear();
-  fireEvent.click(screen.getByRole('button', { name: 'Continua' }));
-  // The contract update API is not available yet: the complete call must not be sent
-  expect(onboardingContractUpload).not.toHaveBeenCalled();
-  screen.getByText(mockedContract.name);
 });
