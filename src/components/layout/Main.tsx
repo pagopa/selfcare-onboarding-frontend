@@ -1,6 +1,5 @@
 import { Box } from '@mui/material';
-import { Redirect, Route, Switch } from 'react-router-dom';
-import { useLocation } from 'react-router';
+import { Navigate, Route, Routes, useLocation } from 'react-router';
 import { ROUTES } from '../../utils/constants';
 
 export function Main() {
@@ -8,22 +7,28 @@ export function Main() {
   const productId = location.pathname.replace(/^\/onboarding\/([^/]+)\/?.*/, '$1');
   return (
     <Box component="main" my="auto" marginY={11}>
-      <Switch>
-        {Object.values(ROUTES).map(({ PATH, EXACT, COMPONENT: Component }, i) => (
-          <Route path={PATH} exact={EXACT} key={i}>
-            {Component && <Component productId={productId} />}
-          </Route>
+      <Routes>
+        {Object.values(ROUTES).map(({ PATH, PREFIX_MATCH, COMPONENT: Component }, i) => (
+          <Route
+            path={PREFIX_MATCH ? `${PATH}/*` : PATH}
+            element={Component && <Component productId={productId} />}
+            key={i}
+          />
         ))}
 
-        {/* If on the ROOT, redirect to platform or login page based on whether the user is logged in */}
-        <Route path={ROUTES.ONBOARDING_PRODUCT.PATH} exact={false}>
-          <Redirect to={ROUTES.ONBOARDING_PRODUCT.PATH.replace(':productId', productId)} />
-        </Route>
+        {/* Any deeper path under a product redirects to the product page */}
+        <Route
+          path={`${ROUTES.ONBOARDING_PRODUCT.PATH}/*`}
+          element={
+            <Navigate
+              replace
+              to={ROUTES.ONBOARDING_PRODUCT.PATH.replace(':productId', productId)}
+            />
+          }
+        />
 
-        <Route path="*">
-          <Redirect to={ROUTES.ONBOARDING_ROOT.PATH} />
-        </Route>
-      </Switch>
+        <Route path="*" element={<Navigate replace to={ROUTES.ONBOARDING_ROOT.PATH} />} />
+      </Routes>
     </Box>
   );
 }

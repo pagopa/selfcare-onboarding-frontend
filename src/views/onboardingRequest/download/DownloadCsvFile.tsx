@@ -1,6 +1,6 @@
 import { storageTokenOps } from '@pagopa/selfcare-common-frontend/lib/utils/storage';
 import React, { useContext, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams } from 'react-router';
 import { productId2ProductTitle } from '@pagopa/selfcare-common-frontend/lib/utils/productId2ProductTitle';
 import { HeaderContext, UserContext } from '../../../lib/context';
 import { ENV } from '../../../utils/env';
