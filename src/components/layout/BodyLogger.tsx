@@ -3,7 +3,7 @@ import { Footer, Header } from '@pagopa/selfcare-common-frontend/lib';
 import i18n from '@pagopa/selfcare-common-frontend/lib/locale/locale-utils';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
 import { useContext, useEffect, useState } from 'react';
-import { useHistory, useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router';
 import { logAction } from '../../lib/action-log';
 import { PRODUCT_IDS, ROUTES } from '../../utils/constants';
 import { ENV } from '../../utils/env';
@@ -13,7 +13,7 @@ import { Main } from './Main';
 export function BodyLogger() {
   const { user } = useContext(UserContext);
   const location = useLocation();
-  const history = useHistory();
+  const navigate = useNavigate();
   const [subHeaderVisible, setSubHeaderVisible] = useState<boolean>(false);
   const [onExit, setOnExit] = useState<((exitAction: () => void) => void) | undefined>();
   const [enableLogin, setEnableLogin] = useState<boolean>(true);
@@ -21,14 +21,14 @@ export function BodyLogger() {
 
   useEffect(() => {
     if (location.pathname === '/onboarding/prod-io-premium') {
-      history.push(
+      void navigate(
         ROUTES.ONBOARDING_PREMIUM.PATH.replace(':productId', PRODUCT_IDS.IO).replace(
           ':subProductId',
           PRODUCT_IDS.IO_PREMIUM
         )
       );
     } else if(location.pathname === '/onboarding/prod-dashboard-psp') {
-      history.push(
+      void navigate(
         ROUTES.ONBOARDING_PREMIUM.PATH.replace(':productId', PRODUCT_IDS.PAGOPA).replace(
           ':subProductId',
           PRODUCT_IDS.DASHBOARD_PSP

@@ -1,4 +1,3 @@
-import { History } from 'history';
 import { Dispatch } from 'react';
 import {
   OnboardingProductAction,
@@ -26,7 +25,7 @@ export type BackFunctionsContext = {
 };
 
 export type BackFunctionsEffects = {
-  history: Pick<History, 'goBack'>;
+  goBack: () => void;
 };
 
 export type BackFunctionsParams = {
@@ -47,10 +46,10 @@ export const createBackFunctions = ({ state, dispatch, ctx, effects }: BackFunct
     subunitTypeByQuery,
     isRequiredDocumentsFlow,
   } = ctx;
-  const { history } = effects;
+  const { goBack } = effects;
 
   const handleOpenExitModal = () => {
-    dispatch({ type: 'OPEN_EXIT_MODAL', onExitAction: () => history.goBack() });
+    dispatch({ type: 'OPEN_EXIT_MODAL', onExitAction: () => goBack() });
   };
 
   const run = (transition: Transition) => {

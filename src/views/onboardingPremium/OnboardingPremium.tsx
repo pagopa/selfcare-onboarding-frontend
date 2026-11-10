@@ -5,7 +5,6 @@ import { uniqueId } from 'lodash';
 import { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { useParams } from 'react-router';
-import { useHistory } from 'react-router-dom';
 import {
   DataProtectionOfficerDto,
   InstitutionType,
@@ -22,7 +21,7 @@ import { StepAddManager, UsersObject } from '../../components/steps/StepAddManag
 import StepOnboardingData, { genericError } from '../../components/steps/StepOnboardingData';
 import StepOnboardingFormData from '../../components/steps/StepOnboardingFormData';
 import { withLogin } from '../../components/withLogin';
-import { useHistoryState } from '../../hooks/useHistoryState';
+import { useHistoryState, useReplaceHistoryState } from '../../hooks/useHistoryState';
 import { HeaderContext } from '../../lib/context';
 import { MessageNoAction } from '../../components/shared/MessageNoAction';
 import { CompanyInformations } from '../../model/CompanyInformations';
@@ -48,7 +47,8 @@ type OnboardingPremiumUrlParams = {
 
 function OnboardingPremiumComponent() {
   const { t } = useTranslation();
-  const { subProductId, productId } = useParams<OnboardingPremiumUrlParams>();
+  // both params are always defined by the route ONBOARDING_PREMIUM
+  const { subProductId = '', productId = '' } = useParams<OnboardingPremiumUrlParams>();
   const [loading, setLoading] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
   const [subProduct, setSubProduct] = useState<Product>();
@@ -68,7 +68,7 @@ function OnboardingPremiumComponent() {
 
   const setStepAddManagerHistoryState = useHistoryState<UsersObject>('people_step2', {})[2];
 
-  const history = useHistory();
+  const replaceHistoryState = useReplaceHistoryState();
 
   const [openExitModal, setOpenExitModal] = useState(false);
   const { setOnExit } = useContext(HeaderContext);
@@ -89,8 +89,7 @@ function OnboardingPremiumComponent() {
   }, []);
 
   useEffect(() => {
-    // eslint-disable-next-line functional/immutable-data
-    Object.assign(history.location, { state: undefined });
+    replaceHistoryState(() => null);
   }, []);
 
   useEffect(() => {

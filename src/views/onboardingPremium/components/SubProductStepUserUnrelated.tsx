@@ -4,7 +4,7 @@ import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyt
 import { resolvePathVariables } from '@pagopa/selfcare-common-frontend/lib/utils/routes-utils';
 import { useEffect } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import { Product } from '../../../../types';
 import { onExitPremiumFlow } from '../../../services/subProductServices';
 import { ROUTES } from '../../../utils/constants';
@@ -16,7 +16,7 @@ type Props = {
 };
 
 export default function SubProductStepUserUnrelated({ product, subProduct, productId }: Props) {
-  const history = useHistory();
+  const navigate = useNavigate();
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -24,7 +24,7 @@ export default function SubProductStepUserUnrelated({ product, subProduct, produ
   }, []);
 
   const onButtonGoTo = () => {
-    history.push(resolvePathVariables(ROUTES.ONBOARDING_PRODUCT.PATH, { productId }));
+    void navigate(resolvePathVariables(ROUTES.ONBOARDING_PRODUCT.PATH, { productId }));
   };
 
   return (
