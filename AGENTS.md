@@ -43,5 +43,5 @@ Without `yarn generate`, `tsc` and many tests fail with missing-module errors. R
 
 - Unit tests (jsdom + MUI) are CPU-heavy and have long timeouts; prefer running individual files.
 - `VITE_MOCK_API=true` switches the app to mock behavior (see `isMockEnvironment()` in `src/utils/institutionTypeUtils.ts`).
-- Routing uses React Router v5 (`Switch`, `useHistory`); do not use v6 APIs.
+- Routing uses React Router v7 (`Routes`, `Route`, `useNavigate`), imported from `react-router` (not `react-router-dom`).
 - Prettier: 100 cols, single quotes, semicolons, trailing commas `es5`.
