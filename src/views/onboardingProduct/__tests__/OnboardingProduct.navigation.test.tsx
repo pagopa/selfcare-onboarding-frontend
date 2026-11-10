@@ -21,12 +21,11 @@ import {
   executeStepInstitutionType,
   executeStepSearchParty,
   renderComponent,
+  waitForSearchFormToSettle,
 } from './shared/stepHelpers';
 import {
   fetchWithLogsSpy,
-  mockedHistoryPush,
   mockedLocation,
-  replaceMockedLocation,
   setupTestHooks,
 } from './shared/testSetup';
 
@@ -52,28 +51,34 @@ const ADMIN_TITLE = "Indica l'Amministratore";
 const AGGREGATES_IO_TITLE = 'Indica i soggetti aggregati per IO';
 const APPLICANT_EMAIL_TITLE = 'Indica la tua email';
 
-const mockedHistoryGoBack = vi.fn();
+const mockedNavigateBack = vi.fn();
 
-vi.mock('react-router-dom', async () => ({
-  ...(await vi.importActual('react-router-dom')),
-  useHistory: () => ({
-    location: mockedLocation,
-    replace: replaceMockedLocation,
-    push: mockedHistoryPush,
-    goBack: mockedHistoryGoBack,
-  }),
-}));
+// Only history-back navigations are intercepted; every other navigate call stays real.
+vi.mock('react-router', async () => {
+  const actual = await vi.importActual<typeof import('react-router')>('react-router');
+  return {
+    ...actual,
+    useNavigate: () => {
+      const navigate = actual.useNavigate();
+      return (to: unknown, options?: unknown) =>
+        typeof to === 'number'
+          ? mockedNavigateBack(to)
+          : (navigate as (to: unknown, options?: unknown) => void)(to, options);
+    },
+  };
+});
 vi.mock('axios');
 
 setupTestHooks(() => {
   mockedLocation.assign.mockClear();
-  mockedHistoryGoBack.mockClear();
+  mockedNavigateBack.mockClear();
 });
 
 // Lighter than executeStepSearchParty: it does not assert on the number of API calls, which
 // changes when the flow is re-entered or started from the dashboard.
 const selectPartyByBusinessName = async (partyName: string, isAggregator: boolean = false) => {
   await waitFor(() => screen.getByText(SEARCH_PARTY_TITLE));
+  await waitForSearchFormToSettle();
   if (isAggregator) {
     fireEvent.click(screen.getByLabelText('Sono un ente aggregatore'));
   }
@@ -178,13 +183,13 @@ describe('Exit modal', () => {
     await waitFor(() => screen.getByText('Vuoi davvero uscire?'));
     fireEvent.click(screen.getByRole('button', { name: 'Annulla' }));
     await waitFor(() => expect(screen.queryByText('Vuoi davvero uscire?')).not.toBeInTheDocument());
-    expect(mockedHistoryGoBack).not.toHaveBeenCalled();
+    expect(mockedNavigateBack).not.toHaveBeenCalled();
     screen.getByText(INSTITUTION_TYPE_TITLE);
 
     fireEvent.click(screen.getByRole('button', { name: 'Indietro' }));
     await waitFor(() => screen.getByText('Vuoi davvero uscire?'));
     fireEvent.click(screen.getByRole('button', { name: 'Esci' }));
-    expect(mockedHistoryGoBack).toHaveBeenCalledTimes(1);
+    expect(mockedNavigateBack).toHaveBeenCalledExactlyOnceWith(-1);
   });
 });
 

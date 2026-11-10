@@ -1,5 +1,7 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render as rtlRender, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import type { ReactElement } from 'react';
+import { MemoryRouter } from 'react-router';
 import { afterAll, beforeAll, beforeEach, expect, test, vi } from 'vitest';
 import '../../../../locale';
 import { ENV } from '../../../../utils/env';
@@ -16,23 +18,14 @@ vi.setConfig({ testTimeout: 80000 });
 
 vi.mock('../../../../utils/qualtricsUtils', () => ({ triggerQualtricsIntercept: vi.fn() }));
 
+const render = (ui: ReactElement) => rtlRender(<MemoryRouter>{ui}</MemoryRouter>);
+
 vi.mock('../../../../services/requestStatusServices', async (importOriginal) => ({
   ...(await importOriginal<typeof import('../../../../services/requestStatusServices')>()),
   onboardingContractUpload: vi.fn(
     async (_file: File, ctx: { setOutcomeContentState: (outcome: 'success') => void }) =>
       ctx.setOutcomeContentState('success')
   ),
-}));
-
-vi.mock('react-router-dom', () => ({
-  useHistory: () => ({
-    location: mockedLocation,
-    replace: vi.fn(),
-  }),
-}));
-
-vi.mock('react-router', () => ({
-  useParams: () => ({}),
 }));
 
 let mockedContract: File;

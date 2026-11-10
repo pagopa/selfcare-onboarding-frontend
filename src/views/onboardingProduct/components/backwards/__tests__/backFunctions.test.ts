@@ -38,7 +38,7 @@ const buildBackFunctions = (overrides: Overrides = {}) => {
       subunitTypeByQuery: overrides.subunitTypeByQuery ?? '',
       isRequiredDocumentsFlow: overrides.isRequiredDocumentsFlow,
     },
-    effects: { history: { goBack } },
+    effects: { goBack },
   });
 
   return { ...backFunctions, dispatch, goBack };

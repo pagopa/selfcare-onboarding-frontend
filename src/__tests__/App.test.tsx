@@ -2,8 +2,7 @@ import { render, screen } from '@testing-library/react';
 import { beforeEach, expect, test, vi } from 'vitest';
 import App from '../App';
 import { ROUTES } from '../utils/constants';
-import { createMemoryHistory } from 'history';
-import { Router } from 'react-router';
+import { MemoryRouter, useLocation } from 'react-router';
 import './../locale';
 import { createStore } from '../redux/store';
 import { Provider } from 'react-redux';
@@ -18,73 +17,58 @@ vi.mock('../views/onboardingRequest/complete/CompleteRequest', () => ({
   default: () => 'Complete onboarding request',
 }));
 
-let history: any;
 let store: any;
+let currentPath: string;
+
+const LocationSpy = () => {
+  currentPath = useLocation().pathname;
+  return null;
+};
+
+const renderAt = (path: string) =>
+  render(
+    <MemoryRouter initialEntries={[path]}>
+      <Provider store={store}>
+        <App />
+        <LocationSpy />
+      </Provider>
+    </MemoryRouter>
+  );
 
 beforeEach(() => {
-  history = createMemoryHistory();
   store = createStore();
 });
 
 test('test not served path', () => {
-  history.push('/some/bad/route');
-  vi.spyOn(history, 'push');
+  renderAt('/some/bad/route');
+  expect(currentPath).toBe(ROUTES.ONBOARDING_ROOT.PATH);
+});
 
-  render(
-    <Router history={history}>
-      <Provider store={store}>
-        <App />
-      </Provider>
-    </Router>
-  );
-  expect(history.location.pathname).toBe(ROUTES.ONBOARDING_ROOT.PATH);
-  checkRedirect(history, false);
+test('test deeper path under a product redirects to the product', () => {
+  renderAt('/onboarding/PRODUCTID/sub/other');
+  expect(currentPath).toBe('/onboarding/PRODUCTID');
+  screen.getByText('OnboardingProduct');
 });
 
 test('test OnBoarding', () => {
-  history.push('/onboarding/PRODUCTID');
-  vi.spyOn(history, 'push');
-  render(
-    <Router history={history}>
-      <Provider store={store}>
-        <App />
-      </Provider>
-    </Router>
-  );
+  renderAt('/onboarding/PRODUCTID');
   screen.getByText('OnboardingProduct');
-  checkRedirect(history, false);
+  expect(currentPath).toBe('/onboarding/PRODUCTID');
 });
 
 test('test Reject OnBoarding', () => {
-  history.push('/onboarding/cancel');
-  vi.spyOn(history, 'push');
-
-  render(
-    <Router history={history}>
-      <Provider store={store}>
-        <App />
-      </Provider>
-    </Router>
-  );
+  renderAt('/onboarding/cancel');
   screen.getByText('Cancel onboarding request');
-  checkRedirect(history, false);
+  expect(currentPath).toBe('/onboarding/cancel');
 });
 
 test('test Confirm OnBoarding', () => {
-  history.push('/onboarding/confirm');
-  vi.spyOn(history, 'push');
-
-  render(
-    <Router history={history}>
-      <Provider store={store}>
-        <App />
-      </Provider>
-    </Router>
-  );
+  renderAt('/onboarding/confirm');
   screen.getByText('Complete onboarding request');
-  checkRedirect(history, false);
+  expect(currentPath).toBe('/onboarding/confirm');
 });
 
-function checkRedirect(history: any, expected: boolean) {
-  expect(history.push.mock.calls.length).toBe(expected ? 1 : 0);
-}
+test('test Confirm OnBoarding keeps matching sub paths', () => {
+  renderAt('/onboarding/confirm/extra');
+  screen.getByText('Complete onboarding request');
+});

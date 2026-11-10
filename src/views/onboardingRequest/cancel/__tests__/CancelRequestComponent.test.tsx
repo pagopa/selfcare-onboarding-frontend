@@ -32,13 +32,6 @@ afterAll(() => {
   Object.defineProperty(window, 'location', { value: oldWindowLocation });
 });
 
-vi.mock('react-router-dom', () => ({
-  useHistory: () => ({
-    location: mockedLocation,
-    replace: vi.fn(),
-  }),
-}));
-
 test("Test: The onboarding request can't be cancel because is not found (jwt queryparam is empty)", async () => {
   mockedLocation.search = 'jwt=';
 
