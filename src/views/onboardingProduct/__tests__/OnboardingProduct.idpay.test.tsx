@@ -16,21 +16,11 @@ import {
 } from './shared/stepHelpers';
 import {
   fetchWithLogsSpy,
-  mockedHistoryPush,
   mockedLocation,
-  replaceMockedLocation,
   setupTestHooks,
 } from './shared/testSetup';
 
 vi.setConfig({ testTimeout: 80000 });
-vi.mock('react-router-dom', async () => ({
-  ...(await vi.importActual('react-router-dom')),
-  useHistory: () => ({
-    location: mockedLocation,
-    replace: replaceMockedLocation,
-    push: mockedHistoryPush,
-  }),
-}));
 vi.mock('axios');
 
 setupTestHooks();

@@ -6,7 +6,7 @@ import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyt
 import { uniqueId } from 'lodash';
 import { useCallback, useContext, useEffect, useMemo } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import { InstitutionType, RequestOutcomeMessage, StepperStep, UserOnCreate } from '../../../types';
 import NoProductPage from '../../components/layout/NoProductPage';
 import { LoadingOverlay } from '../../components/modals/LoadingOverlay';
@@ -18,6 +18,7 @@ import StepOnboardingFormData from '../../components/steps/StepOnboardingFormDat
 import { StepSearchParty } from '../../components/steps/StepSearchParty';
 import { withLogin } from '../../components/withLogin';
 import { HeaderContext, UserContext } from '../../lib/context';
+import { useReplaceHistoryState } from '../../hooks/useHistoryState';
 import { AggregateInstitution } from '../../model/AggregateInstitution';
 import { OnboardingFormData } from '../../model/OnboardingFormData';
 import { checkProduct, getFilterCategories } from '../../services/onboardingServices';
@@ -103,7 +104,8 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     onExitAction,
   } = state;
   const { activeStep } = state;
-  const history = useHistory();
+  const navigate = useNavigate();
+  const replaceHistoryState = useReplaceHistoryState();
   const { setOnExit } = useContext(HeaderContext);
   const { t } = useTranslation();
   const {
@@ -245,7 +247,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
       subunitTypeByQuery,
       isRequiredDocumentsFlow,
     },
-    effects: { history },
+    effects: { goBack: () => navigate(-1) },
   });
 
   useEffect(() => {
@@ -271,8 +273,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
   }, []);
 
   useEffect(() => {
-    // eslint-disable-next-line functional/immutable-data
-    Object.assign(history.location, { state: undefined });
+    replaceHistoryState(() => null);
   }, []);
 
   useEffect(() => {

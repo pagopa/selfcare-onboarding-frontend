@@ -10,7 +10,7 @@ applyTo: "src/components/**,src/views/**,src/hooks/**"
 - API calls go through `src/services/*` (which use `src/api` clients), not directly in presentational components.
 - Handle loading, error and empty states. Errors use helpers from `src/lib/error-utils.ts` and the common-frontend error handling.
 - Forms use Formik; validation helpers are in `src/utils/validateFields.ts`.
-- Routing is React Router v5 (`useHistory`, `useLocation`); navigate with `ROUTES` from `src/utils/constants.ts`.
+- Routing is React Router v7 (`useNavigate`, `useLocation` from `react-router`); navigate with `ROUTES` from `src/utils/constants.ts`.
 - Extract reusable logic to hooks in `src/hooks`; avoid `useEffect` when a derived value or event handler suffices.
 - Keep state as close as possible to where it is used; don't store values derivable from props or other state.
 - Use semantic HTML and accessibility attributes (labels, alt, roles); stable keys in lists, never the index when order can change.

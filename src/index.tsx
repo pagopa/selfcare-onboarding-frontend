@@ -5,7 +5,7 @@ import { CssBaseline, ThemeProvider } from '@mui/material';
 import { theme } from '@pagopa/mui-italia';
 import { CONFIG } from '@pagopa/selfcare-common-frontend/lib/config/env';
 import { Provider } from 'react-redux';
-import { BrowserRouter } from 'react-router-dom';
+import { BrowserRouter } from 'react-router';
 import App from './App';
 import './consentAndAnalyticsConfiguration';
 import './index.css';

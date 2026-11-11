@@ -2,10 +2,9 @@
 import { User } from '@pagopa/selfcare-common-frontend/lib/model/User';
 import '@testing-library/jest-dom';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { createMemoryHistory } from 'history';
 import { useState } from 'react';
 import { Provider } from 'react-redux';
-import { Route, Router, Switch } from 'react-router';
+import { MemoryRouter, Route, Routes } from 'react-router';
 import axios from 'axios';
 import {
   afterAll,
@@ -44,17 +43,8 @@ const initialLocation = {
 };
 
 const mockedLocation = Object.assign({}, initialLocation);
-const mockedHistoryPush = vi.fn();
 const originalFetch = global.fetch;
 let fetchWithLogsSpy: MockInstance;
-
-vi.mock('react-router-dom', () => ({
-  useHistory: () => ({
-    push: mockedHistoryPush,
-    location: mockedLocation,
-    replace: (nextLocation: any) => Object.assign(mockedLocation, nextLocation),
-  }),
-}));
 
 // getFilterCategories reads config.json straight from the CDN with axios: without this mock
 // the premium flow would issue a real network request and the loading overlay would race.
@@ -87,22 +77,17 @@ afterAll(() => {
 const renderComponent = (
   productId: string = PRODUCT_IDS.IO,
   subProductId: string = PRODUCT_IDS.IO_PREMIUM,
-  injectedHistory?: ReturnType<typeof createMemoryHistory>,
   injectedStore?: ReturnType<typeof createStore>
 ) => {
   const Component = () => {
-    const history = injectedHistory ? injectedHistory : createMemoryHistory();
     const [user, setUser] = useState<User | null>(null);
     const [subHeaderVisible, setSubHeaderVisible] = useState<boolean>(false);
     const [onExit, setOnExit] = useState<(exitAction: () => void) => void | undefined>();
     const [enableLogin, setEnableLogin] = useState<boolean>(true);
     const store = injectedStore ? injectedStore : createStore();
-    if (!injectedHistory) {
-      history.push(`/${productId}/${subProductId}`);
-    }
     return (
       <Provider store={store}>
-        <Router history={history}>
+        <MemoryRouter initialEntries={[`/${productId}/${subProductId}`]}>
           <HeaderContext.Provider
             value={{
               subHeaderVisible,
@@ -119,14 +104,12 @@ const renderComponent = (
               <button onClick={() => onExit?.(() => window.location.assign(ENV.URL_FE.LOGOUT))}>
                 LOGOUT
               </button>
-              <Switch>
-                <Route path="/:productId/:subProductId">
-                  <OnboardingPremium />
-                </Route>
-              </Switch>
+              <Routes>
+                <Route path="/:productId/:subProductId" element={<OnboardingPremium />} />
+              </Routes>
             </UserContext.Provider>
           </HeaderContext.Provider>
-        </Router>
+        </MemoryRouter>
       </Provider>
     );
   };

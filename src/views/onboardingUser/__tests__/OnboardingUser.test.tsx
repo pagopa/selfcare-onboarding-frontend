@@ -6,7 +6,7 @@ import { User } from '@pagopa/selfcare-common-frontend/lib/model/User';
 import { HeaderContext, UserContext } from '../../../lib/context';
 import { ENV } from '../../../utils/env';
 import '../../../locale';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter } from 'react-router';
 import OnboardingUser from '../OnboardingUser';
 import { mockPartyRegistry, mockedProducts } from '../../../lib/__mocks__/mockApiRequests';
 import { executeStepAddAdmin, executeStepAddManager } from '../../../utils/test/test-utils';

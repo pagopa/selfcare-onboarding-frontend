@@ -22,7 +22,7 @@ SelfCare onboarding flow (PagoPA): React 18 + TypeScript SPA built with Vite, MU
 
 ## Onboarding flow and routing
 
-- Routes are declared in `ROUTES` (`src/utils/constants.ts`) as `{ PATH, EXACT, COMPONENT }` and rendered by `src/components/layout/Main.tsx` (React Router v5 `Switch`). Flows: `ONBOARDING_PRODUCT`, `ONBOARDING_PREMIUM`, `ONBOARDING_USER`, `ONBOARDING_REQUEST`.
+- Routes are declared in `ROUTES` (`src/utils/constants.ts`) as `{ PATH, COMPONENT, PREFIX_MATCH? }` and rendered by `src/components/layout/Main.tsx` (React Router v7 `Routes`; `PREFIX_MATCH` appends `/*` to the path). Flows: `ONBOARDING_PRODUCT`, `ONBOARDING_PREMIUM`, `ONBOARDING_USER`, `ONBOARDING_REQUEST`.
 - Each flow is a sequence of steps; shared steps live in `src/components/steps` (`StepInstitutionType`, `StepSearchParty`, `StepOnboardingFormData`, `StepAddManager`, `StepOnboardingData`). Flow state is carried through history state (`useHistoryState`) and `UserContext` (`src/lib/context.ts`).
 - Product IDs are in `PRODUCT_IDS`; institution-type logic is in `src/utils/institutionTypeUtils.ts`.
 - `ONBOARDING_PRODUCT` wizard state lives in a single reducer, not in `useState`:

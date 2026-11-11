@@ -30,45 +30,45 @@ export const ROUTES: RoutesObject = {
   ONBOARDING_ROOT: {
     PATH: `${BASE_ROUTE}/`,
     LABEL: 'Onboarding',
-    EXACT: true,
     COMPONENT: NoProductPage,
   },
   REGISTRATION_FINALIZE_COMPLETE: {
     PATH: `${BASE_ROUTE}/confirm`,
     LABEL: 'Complete onboarding request',
+    PREFIX_MATCH: true,
     COMPONENT: CompleteRequest,
   },
   REGISTRATION_FINALIZE_REJECT: {
     PATH: `${BASE_ROUTE}/cancel`,
     LABEL: 'Cancel onboarding request',
+    PREFIX_MATCH: true,
     COMPONENT: CancelRequest,
   },
   REGISTRATION_ATTACHMENTS: {
     PATH: `${BASE_ROUTE}/:onboardingId/attachments`,
     LABEL: 'Upload onboarding attachments',
+    PREFIX_MATCH: true,
     COMPONENT: CompleteRequest,
   },
   ONBOARDING_FILE_DOWNLOAD: {
     PATH: `${BASE_ROUTE}/:onboardingId/products/:productId/aggregates`,
     LABEL: 'Csv file download',
+    PREFIX_MATCH: true,
     COMPONENT: DownloadCsvFile,
   },
   ONBOARDING_USER: {
     PATH: `${BASE_ROUTE}/user`,
     LABEL: 'Onboarding user',
-    EXACT: true,
     COMPONENT: OnboardingUser,
   },
   ONBOARDING_PRODUCT: {
     PATH: `${BASE_ROUTE}/:productId`,
     LABEL: 'Onboarding product',
-    EXACT: true,
     COMPONENT: OnboardingProduct,
   },
   ONBOARDING_PREMIUM: {
     PATH: `${BASE_ROUTE}/:productId/:subProductId`,
     LABEL: 'Onboarding premium',
-    EXACT: true,
     COMPONENT: OnboardingPremium,
   },
 };

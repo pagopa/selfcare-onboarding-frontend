@@ -1,10 +1,9 @@
 import { User } from '@pagopa/selfcare-common-frontend/lib/model/User';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { createMemoryHistory } from 'history';
 import { useState } from 'react';
 import { Provider } from 'react-redux';
-import { Router } from 'react-router-dom';
+import { MemoryRouter } from 'react-router';
 import { expect, MockInstance } from 'vitest';
 import { InstitutionType } from '../../../../../types';
 import { HeaderContext, UserContext } from '../../../../lib/context';
@@ -49,7 +48,6 @@ export const renderComponent = (
     const [onExit, setOnExit] = useState<(exitAction: () => void) => void | undefined>();
     const [enableLogin, setEnableLogin] = useState<boolean>(true);
     const store = injectedStore ? injectedStore : createStore();
-    const history = createMemoryHistory();
 
     return (
       <Provider store={store}>
@@ -69,9 +67,9 @@ export const renderComponent = (
             <button onClick={() => onExit?.(() => window.location.assign(ENV.URL_FE.LOGOUT))}>
               LOGOUT
             </button>
-            <Router history={history}>
+            <MemoryRouter>
               <OnboardingProduct productId={productId} />
-            </Router>
+            </MemoryRouter>
           </UserContext.Provider>
         </HeaderContext.Provider>
       </Provider>
@@ -79,7 +77,6 @@ export const renderComponent = (
   };
 
   render(<Component />);
-  return { history };
 };
 
 export const executeStepInstitutionType = async (
@@ -152,6 +149,15 @@ const checkAggregatorCheckbox = (
   }
 };
 
+/**
+ * The search form replaces the history state while it mounts: the resulting router re-render within
+ * the 100ms debounce window would drop the first search, so tests wait for the form to settle.
+ */
+export const waitForSearchFormToSettle = () =>
+  act(async () => {
+    await new Promise((resolve) => setTimeout(resolve, 500));
+  });
+
 const searchByBusinessName = async (
   productId: string,
   institutionType: string,
@@ -159,6 +165,7 @@ const searchByBusinessName = async (
   fetchWithLogsSpy: MockInstance,
   inputPartyName: HTMLElement
 ) => {
+  await waitForSearchFormToSettle();
   fireEvent.change(inputPartyName, { target: { value: 'XXX' } });
 
   const partyNameSelection = await waitFor(() => screen.getByText(partyName));

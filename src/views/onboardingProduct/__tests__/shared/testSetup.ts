@@ -18,9 +18,6 @@ export const initialLocation: MockedLocation = {
 };
 
 export const mockedLocation: MockedLocation = Object.assign({}, initialLocation);
-export const replaceMockedLocation = (nextLocation: Partial<MockedLocation>) =>
-  Object.assign(mockedLocation, nextLocation);
-export const mockedHistoryPush = vi.fn();
 export const mockedAxios = axios as Mocked<typeof axios>;
 
 const oldWindowLocation = window.location;

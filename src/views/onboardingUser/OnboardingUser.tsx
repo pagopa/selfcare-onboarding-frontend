@@ -5,7 +5,7 @@ import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyt
 import { uniqueId } from 'lodash';
 import { useContext, useEffect, useMemo, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
-import { useHistory, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router';
 import {
   InstitutionType,
   PartyData,
@@ -18,6 +18,7 @@ import { LoadingOverlay } from '../../components/modals/LoadingOverlay';
 import { MessageNoAction } from '../../components/shared/MessageNoAction';
 import { StepAddManager } from '../../components/steps/StepAddManager';
 import { withLogin } from '../../components/withLogin';
+import { useReplaceHistoryState } from '../../hooks/useHistoryState';
 import { HeaderContext } from '../../lib/context';
 import { OnboardingFormData } from '../../model/OnboardingFormData';
 import { ProductResource } from '../../model/ProductResource';
@@ -46,8 +47,8 @@ type OnboardingUserLocationState =
 
 function OnboardingUserComponent() {
   const { t } = useTranslation();
-  const location = useLocation<OnboardingUserLocationState>();
-  const history = useHistory();
+  const location = useLocation();
+  const replaceHistoryState = useReplaceHistoryState();
   const requestId = uniqueId();
   const [loading, setLoading] = useState<boolean>(true);
   const [activeStep, setActiveStep] = useState<number>(0);
@@ -70,7 +71,7 @@ function OnboardingUserComponent() {
     forward();
   };
 
-  const locationData = location.state?.data;
+  const locationData = (location.state as OnboardingUserLocationState)?.data;
 
   useEffect(() => {
     if (locationData) {
@@ -82,15 +83,12 @@ function OnboardingUserComponent() {
 
   useEffect(() => {
     if (selectedParty) {
-      history.replace({
-        ...history.location,
-        state: null,
-      });
+      replaceHistoryState(() => null);
       const onboardingData = selected2OnboardingData(selectedParty);
       setOnboardingFormData(onboardingData);
       setActiveStep(2);
     }
-  }, [selectedParty, history]);
+  }, [selectedParty]);
 
   const back = () => {
     setActiveStep(activeStep - 1);

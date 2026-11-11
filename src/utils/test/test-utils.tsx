@@ -1,10 +1,9 @@
 import { User } from '@pagopa/selfcare-common-frontend/lib/model/User';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { createMemoryHistory, type MemoryHistory } from 'history';
 import i18n from 'i18next';
 import React, { useState } from 'react';
 import { Provider } from 'react-redux';
-import { Router } from 'react-router-dom';
+import { MemoryRouter } from 'react-router';
 import { MockInstance } from 'vitest';
 import { InstitutionType } from '../../../types';
 import { mockedGeoTaxonomy, mockedPspOnboardingData } from '../../lib/__mocks__/mockApiRequests';
@@ -81,15 +80,13 @@ export type { Search, Source };
 
 export const renderComponentWithProviders = (
   component: React.ReactElement,
-  productId: string = PRODUCT_IDS.SEND,
-  injectedHistory?: MemoryHistory
+  productId: string = PRODUCT_IDS.SEND
 ) => {
   const Component = () => {
     const [user, setUser] = useState<User | null>(null);
     const [subHeaderVisible, setSubHeaderVisible] = useState<boolean>(false);
     const [onExit, setOnExit] = useState<(exitAction: () => void) => void | undefined>();
     const [enableLogin, setEnableLogin] = useState<boolean>(true);
-    const history = injectedHistory ? injectedHistory : createMemoryHistory();
 
     return (
       <HeaderContext.Provider
@@ -108,9 +105,9 @@ export const renderComponentWithProviders = (
           <button onClick={() => onExit?.(() => window.location.assign(ENV.URL_FE.LOGOUT))}>
             LOGOUT
           </button>
-          <Router history={history}>
+          <MemoryRouter>
             {React.createElement(component.type, { ...component.props, productId })}
-          </Router>
+          </MemoryRouter>
         </UserContext.Provider>
       </HeaderContext.Provider>
     );

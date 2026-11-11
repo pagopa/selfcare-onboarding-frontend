@@ -33,7 +33,7 @@ export type RoutesObject = { [key: string]: RouteConfig };
 export type RouteConfig = {
   PATH: string;
   LABEL: string;
-  EXACT?: boolean;
+  PREFIX_MATCH?: boolean;
   SUBROUTES?: RoutesObject;
   COMPONENT?: React.FunctionComponent<{ productId: string }>;
 };
