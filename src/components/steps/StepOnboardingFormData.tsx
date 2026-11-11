@@ -146,11 +146,15 @@ export default function StepOnboardingFormData({
   });
 
   useEffect(() => {
-    if (externalInstitutionId !== stepHistoryState.externalInstitutionId) {
+    const isTaxCodeEqualsVatNumber =
+      !!initialFormData.vatNumber && initialFormData.taxCode === initialFormData.vatNumber;
+    // The flag restored from the history can be stale: when the same party is selected again the
+    // form data is reloaded without the vatNumber that had been derived from the taxCode
+    const isRestoredFlagStale = stepHistoryState.isTaxCodeEquals2PIVA && !isTaxCodeEqualsVatNumber;
+    if (externalInstitutionId !== stepHistoryState.externalInstitutionId || isRestoredFlagStale) {
       setStepHistoryState({
         externalInstitutionId,
-        isTaxCodeEquals2PIVA:
-          !!initialFormData.vatNumber && initialFormData.taxCode === initialFormData.vatNumber,
+        isTaxCodeEquals2PIVA: isTaxCodeEqualsVatNumber,
       });
     }
   }, []);
