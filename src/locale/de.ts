@@ -717,6 +717,17 @@ export default {
       'Wir können die gesuchte Seite nicht finden. <1 />Vergewissern Sie sich, dass die Adresse korrekt ist, oder gehen Sie zur Startseite.',
     backButton: 'Zurück zur Homepage',
   },
+  stepServicesChoice: {
+    title: 'Select the type of service',
+    subtitle:
+      'Choose the service you want to join as <1>Debtor Service Provider</1>. If you also want to join with the Technical Solution Provider function, you must send a PEC to apply.',
+    services: {
+      rtp: 'Request to Pay (RTP) service',
+      repository: 'Repository Management and Consultation service',
+    },
+    backLabel: 'Back',
+    confirmLabel: 'Continue',
+  },
   stepInstitutionType: {
     title: 'Wähle die Art der Körperschaft, die du <1/> vertrittst',
     subtitle: 'Gib die Art der Körperschaft an, die <1>{{productName}} beitreten wird</1>',
