@@ -191,6 +191,23 @@ describe('Exit modal', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Esci' }));
     expect(mockedNavigateBack).toHaveBeenCalledExactlyOnceWith(-1);
   });
+
+  test('A15: back from the search party step returns to the institution type step', async () => {
+    renderComponent(PRODUCT_IDS.IO);
+    await executeStepInstitutionType(PRODUCT_IDS.IO, 'PA');
+    await waitFor(() => screen.getByText(SEARCH_PARTY_TITLE));
+
+    await executeBack(INSTITUTION_TYPE_TITLE);
+  });
+
+  test('A16: when the institution type step is skipped, back from the search party step opens the exit modal', async () => {
+    renderComponent(PRODUCT_IDS.SEND);
+    await executeStepInstitutionType(PRODUCT_IDS.SEND, 'PA');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Indietro' }));
+    await waitFor(() => screen.getByText('Vuoi davvero uscire?'));
+    expect(screen.queryByText(INSTITUTION_TYPE_TITLE)).not.toBeInTheDocument();
+  });
 });
 
 describe('Back navigation by institution type', () => {

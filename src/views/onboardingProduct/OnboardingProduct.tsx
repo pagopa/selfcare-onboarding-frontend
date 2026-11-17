@@ -345,7 +345,6 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
             </Trans>
           ),
           institutionType,
-          productAvoidStep,
           product: selectedProduct,
           back: backFromSearchParty,
           subunitTypeByQuery,
