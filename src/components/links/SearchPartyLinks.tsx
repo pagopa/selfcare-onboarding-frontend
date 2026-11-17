@@ -10,6 +10,7 @@ import {
   isPrivateInstitution,
   isPrivatePersonInstitution,
   isGlobalServiceProvider,
+  isRtpProduct,
 } from '../../utils/institutionTypeUtils';
 import { InstitutionType, Product } from '../../../types';
 
@@ -26,7 +27,8 @@ const SearchPartyLinks = ({
   !isInsuranceCompany(institutionType) &&
   !isPublicServiceCompany(institutionType) &&
   !isPrivateInstitution(institutionType) &&
-  !isPrivatePersonInstitution(institutionType) && (
+  !isPrivatePersonInstitution(institutionType) && 
+  !isRtpProduct(product?.id) && (
     <Grid container item justifyContent="center">
       <Grid item xs={6}>
         <Box

@@ -298,6 +298,8 @@ export default {
         'Inserisci uno dei dati richiesti e cerca da InfoCamere l’ente <3/> per cui vuoi richiedere l’adesione a <5>{{productName}}.</5>',
       merchantSubtitle:
         'Inserisci uno dei dati richiesti per cercare su InfoCamere l’ente <3/> per cui vuoi richiedere l’adesione a <5>{{productName}}.</5>',
+      rtpSubtitle:
+        'Inserisci uno dei dati richiesti per cercare su InfoCamere l’ente <3/> per cui vuoi richiedere l’adesione a <5>{{productName}}.</5>',
       merchantCompanyStatusDisabled:
         'La tua società non può aderire al portale perché risulta cessata o in liquidazione',
       asyncAutocomplete: {

@@ -33,6 +33,7 @@ const productsAvoidingInstitutionTypeStep = (): ReadonlyArray<string> => [
   PRODUCT_IDS.SEND,
   PRODUCT_IDS.IDPAY,
   PRODUCT_IDS.IDPAY_MERCHANT,
+  PRODUCT_IDS.RTP,
 ];
 
 export const getPartyName = (onboardingFormData?: OnboardingFormData): string =>
