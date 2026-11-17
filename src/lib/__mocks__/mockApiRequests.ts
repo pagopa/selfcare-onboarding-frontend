@@ -176,6 +176,10 @@ export const mockInstitutionTypeByProductId = (productId: string | undefined) =>
           { institutionType: 'PRV', origin: 'SELC', labelKey: 'prv_ced' },
         ],
       };
+    case 'prod-rtp':
+      return {
+        origins: [{ institutionType: 'PSP', origin: 'SELC', labelKey: 'psp' }],
+      };
     default:
       return undefined;
   }
@@ -1243,6 +1247,11 @@ export const mockedProducts: Array<Product> = [
   {
     id: 'prod-ced',
     title: 'Carta Europea della Disabilità',
+    status: statusActive,
+  },
+  {
+    id: 'prod-rtp',
+    title: 'Request to pay',
     status: statusActive,
   },
 ];

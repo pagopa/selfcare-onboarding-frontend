@@ -631,6 +631,17 @@ export default {
     description: 'Ne moremo najti strani, ki jo iščete. <1 />Preverite, ali je naslov pravilen, ali se vrnite na domov.',
     backButton: 'Vrni se domov'
   },
+  stepServicesChoice: {
+    title: 'Select the type of service',
+    subtitle:
+      'Choose the service you want to join as <1>Debtor Service Provider</1>. If you also want to join with the Technical Solution Provider function, you must send a PEC to apply.',
+    services: {
+      rtp: 'Request to Pay (RTP) service',
+      repository: 'Repository Management and Consultation service',
+    },
+    backLabel: 'Back',
+    confirmLabel: 'Continue',
+  },
   stepInstitutionType: {
     title: 'Izberite vrsto organizacije, ki jo <1/> predstavljate',
     subtitle: 'Navedite vrsto organizacije, ki se bo pridružila <1>{{productName}}</1>',

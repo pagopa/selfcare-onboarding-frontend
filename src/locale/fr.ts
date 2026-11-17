@@ -631,6 +631,17 @@ export default {
     description: "Nous ne parvenons pas à trouver la page que vous recherchez. <1 />Assurez-vous que l'adresse est correcte ou retournez à la page d'accueil.",
     backButton: 'Retour à la page d’accueil'
   },
+  stepServicesChoice: {
+    title: 'Select the type of service',
+    subtitle:
+      'Choose the service you want to join as <1>Debtor Service Provider</1>. If you also want to join with the Technical Solution Provider function, you must send a PEC to apply.',
+    services: {
+      rtp: 'Request to Pay (RTP) service',
+      repository: 'Repository Management and Consultation service',
+    },
+    backLabel: 'Back',
+    confirmLabel: 'Continue',
+  },
   stepInstitutionType: {
     title: 'Sélectionnez le type d’organisme que vous <1/> représentez',
     subtitle: 'Indiquez le type d’organisme qui adhérera à <1>{{productName}}</1>',

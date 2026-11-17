@@ -298,6 +298,8 @@ export default {
         'Inserisci uno dei dati richiesti e cerca da InfoCamere l’ente <3/> per cui vuoi richiedere l’adesione a <5>{{productName}}.</5>',
       merchantSubtitle:
         'Inserisci uno dei dati richiesti per cercare su InfoCamere l’ente <3/> per cui vuoi richiedere l’adesione a <5>{{productName}}.</5>',
+      rtpSubtitle:
+        'Inserisci uno dei dati richiesti per cercare su InfoCamere l’ente <3/> per cui vuoi richiedere l’adesione a <5>{{productName}}.</5>',
       merchantCompanyStatusDisabled:
         'La tua società non può aderire al portale perché risulta cessata o in liquidazione',
       asyncAutocomplete: {
@@ -743,6 +745,17 @@ export default {
     description:
       'Non riusciamo a trovare la pagina che stai cercando. <1 />Assicurati che l’indirizzo sia corretto o torna alla home.',
     backButton: 'Torna alla home',
+  },
+  stepServicesChoice: {
+    title: 'Seleziona il tipo di servizio',
+    subtitle:
+      'Scegli il servizio a cui vuoi aderire come <1>Service Provider del Debitore</1>. Se desideri aderire anche con la funzione Technical Solution Provider devi mandare una PEC per fare richiesta.',
+    services: {
+      rtp: 'Servizio Request to Pay (RTP)',
+      repository: 'Servizio di Gestione e Consultazione del Repository',
+    },
+    backLabel: 'Indietro',
+    confirmLabel: 'Continua',
   },
   stepInstitutionType: {
     title: 'Seleziona il tipo di ente che <1/> rappresenti',

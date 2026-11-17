@@ -8,6 +8,7 @@ import { useCallback, useContext, useEffect, useMemo } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { InstitutionType, RequestOutcomeMessage, StepperStep, UserOnCreate } from '../../../types';
+import { OnboardingApi } from '../../api/OnboardingApiClient';
 import NoProductPage from '../../components/layout/NoProductPage';
 import { LoadingOverlay } from '../../components/modals/LoadingOverlay';
 import { MessageNoAction } from '../../components/shared/MessageNoAction';
@@ -16,9 +17,10 @@ import StepInstitutionType from '../../components/steps/StepInstitutionType';
 import StepOnboardingData from '../../components/steps/StepOnboardingData';
 import StepOnboardingFormData from '../../components/steps/StepOnboardingFormData';
 import { StepSearchParty } from '../../components/steps/StepSearchParty';
+import StepServicesChoice from '../../components/steps/StepServicesChoice';
 import { withLogin } from '../../components/withLogin';
-import { HeaderContext, UserContext } from '../../lib/context';
 import { useReplaceHistoryState } from '../../hooks/useHistoryState';
+import { HeaderContext, UserContext } from '../../lib/context';
 import { AggregateInstitution } from '../../model/AggregateInstitution';
 import { OnboardingFormData } from '../../model/OnboardingFormData';
 import { checkProduct, getFilterCategories } from '../../services/onboardingServices';
@@ -27,9 +29,8 @@ import { ENV } from '../../utils/env';
 import { isPagoPaProduct, isSendProduct, isTechPartner } from '../../utils/institutionTypeUtils';
 import { triggerQualtricsIntercept } from '../../utils/qualtricsUtils';
 import { registerUnloadEvent, unregisterUnloadEvent } from '../../utils/unloadEvent-utils';
-import { OnboardingApi } from '../../api/OnboardingApiClient';
-import UploadDocumentsFlow from './documents/UploadDocumentsFlow';
 import { createBackFunctions } from './components/backwards/backFunctions';
+import StepContractsSummary from './components/contracts/StepContractsSummary';
 import { createForwardFunctions } from './components/forwards/forwardFunctions';
 import { StepAddAdmin } from './components/StepAddAdmin';
 import StepAddApplicantEmail from './components/StepAddApplicantEmail';
@@ -37,13 +38,13 @@ import { StepAdditionalGpuInformations } from './components/StepAdditionalGpuInf
 import { StepAdditionalInformations } from './components/StepAdditionalInformations';
 import { StepUploadAggregates } from './components/StepUploadAggregates';
 import { genericError, StepVerifyOnboarding } from './components/StepVerifyOnboarding';
-import StepContractsSummary from './components/contracts/StepContractsSummary';
+import UploadDocumentsFlow from './documents/UploadDocumentsFlow';
+import { buildNotAllowedError, buildOutcomeContent } from './outcomes/onboardingProductOutcomes';
 import { buildFlowContext } from './state/flowContext';
 import { normalizeUsers } from './state/normalizeUsers';
 import { usersOf } from './state/onboardingProductReducer';
 import { OnboardingStepName } from './state/onboardingSteps';
 import { selectFilterCategories as selectFilterCategoriesFor } from './state/selectFilterCategories';
-import { buildNotAllowedError, buildOutcomeContent } from './outcomes/onboardingProductOutcomes';
 import { useOnboardingProductWizard } from './useOnboardingProductWizard';
 
 export type ValidateErrorType = 'conflictError';
@@ -211,6 +212,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     forwardGspNoIpa,
     forwardWithDataAndInstitution,
     forwardFromVerifyOnboarding,
+    forwardFromRtp,
     forwardWithBillingData,
     forwardWithAdditionalGSPInfo,
     forwardWithAdditionalGPUInfo,
@@ -230,6 +232,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     handleOpenExitModal,
     backFromSearchParty,
     backFromContractsSummary,
+    backFromRtp,
     backFromBillingData,
     backFromAdditionalGpuInfo,
     backFromAdditionalInfo,
@@ -342,7 +345,6 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
             </Trans>
           ),
           institutionType,
-          productAvoidStep,
           product: selectedProduct,
           back: backFromSearchParty,
           subunitTypeByQuery,
@@ -351,6 +353,15 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           setInstitutionType,
           forward: forwardWithDataAndInstitution,
           addUser,
+        }),
+    },
+    rtp: {
+      label: 'RTP',
+      Component: () =>
+        StepServicesChoice({
+          forward: forwardFromRtp,
+          back: backFromRtp,
+          initialServices: state.rtpServices,
         }),
     },
     contractsSummary: {

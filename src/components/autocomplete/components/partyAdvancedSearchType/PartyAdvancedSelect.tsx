@@ -20,6 +20,7 @@ import {
   isPrivateOrPersonInstitution,
   isPrivatePersonInstitution,
   isPublicServiceCompany,
+  isRtpProduct,
 } from '../../../../utils/institutionTypeUtils';
 
 type Props = {
@@ -47,11 +48,16 @@ const isSubunitProduct = (productId?: string): boolean =>
     productId ?? ''
   );
 
-const hidesBusinessNameSearch = (addUser: boolean, institutionType?: InstitutionType): boolean =>
+const hidesBusinessNameSearch = (
+  addUser: boolean,
+  institutionType?: InstitutionType,
+  productId?: string
+): boolean =>
   addUser ||
   isPublicServiceCompany(institutionType) ||
   isPrivateInstitution(institutionType) ||
-  isPrivatePersonInstitution(institutionType);
+  isPrivatePersonInstitution(institutionType) ||
+  isRtpProduct(productId);
 
 const isMerchantPrivateParty = (institutionType?: InstitutionType, productId?: string): boolean =>
   isPrivateOrPersonInstitution(institutionType) && isIdpayMerchantProduct(productId);
@@ -127,7 +133,7 @@ export default function PartyAdvancedSelect({
   useEffect(() => {
     // Set taxCode as default when businessName is not available as an option
     // (for SCP, PRV, PRV_PF institution types, businessName is never shown in menuItems)
-    if (hidesBusinessNameSearch(addUser, institutionType)) {
+    if (hidesBusinessNameSearch(addUser, institutionType, product?.id)) {
       onSelectValue(SelectionEnum.taxCode);
     } else {
       onSelectValue(SelectionEnum.businessName);
@@ -148,7 +154,7 @@ export default function PartyAdvancedSelect({
   }, [selections]);
 
   const menuItems = [
-    !hidesBusinessNameSearch(addUser, institutionType) && (
+    !hidesBusinessNameSearch(addUser, institutionType, product?.id) && (
       <MenuItem
         key="businessName"
         id="businessName"

@@ -28,7 +28,6 @@ import SearchPartySubtitle from '../SearchPartySubtitle';
 type Props = {
   subTitle: string | ReactElement;
   institutionType?: InstitutionType;
-  productAvoidStep?: boolean;
   product?: Product | null;
   externalInstitutionId: string;
   subunitTypeByQuery: string;
@@ -44,7 +43,6 @@ export function StepSearchParty({
   forward,
   back,
   institutionType,
-  productAvoidStep,
   product,
   externalInstitutionId,
   subunitTypeByQuery,
@@ -248,15 +246,11 @@ export function StepSearchParty({
         />
         <Grid item mt={2}>
           <OnboardingStepActions
-            back={
-              !productAvoidStep && isIdpayMerchantProduct(product?.id)
-                ? {
-                    action: onBackAction,
-                    label: t('stepInstitutionType.backLabel'),
-                    disabled: false,
-                  }
-                : undefined
-            }
+            back={{
+              action: onBackAction,
+              label: t('stepInstitutionType.backLabel'),
+              disabled: false,
+            }}
             forward={{
               action: () => {
                 if (isAggregator) {

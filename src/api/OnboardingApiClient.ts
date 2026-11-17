@@ -3,7 +3,7 @@ import i18n from '@pagopa/selfcare-common-frontend/lib/locale/locale-utils';
 import { appStateActions } from '@pagopa/selfcare-common-frontend/lib/redux/slices/appStateSlice';
 import {
   buildFetchApi,
-  extractResponse,
+  extractResponse as extractGeneratedResponse,
 } from '@pagopa/selfcare-common-frontend/lib/utils/api-utils';
 import { storageTokenOps } from '@pagopa/selfcare-common-frontend/lib/utils/storage';
 import { InstitutionOnboardingInfoResource } from '../../types';
@@ -60,6 +60,14 @@ const onRedirectToLogin = () =>
       displayableDescription: i18n.t('session.expired.message'),
     })
   );
+
+// The mock client already returns the unwrapped response data, not the Either of the generated
+// client, so extractResponse must be applied only to real responses.
+const extractResponse = <R>(...args: Parameters<typeof extractGeneratedResponse>): Promise<R> =>
+  // The cast is at the mock boundary: the mock data is the already decoded resource.
+  isMockEnvironment()
+    ? Promise.resolve(args[0] as unknown as R)
+    : extractGeneratedResponse<R>(...args);
 
 /* istanbul ignore next */
 export const OnboardingApi = {
