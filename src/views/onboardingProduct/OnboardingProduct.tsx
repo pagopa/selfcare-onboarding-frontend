@@ -362,6 +362,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
         StepServicesChoice({
           forward: forwardFromRtp,
           back: backFromRtp,
+          initialServices: state.rtpServices,
         }),
     },
     contractsSummary: {
