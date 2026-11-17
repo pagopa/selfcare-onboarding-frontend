@@ -13,6 +13,7 @@ import {
   afterManager,
   afterOnboardingData,
   afterPartySelection,
+  afterRtpServices,
   afterVerifyOnboarding,
   backFromAdditionalGpuInfo,
   backFromAdditionalInfo,
@@ -20,9 +21,9 @@ import {
   backFromAggregates,
   backFromApplicantEmail,
   backFromBillingData,
-  backFromContractsSummary,
   backFromInstitutionType,
   backFromManager,
+  backFromRtp,
   backFromSearchParty,
   backFromUploadDocuments,
   goTo,
@@ -52,6 +53,7 @@ describe('onboardingSteps', () => {
     expect(ONBOARDING_STEPS).toEqual([
       'institutionType',
       'searchParty',
+      'rtp',
       'contractsSummary',
       'verifyOnboarding',
       'onboardingData',
@@ -87,6 +89,7 @@ describe('forward transitions', () => {
       ['PRV', 'prod-pagopa', 'billingData'],
       ['PRV', 'prod-ced', 'billingData'],
       ['PSP', 'prod-pagopa', 'billingData'],
+      ['PSP', 'prod-rtp', 'searchParty'],
       ['PT', 'prod-pagopa', 'billingData'],
       ['GPU', 'prod-pagopa', 'billingData'],
       ['PRV_PF', 'prod-pagopa', 'billingData'],
@@ -142,20 +145,31 @@ describe('forward transitions', () => {
       );
     });
 
-    test('a party selection skips the contracts summary like the legacy +2', () => {
-      expectLegacyTarget(
-        afterPartySelection(ipaParty, 'PA', { gspNoIpaEnabled: false, hasFormData: false }),
-        'searchParty',
-        2
-      );
+    test('on RTP a party selection moves to the services choice', () => {
+      expect(
+        afterPartySelection(ipaParty, 'PSP', {
+          gspNoIpaEnabled: false,
+          hasFormData: false,
+          productId: 'prod-rtp',
+        })
+      ).toEqual(goTo('rtp'));
     });
 
-    test('NO_IPA on moves to the contracts summary like the legacy +1', () => {
-      expectLegacyTarget(
-        afterPartySelection(gspNoIpaParty, 'GSP', { gspNoIpaEnabled: true, hasFormData: false }),
-        'searchParty',
-        1
-      );
+    test('the services choice moves to the onboarding verification and back to the search', () => {
+      expect(afterRtpServices()).toEqual(goTo('verifyOnboarding'));
+      expect(backFromRtp()).toEqual(goTo('searchParty'));
+    });
+
+    test('a party selection skips the contracts summary', () => {
+      expect(
+        afterPartySelection(ipaParty, 'PA', { gspNoIpaEnabled: false, hasFormData: false })
+      ).toEqual(goTo('verifyOnboarding'));
+    });
+
+    test('NO_IPA on moves to the contracts summary', () => {
+      expect(
+        afterPartySelection(gspNoIpaParty, 'GSP', { gspNoIpaEnabled: true, hasFormData: false })
+      ).toEqual(goTo('contractsSummary'));
     });
   });
 
@@ -163,10 +177,8 @@ describe('forward transitions', () => {
     test.each<[OnboardingStepName, OnboardingStepName]>([
       ['searchParty', 'onboardingData'],
       ['contractsSummary', 'billingData'],
-    ])('from %s goes to %s (legacy +3)', (from, expected) => {
-      const transition = afterGspNoIpa(from);
-      expect(transition).toEqual(goTo(expected));
-      expectLegacyTarget(transition, from, 3);
+    ])('from %s goes to %s', (from, expected) => {
+      expect(afterGspNoIpa(from)).toEqual(goTo(expected));
     });
   });
 
@@ -255,8 +267,11 @@ describe('back transitions', () => {
     expect(backFromSearchParty()).toEqual(goTo('institutionType'));
   });
 
+  test('backFromSearchParty exits the flow when the institution type step is skipped', () => {
+    expect(backFromSearchParty(true)).toEqual(openExitModal());
+  });
+
   test.each<[string, () => Transition, OnboardingStepName, number]>([
-    ['backFromContractsSummary', backFromContractsSummary, 'contractsSummary', -1],
     ['backFromAdditionalGpuInfo', backFromAdditionalGpuInfo, 'additionalGpuInfo', -1],
     ['backFromAdditionalInfo', backFromAdditionalInfo, 'additionalInfo', -2],
     ['backFromAggregates', backFromAggregates, 'aggregates', -1],
@@ -314,6 +329,7 @@ describe('back transitions', () => {
         goTo('institutionType'),
       ],
       ['no institution type', { institutionType: undefined }, goTo('institutionType')],
+      ['PSP on RTP', { institutionType: 'PSP', productId: 'prod-rtp' }, goTo('rtp')],
     ])('%s', (_label, overrides, expected) => {
       expect(backFromBillingData({ ...base, ...overrides })).toEqual(expected);
     });

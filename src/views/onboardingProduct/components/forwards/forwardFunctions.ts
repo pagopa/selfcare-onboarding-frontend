@@ -1,6 +1,7 @@
 import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
 import { Dispatch, MutableRefObject } from 'react';
 import { InstitutionType } from '../../../../../types';
+import { ServicesChoice } from '../../../../components/steps/StepServicesChoice';
 import { AdditionalGpuInformations } from '../../../../model/AdditionalGpuInformations';
 import { AdditionalData, AdditionalInformations } from '../../../../model/AdditionalInformations';
 import { AggregateInstitution } from '../../../../model/AggregateInstitution';
@@ -122,7 +123,12 @@ export const createForwardFunctions = ({
       party: onboardingData,
       institutionType: institutionTypeParam,
       gspNoIpaEnabled,
+      productId,
     });
+  };
+
+  const forwardFromRtp = (services: ServicesChoice) => {
+    dispatch({ type: 'RTP_SERVICES_SELECTED', services });
   };
 
   const forwardFromVerifyOnboarding = () => {
@@ -217,6 +223,7 @@ export const createForwardFunctions = ({
     forwardGspNoIpa,
     forwardWithDataAndInstitution,
     forwardFromVerifyOnboarding,
+    forwardFromRtp,
     forwardWithBillingData,
     forwardWithAdditionalGSPInfo,
     forwardWithAdditionalGPUInfo,

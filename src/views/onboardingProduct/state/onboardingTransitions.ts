@@ -9,6 +9,7 @@ import {
   isPagoPaInsights,
   isPagoPaProduct,
   isPaymentServiceProvider,
+  isRtpProduct,
   isPrivateInstitution,
   isPrivatePersonInstitution,
   isPublicAdministration,
@@ -65,8 +66,13 @@ export const requiresApplicantEmail = (
 // Forward transitions: party selection
 // ---------------------------------------------------------------------------------------------
 
+/** On RTP the institution type is always PSP and the party is searched like the other ones. */
+export const isRtpPartySearch = (institutionType: InstitutionType, productId?: string): boolean =>
+  isRtpProduct(productId) && isPaymentServiceProvider(institutionType);
+
 /** Institution types that are not searched in a registry and go straight to the billing data. */
-export const skipsPartySearch = (institutionType: InstitutionType): boolean =>
+export const skipsPartySearch = (institutionType: InstitutionType, productId?: string): boolean =>
+  !isRtpPartySearch(institutionType, productId) &&
   !isGlobalServiceProvider(institutionType) &&
   !isPublicAdministration(institutionType) &&
   !isContractingAuthority(institutionType) &&
@@ -87,7 +93,7 @@ export const afterInstitutionType = (
   { productId }: Pick<TransitionContext, 'productId'>
 ): Transition =>
   isPrivateWithoutPartySearch(selectedInstitutionType, productId) ||
-  skipsPartySearch(selectedInstitutionType)
+  skipsPartySearch(selectedInstitutionType, productId)
     ? goTo('billingData')
     : goTo('searchParty');
 
@@ -122,17 +128,23 @@ export const afterPartySelection = (
   {
     gspNoIpaEnabled,
     hasFormData,
+    productId,
   }: Pick<TransitionContext, 'gspNoIpaEnabled'> & {
     hasFormData: boolean;
+    productId?: string;
   }
 ): Transition => {
   if (isGspWithoutIpa(party, selectedInstitutionType)) {
     return gspNoIpaEnabled ? goTo('contractsSummary') : afterGspNoIpa('searchParty');
   }
-  return (party?.externalId && selectedInstitutionType) || hasFormData
-    ? goTo('verifyOnboarding')
-    : stay();
+  if ((party?.externalId && selectedInstitutionType) || hasFormData) {
+    return isRtpProduct(productId) ? goTo('rtp') : goTo('verifyOnboarding');
+  }
+  return stay();
 };
+
+/** On RTP the chosen services are asked right after the party selection. */
+export const afterRtpServices = (): Transition => goTo('verifyOnboarding');
 
 export const afterVerifyOnboarding = (): Transition => goTo('onboardingData');
 
@@ -188,9 +200,13 @@ export const afterApplicantEmail = (): Transition => submit();
 
 export const backFromInstitutionType = (): Transition => openExitModal();
 
-export const backFromSearchParty = (): Transition => goTo('institutionType');
+/** Products that skip the institution type step have nothing to go back to: the flow is exited. */
+export const backFromSearchParty = (productAvoidStep = false): Transition =>
+  productAvoidStep ? openExitModal() : goTo('institutionType');
 
 export const backFromContractsSummary = (): Transition => goTo('searchParty');
+
+export const backFromRtp = (): Transition => goTo('searchParty');
 
 const hasPartySearch = (institutionType: InstitutionType | undefined): boolean =>
   isPublicAdministration(institutionType) ||
@@ -223,12 +239,18 @@ export const backFromBillingData = ({
   if ((fromDashboard || subunitTypeByQuery) && productAvoidStep) {
     return openExitModal();
   }
-  if (isPaymentServiceProvider(institutionType) || !hasPartySearch(institutionType)) {
+  if (
+    !isRtpPartySearch(institutionType as InstitutionType, productId) &&
+    (isPaymentServiceProvider(institutionType) || !hasPartySearch(institutionType))
+  ) {
     return goTo('institutionType');
   }
   if (fromDashboard && isPagoPaInsights(productId)) {
     // Shadowed by the two fromDashboard branches above: kept to mirror backFunctions 1:1.
     return redirect(`${ENV.URL_FE.DASHBOARD}/${externalInstitutionId}`);
+  }
+  if (isRtpProduct(productId)) {
+    return goTo('rtp');
   }
   return isRequiredDocumentsFlow ? goTo('contractsSummary') : goTo('searchParty');
 };

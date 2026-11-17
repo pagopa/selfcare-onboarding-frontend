@@ -132,6 +132,7 @@ describe('party selection', () => {
       party,
       institutionType: 'PA',
       gspNoIpaEnabled: false,
+      productId: PRODUCT_ID,
     });
     expect(reduce()).toMatchObject({
       activeStep: 'verifyOnboarding',
