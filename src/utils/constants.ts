@@ -251,6 +251,7 @@ export const PRODUCT_IDS = {
   CGN: 'prod-cgn',
   IDPAY_MERCHANT: 'prod-idpay-merchant',
   CED: 'prod-ced',
+  RTP: 'prod-rtp',
 };
 
 export const requiredError = 'Required';
