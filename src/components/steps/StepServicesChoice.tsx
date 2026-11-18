@@ -10,32 +10,35 @@ import {
 } from '@mui/material';
 import { useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
+import { OnboardingProductDto } from '../../api/generated/onboarding/OnboardingProductDto';
+import { RtpServiceTypeEnum } from '../../api/generated/onboarding/RtpServiceType';
 import { OnboardingStepActions } from '../registrationSteps/OnboardingStepActions';
 
-export type ServicesChoice = {
-  rtp: boolean;
-  repository: boolean;
-};
+export type RtpServiceTypes = NonNullable<OnboardingProductDto['rtpServiceTypes']>;
 
 type Props = {
-  forward: (services: ServicesChoice) => void;
+  forward: (rtpServiceTypes: RtpServiceTypes) => void;
   back: () => void;
-  initialServices?: ServicesChoice;
+  initialServiceTypes?: RtpServiceTypes;
 };
 
-const SERVICES: Array<keyof ServicesChoice> = ['rtp', 'repository'];
+const SERVICE_LABEL_KEYS: Record<RtpServiceTypeEnum, string> = {
+  [RtpServiceTypeEnum.RTP]: 'stepServicesChoice.services.rtp',
+  [RtpServiceTypeEnum.REPOSITORY_CONSULTATION]: 'stepServicesChoice.services.repository',
+};
 
-export default function StepServicesChoice({
-  forward,
-  back,
-  initialServices = { rtp: false, repository: false },
-}: Props) {
-  const [services, setServices] = useState<ServicesChoice>(initialServices);
+const SERVICES: ReadonlyArray<RtpServiceTypeEnum> = [
+  RtpServiceTypeEnum.RTP,
+  RtpServiceTypeEnum.REPOSITORY_CONSULTATION,
+];
+
+export default function StepServicesChoice({ forward, back, initialServiceTypes = [] }: Props) {
+  const [serviceTypes, setServiceTypes] = useState<RtpServiceTypes>(initialServiceTypes);
   const { t } = useTranslation();
   const theme = useTheme();
 
-  const handleChange = (service: keyof ServicesChoice, checked: boolean) =>
-    setServices((prev) => ({ ...prev, [service]: checked }));
+  const handleChange = (service: RtpServiceTypeEnum, checked: boolean) =>
+    setServiceTypes((prev) => SERVICES.filter((s) => (s === service ? checked : prev.includes(s))));
 
   return (
     <Grid container display="flex" justifyContent="center" alignItems="center">
@@ -67,13 +70,13 @@ export default function StepServicesChoice({
                   control={
                     <Checkbox
                       id={`service-${service}`}
-                      checked={services[service]}
+                      checked={serviceTypes.includes(service)}
                       onChange={(_, checked) => handleChange(service, checked)}
                     />
                   }
                   label={
                     <Typography sx={{ fontWeight: 600, fontSize: '18px', color: '#17324D' }}>
-                      {t(`stepServicesChoice.services.${service}`)}
+                      {t(SERVICE_LABEL_KEYS[service])}
                     </Typography>
                   }
                 />
@@ -90,9 +93,9 @@ export default function StepServicesChoice({
             disabled: false,
           }}
           forward={{
-            action: () => forward(services),
+            action: () => forward(serviceTypes),
             label: t('stepServicesChoice.confirmLabel'),
-            disabled: !services.rtp && !services.repository,
+            disabled: serviceTypes.length === 0,
           }}
         />
       </Grid>

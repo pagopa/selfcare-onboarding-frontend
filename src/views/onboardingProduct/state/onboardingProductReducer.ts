@@ -6,7 +6,7 @@ import { AggregateInstitution } from '../../../model/AggregateInstitution';
 import { FilterCategoriesResponse } from '../../../model/FilterCategoriesResponse';
 import { OnboardingFormData, UserRequester } from '../../../model/OnboardingFormData';
 import { selected2OnboardingData } from '../../../utils/selected2OnboardingData';
-import { ServicesChoice } from '../../../components/steps/StepServicesChoice';
+import { RtpServiceTypes } from '../../../components/steps/StepServicesChoice';
 import { OnboardingStepName } from './onboardingSteps';
 import {
   afterAdditionalGpuInfo,
@@ -52,7 +52,7 @@ export type OnboardingProductState = {
   additionalInformations?: AdditionalInformations;
   additionalGPUInformations?: AdditionalGpuInformations;
   aggregatesData?: Array<AggregateInstitution>;
-  rtpServices?: ServicesChoice;
+  rtpServiceTypes?: RtpServiceTypes;
   filterCategoriesResponse?: FilterCategoriesResponse;
   categoriesLoaded: boolean;
   openExitModal: boolean;
@@ -103,7 +103,7 @@ export type OnboardingProductAction =
       gspNoIpaEnabled: boolean;
       productId?: string;
     }
-  | { type: 'RTP_SERVICES_SELECTED'; services: ServicesChoice }
+  | { type: 'RTP_SERVICES_SELECTED'; rtpServiceTypes: RtpServiceTypes }
   | { type: 'GSP_NO_IPA_SELECTED'; from: OnboardingStepName }
   | {
       type: 'ONBOARDING_DATA_LOADED';
@@ -323,7 +323,10 @@ export const onboardingProductReducer = (
         action.productId
       );
     case 'RTP_SERVICES_SELECTED':
-      return applyTransition({ ...state, rtpServices: action.services }, afterRtpServices());
+      return applyTransition(
+        { ...state, rtpServiceTypes: action.rtpServiceTypes },
+        afterRtpServices()
+      );
     case 'GSP_NO_IPA_SELECTED':
       return selectGspNoIpa(state, action.from);
     case 'ONBOARDING_DATA_LOADED':
