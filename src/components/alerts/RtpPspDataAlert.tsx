@@ -15,7 +15,7 @@ const RtpPspDataAlert = () => {
           <ButtonNaked
             component="a"
             href={ENV.URL_FE.ASSISTANCE}
-            color="text"
+            color="blueItaly"
             sx={{ fontWeight: 'fontWeightBold', whiteSpace: 'nowrap', mx: 1 }}
           >
             {t('onboardingFormData.rtpPspDataAlert.action')}
