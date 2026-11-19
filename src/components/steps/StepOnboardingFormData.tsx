@@ -492,6 +492,7 @@ export default function StepOnboardingFormData({
                 formik.setFieldValue('geographicTaxonomies', geographicTaxonomies)
               }
               formik={formik}
+              disabled={controllers.isRtpPsp}
             />
           </Grid>
         )}
@@ -500,7 +501,7 @@ export default function StepOnboardingFormData({
             <DpoSection
               baseTextFieldProps={baseTextFieldProps}
               dpoData={formik.values}
-              lockedData={controllers.isRtpPsp ? dpoData : undefined}
+              disabled={controllers.isRtpPsp}
             />
           </Grid>
         )}

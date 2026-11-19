@@ -83,11 +83,10 @@ describe('getInvoiceLayout', () => {
     expect(premiumWithRecipientCode().isRecipientCodeDisabled).toBe(true);
   });
 
-  it('disables SDI code for an RTP PSP with a valid recipient code already set', () => {
+  it('always disables SDI code for an RTP PSP, even when it is empty', () => {
     const layout = layoutOf({
       controllers: { ...controllers, isRtpPsp: true },
       institutionType: 'PSP',
-      formik: { values: formValues('A1B2V3'), initialValues: formValues('A1B2V3'), errors: {} },
     });
     expect(layout.isRecipientCodeDisabled).toBe(true);
   });

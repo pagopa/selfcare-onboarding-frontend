@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import { render, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { MemoryRouter } from 'react-router';
 import { beforeEach, expect, test, vi } from 'vitest';
@@ -164,5 +164,9 @@ test.each(['25301208621', '01234567890'])(
       expect(input, id).toBeDisabled();
     });
     expect(document.getElementById('vatNumberGroup')).toBeDisabled();
+    const geoRadios = document.querySelectorAll('input[name="geographicTaxonomy"]');
+    expect(geoRadios).toHaveLength(2);
+    geoRadios.forEach((radio) => expect(radio).toBeDisabled());
+    expect(screen.getByDisplayValue('Arcore (MB)')).toBeDisabled();
   }
 );

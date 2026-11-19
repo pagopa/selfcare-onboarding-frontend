@@ -48,10 +48,12 @@ export const getInvoiceLayout = ({
     showRecipientCode: controllers.isInvoiceable && (!isIoProduct(productId) || isIoPremium),
     isPaOrAooUo: isPa || controllers.isAooUo,
     isRecipientCodeDisabled:
-      ((controllers.isPremium && !isIoPremium) || controllers.isRtpPsp) &&
-      hasAtLeast6Chars(formik.values.recipientCode) &&
-      hasAtLeast6Chars(formik.initialValues.recipientCode) &&
-      !recipientCodeError,
+      controllers.isRtpPsp ||
+      (controllers.isPremium &&
+        !isIoPremium &&
+        hasAtLeast6Chars(formik.values.recipientCode) &&
+        hasAtLeast6Chars(formik.initialValues.recipientCode) &&
+        !recipientCodeError),
     recipientCodeError: recipientCodeError === 'Required' ? undefined : recipientCodeError,
     showTaxCodeInvoicing:
       (!!onboardingFormData?.uoUniqueCode || isPa) &&

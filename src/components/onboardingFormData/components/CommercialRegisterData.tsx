@@ -40,6 +40,7 @@ const CommercialRegisterData = ({
     institutionType,
     productId,
     isDisabled: controllers.isDisabled,
+    isLocked: controllers.isRtpPsp,
     pspData,
     errors: formik.errors,
   });

@@ -15,13 +15,10 @@ const DPO_FIELDS: ReadonlyArray<{ field: DpoField; labelKey: string }> = [
 type Props = {
   baseTextFieldProps: BaseTextFieldPropsFn;
   dpoData: OnboardingFormData;
-  /** Registered DPO data: the fields it fills are read-only. */
-  lockedData?: DataProtectionOfficerDto;
+  disabled?: boolean;
 };
 
-const isLocked = (value?: string) => !!value && value !== 'N/A';
-
-export default function DpoSection({ baseTextFieldProps, dpoData, lockedData }: Props) {
+export default function DpoSection({ baseTextFieldProps, dpoData, disabled }: Props) {
   const theme = useTheme();
   const { t } = useTranslation();
 
@@ -45,7 +42,7 @@ export default function DpoSection({ baseTextFieldProps, dpoData, lockedData }: 
               <CustomTextField
                 {...baseTextFieldProps(field, t(labelKey), 600)}
                 value={dpoData?.[field]}
-                disabled={isLocked(lockedData?.[field])}
+                disabled={disabled}
               />
             </Grid>
           ))}
