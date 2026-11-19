@@ -827,6 +827,8 @@ export default {
     },
     pspDashboardWarning:
       'Per aggiornare i dati presenti, contatta il servizio di <1>Assistenza</1>',
+    rtpPspDataWarning:
+      "I dati del tuo ente non sono corretti o aggiornati? <1>Segnalalo all'assistenza</1> per procedere con la modifica.",
     billingDataSection: {
       invalidFiscalCode: 'Il Codice Fiscale non è valido',
       invalidTaxCodeInvoicing: 'Il Codice Fiscale inserito non è relativo al tuo ente',

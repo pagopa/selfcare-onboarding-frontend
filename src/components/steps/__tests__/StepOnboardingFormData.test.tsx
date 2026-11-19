@@ -176,7 +176,10 @@ test.each(['25301208621', '01234567890'])(
     expect(geoRadios).toHaveLength(2);
     geoRadios.forEach((radio) => expect(radio).toBeDisabled());
     expect(screen.getByDisplayValue('Arcore (MB)')).toBeDisabled();
-    expect(screen.getByRole('link', { name: 'Assistenza' })).toHaveAttribute(
+    expect(
+      screen.getByText(/I dati del tuo ente non sono corretti o aggiornati\?/)
+    ).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: "Segnalalo all'assistenza" })).toHaveAttribute(
       'href',
       ENV.URL_FE.ASSISTANCE
     );
@@ -209,5 +212,5 @@ test('the support alert is not shown outside RTP', async () => {
   renderStep(partyFromIpa);
 
   await findVatNumber();
-  expect(screen.queryByRole('link', { name: 'Assistenza' })).not.toBeInTheDocument();
+  expect(screen.queryByRole('link', { name: "Segnalalo all'assistenza" })).not.toBeInTheDocument();
 });

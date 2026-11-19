@@ -709,6 +709,8 @@ export default {
       subTitle: 'Vnesite zahtevane informacije in se prepričajte, da so pravilne. <1 /> Potrebni bodo za registracijo kot tehnološki partner za <3 /> produkt <5>{{nameProduct}}</5>.'
     },
     pspDashboardWarning: 'Za posodobitev obstoječih podatkov se obrnite na <1>storitev pomoči</1>',
+    rtpPspDataWarning:
+      'Podatki vaše ustanove niso pravilni ali posodobljeni? <1>Sporočite to podpori</1>, da nadaljujete s spremembo.',
     billingDataSection: {
       invalidFiscalCode: 'Davčna številka je neveljavna',
       invalidTaxCodeInvoicing: 'Vnesena davčna številka ni povezana z vašo organizacijo',

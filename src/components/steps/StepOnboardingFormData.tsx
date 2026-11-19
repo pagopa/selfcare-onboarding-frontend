@@ -460,14 +460,25 @@ export default function StepOnboardingFormData({
         {(isPagoPaInsights(subProductId) || controllers.isRtpPsp) && (
           <Grid item xs={12} display="flex" justifyContent="center" mb={5}>
             <Alert severity="warning" variant="standard" sx={{ width: '65%' }}>
-              <Trans
-                i18nKey="onboardingFormData.pspDashboardWarning"
-                components={{
-                  1: <Link color={'inherit'} href={ENV.URL_FE.ASSISTANCE} />,
-                }}
-              >
-                {`Per aggiornare i dati presenti, contatta il servizio di <1>Assistenza</1>.`}
-              </Trans>
+              {controllers.isRtpPsp ? (
+                <Trans
+                  i18nKey="onboardingFormData.rtpPspDataWarning"
+                  components={{
+                    1: <Link color={'inherit'} href={ENV.URL_FE.ASSISTANCE} />,
+                  }}
+                >
+                  {`I dati del tuo ente non sono corretti o aggiornati? <1>Segnalalo all'assistenza</1> per procedere con la modifica.`}
+                </Trans>
+              ) : (
+                <Trans
+                  i18nKey="onboardingFormData.pspDashboardWarning"
+                  components={{
+                    1: <Link color={'inherit'} href={ENV.URL_FE.ASSISTANCE} />,
+                  }}
+                >
+                  {`Per aggiornare i dati presenti, contatta il servizio di <1>Assistenza</1>.`}
+                </Trans>
+              )}
             </Alert>
           </Grid>
         )}

@@ -709,6 +709,8 @@ export default {
       subTitle: 'Enter the required information and make sure it is correct.<1 /> It will be used to register you as a Technology Partner for the<3 /> product <5>{{nameProduct}}</5>.'
     },
     pspDashboardWarning: 'To update the present data, contact the <1>Support</1> service',
+    rtpPspDataWarning:
+      "Is your institution's data incorrect or out of date? <1>Report it to support</1> to proceed with the change.",
     billingDataSection: {
       invalidFiscalCode: 'The Tax Code is not valid',
       invalidTaxCodeInvoicing: 'The entered Tax Code is not related to your institution',
