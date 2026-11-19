@@ -11,6 +11,7 @@ import StepOnboardingFormData, { StepBillingDataHistoryState } from '../StepOnbo
 import { InstitutionType, PartyData } from '../../../../types';
 import { mockedPspInstitutionsSearch } from '../../../lib/__mocks__/mockApiRequests';
 import { selected2OnboardingData } from '../../../utils/selected2OnboardingData';
+import { ENV } from '../../../utils/env';
 
 vi.mock('../../../services/geoTaxonomyServices', () => ({
   getPreviousGeotaxononomies: vi.fn(),
@@ -122,14 +123,24 @@ test('vatNumber is locked to the taxCode when the flag matches the party data', 
   expect(vatNumber).toHaveValue(taxCode);
 });
 
-const rtpPspFormData = (vatNumber: string) => {
-  const [psp] = mockedPspInstitutionsSearch.institutions ?? [];
+const [registeredPsp] = mockedPspInstitutionsSearch.institutions ?? [];
+
+const rtpPspFormData = (vatNumber: string, overrides: Partial<typeof registeredPsp> = {}) => {
   const party = {
-    ...psp,
-    onboarding: psp.onboarding?.map((o) => ({ ...o, billing: { ...o.billing, vatNumber } })),
+    ...registeredPsp,
+    ...overrides,
+    onboarding: registeredPsp.onboarding?.map((o) => ({
+      ...o,
+      billing: { ...o.billing, vatNumber },
+    })),
   } as unknown as PartyData;
   return selected2OnboardingData(party, false, 'PSP', PRODUCT_IDS.RTP);
 };
+
+const renderRtpPsp = (formData: OnboardingFormData) =>
+  renderStep(formData, undefined, { productId: PRODUCT_IDS.RTP, institutionType: 'PSP' });
+
+const findContinueButton = () => screen.getByText('Continua').closest('button');
 
 const rtpPspFields: Array<[string, string]> = [
   ['businessName', 'Antico Credito Arcorese'],
@@ -150,10 +161,7 @@ const rtpPspFields: Array<[string, string]> = [
 test.each(['25301208621', '01234567890'])(
   'RTP PSP form is filled with the registered data and read-only (vat number %s)',
   async (vatNumber) => {
-    renderStep(rtpPspFormData(vatNumber), undefined, {
-      productId: PRODUCT_IDS.RTP,
-      institutionType: 'PSP',
-    });
+    renderRtpPsp(rtpPspFormData(vatNumber));
 
     const vatNumberInput = await findVatNumber();
     await waitFor(() => expect(vatNumberInput).toHaveValue(vatNumber));
@@ -168,5 +176,38 @@ test.each(['25301208621', '01234567890'])(
     expect(geoRadios).toHaveLength(2);
     geoRadios.forEach((radio) => expect(radio).toBeDisabled());
     expect(screen.getByDisplayValue('Arcore (MB)')).toBeDisabled();
+    expect(screen.getByRole('link', { name: 'Assistenza' })).toHaveAttribute(
+      'href',
+      ENV.URL_FE.ASSISTANCE
+    );
+    await waitFor(() => expect(findContinueButton()).toBeEnabled());
   }
 );
+
+test('RTP PSP with legacy N/A data keeps the registered values and can go on', async () => {
+  renderRtpPsp(
+    rtpPspFormData('25301208621', {
+      paymentServiceProvider: {
+        ...registeredPsp.paymentServiceProvider,
+        legalRegisterName: 'N/A',
+        legalRegisterNumber: 'N/A',
+      },
+      dataProtectionOfficer: { ...registeredPsp.dataProtectionOfficer, address: 'N/A' },
+    })
+  );
+
+  await findVatNumber();
+  ['registrationInRegister', 'registerNumber', 'address'].forEach((id) => {
+    const input = document.getElementById(id);
+    expect(input, id).toHaveValue('N/A');
+    expect(input, id).toBeDisabled();
+  });
+  await waitFor(() => expect(findContinueButton()).toBeEnabled());
+});
+
+test('the support alert is not shown outside RTP', async () => {
+  renderStep(partyFromIpa);
+
+  await findVatNumber();
+  expect(screen.queryByRole('link', { name: 'Assistenza' })).not.toBeInTheDocument();
+});

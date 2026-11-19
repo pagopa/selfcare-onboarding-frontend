@@ -197,14 +197,14 @@ export default function StepOnboardingFormData({
   }, [dpoData]);
 
   useEffect(() => {
-    if (controllers.isPremium || controllers.isRtpPsp) {
+    if (controllers.isPremium) {
       setDpoData({
         address: formik.values.address,
         email: formik.values.email,
         pec: formik.values.pec,
       });
     }
-  }, [controllers.isPremium, controllers.isRtpPsp]);
+  }, [controllers.isPremium]);
 
   // Premium: track the step and resolve the IPA origin id once. The SDI code is editable in the
   // prod-io-premium flow, so this must not be tied to recipientCode or it fires on every keystroke.
@@ -281,26 +281,29 @@ export default function StepOnboardingFormData({
 
   const handleClose = () => updateGeotaxonomy({ add: false, edit: false });
 
+  // The RTP PSP form is read-only: registered data is fixed by the support service, not by the user
   const validate = (values: Partial<OnboardingFormData>) =>
-    Object.fromEntries(
-      validateFields(values, t, {
-        institutionType,
-        isVatRegistrated,
-        vatVerificationGenericError,
-        isPaymentServiceProvider: isPaymentServiceProvider(institutionType),
-        isInvoiceable: controllers.isInvoiceable,
-        uoSelected,
-        isInformationCompany: isInformationCompany(origin, institutionType, productId),
-        institutionAvoidGeotax,
-        isPremium: controllers.isPremium,
-        invalidTaxCodeInvoicing,
-        isPdndPrivate: isPdndPrivate(institutionType, productId),
-        isPrivateMerchantInstitution: isPrivateMerchantInstitution(institutionType, productId),
-        recipientCodeStatus,
-        productId,
-        subProductId,
-      })
-    );
+    controllers.isRtpPsp
+      ? {}
+      : Object.fromEntries(
+          validateFields(values, t, {
+            institutionType,
+            isVatRegistrated,
+            vatVerificationGenericError,
+            isPaymentServiceProvider: isPaymentServiceProvider(institutionType),
+            isInvoiceable: controllers.isInvoiceable,
+            uoSelected,
+            isInformationCompany: isInformationCompany(origin, institutionType, productId),
+            institutionAvoidGeotax,
+            isPremium: controllers.isPremium,
+            invalidTaxCodeInvoicing,
+            isPdndPrivate: isPdndPrivate(institutionType, productId),
+            isPrivateMerchantInstitution: isPrivateMerchantInstitution(institutionType, productId),
+            recipientCodeStatus,
+            productId,
+            subProductId,
+          })
+        );
 
   const formik = useFormik<OnboardingFormData>({
     initialValues: {
@@ -454,7 +457,7 @@ export default function StepOnboardingFormData({
     <Box display="flex" justifyContent="center">
       <Grid container item xs={8} display="flex" justifyContent="center">
         <Heading subtitle={subtitle} />
-        {isPagoPaInsights(subProductId) && (
+        {(isPagoPaInsights(subProductId) || controllers.isRtpPsp) && (
           <Grid item xs={12} display="flex" justifyContent="center" mb={5}>
             <Alert severity="warning" variant="standard" sx={{ width: '65%' }}>
               <Trans

@@ -38,7 +38,7 @@ export type VatNumberLayout = {
 const isVatNumberGroupLocked = (
   controllers: OnboardingControllers,
   pspData?: PaymentServiceProviderDto
-) => (controllers.isPremium && !!pspData?.vatNumberGroup) || (controllers.isRtpPsp && !!pspData);
+) => controllers.isRtpPsp || (controllers.isPremium && !!pspData?.vatNumberGroup);
 
 export const getVatNumberLayout = ({
   controllers,
