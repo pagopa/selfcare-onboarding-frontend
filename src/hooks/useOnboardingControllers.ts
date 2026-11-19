@@ -2,7 +2,11 @@ import { useMemo } from 'react';
 import { InstitutionType } from '../../types';
 import { OnboardingFormData } from '../model/OnboardingFormData';
 import { canInvoice } from '../utils/constants';
-import { isPaymentServiceProvider, isPublicAdministration } from '../utils/institutionTypeUtils';
+import {
+  isPaymentServiceProvider,
+  isPublicAdministration,
+  isRtpProduct,
+} from '../utils/institutionTypeUtils';
 
 interface OnboardingControllersParams {
   subProductId?: string;
@@ -23,6 +27,8 @@ export interface OnboardingControllers {
   isVatRegistrated?: boolean;
   isFromIPA: boolean;
   isAooUo: boolean;
+  /** RTP onboarding of a PSP already onboarded in SelfCare: its registered data is read-only. */
+  isRtpPsp: boolean;
 }
 
 /**
@@ -47,9 +53,11 @@ export const useOnboardingControllers = (
     const isPremium = !!subProductId;
     const isInvoiceable = canInvoice(institutionType, productId);
     const isForeignInsurance = onboardingFormData?.registerType?.includes('Elenco II') ?? false;
+    const isRtpPsp = isRtpProduct(productId) && isPaymentServiceProvider(institutionType);
 
     const isDisabled =
       isPremium ||
+      isRtpPsp ||
       (origin === 'IPA' &&
         !isPublicAdministration(institutionType) &&
         !isPaymentServiceProvider(institutionType)) ||
@@ -67,6 +75,7 @@ export const useOnboardingControllers = (
       isVatRegistrated,
       isFromIPA,
       isAooUo,
+      isRtpPsp,
     };
   }, [
     subProductId,

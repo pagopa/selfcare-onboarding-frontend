@@ -31,7 +31,14 @@ export type VatNumberLayout = {
   isVatNumberDisabled: boolean;
   showVatNumberGroup: boolean;
   isVatNumberGroupDisabled: boolean;
+  isPartyWithoutVatNumberDisabled: boolean;
 };
+
+// Premium and RTP PSP start from the registered data, which the user must not change
+const isVatNumberGroupLocked = (
+  controllers: OnboardingControllers,
+  pspData?: PaymentServiceProviderDto
+) => (controllers.isPremium && !!pspData?.vatNumberGroup) || (controllers.isRtpPsp && !!pspData);
 
 export const getVatNumberLayout = ({
   controllers,
@@ -47,14 +54,15 @@ export const getVatNumberLayout = ({
   const isPrivateMerchant = isPrivateMerchantInstitution(institutionType, productId);
   const hasOnboardingTaxCode = !!onboardingFormData?.taxCode;
   const withoutVatnumberInvoiceable = !hasVatnumber && controllers.isInvoiceable;
-  const isVatNumberLocked = isTaxCodeEquals2PIVA || controllers.isPremium;
+  const isPrefilled = controllers.isPremium || controllers.isRtpPsp;
+  const isVatNumberLocked = isTaxCodeEquals2PIVA || isPrefilled;
 
   return {
     showCheckboxes: !controllers.isForeignInsurance,
     checkboxesMarginBottom: withoutVatnumberInvoiceable && isInsurance ? -3 : 0,
     showTaxCodeEquals2PIVA:
       hasVatnumber && (!isInsurance || hasOnboardingTaxCode) && !isPrivateMerchant,
-    isTaxCodeEquals2PIVADisabled: controllers.isPremium || values.taxCode?.length !== 11,
+    isTaxCodeEquals2PIVADisabled: isPrefilled || values.taxCode?.length !== 11,
     showPartyWithoutVatNumber:
       !isFideiussioniProduct(productId) &&
       !isFideiussioniGuaranteeProduct(productId) &&
@@ -64,6 +72,7 @@ export const getVatNumberLayout = ({
     isVatNumberLocked,
     isVatNumberDisabled: isVatNumberLocked || isPrivateMerchant,
     showVatNumberGroup: isPaymentServiceProvider(institutionType) && hasVatnumber,
-    isVatNumberGroupDisabled: controllers.isPremium && !!pspData?.vatNumberGroup,
+    isVatNumberGroupDisabled: isVatNumberGroupLocked(controllers, pspData),
+    isPartyWithoutVatNumberDisabled: controllers.isRtpPsp,
   };
 };

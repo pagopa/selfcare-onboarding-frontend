@@ -167,7 +167,7 @@ export default function StepOnboardingFormData({
         return;
       }
 
-      if (!controllers.isPremium) {
+      if (!controllers.isPremium && !controllers.isRtpPsp) {
         try {
           await getPreviousGeotaxononomies(
             externalInstitutionId,
@@ -197,14 +197,14 @@ export default function StepOnboardingFormData({
   }, [dpoData]);
 
   useEffect(() => {
-    if (controllers.isPremium) {
+    if (controllers.isPremium || controllers.isRtpPsp) {
       setDpoData({
         address: formik.values.address,
         email: formik.values.email,
         pec: formik.values.pec,
       });
     }
-  }, [controllers.isPremium]);
+  }, [controllers.isPremium, controllers.isRtpPsp]);
 
   // Premium: track the step and resolve the IPA origin id once. The SDI code is editable in the
   // prod-io-premium flow, so this must not be tied to recipientCode or it fires on every keystroke.
@@ -497,7 +497,11 @@ export default function StepOnboardingFormData({
         )}
         {isPaymentServiceProvider(institutionType) && (
           <Grid item xs={12} display="flex" justifyContent={'center'}>
-            <DpoSection baseTextFieldProps={baseTextFieldProps} dpoData={formik.values} />
+            <DpoSection
+              baseTextFieldProps={baseTextFieldProps}
+              dpoData={formik.values}
+              lockedData={controllers.isRtpPsp ? dpoData : undefined}
+            />
           </Grid>
         )}
         <Grid item xs={12} mb={2}>

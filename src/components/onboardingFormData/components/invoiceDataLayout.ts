@@ -48,8 +48,7 @@ export const getInvoiceLayout = ({
     showRecipientCode: controllers.isInvoiceable && (!isIoProduct(productId) || isIoPremium),
     isPaOrAooUo: isPa || controllers.isAooUo,
     isRecipientCodeDisabled:
-      controllers.isPremium &&
-      !isIoPremium &&
+      ((controllers.isPremium && !isIoPremium) || controllers.isRtpPsp) &&
       hasAtLeast6Chars(formik.values.recipientCode) &&
       hasAtLeast6Chars(formik.initialValues.recipientCode) &&
       !recipientCodeError,

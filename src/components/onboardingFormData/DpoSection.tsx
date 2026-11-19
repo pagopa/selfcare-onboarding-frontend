@@ -2,12 +2,26 @@ import { Grid, Typography, useTheme, Paper } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { BaseTextFieldPropsFn, CustomTextField } from '../steps/StepOnboardingFormData';
 import { OnboardingFormData } from '../../model/OnboardingFormData';
+import { DataProtectionOfficerDto } from '../../../types';
+
+type DpoField = keyof DataProtectionOfficerDto;
+
+const DPO_FIELDS: ReadonlyArray<{ field: DpoField; labelKey: string }> = [
+  { field: 'address', labelKey: 'onboardingFormData.dpoDataSection.dpoAddress' },
+  { field: 'pec', labelKey: 'onboardingFormData.dpoDataSection.dpoPecAddress' },
+  { field: 'email', labelKey: 'onboardingFormData.dpoDataSection.dpoEmailAddress' },
+];
 
 type Props = {
   baseTextFieldProps: BaseTextFieldPropsFn;
   dpoData: OnboardingFormData;
+  /** Registered DPO data: the fields it fills are read-only. */
+  lockedData?: DataProtectionOfficerDto;
 };
-export default function DpoSection({ baseTextFieldProps, dpoData }: Props) {
+
+const isLocked = (value?: string) => !!value && value !== 'N/A';
+
+export default function DpoSection({ baseTextFieldProps, dpoData, lockedData }: Props) {
   const theme = useTheme();
   const { t } = useTranslation();
 
@@ -26,36 +40,15 @@ export default function DpoSection({ baseTextFieldProps, dpoData }: Props) {
           </Grid>
         </Grid>
         <Grid item container spacing={3}>
-          <Grid item xs={12}>
-            <CustomTextField
-              {...baseTextFieldProps(
-                'address',
-                t('onboardingFormData.dpoDataSection.dpoAddress'),
-                600
-              )}
-              value={dpoData?.address}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <CustomTextField
-              {...baseTextFieldProps(
-                'pec',
-                t('onboardingFormData.dpoDataSection.dpoPecAddress'),
-                600
-              )}
-              value={dpoData?.pec}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <CustomTextField
-              {...baseTextFieldProps(
-                'email',
-                t('onboardingFormData.dpoDataSection.dpoEmailAddress'),
-                600
-              )}
-              value={dpoData?.email}
-            />
-          </Grid>
+          {DPO_FIELDS.map(({ field, labelKey }) => (
+            <Grid item xs={12} key={field}>
+              <CustomTextField
+                {...baseTextFieldProps(field, t(labelKey), 600)}
+                value={dpoData?.[field]}
+                disabled={isLocked(lockedData?.[field])}
+              />
+            </Grid>
+          ))}
         </Grid>
       </Paper>
     </>

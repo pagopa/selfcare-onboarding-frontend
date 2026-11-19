@@ -109,8 +109,9 @@ export default function PersonalAndBillingDataSection({
     }
   }, [institutionLocationData]);
 
+  // Premium and RTP PSP forms start from the registered data, which locks the related fields
   useEffect(() => {
-    if (controllers.isPremium) {
+    if (controllers.isPremium || controllers.isRtpPsp) {
       setAssistanceContacts({
         supportEmail: formik.values.supportEmail,
       });
@@ -127,7 +128,7 @@ export default function PersonalAndBillingDataSection({
         city: formik.values.city ?? '',
       });
     }
-  }, [controllers.isPremium]);
+  }, [controllers.isPremium, controllers.isRtpPsp]);
 
   useEffect(() => {
     if (!controllers.isPremium && (controllers.isFromIPA || controllers.isAooUo)) {
