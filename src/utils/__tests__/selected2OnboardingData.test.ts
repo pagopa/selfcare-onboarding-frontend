@@ -1,4 +1,5 @@
 import { PartyData } from '../../../types';
+import { mockedPspInstitutionsSearch } from '../../lib/__mocks__/mockApiRequests';
 import { selected2OnboardingData } from '../selected2OnboardingData';
 
 const toParty = (party: Record<string, unknown>) => party as unknown as PartyData;
@@ -105,4 +106,48 @@ it('test selected2OnboardingData maps a registry party using generic fields', ()
       institutionType: 'PRV',
     })
   );
+});
+
+const onboardedPsp = toParty({
+  ...mockedPspInstitutionsSearch.institutions?.[0],
+  onboarding: [
+    { productId: 'prod-io', billing: { vatNumber: 'IGNORED' } },
+    ...(mockedPspInstitutionsSearch.institutions?.[0].onboarding ?? []),
+  ],
+});
+
+it('test selected2OnboardingData fills the registered PSP data on RTP', () => {
+  expect(selected2OnboardingData(onboardedPsp, false, 'PSP', 'prod-rtp')).toEqual(
+    expect.objectContaining({
+      businessName: 'Antico Credito Arcorese',
+      registeredOffice: 'Via Umberto I',
+      vatNumber: '25301208621',
+      recipientCode: 'A1B2V3',
+      taxCodeInvoicing: '25301208621',
+      publicServices: false,
+      commercialRegisterNumber: '12345678910',
+      registrationInRegister: 'Albo delle banche',
+      registerNumber: '24',
+      abiCode: '25301',
+      vatNumberGroup: false,
+      address: 'Via Umberto I, 20862 Arcore (MB)',
+      pec: 'dpo.anticocreditoarcorese@pec.it',
+      email: 'dpo@anticocreditoarcorese.it',
+      rea: 'MB-1234567',
+      shareCapital: '1000000',
+      businessRegisterPlace: 'Monza e Brianza',
+      supportEmail: 'assistenza@anticocreditoarcorese.it',
+      country: 'IT',
+      geographicTaxonomies: [{ code: '108004', desc: 'ARCORE - COMUNE' }],
+    })
+  );
+});
+
+it('test selected2OnboardingData ignores the registered PSP data outside RTP', () => {
+  const data = selected2OnboardingData(onboardedPsp, false, 'PSP', 'prod-pagopa');
+
+  expect(data.vatNumber).toBe('');
+  expect(data.abiCode).toBeUndefined();
+  expect(data.address).toBeUndefined();
+  expect(data.geographicTaxonomies).toEqual([]);
 });
