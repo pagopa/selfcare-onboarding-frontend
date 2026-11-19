@@ -15,6 +15,7 @@ const controllers: OnboardingControllers = {
   isForeignInsurance: false,
   isFromIPA: false,
   isAooUo: false,
+  isRtpPsp: false,
   isCityEditable: true,
 };
 
@@ -140,6 +141,11 @@ describe('getPartyGeneralLayout', () => {
     [
       'premium',
       { isPremium: true },
+      { isCityAutocompleteDisabled: true, isCityLocked: false, showCityPopupIcon: true },
+    ],
+    [
+      'RTP PSP',
+      { isRtpPsp: true },
       { isCityAutocompleteDisabled: true, isCityLocked: false, showCityPopupIcon: true },
     ],
     [
