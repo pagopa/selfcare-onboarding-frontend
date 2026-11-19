@@ -227,7 +227,6 @@ export const fetchInstitutionByTaxCode = async (
       productId
     )) as PartyData;
 
-    console.log('RESPONSE', response);
     setCfResult(response);
 
     if (addUser || isIdpayMerchantProduct(productId)) {
