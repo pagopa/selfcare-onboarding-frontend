@@ -42,6 +42,7 @@ import DpoSection from '../onboardingFormData/DpoSection';
 import Heading from '../onboardingFormData/Heading';
 import PersonalAndBillingDataSection from '../onboardingFormData/PersonalAndBillingDataSection';
 import { VatNumberErrorModal } from '../onboardingFormData/VatNumberErrorModal';
+import RtpPspDataAlert from '../alerts/RtpPspDataAlert';
 import GeoTaxonomySection from '../onboardingFormData/components/GeoTaxonomySection';
 import UpdateGeotaxonomy from '../onboardingFormData/components/UpdateGeotaxonomy';
 import { OnboardingStepActions } from '../registrationSteps/OnboardingStepActions';
@@ -457,28 +458,18 @@ export default function StepOnboardingFormData({
     <Box display="flex" justifyContent="center">
       <Grid container item xs={8} display="flex" justifyContent="center">
         <Heading subtitle={subtitle} />
-        {(isPagoPaInsights(subProductId) || controllers.isRtpPsp) && (
+        {controllers.isRtpPsp && <RtpPspDataAlert />}
+        {isPagoPaInsights(subProductId) && (
           <Grid item xs={12} display="flex" justifyContent="center" mb={5}>
             <Alert severity="warning" variant="standard" sx={{ width: '65%' }}>
-              {controllers.isRtpPsp ? (
-                <Trans
-                  i18nKey="onboardingFormData.rtpPspDataWarning"
-                  components={{
-                    1: <Link color={'inherit'} href={ENV.URL_FE.ASSISTANCE} />,
-                  }}
-                >
-                  {`I dati del tuo ente non sono corretti o aggiornati? <1>Segnalalo all'assistenza</1> per procedere con la modifica.`}
-                </Trans>
-              ) : (
-                <Trans
-                  i18nKey="onboardingFormData.pspDashboardWarning"
-                  components={{
-                    1: <Link color={'inherit'} href={ENV.URL_FE.ASSISTANCE} />,
-                  }}
-                >
-                  {`Per aggiornare i dati presenti, contatta il servizio di <1>Assistenza</1>.`}
-                </Trans>
-              )}
+              <Trans
+                i18nKey="onboardingFormData.pspDashboardWarning"
+                components={{
+                  1: <Link color={'inherit'} href={ENV.URL_FE.ASSISTANCE} />,
+                }}
+              >
+                {`Per aggiornare i dati presenti, contatta il servizio di <1>Assistenza</1>.`}
+              </Trans>
             </Alert>
           </Grid>
         )}

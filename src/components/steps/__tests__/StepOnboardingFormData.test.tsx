@@ -179,7 +179,7 @@ test.each(['25301208621', '01234567890'])(
     expect(
       screen.getByText(/I dati del tuo ente non sono corretti o aggiornati\?/)
     ).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: "Segnalalo all'assistenza" })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: "Contatta l'assistenza" })).toHaveAttribute(
       'href',
       ENV.URL_FE.ASSISTANCE
     );
@@ -212,5 +212,5 @@ test('the support alert is not shown outside RTP', async () => {
   renderStep(partyFromIpa);
 
   await findVatNumber();
-  expect(screen.queryByRole('link', { name: "Segnalalo all'assistenza" })).not.toBeInTheDocument();
+  expect(screen.queryByRole('link', { name: "Contatta l'assistenza" })).not.toBeInTheDocument();
 });
