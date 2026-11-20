@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import { render, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { MemoryRouter } from 'react-router';
 import { beforeEach, expect, test, vi } from 'vitest';
@@ -8,6 +8,10 @@ import { OnboardingFormData } from '../../../model/OnboardingFormData';
 import { store } from '../../../redux/store';
 import { PRODUCT_IDS } from '../../../utils/constants';
 import StepOnboardingFormData, { StepBillingDataHistoryState } from '../StepOnboardingFormData';
+import { InstitutionType, PartyData } from '../../../../types';
+import { mockedPspInstitutionsSearch } from '../../../lib/__mocks__/mockApiRequests';
+import { selected2OnboardingData } from '../../../utils/selected2OnboardingData';
+import { ENV } from '../../../utils/env';
 
 vi.mock('../../../services/geoTaxonomyServices', () => ({
   getPreviousGeotaxononomies: vi.fn(),
@@ -35,7 +39,11 @@ const taxCode = '12345678901';
 
 const renderStep = (
   initialFormData: OnboardingFormData,
-  historyState?: StepBillingDataHistoryState
+  historyState?: StepBillingDataHistoryState,
+  { productId, institutionType }: { productId: string; institutionType: InstitutionType } = {
+    productId: PRODUCT_IDS.PAGOPA,
+    institutionType: 'PA',
+  }
 ) =>
   render(
     <Provider store={store}>
@@ -58,8 +66,8 @@ const renderStep = (
             ]}
           >
             <StepOnboardingFormData
-              productId={PRODUCT_IDS.PAGOPA}
-              institutionType="PA"
+              productId={productId}
+              institutionType={institutionType}
               subtitle=""
               externalInstitutionId={externalInstitutionId}
               initialFormData={initialFormData}
@@ -113,4 +121,96 @@ test('vatNumber is locked to the taxCode when the flag matches the party data', 
   const vatNumber = await findVatNumber();
   await waitFor(() => expect(vatNumber).toBeDisabled());
   expect(vatNumber).toHaveValue(taxCode);
+});
+
+const [registeredPsp] = mockedPspInstitutionsSearch.institutions ?? [];
+
+const rtpPspFormData = (vatNumber: string, overrides: Partial<typeof registeredPsp> = {}) => {
+  const party = {
+    ...registeredPsp,
+    ...overrides,
+    onboarding: registeredPsp.onboarding?.map((o) => ({
+      ...o,
+      billing: { ...o.billing, vatNumber },
+    })),
+  } as unknown as PartyData;
+  return selected2OnboardingData(party, false, 'PSP', PRODUCT_IDS.RTP);
+};
+
+const renderRtpPsp = (formData: OnboardingFormData) =>
+  renderStep(formData, undefined, { productId: PRODUCT_IDS.RTP, institutionType: 'PSP' });
+
+const findContinueButton = () => screen.getByText('Continua').closest('button');
+
+const rtpPspFields: Array<[string, string]> = [
+  ['businessName', 'Antico Credito Arcorese'],
+  ['registeredOffice', 'Via Umberto I'],
+  ['zipCode', '20862'],
+  ['digitalAddress', 'antico.credito.arcorese@test.it'],
+  ['taxCode', '25301208621'],
+  ['recipientCode', 'A1B2V3'],
+  ['commercialRegisterNumber', '12345678910'],
+  ['registrationInRegister', 'Albo delle banche'],
+  ['registerNumber', '24'],
+  ['abiCode', '25301'],
+  ['address', 'Via Umberto I, 20862 Arcore (MB)'],
+  ['pec', 'dpo.anticocreditoarcorese@pec.it'],
+  ['email', 'dpo@anticocreditoarcorese.it'],
+];
+
+test.each(['25301208621', '01234567890'])(
+  'RTP PSP form is filled with the registered data and read-only (vat number %s)',
+  async (vatNumber) => {
+    renderRtpPsp(rtpPspFormData(vatNumber));
+
+    const vatNumberInput = await findVatNumber();
+    await waitFor(() => expect(vatNumberInput).toHaveValue(vatNumber));
+    expect(vatNumberInput).toBeDisabled();
+    rtpPspFields.forEach(([id, value]) => {
+      const input = document.getElementById(id);
+      expect(input, id).toHaveValue(value);
+      expect(input, id).toBeDisabled();
+    });
+    expect(document.getElementById('vatNumberGroup')).toBeDisabled();
+    const geoRadios = document.querySelectorAll('input[name="geographicTaxonomy"]');
+    expect(geoRadios).toHaveLength(2);
+    geoRadios.forEach((radio) => expect(radio).toBeDisabled());
+    expect(screen.getByDisplayValue('Arcore (MB)')).toBeDisabled();
+    expect(
+      screen.getByText(/I dati del tuo ente non sono corretti o aggiornati\?/)
+    ).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: "Contatta l'assistenza" })).toHaveAttribute(
+      'href',
+      ENV.URL_FE.ASSISTANCE
+    );
+    await waitFor(() => expect(findContinueButton()).toBeEnabled());
+  }
+);
+
+test('RTP PSP with legacy N/A data keeps the registered values and can go on', async () => {
+  renderRtpPsp(
+    rtpPspFormData('25301208621', {
+      paymentServiceProvider: {
+        ...registeredPsp.paymentServiceProvider,
+        legalRegisterName: 'N/A',
+        legalRegisterNumber: 'N/A',
+      },
+      dataProtectionOfficer: { ...registeredPsp.dataProtectionOfficer, address: 'N/A' },
+    })
+  );
+
+  await findVatNumber();
+  ['registrationInRegister', 'registerNumber', 'address'].forEach((id) => {
+    const input = document.getElementById(id);
+    expect(input, id).toHaveValue('N/A');
+    expect(input, id).toBeDisabled();
+  });
+  await waitFor(() => expect(findContinueButton()).toBeEnabled());
+});
+
+test('the support alert is not shown outside RTP', async () => {
+  renderStep(partyFromIpa);
+
+  await findVatNumber();
+  expect(screen.queryByRole('link', { name: "Contatta l'assistenza" })).not.toBeInTheDocument();
 });

@@ -5,6 +5,8 @@ import {
   shouldUsePdndInfocamereFallback,
   shouldIncludeLegalForm,
   isMockEnvironment,
+  isPagoPaProduct,
+  isRtpProduct,
 } from './institutionTypeUtils';
 
 const getOriginId = (
@@ -55,6 +57,42 @@ const getRegisteredOffice = (party: Partial<PartyData>): string =>
 const getTaxCode = (party: Partial<PartyData>): string =>
   party.codiceFiscaleEnte ?? party.taxCode ?? party.businessTaxId ?? '';
 
+const getOnboardedBilling = (party: Partial<PartyData>) =>
+  (
+    party.onboarding?.find((onboarding) => isPagoPaProduct(onboarding.productId)) ??
+    party.onboarding?.find((onboarding) => !!onboarding.billing)
+  )?.billing;
+
+// The PSP searched on RTP is already onboarded: the form is filled with its registered data
+const getOnboardedPspData = (party: Partial<PartyData>): Partial<OnboardingFormData> => {
+  const billing = getOnboardedBilling(party);
+  const psp = party.paymentServiceProvider;
+  const dpo = party.dataProtectionOfficer;
+  return {
+    vatNumber: billing?.vatNumber ?? '',
+    recipientCode: billing?.recipientCode,
+    taxCodeInvoicing: billing?.taxCodeInvoicing,
+    publicServices: billing?.publicServices,
+    commercialRegisterNumber: psp?.businessRegisterNumber,
+    registrationInRegister: psp?.legalRegisterName,
+    registerNumber: psp?.legalRegisterNumber,
+    abiCode: psp?.abiCode,
+    vatNumberGroup: psp?.vatNumberGroup,
+    address: dpo?.address,
+    pec: dpo?.pec,
+    email: dpo?.email,
+    rea: party.rea,
+    shareCapital: party.shareCapital,
+    businessRegisterPlace: party.businessRegisterPlace,
+    supportEmail: party.supportEmail,
+    country: party.country,
+    geographicTaxonomies: (party.geographicTaxonomies ?? []).map(({ code, desc }) => ({
+      code: code ?? '',
+      desc: desc ?? '',
+    })),
+  };
+};
+
 export const selected2OnboardingData = (
   selectedParty: PartyData | null,
   isAggregator?: boolean,
@@ -88,5 +126,6 @@ export const selected2OnboardingData = (
     istatCode: party.codiceComuneISTAT ?? party.istatCode,
     registerType: party.registerType,
     institutionType: party.institutionType,
+    ...(isRtpProduct(productId) ? getOnboardedPspData(party) : {}),
   };
 };

@@ -27,6 +27,7 @@ const controllers = (overrides: Partial<OnboardingControllers> = {}): Onboarding
   isDisabled: false,
   isFromIPA: false,
   isAooUo: false,
+  isRtpPsp: false,
   ...overrides,
 });
 

@@ -17,6 +17,8 @@ export type CommercialRegisterLayoutParams = {
   institutionType: InstitutionType;
   productId?: string;
   isDisabled: boolean;
+  /** Every PSP register field is read-only, whatever its value (RTP PSP). */
+  isLocked?: boolean;
   pspData?: PaymentServiceProviderDto;
   errors: FormikErrors<OnboardingFormData>;
 };
@@ -61,6 +63,7 @@ export const getCommercialRegisterLayout = ({
   institutionType,
   productId,
   isDisabled,
+  isLocked,
   pspData,
   errors,
 }: CommercialRegisterLayoutParams): CommercialRegisterLayout => {
@@ -80,6 +83,13 @@ export const getCommercialRegisterLayout = ({
     isShareCapitalRequired: isSa || isPdnd,
     showShareCapitalHelper: isIdpayMerchantProduct(productId),
     showPspFields: isPaymentServiceProvider(institutionType),
-    pspFieldsDisabled: getPspFieldsDisabled(isDisabled, errors, pspData),
+    pspFieldsDisabled: isLocked
+      ? {
+          commercialRegisterNumber: true,
+          registrationInRegister: true,
+          registerNumber: true,
+          abiCode: true,
+        }
+      : getPspFieldsDisabled(isDisabled, errors, pspData),
   };
 };

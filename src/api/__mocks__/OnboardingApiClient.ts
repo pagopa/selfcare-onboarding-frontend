@@ -137,6 +137,9 @@ export const ApiClientMocked = {
   getInstitutionsByFilters: vi.fn((params: MockedCallOptions['params']) =>
     callViaFetchWithLogs('ONBOARDING_GET_INSTITUTIONS', { params })
   ),
+  searchInstitution: vi.fn((taxCode: string) =>
+    callViaFetchWithLogs('ONBOARDING_SEARCH_INSTITUTIONS', { params: { taxCode } })
+  ),
   searchInstitutionsIpa: vi.fn((params: MockedCallOptions['params']) =>
     callViaFetchWithLogs('ONBOARDING_GET_SEARCH_PARTIES', { params })
   ),

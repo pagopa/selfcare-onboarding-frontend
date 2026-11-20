@@ -32,6 +32,7 @@ import { UserTaxCodeDto } from './generated/onboarding/UserTaxCodeDto';
 import { VerifyAggregatesResponse } from './generated/onboarding/VerifyAggregatesResponse';
 import { IpaInstitutionResource } from './generated/onboarding/IpaInstitutionResource';
 import { ApiClientMocked } from './__mocks__/OnboardingApiClient';
+import { InstitutionsSearchResponse } from './generated/onboarding/InstitutionsSearchResponse';
 
 const withBearerAuth: WithDefaultsT<'bearerAuth'> = (wrappedOperation) => (params) => {
   const token = storageTokenOps.read();
@@ -221,6 +222,12 @@ export const OnboardingApi = {
     const result = isMockEnvironment()
       ? await ApiClientMocked.getInstitutionsByFilters(params)
       : await realApiClient.v2GetInstitutionByFilters(params);
+    return extractResponse(result, 200, onRedirectToLogin, 401, 403, undefined);
+  },
+  searchInstitution: async (taxCode: string): Promise<InstitutionsSearchResponse> => {
+    const result = isMockEnvironment()
+      ? await ApiClientMocked.searchInstitution(taxCode)
+      : await realApiClient.searchInstitutions({ taxCode });
     return extractResponse(result, 200, onRedirectToLogin, 401, 403, undefined);
   },
   verifyAggregatesCsv: async (

@@ -30,6 +30,8 @@ type Props = {
   retrievedTaxonomies: Array<GeographicTaxonomy>;
   setGeographicTaxonomies: React.Dispatch<React.SetStateAction<Array<GeographicTaxonomy>>>;
   formik: FormikProps<OnboardingFormData>;
+  /** Read-only: the registered taxonomies are shown but cannot be changed. */
+  disabled?: boolean;
 };
 
 // Search results also carry the province abbreviation shown next to municipalities.
@@ -44,6 +46,7 @@ export default function GeoTaxonomySection({
   retrievedTaxonomies,
   setGeographicTaxonomies,
   formik,
+  disabled = false,
 }: Props) {
   const { t } = useTranslation();
   const nationalArea = [{ code: nationalValue, desc: 'ITALIA' }];
@@ -314,6 +317,7 @@ export default function GeoTaxonomySection({
           <FormControlLabel
             checked={isNationalAreaVisible}
             value={'national'}
+            disabled={disabled}
             control={<Radio id={'national_geographicTaxonomies'} />}
             label={t('onboardingFormData.taxonomySection.nationalLabel')}
             onChange={() => {
@@ -328,6 +332,7 @@ export default function GeoTaxonomySection({
             id={'geographicTaxonomies'}
             checked={isLocalAreaVisible}
             value={'local'}
+            disabled={disabled}
             control={<Radio />}
             label={t('onboardingFormData.taxonomySection.localLabel')}
             onChange={() => {
@@ -348,6 +353,7 @@ export default function GeoTaxonomySection({
                   <Box display="flex" alignItems={'center'}>
                     <ButtonNaked
                       component="button"
+                      disabled={disabled}
                       onClick={() => handleRemoveClick(i)}
                       startIcon={<RemoveCircleOutlineOutlined />}
                       sx={{ color: 'error.dark', size: 'medium' }}
@@ -359,6 +365,7 @@ export default function GeoTaxonomySection({
                 <Box width="100%">
                   <Autocomplete
                     freeSolo
+                    disabled={disabled}
                     onOpen={() => setOptions([])}
                     disablePortal
                     options={input.length >= 3 ? options : []}
@@ -398,7 +405,7 @@ export default function GeoTaxonomySection({
               {optionsSelected.length - 1 === i && (
                 <Box mt={2}>
                   <ButtonNaked
-                    disabled={!isAddNewAutocompleteEnabled}
+                    disabled={disabled || !isAddNewAutocompleteEnabled}
                     component="button"
                     onClick={handleAddClick}
                     startIcon={<AddOutlined />}

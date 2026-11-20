@@ -78,6 +78,19 @@ async function fixPreGen() {
     })
   );
 
+  // Patch: gen-api-models ignores inline string enums declared as array items
+  // and types them as plain strings. Move the OnboardingProductDto.rtpServiceTypes
+  // item enum into a named RtpServiceType definition so the codegen emits
+  // RtpServiceTypeEnum, used by StepServicesChoice.
+  const rtpServiceTypes = spec.definitions.OnboardingProductDto?.properties?.rtpServiceTypes;
+  if (rtpServiceTypes?.items?.enum) {
+    spec.definitions.RtpServiceType = {
+      type: 'string',
+      enum: rtpServiceTypes.items.enum,
+    };
+    rtpServiceTypes.items = { $ref: '#/definitions/RtpServiceType' };
+  }
+
   // Patch: @pagopa/openapi-codegen-ts v14 skips HEAD operations entirely. The
   // HEAD /v1/institutions/onboarding (verifyOnboardingUsingHEAD) is the only
   // HEAD endpoint the FE uses (verifyVatNumber + verifyOnboarding). We rename

@@ -709,6 +709,11 @@ export default {
       subTitle: "Saisissez les informations requises et assurez-vous qu'elles sont correctes.<1 /> Elles serviront à vous enregistrer en tant que Partenaire technologique pour le<3 /> produit <5>{{nameProduct}}</5>."
     },
     pspDashboardWarning: "Pour mettre à jour les données présentes, contactez le service <1>d'Assistance</1>",
+    rtpPspDataAlert: {
+      description:
+        "Les données de votre organisme ne sont pas correctes ou à jour ? Signalez-le à l'assistance pour procéder à la modification.",
+      action: "Contacter l'assistance",
+    },
     billingDataSection: {
       invalidFiscalCode: 'Le Code Fiscal est invalide',
       invalidTaxCodeInvoicing: 'Le Code Fiscal saisi ne correspond pas à votre organisme',

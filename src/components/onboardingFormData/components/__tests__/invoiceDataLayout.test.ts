@@ -11,6 +11,7 @@ const controllers: OnboardingControllers = {
   isForeignInsurance: false,
   isFromIPA: false,
   isAooUo: false,
+  isRtpPsp: false,
 };
 
 const formValues = (recipientCode?: string): OnboardingFormData => ({
@@ -80,6 +81,14 @@ describe('getInvoiceLayout', () => {
 
   it('disables SDI code for premium with a valid recipient code already set', () => {
     expect(premiumWithRecipientCode().isRecipientCodeDisabled).toBe(true);
+  });
+
+  it('always disables SDI code for an RTP PSP, even when it is empty', () => {
+    const layout = layoutOf({
+      controllers: { ...controllers, isRtpPsp: true },
+      institutionType: 'PSP',
+    });
+    expect(layout.isRecipientCodeDisabled).toBe(true);
   });
 
   it('keeps SDI code enabled for premium when the recipient code has an error', () => {

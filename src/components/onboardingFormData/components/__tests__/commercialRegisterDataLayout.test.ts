@@ -105,6 +105,13 @@ describe('getCommercialRegisterLayout', () => {
   it('shows the PSP fields for PSP', () => {
     expect(layoutOf({ institutionType: 'PSP' }).showPspFields).toBe(true);
   });
+
+  it('locks every PSP field when locked, even without registry data or with errors', () => {
+    expect(
+      layoutOf({ institutionType: 'PSP', isLocked: true, errors: { abiCode: 'err' } })
+        .pspFieldsDisabled
+    ).toEqual(allDisabled);
+  });
 });
 
 describe('getPspFieldsDisabled', () => {

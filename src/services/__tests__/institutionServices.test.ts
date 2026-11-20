@@ -37,6 +37,7 @@ vi.mock('../../api/OnboardingApiClient', () => ({
     getInstitutionsByFilters: vi.fn(),
     searchInstitutionsIpa: vi.fn(),
     searchInstitutionIpaByTaxCode: vi.fn(),
+    searchInstitution: vi.fn(),
   },
 }));
 
@@ -336,6 +337,50 @@ it('test fetchInstitutionByTaxCode on 404 clears cfResult', async () => {
     'prod-1',
     'PA',
     'cat-x',
+    undefined,
+    setCfResult,
+    undefined,
+    setDisabled,
+    setRequiredLogin
+  );
+
+  expect(setCfResult).toHaveBeenCalledWith(undefined);
+});
+
+it('test fetchInstitutionByTaxCode search institutions sets the first institution as cfResult', async () => {
+  const psp = { id: 'psp1', origin: 'SELC', originId: '25301208621', taxCode: '25301208621' };
+  vi.mocked(OnboardingApi.searchInstitution).mockResolvedValue({ institutions: [psp] });
+
+  await fetchInstitutionByTaxCode(
+    false,
+    'ONBOARDING_SEARCH_INSTITUTIONS',
+    {},
+    '25301208621',
+    'prod-rtp',
+    'PSP',
+    undefined,
+    undefined,
+    setCfResult,
+    undefined,
+    setDisabled,
+    setRequiredLogin
+  );
+
+  expect(OnboardingApi.searchInstitution).toHaveBeenCalledWith('25301208621');
+  expect(setCfResult).toHaveBeenCalledWith(psp);
+});
+
+it('test fetchInstitutionByTaxCode search institutions with no match clears cfResult', async () => {
+  vi.mocked(OnboardingApi.searchInstitution).mockResolvedValue({ institutions: [] });
+
+  await fetchInstitutionByTaxCode(
+    false,
+    'ONBOARDING_SEARCH_INSTITUTIONS',
+    {},
+    '00000000000',
+    'prod-rtp',
+    'PSP',
+    undefined,
     undefined,
     setCfResult,
     undefined,

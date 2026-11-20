@@ -797,6 +797,11 @@ export default {
     },
     pspDashboardWarning:
       'Um die vorhandenen Daten zu aktualisieren, kontaktieren Sie den <1>Support</1>-Service.',
+    rtpPspDataAlert: {
+      description:
+        'Die Daten Ihrer Einrichtung sind nicht korrekt oder nicht aktuell? Melden Sie es dem Support, um die Änderung vorzunehmen.',
+      action: 'Support kontaktieren',
+    },
     billingDataSection: {
       invalidFiscalCode: 'Die Steuernummer ist ungültig',
       invalidTaxCodeInvoicing:

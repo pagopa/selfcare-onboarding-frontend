@@ -42,6 +42,7 @@ import DpoSection from '../onboardingFormData/DpoSection';
 import Heading from '../onboardingFormData/Heading';
 import PersonalAndBillingDataSection from '../onboardingFormData/PersonalAndBillingDataSection';
 import { VatNumberErrorModal } from '../onboardingFormData/VatNumberErrorModal';
+import RtpPspDataAlert from '../alerts/RtpPspDataAlert';
 import GeoTaxonomySection from '../onboardingFormData/components/GeoTaxonomySection';
 import UpdateGeotaxonomy from '../onboardingFormData/components/UpdateGeotaxonomy';
 import { OnboardingStepActions } from '../registrationSteps/OnboardingStepActions';
@@ -167,7 +168,7 @@ export default function StepOnboardingFormData({
         return;
       }
 
-      if (!controllers.isPremium) {
+      if (!controllers.isPremium && !controllers.isRtpPsp) {
         try {
           await getPreviousGeotaxononomies(
             externalInstitutionId,
@@ -281,26 +282,29 @@ export default function StepOnboardingFormData({
 
   const handleClose = () => updateGeotaxonomy({ add: false, edit: false });
 
+  // The RTP PSP form is read-only: registered data is fixed by the support service, not by the user
   const validate = (values: Partial<OnboardingFormData>) =>
-    Object.fromEntries(
-      validateFields(values, t, {
-        institutionType,
-        isVatRegistrated,
-        vatVerificationGenericError,
-        isPaymentServiceProvider: isPaymentServiceProvider(institutionType),
-        isInvoiceable: controllers.isInvoiceable,
-        uoSelected,
-        isInformationCompany: isInformationCompany(origin, institutionType, productId),
-        institutionAvoidGeotax,
-        isPremium: controllers.isPremium,
-        invalidTaxCodeInvoicing,
-        isPdndPrivate: isPdndPrivate(institutionType, productId),
-        isPrivateMerchantInstitution: isPrivateMerchantInstitution(institutionType, productId),
-        recipientCodeStatus,
-        productId,
-        subProductId,
-      })
-    );
+    controllers.isRtpPsp
+      ? {}
+      : Object.fromEntries(
+          validateFields(values, t, {
+            institutionType,
+            isVatRegistrated,
+            vatVerificationGenericError,
+            isPaymentServiceProvider: isPaymentServiceProvider(institutionType),
+            isInvoiceable: controllers.isInvoiceable,
+            uoSelected,
+            isInformationCompany: isInformationCompany(origin, institutionType, productId),
+            institutionAvoidGeotax,
+            isPremium: controllers.isPremium,
+            invalidTaxCodeInvoicing,
+            isPdndPrivate: isPdndPrivate(institutionType, productId),
+            isPrivateMerchantInstitution: isPrivateMerchantInstitution(institutionType, productId),
+            recipientCodeStatus,
+            productId,
+            subProductId,
+          })
+        );
 
   const formik = useFormik<OnboardingFormData>({
     initialValues: {
@@ -454,6 +458,7 @@ export default function StepOnboardingFormData({
     <Box display="flex" justifyContent="center">
       <Grid container item xs={8} display="flex" justifyContent="center">
         <Heading subtitle={subtitle} />
+        {controllers.isRtpPsp && <RtpPspDataAlert />}
         {isPagoPaInsights(subProductId) && (
           <Grid item xs={12} display="flex" justifyContent="center" mb={5}>
             <Alert severity="warning" variant="standard" sx={{ width: '65%' }}>
@@ -492,12 +497,17 @@ export default function StepOnboardingFormData({
                 formik.setFieldValue('geographicTaxonomies', geographicTaxonomies)
               }
               formik={formik}
+              disabled={controllers.isRtpPsp}
             />
           </Grid>
         )}
         {isPaymentServiceProvider(institutionType) && (
           <Grid item xs={12} display="flex" justifyContent={'center'}>
-            <DpoSection baseTextFieldProps={baseTextFieldProps} dpoData={formik.values} />
+            <DpoSection
+              baseTextFieldProps={baseTextFieldProps}
+              dpoData={formik.values}
+              disabled={controllers.isRtpPsp}
+            />
           </Grid>
         )}
         <Grid item xs={12} mb={2}>

@@ -4,6 +4,7 @@ import { User } from '@pagopa/selfcare-common-frontend/lib/model/User';
 import { UserRole } from '@pagopa/selfcare-common-frontend/lib/utils/constants';
 import { AxiosRequestConfig } from 'axios';
 import { FunctionComponent, SVGProps } from 'react';
+import { InstitutionDetails } from './src/api/generated/onboarding/InstitutionDetails';
 import { AooData } from './src/model/AooData';
 import { AssistanceContacts } from './src/model/AssistanceContacts';
 import { CompanyInformations } from './src/model/CompanyInformations';
@@ -176,7 +177,8 @@ export type PartyData = IPACatalogParty &
   InsuranceCompanyResource &
   ANACParty &
   PDNDBusinessResource &
-  OnboardedParty;
+  OnboardedParty &
+  OnboardedInstitutionDetails;
 
 export type SelfcareParty = {
   id: string;
@@ -213,6 +215,19 @@ export type OnboardedParty = {
   taxCode: string;
   origin: string;
 };
+
+// Data already registered for an onboarded institution, returned by the institutions search (RTP)
+export type OnboardedInstitutionDetails = Pick<
+  InstitutionDetails,
+  | 'paymentServiceProvider'
+  | 'dataProtectionOfficer'
+  | 'onboarding'
+  | 'rea'
+  | 'shareCapital'
+  | 'businessRegisterPlace'
+  | 'country'
+  | 'geographicTaxonomies'
+>;
 
 export type InstitutionData = {
   id: string;

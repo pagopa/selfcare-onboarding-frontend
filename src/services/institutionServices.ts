@@ -40,6 +40,16 @@ export type InstitutionSearchParams = {
   subunitCode?: string;
 };
 
+// addUser=false passes the tax code as endpointParams.id, addUser=true via queryParams.taxCode
+const resolveSearchTaxCode = (
+  endpointParams: Record<string, string>,
+  queryParams: InstitutionSearchParams
+): string => endpointParams.id ?? queryParams.taxCode ?? '';
+
+// The onboarded party is the first institution found for the tax code
+const searchOnboardedInstitution = (taxCode: string) =>
+  OnboardingApi.searchInstitution(taxCode).then((response) => response.institutions?.[0]);
+
 const dispatchInstitutionSearch = (
   endpoint: ApiEndpointKey,
   endpointParams: Record<string, string> | undefined,
@@ -68,9 +78,8 @@ const dispatchInstitutionSearch = (
     case 'ONBOARDING_GET_INSURANCE_COMPANIES_FROM_IVASSCODE':
       return PartyRegistryProxyApi.getInsuranceByTaxId(ep.taxId);
     case 'ONBOARDING_GET_PARTY_FROM_CF':
-      // addUser=false passes the tax code as endpointParams.id, addUser=true via queryParams.taxCode
       return OnboardingApi.searchInstitutionIpaByTaxCode(
-        ep.id ?? queryParams.taxCode ?? '',
+        resolveSearchTaxCode(ep, queryParams),
         queryParams.categories
       );
     case 'ONBOARDING_GET_PARTY_BY_CF_FROM_INFOCAMERE':
@@ -81,6 +90,8 @@ const dispatchInstitutionSearch = (
       return PartyRegistryProxyApi.getVisuraByRea(queryParams.rea ?? '', productId);
     case 'ONBOARDING_GET_INSTITUTIONS':
       return OnboardingApi.getInstitutionsByFilters(queryParams as { productId: string });
+    case 'ONBOARDING_SEARCH_INSTITUTIONS':
+      return searchOnboardedInstitution(resolveSearchTaxCode(ep, queryParams));
     default:
       return Promise.reject(new Error(`Unsupported institution search endpoint: ${endpoint}`));
   }
@@ -215,6 +226,7 @@ export const fetchInstitutionByTaxCode = async (
       updatedParams,
       productId
     )) as PartyData;
+
     setCfResult(response);
 
     if (addUser || isIdpayMerchantProduct(productId)) {

@@ -10,6 +10,7 @@ const controllers: OnboardingControllers = {
   isForeignInsurance: false,
   isFromIPA: false,
   isAooUo: false,
+  isRtpPsp: false,
 };
 
 const layoutOf = (overrides: Partial<VatNumberLayoutParams> = {}) =>
@@ -36,6 +37,7 @@ describe('getVatNumberLayout', () => {
       isVatNumberDisabled: false,
       showVatNumberGroup: false,
       isVatNumberGroupDisabled: false,
+      isPartyWithoutVatNumberDisabled: false,
     });
   });
 
@@ -90,6 +92,7 @@ describe('getVatNumberLayout', () => {
 
   it.each([
     ['premium', { controllers: { ...controllers, isPremium: true } }],
+    ['RTP PSP', { controllers: { ...controllers, isRtpPsp: true } }],
     ['tax code equals vat number', { isTaxCodeEquals2PIVA: true }],
   ])('locks and disables the vat number when %s', (_label, overrides) => {
     const layout = layoutOf(overrides);
@@ -112,5 +115,22 @@ describe('getVatNumberLayout', () => {
         },
       }).isVatNumberGroupDisabled
     ).toBe(true);
+  });
+
+  it('locks every vat number choice for an RTP PSP, even when it is not a group', () => {
+    const layout = layoutOf({
+      institutionType: 'PSP',
+      controllers: { ...controllers, isRtpPsp: true },
+      pspData: {
+        businessRegisterNumber: '12345678910',
+        legalRegisterName: 'Albo delle banche',
+        legalRegisterNumber: '24',
+        abiCode: '25301',
+        vatNumberGroup: false,
+      },
+    });
+    expect(layout.isTaxCodeEquals2PIVADisabled).toBe(true);
+    expect(layout.isPartyWithoutVatNumberDisabled).toBe(true);
+    expect(layout.isVatNumberGroupDisabled).toBe(true);
   });
 });

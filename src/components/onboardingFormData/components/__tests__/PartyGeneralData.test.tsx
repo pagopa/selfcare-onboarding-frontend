@@ -46,6 +46,7 @@ const defaultControllers: OnboardingControllers = {
   isForeignInsurance: false,
   isFromIPA: false,
   isAooUo: false,
+  isRtpPsp: false,
   isCityEditable: true,
 };
 

@@ -89,7 +89,7 @@ export const getPartyGeneralLayout = ({
     isAddressDisabled: isAddressDisabled(controllers, institutionType),
     isForeignInsuranceCompany:
       isInsuranceCompany(institutionType) && controllers.isForeignInsurance,
-    isCityAutocompleteDisabled: controllers.isPremium || isCityFromRegistry,
+    isCityAutocompleteDisabled: controllers.isPremium || controllers.isRtpPsp || isCityFromRegistry,
     isCityLocked: !controllers.isCityEditable || isCityFromRegistry,
     showCityPopupIcon: !(controllers.isFromIPA || !controllers.isCityEditable),
     isDigitalAddressDisabled: isLocked(isDigitalAddressDisabled),

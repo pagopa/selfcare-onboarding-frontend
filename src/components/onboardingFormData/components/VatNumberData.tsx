@@ -76,6 +76,7 @@ const VatNumberData = ({
                 id="party_without_vatnumber"
                 label={t('onboardingFormData.billingDataSection.partyWithoutVatNumber')}
                 containerProps={{ marginBottom: layout.partyWithoutVatNumberMarginBottom }}
+                disabled={layout.isPartyWithoutVatNumberDisabled}
                 onChange={(e) => {
                   void formik.setFieldValue('hasVatnumber', !e.target.checked);
                   setStepHistoryState({

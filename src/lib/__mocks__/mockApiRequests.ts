@@ -13,6 +13,7 @@ import {
   StationResource,
   UserOnCreate,
 } from '../../../types';
+import { InstitutionsSearchResponse } from '../../api/generated/onboarding/InstitutionsSearchResponse';
 import { BillingDataDto } from '../../model/BillingData';
 import { CountryResource } from '../../model/CountryResource';
 import { RequiredDocument } from '../../model/Documents';
@@ -1118,6 +1119,75 @@ export const mockedPspOnboardingData: Array<InstitutionOnboardingInfoResource> =
   },
 ];
 
+// Onboarded PSP returned by GET /v1/institutions/search (same institution as
+// mockedPspOnboardingData[0]), with every field a PSP onboarded on prod-pagopa carries.
+export const mockedPspInstitutionsSearch: InstitutionsSearchResponse = {
+  institutions: [
+    {
+      id: 'e8ea8aed-4c57-4f56-bc4e-7d52519a4c7a',
+      externalId: '25301208621',
+      origin: 'SELC',
+      originId: '25301208621',
+      description: 'Antico Credito Arcorese',
+      institutionType: 'PSP',
+      digitalAddress: 'antico.credito.arcorese@test.it',
+      address: 'Via Umberto I',
+      zipCode: '20862',
+      taxCode: '25301208621',
+      city: 'Arcore',
+      county: 'MB',
+      country: 'IT',
+      istatCode: '108004',
+      geographicTaxonomies: [{ code: '108004', desc: 'ARCORE - COMUNE' }],
+      attributes: [],
+      onboarding: [
+        {
+          productId: 'prod-pagopa',
+          tokenId: '3f1c2b9a-6d7e-4a8b-9c0d-1e2f3a4b5c6d',
+          status: 'ACTIVE',
+          billing: {
+            vatNumber: '25301208621',
+            recipientCode: 'A1B2V3',
+            publicServices: false,
+            taxCodeInvoicing: '25301208621',
+          },
+          createdAt: new Date('2024-03-12T09:30:00Z'),
+          updatedAt: new Date('2024-03-15T14:45:00Z'),
+          isAggregator: false,
+          institutionType: 'PSP',
+          origin: 'SELC',
+          originId: '25301208621',
+          isPartnerTech: false,
+        },
+      ],
+      paymentServiceProvider: {
+        abiCode: '25301',
+        businessRegisterNumber: '12345678910',
+        legalRegisterNumber: '24',
+        legalRegisterName: 'Albo delle banche',
+        vatNumberGroup: false,
+      },
+      dataProtectionOfficer: {
+        address: 'Via Umberto I, 20862 Arcore (MB)',
+        email: 'dpo@anticocreditoarcorese.it',
+        pec: 'dpo.anticocreditoarcorese@pec.it',
+      },
+      rea: 'MB-1234567',
+      shareCapital: '1000000',
+      businessRegisterPlace: 'Monza e Brianza',
+      supportEmail: 'assistenza@anticocreditoarcorese.it',
+      supportPhone: '0391234567',
+      imported: false,
+      createdAt: new Date('2024-03-12T09:30:00Z'),
+      updatedAt: new Date('2024-03-15T14:45:00Z'),
+      delegation: false,
+      logo: 'https://selfcare.pagopa.it/institutions/e8ea8aed-4c57-4f56-bc4e-7d52519a4c7a/logo.png',
+      isTest: false,
+      legalForm: 'Società per azioni',
+    },
+  ],
+};
+
 const mockedOnboardedParties: Array<OnboardedParty> = [
   {
     id: '1',
@@ -1847,6 +1917,12 @@ const mockHandlers: Partial<Record<ApiEndpointKey, MockHandler>> = {
     ok(mockedProducts.filter((p) => addUserFlowProducts(p.id))),
   ONBOARDING_CHECK_MANAGER: () => ok({ result: true }),
   ONBOARDING_SEARCH_USER: () => ok({ id: '71d1fc35-debf-4763-879e-19329e77ca83' }),
+  ONBOARDING_SEARCH_INSTITUTIONS: ({ params }) =>
+    ok({
+      institutions: (mockedPspInstitutionsSearch.institutions ?? []).filter(
+        (i) => i.taxCode === params.taxCode
+      ),
+    }),
   ONBOARDING_VERIFY_AGGREGATES: () =>
     ok({
       aggregates: [],

@@ -44,6 +44,7 @@ import {
   isInsuranceCompany,
   isPrivateInstitution,
   isPublicServiceCompany,
+  isRtpProduct,
 } from '../../../../utils/institutionTypeUtils';
 import AsyncAutocompleteResultsBusinessName from './components/AsyncAutocompleteResultsBusinessName';
 import AsyncAutocompleteResultsCode from './components/AsyncAutocompleteResultsCode';
@@ -149,6 +150,9 @@ const getTaxIdSearchEndpoint = (
   }
   if (isPrivateInstitution(institutionType) || isPublicServiceCompany(institutionType)) {
     return 'ONBOARDING_GET_PARTY_BY_CF_FROM_INFOCAMERE';
+  }
+  if (isRtpProduct(productId)) {
+    return 'ONBOARDING_SEARCH_INSTITUTIONS';
   }
   return 'ONBOARDING_GET_PARTY_FROM_CF';
 };
