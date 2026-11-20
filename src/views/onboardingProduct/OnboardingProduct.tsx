@@ -103,6 +103,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     filterCategoriesResponse,
     categoriesLoaded,
     onExitAction,
+    rtpServiceTypes,
   } = state;
   const { activeStep } = state;
   const navigate = useNavigate();
@@ -197,7 +198,8 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           institutionType: institutionType ?? '',
         });
       },
-      isRequiredDocumentsFlow ? enterRequiredDocumentsFlow : undefined
+      isRequiredDocumentsFlow ? enterRequiredDocumentsFlow : undefined,
+      rtpServiceTypes
     ).catch(() => {
       trackEvent('ONBOARDING_ADD_DELEGATE', {
         request_id: requestIdRef.current,
@@ -361,7 +363,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
         StepServicesChoice({
           forward: forwardFromRtp,
           back: backFromRtp,
-          initialServiceTypes: state.rtpServiceTypes,
+          initialServiceTypes: rtpServiceTypes,
         }),
     },
     contractsSummary: {

@@ -7,6 +7,7 @@ import { buildProduct, buildUser } from '../../utils/test/builders';
 import { it, expect, vi, beforeEach } from 'vitest';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
 import { OnboardingApi } from '../../api/OnboardingApiClient';
+import { RtpServiceTypeEnum } from '../../api/generated/onboarding/RtpServiceType';
 import { postOnboardingSubmit, postSubProductOnboardingSubmit } from '../onboardingSubmitServices';
 
 vi.mock('../../api/OnboardingApiClient', () => ({
@@ -38,7 +39,8 @@ const requestIdRef = { current: 'req-1' };
 
 const submitArgs = (
   onSuccess?: () => void,
-  onRequiredDocuments?: () => void
+  onRequiredDocuments?: () => void,
+  rtpServiceTypes?: Parameters<typeof postOnboardingSubmit>[19]
 ): Parameters<typeof postOnboardingSubmit> => [
   setLoading,
   'prod-1',
@@ -59,6 +61,7 @@ const submitArgs = (
   undefined,
   onSuccess,
   onRequiredDocuments,
+  rtpServiceTypes,
 ];
 
 const subProductArgs = (): Parameters<typeof postSubProductOnboardingSubmit> => [
@@ -276,5 +279,25 @@ it.each([
     const payload = vi.mocked(OnboardingApi.onboardingInstitution).mock.calls[0][0];
     expect(payload.gpuData).toEqual(gpuData);
     expect(payload.institutionLocationData?.country).toBe(country);
+  }
+);
+
+it.each([
+  ['prod-rtp', [RtpServiceTypeEnum.RTP, RtpServiceTypeEnum.REPOSITORY_CONSULTATION]],
+  ['prod-pagopa', undefined],
+])(
+  'test postOnboardingSubmit on %s sends rtpServiceTypes only for RTP',
+  async (productId, expected) => {
+    vi.mocked(OnboardingApi.onboardingInstitution).mockResolvedValue(undefined);
+    const args = submitArgs(undefined, undefined, [
+      RtpServiceTypeEnum.RTP,
+      RtpServiceTypeEnum.REPOSITORY_CONSULTATION,
+    ]);
+    args[1] = productId;
+
+    await postOnboardingSubmit(...args);
+
+    const payload = vi.mocked(OnboardingApi.onboardingInstitution).mock.calls[0][0];
+    expect(payload.rtpServiceTypes).toEqual(expected);
   }
 );
