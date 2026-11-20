@@ -30,7 +30,7 @@ export default {
         product: {
           title: 'Beitrittsvereinbarung downloaden',
           description:
-            'Um die Anmeldung abzuschließen, laden Sie die Vereinbarung herunter und lassen Sie diese vom Rechtsvertreter der Körperschaft digital in <1 /><2>p7m-Format</2> unterzeichnen.',
+            'Um die Anmeldung abzuschließen, laden Sie die bereits mit den erforderlichen Daten ausgefüllte Vereinbarung herunter und lassen Sie diese vom Rechtsvertreter digital im <2>.p7m-Format</2> unterzeichnen, ohne Daten in der Datei hinzuzufügen oder zu ändern.',
           downloadContract: 'Vereinbarung downloaden',
         },
         attachments: {

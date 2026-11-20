@@ -29,7 +29,7 @@ export default {
       download: {
         product: {
           title: 'Download the membership agreement',
-          description: "To complete the membership, download the agreement and have it digitally signed in <1 /><2>p7m format</2> by the institution's Legal Representative.",
+          description: 'To complete the membership, download the agreement, already filled in with the required data, and have it digitally signed in <2>.p7m format</2> by the Legal Representative, without adding or changing any data in the file.',
           downloadContract: 'Download the agreement'
         },
         attachments: {
