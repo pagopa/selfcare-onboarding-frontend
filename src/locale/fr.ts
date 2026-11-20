@@ -29,7 +29,7 @@ export default {
       download: {
         product: {
           title: 'Télécharger l’accord d’adhésion',
-          description: "Une fois l'accord signé, téléchargez l'accord et demandez au Représentant Légal de l'organisme de le signer numériquement en <1 /><2>format p7m</2>.",
+          description: "Pour compléter l'adhésion, téléchargez l'accord déjà rempli avec les données nécessaires et faites-le signer numériquement en <2>format .p7m</2> par le Représentant Légal, sans ajouter ni modifier les données du fichier.",
           downloadContract: 'Télécharger l’accord'
         },
         attachments: {

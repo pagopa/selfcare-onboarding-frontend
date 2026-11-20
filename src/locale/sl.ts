@@ -29,7 +29,7 @@ export default {
       download: {
         product: {
           title: 'Prenesite pogodbo o članstvu',
-          description: 'Za dokončanje naročnine prenesite pogodbo in pridobite digitalni podpis v <1 /><2>obliki p7m</2> od pravnega zastopnika organizacije.',
+          description: 'Za dokončanje naročnine prenesite pogodbo, že izpolnjeno s potrebnimi podatki, in pridobite digitalni podpis v <2>obliki .p7m</2> od pravnega zastopnika, ne da bi v datoteki dodajali ali spreminjali podatke.',
           downloadContract: 'Prenesite pogodbo'
         },
         attachments: {

@@ -29,7 +29,7 @@ export default {
       download: {
         product: {
           title: 'Scarica l’accordo di adesione',
-          description: `Per completare l’adesione, scarica l’accordo e fai apporre la firma digitale in <1 /><2>formato p7m</2> dal Legale Rappresentante dell’ente.`,
+          description: `Per completare l’adesione, scarica l’accordo già compilato con i dati necessari e fai apporre la firma digitale <2>formato .p7m</2> dal Legale Rappresentante, senza aggiungere o modificare i dati nel file.`,
           downloadContract: 'Scarica l’accordo',
         },
         attachments: {
