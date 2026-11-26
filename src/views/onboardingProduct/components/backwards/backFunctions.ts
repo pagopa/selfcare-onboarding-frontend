@@ -12,7 +12,6 @@ import {
   backFromBillingData as backFromBillingDataTransition,
   backFromContractsSummary as backFromContractsSummaryTransition,
   backFromManager as backFromManagerTransition,
-  backFromRtp as backFromRtpTransition,
   backFromSearchParty as backFromSearchPartyTransition,
   Transition,
 } from '../../state/onboardingTransitions';
@@ -73,8 +72,6 @@ export const createBackFunctions = ({ state, dispatch, ctx, effects }: BackFunct
 
   const backFromContractsSummary = () => run(backFromContractsSummaryTransition());
 
-  const backFromRtp = () => run(backFromRtpTransition());
-
   const backFromBillingData = () =>
     run(
       backFromBillingDataTransition({
@@ -108,7 +105,6 @@ export const createBackFunctions = ({ state, dispatch, ctx, effects }: BackFunct
     handleOpenExitModal,
     backFromSearchParty,
     backFromContractsSummary,
-    backFromRtp,
     backFromBillingData,
     backFromAdditionalGpuInfo,
     backFromAdditionalInfo,

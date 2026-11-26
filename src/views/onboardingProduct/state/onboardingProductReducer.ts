@@ -6,7 +6,6 @@ import { AggregateInstitution } from '../../../model/AggregateInstitution';
 import { FilterCategoriesResponse } from '../../../model/FilterCategoriesResponse';
 import { OnboardingFormData, UserRequester } from '../../../model/OnboardingFormData';
 import { selected2OnboardingData } from '../../../utils/selected2OnboardingData';
-import { RtpServiceTypes } from '../../../components/steps/StepServicesChoice';
 import { OnboardingStepName } from './onboardingSteps';
 import {
   afterAdditionalGpuInfo,
@@ -19,7 +18,6 @@ import {
   afterManager,
   afterOnboardingData,
   afterPartySelection,
-  afterRtpServices,
   backFromUploadDocuments,
   goTo,
   isGspWithoutIpa,
@@ -52,7 +50,6 @@ export type OnboardingProductState = {
   additionalInformations?: AdditionalInformations;
   additionalGPUInformations?: AdditionalGpuInformations;
   aggregatesData?: Array<AggregateInstitution>;
-  rtpServiceTypes?: RtpServiceTypes;
   filterCategoriesResponse?: FilterCategoriesResponse;
   categoriesLoaded: boolean;
   openExitModal: boolean;
@@ -101,9 +98,7 @@ export type OnboardingProductAction =
       party: OnboardingFormData;
       institutionType?: InstitutionType;
       gspNoIpaEnabled: boolean;
-      productId?: string;
     }
-  | { type: 'RTP_SERVICES_SELECTED'; rtpServiceTypes: RtpServiceTypes }
   | { type: 'GSP_NO_IPA_SELECTED'; from: OnboardingStepName }
   | {
       type: 'ONBOARDING_DATA_LOADED';
@@ -194,8 +189,7 @@ const selectParty = (
   state: OnboardingProductState,
   party: OnboardingFormData,
   institutionType: InstitutionType | undefined,
-  gspNoIpaEnabled: boolean,
-  productId?: string
+  gspNoIpaEnabled: boolean
 ): OnboardingProductState => {
   if (isGspWithoutIpa(party, institutionType)) {
     return gspNoIpaEnabled
@@ -208,7 +202,6 @@ const selectParty = (
   const transition = afterPartySelection(party, institutionType, {
     gspNoIpaEnabled,
     hasFormData: !!state.formData,
-    productId,
   });
 
   return applyTransition(
@@ -315,18 +308,7 @@ export const onboardingProductReducer = (
     case 'INSTITUTION_TYPE_SELECTED':
       return selectInstitutionType(state, action.institutionType, action.productId);
     case 'PARTY_SELECTED':
-      return selectParty(
-        state,
-        action.party,
-        action.institutionType,
-        action.gspNoIpaEnabled,
-        action.productId
-      );
-    case 'RTP_SERVICES_SELECTED':
-      return applyTransition(
-        { ...state, rtpServiceTypes: action.rtpServiceTypes },
-        afterRtpServices()
-      );
+      return selectParty(state, action.party, action.institutionType, action.gspNoIpaEnabled);
     case 'GSP_NO_IPA_SELECTED':
       return selectGspNoIpa(state, action.from);
     case 'ONBOARDING_DATA_LOADED':

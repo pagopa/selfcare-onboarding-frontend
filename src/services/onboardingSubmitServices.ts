@@ -11,6 +11,7 @@ import {
 } from '../../types';
 import { OnboardingApi } from '../api/OnboardingApiClient';
 import { OnboardingProductDto } from '../api/generated/onboarding/OnboardingProductDto';
+import { RtpServiceTypeEnum } from '../api/generated/onboarding/RtpServiceType';
 import { getErrorStatus, HttpError } from '../lib/error-utils';
 import { AdditionalGpuInformations } from '../model/AdditionalGpuInformations';
 import { AdditionalInformations } from '../model/AdditionalInformations';
@@ -167,7 +168,6 @@ type OnboardingSubmitPayloadParams = {
   users: Array<UserOnCreate>;
   loggedUser: User | null;
   aggregates?: Array<AggregateInstitution>;
-  rtpServiceTypes?: OnboardingProductDto['rtpServiceTypes'];
 };
 
 const buildOnboardingSubmitPayload = ({
@@ -182,7 +182,6 @@ const buildOnboardingSubmitPayload = ({
   users,
   loggedUser,
   aggregates,
-  rtpServiceTypes,
 }: OnboardingSubmitPayloadParams): OnboardingLegalsPayload => ({
   billingData: billingData2billingDataRequest(onboardingFormData as OnboardingFormData),
   additionalInformations: buildGspAdditionalInformations(
@@ -220,7 +219,7 @@ const buildOnboardingSubmitPayload = ({
   isAggregator: onboardingFormData?.isAggregator || undefined,
   aggregates,
   userRequester: buildUserRequester(onboardingFormData, users, loggedUser),
-  rtpServiceTypes: isRtpProduct(productId) ? rtpServiceTypes : undefined,
+  rtpServiceTypes: isRtpProduct(productId) ? [RtpServiceTypeEnum.RTP] : undefined,
 });
 
 // Prima funzione con logica specifica per onboarding standard
@@ -245,8 +244,7 @@ export const postOnboardingSubmit = async (
   onSuccess?: () => void,
   // GSP non-IPA: when provided, on success drives the in-flow document upload instead of the
   // standard "check your email" outcome (the onboarding is created in REQUESTING first).
-  onRequiredDocuments?: () => void,
-  rtpServiceTypes?: OnboardingProductDto['rtpServiceTypes']
+  onRequiredDocuments?: () => void
 ) => {
   setLoading(true);
   const { outcome, status } = await postOnboardingLegals(
@@ -262,7 +260,6 @@ export const postOnboardingSubmit = async (
       users,
       loggedUser,
       aggregates,
-      rtpServiceTypes,
     })
   );
 

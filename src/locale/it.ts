@@ -746,17 +746,6 @@ export default {
       'Non riusciamo a trovare la pagina che stai cercando. <1 />Assicurati che l’indirizzo sia corretto o torna alla home.',
     backButton: 'Torna alla home',
   },
-  stepServicesChoice: {
-    title: 'Seleziona il tipo di servizio',
-    subtitle:
-      'Scegli il servizio a cui vuoi aderire come <1>Service Provider del Debitore</1>. Se desideri aderire anche con la funzione Technical Solution Provider devi mandare una PEC per fare richiesta.',
-    services: {
-      rtp: 'Servizio Request to Pay (RTP)',
-      repository: 'Servizio di Gestione e Consultazione del Repository',
-    },
-    backLabel: 'Indietro',
-    confirmLabel: 'Continua',
-  },
   stepInstitutionType: {
     title: 'Seleziona il tipo di ente che <1/> rappresenti',
     subtitle: 'Indica il tipo di ente che aderirà a <1>{{productName}}</1>',

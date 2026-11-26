@@ -128,23 +128,18 @@ export const afterPartySelection = (
   {
     gspNoIpaEnabled,
     hasFormData,
-    productId,
   }: Pick<TransitionContext, 'gspNoIpaEnabled'> & {
     hasFormData: boolean;
-    productId?: string;
   }
 ): Transition => {
   if (isGspWithoutIpa(party, selectedInstitutionType)) {
     return gspNoIpaEnabled ? goTo('contractsSummary') : afterGspNoIpa('searchParty');
   }
   if ((party?.externalId && selectedInstitutionType) || hasFormData) {
-    return isRtpProduct(productId) ? goTo('rtp') : goTo('verifyOnboarding');
+    return goTo('verifyOnboarding');
   }
   return stay();
 };
-
-/** On RTP the chosen services are asked right after the party selection. */
-export const afterRtpServices = (): Transition => goTo('verifyOnboarding');
 
 export const afterVerifyOnboarding = (): Transition => goTo('onboardingData');
 
@@ -206,8 +201,6 @@ export const backFromSearchParty = (productAvoidStep = false): Transition =>
 
 export const backFromContractsSummary = (): Transition => goTo('searchParty');
 
-export const backFromRtp = (): Transition => goTo('searchParty');
-
 const hasPartySearch = (institutionType: InstitutionType | undefined): boolean =>
   isPublicAdministration(institutionType) ||
   isContractingAuthority(institutionType) ||
@@ -248,9 +241,6 @@ export const backFromBillingData = ({
   if (fromDashboard && isPagoPaInsights(productId)) {
     // Shadowed by the two fromDashboard branches above: kept to mirror backFunctions 1:1.
     return redirect(`${ENV.URL_FE.DASHBOARD}/${externalInstitutionId}`);
-  }
-  if (isRtpProduct(productId)) {
-    return goTo('rtp');
   }
   return isRequiredDocumentsFlow ? goTo('contractsSummary') : goTo('searchParty');
 };

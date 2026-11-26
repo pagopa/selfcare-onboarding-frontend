@@ -39,8 +39,7 @@ const requestIdRef = { current: 'req-1' };
 
 const submitArgs = (
   onSuccess?: () => void,
-  onRequiredDocuments?: () => void,
-  rtpServiceTypes?: Parameters<typeof postOnboardingSubmit>[19]
+  onRequiredDocuments?: () => void
 ): Parameters<typeof postOnboardingSubmit> => [
   setLoading,
   'prod-1',
@@ -61,7 +60,6 @@ const submitArgs = (
   undefined,
   onSuccess,
   onRequiredDocuments,
-  rtpServiceTypes,
 ];
 
 const subProductArgs = (): Parameters<typeof postSubProductOnboardingSubmit> => [
@@ -283,16 +281,13 @@ it.each([
 );
 
 it.each([
-  ['prod-rtp', [RtpServiceTypeEnum.RTP, RtpServiceTypeEnum.REPOSITORY_CONSULTATION]],
+  ['prod-rtp', [RtpServiceTypeEnum.RTP]],
   ['prod-pagopa', undefined],
 ])(
-  'test postOnboardingSubmit on %s sends rtpServiceTypes only for RTP',
+  'test postOnboardingSubmit on %s sends the default rtpServiceTypes only for RTP',
   async (productId, expected) => {
     vi.mocked(OnboardingApi.onboardingInstitution).mockResolvedValue(undefined);
-    const args = submitArgs(undefined, undefined, [
-      RtpServiceTypeEnum.RTP,
-      RtpServiceTypeEnum.REPOSITORY_CONSULTATION,
-    ]);
+    const args = submitArgs();
     args[1] = productId;
 
     await postOnboardingSubmit(...args);
