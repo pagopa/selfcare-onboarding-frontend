@@ -13,7 +13,7 @@ vi.mock('axios');
 
 setupTestHooks();
 
-const BILLING_TITLE = 'Inserisci i dati dell’ente';
+const BILLING_TITLE = 'Dati dell’ente';
 const RTP_PSP_TAX_CODE = '25301208621';
 
 const clickContinue = async () => {

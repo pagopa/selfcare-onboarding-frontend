@@ -614,7 +614,8 @@ export default {
       closeButton: 'Close'
     },
     billingData: {
-      subTitle: 'Confirm, modify or enter the required data, making sure they are correct.<1 /> They will also be used to request membership to other products and in case of invoicing.'
+      subTitle: 'Confirm, modify or enter the required data, making sure they are correct.<1 />       They will also be used to request membership to other products and in case of invoicing.',
+            rtpSubtitle: 'Check and confirm the existing institution data, making sure they are correct'
     },
     exitModal: {
       title: 'Do you really want to exit?',
@@ -689,6 +690,7 @@ export default {
   },
   onboardingFormData: {
     title: 'Enter the institution data',
+    rtpTitle: 'Institution data',
     pspAndProdPagoPATitle: 'Enter the data',
     backLabel: 'Back',
     confirmLabel: 'Continue',

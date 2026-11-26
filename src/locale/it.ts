@@ -729,6 +729,7 @@ export default {
     },
     billingData: {
       subTitle: `Conferma, modifica o inserisci i dati richiesti, assicurandoti che siano corretti.<1 /> Verranno usati anche per richiedere l’adesione ad altri prodotti e in caso di fatturazione.`,
+      rtpSubtitle: 'Controlla e conferma i dati dell’ente presenti, assicurandoti che siano corretti',
     },
     exitModal: {
       title: 'Vuoi davvero uscire?',
@@ -805,6 +806,7 @@ export default {
   },
   onboardingFormData: {
     title: 'Inserisci i dati dell’ente',
+    rtpTitle: 'Dati dell’ente',
     pspAndProdPagoPATitle: 'Inserisci i dati',
     backLabel: 'Indietro',
     confirmLabel: 'Continua',

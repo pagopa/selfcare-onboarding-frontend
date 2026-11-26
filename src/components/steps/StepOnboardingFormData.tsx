@@ -38,13 +38,13 @@ import {
   isPublicAdministration,
 } from '../../utils/institutionTypeUtils';
 import { validateFields } from '../../utils/validateFields';
+import RtpPspDataAlert from '../alerts/RtpPspDataAlert';
+import GeoTaxonomySection from '../onboardingFormData/components/GeoTaxonomySection';
+import UpdateGeotaxonomy from '../onboardingFormData/components/UpdateGeotaxonomy';
 import DpoSection from '../onboardingFormData/DpoSection';
 import Heading from '../onboardingFormData/Heading';
 import PersonalAndBillingDataSection from '../onboardingFormData/PersonalAndBillingDataSection';
 import { VatNumberErrorModal } from '../onboardingFormData/VatNumberErrorModal';
-import RtpPspDataAlert from '../alerts/RtpPspDataAlert';
-import GeoTaxonomySection from '../onboardingFormData/components/GeoTaxonomySection';
-import UpdateGeotaxonomy from '../onboardingFormData/components/UpdateGeotaxonomy';
 import { OnboardingStepActions } from '../registrationSteps/OnboardingStepActions';
 import { MessageNoAction } from '../shared/MessageNoAction';
 
@@ -70,7 +70,6 @@ type Props = StepperStepComponentProps & {
   forward: (formData: OnboardingFormData) => void;
   initialFormData: OnboardingFormData;
   institutionType: InstitutionType;
-  subtitle: string | JSX.Element;
   externalInstitutionId: string;
   origin?: string;
   originId?: string;
@@ -89,7 +88,6 @@ export default function StepOnboardingFormData({
   initialFormData,
   back,
   forward,
-  subtitle,
   institutionType,
   externalInstitutionId,
   origin,
@@ -97,6 +95,7 @@ export default function StepOnboardingFormData({
   outcome,
   productId,
   subProductId,
+  selectedProduct,
   aooSelected,
   uoSelected,
   onboardingFormData,
@@ -457,7 +456,7 @@ export default function StepOnboardingFormData({
   ) : (
     <Box display="flex" justifyContent="center">
       <Grid container item xs={8} display="flex" justifyContent="center">
-        <Heading subtitle={subtitle} />
+        <Heading institutionType={institutionType} selectedProduct={selectedProduct} />
         {controllers.isRtpPsp && <RtpPspDataAlert />}
         {isPagoPaInsights(subProductId) && (
           <Grid item xs={12} display="flex" justifyContent="center" mb={5}>
