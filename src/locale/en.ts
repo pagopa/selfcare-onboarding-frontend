@@ -631,17 +631,6 @@ export default {
     description: 'We cannot find the page you are looking for. <1 />Make sure the address is correct or go back to home.',
     backButton: 'Back to home'
   },
-  stepServicesChoice: {
-    title: 'Select the type of service',
-    subtitle:
-      'Choose the service you want to join as <1>Debtor Service Provider</1>. If you also want to join with the Technical Solution Provider function, you must send a PEC to apply.',
-    services: {
-      rtp: 'Request to Pay (RTP) service',
-      repository: 'Repository Management and Consultation service',
-    },
-    backLabel: 'Back',
-    confirmLabel: 'Continue',
-  },
   stepInstitutionType: {
     title: 'Select the type of institution you <1/> represent',
     subtitle: 'Indicate the type of institution that will join <1>{{productName}}</1>',
