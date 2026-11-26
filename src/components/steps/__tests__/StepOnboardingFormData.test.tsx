@@ -179,10 +179,9 @@ test.each(['25301208621', '01234567890'])(
     expect(
       screen.getByText(/I dati del tuo ente non sono corretti o aggiornati\?/)
     ).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: "Contatta l'assistenza" })).toHaveAttribute(
-      'href',
-      ENV.URL_FE.ASSISTANCE
-    );
+    const assistanceLink = screen.getByRole('link', { name: "Contatta l'assistenza" });
+    expect(assistanceLink).toHaveAttribute('href', ENV.URL_FE.ASSISTANCE);
+    expect(assistanceLink).toHaveAttribute('target', '_blank');
     await waitFor(() => expect(findContinueButton()).toBeEnabled());
   }
 );
