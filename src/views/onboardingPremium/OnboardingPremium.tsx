@@ -3,7 +3,7 @@ import SessionModal from '@pagopa/selfcare-common-frontend/lib/components/Sessio
 import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
 import { uniqueId } from 'lodash';
 import { useContext, useEffect, useMemo, useRef, useState } from 'react';
-import { Trans, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router';
 import {
   DataProtectionOfficerDto,
@@ -236,11 +236,6 @@ function OnboardingPremiumComponent() {
           institutionType: institutionType as InstitutionType,
           origin,
           originId,
-          subtitle: (
-            <Trans i18nKey="onboardingSubProduct.billingData.subTitle" components={{ 1: <br /> }}>
-              {`Conferma, modifica o inserisci i dati richiesti, assicurandoti che siano corretti. <1 />Verranno usati anche per richiedere l’adesione ad altri prodotti e in caso di fatturazione.`}
-            </Trans>
-          ),
           forward: forwardWithBillingData,
           back: () => {
             if (window.location.search.indexOf(`partyExternalId=${externalInstitutionId}`) > -1) {

@@ -68,7 +68,7 @@ const renderStep = (
             <StepOnboardingFormData
               productId={productId}
               institutionType={institutionType}
-              subtitle=""
+              selectedProduct={{ id: productId, title: productId, status: 'ACTIVE' }}
               externalInstitutionId={externalInstitutionId}
               initialFormData={initialFormData}
               onboardingFormData={initialFormData}
@@ -207,9 +207,22 @@ test('RTP PSP with legacy N/A data keeps the registered values and can go on', a
   await waitFor(() => expect(findContinueButton()).toBeEnabled());
 });
 
-test('the support alert is not shown outside RTP', async () => {
+test('outside RTP the default heading is shown and the support alert is not', async () => {
   renderStep(partyFromIpa);
 
   await findVatNumber();
   expect(screen.queryByRole('link', { name: "Contatta l'assistenza" })).not.toBeInTheDocument();
+  expect(screen.getByRole('heading', { name: 'Inserisci i dati dell’ente' })).toBeInTheDocument();
+  expect(screen.getByText(/Conferma, modifica o inserisci i dati richiesti/)).toBeInTheDocument();
+});
+
+test('RTP shows the dedicated title and subtitle', async () => {
+  renderRtpPsp(rtpPspFormData('25301208621'));
+
+  await findVatNumber();
+  expect(screen.getByRole('heading', { name: 'Dati dell’ente' })).toBeInTheDocument();
+  expect(
+    screen.getByText('Controlla e conferma i dati dell’ente presenti, assicurandoti che siano corretti')
+  ).toBeInTheDocument();
+  expect(screen.queryByText('Inserisci i dati dell’ente')).not.toBeInTheDocument();
 });

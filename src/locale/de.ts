@@ -659,6 +659,10 @@ export default {
         'Die von Ihnen gewählte Körperschaft hat das <1 /><strong>Premium</strong>-Angebot bereits abonniert.',
       closeButton: 'Beenden',
     },
+    billingData: {
+      rtpSubtitle:
+        'Überprüfen und bestätigen Sie die vorhandenen Daten der Körperschaft und stellen Sie sicher, dass sie korrekt sind',
+    },
   },
   subProductStepUserUnrelated: {
     title: 'Du kannst {{selectedProduct}} Premium nicht beitreten',
@@ -775,6 +779,7 @@ export default {
   },
   onboardingFormData: {
     title: 'Gib die Daten der Körperschaft ein',
+    rtpTitle: 'Daten der Körperschaft',
     pspAndProdPagoPATitle: 'Daten eingeben',
     backLabel: 'Zurück',
     confirmLabel: 'Weiter',

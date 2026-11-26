@@ -614,7 +614,8 @@ export default {
       closeButton: 'Fermer'
     },
     billingData: {
-      subTitle: "Confirmez, modifiez ou saisissez les données requises, en vous assurant qu'elles sont correctes.<1 /> Elles seront également utilisées pour demander l'adhésion à d'autres produits et en cas de facturation."
+      subTitle: "Confirmez, modifiez ou saisissez les données requises, en vous assurant qu'elles sont correctes.<1 />       Elles seront également utilisées pour demander l'adhésion à d'autres produits et en cas de facturation.",
+            rtpSubtitle: "Vérifiez et confirmez les données de l’organisme, en vous assurant qu'elles sont correctes"
     },
     exitModal: {
       title: 'Voulez-vous vraiment sortir ?',
@@ -689,6 +690,7 @@ export default {
   },
   onboardingFormData: {
     title: 'Saisir les données de l’organisme',
+    rtpTitle: 'Données de l’organisme',
     pspAndProdPagoPATitle: 'Saisissez vos données',
     backLabel: 'Retour',
     confirmLabel: 'Continuer',

@@ -614,7 +614,8 @@ export default {
       closeButton: 'Zapri'
     },
     billingData: {
-      subTitle: 'Potrdite, spremenite ali vnesite zahtevane podatke in se prepričajte, da so pravilni. <1 /> Uporabljeni bodo tudi za zahtevo za članstvo pri drugih produktih in za namene obračunavanja.'
+      subTitle: 'Potrdite, spremenite ali vnesite zahtevane podatke in se prepričajte, da so pravilni. <1 />       Uporabljeni bodo tudi za zahtevo za članstvo pri drugih produktih in za namene obračunavanja.',
+            rtpSubtitle: 'Preverite in potrdite obstoječe podatke o organizaciji ter se prepričajte, da so pravilni'
     },
     exitModal: {
       title: 'Ali se res želite odjaviti?',
@@ -689,6 +690,7 @@ export default {
   },
   onboardingFormData: {
     title: 'Vnesite podatke o organizaciji',
+    rtpTitle: 'Podatki o organizaciji',
     pspAndProdPagoPATitle: 'Vnesite podatke',
     backLabel: 'Nazaj',
     confirmLabel: 'Nadaljuj',
