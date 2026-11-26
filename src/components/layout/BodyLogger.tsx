@@ -3,12 +3,13 @@ import { Footer, Header } from '@pagopa/selfcare-common-frontend/lib';
 import i18n from '@pagopa/selfcare-common-frontend/lib/locale/locale-utils';
 import { trackEvent } from '@pagopa/selfcare-common-frontend/lib/services/analyticsService';
 import { useContext, useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router';
+import { matchPath, useLocation, useNavigate } from 'react-router';
 import { logAction } from '../../lib/action-log';
 import { PRODUCT_IDS, ROUTES } from '../../utils/constants';
 import { ENV } from '../../utils/env';
 import { HeaderContext, UserContext } from './../../lib/context';
 import { Main } from './Main';
+import RtpHeader from './RtpHeader';
 
 export function BodyLogger() {
   const { user } = useContext(UserContext);
@@ -27,7 +28,7 @@ export function BodyLogger() {
           PRODUCT_IDS.IO_PREMIUM
         )
       );
-    } else if(location.pathname === '/onboarding/prod-dashboard-psp') {
+    } else if (location.pathname === '/onboarding/prod-dashboard-psp') {
       void navigate(
         ROUTES.ONBOARDING_PREMIUM.PATH.replace(':productId', PRODUCT_IDS.PAGOPA).replace(
           ':subProductId',
@@ -52,6 +53,33 @@ export function BodyLogger() {
     logAction('Route change', location);
   }, [location]);
 
+  const isRtpRoute =
+    matchPath({ path: ROUTES.ONBOARDING_PRODUCT.PATH, end: false }, location.pathname)?.params
+      .productId === PRODUCT_IDS.RTP;
+
+  const headerProps = {
+    onExit,
+    enableAssistanceButton: ENV.ENV !== 'UAT',
+    assistanceEmail: ENV.ASSISTANCE.ENABLE ? ENV.ASSISTANCE.EMAIL : undefined,
+    onDocumentationClick: showDocBtn
+      ? () => {
+          trackEvent('OPEN_OPERATIVE_MANUAL', {
+            from: 'onboarding',
+          });
+          window.open(ENV.URL_DOCUMENTATION, '_blank');
+        }
+      : undefined,
+    enableLogin,
+    loggedUser: user
+      ? {
+          id: user.uid,
+          name: user.name,
+          surname: user.surname,
+          email: user.email,
+        }
+      : (false as const),
+  };
+
   return (
     <Box
       sx={{
@@ -71,33 +99,11 @@ export function BodyLogger() {
           setEnableLogin,
         }}
       >
-        <Header
-          withSecondHeader={subHeaderVisible}
-          onExit={onExit}
-          enableAssistanceButton={ENV.ENV !== 'UAT'}
-          assistanceEmail={ENV.ASSISTANCE.ENABLE ? ENV.ASSISTANCE.EMAIL : undefined}
-          onDocumentationClick={
-            showDocBtn
-              ? () => {
-                  trackEvent('OPEN_OPERATIVE_MANUAL', {
-                    from: 'onboarding',
-                  });
-                  window.open(ENV.URL_DOCUMENTATION, '_blank');
-                }
-              : undefined
-          }
-          enableLogin={enableLogin}
-          loggedUser={
-            user
-              ? {
-                  id: user ? user.uid : '',
-                  name: user?.name,
-                  surname: user?.surname,
-                  email: user?.email,
-                }
-              : false
-          }
-        />
+        {isRtpRoute ? (
+          <RtpHeader {...headerProps} />
+        ) : (
+          <Header withSecondHeader={subHeaderVisible} {...headerProps} />
+        )}
         <Main />
         <Box>
           <Footer loggedUser={!!user} onExit={onExit} />
