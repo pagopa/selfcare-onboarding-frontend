@@ -13,7 +13,6 @@ import {
   afterManager,
   afterOnboardingData,
   afterPartySelection,
-  afterRtpServices,
   afterVerifyOnboarding,
   backFromAdditionalGpuInfo,
   backFromAdditionalInfo,
@@ -23,7 +22,6 @@ import {
   backFromBillingData,
   backFromInstitutionType,
   backFromManager,
-  backFromRtp,
   backFromSearchParty,
   backFromUploadDocuments,
   goTo,
@@ -53,7 +51,6 @@ describe('onboardingSteps', () => {
     expect(ONBOARDING_STEPS).toEqual([
       'institutionType',
       'searchParty',
-      'rtp',
       'contractsSummary',
       'verifyOnboarding',
       'onboardingData',
@@ -143,21 +140,6 @@ describe('forward transitions', () => {
       expect(afterPartySelection(party, institutionType, { gspNoIpaEnabled, hasFormData })).toEqual(
         expected
       );
-    });
-
-    test('on RTP a party selection moves to the services choice', () => {
-      expect(
-        afterPartySelection(ipaParty, 'PSP', {
-          gspNoIpaEnabled: false,
-          hasFormData: false,
-          productId: 'prod-rtp',
-        })
-      ).toEqual(goTo('rtp'));
-    });
-
-    test('the services choice moves to the onboarding verification and back to the search', () => {
-      expect(afterRtpServices()).toEqual(goTo('verifyOnboarding'));
-      expect(backFromRtp()).toEqual(goTo('searchParty'));
     });
 
     test('a party selection skips the contracts summary', () => {
@@ -329,7 +311,7 @@ describe('back transitions', () => {
         goTo('institutionType'),
       ],
       ['no institution type', { institutionType: undefined }, goTo('institutionType')],
-      ['PSP on RTP', { institutionType: 'PSP', productId: 'prod-rtp' }, goTo('rtp')],
+      ['PSP on RTP', { institutionType: 'PSP', productId: 'prod-rtp' }, goTo('searchParty')],
     ])('%s', (_label, overrides, expected) => {
       expect(backFromBillingData({ ...base, ...overrides })).toEqual(expected);
     });

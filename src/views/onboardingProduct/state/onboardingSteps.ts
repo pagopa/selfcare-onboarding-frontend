@@ -5,7 +5,6 @@
 export const ONBOARDING_STEPS = [
   'institutionType',
   'searchParty',
-  'rtp',
   'contractsSummary',
   'verifyOnboarding',
   'onboardingData',

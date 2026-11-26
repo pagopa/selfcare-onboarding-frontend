@@ -17,7 +17,6 @@ import StepInstitutionType from '../../components/steps/StepInstitutionType';
 import StepOnboardingData from '../../components/steps/StepOnboardingData';
 import StepOnboardingFormData from '../../components/steps/StepOnboardingFormData';
 import { StepSearchParty } from '../../components/steps/StepSearchParty';
-import StepServicesChoice from '../../components/steps/StepServicesChoice';
 import { withLogin } from '../../components/withLogin';
 import { useReplaceHistoryState } from '../../hooks/useHistoryState';
 import { HeaderContext, UserContext } from '../../lib/context';
@@ -103,7 +102,6 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     filterCategoriesResponse,
     categoriesLoaded,
     onExitAction,
-    rtpServiceTypes,
   } = state;
   const { activeStep } = state;
   const navigate = useNavigate();
@@ -198,8 +196,7 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           institutionType: institutionType ?? '',
         });
       },
-      isRequiredDocumentsFlow ? enterRequiredDocumentsFlow : undefined,
-      rtpServiceTypes
+      isRequiredDocumentsFlow ? enterRequiredDocumentsFlow : undefined
     ).catch(() => {
       trackEvent('ONBOARDING_ADD_DELEGATE', {
         request_id: requestIdRef.current,
@@ -214,7 +211,6 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     forwardGspNoIpa,
     forwardWithDataAndInstitution,
     forwardFromVerifyOnboarding,
-    forwardFromRtp,
     forwardWithBillingData,
     forwardWithAdditionalGSPInfo,
     forwardWithAdditionalGPUInfo,
@@ -234,7 +230,6 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
     handleOpenExitModal,
     backFromSearchParty,
     backFromContractsSummary,
-    backFromRtp,
     backFromBillingData,
     backFromAdditionalGpuInfo,
     backFromAdditionalInfo,
@@ -355,15 +350,6 @@ function OnboardingProductComponent({ productId }: { productId: string }) {
           setInstitutionType,
           forward: forwardWithDataAndInstitution,
           addUser,
-        }),
-    },
-    rtp: {
-      label: 'RTP',
-      Component: () =>
-        StepServicesChoice({
-          forward: forwardFromRtp,
-          back: backFromRtp,
-          initialServiceTypes: rtpServiceTypes,
         }),
     },
     contractsSummary: {
