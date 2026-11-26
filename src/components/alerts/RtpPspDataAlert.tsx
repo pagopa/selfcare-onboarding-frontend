@@ -15,6 +15,8 @@ const RtpPspDataAlert = () => {
           <ButtonNaked
             component="a"
             href={ENV.URL_FE.ASSISTANCE}
+            target="_blank"
+            rel="noopener noreferrer"
             color="blueItaly"
             sx={{ fontWeight: 'fontWeightBold', whiteSpace: 'nowrap', mx: 1 }}
           >
